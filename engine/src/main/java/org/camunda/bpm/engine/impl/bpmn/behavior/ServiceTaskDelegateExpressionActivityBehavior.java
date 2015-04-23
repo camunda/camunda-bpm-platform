@@ -55,42 +55,43 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
   @Override
   public void signal(final ActivityExecution execution, final String signalName, final Object signalData) throws Exception {
     ProcessApplicationReference targetProcessApplication = ProcessApplicationContextUtil.getTargetProcessApplication((ExecutionEntity) execution);
-
-    if (!ProcessApplicationContextUtil.requiresContextSwitch(targetProcessApplication)) {
-
-      Object delegate = expression.getValue(execution);
-      applyFieldDeclaration(fieldDeclarations, delegate);
-      ActivityBehavior activityBehaviorInstance = getActivityBehaviorInstance(execution, delegate);
-
-      if (activityBehaviorInstance instanceof SignallableActivityBehavior) {
-        try {
-          ((SignallableActivityBehavior) activityBehaviorInstance).signal(execution, signalName, signalData);
-        }
-        catch (BpmnError error) {
-          propagateBpmnError(error, execution);
-        }
-        catch (Exception exception) {
-          propagateExceptionAsError(exception, execution);
-        }
-      }
-
-    } else {
+    if(ProcessApplicationContextUtil.requiresContextSwitch(targetProcessApplication)) {
       Context.executeWithinProcessApplication(new Callable<Void>() {
-
+        @Override
         public Void call() throws Exception {
-          try {
-            signal(execution, signalName, signalData);
-          }
-          catch (BpmnError error) {
-            propagateBpmnError(error, execution);
-          }
-          catch (Exception exception) {
-            propagateExceptionAsError(exception, execution);
-          }
+          signal(execution, signalName, signalData);
           return null;
         }
-
       }, targetProcessApplication);
+    }
+    else {
+      doSignal(execution, signalName, signalData);
+    }
+  }
+
+  public void doSignal(final ActivityExecution execution, String signalName, Object signalData) throws Exception {
+    Object delegate = expression.getValue(execution);
+    applyFieldDeclaration(fieldDeclarations, delegate);
+    ActivityBehavior activityBehaviorInstance = getActivityBehaviorInstance(execution, delegate);
+
+    if (activityBehaviorInstance instanceof CustomActivityBehavior) {
+      CustomActivityBehavior behavior = (CustomActivityBehavior) activityBehaviorInstance;
+      ActivityBehavior delegateActivityBehavior = behavior.getDelegateActivityBehavior();
+
+      if (!(delegateActivityBehavior instanceof SignallableActivityBehavior)) {
+        // legacy behavior: do nothing when it is not a signallable activity behavior
+        return;
+      }
+    }
+
+    try {
+      ((SignallableActivityBehavior) activityBehaviorInstance).signal(execution, signalName, signalData);
+    }
+    catch (BpmnError error) {
+      propagateBpmnError(error, execution);
+    }
+    catch (Exception exception) {
+      propagateExceptionAsError(exception, execution);
     }
   }
 
@@ -143,7 +144,7 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
   protected ActivityBehavior getActivityBehaviorInstance(ActivityExecution execution, Object delegateInstance) {
 
     if (delegateInstance instanceof ActivityBehavior) {
-      return (ActivityBehavior) delegateInstance;
+      return new CustomActivityBehavior((ActivityBehavior) delegateInstance);
     } else if (delegateInstance instanceof JavaDelegate) {
       return new ServiceTaskJavaDelegateActivityBehavior((JavaDelegate) delegateInstance);
     } else {

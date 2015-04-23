@@ -13,15 +13,11 @@
 
 package org.camunda.bpm.engine.impl.form.handler;
 
-import java.util.concurrent.Callable;
-
-import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParser;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.form.StartFormDataImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
@@ -57,26 +53,7 @@ public class DefaultStartFormHandler extends DefaultFormHandler implements Start
     }
   }
 
-  public StartFormData createStartFormData(final ProcessDefinitionEntity processDefinition) {
-    ProcessApplicationReference targetProcessApplication = ProcessApplicationContextUtil.getTargetProcessApplication(deploymentId);
-
-    if(targetProcessApplication != null) {
-
-      return Context.executeWithinProcessApplication(new Callable<StartFormData>() {
-
-        public StartFormData call() throws Exception {
-          return createStartFormDataInternal(processDefinition);
-        }
-
-      }, targetProcessApplication);
-    }
-    else {
-      return createStartFormDataInternal(processDefinition);
-    }
-
-  }
-
-  protected StartFormData createStartFormDataInternal(ProcessDefinitionEntity processDefinition) {
+  public StartFormData createStartFormData(ProcessDefinitionEntity processDefinition) {
     StartFormDataImpl startFormData = new StartFormDataImpl();
 
     if (formKey != null) {

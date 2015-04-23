@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.impl.ActivityStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.DeploymentStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.ProcessDefinitionStatisticsQueryImpl;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.DeploymentStatistics;
@@ -62,7 +63,8 @@ public class StatisticsManager extends AbstractManager {
   }
 
   protected void checkReadProcessDefinition(ActivityStatisticsQueryImpl query) {
-    if (isAuthorizationEnabled() && getCurrentAuthentication() != null) {
+    CommandContext commandContext = getCommandContext();
+    if(isAuthorizationEnabled() && getCurrentAuthentication() != null && commandContext.isAuthorizationCheckEnabled()) {
       String processDefinitionId = query.getProcessDefinitionId();
       ProcessDefinitionEntity definition = getProcessDefinitionManager().findLatestProcessDefinitionById(processDefinitionId);
       ensureNotNull("no deployed process definition found with id '" + processDefinitionId + "'", "processDefinition", definition);

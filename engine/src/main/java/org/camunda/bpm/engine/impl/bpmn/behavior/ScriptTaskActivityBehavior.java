@@ -17,6 +17,7 @@ import javax.script.ScriptException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.delegate.ScriptInvocation;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
@@ -46,9 +47,12 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
     boolean noErrors = true;
 
     try {
-      Object result = Context.getProcessEngineConfiguration()
-        .getScriptingEnvironment()
-        .execute(script, execution);
+      ScriptInvocation invocation = new ScriptInvocation(script, execution);
+      Context
+        .getProcessEngineConfiguration()
+        .getDelegateInterceptor()
+        .handleInvocation(invocation);
+      Object result = invocation.getInvocationResult();
       if(result != null && resultVariable != null) {
         execution.setVariable(resultVariable, result);
       }

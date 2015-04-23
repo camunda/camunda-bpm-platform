@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.impl.cmmn.listener;
 import org.camunda.bpm.engine.delegate.CaseExecutionListener;
 import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.delegate.ScriptInvocation;
 import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
 
 /**
@@ -33,9 +34,11 @@ public class ScriptCaseExecutionListener implements CaseExecutionListener {
   }
 
   public void notify(DelegateCaseExecution caseExecution) throws Exception {
-    Context.getProcessEngineConfiguration()
-        .getScriptingEnvironment()
-        .execute(script, caseExecution);
+    ScriptInvocation invocation = new ScriptInvocation(script, caseExecution);
+    Context
+      .getProcessEngineConfiguration()
+      .getDelegateInterceptor()
+      .handleInvocation(invocation);
   }
 
   public ExecutableScript getScript() {

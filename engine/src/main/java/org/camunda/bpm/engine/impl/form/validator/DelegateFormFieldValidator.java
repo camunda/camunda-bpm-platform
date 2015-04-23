@@ -74,13 +74,14 @@ public class DelegateFormFieldValidator implements FormFieldValidator {
     }
   }
 
-  protected boolean doValidate(final Object submittedValue, final FormFieldValidatorContext validatorContext) {
+  protected boolean doValidate(Object submittedValue, FormFieldValidatorContext validatorContext) {
+    FormFieldValidator validator;
+
     if(clazz != null) {
       // resolve validator using Fully Qualified Classname
       Object validatorObject = ReflectUtil.instantiate(clazz);
       if(validatorObject instanceof FormFieldValidator) {
-        FormFieldValidator validator = (FormFieldValidator) validatorObject;
-        return validator.validate(submittedValue, validatorContext);
+        validator = (FormFieldValidator) validatorObject;
 
       } else {
         throw new ProcessEngineException("Validator class '"+clazz+"' is not an instance of "+ FormFieldValidator.class.getName());
@@ -90,14 +91,27 @@ public class DelegateFormFieldValidator implements FormFieldValidator {
       //resolve validator using expression
       Object validatorObject = delegateExpression.getValue(validatorContext.getExecution());
       if (validatorObject instanceof FormFieldValidator) {
-        FormFieldValidator validator = (FormFieldValidator) validatorObject;
-        return validator.validate(submittedValue, validatorContext);
+        validator = (FormFieldValidator) validatorObject;
 
       } else {
         throw new ProcessEngineException("Validator expression '"+delegateExpression+"' does not resolve to instance of "+ FormFieldValidator.class.getName());
 
       }
     }
+
+    FormFieldValidatorInvocation invocation = new FormFieldValidatorInvocation(validator, submittedValue, validatorContext);
+    try {
+      Context
+        .getProcessEngineConfiguration()
+        .getDelegateInterceptor()
+        .handleInvocation(invocation);
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new ProcessEngineException(e);
+    }
+
+    return invocation.getInvocationResult();
   }
 
 }

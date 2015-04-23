@@ -16,9 +16,11 @@ package org.camunda.bpm.engine.impl.scripting;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureInstanceOf;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.Condition;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.delegate.ScriptInvocation;
 
 /**
  * A {@link Condition} which invokes a {@link ExecutableScript} when evaluated.
@@ -34,9 +36,19 @@ public class ScriptCondition implements Condition {
   }
 
   public boolean evaluate(DelegateExecution execution) {
-    Object result = Context.getProcessEngineConfiguration()
-      .getScriptingEnvironment()
-      .execute(script, execution);
+    ScriptInvocation invocation = new ScriptInvocation(script, execution);
+    try {
+      Context
+        .getProcessEngineConfiguration()
+        .getDelegateInterceptor()
+        .handleInvocation(invocation);
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new ProcessEngineException(e);
+    }
+
+    Object result = invocation.getInvocationResult();
 
     ensureNotNull("condition script returns null", "result", result);
     ensureInstanceOf("condition script returns non-Boolean", "result", result, Boolean.class);

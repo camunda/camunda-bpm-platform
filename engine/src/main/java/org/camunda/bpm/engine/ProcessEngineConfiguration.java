@@ -17,6 +17,7 @@ import java.io.InputStream;
 
 import javax.sql.DataSource;
 
+import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.cfg.BeansConfigurationHelper;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
@@ -178,6 +179,20 @@ public abstract class ProcessEngineConfiguration {
    * The default value is false.
    */
   protected boolean authorizationEnabled = false;
+
+  /**
+   * <p>The following flag <code>authorizationEnabledForCustomCode</code> will
+   * only be taken into account iff <code>authorizationEnabled</code> is set
+   * <code>true</code>.</p>
+   *
+   * <p>If the value of the flag <code>authorizationEnabledForCustomCode</code>
+   * is set <code>true</code> then an authorization check will be performed by
+   * executing commands inside custom code (e.g. inside {@link JavaDelegate}).</p>
+   *
+   * <p>The default value is <code>false</code>.</p>
+   *
+   */
+  protected boolean authorizationEnabledForCustomCode = false;
 
   protected ValueTypeResolver valueTypeResolver;
 
@@ -541,6 +556,15 @@ public abstract class ProcessEngineConfiguration {
 
   public ProcessEngineConfiguration setAuthorizationEnabled(boolean isAuthorizationChecksEnabled) {
     this.authorizationEnabled = isAuthorizationChecksEnabled;
+    return this;
+  }
+
+  public boolean isAuthorizationEnabledForCustomCode() {
+    return authorizationEnabledForCustomCode;
+  }
+
+  public ProcessEngineConfiguration setAuthorizationEnabledForCustomCode(boolean authorizationEnabledForCustomCode) {
+    this.authorizationEnabledForCustomCode = authorizationEnabledForCustomCode;
     return this;
   }
 

@@ -16,9 +16,11 @@ import java.util.concurrent.Callable;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.delegate.BaseDelegateExecution;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.DelegateInterceptor;
 
 /**
@@ -43,7 +45,24 @@ public class DefaultDelegateInterceptor implements DelegateInterceptor {
         }
       }, processApplication);
     } else {
-      invocation.proceed();
+
+      CommandContext commandContext = Context.getCommandContext();
+      boolean oldValue = commandContext.isAuthorizationCheckEnabled();
+
+      ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
+      if (!configuration.isAuthorizationEnabledForCustomCode()) {
+        // the custom code should be executed without authorization
+        commandContext.disableAuthorizationCheck();
+      }
+
+      try {
+        invocation.proceed();
+      } finally {
+        if (oldValue) {
+          // the last "one" set the flag back to true
+          commandContext.enableAuthorizationCheck();
+        }
+      }
     }
   }
 

@@ -46,10 +46,12 @@ import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.ProcessDefinitionStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.impl.VariableInstanceQueryImpl;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.AuthorizationCheck;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.PermissionCheck;
 import org.camunda.bpm.engine.impl.identity.Authentication;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 
 /**
@@ -119,8 +121,9 @@ public class AuthorizationManager extends AbstractManager {
 
   public void checkAuthorization(List<PermissionCheck> permissionChecks) {
     Authentication currentAuthentication = getCurrentAuthentication();
+    CommandContext commandContext = getCommandContext();
 
-    if(isAuthorizationEnabled() && currentAuthentication != null) {
+    if(isAuthorizationEnabled() && currentAuthentication != null && commandContext.isAuthorizationCheckEnabled()) {
 
       String userId = currentAuthentication.getUserId();
       boolean isAuthorized = isAuthorized(userId, currentAuthentication.getGroupIds(), permissionChecks);
@@ -164,8 +167,9 @@ public class AuthorizationManager extends AbstractManager {
   public void checkAuthorization(Permission permission, Resource resource, String resourceId) {
 
     final Authentication currentAuthentication = getCurrentAuthentication();
+    CommandContext commandContext = Context.getCommandContext();
 
-    if(isAuthorizationEnabled() && currentAuthentication != null) {
+    if(isAuthorizationEnabled() && currentAuthentication != null && commandContext.isAuthorizationCheckEnabled()) {
 
       boolean isAuthorized = isAuthorized(currentAuthentication.getUserId(), currentAuthentication.getGroupIds(), permission, resource, resourceId);
       if (!isAuthorized) {
@@ -176,7 +180,9 @@ public class AuthorizationManager extends AbstractManager {
   }
 
   public boolean isAuthorized(Permission permission, Resource resource, String resourceId) {
-
+    // this will be called by LdapIdentityProviderSession#isAuthorized() for executing LdapQueries.
+    // to be backward compatible a check whether authorization has been enabled inside the given
+    // command context will not be done.
     final Authentication currentAuthentication = getCurrentAuthentication();
 
     if(isAuthorizationEnabled() && currentAuthentication != null) {
@@ -209,10 +215,11 @@ public class AuthorizationManager extends AbstractManager {
 
   public void configureQuery(AbstractQuery query) {
     final Authentication currentAuthentication = getCurrentAuthentication();
+    CommandContext commandContext = getCommandContext();
 
     query.getPermissionChecks().clear();
 
-    if(isAuthorizationEnabled() && currentAuthentication != null) {
+    if(isAuthorizationEnabled() && currentAuthentication != null && commandContext.isAuthorizationCheckEnabled()) {
 
       query.setAuthorizationCheckEnabled(true);
 
@@ -239,11 +246,12 @@ public class AuthorizationManager extends AbstractManager {
 
   public void configureQuery(AbstractQuery query, Resource resource, String queryParam, Permission permission) {
     configureQuery(query);
-    addAuthorizationCheckParameter(query, resource, queryParam, permission);
+    addPermissionCheck(query, resource, queryParam, permission);
   }
 
-  protected void addAuthorizationCheckParameter(AbstractQuery query, Resource resource, String queryParam, Permission permission) {
-    if (isAuthorizationEnabled() && getCurrentAuthentication() != null) {
+  protected void addPermissionCheck(AbstractQuery query, Resource resource, String queryParam, Permission permission) {
+    CommandContext commandContext = getCommandContext();
+    if (isAuthorizationEnabled() && getCurrentAuthentication() != null && commandContext.isAuthorizationCheckEnabled()) {
       PermissionCheck permCheck = new PermissionCheck();
       permCheck.setResource(resource);
       permCheck.setResourceIdQueryParam(queryParam);
@@ -550,8 +558,8 @@ public class AuthorizationManager extends AbstractManager {
 
   public void configureExecutionQuery(AbstractQuery query) {
     configureQuery(query);
-    addAuthorizationCheckParameter(query, PROCESS_INSTANCE, "RES.PROC_INST_ID_", READ);
-    addAuthorizationCheckParameter(query, PROCESS_DEFINITION, "P.KEY_", READ_INSTANCE);
+    addPermissionCheck(query, PROCESS_INSTANCE, "RES.PROC_INST_ID_", READ);
+    addPermissionCheck(query, PROCESS_DEFINITION, "P.KEY_", READ_INSTANCE);
   }
 
   // task query //////////////////////////////////////////////
@@ -561,13 +569,14 @@ public class AuthorizationManager extends AbstractManager {
     query.getTaskPermissionChecks().clear();
 
     Authentication currentAuthentication = getCurrentAuthentication();
-    if(isAuthorizationEnabled() && currentAuthentication != null) {
+    CommandContext commandContext = getCommandContext();
+    if(isAuthorizationEnabled() && currentAuthentication != null && commandContext.isAuthorizationCheckEnabled()) {
 
       // necessary authorization check when the task is part of
       // a running process instance
       configureQuery(query);
-      addAuthorizationCheckParameter(query, TASK, "RES.ID_", READ);
-      addAuthorizationCheckParameter(query, PROCESS_DEFINITION, "PROCDEF.KEY_", READ_TASK);
+      addPermissionCheck(query, TASK, "RES.ID_", READ);
+      addPermissionCheck(query, PROCESS_DEFINITION, "PROCDEF.KEY_", READ_TASK);
 
       // necessary authorization check when the task is not part
       // of running process or case instance
@@ -585,16 +594,16 @@ public class AuthorizationManager extends AbstractManager {
 
   public void configureEventSubscriptionQuery(EventSubscriptionQueryImpl query) {
     configureQuery(query);
-    addAuthorizationCheckParameter(query, PROCESS_INSTANCE, "RES.PROC_INST_ID_", READ);
-    addAuthorizationCheckParameter(query, PROCESS_DEFINITION, "PROCDEF.KEY_", READ_INSTANCE);
+    addPermissionCheck(query, PROCESS_INSTANCE, "RES.PROC_INST_ID_", READ);
+    addPermissionCheck(query, PROCESS_DEFINITION, "PROCDEF.KEY_", READ_INSTANCE);
   }
 
   // incident query ///////////////////////////////////////
 
   public void configureIncidentQuery(IncidentQueryImpl query) {
     configureQuery(query);
-    addAuthorizationCheckParameter(query, PROCESS_INSTANCE, "RES.PROC_INST_ID_", READ);
-    addAuthorizationCheckParameter(query, PROCESS_DEFINITION, "PROCDEF.KEY_", READ_INSTANCE);
+    addPermissionCheck(query, PROCESS_INSTANCE, "RES.PROC_INST_ID_", READ);
+    addPermissionCheck(query, PROCESS_DEFINITION, "PROCDEF.KEY_", READ_INSTANCE);
   }
 
   // variable instance query /////////////////////////////
@@ -604,13 +613,14 @@ public class AuthorizationManager extends AbstractManager {
     query.getTaskPermissionChecks().clear();
 
     Authentication currentAuthentication = getCurrentAuthentication();
-    if(isAuthorizationEnabled() && currentAuthentication != null) {
+    CommandContext commandContext = getCommandContext();
+    if(isAuthorizationEnabled() && currentAuthentication != null && commandContext.isAuthorizationCheckEnabled()) {
 
       // necessary authorization check when the variable instance is part of
       // a running process instance
       configureQuery(query);
-      addAuthorizationCheckParameter(query, PROCESS_INSTANCE, "RES.PROC_INST_ID_", READ);
-      addAuthorizationCheckParameter(query, PROCESS_DEFINITION, "PROCDEF.KEY_", READ_INSTANCE);
+      addPermissionCheck(query, PROCESS_INSTANCE, "RES.PROC_INST_ID_", READ);
+      addPermissionCheck(query, PROCESS_DEFINITION, "PROCDEF.KEY_", READ_INSTANCE);
 
       // necessary authorization check when the variable instance is part
       // of a standalone task
@@ -633,51 +643,57 @@ public class AuthorizationManager extends AbstractManager {
     query.getJobPermissionChecks().clear();
     query.getIncidentPermissionChecks().clear();
 
-    PermissionCheck firstProcessInstancePermissionCheck = new PermissionCheck();
-    firstProcessInstancePermissionCheck.setResource(PROCESS_INSTANCE);
-    firstProcessInstancePermissionCheck.setPermission(READ);
-    firstProcessInstancePermissionCheck.setResourceIdQueryParam("E.PROC_INST_ID_");
+    Authentication currentAuthentication = getCurrentAuthentication();
+    CommandContext commandContext = getCommandContext();
 
-    PermissionCheck secondProcessInstancePermissionCheck = new PermissionCheck();
-    secondProcessInstancePermissionCheck.setResource(PROCESS_DEFINITION);
-    secondProcessInstancePermissionCheck.setPermission(READ_INSTANCE);
-    secondProcessInstancePermissionCheck.setResourceIdQueryParam("P.KEY_");
-    secondProcessInstancePermissionCheck.setAuthorizationNotFoundReturnValue(0l);
+    if(isAuthorizationEnabled() && currentAuthentication != null && commandContext.isAuthorizationCheckEnabled()) {
 
-    query.addProcessInstancePermissionCheck(firstProcessInstancePermissionCheck);
-    query.addProcessInstancePermissionCheck(secondProcessInstancePermissionCheck);
+      PermissionCheck firstProcessInstancePermissionCheck = new PermissionCheck();
+      firstProcessInstancePermissionCheck.setResource(PROCESS_INSTANCE);
+      firstProcessInstancePermissionCheck.setPermission(READ);
+      firstProcessInstancePermissionCheck.setResourceIdQueryParam("E.PROC_INST_ID_");
 
-    if (query.isFailedJobsToInclude()) {
-      PermissionCheck firstJobPermissionCheck = new PermissionCheck();
-      firstJobPermissionCheck.setResource(PROCESS_INSTANCE);
-      firstJobPermissionCheck.setPermission(READ);
-      firstJobPermissionCheck.setResourceIdQueryParam("PROCESS_INSTANCE_ID_");
+      PermissionCheck secondProcessInstancePermissionCheck = new PermissionCheck();
+      secondProcessInstancePermissionCheck.setResource(PROCESS_DEFINITION);
+      secondProcessInstancePermissionCheck.setPermission(READ_INSTANCE);
+      secondProcessInstancePermissionCheck.setResourceIdQueryParam("P.KEY_");
+      secondProcessInstancePermissionCheck.setAuthorizationNotFoundReturnValue(0l);
 
-      PermissionCheck secondJobPermissionCheck = new PermissionCheck();
-      secondJobPermissionCheck.setResource(PROCESS_DEFINITION);
-      secondJobPermissionCheck.setPermission(READ_INSTANCE);
-      secondJobPermissionCheck.setResourceIdQueryParam("PROCESS_DEF_KEY_");
-      secondJobPermissionCheck.setAuthorizationNotFoundReturnValue(0l);
+      query.addProcessInstancePermissionCheck(firstProcessInstancePermissionCheck);
+      query.addProcessInstancePermissionCheck(secondProcessInstancePermissionCheck);
 
-      query.addJobPermissionCheck(firstJobPermissionCheck);
-      query.addJobPermissionCheck(secondJobPermissionCheck);
-    }
+      if (query.isFailedJobsToInclude()) {
+        PermissionCheck firstJobPermissionCheck = new PermissionCheck();
+        firstJobPermissionCheck.setResource(PROCESS_INSTANCE);
+        firstJobPermissionCheck.setPermission(READ);
+        firstJobPermissionCheck.setResourceIdQueryParam("PROCESS_INSTANCE_ID_");
 
-    if (query.isIncidentsToInclude()) {
-      PermissionCheck firstIncidentPermissionCheck = new PermissionCheck();
-      firstIncidentPermissionCheck.setResource(PROCESS_INSTANCE);
-      firstIncidentPermissionCheck.setPermission(READ);
-      firstIncidentPermissionCheck.setResourceIdQueryParam("I.PROC_INST_ID_");
+        PermissionCheck secondJobPermissionCheck = new PermissionCheck();
+        secondJobPermissionCheck.setResource(PROCESS_DEFINITION);
+        secondJobPermissionCheck.setPermission(READ_INSTANCE);
+        secondJobPermissionCheck.setResourceIdQueryParam("PROCESS_DEF_KEY_");
+        secondJobPermissionCheck.setAuthorizationNotFoundReturnValue(0l);
 
-      PermissionCheck secondIncidentPermissionCheck = new PermissionCheck();
-      secondIncidentPermissionCheck.setResource(PROCESS_DEFINITION);
-      secondIncidentPermissionCheck.setPermission(READ_INSTANCE);
-      secondIncidentPermissionCheck.setResourceIdQueryParam("PROCDEF.KEY_");
-      secondIncidentPermissionCheck.setAuthorizationNotFoundReturnValue(0l);
+        query.addJobPermissionCheck(firstJobPermissionCheck);
+        query.addJobPermissionCheck(secondJobPermissionCheck);
+      }
 
-      query.addIncidentPermissionCheck(firstIncidentPermissionCheck);
-      query.addIncidentPermissionCheck(secondIncidentPermissionCheck);
+      if (query.isIncidentsToInclude()) {
+        PermissionCheck firstIncidentPermissionCheck = new PermissionCheck();
+        firstIncidentPermissionCheck.setResource(PROCESS_INSTANCE);
+        firstIncidentPermissionCheck.setPermission(READ);
+        firstIncidentPermissionCheck.setResourceIdQueryParam("I.PROC_INST_ID_");
 
+        PermissionCheck secondIncidentPermissionCheck = new PermissionCheck();
+        secondIncidentPermissionCheck.setResource(PROCESS_DEFINITION);
+        secondIncidentPermissionCheck.setPermission(READ_INSTANCE);
+        secondIncidentPermissionCheck.setResourceIdQueryParam("PROCDEF.KEY_");
+        secondIncidentPermissionCheck.setAuthorizationNotFoundReturnValue(0l);
+
+        query.addIncidentPermissionCheck(firstIncidentPermissionCheck);
+        query.addIncidentPermissionCheck(secondIncidentPermissionCheck);
+
+      }
     }
   }
 
@@ -688,51 +704,57 @@ public class AuthorizationManager extends AbstractManager {
     query.getJobPermissionChecks().clear();
     query.getIncidentPermissionChecks().clear();
 
-    PermissionCheck firstProcessInstancePermissionCheck = new PermissionCheck();
-    firstProcessInstancePermissionCheck.setResource(PROCESS_INSTANCE);
-    firstProcessInstancePermissionCheck.setPermission(READ);
-    firstProcessInstancePermissionCheck.setResourceIdQueryParam("E.PROC_INST_ID_");
+    Authentication currentAuthentication = getCurrentAuthentication();
+    CommandContext commandContext = getCommandContext();
 
-    PermissionCheck secondProcessInstancePermissionCheck = new PermissionCheck();
-    secondProcessInstancePermissionCheck.setResource(PROCESS_DEFINITION);
-    secondProcessInstancePermissionCheck.setPermission(READ_INSTANCE);
-    secondProcessInstancePermissionCheck.setResourceIdQueryParam("P.KEY_");
-    secondProcessInstancePermissionCheck.setAuthorizationNotFoundReturnValue(0l);
+    if(isAuthorizationEnabled() && currentAuthentication != null && commandContext.isAuthorizationCheckEnabled()) {
 
-    query.addProcessInstancePermissionCheck(firstProcessInstancePermissionCheck);
-    query.addProcessInstancePermissionCheck(secondProcessInstancePermissionCheck);
+      PermissionCheck firstProcessInstancePermissionCheck = new PermissionCheck();
+      firstProcessInstancePermissionCheck.setResource(PROCESS_INSTANCE);
+      firstProcessInstancePermissionCheck.setPermission(READ);
+      firstProcessInstancePermissionCheck.setResourceIdQueryParam("E.PROC_INST_ID_");
 
-    if (query.isFailedJobsToInclude()) {
-      PermissionCheck firstJobPermissionCheck = new PermissionCheck();
-      firstJobPermissionCheck.setResource(PROCESS_INSTANCE);
-      firstJobPermissionCheck.setPermission(READ);
-      firstJobPermissionCheck.setResourceIdQueryParam("JOB.PROCESS_INSTANCE_ID_");
+      PermissionCheck secondProcessInstancePermissionCheck = new PermissionCheck();
+      secondProcessInstancePermissionCheck.setResource(PROCESS_DEFINITION);
+      secondProcessInstancePermissionCheck.setPermission(READ_INSTANCE);
+      secondProcessInstancePermissionCheck.setResourceIdQueryParam("P.KEY_");
+      secondProcessInstancePermissionCheck.setAuthorizationNotFoundReturnValue(0l);
 
-      PermissionCheck secondJobPermissionCheck = new PermissionCheck();
-      secondJobPermissionCheck.setResource(PROCESS_DEFINITION);
-      secondJobPermissionCheck.setPermission(READ_INSTANCE);
-      secondJobPermissionCheck.setResourceIdQueryParam("JOB.PROCESS_DEF_KEY_");
-      secondJobPermissionCheck.setAuthorizationNotFoundReturnValue(0l);
+      query.addProcessInstancePermissionCheck(firstProcessInstancePermissionCheck);
+      query.addProcessInstancePermissionCheck(secondProcessInstancePermissionCheck);
 
-      query.addJobPermissionCheck(firstJobPermissionCheck);
-      query.addJobPermissionCheck(secondJobPermissionCheck);
-    }
+      if (query.isFailedJobsToInclude()) {
+        PermissionCheck firstJobPermissionCheck = new PermissionCheck();
+        firstJobPermissionCheck.setResource(PROCESS_INSTANCE);
+        firstJobPermissionCheck.setPermission(READ);
+        firstJobPermissionCheck.setResourceIdQueryParam("JOB.PROCESS_INSTANCE_ID_");
 
-    if (query.isIncidentsToInclude()) {
-      PermissionCheck firstIncidentPermissionCheck = new PermissionCheck();
-      firstIncidentPermissionCheck.setResource(PROCESS_INSTANCE);
-      firstIncidentPermissionCheck.setPermission(READ);
-      firstIncidentPermissionCheck.setResourceIdQueryParam("I.PROC_INST_ID_");
+        PermissionCheck secondJobPermissionCheck = new PermissionCheck();
+        secondJobPermissionCheck.setResource(PROCESS_DEFINITION);
+        secondJobPermissionCheck.setPermission(READ_INSTANCE);
+        secondJobPermissionCheck.setResourceIdQueryParam("JOB.PROCESS_DEF_KEY_");
+        secondJobPermissionCheck.setAuthorizationNotFoundReturnValue(0l);
 
-      PermissionCheck secondIncidentPermissionCheck = new PermissionCheck();
-      secondIncidentPermissionCheck.setResource(PROCESS_DEFINITION);
-      secondIncidentPermissionCheck.setPermission(READ_INSTANCE);
-      secondIncidentPermissionCheck.setResourceIdQueryParam("PROCDEF.KEY_");
-      secondIncidentPermissionCheck.setAuthorizationNotFoundReturnValue(0l);
+        query.addJobPermissionCheck(firstJobPermissionCheck);
+        query.addJobPermissionCheck(secondJobPermissionCheck);
+      }
 
-      query.addIncidentPermissionCheck(firstIncidentPermissionCheck);
-      query.addIncidentPermissionCheck(secondIncidentPermissionCheck);
+      if (query.isIncidentsToInclude()) {
+        PermissionCheck firstIncidentPermissionCheck = new PermissionCheck();
+        firstIncidentPermissionCheck.setResource(PROCESS_INSTANCE);
+        firstIncidentPermissionCheck.setPermission(READ);
+        firstIncidentPermissionCheck.setResourceIdQueryParam("I.PROC_INST_ID_");
 
+        PermissionCheck secondIncidentPermissionCheck = new PermissionCheck();
+        secondIncidentPermissionCheck.setResource(PROCESS_DEFINITION);
+        secondIncidentPermissionCheck.setPermission(READ_INSTANCE);
+        secondIncidentPermissionCheck.setResourceIdQueryParam("PROCDEF.KEY_");
+        secondIncidentPermissionCheck.setAuthorizationNotFoundReturnValue(0l);
+
+        query.addIncidentPermissionCheck(firstIncidentPermissionCheck);
+        query.addIncidentPermissionCheck(secondIncidentPermissionCheck);
+
+      }
     }
   }
 

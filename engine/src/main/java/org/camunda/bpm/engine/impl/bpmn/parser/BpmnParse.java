@@ -89,6 +89,8 @@ import org.camunda.bpm.engine.impl.el.UelExpressionCondition;
 import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.form.handler.DefaultStartFormHandler;
 import org.camunda.bpm.engine.impl.form.handler.DefaultTaskFormHandler;
+import org.camunda.bpm.engine.impl.form.handler.DelegateStartFormHandler;
+import org.camunda.bpm.engine.impl.form.handler.DelegateTaskFormHandler;
 import org.camunda.bpm.engine.impl.form.handler.StartFormHandler;
 import org.camunda.bpm.engine.impl.form.handler.TaskFormHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.AsyncAfterMessageJobDeclaration;
@@ -795,7 +797,7 @@ public class BpmnParse extends Parse {
           }
           startFormHandler.parseConfiguration(startEventElement, deployment, processDefinition, this);
 
-          processDefinition.setStartFormHandler(startFormHandler);
+          processDefinition.setStartFormHandler(new DelegateStartFormHandler(startFormHandler, deployment));
         }
 
       }
@@ -2073,7 +2075,7 @@ public class BpmnParse extends Parse {
     }
     taskFormHandler.parseConfiguration(taskElement, deployment, processDefinition, this);
 
-    TaskDefinition taskDefinition = new TaskDefinition(taskFormHandler);
+    TaskDefinition taskDefinition = new TaskDefinition(new DelegateTaskFormHandler(taskFormHandler, deployment));
 
     taskDefinition.setKey(taskDefinitionKey);
     processDefinition.getTaskDefinitions().put(taskDefinitionKey, taskDefinition);

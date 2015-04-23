@@ -88,6 +88,8 @@ public class CommandContext {
 
   private static Logger log = Logger.getLogger(CommandContext.class.getName());
 
+  protected boolean authorizationCheckEnabled = true;
+
   protected TransactionContext transactionContext;
   protected Map<Class< ? >, SessionFactory> sessionFactories;
   protected Map<Class< ? >, Session> sessions = new HashMap<Class< ? >, Session>();
@@ -503,5 +505,21 @@ public class CommandContext {
     } else {
       return currentAuthentication.getGroupIds();
     }
+  }
+
+  public void enableAuthorizationCheck() {
+    authorizationCheckEnabled = true;
+  }
+
+  public void disableAuthorizationCheck() {
+    authorizationCheckEnabled = false;
+  }
+
+  public boolean isAuthorizationCheckEnabled() {
+    return authorizationCheckEnabled;
+  }
+
+  public void setAuthorizationCheckEnabled(boolean authorizationCheckEnabled) {
+    this.authorizationCheckEnabled = authorizationCheckEnabled;
   }
 }

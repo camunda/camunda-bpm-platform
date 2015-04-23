@@ -23,12 +23,12 @@ import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.delegate.ScriptInvocation;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
 import org.camunda.bpm.engine.impl.scripting.ScriptFactory;
 import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
-import org.camunda.bpm.engine.impl.scripting.env.ScriptingEnvironment;
 
 
 /**
@@ -60,10 +60,21 @@ public class JuelFormEngine implements FormEngine {
 
   protected Object executeScript(String scriptSrc, VariableScope scope) {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
-    ScriptingEnvironment scriptingEnvironment = processEngineConfiguration.getScriptingEnvironment();
     ScriptFactory scriptFactory = processEngineConfiguration.getScriptFactory();
     ExecutableScript script = scriptFactory.createScriptFromSource(ScriptingEngines.DEFAULT_SCRIPTING_LANGUAGE, scriptSrc);
-    return scriptingEnvironment.execute(script, scope);
+
+    ScriptInvocation invocation = new ScriptInvocation(script, scope);
+    try {
+      processEngineConfiguration
+        .getDelegateInterceptor()
+        .handleInvocation(invocation);
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new ProcessEngineException(e);
+    }
+
+    return invocation.getInvocationResult();
   }
 
   protected String getFormTemplateString(FormData formInstance, String formKey) {

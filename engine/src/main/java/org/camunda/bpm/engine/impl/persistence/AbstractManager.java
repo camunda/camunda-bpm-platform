@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSession;
 import org.camunda.bpm.engine.impl.identity.Authentication;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.persistence.entity.AttachmentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
@@ -190,6 +191,10 @@ public abstract class AbstractManager implements Session {
   }
 
   // authorizations ///////////////////////////////////////
+
+  protected CommandContext getCommandContext() {
+    return Context.getCommandContext();
+  }
 
   protected AuthorizationManager getAuthorizationManager() {
     return getSession(AuthorizationManager.class);

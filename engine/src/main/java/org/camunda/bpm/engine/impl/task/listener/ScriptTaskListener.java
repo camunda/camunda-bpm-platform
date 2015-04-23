@@ -13,9 +13,11 @@
 
 package org.camunda.bpm.engine.impl.task.listener;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.delegate.ScriptInvocation;
 import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
 
 /**
@@ -32,9 +34,17 @@ public class ScriptTaskListener implements TaskListener {
   }
 
 	public void notify(DelegateTask delegateTask) {
-    Context.getProcessEngineConfiguration()
-      .getScriptingEnvironment()
-      .execute(script, delegateTask);
+    ScriptInvocation invocation = new ScriptInvocation(script, delegateTask);
+    try {
+      Context
+        .getProcessEngineConfiguration()
+        .getDelegateInterceptor()
+        .handleInvocation(invocation);
+    } catch (RuntimeException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new ProcessEngineException(e);
+    }
 	}
 
   public ExecutableScript getScript() {

@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.variable.listener;
 import org.camunda.bpm.engine.delegate.CaseVariableListener;
 import org.camunda.bpm.engine.delegate.DelegateCaseVariableInstance;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.delegate.ScriptInvocation;
 import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
 
 /**
@@ -32,9 +33,11 @@ public class ScriptCaseVariableListener implements CaseVariableListener {
   public void notify(DelegateCaseVariableInstance variableInstance) throws Exception {
     DelegateCaseVariableInstanceImpl variableInstanceImpl = (DelegateCaseVariableInstanceImpl) variableInstance;
 
-    Context.getProcessEngineConfiguration()
-        .getScriptingEnvironment()
-        .execute(script, variableInstanceImpl.getScopeExecution());
+    ScriptInvocation invocation = new ScriptInvocation(script, variableInstanceImpl.getScopeExecution());
+    Context
+      .getProcessEngineConfiguration()
+      .getDelegateInterceptor()
+      .handleInvocation(invocation);
   }
 
   public ExecutableScript getScript() {
