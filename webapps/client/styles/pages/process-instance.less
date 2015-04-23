@@ -1,8 +1,7 @@
-@modification-cancel-all-color:   #E8917C;
-@modification-cancel-some-color:  @canceled-color;
-@modification-start-before-color: lighten(@link-color, 5%);
-@modification-start-after-color:  darken(@link-color, 5%);
-@modification-highlight-color: #FFFDAB;
+@modification-cancel-color:       #E8917C;
+@modification-start-before-color: lighten(@link-color, 16%);
+@modification-start-after-color:  darken(@link-color, 16%);
+@modification-highlight-color:    @highlight-bg;//#FFFDAB;
 
 .ctn-content-bottom > div:first-child {
   position: absolute;
@@ -47,6 +46,10 @@
       }
     }
 
+    .input-group .value-wrapper .set-null {
+      line-height: 1;
+    }
+
     .modification {
       border-left: (@grid-gutter-width / 2) solid;
       .transition(border-color 0.218s ease-in-out);
@@ -59,10 +62,10 @@
     }
 
     &.cancel .modification {
-      border-color: @modification-cancel-all-color;
+      border-color: @modification-cancel-color;
     }
     &.cancelSome .modification {
-      border-color: @modification-cancel-some-color;
+      border-color: @modification-cancel-color;
     }
     &.startAfter .modification {
       border-color: @modification-start-after-color;
@@ -79,9 +82,6 @@
 
     .variables {
       margin-top: 5px;
-      .actions {
-        text-align: right;
-      }
       > .row {
         margin-top: 5px;
       }
@@ -147,27 +147,43 @@
 
 
 .modification-confirmation-dialog {
+  cursor: default;
+
+  .glyphicon-fire {
+    color: @brand-primary;
+  }
+
   .instruction {
     line-height: 34px;
     min-height: 34px;
+    margin: 0;
 
+    .type,
+    .target {
+      border-top: 1px solid;
+      float: left;
+      width: 75%;
+      padding: 0 (@grid-gutter-width / 2);
+    }
     .type {
-      border-left: 15px solid;
+      border-left: (@grid-gutter-width / 2) solid;
+      width: 25%;
     }
 
-    &:first-child {
-      margin-top: (@grid-gutter-width / 2);
-    }
 
-    &.cancel .type {
-      border-color: @modification-cancel-some-color;
+    &.cancel > div {
+      border-color: @modification-cancel-color;
     }
-    &.startAfter .type {
+    &.startAfter > div {
       border-color: @modification-start-after-color;
     }
-    &.startBefore .type {
+    &.startBefore > div {
       border-color: @modification-start-before-color;
     }
+
   }
-  cursor: default;
+
+  .debug {
+    margin-top: (@grid-gutter-width / 2);
+  }
 }
