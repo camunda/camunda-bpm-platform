@@ -47,6 +47,8 @@ public enum HistoryEventTypes implements HistoryEventType {
   VARIABLE_INSTANCE_CREATE("variable-instance", "create"),
   /** fired when a variable instance is updated. */
   VARIABLE_INSTANCE_UPDATE("variable-instance", "update"),
+  /** fired when a variable instance is updated. */
+  VARIABLE_INSTANCE_UPDATE_DETAIL("variable-instance", "update-detail"),
   /** fired when a variable instance is deleted. */
   VARIABLE_INSTANCE_DELETE("variable-instance", "delete"),
 

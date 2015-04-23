@@ -23,8 +23,6 @@ import org.camunda.bpm.engine.impl.variable.AbstractPersistentVariableStore;
  */
 public class CaseExecutionEntityVariableStore extends AbstractPersistentVariableStore {
 
-  private static final long serialVersionUID = 1L;
-
   protected CaseExecutionEntity caseExecutionEntity;
 
   public CaseExecutionEntityVariableStore(CaseExecutionEntity executionEntity) {

@@ -52,6 +52,7 @@ public abstract class CoreExecution extends AbstractVariableScope implements Bas
 
   // atomic operations ////////////////////////////////////////////////////////
 
+  @SuppressWarnings("unchecked")
   public <T extends CoreExecution> void performOperation(CoreAtomicOperation<T> operation) {
     if (log.isLoggable(Level.FINEST)) {
       log.finest("AtomicOperation: " + operation + " on " + this);

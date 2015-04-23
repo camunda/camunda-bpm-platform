@@ -16,7 +16,6 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
-import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoricScopeInstanceEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
@@ -82,7 +81,8 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
     DbEntityManager dbEntityManager = getDbEntityManager();
 
     // insert update only if history level = FULL
-    if(Context.getProcessEngineConfiguration().getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_FULL)) {
+    if(Context.getProcessEngineConfiguration().getHistoryLevel()
+        .isHistoryEventProduced(HistoryEventTypes.VARIABLE_INSTANCE_UPDATE_DETAIL, historyEvent)) {
 
       // insert byte array entity (if applicable)
       byte[] byteValue = historyEvent.getByteValue();
