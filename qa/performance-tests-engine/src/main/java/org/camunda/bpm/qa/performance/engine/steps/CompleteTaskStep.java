@@ -16,13 +16,12 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.qa.performance.engine.framework.PerfTestRunContext;
-import org.camunda.bpm.qa.performance.engine.framework.PerfTestStepBehavior;
 
 /**
  * @author Daniel Meyer, Ingo Richtsmeier
  *
  */
-public class CompleteTaskStep extends ProcessEngineAwareStep implements PerfTestStepBehavior {
+public class CompleteTaskStep extends ProcessEngineAwareStep {
 
   protected String taskIdKey;
   private Map<String, Object> processVariables;

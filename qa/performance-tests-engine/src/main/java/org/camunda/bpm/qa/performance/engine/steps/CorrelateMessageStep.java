@@ -15,13 +15,12 @@ package org.camunda.bpm.qa.performance.engine.steps;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.qa.performance.engine.framework.PerfTestRunContext;
-import org.camunda.bpm.qa.performance.engine.framework.PerfTestStepBehavior;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class CorrelateMessageStep extends ProcessEngineAwareStep implements PerfTestStepBehavior {
+public class CorrelateMessageStep extends ProcessEngineAwareStep {
 
   protected String message;
   protected String processInstanceKey;
