@@ -12,7 +12,9 @@ define(['angular'], function(angular) {
       'Integer',
       'Long',
       'Double',
-      'Date'
+      'Date',
+      'Null',
+      'Object'
     ];
 
     var newVariable = $scope.newVariable = {

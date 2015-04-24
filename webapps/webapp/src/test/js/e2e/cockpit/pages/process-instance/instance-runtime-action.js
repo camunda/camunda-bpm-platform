@@ -29,14 +29,26 @@ module.exports = ActionBar.extend({
   addVariable: function(name, type, value) {
     var that = this;
 
+    var submitFct = function() {
+      that.addVariableModalAddButton().click().then(function() {
+        that.addVariableModalOkButton().click();
+      });
+    };
+
     this.addVariableButton().click().then(function() {
       element(by.model('newVariable.name')).sendKeys(name).then(function() {
         element(by.css('.modal-body [ng-model="newVariable.type"]')).element(by.cssContainingText('option', type)).click().then(function() {
-          element(by.model('variable.value')).sendKeys(value).then(function() {
-            that.addVariableModalAddButton().click().then(function() {
-              that.addVariableModalOkButton().click();
-            });
-          });
+          if(value) {
+            if(typeof value === 'object') {
+              element(by.model('variable.valueInfo.objectTypeName')).sendKeys(value.objectTypeName);
+              element(by.model('variable.valueInfo.serializationDataFormat')).sendKeys(value.serializationDataFormat);
+              element(by.model('variable.value')).sendKeys(value.value).then(submitFct);
+            } else {
+              element(by.model('variable.value')).sendKeys(value).then(submitFct);
+            }
+          } else {
+            submitFct();
+          }
         });
       });
     });

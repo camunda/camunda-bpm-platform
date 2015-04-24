@@ -116,6 +116,28 @@ describe('Cockpit Process Instance Spec', function() {
         });
     });
 
+    it('should add a NULL process variable', function() {
+      instancePage.variablesTab.table().count().then(function(varCountBefore) {
+
+        instancePage.actionBar.addVariable('myNullVar', 'Null');
+
+        expect(instancePage.variablesTab.table().count()).to.eventually.eql(varCountBefore+1);
+
+      });
+    });
+
+    it('should add an Object process variable', function() {
+      instancePage.variablesTab.table().count().then(function(varCountBefore) {
+
+        instancePage.actionBar.addVariable('myObjectVar', 'Object', {
+          value: '',
+          objectTypeName: 'java.lang.Object',
+          serializationDataFormat: 'application/x-java-serialized-object'
+        });
+
+        expect(instancePage.variablesTab.table().count()).to.eventually.eql(varCountBefore+1);
+      });
+    });
 
     it('should change variable', function() {
 
