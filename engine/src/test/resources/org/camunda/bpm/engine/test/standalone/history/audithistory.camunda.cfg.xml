@@ -6,12 +6,12 @@
 
   <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
   
-    <property name="processEngineName" value="full-history-engine" />
+    <property name="processEngineName" value="audit-history-engine" />
   
     <!-- Database configurations -->
     <property name="history" value="audit" />
     <property name="databaseSchemaUpdate" value="true" />
-    <property name="jdbcUrl" value="jdbc:h2:mem:full-history-engine" />
+    <property name="jdbcUrl" value="jdbc:h2:mem:audit-history-engine" />
     
     <!-- job executor configurations -->
     <property name="jobExecutorActivate" value="false" />
