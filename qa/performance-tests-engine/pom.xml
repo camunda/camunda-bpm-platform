@@ -41,6 +41,11 @@
       <version>7.0.33</version>
     </dependency>
 
+    <dependency>
+      <groupId>com.fasterxml.uuid</groupId>
+      <artifactId>java-uuid-generator</artifactId>
+    </dependency>
+
   </dependencies>
 
   <profiles>

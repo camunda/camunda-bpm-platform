@@ -21,6 +21,13 @@ package org.camunda.bpm.qa.performance.engine.framework;
 public interface PerfTestWatcher {
 
   /**
+   * Invoked before a performance test pass is started.
+   *
+   * @param pass the current {@link PerfTestPass}
+   */
+  void beforePass(PerfTestPass pass);
+
+  /**
    * Invoked before a performance test run is started.
    *
    * @param test the {@link PerfTest} about to be executed
@@ -60,5 +67,10 @@ public interface PerfTestWatcher {
    */
   void afterRun(PerfTest test, PerfTestRun run);
 
-
+  /**
+   * Invoked after a performance test pass is ended.
+   *
+   * @param pass the current {@link PerfTestPass}
+   */
+  void afterPass(PerfTestPass pass);
 }

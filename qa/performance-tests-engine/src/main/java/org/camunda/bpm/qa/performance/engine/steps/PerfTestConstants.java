@@ -18,6 +18,8 @@ package org.camunda.bpm.qa.performance.engine.steps;
  */
 public final class PerfTestConstants {
 
+  public static final String RUN_ID = "runId";
+
   public static final String PROCESS_INSTANCE_ID = "processInstanceId";
   public static final String EXECUTION_ID = "executionId";
   public static final String TASK_ID = "taskId";

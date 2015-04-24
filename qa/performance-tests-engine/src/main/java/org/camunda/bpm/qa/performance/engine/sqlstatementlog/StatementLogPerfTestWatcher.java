@@ -15,6 +15,7 @@ package org.camunda.bpm.qa.performance.engine.sqlstatementlog;
 import java.util.List;
 
 import org.camunda.bpm.qa.performance.engine.framework.PerfTest;
+import org.camunda.bpm.qa.performance.engine.framework.PerfTestPass;
 import org.camunda.bpm.qa.performance.engine.framework.PerfTestRun;
 import org.camunda.bpm.qa.performance.engine.framework.PerfTestStep;
 import org.camunda.bpm.qa.performance.engine.framework.PerfTestWatcher;
@@ -27,6 +28,10 @@ import org.camunda.bpm.qa.performance.engine.sqlstatementlog.StatementLogSqlSess
  *
  */
 public class StatementLogPerfTestWatcher implements PerfTestWatcher {
+
+  public void beforePass(PerfTestPass pass) {
+    // nothing to do
+  }
 
   public void beforeRun(PerfTest test, PerfTestRun run) {
     // nothing to do
@@ -42,6 +47,10 @@ public class StatementLogPerfTestWatcher implements PerfTestWatcher {
   }
 
   public void afterRun(PerfTest test, PerfTestRun run) {
+    // nothing to do
+  }
+
+  public void afterPass(PerfTestPass pass) {
     // nothing to do
   }
 

@@ -21,7 +21,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 
@@ -35,16 +34,10 @@ public class PerfTestRunner {
   protected PerfTest test;
   protected PerfTestConfiguration configuration;
 
-  // pass state
-  protected AtomicLong passCompletedRuns;
-  protected Object passMonitor;
-  protected boolean passCompleted;
-  protected long passStartTime;
-  protected int passNumberOfThreads;
-  protected PerfTestResult passResult;
-
   // global state
+  public static PerfTestPass currentPass;
   protected PerfTestResults results;
+  protected Object passMonitor;
   protected Object doneMonitor;
   protected boolean isDone;
   protected Throwable exception;
@@ -142,13 +135,10 @@ public class PerfTestRunner {
   }
 
 
-  protected void runPassWithThreadCount(int t) {
+  protected void runPassWithThreadCount(int passNumberOfThreads) {
 
-    this.passNumberOfThreads = t;
-
-    executor = Executors.newFixedThreadPool(t);
-    passCompletedRuns = new AtomicLong();
-    passResult = new PerfTestResult();
+    currentPass = new PerfTestPass(passNumberOfThreads);
+    executor = Executors.newFixedThreadPool(passNumberOfThreads);
 
     // do a GC pause before running the test
     for(int i = 0; i<5; i++) {
@@ -156,25 +146,24 @@ public class PerfTestRunner {
     }
 
     passMonitor = new Object();
-    passCompleted = false;
 
     PerfTestStep firstStep = test.getFirstStep();
     int numberOfRuns = configuration.getNumberOfRuns();
 
     // first create the runs
-    PerfTestRun[] runs = new PerfTestRun[numberOfRuns];
-    for (int i = 0; i < numberOfRuns; i++) {
-      runs[i] = new PerfTestRun(this, firstStep);
-    }
+    currentPass.createRuns(this, firstStep, numberOfRuns);
+
+    // start the pass
+    currentPass.startPass();
+    notifyWatchersBeforePass();
 
     // now execute the runs
-    this.passStartTime = System.currentTimeMillis();
-    for (int i = 0; i < numberOfRuns; i++) {
-      executor.execute(runs[i]);
+    for (PerfTestRun run : currentPass.getRuns().values()) {
+      executor.execute(run);
     }
 
     synchronized (passMonitor) {
-      if(!passCompleted) {
+      if(!currentPass.isCompleted()) {
         try {
           passMonitor.wait();
 
@@ -186,8 +175,24 @@ public class PerfTestRunner {
           }
 
         } catch (InterruptedException e) {
-          throw new PerfTestException("Interrupted wile waiting for pass "+t+" to complete.");
+          throw new PerfTestException("Interrupted wile waiting for pass "+ passNumberOfThreads +" to complete.");
         }
+      }
+    }
+  }
+
+  protected void notifyWatchersBeforePass() {
+    if (watchers != null) {
+      for (PerfTestWatcher perfTestWatcher : watchers) {
+        perfTestWatcher.beforePass(currentPass);
+      }
+    }
+  }
+
+  protected void notifyWatchersAfterPass() {
+    if (watchers != null) {
+      for (PerfTestWatcher perfTestWatcher : watchers) {
+        perfTestWatcher.afterPass(currentPass);
       }
     }
   }
@@ -199,7 +204,6 @@ public class PerfTestRunner {
    * @param currentStep the completed step
    */
   public void completedStep(PerfTestRun run, PerfTestStep currentStep) {
-
     PerfTestStep nextStep = currentStep.getNextStep();
 
     if(nextStep != null) {
@@ -220,22 +224,20 @@ public class PerfTestRunner {
   public void completedRun(PerfTestRun run) {
     run.endRun();
 
-    long currentlyCompleted = passCompletedRuns.incrementAndGet();
+    long currentlyCompleted = currentPass.completeRun();
     if(currentlyCompleted >= configuration.getNumberOfRuns()) {
       synchronized (passMonitor) {
 
         // record the results:
-        passResult.setDuration(System.currentTimeMillis() - passStartTime);
-        passResult.setNumberOfThreads(passNumberOfThreads);
+        currentPass.endPass();
+        notifyWatchersAfterPass();
 
-        results.getPassResults().add(passResult);
+        results.getPassResults().add(currentPass.getResult());
 
-        passCompleted = true;
         passMonitor.notifyAll();
       }
     }
   }
-
 
   public void failed(PerfTestRun perfTestRun, Throwable t) {
     synchronized (doneMonitor) {
@@ -257,7 +259,7 @@ public class PerfTestRunner {
   }
 
   public void logStepResult(PerfTestRun perfTestRun, Object stepResult) {
-    passResult.logStepResult(perfTestRun.getCurrentStep(), stepResult);
+    currentPass.logStepResult(perfTestRun.getCurrentStep(), stepResult);
   }
 
 }
