@@ -56,6 +56,10 @@ define([ 'angular', 'text!./variable.html' ], function(angular, template) {
           return variable.type.toLowerCase() === 'null';
         };
 
+        var isObject = scope.isObject = function (variable) {
+          return variable.type.toLowerCase() === 'object';
+        };
+
         scope.isInPlaceEdit = function () {
           return inPlaceEdit;
         };
@@ -77,6 +81,14 @@ define([ 'angular', 'text!./variable.html' ], function(angular, template) {
 
             scope.variable.value = oldVariableValue;
             return;
+          }
+
+          if(newValue.toLowerCase() === 'null') {
+            scope.variable.value = null;
+          }
+
+          if(newValue.toLowerCase() === 'object') {
+            scope.variable.valueInfo = scope.variable.valueInfo || {};
           }
         });
 
