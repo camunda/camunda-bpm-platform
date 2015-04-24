@@ -13,12 +13,14 @@
 package org.camunda.bpm.engine.impl.scripting;
 
 import java.util.logging.Logger;
+
 import javax.script.Bindings;
 import javax.script.CompiledScript;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
 import org.camunda.bpm.engine.ScriptEvaluationException;
+import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -59,14 +61,14 @@ public class SourceExecutableScript extends ExecutableScript {
     if (!processEngineConfiguration.isEnableScriptCompilation()) {
       // if script compilation is disabled abort
       shouldBeCompiled = false;
-    }
-    else {
+    } else {
       if (compiledScript == null && shouldBeCompiled) {
         synchronized (this) {
           if (compiledScript == null && shouldBeCompiled) {
             // try to compile script
             compiledScript = processEngineConfiguration.getScriptingEngines().compile(language, scriptSource);
-            // either the script was successfully compiled or it can't be compiled but we won't try it again
+            // either the script was successfully compiled or it can't be
+            // compiled but we won't try it again
             shouldBeCompiled = false;
           }
         }
@@ -80,13 +82,14 @@ public class SourceExecutableScript extends ExecutableScript {
       if (compiledScript != null) {
         LOG.fine("Evaluating compiled script using " + language + " script engine ");
         return compiledScript.eval(bindings);
-      }
-      else {
+      } else {
         LOG.fine("Evaluating un-compiled script using " + language + " script engine ");
         return engine.eval(scriptSource, bindings);
       }
-    }
-    catch (ScriptException e) {
+    } catch (ScriptException e) {
+      if (e.getCause() instanceof BpmnError) {
+        throw (BpmnError) e.getCause();
+      }
       throw new ScriptEvaluationException("Unable to evaluate script: " + e.getMessage(), e);
     }
   }
@@ -98,7 +101,8 @@ public class SourceExecutableScript extends ExecutableScript {
   /**
    * Sets the script source code. And invalidates any cached compilation result.
    *
-   * @param scriptSource the new script source code
+   * @param scriptSource
+   *          the new script source code
    */
   public void setScriptSource(String scriptSource) {
     this.compiledScript = null;

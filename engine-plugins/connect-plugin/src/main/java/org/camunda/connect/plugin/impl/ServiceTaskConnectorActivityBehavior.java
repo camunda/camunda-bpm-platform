@@ -12,7 +12,7 @@
  */
 package org.camunda.connect.plugin.impl;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.impl.bpmn.behavior.TaskActivityBehavior;
 import org.camunda.bpm.engine.impl.core.variable.mapping.IoMapping;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
@@ -54,8 +54,10 @@ public class ServiceTaskConnectorActivityBehavior extends TaskActivityBehavior {
       // execute the request and obtain a response:
       ConnectorResponse response = request.execute();
       applyOutputParameters(execution, response);
+    } catch(BpmnError bpmne){
+      propagateBpmnError(bpmne, execution);
     } catch(Exception e) {
-      throw new ProcessEngineException("Exception while invoking connector "+e.getMessage(), e);
+      propagateExceptionAsError(e, execution);
     }
 
     // leave activity

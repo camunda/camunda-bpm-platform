@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
-import javax.script.ScriptException;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -22,9 +20,10 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
 
-
 /**
- * <p>{@link ActivityBehavior} implementation of the BPMN 2.0 script task.</p>
+ * <p>
+ * {@link ActivityBehavior} implementation of the BPMN 2.0 script task.
+ * </p>
  *
  * @author Joram Barrez
  * @author Christian Stettler
@@ -48,27 +47,17 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
 
     try {
       ScriptInvocation invocation = new ScriptInvocation(script, execution);
-      Context
-        .getProcessEngineConfiguration()
-        .getDelegateInterceptor()
-        .handleInvocation(invocation);
+      Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(invocation);
       Object result = invocation.getInvocationResult();
-      if(result != null && resultVariable != null) {
+      if (result != null && resultVariable != null) {
         execution.setVariable(resultVariable, result);
       }
 
     } catch (ProcessEngineException e) {
       noErrors = false;
-      if (e.getCause() instanceof ScriptException
-          && e.getCause().getCause() instanceof BpmnError) {
-        propagateBpmnError((BpmnError) e.getCause().getCause(), execution);
-
-      } else if (e.getCause() instanceof ScriptException
-          && e.getCause().getCause() instanceof ScriptException
-          && e.getCause().getCause().getCause() instanceof BpmnError) {
-        propagateBpmnError((BpmnError) e.getCause().getCause().getCause(), execution);
-
-
+      BpmnError error = checkIfCauseOfExceptionIsBpmnError(e);
+      if (error != null) {
+        propagateBpmnError(error, execution);
       } else {
         propagateExceptionAsError(e, execution);
       }
@@ -76,6 +65,24 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
     if (noErrors) {
       leave(execution);
     }
+  }
+
+  /**
+   * Searches recursively through the exception to see if the exception itself
+   * or one of its causes is a {@link BpmnError}.
+   * 
+   * @param e
+   *          the exception to check
+   * @return the BpmnError that was the cause of this exception or null if no
+   *         BpmnError was found
+   */
+  protected BpmnError checkIfCauseOfExceptionIsBpmnError(Throwable e) {
+    if (e instanceof BpmnError) {
+      return (BpmnError) e;
+    } else if (e.getCause() == null) {
+      return null;
+    }
+    return checkIfCauseOfExceptionIsBpmnError(e.getCause());
   }
 
   public ExecutableScript getScript() {
