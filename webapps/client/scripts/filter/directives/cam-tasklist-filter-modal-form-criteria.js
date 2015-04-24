@@ -60,10 +60,15 @@ define([
 
         $scope.query = $scope.filter.query = $scope.filter.query || [];
 
-
+        var includeAssignedTasks;
+        $scope.query.forEach(function (queryItem) {
+          if (queryItem.key === 'includeAssignedTasks') {
+            includeAssignedTasks = queryItem.value;
+          }
+        });
 
         // a little exception to deal with
-        $scope.includeAssignedTasks = $scope.filter.includeAssignedTasks = false;
+        $scope.includeAssignedTasks = $scope.filter.includeAssignedTasks = includeAssignedTasks;
         $scope.query = $scope.filter.query = $scope.query.filter(function (item) {
           if (item.key === 'includeAssignedTasks') {
             $scope.includeAssignedTasks = item.value;
