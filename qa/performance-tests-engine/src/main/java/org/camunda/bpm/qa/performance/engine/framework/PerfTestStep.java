@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.qa.performance.engine.framework;
 
+import org.camunda.bpm.qa.performance.engine.steps.WaitStep;
+
 /**
  * A step in a performance test.
  *
@@ -44,6 +46,10 @@ public class PerfTestStep {
 
   public String getStepName() {
     return perfTestStepBehavior.getClass().getSimpleName();
+  }
+
+  public boolean isWaitStep() {
+    return perfTestStepBehavior instanceof WaitStep;
   }
 
 }

@@ -15,6 +15,10 @@ package org.camunda.bpm.qa.performance.engine.framework;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.camunda.bpm.qa.performance.engine.framework.activitylog.ActivityPerfTestResult;
+import org.camunda.bpm.qa.performance.engine.steps.PerfTestConstants;
 
 /**
  * An individual run of a performance test. Holds all state related to a test run.
@@ -32,15 +36,17 @@ public class PerfTestRun implements PerfTestRunContext, Runnable {
   protected long stepStartTime;
   protected long stepEndTime;
 
-  protected PerfTestStep currentStep;
+  protected volatile PerfTestStep currentStep;
+  protected AtomicInteger state = new AtomicInteger();
 
   protected PerfTestRunner runner;
 
   protected Map<String, Object> runContext = new HashMap<String, Object>();
 
-  public PerfTestRun(PerfTestRunner runner, PerfTestStep firstStep) {
+  public PerfTestRun(PerfTestRunner runner, String runId, PerfTestStep firstStep) {
     this.runner = runner;
     this.currentStep = firstStep;
+    setVariable(PerfTestConstants.RUN_ID, runId);
   }
 
   public void startRun() {
@@ -59,15 +65,15 @@ public class PerfTestRun implements PerfTestRunContext, Runnable {
       if(!isStarted) {
         startRun();
       }
-      notifyWatchersBeforeStep();
 
       PerfTestRunContext.currentContext.set(this);
 
-      PerfTestStepBehavior perfTestStepBehavior = currentStep.getStepBehavior();
-      perfTestStepBehavior.execute(this);
-
-      notifyWatchersAfterStep();
-      runner.completedStep(this, currentStep);
+      if(!currentStep.isWaitStep()) {
+        continueRun();
+      }
+      else {
+        pauseRun();
+      }
 
     } catch(Throwable t) {
       runner.failed(this, t);
@@ -75,6 +81,20 @@ public class PerfTestRun implements PerfTestRunContext, Runnable {
     } finally {
       PerfTestRunContext.currentContext.remove();
 
+    }
+  }
+
+  protected void continueRun() {
+    notifyWatchersBeforeStep();
+    currentStep.getStepBehavior().execute(this);
+    notifyWatchersAfterStep();
+    runner.completedStep(this, currentStep);
+  }
+
+  protected void pauseRun() {
+    if (isAlreadySignaled()) {
+      // if a signal was already received immediately continue
+      runner.completedStep(this, currentStep);
     }
   }
 
@@ -119,6 +139,34 @@ public class PerfTestRun implements PerfTestRunContext, Runnable {
     return stepStartTime;
   }
 
+  /**
+   * Sets the run into waiting state and returns if the run
+   * was already signaled.
+   *
+   * Note: This method will change the state of the run
+   * to waiting.
+   *
+   * @return true if the run was already signaled, false otherwise
+   */
+  public boolean isAlreadySignaled() {
+    int newState = this.state.incrementAndGet();
+    return newState == 0;
+  }
+
+  /**
+   * Signals the run and returns if the run was already
+   * waiting for a signal.
+   *
+   * Note: This method will change the state of the run
+   * to signaled.
+   *
+   * @return true if the run was waiting, false otherwise
+   */
+  public boolean isWaitingForSignal() {
+    int newState = this.state.decrementAndGet();
+    return newState == 0;
+  }
+
   protected void notifyWatchersStartRun() {
     List<PerfTestWatcher> watchers = runner.getWatchers();
     if(watchers != null) {
@@ -139,7 +187,7 @@ public class PerfTestRun implements PerfTestRunContext, Runnable {
 
   protected void notifyWatchersBeforeStep() {
     List<PerfTestWatcher> watchers = runner.getWatchers();
-    if(watchers != null) {
+    if (watchers != null) {
       for (PerfTestWatcher perfTestWatcher : watchers) {
         perfTestWatcher.beforeStep(currentStep, this);
       }
@@ -148,7 +196,7 @@ public class PerfTestRun implements PerfTestRunContext, Runnable {
 
   protected void notifyWatchersAfterStep() {
     List<PerfTestWatcher> watchers = runner.getWatchers();
-    if(watchers != null) {
+    if (watchers != null) {
       for (PerfTestWatcher perfTestWatcher : watchers) {
         perfTestWatcher.afterStep(currentStep, this);
       }

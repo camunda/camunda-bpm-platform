@@ -134,6 +134,9 @@ public class PerfTestRunner {
     };
   }
 
+  public ExecutorService getExecutor() {
+    return executor;
+  }
 
   protected void runPassWithThreadCount(int passNumberOfThreads) {
 
@@ -260,6 +263,18 @@ public class PerfTestRunner {
 
   public void logStepResult(PerfTestRun perfTestRun, Object stepResult) {
     currentPass.logStepResult(perfTestRun.getCurrentStep(), stepResult);
+  }
+
+  public static void signalRun(String runId) {
+    final PerfTestRun run = currentPass.getRun(runId);
+    if (run.isWaitingForSignal()) {
+      // only complete step if the run is already waiting for a signal
+      run.getRunner().getExecutor().execute(new Runnable() {
+        public void run() {
+          run.getRunner().completedStep(run, run.getCurrentStep());
+        }
+      });
+    }
   }
 
 }

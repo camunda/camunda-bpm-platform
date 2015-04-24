@@ -14,6 +14,7 @@ package org.camunda.bpm.qa.performance.engine.steps;
 
 import static org.camunda.bpm.qa.performance.engine.steps.PerfTestConstants.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngine;
@@ -41,7 +42,14 @@ public class StartProcessInstanceStep extends ProcessEngineAwareStep {
 
   @Override
   public void execute(PerfTestRunContext context) {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey, processVariables);
+    Map<String, Object> variables = new HashMap<String, Object>();
+    if (processVariables != null) {
+      variables.putAll(processVariables);
+    }
+    // unique run id as variable
+    variables.put(RUN_ID, context.getVariable(RUN_ID));
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey, variables);
     context.setVariable(PROCESS_INSTANCE_ID, processInstance.getId());
   }
 
