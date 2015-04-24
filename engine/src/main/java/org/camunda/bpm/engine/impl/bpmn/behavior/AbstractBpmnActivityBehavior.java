@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.ErrorEventDefinition;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
@@ -85,11 +86,19 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
   }
 
   protected void propagateExceptionAsError(Exception exception, ActivityExecution execution) throws Exception {
-    if (exception instanceof ProcessEngineException && exception.getCause() == null) {
+    if (isProcessEngineExceptionWithoutCause(exception) || isTransactionNotActive()) {
       throw exception;
     } else {
       propagateError(null, exception, execution);
     }
+  }
+
+  protected boolean isTransactionNotActive() {
+    return !Context.getCommandContext().getTransactionContext().isTransactionActive();
+  }
+
+  protected boolean isProcessEngineExceptionWithoutCause(Exception exception) {
+    return exception instanceof ProcessEngineException && exception.getCause() == null;
   }
 
   protected void propagateBpmnError(BpmnError error, ActivityExecution execution) throws Exception {

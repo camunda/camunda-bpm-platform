@@ -45,5 +45,11 @@
   </bean>
 
   <bean id="printer" class="org.camunda.bpm.engine.spring.test.transaction.Printer" />
+  
+  <bean id="beanWithException" class="org.camunda.bpm.engine.spring.test.transaction.BeanWithException" />
+  
+  <bean id="serviceTaskBean" class="org.camunda.bpm.engine.spring.test.transaction.ServiceTaskBean">
+  	<property name="beanWithException" ref="beanWithException" />
+  </bean>
 
 </beans>

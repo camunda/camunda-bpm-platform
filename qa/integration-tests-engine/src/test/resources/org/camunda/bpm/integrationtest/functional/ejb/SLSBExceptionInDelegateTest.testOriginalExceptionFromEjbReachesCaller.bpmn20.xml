@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+  xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema"
+  expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="Examples">
+  
+  <process id="testProcessEjbWithException">
+  
+    <startEvent id="theStart" />
+
+	<subProcess id="sub" >
+		<startEvent id="subStart" />
+	    <serviceTask id="servicetask1"      
+	      activiti:delegateExpression="${SLSBClientDelegate}"
+		  activiti:async="true" />
+		<endEvent id="subEnd" />
+		<sequenceFlow sourceRef="subStart" targetRef="servicetask1"/>
+		<sequenceFlow sourceRef="servicetask1" targetRef="subEnd"/>
+    </subProcess>
+    
+    <userTask id="waitHere" />
+    
+    <sequenceFlow sourceRef="theStart" targetRef="sub" />
+    <sequenceFlow sourceRef="sub" targetRef="waitHere" />
+    <sequenceFlow sourceRef="waitHere" targetRef="endevent1" />
+    <endEvent id="endevent1" />
+    
+  </process>
+  
+</definitions>

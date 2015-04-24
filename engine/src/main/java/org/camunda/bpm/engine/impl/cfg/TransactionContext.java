@@ -44,4 +44,6 @@ public interface TransactionContext {
    */
   void addTransactionListener(TransactionState transactionState, TransactionListener transactionListener);
 
+  boolean isTransactionActive();
+
 }

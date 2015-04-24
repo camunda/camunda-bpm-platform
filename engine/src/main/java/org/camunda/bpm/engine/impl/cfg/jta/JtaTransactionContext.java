@@ -107,6 +107,14 @@ public class JtaTransactionContext implements TransactionContext {
     }
     
   }
+
+  public boolean isTransactionActive() {
+    try {
+      return !(transactionManager.getStatus() == Status.STATUS_MARKED_ROLLBACK) && !(transactionManager.getStatus() == Status.STATUS_NO_TRANSACTION);
+    } catch (SystemException e) {
+      throw new ProcessEngineException(e);
+    }
+  }
   
 
 }

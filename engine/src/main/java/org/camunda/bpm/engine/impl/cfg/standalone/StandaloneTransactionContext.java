@@ -33,6 +33,7 @@ public class StandaloneTransactionContext implements TransactionContext {
   private static Logger log = Logger.getLogger(StandaloneTransactionContext.class.getName());
   protected CommandContext commandContext;
   protected Map<TransactionState, List<TransactionListener>> stateTransactionListeners = null;
+  private TransactionState lastTransactionState;
 
   public StandaloneTransactionContext(CommandContext commandContext) {
     this.commandContext = commandContext;
@@ -60,6 +61,7 @@ public class StandaloneTransactionContext implements TransactionContext {
   }
 
   protected void fireTransactionEvent(TransactionState transactionState) {
+    this.setLastTransactionState(transactionState);
     if (stateTransactionListeners==null) {
       return;
     }
@@ -70,6 +72,10 @@ public class StandaloneTransactionContext implements TransactionContext {
     for (TransactionListener transactionListener: transactionListeners) {
       transactionListener.execute(commandContext);
     }
+  }
+
+  protected void setLastTransactionState(TransactionState transactionState) {
+    this.lastTransactionState = transactionState;
   }
 
   private PersistenceSession getPersistenceProvider() {
@@ -99,5 +105,9 @@ public class StandaloneTransactionContext implements TransactionContext {
       log.fine("firing event rolled back...");
       fireTransactionEvent(TransactionState.ROLLED_BACK);
     }
+  }
+
+  public boolean isTransactionActive() {
+    return !TransactionState.ROLLINGBACK.equals(lastTransactionState) && !TransactionState.ROLLED_BACK.equals(lastTransactionState);
   }
 }

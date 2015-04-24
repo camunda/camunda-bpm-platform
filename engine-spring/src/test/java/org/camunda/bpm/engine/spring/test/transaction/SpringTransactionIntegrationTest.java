@@ -13,8 +13,15 @@
 
 package org.camunda.bpm.engine.spring.test.transaction;
 
+import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.Assert.assertThat;
+
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import javax.sql.DataSource;
 
+import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.spring.impl.test.SpringProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
@@ -67,6 +74,17 @@ public class SpringTransactionIntegrationTest extends SpringProcessEngineTestCas
     
     // Cleanup
     jdbcTemplate.execute("drop table MY_TABLE if exists;");
+  }
+  
+  @Deployment(resources={
+      "org/camunda/bpm/engine/spring/test/transaction/SpringTransactionIntegrationTest.testErrorPropagationOnExceptionInTransaction.bpmn20.xml",
+      "org/camunda/bpm/engine/spring/test/transaction/SpringTransactionIntegrationTest.throwExceptionProcess.bpmn20.xml"
+  })
+  public void testErrorPropagationOnExceptionInTransaction(){
+      runtimeService.startProcessInstanceByKey("process");
+      waitForJobExecutorToProcessAllJobs(TimeUnit.MILLISECONDS.convert(10L, TimeUnit.SECONDS));
+      Incident incident = runtimeService.createIncidentQuery().activityId("servicetask").singleResult();
+      assertThat(incident.getIncidentMessage(), containsString("error"));
   }
   
   

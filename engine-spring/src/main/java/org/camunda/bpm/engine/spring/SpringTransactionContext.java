@@ -19,6 +19,7 @@ import org.camunda.bpm.engine.impl.cfg.TransactionListener;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -88,6 +89,11 @@ public class SpringTransactionContext implements TransactionContext {
       
     }
     
+  }
+
+  public boolean isTransactionActive() {
+    TransactionStatus transaction = transactionManager.getTransaction(null);
+    return !transaction.isRollbackOnly() && transaction.isCompleted();
   }
   
   protected abstract class TransactionSynchronizationAdapter implements TransactionSynchronization {
