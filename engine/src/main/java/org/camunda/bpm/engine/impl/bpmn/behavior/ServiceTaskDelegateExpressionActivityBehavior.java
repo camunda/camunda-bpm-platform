@@ -57,7 +57,6 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
     ProcessApplicationReference targetProcessApplication = ProcessApplicationContextUtil.getTargetProcessApplication((ExecutionEntity) execution);
     if(ProcessApplicationContextUtil.requiresContextSwitch(targetProcessApplication)) {
       Context.executeWithinProcessApplication(new Callable<Void>() {
-        @Override
         public Void call() throws Exception {
           signal(execution, signalName, signalData);
           return null;
