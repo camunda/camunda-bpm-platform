@@ -1,22 +1,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>camunda-qa-db-upgrade</artifactId>
-  <packaging>jar</packaging>
-  <name>camunda BPM - QA - upgrade - test</name>
-
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>
     <artifactId>camunda-qa</artifactId>
     <version>7.3.0-SNAPSHOT</version>
   </parent>
 
-  <properties>
-    <test.version.old>7.2.0</test.version.old>
-    <test.version.old.major>7.2</test.version.old.major>
-    <test.version.current>${project.version}</test.version.current>
-    <mail.server.port>5025</mail.server.port>
-  </properties>
+  <artifactId>camunda-qa-db-upgrade</artifactId>
+  <packaging>jar</packaging>
+  <name>camunda BPM - QA - upgrade - database</name>
 
   <build>
     <testSourceDirectory>${project.build.directory}/engine-test-sources</testSourceDirectory>
@@ -53,45 +46,52 @@
         </plugins>
       </build>
     </profile>
+
     <profile>
-      <id>73</id>
-      <properties>
-        <test.version.current>${project.version}</test.version.current>
-        <test.version.current.major>7.3</test.version.current.major>
-      </properties>
+      <id>upgrade-db</id>
       <dependencies>
         <dependency>
           <groupId>org.camunda.bpm.distro</groupId>
           <artifactId>camunda-sql-scripts</artifactId>
-          <version>${test.version.current}</version>
+          <version>${project.version}</version>
         </dependency>
 
         <dependency>
           <groupId>org.camunda.bpm</groupId>
           <artifactId>camunda-engine</artifactId>
-          <version>${test.version.current}</version>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-    </profile>
-    <profile>
-      <id>upgrade</id>
-      <dependencies>
-        <dependency>
-          <groupId>org.camunda.bpm.distro</groupId>
-          <artifactId>camunda-sql-scripts</artifactId>
-          <version>${test.version.current}</version>
-        </dependency>
-
-        <dependency>
-          <groupId>org.camunda.bpm</groupId>
-          <artifactId>camunda-engine</artifactId>
-          <version>${test.version.current}</version>
+          <version>${project.version}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
       <build>
         <plugins>
+          <!-- parse version properties from qa/pom.xml -->
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>parse-current-version</id>
+                <goals>
+                  <goal>parse-version</goal>
+                </goals>
+                <configuration>
+                  <propertyPrefix>camunda.current</propertyPrefix>
+                </configuration>
+              </execution>
+              <execution>
+                <id>parse-old-version</id>
+                <goals>
+                  <goal>parse-version</goal>
+                </goals>
+                <configuration>
+                  <propertyPrefix>camunda.old</propertyPrefix>
+                  <versionString>${camunda.version.old}</versionString>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-antrun-plugin</artifactId>
@@ -107,17 +107,17 @@
 
                     <mkdir dir="${project.build.directory}/scripts-current/sql/upgrade/"/>
                     <touch
-                      file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${test.version.old.major}_to_${test.version.current.major}.sql" />
+                      file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql" />
                     <touch
-                      file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${test.version.old.major}_to_${test.version.current.major}.sql" />
+                      file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql" />
                     <touch
-                      file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${test.version.current.major}_patch.sql" />
+                      file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql" />
                     <touch
-                      file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${test.version.current.major}_patch.sql" />
+                      file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql" />
                     <touch
-                      file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${test.version.old.major}_patch.sql" />
+                      file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" />
                     <touch
-                      file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${test.version.old.major}_patch.sql" />
+                      file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" />
 
                   </target>
                 </configuration>
@@ -144,7 +144,7 @@
                     <artifactItem>
                       <groupId>org.camunda.bpm</groupId>
                       <artifactId>camunda-engine</artifactId>
-                      <version>${test.version.current}</version>
+                      <version>${project.version}</version>
                       <type>test-jar</type>
                       <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
                     </artifactItem>
@@ -162,14 +162,14 @@
                     <artifactItem>
                       <groupId>org.camunda.bpm.distro</groupId>
                       <artifactId>camunda-sql-scripts</artifactId>
-                      <version>${test.version.old}</version>
+                      <version>${camunda.version.old}</version>
                       <outputDirectory>${project.build.directory}/scripts-old</outputDirectory>
                       <overWrite>true</overWrite>
                     </artifactItem>
                     <artifactItem>
                       <groupId>org.camunda.bpm.distro</groupId>
                       <artifactId>camunda-sql-scripts</artifactId>
-                      <version>${test.version.current}</version>
+                      <version>${project.version}</version>
                       <outputDirectory>${project.build.directory}/scripts-current</outputDirectory>
                       <overWrite>true</overWrite>
                     </artifactItem>
@@ -191,8 +191,8 @@
                 <configuration>
                   <srcFiles>
                     <!-- first: try dropping the DB -->
-                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_engine_${test.version.current}.sql</srcFile>
-                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_identity_${test.version.current}.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_engine_${project.version}.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_identity_${project.version}.sql</srcFile>
                   </srcFiles>
                   <autocommit>true</autocommit>
                   <onError>continue</onError>
@@ -207,8 +207,8 @@
                 <configuration>
                   <srcFiles>
                     <!-- now create old version of the schema -->
-                    <srcFile>${project.build.directory}/scripts-old/sql/create/${database.type}_engine_${test.version.old}.sql</srcFile>
-                    <srcFile>${project.build.directory}/scripts-old/sql/create/${database.type}_identity_${test.version.old}.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-old/sql/create/${database.type}_engine_${camunda.version.old}.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-old/sql/create/${database.type}_identity_${camunda.version.old}.sql</srcFile>
                   </srcFiles>
                 </configuration>
               </execution>
@@ -221,8 +221,8 @@
                 <configuration>
                   <srcFiles>
                     <!-- now patch old version of the schema -->
-                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${test.version.old.major}_patch.sql</srcFile>
-                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${test.version.old.major}_patch.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql</srcFile>
                   </srcFiles>
                 </configuration>
               </execution>
@@ -235,8 +235,8 @@
                 <configuration>
                   <srcFiles>
                     <!-- now perform the schema migrations -->
-                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${test.version.old.major}_to_${test.version.current.major}.sql</srcFile>
-                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${test.version.old.major}_to_${test.version.current.major}.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql</srcFile>
                   </srcFiles>
                 </configuration>
               </execution>
@@ -249,8 +249,8 @@
                 <configuration>
                   <srcFiles>
                     <!-- finally drop db -->
-                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_engine_${test.version.current}.sql</srcFile>
-                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_identity_${test.version.current}.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_engine_${project.version}.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_identity_${project.version}.sql</srcFile>
                   </srcFiles>
                 </configuration>
               </execution>
@@ -273,7 +273,6 @@
                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
 
                 <exclude>**/ProcessDiagramRetrievalTest.java</exclude>
-                <!--exclude>**/ManagementServiceTest.java</exclude -->
               </excludes>
               <testFailureIgnore>false</testFailureIgnore>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>

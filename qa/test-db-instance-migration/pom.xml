@@ -14,8 +14,8 @@
   </parent>
 
   <modules>
-    <module>test-fixture-70</module>
-    <module>test-fixture-71</module>
+    <module>test-fixture-old</module>
+    <module>test-fixture-new</module>
   </modules>
 
 </project>
