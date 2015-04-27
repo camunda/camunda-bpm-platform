@@ -2,9 +2,7 @@
 define([
   'angular',
   'jquery',
-  'text!./processDiagram.html',
-  'jquery-overscroll',
-  'jquery-mousewheel'
+  'text!./processDiagram.html'
 ], function(angular, $, template) {
   'use strict';
   /* jshint unused: false */
