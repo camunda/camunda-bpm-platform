@@ -1,6 +1,7 @@
 td {
   &.authorization-type {
-    max-width: 80px;
+    min-width: 120px;
+    max-width: 160px;
     select {
       padding-left: 3px;
     }
@@ -10,21 +11,23 @@ td {
     width: 180px;
   }
 
-  &.resource-id,
-  &.permissions {
-    max-width: 120px;
+  &.resource-id {
+    min-width: 120px;
+    max-width: 180px;
   }
 
   &.permissions {
     .form-control-static {
-      .border-left-radius(@input-border-radius);
-      background-color: @body-bg;
-      padding-left: 7px;
-      padding-right: 7px;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .input-group-btn {
+      vertical-align: top;
     }
   }
 
-  &.actions {
-    width: 90px;
+  &.action {
+    min-width: 90px;
   }
 }

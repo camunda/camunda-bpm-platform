@@ -20,176 +20,169 @@
         </div>
       </div>
 
-      <div class="col-md-9">
+      <form class="col-md-9 form-horizontal"
+            name="createAuthForm"
+            ng-controller="AuthorizationCreateController">
 
-        <form class="form-horizontal"
-              name="createAuthForm"
-              ng-controller="AuthorizationCreateController">
+        <legend>{{title}} Authorizations</legend>
 
-          <legend>{{title}} Authorizations</legend>
+        <table class="cam-table">
+          <thead>
+            <tr>
+              <th class="type">Type</th>
+              <th class="user group">User / Group</th>
+              <th class="permissions">Permissions</th>
+              <th class="resource-id">Resource Id</th>
+              <th class="action">Action</th>
+            </tr>
+          </thead>
 
-          <div cam-widget-loader
-               loading-state="{{ loadingState }}">
-            <table class="cam-table">
-              <thead>
-                <tr>
-                  <th class="type">Type</th>
-                  <th class="user group">User / Group</th>
-                  <th class="permissions">Permissions</th>
-                  <th class="resource-id">Resource Id</th>
-                  <th class="action">Action</th>
-                </tr>
-              </thead>
+          <tbody>
+            <tr ng-if="loadingState === 'LOADED'"
+                ng-repeat="authorization in authorizations | orderBy:getIdentityId:false">
+              <td class="type">
+                {{getType(authorization)}}
+              </td>
 
-              <tbody>
-                <tr ng-repeat="authorization in authorizations | orderBy:getIdentityId:false">
-                  <td class="type">
-                    {{getType(authorization)}}
-                  </td>
+              <td class="user group">
+                <span ng-show="authorization.userId"
+                      tooltip="User">
+                  <span class="glyphicon glyphicon-user"></span>
+                  {{authorization.userId}}
+                </span>
 
-                  <td class="user group">
-                    <span ng-show="authorization.userId"
-                          tooltip="User">
-                      <span class="glyphicon glyphicon-user"></span>
-                      {{authorization.userId}}
-                    </span>
+                <span ng-show="authorization.groupId"
+                      tooltip="Group">
+                  <span class="glyphicon glyphicon-th"></span>
+                  {{authorization.groupId}}
+                </span>
+              </td>
 
-                    <span ng-show="authorization.groupId"
-                          tooltip="Group">
-                      <span class="glyphicon glyphicon-th"></span>
-                      {{authorization.groupId}}
-                    </span>
-                  </td>
+              <td class="permissions">
+                {{formatPermissions(authorization.permissions)}}
+              </td>
 
-                  <td class="permissions">
-                    {{formatPermissions(authorization.permissions)}}
-                  </td>
+              <td class="resource-id">
+                {{authorization.resourceId}}
+              </td>
 
-                  <td class="resource-id">
-                    {{authorization.resourceId}}
-                  </td>
+              <td class="action">
+                <a class="btn btn-link btn-sm"
+                   ng-click="deleteAuthorization(authorization)">
+                  Delete
+                </a>
+              </td>
+            </tr>
+            <!-- ....................................... -->
+            <tr class="warning"
+                id="createNew"
+                ng-show="isCreateNewAuthorization">
+              <td class="authorization-type">
+                <select id="selectType"
+                        ng-model="newAuthorization.type"
+                        class="select-auth-type form-control">
+                  <option value="0">GLOBAL</option>
+                  <option value="1">ALLOW</option>
+                  <option value="2">DENY</option>
+                </select>
+              </td>
 
-                  <td class="action">
-                    <a class="btn btn-link btn-sm"
-                       ng-click="deleteAuthorization(authorization)">
-                      Delete
-                    </a>
-                  </td>
-                </tr>
+              <td class="identity-id">
+                <div class="input-group">
+                  <a class="input-group-addon"
+                     ng-disabled="isIdentityIdDisabled()"
+                     ng-click="setIdentityType(identityType == 'Group' ? 'User' : 'Group')"
+                     tooltip="{{identityType}}">
+                    <span class="glyphicon"
+                          ng-class="{'glyphicon-th': identityType == 'Group', 'glyphicon-user': identityType == 'User'}"></span>
+                  </a>
 
-                <tr class="warning"
-                    id="createNew"
-                    ng-show="isCreateNewAuthorization">
-                  <td class="authorization-type">
-                    <select id="selectType"
-                            ng-model="newAuthorization.type"
-                            class="select-auth-type form-control">
-                      <option value="0">GLOBAL</option>
-                      <option value="1">ALLOW</option>
-                      <option value="2">DENY</option>
-                    </select>
-                  </td>
-
-                  <td class="identity-id">
-                    <div class="input-group">
-                      <a class="input-group-addon"
+                  <input type="text"
+                         class="input-auth-name form-control"
+                         id="inputIdentityId"
+                         placeholder="User / Group Id"
                          ng-disabled="isIdentityIdDisabled()"
-                         ng-click="setIdentityType(identityType == 'Group' ? 'User' : 'Group')"
-                         tooltip="{{identityType}}">
-                        <span class="glyphicon"
-                              ng-class="{'glyphicon-th': identityType == 'Group', 'glyphicon-user': identityType == 'User'}"></span>
-                      </a>
+                         ng-model="newAuthorization.identityId"
+                         required />
+                </div>
+              </td>
 
-                      <input type="text"
-                             class="input-auth-name form-control"
-                             id="inputIdentityId"
-                             placeholder="User / Group Id"
-                             ng-disabled="isIdentityIdDisabled()"
-                             ng-model="newAuthorization.identityId"
-                             required />
-                    </div>
-                  </td>
+              <td class="permissions">
+                <div class="input-group">
 
-                  <td class="permissions">
-                    <div class="input-group">
+                  <div class="form-control-static"
+                       ng-click="addAllPermissions()">
+                    {{ formatPermissions(selectedPermissions) }}
+                  </div>
 
-                      <div class="form-control-static"
-                           ng-click="addAllPermissions()">
-                        {{ formatPermissions(selectedPermissions) }}
-                      </div>
-
-                      <!-- using "ng-if" rather than "ng-show" to prevent style glitches -->
-                      <div ng-if="selectedPermissions != 'ALL'"
-                           class="input-group-btn">
-                        <a ng-click="addAllPermissions()"
-                           class="btn btn-default">
-                          <span class="glyphicon glyphicon-asterisk"></span>
-                        </a>
-                      </div>
-
-                      <div ng-if="availablePermissions.length > 0"
-                           class="input-group-btn dropdown">
-                        <button type="button"
-                                class="btn btn-default dropdown-toggle"
-                                data-toggle="dropdown"
-                                aria-expanded="false">
-                          <span class="glyphicon glyphicon-pencil"></span>
-                          <span class="caret"></span>
-                        </button>
-
-                        <ul class="dropdown-menu dropdown-menu-right">
-                          <li ng-repeat="perm in availablePermissions">
-                            <a ng-click="addPermission(perm)">{{perm}}</a>
-                          </li>
-                        </ul>
-                      </div><!-- /input-btn-group -->
-                    </div><!-- /input-group -->
-                  </td>
-
-                  <td class="resource-id">
-                    <input type="text"
-                           id="inputResourceId"
-                           ng-model="newAuthorization.resourceId"
-                           class="in-place-edit form-control"
-                           required />
-
-                    <span ng-show="selectedResourceType==0"
-                          class="text-muted">(cockpit or tasklist or *)</span>
-                  </td>
-
-                  <td class="action">
-                    <div class="btn-group">
-                      <button type="submit"
-                              class="btn btn-primary"
-                              ng-disabled="createAuthForm.$invalid"
-                              ng-click="createAuthorization()">
-                        <span class="glyphicon glyphicon-ok "></span>
-                      </button>
-
-                      <a class="btn btn-default"
-                         ng-click="toggleCreateNewForm()">
-                        <span class="glyphicon glyphicon-ban-circle"></span>
-                      </a>
-                    </div>
-                  </td>
-                </tr>
-
-                <tr ng-hide="isCreateNewAuthorization">
-                  <td colspan="5">
-                    <a class="btn btn-link"
-                       ng-click="toggleCreateNewForm()">
-                      <span class="glyphicon glyphicon-plus"></span>
-                      Create New
+                  <!-- using "ng-if" rather than "ng-show" to prevent style glitches -->
+                  <div ng-if="selectedPermissions != 'ALL'"
+                       class="input-group-btn">
+                    <a ng-click="addAllPermissions()"
+                       class="btn btn-default">
+                      <span class="glyphicon glyphicon-asterisk"></span>
                     </a>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </form>
+                  </div>
 
-      </div>
-    </div>
+                  <div ng-if="availablePermissions.length > 0"
+                       class="input-group-btn dropdown">
+                    <button type="button"
+                            class="btn btn-default dropdown-toggle"
+                            data-toggle="dropdown"
+                            aria-expanded="false">
+                      <span class="glyphicon glyphicon-pencil"></span>
+                      <span class="caret"></span>
+                    </button>
+
+                    <ul class="dropdown-menu dropdown-menu-right">
+                      <li ng-repeat="perm in availablePermissions">
+                        <a ng-click="addPermission(perm)">{{perm}}</a>
+                      </li>
+                    </ul>
+                  </div><!-- /input-btn-group -->
+                </div><!-- /input-group -->
+              </td>
+
+              <td class="resource-id">
+                <input type="text"
+                       id="inputResourceId"
+                       ng-model="newAuthorization.resourceId"
+                       class="in-place-edit form-control"
+                       required />
+
+                <span ng-show="selectedResourceType==0"
+                      class="text-muted">(cockpit or tasklist or *)</span>
+              </td>
+
+              <td class="action">
+                <div class="btn-group">
+                  <button type="submit"
+                          class="btn btn-primary"
+                          ng-disabled="createAuthForm.$invalid"
+                          ng-click="createAuthorization()">
+                    <span class="glyphicon glyphicon-ok "></span>
+                  </button>
+
+                  <a class="btn btn-default"
+                     ng-click="toggleCreateNewForm()">
+                    <span class="glyphicon glyphicon-ban-circle"></span>
+                  </a>
+                </div>
+              </td>
+            </tr>
+
+            <tr ng-hide="isCreateNewAuthorization">
+              <td colspan="5">
+                <a class="btn btn-link"
+                   ng-click="toggleCreateNewForm()">
+                  <span class="glyphicon glyphicon-plus"></span>
+                  Create New
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </form>
   </section>
 </div>
 <!-- / CE - camunda-admin-ui/client/scripts/pages/authorizations.html -->
