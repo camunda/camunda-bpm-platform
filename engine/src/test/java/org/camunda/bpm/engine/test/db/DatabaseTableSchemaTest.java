@@ -86,7 +86,7 @@ public class DatabaseTableSchemaTest extends TestCase {
         .setDataSource(pooledDataSource).setDatabaseSchemaUpdate("NO_CHECK");
     config1.setDatabaseTablePrefix(SCHEMA_NAME + "." + PREFIX_NAME);
     config1.setDatabaseSchema(SCHEMA_NAME);
-    config1.buildProcessEngine();
+    ProcessEngine engine = config1.buildProcessEngine();
     CommandExecutor commandExecutor = config1.getCommandExecutorTxRequired();
 
     commandExecutor.execute(new Command<Void>(){
@@ -96,6 +96,8 @@ public class DatabaseTableSchemaTest extends TestCase {
         return null;
       }
     });
+
+    engine.close();
 
   }
 
