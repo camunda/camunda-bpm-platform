@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,11 +15,15 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.bpmn.diagram.ProcessDiagramLayoutFactory;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.repository.DiagramLayout;
 
 
@@ -42,13 +46,27 @@ public class GetDeploymentProcessDiagramLayoutCmd implements Command<DiagramLayo
     this.processDefinitionId = processDefinitionId;
   }
 
-  public DiagramLayout execute(CommandContext commandContext) {
-    InputStream processModelStream =
-            new GetDeploymentProcessModelCmd(processDefinitionId)
-            .execute(commandContext);
-    InputStream processDiagramStream =
-            new GetDeploymentProcessDiagramCmd(processDefinitionId)
-            .execute(commandContext);
+  public DiagramLayout execute(final CommandContext commandContext) {
+    ProcessDefinitionEntity processDefinition = Context
+        .getProcessEngineConfiguration()
+        .getDeploymentCache()
+        .findDeployedProcessDefinitionById(processDefinitionId);
+
+    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+    authorizationManager.checkReadProcessDefinition(processDefinition);
+
+    InputStream processModelStream = commandContext.runWithoutAuthentication(new Callable<InputStream>() {
+      public InputStream call() throws Exception {
+        return new GetDeploymentProcessModelCmd(processDefinitionId).execute(commandContext);
+      }
+    });
+
+    InputStream processDiagramStream = commandContext.runWithoutAuthentication(new Callable<InputStream>() {
+      public InputStream call() throws Exception {
+        return new GetDeploymentProcessDiagramCmd(processDefinitionId).execute(commandContext);
+      }
+    });
+
     return new ProcessDiagramLayoutFactory().getProcessDiagramLayout(processModelStream, processDiagramStream);
   }
 

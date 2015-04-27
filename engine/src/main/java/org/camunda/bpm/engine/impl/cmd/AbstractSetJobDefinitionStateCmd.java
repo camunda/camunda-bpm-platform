@@ -13,7 +13,6 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.Date;
-import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -56,19 +55,15 @@ public abstract class AbstractSetJobDefinitionStateCmd extends AbstractSetStateC
 
     if (jobDefinitionId != null) {
 
-      final JobDefinitionManager jobDefinitionManager = commandContext.getJobDefinitionManager();
-      JobDefinitionEntity jobDefinition = commandContext.runWithoutAuthentication(new Callable<JobDefinitionEntity>() {
-        public JobDefinitionEntity call() throws Exception {
-          return jobDefinitionManager.findById(jobDefinitionId);
-        }
-      });
+      JobDefinitionManager jobDefinitionManager = commandContext.getJobDefinitionManager();
+      JobDefinitionEntity jobDefinition = jobDefinitionManager.findById(jobDefinitionId);
 
       if (jobDefinition != null) {
         String processDefinitionKey = jobDefinition.getProcessDefinitionKey();
         authorizationManager.checkUpdateProcessDefinitionByKey(processDefinitionKey);
 
         if (includeSubResources) {
-          authorizationManager.checkUpdateInstanceOnProcessDefinitionByKey(processDefinitionKey);
+          authorizationManager.checkUpdateProcessInstanceByProcessDefinitionKey(processDefinitionKey);
         }
       }
 
@@ -78,7 +73,7 @@ public abstract class AbstractSetJobDefinitionStateCmd extends AbstractSetStateC
       authorizationManager.checkUpdateProcessDefinitionById(processDefinitionId);
 
       if (includeSubResources) {
-        authorizationManager.checkUpdateInstanceOnProcessDefinitionById(processDefinitionId);
+        authorizationManager.checkUpdateProcessInstanceByProcessDefinitionId(processDefinitionId);
       }
 
     } else
@@ -87,7 +82,7 @@ public abstract class AbstractSetJobDefinitionStateCmd extends AbstractSetStateC
       authorizationManager.checkUpdateProcessDefinitionByKey(processDefinitionKey);
 
       if (includeSubResources) {
-        authorizationManager.checkUpdateInstanceOnProcessDefinitionByKey(processDefinitionKey);
+        authorizationManager.checkUpdateProcessInstanceByProcessDefinitionKey(processDefinitionKey);
       }
     }
   }

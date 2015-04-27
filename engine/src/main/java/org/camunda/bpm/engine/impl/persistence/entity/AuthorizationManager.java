@@ -23,6 +23,7 @@ import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_TASK;
 import static org.camunda.bpm.engine.authorization.Resources.AUTHORIZATION;
+import static org.camunda.bpm.engine.authorization.Resources.DEPLOYMENT;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Resources.TASK;
@@ -40,6 +41,7 @@ import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.ActivityStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.AuthorizationQueryImpl;
+import org.camunda.bpm.engine.impl.DeploymentQueryImpl;
 import org.camunda.bpm.engine.impl.EventSubscriptionQueryImpl;
 import org.camunda.bpm.engine.impl.IncidentQueryImpl;
 import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
@@ -280,6 +282,26 @@ public class AuthorizationManager extends AbstractManager {
 
   // predefined authorization checks
 
+  /* DEPLOYMENT */
+
+  // create permission ////////////////////////////////////////////////
+
+  public void checkCreateDeployment() {
+    checkAuthorization(CREATE, DEPLOYMENT);
+  }
+
+  // read permission //////////////////////////////////////////////////
+
+  public void checkReadDeployment(String deploymentId) {
+    checkAuthorization(READ, DEPLOYMENT, deploymentId);
+  }
+
+  // delete permission ///////////////////////////////////////////////
+
+  public void checkDeleteDeployment(String deploymentId) {
+    checkAuthorization(DELETE, DEPLOYMENT, deploymentId);
+  }
+
   /* PROCESS DEFINITION */
 
   // read permission //////////////////////////////////////////////////
@@ -382,16 +404,33 @@ public class AuthorizationManager extends AbstractManager {
     checkAuthorization(Arrays.asList(firstCheck, secondCheck));
   }
 
-  public void checkUpdateInstanceOnProcessDefinitionById(String processDefinitionId) {
+  public void checkUpdateProcessInstanceByProcessDefinitionId(String processDefinitionId) {
     ProcessDefinitionEntity definition = getProcessDefinitionManager().findLatestProcessDefinitionById(processDefinitionId);
     if (definition != null) {
       String processDefinitionKey = definition.getKey();
-      checkUpdateInstanceOnProcessDefinitionByKey(processDefinitionKey);
+      checkUpdateProcessInstanceByProcessDefinitionKey(processDefinitionKey);
     }
   }
 
-  public void checkUpdateInstanceOnProcessDefinitionByKey(String processDefinitionKey) {
-    checkAuthorization(UPDATE_INSTANCE, PROCESS_DEFINITION, processDefinitionKey);
+  public void checkUpdateProcessInstanceByProcessDefinitionKey(String processDefinitionKey) {
+    // necessary permissions:
+    // - UPDATE on ANY PROCESS_INSTANCE
+
+    PermissionCheck firstCheck = new PermissionCheck();
+    firstCheck.setPermission(UPDATE);
+    firstCheck.setResource(PROCESS_INSTANCE);
+
+    // ... OR ...
+
+    // - UPDATE_INSTANCE on PROCESS_DEFINITION
+
+    PermissionCheck secondCheck = new PermissionCheck();
+    secondCheck.setPermission(UPDATE_INSTANCE);
+    secondCheck.setResource(PROCESS_DEFINITION);
+    secondCheck.setResourceId(processDefinitionKey);
+    secondCheck.setAuthorizationNotFoundReturnValue(0l);
+
+    checkAuthorization(Arrays.asList(firstCheck, secondCheck));
   }
 
   // delete permission /////////////////////////////////////////////////
@@ -547,6 +586,12 @@ public class AuthorizationManager extends AbstractManager {
   }
 
   /* QUERIES */
+
+  // deployment query ////////////////////////////////////////
+
+  public void configureDeploymentQuery(DeploymentQueryImpl query) {
+    configureQuery(query, DEPLOYMENT);
+  }
 
   // process definition query ////////////////////////////////
 

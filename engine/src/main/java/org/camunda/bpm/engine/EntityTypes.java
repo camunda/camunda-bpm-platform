@@ -32,5 +32,6 @@ public class EntityTypes {
   public static final String JOB = "Job";
   public static final String JOB_DEFINITION = "JobDefinition";
   public static final String VARIABLE = "Variable";
+  public static final String DEPLOYMENT = "Deployment";
 
 }

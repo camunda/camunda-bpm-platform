@@ -31,8 +31,9 @@ import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.AbstractQuery;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -54,15 +55,7 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
   protected static final String VARIABLE_NAME = "aVariableName";
   protected static final String VARIABLE_VALUE = "aVariableValue";
 
-  protected void initializeProcessEngine() {
-    super.initializeProcessEngine();
-
-    processEngineConfiguration = (ProcessEngineConfigurationImpl) getProcessEngine()
-        .getProcessEngineConfiguration();
-
-    identityService = processEngineConfiguration.getIdentityService();
-    authorizationService = processEngineConfiguration.getAuthorizationService();
-
+  protected void setUp() throws Exception {
     user = createUser(userId);
     group = createGroup(groupId);
 
@@ -303,9 +296,38 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     return instance;
   }
 
+  protected void suspendProcessDefinitionByKey(String processDefinitionKey) {
+    disableAuthorization();
+    repositoryService.suspendProcessDefinitionByKey(processDefinitionKey);
+    enableAuthorization();
+  }
+
+  protected void suspendProcessDefinitionById(String processDefinitionId) {
+    disableAuthorization();
+    repositoryService.suspendProcessDefinitionById(processDefinitionId);
+    enableAuthorization();
+  }
+
   protected void suspendProcessInstanceById(String processInstanceId) {
     disableAuthorization();
     runtimeService.suspendProcessInstanceById(processInstanceId);
+    enableAuthorization();
+  }
+
+  protected Deployment createDeployment(String name, String... resources) {
+    disableAuthorization();
+    DeploymentBuilder builder = repositoryService.createDeployment();
+    for (String resource : resources) {
+      builder.addClasspathResource(resource);
+    }
+    Deployment deployment = builder.deploy();
+    enableAuthorization();
+    return deployment;
+  }
+
+  protected void deleteDeployment(String deploymentId) {
+    disableAuthorization();
+    repositoryService.deleteDeployment(deploymentId, true);
     enableAuthorization();
   }
 

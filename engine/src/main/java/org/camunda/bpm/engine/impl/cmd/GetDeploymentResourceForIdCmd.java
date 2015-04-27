@@ -12,14 +12,16 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
+
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -39,6 +41,9 @@ public class GetDeploymentResourceForIdCmd implements Command<InputStream>, Seri
   public InputStream execute(CommandContext commandContext) {
     ensureNotNull("deploymentId", deploymentId);
     ensureNotNull("resourceId", resourceId);
+
+    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+    authorizationManager.checkReadDeployment(deploymentId);
 
     ResourceEntity resource = commandContext
       .getResourceManager()

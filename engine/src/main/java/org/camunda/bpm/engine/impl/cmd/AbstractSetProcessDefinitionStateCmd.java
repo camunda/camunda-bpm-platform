@@ -67,7 +67,7 @@ public abstract class AbstractSetProcessDefinitionStateCmd extends AbstractSetSt
       authorizationManager.checkUpdateProcessDefinitionById(processDefinitionId);
 
       if (includeSubResources) {
-        authorizationManager.checkUpdateInstanceOnProcessDefinitionById(processDefinitionId);
+        authorizationManager.checkUpdateProcessInstanceByProcessDefinitionId(processDefinitionId);
       }
     } else
 
@@ -75,7 +75,7 @@ public abstract class AbstractSetProcessDefinitionStateCmd extends AbstractSetSt
       authorizationManager.checkUpdateProcessDefinitionByKey(processDefinitionKey);
 
       if (includeSubResources) {
-        authorizationManager.checkUpdateInstanceOnProcessDefinitionByKey(processDefinitionId);
+        authorizationManager.checkUpdateProcessInstanceByProcessDefinitionKey(processDefinitionKey);
       }
     }
   }

@@ -51,11 +51,11 @@ public abstract class AbstractSetProcessInstanceStateCmd extends AbstractSetStat
     } else
 
     if (processDefinitionId != null) {
-      authorizationManager.checkUpdateInstanceOnProcessDefinitionById(processDefinitionId);
+      authorizationManager.checkUpdateProcessInstanceByProcessDefinitionId(processDefinitionId);
     } else
 
     if (processDefinitionKey != null) {
-      authorizationManager.checkUpdateInstanceOnProcessDefinitionByKey(processDefinitionKey);
+      authorizationManager.checkUpdateProcessInstanceByProcessDefinitionKey(processDefinitionKey);
     }
   }
 

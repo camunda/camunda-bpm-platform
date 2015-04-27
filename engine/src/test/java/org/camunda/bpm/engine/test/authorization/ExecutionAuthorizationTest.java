@@ -33,18 +33,16 @@ public class ExecutionAuthorizationTest extends AuthorizationTest {
 
   protected String deploymentId;
 
-  public void setUp() {
-    deploymentId = repositoryService
-      .createDeployment()
-      .addClasspathResource("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
-      .addClasspathResource("org/camunda/bpm/engine/test/authorization/messageBoundaryEventProcess.bpmn20.xml")
-      .deploy()
-      .getId();
+  public void setUp() throws Exception {
+    super.setUp();
+    deploymentId = createDeployment(null,
+        "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
+        "org/camunda/bpm/engine/test/authorization/messageBoundaryEventProcess.bpmn20.xml").getId();
   }
 
   public void tearDown() {
+    deleteDeployment(deploymentId);
     super.tearDown();
-    repositoryService.deleteDeployment(deploymentId, true);
   }
 
   public void testSimpleQueryWithoutAuthorization() {

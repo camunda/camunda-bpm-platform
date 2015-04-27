@@ -27,14 +27,20 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
+import java.util.concurrent.Callable;
+
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * Gives access to a deploy BPMN model instance which can be accessed by
@@ -55,10 +61,19 @@ public class GetDeploymentBpmnModelInstanceCmd implements Command<BpmnModelInsta
   }
 
   public BpmnModelInstance execute(CommandContext commandContext) {
-    BpmnModelInstance modelInstance = Context
-      .getProcessEngineConfiguration()
-      .getDeploymentCache()
-      .findBpmnModelInstanceForProcessDefinition(processDefinitionId);
+    ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
+    final DeploymentCache deploymentCache = configuration.getDeploymentCache();
+
+    ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
+
+    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+    authorizationManager.checkReadProcessDefinition(processDefinition);
+
+    BpmnModelInstance modelInstance = commandContext.runWithoutAuthentication(new Callable<BpmnModelInstance>() {
+      public BpmnModelInstance call() throws Exception {
+        return deploymentCache.findBpmnModelInstanceForProcessDefinition(processDefinitionId);
+      }
+    });
 
     ensureNotNull("no BPMN model instance found for process definition id " + processDefinitionId, "modelInstance", modelInstance);
     return modelInstance;

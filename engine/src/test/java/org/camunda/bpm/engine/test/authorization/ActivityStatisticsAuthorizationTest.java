@@ -35,21 +35,17 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
 
   protected String deploymentId;
 
-  public void setUp() {
-    deploymentId = repositoryService
-      .createDeployment()
-      .addClasspathResource("org/camunda/bpm/engine/test/authorization/oneIncidentProcess.bpmn20.xml")
-      .deploy()
-      .getId();
-
+  public void setUp() throws Exception {
+    super.setUp();
+    deploymentId = createDeployment(null, "org/camunda/bpm/engine/test/authorization/oneIncidentProcess.bpmn20.xml").getId();
     startOneIncidentProcessAndExecuteJob();
     startOneIncidentProcessAndExecuteJob();
     startOneIncidentProcessAndExecuteJob();
   }
 
   public void tearDown() {
+    deleteDeployment(deploymentId);
     super.tearDown();
-    repositoryService.deleteDeployment(deploymentId, true);
   }
 
   // without any authorization

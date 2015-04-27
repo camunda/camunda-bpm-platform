@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" ?> 
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
-  
+
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity">
 
   <!-- DEPLOYMENT INSERT -->
-  
+
   <insert id="insertDeployment" parameterType="org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity">
     insert into ${prefix}ACT_RE_DEPLOYMENT(ID_, NAME_, DEPLOY_TIME_)
     values(#{id, jdbcType=VARCHAR}, #{name, jdbcType=VARCHAR}, #{deploymentTime, jdbcType=TIMESTAMP})
   </insert>
-  
+
   <!-- DEPLOYMENT UPDATE -->
-  
+
   <!-- DEPLOYMENT DELETE -->
-  
+
   <delete id="deleteDeployment" parameterType="string">
     delete from ${prefix}ACT_RE_DEPLOYMENT where ID_ = #{id}
   </delete>
-  
+
   <!-- DEPLOYMENT RESULTMAP -->
-  
+
   <resultMap id="deploymentResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
@@ -36,7 +36,7 @@
   <select id="selectDeploymentsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.DeploymentQueryImpl" resultMap="deploymentResultMap">
   	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select distinct RES.* 
+    select distinct RES.*
     ${limitBetween}
     <include refid="selectDeploymentsByQueryCriteriaSql"/>
     ${orderBy}
@@ -47,8 +47,8 @@
     select count(distinct RES.ID_)
     <include refid="selectDeploymentsByQueryCriteriaSql"/>
   </select>
-  
-  <sql id="selectDeploymentsByQueryCriteriaSql">  
+
+  <sql id="selectDeploymentsByQueryCriteriaSql">
     from ${prefix}ACT_RE_DEPLOYMENT RES
     <where>
       <if test="deploymentId != null">
@@ -66,9 +66,12 @@
       <if test="deploymentAfter != null">
         and RES.DEPLOY_TIME_ &gt; #{deploymentAfter}
       </if>
+
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+
     </where>
   </sql>
-    
+
   <select id="selectDeploymentsByName" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="deploymentResultMap">
     select * from ${prefix}ACT_RE_DEPLOYMENT D where NAME_=#{parameter} order by D.DEPLOY_TIME_ desc
   </select>
@@ -77,13 +80,13 @@
   <select id="selectDeploymentsByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.DeploymentQueryImpl" resultMap="deploymentResultMap">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select distinct RES.* 
+    select distinct RES.*
     ${limitBetween}
     <include refid="selectDeploymentsByQueryCriteriaSql"/>
    	${orderBy}
     ${limitAfter}
   </select>
-  
+
   <!-- mysql specific -->
   <select id="selectDeploymentCountByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.DeploymentQueryImpl" resultType="long">
     select distinct count(RES.ID_)

@@ -12,12 +12,15 @@
  */
 package org.camunda.bpm.engine.repository;
 
-import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
 import java.util.zip.ZipInputStream;
+
+import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 /**
  * Builder for creating new deployments.
@@ -80,6 +83,9 @@ public interface DeploymentBuilder {
 
   /**
    * Deploys all provided sources to the process engine.
+   *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#CREATE} permission on {@link Resources#DEPLOYMENT}.
    */
   Deployment deploy();
 

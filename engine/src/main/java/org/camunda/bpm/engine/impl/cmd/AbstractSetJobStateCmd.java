@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.util.concurrent.Callable;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
@@ -55,49 +53,40 @@ public abstract class AbstractSetJobStateCmd extends AbstractSetStateCmd {
 
     if (jobId != null) {
 
-      final JobManager jobManager = commandContext.getJobManager();
-      JobEntity job = commandContext.runWithoutAuthentication(new Callable<JobEntity>() {
-        public JobEntity call() throws Exception {
-          return jobManager.findJobById(jobId);
-        }
-      });
-
-      job = jobManager.findJobById(jobId);
+      JobManager jobManager = commandContext.getJobManager();
+      JobEntity job = jobManager.findJobById(jobId);
 
       if (job != null) {
 
         String processInstanceId = job.getProcessInstanceId();
         if (processInstanceId != null) {
           authorizationManager.checkUpdateProcessInstanceById(processInstanceId);
-          return;
         }
-
-        // start timer job is not assigned to a specific process
-        // instance, that's why we have to check whether there
-        // exists a UPDATE_INSTANCES permission on process definition
-        String processDefinitionKey = job.getProcessDefinitionKey();
-        if (processDefinitionKey != null) {
-          authorizationManager.checkUpdateInstanceOnProcessDefinitionByKey(processDefinitionKey);
-          return;
+        else {
+          // start timer job is not assigned to a specific process
+          // instance, that's why we have to check whether there
+          // exists a UPDATE_INSTANCES permission on process definition or
+          // a UPDATE permission on any process instance
+          String processDefinitionKey = job.getProcessDefinitionKey();
+          if (processDefinitionKey != null) {
+            authorizationManager.checkUpdateProcessInstanceByProcessDefinitionKey(processDefinitionKey);
+          }
         }
-
+        // if (processInstanceId == null && processDefinitionKey == null):
         // job is not assigned to any process instance nor process definition
-        // then it is possible to activate/suspend the corresponding job
+        // then it is always possible to activate/suspend the corresponding job
+        // -> no authorization check necessary
       }
     } else
 
     if (jobDefinitionId != null) {
 
-      final JobDefinitionManager jobDefinitionManager = commandContext.getJobDefinitionManager();
-      JobDefinitionEntity jobDefinition = commandContext.runWithoutAuthentication(new Callable<JobDefinitionEntity>() {
-        public JobDefinitionEntity call() throws Exception {
-          return jobDefinitionManager.findById(jobDefinitionId);
-        }
-      });
+      JobDefinitionManager jobDefinitionManager = commandContext.getJobDefinitionManager();
+      JobDefinitionEntity jobDefinition = jobDefinitionManager.findById(jobDefinitionId);
 
       if (jobDefinition != null) {
         String processDefinitionKey = jobDefinition.getProcessDefinitionKey();
-        authorizationManager.checkUpdateInstanceOnProcessDefinitionByKey(processDefinitionKey);
+        authorizationManager.checkUpdateProcessInstanceByProcessDefinitionKey(processDefinitionKey);
       }
 
     } else
@@ -107,11 +96,11 @@ public abstract class AbstractSetJobStateCmd extends AbstractSetStateCmd {
     } else
 
     if (processDefinitionId != null) {
-      authorizationManager.checkUpdateInstanceOnProcessDefinitionById(processDefinitionId);
+      authorizationManager.checkUpdateProcessInstanceByProcessDefinitionId(processDefinitionId);
     } else
 
     if (processDefinitionKey != null) {
-      authorizationManager.checkUpdateInstanceOnProcessDefinitionByKey(processDefinitionKey);
+      authorizationManager.checkUpdateProcessInstanceByProcessDefinitionKey(processDefinitionKey);
     }
   }
 

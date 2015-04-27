@@ -15,9 +15,11 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.impl.DeploymentQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
@@ -35,6 +37,7 @@ public class DeploymentManager extends AbstractManager {
 
   public void insertDeployment(DeploymentEntity deployment) {
     getDbEntityManager().insert(deployment);
+    createDefaultAuthorizations(deployment);
 
     for (ResourceEntity resource : deployment.getResources().values()) {
       resource.setDeploymentId(deployment.getId());
@@ -125,6 +128,7 @@ public class DeploymentManager extends AbstractManager {
 
     getResourceManager().deleteResourcesByDeploymentId(deploymentId);
 
+    deleteAuthorizations(Resources.DEPLOYMENT, deploymentId);
     getDbEntityManager().delete(DeploymentEntity.class, "deleteDeployment", deploymentId);
   }
 
@@ -175,13 +179,14 @@ public class DeploymentManager extends AbstractManager {
   }
 
   public long findDeploymentCountByQueryCriteria(DeploymentQueryImpl deploymentQuery) {
+    getAuthorizationManager().configureDeploymentQuery(deploymentQuery);
     return (Long) getDbEntityManager().selectOne("selectDeploymentCountByQueryCriteria", deploymentQuery);
   }
 
   @SuppressWarnings("unchecked")
   public List<Deployment> findDeploymentsByQueryCriteria(DeploymentQueryImpl deploymentQuery, Page page) {
-    final String query = "selectDeploymentsByQueryCriteria";
-    return getDbEntityManager().selectList(query, deploymentQuery, page);
+    getAuthorizationManager().configureDeploymentQuery(deploymentQuery);
+    return getDbEntityManager().selectList("selectDeploymentsByQueryCriteria", deploymentQuery, page);
   }
 
   @SuppressWarnings("unchecked")
@@ -193,6 +198,16 @@ public class DeploymentManager extends AbstractManager {
   }
 
   public void flush() {
+  }
+
+  // helper /////////////////////////////////////////////////
+
+  protected void createDefaultAuthorizations(DeploymentEntity deployment) {
+    if(isAuthorizationEnabled()) {
+      ResourceAuthorizationProvider provider = getResourceAuthorizationProvider();
+      AuthorizationEntity[] authorizations = provider.newDeployment(deployment);
+      saveDefaultAuthorizations(authorizations);
+    }
   }
 
 }

@@ -14,8 +14,10 @@ package org.camunda.bpm.engine.impl.cfg.auth;
 
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
 import static org.camunda.bpm.engine.authorization.Permissions.ALL;
+import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
+import static org.camunda.bpm.engine.authorization.Resources.DEPLOYMENT;
 import static org.camunda.bpm.engine.authorization.Resources.FILTER;
 import static org.camunda.bpm.engine.authorization.Resources.GROUP;
 import static org.camunda.bpm.engine.authorization.Resources.TASK;
@@ -24,15 +26,19 @@ import static org.camunda.bpm.engine.authorization.Resources.USER;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
+import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -86,6 +92,23 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
       return null;
 
     }
+  }
+
+  // Deployment ///////////////////////////////////////////////
+
+  public AuthorizationEntity[] newDeployment(Deployment deployment) {
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    IdentityService identityService = processEngineConfiguration.getIdentityService();
+    Authentication currentAuthentication = identityService.getCurrentAuthentication();
+
+    if (currentAuthentication != null && currentAuthentication.getUserId() != null) {
+      String userId = currentAuthentication.getUserId();
+      String deploymentId = deployment.getId();
+      AuthorizationEntity authorization = createGrantAuthorization(userId, null, DEPLOYMENT, deploymentId, READ, DELETE);
+      return new AuthorizationEntity[]{ authorization };
+    }
+
+    return null;
   }
 
   // Process Definition //////////////////////////////////////

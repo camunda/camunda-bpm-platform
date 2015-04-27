@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.Date;
+import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -45,10 +46,19 @@ public abstract class AbstractSetStateCmd implements Command<Void> {
       updateSuspensionState(commandContext, getNewSuspensionState());
 
       if (isIncludeSubResources()) {
-        AbstractSetStateCmd cmd = getNextCommand();
+        final AbstractSetStateCmd cmd = getNextCommand();
         if (cmd != null) {
           cmd.disableLogUserOperation();
-          cmd.execute(commandContext);
+          // avoids unnecessary authorization checks
+          // pre-requirement: the necessary authorization check
+          // for included resources should be done before this
+          // call.
+          commandContext.runWithoutAuthentication(new Callable<Void>() {
+            public Void call() throws Exception {
+              cmd.execute(commandContext);
+              return null;
+            }
+          });
         }
       }
 

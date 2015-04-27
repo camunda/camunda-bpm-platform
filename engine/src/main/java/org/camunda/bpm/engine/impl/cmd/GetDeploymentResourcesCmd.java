@@ -12,18 +12,21 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
 import java.util.List;
+
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 
 
 /**
  * @author kristin.polenz@camunda.com
  */
+@SuppressWarnings("rawtypes")
 public class GetDeploymentResourcesCmd implements Command<List>, Serializable {
 
   private static final long serialVersionUID = 1L;
@@ -35,6 +38,9 @@ public class GetDeploymentResourcesCmd implements Command<List>, Serializable {
 
   public List execute(CommandContext commandContext) {
     ensureNotNull("deploymentId", deploymentId);
+
+    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+    authorizationManager.checkReadDeployment(deploymentId);
 
     return Context
       .getCommandContext()

@@ -17,6 +17,7 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
+import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -64,6 +65,10 @@ public class MyResourceAuthorizationProvider implements ResourceAuthorizationPro
   }
 
   public AuthorizationEntity[] newFilter(Filter filter) {
+    return null;
+  }
+
+  public AuthorizationEntity[] newDeployment(Deployment deployment) {
     return null;
   }
 
@@ -129,4 +134,5 @@ public class MyResourceAuthorizationProvider implements ResourceAuthorizationPro
     DELETE_GROUP_IDENTITY_LINK_TYPE = null;
     DELETE_GROUP_IDENTITY_LINK_GROUP = null;
   }
+
 }

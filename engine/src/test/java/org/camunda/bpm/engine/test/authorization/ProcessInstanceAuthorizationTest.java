@@ -56,20 +56,18 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
   protected String deploymentId;
 
-  public void setUp() {
-    deploymentId = repositoryService
-      .createDeployment()
-      .addClasspathResource("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
-      .addClasspathResource("org/camunda/bpm/engine/test/authorization/messageStartEventProcess.bpmn20.xml")
-      .addClasspathResource("org/camunda/bpm/engine/test/authorization/messageBoundaryEventProcess.bpmn20.xml")
-      .addClasspathResource("org/camunda/bpm/engine/test/authorization/signalBoundaryEventProcess.bpmn20.xml")
-      .deploy()
-      .getId();
+  public void setUp() throws Exception {
+    super.setUp();
+    deploymentId = createDeployment(null,
+        "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
+        "org/camunda/bpm/engine/test/authorization/messageStartEventProcess.bpmn20.xml",
+        "org/camunda/bpm/engine/test/authorization/messageBoundaryEventProcess.bpmn20.xml",
+        "org/camunda/bpm/engine/test/authorization/signalBoundaryEventProcess.bpmn20.xml").getId();
   }
 
   public void tearDown() {
+    deleteDeployment(deploymentId);
     super.tearDown();
-    repositoryService.deleteDeployment(deploymentId, true);
   }
 
   // process instance query //////////////////////////////////////////////////////////
@@ -1675,19 +1673,12 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     String processDefinitionId = instance.getProcessDefinitionId();
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE);
 
-    try {
-      // when
-      runtimeService.suspendProcessInstanceByProcessDefinitionId(processDefinitionId);
-      fail("Exception expected: It should not be posssible to suspend a process instance.");
-    } catch (AuthorizationException e) {
+    // when
+    runtimeService.suspendProcessInstanceByProcessDefinitionId(processDefinitionId);
 
-      // then
-      String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE_INSTANCE.getName(), message);
-      assertTextPresent(PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
-    }
+    // then
+    instance = selectSingleProcessInstance();
+    assertTrue(instance.isSuspended());
   }
 
   public void testSuspendProcessInstanceByProcessDefinitionIdWithUpdateInstancesPermissionOnProcessDefinition() {
@@ -1778,19 +1769,12 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE);
 
-    try {
-      // when
-      runtimeService.activateProcessInstanceByProcessDefinitionId(processDefinitionId);
-      fail("Exception expected: It should not be posssible to suspend a process instance.");
-    } catch (AuthorizationException e) {
+    // when
+    runtimeService.activateProcessInstanceByProcessDefinitionId(processDefinitionId);
 
-      // then
-      String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE_INSTANCE.getName(), message);
-      assertTextPresent(PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
-    }
+    // then
+    instance = selectSingleProcessInstance();
+    assertFalse(instance.isSuspended());
   }
 
   public void testActivateProcessInstanceByProcessDefinitionIdWithUpdateInstancesPermissionOnProcessDefinition() {
@@ -1875,31 +1859,27 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     startProcessInstanceByKey(PROCESS_KEY);
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE);
 
-    try {
-      // when
-      runtimeService.suspendProcessInstanceByProcessDefinitionKey(PROCESS_KEY);
-      fail("Exception expected: It should not be posssible to suspend a process instance.");
-    } catch (AuthorizationException e) {
+    // when
+    runtimeService.suspendProcessInstanceByProcessDefinitionKey(PROCESS_KEY);
 
-      // then
-      String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE_INSTANCE.getName(), message);
-      assertTextPresent(PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
-    }
+    // then
+    ProcessInstance instance = selectSingleProcessInstance();
+    assertTrue(instance.isSuspended());
+
+    // clean operation log
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   public void testSuspendProcessInstanceByProcessDefinitionKeyWithUpdateInstancesPermissionOnProcessDefinition() {
     // given
-    ProcessInstance instance = startProcessInstanceByKey(PROCESS_KEY);
+    startProcessInstanceByKey(PROCESS_KEY);
     createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_INSTANCE);
 
     // when
     runtimeService.suspendProcessInstanceByProcessDefinitionKey(PROCESS_KEY);
 
     // then
-    instance = selectSingleProcessInstance();
+    ProcessInstance instance = selectSingleProcessInstance();
     assertTrue(instance.isSuspended());
 
     // clean operation log
@@ -1979,19 +1959,15 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, UPDATE);
 
-    try {
-      // when
-      runtimeService.activateProcessInstanceByProcessDefinitionKey(PROCESS_KEY);
-      fail("Exception expected: It should not be posssible to suspend a process instance.");
-    } catch (AuthorizationException e) {
+    // when
+    runtimeService.activateProcessInstanceByProcessDefinitionKey(PROCESS_KEY);
 
-      // then
-      String message = e.getMessage();
-      assertTextPresent(userId, message);
-      assertTextPresent(UPDATE_INSTANCE.getName(), message);
-      assertTextPresent(PROCESS_KEY, message);
-      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
-    }
+    // then
+    instance = selectSingleProcessInstance();
+    assertFalse(instance.isSuspended());
+
+    // clean operation log
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   public void testActivateProcessInstanceByProcessDefinitionKeyWithUpdateInstancesPermissionOnProcessDefinition() {
