@@ -1,5 +1,4 @@
 drop index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION;
-drop index ACT_IDX_EXECUTION_PROCINST on ACT_RU_EXECUTION;
 drop index ACT_IDX_TASK_CREATE on ACT_RU_TASK;
 drop index ACT_IDX_TASK_ASSIGNEE on ACT_RU_TASK;
 drop index ACT_IDX_IDENT_LNK_USER on ACT_RU_IDENTITYLINK;
@@ -86,7 +85,7 @@ drop table if exists ACT_RU_IDENTITYLINK;
 drop table if exists ACT_RU_TASK;
 drop table if exists ACT_RE_PROCDEF;
 drop table if exists ACT_RU_EXECUTION;
-drop table if exists ACT_RU_JOB; 
+drop table if exists ACT_RU_JOB;
 drop table if exists ACT_RU_JOBDEF;
 drop table if exists ACT_RU_EVENT_SUBSCR;
 drop table if exists ACT_RU_INCIDENT;
