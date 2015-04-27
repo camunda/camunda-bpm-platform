@@ -397,10 +397,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
   }
 
   public boolean isTablePresent(String tableName) {
-    //if we use a schema we must not prepend the prefix
-    if(dbSqlSessionFactory.getDatabaseSchema()==null){
-      tableName = prependDatabaseTablePrefix(tableName);
-    }
+    tableName = prependDatabaseTablePrefix(tableName);
     Connection connection = null;
     try {
       connection = sqlSession.getConnection();
@@ -431,7 +428,20 @@ public class DbSqlSession extends AbstractPersistenceSession {
   }
 
   protected String prependDatabaseTablePrefix(String tableName) {
-    return dbSqlSessionFactory.getDatabaseTablePrefix() + tableName;
+    String prefixWithoutSchema = dbSqlSessionFactory.getDatabaseTablePrefix();
+    String schema = dbSqlSessionFactory.getDatabaseSchema();
+    if (prefixWithoutSchema == null) {
+      return tableName;
+    }
+    if (schema == null) {
+      return prefixWithoutSchema + tableName;
+    }
+
+    if (prefixWithoutSchema.startsWith(schema + ".")) {
+      prefixWithoutSchema = prefixWithoutSchema.substring(schema.length() + 1);
+    }
+
+    return prefixWithoutSchema + tableName;
   }
 
   public String getResourceForDbOperation(String directory, String operation, String component) {

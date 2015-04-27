@@ -924,8 +924,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected void ensurePrefixAndSchemaFitToegether(String prefix, String schema) {
     if(schema == null) {
       return;
-    } else if(!prefix.equals(schema + ".")){
-      throw new ProcessEngineException("When setting a schema the prefix has to be schema + \'.\'. Received schema: " + schema + " prefix: " + prefix);
+    } else if(prefix == null || (prefix != null && !prefix.startsWith(schema + "."))){
+      throw new ProcessEngineException("When setting a schema the prefix has to be schema + '.'. Received schema: " + schema + " prefix: " + prefix);
     }
   }
 
