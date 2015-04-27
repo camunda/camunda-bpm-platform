@@ -13,6 +13,7 @@ define([
   var copy = angular.copy;
 
   var includeAssignedTasksSupport = {};
+  var booleanCriterion            = {};
   var criteriaExpressionSupport   = {};
   var criteriaHelp                = {};
   var criteriaValidator           = {};
@@ -26,6 +27,10 @@ define([
       includeAssignedTasksSupport[criterion.name] = criterion.includeAssignedTasksSupport;
       if (includeAssignedTasksSupport[criterion.name]) {
         includeAssignedTasksSupport[criterion.name +'Expression'] = true;
+      }
+
+      if (criterion.bool) {
+        booleanCriterion[criterion.name] = true;
       }
 
       criteriaExpressionSupport[criterion.name] = criterion.expressionSupport;
@@ -57,6 +62,7 @@ define([
         $scope.criteria = criteria;
         $scope.criteriaExpressionSupport = criteriaExpressionSupport;
         $scope.criteriaHelp = criteriaHelp;
+        $scope.booleanCriterion = booleanCriterion;
 
         $scope.query = $scope.filter.query = $scope.filter.query || [];
 
@@ -130,7 +136,12 @@ define([
         $scope.valueChanged = function(queryParam, control) {
           control.$setValidity('number', true);
           control.$setValidity('date', true);
-          if (queryParam.value) {
+
+          if (booleanCriterion[queryParam.key]) {
+            queryParam.value = true;
+          }
+
+          else if (queryParam.value) {
             if (control.$pristine) {
               control.$setViewValue(queryParam.value);
             }
@@ -141,7 +152,6 @@ define([
               control.$setValidity(validationResult.error, false);
             }
           }
-
         };
 
         // helper //////////////////////////////////////////////////////////////

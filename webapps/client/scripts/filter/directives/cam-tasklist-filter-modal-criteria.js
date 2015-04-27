@@ -119,7 +119,8 @@ define(function() {
       options: [
         {
           name: 'active',
-          label: 'Active'
+          label: 'Active',
+          bool: true
         },
         {
           name: 'activityInstanceIdIn',
@@ -180,7 +181,8 @@ define(function() {
         },
         {
           name: 'unassigned',
-          label: 'Unassigned'
+          label: 'Unassigned',
+          bool: true
         },
         {
           name: 'delegationState',

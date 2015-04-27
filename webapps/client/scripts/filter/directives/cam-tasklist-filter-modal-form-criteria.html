@@ -72,7 +72,7 @@
 
           <div class="col-xs-6">
 
-            <div>
+            <div ng-if="!booleanCriterion[getCriterionName(queryParam.key)]">
               <input class="form-control"
                      name="queryParamValue"
                      type="text"
@@ -87,7 +87,7 @@
               </span>
 
               <div ng-if="this.criteriaFieldForm.queryParamValue.$invalid && this.criteriaFieldForm.queryParamValue.$dirty"
-                    class="has-error">
+                   class="has-error">
                 <span ng-show="this.criteriaFieldForm.queryParamValue.$error.required"
                       class="help-block">
                   {{ 'REQUIRED_FIELD' | translate }}
@@ -101,6 +101,14 @@
                   {{ 'INVALID_DATE' | translate }}
                 </span>
               </div>
+            </div>
+
+            <div ng-if="booleanCriterion[getCriterionName(queryParam.key)]"
+                 class="form-control-static">
+              <span class="glyphicon glyphicon-ok"></span>
+              <input type="hidden"
+                     name="queryParamValue"
+                     ng-model="queryParam.value" />
             </div>
 
           </div>
