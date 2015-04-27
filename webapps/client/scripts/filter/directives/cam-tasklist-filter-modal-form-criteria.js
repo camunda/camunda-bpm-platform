@@ -66,18 +66,10 @@ define([
 
         $scope.query = $scope.filter.query = $scope.filter.query || [];
 
-        var includeAssignedTasks;
-        $scope.query.forEach(function (queryItem) {
-          if (queryItem.key === 'includeAssignedTasks') {
-            includeAssignedTasks = queryItem.value;
-          }
-        });
-
         // a little exception to deal with
-        $scope.includeAssignedTasks = $scope.filter.includeAssignedTasks = includeAssignedTasks;
         $scope.query = $scope.filter.query = $scope.query.filter(function (item) {
           if (item.key === 'includeAssignedTasks') {
-            $scope.includeAssignedTasks = item.value;
+            $scope.includeAssignedTasks = $scope.filter.includeAssignedTasks = item.value;
           }
           return item.key !== 'includeAssignedTasks';
         });
@@ -91,7 +83,12 @@ define([
           return false;
         };
 
-
+        $scope.$watch('query', function () {
+          $scope.includeAssignedTasks = $scope.filter.includeAssignedTasks = (
+            $scope.canIncludeAssignedTasks() &&
+            $scope.includeAssignedTasks
+          );
+        }, true);
 
         // register handler to show or hide the accordion hint /////////////////
 
