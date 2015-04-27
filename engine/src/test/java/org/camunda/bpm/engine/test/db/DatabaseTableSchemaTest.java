@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.test.db;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 
 import junit.framework.TestCase;
 
@@ -24,6 +25,10 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSession;
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 
 /**
@@ -32,6 +37,7 @@ import org.camunda.bpm.engine.impl.util.ReflectUtil;
 public class DatabaseTableSchemaTest extends TestCase {
 
   private static final String SCHEMA_NAME = "SCHEMA1";
+  private static final String PREFIX_NAME = "PREFIX1_";
 
   public void testPerformDatabaseSchemaOperationCreateTwice() throws Exception {
 
@@ -63,6 +69,34 @@ public class DatabaseTableSchemaTest extends TestCase {
     connection.createStatement().execute("set schema " + SCHEMA_NAME);
     engine1.getManagementService().databaseSchemaUpgrade(connection, "", SCHEMA_NAME);
     engine1.close();
+  }
+
+  public void testTablePresentWithSchemaAndPrefix() throws SQLException {
+    PooledDataSource pooledDataSource = new PooledDataSource(ReflectUtil.getClassLoader(), "org.h2.Driver",
+        "jdbc:h2:mem:DatabaseTablePrefixTest;DB_CLOSE_DELAY=1000", "sa", "");
+
+    Connection connection = pooledDataSource.getConnection();
+    connection.createStatement().execute("drop schema if exists " + SCHEMA_NAME);
+    connection.createStatement().execute("create schema " + SCHEMA_NAME);
+    connection.createStatement().execute("create table " + SCHEMA_NAME + "." + PREFIX_NAME + "SOME_TABLE(id varchar(64));");
+    connection.close();
+
+    ProcessEngineConfigurationImpl config1 = createCustomProcessEngineConfiguration().setProcessEngineName("DatabaseTablePrefixTest-engine1")
+    // disable auto create/drop schema
+        .setDataSource(pooledDataSource).setDatabaseSchemaUpdate("NO_CHECK");
+    config1.setDatabaseTablePrefix(SCHEMA_NAME + "." + PREFIX_NAME);
+    config1.setDatabaseSchema(SCHEMA_NAME);
+    config1.buildProcessEngine();
+    CommandExecutor commandExecutor = config1.getCommandExecutorTxRequired();
+
+    commandExecutor.execute(new Command<Void>(){
+      public Void execute(CommandContext commandContext) {
+        DbSqlSession sqlSession = commandContext.getSession(DbSqlSession.class);
+        assertTrue(sqlSession.isTablePresent("SOME_TABLE"));
+        return null;
+      }
+    });
+
   }
 
   public void testCreateConfigurationWithMismatchtingSchemaAndPrefix() {
