@@ -84,6 +84,7 @@ import org.camunda.bpm.engine.impl.TaskServiceImpl;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.core.variable.type.ObjectTypeImpl;
+import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
@@ -654,6 +655,26 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     expectedVariables.put("aThirdValue", Boolean.TRUE);
 
     verify(formServiceMock).submitTaskForm(eq(EXAMPLE_TASK_ID), argThat(new EqualsMap(expectedVariables)));
+  }
+
+  @Test
+  public void testSubmitTaskFormWithBase64EncodedBytes() {
+    Map<String, Object> variables = VariablesBuilder.create()
+        .variable("aVariable", Base64.encodeBase64String("someBytes".getBytes()), "Bytes")
+        .getVariables();
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", variables);
+
+    given().pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().post(SUBMIT_FORM_URL);
+
+    verify(formServiceMock).submitTaskForm(eq(EXAMPLE_TASK_ID), argThat(new EqualsMap()
+      .matcher("aVariable", EqualsPrimitiveValue.bytesValue("someBytes".getBytes()))));
   }
 
   @Test

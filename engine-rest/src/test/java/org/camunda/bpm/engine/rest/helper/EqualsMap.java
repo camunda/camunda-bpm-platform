@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.camunda.bpm.engine.variable.VariableMap;
 import org.hamcrest.Matcher;
 import org.mockito.ArgumentMatcher;
 
@@ -69,12 +70,21 @@ public class EqualsMap extends ArgumentMatcher<Map<String, Object>> {
       return false;
     }
 
-    for (Map.Entry<String, Object> value : argumentMap.entrySet()) {
-      Matcher<?> matcher = matchers.get(value.getKey());
-      if (!matcher.matches(value.getValue())) {
+    for (String key : argumentMap.keySet()) {
+      Matcher<?> matcher = matchers.get(key);
+      Object value = null;
+      if (argumentMap instanceof VariableMap) {
+        VariableMap varMap = (VariableMap) argumentMap;
+        value = varMap.getValueTyped(key);
+      }
+      else {
+        value = argumentMap.get(key);
+      }
+      if (!matcher.matches(value)) {
         return false;
       }
     }
+
 
     return true;
   }
