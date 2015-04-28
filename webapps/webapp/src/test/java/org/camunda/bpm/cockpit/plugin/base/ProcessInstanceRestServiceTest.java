@@ -47,6 +47,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 /**
  * @author roman.smirnov
@@ -394,6 +395,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
   @Deployment(resources = {
     "processes/variables-process.bpmn"
   })
+  @Category(SlowMariaDbTest.class)
   public void testQueryWithComplexVariableFilter() {
     // given
     startProcessInstances("variableProcess", 2);

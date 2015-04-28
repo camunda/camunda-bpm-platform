@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
 
@@ -588,6 +589,7 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
       "processes/variables-process-with-call-activity.bpmn",
       "processes/user-task-process.bpmn"
   })
+  @Category(SlowMariaDbTest.class)
   public void testQueryWithComplexVariableFilter() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("variableProcessWithCallActivity");

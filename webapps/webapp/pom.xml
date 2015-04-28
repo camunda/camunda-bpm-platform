@@ -458,6 +458,21 @@
     </profile>
 
     <profile>
+      <id>mariadb</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <excludedGroups>org.camunda.bpm.cockpit.plugin.base.SlowMariaDbTest</excludedGroups>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+
+    <profile>
       <id>dev-e2e</id>
       <dependencies>
         <dependency>
