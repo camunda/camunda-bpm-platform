@@ -1401,7 +1401,7 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
       "org/camunda/bpm/engine/test/cmmn/processtask/ProcessTaskTest.testInputOutputAll.cmmn",
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"
     })
-  public void testTypedVariablesRoundtrip() {
+  public void testInputOutputAllTypedVariables() {
     String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
     String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
@@ -1441,6 +1441,51 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
 
     close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
+  }
+  
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/processtask/ProcessTaskTest.testVariablesRoundtrip.cmmn",
+      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"
+    })
+  public void testInputOutputLimitedTypedVariables() {
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
+    String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
+    String variableName = "aVariable";
+    String variableName2 = "anotherVariable";
+    TypedValue caseVariableValue = Variables.stringValue("abc");
+    TypedValue caseVariableValue2 = Variables.integerValue(null);
+    caseService
+      .withCaseExecution(processTaskId)
+      .setVariable(variableName, caseVariableValue)
+      .setVariable(variableName2, caseVariableValue2)
+      .manualStart();
+
+    String processInstanceId = queryProcessInstance().getId();
+    TypedValue value = runtimeService.getVariableTyped(processInstanceId, variableName);
+    assertThat(value, is(caseVariableValue));
+    value = runtimeService.getVariableTyped(processInstanceId, variableName2);
+    assertThat(value, is(caseVariableValue2));
+    
+
+    TypedValue processVariableValue = Variables.stringValue("cba");
+    TypedValue processVariableValue2 = Variables.booleanValue(null);
+    runtimeService.setVariable(processInstanceId, variableName, processVariableValue);
+    runtimeService.setVariable(processInstanceId, variableName2, processVariableValue2);
+
+    // should also complete process instance
+    taskService.complete(queryTask().getId());
+
+    value = caseService.getVariableTyped(caseInstanceId, variableName);
+    assertThat(value, is(processVariableValue));
+    value = caseService.getVariableTyped(caseInstanceId, variableName2);
+    assertThat(value, is(processVariableValue2));
+    // complete ////////////////////////////////////////////////////////
+
+    assertProcessEnded(processInstanceId);
+
+    close(caseInstanceId);
+    assertCaseEnded(caseInstanceId);
+
   }
   
   @Deployment(resources = {
