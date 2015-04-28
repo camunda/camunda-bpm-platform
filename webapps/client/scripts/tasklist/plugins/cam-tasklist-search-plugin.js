@@ -89,7 +89,7 @@ define([
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('tasklist.task.list', {
+    ViewsProvider.registerDefaultView('tasklist.list', {
       id: 'task-search',
       template: template,
       controller: Controller,

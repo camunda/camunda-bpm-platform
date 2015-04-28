@@ -10,7 +10,7 @@ define([], function() {
   ) {
 
     $scope.tasklistVars = { read: [ 'tasklistData' ] };
-    $scope.tasklistPlugins = Views.getProviders({ component: 'tasklist.task.list' });
+    $scope.tasklistPlugins = Views.getProviders({ component: 'tasklist.list' });
 
   }];
 
