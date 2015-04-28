@@ -8,178 +8,53 @@ var cockpitPage = require('../../cockpit/pages/dashboard');
 
 describe('Admin authorizations Spec', function() {
 
-  describe('authorizations page navigation', function() {
+  function checkCreateNewState() {
 
-    before(function() {
-      return testHelper(setupFile, function() {
+    // then
+    expect(authorizationsPage.createNewElement().isDisplayed()).to.eventually.be.true;
+    expect(authorizationsPage.submitNewAuthorizationButton().isEnabled()).to.eventually.be.false;
+    expect(authorizationsPage.abortNewAuthorizationButton().isEnabled()).to.eventually.be.true;
+    expect(authorizationsPage.resourceIdField().getAttribute('value')).to.eventually.eql('*');
+  }
 
-        authorizationsPage.navigateToWebapp('Admin');
-        authorizationsPage.authentication.userLogin('admin', 'admin');
-      });
-    });
+  function checkAuthorizationTypes() {
 
+    authorizationsPage.authorizationType('GLOBAL').click();
+    expect(authorizationsPage.identityIdInputFiled().isEnabled()).to.eventually.be.false;
 
-    it('should navigate to authorizations page', function() {
+    authorizationsPage.authorizationType('DENY').click();
+    expect(authorizationsPage.identityIdInputFiled().isEnabled()).to.eventually.be.true;
 
-      // when
-      authorizationsPage.selectNavbarItem('Authorizations');
+    authorizationsPage.authorizationType('ALLOW').click();
+    expect(authorizationsPage.identityIdInputFiled().isEnabled()).to.eventually.be.true;
+  }
 
-      // then
-      expect(authorizationsPage.pageHeader()).to.eventually.eql('Authorizations');
-    });
+  function checkPermissionTypes(permissionsList, permissionDefaultValue) {
 
+    // when
+    authorizationsPage.permissionsButton().click();
 
-    it('should navigate to group membership sub page', function(done) {
+    // then
+    for (var i = 0; i < permissionsList.length; i++) {
+      expect(authorizationsPage.permissionsDropdownList().get(i).getText()).to.eventually.eql(permissionsList[i]);
+    };
 
-      // when
-      authorizationsPage.selectAuthorizationNavbarItem('Group Membership');
+    if (arguments.length !== 2) {
+      permissionDefaultValue = 'ALL';
+    }
+    expect(authorizationsPage.permissionsField().getText()).to.eventually.eql(permissionDefaultValue);
+  }
 
-      // then
-      authorizationsPage.groupMembership.isActive();
-      expect(authorizationsPage.groupMembership.createNewButton().isEnabled()).to.eventually.be.true;
-      expect(authorizationsPage.groupMembership.boxHeader()).to.eventually.eql('Group Membership Authorizations');
-    });
+  function abortCreatingNewAuthorization() {
 
+     // when
+    authorizationsPage.abortNewAuthorizationButton().click();
 
-    it('should open new authorization input', function(done) {
+    // then
+    expect(authorizationsPage.createNewElement().isDisplayed()).to.eventually.be.false;
+  }
 
-      // give
-      expect(authorizationsPage.groupMembership.createNewElement().isDisplayed()).to.eventually.be.false;
-
-      // when
-      authorizationsPage.groupMembership.createNewButton().click();
-
-      // then
-      expect(authorizationsPage.groupMembership.resourceId().getAttribute('value')).to.eventually.eql('*');
-      expect(authorizationsPage.groupMembership.createNewElement().isDisplayed()).to.eventually.be.true;
-    });
-
-
-    it('should validate authorization type', function(done) {
-
-      // when
-      authorizationsPage.groupMembership.authorizationType('GLOBAL')
-
-      // then
-      expect(authorizationsPage.application.identityIdInputFiled().isEnabled()).to.eventually.be.false;
-
-      // when
-      authorizationsPage.groupMembership.authorizationType('DENY')
-
-      // then
-      expect(authorizationsPage.application.identityIdInputFiled().isEnabled()).to.eventually.be.true;
-
-      // when
-      authorizationsPage.groupMembership.authorizationType('ALLOW')
-
-      // then
-      expect(authorizationsPage.application.identityIdInputFiled().isEnabled()).to.eventually.be.true;
-    });
-
-
-    it('should abort new authorization input', function(done) {
-
-      // when
-      authorizationsPage.groupMembership.abortNewAuthorizationButton().click();
-
-      // then
-      expect(authorizationsPage.groupMembership.createNewElement().isDisplayed()).to.eventually.be.false;
-    });
-
-  });
-
-
-  describe('authorizations sub pages', function() {
-
-    before(function() {
-      return testHelper(setupFile, function() {
-
-        authorizationsPage.navigateToWebapp('Admin');
-        authorizationsPage.authentication.userLogin('admin', 'admin');
-      });
-    });
-
-    beforeEach(function() {
-      authorizationsPage.navigateToWebapp('Admin');
-      authorizationsPage.selectNavbarItem('Authorizations');
-    });
-
-
-    it('should validate application page', function() {
-
-      // when
-      authorizationsPage.selectAuthorizationNavbarItem('Application');
-
-      // then
-      authorizationsPage.application.isActive();
-      expect(authorizationsPage.application.createNewButton().isEnabled()).to.eventually.eql(true);
-      expect(authorizationsPage.application.boxHeader()).to.eventually.eql('Application Authorizations');
-    });
-
-
-    it('should validate authorization page', function() {
-
-      // when
-      authorizationsPage.selectAuthorizationNavbarItem('Authorization');
-
-      // then
-      authorizationsPage.authorization.isActive();
-      expect(authorizationsPage.authorization.createNewButton().isEnabled()).to.eventually.eql(true);
-      expect(authorizationsPage.authorization.boxHeader()).to.eventually.eql('Authorization Authorizations');
-    });
-
-
-    it('should validate filter page', function() {
-
-      // when
-      authorizationsPage.selectAuthorizationNavbarItem('Filter');
-
-      // then
-      authorizationsPage.filter.isActive();
-      expect(authorizationsPage.filter.createNewButton().isEnabled()).to.eventually.eql(true);
-      expect(authorizationsPage.filter.boxHeader()).to.eventually.eql('Filter Authorizations');
-    });
-
-
-    it('should validate group page', function() {
-
-      // when
-      authorizationsPage.selectAuthorizationNavbarItem('Group');
-
-      // then
-      authorizationsPage.group.isActive();
-      expect(authorizationsPage.group.createNewButton().isEnabled()).to.eventually.eql(true);
-      expect(authorizationsPage.group.boxHeader()).to.eventually.eql('Group Authorizations');
-    });
-
-
-    it('should validate group membership page', function() {
-
-      // when
-      authorizationsPage.selectAuthorizationNavbarItem('Group Membership');
-
-      // then
-      authorizationsPage.groupMembership.isActive();
-      expect(authorizationsPage.groupMembership.createNewButton().isEnabled()).to.eventually.eql(true);
-      expect(authorizationsPage.groupMembership.boxHeader()).to.eventually.eql('Group Membership Authorizations');
-    });
-
-
-    it('should validate user page', function() {
-
-      // when
-      authorizationsPage.selectAuthorizationNavbarItem('User');
-
-      // then
-      authorizationsPage.user.isActive();
-      expect(authorizationsPage.user.createNewButton().isEnabled()).to.eventually.eql(true);
-      expect(authorizationsPage.user.boxHeader()).to.eventually.eql('User Authorizations');
-    });
-
-  });
-
-
-  xdescribe('create application authorization', function() {
+  describe('Application Authorizations', function() {
 
     before(function() {
       return testHelper(setupFile, function() {
@@ -192,7 +67,7 @@ describe('Admin authorizations Spec', function() {
     });
 
 
-    it('should navigate to application sub page', function() {
+    it('should navigate to application page', function() {
 
       // when
       authorizationsPage.selectAuthorizationNavbarItem('Application');
@@ -204,20 +79,437 @@ describe('Admin authorizations Spec', function() {
     });
 
 
+    it('should validate authorization attributes', function() {
+
+      authorizationsPage.createNewButton().click().then(function() {
+
+        checkCreateNewState();
+
+        checkAuthorizationTypes();
+
+        var permissionsList = [
+          'ACCESS',
+        ];
+        checkPermissionTypes(permissionsList);
+
+        abortCreatingNewAuthorization();
+      });
+
+    });
+
+
     it('should create new application authorization', function() {
 
       // when
-      authorizationsPage.application.createNewButton().click();
-      authorizationsPage.application.identityIdInputFiled('john');
-      authorizationsPage.application.resourceId().clear();
-      authorizationsPage.application.resourceId('Cockpit');
-      authorizationsPage.application.submitNewAuthorizationButton().click();
+      authorizationsPage.application.createNewAuthorization('ALLOW', 'USER', 'john', 'ACCESS', 'cockpit');
 
       // then
       authorizationsPage.logout();
       cockpitPage.navigateToWebapp('Cockpit');
       cockpitPage.authentication.userLogin('john', 'MobyDick');
       cockpitPage.isActive();
+    });
+
+  });
+
+
+  describe('Authorization Authorizations', function() {
+
+    before(function() {
+      return testHelper(setupFile, function() {
+
+        authorizationsPage.navigateToWebapp('Admin');
+        authorizationsPage.authentication.userLogin('admin', 'admin');
+
+        authorizationsPage.selectNavbarItem('Authorizations');
+      });
+    });
+
+
+    it('should navigate to authorization page', function() {
+
+      // when
+      authorizationsPage.selectAuthorizationNavbarItem('Authorization');
+
+      // then
+      authorizationsPage.authorization.isActive();
+      expect(authorizationsPage.authorization.createNewButton().isEnabled()).to.eventually.eql(true);
+      expect(authorizationsPage.authorization.boxHeader()).to.eventually.eql('Authorization Authorizations');
+    });
+
+
+    it('should validate authorization attributes', function() {
+
+      authorizationsPage.createNewButton().click().then(function() {
+
+        checkCreateNewState();
+
+        checkAuthorizationTypes();
+
+        var permissionsList = [
+          'READ',
+          'UPDATE',
+          'CREATE',
+          'DELETE'
+        ];
+        checkPermissionTypes(permissionsList);
+
+        abortCreatingNewAuthorization();
+      });
+
+    });
+
+  });
+
+
+  describe('Filter Authorizations', function() {
+
+    before(function() {
+      return testHelper(setupFile, function() {
+
+        authorizationsPage.navigateToWebapp('Admin');
+        authorizationsPage.authentication.userLogin('admin', 'admin');
+
+        authorizationsPage.selectNavbarItem('Authorizations');
+      });
+    });
+
+
+    it('should navigate to filter page', function() {
+
+      // when
+      authorizationsPage.selectAuthorizationNavbarItem('Filter');
+
+      // then
+      authorizationsPage.filter.isActive();
+      expect(authorizationsPage.filter.createNewButton().isEnabled()).to.eventually.eql(true);
+      expect(authorizationsPage.filter.boxHeader()).to.eventually.eql('Filter Authorizations');
+    });
+
+
+    it('should validate authorization attributes', function() {
+
+      authorizationsPage.createNewButton().click().then(function() {
+
+        checkCreateNewState();
+
+        checkAuthorizationTypes();
+
+        var permissionsList = [
+          'READ',
+          'UPDATE',
+          'DELETE'
+        ];
+        checkPermissionTypes(permissionsList);
+
+        abortCreatingNewAuthorization();
+      });
+
+    });
+
+  });
+
+
+  describe('Group Authorizations', function() {
+
+    before(function() {
+      return testHelper(setupFile, function() {
+
+        authorizationsPage.navigateToWebapp('Admin');
+        authorizationsPage.authentication.userLogin('admin', 'admin');
+
+        authorizationsPage.selectNavbarItem('Authorizations');
+      });
+    });
+
+
+    it('should navigate to group page', function() {
+
+      // when
+      authorizationsPage.selectAuthorizationNavbarItem('Group');
+
+      // then
+      authorizationsPage.group.isActive();
+      expect(authorizationsPage.group.createNewButton().isEnabled()).to.eventually.eql(true);
+      expect(authorizationsPage.group.boxHeader()).to.eventually.eql('Group Authorizations');
+    });
+
+
+    it('should validate authorization attributes', function() {
+
+      authorizationsPage.createNewButton().click().then(function() {
+
+        checkCreateNewState();
+
+        checkAuthorizationTypes();
+
+        var permissionsList = [
+          'READ',
+          'UPDATE',
+          'CREATE',
+          'DELETE'
+        ];
+        checkPermissionTypes(permissionsList);
+
+        abortCreatingNewAuthorization();
+      });
+
+    });
+
+  });
+
+
+  describe('Group Membership Authorizations', function() {
+
+    before(function() {
+      return testHelper(setupFile, function() {
+
+        authorizationsPage.navigateToWebapp('Admin');
+        authorizationsPage.authentication.userLogin('admin', 'admin');
+
+        authorizationsPage.selectNavbarItem('Authorizations');
+      });
+    });
+
+
+    it('should navigate to group membership page', function() {
+
+      // when
+      authorizationsPage.selectAuthorizationNavbarItem('Group Membership');
+
+      // then
+      authorizationsPage.groupMembership.isActive();
+      expect(authorizationsPage.groupMembership.createNewButton().isEnabled()).to.eventually.eql(true);
+      expect(authorizationsPage.groupMembership.boxHeader()).to.eventually.eql('Group Membership Authorizations');
+    });
+
+
+    it('should validate authorization attributes', function() {
+
+      authorizationsPage.createNewButton().click().then(function() {
+
+        checkCreateNewState();
+
+        checkAuthorizationTypes();
+
+        var permissionsList = [
+          'CREATE',
+          'DELETE'
+        ];
+        checkPermissionTypes(permissionsList);
+
+        abortCreatingNewAuthorization();
+      });
+
+    });
+
+  });
+
+
+  describe('Process Definition Authorizations', function() {
+
+    before(function() {
+      return testHelper(setupFile, function() {
+
+        authorizationsPage.navigateToWebapp('Admin');
+        authorizationsPage.authentication.userLogin('admin', 'admin');
+
+        authorizationsPage.selectNavbarItem('Authorizations');
+      });
+    });
+
+
+    it('should navigate to process definition page', function() {
+
+      // when
+      authorizationsPage.selectAuthorizationNavbarItem('Process Definition');
+
+      // then
+      authorizationsPage.processDefinition.isActive();
+      expect(authorizationsPage.processDefinition.createNewButton().isEnabled()).to.eventually.eql(true);
+      expect(authorizationsPage.processDefinition.boxHeader()).to.eventually.eql('Process Definition Authorizations');
+    });
+
+
+    it('should validate authorization attributes', function() {
+
+      authorizationsPage.createNewButton().click().then(function() {
+
+        checkCreateNewState();
+
+        checkAuthorizationTypes();
+
+        var permissionsList = [
+          'READ',
+          'CREATE_INSTANCE',
+          'READ_INSTANCE',
+          'UPDATE_INSTANCE',
+          'DELETE_INSTANCE',
+          'READ_TASK',
+          'UPDATE_TASK'
+        ];
+        checkPermissionTypes(permissionsList);
+
+        abortCreatingNewAuthorization();
+      });
+
+    });
+
+
+    it('should create new authorization', function() {
+
+      // when
+      authorizationsPage.application.createNewAuthorization('ALLOW', 'GROUP', 'marketing', 'READ_INSTANCE', 'invoice');
+
+      // then
+
+    });
+
+  });
+
+
+  describe('Process Instance Authorizations', function() {
+
+    before(function() {
+      return testHelper(setupFile, function() {
+
+        authorizationsPage.navigateToWebapp('Admin');
+        authorizationsPage.authentication.userLogin('admin', 'admin');
+
+        authorizationsPage.selectNavbarItem('Authorizations');
+      });
+    });
+
+
+    it('should navigate to process instance page', function() {
+
+      // when
+      authorizationsPage.selectAuthorizationNavbarItem('Process Instance');
+
+      // then
+      authorizationsPage.processInstance.isActive();
+      expect(authorizationsPage.processInstance.createNewButton().isEnabled()).to.eventually.eql(true);
+      expect(authorizationsPage.processInstance.boxHeader()).to.eventually.eql('Process Instance Authorizations');
+    });
+
+
+    it('should validate authorization attributes', function() {
+
+      authorizationsPage.createNewButton().click().then(function() {
+
+        checkCreateNewState();
+
+        checkAuthorizationTypes();
+
+        var permissionsList = [
+          'CREATE',
+          'READ',
+          'UPDATE',
+          'DELETE'
+        ];
+        checkPermissionTypes(permissionsList);
+
+        abortCreatingNewAuthorization();
+      });
+
+    });
+
+  });
+
+
+  describe('Task Authorizations', function() {
+
+    before(function() {
+      return testHelper(setupFile, function() {
+
+        authorizationsPage.navigateToWebapp('Admin');
+        authorizationsPage.authentication.userLogin('admin', 'admin');
+
+        authorizationsPage.selectNavbarItem('Authorizations');
+      });
+    });
+
+
+    it('should navigate to task page', function() {
+
+      // when
+      authorizationsPage.selectAuthorizationNavbarItem('Task');
+
+      // then
+      authorizationsPage.task.isActive();
+      expect(authorizationsPage.task.createNewButton().isEnabled()).to.eventually.eql(true);
+      expect(authorizationsPage.task.boxHeader()).to.eventually.eql('Task Authorizations');
+    });
+
+
+    it('should validate authorization attributes', function() {
+
+      authorizationsPage.createNewButton().click().then(function() {
+
+        checkCreateNewState();
+
+        checkAuthorizationTypes();
+
+        var permissionsList = [
+          'CREATE',
+          'READ',
+          'UPDATE',
+          'DELETE'
+        ];
+        checkPermissionTypes(permissionsList);
+
+        abortCreatingNewAuthorization();
+      });
+
+    });
+
+  });
+
+
+  describe('User Authorizations', function() {
+
+    before(function() {
+      return testHelper(setupFile, function() {
+
+        authorizationsPage.navigateToWebapp('Admin');
+        authorizationsPage.authentication.userLogin('admin', 'admin');
+
+        authorizationsPage.selectNavbarItem('Authorizations');
+      });
+    });
+
+
+    it('should navigate to user page', function() {
+
+      // when
+      authorizationsPage.selectAuthorizationNavbarItem('User');
+
+      // then
+      authorizationsPage.user.isActive();
+      expect(authorizationsPage.user.createNewButton().isEnabled()).to.eventually.eql(true);
+      expect(authorizationsPage.user.boxHeader()).to.eventually.eql('User Authorizations');
+    });
+
+
+    it('should validate authorization attributes', function() {
+
+      authorizationsPage.createNewButton().click().then(function() {
+
+        checkCreateNewState();
+
+        checkAuthorizationTypes();
+
+        var permissionsList = [
+          'READ',
+          'UPDATE',
+          'CREATE',
+          'DELETE'
+        ];
+        checkPermissionTypes(permissionsList);
+
+        abortCreatingNewAuthorization();
+      });
+
     });
 
   });
