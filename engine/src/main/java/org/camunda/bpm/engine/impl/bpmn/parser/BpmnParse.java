@@ -2777,13 +2777,12 @@ public class BpmnParse extends Parse {
     subProcessActivity.setProperty(PROPERTYNAME_TRIGGERED_BY_EVENT, isTriggeredByEvent);
     subProcessActivity.setProperty(PROPERTYNAME_CONSUMES_COMPENSATION, !isTriggeredByEvent);
 
+    subProcessActivity.setScope(true);
     if(isTriggeredByEvent) {
-      subProcessActivity.setScope(LegacyBehavior.get().isEventSubprocessScope());
       subProcessActivity.setActivityBehavior(new EventSubProcessActivityBehavior());
       subProcessActivity.setEventScope(scope);
     }
     else {
-      subProcessActivity.setScope(true);
       subProcessActivity.setActivityBehavior(new SubProcessActivityBehavior());
     }
     parseScope(subProcessElement, subProcessActivity);

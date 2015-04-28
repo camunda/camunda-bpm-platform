@@ -29,7 +29,6 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SubProcessActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
-import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.impl.tree.Collector;
 import org.camunda.bpm.engine.impl.tree.TreeWalker;
@@ -174,7 +173,6 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
 
     // the execution may currently not be executing a scope activity
     scope = scope.isScope() ? scope : scope.getFlowScope();
-    scope = LegacyBehavior.get().normalizeSecondNonScope(scope);
 
     return scope;
   }
@@ -276,7 +274,6 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
       if (currentScope != null) {
         // the execution may currently not be executing a scope activity
         currentScope = currentScope.isScope() ? currentScope : currentScope.getFlowScope();
-        currentScope = LegacyBehavior.get().normalizeSecondNonScope(currentScope);
       }
     }
 

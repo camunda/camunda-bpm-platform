@@ -22,8 +22,6 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.SequentialMultiInstanceActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.SubProcessActivityBehavior;
-import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
@@ -62,61 +60,7 @@ public class LegacyBehavior {
 
   private final static Logger log = Logger.getLogger(LegacyBehavior.class.getName());
 
-  protected boolean isEventSubprocessScope = true;
-  protected boolean isSequentialMiSubprocessScope = true;
-  protected boolean isConcurrentScopeExecutionEnabled = false;
-
-  /** the default behavior: legacy behavior is switched off */
-  private static LegacyBehavior DEFAULT_BEHAVIOR = new LegacyBehavior(false);
-
-  public LegacyBehavior(boolean isOn) {
-    if(isOn) {
-      isEventSubprocessScope = false;
-      isSequentialMiSubprocessScope = false;
-      isConcurrentScopeExecutionEnabled = true;
-    }
-  }
-
-  public static LegacyBehavior get() {
-    CommandContext commandContext = Context.getCommandContext();
-    if(commandContext == null) {
-      return DEFAULT_BEHAVIOR;
-    }
-    else {
-      return Context.getProcessEngineConfiguration()
-        .getConfiguredLegacyBehavior();
-    }
-  }
-
-  // getters /////////////////////////////////////////////////////
-
-  public boolean isEventSubprocessScope() {
-    return isEventSubprocessScope;
-  }
-
-  public boolean isSequentialMiSubprocessScope() {
-    return isSequentialMiSubprocessScope;
-  }
-
-  public boolean isConcurrentScopeExecutionEnabled() {
-    return isConcurrentScopeExecutionEnabled;
-  }
-
   // concurrent scopes ///////////////////////////////////////////
-
-  /**
-   * Creates a concurrent scope. This can only happen if {@link #isConcurrentScopeExecutionEnabled()}
-   * is (ie. the process engine is configured to perform legacy behavior).
-   *
-   * See: javadoc of this class for note about concurrent scopes.
-   *
-   * @param execution
-   */
-  public void createConcurrentScope(PvmExecutionImpl execution) {
-    ensureScope(execution);
-    log.fine("[LEGACY BEHAVIOR]: create concurrent scope execution "+execution);
-    execution.setConcurrent(true);
-  }
 
   /**
    * Prunes a concurrent scope. This can only happen if
@@ -129,7 +73,7 @@ public class LegacyBehavior {
    *
    * @param execution
    */
-  public void pruneConcurrentScope(PvmExecutionImpl execution) {
+  public static void pruneConcurrentScope(PvmExecutionImpl execution) {
     ensureConcurrentScope(execution);
     log.fine("[LEGACY BEHAVIOR]: concurrent scope execution is pruned "+execution);
     execution.setConcurrent(false);
@@ -144,7 +88,7 @@ public class LegacyBehavior {
    *
    * @param execution the concurrent scope execution to destroy
    */
-  public void cancelConcurrentScope(PvmExecutionImpl execution, PvmActivity cancellingActivity) {
+  public static void cancelConcurrentScope(PvmExecutionImpl execution, PvmActivity cancellingActivity) {
     ensureConcurrentScope(execution);
     log.fine("[LEGACY BEHAVIOR]: cancel concurrent scope execution "+execution);
 
@@ -165,7 +109,7 @@ public class LegacyBehavior {
    *
    * @param execution the execution to destroy
    */
-  public void destroyConcurrentScope(PvmExecutionImpl execution) {
+  public static void destroyConcurrentScope(PvmExecutionImpl execution) {
     ensureConcurrentScope(execution);
     log.fine("[LEGACY BEHAVIOR]: destroy concurrent scope execution "+execution);
 
@@ -174,19 +118,19 @@ public class LegacyBehavior {
 
   // sequential multi instance /////////////////////////////////
 
-  public boolean eventSubprocessComplete(ActivityExecution scopeExecution) {
-    boolean perfromLegacyBehavior = isLegacyBehaviorRequired(scopeExecution, isEventSubprocessScope);
+  public static boolean eventSubprocessComplete(ActivityExecution scopeExecution) {
+    boolean performLegacyBehavior = isLegacyBehaviorRequired(scopeExecution);
 
-    if(perfromLegacyBehavior) {
+    if(performLegacyBehavior) {
       log.fine("[LEGACY BEHAVIOR]: complete non-scope event subprocess.");
       scopeExecution.end(false);
     }
 
-    return perfromLegacyBehavior;
+    return performLegacyBehavior;
   }
 
-  public boolean eventSubprocessConcurrentChildExecutionEnded(ActivityExecution scopeExecution, ActivityExecution endedExecution) {
-    boolean performLegacyBehavior = isLegacyBehaviorRequired(endedExecution, isEventSubprocessScope);
+  public static boolean eventSubprocessConcurrentChildExecutionEnded(ActivityExecution scopeExecution, ActivityExecution endedExecution) {
+    boolean performLegacyBehavior = isLegacyBehaviorRequired(endedExecution);
 
     if(performLegacyBehavior) {
       log.fine("[LEGACY BEHAVIOR]: end concurrent execution in event subprocess.");
@@ -196,46 +140,13 @@ public class LegacyBehavior {
     return performLegacyBehavior;
   }
 
-  // non-scopes which should be scopes ////////////////////////////
-
-  /**
-   * Usually you will find this line after a line which does the exact same thing as the implementation
-   * of this method.
-   * Please don't try to be smart and replace both lines with a while loop or something!
-   *<p>
-   * The line you found above the line from which this method is called will always be necessary
-   * as long as we allow non-scope activities.
-   * What this method is doing is normalizing the fact that there may be even two non-scope activities
-   * executed by the same scope execution.
-   *<p>
-   * This can only happen if {@link #isEventSubprocessScope()} is false or {@link #isSequentialMiSubprocessScope()}
-   * is false;
-   */
-  public ScopeImpl normalizeSecondNonScope(ScopeImpl scope) {
-    if(!isEventSubprocessScope) {
-      if(!scope.isScope()) {
-        log.fine("[LEGACY BEHAVIOR]: normalizing second non-scope scope.");
-        return scope.getFlowScope();
-      }
-      else {
-        return scope;
-      }
-    }
-    else {
-      return scope;
-    }
-  }
-
   /**
    * This method
    * @param scopeExecution
    * @param isLegacyBehaviorTurnedOff
    * @return
    */
-  protected boolean isLegacyBehaviorRequired(ActivityExecution scopeExecution, boolean isLegacyBehaviorTurnedOff) {
-    if(!isLegacyBehaviorTurnedOff) {
-      return true;
-    }
+  protected static boolean isLegacyBehaviorRequired(ActivityExecution scopeExecution) {
     // legacy behavior is turned off: the current activity was parsed as scope.
     // now we need to check whether a scope execution was correctly created for the
     // event subprocess.
@@ -258,25 +169,25 @@ public class LegacyBehavior {
    * @param activityExecutionMapping
    * @return
    */
-  public PvmExecutionImpl getScopeExecution(ScopeImpl scope, Map<ScopeImpl, PvmExecutionImpl> activityExecutionMapping) {
+  public static PvmExecutionImpl getScopeExecution(ScopeImpl scope, Map<ScopeImpl, PvmExecutionImpl> activityExecutionMapping) {
     ScopeImpl flowScope = scope.getFlowScope();
     return activityExecutionMapping.get(flowScope);
   }
 
   // helpers ////////////////////////////////////////////////
 
-  protected void ensureConcurrentScope(PvmExecutionImpl execution) {
+  protected static void ensureConcurrentScope(PvmExecutionImpl execution) {
     ensureScope(execution);
     ensureConcurrent(execution);
   }
 
-  private void ensureConcurrent(PvmExecutionImpl execution) {
+  protected static void ensureConcurrent(PvmExecutionImpl execution) {
     if(!execution.isConcurrent()) {
       throw new ProcessEngineException("Execution must be concurrent.");
     }
   }
 
-  private void ensureScope(PvmExecutionImpl execution) {
+  protected static void ensureScope(PvmExecutionImpl execution) {
     if(!execution.isScope()) {
       throw new ProcessEngineException("Execution must be scope.");
     }
@@ -289,7 +200,7 @@ public class LegacyBehavior {
    * @param scopes
    * @return
    */
-  public Map<ScopeImpl, PvmExecutionImpl> createActivityExecutionMapping(List<PvmExecutionImpl> scopeExecutions, List<ScopeImpl> scopes) {
+  public static Map<ScopeImpl, PvmExecutionImpl> createActivityExecutionMapping(List<PvmExecutionImpl> scopeExecutions, List<ScopeImpl> scopes) {
     // The trees are out of sync.
     // We are missing executions:
     int numOfMissingExecutions = scopes.size() - scopeExecutions.size();
@@ -315,8 +226,8 @@ public class LegacyBehavior {
       if(numOfMissingExecutions > 0) {
         ActivityBehavior activityBehavior = scope.getActivityBehavior();
         ActivityBehavior parentActivityBehavior = (ActivityBehavior) (scope.getFlowScope() != null ? scope.getFlowScope().getActivityBehavior() : null);
-        if((isEventSubprocessScope && activityBehavior instanceof EventSubProcessActivityBehavior)
-            || (isSequentialMiSubprocessScope && activityBehavior instanceof SubProcessActivityBehavior
+        if((activityBehavior instanceof EventSubProcessActivityBehavior)
+            || (activityBehavior instanceof SubProcessActivityBehavior
                   && parentActivityBehavior instanceof SequentialMultiInstanceActivityBehavior)) {
           // found a missing scope
           numOfMissingExecutions--;

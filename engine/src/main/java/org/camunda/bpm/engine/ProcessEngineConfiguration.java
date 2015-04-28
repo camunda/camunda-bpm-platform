@@ -22,7 +22,6 @@ import org.camunda.bpm.engine.impl.cfg.BeansConfigurationHelper;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
-import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
 import org.camunda.bpm.engine.variable.type.ValueTypeResolver;
 
 
@@ -195,8 +194,6 @@ public abstract class ProcessEngineConfiguration {
   protected boolean authorizationEnabledForCustomCode = false;
 
   protected ValueTypeResolver valueTypeResolver;
-
-  protected boolean legacyBehaviorEnabled = false;
 
   /** use one of the static createXxxx methods instead */
   protected ProcessEngineConfiguration() {
@@ -583,20 +580,5 @@ public abstract class ProcessEngineConfiguration {
   public ProcessEngineConfiguration setValueTypeResolver(ValueTypeResolver valueTypeResolver) {
     this.valueTypeResolver = valueTypeResolver;
     return this;
-  }
-
-  /**
-   * @see LegacyBehavior
-   */
-  public ProcessEngineConfiguration setLegacyBehaviorEnabled(boolean legacyBehaviorEnabled) {
-    this.legacyBehaviorEnabled = legacyBehaviorEnabled;
-    return this;
-  }
-
-  /**
-   * @see LegacyBehavior
-   */
-  public boolean isLegacyBehaviorEnabled() {
-    return legacyBehaviorEnabled;
   }
 }

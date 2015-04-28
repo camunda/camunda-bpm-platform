@@ -21,7 +21,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
-import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 
@@ -53,7 +52,6 @@ public class CancelEndEventActivityBehavior extends AbstractBpmnActivityBehavior
   protected void leave(ActivityExecution execution) {
     // continue via the appropriate cancel boundary event
     ScopeImpl eventScope = (ScopeImpl) cancelBoundaryEvent.getEventScope();
-    eventScope = LegacyBehavior.get().normalizeSecondNonScope(eventScope);
 
     ActivityExecution boundaryEventScopeExecution = execution.findExecutionForFlowScope(eventScope);
     boundaryEventScopeExecution.executeActivity(cancelBoundaryEvent);

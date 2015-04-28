@@ -326,19 +326,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     // e3 is created and is concurrent;
     // e4 is the new root for the activity stack to instantiate
     //
-    // (2b: LEGACY behavior)
-    // Before:               After:
-    //       -------               -------
-    //       |  e1 |               |  e1 |
-    //       -------               -------
-    //          |                  /     \
-    //       -------           -------  -------
-    //       |  e2 |           |  e2 |  |  e3 |
-    //       -------           -------  -------
-    //
-    // e2 remains under e1 but is now scope AND concurrent
-    // e3 is a new, non-scope activity
-    //
     // (3) Existing concurrent execution(s)
     // Before:               After:
     //       -------                    ---------
@@ -366,18 +353,13 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       // (2)
       PvmExecutionImpl child = children.get(0);
 
-      if(LegacyBehavior.get().isConcurrentScopeExecutionEnabled()) {
-        // 2b) legacy behavior
-        LegacyBehavior.get().createConcurrentScope(child);
-      } else {
-        PvmExecutionImpl concurrentReplacingExecution = this.createExecution();
-        concurrentReplacingExecution.setConcurrent(true);
-        concurrentReplacingExecution.setScope(false);
-        child.setParent(concurrentReplacingExecution);
-        ((List<PvmExecutionImpl>) concurrentReplacingExecution.getExecutions()).add(child);
-        this.getExecutions().remove(child);
-        this.leaveActivityInstance();
-      }
+      PvmExecutionImpl concurrentReplacingExecution = this.createExecution();
+      concurrentReplacingExecution.setConcurrent(true);
+      concurrentReplacingExecution.setScope(false);
+      child.setParent(concurrentReplacingExecution);
+      ((List<PvmExecutionImpl>) concurrentReplacingExecution.getExecutions()).add(child);
+      this.getExecutions().remove(child);
+      this.leaveActivityInstance();
     }
 
     // (1), (2), and (3)
@@ -420,7 +402,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
           lastConcurrent.remove();
         } else {
           // legacy behavior
-          LegacyBehavior.get().pruneConcurrentScope(lastConcurrent);
+          LegacyBehavior.pruneConcurrentScope(lastConcurrent);
         }
         return true;
       }
@@ -457,7 +439,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
     // the target scope
     ScopeImpl flowScope = eventHandlerActivity.getFlowScope();
-    flowScope = LegacyBehavior.get().normalizeSecondNonScope(flowScope);
 
     // the event scope (the current activity)
     ScopeImpl eventScope = eventHandlerActivity.getEventScope();
@@ -1032,7 +1013,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
     // if this is a scope execution currently executing a non scope activity
     currentActivity = currentActivity.isScope() ? currentActivity : currentActivity.getFlowScope();
-    currentActivity = LegacyBehavior.get().normalizeSecondNonScope(currentActivity);
 
     return scopeExecution.findExecutionForScope(currentActivity, (ScopeImpl) targetFlowScope);
   }
@@ -1049,7 +1029,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     if(scopeExecution == null){
       // the target scope is scope but no corresponding execution was found
       // => legacy behavior
-      scopeExecution = LegacyBehavior.get().getScopeExecution(targetScope, activityExecutionMapping);
+      scopeExecution = LegacyBehavior.getScopeExecution(targetScope, activityExecutionMapping);
     }
     return scopeExecution;
   }
@@ -1064,7 +1044,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     if (!currentActivity.isScope() || activityInstanceId == null) {
       currentActivity = currentActivity.getFlowScope();
     }
-    currentActivity = LegacyBehavior.get().normalizeSecondNonScope(currentActivity);
 
     PvmExecutionImpl scopeExecution = getFlowScopeExecution();
 
@@ -1135,7 +1114,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     }
     else {
       // Wounderful! The trees are out of sync. This is due to legacy behavior
-      return LegacyBehavior.get().createActivityExecutionMapping(scopeExecutions, scopes);
+      return LegacyBehavior.createActivityExecutionMapping(scopeExecutions, scopes);
     }
   }
 

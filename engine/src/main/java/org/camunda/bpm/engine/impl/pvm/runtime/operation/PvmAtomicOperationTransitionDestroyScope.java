@@ -52,7 +52,7 @@ public class PvmAtomicOperationTransitionDestroyScope implements PvmAtomicOperat
 
       if (execution.isConcurrent()) {
         // legacy behavior
-        LegacyBehavior.get().destroyConcurrentScope(execution);
+        LegacyBehavior.destroyConcurrentScope(execution);
         propagatingExecution = execution;
       }
       else {
