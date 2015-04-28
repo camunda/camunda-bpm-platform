@@ -117,7 +117,6 @@ import org.camunda.bpm.engine.impl.pvm.process.ParticipantProcess;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
-import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
 import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
 import org.camunda.bpm.engine.impl.scripting.ScriptCondition;
 import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
@@ -1468,18 +1467,26 @@ public class BpmnParse extends Parse {
 
   public String parseDocumentation(Element element) {
     List<Element> docElements = element.elements("documentation");
-    if (docElements.isEmpty()) {
+    List<String> docStrings = new ArrayList<String>();
+    for (Element e: docElements) {
+      docStrings.add(e.getText());
+    }
+
+    return parseDocumentation(docStrings);
+  }
+
+  public static String parseDocumentation(List<String> docStrings) {
+    if (docStrings.isEmpty()) {
       return null;
     }
 
-
     StringBuilder builder = new StringBuilder();
-    for (Element e: docElements) {
+    for (String e: docStrings) {
       if (builder.length() != 0) {
         builder.append("\n\n");
       }
 
-      builder.append(e.getText().trim());
+      builder.append(e.trim());
     }
 
     return builder.toString();

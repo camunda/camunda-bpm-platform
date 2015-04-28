@@ -137,32 +137,38 @@ public class DeploymentCache {
     return cachedProcessDefinition;
   }
 
+  public BpmnModelInstance findBpmnModelInstanceForProcessDefinition(ProcessDefinitionEntity processDefinitionEntity) {
+    BpmnModelInstance bpmnModelInstance = bpmnModelInstanceCache.get(processDefinitionEntity.getId());
+    if(bpmnModelInstance == null) {
+      bpmnModelInstance = loadAndCacheBpmnModelInstance(processDefinitionEntity);
+    }
+    return bpmnModelInstance;
+  }
+
   public BpmnModelInstance findBpmnModelInstanceForProcessDefinition(String processDefinitionId) {
     BpmnModelInstance bpmnModelInstance = bpmnModelInstanceCache.get(processDefinitionId);
     if(bpmnModelInstance == null) {
-
       ProcessDefinitionEntity processDefinition = findDeployedProcessDefinitionById(processDefinitionId);
-      final String deploymentId = processDefinition.getDeploymentId();
-      final String resourceName = processDefinition.getResourceName();
-
-      final CommandContext commandContext = Context.getCommandContext();
-      InputStream bpmnResourceInputStream = commandContext.runWithoutAuthorization(new Callable<InputStream>() {
-        public InputStream call() throws Exception {
-          return new GetDeploymentResourceCmd(deploymentId, resourceName).execute(commandContext);
-        }
-      });
-
-      try {
-        bpmnModelInstance = Bpmn.readModelFromStream(bpmnResourceInputStream);
-      }catch(Exception e) {
-        throw new ProcessEngineException("Could not load Bpmn Model for process definition "+processDefinitionId, e);
-      }
-
-      // put model instance into cache.
-      bpmnModelInstanceCache.put(processDefinitionId, bpmnModelInstance);
-
+      bpmnModelInstance = loadAndCacheBpmnModelInstance(processDefinition);
     }
     return bpmnModelInstance;
+  }
+
+  protected BpmnModelInstance loadAndCacheBpmnModelInstance(final ProcessDefinitionEntity processDefinitionEntity) {
+    final CommandContext commandContext = Context.getCommandContext();
+    InputStream bpmnResourceInputStream = commandContext.runWithoutAuthorization(new Callable<InputStream>() {
+      public InputStream call() throws Exception {
+        return new GetDeploymentResourceCmd(processDefinitionEntity.getDeploymentId(), processDefinitionEntity.getResourceName()).execute(commandContext);
+      }
+    });
+
+    try {
+      BpmnModelInstance bpmnModelInstance = Bpmn.readModelFromStream(bpmnResourceInputStream);
+      bpmnModelInstanceCache.put(processDefinitionEntity.getId(), bpmnModelInstance);
+      return bpmnModelInstance;
+    }catch(Exception e) {
+      throw new ProcessEngineException("Could not load Bpmn Model for process definition "+processDefinitionEntity.getId(), e);
+    }
   }
 
   public void addProcessDefinition(ProcessDefinitionEntity processDefinition) {
