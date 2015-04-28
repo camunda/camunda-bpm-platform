@@ -49,9 +49,6 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
  * a new, concurrent execution will be created and be interleaved between the parent and the
  * existing scope execution.
  *<p>
- * WARNING: Legacy behavior must not be turned off as a rolling upgrade.
- * All process engines connected to the database need to be shut down and then the legacy
- * behavior needs to be turned off.
  *
  * @author Daniel Meyer
  * @since 7.3
