@@ -54,6 +54,7 @@
           <groupId>org.camunda.bpm.distro</groupId>
           <artifactId>camunda-sql-scripts</artifactId>
           <version>${project.version}</version>
+          <type>test-jar</type>
         </dependency>
 
         <dependency>
@@ -170,6 +171,7 @@
                       <groupId>org.camunda.bpm.distro</groupId>
                       <artifactId>camunda-sql-scripts</artifactId>
                       <version>${project.version}</version>
+                      <type>test-jar</type>
                       <outputDirectory>${project.build.directory}/scripts-current</outputDirectory>
                       <overWrite>true</overWrite>
                     </artifactItem>

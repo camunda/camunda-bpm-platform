@@ -66,6 +66,7 @@
                     <groupId>org.camunda.bpm.distro</groupId>
                     <artifactId>camunda-sql-scripts</artifactId>
                     <version>${project.version}</version>
+                    <type>test-jar</type>
                     <outputDirectory>${project.build.directory}/scripts-current</outputDirectory>
                     <overWrite>true</overWrite>
                   </artifactItem>
@@ -101,6 +102,42 @@
       <id>instance-migration</id>
       <build>
         <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>compile</id>
+                <phase>generate-test-resources</phase>
+                <configuration>
+                  <target>
+
+                    <!-- create the SQL scripts so that the files exist even if they do not exist in the distribution. (this can be the case if there are no db
+                      upgrades (yet) for a particular release ) -->
+
+                    <mkdir dir="${project.build.directory}/scripts-current/sql/upgrade/"/>
+                    <touch
+                        file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql" />
+                    <touch
+                        file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql" />
+                    <touch
+                        file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql" />
+                    <touch
+                        file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql" />
+                    <touch
+                        file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" />
+                    <touch
+                        file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" />
+
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
           <!-- provide sql scripts -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -145,7 +182,7 @@
             </configuration>
             <executions>
               <execution>
-                <id>Run old version test fixture</id>
+                <id>create-old-schema</id>
                 <goals>
                   <goal>java</goal>
                 </goals>
@@ -156,7 +193,23 @@
                 </configuration>
               </execution>
               <execution>
-                <id>Perform DB upgrade</id>
+                <id>patch-old-schema</id>
+                <goals>
+                  <goal>java</goal>
+                </goals>
+                <phase>process-test-classes</phase>
+                <configuration>
+                  <mainClass>org.camunda.bpm.engine.impl.db.DbSchemaExecuteFile</mainClass>
+                  <arguments>
+                    <argument>process-engine-config-new.xml</argument>
+                    <argument>
+                      ${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql
+                    </argument>
+                  </arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <id>upgrade-db</id>
                 <goals>
                   <goal>java</goal>
                 </goals>
@@ -172,7 +225,7 @@
                 </configuration>
               </execution>
               <execution>
-                <id>Drop upgraded DB</id>
+                <id>drop-db</id>
                 <goals>
                   <goal>java</goal>
                 </goals>
