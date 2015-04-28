@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.engine.test.bpmn.callactivity;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +31,7 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * @author Roman Smirnov
@@ -1043,6 +1047,30 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
 
   }
 
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testOutputAll.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
+    })
+  public void testCallCaseOutputAllVariablesTypedToProcess(){
+    startProcessInstanceByKey("process");
+    CaseInstance caseInstance = queryOneTaskCaseInstance();
+    String variableName = "foo";
+    String variableName2 = "null";
+    TypedValue variableValue = Variables.stringValue("bar");
+    TypedValue variableValue2 = Variables.integerValue(null);
+    caseService.withCaseExecution(caseInstance.getId())
+      .setVariable(variableName, variableValue)
+      .setVariable(variableName2, variableValue2)
+      .execute();
+    complete(caseInstance.getId());
+    
+    Task task = taskService.createTaskQuery().singleResult();
+    TypedValue value = runtimeService.getVariableTyped(task.getProcessInstanceId(), variableName);
+    assertThat(value, is(variableValue));
+    value = runtimeService.getVariableTyped(task.getProcessInstanceId(), variableName2);
+    assertThat(value, is(variableValue2));
+  }
+  
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testCallCaseAsConstant.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"

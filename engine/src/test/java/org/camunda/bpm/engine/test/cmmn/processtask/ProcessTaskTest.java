@@ -30,6 +30,8 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * @author Roman Smirnov
@@ -1394,7 +1396,53 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     assertCaseEnded(caseInstanceId);
 
   }
+  
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/processtask/ProcessTaskTest.testInputOutputAll.cmmn",
+      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"
+    })
+  public void testTypedVariablesRoundtrip() {
+    String caseInstanceId = createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
+    String processTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
 
+    String variableName = "aVariable";
+    String variableName2 = "anotherVariable";
+    String variableName3 = "theThirdVariable";
+    TypedValue variableValue = Variables.stringValue("abc");
+    TypedValue variableValue2 = Variables.longValue(null);
+    caseService
+      .withCaseExecution(processTaskId)
+      .setVariable(variableName, variableValue)
+      .setVariable(variableName2, variableValue2)
+      .manualStart();
+
+    String processInstanceId = queryProcessInstance().getId();
+
+    TypedValue value = runtimeService.getVariableTyped(processInstanceId, variableName);
+    assertThat(value, is(variableValue));
+    value = runtimeService.getVariableTyped(processInstanceId, variableName2);
+    assertThat(value, is(variableValue2));
+    
+    String taskId = queryTask().getId();
+
+    TypedValue variableValue3 = Variables.integerValue(1);
+    runtimeService.setVariable(processInstanceId, variableName3, variableValue3);
+
+    // should also complete process instance
+    taskService.complete(taskId);
+
+    value = caseService.getVariableTyped(caseInstanceId, variableName3);
+
+    assertThat(value, is(variableValue3));
+
+    // complete ////////////////////////////////////////////////////////
+
+    assertProcessEnded(processInstanceId);
+
+    close(caseInstanceId);
+    assertCaseEnded(caseInstanceId);
+  }
+  
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/cmmn/oneProcessTaskCase.cmmn",
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"
