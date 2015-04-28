@@ -14,7 +14,7 @@ define([
         UriProvider
       ) {
 
-        UriProvider.replace(':appName', 'admin');
+        UriProvider.replace(':appName', 'tasklist');
         UriProvider.replace('app://', config.href);
         UriProvider.replace('adminbase://', config['app-root'] + '/app/admin/');
         UriProvider.replace('tasklistbase://', config['app-root'] + '/app/tasklist/');
