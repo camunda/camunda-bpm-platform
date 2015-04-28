@@ -89,10 +89,14 @@ public abstract class TreeWalker<T> {
     boolean isFulfilled(S element);
   }
 
-  public class NullCondition<S> implements WalkCondition<S> {
+  public static class NullCondition<S> implements WalkCondition<S> {
 
     public boolean isFulfilled(S element) {
       return element == null;
+    }
+
+    public static <S> WalkCondition<S> notNull() {
+      return new NullCondition<S>();
     }
 
   }

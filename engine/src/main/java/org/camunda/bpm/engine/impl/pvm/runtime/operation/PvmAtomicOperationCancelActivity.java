@@ -38,9 +38,9 @@ public abstract class PvmAtomicOperationCancelActivity implements PvmAtomicOpera
 
     PvmExecutionImpl propagatingExecution = null;
 
-    if(execution.isConcurrent()) {
+    if(LegacyBehavior.isConcurrentScope(execution)) {
       // this is legacy behavior
-      LegacyBehavior.cancelConcurrentScope(execution, cancellingActivity);
+      LegacyBehavior.cancelConcurrentScope(execution, (PvmActivity) cancellingActivity.getEventScope());
       propagatingExecution = execution;
     }
     else {

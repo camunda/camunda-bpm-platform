@@ -13,12 +13,16 @@
 
 package org.camunda.bpm.engine.test.bpmn.event.message;
 
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
 
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
@@ -235,12 +239,22 @@ public class MessageNonInterruptingBoundaryEventTest extends PluggableProcessEng
   @Deployment
   public void testNonInterruptingEventInCombinationWithReceiveTaskInsideSubProcess() {
     // given
-    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("process");
+    String processInstanceId = instance.getId();
 
     // when (1)
     runtimeService.correlateMessage("firstMessage");
 
     // then (1)
+    ActivityInstance activityInstance = runtimeService.getActivityInstance(instance.getId());
+    assertThat(activityInstance).hasStructure(
+        describeActivityInstanceTree(instance.getProcessDefinitionId())
+        .beginScope("subProcess")
+          .activity("task1")
+          .beginScope("innerSubProcess")
+            .activity("receiveTask")
+        .done());
+
     assertEquals(1, taskService.createTaskQuery().count());
 
     Task task1 = taskService.createTaskQuery()

@@ -13,22 +13,37 @@
 package org.camunda.bpm.qa.upgrade;
 
 
-import org.camunda.bpm.engine.*;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.repository.Deployment;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.engine.task.TaskQuery;
-import org.junit.Assert;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.camunda.bpm.qa.upgrade.scenarios.boundary.NestedNonInterruptingBoundaryEventOnInnerSubprocessScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.boundary.NestedNonInterruptingBoundaryEventOnOuterSubprocessScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.boundary.NonInterruptingBoundaryEventScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.eventsubprocess.InterruptingEventSubprocessScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.eventsubprocess.NestedInterruptingErrorEventSubprocessScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.eventsubprocess.NestedInterruptingEventSubprocessParallelScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.eventsubprocess.NestedNonInterruptingEventSubprocessNestedSubprocessScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.eventsubprocess.NestedNonInterruptingEventSubprocessScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.eventsubprocess.NestedParallelNonInterruptingEventSubprocessScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.eventsubprocess.NonInterruptingEventSubprocessScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.eventsubprocess.ParallelNestedNonInterruptingEventSubprocessScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.eventsubprocess.TwoLevelNestedNonInterruptingEventSubprocessScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.multiinstance.MultiInstanceReceiveTaskScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.multiinstance.NestedSequentialMultiInstanceSubprocessScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.multiinstance.ParallelMultiInstanceSubprocessScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.multiinstance.SequentialMultiInstanceSubprocessScenario;
 
 /**
  * @author Daniel Meyer
@@ -62,13 +77,32 @@ public class TestFixtureOld {
 
     dropCreateDatabase(processEngine);
 
-    TestFixtureOld fixture = new TestFixtureOld(processEngine);
+    // register test scenarios
+    ScenarioRunner runner = new ScenarioRunner(processEngine);
 
-    // userTask migration
-    fixture.startTestUserTaskMigration();
+    // event subprocesses
+    runner.setupScenarios(InterruptingEventSubprocessScenario.class);
+    runner.setupScenarios(NonInterruptingEventSubprocessScenario.class);
+    runner.setupScenarios(NestedNonInterruptingEventSubprocessScenario.class);
+    runner.setupScenarios(ParallelNestedNonInterruptingEventSubprocessScenario.class);
+    runner.setupScenarios(NestedParallelNonInterruptingEventSubprocessScenario.class);
+    runner.setupScenarios(NestedNonInterruptingEventSubprocessNestedSubprocessScenario.class);
+    runner.setupScenarios(NestedInterruptingErrorEventSubprocessScenario.class);
+    runner.setupScenarios(TwoLevelNestedNonInterruptingEventSubprocessScenario.class);
+    runner.setupScenarios(NestedInterruptingEventSubprocessParallelScenario.class);
+
+    // multi instance
+    runner.setupScenarios(SequentialMultiInstanceSubprocessScenario.class);
+    runner.setupScenarios(NestedSequentialMultiInstanceSubprocessScenario.class);
+    runner.setupScenarios(MultiInstanceReceiveTaskScenario.class);
+    runner.setupScenarios(ParallelMultiInstanceSubprocessScenario.class);
+
+    // boundary event
+    runner.setupScenarios(NonInterruptingBoundaryEventScenario.class);
+    runner.setupScenarios(NestedNonInterruptingBoundaryEventOnInnerSubprocessScenario.class);
+    runner.setupScenarios(NestedNonInterruptingBoundaryEventOnOuterSubprocessScenario.class);
 
     processEngine.close();
-
   }
 
   protected static void dropCreateDatabase(ProcessEngine processEngine) {
@@ -103,29 +137,6 @@ public class TestFixtureOld {
           return null;
         }
       });
-  }
-
-  public void startTestUserTaskMigration() {
-    deploy("org/camunda/bpm/qa/upgrade/TestFixtureOld.testUserTaskMigration.bpmn20.xml");
-
-    Map<String, Object> params = Collections.<String, Object>singletonMap("aStartVariableName", "aStartVariableValue");
-    ProcessInstance pi = runtimeService
-        .startProcessInstanceByKey("TestFixtureOld.testUserTaskMigration", params);
-
-    TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(pi.getId());
-
-    // get current task
-    Task task = taskQuery.singleResult();
-    Assert.assertNotNull(task);
-  }
-
-  public Deployment deploy(String processOrCaseXml) {
-    Deployment deployment = repositoryService
-        .createDeployment()
-        .addClasspathResource(processOrCaseXml)
-        .deploy();
-
-    return deployment;
   }
 
 }

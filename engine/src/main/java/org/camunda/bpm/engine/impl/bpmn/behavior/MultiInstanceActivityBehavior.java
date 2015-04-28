@@ -41,12 +41,12 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
   protected static final Logger LOGGER = Logger.getLogger(MultiInstanceActivityBehavior.class.getName());
 
   // Variable names for mi-body scoped variables (as described in spec)
-  protected final String NUMBER_OF_INSTANCES = "nrOfInstances";
-  protected final String NUMBER_OF_ACTIVE_INSTANCES = "nrOfActiveInstances";
-  protected final String NUMBER_OF_COMPLETED_INSTANCES = "nrOfCompletedInstances";
+  public static final String NUMBER_OF_INSTANCES = "nrOfInstances";
+  public static final String NUMBER_OF_ACTIVE_INSTANCES = "nrOfActiveInstances";
+  public static final String NUMBER_OF_COMPLETED_INSTANCES = "nrOfCompletedInstances";
 
   // Variable names for mi-instance scoped variables (as described in the spec)
-  protected final String LOOP_COUNTER = "loopCounter";
+  public static final String LOOP_COUNTER = "loopCounter";
 
   protected Expression loopCardinalityExpression;
   protected Expression completionConditionExpression;

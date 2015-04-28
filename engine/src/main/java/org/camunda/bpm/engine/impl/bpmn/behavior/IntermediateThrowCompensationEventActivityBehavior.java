@@ -30,7 +30,6 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.impl.tree.Collector;
 import org.camunda.bpm.engine.impl.tree.FlowScopeWalker;
-import org.camunda.bpm.engine.impl.tree.TreeWalker;
 import org.camunda.bpm.engine.impl.tree.TreeWalker.WalkCondition;
 
 

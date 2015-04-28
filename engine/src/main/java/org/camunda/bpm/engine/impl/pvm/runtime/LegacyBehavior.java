@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -20,13 +22,25 @@ import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.ReceiveTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.SequentialMultiInstanceActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.SubProcessActivityBehavior;
+import org.camunda.bpm.engine.impl.cmd.GetActivityInstanceCmd;
+import org.camunda.bpm.engine.impl.persistence.entity.ActivityInstanceImpl;
+import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
+import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
+import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
+import org.camunda.bpm.engine.impl.tree.ExecutionWalker;
+import org.camunda.bpm.engine.impl.tree.FlowScopeWalker;
+import org.camunda.bpm.engine.impl.tree.ScopeCollector;
+import org.camunda.bpm.engine.impl.tree.ScopeExecutionCollector;
 
 /**
  * This class encapsulates legacy runtime behavior for the process engine.
@@ -62,7 +76,6 @@ public class LegacyBehavior {
   /**
    * Prunes a concurrent scope. This can only happen if
    * (a) the process instance has been migrated from a previous version to a new version of the process engine
-   * (b) {@link #isConcurrentScopeExecutionEnabled()}
    *
    * This is an inverse operation to {@link #createConcurrentScope(PvmExecutionImpl)}.
    *
@@ -79,28 +92,28 @@ public class LegacyBehavior {
   /**
    * Cancels an execution which is both concurrent and scope. This can only happen if
    * (a) the process instance has been migrated from a previous version to a new version of the process engine
-   * (b) {@link #isConcurrentScopeExecutionEnabled()}
    *
    * See: javadoc of this class for note about concurrent scopes.
    *
    * @param execution the concurrent scope execution to destroy
+   * @param cancellingActivity the activity that cancels the execution; it must hold that
+   *   cancellingActivity's event scope is the scope the execution is responsible for
    */
-  public static void cancelConcurrentScope(PvmExecutionImpl execution, PvmActivity cancellingActivity) {
+  public static void cancelConcurrentScope(PvmExecutionImpl execution, PvmActivity cancelledScopeActivity) {
     ensureConcurrentScope(execution);
     log.fine("[LEGACY BEHAVIOR]: cancel concurrent scope execution "+execution);
 
-    execution.interrupt("Cancel scope activity "+cancellingActivity+" executed.");
-    // <!> HACK set to parent activity and leave activity instance
-    execution.setActivity((PvmActivity) cancellingActivity.getFlowScope());
+    execution.interrupt("Scope "+cancelledScopeActivity+" cancelled.");
+    // <!> HACK set to event scope activity and leave activity instance
+    execution.setActivity(cancelledScopeActivity);
     execution.leaveActivityInstance();
-    execution.interrupt("Cancel scope activity "+cancellingActivity+" executed.");
+    execution.interrupt("Scope "+cancelledScopeActivity+" cancelled.");
     execution.destroy();
   }
 
   /**
    * Destroys a concurrent scope Execution. This can only happen if
    * (a) the process instance has been migrated from a previous version to a 7.3+ version of the process engine
-   * (b) {@link #isConcurrentScopeExecutionEnabled()}
    *
    * See: javadoc of this class for note about concurrent scopes.
    *
@@ -131,7 +144,43 @@ public class LegacyBehavior {
 
     if(performLegacyBehavior) {
       log.fine("[LEGACY BEHAVIOR]: end concurrent execution in event subprocess.");
-      endedExecution.end(false);
+      // notify the grandparent flow scope in a similar way PvmAtomicOperationAcitivtyEnd does
+      ScopeImpl flowScope = endedExecution.getActivity().getFlowScope();
+      if (flowScope != null) {
+        flowScope = flowScope.getFlowScope();
+
+        if (flowScope != null) {
+          if (flowScope == endedExecution.getActivity().getProcessDefinition()) {
+            endedExecution.remove();
+            scopeExecution.tryPruneLastConcurrentChild();
+            scopeExecution.forceUpdate();
+          }
+          else {
+            PvmActivity flowScopeActivity = (PvmActivity) flowScope;
+
+            ActivityBehavior activityBehavior = flowScopeActivity.getActivityBehavior();
+            if (activityBehavior instanceof CompositeActivityBehavior) {
+              ((CompositeActivityBehavior) activityBehavior).concurrentChildExecutionEnded(scopeExecution, endedExecution);
+            }
+          }
+        }
+      }
+    }
+
+    return performLegacyBehavior;
+  }
+
+  /**
+   * Destroy an execution for an activity that was previously not a scope and now is
+   * (e.g. event subprocess)
+   */
+  public static boolean destroySecondNonScope(PvmExecutionImpl execution) {
+    ensureScope(execution);
+    boolean performLegacyBehavior = isLegacyBehaviorRequired(execution);
+
+    if(performLegacyBehavior) {
+      log.fine("[LEGACY BEHAVIOR]: end scope execution in previously non-scope activity");
+      // legacy behavior is to do nothing
     }
 
     return performLegacyBehavior;
@@ -152,7 +201,10 @@ public class LegacyBehavior {
     Map<ScopeImpl, PvmExecutionImpl> activityExecutionMapping = scopeExecution.createActivityExecutionMapping();
     // if the scope execution for the current activity is the same as for the parent scope
     // -> we need to perform legacy behavior
-    PvmActivity activity = scopeExecution.getActivity();
+    PvmScope activity = scopeExecution.getActivity();
+    if (!activity.isScope()) {
+      activity = activity.getFlowScope();
+    }
     return activityExecutionMapping.get(activity) == activityExecutionMapping.get(activity.getFlowScope());
   }
 
@@ -219,24 +271,193 @@ public class LegacyBehavior {
     int executionCounter = 0;
     for(int i = 1; i < scopes.size(); i++) {
       ActivityImpl scope = (ActivityImpl) scopes.get(i);
-      PvmExecutionImpl execution = scopeExecutions.get(executionCounter);
-      if(numOfMissingExecutions > 0) {
-        ActivityBehavior activityBehavior = scope.getActivityBehavior();
-        ActivityBehavior parentActivityBehavior = (ActivityBehavior) (scope.getFlowScope() != null ? scope.getFlowScope().getActivityBehavior() : null);
-        if((activityBehavior instanceof EventSubProcessActivityBehavior)
-            || (activityBehavior instanceof SubProcessActivityBehavior
-                  && parentActivityBehavior instanceof SequentialMultiInstanceActivityBehavior)) {
-          // found a missing scope
-          numOfMissingExecutions--;
-        }
-        else {
-          executionCounter++;
-        }
+      if(numOfMissingExecutions > 0 && wasNoScope(scope)) {
+        // found a missing scope
+        numOfMissingExecutions--;
       }
+      else {
+        executionCounter++;
+      }
+
+      if (executionCounter >= scopeExecutions.size()) {
+        throw new ProcessEngineException("Cannot construct activity-execution mapping: there are "
+            + "more scope executions missing than explained by the flow scope hierarchy.");
+      }
+
+      PvmExecutionImpl execution = scopeExecutions.get(executionCounter);
       mapping.put(scope, execution);
     }
 
     return mapping;
   }
+
+  /**
+   * Determines whether the given scope was a scope (boolean flag isScope)
+   * when used as a multi-instance activity
+   */
+  protected static boolean wasNoScope(ActivityImpl activity) {
+    ActivityBehavior activityBehavior = activity.getActivityBehavior();
+    ActivityBehavior parentActivityBehavior = (ActivityBehavior) (activity.getFlowScope() != null ? activity.getFlowScope().getActivityBehavior() : null);
+    return (activityBehavior instanceof EventSubProcessActivityBehavior)
+        || (activityBehavior instanceof SubProcessActivityBehavior
+              && parentActivityBehavior instanceof SequentialMultiInstanceActivityBehavior)
+        || (activityBehavior instanceof ReceiveTaskActivityBehavior
+              && parentActivityBehavior instanceof MultiInstanceActivityBehavior);
+  }
+
+  /**
+   * Tolerates the broken execution trees fixed with CAM-3727 where there may be more
+   * ancestor scope executions than ancestor flow scopes;
+   *
+   * In that case, the argument execution is removed, the parent execution of the argument
+   * is returned such that one level of mismatch is corrected.
+   *
+   * Note that this does not necessarily skip the correct scope execution, since
+   * the broken parent-child relationships may be anywhere in the tree (e.g. consider a non-interrupting
+   * boundary event followed by a subprocess (i.e. scope), when the subprocess ends, we would
+   * skip the subprocess's execution).
+   *
+   */
+  public static PvmExecutionImpl determinePropagatingExecutionOnEnd(PvmExecutionImpl propagatingExecution) {
+    if (!propagatingExecution.isScope()) {
+      // non-scope executions may end in the "wrong" flow scope
+      return propagatingExecution;
+    }
+
+    ScopeExecutionCollector scopeExecutionCollector = new ScopeExecutionCollector();
+    new ExecutionWalker(propagatingExecution)
+      .addPreCollector(scopeExecutionCollector)
+      .walkUntil();
+    List<PvmExecutionImpl> scopeExecutions = scopeExecutionCollector.getExecutions();
+
+    ScopeCollector scopeCollector = new ScopeCollector();
+    new FlowScopeWalker(propagatingExecution.getActivity().getFlowScope())
+      .addPreCollector(scopeCollector)
+      .walkUntil();
+
+    List<ScopeImpl> flowScopes = scopeCollector.getScopes();
+
+    if (scopeExecutions.size() > flowScopes.size()) {
+      // skip one scope
+      propagatingExecution.remove();
+      PvmExecutionImpl parent = propagatingExecution.getParent();
+      parent.setActivity(propagatingExecution.getActivity());
+      return propagatingExecution.getParent();
+    }
+    else {
+      return propagatingExecution;
+    }
+  }
+
+  /**
+   * Concurrent + scope executions are legacy and could occur in processes with non-interrupting
+   * boundary events or event subprocesses
+   */
+  public static boolean isConcurrentScope(PvmExecutionImpl propagatingExecution) {
+    return propagatingExecution.isConcurrent() && propagatingExecution.isScope();
+  }
+
+  /**
+   * <p>Required for migrating active sequential MI receive tasks. These activities were formerly not scope,
+   * but are now. This has the following implications:
+   *
+   * <p>Before migration:
+   * <ul><li> the event subscription is attached to the miBody scope execution</ul>
+   *
+   * <p>After migration:
+   * <ul><li> a new subscription is created for every instance
+   * <li> the new subscription is attached to a dedicated scope execution as a child of the miBody scope
+   *   execution</ul>
+   *
+   * <p>Thus, this method removes the subscription on the miBody scope
+   */
+  public static void removeLegacySubscriptionOnParent(ExecutionEntity execution, EventSubscriptionEntity eventSubscription) {
+    ActivityImpl activity = execution.getActivity();
+    if (activity == null) {
+      return;
+    }
+
+    ActivityBehavior behavior = activity.getActivityBehavior();
+    ActivityBehavior parentBehavior = (ActivityBehavior) (activity.getFlowScope() != null ? activity.getFlowScope().getActivityBehavior() : null);
+
+    if (behavior instanceof ReceiveTaskActivityBehavior &&
+        parentBehavior instanceof MultiInstanceActivityBehavior) {
+      List<EventSubscriptionEntity> parentSubscriptions = execution.getParent().getEventSubscriptions();
+
+      for (EventSubscriptionEntity subscription : parentSubscriptions) {
+        // distinguish a boundary event on the mi body with the same message name from the receive task subscription
+        if (areEqualEventSubscriptions(subscription, eventSubscription)) {
+          subscription.delete();
+        }
+      }
+    }
+
+  }
+
+  /**
+   * Checks if the parameters are the same apart from the execution id
+   */
+  protected static boolean areEqualEventSubscriptions(EventSubscriptionEntity subscription1, EventSubscriptionEntity subscription2) {
+    return !valuesDiffer(subscription1.getEventType(), subscription2.getEventType())
+        && !valuesDiffer(subscription1.getEventName(), subscription2.getEventName())
+        && !valuesDiffer(subscription1.getActivityId(), subscription2.getActivityId());
+
+  }
+
+  protected static <T> boolean valuesDiffer(T value1, T value2) {
+    if ((value1 != null && !value1.equals(value2))
+        || (value1 == null && value2 != null)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Remove all entries for legacy non-scopes given that the assigned scope execution is also responsible for another scope
+   */
+  public static void removeLegacyNonScopesFromMapping(Map<ScopeImpl, PvmExecutionImpl> mapping) {
+    Map<PvmExecutionImpl, List<ScopeImpl>> scopesForExecutions = new HashMap<PvmExecutionImpl, List<ScopeImpl>>();
+
+    for (Map.Entry<ScopeImpl, PvmExecutionImpl> mappingEntry : mapping.entrySet()) {
+      List<ScopeImpl> scopesForExecution = scopesForExecutions.get(mappingEntry.getValue());
+      if (scopesForExecution == null) {
+        scopesForExecution = new ArrayList<ScopeImpl>();
+        scopesForExecutions.put(mappingEntry.getValue(), scopesForExecution);
+      }
+
+      scopesForExecution.add(mappingEntry.getKey());
+    }
+
+    for (Map.Entry<PvmExecutionImpl, List<ScopeImpl>> scopesForExecution : scopesForExecutions.entrySet()) {
+      List<ScopeImpl> scopes = scopesForExecution.getValue();
+
+      if (scopes.size() > 1) {
+        for (ScopeImpl scope : scopes) {
+          if (scope != scope.getProcessDefinition()) {
+            ActivityImpl scopeActivity = (ActivityImpl) scope;
+            if (wasNoScope(scopeActivity)) {
+              mapping.remove(scope);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * This is relevant for {@link GetActivityInstanceCmd} where in case of legacy multi-instance execution trees, the default
+   * algorithm omits multi-instance activity instances.
+   */
+  public static void repairParentRelationships(Collection<ActivityInstanceImpl> values, String processInstanceId) {
+    for (ActivityInstanceImpl activityInstance : values) {
+      // if the determined activity instance id and the parent activity instance are equal,
+      // just put the activity instance under the process instance
+      if (!valuesDiffer(activityInstance.getId(), activityInstance.getParentActivityInstanceId())) {
+        activityInstance.setParentActivityInstanceId(processInstanceId);
+      }
+    }
+  }
+
 
 }

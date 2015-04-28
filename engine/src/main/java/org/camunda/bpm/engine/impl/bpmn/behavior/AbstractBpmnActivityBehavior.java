@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -32,6 +33,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.impl.tree.Collector;
+import org.camunda.bpm.engine.impl.tree.FlowScopeWalker;
 import org.camunda.bpm.engine.impl.tree.TreeWalker;
 import org.camunda.bpm.engine.impl.tree.TreeWalker.WalkCondition;
 
@@ -107,38 +109,28 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
 
   protected void propagateError(String errorCode, Exception origException, ActivityExecution execution) throws Exception {
 
-    // get the scope activity or process definition for the current execution
-    ScopeImpl scope = getCurrentFlowScope(execution);
-
-    // make sure we start with the scope execution for the current scope
-    PvmExecutionImpl scopeExecution = (PvmExecutionImpl) (execution.isScope() ? execution : execution.getParent());
-
-    // walk the tree of parent scope executions and activities and search a scope in both trees which catches the error
-    ExecutionScopeHierarchyWalker scopeHierarchyWalker = new ExecutionScopeHierarchyWalker(scopeExecution, true);
+    // walk the hierarchy of process instances (cf call activity);
+    // this walker walks from leaf execution to leaf execution (i.e. visits one execution per process instance)
+    LeafExecutionHierarchyWalker scopeHierarchyWalker = new LeafExecutionHierarchyWalker((PvmExecutionImpl) execution);
 
     // collectors
-    ErrorDeclarationFinder errorDeclarationFinder = new ErrorDeclarationFinder(scope, errorCode, origException, (PvmExecutionImpl) execution);
+    // the error declaration finder internally walks the flow scope hierarchy of the current process instance and searches for an error handler
+    ErrorDeclarationFinder errorDeclarationFinder = new ErrorDeclarationFinder(origException, errorCode);
     ProcessInstanceCollector processInstanceCollector = new ProcessInstanceCollector();
 
     // walk
     scopeHierarchyWalker.addPreCollector(errorDeclarationFinder);
     scopeHierarchyWalker.addPreCollector(processInstanceCollector);
-    scopeHierarchyWalker.walkWhile(errorDeclarationFinder);
+    scopeHierarchyWalker.walkUntil(errorDeclarationFinder.declarationFound());
 
     PvmActivity errorHandlingActivity = errorDeclarationFinder.getErrorHandlerActivity();
     ErrorEventDefinition errorDefinition = errorDeclarationFinder.getErrorEventDefinition();
-    PvmExecutionImpl errorHandlingExecution = null;
-    if(errorHandlingActivity != null) {
-      // Why is this necessary (or: why can we not just use the last execution the ExecutionScopeHierarchyWalker looked at?)
-      // => legacy behavior: the execution hierarchy may be out of sync with the scope hierarchy. findExecutionForFlowScope()
-      // will return the correct scope execution even for trees which are out of sync
-      // TODO: maybe all of this can be simplified? However: in order to handle the "out of sync tree case", we always need to create the complete
-      // tree scope for the process instance which handles the error. Otherwise we cannot detect out of sync trees.
-      errorHandlingExecution = errorDeclarationFinder.getLastLeafExecution().findExecutionForFlowScope(errorHandlingActivity.getEventScope());
-    }
+    PvmExecutionImpl errorHandlingExecution = errorDeclarationFinder.getErrorHandlingExecution();
 
     // map variables to super executions in the hierarchy of called process instances
-    for (PvmExecutionImpl processInstance : processInstanceCollector.getProcessInstanceHierarchy()) {
+    List<PvmExecutionImpl> processInstanceHierarchy = processInstanceCollector.getProcessInstanceHierarchy();
+    for (int i = 0; i < processInstanceHierarchy.size() - 1; i++) {
+      PvmExecutionImpl processInstance = processInstanceHierarchy.get(i);
       PvmExecutionImpl superExecution = processInstance.getSuperExecution();
       ActivityImpl activity = ((PvmExecutionImpl)superExecution).getActivity();
       SubProcessActivityBehavior subProcessActivityBehavior = (SubProcessActivityBehavior) activity.getActivityBehavior();
@@ -170,7 +162,7 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
    *
    * @return the scope for the transition or activity the execution is currently executing
    */
-  protected ScopeImpl getCurrentFlowScope(ActivityExecution execution) {
+  protected static ScopeImpl getCurrentFlowScope(ActivityExecution execution) {
     ScopeImpl scope = null;
     if(execution.getTransition() != null) {
       // error may be thrown from a sequence flow listener(?)
@@ -213,104 +205,123 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
   }
 
   /**
-   * Walks the execution tree hierarchy skipping all non-scope executions.
+   * In a hierarchy of process instances, visits all leaf executions (i.e. those that are a super execution)
+   * from bottom to top.
    */
-  public static class ExecutionScopeHierarchyWalker extends TreeWalker<PvmExecutionImpl> {
+  public static class LeafExecutionHierarchyWalker extends TreeWalker<PvmExecutionImpl> {
 
-    protected boolean considerSuperProcessInstances;
-
-    public ExecutionScopeHierarchyWalker(PvmExecutionImpl initialElement, boolean considerSuperProcessInstances) {
+    public LeafExecutionHierarchyWalker(PvmExecutionImpl initialElement) {
       super(initialElement);
-      this.considerSuperProcessInstances = considerSuperProcessInstances;
     }
 
     protected PvmExecutionImpl nextElement() {
-      return currentElement.getParentScopeExecution(considerSuperProcessInstances);
+      return currentElement.getProcessInstance().getSuperExecution();
     }
 
   }
 
-  public static class ErrorDeclarationFinder implements Collector<PvmExecutionImpl>, WalkCondition<PvmExecutionImpl> {
+  public static class ErrorDeclarationFinder implements Collector<PvmExecutionImpl> {
 
-    protected ScopeImpl currentScope;
-    protected String errorCode;
     protected Exception exception;
-    protected ErrorEventDefinition errorEventDefinition;
-    protected PvmActivity errorHandlerActivity;
-    protected PvmExecutionImpl lastLeafExecution;
+    protected String errorCode;
+    protected ErrorDeclarationForProcessInstanceFinder currentProcessInstanceErrorFinder;
+    protected Map<ScopeImpl, PvmExecutionImpl> currentProcessInstanceScopeExecutionMapping;
 
-    public ErrorDeclarationFinder(ScopeImpl currentScope, String errorCode, Exception exception, PvmExecutionImpl lastLeafExecution) {
-      this.currentScope = currentScope;
-      this.errorCode = errorCode;
+    public ErrorDeclarationFinder(Exception exception, String errorCode) {
       this.exception = exception;
-      this.lastLeafExecution = lastLeafExecution;
+      this.errorCode = errorCode;
     }
 
-    public boolean isFulfilled(PvmExecutionImpl element) {
-      if (currentScope == null) {
-        return true;
-      }
-      else {
-        List<ErrorEventDefinition> errorEventDefinitions = (List) currentScope.getProperty(BpmnParse.PROPERTYNAME_ERROR_EVENT_DEFINITIONS);
-        if(errorEventDefinitions != null) {
-          for (ErrorEventDefinition errorEventDefinition : errorEventDefinitions) {
-            if ((exception != null && errorEventDefinition.catchesException(exception)) ||
-                (exception == null && errorEventDefinition.catchesError(errorCode))) {
-              errorHandlerActivity = currentScope.getProcessDefinition().findActivity(errorEventDefinition.getHandlerActivityId());
-              this.errorEventDefinition = errorEventDefinition;
-              return true;
-            }
+    public WalkCondition<PvmExecutionImpl> declarationFound() {
+      return new WalkCondition<PvmExecutionImpl>() {
+        public boolean isFulfilled(PvmExecutionImpl element) {
+          if (element == null || currentProcessInstanceErrorFinder.getErrorHandlerActivity() != null) {
+            return true;
           }
+          return false;
         }
-        return false;
-      }
-
+      };
     }
 
     public void collect(PvmExecutionImpl obj) {
-      currentScope = currentScope.getFlowScope();
+      // walk the scope hierarchy for the current process instance and search for an error handler
+      currentProcessInstanceScopeExecutionMapping = obj.createActivityExecutionMapping();
+      ScopeImpl flowScope = getCurrentFlowScope(obj);
+      FlowScopeWalker flowScopeWalker = new FlowScopeWalker(flowScope);
+      currentProcessInstanceErrorFinder = new ErrorDeclarationForProcessInstanceFinder(exception, errorCode);
+      flowScopeWalker.addPreCollector(currentProcessInstanceErrorFinder);
+      flowScopeWalker.walkWhile(currentProcessInstanceErrorFinder.declarationFound());
+    }
 
-      // if process definition was already reached, go one process definition up
-      if (currentScope == null) {
-        PvmExecutionImpl superExecution = obj.getSuperExecution();
+    public ActivityImpl getErrorHandlerActivity() {
+      return currentProcessInstanceErrorFinder.getErrorHandlerActivity();
+    }
 
-        if (superExecution != null) {
-          currentScope = superExecution.getActivity();
-          lastLeafExecution = superExecution;
-        }
+    public PvmExecutionImpl getErrorHandlingExecution() {
+      ActivityImpl errorHandlingActivity = getErrorHandlerActivity();
+      if (errorHandlingActivity != null) {
+        return currentProcessInstanceScopeExecutionMapping.get(errorHandlingActivity.getEventScope());
       }
-
-      if (currentScope != null) {
-        // the execution may currently not be executing a scope activity
-        currentScope = currentScope.isScope() ? currentScope : currentScope.getFlowScope();
+      else {
+        // in case no error handler was found
+        return null;
       }
     }
 
-    public PvmActivity getErrorHandlerActivity() {
+    public ErrorEventDefinition getErrorEventDefinition() {
+      return currentProcessInstanceErrorFinder.getErrorEventDefinition();
+    }
+  }
+
+  public static class ErrorDeclarationForProcessInstanceFinder implements Collector<ScopeImpl> {
+
+    protected Exception exception;
+    protected String errorCode;
+    protected ActivityImpl errorHandlerActivity;
+    protected ErrorEventDefinition errorEventDefinition;
+
+    public ErrorDeclarationForProcessInstanceFinder(Exception exception, String errorCode) {
+      this.exception = exception;
+      this.errorCode = errorCode;
+    }
+
+    public WalkCondition<ScopeImpl> declarationFound() {
+      return new WalkCondition<ScopeImpl>() {
+        public boolean isFulfilled(ScopeImpl element) {
+          return element == null || errorHandlerActivity != null;
+        }
+      };
+    }
+
+    public void collect(ScopeImpl scope) {
+      List<ErrorEventDefinition> errorEventDefinitions = (List) scope.getProperty(BpmnParse.PROPERTYNAME_ERROR_EVENT_DEFINITIONS);
+      if(errorEventDefinitions != null) {
+        for (ErrorEventDefinition errorEventDefinition : errorEventDefinitions) {
+          if ((exception != null && errorEventDefinition.catchesException(exception)) ||
+              (exception == null && errorEventDefinition.catchesError(errorCode))) {
+            errorHandlerActivity = scope.getProcessDefinition().findActivity(errorEventDefinition.getHandlerActivityId());
+            this.errorEventDefinition = errorEventDefinition;
+            break;
+          }
+        }
+      }
+    }
+
+    public ActivityImpl getErrorHandlerActivity() {
       return errorHandlerActivity;
     }
 
     public ErrorEventDefinition getErrorEventDefinition() {
       return errorEventDefinition;
     }
-
-    public PvmExecutionImpl getLastLeafExecution() {
-      return lastLeafExecution;
-    }
-
   }
 
-  /**
-   * Finds all process instance executions that have a super execution (i.e. called process instances)
-   */
   public static class ProcessInstanceCollector implements Collector<PvmExecutionImpl> {
 
     protected List<PvmExecutionImpl> processInstanceHierarchy = new ArrayList<PvmExecutionImpl>();
 
     public void collect(PvmExecutionImpl obj) {
-      if (obj.getSuperExecution() != null) {
-        processInstanceHierarchy.add(obj);
-      }
+      processInstanceHierarchy.add(obj.getProcessInstance());
     }
 
     public List<PvmExecutionImpl> getProcessInstanceHierarchy() {

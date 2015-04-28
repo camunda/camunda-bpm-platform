@@ -18,6 +18,7 @@ import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
+import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
@@ -51,14 +52,17 @@ public class PvmAtomicOperationActivityEnd implements PvmAtomicOperation {
     PvmExecutionImpl propagatingExecution = execution;
 
     if(execution.isScope() && activity.isScope()) {
-      execution.destroy();
-      if(!execution.isConcurrent()) {
-        execution.remove();
-        propagatingExecution = execution.getParent();
-        propagatingExecution.setActivity(execution.getActivity());
+      if (!LegacyBehavior.destroySecondNonScope(execution)) {
+        execution.destroy();
+        if(!execution.isConcurrent()) {
+          execution.remove();
+          propagatingExecution = execution.getParent();
+          propagatingExecution.setActivity(execution.getActivity());
+        }
       }
     }
 
+    propagatingExecution = LegacyBehavior.determinePropagatingExecutionOnEnd(propagatingExecution);
     PvmScope flowScope = activity.getFlowScope();
 
     // 1. flow scope = Process Definition
@@ -83,7 +87,7 @@ public class PvmAtomicOperationActivityEnd implements PvmAtomicOperation {
       if (activityBehavior instanceof CompositeActivityBehavior) {
         CompositeActivityBehavior compositeActivityBehavior = (CompositeActivityBehavior) activityBehavior;
         // 2.1 Concurrent execution => composite behavior.concurrentExecutionEnded()
-        if(propagatingExecution.isConcurrent()) {
+        if(propagatingExecution.isConcurrent() && !LegacyBehavior.isConcurrentScope(propagatingExecution)) {
           compositeActivityBehavior.concurrentChildExecutionEnded(propagatingExecution.getParent(), propagatingExecution);
         }
         else {

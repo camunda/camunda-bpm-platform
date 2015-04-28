@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 public class SequentialMultiInstanceActivityBehavior extends MultiInstanceActivityBehavior {
 
   protected void createInstances(ActivityExecution execution, int nrOfInstances) throws Exception {
+
     setLoopVariable(execution, NUMBER_OF_INSTANCES, nrOfInstances);
     setLoopVariable(execution, NUMBER_OF_COMPLETED_INSTANCES, 0);
     setLoopVariable(execution, NUMBER_OF_ACTIVE_INSTANCES, 1);

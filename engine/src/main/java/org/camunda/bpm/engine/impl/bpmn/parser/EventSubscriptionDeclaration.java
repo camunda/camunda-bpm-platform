@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.MessageEventSubscriptionEn
 import org.camunda.bpm.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
 
 
 /**
@@ -121,6 +122,8 @@ public class EventSubscriptionDeclaration implements Serializable {
     }
 
     eventSubscriptionEntity.insert();
+    LegacyBehavior.removeLegacySubscriptionOnParent(execution, eventSubscriptionEntity);
+
     return eventSubscriptionEntity;
   }
 

@@ -1040,8 +1040,10 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
     // if
     // - this is a scope execution currently executing a non scope activity
+    // - or it is not scope but the current activity is (e.g. can happen during activity end, when the actual
+    //   scope execution has been removed and the concurrent parent has been set to the scope activity)
     // - or it is asyncBefore/asyncAfter
-    if (!currentActivity.isScope() || activityInstanceId == null) {
+    if (!currentActivity.isScope() || activityInstanceId == null || (currentActivity.isScope() && !isScope())) {
       currentActivity = currentActivity.getFlowScope();
     }
 

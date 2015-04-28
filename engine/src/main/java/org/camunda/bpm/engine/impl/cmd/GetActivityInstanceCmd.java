@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TransitionInstanceImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 
@@ -109,6 +110,8 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
       Map<ScopeImpl, PvmExecutionImpl> activityExecutionMapping = leaf.createActivityExecutionMapping();
       activityExecutionMapping.remove(leaf.getActivity());
       activityExecutionMapping.remove(leaf.getProcessDefinition());
+      LegacyBehavior.removeLegacyNonScopesFromMapping(activityExecutionMapping);
+
       for (Map.Entry<ScopeImpl, PvmExecutionImpl> scopeExecutionEntry : activityExecutionMapping.entrySet()) {
         ScopeImpl scope = scopeExecutionEntry.getKey();
         PvmExecutionImpl scopeExecution = scopeExecutionEntry.getValue();
@@ -140,13 +143,14 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
           ActivityInstanceImpl scopeInstance = createActivityInstance(
               scopeExecution,
               scope,
-              scopeExecution.getParentActivityInstanceId(),
+              activityInstanceId,
               parentActivityInstanceId);
           activityInstances.put(activityInstanceId, scopeInstance);
         }
       }
     }
 
+    LegacyBehavior.repairParentRelationships(activityInstances.values(), processInstanceId);
     populateChildInstances(activityInstances, transitionInstances);
 
     return processActInst;
@@ -334,6 +338,9 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
       List<ExecutionEntity> children = executionsByParent.get(execution.getId());
       if (children != null) {
         execution.setExecutions(children);
+        for (ExecutionEntity child : children) {
+          child.setParent(execution);
+        }
       }
       else {
         execution.setExecutions(new ArrayList<ExecutionEntity>());
