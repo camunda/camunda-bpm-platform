@@ -175,7 +175,7 @@
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
             <configuration>
-              <cleanupDaemonThreads>true</cleanupDaemonThreads>
+              <cleanupDaemonThreads>false</cleanupDaemonThreads>
               <includeProjectDependencies>true</includeProjectDependencies>
               <includePluginDependencies>false</includePluginDependencies>
               <classpathScope>test</classpathScope>

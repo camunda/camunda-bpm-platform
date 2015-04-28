@@ -336,6 +336,7 @@
             <configuration>
               <mainClass>org.camunda.bpm.engine.impl.db.DbSchemaDrop</mainClass>
               <classpathScope>test</classpathScope>
+              <cleanupDaemonThreads>false</cleanupDaemonThreads>
             </configuration>
           </plugin>
         </plugins>
