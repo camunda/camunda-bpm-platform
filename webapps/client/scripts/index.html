@@ -34,7 +34,8 @@
 
 
   <!-- # list column -->
-  <section class="column tasks-list">
+  <section class="column tasks-list"
+           ng-controller="camListCtrl">
     <header class="cell top">
       <div cam-sorting-choices
            tasklist-data="tasklistData"></div>
@@ -49,8 +50,9 @@
     </header>
 
     <div class="cell content">
-      <div cam-task-search
-           tasklist-data="tasklistData"></div>
+      <view ng-repeat="tasklistPlugin in tasklistPlugins"
+            provider="tasklistPlugin"
+            vars="tasklistVars" />
 
       <div cam-tasks
            tasklist-data="tasklistData"></div>
