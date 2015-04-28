@@ -16,7 +16,6 @@ package org.camunda.bpm.engine.impl.cmd;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
-import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.impl.form.handler.TaskFormHandler;
@@ -40,12 +39,8 @@ public class GetTaskFormCmd implements Command<TaskFormData>, Serializable {
   }
 
   public TaskFormData execute(CommandContext commandContext) {
-    final TaskManager taskManager = commandContext.getTaskManager();
-    TaskEntity task = commandContext.runWithoutAuthentication(new Callable<TaskEntity>() {
-      public TaskEntity call() throws Exception {
-        return taskManager.findTaskById(taskId);
-      }
-    });
+    TaskManager taskManager = commandContext.getTaskManager();
+    TaskEntity task = taskManager.findTaskById(taskId);
     ensureNotNull("No task found for taskId '" + taskId + "'", "task", task);
 
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();

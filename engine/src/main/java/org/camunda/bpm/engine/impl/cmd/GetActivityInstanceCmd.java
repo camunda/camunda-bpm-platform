@@ -316,7 +316,7 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
   protected List<ExecutionEntity> loadFromDb(final String processInstanceId, final CommandContext commandContext) {
-    List<ExecutionEntity> executions = commandContext.runWithoutAuthentication(new Callable<List<ExecutionEntity>>() {
+    List<ExecutionEntity> executions = commandContext.runWithoutAuthorization(new Callable<List<ExecutionEntity>>() {
       public List<ExecutionEntity> call() throws Exception {
         return (List) new ExecutionQueryImpl(commandContext)
           .processInstanceId(processInstanceId)

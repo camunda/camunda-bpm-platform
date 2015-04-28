@@ -21,7 +21,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -53,29 +52,14 @@ public class MessageEventReceivedCmd implements Command<Void>, Serializable {
   public Void execute(CommandContext commandContext) {
     ensureNotNull("executionId", executionId);
 
-    final EventSubscriptionManager eventSubscriptionManager = commandContext.getEventSubscriptionManager();
-    Callable<List<EventSubscriptionEntity>> callableWithoutAuthoriatzion = null;
+    EventSubscriptionManager eventSubscriptionManager = commandContext.getEventSubscriptionManager();
+    List<EventSubscriptionEntity> eventSubscriptions = null;
     if (messageName != null) {
-
-      callableWithoutAuthoriatzion = new Callable<List<EventSubscriptionEntity>>() {
-        public List<EventSubscriptionEntity> call() throws Exception {
-          return eventSubscriptionManager
-              .findEventSubscriptionsByNameAndExecution(MessageEventHandler.EVENT_HANDLER_TYPE, messageName, executionId);
-        }
-      };
-
+      eventSubscriptions = eventSubscriptionManager.findEventSubscriptionsByNameAndExecution(MessageEventHandler.EVENT_HANDLER_TYPE, messageName, executionId);
     } else {
-
-      callableWithoutAuthoriatzion = new Callable<List<EventSubscriptionEntity>>() {
-        public List<EventSubscriptionEntity> call() throws Exception {
-          return eventSubscriptionManager
-              .findEventSubscriptionsByExecutionAndType(executionId, MessageEventHandler.EVENT_HANDLER_TYPE);
-        }
-      };
-
+      eventSubscriptions = eventSubscriptionManager.findEventSubscriptionsByExecutionAndType(executionId, MessageEventHandler.EVENT_HANDLER_TYPE);
     }
 
-    List<EventSubscriptionEntity> eventSubscriptions = commandContext.runWithoutAuthentication(callableWithoutAuthoriatzion);
     ensureNotEmpty("Execution with id '" + executionId + "' does not have a subscription to a message event with name '" + messageName + "'", "eventSubscriptions", eventSubscriptions);
     ensureNumberOfElements("More than one matching message subscription found for execution " + executionId, "eventSubscriptions", eventSubscriptions, 1);
 

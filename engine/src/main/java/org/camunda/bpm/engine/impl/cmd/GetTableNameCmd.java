@@ -1,10 +1,11 @@
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
+
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 public class GetTableNameCmd implements Command<String>, Serializable {
@@ -19,6 +20,9 @@ public class GetTableNameCmd implements Command<String>, Serializable {
 
   public String execute(CommandContext commandContext) {
     ensureNotNull("entityClass", entityClass);
+
+    commandContext.getAuthorizationManager().isCamundaAdmin();
+
     return commandContext
       .getTableDataManager()
       .getTableName(entityClass, true);

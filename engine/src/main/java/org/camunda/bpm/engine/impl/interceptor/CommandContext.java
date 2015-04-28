@@ -472,18 +472,20 @@ public class CommandContext {
     return identityService.getCurrentAuthentication();
   }
 
-  public <T> T runWithoutAuthentication(Callable<T> runnable) {
-    IdentityService identityService = processEngineConfiguration.getIdentityService();
-    Authentication currentAuthentication = identityService.getCurrentAuthentication();
+  public <T> T runWithoutAuthorization(Callable<T> runnable) {
+    CommandContext commandContext = Context.getCommandContext();
+    boolean authorizationEnabled = commandContext.isAuthorizationCheckEnabled();
     try {
-      identityService.clearAuthentication();
+      commandContext.disableAuthorizationCheck();
       return runnable.call();
     } catch (RuntimeException e) {
       throw e;
     } catch (Exception e) {
       throw new ProcessEngineException(e);
     } finally {
-      identityService.setAuthentication(currentAuthentication);
+      if (authorizationEnabled) {
+        commandContext.enableAuthorizationCheck();
+      }
     }
   }
 

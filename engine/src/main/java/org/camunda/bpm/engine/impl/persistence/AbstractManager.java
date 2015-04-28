@@ -227,7 +227,7 @@ public abstract class AbstractManager implements Session {
 
   public void saveDefaultAuthorizations(final AuthorizationEntity[] authorizations) {
     if(authorizations != null && authorizations.length > 0) {
-      Context.getCommandContext().runWithoutAuthentication(new Callable<Void>() {
+      Context.getCommandContext().runWithoutAuthorization(new Callable<Void>() {
         public Void call() {
           AuthorizationManager authorizationManager = getAuthorizationManager();
           for (AuthorizationEntity authorization : authorizations) {
@@ -247,7 +247,7 @@ public abstract class AbstractManager implements Session {
 
   public void deleteDefaultAuthorizations(final AuthorizationEntity[] authorizations) {
     if(authorizations != null && authorizations.length > 0) {
-      Context.getCommandContext().runWithoutAuthentication(new Callable<Void>() {
+      Context.getCommandContext().runWithoutAuthorization(new Callable<Void>() {
         public Void call() {
           AuthorizationManager authorizationManager = getAuthorizationManager();
           for (AuthorizationEntity authorization : authorizations) {

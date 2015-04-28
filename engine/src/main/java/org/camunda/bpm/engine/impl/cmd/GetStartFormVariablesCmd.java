@@ -37,7 +37,7 @@ public class GetStartFormVariablesCmd extends AbstractGetFormVariablesCmd {
   }
 
   public VariableMap execute(final CommandContext commandContext) {
-    StartFormData startFormData = commandContext.runWithoutAuthentication(new Callable<StartFormData>() {
+    StartFormData startFormData = commandContext.runWithoutAuthorization(new Callable<StartFormData>() {
       public StartFormData call() throws Exception {
         return new GetStartFormCmd(resourceId).execute(commandContext);
       }

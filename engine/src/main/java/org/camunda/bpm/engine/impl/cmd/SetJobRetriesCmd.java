@@ -19,7 +19,9 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
@@ -66,6 +68,10 @@ public class SetJobRetriesCmd implements Command<Void>, Serializable {
         .getJobManager()
         .findJobById(jobId);
     if (job != null) {
+
+      AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+      authorizationManager.checkUpdateProcessInstance(job);
+
       if (job.isInInconsistentLockState()) {
         job.resetLock();
       }
@@ -82,6 +88,15 @@ public class SetJobRetriesCmd implements Command<Void>, Serializable {
   }
 
   protected void setJobRetriesByJobDefinitionId(CommandContext commandContext) {
+    JobDefinitionManager jobDefinitionManager = commandContext.getJobDefinitionManager();
+    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+    JobDefinitionEntity jobDefinition = jobDefinitionManager.findById(jobDefinitionId);
+
+    if (jobDefinition != null) {
+      String processDefinitionKey = jobDefinition.getProcessDefinitionKey();
+      authorizationManager.checkUpdateProcessInstanceByProcessDefinitionKey(processDefinitionKey);
+    }
+
     commandContext
         .getJobManager()
         .updateFailedJobRetriesByJobDefinitionId(jobDefinitionId, retries);

@@ -39,7 +39,7 @@ public class ActivityInstanceCancellationCmd extends AbstractInstanceCancellatio
     // rebuild the mapping because the execution tree changes with every iteration
     ActivityExecutionMapping mapping = new ActivityExecutionMapping(commandContext, processInstanceId);
 
-    ActivityInstance instance = commandContext.runWithoutAuthentication(new Callable<ActivityInstance>() {
+    ActivityInstance instance = commandContext.runWithoutAuthorization(new Callable<ActivityInstance>() {
       public ActivityInstance call() throws Exception {
         return new GetActivityInstanceCmd(processInstanceId).execute(commandContext);
       }

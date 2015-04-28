@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.FailedJobListener;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorContext;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
 /**
@@ -70,6 +71,11 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
 
       }
 
+    }
+
+    if (jobExecutorContext == null) { // if null, then we are not called by the job executor
+      AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+      authorizationManager.checkUpdateProcessInstance(job);
     }
 
     // set the given job to executing

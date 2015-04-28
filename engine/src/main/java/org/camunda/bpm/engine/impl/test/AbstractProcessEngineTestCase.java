@@ -122,7 +122,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
 
     } finally {
       TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, getClass(), getName());
-      identityService.setAuthenticatedUserId(null);
+      identityService.clearAuthentication();
       assertAndEnsureCleanDb();
       ClockUtil.reset();
 

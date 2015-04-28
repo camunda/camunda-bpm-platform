@@ -173,8 +173,8 @@ public class JobManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<Job> findJobsByQueryCriteria(JobQueryImpl jobQuery, Page page) {
-    final String query = "selectJobByQueryCriteria";
-    return getDbEntityManager().selectList(query, jobQuery, page);
+    getAuthorizationManager().configureJobQuery(jobQuery);
+    return getDbEntityManager().selectList("selectJobByQueryCriteria", jobQuery, page);
   }
 
   @SuppressWarnings("unchecked")
@@ -196,6 +196,7 @@ public class JobManager extends AbstractManager {
   }
 
   public long findJobCountByQueryCriteria(JobQueryImpl jobQuery) {
+    getAuthorizationManager().configureJobQuery(jobQuery);
     return (Long) getDbEntityManager().selectOne("selectJobCountByQueryCriteria", jobQuery);
   }
 

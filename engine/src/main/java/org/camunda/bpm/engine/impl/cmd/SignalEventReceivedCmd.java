@@ -19,7 +19,6 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -49,26 +48,18 @@ public class SignalEventReceivedCmd implements Command<Void> {
   public Void execute(final CommandContext commandContext) {
     final EventSubscriptionManager eventSubscriptionManager = commandContext.getEventSubscriptionManager();
     List<SignalEventSubscriptionEntity> signalEvents = null;
-    if(executionId == null) {
 
-      signalEvents = commandContext.runWithoutAuthentication(new Callable<List<SignalEventSubscriptionEntity>>() {
-        public List<SignalEventSubscriptionEntity> call() throws Exception {
-          return eventSubscriptionManager.findSignalEventSubscriptionsByEventName(eventName);
-        }
-      });
+    if(executionId == null) {
+      signalEvents =eventSubscriptionManager.findSignalEventSubscriptionsByEventName(eventName);
 
     } else {
 
-      final ExecutionManager executionManager = commandContext.getExecutionManager();
-      signalEvents = commandContext.runWithoutAuthentication(new Callable<List<SignalEventSubscriptionEntity>>() {
-        public List<SignalEventSubscriptionEntity> call() throws Exception {
-          ExecutionEntity execution = executionManager.findExecutionById(executionId);
-          ensureNotNull("Cannot find execution with id '" + executionId + "'", "execution", execution);
-          return eventSubscriptionManager.findSignalEventSubscriptionsByNameAndExecution(eventName, executionId);
-        }
-      });
-      ensureNotEmpty("Execution '" + executionId + "' has not subscribed to a signal event with name '" + eventName + "'.", signalEvents);
+      ExecutionManager executionManager = commandContext.getExecutionManager();
+      ExecutionEntity execution = executionManager.findExecutionById(executionId);
+      ensureNotNull("Cannot find execution with id '" + executionId + "'", "execution", execution);
 
+      signalEvents = eventSubscriptionManager.findSignalEventSubscriptionsByNameAndExecution(eventName, executionId);
+      ensureNotEmpty("Execution '" + executionId + "' has not subscribed to a signal event with name '" + eventName + "'.", signalEvents);
     }
 
     // check authorization for each fetched signal event

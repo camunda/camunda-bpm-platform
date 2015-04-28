@@ -1,14 +1,16 @@
 package org.camunda.bpm.engine.impl.cmd;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Saeid Mirzaei
@@ -34,6 +36,9 @@ public class DeleteJobCmd implements Command<Object>, Serializable {
 
     JobEntity job = commandContext.getJobManager().findJobById(jobId);
     ensureNotNull("No job found with id '" + jobId + "'", "job", job);
+
+    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+    authorizationManager.checkUpdateProcessInstance(job);
 
     // We need to check if the job was locked, ie acquired by the job acquisition thread
     // This happens if the the job was already acquired, but not yet executed.

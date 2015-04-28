@@ -55,7 +55,7 @@ public class GetDeploymentProcessModelCmd implements Command<InputStream>, Seria
     final String deploymentId = processDefinition.getDeploymentId();
     final String resourceName = processDefinition.getResourceName();
 
-    InputStream processModelStream = commandContext.runWithoutAuthentication(new Callable<InputStream>() {
+    InputStream processModelStream = commandContext.runWithoutAuthorization(new Callable<InputStream>() {
       public InputStream call() throws Exception {
         return new GetDeploymentResourceCmd(deploymentId, resourceName).execute(commandContext);
       }

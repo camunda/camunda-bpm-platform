@@ -55,13 +55,13 @@ public class GetDeploymentProcessDiagramLayoutCmd implements Command<DiagramLayo
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     authorizationManager.checkReadProcessDefinition(processDefinition);
 
-    InputStream processModelStream = commandContext.runWithoutAuthentication(new Callable<InputStream>() {
+    InputStream processModelStream = commandContext.runWithoutAuthorization(new Callable<InputStream>() {
       public InputStream call() throws Exception {
         return new GetDeploymentProcessModelCmd(processDefinitionId).execute(commandContext);
       }
     });
 
-    InputStream processDiagramStream = commandContext.runWithoutAuthentication(new Callable<InputStream>() {
+    InputStream processDiagramStream = commandContext.runWithoutAuthorization(new Callable<InputStream>() {
       public InputStream call() throws Exception {
         return new GetDeploymentProcessDiagramCmd(processDefinitionId).execute(commandContext);
       }

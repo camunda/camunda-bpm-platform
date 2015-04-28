@@ -16,7 +16,6 @@ package org.camunda.bpm.engine.impl.cmd;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
-import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -44,13 +43,8 @@ public class DelegateTaskCmd implements Command<Object>, Serializable {
   public Object execute(CommandContext commandContext) {
     ensureNotNull("taskId", taskId);
 
-    final TaskManager taskManager = commandContext.getTaskManager();
-    TaskEntity task = commandContext.runWithoutAuthentication(new Callable<TaskEntity>() {
-      public TaskEntity call() throws Exception {
-        return taskManager.findTaskById(taskId);
-      }
-    });
-
+    TaskManager taskManager = commandContext.getTaskManager();
+    TaskEntity task = taskManager.findTaskById(taskId);
     ensureNotNull("Cannot find task with id " + taskId, "task", task);
 
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();

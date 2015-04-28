@@ -16,7 +16,6 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -53,12 +52,8 @@ public class SubmitStartFormCmd implements Command<ProcessInstance>, Serializabl
   @Override
   public ProcessInstance execute(CommandContext commandContext) {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
-    final DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
-    ProcessDefinitionEntity processDefinition = commandContext.runWithoutAuthentication(new Callable<ProcessDefinitionEntity>() {
-      public ProcessDefinitionEntity call() throws Exception {
-        return deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
-      }
-    });
+    DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
+    ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
     ensureNotNull("No process definition found for id = '" + processDefinitionId + "'", "processDefinition", processDefinition);
 
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();

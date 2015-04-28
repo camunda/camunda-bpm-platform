@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.test.authorization;
 
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+import static org.camunda.bpm.engine.authorization.Groups.CAMUNDA_ADMIN;
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
@@ -21,10 +22,15 @@ import static org.camunda.bpm.engine.authorization.Resources.DEPLOYMENT;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Set;
 
+import org.camunda.bpm.application.ProcessApplicationReference;
+import org.camunda.bpm.application.ProcessApplicationRegistration;
+import org.camunda.bpm.application.impl.EmbeddedProcessApplication;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.AuthorizationQuery;
+import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
@@ -494,6 +500,236 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     deleteDeployment(deploymentId);
   }
 
+  // register process application ///////////////////////////////////
+
+  public void testRegisterProcessApplicationWithoutAuthorization() {
+    // given
+    EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication();
+    ProcessApplicationReference reference = processApplication.getReference();
+    String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
+
+    try {
+      // when
+      managementService.registerProcessApplication(deploymentId, reference);
+      fail("Exception expected: It should not be possible to register a process application");
+    } catch (AuthorizationException e) {
+      //then
+      String message = e.getMessage();
+      assertTextPresent("The user 'test' is not a member of group 'camunda-admin'", message);
+
+    }
+
+    deleteDeployment(deploymentId);
+  }
+
+  public void testRegisterProcessApplicationAsCamundaAdmin() {
+    // given
+    createGroup(CAMUNDA_ADMIN);
+    createMembership(userId, CAMUNDA_ADMIN);
+
+    EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication();
+    ProcessApplicationReference reference = processApplication.getReference();
+    String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
+
+    // when
+    ProcessApplicationRegistration registration = managementService.registerProcessApplication(deploymentId, reference);
+
+    // then
+    assertNotNull(registration);
+    assertNotNull(getProcessApplicationForDeployment(deploymentId));
+
+    deleteDeployment(deploymentId);
+  }
+
+  // unregister process application ///////////////////////////////////
+
+  public void testUnregisterProcessApplicationWithoutAuthorization() {
+    // given
+    EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication();
+    String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
+    ProcessApplicationReference reference = processApplication.getReference();
+    registerProcessApplication(deploymentId, reference);
+
+    try {
+      // when
+      managementService.unregisterProcessApplication(deploymentId, true);
+      fail("Exception expected: It should not be possible to unregister a process application");
+    } catch (AuthorizationException e) {
+      //then
+      String message = e.getMessage();
+      assertTextPresent("The user 'test' is not a member of group 'camunda-admin'", message);
+
+    }
+
+    deleteDeployment(deploymentId);
+  }
+
+  public void testUnregisterProcessApplicationAsCamundaAdmin() {
+    // given
+    createGroup(CAMUNDA_ADMIN);
+    createMembership(userId, CAMUNDA_ADMIN);
+
+    EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication();
+    String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
+    ProcessApplicationReference reference = processApplication.getReference();
+    registerProcessApplication(deploymentId, reference);
+
+    // when
+    managementService.unregisterProcessApplication(deploymentId, true);
+
+    // then
+    assertNull(getProcessApplicationForDeployment(deploymentId));
+
+    deleteDeployment(deploymentId);
+  }
+
+  // get process application for deployment ///////////////////////////////////
+
+  public void testGetProcessApplicationForDeploymentWithoutAuthorization() {
+    // given
+    EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication();
+    String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
+    ProcessApplicationReference reference = processApplication.getReference();
+    registerProcessApplication(deploymentId, reference);
+
+    try {
+      // when
+      managementService.getProcessApplicationForDeployment(deploymentId);
+      fail("Exception expected: It should not be possible to get the process application");
+    } catch (AuthorizationException e) {
+      //then
+      String message = e.getMessage();
+      assertTextPresent("The user 'test' is not a member of group 'camunda-admin'", message);
+
+    }
+
+    deleteDeployment(deploymentId);
+  }
+
+  public void testGetProcessApplicationForDeploymentAsCamundaAdmin() {
+    // given
+    createGroup(CAMUNDA_ADMIN);
+    createMembership(userId, CAMUNDA_ADMIN);
+
+    EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication();
+    String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
+    ProcessApplicationReference reference = processApplication.getReference();
+    registerProcessApplication(deploymentId, reference);
+
+    // when
+    String application = managementService.getProcessApplicationForDeployment(deploymentId);
+
+    // then
+    assertNotNull(application);
+
+    deleteDeployment(deploymentId);
+  }
+
+  // get registered deployments ///////////////////////////////////
+
+  public void testGetRegisteredDeploymentsWithoutAuthorization() {
+    // given
+    String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
+
+    try {
+      // when
+      managementService.getRegisteredDeployments();
+      fail("Exception expected: It should not be possible to get the registered deployments");
+    } catch (AuthorizationException e) {
+      //then
+      String message = e.getMessage();
+      assertTextPresent("The user 'test' is not a member of group 'camunda-admin'", message);
+
+    }
+
+    deleteDeployment(deploymentId);
+  }
+
+  public void testGetRegisteredDeploymentsAsCamundaAdmin() {
+    // given
+    createGroup(CAMUNDA_ADMIN);
+    createMembership(userId, CAMUNDA_ADMIN);
+    String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
+
+    // when
+    Set<String> deployments = managementService.getRegisteredDeployments();
+
+    // then
+    assertTrue(deployments.contains(deploymentId));
+
+    deleteDeployment(deploymentId);
+  }
+
+  // register deployment for job executor ///////////////////////////////////
+
+  public void testRegisterDeploymentForJobExecutorWithoutAuthorization() {
+    // given
+    String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
+
+    try {
+      // when
+      managementService.registerDeploymentForJobExecutor(deploymentId);
+      fail("Exception expected: It should not be possible to register the deployment");
+    } catch (AuthorizationException e) {
+      //then
+      String message = e.getMessage();
+      assertTextPresent("The user 'test' is not a member of group 'camunda-admin'", message);
+
+    }
+
+    deleteDeployment(deploymentId);
+  }
+
+  public void testRegisterDeploymentForJobExecutorAsCamundaAdmin() {
+    // given
+    createGroup(CAMUNDA_ADMIN);
+    createMembership(userId, CAMUNDA_ADMIN);
+    String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
+
+    // when
+    managementService.registerDeploymentForJobExecutor(deploymentId);
+
+    // then
+    assertTrue(getRegisteredDeployments().contains(deploymentId));
+
+    deleteDeployment(deploymentId);
+  }
+
+  // unregister deployment for job executor ///////////////////////////////////
+
+  public void testUnregisterDeploymentForJobExecutorWithoutAuthorization() {
+    // given
+    String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
+
+    try {
+      // when
+      managementService.unregisterDeploymentForJobExecutor(deploymentId);
+      fail("Exception expected: It should not be possible to unregister the deployment");
+    } catch (AuthorizationException e) {
+      //then
+      String message = e.getMessage();
+      assertTextPresent("The user 'test' is not a member of group 'camunda-admin'", message);
+
+    }
+
+    deleteDeployment(deploymentId);
+  }
+
+  public void testUnregisterDeploymentForJobExecutorAsCamundaAdmin() {
+    // given
+    createGroup(CAMUNDA_ADMIN);
+    createMembership(userId, CAMUNDA_ADMIN);
+    String deploymentId = createDeployment(null, FIRST_RESOURCE).getId();
+
+    // when
+    managementService.unregisterDeploymentForJobExecutor(deploymentId);
+
+    // then
+    assertFalse(getRegisteredDeployments().contains(deploymentId));
+
+    deleteDeployment(deploymentId);
+  }
+
   // helper /////////////////////////////////////////////////////////
 
   protected void verifyQueryResults(DeploymentQuery query, int countExpected) {
@@ -502,6 +738,39 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
 
   protected String createDeployment(String name) {
     return createDeployment(name, FIRST_RESOURCE, SECOND_RESOURCE).getId();
+  }
+
+  protected Group createGroup(String groupId) {
+    disableAuthorization();
+    Group group = super.createGroup(groupId);
+    enableAuthorization();
+    return group;
+  }
+
+  protected void createMembership(String userId, String groupId) {
+    disableAuthorization();
+    identityService.createMembership(userId, groupId);
+    enableAuthorization();
+  }
+
+  protected void registerProcessApplication(String deploymentId, ProcessApplicationReference reference) {
+    disableAuthorization();
+    managementService.registerProcessApplication(deploymentId, reference);
+    enableAuthorization();
+  }
+
+  protected String getProcessApplicationForDeployment(String deploymentId) {
+    disableAuthorization();
+    String applications = managementService.getProcessApplicationForDeployment(deploymentId);
+    enableAuthorization();
+    return applications;
+  }
+
+  protected Set<String> getRegisteredDeployments() {
+    disableAuthorization();
+    Set<String> deployments = managementService.getRegisteredDeployments();
+    enableAuthorization();
+    return deployments;
   }
 
 }

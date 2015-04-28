@@ -36,6 +36,7 @@ public class UnregisterDeploymentCmd implements Command<Void> {
   }
 
   public Void execute(CommandContext commandContext) {
+    commandContext.getAuthorizationManager().isCamundaAdmin();
     Context.getProcessEngineConfiguration().getRegisteredDeployments().removeAll(deploymentIds);
     return null;
   }

@@ -53,7 +53,7 @@ public abstract class AbstractSetStateCmd implements Command<Void> {
           // pre-requirement: the necessary authorization check
           // for included resources should be done before this
           // call.
-          commandContext.runWithoutAuthentication(new Callable<Void>() {
+          commandContext.runWithoutAuthorization(new Callable<Void>() {
             public Void call() throws Exception {
               cmd.execute(commandContext);
               return null;

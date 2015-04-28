@@ -55,10 +55,12 @@ public class StatisticsManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<DeploymentStatistics> getStatisticsGroupedByDeployment(DeploymentStatisticsQueryImpl query, Page page) {
+    getAuthorizationManager().configureDeploymentStatisticsQuery(query);
     return getDbEntityManager().selectList("selectDeploymentStatistics", query, page);
   }
 
   public long getStatisticsCountGroupedByDeployment(DeploymentStatisticsQueryImpl query) {
+    getAuthorizationManager().configureDeploymentStatisticsQuery(query);
     return (Long) getDbEntityManager().selectOne("selectDeploymentStatisticsCount", query);
   }
 

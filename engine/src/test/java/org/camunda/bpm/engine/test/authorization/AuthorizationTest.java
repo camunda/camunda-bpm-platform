@@ -103,7 +103,7 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
 
   protected Group createGroup(String groupId) {
     Group group = identityService.newGroup(groupId);
-    identityService.saveGroup(group);;
+    identityService.saveGroup(group);
     return group;
   }
 
@@ -311,6 +311,72 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
   protected void suspendProcessInstanceById(String processInstanceId) {
     disableAuthorization();
     runtimeService.suspendProcessInstanceById(processInstanceId);
+    enableAuthorization();
+  }
+
+  protected void suspendJobById(String jobId) {
+    disableAuthorization();
+    managementService.suspendJobById(jobId);
+    enableAuthorization();
+  }
+
+  protected void suspendJobByProcessInstanceId(String processInstanceId) {
+    disableAuthorization();
+    managementService.suspendJobByProcessInstanceId(processInstanceId);
+    enableAuthorization();
+  }
+
+  protected void suspendJobByJobDefinitionId(String jobDefinitionId) {
+    disableAuthorization();
+    managementService.suspendJobByJobDefinitionId(jobDefinitionId);
+    enableAuthorization();
+  }
+
+  protected void suspendJobByProcessDefinitionId(String processDefinitionId) {
+    disableAuthorization();
+    managementService.suspendJobByProcessDefinitionId(processDefinitionId);
+    enableAuthorization();
+  }
+
+  protected void suspendJobByProcessDefinitionKey(String processDefinitionKey) {
+    disableAuthorization();
+    managementService.suspendJobByProcessDefinitionKey(processDefinitionKey);
+    enableAuthorization();
+  }
+
+  protected void suspendJobDefinitionById(String jobDefinitionId) {
+    disableAuthorization();
+    managementService.suspendJobDefinitionById(jobDefinitionId);
+    enableAuthorization();
+  }
+
+  protected void suspendJobDefinitionByProcessDefinitionId(String processDefinitionId) {
+    disableAuthorization();
+    managementService.suspendJobDefinitionByProcessDefinitionId(processDefinitionId);
+    enableAuthorization();
+  }
+
+  protected void suspendJobDefinitionByProcessDefinitionKey(String processDefinitionKey) {
+    disableAuthorization();
+    managementService.suspendJobDefinitionByProcessDefinitionKey(processDefinitionKey);
+    enableAuthorization();
+  }
+
+  protected void suspendJobDefinitionIncludingJobsById(String jobDefinitionId) {
+    disableAuthorization();
+    managementService.suspendJobDefinitionById(jobDefinitionId, true);
+    enableAuthorization();
+  }
+
+  protected void suspendJobDefinitionIncludingJobsByProcessDefinitionId(String processDefinitionId) {
+    disableAuthorization();
+    managementService.suspendJobDefinitionByProcessDefinitionId(processDefinitionId, true);
+    enableAuthorization();
+  }
+
+  protected void suspendJobDefinitionIncludingJobsByProcessDefinitionKey(String processDefinitionKey) {
+    disableAuthorization();
+    managementService.suspendJobDefinitionByProcessDefinitionKey(processDefinitionKey, true);
     enableAuthorization();
   }
 

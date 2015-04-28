@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.impl.cmd;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.Collection;
-import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.form.FormField;
@@ -42,11 +41,7 @@ public class GetTaskFormVariablesCmd extends AbstractGetFormVariablesCmd {
 
   public VariableMap execute(CommandContext commandContext) {
     final TaskManager taskManager = commandContext.getTaskManager();
-    TaskEntity task = commandContext.runWithoutAuthentication(new Callable<TaskEntity>() {
-      public TaskEntity call() throws Exception {
-        return taskManager.findTaskById(resourceId);
-      }
-    });
+    TaskEntity task = taskManager.findTaskById(resourceId);
 
     ensureNotNull(BadUserRequestException.class, "Cannot find task with id '" + resourceId + "'.", "task", task);
 

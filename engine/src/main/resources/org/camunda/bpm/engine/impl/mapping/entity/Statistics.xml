@@ -243,6 +243,16 @@
                   where
                       EXECUTION.ID_ = EXECUTION.PROC_INST_ID_
                       and EXECUTION.PROC_DEF_ID_ = PROCDEF.ID_
+
+                    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+                    and
+                        (COALESCE (
+                        <foreach item="permCheck" collection="processInstancePermissionChecks" separator=",">
+                          (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
+                        </foreach>
+                          , 0) ) = 1
+                    </if>
+
                   group by
                       PROCDEF.DEPLOYMENT_ID_
                 ) INSTANCE
@@ -262,6 +272,16 @@
                       ${prefix}ACT_RU_JOB JOB
                   where
                       RETRIES_ = 0
+
+                    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+                    and
+                        (COALESCE (
+                        <foreach item="permCheck" collection="jobPermissionChecks" separator=",">
+                          (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
+                        </foreach>
+                          , 0) ) = 1
+                    </if>
+
                   group by
                       DEPLOYMENT_ID_
                 ) JOB
@@ -287,12 +307,27 @@
                       <if test="includeIncidentsForType != null">
                       and INC.INCIDENT_TYPE_ = #{includeIncidentsForType}
                       </if>
+
+                    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+                    and
+                        (COALESCE (
+                        <foreach item="permCheck" collection="incidentPermissionChecks" separator=",">
+                          (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
+                        </foreach>
+                          , 0) ) = 1
+                    </if>
+
                   group by
                       PROCDEF.DEPLOYMENT_ID_, INC.INCIDENT_TYPE_
                 ) INC
             on
                  DEPLOYMENT.ID_ = INC.DEPLOYMENT_ID_
             </if>
+
+            <where>
+              <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+            </where>
+
           ) RES
   </sql>
 

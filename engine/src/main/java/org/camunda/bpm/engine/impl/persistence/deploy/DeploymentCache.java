@@ -13,12 +13,16 @@
 
 package org.camunda.bpm.engine.impl.persistence.deploy;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.cmmn.CaseDefinitionNotFoundException;
 import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
@@ -36,8 +40,6 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.cmmn.Cmmn;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
 
 /**
  * @author Tom Baeyens
@@ -53,10 +55,15 @@ public class DeploymentCache {
   protected Map<String, CmmnModelInstance> cmmnModelInstanceCache = new HashMap<String, CmmnModelInstance>();
   protected List<Deployer> deployers;
 
-  public void deploy(DeploymentEntity deployment) {
-    for (Deployer deployer: deployers) {
-      deployer.deploy(deployment);
-    }
+  public void deploy(final DeploymentEntity deployment) {
+    Context.getCommandContext().runWithoutAuthorization(new Callable<Void>() {
+      public Void call() throws Exception {
+        for (Deployer deployer: deployers) {
+          deployer.deploy(deployment);
+        }
+        return null;
+      }
+    });
   }
 
   // PROCESS DEFINITION ////////////////////////////////////////////////////////////////////////////////
@@ -85,11 +92,15 @@ public class DeploymentCache {
     return processDefinition;
   }
 
-  public ProcessDefinitionEntity findDeployedProcessDefinitionByKeyAndVersion(String processDefinitionKey, Integer processDefinitionVersion) {
-    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) Context
-      .getCommandContext()
-      .getProcessDefinitionManager()
-      .findProcessDefinitionByKeyAndVersion(processDefinitionKey, processDefinitionVersion);
+  public ProcessDefinitionEntity findDeployedProcessDefinitionByKeyAndVersion(final String processDefinitionKey, final Integer processDefinitionVersion) {
+    final CommandContext commandContext = Context.getCommandContext();
+    ProcessDefinitionEntity processDefinition = commandContext.runWithoutAuthorization(new Callable<ProcessDefinitionEntity>() {
+      public ProcessDefinitionEntity call() throws Exception {
+        return (ProcessDefinitionEntity) commandContext
+          .getProcessDefinitionManager()
+          .findProcessDefinitionByKeyAndVersion(processDefinitionKey, processDefinitionVersion);
+      }
+    });
     ensureNotNull("no processes deployed with key = '" + processDefinitionKey + "' and version = '" + processDefinitionVersion + "'", "processDefinition", processDefinition);
     processDefinition = resolveProcessDefinition(processDefinition);
     return processDefinition;
@@ -131,11 +142,15 @@ public class DeploymentCache {
     if(bpmnModelInstance == null) {
 
       ProcessDefinitionEntity processDefinition = findDeployedProcessDefinitionById(processDefinitionId);
-      String deploymentId = processDefinition.getDeploymentId();
-      String resourceName = processDefinition.getResourceName();
+      final String deploymentId = processDefinition.getDeploymentId();
+      final String resourceName = processDefinition.getResourceName();
 
-      InputStream bpmnResourceInputStream = new GetDeploymentResourceCmd(deploymentId, resourceName)
-        .execute(Context.getCommandContext());
+      final CommandContext commandContext = Context.getCommandContext();
+      InputStream bpmnResourceInputStream = commandContext.runWithoutAuthorization(new Callable<InputStream>() {
+        public InputStream call() throws Exception {
+          return new GetDeploymentResourceCmd(deploymentId, resourceName).execute(commandContext);
+        }
+      });
 
       try {
         bpmnModelInstance = Bpmn.readModelFromStream(bpmnResourceInputStream);
@@ -273,11 +288,15 @@ public class DeploymentCache {
     if(cmmnModelInstance == null) {
 
       CaseDefinitionEntity caseDefinition = findDeployedCaseDefinitionById(caseDefinitionId);
-      String deploymentId = caseDefinition.getDeploymentId();
-      String resourceName = caseDefinition.getResourceName();
+      final String deploymentId = caseDefinition.getDeploymentId();
+      final String resourceName = caseDefinition.getResourceName();
 
-      InputStream cmmnResourceInputStream = new GetDeploymentResourceCmd(deploymentId, resourceName)
-        .execute(Context.getCommandContext());
+      final CommandContext commandContext = Context.getCommandContext();
+      InputStream cmmnResourceInputStream = commandContext.runWithoutAuthorization(new Callable<InputStream>() {
+        public InputStream call() throws Exception {
+          return new GetDeploymentResourceCmd(deploymentId, resourceName).execute(commandContext);
+        }
+      });
 
       try {
         cmmnModelInstance = Cmmn.readModelFromStream(cmmnResourceInputStream);
@@ -343,13 +362,17 @@ public class DeploymentCache {
     removeAllCaseDefinitionsByDeploymentId(deploymentId);
   }
 
-  protected void removeAllProcessDefinitionsByDeploymentId(String deploymentId) {
+  protected void removeAllProcessDefinitionsByDeploymentId(final String deploymentId) {
     // remove all process definitions for a specific deployment
-    CommandContext commandContext = Context.getCommandContext();
+    final CommandContext commandContext = Context.getCommandContext();
 
-    List<ProcessDefinition> allDefinitionsForDeployment = new ProcessDefinitionQueryImpl(commandContext)
-        .deploymentId(deploymentId)
-        .list();
+    List<ProcessDefinition> allDefinitionsForDeployment = commandContext.runWithoutAuthorization(new Callable<List<ProcessDefinition>>() {
+      public List<ProcessDefinition> call() throws Exception {
+        return new ProcessDefinitionQueryImpl(commandContext)
+          .deploymentId(deploymentId)
+          .list();
+      }
+    });
 
     for (ProcessDefinition processDefinition : allDefinitionsForDeployment) {
       try {

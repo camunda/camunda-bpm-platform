@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.impl.cmd;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
-import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
@@ -47,13 +46,8 @@ public class DeleteProcessInstanceCmd implements Command<Void>, Serializable {
     ensureNotNull(BadUserRequestException.class, "processInstanceId is null", "processInstanceId", processInstanceId);
 
     // fetch process instance
-    final ExecutionManager executionManager = commandContext.getExecutionManager();
-    ExecutionEntity execution = commandContext.runWithoutAuthentication(new Callable<ExecutionEntity>() {
-      public ExecutionEntity call() throws Exception {
-        return executionManager.findExecutionById(processInstanceId);
-      }
-    });
-
+    ExecutionManager executionManager = commandContext.getExecutionManager();
+    ExecutionEntity execution = executionManager.findExecutionById(processInstanceId);
     ensureNotNull(BadUserRequestException.class, "No process instance found for id '" + processInstanceId + "'", "processInstance", execution);
 
     // check authorization

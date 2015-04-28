@@ -17,7 +17,6 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -38,16 +37,12 @@ public class FindActiveActivityIdsCmd implements Command<List<String>>, Serializ
     this.executionId = executionId;
   }
 
-  public List<String> execute(final CommandContext commandContext) {
+  public List<String> execute(CommandContext commandContext) {
     ensureNotNull("executionId", executionId);
 
     // fetch execution
-    final ExecutionManager executionManager = commandContext.getExecutionManager();
-    ExecutionEntity execution = commandContext.runWithoutAuthentication(new Callable<ExecutionEntity>() {
-      public ExecutionEntity call() throws Exception {
-        return executionManager.findExecutionById(executionId);
-      }
-    });
+    ExecutionManager executionManager = commandContext.getExecutionManager();
+    ExecutionEntity execution = executionManager.findExecutionById(executionId);
     ensureNotNull("execution " + executionId + " doesn't exist", "execution", execution);
 
     // check authorization

@@ -91,7 +91,7 @@ public abstract class AbstractSetProcessDefinitionStateCmd extends AbstractSetSt
       processDefinitionManager.updateProcessDefinitionSuspensionStateByKey(processDefinitionKey, suspensionState);
     }
 
-    commandContext.runWithoutAuthentication(new Callable<Void>() {
+    commandContext.runWithoutAuthorization(new Callable<Void>() {
       public Void call() throws Exception {
         AbstractSetJobDefinitionStateCmd jobDefinitionCmd = getSetJobDefinitionStateCmd();
         jobDefinitionCmd.disableLogUserOperation();

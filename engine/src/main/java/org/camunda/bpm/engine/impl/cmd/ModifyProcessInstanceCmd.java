@@ -13,8 +13,6 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 
-import java.util.concurrent.Callable;
-
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessInstanceModificationBuilderImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -37,14 +35,10 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
   }
 
   public Void execute(CommandContext commandContext) {
-    final String processInstanceId = builder.getProcessInstanceId();
+    String processInstanceId = builder.getProcessInstanceId();
 
-    final ExecutionManager executionManager = commandContext.getExecutionManager();
-    ExecutionEntity processInstance = commandContext.runWithoutAuthentication(new Callable<ExecutionEntity>() {
-      public ExecutionEntity call() throws Exception {
-        return executionManager.findExecutionById(processInstanceId);
-      }
-    });
+    ExecutionManager executionManager = commandContext.getExecutionManager();
+    ExecutionEntity processInstance = executionManager.findExecutionById(processInstanceId);
 
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     authorizationManager.checkUpdateProcessInstance(processInstance);
@@ -57,12 +51,7 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
       instruction.execute(commandContext);
     }
 
-
-    processInstance = commandContext.runWithoutAuthentication(new Callable<ExecutionEntity>() {
-      public ExecutionEntity call() throws Exception {
-        return executionManager.findExecutionById(processInstanceId);
-      }
-    });
+    processInstance = executionManager.findExecutionById(processInstanceId);
 
     if (processInstance.getExecutions().isEmpty() && processInstance.getActivity() == null) {
       authorizationManager.checkDeleteProcessInstance(processInstance);

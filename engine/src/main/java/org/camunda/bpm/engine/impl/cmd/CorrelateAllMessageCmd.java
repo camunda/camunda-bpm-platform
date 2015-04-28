@@ -53,7 +53,7 @@ public class CorrelateAllMessageCmd extends AbstractCorrelateMessageCmd {
 
     final CorrelationHandler correlationHandler = Context.getProcessEngineConfiguration().getCorrelationHandler();
     final CorrelationSet correlationSet = new CorrelationSet(businessKey, processInstanceId, correlationKeys);
-    List<MessageCorrelationResult> correlationResults = commandContext.runWithoutAuthentication(new Callable<List<MessageCorrelationResult>>() {
+    List<MessageCorrelationResult> correlationResults = commandContext.runWithoutAuthorization(new Callable<List<MessageCorrelationResult>>() {
       public List<MessageCorrelationResult> call() throws Exception {
         return correlationHandler.correlateMessages(commandContext, messageName, correlationSet);
       }

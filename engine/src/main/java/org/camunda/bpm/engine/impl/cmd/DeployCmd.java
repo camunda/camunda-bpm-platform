@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -73,39 +74,43 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
     this.deploymentBuilder = deploymentBuilder;
   }
 
-  public Deployment execute(CommandContext commandContext) {
+  public Deployment execute(final CommandContext commandContext) {
 
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     authorizationManager.checkCreateDeployment();
 
-    acquireExclusiveLock(commandContext);
-    DeploymentEntity deployment = initDeployment();
-    Map<String, ResourceEntity> resourcesToDeploy = resolveResourcesToDeploy(commandContext, deployment);
-    Map<String, ResourceEntity> resourcesToIgnore = new HashMap<String, ResourceEntity>(deployment.getResources());
-    resourcesToIgnore.keySet().removeAll(resourcesToDeploy.keySet());
+    return commandContext.runWithoutAuthorization(new Callable<Deployment>() {
+      public Deployment call() throws Exception {
+        acquireExclusiveLock(commandContext);
+        DeploymentEntity deployment = initDeployment();
+        Map<String, ResourceEntity> resourcesToDeploy = resolveResourcesToDeploy(commandContext, deployment);
+        Map<String, ResourceEntity> resourcesToIgnore = new HashMap<String, ResourceEntity>(deployment.getResources());
+        resourcesToIgnore.keySet().removeAll(resourcesToDeploy.keySet());
 
-    if (!resourcesToDeploy.isEmpty()) {
-      log.fine("Creating new deployment.");
-      deployment.setResources(resourcesToDeploy);
-      deploy(deployment);
-    } else {
-      log.fine("Using existing deployment.");
-      deployment = getExistingDeployment(commandContext, deployment.getName());
-    }
+        if (!resourcesToDeploy.isEmpty()) {
+          log.fine("Creating new deployment.");
+          deployment.setResources(resourcesToDeploy);
+          deploy(deployment);
+        } else {
+          log.fine("Using existing deployment.");
+          deployment = getExistingDeployment(commandContext, deployment.getName());
+        }
 
-    scheduleProcessDefinitionActivation(commandContext, deployment);
+        scheduleProcessDefinitionActivation(commandContext, deployment);
 
-    if(deploymentBuilder instanceof ProcessApplicationDeploymentBuilder) {
-      // for process application deployments, job executor registration is managed by
-      // process application manager
-      Set<String> processesToRegisterFor = retrieveProcessKeysFromResources(resourcesToIgnore);
-      ProcessApplicationRegistration registration = registerProcessApplication(commandContext, deployment, processesToRegisterFor);
-      return new ProcessApplicationDeploymentImpl(deployment, registration);
-    } else {
-      registerWithJobExecutor(commandContext, deployment);
-    }
+        if(deploymentBuilder instanceof ProcessApplicationDeploymentBuilder) {
+          // for process application deployments, job executor registration is managed by
+          // process application manager
+          Set<String> processesToRegisterFor = retrieveProcessKeysFromResources(resourcesToIgnore);
+          ProcessApplicationRegistration registration = registerProcessApplication(commandContext, deployment, processesToRegisterFor);
+          return new ProcessApplicationDeploymentImpl(deployment, registration);
+        } else {
+          registerWithJobExecutor(commandContext, deployment);
+        }
 
-    return deployment;
+        return deployment;
+      }
+    });
   }
 
   protected void acquireExclusiveLock(CommandContext commandContext) {
@@ -221,7 +226,7 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
 
   /**
    * Searches in previous deployments for the same processes and retrieves the deployment ids.
-   * 
+   *
    * @param commandContext
    * @param deployment
    *          the current deployment
@@ -245,7 +250,7 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
 
     return findDeploymentIdsForProcessDefinitions(commandContext, processDefinitionKeys);
   }
-  
+
   /**
    * Searches for previous deployments with the same name.
    * @param commandContext

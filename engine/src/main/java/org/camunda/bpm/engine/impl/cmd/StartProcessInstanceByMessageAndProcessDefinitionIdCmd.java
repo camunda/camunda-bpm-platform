@@ -16,7 +16,6 @@ package org.camunda.bpm.engine.impl.cmd;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -53,18 +52,14 @@ public class StartProcessInstanceByMessageAndProcessDefinitionIdCmd implements C
     this.processDefinitionId = processDefinitionId;
   }
 
-  public ProcessInstance execute(final CommandContext commandContext) {
+  public ProcessInstance execute(CommandContext commandContext) {
     ensureNotNull("Cannot start process instance by message and process definition id", "messageName", messageName);
     ensureNotNull("Cannot start process instance by message and process definition id", "processDefinitionId", processDefinitionId);
 
-    ProcessDefinitionEntity processDefinition = commandContext.runWithoutAuthentication(new Callable<ProcessDefinitionEntity>() {
-      public ProcessDefinitionEntity call() throws Exception {
-        DeploymentCache deploymentCache = Context
-            .getProcessEngineConfiguration()
-            .getDeploymentCache();
-        return deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
-      }
-    });
+    DeploymentCache deploymentCache = Context
+        .getProcessEngineConfiguration()
+        .getDeploymentCache();
+    ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
     ensureNotNull("No process definition found for id '" + processDefinitionId + "'", "processDefinition", processDefinition);
 
     // check authorization

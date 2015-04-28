@@ -13,8 +13,6 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.util.concurrent.Callable;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -67,12 +65,8 @@ public class GetFormKeyCmd implements Command<String> {
 
   public String execute(CommandContext commandContext) {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
-    final DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
-    ProcessDefinitionEntity processDefinition = commandContext.runWithoutAuthentication(new Callable<ProcessDefinitionEntity>() {
-      public ProcessDefinitionEntity call() throws Exception {
-        return deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
-      }
-    });
+    DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
+    ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
 
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     authorizationManager.checkReadProcessDefinition(processDefinition);

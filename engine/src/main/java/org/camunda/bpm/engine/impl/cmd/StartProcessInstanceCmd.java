@@ -16,7 +16,6 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -52,28 +51,20 @@ public class StartProcessInstanceCmd implements Command<ProcessInstance>, Serial
 
   public ProcessInstance execute(CommandContext commandContext) {
 
-    ProcessDefinitionEntity processDefinition = commandContext.runWithoutAuthentication(new Callable<ProcessDefinitionEntity>() {
-
-      public ProcessDefinitionEntity call() throws Exception {
-        DeploymentCache deploymentCache = Context
-            .getProcessEngineConfiguration()
-            .getDeploymentCache();
-
-        // Find the process definition
-        ProcessDefinitionEntity processDefinition = null;
-        if (processDefinitionId!=null) {
-          processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
-          ensureNotNull("No process definition found for id = '" + processDefinitionId + "'", "processDefinition", processDefinition);
-        } else if(processDefinitionKey != null) {
-          processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKey(processDefinitionKey);
-          ensureNotNull("No process definition found for key '" + processDefinitionKey + "'", "processDefinition", processDefinition);
-        } else {
-          throw new ProcessEngineException("processDefinitionKey and processDefinitionId are null");
-        }
-
-        return processDefinition;
-      }
-    });
+    DeploymentCache deploymentCache = Context
+        .getProcessEngineConfiguration()
+        .getDeploymentCache();
+    // Find the process definition
+    ProcessDefinitionEntity processDefinition = null;
+    if (processDefinitionId!=null) {
+      processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
+      ensureNotNull("No process definition found for id = '" + processDefinitionId + "'", "processDefinition", processDefinition);
+    } else if(processDefinitionKey != null) {
+      processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKey(processDefinitionKey);
+      ensureNotNull("No process definition found for key '" + processDefinitionKey + "'", "processDefinition", processDefinition);
+    } else {
+      throw new ProcessEngineException("processDefinitionKey and processDefinitionId are null");
+    }
 
     // check authorization
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();

@@ -29,7 +29,7 @@
   </insert>
 
   <!-- JOB DEFINITION UPDATE -->
-  
+
   <update id="updateJobDefinition" parameterType="org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity">
     update ${prefix}ACT_RU_JOBDEF set
       REV_ = #{revisionNext, jdbcType=INTEGER},
@@ -50,7 +50,7 @@
     <where>
       <if test="jobDefinitionId != null">
         ID_ = #{jobDefinitionId, jdbcType=VARCHAR}
-      </if>    
+      </if>
       <if test="processDefinitionId != null">
         and PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR}
       </if>
@@ -59,21 +59,21 @@
       </if>
     </where>
   </update>
-  
+
   <!-- JOB DEFINITION DELETE -->
-  
+
   <delete id="deleteJobDefinition" parameterType="org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity">
-    DELETE FROM 
-        ${prefix}ACT_RU_JOBDEF 
-    where  
-        ID_ = #{id}  
+    DELETE FROM
+        ${prefix}ACT_RU_JOBDEF
+    where
+        ID_ = #{id}
         and REV_ = #{revision}
   </delete>
-  
+
   <delete id="deleteJobDefinitionsByProcessDefinitionId" parameterType="string">
-    DELETE FROM 
-        ${prefix}ACT_RU_JOBDEF 
-    where  
+    DELETE FROM
+        ${prefix}ACT_RU_JOBDEF
+    where
         PROC_DEF_ID_ = #{id}
   </delete>
 
@@ -99,11 +99,11 @@
   <select id="selectJobDefinitionsByProcessDefinitionId" resultMap="jobDefinitionResultMap">
     select * from ${prefix}ACT_RU_JOBDEF where PROC_DEF_ID_ = #{parameter}
   </select>
-  
+
   <select id="selectJobDefinitionByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.JobDefinitionQueryImpl" resultMap="jobDefinitionResultMap">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* 
+    select RES.*
     ${limitBetween}
     <include refid="selectJobDefinitionByQueryCriteriaSql"/>
     ${orderBy}
@@ -114,7 +114,7 @@
     select count(distinct RES.ID_)
     <include refid="selectJobDefinitionByQueryCriteriaSql"/>
   </select>
-  
+
   <sql id="selectJobDefinitionByQueryCriteriaSql">
     from ${prefix}ACT_RU_JOBDEF RES
     <where>
@@ -133,7 +133,7 @@
       </if>
       <if test="processDefinitionKey != null">
         and RES.PROC_DEF_KEY_ = #{processDefinitionKey}
-      </if>      
+      </if>
       <if test="jobType != null">
         and RES.JOB_TYPE_ = #{jobType}
       </if>
@@ -143,6 +143,9 @@
       <if test="suspensionState != null">
         and RES.SUSPENSION_STATE_ = #{suspensionState.stateCode}
       </if>
+
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+
     </where>
   </sql>
 

@@ -16,7 +16,6 @@ package org.camunda.bpm.engine.impl.cmd;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -45,29 +44,21 @@ public class StartProcessInstanceByMessageCmd implements Command<ProcessInstance
     this.processVariables = processVariables;
   }
 
-  public ProcessInstance execute(final CommandContext commandContext) {
+  public ProcessInstance execute(CommandContext commandContext) {
     ensureNotNull("Cannot start process instance by message", "message name", messageName);
 
     // fetch message event subscription
-    MessageEventSubscriptionEntity messageEventSubscription = commandContext.runWithoutAuthentication(new Callable<MessageEventSubscriptionEntity>() {
-      public MessageEventSubscriptionEntity call() throws Exception {
-        return commandContext.getEventSubscriptionManager().findMessageStartEventSubscriptionByName(messageName);
-      }
-    });
+    MessageEventSubscriptionEntity messageEventSubscription = commandContext.getEventSubscriptionManager().findMessageStartEventSubscriptionByName(messageName);
     ensureNotNull("Cannot start process instance by message: no subscription to message with name '" + messageName + "' found", "messageEventSubscription", messageEventSubscription);
 
-    final String processDefinitionId = messageEventSubscription.getConfiguration();
+    String processDefinitionId = messageEventSubscription.getConfiguration();
     ensureNotNull("Cannot start process instance by message: subscription to message with name '" + messageName + "' is not a message start event", "processDefinitionId", processDefinitionId);
 
     // fetch process definition
-    ProcessDefinitionEntity processDefinition = commandContext.runWithoutAuthentication(new Callable<ProcessDefinitionEntity>() {
-      public ProcessDefinitionEntity call() throws Exception {
-        DeploymentCache deploymentCache = Context
-            .getProcessEngineConfiguration()
-            .getDeploymentCache();
-        return deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
-      }
-    });
+    DeploymentCache deploymentCache = Context
+        .getProcessEngineConfiguration()
+        .getDeploymentCache();
+    ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
     ensureNotNull("No process definition found for id '" + processDefinitionId + "'", "processDefinition", processDefinition);
 
     // check authorization

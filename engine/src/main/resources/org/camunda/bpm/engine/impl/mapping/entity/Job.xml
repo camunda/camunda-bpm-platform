@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?> 
 
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.JobEntity">
 
@@ -94,7 +94,7 @@
     <result property="repeat" column="REPEAT_" jdbcType="VARCHAR" />
   </resultMap>
 
-  <!-- JOB SELECT (FOR TIMER AND MESSAGE) -->  
+  <!-- JOB SELECT (FOR TIMER AND MESSAGE) -->
 
   <select id="selectJob" parameterType="string" resultMap="jobResultMap">
     select * from ${prefix}ACT_RU_JOB where ID_ = #{id}
@@ -102,7 +102,7 @@
 
   <select id="selectNextJobsToExecute" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
   	${limitBefore}
-    select 
+    select
     	RES.* ${limitBetween}
     from ${prefix}ACT_RU_JOB RES
 
@@ -112,10 +112,10 @@
       and (RES.SUSPENSION_STATE_ = 1 or RES.SUSPENSION_STATE_ is null)
 
       <if test="parameter.deploymentAware">
-        and (RES.DEPLOYMENT_ID_ is null 
+        and (RES.DEPLOYMENT_ID_ is null
         <if test="parameter.deploymentIds != null">
-          or 
-          RES.DEPLOYMENT_ID_ in 
+          or
+          RES.DEPLOYMENT_ID_ in
 	        <foreach item="deploymentId" index="index" collection="parameter.deploymentIds"
 	        open="(" separator="," close=")">
 	          #{deploymentId}
@@ -153,7 +153,7 @@
     from ${prefix}ACT_RU_JOB J
     where J.EXECUTION_ID_ = #{parameter}
   </select>
-  
+
   <select id="selectJobsByProcessInstanceId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
     select *
     from ${prefix}ACT_RU_JOB J
@@ -163,7 +163,7 @@
   <select id="selectJobByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.JobQueryImpl" resultMap="jobResultMap">
   	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* 
+    select RES.*
     ${limitBetween}
     <include refid="selectJobByQueryCriteriaSql"/>
     ${orderBy}
@@ -247,6 +247,22 @@
       <if test="suspensionState != null">
         and RES.SUSPENSION_STATE_ = #{suspensionState.stateCode}
       </if>
+
+      <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+        AND
+          ( CASE
+
+            WHEN
+              RES.PROCESS_DEF_KEY_ is not null
+            THEN
+              (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />)
+
+            ELSE
+              <!-- "standalone" job (e.g. job to activate/suspend a process definition etc.) -->
+              1
+          END ) = 1
+      </if>
+
     </where>
   </sql>
 
@@ -263,7 +279,7 @@
 	   <if test="parameter.deploymentAware">
         and (RES.DEPLOYMENT_ID_ is null 
         <if test="parameter.deploymentIds != null">
-          or 
+          or
           RES.DEPLOYMENT_ID_ in 
           <foreach item="deploymentId" index="index" collection="parameter.deploymentIds"
           open="(" separator="," close=")">
@@ -271,13 +287,13 @@
           </foreach>
         </if>
         )
-      </if>  
+      </if>
 	  ${limitAfter}
   </select>
 
   <select id="selectExclusiveJobsToExecute_mysql" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
   	${limitBefore}
-    select RES.* ${limitBetween} 
+    select RES.* ${limitBetween}
     from ${prefix}ACT_RU_JOB RES
     where (RETRIES_ &gt; 0)
       and (DUEDATE_ is null or DUEDATE_ &lt;= #{parameter.now, jdbcType=TIMESTAMP})
@@ -293,16 +309,16 @@
 
   <insert id="insertTimer" parameterType="org.camunda.bpm.engine.impl.persistence.entity.TimerEntity">
     insert into ${prefix}ACT_RU_JOB (
-            ID_, 
+            ID_,
             TYPE_,
-            LOCK_OWNER_, 
+            LOCK_OWNER_,
             LOCK_EXP_TIME_,
             EXCLUSIVE_,
-            EXECUTION_ID_, 
+            EXECUTION_ID_,
             PROCESS_INSTANCE_ID_,
             PROCESS_DEF_ID_,
             PROCESS_DEF_KEY_,
-            RETRIES_, 
+            RETRIES_,
             EXCEPTION_STACK_ID_,
             EXCEPTION_MSG_,
             DUEDATE_,
@@ -377,8 +393,8 @@
   </select>
 
   <select id="selectTimersByExecutionId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
-    select * 
-    from ${prefix}ACT_RU_JOB 
+    select *
+    from ${prefix}ACT_RU_JOB
     where (RETRIES_ &gt; 0)
       and (TYPE_ = 'timer')
       and (EXECUTION_ID_ = #{parameter})
@@ -388,12 +404,12 @@
 
   <insert id="insertMessage" parameterType="org.camunda.bpm.engine.impl.persistence.entity.MessageEntity">
     insert into ${prefix}ACT_RU_JOB (
-            ID_, 
+            ID_,
             TYPE_,
-            LOCK_OWNER_, 
+            LOCK_OWNER_,
             LOCK_EXP_TIME_,
             EXCLUSIVE_,
-            EXECUTION_ID_, 
+            EXECUTION_ID_,
             PROCESS_INSTANCE_ID_,
             PROCESS_DEF_ID_,
             PROCESS_DEF_KEY_,

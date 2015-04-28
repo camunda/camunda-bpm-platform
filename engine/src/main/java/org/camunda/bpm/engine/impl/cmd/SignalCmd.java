@@ -17,7 +17,6 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -45,17 +44,12 @@ public class SignalCmd implements Command<Object>, Serializable {
     this.processVariables = processVariables;
   }
 
-  public Object execute(final CommandContext commandContext) {
+  public Object execute(CommandContext commandContext) {
     ensureNotNull(BadUserRequestException.class, "executionId is null", "executionId", executionId);
 
-    ExecutionEntity execution = commandContext.runWithoutAuthentication(new Callable<ExecutionEntity>() {
-      public ExecutionEntity call() throws Exception {
-        return commandContext
+    ExecutionEntity execution = commandContext
           .getExecutionManager()
           .findExecutionById(executionId);
-      }
-    });
-
     ensureNotNull(BadUserRequestException.class, "execution "+executionId+" doesn't exist", "execution", execution);
 
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();

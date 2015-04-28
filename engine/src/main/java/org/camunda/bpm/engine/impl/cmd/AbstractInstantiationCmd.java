@@ -137,7 +137,7 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
       scopeExecution = flowScopeExecutions.iterator().next();
     }
     else {
-      ActivityInstance tree = commandContext.runWithoutAuthentication(new Callable<ActivityInstance>() {
+      ActivityInstance tree = commandContext.runWithoutAuthorization(new Callable<ActivityInstance>() {
         public ActivityInstance call() throws Exception {
           return new GetActivityInstanceCmd(processInstanceId).execute(commandContext);
         }

@@ -16,7 +16,6 @@ package org.camunda.bpm.engine.impl.cmd;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
-import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -74,13 +73,8 @@ public abstract class DeleteIdentityLinkCmd implements Command<Void>, Serializab
   public Void execute(CommandContext commandContext) {
     ensureNotNull("taskId", taskId);
 
-    final TaskManager taskManager = commandContext.getTaskManager();
-    task = commandContext.runWithoutAuthentication(new Callable<TaskEntity>() {
-      public TaskEntity call() throws Exception {
-        return taskManager.findTaskById(taskId);
-      }
-    });
-
+    TaskManager taskManager = commandContext.getTaskManager();
+    task = taskManager.findTaskById(taskId);
     ensureNotNull("Cannot find task with id " + taskId, "task", task);
 
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();

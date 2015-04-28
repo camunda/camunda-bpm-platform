@@ -30,7 +30,6 @@ package org.camunda.bpm.engine.impl.cmd;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
-import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -69,11 +68,7 @@ public class GetDeploymentBpmnModelInstanceCmd implements Command<BpmnModelInsta
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     authorizationManager.checkReadProcessDefinition(processDefinition);
 
-    BpmnModelInstance modelInstance = commandContext.runWithoutAuthentication(new Callable<BpmnModelInstance>() {
-      public BpmnModelInstance call() throws Exception {
-        return deploymentCache.findBpmnModelInstanceForProcessDefinition(processDefinitionId);
-      }
-    });
+    BpmnModelInstance modelInstance = deploymentCache.findBpmnModelInstanceForProcessDefinition(processDefinitionId);
 
     ensureNotNull("no BPMN model instance found for process definition id " + processDefinitionId, "modelInstance", modelInstance);
     return modelInstance;

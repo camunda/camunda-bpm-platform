@@ -42,7 +42,7 @@ public class ActivityCancellationCmd extends AbstractProcessInstanceModification
   }
 
   public Void execute(final CommandContext commandContext) {
-    ActivityInstance activityInstanceTree = commandContext.runWithoutAuthentication(new Callable<ActivityInstance>() {
+    ActivityInstance activityInstanceTree = commandContext.runWithoutAuthorization(new Callable<ActivityInstance>() {
       public ActivityInstance call() throws Exception {
         return new GetActivityInstanceCmd(processInstanceId).execute(commandContext);
       }

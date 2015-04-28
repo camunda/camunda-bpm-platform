@@ -44,6 +44,8 @@ public class UnregisterProcessApplicationCmd implements Command<Void> {
       throw new ProcessEngineException("Deployment Ids cannot be null.");
     }
 
+    commandContext.getAuthorizationManager().isCamundaAdmin();
+
     Context.getProcessEngineConfiguration()
       .getProcessApplicationManager()
       .unregisterProcessApplicationForDeployments(deploymentIds, removeProcessesFromCache);

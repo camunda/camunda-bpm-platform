@@ -44,10 +44,12 @@ public class JobDefinitionManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<JobDefinition> findJobDefnitionByQueryCriteria(JobDefinitionQueryImpl jobDefinitionQuery, Page page) {
+    getAuthorizationManager().configureJobDefinitionQuery(jobDefinitionQuery);
     return getDbEntityManager().selectList("selectJobDefinitionByQueryCriteria", jobDefinitionQuery, page);
   }
 
   public long findJobDefinitionCountByQueryCriteria(JobDefinitionQueryImpl jobDefinitionQuery) {
+    getAuthorizationManager().configureJobDefinitionQuery(jobDefinitionQuery);
     return (Long) getDbEntityManager().selectOne("selectJobDefinitionCountByQueryCriteria", jobDefinitionQuery);
   }
 

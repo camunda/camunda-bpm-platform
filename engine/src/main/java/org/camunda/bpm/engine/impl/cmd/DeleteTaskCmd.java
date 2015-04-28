@@ -14,7 +14,6 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -63,13 +62,9 @@ public class DeleteTaskCmd implements Command<Void>, Serializable {
     return null;
   }
 
-  protected void deleteTask(final String taskId, CommandContext commandContext) {
-    final TaskManager taskManager = commandContext.getTaskManager();
-    TaskEntity task = commandContext.runWithoutAuthentication(new Callable<TaskEntity>() {
-      public TaskEntity call() throws Exception {
-        return taskManager.findTaskById(taskId);
-      }
-    });
+  protected void deleteTask(String taskId, CommandContext commandContext) {
+    TaskManager taskManager = commandContext.getTaskManager();
+    TaskEntity task = taskManager.findTaskById(taskId);
 
     if (task != null) {
       if(task.getExecutionId() != null) {
