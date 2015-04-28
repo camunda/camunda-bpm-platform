@@ -19,7 +19,6 @@
     <!--
       all maven properties used in QA/CI
     -->
-    <camunda.version.old>7.2.0</camunda.version.old>
     <!-- override mail port so subethawiser does not try to bind itself on port 25 -->
     <mail.server.port>5025</mail.server.port>
 
