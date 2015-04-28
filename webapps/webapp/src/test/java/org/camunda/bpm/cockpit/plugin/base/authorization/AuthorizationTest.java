@@ -33,6 +33,8 @@ import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.junit.After;
@@ -188,6 +190,23 @@ public abstract class AuthorizationTest extends AbstractCockpitPluginTest {
     for (int i = 0; i < numOfInstances; i++) {
       runtimeService.startProcessInstanceByKey(processDefinitionKey, "businessKey_" + i);
     }
+    enableAuthorization();
+  }
+
+  protected Deployment createDeployment(String name, String... resources) {
+    disableAuthorization();
+    DeploymentBuilder builder = repositoryService.createDeployment();
+    for (String resource : resources) {
+      builder.addClasspathResource(resource);
+    }
+    Deployment deployment = builder.deploy();
+    enableAuthorization();
+    return deployment;
+  }
+
+  protected void deleteDeployment(String deploymentId) {
+    disableAuthorization();
+    repositoryService.deleteDeployment(deploymentId, true);
     enableAuthorization();
   }
 

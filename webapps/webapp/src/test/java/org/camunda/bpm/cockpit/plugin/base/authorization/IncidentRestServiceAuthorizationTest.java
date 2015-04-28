@@ -46,11 +46,7 @@ public class IncidentRestServiceAuthorizationTest extends AuthorizationTest {
 
     runtimeService = processEngine.getRuntimeService();
 
-    deploymentId = repositoryService
-        .createDeployment()
-        .addClasspathResource("processes/failing-process.bpmn")
-        .deploy()
-        .getId();
+    deploymentId = createDeployment(null, "processes/failing-process.bpmn").getId();
 
     resource = new IncidentRestService(engineName);
 
@@ -62,8 +58,8 @@ public class IncidentRestServiceAuthorizationTest extends AuthorizationTest {
 
   @After
   public void tearDown() {
+    deleteDeployment(deploymentId);
     super.tearDown();
-    repositoryService.deleteDeployment(deploymentId, true);
   }
 
   @Test

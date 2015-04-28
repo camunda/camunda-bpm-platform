@@ -50,20 +50,15 @@ public class ProcessDefinitionResourceAuthorizationTest extends AuthorizationTes
 
     runtimeService = processEngine.getRuntimeService();
 
-    deploymentId = repositoryService
-        .createDeployment()
-        .addClasspathResource("processes/user-task-process.bpmn")
-        .addClasspathResource("processes/calling-user-task-process.bpmn")
-        .deploy()
-        .getId();
+    deploymentId = createDeployment(null, "processes/user-task-process.bpmn", "processes/calling-user-task-process.bpmn").getId();
 
     startProcessInstances(CALLING_USER_TASK_PROCESS_KEY, 3);
   }
 
   @After
   public void tearDown() {
+    deleteDeployment(deploymentId);
     super.tearDown();
-    repositoryService.deleteDeployment(deploymentId, true);
   }
 
   @Test

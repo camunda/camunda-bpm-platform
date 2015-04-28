@@ -44,11 +44,7 @@ public class ProcessInstanceRestServiceAuthorizationTest extends AuthorizationTe
   public void setUp() throws Exception {
     super.setUp();
 
-    deploymentId = repositoryService
-        .createDeployment()
-        .addClasspathResource("processes/user-task-process.bpmn")
-        .deploy()
-        .getId();
+    deploymentId = createDeployment(null, "processes/user-task-process.bpmn").getId();
 
     startProcessInstances(USER_TASK_PROCESS_KEY, 3);
 
@@ -57,8 +53,8 @@ public class ProcessInstanceRestServiceAuthorizationTest extends AuthorizationTe
 
   @After
   public void tearDown() {
+    deleteDeployment(deploymentId);
     super.tearDown();
-    repositoryService.deleteDeployment(deploymentId, true);
   }
 
   @Test
