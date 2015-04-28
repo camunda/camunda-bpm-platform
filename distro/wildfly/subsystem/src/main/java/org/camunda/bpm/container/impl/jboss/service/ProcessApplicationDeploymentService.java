@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
+import org.camunda.bpm.engine.repository.ResumePreviousBy;
 import org.jboss.as.ee.component.ComponentView;
 import org.jboss.as.naming.ManagedReference;
 import org.jboss.modules.Module;
@@ -139,7 +140,7 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
 
       // enable resuming of previous versions:
       if(PropertyHelper.getBooleanProperty(processArchive.getProperties(), ProcessArchiveXml.PROP_IS_RESUME_PREVIOUS_VERSIONS, true)) {
-        deploymentBuilder.resumePreviousVersions();
+        enableResumingOfPreviousVersions(deploymentBuilder);
       }
 
       // set the name for the deployment
@@ -184,6 +185,27 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
     }
   }
 
+  protected void enableResumingOfPreviousVersions(ProcessApplicationDeploymentBuilder deploymentBuilder) throws IllegalArgumentException {
+    deploymentBuilder.resumePreviousVersions();
+    String resumePreviousBy = processArchive.getProperties().get(ProcessArchiveXml.PROP_RESUME_PREVIOUS_BY);
+    if (resumePreviousBy == null) {
+      deploymentBuilder.resumePreviousVersionsBy(ResumePreviousBy.RESUME_BY_PROCESS_DEFINITION_KEY);
+    } else if (isValidValueForResumePreviousBy(resumePreviousBy)) {
+      deploymentBuilder.resumePreviousVersionsBy(resumePreviousBy);
+    } else {
+      StringBuilder b = new StringBuilder();
+      b.append("Illegal value passed for property ").append(ProcessArchiveXml.PROP_RESUME_PREVIOUS_BY);
+      b.append(". Value was ").append(resumePreviousBy);
+      b.append(" expected ").append(ResumePreviousBy.RESUME_BY_DEPLOYMENT_NAME);
+      b.append(" or ").append(ResumePreviousBy.RESUME_BY_PROCESS_DEFINITION_KEY).append(".");
+      throw new IllegalArgumentException(b.toString());
+    }
+  }
+  
+  protected boolean isValidValueForResumePreviousBy(String resumePreviousBy) {
+    return resumePreviousBy.equals(ResumePreviousBy.RESUME_BY_DEPLOYMENT_NAME) || resumePreviousBy.equals(ResumePreviousBy.RESUME_BY_PROCESS_DEFINITION_KEY);
+  }
+  
   /**
    * @param deploymentMap2
    * @param deploymentName
