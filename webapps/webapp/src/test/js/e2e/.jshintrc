@@ -13,9 +13,12 @@
     "expect": false,
     "beforeEach": false,
     "afterEach": false,
+    "before": false,
+    "after": false,
     "runs": false,
     "waitsFor": false
   },
+  "expr": true,
   "node": true,
   "indent": 2,
   "strict": true
