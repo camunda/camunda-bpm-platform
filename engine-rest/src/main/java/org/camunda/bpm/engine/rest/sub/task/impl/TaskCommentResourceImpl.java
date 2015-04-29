@@ -12,23 +12,26 @@
  */
 package org.camunda.bpm.engine.rest.sub.task.impl;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
+
+import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.rest.TaskRestService;
 import org.camunda.bpm.engine.rest.dto.task.CommentDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.task.TaskCommentResource;
 import org.camunda.bpm.engine.task.Comment;
-
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class TaskCommentResourceImpl implements TaskCommentResource {
 
@@ -98,8 +101,15 @@ public class TaskCommentResourceImpl implements TaskCommentResource {
   }
 
   private boolean isHistoryEnabled() {
-    int historyLevel = engine.getManagementService().getHistoryLevel();
-    return historyLevel > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE;
+    IdentityService identityService = engine.getIdentityService();
+    Authentication currentAuthentication = identityService.getCurrentAuthentication();
+    try {
+      identityService.clearAuthentication();
+      int historyLevel = engine.getManagementService().getHistoryLevel();
+      return historyLevel > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE;
+    } finally {
+      identityService.setAuthentication(currentAuthentication);
+    }
   }
 
   private void ensureHistoryEnabled(Status status) {
