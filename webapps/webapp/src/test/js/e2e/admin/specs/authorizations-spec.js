@@ -162,6 +162,54 @@ describe('Admin authorizations Spec', function() {
   });
 
 
+  describe('Deployment Authorizations', function() {
+
+    before(function() {
+      return testHelper(setupFile, function() {
+
+        authorizationsPage.navigateToWebapp('Admin');
+        authorizationsPage.authentication.userLogin('admin', 'admin');
+
+        authorizationsPage.selectNavbarItem('Authorizations');
+      });
+    });
+
+
+    it('should navigate to deployment page', function() {
+
+      // when
+      authorizationsPage.selectAuthorizationNavbarItem('Deployment');
+
+      // then
+      authorizationsPage.deployment.isActive();
+      expect(authorizationsPage.deployment.createNewButton().isEnabled()).to.eventually.eql(true);
+      expect(authorizationsPage.deployment.boxHeader()).to.eventually.eql('Deployment Authorizations');
+    });
+
+
+    it('should validate authorization attributes', function() {
+
+      authorizationsPage.createNewButton().click().then(function() {
+
+        checkCreateNewState();
+
+        checkAuthorizationTypes();
+
+        var permissionsList = [
+          'CREATE',
+          'READ',
+          'DELETE'
+        ];
+        checkPermissionTypes(permissionsList);
+
+        abortCreatingNewAuthorization();
+      });
+
+    });
+
+  });
+
+
   describe('Filter Authorizations', function() {
 
     before(function() {
