@@ -15,6 +15,8 @@ package org.camunda.bpm.application.impl.metadata.spi;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.repository.ResumePreviousBy;
+
 /**
  * <p>Java API representation of a ProcessArchive definition inside a processes.xml file</p>
  *
@@ -34,6 +36,12 @@ public interface ProcessArchiveXml {
   /** Indicates whether old versions of the deployment should be resumed.
    * If this property is not set, the default value is used: true. */
   public static final String PROP_IS_RESUME_PREVIOUS_VERSIONS = "isResumePreviousVersions";
+
+  /**
+   * Indicates which previous deployments should be resumed by this deployment.
+   * Can be any of the options in {@link ResumePreviousBy}.
+   */
+  public static final String PROP_RESUME_PREVIOUS_BY = "resumePreviousBy";
 
   /**
    * Indicates whether only changed resources should be part of the deployment.
@@ -89,8 +97,6 @@ public interface ProcessArchiveXml {
    */
   public static final String PROP_ADDITIONAL_RESOURCE_SUFFIXES = "additionalResourceSuffixes";
   public static final String PROP_ADDITIONAL_RESOURCE_SUFFIXES_SEPARATOR = ",";
-
-  public static final String PROP_RESUME_PREVIOUS_BY = "resumePreviousBy";
 
   /**
    * @return the name of the process archive. Must not be null.

@@ -274,6 +274,37 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
     deleteDeployments(deployment1, deployment2);
   }
 
+  public void testProcessApplicationDeploymentResumePreviousVersionsDifferentKeys() {
+    // create initial deployment
+    ProcessApplicationDeployment deployment1 = repositoryService.createDeployment(processApplication.getReference())
+      .name("deployment")
+      .addClasspathResource("org/camunda/bpm/engine/test/api/repository/version1.bpmn20.xml")
+      .deploy();
+
+    assertThatOneProcessIsDeployed();
+
+    // deploy update with changes:
+    ProcessApplicationDeployment deployment2 = repositoryService.createDeployment(processApplication.getReference())
+      .name("deployment")
+      .resumePreviousVersions()
+      .addClasspathResource("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+      .deploy();
+
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionVersion().asc().list();
+    // now there are 2 process definitions deployed
+    assertEquals(1, processDefinitions.get(0).getVersion());
+    assertEquals(1, processDefinitions.get(1).getVersion());
+
+    // and the old deployment was not resumed
+    ProcessApplicationRegistration registration = deployment2.getProcessApplicationRegistration();
+    Set<String> deploymentIds = registration.getDeploymentIds();
+    assertEquals(1, deploymentIds.size());
+    assertEquals(deployment2.getId(), deploymentIds.iterator().next());
+    assertEquals(processEngine.getName(), registration.getProcessEngineName());
+
+    deleteDeployments(deployment1, deployment2);
+  }
+
   public void testProcessApplicationDeploymentNoResume() {
     // create initial deployment
     ProcessApplicationDeployment deployment1 = repositoryService.createDeployment(processApplication.getReference())
@@ -303,7 +334,7 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
 
     deleteDeployments(deployment1, deployment2);
   }
-  
+
   public void testProcessApplicationDeploymentResumePreviousVersionsByDeploymentName() {
     // create initial deployment
     ProcessApplicationDeployment deployment1 = repositoryService.createDeployment(processApplication.getReference())
@@ -335,7 +366,7 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
 
     deleteDeployments(deployment1, deployment2);
   }
-  
+
   public void testProcessApplicationDeploymentResumePreviousVersionsByDeploymentNameDeployDifferentProcesses(){
     BpmnModelInstance process1 = Bpmn.createExecutableProcess("process1").done();
     BpmnModelInstance process2 = Bpmn.createExecutableProcess("process2").done();
@@ -343,30 +374,61 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
       .name("deployment")
       .addModelInstance("process1.bpmn", process1)
       .deploy();
-    
+
     assertThatOneProcessIsDeployed();
-    
+
     ProcessApplicationDeployment deployment2 = repositoryService.createDeployment(processApplication.getReference())
       .name("deployment")
       .resumePreviousVersions()
       .resumePreviousVersionsBy(ResumePreviousBy.RESUME_BY_DEPLOYMENT_NAME)
       .addModelInstance("process2.bpmn", process2)
       .deploy();
-    
+
     List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionVersion().asc().list();
     // now there are 2 process definitions deployed but both with version 1
     assertEquals(1, processDefinitions.get(0).getVersion());
     assertEquals(1, processDefinitions.get(1).getVersion());
-    
+
     // old deployment was resumed
     ProcessApplicationRegistration registration = deployment2.getProcessApplicationRegistration();
     Set<String> deploymentIds = registration.getDeploymentIds();
     assertEquals(2, deploymentIds.size());
     assertEquals(processEngine.getName(), registration.getProcessEngineName());
-    
+
     deleteDeployments(deployment, deployment2);
   }
-  
+
+  public void testProcessApplicationDeploymentResumePreviousVersionsByDeploymentNameNoResume(){
+    BpmnModelInstance process1 = Bpmn.createExecutableProcess("process1").done();
+    ProcessApplicationDeployment deployment = repositoryService.createDeployment(processApplication.getReference())
+      .name("deployment")
+      .addModelInstance("process1.bpmn", process1)
+      .deploy();
+
+    assertThatOneProcessIsDeployed();
+
+    ProcessApplicationDeployment deployment2 = repositoryService.createDeployment(processApplication.getReference())
+      .name("anotherDeployment")
+      .resumePreviousVersions()
+      .resumePreviousVersionsBy(ResumePreviousBy.RESUME_BY_DEPLOYMENT_NAME)
+      .addModelInstance("process2.bpmn", process1)
+      .deploy();
+
+    List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionVersion().asc().list();
+    // there is a new version of the process
+    assertEquals(1, processDefinitions.get(0).getVersion());
+    assertEquals(2, processDefinitions.get(1).getVersion());
+
+    // but the old deployment was not resumed
+    ProcessApplicationRegistration registration = deployment2.getProcessApplicationRegistration();
+    Set<String> deploymentIds = registration.getDeploymentIds();
+    assertEquals(1, deploymentIds.size());
+    assertEquals(deployment2.getId(), deploymentIds.iterator().next());
+    assertEquals(processEngine.getName(), registration.getProcessEngineName());
+
+    deleteDeployments(deployment, deployment2);
+  }
+
   public void testPartialChangesResumePreviousVersionByDeploymentName() {
     BpmnModelInstance model1 = Bpmn.createExecutableProcess("process1").done();
     BpmnModelInstance model2 = Bpmn.createExecutableProcess("process2").done();

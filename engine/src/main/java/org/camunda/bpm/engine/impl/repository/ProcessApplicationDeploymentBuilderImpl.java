@@ -111,8 +111,8 @@ public class ProcessApplicationDeploymentBuilderImpl extends DeploymentBuilderIm
   public ProcessApplicationReference getProcessApplicationReference() {
     return processApplicationReference;
   }
-  
-  public String getResumePreviousVersionsBy(){
+
+  public String getResumePreviousVersionsBy() {
     return resumePreviousVersionsBy;
   }
 
