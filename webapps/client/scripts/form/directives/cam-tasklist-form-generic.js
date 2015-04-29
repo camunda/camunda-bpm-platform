@@ -28,6 +28,7 @@ define([
       template: template,
 
       link: function($scope, $element, attrs, formController) {
+        $scope.showBusinessKeyField = !!formController.getParams().processDefinitionId;
 
         var formElement = $element.find('form');
         var camForm = null;

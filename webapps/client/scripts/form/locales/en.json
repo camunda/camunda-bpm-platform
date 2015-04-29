@@ -29,6 +29,8 @@
                         "Load Variables",
   "LOAD_VARIABLES_FAILURE":
                         "Could not load variables",
+  "BUSINESS_KEY":
+                        "Business Key",
   "NO_TASK_VARIABLES":
                         "The task does not contain any variables",
   "REQUIRE_UNIQUE_NAME":
