@@ -212,7 +212,7 @@ public class DeploymentAwareJobExecutorTest extends PluggableProcessEngineTestCa
 
     Job existingJob = managementService.createJobQuery().singleResult();
 
-    ClockUtil.setCurrentTime(new Date(System.currentTimeMillis()+1000));
+    ClockUtil.setCurrentTime(new Date(System.currentTimeMillis() + 61 * 1000));
 
     List<JobEntity> acquirableJobs = findAcquirableJobs();
 

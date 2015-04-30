@@ -77,7 +77,9 @@ public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCa
     ProcessEngineConfiguration configuration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();
 
     // assert engine properties specified
-    assertEquals(true, configuration.isJobExecutorDeploymentAware());
+    assertTrue(configuration.isJobExecutorDeploymentAware());
+    assertTrue(configuration.isJobExecutorPreferTimerJobs());
+    assertTrue(configuration.isJobExecutorAcquireByDueDate());
     assertEquals(5, configuration.getJdbcMaxActiveConnections());
 
     processApplication.undeploy();

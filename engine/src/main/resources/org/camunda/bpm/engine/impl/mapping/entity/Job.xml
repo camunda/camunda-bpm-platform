@@ -75,6 +75,7 @@
     <result property="retriesFromPersistence" column="RETRIES_" jdbcType="INTEGER" />
     <result property="exceptionByteArrayId" column="EXCEPTION_STACK_ID_" jdbcType="VARCHAR" />
     <result property="exceptionMessage" column="EXCEPTION_MSG_" jdbcType="VARCHAR" />
+    <result property="duedate" column="DUEDATE_" jdbcType="TIMESTAMP" />
     <result property="jobHandlerType" column="HANDLER_TYPE_" jdbcType="VARCHAR" />
     <result property="jobHandlerConfiguration" column="HANDLER_CFG_" jdbcType="VARCHAR" />
     <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR" />
@@ -90,7 +91,6 @@
   <resultMap id="messageResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.MessageEntity" extends="jobResultMap"/>
 
   <resultMap id="timerResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.TimerEntity" extends="jobResultMap">
-    <result property="duedate" column="DUEDATE_" jdbcType="TIMESTAMP" />
     <result property="repeat" column="REPEAT_" jdbcType="VARCHAR" />
   </resultMap>
 
@@ -103,11 +103,11 @@
   <select id="selectNextJobsToExecute" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
   	${limitBefore}
     select
-    	RES.* ${limitBetween}
+      RES.* ${limitBetweenNextJobs}
     from ${prefix}ACT_RU_JOB RES
 
     where (RES.RETRIES_ &gt; 0)
-      and (RES.DUEDATE_ is null or RES.DUEDATE_ &lt; #{parameter.now, jdbcType=TIMESTAMP})
+      and (RES.DUEDATE_ is null or RES.DUEDATE_ &lt;= #{parameter.now, jdbcType=TIMESTAMP})
       and (RES.LOCK_OWNER_ is null or RES.LOCK_EXP_TIME_ &lt; #{parameter.now, jdbcType=TIMESTAMP})
       and (RES.SUSPENSION_STATE_ = 1 or RES.SUSPENSION_STATE_ is null)
 
@@ -123,6 +123,7 @@
         </if>
         )
       </if>
+    ${orderByNextJobs}
     ${limitAfter}
   </select>
 
@@ -131,7 +132,7 @@
     select RES.* ${limitBetween}
     from ${prefix}ACT_RU_JOB RES
     where (RETRIES_ &gt; 0)
-      and (DUEDATE_ is null or DUEDATE_ &lt; #{parameter.now, jdbcType=TIMESTAMP})
+      and (DUEDATE_ is null or DUEDATE_ &lt;= #{parameter.now, jdbcType=TIMESTAMP})
       and (LOCK_OWNER_ is null or LOCK_EXP_TIME_ &lt; #{parameter.now, jdbcType=TIMESTAMP})
       and (EXCLUSIVE_ = ${trueConstant})
       and (PROCESS_INSTANCE_ID_ = #{parameter.pid})
@@ -266,45 +267,6 @@
     </where>
   </sql>
 
-  <!--  SELECT DEPENDENT -->  
-  <!--  ACT-1064: MySQL-specific select's are needed to handle non-millisecond precision -->
-  <select id="selectNextJobsToExecute_mysql" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
-	 	${limitBefore}
-	  select RES.* ${limitBetween} 
-	  from ${prefix}ACT_RU_JOB RES
-	  where (RETRIES_ &gt; 0)
-	    and (DUEDATE_ is null or DUEDATE_ &lt;= #{parameter.now, jdbcType=TIMESTAMP})
-	    and (LOCK_OWNER_ is null or LOCK_EXP_TIME_ &lt;= #{parameter.now, jdbcType=TIMESTAMP})
-      and (RES.SUSPENSION_STATE_ = 1 or RES.SUSPENSION_STATE_ is null)
-	   <if test="parameter.deploymentAware">
-        and (RES.DEPLOYMENT_ID_ is null 
-        <if test="parameter.deploymentIds != null">
-          or
-          RES.DEPLOYMENT_ID_ in 
-          <foreach item="deploymentId" index="index" collection="parameter.deploymentIds"
-          open="(" separator="," close=")">
-            #{deploymentId}
-          </foreach>
-        </if>
-        )
-      </if>
-	  ${limitAfter}
-  </select>
-
-  <select id="selectExclusiveJobsToExecute_mysql" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
-  	${limitBefore}
-    select RES.* ${limitBetween}
-    from ${prefix}ACT_RU_JOB RES
-    where (RETRIES_ &gt; 0)
-      and (DUEDATE_ is null or DUEDATE_ &lt;= #{parameter.now, jdbcType=TIMESTAMP})
-      and (LOCK_OWNER_ is null or LOCK_EXP_TIME_ &lt;= #{parameter.now, jdbcType=TIMESTAMP})
-      and (EXCLUSIVE_ = TRUE)
-      and (PROCESS_INSTANCE_ID_ = #{parameter.pid})
-      and (RES.SUSPENSION_STATE_ = 1 or RES.SUSPENSION_STATE_ is null)
-    ${limitAfter}
-  </select>
-
-
   <!-- TIMER INSERT -->
 
   <insert id="insertTimer" parameterType="org.camunda.bpm.engine.impl.persistence.entity.TimerEntity">
@@ -416,6 +378,7 @@
             RETRIES_, 
             EXCEPTION_STACK_ID_,
             EXCEPTION_MSG_,
+            DUEDATE_,
             HANDLER_TYPE_,
             HANDLER_CFG_,
             DEPLOYMENT_ID_,
@@ -436,6 +399,7 @@
             #{retries, jdbcType=INTEGER},
             #{exceptionByteArrayId, jdbcType=VARCHAR},
             #{exceptionMessage, jdbcType=VARCHAR},
+            #{duedate, jdbcType=TIMESTAMP},
             #{jobHandlerType, jdbcType=VARCHAR},
             #{jobHandlerConfiguration, jdbcType=VARCHAR},
             #{deploymentId, jdbcType=VARCHAR},

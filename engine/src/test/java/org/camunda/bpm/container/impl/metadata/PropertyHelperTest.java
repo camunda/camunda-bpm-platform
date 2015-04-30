@@ -17,6 +17,8 @@ import org.junit.Assert;
 public class PropertyHelperTest extends TestCase {
   
   protected static final String JOB_EXECUTOR_DEPLOYMENT_AWARE_PROP = "jobExecutorDeploymentAware";
+  protected static final String JOB_EXECUTOR_PREFER_TIMER_JOBS = "jobExecutorPreferTimerJobs";
+  protected static final String JOB_EXECUTOR_ACQUIRE_BY_DUE_DATE = "jobExecutorAcquireByDueDate";
   protected static final String MAIL_SERVER_PORT_PROP = "mailServerPort";
   protected static final String JDBC_URL_PROP = "jdbcUrl";
   protected static final String DB_IDENTITY_USED_PROP = "dbIdentityUsed";
@@ -29,12 +31,16 @@ public class PropertyHelperTest extends TestCase {
     
     Map<String, String> propertiesToSet = new HashMap<String, String>();
     propertiesToSet.put(JOB_EXECUTOR_DEPLOYMENT_AWARE_PROP, "true");
+    propertiesToSet.put(JOB_EXECUTOR_PREFER_TIMER_JOBS, "true");
+    propertiesToSet.put(JOB_EXECUTOR_ACQUIRE_BY_DUE_DATE, "true");
     propertiesToSet.put(MAIL_SERVER_PORT_PROP, "42");
     propertiesToSet.put(JDBC_URL_PROP, "someUrl");
     
     PropertyHelper.applyProperties(engineConfiguration, propertiesToSet);
     
     Assert.assertTrue(engineConfiguration.isJobExecutorDeploymentAware());
+    Assert.assertTrue(engineConfiguration.isJobExecutorPreferTimerJobs());
+    Assert.assertTrue(engineConfiguration.isJobExecutorAcquireByDueDate());
     Assert.assertEquals(42, engineConfiguration.getMailServerPort());
     Assert.assertEquals("someUrl", engineConfiguration.getJdbcUrl());
   }

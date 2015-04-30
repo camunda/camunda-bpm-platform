@@ -791,6 +791,27 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
           properties.put("orderBy" , DbSqlSessionFactory.databaseSpecificOrderByStatements.get(databaseType));
           properties.put("limitBeforeNativeQuery" , DbSqlSessionFactory.databaseSpecificLimitBeforeNativeQueryStatements.get(databaseType));
 
+          if (isJobExecutorPreferTimerJobs() && isJobExecutorAcquireByDueDate()) {
+            // sort next jobs to execute by type and due date
+            properties.put("limitBetweenNextJobs", DbSqlSessionFactory.databaseSpecificLimitBetweenNextJobsByTypeAndDueDateStatements.get(databaseType));
+            properties.put("orderByNextJobs", DbSqlSessionFactory.databaseSpecificOrderByNextJobsByTypeAndDueDateStatements.get(databaseType));
+          }
+          else if (isJobExecutorPreferTimerJobs()) {
+            // sort next jobs to execute by type
+            properties.put("limitBetweenNextJobs", DbSqlSessionFactory.databaseSpecificLimitBetweenNextJobsByTypeStatements.get(databaseType));
+            properties.put("orderByNextJobs", DbSqlSessionFactory.databaseSpecificOrderByNextJobsByTypeStatements.get(databaseType));
+          }
+          else if (isJobExecutorAcquireByDueDate()) {
+            // sort next jobs to execute by due date
+            properties.put("limitBetweenNextJobs", DbSqlSessionFactory.databaseSpecificLimitBetweenNextJobsByDueDateStatements.get(databaseType));
+            properties.put("orderByNextJobs", DbSqlSessionFactory.databaseSpecificOrderByNextJobsByDueDateStatements.get(databaseType));
+          }
+          else {
+            // don't sort next jobs to execute
+            properties.put("limitBetweenNextJobs", DbSqlSessionFactory.databaseSpecificLimitBetweenStatements.get(databaseType));
+            properties.put("orderByNextJobs", "");
+          }
+
           properties.put("bitand1" , DbSqlSessionFactory.databaseSpecificBitAnd1.get(databaseType));
           properties.put("bitand2" , DbSqlSessionFactory.databaseSpecificBitAnd2.get(databaseType));
           properties.put("bitand3" , DbSqlSessionFactory.databaseSpecificBitAnd3.get(databaseType));

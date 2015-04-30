@@ -131,6 +131,8 @@ public abstract class ProcessEngineConfiguration {
   protected String history = HISTORY_AUDIT;
   protected boolean jobExecutorActivate;
   protected boolean jobExecutorDeploymentAware = false;
+  protected boolean jobExecutorPreferTimerJobs = false;
+  protected boolean jobExecutorAcquireByDueDate = false;
 
   /**
    * The flag will be used inside the method "JobManager#send()". It will be used to decide whether to notify the
@@ -474,6 +476,24 @@ public abstract class ProcessEngineConfiguration {
 
   public ProcessEngineConfiguration setJobExecutorDeploymentAware(boolean jobExecutorDeploymentAware) {
     this.jobExecutorDeploymentAware = jobExecutorDeploymentAware;
+    return this;
+  }
+
+  public boolean isJobExecutorAcquireByDueDate() {
+    return jobExecutorAcquireByDueDate;
+  }
+
+  public ProcessEngineConfiguration setJobExecutorAcquireByDueDate(boolean jobExecutorAcquireByDueDate) {
+    this.jobExecutorAcquireByDueDate = jobExecutorAcquireByDueDate;
+    return this;
+  }
+
+  public boolean isJobExecutorPreferTimerJobs() {
+    return jobExecutorPreferTimerJobs;
+  }
+
+  public ProcessEngineConfiguration setJobExecutorPreferTimerJobs(boolean jobExecutorPreferTimerJobs) {
+    this.jobExecutorPreferTimerJobs = jobExecutorPreferTimerJobs;
     return this;
   }
 

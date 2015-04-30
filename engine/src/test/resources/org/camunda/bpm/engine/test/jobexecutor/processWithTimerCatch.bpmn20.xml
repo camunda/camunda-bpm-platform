@@ -8,7 +8,7 @@
     
     <intermediateCatchEvent id="timer">
       <timerEventDefinition>
-        <timeDuration>PT0M</timeDuration>
+        <timeDuration>PT1M</timeDuration>
       </timerEventDefinition>
     </intermediateCatchEvent>
     

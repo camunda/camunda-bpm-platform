@@ -11,6 +11,8 @@
     <properties>
         <property name="jdbcUrl">jdbc:h2:mem:embeddedEngine</property>
         <property name="jobExecutorDeploymentAware">true</property>
+        <property name="jobExecutorPreferTimerJobs">true</property>
+        <property name="jobExecutorAcquireByDueDate">true</property>
         <property name="jdbcMaxActiveConnections">5</property>
     </properties>
     
