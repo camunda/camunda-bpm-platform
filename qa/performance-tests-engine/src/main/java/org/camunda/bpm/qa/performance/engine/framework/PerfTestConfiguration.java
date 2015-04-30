@@ -12,7 +12,12 @@
  */
 package org.camunda.bpm.qa.performance.engine.framework;
 
+import static org.camunda.bpm.qa.performance.engine.framework.activitylog.ActivityPerfTestWatcher.WATCH_ALL_ACTIVITIES;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 
 
@@ -30,9 +35,11 @@ public class PerfTestConfiguration {
 
   protected String testWatchers = null;
   protected String historyLevel;
-  
+
+  protected List<String> watchActivities = null;
+
   protected Date startTime;
-  
+
   protected String platform;
 
   public PerfTestConfiguration(Properties properties) {
@@ -41,6 +48,7 @@ public class PerfTestConfiguration {
     testWatchers = properties.getProperty("testWatchers", null);
     databaseName = properties.getProperty("databaseDriver", null);
     historyLevel = properties.getProperty("historyLevel");
+    watchActivities = parseWatchActivities(properties.getProperty("watchActivities", null));
   }
 
   public PerfTestConfiguration() {
@@ -81,11 +89,11 @@ public class PerfTestConfiguration {
   public void setHistoryLevel(String historyLevel) {
     this.historyLevel = historyLevel;
   }
-  
+
   public Date getStartTime() {
     return startTime;
   }
-  
+
   public void setStartTime(Date startTime) {
     this.startTime = startTime;
   }
@@ -98,4 +106,31 @@ public class PerfTestConfiguration {
     this.platform = platform;
   }
 
+  public List<String> getWatchActivities() {
+    return watchActivities;
+  }
+
+  public void setWatchActivities(List<String> watchActivities) {
+    this.watchActivities = watchActivities;
+  }
+
+  protected List<String> parseWatchActivities(String watchActivitiesString) {
+    if (watchActivitiesString == null || watchActivitiesString.trim().isEmpty()) {
+      return null;
+    }
+    else if (watchActivitiesString.trim().equalsIgnoreCase(WATCH_ALL_ACTIVITIES.get(0))) {
+      return WATCH_ALL_ACTIVITIES;
+    }
+    else {
+      List<String> watchActivities = new ArrayList<String>();
+      String[] parts = watchActivitiesString.split(",");
+      for (String part : parts) {
+        part = part.trim();
+        if (!part.isEmpty()) {
+          watchActivities.add(part);
+        }
+      }
+      return Collections.unmodifiableList(watchActivities);
+    }
+  }
 }

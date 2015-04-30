@@ -8,11 +8,11 @@
       <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>
     </bpmn2:startEvent>
     <bpmn2:sequenceFlow id="SequenceFlow_1" name="" sourceRef="start" targetRef="timer"/>
-    <bpmn2:intermediateCatchEvent id="timer" name="Timer&#xA;(6s)">
+    <bpmn2:intermediateCatchEvent id="timer" name="Timer&#xA;(10s)">
       <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing>
       <bpmn2:timerEventDefinition id="_TimerEventDefinition_3">
-        <bpmn2:timeDuration xsi:type="bpmn2:tFormalExpression">PT6S</bpmn2:timeDuration>
+        <bpmn2:timeDuration xsi:type="bpmn2:tFormalExpression">PT10S</bpmn2:timeDuration>
       </bpmn2:timerEventDefinition>
     </bpmn2:intermediateCatchEvent>
     <bpmn2:sequenceFlow id="SequenceFlow_2" name="" sourceRef="timer" targetRef="end"/>

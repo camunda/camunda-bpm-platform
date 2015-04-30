@@ -14,7 +14,11 @@ package org.camunda.bpm.qa.performance.engine.framework;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.camunda.bpm.qa.performance.engine.framework.activitylog.ActivityPerfTestResult;
 
 /**
  * @author Daniel Meyer
@@ -28,16 +32,14 @@ public class PerfTestResult {
 
   protected List<PerfTestStepResult> stepResults = Collections.synchronizedList(new ArrayList<PerfTestStepResult>());
 
+  protected final Map<String, List<ActivityPerfTestResult>> activityResults = Collections.synchronizedMap(new HashMap<String, List<ActivityPerfTestResult>>());
+
   public long getDuration() {
     return duration;
   }
 
   public void setDuration(long duration) {
     this.duration = duration;
-  }
-
-  public List<PerfTestStepResult> getStepResults() {
-    return stepResults;
   }
 
   public int getNumberOfThreads() {
@@ -48,8 +50,16 @@ public class PerfTestResult {
     this.numberOfThreads = numberOfThreads;
   }
 
+  public List<PerfTestStepResult> getStepResults() {
+    return stepResults;
+  }
+
   public void setStepResults(List<PerfTestStepResult> stepResults) {
     this.stepResults = stepResults;
+  }
+
+  public Map<String, List<ActivityPerfTestResult>> getActivityResults() {
+    return activityResults;
   }
 
   /**
@@ -60,6 +70,10 @@ public class PerfTestResult {
    */
   public void logStepResult(PerfTestStep currentStep, Object stepResult) {
     stepResults.add(new PerfTestStepResult(currentStep.getStepName(), stepResult));
+  }
+
+  public void logActivityResult(String identifier, List<ActivityPerfTestResult> results) {
+    activityResults.put(identifier, results);
   }
 
 }

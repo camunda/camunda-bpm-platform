@@ -79,6 +79,7 @@
         <numberOfRuns>100</numberOfRuns>
         <testWatchers></testWatchers>
         <processEnginePlugins></processEnginePlugins>
+        <watchActivities></watchActivities>
       </properties>
 
       <build>
@@ -139,6 +140,7 @@
         <numberOfRuns>1</numberOfRuns>
         <testWatchers>org.camunda.bpm.qa.performance.engine.sqlstatementlog.StatementLogPerfTestWatcher</testWatchers>
         <processEnginePlugins>org.camunda.bpm.qa.performance.engine.sqlstatementlog.StatementLogProcessEnginePlugin</processEnginePlugins>
+        <watchActivities></watchActivities>
       </properties>
 
       <build>
@@ -188,6 +190,68 @@
 
     </profile>
 
+    <!-- allows to log activity start/end counts -->
+    <profile>
+      <id>activity-count</id>
+
+      <properties>
+        <!-- default values for properties -->
+        <numberOfThreads>1</numberOfThreads>
+        <numberOfRuns>100</numberOfRuns>
+        <testWatchers></testWatchers>
+        <processEnginePlugins></processEnginePlugins>
+        <watchActivities></watchActivities>
+      </properties>
+
+      <build>
+        <testResources>
+          <testResource>
+            <directory>src/test/resources</directory>
+            <filtering>true</filtering>
+          </testResource>
+        </testResources>
+
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <argLine>-Xmx512m</argLine>
+            </configuration>
+          </plugin>
+
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.4</version>
+            <executions>
+              <execution>
+                <id>generate-report</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <tasks>
+                    <echo message="Generating reports" />
+                    <copy todir="${basedir}/target/reports/images" flatten="true">
+                      <fileset dir="${basedir}/src/test/resources">
+                        <include name="**/*.png"/>
+                      </fileset>
+                    </copy>
+                    <java classname="org.camunda.bpm.qa.performance.engine.framework.activitylog.ActivityCountReporter" classpathref="maven.test.classpath" />
+                  </tasks>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+        </plugins>
+
+      </build>
+
+    </profile>
+
     <!-- override h2 profile to use in-mem db -->
     <profile>
       <id>h2</id>
@@ -216,5 +280,6 @@
     </profile>
 
   </profiles>
+
 
 </project>

@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
+import org.camunda.bpm.qa.performance.engine.framework.activitylog.ActivityPerfTestWatcher;
 
 /**
  * @author Daniel Meyer, Ingo Richtsmeier
@@ -71,6 +72,13 @@ public class PerfTestRunner {
           }
         }
       }
+    }
+    // add activity watcher
+    if (configuration.getWatchActivities() != null) {
+      if (watchers == null) {
+        watchers = new ArrayList<PerfTestWatcher>();
+      }
+      watchers.add(new ActivityPerfTestWatcher(configuration.getWatchActivities()));
     }
     configuration.setStartTime(new Date(System.currentTimeMillis()));
   }
