@@ -84,7 +84,7 @@ describe('Cockpit Process Instance Spec', function() {
   });
 
 
-  describe('work with process variables', function() {
+  describe('work with variables', function() {
 
     before(function() {
       return testHelper(setupFile, function() {
@@ -96,13 +96,13 @@ describe('Cockpit Process Instance Spec', function() {
     });
 
 
-    it('should add process variable', function() {
+    it('should add String variable', function() {
 
       // given
       expect(instancePage.variablesTab.table().count()).to.eventually.eql(3);
 
       // when
-      instancePage.actionBar.addVariable('myTestVar', 'String', '12345');
+      instancePage.addVariable.addVariable('myTestVar', 'String', '12345');
 
       // then
       expect(instancePage.variablesTab.table().count()).to.eventually.eql(4);
@@ -116,28 +116,74 @@ describe('Cockpit Process Instance Spec', function() {
         });
     });
 
-    it('should add a NULL process variable', function() {
+
+    it('should add Boolean variable', function() {
+
+      // given
       instancePage.variablesTab.table().count().then(function(varCountBefore) {
 
-        instancePage.actionBar.addVariable('myNullVar', 'Null');
+        // when
+        instancePage.addVariable.addVariable('myBooleanVar', 'Boolean', true);
 
+        // then
         expect(instancePage.variablesTab.table().count()).to.eventually.eql(varCountBefore+1);
 
+        instancePage.variablesTab.findElementIndexInRepeater('variable in variables', by.binding('variable.name'), 'myBooleanVar')
+          .then(function(idx) {
+            expect(instancePage.variablesTab.variableName(idx)).to.eventually.eql('myBooleanVar');
+            expect(instancePage.variablesTab.variableType(idx)).to.eventually.eql('Boolean');
+            expect(instancePage.variablesTab.variableValue(idx)).to.eventually.eql('true');
+            expect(instancePage.variablesTab.variableScopeName(idx)).to.eventually.eql('User Tasks');
+          });
       });
     });
 
-    it('should add an Object process variable', function() {
+
+    it('should add a NULL process variable', function() {
+
+      //given
       instancePage.variablesTab.table().count().then(function(varCountBefore) {
 
-        instancePage.actionBar.addVariable('myObjectVar', 'Object', {
+        // when
+        instancePage.addVariable.addVariable('myNullVar', 'Null');
+
+        // then
+        expect(instancePage.variablesTab.table().count()).to.eventually.eql(varCountBefore+1);
+        instancePage.variablesTab.findElementIndexInRepeater('variable in variables', by.binding('variable.name'), 'myNullVar')
+        .then(function(idx) {
+          expect(instancePage.variablesTab.variableName(idx)).to.eventually.eql('myNullVar');
+          expect(instancePage.variablesTab.variableType(idx)).to.eventually.eql('Null');
+          expect(instancePage.variablesTab.variableValue(idx)).to.eventually.eql('');
+          expect(instancePage.variablesTab.variableScopeName(idx)).to.eventually.eql('User Tasks');
+        });
+      });
+    });
+
+
+    it('should add an Object process variable', function() {
+
+      // given
+      instancePage.variablesTab.table().count().then(function(varCountBefore) {
+
+        // when
+        instancePage.addVariable.addVariable('myObjectVar', 'Object', {
           value: '',
           objectTypeName: 'java.lang.Object',
           serializationDataFormat: 'application/x-java-serialized-object'
         });
 
+        // then
         expect(instancePage.variablesTab.table().count()).to.eventually.eql(varCountBefore+1);
+        instancePage.variablesTab.findElementIndexInRepeater('variable in variables', by.binding('variable.name'), 'myObjectVar')
+        .then(function(idx) {
+          expect(instancePage.variablesTab.variableName(idx)).to.eventually.eql('myObjectVar');
+          expect(instancePage.variablesTab.variableType(idx)).to.eventually.eql('Object');
+          expect(instancePage.variablesTab.variableValue(idx)).to.eventually.eql('java.lang.Object');
+          expect(instancePage.variablesTab.variableScopeName(idx)).to.eventually.eql('User Tasks');
+        });
       });
     });
+
 
     it('should change variable', function() {
 
@@ -185,6 +231,161 @@ describe('Cockpit Process Instance Spec', function() {
             expect(instancePage.variablesTab.inlineEditRow().isPresent()).to.eventually.be.false;
           });
         });
+    });
+
+
+    describe('validate add variables modal view', function() {
+
+      before(function() {
+        return testHelper(setupFile, function() {
+          dashboardPage.navigateToWebapp('Cockpit');
+          dashboardPage.authentication.userLogin('admin', 'admin');
+          dashboardPage.deployedProcessesList.selectProcess(0);
+          definitionPage.processInstancesTab.selectInstance(0);
+        });
+      });
+
+
+      it('should open modal view', function() {
+
+        // when
+        instancePage.addVariable.addVariableButton().click()
+
+        // then
+        expect(instancePage.addVariable.modalHeading().getText()).to.eventually.eql('Add Variable to Process Instance');
+      });
+
+
+      it('should enter variable data', function() {
+
+        // given
+        expect(instancePage.addVariable.addButton().isEnabled()).to.eventually.be.false;
+        expect(instancePage.addVariable.variableTypeDropdownSelectedItem().getText()).to.eventually.eql('String');
+
+        // when
+        instancePage.addVariable.variableNameInput('myTestVariable');
+
+        // then
+        expect(instancePage.addVariable.addButton().isEnabled()).to.eventually.be.false;
+
+        // when
+        instancePage.addVariable.variableValueInput('abc123$%&');
+
+        // then
+        expect(instancePage.addVariable.addButton().isEnabled()).to.eventually.be.true;
+
+        // when
+        instancePage.addVariable.variableNameInput().clear();
+
+        // then
+        expect(instancePage.addVariable.addButton().isEnabled()).to.eventually.be.false;
+
+        // finaly
+        instancePage.addVariable.variableNameInput('myTestVariable');
+      });
+
+
+      it('should change from string to integer', function() {
+
+        // given
+        expect(instancePage.addVariable.addButton().isEnabled()).to.eventually.be.true;
+
+        // when
+        instancePage.addVariable.variableTypeDropdown('Integer').click();
+
+        // then
+        expect(instancePage.addVariable.addButton().isEnabled()).to.eventually.be.false;
+        expect(instancePage.addVariable.variableValueInfoLabel().getText()).to.eventually.eql('Only a Integer value is allowed.');
+      });
+
+
+      it('should change to short', function() {
+
+        // when
+        instancePage.addVariable.variableTypeDropdown('Short').click();
+
+        // then
+        expect(instancePage.addVariable.addButton().isEnabled()).to.eventually.be.false;
+        expect(instancePage.addVariable.variableValueInfoLabel().getText()).to.eventually.eql('Only a Short value is allowed.');
+      });
+
+
+      it('should change to double', function() {
+
+        // when
+        instancePage.addVariable.variableTypeDropdown('Double').click();
+
+        // then
+        expect(instancePage.addVariable.addButton().isEnabled()).to.eventually.be.false;
+        expect(instancePage.addVariable.variableValueInfoLabel().getText()).to.eventually.eql('Only a Double value is allowed.');
+      });
+
+
+      it('should change long', function() {
+
+        // when
+        instancePage.addVariable.variableTypeDropdown('Long').click();
+
+        // then
+        expect(instancePage.addVariable.addButton().isEnabled()).to.eventually.be.false;
+        expect(instancePage.addVariable.variableValueInfoLabel().getText()).to.eventually.eql('Only a Long value is allowed.');
+      });
+
+
+      it('should enter valid variable value', function() {
+
+        // when
+        instancePage.addVariable.variableValueInput().clear();
+        instancePage.addVariable.variableValueInput('123456789');
+
+        // then
+        expect(instancePage.addVariable.addButton().isEnabled()).to.eventually.be.true;
+        expect(instancePage.addVariable.variableValueInfoLabel().isPresent()).to.eventually.be.false;
+      });
+
+
+      it('should change to date', function() {
+
+        // when
+        instancePage.addVariable.variableTypeDropdown('Date').click();
+
+        // then
+        expect(instancePage.addVariable.addButton().isEnabled()).to.eventually.be.false;
+        expect(instancePage.addVariable.variableValueInfoLabel().getText()).to.eventually.eql('Supported pattern \'yyyy-MM-ddTHH:mm:ss\'.');
+      });
+
+
+      it('should change to object', function() {
+
+        // when
+        instancePage.addVariable.variableTypeDropdown('Object').click();
+
+        // then
+        expect(instancePage.addVariable.addButton().isEnabled()).to.eventually.be.false;
+        expect(instancePage.addVariable.objectValueInput().getAttribute('value')).to.eventually.eql('123456789');
+      });
+
+
+      it('should change to null', function() {
+
+        // when
+        instancePage.addVariable.variableTypeDropdown('Null').click();
+
+        // then
+        expect(instancePage.addVariable.addButton().isEnabled()).to.eventually.be.true;
+        expect(instancePage.addVariable.variableValueInput().isPresent()).to.eventually.be.false;
+      });
+
+
+      it('should change to boolean', function() {
+
+        // when
+        instancePage.addVariable.variableTypeDropdown('Boolean').click();
+
+        // then
+        expect(instancePage.addVariable.addButton().isEnabled()).to.eventually.be.true;
+      });
+
     });
 
   });

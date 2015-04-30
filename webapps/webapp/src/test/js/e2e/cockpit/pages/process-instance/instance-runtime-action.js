@@ -14,9 +14,17 @@ module.exports = ActionBar.extend({
     return this.getActionButton(1);
   },
 
-  addVariableButton: function() {
+  /*addVariableButton: function() {
     return this.getActionButton(2);
   },
+
+  addVariableModalHeading: function() {
+    return element(by.css('.modal-header'));
+  },
+
+  addVariableVariableNameInput: function(parameter) {
+    return element(by.css(''));
+  }
 
   addVariableModalAddButton: function() {
     return element(by.css('[ng-click="save()"]'));
@@ -43,6 +51,8 @@ module.exports = ActionBar.extend({
               element(by.model('variable.valueInfo.objectTypeName')).sendKeys(value.objectTypeName);
               element(by.model('variable.valueInfo.serializationDataFormat')).sendKeys(value.serializationDataFormat);
               element(by.model('variable.value')).sendKeys(value.value).then(submitFct);
+            } else if(typeof value === 'boolean') {
+              element(by.model('variable.value')).sendKeys(value).then(submitFct);
             } else {
               element(by.model('variable.value')).sendKeys(value).then(submitFct);
             }
@@ -52,7 +62,7 @@ module.exports = ActionBar.extend({
         });
       });
     });
-  },
+  },*/
 
   suspendButton: function() {
     return this.getActionButton(3);
