@@ -106,6 +106,16 @@ public class JobEntityTest extends PluggableProcessEngineTestCase {
     assertEquals(JobEntity.MAX_EXCEPTION_MESSAGE_LENGTH, threeByteJobEntity.getExceptionMessage().length());
   }
 
+  @Deployment
+  public void FAILING_testLongProcessDefinitionKey() {
+    String key = "myrealrealrealrealrealrealrealrealrealrealreallongprocessdefinitionkeyawesome";
+    String processInstanceId = runtimeService.startProcessInstanceByKey(key).getId();
+
+    Job job = managementService.createJobQuery().processInstanceId(processInstanceId).singleResult();
+
+    assertEquals(key, job.getProcessDefinitionKey());
+  }
+
   protected void insertJob(final JobEntity jobEntity) {
     processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
 
