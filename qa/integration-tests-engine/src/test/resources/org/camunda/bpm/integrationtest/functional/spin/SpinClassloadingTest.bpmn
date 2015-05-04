@@ -8,11 +8,23 @@
       <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing>
     </bpmn2:serviceTask>
+    <bpmn2:scriptTask id="jsonPath" name="Use JsonPath" scriptFormat="groovy">
+      <bpmn2:incoming>SequenceFlow_2</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_3</bpmn2:outgoing>
+      <bpmn2:script>
+        import static org.camunda.spin.Spin.*;
+        def json = "{\"child\": [{\"id\": 1,\"name\": \"Lucy\",\"sex\": \"female\"},{\"id\": 2,\"name\": \"Tracy\",\"sex\": \"female\"}],\"number\": 1,\"boolean\": true}";
+        def element = JSON(json).jsonPath('$.child[0]').element();
+        assert element != null
+        println element
+      </bpmn2:script>
+    </bpmn2:scriptTask>
     <bpmn2:sequenceFlow id="SequenceFlow_1" name="" sourceRef="StartEvent_1" targetRef="te"/>
     <bpmn2:endEvent id="EndEvent_1">
-      <bpmn2:incoming>SequenceFlow_2</bpmn2:incoming>
+      <bpmn2:incoming>SequenceFlow_3</bpmn2:incoming>
     </bpmn2:endEvent>
-    <bpmn2:sequenceFlow id="SequenceFlow_2" name="" sourceRef="te" targetRef="EndEvent_1"/>
+    <bpmn2:sequenceFlow id="SequenceFlow_2" name="" sourceRef="te" targetRef="jsonPath"/>
+    <bpmn2:sequenceFlow id="SequenceFlow_3" name="" sourceRef="jsonPath" targetRef="EndEvent_1"/>
   </bpmn2:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="testProcess">
