@@ -30,7 +30,7 @@ define(['text!./authorizations.html', 'text!./confirm-delete-authorization.html'
           3: [ 'CREATE', 'DELETE' ],
           4: [ 'READ', 'UPDATE', 'CREATE', 'DELETE' ],
           5: [ 'READ', 'UPDATE', 'DELETE' ],
-          6: [ 'READ', 'CREATE_INSTANCE', 'READ_INSTANCE', 'UPDATE_INSTANCE', 'DELETE_INSTANCE', 'READ_TASK', 'UPDATE_TASK' ],
+          6: [ 'READ', 'CREATE_INSTANCE', 'READ_INSTANCE', 'UPDATE_INSTANCE', 'DELETE_INSTANCE', 'READ_TASK', 'UPDATE_TASK', 'READ_HISTORY', 'DELETE_HISTORY' ],
           7: [ 'CREATE', 'READ', 'UPDATE', 'DELETE' ],
           8: [ 'CREATE', 'READ', 'UPDATE', 'DELETE' ],
           9: [ 'CREATE', 'READ', 'DELETE' ]
