@@ -362,6 +362,11 @@
                 <exclude>**/HistoricIncident*Test.java</exclude>
                 <exclude>**/HistoricJobLog*Test.java</exclude>
                 <exclude>**/ProcessInstanceModificationHistoryTest.java</exclude>
+                <exclude>**/UserOperationLogAuthorizationTest.java</exclude>
+                <exclude>**/HistoricDetailAuthorizationTest.java</exclude>
+                <exclude>**/HistoricVariableInstanceAuthorizationTest.java</exclude>
+                <exclude>**/UserOperationLogAuthorizationTest.java</exclude>
+                <exclude>**/HistoricDetailAuthorizationTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -395,6 +400,9 @@
                 <exclude>**/HistoricTaskInstanceQueryTest.java</exclude>
                 <exclude>**/HistoricJobLog*Test.java</exclude>
                 <exclude>**/ProcessInstanceModificationHistoryTest.java</exclude>
+                <exclude>**/UserOperationLogAuthorizationTest.java</exclude>
+                <exclude>**/HistoricDetailAuthorizationTest.java</exclude>
+                <exclude>**/HistoricVariableInstanceAuthorizationTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -428,6 +436,8 @@
                 <exclude>**/Historic*QueryTest.java</exclude>
                 <exclude>**/HistoricJobLog*Test.java</exclude>
                 <exclude>**/ProcessInstanceModificationHistoryTest.java</exclude>
+                <exclude>**/UserOperationLogAuthorizationTest.java</exclude>
+                <exclude>**/Historic*AuthorizationTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
