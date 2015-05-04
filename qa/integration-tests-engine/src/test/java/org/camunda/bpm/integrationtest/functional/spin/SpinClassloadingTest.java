@@ -37,7 +37,8 @@ public class SpinClassloadingTest extends AbstractFoxPlatformIntegrationTest {
     return initWebArchiveDeployment()
       .addAsResource("org/camunda/bpm/integrationtest/functional/spin/SpinClassloadingTest.bpmn")
       .addClass(XmlSerializable.class)
-      .addClass(SpinVariableDelegate.class);
+      .addClass(SpinVariableDelegate.class)
+      .addClass(SpinJsonPathDelegate.class);
   }
 
   @Deployment(name="client-app")
