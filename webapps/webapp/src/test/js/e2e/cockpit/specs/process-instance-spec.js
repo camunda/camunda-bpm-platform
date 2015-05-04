@@ -84,6 +84,41 @@ describe('Cockpit Process Instance Spec', function() {
   });
 
 
+  describe('edit User Task assignee', function() {
+
+    before(function() {
+      return testHelper(setupFile, function() {
+        dashboardPage.navigateToWebapp('Cockpit');
+        dashboardPage.authentication.userLogin('admin', 'admin');
+        dashboardPage.deployedProcessesList.selectProcess(0);
+        definitionPage.processInstancesTab.selectInstance(0);
+      });
+    });
+
+
+    it('should open user tasks tab', function() {
+
+      // when
+      instancePage.userTasksTab.selectTab();
+
+      // then
+      expect(instancePage.userTasksTab.table().count()).to.eventually.eql(1);
+      expect(instancePage.userTasksTab.userTaskName(0)).to.eventually.eql('User Task 1');
+    });
+
+
+    it('should select user task', function() {
+
+      // when
+      instancePage.userTasksTab.selectUserTask(0);
+
+      // then
+      expect(instancePage.diagram.isActivitySelected('UserTask_1')).to.eventually.be.true;
+    });
+
+  });
+
+
   describe('work with variables', function() {
 
     before(function() {
