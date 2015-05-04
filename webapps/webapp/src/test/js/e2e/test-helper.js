@@ -63,8 +63,31 @@ module.exports = function (operations, noReset, done) {
   });
 
   CamSDK.utils.series(callbacks, function(err, result) {
-    done(err, result);
-    deferred.fulfill();
+    // now all process instances are started, we can start the jobs to create incidents
+    if(err) {
+      done(err, result);
+      deferred.reject();
+    }
+
+    var resource = new camClient.resource('job');
+
+    resource.list({}, function(err, result) {
+      var jobTasks = [];
+      for(var i = 0; i < result.length; i++) {
+        jobTasks.push((function(i) {
+          return function(cb) {
+            resource.setRetries({
+              id: result[i].id,
+              retries: 0
+            }, cb);
+          };
+        })(i));
+      }
+      CamSDK.utils.series(jobTasks, function(err, result) {
+        done(err, result);
+        deferred.fulfill();
+      });
+    });
   });
 
   return deferred.promise;
