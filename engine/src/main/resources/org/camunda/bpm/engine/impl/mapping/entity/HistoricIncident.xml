@@ -9,6 +9,7 @@
   <insert id="insertHistoricIncidentEvent" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricIncidentEventEntity">
       insert into ${prefix}ACT_HI_INCIDENT (
         ID_,
+        PROC_DEF_KEY_,
         PROC_DEF_ID_,
         PROC_INST_ID_,
         EXECUTION_ID_,
@@ -23,6 +24,7 @@
         INCIDENT_STATE_
       ) values (
         #{id ,jdbcType=VARCHAR},
+        #{processDefinitionKey, jdbcType=VARCHAR},
         #{processDefinitionId, jdbcType=VARCHAR},
         #{processInstanceId, jdbcType=VARCHAR},
         #{executionId, jdbcType=VARCHAR},
@@ -68,6 +70,7 @@
 
   <resultMap id="historicIncidentResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricIncidentEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
@@ -135,6 +138,22 @@
       <if test="incidentState != null">
         and RES.INCIDENT_STATE_ = #{incidentState.stateCode}
       </if>
+
+      <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+        AND
+          ( CASE
+
+            WHEN
+              <!-- incident exists in context of a process instance -->
+              RES.PROC_DEF_ID_ is not null
+            THEN
+              (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />)
+
+            ELSE
+              1
+          END ) = 1
+      </if>
+
     </where>
   </sql>
 

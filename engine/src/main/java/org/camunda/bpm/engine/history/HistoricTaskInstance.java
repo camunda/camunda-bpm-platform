@@ -30,6 +30,9 @@ public interface HistoricTaskInstance {
    */
   String getId();
 
+  /** Process definition key reference. */
+  String getProcessDefinitionKey();
+
   /** Process definition reference. */
   String getProcessDefinitionId();
 
@@ -38,6 +41,9 @@ public interface HistoricTaskInstance {
 
   /** Execution reference. */
   String getExecutionId();
+
+  /** Case definition key reference. */
+  String getCaseDefinitionKey();
 
   /** Case definition reference. */
   String getCaseDefinitionId();

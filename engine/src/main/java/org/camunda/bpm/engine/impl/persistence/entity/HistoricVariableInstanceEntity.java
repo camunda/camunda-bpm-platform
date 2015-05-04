@@ -20,12 +20,12 @@ import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.DbEntityLifecycleAware;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
-import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
-import org.camunda.bpm.engine.impl.variable.serializer.ValueFields;
 import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
+import org.camunda.bpm.engine.impl.variable.serializer.ValueFields;
 import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -38,12 +38,17 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
   private static final long serialVersionUID = 1L;
 
   protected String id;
+
+  protected String processDefinitionKey;
+  protected String processDefinitionId;
   protected String processInstanceId;
 
   protected String taskId;
   protected String executionId;
   protected String activityInstanceId;
 
+  protected String caseDefinitionKey;
+  protected String caseDefinitionId;
   protected String caseInstanceId;
   protected String caseExecutionId;
 
@@ -73,10 +78,14 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
 
   public void updateFromEvent(HistoricVariableUpdateEventEntity historyEvent) {
     this.id = historyEvent.getVariableInstanceId();
+    this.processDefinitionKey = historyEvent.getProcessDefinitionKey();
+    this.processDefinitionId = historyEvent.getProcessDefinitionId();
     this.processInstanceId = historyEvent.getProcessInstanceId();
     this.taskId = historyEvent.getTaskId();
     this.executionId = historyEvent.getExecutionId();
     this.activityInstanceId = historyEvent.getScopeActivityInstanceId();
+    this.caseDefinitionKey = historyEvent.getCaseDefinitionKey();
+    this.caseDefinitionId = historyEvent.getCaseDefinitionId();
     this.caseInstanceId = historyEvent.getCaseInstanceId();
     this.caseExecutionId = historyEvent.getCaseExecutionId();
     this.name = historyEvent.getVariableName();
@@ -314,10 +323,6 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     this.byteArrayValue = byteArrayValue;
   }
 
-  public void setProcessInstanceId(String processInstanceId) {
-    this.processInstanceId = processInstanceId;
-  }
-
   public String getId() {
     return id;
   }
@@ -326,8 +331,28 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     this.id = id;
   }
 
+  public String getProcessDefinitionKey() {
+    return processDefinitionKey;
+  }
+
+  public void setProcessDefinitionKey(String processDefinitionKey) {
+    this.processDefinitionKey = processDefinitionKey;
+  }
+
+  public String getProcessDefinitionId() {
+    return processDefinitionId;
+  }
+
+  public void setProcessDefinitionId(String processDefinitionId) {
+    this.processDefinitionId = processDefinitionId;
+  }
+
   public String getProcessInstanceId() {
     return processInstanceId;
+  }
+
+  public void setProcessInstanceId(String processInstanceId) {
+    this.processInstanceId = processInstanceId;
   }
 
   public String getTaskId() {
@@ -359,6 +384,22 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     this.activityInstanceId = activityInstanceId;
   }
 
+  public String getCaseDefinitionKey() {
+    return caseDefinitionKey;
+  }
+
+  public void setCaseDefinitionKey(String caseDefinitionKey) {
+    this.caseDefinitionKey = caseDefinitionKey;
+  }
+
+  public String getCaseDefinitionId() {
+    return caseDefinitionId;
+  }
+
+  public void setCaseDefinitionId(String caseDefinitionId) {
+    this.caseDefinitionId = caseDefinitionId;
+  }
+
   public String getCaseInstanceId() {
     return caseInstanceId;
   }
@@ -383,10 +424,14 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
   public String toString() {
     return this.getClass().getSimpleName()
       + "[id=" + id
+      + ", processDefinitionKey=" + processDefinitionKey
+      + ", processDefinitionId=" + processDefinitionId
       + ", processInstanceId=" + processInstanceId
       + ", taskId=" + taskId
       + ", executionId=" + executionId
       + ", activityInstanceId=" + activityInstanceId
+      + ", caseDefinitionKey=" + caseDefinitionKey
+      + ", caseDefinitionId=" + caseDefinitionId
       + ", caseInstanceId=" + caseInstanceId
       + ", caseExecutionId=" + caseExecutionId
       + ", name=" + name

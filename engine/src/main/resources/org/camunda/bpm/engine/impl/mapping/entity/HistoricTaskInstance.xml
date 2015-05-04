@@ -23,9 +23,11 @@
   <insert id="insertHistoricTaskInstanceEvent" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity">
       insert into ${prefix}ACT_HI_TASKINST (
         ID_,
+        PROC_DEF_KEY_,
         PROC_DEF_ID_,
         PROC_INST_ID_,
         EXECUTION_ID_,
+        CASE_DEF_KEY_,
         CASE_DEF_ID_,
         CASE_INST_ID_,
         CASE_EXECUTION_ID_,
@@ -45,9 +47,11 @@
         FOLLOW_UP_DATE_
       ) values (
         #{id ,jdbcType=VARCHAR},
+        #{processDefinitionKey, jdbcType=VARCHAR},
         #{processDefinitionId, jdbcType=VARCHAR},
         #{processInstanceId, jdbcType=VARCHAR},
         #{executionId, jdbcType=VARCHAR},
+        #{caseDefinitionKey, jdbcType=VARCHAR},
         #{caseDefinitionId, jdbcType=VARCHAR},
         #{caseInstanceId, jdbcType=VARCHAR},
         #{caseExecutionId, jdbcType=VARCHAR},
@@ -109,9 +113,11 @@
 
   <resultMap id="historicTaskInstanceResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
+    <result property="caseDefinitionKey" column="CASE_DEF_KEY_" jdbcType="VARCHAR" />
     <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />
     <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
     <result property="caseExecutionId" column="CASE_EXECUTION_ID_" jdbcType="VARCHAR" />
@@ -159,7 +165,7 @@
   <select id="selectHistoricTaskInstancesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricTaskInstanceQueryImpl" resultMap="historicTaskInstanceResultMap">
   	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* 
+    select RES.*
     ${limitBetween}
     <include refid="selectHistoricTaskInstancesByQueryCriteriaSql"/>
     ${orderBy}
@@ -314,7 +320,7 @@
               and PROC_INST_ID_ = RES.PROC_INST_ID_ and TASK_ID_ is null
             </otherwise>
           </choose>
-          
+
           <bind name="varTypeField" value="'VAR_TYPE_'"/>
           <bind name="varPrefix" value="''"/>
           <if test="queryVariableValue.valueConditions != null">
@@ -323,6 +329,24 @@
           </if>
         )
       </foreach>
+
+      <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+        AND
+          ( CASE
+
+            WHEN
+              <!-- task exists in context of a process instance -->
+              RES.EXECUTION_ID_ is not null
+            THEN
+              (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />)
+
+            ELSE
+              <!-- (1) standalone task or -->
+              <!-- (2) a task which exists in context of a case instance -->
+              1
+          END ) = 1
+      </if>
+
     </where>
   </sql>
 

@@ -12,11 +12,17 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
-import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventType;
@@ -25,8 +31,6 @@ import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Incident;
-
-import java.util.*;
 
 /**
  * @author roman.smirnov
@@ -296,6 +300,16 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
 
   public void setProcessInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
+  }
+
+  public ProcessDefinitionEntity getProcessDefinition() {
+    if (processDefinitionId != null) {
+      return Context
+          .getProcessEngineConfiguration()
+          .getDeploymentCache()
+          .findDeployedProcessDefinitionById(processDefinitionId);
+    }
+    return null;
   }
 
   public String getProcessDefinitionId() {

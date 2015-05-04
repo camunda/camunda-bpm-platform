@@ -368,7 +368,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     assertTrue(definition.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   // activate process definition by id ///////////////////////////////////////////
@@ -392,7 +392,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     }
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   public void testActivateProcessDefinitionById() {
@@ -409,7 +409,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     assertFalse(definition.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   // suspend process definition by id including instances ///////////////////////////////////////////
@@ -478,7 +478,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     assertTrue(instance.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   public void testSuspendProcessDefinitionByIdIncludingInstancesWithUpdateInstancePermissionOnProcessDefinition() {
@@ -499,7 +499,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     assertTrue(instance.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   // activate process definition by id including instances ///////////////////////////////////////////
@@ -528,7 +528,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     }
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   public void testActivateProcessDefinitionByIdIncludingInstancesWithUpdatePermissionOnProcessInstance() {
@@ -556,7 +556,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     }
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   public void testActivateProcessDefinitionByIdIncludingInstancesWithUpdatePermissionOnAnyProcessInstance() {
@@ -579,7 +579,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     assertFalse(instance.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   public void testActivateProcessDefinitionByIdIncludingInstancesWithUpdateInstancePermissionOnProcessDefinition() {
@@ -601,7 +601,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     assertFalse(instance.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   // suspend process definition by key ///////////////////////////////////////////
@@ -635,7 +635,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     assertTrue(definition.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   // activate process definition by id ///////////////////////////////////////////
@@ -658,7 +658,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     }
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   public void testActivateProcessDefinitionByKey() {
@@ -674,7 +674,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     assertFalse(definition.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   // suspend process definition by key including instances ///////////////////////////////////////////
@@ -740,7 +740,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     assertTrue(instance.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   public void testSuspendProcessDefinitionByKeyIncludingInstancesWithUpdateInstancePermissionOnProcessDefinition() {
@@ -760,7 +760,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     assertTrue(instance.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   // activate process definition by key including instances ///////////////////////////////////////////
@@ -788,7 +788,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     }
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   public void testActivateProcessDefinitionByKeyIncludingInstancesWithUpdatePermissionOnProcessInstance() {
@@ -815,7 +815,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     }
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   public void testActivateProcessDefinitionByKeyIncludingInstancesWithUpdatePermissionOnAnyProcessInstance() {
@@ -837,7 +837,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     assertFalse(instance.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   public void testActivateProcessDefinitionByKeyIncludingInstancesWithUpdateInstancePermissionOnProcessDefinition() {
@@ -858,7 +858,7 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     assertFalse(instance.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   // helper /////////////////////////////////////////////////////////////////////

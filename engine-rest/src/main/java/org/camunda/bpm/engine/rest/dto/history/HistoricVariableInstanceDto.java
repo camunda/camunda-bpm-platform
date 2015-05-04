@@ -19,8 +19,12 @@ public class HistoricVariableInstanceDto extends VariableValueDto {
 
   private String id;
   private String name;
+  private String processDefinitionKey;
+  private String processDefinitionId;
   private String processInstanceId;
   private String activityInstanceId;
+  private String caseDefinitionKey;
+  private String caseDefinitionId;
   private String errorMessage;
 
   public String getId() {
@@ -31,12 +35,28 @@ public class HistoricVariableInstanceDto extends VariableValueDto {
     return name;
   }
 
+  public String getProcessDefinitionKey() {
+    return processDefinitionKey;
+  }
+
+  public String getProcessDefinitionId() {
+    return processDefinitionId;
+  }
+
   public String getProcessInstanceId() {
     return processInstanceId;
   }
 
   public String getActivityInstanceId() {
     return activityInstanceId;
+  }
+
+  public String getCaseDefinitionKey() {
+    return caseDefinitionKey;
+  }
+
+  public String getCaseDefinitionId() {
+    return caseDefinitionId;
   }
 
   public String getErrorMessage() {
@@ -49,8 +69,12 @@ public class HistoricVariableInstanceDto extends VariableValueDto {
 
     dto.id = historicVariableInstance.getId();
     dto.name = historicVariableInstance.getName();
+    dto.processDefinitionKey = historicVariableInstance.getProcessDefinitionKey();
+    dto.processDefinitionId = historicVariableInstance.getProcessDefinitionId();
     dto.processInstanceId = historicVariableInstance.getProcessInstanceId();
     dto.activityInstanceId = historicVariableInstance.getActivityInstanceId();
+    dto.caseDefinitionKey = historicVariableInstance.getCaseDefinitionKey();
+    dto.caseDefinitionId = historicVariableInstance.getCaseDefinitionId();
 
     if(historicVariableInstance.getErrorMessage() == null) {
       VariableValueDto.fromTypedValue(dto, historicVariableInstance.getTypedValue());

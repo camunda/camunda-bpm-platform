@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
+import org.camunda.bpm.engine.history.HistoricFormField;
 import org.camunda.bpm.engine.history.HistoricFormProperty;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
@@ -34,6 +35,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
@@ -43,6 +45,7 @@ import org.camunda.bpm.engine.test.api.runtime.DummySerializable;
 import org.camunda.bpm.engine.test.api.runtime.util.CustomSerializable;
 import org.camunda.bpm.engine.test.api.runtime.util.FailingSerializable;
 import org.camunda.bpm.engine.test.history.SerializableVariable;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.junit.Assert;
@@ -1515,4 +1518,188 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
 
     taskService.deleteTask(newTask.getId(), true);
   }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testHistoricVariableUpdateProcessDefinitionProperty() {
+    // given
+    String key = "oneTaskProcess";
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(key);
+
+    String processInstanceId = processInstance.getId();
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    runtimeService.setVariable(processInstanceId, "aVariable", "aValue");
+    taskService.setVariableLocal(taskId, "aLocalVariable", "anotherValue");
+
+    String firstVariable = runtimeService
+        .createVariableInstanceQuery()
+        .variableName("aVariable")
+        .singleResult()
+        .getId();
+
+    String secondVariable = runtimeService
+        .createVariableInstanceQuery()
+        .variableName("aLocalVariable")
+        .singleResult()
+        .getId();
+
+    // when (1)
+    HistoricVariableUpdate instance = (HistoricVariableUpdate) historyService
+        .createHistoricDetailQuery()
+        .variableUpdates()
+        .variableInstanceId(firstVariable)
+        .singleResult();
+
+    // then (1)
+    assertNotNull(instance.getProcessDefinitionKey());
+    assertEquals(key, instance.getProcessDefinitionKey());
+
+    assertNotNull(instance.getProcessDefinitionId());
+    assertEquals(processInstance.getProcessDefinitionId(), instance.getProcessDefinitionId());
+
+    assertNull(instance.getCaseDefinitionKey());
+    assertNull(instance.getCaseDefinitionId());
+
+    // when (2)
+    instance = (HistoricVariableUpdate) historyService
+        .createHistoricDetailQuery()
+        .variableUpdates()
+        .variableInstanceId(secondVariable)
+        .singleResult();
+
+    // then (2)
+    assertNotNull(instance.getProcessDefinitionKey());
+    assertEquals(key, instance.getProcessDefinitionKey());
+
+    assertNotNull(instance.getProcessDefinitionId());
+    assertEquals(processInstance.getProcessDefinitionId(), instance.getProcessDefinitionId());
+
+    assertNull(instance.getCaseDefinitionKey());
+    assertNull(instance.getCaseDefinitionId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn")
+  public void testHistoricVariableUpdateCaseDefinitionProperty() {
+    // given
+    String key = "oneTaskCase";
+    CaseInstance caseInstance = caseService.createCaseInstanceByKey(key);
+
+    String caseInstanceId = caseInstance.getId();
+
+    String humanTask = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+    caseService.manuallyStartCaseExecution(humanTask);
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    caseService.setVariable(caseInstanceId, "aVariable", "aValue");
+    taskService.setVariableLocal(taskId, "aLocalVariable", "anotherValue");
+
+    String firstVariable = runtimeService
+        .createVariableInstanceQuery()
+        .variableName("aVariable")
+        .singleResult()
+        .getId();
+
+    String secondVariable = runtimeService
+        .createVariableInstanceQuery()
+        .variableName("aLocalVariable")
+        .singleResult()
+        .getId();
+
+
+    // when (1)
+    HistoricVariableUpdate instance = (HistoricVariableUpdate) historyService
+        .createHistoricDetailQuery()
+        .variableUpdates()
+        .variableInstanceId(firstVariable)
+        .singleResult();
+
+    // then (1)
+    assertNotNull(instance.getCaseDefinitionKey());
+    assertEquals(key, instance.getCaseDefinitionKey());
+
+    assertNotNull(instance.getCaseDefinitionId());
+    assertEquals(caseInstance.getCaseDefinitionId(), instance.getCaseDefinitionId());
+
+    assertNull(instance.getProcessDefinitionKey());
+    assertNull(instance.getProcessDefinitionId());
+
+    // when (2)
+    instance = (HistoricVariableUpdate) historyService
+        .createHistoricDetailQuery()
+        .variableUpdates()
+        .variableInstanceId(secondVariable)
+        .singleResult();
+
+    // then (2)
+    assertNotNull(instance.getCaseDefinitionKey());
+    assertEquals(key, instance.getCaseDefinitionKey());
+
+    assertNotNull(instance.getCaseDefinitionId());
+    assertEquals(caseInstance.getCaseDefinitionId(), instance.getCaseDefinitionId());
+
+    assertNull(instance.getProcessDefinitionKey());
+    assertNull(instance.getProcessDefinitionId());
+  }
+
+  public void testHistoricVariableUpdateStandaloneTaskDefinitionProperties() {
+    // given
+    String taskId = "myTask";
+    Task task = taskService.newTask(taskId);
+    taskService.saveTask(task);
+
+    taskService.setVariable(taskId, "aVariable", "anotherValue");
+
+    String firstVariable = runtimeService
+        .createVariableInstanceQuery()
+        .variableName("aVariable")
+        .singleResult()
+        .getId();
+
+    // when
+    HistoricVariableUpdate instance = (HistoricVariableUpdate) historyService
+        .createHistoricDetailQuery()
+        .variableUpdates()
+        .variableInstanceId(firstVariable)
+        .singleResult();
+
+    // then
+    assertNull(instance.getProcessDefinitionKey());
+    assertNull(instance.getProcessDefinitionId());
+    assertNull(instance.getCaseDefinitionKey());
+    assertNull(instance.getCaseDefinitionId());
+
+    taskService.deleteTask(taskId, true);
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testHistoricFormFieldProcessDefinitionProperty() {
+    // given
+    String key = "oneTaskProcess";
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(key);
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    formService.submitTaskForm(taskId, Variables.createVariables().putValue("aVariable", "aValue"));
+
+    // when
+    HistoricFormField instance = (HistoricFormField) historyService
+        .createHistoricDetailQuery()
+        .formFields()
+        .singleResult();
+
+    // then
+    assertNotNull(instance.getProcessDefinitionKey());
+    assertEquals(key, instance.getProcessDefinitionKey());
+
+    assertNotNull(instance.getProcessDefinitionId());
+    assertEquals(processInstance.getProcessDefinitionId(), instance.getProcessDefinitionId());
+
+    assertNull(instance.getCaseDefinitionKey());
+    assertNull(instance.getCaseDefinitionId());
+  }
+
 }

@@ -83,6 +83,8 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
       .body("variableInstanceId", equalTo(builder.getVariableInstanceId()))
       .body("variableType", equalTo(VariableTypeHelper.toExpectedValueTypeName(builder.getTypedValue().getType())))
       .body("value", equalTo(builder.getValue()))
+      .body("processDefinitionKey", equalTo(builder.getProcessDefinitionKey()))
+      .body("processDefinitionId", equalTo(builder.getProcessDefinitionId()))
       .body("processInstanceId", equalTo(builder.getProcessInstanceId()))
       .body("errorMessage", equalTo(builder.getErrorMessage()))
       .body("activityInstanceId", equalTo(builder.getActivityInstanceId()))
@@ -90,6 +92,8 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
       .body("time", equalTo(builder.getTime()))
       .body("taskId", equalTo(builder.getTaskId()))
       .body("executionId", equalTo(builder.getExecutionId()))
+      .body("caseDefinitionKey", equalTo(builder.getCaseDefinitionKey()))
+      .body("caseDefinitionId", equalTo(builder.getCaseDefinitionId()))
     .when().get(HISTORIC_DETAIL_URL);
 
     verify(historicDetailQueryMock, times(1)).disableBinaryFetching();
@@ -119,6 +123,8 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
       .body("value", equalTo("a value"))
       .body("valueInfo.serializationDataFormat", equalTo("aDataFormat"))
       .body("valueInfo.objectTypeName", equalTo("aTypeName"))
+      .body("processDefinitionKey", equalTo(builder.getProcessDefinitionKey()))
+      .body("processDefinitionId", equalTo(builder.getProcessDefinitionId()))
       .body("processInstanceId", equalTo(builder.getProcessInstanceId()))
       .body("errorMessage", equalTo(builder.getErrorMessage()))
       .body("activityInstanceId", equalTo(builder.getActivityInstanceId()))
@@ -126,6 +132,8 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
       .body("time", equalTo(builder.getTime()))
       .body("taskId", equalTo(builder.getTaskId()))
       .body("executionId", equalTo(builder.getExecutionId()))
+      .body("caseDefinitionKey", equalTo(builder.getCaseDefinitionKey()))
+      .body("caseDefinitionId", equalTo(builder.getCaseDefinitionId()))
     .when().get(HISTORIC_DETAIL_URL);
 
     verify(historicDetailQueryMock, times(1)).disableBinaryFetching();
@@ -157,6 +165,8 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
       .body("value", equalTo("a serialized value"))
       .body("valueInfo.serializationDataFormat", equalTo("aDataFormat"))
       .body("valueInfo.objectTypeName", equalTo("aTypeName"))
+      .body("processDefinitionKey", equalTo(builder.getProcessDefinitionKey()))
+      .body("processDefinitionId", equalTo(builder.getProcessDefinitionId()))
       .body("processInstanceId", equalTo(builder.getProcessInstanceId()))
       .body("errorMessage", equalTo(builder.getErrorMessage()))
       .body("activityInstanceId", equalTo(builder.getActivityInstanceId()))
@@ -164,6 +174,8 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
       .body("time", equalTo(builder.getTime()))
       .body("taskId", equalTo(builder.getTaskId()))
       .body("executionId", equalTo(builder.getExecutionId()))
+      .body("caseDefinitionKey", equalTo(builder.getCaseDefinitionKey()))
+      .body("caseDefinitionId", equalTo(builder.getCaseDefinitionId()))
     .when().get(HISTORIC_DETAIL_URL);
 
     verify(historicDetailQueryMock, times(1)).disableBinaryFetching();
@@ -191,6 +203,8 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
       .body("variableInstanceId", equalTo(builder.getVariableInstanceId()))
       .body("variableType", equalTo(VariableTypeHelper.toExpectedValueTypeName(builder.getTypedValue().getType())))
       .body("value", equalTo(builder.getValue()))
+      .body("processDefinitionKey", equalTo(builder.getProcessDefinitionKey()))
+      .body("processDefinitionId", equalTo(builder.getProcessDefinitionId()))
       .body("processInstanceId", equalTo(builder.getProcessInstanceId()))
       .body("errorMessage", equalTo(builder.getErrorMessage()))
       .body("activityInstanceId", equalTo(builder.getActivityInstanceId()))
@@ -198,6 +212,8 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
       .body("time", equalTo(builder.getTime()))
       .body("taskId", equalTo(builder.getTaskId()))
       .body("executionId", equalTo(builder.getExecutionId()))
+      .body("caseDefinitionKey", equalTo(builder.getCaseDefinitionKey()))
+      .body("caseDefinitionId", equalTo(builder.getCaseDefinitionId()))
     .when().get(HISTORIC_DETAIL_URL);
 
     verify(historicDetailQueryMock, times(1)).disableBinaryFetching();

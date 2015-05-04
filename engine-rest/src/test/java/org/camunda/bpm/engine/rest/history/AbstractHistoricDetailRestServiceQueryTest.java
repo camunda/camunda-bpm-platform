@@ -15,8 +15,8 @@ package org.camunda.bpm.engine.rest.history;
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -308,6 +308,8 @@ public abstract class AbstractHistoricDetailRestServiceQueryTest extends Abstrac
           .body("[0].variableType", equalTo(VariableTypeHelper.toExpectedValueTypeName(
               historicUpdateBuilder.getTypedValue().getType())))
           .body("[0].value", equalTo(historicUpdateBuilder.getTypedValue().getValue()))
+          .body("[0].processDefinitionKey", equalTo(historicUpdateBuilder.getProcessDefinitionKey()))
+          .body("[0].processDefinitionId", equalTo(historicUpdateBuilder.getProcessDefinitionId()))
           .body("[0].processInstanceId", equalTo(historicUpdateBuilder.getProcessInstanceId()))
           .body("[0].errorMessage", equalTo(historicUpdateBuilder.getErrorMessage()))
           .body("[0].activityInstanceId", equalTo(historicUpdateBuilder.getActivityInstanceId()))
@@ -316,6 +318,8 @@ public abstract class AbstractHistoricDetailRestServiceQueryTest extends Abstrac
           .body("[0].taskId", equalTo(historicUpdateBuilder.getTaskId()))
           .body("[0].executionId", equalTo(historicUpdateBuilder.getExecutionId()))
           .body("[0].type", equalTo("variableUpdate"))
+          .body("[0].caseDefinitionKey", equalTo(historicUpdateBuilder.getCaseDefinitionKey()))
+          .body("[0].caseDefinitionId", equalTo(historicUpdateBuilder.getCaseDefinitionId()))
         .when()
           .get(HISTORIC_DETAIL_RESOURCE_URL);
 
@@ -331,6 +335,8 @@ public abstract class AbstractHistoricDetailRestServiceQueryTest extends Abstrac
     // note: element [0] is asserted as part of the fluent rest-assured invocation
 
     String returnedId2 = from(content).getString("[1].id");
+    String returnedProcessDefinitionKey2 = from(content).getString("[1].processDefinitionKey");
+    String returnedProcessDefinitionId2 = from(content).getString("[1].processDefinitionId");
     String returnedProcessInstanceId2 = from(content).getString("[1].processInstanceId");
     String returnedActivityInstanceId2 = from(content).getString("[1].activityInstanceId");
     String returnedExecutionId2 = from(content).getString("[1].executionId");
@@ -339,8 +345,12 @@ public abstract class AbstractHistoricDetailRestServiceQueryTest extends Abstrac
     String returnedFieldId = from(content).getString("[1].fieldId");
     String returnedFieldValue = from(content).getString("[1].fieldValue");
     String returnedType = from(content).getString("[1].type");
+    String returnedCaseDefinitionKey2 = from(content).getString("[1].caseDefinitionKey");
+    String returnedCaseDefinitionId2 = from(content).getString("[1].caseDefinitionId");
 
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_ID, returnedId2);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_PROC_DEF_KEY, returnedProcessDefinitionKey2);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_PROC_DEF_ID, returnedProcessDefinitionId2);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_PROC_INST_ID, returnedProcessInstanceId2);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_ACT_INST_ID, returnedActivityInstanceId2);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_EXEC_ID, returnedExecutionId2);
@@ -349,6 +359,8 @@ public abstract class AbstractHistoricDetailRestServiceQueryTest extends Abstrac
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_FIELD_ID, returnedFieldId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_VALUE, returnedFieldValue);
     Assert.assertEquals("formField", returnedType);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_CASE_DEF_ID, returnedCaseDefinitionId2);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_CASE_DEF_KEY, returnedCaseDefinitionKey2);
 
   }
 

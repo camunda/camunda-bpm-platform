@@ -866,4 +866,51 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
     taskService.deleteTask(task.getId(), true);
 
   }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testProcessDefinitionKeyProperty() {
+    // given
+    String key = "oneTaskProcess";
+    String processInstanceId = runtimeService.startProcessInstanceByKey(key).getId();
+
+    // when
+    HistoricTaskInstance task = historyService
+        .createHistoricTaskInstanceQuery()
+        .processInstanceId(processInstanceId)
+        .taskDefinitionKey("theTask")
+        .singleResult();
+
+    // then
+    assertNotNull(task.getProcessDefinitionKey());
+    assertEquals(key, task.getProcessDefinitionKey());
+
+    assertNull(task.getCaseDefinitionKey());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn")
+  public void testCaseDefinitionKeyProperty() {
+    // given
+    String key = "oneTaskCase";
+    String caseInstanceId = caseService.createCaseInstanceByKey(key).getId();
+    String humanTask = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+    caseService.manuallyStartCaseExecution(humanTask);
+
+    // when
+    HistoricTaskInstance task = historyService
+        .createHistoricTaskInstanceQuery()
+        .caseInstanceId(caseInstanceId)
+        .taskDefinitionKey("PI_HumanTask_1")
+        .singleResult();
+
+    // then
+    assertNotNull(task.getCaseDefinitionKey());
+    assertEquals(key, task.getCaseDefinitionKey());
+
+    assertNull(task.getProcessDefinitionKey());
+  }
+
 }

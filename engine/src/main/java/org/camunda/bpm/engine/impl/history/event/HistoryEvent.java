@@ -90,6 +90,9 @@ public class HistoryEvent implements Serializable, DbEntity {
   /** the id of the process definition */
   protected String processDefinitionId;
 
+  /** the key of the process definition */
+  protected String processDefinitionKey;
+
   /** the case instance in which the event has happened */
   protected String caseInstanceId;
 
@@ -98,6 +101,9 @@ public class HistoryEvent implements Serializable, DbEntity {
 
   /** the id of the case definition */
   protected String caseDefinitionId;
+
+  /** the key of the case definition */
+  protected String caseDefinitionKey;
 
   /**
    * The type of the activity audit event.
@@ -131,6 +137,22 @@ public class HistoryEvent implements Serializable, DbEntity {
 
   public void setProcessDefinitionId(String processDefinitionId) {
     this.processDefinitionId = processDefinitionId;
+  }
+
+  public String getProcessDefinitionKey() {
+    return processDefinitionKey;
+  }
+
+  public void setProcessDefinitionKey(String processDefinitionKey) {
+    this.processDefinitionKey = processDefinitionKey;
+  }
+
+  public String getCaseDefinitionKey() {
+    return caseDefinitionKey;
+  }
+
+  public void setCaseDefinitionKey(String caseDefinitionKey) {
+    this.caseDefinitionKey = caseDefinitionKey;
   }
 
   public String getCaseDefinitionId() {

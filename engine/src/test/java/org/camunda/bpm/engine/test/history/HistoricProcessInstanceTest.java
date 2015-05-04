@@ -824,4 +824,21 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     assertEquals(superCaseInstanceId, instance.getSuperCaseInstanceId());
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testProcessDefinitionKeyProperty() {
+    // given
+    String key = "oneTaskProcess";
+    String processInstanceId = runtimeService.startProcessInstanceByKey(key).getId();
+
+    // when
+    HistoricProcessInstance instance = historyService
+        .createHistoricProcessInstanceQuery()
+        .processInstanceId(processInstanceId)
+        .singleResult();
+
+    // then
+    assertNotNull(instance.getProcessDefinitionKey());
+    assertEquals(key, instance.getProcessDefinitionKey());
+  }
+
 }

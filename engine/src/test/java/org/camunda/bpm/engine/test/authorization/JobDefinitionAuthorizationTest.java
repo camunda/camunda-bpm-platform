@@ -21,7 +21,6 @@ import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.impl.AbstractQuery;
-import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
 import org.camunda.bpm.engine.runtime.Job;
@@ -753,7 +752,7 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
     }
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   public void testSuspendByProcessDefinitionKeyWithUpdatePermissionOnProcessDefinition() {
@@ -769,7 +768,7 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
     assertTrue(jobDefinition.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   public void testSuspendByProcessDefinitionKeyWithUpdatePermissionOnAnyProcessDefinition() {
@@ -785,7 +784,7 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
     assertTrue(jobDefinition.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   // activate job definition by process definition key ///////////////////////////////
@@ -808,7 +807,7 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
     }
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   public void testActivateByProcessDefinitionKeyWithUpdatePermissionOnProcessDefinition() {
@@ -825,7 +824,7 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
     assertFalse(jobDefinition.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   public void testActivateByProcessDefinitionKeyWithUpdatePermissionOnAnyProcessDefinition() {
@@ -842,7 +841,7 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
     assertFalse(jobDefinition.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   // suspend job definition by process definition key (including jobs) ///////////////////////////////
@@ -869,7 +868,7 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
     }
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   public void testSuspendIncludingJobsByProcessDefinitionKeyWithUpdatePermissionOnProcessInstance() {
@@ -895,7 +894,7 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
     }
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   public void testSuspendIncludingJobsByProcessDefinitionKeyWithUpdatePermissionOnAnyProcessInstance() {
@@ -918,7 +917,7 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
     assertTrue(job.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   public void testSuspendIncludingJobsByProcessDefinitionKeyWithUpdateInstancePermissionOnProcessDefinition() {
@@ -940,7 +939,7 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
     assertTrue(job.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   public void testSuspendIncludingJobsByProcessDefinitionKeyWithUpdateInstancePermissionOnAnyProcessDefinition() {
@@ -963,7 +962,7 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
     assertTrue(job.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   // activate job definition by id (including jobs) ///////////////////////////////
@@ -991,7 +990,7 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
     }
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   public void testActivateIncludingJobsByProcessDefinitionKeyWithUpdatePermissionOnProcessInstance() {
@@ -1018,7 +1017,7 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
     }
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   public void testActivateIncludingJobsByProcessDefinitionKeyWithUpdatePermissionOnAnyProcessInstance() {
@@ -1042,7 +1041,7 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
     assertFalse(job.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   public void testActivateIncludingJobsByProcessDefinitionKeyWithUpdateInstancePermissionOnProcessDefinition() {
@@ -1065,7 +1064,7 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
     assertFalse(job.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   public void testActivateIncludingJobsByProcessDefinitionKeyWithUpdateInstancePermissionOnAnyProcessDefinition() {
@@ -1089,7 +1088,7 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
     assertFalse(job.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   // helper /////////////////////////////////////////////////////

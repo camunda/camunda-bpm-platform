@@ -39,6 +39,9 @@ public interface HistoricActivityInstance {
   /** The XML tag of the activity as in the process file */
   String getActivityType();
 
+  /** Process definition key reference */
+  String getProcessDefinitionKey();
+
   /** Process definition reference */
   String getProcessDefinitionId();
 

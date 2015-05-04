@@ -74,6 +74,7 @@ public abstract class AbstractHistoricActivityInstanceRestServiceInteractionTest
     String returnedActivityId = from(content).getString("activityId");
     String returnedActivityName = from(content).getString("activityName");
     String returnedActivityType = from(content).getString("activityType");
+    String returnedProcessDefinitionKey = from(content).getString("processDefinitionKey");
     String returnedProcessDefinitionId = from(content).getString("processDefinitionId");
     String returnedProcessInstanceId = from(content).getString("processInstanceId");
     String returnedExecutionId = from(content).getString("executionId");
@@ -92,6 +93,7 @@ public abstract class AbstractHistoricActivityInstanceRestServiceInteractionTest
     Assert.assertEquals(MockProvider.EXAMPLE_ACTIVITY_ID, returnedActivityId);
     Assert.assertEquals(MockProvider.EXAMPLE_ACTIVITY_NAME, returnedActivityName);
     Assert.assertEquals(MockProvider.EXAMPLE_ACTIVITY_TYPE, returnedActivityType);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, returnedProcessDefinitionKey);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, returnedProcessDefinitionId);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, returnedProcessInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_EXECUTION_ID, returnedExecutionId);

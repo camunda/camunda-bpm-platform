@@ -510,6 +510,16 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     this.caseInstanceId = caseInstanceId;
   }
 
+  public CaseDefinitionEntity getCaseDefinition() {
+    if (caseDefinitionId != null) {
+      return Context
+          .getProcessEngineConfiguration()
+          .getDeploymentCache()
+          .findDeployedCaseDefinitionById(caseDefinitionId);
+    }
+    return null;
+  }
+
   public String getCaseDefinitionId() {
     return caseDefinitionId;
   }
@@ -983,6 +993,16 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
   public String getProcessInstanceId() {
     return processInstanceId;
+  }
+
+  public ProcessDefinitionEntity getProcessDefinition() {
+    if (processDefinitionId != null) {
+      return Context
+          .getProcessEngineConfiguration()
+          .getDeploymentCache()
+          .findDeployedProcessDefinitionById(processDefinitionId);
+    }
+    return null;
   }
 
   public String getProcessDefinitionId() {

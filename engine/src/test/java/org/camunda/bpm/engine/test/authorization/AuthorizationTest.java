@@ -21,6 +21,7 @@ import static org.camunda.bpm.engine.authorization.Resources.AUTHORIZATION;
 import static org.camunda.bpm.engine.authorization.Resources.USER;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -32,10 +33,12 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.CaseInstance;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -394,6 +397,36 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
   protected void deleteDeployment(String deploymentId) {
     disableAuthorization();
     repositoryService.deleteDeployment(deploymentId, true);
+    enableAuthorization();
+  }
+
+  protected ProcessInstance startProcessAndExecuteJob(String key) {
+    ProcessInstance processInstance = startProcessInstanceByKey(key);
+    executeAvailableJobs(key);
+    return processInstance;
+  }
+
+  protected void executeAvailableJobs(String key) {
+    disableAuthorization();
+    List<Job> jobs = managementService.createJobQuery().processDefinitionKey(key).withRetriesLeft().list();
+
+    if (jobs.isEmpty()) {
+      enableAuthorization();
+      return;
+    }
+
+    for (Job job : jobs) {
+      try {
+        managementService.executeJob(job.getId());
+      } catch (Exception e) {}
+    }
+
+    executeAvailableJobs(key);
+  }
+
+  protected void clearOpLog() {
+    disableAuthorization();
+    TestHelper.clearOpLog(processEngineConfiguration);
     enableAuthorization();
   }
 

@@ -125,7 +125,20 @@
         and RES.CONFIGURATION_ = #{configuration}
       </if>
 
-      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+      <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+        AND
+          ( CASE
+
+            WHEN
+              <!-- incident exists in context of a process instance -->
+              RES.PROC_DEF_ID_ is not null
+            THEN
+              (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />)
+
+            ELSE
+              1
+          END ) = 1
+      </if>
 
     </where>
   </sql>

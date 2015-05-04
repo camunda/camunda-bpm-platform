@@ -25,7 +25,6 @@ public class UserOperationLogEntryEventEntity extends HistoryEvent implements Us
 
   protected String operationId;
   protected String operationType;
-  protected String processDefinitionKey;
   protected String jobId;
   protected String jobDefinitionId;
   protected String taskId;
@@ -42,10 +41,6 @@ public class UserOperationLogEntryEventEntity extends HistoryEvent implements Us
 
   public String getOperationType() {
     return operationType;
-  }
-
-  public String getProcessDefinitionKey() {
-    return processDefinitionKey;
   }
 
   public String getTaskId() {
@@ -78,10 +73,6 @@ public class UserOperationLogEntryEventEntity extends HistoryEvent implements Us
 
   public void setOperationType(String operationType) {
     this.operationType = operationType;
-  }
-
-  public void setProcessDefinitionKey(String processDefinitionKey) {
-    this.processDefinitionKey = processDefinitionKey;
   }
 
   public void setTaskId(String taskId) {

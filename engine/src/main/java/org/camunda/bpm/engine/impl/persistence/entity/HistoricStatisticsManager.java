@@ -28,10 +28,12 @@ public class HistoricStatisticsManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<HistoricActivityStatistics> getHistoricStatisticsGroupedByActivity(HistoricActivityStatisticsQueryImpl query, Page page) {
+    getAuthorizationManager().configureHistoricActivityStatisticsQuery(query);
     return getDbEntityManager().selectList("selectHistoricActivityStatistics", query, page);
   }
 
   public long getHistoricStatisticsCountGroupedByActivity(HistoricActivityStatisticsQueryImpl query) {
+    getAuthorizationManager().configureHistoricActivityStatisticsQuery(query);
     return (Long) getDbEntityManager().selectOne("selectHistoricActivityStatisticsCount", query);
   }
 

@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.history.IncidentState;
 import org.camunda.bpm.engine.history.JobState;
 import org.camunda.bpm.engine.history.UserOperationLogContext;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
@@ -43,7 +44,9 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
@@ -73,6 +76,11 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setProcessInstanceId(execution.getProcessInstanceId());
     evt.setExecutionId(execution.getId());
 
+    ProcessDefinitionEntity definition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+    if (definition != null) {
+      evt.setProcessDefinitionKey(definition.getKey());
+    }
+
     PvmScope eventSource = null;
     if(activityId != null) {
       eventSource = execution.getActivity();
@@ -94,8 +102,15 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     // the given execution is the process instance!
     String caseInstanceId = execution.getCaseInstanceId();
 
+    ProcessDefinitionEntity definition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+    String processDefinitionKey = null;
+    if (definition != null) {
+      processDefinitionKey = definition.getKey();
+    }
+
     evt.setId(processInstanceId);
     evt.setEventType(eventType.getEventName());
+    evt.setProcessDefinitionKey(processDefinitionKey);
     evt.setProcessDefinitionId(processDefinitionId);
     evt.setProcessInstanceId(processInstanceId);
     evt.setExecutionId(executionId);
@@ -105,9 +120,21 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
   protected void initTaskInstanceEvent(HistoricTaskInstanceEventEntity evt, TaskEntity taskEntity, HistoryEventType eventType) {
 
+    String processDefinitionKey = null;
+    ProcessDefinitionEntity definition = taskEntity.getProcessDefinition();
+    if (definition != null) {
+      processDefinitionKey = definition.getKey();
+    }
+
     String processDefinitionId = taskEntity.getProcessDefinitionId();
     String processInstanceId = taskEntity.getProcessInstanceId();
     String executionId = taskEntity.getExecutionId();
+
+    String caseDefinitionKey = null;
+    CaseDefinitionEntity caseDefinition = taskEntity.getCaseDefinition();
+    if (caseDefinition != null) {
+      caseDefinitionKey = caseDefinition.getKey();
+    }
 
     String caseDefinitionId = taskEntity.getCaseDefinitionId();
     String caseExecutionId = taskEntity.getCaseExecutionId();
@@ -117,10 +144,12 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setEventType(eventType.getEventName());
     evt.setTaskId(taskEntity.getId());
 
+    evt.setProcessDefinitionKey(processDefinitionKey);
     evt.setProcessDefinitionId(processDefinitionId);
     evt.setProcessInstanceId(processInstanceId);
     evt.setExecutionId(executionId);
 
+    evt.setCaseDefinitionKey(caseDefinitionKey);
     evt.setCaseDefinitionId(caseDefinitionId);
     evt.setCaseExecutionId(caseExecutionId);
     evt.setCaseInstanceId(caseInstanceId);
@@ -156,6 +185,24 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setRevision(variableInstance.getRevision());
     evt.setVariableName(variableInstance.getName());
     evt.setSerializerName(variableInstance.getSerializerName());
+
+    ExecutionEntity execution = variableInstance.getExecution();
+    if (execution != null) {
+      ProcessDefinitionEntity definition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+      if (definition != null) {
+        evt.setProcessDefinitionId(definition.getId());
+        evt.setProcessDefinitionKey(definition.getKey());
+      }
+    }
+
+    CaseExecutionEntity caseExecution = variableInstance.getCaseExecution();
+    if (caseExecution != null) {
+      CaseDefinitionEntity definition = (CaseDefinitionEntity) caseExecution.getCaseDefinition();
+      if (definition != null) {
+        evt.setCaseDefinitionId(definition.getId());
+        evt.setCaseDefinitionKey(definition.getKey());
+      }
+    }
 
     // copy value
     evt.setTextValue(variableInstance.getTextValue());
@@ -205,6 +252,12 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setRootCauseIncidentId(incident.getRootCauseIncidentId());
     evt.setConfiguration(incident.getConfiguration());
     evt.setIncidentMessage(incident.getIncidentMessage());
+
+    IncidentEntity incidentEntity = (IncidentEntity) incident;
+    ProcessDefinitionEntity definition = incidentEntity.getProcessDefinition();
+    if (definition != null) {
+      evt.setProcessDefinitionKey(definition.getKey());
+    }
 
     // init event type
     evt.setEventType(eventType.getEventName());
@@ -547,6 +600,11 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     historicFormPropertyEntity.setPropertyId(propertyId);
     historicFormPropertyEntity.setPropertyValue(propertyValue);
     historicFormPropertyEntity.setTaskId(taskId);
+
+    ProcessDefinitionEntity definition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+    if (definition != null) {
+      historicFormPropertyEntity.setProcessDefinitionKey(definition.getKey());
+    }
 
     // initialize sequence counter
     initSequenceCounter(execution, historicFormPropertyEntity);

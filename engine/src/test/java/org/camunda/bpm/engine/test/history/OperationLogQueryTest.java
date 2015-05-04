@@ -339,7 +339,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     assertNotNull(suspendEntry);
     assertEquals(process.getProcessDefinitionId(), suspendEntry.getProcessDefinitionId());
     assertNull(suspendEntry.getProcessInstanceId());
-    assertNull(suspendEntry.getProcessDefinitionKey());
+    assertEquals("oneTaskProcess", suspendEntry.getProcessDefinitionKey());
 
     assertEquals("suspensionState", suspendEntry.getProperty());
     assertEquals("suspended", suspendEntry.getNewValue());
@@ -353,7 +353,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
 
     assertNotNull(activateEntry);
     assertNull(activateEntry.getProcessInstanceId());
-    assertNull(activateEntry.getProcessDefinitionKey());
+    assertEquals("oneTaskProcess", activateEntry.getProcessDefinitionKey());
     assertEquals(process.getProcessDefinitionId(), activateEntry.getProcessDefinitionId());
 
     assertEquals("suspensionState", activateEntry.getProperty());
@@ -430,7 +430,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
 
     assertNotNull(suspendDefinitionEntry);
     assertEquals(process.getProcessDefinitionId(), suspendDefinitionEntry.getProcessDefinitionId());
-    assertNull(suspendDefinitionEntry.getProcessDefinitionKey());
+    assertEquals("oneTaskProcess", suspendDefinitionEntry.getProcessDefinitionKey());
 
     assertEquals("suspensionState", suspendDefinitionEntry.getProperty());
     assertEquals("suspended", suspendDefinitionEntry.getNewValue());
@@ -444,7 +444,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
 
     assertNotNull(activateDefinitionEntry);
     assertEquals(process.getProcessDefinitionId(), activateDefinitionEntry.getProcessDefinitionId());
-    assertNull(activateDefinitionEntry.getProcessDefinitionKey());
+    assertEquals("oneTaskProcess", activateDefinitionEntry.getProcessDefinitionKey());
 
     assertEquals("suspensionState", activateDefinitionEntry.getProperty());
     assertEquals("active", activateDefinitionEntry.getNewValue());

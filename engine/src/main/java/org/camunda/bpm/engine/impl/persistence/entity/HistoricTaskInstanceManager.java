@@ -70,8 +70,8 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
 
   public long findHistoricTaskInstanceCountByQueryCriteria(final HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
     if (isHistoryEnabled()) {
-      return (Long) getDbEntityManager()
-        .selectOne("selectHistoricTaskInstanceCountByQueryCriteria",historicTaskInstanceQuery);
+      getAuthorizationManager().configureHistoricTaskInstanceQuery(historicTaskInstanceQuery);
+      return (Long) getDbEntityManager().selectOne("selectHistoricTaskInstanceCountByQueryCriteria",historicTaskInstanceQuery);
     }
 
     return 0;
@@ -80,6 +80,7 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
   @SuppressWarnings("unchecked")
   public List<HistoricTaskInstance> findHistoricTaskInstancesByQueryCriteria(final HistoricTaskInstanceQueryImpl historicTaskInstanceQuery, final Page page) {
     if (isHistoryEnabled()) {
+      getAuthorizationManager().configureHistoricTaskInstanceQuery(historicTaskInstanceQuery);
       return getDbEntityManager().selectList("selectHistoricTaskInstancesByQueryCriteria", historicTaskInstanceQuery, page);
     }
 

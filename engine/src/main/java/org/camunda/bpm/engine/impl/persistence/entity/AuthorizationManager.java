@@ -15,8 +15,10 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
+import static org.camunda.bpm.engine.authorization.Permissions.DELETE_HISTORY;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.READ;
+import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.READ_TASK;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
@@ -40,18 +42,29 @@ import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resource;
+import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.ActivityStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.AuthorizationQueryImpl;
 import org.camunda.bpm.engine.impl.DeploymentQueryImpl;
 import org.camunda.bpm.engine.impl.DeploymentStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.EventSubscriptionQueryImpl;
+import org.camunda.bpm.engine.impl.HistoricActivityInstanceQueryImpl;
+import org.camunda.bpm.engine.impl.HistoricActivityStatisticsQueryImpl;
+import org.camunda.bpm.engine.impl.HistoricDetailQueryImpl;
+import org.camunda.bpm.engine.impl.HistoricIncidentQueryImpl;
+import org.camunda.bpm.engine.impl.HistoricJobLogQueryImpl;
+import org.camunda.bpm.engine.impl.HistoricProcessInstanceQueryImpl;
+import org.camunda.bpm.engine.impl.HistoricTaskInstanceQueryImpl;
+import org.camunda.bpm.engine.impl.HistoricVariableInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.IncidentQueryImpl;
 import org.camunda.bpm.engine.impl.JobDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.JobQueryImpl;
 import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.ProcessDefinitionStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
+import org.camunda.bpm.engine.impl.UserOperationLogQueryImpl;
 import org.camunda.bpm.engine.impl.VariableInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.AuthorizationCheck;
@@ -424,6 +437,12 @@ public class AuthorizationManager extends AbstractManager {
     checkAuthorization(Arrays.asList(firstCheck, secondCheck));
   }
 
+  public void checkReadHistoricJobLog(HistoricJobLogEventEntity historicJobLog) {
+    if (historicJobLog.getProcessDefinitionKey() != null) {
+      checkAuthorization(READ_HISTORY, PROCESS_DEFINITION, historicJobLog.getProcessDefinitionKey());
+    }
+  }
+
   // update permission //////////////////////////////////////////////////
 
   public void checkUpdateProcessInstanceById(String processInstanceId) {
@@ -536,6 +555,10 @@ public class AuthorizationManager extends AbstractManager {
     secondCheck.setAuthorizationNotFoundReturnValue(0l);
 
     checkAuthorization(Arrays.asList(firstCheck, secondCheck));
+  }
+
+  public void checkDeleteHistoricProcessInstance(HistoricProcessInstance instance) {
+    checkAuthorization(DELETE_HISTORY, PROCESS_DEFINITION, instance.getProcessDefinitionKey());
   }
 
   /* TASK */
@@ -664,6 +687,27 @@ public class AuthorizationManager extends AbstractManager {
     }
   }
 
+  public void checkDeleteHistoricTaskInstance(HistoricTaskInstanceEntity task) {
+    if (task != null) {
+      if (task.getExecutionId() != null) {
+        checkAuthorization(DELETE_HISTORY, PROCESS_DEFINITION, task.getProcessDefinitionKey());
+      }
+    }
+  }
+
+  /* USER OPERATION LOG */
+
+  // delete user operation log ///////////////////////////////
+
+  public void checkDeleteUserOperationLog(UserOperationLogEntry entry) {
+    if (entry != null) {
+      String processDefinitionKey = entry.getProcessDefinitionKey();
+      if (processDefinitionKey != null) {
+        checkAuthorization(DELETE_HISTORY, PROCESS_DEFINITION, processDefinitionKey);
+      }
+    }
+  }
+
   /* QUERIES */
 
   // deployment query ////////////////////////////////////////
@@ -770,6 +814,62 @@ public class AuthorizationManager extends AbstractManager {
     configureQuery(query);
     addPermissionCheck(query, PROCESS_INSTANCE, "RES.PROCESS_INSTANCE_ID_", READ);
     addPermissionCheck(query, PROCESS_DEFINITION, "RES.PROCESS_DEF_KEY_", READ_INSTANCE);
+  }
+
+  /* HISTORY */
+
+  // historic process instance query ///////////////////////////////////
+
+  public void configureHistoricProcessInstanceQuery(HistoricProcessInstanceQueryImpl query) {
+    configureQuery(query, PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY);
+  }
+
+  // historic activity instance query /////////////////////////////////
+
+  public void configureHistoricActivityInstanceQuery(HistoricActivityInstanceQueryImpl query) {
+    configureQuery(query, PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY);
+  }
+
+  // historic task instance query ////////////////////////////////////
+
+  public void configureHistoricTaskInstanceQuery(HistoricTaskInstanceQueryImpl query) {
+    configureQuery(query, PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY);
+  }
+
+  // historic variable instance query ////////////////////////////////
+
+  public void configureHistoricVariableInstanceQuery(HistoricVariableInstanceQueryImpl query) {
+    configureQuery(query, PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY);
+  }
+
+  // historic detail query ////////////////////////////////
+
+  public void configureHistoricDetailQuery(HistoricDetailQueryImpl query) {
+    configureQuery(query, PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY);
+  }
+
+  // historic job log query ////////////////////////////////
+
+  public void configureHistoricJobLogQuery(HistoricJobLogQueryImpl query) {
+    configureQuery(query, PROCESS_DEFINITION, "RES.PROCESS_DEF_KEY_", READ_HISTORY);
+  }
+
+  // historic incident query ////////////////////////////////
+
+  public void configureHistoricIncidentQuery(HistoricIncidentQueryImpl query) {
+    configureQuery(query, PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY);
+  }
+
+  // historic activity statistics query /////////////////////
+
+  public void configureHistoricActivityStatisticsQuery(HistoricActivityStatisticsQueryImpl query) {
+    configureQuery(query, PROCESS_DEFINITION, "PROC_DEF_KEY_", READ_HISTORY);
+  }
+
+  // user operation log query ///////////////////////////////
+
+  public void configureUserOperationLogQuery(UserOperationLogQueryImpl query) {
+    configureQuery(query, PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_HISTORY);
   }
 
   /* STATISTICS QUERY */

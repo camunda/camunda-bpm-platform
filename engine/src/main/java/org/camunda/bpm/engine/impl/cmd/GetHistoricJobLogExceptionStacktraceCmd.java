@@ -16,6 +16,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
 
 /**
@@ -38,6 +39,9 @@ public class GetHistoricJobLogExceptionStacktraceCmd implements Command<String> 
         .findHistoricJobLogById(historicJobLogId);
 
     ensureNotNull("No historic job log found with id " + historicJobLogId, "historicJobLog", job);
+
+    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+    authorizationManager.checkReadHistoricJobLog(job);
 
     return job.getExceptionStacktrace();
   }

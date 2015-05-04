@@ -370,6 +370,7 @@ public abstract class AbstractHistoricActivityInstanceRestServiceQueryTest exten
     String returnedActivityId = from(content).getString("[0].activityId");
     String returnedActivityName = from(content).getString("[0].activityName");
     String returnedActivityType = from(content).getString("[0].activityType");
+    String returnedProcessDefinitionKey = from(content).getString("[0].processDefinitionKey");
     String returnedProcessDefinitionId = from(content).getString("[0].processDefinitionId");
     String returnedProcessInstanceId = from(content).getString("[0].processInstanceId");
     String returnedExecutionId = from(content).getString("[0].executionId");
@@ -388,6 +389,7 @@ public abstract class AbstractHistoricActivityInstanceRestServiceQueryTest exten
     Assert.assertEquals(MockProvider.EXAMPLE_ACTIVITY_ID, returnedActivityId);
     Assert.assertEquals(MockProvider.EXAMPLE_ACTIVITY_NAME, returnedActivityName);
     Assert.assertEquals(MockProvider.EXAMPLE_ACTIVITY_TYPE, returnedActivityType);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, returnedProcessDefinitionKey);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, returnedProcessDefinitionId);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, returnedProcessInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_EXECUTION_ID, returnedExecutionId);

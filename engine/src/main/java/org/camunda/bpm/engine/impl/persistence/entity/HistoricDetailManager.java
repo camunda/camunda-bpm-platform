@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureOnlyOneNotNull;
 
 import java.util.List;
+
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.impl.HistoricDetailQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
@@ -76,11 +77,13 @@ public class HistoricDetailManager extends AbstractHistoricManager {
   }
 
   public long findHistoricDetailCountByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery) {
+    getAuthorizationManager().configureHistoricDetailQuery(historicVariableUpdateQuery);
     return (Long) getDbEntityManager().selectOne("selectHistoricDetailCountByQueryCriteria", historicVariableUpdateQuery);
   }
 
   @SuppressWarnings("unchecked")
   public List<HistoricDetail> findHistoricDetailsByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery, Page page) {
+    getAuthorizationManager().configureHistoricDetailQuery(historicVariableUpdateQuery);
     return getDbEntityManager().selectList("selectHistoricDetailsByQueryCriteria", historicVariableUpdateQuery, page);
   }
 

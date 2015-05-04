@@ -2,6 +2,7 @@ create table ACT_HI_PROCINST (
     ID_ varchar(64) not null,
     PROC_INST_ID_ varchar(64) not null,
     BUSINESS_KEY_ varchar(255),
+    PROC_DEF_KEY_ varchar(255),
     PROC_DEF_ID_ varchar(64) not null,
     START_TIME_ timestamp not null,
     END_TIME_ timestamp,
@@ -20,6 +21,7 @@ create table ACT_HI_PROCINST (
 create table ACT_HI_ACTINST (
     ID_ varchar(64) not null,
     PARENT_ACT_INST_ID_ varchar(64),
+    PROC_DEF_KEY_ varchar(255),
     PROC_DEF_ID_ varchar(64) not null,
     PROC_INST_ID_ varchar(64) not null,
     EXECUTION_ID_ varchar(64) not null,
@@ -40,10 +42,12 @@ create table ACT_HI_ACTINST (
 
 create table ACT_HI_TASKINST (
     ID_ varchar(64) not null,
-    PROC_DEF_ID_ varchar(64),
     TASK_DEF_KEY_ varchar(255),
+    PROC_DEF_KEY_ varchar(255),
+    PROC_DEF_ID_ varchar(64),
     PROC_INST_ID_ varchar(64),
     EXECUTION_ID_ varchar(64),
+    CASE_DEF_KEY_ varchar(255),
     CASE_DEF_ID_ varchar(64),
     CASE_INST_ID_ varchar(64),
     CASE_EXECUTION_ID_ varchar(64),
@@ -65,12 +69,16 @@ create table ACT_HI_TASKINST (
 
 create table ACT_HI_VARINST (
     ID_ varchar(64) not null,
+    PROC_DEF_KEY_ varchar(255),
+    PROC_DEF_ID_ varchar(64),
     PROC_INST_ID_ varchar(64),
     EXECUTION_ID_ varchar(64),
-    ACT_INST_ID_ varchar(64),
+    CASE_DEF_KEY_ varchar(255),
+    CASE_DEF_ID_ varchar(64),
     CASE_INST_ID_ varchar(64),
     CASE_EXECUTION_ID_ varchar(64),
     TASK_ID_ varchar(64),
+    ACT_INST_ID_ varchar(64),
     NAME_ varchar(255) not null,
     VAR_TYPE_ varchar(100),
     REV_ integer,
@@ -87,8 +95,12 @@ create table ACT_HI_DETAIL (
     TYPE_ varchar(255) not null,
     TIME_ timestamp not null,
     NAME_ varchar(255) NOT null,
+    PROC_DEF_KEY_ varchar(255),
+    PROC_DEF_ID_ varchar(64),
     PROC_INST_ID_ varchar(64),
     EXECUTION_ID_ varchar(64),
+    CASE_DEF_KEY_ varchar(255),
+    CASE_DEF_ID_ varchar(64),
     CASE_INST_ID_ varchar(64),
     CASE_EXECUTION_ID_ varchar(64),
     TASK_ID_ varchar(64),
@@ -157,6 +169,7 @@ create table ACT_HI_OP_LOG (
 
 create table ACT_HI_INCIDENT (
   ID_ varchar(64) not null,
+  PROC_DEF_KEY_ varchar(255),
   PROC_DEF_ID_ varchar(64),
   PROC_INST_ID_ varchar(64),
   EXECUTION_ID_ varchar(64),

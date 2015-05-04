@@ -170,6 +170,8 @@ public abstract class MockProvider {
   public static final String EXAMPLE_VARIABLE_INSTANCE_NAME = "aVariableInstanceName";
 
   public static final StringValue EXAMPLE_PRIMITIVE_VARIABLE_VALUE = Variables.stringValue("aVariableInstanceValue");
+  public static final String EXAMPLE_VARIABLE_INSTANCE_PROC_DEF_KEY = "aVariableInstanceProcDefKey";
+  public static final String EXAMPLE_VARIABLE_INSTANCE_PROC_DEF_ID = "aVariableInstanceProcDefId";
   public static final String EXAMPLE_VARIABLE_INSTANCE_PROC_INST_ID = "aVariableInstanceProcInstId";
   public static final String EXAMPLE_VARIABLE_INSTANCE_EXECUTION_ID = "aVariableInstanceExecutionId";
   public static final String EXAMPLE_VARIABLE_INSTANCE_CASE_INST_ID = "aVariableInstanceCaseInstId";
@@ -177,6 +179,8 @@ public abstract class MockProvider {
   public static final String EXAMPLE_VARIABLE_INSTANCE_TASK_ID = "aVariableInstanceTaskId";
   public static final String EXAMPLE_VARIABLE_INSTANCE_ACTIVITY_INSTANCE_ID = "aVariableInstanceVariableInstanceId";
   public static final String EXAMPLE_VARIABLE_INSTANCE_ERROR_MESSAGE = "aVariableInstanceErrorMessage";
+  public static final String EXAMPLE_VARIABLE_INSTANCE_CASE_DEF_KEY = "aVariableInstanceCaseDefKey";
+  public static final String EXAMPLE_VARIABLE_INSTANCE_CASE_DEF_ID = "aVariableInstanceCaseDefId";
 
   public static final String EXAMPLE_VARIABLE_INSTANCE_SERIALIZED_VALUE = "aSerializedValue";
   public static final byte[] EXAMPLE_VARIABLE_INSTANCE_BYTE = "aSerializedValue".getBytes();
@@ -405,6 +409,8 @@ public abstract class MockProvider {
 
   // historic detail
   public static final String EXAMPLE_HISTORIC_VAR_UPDATE_ID = "aHistoricVariableUpdateId";
+  public static final String EXAMPLE_HISTORIC_VAR_UPDATE_PROC_DEF_KEY = "aProcDefKey";
+  public static final String EXAMPLE_HISTORIC_VAR_UPDATE_PROC_DEF_ID = "aProcDefId";
   public static final String EXAMPLE_HISTORIC_VAR_UPDATE_PROC_INST_ID = "aProcInst";
   public static final String EXAMPLE_HISTORIC_VAR_UPDATE_ACT_INST_ID = "anActInst";
   public static final String EXAMPLE_HISTORIC_VAR_UPDATE_EXEC_ID = "anExecutionId";
@@ -416,8 +422,12 @@ public abstract class MockProvider {
   public static final int EXAMPLE_HISTORIC_VAR_UPDATE_REVISION = 1;
   public static final String EXAMPLE_HISTORIC_VAR_UPDATE_ERROR = "anErrorMessage";
   public static final String EXAMPLE_HISTORIC_VAR_UPDATE_VAR_INST_ID = "aVariableInstanceId";
+  public static final String EXAMPLE_HISTORIC_VAR_UPDATE_CASE_DEF_KEY = "aCaseDefKey";
+  public static final String EXAMPLE_HISTORIC_VAR_UPDATE_CASE_DEF_ID = "aCaseDefId";
 
   public static final String EXAMPLE_HISTORIC_FORM_FIELD_ID = "anId";
+  public static final String EXAMPLE_HISTORIC_FORM_FIELD_PROC_DEF_KEY = "aProcDefKey";
+  public static final String EXAMPLE_HISTORIC_FORM_FIELD_PROC_DEF_ID = "aProcDefId";
   public static final String EXAMPLE_HISTORIC_FORM_FIELD_PROC_INST_ID = "aProcInst";
   public static final String EXAMPLE_HISTORIC_FORM_FIELD_ACT_INST_ID = "anActInst";
   public static final String EXAMPLE_HISTORIC_FORM_FIELD_EXEC_ID = "anExecutionId";
@@ -425,10 +435,13 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_FORM_FIELD_TIME = "2014-01-01T00:00:00";
   public static final String EXAMPLE_HISTORIC_FORM_FIELD_FIELD_ID = "aFormFieldId";
   public static final String EXAMPLE_HISTORIC_FORM_FIELD_VALUE = "aFormFieldValue";
+  public static final String EXAMPLE_HISTORIC_FORM_FIELD_CASE_DEF_KEY = "aCaseDefKey";
+  public static final String EXAMPLE_HISTORIC_FORM_FIELD_CASE_DEF_ID = "aCaseDefId";
 
   // historic task instance
   public static final String EXAMPLE_HISTORIC_TASK_INST_ID = "aHistoricTaskInstanceId";
   public static final String EXAMPLE_HISTORIC_TASK_INST_PROC_DEF_ID = "aProcDefId";
+  public static final String EXAMPLE_HISTORIC_TASK_INST_PROC_DEF_KEY = "aProcDefKey";
   public static final String EXAMPLE_HISTORIC_TASK_INST_PROC_INST_ID = "aProcInstId";
   public static final String EXAMPLE_HISTORIC_TASK_INST_EXEC_ID = "anExecId";
   public static final String EXAMPLE_HISTORIC_TASK_INST_ACT_INST_ID = "anActInstId";
@@ -445,6 +458,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_TASK_INST_DUE_DATE = "2014-01-01T00:00:00";
   public static final String EXAMPLE_HISTORIC_TASK_INST_FOLLOW_UP_DATE = "2014-01-01T00:00:00";
   public static final String EXAMPLE_HISTORIC_TASK_INST_PARENT_TASK_ID = "aParentTaskId";
+  public static final String EXAMPLE_HISTORIC_TASK_INST_CASE_DEF_KEY = "aCaseDefinitionKey";
   public static final String EXAMPLE_HISTORIC_TASK_INST_CASE_DEF_ID = "aCaseDefinitionId";
   public static final String EXAMPLE_HISTORIC_TASK_INST_CASE_INST_ID = "aCaseInstanceId";
   public static final String EXAMPLE_HISTORIC_TASK_INST_CASE_EXEC_ID = "aCaseExecutionId";
@@ -473,6 +487,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HIST_INCIDENT_ACTIVITY_ID = "anActivityId";
   public static final String EXAMPLE_HIST_INCIDENT_PROC_INST_ID = "aProcInstId";
   public static final String EXAMPLE_HIST_INCIDENT_PROC_DEF_ID = "aProcDefId";
+  public static final String EXAMPLE_HIST_INCIDENT_PROC_DEF_KEY = "aProcDefKey";
   public static final String EXAMPLE_HIST_INCIDENT_CAUSE_INCIDENT_ID = "aCauseIncidentId";
   public static final String EXAMPLE_HIST_INCIDENT_ROOT_CAUSE_INCIDENT_ID = "aRootCauseIncidentId";
   public static final String EXAMPLE_HIST_INCIDENT_CONFIGURATION = "aConfiguration";
@@ -1064,6 +1079,7 @@ public abstract class MockProvider {
     when(mock.getActivityId()).thenReturn(EXAMPLE_ACTIVITY_ID);
     when(mock.getActivityName()).thenReturn(EXAMPLE_ACTIVITY_NAME);
     when(mock.getActivityType()).thenReturn(EXAMPLE_ACTIVITY_TYPE);
+    when(mock.getProcessDefinitionKey()).thenReturn(EXAMPLE_PROCESS_DEFINITION_KEY);
     when(mock.getProcessDefinitionId()).thenReturn(EXAMPLE_PROCESS_DEFINITION_ID);
     when(mock.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
     when(mock.getExecutionId()).thenReturn(EXAMPLE_EXECUTION_ID);
@@ -1198,6 +1214,7 @@ public abstract class MockProvider {
 
     when(mock.getId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
     when(mock.getBusinessKey()).thenReturn(EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY);
+    when(mock.getProcessDefinitionKey()).thenReturn(EXAMPLE_PROCESS_DEFINITION_KEY);
     when(mock.getProcessDefinitionId()).thenReturn(EXAMPLE_PROCESS_DEFINITION_ID);
     when(mock.getDeleteReason()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_DELETE_REASON);
     when(mock.getEndTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_PROCESS_INSTANCE_END_TIME));
@@ -1284,8 +1301,12 @@ public abstract class MockProvider {
         .id(EXAMPLE_VARIABLE_INSTANCE_ID)
         .name(EXAMPLE_VARIABLE_INSTANCE_NAME)
         .typedValue(EXAMPLE_PRIMITIVE_VARIABLE_VALUE)
+        .processDefinitionKey(EXAMPLE_VARIABLE_INSTANCE_PROC_DEF_KEY)
+        .processDefinitionId(EXAMPLE_VARIABLE_INSTANCE_PROC_DEF_ID)
         .processInstanceId(EXAMPLE_VARIABLE_INSTANCE_PROC_INST_ID)
         .activityInstanceId(EXAMPLE_VARIABLE_INSTANCE_ACTIVITY_INSTANCE_ID)
+        .caseDefinitionKey(EXAMPLE_VARIABLE_INSTANCE_CASE_DEF_KEY)
+        .caseDefinitionId(EXAMPLE_VARIABLE_INSTANCE_CASE_DEF_ID)
         .errorMessage(null);
   }
 
@@ -1409,6 +1430,8 @@ public abstract class MockProvider {
   public static MockHistoricVariableUpdateBuilder mockHistoricVariableUpdate() {
     return new MockHistoricVariableUpdateBuilder()
         .id(EXAMPLE_HISTORIC_VAR_UPDATE_ID)
+        .processDefinitionKey(EXAMPLE_HISTORIC_VAR_UPDATE_PROC_DEF_KEY)
+        .processDefinitionId(EXAMPLE_HISTORIC_VAR_UPDATE_PROC_DEF_ID)
         .processInstanceId(EXAMPLE_HISTORIC_VAR_UPDATE_PROC_INST_ID)
         .activityInstanceId(EXAMPLE_HISTORIC_VAR_UPDATE_ACT_INST_ID)
         .executionId(EXAMPLE_HISTORIC_VAR_UPDATE_EXEC_ID)
@@ -1418,7 +1441,9 @@ public abstract class MockProvider {
         .variableInstanceId(EXAMPLE_HISTORIC_VAR_UPDATE_VAR_INST_ID)
         .typedValue(EXAMPLE_PRIMITIVE_VARIABLE_VALUE)
         .revision(EXAMPLE_HISTORIC_VAR_UPDATE_REVISION)
-        .errorMessage(null);
+        .errorMessage(null)
+        .caseDefinitionKey(EXAMPLE_HISTORIC_VAR_UPDATE_CASE_DEF_KEY)
+        .caseDefinitionId(EXAMPLE_HISTORIC_VAR_UPDATE_CASE_DEF_ID);
   }
 
 
@@ -1426,6 +1451,8 @@ public abstract class MockProvider {
     HistoricFormField historicFromField = mock(HistoricFormField.class);
 
     when(historicFromField.getId()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_ID);
+    when(historicFromField.getProcessDefinitionKey()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_PROC_DEF_KEY);
+    when(historicFromField.getProcessDefinitionId()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_PROC_DEF_ID);
     when(historicFromField.getProcessInstanceId()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_PROC_INST_ID);
     when(historicFromField.getActivityInstanceId()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_ACT_INST_ID);
     when(historicFromField.getExecutionId()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_EXEC_ID);
@@ -1433,6 +1460,8 @@ public abstract class MockProvider {
     when(historicFromField.getTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_FORM_FIELD_TIME));
     when(historicFromField.getFieldId()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_FIELD_ID);
     when(historicFromField.getFieldValue()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_VALUE);
+    when(historicFromField.getCaseDefinitionKey()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_CASE_DEF_KEY);
+    when(historicFromField.getCaseDefinitionId()).thenReturn(EXAMPLE_HISTORIC_FORM_FIELD_CASE_DEF_ID);
 
     return historicFromField;
   }
@@ -1458,6 +1487,7 @@ public abstract class MockProvider {
     when(taskInstance.getActivityInstanceId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_ACT_INST_ID);
     when(taskInstance.getExecutionId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_EXEC_ID);
     when(taskInstance.getProcessDefinitionId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_PROC_DEF_ID);
+    when(taskInstance.getProcessDefinitionKey()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_PROC_DEF_KEY);
     when(taskInstance.getName()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_NAME);
     when(taskInstance.getDescription()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_DESCRIPTION);
     when(taskInstance.getDeleteReason()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_DELETE_REASON);
@@ -1471,6 +1501,7 @@ public abstract class MockProvider {
     when(taskInstance.getDueDate()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_TASK_INST_DUE_DATE));
     when(taskInstance.getFollowUpDate()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_TASK_INST_FOLLOW_UP_DATE));
     when(taskInstance.getParentTaskId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_PARENT_TASK_ID);
+    when(taskInstance.getCaseDefinitionKey()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_CASE_DEF_KEY);
     when(taskInstance.getCaseDefinitionId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_CASE_DEF_ID);
     when(taskInstance.getCaseInstanceId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_CASE_INST_ID);
     when(taskInstance.getCaseExecutionId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_CASE_EXEC_ID);
@@ -1523,6 +1554,7 @@ public abstract class MockProvider {
     when(incident.getActivityId()).thenReturn(EXAMPLE_HIST_INCIDENT_ACTIVITY_ID);
     when(incident.getProcessInstanceId()).thenReturn(EXAMPLE_HIST_INCIDENT_PROC_INST_ID);
     when(incident.getProcessDefinitionId()).thenReturn(EXAMPLE_HIST_INCIDENT_PROC_DEF_ID);
+    when(incident.getProcessDefinitionKey()).thenReturn(EXAMPLE_HIST_INCIDENT_PROC_DEF_KEY);
     when(incident.getCauseIncidentId()).thenReturn(EXAMPLE_HIST_INCIDENT_CAUSE_INCIDENT_ID);
     when(incident.getRootCauseIncidentId()).thenReturn(EXAMPLE_HIST_INCIDENT_ROOT_CAUSE_INCIDENT_ID);
     when(incident.getConfiguration()).thenReturn(EXAMPLE_HIST_INCIDENT_CONFIGURATION);

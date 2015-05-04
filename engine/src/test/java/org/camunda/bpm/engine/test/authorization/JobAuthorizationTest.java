@@ -21,7 +21,6 @@ import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
 
 import java.util.Date;
-import java.util.List;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.impl.AbstractQuery;
@@ -29,12 +28,10 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendJobDefinitionHandler;
-import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 
 /**
@@ -179,7 +176,7 @@ public class JobAuthorizationTest extends AuthorizationTest {
     deleteJob(job.getId());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   // execute job ////////////////////////////////////////////////
@@ -290,7 +287,7 @@ public class JobAuthorizationTest extends AuthorizationTest {
     assertTrue(jobDefinition.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   // delete job ////////////////////////////////////////////////
@@ -396,7 +393,7 @@ public class JobAuthorizationTest extends AuthorizationTest {
     assertNull(job);
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   // set job retries ////////////////////////////////////////////////
@@ -509,7 +506,7 @@ public class JobAuthorizationTest extends AuthorizationTest {
     deleteJob(jobId);
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   // set job retries by job definition id ///////////////////////
@@ -718,14 +715,14 @@ public class JobAuthorizationTest extends AuthorizationTest {
     deleteJob(jobId);
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   // get exception stacktrace ///////////////////////////////////////////
 
   public void testGetExceptionStacktraceWithoutAuthorization() {
     // given
-    String processInstanceId = startOneIncidentProcessAndExecuteJob().getId();
+    String processInstanceId = startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY).getId();
     disableAuthorization();
     String jobId = selectJobByProcessInstanceId(processInstanceId).getId();
 
@@ -748,7 +745,7 @@ public class JobAuthorizationTest extends AuthorizationTest {
 
   public void testGetExceptionStacktraceWithReadPermissionOnProcessInstance() {
     // given
-    String processInstanceId = startOneIncidentProcessAndExecuteJob().getId();
+    String processInstanceId = startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY).getId();
     String jobId = selectJobByProcessInstanceId(processInstanceId).getId();
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
 
@@ -761,7 +758,7 @@ public class JobAuthorizationTest extends AuthorizationTest {
 
   public void testGetExceptionStacktraceReadPermissionOnAnyProcessInstance() {
     // given
-    String processInstanceId = startOneIncidentProcessAndExecuteJob().getId();
+    String processInstanceId = startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY).getId();
     String jobId = selectJobByProcessInstanceId(processInstanceId).getId();
 
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
@@ -775,7 +772,7 @@ public class JobAuthorizationTest extends AuthorizationTest {
 
   public void testGetExceptionStacktraceWithReadInstancePermissionOnTimerBoundaryProcessDefinition() {
     // given
-    String processInstanceId = startOneIncidentProcessAndExecuteJob().getId();
+    String processInstanceId = startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY).getId();
     String jobId = selectJobByProcessInstanceId(processInstanceId).getId();
 
     createGrantAuthorization(PROCESS_DEFINITION, ONE_INCIDENT_PROCESS_KEY, userId, READ_INSTANCE);
@@ -789,7 +786,7 @@ public class JobAuthorizationTest extends AuthorizationTest {
 
   public void testGetExceptionStacktraceWithReadInstancePermissionOnAnyProcessDefinition() {
     // given
-    String processInstanceId = startOneIncidentProcessAndExecuteJob().getId();
+    String processInstanceId = startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY).getId();
     String jobId = selectJobByProcessInstanceId(processInstanceId).getId();
 
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_INSTANCE);
@@ -827,7 +824,7 @@ public class JobAuthorizationTest extends AuthorizationTest {
     deleteJob(jobId);
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   // suspend job by id //////////////////////////////////////////
@@ -944,7 +941,7 @@ public class JobAuthorizationTest extends AuthorizationTest {
     deleteJob(jobId);
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   // activate job by id //////////////////////////////////////////
@@ -1067,7 +1064,7 @@ public class JobAuthorizationTest extends AuthorizationTest {
     deleteJob(jobId);
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   // suspend job by process instance id //////////////////////////////////////////
@@ -1684,7 +1681,7 @@ public class JobAuthorizationTest extends AuthorizationTest {
     assertTrue(job.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   public void testSuspendJobByProcessDefinitionKeyWihtUpdatePermissionOnProcessDefinition() {
@@ -1701,7 +1698,7 @@ public class JobAuthorizationTest extends AuthorizationTest {
     assertTrue(job.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   public void testSuspendJobByProcessDefinitionKeyWihtUpdatePermissionOnAnyProcessDefinition() {
@@ -1718,7 +1715,7 @@ public class JobAuthorizationTest extends AuthorizationTest {
     assertTrue(job.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   // activate job by process definition key //////////////////////////////////////////
@@ -1744,7 +1741,7 @@ public class JobAuthorizationTest extends AuthorizationTest {
     }
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   public void testActivateJobByProcessDefinitionKeyWihtUpdatePermissionOnProcessInstance() {
@@ -1769,7 +1766,7 @@ public class JobAuthorizationTest extends AuthorizationTest {
     }
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   public void testActivateJobByProcessDefinitionKeyWihtUpdatePermissionOnAnyProcessInstance() {
@@ -1787,7 +1784,7 @@ public class JobAuthorizationTest extends AuthorizationTest {
     assertFalse(job.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   public void testActivateJobByProcessDefinitionKeyWihtUpdatePermissionOnProcessDefinition() {
@@ -1805,7 +1802,7 @@ public class JobAuthorizationTest extends AuthorizationTest {
     assertFalse(job.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   public void testActivateJobByProcessDefinitionKeyWihtUpdatePermissionOnAnyProcessDefinition() {
@@ -1823,7 +1820,7 @@ public class JobAuthorizationTest extends AuthorizationTest {
     assertFalse(job.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   // helper /////////////////////////////////////////////////////
@@ -1843,30 +1840,6 @@ public class JobAuthorizationTest extends AuthorizationTest {
     disableAuthorization();
     managementService.deleteJob(jobId);
     enableAuthorization();
-  }
-
-  protected ProcessInstance startOneIncidentProcessAndExecuteJob() {
-    ProcessInstance processInstance = startProcessInstanceByKey(ONE_INCIDENT_PROCESS_KEY);
-    disableAuthorization();
-    executeAvailableJobs(ONE_INCIDENT_PROCESS_KEY);
-    enableAuthorization();
-    return processInstance;
-  }
-
-  protected void executeAvailableJobs(String key) {
-    List<Job> jobs = managementService.createJobQuery().processDefinitionKey(key).withRetriesLeft().list();
-
-    if (jobs.isEmpty()) {
-      return;
-    }
-
-    for (Job job : jobs) {
-      try {
-        managementService.executeJob(job.getId());
-      } catch (Exception e) {}
-    }
-
-    executeAvailableJobs(key);
   }
 
   protected Job selectJobByProcessInstanceId(String processInstanceId) {

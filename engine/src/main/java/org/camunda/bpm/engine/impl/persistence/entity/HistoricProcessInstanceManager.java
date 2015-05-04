@@ -89,6 +89,7 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
 
   public long findHistoricProcessInstanceCountByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
     if (isHistoryEnabled()) {
+      getAuthorizationManager().configureHistoricProcessInstanceQuery(historicProcessInstanceQuery);
       return (Long) getDbEntityManager().selectOne("selectHistoricProcessInstanceCountByQueryCriteria", historicProcessInstanceQuery);
     }
     return 0;
@@ -97,6 +98,7 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
   @SuppressWarnings("unchecked")
   public List<HistoricProcessInstance> findHistoricProcessInstancesByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery, Page page) {
     if (isHistoryEnabled()) {
+      getAuthorizationManager().configureHistoricProcessInstanceQuery(historicProcessInstanceQuery);
       return getDbEntityManager().selectList("selectHistoricProcessInstancesByQueryCriteria", historicProcessInstanceQuery, page);
     }
     return Collections.EMPTY_LIST;

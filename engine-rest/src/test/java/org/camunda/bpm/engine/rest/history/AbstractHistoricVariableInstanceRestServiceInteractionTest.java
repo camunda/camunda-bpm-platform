@@ -84,9 +84,13 @@ public abstract class AbstractHistoricVariableInstanceRestServiceInteractionTest
       .body("name", equalTo(builder.getName()))
       .body("type", equalTo(VariableTypeHelper.toExpectedValueTypeName(builder.getTypedValue().getType())))
       .body("value", equalTo(builder.getValue()))
+      .body("processDefinitionKey", equalTo(builder.getProcessDefinitionKey()))
+      .body("processDefinitionId", equalTo(builder.getProcessDefinitionId()))
       .body("processInstanceId", equalTo(builder.getProcessInstanceId()))
       .body("errorMessage", equalTo(builder.getErrorMessage()))
       .body("activityInstanceId", equalTo(builder.getActivityInstanceId()))
+      .body("caseDefinitionKey", equalTo(builder.getCaseDefinitionKey()))
+      .body("caseDefinitionId", equalTo(builder.getCaseDefinitionId()))
     .when().get(VARIABLE_INSTANCE_URL);
 
     verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();
@@ -116,9 +120,13 @@ public abstract class AbstractHistoricVariableInstanceRestServiceInteractionTest
       .body("value", equalTo("a value"))
       .body("valueInfo.serializationDataFormat", equalTo("aDataFormat"))
       .body("valueInfo.objectTypeName", equalTo("aTypeName"))
+      .body("processDefinitionKey", equalTo(builder.getProcessDefinitionKey()))
+      .body("processDefinitionId", equalTo(builder.getProcessDefinitionId()))
       .body("processInstanceId", equalTo(builder.getProcessInstanceId()))
       .body("errorMessage", equalTo(builder.getErrorMessage()))
       .body("activityInstanceId", equalTo(builder.getActivityInstanceId()))
+      .body("caseDefinitionKey", equalTo(builder.getCaseDefinitionKey()))
+      .body("caseDefinitionId", equalTo(builder.getCaseDefinitionId()))
     .when().get(VARIABLE_INSTANCE_URL);
 
     verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();
@@ -150,8 +158,12 @@ public abstract class AbstractHistoricVariableInstanceRestServiceInteractionTest
       .body("valueInfo.serializationDataFormat", equalTo("aDataFormat"))
       .body("valueInfo.objectTypeName", equalTo("aTypeName"))
       .body("processInstanceId", equalTo(builder.getProcessInstanceId()))
+      .body("processDefinitionKey", equalTo(builder.getProcessDefinitionKey()))
+      .body("processDefinitionId", equalTo(builder.getProcessDefinitionId()))
       .body("errorMessage", equalTo(builder.getErrorMessage()))
       .body("activityInstanceId", equalTo(builder.getActivityInstanceId()))
+      .body("caseDefinitionKey", equalTo(builder.getCaseDefinitionKey()))
+      .body("caseDefinitionId", equalTo(builder.getCaseDefinitionId()))
     .when().get(VARIABLE_INSTANCE_URL);
 
     verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();

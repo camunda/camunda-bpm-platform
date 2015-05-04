@@ -358,6 +358,7 @@ public abstract class AbstractHistoricProcessInstanceRestServiceQueryTest extend
     String returnedProcessInstanceId = from(content).getString("[0].id");
     String returnedProcessInstanceBusinessKey = from(content).getString("[0].businessKey");
     String returnedProcessDefinitionId = from(content).getString("[0].processDefinitionId");
+    String returnedProcessDefinitionKey = from(content).getString("[0].processDefinitionKey");
     String returnedStartTime = from(content).getString("[0].startTime");
     String returnedEndTime = from(content).getString("[0].endTime");
     long returnedDurationInMillis = from(content).getLong("[0].durationInMillis");
@@ -371,6 +372,7 @@ public abstract class AbstractHistoricProcessInstanceRestServiceQueryTest extend
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, returnedProcessInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY, returnedProcessInstanceBusinessKey);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, returnedProcessDefinitionId);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, returnedProcessDefinitionKey);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_TIME.toString(), returnedStartTime);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_END_TIME.toString(), returnedEndTime);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_PROCESS_INSTANCE_DURATION_MILLIS, returnedDurationInMillis);

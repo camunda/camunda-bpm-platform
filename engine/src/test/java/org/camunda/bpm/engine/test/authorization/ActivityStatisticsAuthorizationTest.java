@@ -23,7 +23,6 @@ import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
 import org.camunda.bpm.engine.management.IncidentStatistics;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 /**
  * @author Roman Smirnov
@@ -38,9 +37,9 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
   public void setUp() throws Exception {
     super.setUp();
     deploymentId = createDeployment(null, "org/camunda/bpm/engine/test/authorization/oneIncidentProcess.bpmn20.xml").getId();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
   }
 
   public void tearDown() {
@@ -412,12 +411,6 @@ public class ActivityStatisticsAuthorizationTest extends AuthorizationTest {
 
   protected void verifyQueryResults(ActivityStatisticsQuery query, int countExpected) {
     verifyQueryResults((AbstractQuery<?, ?>) query, countExpected);
-  }
-
-  protected ProcessInstance startOneIncidentProcessAndExecuteJob() {
-    ProcessInstance processInstance = startProcessInstanceByKey(ONE_INCIDENT_PROCESS_KEY);
-    executeAvailableJobs();
-    return processInstance;
   }
 
 }

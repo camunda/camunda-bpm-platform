@@ -51,6 +51,7 @@ public class HistoricIncidentTest extends PluggableProcessEngineTestCase {
     assertEquals(incident.getActivityId(), historicIncident.getActivityId());
     assertEquals(incident.getProcessInstanceId(), historicIncident.getProcessInstanceId());
     assertEquals(incident.getProcessDefinitionId(), historicIncident.getProcessDefinitionId());
+    assertEquals(PROCESS_DEFINITION_KEY, historicIncident.getProcessDefinitionKey());
     assertEquals(incident.getCauseIncidentId(), historicIncident.getCauseIncidentId());
     assertEquals(incident.getRootCauseIncidentId(), historicIncident.getRootCauseIncidentId());
     assertEquals(incident.getConfiguration(), historicIncident.getConfiguration());

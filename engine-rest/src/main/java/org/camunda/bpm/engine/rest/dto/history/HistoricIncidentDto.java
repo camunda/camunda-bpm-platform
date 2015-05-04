@@ -12,9 +12,9 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
-import org.camunda.bpm.engine.history.HistoricIncident;
-
 import java.util.Date;
+
+import org.camunda.bpm.engine.history.HistoricIncident;
 
 /**
  * @author Roman Smirnov
@@ -23,6 +23,7 @@ import java.util.Date;
 public class HistoricIncidentDto {
 
   protected String id;
+  protected String processDefinitionKey;
   protected String processDefinitionId;
   protected String processInstanceId;
   protected String executionId;
@@ -40,6 +41,10 @@ public class HistoricIncidentDto {
 
   public String getId() {
     return id;
+  }
+
+  public String getProcessDefinitionKey() {
+    return processDefinitionKey;
   }
 
   public String getProcessDefinitionId() {
@@ -102,6 +107,7 @@ public class HistoricIncidentDto {
     HistoricIncidentDto dto = new HistoricIncidentDto();
 
     dto.id = historicIncident.getId();
+    dto.processDefinitionKey = historicIncident.getProcessDefinitionKey();
     dto.processDefinitionId = historicIncident.getProcessDefinitionId();
     dto.processInstanceId = historicIncident.getProcessInstanceId();
     dto.executionId = historicIncident.getExecutionId();

@@ -12,15 +12,16 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
-import org.camunda.bpm.engine.history.HistoricProcessInstance;
-
 import java.util.Date;
+
+import org.camunda.bpm.engine.history.HistoricProcessInstance;
 
 public class HistoricProcessInstanceDto {
 
   private String id;
   private String businessKey;
   private String processDefinitionId;
+  private String processDefinitionKey;
   private Date startTime;
   private Date endTime;
   private Long durationInMillis;
@@ -41,6 +42,10 @@ public class HistoricProcessInstanceDto {
 
   public String getProcessDefinitionId() {
     return processDefinitionId;
+  }
+
+  public String getProcessDefinitionKey() {
+    return processDefinitionKey;
   }
 
   public Date getStartTime() {
@@ -86,6 +91,7 @@ public class HistoricProcessInstanceDto {
     dto.id = historicProcessInstance.getId();
     dto.businessKey = historicProcessInstance.getBusinessKey();
     dto.processDefinitionId = historicProcessInstance.getProcessDefinitionId();
+    dto.processDefinitionKey = historicProcessInstance.getProcessDefinitionKey();
     dto.startTime = historicProcessInstance.getStartTime();
     dto.endTime = historicProcessInstance.getEndTime();
     dto.durationInMillis = historicProcessInstance.getDurationInMillis();

@@ -81,6 +81,12 @@ public interface HistoricIncident {
   public String getProcessDefinitionId();
 
   /**
+   * Returns the key of the process definition of this
+   * process instance on which the incident has happened.
+   */
+  public String getProcessDefinitionKey();
+
+  /**
    * Returns the id of the incident on which this incident
    * has been triggered.
    */

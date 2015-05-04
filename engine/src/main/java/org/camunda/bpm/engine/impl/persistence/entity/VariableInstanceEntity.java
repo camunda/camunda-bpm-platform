@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
 import org.camunda.bpm.engine.impl.core.variable.value.UntypedValueImpl;
@@ -101,12 +102,6 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     variableInstance.setValue(value);
 
     return variableInstance;
-  }
-
-  public void setExecution(ExecutionEntity execution) {
-    this.executionId = execution.getId();
-    this.processInstanceId = execution.getProcessInstanceId();
-    forcedUpdate = true;
   }
 
   public void delete() {
@@ -364,6 +359,36 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   public void postLoad() {
     // make sure the serializer is initialized
     ensureSerializerInitialized();
+  }
+
+  // execution ////////////////////////////////////////////////////////////////
+
+  public ExecutionEntity getExecution() {
+    if (executionId != null) {
+      return Context
+        .getCommandContext()
+        .getExecutionManager()
+        .findExecutionById(executionId);
+    }
+    return null;
+  }
+
+  public void setExecution(ExecutionEntity execution) {
+    this.executionId = execution.getId();
+    this.processInstanceId = execution.getProcessInstanceId();
+    forcedUpdate = true;
+  }
+
+  // case execution ///////////////////////////////////////////////////////////
+
+  public CaseExecutionEntity getCaseExecution() {
+    if (caseExecutionId != null) {
+      return Context
+          .getCommandContext()
+          .getCaseExecutionManager()
+          .findCaseExecutionById(caseExecutionId);
+    }
+    return null;
   }
 
   // getters and setters //////////////////////////////////////////////////////

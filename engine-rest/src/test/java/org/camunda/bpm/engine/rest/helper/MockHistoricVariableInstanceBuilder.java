@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.rest.helper;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -33,9 +32,13 @@ public class MockHistoricVariableInstanceBuilder {
   protected String id;
   protected String name;
   protected TypedValue value;
+  protected String processDefinitionKey;
+  protected String processDefinitionId;
   protected String processInstanceId;
   protected String errorMessage;
   protected String activityInstanceId;
+  protected String caseDefinitionKey;
+  protected String caseDefinitionId;
 
   public MockHistoricVariableInstanceBuilder id(String id) {
     this.id = id;
@@ -52,6 +55,16 @@ public class MockHistoricVariableInstanceBuilder {
     return this;
   }
 
+  public MockHistoricVariableInstanceBuilder processDefinitionKey(String processDefinitionKey) {
+    this.processDefinitionKey = processDefinitionKey;
+    return this;
+  }
+
+  public MockHistoricVariableInstanceBuilder processDefinitionId(String processDefinitionId) {
+    this.processDefinitionId = processDefinitionId;
+    return this;
+  }
+
   public MockHistoricVariableInstanceBuilder processInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
     return this;
@@ -64,6 +77,16 @@ public class MockHistoricVariableInstanceBuilder {
 
   public MockHistoricVariableInstanceBuilder activityInstanceId(String activityInstanceId) {
     this.activityInstanceId = activityInstanceId;
+    return this;
+  }
+
+  public MockHistoricVariableInstanceBuilder caseDefinitionKey(String caseDefinitionKey) {
+    this.caseDefinitionKey = caseDefinitionKey;
+    return this;
+  }
+
+  public MockHistoricVariableInstanceBuilder caseDefinitionId(String caseDefinitionId) {
+    this.caseDefinitionId = caseDefinitionId;
     return this;
   }
 
@@ -83,6 +106,14 @@ public class MockHistoricVariableInstanceBuilder {
     return value.getValue();
   }
 
+  public String getProcessDefinitionKey() {
+    return processDefinitionKey;
+  }
+
+  public String getProcessDefinitionId() {
+    return processDefinitionId;
+  }
+
   public String getProcessInstanceId() {
     return processInstanceId;
   }
@@ -93,6 +124,14 @@ public class MockHistoricVariableInstanceBuilder {
 
   public String getActivityInstanceId() {
     return activityInstanceId;
+  }
+
+  public String getCaseDefinitionKey() {
+    return caseDefinitionKey;
+  }
+
+  public String getCaseDefinitionId() {
+    return caseDefinitionId;
   }
 
   public HistoricVariableInstance build() {
@@ -115,10 +154,14 @@ public class MockHistoricVariableInstanceBuilder {
     }
 
     when(mockVariable.getTypedValue()).thenReturn(value);
+    when(mockVariable.getProcessDefinitionKey()).thenReturn(processDefinitionKey);
+    when(mockVariable.getProcessDefinitionId()).thenReturn(processDefinitionId);
     when(mockVariable.getProcessInstanceId()).thenReturn(processInstanceId);
     when(mockVariable.getErrorMessage()).thenReturn(errorMessage);
     when(mockVariable.getActivtyInstanceId()).thenReturn(activityInstanceId);
     when(mockVariable.getActivityInstanceId()).thenReturn(activityInstanceId);
+    when(mockVariable.getCaseDefinitionKey()).thenReturn(caseDefinitionKey);
+    when(mockVariable.getCaseDefinitionId()).thenReturn(caseDefinitionId);
 
     return mockVariable;
   }

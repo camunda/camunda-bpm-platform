@@ -12,9 +12,9 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
-import org.camunda.bpm.engine.history.HistoricTaskInstance;
-
 import java.util.Date;
+
+import org.camunda.bpm.engine.history.HistoricTaskInstance;
 
 /**
  * @author Roman Smirnov
@@ -23,9 +23,11 @@ import java.util.Date;
 public class HistoricTaskInstanceDto {
 
   protected String id;
+  protected String processDefinitionKey;
   protected String processDefinitionId;
   protected String processInstanceId;
   protected String executionId;
+  protected String caseDefinitionKey;
   protected String caseDefinitionId;
   protected String caseInstanceId;
   protected String caseExecutionId;
@@ -48,6 +50,10 @@ public class HistoricTaskInstanceDto {
     return id;
   }
 
+  public String getProcessDefinitionKey() {
+    return processDefinitionKey;
+  }
+
   public String getProcessDefinitionId() {
     return processDefinitionId;
   }
@@ -58,6 +64,10 @@ public class HistoricTaskInstanceDto {
 
   public String getExecutionId() {
     return executionId;
+  }
+
+  public String getCaseDefinitionKey() {
+    return caseDefinitionKey;
   }
 
   public String getCaseDefinitionId() {
@@ -133,9 +143,11 @@ public class HistoricTaskInstanceDto {
     HistoricTaskInstanceDto dto = new HistoricTaskInstanceDto();
 
     dto.id = taskInstance.getId();
+    dto.processDefinitionKey = taskInstance.getProcessDefinitionKey();
     dto.processDefinitionId = taskInstance.getProcessDefinitionId();
     dto.processInstanceId = taskInstance.getProcessInstanceId();
     dto.executionId = taskInstance.getExecutionId();
+    dto.caseDefinitionKey = taskInstance.getCaseDefinitionKey();
     dto.caseDefinitionId = taskInstance.getCaseDefinitionId();
     dto.caseInstanceId = taskInstance.getCaseInstanceId();
     dto.caseExecutionId = taskInstance.getCaseExecutionId();

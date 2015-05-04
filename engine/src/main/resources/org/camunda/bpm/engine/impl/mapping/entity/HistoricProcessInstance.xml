@@ -25,6 +25,7 @@
         ID_,
         PROC_INST_ID_,
         BUSINESS_KEY_,
+        PROC_DEF_KEY_,
         PROC_DEF_ID_,
         START_TIME_,
         END_TIME_,
@@ -40,6 +41,7 @@
         #{id ,jdbcType=VARCHAR},
         #{processInstanceId, jdbcType=VARCHAR},
         #{businessKey, jdbcType=VARCHAR},
+        #{processDefinitionKey, jdbcType=VARCHAR},
         #{processDefinitionId, jdbcType=VARCHAR},
         #{startTime, jdbcType=TIMESTAMP},
         #{endTime, jdbcType=TIMESTAMP},
@@ -84,11 +86,12 @@
   </delete>
 
   <!-- HISTORIC PROCESS INSTANCE RESULT MAP -->
-  
+
   <resultMap id="historicProcessInstanceResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR"/>
+    <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
@@ -110,7 +113,7 @@
 
   <select id="selectHistoricProcessInstanceIdsByProcessDefinitionId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
     select ID_
-    from ${prefix}ACT_HI_PROCINST 
+    from ${prefix}ACT_HI_PROCINST
     where PROC_DEF_ID_ = #{parameter}
   </select>
 
@@ -242,6 +245,9 @@
         </if>
         )
       </foreach>
+
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+
     </where>
   </sql>
 

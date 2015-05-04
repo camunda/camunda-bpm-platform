@@ -19,14 +19,37 @@
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity">
 
   <!-- HISTORIC PROCESS VARIABLE INSERT -->
-  
+
   <insert id="insertHistoricVariableInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity">
-    insert into ${prefix}ACT_HI_VARINST (ID_, PROC_INST_ID_, EXECUTION_ID_, ACT_INST_ID_, CASE_INST_ID_, CASE_EXECUTION_ID_, TASK_ID_, NAME_, REV_, VAR_TYPE_, BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_)
-    values (
+    insert into ${prefix}ACT_HI_VARINST (
+      ID_,
+      PROC_DEF_KEY_,
+      PROC_DEF_ID_,
+      PROC_INST_ID_,
+      EXECUTION_ID_,
+      ACT_INST_ID_,
+      CASE_DEF_KEY_,
+      CASE_DEF_ID_,
+      CASE_INST_ID_,
+      CASE_EXECUTION_ID_,
+      TASK_ID_,
+      NAME_,
+      REV_,
+      VAR_TYPE_,
+      BYTEARRAY_ID_,
+      DOUBLE_,
+      LONG_,
+      TEXT_,
+      TEXT2_
+    ) values (
       #{id, jdbcType=VARCHAR},
+      #{processDefinitionKey, jdbcType=VARCHAR},
+      #{processDefinitionId, jdbcType=VARCHAR},
       #{processInstanceId, jdbcType=VARCHAR},
       #{executionId, jdbcType=VARCHAR},
       #{activityInstanceId, jdbcType=VARCHAR},
+      #{caseDefinitionKey, jdbcType=VARCHAR},
+      #{caseDefinitionId, jdbcType=VARCHAR},
       #{caseInstanceId, jdbcType=VARCHAR},
       #{caseExecutionId, jdbcType=VARCHAR},
       #{taskId, jdbcType=VARCHAR},
@@ -42,7 +65,7 @@
   </insert>
 
   <!-- HISTORIC PROCESS VARIABLE UPDATE -->
-  
+
   <update id="updateHistoricVariableInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity">
     update ${prefix}ACT_HI_VARINST set
       REV_ = #{revisionNext, jdbcType=INTEGER},
@@ -55,23 +78,27 @@
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
-  
+
   <!-- HISTORIC PROCESS VARIABLE DELETE -->
 
   <delete id="deleteHistoricVariableInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity">
     delete from ${prefix}ACT_HI_VARINST where ID_ = #{id} and REV_ = #{revision}
   </delete>
-  
+
   <delete id="deleteHistoricVariableInstanceById">
     delete from ${prefix}ACT_HI_VARINST where ID_ = #{id}
   </delete>
-  
+
   <!-- HISTORIC PROCESS VARIABLE RESULTMAP -->
   <resultMap id="historicVariableInstanceResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
+    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
+    <result property="caseDefinitionKey" column="CASE_DEF_KEY_" jdbcType="VARCHAR" />
+    <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />
     <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
     <result property="caseExecutionId" column="CASE_EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
@@ -84,12 +111,16 @@
     <result property="textValue2" column="TEXT2_" jdbcType="VARCHAR" />
     <result property="longValue" column="LONG_" jdbcType="BIGINT" />
   </resultMap>
-  
+
   <resultMap id="historicVariableInstanceResultMap_postgres" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
+    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
+    <result property="caseDefinitionKey" column="CASE_DEF_KEY_" jdbcType="VARCHAR" />
+    <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />
     <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
     <result property="caseExecutionId" column="CASE_EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
@@ -102,11 +133,11 @@
     <result property="textValue2" column="TEXT2_" jdbcType="VARCHAR" />
     <result property="longValue" column="LONG_" jdbcType="BIGINT" />
   </resultMap>
-  
+
   <!-- HISTORIC VARIABLE SELECT -->
 
   <select id="selectHistoricVariablesByProcessInstanceId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="historicVariableInstanceResultMap">
-    select * from ${prefix}ACT_HI_VARINST 
+    select * from ${prefix}ACT_HI_VARINST
     where PROC_INST_ID_ = #{parameter, jdbcType=VARCHAR}
   </select>
 
@@ -118,28 +149,28 @@
   <select id="selectHistoricVariableInstanceByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricVariableInstanceQueryImpl" resultMap="historicVariableInstanceResultMap">
   	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* 
+    select RES.*
     ${limitBetween}
     <include refid="selectHistoricVariableInstanceByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}
   </select>
-  
+
   <select id="selectHistoricVariableInstanceCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricVariableInstanceQueryImpl" resultType="long">
     select count(*)
     <include refid="selectHistoricVariableInstanceByQueryCriteriaSql"/>
   </select>
-  
+
   <select id="selectHistoricVariableInstanceByQueryCriteria_postgres" parameterType="org.camunda.bpm.engine.impl.HistoricVariableInstanceQueryImpl" resultMap="historicVariableInstanceResultMap_postgres">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* 
+    select RES.*
     ${limitBetween}
     <include refid="selectHistoricVariableInstanceByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}
   </select>
-    
+
   <sql id="selectHistoricVariableInstanceByQueryCriteriaSql">
     from ${prefix}ACT_HI_VARINST RES
     <where>
@@ -204,16 +235,34 @@
           <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.variableValueConditions"/>
         </if>
       </if>
-      
+
+      <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+        AND
+          ( CASE
+
+            WHEN
+              <!-- variable instance exists in context of a process instance -->
+              RES.EXECUTION_ID_ is not null
+            THEN
+              (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />)
+
+            ELSE
+              <!-- variable instance exists in context of a -->
+              <!-- (1) standalone task or -->
+              <!-- (2) case instance -->
+              1
+          END ) = 1
+      </if>
+
     </where>
   </sql>
-  
+
   <select id="selectHistoricVariableInstance" resultMap="historicVariableInstanceResultMap">
     select * from ${prefix}ACT_HI_VARINST where ID_ = #{id}
   </select>
-  
+
   <select id="selectHistoricVariableInstanceByVariableInstanceId" resultMap="historicVariableInstanceResultMap">
     select * from ${prefix}ACT_HI_VARINST where ID_ = #{variableInstanceId}
   </select>
-  
+
 </mapper>

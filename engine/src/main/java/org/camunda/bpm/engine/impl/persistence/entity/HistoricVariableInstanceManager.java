@@ -77,11 +77,13 @@ public class HistoricVariableInstanceManager extends AbstractHistoricManager {
   }
 
   public long findHistoricVariableInstanceCountByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery) {
+    getAuthorizationManager().configureHistoricVariableInstanceQuery(historicProcessVariableQuery);
     return (Long) getDbEntityManager().selectOne("selectHistoricVariableInstanceCountByQueryCriteria", historicProcessVariableQuery);
   }
 
   @SuppressWarnings("unchecked")
   public List<HistoricVariableInstance> findHistoricVariableInstancesByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery, Page page) {
+    getAuthorizationManager().configureHistoricVariableInstanceQuery(historicProcessVariableQuery);
     return getDbEntityManager().selectList("selectHistoricVariableInstanceByQueryCriteria", historicProcessVariableQuery, page);
   }
 

@@ -48,8 +48,6 @@ public class HistoricJobLogEvent extends HistoryEvent {
 
   protected String activityId;
 
-  protected String processDefinitionKey;
-
   protected String deploymentId;
 
   protected int state;
@@ -148,14 +146,6 @@ public class HistoricJobLogEvent extends HistoryEvent {
 
   public void setActivityId(String activityId) {
     this.activityId = activityId;
-  }
-
-  public String getProcessDefinitionKey() {
-    return processDefinitionKey;
-  }
-
-  public void setProcessDefinitionKey(String processDefinitionKey) {
-    this.processDefinitionKey = processDefinitionKey;
   }
 
   public String getDeploymentId() {

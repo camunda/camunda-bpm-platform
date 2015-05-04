@@ -2,6 +2,7 @@ create table ACT_HI_PROCINST (
     ID_ nvarchar(64) not null,
     PROC_INST_ID_ nvarchar(64) not null,
     BUSINESS_KEY_ nvarchar(255),
+    PROC_DEF_KEY_ nvarchar(255),
     PROC_DEF_ID_ nvarchar(64) not null,
     START_TIME_ datetime2 not null,
     END_TIME_ datetime2,
@@ -20,6 +21,7 @@ create table ACT_HI_PROCINST (
 create table ACT_HI_ACTINST (
     ID_ nvarchar(64) not null,
     PARENT_ACT_INST_ID_ nvarchar(64),
+    PROC_DEF_KEY_ nvarchar(255),
     PROC_DEF_ID_ nvarchar(64) not null,
     PROC_INST_ID_ nvarchar(64) not null,
     EXECUTION_ID_ nvarchar(64) not null,
@@ -40,10 +42,12 @@ create table ACT_HI_ACTINST (
 
 create table ACT_HI_TASKINST (
     ID_ nvarchar(64) not null,
-    PROC_DEF_ID_ nvarchar(64),
     TASK_DEF_KEY_ nvarchar(255),
+    PROC_DEF_KEY_ nvarchar(255),
+    PROC_DEF_ID_ nvarchar(64),
     PROC_INST_ID_ nvarchar(64),
     EXECUTION_ID_ nvarchar(64),
+    CASE_DEF_KEY_ nvarchar(255),
     CASE_DEF_ID_ nvarchar(64),
     CASE_INST_ID_ nvarchar(64),
     CASE_EXECUTION_ID_ nvarchar(64),
@@ -65,8 +69,12 @@ create table ACT_HI_TASKINST (
 
 create table ACT_HI_VARINST (
     ID_ nvarchar(64) not null,
+    PROC_DEF_KEY_ nvarchar(255),
+    PROC_DEF_ID_ nvarchar(64),
     PROC_INST_ID_ nvarchar(64),
     EXECUTION_ID_ nvarchar(64),
+    CASE_DEF_KEY_ nvarchar(255),
+    CASE_DEF_ID_ nvarchar(64),
     CASE_INST_ID_ nvarchar(64),
     CASE_EXECUTION_ID_ nvarchar(64),
     ACT_INST_ID_ nvarchar(64),
@@ -85,8 +93,12 @@ create table ACT_HI_VARINST (
 create table ACT_HI_DETAIL (
     ID_ nvarchar(64) not null,
     TYPE_ nvarchar(255) not null,
+    PROC_DEF_KEY_ nvarchar(255),
+    PROC_DEF_ID_ nvarchar(64),
     PROC_INST_ID_ nvarchar(64),
     EXECUTION_ID_ nvarchar(64),
+    CASE_DEF_KEY_ nvarchar(255),
+    CASE_DEF_ID_ nvarchar(64),
     CASE_INST_ID_ nvarchar(64),
     CASE_EXECUTION_ID_ nvarchar(64),
     TASK_ID_ nvarchar(64),
@@ -157,6 +169,7 @@ create table ACT_HI_OP_LOG (
 
 create table ACT_HI_INCIDENT (
   ID_ nvarchar(64) not null,
+  PROC_DEF_KEY_ nvarchar(255),
   PROC_DEF_ID_ nvarchar(64),
   PROC_INST_ID_ nvarchar(64),
   EXECUTION_ID_ nvarchar(64),

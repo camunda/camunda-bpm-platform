@@ -25,8 +25,6 @@ import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.management.DeploymentStatistics;
 import org.camunda.bpm.engine.management.DeploymentStatisticsQuery;
 import org.camunda.bpm.engine.management.IncidentStatistics;
-import org.camunda.bpm.engine.runtime.Job;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 
 /**
@@ -105,9 +103,9 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     // given
     createGrantAuthorization(DEPLOYMENT, ANY, userId, READ);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     startProcessInstanceByKey(TIMER_START_PROCESS_KEY);
     startProcessInstanceByKey(TIMER_START_PROCESS_KEY);
@@ -142,9 +140,9 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     // given
     createGrantAuthorization(DEPLOYMENT, ANY, userId, READ);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     startProcessInstanceByKey(TIMER_START_PROCESS_KEY);
     startProcessInstanceByKey(TIMER_START_PROCESS_KEY);
@@ -180,9 +178,9 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     // given
     createGrantAuthorization(DEPLOYMENT, ANY, userId, READ);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     startProcessInstanceByKey(TIMER_START_PROCESS_KEY);
     startProcessInstanceByKey(TIMER_START_PROCESS_KEY);
@@ -218,9 +216,9 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     // given
     createGrantAuthorization(DEPLOYMENT, ANY, userId, READ);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     startProcessInstanceByKey(TIMER_START_PROCESS_KEY);
     startProcessInstanceByKey(TIMER_START_PROCESS_KEY);
@@ -258,9 +256,9 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     // given
     createGrantAuthorization(DEPLOYMENT, ANY, userId, READ);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    String processInstanceId = startOneIncidentProcessAndExecuteJob().getId();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    String processInstanceId = startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
 
     startProcessInstanceByKey(TIMER_START_PROCESS_KEY);
@@ -297,9 +295,9 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     // given
     createGrantAuthorization(DEPLOYMENT, ANY, userId, READ);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     startProcessInstanceByKey(TIMER_START_PROCESS_KEY);
     startProcessInstanceByKey(TIMER_START_PROCESS_KEY);
@@ -337,9 +335,9 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     // given
     createGrantAuthorization(DEPLOYMENT, ANY, userId, READ);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     startProcessInstanceByKey(TIMER_START_PROCESS_KEY);
     startProcessInstanceByKey(TIMER_START_PROCESS_KEY);
@@ -377,9 +375,9 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     // given
     createGrantAuthorization(DEPLOYMENT, ANY, userId, READ);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     startProcessInstanceByKey(TIMER_START_PROCESS_KEY);
     startProcessInstanceByKey(TIMER_START_PROCESS_KEY);
@@ -419,9 +417,9 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     // given
     createGrantAuthorization(DEPLOYMENT, ANY, userId, READ);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    String processInstanceId = startOneIncidentProcessAndExecuteJob().getId();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    String processInstanceId = startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
 
     startProcessInstanceByKey(TIMER_START_PROCESS_KEY);
@@ -458,9 +456,9 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     // given
     createGrantAuthorization(DEPLOYMENT, ANY, userId, READ);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     startProcessInstanceByKey(TIMER_START_PROCESS_KEY);
     startProcessInstanceByKey(TIMER_START_PROCESS_KEY);
@@ -498,9 +496,9 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     // given
     createGrantAuthorization(DEPLOYMENT, ANY, userId, READ);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     startProcessInstanceByKey(TIMER_START_PROCESS_KEY);
     startProcessInstanceByKey(TIMER_START_PROCESS_KEY);
@@ -538,9 +536,9 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     // given
     createGrantAuthorization(DEPLOYMENT, ANY, userId, READ);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     startProcessInstanceByKey(TIMER_START_PROCESS_KEY);
     startProcessInstanceByKey(TIMER_START_PROCESS_KEY);
@@ -580,9 +578,9 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     // given
     createGrantAuthorization(DEPLOYMENT, ANY, userId, READ);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    String processInstanceId = startOneIncidentProcessAndExecuteJob().getId();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    String processInstanceId = startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY).getId();
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, READ);
 
     startProcessInstanceByKey(TIMER_START_PROCESS_KEY);
@@ -620,9 +618,9 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     // given
     createGrantAuthorization(DEPLOYMENT, ANY, userId, READ);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     startProcessInstanceByKey(TIMER_START_PROCESS_KEY);
     startProcessInstanceByKey(TIMER_START_PROCESS_KEY);
@@ -661,9 +659,9 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     // given
     createGrantAuthorization(DEPLOYMENT, ANY, userId, READ);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     startProcessInstanceByKey(TIMER_START_PROCESS_KEY);
     startProcessInstanceByKey(TIMER_START_PROCESS_KEY);
@@ -702,9 +700,9 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
     // given
     createGrantAuthorization(DEPLOYMENT, ANY, userId, READ);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     startProcessInstanceByKey(TIMER_START_PROCESS_KEY);
     startProcessInstanceByKey(TIMER_START_PROCESS_KEY);
@@ -757,30 +755,6 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
       // the test does have only one type of incidents
       assertEquals("Incidents", incidents, incidentStatistics.get(0).getIncidentCount());
     }
-  }
-
-  protected ProcessInstance startOneIncidentProcessAndExecuteJob() {
-    ProcessInstance processInstance = startProcessInstanceByKey(ONE_INCIDENT_PROCESS_KEY);
-    disableAuthorization();
-    executeAvailableJobs(ONE_INCIDENT_PROCESS_KEY);
-    enableAuthorization();
-    return processInstance;
-  }
-
-  protected void executeAvailableJobs(String key) {
-    List<Job> jobs = managementService.createJobQuery().processDefinitionKey(key).withRetriesLeft().list();
-
-    if (jobs.isEmpty()) {
-      return;
-    }
-
-    for (Job job : jobs) {
-      try {
-        managementService.executeJob(job.getId());
-      } catch (Exception e) {}
-    }
-
-    executeAvailableJobs(key);
   }
 
 }

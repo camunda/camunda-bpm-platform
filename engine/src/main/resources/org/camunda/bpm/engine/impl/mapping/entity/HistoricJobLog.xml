@@ -216,6 +216,20 @@
       <if test="state != null">
         and RES.JOB_STATE_ = #{state.stateCode}
       </if>
+      <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+        AND
+          ( CASE
+
+            WHEN
+              RES.PROCESS_DEF_KEY_ is not null
+            THEN
+              (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />)
+
+            ELSE
+              <!-- "standalone" job (e.g. job to activate/suspend a process definition etc.) -->
+              1
+          END ) = 1
+      </if>
     </where>
   </sql>
 

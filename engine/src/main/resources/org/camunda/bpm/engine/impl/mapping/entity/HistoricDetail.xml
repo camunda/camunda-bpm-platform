@@ -25,6 +25,8 @@
     (
       ID_,
       TYPE_,
+      PROC_DEF_KEY_,
+      PROC_DEF_ID_,
       PROC_INST_ID_,
       ACT_INST_ID_,
       EXECUTION_ID_,
@@ -37,6 +39,8 @@
     values (
       #{id, jdbcType=VARCHAR},
       'FormProperty',
+      #{processDefinitionKey, jdbcType=VARCHAR},
+      #{processDefinitionId, jdbcType=VARCHAR},
       #{processInstanceId, jdbcType=VARCHAR},
       #{activityInstanceId, jdbcType=VARCHAR},
       #{executionId, jdbcType=VARCHAR},
@@ -54,9 +58,13 @@
     (
       ID_,
       TYPE_,
+      PROC_DEF_KEY_,
+      PROC_DEF_ID_,
       PROC_INST_ID_,
       EXECUTION_ID_,
       ACT_INST_ID_,
+      CASE_DEF_KEY_,
+      CASE_DEF_ID_,
       CASE_INST_ID_,
       CASE_EXECUTION_ID_,
       TASK_ID_,
@@ -75,9 +83,13 @@
     values (
       #{id, jdbcType=VARCHAR},
       'VariableUpdate',
+      #{processDefinitionKey, jdbcType=VARCHAR},
+      #{processDefinitionId, jdbcType=VARCHAR},
       #{processInstanceId, jdbcType=VARCHAR},
       #{executionId, jdbcType=VARCHAR},
       #{activityInstanceId, jdbcType=VARCHAR},
+      #{caseDefinitionKey, jdbcType=VARCHAR},
+      #{caseDefinitionId, jdbcType=VARCHAR},
       #{caseInstanceId, jdbcType=VARCHAR},
       #{caseExecutionId, jdbcType=VARCHAR},
       #{taskId, jdbcType=VARCHAR},
@@ -108,8 +120,12 @@
   <!-- HISTORIC DETAILS RESULTMAP -->
   <resultMap id="historicDetailResultMap" type="org.camunda.bpm.engine.impl.history.event.HistoricDetailEventEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
+    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
+    <result property="caseDefinitionKey" column="CASE_DEF_KEY_" jdbcType="VARCHAR" />
+    <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />
     <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
     <result property="caseExecutionId" column="CASE_EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="timestamp" column="TIME_" jdbcType="TIMESTAMP" />
@@ -212,6 +228,25 @@
       <if test="type != null">
         and RES.TYPE_ = #{type}
       </if>
+
+      <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+        AND
+          ( CASE
+
+            WHEN
+              <!-- detail instance exists in context of a process instance -->
+              RES.EXECUTION_ID_ is not null
+            THEN
+              (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />)
+
+            ELSE
+              <!-- detail instance exists in context of a -->
+              <!-- (1) standalone task or -->
+              <!-- (2) case instance -->
+              1
+          END ) = 1
+      </if>
+
     </where>
   </sql>
 

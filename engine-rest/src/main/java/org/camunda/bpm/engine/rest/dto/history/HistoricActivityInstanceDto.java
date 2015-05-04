@@ -12,9 +12,9 @@
  */
 package org.camunda.bpm.engine.rest.dto.history;
 
-import org.camunda.bpm.engine.history.HistoricActivityInstance;
-
 import java.util.Date;
+
+import org.camunda.bpm.engine.history.HistoricActivityInstance;
 
 public class HistoricActivityInstanceDto {
 
@@ -23,6 +23,7 @@ public class HistoricActivityInstanceDto {
   private String activityId;
   private String activityName;
   private String activityType;
+  private String processDefinitionKey;
   private String processDefinitionId;
   private String processInstanceId;
   private String executionId;
@@ -54,6 +55,10 @@ public class HistoricActivityInstanceDto {
 
   public String getActivityType() {
     return activityType;
+  }
+
+  public String getProcessDefinitionKey() {
+    return processDefinitionKey;
   }
 
   public String getProcessDefinitionId() {
@@ -113,6 +118,7 @@ public class HistoricActivityInstanceDto {
     dto.activityId = historicActivityInstance.getActivityId();
     dto.activityName = historicActivityInstance.getActivityName();
     dto.activityType = historicActivityInstance.getActivityType();
+    dto.processDefinitionKey = historicActivityInstance.getProcessDefinitionKey();
     dto.processDefinitionId = historicActivityInstance.getProcessDefinitionId();
     dto.processInstanceId = historicActivityInstance.getProcessInstanceId();
     dto.executionId = historicActivityInstance.getExecutionId();

@@ -50,10 +50,12 @@ public class HistoricJobLogManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<HistoricJobLog> findHistoricJobLogsByQueryCriteria(HistoricJobLogQueryImpl query, Page page) {
+    getAuthorizationManager().configureHistoricJobLogQuery(query);
     return getDbEntityManager().selectList("selectHistoricJobLogByQueryCriteria", query, page);
   }
 
   public long findHistoricJobLogsCountByQueryCriteria(HistoricJobLogQueryImpl query) {
+    getAuthorizationManager().configureHistoricJobLogQuery(query);
     return (Long) getDbEntityManager().selectOne("selectHistoricJobLogCountByQueryCriteria", query);
   }
 

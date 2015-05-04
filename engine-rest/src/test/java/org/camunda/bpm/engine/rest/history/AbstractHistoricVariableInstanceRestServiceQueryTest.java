@@ -327,9 +327,13 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
           .body("[0].name", equalTo(mockInstanceBuilder.getName()))
           .body("[0].type", equalTo(VariableTypeHelper.toExpectedValueTypeName(mockInstanceBuilder.getTypedValue().getType())))
           .body("[0].value", equalTo(mockInstanceBuilder.getValue()))
+          .body("[0].processDefinitionKey", equalTo(mockInstanceBuilder.getProcessDefinitionKey()))
+          .body("[0].processDefinitionId", equalTo(mockInstanceBuilder.getProcessDefinitionId()))
           .body("[0].processInstanceId", equalTo(mockInstanceBuilder.getProcessInstanceId()))
           .body("[0].errorMessage", equalTo(mockInstanceBuilder.getErrorMessage()))
           .body("[0].activityInstanceId", equalTo(mockInstanceBuilder.getActivityInstanceId()))
+          .body("[0].caseDefinitionKey", equalTo(mockInstanceBuilder.getCaseDefinitionKey()))
+          .body("[0].caseDefinitionId", equalTo(mockInstanceBuilder.getCaseDefinitionId()))
       .when()
         .get(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
 

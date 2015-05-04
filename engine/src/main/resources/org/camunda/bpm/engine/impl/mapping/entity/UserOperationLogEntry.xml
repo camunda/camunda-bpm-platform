@@ -128,7 +128,7 @@
 
   <!-- OPERATION LOG ENTRY SELECT -->
 
-  <select id="selectUserOperationLogEntry" resultMap="UserOperationLogResultMap">
+  <select id="selectUserOperationLogEntryEvent" resultMap="UserOperationLogResultMap">
     select * from ${prefix}ACT_HI_OP_LOG where ID_ = #{id}
   </select>
 
@@ -201,6 +201,21 @@
       <if test="timestampBefore != null">
         and RES.TIMESTAMP_ &lt; #{timestampBefore}
       </if>
+
+      <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+        AND
+          ( CASE
+
+            WHEN
+              RES.PROC_DEF_KEY_ is not null
+            THEN
+              (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />)
+
+            ELSE
+              1
+          END ) = 1
+      </if>
+
     </where>
   </sql>
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?> 
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
-  
+
 <mapper namespace="org.camunda.bpm.engine.history.HistoricActivityStatistics">
 
   <!-- RESULTMAP -->
@@ -13,7 +13,7 @@
     <result property="canceled" column="CANCELED_COUNT_" jdbcType="INTEGER" />
     <result property="completeScope" column="COMPLETE_SCOPE_COUNT_" jdbcType="INTEGER" />
   </resultMap>
-  
+
   <!-- HistoricActivity statistics -->
 
   <select id ="selectHistoricActivityStatistics" resultMap="historicActivityStatisticsResultMap" 
@@ -26,13 +26,13 @@
     ${orderBy}
     ${limitAfter}
   </select>
-  
+
   <select id ="selectHistoricActivityStatisticsCount" resultType="long" 
     parameterType="org.camunda.bpm.engine.impl.HistoricActivityStatisticsQueryImpl">
     select count(RES.ID_)
     <include refid="selectHistoricActivityStatisticsByQueryCriteriaSql"/>
   </select>
-   
+
   <sql id="selectHistoricActivityStatisticsByQueryCriteriaSql">
     from (
       select ACTIVITY.ACT_ID_ as ID_
@@ -64,6 +64,9 @@
           or ACT_INST_STATE_ = 1
           </if>
           )
+
+          <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+
         ) ACTIVITY
 
         left outer join
@@ -89,7 +92,7 @@
         ) FINISHED
         on FINISHED.ACT_ID_ = ACTIVITY.ACT_ID_
         </if>
-        
+
         <if test="includeCanceled">
         left outer join
 
@@ -102,7 +105,7 @@
         ) CANCELED
         on CANCELED.ACT_ID_ = ACTIVITY.ACT_ID_
         </if>
-      
+
         <if test="includeCompleteScope">
         left outer join
 
@@ -115,8 +118,8 @@
         ) COMPLETE
         on COMPLETE.ACT_ID_ = ACTIVITY.ACT_ID_
         </if>
-      
+
       ) RES
   </sql>
-  
+
 </mapper>

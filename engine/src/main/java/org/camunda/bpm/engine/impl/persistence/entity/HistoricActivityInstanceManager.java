@@ -47,11 +47,13 @@ public class HistoricActivityInstanceManager extends AbstractHistoricManager {
   }
 
   public long findHistoricActivityInstanceCountByQueryCriteria(HistoricActivityInstanceQueryImpl historicActivityInstanceQuery) {
+    getAuthorizationManager().configureHistoricActivityInstanceQuery(historicActivityInstanceQuery);
     return (Long) getDbEntityManager().selectOne("selectHistoricActivityInstanceCountByQueryCriteria", historicActivityInstanceQuery);
   }
 
   @SuppressWarnings("unchecked")
   public List<HistoricActivityInstance> findHistoricActivityInstancesByQueryCriteria(HistoricActivityInstanceQueryImpl historicActivityInstanceQuery, Page page) {
+    getAuthorizationManager().configureHistoricActivityInstanceQuery(historicActivityInstanceQuery);
     return getDbEntityManager().selectList("selectHistoricActivityInstancesByQueryCriteria", historicActivityInstanceQuery, page);
   }
 

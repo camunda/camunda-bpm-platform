@@ -14,6 +14,8 @@
 
 package org.camunda.bpm.engine;
 
+import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricActivityStatisticsQuery;
@@ -86,20 +88,31 @@ public interface HistoryService {
   /** Creates a new programmatic query to search for {@link HistoricCaseActivityInstance}s. */
   HistoricCaseActivityInstanceQuery createHistoricCaseActivityInstanceQuery();
 
-  /** Deletes historic task instance.  This might be useful for tasks that are
+  /**
+   * Deletes historic task instance.  This might be useful for tasks that are
    * {@link TaskService#newTask() dynamically created} and then {@link TaskService#complete(String) completed}.
    * If the historic task instance doesn't exist, no exception is thrown and the
-   * method returns normal.*/
+   * method returns normal.
+   *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}.
+   */
   void deleteHistoricTaskInstance(String taskId);
 
   /**
    * Deletes historic process instance. All historic activities, historic task and
    * historic details (variable updates, form properties) are deleted as well.
+   *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void deleteHistoricProcessInstance(String processInstanceId);
 
   /**
    * Deletes a user operation log entry. Does not cascade to any related entities.
+   *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void deleteUserOperationLogEntry(String entryId);
 
@@ -148,6 +161,9 @@ public interface HistoryService {
    *
    * @param historicJobLogId id of the historic job log, cannot be null.
    * @throws ProcessEngineException when no historic job log exists with the given id.
+   *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#READ_HISTORY} permission on {@link Resources#PROCESS_DEFINITION}.
    *
    * @since 7.3
    */

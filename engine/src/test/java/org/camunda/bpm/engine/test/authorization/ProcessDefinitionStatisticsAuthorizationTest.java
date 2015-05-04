@@ -24,7 +24,6 @@ import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatisticsQuery;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 /**
  * @author Roman Smirnov
@@ -101,9 +100,9 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ);
 
@@ -123,9 +122,9 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     String firstProcessInstanceId = startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ);
     createGrantAuthorization(PROCESS_INSTANCE, firstProcessInstanceId, userId, READ);
@@ -148,9 +147,9 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ);
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
@@ -173,9 +172,9 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ);
     createGrantAuthorization(PROCESS_DEFINITION, ONE_TASK_PROCESS_KEY, userId, READ_INSTANCE);
@@ -198,9 +197,9 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ, READ_INSTANCE);
 
@@ -224,9 +223,9 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ);
 
@@ -249,9 +248,9 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
 
-    String firstProcessInstanceId = startOneIncidentProcessAndExecuteJob().getId();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    String firstProcessInstanceId = startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY).getId();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ);
     createGrantAuthorization(PROCESS_INSTANCE, firstProcessInstanceId, userId, READ);
@@ -277,9 +276,9 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ);
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
@@ -305,9 +304,9 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ);
     createGrantAuthorization(PROCESS_DEFINITION, ONE_INCIDENT_PROCESS_KEY, userId, READ_INSTANCE);
@@ -333,9 +332,9 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ, READ_INSTANCE);
 
@@ -362,9 +361,9 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ);
 
@@ -387,9 +386,9 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
 
-    String firstProcessInstanceId = startOneIncidentProcessAndExecuteJob().getId();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    String firstProcessInstanceId = startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY).getId();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ);
     createGrantAuthorization(PROCESS_INSTANCE, firstProcessInstanceId, userId, READ);
@@ -415,9 +414,9 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ);
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
@@ -443,9 +442,9 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ);
     createGrantAuthorization(PROCESS_DEFINITION, ONE_INCIDENT_PROCESS_KEY, userId, READ_INSTANCE);
@@ -471,9 +470,9 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ, READ_INSTANCE);
 
@@ -500,9 +499,9 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ);
 
@@ -526,9 +525,9 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY).getId();
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
 
-    String firstProcessInstanceId = startOneIncidentProcessAndExecuteJob().getId();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    String firstProcessInstanceId = startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY).getId();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ);
     createGrantAuthorization(PROCESS_INSTANCE, firstProcessInstanceId, userId, READ);
@@ -555,9 +554,9 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ);
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, READ);
@@ -584,9 +583,9 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ);
     createGrantAuthorization(PROCESS_DEFINITION, ONE_INCIDENT_PROCESS_KEY, userId, READ_INSTANCE);
@@ -613,9 +612,9 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
     startProcessInstanceByKey(ONE_TASK_PROCESS_KEY);
 
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
-    startOneIncidentProcessAndExecuteJob();
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
+    startProcessAndExecuteJob(ONE_INCIDENT_PROCESS_KEY);
 
     createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ, READ_INSTANCE);
 
@@ -654,12 +653,6 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
       // the test does have only one type of incidents
       assertEquals("Incidents", incidents, incidentStatistics.get(0).getIncidentCount());
     }
-  }
-
-  protected ProcessInstance startOneIncidentProcessAndExecuteJob() {
-    ProcessInstance processInstance = startProcessInstanceByKey(ONE_INCIDENT_PROCESS_KEY);
-    executeAvailableJobs();
-    return processInstance;
   }
 
   protected ProcessDefinitionStatistics getStatisticsByKey(List<ProcessDefinitionStatistics> statistics, String key) {

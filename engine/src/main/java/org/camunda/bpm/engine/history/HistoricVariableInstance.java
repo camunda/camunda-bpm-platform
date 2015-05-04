@@ -69,6 +69,16 @@ public interface HistoricVariableInstance {
   String getVariableTypeName();
 
   /**
+   * The process definition key reference.
+   */
+  String getProcessDefinitionKey();
+
+  /**
+   * The process definition reference.
+   */
+  String getProcessDefinitionId();
+
+  /**
    * The process instance reference.
    */
   String getProcessInstanceId();
@@ -83,6 +93,16 @@ public interface HistoricVariableInstance {
    * Returns the corresponding activity instance id.
    */
   String getActivityInstanceId();
+
+  /**
+   * The case definition key reference.
+   */
+  String getCaseDefinitionKey();
+
+  /**
+   * The case definition reference.
+   */
+  String getCaseDefinitionId();
 
   /**
    * The case instance reference.

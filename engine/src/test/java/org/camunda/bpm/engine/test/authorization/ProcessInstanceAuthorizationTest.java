@@ -34,7 +34,6 @@ import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
-import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
@@ -1867,7 +1866,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     assertTrue(instance.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   public void testSuspendProcessInstanceByProcessDefinitionKeyWithUpdateInstancesPermissionOnProcessDefinition() {
@@ -1883,7 +1882,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     assertTrue(instance.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   public void testSuspendProcessInstanceByProcessDefinitionKey() {
@@ -1902,7 +1901,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     assertTrue(instance.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   // activate process instance by process definition key /////////////////////////////
@@ -1967,7 +1966,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     assertFalse(instance.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   public void testActivateProcessInstanceByProcessDefinitionKeyWithUpdateInstancesPermissionOnProcessDefinition() {
@@ -1986,7 +1985,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     assertFalse(instance.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   public void testActivateProcessInstanceByProcessDefinitionKey() {
@@ -2006,7 +2005,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     assertFalse(instance.isSuspended());
 
     // clean operation log
-    TestHelper.clearOpLog(processEngineConfiguration);
+    clearOpLog();
   }
 
   // modify process instance /////////////////////////////////////

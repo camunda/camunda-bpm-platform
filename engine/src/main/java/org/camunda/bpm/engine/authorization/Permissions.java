@@ -68,7 +68,13 @@ public enum Permissions implements Permission {
   UPDATE_INSTANCE("UPDATE_INSTANCE", 1024),
 
   /** Indicates that DELETE_INSTANCE interactions are permitted. */
-  DELETE_INSTANCE("DELETE_INSTANCE", 2048);
+  DELETE_INSTANCE("DELETE_INSTANCE", 2048),
+
+  /** Indicates that UPDATE_INSTANCE interactions are permitted. */
+  READ_HISTORY("READ_HISTORY", 4096),
+
+  /** Indicates that DELETE_INSTANCE interactions are permitted. */
+  DELETE_HISTORY("DELETE_HISTORY", 8192);
 
   // 10 additional (32 ... 16384(=2^14)) are reserved
 

@@ -978,4 +978,23 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     assertNotNull(historicCallActivity.getEndTime());
   }
 
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
+  public void testProcessDefinitionKeyProperty() {
+    // given
+    String key = "oneTaskProcess";
+    String processInstanceId = runtimeService.startProcessInstanceByKey(key).getId();
+
+    // when
+    HistoricActivityInstance activityInstance = historyService
+      .createHistoricActivityInstanceQuery()
+      .processInstanceId(processInstanceId)
+      .activityId("theTask")
+      .singleResult();
+
+    // then
+    assertNotNull(activityInstance.getProcessDefinitionKey());
+    assertEquals(key, activityInstance.getProcessDefinitionKey());
+
+  }
+
 }
