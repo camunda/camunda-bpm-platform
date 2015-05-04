@@ -125,8 +125,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificDummyTable.put(MYSQL, "");
     databaseSpecificTrueConstant.put(MYSQL, "1");
     databaseSpecificFalseConstant.put(MYSQL, "0");
-    addDatabaseSpecificStatement(MYSQL, "selectNextJobsToExecute", "selectNextJobsToExecute_mysql");
-    addDatabaseSpecificStatement(MYSQL, "selectExclusiveJobsToExecute", "selectExclusiveJobsToExecute_mysql");
     addDatabaseSpecificStatement(MYSQL, "selectProcessDefinitionsByQueryCriteria", "selectProcessDefinitionsByQueryCriteria_mysql");
     addDatabaseSpecificStatement(MYSQL, "selectProcessDefinitionCountByQueryCriteria", "selectProcessDefinitionCountByQueryCriteria_mysql");
     addDatabaseSpecificStatement(MYSQL, "selectDeploymentsByQueryCriteria", "selectDeploymentsByQueryCriteria_mysql");
