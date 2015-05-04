@@ -7,6 +7,7 @@
 
     <module name="javax.api" />
     <module name="com.fasterxml.jackson.core.jackson-databind" />
+    <module name="org.slf4j" />
 
   </dependencies>
 </module>
