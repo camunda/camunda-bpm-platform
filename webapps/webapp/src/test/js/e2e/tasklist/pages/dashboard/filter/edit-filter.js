@@ -14,6 +14,10 @@ module.exports = Page.extend({
 
   deleteFilterButton: function() {
     return this.formElement().element(by.css('[ng-click="confirmDeletion()"]'));
+  },
+
+  includeAssignedTasksCheckbox: function () {
+    return this.formElement().element(by.css('[ng-model="filter.includeAssignedTasks"]'));
   }
 
 });

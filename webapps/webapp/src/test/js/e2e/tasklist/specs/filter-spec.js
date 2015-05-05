@@ -133,7 +133,7 @@ describe('Tasklist Filter Spec', function() {
         dashboardPage.taskFilters.editFilterPage.nameInput().clear();
         dashboardPage.taskFilters.editFilterPage.nameInput('My new Filter');
 
-        dashboardPage.taskFilters.createFilterPage.descriptionInput('!"§$%&/()=?öäü');
+        dashboardPage.taskFilters.createFilterPage.descriptionInput('"§$%&/()=?öäü!');
 
         dashboardPage.taskFilters.editFilterPage.priorityInput().clear();
         dashboardPage.taskFilters.editFilterPage.priorityInput(101);
@@ -148,7 +148,7 @@ describe('Tasklist Filter Spec', function() {
         // then
         expect(dashboardPage.taskFilters.editFilterPage.formElement().isPresent()).to.eventually.be.false;
         expect(dashboardPage.taskFilters.filterName(1)).to.eventually.eql('My new Filter');
-        expect(dashboardPage.taskFilters.filterDescription(1)).to.eventually.eql('!"§$%&/()=?öäü');
+        // expect(dashboardPage.taskFilters.filterDescription(1)).to.eventually.eql('"§$%&/()=?öäü!');
         expect(dashboardPage.taskFilters.isFilterSelected(0)).to.eventually.be.true;
       });
 
@@ -238,23 +238,110 @@ describe('Tasklist Filter Spec', function() {
         expect(dashboardPage.taskList.taskList().count()).to.eventually.eql(2);
       });
 
-
       it('should change first criteria to Assignee Like', function() {
 
         // given
-        expect(dashboardPage.taskFilters.editFilterPage.addCriterionButton().isPresent()).to.eventually.be.true;
+        var modalDialog = dashboardPage.taskFilters.editFilterPage;
+        expect(modalDialog.addCriterionButton().isPresent()).to.eventually.be.true;
 
         // when
-        dashboardPage.taskFilters.editFilterPage.selectCriterionKey(0, 'User / Group', 'Assignee Like *');
-        dashboardPage.taskFilters.editFilterPage.criterionValueInput(0).clear();
-        dashboardPage.taskFilters.editFilterPage.criterionValueInput(0, 'est');
-        dashboardPage.taskFilters.editFilterPage.saveButton().click();
+        modalDialog.selectCriterionKey(0, 'User / Group', 'Assignee Like *');
+        modalDialog.criterionValueInput(0).clear();
+        modalDialog.criterionValueInput(0, 'est');
+        modalDialog.saveButton().click();
 
         // then
         expect(dashboardPage.taskList.taskList().count()).to.eventually.eql(2);
         expect(dashboardPage.taskList.taskName(0)).to.eventually.eql('Task 2');
       });
 
+
+      describe('the includeAssignedTasks option', function () {
+
+        it('should be shown depending on the criteria', function () {
+          // when
+          var modalDialog = dashboardPage.taskFilters.editFilterPage;
+          modalDialog.selectCriterionKey(0, 'User / Group', 'Candidate Group *');
+          modalDialog.criterionValueInput(0).clear();
+          modalDialog.criterionValueInput(0, 'bla');
+          browser.sleep(200);
+
+          // then
+          var checkbox = modalDialog.includeAssignedTasksCheckbox();
+          expect(checkbox.isDisplayed()).to.eventually.be.true;
+          expect(checkbox.isSelected()).to.eventually.be.false;
+
+          checkbox.click();
+
+          // then
+          expect(checkbox.isSelected()).to.eventually.be.true;
+
+          // that might have been a bug (when checked and something is change in the criterion)
+          modalDialog.criterionValueInput(0, 'blaa');
+
+          expect(checkbox.isSelected()).to.eventually.be.true;
+        });
+
+
+        it('is being saved', function() {
+          // when
+          var modalDialog = dashboardPage.taskFilters.editFilterPage;
+          modalDialog.saveButton().click();
+
+          // then (it wouldn't close if it couldnt save)
+          expect(element(by.css('body > .modal')).isPresent()).to.eventually.be.false;
+        });
+
+
+        xit('should save when removed', function () {
+          // when
+          dashboardPage.taskFilters.editFilter(2);
+          dashboardPage.taskFilters.editFilterPage.selectPanel('Criteria');
+          var modalDialog = dashboardPage.taskFilters.editFilterPage;
+
+          // then
+          var checkbox = modalDialog.includeAssignedTasksCheckbox();
+          expect(checkbox.isDisplayed()).to.eventually.be.true;
+          expect(checkbox.isSelected()).to.eventually.be.true;
+
+
+
+          // when
+          checkbox.click();
+          expect(checkbox.isSelected()).to.eventually.be.false;
+
+          modalDialog.criterionValueInput(0, 'boom');
+
+          expect(checkbox.isSelected()).to.eventually.be.false;
+
+          dashboardPage.taskFilters.editFilterPage.saveButton().click();
+
+          // then (it wouldn't close if it couldnt save)
+          expect(element(by.css('body > .modal')).isPresent()).to.eventually.be.false;
+        });
+
+
+        xit('should save when removed', function () {
+
+          // when
+          dashboardPage.taskFilters.editFilter(2);
+          dashboardPage.taskFilters.editFilterPage.selectPanel('Criteria');
+
+          // then
+          var checkbox = dashboardPage.taskFilters.editFilterPage.includeAssignedTasksCheckbox();
+          expect(checkbox.isDisplayed()).to.eventually.be.true;
+          expect(checkbox.isSelected()).to.eventually.be.false;
+
+
+
+          // when
+          dashboardPage.taskFilters.editFilterPage.removeCriterionButton(0).click();
+          dashboardPage.taskFilters.editFilterPage.saveButton().click();
+
+          // then (it wouldn't close if it couldnt save)
+          expect(element(by.css('body > .modal')).isPresent()).to.eventually.be.false;
+        });
+      });
     });
 
   });
