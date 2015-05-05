@@ -22,6 +22,10 @@ module.exports = Page.extend({
 
   removeVariableButton: function() {
     return this.formElement().element(by.css('[ng-click="removeVariable(delta)"]'));
+  },
+
+  businessKeyField: function () {
+    return this.formElement().element(by.css('[cam-business-key]'));
   }
 
 });
