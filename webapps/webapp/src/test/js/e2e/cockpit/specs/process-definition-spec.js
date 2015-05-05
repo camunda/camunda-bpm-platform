@@ -48,7 +48,7 @@ describe('Cockpit Process Definition Spec', function() {
 
       // then
       expect(definitionPage.calledProcessDefinitionsTab.isTabSelected()).to.eventually.be.true;
-      expect(definitionPage.calledProcessDefinitionsTab.tabName()).to.eventually.eql(definitionPage.calledProcessDefinitionsTab.tabLabel)
+      expect(definitionPage.calledProcessDefinitionsTab.tabName()).to.eventually.eql(definitionPage.calledProcessDefinitionsTab.tabLabel);
     });
 
 
@@ -59,7 +59,7 @@ describe('Cockpit Process Definition Spec', function() {
 
       // then
       expect(definitionPage.jobDefinitionsTab.isTabSelected()).to.eventually.be.true;
-      expect(definitionPage.jobDefinitionsTab.tabName()).to.eventually.eql(definitionPage.jobDefinitionsTab.tabLabel)
+      expect(definitionPage.jobDefinitionsTab.tabName()).to.eventually.eql(definitionPage.jobDefinitionsTab.tabLabel);
     });
 
 
@@ -70,7 +70,7 @@ describe('Cockpit Process Definition Spec', function() {
 
       // then
       expect(definitionPage.processInstancesTab.isTabSelected()).to.eventually.be.true;
-      expect(definitionPage.processInstancesTab.tabName()).to.eventually.eql(definitionPage.processInstancesTab.tabLabel)
+      expect(definitionPage.processInstancesTab.tabName()).to.eventually.eql(definitionPage.processInstancesTab.tabLabel);
     });
 
   });

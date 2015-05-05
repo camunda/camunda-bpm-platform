@@ -45,7 +45,7 @@ describe('Cockpit Process Instance Spec', function() {
 
       // then
       expect(instancePage.userTasksTab.isTabSelected()).to.eventually.be.true;
-      expect(instancePage.userTasksTab.tabName()).to.eventually.eql(instancePage.userTasksTab.tabLabel)
+      expect(instancePage.userTasksTab.tabName()).to.eventually.eql(instancePage.userTasksTab.tabLabel);
     });
 
 
@@ -56,7 +56,7 @@ describe('Cockpit Process Instance Spec', function() {
 
       // then
       expect(instancePage.calledInstancesTab.isTabSelected()).to.eventually.be.true;
-      expect(instancePage.calledInstancesTab.tabName()).to.eventually.eql(instancePage.calledInstancesTab.tabLabel)
+      expect(instancePage.calledInstancesTab.tabName()).to.eventually.eql(instancePage.calledInstancesTab.tabLabel);
     });
 
 
@@ -67,7 +67,7 @@ describe('Cockpit Process Instance Spec', function() {
 
       // then
       expect(instancePage.incidentsTab.isTabSelected()).to.eventually.be.true;
-      expect(instancePage.incidentsTab.tabName()).to.eventually.eql(instancePage.incidentsTab.tabLabel)
+      expect(instancePage.incidentsTab.tabName()).to.eventually.eql(instancePage.incidentsTab.tabLabel);
     });
 
 
@@ -78,7 +78,7 @@ describe('Cockpit Process Instance Spec', function() {
 
       // then
       expect(instancePage.variablesTab.isTabSelected()).to.eventually.be.true;
-      expect(instancePage.variablesTab.tabName()).to.eventually.eql(instancePage.variablesTab.tabLabel)
+      expect(instancePage.variablesTab.tabName()).to.eventually.eql(instancePage.variablesTab.tabLabel);
     });
 
   });
