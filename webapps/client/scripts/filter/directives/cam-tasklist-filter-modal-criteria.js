@@ -1,9 +1,10 @@
 define(function() {
   'use strict';
 
-  var dateExpLangHelp = 'E.g.: ${ now() }, ${ dateTime() } or ${ dateTime().plusWeeks(2) }';
-  var userExpLangHelp = 'E.g.: ${ currentUser() }';
-  var groupExpLangHelp = 'E.g.: ${ currentUserGroups() }';
+  var dateExpLangHelp = 'E.g.: `${ now() }`, `${ dateTime() }` or `${ dateTime().plusWeeks(2) }`';
+  var userExpLangHelp = 'E.g.: `${ currentUser() }`';
+  var commaSeparatedExps = 'List of expressions or values separated by comma. E.g.: `${ currentUserGroups() }, camunda-admin`';
+  var commaSeparatedValues = 'List of values seperated by comma. E.g.: `keyC, keyA, keyB`';
 
   // yyyy-MM-dd'T'HH:mm:ss
   var dateRegex = /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(|\.[0-9]{0,4})(|Z)$/;
@@ -64,7 +65,8 @@ define(function() {
         },
         {
           name: 'processDefinitionKeyIn',
-          label: 'Key In'
+          label: 'Key In',
+          help: commaSeparatedValues
         },
         {
           name: 'processDefinitionName',
@@ -124,7 +126,8 @@ define(function() {
         },
         {
           name: 'activityInstanceIdIn',
-          label: 'Activity Instance Id In'
+          label: 'Activity Instance Id In',
+          help: commaSeparatedValues
         },
         {
           name: 'executionId',
@@ -163,7 +166,7 @@ define(function() {
           name: 'candidateGroups',
           label: 'Candidate Groups',
           expressionSupport: true,
-          help: groupExpLangHelp,
+          help: commaSeparatedExps,
           includeAssignedTasksSupport: true
         },
         {
@@ -199,7 +202,8 @@ define(function() {
         },
         {
           name: 'taskDefinitionKeyIn',
-          label: 'Definition Key In'
+          label: 'Definition Key In',
+          help: commaSeparatedValues
         },
         {
           name: 'taskDefinitionKeyLike',
