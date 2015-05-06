@@ -86,7 +86,7 @@ define([
         $scope.$watch('query', function () {
           $scope.includeAssignedTasks = $scope.filter.includeAssignedTasks = (
             $scope.canIncludeAssignedTasks() &&
-            $scope.includeAssignedTasks
+            $scope.filter.includeAssignedTasks
           );
         }, true);
 
