@@ -30,8 +30,8 @@ module.exports = Table.extend({
     return element.all(by.repeater(this.tableRepeater));
   },
 
-  tableItem: function(item, bindingSelector) {
-    return this.table().get(item).element(by.binding(bindingSelector));
+  tableItem: function(item, cssSelector) {
+    return this.table().get(item).element(by.css(cssSelector));
   }
 
 });

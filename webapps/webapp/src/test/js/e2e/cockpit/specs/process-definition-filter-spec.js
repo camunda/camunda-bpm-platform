@@ -37,7 +37,7 @@ describe('Cockpit Process Definition Filter Spec', function() {
 
       // then
       expect(definitionPage.processInstancesTab.table().count()).to.eventually.eql(1);
-      expect(definitionPage.processInstancesTab.instanceBusinessKey(0)).to.eventually.eql('Instance2');
+      expect(definitionPage.processInstancesTab.businessKey(0).getText()).to.eventually.eql('Instance2');
     });
 
 
@@ -61,7 +61,7 @@ describe('Cockpit Process Definition Filter Spec', function() {
 
       // then
       expect(definitionPage.processInstancesTab.table().count()).to.eventually.eql(1);
-      expect(definitionPage.processInstancesTab.instanceBusinessKey(0)).to.eventually.eql('Instance1');
+      expect(definitionPage.processInstancesTab.businessKey(0).getText()).to.eventually.eql('Instance1');
     });
 
   });
@@ -85,7 +85,7 @@ describe('Cockpit Process Definition Filter Spec', function() {
 
       // then
       expect(definitionPage.processInstancesTab.table().count()).to.eventually.eql(1);
-      expect(definitionPage.processInstancesTab.instanceBusinessKey(0)).to.eventually.eql('myBusinessKey');
+      expect(definitionPage.processInstancesTab.businessKey(0).getText()).to.eventually.eql('myBusinessKey');
     });
 
 
@@ -99,7 +99,7 @@ describe('Cockpit Process Definition Filter Spec', function() {
     });
 
 
-    it('should combine variable filter and business key filter', function(done) {
+    it('should combine variable filter and business key filter', function() {
 
       // when
       definitionPage.filter.addFilterByVariable('test>1.49');
@@ -112,7 +112,7 @@ describe('Cockpit Process Definition Filter Spec', function() {
 
       // then
       expect(definitionPage.processInstancesTab.table().count()).to.eventually.eql(1);
-      expect(definitionPage.processInstancesTab.instanceBusinessKey(0)).to.eventually.eql('Instance1');
+      expect(definitionPage.processInstancesTab.businessKey(0).getText()).to.eventually.eql('Instance1');
     });
 
   });
@@ -139,7 +139,7 @@ describe('Cockpit Process Definition Filter Spec', function() {
 
       // then
       expect(definitionPage.processInstancesTab.table().count()).to.eventually.eql(1);
-      expect(definitionPage.processInstancesTab.instanceBusinessKey(0)).to.eventually.eql('myBusinessKey');
+      expect(definitionPage.processInstancesTab.businessKey(0).getText()).to.eventually.eql('myBusinessKey');
     });
 
 
@@ -150,7 +150,7 @@ describe('Cockpit Process Definition Filter Spec', function() {
 
       // then
       expect(definitionPage.processInstancesTab.table().count()).to.eventually.eql(1);
-      expect(definitionPage.processInstancesTab.instanceBusinessKey(0)).to.eventually.eql('Instance1');
+      expect(definitionPage.processInstancesTab.businessKey(0).getText()).to.eventually.eql('Instance1');
     });
 
   });
@@ -169,7 +169,7 @@ describe('Cockpit Process Definition Filter Spec', function() {
     it('should add date filter', function() {
 
       // when
-      definitionPage.processInstancesTab.instanceStartTime(0).then(function(startTime) {
+      definitionPage.processInstancesTab.startTime(0).getText().then(function(startTime) {
         definitionPage.filter.addFilterByStartDate('after', startTime);
       });
 

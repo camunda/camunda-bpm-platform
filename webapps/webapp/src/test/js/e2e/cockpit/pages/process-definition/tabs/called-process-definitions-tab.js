@@ -9,21 +9,12 @@ module.exports = Table.extend({
   tabLabel: 'Called Process Definitions',
   tableRepeater: 'calledProcessDefinition in calledProcessDefinitions',
 
-  selectCalledProcessDefinitions: function(item) {
-    this.tableItem(item, 'calledProcessDefinition.name').click();
+  calledProcessDefintion: function(item) {
+    return this.tableItem(item, '.process-definition');
   },
 
-  calledProcessDefintionName: function(item) {
-    return this.tableItem(item, 'calledProcessDefinition.name').getText();
-  },
-
-  selectCalledFromActivity: function(item) {
-    this.tableItem(item, 'calledProcessDefinition.calledFromActivities[0].name').click()
-  },
-
-  calledFromActivityName: function(item) {
-    return this.tableItem(item, 'activity.name').getText();
+  activity: function(item) {
+    return this.tableItem(item, '.activity');
   }
-
 
 });

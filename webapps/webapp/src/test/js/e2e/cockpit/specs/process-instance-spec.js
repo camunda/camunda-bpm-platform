@@ -27,13 +27,13 @@ describe('Cockpit Process Instance Spec', function() {
     it('should go to process instance view', function() {
 
       // given
-      definitionPage.processInstancesTab.instanceId(1).then(function(instanceIdy) {
+      definitionPage.processInstancesTab.instanceId(1).then(function(instanceId) {
 
         // when
-        definitionPage.processInstancesTab.selectInstance(1);
+        definitionPage.processInstancesTab.instanceIdClick(1);
 
         // then
-        expect(instancePage.pageHeaderProcessInstanceName()).to.eventually.eql(instanceIdy);
+        expect(instancePage.pageHeaderProcessInstanceName()).to.eventually.eql(instanceId);
       });
     });
 
@@ -91,7 +91,7 @@ describe('Cockpit Process Instance Spec', function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
         dashboardPage.deployedProcessesList.selectProcess(0);
-        definitionPage.processInstancesTab.selectInstance(0);
+        definitionPage.processInstancesTab.instanceIdClick(0);
       });
     });
 
@@ -103,17 +103,27 @@ describe('Cockpit Process Instance Spec', function() {
 
       // then
       expect(instancePage.userTasksTab.table().count()).to.eventually.eql(1);
-      expect(instancePage.userTasksTab.userTaskName(0)).to.eventually.eql('User Task 1');
+      expect(instancePage.userTasksTab.activity(0).getText()).to.eventually.eql('User Task 1');
     });
 
 
     it('should select user task', function() {
 
       // when
-      instancePage.userTasksTab.selectUserTask(0);
+      instancePage.userTasksTab.activity(0).click();
 
       // then
       expect(instancePage.diagram.isActivitySelected('UserTask_1')).to.eventually.be.true;
+    });
+
+
+    it('should add new assignee', function() {
+
+      // when
+      instancePage.userTasksTab.addNewAssignee(0, 'Franz');
+
+      // then
+      expect(instancePage.userTasksTab.assignee(0).getText()).is.eventually.eql('Franz');
     });
 
   });
@@ -126,7 +136,7 @@ describe('Cockpit Process Instance Spec', function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
         dashboardPage.deployedProcessesList.selectProcess(0);
-        definitionPage.processInstancesTab.selectInstance(0);
+        definitionPage.processInstancesTab.instanceIdClick(0);
       });
     });
 
@@ -144,10 +154,10 @@ describe('Cockpit Process Instance Spec', function() {
 
       instancePage.variablesTab.findElementIndexInRepeater('variable in variables', by.binding('variable.name'), 'myTestVar')
         .then(function(idx) {
-          expect(instancePage.variablesTab.variableName(idx)).to.eventually.eql('myTestVar');
-          expect(instancePage.variablesTab.variableType(idx)).to.eventually.eql('String');
-          expect(instancePage.variablesTab.variableValue(idx)).to.eventually.eql('12345');
-          expect(instancePage.variablesTab.variableScopeName(idx)).to.eventually.eql('User Tasks');
+          expect(instancePage.variablesTab.variableName(idx).getText()).to.eventually.eql('myTestVar');
+          expect(instancePage.variablesTab.variableType(idx).getText()).to.eventually.eql('String');
+          expect(instancePage.variablesTab.variableValue(idx).getText()).to.eventually.eql('12345');
+          expect(instancePage.variablesTab.variableScope(idx).getText()).to.eventually.eql('User Tasks');
         });
     });
 
@@ -165,10 +175,10 @@ describe('Cockpit Process Instance Spec', function() {
 
         instancePage.variablesTab.findElementIndexInRepeater('variable in variables', by.binding('variable.name'), 'myBooleanVar')
           .then(function(idx) {
-            expect(instancePage.variablesTab.variableName(idx)).to.eventually.eql('myBooleanVar');
-            expect(instancePage.variablesTab.variableType(idx)).to.eventually.eql('Boolean');
-            expect(instancePage.variablesTab.variableValue(idx)).to.eventually.eql('true');
-            expect(instancePage.variablesTab.variableScopeName(idx)).to.eventually.eql('User Tasks');
+            expect(instancePage.variablesTab.variableName(idx).getText()).to.eventually.eql('myBooleanVar');
+            expect(instancePage.variablesTab.variableType(idx).getText()).to.eventually.eql('Boolean');
+            expect(instancePage.variablesTab.variableValue(idx).getText()).to.eventually.eql('true');
+            expect(instancePage.variablesTab.variableScope(idx).getText()).to.eventually.eql('User Tasks');
           });
       });
     });
@@ -186,10 +196,10 @@ describe('Cockpit Process Instance Spec', function() {
         expect(instancePage.variablesTab.table().count()).to.eventually.eql(varCountBefore+1);
         instancePage.variablesTab.findElementIndexInRepeater('variable in variables', by.binding('variable.name'), 'myNullVar')
         .then(function(idx) {
-          expect(instancePage.variablesTab.variableName(idx)).to.eventually.eql('myNullVar');
-          expect(instancePage.variablesTab.variableType(idx)).to.eventually.eql('Null');
-          expect(instancePage.variablesTab.variableValue(idx)).to.eventually.eql('');
-          expect(instancePage.variablesTab.variableScopeName(idx)).to.eventually.eql('User Tasks');
+          expect(instancePage.variablesTab.variableName(idx).getText()).to.eventually.eql('myNullVar');
+          expect(instancePage.variablesTab.variableType(idx).getText()).to.eventually.eql('Null');
+          expect(instancePage.variablesTab.variableValue(idx).getText()).to.eventually.eql('');
+          expect(instancePage.variablesTab.variableScope(idx).getText()).to.eventually.eql('User Tasks');
         });
       });
     });
@@ -211,10 +221,10 @@ describe('Cockpit Process Instance Spec', function() {
         expect(instancePage.variablesTab.table().count()).to.eventually.eql(varCountBefore+1);
         instancePage.variablesTab.findElementIndexInRepeater('variable in variables', by.binding('variable.name'), 'myObjectVar')
         .then(function(idx) {
-          expect(instancePage.variablesTab.variableName(idx)).to.eventually.eql('myObjectVar');
-          expect(instancePage.variablesTab.variableType(idx)).to.eventually.eql('Object');
-          expect(instancePage.variablesTab.variableValue(idx)).to.eventually.eql('java.lang.Object');
-          expect(instancePage.variablesTab.variableScopeName(idx)).to.eventually.eql('User Tasks');
+          expect(instancePage.variablesTab.variableName(idx).getText()).to.eventually.eql('myObjectVar');
+          expect(instancePage.variablesTab.variableType(idx).getText()).to.eventually.eql('Object');
+          expect(instancePage.variablesTab.variableValue(idx).getText()).to.eventually.eql('java.lang.Object');
+          expect(instancePage.variablesTab.variableScope(idx).getText()).to.eventually.eql('User Tasks');
         });
       });
     });
@@ -225,21 +235,21 @@ describe('Cockpit Process Instance Spec', function() {
       // given
       instancePage.variablesTab.findElementIndexInRepeater('variable in variables', by.binding('variable.name'), 'test')
         .then(function(idx) {
-          expect(instancePage.variablesTab.variableType(idx)).to.eventually.eql('Double');
-          expect(instancePage.variablesTab.variableValue(idx)).to.eventually.eql('1.49');
+          expect(instancePage.variablesTab.variableType(idx).getText()).to.eventually.eql('Double');
+          expect(instancePage.variablesTab.variableValue(idx).getText()).to.eventually.eql('1.49');
 
           // when
           instancePage.variablesTab.editVariableButton(idx).click().then(function() {
-            instancePage.variablesTab.editVariableValue().clear();
-            instancePage.variablesTab.editVariableValue('1.5');
+            instancePage.variablesTab.editVariableInput().clear();
+            instancePage.variablesTab.editVariableInput('1.5');
             instancePage.variablesTab.editVariableType('String');
             instancePage.variablesTab.editVariableConfirmButton().click();
           });
 
           // then
-          expect(instancePage.variablesTab.variableName(idx)).to.eventually.eql('test');
-          expect(instancePage.variablesTab.variableValue(idx)).to.eventually.eql('1.5');
-          expect(instancePage.variablesTab.variableType(idx)).to.eventually.eql('String');
+          expect(instancePage.variablesTab.variableName(idx).getText()).to.eventually.eql('test');
+          expect(instancePage.variablesTab.variableValue(idx).getText()).to.eventually.eql('1.5');
+          expect(instancePage.variablesTab.variableType(idx).getText()).to.eventually.eql('String');
         });
     });
 
@@ -249,8 +259,8 @@ describe('Cockpit Process Instance Spec', function() {
       // given
       instancePage.variablesTab.findElementIndexInRepeater('variable in variables', by.binding('variable.name'), 'myDate')
         .then(function(idx) {
-          expect(instancePage.variablesTab.variableType(idx)).to.eventually.eql('Date');
-          expect(instancePage.variablesTab.variableValue(idx)).to.eventually.eql('2011-11-11T11:11:11');
+          expect(instancePage.variablesTab.variableType(idx).getText()).to.eventually.eql('Date');
+          expect(instancePage.variablesTab.variableValue(idx).getText()).to.eventually.eql('2011-11-11T11:11:11');
 
           // when
           instancePage.variablesTab.editVariableButton(idx).click().then(function() {
@@ -276,7 +286,7 @@ describe('Cockpit Process Instance Spec', function() {
           dashboardPage.navigateToWebapp('Cockpit');
           dashboardPage.authentication.userLogin('admin', 'admin');
           dashboardPage.deployedProcessesList.selectProcess(0);
-          definitionPage.processInstancesTab.selectInstance(0);
+          definitionPage.processInstancesTab.instanceIdClick(0);
         });
       });
 
@@ -433,7 +443,7 @@ describe('Cockpit Process Instance Spec', function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
         dashboardPage.deployedProcessesList.selectProcess(0);
-        definitionPage.processInstancesTab.selectInstance(0);
+        definitionPage.processInstancesTab.instanceIdClick(0);
       });
     });
 

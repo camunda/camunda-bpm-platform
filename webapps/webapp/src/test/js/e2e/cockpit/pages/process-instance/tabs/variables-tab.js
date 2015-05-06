@@ -10,23 +10,19 @@ module.exports = Table.extend({
   tableRepeater: 'variable in variables',
 
   variableName: function(item) {
-    return this.tableItem(item, 'variable.name').getText();
+    return this.tableItem(item, '.variable-name');
   },
 
   variableValue: function(item) {
-    return this.tableItem(item, 'variable.value').getText();
+    return this.tableItem(item, '.variable-value');
   },
 
   variableType: function(item) {
-    return this.tableItem(item, 'variable.type').getText();
+    return this.tableItem(item, '.variable-type');
   },
 
-  selectVariableScope: function(item) {
-    this.tableItem(item, 'variable.instance.name').click();
-  },
-
-  variableScopeName: function(item) {
-    return this.tableItem(item, 'variable.instance.name').getText();
+  variableScope: function(item) {
+    return this.tableItem(item, '.variable-scope');
   },
 
   inlineEditRow: function() {
@@ -34,10 +30,10 @@ module.exports = Table.extend({
   },
 
   editVariableButton: function(item) {
-    return this.tableItem(item, 'variable.value').element(by.css('[ng-click="editVariable(variable)"]'));
+    return this.variableValue(item).element(by.css('[ng-click="editVariable(variable)"]'));
   },
 
-  editVariableValue: function(inputValue) {
+  editVariableInput: function(inputValue) {
     var inputField = this.inlineEditRow().element(by.model('variable.value'));
 
     if (arguments.length !== 0)

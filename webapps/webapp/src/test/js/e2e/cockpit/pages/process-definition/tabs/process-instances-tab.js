@@ -9,20 +9,20 @@ module.exports = Table.extend({
   tabLabel: 'Process Instances',
   tableRepeater: 'processInstance in processInstances',
 
-  selectInstance: function(item) {
-    this.tableItem(item, 'processInstance.id').click();
+  instanceIdClick: function(item) {
+    this.table().get(item).element(by.binding('processInstance.id')).click();
   },
 
   instanceId: function(item) {
-    return this.table().get(item).element(by.css('[title]')).getAttribute('title');
+    return this.tableItem(item, '[title]').getAttribute('title');
   },
 
-  instanceStartTime: function(item) {
-    return this.tableItem(item, 'processInstance.startTime').getText();
+  startTime: function(item) {
+    return this.tableItem(item, '.start-time');
   },
 
-  instanceBusinessKey: function(item) {
-    return this.tableItem(item, 'processInstance.businessKey').getText();
+  businessKey: function(item) {
+    return this.tableItem(item, '.business-key');
   }
 
 });

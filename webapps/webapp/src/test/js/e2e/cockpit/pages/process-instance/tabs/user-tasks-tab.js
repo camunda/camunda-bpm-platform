@@ -9,12 +9,19 @@ module.exports = Table.extend({
   tabLabel: 'User Tasks',
   tableRepeater: 'userTask in userTasks',
 
-  userTaskName: function(item) {
-    return this.tableItem(item, 'userTask.instance.name').getText();
+  activity: function(item) {
+    return this.tableItem(item, '.activity');
   },
 
-  selectUserTask: function(item) {
-    this.tableItem(item, 'userTask.instance.name').click();
+  assignee: function(item) {
+    return this.tableItem(item, '.assignee');
+  },
+
+  addNewAssignee: function(item, inputValue) {
+    this.tableItem(item, '.edit-toggle').click();
+    element(by.css('.in-place-edit')).clear();
+    element(by.css('.in-place-edit')).sendKeys(inputValue);
+    this.tableItem(item, '.btn-group [type="submit"]').click();
   }
 
 });

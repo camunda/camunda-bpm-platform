@@ -9,28 +9,28 @@ module.exports = Table.extend({
   tabLabel: 'Called Process Instances',
   tableRepeater: 'calledProcessInstance in calledProcessInstances',
 
-  calledProcessInstanceName: function(item) {
-    return this.table().get(item).element(by.css('[title]')).getAttribute('title').getText();
+  calledProcessInstance: function(item) {
+    return this.tableItem(item, '[title]').getAttribute('title').getText();
   },
 
   selectCalledProcessInstance: function(item) {
-    return this.tableItem(item, 'calledProcessInstance.id').click();
+    return this.tableItem(item, '.called-process-instance').click();
   },
 
-  processDefinitionName: function(item) {
-    return this.tableItem(item, 'calledProcessInstance.processDefinitionName').getText();
+  processDefinition: function(item) {
+    return this.tableItem(item, '.process-definition').getText();
   },
 
   selectProcessDefinition: function(item) {
-    return this.tableItem(item, 'calledProcessInstance.processDefinitionName').click();
+    return this.tableItem(item, '.process-definition').click();
   },
 
-  calledActivityName: function(item) {
-    return this.tableItem(item, 'calledProcessInstance.instance.name').getText();
+  activity: function(item) {
+    return this.tableItem(item, '.activity').getText();
   },
 
-  selectCalledActivity: function(item) {
-    return this.tableItem(item, 'calledProcessInstance.instance.name').click();
+  selectActivity: function(item) {
+    return this.tableItem(item, '.activity').click();
   }
 
 });

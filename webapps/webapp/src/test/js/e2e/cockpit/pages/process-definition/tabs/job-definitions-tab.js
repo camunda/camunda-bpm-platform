@@ -9,21 +9,24 @@ module.exports = Table.extend({
   tabLabel: 'Job Definitions',
   tableRepeater: 'jobDefinition in jobDefinitions',
 
-  selectJobDefinition: function(item) {
-    this.tableItem(item, 'jobDefinition.activityName').click();
+  state: function(item) {
+    return this.tableItem(item, '.state:not(.ng-hide)');
   },
 
-  jobDefinitionName: function(item) {
-    return this.tableItem(item, 'jobDefinition.activityName').getText();
+  activity: function(item) {
+    return this.tableItem(item, '.activity');
   },
 
-  suspendJobButton: function(item) {
-    //return this.table().get(item).element(by.css('[ng-click="openSuspensionStateDialog(jobDefinition)"]:visible'));
-    return this.table().get(item).element(by.css('.btn.action-button[tooltip="Suspend Job Definition"]'));
+  configuration: function(item) {
+    return this.tableItem(item, '.configuration');
   },
 
-  suspendJob: function(item) {
-    this.suspendJobButton(item).click();
+  suspendJobDefinitionButton: function(item) {
+    return this.tableItem(item, '[ng-click="openSuspensionStateDialog(jobDefinition)"]:not(.ng-hide)');
+  },
+
+  activateJobDefinitionButton: function(item) {
+    return this.suspendJobDefinitionButton(item);
   }
 
 });

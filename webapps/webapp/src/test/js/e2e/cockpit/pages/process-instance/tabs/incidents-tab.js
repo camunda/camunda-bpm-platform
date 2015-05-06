@@ -10,19 +10,11 @@ module.exports = Table.extend({
   tableRepeater: 'incident in incidents',
 
   incidentMessage: function(item) {
-    return this.tableItem(item, 'incident.rootCauseIncidentMessage').getText();
-  },
-
-  selectIncidentMessage: function(item) {
-    this.tableItem(item, 'incident.rootCauseIncidentMessage').click();
+    return this.tableItem(item, '.message');
   },
 
   incidentActivity: function(item) {
-    return this.tableItem(item, 'incident.activityName').getText();
-  },
-
-  selectIncidentActivity: function(item) {
-    this.tableItem(item, 'incident.activityName').click();
+    return this.tableItem(item, '.activity');
   }
 
 });
