@@ -53,7 +53,7 @@ module.exports = function (operations, noReset, done) {
       operations[resourceName][methodName].forEach(function (data) {
         var resource = new camClient.resource(resourceName);
         callbacks.push(function (cb) {
-          console.info('doing '+resourceName+'.'+methodName, data);
+          console.info('doing '+resourceName+'.'+methodName);//, data);
           resource[methodName](data, function(){
             cb();
           });
