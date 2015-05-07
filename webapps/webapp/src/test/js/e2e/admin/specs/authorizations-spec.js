@@ -564,4 +564,36 @@ describe('Admin authorizations Spec', function() {
 
   });
 
+
+  describe('Pagination', function () {
+    // create 45 authorizations... because we can.
+    before(function() {
+      var authBatch = [];
+      for (var i = 0; i < 45; i++) {
+        authBatch.push({
+          type: 1, resourceType: 7, resourceId: '1', permissions: ['CREATE'], userId: 'xxxxxxxxxxx' + i
+        });
+      }
+
+      return testHelper({
+        authorization: {
+          create: authBatch
+        }
+      }, function () {
+        authorizationsPage.navigateToWebapp('Admin');
+        authorizationsPage.authentication.userLogin('admin', 'admin');
+
+        authorizationsPage.selectNavbarItem('Authorizations');
+
+        authorizationsPage.selectAuthorizationNavbarItem('Task');
+      });
+    });
+
+    it('displays a pager', function () {
+      expect(element(by.css('.pagination')).isPresent())
+        .to.eventually.eql(true);
+      expect(element.all(by.css('[ng-repeat="page in pages track by $index"]')).count())
+        .to.eventually.eql(2);
+    });
+  });
 });
