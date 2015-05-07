@@ -3,6 +3,7 @@ package org.camunda.bpm.integrationtest.functional.ejb.beans;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
+import javax.ejb.ApplicationException;
 import javax.ejb.Stateless;
 import javax.inject.Named;
 
@@ -20,6 +21,7 @@ public class SLSBThrowExceptionDelegate implements JavaDelegate {
     throw new MyException("error");
   }
 
+  @ApplicationException
   public static class MyException extends RuntimeException{
 
     private static final long serialVersionUID = 826202870386719558L;
