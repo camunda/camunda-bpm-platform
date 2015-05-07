@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.engine.rest.sub.management;
 
+import javax.ws.rs.core.Response.Status;
+
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -20,8 +23,6 @@ import org.camunda.bpm.engine.rest.dto.management.JobDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.management.JobDefinitionSuspensionStateDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobRetriesDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-
-import javax.ws.rs.core.Response.Status;
 
 /**
  * @author roman.smirnov
@@ -63,6 +64,8 @@ public class JobDefinitionResourceImpl implements JobDefinitionResource {
     try {
       ManagementService managementService = engine.getManagementService();
       managementService.setJobRetriesByJobDefinitionId(jobDefinitionId, dto.getRetries());
+    } catch (AuthorizationException e) {
+      throw e;
     } catch (ProcessEngineException e) {
       throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, e.getMessage());
     }

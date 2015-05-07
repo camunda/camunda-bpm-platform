@@ -1,6 +1,7 @@
 package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
@@ -11,6 +12,7 @@ import java.util.List;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
@@ -22,6 +24,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
+
+import com.jayway.restassured.http.ContentType;
 
 public abstract class AbstractStatisticsRestTest extends AbstractRestServiceTest {
 
@@ -280,6 +284,21 @@ public abstract class AbstractStatisticsRestTest extends AbstractRestServiceTest
   }
 
   @Test
+  public void testActivtyStatisticsByIdThrowsAuthorizationException() {
+    String message = "expected exception";
+    when(activityQueryMock.list()).thenThrow(new AuthorizationException(message));
+
+    given()
+      .pathParam("id", "aDefinitionId")
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .get(ACTIVITY_STATISTICS_URL);
+  }
+
+  @Test
   public void testActivtyStatisticsIncidentsForTypeAndFailedJobsOptionByKey() {
     given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
     .queryParam("incidentsForType", "failedJob").queryParam("failedJobs", "true")
@@ -309,6 +328,21 @@ public abstract class AbstractStatisticsRestTest extends AbstractRestServiceTest
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
     .when().get(ACTIVITY_STATISTICS_BY_KEY_URL);
+  }
+
+  @Test
+  public void testActivtyStatisticsByIdThrowsAuthorizationExceptionByKey() {
+    String message = "expected exception";
+    when(activityQueryMock.list()).thenThrow(new AuthorizationException(message));
+
+    given()
+      .pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .get(ACTIVITY_STATISTICS_BY_KEY_URL);
   }
 
 }

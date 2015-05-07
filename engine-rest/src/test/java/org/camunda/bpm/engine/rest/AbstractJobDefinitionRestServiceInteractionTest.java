@@ -17,6 +17,7 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -238,6 +239,31 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
   }
 
   @Test
+  public void testActivateJobDefinitionByIdThrowsAuthorizationException() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", false);
+    params.put("includeJobs", false);
+
+    String expectedMessage = "expectedMessage";
+    doThrow(new AuthorizationException(expectedMessage))
+      .when(mockManagementService)
+      .activateJobDefinitionById(eq(MockProvider.NON_EXISTING_JOB_DEFINITION_ID), eq(false), isNull(Date.class));
+
+    given()
+      .pathParam("id", MockProvider.NON_EXISTING_JOB_DEFINITION_ID)
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("type", is(AuthorizationException.class.getSimpleName()))
+        .body("message", is(expectedMessage))
+      .when()
+        .put(SINGLE_JOB_DEFINITION_SUSPENDED_URL);
+  }
+
+  @Test
   public void testSuspendJobDefinitionExcludingInstances() {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("suspended", true);
@@ -390,6 +416,31 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
   }
 
   @Test
+  public void testSuspendJobDefinitionByIdThrowsAuthorizationException() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", true);
+    params.put("includeJobs", false);
+
+    String expectedMessage = "expectedMessage";
+    doThrow(new AuthorizationException(expectedMessage))
+      .when(mockManagementService)
+      .suspendJobDefinitionById(eq(MockProvider.NON_EXISTING_JOB_DEFINITION_ID), eq(false), isNull(Date.class));
+
+    given()
+      .pathParam("id", MockProvider.NON_EXISTING_JOB_DEFINITION_ID)
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("type", is(AuthorizationException.class.getSimpleName()))
+        .body("message", is(expectedMessage))
+      .when()
+        .put(SINGLE_JOB_DEFINITION_SUSPENDED_URL);
+  }
+
+  @Test
   public void testActivateJobDefinitionByProcessDefinitionKey() {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("suspended", false);
@@ -508,6 +559,29 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
       .expect()
         .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
         .body("type", is(ProcessEngineException.class.getSimpleName()))
+        .body("message", is(expectedException))
+      .when()
+        .put(JOB_DEFINITION_SUSPENDED_URL);
+  }
+
+  @Test
+  public void testActivateJobDefinitionByProcessDefinitionKeyWithAuthorizationException() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", false);
+    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+
+    String expectedException = "expectedException";
+    doThrow(new AuthorizationException(expectedException))
+      .when(mockManagementService)
+      .activateJobDefinitionByProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, false, null);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .body("type", is(AuthorizationException.class.getSimpleName()))
         .body("message", is(expectedException))
       .when()
         .put(JOB_DEFINITION_SUSPENDED_URL);
@@ -638,6 +712,29 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
   }
 
   @Test
+  public void testSuspendJobDefinitionByProcessDefinitionKeyWithAuthorizationException() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", true);
+    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+
+    String expectedException = "expectedException";
+    doThrow(new AuthorizationException(expectedException))
+      .when(mockManagementService)
+      .suspendJobDefinitionByProcessDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, false, null);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .body("type", is(AuthorizationException.class.getSimpleName()))
+        .body("message", is(expectedException))
+      .when()
+        .put(JOB_DEFINITION_SUSPENDED_URL);
+  }
+
+  @Test
   public void testActivateJobDefinitionByProcessDefinitionId() {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("suspended", false);
@@ -756,6 +853,29 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
       .expect()
         .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
         .body("type", is(ProcessEngineException.class.getSimpleName()))
+        .body("message", is(expectedException))
+      .when()
+        .put(JOB_DEFINITION_SUSPENDED_URL);
+  }
+
+  @Test
+  public void testActivateJobDefinitionByProcessDefinitionIdWithAuthorizationException() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", false);
+    params.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+
+    String expectedException = "expectedException";
+    doThrow(new AuthorizationException(expectedException))
+      .when(mockManagementService)
+      .activateJobDefinitionByProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, false, null);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .body("type", is(AuthorizationException.class.getSimpleName()))
         .body("message", is(expectedException))
       .when()
         .put(JOB_DEFINITION_SUSPENDED_URL);
@@ -886,6 +1006,29 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
   }
 
   @Test
+  public void testSuspendJobDefinitionByProcessDefinitionIdWithAuthorizationException() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", true);
+    params.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+
+    String expectedException = "expectedException";
+    doThrow(new AuthorizationException(expectedException))
+      .when(mockManagementService)
+      .suspendJobDefinitionByProcessDefinitionId(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, false, null);
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .body("type", is(AuthorizationException.class.getSimpleName()))
+        .body("message", is(expectedException))
+      .when()
+        .put(JOB_DEFINITION_SUSPENDED_URL);
+  }
+
+  @Test
   public void testActivateJobDefinitionByIdShouldThrowException() {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("suspended", false);
@@ -986,6 +1129,29 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
       .put(JOB_DEFINITION_RETRIES_URL);
 
     verify(mockManagementService).setJobRetriesByJobDefinitionId(MockProvider.NON_EXISTING_JOB_DEFINITION_ID, MockProvider.EXAMPLE_JOB_RETRIES);
+  }
+
+  @Test
+  public void testSetJobRetriesAuthorizationException() {
+    String expectedMessage = "expected exception message";
+    doThrow(new AuthorizationException(expectedMessage))
+      .when(mockManagementService)
+        .setJobRetriesByJobDefinitionId(MockProvider.NON_EXISTING_JOB_DEFINITION_ID, MockProvider.EXAMPLE_JOB_RETRIES);
+
+    Map<String, Object> retriesVariableJson = new HashMap<String, Object>();
+    retriesVariableJson.put("retries", MockProvider.EXAMPLE_JOB_RETRIES);
+
+    given()
+      .pathParam("id", MockProvider.NON_EXISTING_JOB_DEFINITION_ID)
+      .contentType(ContentType.JSON)
+      .body(retriesVariableJson)
+    .then()
+      .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+        .body("message", equalTo(expectedMessage))
+    .when()
+      .put(JOB_DEFINITION_RETRIES_URL);
   }
 
 }

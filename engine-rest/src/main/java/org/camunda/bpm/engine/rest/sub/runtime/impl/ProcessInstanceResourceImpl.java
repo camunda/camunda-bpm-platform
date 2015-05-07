@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest.sub.runtime.impl;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
@@ -60,6 +61,8 @@ public class ProcessInstanceResourceImpl implements ProcessInstanceResource {
     RuntimeService runtimeService = engine.getRuntimeService();
     try {
       runtimeService.deleteProcessInstance(processInstanceId, null);
+    } catch (AuthorizationException e) {
+      throw e;
     } catch (ProcessEngineException e) {
       throw new InvalidRequestException(Status.NOT_FOUND, e, "Process instance with id " + processInstanceId + " does not exist");
     }
@@ -79,6 +82,8 @@ public class ProcessInstanceResourceImpl implements ProcessInstanceResource {
 
     try {
       activityInstance = runtimeService.getActivityInstance(processInstanceId);
+    } catch (AuthorizationException e) {
+      throw e;
     } catch (ProcessEngineException e) {
       throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
     }

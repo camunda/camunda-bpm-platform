@@ -21,6 +21,7 @@ import static org.mockito.Mockito.when;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -151,6 +152,22 @@ public abstract class AbstractHistoricJobLogRestServiceInteractionTest extends A
       .expect()
         .statusCode(Status.NOT_FOUND.getStatusCode())
         .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo(exceptionMessage))
+    .when()
+      .get(HISTORIC_JOB_LOG_RESOURCE_GET_STACKTRACE_URL);
+  }
+
+  @Test
+  public void testGetStacktraceThrowsAuthorizationException() {
+    String exceptionMessage = "expected exception";
+    doThrow(new AuthorizationException(exceptionMessage)).when(mockHistoryService).getHistoricJobLogExceptionStacktrace(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_ID);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_HISTORIC_JOB_LOG_ID)
+    .then()
+      .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .body("type", equalTo(AuthorizationException.class.getSimpleName()))
         .body("message", equalTo(exceptionMessage))
     .when()
       .get(HISTORIC_JOB_LOG_RESOURCE_GET_STACKTRACE_URL);

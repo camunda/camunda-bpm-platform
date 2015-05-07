@@ -21,6 +21,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Variant;
 
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -90,6 +91,9 @@ public class TaskResourceImpl implements TaskResource {
       String errorMessage = String.format("Cannot complete task %s: %s", taskId, e.getMessage());
       throw new InvalidRequestException(e.getStatus(), e, errorMessage);
 
+    } catch (AuthorizationException e) {
+      throw e;
+
     } catch (ProcessEngineException e) {
       String errorMessage = String.format("Cannot complete task %s: %s", taskId, e.getMessage());
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
@@ -106,6 +110,9 @@ public class TaskResourceImpl implements TaskResource {
     } catch (RestException e) {
       String errorMessage = String.format("Cannot submit task form %s: %s", taskId, e.getMessage());
       throw new InvalidRequestException(e.getStatus(), e, errorMessage);
+
+    } catch (AuthorizationException e) {
+      throw e;
 
     } catch (ProcessEngineException e) {
       String errorMessage = String.format("Cannot submit task form %s: %s", taskId, e.getMessage());
@@ -157,6 +164,8 @@ public class TaskResourceImpl implements TaskResource {
     FormData formData;
     try {
       formData = formService.getTaskFormData(taskId);
+    } catch (AuthorizationException e) {
+      throw e;
     } catch (ProcessEngineException e) {
       throw new RestException(Status.BAD_REQUEST, e, "Cannot get form for task " + taskId);
     }

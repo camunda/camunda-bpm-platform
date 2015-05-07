@@ -66,6 +66,7 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ManagementService;
@@ -586,6 +587,23 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   }
 
   @Test
+  public void testGetFormThrowsAuthorizationException() {
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(formServiceMock).getTaskFormData(anyString());
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .get(TASK_FORM_URL);
+  }
+
+  @Test
   public void testGetRenderedForm() {
     String expectedResult = "<formField>anyContent</formField>";
 
@@ -618,6 +636,21 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
           .body("message", equalTo("No matching rendered form for task with the id " + EXAMPLE_TASK_ID + " found."))
       .when()
         .get(RENDERED_FORM_URL);
+  }
+
+  @Test
+  public void testGetRenderedFormThrowsAuthorizationException() {
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(formServiceMock).getRenderedTaskForm(anyString());
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .get(RENDERED_FORM_URL);
   }
 
   @Test
@@ -823,6 +856,25 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   }
 
   @Test
+  public void testSubmitFormThrowsAuthorizationException() {
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(formServiceMock).submitTaskForm(anyString(), Matchers.<Map<String, Object>>any());
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(EMPTY_JSON_OBJECT)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .post(SUBMIT_FORM_URL);
+  }
+
+  @Test
   public void testGetTaskFormVariables() {
 
     given().pathParam("id", EXAMPLE_TASK_ID)
@@ -886,6 +938,21 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   }
 
   @Test
+  public void testGetTaskFormVariablesThrowsAuthorizationException() {
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(formServiceMock).getTaskFormVariables(anyString(), Matchers.<Collection<String>>any(), anyBoolean());
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .get(FORM_VARIABLES_URL);
+  }
+
+  @Test
   public void testClaimTask() {
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("userId", EXAMPLE_USER_ID);
@@ -930,6 +997,25 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   }
 
   @Test
+  public void testClaimTaskThrowsAuthorizationException() {
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(taskServiceMock).claim(anyString(), anyString());
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(EMPTY_JSON_OBJECT)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .post(CLAIM_TASK_URL);
+  }
+
+  @Test
   public void testUnclaimTask() {
     given().pathParam("id", EXAMPLE_TASK_ID)
       .header("accept", MediaType.APPLICATION_JSON)
@@ -951,6 +1037,23 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
         .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
         .body("message", equalTo("expected exception"))
       .when().post(UNCLAIM_TASK_URL);
+  }
+
+  @Test
+  public void testUnclaimTaskThrowsAuthorizationException() {
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(taskServiceMock).setAssignee(anyString(), anyString());
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .post(UNCLAIM_TASK_URL);
   }
 
   @Test
@@ -997,6 +1100,23 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .when().post(ASSIGNEE_TASK_URL);
   }
 
+  @Test
+  public void testSetAssigneeThrowsAuthorizationException() {
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(taskServiceMock).setAssignee(anyString(), anyString());
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(EMPTY_JSON_OBJECT)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .post(ASSIGNEE_TASK_URL);
+  }
+
   protected Map<String, Object> toExpectedJsonMap(IdentityLink identityLink) {
     Map<String, Object> result = new HashMap<String, Object>();
     result.put("userId", identityLink.getUserId());
@@ -1041,6 +1161,21 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .when().get(TASK_IDENTITY_LINKS_URL);
 
     verify(taskServiceMock).getIdentityLinksForTask(EXAMPLE_TASK_ID);
+  }
+
+  @Test
+  public void testGetIdentityLinksThrowsAuthorizationException() {
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(taskServiceMock).getIdentityLinksForTask(anyString());
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .get(TASK_IDENTITY_LINKS_URL);
   }
 
   @Test
@@ -1136,6 +1271,58 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   }
 
   @Test
+  public void testAddGroupIdentityLinkThrowsAuthorizationException() {
+    String groupId = "someGroupId";
+    String taskId = EXAMPLE_TASK_ID;
+    String type = "someType";
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("groupId", groupId);
+    json.put("taskId", taskId);
+    json.put("type", type);
+
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(taskServiceMock).addGroupIdentityLink(anyString(), anyString(), anyString());
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .post(TASK_IDENTITY_LINKS_URL);
+  }
+
+  @Test
+  public void testAddUserIdentityLinkThrowsAuthorizationException() {
+    String userId = "someUserId";
+    String taskId = EXAMPLE_TASK_ID;
+    String type = "someType";
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("userId", userId);
+    json.put("taskId", taskId);
+    json.put("type", type);
+
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(taskServiceMock).addUserIdentityLink(anyString(), anyString(), anyString());
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .post(TASK_IDENTITY_LINKS_URL);
+  }
+
+  @Test
   public void testDeleteUserIdentityLink() {
     String deleteIdentityLinkUrl = TASK_IDENTITY_LINKS_URL + "/delete";
 
@@ -1179,6 +1366,60 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     verify(taskServiceMock).deleteGroupIdentityLink(taskId, groupId, type);
     verify(taskServiceMock, never()).deleteUserIdentityLink(anyString(), anyString(), anyString());
+  }
+
+  @Test
+  public void testDeleteGroupIdentityLinkThrowsAuthorizationException() {
+    String deleteIdentityLinkUrl = TASK_IDENTITY_LINKS_URL + "/delete";
+
+    String taskId = EXAMPLE_TASK_ID;
+    String groupId = MockProvider.EXAMPLE_GROUP_ID;
+    String type = "someIdentityLinkType";
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("groupId", groupId);
+    json.put("type", type);
+
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(taskServiceMock).deleteGroupIdentityLink(anyString(), anyString(), anyString());
+
+    given()
+      .pathParam("id", taskId)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .post(deleteIdentityLinkUrl);
+  }
+
+  @Test
+  public void testDeleteUserIdentityLinkThrowsAuthorizationException() {
+    String deleteIdentityLinkUrl = TASK_IDENTITY_LINKS_URL + "/delete";
+
+    String taskId = EXAMPLE_TASK_ID;
+    String userId = MockProvider.EXAMPLE_USER_ID;
+    String type = "someIdentityLinkType";
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("userId", userId);
+    json.put("type", type);
+
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(taskServiceMock).deleteUserIdentityLink(anyString(), anyString(), anyString());
+
+    given()
+      .pathParam("id", taskId)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .post(deleteIdentityLinkUrl);
   }
 
   @Test
@@ -1364,6 +1605,24 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   }
 
   @Test
+  public void testCompleteTaskThrowsAuthorizationException() {
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(taskServiceMock).complete(anyString(), Matchers.<Map<String, Object>>any());
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .post(COMPLETE_TASK_URL);
+  }
+
+  @Test
   public void testResolveTask() {
     Map<String, Object> variables = VariablesBuilder.create()
         .variable("aVariable", "aStringValue")
@@ -1520,6 +1779,23 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   }
 
   @Test
+  public void testResolveTaskThrowsAuthorizationException() {
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(taskServiceMock).resolveTask(anyString(), Matchers.<Map<String, Object>>any());
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(EMPTY_JSON_OBJECT)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .post(RESOLVE_TASK_URL);
+  }
+
+  @Test
   public void testUnsuccessfulResolving() {
     doThrow(new ProcessEngineException("expected exception")).when(taskServiceMock).resolveTask(any(String.class), any(Map.class));
 
@@ -1587,6 +1863,25 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
         .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
         .body("message", equalTo("expected exception"))
       .when().post(DELEGATE_TASK_URL);
+  }
+
+  @Test
+  public void testDelegateTaskThrowsAuthorizationException() {
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(taskServiceMock).delegateTask(anyString(), anyString());
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(EMPTY_JSON_OBJECT)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .post(DELEGATE_TASK_URL);
   }
 
   @Test
@@ -2409,6 +2704,22 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   }
 
   @Test
+  public void testGetLocalVariablesThrowsAuthorizationException() {
+    String message = "expected exception";
+    when(taskServiceMock.getVariablesLocalTyped(anyString(), anyBoolean())).thenThrow(new AuthorizationException(message));
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .get(SINGLE_TASK_VARIABLES_URL);
+  }
+
+  @Test
   public void testLocalVariableModification() {
     TaskServiceImpl taskServiceMock = mockTaskServiceImpl();
 
@@ -2463,6 +2774,30 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
       .when().post(SINGLE_TASK_MODIFY_VARIABLES_URL);
+  }
+
+  @Test
+  public void testVariableModificationThrowsAuthorizationException() {
+    String variableKey = "aKey";
+    int variableValue = 123;
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> modifications = VariablesBuilder.create().variable(variableKey, variableValue).getVariables();
+    messageBodyJson.put("modifications", modifications);
+
+    TaskServiceImpl taskServiceMock = mockTaskServiceImpl();
+    String message = "excpected exception";
+    doThrow(new AuthorizationException(message)).when(taskServiceMock).updateVariablesLocal(anyString(), any(Map.class), any(List.class));
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .contentType(ContentType.JSON)
+      .body(messageBodyJson)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", is(AuthorizationException.class.getSimpleName()))
+      .body("message", is(message))
+    .when()
+      .post(SINGLE_TASK_MODIFY_VARIABLES_URL);
   }
 
   @Test
@@ -2623,6 +2958,24 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .body("type", is(RestException.class.getSimpleName()))
       .body("message", is("Cannot get task variable " + variableKey + ": task " + NON_EXISTING_ID + " doesn't exist"))
       .when().get(SINGLE_TASK_SINGLE_VARIABLE_URL);
+  }
+
+  @Test
+  public void testGetSingleLocalVariableThrowsAuthorizationException() {
+    String variableKey = "aVariableKey";
+
+    String message = "excpected exception";
+    when(taskServiceMock.getVariableLocalTyped(anyString(), anyString(), anyBoolean())).thenThrow(new AuthorizationException(message));
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .pathParam("varId", variableKey)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", is(AuthorizationException.class.getSimpleName()))
+      .body("message", is(message))
+    .when()
+      .get(SINGLE_TASK_SINGLE_VARIABLE_URL);
   }
 
   @Test
@@ -2896,6 +3249,29 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   }
 
   @Test
+  public void testPutSingleVariableThrowsAuthorizationException() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String type = "String";
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(taskServiceMock).setVariableLocal(anyString(), anyString(), any());
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .pathParam("varId", variableKey)
+      .contentType(ContentType.JSON)
+      .body(variableJson)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .put(SINGLE_TASK_PUT_SINGLE_VARIABLE_URL);
+  }
+
+  @Test
   public void testPostSingleLocalBinaryVariable() throws Exception {
     byte[] bytes = "someContent".getBytes();
 
@@ -2931,6 +3307,27 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     verify(taskServiceMock).setVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey),
         argThat(EqualsPrimitiveValue.bytesValue(bytes)));
+  }
+
+  @Test
+  public void testPutSingleBinaryVariableThrowsAuthorizationException() {
+    byte[] bytes = "someContent".getBytes();
+    String variableKey = "aVariableKey";
+
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(taskServiceMock).setVariableLocal(anyString(), anyString(), any());
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .pathParam("varId", variableKey)
+      .multiPart("data", "unspecified", bytes)
+    .expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .post(SINGLE_TASK_SINGLE_BINARY_VARIABLE_URL);
   }
 
   @Test
@@ -3075,6 +3472,25 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .body("type", is(RestException.class.getSimpleName()))
       .body("message", is("Cannot delete task variable " + variableKey + ": Cannot find task with id " + NON_EXISTING_ID))
       .when().delete(SINGLE_TASK_DELETE_SINGLE_VARIABLE_URL);
+  }
+
+  @Test
+  public void testDeleteVariableThrowsAuthorizationException() {
+    String variableKey = "aVariableKey";
+
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(taskServiceMock).removeVariableLocal(anyString(), anyString());
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .pathParam("varId", variableKey)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", is(AuthorizationException.class.getSimpleName()))
+      .body("message", is(message))
+    .when()
+      .delete(SINGLE_TASK_DELETE_SINGLE_VARIABLE_URL);
   }
 
   @Test
@@ -3271,6 +3687,49 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   }
 
   @Test
+  public void testPostCreateTaskThrowsAuthorizationException() {
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("id", "anyTaskId");
+
+    String message = "expected exception";
+    when(taskServiceMock.newTask(anyString())).thenThrow(new AuthorizationException(message));
+
+    given()
+      .body(json)
+      .contentType(ContentType.JSON)
+      .header("accept", MediaType.APPLICATION_JSON)
+    .then()
+      .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+        .body("message", equalTo(message))
+      .when().post(TASK_CREATE_URL);
+  }
+
+  @Test
+  public void testSaveNewTaskThrowsAuthorizationException() {
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("id", "anyTaskId");
+
+    Task newTask = mock(Task.class);
+    when(taskServiceMock.newTask(anyString())).thenReturn(newTask);
+
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(taskServiceMock).saveTask(newTask);
+
+    given()
+      .body(json)
+      .contentType(ContentType.JSON)
+      .header("accept", MediaType.APPLICATION_JSON)
+    .then()
+      .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+        .body("message", equalTo(message))
+      .when().post(TASK_CREATE_URL);
+  }
+
+  @Test
   public void testPutUpdateTask() {
     Map<String, Object> json = new HashMap<String, Object>();
 
@@ -3448,6 +3907,26 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     verify(mockTask).setDelegationState(DelegationState.PENDING);
     verify(taskServiceMock).saveTask(mockTask);
+  }
+
+  @Test
+  public void testPutUpdateTaskThrowsAuthorizationException() {
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("delegationState", "pending");
+
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(taskServiceMock).saveTask(any(Task.class));
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .put(SINGLE_TASK_URL);
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })

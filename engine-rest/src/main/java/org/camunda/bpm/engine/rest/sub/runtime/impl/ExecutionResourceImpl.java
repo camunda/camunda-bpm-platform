@@ -12,7 +12,9 @@
  */
 package org.camunda.bpm.engine.rest.sub.runtime.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.ws.rs.core.Response.Status;
+
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
@@ -27,7 +29,7 @@ import org.camunda.bpm.engine.rest.sub.runtime.ExecutionResource;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.variable.VariableMap;
 
-import javax.ws.rs.core.Response.Status;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ExecutionResourceImpl implements ExecutionResource {
 
@@ -63,6 +65,9 @@ public class ExecutionResourceImpl implements ExecutionResource {
     } catch (RestException e) {
       String errorMessage = String.format("Cannot signal execution %s: %s", executionId, e.getMessage());
       throw new InvalidRequestException(e.getStatus(), e, errorMessage);
+
+    } catch (AuthorizationException e) {
+      throw e;
 
     } catch (ProcessEngineException e) {
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Cannot signal execution " + executionId + ": " + e.getMessage());

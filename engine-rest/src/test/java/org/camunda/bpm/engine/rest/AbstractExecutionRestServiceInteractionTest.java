@@ -27,6 +27,7 @@ import java.util.Map;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
@@ -263,6 +264,23 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .when().post(SIGNAL_EXECUTION_URL);
   }
 
+  @Test
+  public void testSignalThrowsAuthorizationException() {
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(runtimeServiceMock).signal(anyString(), any(Map.class));
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID)
+      .contentType(ContentType.JSON)
+      .body(EMPTY_JSON_OBJECT)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .post(SIGNAL_EXECUTION_URL);
+  }
 
   @Test
   public void testGetLocalVariables() {
@@ -349,6 +367,22 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
   }
 
   @Test
+  public void testGetLocalVariablesThrowsAuthorizationException() {
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(runtimeServiceMock).getVariablesLocalTyped(anyString(), anyBoolean());
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .get(EXECUTION_LOCAL_VARIABLES_URL);
+  }
+
+  @Test
   public void testLocalVariableModification() {
     Map<String, Object> messageBodyJson = new HashMap<String, Object>();
 
@@ -395,6 +429,31 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).contentType(ContentType.JSON).body(EMPTY_JSON_OBJECT)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
       .when().post(EXECUTION_LOCAL_VARIABLES_URL);
+  }
+
+  @Test
+  public void testLocalVariableModificationThrowsAuthorizationException() {
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(runtimeServiceMock).updateVariablesLocal(anyString(), any(Map.class), any(List.class));
+
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+
+    String variableKey = "aKey";
+    int variableValue = 123;
+    Map<String, Object> modifications = VariablesBuilder.create().variable(variableKey, variableValue).getVariables();
+    messageBodyJson.put("modifications", modifications);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID)
+      .contentType(ContentType.JSON)
+      .body(messageBodyJson)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .post(EXECUTION_LOCAL_VARIABLES_URL);
   }
 
   @Test
@@ -551,6 +610,25 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .body("type", is(RestException.class.getSimpleName()))
       .body("message", is("Cannot get execution variable " + variableKey + ": expected exception"))
       .when().get(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
+  }
+
+  @Test
+  public void testGetLocalVariableThrowsAuthorizationException() {
+    String variableKey = "aVariableKey";
+
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(runtimeServiceMock).getVariableLocalTyped(anyString(), anyString(), anyBoolean());
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID)
+      .pathParam("varId", variableKey)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .get(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
   }
 
   @Test
@@ -778,6 +856,30 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
   }
 
   @Test
+  public void testPutSingleVariableThrowsAuthorizationException() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String type = "String";
+
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(runtimeServiceMock).setVariableLocal(anyString(), anyString(), any());
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID)
+      .pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
+  }
+
+  @Test
   public void testPutSingleLocalBinaryVariable() throws Exception {
     byte[] bytes = "someContent".getBytes();
 
@@ -866,6 +968,25 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
         eq(serializable));
   }
 
+  @Test
+  public void testPutSingleLocalBinaryVariableThrowsAuthorizationException() {
+    byte[] bytes = "someContent".getBytes();
+    String variableKey = "aVariableKey";
+
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(runtimeServiceMock).setVariableLocal(anyString(), anyString(), any());
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
+      .multiPart("data", "unspecified", bytes)
+    .expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .post(SINGLE_EXECUTION_LOCAL_BINARY_VARIABLE_URL);
+  }
 
   @Test
   public void testPutSingleLocalVariableFromSerialized() throws Exception {
@@ -992,6 +1113,25 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
   }
 
   @Test
+  public void testDeleteLocalVariableThrowsAuthorizationException() {
+    String variableKey = "aVariableKey";
+
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(runtimeServiceMock).removeVariableLocal(anyString(), anyString());
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID)
+      .pathParam("varId", variableKey)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", is(AuthorizationException.class.getSimpleName()))
+      .body("message", is(message))
+    .when()
+      .delete(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
+  }
+
+  @Test
   public void testGetMessageEventSubscription() {
     String messageName = MockProvider.EXAMPLE_EVENT_SUBSCRIPTION_NAME;
 
@@ -1079,5 +1219,24 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .body("type", is(RestException.class.getSimpleName()))
       .body("message", is("Cannot trigger message " + messageName + " for execution " + MockProvider.EXAMPLE_EXECUTION_ID + ": expected exception"))
       .when().post(TRIGGER_MESSAGE_SUBSCRIPTION_URL);
+  }
+
+  @Test
+  public void testMessageEventTriggeringThrowsAuthorizationException() {
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message))
+      .when(runtimeServiceMock).messageEventReceived(anyString(), anyString(), any(Map.class));
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID)
+      .pathParam("messageName", "someMessage")
+      .contentType(ContentType.JSON)
+      .body(EMPTY_JSON_OBJECT)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", is(AuthorizationException.class.getSimpleName()))
+      .body("message", is(message))
+    .when()
+      .post(TRIGGER_MESSAGE_SUBSCRIPTION_URL);
   }
 }

@@ -12,8 +12,25 @@
  */
 package org.camunda.bpm.engine.rest.sub.repository.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.camunda.bpm.engine.*;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
+
+import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.FormService;
+import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.management.ActivityStatistics;
@@ -37,16 +54,7 @@ import org.camunda.bpm.engine.rest.util.ApplicationContextPathUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.variable.VariableMap;
 
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource {
 
@@ -90,6 +98,9 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
 
       instance = runtimeService.startProcessInstanceById(processDefinitionId, businessKey, caseInstanceId, variables);
 
+    } catch (AuthorizationException e) {
+      throw e;
+
     } catch (ProcessEngineException e) {
       String errorMessage = String.format("Cannot instantiate process definition %s: %s", processDefinitionId, e.getMessage());
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
@@ -126,6 +137,9 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
       } else {
         instance = formService.submitStartForm(processDefinitionId, variables);
       }
+
+    } catch (AuthorizationException e) {
+      throw e;
 
     } catch (ProcessEngineException e) {
       String errorMessage = String.format("Cannot instantiate process definition %s: %s", processDefinitionId, e.getMessage());
@@ -188,6 +202,8 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
       processModelIn = engine.getRepositoryService().getProcessModel(processDefinitionId);
       byte[] processModel = IoUtil.readInputStream(processModelIn, "processModelBpmn20Xml");
       return ProcessDefinitionDiagramDto.create(processDefinitionId, new String(processModel, "UTF-8"));
+    } catch (AuthorizationException e) {
+      throw e;
     } catch (ProcessEngineException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e, "No matching definition with id " + processDefinitionId);
     } catch (UnsupportedEncodingException e) {
@@ -244,6 +260,8 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
     final StartFormData formData;
     try {
       formData = formService.getStartFormData(processDefinitionId);
+    } catch (AuthorizationException e) {
+      throw e;
     } catch (ProcessEngineException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e, "Cannot get start form data for process definition " + processDefinitionId);
     }

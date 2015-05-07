@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.engine.rest.sub.runtime.impl;
 
+import javax.ws.rs.core.Response.Status;
+
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -23,8 +26,6 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.runtime.JobResource;
 import org.camunda.bpm.engine.runtime.Job;
-
-import javax.ws.rs.core.Response.Status;
 
 public class JobResourceImpl implements JobResource {
 
@@ -54,6 +55,8 @@ public class JobResourceImpl implements JobResource {
       ManagementService managementService = engine.getManagementService();
       String stacktrace = managementService.getJobExceptionStacktrace(jobId);
       return stacktrace;
+    } catch (AuthorizationException e) {
+      throw e;
     } catch (ProcessEngineException e) {
       throw new InvalidRequestException(Status.NOT_FOUND, e.getMessage());
     }
@@ -64,6 +67,8 @@ public class JobResourceImpl implements JobResource {
     try {
       ManagementService managementService = engine.getManagementService();
       managementService.setJobRetries(jobId, dto.getRetries());
+    } catch (AuthorizationException e) {
+      throw e;
     } catch (ProcessEngineException e) {
       throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, e.getMessage());
     }
@@ -74,6 +79,8 @@ public class JobResourceImpl implements JobResource {
     try {
       ManagementService managementService = engine.getManagementService();
       managementService.executeJob(this.jobId);
+    } catch (AuthorizationException e) {
+      throw e;
     } catch (ProcessEngineException e) {
       throw new InvalidRequestException(Status.NOT_FOUND, e.getMessage());
     } catch (RuntimeException r) {
@@ -86,6 +93,8 @@ public class JobResourceImpl implements JobResource {
     try {
       ManagementService managementService = engine.getManagementService();
       managementService.setJobDuedate(jobId, dto.getDuedate());
+    } catch (AuthorizationException e) {
+      throw e;
     } catch (ProcessEngineException e) {
       throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, e.getMessage());
     }

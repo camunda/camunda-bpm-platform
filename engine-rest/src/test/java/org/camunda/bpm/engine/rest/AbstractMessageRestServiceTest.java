@@ -19,6 +19,7 @@ import java.util.Map.Entry;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
@@ -514,5 +515,46 @@ public abstract class AbstractMessageRestServiceTest extends AbstractRestService
     .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
     .body("message", equalTo("Cannot deliver message: Unsupported value type 'X'"))
     .when().post(MESSAGE_URL);
+  }
+
+  @Test
+  public void testCorrelateThrowsAuthorizationException() {
+    String messageName = "aMessageName";
+    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    messageParameters.put("messageName", messageName);
+
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(messageCorrelationBuilderMock).correlate();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(messageParameters)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .post(MESSAGE_URL);
+  }
+
+  @Test
+  public void testCorrelateAllThrowsAuthorizationException() {
+    String messageName = "aMessageName";
+    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    messageParameters.put("messageName", messageName);
+    messageParameters.put("all", true);
+
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(messageCorrelationBuilderMock).correlateAll();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(messageParameters)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .post(MESSAGE_URL);
   }
 }

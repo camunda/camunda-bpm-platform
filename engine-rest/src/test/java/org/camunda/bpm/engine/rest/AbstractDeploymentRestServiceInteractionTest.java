@@ -12,9 +12,38 @@
  */
 package org.camunda.bpm.engine.rest;
 
-import com.jayway.restassured.path.json.JsonPath;
-import com.jayway.restassured.response.Response;
+import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT_RESOURCE_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.NON_EXISTING_DEPLOYMENT_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.NON_EXISTING_DEPLOYMENT_RESOURCE_ID;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.Response.Status;
+
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
@@ -26,19 +55,8 @@ import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.Response.Status;
-
-import java.io.InputStream;
-import java.util.*;
-
-import static com.jayway.restassured.RestAssured.given;
-import static com.jayway.restassured.path.json.JsonPath.from;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.*;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import com.jayway.restassured.path.json.JsonPath;
+import com.jayway.restassured.response.Response;
 
 public abstract class AbstractDeploymentRestServiceInteractionTest extends AbstractRestServiceTest {
 
@@ -140,6 +158,20 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
   }
 
   @Test
+  public void testGetDeploymentResourcesThrowsAuthorizationException() {
+    String message = "expected exception";
+    when(mockRepositoryService.getDeploymentResources(EXAMPLE_DEPLOYMENT_ID)).thenThrow(new AuthorizationException(message));
+
+    given()
+      .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", is(AuthorizationException.class.getSimpleName()))
+      .body("message", is(message))
+    .when().get(RESOURCES_URL);
+  }
+
+  @Test
   public void testGetDeploymentResource() {
 
     Response response = given()
@@ -186,6 +218,22 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
         .body(containsString("Deployment resources for deployment id '" + NON_EXISTING_DEPLOYMENT_ID + "' do not exist."))
       .when().get(SINGLE_RESOURCE_URL);
 
+  }
+
+  @Test
+  public void testGetDeploymentResourceThrowsAuthorizationException() {
+    String message = "expected exception";
+    when(mockRepositoryService.getDeploymentResources(EXAMPLE_DEPLOYMENT_ID)).thenThrow(new AuthorizationException(message));
+
+    given()
+      .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+      .pathParam("resourceId", EXAMPLE_DEPLOYMENT_RESOURCE_ID)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", is(AuthorizationException.class.getSimpleName()))
+      .body("message", is(message))
+    .when()
+      .get(SINGLE_RESOURCE_URL);
   }
 
   @Test
@@ -236,6 +284,22 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
       .body(containsString("Deployment resource '" + NON_EXISTING_DEPLOYMENT_RESOURCE_ID + "' for deployment id '" + NON_EXISTING_DEPLOYMENT_ID + "' does not exist."))
       .when().get(SINGLE_RESOURCE_DATA_URL);
 
+  }
+
+  @Test
+  public void testGetDeploymentResourceDataThrowsAuthorizationException() {
+    String message = "expected exception";
+    when(mockRepositoryService.getResourceAsStreamById(EXAMPLE_DEPLOYMENT_ID, EXAMPLE_DEPLOYMENT_RESOURCE_ID)).thenThrow(new AuthorizationException(message));
+
+    given()
+      .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+      .pathParam("resourceId", EXAMPLE_DEPLOYMENT_RESOURCE_ID)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", is(AuthorizationException.class.getSimpleName()))
+      .body("message", is(message))
+    .when()
+      .get(SINGLE_RESOURCE_DATA_URL);
   }
 
   @Test
@@ -324,23 +388,43 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
       .post(CREATE_DEPLOYMENT_URL);
 
   }
-  
+
+  @Test
+  public void testCreateDeploymentThrowsAuthorizationException() {
+    String message = "expected exception";
+    when(mockDeploymentBuilder.deploy()).thenThrow(new AuthorizationException(message));
+
+    resourceNames.addAll( Arrays.asList("data", "more-data") );
+
+    given()
+      .multiPart("data", "unspecified", createMockDeploymentResourceByteData())
+      .multiPart("more-data", "unspecified", createMockDeploymentResourceBpmnData())
+      .multiPart("deployment-name", MockProvider.EXAMPLE_DEPLOYMENT_ID)
+      .multiPart("enable-duplicate-filtering", "true")
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", is(AuthorizationException.class.getSimpleName()))
+      .body("message", is(message))
+    .when()
+      .post(CREATE_DEPLOYMENT_URL);
+  }
+
   @Test
   public void testDeleteDeployment() {
-    
+
     given()
       .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
       .delete(DEPLOYMENT_URL);
-    
+
     verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, false);
   }
-  
+
   @Test
   public void testDeleteDeploymentCascade() {
-    
+
     given()
       .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
       .queryParam("cascade", true)
@@ -348,13 +432,13 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
       .delete(DEPLOYMENT_URL);
-    
+
     verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, true);
   }
-  
+
   @Test
   public void testDeleteDeploymentCascadeNonsense() {
-    
+
     given()
       .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
       .queryParam("cascade", "bla")
@@ -362,13 +446,13 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
       .delete(DEPLOYMENT_URL);
-    
+
     verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, false);
   }
 
   @Test
   public void testDeleteDeploymentCascadeFalse() {
-    
+
     given()
       .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
       .queryParam("cascade", false)
@@ -376,21 +460,36 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
       .delete(DEPLOYMENT_URL);
-    
+
     verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, false);
   }
-  
+
   @Test
   public void testDeleteNonExistingDeployment() {
 
     when(mockDeploymentQuery.deploymentId(NON_EXISTING_DEPLOYMENT_ID)).thenReturn(mockDeploymentQuery);
     when(mockDeploymentQuery.singleResult()).thenReturn(null);
-    
+
     given()
       .pathParam("id", NON_EXISTING_DEPLOYMENT_ID)
     .expect()
       .statusCode(Status.NOT_FOUND.getStatusCode())
       .body(containsString("Deployment with id '" + NON_EXISTING_DEPLOYMENT_ID + "' do not exist"))
+    .when()
+       .delete(DEPLOYMENT_URL);
+  }
+
+  @Test
+  public void testDeleteDeploymentThrowsAuthorizationException() {
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, false);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
+    .expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", is(AuthorizationException.class.getSimpleName()))
+      .body("message", is(message))
     .when()
        .delete(DEPLOYMENT_URL);
   }

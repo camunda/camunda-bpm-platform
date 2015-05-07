@@ -12,9 +12,17 @@
  */
 package org.camunda.bpm.engine.rest.sub.impl;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
+
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -30,14 +38,9 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.BytesValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.Status;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 
 
 public abstract class AbstractVariablesResource implements VariableResource {
@@ -77,6 +80,8 @@ public abstract class AbstractVariablesResource implements VariableResource {
     TypedValue value = null;
     try {
        value = getVariableEntity(variableName, deserializeValue);
+    } catch (AuthorizationException e) {
+      throw e;
     } catch (ProcessEngineException e) {
       String errorMessage = String.format("Cannot get %s variable %s: %s", getResourceTypeName(), variableName, e.getMessage());
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
@@ -117,7 +122,8 @@ public abstract class AbstractVariablesResource implements VariableResource {
     } catch (BadUserRequestException e) {
       throw new RestException(Status.BAD_REQUEST, e,
         String.format("Cannot put %s variable %s: %s", getResourceTypeName(), variableName, e.getMessage()));
-
+    } catch (AuthorizationException e) {
+      throw e;
     } catch (ProcessEngineException e) {
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e,
           String.format("Cannot put %s variable %s: %s", getResourceTypeName(), variableName, e.getMessage()));
@@ -146,6 +152,8 @@ public abstract class AbstractVariablesResource implements VariableResource {
     } else {
       try {
         setVariableEntity(variableKey, Variables.byteArrayValue(dataPart.getBinaryContent()));
+      } catch (AuthorizationException e) {
+        throw e;
       } catch (ProcessEngineException e) {
         String errorMessage = String.format("Cannot put %s variable %s: %s", getResourceTypeName(), variableKey, e.getMessage());
         throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
@@ -169,6 +177,8 @@ public abstract class AbstractVariablesResource implements VariableResource {
   public void deleteVariable(String variableName) {
     try {
       removeVariableEntity(variableName);
+    } catch (AuthorizationException e) {
+      throw e;
     } catch (ProcessEngineException e) {
       String errorMessage = String.format("Cannot delete %s variable %s: %s", getResourceTypeName(), variableName, e.getMessage());
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
@@ -192,6 +202,8 @@ public abstract class AbstractVariablesResource implements VariableResource {
 
     try {
       updateVariableEntities(variableModifications, variableDeletions);
+    } catch (AuthorizationException e) {
+      throw e;
     } catch (ProcessEngineException e) {
       String errorMessage = String.format("Cannot modify variables for %s %s: %s", getResourceTypeName(), resourceId, e.getMessage());
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);

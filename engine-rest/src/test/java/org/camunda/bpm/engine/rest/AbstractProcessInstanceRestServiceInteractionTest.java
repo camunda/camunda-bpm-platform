@@ -16,11 +16,11 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.inOrder;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -33,6 +33,7 @@ import java.util.Map;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.impl.core.variable.type.ObjectTypeImpl;
@@ -171,6 +172,22 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   }
 
   @Test
+  public void testGetActivityInstanceTreeThrowsAuthorizationException() {
+    String message = "expected exception";
+    when(runtimeServiceMock.getActivityInstance(anyString())).thenThrow(new AuthorizationException(message));
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .get(PROCESS_INSTANCE_ACTIVIY_INSTANCES_URL);
+  }
+
+  @Test
   public void testGetVariables() {
     Response response = given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
       .then().expect().statusCode(Status.OK.getStatusCode())
@@ -283,6 +300,22 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   }
 
   @Test
+  public void testGetVariablesThrowsAuthorizationException() {
+    String message = "expected exception";
+    when(runtimeServiceMock.getVariablesTyped(anyString(), anyBoolean())).thenThrow(new AuthorizationException(message));
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .get(PROCESS_INSTANCE_VARIABLES_URL);
+  }
+
+  @Test
   public void testGetSingleInstance() {
     ProcessInstance mockInstance = MockProvider.createMockInstance();
     ProcessInstanceQuery sampleInstanceQuery = mock(ProcessInstanceQuery.class);
@@ -332,6 +365,22 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
       .body("message", equalTo("Process instance with id " + MockProvider.EXAMPLE_PROCESS_INSTANCE_ID + " does not exist"))
       .when().delete(SINGLE_PROCESS_INSTANCE_URL);
+  }
+
+  @Test
+  public void testDeleteProcessInstanceThrowsAuthorizationException() {
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(runtimeServiceMock).deleteProcessInstance(anyString(), anyString());
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .delete(SINGLE_PROCESS_INSTANCE_URL);
   }
 
   @Test
@@ -508,6 +557,29 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   }
 
   @Test
+  public void testVariableModificationThrowsAuthorizationException() {
+    String variableKey = "aKey";
+    int variableValue = 123;
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    Map<String, Object> modifications = VariablesBuilder.create().variable(variableKey, variableValue).getVariables();
+    messageBodyJson.put("modifications", modifications);
+
+    String message = "excpected exception";
+    doThrow(new AuthorizationException(message)).when(runtimeServiceMock).updateVariables(anyString(), anyMapOf(String.class, Object.class), anyCollectionOf(String.class));
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(messageBodyJson)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", is(AuthorizationException.class.getSimpleName()))
+      .body("message", is(message))
+    .when()
+      .post(PROCESS_INSTANCE_VARIABLES_URL);
+  }
+
+  @Test
   public void testGetSingleVariable() {
     String variableKey = "aVariableKey";
     int variableValue = 123;
@@ -526,7 +598,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   public void testNonExistingVariable() {
     String variableKey = "aVariableKey";
 
-    when(runtimeServiceMock.getVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey))).thenReturn(null);
+    when(runtimeServiceMock.getVariableTyped(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey), anyBoolean())).thenReturn(null);
 
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
       .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
@@ -535,6 +607,23 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
       .when().get(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
   }
 
+  @Test
+  public void testGetSingleVariableThrowsAuthorizationException() {
+    String variableKey = "aVariableKey";
+
+    String message = "excpected exception";
+    when(runtimeServiceMock.getVariableTyped(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey), anyBoolean())).thenThrow(new AuthorizationException(message));
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
+      .pathParam("varId", variableKey)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", is(AuthorizationException.class.getSimpleName()))
+      .body("message", is(message))
+    .when()
+      .get(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+  }
 
   @Test
   public void testGetSingleLocalVariableData() {
@@ -906,6 +995,29 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   }
 
   @Test
+  public void testPutSingleVariableThrowsAuthorizationException() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String type = "String";
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(runtimeServiceMock).setVariable(anyString(), anyString(), any());
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
+      .pathParam("varId", variableKey)
+      .contentType(ContentType.JSON)
+      .body(variableJson)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+  }
+
+  @Test
   public void testPutSingleBinaryVariable() throws Exception {
     byte[] bytes = "someContent".getBytes();
 
@@ -939,6 +1051,27 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
 
     verify(runtimeServiceMock).setVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey),
         argThat(EqualsPrimitiveValue.bytesValue(bytes)));
+  }
+
+  @Test
+  public void testPutSingleBinaryVariableThrowsAuthorizationException() {
+    byte[] bytes = "someContent".getBytes();
+    String variableKey = "aVariableKey";
+
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(runtimeServiceMock).setVariable(anyString(), anyString(), any());
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
+      .pathParam("varId", variableKey)
+      .multiPart("data", "unspecified", bytes)
+    .expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .post(SINGLE_PROCESS_INSTANCE_BINARY_VARIABLE_URL);
   }
 
   @Test
@@ -1112,6 +1245,25 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   }
 
   @Test
+  public void testDeleteVariableThrowsAuthorizationException() {
+    String variableKey = "aVariableKey";
+
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(runtimeServiceMock).removeVariable(anyString(), anyString());
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
+      .pathParam("varId", variableKey)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", is(AuthorizationException.class.getSimpleName()))
+      .body("message", is(message))
+    .when()
+      .delete(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+  }
+
+  @Test
   public void testActivateInstance() {
     ProcessInstanceSuspensionStateDto dto = new ProcessInstanceSuspensionStateDto();
     dto.setSuspended(false);
@@ -1151,6 +1303,30 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
         .body("message", is(expectedMessage))
       .when()
         .put(SINGLE_PROCESS_INSTANCE_SUSPENDED_URL);
+  }
+
+  @Test
+  public void testActivateThrowsAuthorizationException() {
+    ProcessInstanceSuspensionStateDto dto = new ProcessInstanceSuspensionStateDto();
+    dto.setSuspended(false);
+
+    String message = "expectedMessage";
+
+    doThrow(new AuthorizationException(message))
+      .when(runtimeServiceMock)
+      .activateProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(dto)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+    .put(SINGLE_PROCESS_INSTANCE_SUSPENDED_URL);
   }
 
   @Test
@@ -1218,6 +1394,30 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   }
 
   @Test
+  public void testSuspendThrowsAuthorizationException() {
+    ProcessInstanceSuspensionStateDto dto = new ProcessInstanceSuspensionStateDto();
+    dto.setSuspended(true);
+
+    String message = "expectedMessage";
+
+    doThrow(new AuthorizationException(message))
+      .when(runtimeServiceMock)
+      .suspendProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(dto)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+    .put(SINGLE_PROCESS_INSTANCE_SUSPENDED_URL);
+  }
+
+  @Test
   public void testActivateProcessInstanceByProcessDefinitionKey() {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("suspended", false);
@@ -1256,6 +1456,30 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
         .body("message", is(expectedException))
       .when()
         .put(PROCESS_INSTANCE_SUSPENDED_URL);
+  }
+
+  @Test
+  public void testActivateProcessInstanceByProcessDefinitionKeyThrowsAuthorizationException() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", false);
+    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+
+    String message = "expectedMessage";
+
+    doThrow(new AuthorizationException(message))
+      .when(runtimeServiceMock)
+      .activateProcessInstanceByProcessDefinitionKey(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY));
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+    .put(PROCESS_INSTANCE_SUSPENDED_URL);
   }
 
   @Test
@@ -1300,6 +1524,30 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   }
 
   @Test
+  public void testSuspendProcessInstanceByProcessDefinitionKeyThrowsAuthorizationException() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", true);
+    params.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+
+    String message = "expectedMessage";
+
+    doThrow(new AuthorizationException(message))
+      .when(runtimeServiceMock)
+      .suspendProcessInstanceByProcessDefinitionKey(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY));
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+    .put(PROCESS_INSTANCE_SUSPENDED_URL);
+  }
+
+  @Test
   public void testActivateProcessInstanceByProcessDefinitionId() {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("suspended", false);
@@ -1341,6 +1589,30 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   }
 
   @Test
+  public void testActivateProcessInstanceByProcessDefinitionIdThrowsAuthorizationException() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", false);
+    params.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+
+    String message = "expectedMessage";
+
+    doThrow(new AuthorizationException(message))
+      .when(runtimeServiceMock)
+      .activateProcessInstanceByProcessDefinitionId(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID));
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .put(PROCESS_INSTANCE_SUSPENDED_URL);
+  }
+
+  @Test
   public void testSuspendProcessInstanceByProcessDefinitionId() {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("suspended", true);
@@ -1379,6 +1651,30 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
         .body("message", is(expectedException))
       .when()
         .put(PROCESS_INSTANCE_SUSPENDED_URL);
+  }
+
+  @Test
+  public void testSuspendProcessInstanceByProcessDefinitionIdThrowsAuthorizationException() {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("suspended", true);
+    params.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+
+    String message = "expectedMessage";
+
+    doThrow(new AuthorizationException(message))
+      .when(runtimeServiceMock)
+      .suspendProcessInstanceByProcessDefinitionId(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID));
+
+    given()
+      .contentType(ContentType.JSON)
+      .body(params)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .put(PROCESS_INSTANCE_SUSPENDED_URL);
   }
 
   @Test
@@ -1642,6 +1938,50 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     .when()
       .post(PROCESS_INSTANCE_MODIFICATION_URL);
 
+  }
+
+  @Test
+  public void testModifyProcessInstanceThrowsAuthorizationException() {
+    ProcessInstanceActivityInstantiationBuilder mockModificationBuilder = setUpMockModificationBuilder();
+    when(runtimeServiceMock.createProcessInstanceModification(anyString())).thenReturn(mockModificationBuilder);
+
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(mockModificationBuilder).execute(anyBoolean(), anyBoolean());
+
+    Map<String, Object> json = new HashMap<String, Object>();
+
+    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+
+    instructions.add(
+        ModificationInstructionBuilder.startBefore()
+          .activityId("activityId")
+          .variables(VariablesBuilder.create()
+              .variable("var", "value", "String", false)
+              .variable("varLocal", "valueLocal", "String", true)
+              .getVariables())
+          .getJson());
+    instructions.add(
+        ModificationInstructionBuilder.startAfter()
+          .activityId("activityId")
+          .variables(VariablesBuilder.create()
+              .variable("var", 52, "Integer", false)
+              .variable("varLocal", 74, "Integer", true)
+              .getVariables())
+          .getJson());
+
+    json.put("instructions", instructions);
+
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .post(PROCESS_INSTANCE_MODIFICATION_URL);
   }
 
 

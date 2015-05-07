@@ -30,6 +30,7 @@ import static org.mockito.Mockito.when;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -268,6 +269,22 @@ public abstract class AbstractUserRestServiceInteractionTest extends AbstractRes
   }
 
   @Test
+  public void testDeleteUserThrowsAuthorizationException() {
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(identityServiceMock).deleteUser(MockProvider.EXAMPLE_USER_ID);
+
+    given()
+        .pathParam("id", MockProvider.EXAMPLE_USER_ID)
+    .then()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+        .delete(USER_URL);
+  }
+
+  @Test
   public void testCreateNewUserWithCredentials() {
     User newUser = MockProvider.createMockUser();
     when(identityServiceMock.newUser(MockProvider.EXAMPLE_USER_ID)).thenReturn(newUser);
@@ -334,6 +351,47 @@ public abstract class AbstractUserRestServiceInteractionTest extends AbstractRes
   }
 
   @Test
+  public void testUserCreateThrowsAuthorizationException() {
+    User newUser = MockProvider.createMockUser();
+    String message = "exception expected";
+    when(identityServiceMock.newUser(MockProvider.EXAMPLE_USER_ID)).thenThrow(new AuthorizationException(message));
+
+    UserDto userDto = UserDto.fromUser(newUser, true);
+
+    given()
+      .body(userDto)
+      .contentType(ContentType.JSON)
+    .then()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .post(USER_CREATE_URL);
+  }
+
+  @Test
+  public void testSaveNewUserThrowsAuthorizationException() {
+    User newUser = MockProvider.createMockUser();
+    when(identityServiceMock.newUser(MockProvider.EXAMPLE_USER_ID)).thenReturn(newUser);
+    String message = "exception expected";
+    doThrow(new AuthorizationException(message)).when(identityServiceMock).saveUser(newUser);
+
+    UserDto userDto = UserDto.fromUser(newUser, true);
+
+    given()
+      .body(userDto)
+      .contentType(ContentType.JSON)
+    .then()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .post(USER_CREATE_URL);
+  }
+
+  @Test
   public void testPutCredentials() {
     User initialUser = MockProvider.createMockUser();
     UserQuery sampleUserQuery = mock(UserQuery.class);
@@ -357,6 +415,32 @@ public abstract class AbstractUserRestServiceInteractionTest extends AbstractRes
 
     // and then saved
     verify(identityServiceMock).saveUser(initialUser);
+  }
+
+  @Test
+  public void testPutCredentialsThrowsAuthorizationException() {
+    User initialUser = MockProvider.createMockUser();
+    UserQuery sampleUserQuery = mock(UserQuery.class);
+    when(identityServiceMock.createUserQuery()).thenReturn(sampleUserQuery);
+    when(sampleUserQuery.userId(MockProvider.EXAMPLE_USER_ID)).thenReturn(sampleUserQuery);
+    when(sampleUserQuery.singleResult()).thenReturn(initialUser);
+
+    String message = "exception expected";
+    doThrow(new AuthorizationException(message)).when(identityServiceMock).saveUser(any(User.class));
+
+    UserCredentialsDto dto = new UserCredentialsDto();
+    dto.setPassword("new-password");
+
+    given()
+        .pathParam("id", MockProvider.EXAMPLE_USER_ID)
+        .body(dto).contentType(ContentType.JSON)
+    .then()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+        .put(USER_CREDENTIALS_URL);
   }
 
   @Test
@@ -501,6 +585,33 @@ public abstract class AbstractUserRestServiceInteractionTest extends AbstractRes
 
     // nothing was saved
     verify(identityServiceMock, never()).saveUser(any(User.class));
+  }
+
+  @Test
+  public void testPutProfileThrowsAuthorizationException() {
+    User initialUser = MockProvider.createMockUser();
+    User userUpdate = MockProvider.createMockUserUpdate();
+
+    UserQuery sampleUserQuery = mock(UserQuery.class);
+    when(identityServiceMock.createUserQuery()).thenReturn(sampleUserQuery);
+    when(sampleUserQuery.userId(MockProvider.EXAMPLE_USER_ID)).thenReturn(sampleUserQuery);
+    when(sampleUserQuery.singleResult()).thenReturn(initialUser);
+
+    String message = "exception expected";
+    doThrow(new AuthorizationException(message)).when(identityServiceMock).saveUser(any(User.class));
+
+    UserProfileDto updateDto = UserProfileDto.fromUser(userUpdate);
+
+    given()
+        .pathParam("id", MockProvider.EXAMPLE_USER_ID)
+        .body(updateDto).contentType(ContentType.JSON)
+    .then()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+        .body("message", equalTo(message))
+    .when()
+        .put(USER_PROFILE_URL);
   }
 
   @Test

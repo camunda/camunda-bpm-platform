@@ -12,7 +12,9 @@
  */
 package org.camunda.bpm.engine.rest.sub.runtime.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.ws.rs.core.Response.Status;
+
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
@@ -25,7 +27,7 @@ import org.camunda.bpm.engine.rest.sub.runtime.EventSubscriptionResource;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.variable.VariableMap;
 
-import javax.ws.rs.core.Response.Status;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class MessageEventSubscriptionResource implements EventSubscriptionResource {
 
@@ -67,6 +69,8 @@ public class MessageEventSubscriptionResource implements EventSubscriptionResour
       VariableMap variables = VariableValueDto.toMap(triggerDto.getVariables(), engine, objectMapper);
       runtimeService.messageEventReceived(messageName, executionId, variables);
 
+    } catch (AuthorizationException e) {
+      throw e;
     } catch (ProcessEngineException e) {
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e, String.format("Cannot trigger message %s for execution %s: %s",
         messageName, executionId, e.getMessage()));

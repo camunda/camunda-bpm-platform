@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest.sub.history.impl;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -55,6 +56,8 @@ public class HistoricJobLogResourceImpl implements HistoricJobLogResource {
       HistoryService historyService = engine.getHistoryService();
       String stacktrace = historyService.getHistoricJobLogExceptionStacktrace(id);
       return stacktrace;
+    } catch (AuthorizationException e) {
+      throw e;
     } catch (ProcessEngineException e) {
       throw new InvalidRequestException(Status.NOT_FOUND, e.getMessage());
     }
