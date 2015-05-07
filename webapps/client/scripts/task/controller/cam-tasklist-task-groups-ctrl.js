@@ -34,6 +34,8 @@ define([
 
     var groupsChanged = $scope.groupsChanged;
 
+    var errorHandler = $scope.errorHandler();
+
     $scope._groups = [];
 
     var messages = {};
@@ -82,12 +84,14 @@ define([
       delete newGroup.error;
       Task.identityLinksAdd(taskId, newGroup, function(err) {
         if (err) {
-          return Notifications.addError({
-            status: messages.failure,
-            message: messages.addGroupFailed,
-            exclusive: true,
-            scope: $scope
-          });
+          // return Notifications.addError({
+          //   status: messages.failure,
+          //   message: messages.addGroupFailed,
+          //   exclusive: true,
+          //   scope: $scope
+          // });
+
+          return errorHandler('TASK_UPDATE_ERROR', err);
         }
 
         $scope.taskGroupForm.$setPristine();

@@ -228,7 +228,8 @@ define([
                 return function () {
                   groupsChanged = true;
                 };
-              }
+              },
+              errorHandler: function () { return $scope.errorHandler; }
             }
           }).result.then(dialogClosed, dialogClosed);
 
