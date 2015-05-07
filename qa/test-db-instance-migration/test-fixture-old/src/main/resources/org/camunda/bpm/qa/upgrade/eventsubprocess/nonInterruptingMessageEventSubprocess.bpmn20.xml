@@ -2,8 +2,8 @@
 <definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:camunda="http://activiti.org/bpmn" targetNamespace="Examples"
   xmlns:tns="Examples">
   <message id="messageId" name="Message" />
-  
-  <process id="NonInterruptingEventSubprocessScenario">
+
+  <process id="NonInterruptingEventSubprocessScenario" isExecutable="true">
     <startEvent id="theStart" />
     <sequenceFlow sourceRef="theStart" targetRef="outerTask" />
     <userTask id="outerTask" />

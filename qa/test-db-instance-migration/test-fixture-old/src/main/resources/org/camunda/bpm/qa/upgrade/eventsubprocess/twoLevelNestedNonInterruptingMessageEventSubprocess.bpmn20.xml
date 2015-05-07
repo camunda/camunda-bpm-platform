@@ -4,21 +4,21 @@
   <message id="outerMessageId" name="OuterEventSubProcessMessage" />
   <message id="innerMessageId" name="InnerEventSubProcessMessage" />
   <error id="errorId" errorCode="ThrowBpmnErrorDelegate"/>
-  
-  <process id="NestedNonInterruptingMessageEventSubprocessScenarioNestedSubprocess">
+
+  <process id="NestedNonInterruptingMessageEventSubprocessScenarioNestedSubprocess" isExecutable="true">
     <startEvent id="theStart" />
     <sequenceFlow sourceRef="theStart" targetRef="outerTask" />
     <userTask id="outerTask" />
     <sequenceFlow sourceRef="outerTask" targetRef="theEnd" />
     <endEvent id="theEnd" />
-    
+
     <!-- Outer event subprocess -->
     <subProcess id="outerEventSubProcess"  triggeredByEvent="true">
       <startEvent id="outerEventEventSubProcessStart" isInterrupting="false">
         <messageEventDefinition messageRef="outerMessageId" />
       </startEvent>
       <sequenceFlow sourceRef="outerEventEventSubProcessStart" targetRef="subProcess" />
-      
+
       <!-- subprocess -->
       <subProcess id="subProcess">
         <startEvent id="subProcessStart" />
@@ -26,7 +26,7 @@
         <userTask id="subProcessTask" />
         <sequenceFlow sourceRef="subProcessTask" targetRef="subProcessEnd" />
         <endEvent id="subProcessEnd" />
-        
+
         <!-- inner event subprocess -->
         <subProcess id="innerEventSubProcess" triggeredByEvent="true">
           <startEvent id="innerEventSubProcessStart" isInterrupting="false">
@@ -41,7 +41,7 @@
         </subProcess>
       </subProcess>
     </subProcess>
-    
+
     <!-- Event subprocess catching the error -->
     <subProcess id="errorEventSubProcess" triggeredByEvent="true">
       <startEvent id="errorEventProcessStart" isInterrupting="true">

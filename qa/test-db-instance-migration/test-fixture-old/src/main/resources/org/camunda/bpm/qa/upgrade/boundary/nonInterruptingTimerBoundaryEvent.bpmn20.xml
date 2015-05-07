@@ -4,7 +4,7 @@
   targetNamespace="Examples">
   <message id="messageId" name="ReceiveTaskMessage" />
 
-  <process id="NonInterruptingTimerBoundaryEventScenario">
+  <process id="NonInterruptingTimerBoundaryEventScenario" isExecutable="true">
     <startEvent id="theStart" />
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="outerTask" />
     <receiveTask id="outerTask" messageRef="messageId" />

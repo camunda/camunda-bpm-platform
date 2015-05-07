@@ -3,15 +3,15 @@
   xmlns:tns="Examples">
   <message id="messageId" name="Message" />
   <error id="errorId" errorCode="ThrowBpmnErrorDelegate"/>
-  
-  <process id="ParallelNestedNonInterruptingEventSubprocessScenario">
+
+  <process id="ParallelNestedNonInterruptingEventSubprocessScenario" isExecutable="true">
     <startEvent id="outerStart" />
     <sequenceFlow sourceRef="outerStart" targetRef="fork" />
-    
+
     <parallelGateway id="fork" />
     <sequenceFlow sourceRef="fork" targetRef="outerTask" />
     <userTask id="outerTask" />
-    
+
     <sequenceFlow sourceRef="fork" targetRef="subProcess" />
     <subProcess id="subProcess">
       <!-- main flow -->
@@ -20,7 +20,7 @@
       <userTask id="innerTask" />
       <sequenceFlow sourceRef="innerTask" targetRef="innerEnd" />
       <endEvent id="innerEnd" />
-  
+
       <!-- subprocess (second task may optionally throw BPMN error) -->
       <subProcess id="eventSubProcess" triggeredByEvent="true">
         <startEvent id="eventProcessStart" isInterrupting="false">
@@ -34,13 +34,13 @@
         <endEvent id="eventSubProcessEnd" />
       </subProcess>
     </subProcess>
-    
+
     <sequenceFlow sourceRef="outerTask" targetRef="join" />
     <sequenceFlow sourceRef="subProcess" targetRef="join" />
     <parallelGateway id="join" />
     <sequenceFlow sourceRef="join" targetRef="outerEnd" />
     <endEvent id="outerEnd" />
-    
+
     <!-- Boundary event catching the error -->
     <boundaryEvent id="catchError" attachedToRef="subProcess">
       <errorEventDefinition errorRef="errorId"/>

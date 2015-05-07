@@ -2,8 +2,8 @@
 <definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:camunda="http://activiti.org/bpmn" targetNamespace="Examples"
   xmlns:tns="Examples">
   <error id="errorId" errorCode="ThrowBpmnErrorDelegate"/>
-  
-  <process id="SequentialMultiInstanceSubprocess">
+
+  <process id="SequentialMultiInstanceSubprocess" isExecutable="true">
     <startEvent id="theStart" />
     <sequenceFlow sourceRef="theStart" targetRef="miSubProcess" />
 
@@ -19,10 +19,10 @@
       <sequenceFlow sourceRef="throwErrorServiceTask" targetRef="subProcessEnd" />
       <endEvent id="subProcessEnd" />
     </subProcess>
-    
+
     <sequenceFlow sourceRef="miSubProcess" targetRef="theEnd" />
     <endEvent id="theEnd" />
-    
+
     <!-- Boundary event catching the error -->
     <boundaryEvent id="catchError" attachedToRef="miSubProcess">
       <errorEventDefinition errorRef="errorId"/>

@@ -3,8 +3,8 @@
   xmlns:tns="Examples">
   <message id="messageId" name="Message" />
   <error id="errorId" errorCode="ThrowBpmnErrorDelegate"/>
-  
-  <process id="SequentialMultiInstanceReceiveTask">
+
+  <process id="SequentialMultiInstanceReceiveTask" isExecutable="true">
     <startEvent id="theStart" />
     <sequenceFlow sourceRef="theStart" targetRef="miReceiveTask" />
 
@@ -18,10 +18,10 @@
         <loopCardinality>3</loopCardinality>
       </multiInstanceLoopCharacteristics>
     </receiveTask>
-    
+
     <sequenceFlow sourceRef="miReceiveTask" targetRef="theEnd" />
     <endEvent id="theEnd" />
-    
+
     <!-- Boundary event catching the error -->
     <boundaryEvent id="catchError" attachedToRef="miReceiveTask">
       <errorEventDefinition errorRef="errorId"/>

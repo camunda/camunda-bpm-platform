@@ -3,11 +3,11 @@
   xmlns:tns="Examples">
   <message id="messageId" name="Message" />
   <error id="errorId" errorCode="ThrowBpmnErrorDelegate"/>
-  
-  <process id="NestedInterruptingEventSubprocessParallelScenario">
+
+  <process id="NestedInterruptingEventSubprocessParallelScenario" isExecutable="true">
     <startEvent id="outerStart" />
     <sequenceFlow sourceRef="outerStart" targetRef="subProcess" />
-      
+
     <subProcess id="subProcess">
       <!-- main flow -->
       <startEvent id="innerStart" />
@@ -15,7 +15,7 @@
       <userTask id="innerTask" />
       <sequenceFlow sourceRef="innerTask" targetRef="innerEnd" />
       <endEvent id="innerEnd" />
-  
+
       <!-- subprocess (second task may optionally throw BPMN error) -->
       <subProcess id="innerEventSubProcess" triggeredByEvent="true">
         <startEvent id="innerEventProcessStart" isInterrupting="false">
@@ -23,7 +23,7 @@
         </startEvent>
         <sequenceFlow sourceRef="innerEventProcessStart" targetRef="fork" />
         <parallelGateway id="fork" />
-        
+
         <!-- branch 1: user task + (optionally error-throwing) service task -->
         <sequenceFlow sourceRef="fork" targetRef="innerEventSubProcessTask1" />
         <userTask id="innerEventSubProcessTask1" />
@@ -31,7 +31,7 @@
         <serviceTask id="throwErrorServiceTask" camunda:class="org.camunda.bpm.qa.upgrade.util.ThrowBpmnErrorDelegate" />
         <sequenceFlow sourceRef="throwErrorServiceTask" targetRef="innerEventSubProcessEnd1" />
         <endEvent id="innerEventSubProcessEnd1" />
-        
+
         <!-- branch 2: user task -->
         <sequenceFlow sourceRef="fork" targetRef="innerEventSubProcessTask2" />
         <userTask id="innerEventSubProcessTask2" />
@@ -39,10 +39,10 @@
         <endEvent id="innerEventSubProcessEnd2" />
       </subProcess>
     </subProcess>
-    
+
     <sequenceFlow sourceRef="subProcess" targetRef="outerEnd" />
     <endEvent id="outerEnd" />
-    
+
     <!-- Event subprocess catching the error -->
     <subProcess id="outerEventSubProcess" triggeredByEvent="true">
       <startEvent id="outerEventProcessStart" isInterrupting="true">
