@@ -182,6 +182,19 @@
             </tr>
           </tbody>
         </table>
+
+        <pagination ng-if="pages.total > pages.size"
+                    class="pagination-sm"
+
+                    page="pages.current"
+                    ng-model="pages.current"
+
+                    total-items="pages.total"
+                    items-per-page="pages.size"
+
+                    max-size="7"
+                    boundary-links="true"></pagination>
+
       </form>
   </section>
 </div>

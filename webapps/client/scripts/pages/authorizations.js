@@ -104,22 +104,47 @@ define(['text!./authorizations.html', 'text!./confirm-delete-authorization.html'
           });
 
           dialog.result.then(function(result) {
-
             if (result == 'SUCCESS') {
               loadAuthorizations();
             }
           });
         };
 
+
+        $scope.pages = $scope.pages || {
+          total: 0,
+          size: 25,
+          current: 1
+        };
+
         var loadAuthorizations = $scope.loadAuthorizations = function() {
           $scope.loadingState = 'LOADING';
-          AuthorizationResource.query({resourceType : $scope.selectedResourceType}).$promise.then(function(response) {
-            $scope.authorizations = response;
-            $scope.loadingState = response.length ? 'LOADED' : 'EMPTY';
-          }, function () {
+          function reqError() {
             $scope.loadingState = 'ERROR';
-          });
+          }
+
+          AuthorizationResource.count({
+            resourceType :  $scope.selectedResourceType,
+          }).$promise.then(function (response) {
+            if (!response.count) {
+              $scope.loadingState = 'EMPTY';
+              return;
+            }
+
+            $scope.pages.total = response.count;
+            AuthorizationResource.query({
+              resourceType :  $scope.selectedResourceType,
+              firstResult:    ($scope.pages.current - 1) * $scope.pages.size,
+              maxResults:     $scope.pages.size
+            }).$promise.then(function(response) {
+              $scope.authorizations = response;
+              $scope.loadingState = 'LOADED';
+            }, reqError);
+          }, reqError);
         };
+
+        // will also trigger the initial load request
+        $scope.$watch('pages.current', loadAuthorizations);
 
         $scope.getPermissionsForResource = function() {
           if(!!$scope.selectedResourceType) {
@@ -153,11 +178,7 @@ define(['text!./authorizations.html', 'text!./confirm-delete-authorization.html'
         } else {
           $scope.title = $scope.getResource($routeParams.resource);
           $scope.selectedResourceType = $routeParams.resource;
-
         }
-
-        loadAuthorizations();
-
       }],
       authentication: 'required',
       reloadOnSearch: false
