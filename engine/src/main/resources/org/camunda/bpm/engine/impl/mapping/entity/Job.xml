@@ -101,9 +101,11 @@
   </select>
 
   <select id="selectNextJobsToExecute" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
-  	${limitBefore}
+    <bind name="orderingProperties" value="parameter.orderingProperties" />
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
     select
-      RES.* ${limitBetweenNextJobs}
+      RES.* ${limitBetween}
     from ${prefix}ACT_RU_JOB RES
 
     where (RES.RETRIES_ &gt; 0)
@@ -123,7 +125,9 @@
         </if>
         )
       </if>
-    ${orderByNextJobs}
+    <if test="parameter.applyOrdering">
+      ${orderBy}
+    </if>
     ${limitAfter}
   </select>
 

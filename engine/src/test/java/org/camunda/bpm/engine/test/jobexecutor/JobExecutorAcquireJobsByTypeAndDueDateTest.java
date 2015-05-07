@@ -73,5 +73,4 @@ public class JobExecutorAcquireJobsByTypeAndDueDateTest extends AbstractJobExecu
     assertEquals(messageJob1.getId(), acquirableJobs.get(2).getId());
     assertEquals(messageJob2.getId(), acquirableJobs.get(3).getId());
   }
-
 }

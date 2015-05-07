@@ -49,13 +49,6 @@ public class DbSqlSessionFactory implements SessionFactory {
   public static final Map<String, String> databaseSpecificOrderByStatements = new HashMap<String, String>();
   public static final Map<String, String> databaseSpecificLimitBeforeNativeQueryStatements = new HashMap<String, String>();
 
-  public static final Map<String, String> databaseSpecificLimitBetweenNextJobsByTypeStatements = new HashMap<String, String>();
-  public static final Map<String, String> databaseSpecificOrderByNextJobsByTypeStatements = new HashMap<String, String>();
-  public static final Map<String, String> databaseSpecificLimitBetweenNextJobsByDueDateStatements = new HashMap<String, String>();
-  public static final Map<String, String> databaseSpecificOrderByNextJobsByDueDateStatements = new HashMap<String, String>();
-  public static final Map<String, String> databaseSpecificLimitBetweenNextJobsByTypeAndDueDateStatements = new HashMap<String, String>();
-  public static final Map<String, String> databaseSpecificOrderByNextJobsByTypeAndDueDateStatements = new HashMap<String, String>();
-
   public static final Map<String, String> databaseSpecificBitAnd1 = new HashMap<String, String>();
   public static final Map<String, String> databaseSpecificBitAnd2 = new HashMap<String, String>();
   public static final Map<String, String> databaseSpecificBitAnd3 = new HashMap<String, String>();
@@ -70,9 +63,6 @@ public class DbSqlSessionFactory implements SessionFactory {
   static {
 
     String defaultOrderBy = " order by ${orderBy} ";
-    String defaultOrderByType = " ORDER BY TYPE_ DESC";
-    String defaultOrderByDueDate = " ORDER BY DUEDATE_ ASC";
-    String defaultOrderByTypeAndDueDate = " ORDER BY TYPE_ DESC, DUEDATE_ ASC";
 
     // h2
     databaseSpecificLimitBeforeStatements.put(H2, "");
@@ -82,13 +72,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificLimitBetweenClobStatements.put(H2, databaseSpecificLimitBetweenStatements.get(H2));
     databaseSpecificOrderByStatements.put(H2, defaultOrderBy);
     databaseSpecificLimitBeforeNativeQueryStatements.put(H2, "");
-
-    databaseSpecificLimitBetweenNextJobsByTypeStatements.put(H2, "");
-    databaseSpecificOrderByNextJobsByTypeStatements.put(H2, defaultOrderByType);
-    databaseSpecificLimitBetweenNextJobsByDueDateStatements.put(H2, "");
-    databaseSpecificOrderByNextJobsByDueDateStatements.put(H2, defaultOrderByDueDate);
-    databaseSpecificLimitBetweenNextJobsByTypeAndDueDateStatements.put(H2, "");
-    databaseSpecificOrderByNextJobsByTypeAndDueDateStatements.put(H2, defaultOrderByTypeAndDueDate);
 
     databaseSpecificBitAnd1.put(H2, "BITAND(");
     databaseSpecificBitAnd2.put(H2, ",");
@@ -111,13 +94,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificLimitBetweenClobStatements.put(MYSQL, databaseSpecificLimitBetweenStatements.get(MYSQL));
     databaseSpecificOrderByStatements.put(MYSQL, defaultOrderBy);
     databaseSpecificLimitBeforeNativeQueryStatements.put(MYSQL, "");
-
-    databaseSpecificLimitBetweenNextJobsByTypeStatements.put(MYSQL, "");
-    databaseSpecificOrderByNextJobsByTypeStatements.put(MYSQL, defaultOrderByType);
-    databaseSpecificLimitBetweenNextJobsByDueDateStatements.put(MYSQL, "");
-    databaseSpecificOrderByNextJobsByDueDateStatements.put(MYSQL, defaultOrderByDueDate);
-    databaseSpecificLimitBetweenNextJobsByTypeAndDueDateStatements.put(MYSQL, "");
-    databaseSpecificOrderByNextJobsByTypeAndDueDateStatements.put(MYSQL, defaultOrderByTypeAndDueDate);
 
     databaseSpecificBitAnd1.put(MYSQL, "");
     databaseSpecificBitAnd2.put(MYSQL, " & ");
@@ -144,13 +120,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificLimitBetweenClobStatements.put(POSTGRES, databaseSpecificLimitBetweenStatements.get(POSTGRES));
     databaseSpecificOrderByStatements.put(POSTGRES, defaultOrderBy);
     databaseSpecificLimitBeforeNativeQueryStatements.put(POSTGRES, "");
-
-    databaseSpecificLimitBetweenNextJobsByTypeStatements.put(POSTGRES, "");
-    databaseSpecificOrderByNextJobsByTypeStatements.put(POSTGRES, defaultOrderByType);
-    databaseSpecificLimitBetweenNextJobsByDueDateStatements.put(POSTGRES, "");
-    databaseSpecificOrderByNextJobsByDueDateStatements.put(POSTGRES, defaultOrderByDueDate);
-    databaseSpecificLimitBetweenNextJobsByTypeAndDueDateStatements.put(POSTGRES, "");
-    databaseSpecificOrderByNextJobsByTypeAndDueDateStatements.put(POSTGRES, defaultOrderByTypeAndDueDate);
 
     databaseSpecificBitAnd1.put(POSTGRES, "");
     databaseSpecificBitAnd2.put(POSTGRES, " & ");
@@ -195,13 +164,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificOrderByStatements.put(ORACLE, defaultOrderBy);
     databaseSpecificLimitBeforeNativeQueryStatements.put(ORACLE, "");
 
-    databaseSpecificLimitBetweenNextJobsByTypeStatements.put(ORACLE, "");
-    databaseSpecificOrderByNextJobsByTypeStatements.put(ORACLE, defaultOrderByType);
-    databaseSpecificLimitBetweenNextJobsByDueDateStatements.put(ORACLE, "");
-    databaseSpecificOrderByNextJobsByDueDateStatements.put(ORACLE, defaultOrderByDueDate);
-    databaseSpecificLimitBetweenNextJobsByTypeAndDueDateStatements.put(ORACLE, "");
-    databaseSpecificOrderByNextJobsByTypeAndDueDateStatements.put(ORACLE, defaultOrderByTypeAndDueDate);
-
     databaseSpecificDummyTable.put(ORACLE, "FROM DUAL");
     databaseSpecificBitAnd1.put(ORACLE, "BITAND(");
     databaseSpecificBitAnd2.put(ORACLE, ",");
@@ -223,13 +185,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificLimitBetweenClobStatements.put(DB2, ", row_number() over (ORDER BY ${orderBy}) rnk FROM ( select RES.* ");
     databaseSpecificOrderByStatements.put(DB2, "");
     databaseSpecificLimitBeforeNativeQueryStatements.put(DB2, "SELECT SUB.* FROM ( select RES.* , row_number() over (ORDER BY ${orderBy}) rnk FROM (");
-
-    databaseSpecificLimitBetweenNextJobsByTypeStatements.put(DB2, ", row_number() over (ORDER BY TYPE_ DESC) rnk FROM ( select distinct RES.* ");
-    databaseSpecificOrderByNextJobsByTypeStatements.put(DB2, "");
-    databaseSpecificLimitBetweenNextJobsByDueDateStatements.put(DB2, ", row_number() over (ORDER BY DUEDATE_ ASC) rnk FROM ( select distinct RES.* ");
-    databaseSpecificOrderByNextJobsByDueDateStatements.put(DB2, "");
-    databaseSpecificLimitBetweenNextJobsByTypeAndDueDateStatements.put(DB2, ", row_number() over (ORDER BY TYPE_ DESC, DUEDATE_ ASC) rnk FROM ( select distinct RES.* ");
-    databaseSpecificOrderByNextJobsByTypeAndDueDateStatements.put(DB2, "");
 
     databaseSpecificBitAnd1.put(DB2, "BITAND(");
     databaseSpecificBitAnd2.put(DB2, ",");
@@ -260,13 +215,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificLimitBetweenClobStatements.put(MSSQL, databaseSpecificLimitBetweenStatements.get(MSSQL));
     databaseSpecificOrderByStatements.put(MSSQL, "");
     databaseSpecificLimitBeforeNativeQueryStatements.put(MSSQL, "SELECT SUB.* FROM ( select RES.* , row_number() over (ORDER BY ${orderBy}) rnk FROM (");
-
-    databaseSpecificLimitBetweenNextJobsByTypeStatements.put(MSSQL, ", row_number() over (ORDER BY TYPE_ DESC) rnk FROM ( select distinct RES.* ");
-    databaseSpecificOrderByNextJobsByTypeStatements.put(MSSQL, "");
-    databaseSpecificLimitBetweenNextJobsByDueDateStatements.put(MSSQL, ", row_number() over (ORDER BY DUEDATE_ ASC) rnk FROM ( select distinct RES.* ");
-    databaseSpecificOrderByNextJobsByDueDateStatements.put(MSSQL, "");
-    databaseSpecificLimitBetweenNextJobsByTypeAndDueDateStatements.put(MSSQL, ", row_number() over (ORDER BY TYPE_ DESC, DUEDATE_ ASC) rnk FROM ( select distinct RES.* ");
-    databaseSpecificOrderByNextJobsByTypeAndDueDateStatements.put(MSSQL, "");
 
     databaseSpecificBitAnd1.put(MSSQL, "");
     databaseSpecificBitAnd2.put(MSSQL, " &");

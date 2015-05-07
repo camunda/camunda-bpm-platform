@@ -17,14 +17,18 @@ import static org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler.JOB_H
 import static org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler.JOB_HANDLER_CONFIG_PROPERTY_FOLLOW_UP_JOB_CREATED;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.camunda.bpm.engine.impl.Direction;
 import org.camunda.bpm.engine.impl.JobQueryImpl;
+import org.camunda.bpm.engine.impl.JobQueryProperty;
 import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.QueryOrderingProperty;
 import org.camunda.bpm.engine.impl.cfg.TransactionListener;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -46,6 +50,14 @@ import org.camunda.bpm.engine.runtime.Job;
  * @author Daniel Meyer
  */
 public class JobManager extends AbstractManager {
+
+  public static QueryOrderingProperty JOB_TYPE_ORDERING_PROPERTY = new QueryOrderingProperty(null, JobQueryProperty.TYPE);
+  public static QueryOrderingProperty JOB_DUEDATE_ORDERING_PROPERTY = new QueryOrderingProperty(null, JobQueryProperty.DUEDATE);
+
+  static {
+    JOB_TYPE_ORDERING_PROPERTY.setDirection(Direction.DESCENDING);
+    JOB_DUEDATE_ORDERING_PROPERTY.setDirection(Direction.ASCENDING);
+  }
 
   public void insertJob(JobEntity job) {
     getDbEntityManager().insert(job);
@@ -138,6 +150,18 @@ public class JobManager extends AbstractManager {
         params.put("deploymentIds", registeredDeployments);
       }
     }
+
+    List<QueryOrderingProperty> orderingProperties = new ArrayList<QueryOrderingProperty>();
+    if (Context.getProcessEngineConfiguration().isJobExecutorPreferTimerJobs()) {
+      orderingProperties.add(JOB_TYPE_ORDERING_PROPERTY);
+    }
+    if (Context.getProcessEngineConfiguration().isJobExecutorAcquireByDueDate()) {
+      orderingProperties.add(JOB_DUEDATE_ORDERING_PROPERTY);
+    }
+    params.put("orderingProperties", orderingProperties);
+    // don't apply default sorting
+    params.put("applyOrdering", !orderingProperties.isEmpty());
+
     return getDbEntityManager().selectList("selectNextJobsToExecute", params, page);
   }
 

@@ -30,5 +30,6 @@ public interface JobQueryProperty {
   public static final QueryProperty PROCESS_DEFINITION_KEY = new QueryPropertyImpl("PROCESS_DEF_KEY_");
   public static final QueryProperty DUEDATE = new QueryPropertyImpl("DUEDATE_");
   public static final QueryProperty RETRIES = new QueryPropertyImpl("RETRIES_");
+  public static final QueryProperty TYPE = new QueryPropertyImpl("TYPE_");
 
 }
