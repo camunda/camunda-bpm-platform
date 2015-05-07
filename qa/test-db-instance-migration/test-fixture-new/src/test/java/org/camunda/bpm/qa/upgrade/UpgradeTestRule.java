@@ -34,6 +34,10 @@ public class UpgradeTestRule extends ProcessEngineRule {
     super("process-engine-config-new.xml");
   }
 
+  public UpgradeTestRule(String configurationResource) {
+    super(configurationResource);
+  }
+
   public void starting(Description description) {
     if (scenarioTestedByClass == null) {
       Class<?> testClass = description.getTestClass();

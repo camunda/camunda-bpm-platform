@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.qa.upgrade.scenarios.authorization.AuthorizationScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.boundary.NestedNonInterruptingBoundaryEventOnInnerSubprocessScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.boundary.NestedNonInterruptingBoundaryEventOnOuterSubprocessScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.boundary.NonInterruptingBoundaryEventScenario;
@@ -70,7 +71,6 @@ public class TestFixtureOld {
   }
 
   public static void main(String[] args) {
-
     ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
       .createProcessEngineConfigurationFromResource("process-engine-config-old.xml");
     ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();
@@ -101,6 +101,19 @@ public class TestFixtureOld {
     runner.setupScenarios(NonInterruptingBoundaryEventScenario.class);
     runner.setupScenarios(NestedNonInterruptingBoundaryEventOnInnerSubprocessScenario.class);
     runner.setupScenarios(NestedNonInterruptingBoundaryEventOnOuterSubprocessScenario.class);
+
+    processEngine.close();
+
+    // process engine with authorization ////////////////////////////////////////////
+
+    processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
+      .createProcessEngineConfigurationFromResource("process-engine-config-authorization-enabled-old.xml");
+    processEngine = processEngineConfiguration.buildProcessEngine();
+
+    // register test scenarios
+    runner = new ScenarioRunner(processEngine);
+
+    runner.setupScenarios(AuthorizationScenario.class);
 
     processEngine.close();
   }

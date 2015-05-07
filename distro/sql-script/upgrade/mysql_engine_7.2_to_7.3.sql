@@ -108,3 +108,18 @@ ALTER TABLE ACT_HI_DETAIL
 
 ALTER TABLE ACT_RU_JOB
   ADD SEQUENCE_COUNTER_ bigint;
+
+-- add global grant authorizations for new authorization resources:
+-- DEPLOYMENT
+-- PROCESS_DEFINITION
+-- PROCESS_INSTANCE
+-- TASK
+-- with ALL permissions
+
+INSERT INTO
+  ACT_RU_AUTHORIZATION (ID_, TYPE_, USER_ID_, RESOURCE_TYPE_, RESOURCE_ID_, PERMS_, REV_)
+VALUES
+  ('global-grant-process-definition', 0, '*', 6, '*', 2147483647, 1),
+  ('global-grant-task', 0, '*', 7, '*', 2147483647, 1),
+  ('global-grant-process-instance', 0, '*', 8, '*', 2147483647, 1),
+  ('global-grant-deployment', 0, '*', 9, '*', 2147483647, 1);
