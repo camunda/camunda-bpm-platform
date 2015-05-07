@@ -23,6 +23,9 @@ define([
     if(value === 'NULL') {
       return null;
     }
+    if(value.indexOf('\'') === 0 && value.lastIndexOf('\'') === value.length - 1) {
+      return value.substr(1, value.length - 2);
+    }
     return value;
   };
 
