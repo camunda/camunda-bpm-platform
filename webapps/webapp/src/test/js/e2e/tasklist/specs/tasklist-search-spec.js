@@ -107,11 +107,10 @@ describe('Tasklist Search', function() {
       expect(page.taskList.taskName(0)).to.eventually.eql('Task 2');
     });
 
-    // skip related to CAM-3620
-    it.skip('should change String search value and find Task 1', function() {
+    it('should change String search value and find Task 1', function() {
 
       // when
-      page.taskList.taskSearch.changeValue(2, '4711');
+      page.taskList.taskSearch.changeValue(2, '\'4711\'');
 
       // then
       expect(page.taskList.taskList().count()).to.eventually.eql(1);
