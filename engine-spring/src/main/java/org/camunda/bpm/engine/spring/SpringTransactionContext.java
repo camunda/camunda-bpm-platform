@@ -19,7 +19,6 @@ import org.camunda.bpm.engine.impl.cfg.TransactionListener;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -32,10 +31,31 @@ public class SpringTransactionContext implements TransactionContext {
 
   protected PlatformTransactionManager transactionManager;
   protected CommandContext commandContext;
+  protected TransactionState lastTransactionState = null; 
   
   public SpringTransactionContext(PlatformTransactionManager transactionManager, CommandContext commandContext) {
     this.transactionManager = transactionManager;
     this.commandContext = commandContext;
+    TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+      @Override
+      public void beforeCommit(boolean readOnly) {
+        lastTransactionState = TransactionState.COMMITTING;
+      }
+      @Override
+      public void afterCommit() {
+        lastTransactionState = TransactionState.COMMITTED;
+      }
+      @Override
+      public void beforeCompletion() {
+        lastTransactionState = TransactionState.ROLLINGBACK;
+      }
+      @Override
+      public void afterCompletion(int status) {
+        if(TransactionSynchronization.STATUS_ROLLED_BACK == status) {
+          lastTransactionState = TransactionState.ROLLED_BACK;
+        }
+      }
+    });
   }
   
   public void commit() {
@@ -93,8 +113,7 @@ public class SpringTransactionContext implements TransactionContext {
 
   public boolean isTransactionActive() {
     if(TransactionSynchronizationManager.isActualTransactionActive()){
-      TransactionStatus transaction = transactionManager.getTransaction(null);
-      return !transaction.isRollbackOnly() && !transaction.isCompleted();
+      return !TransactionState.ROLLED_BACK.equals(lastTransactionState) && !TransactionState.ROLLINGBACK.equals(lastTransactionState);
     }
     return TransactionSynchronizationManager.isActualTransactionActive();
   }
