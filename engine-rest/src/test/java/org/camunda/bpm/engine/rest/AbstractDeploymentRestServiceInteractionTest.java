@@ -311,7 +311,7 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
       .multiPart("data", "unspecified", createMockDeploymentResourceByteData())
       .multiPart("more-data", "unspecified", createMockDeploymentResourceBpmnData())
       .multiPart("deployment-name", MockProvider.EXAMPLE_DEPLOYMENT_ID)
-      .multiPart("enable-duplicate-filtering", "true")
+      .multiPart("enable-duplicate-filtering", "true").log().body()
     .expect()
       .statusCode(Status.OK.getStatusCode())
     .when()

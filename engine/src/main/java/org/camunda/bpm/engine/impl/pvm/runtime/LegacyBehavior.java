@@ -27,9 +27,12 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.ReceiveTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.SequentialMultiInstanceActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.SubProcessActivityBehavior;
 import org.camunda.bpm.engine.impl.cmd.GetActivityInstanceCmd;
+import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.ActivityInstanceImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
@@ -250,6 +253,13 @@ public class LegacyBehavior {
    * @return
    */
   public static Map<ScopeImpl, PvmExecutionImpl> createActivityExecutionMapping(List<PvmExecutionImpl> scopeExecutions, List<ScopeImpl> scopes) {
+    PvmExecutionImpl deepestExecution = scopeExecutions.get(0);
+    if (isLegacyAsyncAtMultiInstance(deepestExecution)) {
+      // in case the deepest execution is in fact async at multi-instance, the multi instance body is part
+      // of the list of scopes, however it is not instantiated yet or has already ended. Thus it must be removed.
+      scopes.remove(0);
+    }
+
     // The trees are out of sync.
     // We are missing executions:
     int numOfMissingExecutions = scopes.size() - scopeExecutions.size();
@@ -303,6 +313,27 @@ public class LegacyBehavior {
               && parentActivityBehavior instanceof SequentialMultiInstanceActivityBehavior)
         || (activityBehavior instanceof ReceiveTaskActivityBehavior
               && parentActivityBehavior instanceof MultiInstanceActivityBehavior);
+  }
+
+  /**
+   * This returns true only if the provided execution has reached its wait state in a legacy engine version, because
+   * only in that case, it can be async and waiting at the inner activity wrapped by the miBody. In versions >= 7.3,
+   * the execution would reference the multi-instance body instead.
+   */
+  protected static boolean isLegacyAsyncAtMultiInstance(PvmExecutionImpl execution) {
+    ActivityImpl activity = execution.getActivity();
+
+    if (activity != null) {
+      boolean isAsync = execution.getActivityInstanceId() == null;
+      boolean isAtMultiInstance = activity.getParentFlowScopeActivity() != null
+          && activity.getParentFlowScopeActivity().getActivityBehavior() instanceof MultiInstanceActivityBehavior;
+
+
+      return isAsync && isAtMultiInstance;
+    }
+    else {
+      return false;
+    }
   }
 
   /**
@@ -459,5 +490,43 @@ public class LegacyBehavior {
     }
   }
 
+  public static void migrateMultiInstanceJobDefinitions(ProcessDefinitionEntity processDefinition, List<JobDefinitionEntity> jobDefinitions) {
+    // TODO: this has to be improved once we support async for the inner activity
+
+    for (JobDefinitionEntity jobDefinition : jobDefinitions) {
+
+      String activityId = jobDefinition.getActivityId();
+      if (activityId != null) {
+        ActivityImpl activity = processDefinition.findActivity(jobDefinition.getActivityId());
+        ScopeImpl flowScope = activity.getFlowScope();
+        if (flowScope != processDefinition) {
+          ActivityImpl flowScopeActivity = (ActivityImpl) flowScope;
+          if (flowScopeActivity.getActivityBehavior() instanceof MultiInstanceActivityBehavior
+              && AsyncContinuationJobHandler.TYPE.equals(jobDefinition.getJobType())) {
+            jobDefinition.setActivityId(flowScopeActivity.getId());
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * When executing an async job for an activity wrapped in an miBody, set the execution to the
+   * miBody. Background: in <= 7.2 async jobs were created for the inner activity, although the
+   * semantics are that they are executed before the miBody is entered
+   */
+  public static void repairMultiInstanceAsyncJob(ExecutionEntity execution) {
+    // TODO: this has to be improved once we support async for the inner activity
+
+    ActivityImpl activity = execution.getActivity();
+    ScopeImpl flowScope = activity.getFlowScope();
+    if (flowScope != activity.getProcessDefinition()) {
+      ActivityImpl flowScopeActivity = (ActivityImpl) flowScope;
+      if (flowScopeActivity.getActivityBehavior() instanceof MultiInstanceActivityBehavior) {
+        execution.setActivity(flowScopeActivity);
+      }
+    }
+
+  }
 
 }

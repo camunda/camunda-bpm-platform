@@ -48,6 +48,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.MessageEventSubscriptionEn
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
+import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -182,7 +183,7 @@ public class BpmnDeployer implements Deployer {
     }
   }
 
-  protected void updateJobDeclarations(List<JobDeclaration<?>> jobDeclarations, ProcessDefinition processDefinition, boolean isNewDeployment) {
+  protected void updateJobDeclarations(List<JobDeclaration<?>> jobDeclarations, ProcessDefinitionEntity processDefinition, boolean isNewDeployment) {
 
     if(jobDeclarations == null || jobDeclarations.isEmpty()) {
       return;
@@ -199,6 +200,9 @@ public class BpmnDeployer implements Deployer {
     } else {
       // query all job definitions and update the declarations with their Ids
       List<JobDefinitionEntity> existingDefinitions = jobDefinitionManager.findByProcessDefinitionId(processDefinition.getId());
+
+      LegacyBehavior.migrateMultiInstanceJobDefinitions(processDefinition, existingDefinitions);
+
       for (JobDeclaration<?> jobDeclaration : jobDeclarations) {
         boolean jobDefinitionExists = false;
         for (JobDefinition jobDefinitionEntity : existingDefinitions) {

@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.engine.test.bpmn.async;
 
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -210,9 +213,16 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testAsyncServiceSubProcess() {
     // start process
-    runtimeService.startProcessInstanceByKey("asyncService");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncService");
 
     assertEquals(1, managementService.createJobQuery().count());
+
+    ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
+
+    assertThat(activityInstance).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .transition("subProcess")
+      .done());
 
     executeAvailableJobs();
 

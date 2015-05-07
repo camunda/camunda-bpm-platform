@@ -12,7 +12,9 @@
  */
 package org.camunda.bpm.qa.upgrade;
 
+import org.camunda.bpm.engine.management.JobDefinitionQuery;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
+import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
@@ -70,6 +72,17 @@ public class UpgradeTestRule extends ProcessEngineRule {
 
   public ExecutionQuery executionQuery() {
     return runtimeService.createExecutionQuery().processInstanceBusinessKey(scenarioName);
+  }
+
+  public JobQuery jobQuery() {
+    ProcessInstance instance = processInstance();
+    return managementService.createJobQuery().processInstanceId(instance.getId());
+  }
+
+  public JobDefinitionQuery jobDefinitionQuery() {
+    ProcessInstance instance = processInstance();
+    return managementService.createJobDefinitionQuery()
+        .processDefinitionId(instance.getProcessDefinitionId());
   }
 
   public ProcessInstanceQuery processInstanceQuery() {
