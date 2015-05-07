@@ -22,21 +22,38 @@ import org.camunda.bpm.qa.upgrade.Times;
  * @author Thorben Lindhauer
  *
  */
-public class AsyncSequentialMultiInstanceSubprocessScenario {
+public class AsyncParallelMultiInstanceScenario {
 
   @Deployment
-  public static String deployAsyncBeforeProcess() {
-    return "org/camunda/bpm/qa/upgrade/job/asyncBeforeSequentialMultiInstanceSubprocess.bpmn20.xml";
+  public static String deployAsyncBeforeSubprocessProcess() {
+    return "org/camunda/bpm/qa/upgrade/job/asyncBeforeParallelMultiInstanceSubprocess.bpmn20.xml";
   }
 
-  @DescribesScenario("initAsyncBefore")
+  @Deployment
+  public static String deployAsyncBeforeTaskProcess() {
+    return "org/camunda/bpm/qa/upgrade/job/asyncBeforeParallelMultiInstanceTask.bpmn20.xml";
+  }
+
+  @DescribesScenario("initAsyncBeforeSubprocess")
   @Times(4)
-  public static ScenarioSetup initializeAsyncBefore() {
+  public static ScenarioSetup initializeAsyncBeforeSubprocess() {
     return new ScenarioSetup() {
       public void execute(ProcessEngine engine, String scenarioName) {
         engine
           .getRuntimeService()
-          .startProcessInstanceByKey("AsyncBeforeSequentialMultiInstanceSubprocess", scenarioName);
+          .startProcessInstanceByKey("AsyncBeforeParallelMultiInstanceSubprocess", scenarioName);
+      }
+    };
+  }
+
+  @DescribesScenario("initAsyncBeforeTask")
+  @Times(4)
+  public static ScenarioSetup initializeAsyncBeforeTask() {
+    return new ScenarioSetup() {
+      public void execute(ProcessEngine engine, String scenarioName) {
+        engine
+          .getRuntimeService()
+          .startProcessInstanceByKey("AsyncBeforeParallelMultiInstanceTask", scenarioName);
       }
     };
   }

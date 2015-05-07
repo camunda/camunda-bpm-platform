@@ -41,8 +41,8 @@ import org.camunda.bpm.qa.upgrade.scenarios.eventsubprocess.NestedParallelNonInt
 import org.camunda.bpm.qa.upgrade.scenarios.eventsubprocess.NonInterruptingEventSubprocessScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.eventsubprocess.ParallelNestedNonInterruptingEventSubprocessScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.eventsubprocess.TwoLevelNestedNonInterruptingEventSubprocessScenario;
-import org.camunda.bpm.qa.upgrade.scenarios.job.AsyncParallelMultiInstanceSubprocessScenario;
-import org.camunda.bpm.qa.upgrade.scenarios.job.AsyncSequentialMultiInstanceSubprocessScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.job.AsyncParallelMultiInstanceScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.job.AsyncSequentialMultiInstanceScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.multiinstance.MultiInstanceReceiveTaskScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.multiinstance.NestedSequentialMultiInstanceSubprocessScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.multiinstance.ParallelMultiInstanceSubprocessScenario;
@@ -100,8 +100,8 @@ public class TestFixtureOld {
     runner.setupScenarios(ParallelMultiInstanceSubprocessScenario.class);
 
     // async
-    runner.setupScenarios(AsyncParallelMultiInstanceSubprocessScenario.class);
-    runner.setupScenarios(AsyncSequentialMultiInstanceSubprocessScenario.class);
+    runner.setupScenarios(AsyncParallelMultiInstanceScenario.class);
+    runner.setupScenarios(AsyncSequentialMultiInstanceScenario.class);
 
     // boundary event
     runner.setupScenarios(NonInterruptingBoundaryEventScenario.class);
