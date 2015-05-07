@@ -181,6 +181,71 @@
 
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
+            <artifactId>sql-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>drop-db-if-present</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <srcFiles>
+                    <!-- first: try dropping the DB -->
+                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_engine_${project.version}.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_identity_${project.version}.sql</srcFile>
+                  </srcFiles>
+                  <autocommit>true</autocommit>
+                  <onError>continue</onError>
+                </configuration>
+              </execution>
+              <execution>
+                <id>patch-old-schema</id>
+                <phase>process-test-classes</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <srcFiles>
+                    <!-- now patch old version of the schema -->
+                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql</srcFile>
+                  </srcFiles>
+                </configuration>
+              </execution>
+              <execution>
+                <id>upgrade-db</id>
+                <phase>process-test-classes</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <srcFiles>
+                    <!-- now perform the schema migrations -->
+                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql</srcFile>
+                  </srcFiles>
+                </configuration>
+              </execution>
+              <execution>
+                <id>patch-new-schema</id>
+                <phase>process-test-classes</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <srcFiles>
+                    <!-- now patch old version of the schema -->
+                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql</srcFile>
+                  </srcFiles>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
             <configuration>
               <cleanupDaemonThreads>false</cleanupDaemonThreads>
@@ -190,66 +255,18 @@
             </configuration>
             <executions>
               <execution>
-                <id>create-old-schema</id>
+                <id>create-old-test-fixture</id>
                 <goals>
                   <goal>java</goal>
                 </goals>
-                <phase>process-test-classes</phase>
+                <phase>test-compile</phase>
                 <configuration>
                   <mainClass>org.camunda.bpm.qa.upgrade.TestFixtureOld</mainClass>
                   <includePluginDependencies>true</includePluginDependencies>
                 </configuration>
               </execution>
               <execution>
-                <id>patch-old-schema</id>
-                <goals>
-                  <goal>java</goal>
-                </goals>
-                <phase>process-test-classes</phase>
-                <configuration>
-                  <mainClass>org.camunda.bpm.engine.impl.db.DbSchemaExecuteFile</mainClass>
-                  <arguments>
-                    <argument>process-engine-config-new.xml</argument>
-                    <argument>
-                      ${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql
-                    </argument>
-                  </arguments>
-                </configuration>
-              </execution>
-              <execution>
-                <id>upgrade-db</id>
-                <goals>
-                  <goal>java</goal>
-                </goals>
-                <phase>process-test-classes</phase>
-                <configuration>
-                  <mainClass>org.camunda.bpm.engine.impl.db.DbSchemaExecuteFile</mainClass>
-                  <arguments>
-                    <argument>process-engine-config-new.xml</argument>
-                    <argument>
-                      ${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql
-                    </argument>
-                  </arguments>
-                </configuration>
-              </execution>
-              <execution>
-                <id>patch-new-schema</id>
-                <goals>
-                  <goal>java</goal>
-                </goals>
-                <phase>process-test-classes</phase>
-                <configuration>
-                  <mainClass>org.camunda.bpm.engine.impl.db.DbSchemaExecuteFile</mainClass>
-                  <arguments>
-                    <argument>process-engine-config-new.xml</argument>
-                    <argument>
-                      ${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql
-                    </argument>
-                  </arguments>
-                </configuration>
-              </execution>
-              <execution>
-                <id>drop-db</id>
+                <id>drop-upgraded-db</id>
                 <goals>
                   <goal>java</goal>
                 </goals>
