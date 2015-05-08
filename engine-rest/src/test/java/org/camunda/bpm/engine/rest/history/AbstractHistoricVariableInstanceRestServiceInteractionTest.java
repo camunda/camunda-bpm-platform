@@ -91,6 +91,7 @@ public abstract class AbstractHistoricVariableInstanceRestServiceInteractionTest
       .body("activityInstanceId", equalTo(builder.getActivityInstanceId()))
       .body("caseDefinitionKey", equalTo(builder.getCaseDefinitionKey()))
       .body("caseDefinitionId", equalTo(builder.getCaseDefinitionId()))
+      .body("taskId", equalTo(builder.getTaskId()))
     .when().get(VARIABLE_INSTANCE_URL);
 
     verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();
@@ -127,6 +128,7 @@ public abstract class AbstractHistoricVariableInstanceRestServiceInteractionTest
       .body("activityInstanceId", equalTo(builder.getActivityInstanceId()))
       .body("caseDefinitionKey", equalTo(builder.getCaseDefinitionKey()))
       .body("caseDefinitionId", equalTo(builder.getCaseDefinitionId()))
+      .body("taskId", equalTo(builder.getTaskId()))
     .when().get(VARIABLE_INSTANCE_URL);
 
     verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();
@@ -164,6 +166,7 @@ public abstract class AbstractHistoricVariableInstanceRestServiceInteractionTest
       .body("activityInstanceId", equalTo(builder.getActivityInstanceId()))
       .body("caseDefinitionKey", equalTo(builder.getCaseDefinitionKey()))
       .body("caseDefinitionId", equalTo(builder.getCaseDefinitionId()))
+      .body("taskId", equalTo(builder.getTaskId()))
     .when().get(VARIABLE_INSTANCE_URL);
 
     verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();

@@ -1307,6 +1307,7 @@ public abstract class MockProvider {
         .activityInstanceId(EXAMPLE_VARIABLE_INSTANCE_ACTIVITY_INSTANCE_ID)
         .caseDefinitionKey(EXAMPLE_VARIABLE_INSTANCE_CASE_DEF_KEY)
         .caseDefinitionId(EXAMPLE_VARIABLE_INSTANCE_CASE_DEF_ID)
+        .taskId(EXAMPLE_VARIABLE_INSTANCE_TASK_ID)
         .errorMessage(null);
   }
 

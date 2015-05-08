@@ -1157,4 +1157,25 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     taskService.deleteTask(taskId, true);
   }
 
+  public void testTaskIdProperty() {
+    // given
+    String taskId = "myTask";
+    Task task = taskService.newTask(taskId);
+    taskService.saveTask(task);
+
+    taskService.setVariable(taskId, "aVariable", "anotherValue");
+
+    // when
+    HistoricVariableInstance instance = historyService
+        .createHistoricVariableInstanceQuery()
+        .taskIdIn(taskId)
+        .variableName("aVariable")
+        .singleResult();
+
+    // then
+    assertEquals(taskId, instance.getTaskId());
+
+    taskService.deleteTask(taskId, true);
+  }
+
 }

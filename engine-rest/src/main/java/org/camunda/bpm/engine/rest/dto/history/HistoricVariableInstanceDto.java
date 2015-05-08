@@ -25,6 +25,7 @@ public class HistoricVariableInstanceDto extends VariableValueDto {
   private String activityInstanceId;
   private String caseDefinitionKey;
   private String caseDefinitionId;
+  private String taskId;
   private String errorMessage;
 
   public String getId() {
@@ -59,6 +60,10 @@ public class HistoricVariableInstanceDto extends VariableValueDto {
     return caseDefinitionId;
   }
 
+  public String getTaskId() {
+    return taskId;
+  }
+
   public String getErrorMessage() {
     return errorMessage;
   }
@@ -75,6 +80,7 @@ public class HistoricVariableInstanceDto extends VariableValueDto {
     dto.activityInstanceId = historicVariableInstance.getActivityInstanceId();
     dto.caseDefinitionKey = historicVariableInstance.getCaseDefinitionKey();
     dto.caseDefinitionId = historicVariableInstance.getCaseDefinitionId();
+    dto.taskId = historicVariableInstance.getTaskId();
 
     if(historicVariableInstance.getErrorMessage() == null) {
       VariableValueDto.fromTypedValue(dto, historicVariableInstance.getTypedValue());

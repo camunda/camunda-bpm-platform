@@ -2,8 +2,8 @@ package org.camunda.bpm.engine.rest.history;
 
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -334,6 +334,7 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
           .body("[0].activityInstanceId", equalTo(mockInstanceBuilder.getActivityInstanceId()))
           .body("[0].caseDefinitionKey", equalTo(mockInstanceBuilder.getCaseDefinitionKey()))
           .body("[0].caseDefinitionId", equalTo(mockInstanceBuilder.getCaseDefinitionId()))
+          .body("[0].taskId", equalTo(mockInstanceBuilder.getTaskId()))
       .when()
         .get(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);
 

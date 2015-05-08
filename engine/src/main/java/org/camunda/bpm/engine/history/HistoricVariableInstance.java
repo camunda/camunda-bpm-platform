@@ -115,6 +115,11 @@ public interface HistoricVariableInstance {
   String getCaseExecutionId();
 
   /**
+   * Return the corresponding task id.
+   */
+  String getTaskId();
+
+  /**
    * If the variable value could not be loaded, this returns the error message.
    * @return an error message indicating why the variable value could not be loaded.
    */
