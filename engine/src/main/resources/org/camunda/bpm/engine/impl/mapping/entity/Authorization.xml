@@ -200,7 +200,7 @@
              AND
                     ${bitand1}A.PERMS_${bitand2}#{permCheck.perms, jdbcType=INTEGER}${bitand3} = #{permCheck.perms,  jdbcType=INTEGER}
              AND
-                    A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=VARCHAR}
+                    A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=INTEGER}
              AND
                     A.RESOURCE_ID_ = <if test="permCheck.resourceIdQueryParam != null">${permCheck.resourceIdQueryParam}</if><if test="permCheck.resourceId != null">#{permCheck.resourceId, jdbcType=VARCHAR}</if>)
         THEN 1
@@ -226,7 +226,7 @@
              AND
                     ${bitand1}A.PERMS_${bitand2}#{permCheck.perms, jdbcType=INTEGER}${bitand3} != #{permCheck.perms,  jdbcType=INTEGER}
              AND
-                    A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=VARCHAR}
+                    A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=INTEGER}
              AND
                     A.RESOURCE_ID_ = <if test="permCheck.resourceIdQueryParam != null">${permCheck.resourceIdQueryParam}</if><if test="permCheck.resourceId != null">#{permCheck.resourceId, jdbcType=VARCHAR}</if>)
         THEN 0
@@ -246,7 +246,7 @@
            AND
                   ${bitand1}A.PERMS_${bitand2}#{permCheck.perms, jdbcType=INTEGER}${bitand3} = #{permCheck.perms, jdbcType=INTEGER}
            AND
-                  A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=VARCHAR}
+                  A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=INTEGER}
            AND
                   A.RESOURCE_ID_ = '*')
         THEN 1
@@ -265,7 +265,7 @@
            AND
                   ${bitand1}A.PERMS_${bitand2}#{permCheck.perms, jdbcType=INTEGER}${bitand3} != #{permCheck.perms, jdbcType=INTEGER}
            AND
-                  A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=VARCHAR}
+                  A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=INTEGER}
            AND
                   A.RESOURCE_ID_ = '*')
       THEN 0
@@ -297,7 +297,7 @@
                          AND
                                 ${bitand1}A.PERMS_${bitand2}#{permCheck.perms, jdbcType=INTEGER}${bitand3} = #{permCheck.perms,  jdbcType=INTEGER}
                          AND
-                                A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=VARCHAR}
+                                A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=INTEGER}
                          AND
                                 A.RESOURCE_ID_ = <if test="permCheck.resourceIdQueryParam != null">${permCheck.resourceIdQueryParam}</if><if test="permCheck.resourceId != null">#{permCheck.resourceId, jdbcType=VARCHAR}</if>)
                     THEN 1
@@ -325,7 +325,7 @@
                          AND
                                 ${bitand1}A.PERMS_${bitand2}#{permCheck.perms, jdbcType=INTEGER}${bitand3} != #{permCheck.perms,  jdbcType=INTEGER}
                          AND
-                                A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=VARCHAR}
+                                A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=INTEGER}
                          AND
                                 A.RESOURCE_ID_ = <if test="permCheck.resourceIdQueryParam != null">${permCheck.resourceIdQueryParam}</if><if test="permCheck.resourceId != null">#{permCheck.resourceId, jdbcType=VARCHAR}</if>)
                     THEN 0
@@ -347,7 +347,7 @@
                      AND
                             ${bitand1}A.PERMS_${bitand2}#{permCheck.perms, jdbcType=INTEGER}${bitand3} = #{permCheck.perms, jdbcType=INTEGER}
                      AND
-                            A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=VARCHAR}
+                            A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=INTEGER}
                      AND
                             A.RESOURCE_ID_ = '*')
                   THEN 1
@@ -368,7 +368,7 @@
                      AND
                             ${bitand1}A.PERMS_${bitand2}#{permCheck.perms, jdbcType=INTEGER}${bitand3} != #{permCheck.perms, jdbcType=INTEGER}
                      AND
-                            A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=VARCHAR}
+                            A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=INTEGER}
                      AND
                             A.RESOURCE_ID_ = '*')
                   THEN 0
@@ -397,7 +397,7 @@
                                  AND
                                         ${bitand1}A.PERMS_${bitand2}#{permCheck.perms, jdbcType=INTEGER}${bitand3} = #{permCheck.perms,  jdbcType=INTEGER}
                                  AND
-                                        A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=VARCHAR}
+                                        A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=INTEGER}
                                  AND
                                         A.RESOURCE_ID_ = <if test="permCheck.resourceIdQueryParam != null">${permCheck.resourceIdQueryParam}</if><if test="permCheck.resourceId != null">#{permCheck.resourceId, jdbcType=VARCHAR}</if>)
                             THEN 1
@@ -423,7 +423,7 @@
                                  AND
                                         ${bitand1}A.PERMS_${bitand2}#{permCheck.perms, jdbcType=INTEGER}${bitand3} != #{permCheck.perms,  jdbcType=INTEGER}
                                  AND
-                                        A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=VARCHAR}
+                                        A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=INTEGER}
                                  AND
                                         A.RESOURCE_ID_ = <if test="permCheck.resourceIdQueryParam != null">${permCheck.resourceIdQueryParam}</if><if test="permCheck.resourceId != null">#{permCheck.resourceId, jdbcType=VARCHAR}</if>)
                             THEN 0
@@ -443,7 +443,7 @@
                                AND
                                       ${bitand1}A.PERMS_${bitand2}#{permCheck.perms, jdbcType=INTEGER}${bitand3} = #{permCheck.perms, jdbcType=INTEGER}
                                AND
-                                      A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=VARCHAR}
+                                      A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=INTEGER}
                                AND
                                       A.RESOURCE_ID_ = '*')
                             THEN 1
@@ -462,7 +462,7 @@
                                AND
                                       ${bitand1}A.PERMS_${bitand2}#{permCheck.perms, jdbcType=INTEGER}${bitand3} != #{permCheck.perms, jdbcType=INTEGER}
                                AND
-                                      A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=VARCHAR}
+                                      A.RESOURCE_TYPE_ = #{permCheck.resourceType, jdbcType=INTEGER}
                                AND
                                       A.RESOURCE_ID_ = '*')
                             THEN 0
@@ -470,7 +470,7 @@
                           <!-- No matching authorization found: request is not authorized -->
                           ELSE
                           <if test="permCheck.authorizationNotFoundReturnValue != null">
-                            #{permCheck.authorizationNotFoundReturnValue}
+                            ${permCheck.authorizationNotFoundReturnValue}
                           </if>
                           <if test="permCheck.authorizationNotFoundReturnValue == null">
                             null
