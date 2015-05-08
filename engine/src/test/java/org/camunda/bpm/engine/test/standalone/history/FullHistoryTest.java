@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.history.HistoricFormField;
 import org.camunda.bpm.engine.history.HistoricFormProperty;
+import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
@@ -1700,6 +1701,25 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
 
     assertNull(instance.getCaseDefinitionKey());
     assertNull(instance.getCaseDefinitionId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+  public void testDeleteProcessInstanceSkipCustomListener() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
+
+    // when
+    runtimeService.deleteProcessInstance(processInstanceId, null, true);
+
+    // then
+    HistoricProcessInstance instance = historyService
+        .createHistoricProcessInstanceQuery()
+        .processInstanceId(processInstanceId)
+        .singleResult();
+    assertNotNull(instance);
+
+    assertEquals(processInstanceId, instance.getId());
+    assertNotNull(instance.getEndTime());
   }
 
 }
