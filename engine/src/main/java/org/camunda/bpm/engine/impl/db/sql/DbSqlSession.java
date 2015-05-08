@@ -101,13 +101,13 @@ public class DbSqlSession extends AbstractPersistenceSession {
 
   // lock ////////////////////////////////////////////
 
-  public void lock(String statement) {
+  public void lock(String statement, Object parameter) {
     // do not perform locking if H2 database is used. H2 uses table level locks
     // by default which may cause deadlocks if the deploy command needs to get a new
     // Id using the DbIdGenerator while performing a deployment.
     if (!DbSqlSessionFactory.H2.equals(dbSqlSessionFactory.getDatabaseType())) {
       String mappedStatement = dbSqlSessionFactory.mapStatement(statement);
-      sqlSession.update(mappedStatement);
+      sqlSession.update(mappedStatement, parameter);
     }
   }
 

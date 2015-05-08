@@ -48,6 +48,11 @@ public class EventSubscriptionManager extends AbstractManager {
     }
   }
 
+  public void deleteAndFlushEventSubscription(EventSubscriptionEntity persistentObject) {
+    deleteEventSubscription(persistentObject);
+    getDbEntityManager().flushEntity(persistentObject);
+  }
+
   public EventSubscriptionEntity findEventSubscriptionbyId(String id) {
     return (EventSubscriptionEntity) getDbEntityManager().selectOne("selectEventSubscription", id);
   }
@@ -112,11 +117,12 @@ public class EventSubscriptionManager extends AbstractManager {
     return new ArrayList<SignalEventSubscriptionEntity>(selectList);
   }
 
-  public List<EventSubscriptionEntity> findEventSubscriptionsByExecutionAndType(String executionId, String type) {
+  public List<EventSubscriptionEntity> findEventSubscriptionsByExecutionAndType(String executionId, String type, boolean lockResult) {
     final String query = "selectEventSubscriptionsByExecutionAndType";
-    Map<String,String> params = new HashMap<String, String>();
+    Map<String, Object> params = new HashMap<String, Object>();
     params.put("executionId", executionId);
     params.put("eventType", type);
+    params.put("lockResult", lockResult);
     return getDbEntityManager().selectList(query, params);
   }
 
@@ -150,12 +156,14 @@ public class EventSubscriptionManager extends AbstractManager {
     return getDbEntityManager().selectList(query, params);
   }
 
-  public List<EventSubscriptionEntity> findEventSubscriptionsByNameAndExecution(String type, String eventName, String executionId) {
+  public List<EventSubscriptionEntity> findEventSubscriptionsByNameAndExecution(String type, String eventName,
+      String executionId, boolean lockResult) {
     final String query = "selectEventSubscriptionsByNameAndExecution";
-    Map<String,String> params = new HashMap<String, String>();
+    Map<String, Object> params = new HashMap<String, Object>();
     params.put("eventType", type);
     params.put("eventName", eventName);
     params.put("executionId", executionId);
+    params.put("lockResult", lockResult);
     return getDbEntityManager().selectList(query, params);
   }
 

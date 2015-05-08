@@ -34,7 +34,7 @@ public interface PersistenceSession extends Session {
 
   Object selectOne(String statement, Object parameter);
 
-  void lock(String statement);
+  void lock(String statement, Object parameter);
 
   void commit();
 

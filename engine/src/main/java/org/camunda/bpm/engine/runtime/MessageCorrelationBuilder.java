@@ -100,6 +100,26 @@ public interface MessageCorrelationBuilder {
    */
   void correlate();
 
+  /**
+   * <p>
+   *   Behaves like {@link #correlate()}, however uses pessimistic locking for correlating a waiting execution, meaning
+   *   that two threads correlating a message to the same execution in parallel do not end up continuing the
+   *   process in parallel until the next wait state is reached
+   * </p>
+   * <p>
+   *   <strong>CAUTION:</strong> Wherever there are pessimistic locks, there is a potential for deadlocks to occur.
+   *   This can either happen when multiple messages are correlated in parallel, but also with other
+   *   race conditions such as a message boundary event on a user task. The process engine is not able to detect such a potential.
+   *   In consequence, the user of this API should investigate this potential in his/her use case and implement
+   *   countermeasures if needed.
+   * </p>
+   * <p>
+   *   A less error-prone alternative to this method is to set appropriate async boundaries in the process model
+   *   such that parallel message correlation is solved by optimistic locking.
+   * </p>
+   */
+  void correlateExclusively();
+
 
   /**
    * Executes the message correlation for multiple messages.

@@ -240,7 +240,11 @@ public class DbEntityManager implements Session {
   }
 
   public void lock(String statement) {
-    persistenceSession.lock(statement);
+    lock(statement, null);
+  }
+
+  public void lock(String statement, Object parameter) {
+    persistenceSession.lock(statement, parameter);
   }
 
   public boolean isDirty(DbEntity dbEntity) {
@@ -254,9 +258,14 @@ public class DbEntityManager implements Session {
 
   public void flush() {
 
-    // flush the entity cache
+    // flush the entity cache which inserts operations to the db operation manager
     flushEntityCache();
 
+    // flush the db operation manager
+    flushDbOperationManager();
+  }
+
+  protected void flushDbOperationManager() {
     // obtain totally ordered operation list from operation manager
     List<DbOperation> operationsToFlush = dbOperationManager.calculateFlush();
     logFlushSummary(operationsToFlush);
@@ -273,7 +282,15 @@ public class DbEntityManager implements Session {
         handleOptimisticLockingException(dbOperation);
       }
     }
+  }
 
+  public void flushEntity(DbEntity entity) {
+    CachedDbEntity cachedEntity = dbEntityCache.getCachedEntity(entity);
+    if (cachedEntity != null) {
+      flushCachedEntity(cachedEntity);
+    }
+
+    flushDbOperationManager();
   }
 
   protected String formatExceptionMessage(Exception e, DbOperation dbOperation, List<DbOperation> operationsToFlush) {
@@ -317,41 +334,7 @@ public class DbEntityManager implements Session {
   protected void flushEntityCache() {
     List<CachedDbEntity> cachedEntities = dbEntityCache.getCachedEntities();
     for (CachedDbEntity cachedDbEntity : cachedEntities) {
-
-      if(cachedDbEntity.getEntityState() == TRANSIENT) {
-        // perform INSERT
-        performEntityOperation(cachedDbEntity, INSERT);
-        // mark PERSISTENT
-        cachedDbEntity.setEntityState(PERSISTENT);
-
-      } else if(cachedDbEntity.getEntityState() == PERSISTENT && cachedDbEntity.isDirty()) {
-        // object is dirty -> perform UPDATE
-        performEntityOperation(cachedDbEntity, UPDATE);
-
-      } else if(cachedDbEntity.getEntityState() == MERGED) {
-        // perform UPDATE
-        performEntityOperation(cachedDbEntity, UPDATE);
-        // mark PERSISTENT
-        cachedDbEntity.setEntityState(PERSISTENT);
-
-      } else if(cachedDbEntity.getEntityState() == DELETED_TRANSIENT) {
-        // remove from cache
-        dbEntityCache.remove(cachedDbEntity);
-
-      } else if(cachedDbEntity.getEntityState() == DELETED_PERSISTENT
-             || cachedDbEntity.getEntityState() == DELETED_MERGED) {
-        // perform DELETE
-        performEntityOperation(cachedDbEntity, DELETE);
-        // remove from cache
-        dbEntityCache.remove(cachedDbEntity);
-
-      }
-
-      // if object is PERSISTENT after flush
-      if(cachedDbEntity.getEntityState() == PERSISTENT) {
-        // make a new copy
-        cachedDbEntity.makeCopy();
-      }
+      flushCachedEntity(cachedDbEntity);
     }
 
     // log cache state after flush
@@ -361,6 +344,43 @@ public class DbEntityManager implements Session {
       for (CachedDbEntity cachedDbEntity : cachedEntities) {
         log.finest("  "+cachedDbEntity);
       }
+    }
+  }
+
+  protected void flushCachedEntity(CachedDbEntity cachedDbEntity) {
+    if(cachedDbEntity.getEntityState() == TRANSIENT) {
+      // perform INSERT
+      performEntityOperation(cachedDbEntity, INSERT);
+      // mark PERSISTENT
+      cachedDbEntity.setEntityState(PERSISTENT);
+
+    } else if(cachedDbEntity.getEntityState() == PERSISTENT && cachedDbEntity.isDirty()) {
+      // object is dirty -> perform UPDATE
+      performEntityOperation(cachedDbEntity, UPDATE);
+
+    } else if(cachedDbEntity.getEntityState() == MERGED) {
+      // perform UPDATE
+      performEntityOperation(cachedDbEntity, UPDATE);
+      // mark PERSISTENT
+      cachedDbEntity.setEntityState(PERSISTENT);
+
+    } else if(cachedDbEntity.getEntityState() == DELETED_TRANSIENT) {
+      // remove from cache
+      dbEntityCache.remove(cachedDbEntity);
+
+    } else if(cachedDbEntity.getEntityState() == DELETED_PERSISTENT
+           || cachedDbEntity.getEntityState() == DELETED_MERGED) {
+      // perform DELETE
+      performEntityOperation(cachedDbEntity, DELETE);
+      // remove from cache
+      dbEntityCache.remove(cachedDbEntity);
+
+    }
+
+    // if object is PERSISTENT after flush
+    if(cachedDbEntity.getEntityState() == PERSISTENT) {
+      // make a new copy
+      cachedDbEntity.makeCopy();
     }
   }
 

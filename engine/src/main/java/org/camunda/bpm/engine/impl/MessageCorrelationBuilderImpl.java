@@ -31,6 +31,7 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
   protected CommandExecutor commandExecutor;
   protected CommandContext commandContext;
 
+  protected boolean isExclusiveCorrelation = false;
   protected String messageName;
   protected String businessKey;
   protected String processInstanceId;
@@ -45,7 +46,7 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
 
   public MessageCorrelationBuilderImpl(CommandContext commandContext, String messageName) {
     this(messageName);
-    ensureNotNull("commandContext", commandExecutor);
+    ensureNotNull("commandContext", commandContext);
     this.commandContext = commandContext;
   }
 
@@ -100,6 +101,12 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
     }
   }
 
+
+  public void correlateExclusively() {
+    isExclusiveCorrelation = true;
+    correlate();
+  }
+
   public void correlateAll() {
     CorrelateAllMessageCmd command = new CorrelateAllMessageCmd(this);
     if(commandExecutor != null) {
@@ -137,6 +144,10 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
 
   public Map<String, Object> getPayloadProcessInstanceVariables() {
     return payloadProcessInstanceVariables;
+  }
+
+  public boolean isExclusiveCorrelation() {
+    return isExclusiveCorrelation;
   }
 
 }

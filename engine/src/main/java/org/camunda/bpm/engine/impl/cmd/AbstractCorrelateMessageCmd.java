@@ -37,6 +37,7 @@ public abstract class AbstractCorrelateMessageCmd implements Command<Void> {
   protected final Map<String, Object> correlationKeys;
   protected final Map<String, Object> processVariables;
   protected String processInstanceId;
+  protected boolean isExclusiveCorrelation = false;
 
   protected AbstractCorrelateMessageCmd(String messageName, String businessKey,
       Map<String, Object> correlationKeys, Map<String, Object> processVariables) {
@@ -57,10 +58,11 @@ public abstract class AbstractCorrelateMessageCmd implements Command<Void> {
     this.correlationKeys = messageCorrelationBuilderImpl.getCorrelationProcessInstanceVariables();
     this.businessKey = messageCorrelationBuilderImpl.getBusinessKey();
     this.processInstanceId = messageCorrelationBuilderImpl.getProcessInstanceId();
+    this.isExclusiveCorrelation = messageCorrelationBuilderImpl.isExclusiveCorrelation();
   }
 
   protected void triggerExecution(CommandContext commandContext, MessageCorrelationResult correlationResult) {
-    new MessageEventReceivedCmd(messageName, correlationResult.getExecutionEntity().getId(), processVariables).execute(commandContext);
+    new MessageEventReceivedCmd(messageName, correlationResult.getExecutionEntity().getId(), processVariables, isExclusiveCorrelation).execute(commandContext);
   }
 
   protected void instantiateProcess(CommandContext commandContext, MessageCorrelationResult correlationResult) {

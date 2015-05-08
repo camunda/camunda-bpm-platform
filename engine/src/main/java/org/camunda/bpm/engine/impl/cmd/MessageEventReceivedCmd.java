@@ -41,11 +41,17 @@ public class MessageEventReceivedCmd implements Command<Void>, Serializable {
   protected final String executionId;
   protected final Map<String, Object> processVariables;
   protected final String messageName;
+  protected boolean exclusive = false;
 
   public MessageEventReceivedCmd(String messageName, String executionId, Map<String, Object> processVariables) {
     this.executionId = executionId;
     this.messageName = messageName;
     this.processVariables = processVariables;
+  }
+
+  public MessageEventReceivedCmd(String messageName, String executionId, Map<String, Object> processVariables, boolean exclusive) {
+    this(messageName, executionId, processVariables);
+    this.exclusive = exclusive;
   }
 
   @Override
@@ -55,9 +61,11 @@ public class MessageEventReceivedCmd implements Command<Void>, Serializable {
     EventSubscriptionManager eventSubscriptionManager = commandContext.getEventSubscriptionManager();
     List<EventSubscriptionEntity> eventSubscriptions = null;
     if (messageName != null) {
-      eventSubscriptions = eventSubscriptionManager.findEventSubscriptionsByNameAndExecution(MessageEventHandler.EVENT_HANDLER_TYPE, messageName, executionId);
+      eventSubscriptions = eventSubscriptionManager.findEventSubscriptionsByNameAndExecution(
+          MessageEventHandler.EVENT_HANDLER_TYPE, messageName, executionId, exclusive);
     } else {
-      eventSubscriptions = eventSubscriptionManager.findEventSubscriptionsByExecutionAndType(executionId, MessageEventHandler.EVENT_HANDLER_TYPE);
+      eventSubscriptions = eventSubscriptionManager.findEventSubscriptionsByExecutionAndType(
+          executionId, MessageEventHandler.EVENT_HANDLER_TYPE, exclusive);
     }
 
     ensureNotEmpty("Execution with id '" + executionId + "' does not have a subscription to a message event with name '" + messageName + "'", "eventSubscriptions", eventSubscriptions);

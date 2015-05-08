@@ -197,7 +197,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <database.url>jdbc:h2:mem:camunda;DB_CLOSE_DELAY=1000</database.url>
+        <database.url>jdbc:h2:mem:camunda;DB_CLOSE_DELAY=1000;MVCC=true;LOCK_TIMEOUT=10000</database.url>
         <database.driver>org.h2.Driver</database.driver>
         <database.username>sa</database.username>
         <database.password />
@@ -221,7 +221,7 @@
         <database.password>sa</database.password>
         <database.port>18080</database.port>
         <!-- This url has to consistent for the subprojects: {server}-runtime and webapp-integration-tests -->
-        <database.url>jdbc:h2:${database.host}${database.name};MVCC=TRUE;AUTO_SERVER=TRUE;AUTO_SERVER_PORT=${database.port}</database.url>
+        <database.url>jdbc:h2:${database.host}${database.name};MVCC=TRUE;AUTO_SERVER=TRUE;AUTO_SERVER_PORT=${database.port};LOCK_TIMEOUT=10000</database.url>
 
         <database.type>h2</database.type>
         <database.driver>org.h2.Driver</database.driver>

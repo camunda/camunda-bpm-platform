@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 
@@ -20,6 +23,28 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
  *
  */
 public abstract class ConcurrencyTestCase extends PluggableProcessEngineTestCase {
+
+  protected List<ControllableCommand<?>> controllableCommands;
+
+  protected void setUp() throws Exception {
+    controllableCommands = new ArrayList<ControllableCommand<?>>();
+    super.setUp();
+  }
+
+  protected void tearDown() throws Exception {
+
+    // wait for all spawned threads to end
+    for (ControllableCommand<?> controllableCommand : controllableCommands) {
+      ThreadControl threadControl = controllableCommand.monitor;
+      threadControl.executingThread.interrupt();
+      threadControl.executingThread.join();
+    }
+
+    // clear the test thread's interruption state
+    Thread.interrupted();
+
+    super.tearDown();
+  }
 
   protected ThreadControl executeControllableCommand(final ControllableCommand<?> command) {
 
@@ -30,12 +55,14 @@ public abstract class ConcurrencyTestCase extends PluggableProcessEngineTestCase
         try {
           processEngineConfiguration.getCommandExecutorTxRequired().execute(command);
         } catch(RuntimeException e) {
+          command.monitor.setException(e);
           controlThread.interrupt();
           throw e;
         }
       }
     });
 
+    controllableCommands.add(command);
     command.monitor.executingThread = thread;
 
     thread.start();
@@ -56,32 +83,51 @@ public abstract class ConcurrencyTestCase extends PluggableProcessEngineTestCase
 
   static class ThreadControl {
 
-    protected boolean syncAvailable = false;
+    protected volatile boolean syncAvailable = false;
 
     protected Thread executingThread;
 
+    protected volatile boolean reportFailure;
+    protected volatile Exception exception;
+
     public void waitForSync() {
       synchronized (this) {
-        if(Thread.interrupted()) {
-          fail();
-        }
-        if(!syncAvailable) {
-          try {
-            wait();
-          } catch (InterruptedException e) {
+        if(exception != null) {
+          if (reportFailure) {
+            return;
+          }
+          else {
             fail();
           }
         }
-        syncAvailable = false;
+        try {
+          if(!syncAvailable) {
+            try {
+              wait();
+            } catch (InterruptedException e) {
+              if (!reportFailure || exception == null) {
+                fail("unexpected interruption");
+              }
+            }
+          }
+        } finally {
+          syncAvailable = false;
+        }
       }
     }
 
     public void waitUntilDone() {
       makeContinue();
+      join();
+    }
+
+    public void join() {
       try {
         executingThread.join();
       } catch (InterruptedException e) {
-        fail();
+        if (!reportFailure || exception == null) {
+          fail("Unexpected interruption");
+        }
       }
     }
 
@@ -92,18 +138,32 @@ public abstract class ConcurrencyTestCase extends PluggableProcessEngineTestCase
           notifyAll();
           wait();
         } catch (InterruptedException e) {
-          fail();
+          if (!reportFailure || exception == null) {
+            fail("Unexpected interruption");
+          }
         }
       }
     }
 
     public void makeContinue() {
       synchronized (this) {
-        if(Thread.interrupted()) {
+        if(exception != null) {
           fail();
         }
         notifyAll();
       }
+    }
+
+    public void reportInterrupts() {
+      this.reportFailure = true;
+    }
+
+    public synchronized void setException(Exception e) {
+      this.exception = e;
+    }
+
+    public Throwable getException() {
+      return exception;
     }
 
   }
