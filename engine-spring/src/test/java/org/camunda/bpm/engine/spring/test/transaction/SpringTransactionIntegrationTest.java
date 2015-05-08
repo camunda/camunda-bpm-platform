@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.spring.test.transaction;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertThat;
 
@@ -84,7 +85,7 @@ public class SpringTransactionIntegrationTest extends SpringProcessEngineTestCas
       runtimeService.startProcessInstanceByKey("process");
       waitForJobExecutorToProcessAllJobs(TimeUnit.MILLISECONDS.convert(10L, TimeUnit.SECONDS));
       Incident incident = runtimeService.createIncidentQuery().activityId("servicetask").singleResult();
-      assertThat(incident.getIncidentMessage(), containsString("error"));
+      assertThat(incident.getIncidentMessage(), is("error"));
   }
   
   

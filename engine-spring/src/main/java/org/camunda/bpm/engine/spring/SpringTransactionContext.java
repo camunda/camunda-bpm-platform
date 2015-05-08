@@ -112,10 +112,9 @@ public class SpringTransactionContext implements TransactionContext {
   }
 
   public boolean isTransactionActive() {
-    if(TransactionSynchronizationManager.isActualTransactionActive()){
-      return !TransactionState.ROLLED_BACK.equals(lastTransactionState) && !TransactionState.ROLLINGBACK.equals(lastTransactionState);
-    }
-    return TransactionSynchronizationManager.isActualTransactionActive();
+    return TransactionSynchronizationManager.isActualTransactionActive() &&
+           !TransactionState.ROLLED_BACK.equals(lastTransactionState) &&
+           !TransactionState.ROLLINGBACK.equals(lastTransactionState);
   }
   
   protected abstract class TransactionSynchronizationAdapter implements TransactionSynchronization {
