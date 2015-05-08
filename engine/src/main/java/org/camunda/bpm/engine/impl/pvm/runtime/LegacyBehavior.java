@@ -429,19 +429,14 @@ public class LegacyBehavior {
    * Checks if the parameters are the same apart from the execution id
    */
   protected static boolean areEqualEventSubscriptions(EventSubscriptionEntity subscription1, EventSubscriptionEntity subscription2) {
-    return !valuesDiffer(subscription1.getEventType(), subscription2.getEventType())
-        && !valuesDiffer(subscription1.getEventName(), subscription2.getEventName())
-        && !valuesDiffer(subscription1.getActivityId(), subscription2.getActivityId());
+    return valuesEqual(subscription1.getEventType(), subscription2.getEventType())
+        && valuesEqual(subscription1.getEventName(), subscription2.getEventName())
+        && valuesEqual(subscription1.getActivityId(), subscription2.getActivityId());
 
   }
 
-  protected static <T> boolean valuesDiffer(T value1, T value2) {
-    if ((value1 != null && !value1.equals(value2))
-        || (value1 == null && value2 != null)) {
-      return true;
-    }
-
-    return false;
+  protected static <T> boolean valuesEqual(T value1, T value2) {
+    return (value1 == null && value2 == null) || (value1 != null && value1.equals(value2));
   }
 
   /**
@@ -484,7 +479,7 @@ public class LegacyBehavior {
     for (ActivityInstanceImpl activityInstance : values) {
       // if the determined activity instance id and the parent activity instance are equal,
       // just put the activity instance under the process instance
-      if (!valuesDiffer(activityInstance.getId(), activityInstance.getParentActivityInstanceId())) {
+      if (valuesEqual(activityInstance.getId(), activityInstance.getParentActivityInstanceId())) {
         activityInstance.setParentActivityInstanceId(processInstanceId);
       }
     }
