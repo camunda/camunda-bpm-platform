@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.api.runtime;
 import java.util.List;
 
 import org.camunda.bpm.engine.history.HistoricDetail;
+import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -29,6 +30,7 @@ import org.camunda.bpm.engine.test.Deployment;
  */
 public class ProcessInstanceModificationHistoryTest extends PluggableProcessEngineTestCase {
 
+  protected static final String ONE_TASK_PROCESS = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml";
   protected static final String EXCLUSIVE_GATEWAY_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.exclusiveGateway.bpmn20.xml";
   protected static final String EXCLUSIVE_GATEWAY_ASYNC_TASK_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.exclusiveGatewayAsyncTask.bpmn20.xml";
 
@@ -180,6 +182,25 @@ public class ProcessInstanceModificationHistoryTest extends PluggableProcessEngi
     completeTasksInOrder("task1", "task1");
     assertProcessEnded(processInstance.getId());
 
+  }
+
+  @Deployment(resources = ONE_TASK_PROCESS)
+  public void testCancelTaskShouldCancelProcessInstance() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
+
+    // when
+    runtimeService
+      .createProcessInstanceModification(processInstanceId)
+      .cancelAllForActivity("theTask")
+      .execute(true, false);
+
+    // then
+    HistoricProcessInstance instance = historyService.createHistoricProcessInstanceQuery().singleResult();
+    assertNotNull(instance);
+
+    assertEquals(processInstanceId, instance.getId());
+    assertNotNull(instance.getEndTime());
   }
 
   protected ActivityInstance getChildInstanceForActivity(ActivityInstance activityInstance, String activityId) {
