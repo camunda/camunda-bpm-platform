@@ -94,6 +94,8 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
       .body("executionId", equalTo(builder.getExecutionId()))
       .body("caseDefinitionKey", equalTo(builder.getCaseDefinitionKey()))
       .body("caseDefinitionId", equalTo(builder.getCaseDefinitionId()))
+      .body("caseInstanceId", equalTo(builder.getCaseInstanceId()))
+      .body("caseExecutionId", equalTo(builder.getCaseExecutionId()))
     .when().get(HISTORIC_DETAIL_URL);
 
     verify(historicDetailQueryMock, times(1)).disableBinaryFetching();
@@ -134,6 +136,8 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
       .body("executionId", equalTo(builder.getExecutionId()))
       .body("caseDefinitionKey", equalTo(builder.getCaseDefinitionKey()))
       .body("caseDefinitionId", equalTo(builder.getCaseDefinitionId()))
+      .body("caseInstanceId", equalTo(builder.getCaseInstanceId()))
+      .body("caseExecutionId", equalTo(builder.getCaseExecutionId()))
     .when().get(HISTORIC_DETAIL_URL);
 
     verify(historicDetailQueryMock, times(1)).disableBinaryFetching();
@@ -176,6 +180,8 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
       .body("executionId", equalTo(builder.getExecutionId()))
       .body("caseDefinitionKey", equalTo(builder.getCaseDefinitionKey()))
       .body("caseDefinitionId", equalTo(builder.getCaseDefinitionId()))
+      .body("caseInstanceId", equalTo(builder.getCaseInstanceId()))
+      .body("caseExecutionId", equalTo(builder.getCaseExecutionId()))
     .when().get(HISTORIC_DETAIL_URL);
 
     verify(historicDetailQueryMock, times(1)).disableBinaryFetching();
@@ -214,6 +220,8 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
       .body("executionId", equalTo(builder.getExecutionId()))
       .body("caseDefinitionKey", equalTo(builder.getCaseDefinitionKey()))
       .body("caseDefinitionId", equalTo(builder.getCaseDefinitionId()))
+      .body("caseInstanceId", equalTo(builder.getCaseInstanceId()))
+      .body("caseExecutionId", equalTo(builder.getCaseExecutionId()))
     .when().get(HISTORIC_DETAIL_URL);
 
     verify(historicDetailQueryMock, times(1)).disableBinaryFetching();

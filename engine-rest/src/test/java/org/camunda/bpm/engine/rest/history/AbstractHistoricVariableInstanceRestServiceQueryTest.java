@@ -334,6 +334,8 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest exten
           .body("[0].activityInstanceId", equalTo(mockInstanceBuilder.getActivityInstanceId()))
           .body("[0].caseDefinitionKey", equalTo(mockInstanceBuilder.getCaseDefinitionKey()))
           .body("[0].caseDefinitionId", equalTo(mockInstanceBuilder.getCaseDefinitionId()))
+          .body("[0].caseInstanceId", equalTo(mockInstanceBuilder.getCaseInstanceId()))
+          .body("[0].caseExecutionId", equalTo(mockInstanceBuilder.getCaseExecutionId()))
           .body("[0].taskId", equalTo(mockInstanceBuilder.getTaskId()))
       .when()
         .get(HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL);

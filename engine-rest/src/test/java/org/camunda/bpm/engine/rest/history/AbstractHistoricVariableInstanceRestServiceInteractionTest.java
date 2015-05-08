@@ -91,6 +91,8 @@ public abstract class AbstractHistoricVariableInstanceRestServiceInteractionTest
       .body("activityInstanceId", equalTo(builder.getActivityInstanceId()))
       .body("caseDefinitionKey", equalTo(builder.getCaseDefinitionKey()))
       .body("caseDefinitionId", equalTo(builder.getCaseDefinitionId()))
+      .body("caseInstanceId", equalTo(builder.getCaseInstanceId()))
+      .body("caseExecutionId", equalTo(builder.getCaseExecutionId()))
       .body("taskId", equalTo(builder.getTaskId()))
     .when().get(VARIABLE_INSTANCE_URL);
 
@@ -128,6 +130,8 @@ public abstract class AbstractHistoricVariableInstanceRestServiceInteractionTest
       .body("activityInstanceId", equalTo(builder.getActivityInstanceId()))
       .body("caseDefinitionKey", equalTo(builder.getCaseDefinitionKey()))
       .body("caseDefinitionId", equalTo(builder.getCaseDefinitionId()))
+      .body("caseInstanceId", equalTo(builder.getCaseInstanceId()))
+      .body("caseExecutionId", equalTo(builder.getCaseExecutionId()))
       .body("taskId", equalTo(builder.getTaskId()))
     .when().get(VARIABLE_INSTANCE_URL);
 
@@ -166,6 +170,8 @@ public abstract class AbstractHistoricVariableInstanceRestServiceInteractionTest
       .body("activityInstanceId", equalTo(builder.getActivityInstanceId()))
       .body("caseDefinitionKey", equalTo(builder.getCaseDefinitionKey()))
       .body("caseDefinitionId", equalTo(builder.getCaseDefinitionId()))
+      .body("caseInstanceId", equalTo(builder.getCaseInstanceId()))
+      .body("caseExecutionId", equalTo(builder.getCaseExecutionId()))
       .body("taskId", equalTo(builder.getTaskId()))
     .when().get(VARIABLE_INSTANCE_URL);
 

@@ -320,6 +320,8 @@ public abstract class AbstractHistoricDetailRestServiceQueryTest extends Abstrac
           .body("[0].type", equalTo("variableUpdate"))
           .body("[0].caseDefinitionKey", equalTo(historicUpdateBuilder.getCaseDefinitionKey()))
           .body("[0].caseDefinitionId", equalTo(historicUpdateBuilder.getCaseDefinitionId()))
+          .body("[0].caseInstanceId", equalTo(historicUpdateBuilder.getCaseInstanceId()))
+          .body("[0].caseExecutionId", equalTo(historicUpdateBuilder.getCaseExecutionId()))
         .when()
           .get(HISTORIC_DETAIL_RESOURCE_URL);
 
@@ -347,6 +349,8 @@ public abstract class AbstractHistoricDetailRestServiceQueryTest extends Abstrac
     String returnedType = from(content).getString("[1].type");
     String returnedCaseDefinitionKey2 = from(content).getString("[1].caseDefinitionKey");
     String returnedCaseDefinitionId2 = from(content).getString("[1].caseDefinitionId");
+    String returnedCaseInstanceId2 = from(content).getString("[1].caseInstanceId");
+    String returnedCaseExecutionId2 = from(content).getString("[1].caseExecutionId");
 
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_ID, returnedId2);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_PROC_DEF_KEY, returnedProcessDefinitionKey2);
@@ -361,6 +365,8 @@ public abstract class AbstractHistoricDetailRestServiceQueryTest extends Abstrac
     Assert.assertEquals("formField", returnedType);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_CASE_DEF_ID, returnedCaseDefinitionId2);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_CASE_DEF_KEY, returnedCaseDefinitionKey2);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_CASE_INST_ID, returnedCaseInstanceId2);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_FORM_FIELD_CASE_EXEC_ID, returnedCaseExecutionId2);
 
   }
 
