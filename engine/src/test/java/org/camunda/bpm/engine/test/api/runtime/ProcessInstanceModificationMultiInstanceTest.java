@@ -52,6 +52,9 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
   public static final String PARALLEL_MULTI_INSTANCE_SUBPROCESS_COMPLETION_CONDITION_PROCESS =
       "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationMultiInstanceTest.parallelSubprocessCompletionCondition.bpmn20.xml";
 
+  public static final String NESTED_PARALLEL_MULTI_INSTANCE_TASK_PROCESS =
+      "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationMultiInstanceTest.nestedParallelTasks.bpmn20.xml";
+
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_TASK_PROCESS)
   public void testStartBeforeMultiInstanceBodyParallelTasks() {
     // given
@@ -765,6 +768,38 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
     assertProcessEnded(processInstance.getId());
   }
 
+  @Deployment(resources = PARALLEL_MULTI_INSTANCE_TASK_PROCESS)
+  public void testCancelAllInnerActivityParallelTasks() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelUserTasks");
+    completeTasksInOrder("beforeTask");
+
+    // when
+    runtimeService
+      .createProcessInstanceModification(processInstance.getId())
+      .cancelAllForActivity("miTasks")
+      .execute();
+
+    // then
+    assertProcessEnded(processInstance.getId());
+  }
+
+  @Deployment(resources = NESTED_PARALLEL_MULTI_INSTANCE_TASK_PROCESS)
+  public void testCancelAllInnerActivityNestedParallelTasks() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedMiParallelUserTasks");
+    completeTasksInOrder("beforeTask");
+
+    // when
+    runtimeService
+      .createProcessInstanceModification(processInstance.getId())
+      .cancelAllForActivity("miTasks")
+      .execute();
+
+    // then
+    assertProcessEnded(processInstance.getId());
+  }
+
   /**
    * Ensures that the modification cmd does not prune the last concurrent execution
    * because parallel MI requires this
@@ -859,6 +894,22 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
     runtimeService
       .createProcessInstanceModification(processInstance.getId())
       .cancelActivityInstance(tree.getActivityInstances("miTasks")[0].getId())
+      .execute();
+
+    // then
+    assertProcessEnded(processInstance.getId());
+  }
+
+  @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_TASK_PROCESS)
+  public void testCancelAllInnerActivitySequentialTasks() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialUserTasks");
+    completeTasksInOrder("beforeTask");
+
+    // when
+    runtimeService
+      .createProcessInstanceModification(processInstance.getId())
+      .cancelAllForActivity("miTasks")
       .execute();
 
     // then

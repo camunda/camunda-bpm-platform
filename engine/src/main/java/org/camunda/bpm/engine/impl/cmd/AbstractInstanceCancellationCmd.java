@@ -42,8 +42,9 @@ public abstract class AbstractInstanceCancellationCmd extends AbstractProcessIns
     ExecutionEntity topmostCancellableExecution = sourceInstanceExecution;
     ExecutionEntity parentScopeExecution = (ExecutionEntity) topmostCancellableExecution.getParentScopeExecution(false);
 
-    // if topmostCancellabelExecution's parent is concurrent, we have reached the target execution
-    while (parentScopeExecution != null && !topmostCancellableExecution.isConcurrent() && !topmostCancellableExecution.getParent().isConcurrent()) {
+    // if topmostCancellableExecution's scope execution has no other non-event-scope children,
+    // we have reached the correct execution
+    while (parentScopeExecution != null && (parentScopeExecution.getNonEventScopeExecutions().size() <= 1)) {
       topmostCancellableExecution = parentScopeExecution;
       parentScopeExecution = (ExecutionEntity) topmostCancellableExecution.getParentScopeExecution(false);
     }
