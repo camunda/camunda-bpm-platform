@@ -121,6 +121,8 @@ public abstract class AbstractRestServiceTest {
     childTransition.setId(CHILD_EXAMPLE_ACTIVITY_INSTANCE_ID);
     childTransition.setParentActivityInstanceId(CHILD_EXAMPLE_PARENT_ACTIVITY_INSTANCE_ID);
     childTransition.setActivityId(CHILD_EXAMPLE_ACTIVITY_ID);
+    childTransition.setActivityName(CHILD_EXAMPLE_ACTIVITY_NAME);
+    childTransition.setActivityType(CHILD_EXAMPLE_ACTIVITY_TYPE);
     childTransition.setProcessInstanceId(CHILD_EXAMPLE_PROCESS_INSTANCE_ID);
     childTransition.setProcessDefinitionId(CHILD_EXAMPLE_PROCESS_DEFINITION_ID);
     childTransition.setExecutionId(EXAMPLE_EXECUTION_ID);

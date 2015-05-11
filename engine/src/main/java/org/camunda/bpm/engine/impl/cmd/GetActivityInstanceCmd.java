@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ActivityInstanceImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TransitionInstanceImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
@@ -166,7 +167,13 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     actInst.setProcessDefinitionId(scopeExecution.getProcessDefinitionId());
     actInst.setBusinessKey(scopeExecution.getBusinessKey());
     actInst.setActivityId(scope.getId());
-    actInst.setActivityName(scope.getName());
+
+    String name = scope.getName();
+    if (name == null) {
+      name = (String) scope.getProperty("name");
+    }
+    actInst.setActivityName(name);
+
     if (scope.getId().equals(scopeExecution.getProcessDefinition().getId())) {
       actInst.setActivityType("processDefinition");
     }
@@ -199,6 +206,16 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     transitionInstance.setProcessDefinitionId(execution.getProcessDefinitionId());
     transitionInstance.setExecutionId(execution.getId());
     transitionInstance.setActivityId(execution.getActivityId());
+
+    ActivityImpl activity = execution.getActivity();
+    if (activity != null) {
+      String name = activity.getName();
+      if (name == null) {
+        name = (String) activity.getProperty("name");
+      }
+      transitionInstance.setActivityName(name);
+      transitionInstance.setActivityType((String) activity.getProperty("type"));
+    }
 
     return transitionInstance;
   }

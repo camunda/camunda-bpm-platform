@@ -20,8 +20,10 @@ import org.camunda.bpm.engine.runtime.TransitionInstance;
  */
 public class TransitionInstanceImpl extends ProcessElementInstanceImpl implements TransitionInstance {
 
-  protected String activityId;
   protected String executionId;
+  protected String activityId;
+  protected String activityName;
+  protected String activityType;
 
   public String getActivityId() {
     return activityId;
@@ -43,10 +45,28 @@ public class TransitionInstanceImpl extends ProcessElementInstanceImpl implement
     this.executionId = executionId;
   }
 
+  public String getActivityType() {
+    return activityType;
+  }
+
+  public void setActivityType(String activityType) {
+    this.activityType = activityType;
+  }
+
+  public String getActivityName() {
+    return activityName;
+  }
+
+  public void setActivityName(String activityName) {
+    this.activityName = activityName;
+  }
+
   public String toString() {
     return this.getClass().getSimpleName()
            + "[executionId=" + executionId
            + ", targetActivityId=" + activityId
+           + ", activityName=" + activityName
+           + ", activityType=" + activityType
            + ", id=" + id
            + ", parentActivityInstanceId=" + parentActivityInstanceId
            + ", processInstanceId=" + processInstanceId

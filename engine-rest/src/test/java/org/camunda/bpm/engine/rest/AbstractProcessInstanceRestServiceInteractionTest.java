@@ -140,6 +140,8 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
         .body("childTransitionInstances[0].id", equalTo(CHILD_EXAMPLE_ACTIVITY_INSTANCE_ID))
         .body("childTransitionInstances[0].parentActivityInstanceId", equalTo(CHILD_EXAMPLE_PARENT_ACTIVITY_INSTANCE_ID))
         .body("childTransitionInstances[0].activityId", equalTo(CHILD_EXAMPLE_ACTIVITY_ID))
+        .body("childTransitionInstances[0].activityName", equalTo(CHILD_EXAMPLE_ACTIVITY_NAME))
+        .body("childTransitionInstances[0].activityType", equalTo(CHILD_EXAMPLE_ACTIVITY_TYPE))
         .body("childTransitionInstances[0].targetActivityId", equalTo(CHILD_EXAMPLE_ACTIVITY_ID))
         .body("childTransitionInstances[0].processInstanceId", equalTo(CHILD_EXAMPLE_PROCESS_INSTANCE_ID))
         .body("childTransitionInstances[0].processDefinitionId", equalTo(CHILD_EXAMPLE_PROCESS_DEFINITION_ID))

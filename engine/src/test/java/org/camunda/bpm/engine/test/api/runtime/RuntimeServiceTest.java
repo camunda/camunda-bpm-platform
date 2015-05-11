@@ -1599,4 +1599,174 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 		 }
 	 }
   }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testActivityInstanceActivityNameProperty() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
+
+    // when
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstanceId);
+
+    // then
+    ActivityInstance[] activityInstances = tree.getActivityInstances("theTask");
+    assertEquals(1, activityInstances.length);
+
+    ActivityInstance task = activityInstances[0];
+    assertNotNull(task);
+    assertNotNull(task.getActivityName());
+    assertEquals("my task", task.getActivityName());
+  }
+
+  @Deployment
+  public void testTransitionInstanceActivityNamePropertyBeforeTask() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
+
+    // when
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstanceId);
+
+    // then
+    TransitionInstance[] instances = tree.getTransitionInstances("firstServiceTask");
+    TransitionInstance task = instances[0];
+    assertNotNull(task);
+    assertNotNull(task.getActivityName());
+    assertEquals("First Service Task", task.getActivityName());
+
+    instances = tree.getTransitionInstances("secondServiceTask");
+    task = instances[0];
+    assertNotNull(task);
+    assertNotNull(task.getActivityName());
+    assertEquals("Second Service Task", task.getActivityName());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testTransitionInstanceActivityNamePropertyBeforeTask.bpmn20.xml")
+  public void testTransitionInstanceActivityTypePropertyBeforeTask() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
+
+    // when
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstanceId);
+
+    // then
+    TransitionInstance[] instances = tree.getTransitionInstances("firstServiceTask");
+    TransitionInstance task = instances[0];
+    assertNotNull(task);
+    assertNotNull(task.getActivityType());
+    assertEquals("serviceTask", task.getActivityType());
+
+    instances = tree.getTransitionInstances("secondServiceTask");
+    task = instances[0];
+    assertNotNull(task);
+    assertNotNull(task.getActivityType());
+    assertEquals("serviceTask", task.getActivityType());
+  }
+
+  @Deployment
+  public void testTransitionInstanceActivityNamePropertyAfterTask() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
+
+    // when
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstanceId);
+
+    // then
+    TransitionInstance[] instances = tree.getTransitionInstances("firstServiceTask");
+    TransitionInstance task = instances[0];
+    assertNotNull(task);
+    assertNotNull(task.getActivityName());
+    assertEquals("First Service Task", task.getActivityName());
+
+    instances = tree.getTransitionInstances("secondServiceTask");
+    task = instances[0];
+    assertNotNull(task);
+    assertNotNull(task.getActivityName());
+    assertEquals("Second Service Task", task.getActivityName());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testTransitionInstanceActivityNamePropertyAfterTask.bpmn20.xml")
+  public void testTransitionInstanceActivityTypePropertyAfterTask() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
+
+    // when
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstanceId);
+
+    // then
+    TransitionInstance[] instances = tree.getTransitionInstances("firstServiceTask");
+    TransitionInstance task = instances[0];
+    assertNotNull(task);
+    assertNotNull(task.getActivityType());
+    assertEquals("serviceTask", task.getActivityType());
+
+    instances = tree.getTransitionInstances("secondServiceTask");
+    task = instances[0];
+    assertNotNull(task);
+    assertNotNull(task.getActivityType());
+    assertEquals("serviceTask", task.getActivityType());
+  }
+
+  @Deployment
+  public void testTransitionInstanceActivityNamePropertyBeforeStartEvent() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
+
+    // when
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstanceId);
+
+    // then
+    TransitionInstance[] instances = tree.getTransitionInstances("start");
+    TransitionInstance task = instances[0];
+    assertNotNull(task);
+    assertNotNull(task.getActivityName());
+    assertEquals("The Start Event", task.getActivityName());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testTransitionInstanceActivityNamePropertyBeforeStartEvent.bpmn20.xml")
+  public void testTransitionInstanceActivityTypePropertyBeforeStartEvent() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
+
+    // when
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstanceId);
+
+    // then
+    TransitionInstance[] instances = tree.getTransitionInstances("start");
+    TransitionInstance task = instances[0];
+    assertNotNull(task);
+    assertNotNull(task.getActivityType());
+    assertEquals("startEvent", task.getActivityType());
+  }
+
+  @Deployment
+  public void testTransitionInstanceActivityNamePropertyAfterStartEvent() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
+
+    // when
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstanceId);
+
+    // then
+    TransitionInstance[] instances = tree.getTransitionInstances("start");
+    TransitionInstance task = instances[0];
+    assertNotNull(task);
+    assertNotNull(task.getActivityName());
+    assertEquals("The Start Event", task.getActivityName());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testTransitionInstanceActivityNamePropertyAfterStartEvent.bpmn20.xml")
+  public void testTransitionInstanceActivityTypePropertyAfterStartEvent() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
+
+    // when
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstanceId);
+
+    // then
+    TransitionInstance[] instances = tree.getTransitionInstances("start");
+    TransitionInstance task = instances[0];
+    assertNotNull(task);
+    assertNotNull(task.getActivityType());
+    assertEquals("startEvent", task.getActivityType());
+  }
 }

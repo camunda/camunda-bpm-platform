@@ -25,27 +25,43 @@ public class TransitionInstanceDto {
   protected String processInstanceId;
   protected String processDefinitionId;
   protected String activityId;
+  protected String activityName;
+  protected String activityType;
   protected String executionId;
 
   public String getId() {
     return id;
   }
+
   public String getParentActivityInstanceId() {
     return parentActivityInstanceId;
   }
+
   public String getProcessInstanceId() {
     return processInstanceId;
   }
+
   public String getProcessDefinitionId() {
     return processDefinitionId;
   }
+
   @Deprecated
   public String getTargetActivityId() {
     return activityId;
   }
+
   public String getActivityId() {
     return activityId;
   }
+
+  public String getActivityName() {
+    return activityName;
+  }
+
+  public String getActivityType() {
+    return activityType;
+  }
+
   public String getExecutionId() {
     return executionId;
   }
@@ -55,6 +71,8 @@ public class TransitionInstanceDto {
     result.id = instance.getId();
     result.parentActivityInstanceId = instance.getParentActivityInstanceId();
     result.activityId = instance.getActivityId();
+    result.activityName = instance.getActivityName();
+    result.activityType = instance.getActivityType();
     result.processInstanceId = instance.getProcessInstanceId();
     result.processDefinitionId = instance.getProcessDefinitionId();
     result.executionId = instance.getExecutionId();

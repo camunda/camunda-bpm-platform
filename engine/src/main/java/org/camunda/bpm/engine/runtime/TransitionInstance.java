@@ -47,4 +47,14 @@ public interface TransitionInstance extends ProcessElementInstance {
    * executing this transition instance */
   String getExecutionId();
 
+  /**
+   * returns the type of the activity a transition is made from/to
+   */
+  String getActivityType();
+
+  /**
+   * returns the name of the activity a transition is made from/to
+   */
+  String getActivityName();
+
 }
