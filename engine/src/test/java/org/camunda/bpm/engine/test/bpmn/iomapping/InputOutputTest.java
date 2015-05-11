@@ -12,6 +12,10 @@
  */
 package org.camunda.bpm.engine.test.bpmn.iomapping;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +24,7 @@ import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
@@ -813,6 +818,54 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
       assertTextPresent("camunda:outputParameter not allowed for multi-instance constructs", e.getMessage());
     }
 
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testThrowErrorInScriptInputOutputMapping.bpmn")
+  public void testBpmnErrorInScriptInputMapping() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("throwInMapping", "in");
+    variables.put("exception", new BpmnError("error"));
+    runtimeService.startProcessInstanceByKey("testProcess", variables);
+    //we will only reach the user task if the BPMNError from the script was handled by the boundary event
+    Task task = taskService.createTaskQuery().singleResult();
+    assertThat(task.getName(), is("User Task"));
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testThrowErrorInScriptInputOutputMapping.bpmn")
+  public void testExceptionInScriptInputMapping() {
+    String exceptionMessage = "myException";
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("throwInMapping", "in");
+    variables.put("exception", new RuntimeException(exceptionMessage));
+    try {
+      runtimeService.startProcessInstanceByKey("testProcess", variables);
+    } catch(RuntimeException re){
+      assertThat(re.getMessage(), containsString(exceptionMessage));
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testThrowErrorInScriptInputOutputMapping.bpmn")
+  public void testBpmnErrorInScriptOutputMapping() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("throwInMapping", "out");
+    variables.put("exception", new BpmnError("error"));
+    runtimeService.startProcessInstanceByKey("testProcess", variables);
+    //we will only reach the user task if the BPMNError from the script was handled by the boundary event
+    Task task = taskService.createTaskQuery().singleResult();
+    assertThat(task.getName(), is("User Task"));
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/iomapping/InputOutputTest.testThrowErrorInScriptInputOutputMapping.bpmn")
+  public void testExceptionInScriptOutputMapping() {
+    String exceptionMessage = "myException";
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("throwInMapping", "out");
+    variables.put("exception", new RuntimeException(exceptionMessage));
+    try {
+      runtimeService.startProcessInstanceByKey("testProcess", variables);
+    } catch(RuntimeException re){
+      assertThat(re.getMessage(), containsString(exceptionMessage));
+    }
   }
 
   @Deployment
