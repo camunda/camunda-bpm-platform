@@ -397,15 +397,17 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testActivityInstanceTreeWithoutEventScope() {
     // given
-    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("process");
+    String processInstanceId = instance.getId();
 
     // when
     String taskId = taskService.createTaskQuery().singleResult().getId();
     taskService.complete(taskId);
 
     // then
-    assertThat(
-      describeActivityInstanceTree(processInstanceId)
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstanceId);
+    assertThat(tree).hasStructure(
+      describeActivityInstanceTree(instance.getProcessDefinitionId())
         .activity("task")
       .done());
   }
@@ -413,7 +415,8 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
   @Deployment
   public void testConcurrentExecutionsAndPendingCompensation() {
     // given
-    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("process");
+    String processInstanceId = instance.getId();
     String taskId = taskService.createTaskQuery().taskDefinitionKey("innerTask").singleResult().getId();
 
     // when (1)
@@ -421,7 +424,6 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
 
     // then (1)
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
-
     assertThat(executionTree)
       .matches(
         describeExecutionTree(null).scope()
@@ -430,8 +432,9 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
           .child("subProcess").eventScope().scope().up()
         .done());
 
-    assertThat(
-      describeActivityInstanceTree(processInstanceId)
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstanceId);
+    assertThat(tree).hasStructure(
+      describeActivityInstanceTree(instance.getProcessDefinitionId())
         .activity("task1")
         .activity("task2")
       .done());
@@ -442,16 +445,16 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
 
     // then (2)
     executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
-
     assertThat(executionTree)
       .matches(
         describeExecutionTree("task2").scope()
           .child("subProcess").eventScope().scope().up()
         .done());
 
-    assertThat(
-      describeActivityInstanceTree(processInstanceId)
-        .activity("task1")
+    tree = runtimeService.getActivityInstance(processInstanceId);
+    assertThat(tree).hasStructure(
+      describeActivityInstanceTree(instance.getProcessDefinitionId())
+        .activity("task2")
       .done());
 
     // when (3)
