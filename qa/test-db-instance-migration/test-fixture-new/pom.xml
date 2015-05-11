@@ -128,14 +128,15 @@
                         file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql" />
                     <touch
                         file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql" />
+
+                    <!-- concatenated patches for current minor version -->
                     <touch
                         file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql" />
                     <touch
                         file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql" />
+                    <!-- patch scripts -->
                     <touch
-                        file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" />
-                    <touch
-                        file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" />
+                        file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_7.2_patch_7.2.4_to_7.2.5.sql" />
 
                   </target>
                 </configuration>
@@ -207,9 +208,8 @@
                 </goals>
                 <configuration>
                   <srcFiles>
-                    <!-- now patch old version of the schema -->
-                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql</srcFile>
-                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql</srcFile>
+                    <!-- now patch old version of the schema - insert all patches for old version here -->
+                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_7.2_patch_7.2.4_to_7.2.5.sql</srcFile>
                   </srcFiles>
                 </configuration>
               </execution>
@@ -235,7 +235,7 @@
                 </goals>
                 <configuration>
                   <srcFiles>
-                    <!-- now patch old version of the schema -->
+                    <!-- now patch new version of the schema -->
                     <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql</srcFile>
                     <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql</srcFile>
                   </srcFiles>
