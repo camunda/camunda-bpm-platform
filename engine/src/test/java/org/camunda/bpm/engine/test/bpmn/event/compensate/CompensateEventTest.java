@@ -15,6 +15,8 @@ package org.camunda.bpm.engine.test.bpmn.event.compensate;
 
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
+import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
+import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +32,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.bpmn.event.compensate.helper.SetVariablesDelegate;
+import org.camunda.bpm.engine.test.util.ExecutionTree;
 
 
 /**
@@ -48,7 +51,6 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(processInstance.getId());
 
   }
-
 
   @Deployment
   public void testCompensateParallelSubprocess() {
@@ -406,6 +408,58 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
       describeActivityInstanceTree(processInstanceId)
         .activity("task")
       .done());
+  }
+
+  @Deployment
+  public void testConcurrentExecutionsAndPendingCompensation() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
+    String taskId = taskService.createTaskQuery().taskDefinitionKey("innerTask").singleResult().getId();
+
+    // when (1)
+    taskService.complete(taskId);
+
+    // then (1)
+    ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
+
+    assertThat(executionTree)
+      .matches(
+        describeExecutionTree(null).scope()
+          .child("task1").concurrent().noScope().up()
+          .child("task2").concurrent().noScope().up()
+          .child("subProcess").eventScope().scope().up()
+        .done());
+
+    assertThat(
+      describeActivityInstanceTree(processInstanceId)
+        .activity("task1")
+        .activity("task2")
+      .done());
+
+    // when (2)
+    taskId = taskService.createTaskQuery().taskDefinitionKey("task1").singleResult().getId();
+    taskService.complete(taskId);
+
+    // then (2)
+    executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
+
+    assertThat(executionTree)
+      .matches(
+        describeExecutionTree("task2").scope()
+          .child("subProcess").eventScope().scope().up()
+        .done());
+
+    assertThat(
+      describeActivityInstanceTree(processInstanceId)
+        .activity("task1")
+      .done());
+
+    // when (3)
+    taskId = taskService.createTaskQuery().taskDefinitionKey("task2").singleResult().getId();
+    taskService.complete(taskId);
+
+    // then (3)
+    assertProcessEnded(processInstanceId);
   }
 
 }

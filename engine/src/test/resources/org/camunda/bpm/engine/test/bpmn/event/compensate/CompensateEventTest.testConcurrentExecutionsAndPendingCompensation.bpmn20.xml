@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="process">
+
+    <startEvent id="start" />
+
+    <sequenceFlow sourceRef="start"	targetRef="gtw" />
+
+    <parallelGateway id="gtw" />
+
+    <sequenceFlow sourceRef="gtw" targetRef="task1" />
+
+    <userTask id="task1" />
+
+    <sequenceFlow sourceRef="task1" targetRef="end1" />
+
+    <endEvent id="end1" />
+
+    <sequenceFlow sourceRef="gtw" targetRef="task2" />
+
+    <userTask id="task2" />
+
+    <sequenceFlow sourceRef="task2" targetRef="end2" />
+
+    <endEvent id="end2" />
+
+    <sequenceFlow sourceRef="gtw" targetRef="subProcess" />
+
+    <subProcess id="subProcess">
+
+      <startEvent id="innerStart" />
+
+      <sequenceFlow sourceRef="innerStart" targetRef="innerTask" />
+
+      <userTask id="innerTask" />
+
+      <sequenceFlow sourceRef="innerTask" targetRef="innerEnd" />
+
+      <endEvent id="innerEnd" />
+
+      <boundaryEvent id="compensate" attachedToRef="innerTask">
+        <compensateEventDefinition />
+      </boundaryEvent>
+
+      <userTask id="undoInnerTask" isForCompensation="true" />
+
+      <association associationDirection="One" sourceRef="compensate" targetRef="undoInnerTask" />
+
+    </subProcess>
+
+    <sequenceFlow sourceRef="subProcess" targetRef="end3" />
+
+    <endEvent id="end3" />
+
+  </process>
+</definitions>

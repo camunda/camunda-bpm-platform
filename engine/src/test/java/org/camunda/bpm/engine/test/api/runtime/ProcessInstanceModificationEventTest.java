@@ -366,8 +366,7 @@ public class ProcessInstanceModificationEventTest extends PluggableProcessEngine
     taskService.complete(afterCancellationTask.getId());
     taskService.complete(afterSuccessTask.getId());
 
-    // TODO: fix CAM-3629
-//    assertProcessEnded(processInstanceId);
+    assertProcessEnded(processInstanceId);
   }
 
   protected ActivityInstance getChildInstanceForActivity(ActivityInstance activityInstance, String activityId) {
