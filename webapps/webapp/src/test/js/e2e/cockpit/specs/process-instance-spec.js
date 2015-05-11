@@ -141,6 +141,23 @@ describe('Cockpit Process Instance Spec', function() {
     });
 
 
+    it('should select variable scope', function() {
+
+      // given
+      expect(instancePage.instanceTree.instanceSelectionLabel().getText()).to.eventually.eql('Nothing');
+
+      // when
+      instancePage.variablesTab.variableScope(1).click();
+
+      // then
+      expect(instancePage.instanceTree.isInstanceSelected('User Tasks')).to.eventually.be.true;
+      expect(instancePage.instanceTree.instanceSelectionLabel().getText()).to.eventually.eql('1 activity instance');
+
+      // finaly
+      instancePage.instanceTree.clearInstanceSelection();
+    });
+
+
     it('should add String variable', function() {
 
       // given

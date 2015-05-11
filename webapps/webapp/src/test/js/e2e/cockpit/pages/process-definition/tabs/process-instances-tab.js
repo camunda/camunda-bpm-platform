@@ -10,7 +10,7 @@ module.exports = Table.extend({
   tableRepeater: 'processInstance in processInstances',
 
   instanceIdClick: function(item) {
-    this.table().get(item).element(by.binding('processInstance.id')).click();
+    this.tableItem(item, by.binding('processInstance.id')).click();
   },
 
   instanceId: function(item) {

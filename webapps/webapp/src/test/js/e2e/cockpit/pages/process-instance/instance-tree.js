@@ -18,7 +18,7 @@ module.exports = Base.extend({
   },
 
   instanceSelectionLabel: function() {
-    return this.formElement().all(by.css('ng-pluralize')).get(0).getText();
+    return this.formElement().all(by.css('ng-pluralize')).get(0);
   },
 
   instanceSelectionRemoveIcon: function() {
@@ -44,14 +44,6 @@ module.exports = Base.extend({
       .getAttribute('class')
       .then(function(classes) {
         return classes.indexOf('selected') !== -1;
-      });
-  },
-
-  isInstanceNotSelected: function(activityName) {
-    return this.formElement().element(by.cssContainingText('.tree-node-label', activityName))
-      .getAttribute('class')
-      .then(function(classes) {
-        return classes.indexOf('selected') === -1;
       });
   }
 

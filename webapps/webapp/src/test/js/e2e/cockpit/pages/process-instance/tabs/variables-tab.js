@@ -22,7 +22,7 @@ module.exports = Table.extend({
   },
 
   variableScope: function(item) {
-    return this.tableItem(item, '.variable-scope');
+    return this.tableItem(item, by.binding('variable.instance.name'));
   },
 
   inlineEditRow: function() {
