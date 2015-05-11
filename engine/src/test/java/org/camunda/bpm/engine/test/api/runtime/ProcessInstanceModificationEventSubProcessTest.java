@@ -52,12 +52,13 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-//    requires fix for CAM-3566
-//    assertThat(updatedTree).hasStructure(
-//      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-//        .activity("task1")
-//        .activity("eventSubProcessTask")
-//      .done());
+    assertThat(updatedTree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .activity("task1")
+        .beginScope("eventSubProcess")
+          .activity("eventSubProcessTask")
+        .endScope()
+      .done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
@@ -90,11 +91,12 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-//  requires fix for CAM-3566
-//    assertThat(updatedTree).hasStructure(
-//      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-//        .activity("eventSubProcessTask")
-//      .done());
+    assertThat(updatedTree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .beginScope("eventSubProcess")
+          .activity("eventSubProcessTask")
+        .endScope()
+      .done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
@@ -123,11 +125,12 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-//  requires fix for CAM-3566
-//    assertThat(updatedTree).hasStructure(
-//      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-//        .activity("eventSubProcessTask")
-//      .done());
+    assertThat(updatedTree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .beginScope("eventSubProcess")
+          .activity("eventSubProcessTask")
+        .endScope()
+      .done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
@@ -155,11 +158,12 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-//  requires fix for CAM-3566
-//    assertThat(updatedTree).hasStructure(
-//      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-//        .activity("eventSubProcessTask")
-//      .done());
+    assertThat(updatedTree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .beginScope("eventSubProcess")
+          .activity("eventSubProcessTask")
+        .endScope()
+      .done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
@@ -187,12 +191,13 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-//  requires fix for CAM-3566
-//    assertThat(updatedTree).hasStructure(
-//      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-//        .activity("task1")
-//        .activity("eventSubProcessTask")
-//      .done());
+    assertThat(updatedTree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .activity("task1")
+        .beginScope("eventSubProcess")
+          .activity("eventSubProcessTask")
+        .endScope()
+      .done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
@@ -225,11 +230,12 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-//  requires fix for CAM-3566
-//    assertThat(updatedTree).hasStructure(
-//      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-//        .activity("eventSubProcessTask")
-//      .done());
+    assertThat(updatedTree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .beginScope("eventSubProcess")
+          .activity("eventSubProcessTask")
+        .endScope()
+      .done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
@@ -257,12 +263,13 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-//  requires fix for CAM-3566
-//    assertThat(updatedTree).hasStructure(
-//      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-//        .activity("task1")
-//        .activity("eventSubProcessTask")
-//      .done());
+    assertThat(updatedTree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .activity("task1")
+        .beginScope("eventSubProcess")
+          .activity("eventSubProcessTask")
+        .endScope()
+      .done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
@@ -292,12 +299,13 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-//  requires fix for CAM-3566
-//    assertThat(updatedTree).hasStructure(
-//      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-//        .activity("task1")
-//        .activity("eventSubProcessTask")
-//      .done());
+    assertThat(updatedTree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .activity("task1")
+        .beginScope("eventSubProcess")
+          .activity("eventSubProcessTask")
+        .endScope()
+      .done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
@@ -323,20 +331,17 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
       .startBeforeActivity("eventSubProcessTask")
       .execute();
 
-    // TODO: the eventSubProcess should be set to scope
-
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-//  requires fix for CAM-3566
-//    assertThat(updatedTree).hasStructure(
-//      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-//        .activity("task1")
-//          .beginScope("subProcess")
-//            .beginScope("eventSubProcess")
-//              .activity("eventSubProcessTask")
-//      .done());
+    assertThat(updatedTree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .activity("task1")
+          .beginScope("subProcess")
+            .beginScope("eventSubProcess")
+              .activity("eventSubProcessTask")
+      .done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
@@ -363,21 +368,17 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
       .startBeforeActivity("eventProcessStart")
       .execute();
 
-    // TODO: the eventSubProcess should be set to scope
-
-
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-//  requires fix for CAM-3566
-//    assertThat(updatedTree).hasStructure(
-//      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-//        .activity("task1")
-//          .beginScope("subProcess")
-//            .beginScope("eventSubProcess")
-//              .activity("eventSubProcessTask")
-//      .done());
+    assertThat(updatedTree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .activity("task1")
+          .beginScope("subProcess")
+            .beginScope("eventSubProcess")
+              .activity("eventSubProcessTask")
+      .done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
@@ -404,19 +405,17 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
       .startBeforeActivity("eventSubProcess")
       .execute();
 
-
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-//  requires fix for CAM-3566
-//    assertThat(updatedTree).hasStructure(
-//      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-//        .activity("task1")
-//          .beginScope("subProcess")
-//            .beginScope("eventSubProcess")
-//              .activity("eventSubProcessTask")
-//      .done());
+    assertThat(updatedTree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .activity("task1")
+          .beginScope("subProcess")
+            .beginScope("eventSubProcess")
+              .activity("eventSubProcessTask")
+      .done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
@@ -446,19 +445,17 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
       .startBeforeActivity("eventSubProcessTask")
       .execute();
 
-
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-//  requires fix for CAM-3566
-//    assertThat(updatedTree).hasStructure(
-//      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-//        .beginScope("subProcess")
-//          .activity("task2")
-//          .beginScope("eventSubProcess")
-//            .activity("eventSubProcessTask")
-//      .done());
+    assertThat(updatedTree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .beginScope("subProcess")
+          .activity("task2")
+          .beginScope("eventSubProcess")
+            .activity("eventSubProcessTask")
+      .done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
@@ -492,13 +489,12 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-//  requires fix for CAM-3566
-//    assertThat(updatedTree).hasStructure(
-//      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-//        .beginScope("subProcess")
-//          .beginScope("eventSubProcess")
-//            .activity("eventSubProcessTask")
-//      .done());
+    assertThat(updatedTree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .beginScope("subProcess")
+          .beginScope("eventSubProcess")
+            .activity("eventSubProcessTask")
+      .done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
@@ -530,13 +526,12 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-//  requires fix for CAM-3566
-//    assertThat(updatedTree).hasStructure(
-//      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-//        .beginScope("subProcess")
-//          .beginScope("eventSubProcess")
-//            .activity("eventSubProcessTask")
-//      .done());
+    assertThat(updatedTree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .beginScope("subProcess")
+          .beginScope("eventSubProcess")
+            .activity("eventSubProcessTask")
+      .done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
@@ -565,14 +560,13 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-//  requires fix for CAM-3566
-//    assertThat(updatedTree).hasStructure(
-//      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-//        .activity("task1")
-//        .beginScope("subProcess")
-//          .beginScope("eventSubProcess")
-//            .activity("eventSubProcessTask")
-//      .done());
+    assertThat(updatedTree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .activity("task1")
+        .beginScope("subProcess")
+          .beginScope("eventSubProcess")
+            .activity("eventSubProcessTask")
+      .done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
@@ -603,15 +597,13 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-//  requires fix for CAM-3566
-//    assertThat(updatedTree).hasStructure(
-//      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-//        .activity("task1")
-//        .beginScope("subProcess")
-//          .beginScope("eventSubProcess")
-//            .activity("eventSubProcessTask")
-//      .done());
-
+    assertThat(updatedTree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .activity("task1")
+        .beginScope("subProcess")
+          .beginScope("eventSubProcess")
+            .activity("eventSubProcessTask")
+      .done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
@@ -638,20 +630,17 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
       .startBeforeActivity("eventSubProcess")
       .execute();
 
-    // TODO: the eventSubProcess should be set to scope
-
     ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstanceId);
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-//  requires fix for CAM-3566
-//    assertThat(updatedTree).hasStructure(
-//      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-//        .activity("task1")
-//        .beginScope("subProcess")
-//          .beginScope("eventSubProcess")
-//            .activity("eventSubProcessTask")
-//      .done());
+    assertThat(updatedTree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .activity("task1")
+        .beginScope("subProcess")
+          .beginScope("eventSubProcess")
+            .activity("eventSubProcessTask")
+      .done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
@@ -687,14 +676,13 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-//  requires fix for CAM-3566
-//    assertThat(updatedTree).hasStructure(
-//      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-//        .beginScope("subProcess")
-//          .activity("task2")
-//          .beginScope("eventSubProcess")
-//            .activity("eventSubProcessTask")
-//      .done());
+    assertThat(updatedTree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .beginScope("subProcess")
+          .activity("task2")
+          .beginScope("eventSubProcess")
+            .activity("eventSubProcessTask")
+      .done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
@@ -728,15 +716,13 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-//  requires fix for CAM-3566
-//    assertThat(updatedTree).hasStructure(
-//      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-//        .beginScope("subProcess")
-//          .activity("task2")
-//          .beginScope("eventSubProcess")
-//            .activity("eventSubProcessTask")
-//      .done());
-
+    assertThat(updatedTree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .beginScope("subProcess")
+          .activity("task2")
+          .beginScope("eventSubProcess")
+            .activity("eventSubProcessTask")
+      .done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
@@ -770,15 +756,13 @@ public class ProcessInstanceModificationEventSubProcessTest extends PluggablePro
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-//  requires fix for CAM-3566
-//    assertThat(updatedTree).hasStructure(
-//        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-//          .beginScope("subProcess")
-//            .activity("task2")
-//            .beginScope("eventSubProcess")
-//              .activity("eventSubProcessTask")
-//        .done());
-
+    assertThat(updatedTree).hasStructure(
+        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+          .beginScope("subProcess")
+            .activity("task2")
+            .beginScope("eventSubProcess")
+              .activity("eventSubProcessTask")
+        .done());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 

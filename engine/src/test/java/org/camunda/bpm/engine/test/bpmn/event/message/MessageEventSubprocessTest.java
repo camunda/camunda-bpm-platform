@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.test.bpmn.event.message;
 
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
 
@@ -22,6 +24,7 @@ import org.camunda.bpm.engine.impl.EventSubscriptionQueryImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
@@ -866,4 +869,46 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(processInstanceId);
   }
 
+  @Deployment
+  public void testInterruptingActivityInstanceTree() {
+    // given
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("process");
+    String processInstanceId = instance.getId();
+
+    // when
+    runtimeService.correlateMessage("newMessage");
+
+    // then
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstanceId);
+    assertThat(tree).hasStructure(
+        describeActivityInstanceTree(instance.getProcessDefinitionId())
+          .beginScope("subProcess")
+            .beginScope("eventSubProcess")
+              .activity("eventSubProcessTask")
+            .endScope()
+          .endScope()
+        .done());
+  }
+
+  @Deployment
+  public void testNonInterruptingActivityInstanceTree() {
+    // given
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("process");
+    String processInstanceId = instance.getId();
+
+    // when
+    runtimeService.correlateMessage("newMessage");
+
+    // then
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstanceId);
+    assertThat(tree).hasStructure(
+        describeActivityInstanceTree(instance.getProcessDefinitionId())
+          .beginScope("subProcess")
+            .activity("innerTask")
+            .beginScope("eventSubProcess")
+              .activity("eventSubProcessTask")
+            .endScope()
+          .endScope()
+        .done());
+  }
 }
