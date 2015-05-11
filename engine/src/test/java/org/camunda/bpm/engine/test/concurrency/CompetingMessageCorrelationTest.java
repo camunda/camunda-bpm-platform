@@ -97,8 +97,8 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     thread2.makeContinue();
     Thread.sleep(2000);
 
-    // the first thread ends its transaction and releases the lock; the event subscription is now gone
-    thread1.waitUntilDone();
+    // let the first thread ends its transaction
+    thread1.makeContinue();
     assertNull(thread1.getException());
 
     Task afterMessageTask = taskService.createTaskQuery().singleResult();
@@ -110,6 +110,10 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     assertTrue(thread2.getException() instanceof ProcessEngineException);
     assertTextPresent("does not have a subscription to a message event with name 'Message'",
         thread2.getException().getMessage());
+
+    // the first thread ended successfully without an exception
+    thread1.join();
+    assertNull(thread1.getException());
 
     // the service task was not executed a second time
     assertEquals(1, InvocationLogListener.getInvocations());

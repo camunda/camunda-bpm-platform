@@ -139,7 +139,7 @@
     </if>
   </select>
   
-  <update id="selectEventSubscriptionsByExecutionAndType_mssql">
+  <select id="selectEventSubscriptionsByExecutionAndType_mssql" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     select *
     from ${prefix}ACT_RU_EVENT_SUBSCR 
     <if test="parameter.lockResult">
@@ -147,7 +147,7 @@
     </if>
     where (EVENT_TYPE_ = #{parameter.eventType})
       and (EXECUTION_ID_ = #{parameter.executionId})
-  </update>
+  </select>
 
   <select id="selectEventSubscriptionsByExecutionTypeAndActivity" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     select *
@@ -182,7 +182,7 @@
     </if>      
   </select>
   
-  <update id="selectEventSubscriptionsByNameAndExecution_mssql">
+  <select id="selectEventSubscriptionsByNameAndExecution_mssql"  resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     select *
     from ${prefix}ACT_RU_EVENT_SUBSCR
     <if test="parameter.lockResult">
@@ -191,7 +191,7 @@
     where (EVENT_TYPE_ = #{parameter.eventType})
       and (EVENT_NAME_ = #{parameter.eventName})
       and (EXECUTION_ID_ = #{parameter.executionId})
-  </update>
+  </select>
   
   <select id="selectMessageStartEventSubscriptionByName" resultMap="eventSubscriptionResultMap" parameterType="string">
     select *
