@@ -48,9 +48,9 @@ public class ServiceTaskConnectorActivityBehavior extends TaskActivityBehavior {
     ensureConnectorInitialized();
 
     ConnectorRequest<?> request = connectorInstance.createRequest();
-    applyInputParameters(execution, request);
 
     try {
+      applyInputParameters(execution, request);
       // execute the request and obtain a response:
       ConnectorResponse response = request.execute();
       applyOutputParameters(execution, response);

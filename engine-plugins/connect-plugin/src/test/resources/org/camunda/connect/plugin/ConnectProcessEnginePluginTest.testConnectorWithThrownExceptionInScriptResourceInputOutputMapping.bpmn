@@ -9,13 +9,10 @@
           <camunda:connectorId>testConnector</camunda:connectorId>
           <camunda:inputOutput>
             <camunda:inputParameter name="in">
-              <camunda:script scriptFormat="groovy">
-              </camunda:script>
+              <camunda:script scriptFormat="groovy" resource="org/camunda/connect/plugin/ConnectProcessEnginePluginTest.throwError.groovy" />
             </camunda:inputParameter>
             <camunda:outputParameter name="out">
-              <camunda:script scriptFormat="groovy">
-              	throw exception
-              </camunda:script>
+              <camunda:script scriptFormat="groovy" resource="org/camunda/connect/plugin/ConnectProcessEnginePluginTest.throwError.groovy" />
             </camunda:outputParameter>
           </camunda:inputOutput>
         </camunda:connector>
