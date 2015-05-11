@@ -35,6 +35,7 @@ public class MockHistoricVariableInstanceBuilder {
   protected String processDefinitionKey;
   protected String processDefinitionId;
   protected String processInstanceId;
+  protected String executionId;
   protected String errorMessage;
   protected String activityInstanceId;
   protected String caseDefinitionKey;
@@ -70,6 +71,11 @@ public class MockHistoricVariableInstanceBuilder {
 
   public MockHistoricVariableInstanceBuilder processInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
+    return this;
+  }
+
+  public MockHistoricVariableInstanceBuilder executionId(String executionId) {
+    this.executionId = executionId;
     return this;
   }
 
@@ -136,6 +142,10 @@ public class MockHistoricVariableInstanceBuilder {
     return processInstanceId;
   }
 
+  public String getExecutionId() {
+    return executionId;
+  }
+
   public String getErrorMessage() {
     return errorMessage;
   }
@@ -187,6 +197,7 @@ public class MockHistoricVariableInstanceBuilder {
     when(mockVariable.getProcessDefinitionKey()).thenReturn(processDefinitionKey);
     when(mockVariable.getProcessDefinitionId()).thenReturn(processDefinitionId);
     when(mockVariable.getProcessInstanceId()).thenReturn(processInstanceId);
+    when(mockVariable.getExecutionId()).thenReturn(executionId);
     when(mockVariable.getErrorMessage()).thenReturn(errorMessage);
     when(mockVariable.getActivtyInstanceId()).thenReturn(activityInstanceId);
     when(mockVariable.getActivityInstanceId()).thenReturn(activityInstanceId);

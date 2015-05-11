@@ -1308,6 +1308,7 @@ public abstract class MockProvider {
         .processDefinitionKey(EXAMPLE_VARIABLE_INSTANCE_PROC_DEF_KEY)
         .processDefinitionId(EXAMPLE_VARIABLE_INSTANCE_PROC_DEF_ID)
         .processInstanceId(EXAMPLE_VARIABLE_INSTANCE_PROC_INST_ID)
+        .executionId(EXAMPLE_VARIABLE_INSTANCE_EXECUTION_ID)
         .activityInstanceId(EXAMPLE_VARIABLE_INSTANCE_ACTIVITY_INSTANCE_ID)
         .caseDefinitionKey(EXAMPLE_VARIABLE_INSTANCE_CASE_DEF_KEY)
         .caseDefinitionId(EXAMPLE_VARIABLE_INSTANCE_CASE_DEF_ID)

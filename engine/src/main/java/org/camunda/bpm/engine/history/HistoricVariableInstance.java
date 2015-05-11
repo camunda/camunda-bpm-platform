@@ -84,6 +84,11 @@ public interface HistoricVariableInstance {
   String getProcessInstanceId();
 
   /**
+   * Return the corresponding execution id.
+   */
+  String getExecutionId();
+
+  /**
    * Returns the corresponding activity instance id.
    */
   @Deprecated

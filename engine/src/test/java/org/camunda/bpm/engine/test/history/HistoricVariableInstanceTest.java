@@ -384,15 +384,21 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     variables1.put("myVar", "test123");
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
 
-    assertEquals(2, historyService.createHistoricVariableInstanceQuery().executionIdIn(processInstance1.getId()).list().size());
-    assertEquals(2, historyService.createHistoricVariableInstanceQuery().executionIdIn(processInstance1.getId()).count());
+    HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery().executionIdIn(processInstance1.getId());
+    assertEquals(2, query.count());
+    List<HistoricVariableInstance> variableInstances = query.list();
+    assertEquals(2, variableInstances.size());
+    for (HistoricVariableInstance variableInstance : variableInstances) {
+      assertEquals(processInstance1.getId(), variableInstance.getExecutionId());
+    }
 
     Map<String, Object> variables2 = new HashMap<String, Object>();
     variables2.put("myVar", "test123");
     ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
 
-    assertEquals(3, historyService.createHistoricVariableInstanceQuery().executionIdIn(processInstance1.getId(), processInstance2.getId()).list().size());
-    assertEquals(3, historyService.createHistoricVariableInstanceQuery().executionIdIn(processInstance1.getId(), processInstance2.getId()).count());
+    query = historyService.createHistoricVariableInstanceQuery().executionIdIn(processInstance1.getId(), processInstance2.getId());
+    assertEquals(3, query.list().size());
+    assertEquals(3, query.count());
   }
 
   public void testQueryByInvalidExecutionIdIn() {

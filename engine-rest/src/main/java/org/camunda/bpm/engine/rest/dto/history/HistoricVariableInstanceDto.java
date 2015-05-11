@@ -22,6 +22,7 @@ public class HistoricVariableInstanceDto extends VariableValueDto {
   private String processDefinitionKey;
   private String processDefinitionId;
   private String processInstanceId;
+  private String executionId;
   private String activityInstanceId;
   private String caseDefinitionKey;
   private String caseDefinitionId;
@@ -48,6 +49,10 @@ public class HistoricVariableInstanceDto extends VariableValueDto {
 
   public String getProcessInstanceId() {
     return processInstanceId;
+  }
+
+  public String getExecutionId() {
+    return executionId;
   }
 
   public String getActivityInstanceId() {
@@ -87,6 +92,7 @@ public class HistoricVariableInstanceDto extends VariableValueDto {
     dto.processDefinitionKey = historicVariableInstance.getProcessDefinitionKey();
     dto.processDefinitionId = historicVariableInstance.getProcessDefinitionId();
     dto.processInstanceId = historicVariableInstance.getProcessInstanceId();
+    dto.executionId = historicVariableInstance.getExecutionId();
     dto.activityInstanceId = historicVariableInstance.getActivityInstanceId();
     dto.caseDefinitionKey = historicVariableInstance.getCaseDefinitionKey();
     dto.caseDefinitionId = historicVariableInstance.getCaseDefinitionId();
