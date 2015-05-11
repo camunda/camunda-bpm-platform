@@ -92,6 +92,10 @@ public class ActivityInstanceVerification extends Assert implements ExecutionLis
   public void assertStartInstanceCount(int count, String actId) {
 
     List<ActivityInstance> startInstancesForThisAct = startedActivityInstances.get(actId);
+    if (count == 0 && startInstancesForThisAct == null) {
+      return;
+    }
+
     assertNotNull(startInstancesForThisAct);
     assertEquals(count, startInstancesForThisAct.size());
 

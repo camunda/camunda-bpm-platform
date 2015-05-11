@@ -57,6 +57,11 @@ import org.camunda.bpm.engine.rest.helper.variable.EqualsUntypedValue;
 import org.camunda.bpm.engine.rest.sub.repository.impl.ProcessDefinitionResourceImpl;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+<<<<<<< HEAD
+=======
+import org.camunda.bpm.engine.runtime.ProcessInstanceModificationInstantiationBuilder;
+import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
+>>>>>>> 68558b3... renaming etc
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.fest.assertions.Assertions;

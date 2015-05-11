@@ -214,20 +214,19 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    // TODO: re-add when instance tree algorithm is fixed
-//    assertThat(updatedTree).hasStructure(
-//      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-//        .beginScope("subProcess")
-//          .activity("subProcessTask")
-//        .endScope()
-//        .beginScope("subProcess")
-//          .activity("subProcessTask")
-//          .beginScope("innerSubProcess")
-//            .activity("innerSubProcessTask")
-//      .done());
-//
-//    ActivityInstance innerSubProcessInstance = getChildInstanceForActivity(updatedTree, "innerSubProcess");
-//    assertEquals(randomSubProcessInstance.getId(), innerSubProcessInstance.getParentActivityInstanceId());
+    assertThat(updatedTree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .beginScope("subProcess")
+          .activity("subProcessTask")
+        .endScope()
+        .beginScope("subProcess")
+          .activity("subProcessTask")
+          .beginScope("innerSubProcess")
+            .activity("innerSubProcessTask")
+      .done());
+
+    ActivityInstance innerSubProcessInstance = getChildInstanceForActivity(updatedTree, "innerSubProcess");
+    assertEquals(randomSubProcessInstance.getId(), innerSubProcessInstance.getParentActivityInstanceId());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
@@ -440,20 +439,19 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    // TODO: re-add when instance tree algorithm is fixed
-//    assertThat(updatedTree).hasStructure(
-//      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-//        .beginScope("subProcess")
-//          .activity("subProcessTask")
-//        .endScope()
-//        .beginScope("subProcess")
-//          .activity("subProcessTask")
-//          .beginScope("innerSubProcess")
-//            .activity("innerSubProcessTask")
-//      .done());
-//
-//    ActivityInstance innerSubProcessInstance = getChildInstanceForActivity(updatedTree, "innerSubProcess");
-//    assertEquals(randomSubProcessInstance.getId(), innerSubProcessInstance.getParentActivityInstanceId());
+    assertThat(updatedTree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .beginScope("subProcess")
+          .activity("subProcessTask")
+        .endScope()
+        .beginScope("subProcess")
+          .activity("subProcessTask")
+          .beginScope("innerSubProcess")
+            .activity("innerSubProcessTask")
+      .done());
+
+    ActivityInstance innerSubProcessInstance = getChildInstanceForActivity(updatedTree, "innerSubProcess");
+    assertEquals(randomSubProcessInstance.getId(), innerSubProcessInstance.getParentActivityInstanceId());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 
@@ -681,20 +679,19 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     assertNotNull(updatedTree);
     assertEquals(processInstanceId, updatedTree.getProcessInstanceId());
 
-    // TODO: re-add when instance tree algorithm is fixed
-//    assertThat(updatedTree).hasStructure(
-//      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-//        .beginScope("subProcess")
-//          .activity("subProcessTask")
-//        .endScope()
-//        .beginScope("subProcess")
-//          .activity("subProcessTask")
-//          .beginScope("innerSubProcess")
-//            .activity("innerSubProcessTask")
-//      .done());
-//
-//    ActivityInstance innerSubProcessInstance = getChildInstanceForActivity(updatedTree, "innerSubProcess");
-//    assertEquals(randomSubProcessInstance.getId(), innerSubProcessInstance.getParentActivityInstanceId());
+    assertThat(updatedTree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .beginScope("subProcess")
+          .activity("subProcessTask")
+        .endScope()
+        .beginScope("subProcess")
+          .activity("subProcessTask")
+          .beginScope("innerSubProcess")
+            .activity("innerSubProcessTask")
+      .done());
+
+    ActivityInstance innerSubProcessInstance = getChildInstanceForActivity(updatedTree, "innerSubProcess");
+    assertEquals(randomSubProcessInstance.getId(), innerSubProcessInstance.getParentActivityInstanceId());
 
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
 

@@ -13,12 +13,9 @@
 
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
-import java.util.List;
-
 import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.InstantiationStack;
 import org.camunda.bpm.engine.impl.pvm.runtime.ProcessInstanceStartContext;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
@@ -52,11 +49,18 @@ public class PvmAtomicOperationProcessStart extends AbstractPvmEventAtomicOperat
   }
 
   protected void eventNotificationsCompleted(PvmExecutionImpl execution) {
-    ProcessDefinitionImpl processDefinition = execution.getProcessDefinition();
     ProcessInstanceStartContext processInstanceStartContext = execution.getProcessInstanceStartContext();
-    List<ActivityImpl> initialActivityStack = processDefinition.getInitialActivityStack(processInstanceStartContext.getInitial());
-    execution.setActivity(initialActivityStack.get(0));
-    execution.performOperation(PROCESS_START_INITIAL);
+    InstantiationStack instantiationStack = processInstanceStartContext.getInstantiationStack();
+    if (instantiationStack.getActivities().isEmpty()) {
+      execution.setActivity(instantiationStack.getTargetActivity());
+      execution.performOperation(ACTIVITY_START_CREATE_SCOPE);
+    }
+    else {
+      // initialize the activity instance id
+      execution.setActivityInstanceId(execution.getId());
+      execution.performOperation(ACTIVITY_INIT_STACK);
+
+    }
   }
 
   public String getCanonicalName() {

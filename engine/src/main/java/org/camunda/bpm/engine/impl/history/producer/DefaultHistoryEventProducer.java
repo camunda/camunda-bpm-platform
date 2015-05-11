@@ -116,6 +116,13 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setExecutionId(executionId);
     evt.setBusinessKey(execution.getProcessBusinessKey());
     evt.setCaseInstanceId(caseInstanceId);
+
+    if (execution.getSuperCaseExecution() != null) {
+      evt.setSuperCaseInstanceId(execution.getSuperCaseExecution().getCaseInstanceId());
+    }
+    if (execution.getSuperExecution() != null) {
+      evt.setSuperProcessInstanceId(execution.getSuperExecution().getProcessInstanceId());
+    }
   }
 
   protected void initTaskInstanceEvent(HistoricTaskInstanceEventEntity evt, TaskEntity taskEntity, HistoryEventType eventType) {
@@ -386,24 +393,6 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
     // set start user Id
     evt.setStartUserId(Context.getCommandContext().getAuthenticatedUserId());
-
-    return evt;
-  }
-
-  public HistoryEvent createProcessInstanceUpdateEvt(DelegateExecution execution) {
-    final ExecutionEntity executionEntity = (ExecutionEntity) execution;
-
-    // create event instance
-    HistoricProcessInstanceEventEntity evt = loadProcessInstanceEventEntity(executionEntity);
-
-    // initialize event
-    initProcessInstanceEvent(evt, executionEntity, HistoryEventTypes.PROCESS_INSTANCE_UPDATE);
-
-    // set super case instance id
-    CaseExecutionEntity superCaseExecution = executionEntity.getSuperCaseExecution();
-    if (superCaseExecution != null) {
-      evt.setSuperCaseInstanceId(superCaseExecution.getCaseInstanceId());
-    }
 
     return evt;
   }

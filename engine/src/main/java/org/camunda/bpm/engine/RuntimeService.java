@@ -32,6 +32,7 @@ import org.camunda.bpm.engine.runtime.NativeProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceModificationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.value.SerializableValue;
@@ -1628,9 +1629,26 @@ public interface RuntimeService {
 
   /**
    * Define a modification of a process instance in terms of activity cancellations
-   * and instantiations via a fluent builder
+   * and instantiations via a fluent builder. Instructions are executed in the order they are specified.
    *
    * @param processInstanceId the process instance to modify
    */
   ProcessInstanceModificationBuilder createProcessInstanceModification(String processInstanceId);
+
+  /**
+   * Starts a process instance at any set of activities in the process with the given id.
+   * Returns a fluent builder that can be used to specify instantiation instructions.
+   *
+   * @return the created process instance
+   */
+  ProcessInstantiationBuilder createProcessInstanceById(String processDefinitionId);
+
+  /**
+   * Starts a process instance at any set of activities in the process with the latest version
+   * of the given key. Returns a fluent builder that can be used to specify instantiation
+   * instructions.
+   *
+   * @return the created process instance
+   */
+  ProcessInstantiationBuilder createProcessInstanceByKey(String processDefinitionKey);
 }

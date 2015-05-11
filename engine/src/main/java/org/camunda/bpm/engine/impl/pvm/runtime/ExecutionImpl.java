@@ -27,11 +27,8 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.core.variable.scope.CoreVariableStore;
 import org.camunda.bpm.engine.impl.core.variable.scope.SimpleVariableStore;
-import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.FlowElement;
 
@@ -88,10 +85,6 @@ public class ExecutionImpl extends PvmExecutionImpl implements
   public ExecutionImpl() {
   }
 
-  public ExecutionImpl(ActivityImpl startActivity) {
-    super(startActivity);
-  }
-
   /** creates a new execution. properties processDefinition, processInstance and activity will be initialized. */
   public ExecutionImpl createExecution(boolean initializeExecutionStartContext) {
     // create the new child execution
@@ -127,35 +120,6 @@ public class ExecutionImpl extends PvmExecutionImpl implements
   /** instantiates a new execution.  can be overridden by subclasses */
   protected ExecutionImpl newExecution() {
     return new ExecutionImpl();
-  }
-
-  public PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey) {
-    ExecutionImpl processInstance = getProcessInstance();
-    String caseInstanceId = processInstance.getCaseInstanceId();
-
-    return createSubProcessInstance(processDefinition, businessKey, caseInstanceId);
-  }
-
-  public PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey, String caseInstanceId) {
-    ExecutionImpl subProcessInstance = newExecution();
-
-    // manage bidirectional super-subprocess relation
-    subProcessInstance.setSuperExecution(this);
-    this.setSubProcessInstance(subProcessInstance);
-
-    // Initialize the new execution
-    subProcessInstance.setProcessDefinition((ProcessDefinitionImpl) processDefinition);
-    subProcessInstance.setProcessInstance(subProcessInstance);
-
-    if(businessKey != null) {
-      subProcessInstance.setBusinessKey(businessKey);
-    }
-
-    if(caseInstanceId != null) {
-      subProcessInstance.setCaseInstanceId(caseInstanceId);
-    }
-
-    return subProcessInstance;
   }
 
   public void initialize() {
@@ -247,8 +211,8 @@ public class ExecutionImpl extends PvmExecutionImpl implements
 
   public void start(Map<String, Object> variables) {
     if (isProcessInstanceExecution()) {
-      if (processInstanceStartContext == null) {
-        processInstanceStartContext = new ProcessInstanceStartContext(processDefinition.getInitial());
+      if (startContext == null) {
+        startContext = new ProcessInstanceStartContext(processDefinition.getInitial());
       }
     }
 
@@ -359,6 +323,10 @@ public class ExecutionImpl extends PvmExecutionImpl implements
 
   public void forceUpdate() {
     // nothing to do
+  }
+
+  public void fireProcessStartEvent() {
+    // do nothing
   }
 
 }

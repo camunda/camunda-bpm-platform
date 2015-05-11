@@ -27,7 +27,6 @@ import org.camunda.bpm.engine.impl.cmd.CorrelateMessageCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.FindActiveActivityIdsCmd;
 import org.camunda.bpm.engine.impl.cmd.GetActivityInstanceCmd;
-import org.camunda.bpm.engine.impl.cmd.GetActivityInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.GetExecutionVariableCmd;
 import org.camunda.bpm.engine.impl.cmd.GetExecutionVariableTypedCmd;
 import org.camunda.bpm.engine.impl.cmd.GetExecutionVariablesCmd;
@@ -52,6 +51,7 @@ import org.camunda.bpm.engine.runtime.NativeProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceModificationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -401,6 +401,14 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
 
   public ProcessInstanceModificationBuilder createProcessInstanceModification(String processInstanceId) {
     return new ProcessInstanceModificationBuilderImpl(commandExecutor, processInstanceId);
+  }
+
+  public ProcessInstantiationBuilder createProcessInstanceById(String processDefinitionId) {
+    return new ProcessInstantiationBuilderImpl(commandExecutor, processDefinitionId, null);
+  }
+
+  public ProcessInstantiationBuilder createProcessInstanceByKey(String processDefinitionKey) {
+    return new ProcessInstantiationBuilderImpl(commandExecutor, null, processDefinitionKey);
   }
 
 }

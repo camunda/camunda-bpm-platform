@@ -10,29 +10,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.tree;
+package org.camunda.bpm.engine.runtime;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 
 /**
- * @author Daniel Meyer
- *
+ * @author Thorben Lindhauer
  */
-public class ScopeCollector implements Collector<ScopeImpl> {
-
-  protected List<ScopeImpl> scopes = new ArrayList<ScopeImpl>();
-
-  public void collect(ScopeImpl obj) {
-    if(obj != null && obj.isScope()) {
-      scopes.add(obj);
-    }
-  }
-
-  public List<ScopeImpl> getScopes() {
-    return scopes;
-  }
+public interface ProcessInstanceModificationInstantiationBuilder extends
+  ProcessInstanceModificationBuilder,
+  ActivityInstantiationBuilder<ProcessInstanceModificationInstantiationBuilder> {
 
 }

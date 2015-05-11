@@ -16,26 +16,31 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.cmd.AbstractInstantiationCmd;
 import org.camunda.bpm.engine.impl.cmd.AbstractProcessInstanceModificationCommand;
 import org.camunda.bpm.engine.impl.cmd.ActivityAfterInstantiationCmd;
+import org.camunda.bpm.engine.impl.cmd.ActivityBeforeInstantiationCmd;
 import org.camunda.bpm.engine.impl.cmd.ActivityCancellationCmd;
 import org.camunda.bpm.engine.impl.cmd.ActivityInstanceCancellationCmd;
-import org.camunda.bpm.engine.impl.cmd.ActivityBeforeInstantiationCmd;
 import org.camunda.bpm.engine.impl.cmd.ModifyProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.TransitionInstanceCancellationCmd;
 import org.camunda.bpm.engine.impl.cmd.TransitionInstantiationCmd;
+import org.camunda.bpm.engine.impl.core.variable.VariableMapImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.runtime.ProcessInstanceActivityInstantiationBuilder;
+import org.camunda.bpm.engine.runtime.ProcessInstanceModificationInstantiationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstanceModificationBuilder;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceModificationBuilder {
+public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceModificationInstantiationBuilder {
 
   protected CommandExecutor commandExecutor;
   protected CommandContext commandContext;
@@ -46,6 +51,9 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
   protected boolean skipIoMappings = false;
 
   protected List<AbstractProcessInstanceModificationCommand> operations = new ArrayList<AbstractProcessInstanceModificationCommand>();
+
+  // variables not associated with an activity that are to be set on the instance itself
+  protected VariableMap processVariables = new VariableMapImpl();
 
   public ProcessInstanceModificationBuilderImpl(CommandExecutor commandExecutor, String processInstanceId) {
     this(processInstanceId);
@@ -60,6 +68,9 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
   public ProcessInstanceModificationBuilderImpl(String processInstanceId) {
     ensureNotNull("processInstanceId", processInstanceId);
     this.processInstanceId = processInstanceId;
+  }
+
+  public ProcessInstanceModificationBuilderImpl() {
   }
 
   public ProcessInstanceModificationBuilder cancelActivityInstance(String activityInstanceId) {
@@ -80,50 +91,120 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
     return this;
   }
 
-  public ProcessInstanceActivityInstantiationBuilder startBeforeActivity(String activityId) {
+  public ProcessInstanceModificationInstantiationBuilder startBeforeActivity(String activityId) {
     ensureNotNull("activityId", activityId);
     AbstractInstantiationCmd currentInstantiation = new ActivityBeforeInstantiationCmd(processInstanceId, activityId);
     operations.add(currentInstantiation);
-    return new ProcessInstanceActivityInstantiationBuilderImpl(this, currentInstantiation);
+    return this;
   }
 
-  public ProcessInstanceActivityInstantiationBuilder startBeforeActivity(String activityId, String ancestorActivityInstanceId) {
+  public ProcessInstanceModificationInstantiationBuilder startBeforeActivity(String activityId, String ancestorActivityInstanceId) {
     ensureNotNull("activityId", activityId);
     ensureNotNull("ancestorActivityInstanceId", ancestorActivityInstanceId);
     AbstractInstantiationCmd currentInstantiation = new ActivityBeforeInstantiationCmd(processInstanceId, activityId, ancestorActivityInstanceId);
     operations.add(currentInstantiation);
-    return new ProcessInstanceActivityInstantiationBuilderImpl(this, currentInstantiation);
+    return this;
   }
 
-  public ProcessInstanceActivityInstantiationBuilder startAfterActivity(String activityId) {
+  public ProcessInstanceModificationInstantiationBuilder startAfterActivity(String activityId) {
     ensureNotNull("activityId", activityId);
     AbstractInstantiationCmd currentInstantiation = new ActivityAfterInstantiationCmd(processInstanceId, activityId);
     operations.add(currentInstantiation);
-    return new ProcessInstanceActivityInstantiationBuilderImpl(this, currentInstantiation);
+    return this;
   }
 
-  public ProcessInstanceActivityInstantiationBuilder startAfterActivity(String activityId, String ancestorActivityInstanceId) {
+  public ProcessInstanceModificationInstantiationBuilder startAfterActivity(String activityId, String ancestorActivityInstanceId) {
     ensureNotNull("activityId", activityId);
     ensureNotNull("ancestorActivityInstanceId", ancestorActivityInstanceId);
     AbstractInstantiationCmd currentInstantiation = new ActivityAfterInstantiationCmd(processInstanceId, activityId, ancestorActivityInstanceId);
     operations.add(currentInstantiation);
-    return new ProcessInstanceActivityInstantiationBuilderImpl(this, currentInstantiation);
+    return this;
   }
 
-  public ProcessInstanceActivityInstantiationBuilder startTransition(String transitionId) {
+  public ProcessInstanceModificationInstantiationBuilder startTransition(String transitionId) {
     ensureNotNull("transitionId", transitionId);
     AbstractInstantiationCmd currentInstantiation = new TransitionInstantiationCmd(processInstanceId, transitionId);
     operations.add(currentInstantiation);
-    return new ProcessInstanceActivityInstantiationBuilderImpl(this, currentInstantiation);
+    return this;
   }
 
-  public ProcessInstanceActivityInstantiationBuilder startTransition(String transitionId, String ancestorActivityInstanceId) {
+  public ProcessInstanceModificationInstantiationBuilder startTransition(String transitionId, String ancestorActivityInstanceId) {
     ensureNotNull("transitionId", transitionId);
     ensureNotNull("ancestorActivityInstanceId", ancestorActivityInstanceId);
     AbstractInstantiationCmd currentInstantiation = new TransitionInstantiationCmd(processInstanceId, transitionId, ancestorActivityInstanceId);
     operations.add(currentInstantiation);
-    return new ProcessInstanceActivityInstantiationBuilderImpl(this, currentInstantiation);
+    return this;
   }
+
+  protected AbstractInstantiationCmd getCurrentInstantiation() {
+    if (operations.isEmpty()) {
+      return null;
+    }
+
+    // casting should be safe
+    AbstractProcessInstanceModificationCommand lastInstantiationCmd = operations.get(operations.size() - 1);
+
+    if (!(lastInstantiationCmd instanceof AbstractInstantiationCmd)) {
+      throw new ProcessEngineException("last instruction is not an instantiation");
+    }
+
+    return (AbstractInstantiationCmd) lastInstantiationCmd;
+  }
+
+  public ProcessInstanceModificationInstantiationBuilder setVariable(String name, Object value) {
+    ensureNotNull(NotValidException.class, "Variable name must not be null", "name", name);
+
+    AbstractInstantiationCmd currentInstantiation = getCurrentInstantiation();
+    if (currentInstantiation != null) {
+      currentInstantiation.addVariable(name, value);
+    }
+    else {
+      processVariables.put(name, value);
+    }
+
+    return this;
+  }
+
+  public ProcessInstanceModificationInstantiationBuilder setVariableLocal(String name, Object value) {
+    ensureNotNull(NotValidException.class, "Variable name must not be null", "name", name);
+
+    AbstractInstantiationCmd currentInstantiation = getCurrentInstantiation();
+    if (currentInstantiation != null) {
+      currentInstantiation.addVariableLocal(name, value);
+    }
+    else {
+      processVariables.put(name, value);
+    }
+
+    return this;
+  }
+
+  public ProcessInstanceModificationInstantiationBuilder setVariables(Map<String, Object> variables) {
+    ensureNotNull(NotValidException.class, "Variable map must not be null", "variables", variables);
+
+    AbstractInstantiationCmd currentInstantiation = getCurrentInstantiation();
+    if (currentInstantiation != null) {
+      currentInstantiation.addVariables(variables);
+    }
+    else {
+      processVariables.putAll(variables);
+    }
+    return this;
+  }
+
+  public ProcessInstanceModificationInstantiationBuilder setVariablesLocal(Map<String, Object> variables) {
+    ensureNotNull(NotValidException.class, "Variable map must not be null", "variablesLocal", variables);
+
+    AbstractInstantiationCmd currentInstantiation = getCurrentInstantiation();
+    if (currentInstantiation != null) {
+      currentInstantiation.addVariablesLocal(variables);
+    }
+    else {
+      processVariables.putAll(variables);
+    }
+    return this;
+  }
+
 
   public void execute() {
     execute(false, false);
@@ -165,5 +246,16 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
     return skipIoMappings;
   }
 
+  public void setSkipCustomListeners(boolean skipCustomListeners) {
+    this.skipCustomListeners = skipCustomListeners;
+  }
+
+  public void setSkipIoMappings(boolean skipIoMappings) {
+    this.skipIoMappings = skipIoMappings;
+  }
+
+  public VariableMap getProcessVariables() {
+    return processVariables;
+  }
 
 }

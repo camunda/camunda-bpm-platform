@@ -19,10 +19,8 @@ import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecution
 
 import java.util.List;
 
-import org.apache.ibatis.logging.LogFactory;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.impl.util.LogUtil;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;

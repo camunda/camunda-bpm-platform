@@ -54,7 +54,7 @@ import org.camunda.bpm.engine.rest.helper.variable.EqualsUntypedValue;
 import org.camunda.bpm.engine.rest.util.ModificationInstructionBuilder;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.runtime.ProcessInstanceActivityInstantiationBuilder;
+import org.camunda.bpm.engine.runtime.ProcessInstanceModificationInstantiationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
@@ -1743,7 +1743,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testProcessInstanceModification() {
-    ProcessInstanceActivityInstantiationBuilder mockModificationBuilder = setUpMockModificationBuilder();
+    ProcessInstanceModificationInstantiationBuilder mockModificationBuilder = setUpMockModificationBuilder();
     when(runtimeServiceMock.createProcessInstanceModification(anyString())).thenReturn(mockModificationBuilder);
 
     Map<String, Object> json = new HashMap<String, Object>();
@@ -1797,7 +1797,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testProcessInstanceModificationWithVariables() {
-    ProcessInstanceActivityInstantiationBuilder mockModificationBuilder = setUpMockModificationBuilder();
+    ProcessInstanceModificationInstantiationBuilder mockModificationBuilder = setUpMockModificationBuilder();
     when(runtimeServiceMock.createProcessInstanceModification(anyString())).thenReturn(mockModificationBuilder);
 
     Map<String, Object> json = new HashMap<String, Object>();
@@ -1947,7 +1947,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testModifyProcessInstanceThrowsAuthorizationException() {
-    ProcessInstanceActivityInstantiationBuilder mockModificationBuilder = setUpMockModificationBuilder();
+    ProcessInstanceModificationInstantiationBuilder mockModificationBuilder = setUpMockModificationBuilder();
     when(runtimeServiceMock.createProcessInstanceModification(anyString())).thenReturn(mockModificationBuilder);
 
     String message = "expected exception";
@@ -1991,9 +1991,9 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
 
 
   @SuppressWarnings("unchecked")
-  protected ProcessInstanceActivityInstantiationBuilder setUpMockModificationBuilder() {
-    ProcessInstanceActivityInstantiationBuilder mockModificationBuilder =
-        mock(ProcessInstanceActivityInstantiationBuilder.class);
+  protected ProcessInstanceModificationInstantiationBuilder setUpMockModificationBuilder() {
+    ProcessInstanceModificationInstantiationBuilder mockModificationBuilder =
+        mock(ProcessInstanceModificationInstantiationBuilder.class);
 
     when(mockModificationBuilder.cancelActivityInstance(anyString())).thenReturn(mockModificationBuilder);
     when(mockModificationBuilder.cancelAllForActivity(anyString())).thenReturn(mockModificationBuilder);

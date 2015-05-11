@@ -23,16 +23,10 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.form.handler.StartFormHandler;
-import org.camunda.bpm.engine.impl.history.HistoryLevel;
-import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
-import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
-import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
-import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
@@ -78,31 +72,29 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
   }
 
   public ExecutionEntity createProcessInstance() {
-    return createProcessInstance(null, null, null);
+    return (ExecutionEntity) super.createProcessInstance();
   }
 
   public ExecutionEntity createProcessInstance(String businessKey) {
-    return createProcessInstance(businessKey, null, null);
+    return (ExecutionEntity) super.createProcessInstance(businessKey);
   }
 
   public ExecutionEntity createProcessInstance(String businessKey, String caseInstanceId) {
-    return createProcessInstance(businessKey, caseInstanceId, null);
+    return (ExecutionEntity) super.createProcessInstance(businessKey, caseInstanceId);
   }
 
   public ExecutionEntity createProcessInstance(String businessKey, ActivityImpl initial) {
-    return createProcessInstance(businessKey, null, initial);
+    return (ExecutionEntity) super.createProcessInstance(businessKey, initial);
+  }
+
+  protected PvmExecutionImpl newProcessInstance() {
+    return ExecutionEntity.createNewExecution();
   }
 
   public ExecutionEntity createProcessInstance(String businessKey, String caseInstanceId, ActivityImpl initial) {
     ensureNotSuspended();
 
-    ExecutionEntity processInstance = null;
-
-    if(initial == null) {
-      processInstance = (ExecutionEntity) super.createProcessInstance();
-    } else {
-      processInstance = (ExecutionEntity) createProcessInstanceForInitial(initial);
-    }
+    ExecutionEntity processInstance = (ExecutionEntity) createProcessInstanceForInitial(initial);
 
     // do not reset executions (CAM-2557)!
     // processInstance.setExecutions(new ArrayList<ExecutionEntity>());
@@ -124,38 +116,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
       processInstance.setCaseInstanceId(caseInstanceId);
     }
 
-    String initiatorVariableName = (String) getProperty(BpmnParse.PROPERTYNAME_INITIATOR_VARIABLE_NAME);
-    if (initiatorVariableName != null) {
-      String authenticatedUserId = Context.getCommandContext().getAuthenticatedUserId();
-      processInstance.setVariable(initiatorVariableName, authenticatedUserId);
-    }
-
-    ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
-    HistoryLevel historyLevel = configuration.getHistoryLevel();
-    // TODO: This smells bad, as the rest of the history is done via the ParseListener
-    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.PROCESS_INSTANCE_START, processInstance)) {
-
-      final HistoryEventProducer eventFactory = configuration.getHistoryEventProducer();
-      final HistoryEventHandler eventHandler = configuration.getHistoryEventHandler();
-
-      // publish event for historic process instance start
-      HistoryEvent pise = eventFactory.createProcessInstanceStartEvt(processInstance);
-      eventHandler.handleEvent(pise);
-
-    }
-
     return processInstance;
-  }
-
-  @Override
-  protected PvmExecutionImpl createProcessInstance(ActivityImpl activityImpl) {
-    ExecutionEntity processInstance = new ExecutionEntity(activityImpl);
-    return processInstance;
-  }
-
-  protected void insertProcessInstance(PvmExecutionImpl processInstance) {
-    ExecutionEntity execution = (ExecutionEntity) processInstance;
-    execution.insert();
   }
 
   public IdentityLinkEntity addIdentityLink(String userId, String groupId) {

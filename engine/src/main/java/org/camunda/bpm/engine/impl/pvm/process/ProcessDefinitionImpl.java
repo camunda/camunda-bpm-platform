@@ -22,7 +22,6 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.delegate.BaseDelegateExecution;
 import org.camunda.bpm.engine.impl.core.delegate.CoreActivityBehavior;
-import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
@@ -52,16 +51,30 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
     isSubProcessScope = true;
   }
 
-  public PvmProcessInstance createProcessInstance() {
+  protected void ensureDefaultInitialExists() {
     ensureNotNull("Process '" + name + "' has no default start activity (e.g. none start event), hence you cannot use 'startProcessInstanceBy...' but have to start it using one of the modeled start events (e.g. message start events)", "initial", initial);
-    return createProcessInstanceForInitial(initial);
+  }
+
+  public PvmProcessInstance createProcessInstance() {
+    ensureDefaultInitialExists();
+    return createProcessInstance(null, null, initial);
   }
 
   public PvmProcessInstance createProcessInstance(String businessKey) {
-    return createProcessInstance(businessKey, null);
+    ensureDefaultInitialExists();
+    return createProcessInstance(businessKey, null, this.initial);
   }
 
   public PvmProcessInstance createProcessInstance(String businessKey, String caseInstanceId) {
+    ensureDefaultInitialExists();
+    return createProcessInstance(businessKey, caseInstanceId, this.initial);
+  }
+
+  public PvmProcessInstance createProcessInstance(String businessKey, ActivityImpl initial) {
+    return createProcessInstance(businessKey, null, initial);
+  }
+
+  public PvmProcessInstance createProcessInstance(String businessKey, String caseInstanceId, ActivityImpl initial) {
     PvmExecutionImpl processInstance = (PvmExecutionImpl) createProcessInstanceForInitial(initial);
 
     processInstance.setBusinessKey(businessKey);
@@ -74,32 +87,22 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
   public PvmProcessInstance createProcessInstanceForInitial(ActivityImpl initial) {
     ensureNotNull("Cannot start process instance, initial activity where the process instance should start is null", "initial", initial);
 
-    PvmExecutionImpl processInstance = createProcessInstance(initial);
+    PvmExecutionImpl processInstance = newProcessInstance();
 
     processInstance.setProcessDefinition(this);
 
-    insertProcessInstance(processInstance);
-
     processInstance.setProcessInstance(processInstance);
-    processInstance.initialize();
 
-    PvmExecutionImpl scopeInstance = processInstance;
-
-    List<ActivityImpl> initialActivityStack = getInitialActivityStack(initial);
-
-    for (PvmActivity initialActivity: initialActivityStack) {
-      if (initialActivity.isScope()) {
-        scopeInstance = scopeInstance.createExecution();
-        scopeInstance.setActivity(initialActivity);
-        if (initialActivity.isScope()) {
-          scopeInstance.initialize();
-        }
-      }
-    }
-
-    scopeInstance.setActivity(initial);
+    // always set the process instance to the initial activity, no matter how deeply it is nested;
+    // this is required for firing history events (cf start activity) and persisting the initial activity
+    // on async start
+    processInstance.setActivity(initial);
 
     return processInstance;
+  }
+
+  protected PvmExecutionImpl newProcessInstance() {
+    return new ExecutionImpl();
   }
 
   public List<ActivityImpl> getInitialActivityStack() {
@@ -118,13 +121,6 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
       initialActivityStacks.put(startActivity, initialActivityStack);
     }
     return initialActivityStack;
-  }
-
-  protected PvmExecutionImpl createProcessInstance(ActivityImpl startActivity) {
-    return new ExecutionImpl(startActivity);
-  }
-
-  protected void insertProcessInstance(PvmExecutionImpl processInstance) {
   }
 
   public String getDiagramResourceName() {

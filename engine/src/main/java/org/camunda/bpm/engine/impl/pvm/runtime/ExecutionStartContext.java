@@ -13,12 +13,10 @@
 
 package org.camunda.bpm.engine.impl.pvm.runtime;
 
-import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 
 /**
  * @author Sebastian Menski

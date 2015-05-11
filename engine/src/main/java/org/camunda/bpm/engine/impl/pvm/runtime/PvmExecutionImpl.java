@@ -66,8 +66,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   protected transient ExecutionStartContext startContext;
 
-  protected transient ProcessInstanceStartContext processInstanceStartContext;
-
   // current position /////////////////////////////////////////////////////////
 
   /** current activity */
@@ -122,10 +120,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   public PvmExecutionImpl() {
   }
 
-  public PvmExecutionImpl(ActivityImpl initialActivity) {
-    processInstanceStartContext = new ProcessInstanceStartContext(initialActivity);
-  }
-
   // API ////////////////////////////////////////////////
 
   /** creates a new execution. properties processDefinition, processInstance and activity will be initialized. */
@@ -141,9 +135,41 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     return createSubProcessInstance(processDefinition, null);
   }
 
-  public abstract PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey);
+  public PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey) {
+    PvmExecutionImpl processInstance = getProcessInstance();
 
-  public abstract PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey, String caseInstanceId);
+    String caseInstanceId = null;
+    if (processInstance != null) {
+      caseInstanceId = processInstance.getCaseInstanceId();
+    }
+
+    return createSubProcessInstance(processDefinition, businessKey, caseInstanceId);
+  }
+
+  public PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey, String caseInstanceId) {
+    PvmExecutionImpl subProcessInstance = newExecution();
+
+    // manage bidirectional super-subprocess relation
+    subProcessInstance.setSuperExecution(this);
+    this.setSubProcessInstance(subProcessInstance);
+
+    // Initialize the new execution
+    subProcessInstance.setProcessDefinition((ProcessDefinitionImpl) processDefinition);
+    subProcessInstance.setProcessInstance(subProcessInstance);
+    subProcessInstance.setActivity(processDefinition.getInitial());
+
+    if(businessKey != null) {
+      subProcessInstance.setBusinessKey(businessKey);
+    }
+
+    if(caseInstanceId != null) {
+      subProcessInstance.setCaseInstanceId(caseInstanceId);
+    }
+
+    return subProcessInstance;
+  }
+
+  protected abstract PvmExecutionImpl newExecution();
 
   // sub case instance
 
@@ -155,10 +181,15 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   public void executeIoMapping() {
     // execute Input Mappings (if they exist).
-    ActivityImpl currentActivity = getActivity();
-    if (currentActivity != null && currentActivity.getIoMapping() != null && !skipIoMapping) {
-      currentActivity.getIoMapping().executeInputParameters(this);
+    ScopeImpl currentScope = getScopeActivity();
+    if (currentScope != currentScope.getProcessDefinition()) {
+      ActivityImpl currentActivity = (ActivityImpl) currentScope;
+
+      if (currentActivity != null && currentActivity.getIoMapping() != null && !skipIoMapping) {
+        currentActivity.getIoMapping().executeInputParameters(this);
+      }
     }
+
   }
 
   public void start() {
@@ -166,12 +197,29 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   }
 
   public void start(Map<String, Object> variables) {
+    startContext = new ProcessInstanceStartContext(getActivity());
+
+    initialize();
+
     if(variables != null) {
       setVariables(variables);
     }
 
+    fireProcessStartEvent();
+
     performOperation(PvmAtomicOperation.PROCESS_START);
   }
+
+  /**
+   * perform starting behavior but don't execute the initial activity
+   */
+  public void startWithoutExecuting() {
+    initialize();
+    fireProcessStartEvent();
+    performOperation(PvmAtomicOperation.FIRE_PROCESS_START);
+  }
+
+  public abstract void fireProcessStartEvent();
 
   public void destroy() {
     log.fine("destroying "+this);
@@ -878,11 +926,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   public void enterActivityInstance() {
     ActivityImpl activity = getActivity();
 
-    // special treatment for starting process instance
-    if(activity == null && processInstanceStartContext!= null) {
-      activity = processInstanceStartContext.getInitial();
-    }
-
     activityInstanceId = generateActivityInstanceId(activity.getId());
 
     if(log.isLoggable(Level.FINE)) {
@@ -978,6 +1021,9 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   protected ScopeImpl getScopeActivity() {
     ScopeImpl scope = null;
+    // this if condition is important during process instance startup
+    // where the activity of the process instance execution may not be aligned
+    // with the execution tree
     if (isProcessInstanceExecution()) {
       scope = getProcessDefinition();
     } else {
@@ -1263,7 +1309,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   }
 
   public void disposeProcessInstanceStartContext() {
-    processInstanceStartContext = null;
+    startContext = null;
   }
 
   public void disposeExecutionStartContext() {
@@ -1279,7 +1325,14 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   }
 
   public ProcessInstanceStartContext getProcessInstanceStartContext() {
-    return processInstanceStartContext;
+    if (startContext != null && startContext instanceof ProcessInstanceStartContext) {
+      return (ProcessInstanceStartContext) startContext;
+    }
+    return null;
+  }
+
+  public boolean hasProcessInstanceStartContext() {
+    return startContext != null && startContext instanceof ProcessInstanceStartContext;
   }
 
   public void setStartContext(ExecutionStartContext startContext) {

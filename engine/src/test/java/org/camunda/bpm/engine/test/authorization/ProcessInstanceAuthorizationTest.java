@@ -382,6 +382,134 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
   }
 
+  public void testStartProcessInstanceAtActivitiesByKey() {
+    // given
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, CREATE_INSTANCE);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
+
+    // when
+    runtimeService.createProcessInstanceByKey(PROCESS_KEY).startBeforeActivity("theTask").execute();
+
+    // then
+    disableAuthorization();
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+    verifyQueryResults(query, 1);
+    enableAuthorization();
+  }
+
+  public void testStartProcessInstanceAtActivitiesByKeyWithoutAuthorization() {
+    // given
+    // no authorization to start a process instance
+
+    try {
+      // when
+      runtimeService.createProcessInstanceByKey(PROCESS_KEY).startBeforeActivity("theTask").execute();
+      fail("Exception expected: It should not be possible to start a process instance");
+    } catch (AuthorizationException e) {
+
+      // then
+      assertTextPresent("The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'", e.getMessage());
+    }
+  }
+
+  public void testStartProcessInstanceAtActivitiesByKeyWithCreatePermissionOnProcessInstance() {
+    // given
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
+
+    try {
+      // when
+      runtimeService.createProcessInstanceByKey(PROCESS_KEY).startBeforeActivity("theTask").execute();
+      fail("Exception expected: It should not be possible to start a process instance");
+    } catch (AuthorizationException e) {
+
+      // then
+      assertTextPresent("The user with id 'test' does not have 'CREATE_INSTANCE' permission on resource 'oneTaskProcess' of type 'ProcessDefinition'", e.getMessage());
+    }
+  }
+
+  public void testStartProcessInstanceAtActivitiesByKeyWithCreateInstancesPermissionOnProcessDefinition() {
+    // given
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, CREATE_INSTANCE);
+
+    try {
+      // when
+      runtimeService.createProcessInstanceByKey(PROCESS_KEY).startBeforeActivity("theTask").execute();
+      fail("Exception expected: It should not be possible to start a process instance");
+    } catch (AuthorizationException e) {
+
+      // then
+      assertTextPresent("The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'", e.getMessage());
+    }
+  }
+
+  public void testStartProcessInstanceAtActivitiesById() {
+    // given
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, CREATE_INSTANCE);
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
+
+    String processDefinitionId = selectProcessDefinitionByKey(PROCESS_KEY).getId();
+
+    // when
+    runtimeService.createProcessInstanceById(processDefinitionId).startBeforeActivity("theTask").execute();
+
+    // then
+    disableAuthorization();
+    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
+    verifyQueryResults(query, 1);
+    enableAuthorization();
+  }
+
+  public void testStartProcessInstanceAtActivitiesByIdWithoutAuthorization() {
+    // given
+    // no authorization to start a process instance
+
+    String processDefinitionId = selectProcessDefinitionByKey(PROCESS_KEY).getId();
+
+    try {
+      // when
+      runtimeService.createProcessInstanceById(processDefinitionId).startBeforeActivity("theTask").execute();
+      fail("Exception expected: It should not be possible to start a process instance");
+    } catch (AuthorizationException e) {
+
+      // then
+      assertTextPresent("The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'", e.getMessage());
+    }
+  }
+
+  public void testStartProcessInstanceAtActivitiesByIdWithCreatePermissionOnProcessInstance() {
+    // given
+    createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
+
+    String processDefinitionId = selectProcessDefinitionByKey(PROCESS_KEY).getId();
+
+    try {
+      // when
+      runtimeService.createProcessInstanceById(processDefinitionId).startBeforeActivity("theTask").execute();
+      fail("Exception expected: It should not be possible to start a process instance");
+    } catch (AuthorizationException e) {
+
+      // then
+      assertTextPresent("The user with id 'test' does not have 'CREATE_INSTANCE' permission on resource 'oneTaskProcess' of type 'ProcessDefinition'", e.getMessage());
+    }
+  }
+
+  public void testStartProcessInstanceAtActivitiesByIdWithCreateInstancesPermissionOnProcessDefinition() {
+    // given
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, CREATE_INSTANCE);
+
+    String processDefinitionId = selectProcessDefinitionByKey(PROCESS_KEY).getId();
+
+    try {
+      // when
+      runtimeService.createProcessInstanceById(processDefinitionId).startBeforeActivity("theTask").execute();
+      fail("Exception expected: It should not be possible to start a process instance");
+    } catch (AuthorizationException e) {
+
+      // then
+      assertTextPresent("The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'", e.getMessage());
+    }
+  }
+
   // start process instance by message //////////////////////////////////////////////
 
   public void testStartProcessInstanceByMessageWithoutAuthorization() {

@@ -50,6 +50,10 @@ public abstract class AbstractProcessInstanceModificationCommand implements Comm
     this.skipIoMappings = skipIoMappings;
   }
 
+  public void setProcessInstanceId(String processInstanceId) {
+    this.processInstanceId = processInstanceId;
+  }
+
   protected ActivityInstance findActivityInstance(ActivityInstance tree, String activityInstanceId) {
     if (activityInstanceId.equals(tree.getId())) {
       return tree;

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,6 +20,8 @@ import org.camunda.bpm.engine.impl.pvm.ProcessDefinitionBuilder;
 import org.camunda.bpm.engine.impl.pvm.PvmExecution;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.test.PvmTestCase;
 import org.camunda.bpm.engine.test.pvm.activities.Automatic;
 import org.camunda.bpm.engine.test.pvm.activities.EmbeddedSubProcess;
@@ -33,7 +35,7 @@ import org.camunda.bpm.engine.test.pvm.activities.WaitState;
  */
 public class PvmEmbeddedSubProcessTest extends PvmTestCase {
 
-  /** 
+  /**
    *           +------------------------------+
    *           | embedded subprocess          |
    * +-----+   |  +-----------+   +---------+ |   +---+
@@ -64,17 +66,17 @@ public class PvmEmbeddedSubProcessTest extends PvmTestCase {
         .behavior(new WaitState())
       .endActivity()
     .buildProcessDefinition();
-    
-    PvmProcessInstance processInstance = processDefinition.createProcessInstance(); 
+
+    PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
-    
+
     List<String> expectedActiveActivityIds = new ArrayList<String>();
     expectedActiveActivityIds.add("end");
-      
+
     assertEquals(expectedActiveActivityIds, processInstance.findActiveActivityIds());
   }
 
-  /** 
+  /**
    *           +----------------------------------------+
    *           | embeddedsubprocess        +----------+ |
    *           |                     +---->|endInside1| |
@@ -124,14 +126,14 @@ public class PvmEmbeddedSubProcessTest extends PvmTestCase {
         .behavior(new End())
       .endActivity()
     .buildProcessDefinition();
-    
-    PvmProcessInstance processInstance = processDefinition.createProcessInstance(); 
+
+    PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
-    
+
     assertTrue(processInstance.isEnded());
   }
 
-  /** 
+  /**
    *           +-------------------------------------------------+
    *           | embeddedsubprocess        +----------+          |
    *           |                     +---->|endInside1|          |
@@ -185,18 +187,18 @@ public class PvmEmbeddedSubProcessTest extends PvmTestCase {
         .behavior(new End())
       .endActivity()
     .buildProcessDefinition();
-    
-    PvmProcessInstance processInstance = processDefinition.createProcessInstance(); 
+
+    PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
-    
+
     assertFalse(processInstance.isEnded());
     PvmExecution execution = processInstance.findExecution("wait");
     execution.signal(null, null);
-    
+
     assertTrue(processInstance.isEnded());
   }
-  
-  /** 
+
+  /**
    *           +-------------------------------------------------------+
    *           | embedded subprocess                                   |
    *           |                  +--------------------------------+   |
@@ -239,17 +241,17 @@ public class PvmEmbeddedSubProcessTest extends PvmTestCase {
         .behavior(new WaitState())
       .endActivity()
     .buildProcessDefinition();
-    
-    PvmProcessInstance processInstance = processDefinition.createProcessInstance(); 
+
+    PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
-    
+
     List<String> expectedActiveActivityIds = new ArrayList<String>();
     expectedActiveActivityIds.add("end");
-      
+
     assertEquals(expectedActiveActivityIds, processInstance.findActiveActivityIds());
   }
-  
-  /** 
+
+  /**
    *           +------------------------------+
    *           | embedded subprocess          |
    * +-----+   |  +-----------+               |
@@ -258,7 +260,7 @@ public class PvmEmbeddedSubProcessTest extends PvmTestCase {
    *           +------------------------------+
    */
   public void testEmbeddedSubProcessWithoutEndEvents() {
-    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()   
+    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
       .createActivity("start")
         .initial()
         .behavior(new Automatic())
@@ -269,17 +271,17 @@ public class PvmEmbeddedSubProcessTest extends PvmTestCase {
         .behavior(new EmbeddedSubProcess())
         .createActivity("startInside")
           .behavior(new Automatic())
-        .endActivity()       
-      .endActivity()      
+        .endActivity()
+      .endActivity()
     .buildProcessDefinition();
-    
-    PvmProcessInstance processInstance = processDefinition.createProcessInstance(); 
+
+    PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
-    
+
     assertTrue(processInstance.isEnded());
   }
-  
-  /** 
+
+  /**
    *           +-------------------------------------------------------+
    *           | embedded subprocess                                   |
    *           |                  +--------------------------------+   |
@@ -309,20 +311,20 @@ public class PvmEmbeddedSubProcessTest extends PvmTestCase {
           .scope()
           .behavior(new EmbeddedSubProcess())
           .createActivity("startNestedInside")
-            .behavior(new Automatic())            
-            .endActivity()        
+            .behavior(new Automatic())
+            .endActivity()
         .endActivity()
-      .endActivity()  
+      .endActivity()
     .buildProcessDefinition();
-    
-    PvmProcessInstance processInstance = processDefinition.createProcessInstance(); 
+
+    PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
-    
+
     assertTrue(processInstance.isEnded());
   }
-  
-  
-  /** 
+
+
+  /**
    *           +------------------------------+
    *           | embedded subprocess          |
    * +-----+   |  +-----------+   +---------+ |
@@ -331,7 +333,7 @@ public class PvmEmbeddedSubProcessTest extends PvmTestCase {
    *           +------------------------------+
    */
   public void testEmbeddedSubProcessNoEnd() {
-    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()   
+    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
       .createActivity("start")
         .initial()
         .behavior(new Automatic())
@@ -347,13 +349,55 @@ public class PvmEmbeddedSubProcessTest extends PvmTestCase {
         .createActivity("endInside")
           .behavior(new End())
         .endActivity()
-      .endActivity()      
+      .endActivity()
     .buildProcessDefinition();
-    
-    PvmProcessInstance processInstance = processDefinition.createProcessInstance(); 
+
+    PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
-    
+
     assertTrue(processInstance.isEnded());
   }
-    
+
+  /**
+   *           +------------------------------+
+   *           | embedded subprocess          |
+   * +-----+   |  +-----------+   +---------+ |   +---+
+   * |start|-->|  |startInside|-->|endInside| |-->|end|
+   * +-----+   |  +-----------+   +---------+ |   +---+
+   *           +------------------------------+
+   */
+  public void testStartInScope() {
+    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
+      .createActivity("start")
+        .initial()
+        .behavior(new Automatic())
+        .transition("embeddedsubprocess")
+      .endActivity()
+      .createActivity("embeddedsubprocess")
+        .scope()
+        .behavior(new EmbeddedSubProcess())
+        .createActivity("startInside")
+          .behavior(new Automatic())
+          .transition("endInside")
+        .endActivity()
+        .createActivity("endInside")
+          .behavior(new End())
+        .endActivity()
+        .transition("end")
+      .endActivity()
+      .createActivity("end")
+        .behavior(new WaitState())
+      .endActivity()
+    .buildProcessDefinition();
+
+    PvmProcessInstance processInstance = ((ProcessDefinitionImpl) processDefinition)
+        .createProcessInstanceForInitial((ActivityImpl) processDefinition.findActivity("startInside"));
+    processInstance.start();
+
+    List<String> expectedActiveActivityIds = new ArrayList<String>();
+    expectedActiveActivityIds.add("end");
+
+    assertEquals(expectedActiveActivityIds, processInstance.findActiveActivityIds());
+  }
+
 }

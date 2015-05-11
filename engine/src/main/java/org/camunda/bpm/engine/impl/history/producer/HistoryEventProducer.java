@@ -46,16 +46,6 @@ public interface HistoryEventProducer {
   public HistoryEvent createProcessInstanceStartEvt(DelegateExecution execution);
 
   /**
-   * Creates the history event fired when an process instances is <strong>updated</strong>.
-   *
-   * @param execution the current execution.
-   * @return the history event
-   *
-   * @since 7.3
-   */
-  public HistoryEvent createProcessInstanceUpdateEvt(DelegateExecution execution);
-
-  /**
    * Creates the history event fired when a process instances is <strong>ended</strong>.
    *
    * @param execution the current execution.

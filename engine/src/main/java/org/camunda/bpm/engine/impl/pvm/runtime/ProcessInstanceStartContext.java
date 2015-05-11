@@ -12,7 +12,15 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime;
 
+import java.util.Collections;
+import java.util.List;
+
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
+import org.camunda.bpm.engine.impl.tree.FlowScopeWalker;
+import org.camunda.bpm.engine.impl.tree.ScopeCollector;
+import org.camunda.bpm.engine.impl.tree.TreeWalker.WalkCondition;
 
 /**
  * Callback for being notified when a model instance has started.
@@ -20,9 +28,11 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
  * @author Daniel Meyer
  *
  */
-public class ProcessInstanceStartContext {
+public class ProcessInstanceStartContext extends ExecutionStartContext {
 
   protected ActivityImpl initial;
+
+  protected InstantiationStack instantiationStack;
 
   /**
    * @param initial
@@ -39,8 +49,25 @@ public class ProcessInstanceStartContext {
     this.initial = initial;
   }
 
-  public void initialStarted(PvmExecutionImpl execution) {
-    // do nothing
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  public InstantiationStack getInstantiationStack() {
+
+    if (instantiationStack == null) {
+      FlowScopeWalker flowScopeWalker = new FlowScopeWalker(initial.getFlowScope());
+      ScopeCollector scopeCollector = new ScopeCollector();
+      flowScopeWalker.addPreCollector(scopeCollector).walkWhile(new WalkCondition<ScopeImpl>() {
+        public boolean isFulfilled(ScopeImpl element) {
+          return element == null || element == initial.getProcessDefinition();
+        }
+      });
+
+      List<PvmActivity> scopeActivities = (List) scopeCollector.getScopes();
+      Collections.reverse(scopeActivities);
+
+      instantiationStack = new InstantiationStack(scopeActivities, initial, null);
+    }
+
+    return instantiationStack;
   }
 
   public boolean isAsync() {

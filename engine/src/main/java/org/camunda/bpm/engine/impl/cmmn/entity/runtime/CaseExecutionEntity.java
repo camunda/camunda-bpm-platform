@@ -445,7 +445,6 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
     subProcessInstance.setSuperCaseExecution(this);
     setSubProcessInstance(subProcessInstance);
 
-    fireHistoricSubProcessInstanceUpdate();
     fireHistoricCaseActivityInstanceUpdate();
 
     return subProcessInstance;
@@ -457,21 +456,6 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
         .getCommandContext()
         .getExecutionManager()
         .findSubProcessInstanceBySuperCaseExecutionId(id);
-    }
-  }
-
-
-  public void fireHistoricSubProcessInstanceUpdate() {
-    ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
-    HistoryLevel historyLevel = configuration.getHistoryLevel();
-    if (historyLevel.isHistoryEventProduced(HistoryEventTypes.PROCESS_INSTANCE_UPDATE, this)) {
-
-      final HistoryEventProducer eventFactory = configuration.getHistoryEventProducer();
-      final HistoryEventHandler eventHandler = configuration.getHistoryEventHandler();
-
-      // publish start event for sub process instance
-      HistoryEvent hpise = eventFactory.createProcessInstanceUpdateEvt(subProcessInstance);
-      eventHandler.handleEvent(hpise);
     }
   }
 

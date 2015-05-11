@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 public interface PvmAtomicOperation extends CoreAtomicOperation<PvmExecutionImpl>, AtomicOperation {
 
   PvmAtomicOperation PROCESS_START = new PvmAtomicOperationProcessStart();
-  PvmAtomicOperation PROCESS_START_INITIAL = new PvmAtomicOperationProcessStartInitial();
+  PvmAtomicOperation FIRE_PROCESS_START = new PvmAtomicOperationFireProcessStart();
   PvmAtomicOperation PROCESS_END = new PvmAtomicOperationProcessEnd();
 
   PvmAtomicOperation ACTIVITY_START = new PvmAtomicOperationActivityStart();

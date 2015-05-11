@@ -18,8 +18,8 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.runtime.ProcessInstanceActivityInstantiationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstanceModificationBuilder;
+import org.camunda.bpm.engine.runtime.ProcessInstanceModificationInstantiationBuilder;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -95,7 +95,7 @@ public abstract class ProcessInstanceModificationInstructionDto {
     return "For instruction type '" + type + "': " +  message;
   }
 
-  protected void applyVariables(ProcessInstanceActivityInstantiationBuilder builder,
+  protected void applyVariables(ProcessInstanceModificationInstantiationBuilder builder,
       ProcessEngine engine, ObjectMapper mapper) {
 
     if (variables != null) {
@@ -123,7 +123,7 @@ public abstract class ProcessInstanceModificationInstructionDto {
             buildErrorMessage("'activityId' must be set"));
       }
 
-      ProcessInstanceActivityInstantiationBuilder activityBuilder = null;
+      ProcessInstanceModificationInstantiationBuilder activityBuilder = null;
 
       if (ancestorActivityInstanceId != null) {
         activityBuilder = builder.startBeforeActivity(activityId, ancestorActivityInstanceId);
@@ -193,7 +193,7 @@ public abstract class ProcessInstanceModificationInstructionDto {
             buildErrorMessage("'activityId' must be set"));
       }
 
-      ProcessInstanceActivityInstantiationBuilder activityBuilder = null;
+      ProcessInstanceModificationInstantiationBuilder activityBuilder = null;
 
       if (ancestorActivityInstanceId != null) {
         activityBuilder = builder.startAfterActivity(activityId, ancestorActivityInstanceId);
@@ -216,7 +216,7 @@ public abstract class ProcessInstanceModificationInstructionDto {
             buildErrorMessage("'activityId' must be set"));
       }
 
-      ProcessInstanceActivityInstantiationBuilder activityBuilder = null;
+      ProcessInstanceModificationInstantiationBuilder activityBuilder = null;
 
       if (ancestorActivityInstanceId != null) {
         activityBuilder = builder.startTransition(activityId, ancestorActivityInstanceId);

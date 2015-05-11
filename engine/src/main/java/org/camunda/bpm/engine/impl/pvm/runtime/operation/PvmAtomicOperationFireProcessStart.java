@@ -10,28 +10,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.persistence.entity;
 
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+package org.camunda.bpm.engine.impl.pvm.runtime.operation;
+
+import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.InstantiationStack;
 import org.camunda.bpm.engine.impl.pvm.runtime.ProcessInstanceStartContext;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
-/**
- * @author Daniel Meyer
- *
- */
-public class HistoryAwareStartContext extends ProcessInstanceStartContext {
 
-  public HistoryAwareStartContext(ActivityImpl initial) {
-    super(initial);
+/**
+ * @author Tom Baeyens
+ * @author Daniel Meyer
+ */
+public class PvmAtomicOperationFireProcessStart extends AbstractPvmEventAtomicOperation {
+
+  protected ScopeImpl getScope(PvmExecutionImpl execution) {
+    return execution.getProcessDefinition();
   }
 
-  @Override
-  public void initialStarted(PvmExecutionImpl execution) {
-    ExecutionEntity executionEntity = (ExecutionEntity) execution;
-    executionEntity.fireHistoricVariableInstanceCreateEvents();
-    super.initialStarted(execution);
+  protected String getEventName() {
+    return ExecutionListener.EVENTNAME_START;
+  }
 
+  protected void eventNotificationsCompleted(PvmExecutionImpl execution) {
+    // do nothing
+  }
+
+  public String getCanonicalName() {
+    return "fire-process-start";
   }
 
 }

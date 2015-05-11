@@ -13,8 +13,8 @@
 package org.camunda.bpm.engine.impl.persistence.entity.util;
 
 import org.camunda.bpm.engine.impl.form.FormPropertyHelper;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoryAwareStartContext;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.ProcessInstanceStartContext;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.variable.VariableMap;
 
@@ -22,7 +22,7 @@ import org.camunda.bpm.engine.variable.VariableMap;
  * @author Daniel Meyer
  *
  */
-public class FormPropertyStartContext extends HistoryAwareStartContext {
+public class FormPropertyStartContext extends ProcessInstanceStartContext {
 
   protected VariableMap formProperties;
 
@@ -37,11 +37,11 @@ public class FormPropertyStartContext extends HistoryAwareStartContext {
     this.formProperties = properties;
   }
 
-  public void initialStarted(PvmExecutionImpl execution) {
+  public void executionStarted(PvmExecutionImpl execution) {
     FormPropertyHelper.initFormPropertiesOnScope(formProperties, execution);
 
     // make sure create events are fired after form is submitted
-    super.initialStarted(execution);
+    super.executionStarted(execution);
   }
 
 }

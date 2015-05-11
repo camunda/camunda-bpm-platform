@@ -19,6 +19,8 @@ import org.camunda.bpm.engine.impl.pvm.ProcessDefinitionBuilder;
 import org.camunda.bpm.engine.impl.pvm.PvmExecution;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionImpl;
 import org.camunda.bpm.engine.impl.test.PvmTestCase;
 import org.camunda.bpm.engine.test.pvm.activities.Automatic;
@@ -464,6 +466,59 @@ public class PvmActivityInstanceTest extends PvmTestCase {
     verifier.assertStartInstanceCount(1, "startInside");
     verifier.assertStartInstanceCount(1, "startInside");
 
+  }
+
+  public void testStartInSubProcess() {
+
+    ActivityInstanceVerification verifier = new ActivityInstanceVerification();
+
+    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
+      .createActivity("start")
+        .initial()
+        .behavior(new Automatic())
+        .executionListener(ExecutionListener.EVENTNAME_START, verifier)
+        .executionListener(ExecutionListener.EVENTNAME_END, verifier)
+        .transition("embeddedsubprocess")
+      .endActivity()
+      .createActivity("embeddedsubprocess")
+        .scope()
+        .behavior(new EmbeddedSubProcess())
+        .executionListener(ExecutionListener.EVENTNAME_START, verifier)
+        .executionListener(ExecutionListener.EVENTNAME_END, verifier)
+        .createActivity("startInside")
+          .behavior(new Automatic())
+          .executionListener(ExecutionListener.EVENTNAME_START, verifier)
+          .executionListener(ExecutionListener.EVENTNAME_END, verifier)
+          .transition("endInside")
+        .endActivity()
+        .createActivity("endInside")
+          .behavior(new End())
+          .executionListener(ExecutionListener.EVENTNAME_START, verifier)
+          .executionListener(ExecutionListener.EVENTNAME_END, verifier)
+        .endActivity()
+        .transition("end")
+      .endActivity()
+      .executionListener(ExecutionListener.EVENTNAME_START, verifier)
+      .executionListener(ExecutionListener.EVENTNAME_END, verifier)
+      .createActivity("end")
+        .behavior(new End())
+        .executionListener(ExecutionListener.EVENTNAME_START, verifier)
+        .executionListener(ExecutionListener.EVENTNAME_END, verifier)
+      .endActivity()
+    .buildProcessDefinition();
+
+    PvmProcessInstance processInstance = ((ProcessDefinitionImpl) processDefinition)
+        .createProcessInstanceForInitial((ActivityImpl) processDefinition.findActivity("endInside"));
+    processInstance.start();
+
+    assertTrue(processInstance.isEnded());
+
+    verifier.assertStartInstanceCount(0, "start");
+    verifier.assertStartInstanceCount(1, "embeddedsubprocess");
+    verifier.assertProcessInstanceParent("embeddedsubprocess", processInstance);
+    verifier.assertStartInstanceCount(0, "startInside");
+    verifier.assertIsCompletingActivityInstance("endInside", 1);
+    verifier.assertStartInstanceCount(1, "end");
   }
 
 
