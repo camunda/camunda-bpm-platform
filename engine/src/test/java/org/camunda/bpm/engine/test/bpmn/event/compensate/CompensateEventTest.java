@@ -392,4 +392,20 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Deployment
+  public void testActivityInstanceTreeWithoutEventScope() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
+
+    // when
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+    taskService.complete(taskId);
+
+    // then
+    assertThat(
+      describeActivityInstanceTree(processInstanceId)
+        .activity("task")
+      .done());
+  }
+
 }

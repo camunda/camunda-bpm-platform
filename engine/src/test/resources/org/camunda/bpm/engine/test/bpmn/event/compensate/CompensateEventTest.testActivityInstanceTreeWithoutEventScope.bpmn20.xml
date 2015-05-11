@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="process">
+
+    <startEvent id="start" />
+
+    <sequenceFlow sourceRef="start"	targetRef="transaction" />
+
+    <transaction id="transaction">
+
+      <startEvent id="innerStart" />
+
+      <sequenceFlow sourceRef="innerStart" targetRef="innerTask" />
+
+      <userTask id="innerTask" />
+
+      <sequenceFlow sourceRef="innerTask" targetRef="innerEnd" />
+
+      <endEvent id="innerEnd" />
+
+      <boundaryEvent id="compensate" attachedToRef="innerTask">
+        <compensateEventDefinition />
+      </boundaryEvent>
+
+      <userTask id="undoInnerTask" isForCompensation="true" />
+
+      <association associationDirection="One" sourceRef="compensate" targetRef="undoInnerTask" />
+
+    </transaction>
+
+    <sequenceFlow sourceRef="transaction" targetRef="task" />
+
+    <userTask id="task" />
+
+    <sequenceFlow sourceRef="task" targetRef="end" />
+
+    <endEvent id="end" />
+
+  </process>
+</definitions>
