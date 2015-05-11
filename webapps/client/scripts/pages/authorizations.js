@@ -126,21 +126,18 @@ define(['text!./authorizations.html', 'text!./confirm-delete-authorization.html'
           AuthorizationResource.count({
             resourceType :  $scope.selectedResourceType,
           }).$promise.then(function (response) {
-            if (!response.count) {
-              $scope.loadingState = 'EMPTY';
-              return;
-            }
-
             $scope.pages.total = response.count;
-            AuthorizationResource.query({
-              resourceType :  $scope.selectedResourceType,
-              firstResult:    ($scope.pages.current - 1) * $scope.pages.size,
-              maxResults:     $scope.pages.size
-            }).$promise.then(function(response) {
-              $scope.authorizations = response;
-              $scope.loadingState = 'LOADED';
-            }, reqError);
           }, reqError);
+        
+          AuthorizationResource.query({
+            resourceType :  $scope.selectedResourceType,
+            firstResult:    ($scope.pages.current - 1) * $scope.pages.size,
+            maxResults:     $scope.pages.size
+          }).$promise.then(function(response) {
+            $scope.authorizations = response;
+            $scope.loadingState = response.length ? 'LOADED' : 'EMPTY';
+          }, reqError);
+
         };
 
         // will also trigger the initial load request
