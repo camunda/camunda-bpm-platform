@@ -10,7 +10,7 @@ module.exports = Table.extend({
   tableRepeater: 'userTask in userTasks',
 
   activity: function(item) {
-    return this.tableItem(item, '.activity');
+    return this.tableItem(item, by.binding('userTask.instance.name'));
   },
 
   assignee: function(item) {
