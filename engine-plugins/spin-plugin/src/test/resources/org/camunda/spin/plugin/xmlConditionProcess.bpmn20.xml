@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="process">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow sourceRef="theStart" targetRef="gtw" />
+
+    <exclusiveGateway id="gtw" />
+
+    <sequenceFlow sourceRef="gtw" targetRef="task1">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[
+          ${ customer.xPath('@age').number() >= 21 }
+        ]]>
+      </conditionExpression>
+    </sequenceFlow>
+
+    <userTask id="task1" />
+
+    <sequenceFlow sourceRef="task1" targetRef="theEnd1" />
+
+    <endEvent id="theEnd1" />
+
+    <sequenceFlow sourceRef="gtw" targetRef="task2">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[
+          ${ customer.xPath('@age').number() < 21 }
+        ]]>
+      </conditionExpression>
+    </sequenceFlow>
+
+    <userTask id="task2" />
+
+    <sequenceFlow sourceRef="task2" targetRef="theEnd2" />
+
+    <endEvent id="theEnd2" />
+
+  </process>
+
+</definitions>

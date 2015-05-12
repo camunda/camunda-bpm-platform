@@ -13,18 +13,17 @@
 package org.camunda.spin.plugin.variable.value.builder;
 
 import org.camunda.bpm.engine.variable.value.SerializationDataFormat;
+import org.camunda.bpm.engine.variable.value.builder.TypedValueBuilder;
 import org.camunda.spin.plugin.variable.value.SpinValue;
 
 /**
  * @author Roman Smirnov
  *
  */
-public interface SpinValueBuilder<T extends SpinValue> {
+public interface SpinValueBuilder<T extends SpinValue> extends TypedValueBuilder<T> {
 
   SpinValueBuilder<T> serializationDataFormat(String dataFormatName);
 
   SpinValueBuilder<T> serializationDataFormat(SerializationDataFormat dataFormat);
-
-  T create();
 
 }

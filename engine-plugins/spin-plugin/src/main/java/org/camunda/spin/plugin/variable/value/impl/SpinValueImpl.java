@@ -30,7 +30,6 @@ public abstract class SpinValueImpl extends AbstractTypedValue<Spin<?>> implemen
 
   private static final long serialVersionUID = 1L;
   protected String serializedValue;
-  protected DataFormat<? extends Spin<?>> dataFormat;
   protected boolean isDeserialized;
   protected String dataFormatName;
 

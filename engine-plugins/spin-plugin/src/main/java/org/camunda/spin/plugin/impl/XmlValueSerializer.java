@@ -42,7 +42,8 @@ public class XmlValueSerializer extends SpinValueSerializer {
   }
 
   protected SpinValue createDeserializedValue(Object deserializedObject, String serializedStringValue, ValueFields valueFields) {
-    return SpinValues.xmlValue((SpinXmlElement) deserializedObject).create();
+    SpinXmlElement value = (SpinXmlElement) deserializedObject;
+    return new XmlValueImpl(value, serializedStringValue, value.getDataFormatName(), true);
   }
 
   protected SpinValue createSerializedValue(String serializedStringValue, ValueFields valueFields) {

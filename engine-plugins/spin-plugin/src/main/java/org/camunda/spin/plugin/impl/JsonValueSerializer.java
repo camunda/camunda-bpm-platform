@@ -42,7 +42,8 @@ public class JsonValueSerializer extends SpinValueSerializer {
   }
 
   protected SpinValue createDeserializedValue(Object deserializedObject, String serializedStringValue, ValueFields valueFields) {
-    return SpinValues.jsonValue((SpinJsonNode) deserializedObject).create();
+    SpinJsonNode value = (SpinJsonNode) deserializedObject;
+    return new JsonValueImpl(value, serializedStringValue, value.getDataFormatName(), true);
   }
 
   protected SpinValue createSerializedValue(String serializedStringValue, ValueFields valueFields) {
