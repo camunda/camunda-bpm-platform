@@ -112,14 +112,16 @@
                       file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql" />
                     <touch
                       file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.old.majorVersion}.${camunda.old.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql" />
+
+                    <!-- patch scripts for old version of the schema - insert all patches for old version here (and down in the 'patch-old-schema' execution) -->
+                    <touch
+                      file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_7.2_patch_7.2.4_to_7.2.5.sql" />
+
                     <!-- concatenated patches for current minor version -->
                     <touch
                       file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql" />
                     <touch
                       file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch.sql" />
-                    <!-- patch scripts -->
-                    <touch
-                      file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_7.2_patch_7.2.4_to_7.2.5.sql" />
 
                   </target>
                 </configuration>
@@ -223,7 +225,7 @@
                 </goals>
                 <configuration>
                   <srcFiles>
-                    <!-- now patch old version of the schema - insert all patches for old version here -->
+                    <!-- now patch old version of the schema - insert all patches for old version here (and up in the 'compile' execution) -->
                     <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_7.2_patch_7.2.4_to_7.2.5.sql</srcFile>
                   </srcFiles>
                 </configuration>
