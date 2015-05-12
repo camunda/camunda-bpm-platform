@@ -9,6 +9,15 @@ module.exports = Table.extend({
   tabLabel: 'Process Instances',
   tableRepeater: 'processInstance in processInstances',
 
+
+  isInstanceSuspended: function(item) {
+    return this.tableItem(item, '.state .badge-suspended')
+      .getAttribute('class')
+      .then(function(classes) {
+        return classes.indexOf('ng-hide') === -1;
+      });
+  },
+
   instanceIdClick: function(item) {
     this.tableItem(item, by.binding('processInstance.id')).click();
   },

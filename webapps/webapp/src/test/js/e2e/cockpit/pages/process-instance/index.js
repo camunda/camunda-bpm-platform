@@ -8,6 +8,7 @@ var TableCalledInstancesPage = require('./tabs/called-process-instances-tab');
 var TableUserTasksPage = require('./tabs/user-tasks-tab');
 var ActionBarPage = require('./instance-runtime-action');
 var AddVariablePage = require('./actions/add-variable');
+var SuspensionPage = require('./actions/suspension');
 var InstanceTreePage = require('./instance-tree');
 
 module.exports = new ProcessInstancePage();
@@ -18,4 +19,5 @@ module.exports.calledInstancesTab = new TableCalledInstancesPage();
 module.exports.userTasksTab = new TableUserTasksPage();
 module.exports.actionBar = new ActionBarPage();
 module.exports.addVariable = new AddVariablePage();
+module.exports.suspension = new SuspensionPage();
 module.exports.instanceTree = new InstanceTreePage();

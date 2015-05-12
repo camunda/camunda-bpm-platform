@@ -37,11 +37,11 @@ module.exports = Base.extend({
   },
 
   isInstanceSuspended: function() {
-    expect(this.suspendedBadge().isDisplayed()).toBeTruthy();
-  },
-
-  isInstanceNotSuspended: function() {
-    expect(this.suspendedBadge().isDisplayed()).toBeFalsy();
+    return element(by.css('.ctn-header .badge'))
+      .getAttribute('class')
+      .then(function(classes) {
+        return classes.indexOf('ng-hide') === -1;
+      });
   }
 
 });
