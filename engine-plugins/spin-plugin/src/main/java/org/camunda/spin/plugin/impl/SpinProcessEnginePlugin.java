@@ -71,9 +71,12 @@ public class SpinProcessEnginePlugin extends AbstractProcessEnginePlugin {
     for (DataFormat<?> dataFormat : availableDataFormats) {
       serializers.add(new SpinObjectValueSerializer("spin://"+dataFormat.getName(), dataFormat));
     }
-
-    serializers.add(new JsonValueSerializer());
-    serializers.add(new XmlValueSerializer());
+    if(DataFormats.json() != null) {
+      serializers.add(new JsonValueSerializer());
+    }
+    if(DataFormats.xml() != null){
+      serializers.add(new XmlValueSerializer());
+    }
 
     return serializers;
   }
