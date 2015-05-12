@@ -21,6 +21,7 @@ import java.util.List;
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.filter.Filter;
+import org.camunda.bpm.engine.filter.FilterQuery;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.Direction;
@@ -613,6 +614,84 @@ public class FilterTaskQueryTest extends PluggableProcessEngineTestCase {
 
     tasks = filterService.list(filter.getId(), extendingQuery);
     assertEquals(2, tasks.size());
+  }
+
+  public void testExtendTaskQueryWithCandidateUserExpressionAndIncludeAssignedTasks() {
+    // create an empty query and save it as a filter
+    TaskQuery emptyQuery = taskService.createTaskQuery();
+    Filter emptyFilter = filterService.newTaskFilter("empty");
+    emptyFilter.setQuery(emptyQuery);
+
+    // create a query with candidate user expression and include assigned tasks
+    // and save it as filter
+    TaskQuery query = taskService.createTaskQuery();
+    query.taskCandidateUserExpression("${'test'}").includeAssignedTasks();
+    Filter filter = filterService.newTaskFilter("filter");
+    filter.setQuery(query);
+
+    // extend empty query by query with candidate user expression and include assigned tasks
+    Filter extendedFilter = emptyFilter.extend(query);
+    TaskQueryImpl extendedQuery = extendedFilter.getQuery();
+    assertEquals("${'test'}", extendedQuery.getExpressions().get("taskCandidateUser"));
+    assertTrue(extendedQuery.isIncludeAssignedTasks());
+
+    // extend query with candidate user expression and include assigned tasks with empty query
+    extendedFilter = filter.extend(emptyQuery);
+    extendedQuery = extendedFilter.getQuery();
+    assertEquals("${'test'}", extendedQuery.getExpressions().get("taskCandidateUser"));
+    assertTrue(extendedQuery.isIncludeAssignedTasks());
+  }
+
+  public void testExtendTaskQueryWithCandidateGroupExpressionAndIncludeAssignedTasks() {
+    // create an empty query and save it as a filter
+    TaskQuery emptyQuery = taskService.createTaskQuery();
+    Filter emptyFilter = filterService.newTaskFilter("empty");
+    emptyFilter.setQuery(emptyQuery);
+
+    // create a query with candidate group expression and include assigned tasks
+    // and save it as filter
+    TaskQuery query = taskService.createTaskQuery();
+    query.taskCandidateGroupExpression("${'test'}").includeAssignedTasks();
+    Filter filter = filterService.newTaskFilter("filter");
+    filter.setQuery(query);
+
+    // extend empty query by query with candidate group expression and include assigned tasks
+    Filter extendedFilter = emptyFilter.extend(query);
+    TaskQueryImpl extendedQuery = extendedFilter.getQuery();
+    assertEquals("${'test'}", extendedQuery.getExpressions().get("taskCandidateGroup"));
+    assertTrue(extendedQuery.isIncludeAssignedTasks());
+
+    // extend query with candidate group expression and include assigned tasks with empty query
+    extendedFilter = filter.extend(emptyQuery);
+    extendedQuery = extendedFilter.getQuery();
+    assertEquals("${'test'}", extendedQuery.getExpressions().get("taskCandidateGroup"));
+    assertTrue(extendedQuery.isIncludeAssignedTasks());
+  }
+
+  public void testExtendTaskQueryWithCandidateGroupInExpressionAndIncludeAssignedTasks() {
+    // create an empty query and save it as a filter
+    TaskQuery emptyQuery = taskService.createTaskQuery();
+    Filter emptyFilter = filterService.newTaskFilter("empty");
+    emptyFilter.setQuery(emptyQuery);
+
+    // create a query with candidate group in expression and include assigned tasks
+    // and save it as filter
+    TaskQuery query = taskService.createTaskQuery();
+    query.taskCandidateGroupInExpression("${'test'}").includeAssignedTasks();
+    Filter filter = filterService.newTaskFilter("filter");
+    filter.setQuery(query);
+
+    // extend empty query by query with candidate group in expression and include assigned tasks
+    Filter extendedFilter = emptyFilter.extend(query);
+    TaskQueryImpl extendedQuery = extendedFilter.getQuery();
+    assertEquals("${'test'}", extendedQuery.getExpressions().get("taskCandidateGroupIn"));
+    assertTrue(extendedQuery.isIncludeAssignedTasks());
+
+    // extend query with candidate group in expression and include assigned tasks with empty query
+    extendedFilter = filter.extend(emptyQuery);
+    extendedQuery = extendedFilter.getQuery();
+    assertEquals("${'test'}", extendedQuery.getExpressions().get("taskCandidateGroupIn"));
+    assertTrue(extendedQuery.isIncludeAssignedTasks());
   }
 
   public void testExecuteTaskQueryListPage() {

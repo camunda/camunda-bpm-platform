@@ -1222,10 +1222,6 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
       extendedQuery.taskCandidateGroupIn(this.getCandidateGroupsInternal());
     }
 
-    if (extendingQuery.isIncludeAssignedTasks() || this.isIncludeAssignedTasks()) {
-      extendedQuery.includeAssignedTasks();
-    }
-
     if (extendingQuery.getProcessInstanceId() != null) {
       extendedQuery.processInstanceId(extendingQuery.getProcessInstanceId());
     }
@@ -1509,6 +1505,12 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
     // merge expressions
     mergeExpressions(extendedQuery, extendingQuery);
+
+    // include assigned tasks has to be set after expression as it asserts on already set
+    // candidate properties which could be expressions
+    if (extendingQuery.isIncludeAssignedTasks() || this.isIncludeAssignedTasks()) {
+      extendedQuery.includeAssignedTasks();
+    }
 
     mergeOrdering(extendedQuery, extendingQuery);
 
