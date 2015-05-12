@@ -1,4 +1,4 @@
-td {
+.authorizations td {
   &.authorization-type {
     min-width: 120px;
     max-width: 160px;
@@ -31,5 +31,43 @@ td {
 
   &.action {
     min-width: 90px;
+  }
+}
+
+
+.sidebar-nav {
+  &.well {
+    border: none;
+    padding: (@grid-gutter-width / 4) 0;
+    .box-shadow(none);
+  }
+  li {
+    margin: 0;
+    padding: (@grid-gutter-width / 4) (@grid-gutter-width / 2);
+    position: relative;
+    font-size: 1.25em;
+    a {
+      margin: 0;
+      padding: 0;
+      &:hover {
+        background: none;
+      }
+    }
+    &.active {
+      background-color: @gray-lighter;
+      &:after {
+        border-bottom: (@grid-gutter-width / 3) solid transparent;
+        border-right: (@grid-gutter-width / 3) solid @body-bg;
+        border-top: (@grid-gutter-width / 3) solid transparent;
+        content: ' ';
+        display: block;
+        height: 0px;
+        margin-top: -(@grid-gutter-width / 3);
+        position: absolute;
+        right: 0;
+        top: 50%;
+        width: 0px;
+      }
+    }
   }
 }
