@@ -101,9 +101,6 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     thread1.makeContinue();
     assertNull(thread1.getException());
 
-    Task afterMessageTask = taskService.createTaskQuery().singleResult();
-    assertEquals(afterMessageTask.getTaskDefinitionKey(), "afterMessageUserTask");
-
     // thread 2 can't continue because the event subscription it tried to lock was deleted
     thread2.waitForSync();
     assertTrue(thread2.getException() != null);
@@ -114,6 +111,10 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     // the first thread ended successfully without an exception
     thread1.join();
     assertNull(thread1.getException());
+
+    // the follow-up task was reached
+    Task afterMessageTask = taskService.createTaskQuery().singleResult();
+    assertEquals(afterMessageTask.getTaskDefinitionKey(), "afterMessageUserTask");
 
     // the service task was not executed a second time
     assertEquals(1, InvocationLogListener.getInvocations());
