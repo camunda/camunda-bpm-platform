@@ -123,11 +123,6 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     assertEquals(1, InvocationLogListener.getInvocations());
   }
 
-  static {
-    LogFactory.useJdkLogging();
-    LogUtil.readJavaUtilLoggingConfigFromClasspath();
-  }
-
   @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingMessageCorrelationTest.catchMessageProcess.bpmn20.xml")
   public void testConcurrentExclusiveCorrelationToDifferentExecutions() throws InterruptedException {
     InvocationLogListener.reset();
