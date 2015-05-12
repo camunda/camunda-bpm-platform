@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns="urn:maven:assembly:1.1.2">
+  
+  <id>artifacts</id>
+  
+  <formats>
+    <format>zip</format>
+    <format>tar.gz</format>
+  </formats>
+
+  <includeBaseDirectory>false</includeBaseDirectory>
+  
+  <fileSets>
+    <fileSet>
+      <directory>${project.build.directory}/sql</directory>
+      <outputDirectory>/camunda-sql-scripts-${project.version}/</outputDirectory>
+    </fileSet>     
+  </fileSets>
+  
+</assembly>
