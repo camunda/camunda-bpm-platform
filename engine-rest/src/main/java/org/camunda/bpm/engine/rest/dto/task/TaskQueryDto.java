@@ -1240,6 +1240,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     dto.processInstanceBusinessKey = taskQuery.getProcessInstanceBusinessKey();
     dto.processInstanceBusinessKeyLike = taskQuery.getProcessInstanceBusinessKeyLike();
     dto.processDefinitionKey = taskQuery.getProcessDefinitionKey();
+    dto.processDefinitionKeyIn = taskQuery.getProcessDefinitionKeys();
     dto.processDefinitionId = taskQuery.getProcessDefinitionId();
     dto.executionId = taskQuery.getExecutionId();
     dto.activityInstanceIdIn = taskQuery.getActivityInstanceIdIn();
@@ -1249,6 +1250,7 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     dto.assignee = taskQuery.getAssignee();
     dto.assigneeLike = taskQuery.getAssigneeLike();
     dto.taskDefinitionKey = taskQuery.getKey();
+    dto.taskDefinitionKeyIn = taskQuery.getKeys();
     dto.taskDefinitionKeyLike = taskQuery.getKeyLike();
     dto.description = taskQuery.getDescription();
     dto.descriptionLike = taskQuery.getDescriptionLike();

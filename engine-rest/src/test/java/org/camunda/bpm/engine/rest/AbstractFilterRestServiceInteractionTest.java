@@ -46,8 +46,8 @@ import static org.camunda.bpm.engine.rest.helper.MockProvider.mockVariableInstan
 import static org.camunda.bpm.engine.rest.helper.TaskQueryMatcher.hasName;
 import static org.camunda.bpm.engine.variable.Variables.stringValue;
 import static org.fest.assertions.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.notNullValue;
@@ -71,6 +71,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response.Status;
 
@@ -85,12 +86,10 @@ import org.camunda.bpm.engine.filter.FilterQuery;
 import org.camunda.bpm.engine.impl.AuthorizationServiceImpl;
 import org.camunda.bpm.engine.impl.IdentityServiceImpl;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
-import org.camunda.bpm.engine.impl.core.variable.type.ObjectTypeImpl;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.persistence.entity.FilterEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.query.Query;
-import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
@@ -99,8 +98,6 @@ import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
-import org.camunda.bpm.engine.variable.type.PrimitiveValueType;
-import org.camunda.bpm.engine.variable.type.SerializableValueType;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.junit.Before;
@@ -158,7 +155,7 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
     when(filterServiceMock.getFilter(eq(EXAMPLE_FILTER_ID))).thenReturn(filterMock);
     when(filterServiceMock.getFilter(eq(MockProvider.NON_EXISTING_ID))).thenReturn(null);
 
-    List mockTasks = Collections.singletonList(new TaskEntity());
+    List<Object> mockTasks = Collections.<Object>singletonList(new TaskEntity());
 
     when(filterServiceMock.singleResult(eq(EXAMPLE_FILTER_ID)))
       .thenReturn(mockTasks.get(0));
@@ -259,12 +256,14 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
     when(query.getProcessInstanceBusinessKey()).thenReturn(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY);
     when(query.getProcessInstanceBusinessKeyLike()).thenReturn(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY_LIKE);
     when(query.getProcessDefinitionKey()).thenReturn(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
+    when(query.getProcessDefinitionKeys()).thenReturn(new String[]{MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY});
     when(query.getProcessDefinitionId()).thenReturn(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
     when(query.getExecutionId()).thenReturn(MockProvider.EXAMPLE_EXECUTION_ID);
     when(query.getProcessDefinitionName()).thenReturn(MockProvider.EXAMPLE_PROCESS_DEFINITION_NAME);
     when(query.getProcessDefinitionNameLike()).thenReturn(MockProvider.EXAMPLE_PROCESS_DEFINITION_NAME_LIKE);
     when(query.getProcessInstanceId()).thenReturn(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
     when(query.getKey()).thenReturn(MockProvider.EXAMPLE_TASK_DEFINITION_KEY);
+    when(query.getKeys()).thenReturn(new String[]{MockProvider.EXAMPLE_TASK_DEFINITION_KEY, MockProvider.EXAMPLE_TASK_DEFINITION_KEY});
     when(query.getKeyLike()).thenReturn(MockProvider.EXAMPLE_TASK_DEFINITION_KEY);
     when(query.getDescription()).thenReturn(MockProvider.EXAMPLE_TASK_DESCRIPTION);
     when(query.getDescriptionLike()).thenReturn(MockProvider.EXAMPLE_TASK_DESCRIPTION);
@@ -299,12 +298,14 @@ public abstract class AbstractFilterRestServiceInteractionTest extends AbstractR
       .body("query.processInstanceBusinessKey", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY))
       .body("query.processInstanceBusinessKeyLike", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY_LIKE))
       .body("query.processDefinitionKey", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY))
+      .body("query.processDefinitionKeyIn", hasItems(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY))
       .body("query.processDefinitionId", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
       .body("query.executionId", equalTo(MockProvider.EXAMPLE_EXECUTION_ID))
       .body("query.processDefinitionName", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_NAME))
       .body("query.processDefinitionNameLike", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_NAME_LIKE))
       .body("query.processInstanceId", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
       .body("query.taskDefinitionKey", equalTo(MockProvider.EXAMPLE_TASK_DEFINITION_KEY))
+      .body("query.taskDefinitionKeyIn", hasItems(MockProvider.EXAMPLE_TASK_DEFINITION_KEY, MockProvider.EXAMPLE_TASK_DEFINITION_KEY))
       .body("query.taskDefinitionKeyLike", equalTo(MockProvider.EXAMPLE_TASK_DEFINITION_KEY))
       .body("query.description", equalTo(MockProvider.EXAMPLE_TASK_DESCRIPTION))
       .body("query.descriptionLike", equalTo(MockProvider.EXAMPLE_TASK_DESCRIPTION))
