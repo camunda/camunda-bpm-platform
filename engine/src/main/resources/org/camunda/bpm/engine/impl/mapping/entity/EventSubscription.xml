@@ -143,7 +143,7 @@
     select *
     from ${prefix}ACT_RU_EVENT_SUBSCR 
     <if test="parameter.lockResult">
-      with (XLOCK, ROWLOCK)
+      with (UPDLOCK, ROWLOCK)
     </if>
     where (EVENT_TYPE_ = #{parameter.eventType})
       and (EXECUTION_ID_ = #{parameter.executionId})
@@ -186,7 +186,7 @@
     select *
     from ${prefix}ACT_RU_EVENT_SUBSCR
     <if test="parameter.lockResult">
-      with (XLOCK, ROWLOCK)
+      with (UPDLOCK, ROWLOCK)
     </if>
     where (EVENT_TYPE_ = #{parameter.eventType})
       and (EVENT_NAME_ = #{parameter.eventName})

@@ -14,12 +14,15 @@ package org.camunda.bpm.engine.test.concurrency;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.ibatis.logging.LogFactory;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.MessageCorrelationBuilderImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.util.LogUtil;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 
@@ -118,6 +121,106 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
 
     // the service task was not executed a second time
     assertEquals(1, InvocationLogListener.getInvocations());
+  }
+
+  static {
+    LogFactory.useJdkLogging();
+    LogUtil.readJavaUtilLoggingConfigFromClasspath();
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingMessageCorrelationTest.catchMessageProcess.bpmn20.xml")
+  public void testConcurrentExclusiveCorrelationToDifferentExecutions() throws InterruptedException {
+    InvocationLogListener.reset();
+
+    // given a process instance
+    ProcessInstance instance1 = runtimeService.startProcessInstanceByKey("testProcess");
+    ProcessInstance instance2 = runtimeService.startProcessInstanceByKey("testProcess");
+
+    // and two threads correlating in parallel to each of the two instances
+    ThreadControl thread1 = executeControllableCommand(new ControllableMessageCorrelationCommand("Message", instance1.getId(), true));
+    thread1.reportInterrupts();
+    ThreadControl thread2 = executeControllableCommand(new ControllableMessageCorrelationCommand("Message", instance2.getId(), true));
+    thread2.reportInterrupts();
+
+    // both threads open a transaction and wait before correlating the message
+    thread1.waitForSync();
+    thread2.waitForSync();
+
+    // thread one correlates and acquires the exclusive lock on the event subscription of instance1
+    thread1.makeContinue();
+    thread1.waitForSync();
+
+    // the service task was executed once
+    assertEquals(1, InvocationLogListener.getInvocations());
+
+    // thread two correlates and acquires the exclusive lock on the event subscription of instance2
+    // depending on the database and locking used, this may block thread2
+    thread2.makeContinue();
+
+    // thread 1 completes successfully
+    thread1.waitUntilDone();
+    assertNull(thread1.getException());
+
+    // thread2 should be able to continue at least after thread1 has finished and released its lock
+    thread2.waitForSync();
+
+    // the service task was executed the second time
+    assertEquals(2, InvocationLogListener.getInvocations());
+
+    // thread 2 completes successfully
+    thread2.waitUntilDone();
+    assertNull(thread2.getException());
+
+    // the follow-up task was reached in both instances
+    assertEquals(2, taskService.createTaskQuery().taskDefinitionKey("afterMessageUserTask").count());
+  }
+
+  /**
+   * Fails at least on mssql; mssql appears to lock more than the actual event subscription row
+   */
+  @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingMessageCorrelationTest.catchMessageProcess.bpmn20.xml")
+  public void FAILING_testConcurrentExclusiveCorrelationToDifferentExecutionsCase2() throws InterruptedException {
+    InvocationLogListener.reset();
+
+    // given a process instance
+    ProcessInstance instance1 = runtimeService.startProcessInstanceByKey("testProcess");
+    ProcessInstance instance2 = runtimeService.startProcessInstanceByKey("testProcess");
+
+    // and two threads correlating in parallel to each of the two instances
+    ThreadControl thread1 = executeControllableCommand(new ControllableMessageCorrelationCommand("Message", instance1.getId(), true));
+    thread1.reportInterrupts();
+    ThreadControl thread2 = executeControllableCommand(new ControllableMessageCorrelationCommand("Message", instance2.getId(), true));
+    thread2.reportInterrupts();
+
+    // both threads open a transaction and wait before correlating the message
+    thread1.waitForSync();
+    thread2.waitForSync();
+
+    // thread one correlates and acquires the exclusive lock on the event subscription of instance1
+    thread1.makeContinue();
+    thread1.waitForSync();
+
+    // the service task was executed once
+    assertEquals(1, InvocationLogListener.getInvocations());
+
+    // thread two correlates and acquires the exclusive lock on the event subscription of instance2
+    thread2.makeContinue();
+    // FIXME: this does not return on sql server due to locking
+    thread2.waitForSync();
+
+    // the service task was executed the second time
+    assertEquals(2, InvocationLogListener.getInvocations());
+
+    // thread 2 completes successfully, even though it acquired its lock after thread 1
+    thread2.waitUntilDone();
+    assertNull(thread2.getException());
+
+    // thread 1 completes successfully
+    thread1.waitUntilDone();
+    assertNull(thread1.getException());
+
+    // the follow-up task was reached in both instances
+    assertEquals(2, taskService.createTaskQuery().taskDefinitionKey("afterMessageUserTask").count());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingMessageCorrelationTest.catchMessageProcess.bpmn20.xml")
@@ -241,23 +344,32 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
 
     protected String messageName;
     protected boolean exclusive;
+    protected String processInstanceId;
 
     public ControllableMessageCorrelationCommand(String messageName, boolean exclusive) {
       this.messageName = messageName;
       this.exclusive = exclusive;
     }
 
+    public ControllableMessageCorrelationCommand(String messageName, String processInstanceId, boolean exclusive) {
+      this(messageName, exclusive);
+      this.processInstanceId = processInstanceId;
+    }
+
     public Void execute(CommandContext commandContext) {
 
       monitor.sync();  // thread will block here until makeContinue() is called form main thread
 
+      MessageCorrelationBuilderImpl correlationBuilder = new MessageCorrelationBuilderImpl(commandContext, messageName);
+      if (processInstanceId != null) {
+        correlationBuilder.processInstanceId(processInstanceId);
+      }
+
       if (exclusive) {
-        new MessageCorrelationBuilderImpl(commandContext, messageName)
-          .correlateExclusively();
+        correlationBuilder.correlateExclusively();
       }
       else {
-        new MessageCorrelationBuilderImpl(commandContext, messageName)
-          .correlate();
+        correlationBuilder.correlate();
       }
 
       monitor.sync();  // thread will block here until waitUntilDone() is called form main thread
