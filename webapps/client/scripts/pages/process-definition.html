@@ -40,12 +40,59 @@
 
       <div class="filters"
            ng-controller="ProcessDefinitionFilterController">
+        <div class="version-filter filter">
+          <span class="name">
+            Version
+          </span>
+          <span ng-if="!instanceStatistics.$loaded"
+                class="glyphicon glyphicon-refresh animate-spin"></span>
+
+          <div class="btn-group dropdown"
+               ng-if="instanceStatistics.$loaded && filterData.allDefinitions.length > 1">
+            <button class="btn btn-default dropdown-toggle"
+                    data-toggle="dropdown">
+              {{ processDefinition.version }} <span class="caret"></span>
+            </button>
+
+            <ul class="dropdown-menu">
+              <li ng-repeat="definition in filterData.allDefinitions">
+                <a ng-href="#/process-definition/{{ definition.id }}">
+                  {{ definition.version }}
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <span ng-if="instanceStatistics.$loaded && filterData.allDefinitions.length < 2">
+            {{ filterData.allDefinitions.length }}
+          </span>
+        </div>
+
+
+        <div class="process-instances">
+          <label>Running Instances</label>
+          <ul ng-if="instanceStatistics.$loaded">
+            <li>
+              of the selected version:
+              <label>{{ instanceStatistics.current.count }}</label>
+            </li>
+
+            <li>
+              of all versions:
+              <label>{{ instanceStatistics.all.count }}</label>
+            </li>
+          </ul>
+          <span ng-if="!instanceStatistics.$loaded"
+                class="glyphicon glyphicon-refresh animate-spin"></span>
+        </div>
+
+
         <h5>
           Filter
           <div class="btn-group btn-control dropdown">
-            <button class="btn btn-default btn-xs dropdown-toggle"
+            <button class="btn btn-link dropdown-toggle"
                     data-toggle="dropdown">
-              <span class="glyphicon glyphicon-plus"></span>
+              <span class="glyphicon glyphicon-plus-sign"></span>
             </button>
 
             <ul class="dropdown-menu">
@@ -71,32 +118,11 @@
           </div>
         </h5>
 
+
         <form name="filterForm"
               novalidate
               ng-submit="filterChanged()">
           <ul class="list-unstyled">
-
-            <li class="version-filter filter">
-              <span class="name">
-                Version
-              </span>
-
-              <div class="btn-group dropdown">
-                <button class="btn btn-default btn-xs dropdown-toggle"
-                        data-toggle="dropdown">
-                  {{ processDefinition.version }} <span class="caret"></span>
-                </button>
-
-                <ul class="dropdown-menu">
-                  <li ng-repeat="definition in filterData.allDefinitions">
-                    <a ng-href="#/process-definition/{{ definition.id }}">
-                      {{ definition.version }}
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </li>
-
             <li class="parent-filter filter" ng-if="filterData.parent">
               <div class="name">
                 Parent
@@ -191,11 +217,11 @@
                 </div>
               </div>
 
-              <button class="btn btn-default btn-xs pull-right"
-                      ng-click="addStartDateFilter()"
-                      ng-disabled="filterData.start.length === 2">
-                <span class="glyphicon glyphicon-plus"></span>
-              </button>
+              <a class="glyphicon glyphicon-plus-sign pull-right"
+                 tooltip="Add a start date filter"
+                 tooltip-placement="right"
+                 ng-click="addStartDateFilter()"
+                 ng-if="filterData.start.length < 2"></a>
             </li>
 
             <li class="variable-filter filter"
@@ -204,8 +230,9 @@
                 Variables
                 <a href
                    ng-click="toggleVariableFilterHelp()"
-                   title="Get help on variable filters">
-                    <span class="glyphicon glyphicon-question-sign"></span>
+                   tooltip-placement="right"
+                   tooltip="Get help on variable filters">
+                  <span class="glyphicon glyphicon-question-sign"></span>
                 </a>
               </div>
 
@@ -241,20 +268,19 @@
                 </div>
               </div>
 
-              <button class="btn btn-default btn-xs pull-right"
-                      ng-click="addVariableFilter()">
-                <span class="glyphicon glyphicon-plus"></span>
-              </button>
+              <a tooltip="Add a variable filter"
+                 tooltip-placement="right"
+                 class="pull-right glyphicon glyphicon-plus-sign"
+                 ng-click="addVariableFilter()">
+              </a>
 
               <div class="note"
                    ng-show="showVariableFilterHelp">
-                <div class="name">
+                <h5>
                   Variable filter syntax
-                  <a href
-                     ng-click="toggleVariableFilterHelp()">
-                    hide
-                  </a>
-                </div>
+                  <a ng-click="toggleVariableFilterHelp()">hide</a>
+                </h5>
+
                 <div>
                   Filters on variables must be specified as
                   <code>variableName OPERATOR value</code> where <code>OPERATOR</code> may be any of
@@ -262,6 +288,7 @@
                     <span ng-show="$index > 0">, </span>
                     <code>{{ op }}</code>
                   </span>.
+                  <br/>
                   All variable filters are applied using the logical <code>AND</code>.
                   Strings must be properly enclosed in <code>""</code>.
                   <br/>
@@ -293,26 +320,8 @@
 
         <div class="footer"
              ng-show="filterChanged.$loading">
-          <span>
-            <span class="glyphicon glyphicon-loading"></span>
-            refreshing...
-          </span>
+          <span class="glyphicon glyphicon-refresh animate-spin"></span> refreshing…
         </div>
-      </div>
-
-      <div>
-        <strong>Running Instances</strong>
-        <ul ng-show="instanceStatistics.$loaded">
-          <li>
-            <strong>Selected Version</strong> {{ instanceStatistics.current.count }}
-          </li>
-
-          <li>
-            <strong>All Versions</strong> {{ instanceStatistics.all.count }}
-          </li>
-        </ul>
-        <span ng-hide="instanceStatistics.$loaded"
-           class="glyphicon glyphicon-loading"></span>
       </div>
 
       <a class="hide-collapsable pull-right"></a>

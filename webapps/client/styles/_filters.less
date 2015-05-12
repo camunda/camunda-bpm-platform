@@ -22,9 +22,17 @@
     min-width: 50px;
   }
 
+  .pull-right.glyphicon-plus-sign {
+    top: 3px;
+    margin-right: 5px;
+  }
+
   .note {
     line-height: 1.5em;
     margin-bottom: 10px;
+    h5 {
+      margin-top: 8px;
+    }
   }
 
   .note-small {
@@ -40,7 +48,7 @@
     color: inherit;
     font-size: inherit;
     white-space: normal;
-    background-color: mix(@gray-light, @gray-lighter);
+    background-color: transparent;//mix(@gray-light, @gray-lighter);
     border: none;
     border-radius: 0;
   }
@@ -53,7 +61,7 @@
 
 .filter {
   line-height: 25px;
-  padding: 5px 0;
+  padding: 5px 0 8px 0;
   border-bottom: dotted 1px @filters-color;
   overflow: visible;
 
@@ -64,9 +72,15 @@
   }
 
   .search-date {
+    display: table;
     overflow: hidden;
+    .removable-input,
     select {
-      width: 80px;
+      display: table-cell;
+    }
+    select {
+      width: 90px;
+      border-right: none;
     }
   }
 
