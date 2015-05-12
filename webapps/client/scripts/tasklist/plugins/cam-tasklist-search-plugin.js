@@ -9,6 +9,8 @@ define([
 ) {
   'use strict';
 
+  var searchConfig = JSON.parse(searchConfigJSON);
+
   var parseValue = function(value) {
     if(!isNaN(value) && value.trim() !== '') {
       // value must be transformed to number
@@ -44,8 +46,6 @@ define([
     $translate
   ) {
 
-    var searchConfig = JSON.parse(searchConfigJSON);
-
     $scope.searches = [];
     $scope.translations = {};
 
@@ -79,7 +79,7 @@ define([
 
       angular.forEach($scope.searches, function(search) {
         query[search.type.value.key].push({
-          name: search.name.value,
+          name: typeof search.name.value === 'object' ? search.name.value.key : search.name.value,
           operator: search.operator.value.key,
           value: sanitizeValue(parseValue(search.value.value), search.operator.value.key)
         });
@@ -87,6 +87,25 @@ define([
 
       searchData.set('searchQuery', query);
     }, true);
+
+    searchData.observe('currentFilter', function(filter) {
+      angular.forEach($scope.types, function(ea) {
+        ea.potentialNames = [];
+        for(var i = 0; i < filter.properties.variables.length; i++) {
+          var v = filter.properties.variables[i];
+          ea.potentialNames.push({
+            key: v.name,
+            value: v.label+' ('+v.name+')'
+          });
+        }
+      });
+
+      angular.forEach($scope.searches, function(ea) {
+        ea.potentialNames = $scope.types.filter(function(type) {
+          return type.key === ea.type.value.key;
+        })[0].potentialNames;
+      });
+    });
 
   }];
 
