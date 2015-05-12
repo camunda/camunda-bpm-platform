@@ -48,7 +48,10 @@ public interface TransitionInstance extends ProcessElementInstance {
   String getExecutionId();
 
   /**
-   * returns the type of the activity a transition is made from/to
+   * returns the type of the activity a transition is made from/to.
+   * Corresponds to BPMN element name in XML (e.g. 'userTask').
+   * The type of the root activity instance (the one corresponding to the process instance)
+   * is 'processDefinition'.
    */
   String getActivityType();
 

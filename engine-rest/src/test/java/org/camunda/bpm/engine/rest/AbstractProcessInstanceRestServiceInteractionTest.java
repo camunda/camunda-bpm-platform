@@ -124,18 +124,21 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
         .body("processDefinitionId", equalTo(EXAMPLE_PROCESS_DEFINITION_ID))
         .body("executionIds", not(empty()))
         .body("executionIds[0]", equalTo(EXAMPLE_EXECUTION_ID))
+        .body("activityName", equalTo(EXAMPLE_ACTIVITY_NAME))
+        // "name" is deprecated and there for legacy reasons
         .body("name", equalTo(EXAMPLE_ACTIVITY_NAME))
         .body("childActivityInstances", not(empty()))
         .body("childActivityInstances[0].id", equalTo(CHILD_EXAMPLE_ACTIVITY_INSTANCE_ID))
         .body("childActivityInstances[0].parentActivityInstanceId", equalTo(CHILD_EXAMPLE_PARENT_ACTIVITY_INSTANCE_ID))
         .body("childActivityInstances[0].activityId", equalTo(CHILD_EXAMPLE_ACTIVITY_ID))
         .body("childActivityInstances[0].activityType", equalTo(CHILD_EXAMPLE_ACTIVITY_TYPE))
+        .body("childActivityInstances[0].activityName", equalTo(CHILD_EXAMPLE_ACTIVITY_NAME))
+        .body("childActivityInstances[0].name", equalTo(CHILD_EXAMPLE_ACTIVITY_NAME))
         .body("childActivityInstances[0].processInstanceId", equalTo(CHILD_EXAMPLE_PROCESS_INSTANCE_ID))
         .body("childActivityInstances[0].processDefinitionId", equalTo(CHILD_EXAMPLE_PROCESS_DEFINITION_ID))
         .body("childActivityInstances[0].executionIds", not(empty()))
         .body("childActivityInstances[0].childActivityInstances", empty())
         .body("childActivityInstances[0].childTransitionInstances", empty())
-        .body("childActivityInstances[0].name", equalTo(CHILD_EXAMPLE_ACTIVITY_NAME))
         .body("childTransitionInstances", not(empty()))
         .body("childTransitionInstances[0].id", equalTo(CHILD_EXAMPLE_ACTIVITY_INSTANCE_ID))
         .body("childTransitionInstances[0].parentActivityInstanceId", equalTo(CHILD_EXAMPLE_PARENT_ACTIVITY_INSTANCE_ID))
@@ -148,7 +151,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
         .body("childTransitionInstances[0].executionId", equalTo(EXAMPLE_EXECUTION_ID))
         .when().get(PROCESS_INSTANCE_ACTIVIY_INSTANCES_URL);
 
-    Assert.assertEquals("Should return right number of properties", 10, response.jsonPath().getMap("").size());
+    Assert.assertEquals("Should return right number of properties", 11, response.jsonPath().getMap("").size());
   }
 
   @Test

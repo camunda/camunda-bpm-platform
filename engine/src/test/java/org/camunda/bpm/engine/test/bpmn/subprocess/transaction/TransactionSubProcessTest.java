@@ -84,11 +84,8 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTestCase {
 
   }
 
-  /**
-   * CAM-3589
-   */
   @Deployment(resources={"org/camunda/bpm/engine/test/bpmn/subprocess/transaction/TransactionSubProcessTest.testSimpleCase.bpmn20.xml"})
-  public void FAILING_testActivityInstanceTreeAfterSuccessfulCompletion() {
+  public void testActivityInstanceTreeAfterSuccessfulCompletion() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("transactionProcess");
 
     // the tx task is present
