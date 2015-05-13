@@ -151,4 +151,15 @@ describe('Tasklist Search', function() {
     });
 
   });
+
+  describe('search by label', function() {
+    it('should find tasks by label', function() {
+      // when
+      page.taskList.taskSearch.createSearch('Task Variable', 'Test Variable', '=', '42');
+
+      //then
+      expect(page.taskList.taskList().count()).to.eventually.eql(1);
+      expect(page.taskList.taskName(0)).to.eventually.eql('Task 1');
+    });
+  });
 });

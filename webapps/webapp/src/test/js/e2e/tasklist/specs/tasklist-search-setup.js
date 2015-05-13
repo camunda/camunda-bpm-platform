@@ -8,7 +8,13 @@ ops.filter = {
   create: [{
     name:         'All',
     query: {},
-    resourceType: 'Task'
+    resourceType: 'Task',
+    properties: {
+      variables: [
+        {name: 'testVar', label: 'Test Variable'},
+        {name: 'testString', label:'String Variable'}
+      ]
+    }
   }]
 };
 

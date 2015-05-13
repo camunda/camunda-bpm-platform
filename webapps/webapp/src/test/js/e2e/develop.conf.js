@@ -45,7 +45,8 @@ exports.config = {
     'cockpit/specs/process-definition-filter-spec.js',
     'cockpit/specs/suspension-spec.js',
     'tasklist/specs/tasklist-task-spec.js',
-    'tasklist/specs/tasklist-sorting-spec.js'
+    'tasklist/specs/tasklist-sorting-spec.js',
+    'tasklist/specs/tasklist-search-spec.js'
   ],
 
   // A base URL for your application under test. Calls to protractor.get()
