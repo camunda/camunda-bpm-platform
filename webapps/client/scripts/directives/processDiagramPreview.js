@@ -1,10 +1,13 @@
-define(['text!./processDiagramPreview.html'], function(template) {
+define(['text!./processDiagramPreview.html', 'angular'], function(template, angular) {
   'use strict';
 
-  return ['ProcessDefinitionResource', function (ProcessDefinitionResource) {
+  return ['ProcessDefinitionResource', 'debounce', function (ProcessDefinitionResource, debounce) {
     return {
       restrict: 'EAC',
       template: template,
+      controller: ['$scope', function($scope) {
+        $scope.control = {};
+      }],
       link: function(scope, element, attrs) {
         scope.$watch(attrs.processDefinitionId, function(processDefinitionId) {
           if (processDefinitionId) {
@@ -17,6 +20,21 @@ define(['text!./processDiagramPreview.html'], function(template) {
               element.find('[cam-widget-bpmn-viewer]').css({
                 width : parseInt(element.parent().width(), 10),
                 height : element.parent().height(),
+              });
+
+              var debouncedZoom = debounce(function() {
+                // Zoom is only correct after resetting twice.
+                // See: https://github.com/bpmn-io/diagram-js/issues/85
+
+                scope.control.resetZoom();
+                scope.control.resetZoom();
+              }, 500);
+              angular.element(window).on('resize', function() {
+                element.find('[cam-widget-bpmn-viewer]').css({
+                  width : parseInt(element.parent().width(), 10),
+                  height : element.parent().height(),
+                });
+                debouncedZoom();
               });
 
             });
