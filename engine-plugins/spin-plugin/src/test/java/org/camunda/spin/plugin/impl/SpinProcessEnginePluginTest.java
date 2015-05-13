@@ -32,7 +32,7 @@ public class SpinProcessEnginePluginTest extends PluggableProcessEngineTestCase 
 
   public void testPluginDoesNotRegisterXmlSerializerIfNotPresentInClasspath() throws IOException {
     ClassLoader mockClassloader = Mockito.mock(ClassLoader.class);
-    Mockito.when(mockClassloader.getResources(Mockito.anyString())).thenReturn(Collections.<URL>emptyEnumeration());
+    Mockito.when(mockClassloader.getResources(Mockito.anyString())).thenReturn(Collections.enumeration(Collections.<URL>emptyList()));
     DataFormats.loadDataFormats(mockClassloader);
     ProcessEngineConfigurationImpl mockConfig = Mockito.mock(ProcessEngineConfigurationImpl.class);
     DefaultVariableSerializers serializers = new DefaultVariableSerializers();
@@ -44,7 +44,7 @@ public class SpinProcessEnginePluginTest extends PluggableProcessEngineTestCase 
 
   public void testPluginDoesNotRegisterJsonSerializerIfNotPresentInClasspath() throws IOException {
     ClassLoader mockClassloader = Mockito.mock(ClassLoader.class);
-    Mockito.when(mockClassloader.getResources(Mockito.anyString())).thenReturn(Collections.<URL>emptyEnumeration());
+    Mockito.when(mockClassloader.getResources(Mockito.anyString())).thenReturn(Collections.enumeration(Collections.<URL>emptyList()));
     DataFormats.loadDataFormats(mockClassloader);
     ProcessEngineConfigurationImpl mockConfig = Mockito.mock(ProcessEngineConfigurationImpl.class);
     DefaultVariableSerializers serializers = new DefaultVariableSerializers();
