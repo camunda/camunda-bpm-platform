@@ -1320,6 +1320,13 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
       extendedQuery.taskDefinitionKeyLike(this.getKeyLike());
     }
 
+    if (extendingQuery.getKeys() != null) {
+      extendedQuery.taskDefinitionKeyIn(extendingQuery.getKeys());
+    }
+    else if (this.getKeys() != null) {
+      extendedQuery.taskDefinitionKeyIn(this.getKeys());
+    }
+
     if (extendingQuery.getParentTaskId() != null) {
       extendedQuery.taskParentTaskId(extendingQuery.getParentTaskId());
     }
@@ -1332,6 +1339,13 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     }
     else if (this.getProcessDefinitionKey() != null) {
       extendedQuery.processDefinitionKey(this.getProcessDefinitionKey());
+    }
+
+    if (extendingQuery.getProcessDefinitionKeys() != null) {
+      extendedQuery.processDefinitionKeyIn(extendingQuery.getProcessDefinitionKeys());
+    }
+    else if (this.getProcessDefinitionKeys() != null) {
+      extendedQuery.processDefinitionKeyIn(this.getProcessDefinitionKeys());
     }
 
     if (extendingQuery.getProcessDefinitionId() != null) {

@@ -45,6 +45,7 @@ import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.filter.Filter;
+import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
@@ -4848,6 +4849,78 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     verifyQueryResults(query, 2);
 
     taskService.deleteTask(parentTaskId, true);
+  }
+
+  public void testExtendTaskQueryList_ProcessDefinitionKeyIn() {
+    // given
+    String processDefinitionKey = "invoice";
+    TaskQuery query = taskService
+        .createTaskQuery()
+        .processDefinitionKeyIn(processDefinitionKey);
+
+    TaskQuery extendingQuery = taskService.createTaskQuery();
+
+    // when
+    TaskQuery result = ((TaskQueryImpl)query).extend(extendingQuery);
+
+    // then
+    String[] processDefinitionKeys = ((TaskQueryImpl) result).getProcessDefinitionKeys();
+    assertEquals(1, processDefinitionKeys.length);
+    assertEquals(processDefinitionKey, processDefinitionKeys[0]);
+  }
+
+  public void testExtendingTaskQueryList_ProcessDefinitionKeyIn() {
+    // given
+    String processDefinitionKey = "invoice";
+    TaskQuery query = taskService.createTaskQuery();
+
+    TaskQuery extendingQuery = taskService
+        .createTaskQuery()
+        .processDefinitionKeyIn(processDefinitionKey);
+
+    // when
+    TaskQuery result = ((TaskQueryImpl)query).extend(extendingQuery);
+
+    // then
+    String[] processDefinitionKeys = ((TaskQueryImpl) result).getProcessDefinitionKeys();
+    assertEquals(1, processDefinitionKeys.length);
+    assertEquals(processDefinitionKey, processDefinitionKeys[0]);
+  }
+
+  public void testExtendTaskQueryList_TaskDefinitionKeyIn() {
+    // given
+    String taskDefinitionKey = "assigneApprover";
+    TaskQuery query = taskService
+        .createTaskQuery()
+        .taskDefinitionKeyIn(taskDefinitionKey);
+
+    TaskQuery extendingQuery = taskService.createTaskQuery();
+
+    // when
+    TaskQuery result = ((TaskQueryImpl)query).extend(extendingQuery);
+
+    // then
+    String[] key = ((TaskQueryImpl) result).getKeys();
+    assertEquals(1, key.length);
+    assertEquals(taskDefinitionKey, key[0]);
+  }
+
+  public void testExtendingTaskQueryList_TaskDefinitionKeyIn() {
+    // given
+    String taskDefinitionKey = "assigneApprover";
+    TaskQuery query = taskService.createTaskQuery();
+
+    TaskQuery extendingQuery = taskService
+        .createTaskQuery()
+        .taskDefinitionKeyIn(taskDefinitionKey);
+
+    // when
+    TaskQuery result = ((TaskQueryImpl)query).extend(extendingQuery);
+
+    // then
+    String[] key = ((TaskQueryImpl) result).getKeys();
+    assertEquals(1, key.length);
+    assertEquals(taskDefinitionKey, key[0]);
   }
 
   /**
