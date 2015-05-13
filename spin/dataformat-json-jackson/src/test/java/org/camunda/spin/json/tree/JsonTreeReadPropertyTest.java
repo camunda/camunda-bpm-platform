@@ -13,6 +13,7 @@
 package org.camunda.spin.json.tree;
 
 import org.camunda.spin.SpinList;
+import org.camunda.spin.impl.util.SpinIoUtil;
 import org.camunda.spin.json.SpinJsonDataFormatException;
 import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.json.SpinJsonPropertyException;
@@ -397,6 +398,24 @@ public class JsonTreeReadPropertyTest {
     } catch(SpinDataFormatException e) {
       // expected
     }
+  }
+
+
+  /**
+   * Tests an issue with Jackson 2.4.1
+   *
+   * The test contains a negative float at character position 8000 which is important
+   * to provoke Jackson bug #146.
+   * See also <a href="https://github.com/FasterXML/jackson-core/issues/146">the Jackson bug report</a>.
+   */
+  @Test
+  public void shouldNotFailWithJackson146Bug() {
+    // this should not fail
+    SpinJsonNode node = JSON(SpinIoUtil.fileAsString("org/camunda/spin/json/jackson146.json"));
+
+    // file has 4000 characters in length a
+    // 20 characters per repeated JSON object
+    assertThat(node.prop("abcdef").elements()).hasSize(200);
   }
 
 }
