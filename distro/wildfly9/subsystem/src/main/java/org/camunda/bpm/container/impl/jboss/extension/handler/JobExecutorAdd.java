@@ -127,7 +127,7 @@ public class JobExecutorAdd extends AbstractAddStepHandler implements Descriptio
       factoryBuilder.install();
     }
 
-    final BoundedQueueThreadPoolService service = new BoundedQueueThreadPoolService(3, 19, 3, false, new TimeSpec(TimeUnit.SECONDS, 10), true);
+    final BoundedQueueThreadPoolService service = new BoundedQueueThreadPoolService(3, 10, 3, false, new TimeSpec(TimeUnit.SECONDS, 10), true);
 
     ServiceBuilder<ManagedQueueExecutorService> builder = serviceTarget.addService(jobExecutorThreadPoolServiceName, service)
         .addDependency(threadFactoryServiceName, ThreadFactory.class, service.getThreadFactoryInjector())
