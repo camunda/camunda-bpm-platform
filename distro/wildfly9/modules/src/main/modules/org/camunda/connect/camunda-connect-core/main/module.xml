@@ -1,0 +1,11 @@
+<module xmlns="urn:jboss:module:1.0" name="org.camunda.connect.camunda-connect-core">
+  <resources>
+    <resource-root path="camunda-connect-core-@version.camunda.connect@.jar" />
+  </resources>
+
+  <dependencies>
+    <module name="javax.api"/>
+    <module name="org.camunda.commons.camunda-commons-logging" />
+    <module name="org.camunda.commons.camunda-commons-utils" />
+  </dependencies>
+</module>
