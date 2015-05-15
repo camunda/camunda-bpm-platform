@@ -504,15 +504,14 @@
     </if>
 
     <if test="permissionChecks != null &amp;&amp; permissionChecks.size() > 1">
-      COALESCE (
 
       <foreach item="permCheck" index="index" collection="permissionChecks" separator=",">
-
-        (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
-
+        ${dbSpecificIfNullFunction}((<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
       </foreach>
-
-      , 0)
+        , 0
+      <foreach item="permCheck" index="index" collection="permissionChecks">
+        )
+      </foreach>
     </if>
 
   </sql>
