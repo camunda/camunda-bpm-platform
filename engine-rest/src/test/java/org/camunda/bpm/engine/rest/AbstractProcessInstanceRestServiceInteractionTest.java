@@ -1761,9 +1761,9 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     instructions.add(ModificationInstructionBuilder.startAfter().activityId("activityId").getJson());
     instructions.add(ModificationInstructionBuilder.startAfter()
         .activityId("activityId").ancestorActivityInstanceId("ancestorActivityInstanceId").getJson());
-    instructions.add(ModificationInstructionBuilder.startTransition().activityId("activityId").getJson());
+    instructions.add(ModificationInstructionBuilder.startTransition().transitionId("transitionId").getJson());
     instructions.add(ModificationInstructionBuilder.startTransition()
-        .activityId("activityId").ancestorActivityInstanceId("ancestorActivityInstanceId").getJson());
+        .transitionId("transitionId").ancestorActivityInstanceId("ancestorActivityInstanceId").getJson());
 
     json.put("instructions", instructions);
 
@@ -1787,8 +1787,8 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     inOrder.verify(mockModificationBuilder).startBeforeActivity("activityId", "ancestorActivityInstanceId");
     inOrder.verify(mockModificationBuilder).startAfterActivity("activityId");
     inOrder.verify(mockModificationBuilder).startAfterActivity("activityId", "ancestorActivityInstanceId");
-    inOrder.verify(mockModificationBuilder).startTransition("activityId");
-    inOrder.verify(mockModificationBuilder).startTransition("activityId", "ancestorActivityInstanceId");
+    inOrder.verify(mockModificationBuilder).startTransition("transitionId");
+    inOrder.verify(mockModificationBuilder).startTransition("transitionId", "ancestorActivityInstanceId");
 
     inOrder.verify(mockModificationBuilder).execute(true, true);
 
@@ -1902,7 +1902,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     .expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .body("type", is(InvalidRequestException.class.getSimpleName()))
-      .body("message", containsString("'activityId' must be set"))
+      .body("message", containsString("'transitionId' must be set"))
     .when()
       .post(PROCESS_INSTANCE_MODIFICATION_URL);
 

@@ -12,15 +12,20 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
-import org.camunda.bpm.engine.rest.dto.VariableValueDto;
-
+import java.util.List;
 import java.util.Map;
+
+import org.camunda.bpm.engine.rest.dto.VariableValueDto;
+import org.camunda.bpm.engine.rest.dto.runtime.modification.ProcessInstanceModificationInstructionDto;
 
 public class StartProcessInstanceDto {
 
-  private Map<String, VariableValueDto> variables;
-  private String businessKey;
-  private String caseInstanceId;
+  protected Map<String, VariableValueDto> variables;
+  protected String businessKey;
+  protected String caseInstanceId;
+  protected List<ProcessInstanceModificationInstructionDto> startInstructions;
+  protected boolean skipCustomListeners;
+  protected boolean skipIoMappings;
 
   public Map<String, VariableValueDto> getVariables() {
     return variables;
@@ -44,5 +49,29 @@ public class StartProcessInstanceDto {
 
   public void setCaseInstanceId(String caseInstanceId) {
     this.caseInstanceId = caseInstanceId;
+  }
+
+  public List<ProcessInstanceModificationInstructionDto> getStartInstructions() {
+    return startInstructions;
+  }
+
+  public void setStartInstructions(List<ProcessInstanceModificationInstructionDto> startInstructions) {
+    this.startInstructions = startInstructions;
+  }
+
+  public boolean isSkipCustomListeners() {
+    return skipCustomListeners;
+  }
+
+  public void setSkipCustomListeners(boolean skipCustomListeners) {
+    this.skipCustomListeners = skipCustomListeners;
+  }
+
+  public boolean isSkipIoMappings() {
+    return skipIoMappings;
+  }
+
+  public void setSkipIoMappings(boolean skipIoMappings) {
+    this.skipIoMappings = skipIoMappings;
   }
 }

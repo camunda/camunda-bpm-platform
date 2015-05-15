@@ -11,6 +11,7 @@ import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -20,10 +21,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
@@ -55,19 +58,17 @@ import org.camunda.bpm.engine.rest.helper.variable.EqualsObjectValue;
 import org.camunda.bpm.engine.rest.helper.variable.EqualsPrimitiveValue;
 import org.camunda.bpm.engine.rest.helper.variable.EqualsUntypedValue;
 import org.camunda.bpm.engine.rest.sub.repository.impl.ProcessDefinitionResourceImpl;
+import org.camunda.bpm.engine.rest.util.ModificationInstructionBuilder;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-<<<<<<< HEAD
-=======
-import org.camunda.bpm.engine.runtime.ProcessInstanceModificationInstantiationBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
->>>>>>> 68558b3... renaming etc
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.fest.assertions.Assertions;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InOrder;
 import org.mockito.Matchers;
 
 import com.jayway.restassured.http.ContentType;
@@ -903,6 +904,271 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
 
     verify(runtimeServiceMock).startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), eq("myBusinessKey"), isNull(String.class), argThat(new EqualsMap(expectedParameters)));
 
+  }
+
+  @Test
+  public void testProcessInstantiationAtActivitiesById() {
+    ProcessInstantiationBuilder mockInstantiationBuilder = setUpMockInstantiationBuilder();
+    when(runtimeServiceMock.createProcessInstanceById(anyString())).thenReturn(mockInstantiationBuilder);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", VariablesBuilder.create()
+        .variable("processVariable", "aString", "String").getVariables());
+    json.put("businessKey", "aBusinessKey");
+    json.put("caseInstanceId", "aCaseInstanceId");
+
+    List<Map<String, Object>> startInstructions = new ArrayList<Map<String, Object>>();
+
+    startInstructions.add(
+        ModificationInstructionBuilder.startBefore()
+          .activityId("activityId")
+          .variables(VariablesBuilder.create()
+              .variable("var", "value", "String", false)
+              .variable("varLocal", "valueLocal", "String", true)
+              .getVariables())
+          .getJson());
+    startInstructions.add(
+        ModificationInstructionBuilder.startAfter()
+          .activityId("activityId")
+          .variables(VariablesBuilder.create()
+              .variable("var", 52, "Integer", false)
+              .variable("varLocal", 74, "Integer", true)
+              .getVariables())
+          .getJson());
+    startInstructions.add(
+        ModificationInstructionBuilder.startTransition()
+          .transitionId("transitionId")
+          .variables(VariablesBuilder.create()
+              .variable("var", 53, "Integer", false)
+              .variable("varLocal", 75, "Integer", true)
+              .getVariables())
+          .getJson());
+
+
+    json.put("startInstructions", startInstructions);
+
+    given().pathParam("id", EXAMPLE_PROCESS_DEFINITION_ID)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
+      .when().post(START_PROCESS_INSTANCE_URL);
+
+    verify(runtimeServiceMock).createProcessInstanceById(eq(EXAMPLE_PROCESS_DEFINITION_ID));
+
+    InOrder inOrder = inOrder(mockInstantiationBuilder);
+
+    inOrder.verify(mockInstantiationBuilder).businessKey("aBusinessKey");
+    inOrder.verify(mockInstantiationBuilder).caseInstanceId("aCaseInstanceId");
+    inOrder.verify(mockInstantiationBuilder).setVariables(argThat(EqualsVariableMap.matches()
+        .matcher("processVariable", EqualsPrimitiveValue.stringValue("aString"))));
+
+    inOrder.verify(mockInstantiationBuilder).startBeforeActivity("activityId");
+
+    verify(mockInstantiationBuilder).setVariableLocal(eq("varLocal"), argThat(EqualsPrimitiveValue.stringValue("valueLocal")));
+    verify(mockInstantiationBuilder).setVariable(eq("var"), argThat(EqualsPrimitiveValue.stringValue("value")));
+
+    inOrder.verify(mockInstantiationBuilder).startAfterActivity("activityId");
+
+    verify(mockInstantiationBuilder).setVariable(eq("var"), argThat(EqualsPrimitiveValue.integerValue(52)));
+    verify(mockInstantiationBuilder).setVariableLocal(eq("varLocal"), argThat(EqualsPrimitiveValue.integerValue(74)));
+
+    inOrder.verify(mockInstantiationBuilder).startTransition("transitionId");
+
+    verify(mockInstantiationBuilder).setVariable(eq("var"), argThat(EqualsPrimitiveValue.integerValue(53)));
+    verify(mockInstantiationBuilder).setVariableLocal(eq("varLocal"), argThat(EqualsPrimitiveValue.integerValue(75)));
+
+    inOrder.verify(mockInstantiationBuilder).execute(false, false);
+
+    inOrder.verifyNoMoreInteractions();
+  }
+
+  @Test
+  public void testProcessInstantiationAtActivitiesByKey() {
+    ProcessInstantiationBuilder mockInstantiationBuilder = setUpMockInstantiationBuilder();
+    when(runtimeServiceMock.createProcessInstanceById(anyString())).thenReturn(mockInstantiationBuilder);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", VariablesBuilder.create()
+        .variable("processVariable", "aString", "String").getVariables());
+    json.put("businessKey", "aBusinessKey");
+    json.put("caseInstanceId", "aCaseInstanceId");
+
+    List<Map<String, Object>> startInstructions = new ArrayList<Map<String, Object>>();
+
+    startInstructions.add(
+        ModificationInstructionBuilder.startBefore()
+          .activityId("activityId")
+          .variables(VariablesBuilder.create()
+              .variable("var", "value", "String", false)
+              .variable("varLocal", "valueLocal", "String", true)
+              .getVariables())
+          .getJson());
+    startInstructions.add(
+        ModificationInstructionBuilder.startAfter()
+          .activityId("activityId")
+          .variables(VariablesBuilder.create()
+              .variable("var", 52, "Integer", false)
+              .variable("varLocal", 74, "Integer", true)
+              .getVariables())
+          .getJson());
+    startInstructions.add(
+        ModificationInstructionBuilder.startTransition()
+          .transitionId("transitionId")
+          .variables(VariablesBuilder.create()
+              .variable("var", 53, "Integer", false)
+              .variable("varLocal", 75, "Integer", true)
+              .getVariables())
+          .getJson());
+
+
+    json.put("startInstructions", startInstructions);
+
+    given().pathParam("key", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
+      .when().post(START_PROCESS_INSTANCE_BY_KEY_URL);
+
+    verify(runtimeServiceMock).createProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID));
+
+    InOrder inOrder = inOrder(mockInstantiationBuilder);
+
+    inOrder.verify(mockInstantiationBuilder).businessKey("aBusinessKey");
+    inOrder.verify(mockInstantiationBuilder).caseInstanceId("aCaseInstanceId");
+    inOrder.verify(mockInstantiationBuilder).setVariables(argThat(EqualsVariableMap.matches()
+        .matcher("processVariable", EqualsPrimitiveValue.stringValue("aString"))));
+
+    inOrder.verify(mockInstantiationBuilder).startBeforeActivity("activityId");
+
+    verify(mockInstantiationBuilder).setVariableLocal(eq("varLocal"), argThat(EqualsPrimitiveValue.stringValue("valueLocal")));
+    verify(mockInstantiationBuilder).setVariable(eq("var"), argThat(EqualsPrimitiveValue.stringValue("value")));
+
+    inOrder.verify(mockInstantiationBuilder).startAfterActivity("activityId");
+
+    verify(mockInstantiationBuilder).setVariable(eq("var"), argThat(EqualsPrimitiveValue.integerValue(52)));
+    verify(mockInstantiationBuilder).setVariableLocal(eq("varLocal"), argThat(EqualsPrimitiveValue.integerValue(74)));
+
+    inOrder.verify(mockInstantiationBuilder).startTransition("transitionId");
+
+    verify(mockInstantiationBuilder).setVariable(eq("var"), argThat(EqualsPrimitiveValue.integerValue(53)));
+    verify(mockInstantiationBuilder).setVariableLocal(eq("varLocal"), argThat(EqualsPrimitiveValue.integerValue(75)));
+
+    inOrder.verify(mockInstantiationBuilder).execute(false, false);
+
+    inOrder.verifyNoMoreInteractions();
+  }
+
+  @Test
+  public void testProcessInstantiationAtActivitiesSkipIoMappingsAndListeners() {
+    ProcessInstantiationBuilder mockInstantiationBuilder = setUpMockInstantiationBuilder();
+    when(runtimeServiceMock.createProcessInstanceById(anyString())).thenReturn(mockInstantiationBuilder);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+
+    List<Map<String, Object>> startInstructions = new ArrayList<Map<String, Object>>();
+
+    startInstructions.add(
+        ModificationInstructionBuilder.startBefore()
+          .activityId("activityId")
+          .getJson());
+
+    json.put("startInstructions", startInstructions);
+    json.put("skipIoMappings", true);
+    json.put("skipCustomListeners", true);
+
+    given().pathParam("id", EXAMPLE_PROCESS_DEFINITION_ID)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
+      .when().post(START_PROCESS_INSTANCE_URL);
+
+    verify(runtimeServiceMock).createProcessInstanceById(eq(EXAMPLE_PROCESS_DEFINITION_ID));
+
+    InOrder inOrder = inOrder(mockInstantiationBuilder);
+
+    inOrder.verify(mockInstantiationBuilder).startBeforeActivity("activityId");
+    inOrder.verify(mockInstantiationBuilder).execute(true, true);
+
+    inOrder.verifyNoMoreInteractions();
+  }
+
+  @Test
+  public void testInvalidInstantiationAtActivities() {
+    ProcessInstantiationBuilder mockInstantiationBuilder = setUpMockInstantiationBuilder();
+    when(runtimeServiceMock.createProcessInstanceById(anyString())).thenReturn(mockInstantiationBuilder);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+
+    // start before: missing activity id
+    List<Map<String, Object>> instructions = new ArrayList<Map<String, Object>>();
+    instructions.add(ModificationInstructionBuilder.startBefore().getJson());
+    json.put("startInstructions", instructions);
+
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_DEFINITION_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+    .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", is(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("'activityId' must be set"))
+    .when()
+      .post(START_PROCESS_INSTANCE_URL);
+
+    // start after: missing ancestor activity instance id
+    instructions = new ArrayList<Map<String, Object>>();
+    instructions.add(ModificationInstructionBuilder.startAfter().getJson());
+    json.put("startInstructions", instructions);
+
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_DEFINITION_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+    .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", is(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("'activityId' must be set"))
+    .when()
+      .post(START_PROCESS_INSTANCE_URL);
+
+    // start transition: missing ancestor activity instance id
+    instructions = new ArrayList<Map<String, Object>>();
+    instructions.add(ModificationInstructionBuilder.startTransition().getJson());
+    json.put("startInstructions", instructions);
+
+    given()
+      .pathParam("id", EXAMPLE_PROCESS_DEFINITION_ID)
+      .contentType(ContentType.JSON)
+      .body(json)
+    .then()
+    .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", is(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("'transitionId' must be set"))
+    .when()
+      .post(START_PROCESS_INSTANCE_URL);
+  }
+
+  @SuppressWarnings("unchecked")
+  protected ProcessInstantiationBuilder setUpMockInstantiationBuilder() {
+    ProcessInstance resultInstance = MockProvider.createMockInstance();
+    ProcessInstantiationBuilder mockInstantiationBuilder = mock(ProcessInstantiationBuilder.class);
+
+    when(mockInstantiationBuilder.startAfterActivity(anyString())).thenReturn(mockInstantiationBuilder);
+    when(mockInstantiationBuilder.startBeforeActivity(anyString())).thenReturn(mockInstantiationBuilder);
+    when(mockInstantiationBuilder.startTransition(anyString())).thenReturn(mockInstantiationBuilder);
+    when(mockInstantiationBuilder.setVariables(any(Map.class))).thenReturn(mockInstantiationBuilder);
+    when(mockInstantiationBuilder.setVariablesLocal(any(Map.class))).thenReturn(mockInstantiationBuilder);
+    when(mockInstantiationBuilder.businessKey(anyString())).thenReturn(mockInstantiationBuilder);
+    when(mockInstantiationBuilder.caseInstanceId(anyString())).thenReturn(mockInstantiationBuilder);
+    when(mockInstantiationBuilder.execute(anyBoolean(), anyBoolean())).thenReturn(resultInstance);
+
+    return mockInstantiationBuilder;
   }
 
   /**

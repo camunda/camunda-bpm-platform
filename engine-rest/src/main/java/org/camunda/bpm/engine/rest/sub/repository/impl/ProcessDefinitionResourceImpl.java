@@ -46,12 +46,14 @@ import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionSuspensionStateDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
+import org.camunda.bpm.engine.rest.dto.runtime.modification.ProcessInstanceModificationInstructionDto;
 import org.camunda.bpm.engine.rest.dto.task.FormDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.repository.ProcessDefinitionResource;
 import org.camunda.bpm.engine.rest.util.ApplicationContextPathUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
 import org.camunda.bpm.engine.variable.VariableMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -88,15 +90,14 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
 
   @Override
   public ProcessInstanceDto startProcessInstance(UriInfo context, StartProcessInstanceDto parameters) {
-    RuntimeService runtimeService = engine.getRuntimeService();
-
     ProcessInstance instance = null;
     try {
-      Map<String, Object> variables = VariableValueDto.toMap(parameters.getVariables(), engine, objectMapper);
-      String businessKey = parameters.getBusinessKey();
-      String caseInstanceId = parameters.getCaseInstanceId();
-
-      instance = runtimeService.startProcessInstanceById(processDefinitionId, businessKey, caseInstanceId, variables);
+      if (parameters.getStartInstructions() == null || parameters.getStartInstructions().isEmpty()) {
+        instance = startProcessInstance(parameters);
+      }
+      else {
+        instance = startProcessInstanceAtActivities(parameters);
+      }
 
     } catch (AuthorizationException e) {
       throw e;
@@ -122,6 +123,33 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
     result.addReflexiveLink(uri, HttpMethod.GET, "self");
 
     return result;
+  }
+
+  protected ProcessInstance startProcessInstance(StartProcessInstanceDto dto) {
+    Map<String, Object> variables = VariableValueDto.toMap(dto.getVariables(), engine, objectMapper);
+    String businessKey = dto.getBusinessKey();
+    String caseInstanceId = dto.getCaseInstanceId();
+
+    return engine.getRuntimeService()
+        .startProcessInstanceById(processDefinitionId, businessKey, caseInstanceId, variables);
+  }
+
+  protected ProcessInstance startProcessInstanceAtActivities(StartProcessInstanceDto dto) {
+    Map<String, Object> processInstanceVariables = VariableValueDto.toMap(dto.getVariables(), engine, objectMapper);
+    String businessKey = dto.getBusinessKey();
+    String caseInstanceId = dto.getCaseInstanceId();
+
+    ProcessInstantiationBuilder instantiationBuilder = engine.getRuntimeService()
+        .createProcessInstanceById(processDefinitionId)
+        .businessKey(businessKey)
+        .caseInstanceId(caseInstanceId)
+        .setVariables(processInstanceVariables);
+
+    for (ProcessInstanceModificationInstructionDto instruction : dto.getStartInstructions()) {
+      instruction.applyTo(instantiationBuilder, engine, objectMapper);
+    }
+
+    return instantiationBuilder.execute(dto.isSkipCustomListeners(), dto.isSkipIoMappings());
   }
 
   @Override
