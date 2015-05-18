@@ -96,7 +96,7 @@
   .row.header {
     line-height: 34px;
     min-height: 34px;
-    font-weight: bolder;
+
     input,
     select,
     .dropdown {
@@ -129,18 +129,36 @@
 
 
   .ancestor-dropwdown {
-    li > a > div {
-      &.name {
+    min-width: 300px;
+    max-width: 500px;
+
+    li {
+      margin-bottom: 5px;
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .name {
         font-weight: bolder;
       }
-      overflow: hidden;
-      max-width: 100%;
-      text-overflow: ellipsis;
     }
 
     .id {
+      margin-bottom: 3px;
       font-family: monospace;
       color: @gray-dark;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+
+      .variables {
+        > span {
+          font-style: italic;
+        }
+        > .row {
+          margin-top: 0;
+        }
+      }
     }
   }
 }

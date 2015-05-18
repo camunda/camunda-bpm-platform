@@ -116,10 +116,9 @@
     }
 
     &.drag {
+      opacity: 0.5;
       position: absolute;
-      boxShadow: 2px 2px 1px #333333;
-      left: 0;
-      top: -20px;
+      .box-shadow(0 0 3px @gray);
     }
   }
 }
