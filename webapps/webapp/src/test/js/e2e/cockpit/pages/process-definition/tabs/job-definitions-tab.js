@@ -9,24 +9,40 @@ module.exports = Table.extend({
   tabLabel: 'Job Definitions',
   tableRepeater: 'jobDefinition in jobDefinitions',
 
-  state: function(item) {
-    return this.tableItem(item, '.state:not(.ng-hide)');
+  state: function(idx) {
+    return this.tableItem(idx, '.state:not(.ng-hide)');
   },
 
-  activity: function(item) {
-    return this.tableItem(item, '.activity');
+  activity: function(idx) {
+    return this.tableItem(idx, '.activity');
   },
 
-  configuration: function(item) {
-    return this.tableItem(item, '.configuration');
+  configuration: function(idx) {
+    return this.tableItem(idx, '.configuration');
   },
 
-  suspendJobDefinitionButton: function(item) {
-    return this.tableItem(item, '[ng-click="openSuspensionStateDialog(jobDefinition)"]:not(.ng-hide)');
+  suspendJobDefinitionButton: function(idx) {
+    return this.tableItem(idx, '[ng-click="openSuspensionStateDialog(jobDefinition)"]:not(.ng-hide)');
   },
 
-  activateJobDefinitionButton: function(item) {
-    return this.suspendJobDefinitionButton(item);
+  activateJobDefinitionButton: function(idx) {
+    return this.suspendJobDefinitionButton(idx);
+  },
+
+  suspendJobDefinition: function(idx) {
+    var modal = this.modal;
+
+    this.suspendJobDefinitionButton(idx).click().then(function() {
+      browser.sleep(500);
+      modal.suspendButton().click().then(function(){
+        browser.sleep(500);
+        modal.okButton().click();
+      });
+    });
+  },
+
+  activateJobDefinition: function(idx) {
+    this.suspendJobDefinition(idx);
   }
 
 });

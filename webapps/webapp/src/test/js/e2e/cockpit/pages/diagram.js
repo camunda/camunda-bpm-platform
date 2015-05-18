@@ -25,15 +25,19 @@ module.exports = Base.extend({
   },
 
   isActivitySelected: function(activityName) {
-    return this.diagramActivity(activityName).getAttribute('class').then(function(classes) {
-      return classes.indexOf('highlight') !== -1;
-    });
-  }
+    return this.diagramActivity(activityName)
+            .getAttribute('class')
+            .then(function(classes) {
+              return classes.indexOf('highlight') !== -1;
+            });
+  },
 
-/*  isActivityNotSelected: function(activityName) {
-    return this.diagramActivity(activityName).getAttribute('class').then(function(classes) {
-      return classes.indexOf('highlight') === -1;
-    });
-  }*/
+  isActivitySuspended: function(activityName) {
+    return element(by.css('.djs-overlays-'+activityName+' .badge[tooltip="Suspended Job Definition"]'))
+            .getAttribute('class')
+            .then(function(classes) {
+              return classes.indexOf('ng-hide') === -1;
+            });
+  }
 
 });

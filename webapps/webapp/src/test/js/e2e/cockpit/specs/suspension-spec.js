@@ -11,7 +11,7 @@ var instancePage = require('../pages/process-instance');
 
 describe('Cockpit Suspsension Spec', function() {
 
-  describe.skip('process definition suspension', function() {
+  describe('process definition suspension', function() {
 
     before(function() {
       return testHelper(setupFile, function() {
@@ -20,6 +20,26 @@ describe('Cockpit Suspsension Spec', function() {
         dashboardPage.authentication.userLogin('admin', 'admin');
         dashboardPage.deployedProcessesList.selectProcess(0);
       });
+    });
+
+
+    it('should suspend definition immediately', function() {
+
+      // when
+      definitionPage.suspension.suspendDefinition();
+
+      // then
+      expect(definitionPage.isDefinitionSuspended()).to.eventually.be.true;
+    });
+
+
+    it('should active definition immediately', function() {
+
+      // when
+      definitionPage.suspension.activateDefinition();
+
+      // then
+      expect(definitionPage.isDefinitionSuspended()).to.eventually.be.false;
     });
 
   });
@@ -73,7 +93,7 @@ describe('Cockpit Suspsension Spec', function() {
   });
 
 
-  describe.skip('job suspension', function() {
+  describe('job suspension', function() {
 
     before(function() {
       return testHelper(setupFile, function() {
@@ -81,7 +101,28 @@ describe('Cockpit Suspsension Spec', function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
         dashboardPage.deployedProcessesList.selectProcess(0);
+        definitionPage.jobDefinitionsTab.selectTab();
       });
+    });
+
+
+    it('should suspend job definition immediately', function() {
+
+      // when
+      definitionPage.jobDefinitionsTab.suspendJobDefinition(0);
+
+      // then
+      expect(definitionPage.diagram.isActivitySuspended('IntermediateCatchEvent_1')).to.eventually.be.true
+    });
+
+
+    it('should active job definition immediately', function() {
+
+      // when
+      definitionPage.jobDefinitionsTab.activateJobDefinition(0);
+
+      // then
+      expect(definitionPage.diagram.isActivitySuspended('IntermediateCatchEvent_1')).to.eventually.be.false
     });
 
   });

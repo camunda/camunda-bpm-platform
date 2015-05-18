@@ -20,12 +20,12 @@ module.exports = Base.extend({
     });
   },
 
-  isDefintionSuspended: function() {
-    expect(this.suspendedBadge().isDisplayed()).toBeTruthy();
-  },
-
-  isDefintionNotSuspended: function() {
-    expect(this.suspendedBadge().isDisplayed()).toBeFalsy();
+  isDefinitionSuspended: function() {
+    return element(by.css('.ctn-header .badge'))
+      .getAttribute('class')
+      .then(function(classes) {
+        return classes.indexOf('ng-hide') === -1;
+      });
   }
 
 });

@@ -6,24 +6,24 @@ var ops = module.exports = {};
 
 ops.deployment = {
   create: [{
-    deploymentName:  'user-tasks',
+    deploymentName:  'suspension-process',
     files:           [{
-      name: 'user-tasks.bpmn',
-      content: fs.readFileSync(__dirname + '/../../resources/user-tasks.bpmn').toString()
+      name: 'suspension-process.bpmn',
+      content: fs.readFileSync(__dirname + '/../../resources/suspension-process.bpmn').toString()
     }]
   }]
 };
 ops['process-definition'] = {
   start: [{
-    key: 'user-tasks',
+    key: 'suspension-process',
     businessKey: 'Instance1'
   },
   {
-    key: 'user-tasks',
+    key: 'suspension-process',
     businessKey: 'Instance2'
   },
   {
-    key: 'user-tasks',
+    key: 'suspension-process',
     businessKey: 'myBusinessKey'
   }]
 };
