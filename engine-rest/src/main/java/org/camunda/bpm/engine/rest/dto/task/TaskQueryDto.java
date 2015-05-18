@@ -17,7 +17,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 
@@ -395,8 +394,14 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     this.dueBeforeExpression = dueBeforeExpression;
   }
 
-  @CamundaQueryParam(value = "due", converter = DateConverter.class)
+  @CamundaQueryParam(value = "dueDate", converter = DateConverter.class)
   public void setDueDate(Date dueDate) {
+    this.dueDate = dueDate;
+  }
+
+  @Deprecated
+  @CamundaQueryParam(value = "due", converter = DateConverter.class)
+  public void setDue(Date dueDate) {
     this.dueDate = dueDate;
   }
 
@@ -435,9 +440,15 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     this.followUpBeforeExpression = followUpBeforeExpression;
   }
 
+  @CamundaQueryParam(value = "followUpDate", converter = DateConverter.class)
+  public void setFollowUpDate(Date followUpDate) {
+    this.followUpDate = followUpDate;
+  }
+
+  @Deprecated
   @CamundaQueryParam(value = "followUp", converter = DateConverter.class)
-  public void setFollowUpDate(Date followUp) {
-    this.followUpDate = followUp;
+  public void setFollowUp(Date followUpDate) {
+    this.followUpDate = followUpDate;
   }
 
   @CamundaQueryParam(value = "followUpDateExpression")
@@ -465,8 +476,14 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     this.createdBeforeExpression = createdBeforeExpression;
   }
 
-  @CamundaQueryParam(value = "created", converter = DateConverter.class)
+  @CamundaQueryParam(value = "createdOn", converter = DateConverter.class)
   public void setCreatedOn(Date createdOn) {
+    this.createdOn = createdOn;
+  }
+
+  @Deprecated
+  @CamundaQueryParam(value = "created", converter = DateConverter.class)
+  public void setCreated(Date createdOn) {
     this.createdOn = createdOn;
   }
 

@@ -518,18 +518,63 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     verify(mockQuery).taskCreatedOn(any(Date.class));
   }
 
+  @Test
+  public void testDateParametersPost() {
+    Map<String, String> json = getDateParameters();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+      .header("accept", MediaType.APPLICATION_JSON)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(TASK_QUERY_URL);
+
+    verify(mockQuery).dueAfter(any(Date.class));
+    verify(mockQuery).dueBefore(any(Date.class));
+    verify(mockQuery).dueDate(any(Date.class));
+    verify(mockQuery).followUpAfter(any(Date.class));
+    verify(mockQuery).followUpBefore(any(Date.class));
+    verify(mockQuery).followUpBeforeOrNotExistent(any(Date.class));
+    verify(mockQuery).followUpDate(any(Date.class));
+    verify(mockQuery).taskCreatedAfter(any(Date.class));
+    verify(mockQuery).taskCreatedBefore(any(Date.class));
+    verify(mockQuery).taskCreatedOn(any(Date.class));
+  }
+
+  @Test
+  public void testDeprecatedDateParameters() {
+    Map<String, String> queryParameters = new HashMap<String, String>();
+    queryParameters.put("due", "2013-01-23T14:42:44");
+    queryParameters.put("created", "2013-01-23T14:42:47");
+    queryParameters.put("followUp", "2013-01-23T14:42:50");
+
+    given()
+      .queryParams(queryParameters)
+      .header("accept", MediaType.APPLICATION_JSON)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(TASK_QUERY_URL);
+
+    verify(mockQuery).dueDate(any(Date.class));
+    verify(mockQuery).taskCreatedOn(any(Date.class));
+    verify(mockQuery).followUpDate(any(Date.class));
+  }
+
   private Map<String, String> getDateParameters() {
     Map<String, String> parameters = new HashMap<String, String>();
     parameters.put("dueAfter", "2013-01-23T14:42:42");
     parameters.put("dueBefore", "2013-01-23T14:42:43");
-    parameters.put("due", "2013-01-23T14:42:44");
+    parameters.put("dueDate", "2013-01-23T14:42:44");
     parameters.put("createdAfter", "2013-01-23T14:42:45");
     parameters.put("createdBefore", "2013-01-23T14:42:46");
-    parameters.put("created", "2013-01-23T14:42:47");
+    parameters.put("createdOn", "2013-01-23T14:42:47");
     parameters.put("followUpAfter", "2013-01-23T14:42:48");
     parameters.put("followUpBefore", "2013-01-23T14:42:49");
     parameters.put("followUpBeforeOrNotExistent", "2013-01-23T14:42:49");
-    parameters.put("followUp", "2013-01-23T14:42:50");
+    parameters.put("followUpDate", "2013-01-23T14:42:50");
     return parameters;
   }
 
