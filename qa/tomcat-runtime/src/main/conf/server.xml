@@ -20,6 +20,7 @@
      Documentation at /docs/config/server.html
  -->
 <Server port="${tomcat6.server.port}" shutdown="SHUTDOWN">
+  <Listener className="org.apache.catalina.startup.VersionLoggerListener" />
   <!-- Security listener. Documentation at /docs/config/listeners.html
   <Listener className="org.apache.catalina.security.SecurityListener" />
   -->
@@ -57,9 +58,9 @@
               driverClassName="${database.driver}" 
               url="${database.url}"
               username="${database.username}"
-              password="${database.password}"  
-              maxPoolSize="20"  
-              minPoolSize="5" />
+              password="${database.password}"
+              maxActive="20"
+              minIdle="5" />
               
     <Resource name="global/camunda-bpm-platform/process-engine/ProcessEngineService!org.camunda.bpm.ProcessEngineService" auth="Container"
               type="org.camunda.bpm.ProcessEngineService"

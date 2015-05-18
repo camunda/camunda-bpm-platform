@@ -31,7 +31,7 @@
     <version.jboss.as>7.2.0.Final</version.jboss.as>
     <version.wildfly>8.2.0.Final</version.wildfly>
     <version.glassfish>3.1.2</version.glassfish>
-    <version.tomcat>7.0.50</version.tomcat>
+    <version.tomcat>7.0.62</version.tomcat>
 
     <version.arquillian>1.0.0.Final</version.arquillian>
     <version.arquillian.drone>1.0.0.Final</version.arquillian.drone>

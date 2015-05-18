@@ -12,6 +12,8 @@
   </parent>
 
   <properties>
+    <!-- pin tomcat version for engine-rest -->
+    <version.tomcat>7.0.50</version.tomcat>
     <rest.http.port>8080</rest.http.port>
     <jackson.version>2.5.1</jackson.version>
     <!-- use inherited version as default -->
