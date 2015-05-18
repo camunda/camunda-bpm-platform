@@ -134,6 +134,8 @@ define([
         return null;
       }
 
+      var taskListQuery = angular.copy(searchQuery);
+
       var firstResult = ((getPropertyFromLocation('page') || 1) - 1) * 15;
       var sorting = getPropertyFromLocation('sorting');
       try {
@@ -146,16 +148,13 @@ define([
       sorting[0].sortOrder = sorting[0].sortOrder || 'desc';
       sorting[0].sortBy = sorting[0].sortBy || 'created';
 
-      return {
-        id : currentFilter.id,
-        firstResult : firstResult,
-        maxResults : 15,
-        sorting: sorting,
-        active: true,
-        processVariables : searchQuery.processVariables,
-        taskVariables : searchQuery.taskVariables,
-        caseInstanceVariables : searchQuery.caseInstanceVariables
-      };
+      taskListQuery.id = currentFilter.id;
+      taskListQuery.firstResult = firstResult;
+      taskListQuery.maxResults = 15;
+      taskListQuery.sorting = sorting;
+      taskListQuery.active = true;
+
+      return taskListQuery;
 
     }]);
 

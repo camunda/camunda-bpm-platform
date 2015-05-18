@@ -9,6 +9,8 @@ define([
 ) {
   'use strict';
 
+  var expressionsRegex = /^[\s]*(\#|\$)\{/;
+
   var searchConfig = JSON.parse(searchConfigJSON);
 
   var parseValue = function(value) {
@@ -32,10 +34,21 @@ define([
   };
 
   var sanitizeValue = function(value, operator) {
-    if(operator === 'like') {
+    if(operator === 'Like' || operator === 'like') {
       return '%'+value+'%';
     }
     return value;
+  };
+
+  var sanitizeProperty = function(search, type, operator, value) {
+    var out = type;
+    if(['Like', 'Before', 'After'].indexOf(operator) !== -1) {
+      out += operator;
+    }
+    if(expressionsRegex.test(value)) {
+      out += 'Expession';
+    }
+    return out;
   };
 
   var Controller = [
@@ -54,14 +67,14 @@ define([
     });
 
     $scope.types = searchConfig.types.map(function(el) {
-      return {
-        id: {
-          key: el.key,
-          value: $translate.instant(el.value)
-        },
-        extended: true,
-        allowDates: true
-      };
+      el.id.value = $translate.instant(el.id.value);
+      if(el.operators) {
+        el.operators = el.operators.map(function(op) {
+          op.value = $translate.instant(op.value);
+          return op;
+        });
+      }
+      return el;
     });
 
     $scope.operators = searchConfig.operators;
@@ -78,11 +91,15 @@ define([
       query.caseInstanceVariables = [];
 
       angular.forEach($scope.searches, function(search) {
-        query[search.type.value.key].push({
-          name: typeof search.name.value === 'object' ? search.name.value.key : search.name.value,
-          operator: search.operator.value.key,
-          value: sanitizeValue(parseValue(search.value.value), search.operator.value.key)
-        });
+        if(typeof query[search.type.value.key] === 'object') {
+          query[search.type.value.key].push({
+            name: typeof search.name.value === 'object' ? search.name.value.key : search.name.value,
+            operator: search.operator.value.key,
+            value: sanitizeValue(parseValue(search.value.value), search.operator.value.key)
+          });
+        } else {
+          query[sanitizeProperty(search, search.type.value.key, search.operator.value.key, search.value.value)] = sanitizeValue(parseValue(search.value.value), search.operator.value.key);
+        }
       });
 
       searchData.set('searchQuery', query);
@@ -91,7 +108,7 @@ define([
     searchData.observe('currentFilter', function(filter) {
       angular.forEach($scope.types, function(ea) {
         ea.potentialNames = [];
-        for(var i = 0; i < filter.properties.variables.length; i++) {
+        for(var i = 0; i < (filter.properties.variables && filter.properties.variables.length) || 0; i++) {
           var v = filter.properties.variables[i];
           ea.potentialNames.push({
             key: v.name,
@@ -102,7 +119,7 @@ define([
 
       angular.forEach($scope.searches, function(ea) {
         ea.potentialNames = $scope.types.filter(function(type) {
-          return type.key === ea.type.value.key;
+          return type.id.key === ea.type.value.key;
         })[0].potentialNames;
       });
     });
