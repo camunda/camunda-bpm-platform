@@ -111,6 +111,14 @@ public class CompensationUtil {
         eventSubscriptionEntity = eventSubscriptionEntity.moveUnder(eventScopeExecution);
       }
 
+      // set existing event scope executions as children of new event scope execution
+      // (ensuring they don't get removed when 'execution' gets removed)
+      for (PvmExecutionImpl childEventScopeExecution : execution.getEventScopeExecutions()) {
+        childEventScopeExecution.setParent(eventScopeExecution);
+        eventScopeExecution.getExecutions().add((ExecutionEntity) childEventScopeExecution);
+        execution.getExecutions().remove(childEventScopeExecution);
+      }
+
       CompensateEventSubscriptionEntity eventSubscription = CompensateEventSubscriptionEntity.createAndInsert(levelOfSubprocessScopeExecution, execution.getActivity());
       eventSubscription.setConfiguration(eventScopeExecution.getId());
 

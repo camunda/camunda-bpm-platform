@@ -160,6 +160,53 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(instance.getId());
   }
 
+  @Deployment
+  public void testCompensateActivityInSubprocess() {
+    // given
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("compensateProcess");
+
+    Task scopeTask = taskService.createTaskQuery().singleResult();
+    taskService.complete(scopeTask.getId());
+
+    // process has not yet thrown compensation
+    // when throw compensation
+    runtimeService.signal(instance.getId());
+
+    // then
+    Task compensationTask = taskService.createTaskQuery().singleResult();
+    assertNotNull(compensationTask);
+    assertEquals("undoScopeTask", compensationTask.getTaskDefinitionKey());
+
+    taskService.complete(compensationTask.getId());
+    runtimeService.signal(instance.getId());
+    assertProcessEnded(instance.getId());
+  }
+
+  @Deployment
+  public void testCompensateActivityInConcurrentSubprocess() {
+    // given
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("compensateProcess");
+
+    Task scopeTask = taskService.createTaskQuery().taskDefinitionKey("scopeTask").singleResult();
+    taskService.complete(scopeTask.getId());
+
+    Task outerTask = taskService.createTaskQuery().taskDefinitionKey("outerTask").singleResult();
+    taskService.complete(outerTask.getId());
+
+    // process has not yet thrown compensation
+    // when throw compensation
+    runtimeService.signal(instance.getId());
+
+    // then
+    Task compensationTask = taskService.createTaskQuery().singleResult();
+    assertNotNull(compensationTask);
+    assertEquals("undoScopeTask", compensationTask.getTaskDefinitionKey());
+
+    taskService.complete(compensationTask.getId());
+    runtimeService.signal(instance.getId());
+    assertProcessEnded(instance.getId());
+  }
+
   @Deployment(resources={
           "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testCallActivityCompensationHandler.bpmn20.xml",
           "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensationHandler.bpmn20.xml"

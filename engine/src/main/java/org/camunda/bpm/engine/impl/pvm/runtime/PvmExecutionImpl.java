@@ -228,13 +228,11 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   }
 
   protected void removeEventScopes() {
-    List<PvmExecutionImpl> childExecutions = new ArrayList<PvmExecutionImpl>(getExecutions());
+    List<PvmExecutionImpl> childExecutions = new ArrayList<PvmExecutionImpl>(getEventScopeExecutions());
     for (PvmExecutionImpl childExecution : childExecutions) {
-      if(childExecution.isEventScope()) {
-        log.fine("removing eventScope "+childExecution);
-        childExecution.destroy();
-        childExecution.remove();
-      }
+      log.fine("removing eventScope "+childExecution);
+      childExecution.destroy();
+      childExecution.remove();
     }
   }
 
@@ -247,7 +245,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     }
 
     // remove all child executions and sub process instances:
-    List<PvmExecutionImpl> executions = new ArrayList<PvmExecutionImpl>(getExecutions());
+    List<PvmExecutionImpl> executions = new ArrayList<PvmExecutionImpl>(getNonEventScopeExecutions());
     for (PvmExecutionImpl childExecution : executions) {
       if (childExecution.getSubProcessInstance()!=null) {
         childExecution.getSubProcessInstance().deleteCascade(reason, skipCustomListeners, skipIoMappings);
@@ -799,6 +797,19 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
     for (PvmExecutionImpl child : children) {
       if (!child.isEventScope()) {
+        result.add(child);
+      }
+    }
+
+    return result;
+  }
+
+  public List<? extends PvmExecutionImpl> getEventScopeExecutions() {
+    List<? extends PvmExecutionImpl> children = getExecutions();
+    List<PvmExecutionImpl> result = new ArrayList<PvmExecutionImpl>();
+
+    for (PvmExecutionImpl child : children) {
+      if (child.isEventScope()) {
         result.add(child);
       }
     }

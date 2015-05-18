@@ -436,6 +436,84 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Deployment
+  public void testCompensateSubprocess() {
+    // given
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("txProcess");
+
+    Task innerTask = taskService.createTaskQuery().singleResult();
+    taskService.complete(innerTask.getId());
+
+    // when the transaction is cancelled
+    runtimeService.setVariable(instance.getId(), "cancelTx", true);
+    runtimeService.setVariable(instance.getId(), "compensate", false);
+    Task beforeCancelTask = taskService.createTaskQuery().singleResult();
+    taskService.complete(beforeCancelTask.getId());
+
+    // then compensation is triggered
+    Task compensationTask = taskService.createTaskQuery().singleResult();
+    assertNotNull(compensationTask);
+    assertEquals("undoInnerTask", compensationTask.getTaskDefinitionKey());
+    taskService.complete(compensationTask.getId());
+
+    // and the process instance ends successfully
+    Task afterBoundaryTask = taskService.createTaskQuery().singleResult();
+    assertEquals("afterCancel", afterBoundaryTask.getTaskDefinitionKey());
+    taskService.complete(afterBoundaryTask.getId());
+    assertProcessEnded(instance.getId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/subprocess/transaction/TransactionSubProcessTest.testCompensateSubprocess.bpmn20.xml")
+  public void testCompensateSubprocessNotTriggered() {
+    // given
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("txProcess");
+
+    Task innerTask = taskService.createTaskQuery().singleResult();
+    taskService.complete(innerTask.getId());
+
+    // when the transaction is not cancelled
+    runtimeService.setVariable(instance.getId(), "cancelTx", false);
+    runtimeService.setVariable(instance.getId(), "compensate", false);
+    Task beforeEndTask = taskService.createTaskQuery().singleResult();
+    taskService.complete(beforeEndTask.getId());
+
+    // then
+    Task afterTxTask = taskService.createTaskQuery().singleResult();
+    assertEquals("afterTx", afterTxTask.getTaskDefinitionKey());
+
+    // and the process has ended
+    taskService.complete(afterTxTask.getId());
+    assertProcessEnded(instance.getId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/subprocess/transaction/TransactionSubProcessTest.testCompensateSubprocess.bpmn20.xml")
+  public void testCompensateSubprocessAfterTxCompletion() {
+    // given
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("txProcess");
+
+    Task innerTask = taskService.createTaskQuery().singleResult();
+    taskService.complete(innerTask.getId());
+
+    // when the transaction is not cancelled
+    runtimeService.setVariable(instance.getId(), "cancelTx", false);
+    runtimeService.setVariable(instance.getId(), "compensate", true);
+    Task beforeTxEndTask = taskService.createTaskQuery().singleResult();
+    taskService.complete(beforeTxEndTask.getId());
+
+    // but when compensation is thrown after the tx has completed successfully
+    Task afterTxTask = taskService.createTaskQuery().singleResult();
+    taskService.complete(afterTxTask.getId());
+
+    // then compensation for the subprocess is triggered
+    Task compensationTask = taskService.createTaskQuery().singleResult();
+    assertNotNull(compensationTask);
+    assertEquals("undoInnerTask", compensationTask.getTaskDefinitionKey());
+    taskService.complete(compensationTask.getId());
+
+    // and the process has ended
+    assertProcessEnded(instance.getId());
+  }
+
   public void testMultipleCancelBoundaryFails() {
     try {
       repositoryService.createDeployment()

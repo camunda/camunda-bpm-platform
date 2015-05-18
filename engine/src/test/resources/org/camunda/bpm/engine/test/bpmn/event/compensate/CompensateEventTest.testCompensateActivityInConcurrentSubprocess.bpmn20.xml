@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+	
+	<process id="compensateProcess">
+
+		<startEvent id="start" />
+		<sequenceFlow sourceRef="start"	targetRef="fork" />
+    <parallelGateway id="fork"/>
+    
+    <sequenceFlow sourceRef="fork" targetRef="outerTask" />
+    <userTask id="outerTask"/>
+    <sequenceFlow sourceRef="outerTask" targetRef="join" />
+    
+    <sequenceFlow sourceRef="fork" targetRef="subprocess" />
+		<subProcess id="subprocess">
+			<startEvent id="startInScope" />
+			<sequenceFlow sourceRef="startInScope" targetRef="scopeTask" />
+      <userTask id="scopeTask" />
+      <sequenceFlow sourceRef="scopeTask" targetRef="endInScope" />
+			<endEvent id="endInScope" />
+      
+      <!-- compensation -->
+      <boundaryEvent id="compensateScopeTask" attachedToRef="scopeTask">
+        <compensateEventDefinition />
+      </boundaryEvent>
+      <userTask id="undoScopeTask" isForCompensation="true"/>
+      <association associationDirection="One" sourceRef="compensateScopeTask" targetRef="undoScopeTask" />
+		</subProcess>
+    <sequenceFlow sourceRef="subprocess" targetRef="join" />
+    <parallelGateway id="join"/>
+
+		<sequenceFlow sourceRef="join" targetRef="beforeCompensate" />
+    <receiveTask id="beforeCompensate" />
+    <sequenceFlow sourceRef="beforeCompensate" targetRef="throwCompensate" />
+		
+		<intermediateThrowEvent id="throwCompensate">
+			<compensateEventDefinition activityRef="subprocess" />
+		</intermediateThrowEvent>
+		
+		<sequenceFlow sourceRef="throwCompensate" targetRef="beforeEnd" />
+		<receiveTask id="beforeEnd" />
+		<sequenceFlow sourceRef="beforeEnd" targetRef="end" />
+		<endEvent id="end" />
+    
+	</process>
+
+</definitions>

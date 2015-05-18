@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="txProcess">
+
+    <startEvent id="start" />
+    
+    <sequenceFlow sourceRef="start" targetRef="tx" />
+    <transaction id="tx">
+      <startEvent id="txStart" />
+      <sequenceFlow sourceRef="txStart" targetRef="subprocess" />
+      
+      <subProcess id="subprocess">
+        <startEvent id="startInScope" />
+        <sequenceFlow sourceRef="startInScope" targetRef="innerTask" />
+        <userTask id="innerTask" />
+        <sequenceFlow sourceRef="innerTask" targetRef="endInScope" />
+        <endEvent id="endInScope" />
+        
+        <!-- compensation -->
+        <boundaryEvent id="compensateScopeTask" attachedToRef="innerTask">
+          <compensateEventDefinition />
+        </boundaryEvent>
+        <userTask id="undoInnerTask" isForCompensation="true"/>
+        <association associationDirection="One" sourceRef="compensateScopeTask" targetRef="undoInnerTask" />
+      </subProcess>
+  
+      <sequenceFlow sourceRef="subprocess" targetRef="beforeCancel" />
+      <userTask id="beforeCancel" />
+      <sequenceFlow sourceRef="beforeCancel" targetRef="exclusiveGw" />
+      <exclusiveGateway id="exclusiveGw" />
+      <sequenceFlow sourceRef="exclusiveGw" targetRef="txEnd">
+        <conditionExpression>${not cancelTx}</conditionExpression>
+      </sequenceFlow>
+      <endEvent id="txEnd" />
+      
+      <sequenceFlow sourceRef="exclusiveGw" targetRef="cancelEnd">
+        <conditionExpression>${cancelTx}</conditionExpression>
+      </sequenceFlow>
+      <endEvent id="cancelEnd" >
+        <cancelEventDefinition id="cancelEndId" />
+      </endEvent>
+    </transaction>
+    
+    <sequenceFlow sourceRef="tx" targetRef="afterTx"/>
+    <userTask id="afterTx"/>
+    
+    <!-- regular end -->
+    <sequenceFlow sourceRef="afterTx" targetRef="exclusiveGw2" />
+    <exclusiveGateway id="exclusiveGw2" />
+    <sequenceFlow sourceRef="exclusiveGw2" targetRef="end">
+      <conditionExpression>${not compensate}</conditionExpression>
+    </sequenceFlow>
+    <endEvent id="end" />
+    
+    <!-- compensation requested -->
+    <sequenceFlow sourceRef="exclusiveGw2" targetRef="throwCompensate">
+      <conditionExpression>${compensate}</conditionExpression>
+    </sequenceFlow>
+    <intermediateThrowEvent id="throwCompensate">
+      <compensateEventDefinition />
+    </intermediateThrowEvent>
+    <sequenceFlow sourceRef="throwCompensate" targetRef="compensateEnd" />
+    <endEvent id="compensateEnd" />
+    
+    <!-- cancel boundary event -->
+    <boundaryEvent attachedToRef="tx" id="catchCancelTx">
+      <cancelEventDefinition id="cancel"/>      
+    </boundaryEvent>
+    <sequenceFlow sourceRef="catchCancelTx" targetRef="afterCancel" />
+    <userTask id="afterCancel"/>
+    <sequenceFlow sourceRef="afterCancel" targetRef="cancelled" />
+    <endEvent id="cancelled" />
+  </process>
+
+</definitions>
