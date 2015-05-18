@@ -276,6 +276,30 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Deployment
+  public void testDeleteProcessInstanceWithActiveCompensation() {
+    // given
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("compensationProcess");
+
+    Task innerTask = taskService.createTaskQuery().singleResult();
+    taskService.complete(innerTask.getId());
+
+    Task afterSubProcessTask = taskService.createTaskQuery().singleResult();
+    assertEquals("taskAfterSubprocess", afterSubProcessTask.getTaskDefinitionKey());
+    taskService.complete(afterSubProcessTask.getId());
+
+    // when
+    // there are two compensation tasks
+    assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("outerAfterBoundaryTask").count());
+    assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("innerAfterBoundaryTask").count());
+
+    // when the process instance is deleted
+    runtimeService.deleteProcessInstance(instance.getId(), "");
+
+    // then
+    assertProcessEnded(instance.getId());
+  }
+
   @Deployment(resources={
     "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
   public void testFindActiveActivityIds() {

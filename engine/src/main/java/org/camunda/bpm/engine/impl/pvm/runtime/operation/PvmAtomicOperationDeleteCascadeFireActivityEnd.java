@@ -84,7 +84,7 @@ public class PvmAtomicOperationDeleteCascadeFireActivityEnd extends PvmAtomicOpe
 
       if (continueRemoval) {
         PvmExecutionImpl propagatingExecution = execution.getParent();
-        if (propagatingExecution != null && !propagatingExecution.isScope()) {
+        if (propagatingExecution != null && !propagatingExecution.isScope() && propagatingExecution.getExecutions().isEmpty()) {
           propagatingExecution.remove();
           continueRemoval = !propagatingExecution.isDeleteRoot();
           propagatingExecution = propagatingExecution.getParent();

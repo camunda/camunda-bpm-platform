@@ -105,6 +105,22 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensateParallelSubprocessCompHandlerWaitstate.bpmn20.xml")
+  public void testDeleteParallelSubprocessCompHandlerWaitstate() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
+
+    // five inner tasks
+    List<Task> compensationHandlerTasks = taskService.createTaskQuery().taskDefinitionKey("undoBookHotel").list();
+    assertEquals(5, compensationHandlerTasks.size());
+
+    // when
+    runtimeService.deleteProcessInstance(processInstance.getId(), "");
+
+    // then the process has been removed
+    assertProcessEnded(processInstance.getId());
+  }
+
   @Deployment
   public void testCompensateMiSubprocess() {
 

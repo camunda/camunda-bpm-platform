@@ -102,7 +102,7 @@ public class PvmAtomicOperationTransitionDestroyScope implements PvmAtomicOperat
             outgoingExecutions.remove(0);
             // get ahold of the concurrent execution that replaced the scope propagating execution
             PvmExecutionImpl replacingExecution = null;
-            for (PvmExecutionImpl concurrentChild : scopeExecution.getExecutions())  {
+            for (PvmExecutionImpl concurrentChild : scopeExecution.getNonEventScopeExecutions())  {
               if (!(concurrentChild == propagatingExecution)) {
                 replacingExecution = concurrentChild;
                 break;
