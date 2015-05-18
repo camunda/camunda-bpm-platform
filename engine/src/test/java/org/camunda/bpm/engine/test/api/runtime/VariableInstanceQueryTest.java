@@ -2214,7 +2214,10 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
       task1Instance = tree.getChildActivityInstances()[1];
     }
 
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().activityInstanceIdIn(task1Instance.getId());
+    VariableInstanceQuery query = runtimeService
+        .createVariableInstanceQuery()
+        .variableName("aLocalVariable")
+        .activityInstanceIdIn(processInstance.getId());
     VariableInstance localVariable = query.singleResult();
     assertNotNull(localVariable);
     assertEquals("aLocalVariable", localVariable.getName());
@@ -2230,7 +2233,10 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
       task3Instance = tree.getChildActivityInstances()[1];
     }
 
-    query = runtimeService.createVariableInstanceQuery().activityInstanceIdIn(task3Instance.getId());
+    query = runtimeService
+        .createVariableInstanceQuery()
+        .variableName("aLocalVariable")
+        .activityInstanceIdIn(processInstance.getId());
     localVariable = query.singleResult();
     assertNotNull(localVariable);
     assertEquals("aLocalVariable", localVariable.getName());

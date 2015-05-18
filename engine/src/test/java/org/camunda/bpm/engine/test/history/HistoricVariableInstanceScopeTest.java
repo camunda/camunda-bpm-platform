@@ -17,8 +17,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
+import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
+import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -238,7 +241,7 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
 
     HistoricVariableInstance variable = query.singleResult();
     // the variable is in the service task scope
-    assertEquals(serviceTask.getId(), variable.getActivityInstanceId());
+    assertEquals(pi.getId(), variable.getActivityInstanceId());
 
     assertProcessEnded(pi.getId());
   }
@@ -273,6 +276,74 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
       assertEquals(5, historyService.createHistoricDetailQuery().caseInstanceId(caseInstanceId).count());
       assertEquals(3, historyService.createHistoricDetailQuery().caseExecutionId(caseExecutionId).count());
       assertEquals(2, historyService.createHistoricDetailQuery().caseExecutionId(taskExecutionId).count());
+    }
+  }
+
+  @Deployment
+  public void testInputMappings() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
+
+    HistoricActivityInstanceQuery activityInstanceQuery = historyService
+        .createHistoricActivityInstanceQuery()
+        .processInstanceId(processInstanceId);
+
+    String theService1Id = activityInstanceQuery.activityId("theService1").singleResult().getId();
+    String theService2Id = activityInstanceQuery.activityId("theService2").singleResult().getId();
+    String theTaskId = activityInstanceQuery.activityId("theTask").singleResult().getId();
+
+    // when (1)
+    HistoricVariableInstance firstVariable = historyService
+      .createHistoricVariableInstanceQuery()
+      .variableName("firstInputVariable")
+      .singleResult();
+
+    // then (1)
+    assertEquals(theService1Id, firstVariable.getActivityInstanceId());
+
+    if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+      HistoricDetail firstVariableDetail = historyService
+        .createHistoricDetailQuery()
+        .variableUpdates()
+        .variableInstanceId(firstVariable.getId())
+        .singleResult();
+      assertEquals(theService1Id, firstVariableDetail.getActivityInstanceId());
+    }
+
+    // when (2)
+    HistoricVariableInstance secondVariable = historyService
+      .createHistoricVariableInstanceQuery()
+      .variableName("secondInputVariable")
+      .singleResult();
+
+    // then (2)
+    assertEquals(theService2Id, secondVariable.getActivityInstanceId());
+
+    if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+      HistoricDetail secondVariableDetail = historyService
+        .createHistoricDetailQuery()
+        .variableUpdates()
+        .variableInstanceId(secondVariable.getId())
+        .singleResult();
+      assertEquals(theService2Id, secondVariableDetail.getActivityInstanceId());
+    }
+
+    // when (3)
+    HistoricVariableInstance thirdVariable = historyService
+      .createHistoricVariableInstanceQuery()
+      .variableName("thirdInputVariable")
+      .singleResult();
+
+    // then (3)
+    assertEquals(theTaskId, thirdVariable.getActivityInstanceId());
+
+    if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+      HistoricDetail thirdVariableDetail = historyService
+        .createHistoricDetailQuery()
+        .variableUpdates()
+        .variableInstanceId(thirdVariable.getId())
+        .singleResult();
+      assertEquals(theTaskId, thirdVariableDetail.getActivityInstanceId());
     }
   }
 }

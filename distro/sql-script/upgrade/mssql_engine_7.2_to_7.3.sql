@@ -134,3 +134,8 @@ VALUES
   ('global-grant-task', 0, '*', 7, '*', 2147483647, 1),
   ('global-grant-process-instance', 0, '*', 8, '*', 2147483647, 1),
   ('global-grant-deployment', 0, '*', 9, '*', 2147483647, 1);
+
+-- variables --
+
+ALTER TABLE ACT_RU_VARIABLE
+  ADD ACT_INST_ID_ nvarchar(64);

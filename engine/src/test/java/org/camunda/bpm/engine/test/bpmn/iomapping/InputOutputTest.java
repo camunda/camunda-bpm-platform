@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -999,6 +1000,23 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     taskService.complete(task.getId());
 
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+  }
+
+  @Deployment
+  public void testScopeActivityInstanceId() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstanceId);
+    ActivityInstance theTaskInstance = tree.getActivityInstances("theTask")[0];
+
+    // when
+    VariableInstance variableInstance = runtimeService
+      .createVariableInstanceQuery()
+      .singleResult();
+
+    // then
+    assertEquals(theTaskInstance.getId(), variableInstance.getActivityInstanceId());
   }
 
 }

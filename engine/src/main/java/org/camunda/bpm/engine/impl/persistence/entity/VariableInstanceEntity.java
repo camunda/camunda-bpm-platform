@@ -508,8 +508,8 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     return activityInstanceId;
   }
 
-  public void setActivityInstanceId(String acitivtyInstanceId) {
-    this.activityInstanceId = acitivtyInstanceId;
+  public void setActivityInstanceId(String activityInstanceId) {
+    this.activityInstanceId = activityInstanceId;
   }
 
   public String getSerializerName() {

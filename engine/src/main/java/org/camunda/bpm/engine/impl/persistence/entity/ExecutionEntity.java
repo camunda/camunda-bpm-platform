@@ -324,8 +324,6 @@ public class ExecutionEntity extends PvmExecutionImpl implements
       }
     }
 
-    executeIoMapping();
-
     if (isProcessInstanceExecution()) {
       String initiatorVariableName = (String) processDefinition.getProperty(BpmnParse.PROPERTYNAME_INITIATOR_VARIABLE_NAME);
       if (initiatorVariableName != null) {
@@ -1035,6 +1033,27 @@ public class ExecutionEntity extends PvmExecutionImpl implements
   protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
     variableInstance.setProcessInstanceId(processInstanceId);
     variableInstance.setExecutionId(id);
+
+    String scopeActivityInstanceId = null;
+
+    ActivityImpl activity = getActivity();
+    if(activity != null) {
+      if(activity.isScope()) {
+        scopeActivityInstanceId = getActivityInstanceId();
+      }
+      else {
+        scopeActivityInstanceId = getParentActivityInstanceId();
+      }
+    }
+    else {
+      ExecutionEntity scopeExecution = this;
+      if(isConcurrent()) {
+        scopeExecution = scopeExecution.getParent();
+      }
+      scopeActivityInstanceId = scopeExecution.getParentActivityInstanceId();
+    }
+
+    variableInstance.setActivityInstanceId(scopeActivityInstanceId);
   }
 
   protected List<VariableInstanceEntity> loadVariableInstances() {

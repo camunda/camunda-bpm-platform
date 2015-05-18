@@ -123,7 +123,7 @@ public class ExecutionImpl extends PvmExecutionImpl implements
   }
 
   public void initialize() {
-    executeIoMapping();
+    return;
   }
 
   // parent ///////////////////////////////////////////////////////////////////

@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.engine.test.cmmn.listener;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.camunda.bpm.engine.delegate.DelegateCaseVariableInstance;
 import org.camunda.bpm.engine.runtime.CaseExecution;
@@ -80,6 +80,11 @@ public class DelegateVariableInstanceSpec {
 
   public DelegateVariableInstanceSpec value(String variableValue) {
     this.expectedVariableValue = variableValue;
+    return this;
+  }
+
+  public DelegateVariableInstanceSpec activityInstanceId(String activityInstanceId) {
+    this.expectedActivityInstanceId = activityInstanceId;
     return this;
   }
 }

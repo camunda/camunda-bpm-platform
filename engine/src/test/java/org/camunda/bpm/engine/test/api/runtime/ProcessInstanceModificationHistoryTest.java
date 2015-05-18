@@ -68,7 +68,7 @@ public class ProcessInstanceModificationHistoryTest extends PluggableProcessEngi
       .singleResult();
 
     assertNotNull(localVariable);
-    assertNull(localVariable.getActivityInstanceId());
+    assertEquals(updatedTree.getId(), localVariable.getActivityInstanceId());
     assertEquals("localVar", localVariable.getName());
     assertEquals("localValue", localVariable.getValue());
 
@@ -116,7 +116,7 @@ public class ProcessInstanceModificationHistoryTest extends PluggableProcessEngi
       .singleResult();
 
     assertNotNull(localVariable);
-    assertNull(localVariable.getActivityInstanceId());
+    assertEquals(updatedTree.getId(), localVariable.getActivityInstanceId());
     assertEquals("localVar", localVariable.getName());
     assertEquals("localValue", localVariable.getValue());
 

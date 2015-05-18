@@ -15,9 +15,6 @@ package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
-import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
-import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
-import org.camunda.bpm.engine.impl.pvm.delegate.ModificationObserverBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionStartContext;
 import org.camunda.bpm.engine.impl.pvm.runtime.InstantiationStack;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
@@ -49,11 +46,6 @@ public class PvmAtomicOperationActivityInitStack implements PvmAtomicOperation {
     }
     else {
       propagatingExecution.setActivity(currentActivity);
-      // <LEGACY>: in general, io mappings may only exist when the activity is scope
-      // however, for multi instance activities, the inner activity does not become a scope
-      // due to the presence of an io mapping. In that case, it is ok to execute the io mapping
-      // anyway because the multi-instance body already ensures variable isolation
-      propagatingExecution.executeIoMapping();
     }
 
 

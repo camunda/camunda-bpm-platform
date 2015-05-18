@@ -280,23 +280,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
   }
 
   protected HistoryEvent createHistoricVariableEvent(VariableInstanceEntity variableInstance, VariableScope sourceVariableScope, HistoryEventType eventType) {
-    String scopeActivityInstanceId = null;
     String sourceActivityInstanceId = null;
-
-    if(variableInstance.getExecutionId() != null) {
-      ExecutionEntity scopeExecution = Context.getCommandContext()
-        .getDbEntityManager()
-        .selectById(ExecutionEntity.class, variableInstance.getExecutionId());
-
-      if (variableInstance.getTaskId() == null
-          && scopeExecution.isScope()
-          && (scopeExecution.isActive() || (!scopeExecution.isActive() && scopeExecution.getActivityId() == null))) {
-        scopeActivityInstanceId = scopeExecution.getParentActivityInstanceId();
-
-      } else {
-        scopeActivityInstanceId = scopeExecution.getActivityInstanceId();
-      }
-    }
 
     ExecutionEntity sourceExecution = null;
     if (sourceVariableScope instanceof ExecutionEntity) {
@@ -318,7 +302,9 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     initSequenceCounter(variableInstance, evt);
 
     // set scope activity instance id
+    String scopeActivityInstanceId = variableInstance.getActivityInstanceId();
     evt.setScopeActivityInstanceId(scopeActivityInstanceId);
+    
     // set source activity instance id
     evt.setActivityInstanceId(sourceActivityInstanceId);
 

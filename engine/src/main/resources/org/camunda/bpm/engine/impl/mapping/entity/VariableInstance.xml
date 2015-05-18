@@ -17,6 +17,7 @@
       CASE_INST_ID_,
       CASE_EXECUTION_ID_,
       TASK_ID_,
+      ACT_INST_ID_,
       BYTEARRAY_ID_,
       DOUBLE_,
       LONG_,
@@ -35,6 +36,7 @@
       #{caseInstanceId, jdbcType=VARCHAR},
       #{caseExecutionId, jdbcType=VARCHAR},
       #{taskId, jdbcType=VARCHAR},
+      #{activityInstanceId, jdbcType=VARCHAR},
       #{byteArrayValueId, jdbcType=VARCHAR},
       #{doubleValue, jdbcType=DOUBLE},
       #{longValue, jdbcType=BIGINT},
@@ -50,7 +52,7 @@
 
   <update id="updateVariableInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity">
     update ${prefix}ACT_RU_VARIABLE
-    set 
+    set
       REV_ = #{revisionNext, jdbcType=INTEGER},
       EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
       TYPE_ = #{serializerName, jdbcType=VARCHAR },
@@ -82,7 +84,7 @@
       <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
       <result property="caseExecutionId" column="CASE_EXECUTION_ID_" jdbcType="VARCHAR" />
       <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
-      <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
+      <result property="activityInstanceId" column="ACT_INSTANCE_ID_" jdbcType="VARCHAR" />
       <result property="activityId" column="ACTIVITY_ID_" jdbcType="VARCHAR" />
       <result property="isActive" column="IS_ACTIVE_" jdbcType="BOOLEAN" />
       <result property="isConcurrencyScope" column="IS_CONCURRENCY_SCOPE_" jdbcType="BOOLEAN" />
@@ -97,30 +99,116 @@
   <!-- VARIABLE INSTANCE SELECT -->
 
 	<select id="selectVariableInstance" parameterType="string" resultMap="variableInstanceResultMap">
-		select * from ${prefix}ACT_RU_VARIABLE where ID_ = #{id, jdbcType=VARCHAR}
+		SELECT
+        RES.*,
+        (<include refid="actInstIdColumn"/>) ACT_INSTANCE_ID_
+    FROM
+        ${prefix}ACT_RU_VARIABLE RES
+
+    LEFT JOIN
+        ${prefix}ACT_RU_EXECUTION EXECUTION
+    ON
+        RES.EXECUTION_ID_ = EXECUTION.ID_
+
+    LEFT JOIN
+        ${prefix}ACT_RU_EXECUTION PARENT_EXECUTION
+    ON
+        EXECUTION.PARENT_ID_ = PARENT_EXECUTION.ID_
+
+    LEFT JOIN
+        ${prefix}ACT_RU_CASE_EXECUTION CASE_EXECUTION
+    ON
+        RES.CASE_EXECUTION_ID_ = CASE_EXECUTION.ID_
+    WHERE
+        ID_ = #{id, jdbcType=VARCHAR}
   </select>
 
 	<select id="selectVariablesByExecutionId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="variableInstanceResultMap">
-		select * from ${prefix}ACT_RU_VARIABLE 
-		where EXECUTION_ID_ = #{parameter, jdbcType=VARCHAR}
-		  and TASK_ID_ is null
+		SELECT
+        RES.*,
+        (<include refid="actInstIdColumn"/>) ACT_INSTANCE_ID_
+    FROM
+        ${prefix}ACT_RU_VARIABLE RES
+
+    LEFT JOIN
+        ${prefix}ACT_RU_EXECUTION EXECUTION
+    ON
+        RES.EXECUTION_ID_ = EXECUTION.ID_
+
+    LEFT JOIN
+        ${prefix}ACT_RU_EXECUTION PARENT_EXECUTION
+    ON
+        EXECUTION.PARENT_ID_ = PARENT_EXECUTION.ID_
+
+    LEFT JOIN
+        ${prefix}ACT_RU_CASE_EXECUTION CASE_EXECUTION
+    ON
+        RES.CASE_EXECUTION_ID_ = CASE_EXECUTION.ID_
+
+		WHERE
+        EXECUTION_ID_ = #{parameter, jdbcType=VARCHAR}
+		AND
+        TASK_ID_ is null
   </select>
 
   <select id="selectVariablesByCaseExecutionId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="variableInstanceResultMap">
-    select * from ${prefix}ACT_RU_VARIABLE 
-    where CASE_EXECUTION_ID_ = #{parameter, jdbcType=VARCHAR}
-      and TASK_ID_ is null
+    SELECT
+        RES.*,
+        (<include refid="actInstIdColumn"/>) ACT_INSTANCE_ID_
+    FROM
+        ${prefix}ACT_RU_VARIABLE RES
+
+    LEFT JOIN
+        ${prefix}ACT_RU_EXECUTION EXECUTION
+    ON
+        RES.EXECUTION_ID_ = EXECUTION.ID_
+
+    LEFT JOIN
+        ${prefix}ACT_RU_EXECUTION PARENT_EXECUTION
+    ON
+        EXECUTION.PARENT_ID_ = PARENT_EXECUTION.ID_
+
+    LEFT JOIN
+        ${prefix}ACT_RU_CASE_EXECUTION CASE_EXECUTION
+    ON
+        RES.CASE_EXECUTION_ID_ = CASE_EXECUTION.ID_
+
+    WHERE
+        CASE_EXECUTION_ID_ = #{parameter, jdbcType=VARCHAR}
+    AND
+        TASK_ID_ is null
   </select>
 
   <select id="selectVariablesByTaskId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="variableInstanceResultMap">
-    select * from ${prefix}ACT_RU_VARIABLE where
-    TASK_ID_ = #{parameter, jdbcType=VARCHAR}
+    SELECT
+        RES.*,
+        (<include refid="actInstIdColumn"/>) ACT_INSTANCE_ID_
+    FROM
+        ${prefix}ACT_RU_VARIABLE RES
+
+    LEFT JOIN
+        ${prefix}ACT_RU_EXECUTION EXECUTION
+    ON
+        RES.EXECUTION_ID_ = EXECUTION.ID_
+
+    LEFT JOIN
+        ${prefix}ACT_RU_EXECUTION PARENT_EXECUTION
+    ON
+        EXECUTION.PARENT_ID_ = PARENT_EXECUTION.ID_
+
+    LEFT JOIN
+        ${prefix}ACT_RU_CASE_EXECUTION CASE_EXECUTION
+    ON
+        RES.CASE_EXECUTION_ID_ = CASE_EXECUTION.ID_
+
+    WHERE
+        TASK_ID_ = #{parameter, jdbcType=VARCHAR}
   </select>
 
   <select id="selectVariableInstanceByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.VariableInstanceQueryImpl" resultMap="variableInstanceResultMap">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}
-    select RES.* 
+    select RES.*
     ${limitBetween}
     <include refid="selectVariableInstanceByQueryCriteriaSql"/>
     ${orderBy}
@@ -134,6 +222,11 @@
 
   <sql id="actInstIdColumn">
   case
+    when
+      RES.ACT_INST_ID_ is not null
+    then RES.ACT_INST_ID_
+
+    <!-- ensures backwards compatibility -->
 	  when
       RES.TASK_ID_ is not null
       and RES.EXECUTION_ID_ is not null
@@ -161,9 +254,9 @@
 
   <sql id="selectVariableInstanceByQueryCriteriaSql">
     from (
-          select 
-            RES.*, 
-            (<include refid="actInstIdColumn"/>) ACT_INST_ID_
+          select
+            RES.*,
+            (<include refid="actInstIdColumn"/>) ACT_INSTANCE_ID_
 
           from ${prefix}ACT_RU_VARIABLE RES
 

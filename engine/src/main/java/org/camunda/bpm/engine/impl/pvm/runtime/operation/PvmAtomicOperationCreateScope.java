@@ -44,11 +44,6 @@ public abstract class PvmAtomicOperationCreateScope implements PvmAtomicOperatio
 
     } else {
       propagatingExecution = execution;
-      // <LEGACY>: in general, io mappings may only exist when the activity is scope
-      // however, for multi instance activities, the inner activity does not become a scope
-      // due to the presence of an io mapping. In that case, it is ok to execute the io mapping
-      // anyway because the multi-instance body already ensures variable isolation
-      propagatingExecution.executeIoMapping();
     }
 
 

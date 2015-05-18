@@ -153,6 +153,7 @@ create table ACT_RU_VARIABLE (
     CASE_EXECUTION_ID_ nvarchar(64),
     CASE_INST_ID_ nvarchar(64),
     TASK_ID_ nvarchar(64),
+    ACT_INST_ID_ nvarchar(64),
     BYTEARRAY_ID_ nvarchar(64),
     DOUBLE_ double precision,
     LONG_ numeric(19,0),

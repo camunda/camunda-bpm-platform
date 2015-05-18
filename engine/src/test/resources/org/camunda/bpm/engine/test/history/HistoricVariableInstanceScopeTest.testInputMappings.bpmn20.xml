@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definition" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="process">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow sourceRef="theStart" targetRef="theService1" />
+
+    <serviceTask id="theService1" camunda:expression="${true}">
+      <extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="firstInputVariable">firstValue</camunda:inputParameter>
+        </camunda:inputOutput>
+      </extensionElements>
+    </serviceTask>
+
+    <sequenceFlow sourceRef="theService1" targetRef="theService2" />
+
+    <serviceTask id="theService2" camunda:expression="${true}">
+      <extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="secondInputVariable">secondValue</camunda:inputParameter>
+        </camunda:inputOutput>
+      </extensionElements>
+    </serviceTask>
+
+    <sequenceFlow sourceRef="theService2" targetRef="theTask" />
+
+    <userTask id="theTask">
+      <extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="thirdInputVariable">thirdValue</camunda:inputParameter>
+        </camunda:inputOutput>
+      </extensionElements>
+    </userTask>
+
+    <sequenceFlow sourceRef="theTask" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+
+  </process>
+
+</definitions>

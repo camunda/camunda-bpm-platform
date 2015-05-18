@@ -85,8 +85,8 @@ public class VariableListenerTest extends PluggableProcessEngineTestCase {
       .event(VariableListener.UPDATE)
       .name("aTaskVariable")
       .value("aNewTaskValue")
+      .activityInstanceId(taskExecution.getId())
       .matches(LogVariableListener.getInvocations().get(0));
-
     LogVariableListener.reset();
 
     // when i remove the variable from the human task
@@ -99,6 +99,7 @@ public class VariableListenerTest extends PluggableProcessEngineTestCase {
       .event(VariableListener.DELETE)
       .name("aTaskVariable")
       .value(null)
+      .activityInstanceId(taskExecution.getId())
       .matches(LogVariableListener.getInvocations().get(0));
 
     LogVariableListener.reset();
@@ -169,6 +170,7 @@ public class VariableListenerTest extends PluggableProcessEngineTestCase {
       .event(VariableListener.UPDATE)
       .name("aTaskVariable")
       .value("aNewTaskValue")
+      .activityInstanceId(taskExecution.getId())
       .matches(LogVariableListener.getInvocations().get(0));
 
     LogVariableListener.reset();
@@ -210,6 +212,7 @@ public class VariableListenerTest extends PluggableProcessEngineTestCase {
       .event(VariableListener.UPDATE)
       .name("aTaskVariable")
       .value("aTaskValue")
+      .activityInstanceId(caseInstance.getId())
       .matches(LogVariableListener.getInvocations().get(0));
 
     LogVariableListener.reset();
@@ -248,6 +251,7 @@ public class VariableListenerTest extends PluggableProcessEngineTestCase {
       .event(VariableListener.DELETE)
       .name("aTaskVariable")
       .value(null)
+      .activityInstanceId(taskExecution.getId())
       .matches(LogVariableListener.getInvocations().get(0));
 
     LogVariableListener.reset();
