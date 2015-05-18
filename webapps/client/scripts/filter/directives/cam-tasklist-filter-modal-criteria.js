@@ -3,7 +3,7 @@ define(function() {
 
   var dateExpLangHelp = 'E.g.: `${ now() }`, `${ dateTime() }` or `${ dateTime().plusWeeks(2) }`';
   var userExpLangHelp = 'E.g.: `${ currentUser() }`';
-  var commaSeparatedExps = 'List of expressions or values separated by comma. E.g.: `${ currentUserGroups() }, camunda-admin`';
+  var commaSeparatedExps = 'List of values separated by comma or an expression which evaluates to a list. E.g.: `camunda-admin, accounting` or `${ currentUserGroups() }`';
   var commaSeparatedValues = 'List of values seperated by comma. E.g.: `keyC, keyA, keyB`';
 
   // yyyy-MM-dd'T'HH:mm:ss
