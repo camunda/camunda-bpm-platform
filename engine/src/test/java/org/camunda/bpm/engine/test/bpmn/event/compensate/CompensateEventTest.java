@@ -148,7 +148,7 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
    * CAM-3628
    */
   @Deployment
-  public void FAILING_testCompensateSubprocessWithBoundaryEvent() {
+  public void testCompensateSubprocessWithBoundaryEvent() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("compensateProcess");
 
     Task compensationTask = taskService.createTaskQuery().singleResult();
