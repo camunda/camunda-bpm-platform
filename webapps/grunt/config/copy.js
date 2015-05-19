@@ -104,6 +104,13 @@ module.exports = function(config) {
           ],
           dest: '<%= buildTarget %>/fonts/'
         },
+        // open sans fonts
+        {
+          expand: true,
+          cwd: 'node_modules/camunda-commons-ui/vendor/fonts',
+          src: ['*.{eot,svg,ttf,woff,woff2}'],
+          dest: '<%= buildTarget %>/fonts/'
+        },
 
         // placeholder shims
         {

@@ -1,5 +1,6 @@
 @import "_vars.less";
 @import "../../node_modules/camunda-commons-ui/resources/less/common";
+@import "../../node_modules/camunda-commons-ui/resources/less/_fonts";
 
 
 @import "./../node_modules/camunda-commons-ui/lib/auth/page/login";
@@ -26,3 +27,21 @@
 @import "directives/variables";
 @import "directives/state-circle";
 @import "directives/view-pills";
+
+
+h1,
+h2,
+h3,
+h4 {
+  .font-light;
+}
+
+h1 {
+  text-transform: uppercase;
+}
+
+
+label,
+strong {
+  .font-bold();
+}
