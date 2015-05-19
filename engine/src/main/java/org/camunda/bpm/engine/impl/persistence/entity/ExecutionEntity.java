@@ -340,7 +340,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
 
   @SuppressWarnings("unchecked")
   public void initializeTimerDeclarations() {
-    log.fine("initializing timer declaration"+this);
+    log.fine("initializing timer declaration "+this);
     ScopeImpl scope = getScopeActivity();
     List<TimerDeclarationImpl> timerDeclarations = (List<TimerDeclarationImpl>) scope.getProperty(BpmnParse.PROPERTYNAME_TIMER_DECLARATION);
     if (timerDeclarations!=null) {
