@@ -13,7 +13,8 @@ define(['angular',
   './groupMembershipsCreate',
   './setup',
   './system',
-  './systemSettingsGeneral'
+  './systemSettingsGeneral',
+  './systemSettingsFlowNodeCount'
 ], function(angular,
   angularRoute,
   camundaCommonsUi,
@@ -29,7 +30,9 @@ define(['angular',
   groupMembershipsCreate,
   setup,
   system,
-  systemSettingsGeneral) {
+  systemSettingsGeneral,
+  systemSettingsFlowNodeCount) {
+  'use strict';
 
   var ngModule = angular.module('admin.pages', ['ngRoute', 'cam.commons']);
 
@@ -46,6 +49,7 @@ define(['angular',
   ngModule.config(setup);
   ngModule.config(system);
   ngModule.config(systemSettingsGeneral);
+  ngModule.config(systemSettingsFlowNodeCount);
 
   return ngModule;
 });

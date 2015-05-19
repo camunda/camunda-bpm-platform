@@ -2,12 +2,15 @@ define(['angular',
 	'./userResource',
 	'./groupResource',
 	'./groupMembershipResource',
-	'./initialUserResource'
+	'./initialUserResource',
+  './metricsResource'
 ], function(angular,
 	userResource,
 	groupResource,
 	groupMembershipResource,
-	initialUserResource) {
+	initialUserResource,
+  metricsResource) {
+  'use strict';
 
   var ngModule = angular.module('admin.resources', []);
 
@@ -15,6 +18,7 @@ define(['angular',
   ngModule.factory('GroupResource', groupResource);
   ngModule.factory('GroupMembershipResource', groupMembershipResource);
   ngModule.factory('InitialUserResource', initialUserResource);
+  ngModule.factory('MetricsResource', metricsResource);
 
   return ngModule;
 });
