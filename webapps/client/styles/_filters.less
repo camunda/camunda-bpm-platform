@@ -72,15 +72,24 @@
   }
 
   .search-date {
-    display: table;
-    overflow: hidden;
-    .removable-input,
-    select {
-      display: table-cell;
+    > .wrapper {
+      display: table;
+      overflow: hidden;
+
+      .removable-input,
+      select {
+        display: table-cell;
+        vertical-align: top;
+      }
+
+      select {
+        width: 90px;
+        border-right: none;
+      }
     }
-    select {
-      width: 90px;
-      border-right: none;
+    .note-error {
+      display: block;
+      width: 100%;
     }
   }
 
