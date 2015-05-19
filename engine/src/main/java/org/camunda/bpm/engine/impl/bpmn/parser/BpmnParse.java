@@ -117,6 +117,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ParticipantProcess;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
 import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
 import org.camunda.bpm.engine.impl.scripting.ScriptCondition;
 import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
@@ -1302,6 +1303,8 @@ public class BpmnParse extends Parse {
 
   protected ActivityBehavior parseBoundaryCancelEventDefinition(Element cancelEventDefinition, ActivityImpl activity) {
     activity.setProperty("type", "cancelBoundaryCatch");
+
+    LegacyBehavior.parseCancelBoundaryEvent(activity);
 
     ActivityImpl transaction = (ActivityImpl) activity.getEventScope();
     if (transaction.getActivityBehavior() != null && transaction.getActivityBehavior() instanceof MultiInstanceActivityBehavior) {

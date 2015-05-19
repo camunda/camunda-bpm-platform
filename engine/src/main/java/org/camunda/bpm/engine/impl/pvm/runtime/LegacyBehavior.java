@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ReceiveTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.SequentialMultiInstanceActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.SubProcessActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.cmd.GetActivityInstanceCmd;
 import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.ActivityInstanceImpl;
@@ -522,6 +523,21 @@ public class LegacyBehavior {
       }
     }
 
+  }
+
+  /**
+   * With prior versions, the boundary event was already executed when compensation was performed; Thus, after
+   * compensation completes, the execution is signalled waiting at the boundary event.
+   */
+  public static boolean signalCancelBoundaryEvent(String signalName) {
+    return "compensationDone".equals(signalName);
+  }
+
+  /**
+   * @see #signalCancelBoundaryEvent(String)
+   */
+  public static void parseCancelBoundaryEvent(ActivityImpl activity) {
+    activity.setProperty(BpmnParse.PROPERTYNAME_THROWS_COMPENSATION, true);
   }
 
 }

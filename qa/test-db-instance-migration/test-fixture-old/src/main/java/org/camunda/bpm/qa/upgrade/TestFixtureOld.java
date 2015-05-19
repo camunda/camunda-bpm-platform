@@ -32,6 +32,11 @@ import org.camunda.bpm.qa.upgrade.scenarios.authorization.AuthorizationScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.boundary.NestedNonInterruptingBoundaryEventOnInnerSubprocessScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.boundary.NestedNonInterruptingBoundaryEventOnOuterSubprocessScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.boundary.NonInterruptingBoundaryEventScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.compensation.InterruptingEventSubprocessCompensationScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.compensation.SingleActivityCompensationScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.compensation.SubprocessCompensationScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.compensation.SubprocessParallelCompensationScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.compensation.TransactionCancelCompensationScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.eventsubprocess.InterruptingEventSubprocessScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.eventsubprocess.NestedInterruptingErrorEventSubprocessScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.eventsubprocess.NestedInterruptingEventSubprocessParallelScenario;
@@ -107,6 +112,13 @@ public class TestFixtureOld {
     runner.setupScenarios(NonInterruptingBoundaryEventScenario.class);
     runner.setupScenarios(NestedNonInterruptingBoundaryEventOnInnerSubprocessScenario.class);
     runner.setupScenarios(NestedNonInterruptingBoundaryEventOnOuterSubprocessScenario.class);
+
+    // compensation
+    runner.setupScenarios(SingleActivityCompensationScenario.class);
+    runner.setupScenarios(SubprocessCompensationScenario.class);
+    runner.setupScenarios(TransactionCancelCompensationScenario.class);
+    runner.setupScenarios(InterruptingEventSubprocessCompensationScenario.class);
+    runner.setupScenarios(SubprocessParallelCompensationScenario.class);
 
     processEngine.close();
 

@@ -13,6 +13,10 @@
 
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
+import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
+
 /**
  * See CancelEndEventActivityBehavior: the cancel end event interrupts the scope and performs compensation.
  *
@@ -20,5 +24,20 @@ package org.camunda.bpm.engine.impl.bpmn.behavior;
  */
 public class CancelBoundaryEventActivityBehavior extends BoundaryEventActivityBehavior {
 
+  public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
+
+    if (LegacyBehavior.signalCancelBoundaryEvent(signalName)) {
+      // join compensating executions
+      if(execution.getExecutions().isEmpty()) {
+        leave(execution);
+      }
+      else {
+        ((ExecutionEntity)execution).forceUpdate();
+      }
+    }
+    else {
+      super.signal(execution, signalName, signalData);
+    }
+  }
 
 }
