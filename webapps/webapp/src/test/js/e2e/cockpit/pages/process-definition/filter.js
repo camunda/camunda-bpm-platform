@@ -9,7 +9,7 @@ module.exports = Filter.extend({
   },
 
   addFilterButton: function() {
-    return this.filterSideBarElement().all(by.css('.glyphicon-plus')).get(0);
+    return this.filterSideBarElement().all(by.css('.glyphicon-plus-sign')).get(0);
   },
 
   dropdownElement: function() {
