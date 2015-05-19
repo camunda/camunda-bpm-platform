@@ -67,7 +67,8 @@ ops.task = {
     },
     {
       id: '3',
-      name: 'Task 3'
+      name: 'Task 3',
+      assignee: 'test'
     }
   ],
 

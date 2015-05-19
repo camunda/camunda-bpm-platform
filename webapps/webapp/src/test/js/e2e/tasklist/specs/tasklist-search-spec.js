@@ -180,5 +180,27 @@ describe('Tasklist Search', function() {
       expect(page.taskList.taskList().count()).to.eventually.eql(1);
       expect(page.taskList.taskName(0)).to.eventually.eql('Task 1');
     });
+
+    it('should not find a task if search is changed to equal', function() {
+      page.taskList.taskSearch.changeOperator(0, '=');
+
+      expect(page.taskList.taskList().count()).to.eventually.eql(0);
+    });
+
+    it('should find tasks by assignee', function() {
+      page.taskList.taskSearch.deleteSearch(0);
+      page.taskList.taskSearch.createSearch('Assignee', 'test', '=');
+
+      expect(page.taskList.taskList().count()).to.eventually.eql(1);
+      expect(page.taskList.taskName(0)).to.eventually.eql('Task 3');
+    });
+
+    it('should allow to use expressions', function() {
+      page.taskList.taskSearch.deleteSearch(0);
+      page.taskList.taskSearch.createSearch('Assignee', '${ currentUser() }', '=');
+
+      expect(page.taskList.taskList().count()).to.eventually.eql(1);
+      expect(page.taskList.taskName(0)).to.eventually.eql('Task 3');
+    });
   });
 });

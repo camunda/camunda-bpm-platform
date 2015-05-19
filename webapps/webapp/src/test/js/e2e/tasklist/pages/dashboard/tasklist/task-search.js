@@ -23,7 +23,9 @@ module.exports = Page.extend({
     this.formElement().element(by.css('.main-field')).click();
     this.variableTypeDropdown(type).click();
     this.searchList().last().element(by.model('editValue')).sendKeys(name, protractor.Key.ENTER);
-    this.searchList().last().element(by.model('editValue')).sendKeys(value, protractor.Key.ENTER);
+    if(value) {
+      this.searchList().last().element(by.model('editValue')).sendKeys(value, protractor.Key.ENTER);
+    }
     this.searchList().last().element(by.css('[value="operator.value"]')).click();
     this.searchList().last().element(by.cssContainingText('[value="operator.value"] .dropdown-menu li', operator)).click();
   },
