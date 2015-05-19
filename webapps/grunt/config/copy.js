@@ -80,8 +80,8 @@ module.exports = function(config) {
         },
         {
           expand: true,
-          cwd: '<%= pkg.gruntConfig.clientDir %>/fonts',
-          src: ['*/*.{eot,svg,ttf,woff}'],
+          cwd: 'node_modules/camunda-commons-ui/vendor/fonts',
+          src: ['*.{eot,svg,ttf,woff,woff2}'],
           dest: '<%= buildTarget %>/fonts/'
         },
         {
