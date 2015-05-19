@@ -14,16 +14,22 @@
 package org.camunda.bpm.integrationtest.functional.spin;
 
 import static org.camunda.bpm.engine.variable.Variables.serializedObjectValue;
+import static org.camunda.spin.Spin.JSON;
 import static org.camunda.spin.Spin.XML;
+import static org.junit.Assert.assertEquals;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
+import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
+import org.camunda.spin.impl.util.SpinIoUtil;
+import org.camunda.spin.json.SpinJsonNode;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -42,7 +48,8 @@ public class PaSpinSupportTest extends AbstractFoxPlatformIntegrationTest {
   @Deployment
   public static WebArchive createDeployment() {
     return initWebArchiveDeployment()
-        .addAsResource("org/camunda/bpm/integrationtest/oneTaskProcess.bpmn");
+        .addAsResource("org/camunda/bpm/integrationtest/oneTaskProcess.bpmn")
+        .addAsResource("org/camunda/bpm/integrationtest/functional/spin/jackson146.json");
   }
 
   @Test
@@ -80,5 +87,33 @@ public class PaSpinSupportTest extends AbstractFoxPlatformIntegrationTest {
     Assert.assertTrue(spinPluginFound);
   }
 
-}
+  @Test
+  public void testJacksonBug146() {
+    InputStream resourceAsStream = getClass().getClassLoader().getResourceAsStream("org/camunda/bpm/integrationtest/functional/spin/jackson146.json");
+    String jackson146 = SpinIoUtil.inputStreamAsString(resourceAsStream);
 
+    // this should not fail
+    SpinJsonNode node = JSON(jackson146);
+
+    // file has 4000 characters in length a
+    // 20 characters per repeated JSON object
+    assertEquals(200, node.prop("abcdef").elements().size());
+  }
+
+  @Test
+  public void testJacksonBug146AsVariable() {
+    InputStream resourceAsStream = getClass().getClassLoader().getResourceAsStream("org/camunda/bpm/integrationtest/functional/spin/jackson146.json");
+    String jackson146 = SpinIoUtil.inputStreamAsString(resourceAsStream);
+
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", Variables.createVariables()
+      .putValue("jackson146", serializedObjectValue(jackson146).serializationDataFormat("application/json").objectTypeName(HashMap.class.getName())));
+
+    // file has 4000 characters in length a
+    // 20 characters per repeated JSON object
+    ObjectValue objectValue = runtimeService.getVariableTyped(pi.getId(), "jackson146", true);
+    HashMap<String, List<Object>> map = (HashMap<String, List<Object>>) objectValue.getValue();
+
+    assertEquals(200, map.get("abcdef").size());
+  }
+
+}
