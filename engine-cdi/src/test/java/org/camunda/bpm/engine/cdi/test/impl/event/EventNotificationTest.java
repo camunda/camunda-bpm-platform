@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,19 +12,23 @@
  */
 package org.camunda.bpm.engine.cdi.test.impl.event;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+
+import java.util.concurrent.TimeUnit;
+
 import org.camunda.bpm.engine.cdi.test.CdiProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
 public class EventNotificationTest extends CdiProcessEngineTestCase {
 
   @Test
   @Deployment(resources = {"org/camunda/bpm/engine/cdi/test/impl/event/EventNotificationTest.process1.bpmn20.xml"})
-  public void testReceiveAll() { 
+  public void testReceiveAll() {
     TestEventListener listenerBean = getBeanInstance(TestEventListener.class);
     listenerBean.reset();
 
@@ -36,18 +40,17 @@ public class EventNotificationTest extends CdiProcessEngineTestCase {
     Task task = taskService.createTaskQuery().singleResult();
     taskService.complete(task.getId());
 
-    // assert that now the bean has received 11 events
     assertEquals(16, listenerBean.getEventsReceived().size());
   }
 
   @Test
-  @Deployment(resources = { 
+  @Deployment(resources = {
       "org/camunda/bpm/engine/cdi/test/impl/event/EventNotificationTest.process1.bpmn20.xml",
       "org/camunda/bpm/engine/cdi/test/impl/event/EventNotificationTest.process2.bpmn20.xml" })
   public void testSelectEventsPerProcessDefinition() {
     TestEventListener listenerBean = getBeanInstance(TestEventListener.class);
     listenerBean.reset();
-    
+
     assertEquals(0, listenerBean.getEventsReceivedByKey().size());
     //start the 2 processes
     runtimeService.startProcessInstanceByKey("process1");
@@ -56,13 +59,13 @@ public class EventNotificationTest extends CdiProcessEngineTestCase {
     // assert that now the bean has received 11 events
     assertEquals(11, listenerBean.getEventsReceivedByKey().size());
   }
-  
+
   @Test
   @Deployment(resources = {"org/camunda/bpm/engine/cdi/test/impl/event/EventNotificationTest.process1.bpmn20.xml"})
   public void testSelectEventsPerActivity() {
     TestEventListener listenerBean = getBeanInstance(TestEventListener.class);
     listenerBean.reset();
-    
+
     assertEquals(0, listenerBean.getEndActivityService1());
     assertEquals(0, listenerBean.getStartActivityService1());
     assertEquals(0, listenerBean.getTakeTransition1());
@@ -111,6 +114,23 @@ public class EventNotificationTest extends CdiProcessEngineTestCase {
     runtimeService.deleteProcessInstance(processInstance.getId(), "test");
 
     assertEquals(1, listenerBean.getDeleteTaskUser1());
+  }
+
+  @Test
+  @Deployment
+  public void testMultiInstanceEvents(){
+    TestEventListener listenerBean = getBeanInstance(TestEventListener.class);
+    listenerBean.reset();
+
+    assertThat(listenerBean.getEventsReceived().size(), is(0));
+    runtimeService.startProcessInstanceByKey("process1");
+    waitForJobExecutorToProcessAllJobs(TimeUnit.SECONDS.toMillis(5L), 500L);
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertThat(task.getName(), is("User Task"));
+
+    // two times each event/task times iteration + three transitions
+    assertThat(listenerBean.getEventsReceived().size(), is(15));
   }
 
 }
