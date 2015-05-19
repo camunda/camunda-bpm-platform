@@ -126,38 +126,38 @@
   > .debug {
     margin-top: (@grid-gutter-width / 2);
   }
+}
 
 
-  .ancestor-dropwdown {
-    min-width: 300px;
-    max-width: 500px;
+.ancestor-dropdown {
+  min-width: 300px;
+  max-width: 500px;
 
-    li {
-      margin-bottom: 5px;
-      &:last-child {
-        margin-bottom: 0;
-      }
-
-      .name {
-        font-weight: bolder;
-      }
+  li {
+    margin-bottom: 5px;
+    &:last-child {
+      margin-bottom: 0;
     }
 
-    .id {
-      margin-bottom: 3px;
-      font-family: monospace;
-      color: @gray-dark;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 100%;
+    .name {
+      font-weight: bolder;
+    }
+  }
 
-      .variables {
-        > span {
-          font-style: italic;
-        }
-        > .row {
-          margin-top: 0;
-        }
+  .id {
+    margin-bottom: 3px;
+    font-family: monospace;
+    color: @gray-dark;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+
+    .variables {
+      > span {
+        font-style: italic;
+      }
+      > .row {
+        margin-top: 0;
       }
     }
   }
