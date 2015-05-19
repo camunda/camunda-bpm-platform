@@ -64,11 +64,7 @@ public class Scenario {
 
   public void createInstances(ProcessEngine engine, Map<String, Scenario> scenarios) {
     for (int i = 1; i <= times; i++) {
-      String scenarioInstanceName = name;
-      if (times > 1) {
-        scenarioInstanceName = name + "." + i;
-      }
-
+      String scenarioInstanceName = name + "." + i;
       create(engine, scenarios, scenarioInstanceName);
     }
   }

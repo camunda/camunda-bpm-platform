@@ -46,12 +46,17 @@ import org.camunda.bpm.qa.upgrade.scenarios.eventsubprocess.NestedParallelNonInt
 import org.camunda.bpm.qa.upgrade.scenarios.eventsubprocess.NonInterruptingEventSubprocessScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.eventsubprocess.ParallelNestedNonInterruptingEventSubprocessScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.eventsubprocess.TwoLevelNestedNonInterruptingEventSubprocessScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.gateway.EventBasedGatewayScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.job.AsyncParallelMultiInstanceScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.job.AsyncSequentialMultiInstanceScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.multiinstance.MultiInstanceReceiveTaskScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.multiinstance.NestedSequentialMultiInstanceSubprocessScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.multiinstance.ParallelMultiInstanceSubprocessScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.multiinstance.SequentialMultiInstanceSubprocessScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.task.OneScopeTaskScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.task.OneTaskScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.task.ParallelScopeTasksScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.task.ParallelTasksScenario;
 
 /**
  * @author Daniel Meyer
@@ -119,6 +124,15 @@ public class TestFixtureOld {
     runner.setupScenarios(TransactionCancelCompensationScenario.class);
     runner.setupScenarios(InterruptingEventSubprocessCompensationScenario.class);
     runner.setupScenarios(SubprocessParallelCompensationScenario.class);
+
+    // plain tasks
+    runner.setupScenarios(OneTaskScenario.class);
+    runner.setupScenarios(OneScopeTaskScenario.class);
+    runner.setupScenarios(ParallelTasksScenario.class);
+    runner.setupScenarios(ParallelScopeTasksScenario.class);
+
+    // event-based gateway
+    runner.setupScenarios(EventBasedGatewayScenario.class);
 
     processEngine.close();
 

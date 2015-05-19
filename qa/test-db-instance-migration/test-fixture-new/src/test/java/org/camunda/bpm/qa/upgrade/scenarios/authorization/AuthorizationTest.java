@@ -71,14 +71,14 @@ public class AuthorizationTest {
   }
 
   @Test
-  @ScenarioUnderTest("startProcessInstance")
+  @ScenarioUnderTest("startProcessInstance.1")
   public void testGetDeployment() {
     List<Deployment> deployments = repositoryService.createDeploymentQuery().list();
     assertFalse(deployments.isEmpty());
   }
 
   @Test
-  @ScenarioUnderTest("startProcessInstance")
+  @ScenarioUnderTest("startProcessInstance.1")
   public void testGetProcessDefinition() {
     ProcessDefinition definition = repositoryService
         .createProcessDefinitionQuery()
@@ -88,7 +88,7 @@ public class AuthorizationTest {
   }
 
   @Test
-  @ScenarioUnderTest("startProcessInstance")
+  @ScenarioUnderTest("startProcessInstance.1")
   public void testGetProcessInstance() {
     List<ProcessInstance> instances = runtimeService
         .createProcessInstanceQuery()
@@ -98,7 +98,7 @@ public class AuthorizationTest {
   }
 
   @Test
-  @ScenarioUnderTest("startProcessInstance")
+  @ScenarioUnderTest("startProcessInstance.1")
   public void testGetExecution() {
     List<Execution> executions = runtimeService
         .createExecutionQuery()
@@ -108,7 +108,7 @@ public class AuthorizationTest {
   }
 
   @Test
-  @ScenarioUnderTest("startProcessInstance")
+  @ScenarioUnderTest("startProcessInstance.1")
   public void testGetTask() {
     List<Task> tasks = taskService
         .createTaskQuery()
@@ -118,7 +118,7 @@ public class AuthorizationTest {
   }
 
   @Test
-  @ScenarioUnderTest("startProcessInstance")
+  @ScenarioUnderTest("startProcessInstance.1")
   public void testGetHistoricProcessInstance() {
     List<HistoricProcessInstance> instances= historyService
         .createHistoricProcessInstanceQuery()
@@ -128,7 +128,7 @@ public class AuthorizationTest {
   }
 
   @Test
-  @ScenarioUnderTest("startProcessInstance")
+  @ScenarioUnderTest("startProcessInstance.1")
   public void testGetHistoricActivityInstance() {
     List<HistoricActivityInstance> instances= historyService
         .createHistoricActivityInstanceQuery()
@@ -137,7 +137,7 @@ public class AuthorizationTest {
   }
 
   @Test
-  @ScenarioUnderTest("startProcessInstance")
+  @ScenarioUnderTest("startProcessInstance.1")
   public void testGetHistoricTaskInstance() {
     List<HistoricTaskInstance> instances= historyService
         .createHistoricTaskInstanceQuery()
@@ -147,14 +147,14 @@ public class AuthorizationTest {
   }
 
   @Test
-  @ScenarioUnderTest("startProcessInstance")
+  @ScenarioUnderTest("startProcessInstance.1")
   public void testStartProcessInstance() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
     assertNotNull(instance);
   }
 
   @Test
-  @ScenarioUnderTest("startProcessInstance")
+  @ScenarioUnderTest("startProcessInstance.1")
   public void testSubmitStartForm() {
     String processDefinitionId = repositoryService
         .createProcessDefinitionQuery()
@@ -166,7 +166,7 @@ public class AuthorizationTest {
   }
 
   @Test
-  @ScenarioUnderTest("startProcessInstance")
+  @ScenarioUnderTest("startProcessInstance.1")
   public void testCompleteTaskInstance() {
     String taskId = taskService
         .createTaskQuery()
@@ -178,7 +178,7 @@ public class AuthorizationTest {
   }
 
   @Test
-  @ScenarioUnderTest("startProcessInstance")
+  @ScenarioUnderTest("startProcessInstance.1")
   public void testSubmitTaskForm() {
     String taskId = taskService
         .createTaskQuery()
@@ -190,7 +190,7 @@ public class AuthorizationTest {
   }
 
   @Test
-  @ScenarioUnderTest("startProcessInstance")
+  @ScenarioUnderTest("startProcessInstance.1")
   public void testSetVariable() {
     String processInstanceId = runtimeService
         .createProcessInstanceQuery()
