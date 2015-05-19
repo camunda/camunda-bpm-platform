@@ -45,8 +45,9 @@ define([
     if(['Like', 'Before', 'After'].indexOf(operator) !== -1) {
       out += operator;
     }
-    if(expressionsRegex.test(value)) {
-      out += 'Expession';
+    if(expressionsRegex.test(value) &&
+       ['assignee', 'owner', 'candidateGroup', 'candidateUser', 'involvedUser'].indexOf(type) !== -1) {
+      out += 'Expression';
     }
     return out;
   };
