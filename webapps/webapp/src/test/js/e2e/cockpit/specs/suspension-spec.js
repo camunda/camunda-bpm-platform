@@ -71,7 +71,8 @@ describe('Cockpit Suspsension Spec', function() {
     it('should validate suspended instance', function() {
 
       // when
-      instancePage.selectBreadCrumb(1);
+      instancePage.navbarBrand().click();
+      dashboardPage.deployedProcessesList.selectProcess(0);
 
       // then
       expect(definitionPage.processInstancesTab.isInstanceSuspended(0)).to.eventually.be.true;
