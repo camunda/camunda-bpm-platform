@@ -28,6 +28,10 @@ module.exports = Page.extend({
     this.searchList().last().element(by.cssContainingText('[value="operator.value"] .dropdown-menu li', operator)).click();
   },
 
+  searchInputField: function() {
+    return this.formElement().element(by.css('.main-field'));
+  },
+
   deleteSearch: function(index) {
     this.searchList().get(index).element(by.css('.remove-search')).click();
   },

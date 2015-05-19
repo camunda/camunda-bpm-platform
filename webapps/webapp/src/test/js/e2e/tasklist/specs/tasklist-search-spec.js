@@ -161,5 +161,24 @@ describe('Tasklist Search', function() {
       expect(page.taskList.taskList().count()).to.eventually.eql(1);
       expect(page.taskList.taskName(0)).to.eventually.eql('Task 1');
     });
+
+    it('should remove label search', function() {
+
+      // when
+      page.taskList.taskSearch.deleteSearch(0);
+
+      // then
+      expect(page.taskList.taskList().count()).to.eventually.eql(3);
+    });
+  });
+
+  describe('search task properties', function() {
+    it('should search by name like per default', function() {
+      page.taskList.taskSearch.searchInputField().click();
+      page.taskList.taskSearch.searchInputField().sendKeys('1', protractor.Key.ENTER);
+
+      expect(page.taskList.taskList().count()).to.eventually.eql(1);
+      expect(page.taskList.taskName(0)).to.eventually.eql('Task 1');
+    });
   });
 });
