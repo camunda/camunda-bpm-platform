@@ -25,12 +25,15 @@ import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.DELETE;
 import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.OWNER;
 import static org.camunda.bpm.engine.impl.persistence.entity.TaskEntity.PRIORITY;
 
+import java.util.Date;
 import java.util.HashMap;
 
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
+import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.DelegationState;
@@ -120,6 +123,10 @@ public class OperationLogTaskProcessTest extends PluggableProcessEngineTestCase 
     // note: 50 is the default task priority
     assertEquals(50, Integer.parseInt(userOperationLogEntry.getOrgValue()));
     assertEquals(10, Integer.parseInt(userOperationLogEntry.getNewValue()));
+
+    // move clock by 5 minutes
+    Date date = DateTimeUtil.now().plusMinutes(5).toDate();
+    ClockUtil.setCurrentTime(date);
 
     // then: set priority again
     taskService.setPriority(task.getId(), 75);
