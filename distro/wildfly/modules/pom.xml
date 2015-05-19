@@ -13,6 +13,8 @@
 
   <properties>
     <org.jboss.shrinkwrap.resolver.version>1.0.0-beta-5</org.jboss.shrinkwrap.resolver.version>
+    <version.jackson>2.5.3</version.jackson>
+    <version.jackson.annotations>2.5.0</version.jackson.annotations>
   </properties>
 
   <dependencies>
@@ -57,20 +59,6 @@
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>com.fasterxml.jackson.core</groupId>
-          <artifactId>jackson-databind</artifactId>
-	    </exclusion>
-        <exclusion>
-          <groupId>com.fasterxml.jackson.core</groupId>
-          <artifactId>jackson-core</artifactId>
-	    </exclusion>
-        <exclusion>
-          <groupId>com.fasterxml.jackson.core</groupId>
-          <artifactId>jackson-annotations</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
@@ -114,25 +102,6 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <version>1.7.7</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <version>2.4.1</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-      <version>2.4.1</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-annotations</artifactId>
-      <version>2.4.1</version>
       <scope>provided</scope>
     </dependency>
 
@@ -198,6 +167,29 @@
                   </mapper>
                 </copy>
 
+                <!-- copy jackson dependencies to slot -->
+                <delete dir="target/modules/com/fasterxml/jackson" />
+                <copy todir="target/modules" flatten="false">
+                  <fileset refid="maven.project.dependencies" />
+                  <mapper>
+                    <chainedmapper>
+                      <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/${version.jackson}/\3" handledirsep="yes" />
+                      <regexpmapper from="^(com.fasterxml.jackson.*/.*.jar)$$" to="\1" handledirsep="yes" />
+                    </chainedmapper>
+                  </mapper>
+                </copy>
+
+                <delete dir="target/modules/com/fasterxml/jackson/core/jackson-annotations" />
+                <copy todir="target/modules" flatten="false">
+                  <fileset refid="maven.project.dependencies" />
+                  <mapper>
+                    <chainedmapper>
+                      <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/${version.jackson.annotations}/\3" handledirsep="yes" />
+                      <regexpmapper from="^(com.fasterxml.jackson.core.jackson-annotations/.*.jar)$$" to="\1" handledirsep="yes" />
+                    </chainedmapper>
+                  </mapper>
+                </copy>
+
 
                 <copy todir="target/modules" flatten="false">
                   <fileset dir="src/main/modules" />
@@ -220,6 +212,14 @@
                 </replace>
 
                 <replace dir="target/modules" token="@version.camunda.template-engines@" value="${version.camunda.template-engines}">
+                  <include name="**/module.xml" />
+                </replace>
+
+                <replace dir="target/modules" token="@version.jackson@" value="${version.jackson}">
+                  <include name="**/module.xml" />
+                </replace>
+
+                <replace dir="target/modules" token="@version.jackson.annotations@" value="${version.jackson.annotations}">
                   <include name="**/module.xml" />
                 </replace>
 
