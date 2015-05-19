@@ -8,6 +8,15 @@ module.exports = ActionBar.extend({
 
   cancelInstanceButton: function() {
     return this.getActionButton(0);
+  },
+
+  cancelInstance: function() {
+    var modal = this.modal;
+    this.cancelInstanceButton().click().then(function() {
+      modal.cancelButton().click().then(function() {
+        modal.okButton().click();
+      });
+    });
   }
 
 });

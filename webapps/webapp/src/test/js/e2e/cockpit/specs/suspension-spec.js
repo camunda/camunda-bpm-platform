@@ -53,7 +53,7 @@ describe('Cockpit Suspsension Spec', function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
         dashboardPage.deployedProcessesList.selectProcess(0);
-        definitionPage.processInstancesTab.instanceIdClick(0);
+        definitionPage.processInstancesTab.selectInstanceId(0);
       });
     });
 
@@ -78,7 +78,7 @@ describe('Cockpit Suspsension Spec', function() {
       expect(definitionPage.processInstancesTab.isInstanceSuspended(0)).to.eventually.be.true;
 
       // finaly
-      definitionPage.processInstancesTab.instanceIdClick(0);
+      definitionPage.processInstancesTab.selectInstanceId(0);
     });
 
 

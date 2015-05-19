@@ -10,28 +10,28 @@ module.exports = Table.extend({
   tableRepeater: 'processInstance in processInstances',
 
 
-  isInstanceSuspended: function(item) {
-    return this.tableItem(item, '.state .badge-suspended')
+  isInstanceSuspended: function(idx) {
+    return this.tableItem(idx, '.state .badge-suspended')
       .getAttribute('class')
       .then(function(classes) {
         return classes.indexOf('ng-hide') === -1;
       });
   },
 
-  instanceIdClick: function(item) {
-    this.tableItem(item, by.binding('processInstance.id')).click();
+  selectInstanceId: function(idx) {
+    this.tableItem(idx, by.binding('processInstance.id')).click();
   },
 
-  instanceId: function(item) {
-    return this.tableItem(item, '[title]').getAttribute('title');
+  instanceId: function(idx) {
+    return this.tableItem(idx, '[title]').getAttribute('title');
   },
 
-  startTime: function(item) {
-    return this.tableItem(item, '.start-time');
+  startTime: function(idx) {
+    return this.tableItem(idx, '.start-time');
   },
 
-  businessKey: function(item) {
-    return this.tableItem(item, '.business-key');
+  businessKey: function(idx) {
+    return this.tableItem(idx, '.business-key');
   }
 
 });
