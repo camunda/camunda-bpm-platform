@@ -52,32 +52,33 @@
     bottom: 0;
     line-height: 40px;
     margin: 0 10px;
+    text-transform: none;
+  }
 
-    .process-name-prefix {
+  .process-name-prefix {
+    position: absolute;
+    bottom: 7px;
+    left: 0;
+    margin: 0;
+    padding: 0;
+    display: block;
+    text-transform: uppercase;
+    font-size: 10px;
+    width: 65px;
+    line-height: 12px;
+    color: @gray-light;
+    text-shadow: 0 1px 0 @body-bg;
+
+    &:after {
       position: absolute;
-      bottom: 7px;
-      left: 0;
-      margin: 0;
-      padding: 0;
+      top: 0;
+      right: 0;
       display: block;
-      text-transform: uppercase;
-      font-size: 10px;
-      width: 65px;
-      line-height: 12px;
-      color: @gray-light;
+      content: ':';
+      font-size: 20px;
+      line-height: 20px;
+      color: darken(@gray-light, 10%);
       text-shadow: 0 1px 0 @body-bg;
-
-      &:after {
-        position: absolute;
-        top: 0;
-        right: 0;
-        display: block;
-        content: ':';
-        font-size: 20px;
-        line-height: 20px;
-        color: darken(@gray-light, 10%);
-        text-shadow: 0 1px 0 @body-bg;
-      }
     }
   }
 
