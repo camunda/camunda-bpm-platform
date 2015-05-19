@@ -332,16 +332,21 @@ public class ExecutionEntity extends PvmExecutionImpl implements
       }
     }
 
+    // create event subscriptions for the current scope
+    for (EventSubscriptionDeclaration declaration : EventSubscriptionDeclaration.getDeclarationsForScope(scope)) {
+      declaration.createSubscription(this);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public void initializeTimerDeclarations() {
+    log.fine("initializing timer declaration"+this);
+    ScopeImpl scope = getScopeActivity();
     List<TimerDeclarationImpl> timerDeclarations = (List<TimerDeclarationImpl>) scope.getProperty(BpmnParse.PROPERTYNAME_TIMER_DECLARATION);
     if (timerDeclarations!=null) {
       for (TimerDeclarationImpl timerDeclaration : timerDeclarations) {
         timerDeclaration.createTimerInstance(this);
       }
-    }
-
-    // create event subscriptions for the current scope
-    for (EventSubscriptionDeclaration declaration : EventSubscriptionDeclaration.getDeclarationsForScope(scope)) {
-      declaration.createSubscription(this);
     }
   }
 
@@ -370,6 +375,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
       startContext = formPropertyStartContext;
 
       initialize();
+      initializeTimerDeclarations();
       fireProcessStartEvent();
     }
     performOperation(PvmAtomicOperation.PROCESS_START);

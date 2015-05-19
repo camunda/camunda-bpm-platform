@@ -179,6 +179,8 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   public abstract void initialize();
 
+  public abstract void initializeTimerDeclarations();
+
   public void executeIoMapping() {
     // execute Input Mappings (if they exist).
     ScopeImpl currentScope = getScopeActivity();
@@ -200,6 +202,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     startContext = new ProcessInstanceStartContext(getActivity());
 
     initialize();
+    initializeTimerDeclarations();
 
     if(variables != null) {
       setVariables(variables);
@@ -215,6 +218,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
    */
   public void startWithoutExecuting() {
     initialize();
+    initializeTimerDeclarations();
     fireProcessStartEvent();
     performOperation(PvmAtomicOperation.FIRE_PROCESS_START);
   }
@@ -941,6 +945,16 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
     if(log.isLoggable(Level.FINE)) {
       log.fine("[ENTER] "+this + ": "+activityInstanceId+", parent: "+getParentActivityInstanceId());
+    }
+
+    // <LEGACY>: in general, io mappings may only exist when the activity is scope
+    // however, for multi instance activities, the inner activity does not become a scope
+    // due to the presence of an io mapping. In that case, it is ok to execute the io mapping
+    // anyway because the multi-instance body already ensures variable isolation
+    executeIoMapping();
+
+    if (activity.isScope()) {
+      initializeTimerDeclarations();
     }
 
   }

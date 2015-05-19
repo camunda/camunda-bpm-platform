@@ -126,6 +126,10 @@ public class ExecutionImpl extends PvmExecutionImpl implements
     return;
   }
 
+  public void initializeTimerDeclarations() {
+    return;
+  }
+
   // parent ///////////////////////////////////////////////////////////////////
 
   /** ensures initialization and returns the parent */

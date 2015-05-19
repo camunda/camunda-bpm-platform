@@ -74,7 +74,7 @@ public class InputOutputEventTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
-  public void FAILING_testTimerCatchEvent() {
+  public void testTimerCatchEvent() {
     Map<String, Object> variables = new HashMap<String, Object>();
     Date dueDate = DateTimeUtil.now().plusMinutes(5).toDate();
     variables.put("outerVariable", new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(dueDate));
