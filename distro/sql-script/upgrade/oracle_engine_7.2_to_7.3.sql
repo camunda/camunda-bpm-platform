@@ -149,3 +149,13 @@ SELECT * FROM dual;
 
 ALTER TABLE ACT_RU_VARIABLE
   ADD ACT_INST_ID_ NVARCHAR2(64);
+
+-- metrics --
+
+create table ACT_RU_METER_LOG (
+  ID_ NVARCHAR2(64) not null,
+  NAME_ NVARCHAR2(64) not null,
+  VALUE_ NUMBER(19,0),
+  TIMESTAMP_ TIMESTAMP(6) not null,
+  primary key (ID_)
+);

@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
 import org.camunda.bpm.engine.management.DeploymentStatisticsQuery;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
+import org.camunda.bpm.engine.management.MetricsQuery;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatisticsQuery;
 import org.camunda.bpm.engine.management.TableMetaData;
 import org.camunda.bpm.engine.management.TablePage;
@@ -784,5 +785,20 @@ public interface ManagementService {
    *          If the user is not a member of the group {@link Groups#CAMUNDA_ADMIN}.
    */
   int getHistoryLevel();
+
+  /**
+   * @return a new metrics Query.
+   * @since 7.3
+   */
+  MetricsQuery createMetricsQuery();
+
+  /**
+   * Deletes all metrics events which are older than the specified timestamp.
+   * If the timestamp is null, all metrics will be deleted
+   *
+   * @param timestamp or null
+   * @since 7.3
+   */
+  void deleteMetrics(Date timestamp);
 
 }

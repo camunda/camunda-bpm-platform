@@ -21,6 +21,9 @@
     
     <property name="history" value="aCustomHistoryLevel" />
     
+    <!-- turn off metrics reporter -->
+    <property name="dbMetricsReporterActivate" value="false" />
+    
     <property name="customHistoryLevels">
       <list>
         <bean class="org.camunda.bpm.engine.test.standalone.history.CustomHistoryLevelFull" />

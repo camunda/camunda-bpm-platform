@@ -216,6 +216,14 @@ create table ACT_RU_FILTER (
   primary key (ID_)
 );
 
+create table ACT_RU_METER_LOG (
+  ID_ nvarchar(64) not null,
+  NAME_ nvarchar(64) not null,
+  VALUE_ numeric(19,0),
+  TIMESTAMP_ datetime2 not null,
+  primary key (ID_)
+);
+
 create index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION(BUSINESS_KEY_);
 create index ACT_IDX_TASK_CREATE on ACT_RU_TASK(CREATE_TIME_);
 create index ACT_IDX_TASK_ASSIGNEE on ACT_RU_TASK(ASSIGNEE_);

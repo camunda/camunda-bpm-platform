@@ -66,7 +66,8 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
   }
 
   private static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Arrays.asList(
-    "ACT_GE_PROPERTY"
+    "ACT_GE_PROPERTY",
+    "ACT_RU_METER_LOG"
   );
 
   protected ProcessEngine processEngine;

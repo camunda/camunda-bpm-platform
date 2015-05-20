@@ -172,6 +172,13 @@ public abstract class AbstractProcessEngineRestServiceImpl {
     return subResource;
   }
 
+  public MetricsRestService getMetricsRestService(String engineName) {
+    String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
+    MetricsRestServiceImpl subResource = new MetricsRestServiceImpl(engineName, getObjectMapper());
+    subResource.setRelativeRootResourceUri(rootResourcePath);
+    return subResource;
+  }
+
   protected abstract URI getRelativeEngineUri(String engineName);
 
   protected ObjectMapper getObjectMapper() {

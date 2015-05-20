@@ -100,6 +100,11 @@ public class ProcessEngineImpl implements ProcessEngine {
       // register process engine with Job Executor
       jobExecutor.registerProcessEngine(this);
     }
+
+    if(processEngineConfiguration.isMetricsEnabled()
+        && processEngineConfiguration.isDbMetricsReporterActivate()) {
+      processEngineConfiguration.getDbMetricsReporter().start();
+    }
   }
 
   protected void executeSchemaOperations() {
@@ -109,6 +114,10 @@ public class ProcessEngineImpl implements ProcessEngine {
   public void close() {
 
     ProcessEngines.unregister(this);
+
+    if(processEngineConfiguration.isMetricsEnabled()) {
+      processEngineConfiguration.getDbMetricsReporter().stop();
+    }
 
     if ((jobExecutor != null)) {
       // unregister process engine with Job Executor

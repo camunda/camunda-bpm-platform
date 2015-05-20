@@ -25,6 +25,9 @@
     <!-- job executor configurations -->
     <property name="jobExecutorActivate" value="false" />
 
+    <!-- turn off metrics reporter -->
+    <property name="dbMetricsReporterActivate" value="false" />
+
     <!-- resource authorization provider -->
     <property name="resourceAuthorizationProvider" ref="myResourceAuthorizationProvider" />
 

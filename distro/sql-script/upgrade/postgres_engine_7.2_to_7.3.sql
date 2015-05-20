@@ -142,3 +142,14 @@ VALUES
 
 ALTER TABLE ACT_RU_VARIABLE
   ADD ACT_INST_ID_ varchar(64);
+
+-- metrics --
+
+create table ACT_RU_METER_LOG (
+  ID_ varchar(64) not null,
+  NAME_ varchar(64) not null,
+  VALUE_ bigint,
+  TIMESTAMP_ timestamp not null,
+  primary key (ID_)
+);
+

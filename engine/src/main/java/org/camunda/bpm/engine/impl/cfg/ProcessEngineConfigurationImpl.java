@@ -163,6 +163,9 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendJobDefinitionHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
+import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
+import org.camunda.bpm.engine.impl.metrics.parser.MetricsParseListener;
+import org.camunda.bpm.engine.impl.metrics.reporter.DbMetricsReporter;
 import org.camunda.bpm.engine.impl.persistence.GenericManagerFactory;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
@@ -189,6 +192,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.IdentityLinkManager;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
+import org.camunda.bpm.engine.impl.persistence.entity.MeterLogManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceManager;
@@ -226,6 +230,7 @@ import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSession;
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSessionFactory;
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.JPAVariableSerializer;
+import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
@@ -448,6 +453,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected DbEntityCacheKeyMapping dbEntityCacheKeyMapping = DbEntityCacheKeyMapping.defaultEntityCacheKeyMapping();
 
+  /** the metrics registry */
+  protected MetricsRegistry metricsRegistry;
+
+  protected DbMetricsReporter dbMetricsReporter;
+
+  protected boolean isMetricsEnabled = true;
+  protected boolean isDbMetricsReporterActivate = true;
+
   // buildProcessEngine ///////////////////////////////////////////////////////
 
   public ProcessEngine buildProcessEngine() {
@@ -498,6 +511,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initPasswordDigest();
     initDeploymentRegistration();
     initResourceAuthorizationProvider();
+    initMetrics();
 
     invokePostInit();
   }
@@ -872,6 +886,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       addSessionFactory(new GenericManagerFactory(IncidentManager.class));
       addSessionFactory(new GenericManagerFactory(AuthorizationManager.class));
       addSessionFactory(new GenericManagerFactory(FilterManager.class));
+      addSessionFactory(new GenericManagerFactory(MeterLogManager.class));
 
       addSessionFactory(new GenericManagerFactory(CaseDefinitionManager.class));
       addSessionFactory(new GenericManagerFactory(CaseExecutionManager.class));
@@ -993,6 +1008,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     List<BpmnParseListener> defaultListeners = new ArrayList<BpmnParseListener>();
     if (!historyLevel.equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
       defaultListeners.add(new HistoryParseListener(historyLevel, historyEventProducer));
+    }
+    if(isMetricsEnabled) {
+      defaultListeners.add(new MetricsParseListener());
     }
     return defaultListeners;
   }
@@ -1183,7 +1201,25 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       }
       defaultCharset = Charset.forName(defaultCharsetName);
     }
+  }
 
+  protected void initMetrics() {
+    if(isMetricsEnabled) {
+
+      if(metricsRegistry == null) {
+        metricsRegistry = new MetricsRegistry();
+      }
+
+      initDefaultMetrics(metricsRegistry);
+
+      if(dbMetricsReporter == null) {
+        dbMetricsReporter = new DbMetricsReporter(metricsRegistry, commandExecutorTxRequired);
+      }
+    }
+  }
+
+  protected void initDefaultMetrics(MetricsRegistry metricsRegistry) {
+    metricsRegistry.createMeter(Metrics.ACTIVTY_INSTANCE_END);
   }
 
   protected void initSerialization() {
@@ -2516,6 +2552,42 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       // ACT-233: connection pool of Ibatis is not properely initialized if this is not called!
       ((PooledDataSource)dataSource).forceCloseAll();
     }
+  }
+
+  public MetricsRegistry getMetricsRegistry() {
+    return metricsRegistry;
+  }
+
+  public ProcessEngineConfigurationImpl setMetricsRegistry(MetricsRegistry metricsRegistry) {
+    this.metricsRegistry = metricsRegistry;
+    return this;
+  }
+
+  public ProcessEngineConfigurationImpl setMetricsEnabled(boolean isMetricsEnabled) {
+    this.isMetricsEnabled = isMetricsEnabled;
+    return this;
+  }
+
+  public boolean isMetricsEnabled() {
+    return isMetricsEnabled;
+  }
+
+  public DbMetricsReporter getDbMetricsReporter() {
+    return dbMetricsReporter;
+  }
+
+  public ProcessEngineConfigurationImpl setDbMetricsReporter(DbMetricsReporter dbMetricsReporter) {
+    this.dbMetricsReporter = dbMetricsReporter;
+    return this;
+  }
+
+  public boolean isDbMetricsReporterActivate() {
+    return isDbMetricsReporterActivate;
+  }
+
+  public ProcessEngineConfigurationImpl setDbMetricsReporterActivate(boolean isDbMetricsReporterEnabled) {
+    this.isDbMetricsReporterActivate = isDbMetricsReporterEnabled;
+    return this;
   }
 
 }

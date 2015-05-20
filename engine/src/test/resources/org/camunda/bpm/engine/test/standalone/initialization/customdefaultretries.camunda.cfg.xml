@@ -31,6 +31,9 @@
     </property>
 
     <property name="failedJobCommandFactory" ref="foxFailedJobCommandFactory" />
+    
+    <!-- turn off metrics reporter -->
+    <property name="dbMetricsReporterActivate" value="false" />
 
   </bean>
 

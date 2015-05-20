@@ -53,6 +53,7 @@ import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.impl.task.delegate.TaskListenerInvocation;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.variable.AbstractPersistentVariableStore;
+import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
@@ -235,6 +236,17 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
       ExecutionEntity execution = getExecution();
       execution.removeTask(this);
       execution.signal(null, null);
+    }
+    else {
+      // standalone task
+
+      // increase activity instance end count
+      ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+      if(processEngineConfiguration.isMetricsEnabled()) {
+        processEngineConfiguration.getMetricsRegistry()
+          .getMeterByName(Metrics.ACTIVTY_INSTANCE_END)
+          .mark();
+      }
     }
   }
 

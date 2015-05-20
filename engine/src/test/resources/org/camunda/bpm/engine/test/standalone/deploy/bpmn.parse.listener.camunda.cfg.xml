@@ -22,6 +22,9 @@
     
     <property name="createDiagramOnDeploy" value="true" />
     
+    <!-- turn off metrics reporter -->
+    <property name="dbMetricsReporterActivate" value="false" />
+    
     <property name="customPreBPMNParseListeners">
       <list>
         <bean class="org.camunda.bpm.engine.test.standalone.deploy.TestBPMNParseListener" />

@@ -118,6 +118,11 @@ public class DefaultProcessEngineRestServiceImpl extends AbstractProcessEngineRe
     return super.getFilterRestService(null);
   }
 
+  @Path(MetricsRestService.PATH)
+  public MetricsRestService getMetricsRestService() {
+    return super.getMetricsRestService(null);
+  }
+
   @Override
   protected URI getRelativeEngineUri(String engineName) {
     // the default engine

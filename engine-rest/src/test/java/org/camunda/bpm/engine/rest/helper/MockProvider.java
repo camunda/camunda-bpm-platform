@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.rest.helper;
 
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -63,6 +64,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.management.JobDefinition;
+import org.camunda.bpm.engine.management.MetricsQuery;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.repository.CaseDefinition;
@@ -565,6 +567,10 @@ public abstract class MockProvider {
   public static final boolean EXAMPLE_HISTORIC_JOB_LOG_IS_FAILURE_LOG = true;
   public static final boolean EXAMPLE_HISTORIC_JOB_LOG_IS_SUCCESS_LOG = true;
   public static final boolean EXAMPLE_HISTORIC_JOB_LOG_IS_DELETION_LOG = true;
+
+  // metrics
+  public static final String EXAMPLE_METRICS_START_DATE = "2015-01-01T00:00:00";
+  public static final String EXAMPLE_METRICS_END_DATE = "2015-02-01T00:00:00";
 
   // tasks
   public static Task createMockTask() {
@@ -1718,6 +1724,18 @@ public abstract class MockProvider {
     FilterQuery nonExistingQuery = mock(FilterQuery.class);
     when(query.filterId(NON_EXISTING_ID)).thenReturn(nonExistingQuery);
     when(nonExistingQuery.singleResult()).thenReturn(null);
+
+    return query;
+
+  }
+
+  public static MetricsQuery createMockMeterQuery() {
+
+    MetricsQuery query = mock(MetricsQuery.class);
+
+    when(query.name(anyString())).thenReturn(query);
+    when(query.startDate(any(Date.class))).thenReturn(query);
+    when(query.endDate(any(Date.class))).thenReturn(query);
 
     return query;
 

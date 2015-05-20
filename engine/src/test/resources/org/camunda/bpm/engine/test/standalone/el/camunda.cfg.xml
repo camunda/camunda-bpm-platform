@@ -25,6 +25,9 @@
     <!-- history level -->
     <property name="history" value="${history.level}" />
     
+    <!-- turn off metrics reporter -->
+    <property name="dbMetricsReporterActivate" value="false" />
+    
     <!-- Expose beans to expressions -->
     <property name="beans">
       <map>

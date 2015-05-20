@@ -21,6 +21,9 @@
     <!-- job executor configurations -->
     <property name="jobExecutorActivate" value="false" />
     
+    <!-- turn off metrics reporter -->
+    <property name="dbMetricsReporterActivate" value="false" />
+    
   </bean>
   
   <bean name="idGeneratorDataSource" class="org.camunda.bpm.engine.test.db.IdGeneratorDataSource" />

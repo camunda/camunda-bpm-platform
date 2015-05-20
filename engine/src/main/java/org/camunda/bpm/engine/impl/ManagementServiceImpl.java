@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.impl.cmd.ActivateJobCmd;
 import org.camunda.bpm.engine.impl.cmd.ActivateJobDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteJobCmd;
+import org.camunda.bpm.engine.impl.cmd.DeleteMetricsCmd;
 import org.camunda.bpm.engine.impl.cmd.DeletePropertyCmd;
 import org.camunda.bpm.engine.impl.cmd.ExecuteJobsCmd;
 import org.camunda.bpm.engine.impl.cmd.GetHistoryLevelCmd;
@@ -47,9 +48,11 @@ import org.camunda.bpm.engine.impl.db.sql.DbSqlSession;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.metrics.MetricsQueryImpl;
 import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
 import org.camunda.bpm.engine.management.DeploymentStatisticsQuery;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
+import org.camunda.bpm.engine.management.MetricsQuery;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatisticsQuery;
 import org.camunda.bpm.engine.management.TableMetaData;
 import org.camunda.bpm.engine.management.TablePageQuery;
@@ -299,6 +302,14 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
 
   public int getHistoryLevel() {
     return commandExecutor.execute(new GetHistoryLevelCmd());
+  }
+
+  public MetricsQuery createMetricsQuery() {
+    return new MetricsQueryImpl(commandExecutor);
+  }
+
+  public void deleteMetrics(Date timestamp) {
+    commandExecutor.execute(new DeleteMetricsCmd(timestamp));
   }
 
 }
