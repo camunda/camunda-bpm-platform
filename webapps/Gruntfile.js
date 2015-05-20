@@ -39,8 +39,6 @@ module.exports = function(grunt) {
 
     jshint:           require('camunda-commons-ui/grunt/config/jshint')(config),
 
-    changelog:        require('camunda-commons-ui/grunt/config/changelog')(config),
-
     clean:            require('camunda-commons-ui/grunt/config/clean')(config)
   });
 
@@ -52,8 +50,6 @@ module.exports = function(grunt) {
     'watch'
   ]);
 
-
-  grunt.registerTask('prepublish', ['build', 'changelog']);
 
   grunt.registerTask('default', ['build']);
 };
