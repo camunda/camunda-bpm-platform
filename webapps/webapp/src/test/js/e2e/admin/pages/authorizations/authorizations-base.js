@@ -36,7 +36,7 @@ module.exports = Page.extend({
   },
 
   createNewButton: function() {
-    return element(by.css('[ng-hide="isCreateNewAuthorization"]')).element(by.css('[ng-click="toggleCreateNewForm()"]'));
+    return element(by.css('[ng-hide="isCreateNewAuthorization"]')).element(by.css('[ng-click="addNewAuthorization()"]'));
   },
 
   authorizationList: function() {
@@ -44,11 +44,11 @@ module.exports = Page.extend({
   },
 
   createNewElement: function() {
-    return element(by.id('createNew'));
+    return this.authorizationList().last();
   },
 
   authorizationType: function(authType) {
-    return element(by.css('.authorization-type')).element(by.cssContainingText('option', authType.toUpperCase()));
+    return element.all(by.css('.authorization-type')).last().element(by.cssContainingText('option', authType.toUpperCase()));
   },
 
   identityButton: function() {
@@ -63,7 +63,7 @@ module.exports = Page.extend({
   },
 
   identityIdInputFiled: function(inputValue) {
-    var inputField = this.createNewElement().element(by.model('newAuthorization.identityId'));
+    var inputField = this.createNewElement().element(by.model('authorization.identityId'));
 
     if (arguments.length !== 0)
       inputField.sendKeys(inputValue);
@@ -104,7 +104,7 @@ module.exports = Page.extend({
   },
 
   resourceIdField: function(inputValue) {
-    var inputField = this.createNewElement().element(by.model('newAuthorization.resourceId'));
+    var inputField = this.createNewElement().element(by.model('authorization.resourceId'));
 
     if (arguments.length !== 0)
       inputField.sendKeys(inputValue);
@@ -113,11 +113,11 @@ module.exports = Page.extend({
   },
 
   submitNewAuthorizationButton: function() {
-    return this.createNewElement().element(by.css('[ng-click="createAuthorization()"]'));
+    return this.createNewElement().element(by.css('[ng-click="confirmUpdateAuthorization(authorization)"]'));
   },
 
   abortNewAuthorizationButton: function() {
-    return this.createNewElement().element(by.css('[ng-click="toggleCreateNewForm()"]'));
+    return this.createNewElement().element(by.css('[ng-click="cancelUpdateAuthorization(authorization)"]'));
   },
 
   createNewAuthorization: function(authType, identityType, identityId, permissions, resourceId) {
@@ -131,7 +131,7 @@ module.exports = Page.extend({
       } else if (!state && (identityType.toUpperCase() === 'GROUP')){
         that.identityButton().click();
       }
-    })
+    });
     this.identityIdInputFiled().clear();
     this.identityIdInputFiled(identityId);
     this.selectPermission(permissions);
