@@ -46,9 +46,13 @@
     padding: (@grid-gutter-width / 4) (@grid-gutter-width / 2);
     position: relative;
     font-size: 1.25em;
-  }
 
-  li.ng-scope {
+    &.nav-header {
+      &:before,
+      &:after {
+        display: none;
+      }
+    }
     a {
       margin: 0;
       padding: 0;
