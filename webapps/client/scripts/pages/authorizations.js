@@ -128,7 +128,7 @@ define(['text!./authorizations.html', 'text!./confirm-delete-authorization.html'
           }).$promise.then(function (response) {
             $scope.pages.total = response.count;
           }, reqError);
-        
+
           AuthorizationResource.query({
             resourceType :  $scope.selectedResourceType,
             firstResult:    ($scope.pages.current - 1) * $scope.pages.size,
