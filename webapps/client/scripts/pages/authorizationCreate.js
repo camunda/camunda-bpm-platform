@@ -7,36 +7,17 @@ define(['camunda-bpm-sdk-js', 'angular'], function(CamSDK, angular) {
       engine: Uri.appUri(':engine')
     }).resource('authorization');
 
-    $scope.isCreateNewAuthorization = false;
-
-    var newAuthorization = $scope.newAuthorization = {};
-
-    var updatePermissions = function() {
-      $scope.availablePermissions = [];
-      var resourcePermissions = $scope.getPermissionsForResource();
-
-      for (var i = 0; i < resourcePermissions.length; i++) {
-        if($scope.selectedPermissions.indexOf(resourcePermissions[i]) < 0) {
-          $scope.availablePermissions.push(resourcePermissions[i]);
-        }
-      }
-    };
-
-    var resetForm = function() {
-      newAuthorization = $scope.newAuthorization = {
+    $scope.addNewAuthorization = function() {
+      $scope.authorizations.push({
+        inUpdate: true,
         type: 1,
         resourceType: Number($scope.selectedResourceType),
-        resourceId: '*'
-      };
-
-      $scope.selectedPermissions = ['ALL'];
-
-      newAuthorization.identityId = undefined;
-      $scope.identityType = 'User';
-      updatePermissions();
+        resourceId: '*',
+        permissions: ['ALL'],
+        identityId: '',
+        identityType: 'User'
+      });
     };
-
-    resetForm();
 
     $scope.updateAuthorization = function(authorization) {
       authorization.original = angular.copy(authorization);
@@ -87,106 +68,64 @@ define(['camunda-bpm-sdk-js', 'angular'], function(CamSDK, angular) {
 
       // create the update query
       var query = {
-        id: authorization.id,
         permissions: authorization.permissions,
         resourceType: authorization.resourceType,
-        resourceId: authorization.resourceId
+        resourceId: authorization.resourceId,
+        type: authorization.type
       };
       query[authorization.identityType === 'Group' ? 'groupId' : 'userId'] = authorization.identityId;
+      if(!!authorization.id) {
+        query.id = authorization.id;
+      }
 
       delete authorization.identityId;
       delete authorization.identityType;
 
-      authorizationService.update(query, function(result) {
-        if(!!result) {
+      authorizationService.save(query, function(err, result) {
+        if(!!err) {
           Notifications.addError({
-            status: 'Could not update authorization',
-            message: result.toString()
+            status: 'Could not ' + (query.id ? 'update' : 'create') + ' authorization',
+            message: err.toString()
           });
           $scope.cancelUpdateAuthorization(authorization);
           $scope.$apply();
+        }
+        if(!!result) {
+          authorization.id = result.id;
         }
       });
 
     };
 
     $scope.cancelUpdateAuthorization = function(authorization) {
-      delete authorization.userId;
-      delete authorization.groupId;
+      if(!authorization.id) {
+        $scope.authorizations.splice($scope.authorizations.indexOf(authorization), 1);
+      } else {
+        delete authorization.userId;
+        delete authorization.groupId;
 
-      angular.forEach(authorization.original, function(value, key) {
-        authorization[key] = value;
-      });
+        angular.forEach(authorization.original, function(value, key) {
+          authorization[key] = value;
+        });
 
-      delete authorization.original;
-      delete authorization.inUpdate;
+        delete authorization.original;
+        delete authorization.inUpdate;
+      }
     };
 
     $scope.isAuthorizationValid = function(authorization) {
       return !!authorization.identityId && !!authorization.resourceId;
     };
 
+    $scope.isIdentityIdDisabledFor = function(authorization) {
+      return authorization.type === '0';
+    };
 
-    $scope.toggleCreateNewForm = function() {
-      $scope.isCreateNewAuthorization = !$scope.isCreateNewAuthorization;
-      if(!$scope.isCreateNewAuthorization) {
-        resetForm();
+    $scope.ensureValidUser = function(authorization) {
+      if(authorization.type === '0') {
+        authorization.identityId = '*';
+        authorization.identityType = 'User';
       }
     };
-
-    $scope.isIdentityIdDisabled = function() {
-      return newAuthorization.type === 0;
-    };
-
-    $scope.setIdentityType = function(identityType) {
-      $scope.identityType = identityType;
-    };
-
-
-    $scope.addPermission = function(perm) {
-      if($scope.selectedPermissions.indexOf('ALL')!= -1 ||
-         $scope.selectedPermissions.indexOf('NONE')!= -1) {
-        $scope.selectedPermissions = [];
-      }
-      $scope.selectedPermissions.push(perm);
-      updatePermissions();
-    };
-
-    $scope.addAllPermissions = function() {
-      $scope.selectedPermissions = [ 'ALL' ];
-      updatePermissions();
-    };
-
-    $scope.$watch('newAuthorization.type', function() {
-      if(newAuthorization.type === 0) {
-        newAuthorization.identityId = '*';
-        $scope.identityType = 'User';
-      } else {
-        newAuthorization.identityId = undefined;
-        $scope.identityType = 'Group';
-      }
-    });
-
-    $scope.createAuthorization = function() {
-
-      newAuthorization.permissions = $scope.selectedPermissions;
-
-      if($scope.identityType == 'User') {
-        newAuthorization.userId = newAuthorization.identityId;
-      }
-
-      if($scope.identityType == 'Group') {
-        newAuthorization.groupId = newAuthorization.identityId;
-      }
-
-      delete newAuthorization.identityId;
-
-      AuthorizationResource.create(newAuthorization).$promise.then(function(response) {
-        resetForm();
-        $scope.loadAuthorizations();
-      });
-
-    };
-
   }];
 });
