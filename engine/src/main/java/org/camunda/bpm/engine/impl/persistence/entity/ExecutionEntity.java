@@ -376,12 +376,12 @@ public class ExecutionEntity extends PvmExecutionImpl implements
 
       initialize();
       initializeTimerDeclarations();
-      fireProcessStartEvent();
+      fireHistoricProcessStartEvent();
     }
     performOperation(PvmAtomicOperation.PROCESS_START);
   }
 
-  public void fireProcessStartEvent() {
+  public void fireHistoricProcessStartEvent() {
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
     HistoryLevel historyLevel = configuration.getHistoryLevel();
     // TODO: This smells bad, as the rest of the history is done via the ParseListener

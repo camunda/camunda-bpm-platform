@@ -329,7 +329,7 @@ public class ExecutionImpl extends PvmExecutionImpl implements
     // nothing to do
   }
 
-  public void fireProcessStartEvent() {
+  public void fireHistoricProcessStartEvent() {
     // do nothing
   }
 

@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.ActivityExecutionMapping;
 import org.camunda.bpm.engine.impl.bpmn.behavior.SequentialMultiInstanceActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
@@ -89,7 +90,8 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
 
     CoreModelElement elementToInstantiate = getTargetElement(processDefinition);
 
-    EnsureUtil.ensureNotNull("element", elementToInstantiate);
+    EnsureUtil.ensureNotNull(NotValidException.class, "Element '" + getTargetElementId() + "' does not exist in process " + processDefinition.getId(),
+        "element", elementToInstantiate);
 
     // rebuild the mapping because the execution tree changes with every iteration
     final ActivityExecutionMapping mapping = new ActivityExecutionMapping(commandContext, processInstanceId);
@@ -258,7 +260,10 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
         }
       default:
         {
-          if (scopeExecution.getExecutions().isEmpty() && scopeExecution.getActivity() == null) {
+          // if all child executions have been cancelled
+          // or this execution has ended executing its scope, it can be reused
+          if (scopeExecution.getExecutions().isEmpty() &&
+              (scopeExecution.getActivity() == null || scopeExecution.isEnded())) {
             // reuse the scope execution
             instantiate(scopeExecution, activitiesToInstantiate, elementToInstantiate);
           } else {
@@ -340,5 +345,7 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
   protected abstract ScopeImpl getTargetFlowScope(ProcessDefinitionImpl processDefinition);
 
   protected abstract CoreModelElement getTargetElement(ProcessDefinitionImpl processDefinition);
+
+  protected abstract String getTargetElementId();
 
 }

@@ -208,7 +208,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       setVariables(variables);
     }
 
-    fireProcessStartEvent();
+    fireHistoricProcessStartEvent();
 
     performOperation(PvmAtomicOperation.PROCESS_START);
   }
@@ -219,11 +219,11 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   public void startWithoutExecuting() {
     initialize();
     initializeTimerDeclarations();
-    fireProcessStartEvent();
+    fireHistoricProcessStartEvent();
     performOperation(PvmAtomicOperation.FIRE_PROCESS_START);
   }
 
-  public abstract void fireProcessStartEvent();
+  public abstract void fireHistoricProcessStartEvent();
 
   public void destroy() {
     log.fine("destroying "+this);
@@ -284,9 +284,9 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     clearScope(reason, skipCustomListeners, skipIoMappings);
   }
 
-  /** removes an execution. if there are nested executions, those will be ended recursively.
-   * if there is a parent, this method removes the bidirectional relation
-   * between parent and this execution.
+  /**
+   * Ends an execution. Invokes end listeners for the current activity and notifies the flow scope execution
+   * of this happening which may result in the flow scope ending.
    *
    * @param completeScope true if ending the execution contributes to completing the BPMN 2.0 scope
    */
@@ -303,6 +303,25 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     remove();
     performOperation(PvmAtomicOperation.FIRE_ACTIVITY_END);
     getParent().signal("compensationDone", null);
+  }
+
+  /**
+   * <p>Precondition: execution is already ended but this has not been propagated yet.</p>
+   *
+   * <p>Propagates the ending of this execution to the flowscope execution; currently only supports
+   * the process instance execution</p>
+   */
+  public void propagateEnd() {
+    if (!isEnded()) {
+      throw new ProcessEngineException(toString() + " must have ended before ending can be propagated");
+    }
+
+    if (isProcessInstanceExecution()) {
+      performOperation(PvmAtomicOperation.PROCESS_END);
+    }
+    else {
+      // not supported yet
+    }
   }
 
   public void remove() {
@@ -654,6 +673,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     this.skipCustomListeners = skipCustomListeners;
     this.skipIoMapping = skipIoMappings;
     this.activityInstanceId = null;
+    this.isEnded = false;
 
     if (!activityStack.isEmpty()) {
       ExecutionStartContext executionStartContext = new ExecutionStartContext(false);

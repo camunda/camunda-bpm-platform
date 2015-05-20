@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -290,11 +291,26 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     }
   }
 
+  @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  public void testStartBeforeNonExistingActivity() {
+    try {
+      // when
+      runtimeService
+          .createProcessInstanceByKey("exclusiveGateway")
+          .startBeforeActivity("someNonExistingActivity")
+          .execute();
+      fail("should not succeed");
+    } catch (NotValidException e) {
+      // then
+      assertTextPresentIgnoreCase("element 'someNonExistingActivity' does not exist in process ", e.getMessage());
+    }
+  }
+
   /**
    * CAM-3718
    */
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
-  public void FAILING_testEndProcessInstanceIntermediately() {
+  public void testEndProcessInstanceIntermediately() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exclusiveGateway");
     String processInstanceId = processInstance.getId();
 

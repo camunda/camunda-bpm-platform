@@ -170,14 +170,14 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
 
     // then
     List<RecordedEvent> recordedEvents = RecorderExecutionListener.getRecordedEvents();
-    assertEquals(4, recordedEvents.size());
+    assertEquals(5, recordedEvents.size());
 
     Set<String> endActivityIds = new HashSet<String>();
     for (RecordedEvent event : recordedEvents) {
       endActivityIds.add(event.getActivityId());
     }
 
-    assertEquals(4, endActivityIds.size());
+    assertEquals(5, endActivityIds.size());
     assertTrue(endActivityIds.contains("innerTask1"));
     assertTrue(endActivityIds.contains("innerTask2"));
     assertTrue(endActivityIds.contains("outerTask"));

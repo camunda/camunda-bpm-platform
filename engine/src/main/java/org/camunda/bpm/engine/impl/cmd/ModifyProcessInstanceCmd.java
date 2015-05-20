@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
+import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
 
 /**
  * @author Thorben Lindhauer
@@ -53,9 +54,16 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
 
     processInstance = executionManager.findExecutionById(processInstanceId);
 
-    if (processInstance.getExecutions().isEmpty() && processInstance.getActivity() == null) {
-      authorizationManager.checkDeleteProcessInstance(processInstance);
-      processInstance.deleteCascade("Cancellation due to process instance modification", builder.isSkipCustomListeners(), builder.isSkipIoMappings());
+    if (processInstance.getExecutions().isEmpty()) {
+      if (processInstance.getActivity() == null) {
+        // process instance was cancelled
+        authorizationManager.checkDeleteProcessInstance(processInstance);
+        processInstance.deleteCascade("Cancellation due to process instance modification", builder.isSkipCustomListeners(), builder.isSkipIoMappings());
+      }
+      else if (processInstance.isEnded()) {
+        // process instance has ended regularly
+        processInstance.performOperation(PvmAtomicOperation.PROCESS_END);
+      }
     }
 
     commandContext.getOperationLogManager().logProcessInstanceOperation(getLogEntryOperation(), processInstanceId, null, null, PropertyChange.EMPTY_CHANGE);

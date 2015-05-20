@@ -44,4 +44,8 @@ public class TransitionInstantiationCmd extends AbstractInstantiationCmd {
     TransitionImpl transition = processDefinition.findTransition(transitionId);
     return transition;
   }
+
+  protected String getTargetElementId() {
+    return transitionId;
+  }
 }

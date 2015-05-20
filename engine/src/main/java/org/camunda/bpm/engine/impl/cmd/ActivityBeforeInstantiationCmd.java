@@ -46,4 +46,8 @@ public class ActivityBeforeInstantiationCmd extends AbstractInstantiationCmd {
     return activity;
   }
 
+  protected String getTargetElementId() {
+    return activityId;
+  }
+
 }

@@ -5,6 +5,9 @@
   targetNamespace="org.camunda.bpm.engine.test.enginge.test.api.runtime">
 
   <process id="nestedParallelGatewayScopeTasks">
+    <extensionElements>
+      <camunda:executionListener event="end" class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener"/>
+    </extensionElements>
   
     <startEvent id="theStart" />
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="fork" />

@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -41,9 +42,10 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
   protected static final String PARALLEL_GATEWAY_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.parallelGateway.bpmn20.xml";
   protected static final String EXCLUSIVE_GATEWAY_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.exclusiveGateway.bpmn20.xml";
   protected static final String SUBPROCESS_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.subprocess.bpmn20.xml";
-  protected static final String LISTENERS_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceAtActivitiesTest.listeners.bpmn20.xml";
-  protected static final String IO_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceAtActivitiesTest.ioMappings.bpmn20.xml";
+  protected static final String LISTENERS_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstantiationAtActivitiesTest.listeners.bpmn20.xml";
+  protected static final String IO_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstantiationAtActivitiesTest.ioMappings.bpmn20.xml";
   protected static final String ASYNC_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.exclusiveGatewayAsyncTask.bpmn20.xml";
+  protected static final String SYNC_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstantiationAtActivitiesTest.synchronous.bpmn20.xml";
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
   public void testSingleActivityInstantiation() {
@@ -161,6 +163,21 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
     assertNotNull(instance);
 
     assertEquals("aValue", runtimeService.getVariable(instance.getId(), "aVariable"));
+  }
+
+  @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  public void testStartWithInvalidInitialActivity() {
+    try {
+      // when
+      runtimeService
+          .createProcessInstanceByKey("exclusiveGateway")
+          .startBeforeActivity("someNonExistingActivity")
+          .execute();
+      fail("should not succeed");
+    } catch (NotValidException e) {
+      // then
+      assertTextPresentIgnoreCase("element 'someNonExistingActivity' does not exist in process ", e.getMessage());
+    }
   }
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
@@ -452,6 +469,53 @@ public class ProcessInstantiationAtActivitiesTest extends PluggableProcessEngine
 
     completeTasksInOrder("task2");
     assertProcessEnded(instance.getId());
+  }
+
+  @Deployment(resources = SYNC_PROCESS)
+  public void testStartMultipleTasksInSyncProcess() {
+    RecorderExecutionListener.clear();
+
+    // when
+    ProcessInstance instance = runtimeService
+      .createProcessInstanceByKey("syncProcess")
+      .startBeforeActivity("syncTask")
+      .startBeforeActivity("syncTask")
+      .startBeforeActivity("syncTask")
+      .execute();
+
+    // then the request was successful even though the process instance has already ended
+    assertNotNull(instance);
+    assertProcessEnded(instance.getId());
+
+    // and the execution listener was invoked correctly
+    List<RecordedEvent> events = RecorderExecutionListener.getRecordedEvents();
+    assertEquals(8, events.size());
+
+    // process start event
+    assertEquals(ExecutionListener.EVENTNAME_START, events.get(0).getEventName());
+    assertEquals("syncTask", events.get(0).getActivityId());
+
+    // start instruction 1
+    assertEquals(ExecutionListener.EVENTNAME_START, events.get(1).getEventName());
+    assertEquals("syncTask", events.get(1).getActivityId());
+    assertEquals(ExecutionListener.EVENTNAME_END, events.get(2).getEventName());
+    assertEquals("syncTask", events.get(2).getActivityId());
+
+    // start instruction 2
+    assertEquals(ExecutionListener.EVENTNAME_START, events.get(3).getEventName());
+    assertEquals("syncTask", events.get(3).getActivityId());
+    assertEquals(ExecutionListener.EVENTNAME_END, events.get(4).getEventName());
+    assertEquals("syncTask", events.get(4).getActivityId());
+
+    // start instruction 3
+    assertEquals(ExecutionListener.EVENTNAME_START, events.get(5).getEventName());
+    assertEquals("syncTask", events.get(5).getActivityId());
+    assertEquals(ExecutionListener.EVENTNAME_END, events.get(6).getEventName());
+    assertEquals("syncTask", events.get(6).getActivityId());
+
+    // process end event
+    assertEquals(ExecutionListener.EVENTNAME_END, events.get(7).getEventName());
+    assertEquals("end", events.get(7).getActivityId());
   }
 
   @Deployment

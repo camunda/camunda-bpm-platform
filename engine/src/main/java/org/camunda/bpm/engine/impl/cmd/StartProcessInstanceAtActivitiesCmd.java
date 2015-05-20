@@ -16,6 +16,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.ProcessInstanceModificationBuilderImpl;
 import org.camunda.bpm.engine.impl.ProcessInstantiationBuilderImpl;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -84,9 +85,10 @@ public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInsta
     // set variables
     processInstance.setVariables(modificationBuilder.getProcessVariables());
 
-    // apply modifications
+    // prevent ending of the process instance between instructions
     processInstance.setPreserveScope(true);
 
+    // apply modifications
     for (AbstractProcessInstanceModificationCommand instruction : modificationBuilder.getModificationOperations()) {
       instruction.setProcessInstanceId(processInstance.getId());
       instruction.setSkipCustomListeners(modificationBuilder.isSkipCustomListeners());
@@ -94,8 +96,10 @@ public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInsta
       instruction.execute(commandContext);
     }
 
-    if (processInstance.getExecutions().isEmpty() && processInstance.getActivity() == null) {
-      processInstance.deleteCascade("Instance has ended in one transaction", modificationBuilder.isSkipCustomListeners(), modificationBuilder.isSkipIoMappings());
+    if (processInstance.getExecutions().isEmpty() && processInstance.isEnded()) {
+      // process instance has ended regularly but this has not been propagated yet
+      // due to preserveScope setting
+      processInstance.propagateEnd();
     }
 
     return processInstance;
@@ -110,13 +114,21 @@ public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInsta
     AbstractProcessInstanceModificationCommand firstInstruction = modificationBuilder.getModificationOperations().get(0);
 
     if (firstInstruction instanceof AbstractInstantiationCmd) {
-      CoreModelElement targetElement = ((AbstractInstantiationCmd) firstInstruction).getTargetElement(processDefinition);
+      AbstractInstantiationCmd instantiationInstruction = (AbstractInstantiationCmd) firstInstruction;
+      CoreModelElement targetElement = instantiationInstruction.getTargetElement(processDefinition);
+
+      ensureNotNull(NotValidException.class,
+          "Element '" + instantiationInstruction.getTargetElementId() + "' does not exist in process " + processDefinition.getId(),
+          "targetElement",
+          targetElement);
+
       if (targetElement instanceof ActivityImpl) {
         return (ActivityImpl) targetElement;
       }
       else if (targetElement instanceof TransitionImpl) {
         return (ActivityImpl) ((TransitionImpl) targetElement).getDestination();
       }
+
     }
 
     return null;

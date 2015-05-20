@@ -70,4 +70,8 @@ public class ActivityAfterInstantiationCmd extends AbstractInstantiationCmd {
 
     return transition;
   }
+
+  protected String getTargetElementId() {
+    return activityId;
+  }
 }
