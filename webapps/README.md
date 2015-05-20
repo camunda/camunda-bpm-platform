@@ -4,7 +4,7 @@ A web based interface for [camunda BPM platform](http://camunda.org) tasks.
 
 ## Installation
 
-`git clone git@github.com:camunda/camunda-tasklist-ui.git camunda-tasklist-ui && cd $_ && npm install && bower install`
+`git clone git@github.com:camunda/camunda-tasklist-ui.git camunda-tasklist-ui && cd $_ && npm install`
 
 ## Usage
 
