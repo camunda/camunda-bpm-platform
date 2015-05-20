@@ -2,7 +2,7 @@
 
 var Page = require('./../base');
 
-var userSection = element(by.id('users'));
+var userSection = element(by.css('section'));
 
 module.exports = Page.extend({
 

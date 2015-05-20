@@ -18,7 +18,7 @@ describe('Admin admin-user Spec', function() {
     usersPage.navigateToWebapp('Admin');
 
     // then
-    expect(usersPage.adminUserSetup.pageHeader()).to.eventually.eql('Setup');
+    expect(usersPage.adminUserSetup.pageHeader()).to.eventually.eql('SETUP');
     expect(usersPage.adminUserSetup.createNewAdminButton().isEnabled()).to.eventually.eql(false);
   });
 

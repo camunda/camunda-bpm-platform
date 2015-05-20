@@ -16,15 +16,15 @@ module.exports = Page.extend({
     return formElement.all(by.repeater('group in groupList'));
   },
 
-  groupId: function(item) {
-    return this.groupList().get(item).element(by.binding('{{group.id}}')).getText();
+  groupId: function(idx) {
+    return this.groupList().get(idx).element(by.binding('{{group.id}}')).getText();
   },
 
   addGroupButton: function() {
     return formElement.element(by.css('[ng-click="openCreateGroupMembershipDialog()"]'));
   },
 
-  removeGroup: function(item) {
-    this.groupList().get(item).element(by.css('[ng-click="removeGroup(group.id)"]')).click();
+  removeGroup: function(idx) {
+    this.groupList().get(idx).element(by.css('[ng-click="removeGroup(group.id)"]')).click();
   }
 });

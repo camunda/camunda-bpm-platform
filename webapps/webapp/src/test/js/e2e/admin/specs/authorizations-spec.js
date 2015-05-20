@@ -6,7 +6,7 @@ var setupFile = require('./authorizations-setup');
 var authorizationsPage = require('../pages/authorizations');
 var cockpitPage = require('../../cockpit/pages/dashboard');
 
-describe('Admin authorizations Spec', function() {
+describe.skip('Admin authorizations Spec', function() {
 
   function checkCreateNewState() {
 

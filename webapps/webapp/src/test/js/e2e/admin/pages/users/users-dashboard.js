@@ -14,20 +14,20 @@ module.exports = Base.extend({
     return element.all(by.repeater('user in userList'));
   },
 
-  userFirstNameAndLastName: function(item) {
-    return element(by.repeater('user in userList').row(item).column('{{user.firstName}} {{user.lastName}}')).getText();
+  userFirstNameAndLastName: function(idx) {
+    return element(by.repeater('user in userList').row(idx).column('{{user.firstName}} {{user.lastName}}')).getText();
   },
 
-	selectUser: function(item) {
-		this.selectUserByEditLink(item);
+	selectUser: function(idx) {
+		this.selectUserByEditLink(idx);
 	},
 
-  selectUserByEditLink: function(item) {
-    this.userList().get(item).element(by.linkText('Edit')).click();
+  selectUserByEditLink: function(idx) {
+    this.userList().get(idx).element(by.linkText('Edit')).click();
   },
 
-  selectUserByNameLink: function(item) {
-    this.userList().get(item).element(by.binding('{{user.firstName}} {{user.lastName}}')).click();
+  selectUserByNameLink: function(idx) {
+    this.userList().get(idx).element(by.binding('{{user.firstName}} {{user.lastName}}')).click();
   }
 
 });

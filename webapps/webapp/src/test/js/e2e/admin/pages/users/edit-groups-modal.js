@@ -12,16 +12,16 @@ module.exports = Page.extend({
     return element.all(by.repeater('group in availableGroups'));
   },
 
-  selectGroup: function(item) {
-    this.groupList().get(item).element(by.model('group.checked')).click();
+  selectGroup: function(idx) {
+    this.groupList().get(idx).element(by.model('group.checked')).click(); //css('.row-select')).click();
   },
 
-  groupId: function(item) {
-    return this.groupList().get(item).element(by.binding('{{group.id}}'));
+  groupId: function(idx) {
+    return this.groupList().get(idx).element(by.css('.group-id')); //binding('{{group.id}}'));
   },
 
-  groupName: function(item) {
-    return this.groupList().get(item).element(by.binding('{{group.name}}'));
+  groupName: function(idx) {
+    return this.groupList().get(idx).element(by.css('.group-name'));
   },
 
   addSelectedGroupButton: function() {
@@ -36,9 +36,10 @@ module.exports = Page.extend({
     return element(by.css('[ng-click="close(status)"]'));
   },
 
-  addGroup: function(item) {
+  addGroup: function(idx) {
     var that = this;
-    this.selectGroup(item);
+    browser.sleep(500);
+    this.selectGroup(idx);
     this.addSelectedGroupButton().click().then(function() {
       that.okButton().click();
     });

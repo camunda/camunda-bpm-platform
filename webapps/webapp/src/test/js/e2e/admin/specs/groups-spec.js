@@ -29,7 +29,7 @@ describe('Admin Groups Spec', function() {
       groupsPage.newGroup.isActive();
 
       // then
-      expect(groupsPage.newGroup.pageHeader()).to.eventually.eql('Create New Group');
+      expect(groupsPage.newGroup.pageHeader()).to.eventually.eql('Create New Group'.toUpperCase());
     });
 
 
@@ -65,11 +65,11 @@ describe('Admin Groups Spec', function() {
     it('should select group by name', function() {
 
       // when
-      groupsPage.groupName(0).getText().then(function(name) {
+      groupsPage.groupName(0).getText().then(function(groupName) {
         groupsPage.selectGroupByNameLink(0);
 
         // then
-        expect(groupsPage.editGroup.pageHeader()).to.eventually.eql(name);
+        expect(groupsPage.editGroup.pageHeader()).to.eventually.eql(groupName.toUpperCase());
       });
     });
 
@@ -124,7 +124,7 @@ describe('Admin Groups Spec', function() {
       groupsPage.selectGroupByNameLink(1);
 
       // then
-      expect(groupsPage.editGroup.pageHeader()).to.eventually.eql('camunda BPM Administrators');
+      expect(groupsPage.editGroup.pageHeader()).to.eventually.eql('camunda BPM Administrators'.toUpperCase());
       groupsPage.editGroup.isActive({ group: 'camunda-admin' });
       expect(groupsPage.editGroup.updateGroupButton().isEnabled()).to.eventually.eql(false);
     });
@@ -137,7 +137,7 @@ describe('Admin Groups Spec', function() {
       groupsPage.editGroup.updateGroupButton().click();
 
       // then
-      expect(groupsPage.editGroup.pageHeader()).to.eventually.eql('camunda BPM Administratorsi');
+      expect(groupsPage.editGroup.pageHeader()).to.eventually.eql('camunda BPM Administratorsi'.toUpperCase());
     });
 
 

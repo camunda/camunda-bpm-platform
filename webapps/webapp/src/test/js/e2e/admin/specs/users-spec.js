@@ -33,7 +33,7 @@ describe('Admin Users Spec', function() {
 
       // then
       usersPage.isActive();
-      expect(usersPage.pageHeader()).to.eventually.eql('Users');
+      expect(usersPage.pageHeader()).to.eventually.eql('Users'.toUpperCase());
       expect(usersPage.newUserButton().isEnabled()).to.eventually.eql(true);
     });
 
@@ -45,7 +45,7 @@ describe('Admin Users Spec', function() {
 
       // then
       usersPage.editUserProfile.isActive({ user: users[1].id });
-      expect(usersPage.editUserProfile.pageHeader()).to.eventually.eql(users[1].firstName + ' ' + users[1].lastName);
+      expect(usersPage.editUserProfile.pageHeader()).to.eventually.eql((users[1].firstName + ' ' + users[1].lastName).toUpperCase());
       expect(usersPage.editUserProfile.emailInput().getAttribute('value')).to.eventually.eql(users[1].email);
     });
 
@@ -57,7 +57,7 @@ describe('Admin Users Spec', function() {
 
       // then
       usersPage.editUserProfile.isActive({ user: users[0].id });
-      expect(usersPage.editUserProfile.pageHeader()).to.eventually.eql(users[0].firstName + ' ' + users[0].lastName);
+      expect(usersPage.editUserProfile.pageHeader()).to.eventually.eql((users[0].firstName + ' ' + users[0].lastName).toUpperCase());
       expect(usersPage.editUserProfile.emailInput().getAttribute('value')).to.eventually.eql(users[0].email);
     });
 
@@ -85,7 +85,7 @@ describe('Admin Users Spec', function() {
 
       // then
       usersPage.newUser.isActive();
-      expect(usersPage.newUser.pageHeader()).to.eventually.eql('Create New User');
+      expect(usersPage.newUser.pageHeader()).to.eventually.eql('Create New User'.toUpperCase());
       expect(usersPage.newUser.createNewUserButton().isEnabled()).to.eventually.eql(false);
     });
 
@@ -97,7 +97,7 @@ describe('Admin Users Spec', function() {
       usersPage.editUserProfile.navigateTo({ user: 'Xäbi' });
 
       // then
-      expect(usersPage.editUserProfile.pageHeader()).to.eventually.eql('Xäbi Älönsö');
+      expect(usersPage.editUserProfile.pageHeader()).to.eventually.eql('Xäbi Älönsö'.toUpperCase());
     });
 
 
@@ -197,7 +197,8 @@ describe('Admin Users Spec', function() {
         usersPage.editUserProfile.updateProfileButton().click();
 
         // then
-        expect(usersPage.editUserProfile.pageHeader()).to.eventually.eql(users[0].firstName + 'i' + ' ' + users[0].lastName);
+        expect(usersPage.editUserProfile.pageHeader())
+          .to.eventually.eql((users[0].firstName + 'i' + ' ' + users[0].lastName).toUpperCase());
       });
 
     });
@@ -302,15 +303,15 @@ describe('Admin Users Spec', function() {
       usersPage.editUserGroups.addGroupButton().click();
 
       //then
-      expect(usersPage.editUserGroups.selectGroup.pageHeader()).to.eventually.eql('Select Groups');
-      expect(usersPage.editUserGroups.selectGroup.groupList().count()).to.eventually.eql(2);
+      expect(usersPage.editUserGroups.selectGroupModal.pageHeader()).to.eventually.eql('Select Groups');
+      expect(usersPage.editUserGroups.selectGroupModal.groupList().count()).to.eventually.eql(2);
     });
 
 
     it('should add new group', function() {
 
       // when
-      usersPage.editUserGroups.selectGroup.addGroup(1);
+      usersPage.editUserGroups.selectGroupModal.addGroup(1);
 
       // then
       expect(usersPage.editUserGroups.groupId(1)).to.eventually.eql('sales');
@@ -336,11 +337,14 @@ describe('Admin Users Spec', function() {
       usersPage.editUserGroups.addGroupButton().click();
 
       // when
-      usersPage.editUserGroups.selectGroup.groupName(0).getText().then(function(name) {
-        usersPage.editUserGroups.selectGroup.groupId(0).click();
+      usersPage.editUserGroups.selectGroupModal.groupName(0).getText().then(function(groupName) {
+        browser.sleep(300).then(function() {
+          usersPage.editUserGroups.selectGroupModal.groupId(0).click().then(function() {
 
-        // then
-        expect(groupsPage.editGroup.pageHeader()).to.eventually.eql(name);
+            // then
+            expect(groupsPage.editGroup.pageHeader()).to.eventually.eql(groupName.toUpperCase());
+          });
+        });
       });
 
     });
@@ -377,15 +381,15 @@ describe('Admin Users Spec', function() {
         usersPage.editUserGroups.addGroupButton().click();
 
         // then
-        expect(usersPage.editUserGroups.selectGroup.groupId(0).getText()).to.eventually.eql('/göäüp_name');
-        expect(usersPage.editUserGroups.selectGroup.groupId(1).getText()).to.eventually.eql('\\göäüp_name');
+        expect(usersPage.editUserGroups.selectGroupModal.groupId(0).getText()).to.eventually.eql('/göäüp_name');
+        expect(usersPage.editUserGroups.selectGroupModal.groupId(1).getText()).to.eventually.eql('\\göäüp_name');
       });
 
 
       it('should add slash group', function() {
 
         // when
-        usersPage.editUserGroups.selectGroup.addGroup(0);
+        usersPage.editUserGroups.selectGroupModal.addGroup(0);
 
         // then
         expect(usersPage.editUserGroups.groupId(0)).to.eventually.eql('/göäüp_name');
@@ -402,14 +406,14 @@ describe('Admin Users Spec', function() {
         usersPage.editUserGroups.addGroupButton().click();
 
         // then
-        expect(usersPage.editUserGroups.selectGroup.groupId(0).getText()).to.eventually.eql('\\göäüp_name');
+        expect(usersPage.editUserGroups.selectGroupModal.groupId(0).getText()).to.eventually.eql('\\göäüp_name');
       });
 
 
       it('should add backslash group', function() {
 
         // when
-        usersPage.editUserGroups.selectGroup.addGroup(0);
+        usersPage.editUserGroups.selectGroupModal.addGroup(0);
 
         // then
         expect(usersPage.editUserGroups.groupId(1)).to.eventually.eql('\\göäüp_name');

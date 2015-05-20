@@ -25,7 +25,7 @@ describe('Admin system Spec', function() {
       // then
       systemPage.general.isActive();
       systemPage.general.loggedInUser('admin');
-      expect(systemPage.pageHeader()).to.eventually.eql('System Settings');
+      expect(systemPage.pageHeader()).to.eventually.eql('System Settings'.toUpperCase());
     });
 
 
