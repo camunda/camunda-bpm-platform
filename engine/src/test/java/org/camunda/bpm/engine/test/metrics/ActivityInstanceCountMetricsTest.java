@@ -12,10 +12,12 @@
  */
 package org.camunda.bpm.engine.test.metrics;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.task.Task;
@@ -26,6 +28,14 @@ import org.camunda.bpm.model.bpmn.Bpmn;
  *
  */
 public class ActivityInstanceCountMetricsTest extends PluggableProcessEngineTestCase {
+
+  @Override
+  protected void setUp() throws Exception {
+    Collection<Meter> meters = processEngineConfiguration.getMetricsRegistry().getMeters().values();
+    for (Meter meter : meters) {
+      meter.getAndClear();
+    }
+  }
 
   public void testBpmnActivityInstances() {
     deployment(Bpmn.createExecutableProcess("testProcess")
