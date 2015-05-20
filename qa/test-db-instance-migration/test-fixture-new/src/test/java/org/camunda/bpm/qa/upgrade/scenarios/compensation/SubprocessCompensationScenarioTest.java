@@ -139,4 +139,118 @@ public class SubprocessCompensationScenarioTest {
           .activity("undoTask")
       .done());
   }
+
+  @Test
+  @ScenarioUnderTest("init.concurrent.1")
+  public void testInitConcurrentCompletion() {
+    // when compensation is thrown
+    Task beforeCompensationTask = rule.taskQuery().singleResult();
+    rule.getTaskService().complete(beforeCompensationTask.getId());
+
+    // then there are two active compensation handler task
+    Assert.assertEquals(2, rule.taskQuery().count());
+    Task undoTask1 = rule.taskQuery().taskDefinitionKey("undoTask1").singleResult();
+    Assert.assertNotNull(undoTask1);
+
+    Task undoTask2 = rule.taskQuery().taskDefinitionKey("undoTask2").singleResult();
+    Assert.assertNotNull(undoTask2);
+
+    // and they can be completed such that the process instance ends successfully
+    rule.getTaskService().complete(undoTask1.getId());
+    rule.getTaskService().complete(undoTask2.getId());
+
+    Task afterCompensateTask = rule.taskQuery().singleResult();
+    Assert.assertNotNull(afterCompensateTask);
+    Assert.assertEquals("afterCompensate", afterCompensateTask.getTaskDefinitionKey());
+
+    rule.getTaskService().complete(afterCompensateTask.getId());
+
+    rule.assertScenarioEnded();
+  }
+
+  @Test
+  @ScenarioUnderTest("init.concurrent.2")
+  public void testInitConcurrentDeletion() {
+    // when compensation is thrown
+    Task beforeCompensationTask = rule.taskQuery().singleResult();
+    rule.getTaskService().complete(beforeCompensationTask.getId());
+
+    // then the process instance can be deleted
+    rule.getRuntimeService().deleteProcessInstance(rule.processInstance().getId(), "");
+
+    // and the process is ended
+    rule.assertScenarioEnded();
+  }
+
+  @Test
+  @ScenarioUnderTest("init.concurrent.3")
+  public void testInitConcurrentActivityInstanceTree() {
+    // given
+    ProcessInstance instance = rule.processInstance();
+
+    // when compensation is thrown
+    Task beforeCompensationTask = rule.taskQuery().singleResult();
+    rule.getTaskService().complete(beforeCompensationTask.getId());
+
+    // then the activity instance tree is meaningful
+    ActivityInstance activityInstance = rule.getRuntimeService().getActivityInstance(instance.getId());
+    Assert.assertNotNull(activityInstance);
+    assertThat(activityInstance).hasStructure(
+      describeActivityInstanceTree(instance.getProcessDefinitionId())
+        .activity("throwCompensate")
+        .beginScope("subProcess")
+          .activity("undoTask1")
+          .activity("undoTask2")
+      .done());
+  }
+
+  @Test
+  @ScenarioUnderTest("init.concurrent.triggerCompensation.1")
+  public void testInitConcurrentTriggerCompensationCompletion() {
+    // given active compensation
+    Task undoTask1 = rule.taskQuery().taskDefinitionKey("undoTask1").singleResult();
+    Task undoTask2 = rule.taskQuery().taskDefinitionKey("undoTask2").singleResult();
+
+    // then it is possible to complete compensation and the follow-up task
+    rule.getTaskService().complete(undoTask1.getId());
+    rule.getTaskService().complete(undoTask2.getId());
+
+    Task afterCompensateTask = rule.taskQuery().singleResult();
+    Assert.assertNotNull(afterCompensateTask);
+    Assert.assertEquals("afterCompensate", afterCompensateTask.getTaskDefinitionKey());
+
+    rule.getTaskService().complete(afterCompensateTask.getId());
+
+    rule.assertScenarioEnded();
+  }
+
+  @Test
+  @ScenarioUnderTest("init.concurrent.triggerCompensation.2")
+  public void testInitConcurrentTriggerCompensationDeletion() {
+    // given active compensation
+
+    // then the process instance can be deleted
+    rule.getRuntimeService().deleteProcessInstance(rule.processInstance().getId(), "");
+
+    // and the process is ended
+    rule.assertScenarioEnded();
+  }
+
+  @Test
+  @ScenarioUnderTest("init.concurrent.triggerCompensation.3")
+  public void testInitConcurrentTriggerCompensationActivityInstanceTree() {
+    // given active compensation
+    ProcessInstance instance = rule.processInstance();
+
+    // then the activity instance tree is meaningful
+    ActivityInstance activityInstance = rule.getRuntimeService().getActivityInstance(instance.getId());
+    Assert.assertNotNull(activityInstance);
+    assertThat(activityInstance).hasStructure(
+      describeActivityInstanceTree(instance.getProcessDefinitionId())
+        .activity("throwCompensate")
+        .beginScope("subProcess")
+          .activity("undoTask1")
+          .activity("undoTask2")
+      .done());
+  }
 }

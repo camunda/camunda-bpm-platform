@@ -31,6 +31,11 @@ public class SubprocessCompensationScenario {
     return "org/camunda/bpm/qa/upgrade/compensation/subprocessCompensationProcess.bpmn20.xml";
   }
 
+  @Deployment
+  public static String deployConcurrentCompensationProcess() {
+    return "org/camunda/bpm/qa/upgrade/compensation/subprocessConcurrentCompensationProcess.bpmn20.xml";
+  }
+
   @DescribesScenario("init")
   @Times(3)
   public static ScenarioSetup instantiate() {
@@ -52,6 +57,41 @@ public class SubprocessCompensationScenario {
   @ExtendsScenario("init")
   @Times(3)
   public static ScenarioSetup instantiateAndTriggerCompensation() {
+    return new ScenarioSetup() {
+      public void execute(ProcessEngine engine, String scenarioName) {
+        // throw compensation; the compensation handler for userTask should then be active
+        Task beforeCompensateTask = engine.getTaskService().createTaskQuery()
+            .processInstanceBusinessKey(scenarioName).singleResult();
+        engine.getTaskService().complete(beforeCompensateTask.getId());
+      }
+    };
+  }
+
+  @DescribesScenario("init.concurrent")
+  @Times(3)
+  public static ScenarioSetup instantiateConcurrent() {
+    return new ScenarioSetup() {
+      public void execute(ProcessEngine engine, String scenarioName) {
+        engine
+          .getRuntimeService()
+          .startProcessInstanceByKey("SubprocessConcurrentCompensationScenario", scenarioName);
+
+        // create the compensation event subscriptions and wait before throwing compensation
+        Task userTask1 = engine.getTaskService().createTaskQuery()
+            .processInstanceBusinessKey(scenarioName).singleResult();
+        engine.getTaskService().complete(userTask1.getId());
+
+        Task userTask2 = engine.getTaskService().createTaskQuery()
+            .processInstanceBusinessKey(scenarioName).singleResult();
+        engine.getTaskService().complete(userTask2.getId());
+      }
+    };
+  }
+
+  @DescribesScenario("init.concurrent.triggerCompensation")
+  @ExtendsScenario("init.concurrent")
+  @Times(3)
+  public static ScenarioSetup instantiateConcurrentAndTriggerCompensation() {
     return new ScenarioSetup() {
       public void execute(ProcessEngine engine, String scenarioName) {
         // throw compensation; the compensation handler for userTask should then be active
