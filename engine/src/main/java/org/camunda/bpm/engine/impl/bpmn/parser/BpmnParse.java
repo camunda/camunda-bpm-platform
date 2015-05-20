@@ -1429,7 +1429,6 @@ public class BpmnParse extends Parse {
         addError("LoopDataInputRef/activiti:collection must be set when using inputDataItem or activiti:elementVariable", miLoopCharacteristics);
       }
 
-      // TODO: for backwards compatibility we should consider invoking this on the other activity
       for (BpmnParseListener parseListener : parseListeners) {
         parseListener.parseMultiInstanceLoopCharacteristics(activityElement, miLoopCharacteristics, miBodyScope);
       }

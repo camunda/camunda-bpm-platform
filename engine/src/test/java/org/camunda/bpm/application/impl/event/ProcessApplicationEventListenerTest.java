@@ -212,6 +212,41 @@ public class ProcessApplicationEventListenerTest extends ResourceProcessEngineTe
   }
 
   @Deployment
+  public void testExecutionListenerWithMultiInstanceBody() {
+    final AtomicInteger eventCountForMultiInstanceBody = new AtomicInteger();
+
+    EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication() {
+      public ExecutionListener getExecutionListener() {
+        return new ExecutionListener() {
+          public void notify(DelegateExecution execution) throws Exception {
+            if ("miTasks#multiInstanceBody".equals(execution.getCurrentActivityId())
+                && (ExecutionListener.EVENTNAME_START.equals(execution.getEventName())
+                    || ExecutionListener.EVENTNAME_END.equals(execution.getEventName()))) {
+              eventCountForMultiInstanceBody.incrementAndGet();
+            }
+          }
+        };
+      }
+    };
+
+    // register app so that it is notified about events
+    managementService.registerProcessApplication(deploymentId, processApplication.getReference());
+
+
+    // start process instance
+    runtimeService.startProcessInstanceByKey("executionListener");
+
+    // complete task
+    List<Task> miTasks = taskService.createTaskQuery().list();
+    for (Task task : miTasks) {
+      taskService.complete(task.getId());
+    }
+
+    // 2 events are expected: one for mi body start; one for mi body end
+    assertEquals(2, eventCountForMultiInstanceBody.get());
+  }
+
+  @Deployment
   public void testTaskListener() {
 
     final List<String> events = new ArrayList<String>();

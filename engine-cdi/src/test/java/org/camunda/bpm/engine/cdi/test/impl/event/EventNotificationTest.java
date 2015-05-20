@@ -129,8 +129,17 @@ public class EventNotificationTest extends CdiProcessEngineTestCase {
     Task task = taskService.createTaskQuery().singleResult();
     assertThat(task.getName(), is("User Task"));
 
-    // two times each event/task times iteration + three transitions
-    assertThat(listenerBean.getEventsReceived().size(), is(15));
+    // 2: start event (start + end)
+    // 1: transition to first mi activity
+    // 2: first mi body (start + end)
+    // 4: two instances of the inner activity (start + end)
+    // 1: transition to second mi activity
+    // 2: second mi body (start + end)
+    // 4: two instances of the inner activity (start + end)
+    // 1: transition to the user task
+    // 2: user task (start + task create event)
+    // = 19
+    assertThat(listenerBean.getEventsReceived().size(), is(19));
   }
 
 }

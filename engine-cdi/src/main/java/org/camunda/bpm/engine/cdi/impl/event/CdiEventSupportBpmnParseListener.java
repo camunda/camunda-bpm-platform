@@ -175,6 +175,8 @@ public class CdiEventSupportBpmnParseListener implements BpmnParseListener {
 
   @Override
   public void parseMultiInstanceLoopCharacteristics(Element activityElement, Element multiInstanceLoopCharacteristicsElement, ActivityImpl activity) {
+    addStartEventListener(activity);
+    addEndEventListener(activity);
   }
 
   @Override
