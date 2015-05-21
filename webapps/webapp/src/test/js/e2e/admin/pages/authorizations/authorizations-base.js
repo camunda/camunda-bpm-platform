@@ -36,7 +36,7 @@ module.exports = Page.extend({
   },
 
   createNewButton: function() {
-    return element(by.css('[ng-hide="isCreateNewAuthorization"]')).element(by.css('[ng-click="addNewAuthorization()"]'));
+    return element.all(by.css('[ng-click="addNewAuthorization()"]')).last();
   },
 
   authorizationList: function() {
