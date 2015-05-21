@@ -429,6 +429,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       ((List<PvmExecutionImpl>) concurrentReplacingExecution.getExecutions()).add(child);
       this.getExecutions().remove(child);
       this.leaveActivityInstance();
+      this.setActivity(null);
     }
 
     // (1), (2), and (3)

@@ -94,6 +94,12 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     Map<String, TransitionInstanceImpl> transitionInstances = new HashMap<String, TransitionInstanceImpl>();
 
     for (ExecutionEntity leaf : leaves) {
+      // skip leafs without activity, e.g. if only the process instance exists after cancellation
+      // it will not have an activity set
+      if (leaf.getActivity() == null) {
+        continue;
+      }
+
       // create an activity/transition instance for each leaf that executes a non-scope activity
       if (leaf.getActivityInstanceId() != null) {
         ActivityInstanceImpl leafInstance = createActivityInstance(leaf,

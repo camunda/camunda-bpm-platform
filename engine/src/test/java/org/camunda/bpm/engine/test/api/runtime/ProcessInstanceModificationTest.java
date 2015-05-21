@@ -55,6 +55,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
   protected static final String IO_MAPPING_ON_SUB_PROCESS_AND_NESTED_SUB_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.ioMappingOnSubProcessNested.bpmn20.xml";
   protected static final String LISTENERS_ON_SUB_PROCESS_AND_NESTED_SUB_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.listenersOnSubProcessNested.bpmn20.xml";
   protected static final String DOUBLE_NESTED_SUB_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.doubleNestedSubprocess.bpmn20.xml";
+  protected static final String TRANSACTION_WITH_COMPENSATION_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.testTransactionWithCompensation.bpmn20.xml";
 
   @Deployment(resources = PARALLEL_GATEWAY_PROCESS)
   public void testCancellation() {
@@ -1374,6 +1375,385 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     assertEquals("outerTask", task.getTaskDefinitionKey());
 
     taskService.complete(task.getId());
+
+    assertProcessEnded(processInstance.getId());
+  }
+
+  @Deployment(resources = TRANSACTION_WITH_COMPENSATION_PROCESS)
+  public void testStartActivityInTransactionWithCompensation() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+
+    completeTasksInOrder("userTask");
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertEquals("undoTask", task.getTaskDefinitionKey());
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .beginScope("tx")
+          .activity("txEnd")
+          .activity("undoTask")
+        .done());
+
+    runtimeService
+      .createProcessInstanceModification(processInstance.getId())
+      .startBeforeActivity("userTask")
+      .execute();
+
+    tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .beginScope("tx")
+          .activity("txEnd")
+          .activity("undoTask")
+          .activity("userTask")
+        .done());
+
+    completeTasksInOrder("userTask");
+
+    tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .beginScope("tx")
+          .activity("txEnd")
+          .activity("undoTask")
+        .done());
+
+    Task newTask = taskService.createTaskQuery().singleResult();
+    assertNotSame(task.getId(), newTask.getId());
+
+    completeTasksInOrder("undoTask", "afterCancel");
+    assertProcessEnded(processInstance.getId());
+  }
+
+  @Deployment(resources = TRANSACTION_WITH_COMPENSATION_PROCESS)
+  public void testStartActivityWithAncestorInTransactionWithCompensation() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+
+    completeTasksInOrder("userTask");
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertEquals("undoTask", task.getTaskDefinitionKey());
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .beginScope("tx")
+          .activity("txEnd")
+          .activity("undoTask")
+        .done());
+
+    runtimeService
+      .createProcessInstanceModification(processInstance.getId())
+      .startBeforeActivity("userTask", processInstance.getId())
+      .execute();
+
+    completeTasksInOrder("userTask");
+
+    tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .beginScope("tx")
+          .activity("txEnd")
+          .activity("undoTask")
+        .endScope()
+        .beginScope("tx")
+          .activity("txEnd")
+          .activity("undoTask")
+        .done());
+
+    completeTasksInOrder("undoTask", "undoTask", "afterCancel", "afterCancel");
+    assertProcessEnded(processInstance.getId());
+  }
+
+  /**
+   * disabled until CAM-3604 is fixed
+   */
+  @Deployment(resources = TRANSACTION_WITH_COMPENSATION_PROCESS)
+  public void FAILING_testStartAfterActivityDuringCompensation() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+
+    completeTasksInOrder("userTask");
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertEquals("undoTask", task.getTaskDefinitionKey());
+
+    runtimeService
+      .createProcessInstanceModification(processInstance.getId())
+      .startAfterActivity("userTask")
+      .execute();
+
+    task = taskService.createTaskQuery().singleResult();
+    assertEquals("afterCancel", task.getTaskDefinitionKey());
+
+    completeTasksInOrder("afterCancel");
+    assertProcessEnded(processInstance.getId());
+  }
+
+  @Deployment(resources = TRANSACTION_WITH_COMPENSATION_PROCESS)
+  public void testCancelCompensatingTask() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+    completeTasksInOrder("userTask");
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+
+    runtimeService
+      .createProcessInstanceModification(processInstance.getId())
+      .cancelActivityInstance(getInstanceIdForActivity(tree, "undoTask"))
+      .execute();
+
+    assertProcessEnded(processInstance.getId());
+  }
+
+  @Deployment(resources = TRANSACTION_WITH_COMPENSATION_PROCESS)
+  public void testCancelCompensatingTaskAndStartActivity() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+    completeTasksInOrder("userTask");
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+
+    runtimeService
+      .createProcessInstanceModification(processInstance.getId())
+      .cancelActivityInstance(getInstanceIdForActivity(tree, "undoTask"))
+      .startBeforeActivity("userTask")
+      .execute();
+
+    tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .beginScope("tx")
+          .activity("userTask")
+        .done());
+
+    completeTasksInOrder("userTask", "undoTask", "afterCancel");
+
+    assertProcessEnded(processInstance.getId());
+  }
+
+  @Deployment(resources = TRANSACTION_WITH_COMPENSATION_PROCESS)
+  public void testCancelCompensatingTaskAndStartActivityWithAncestor() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+    completeTasksInOrder("userTask");
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+
+    runtimeService
+      .createProcessInstanceModification(processInstance.getId())
+      .cancelActivityInstance(getInstanceIdForActivity(tree, "undoTask"))
+      .startBeforeActivity("userTask", processInstance.getId())
+      .execute();
+
+    tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .beginScope("tx")
+          .activity("userTask")
+        .done());
+
+    completeTasksInOrder("userTask", "undoTask", "afterCancel");
+
+    assertProcessEnded(processInstance.getId());
+  }
+
+  @Deployment(resources = TRANSACTION_WITH_COMPENSATION_PROCESS)
+  public void testStartActivityAndCancelCompensatingTask() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+    completeTasksInOrder("userTask");
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+
+    runtimeService
+      .createProcessInstanceModification(processInstance.getId())
+      .startBeforeActivity("userTask")
+      .cancelActivityInstance(getInstanceIdForActivity(tree, "undoTask"))
+      .execute();
+
+    tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .beginScope("tx")
+          .activity("userTask")
+        .done());
+
+    completeTasksInOrder("userTask", "undoTask", "afterCancel");
+
+    assertProcessEnded(processInstance.getId());
+  }
+
+  @Deployment(resources = TRANSACTION_WITH_COMPENSATION_PROCESS)
+  public void testStartCompensatingTask() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+
+    runtimeService
+      .createProcessInstanceModification(processInstance.getId())
+      .startBeforeActivity("undoTask")
+      .execute();
+
+    completeTasksInOrder("undoTask");
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertEquals("userTask", task.getTaskDefinitionKey());
+
+    completeTasksInOrder("userTask", "undoTask", "afterCancel");
+
+    assertProcessEnded(processInstance.getId());
+  }
+
+  @Deployment(resources = TRANSACTION_WITH_COMPENSATION_PROCESS)
+  public void testStartAdditionalCompensatingTaskAndCompleteOldCompensationTask() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+    completeTasksInOrder("userTask");
+
+    Task firstUndoTask = taskService.createTaskQuery().singleResult();
+
+    runtimeService
+      .createProcessInstanceModification(processInstance.getId())
+      .startBeforeActivity("undoTask")
+      .execute();
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .beginScope("tx")
+        .activity("txEnd")
+        .activity("undoTask")
+        .activity("undoTask")
+        .done());
+
+    taskService.complete(firstUndoTask.getId());
+
+    Task secondUndoTask = taskService.createTaskQuery().taskDefinitionKey("undoTask").singleResult();
+    assertNull(secondUndoTask);
+
+    completeTasksInOrder("afterCancel");
+
+    assertProcessEnded(processInstance.getId());
+  }
+
+  @Deployment(resources = TRANSACTION_WITH_COMPENSATION_PROCESS)
+  public void testStartAdditionalCompensatingTaskAndCompleteNewCompensatingTask() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+    completeTasksInOrder("userTask");
+
+    Task firstUndoTask = taskService.createTaskQuery().taskDefinitionKey("undoTask").singleResult();
+
+    runtimeService
+      .createProcessInstanceModification(processInstance.getId())
+      .startBeforeActivity("undoTask")
+      .setVariableLocal("new", true)
+      .execute();
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .beginScope("tx")
+          .activity("txEnd")
+          .activity("undoTask")
+          .activity("undoTask")
+        .done());
+
+    String taskExecutionId = runtimeService.createExecutionQuery().variableValueEquals("new", true).singleResult().getId();
+    Task secondUndoTask = taskService.createTaskQuery().executionId(taskExecutionId).singleResult();
+
+    assertNotNull(secondUndoTask);
+    assertNotSame(firstUndoTask.getId(), secondUndoTask.getId());
+    taskService.complete(secondUndoTask.getId());
+
+    tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .beginScope("tx")
+          .activity("txEnd")
+          .activity("undoTask")
+        .done());
+
+    completeTasksInOrder("undoTask", "afterCancel");
+
+    assertProcessEnded(processInstance.getId());
+  }
+
+  @Deployment(resources = TRANSACTION_WITH_COMPENSATION_PROCESS)
+  public void testStartCompensationBoundary() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+
+    try {
+      runtimeService.createProcessInstanceModification(processInstance.getId())
+        .startBeforeActivity("compensateBoundaryEvent")
+        .execute();
+
+      fail("should not succeed");
+    }
+    catch (ProcessEngineException e) {
+      assertTextPresent("compensation boundary event", e.getMessage());
+    }
+
+    try {
+      runtimeService.createProcessInstanceModification(processInstance.getId())
+        .startAfterActivity("compensateBoundaryEvent")
+        .execute();
+
+      fail("should not succeed");
+    }
+    catch (ProcessEngineException e) {
+      assertTextPresent("no outgoing sequence flow", e.getMessage());
+    }
+  }
+
+  @Deployment(resources = TRANSACTION_WITH_COMPENSATION_PROCESS)
+  public void testStartCancelEndEvent() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+    completeTasksInOrder("userTask");
+
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+      .startBeforeActivity("txEnd")
+      .execute();
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertEquals("afterCancel", task.getTaskDefinitionKey());
+
+    taskService.complete(task.getId());
+
+    assertProcessEnded(processInstance.getId());
+  }
+
+  @Deployment(resources = TRANSACTION_WITH_COMPENSATION_PROCESS)
+  public void testStartCancelBoundaryEvent() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+    completeTasksInOrder("userTask");
+
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+      .startBeforeActivity("catchCancelTx")
+      .execute();
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertEquals("afterCancel", task.getTaskDefinitionKey());
+
+    taskService.complete(task.getId());
+
+    assertProcessEnded(processInstance.getId());
+  }
+
+  @Deployment(resources = TRANSACTION_WITH_COMPENSATION_PROCESS)
+  public void testStartTaskAfterCancelBoundaryEvent() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
+    completeTasksInOrder("userTask");
+
+    runtimeService.createProcessInstanceModification(processInstance.getId())
+      .startBeforeActivity("afterCancel")
+      .execute();
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .beginScope("tx")
+          .activity("txEnd")
+          .activity("undoTask")
+        .endScope()
+        .activity("afterCancel")
+        .done());
+
+    completeTasksInOrder("afterCancel", "undoTask", "afterCancel");
 
     assertProcessEnded(processInstance.getId());
   }

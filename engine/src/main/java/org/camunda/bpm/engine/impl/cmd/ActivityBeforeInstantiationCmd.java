@@ -12,7 +12,10 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.core.model.CoreModelElement;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
@@ -34,6 +37,21 @@ public class ActivityBeforeInstantiationCmd extends AbstractInstantiationCmd {
       String ancestorActivityInstanceId) {
     super(processInstanceId, ancestorActivityInstanceId);
     this.activityId = activityId;
+  }
+
+  public Void execute(CommandContext commandContext) {
+    ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
+    ProcessDefinitionImpl processDefinition = processInstance.getProcessDefinition();
+
+    PvmActivity activity = processDefinition.findActivity(activityId);
+
+    // forbid instantiation of compensation boundary events
+    if (activity != null && "compensationBoundaryCatch".equals(activity.getProperty("type"))) {
+      throw new ProcessEngineException("Cannot start before activity " + activityId + "; activity " +
+        "is a compensation boundary event.");
+    }
+
+    return super.execute(commandContext);
   }
 
   protected ScopeImpl getTargetFlowScope(ProcessDefinitionImpl processDefinition) {
