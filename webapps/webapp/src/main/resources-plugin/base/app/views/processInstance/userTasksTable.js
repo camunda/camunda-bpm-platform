@@ -174,11 +174,12 @@ define(['angular', 'text!./identity-links-modal.html', 'text!./user-tasks-table.
               status: 'Assignee',
               message: 'The assignee of the user task \'' +
                        userTask.instance.name +
-                       '\' could not be set to \'' + copy.assignee +
-                       '\' successfully.',
-              exclusive: true,
-              duration: 5000
+                       '\' could not be set to \'' + userTask.assignee +
+                       '\'. ' + error.data.message,
+              exclusive: true
             };
+
+            userTask.assignee = copy.assignee;
 
             Notifications.addError(err);
             taskIdIdToExceptionMessageMap[userTask.id] = error.data;
@@ -250,10 +251,9 @@ define(['angular', 'text!./identity-links-modal.html', 'text!./user-tasks-table.
           }));
         }, function(error) {
           Notifications.addError({
-            status: 'Assignee',
-            message: error.message,
-            exclusive: true,
-            duration: 5000
+            status: 'Could not remove group',
+            message: error.data.message,
+            exclusive: true
           });
         });
       };
@@ -289,10 +289,9 @@ define(['angular', 'text!./identity-links-modal.html', 'text!./user-tasks-table.
           editForm.newItem = '';
         }, function(error) {
           Notifications.addError({
-            status: 'Assignee',
-            message: error.message,
-            exclusive: true,
-            duration: 5000
+            status: 'Could not add group',
+            message: error.data.message,
+            exclusive: true
           });
         });
       };
