@@ -58,12 +58,10 @@ public class TestServlet extends HttpServlet {
   public final static Logger log = Logger.getLogger(TestServlet.class.getName());
 
   private static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Arrays.asList(
-      "ACT_GE_PROPERTY",
-      "ACT_RU_AUTHORIZATION"
+      "ACT_GE_PROPERTY"
     );
 
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
     resp.setHeader("content-type", "application/json");
 
     String requestURI = req.getRequestURI();
@@ -73,9 +71,22 @@ public class TestServlet extends HttpServlet {
 
     ProcessEngine processEngine = BpmPlatform.getProcessEngineService().getProcessEngine(engineName);
 
+    ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
+    try {
+      processEngineConfiguration.setAuthorizationEnabled(false);
+      doClean(req, resp, processEngine);
+   }
+   finally {
+     processEngineConfiguration.setAuthorizationEnabled(true);
+   }
+
+  }
+
+  protected void doClean(HttpServletRequest req, HttpServletResponse resp, ProcessEngine processEngine) throws ServletException, IOException {
+    ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
+
     deleteAdminUser(processEngine);
 
-    ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
     ManagementService managementService = processEngine.getManagementService();
 
 
@@ -118,7 +129,6 @@ public class TestServlet extends HttpServlet {
       createAdminUser(processEngine);
       resp.getWriter().write("{\"clean\": true}");
     }
-
   }
 
   protected void createAdminUser(ProcessEngine processEngine) {

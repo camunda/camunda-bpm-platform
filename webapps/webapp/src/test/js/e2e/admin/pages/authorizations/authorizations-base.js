@@ -43,8 +43,48 @@ module.exports = Page.extend({
     return element.all(by.repeater('authorization in authorizations'));
   },
 
+  getAuthorization: function(idx) {
+    return this.authorizationList().get(idx);
+  },
+
+  userGroupButton: function(idx) {
+    return this.getAuthorization(idx).element(by.css('a.input-group-addon'));
+  },
+
+  userGroupInput: function(idx) {
+    return this.getAuthorization(idx).element(by.css('input.input-auth-name'));
+  },
+
+  applyUpdateButton: function(idx) {
+    return this.getAuthorization(idx).element(by.css('button.btn-primary'));
+  },
+
+  cancelUpdateButton: function(idx) {
+    return this.getAuthorization(idx).element(by.css('.action a.btn-default'));
+  },
+
+  authorizationIdentityType: function(idx) {
+    return this.getAuthorization(idx).element(by.css('.user.group > span:not(.ng-hide)')).getAttribute('tooltip');
+  },
+
+  authorizationIdentity: function(idx) {
+    return this.getAuthorization(idx).element(by.css('.user.group')).getText();
+  },
+
+  resourceInput: function(idx) {
+    return this.getAuthorization(idx).element(by.css('.resource-id input'));
+  },
+
+  authorizationResource: function(idx) {
+    return this.getAuthorization(idx).element(by.css('.resource-id')).getText();
+  },
+
   createNewElement: function() {
     return this.authorizationList().last();
+  },
+
+  updateButton: function(idx) {
+    return this.getAuthorization(idx).element(by.cssContainingText('a', 'Update'));
   },
 
   authorizationType: function(authType) {
@@ -95,12 +135,18 @@ module.exports = Page.extend({
           that.permissionsDropdownList().get(idx).click();
         });
     } else {
-      this.permissionsDropdownList().get(index).click();
-    };
+      this.permissionsDropdownList(index).get(index).click();
+    }
   },
 
-  permissionsDropdownElements: function(index) {
-    return permissionsDropdownList().get(index);
+  selectPermissionFor: function(idx, permission) {
+    this.getAuthorization(idx).element(by.css('.permissions button')).click();
+
+    this.getAuthorization(idx).element(by.cssContainingText('.permissions a', permission)).click();
+  },
+
+  authorizationPermissions: function(idx) {
+    return this.getAuthorization(idx).element(by.css('.permissions')).getText();
   },
 
   resourceIdField: function(inputValue) {
