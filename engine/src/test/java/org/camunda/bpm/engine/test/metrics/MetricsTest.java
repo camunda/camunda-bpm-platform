@@ -58,7 +58,7 @@ public class MetricsTest extends PluggableProcessEngineTestCase {
     // then
     // all entries are deleted
     assertEquals(0l, managementService.createMetricsQuery()
-        .name(Metrics.ACTIVTY_INSTANCE_END)
+        .name(Metrics.ACTIVTY_INSTANCE_START)
         .sum());
   }
 
@@ -84,7 +84,7 @@ public class MetricsTest extends PluggableProcessEngineTestCase {
     // then
     // all entries are deleted
     assertEquals(0l, managementService.createMetricsQuery()
-        .name(Metrics.ACTIVTY_INSTANCE_END)
+        .name(Metrics.ACTIVTY_INSTANCE_START)
         .sum());
   }
 
@@ -110,7 +110,7 @@ public class MetricsTest extends PluggableProcessEngineTestCase {
     // then
     // the entires are NOT deleted
     assertEquals(3l, managementService.createMetricsQuery()
-        .name(Metrics.ACTIVTY_INSTANCE_END)
+        .name(Metrics.ACTIVTY_INSTANCE_START)
         .sum());
 
     // cleanup
@@ -130,7 +130,7 @@ public class MetricsTest extends PluggableProcessEngineTestCase {
 
     // then (query assertions)
     assertEquals(0l, managementService.createMetricsQuery().name("UNKNOWN").sum());
-    assertEquals(3l, managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_END).sum());
+    assertEquals(3l, managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START).sum());
 
     assertEquals(3l, managementService.createMetricsQuery().sum());
     assertEquals(3l, managementService.createMetricsQuery().startDate(new Date(1000)).sum());

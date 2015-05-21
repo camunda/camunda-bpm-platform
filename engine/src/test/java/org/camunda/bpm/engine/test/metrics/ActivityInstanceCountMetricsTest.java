@@ -20,7 +20,9 @@ import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.Metrics;
+import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.model.bpmn.Bpmn;
 
 /**
@@ -48,7 +50,7 @@ public class ActivityInstanceCountMetricsTest extends PluggableProcessEngineTest
     // given
     // that no activity instances have been executed
     assertEquals(0l, managementService.createMetricsQuery()
-      .name(Metrics.ACTIVTY_INSTANCE_END)
+      .name(Metrics.ACTIVTY_INSTANCE_START)
       .sum());
 
     // if
@@ -58,7 +60,7 @@ public class ActivityInstanceCountMetricsTest extends PluggableProcessEngineTest
     // then
     // the increased count is immediately visible
     assertEquals(3l, managementService.createMetricsQuery()
-        .name(Metrics.ACTIVTY_INSTANCE_END)
+        .name(Metrics.ACTIVTY_INSTANCE_START)
         .sum());
 
     // and force the db metrics reporter to report
@@ -66,7 +68,7 @@ public class ActivityInstanceCountMetricsTest extends PluggableProcessEngineTest
 
     // still 3
     assertEquals(3l, managementService.createMetricsQuery()
-        .name(Metrics.ACTIVTY_INSTANCE_END)
+        .name(Metrics.ACTIVTY_INSTANCE_START)
         .sum());
 
     managementService.deleteMetrics(null);
@@ -77,19 +79,18 @@ public class ActivityInstanceCountMetricsTest extends PluggableProcessEngineTest
     // given
     // that no activity instances have been executed
     assertEquals(0l, managementService.createMetricsQuery()
-      .name(Metrics.ACTIVTY_INSTANCE_END)
+      .name(Metrics.ACTIVTY_INSTANCE_START)
       .sum());
 
     // if
     // I complete a standalone task
     Task task = taskService.newTask();
     taskService.saveTask(task);
-    taskService.complete(task.getId());
 
     // then
     // the increased count is immediately visible
     assertEquals(1l, managementService.createMetricsQuery()
-        .name(Metrics.ACTIVTY_INSTANCE_END)
+        .name(Metrics.ACTIVTY_INSTANCE_START)
         .sum());
 
     // and force the db metrics reporter to report
@@ -97,9 +98,10 @@ public class ActivityInstanceCountMetricsTest extends PluggableProcessEngineTest
 
     // still 1
     assertEquals(1l, managementService.createMetricsQuery()
-        .name(Metrics.ACTIVTY_INSTANCE_END)
+        .name(Metrics.ACTIVTY_INSTANCE_START)
         .sum());
 
+    taskService.deleteTask(task.getId());
     managementService.deleteMetrics(null);
 
     // clean up
@@ -113,6 +115,42 @@ public class ActivityInstanceCountMetricsTest extends PluggableProcessEngineTest
       historyService.deleteUserOperationLogEntry(uole.getId());
     }
 
+  }
+
+  @Deployment
+  public void testCmmnActivitiyInstances() {
+    // given
+    // that no activity instances have been executed
+    assertEquals(0l, managementService.createMetricsQuery()
+      .name(Metrics.ACTIVTY_INSTANCE_START)
+      .sum());
+
+    caseService.createCaseInstanceByKey("case");
+
+    assertEquals(0l, managementService.createMetricsQuery()
+        .name(Metrics.ACTIVTY_INSTANCE_START)
+        .sum());
+
+    List<CaseExecution> list = caseService.createCaseExecutionQuery().enabled().list();
+    for (CaseExecution caseExecution : list) {
+      caseService.withCaseExecution(caseExecution.getId())
+        .manualStart();
+
+    }
+
+    assertEquals(2l, managementService.createMetricsQuery()
+        .name(Metrics.ACTIVTY_INSTANCE_START)
+        .sum());
+
+    // and force the db metrics reporter to report
+    processEngineConfiguration.getDbMetricsReporter().reportNow();
+
+    // still 2
+    assertEquals(2l, managementService.createMetricsQuery()
+        .name(Metrics.ACTIVTY_INSTANCE_START)
+        .sum());
+
+    managementService.deleteMetrics(null);
   }
 
 }

@@ -237,17 +237,6 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
       execution.removeTask(this);
       execution.signal(null, null);
     }
-    else {
-      // standalone task
-
-      // increase activity instance end count
-      ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
-      if(processEngineConfiguration.isMetricsEnabled()) {
-        processEngineConfiguration.getMetricsRegistry()
-          .getMeterByName(Metrics.ACTIVTY_INSTANCE_END)
-          .mark();
-      }
-    }
   }
 
   public void caseExecutionCompleted() {
@@ -1215,6 +1204,15 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     } else if (!id.equals(other.id))
       return false;
     return true;
+  }
+
+  public void executeMetrics(String metricsName) {
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    if(processEngineConfiguration.isMetricsEnabled()) {
+      processEngineConfiguration.getMetricsRegistry()
+        .getMeterByName(Metrics.ACTIVTY_INSTANCE_START)
+        .mark();
+    }
   }
 
 }

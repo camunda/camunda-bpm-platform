@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.task.Task;
 
 /**
@@ -51,9 +52,11 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
         task.insert(null);
         commandContext.getHistoricTaskInstanceManager().createHistoricTask(task);
         operation = UserOperationLogEntry.OPERATION_TYPE_CREATE;
+        task.executeMetrics(Metrics.ACTIVTY_INSTANCE_START);
       } catch (NullValueException e) {
         throw new NotValidException(e.getMessage(), e);
       }
+
 
     } else {
       authorizationManager.checkUpdateTask(task);

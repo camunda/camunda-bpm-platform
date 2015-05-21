@@ -62,14 +62,14 @@ public abstract class AbstractMetricsRestServiceInteractionTest extends Abstract
     when(meterQueryMock.sum()).thenReturn(10l);
 
     given()
-      .pathParam("name", Metrics.ACTIVTY_INSTANCE_END)
+      .pathParam("name", Metrics.ACTIVTY_INSTANCE_START)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
       .body("result", equalTo(10))
      .when()
       .get(SUM_URL);
 
-    verify(meterQueryMock).name(Metrics.ACTIVTY_INSTANCE_END);
+    verify(meterQueryMock).name(Metrics.ACTIVTY_INSTANCE_START);
     verify(meterQueryMock, times(1)).sum();
     verifyNoMoreInteractions(meterQueryMock);
   }
@@ -80,7 +80,7 @@ public abstract class AbstractMetricsRestServiceInteractionTest extends Abstract
     when(meterQueryMock.sum()).thenReturn(10l);
 
     given()
-      .pathParam("name", Metrics.ACTIVTY_INSTANCE_END)
+      .pathParam("name", Metrics.ACTIVTY_INSTANCE_START)
       .queryParam("startDate", MockProvider.EXAMPLE_METRICS_START_DATE)
       .queryParam("endDate", MockProvider.EXAMPLE_METRICS_END_DATE)
     .then().expect()
@@ -89,7 +89,7 @@ public abstract class AbstractMetricsRestServiceInteractionTest extends Abstract
      .when()
       .get(SUM_URL);
 
-    verify(meterQueryMock).name(Metrics.ACTIVTY_INSTANCE_END);
+    verify(meterQueryMock).name(Metrics.ACTIVTY_INSTANCE_START);
     verify(meterQueryMock).startDate(any(Date.class));
     verify(meterQueryMock).endDate(any(Date.class));
     verify(meterQueryMock, times(1)).sum();
@@ -102,7 +102,7 @@ public abstract class AbstractMetricsRestServiceInteractionTest extends Abstract
     when(meterQueryMock.sum()).thenReturn(10l);
 
     given()
-      .pathParam("name", Metrics.ACTIVTY_INSTANCE_END)
+      .pathParam("name", Metrics.ACTIVTY_INSTANCE_START)
       .queryParam("startDate", "INVALID-TIME-STAMP")
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())

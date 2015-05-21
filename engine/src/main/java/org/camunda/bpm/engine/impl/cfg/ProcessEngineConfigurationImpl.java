@@ -164,7 +164,8 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandl
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendJobDefinitionHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
-import org.camunda.bpm.engine.impl.metrics.parser.MetricsParseListener;
+import org.camunda.bpm.engine.impl.metrics.parser.MetricsBpmnParseListener;
+import org.camunda.bpm.engine.impl.metrics.parser.MetricsCmmnTransformListener;
 import org.camunda.bpm.engine.impl.metrics.reporter.DbMetricsReporter;
 import org.camunda.bpm.engine.impl.persistence.GenericManagerFactory;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
@@ -1010,7 +1011,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       defaultListeners.add(new HistoryParseListener(historyLevel, historyEventProducer));
     }
     if(isMetricsEnabled) {
-      defaultListeners.add(new MetricsParseListener());
+      defaultListeners.add(new MetricsBpmnParseListener());
     }
     return defaultListeners;
   }
@@ -1047,6 +1048,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     List<CmmnTransformListener> defaultListener = new ArrayList<CmmnTransformListener>();
     if (!historyLevel.equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
       defaultListener.add(new CmmnHistoryTransformListener(historyLevel, cmmnHistoryEventProducer));
+    }
+    if(isMetricsEnabled) {
+      defaultListener.add(new MetricsCmmnTransformListener());
     }
     return defaultListener;
   }
@@ -1219,7 +1223,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   }
 
   protected void initDefaultMetrics(MetricsRegistry metricsRegistry) {
-    metricsRegistry.createMeter(Metrics.ACTIVTY_INSTANCE_END);
+    metricsRegistry.createMeter(Metrics.ACTIVTY_INSTANCE_START);
   }
 
   protected void initSerialization() {

@@ -23,12 +23,12 @@ import org.camunda.bpm.engine.management.Metrics;
  * @author Daniel Meyer
  *
  */
-public class MetricsParseListener extends AbstractBpmnParseListener {
+public class MetricsBpmnParseListener extends AbstractBpmnParseListener {
 
-  public static MetricsExecutionListener ACTIVITY_INSTANCE_END_COUNTER = new MetricsExecutionListener(Metrics.ACTIVTY_INSTANCE_END);
+  public static MetricsExecutionListener ACTIVITY_INSTANCE_START_COUNTER = new MetricsExecutionListener(Metrics.ACTIVTY_INSTANCE_START);
 
   protected void addListeners(ActivityImpl activity) {
-    activity.addBuiltInListener(ExecutionListener.EVENTNAME_END, ACTIVITY_INSTANCE_END_COUNTER);
+    activity.addBuiltInListener(ExecutionListener.EVENTNAME_START, ACTIVITY_INSTANCE_START_COUNTER);
   }
 
   public void parseStartEvent(Element startEventElement, ScopeImpl scope, ActivityImpl activity) {
@@ -114,5 +114,4 @@ public class MetricsParseListener extends AbstractBpmnParseListener {
   public void parseMultiInstanceLoopCharacteristics(Element activityElement, Element multiInstanceLoopCharacteristicsElement, ActivityImpl activity) {
     addListeners(activity);
   }
-
 }
