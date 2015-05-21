@@ -17,6 +17,7 @@ define([ 'angular', 'require', 'text!./activity-instance-tree.html' ], function(
     'error-end-event':                        'end-event-error',
     'none-end-event':                         'end-event-none',
     'parallel-gateway':                       'gateway-parallel',
+    'exclusive-gateway':                      'gateway-xor',
     'intermediate-compensation-throw-event':  'intermediate-event-throw-compensation'
   };
 
