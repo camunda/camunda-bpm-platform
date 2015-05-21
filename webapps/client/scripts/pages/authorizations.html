@@ -3,7 +3,14 @@
      ng-cloak>
   <section class="authorizations row">
     <div class="page-header">
-      <h1>Authorizations</h1>
+      <h1 ng-controller="AuthorizationCreateController">
+        Authorizations
+        <a ng-click="addNewAuthorization()"
+           tooltip-placement="right"
+           tooltip="Create a new authorization">
+          <span class="glyphicon glyphicon-plus-sign"></span>
+        </a>
+      </h1>
     </div>
 
     <div class="col-md-3">
@@ -160,7 +167,7 @@
               </div>
             </td>
           </tr>
-          <tr ng-hide="isCreateNewAuthorization">
+          <tr>
             <td colspan="5">
               <a ng-click="addNewAuthorization()">
                 Create New

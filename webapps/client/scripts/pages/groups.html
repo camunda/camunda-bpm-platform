@@ -2,16 +2,16 @@
 <div class="container-fluid" ng-cloak>
   <div class="row">
     <div class="page-header">
-      <h1>Groups</h1>
+      <h1>
+        Groups
+        <a ng-show="availableOperations.create"
+           href="#/group-create"
+           tooltip-placement="right"
+           tooltip="Create a new group">
+          <span class="glyphicon glyphicon-plus-sign"></span>
+        </a>
+      </h1>
     </div>
-  </div>
-
-  <div ng-show="availableOperations.create">
-    <a class="btn btn-link pull-right"
-       href="#/group-create">
-      New Group
-      <span class="glyphicon glyphicon-plus-sign"></span>
-    </a>
   </div>
 
   <div cam-widget-loader
@@ -23,7 +23,7 @@
           <th class="group-id">Group Id</th>
           <th class="group-name">Group Name</th>
           <th class="group-type">Group Type</th>
-          <th class="action"><!-- actions --></th>
+          <th class="action">Action</th>
         </tr>
       </thead>
 

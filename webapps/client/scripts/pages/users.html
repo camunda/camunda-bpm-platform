@@ -5,16 +5,14 @@
       <h1>
         <!-- <span class="glyphicon glyphicon-user"></span> -->
         Users
+        <a ng-show="availableOperations.create"
+           href="#/user-create"
+           tooltip-placement="right"
+           tooltip="Create a new user">
+          <span class="glyphicon glyphicon-plus-sign"></span>
+        </a>
       </h1>
     </div>
-  </div>
-
-  <div ng-show="availableOperations.create">
-    <a class="btn btn-default pull-right"
-       href="#/user-create">
-      New User
-      <span class="glyphicon glyphicon-plus-sign"></span>
-    </a>
   </div>
 
   <div cam-widget-loader
