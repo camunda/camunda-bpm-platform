@@ -152,3 +152,5 @@ create table ACT_RU_METER_LOG (
   TIMESTAMP_ timestamp not null,
   primary key (ID_)
 );
+
+create index ACT_IDX_METER_LOG on ACT_RU_METER_LOG(NAME_,TIMESTAMP_);

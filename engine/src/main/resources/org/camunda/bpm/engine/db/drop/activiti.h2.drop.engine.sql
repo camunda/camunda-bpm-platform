@@ -89,6 +89,8 @@ drop index ACT_IDX_INC_PROCDEFID;
 drop index ACT_IDX_INC_PROCINSTID;
 drop index ACT_IDX_INC_ROOTCAUSEINCID;
 
+drop index ACT_IDX_METER_LOG;
+
 drop table ACT_GE_PROPERTY if exists;
 drop table ACT_GE_BYTEARRAY if exists;
 drop table ACT_RE_DEPLOYMENT if exists;

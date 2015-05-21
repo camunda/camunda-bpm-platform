@@ -93,6 +93,7 @@ drop index ACT_IDX_VARIABLE_PROCINST;
 drop index ACT_IDX_TASK_EXEC;
 drop index ACT_IDX_TASK_PROCINST;
 drop index ACT_IDX_TASK_PROC_DEF_ID;
+drop index ACT_IDX_METER_LOG;
 
 drop table ACT_GE_PROPERTY;
 drop table ACT_GE_BYTEARRAY;

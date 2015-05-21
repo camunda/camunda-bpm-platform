@@ -11,6 +11,8 @@ drop index ACT_RU_AUTHORIZATION.ACT_UNIQ_AUTH_GROUP;
 drop index ACT_RU_AUTHORIZATION.ACT_UNIQ_AUTH_USER;
 drop index ACT_RU_VARIABLE.ACT_UNIQ_VARIABLE;
 
+drop index ACT_RU_METER_LOG.ACT_IDX_METER_LOG;
+
 -- indexes for concurrency problems - https://app.camunda.com/jira/browse/CAM-1646 --
 drop index ACT_RU_EXECUTION.ACT_IDX_EXECUTION_PROC;
 drop index ACT_RU_EXECUTION.ACT_IDX_EXECUTION_PARENT;
