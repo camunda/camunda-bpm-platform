@@ -1,11 +1,23 @@
-define(['text!./systemSettingsFlowNodeCount.html'], function(template) {
+define([
+  'text!./systemSettingsFlowNodeCount.html',
+  'camunda-bpm-sdk-js'
+], function(
+  template,
+  CamSDK
+) {
   'use strict';
 
   var Controller = [
    '$scope',
-   'MetricsResource',
+   'Uri',
    '$filter',
-  function ($scope, MetricsResource, $filter) {
+  function ($scope, Uri, $filter) {
+
+    var metricsService = new CamSDK.Client({
+      apiUri: Uri.appUri('engine://'),
+      engine: Uri.appUri(':engine')
+    }).resource('metrics');
+
 
     var dateFilter = $filter('date');
     var now = new Date();
@@ -16,15 +28,16 @@ define(['text!./systemSettingsFlowNodeCount.html'], function(template) {
     $scope.load = function() {
 
       var options = {
-        'name': 'activity-instance-end',
+        'name': 'activity-instance-start',
         'startDate': $scope.startDate,
         'endDate': $scope.endDate
       };
 
-      MetricsResource.sum(options).$promise
-        .then(function(response) {
-          $scope.activityInstances = response.result;
-        });
+      metricsService.sum(options, function(err, res) {
+        $scope.activityInstances = res.result;
+        $scope.$apply();
+      });
+
      };
 
     $scope.load();
