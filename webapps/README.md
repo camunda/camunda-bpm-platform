@@ -184,7 +184,7 @@ You can submit issues in the [camunda Jira](https://app.camunda.com/jira/issues/
 
 ### Coding
 
-Clone the repository, add, fix or improve and send us a pull request.    
+Clone the repository, add, fix or improve and send us a pull request.
 But please take care about the commit messages, [our conventions can be found
 here](https://github.com/ajoslin/conventional-changelog/blob/master/CONVENTIONS.md).
 
@@ -202,7 +202,8 @@ In place of a guide, just follow the formatting of existing code (and / or use t
 
 - [Daniel _meyerdan_ Meyer](https://github.com/meyerdan) - [@meyerdan](http://twitter.com/meyerdan)
 - [Valentin _zeropaper_ Vago](https://github.com/zeropaper) - [@zeropaper](http://twitter.com/zeropaper)
-- [Nico _Nikku_ Rehwaldt](https://github.com/nikku) - [@nrehwaldt](http://twitter.com/nrehwaldt) 
+- [Nico _Nikku_ Rehwaldt](https://github.com/nikku) - [@nrehwaldt](http://twitter.com/nrehwaldt)
+- [Sebastian Stamm](https://github.com/SebastianStamm) - [@seb_stamm](https://twitter.com/seb_stamm)
 
 ## License
 
