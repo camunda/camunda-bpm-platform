@@ -619,6 +619,16 @@ describe('Admin authorizations Spec', function() {
       expect(authorizationsPage.authorizationResource(2)).to.eventually.eql('foobar');
     });
 
+    it('should restore previous state on cancel', function() {
+      authorizationsPage.updateButton(3).click();
+
+      authorizationsPage.userGroupInput(3).clear().sendKeys('a4');
+
+      authorizationsPage.cancelUpdateButton(3).click();
+
+      expect(authorizationsPage.authorizationIdentity(3)).to.eventually.eql('a3');
+    });
+
     it('should not apply conflicting updates', function() {
       authorizationsPage.updateButton(3).click();
 
@@ -628,16 +638,6 @@ describe('Admin authorizations Spec', function() {
 
       // need sleep because update is successful until the server says otherwise
       browser.sleep(500);
-
-      expect(authorizationsPage.authorizationIdentity(3)).to.eventually.eql('a3');
-    });
-
-    it('should restore previous state on cancel', function() {
-      authorizationsPage.updateButton(3).click();
-
-      authorizationsPage.userGroupInput(3).clear().sendKeys('a4');
-
-      authorizationsPage.cancelUpdateButton(3).click();
 
       expect(authorizationsPage.authorizationIdentity(3)).to.eventually.eql('a3');
     });
