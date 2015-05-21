@@ -33,6 +33,7 @@ public class MetricsTest extends PluggableProcessEngineTestCase {
     for (Meter meter : meters) {
       meter.getAndClear();
     }
+    managementService.deleteMetrics(null);
   }
 
   public void testDeleteMetrics() {

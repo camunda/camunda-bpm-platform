@@ -35,6 +35,7 @@ public class ActivityInstanceCountMetricsTest extends PluggableProcessEngineTest
     for (Meter meter : meters) {
       meter.getAndClear();
     }
+    managementService.deleteMetrics(null);
   }
 
   public void testBpmnActivityInstances() {
@@ -103,7 +104,9 @@ public class ActivityInstanceCountMetricsTest extends PluggableProcessEngineTest
 
     // clean up
     HistoricTaskInstance hti = historyService.createHistoricTaskInstanceQuery().singleResult();
-    historyService.deleteHistoricTaskInstance(hti.getId());
+    if(hti!=null) {
+      historyService.deleteHistoricTaskInstance(hti.getId());
+    }
 
     List<UserOperationLogEntry> uoles = historyService.createUserOperationLogQuery().list();
     for (UserOperationLogEntry uole : uoles) {
