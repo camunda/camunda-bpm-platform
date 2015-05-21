@@ -48,7 +48,11 @@ public class MetricsCollectionTask extends TimerTask {
       collectMetrics();
     }
     catch(Exception e) {
-      log.log(Level.WARNING, "Could not collect and log metrics", e);
+      try {
+        log.log(Level.WARNING, "Could not collect and log metrics", e);
+      } catch (Exception ex) {
+        // ignore if log can't be written
+      }
     }
   }
 

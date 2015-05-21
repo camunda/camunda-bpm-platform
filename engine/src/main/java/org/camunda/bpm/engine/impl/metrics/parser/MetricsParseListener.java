@@ -111,4 +111,8 @@ public class MetricsParseListener extends AbstractBpmnParseListener {
     addListeners(activity);
   }
 
+  public void parseMultiInstanceLoopCharacteristics(Element activityElement, Element multiInstanceLoopCharacteristicsElement, ActivityImpl activity) {
+    addListeners(activity);
+  }
+
 }

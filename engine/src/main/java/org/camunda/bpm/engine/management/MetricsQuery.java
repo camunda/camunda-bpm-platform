@@ -27,8 +27,14 @@ public interface MetricsQuery {
    */
   MetricsQuery name(String name);
 
+  /**
+   * Restrict to data collected after the given date
+   */
   MetricsQuery startDate(Date startTime);
 
+  /**
+   * Restrict to data collected before the given date
+   */
   MetricsQuery endDate(Date endTime);
 
   /**
