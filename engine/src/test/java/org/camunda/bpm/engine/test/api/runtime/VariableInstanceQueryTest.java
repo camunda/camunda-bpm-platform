@@ -15,8 +15,10 @@ package org.camunda.bpm.engine.test.api.runtime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -2175,7 +2177,7 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
     assertEquals("aProcessVariable", processVariable.getValue());
 
     // when
-    ActivityInstance subProcessActivityInstance = tree.getChildActivityInstances()[0];
+    ActivityInstance subProcessActivityInstance = tree.getActivityInstances("SubProcess_1")[0];
     VariableInstanceQuery query2 = runtimeService.createVariableInstanceQuery().activityInstanceIdIn(subProcessActivityInstance.getId());
 
     // then
@@ -2186,10 +2188,11 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
     taskService.setVariableLocal(task.getId(), "taskVariable", "taskVariableValue");
 
     // skip mi body instance
-    ActivityInstance taskActivityInstance = subProcessActivityInstance.getChildActivityInstances()[0].getChildActivityInstances()[0];
+    ActivityInstance taskActivityInstance = subProcessActivityInstance.getChildActivityInstances()[0];
     VariableInstanceQuery query3 = runtimeService.createVariableInstanceQuery().activityInstanceIdIn(taskActivityInstance.getId());
 
     // then
+    List<VariableInstance> variables = query3.list();
     VariableInstance taskVariable = query3.singleResult();
     assertNotNull(taskVariable);
     assertEquals("taskVariable", taskVariable.getName());
@@ -2209,15 +2212,12 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
     assertEquals(2, tree.getChildActivityInstances().length);
-    ActivityInstance task1Instance = tree.getChildActivityInstances()[0];
-    if (!task1Instance.getActivityId().equals("task1")) {
-      task1Instance = tree.getChildActivityInstances()[1];
-    }
+    ActivityInstance task1Instance = tree.getActivityInstances("task1")[0];
 
     VariableInstanceQuery query = runtimeService
         .createVariableInstanceQuery()
         .variableName("aLocalVariable")
-        .activityInstanceIdIn(processInstance.getId());
+        .activityInstanceIdIn(task1Instance.getId());
     VariableInstance localVariable = query.singleResult();
     assertNotNull(localVariable);
     assertEquals("aLocalVariable", localVariable.getName());
@@ -2228,15 +2228,12 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
 
     tree = runtimeService.getActivityInstance(processInstance.getId());
     assertEquals(2, tree.getChildActivityInstances().length);
-    ActivityInstance task3Instance = tree.getChildActivityInstances()[0];
-    if (!task3Instance.getActivityId().equals("task3")) {
-      task3Instance = tree.getChildActivityInstances()[1];
-    }
+    ActivityInstance task3Instance = tree.getActivityInstances("task3")[0];
 
     query = runtimeService
         .createVariableInstanceQuery()
         .variableName("aLocalVariable")
-        .activityInstanceIdIn(processInstance.getId());
+        .activityInstanceIdIn(task3Instance.getId());
     localVariable = query.singleResult();
     assertNotNull(localVariable);
     assertEquals("aLocalVariable", localVariable.getName());
@@ -2255,13 +2252,10 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
     assertEquals(1, tree.getChildActivityInstances().length);
-    ActivityInstance task1Instance = tree.getChildActivityInstances()[0];
-    if (!task1Instance.getActivityId().equals("UserTask_1")) {
-      task1Instance = tree.getChildActivityInstances()[0];
-    }
+    ActivityInstance subProcessInstance = tree.getActivityInstances("SubProcess_1")[0];
 
     // then the local variable has activity instance Id of the subprocess
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().activityInstanceIdIn(task1Instance.getId());
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().activityInstanceIdIn(subProcessInstance.getId());
     VariableInstance localVariable = query.singleResult();
     assertNotNull(localVariable);
     assertEquals("aLocalVariable", localVariable.getName());
@@ -2579,5 +2573,64 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
 
     }
   }
+
+
+  @Deployment
+  public void testSequentialMultiInstanceSubProcess() {
+    // given a process instance in sequential MI
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("miSequentialSubprocess");
+
+    // when
+    VariableInstance nrOfInstances = runtimeService.createVariableInstanceQuery()
+        .variableName("nrOfInstances").singleResult();
+    VariableInstance nrOfActiveInstances = runtimeService.createVariableInstanceQuery()
+        .variableName("nrOfActiveInstances").singleResult();
+    VariableInstance nrOfCompletedInstances = runtimeService.createVariableInstanceQuery()
+        .variableName("nrOfCompletedInstances").singleResult();
+    VariableInstance loopCounter = runtimeService.createVariableInstanceQuery()
+        .variableName("loopCounter").singleResult();
+
+    // then the activity instance ids of the variable instances should be correct
+    ActivityInstance tree = runtimeService.getActivityInstance(instance.getId());
+    assertEquals(tree.getActivityInstances("miSubProcess#multiInstanceBody")[0].getId(), nrOfInstances.getActivityInstanceId());
+    assertEquals(tree.getActivityInstances("miSubProcess#multiInstanceBody")[0].getId(), nrOfActiveInstances.getActivityInstanceId());
+    assertEquals(tree.getActivityInstances("miSubProcess#multiInstanceBody")[0].getId(), nrOfCompletedInstances.getActivityInstanceId());
+    assertEquals(tree.getActivityInstances("miSubProcess#multiInstanceBody")[0].getId(), loopCounter.getActivityInstanceId());
+
+  }
+
+  @Deployment
+  public void testParallelMultiInstanceSubProcess() {
+    // given a process instance in sequential MI
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("miSequentialSubprocess");
+
+    // when
+    VariableInstance nrOfInstances = runtimeService.createVariableInstanceQuery()
+        .variableName("nrOfInstances").singleResult();
+    VariableInstance nrOfActiveInstances = runtimeService.createVariableInstanceQuery()
+        .variableName("nrOfActiveInstances").singleResult();
+    VariableInstance nrOfCompletedInstances = runtimeService.createVariableInstanceQuery()
+        .variableName("nrOfCompletedInstances").singleResult();
+    List<VariableInstance> loopCounters = runtimeService.createVariableInstanceQuery()
+        .variableName("loopCounter").list();
+
+    // then the activity instance ids of the variable instances should be correct
+    ActivityInstance tree = runtimeService.getActivityInstance(instance.getId());
+    assertEquals(tree.getActivityInstances("miSubProcess#multiInstanceBody")[0].getId(), nrOfInstances.getActivityInstanceId());
+    assertEquals(tree.getActivityInstances("miSubProcess#multiInstanceBody")[0].getId(), nrOfActiveInstances.getActivityInstanceId());
+    assertEquals(tree.getActivityInstances("miSubProcess#multiInstanceBody")[0].getId(), nrOfCompletedInstances.getActivityInstanceId());
+
+    Set<String> loopCounterActivityInstanceIds = new HashSet<String>();
+    for (VariableInstance loopCounter : loopCounters) {
+      loopCounterActivityInstanceIds.add(loopCounter.getActivityInstanceId());
+    }
+
+    assertEquals(4, loopCounterActivityInstanceIds.size());
+
+    for (ActivityInstance subProcessInstance : tree.getActivityInstances("miSubProcess")) {
+      assertTrue(loopCounterActivityInstanceIds.contains(subProcessInstance.getId()));
+    }
+  }
+
 
 }

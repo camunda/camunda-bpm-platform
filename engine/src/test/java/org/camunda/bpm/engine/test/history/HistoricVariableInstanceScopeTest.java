@@ -241,7 +241,7 @@ public class HistoricVariableInstanceScopeTest extends PluggableProcessEngineTes
 
     HistoricVariableInstance variable = query.singleResult();
     // the variable is in the service task scope
-    assertEquals(pi.getId(), variable.getActivityInstanceId());
+    assertEquals(serviceTask.getId(), variable.getActivityInstanceId());
 
     assertProcessEnded(pi.getId());
   }

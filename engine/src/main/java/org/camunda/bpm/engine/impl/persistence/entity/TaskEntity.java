@@ -407,12 +407,6 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     variableInstance.setCaseExecutionId(caseExecutionId);
     variableInstance.setCaseInstanceId(caseInstanceId);
 
-    ExecutionEntity execution = getExecution();
-    if (execution != null) {
-      String activityInstanceId = execution.getActivityInstanceId();
-      variableInstance.setActivityInstanceId(activityInstanceId);
-    }
-
   }
 
   protected List<VariableInstanceEntity> loadVariableInstances() {

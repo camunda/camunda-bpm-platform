@@ -33,6 +33,7 @@ public class ProcessInstanceModificationHistoryTest extends PluggableProcessEngi
   protected static final String ONE_TASK_PROCESS = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml";
   protected static final String EXCLUSIVE_GATEWAY_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.exclusiveGateway.bpmn20.xml";
   protected static final String EXCLUSIVE_GATEWAY_ASYNC_TASK_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.exclusiveGatewayAsyncTask.bpmn20.xml";
+  protected static final String SUBPROCESS_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.subprocess.bpmn20.xml";
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
   public void testStartBeforeWithVariablesInHistory() {
@@ -68,7 +69,7 @@ public class ProcessInstanceModificationHistoryTest extends PluggableProcessEngi
       .singleResult();
 
     assertNotNull(localVariable);
-    assertEquals(updatedTree.getId(), localVariable.getActivityInstanceId());
+    assertNull(localVariable.getActivityInstanceId());
     assertEquals("localVar", localVariable.getName());
     assertEquals("localValue", localVariable.getValue());
 
@@ -116,7 +117,9 @@ public class ProcessInstanceModificationHistoryTest extends PluggableProcessEngi
       .singleResult();
 
     assertNotNull(localVariable);
-    assertEquals(updatedTree.getId(), localVariable.getActivityInstanceId());
+    // the following is null because localVariable is local on a concurrent execution
+    // but the concurrent execution does not execute an activity at the time the variable is set
+    assertNull(localVariable.getActivityInstanceId());
     assertEquals("localVar", localVariable.getName());
     assertEquals("localValue", localVariable.getValue());
 
@@ -133,6 +136,51 @@ public class ProcessInstanceModificationHistoryTest extends PluggableProcessEngi
 
     completeTasksInOrder("task2");
     assertProcessEnded(processInstance.getId());
+
+  }
+
+  @Deployment(resources = SUBPROCESS_PROCESS)
+  public void testStartBeforeScopeWithVariablesInHistory() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subprocess");
+
+    runtimeService
+      .createProcessInstanceModification(processInstance.getId())
+      .startBeforeActivity("innerTask")
+      .setVariable("procInstVar", "procInstValue")
+      .setVariableLocal("localVar", "localValue")
+      .execute();
+
+    ActivityInstance updatedTree = runtimeService.getActivityInstance(processInstance.getId());
+
+    HistoricVariableInstance procInstVariable = historyService.createHistoricVariableInstanceQuery()
+      .variableName("procInstVar")
+      .singleResult();
+
+    assertNotNull(procInstVariable);
+    assertEquals(updatedTree.getId(), procInstVariable.getActivityInstanceId());
+    assertEquals("procInstVar", procInstVariable.getName());
+    assertEquals("procInstValue", procInstVariable.getValue());
+
+    HistoricDetail procInstanceVarDetail = historyService.createHistoricDetailQuery()
+        .variableInstanceId(procInstVariable.getId()).singleResult();
+    assertNotNull(procInstanceVarDetail);
+    // when starting before/after an activity instance, the activity instance id of the
+    // execution is null and so is the activity instance id of the historic detail
+    assertNull(procInstanceVarDetail.getActivityInstanceId());
+
+    HistoricVariableInstance localVariable = historyService.createHistoricVariableInstanceQuery()
+      .variableName("localVar")
+      .singleResult();
+
+    assertNotNull(localVariable);
+    assertEquals(updatedTree.getActivityInstances("subProcess")[0].getId(), localVariable.getActivityInstanceId());
+    assertEquals("localVar", localVariable.getName());
+    assertEquals("localValue", localVariable.getValue());
+
+    HistoricDetail localInstanceVarDetail = historyService.createHistoricDetailQuery()
+        .variableInstanceId(localVariable.getId()).singleResult();
+    assertNotNull(localInstanceVarDetail);
+    assertNull(localInstanceVarDetail.getActivityInstanceId());
 
   }
 

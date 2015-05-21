@@ -17,7 +17,6 @@
       CASE_INST_ID_,
       CASE_EXECUTION_ID_,
       TASK_ID_,
-      ACT_INST_ID_,
       BYTEARRAY_ID_,
       DOUBLE_,
       LONG_,
@@ -25,6 +24,7 @@
       TEXT2_,
       VAR_SCOPE_,
       SEQUENCE_COUNTER_,
+      IS_CONCURRENT_LOCAL_,
       REV_
     )
     values (
@@ -36,7 +36,6 @@
       #{caseInstanceId, jdbcType=VARCHAR},
       #{caseExecutionId, jdbcType=VARCHAR},
       #{taskId, jdbcType=VARCHAR},
-      #{activityInstanceId, jdbcType=VARCHAR},
       #{byteArrayValueId, jdbcType=VARCHAR},
       #{doubleValue, jdbcType=DOUBLE},
       #{longValue, jdbcType=BIGINT},
@@ -44,6 +43,7 @@
       #{textValue2, jdbcType=VARCHAR},
       #{variableScope, jdbcType=VARCHAR},
       #{sequenceCounter, jdbcType=BIGINT},
+      #{isConcurrentLocal, jdbcType=BOOLEAN},
       1
     )
   </insert>
@@ -84,7 +84,7 @@
       <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
       <result property="caseExecutionId" column="CASE_EXECUTION_ID_" jdbcType="VARCHAR" />
       <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
-      <result property="activityInstanceId" column="ACT_INSTANCE_ID_" jdbcType="VARCHAR" />
+      <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
       <result property="activityId" column="ACTIVITY_ID_" jdbcType="VARCHAR" />
       <result property="isActive" column="IS_ACTIVE_" jdbcType="BOOLEAN" />
       <result property="isConcurrencyScope" column="IS_CONCURRENCY_SCOPE_" jdbcType="BOOLEAN" />
@@ -94,6 +94,7 @@
       <result property="textValue2" column="TEXT2_" jdbcType="VARCHAR"/>
       <result property="longValue" column="LONG_" jdbcType="BIGINT"/>
       <result property="sequenceCounter" column="SEQUENCE_COUNTER_" jdbcType="BIGINT"/>
+      <result property="isConcurrentLocal" column="IS_CONCURRENT_LOCAL_" jdbcType="BOOLEAN"/>
 	</resultMap>
 
   <!-- VARIABLE INSTANCE SELECT -->
@@ -101,7 +102,7 @@
 	<select id="selectVariableInstance" parameterType="string" resultMap="variableInstanceResultMap">
 		SELECT
         RES.*,
-        (<include refid="actInstIdColumn"/>) ACT_INSTANCE_ID_
+        (<include refid="actInstIdColumn"/>) ACT_INST_ID_
     FROM
         ${prefix}ACT_RU_VARIABLE RES
 
@@ -126,7 +127,7 @@
 	<select id="selectVariablesByExecutionId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="variableInstanceResultMap">
 		SELECT
         RES.*,
-        (<include refid="actInstIdColumn"/>) ACT_INSTANCE_ID_
+        (<include refid="actInstIdColumn"/>) ACT_INST_ID_
     FROM
         ${prefix}ACT_RU_VARIABLE RES
 
@@ -154,7 +155,7 @@
   <select id="selectVariablesByCaseExecutionId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="variableInstanceResultMap">
     SELECT
         RES.*,
-        (<include refid="actInstIdColumn"/>) ACT_INSTANCE_ID_
+        (<include refid="actInstIdColumn"/>) ACT_INST_ID_
     FROM
         ${prefix}ACT_RU_VARIABLE RES
 
@@ -182,7 +183,7 @@
   <select id="selectVariablesByTaskId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="variableInstanceResultMap">
     SELECT
         RES.*,
-        (<include refid="actInstIdColumn"/>) ACT_INSTANCE_ID_
+        (<include refid="actInstIdColumn"/>) ACT_INST_ID_
     FROM
         ${prefix}ACT_RU_VARIABLE RES
 
@@ -222,11 +223,6 @@
 
   <sql id="actInstIdColumn">
   case
-    when
-      RES.ACT_INST_ID_ is not null
-    then RES.ACT_INST_ID_
-
-    <!-- ensures backwards compatibility -->
 	  when
       RES.TASK_ID_ is not null
       and RES.EXECUTION_ID_ is not null
@@ -240,12 +236,14 @@
 	    EXECUTION.IS_SCOPE_ = ${trueConstant}
 	    and ((EXECUTION.IS_ACTIVE_ = ${trueConstant}) or (EXECUTION.IS_ACTIVE_ = ${falseConstant} and EXECUTION.ACT_ID_ is null))
 	    and EXECUTION.PARENT_ID_ is null
+      and RES.IS_CONCURRENT_LOCAL_ = ${falseConstant}
 	  then EXECUTION.ID_
 
 	  when
 	    EXECUTION.IS_SCOPE_ = ${trueConstant}
 	    and ((EXECUTION.IS_ACTIVE_ = ${trueConstant}) or (EXECUTION.IS_ACTIVE_ = ${falseConstant} and EXECUTION.ACT_ID_ is null))
 	    and EXECUTION.PARENT_ID_ is not null
+      and RES.IS_CONCURRENT_LOCAL_ = ${falseConstant}
 	  then PARENT_EXECUTION.ACT_INST_ID_
 
 	  else EXECUTION.ACT_INST_ID_
@@ -256,7 +254,7 @@
     from (
           select
             RES.*,
-            (<include refid="actInstIdColumn"/>) ACT_INSTANCE_ID_
+            (<include refid="actInstIdColumn"/>) ACT_INST_ID_
 
           from ${prefix}ACT_RU_VARIABLE RES
 

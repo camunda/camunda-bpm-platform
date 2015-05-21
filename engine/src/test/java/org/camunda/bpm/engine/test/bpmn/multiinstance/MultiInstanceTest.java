@@ -507,12 +507,6 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
   public void testSequentialSubProcess() {
     String procId = runtimeService.startProcessInstanceByKey("miSequentialSubprocess").getId();
 
-//    ActivityInstance processInstance = runtimeService.getProcessInstance(procId);
-//    assertEquals(1, processInstance.getChildInstances().size());
-//    for (ActivityInstance subProcessInstance : processInstance.getChildInstances()) {
-//      assertEquals(2, subProcessInstance.getChildInstances().size());
-//    }
-
     TaskQuery query = taskService.createTaskQuery().orderByTaskName().asc();
     for (int i=0; i<4; i++) {
       List<Task> tasks = query.list();

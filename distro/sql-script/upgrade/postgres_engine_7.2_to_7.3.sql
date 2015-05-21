@@ -141,7 +141,7 @@ VALUES
 -- variables --
 
 ALTER TABLE ACT_RU_VARIABLE
-  ADD ACT_INST_ID_ varchar(64);
+  ADD IS_CONCURRENT_LOCAL_ boolean;
 
 -- metrics --
 

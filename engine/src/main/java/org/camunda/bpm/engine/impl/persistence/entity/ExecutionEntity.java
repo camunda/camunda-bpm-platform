@@ -52,6 +52,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.util.FormPropertyStartContext;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
+import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
@@ -1040,26 +1041,12 @@ public class ExecutionEntity extends PvmExecutionImpl implements
     variableInstance.setProcessInstanceId(processInstanceId);
     variableInstance.setExecutionId(id);
 
-    String scopeActivityInstanceId = null;
+    variableInstance.setConcurrentLocal(!isScope || isExecutingScopeLeafActivity());
+  }
 
-    ActivityImpl activity = getActivity();
-    if(activity != null) {
-      if(activity.isScope()) {
-        scopeActivityInstanceId = getActivityInstanceId();
-      }
-      else {
-        scopeActivityInstanceId = getParentActivityInstanceId();
-      }
-    }
-    else {
-      ExecutionEntity scopeExecution = this;
-      if(isConcurrent()) {
-        scopeExecution = scopeExecution.getParent();
-      }
-      scopeActivityInstanceId = scopeExecution.getParentActivityInstanceId();
-    }
-
-    variableInstance.setActivityInstanceId(scopeActivityInstanceId);
+  protected boolean isExecutingScopeLeafActivity() {
+    return isActive && getActivity() != null && getActivity().isScope() && activityInstanceId != null
+        && !(getActivity().getActivityBehavior() instanceof CompositeActivityBehavior);
   }
 
   protected List<VariableInstanceEntity> loadVariableInstances() {

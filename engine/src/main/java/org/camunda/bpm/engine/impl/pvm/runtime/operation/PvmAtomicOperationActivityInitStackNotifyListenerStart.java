@@ -65,6 +65,9 @@ public class PvmAtomicOperationActivityInitStackNotifyListenerStart extends PvmA
 
     // if the stack has been instantiated
     if (instantiationStack.getActivities().isEmpty() && instantiationStack.getTargetActivity() != null) {
+      // as if we are entering the target activity instance id via a transition
+      execution.setActivityInstanceId(null);
+
       // execute the target activity with this execution
       startContext.applyVariables(propagatingExecution);
       propagatingExecution.setActivity(instantiationStack.getTargetActivity());
@@ -72,6 +75,9 @@ public class PvmAtomicOperationActivityInitStackNotifyListenerStart extends PvmA
 
     }
     else if (instantiationStack.getActivities().isEmpty() && instantiationStack.getTargetTransition() != null) {
+      // as if we are entering the target activity instance id via a transition
+      execution.setActivityInstanceId(null);
+
       // execute the target transition with this execution
       PvmTransition transition = instantiationStack.getTargetTransition();
       startContext.applyVariables(propagatingExecution);

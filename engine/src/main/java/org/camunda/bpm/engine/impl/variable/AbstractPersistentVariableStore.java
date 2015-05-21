@@ -124,7 +124,8 @@ public abstract class AbstractPersistentVariableStore extends AbstractVariableSt
     fireVariableEvent(variableInstanceEntity, VariableListener.UPDATE, sourceActivityExecution);
   }
 
-  public CoreVariableInstance createVariableInstance(String variableName, TypedValue value, AbstractVariableScope sourceActivityExecution) {
+  public CoreVariableInstance createVariableInstance(String variableName, TypedValue value,
+      AbstractVariableScope sourceActivityExecution) {
 
     // create variable instance
     VariableInstanceEntity variableInstance = VariableInstanceEntity.createAndInsert(variableName, value);

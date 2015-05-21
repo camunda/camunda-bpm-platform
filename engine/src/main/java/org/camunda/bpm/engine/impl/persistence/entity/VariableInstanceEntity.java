@@ -78,6 +78,30 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
 
   protected long sequenceCounter = 1;
 
+  /**
+   * <p>Determines whether this variable is supposed to be a local variable
+   * in case of concurrency in its scope. This affects
+   * </p>
+   *
+   * <ul>
+   * <li>tree expansion (not evaluated yet by the engine)
+   * <li>activity instance IDs of variable instances: concurrentLocal
+   *   variables always receive the activity instance id of their execution
+   *   (which may not be the scope execution), while non-concurrentLocal variables
+   *   always receive the activity instance id of their scope (which is set in the
+   *   parent execution)
+   * </ul>
+   *
+   * <p>
+   *   In the future, this field could be used for restoring the variable distribution
+   *   when the tree is expanded/compacted multiple times.
+   *   On expansion, the goal would be to keep concurrentLocal variables always with
+   *   their concurrent replacing executions while non-concurrentLocal variables
+   *   stay in the scope execution
+   * </p>
+   */
+  protected boolean isConcurrentLocal = false;
+
   // Default constructor for SQL mapping
   public VariableInstanceEntity() {
   }
@@ -141,6 +165,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     }
 
     persistentState.put("sequenceCounter", getSequenceCounter());
+    persistentState.put("concurrentLocal", isConcurrentLocal);
 
     return persistentState;
   }
@@ -550,6 +575,15 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     sequenceCounter++;
   }
 
+
+  public boolean isConcurrentLocal() {
+    return isConcurrentLocal;
+  }
+
+  public void setConcurrentLocal(boolean isConcurrentLocal) {
+    this.isConcurrentLocal = isConcurrentLocal;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -570,6 +604,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
       + ", byteArrayValueId=" + byteArrayValueId
       + ", forcedUpdate=" + forcedUpdate
       + ", configuration=" + configuration
+      + ", isConcurrentLocal=" + isConcurrentLocal
       + "]";
   }
 

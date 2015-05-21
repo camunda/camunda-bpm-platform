@@ -153,7 +153,6 @@ create table ACT_RU_VARIABLE (
     CASE_EXECUTION_ID_ varchar(64),
     CASE_INST_ID_ varchar(64),
     TASK_ID_ varchar(64),
-    ACT_INST_ID_ varchar(64),
     BYTEARRAY_ID_ varchar(64),
     DOUBLE_ double precision,
     LONG_ bigint,
@@ -161,6 +160,7 @@ create table ACT_RU_VARIABLE (
     TEXT2_ varchar(4000),
     VAR_SCOPE_ varchar(64),
     SEQUENCE_COUNTER_ bigint,
+    IS_CONCURRENT_LOCAL_ boolean,
     primary key (ID_)
 );
 
