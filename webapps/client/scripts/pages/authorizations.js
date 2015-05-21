@@ -107,6 +107,8 @@ define(['text!./authorizations.html', 'text!./confirm-delete-authorization.html'
             if (result == 'SUCCESS') {
               loadAuthorizations();
             }
+          }, function() {
+            loadAuthorizations();
           });
         };
 
