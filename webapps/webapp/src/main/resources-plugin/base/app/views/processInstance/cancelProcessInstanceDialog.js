@@ -50,10 +50,10 @@ define([], function() {
         $scope.status = CANCEL_SUCCESS;
         Notifications.addMessage({'status': 'Canceled', 'message': 'The cancellation of the process instance was successful.'});
 
-      }, function () {
+      }, function (err) {
         // failure
         $scope.status = CANCEL_FAILED;
-        Notifications.addError({'status': 'Failed', 'message': 'The cancellation of the process instance failed.', 'exclusive': ['type']});
+        Notifications.addError({'status': 'Failed', 'message': 'The cancellation of the process instance failed. ' + err.data.message, 'exclusive': ['type']});
       });
     };
 
