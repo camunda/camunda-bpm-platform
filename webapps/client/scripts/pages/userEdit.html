@@ -247,21 +247,18 @@
                    ng-hide="groupList.length == 0">
               <thead>
                 <tr>
-                  <th class="icon"><!-- icons --></th>
                   <th class="group-id">Group Id</th>
                   <th class="group-name">Group Name</th>
                   <th class="group-type">Group Type</th>
                   <th class="action"
-                      ng-show="availableOperations.removeGroup"><!-- actions --></th>
+                      ng-show="availableOperations.removeGroup">
+                    Action
+                  </th>
                 </tr>
               </thead>
 
               <tbody>
                 <tr ng-repeat="group in groupList">
-                  <td class="icon">
-                    <!-- add group icon here -->
-                  </td>
-
                   <td class="group-id">
                     <a href="#/groups/{{group.id | escape}}?tab=group">{{group.id}}</a>
                   </td>
@@ -276,8 +273,7 @@
 
                   <td class="action"
                       ng-show="availableOperations.removeGroup">
-                    <a class="btn btn-default btn-sm"
-                       ng-click="removeGroup(group.id)">Remove</a>
+                    <a ng-click="removeGroup(group.id)">Remove</a>
                   </td>
                 </tr>
               </tbody>

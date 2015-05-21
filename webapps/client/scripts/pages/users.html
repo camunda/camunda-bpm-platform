@@ -3,7 +3,6 @@
   <div class="row">
     <div class="page-header">
       <h1>
-        <!-- <span class="glyphicon glyphicon-user"></span> -->
         Users
         <a ng-show="availableOperations.create"
            href="#/user-create"
@@ -20,20 +19,14 @@
     <table class="cam-table">
       <thead>
         <tr>
-          <th class="picture"><!-- pictures --></th>
           <th class="name">Name</th>
           <th class="username">Username</th>
-          <th class="action"><!-- actions --></th>
+          <th class="action">Action</th>
         </tr>
       </thead>
 
       <tbody>
         <tr ng-repeat="user in userList">
-          <td class="picture">
-            <!-- add user pictures later -->
-            <span class="glyphicon glyphicon-user"></span>
-          </td>
-
           <td class="name">
             <a ng-href="#/users/{{user.id | escape}}">{{user.firstName}} {{user.lastName}}</a>
           </td>

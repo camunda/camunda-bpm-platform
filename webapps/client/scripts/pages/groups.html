@@ -19,7 +19,6 @@
     <table class="cam-table">
       <thead>
         <tr>
-          <th class="icon"><!-- icons --></th>
           <th class="group-id">Group Id</th>
           <th class="group-name">Group Name</th>
           <th class="group-type">Group Type</th>
@@ -29,10 +28,6 @@
 
       <tbody>
         <tr ng-repeat="group in groupList">
-          <td class="icon">
-            <span class="glyphicon glyphicon-th"></span>
-          </td>
-
           <td class="group-id">
             <a href="#/groups/{{group.id | escape}}">{{group.id}}</a>
           </td>
