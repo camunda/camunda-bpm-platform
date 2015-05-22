@@ -131,11 +131,11 @@ public class ActivityInstanceCountMetricsTest extends PluggableProcessEngineTest
         .name(Metrics.ACTIVTY_INSTANCE_START)
         .sum());
 
+    // start PI_HumanTask_1 and PI_Milestone_1
     List<CaseExecution> list = caseService.createCaseExecutionQuery().enabled().list();
     for (CaseExecution caseExecution : list) {
       caseService.withCaseExecution(caseExecution.getId())
         .manualStart();
-
     }
 
     assertEquals(2l, managementService.createMetricsQuery()
@@ -147,6 +147,15 @@ public class ActivityInstanceCountMetricsTest extends PluggableProcessEngineTest
 
     // still 2
     assertEquals(2l, managementService.createMetricsQuery()
+        .name(Metrics.ACTIVTY_INSTANCE_START)
+        .sum());
+
+    // trigger the milestone
+    CaseExecution taskExecution = caseService.createCaseExecutionQuery().activityId("PI_HumanTask_1").singleResult();
+    caseService.completeCaseExecution(taskExecution.getId());
+
+    // milestone is counted
+    assertEquals(3l, managementService.createMetricsQuery()
         .name(Metrics.ACTIVTY_INSTANCE_START)
         .sum());
 

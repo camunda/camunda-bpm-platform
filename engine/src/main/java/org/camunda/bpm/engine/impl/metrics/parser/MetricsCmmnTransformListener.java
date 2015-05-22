@@ -35,6 +35,7 @@ public class MetricsCmmnTransformListener extends AbstractCmmnTransformListener 
     if(activity != null) {
       activity.addBuiltInListener(CaseExecutionListener.START, listener);
       activity.addBuiltInListener(CaseExecutionListener.MANUAL_START, listener);
+      activity.addBuiltInListener(CaseExecutionListener.OCCUR, listener);
     }
   }
 

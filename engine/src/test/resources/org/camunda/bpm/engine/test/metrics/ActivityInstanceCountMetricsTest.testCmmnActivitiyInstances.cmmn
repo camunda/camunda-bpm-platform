@@ -10,6 +10,13 @@
 
       <planItem id="PI_HumanTask_1" definitionRef="HumanTask_1" />
       <planItem id="PI_Stage_1" definitionRef="Stage_1" />
+      <planItem id="PI_Milestone_1" definitionRef="Milestone" entryCriteriaRefs="Sentry_1" />
+      
+      <sentry id="Sentry_1">
+        <planItemOnPart sourceRef="PI_HumanTask_1">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
 
       <humanTask id="HumanTask_1" name="A HumanTask" />
 
@@ -17,6 +24,8 @@
         <planItem id="PI_HumanTask_2" definitionRef="HumanTask_1" />
         <planItem id="PI_HumanTask_3" definitionRef="HumanTask_1" />
       </stage>
+      
+      <milestone id="Milestone" />
 
     </casePlanModel>
   </case>
