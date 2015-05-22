@@ -160,7 +160,7 @@ create table ACT_RU_VARIABLE (
     TEXT2_ varchar(4000),
     VAR_SCOPE_ varchar(64) not null,
     SEQUENCE_COUNTER_ bigint,
-    IS_CONCURRENT_LOCAL_ smallint check(IS_ACTIVE_ in (1,0)),
+    IS_CONCURRENT_LOCAL_ smallint check(IS_CONCURRENT_LOCAL_ in (1,0)),
     primary key (ID_)
 );
 

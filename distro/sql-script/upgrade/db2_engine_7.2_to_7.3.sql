@@ -145,7 +145,7 @@ VALUES
 -- variables --
 
 ALTER TABLE ACT_RU_VARIABLE
-  ADD IS_CONCURRENT_LOCAL_ smallint check(IS_ACTIVE_ in (1,0));
+  ADD IS_CONCURRENT_LOCAL_ smallint check(IS_CONCURRENT_LOCAL_ in (1,0));
 
 -- metrics --
 
