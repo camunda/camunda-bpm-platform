@@ -48,7 +48,6 @@
         <a tooltip-placement="left"
            tooltip="{{ 'MANAGE_ACCOUNT' | translate }}"
            href
-           sem-show-user-actions
            class="dropdown-toggle"
            data-toggle="dropdown">
           <span class="glyphicon glyphicon-user"></span>
@@ -56,8 +55,7 @@
         </a>
         <ul class="dropdown-menu">
           <li class="user-profile">
-            <a sem-jump-to-profile
-               ng-href="{{ 'adminbase://:engine' | uri }}/#/users/{{ authentication.name }}?tab=profile"
+            <a ng-href="{{ 'adminbase://:engine' | uri }}/#/users/{{ authentication.name }}?tab=profile"
                translate="MY_PROFILE">
               My Profile
             </a>
@@ -66,8 +64,7 @@
           <li class="divider"></li>
 
           <li class="sign-out">
-            <a sem-log-out
-               href="#/logout"
+            <a href="#/logout"
                translate="SIGN_OUT_ACTION">
               Sign out
             </a>
@@ -83,7 +80,6 @@
 
       <li class="app-switch dropdown">
         <a href
-           sem-show-applications
            class="dropdown-toggle"
            data-toggle="dropdown">
           <span class="glyphicon glyphicon-home"></span>
@@ -92,14 +88,12 @@
 
         <ul class="dropdown-menu">
           <li ng-if="!authentication || authentication.canAccess('admin')">
-            <a sem-jump-to-admin
-               ng-href="{{ '../../admin/:engine/' | uri }}"
+            <a ng-href="{{ '../../admin/:engine/' | uri }}"
                translate="ADMIN_APP">Admin</a>
           </li>
 
           <li ng-if="!authentication || authentication.canAccess('cockpit')">
-            <a sem-jump-to-cockpit
-               ng-href="{{ '../../cockpit/:engine/' | uri }}"
+            <a ng-href="{{ '../../cockpit/:engine/' | uri }}"
                translate="COCKPIT_APP">Cockpit</a>
           </li>
         </ul>
