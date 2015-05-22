@@ -1,9 +1,8 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,6 +23,7 @@ import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
@@ -32,44 +32,52 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
-
-/** Convenience for ProcessEngine and services initialization in the form of a JUnit rule.
+/**
+ * Convenience for ProcessEngine and services initialization in the form of a
+ * JUnit rule.
+ * <p>
+ * Usage:
+ * </p>
  *
- * <p>Usage:</p>
- * <pre>public class YourTest {
- *
+ * <pre>
+ * public class YourTest {
+ * 
  *   &#64;Rule
  *   public ProcessEngineRule processEngineRule = new ProcessEngineRule();
- *
+ * 
  *   ...
  * }
  * </pre>
- *
- * <p>The ProcessEngine and the services will be made available to the test class
- * through the getters of the processEngineRule.
- * The processEngine will be initialized by default with the camunda.cfg.xml resource
- * on the classpath.  To specify a different configuration file, pass the
- * resource location in {@link #ProcessEngineRule(String) the appropriate constructor}.
- * Process engines will be cached statically.  Right before the first time the setUp is called for a given
- * configuration resource, the process engine will be constructed.</p>
- *
- * <p>You can declare a deployment with the {@link Deployment} annotation.
- * This base class will make sure that this deployment gets deployed before the
- * setUp and {@link RepositoryService#deleteDeployment(String, boolean) cascade deleted}
- * after the tearDown.
+ * <p>
+ * The ProcessEngine and the services will be made available to the test class
+ * through the getters of the processEngineRule. The processEngine will be
+ * initialized by default with the camunda.cfg.xml resource on the classpath. To
+ * specify a different configuration file, pass the resource location in
+ * {@link #ProcessEngineRule(String) the appropriate constructor}. Process
+ * engines will be cached statically. Right before the first time the setUp is
+ * called for a given configuration resource, the process engine will be
+ * constructed.
  * </p>
- *
- * <p>The processEngineRule also lets you {@link ProcessEngineRule#setCurrentTime(Date) set the current time used by the
- * process engine}. This can be handy to control the exact time that is used by the engine
- * in order to verify e.g. e.g. due dates of timers.  Or start, end and duration times
- * in the history service.  In the tearDown, the internal clock will automatically be
- * reset to use the current system time rather then the time that was set during
- * a test method.  In other words, you don't have to clean up your own time messing mess ;-)
+ * <p>
+ * You can declare a deployment with the {@link Deployment} annotation. This
+ * base class will make sure that this deployment gets deployed before the setUp
+ * and {@link RepositoryService#deleteDeployment(String, boolean) cascade
+ * deleted} after the tearDown.
+ * </p>
+ * <p>
+ * The processEngineRule also lets you
+ * {@link ProcessEngineRule#setCurrentTime(Date) set the current time used by
+ * the process engine}. This can be handy to control the exact time that is used
+ * by the engine in order to verify e.g. e.g. due dates of timers. Or start, end
+ * and duration times in the history service. In the tearDown, the internal
+ * clock will automatically be reset to use the current system time rather then
+ * the time that was set during a test method. In other words, you don't have to
+ * clean up your own time messing mess ;-)
  * </p>
  *
  * @author Tom Baeyens
  */
-public class ProcessEngineRule extends TestWatcher {
+public class ProcessEngineRule extends TestWatcher implements ProcessEngineServices {
 
   protected String configurationResource = "camunda.cfg.xml";
   protected String configurationResourceCompat = "activiti.cfg.xml";
@@ -100,7 +108,7 @@ public class ProcessEngineRule extends TestWatcher {
 
   @Override
   public void starting(Description description) {
-    if (processEngine==null) {
+    if (processEngine == null) {
       initializeProcessEngine();
     }
 
@@ -162,6 +170,7 @@ public class ProcessEngineRule extends TestWatcher {
     this.processEngine = processEngine;
   }
 
+  @Override
   public RepositoryService getRepositoryService() {
     return repositoryService;
   }
@@ -170,6 +179,7 @@ public class ProcessEngineRule extends TestWatcher {
     this.repositoryService = repositoryService;
   }
 
+  @Override
   public RuntimeService getRuntimeService() {
     return runtimeService;
   }
@@ -178,6 +188,7 @@ public class ProcessEngineRule extends TestWatcher {
     this.runtimeService = runtimeService;
   }
 
+  @Override
   public TaskService getTaskService() {
     return taskService;
   }
@@ -186,14 +197,25 @@ public class ProcessEngineRule extends TestWatcher {
     this.taskService = taskService;
   }
 
+  @Override
   public HistoryService getHistoryService() {
     return historyService;
   }
 
-  public void setHistoricDataService(HistoryService historicDataService) {
-    this.historyService = historicDataService;
+  public void setHistoryService(HistoryService historyService) {
+    this.historyService = historyService;
   }
 
+  /**
+   * @see #setHistoryService(HistoryService)
+   * @param historicService
+   *          the historiy service instance
+   */
+  public void setHistoricDataService(HistoryService historicService) {
+    this.setHistoryService(historicService);
+  }
+
+  @Override
   public IdentityService getIdentityService() {
     return identityService;
   }
@@ -202,18 +224,43 @@ public class ProcessEngineRule extends TestWatcher {
     this.identityService = identityService;
   }
 
+  @Override
   public ManagementService getManagementService() {
     return managementService;
   }
 
+  @Override
+  public AuthorizationService getAuthorizationService() {
+    return authorizationService;
+  }
+
+  public void setAuthorizationService(AuthorizationService authorizationService) {
+    this.authorizationService = authorizationService;
+  }
+
+  @Override
+  public CaseService getCaseService() {
+    return caseService;
+  }
+
+  public void setCaseService(CaseService caseService) {
+    this.caseService = caseService;
+  }
+
+  @Override
   public FormService getFormService() {
     return formService;
+  }
+
+  public void setFormService(FormService formService) {
+    this.formService = formService;
   }
 
   public void setManagementService(ManagementService managementService) {
     this.managementService = managementService;
   }
 
+  @Override
   public FilterService getFilterService() {
     return filterService;
   }
