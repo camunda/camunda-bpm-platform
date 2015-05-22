@@ -76,11 +76,6 @@ Page.prototype.loggedInUser = function() {
   return element(by.css('[cam-widget-header] .account')).getText();
 };
 
-Page.prototype.switchWebapp = function(appName) {
-  element(by.css('.navbar [sem-show-applications]')).click();
-  element(by.css('.navbar [sem-jump-to-'+ appName + ']')).click();
-};
-
 Page.prototype.findElementIndexInRepeater = function(repeaterName, elementSelector, elementName) {
   var deferred = protractor.promise.defer();
 

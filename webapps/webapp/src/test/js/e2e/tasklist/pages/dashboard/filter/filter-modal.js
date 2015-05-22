@@ -86,7 +86,7 @@ module.exports = Base.extend({
   },
 
   selectCriterionKey: function(item, group, key) {
-    this.criterionList().get(item).element(by.css('[sem-id="' + group + ' ' + key.replace(/\s*\*/, '') + '"]')).click();
+    this.criterionList().get(item).element(by.cssContainingText('optgroup[label="' + group + '"] > option', key)).click();
   },
 
   criterionKeyInput: function(item, inputKey) {
