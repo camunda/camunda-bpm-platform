@@ -126,7 +126,7 @@ public class BpmnActivityBehavior {
       } else {
 
         Object isForCompensation = execution.getActivity().getProperty(BpmnParse.PROPERTYNAME_IS_FOR_COMPENSATION);
-        if(isForCompensation != null && (Boolean) isForCompensation && isParentCompensating(execution)) {
+        if(isForCompensation != null && (Boolean) isForCompensation && isAncestorCompensationThrowing(execution)) {
 
           execution.endCompensation();
 
@@ -147,7 +147,7 @@ public class BpmnActivityBehavior {
     }
   }
 
-  private boolean isParentCompensating(ActivityExecution execution) {
+  protected boolean isAncestorCompensationThrowing(ActivityExecution execution) {
     ActivityExecution parent = execution.getParent();
     while (parent != null) {
       if (((PvmExecutionImpl) parent).isCompensationThrowing()) {
