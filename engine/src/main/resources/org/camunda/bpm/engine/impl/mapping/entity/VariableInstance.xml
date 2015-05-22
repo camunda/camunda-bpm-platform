@@ -232,16 +232,15 @@
       RES.CASE_EXECUTION_ID_ is not null
     then CASE_EXECUTION.ID_
 
+    <!-- if execution is process instance -->
 	  when
-	    EXECUTION.IS_SCOPE_ = ${trueConstant}
-	    and ((EXECUTION.IS_ACTIVE_ = ${trueConstant}) or (EXECUTION.IS_ACTIVE_ = ${falseConstant} and EXECUTION.ACT_ID_ is null))
-	    and EXECUTION.PARENT_ID_ is null
+	    EXECUTION.PARENT_ID_ is null
       and RES.IS_CONCURRENT_LOCAL_ = ${falseConstant}
 	  then EXECUTION.ID_
 
+    <!-- if execution is scope execution (!= process instance) -->
 	  when
 	    EXECUTION.IS_SCOPE_ = ${trueConstant}
-	    and ((EXECUTION.IS_ACTIVE_ = ${trueConstant}) or (EXECUTION.IS_ACTIVE_ = ${falseConstant} and EXECUTION.ACT_ID_ is null))
 	    and EXECUTION.PARENT_ID_ is not null
       and RES.IS_CONCURRENT_LOCAL_ = ${falseConstant}
 	  then PARENT_EXECUTION.ACT_INST_ID_

@@ -1045,7 +1045,10 @@ public class ExecutionEntity extends PvmExecutionImpl implements
   }
 
   protected boolean isExecutingScopeLeafActivity() {
-    return isActive && getActivity() != null && getActivity().isScope() && activityInstanceId != null
+    return isActive
+        && getActivity() != null
+        && getActivity().isScope()
+        && activityInstanceId != null
         && !(getActivity().getActivityBehavior() instanceof CompositeActivityBehavior);
   }
 
