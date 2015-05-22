@@ -39,7 +39,7 @@ exports.config = {
     'tasklist/specs/filter-spec.js',
     'tasklist/specs/process-start-spec.js',
     'tasklist/specs/tasklist-sorting-spec.js'
-    'tasklist/specs/tasklist-search-spec.js',
+    'tasklist/specs/tasklist-search-spec.js'
   ],
 
   // A base URL for your application under test. Calls to protractor.get()
