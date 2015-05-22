@@ -7,7 +7,7 @@ module.exports = Base.extend({
   url: '/camunda/app/admin/default/#/groups',
 
   newGroupButton: function() {
-    return element(by.css('.btn.pull-right'));
+    return element(by.css('[ng-show="availableOperations.create"]'));
   },
 
   groupList: function() {

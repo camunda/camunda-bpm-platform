@@ -75,13 +75,14 @@ describe('Admin authorizations Spec', function() {
       // then
       authorizationsPage.application.isActive();
       expect(authorizationsPage.application.createNewButton().isEnabled()).to.eventually.be.true;
+      expect(authorizationsPage.application.newAuthorizationButton().isEnabled()).to.eventually.be.true;
       expect(authorizationsPage.application.boxHeader()).to.eventually.eql('Application Authorizations');
     });
 
 
     it('should validate authorization attributes', function() {
 
-      authorizationsPage.createNewButton().click().then(function() {
+      authorizationsPage.newAuthorizationButton().click().then(function() {
 
         checkCreateNewState();
 

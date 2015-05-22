@@ -35,6 +35,10 @@ module.exports = Page.extend({
     return groupsSection.element(by.css('[ng-controller="AuthorizationCreateController"] legend')).getText();
   },
 
+  newAuthorizationButton: function() {
+    return element.all(by.css('[ng-click="addNewAuthorization()"]')).first();
+  },
+
   createNewButton: function() {
     return element.all(by.css('[ng-click="addNewAuthorization()"]')).last();
   },

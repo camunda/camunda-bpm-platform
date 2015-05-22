@@ -6,7 +6,7 @@ var systemPage = require('../pages/system');
 
 var setupFile = require('./system-setup');
 
-describe.only('Admin system Spec', function() {
+describe('Admin system Spec', function() {
 
   before(function() {
     return testHelper(setupFile, function() {

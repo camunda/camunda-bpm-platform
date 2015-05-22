@@ -336,6 +336,7 @@ describe('Admin Users Spec', function() {
       usersPage.editUserGroups.navigateTo({ user: users[2].id });
       usersPage.editUserGroups.addGroupButton().click();
 
+
       // when
       usersPage.editUserGroups.selectGroupModal.groupName(0).getText().then(function(groupName) {
         browser.sleep(300).then(function() {
