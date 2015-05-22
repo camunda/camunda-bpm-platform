@@ -14,6 +14,7 @@ package org.camunda.bpm.pa.rest;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -36,6 +37,7 @@ import org.camunda.bpm.engine.impl.db.PersistenceSession;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.rest.dto.identity.UserCredentialsDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserProfileDto;
@@ -89,6 +91,10 @@ public class TestServlet extends HttpServlet {
 
     ManagementService managementService = processEngine.getManagementService();
 
+    Collection<Meter> meters = processEngineConfiguration.getMetricsRegistry().getMeters().values();
+    for (Meter meter : meters) {
+      meter.getAndClear();
+    }
 
     log.fine("verifying that db is clean after test");
     Map<String, Long> tableCounts = managementService.getTableCount();
