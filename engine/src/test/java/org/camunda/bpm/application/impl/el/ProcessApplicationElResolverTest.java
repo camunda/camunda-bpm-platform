@@ -16,11 +16,13 @@ import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
+import org.junit.Ignore;
 
 /**
  * @author Thorben Lindhauer
  *
  */
+@Ignore
 public class ProcessApplicationElResolverTest extends PluggableProcessEngineTestCase {
 
   RuntimeContainerDelegate runtimeContainerDelegate = null;
@@ -49,6 +51,9 @@ public class ProcessApplicationElResolverTest extends PluggableProcessEngineTest
     }
   }
 
+  /**
+   * Note: please remove the @Ignore annotation of the class if at least one test is inside this class
+   */
   public void FAILING_testCallActivityOutputExpression() {
     // given an instance of the calling process that calls the called process
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("callingProcess");
