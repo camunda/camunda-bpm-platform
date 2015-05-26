@@ -107,11 +107,10 @@ define([
           delete toSend._links;
 
           Task.update(toSend, function(err, result) {
+            reload();
             if (err) {
               return errorHandler('TASK_UPDATE_ERROR', err);
             }
-
-            reload();
           });
         }
 
