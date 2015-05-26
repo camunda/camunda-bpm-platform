@@ -53,7 +53,7 @@ define(['angular'], function(angular) {
         if ($scope.data.executeImmediately) {
           Notifications.addError({'status': 'Finished', 'message': 'Could not update the suspension state of the job definition: ' + data.message, 'exclusive': true });
         } else {
-          Notifications.addMessage({'status': 'Finished', 'message': 'The update of the suspension state of the job definition could not be scheduled: ' + data.message, 'exclusive': true });
+          Notifications.addError({'status': 'Finished', 'message': 'The update of the suspension state of the job definition could not be scheduled: ' + data.message, 'exclusive': true });
         }
       });
     };
