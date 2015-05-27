@@ -403,6 +403,53 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
     assertProcessEnded(processInstance.getId());
   }
 
+  @Deployment(resources = PARALLEL_MULTI_INSTANCE_TASK_PROCESS)
+  public void testStartBeforeInnerActivityWithMiBodyParallelTasks() {
+    // given the mi body is not yet instantiated
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelUserTasks");
+
+    // when
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+
+    runtimeService
+      .createProcessInstanceModification(processInstance.getId())
+      .startBeforeActivity("miTasks")
+      .execute();
+
+    // then the mi variables should be correct
+    Execution leafExecution = runtimeService.createExecutionQuery().activityId("miTasks").singleResult();
+    assertNotNull(leafExecution);
+    assertVariable(leafExecution, "loopCounter", 0);
+    assertVariable(leafExecution, "nrOfInstances", 1);
+    assertVariable(leafExecution, "nrOfCompletedInstances", 0);
+    assertVariable(leafExecution, "nrOfActiveInstances", 1);
+
+    // and the tree should be correct
+    tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .activity("beforeTask")
+        .beginMiBody("miTasks")
+          .activity("miTasks")
+      .done());
+
+    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(), processEngine);
+    assertThat(executionTree).matches(
+      describeExecutionTree(null).scope()
+        .child("beforeTask").concurrent().noScope().up()
+        .child(null).concurrent().noScope()
+          .child(null).scope()
+            .child("miTasks").concurrent().noScope()
+      .done()
+      );
+
+    // and the process is able to complete successfully
+    completeTasksInOrder(
+        "miTasks", "afterTask", "beforeTask", "miTasks",
+        "miTasks", "miTasks", "afterTask");
+    assertProcessEnded(processInstance.getId());
+  }
+
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
   public void testStartBeforeInnerActivityWithMiBodyParallelSubprocess() {
     // given the mi body is not yet instantiated
@@ -549,6 +596,50 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
       assertTextPresent(e.getMessage(), "Concurrent instantiation not possible for activities "
           + "in scope miSubProcess#multiInstanceBody");
     }
+  }
+
+  @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_TASK_PROCESS)
+  public void testStartBeforeInnerActivityWithMiBodySequentialTasks() {
+    // given the mi body is not yet instantiated
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialUserTasks");
+
+    // when
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    runtimeService
+      .createProcessInstanceModification(processInstance.getId())
+      .startBeforeActivity("miTasks")
+      .execute();
+
+    // then the mi variables should be correct
+    Execution leafExecution = runtimeService.createExecutionQuery().activityId("miTasks").singleResult();
+    assertNotNull(leafExecution);
+    assertVariable(leafExecution, "loopCounter", 0);
+    assertVariable(leafExecution, "nrOfInstances", 1);
+    assertVariable(leafExecution, "nrOfCompletedInstances", 0);
+    assertVariable(leafExecution, "nrOfActiveInstances", 1);
+
+    // and the trees should be correct
+    tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .activity("beforeTask")
+        .beginMiBody("miTasks")
+          .activity("miTasks")
+      .done());
+
+    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(), processEngine);
+    assertThat(executionTree).matches(
+      describeExecutionTree(null).scope()
+        .child("beforeTask").concurrent().noScope().up()
+        .child(null).concurrent().noScope()
+          .child("miTasks").scope()
+      .done()
+      );
+
+    // and the process is able to complete successfully
+    completeTasksInOrder("miTasks", "afterTask",
+        "beforeTask", "miTasks", "miTasks", "miTasks", "afterTask");
+    assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
