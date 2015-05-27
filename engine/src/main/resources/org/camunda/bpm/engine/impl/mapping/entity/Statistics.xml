@@ -382,6 +382,7 @@
                   where
                       E.PROC_DEF_ID_ = #{processDefinitionId}
                       and E.IS_ACTIVE_ = ${trueConstant}
+                      and E.ACT_ID_ is not null
 
                       <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
                       and

@@ -15,10 +15,8 @@ package org.camunda.bpm.engine.impl.bpmn.behavior;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
@@ -28,13 +26,9 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivityBehavior {
 
   protected void createInstances(ActivityExecution execution, int nrOfInstances) throws Exception {
-
-    // set the MI-body scoped variables
-    setLoopVariable(execution, NUMBER_OF_INSTANCES, nrOfInstances);
-    setLoopVariable(execution, NUMBER_OF_COMPLETED_INSTANCES, 0);
-    setLoopVariable(execution, NUMBER_OF_ACTIVE_INSTANCES, nrOfInstances);
     PvmActivity nestedActivity = execution.getActivity().getActivities().get(0);
-    execution.setActivity(null);
+
+    prepareScopeExecution(execution, nrOfInstances);
 
     // create the concurrent child executions
     List<ActivityExecution> concurrentExecutions = new ArrayList<ActivityExecution>();
@@ -53,12 +47,15 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
         performInstance(activityExecution, nestedActivity, i);
       }
     }
+  }
 
-    // inactivate this execution unless all child executions are already joined
-    if(!execution.getExecutions().isEmpty()) {
-      execution.inactivate();
-    }
-
+  protected void prepareScopeExecution(ActivityExecution scopeExecution, int nrOfInstances) {
+    // set the MI-body scoped variables
+    setLoopVariable(scopeExecution, NUMBER_OF_INSTANCES, nrOfInstances);
+    setLoopVariable(scopeExecution, NUMBER_OF_COMPLETED_INSTANCES, 0);
+    setLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES, nrOfInstances);
+    scopeExecution.setActivity(null);
+    scopeExecution.inactivate();
   }
 
   public void concurrentChildExecutionEnded(ActivityExecution scopeExecution, ActivityExecution endedExecution) {
@@ -105,15 +102,12 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
 
   public ActivityExecution initializeScope(ActivityExecution scopeExecution) {
 
-    setLoopVariable(scopeExecution, NUMBER_OF_INSTANCES, 1);
-    setLoopVariable(scopeExecution, NUMBER_OF_COMPLETED_INSTANCES, 0);
-    setLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES, 1);
+    prepareScopeExecution(scopeExecution, 1);
 
     // even though there is only one instance, there is always a concurrent child
     ActivityExecution concurrentChild = scopeExecution.createExecution();
     concurrentChild.setConcurrent(true);
     concurrentChild.setScope(false);
-    scopeExecution.setActivity(null);
 
     setLoopVariable(concurrentChild, LOOP_COUNTER, 0);
 

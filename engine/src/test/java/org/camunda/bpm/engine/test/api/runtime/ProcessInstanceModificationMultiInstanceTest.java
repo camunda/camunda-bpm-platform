@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -450,6 +451,30 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
     assertProcessEnded(processInstance.getId());
   }
 
+  @Deployment(resources = PARALLEL_MULTI_INSTANCE_TASK_PROCESS)
+  public void testStartBeforeInnerActivityWithMiBodyParallelTasksActivityStatistics() {
+    // given the mi body is not yet instantiated
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelUserTasks");
+
+    // when
+    runtimeService
+      .createProcessInstanceModification(processInstance.getId())
+      .startBeforeActivity("miTasks")
+      .execute();
+
+    // then the activity instance statistics are correct
+    List<ActivityStatistics> statistics = managementService.createActivityStatisticsQuery(processInstance.getProcessDefinitionId()).list();
+    assertEquals(2, statistics.size());
+
+    ActivityStatistics miTasksStatistics = getStatisticsForActivity(statistics, "miTasks");
+    assertNotNull(miTasksStatistics);
+    assertEquals(1, miTasksStatistics.getInstances());
+
+    ActivityStatistics beforeTaskStatistics = getStatisticsForActivity(statistics, "beforeTask");
+    assertNotNull(beforeTaskStatistics);
+    assertEquals(1, beforeTaskStatistics.getInstances());
+  }
+
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
   public void testStartBeforeInnerActivityWithMiBodyParallelSubprocess() {
     // given the mi body is not yet instantiated
@@ -499,6 +524,31 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
         "subProcessTask", "subProcessTask", "afterTask");
     assertProcessEnded(processInstance.getId());
   }
+
+  @Deployment(resources = PARALLEL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
+  public void testStartBeforeInnerActivityWithMiBodyParallelSubprocessActivityStatistics() {
+    // given the mi body is not yet instantiated
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelSubprocess");
+
+    // when
+    runtimeService
+      .createProcessInstanceModification(processInstance.getId())
+      .startBeforeActivity("subProcessTask")
+      .execute();
+
+    // then the activity instance statistics are correct
+    List<ActivityStatistics> statistics = managementService.createActivityStatisticsQuery(processInstance.getProcessDefinitionId()).list();
+    assertEquals(2, statistics.size());
+
+    ActivityStatistics miTasksStatistics = getStatisticsForActivity(statistics, "subProcessTask");
+    assertNotNull(miTasksStatistics);
+    assertEquals(1, miTasksStatistics.getInstances());
+
+    ActivityStatistics beforeTaskStatistics = getStatisticsForActivity(statistics, "beforeTask");
+    assertNotNull(beforeTaskStatistics);
+    assertEquals(1, beforeTaskStatistics.getInstances());
+  }
+
 
   @Deployment(resources = PARALLEL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
   public void testStartBeforeInnerActivityWithMiBodySetNrOfInstancesParallelSubprocess() {
@@ -642,6 +692,39 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
     assertProcessEnded(processInstance.getId());
   }
 
+  @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_TASK_PROCESS)
+  public void testStartBeforeInnerActivityWithMiBodySequentialTasksActivityStatistics() {
+    // given the mi body is not yet instantiated
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialUserTasks");
+
+    // when
+    runtimeService
+      .createProcessInstanceModification(processInstance.getId())
+      .startBeforeActivity("miTasks")
+      .execute();
+
+    // then the activity instance statistics are correct
+    List<ActivityStatistics> statistics = managementService.createActivityStatisticsQuery(processInstance.getProcessDefinitionId()).list();
+    assertEquals(2, statistics.size());
+
+    ActivityStatistics miTasksStatistics = getStatisticsForActivity(statistics, "miTasks");
+    assertNotNull(miTasksStatistics);
+    assertEquals(1, miTasksStatistics.getInstances());
+
+    ActivityStatistics beforeTaskStatistics = getStatisticsForActivity(statistics, "beforeTask");
+    assertNotNull(beforeTaskStatistics);
+    assertEquals(1, beforeTaskStatistics.getInstances());
+  }
+
+  protected ActivityStatistics getStatisticsForActivity(List<ActivityStatistics> statistics, String activityId) {
+    for (ActivityStatistics statisticsInstance : statistics) {
+      if (statisticsInstance.getId().equals(activityId)) {
+        return statisticsInstance;
+      }
+    }
+    return null;
+  }
+
   @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
   public void testStartBeforeInnerActivityWithMiBodySequentialSubprocess() {
     // given the mi body is not yet instantiated
@@ -687,6 +770,30 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
     completeTasksInOrder("subProcessTask", "afterTask",
         "beforeTask", "subProcessTask", "subProcessTask", "subProcessTask", "afterTask");
     assertProcessEnded(processInstance.getId());
+  }
+
+  @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
+  public void testStartBeforeInnerActivityWithMiBodySequentialSubprocessActivityStatistics() {
+    // given the mi body is not yet instantiated
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miSequentialSubprocess");
+
+    // when
+    runtimeService
+      .createProcessInstanceModification(processInstance.getId())
+      .startBeforeActivity("subProcessTask")
+      .execute();
+
+    // then the activity instance statistics are correct
+    List<ActivityStatistics> statistics = managementService.createActivityStatisticsQuery(processInstance.getProcessDefinitionId()).list();
+    assertEquals(2, statistics.size());
+
+    ActivityStatistics miTasksStatistics = getStatisticsForActivity(statistics, "subProcessTask");
+    assertNotNull(miTasksStatistics);
+    assertEquals(1, miTasksStatistics.getInstances());
+
+    ActivityStatistics beforeTaskStatistics = getStatisticsForActivity(statistics, "beforeTask");
+    assertNotNull(beforeTaskStatistics);
+    assertEquals(1, beforeTaskStatistics.getInstances());
   }
 
   @Deployment(resources = SEQUENTIAL_MULTI_INSTANCE_SUBPROCESS_PROCESS)
