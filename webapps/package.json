@@ -1,6 +1,6 @@
 {
   "name": "camunda-admin-ui",
-  "version": "7.3.0",
+  "version": "7.4.0-SNAPSHOT",
   "private": true,
   "gruntConfig": {
     "connectPort": 8020,
@@ -14,7 +14,7 @@
     "build-sdk": "node_modules/grunt-cli/bin/grunt --gruntfile=node_modules/camunda-commons-ui/node_modules/camunda-bpm-sdk-js/Gruntfile.js browserify:distTypeUtils browserify:distAngular"
   },
   "dependencies": {
-    "camunda-commons-ui": "git://github.com/camunda/camunda-commons-ui#7.3.0"
+    "camunda-commons-ui": "git://github.com/camunda/camunda-commons-ui#master"
   },
   "devDependencies": {
     "grunt": "0.4.5",
