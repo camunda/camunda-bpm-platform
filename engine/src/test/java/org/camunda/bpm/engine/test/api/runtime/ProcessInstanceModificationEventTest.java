@@ -266,20 +266,8 @@ public class ProcessInstanceModificationEventTest extends PluggableProcessEngine
     assertProcessEnded(processInstanceId);
   }
 
-  /**
-   * This fails because ScopeUtil.findScopeExecutionForScope relies on the fact that
-   * the concurrent root execution in the transaction subprocess has an activity id.
-   *
-   * This is the case in the transaction subprocess tests because when concurrency occurs due to a parallel gateway,
-   * the concurrent root has the activity id of the parallel gateway.
-   *
-   * When we create concurrency artificially as in this test, the above setting is not given and the
-   * cancel end event misbehaves seriously.
-   *
-   * TODO: We can re-add this test case after fixing this behavior due to CAM-3580
-   */
   @Deployment(resources = CANCEL_END_EVENT_PROCESS)
-  public void FAILING_testStartBeforeCancelEndEventConcurrent() {
+  public void testStartBeforeCancelEndEventConcurrent() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
     String processInstanceId = processInstance.getId();
 
