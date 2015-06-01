@@ -67,7 +67,39 @@ camunda-bpm-webapp/webapp/src/main/webapp/develop/invoice/invoice-assign-approve
       </div>
     </div>
 
-    <!-- Example of script inclusion in a embedded form -->
+  <script cam-script type="text/form-script">
+    inject(['$http', 'Uri', function($http, Uri) {
+      camForm.on('form-loaded', function() {
+        // get the filename
+        camForm.variableManager.fetchVariable('INVOICE_DOCUMENT_FILENAME');
+      });
+
+      camForm.on('variables-fetched', function() {
+        $scope.INVOICE_DOCUMENT_FILENAME = camForm.variableManager.variableValue('INVOICE_DOCUMENT_FILENAME');
+        // get the download link
+        if($scope.INVOICE_DOCUMENT_FILENAME) {
+          $http.get(Uri.appUri('engine://engine/:engine/task/' + camForm.taskId)).success(function(result){
+            $http.get(Uri.appUri('engine://engine/:engine/variable-instance/?variableName=INVOICE_DOCUMENT&processInstanceIdIn=' + result.processInstanceId)).success(function(result){
+              $scope.downloadLink = Uri.appUri('engine://engine/:engine/variable-instance/' + result[0].id + '/data');
+            });
+          });
+        }
+      });
+    }]);
+  </script>
+
+
+    <div class="form-group">
+      <label for="input-4"
+             class="control-label col-xs-3">Document: </label>
+      <div class="col-xs-9">
+        <a ng-if="INVOICE_DOCUMENT_FILENAME" ng-href="{{downloadLink}}" download="{{INVOICE_DOCUMENT_FILENAME}}" style="padding-top: 7px; display: block;">Download File</a>
+        <div ng-if="!INVOICE_DOCUMENT_FILENAME" style="padding-top: 7px;">No file provided</div>
+      </div>
+    </div>
+
+
+ <!-- Example of script inclusion in a embedded form -->
 
 <!--
     <div class="custom-ng-app"

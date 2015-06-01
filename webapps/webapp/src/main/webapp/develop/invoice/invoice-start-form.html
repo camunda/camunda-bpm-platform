@@ -54,5 +54,30 @@
       </div>
     </div>
   </div>
+
+  <div class="form-group">
+    <label class="control-label col-xs-3"
+           for="invoiceDocument">Invoice Document</label>
+    <div class="col-xs-9">
+      <input type="file"
+           cam-variable-name="INVOICE_DOCUMENT"
+           cam-variable-type="Bytes"
+           cam-max-filesize="10000000"
+           style="padding-top: 7px;" />
+    </div>
+  </div>
+
+  <script cam-script type="text/form-script">
+    camForm.on('submit', function(evt) {
+      if(camForm.formElement.find('[cam-variable-name="INVOICE_DOCUMENT"]')[0].files.length > 0) {
+        camForm.variableManager.createVariable({
+          name: 'INVOICE_DOCUMENT_FILENAME',
+          type: 'String',
+          value: camForm.formElement.find('[cam-variable-name="INVOICE_DOCUMENT"]')[0].files[0].name
+        });
+      }
+    });
+  </script>
+
 </form>
 
