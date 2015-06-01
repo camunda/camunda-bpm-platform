@@ -484,7 +484,7 @@
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>clirr-maven-plugin</artifactId>
             <configuration>
-              <comparisonVersion>7.2.0-Final</comparisonVersion>
+              <comparisonVersion>${camunda.version.old}</comparisonVersion>
               <logResults>true</logResults>
               <excludes>
                 <exclude>org/camunda/bpm/*/impl/**</exclude>
