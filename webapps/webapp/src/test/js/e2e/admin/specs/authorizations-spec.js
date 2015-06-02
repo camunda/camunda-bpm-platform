@@ -589,53 +589,53 @@ describe('Admin authorizations Spec', function() {
     });
 
     it('can change user and group', function() {
-      authorizationsPage.updateButton(2).click();
+      authorizationsPage.editButton(2).click();
 
       authorizationsPage.userGroupButton(2).click();
       authorizationsPage.userGroupInput(2).clear().sendKeys('a2_test');
 
-      authorizationsPage.applyUpdateButton(2).click();
+      authorizationsPage.applyEditButton(2).click();
 
       expect(authorizationsPage.authorizationIdentityType(2)).to.eventually.eql('Group');
       expect(authorizationsPage.authorizationIdentity(2)).to.eventually.eql('a2_test');
     });
 
     it('can add a permission', function() {
-      authorizationsPage.updateButton(2).click();
+      authorizationsPage.editButton(2).click();
 
       authorizationsPage.selectPermissionFor(2, 'UPDATE');
 
-      authorizationsPage.applyUpdateButton(2).click();
+      authorizationsPage.applyEditButton(2).click();
 
       expect(authorizationsPage.authorizationPermissions(2)).to.eventually.eql('CREATE, UPDATE');
     });
 
     it('can change the resource id', function() {
-      authorizationsPage.updateButton(2).click();
+      authorizationsPage.editButton(2).click();
 
       authorizationsPage.resourceInput(2).clear().sendKeys('foobar');
 
-      authorizationsPage.applyUpdateButton(2).click();
+      authorizationsPage.applyEditButton(2).click();
 
       expect(authorizationsPage.authorizationResource(2)).to.eventually.eql('foobar');
     });
 
     it('should restore previous state on cancel', function() {
-      authorizationsPage.updateButton(3).click();
+      authorizationsPage.editButton(3).click();
 
       authorizationsPage.userGroupInput(3).clear().sendKeys('a4');
 
-      authorizationsPage.cancelUpdateButton(3).click();
+      authorizationsPage.cancelEditButton(3).click();
 
       expect(authorizationsPage.authorizationIdentity(3)).to.eventually.eql('a3');
     });
 
     it('should not apply conflicting updates', function() {
-      authorizationsPage.updateButton(3).click();
+      authorizationsPage.editButton(3).click();
 
       authorizationsPage.userGroupInput(3).clear().sendKeys('a4');
 
-      authorizationsPage.applyUpdateButton(3).click();
+      authorizationsPage.applyEditButton(3).click();
 
       // need sleep because update is successful until the server says otherwise
       browser.sleep(500);

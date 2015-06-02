@@ -59,11 +59,11 @@ module.exports = Page.extend({
     return this.getAuthorization(idx).element(by.css('input.input-auth-name'));
   },
 
-  applyUpdateButton: function(idx) {
+  applyEditButton: function(idx) {
     return this.getAuthorization(idx).element(by.css('button.btn-primary'));
   },
 
-  cancelUpdateButton: function(idx) {
+  cancelEditButton: function(idx) {
     return this.getAuthorization(idx).element(by.css('.action a.btn-default'));
   },
 
@@ -87,8 +87,8 @@ module.exports = Page.extend({
     return this.authorizationList().last();
   },
 
-  updateButton: function(idx) {
-    return this.getAuthorization(idx).element(by.cssContainingText('a', 'Update'));
+  editButton: function(idx) {
+    return this.getAuthorization(idx).element(by.cssContainingText('a', 'Edit'));
   },
 
   authorizationType: function(authType) {
