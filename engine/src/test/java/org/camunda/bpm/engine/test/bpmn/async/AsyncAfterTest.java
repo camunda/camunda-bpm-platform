@@ -12,9 +12,13 @@
  */
 package org.camunda.bpm.engine.test.bpmn.async;
 
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.junit.Assert.assertThat;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
@@ -63,6 +67,24 @@ public class AsyncAfterTest extends PluggableProcessEngineTestCase {
 
     // if the waiting job is executed, the process instance should end
     managementService.executeJob(job.getId());
+    assertProcessEnded(pi.getId());
+  }
+
+  @Deployment
+  public void testAsyncAfterMultiInstanceUserTask() {
+    // start process instance
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
+
+    List<Task> list = taskService.createTaskQuery().list();
+    // multiinstance says three in the bpmn
+    assertThat(list, hasSize(3));
+
+    for (Task task : list) {
+      taskService.complete(task.getId());
+    }
+
+    waitForJobExecutorToProcessAllJobs(TimeUnit.MILLISECONDS.convert(5L, TimeUnit.SECONDS));
+
     assertProcessEnded(pi.getId());
   }
 
