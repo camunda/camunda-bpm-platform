@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.hamcrest.CoreMatchers;
 
 /**
  * @author Joram Barrez
@@ -212,7 +213,7 @@ public class ParallelGatewayTest extends PluggableProcessEngineTestCase {
       if (activityInstance.getActivityId().equals("SubProcess_1")) {
         ActivityInstance[] instances = activityInstance.getChildActivityInstances();
         for (ActivityInstance activityInstance2 : instances) {
-          assertThat(activityInstance2.getActivityName(), is(either(equalTo("Inner User Task 1")).or(equalTo("Inner User Task 2"))));
+          assertThat(activityInstance2.getActivityName(), is(either(equalTo("Inner User Task 1")).or(CoreMatchers.<Object>equalTo("Inner User Task 2"))));
         }
       } else {
         assertThat(activityInstance.getActivityName(), is("Outer User Task"));
