@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Definitions xmlns="http://www.omg.org/spec/DMN/20130901"
+             id="definitions"
+             namespace="http://camunda.org/dmn">
+  <Decision id="decision1">
+    <DecisionTable id="decisionTable1"/>
+  </Decision>
+  <Decision id="decision2">
+    <DecisionTable id="decisionTable2" hitPolicy="UNIQUE"/>
+  </Decision>
+  <Decision id="decision3">
+    <DecisionTable id="decisionTable3" hitPolicy="FIRST"/>
+  </Decision>
+  <Decision id="decision4">
+    <DecisionTable id="decisionTable4" hitPolicy="PRIORITY"/>
+  </Decision>
+  <Decision id="decision5">
+    <DecisionTable id="decisionTable5" hitPolicy="ANY"/>
+  </Decision>
+  <Decision id="decision6">
+    <DecisionTable id="decisionTable6" hitPolicy="COLLECT"/>
+  </Decision>
+  <Decision id="decision7">
+    <DecisionTable id="decisionTable7" hitPolicy="RULE ORDER"/>
+  </Decision>
+  <Decision id="decision8">
+    <DecisionTable id="decisionTable8" hitPolicy="OUTPUT ORDER"/>
+  </Decision>
+</Definitions>

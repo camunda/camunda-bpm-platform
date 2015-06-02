@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Definitions xmlns="http://www.omg.org/spec/DMN/20130901"
+             id="definitions"
+             namespace="http://camunda.org/dmn">
+  <Decision id="decision1">
+    <DecisionTable id="decisionTable1"/>
+  </Decision>
+  <Decision id="decision2">
+    <DecisionTable id="decisionTable2" preferedOrientation="Rule-as-Row"/>
+  </Decision>
+  <Decision id="decision3">
+    <DecisionTable id="decisionTable3" preferedOrientation="Rule-as-Column"/>
+  </Decision>
+  <Decision id="decision4">
+    <DecisionTable id="decisionTable4" preferedOrientation="CrossTable"/>
+  </Decision>
+</Definitions>
