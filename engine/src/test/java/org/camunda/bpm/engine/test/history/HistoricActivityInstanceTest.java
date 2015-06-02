@@ -201,9 +201,7 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("start").list().size());
     assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("end").list().size());
 
-    // TODO: Discuss if boundary events will occur in the log!
-    // assertEquals(1,
-    // historyService.createHistoricActivityInstanceQuery().activityId("boundaryEvent").list().size());
+     assertEquals(1, historyService.createHistoricActivityInstanceQuery().activityId("boundaryEvent").list().size());
 
     HistoricActivityInstance intermediateEvent = historyService.createHistoricActivityInstanceQuery().activityId("intermediate-event").singleResult();
     assertNotNull(intermediateEvent.getStartTime());
@@ -769,7 +767,7 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
 
   @Deployment
   public void testMultiInstanceReceiveActivity() {
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
+    runtimeService.startProcessInstanceByKey("process");
 
     HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
     HistoricActivityInstance miBodyInstance = query.activityId("receiveTask#multiInstanceBody").singleResult();
@@ -845,12 +843,9 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
   public void testEndEventTypes() {
     HistoricActivityInstanceQuery query = startEventTestProcess("");
 
-    /*
-    TODO: wait for CAM-2761 to be done
     query.activityId("cancellationEndEvent");
     assertEquals(1, query.count());
     assertEquals("cancelEndEvent", query.singleResult().getActivityType());
-    */
 
     query.activityId("messageEndEvent");
     assertEquals(1, query.count());
@@ -874,11 +869,10 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
   }
 
   private HistoricActivityInstanceQuery startEventTestProcess(String message) {
-    ProcessInstance pi;
     if(message.equals("")) {
-      pi = runtimeService.startProcessInstanceByKey("testEvents");
+      runtimeService.startProcessInstanceByKey("testEvents");
     } else {
-      pi = runtimeService.startProcessInstanceByMessage("CAM-2365");
+      runtimeService.startProcessInstanceByMessage("CAM-2365");
     }
 
     return historyService.createHistoricActivityInstanceQuery();
