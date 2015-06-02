@@ -100,7 +100,11 @@ describe('Tasklist Search', function() {
     it('should keep search pills after page refresh', function() {
 
       // when
-      browser.refresh();
+      browser.getCurrentUrl().then(function(url) {
+        browser.get(url).then(function() {
+          browser.sleep(500);
+        });
+      });
 
       // then
       expect(page.taskList.taskList().count()).to.eventually.eql(1);
