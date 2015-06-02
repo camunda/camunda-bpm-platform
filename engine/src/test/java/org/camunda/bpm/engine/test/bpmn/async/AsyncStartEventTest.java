@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.test.bpmn.async;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricFormField;
@@ -101,7 +100,7 @@ public class AsyncStartEventTest extends PluggableProcessEngineTestCase {
     if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
       HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery().singleResult();
       assertNotNull(variable);
-      assertEquals("foo", variable.getVariableName());
+      assertEquals("foo", variable.getName());
       assertEquals("bar", variable.getValue());
       assertEquals(processInstanceId, variable.getActivityInstanceId());
 
@@ -176,7 +175,7 @@ public class AsyncStartEventTest extends PluggableProcessEngineTestCase {
 
       HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery().singleResult();
       assertNotNull(variable);
-      assertEquals("foo", variable.getVariableName());
+      assertEquals("foo", variable.getName());
       assertEquals("bar", variable.getValue());
       assertEquals(processInstanceId, variable.getActivityInstanceId());
 
@@ -256,7 +255,7 @@ public class AsyncStartEventTest extends PluggableProcessEngineTestCase {
 
       HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery().singleResult();
       assertNotNull(variable);
-      assertEquals("foo", variable.getVariableName());
+      assertEquals("foo", variable.getName());
       assertEquals("bar", variable.getValue());
       assertEquals(processInstanceId, variable.getActivityInstanceId());
 
@@ -324,6 +323,22 @@ public class AsyncStartEventTest extends PluggableProcessEngineTestCase {
       assertEquals(theStartActivityInstanceId, historicFormUpdate.getActivityInstanceId());
 
     }
+  }
+
+  @Deployment
+  public void testAsyncSubProcessStartEvent() {
+    runtimeService.startProcessInstanceByKey("process");
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNull("The subprocess user task should not have been reached yet", task);
+
+    assertEquals(1, runtimeService.createExecutionQuery().activityId("StartEvent_2").count());
+
+    executeAvailableJobs();
+    task = taskService.createTaskQuery().singleResult();
+
+    assertEquals(0, runtimeService.createExecutionQuery().activityId("StartEvent_2").count());
+    assertNotNull("The subprocess user task should have been reached", task);
   }
 
 }
