@@ -75,7 +75,7 @@ To give it a try:
 ```sh
 # cd <path to your workspace>
 git clone git@github.com:camunda/camunda-bpm-webapp.git
-cd camunda-bpm-webapp/
+cd camunda-bpm-webapp/webapp
 npm install
 grunt setup
 ```
