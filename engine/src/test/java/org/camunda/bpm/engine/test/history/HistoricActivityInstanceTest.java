@@ -13,6 +13,9 @@
 
 package org.camunda.bpm.engine.test.history;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -989,6 +992,20 @@ public class HistoricActivityInstanceTest extends PluggableProcessEngineTestCase
     assertNotNull(activityInstance.getProcessDefinitionKey());
     assertEquals(key, activityInstance.getProcessDefinitionKey());
 
+  }
+
+  @Deployment
+  public void testEndParallelJoin() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
+
+    List<HistoricActivityInstance> activityInstance = historyService
+      .createHistoricActivityInstanceQuery()
+      .processInstanceId(pi.getId())
+      .activityId("parallelJoinEnd")
+      .list();
+
+    assertThat(activityInstance.size(), is(2));
+    assertThat(pi.isEnded(), is(true));
   }
 
 }
