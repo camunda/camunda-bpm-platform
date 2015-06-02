@@ -15,8 +15,8 @@ package org.camunda.bpm.engine.test.examples.bpmn.executionlistener;
 
 import static org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.junit.Assert.assertThat;
 
 import java.util.HashMap;
 import java.util.List;
@@ -228,11 +228,10 @@ public class ExecutionListenerTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  /**
-   * See CAM-2937
-   */
   @Deployment
-  public void FAILING_testExecutionListenerOnTerminateEndEvent() {
+  public void testExecutionListenerOnTerminateEndEvent() {
+    RecorderExecutionListener.clear();
+    
     runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
     Task task = taskService.createTaskQuery().singleResult();
@@ -243,10 +242,10 @@ public class ExecutionListenerTest extends PluggableProcessEngineTestCase {
     assertEquals(2, recordedEvents.size());
 
     assertEquals("start", recordedEvents.get(0).getEventName());
-    assertEquals("end", recordedEvents.get(0).getEventName());
+    assertEquals("end", recordedEvents.get(1).getEventName());
 
   }
-  
+
   @Deployment(resources = {"org/camunda/bpm/engine/test/examples/bpmn/executionlistener/ExecutionListenerTest.testOnCancellingBoundaryEvent.bpmn"})
   public void testOnCancellingBoundaryEvents() {
     RecorderExecutionListener.clear();
