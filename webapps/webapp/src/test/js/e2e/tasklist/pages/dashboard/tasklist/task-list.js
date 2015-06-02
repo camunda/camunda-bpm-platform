@@ -16,28 +16,28 @@ module.exports = Page.extend({
     return this.formElement().getText();
   },
 
-  selectTask: function(item) {
-    this.taskList().get(item).element(by.binding('task.name')).click();
+  selectTask: function(idx) {
+    this.taskList().get(idx).element(by.binding('task.name')).click();
   },
 
-  taskName: function(item) {
-    return this.taskList().get(item).element(by.binding('task.name')).getText();
+  taskName: function(idx) {
+    return this.taskList().get(idx).element(by.binding('task.name')).getText();
   },
 
-  taskProcessDefinitionName: function(item) {
-    return this.taskList().get(item).element(by.binding('task._embedded.processDefinition[0].name')).getText();
+  taskProcessDefinitionName: function(idx) {
+    return this.taskList().get(idx).element(by.binding('task._embedded.processDefinition[0].name')).getText();
   },
 
-  taskPriority: function(item) {
-    return this.taskList().get(item).element(by.binding('task.priority')).getText();
+  taskPriority: function(idx) {
+    return this.taskList().get(idx).element(by.binding('task.priority')).getText();
   },
 
-  taskCreated: function(item) {
-    return this.taskList().get(item).element(by.binding('task.created')).getText();
+  taskCreated: function(idx) {
+    return this.taskList().get(idx).element(by.binding('task.created')).getText();
   },
 
-  taskAssignee: function(item) {
-    return this.taskList().get(item).element(by.binding('task.assignee')).getText();
+  taskAssignee: function(idx) {
+    return this.taskList().get(idx).element(by.binding('task.assignee')).getText();
   },
 
   taskVariables: function(taskItem) {

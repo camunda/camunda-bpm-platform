@@ -51,6 +51,10 @@ module.exports = Page.extend({
     element(by.css('[ng-click="unclaim()"]')).click();
   },
 
+  claimedUserName: function() {
+    return element(by.css('.task-card .assignee')).getText();
+  },
+
   editClaimedUser: function(userName) {
     element(by.css('[class="set-value ng-isolate-scope"] [ng-click="startEditing()"]')).click();
     element(by.model('editValue')).clear();
