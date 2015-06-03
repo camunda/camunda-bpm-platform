@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Groups;
+import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.filter.Filter;
@@ -145,6 +146,15 @@ public class DemoDataGenerator {
       salesTasklistAuth.setResource(APPLICATION);
       authorizationService.saveAuthorization(salesTasklistAuth);
 
+      Authorization salesReadProcessDefinition = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+      salesReadProcessDefinition.setGroupId("sales");
+      salesReadProcessDefinition.addPermission(Permissions.READ);
+      salesReadProcessDefinition.addPermission(Permissions.READ_HISTORY);
+      salesReadProcessDefinition.setResource(Resources.PROCESS_DEFINITION);
+      // restrict to invoice process definition only
+      salesReadProcessDefinition.setResourceId("invoice");
+      authorizationService.saveAuthorization(salesReadProcessDefinition);
+
       Authorization accountingTasklistAuth = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
       accountingTasklistAuth.setGroupId("accounting");
       accountingTasklistAuth.addPermission(ACCESS);
@@ -152,12 +162,30 @@ public class DemoDataGenerator {
       accountingTasklistAuth.setResource(APPLICATION);
       authorizationService.saveAuthorization(accountingTasklistAuth);
 
+      Authorization accountingReadProcessDefinition = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+      accountingReadProcessDefinition.setGroupId("accounting");
+      accountingReadProcessDefinition.addPermission(Permissions.READ);
+      accountingReadProcessDefinition.addPermission(Permissions.READ_HISTORY);
+      accountingReadProcessDefinition.setResource(Resources.PROCESS_DEFINITION);
+      // restrict to invoice process definition only
+      accountingReadProcessDefinition.setResourceId("invoice");
+      authorizationService.saveAuthorization(accountingReadProcessDefinition);
+
       Authorization managementTasklistAuth = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
       managementTasklistAuth.setGroupId("management");
       managementTasklistAuth.addPermission(ACCESS);
       managementTasklistAuth.setResourceId("tasklist");
       managementTasklistAuth.setResource(APPLICATION);
       authorizationService.saveAuthorization(managementTasklistAuth);
+
+      Authorization managementReadProcessDefinition = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+      managementReadProcessDefinition.setGroupId("management");
+      managementReadProcessDefinition.addPermission(Permissions.READ);
+      managementReadProcessDefinition.addPermission(Permissions.READ_HISTORY);
+      managementReadProcessDefinition.setResource(Resources.PROCESS_DEFINITION);
+      // restrict to invoice process definition only
+      managementReadProcessDefinition.setResourceId("invoice");
+      authorizationService.saveAuthorization(managementReadProcessDefinition);
 
       Authorization salesDemoAuth = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
       salesDemoAuth.setGroupId("sales");
