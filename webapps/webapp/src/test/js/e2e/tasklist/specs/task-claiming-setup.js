@@ -19,10 +19,10 @@ ops.filter = {
 
 ops.user = {
   create: [{
-    'id': 'test',
-    'firstName': 'test',
-    'lastName': 'test',
-    'password': 'test'
+    id: 'test',
+    firstName: 'Montgomery',
+    lastName: 'QA',
+    password: 'test'
   }]
 };
 
@@ -59,14 +59,7 @@ ops.task = {
     {
       id: '1',
       name: 'Task 1'
-    },
-    {
-      id: '2',
-      name: 'Task 2'
-    },
-    {
-      id: '3',
-      name: 'Task 3'
     }
   ]
+
 };

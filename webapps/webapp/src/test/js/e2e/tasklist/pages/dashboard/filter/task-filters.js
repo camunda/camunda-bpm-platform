@@ -76,7 +76,7 @@ module.exports = Page.extend({
   createFilter: function() {
     var theElement = element(by.css('.modal-title'));
     this.createFilterButton().click();
-    this.waitForModalToBePresent(theElement, 5000);
+    this.waitForElementToBeVisible(theElement, 5000);
   },
 
   editFilter: function(item) {

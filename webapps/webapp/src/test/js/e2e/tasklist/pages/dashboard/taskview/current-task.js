@@ -44,22 +44,44 @@ module.exports = Page.extend({
   },
 
   claim: function() {
-    element(by.css('[ng-click="claim()"]')).click();
+    var claimButton = element(by.css('[ng-click="claim()"]'));
+    claimButton.click();
+    this.waitForElementToBeNotPresent(claimButton, 5000);
   },
 
   unclaim: function() {
     element(by.css('[ng-click="unclaim()"]')).click();
   },
 
-  claimedUserName: function() {
-    return element(by.css('.task-card .assignee')).getText();
+  isTaskClaimed: function() {
+    return element(by.css('.task-card .assignee[ng-if="task.assignee"]')).isPresent();
+  },
+
+  claimedUserField: function() {
+    return element(by.css('.task-card .assignee'));
+  },
+
+  claimedUserFieldEditMode: function() {
+    return this.claimedUserField().element(by.model('editValue'));
+  },
+
+  claimedUser: function() {
+    return this.claimedUserField().getText();
+  },
+
+  clickClaimedUserField: function() {
+    element(by.css('[class="set-value ng-isolate-scope"] [ng-click="startEditing()"]')).click();
   },
 
   editClaimedUser: function(userName) {
-    element(by.css('[class="set-value ng-isolate-scope"] [ng-click="startEditing()"]')).click();
-    element(by.model('editValue')).clear();
-    element(by.model('editValue')).sendKeys(userName);
-    element(by.css('[ng-click="applyChange()"]')).click();
+    this.clickClaimedUserField();
+    this.claimedUserFieldEditMode().clear();
+    this.claimedUserFieldEditMode().sendKeys(userName);
+    element(by.css('[ng-click="applyChange($event)"]')).click();
+  },
+
+  cancelEditClaimedUser: function() {
+    element(by.css('[ng-click="cancelChange($event)"]')).click();
   },
 
   followUpDateFormElement: function() {

@@ -11,7 +11,7 @@ module.exports = Page.extend({
   saveFilter: function() {
     var theElement = this.formElement();
     this.saveButton().click();
-    this.waitForModalToBeAbsent(theElement, 5000);
+    this.waitForElementToBeNotPresent(theElement, 5000);
   },
 
   closeButton: function() {

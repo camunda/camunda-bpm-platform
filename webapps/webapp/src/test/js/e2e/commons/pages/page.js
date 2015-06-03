@@ -48,16 +48,7 @@ Page.prototype.navbarBrand = function() {
   return element(by.css('.navbar-brand'));
 };
 
-Page.prototype.waitForElementToBePresent = function(selector, max) {
-  // maximum waiting time of 2 seconds
-  max = max || 2000;
-  return browser
-      .wait(function() {
-        return element(by.css(selector)).isPresent();
-      }, max, 'Waiting for element (with selector "'+ selector +'") took too long.');
-};
-
-Page.prototype.waitForModalToBePresent = function(element, max) {
+Page.prototype.waitForElementToBeVisible = function(element, max) {
   var EC = protractor.ExpectedConditions;
   var isVisible = EC.visibilityOf(element);
 
@@ -65,7 +56,15 @@ Page.prototype.waitForModalToBePresent = function(element, max) {
   browser.wait(isVisible, max);
 };
 
-Page.prototype.waitForModalToBeAbsent = function(element, max) {
+Page.prototype.waitForElementToBePresent = function(selector, max) {
+  var EC = protractor.ExpectedConditions;
+  var isPresent = EC.presenceOf(element);
+
+  max = max || 5000;
+  browser.wait(isPresent, max);
+};
+
+Page.prototype.waitForElementToBeNotPresent = function(element, max) {
   var EC = protractor.ExpectedConditions;
   var isNotPresent = EC.not(EC.presenceOf(element));
 

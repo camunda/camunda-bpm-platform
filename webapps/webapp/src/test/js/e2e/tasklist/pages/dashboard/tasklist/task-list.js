@@ -36,8 +36,13 @@ module.exports = Page.extend({
     return this.taskList().get(idx).element(by.binding('task.created')).getText();
   },
 
+  taskAssigneeField: function(idx) {
+    //return this.taskList().get(idx).element(by.binding('task.assignee'));
+    return this.taskList().get(idx).element(by.css('.assignee'));
+  },
+
   taskAssignee: function(idx) {
-    return this.taskList().get(idx).element(by.binding('task.assignee')).getText();
+    return this.taskAssigneeField(idx).getText();
   },
 
   taskVariables: function(taskItem) {
