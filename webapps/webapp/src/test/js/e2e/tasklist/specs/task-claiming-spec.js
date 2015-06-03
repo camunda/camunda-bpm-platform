@@ -6,7 +6,7 @@ var setupFile = require('./task-claiming-setup');
 var dashboardPage = require('../pages/dashboard');
 
 
-describe('Task Claiming Spec', function() {
+describe.skip('Task Claiming Spec', function() {
 
   before(function() {
     return testHelper(setupFile, function() {
