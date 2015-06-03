@@ -29,9 +29,9 @@ import org.camunda.bpm.webapp.impl.security.SecurityActions.SecurityAction;
 
 
 /**
- * <p>Servlet {@link Filter} implementation responsible for poulating the
+ * <p>Servlet {@link Filter} implementation responsible for populating the
  * {@link Authentications#getCurrent()} thread-local (ie. binding the current
- * set of authentications to the current thread so that it may esily be obtained
+ * set of authentications to the current thread so that it may easily be obtained
  * by application parts not having access to the current session.</p>
  *
  * @author Daniel Meyer
