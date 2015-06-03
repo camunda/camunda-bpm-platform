@@ -31,10 +31,14 @@ public final class TestModel {
 
       Animals.registerType(modelBuilder);
       Animal.registerType(modelBuilder);
+      AnimalReference.registerType(modelBuilder);
       Bird.registerType(modelBuilder);
       ChildRelationshipDefinition.registerType(modelBuilder);
       FlightPartnerRef.registerType(modelBuilder);
       FlyingAnimal.registerType(modelBuilder);
+      Guardian.registerType(modelBuilder);
+      GuardEgg.registerType(modelBuilder);
+      Mother.registerType(modelBuilder);
       SpouseRef.registerType(modelBuilder);
       FriendRelationshipDefinition.registerType(modelBuilder);
       RelationshipDefinition.registerType(modelBuilder);

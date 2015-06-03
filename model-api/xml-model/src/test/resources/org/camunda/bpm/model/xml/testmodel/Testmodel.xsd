@@ -49,6 +49,7 @@
         <sequence>
           <element ref="tns:egg" minOccurs="0" maxOccurs="6"/>
           <element name="spouseRef" type="QName" minOccurs="0" maxOccurs="1"/>
+          <element name="guardEgg" type="IDREFS" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
       </extension>
     </complexContent>
@@ -97,7 +98,15 @@
 
   <element name="egg" type="tns:tEgg"/>
   <complexType name="tEgg">
+    <sequence>
+      <element name="mother" type="tns:tAnimalReference" minOccurs="0" maxOccurs="1" />
+      <element name="guardian" type="tns:tAnimalReference" minOccurs="0" maxOccurs="unbounded"/>
+    </sequence>
     <attribute name="id" type="ID"/>
+  </complexType>
+
+  <complexType name="tAnimalReference">
+    <attribute name="href" type="anyURI" use="required" />
   </complexType>
 
 </schema>

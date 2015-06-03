@@ -14,6 +14,7 @@ package org.camunda.bpm.model.xml.impl.type.child;
 
 import org.camunda.bpm.model.xml.impl.type.reference.ElementReferenceBuilderImpl;
 import org.camunda.bpm.model.xml.impl.type.reference.QNameElementReferenceBuilderImpl;
+import org.camunda.bpm.model.xml.impl.type.reference.UriElementReferenceBuilderImpl;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.camunda.bpm.model.xml.type.child.ChildElement;
@@ -72,4 +73,12 @@ public class ChildElementBuilderImpl<T extends ModelElementInstance> extends Chi
     setReferenceBuilder(builder);
     return builder;
   }
+
+  public <V extends ModelElementInstance> ElementReferenceBuilder<V, T> uriElementReference(Class<V> referenceTargetType) {
+    ChildElementImpl<T> child = (ChildElementImpl<T>) build();
+    ElementReferenceBuilderImpl<V, T> builder = new UriElementReferenceBuilderImpl<V, T>(childElementType, referenceTargetType, child);
+    setReferenceBuilder(builder);
+    return builder;
+  }
+
 }

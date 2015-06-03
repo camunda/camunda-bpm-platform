@@ -17,7 +17,9 @@ import org.camunda.bpm.model.xml.ModelException;
 import org.camunda.bpm.model.xml.impl.ModelBuildOperation;
 import org.camunda.bpm.model.xml.impl.type.ModelElementTypeImpl;
 import org.camunda.bpm.model.xml.impl.type.reference.ElementReferenceCollectionBuilderImpl;
+import org.camunda.bpm.model.xml.impl.type.reference.IdsElementReferenceCollectionBuilderImpl;
 import org.camunda.bpm.model.xml.impl.type.reference.QNameElementReferenceCollectionBuilderImpl;
+import org.camunda.bpm.model.xml.impl.type.reference.UriElementReferenceCollectionBuilderImpl;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
@@ -87,6 +89,20 @@ public class ChildElementCollectionBuilderImpl<T extends ModelElementInstance> i
   public <V extends ModelElementInstance> ElementReferenceCollectionBuilder<V, T> idElementReferenceCollection(Class<V> referenceTargetType) {
     ChildElementCollectionImpl<T> collection = (ChildElementCollectionImpl<T>) build();
     ElementReferenceCollectionBuilder<V,T> builder = new ElementReferenceCollectionBuilderImpl<V,T>(childElementType, referenceTargetType, collection);
+    setReferenceBuilder(builder);
+    return builder;
+  }
+
+  public <V extends ModelElementInstance> ElementReferenceCollectionBuilder<V, T> idsElementReferenceCollection(Class<V> referenceTargetType) {
+    ChildElementCollectionImpl<T> collection = (ChildElementCollectionImpl<T>) build();
+    ElementReferenceCollectionBuilder<V,T> builder = new IdsElementReferenceCollectionBuilderImpl<V,T>(childElementType, referenceTargetType, collection);
+    setReferenceBuilder(builder);
+    return builder;
+  }
+
+  public <V extends ModelElementInstance> ElementReferenceCollectionBuilder<V, T> uriElementReferenceCollection(Class<V> referenceTargetType) {
+    ChildElementCollectionImpl<T> collection = (ChildElementCollectionImpl<T>) build();
+    ElementReferenceCollectionBuilder<V,T> builder = new UriElementReferenceCollectionBuilderImpl<V, T>(childElementType, referenceTargetType, collection);
     setReferenceBuilder(builder);
     return builder;
   }

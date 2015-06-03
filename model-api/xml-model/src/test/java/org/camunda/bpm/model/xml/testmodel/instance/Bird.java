@@ -19,6 +19,7 @@ import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceP
 import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 import org.camunda.bpm.model.xml.type.reference.ElementReference;
+import org.camunda.bpm.model.xml.type.reference.ElementReferenceCollection;
 
 import java.util.Collection;
 
@@ -33,6 +34,7 @@ public class Bird extends FlyingAnimal {
 
   protected static ChildElementCollection<Egg> eggColl;
   protected static ElementReference<Bird, SpouseRef> spouseRefsColl;
+  protected static ElementReferenceCollection<Egg, GuardEgg> guardEggRefCollection;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Bird.class, ELEMENT_NAME_BIRD)
@@ -53,6 +55,10 @@ public class Bird extends FlyingAnimal {
 
     spouseRefsColl = sequence.element(SpouseRef.class)
       .qNameElementReference(Bird.class)
+      .build();
+
+    guardEggRefCollection = sequence.elementCollection(GuardEgg.class)
+      .idsElementReferenceCollection(Egg.class)
       .build();
 
     typeBuilder.build();
@@ -81,6 +87,14 @@ public class Bird extends FlyingAnimal {
 
   public SpouseRef getSpouseRef() {
     return spouseRefsColl.getReferenceSource(this);
+  }
+
+  public Collection<Egg> getGuardedEggs() {
+    return guardEggRefCollection.getReferenceTargetElements(this);
+  }
+
+  public Collection<GuardEgg> getGuardedEggRefs() {
+    return guardEggRefCollection.getReferenceSourceCollection().get(this);
   }
 
 }

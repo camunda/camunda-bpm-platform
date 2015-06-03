@@ -52,7 +52,7 @@ public class ElementReferenceCollectionImpl<Target extends ModelElementInstance,
     referenceSourceElement.setTextContent(referenceIdentifier);
   }
 
-  private void performAddOperation(ModelElementInstanceImpl referenceSourceParentElement, Target referenceTargetElement) {
+  protected void performAddOperation(ModelElementInstanceImpl referenceSourceParentElement, Target referenceTargetElement) {
     ModelInstanceImpl modelInstance = referenceSourceParentElement.getModelInstance();
     String referenceTargetIdentifier = referenceTargetAttribute.getValue(referenceTargetElement);
     ModelElementInstance existingElement = modelInstance.getModelElementById(referenceTargetIdentifier);
@@ -69,7 +69,7 @@ public class ElementReferenceCollectionImpl<Target extends ModelElementInstance,
     }
   }
 
-  private void performRemoveOperation(ModelElementInstanceImpl referenceSourceParentElement, Object referenceTargetElement) {
+  protected void performRemoveOperation(ModelElementInstanceImpl referenceSourceParentElement, Object referenceTargetElement) {
     Collection<ModelElementInstance> referenceSourceChildElements = referenceSourceParentElement.getChildElementsByType(referenceSourceType);
     for (ModelElementInstance referenceSourceChildElement : referenceSourceChildElements) {
       if (getReferenceTargetElement(referenceSourceChildElement).equals(referenceTargetElement)) {
@@ -78,7 +78,7 @@ public class ElementReferenceCollectionImpl<Target extends ModelElementInstance,
     }
   }
 
-  private void performClearOperation(ModelElementInstanceImpl referenceSourceParentElement, Collection<DomElement> elementsToRemove) {
+  protected void performClearOperation(ModelElementInstanceImpl referenceSourceParentElement, Collection<DomElement> elementsToRemove) {
     for (DomElement element: elementsToRemove) {
       referenceSourceParentElement.getDomElement().removeChild(element);
     }
@@ -111,7 +111,7 @@ public class ElementReferenceCollectionImpl<Target extends ModelElementInstance,
     return referenceSourceType;
   }
 
-  private Collection<DomElement> getView(ModelElementInstanceImpl referenceSourceParentElement) {
+  protected Collection<DomElement> getView(ModelElementInstanceImpl referenceSourceParentElement) {
     DomDocument document = referenceSourceParentElement.getModelInstance().getDocument();
     Collection<Source> referenceSourceElements = referenceSourceCollection.get(referenceSourceParentElement);
     Collection<DomElement> referenceTargetElements = new ArrayList<DomElement>();
