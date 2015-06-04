@@ -12,22 +12,17 @@ module.exports = Base.extend({
     return this.formElement().element(by.css('.modal-title')).getText();
   },
 
-  selectPanel: function(panelItem) {
-    var index = [
-      'General',
-      'Criteria',
-      'Permission',
-      'Variables'
-    ];
-    var item;
-    var itemIndex = index.indexOf(panelItem) + 1;
+  selectPanelByKey: function (key) {
+    var selecta = 'accordion [is-open="accordion.' + key + '"]';
+    var btnSelecta = selecta + ' [ng-click="toggleOpen()"]';
+    this.formElement().element(by.css(btnSelecta)).click();
+    return this.isPanelOpen(key);
+  },
 
-    if (itemIndex)
-      item = this.formElement().element(by.css('accordion .panel:nth-child(' + itemIndex + ') [ng-click="toggleOpen()"]'));
-    else
-      item = this.formElement().element(by.css('accordion .panel:nth-child(1) [ng-click="toggleOpen()"]'));
-
-    return item.click();
+  isPanelOpen: function(key) {
+    var selecta = 'accordion [is-open="accordion.' + key + '"]';
+    var bdySelecta = selecta + ' .panel-body';
+    return element(by.css(bdySelecta)).isDisplayed();
   },
 
   // general
@@ -77,8 +72,8 @@ module.exports = Base.extend({
     return this.formElement().element(by.css('[ng-click="addCriterion()"]'));
   },
 
-  removeCriterionButton: function(item) {
-    return this.criterionList().get(item).element(by.css('[ng-click="removeCriterion(delta)"]'));
+  removeCriterionButton: function(idx) {
+    return this.criterionList().get(idx).element(by.css('[ng-click="removeCriterion(delta)"]'));
   },
 
   criterionList: function() {
@@ -89,8 +84,8 @@ module.exports = Base.extend({
     this.criterionList().get(item).element(by.cssContainingText('optgroup[label="' + group + '"] > option', key)).click();
   },
 
-  criterionKeyInput: function(item, inputKey) {
-    var inputField = this.criterionList().get(item).element(by.model('queryParam.key'));
+  criterionKeyInput: function(idx, inputKey) {
+    var inputField = this.criterionList().get(idx).element(by.model('queryParam.key'));
 
     if (arguments.length !== 0)
       inputField.sendKeys(inputKey);
@@ -98,13 +93,17 @@ module.exports = Base.extend({
     return inputField;
   },
 
-  criterionValueInput: function(item, inputValue) {
-    var inputField = this.criterionList().get(item).element(by.model('queryParam.value'));
+  criterionValueInput: function(idx, inputValue) {
+    var inputField = this.criterionList().get(idx).element(by.model('queryParam.value'));
 
     if (arguments.length !== 0)
       inputField.sendKeys(inputValue);
 
     return inputField;
+  },
+
+  includeAssignedTasksCheckbox: function () {
+    return this.formElement().element(by.css('[ng-model="filter.includeAssignedTasks"]'));
   },
 
   addCriteria: function(group, key, value) {
@@ -119,6 +118,12 @@ module.exports = Base.extend({
     });
   },
 
+  editCriteria: function(idx, group, key, value) {
+    this.selectCriterionKey(idx, group, key);
+    this.criterionValueInput(idx).clear();
+    this.criterionValueInput(idx, value);
+  },
+
   // variables
   showUndefinedVariablesCheckBox: function() {
     return element(by.css('[cam-tasklist-filter-modal-form-variable]'))
@@ -129,16 +134,16 @@ module.exports = Base.extend({
     return this.formElement().element(by.css('[ng-click="addVariable()"]'));
   },
 
-  removeVariableButton: function(item) {
-    return this.variableList().get(item).element(by.css('[ng-click="removeVariable(delta)"]'));
+  removeVariableButton: function(idx) {
+    return this.variableList().get(idx).element(by.css('[ng-click="removeVariable(delta)"]'));
   },
 
   variableList: function() {
     return this.formElement().all(by.repeater('(delta, variable) in variables'));
   },
 
-  variableNameInput: function(item, inputValue) {
-    var inputField = this.variableList().get(item).element(by.model('variable.name'));
+  variableNameInput: function(idx, inputValue) {
+    var inputField = this.variableList().get(idx).element(by.model('variable.name'));
 
     if (arguments.length !== 0)
       inputField.sendKeys(inputValue);
@@ -146,8 +151,8 @@ module.exports = Base.extend({
     return inputField;
   },
 
-  variableLabelInput: function(item, inputValue) {
-    var inputField = this.variableList().get(item).element(by.model('variable.label'));
+  variableLabelInput: function(idx, inputValue) {
+    var inputField = this.variableList().get(idx).element(by.model('variable.label'));
 
     if (arguments.length !== 0)
       inputField.sendKeys(inputValue);
@@ -158,8 +163,7 @@ module.exports = Base.extend({
   addVariable: function(name, label) {
     var self = this;
 
-    this.addVariableButton().then(function(button) {
-      button.click();
+    this.addVariableButton().click().then(function() {
       self.variableList().count().then(function(items) {
         items = items -1;
         self.variableNameInput(items, name);

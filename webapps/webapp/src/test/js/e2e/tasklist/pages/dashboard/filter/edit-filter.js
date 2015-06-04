@@ -8,16 +8,18 @@ module.exports = Page.extend({
     return this.formElement().element(by.css('[ng-click="submit()"]'));
   },
 
+  saveFilter: function() {
+    var theElement = this.formElement();
+    this.saveButton().click();
+    this.waitForModalToBeAbsent(theElement, 5000);
+  },
+
   closeButton: function() {
     return this.formElement().element(by.css('[ng-click="$dismiss()"]'));
   },
 
   deleteFilterButton: function() {
     return this.formElement().element(by.css('[ng-click="confirmDeletion()"]'));
-  },
-
-  includeAssignedTasksCheckbox: function () {
-    return this.formElement().element(by.css('[ng-model="filter.includeAssignedTasks"]'));
   }
 
 });

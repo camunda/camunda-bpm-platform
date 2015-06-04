@@ -33,9 +33,7 @@ module.exports = Page.extend({
   },
 
   selectFilter: function(item) {
-    var filter = this.filterList().get(item).element(by.css('[class="task-filter"]'));
-    filter.click();
-    return filter;
+    this.filterList().get(item).element(by.css('[class="task-filter"]')).click();
   },
 
   filterStatus: function(item) {
@@ -73,6 +71,12 @@ module.exports = Page.extend({
 
   createFilterButton: function() {
     return element(by.css('[ng-click="openModal($event)"]'));
+  },
+
+  createFilter: function() {
+    var theElement = element(by.css('.modal-title'));
+    this.createFilterButton().click();
+    this.waitForModalToBePresent(theElement, 5000);
   },
 
   editFilter: function(item) {

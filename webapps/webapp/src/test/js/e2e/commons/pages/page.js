@@ -57,6 +57,22 @@ Page.prototype.waitForElementToBePresent = function(selector, max) {
       }, max, 'Waiting for element (with selector "'+ selector +'") took too long.');
 };
 
+Page.prototype.waitForModalToBePresent = function(element, max) {
+  var EC = protractor.ExpectedConditions;
+  var isVisible = EC.visibilityOf(element);
+
+  max = max || 5000;
+  browser.wait(isVisible, max);
+};
+
+Page.prototype.waitForModalToBeAbsent = function(element, max) {
+  var EC = protractor.ExpectedConditions;
+  var isNotPresent = EC.not(EC.presenceOf(element));
+
+  max = max || 5000;
+  browser.wait(isNotPresent, max);
+};
+
 /* notification */
 Page.prototype.notifications = function() {
   return element.all(by.repeater('notification in notifications'));
