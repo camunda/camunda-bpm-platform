@@ -37,8 +37,8 @@ public abstract class TestModelConstants {
   public static final String ELEMENT_NAME_ANIMAL_REFERENCE = "animalReference";
   public static final String ELEMENT_NAME_GUARDIAN = "guardian";
   public static final String ELEMENT_NAME_MOTHER = "mother";
-  public static final String ELEMENT_NAME_FATHER = "father";
   public static final String ELEMENT_NAME_GUARD_EGG = "guardEgg";
+  public static final String ELEMENT_NAME_DESCRIPTION = "description";
 
   public static final String ATTRIBUTE_NAME_ID = "id";
   public static final String ATTRIBUTE_NAME_NAME = "name";

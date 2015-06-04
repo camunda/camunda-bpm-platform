@@ -272,6 +272,13 @@ public class DomElementImpl implements DomElement {
     }
   }
 
+  public void addCDataSection(String data) {
+    synchronized (document) {
+      CDATASection cdataSection = document.createCDATASection(data);
+      element.appendChild(cdataSection);
+    }
+  }
+
   public ModelElementInstance getModelElementInstance() {
     synchronized(document) {
       return (ModelElementInstance) element.getUserData(MODEL_ELEMENT_KEY);

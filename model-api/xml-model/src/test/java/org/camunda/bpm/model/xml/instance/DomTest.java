@@ -19,6 +19,7 @@ import org.camunda.bpm.model.xml.testmodel.Gender;
 import org.camunda.bpm.model.xml.testmodel.TestModelParser;
 import org.camunda.bpm.model.xml.testmodel.TestModelTest;
 import org.camunda.bpm.model.xml.testmodel.instance.Animals;
+import org.camunda.bpm.model.xml.testmodel.instance.Description;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -61,6 +62,10 @@ public class DomTest extends TestModelTest {
 
     Animals animals = modelInstance.newInstance(Animals.class);
     modelInstance.setDocumentElement(animals);
+
+    Description description = modelInstance.newInstance(Description.class);
+    description.getDomElement().addCDataSection("CDATA <test>");
+    animals.addChildElement(description);
 
     return new Object[]{"created", modelInstance, modelParser};
   }
@@ -206,6 +211,13 @@ public class DomTest extends TestModelTest {
     assertThat(element.getAttribute(BPMN_NS, "id")).isEqualTo("test");
     assertThat(element.hasAttribute(XMLNS_ATTRIBUTE_NS_URI, "bpmn2")).isFalse();
     assertThat(document.getRootElement().hasAttribute(XMLNS_ATTRIBUTE_NS_URI, "bpmn2")).isTrue();
+  }
+
+  @Test
+  public void testCData() {
+    Animals animals = (Animals) modelInstance.getDocumentElement();
+    assertThat(animals.getDescription().getTextContent())
+      .isEqualTo("CDATA <test>");
   }
 
 }

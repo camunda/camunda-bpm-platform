@@ -7,6 +7,7 @@
   <element name="animals" type="tns:tAnimals"/>
   <complexType name="tAnimals">
     <sequence>
+      <element name="description" type="string" minOccurs="0" maxOccurs="1" />
       <element ref="tns:animal" minOccurs="0" maxOccurs="unbounded" />
       <any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded" />
     </sequence>

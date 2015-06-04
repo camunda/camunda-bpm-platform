@@ -17,6 +17,7 @@ import org.camunda.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
+import org.camunda.bpm.model.xml.type.child.ChildElement;
 import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 
@@ -31,6 +32,7 @@ import static org.camunda.bpm.model.xml.testmodel.TestModelConstants.MODEL_NAMES
  */
 public class Animals extends ModelElementInstanceImpl {
 
+  protected static ChildElement<Description> descriptionChild;
   protected static ChildElementCollection<Animal> animalColl;
 
   public static void registerType(ModelBuilder modelBuilder) {
@@ -45,6 +47,9 @@ public class Animals extends ModelElementInstanceImpl {
 
     SequenceBuilder sequence = typeBuilder.sequence();
 
+    descriptionChild = sequence.element(Description.class)
+      .build();
+
     animalColl = sequence.elementCollection(Animal.class)
       .build();
 
@@ -54,6 +59,14 @@ public class Animals extends ModelElementInstanceImpl {
 
   public Animals(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
+  }
+
+  public Description getDescription() {
+    return descriptionChild.getChild(this);
+  }
+
+  public void setDescription(Description description) {
+    descriptionChild.setChild(this, description);
   }
 
   public Collection<Animal> getAnimals() {

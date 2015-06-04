@@ -34,6 +34,7 @@ public final class TestModel {
       AnimalReference.registerType(modelBuilder);
       Bird.registerType(modelBuilder);
       ChildRelationshipDefinition.registerType(modelBuilder);
+      Description.registerType(modelBuilder);
       FlightPartnerRef.registerType(modelBuilder);
       FlyingAnimal.registerType(modelBuilder);
       Guardian.registerType(modelBuilder);

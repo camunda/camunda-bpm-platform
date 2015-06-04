@@ -220,6 +220,13 @@ public interface DomElement {
   void setTextContent(String textContent);
 
   /**
+   * Adds a CDATA section to this element.
+   *
+   * @param textContent  the CDATA content to set
+   */
+  void addCDataSection(String data);
+
+  /**
    * Returns the {@link ModelElementInstance} which is associated with this element.
    *
    * @return the {@link ModelElementInstance} or null if non is associated
