@@ -71,6 +71,7 @@ public class InvoiceProcessApplication extends ServletProcessApplication {
     // process instance 3
     pi = processEngine.getRuntimeService().startProcessInstanceByKey("invoice", createVariables()
         .putValue("creditor", "Papa Steve's all you can eat")
+        .putValue("amount", "10.99$")
         .putValue("invoiceNumber", "PSACE-5342"));
     try {
       Calendar calendar = Calendar.getInstance();
