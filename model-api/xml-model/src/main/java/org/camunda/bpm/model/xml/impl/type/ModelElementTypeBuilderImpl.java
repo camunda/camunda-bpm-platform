@@ -92,6 +92,12 @@ public class ModelElementTypeBuilderImpl implements ModelElementTypeBuilder, Mod
     return builder;
   }
 
+  public <V extends Enum<V>> AttributeBuilder<V> namedEnumAttribute(String attributeName, Class<V> enumType) {
+    NamedEnumAttributeBuilder<V> builder = new NamedEnumAttributeBuilder<V>(attributeName, modelType, enumType);
+    modelBuildOperations.add(builder);
+    return builder;
+  }
+
   public ModelElementType build() {
     model.registerType(modelType, instanceType);
     return modelType;

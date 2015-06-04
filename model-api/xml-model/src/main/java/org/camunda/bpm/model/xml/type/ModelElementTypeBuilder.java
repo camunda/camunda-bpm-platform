@@ -41,6 +41,8 @@ public interface ModelElementTypeBuilder {
 
   <V extends Enum<V>> AttributeBuilder<V> enumAttribute(String attributeName, Class<V> enumType);
 
+  <V extends Enum<V>> AttributeBuilder<V> namedEnumAttribute(String attributeName, Class<V> enumType);
+
   SequenceBuilder sequence();
 
   ModelElementType build();
