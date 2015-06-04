@@ -14,8 +14,10 @@ package org.camunda.bpm.model.xml.impl.util;
 
 import org.camunda.bpm.model.xml.ModelException;
 
+import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 
@@ -54,6 +56,15 @@ public abstract class ReflectUtil {
     }
 
     return url;
+  }
+
+  public static File getResourceAsFile(String path) {
+    URL resource = getResource(path);
+    try {
+      return new File(resource.toURI());
+    } catch (URISyntaxException e) {
+      throw new ModelException("Exception while loading resource file " + path, e);
+    }
   }
 
   /**
