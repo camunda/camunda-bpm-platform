@@ -43,7 +43,7 @@ function noErrorDone(done) {
   return function () { done(); };
 }
 
-describe('Start task', function () {
+describe('Tasklist Start task', function () {
   before(function() {
     return testHelper(setupFile);
   });
@@ -66,6 +66,12 @@ describe('Start task', function () {
 
 
   describe('process definitions list', function() {
+    before(function () {
+      page.navigateToWebapp('Tasklist');
+      // page.authentication.userLogin('admin', 'admin');
+    });
+
+
     it('opens', function () {
       // when
       page.startProcess.navigationLinkElement().click();
