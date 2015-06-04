@@ -19,7 +19,6 @@ import java.util.concurrent.Callable;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.bpmn.delegate.ActivityBehaviorInvocation;
@@ -68,10 +67,10 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
     }
   }
 
-  public void doSignal(final ActivityExecution execution, String signalName, Object signalData) throws Exception {
+  public void doSignal(final ActivityExecution execution, final String signalName, final Object signalData) throws Exception {
     Object delegate = expression.getValue(execution);
     applyFieldDeclaration(fieldDeclarations, delegate);
-    ActivityBehavior activityBehaviorInstance = getActivityBehaviorInstance(execution, delegate);
+    final ActivityBehavior activityBehaviorInstance = getActivityBehaviorInstance(execution, delegate);
 
     if (activityBehaviorInstance instanceof CustomActivityBehavior) {
       CustomActivityBehavior behavior = (CustomActivityBehavior) activityBehaviorInstance;
@@ -82,62 +81,44 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
         return;
       }
     }
-
-    try {
-      ((SignallableActivityBehavior) activityBehaviorInstance).signal(execution, signalName, signalData);
-    }
-    catch (BpmnError error) {
-      propagateBpmnError(error, execution);
-    }
-    catch (Exception exception) {
-      propagateExceptionAsError(exception, execution);
-    }
+    executeWithErrorPropagation(execution, new Callable<Void>() {
+      @Override
+      public Void call() throws Exception {
+        ((SignallableActivityBehavior) activityBehaviorInstance).signal(execution, signalName, signalData);
+        return null;
+      }
+    });
   }
 
-	public void execute(ActivityExecution execution) throws Exception {
+	public void execute(final ActivityExecution execution) throws Exception {
+	  Callable<Void> callable = new Callable<Void>() {
+      @Override
+      public Void call() throws Exception {
+        // Note: we can't cache the result of the expression, because the
+        // execution can change: eg. delegateExpression='${mySpringBeanFactory.randomSpringBean()}'
+        Object delegate = expression.getValue(execution);
+        applyFieldDeclaration(fieldDeclarations, delegate);
 
-    try {
+        if (delegate instanceof ActivityBehavior) {
+          Context.getProcessEngineConfiguration()
+            .getDelegateInterceptor()
+            .handleInvocation(new ActivityBehaviorInvocation((ActivityBehavior) delegate, execution));
 
-      // Note: we can't cache the result of the expression, because the
-      // execution can change: eg. delegateExpression='${mySpringBeanFactory.randomSpringBean()}'
-      Object delegate = expression.getValue(execution);
-      applyFieldDeclaration(fieldDeclarations, delegate);
+        } else if (delegate instanceof JavaDelegate) {
+          Context.getProcessEngineConfiguration()
+            .getDelegateInterceptor()
+            .handleInvocation(new JavaDelegateInvocation((JavaDelegate) delegate, execution));
+          leave(execution);
 
-      if (delegate instanceof ActivityBehavior) {
-        Context.getProcessEngineConfiguration()
-          .getDelegateInterceptor()
-          .handleInvocation(new ActivityBehaviorInvocation((ActivityBehavior) delegate, execution));
-
-      } else if (delegate instanceof JavaDelegate) {
-        Context.getProcessEngineConfiguration()
-          .getDelegateInterceptor()
-          .handleInvocation(new JavaDelegateInvocation((JavaDelegate) delegate, execution));
-        leave(execution);
-
-      } else {
-        throw new ProcessEngineException("Delegate expression " + expression
-                + " did neither resolve to an implementation of " + ActivityBehavior.class
-                + " nor " + JavaDelegate.class);
-      }
-    } catch (Exception exc) {
-
-      Throwable cause = exc;
-      BpmnError error = null;
-      while (cause != null) {
-        if (cause instanceof BpmnError) {
-          error = (BpmnError) cause;
-          break;
+        } else {
+          throw new ProcessEngineException("Delegate expression " + expression
+                  + " did neither resolve to an implementation of " + ActivityBehavior.class
+                  + " nor " + JavaDelegate.class);
         }
-        cause = cause.getCause();
+        return null;
       }
-
-      if (error != null) {
-        propagateBpmnError(error, execution);
-      } else {
-        propagateExceptionAsError(exc, execution);
-      }
-
-    }
+    };
+    executeWithErrorPropagation(execution, callable);
   }
 
   protected ActivityBehavior getActivityBehaviorInstance(ActivityExecution execution, Object delegateInstance) {

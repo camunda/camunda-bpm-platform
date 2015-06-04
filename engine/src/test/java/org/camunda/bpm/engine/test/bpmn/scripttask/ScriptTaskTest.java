@@ -602,4 +602,14 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
     assertFalse(processEngineConfiguration.isAutoStoreScriptVariables());
   }
 
+  @org.camunda.bpm.engine.test.Deployment
+  public void testPreviousTaskShouldNotHandleException(){
+    runtimeService.startProcessInstanceByKey("process");
+    Task task = taskService.createTaskQuery().singleResult();
+    try {
+      taskService.complete(task.getId());
+      fail();
+    }
+    catch (ScriptEvaluationException see){}
+  }
 }

@@ -12,7 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import java.util.concurrent.Callable;
+
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.delegate.ScriptInvocation;
@@ -41,36 +42,26 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
     this.resultVariable = resultVariable;
   }
 
-  public void execute(ActivityExecution execution) throws Exception {
-
-    boolean noErrors = true;
-
-    try {
-      ScriptInvocation invocation = new ScriptInvocation(script, execution);
-      Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(invocation);
-      Object result = invocation.getInvocationResult();
-      if (result != null && resultVariable != null) {
-        execution.setVariable(resultVariable, result);
+  public void execute(final ActivityExecution execution) throws Exception {
+    executeWithErrorPropagation(execution, new Callable<Void>() {
+      @Override
+      public Void call() throws Exception {
+        ScriptInvocation invocation = new ScriptInvocation(script, execution);
+        Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(invocation);
+        Object result = invocation.getInvocationResult();
+        if (result != null && resultVariable != null) {
+          execution.setVariable(resultVariable, result);
+        }
+        leave(execution);
+        return null;
       }
-
-    } catch (ProcessEngineException e) {
-      noErrors = false;
-      BpmnError error = checkIfCauseOfExceptionIsBpmnError(e);
-      if (error != null) {
-        propagateBpmnError(error, execution);
-      } else {
-        propagateExceptionAsError(e, execution);
-      }
-    }
-    if (noErrors) {
-      leave(execution);
-    }
+    });
   }
 
   /**
    * Searches recursively through the exception to see if the exception itself
    * or one of its causes is a {@link BpmnError}.
-   * 
+   *
    * @param e
    *          the exception to check
    * @return the BpmnError that was the cause of this exception or null if no

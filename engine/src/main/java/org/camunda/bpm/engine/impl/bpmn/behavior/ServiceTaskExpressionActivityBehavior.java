@@ -13,14 +13,14 @@
 
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
-import org.camunda.bpm.engine.delegate.BpmnError;
+import java.util.concurrent.Callable;
+
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
-
 /**
- * ActivityBehavior that evaluates an expression when executed. Optionally, it sets the result
- * of the expression as a variable on the execution.
+ * ActivityBehavior that evaluates an expression when executed. Optionally, it
+ * sets the result of the expression as a variable on the execution.
  *
  * @author Tom Baeyens
  * @author Christian Stettler
@@ -38,31 +38,19 @@ public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior 
     this.resultVariable = resultVariable;
   }
 
-  public void execute(ActivityExecution execution) throws Exception {
-	Object value = null;
-	try {
-		value = expression.getValue(execution);
-		if (resultVariable != null) {
-		    execution.setVariable(resultVariable, value);
-		}
-		leave(execution);
-    } catch (Exception exc) {
-
-      Throwable cause = exc;
-      BpmnError error = null;
-      while (cause != null) {
-        if (cause instanceof BpmnError) {
-          error = (BpmnError) cause;
-          break;
+  public void execute(final ActivityExecution execution) throws Exception {
+    executeWithErrorPropagation(execution, new Callable<Void>() {
+      @Override
+      public Void call() throws Exception {
+        //getValue() can have side-effects, that's why we have to call it independently from the result variable
+        Object value = expression.getValue(execution);
+        if (resultVariable != null) {
+          execution.setVariable(resultVariable, value);
         }
-        cause = cause.getCause();
+        leave(execution);
+        return null;
       }
+    });
 
-      if (error != null) {
-        propagateBpmnError(error, execution);
-      } else {
-        propagateExceptionAsError(exc, execution);
-      }
-    }
   }
 }

@@ -474,11 +474,8 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
     taskService.complete(userTask.getId());
   }
 
-  /**
-   * See CAM-3031
-   */
   @Deployment
-  public void FAILING_testCatchExceptionExpressionThrownByFollowUpTask() {
+  public void testCatchExceptionExpressionThrownByFollowUpTask() {
     try {
       Map<String, Object> vars = throwException();
       runtimeService.startProcessInstanceByKey("testProcess", vars).getId();
@@ -490,11 +487,8 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
     assertNull(taskService.createTaskQuery().singleResult());
   }
 
-  /**
-   * See CAM-3031
-   */
   @Deployment
-  public void FAILING_testCatchExceptionClassDelegateThrownByFollowUpTask() {
+  public void testCatchExceptionClassDelegateThrownByFollowUpTask() {
     try {
       Map<String, Object> vars = throwException();
       runtimeService.startProcessInstanceByKey("testProcess", vars).getId();
@@ -815,7 +809,7 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
     Task task = taskService.createTaskQuery().executionId(taskExecution.getId()).singleResult();
     assertNotNull(task);
   }
-  
+
   @Deployment
   public void testCatchErrorOnSubprocessSetsErrorCodeVariable(){
     runtimeService.startProcessInstanceByKey("Process_1");
@@ -824,7 +818,7 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
     Object errorCode = "error2";
     checkErrorCodeVariable(variableName, errorCode);
   }
-  
+
   @Deployment(resources={
       "org/camunda/bpm/engine/test/bpmn/event/error/ThrowErrorProcess.bpmn",
       "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorThrownByCallActivityOnSubprocessSetsErrorCodeVariable.bpmn"
@@ -837,7 +831,7 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
     Object errorCode = "error";
     checkErrorCodeVariable(variableName, errorCode);
   }
-  
+
   @Deployment
   public void testCatchErrorThrownByMultiInstanceSubProcessSetsErrorCodeVariable(){
     runtimeService.startProcessInstanceByKey("Process_1");
@@ -847,13 +841,13 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
     Object errorCode = "error";
     checkErrorCodeVariable(variableName, errorCode);
   }
-  
+
   private void checkErrorCodeVariable(String variableName, Object expectedValue){
     VariableInstance errorVariable = runtimeService.createVariableInstanceQuery().variableName(variableName).singleResult();
     assertThat(errorVariable, is(notNullValue()));
     assertThat(errorVariable.getValue(), is(expectedValue));
   }
-  
+
   @Deployment(resources={
     "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchBpmnErrorThrownByJavaDelegateInCallActivityOnSubprocessSetsErrorCodeVariable.bpmn",
     "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithThrownError.bpmn"

@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.impl.bpmn.behavior;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -95,6 +96,62 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
     }
   }
 
+  /**
+   * Takes the an {@link ActivityExecution} and an {@link Callable} and wraps
+   * the call to the Callable with the proper error propagation. This method
+   * also makes sure that exceptions not caught by following activities in the
+   * process will be thrown and not propagated.
+   *
+   * @param execution
+   * @param behavior
+   * @throws Exception
+   */
+  protected void executeWithErrorPropagation(ActivityExecution execution, Callable<Void> toExecute) throws Exception {
+    String activityInstanceId = execution.getActivityInstanceId();
+    try {
+      toExecute.call();
+    } catch (Exception ex) {
+      if (activityInstanceId.equals(execution.getActivityInstanceId())) {
+        propagateException(execution, ex);
+      } else {
+        throw ex;
+      }
+    }
+  }
+
+  /**
+   * Decides how to propagate the exception properly, e.g. as bpmn error or "normal" error.
+   * @param execution the current execution
+   * @param ex the exception to propagate
+   * @throws Exception if no error handler could be found
+   */
+  protected void propagateException(ActivityExecution execution, Exception ex) throws Exception {
+    BpmnError bpmnError = checkIfCauseOfExceptionIsBpmnError(ex);
+    if (bpmnError != null) {
+      propagateBpmnError(bpmnError, execution);
+    } else {
+      propagateExceptionAsError(ex, execution);
+    }
+  }
+
+  /**
+   * Searches recursively through the exception to see if the exception itself
+   * or one of its causes is a {@link BpmnError}.
+   *
+   * @param e
+   *          the exception to check
+   * @return the BpmnError that was the cause of this exception or null if no
+   *         BpmnError was found
+   */
+  protected BpmnError checkIfCauseOfExceptionIsBpmnError(Throwable e) {
+    if (e instanceof BpmnError) {
+      return (BpmnError) e;
+    } else if (e.getCause() == null) {
+      return null;
+    }
+    return checkIfCauseOfExceptionIsBpmnError(e.getCause());
+  }
+
   protected boolean isTransactionNotActive() {
     return !Context.getCommandContext().getTransactionContext().isTransactionActive();
   }
@@ -132,7 +189,7 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
     for (int i = 0; i < processInstanceHierarchy.size() - 1; i++) {
       PvmExecutionImpl processInstance = processInstanceHierarchy.get(i);
       PvmExecutionImpl superExecution = processInstance.getSuperExecution();
-      ActivityImpl activity = ((PvmExecutionImpl)superExecution).getActivity();
+      ActivityImpl activity = superExecution.getActivity();
       SubProcessActivityBehavior subProcessActivityBehavior = (SubProcessActivityBehavior) activity.getActivityBehavior();
       subProcessActivityBehavior.completing(superExecution, processInstance);
     }
