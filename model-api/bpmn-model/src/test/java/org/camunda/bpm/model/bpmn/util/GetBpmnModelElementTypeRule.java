@@ -17,6 +17,7 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
+import org.camunda.bpm.model.xml.test.GetModelElementTypeRule;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -24,7 +25,7 @@ import org.junit.runner.Description;
 /**
  * @author Sebastian Menski
  */
-public class GetBpmnModelElementTypeRule extends TestWatcher {
+public class GetBpmnModelElementTypeRule extends TestWatcher implements GetModelElementTypeRule {
 
   private ModelInstance modelInstance;
   private Model model;
