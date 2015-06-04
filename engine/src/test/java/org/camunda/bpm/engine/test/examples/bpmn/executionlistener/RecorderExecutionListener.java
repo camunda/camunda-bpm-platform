@@ -41,8 +41,9 @@ public class RecorderExecutionListener implements ExecutionListener, Serializabl
     private final String activityInstanceId;
     private final String transitionId;
     private final boolean canceled;
+    private final String executionId;
 
-    public RecordedEvent(String activityId, String activityName, String eventName, String parameter, String activityInstanceId, String transitionId, boolean canceled) {
+    public RecordedEvent(String activityId, String activityName, String eventName, String parameter, String activityInstanceId, String transitionId, boolean canceled, String executionId) {
       this.activityId = activityId;
       this.activityName = activityName;
       this.parameter = parameter;
@@ -50,6 +51,7 @@ public class RecorderExecutionListener implements ExecutionListener, Serializabl
       this.activityInstanceId = activityInstanceId;
       this.transitionId = transitionId;
       this.canceled = canceled;
+      this.executionId = executionId;
     }
 
     public String getActivityId() {
@@ -77,11 +79,14 @@ public class RecorderExecutionListener implements ExecutionListener, Serializabl
     public String getTransitionId() {
       return transitionId;
     }
-    
+
     public boolean isCanceled(){
       return canceled;
     }
 
+    public String getExecutionId(){
+      return executionId;
+    }
   }
 
   public void notify(DelegateExecution execution) throws Exception {
@@ -103,7 +108,8 @@ public class RecorderExecutionListener implements ExecutionListener, Serializabl
                     parameterValue,
                     execution.getActivityInstanceId(),
                     execution.getCurrentTransitionId(),
-                    execution.isCanceled()));
+                    execution.isCanceled(),
+                    execution.getId()));
   }
 
   public static void clear() {
