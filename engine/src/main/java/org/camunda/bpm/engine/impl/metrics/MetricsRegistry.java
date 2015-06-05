@@ -31,6 +31,18 @@ public class MetricsRegistry {
     return meters;
   }
 
+  public void markOccurrence(String name) {
+    markOccurrence(name, 1);
+  }
+
+  public void markOccurrence(String name, int times) {
+    Meter meter = meters.get(name);
+
+    if (meter != null) {
+      meter.markTimes(times);
+    }
+  }
+
   public Meter createMeter(String name) {
     Meter meter = new Meter(name);
     meters.put(name, meter);

@@ -61,7 +61,11 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
           final CommandExecutor commandExecutor = currentProcessEngine.getProcessEngineConfiguration()
               .getCommandExecutorTxRequired();
 
+          jobExecutor.logAcquisitionAttempt(currentProcessEngine);
           AcquiredJobs acquiredJobs = commandExecutor.execute(jobExecutor.getAcquireJobsCmd());
+
+          jobExecutor.logAcquiredJobs(currentProcessEngine, acquiredJobs.size());
+          jobExecutor.logAcquisitionFailureJobs(currentProcessEngine, acquiredJobs.getNumberOfJobsFailedToLock());
 
           for (List<String> jobIds : acquiredJobs.getJobIdBatches()) {
             jobExecutor.executeJobs(jobIds, currentProcessEngine);

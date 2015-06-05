@@ -20,4 +20,27 @@ public class Metrics {
 
   public final static String ACTIVTY_INSTANCE_START = "activity-instance-start";
 
+  /**
+   * Number of times job acqusition is performed
+   */
+  public final static String JOB_ACQUISITION_ATTEMPT = "job-acquisition-attempt";
+
+  /**
+   * Number of jobs successfully acquired (i.e. selected + locked)
+   */
+  public final static String JOB_ACQUIRED_SUCCESS = "job-acquired-success";
+  /**
+   * Number of jobs attempted to acquire but with failure (i.e. selected + lock failed)
+   */
+  public final static String JOB_ACQUIRED_FAILURE = "job-acquired-failure";
+
+  public final static String JOB_SUCCESSFUL = "job-successful";
+  public final static String JOB_FAILED = "job-failed";
+
+  /**
+   * Number of jobs that are immediately locked and executed because they are exclusive
+   * and created in the context of job execution
+   */
+  public final static String JOB_LOCKED_EXCLUSIVE = "job-locked-exclusive";
+
 }

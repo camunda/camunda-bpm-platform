@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cmd.AcquireJobsCmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.runtime.Job;
 
 /**
@@ -124,6 +125,30 @@ public abstract class JobExecutor {
   public void executeJobs(List<String> jobIds) {
     if(!processEngines.isEmpty()) {
       executeJobs(jobIds, processEngines.get(0));
+    }
+  }
+
+  public void logAcquisitionAttempt(ProcessEngineImpl engine) {
+    if (engine.getProcessEngineConfiguration().isMetricsEnabled()) {
+      engine.getProcessEngineConfiguration()
+        .getMetricsRegistry()
+        .markOccurrence(Metrics.JOB_ACQUISITION_ATTEMPT);
+    }
+  }
+
+  public void logAcquiredJobs(ProcessEngineImpl engine, int numJobs) {
+    if (engine != null && engine.getProcessEngineConfiguration().isMetricsEnabled()) {
+      engine.getProcessEngineConfiguration()
+        .getMetricsRegistry()
+        .markOccurrence(Metrics.JOB_ACQUIRED_SUCCESS, numJobs);
+    }
+  }
+
+  public void logAcquisitionFailureJobs(ProcessEngineImpl engine, int numJobs) {
+    if (engine != null && engine.getProcessEngineConfiguration().isMetricsEnabled()) {
+      engine.getProcessEngineConfiguration()
+        .getMetricsRegistry()
+        .markOccurrence(Metrics.JOB_ACQUIRED_FAILURE, numJobs);
     }
   }
 

@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.FailedJobListener;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorContext;
+import org.camunda.bpm.engine.impl.jobexecutor.SuccessfulJobListener;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
@@ -92,6 +93,12 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
     // register as command context close lister to intercept exceptions on flush
     commandContext.registerCommandContextListener(failedJobListener);
 
+    // register a listener in case job is executed successfully
+    SuccessfulJobListener successListener = createSuccessfulJobListener(commandExecutor);
+    commandContext.getTransactionContext().addTransactionListener(
+        TransactionState.COMMITTED,
+        successListener);
+
     if (jobExecutorContext != null) { // if null, then we are not called by the job executor
       jobExecutorContext.setCurrentJob(job);
     }
@@ -119,6 +126,10 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
 
   protected FailedJobListener createFailedJobListener(CommandExecutor commandExecutor) {
     return new FailedJobListener(commandExecutor, jobId);
+  }
+
+  protected SuccessfulJobListener createSuccessfulJobListener(CommandExecutor commandExecutor) {
+    return new SuccessfulJobListener();
   }
 
 }

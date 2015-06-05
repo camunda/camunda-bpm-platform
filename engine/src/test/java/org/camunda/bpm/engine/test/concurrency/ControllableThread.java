@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,15 +20,25 @@ import java.util.logging.Logger;
  * @author Tom Baeyens
  */
 public class ControllableThread extends Thread {
-  
+
   private static Logger log = Logger.getLogger(ControllableThread.class.getName());
 
   public ControllableThread() {
+    super();
+    setName(generateName());
+  }
+
+  public ControllableThread(Runnable runnable) {
+    super(runnable);
+    setName(generateName());
+  }
+
+  protected String generateName() {
     String className = getClass().getName();
     int dollarIndex = className.lastIndexOf('$');
-    setName(className.substring(dollarIndex+1));
+    return className.substring(dollarIndex+1);
   }
-  
+
   public synchronized void startAndWaitUntilControlIsReturned() {
     log.fine("test thread will start "+getName()+" and wait till it returns control");
     start();
@@ -47,6 +57,11 @@ public class ControllableThread extends Thread {
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
+  }
+
+  public synchronized void returnControlToControllableThreadAndWait() {
+    // just for understanding the test case
+    returnControlToTestThreadAndWait();
   }
 
   public synchronized void proceedAndWaitTillDone() {

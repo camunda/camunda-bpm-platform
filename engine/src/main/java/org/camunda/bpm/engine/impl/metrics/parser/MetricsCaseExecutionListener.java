@@ -26,8 +26,7 @@ public class MetricsCaseExecutionListener implements CaseExecutionListener {
   public void notify(DelegateCaseExecution caseExecution) throws Exception {
     Context.getProcessEngineConfiguration()
       .getMetricsRegistry()
-      .getMeterByName(Metrics.ACTIVTY_INSTANCE_START)
-      .mark();
+      .markOccurrence(Metrics.ACTIVTY_INSTANCE_START);
   }
 
 }

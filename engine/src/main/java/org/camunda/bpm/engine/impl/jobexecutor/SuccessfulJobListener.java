@@ -12,43 +12,25 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.impl.cfg.TransactionListener;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.management.Metrics;
 
 /**
+ * @author Thorben Lindhauer
  *
- * @author Daniel Meyer
  */
-public class ExclusiveJobAddedNotification implements TransactionListener {
-
-  private static Logger log = Logger.getLogger(ExclusiveJobAddedNotification.class.getName());
-
-  protected final String jobId;
-  protected final JobExecutorContext jobExecutorContext;
-
-  public ExclusiveJobAddedNotification(String jobId, JobExecutorContext jobExecutorContext) {
-    this.jobId = jobId;
-    this.jobExecutorContext = jobExecutorContext;
-  }
+public class SuccessfulJobListener implements TransactionListener {
 
   public void execute(CommandContext commandContext) {
-    if(log.isLoggable(Level.FINE)) {
-      log.log(Level.FINE, "Adding new exclusive job to job executor context. Job Id='"+jobId+"'.");
-    }
-    jobExecutorContext.getCurrentProcessorJobQueue().add(jobId);
-    logExclusiveJobAdded(commandContext);
+    logJobSuccess(commandContext);
   }
 
-  protected void logExclusiveJobAdded(CommandContext commandContext) {
+  protected void logJobSuccess(CommandContext commandContext) {
     if (commandContext.getProcessEngineConfiguration().isMetricsEnabled()) {
       commandContext.getProcessEngineConfiguration()
         .getMetricsRegistry()
-        .markOccurrence(Metrics.JOB_LOCKED_EXCLUSIVE);
+        .markOccurrence(Metrics.JOB_SUCCESSFUL);
     }
   }
 

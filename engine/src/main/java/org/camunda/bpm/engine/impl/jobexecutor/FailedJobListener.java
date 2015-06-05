@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextListener;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.management.Metrics;
 
 
 /**
@@ -47,6 +48,8 @@ public class FailedJobListener implements TransactionListener, CommandContextLis
   }
 
   public void execute(CommandContext commandContext) {
+    logJobFailure(commandContext);
+
     FailedJobCommandFactory failedJobCommandFactory = commandContext.getFailedJobCommandFactory();
     final Command<Object> cmd = failedJobCommandFactory.getCommand(jobId, exception);
 
@@ -76,6 +79,14 @@ public class FailedJobListener implements TransactionListener, CommandContextLis
     commandContext
       .getHistoricJobLogManager()
       .fireJobFailedEvent(job, exception);
+  }
+
+  protected void logJobFailure(CommandContext commandContext) {
+    if (commandContext.getProcessEngineConfiguration().isMetricsEnabled()) {
+      commandContext.getProcessEngineConfiguration()
+        .getMetricsRegistry()
+        .markOccurrence(Metrics.JOB_FAILED);
+    }
   }
 
   public void setException(Throwable exception) {

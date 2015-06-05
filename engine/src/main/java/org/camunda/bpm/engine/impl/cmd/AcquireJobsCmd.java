@@ -18,6 +18,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingListener;
@@ -29,6 +30,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.AcquiredJobs;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.management.Metrics;
 
 
 /**
@@ -83,7 +85,7 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
 
     // register an OptimisticLockingListener which is notified about jobs which cannot be acquired.
     // the listener removes them from the list of acquired jobs.
-    Context.getCommandContext()
+    commandContext
       .getDbEntityManager()
       .registerOptimisticLockingListener(this);
 

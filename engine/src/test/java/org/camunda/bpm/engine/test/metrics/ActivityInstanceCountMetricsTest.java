@@ -12,13 +12,10 @@
  */
 package org.camunda.bpm.engine.test.metrics;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
-import org.camunda.bpm.engine.impl.metrics.Meter;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.task.Task;
@@ -29,16 +26,7 @@ import org.camunda.bpm.model.bpmn.Bpmn;
  * @author Daniel Meyer
  *
  */
-public class ActivityInstanceCountMetricsTest extends PluggableProcessEngineTestCase {
-
-  @Override
-  protected void setUp() throws Exception {
-    Collection<Meter> meters = processEngineConfiguration.getMetricsRegistry().getMeters().values();
-    for (Meter meter : meters) {
-      meter.getAndClear();
-    }
-    managementService.deleteMetrics(null);
-  }
+public class ActivityInstanceCountMetricsTest extends AbstractMetricsTest {
 
   public void testBpmnActivityInstances() {
     deployment(Bpmn.createExecutableProcess("testProcess")
@@ -70,8 +58,6 @@ public class ActivityInstanceCountMetricsTest extends PluggableProcessEngineTest
     assertEquals(3l, managementService.createMetricsQuery()
         .name(Metrics.ACTIVTY_INSTANCE_START)
         .sum());
-
-    managementService.deleteMetrics(null);
   }
 
   public void testStandaloneTask() {
@@ -102,7 +88,6 @@ public class ActivityInstanceCountMetricsTest extends PluggableProcessEngineTest
         .sum());
 
     taskService.deleteTask(task.getId());
-    managementService.deleteMetrics(null);
 
     // clean up
     HistoricTaskInstance hti = historyService.createHistoricTaskInstanceQuery().singleResult();
@@ -159,7 +144,6 @@ public class ActivityInstanceCountMetricsTest extends PluggableProcessEngineTest
         .name(Metrics.ACTIVTY_INSTANCE_START)
         .sum());
 
-    managementService.deleteMetrics(null);
   }
 
 }

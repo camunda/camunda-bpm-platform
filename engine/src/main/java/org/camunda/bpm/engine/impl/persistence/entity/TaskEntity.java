@@ -1203,9 +1203,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   public void executeMetrics(String metricsName) {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
     if(processEngineConfiguration.isMetricsEnabled()) {
-      processEngineConfiguration.getMetricsRegistry()
-        .getMeterByName(Metrics.ACTIVTY_INSTANCE_START)
-        .mark();
+      processEngineConfiguration.getMetricsRegistry().markOccurrence(Metrics.ACTIVTY_INSTANCE_START);
     }
   }
 

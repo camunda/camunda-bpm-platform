@@ -26,16 +26,7 @@ import org.camunda.bpm.model.bpmn.Bpmn;
  * @author Daniel Meyer
  *
  */
-public class MetricsTest extends PluggableProcessEngineTestCase {
-
-  @Override
-  protected void setUp() throws Exception {
-    Collection<Meter> meters = processEngineConfiguration.getMetricsRegistry().getMeters().values();
-    for (Meter meter : meters) {
-      meter.getAndClear();
-    }
-    managementService.deleteMetrics(null);
-  }
+public class MetricsTest extends AbstractMetricsTest {
 
   public void testDeleteMetrics() {
     deployment(Bpmn.createExecutableProcess("testProcess")
@@ -113,9 +104,6 @@ public class MetricsTest extends PluggableProcessEngineTestCase {
     assertEquals(3l, managementService.createMetricsQuery()
         .name(Metrics.ACTIVTY_INSTANCE_START)
         .sum());
-
-    // cleanup
-    managementService.deleteMetrics(null);
   }
 
   public void testReportNow() {
@@ -138,7 +126,6 @@ public class MetricsTest extends PluggableProcessEngineTestCase {
         .sum());
 
     // cleanup
-    managementService.deleteMetrics(null);
     processEngineConfiguration.setDbMetricsReporterActivate(false);
   }
 
@@ -204,9 +191,6 @@ public class MetricsTest extends PluggableProcessEngineTestCase {
     assertEquals(6l, managementService.createMetricsQuery().startDate(new Date(1000)).endDate(ClockUtil.getCurrentTime()).sum());
     assertEquals(0l, managementService.createMetricsQuery().startDate(new Date(ClockUtil.getCurrentTime().getTime() + 1000l)).sum());
     assertEquals(0l, managementService.createMetricsQuery().startDate(new Date(ClockUtil.getCurrentTime().getTime() + 1000l)).endDate(ClockUtil.getCurrentTime()).sum());
-
-    // cleanup
-    managementService.deleteMetrics(null);
   }
 
 }

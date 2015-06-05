@@ -19,9 +19,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.management.Metrics;
 
 /**
  *
@@ -57,7 +60,11 @@ public class AcquireJobsRunnable implements Runnable {
       int maxJobsPerAcquisition = jobExecutor.getMaxJobsPerAcquisition();
 
       try {
+        jobExecutor.logAcquisitionAttempt(jobExecutor.getProcessEngines().get(0));
         AcquiredJobs acquiredJobs = commandExecutor.execute(jobExecutor.getAcquireJobsCmd());
+
+        jobExecutor.logAcquiredJobs(jobExecutor.getProcessEngines().get(0), acquiredJobs.size());
+        jobExecutor.logAcquisitionFailureJobs(jobExecutor.getProcessEngines().get(0), acquiredJobs.getNumberOfJobsFailedToLock());
 
         for (List<String> jobIds : acquiredJobs.getJobIdBatches()) {
           jobExecutor.executeJobs(jobIds);

@@ -165,6 +165,10 @@ public class CommandContext {
     }
   }
 
+  public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
+    return processEngineConfiguration;
+  }
+
   protected ProcessApplicationReference getTargetProcessApplication(ExecutionEntity execution) {
     return ProcessApplicationContextUtil.getTargetProcessApplication(execution);
   }

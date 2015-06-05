@@ -1224,6 +1224,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void initDefaultMetrics(MetricsRegistry metricsRegistry) {
     metricsRegistry.createMeter(Metrics.ACTIVTY_INSTANCE_START);
+
+    metricsRegistry.createMeter(Metrics.JOB_ACQUISITION_ATTEMPT);
+    metricsRegistry.createMeter(Metrics.JOB_ACQUIRED_SUCCESS);
+    metricsRegistry.createMeter(Metrics.JOB_ACQUIRED_FAILURE);
+    metricsRegistry.createMeter(Metrics.JOB_SUCCESSFUL);
+    metricsRegistry.createMeter(Metrics.JOB_FAILED);
+    metricsRegistry.createMeter(Metrics.JOB_LOCKED_EXCLUSIVE);
   }
 
   protected void initSerialization() {

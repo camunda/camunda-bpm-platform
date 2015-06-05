@@ -19,18 +19,18 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 /**
  * @author Tom Baeyens
  */
-public class ControlledCommand implements Command<Object> {
+public class ControlledCommand<T> implements Command<T> {
 
   protected ControllableThread controllableThread;
-  protected Command<?> command;
+  protected Command<T> command;
 
-  public ControlledCommand(ControllableThread controllableThread, Command<?> command) {
+  public ControlledCommand(ControllableThread controllableThread, Command<T> command) {
     this.controllableThread = controllableThread;
     this.command = command;
   }
 
-  public Object execute(CommandContext commandContext) {
-    Object result = command.execute(commandContext);
+  public T execute(CommandContext commandContext) {
+    T result = command.execute(commandContext);
     controllableThread.returnControlToTestThreadAndWait();
     return result;
   }
