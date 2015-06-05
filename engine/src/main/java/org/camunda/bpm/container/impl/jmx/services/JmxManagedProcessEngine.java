@@ -73,4 +73,9 @@ public class JmxManagedProcessEngine implements PlatformService<ProcessEngine>, 
     managementService.unregisterDeploymentForJobExecutor(deploymentId);
   }
 
+  public void reportDbMetrics() {
+    ManagementService managementService = processEngine.getManagementService();
+    managementService.reportDbMetricsNow();
+  }
+
 }

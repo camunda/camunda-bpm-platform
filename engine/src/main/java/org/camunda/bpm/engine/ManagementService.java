@@ -801,4 +801,12 @@ public interface ManagementService {
    */
   void deleteMetrics(Date timestamp);
 
+  /**
+   * Forces this engine to commit its pending collected metrics to the database.
+   *
+   * @throws ProcessEngineException if metrics reporting is disabled or the db metrics
+   * reporter is deactivated
+   */
+  void reportDbMetricsNow();
+
 }

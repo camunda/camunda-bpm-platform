@@ -117,6 +117,30 @@ public class MetricsTest extends PluggableProcessEngineTestCase {
     managementService.deleteMetrics(null);
   }
 
+  public void testReportNow() {
+    // indicate that db metrics reporter is active (although it is not)
+    processEngineConfiguration.setDbMetricsReporterActivate(true);
+
+    // given
+    deployment(Bpmn.createExecutableProcess("testProcess")
+        .startEvent()
+        .manualTask()
+        .endEvent()
+      .done());
+    runtimeService.startProcessInstanceByKey("testProcess");
+
+    // when
+    managementService.reportDbMetricsNow();
+
+    // then the metrics have been reported
+    assertEquals(3l, managementService.createMetricsQuery()
+        .sum());
+
+    // cleanup
+    managementService.deleteMetrics(null);
+    processEngineConfiguration.setDbMetricsReporterActivate(false);
+  }
+
   public void testQuery() {
     deployment(Bpmn.createExecutableProcess("testProcess")
       .startEvent()

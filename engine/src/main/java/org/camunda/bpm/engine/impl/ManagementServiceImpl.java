@@ -36,6 +36,7 @@ import org.camunda.bpm.engine.impl.cmd.GetTableMetaDataCmd;
 import org.camunda.bpm.engine.impl.cmd.GetTableNameCmd;
 import org.camunda.bpm.engine.impl.cmd.RegisterDeploymentCmd;
 import org.camunda.bpm.engine.impl.cmd.RegisterProcessApplicationCmd;
+import org.camunda.bpm.engine.impl.cmd.ReportDbMetricsCmd;
 import org.camunda.bpm.engine.impl.cmd.SetJobDuedateCmd;
 import org.camunda.bpm.engine.impl.cmd.SetJobRetriesCmd;
 import org.camunda.bpm.engine.impl.cmd.SetPropertyCmd;
@@ -310,6 +311,10 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
 
   public void deleteMetrics(Date timestamp) {
     commandExecutor.execute(new DeleteMetricsCmd(timestamp));
+  }
+
+  public void reportDbMetricsNow() {
+    commandExecutor.execute(new ReportDbMetricsCmd());
   }
 
 }
