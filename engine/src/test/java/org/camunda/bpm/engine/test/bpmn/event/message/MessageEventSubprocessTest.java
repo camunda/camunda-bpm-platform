@@ -17,6 +17,9 @@ import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
 
 import java.util.List;
 
@@ -902,5 +905,27 @@ public class MessageEventSubprocessTest extends PluggableProcessEngineTestCase {
             .endScope()
           .endScope()
         .done());
+  }
+
+  @Deployment
+  public void testNonInterruptingWithTerminatingEndEvent() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    Task task = taskService.createTaskQuery().singleResult();
+    assertThat(task.getName(), is("Inner User Task"));
+    runtimeService.correlateMessage("message");
+
+    Task eventSubprocessTask = taskService.createTaskQuery().taskName("Event User Task").singleResult();
+    assertThat(eventSubprocessTask, is(notNullValue()));
+    taskService.complete(eventSubprocessTask.getId());
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+          .beginScope("SubProcess_1")
+            .activity("UserTask_1")
+           .endScope()
+         .endScope()
+        .done()
+        );
   }
 }
