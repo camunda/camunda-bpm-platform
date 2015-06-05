@@ -36,7 +36,7 @@ Given the following XML document as `String` or `InputStream`:
 It can directly be worked on with Spin:
 
 ```java
-import org.camunda.spin.Spin.*;
+import static org.camunda.spin.Spin.*;
 
 // get id of first customer
 XML( xmlInput ).childElements("customer")
