@@ -130,6 +130,8 @@ public class MetricsTest extends AbstractMetricsTest {
   }
 
   public void testReportNowIfMetricsIsDisabled() {
+    boolean defaultIsMetricsEnabled = processEngineConfiguration.isMetricsEnabled();
+
     // given
     processEngineConfiguration.setMetricsEnabled(false);
 
@@ -142,9 +144,16 @@ public class MetricsTest extends AbstractMetricsTest {
       // then an exception is thrown
       assertTextPresent("Metrics reporting is disabled", e.getMessage());
     }
+    finally {
+      // reset metrics setting
+      processEngineConfiguration.setMetricsEnabled(defaultIsMetricsEnabled);
+    }
   }
 
   public void testReportNowIfReporterIsNotActive() {
+    boolean defaultIsMetricsEnabled = processEngineConfiguration.isMetricsEnabled();
+    boolean defaultIsMetricsReporterActivate = processEngineConfiguration.isDbMetricsReporterActivate();
+
     // given
     processEngineConfiguration.setMetricsEnabled(true);
     processEngineConfiguration.setDbMetricsReporterActivate(false);
@@ -157,6 +166,10 @@ public class MetricsTest extends AbstractMetricsTest {
     catch (ProcessEngineException e) {
       // then an exception is thrown
       assertTextPresent("Metrics reporting to database is disabled", e.getMessage());
+    }
+    finally {
+      processEngineConfiguration.setMetricsEnabled(defaultIsMetricsEnabled);
+      processEngineConfiguration.setDbMetricsReporterActivate(defaultIsMetricsReporterActivate);
     }
   }
 
