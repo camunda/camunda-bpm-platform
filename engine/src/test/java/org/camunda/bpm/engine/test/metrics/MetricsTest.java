@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.metrics;
 import java.util.Collection;
 import java.util.Date;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -139,6 +140,37 @@ public class MetricsTest extends PluggableProcessEngineTestCase {
     // cleanup
     managementService.deleteMetrics(null);
     processEngineConfiguration.setDbMetricsReporterActivate(false);
+  }
+
+  public void testReportNowIfMetricsIsDisabled() {
+    // given
+    processEngineConfiguration.setMetricsEnabled(false);
+
+    try {
+      // when
+      managementService.reportDbMetricsNow();
+      fail("Exception expected");
+    }
+    catch (ProcessEngineException e) {
+      // then an exception is thrown
+      assertTextPresent("Metrics reporting is disabled", e.getMessage());
+    }
+  }
+
+  public void testReportNowIfReporterIsNotActive() {
+    // given
+    processEngineConfiguration.setMetricsEnabled(true);
+    processEngineConfiguration.setDbMetricsReporterActivate(false);
+
+    try {
+      // when
+      managementService.reportDbMetricsNow();
+      fail("Exception expected");
+    }
+    catch (ProcessEngineException e) {
+      // then an exception is thrown
+      assertTextPresent("Metrics reporting to database is disabled", e.getMessage());
+    }
   }
 
   public void testQuery() {

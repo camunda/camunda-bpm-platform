@@ -36,10 +36,10 @@ public class DbMetricsReporter {
   public DbMetricsReporter(MetricsRegistry metricsRegistry, CommandExecutor commandExecutor) {
     this.metricsRegistry = metricsRegistry;
     this.commandExecutor = commandExecutor;
-    initMetricsColletionTask();
+    initMetricsCollectionTask();
   }
 
-  protected void initMetricsColletionTask() {
+  protected void initMetricsCollectionTask() {
     metricsCollectionTask = new MetricsCollectionTask(metricsRegistry, commandExecutor);
   }
 
