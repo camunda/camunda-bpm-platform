@@ -13,6 +13,8 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.metrics.Meter;
@@ -64,8 +66,11 @@ public class MeterLogManager extends AbstractManager {
     getDbEntityManager().delete(MeterLogEntity.class, "deleteAllMeterLogEntries", null);
   }
 
-  public void deleteByTimestamp(Date timestamp) {
-    getDbEntityManager().delete(MeterLogEntity.class, "deleteMeterLogEntriesByTimestamp", timestamp);
+  public void deleteByTimestampAndReporter(Date timestamp, String reporter) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("timestamp", timestamp);
+    parameters.put("reporter", reporter);
+    getDbEntityManager().delete(MeterLogEntity.class, "deleteMeterLogEntriesByTimestampAndReporter", parameters);
   }
 
 }

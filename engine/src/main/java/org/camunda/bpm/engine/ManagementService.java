@@ -802,6 +802,17 @@ public interface ManagementService {
   void deleteMetrics(Date timestamp);
 
   /**
+   * Deletes all metrics events which are older than the specified timestamp
+   * and reported by the given reporter. If a parameter is null, all metric events
+   * are matched in that regard.
+   *
+   * @param timestamp or null
+   * @param reporter or null
+   * @since 7.4
+   */
+  void deleteMetrics(Date timestamp, String reporter);
+
+  /**
    * Forces this engine to commit its pending collected metrics to the database.
    *
    * @throws ProcessEngineException if metrics reporting is disabled or the db metrics

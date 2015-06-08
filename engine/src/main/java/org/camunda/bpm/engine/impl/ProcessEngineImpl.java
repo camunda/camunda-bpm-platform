@@ -34,6 +34,7 @@ import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.metrics.reporter.DbMetricsReporter;
 
 /**
  * @author Tom Baeyens
@@ -101,10 +102,16 @@ public class ProcessEngineImpl implements ProcessEngine {
       jobExecutor.registerProcessEngine(this);
     }
 
-    if(processEngineConfiguration.isMetricsEnabled()
-        && processEngineConfiguration.isDbMetricsReporterActivate()) {
-      processEngineConfiguration.getDbMetricsReporter().start();
+    if (processEngineConfiguration.isMetricsEnabled()) {
+      String reporterId = processEngineConfiguration.getMetricsReporterIdProvider().provideId(this);
+      DbMetricsReporter dbMetricsReporter = processEngineConfiguration.getDbMetricsReporter();
+      dbMetricsReporter.setReporterId(reporterId);
+
+      if(processEngineConfiguration.isDbMetricsReporterActivate()) {
+        dbMetricsReporter.start();
+      }
     }
+
   }
 
   protected void executeSchemaOperations() {

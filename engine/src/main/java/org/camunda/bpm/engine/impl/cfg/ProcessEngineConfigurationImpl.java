@@ -164,6 +164,8 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandl
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendJobDefinitionHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
+import org.camunda.bpm.engine.impl.metrics.MetricsReporterIdProvider;
+import org.camunda.bpm.engine.impl.metrics.SimpleIpBasedProvider;
 import org.camunda.bpm.engine.impl.metrics.parser.MetricsBpmnParseListener;
 import org.camunda.bpm.engine.impl.metrics.parser.MetricsCmmnTransformListener;
 import org.camunda.bpm.engine.impl.metrics.reporter.DbMetricsReporter;
@@ -461,6 +463,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected boolean isMetricsEnabled = true;
   protected boolean isDbMetricsReporterActivate = true;
+
+  protected MetricsReporterIdProvider metricsReporterIdProvider;
 
   // buildProcessEngine ///////////////////////////////////////////////////////
 
@@ -1209,6 +1213,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void initMetrics() {
     if(isMetricsEnabled) {
+
+      if (metricsReporterIdProvider == null) {
+        metricsReporterIdProvider = new SimpleIpBasedProvider();
+      }
 
       if(metricsRegistry == null) {
         metricsRegistry = new MetricsRegistry();
@@ -2601,4 +2609,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
+  public MetricsReporterIdProvider getMetricsReporterIdProvider() {
+    return metricsReporterIdProvider;
+  }
+
+  public void setMetricsReporterIdProvider(MetricsReporterIdProvider metricsReporterIdProvider) {
+    this.metricsReporterIdProvider = metricsReporterIdProvider;
+  }
 }

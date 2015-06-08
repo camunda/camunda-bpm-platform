@@ -31,10 +31,17 @@ public class MeterLogEntity implements DbEntity, Serializable {
 
   protected String name;
 
+  protected String reporter;
+
   protected long value;
 
   public MeterLogEntity(String name, long value, Date timestamp) {
+    this(name, null, value, timestamp);
+  }
+
+  public MeterLogEntity(String name, String reporter, long value, Date timestamp) {
     this.name = name;
+    this.reporter = reporter;
     this.value = value;
     this.timestamp = timestamp;
   }
@@ -72,6 +79,14 @@ public class MeterLogEntity implements DbEntity, Serializable {
 
   public void setValue(long value) {
     this.value = value;
+  }
+
+  public String getReporter() {
+    return reporter;
+  }
+
+  public void setReporter(String reporter) {
+    this.reporter = reporter;
   }
 
   public Object getPersistentState() {

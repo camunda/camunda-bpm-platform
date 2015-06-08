@@ -21,10 +21,11 @@
   <!-- METER INSERT -->
 
   <insert id="insertMeterLog" parameterType="org.camunda.bpm.engine.impl.persistence.entity.MeterLogEntity">
-    insert into ${prefix}ACT_RU_METER_LOG (ID_, NAME_, VALUE_, TIMESTAMP_)
+    insert into ${prefix}ACT_RU_METER_LOG (ID_, NAME_, REPORTER_, VALUE_, TIMESTAMP_)
     values (
       #{id ,jdbcType=VARCHAR},
       #{name ,jdbcType=VARCHAR},
+      #{reporter, jdbcType=VARCHAR},
       #{value ,jdbcType=BIGINT},
       #{timestamp ,jdbcType=TIMESTAMP}
     )
@@ -36,10 +37,17 @@
     delete from ${prefix}ACT_RU_METER_LOG
   </delete>
   
-  <delete id="deleteMeterLogEntriesByTimestamp" parameterType="java.util.Date">
+  <delete id="deleteMeterLogEntriesByTimestampAndReporter" parameterType="java.util.Map">
     delete from ${prefix}ACT_RU_METER_LOG
-    where
-        TIMESTAMP_ &lt;= #{parameter ,jdbcType=TIMESTAMP}
+    <where>
+      <if test="reporter != null">
+        and REPORTER_ = #{reporter, jdbcType=VARCHAR}
+      </if>
+      <if test="timestamp != null">
+        and TIMESTAMP_ &lt;= #{timestamp, jdbcType=TIMESTAMP}
+      </if>
+        
+    </where>
   </delete>
   
 
@@ -48,6 +56,7 @@
   <resultMap id="meterResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.MeterLogEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
+    <result property="reporter" column="REPORTER_" jdbcType="VARCHAR" />
     <result property="value" column="VALUE_" jdbcType="BIGINT" />
     <result property="timestamp" column="TIMESTAMP_" jdbcType="TIMESTAMP" />
   </resultMap>
@@ -64,6 +73,9 @@
     <where>
       <if test="name != null">
         and RES.NAME_ = #{name}
+      </if>
+      <if test="reporter != null">
+        and RES.REPORTER_ = #{reporter}
       </if>
       <if test="startDate != null">
         and RES.TIMESTAMP_ &gt;= #{startDate}

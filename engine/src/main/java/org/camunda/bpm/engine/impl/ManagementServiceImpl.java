@@ -310,11 +310,17 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
   }
 
   public void deleteMetrics(Date timestamp) {
-    commandExecutor.execute(new DeleteMetricsCmd(timestamp));
+    commandExecutor.execute(new DeleteMetricsCmd(timestamp, null));
+  }
+
+  public void deleteMetrics(Date timestamp, String reporter) {
+    commandExecutor.execute(new DeleteMetricsCmd(timestamp, reporter));
+
   }
 
   public void reportDbMetricsNow() {
     commandExecutor.execute(new ReportDbMetricsCmd());
   }
+
 
 }

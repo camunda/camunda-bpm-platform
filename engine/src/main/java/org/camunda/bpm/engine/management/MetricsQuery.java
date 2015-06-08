@@ -28,6 +28,11 @@ public interface MetricsQuery {
   MetricsQuery name(String name);
 
   /**
+   * Restrict to data collected by the reported with the given identifier
+   */
+  MetricsQuery reporter(String reporter);
+
+  /**
    * Restrict to data collected after the given date
    */
   MetricsQuery startDate(Date startTime);

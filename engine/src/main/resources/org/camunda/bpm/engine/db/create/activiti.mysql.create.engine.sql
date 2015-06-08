@@ -219,6 +219,7 @@ create table ACT_RU_FILTER (
 create table ACT_RU_METER_LOG (
   ID_ varchar(64) not null,
   NAME_ varchar(64) not null,
+  REPORTER_ varchar(255),
   VALUE_ bigint,
   TIMESTAMP_ timestamp not null,
   primary key (ID_)

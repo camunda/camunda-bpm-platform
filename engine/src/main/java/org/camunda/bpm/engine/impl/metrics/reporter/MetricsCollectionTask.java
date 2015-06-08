@@ -37,6 +37,7 @@ public class MetricsCollectionTask extends TimerTask {
 
   protected MetricsRegistry metricsRegistry;
   protected CommandExecutor commandExecutor;
+  protected String reporterId = null;
 
   public MetricsCollectionTask(MetricsRegistry metricsRegistry, CommandExecutor commandExecutor) {
     this.metricsRegistry = metricsRegistry;
@@ -61,8 +62,10 @@ public class MetricsCollectionTask extends TimerTask {
     final List<MeterLogEntity> logs = new ArrayList<MeterLogEntity>();
     for (Meter meter : metricsRegistry.getMeters().values()) {
       logs.add(new MeterLogEntity(meter.getName(),
+          reporterId,
           meter.getAndClear(),
           ClockUtil.getCurrentTime()));
+
     }
 
     commandExecutor.execute(new Command<Void>() {
@@ -75,5 +78,15 @@ public class MetricsCollectionTask extends TimerTask {
       }
     });
   }
+
+  public String getReporter() {
+    return reporterId;
+  }
+
+  public void setReporter(String reporterId) {
+    this.reporterId = reporterId;
+  }
+
+
 
 }

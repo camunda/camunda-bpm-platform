@@ -26,6 +26,7 @@ public class DbMetricsReporter {
 
   protected MetricsRegistry metricsRegistry;
   protected CommandExecutor commandExecutor;
+  protected String reporterId;
 
   // log every 15 minutes...
   protected long reportingIntervalInSeconds = 60 * 15;
@@ -90,6 +91,13 @@ public class DbMetricsReporter {
 
   public void setMetricsCollectionTask(MetricsCollectionTask metricsCollectionTask) {
     this.metricsCollectionTask = metricsCollectionTask;
+  }
+
+  public void setReporterId(String reporterId) {
+    this.reporterId = reporterId;
+    if (metricsCollectionTask != null) {
+      metricsCollectionTask.setReporter(reporterId);
+    }
   }
 
 }

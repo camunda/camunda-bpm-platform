@@ -27,20 +27,22 @@ public class DeleteMetricsCmd implements Command<Void>, Serializable {
   private static final long serialVersionUID = 1L;
 
   protected Date timestamp;
+  protected String reporter;
 
-  public DeleteMetricsCmd(Date timestamp) {
+  public DeleteMetricsCmd(Date timestamp, String reporter) {
     this.timestamp = timestamp;
+    this.reporter = reporter;
   }
 
   public Void execute(CommandContext commandContext) {
 
-    if(timestamp ==null) {
+    if(timestamp == null && reporter == null) {
       commandContext.getMeterLogManager()
        .deleteAll();
     }
     else {
       commandContext.getMeterLogManager()
-       .deleteByTimestamp(timestamp);
+       .deleteByTimestampAndReporter(timestamp, reporter);
     }
     return null;
   }

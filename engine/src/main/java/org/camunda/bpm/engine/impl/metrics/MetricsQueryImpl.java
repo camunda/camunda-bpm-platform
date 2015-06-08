@@ -32,6 +32,7 @@ public class MetricsQueryImpl implements Serializable, Command<Object>, MetricsQ
   private static final long serialVersionUID = 1L;
 
   protected String name;
+  protected String reporter;
   protected Date startDate;
   protected Date endDate;
   protected MetricsQueryType queryType;
@@ -45,6 +46,12 @@ public class MetricsQueryImpl implements Serializable, Command<Object>, MetricsQ
   public MetricsQueryImpl name(String name) {
     ensureNotNull("name", name);
     this.name = name;
+    return this;
+  }
+
+  public MetricsQuery reporter(String reporter) {
+    ensureNotNull("reporter", reporter);
+    this.reporter = reporter;
     return this;
   }
 
@@ -84,6 +91,10 @@ public class MetricsQueryImpl implements Serializable, Command<Object>, MetricsQ
 
   public String getName() {
     return name;
+  }
+
+  public String getReporter() {
+    return reporter;
   }
 
 }

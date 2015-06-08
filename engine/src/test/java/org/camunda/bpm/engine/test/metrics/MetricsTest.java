@@ -12,12 +12,9 @@
  */
 package org.camunda.bpm.engine.test.metrics;
 
-import java.util.Collection;
 import java.util.Date;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.metrics.Meter;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -106,6 +103,42 @@ public class MetricsTest extends AbstractMetricsTest {
         .sum());
   }
 
+  public void testDeleteMetricsWithReporterId() {
+    // indicate that db metrics reporter is active (although it is not)
+    processEngineConfiguration.setDbMetricsReporterActivate(true);
+
+    // given
+    deployment(Bpmn.createExecutableProcess("testProcess")
+        .startEvent()
+        .manualTask()
+        .endEvent()
+      .done());
+
+    processEngineConfiguration.getDbMetricsReporter().setReporterId("reporter1");
+    runtimeService.startProcessInstanceByKey("testProcess");
+    managementService.reportDbMetricsNow();
+
+    processEngineConfiguration.getDbMetricsReporter().setReporterId("reporter2");
+    runtimeService.startProcessInstanceByKey("testProcess");
+    managementService.reportDbMetricsNow();
+
+    assertEquals(3l, managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START).reporter("reporter1")
+        .sum());
+
+    // when the metrics for reporter1 are deleted
+    managementService.deleteMetrics(null, "reporter1");
+
+    // then
+    assertEquals(0l, managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START).reporter("reporter1")
+        .sum());
+    assertEquals(3l, managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START).reporter("reporter2")
+        .sum());
+
+    // cleanup
+    processEngineConfiguration.setDbMetricsReporterActivate(false);
+    processEngineConfiguration.getDbMetricsReporter().setReporterId(null);
+  }
+
   public void testReportNow() {
     // indicate that db metrics reporter is active (although it is not)
     processEngineConfiguration.setDbMetricsReporterActivate(true);
@@ -122,7 +155,7 @@ public class MetricsTest extends AbstractMetricsTest {
     managementService.reportDbMetricsNow();
 
     // then the metrics have been reported
-    assertEquals(3l, managementService.createMetricsQuery()
+    assertEquals(3l, managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START)
         .sum());
 
     // cleanup
@@ -204,6 +237,44 @@ public class MetricsTest extends AbstractMetricsTest {
     assertEquals(6l, managementService.createMetricsQuery().startDate(new Date(1000)).endDate(ClockUtil.getCurrentTime()).sum());
     assertEquals(0l, managementService.createMetricsQuery().startDate(new Date(ClockUtil.getCurrentTime().getTime() + 1000l)).sum());
     assertEquals(0l, managementService.createMetricsQuery().startDate(new Date(ClockUtil.getCurrentTime().getTime() + 1000l)).endDate(ClockUtil.getCurrentTime()).sum());
+  }
+
+  public void testReportWithReporterId() {
+    // indicate that db metrics reporter is active (although it is not)
+    processEngineConfiguration.setDbMetricsReporterActivate(true);
+
+    // given
+    deployment(Bpmn.createExecutableProcess("testProcess")
+        .startEvent()
+        .manualTask()
+        .endEvent()
+      .done());
+
+    // when
+    processEngineConfiguration.getDbMetricsReporter().setReporterId("reporter1");
+    runtimeService.startProcessInstanceByKey("testProcess");
+    managementService.reportDbMetricsNow();
+
+    // and
+    processEngineConfiguration.getDbMetricsReporter().setReporterId("reporter2");
+    runtimeService.startProcessInstanceByKey("testProcess");
+    managementService.reportDbMetricsNow();
+
+    // then the metrics have been reported
+    assertEquals(6l, managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START)
+        .sum());
+
+    // and are grouped by reporter
+    assertEquals(3l, managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START).reporter("reporter1")
+        .sum());
+    assertEquals(3l, managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START).reporter("reporter2")
+        .sum());
+    assertEquals(0l, managementService.createMetricsQuery().name(Metrics.ACTIVTY_INSTANCE_START).reporter("aNonExistingReporter")
+        .sum());
+
+    // cleanup
+    processEngineConfiguration.setDbMetricsReporterActivate(false);
+    processEngineConfiguration.getDbMetricsReporter().setReporterId(null);
   }
 
 }
