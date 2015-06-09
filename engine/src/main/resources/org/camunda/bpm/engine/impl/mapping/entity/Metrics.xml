@@ -81,7 +81,7 @@
         and RES.TIMESTAMP_ &gt;= #{startDate}
       </if>
       <if test="endDate != null">
-        and RES.TIMESTAMP_ &lt;= #{endDate}
+        and RES.TIMESTAMP_ &lt; #{endDate}
       </if>
     </where>
   </sql>

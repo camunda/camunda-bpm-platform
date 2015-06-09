@@ -33,12 +33,12 @@ public interface MetricsQuery {
   MetricsQuery reporter(String reporter);
 
   /**
-   * Restrict to data collected after the given date
+   * Restrict to data collected after the given date (inclusive)
    */
   MetricsQuery startDate(Date startTime);
 
   /**
-   * Restrict to data collected before the given date
+   * Restrict to data collected before the given date (exclusive)
    */
   MetricsQuery endDate(Date endTime);
 

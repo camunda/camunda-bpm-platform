@@ -239,6 +239,36 @@ public class MetricsTest extends AbstractMetricsTest {
     assertEquals(0l, managementService.createMetricsQuery().startDate(new Date(ClockUtil.getCurrentTime().getTime() + 1000l)).endDate(ClockUtil.getCurrentTime()).sum());
   }
 
+  public void testQueryEndDateExclusive() {
+    deployment(Bpmn.createExecutableProcess("testProcess")
+        .startEvent()
+        .manualTask()
+        .endEvent()
+      .done());
+
+    // given
+    // note: dates should be exact seconds due to missing milliseconds precision on
+    // older mysql versions
+    ClockUtil.setCurrentTime(new Date(0));
+    runtimeService.startProcessInstanceByKey("testProcess");
+    processEngineConfiguration.getDbMetricsReporter().reportNow();
+
+    ClockUtil.setCurrentTime(new Date(1000L));
+    runtimeService.startProcessInstanceByKey("testProcess");
+    processEngineConfiguration.getDbMetricsReporter().reportNow();
+
+    ClockUtil.setCurrentTime(new Date(2000L));
+    runtimeService.startProcessInstanceByKey("testProcess");
+    processEngineConfiguration.getDbMetricsReporter().reportNow();
+
+    // then Query#startDate is inclusive and Query#endDate is exclusive
+    assertEquals(9l, managementService.createMetricsQuery().sum());
+    assertEquals(9l, managementService.createMetricsQuery().startDate(new Date(0)).sum());
+    assertEquals(6l, managementService.createMetricsQuery().startDate(new Date(0)).endDate(new Date(2000L)).sum());
+    assertEquals(9l, managementService.createMetricsQuery().startDate(new Date(0)).endDate(new Date(3000L)).sum());
+
+  }
+
   public void testReportWithReporterId() {
     // indicate that db metrics reporter is active (although it is not)
     processEngineConfiguration.setDbMetricsReporterActivate(true);
