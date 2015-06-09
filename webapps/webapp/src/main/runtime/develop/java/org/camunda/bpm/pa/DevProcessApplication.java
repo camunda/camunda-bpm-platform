@@ -104,6 +104,11 @@ public class DevProcessApplication extends ServletProcessApplication {
     ClockUtil.setCurrentTime(createArtificalDate(10));
     runtimeService.startProcessInstanceByKey("FailingProcess");
 
+    runtimeService.startProcessInstanceByKey("FailingSubProcess");
+    ClockUtil.setCurrentTime(createArtificalDate(2));
+    runtimeService.startProcessInstanceByKey("FailingSubProcess");
+    ClockUtil.setCurrentTime(createArtificalDate(4));
+
     runtimeService.startProcessInstanceByKey("AnotherFailingProcess");
     ClockUtil.setCurrentTime(createArtificalDate(2));
     runtimeService.startProcessInstanceByKey("AnotherFailingProcess");
