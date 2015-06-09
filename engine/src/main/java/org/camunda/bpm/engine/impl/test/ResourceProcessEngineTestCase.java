@@ -25,8 +25,8 @@ public class ResourceProcessEngineTestCase extends AbstractProcessEngineTestCase
 
   protected String engineConfigurationResource;
 
-  public ResourceProcessEngineTestCase(String activitiConfigurationResource) {
-    this.engineConfigurationResource = activitiConfigurationResource;
+  public ResourceProcessEngineTestCase(String configurationResource) {
+    this.engineConfigurationResource = configurationResource;
   }
 
   @Override
