@@ -49,6 +49,28 @@ public class IoUtil {
   }
 
   /**
+   * Returns the {@link Reader} content as {@link String}.
+   *
+   * @param reader the {@link Reader}
+   */
+  public static String readerAsString(Reader reader) {
+    StringBuilder buffer = new StringBuilder();
+    char[] chars = new char[16 * 1024];
+    int numCharsRead;
+    try {
+      while ((numCharsRead = reader.read(chars, 0, chars.length)) != -1) {
+        buffer.append(chars, 0, numCharsRead);
+      }
+      return buffer.toString();
+    } catch (IOException e) {
+      throw LOG.unableToReadFromReader(e);
+    }
+    finally {
+      closeSilently(reader);
+    }
+  }
+
+  /**
    * Returns the {@link String} as {@link InputStream}.
    *
    * @param string the {@link String} to convert
