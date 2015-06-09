@@ -145,6 +145,14 @@ public class DemoDataGenerator {
       salesTasklistAuth.setResourceId("tasklist");
       salesTasklistAuth.setResource(APPLICATION);
       authorizationService.saveAuthorization(salesTasklistAuth);
+      
+      Authorization salesReadProcessDefinition = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+      salesReadProcessDefinition.setGroupId("sales");
+      salesReadProcessDefinition.addPermission(Permissions.READ);
+      salesReadProcessDefinition.addPermission(Permissions.READ_HISTORY);
+      salesReadProcessDefinition.setResource(Resources.PROCESS_DEFINITION);
+      salesReadProcessDefinition.setResourceId(ANY);
+      authorizationService.saveAuthorization(salesReadProcessDefinition);
 
       Authorization salesReadProcessDefinition = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
       salesReadProcessDefinition.setGroupId("sales");
@@ -161,6 +169,14 @@ public class DemoDataGenerator {
       accountingTasklistAuth.setResourceId("tasklist");
       accountingTasklistAuth.setResource(APPLICATION);
       authorizationService.saveAuthorization(accountingTasklistAuth);
+      
+      Authorization accountingReadProcessDefinition = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+      accountingReadProcessDefinition.setGroupId("accounting");
+      accountingReadProcessDefinition.addPermission(Permissions.READ);
+      accountingReadProcessDefinition.addPermission(Permissions.READ_HISTORY);
+      accountingReadProcessDefinition.setResource(Resources.PROCESS_DEFINITION);
+      accountingReadProcessDefinition.setResourceId(ANY);
+      authorizationService.saveAuthorization(accountingReadProcessDefinition);
 
       Authorization accountingReadProcessDefinition = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
       accountingReadProcessDefinition.setGroupId("accounting");
@@ -177,6 +193,14 @@ public class DemoDataGenerator {
       managementTasklistAuth.setResourceId("tasklist");
       managementTasklistAuth.setResource(APPLICATION);
       authorizationService.saveAuthorization(managementTasklistAuth);
+      
+      Authorization managementReadProcessDefinition = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+      managementReadProcessDefinition.setGroupId("management");
+      managementReadProcessDefinition.addPermission(Permissions.READ);
+      managementReadProcessDefinition.addPermission(Permissions.READ_HISTORY);
+      managementReadProcessDefinition.setResource(Resources.PROCESS_DEFINITION);
+      managementReadProcessDefinition.setResourceId(ANY);
+      authorizationService.saveAuthorization(managementReadProcessDefinition);
 
       Authorization managementReadProcessDefinition = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
       managementReadProcessDefinition.setGroupId("management");
