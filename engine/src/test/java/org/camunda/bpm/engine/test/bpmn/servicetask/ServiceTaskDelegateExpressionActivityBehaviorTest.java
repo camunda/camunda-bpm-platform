@@ -12,9 +12,14 @@
  */
 package org.camunda.bpm.engine.test.bpmn.servicetask;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.assertThat;
+
 import java.util.Collections;
 import java.util.Map;
 
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
@@ -26,17 +31,22 @@ import org.junit.Test;
 public class ServiceTaskDelegateExpressionActivityBehaviorTest extends PluggableProcessEngineTestCase {
 
   @Deployment
-  @Test(expected=ThrowExceptionServiceTask.ServiceTaskException.class)
-  public void testExceptionThrownBySecondServiceTaskIsNotHandled(){
+  @Test
+  public void testExceptionThrownBySecondScopeServiceTaskIsNotHandled() {
     Map<Object, Object> beans = processEngineConfiguration.getBeans();
     beans.put("dummyServiceTask", new DummyServiceTask());
-    beans.put("throwExceptionServiceTask", new ThrowExceptionServiceTask());
     processEngineConfiguration.setBeans(beans);
 
-    try{
-      runtimeService.startProcessInstanceByKey("process", Collections.<String, Object>singletonMap("count", 0));
+    try {
+      runtimeService.startProcessInstanceByKey("process", Collections.<String, Object> singletonMap("count", 0));
       fail();
-    } catch(ThrowExceptionServiceTask.ServiceTaskException e){}
+    } // since the NVE extends the ProcessEngineException we have to handle it
+      // separately
+    catch (NullValueException nve) {
+      fail("Shouldn't have received NullValueException");
+    } catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), containsString("Invalid format"));
+    }
   }
 
 }

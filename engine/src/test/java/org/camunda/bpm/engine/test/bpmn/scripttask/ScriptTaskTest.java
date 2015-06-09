@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.engine.test.bpmn.scripttask;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.assertThat;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -21,6 +24,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ScriptCompilationException;
 import org.camunda.bpm.engine.ScriptEvaluationException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -604,12 +608,16 @@ public class ScriptTaskTest extends PluggableProcessEngineTestCase {
 
   @org.camunda.bpm.engine.test.Deployment
   public void testPreviousTaskShouldNotHandleException(){
-    runtimeService.startProcessInstanceByKey("process");
-    Task task = taskService.createTaskQuery().singleResult();
     try {
-      taskService.complete(task.getId());
+      runtimeService.startProcessInstanceByKey("process");
       fail();
     }
-    catch (ScriptEvaluationException see){}
+    // since the NVE extends the ProcessEngineException we have to handle it
+    // separately
+    catch (NullValueException nve) {
+      fail("Shouldn't have received NullValueException");
+    } catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), containsString("Invalid format"));
+    }
   }
 }
