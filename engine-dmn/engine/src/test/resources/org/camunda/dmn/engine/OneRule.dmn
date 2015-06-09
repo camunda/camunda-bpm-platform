@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Definitions xmlns="http://www.omg.org/spec/DMN/20130901"
+             id="definitions"
+             name="camunda"
+             namespace="http://camunda.org/dmn">
+  <ItemDefinition id="itemDefinition1" name="InputType">
+    <typeDefinition>string</typeDefinition>
+  </ItemDefinition>
+  <ItemDefinition id="itemDefinition2" name="OutputType">
+    <typeDefinition>string</typeDefinition>
+  </ItemDefinition>
+  <Decision id="decision">
+    <DecisionTable id="decisionTable" isComplete="true" isConsistent="true">
+      <clause name="Input">
+        <inputExpression id="inputExpression1" name="input">
+          <itemDefinition href="#itemDefinition1" />
+        </inputExpression>
+        <inputEntry id="inputEntry1">
+          <text>ok</text>
+        </inputEntry>
+      </clause>
+      <clause name="Result">
+        <outputDefinition href="#itemDefinition1" />
+        <outputEntry id="outputEntry1">
+          <text>ok</text>
+        </outputEntry>
+      </clause>
+      <rule>
+        <condition>inputEntry1</condition>
+        <conclusion>outputEntry1</conclusion>
+      </rule>
+    </DecisionTable>
+  </Decision>
+</Definitions>

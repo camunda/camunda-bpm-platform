@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>camunda-scriptengine-dmn</artifactId>
-  <name>camunda DMN - scriptengine</name>
+  <name>camunda DMN - scriptengine DMN</name>
 
   <dependencies>
     <dependency>

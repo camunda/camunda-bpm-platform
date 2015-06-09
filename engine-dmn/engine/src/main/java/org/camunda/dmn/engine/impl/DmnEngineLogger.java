@@ -25,4 +25,16 @@ public class DmnEngineLogger extends DmnLogger {
     return new DmnEngineException(exceptionMessage("002", "Unable to find output component with name '{}'.", name));
   }
 
+  public DmnEngineException notConfigurationSetInContext() {
+    return new DmnEngineException(exceptionMessage("003", "No engine configuration set in decision context"));
+  }
+
+  public DmnEngineException notScriptEngineContextSetInContext() {
+    return new DmnEngineException(exceptionMessage("004", "No script engine context set in decision context"));
+  }
+
+  public DmnEngineException unableToFindScriptEngineForName(String name) {
+    return new DmnEngineException(exceptionMessage("005", "Unable to find script engine for name '{}'.", name));
+  }
+
 }

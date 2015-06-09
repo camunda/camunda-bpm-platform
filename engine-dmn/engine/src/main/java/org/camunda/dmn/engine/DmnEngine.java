@@ -19,6 +19,8 @@ import org.camunda.bpm.model.dmn.DmnModelInstance;
 
 public interface DmnEngine {
 
+  DmnEngineConfiguration getConfiguration();
+
   DmnDecision parseDecision(String filename);
 
   DmnDecision parseDecision(String filename, String decisionId);

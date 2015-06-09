@@ -13,28 +13,10 @@
 
 package org.camunda.dmn.engine;
 
-import java.util.Map;
+public interface DmnDecisionContextBuilder<T> {
 
-public interface DmnDecisionContext {
+  DmnDecisionContextBuilder addVariable(String name, Object value);
 
-  void setConfiguration(DmnEngineConfiguration configuration);
-
-  DmnEngineConfiguration getConfiguration();
-
-  DmnEngineConfiguration getConfigurationChecked();
-
-  void setScriptEngineContext(ScriptEngineContext scriptEngineContext);
-
-  ScriptEngineContext getScriptEngineContext();
-
-  ScriptEngineContext getScriptEngineContextChecked();
-
-  void addVariable(String name, Object value);
-
-  void setVariables(Map<String, Object> variables);
-
-  <T> T getVariable(String name);
-
-  Map<String, Object> getVariables();
+  T build();
 
 }

@@ -13,28 +13,14 @@
 
 package org.camunda.dmn.engine;
 
-import java.util.Map;
+import javax.script.ScriptEngine;
 
-public interface DmnDecisionContext {
+public interface ScriptEngineContext {
 
-  void setConfiguration(DmnEngineConfiguration configuration);
+  String getDefaultScriptingLanguage();
 
-  DmnEngineConfiguration getConfiguration();
+  ScriptEngine getDefaultScriptEngine();
 
-  DmnEngineConfiguration getConfigurationChecked();
-
-  void setScriptEngineContext(ScriptEngineContext scriptEngineContext);
-
-  ScriptEngineContext getScriptEngineContext();
-
-  ScriptEngineContext getScriptEngineContextChecked();
-
-  void addVariable(String name, Object value);
-
-  void setVariables(Map<String, Object> variables);
-
-  <T> T getVariable(String name);
-
-  Map<String, Object> getVariables();
+  ScriptEngine getScriptEngineForName(String name);
 
 }

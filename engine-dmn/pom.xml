@@ -15,8 +15,10 @@
   <modules>
     <module>bom</module>
     <module>engine</module>
-    <module>scriptengine</module>
+    <module>scriptengine-dmn</module>
+    <module>scriptengine-juel</module>
   </modules>
+
 
   <dependencyManagement>
     <dependencies>
@@ -24,7 +26,8 @@
       <dependency>
         <groupId>org.camunda.commons</groupId>
         <artifactId>camunda-commons-bom</artifactId>
-        <version>1.0.6</version>
+        <!-- TODO: use release version -->
+        <version>1.1.0-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>

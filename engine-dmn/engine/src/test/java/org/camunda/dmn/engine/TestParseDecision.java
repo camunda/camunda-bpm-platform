@@ -117,13 +117,6 @@ public class TestParseDecision {
 
     DmnResult result = decision.evaluate(null);
     assertThat(result).isNotNull();
-
-    assertThat(result.getOutputs())
-      .isNotEmpty()
-      .hasSize(1);
-
-    DmnOutput resultEntry = result.getOutputs().get(0);
-    assertThat(resultEntry).isNotNull();
   }
 
 }

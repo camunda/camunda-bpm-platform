@@ -22,5 +22,6 @@ public class DmnLogger extends BaseLogger {
 
  public static DmnEngineLogger ENGINE_LOGGER = createLogger(DmnEngineLogger.class, PROJECT_CODE, PROJECT_LOGGER, "01");
  public static DmnParseLogger PARSE_LOGGER = createLogger(DmnParseLogger.class, PROJECT_CODE, PROJECT_LOGGER, "02");
+ public static DmnExpressionLogger EXPRESSION_LOGGER = createLogger(DmnExpressionLogger.class, PROJECT_CODE, PROJECT_LOGGER, "03");
 
 }

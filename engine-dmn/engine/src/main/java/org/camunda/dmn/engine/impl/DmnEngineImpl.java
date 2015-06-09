@@ -22,6 +22,7 @@ import org.camunda.bpm.model.dmn.instance.Decision;
 import org.camunda.bpm.model.dmn.instance.DecisionTable;
 import org.camunda.bpm.model.dmn.instance.Expression;
 import org.camunda.commons.utils.IoUtil;
+import org.camunda.commons.utils.IoUtilException;
 import org.camunda.dmn.engine.DmnDecision;
 import org.camunda.dmn.engine.DmnEngine;
 import org.camunda.dmn.engine.DmnEngineConfiguration;
@@ -37,14 +38,28 @@ public class DmnEngineImpl implements DmnEngine {
     this.configuration = configuration;
   }
 
+  public DmnEngineConfiguration getConfiguration() {
+    return configuration;
+  }
+
   public DmnDecision parseDecision(String filename) {
     return parseDecision(filename, null);
   }
 
   public DmnDecision parseDecision(String filename, String decisionId) {
     this.filename = filename;
-    InputStream inputStream = IoUtil.fileAsStream(filename);
-    return parseDecision(inputStream, decisionId);
+    InputStream inputStream = null;
+
+    try {
+      inputStream = IoUtil.fileAsStream(filename);
+      return parseDecision(inputStream, decisionId);
+    }
+    catch (IoUtilException e) {
+      throw LOG.unableToParseDecisionFromFile(filename, decisionId, e);
+    }
+    finally {
+      IoUtil.closeSilently(inputStream);
+    }
   }
 
   public DmnDecision parseDecision(InputStream inputStream) {
@@ -62,7 +77,7 @@ public class DmnEngineImpl implements DmnEngine {
 
   public DmnDecision parseDecision(DmnModelInstance modelInstance, String decisionId) {
     Decision decision = null;
-    if (decisionId != null) {
+    if (decisionId != null && !decisionId.isEmpty()) {
       decision = modelInstance.getModelElementById(decisionId);
     }
     else {
@@ -83,7 +98,7 @@ public class DmnEngineImpl implements DmnEngine {
     Expression decisionExpression = decision.getExpression();
 
     if (decisionExpression instanceof DecisionTable) {
-      return new DmnDecisionTableDecision(decision);
+      return new DmnDecisionTable(this, decision);
     }
     else {
       throw LOG.decisionTypeNotSupported(decision);

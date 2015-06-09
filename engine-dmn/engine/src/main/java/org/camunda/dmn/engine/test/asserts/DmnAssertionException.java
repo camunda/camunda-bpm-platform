@@ -11,12 +11,16 @@
  * limitations under the License.
  */
 
-package org.camunda.dmn.engine;
+package org.camunda.dmn.engine.test.asserts;
 
-public interface DmnRule {
+public class DmnAssertionException extends RuntimeException {
 
-  boolean isApplicable(DmnDecisionContext context);
+  public DmnAssertionException(String message) {
+    super(message);
+  }
 
-  DmnOutput getOutput(DmnDecisionContext context);
+  public DmnAssertionException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
 }

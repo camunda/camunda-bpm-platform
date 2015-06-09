@@ -13,28 +13,14 @@
 
 package org.camunda.dmn.engine;
 
-import java.util.Map;
+public class DmnExpressionException extends DmnEngineException {
 
-public interface DmnDecisionContext {
+  public DmnExpressionException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
-  void setConfiguration(DmnEngineConfiguration configuration);
-
-  DmnEngineConfiguration getConfiguration();
-
-  DmnEngineConfiguration getConfigurationChecked();
-
-  void setScriptEngineContext(ScriptEngineContext scriptEngineContext);
-
-  ScriptEngineContext getScriptEngineContext();
-
-  ScriptEngineContext getScriptEngineContextChecked();
-
-  void addVariable(String name, Object value);
-
-  void setVariables(Map<String, Object> variables);
-
-  <T> T getVariable(String name);
-
-  Map<String, Object> getVariables();
+  public DmnExpressionException(String message) {
+    super(message);
+  }
 
 }

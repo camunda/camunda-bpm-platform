@@ -31,6 +31,12 @@
         <version>${project.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.camunda.dmn</groupId>
+        <artifactId>camunda-scriptengine-juel</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 

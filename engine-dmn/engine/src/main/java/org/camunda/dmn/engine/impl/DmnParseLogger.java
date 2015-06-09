@@ -21,10 +21,10 @@ public class DmnParseLogger extends DmnLogger {
   public DmnParseException unableToFindDecision(String decisionId, String filename) {
     String id = "001";
     String message;
-    if (decisionId != null && filename != null) {
+    if (decisionId != null && !decisionId.isEmpty() && filename != null) {
       message = exceptionMessage(id, "Unable to find decision '{}' in DMN model '{}'.", decisionId, filename);
     }
-    else if (decisionId != null) {
+    else if (decisionId != null && !decisionId.isEmpty()) {
       message = exceptionMessage(id, "Unable to find decision '{}' in DMN model.", decisionId);
 
     }
@@ -40,6 +40,16 @@ public class DmnParseLogger extends DmnLogger {
 
   public DmnParseException decisionTypeNotSupported(Decision decision) {
     return new DmnParseException(exceptionMessage("002", "The expression type of the decision '{}' is not supported.", decision.getId()));
+  }
+
+  public DmnParseException unableToParseDecisionFromFile(String filename, String decisionId, Throwable cause) {
+    String id = "003";
+    if (decisionId != null && !decisionId.isEmpty()) {
+      return new DmnParseException(exceptionMessage(id, "Unable to parse decision '{}' from file '{}'.", decisionId, filename), cause);
+    }
+    else {
+      return new DmnParseException(exceptionMessage(id, "Unable to parse decision from file '{}'.", filename), cause);
+    }
   }
 
 }

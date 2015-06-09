@@ -21,15 +21,19 @@ import org.camunda.bpm.model.dmn.instance.DecisionTable;
 import org.camunda.bpm.model.dmn.instance.Rule;
 import org.camunda.dmn.engine.DmnDecision;
 import org.camunda.dmn.engine.DmnDecisionContext;
+import org.camunda.dmn.engine.DmnEngine;
+import org.camunda.dmn.engine.DmnEngineConfiguration;
 import org.camunda.dmn.engine.DmnResult;
 import org.camunda.dmn.engine.DmnRule;
 
-public class DmnDecisionTableDecision implements DmnDecision {
+public class DmnDecisionTable implements DmnDecision {
 
+  protected DmnEngine engine;
   protected String id;
   protected List<DmnRule> rules = new ArrayList<DmnRule>();
 
-  public DmnDecisionTableDecision(Decision decision) {
+  public DmnDecisionTable(DmnEngine engine, Decision decision) {
+    this.engine = engine;
     id = decision.getId();
     DecisionTable decisionTable = (DecisionTable) decision.getExpression();
     for (Rule rule : decisionTable.getRules()) {
@@ -42,13 +46,21 @@ public class DmnDecisionTableDecision implements DmnDecision {
   }
 
   public DmnResult evaluate(DmnDecisionContext context) {
+    configureContext(context);
+
     DmnResult result = new DmnResultImpl();
     for (DmnRule rule : rules) {
       if (rule.isApplicable(context)) {
-        result.addOutput(new DmnOutputImpl());
+        result.addOutput(rule.getOutput(context));
       }
     }
     return result;
+  }
+
+  protected void configureContext(DmnDecisionContext context) {
+    DmnEngineConfiguration configuration = engine.getConfiguration();
+    context.setConfiguration(configuration);
+    context.setScriptEngineContext(new ScriptEngineContextImpl(configuration));
   }
 
 }

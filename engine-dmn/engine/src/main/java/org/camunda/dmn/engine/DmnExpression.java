@@ -15,6 +15,12 @@ package org.camunda.dmn.engine;
 
 public interface DmnExpression {
 
+  String getVariableName();
+
+  String getExpression();
+
+  String getExpressionLanguage();
+
   boolean isSatisfied(DmnDecisionContext context);
 
   <T> T evaluate(DmnDecisionContext context);

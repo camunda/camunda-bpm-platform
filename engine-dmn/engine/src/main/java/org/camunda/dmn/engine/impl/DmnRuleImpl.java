@@ -16,10 +16,14 @@ package org.camunda.dmn.engine.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.model.dmn.instance.Clause;
 import org.camunda.bpm.model.dmn.instance.Expression;
 import org.camunda.bpm.model.dmn.instance.Rule;
+import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.dmn.engine.DmnDecisionContext;
 import org.camunda.dmn.engine.DmnExpression;
+import org.camunda.dmn.engine.DmnOutput;
+import org.camunda.dmn.engine.DmnOutputComponent;
 import org.camunda.dmn.engine.DmnRule;
 
 public class DmnRuleImpl implements DmnRule {
@@ -34,7 +38,7 @@ public class DmnRuleImpl implements DmnRule {
 
   protected void parseConditions(Rule rule) {
     for (Expression condition : rule.getConditions()) {
-      conditions.add(new DmnExpressionImpl(condition));
+      conditions.add(new DmnInputExpressionImpl(condition));
     }
   }
 
@@ -54,4 +58,20 @@ public class DmnRuleImpl implements DmnRule {
     // if all conditions are satisfied the rule is applicable
     return true;
   }
+
+  public DmnOutput getOutput(DmnDecisionContext context) {
+    DmnOutputImpl output = new DmnOutputImpl();
+    for (DmnExpression conclusion : conclusions) {
+      DmnOutputComponent component = outputComponentForConclusion(conclusion, context);
+      output.addComponent(component);
+    }
+    return output;
+  }
+
+  protected DmnOutputComponent outputComponentForConclusion(DmnExpression conclusion, DmnDecisionContext context) {
+    String name = conclusion.getVariableName();
+    String value = conclusion.evaluate(context);
+    return new DmnOutputComponentImpl(name, value);
+  }
+
 }

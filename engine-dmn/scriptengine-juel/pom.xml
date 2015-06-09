@@ -8,8 +8,12 @@
     <version>7.4.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>camunda-engine-dmn</artifactId>
-  <name>camunda DMN - engine</name>
+  <artifactId>camunda-scriptengine-juel</artifactId>
+  <name>camunda DMN - scriptengine JUEL</name>
+
+  <properties>
+    <version.juel>2.2.7</version.juel>
+  </properties>
 
   <dependencies>
     <dependency>
@@ -18,25 +22,33 @@
     </dependency>
 
     <dependency>
-      <groupId>org.camunda.bpm.model</groupId>
-      <artifactId>camunda-dmn-model</artifactId>
+      <groupId>de.odysseus.juel</groupId>
+      <artifactId>juel-api</artifactId>
+      <version>${version.juel}</version>
     </dependency>
 
     <dependency>
-      <groupId>org.camunda.dmn</groupId>
-      <artifactId>camunda-scriptengine-juel</artifactId>
+      <groupId>de.odysseus.juel</groupId>
+      <artifactId>juel-impl</artifactId>
+      <version>${version.juel}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>de.odysseus.juel</groupId>
+      <artifactId>juel-spi</artifactId>
+      <version>${version.juel}</version>
     </dependency>
 
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <scope>provided</scope>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <scope>provided</scope>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
