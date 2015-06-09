@@ -35,4 +35,9 @@ public class IoUtilLogger extends UtilsLogger {
   public IoUtilException nullParameter(String parameter) {
     return new IoUtilException(exceptionMessage("003", "Parameter '{}' can not be null", parameter));
   }
+
+  public IoUtilException unableToReadFromReader(Throwable cause) {
+    return new IoUtilException(exceptionMessage("004", "Unable to read from reader"), cause);
+  }
+
 }

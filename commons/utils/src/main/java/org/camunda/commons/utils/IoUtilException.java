@@ -22,7 +22,7 @@ public class IoUtilException extends RuntimeException {
     super(message);
   }
 
-  public IoUtilException(String message, Exception cause) {
+  public IoUtilException(String message, Throwable cause) {
     super(message, cause);
   }
 
