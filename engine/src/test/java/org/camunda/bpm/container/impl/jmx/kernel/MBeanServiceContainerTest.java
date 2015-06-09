@@ -22,7 +22,7 @@ import org.camunda.bpm.container.impl.spi.PlatformService;
  * @author Daniel Meyer
  *
  */
-public class MBeanServiceContainerTests extends TestCase {
+public class MBeanServiceContainerTest extends TestCase {
 
   private MBeanServiceContainer serviceContainer;
 

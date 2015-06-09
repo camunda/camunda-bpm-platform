@@ -25,9 +25,9 @@ import org.junit.Test;
  * @author Daniel Meyer
  * 
  */
-public class TestSequentialJobAcquisition {
+public class SequentialJobAcquisitionTest {
   
-  private static final String RESOURCE_BASE = TestSequentialJobAcquisition.class.getPackage().getName().replace(".", "/");
+  private static final String RESOURCE_BASE = SequentialJobAcquisitionTest.class.getPackage().getName().replace(".", "/");
   private static final String PROCESS_RESOURCE = RESOURCE_BASE + "/IntermediateTimerEventTest.testCatchingTimerEvent.bpmn20.xml";
     
   private JobExecutor jobExecutor = new DefaultJobExecutor();

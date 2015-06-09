@@ -26,7 +26,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
  * @author Daniel Meyer
  *
  */
-public class DbDeadlockTests extends ConcurrencyTestCase {
+public class DbDeadlockTest extends ConcurrencyTestCase {
 
   private ThreadControl thread1;
   private ThreadControl thread2;
