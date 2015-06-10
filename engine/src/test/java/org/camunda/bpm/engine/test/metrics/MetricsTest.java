@@ -223,7 +223,8 @@ public class MetricsTest extends AbstractMetricsTest {
 
     assertEquals(3l, managementService.createMetricsQuery().sum());
     assertEquals(3l, managementService.createMetricsQuery().startDate(new Date(1000)).sum());
-    assertEquals(3l, managementService.createMetricsQuery().startDate(new Date(1000)).endDate(ClockUtil.getCurrentTime()).sum());
+    assertEquals(3l, managementService.createMetricsQuery().startDate(new Date(1000))
+        .endDate(new Date(ClockUtil.getCurrentTime().getTime() + 2000l)).sum()); // + 2000 for milliseconds imprecision on some databases (MySQL)
     assertEquals(0l, managementService.createMetricsQuery().startDate(new Date(ClockUtil.getCurrentTime().getTime() + 1000l)).sum());
     assertEquals(0l, managementService.createMetricsQuery().startDate(new Date(ClockUtil.getCurrentTime().getTime() + 1000l)).endDate(ClockUtil.getCurrentTime()).sum());
 
@@ -234,7 +235,7 @@ public class MetricsTest extends AbstractMetricsTest {
     // then (query assertions)
     assertEquals(6l, managementService.createMetricsQuery().sum());
     assertEquals(6l, managementService.createMetricsQuery().startDate(new Date(1000)).sum());
-    assertEquals(6l, managementService.createMetricsQuery().startDate(new Date(1000)).endDate(ClockUtil.getCurrentTime()).sum());
+    assertEquals(6l, managementService.createMetricsQuery().startDate(new Date(1000)).endDate(new Date(ClockUtil.getCurrentTime().getTime() + 2000l)).sum()); // + 2000 for milliseconds imprecision on some databases (MySQL)
     assertEquals(0l, managementService.createMetricsQuery().startDate(new Date(ClockUtil.getCurrentTime().getTime() + 1000l)).sum());
     assertEquals(0l, managementService.createMetricsQuery().startDate(new Date(ClockUtil.getCurrentTime().getTime() + 1000l)).endDate(ClockUtil.getCurrentTime()).sum());
   }
@@ -249,23 +250,24 @@ public class MetricsTest extends AbstractMetricsTest {
     // given
     // note: dates should be exact seconds due to missing milliseconds precision on
     // older mysql versions
-    ClockUtil.setCurrentTime(new Date(0));
+    // cannot insert 1970-01-01 00:00:00 into MySQL
+    ClockUtil.setCurrentTime(new Date(5000L));
     runtimeService.startProcessInstanceByKey("testProcess");
     processEngineConfiguration.getDbMetricsReporter().reportNow();
 
-    ClockUtil.setCurrentTime(new Date(1000L));
+    ClockUtil.setCurrentTime(new Date(6000L));
     runtimeService.startProcessInstanceByKey("testProcess");
     processEngineConfiguration.getDbMetricsReporter().reportNow();
 
-    ClockUtil.setCurrentTime(new Date(2000L));
+    ClockUtil.setCurrentTime(new Date(7000L));
     runtimeService.startProcessInstanceByKey("testProcess");
     processEngineConfiguration.getDbMetricsReporter().reportNow();
 
     // then Query#startDate is inclusive and Query#endDate is exclusive
     assertEquals(9l, managementService.createMetricsQuery().sum());
     assertEquals(9l, managementService.createMetricsQuery().startDate(new Date(0)).sum());
-    assertEquals(6l, managementService.createMetricsQuery().startDate(new Date(0)).endDate(new Date(2000L)).sum());
-    assertEquals(9l, managementService.createMetricsQuery().startDate(new Date(0)).endDate(new Date(3000L)).sum());
+    assertEquals(6l, managementService.createMetricsQuery().startDate(new Date(0)).endDate(new Date(7000L)).sum());
+    assertEquals(9l, managementService.createMetricsQuery().startDate(new Date(0)).endDate(new Date(8000L)).sum());
 
   }
 
