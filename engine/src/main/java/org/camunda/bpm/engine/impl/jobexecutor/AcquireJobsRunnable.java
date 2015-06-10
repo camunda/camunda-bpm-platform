@@ -20,11 +20,9 @@ import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.camunda.bpm.engine.management.Metrics;
 
 /**
  *
@@ -54,20 +52,22 @@ public class AcquireJobsRunnable implements Runnable {
       log.info(jobExecutor.getName() + " starting to acquire jobs");
     }
 
-    final CommandExecutor commandExecutor = jobExecutor.getCommandExecutor();
+    ProcessEngineImpl processEngine = jobExecutor.getProcessEngines().get(0);
+
+    final CommandExecutor commandExecutor = processEngine.getProcessEngineConfiguration().getCommandExecutorTxRequired();
 
     while (!isInterrupted) {
       int maxJobsPerAcquisition = jobExecutor.getMaxJobsPerAcquisition();
 
       try {
-        jobExecutor.logAcquisitionAttempt(jobExecutor.getProcessEngines().get(0));
+        jobExecutor.logAcquisitionAttempt(processEngine);
         AcquiredJobs acquiredJobs = commandExecutor.execute(jobExecutor.getAcquireJobsCmd());
 
-        jobExecutor.logAcquiredJobs(jobExecutor.getProcessEngines().get(0), acquiredJobs.size());
-        jobExecutor.logAcquisitionFailureJobs(jobExecutor.getProcessEngines().get(0), acquiredJobs.getNumberOfJobsFailedToLock());
+        jobExecutor.logAcquiredJobs(processEngine, acquiredJobs.size());
+        jobExecutor.logAcquisitionFailureJobs(processEngine, acquiredJobs.getNumberOfJobsFailedToLock());
 
         for (List<String> jobIds : acquiredJobs.getJobIdBatches()) {
-          jobExecutor.executeJobs(jobIds);
+          jobExecutor.executeJobs(jobIds, processEngine);
         }
 
         // if all jobs were executed
