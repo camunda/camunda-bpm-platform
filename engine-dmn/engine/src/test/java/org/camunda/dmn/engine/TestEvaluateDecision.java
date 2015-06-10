@@ -45,5 +45,40 @@ public class TestEvaluateDecision extends DmnDecisionTest {
       .hasEmptyResult();
   }
 
+  @Test
+  @DecisionResource(resource = EXAMPLE_DMN)
+  public void shouldEvaluateExample() {
+    assertThat(decision)
+      .withContext()
+        .addVariable("CustomerStatus", "bronze")
+        .addVariable("OrderSum", 200)
+        .build()
+      .hasResult("CheckResult", "notok")
+      .hasResult("Reason", "work on your status first, as bronze you're not going to get anything");
+
+    assertThat(decision)
+      .withContext()
+        .addVariable("CustomerStatus", "silver")
+        .addVariable("OrderSum", 200)
+        .build()
+      .hasResult("CheckResult", "ok")
+      .hasResult("Reason", "you little fish will get what you want");
+
+    assertThat(decision)
+      .withContext()
+        .addVariable("CustomerStatus", "silver")
+        .addVariable("OrderSum", 1200)
+        .build()
+      .hasResult("CheckResult", "notok")
+      .hasResult("Reason", "you took too much man, you took too much!");
+
+    assertThat(decision)
+      .withContext()
+        .addVariable("CustomerStatus", "gold")
+        .addVariable("OrderSum", 200)
+        .build()
+      .hasResult("CheckResult", "ok")
+      .hasResult("Reason", "you get anything you want");
+  }
 
 }

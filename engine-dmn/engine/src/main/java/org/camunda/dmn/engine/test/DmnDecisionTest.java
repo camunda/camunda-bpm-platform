@@ -24,6 +24,7 @@ public abstract class DmnDecisionTest {
 
   public static final String NO_INPUT_DMN = "org/camunda/dmn/engine/NoInput.dmn";
   public static final String ONE_RULE_DMN = "org/camunda/dmn/engine/OneRule.dmn";
+  public static final String EXAMPLE_DMN = "org/camunda/dmn/engine/Example.dmn";
 
   @Rule
   public DmnEngineRule dmnEngineRule = new DmnEngineRule();

@@ -87,12 +87,14 @@ public class DmnDecisionAssertion extends AbstractAssert<DmnDecisionAssertion, D
     return new DmnResultAssertion(result);
   }
 
-  public DmnResultAssertion hasResult(Object value) {
-    return hasResult().hasSingleOutput(value);
+  public DmnDecisionAssertion hasResult(Object value) {
+    hasResult().hasSingleOutput(value);
+    return this;
   }
 
-  public DmnResultAssertion hasResult(String name, Object value) {
-    return hasResult().hasSingleOutput(name, value);
+  public DmnDecisionAssertion hasResult(String name, Object value) {
+    hasResult().hasSingleOutput(name, value);
+    return this;
   }
 
   protected DmnResult evaluate() {
@@ -114,7 +116,7 @@ public class DmnDecisionAssertion extends AbstractAssert<DmnDecisionAssertion, D
       this.context = new DecisionContextImpl();
     }
 
-    public DmnDecisionContextBuilder addVariable(String name, Object value) {
+    public DmnDecisionContextBuilder<DmnDecisionAssertion> addVariable(String name, Object value) {
       context.addVariable(name, value);
       return this;
     }

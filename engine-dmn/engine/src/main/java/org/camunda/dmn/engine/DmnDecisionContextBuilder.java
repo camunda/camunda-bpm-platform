@@ -15,7 +15,7 @@ package org.camunda.dmn.engine;
 
 public interface DmnDecisionContextBuilder<T> {
 
-  DmnDecisionContextBuilder addVariable(String name, Object value);
+  DmnDecisionContextBuilder<T> addVariable(String name, Object value);
 
   T build();
 
