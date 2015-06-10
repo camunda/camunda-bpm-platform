@@ -21,11 +21,13 @@ import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManagerFactory;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.junit.Ignore;
 
 /**
  * @author Daniel Meyer
  *
  */
+@Ignore // remove after CAM-4060 is solved
 public class DbDeadlockTest extends ConcurrencyTestCase {
 
   private ThreadControl thread1;
