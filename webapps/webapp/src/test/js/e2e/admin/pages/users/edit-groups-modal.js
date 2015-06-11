@@ -13,11 +13,11 @@ module.exports = Page.extend({
   },
 
   selectGroup: function(idx) {
-    this.groupList().get(idx).element(by.model('group.checked')).click(); //css('.row-select')).click();
+    this.groupList().get(idx).element(by.model('group.checked')).click();
   },
 
   groupId: function(idx) {
-    return this.groupList().get(idx).element(by.css('.group-id')); //binding('{{group.id}}'));
+    return this.groupList().get(idx).element(by.css('.group-id'));
   },
 
   groupName: function(idx) {

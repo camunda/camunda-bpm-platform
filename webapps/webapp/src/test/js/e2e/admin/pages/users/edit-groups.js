@@ -20,6 +20,12 @@ module.exports = Page.extend({
     return this.groupList().get(idx).element(by.binding('{{group.id}}')).getText();
   },
 
+  addGroup: function() {
+    var theElement = element(by.css('.modal-header'));
+    this.addGroupButton().click();
+    this.waitForElementToBeVisible(theElement, 5000);
+  },
+
   addGroupButton: function() {
     return formElement.element(by.css('[ng-click="openCreateGroupMembershipDialog()"]'));
   },

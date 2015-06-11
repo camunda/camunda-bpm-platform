@@ -334,7 +334,7 @@ describe('Admin Users Spec', function() {
 
       // given
       usersPage.editUserGroups.navigateTo({ user: users[2].id });
-      usersPage.editUserGroups.addGroupButton().click();
+      usersPage.editUserGroups.addGroup();
 
 
       // when
