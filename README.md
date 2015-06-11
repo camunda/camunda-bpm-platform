@@ -129,3 +129,39 @@ There is a special profile for JBoss Application Server:
 
 * Domain mode: `mvn clean install -Pengine-integration,h2,jboss-domain`
 
+Limiting the number of engine unit tests
+----------
+Due to the fact that the number of unit tests in the camunda engine increases daily and that you might just want to test a certain subset of tests the maven-surefire-plugin is configured in a way that you can include/exclude certain packages in your tests.
+
+There are two properties that can be used for that: ``test.includes`` and ``test.excludes``
+
+When using the includes only the packages listed will be include and with excludes the other way around.
+For example calling Maven in the engine directory with
+```
+mvn clean test -Dtest.includes=bpmn
+```
+will test all packages that contain "bpmn". This will include e.g. ``*test.bpmn*`` and ``*api.bpmn*``. If you want to limit this further you have to get more concrete. Additionally, you can combine certain packages with a pipe:
+```
+mvn clean test -Dtest.includes=bpmn|cmmn
+```
+will execute all bpmn and cmmn tests.
+
+The same works for excludes. Also, you can combine both:
+```
+mvn clean test -Dtest.includes=bpmn -Dtest.excludes=bpmn.async
+```
+Please note that excludes take precedence over includes.
+
+To make it easier for you we created some profiles with predefined in- and excludes:
+- testBpmn
+- testCmmn
+- testBpmnCmmn
+- testExceptBpmn
+- testExceptCmmn
+- testExceptBpmnCmmn
+
+So simply call
+```
+mvn clean test -PtestExceptBpmn
+```
+and all the bpmn testcases won't bother you any longer.

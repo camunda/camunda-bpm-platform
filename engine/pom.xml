@@ -156,6 +156,9 @@
 
 
   <properties>
+      <test.includes></test.includes>
+      <!-- without a special test profile we don't want to exclude anything, this expressions should never match -->
+      <test.excludes>$.</test.excludes>
       <history.level>full</history.level>
       <mail.server.port>5025</mail.server.port>
 
@@ -213,10 +216,12 @@
           <failIfNoTests>false</failIfNoTests>
           <trimStackTrace>false</trimStackTrace>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
+          <includes>
+           <include>%regex[.*(${test.includes}).*Test.*.class]</include>
+          </includes>
           <excludes>
             <exclude>**/*TestCase.java</exclude>
-
-            <exclude>**/RepeatingServiceTaskTest.java</exclude>
+            <exclude>%regex[.*(${test.excludes}).*Test.*.class]</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -575,6 +580,43 @@
           </plugin>
         </plugins>
       </build>
+    </profile>
+    <!-- test profiles -->
+    <profile>
+     <id>testBpmn</id>
+     <properties>
+      <test.includes>bpmn</test.includes>
+     </properties>
+    </profile>
+    <profile>
+     <id>testCmmn</id>
+     <properties>
+      <test.includes>cmmn</test.includes>
+     </properties>
+    </profile>
+    <profile>
+     <id>testBpmnCmmn</id>
+     <properties>
+      <test.includes>bpmn|cmmn</test.includes>
+     </properties>
+    </profile>
+    <profile>
+     <id>testExceptBpmn</id>
+     <properties>
+      <test.excludes>bpmn</test.excludes>
+     </properties>
+    </profile>
+    <profile>
+     <id>testExceptCmmn</id>
+     <properties>
+      <test.excludes>cmmn</test.excludes>
+     </properties>
+    </profile>
+    <profile>
+     <id>testExceptBpmnCmmn</id>
+     <properties>
+      <test.excludes>bpmn|cmmn</test.excludes>
+     </properties>
     </profile>
 
   </profiles>
