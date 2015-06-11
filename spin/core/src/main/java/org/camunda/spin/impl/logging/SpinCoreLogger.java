@@ -22,8 +22,6 @@ import org.camunda.spin.spi.DataFormat;
 import org.camunda.spin.spi.DataFormatConfigurator;
 import org.camunda.spin.spi.DataFormatProvider;
 import org.camunda.spin.spi.SpinDataFormatException;
-import org.camunda.spin.xml.SpinXmlElement;
-import org.camunda.spin.xml.SpinXmlElementException;
 
 
 /**
@@ -53,14 +51,6 @@ public class SpinCoreLogger extends SpinLogger {
 
   public SpinDataFormatException unrecognizableDataFormatException() {
     return new SpinDataFormatException(exceptionMessage("004", "No matching data format detected"));
-  }
-
-  public SpinXmlElementException elementIsNotChildOfThisElement(SpinXmlElement existingChildElement, SpinXmlElement parentDomElement) {
-    return new SpinXmlElementException(exceptionMessage("005", "The element with namespace '{}' and name '{}' " +
-        "is not a child element of the element with namespace '{}' and name '{}'",
-      existingChildElement.namespace(), existingChildElement.name(),
-      parentDomElement.namespace(), parentDomElement.name()
-    ));
   }
 
   public SpinScriptException noScriptEnvFoundForLanguage(String scriptLanguage, String path) {

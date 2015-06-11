@@ -13,6 +13,8 @@
 
 package org.camunda.spin.xml.dom;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.camunda.spin.SpinList;
 import org.camunda.spin.impl.test.Script;
 import org.camunda.spin.impl.test.ScriptTest;
@@ -23,8 +25,6 @@ import org.camunda.spin.xml.SpinXmlAttribute;
 import org.camunda.spin.xml.SpinXmlElement;
 import org.junit.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
  * @author Sebastian Menski
  */
@@ -33,6 +33,97 @@ public abstract class XmlDomXPathScriptTest extends ScriptTest {
   private static final String xml = "<root><child id=\"child\"><a id=\"a\"/><b id=\"b\"/><a id=\"c\"/></child></root>";
   private static final String xmlWithNamespace = "<root xmlns:bar=\"http://camunda.org\" xmlns:foo=\"http://camunda.com\"><foo:child id=\"child\"><bar:a id=\"a\"/><foo:b id=\"b\"/><a id=\"c\"/></foo:child></root>";
   private static final String xmlWithDefaultNamespace = "<root xmlns=\"http://camunda.com/example\" xmlns:bar=\"http://camunda.org\" xmlns:foo=\"http://camunda.com\"><foo:child id=\"child\"><bar:a id=\"a\"/><foo:b id=\"b\"/><a id=\"c\"/></foo:child></root>";
+
+  @Test(expected = SpinXPathException.class)
+  @Script(
+      name = "XmlDomXPathScriptTest.xPath",
+      variables = {
+        @ScriptVariable(name = "input", value = xml),
+        @ScriptVariable(name = "expression", value = "/")
+      }
+    )
+  public void canNotQueryDocumentAsElement() {
+    SpinXPathQuery query = script.getVariable("query");
+    query.element();
+  }
+
+  @Test(expected = SpinXPathException.class)
+  @Script(
+      name = "XmlDomXPathScriptTest.xPath",
+      variables = {
+        @ScriptVariable(name = "input", value = xml),
+        @ScriptVariable(name = "expression", value = "/")
+      }
+    )
+  public void canNotQueryDocumentAsElementList() {
+    SpinXPathQuery query = script.getVariable("query");
+    query.elementList();
+  }
+
+  @Test(expected = SpinXPathException.class)
+  @Script(
+      name = "XmlDomXPathScriptTest.xPath",
+      variables = {
+        @ScriptVariable(name = "input", value = xml),
+        @ScriptVariable(name = "expression", value = "/")
+      }
+    )
+  public void canNotQueryDocumentAsAttribute() {
+    SpinXPathQuery query = script.getVariable("query");
+    query.attribute();
+  }
+
+  @Test(expected = SpinXPathException.class)
+  @Script(
+      name = "XmlDomXPathScriptTest.xPath",
+      variables = {
+        @ScriptVariable(name = "input", value = xml),
+        @ScriptVariable(name = "expression", value = "/")
+      }
+    )
+  public void canNotQueryDocumentAsAttributeList() {
+    SpinXPathQuery query = script.getVariable("query");
+    query.attributeList();
+  }
+
+  @Test(expected = SpinXPathException.class)
+  @Script(
+      name = "XmlDomXPathScriptTest.xPath",
+      variables = {
+        @ScriptVariable(name = "input", value = xml),
+        @ScriptVariable(name = "expression", value = "/")
+      }
+    )
+  public void canNotQueryDocumentAsString() {
+    SpinXPathQuery query = script.getVariable("query");
+    query.string();
+  }
+
+  @Test(expected = SpinXPathException.class)
+  @Script(
+      name = "XmlDomXPathScriptTest.xPath",
+      variables = {
+        @ScriptVariable(name = "input", value = xml),
+        @ScriptVariable(name = "expression", value = "/")
+      }
+    )
+  public void canNotQueryDocumentAsNumber() {
+    SpinXPathQuery query = script.getVariable("query");
+    query.number();
+  }
+
+  @Test(expected = SpinXPathException.class)
+  @Script(
+      name = "XmlDomXPathScriptTest.xPath",
+      variables = {
+        @ScriptVariable(name = "input", value = xml),
+        @ScriptVariable(name = "expression", value = "/")
+      }
+    )
+  public void canNotQueryDocumentAsBoolean() {
+    SpinXPathQuery query = script.getVariable("query");
+    query.bool();
+  }
 
   @Test
   @Script(
@@ -47,6 +138,19 @@ public abstract class XmlDomXPathScriptTest extends ScriptTest {
     SpinXmlElement child = query.element();
     assertThat(child.name()).isEqualTo("child");
     assertThat(child.attr("id").value()).isEqualTo("child");
+  }
+
+  @Test(expected = SpinXPathException.class)
+  @Script(
+      name = "XmlDomXPathScriptTest.xPath",
+      variables = {
+        @ScriptVariable(name = "input", value = xml),
+        @ScriptVariable(name = "expression", value = "/root/nonExisting")
+      }
+    )
+  public void canNotQueryElement() {
+    SpinXPathQuery query = script.getVariable("query");
+    query.element();
   }
 
   @Test(expected = SpinXPathException.class)
@@ -78,15 +182,15 @@ public abstract class XmlDomXPathScriptTest extends ScriptTest {
 
   @Test(expected = SpinXPathException.class)
   @Script(
-    name = "XmlDomXPathScriptTest.xPath",
-    variables = {
-      @ScriptVariable(name = "input", value = xml),
-      @ScriptVariable(name = "expression", value = "/root/child/@id")
-    }
-  )
-  public void canNotQueryAttributeAsElement() {
+      name = "XmlDomXPathScriptTest.xPath",
+      variables = {
+        @ScriptVariable(name = "input", value = xml),
+        @ScriptVariable(name = "expression", value = "/root/child/nonExisting")
+      }
+    )
+  public void canNotQueryElementList() {
     SpinXPathQuery query = script.getVariable("query");
-    query.element();
+    query.elementList();
   }
 
   @Test
@@ -103,6 +207,32 @@ public abstract class XmlDomXPathScriptTest extends ScriptTest {
     assertThat(attribute.value()).isEqualTo("child");
   }
 
+  @Test(expected = SpinXPathException.class)
+  @Script(
+      name = "XmlDomXPathScriptTest.xPath",
+      variables = {
+        @ScriptVariable(name = "input", value = xml),
+        @ScriptVariable(name = "expression", value = "/root/child/@nonExisting")
+      }
+    )
+  public void canNotQueryAttribute() {
+    SpinXPathQuery query = script.getVariable("query");
+    query.attribute();
+  }
+
+  @Test(expected = SpinXPathException.class)
+  @Script(
+    name = "XmlDomXPathScriptTest.xPath",
+    variables = {
+      @ScriptVariable(name = "input", value = xml),
+      @ScriptVariable(name = "expression", value = "/root/child/@id")
+    }
+  )
+  public void canNotQueryAttributeAsElement() {
+    SpinXPathQuery query = script.getVariable("query");
+    query.element();
+  }
+
   @Test
   @Script(
     name = "XmlDomXPathScriptTest.xPath",
@@ -115,6 +245,19 @@ public abstract class XmlDomXPathScriptTest extends ScriptTest {
     SpinXPathQuery query = script.getVariable("query");
     SpinList<SpinXmlAttribute> attributes = query.attributeList();
     assertThat(attributes).hasSize(2);
+  }
+
+  @Test(expected = SpinXPathException.class)
+  @Script(
+      name = "XmlDomXPathScriptTest.xPath",
+      variables = {
+        @ScriptVariable(name = "input", value = xml),
+        @ScriptVariable(name = "expression", value = "/root/child/a/@nonExisting")
+      }
+    )
+  public void canNotQueryAttributeList() {
+    SpinXPathQuery query = script.getVariable("query");
+    query.attributeList();
   }
 
   @Test
@@ -136,6 +279,34 @@ public abstract class XmlDomXPathScriptTest extends ScriptTest {
     name = "XmlDomXPathScriptTest.xPath",
     variables = {
       @ScriptVariable(name = "input", value = xml),
+      @ScriptVariable(name = "expression", value = "string(/root/child/@nonExisting)")
+    }
+  )
+  public void canQueryNonExistingString() {
+    SpinXPathQuery query = script.getVariable("query");
+    String value = query.string();
+    assertThat(value).isEqualTo("");
+  }
+
+  @Test
+  @Script(
+    name = "XmlDomXPathScriptTest.xPath",
+    variables = {
+      @ScriptVariable(name = "input", value = xml),
+      @ScriptVariable(name = "expression", value = "string(/)")
+    }
+  )
+  public void canQueryStringAsDocument() {
+    SpinXPathQuery query = script.getVariable("query");
+    String value = query.string();
+    assertThat(value).isEqualTo("");
+  }
+
+  @Test
+  @Script(
+    name = "XmlDomXPathScriptTest.xPath",
+    variables = {
+      @ScriptVariable(name = "input", value = xml),
       @ScriptVariable(name = "expression", value = "count(/root/child/a)")
     }
   )
@@ -143,6 +314,34 @@ public abstract class XmlDomXPathScriptTest extends ScriptTest {
     SpinXPathQuery query = script.getVariable("query");
     Double count = query.number();
     assertThat(count).isEqualTo(2);
+  }
+
+  @Test
+  @Script(
+    name = "XmlDomXPathScriptTest.xPath",
+    variables = {
+      @ScriptVariable(name = "input", value = xml),
+      @ScriptVariable(name = "expression", value = "count(/root/child/nonExisting)")
+    }
+  )
+  public void canQueryNonExistingNumber() {
+    SpinXPathQuery query = script.getVariable("query");
+    Double count = query.number();
+    assertThat(count).isEqualTo(0);
+  }
+
+  @Test
+  @Script(
+    name = "XmlDomXPathScriptTest.xPath",
+    variables = {
+      @ScriptVariable(name = "input", value = xml),
+      @ScriptVariable(name = "expression", value = "count(/)")
+    }
+  )
+  public void canQueryNumberAsDocument() {
+    SpinXPathQuery query = script.getVariable("query");
+    Double count = query.number();
+    assertThat(count).isEqualTo(1);
   }
 
   @Test
@@ -164,13 +363,27 @@ public abstract class XmlDomXPathScriptTest extends ScriptTest {
     name = "XmlDomXPathScriptTest.xPath",
     variables = {
       @ScriptVariable(name = "input", value = xml),
-      @ScriptVariable(name = "expression", value = "boolean(/root/not)")
+      @ScriptVariable(name = "expression", value = "boolean(/root/nonExisting)")
     }
   )
-  public void canQueryBoolean() {
+  public void canQueryNonExistingBoolean() {
     SpinXPathQuery query = script.getVariable("query");
     Boolean exists = query.bool();
     assertThat(exists).isFalse();
+  }
+
+  @Test
+  @Script(
+    name = "XmlDomXPathScriptTest.xPath",
+    variables = {
+      @ScriptVariable(name = "input", value = xml),
+      @ScriptVariable(name = "expression", value = "boolean(/)")
+    }
+  )
+  public void canQueryBooleanAsDocument() {
+    SpinXPathQuery query = script.getVariable("query");
+    Boolean exists = query.bool();
+    assertThat(exists).isTrue();
   }
 
   @Test

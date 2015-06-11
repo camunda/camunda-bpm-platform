@@ -13,18 +13,18 @@
 
 package org.camunda.spin.xml.dom;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.spin.Spin.S;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.camunda.spin.SpinList;
 import org.camunda.spin.xml.SpinXPathException;
 import org.camunda.spin.xml.SpinXmlAttribute;
 import org.camunda.spin.xml.SpinXmlElement;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.camunda.spin.Spin.S;
 
 /**
  * @author Sebastian Menski
@@ -42,6 +42,41 @@ public class XmlDomXPathTest {
     elementWithDefaultNamespace = S("<root xmlns=\"http://camunda.com/example\" xmlns:bar=\"http://camunda.org\" xmlns:foo=\"http://camunda.com\"><foo:child id=\"child\"><bar:a id=\"a\"/><foo:b id=\"b\"/><a id=\"c\"/></foo:child></root>");
   }
 
+  @Test(expected = SpinXPathException.class)
+  public void canNotQueryDocumentAsElement() {
+    element.xPath("/").element();
+  }
+
+  @Test(expected = SpinXPathException.class)
+  public void canNotQueryDocumentAsElementList() {
+    element.xPath("/").elementList();
+  }
+
+  @Test(expected = SpinXPathException.class)
+  public void canNotQueryDocumentAsAttribute() {
+    element.xPath("/").attribute();
+  }
+
+  @Test(expected = SpinXPathException.class)
+  public void canNotQueryDocumentAsAttributeList() {
+    element.xPath("/").attributeList();
+  }
+
+  @Test(expected = SpinXPathException.class)
+  public void canNotQueryDocumentAsString() {
+    element.xPath("/").string();
+  }
+
+  @Test(expected = SpinXPathException.class)
+  public void canNotQueryDocumentAsNumber() {
+    element.xPath("/").number();
+  }
+
+  @Test(expected = SpinXPathException.class)
+  public void canNotQueryDocumentAsBoolean() {
+    element.xPath("/").bool();
+  }
+
   @Test
   public void canQueryElement() {
     SpinXmlElement child = element.xPath("/root/child").element();
@@ -51,6 +86,11 @@ public class XmlDomXPathTest {
     SpinXmlElement b = child.xPath("b").element();
     assertThat(b.name()).isEqualTo("b");
     assertThat(b.attr("id").value()).isEqualTo("b");
+  }
+
+  @Test(expected = SpinXPathException.class)
+  public void canNotQueryElement() {
+    element.xPath("/root/nonExisting").element();
   }
 
   @Test(expected = SpinXPathException.class)
@@ -65,8 +105,8 @@ public class XmlDomXPathTest {
   }
 
   @Test(expected = SpinXPathException.class)
-  public void canNotQueryAttributeAsElement() {
-    element.xPath("/root/child/@id").element();
+  public void canNotQueryElementList() {
+    element.xPath("/root/child/nonExisting").elementList();
   }
 
   @Test
@@ -75,22 +115,53 @@ public class XmlDomXPathTest {
     assertThat(attribute.value()).isEqualTo("child");
   }
 
+  @Test(expected = SpinXPathException.class)
+  public void canNotQueryAttribute() {
+    element.xPath("/root/child/@nonExisting").attribute();
+  }
+
+  @Test(expected = SpinXPathException.class)
+  public void canNotQueryAttributeAsElement() {
+    element.xPath("/root/child/@id").element();
+  }
+
   @Test
   public void canQueryAttributeList() {
     SpinList<SpinXmlAttribute> attributes = element.xPath("/root/child/a/@id").attributeList();
     assertThat(attributes).hasSize(2);
   }
 
+  @Test(expected = SpinXPathException.class)
+  public void canNotQueryAttributeList() {
+    element.xPath("/root/child/a/@nonExisting").attributeList();
+  }
+
   @Test
   public void canQueryString() {
     String value = element.xPath("string(/root/child/@id)").string();
     assertThat(value).isEqualTo("child");
+
+    // can query not existing string
+    value = element.xPath("string(/root/child/@nonExisting)").string();
+    assertThat(value).isEqualTo("");
+
+    // can query string as document
+    value = element.xPath("string(/)").string();
+    assertThat(value).isEqualTo("");
   }
 
   @Test
   public void canQueryNumber() {
     Double count = element.xPath("count(/root/child/a)").number();
     assertThat(count).isEqualTo(2);
+
+    // can query not existing number
+    count = element.xPath("count(/root/child/nonExisting)").number();
+    assertThat(count).isEqualTo(0);
+
+    // can query number as document
+    count = element.xPath("count(/)").number();
+    assertThat(count).isEqualTo(1);
   }
 
   @Test
@@ -98,8 +169,13 @@ public class XmlDomXPathTest {
     Boolean exists = element.xPath("boolean(/root/child)").bool();
     assertThat(exists).isTrue();
 
-    exists = element.xPath("boolean(/root/not)").bool();
+    // can query not existing boolean
+    exists = element.xPath("boolean(/root/nonExisting)").bool();
     assertThat(exists).isFalse();
+
+    // can query boolean as document
+    exists = element.xPath("boolean(/)").bool();
+    assertThat(exists).isTrue();
   }
 
   @Test
