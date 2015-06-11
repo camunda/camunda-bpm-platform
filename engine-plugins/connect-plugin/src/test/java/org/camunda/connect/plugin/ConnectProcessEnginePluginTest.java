@@ -13,11 +13,10 @@
 
 package org.camunda.connect.plugin;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.hamcrest.CoreMatchers.containsString;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -209,4 +208,14 @@ public class ConnectProcessEnginePluginTest extends PluggableProcessEngineTestCa
       assertThat(re.getMessage(), containsString(exceptionMessage));
     }
   }
+
+  @Deployment
+  public void testFollowingExceptionIsNotHandledByConnector(){
+    try {
+      runtimeService.startProcessInstanceByKey("testProcess");
+    } catch(RuntimeException re){
+      assertThat(re.getMessage(), containsString("Invalid format"));
+    }
+  }
+
 }
