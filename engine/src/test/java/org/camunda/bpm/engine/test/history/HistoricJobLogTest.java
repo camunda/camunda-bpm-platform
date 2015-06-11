@@ -255,6 +255,25 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(MessageJobDeclaration.ASYNC_AFTER, historicJob.getJobDefinitionConfiguration());
   }
 
+  @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuationWithLongId.bpmn20.xml"})
+  public void testSuccessfulHistoricJobLogEntryStoredForLongActivityId() {
+    runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("fail", false));
+
+    Job job = managementService
+        .createJobQuery()
+        .singleResult();
+
+    managementService.executeJob(job.getId());
+
+    HistoricJobLog historicJob = historyService
+        .createHistoricJobLogQuery()
+        .successLog()
+        .singleResult();
+    assertNotNull(historicJob);
+    assertEquals("serviceTaskIdIsReallyLongAndItShouldBeMoreThan64CharsSoItWill" +
+        "BlowAnyActivityIdColumnWhereSizeIs64OrLessSoWeAlignItTo255LikeEverywhereElse", historicJob.getActivityId());
+  }
+
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testStartTimerEvent.bpmn20.xml"})
   public void testStartTimerEventJobHandlerType() {
     Job job = managementService

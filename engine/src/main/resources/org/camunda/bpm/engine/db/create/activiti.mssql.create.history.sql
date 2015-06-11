@@ -197,7 +197,7 @@ create table ACT_HI_JOB_LOG (
     JOB_DEF_ID_ nvarchar(64),
     JOB_DEF_TYPE_ nvarchar(255),
     JOB_DEF_CONFIGURATION_ nvarchar(255),
-    ACT_ID_ nvarchar(64),
+    ACT_ID_ nvarchar(255),
     EXECUTION_ID_ nvarchar(64),
     PROCESS_INSTANCE_ID_ nvarchar(64),
     PROCESS_DEF_ID_ nvarchar(64),
