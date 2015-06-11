@@ -14,7 +14,6 @@ package org.camunda.connect.plugin.impl;
 
 import java.util.concurrent.Callable;
 
-import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.impl.bpmn.behavior.TaskActivityBehavior;
 import org.camunda.bpm.engine.impl.core.variable.mapping.IoMapping;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
@@ -53,21 +52,14 @@ public class ServiceTaskConnectorActivityBehavior extends TaskActivityBehavior {
       @Override
       public Void call() throws Exception {
         ConnectorRequest<?> request = connectorInstance.createRequest();
-        try {
-          applyInputParameters(execution, request);
-          // execute the request and obtain a response:
-          ConnectorResponse response = request.execute();
-          applyOutputParameters(execution, response);
-        } catch(BpmnError bpmne){
-          propagateBpmnError(bpmne, execution);
-        } catch(Exception e) {
-          propagateExceptionAsError(e, execution);
-        }
-        leave(execution);
+        applyInputParameters(execution, request);
+        // execute the request and obtain a response:
+        ConnectorResponse response = request.execute();
+        applyOutputParameters(execution, response);
         return null;
       }
     });
-
+    leave(execution);
   }
 
   protected void applyInputParameters(ActivityExecution execution, ConnectorRequest<?> request) {
