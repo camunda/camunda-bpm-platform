@@ -21,13 +21,11 @@ import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManagerFactory;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.junit.Ignore;
 
 /**
  * @author Daniel Meyer
  *
  */
-@Ignore // remove after CAM-4060 is solved
 public class DbDeadlockTest extends ConcurrencyTestCase {
 
   private ThreadControl thread1;
@@ -84,8 +82,8 @@ public class DbDeadlockTest extends ConcurrencyTestCase {
     }
 
     public Void execute(CommandContext commandContext) {
-      final DbEntityManager dbEntityManger = commandContext.getDbEntityManager();
-      final DbEntityManagerFactory dbEntityManagerFactory = new DbEntityManagerFactory(Context.getProcessEngineConfiguration().getIdGenerator());
+      DbEntityManagerFactory dbEntityManagerFactory = new DbEntityManagerFactory(Context.getProcessEngineConfiguration().getIdGenerator());
+      DbEntityManager newEntityManager = dbEntityManagerFactory.openSession();
 
       HistoricProcessInstanceEventEntity hpi = new HistoricProcessInstanceEventEntity();
       hpi.setId(id);
@@ -93,13 +91,13 @@ public class DbDeadlockTest extends ConcurrencyTestCase {
       hpi.setProcessDefinitionId("someProcDefId");
       hpi.setStartTime(new Date());
 
-      dbEntityManger.insert(hpi);
-      dbEntityManger.flush();
+      newEntityManager.insert(hpi);
+      newEntityManager.flush();
 
       monitor.sync();
 
-      DbEntityManager dbEntityManager = dbEntityManagerFactory.openSession();
-      dbEntityManager.createHistoricProcessInstanceQuery().list();
+      DbEntityManager cmdEntityManager = commandContext.getDbEntityManager();
+      cmdEntityManager.createHistoricProcessInstanceQuery().list();
 
       monitor.sync();
 
