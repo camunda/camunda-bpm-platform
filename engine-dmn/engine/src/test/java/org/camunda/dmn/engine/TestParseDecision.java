@@ -21,7 +21,8 @@ import java.io.InputStream;
 import org.camunda.bpm.model.dmn.Dmn;
 import org.camunda.bpm.model.dmn.DmnModelInstance;
 import org.camunda.commons.utils.IoUtil;
-import org.camunda.dmn.engine.impl.DefaultDmnEngineConfiguration;
+import org.camunda.dmn.engine.context.DmnDecisionContext;
+import org.camunda.dmn.engine.impl.DmnEngineConfigurationImpl;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -35,7 +36,7 @@ public class TestParseDecision {
 
   @BeforeClass
   public static void createEngine() {
-    dmnEngine = new DefaultDmnEngineConfiguration().buildEngine();
+    dmnEngine = new DmnEngineConfigurationImpl().buildEngine();
   }
 
   @Test
@@ -79,7 +80,7 @@ public class TestParseDecision {
     }
     catch (DmnParseException e) {
       assertThat(e)
-        .hasMessageContaining("Unable to find decision")
+        .hasMessageContaining("Unable to find any decision")
         .hasMessageContaining("NoDecision.dmn");
     }
   }
@@ -99,24 +100,20 @@ public class TestParseDecision {
   }
 
   @Test
-  public void shouldFailIfDecisionTypeIsNotSupported() {
+  public void shouldFailIfNoSupportedDecisionIsFound() {
     try {
       dmnEngine.parseDecision(INVOCATION_DECISION_DMN);
-      fail("Exception expected");
     }
     catch (DmnParseException e) {
       assertThat(e)
-        .hasMessageContaining("expression type of the decision 'decision' is not supported.");
+        .hasMessageContaining("Unable to find any decision")
+        .hasMessageContaining("InvocationDecision.dmn");
     }
   }
 
   protected void assertDecision(DmnDecision decision) {
     assertThat(decision).isNotNull();
-
     assertThat(decision.getId()).isEqualTo("decision");
-
-    DmnResult result = decision.evaluate(null);
-    assertThat(result).isNotNull();
   }
 
 }

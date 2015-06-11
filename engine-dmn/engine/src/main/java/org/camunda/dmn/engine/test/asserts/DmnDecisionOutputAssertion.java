@@ -14,28 +14,28 @@
 package org.camunda.dmn.engine.test.asserts;
 
 import org.assertj.core.api.AbstractAssert;
+import org.camunda.dmn.engine.DmnDecisionOutput;
 import org.camunda.dmn.engine.DmnEngineException;
-import org.camunda.dmn.engine.DmnOutput;
 
-public class DmnOutputAssertion extends AbstractAssert<DmnOutputAssertion, DmnOutput> {
+public class DmnDecisionOutputAssertion extends AbstractAssert<DmnDecisionOutputAssertion, DmnDecisionOutput> {
 
-  public DmnOutputAssertion(DmnOutput actual) {
-    super(actual, DmnOutputAssertion.class);
+  public DmnDecisionOutputAssertion(DmnDecisionOutput actual) {
+    super(actual, DmnDecisionOutputAssertion.class);
   }
 
-  public DmnOutputAssertion hasSingleValue() {
+  public DmnDecisionOutputAssertion hasSingleEntry() {
     isNotNull();
 
-    int componentsCount = actual.getComponents().size();
-    if (componentsCount != 1) {
-      failWithMessage("Expected output to have exact one component but has <%s>", componentsCount);
+    int entriesCount = actual.getEntries().size();
+    if (entriesCount != 1) {
+      failWithMessage("Expected output to have exact one entry but has <%s>", entriesCount);
     }
 
     return this;
   }
 
-  public DmnOutputAssertion hasSingleValue(Object expectedValue) {
-    hasSingleValue();
+  public DmnDecisionOutputAssertion hasSingleEntry(Object expectedValue) {
+    hasSingleEntry();
 
     Object actualValue = actual.getValue();
 
@@ -49,17 +49,17 @@ public class DmnOutputAssertion extends AbstractAssert<DmnOutputAssertion, DmnOu
     return this;
   }
 
-  public DmnOutputAssertion hasSingleValue(String name, Object expectedValue) {
+  public DmnDecisionOutputAssertion hasSingleEntry(String name, Object expectedValue) {
+    isNotNull();
+    hasSingleEntry();
+
+    return hasEntry(name, expectedValue);
+  }
+
+  public DmnDecisionOutputAssertion hasEntry(String name, Object expectedValue) {
     isNotNull();
 
-    Object actualValue = null;
-
-    try {
-      actualValue = actual.getValue(name);
-    }
-    catch (DmnEngineException e) {
-      failWithMessage("Expected result to have an output with name <%s> but has not", name);
-    }
+    Object actualValue = actual.getValue(name);
 
     if (actualValue == null && expectedValue != null) {
       failWithMessage("Expected output value to be <%s> but was null", expectedValue);
@@ -70,6 +70,5 @@ public class DmnOutputAssertion extends AbstractAssert<DmnOutputAssertion, DmnOu
 
     return this;
   }
-
 
 }

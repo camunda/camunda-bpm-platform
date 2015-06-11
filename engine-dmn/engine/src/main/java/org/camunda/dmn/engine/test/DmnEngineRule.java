@@ -13,11 +13,10 @@
 
 package org.camunda.dmn.engine.test;
 
-import org.camunda.bpm.model.dmn.Dmn;
 import org.camunda.dmn.engine.DmnDecision;
 import org.camunda.dmn.engine.DmnEngine;
 import org.camunda.dmn.engine.DmnEngineConfiguration;
-import org.camunda.dmn.engine.impl.DefaultDmnEngineConfiguration;
+import org.camunda.dmn.engine.impl.DmnEngineConfigurationImpl;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
@@ -30,7 +29,7 @@ public class DmnEngineRule extends TestWatcher {
   protected DmnDecision decision;
 
   public DmnEngineRule() {
-    this(new DefaultDmnEngineConfiguration());
+    this(new DmnEngineConfigurationImpl());
   }
 
   public DmnEngineRule(DmnEngineConfiguration configuration) {
@@ -61,7 +60,12 @@ public class DmnEngineRule extends TestWatcher {
 
       String decisionId = decisionResource.decisionId();
 
-      return engine.parseDecision(resourcePath, decisionId);
+      if (decisionId == null || decisionId.isEmpty()) {
+        return engine.parseDecision(resourcePath);
+      }
+      else {
+        return engine.parseDecision(resourcePath, decisionId);
+      }
     }
     else {
       return null;

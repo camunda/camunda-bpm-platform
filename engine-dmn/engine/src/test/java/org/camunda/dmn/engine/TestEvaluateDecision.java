@@ -24,23 +24,26 @@ public class TestEvaluateDecision extends DmnDecisionTest {
   @Test
   @DecisionResource(resource = NO_INPUT_DMN)
   public void shouldEvaluateRuleWithoutInput() {
-    assertThat(decision)
-      .hasResult()
-      .hasSingleOutput("ok");
+    assertThat(engine)
+      .evaluates(decision)
+      .hasResult("ok");
   }
 
   @Test
   @DecisionResource(resource = ONE_RULE_DMN)
   public void shouldEvaluateSingleRule() {
-    assertThat(decision)
+    assertThat(engine)
+      .evaluates(decision)
       .withContext("Input", "ok")
       .hasResult("ok");
 
-    assertThat(decision)
+    assertThat(engine)
+      .evaluates(decision)
       .withContext("Input", "ok")
       .hasResult("Result", "ok");
 
-    assertThat(decision)
+    assertThat(engine)
+      .evaluates(decision)
       .withContext("Input", "notok")
       .hasEmptyResult();
   }
@@ -48,37 +51,49 @@ public class TestEvaluateDecision extends DmnDecisionTest {
   @Test
   @DecisionResource(resource = EXAMPLE_DMN)
   public void shouldEvaluateExample() {
-    assertThat(decision)
+    assertThat(engine)
+      .evaluates(decision)
       .withContext()
-        .addVariable("CustomerStatus", "bronze")
-        .addVariable("OrderSum", 200)
+        .setVariable("CustomerStatus", "bronze")
+        .setVariable("OrderSum", 200)
         .build()
-      .hasResult("CheckResult", "notok")
-      .hasResult("Reason", "work on your status first, as bronze you're not going to get anything");
+      .hasResult()
+        .hasSingleOutput()
+          .hasEntry("CheckResult", "notok")
+          .hasEntry("Reason", "work on your status first, as bronze you're not going to get anything");
 
-    assertThat(decision)
+    assertThat(engine)
+      .evaluates(decision)
       .withContext()
-        .addVariable("CustomerStatus", "silver")
-        .addVariable("OrderSum", 200)
+        .setVariable("CustomerStatus", "silver")
+        .setVariable("OrderSum", 200)
         .build()
-      .hasResult("CheckResult", "ok")
-      .hasResult("Reason", "you little fish will get what you want");
+      .hasResult()
+        .hasSingleOutput()
+          .hasEntry("CheckResult", "ok")
+          .hasEntry("Reason", "you little fish will get what you want");
 
-    assertThat(decision)
+    assertThat(engine)
+      .evaluates(decision)
       .withContext()
-        .addVariable("CustomerStatus", "silver")
-        .addVariable("OrderSum", 1200)
+        .setVariable("CustomerStatus", "silver")
+        .setVariable("OrderSum", 1200)
         .build()
-      .hasResult("CheckResult", "notok")
-      .hasResult("Reason", "you took too much man, you took too much!");
+      .hasResult()
+        .hasSingleOutput()
+          .hasEntry("CheckResult", "notok")
+          .hasEntry("Reason", "you took too much man, you took too much!");
 
-    assertThat(decision)
+    assertThat(engine)
+      .evaluates(decision)
       .withContext()
-        .addVariable("CustomerStatus", "gold")
-        .addVariable("OrderSum", 200)
+        .setVariable("CustomerStatus", "gold")
+        .setVariable("OrderSum", 200)
         .build()
-      .hasResult("CheckResult", "ok")
-      .hasResult("Reason", "you get anything you want");
+      .hasResult()
+        .hasSingleOutput()
+          .hasEntry("CheckResult", "ok")
+          .hasEntry("Reason", "you get anything you want");
   }
 
 }

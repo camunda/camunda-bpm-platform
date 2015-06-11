@@ -11,25 +11,28 @@
  * limitations under the License.
  */
 
-package org.camunda.dmn.engine.test.asserts;
+package org.camunda.dmn.engine.impl;
 
-import org.assertj.core.api.Assertions;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.camunda.dmn.engine.DmnDecisionOutput;
 import org.camunda.dmn.engine.DmnDecisionResult;
-import org.camunda.dmn.engine.DmnEngine;
 
-public class DmnAssertions extends Assertions {
+public class DmnDecisionResultImpl implements DmnDecisionResult {
 
-  public static DmnEngineAssertion assertThat(DmnEngine engine) {
-    return new DmnEngineAssertion(engine);
+  protected List<DmnDecisionOutput> outputs = new ArrayList<DmnDecisionOutput>();
+
+  public void setOutputs(List<DmnDecisionOutput> outputs) {
+    this.outputs = outputs;
   }
 
-  public static DmnDecisionResultAssertion assertThat(DmnDecisionResult result) {
-    return new DmnDecisionResultAssertion(result);
+  public List<DmnDecisionOutput> getOutputs() {
+    return outputs;
   }
 
-  public static DmnDecisionOutputAssertion assertThat(DmnDecisionOutput output) {
-    return new DmnDecisionOutputAssertion(output);
+  public void addOutput(DmnDecisionOutput decisionOutput) {
+    outputs.add(decisionOutput);
   }
 
 }
