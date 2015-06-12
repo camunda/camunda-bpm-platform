@@ -27,6 +27,9 @@ public final class DmnModelConstants {
   /** The location of the FEEL schema. */
   public static final String FEEL_SCHEMA_LOCATION = "FEEL.xsd";
 
+  /** Camunda namespace */
+  public static final String CAMUNDA_NS = "http://camunda.org/schema/1.0/dmn";
+
   /** DMN element */
 
   public static final String DMN_ELEMENT = "DMNElement";
