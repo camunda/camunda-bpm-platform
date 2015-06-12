@@ -444,6 +444,7 @@
                 <exclude>**/ProcessInstantiationAtActivitiesHistoryTest.java</exclude>
                 <exclude>**/UserOperationLogAuthorizationTest.java</exclude>
                 <exclude>**/Historic*AuthorizationTest.java</exclude>
+                <exclude>**/DbDeadlockTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
