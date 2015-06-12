@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.variable.type;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.camunda.bpm.engine.impl.core.variable.type.FileValueTypeImpl;
 import org.camunda.bpm.engine.impl.core.variable.type.ObjectTypeImpl;
 import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.BooleanTypeImpl;
 import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.BytesTypeImpl;
@@ -23,9 +24,9 @@ import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.Dou
 import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.IntegerTypeImpl;
 import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.LongTypeImpl;
 import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.NullTypeImpl;
+import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.NumberTypeImpl;
 import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.ShortTypeImpl;
 import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.StringTypeImpl;
-import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.NumberTypeImpl;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
@@ -58,6 +59,8 @@ public interface ValueType extends Serializable {
   public static final PrimitiveValueType NUMBER = new NumberTypeImpl();
 
   public static final SerializableValueType OBJECT = new ObjectTypeImpl();
+
+  public static final FileValueType FILE = new FileValueTypeImpl();
 
   /**
    * Returns the name of the variable type

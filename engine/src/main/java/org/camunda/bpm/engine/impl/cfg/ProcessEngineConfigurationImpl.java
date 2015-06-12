@@ -222,6 +222,7 @@ import org.camunda.bpm.engine.impl.variable.serializer.ByteArrayValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.DateValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.DefaultVariableSerializers;
 import org.camunda.bpm.engine.impl.variable.serializer.DoubleValueSerializer;
+import org.camunda.bpm.engine.impl.variable.serializer.FileValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.IntegerValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.JavaObjectSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.LongValueSerlializer;
@@ -1262,6 +1263,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       variableSerializers.addSerializer(new DoubleValueSerializer());
       variableSerializers.addSerializer(new ByteArrayValueSerializer());
       variableSerializers.addSerializer(new JavaObjectSerializer());
+      variableSerializers.addSerializer(new FileValueSerializer());
 
       if (customPostVariableSerializers!=null) {
         for (TypedValueSerializer<?> customVariableType: customPostVariableSerializers) {

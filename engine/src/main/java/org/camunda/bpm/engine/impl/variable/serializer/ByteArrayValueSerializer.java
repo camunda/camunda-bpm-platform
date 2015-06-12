@@ -12,11 +12,17 @@
  */
 package org.camunda.bpm.engine.impl.variable.serializer;
 
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.core.variable.value.UntypedValueImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.BytesValue;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * @author Tom Baeyens
@@ -29,20 +35,52 @@ public class ByteArrayValueSerializer extends PrimitiveValueSerializer<BytesValu
   }
 
   public BytesValue convertToTypedValue(UntypedValueImpl untypedValue) {
-    return Variables.byteArrayValue( (byte[]) untypedValue.getValue() );
+    Object value = untypedValue.getValue();
+    if (value instanceof byte[]) {
+      return Variables.byteArrayValue((byte[]) value);
+    } else {
+      byte[] data = readBytesFromStream((InputStream) value);
+      return Variables.byteArrayValue(data);
+    }
+  }
+
+  private byte[] readBytesFromStream(InputStream value) {
+    DataInputStream dis = null;
+    byte[] data;
+    try {
+      data = new byte[value.available()];
+      dis = new DataInputStream(value);
+      dis.readFully(data);
+      return data;
+    } catch (IOException e) {
+      throw new ProcessEngineException(e);
+    } finally {
+      try {
+        if (dis != null) {
+          dis.close();
+        }
+      } catch (IOException e) {
+        throw new ProcessEngineException(e);
+      }
+    }
   }
 
   public BytesValue readValue(ValueFields valueFields) {
-    return Variables.byteArrayValue( getBytes(valueFields) );
+    return Variables.byteArrayValue(getBytes(valueFields));
   }
 
   public void writeValue(BytesValue variableValue, ValueFields valueFields) {
     setBytes(valueFields, variableValue.getValue());
   }
 
+  @Override
+  protected boolean canWriteValue(TypedValue typedValue) {
+    return super.canWriteValue(typedValue) || typedValue.getValue() instanceof InputStream;
+  }
+
   public static byte[] getBytes(ValueFields valueFields) {
     byte[] byteArray = null;
-    if(valueFields.getByteArrayValue() != null) {
+    if (valueFields.getByteArrayValue() != null) {
       byteArray = valueFields.getByteArrayValue().getBytes();
     }
     return byteArray;
@@ -51,10 +89,9 @@ public class ByteArrayValueSerializer extends PrimitiveValueSerializer<BytesValu
   public static void setBytes(ValueFields valueFields, byte[] bytes) {
     ByteArrayEntity byteArray = valueFields.getByteArrayValue();
 
-    if (byteArray==null) {
+    if (byteArray == null) {
       valueFields.setByteArrayValue(bytes);
-    }
-    else {
+    } else {
       byteArray.setBytes(bytes);
     }
   }

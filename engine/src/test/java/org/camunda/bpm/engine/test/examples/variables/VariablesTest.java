@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.examples.variables;
 import static org.camunda.bpm.engine.variable.Variables.createVariables;
 import static org.camunda.bpm.engine.variable.Variables.objectValue;
 
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -49,6 +50,7 @@ public class VariablesTest extends PluggableProcessEngineTestCase {
     serializable.add("two");
     serializable.add("three");
     byte[] bytes = "somebytes".getBytes();
+    byte[] streamBytes = "morebytes".getBytes();
 
     // Start process instance with different types of variables
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -60,6 +62,7 @@ public class VariablesTest extends PluggableProcessEngineTestCase {
     variables.put("nullVar", null);
     variables.put("serializableVar", serializable);
     variables.put("bytesVar", bytes);
+    variables.put("byteStreamVar", new ByteArrayInputStream(streamBytes));
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskAssigneeProcess", variables);
 
     variables = runtimeService.getVariables(processInstance.getId());
@@ -71,7 +74,8 @@ public class VariablesTest extends PluggableProcessEngineTestCase {
     assertEquals(null, variables.get("nullVar"));
     assertEquals(serializable, variables.get("serializableVar"));
     assertTrue(Arrays.equals(bytes, (byte[]) variables.get("bytesVar")));
-    assertEquals(8, variables.size());
+    assertTrue(Arrays.equals(streamBytes, (byte[]) variables.get("byteStreamVar")));
+    assertEquals(9, variables.size());
 
     // Set all existing variables values to null
     runtimeService.setVariable(processInstance.getId(), "longVar", null);
@@ -82,6 +86,7 @@ public class VariablesTest extends PluggableProcessEngineTestCase {
     runtimeService.setVariable(processInstance.getId(), "nullVar", null);
     runtimeService.setVariable(processInstance.getId(), "serializableVar", null);
     runtimeService.setVariable(processInstance.getId(), "bytesVar", null);
+    runtimeService.setVariable(processInstance.getId(), "byteStreamVar", null);
 
     variables = runtimeService.getVariables(processInstance.getId());
     assertEquals(null, variables.get("longVar"));
@@ -92,7 +97,8 @@ public class VariablesTest extends PluggableProcessEngineTestCase {
     assertEquals(null, variables.get("nullVar"));
     assertEquals(null, variables.get("serializableVar"));
     assertEquals(null, variables.get("bytesVar"));
-    assertEquals(8, variables.size());
+    assertEquals(null, variables.get("byteStreamVar"));
+    assertEquals(9, variables.size());
 
     // Update existing variable values again, and add a new variable
     runtimeService.setVariable(processInstance.getId(), "new var", "hi");
@@ -103,6 +109,7 @@ public class VariablesTest extends PluggableProcessEngineTestCase {
     runtimeService.setVariable(processInstance.getId(), "dateVar", now);
     runtimeService.setVariable(processInstance.getId(), "serializableVar", serializable);
     runtimeService.setVariable(processInstance.getId(), "bytesVar", bytes);
+    runtimeService.setVariable(processInstance.getId(), "byteStreamVar", new ByteArrayInputStream(streamBytes));
 
     variables = runtimeService.getVariables(processInstance.getId());
     assertEquals("hi", variables.get("new var"));
@@ -114,7 +121,8 @@ public class VariablesTest extends PluggableProcessEngineTestCase {
     assertEquals(null, variables.get("nullVar"));
     assertEquals(serializable, variables.get("serializableVar"));
     assertTrue(Arrays.equals(bytes, (byte[]) variables.get("bytesVar")));
-    assertEquals(9, variables.size());
+    assertTrue(Arrays.equals(streamBytes, (byte[]) variables.get("byteStreamVar")));
+    assertEquals(10, variables.size());
 
     Collection<String> varFilter = new ArrayList<String>(2);
     varFilter.add("stringVar");

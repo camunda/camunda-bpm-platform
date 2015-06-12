@@ -12,9 +12,12 @@
  */
 package org.camunda.bpm.engine.variable;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
+
+import javax.activation.MimetypesFileTypeMap;
 
 import org.camunda.bpm.engine.impl.core.variable.VariableMapImpl;
 import org.camunda.bpm.engine.impl.core.variable.value.NullValueImpl;
@@ -28,12 +31,14 @@ import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.Nu
 import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.ShortValueImpl;
 import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.StringValueImpl;
 import org.camunda.bpm.engine.impl.core.variable.value.UntypedValueImpl;
+import org.camunda.bpm.engine.impl.core.variable.value.builder.FileValueBuilderImpl;
 import org.camunda.bpm.engine.impl.core.variable.value.builder.ObjectVariableBuilderImpl;
 import org.camunda.bpm.engine.impl.core.variable.value.builder.SerializedObjectValueBuilderImpl;
 import org.camunda.bpm.engine.variable.value.BooleanValue;
 import org.camunda.bpm.engine.variable.value.BytesValue;
 import org.camunda.bpm.engine.variable.value.DateValue;
 import org.camunda.bpm.engine.variable.value.DoubleValue;
+import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.engine.variable.value.IntegerValue;
 import org.camunda.bpm.engine.variable.value.LongValue;
 import org.camunda.bpm.engine.variable.value.NumberValue;
@@ -41,6 +46,7 @@ import org.camunda.bpm.engine.variable.value.SerializationDataFormat;
 import org.camunda.bpm.engine.variable.value.ShortValue;
 import org.camunda.bpm.engine.variable.value.StringValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
+import org.camunda.bpm.engine.variable.value.builder.FileValueBuilder;
 import org.camunda.bpm.engine.variable.value.builder.ObjectValueBuilder;
 import org.camunda.bpm.engine.variable.value.builder.SerializedObjectValueBuilder;
 import org.camunda.bpm.engine.variable.value.builder.TypedValueBuilder;
@@ -200,5 +206,20 @@ public class Variables {
       // unknown value
       return new UntypedValueImpl(value);
     }
+  }
+
+  public static FileValueBuilder fileValue(String filename) {
+    return new FileValueBuilderImpl(filename);
+  }
+
+  /**
+   * Shortcut for calling fileValue(name).file(file).mimeType(type).create(). The name will be taken
+   * from the file and the type will be detected by {@link MimetypesFileTypeMap}.
+   * @param file
+   * @return
+   */
+  public static FileValue fileValue(File file){
+    String contentType = MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(file);
+    return new FileValueBuilderImpl(file.getName()).file(file).mimeType(contentType).create();
   }
 }
