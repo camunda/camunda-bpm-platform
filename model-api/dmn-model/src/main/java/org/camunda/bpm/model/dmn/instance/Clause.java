@@ -15,11 +15,7 @@ package org.camunda.bpm.model.dmn.instance;
 
 import java.util.Collection;
 
-public interface Clause extends DmnModelElementInstance {
-
-  String getName();
-
-  void setName(String name);
+public interface Clause extends DmnElement {
 
   boolean isOrdered();
 

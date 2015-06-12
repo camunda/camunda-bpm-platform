@@ -19,7 +19,7 @@ import java.util.Collection;
 public class ClauseTest extends DmnModelElementInstanceTest {
 
   public TypeAssumption getTypeAssumption() {
-    return new TypeAssumption(false);
+    return new TypeAssumption(DmnElement.class, false);
   }
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
@@ -33,7 +33,6 @@ public class ClauseTest extends DmnModelElementInstanceTest {
 
   public Collection<AttributeAssumption> getAttributesAssumptions() {
     return Arrays.asList(
-      new AttributeAssumption("name"),
       new AttributeAssumption("isOrdered", false, false, false)
     );
   }

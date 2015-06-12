@@ -21,6 +21,7 @@ import java.util.Collection;
 import org.camunda.bpm.model.dmn.instance.Conclusion;
 import org.camunda.bpm.model.dmn.instance.Condition;
 import org.camunda.bpm.model.dmn.instance.DecisionRule;
+import org.camunda.bpm.model.dmn.instance.DmnElement;
 import org.camunda.bpm.model.dmn.instance.Expression;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
@@ -29,7 +30,7 @@ import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceP
 import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 import org.camunda.bpm.model.xml.type.reference.ElementReferenceCollection;
 
-public class DecisionRuleImpl extends DmnModelElementInstanceImpl implements DecisionRule {
+public class DecisionRuleImpl extends DmnElementImpl implements DecisionRule {
   
   protected static ElementReferenceCollection<Expression, Condition> conditionRefCollection;
   protected static ElementReferenceCollection<Expression, Conclusion> conclusionRefCollection;
@@ -49,6 +50,7 @@ public class DecisionRuleImpl extends DmnModelElementInstanceImpl implements Dec
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(DecisionRule.class, DMN_ELEMENT_DECISION_RULE)
       .namespaceUri(DMN10_NS)
+      .extendsType(DmnElement.class)
       .instanceProvider(new ModelTypeInstanceProvider<DecisionRule>() {
         public DecisionRule newInstance(ModelTypeInstanceContext instanceContext) {
           return new DecisionRuleImpl(instanceContext);

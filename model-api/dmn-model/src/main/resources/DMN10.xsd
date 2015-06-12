@@ -325,29 +325,36 @@
 	</xsd:complexType>
   
 	<xsd:complexType name="tClause">
-		<xsd:sequence>
-		 	<xsd:choice>
-		 		<xsd:sequence>
-					<xsd:element name="inputExpression" type="tLiteralExpression" minOccurs="0" maxOccurs="1"/>
-					<xsd:element name="inputEntry" type="tLiteralExpression"  minOccurs="0" maxOccurs="unbounded"/>
-				</xsd:sequence>
+		<xsd:complexContent>
+			<xsd:extension base="tDMNElement">
 				<xsd:sequence>
-					<xsd:element name="outputDefinition" type="tDMNElementReference"  minOccurs="0" maxOccurs="1"/>
-					<!-- NB: When the isOrdered attribute is "true", the ordering of the output entries is significant and MUST be preserved -->
-					<xsd:element name="outputEntry" type="tLiteralExpression"  minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:choice>
+						<xsd:sequence>
+							<xsd:element name="inputExpression" type="tLiteralExpression" minOccurs="0" maxOccurs="1"/>
+							<xsd:element name="inputEntry" type="tLiteralExpression"  minOccurs="0" maxOccurs="unbounded"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:element name="outputDefinition" type="tDMNElementReference"  minOccurs="0" maxOccurs="1"/>
+							<!-- NB: When the isOrdered attribute is "true", the ordering of the output entries is significant and MUST be preserved -->
+							<xsd:element name="outputEntry" type="tLiteralExpression"  minOccurs="0" maxOccurs="unbounded"/>
+						</xsd:sequence>
+					</xsd:choice>
 				</xsd:sequence>
-			</xsd:choice>
-		</xsd:sequence>
-		<xsd:attribute name="name" type="xsd:string" use="optional"/>
-		<!-- NB: irOrdered MUST be true iff the hit policy of the containing decision table is PRIORITY or OUTPUT ORDER -->
-		<xsd:attribute name="isOrdered" type="xsd:boolean" use="optional" default="false"/>
+				<!-- NB: irOrdered MUST be true iff the hit policy of the containing decision table is PRIORITY or OUTPUT ORDER -->
+				<xsd:attribute name="isOrdered" type="xsd:boolean" use="optional" default="false"/>
+			</xsd:extension>
+		</xsd:complexContent>
 	</xsd:complexType>
 
 	<xsd:complexType name="tDecisionRule">
-		<xsd:sequence>
-			<xsd:element name="condition" type="xsd:IDREFS" minOccurs="0" maxOccurs="unbounded"/>
-			<xsd:element name="conclusion" type="xsd:IDREFS" minOccurs="0" maxOccurs="unbounded"/>
-		</xsd:sequence>
+		<xsd:complexContent>
+			<xsd:extension base="tDMNElement">
+				<xsd:sequence>
+					<xsd:element name="condition" type="xsd:IDREFS" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element name="conclusion" type="xsd:IDREFS" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
 	</xsd:complexType>
 
 	<xsd:simpleType name="DecisionTableOrientation">

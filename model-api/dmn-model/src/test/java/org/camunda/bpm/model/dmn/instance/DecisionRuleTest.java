@@ -19,7 +19,7 @@ import java.util.Collection;
 public class DecisionRuleTest extends DmnModelElementInstanceTest {
 
   public TypeAssumption getTypeAssumption() {
-    return new TypeAssumption(false);
+    return new TypeAssumption(DmnElement.class, false);
   }
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {

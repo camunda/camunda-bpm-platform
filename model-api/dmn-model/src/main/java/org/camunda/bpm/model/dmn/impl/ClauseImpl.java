@@ -21,6 +21,7 @@ import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_CLAUS
 import java.util.Collection;
 
 import org.camunda.bpm.model.dmn.instance.Clause;
+import org.camunda.bpm.model.dmn.instance.DmnElement;
 import org.camunda.bpm.model.dmn.instance.InputEntry;
 import org.camunda.bpm.model.dmn.instance.InputExpression;
 import org.camunda.bpm.model.dmn.instance.ItemDefinition;
@@ -36,9 +37,8 @@ import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 import org.camunda.bpm.model.xml.type.reference.ElementReference;
 
-public class ClauseImpl extends DmnModelElementInstanceImpl implements Clause {
+public class ClauseImpl extends DmnElementImpl implements Clause {
 
-  protected static Attribute<String> nameAttribute;
   protected static Attribute<Boolean> isOrderedAttribute;
   protected static ChildElement<InputExpression> inputExpressionChild;
   protected static ChildElementCollection<InputEntry> inputEntryCollection;
@@ -47,14 +47,6 @@ public class ClauseImpl extends DmnModelElementInstanceImpl implements Clause {
 
   public ClauseImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
-  }
-
-  public String getName() {
-    return nameAttribute.getValue(this);
-  }
-
-  public void setName(String name) {
-    nameAttribute.setValue(this, name);
   }
 
   public boolean isOrdered() {
@@ -92,14 +84,12 @@ public class ClauseImpl extends DmnModelElementInstanceImpl implements Clause {
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Clause.class, DMN_ELEMENT_CLAUSE)
       .namespaceUri(DMN10_NS)
+      .extendsType(DmnElement.class)
       .instanceProvider(new ModelTypeInstanceProvider<Clause>() {
         public Clause newInstance(ModelTypeInstanceContext instanceContext) {
           return new ClauseImpl(instanceContext);
         }
       });
-
-    nameAttribute = typeBuilder.stringAttribute(DMN_ATTRIBUTE_NAME)
-      .build();
 
     isOrderedAttribute = typeBuilder.booleanAttribute(DMN_ATTRIBUTE_IS_ORDERED)
       .defaultValue(false)

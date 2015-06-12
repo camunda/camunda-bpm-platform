@@ -368,7 +368,7 @@ public class ExampleTest extends DmnModelTest {
     decision.addChildElement(decisionTable);
 
     // 1. Clause
-    Clause clause = generateElement(Clause.class);
+    Clause clause = generateElement(Clause.class, 1);
     clause.setName("Customer Status");
     InputExpression inputExpression = generateElement(InputExpression.class, 1);
     inputExpression.setName("Status");
@@ -392,7 +392,7 @@ public class ExampleTest extends DmnModelTest {
     decisionTable.getClauses().add(clause);
 
     // 2. Clause
-    clause = generateElement(Clause.class);
+    clause = generateElement(Clause.class, 2);
     clause.setName("Order Sum");
     inputExpression = generateElement(InputExpression.class, 2);
     inputExpression.setName("Sum");
@@ -411,7 +411,7 @@ public class ExampleTest extends DmnModelTest {
     decisionTable.getClauses().add(clause);
 
     // 3. Clause
-    clause = generateElement(Clause.class);
+    clause = generateElement(Clause.class, 3);
     clause.setName("Check Result");
     clause.setOutputDefinition(itemDefinition3);
     OutputEntry outputEntry1 = generateElement(OutputEntry.class, 1);
@@ -427,7 +427,7 @@ public class ExampleTest extends DmnModelTest {
     decisionTable.getClauses().add(clause);
 
     // 4. Clause
-    clause = generateElement(Clause.class);
+    clause = generateElement(Clause.class, 4);
     clause.setName("Reason");
     clause.setOutputDefinition(itemDefinition4);
     OutputEntry outputEntry3 = generateElement(OutputEntry.class, 3);
@@ -455,13 +455,13 @@ public class ExampleTest extends DmnModelTest {
     decisionTable.getClauses().add(clause);
 
     // 1. Rule
-    Rule rule = generateElement(Rule.class);
+    Rule rule = generateElement(Rule.class, 1);
     rule.getConditions().add(inputEntry1);
     rule.getConclusions().addAll(Arrays.asList(outputEntry1, outputEntry3));
     decisionTable.getRules().add(rule);
 
     // 2. Rule
-    rule = generateElement(Rule.class);
+    rule = generateElement(Rule.class, 2);
     rule.getConditions().add(inputEntry2);
     rule.getConditions().add(inputEntry4);
     rule.getConclusions().add(outputEntry2);
@@ -469,7 +469,7 @@ public class ExampleTest extends DmnModelTest {
     decisionTable.getRules().add(rule);
 
     // 3. Rule
-    rule = generateElement(Rule.class);
+    rule = generateElement(Rule.class, 3);
     Condition condition = generateElement(Condition.class);
     condition.setTextContent(inputEntry2.getId() + " " + inputEntry5.getId());
     rule.addChildElement(condition);
@@ -479,7 +479,7 @@ public class ExampleTest extends DmnModelTest {
     decisionTable.getRules().add(rule);
 
     // 4. Rule
-    rule = generateElement(Rule.class);
+    rule = generateElement(Rule.class, 4);
     rule.getConditions().add(inputEntry3);
     rule.getConclusions().add(outputEntry2);
     rule.getConclusions().add(outputEntry6);

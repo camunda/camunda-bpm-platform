@@ -32,7 +32,7 @@
   </ItemDefinition>
   <Decision id="decision" name="CheckOrder">
     <DecisionTable id="decisionTable" name="CheckOrder" isComplete="true" isConsistent="true">
-      <clause name="Customer Status">
+      <clause id="clause1" name="Customer Status">
         <inputExpression id="inputExpression1" name="Status">
           <itemDefinition href="#itemDefinition1" />
         </inputExpression>
@@ -46,7 +46,7 @@
           <text>gold</text>
         </inputEntry>
       </clause>
-      <clause name="Order Sum">
+      <clause id="clause2" name="Order Sum">
         <inputExpression id="inputExpression2" name="Sum">
           <itemDefinition href="#itemDefinition2" />
         </inputExpression>
@@ -57,7 +57,7 @@
           <text><![CDATA[>= 1000]]></text>
         </inputEntry>
       </clause>
-      <clause name="Check Result">
+      <clause id="clause3" name="Check Result">
         <outputDefinition href="#itemDefinition3" />
         <outputEntry id="outputEntry1">
           <text>notok</text>
@@ -66,7 +66,7 @@
           <text>ok</text>
         </outputEntry>
       </clause>
-      <clause name="Reason">
+      <clause id="clause4" name="Reason">
         <outputDefinition href="#itemDefinition4" />
         <outputEntry id="outputEntry3">
           <text><![CDATA[work on your status first, as bronze you're not going to get anything]]></text>
@@ -81,22 +81,22 @@
           <text>you get anything you want</text>
         </outputEntry>
       </clause>
-      <rule>
+      <rule id="rule1">
         <condition>inputEntry1</condition>
         <conclusion>outputEntry1</conclusion>
         <conclusion>outputEntry3</conclusion>
       </rule>
-      <rule>
+      <rule id="rule2">
         <condition>inputEntry2</condition>
         <condition>inputEntry4</condition>
         <conclusion>outputEntry2</conclusion>
         <conclusion>outputEntry4</conclusion>
       </rule>
-      <rule>
+      <rule id="rule3">
         <condition>inputEntry2 inputEntry5</condition>
         <conclusion>outputEntry1 outputEntry5</conclusion>
       </rule>
-      <rule>
+      <rule id="rule4">
         <condition>inputEntry3</condition>
         <conclusion>outputEntry2</conclusion>
         <conclusion>outputEntry6</conclusion>

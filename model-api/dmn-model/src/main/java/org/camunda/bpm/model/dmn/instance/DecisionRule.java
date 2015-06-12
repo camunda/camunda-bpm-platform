@@ -15,7 +15,7 @@ package org.camunda.bpm.model.dmn.instance;
 
 import java.util.Collection;
 
-public interface DecisionRule extends DmnModelElementInstance {
+public interface DecisionRule extends DmnElement {
 
   Collection<Expression> getConditions();
 
