@@ -14,6 +14,7 @@
 package org.camunda.dmn.engine;
 
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.dmn.engine.context.DmnDecisionContext;
 
@@ -21,12 +22,15 @@ public interface DmnRule {
 
   String getId();
 
-  List<List<DmnExpression>> getInputExpressions();
+  Map<String, DmnExpression> getInputExpressions();
+
+  Map<String, List<DmnExpression>> getConditions();
+
+  List<DmnExpression> getConclusions();
 
   boolean isApplicable(DmnDecisionContext decisionContext);
 
-  <T> T evaluate(DmnDecisionContext decisionContext);
-
   DmnDecisionOutput getOutput(DmnDecisionContext decisionContext);
+
 
 }

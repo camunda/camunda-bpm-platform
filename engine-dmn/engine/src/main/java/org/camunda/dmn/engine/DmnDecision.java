@@ -19,6 +19,8 @@ import org.camunda.dmn.engine.context.DmnDecisionContext;
 
 public interface DmnDecision {
 
+  void setId(String id);
+
   String getId();
 
   void setRules(List<DmnRule> rules);

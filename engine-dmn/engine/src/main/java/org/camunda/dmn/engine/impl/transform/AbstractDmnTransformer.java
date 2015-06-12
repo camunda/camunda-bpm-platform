@@ -15,9 +15,7 @@ package org.camunda.dmn.engine.impl.transform;
 
 import org.camunda.bpm.model.dmn.DmnModelInstance;
 import org.camunda.bpm.model.dmn.instance.Definitions;
-import org.camunda.bpm.model.dmn.instance.DmnModelElementInstance;
 import org.camunda.dmn.engine.DmnDecisionModel;
-import org.camunda.dmn.engine.transform.DmnElementHandler;
 import org.camunda.dmn.engine.transform.DmnElementHandlerRegistry;
 import org.camunda.dmn.engine.transform.DmnTransformContext;
 import org.camunda.dmn.engine.transform.DmnTransformListener;
@@ -25,11 +23,11 @@ import org.camunda.dmn.engine.transform.DmnTransformer;
 
 public abstract class AbstractDmnTransformer implements DmnTransformer {
 
-  protected DmnElementHandlerRegistry elementHandlerRegistry;
   protected DmnTransformContext transformContext;
 
-  public AbstractDmnTransformer() {
+  public AbstractDmnTransformer(DmnElementHandlerRegistry elementHandlerRegistry) {
     transformContext = new DmnTransformContextImpl();
+    transformContext.setElementHandlerRegistry(elementHandlerRegistry);
   }
 
   public void setTransformContext(DmnTransformContext transformContext) {
@@ -41,11 +39,11 @@ public abstract class AbstractDmnTransformer implements DmnTransformer {
   }
 
   public void setElementHandlerRegistry(DmnElementHandlerRegistry elementHandlerRegistry) {
-    this.elementHandlerRegistry = elementHandlerRegistry;
+    transformContext.setElementHandlerRegistry(elementHandlerRegistry);
   }
 
   public DmnElementHandlerRegistry getElementHandlerRegistry() {
-    return elementHandlerRegistry;
+    return transformContext.getElementHandlerRegistry();
   }
 
   public DmnDecisionModel transform(DmnModelInstance modelInstance) {
@@ -61,10 +59,6 @@ public abstract class AbstractDmnTransformer implements DmnTransformer {
     for (DmnTransformListener dmnTransformListener : transformContext.getTransformListeners()) {
       dmnTransformListener.transformDefinitions(definitions, decisionModel);
     }
-  }
-
-  protected <Source extends DmnModelElementInstance, Target> DmnElementHandler<Source, Target> getDmnElementHandler(Class<Source> elementClass) {
-    return elementHandlerRegistry.getElementHandler(elementClass);
   }
 
 }

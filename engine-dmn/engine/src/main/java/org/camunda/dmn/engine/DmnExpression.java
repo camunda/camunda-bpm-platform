@@ -17,6 +17,10 @@ import org.camunda.dmn.engine.context.DmnDecisionContext;
 
 public interface DmnExpression {
 
+  void setId(String id);
+
+  String getId();
+
   void setVariableName(String variableName);
 
   String getVariableName();
@@ -30,7 +34,5 @@ public interface DmnExpression {
   String getExpressionLanguage();
 
   <T> T evaluate(DmnDecisionContext decisionContext);
-
-  boolean isApplicable(DmnDecisionContext decisionContext);
 
 }

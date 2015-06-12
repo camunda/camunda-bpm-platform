@@ -16,12 +16,28 @@ package org.camunda.dmn.engine.impl.transform;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.model.dmn.instance.DmnModelElementInstance;
+import org.camunda.dmn.engine.transform.DmnElementHandler;
+import org.camunda.dmn.engine.transform.DmnElementHandlerRegistry;
 import org.camunda.dmn.engine.transform.DmnTransformContext;
 import org.camunda.dmn.engine.transform.DmnTransformListener;
 
 public class DmnTransformContextImpl implements DmnTransformContext {
 
   protected List<DmnTransformListener> transformListeners = new ArrayList<DmnTransformListener>();
+  protected DmnElementHandlerRegistry elementHandlerRegistry;
+
+  public void setElementHandlerRegistry(DmnElementHandlerRegistry elementHandlerRegistry) {
+    this.elementHandlerRegistry = elementHandlerRegistry;
+  }
+
+  public DmnElementHandlerRegistry getElementHandlerRegistry() {
+    return elementHandlerRegistry;
+  }
+
+  public <Source extends DmnModelElementInstance, Target> DmnElementHandler<Source, Target> getElementHandler(Class<Source> elementClass) {
+    return elementHandlerRegistry.getElementHandler(elementClass);
+  }
 
   public void setTransformListeners(List<DmnTransformListener> transformListeners) {
     this.transformListeners = transformListeners;

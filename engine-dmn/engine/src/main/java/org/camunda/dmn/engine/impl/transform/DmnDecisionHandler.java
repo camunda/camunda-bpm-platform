@@ -17,19 +17,31 @@ import org.camunda.bpm.model.dmn.instance.Decision;
 import org.camunda.bpm.model.dmn.instance.DecisionTable;
 import org.camunda.bpm.model.dmn.instance.Expression;
 import org.camunda.dmn.engine.DmnDecision;
-import org.camunda.dmn.engine.impl.DmnDecisionImpl;
+import org.camunda.dmn.engine.impl.DmnLogger;
+import org.camunda.dmn.engine.impl.DmnParseLogger;
 import org.camunda.dmn.engine.transform.DmnElementHandler;
 import org.camunda.dmn.engine.transform.DmnTransformContext;
 
 public class DmnDecisionHandler implements DmnElementHandler<Decision, DmnDecision> {
 
+  protected static final DmnParseLogger LOG = DmnLogger.PARSE_LOGGER;
+
   public DmnDecision handleElement(DmnTransformContext context, Decision decision) {
     Expression expression = decision.getExpression();
     if (expression instanceof DecisionTable) {
-
+      DmnDecision dmnDecision = handleDecisionTable(context, (DecisionTable) expression);
+      dmnDecision.setId(decision.getId());
+      return dmnDecision;
     }
-    DmnDecisionImpl dmnDecision = new DmnDecisionImpl(decision.getId());
-    return dmnDecision;
+    else {
+      LOG.decisionTypeNotSupported(decision);
+      return null;
+    }
+  }
+
+  protected DmnDecision handleDecisionTable(DmnTransformContext context, DecisionTable decisionTable) {
+    DmnElementHandler<DecisionTable, DmnDecision> elementHandler = context.getElementHandler(DecisionTable.class);
+    return elementHandler.handleElement(context, decisionTable);
   }
 
 }

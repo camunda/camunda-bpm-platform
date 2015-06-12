@@ -21,7 +21,6 @@ import java.io.InputStream;
 import org.camunda.bpm.model.dmn.Dmn;
 import org.camunda.bpm.model.dmn.DmnModelInstance;
 import org.camunda.commons.utils.IoUtil;
-import org.camunda.dmn.engine.context.DmnDecisionContext;
 import org.camunda.dmn.engine.impl.DmnEngineConfigurationImpl;
 import org.junit.BeforeClass;
 import org.junit.Test;

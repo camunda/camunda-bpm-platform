@@ -13,7 +13,9 @@
 
 package org.camunda.dmn.engine.impl;
 
+import org.camunda.bpm.model.dmn.instance.Clause;
 import org.camunda.bpm.model.dmn.instance.Decision;
+import org.camunda.bpm.model.dmn.instance.Expression;
 import org.camunda.dmn.engine.DmnParseException;
 
 public class DmnParseLogger extends DmnLogger {
@@ -38,8 +40,8 @@ public class DmnParseLogger extends DmnLogger {
     return new DmnParseException(message);
   }
 
-  public DmnParseException decisionTypeNotSupported(Decision decision) {
-    return new DmnParseException(exceptionMessage("002", "The expression type of the decision '{}' is not supported.", decision.getId()));
+  public void decisionTypeNotSupported(Decision decision) {
+    logInfo("002", "The expression type '{}' of the decision '{}' is not supported.", decision.getClass().getSimpleName(), decision.getId());
   }
 
   public DmnParseException unableToParseDecisionFromFile(String filename, String decisionId, Throwable cause) {
@@ -50,6 +52,10 @@ public class DmnParseLogger extends DmnLogger {
     else {
       return new DmnParseException(exceptionMessage(id, "Unable to parse decision from file '{}'.", filename), cause);
     }
+  }
+
+  public void ignoringClause(Clause clause) {
+    logInfo("004", "Ignoring clause '{}' as neither an input expression nor output definition was found.", clause.getId());
   }
 
 }

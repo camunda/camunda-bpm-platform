@@ -73,8 +73,8 @@ public class DmnEngineLogger extends DmnLogger {
     return new DmnExpressionException(exceptionMessage("013", "Unable to evaluate expression for language '{}': '{}'", expressionLanguage, expression), cause);
   }
 
-  public DmnExpressionException unableToCastExpressionResult(Throwable cause) {
-    return new DmnExpressionException(exceptionMessage("014", "Unable to cast result to expected type"), cause);
+  public DmnExpressionException unableToCastExpressionResult(Object result, Throwable cause) {
+    return new DmnExpressionException(exceptionMessage("014", "Unable to cast result '{}' to expected type", result), cause);
   }
 
 }

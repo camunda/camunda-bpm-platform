@@ -31,8 +31,7 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
   protected DmnContextFactory contextFactory;
 
   public DmnEngineConfigurationImpl() {
-    transformer = new DmnTransformerImpl();
-    transformer.setElementHandlerRegistry(new DmnElementHandlerRegistryImpl());
+    transformer = new DmnTransformerImpl(new DmnElementHandlerRegistryImpl());
     defaultExpressionLanguage = JuelScriptEngineFactory.NAME;
     contextFactory = new DmnContextFactoryImpl();
   }

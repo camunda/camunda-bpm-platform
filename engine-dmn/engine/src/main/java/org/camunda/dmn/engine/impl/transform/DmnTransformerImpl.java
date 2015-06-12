@@ -21,19 +21,26 @@ import org.camunda.dmn.engine.DmnDecision;
 import org.camunda.dmn.engine.DmnDecisionModel;
 import org.camunda.dmn.engine.impl.DmnDecisionModelImpl;
 import org.camunda.dmn.engine.transform.DmnElementHandler;
+import org.camunda.dmn.engine.transform.DmnElementHandlerRegistry;
 
 public class DmnTransformerImpl extends AbstractDmnTransformer {
+
+  public DmnTransformerImpl(DmnElementHandlerRegistry elementHandlerRegistry) {
+    super(elementHandlerRegistry);
+  }
 
   protected DmnDecisionModel performTransform(Definitions definitions) {
     Collection<Decision> decisions = definitions.getChildElementsByType(Decision.class);
 
-    DmnElementHandler<Decision, DmnDecision> decisionHandler = getDmnElementHandler(Decision.class);
+    DmnElementHandler<Decision, DmnDecision> decisionHandler = transformContext.getElementHandler(Decision.class);
 
     DmnDecisionModelImpl decisionModel = new DmnDecisionModelImpl();
 
     for (Decision decision : decisions) {
       DmnDecision dmnDecision = decisionHandler.handleElement(transformContext, decision);
-      decisionModel.addDecision(dmnDecision);
+      if (dmnDecision != null) {
+        decisionModel.addDecision(dmnDecision);
+      }
     }
 
     return decisionModel;

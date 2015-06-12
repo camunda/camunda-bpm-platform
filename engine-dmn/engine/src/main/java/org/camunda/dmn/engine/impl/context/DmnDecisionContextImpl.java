@@ -13,7 +13,9 @@
 
 package org.camunda.dmn.engine.impl.context;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
@@ -26,8 +28,11 @@ import org.camunda.dmn.engine.DmnRule;
 import org.camunda.dmn.engine.context.DmnDecisionContext;
 import org.camunda.dmn.engine.context.DmnScriptContext;
 import org.camunda.dmn.engine.context.DmnVariableContext;
+import org.camunda.dmn.engine.impl.DmnDecisionOutputEntryImpl;
+import org.camunda.dmn.engine.impl.DmnDecisionOutputImpl;
 import org.camunda.dmn.engine.impl.DmnDecisionResultImpl;
 import org.camunda.dmn.engine.impl.DmnEngineLogger;
+import org.camunda.dmn.engine.impl.DmnRuleImpl;
 
 public class DmnDecisionContextImpl implements DmnDecisionContext {
 
@@ -71,11 +76,15 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
   }
 
   public DmnDecisionResult evaluate(DmnDecision decision) {
+    return evaluate(decision, new HashMap<String, Object>());
+  }
+
+  public DmnDecisionResult evaluate(DmnDecision decision, Map<String, Object> evaluationCache) {
     DmnDecisionResultImpl decisionResult = new DmnDecisionResultImpl();
 
     for (DmnRule rule : decision.getRules()) {
-      if (rule.isApplicable(this)) {
-        DmnDecisionOutput output = rule.getOutput(this);
+      if (isApplicable(rule, evaluationCache)) {
+        DmnDecisionOutput output = getOutput(rule, evaluationCache);
         // TODO: notify Rule Listener
         decisionResult.addOutput(output);
       }
@@ -88,39 +97,102 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
   }
 
   public boolean isApplicable(DmnRule rule) {
-    List<List<DmnExpression>> disjunctions = rule.getInputExpressions();
-    for (List<DmnExpression> disjunction : disjunctions) {
+    return isApplicable(rule, null);
+  }
+
+  public boolean isApplicable(DmnRule rule, Map<String, Object> evaluationCache) {
+    // evaluate all conditions
+    boolean applicable = true;
+    Map<String, DmnExpression> inputExpressions = rule.getInputExpressions();
+    Map<String, List<DmnExpression>> disjunctions = rule.getConditions();
+    for (Map.Entry<String, List<DmnExpression>> disjunction : disjunctions.entrySet()) {
       boolean disjunctionApplicable = false;
-      for (DmnExpression expression : disjunction) {
-        if (expression.isApplicable(this)) {
+
+      // set new variable context for this rule evaluation
+      DmnVariableContext originalVariableContext = getVariableContextChecked();
+      DmnDelegatingVariableContext evaluationVariableContext = new DmnDelegatingVariableContext(originalVariableContext);
+      setVariableContext(evaluationVariableContext);
+
+      String clauseId = disjunction.getKey();
+      DmnExpression inputExpression = inputExpressions.get(clauseId);
+      if (inputExpression != null) {
+        Object result = evaluate(inputExpression, evaluationCache);
+        String name = inputExpression.getVariableName();
+        evaluationVariableContext.setVariable(name, result);
+      }
+
+      for (DmnExpression expression : disjunction.getValue()) {
+        if (isApplicable(expression, evaluationCache)) {
           disjunctionApplicable = true;
           break;
         }
       }
 
+      // reset variable context
+      setVariableContext(originalVariableContext);
+
       if (!disjunctionApplicable) {
-        return false;
+        applicable = false;
+        break;
       }
     }
 
-    // if all disjunctions are applicable then the rules is applicable
-    return true;
+    return applicable;
+  }
+
+  public <T> T evaluate(DmnExpression expression) {
+    return evaluate(expression, null);
   }
 
   @SuppressWarnings("unchecked")
-  public <T> T evaluate(DmnExpression expression) {
-    String expressionLanguage = expression.getExpressionLanguage();
-    String expressionText = expression.getExpression();
-    ScriptEngine scriptEngine = getScriptEngineForName(expressionLanguage);
-    Bindings bindings = createBindings(scriptEngine);
+  public <T> T evaluate(DmnExpression expression, Map<String, Object> evaluationCache) {
+    String expressionId = expression.getId();
+    Object result;
+
+    if (evaluationCache != null && evaluationCache.containsKey(expressionId)) {
+      result = evaluationCache.get(expressionId);
+    }
+    else {
+      String expressionLanguage = expression.getExpressionLanguage();
+      String expressionText = expression.getExpression();
+      ScriptEngine scriptEngine = getScriptEngineForName(expressionLanguage);
+      Bindings bindings = createBindings(scriptEngine);
+
+      try {
+        result = scriptEngine.eval(expressionText, bindings);
+      } catch (ScriptException e) {
+        throw LOG.unableToEvaluateExpression(expressionText, scriptEngine.getFactory().getLanguageName(), e);
+      }
+    }
 
     try {
-      return (T) scriptEngine.eval(expressionText, bindings);
-    } catch (ScriptException e) {
-      throw LOG.unableToEvaluateExpression(expressionText, scriptEngine.getFactory().getLanguageName(), e);
+      return (T) result;
     } catch (ClassCastException e) {
-      throw LOG.unableToCastExpressionResult(e);
+      throw LOG.unableToCastExpressionResult(result, e);
     }
+  }
+
+  public boolean isApplicable(DmnExpression expression) {
+    return isApplicable(expression, null);
+  }
+
+  public DmnDecisionOutput getOutput(DmnRule rule) {
+    return getOutput(rule, null);
+  }
+
+  public DmnDecisionOutput getOutput(DmnRule rule, Map<String, Object> evaluationCache) {
+    DmnDecisionOutputImpl output = new DmnDecisionOutputImpl();
+    for (DmnExpression expression : rule.getConclusions()) {
+      Object result = evaluate(expression, evaluationCache);
+      String variableName = expression.getVariableName();
+      output.addEntry(new DmnDecisionOutputEntryImpl(variableName, result));
+    }
+    return output;
+  }
+
+  public boolean isApplicable(DmnExpression expression, Map<String, Object> evaluationCache) {
+    Object result = evaluate(expression, evaluationCache);
+    return result != null && result.equals(true);
   }
 
   protected ScriptEngine getScriptEngineForName(String expressionLanguage) {

@@ -14,6 +14,7 @@
 package org.camunda.dmn.engine.context;
 
 import org.camunda.dmn.engine.DmnDecision;
+import org.camunda.dmn.engine.DmnDecisionOutput;
 import org.camunda.dmn.engine.DmnDecisionResult;
 import org.camunda.dmn.engine.DmnExpression;
 import org.camunda.dmn.engine.DmnRule;
@@ -37,5 +38,9 @@ public interface DmnDecisionContext {
   boolean isApplicable(DmnRule rule);
 
   <T> T evaluate(DmnExpression expression);
+
+  boolean isApplicable(DmnExpression expression);
+
+  DmnDecisionOutput getOutput(DmnRule rule);
 
 }

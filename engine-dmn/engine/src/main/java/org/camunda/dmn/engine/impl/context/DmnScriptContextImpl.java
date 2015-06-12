@@ -14,13 +14,16 @@
 package org.camunda.dmn.engine.impl.context;
 
 import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 
 import org.camunda.dmn.engine.context.DmnScriptContext;
 import org.camunda.dmn.juel.JuelScriptEngineFactory;
 
 public class DmnScriptContextImpl implements DmnScriptContext {
 
-  protected String defaultScriptLanguage = JuelScriptEngineFactory.NAME;
+  public static final String DEFAULT_SCRIPT_LANGUAGE = JuelScriptEngineFactory.NAME;
+
+  protected String defaultScriptLanguage = DEFAULT_SCRIPT_LANGUAGE;
 
   public void setDefaultScriptLanguage(String defaultScriptLanguage) {
     this.defaultScriptLanguage = defaultScriptLanguage;
@@ -31,11 +34,11 @@ public class DmnScriptContextImpl implements DmnScriptContext {
   }
 
   public ScriptEngine getDefaultScriptEngine() {
-    return null;
+    return getScriptEngineForName(defaultScriptLanguage);
   }
 
   public ScriptEngine getScriptEngineForName(String name) {
-    return null;
+    return new ScriptEngineManager().getEngineByName(name.toLowerCase());
   }
 
 }

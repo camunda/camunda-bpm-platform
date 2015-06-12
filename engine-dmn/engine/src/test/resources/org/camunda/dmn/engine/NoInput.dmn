@@ -8,13 +8,13 @@
   </ItemDefinition>
   <Decision id="decision">
     <DecisionTable id="decisionTable" isComplete="true" isConsistent="true">
-      <clause name="Result">
+      <clause id="clause" name="Result">
         <outputDefinition href="#itemDefinition1" />
         <outputEntry id="outputEntry1">
           <text>ok</text>
         </outputEntry>
       </clause>
-      <rule>
+      <rule id="rule1">
         <conclusion>outputEntry1</conclusion>
       </rule>
     </DecisionTable>

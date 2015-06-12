@@ -17,8 +17,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.model.dmn.instance.Decision;
+import org.camunda.bpm.model.dmn.instance.DecisionTable;
 import org.camunda.bpm.model.dmn.instance.DmnModelElementInstance;
-import org.camunda.dmn.engine.DmnDecision;
+import org.camunda.bpm.model.dmn.instance.LiteralExpression;
 import org.camunda.dmn.engine.transform.DmnElementHandler;
 import org.camunda.dmn.engine.transform.DmnElementHandlerRegistry;
 
@@ -28,6 +29,8 @@ public class DmnElementHandlerRegistryImpl implements DmnElementHandlerRegistry 
 
   public DmnElementHandlerRegistryImpl() {
     elementHandlers.put(Decision.class, new DmnDecisionHandler());
+    elementHandlers.put(DecisionTable.class, new DmnDecisionTableHandler());
+    elementHandlers.put(LiteralExpression.class, new DmnLiteralExpressionHandler());
   }
 
   @SuppressWarnings("unchecked")

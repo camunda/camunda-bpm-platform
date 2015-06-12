@@ -14,27 +14,21 @@
 package org.camunda.dmn.engine.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.camunda.dmn.engine.DmnDecision;
+import org.camunda.dmn.engine.DmnDecisionOutput;
 import org.camunda.dmn.engine.DmnExpression;
 import org.camunda.dmn.engine.DmnRule;
 import org.camunda.dmn.engine.context.DmnDecisionContext;
-import org.camunda.dmn.engine.DmnDecisionResult;
 
-public class DmnDecisionImpl implements DmnDecision {
+public class DmnRuleImpl implements DmnRule {
 
   protected String id;
   protected Map<String, DmnExpression> inputExpressions = new TreeMap<String, DmnExpression>();
-  protected Map<String, DmnExpression> inputEntries = new HashMap<String, DmnExpression>();
-  protected Map<String, DmnExpression> outputEntries = new HashMap<String, DmnExpression>();
-  protected List<DmnRule> rules = new ArrayList<DmnRule>();
-
-  public DmnDecisionImpl() {
-  }
+  protected Map<String, List<DmnExpression>> conditions = new TreeMap<String, List<DmnExpression>>();
+  protected List<DmnExpression> conclusions = new ArrayList<DmnExpression>();
 
   public void setId(String id) {
     this.id = id;
@@ -48,44 +42,36 @@ public class DmnDecisionImpl implements DmnDecision {
     this.inputExpressions = inputExpressions;
   }
 
-  public Map<String, DmnExpression> getInputExpressions() {
-    return inputExpressions;
-  }
-
   public void addInputExpression(String clauseId, DmnExpression inputExpression) {
     inputExpressions.put(clauseId, inputExpression);
   }
 
-  public void setRules(List<DmnRule> rules) {
-    this.rules = rules;
+  public Map<String, DmnExpression> getInputExpressions() {
+    return inputExpressions;
   }
 
-  public List<DmnRule> getRules() {
-    return rules;
+  public void setConditions(Map<String, List<DmnExpression>> conditions) {
+    this.conditions = conditions;
   }
 
-  public void addRule(DmnRule rule) {
-    rules.add(rule);
+  public Map<String, List<DmnExpression>> getConditions() {
+    return conditions;
   }
 
-  public DmnDecisionResult evaluate(DmnDecisionContext decisionContext) {
-    return decisionContext.evaluate(this);
+  public void setConclusions(List<DmnExpression> conclusions) {
+    this.conclusions = conclusions;
   }
 
-  public void addInputEntry(DmnExpression inputEntry) {
-    inputEntries.put(inputEntry.getId(), inputEntry);
+  public List<DmnExpression> getConclusions() {
+    return conclusions;
   }
 
-  public DmnExpression getInputEntry(String id) {
-    return inputEntries.get(id);
+  public boolean isApplicable(DmnDecisionContext decisionContext) {
+    return decisionContext.isApplicable(this);
   }
 
-  public void addOutputEntry(DmnExpression outputEntry) {
-    outputEntries.put(outputEntry.getId(), outputEntry);
-  }
-
-  public DmnExpression getOutputEntry(String id) {
-    return outputEntries.get(id);
+  public DmnDecisionOutput getOutput(DmnDecisionContext decisionContext) {
+    return decisionContext.getOutput(this);
   }
 
 }

@@ -15,7 +15,15 @@ package org.camunda.dmn.engine.transform;
 
 import java.util.List;
 
+import org.camunda.bpm.model.dmn.instance.DmnModelElementInstance;
+
 public interface DmnTransformContext {
+
+  void setElementHandlerRegistry(DmnElementHandlerRegistry elementHandlerRegistry);
+
+  DmnElementHandlerRegistry getElementHandlerRegistry();
+
+  <Source extends DmnModelElementInstance, Target> DmnElementHandler<Source, Target> getElementHandler(Class<Source> elementClass);
 
   void setTransformListeners(List<DmnTransformListener> transformListeners);
 
@@ -24,5 +32,4 @@ public interface DmnTransformContext {
   void addTransformListener(DmnTransformListener transformListener);
 
   void removeTransformListener(DmnTransformListener transformListener);
-
 }
