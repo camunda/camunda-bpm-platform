@@ -97,4 +97,7 @@ public class MetricsQueryImpl implements Serializable, Command<Object>, MetricsQ
     return reporter;
   }
 
+  public CommandExecutor getCommandExecutor() {
+    return commandExecutor;
+  }
 }
