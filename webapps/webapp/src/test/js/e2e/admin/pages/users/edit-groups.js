@@ -20,7 +20,7 @@ module.exports = Page.extend({
     return this.groupList().get(idx).element(by.binding('{{group.id}}')).getText();
   },
 
-  addGroup: function() {
+  openAddGroupModal: function() {
     var theElement = element(by.css('.modal-header'));
     this.addGroupButton().click();
     this.waitForElementToBeVisible(theElement, 5000);

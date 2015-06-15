@@ -300,7 +300,7 @@ describe('Admin Users Spec', function() {
     it('should add new group - select group modal', function() {
 
       // when
-      usersPage.editUserGroups.addGroupButton().click();
+      usersPage.editUserGroups.openAddGroupModal();
 
       //then
       expect(usersPage.editUserGroups.selectGroupModal.pageHeader()).to.eventually.eql('Select Groups');
@@ -334,7 +334,7 @@ describe('Admin Users Spec', function() {
 
       // given
       usersPage.editUserGroups.navigateTo({ user: users[2].id });
-      usersPage.editUserGroups.addGroup();
+      usersPage.editUserGroups.openAddGroupModal();
 
 
       // when
@@ -379,7 +379,7 @@ describe('Admin Users Spec', function() {
         usersPage.editUserGroups.navigateTo({ user: users[2].id });
 
         // when
-        usersPage.editUserGroups.addGroupButton().click();
+        usersPage.editUserGroups.openAddGroupModal();
 
         // then
         expect(usersPage.editUserGroups.selectGroupModal.groupId(0).getText()).to.eventually.eql('/göäüp_name');
@@ -404,7 +404,7 @@ describe('Admin Users Spec', function() {
         usersPage.editUserGroups.navigateTo({ user: users[2].id });
 
         // when
-        usersPage.editUserGroups.addGroupButton().click();
+        usersPage.editUserGroups.openAddGroupModal();
 
         // then
         expect(usersPage.editUserGroups.selectGroupModal.groupId(0).getText()).to.eventually.eql('\\göäüp_name');

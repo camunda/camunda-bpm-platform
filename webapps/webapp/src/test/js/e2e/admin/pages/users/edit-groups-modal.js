@@ -38,7 +38,9 @@ module.exports = Page.extend({
 
   addGroup: function(idx) {
     var that = this;
-    browser.sleep(500);
+    var theElement = this.groupList().get(idx);
+
+    this.waitForElementToBeVisible(theElement, 5000);
     this.selectGroup(idx);
     this.addSelectedGroupButton().click().then(function() {
       that.okButton().click();
