@@ -13,11 +13,12 @@
 package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ID;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
@@ -63,6 +64,8 @@ import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.engine.variable.value.BooleanValue;
+import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.TypeFactory;
@@ -90,6 +93,7 @@ public abstract class AbstractCaseInstanceRestServiceInteractionTest extends Abs
   protected static final String CASE_INSTANCE_VARIABLES_URL = SINGLE_CASE_INSTANCE_URL + "/variables";
   protected static final String SINGLE_CASE_INSTANCE_VARIABLE_URL = CASE_INSTANCE_VARIABLES_URL + "/{varId}";
   protected static final String SINGLE_CASE_INSTANCE_BINARY_VARIABLE_URL = SINGLE_CASE_INSTANCE_VARIABLE_URL + "/data";
+  protected static final String SINGLE_CASE_INSTANCE_VARIABLE_DOWNLOAD_URL = SINGLE_CASE_INSTANCE_VARIABLE_URL + "/download";
 
   protected static final VariableMap EXAMPLE_OBJECT_VARIABLES = Variables.createVariables();
   static {
@@ -571,6 +575,86 @@ public abstract class AbstractCaseInstanceRestServiceInteractionTest extends Abs
   }
 
   @Test
+  public void testGetFileVariable() {
+    String variableKey = "aVariableKey";
+    final byte[] byteContent = "some bytes".getBytes();
+    String filename = "test.txt";
+    String mimeType = "text/plain";
+    FileValue variableValue = Variables.fileValue(filename).file(byteContent).mimeType(mimeType).create();
+
+    when(caseServiceMock.getVariableTyped(MockProvider.EXAMPLE_CASE_INSTANCE_ID, variableKey, true))
+    .thenReturn(variableValue);
+
+    given().pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID).pathParam("varId", variableKey)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .contentType(ContentType.JSON.toString())
+      .and()
+        .body("valueInfo.mimeType", equalTo(mimeType))
+        .body("valueInfo.filename", equalTo(filename))
+        .body("value", nullValue())
+      .when().get(SINGLE_CASE_INSTANCE_VARIABLE_URL);
+  }
+
+  @Test
+  public void testGetFileVariableDownloadWithType() {
+    String variableKey = "aVariableKey";
+    final byte[] byteContent = "some bytes".getBytes();
+    String filename = "test.txt";
+    FileValue variableValue = Variables.fileValue(filename).file(byteContent).mimeType(ContentType.TEXT.toString()).create();
+
+    when(caseServiceMock.getVariableTyped(eq(MockProvider.EXAMPLE_CASE_INSTANCE_ID), eq(variableKey), anyBoolean()))
+    .thenReturn(variableValue);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID)
+      .pathParam("varId", variableKey)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(ContentType.TEXT.toString())
+    .and()
+      .body(is(equalTo(new String(byteContent))))
+    .when().get(SINGLE_CASE_INSTANCE_VARIABLE_DOWNLOAD_URL);
+  }
+
+  @Test
+  public void testGetFileVariableDownloadWithoutType() {
+    String variableKey = "aVariableKey";
+    final byte[] byteContent = "some bytes".getBytes();
+    String filename = "test.txt";
+    FileValue variableValue = Variables.fileValue(filename).file(byteContent).create();
+
+    when(caseServiceMock.getVariableTyped(eq(MockProvider.EXAMPLE_CASE_INSTANCE_ID), eq(variableKey), anyBoolean()))
+    .thenReturn(variableValue);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID)
+      .pathParam("varId", variableKey)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(MediaType.APPLICATION_OCTET_STREAM)
+    .and()
+      .body(is(equalTo(new String(byteContent))))
+      .header("Content-Disposition", containsString(filename))
+    .when().get(SINGLE_CASE_INSTANCE_VARIABLE_DOWNLOAD_URL);
+  }
+
+  @Test
+  public void testCannotDownloadVariableOtherThanFile() {
+    String variableKey = "aVariableKey";
+    BooleanValue variableValue = Variables.booleanValue(true);
+
+    when(caseServiceMock.getVariableLocalTyped(eq(EXAMPLE_TASK_ID), eq(variableKey), anyBoolean())).thenReturn(variableValue);
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .pathParam("varId", variableKey)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when().get(SINGLE_CASE_INSTANCE_VARIABLE_DOWNLOAD_URL);
+  }
+
+  @Test
   public void testPutSingleVariable() {
     String variableKey = "aVariableKey";
     String variableValue = "aVariableValue";
@@ -875,7 +959,7 @@ public abstract class AbstractCaseInstanceRestServiceInteractionTest extends Abs
 
     ObjectMapper mapper = new ObjectMapper();
     String jsonBytes = mapper.writeValueAsString(serializable);
-    String typeName = TypeFactory.type(serializable.getClass()).toCanonical();
+    String typeName = TypeFactory.defaultInstance().constructType(serializable.getClass()).toCanonical();
 
     String variableKey = "aVariableKey";
 
@@ -902,7 +986,7 @@ public abstract class AbstractCaseInstanceRestServiceInteractionTest extends Abs
 
     ObjectMapper mapper = new ObjectMapper();
     String jsonBytes = mapper.writeValueAsString(serializable);
-    String typeName = TypeFactory.type(serializable.getClass()).toCanonical();
+    String typeName = TypeFactory.defaultInstance().constructType(serializable.getClass()).toCanonical();
 
     String variableKey = "aVariableKey";
 

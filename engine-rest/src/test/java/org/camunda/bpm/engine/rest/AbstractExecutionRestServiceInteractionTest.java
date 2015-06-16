@@ -1,8 +1,10 @@
 package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ID;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Matchers.any;
@@ -50,6 +52,8 @@ import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.engine.variable.value.BooleanValue;
+import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.TypeFactory;
@@ -69,6 +73,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
   protected static final String SINGLE_EXECUTION_LOCAL_BINARY_VARIABLE_URL = SINGLE_EXECUTION_LOCAL_VARIABLE_URL + "/data";
   protected static final String MESSAGE_SUBSCRIPTION_URL = EXECUTION_URL + "/messageSubscriptions/{messageName}";
   protected static final String TRIGGER_MESSAGE_SUBSCRIPTION_URL = EXECUTION_URL + "/messageSubscriptions/{messageName}/trigger";
+  protected static final String SINGLE_EXECUTION_VARIABLE_DOWNLOAD_URL = SINGLE_EXECUTION_LOCAL_VARIABLE_URL + "/download";
 
   private RuntimeServiceImpl runtimeServiceMock;
 
@@ -632,6 +637,85 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
   }
 
   @Test
+  public void testGetFileVariable() {
+    String variableKey = "aVariableKey";
+    final byte[] byteContent = "some bytes".getBytes();
+    String filename = "test.txt";
+    String mimeType = "text/plain";
+    FileValue variableValue = Variables.fileValue(filename).file(byteContent).mimeType(mimeType).create();
+
+    when(runtimeServiceMock.getVariableLocalTyped(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey), anyBoolean())).thenReturn(variableValue);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID)
+      .pathParam("varId", variableKey)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(ContentType.JSON.toString())
+    .and()
+      .body("valueInfo.mimeType", equalTo(mimeType))
+      .body("valueInfo.filename", equalTo(filename))
+      .body("value", nullValue())
+    .when().get(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
+  }
+
+  @Test
+  public void testGetFileVariableDownloadWithType() {
+    String variableKey = "aVariableKey";
+    final byte[] byteContent = "some bytes".getBytes();
+    String filename = "test.txt";
+    FileValue variableValue = Variables.fileValue(filename).file(byteContent).mimeType(ContentType.TEXT.toString()).create();
+
+    when(runtimeServiceMock.getVariableLocalTyped(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey), anyBoolean())).thenReturn(variableValue);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID)
+      .pathParam("varId", variableKey)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(ContentType.TEXT.toString())
+    .and()
+      .body(is(equalTo(new String(byteContent))))
+    .when().get(SINGLE_EXECUTION_VARIABLE_DOWNLOAD_URL);
+  }
+
+  @Test
+  public void testGetFileVariableDownloadWithoutType() {
+    String variableKey = "aVariableKey";
+    final byte[] byteContent = "some bytes".getBytes();
+    String filename = "test.txt";
+    FileValue variableValue = Variables.fileValue(filename).file(byteContent).create();
+
+    when(runtimeServiceMock.getVariableLocalTyped(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey), anyBoolean())).thenReturn(variableValue);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID)
+      .pathParam("varId", variableKey)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(MediaType.APPLICATION_OCTET_STREAM)
+    .and()
+      .body(is(equalTo(new String(byteContent))))
+      .header("Content-Disposition", containsString(filename))
+    .when().get(SINGLE_EXECUTION_VARIABLE_DOWNLOAD_URL);
+  }
+
+  @Test
+  public void testCannotDownloadVariableOtherThanFile() {
+    String variableKey = "aVariableKey";
+    BooleanValue variableValue = Variables.booleanValue(true);
+
+    when(runtimeServiceMock.getVariableLocalTyped(eq(EXAMPLE_TASK_ID), eq(variableKey), anyBoolean())).thenReturn(variableValue);
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .pathParam("varId", variableKey)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when().get(SINGLE_EXECUTION_VARIABLE_DOWNLOAD_URL);
+  }
+
+  @Test
   public void testPutSingleLocalVariable() {
     String variableKey = "aVariableKey";
     String variableValue = "aVariableValue";
@@ -925,7 +1009,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
 
     ObjectMapper mapper = new ObjectMapper();
     String jsonBytes = mapper.writeValueAsString(serializable);
-    String typeName = TypeFactory.type(serializable.getClass()).toCanonical();
+    String typeName = TypeFactory.defaultInstance().constructType(serializable.getClass()).toCanonical();
 
     String variableKey = "aVariableKey";
 
@@ -950,7 +1034,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
 
     ObjectMapper mapper = new ObjectMapper();
     String jsonBytes = mapper.writeValueAsString(serializable);
-    String typeName = TypeFactory.type(serializable.getClass()).toCanonical();
+    String typeName = TypeFactory.defaultInstance().constructType(serializable.getClass()).toCanonical();
 
     String variableKey = "aVariableKey";
 

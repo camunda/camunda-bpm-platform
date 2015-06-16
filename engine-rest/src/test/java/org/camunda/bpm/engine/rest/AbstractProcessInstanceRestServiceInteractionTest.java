@@ -59,6 +59,8 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.engine.variable.value.FileValue;
+import org.camunda.bpm.engine.variable.value.LongValue;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.TypeFactory;
@@ -83,6 +85,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   protected static final String SINGLE_PROCESS_INSTANCE_SUSPENDED_URL = SINGLE_PROCESS_INSTANCE_URL + "/suspended";
   protected static final String PROCESS_INSTANCE_SUSPENDED_URL = PROCESS_INSTANCE_URL + "/suspended";
   protected static final String PROCESS_INSTANCE_MODIFICATION_URL = SINGLE_PROCESS_INSTANCE_URL + "/modification";
+  protected static final String SINGLE_PROCESS_INSTANCE_VARIABLE_DOWNLOAD_URL = SINGLE_PROCESS_INSTANCE_VARIABLE_URL + "/download";
 
   protected static final VariableMap EXAMPLE_OBJECT_VARIABLES = Variables.createVariables();
   static {
@@ -216,6 +219,90 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     Assert.assertEquals("Should return exactly one variable", 1, response.jsonPath().getMap("").size());
   }
 
+  @Test
+  public void testGetFileVariable() {
+    String variableKey = "aVariableKey";
+    final byte[] byteContent = "some bytes".getBytes();
+    String filename = "test.txt";
+    String mimeType = "text/plain";
+    FileValue variableValue = Variables.fileValue(filename).file(byteContent).mimeType(mimeType).create();
+
+    when(runtimeServiceMock.getVariableTyped(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey), eq(true)))
+    .thenReturn(variableValue);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
+      .pathParam("varId", variableKey)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(ContentType.JSON.toString())
+    .and()
+      .body("valueInfo.mimeType", equalTo(mimeType))
+      .body("valueInfo.filename", equalTo(filename))
+      .body("value", nullValue())
+    .when().get(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+  }
+
+  @Test
+  public void testGetFileVariableDownloadWithType() {
+    String variableKey = "aVariableKey";
+    final byte[] byteContent = "some bytes".getBytes();
+    String filename = "test.txt";
+    FileValue variableValue = Variables.fileValue(filename).file(byteContent).mimeType(ContentType.TEXT.toString()).create();
+
+    when(runtimeServiceMock.getVariableTyped(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey), anyBoolean()))
+    .thenReturn(variableValue);
+
+  given()
+    .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
+    .pathParam("varId", variableKey)
+  .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(ContentType.TEXT.toString())
+    .and()
+      .body(is(equalTo(new String(byteContent))))
+    .when().get(SINGLE_PROCESS_INSTANCE_VARIABLE_DOWNLOAD_URL);
+  }
+
+  @Test
+  public void testGetFileVariableDownloadWithoutType() {
+    String variableKey = "aVariableKey";
+    final byte[] byteContent = "some bytes".getBytes();
+    String filename = "test.txt";
+    FileValue variableValue = Variables.fileValue(filename).file(byteContent).create();
+
+    when(runtimeServiceMock.getVariableTyped(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey), anyBoolean()))
+    .thenReturn(variableValue);
+
+   given()
+    .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
+    .pathParam("varId", variableKey)
+  .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(MediaType.APPLICATION_OCTET_STREAM)
+    .and()
+      .body(is(equalTo(new String(byteContent))))
+      .header("Content-Disposition", containsString(filename))
+    .when().get(SINGLE_PROCESS_INSTANCE_VARIABLE_DOWNLOAD_URL);
+  }
+
+  @Test
+  public void testCannotDownloadVariableOtherThanFile() {
+    String variableKey = "aVariableKey";
+    LongValue variableValue = Variables.longValue(123L);
+
+    when(runtimeServiceMock.getVariableTyped(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey), anyBoolean()))
+    .thenReturn(variableValue);
+
+   given()
+    .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
+    .pathParam("varId", variableKey)
+  .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .contentType(MediaType.APPLICATION_JSON)
+    .and()
+    .when().get(SINGLE_PROCESS_INSTANCE_VARIABLE_DOWNLOAD_URL);
+  }
 
   @Test
   public void testJavaObjectVariableSerialization() {
@@ -1087,7 +1174,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
 
     ObjectMapper mapper = new ObjectMapper();
     String jsonBytes = mapper.writeValueAsString(serializable);
-    String typeName = TypeFactory.type(serializable.getClass()).toCanonical();
+    String typeName = TypeFactory.defaultInstance().constructType(serializable.getClass()).toCanonical();
 
     String variableKey = "aVariableKey";
 
@@ -1112,7 +1199,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
 
     ObjectMapper mapper = new ObjectMapper();
     String jsonBytes = mapper.writeValueAsString(serializable);
-    String typeName = TypeFactory.type(serializable.getClass()).toCanonical();
+    String typeName = TypeFactory.defaultInstance().constructType(serializable.getClass()).toCanonical();
 
     String variableKey = "aVariableKey";
 

@@ -23,13 +23,13 @@ import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_PAREN
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_USER_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.NON_EXISTING_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.createMockHistoricTaskInstance;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -115,6 +115,8 @@ import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.engine.variable.value.BooleanValue;
+import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.TypeFactory;
@@ -163,6 +165,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   protected static final String SINGLE_TASK_SINGLE_BINARY_VARIABLE_URL = SINGLE_TASK_PUT_SINGLE_VARIABLE_URL + "/data";
   protected static final String SINGLE_TASK_DELETE_SINGLE_VARIABLE_URL = SINGLE_TASK_SINGLE_VARIABLE_URL;
   protected static final String SINGLE_TASK_MODIFY_VARIABLES_URL = SINGLE_TASK_VARIABLES_URL;
+  protected static final String SINGLE_TASK_SINGLE_VARIABLE_DOWNLOAD_URL = SINGLE_TASK_PUT_SINGLE_VARIABLE_URL + "/download";
 
   protected static final String TASK_CREATE_URL = TASK_SERVICE_URL + "/create";
 
@@ -2979,6 +2982,83 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   }
 
   @Test
+  public void testGetFileVariable() {
+    String variableKey = "aVariableKey";
+    final byte[] byteContent = "some bytes".getBytes();
+    String filename = "test.txt";
+    String mimeType = "text/plain";
+    FileValue variableValue = Variables.fileValue(filename).file(byteContent).mimeType(mimeType).create();
+
+    when(taskServiceMock.getVariableLocalTyped(eq(EXAMPLE_TASK_ID), eq(variableKey), anyBoolean())).thenReturn(variableValue);
+
+    given().pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(ContentType.JSON.toString())
+    .and()
+      .body("valueInfo.mimeType", equalTo(mimeType))
+      .body("valueInfo.filename", equalTo(filename))
+      .body("value", nullValue())
+    .when().get(SINGLE_TASK_SINGLE_VARIABLE_URL);
+  }
+
+  @Test
+  public void testGetFileVariableDownloadWithType() {
+    String variableKey = "aVariableKey";
+    final byte[] byteContent = "some bytes".getBytes();
+    String filename = "test.txt";
+    FileValue variableValue = Variables.fileValue(filename).file(byteContent).mimeType(ContentType.TEXT.toString()).create();
+
+    when(taskServiceMock.getVariableLocalTyped(eq(EXAMPLE_TASK_ID), eq(variableKey), anyBoolean())).thenReturn(variableValue);
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .pathParam("varId", variableKey)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(ContentType.TEXT.toString())
+    .and()
+      .body(is(equalTo(new String(byteContent))))
+    .when().get(SINGLE_TASK_SINGLE_VARIABLE_DOWNLOAD_URL);
+  }
+
+  @Test
+  public void testGetFileVariableDownloadWithoutType() {
+    String variableKey = "aVariableKey";
+    final byte[] byteContent = "some bytes".getBytes();
+    String filename = "test.txt";
+    FileValue variableValue = Variables.fileValue(filename).file(byteContent).create();
+
+    when(taskServiceMock.getVariableLocalTyped(eq(EXAMPLE_TASK_ID), eq(variableKey), anyBoolean())).thenReturn(variableValue);
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .pathParam("varId", variableKey)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(MediaType.APPLICATION_OCTET_STREAM)
+    .and()
+      .body(is(equalTo(new String(byteContent))))
+      .header("Content-Disposition", containsString(filename))
+    .when().get(SINGLE_TASK_SINGLE_VARIABLE_DOWNLOAD_URL);
+  }
+
+  @Test
+  public void testCannotDownloadVariableOtherThanFile() {
+    String variableKey = "aVariableKey";
+    BooleanValue variableValue = Variables.booleanValue(true);
+
+    when(taskServiceMock.getVariableLocalTyped(eq(EXAMPLE_TASK_ID), eq(variableKey), anyBoolean())).thenReturn(variableValue);
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .pathParam("varId", variableKey)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when().get(SINGLE_TASK_SINGLE_VARIABLE_DOWNLOAD_URL);
+  }
+
+  @Test
   public void testPutSingleLocalVariable() {
     String variableKey = "aVariableKey";
     String variableValue = "aVariableValue";
@@ -3338,7 +3418,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     ObjectMapper mapper = new ObjectMapper();
     String jsonBytes = mapper.writeValueAsString(serializable);
-    String typeName = TypeFactory.type(serializable.getClass()).toCanonical();
+    String typeName = TypeFactory.defaultInstance().constructType(serializable.getClass()).toCanonical();
 
     String variableKey = "aVariableKey";
 
@@ -3364,7 +3444,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     ObjectMapper mapper = new ObjectMapper();
     String jsonBytes = mapper.writeValueAsString(serializable);
-    String typeName = TypeFactory.type(serializable.getClass()).toCanonical();
+    String typeName = TypeFactory.defaultInstance().constructType(serializable.getClass()).toCanonical();
 
     String variableKey = "aVariableKey";
 

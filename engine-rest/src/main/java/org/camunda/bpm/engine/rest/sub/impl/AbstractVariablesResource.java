@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.AuthorizationException;
@@ -36,6 +37,7 @@ import org.camunda.bpm.engine.rest.sub.VariableResource;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.BytesValue;
+import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 import com.fasterxml.jackson.databind.JavaType;
@@ -107,6 +109,22 @@ public abstract class AbstractVariablesResource implements VariableResource {
     else {
       throw new InvalidRequestException(Status.BAD_REQUEST, "Variable '"+variableName+"' is not of type 'Bytes' but of type '"+typedValue.getType()+"'.");
     }
+  }
+
+  @Override
+  public Response download(String variableName) {
+    TypedValue typedValue = getTypedValueForVariable(variableName, false);
+    if (typedValue instanceof FileValue) {
+      FileValue fileValue = (FileValue) typedValue;
+      String type = fileValue.getMimeType() != null ? fileValue.getMimeType() : MediaType.APPLICATION_OCTET_STREAM;
+      return Response
+              .ok()
+              .type(type)
+              .entity(fileValue.getValue())
+              .header("Content-Disposition", "attachment; filename=" + fileValue.getFilename())
+              .build();
+    }
+    throw new InvalidRequestException(Status.BAD_REQUEST, "Variable '" + variableName + "' is not of type 'File' but of type '" + typedValue.getType() + "'.");
   }
 
   @Override
