@@ -21,6 +21,7 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.util.Scanner;
 
@@ -81,7 +82,7 @@ public class FileValueSerializerTest {
   }
 
   @Test
-  public void testWriteMimetypeFilenameAndBytesValue() {
+  public void testWriteMimetypeFilenameAndBytesValue() throws UnsupportedEncodingException {
     String filename = "test.txt";
     String mimeType = "text/json";
     InputStream is = this.getClass().getClassLoader().getResourceAsStream("org/camunda/bpm/engine/test/variables/simpleFile.txt");
@@ -90,20 +91,20 @@ public class FileValueSerializerTest {
 
     serializer.writeValue(fileValue, valueFields);
 
-    assertThat(new String(valueFields.getByteArrayValue().getBytes()), is("text"));
+    assertThat(new String(valueFields.getByteArrayValue().getBytes(), "UTF-8"), is("text"));
     assertThat(valueFields.getTextValue(), is(filename));
     assertThat(valueFields.getTextValue2(), is(mimeType));
   }
 
   @Test
-  public void testWriteMimetypeFilenameAndBytesValueWithShortcutMethod() throws URISyntaxException {
+  public void testWriteMimetypeFilenameAndBytesValueWithShortcutMethod() throws URISyntaxException, UnsupportedEncodingException {
     File file = new File(this.getClass().getClassLoader().getResource("org/camunda/bpm/engine/test/variables/simpleFile.txt").toURI());
     FileValue fileValue = Variables.fileValue(file);
     ValueFields valueFields = new MockValueFields();
 
     serializer.writeValue(fileValue, valueFields);
 
-    assertThat(new String(valueFields.getByteArrayValue().getBytes()), is("text"));
+    assertThat(new String(valueFields.getByteArrayValue().getBytes(), "UTF-8"), is("text"));
     assertThat(valueFields.getTextValue(), is("simpleFile.txt"));
     assertThat(valueFields.getTextValue2(), is("text/plain"));
   }
