@@ -74,7 +74,10 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
     this.deploymentBuilder = deploymentBuilder;
   }
 
-  public Deployment execute(final CommandContext commandContext) {
+  // synchronized: ensure serial processing of multiple deployments on the same node.
+  // We experienced deadlock situations with highly concurrent deployment of multiple
+  // applications on Jboss & Wildfly in combination with H2.
+  public synchronized Deployment execute(final CommandContext commandContext) {
 
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     authorizationManager.checkCreateDeployment();
