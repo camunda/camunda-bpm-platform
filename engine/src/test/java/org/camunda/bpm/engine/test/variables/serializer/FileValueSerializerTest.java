@@ -23,8 +23,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.util.Scanner;
 
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.core.variable.type.FileValueTypeImpl;
 import org.camunda.bpm.engine.impl.core.variable.value.UntypedValueImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
@@ -78,7 +80,7 @@ public class FileValueSerializerTest {
 
     assertThat(valueFields.getByteArrayValue().getBytes(), is(nullValue()));
     assertThat(valueFields.getTextValue(), is(filename));
-    assertThat(valueFields.getTextValue2(), is(mimeType));
+    assertThat(valueFields.getTextValue2(), is(mimeType + "\0"));
   }
 
   @Test
@@ -93,7 +95,23 @@ public class FileValueSerializerTest {
 
     assertThat(new String(valueFields.getByteArrayValue().getBytes(), "UTF-8"), is("text"));
     assertThat(valueFields.getTextValue(), is(filename));
-    assertThat(valueFields.getTextValue2(), is(mimeType));
+    assertThat(valueFields.getTextValue2(), is(mimeType + "\0"));
+  }
+
+  @Test
+  public void testWriteMimetypeFilenameBytesValueAndEncoding() throws UnsupportedEncodingException {
+    String filename = "test.txt";
+    String mimeType = "text/json";
+    Charset encoding = Charset.forName("UTF-8");
+    InputStream is = this.getClass().getClassLoader().getResourceAsStream("org/camunda/bpm/engine/test/variables/simpleFile.txt");
+    FileValue fileValue = Variables.fileValue(filename).mimeType(mimeType).encoding(encoding).file(is).create();
+    ValueFields valueFields = new MockValueFields();
+
+    serializer.writeValue(fileValue, valueFields);
+
+    assertThat(new String(valueFields.getByteArrayValue().getBytes(), "UTF-8"), is("text"));
+    assertThat(valueFields.getTextValue(), is(filename));
+    assertThat(valueFields.getTextValue2(), is(mimeType + "\0" + encoding.name()));
   }
 
   @Test
@@ -106,7 +124,7 @@ public class FileValueSerializerTest {
 
     assertThat(new String(valueFields.getByteArrayValue().getBytes(), "UTF-8"), is("text"));
     assertThat(valueFields.getTextValue(), is("simpleFile.txt"));
-    assertThat(valueFields.getTextValue2(), is("text/plain"));
+    assertThat(valueFields.getTextValue2(), is("text/plain\0"));
   }
 
   @Test(expected = UnsupportedOperationException.class)
@@ -115,7 +133,7 @@ public class FileValueSerializerTest {
   }
 
   @Test
-  public void testReadFullValue() throws IOException {
+  public void testReadFileNameMimeTypeAndByteArray() throws IOException {
     InputStream is = this.getClass().getClassLoader().getResourceAsStream("org/camunda/bpm/engine/test/variables/simpleFile.txt");
     byte[] data = new byte[is.available()];
     DataInputStream dataInputStream = new DataInputStream(is);
@@ -132,6 +150,50 @@ public class FileValueSerializerTest {
 
     assertThat(fileValue.getFilename(), is(filename));
     assertThat(fileValue.getMimeType(), is(mimeType));
+    checkStreamFromValue(fileValue, "text");
+  }
+
+  @Test
+  public void testReadFileNameEncodingAndByteArray() throws IOException {
+    InputStream is = this.getClass().getClassLoader().getResourceAsStream("org/camunda/bpm/engine/test/variables/simpleFile.txt");
+    byte[] data = new byte[is.available()];
+    DataInputStream dataInputStream = new DataInputStream(is);
+    dataInputStream.readFully(data);
+    dataInputStream.close();
+    MockValueFields valueFields = new MockValueFields();
+    String filename = "file.txt";
+    valueFields.setTextValue(filename);
+    valueFields.setByteArrayValue(data);
+    String encoding = "\0UTF-8";
+    valueFields.setTextValue2(encoding);
+
+    FileValue fileValue = serializer.readValue(valueFields, true);
+
+    assertThat(fileValue.getFilename(), is(filename));
+    assertThat(fileValue.getEncoding().name(), is("UTF-8"));
+    checkStreamFromValue(fileValue, "text");
+  }
+
+  @Test
+  public void testReadFullValue() throws IOException {
+    InputStream is = this.getClass().getClassLoader().getResourceAsStream("org/camunda/bpm/engine/test/variables/simpleFile.txt");
+    byte[] data = new byte[is.available()];
+    DataInputStream dataInputStream = new DataInputStream(is);
+    dataInputStream.readFully(data);
+    dataInputStream.close();
+    MockValueFields valueFields = new MockValueFields();
+    String filename = "file.txt";
+    valueFields.setTextValue(filename);
+    valueFields.setByteArrayValue(data);
+    String mimeType = "text/plain";
+    String encoding = "UTF-16";
+    valueFields.setTextValue2(mimeType + "\0" + encoding);
+
+    FileValue fileValue = serializer.readValue(valueFields, true);
+
+    assertThat(fileValue.getFilename(), is(filename));
+    assertThat(fileValue.getMimeType(), is(mimeType));
+    assertThat(fileValue.getEncoding(), is(Charset.forName("UTF-16")));
     checkStreamFromValue(fileValue, "text");
   }
 
@@ -170,6 +232,25 @@ public class FileValueSerializerTest {
   @Test
   public void testNameIsFile(){
     assertThat(serializer.getName(), is("file"));
+  }
+
+  @Test
+  public void testWriteFilenameAndEncodingValue() {
+    String filename = "test.txt";
+    String encoding = "UTF-8";
+    FileValue fileValue = Variables.fileValue(filename).encoding(encoding).create();
+    ValueFields valueFields = new MockValueFields();
+
+    serializer.writeValue(fileValue, valueFields);
+
+    assertThat(valueFields.getByteArrayValue().getBytes(), is(nullValue()));
+    assertThat(valueFields.getTextValue(), is(filename));
+    assertThat(valueFields.getTextValue2(), is("\0" + encoding));
+  }
+
+  @Test(expected=NullValueException.class)
+  public void testSerializeFileValueWithoutName(){
+    Variables.fileValue((String) null).file("abc".getBytes()).create();
   }
 
   private void checkStreamFromValue(TypedValue value, String expected) {

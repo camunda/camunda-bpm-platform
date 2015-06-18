@@ -12,11 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.variable.serializer;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.Arrays;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.core.variable.value.FileValueImpl;
 import org.camunda.bpm.engine.impl.core.variable.value.UntypedValueImpl;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
@@ -30,40 +28,27 @@ import org.camunda.bpm.engine.variable.value.builder.FileValueBuilder;
  */
 public class FileValueSerializer extends AbstractTypedValueSerializer<FileValue> {
 
+  /**
+   * Since most unicode characters are allowed in filenames we'll use the null
+   * character to separate the two of them.
+   */
+  protected static final String MIMETYPE_ENCODING_SEPARATOR = "\0";
+
   public FileValueSerializer() {
     super(ValueType.FILE);
   }
 
   @Override
   public void writeValue(FileValue value, ValueFields valueFields) {
-    byte[] data = readBytes(value);
+    byte[] data = ((FileValueImpl) value).getByteArray();
     valueFields.setByteArrayValue(data);
     valueFields.setTextValue(value.getFilename());
-    valueFields.setTextValue2(value.getMimeType());
-  }
-
-  protected byte[] readBytes(FileValue value) {
-    InputStream is = value.getValue();
-    if (is == null) {
-      return null;
-    }
-    DataInputStream dis = null;
-    try {
-      byte[] data = new byte[is.available()];
-      dis = new DataInputStream(is);
-      dis.readFully(data);
-      dis.close();
-      return data;
-    } catch (IOException e) {
-      throw new ProcessEngineException(e);
-    } finally {
-      try {
-        if (dis != null) {
-          dis.close();
-        }
-      } catch (IOException e) {
-        throw new ProcessEngineException(e);
-      }
+    if (value.getMimeType() == null && value.getEncoding() != null) {
+      valueFields.setTextValue2(MIMETYPE_ENCODING_SEPARATOR + value.getEncoding().name());
+    } else if (value.getMimeType() != null && value.getEncoding() == null) {
+      valueFields.setTextValue2(value.getMimeType() + MIMETYPE_ENCODING_SEPARATOR);
+    } else if (value.getMimeType() != null && value.getEncoding() != null) {
+      valueFields.setTextValue2(value.getMimeType() + MIMETYPE_ENCODING_SEPARATOR + value.getEncoding().name());
     }
   }
 
@@ -78,7 +63,12 @@ public class FileValueSerializer extends AbstractTypedValueSerializer<FileValue>
     if (valueFields.getByteArrayValue() != null) {
       builder.file(valueFields.getByteArrayValue().getBytes());
     }
-    builder.mimeType(valueFields.getTextValue2());
+    // to ensure the same array size all the time
+    if (valueFields.getTextValue2() != null) {
+      String[] split = Arrays.copyOf(valueFields.getTextValue2().split(MIMETYPE_ENCODING_SEPARATOR), 2);
+      builder.mimeType(split[0]);
+      builder.encoding(split[1]);
+    }
     return builder.create();
   }
 

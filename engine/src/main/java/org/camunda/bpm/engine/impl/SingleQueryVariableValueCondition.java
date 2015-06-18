@@ -63,7 +63,9 @@ public class SingleQueryVariableValueCondition extends AbstractQueryVariableValu
 
     if(serializer.getType() == ValueType.BYTES){
       throw new ProcessEngineException("Variables of type ByteArray cannot be used to query");
-
+    }
+    else if(serializer.getType() == ValueType.FILE){
+      throw new ProcessEngineException("Variables of type File cannot be used to query");
     }
     else if(serializer instanceof JPAVariableSerializer) {
       if(wrappedQueryValue.getOperator() != QueryOperator.EQUALS) {

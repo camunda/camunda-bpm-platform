@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Scanner;
@@ -112,15 +113,31 @@ public class FileValueTypeImplTest {
   }
 
   @Test
-  public void valueInfoContainsFileTypeAndName() {
+  public void valueInfoContainsFileTypeNameAndCharsetEncoding() {
     InputStream file = this.getClass().getClassLoader().getResourceAsStream("org/camunda/bpm/engine/test/variables/simpleFile.txt");
     String fileName = "simpleFile.txt";
     String fileType = "text/plain";
-    FileValue fileValue = Variables.fileValue(fileName).file(file).mimeType(fileType).create();
+    Charset encoding = Charset.forName("UTF-8");
+    FileValue fileValue = Variables.fileValue(fileName).file(file).mimeType(fileType).encoding(encoding).create();
     Map<String, Object> info = type.getValueInfo(fileValue);
 
     assertThat(info, hasEntry(FileValueTypeImpl.VALUE_INFO_FILE_NAME, (Object) fileName));
     assertThat(info, hasEntry(FileValueTypeImpl.VALUE_INFO_FILE_MIME_TYPE, (Object) fileType));
+    assertThat(info, hasEntry(FileValueTypeImpl.VALUE_INFO_FILE_ENCODING, (Object) encoding.name()));
+  }
+
+  @Test
+  public void valueInfoContainsFileTypeNameAndStringEncoding() {
+    InputStream file = this.getClass().getClassLoader().getResourceAsStream("org/camunda/bpm/engine/test/variables/simpleFile.txt");
+    String fileName = "simpleFile.txt";
+    String fileType = "text/plain";
+    String encoding = "UTF-8";
+    FileValue fileValue = Variables.fileValue(fileName).file(file).mimeType(fileType).encoding(encoding).create();
+    Map<String, Object> info = type.getValueInfo(fileValue);
+
+    assertThat(info, hasEntry(FileValueTypeImpl.VALUE_INFO_FILE_NAME, (Object) fileName));
+    assertThat(info, hasEntry(FileValueTypeImpl.VALUE_INFO_FILE_MIME_TYPE, (Object) fileType));
+    assertThat(info, hasEntry(FileValueTypeImpl.VALUE_INFO_FILE_ENCODING, (Object) encoding));
   }
 
   @Test

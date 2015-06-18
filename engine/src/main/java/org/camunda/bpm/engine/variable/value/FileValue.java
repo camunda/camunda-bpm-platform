@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.variable.value;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 
 
@@ -27,7 +28,13 @@ public interface FileValue extends TypedValue {
 
   String getMimeType();
 
+  Charset getEncoding();
+
   @Override
   InputStream getValue();
+
+  void setEncoding(String encoding);
+
+  void setEncoding(Charset encoding);
 
 }

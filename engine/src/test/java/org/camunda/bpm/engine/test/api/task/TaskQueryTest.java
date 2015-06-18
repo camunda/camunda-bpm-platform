@@ -26,6 +26,8 @@ import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByNam
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByPriority;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.taskByProcessInstanceId;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySortingAndCount;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.assertThat;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -62,6 +64,7 @@ import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.engine.variable.value.FileValue;
 
 /**
  * @author Joram Barrez
@@ -1663,24 +1666,13 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByCaseDefinitionId() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -1715,15 +1707,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .withCaseDefinitionByKey(caseDefinitionKey)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -1760,15 +1744,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .withCaseDefinition(caseDefinitionId)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -1794,24 +1770,13 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByCaseDefinitionNameLike() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -1842,25 +1807,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByCaseInstanceId() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     String caseInstanceId = caseService
       .withCaseDefinition(caseDefinitionId)
       .create()
       .getId();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -1930,10 +1884,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByCaseInstanceBusinessKey() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     String businessKey = "aBusinessKey";
 
@@ -1942,15 +1893,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .businessKey(businessKey)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -1976,10 +1919,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByCaseInstanceBusinessKeyLike() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     String businessKey = "aBusinessKey";
 
@@ -1988,15 +1928,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .businessKey(businessKey)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2027,24 +1959,13 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByCaseExecutionId() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    String humanTaskExecutionId = startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2070,25 +1991,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByNullCaseInstanceVariableValueEquals() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aNullValue", null)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2099,25 +2009,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByStringCaseInstanceVariableValueEquals() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aStringValue", "abc")
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2128,25 +2027,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByBooleanCaseInstanceVariableValueEquals() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aBooleanValue", true)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2157,25 +2045,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByShortCaseInstanceVariableValueEquals() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aShortValue", (short) 123)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2186,25 +2063,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByIntegerCaseInstanceVariableValueEquals() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("anIntegerValue", 456)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2215,25 +2081,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByLongCaseInstanceVariableValueEquals() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aLongValue", (long) 789)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2244,10 +2099,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByDateCaseInstanceVariableValueEquals() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     Date now = new Date();
 
@@ -2256,15 +2108,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aDateValue", now)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2275,25 +2119,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByDoubleCaseInstanceVariableValueEquals() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aDoubleValue", 1.5)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2304,10 +2137,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByByteArrayCaseInstanceVariableValueEquals() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     byte[] bytes = "somebytes".getBytes();
 
@@ -2316,15 +2146,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aByteArrayValue", bytes)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2336,10 +2158,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryBySerializableCaseInstanceVariableValueEquals() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     List<String> serializable = new ArrayList<String>();
     serializable.add("one");
@@ -2351,15 +2170,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aSerializableValue", serializable)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2370,26 +2181,59 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
-  public void testQueryByStringCaseInstanceVariableValueNotEquals() {
+  public void testQueryByFileCaseInstanceVariableValueEquals() {
+    FileValue fileValue = createDefaultFileValue();
+    String variableName = "aFileValue";
+
+    startDefaultCaseWithVariable(fileValue, variableName);
+    TaskQuery query = taskService.createTaskQuery();
+
+    try {
+      query.caseInstanceVariableValueEquals(variableName, fileValue).list();
+      fail();
+    } catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), containsString("Variables of type File cannot be used to query"));
+    }
+  }
+
+  /**
+   * Starts the one deployed case at the point of the manual activity PI_HumanTask_1
+   * with the given variable.
+   */
+  protected void startDefaultCaseWithVariable(Object variableValue, String variableName) {
+    String caseDefinitionId = getCaseDefinitionId();
+    createCaseWithVariable(caseDefinitionId, variableValue, variableName);
+    startDefaultCaseExecutionManually();
+  }
+
+  /**
+   * @return the case definition id if only one case is deployed.
+   */
+  protected String getCaseDefinitionId() {
     String caseDefinitionId = repositoryService
         .createCaseDefinitionQuery()
         .singleResult()
         .getId();
+    return caseDefinitionId;
+  }
+
+  protected void createCaseWithVariable(String caseDefinitionId, Object variableValue, String variableName) {
+    caseService
+      .withCaseDefinition(caseDefinitionId)
+      .setVariable(variableName, variableValue)
+      .create();
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByStringCaseInstanceVariableValueNotEquals() {
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aStringValue", "abc")
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2400,25 +2244,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByBooleanCaseInstanceVariableValueNotEquals() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aBooleanValue", true)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2429,25 +2262,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByShortCaseInstanceVariableValueNotEquals() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aShortValue", (short) 123)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2458,25 +2280,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByIntegerCaseInstanceVariableValueNotEquals() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("anIntegerValue", 456)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2487,25 +2298,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByLongCaseInstanceVariableValueNotEquals() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aLongValue", (long) 789)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2516,10 +2316,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByDateCaseInstanceVariableValueNotEquals() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     Date now = new Date();
 
@@ -2528,15 +2325,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aDateValue", now)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     Date before = new Date(now.getTime() - 100000);
 
@@ -2549,25 +2338,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByDoubleCaseInstanceVariableValueNotEquals() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aDoubleValue", 1.5)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2577,19 +2355,35 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
-  public void testQueryByByteArrayCaseInstanceVariableValueNotEquals() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+  public void testQueryByFileCaseInstanceVariableValueNotEquals() {
+    FileValue fileValue = createDefaultFileValue();
+    String variableName = "aFileValue";
 
-    byte[] bytes = "somebytes".getBytes();
+    startDefaultCaseWithVariable(fileValue, variableName);
+    TaskQuery query = taskService.createTaskQuery();
+    try {
+      query.caseInstanceVariableValueNotEquals(variableName, fileValue).list();
+      fail();
+    } catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), containsString("Variables of type File cannot be used to query"));
+    }
+  }
 
-    caseService
-      .withCaseDefinition(caseDefinitionId)
-      .setVariable("aByteArrayValue", bytes)
-      .create();
+  /**
+   * @return
+   */
+  protected FileValue createDefaultFileValue() {
+    FileValue fileValue = Variables.fileValue("tst.txt").file("somebytes".getBytes()).create();
+    return fileValue;
+  }
 
+  /**
+   * Starts the case execution for oneTaskCase.cmmn<p>
+   * Only works for testcases, which deploy that process.
+   *
+   * @return the execution id for the activity PI_HumanTask_1
+   */
+  protected String startDefaultCaseExecutionManually() {
     String humanTaskExecutionId = caseService
         .createCaseExecutionQuery()
         .activityId("PI_HumanTask_1")
@@ -2599,21 +2393,12 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     caseService
       .withCaseExecution(humanTaskExecutionId)
       .manualStart();
-
-    TaskQuery query = taskService.createTaskQuery();
-
-    try {
-      query.caseInstanceVariableValueNotEquals("aByteArrayValue", bytes).list();
-      fail();
-    } catch (ProcessEngineException e) {}
+    return humanTaskExecutionId;
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryBySerializableCaseInstanceVariableValueNotEquals() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     List<String> serializable = new ArrayList<String>();
     serializable.add("one");
@@ -2625,15 +2410,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aSerializableValue", serializable)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2644,26 +2421,36 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByByteArrayCaseInstanceVariableValueNotEquals() {
+    String caseDefinitionId = getCaseDefinitionId();
+
+    byte[] bytes = "somebytes".getBytes();
+
+    caseService
+      .withCaseDefinition(caseDefinitionId)
+      .setVariable("aByteArrayValue", bytes)
+      .create();
+
+    startDefaultCaseExecutionManually();
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    try {
+      query.caseInstanceVariableValueNotEquals("aByteArrayValue", bytes).list();
+      fail();
+    } catch (ProcessEngineException e) {}
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByNullCaseInstanceVariableValueGreaterThan() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aNullValue", null)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2676,25 +2463,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByStringCaseInstanceVariableValueGreaterThan() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aStringValue", "abc")
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2706,25 +2482,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByBooleanCaseInstanceVariableValueGreaterThan() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aBooleanValue", true)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2737,25 +2502,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByShortCaseInstanceVariableValueGreaterThan() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aShortValue", (short) 123)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2767,25 +2521,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByIntegerCaseInstanceVariableValueGreaterThan() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("anIntegerValue", 456)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2797,25 +2540,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByLongCaseInstanceVariableValueGreaterThan() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aLongValue", (long) 789)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2827,10 +2559,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByDateCaseInstanceVariableValueGreaterThan() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     Date now = new Date();
 
@@ -2839,15 +2568,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aDateValue", now)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2861,25 +2582,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByDoubleCaseInstanceVariableValueGreaterThan() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aDoubleValue", 1.5)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2891,10 +2601,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByByteArrayCaseInstanceVariableValueGreaterThan() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     byte[] bytes = "somebytes".getBytes();
 
@@ -2903,15 +2610,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aByteArrayValue", bytes)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2923,10 +2622,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryBySerializableCaseInstanceVariableGreaterThan() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     List<String> serializable = new ArrayList<String>();
     serializable.add("one");
@@ -2938,15 +2634,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aSerializableValue", serializable)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2957,26 +2645,31 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByFileCaseInstanceVariableValueGreaterThan() {
+    FileValue fileValue = createDefaultFileValue();
+    String variableName = "aFileValue";
+
+    startDefaultCaseWithVariable(fileValue, variableName);
+    TaskQuery query = taskService.createTaskQuery();
+
+    try {
+      query.caseInstanceVariableValueGreaterThan(variableName, fileValue).list();
+      fail();
+    } catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), containsString("Variables of type File cannot be used to query"));
+      }
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByNullCaseInstanceVariableValueGreaterThanOrEqual() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aNullValue", null)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -2989,25 +2682,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByStringCaseInstanceVariableValueGreaterThanOrEqual() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aStringValue", "abc")
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3025,25 +2707,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByBooleanCaseInstanceVariableValueGreaterThanOrEqual() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aBooleanValue", true)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3056,25 +2727,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByShortCaseInstanceVariableValueGreaterThanOrEqual() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aShortValue", (short) 123)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3092,25 +2752,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByIntegerCaseInstanceVariableValueGreaterThanOrEquals() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("anIntegerValue", 456)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3128,25 +2777,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByLongCaseInstanceVariableValueGreaterThanOrEqual() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aLongValue", (long) 789)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3164,10 +2802,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByDateCaseInstanceVariableValueGreaterThanOrEqual() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     Date now = new Date();
 
@@ -3176,15 +2811,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aDateValue", now)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3204,25 +2831,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByDoubleCaseInstanceVariableValueGreaterThanOrEqual() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aDoubleValue", 1.5)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3240,10 +2856,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByByteArrayCaseInstanceVariableValueGreaterThanOrEqual() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     byte[] bytes = "somebytes".getBytes();
 
@@ -3252,15 +2865,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aByteArrayValue", bytes)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3272,10 +2877,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryBySerializableCaseInstanceVariableGreaterThanOrEqual() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     List<String> serializable = new ArrayList<String>();
     serializable.add("one");
@@ -3287,15 +2889,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aSerializableValue", serializable)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3306,26 +2900,31 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByFileCaseInstanceVariableValueGreaterThanOrEqual() {
+    FileValue fileValue = createDefaultFileValue();
+    String variableName = "aFileValue";
+
+    startDefaultCaseWithVariable(fileValue, variableName);
+    TaskQuery query = taskService.createTaskQuery();
+
+    try {
+      query.caseInstanceVariableValueGreaterThanOrEquals(variableName, fileValue).list();
+      fail();
+    } catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), containsString("Variables of type File cannot be used to query"));
+    }
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByNullCaseInstanceVariableValueLessThan() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aNullValue", null)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3338,25 +2937,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByStringCaseInstanceVariableValueLessThan() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aStringValue", "abc")
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3368,25 +2956,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByBooleanCaseInstanceVariableValueLessThan() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aBooleanValue", true)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3399,25 +2976,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByShortCaseInstanceVariableValueLessThan() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aShortValue", (short) 123)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3429,25 +2995,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByIntegerCaseInstanceVariableValueLessThan() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("anIntegerValue", 456)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3459,25 +3014,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByLongCaseInstanceVariableValueLessThan() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aLongValue", (long) 789)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3489,10 +3033,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByDateCaseInstanceVariableValueLessThan() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     Date now = new Date();
 
@@ -3501,15 +3042,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aDateValue", now)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3523,25 +3056,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByDoubleCaseInstanceVariableValueLessThan() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aDoubleValue", 1.5)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3553,10 +3075,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByByteArrayCaseInstanceVariableValueLessThan() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     byte[] bytes = "somebytes".getBytes();
 
@@ -3565,15 +3084,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aByteArrayValue", bytes)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3585,10 +3096,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryBySerializableCaseInstanceVariableLessThan() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     List<String> serializable = new ArrayList<String>();
     serializable.add("one");
@@ -3600,15 +3108,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aSerializableValue", serializable)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3619,26 +3119,30 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByFileCaseInstanceVariableValueLessThan() {
+    FileValue fileValue = createDefaultFileValue();
+    String variableName = "aFileValue";
+
+    startDefaultCaseWithVariable(fileValue, variableName);
+    TaskQuery query = taskService.createTaskQuery();
+    try {
+      query.caseInstanceVariableValueLessThan(variableName, fileValue).list();
+      fail();
+    } catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), containsString("Variables of type File cannot be used to query"));
+    }
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByNullCaseInstanceVariableValueLessThanOrEqual() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aNullValue", null)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3651,25 +3155,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByStringCaseInstanceVariableValueLessThanOrEqual() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aStringValue", "abc")
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3687,25 +3180,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByBooleanCaseInstanceVariableValueLessThanOrEqual() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aBooleanValue", true)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3718,25 +3200,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByShortCaseInstanceVariableValueLessThanOrEqual() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aShortValue", (short) 123)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3754,25 +3225,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByIntegerCaseInstanceVariableValueLessThanOrEquals() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("anIntegerValue", 456)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3790,25 +3250,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByLongCaseInstanceVariableValueLessThanOrEqual() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aLongValue", (long) 789)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3826,10 +3275,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByDateCaseInstanceVariableValueLessThanOrEqual() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     Date now = new Date();
 
@@ -3838,15 +3284,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aDateValue", now)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3866,25 +3304,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByDoubleCaseInstanceVariableValueLessThanOrEqual() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aDoubleValue", 1.5)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3902,10 +3329,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByByteArrayCaseInstanceVariableValueLessThanOrEqual() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     byte[] bytes = "somebytes".getBytes();
 
@@ -3914,15 +3338,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aByteArrayValue", bytes)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3934,10 +3350,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryBySerializableCaseInstanceVariableLessThanOrEqual() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     List<String> serializable = new ArrayList<String>();
     serializable.add("one");
@@ -3949,15 +3362,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       .setVariable("aSerializableValue", serializable)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -3968,26 +3373,30 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
+  public void testQueryByFileCaseInstanceVariableValueLessThanOrEqual() {
+    FileValue fileValue = createDefaultFileValue();
+    String variableName = "aFileValue";
+
+    startDefaultCaseWithVariable(fileValue, variableName);
+    TaskQuery query = taskService.createTaskQuery();
+    try {
+      query.caseInstanceVariableValueLessThanOrEquals(variableName, fileValue).list();
+      fail();
+    } catch (ProcessEngineException e) {
+      assertThat(e.getMessage(), containsString("Variables of type File cannot be used to query"));
+    }
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByNullCaseInstanceVariableValueLike() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aNullValue", null)
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -4000,25 +3409,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"})
   public void testQueryByStringCaseInstanceVariableValueLike() {
-    String caseDefinitionId = repositoryService
-        .createCaseDefinitionQuery()
-        .singleResult()
-        .getId();
+    String caseDefinitionId = getCaseDefinitionId();
 
     caseService
       .withCaseDefinition(caseDefinitionId)
       .setVariable("aStringValue", "abc")
       .create();
 
-    String humanTaskExecutionId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
-    caseService
-      .withCaseExecution(humanTaskExecutionId)
-      .manualStart();
+    startDefaultCaseExecutionManually();
 
     TaskQuery query = taskService.createTaskQuery();
 
@@ -4459,6 +3857,14 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {
       // happy path
       assertTextPresent("Cannot order by variables of type object", e.getMessage());
+    }
+
+    try {
+      taskService.createTaskQuery().orderByProcessVariable("var", ValueType.FILE);
+      fail("this type is not supported");
+    } catch (ProcessEngineException e) {
+      // happy path
+      assertTextPresent("Cannot order by variables of type file", e.getMessage());
     }
   }
 

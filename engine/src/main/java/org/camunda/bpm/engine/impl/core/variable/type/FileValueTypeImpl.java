@@ -36,6 +36,7 @@ public class FileValueTypeImpl extends AbstractValueTypeImpl implements FileValu
   private static final long serialVersionUID = 1L;
   public final static String VALUE_INFO_FILE_NAME = "filename";
   public final static String VALUE_INFO_FILE_MIME_TYPE = "mimeType";
+  public static final String VALUE_INFO_FILE_ENCODING = "encoding";
 
   public FileValueTypeImpl() {
     super("file");
@@ -71,6 +72,9 @@ public class FileValueTypeImpl extends AbstractValueTypeImpl implements FileValu
     result.put(VALUE_INFO_FILE_NAME, fileValue.getFilename());
     if (fileValue.getMimeType() != null) {
       result.put(VALUE_INFO_FILE_MIME_TYPE, fileValue.getMimeType());
+    }
+    if (fileValue.getEncoding() != null) {
+      result.put(VALUE_INFO_FILE_ENCODING, fileValue.getEncoding().name());
     }
     return result;
   }

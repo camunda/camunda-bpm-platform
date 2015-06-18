@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.core.variable.value;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 import org.camunda.bpm.engine.variable.type.FileValueType;
 import org.camunda.bpm.engine.variable.type.ValueType;
@@ -31,16 +32,18 @@ public class FileValueImpl implements FileValue {
   protected String filename;
   protected byte[] value;
   protected FileValueType type;
+  protected String encoding;
 
-  public FileValueImpl(byte[] value, FileValueType type, String filename, String mimeType) {
+  public FileValueImpl(byte[] value, FileValueType type, String filename, String mimeType, String encoding) {
     this.value = value;
     this.type = type;
     this.filename = filename;
     this.mimeType = mimeType;
+    this.encoding = encoding;
   }
 
   public FileValueImpl(FileValueType type, String filename) {
-    this(null, type, filename, null);
+    this(null, type, filename, null, null);
   }
 
   @Override
@@ -72,6 +75,33 @@ public class FileValueImpl implements FileValue {
   @Override
   public ValueType getType() {
     return type;
+  }
+
+  @Override
+  public void setEncoding(String encoding) {
+    this.encoding = encoding;
+  }
+
+  @Override
+  public void setEncoding(Charset encoding) {
+    this.encoding = encoding.name();
+  }
+
+  @Override
+  public Charset getEncoding() {
+    if (encoding == null) {
+      return null;
+    }
+    return Charset.forName(encoding);
+  }
+
+  /**
+   * Get the byte array directly without wrapping it inside a stream to evade
+   * not needed wrapping. This method is intended for the internal API, which
+   * needs the byte array anyways.
+   */
+  public byte[] getByteArray() {
+    return value;
   }
 
   @Override

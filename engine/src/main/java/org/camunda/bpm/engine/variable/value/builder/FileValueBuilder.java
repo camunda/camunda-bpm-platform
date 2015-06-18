@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.variable.value.builder;
 
 import java.io.File;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 import org.camunda.bpm.engine.variable.value.FileValue;
 
@@ -23,6 +24,13 @@ import org.camunda.bpm.engine.variable.value.FileValue;
  *
  */
 public interface FileValueBuilder extends TypedValueBuilder<FileValue> {
+
+  /**
+   * The buffer size that applies for <b>every</b> {@link FileValueBuilder}.
+   * Because we do not want to make any assumptions about environments this is
+   * not a constant and can be adjusted. The default size is 4MiB.
+   */
+  public static int bufferSize = 1024 * 4;
 
   /**
    * Saves the MIME type of a file in the value infos.
@@ -55,4 +63,20 @@ public interface FileValueBuilder extends TypedValueBuilder<FileValue> {
    * @see #file(InputStream)
    */
   FileValueBuilder file(byte[] bytes);
+
+  /**
+   * Sets the encoding for the file in the value infos (optional).
+   *
+   * @param encoding
+   * @return
+   */
+  FileValueBuilder encoding(Charset encoding);
+
+  /**
+   * Sets the encoding for the file in the value infos (optional).
+   *
+   * @param encoding
+   * @return
+   */
+  FileValueBuilder encoding(String encoding);
 }

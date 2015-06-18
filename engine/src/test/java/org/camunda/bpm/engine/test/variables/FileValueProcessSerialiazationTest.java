@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.variables;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.nio.charset.Charset;
 import java.util.Scanner;
 
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -41,7 +42,7 @@ public class FileValueProcessSerialiazationTest extends PluggableProcessEngineTe
     VariableMap variables = Variables.createVariables();
     String filename = "test.txt";
     String type = "text/plain";
-    FileValue fileValue = Variables.fileValue(filename).file("ABC".getBytes()).mimeType(type).create();
+    FileValue fileValue = Variables.fileValue(filename).file("ABC".getBytes()).encoding("UTF-8").mimeType(type).create();
     variables.put("file", fileValue);
     runtimeService.startProcessInstanceByKey("process", variables);
     Task task = taskService.createTaskQuery().singleResult();
@@ -50,6 +51,7 @@ public class FileValueProcessSerialiazationTest extends PluggableProcessEngineTe
 
     assertThat(value.getFilename(), is(filename));
     assertThat(value.getMimeType(), is(type));
+    assertThat(value.getEncoding(), is(Charset.forName("UTF-8")));
     Scanner scanner = new Scanner(value.getValue());
     assertThat(scanner.nextLine(), is("ABC"));
 

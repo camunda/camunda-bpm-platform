@@ -12,15 +12,17 @@
  */
 package org.camunda.bpm.engine.impl.core.variable.value.builder;
 
-import java.io.DataInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.core.variable.value.FileValueImpl;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.variable.type.PrimitiveValueType;
 import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.engine.variable.value.builder.FileValueBuilder;
@@ -35,6 +37,7 @@ public class FileValueBuilderImpl implements FileValueBuilder {
   protected FileValueImpl fileValue;
 
   public FileValueBuilderImpl(String filename) {
+    EnsureUtil.ensureNotNull("filename", filename);
     fileValue = new FileValueImpl(PrimitiveValueType.FILE, filename);
   }
 
@@ -61,16 +64,22 @@ public class FileValueBuilderImpl implements FileValueBuilder {
 
   @Override
   public FileValueBuilder file(InputStream stream) {
-    DataInputStream dis = new DataInputStream(stream);
+    ByteArrayOutputStream output = null;
     try {
-      byte[] data = new byte[dis.available()];
-      dis.readFully(data);
-      this.file(data);
+      output = new ByteArrayOutputStream();
+      int n = 0;
+      byte[] buffer = new byte[bufferSize];
+      while (-1 != (n = stream.read(buffer))) {
+        output.write(buffer, 0, n);
+      }
+      this.file(output.toByteArray());
     } catch (IOException e) {
       throw new ProcessEngineException(e);
     } finally {
       try {
-        dis.close();
+        if (output != null) {
+          output.close();
+        }
       } catch (IOException e) {
         throw new ProcessEngineException(e);
       }
@@ -81,6 +90,18 @@ public class FileValueBuilderImpl implements FileValueBuilder {
   @Override
   public FileValueBuilder file(byte[] bytes) {
     fileValue.setValue(bytes);
+    return this;
+  }
+
+  @Override
+  public FileValueBuilder encoding(Charset encoding) {
+    fileValue.setEncoding(encoding);
+    return this;
+  }
+
+  @Override
+  public FileValueBuilder encoding(String encoding) {
+    fileValue.setEncoding(encoding);
     return this;
   }
 
