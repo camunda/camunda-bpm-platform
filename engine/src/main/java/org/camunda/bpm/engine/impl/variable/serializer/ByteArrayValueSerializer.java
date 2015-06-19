@@ -12,13 +12,11 @@
  */
 package org.camunda.bpm.engine.impl.variable.serializer;
 
-import java.io.DataInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.core.variable.value.UntypedValueImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
+import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.BytesValue;
@@ -39,29 +37,8 @@ public class ByteArrayValueSerializer extends PrimitiveValueSerializer<BytesValu
     if (value instanceof byte[]) {
       return Variables.byteArrayValue((byte[]) value);
     } else {
-      byte[] data = readBytesFromStream((InputStream) value);
+      byte[] data = IoUtil.readInputStream((InputStream) value, null);
       return Variables.byteArrayValue(data);
-    }
-  }
-
-  private byte[] readBytesFromStream(InputStream value) {
-    DataInputStream dis = null;
-    byte[] data;
-    try {
-      data = new byte[value.available()];
-      dis = new DataInputStream(value);
-      dis.readFully(data);
-      return data;
-    } catch (IOException e) {
-      throw new ProcessEngineException(e);
-    } finally {
-      try {
-        if (dis != null) {
-          dis.close();
-        }
-      } catch (IOException e) {
-        throw new ProcessEngineException(e);
-      }
     }
   }
 

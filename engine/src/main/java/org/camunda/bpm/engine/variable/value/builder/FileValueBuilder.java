@@ -26,13 +26,6 @@ import org.camunda.bpm.engine.variable.value.FileValue;
 public interface FileValueBuilder extends TypedValueBuilder<FileValue> {
 
   /**
-   * The buffer size that applies for <b>every</b> {@link FileValueBuilder}.
-   * Because we do not want to make any assumptions about environments this is
-   * not a constant and can be adjusted. The default size is 4MiB.
-   */
-  public static int bufferSize = 1024 * 4;
-
-  /**
    * Saves the MIME type of a file in the value infos.
    *
    * @param type

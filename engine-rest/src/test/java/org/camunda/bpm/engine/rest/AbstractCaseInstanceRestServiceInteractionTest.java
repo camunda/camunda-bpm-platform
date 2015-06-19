@@ -597,6 +597,27 @@ public abstract class AbstractCaseInstanceRestServiceInteractionTest extends Abs
   }
 
   @Test
+  public void testGetNullFileVariable() {
+    String variableKey = "aVariableKey";
+    String filename = "test.txt";
+    String mimeType = "text/plain";
+    FileValue variableValue = Variables.fileValue(filename).mimeType(mimeType).create();
+
+    when(caseServiceMock.getVariableTyped(eq(MockProvider.EXAMPLE_CASE_INSTANCE_ID), eq(variableKey), anyBoolean()))
+    .thenReturn(variableValue);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID)
+      .pathParam("varId", variableKey)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(ContentType.TEXT.toString())
+    .and()
+      .body(is(equalTo("")))
+    .when().get(SINGLE_CASE_INSTANCE_VARIABLE_DOWNLOAD_URL);
+  }
+
+  @Test
   public void testGetFileVariableDownloadWithType() {
     String variableKey = "aVariableKey";
     final byte[] byteContent = "some bytes".getBytes();

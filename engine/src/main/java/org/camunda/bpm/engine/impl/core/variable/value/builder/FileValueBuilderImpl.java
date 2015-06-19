@@ -12,17 +12,16 @@
  */
 package org.camunda.bpm.engine.impl.core.variable.value.builder;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.core.variable.value.FileValueImpl;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
+import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.variable.type.PrimitiveValueType;
 import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.engine.variable.value.builder.FileValueBuilder;
@@ -64,26 +63,7 @@ public class FileValueBuilderImpl implements FileValueBuilder {
 
   @Override
   public FileValueBuilder file(InputStream stream) {
-    ByteArrayOutputStream output = null;
-    try {
-      output = new ByteArrayOutputStream();
-      int n = 0;
-      byte[] buffer = new byte[bufferSize];
-      while (-1 != (n = stream.read(buffer))) {
-        output.write(buffer, 0, n);
-      }
-      this.file(output.toByteArray());
-    } catch (IOException e) {
-      throw new ProcessEngineException(e);
-    } finally {
-      try {
-        if (output != null) {
-          output.close();
-        }
-      } catch (IOException e) {
-        throw new ProcessEngineException(e);
-      }
-    }
+      this.file(IoUtil.readInputStream(stream, null));
     return this;
   }
 

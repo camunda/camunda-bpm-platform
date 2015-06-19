@@ -19,9 +19,10 @@ import java.nio.charset.Charset;
 import java.util.Scanner;
 
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.FileValue;
@@ -35,10 +36,12 @@ import org.junit.Test;
  */
 public class FileValueProcessSerialiazationTest extends PluggableProcessEngineTestCase {
 
+  protected static final String ONE_TASK_PROCESS = "org/camunda/bpm/engine/test/variables/oneTaskProcess.bpmn20.xml";
+
   @Test
   public void testSerializeFileVariable() {
     BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("process").startEvent().userTask().endEvent().done();
-    Deployment deployment = repositoryService.createDeployment().addModelInstance("process.bpmn", modelInstance).deploy();
+    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment().addModelInstance("process.bpmn", modelInstance).deploy();
     VariableMap variables = Variables.createVariables();
     String filename = "test.txt";
     String type = "text/plain";
@@ -57,6 +60,28 @@ public class FileValueProcessSerialiazationTest extends PluggableProcessEngineTe
 
     // clean up
     repositoryService.deleteDeployment(deployment.getId(), true);
+  }
+
+  @Test
+  @Deployment(resources = ONE_TASK_PROCESS)
+  public void testSerializeNullMimeType() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables()
+          .putValue("fileVar", Variables.fileValue("test.txt").file("ABC".getBytes()).create()));
+
+    FileValue fileVar = runtimeService.getVariableTyped(pi.getId(), "fileVar");
+    assertNull(fileVar.getMimeType());
+  }
+
+  @Test
+  @Deployment(resources = ONE_TASK_PROCESS)
+  public void testSerializeNullValue() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables()
+          .putValue("fileVar", Variables.fileValue("test.txt").create()));
+
+    FileValue fileVar = runtimeService.getVariableTyped(pi.getId(), "fileVar");
+    assertNull(fileVar.getMimeType());
   }
 
 }

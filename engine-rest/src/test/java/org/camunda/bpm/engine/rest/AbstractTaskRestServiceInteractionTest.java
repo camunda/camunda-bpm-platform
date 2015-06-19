@@ -3003,6 +3003,27 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   }
 
   @Test
+  public void testGetNullFileVariable() {
+    String variableKey = "aVariableKey";
+    String filename = "test.txt";
+    String mimeType = "text/plain";
+    FileValue variableValue = Variables.fileValue(filename).mimeType(mimeType).create();
+
+    when(taskServiceMock.getVariableLocalTyped(eq(MockProvider.EXAMPLE_TASK_ID), eq(variableKey), anyBoolean()))
+      .thenReturn(variableValue);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+      .pathParam("varId", variableKey)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(ContentType.TEXT.toString())
+    .and()
+      .body(is(equalTo("")))
+    .when().get(SINGLE_TASK_SINGLE_VARIABLE_DOWNLOAD_URL);
+  }
+
+  @Test
   public void testGetFileVariableDownloadWithType() {
     String variableKey = "aVariableKey";
     final byte[] byteContent = "some bytes".getBytes();

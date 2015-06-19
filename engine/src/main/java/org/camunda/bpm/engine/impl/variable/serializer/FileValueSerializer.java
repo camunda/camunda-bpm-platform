@@ -66,8 +66,15 @@ public class FileValueSerializer extends AbstractTypedValueSerializer<FileValue>
     // to ensure the same array size all the time
     if (valueFields.getTextValue2() != null) {
       String[] split = Arrays.copyOf(valueFields.getTextValue2().split(MIMETYPE_ENCODING_SEPARATOR), 2);
-      builder.mimeType(split[0]);
-      builder.encoding(split[1]);
+
+      String mimeType = split[0];
+      if (mimeType.isEmpty()) {
+        mimeType = null;
+      }
+      String encoding = split[1];
+
+      builder.mimeType(mimeType);
+      builder.encoding(encoding);
     }
     return builder.create();
   }
