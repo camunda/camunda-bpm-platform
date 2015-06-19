@@ -67,10 +67,32 @@ public class FileValueProcessSerialiazationTest extends PluggableProcessEngineTe
   public void testSerializeNullMimeType() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("oneTaskProcess",
         Variables.createVariables()
+          .putValue("fileVar", Variables.fileValue("test.txt").file("ABC".getBytes()).encoding("UTF-8").create()));
+
+    FileValue fileVar = runtimeService.getVariableTyped(pi.getId(), "fileVar");
+    assertNull(fileVar.getMimeType());
+  }
+
+  @Test
+  @Deployment(resources = ONE_TASK_PROCESS)
+  public void testSerializeNullMimeTypeAndNullEncoding() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables()
           .putValue("fileVar", Variables.fileValue("test.txt").file("ABC".getBytes()).create()));
 
     FileValue fileVar = runtimeService.getVariableTyped(pi.getId(), "fileVar");
     assertNull(fileVar.getMimeType());
+  }
+
+  @Test
+  @Deployment(resources = ONE_TASK_PROCESS)
+  public void testSerializeNullEncoding() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables()
+          .putValue("fileVar", Variables.fileValue("test.txt").mimeType("some mimetype").file("ABC".getBytes()).create()));
+
+    FileValue fileVar = runtimeService.getVariableTyped(pi.getId(), "fileVar");
+    assertNull(fileVar.getEncoding());
   }
 
   @Test
