@@ -1,7 +1,9 @@
+# IDE
 .classpath
 .project
 .settings
-target
 .springBeans
 .idea/
 *.iml
+# MAVEN
+target
