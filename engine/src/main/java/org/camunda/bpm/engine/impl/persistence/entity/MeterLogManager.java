@@ -19,6 +19,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.metrics.Meter;
 import org.camunda.bpm.engine.impl.metrics.MetricsQueryImpl;
+import org.camunda.bpm.engine.impl.metrics.reporter.DbMetricsReporter;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
@@ -51,10 +52,13 @@ public class MeterLogManager extends AbstractManager {
   }
 
   protected boolean shouldAddCurrentUnloggedCount(MetricsQueryImpl query) {
+      
+      DbMetricsReporter reporter = Context.getProcessEngineConfiguration().getDbMetricsReporter();
+      if (reporter == null){
+          reporter = new DbMetricsReporter(Context.getProcessEngineConfiguration().getMetricsRegistry(), query.getCommandExecutor());
+      }   
 
-    long reportingIntervalInSeconds = Context.getProcessEngineConfiguration()
-      .getDbMetricsReporter()
-      .getReportingIntervalInSeconds();
+    long reportingIntervalInSeconds = reporter.getReportingIntervalInSeconds();
 
     return query.getName() != null
         && (query.getEndDate() == null

@@ -29,7 +29,7 @@ public class MetricsDisabledTest extends ResourceProcessEngineTestCase {
 
   // FAILING, see https://app.camunda.com/jira/browse/CAM-4053
   // (to run, remove "FAILING" from methodname)
-  public void FAILING_testQueryMetricsIfMetricsIsDisabled() {
+  public void testQueryMetricsIfMetricsIsDisabled() {
 
     // given
     // that the metrics are disabled (see xml configuration referenced in constructor)
