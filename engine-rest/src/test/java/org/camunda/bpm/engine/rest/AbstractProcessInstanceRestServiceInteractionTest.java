@@ -1,6 +1,7 @@
 package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.either;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
@@ -64,6 +65,7 @@ import org.camunda.bpm.engine.variable.value.LongValue;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.TypeFactory;
+import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -85,7 +87,6 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   protected static final String SINGLE_PROCESS_INSTANCE_SUSPENDED_URL = SINGLE_PROCESS_INSTANCE_URL + "/suspended";
   protected static final String PROCESS_INSTANCE_SUSPENDED_URL = PROCESS_INSTANCE_URL + "/suspended";
   protected static final String PROCESS_INSTANCE_MODIFICATION_URL = SINGLE_PROCESS_INSTANCE_URL + "/modification";
-  protected static final String SINGLE_PROCESS_INSTANCE_VARIABLE_DOWNLOAD_URL = SINGLE_PROCESS_INSTANCE_VARIABLE_URL + "/download";
 
   protected static final VariableMap EXAMPLE_OBJECT_VARIABLES = Variables.createVariables();
   static {
@@ -261,7 +262,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
       .contentType(ContentType.TEXT.toString())
     .and()
       .body(is(equalTo("")))
-    .when().get(SINGLE_PROCESS_INSTANCE_VARIABLE_DOWNLOAD_URL);
+    .when().get(SINGLE_PROCESS_INSTANCE_BINARY_VARIABLE_URL);
   }
 
   @Test
@@ -282,7 +283,29 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
       .contentType(ContentType.TEXT.toString())
     .and()
       .body(is(equalTo(new String(byteContent))))
-    .when().get(SINGLE_PROCESS_INSTANCE_VARIABLE_DOWNLOAD_URL);
+    .when().get(SINGLE_PROCESS_INSTANCE_BINARY_VARIABLE_URL);
+  }
+
+  @Test
+  public void testGetFileVariableDownloadWithTypeAndEncoding() {
+    String variableKey = "aVariableKey";
+    final byte[] byteContent = "some bytes".getBytes();
+    String filename = "test.txt";
+    String encoding = "UTF-8";
+    FileValue variableValue = Variables.fileValue(filename).file(byteContent).mimeType(ContentType.TEXT.toString()).encoding(encoding).create();
+
+    when(runtimeServiceMock.getVariableTyped(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey), anyBoolean()))
+    .thenReturn(variableValue);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
+      .pathParam("varId", variableKey)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(either(CoreMatchers.<Object>equalTo(ContentType.TEXT.toString() + "; charset=UTF-8")).or(CoreMatchers.<Object>equalTo(ContentType.TEXT.toString() + ";charset=UTF-8")))
+    .and()
+      .body(is(equalTo(new String(byteContent))))
+    .when().get(SINGLE_PROCESS_INSTANCE_BINARY_VARIABLE_URL);
   }
 
   @Test
@@ -304,7 +327,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     .and()
       .body(is(equalTo(new String(byteContent))))
       .header("Content-Disposition", containsString(filename))
-    .when().get(SINGLE_PROCESS_INSTANCE_VARIABLE_DOWNLOAD_URL);
+    .when().get(SINGLE_PROCESS_INSTANCE_BINARY_VARIABLE_URL);
   }
 
   @Test
@@ -322,7 +345,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .contentType(MediaType.APPLICATION_JSON)
     .and()
-    .when().get(SINGLE_PROCESS_INSTANCE_VARIABLE_DOWNLOAD_URL);
+    .when().get(SINGLE_PROCESS_INSTANCE_BINARY_VARIABLE_URL);
   }
 
   @Test

@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.engine.rest.sub;
 
-import java.io.InputStream;
 import java.util.Map;
 
 import javax.ws.rs.Consumes;
@@ -51,12 +50,7 @@ public interface VariableResource {
 
   @GET
   @Path("/{varId}/data")
-  @Produces(MediaType.APPLICATION_OCTET_STREAM)
-  public InputStream getVariableBinary(@PathParam("varId") String variableName);
-
-  @GET
-  @Path("/{varId}/download")
-  public Response download(@PathParam("varId") String variableName);
+  public Response getVariableBinary(@PathParam("varId") String variableName);
 
   @PUT
   @Path("/{varId}")

@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ID;
+import static org.hamcrest.CoreMatchers.either;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.containsString;
@@ -69,6 +70,7 @@ import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.type.TypeFactory;
+import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -93,7 +95,6 @@ public abstract class AbstractCaseInstanceRestServiceInteractionTest extends Abs
   protected static final String CASE_INSTANCE_VARIABLES_URL = SINGLE_CASE_INSTANCE_URL + "/variables";
   protected static final String SINGLE_CASE_INSTANCE_VARIABLE_URL = CASE_INSTANCE_VARIABLES_URL + "/{varId}";
   protected static final String SINGLE_CASE_INSTANCE_BINARY_VARIABLE_URL = SINGLE_CASE_INSTANCE_VARIABLE_URL + "/data";
-  protected static final String SINGLE_CASE_INSTANCE_VARIABLE_DOWNLOAD_URL = SINGLE_CASE_INSTANCE_VARIABLE_URL + "/download";
 
   protected static final VariableMap EXAMPLE_OBJECT_VARIABLES = Variables.createVariables();
   static {
@@ -614,7 +615,7 @@ public abstract class AbstractCaseInstanceRestServiceInteractionTest extends Abs
       .contentType(ContentType.TEXT.toString())
     .and()
       .body(is(equalTo("")))
-    .when().get(SINGLE_CASE_INSTANCE_VARIABLE_DOWNLOAD_URL);
+    .when().get(SINGLE_CASE_INSTANCE_BINARY_VARIABLE_URL);
   }
 
   @Test
@@ -635,7 +636,29 @@ public abstract class AbstractCaseInstanceRestServiceInteractionTest extends Abs
       .contentType(ContentType.TEXT.toString())
     .and()
       .body(is(equalTo(new String(byteContent))))
-    .when().get(SINGLE_CASE_INSTANCE_VARIABLE_DOWNLOAD_URL);
+    .when().get(SINGLE_CASE_INSTANCE_BINARY_VARIABLE_URL);
+  }
+
+  @Test
+  public void testGetFileVariableDownloadWithTypeAndEncoding() {
+    String variableKey = "aVariableKey";
+    final byte[] byteContent = "some bytes".getBytes();
+    String filename = "test.txt";
+    String encoding = "UTF-8";
+    FileValue variableValue = Variables.fileValue(filename).file(byteContent).mimeType(ContentType.TEXT.toString()).encoding(encoding).create();
+
+    when(caseServiceMock.getVariableTyped(eq(MockProvider.EXAMPLE_CASE_INSTANCE_ID), eq(variableKey), anyBoolean()))
+    .thenReturn(variableValue);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID)
+      .pathParam("varId", variableKey)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(either(CoreMatchers.<Object>equalTo(ContentType.TEXT.toString() + "; charset=UTF-8")).or(CoreMatchers.<Object>equalTo(ContentType.TEXT.toString() + ";charset=UTF-8")))
+    .and()
+      .body(is(equalTo(new String(byteContent))))
+    .when().get(SINGLE_CASE_INSTANCE_BINARY_VARIABLE_URL);
   }
 
   @Test
@@ -657,7 +680,7 @@ public abstract class AbstractCaseInstanceRestServiceInteractionTest extends Abs
     .and()
       .body(is(equalTo(new String(byteContent))))
       .header("Content-Disposition", containsString(filename))
-    .when().get(SINGLE_CASE_INSTANCE_VARIABLE_DOWNLOAD_URL);
+    .when().get(SINGLE_CASE_INSTANCE_BINARY_VARIABLE_URL);
   }
 
   @Test
@@ -672,7 +695,7 @@ public abstract class AbstractCaseInstanceRestServiceInteractionTest extends Abs
       .pathParam("varId", variableKey)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-    .when().get(SINGLE_CASE_INSTANCE_VARIABLE_DOWNLOAD_URL);
+    .when().get(SINGLE_CASE_INSTANCE_BINARY_VARIABLE_URL);
   }
 
   @Test

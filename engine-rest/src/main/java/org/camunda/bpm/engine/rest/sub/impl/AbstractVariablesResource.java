@@ -13,7 +13,7 @@
 package org.camunda.bpm.engine.rest.sub.impl;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.io.File;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 import org.camunda.bpm.engine.rest.dto.PatchVariablesDto;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -96,35 +97,27 @@ public abstract class AbstractVariablesResource implements VariableResource {
     return value;
   }
 
-  public InputStream getVariableBinary(String variableName) {
+  public Response getVariableBinary(String variableName) {
     TypedValue typedValue = getTypedValueForVariable(variableName, false);
-    if(typedValue instanceof BytesValue) {
-      byte[] valueBytes = ((BytesValue)typedValue).getValue();
+    if (typedValue instanceof BytesValue) {
+      byte[] valueBytes = ((BytesValue) typedValue).getValue();
       if (valueBytes == null) {
         valueBytes = new byte[0];
       }
-
-      return new ByteArrayInputStream(valueBytes);
-    }
-    else {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "Variable '"+variableName+"' is not of type 'Bytes' but of type '"+typedValue.getType()+"'.");
-    }
-  }
-
-  @Override
-  public Response download(String variableName) {
-    TypedValue typedValue = getTypedValueForVariable(variableName, false);
-    if (typedValue instanceof FileValue) {
+      return Response.ok(new ByteArrayInputStream(valueBytes), MediaType.APPLICATION_OCTET_STREAM).build();
+    } else if (typedValue instanceof FileValue) {
       FileValue fileValue = (FileValue) typedValue;
       String type = fileValue.getMimeType() != null ? fileValue.getMimeType() : MediaType.APPLICATION_OCTET_STREAM;
-      return Response
-              .ok()
-              .type(type)
-              .entity(fileValue.getValue())
+      if(fileValue.getEncoding() != null){
+        type += "; charset=" + fileValue.getEncoding();
+      }
+      return Response.ok(fileValue.getValue(), type)
               .header("Content-Disposition", "attachment; filename=" + fileValue.getFilename())
               .build();
+    } else {
+      throw new InvalidRequestException(Status.BAD_REQUEST, "Variable '" + variableName + "' is not of type 'Bytes' or 'File' but of type '" + typedValue.getType()
+          + "'.");
     }
-    throw new InvalidRequestException(Status.BAD_REQUEST, "Variable '" + variableName + "' is not of type 'File' but of type '" + typedValue.getType() + "'.");
   }
 
   @Override
