@@ -29,10 +29,16 @@ import org.camunda.bpm.engine.variable.value.builder.FileValueBuilder;
 public class FileValueSerializer extends AbstractTypedValueSerializer<FileValue> {
 
   /**
-   * Since most unicode characters are allowed in filenames we'll use the null
-   * character to separate the two of them.
+   * The numbers values we encoded in textfield two.
    */
-  protected static final String MIMETYPE_ENCODING_SEPARATOR = "\0";
+  protected static final int NR_OF_VALUES_IN_TEXTFIELD2 = 2;
+
+  /**
+   * The separator to be able to store encoding and mimetype inside the same
+   * text field. Please be aware that the separator only works when it is a
+   * character that is not allowed in the first component.
+   */
+  protected static final String MIMETYPE_ENCODING_SEPARATOR = "#";
 
   public FileValueSerializer() {
     super(ValueType.FILE);
@@ -44,11 +50,11 @@ public class FileValueSerializer extends AbstractTypedValueSerializer<FileValue>
     valueFields.setByteArrayValue(data);
     valueFields.setTextValue(value.getFilename());
     if (value.getMimeType() == null && value.getEncoding() != null) {
-      valueFields.setTextValue2(MIMETYPE_ENCODING_SEPARATOR + value.getEncoding().name());
+      valueFields.setTextValue2(MIMETYPE_ENCODING_SEPARATOR + value.getEncoding());
     } else if (value.getMimeType() != null && value.getEncoding() == null) {
       valueFields.setTextValue2(value.getMimeType() + MIMETYPE_ENCODING_SEPARATOR);
     } else if (value.getMimeType() != null && value.getEncoding() != null) {
-      valueFields.setTextValue2(value.getMimeType() + MIMETYPE_ENCODING_SEPARATOR + value.getEncoding().name());
+      valueFields.setTextValue2(value.getMimeType() + MIMETYPE_ENCODING_SEPARATOR + value.getEncoding());
     }
   }
 
@@ -65,18 +71,22 @@ public class FileValueSerializer extends AbstractTypedValueSerializer<FileValue>
     }
     // to ensure the same array size all the time
     if (valueFields.getTextValue2() != null) {
-      String[] split = Arrays.copyOf(valueFields.getTextValue2().split(MIMETYPE_ENCODING_SEPARATOR), 2);
+      String[] split = Arrays.copyOf(valueFields.getTextValue2().split(MIMETYPE_ENCODING_SEPARATOR, NR_OF_VALUES_IN_TEXTFIELD2), NR_OF_VALUES_IN_TEXTFIELD2);
 
-      String mimeType = split[0];
-      if (mimeType.isEmpty()) {
-        mimeType = null;
-      }
-      String encoding = split[1];
+      String mimeType = returnNullIfEmptyString(split[0]);
+      String encoding = returnNullIfEmptyString(split[1]);
 
       builder.mimeType(mimeType);
       builder.encoding(encoding);
     }
     return builder.create();
+  }
+
+  protected String returnNullIfEmptyString(String s) {
+    if (s.isEmpty()) {
+      return null;
+    }
+    return s;
   }
 
   @Override

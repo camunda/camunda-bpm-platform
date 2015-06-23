@@ -74,7 +74,7 @@ public class FileValueTypeImpl extends AbstractValueTypeImpl implements FileValu
       result.put(VALUE_INFO_FILE_MIME_TYPE, fileValue.getMimeType());
     }
     if (fileValue.getEncoding() != null) {
-      result.put(VALUE_INFO_FILE_ENCODING, fileValue.getEncoding().name());
+      result.put(VALUE_INFO_FILE_ENCODING, fileValue.getEncoding());
     }
     return result;
   }

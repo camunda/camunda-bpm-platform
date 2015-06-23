@@ -88,11 +88,16 @@ public class FileValueImpl implements FileValue {
   }
 
   @Override
-  public Charset getEncoding() {
+  public Charset getEncodingAsCharset() {
     if (encoding == null) {
       return null;
     }
     return Charset.forName(encoding);
+  }
+
+  @Override
+  public String getEncoding() {
+    return encoding;
   }
 
   /**
@@ -108,5 +113,6 @@ public class FileValueImpl implements FileValue {
   public String toString() {
     return "FileValueImpl [mimeType=" + mimeType + ", filename=" + filename + ", type=" + type + "]";
   }
+
 
 }

@@ -44,6 +44,7 @@ import org.junit.Test;
  */
 public class FileValueSerializerTest {
 
+  private static final String SEPARATOR = "#";
   private FileValueSerializer serializer;
 
   @Before
@@ -80,7 +81,7 @@ public class FileValueSerializerTest {
 
     assertThat(valueFields.getByteArrayValue().getBytes(), is(nullValue()));
     assertThat(valueFields.getTextValue(), is(filename));
-    assertThat(valueFields.getTextValue2(), is(mimeType + "\0"));
+    assertThat(valueFields.getTextValue2(), is(mimeType + SEPARATOR));
   }
 
   @Test
@@ -95,7 +96,7 @@ public class FileValueSerializerTest {
 
     assertThat(new String(valueFields.getByteArrayValue().getBytes(), "UTF-8"), is("text"));
     assertThat(valueFields.getTextValue(), is(filename));
-    assertThat(valueFields.getTextValue2(), is(mimeType + "\0"));
+    assertThat(valueFields.getTextValue2(), is(mimeType + SEPARATOR));
   }
 
   @Test
@@ -111,7 +112,7 @@ public class FileValueSerializerTest {
 
     assertThat(new String(valueFields.getByteArrayValue().getBytes(), "UTF-8"), is("text"));
     assertThat(valueFields.getTextValue(), is(filename));
-    assertThat(valueFields.getTextValue2(), is(mimeType + "\0" + encoding.name()));
+    assertThat(valueFields.getTextValue2(), is(mimeType + SEPARATOR + encoding.name()));
   }
 
   @Test
@@ -124,7 +125,7 @@ public class FileValueSerializerTest {
 
     assertThat(new String(valueFields.getByteArrayValue().getBytes(), "UTF-8"), is("text"));
     assertThat(valueFields.getTextValue(), is("simpleFile.txt"));
-    assertThat(valueFields.getTextValue2(), is("text/plain\0"));
+    assertThat(valueFields.getTextValue2(), is("text/plain" + SEPARATOR));
   }
 
   @Test(expected = UnsupportedOperationException.class)
@@ -144,7 +145,7 @@ public class FileValueSerializerTest {
     valueFields.setTextValue(filename);
     valueFields.setByteArrayValue(data);
     String mimeType = "text/plain";
-    valueFields.setTextValue2(mimeType);
+    valueFields.setTextValue2(mimeType + SEPARATOR);
 
     FileValue fileValue = serializer.readValue(valueFields, true);
 
@@ -164,13 +165,14 @@ public class FileValueSerializerTest {
     String filename = "file.txt";
     valueFields.setTextValue(filename);
     valueFields.setByteArrayValue(data);
-    String encoding = "\0UTF-8";
+    String encoding = SEPARATOR + "UTF-8";
     valueFields.setTextValue2(encoding);
 
     FileValue fileValue = serializer.readValue(valueFields, true);
 
     assertThat(fileValue.getFilename(), is(filename));
-    assertThat(fileValue.getEncoding().name(), is("UTF-8"));
+    assertThat(fileValue.getEncoding(), is("UTF-8"));
+    assertThat(fileValue.getEncodingAsCharset(), is(Charset.forName("UTF-8")));
     checkStreamFromValue(fileValue, "text");
   }
 
@@ -187,13 +189,14 @@ public class FileValueSerializerTest {
     valueFields.setByteArrayValue(data);
     String mimeType = "text/plain";
     String encoding = "UTF-16";
-    valueFields.setTextValue2(mimeType + "\0" + encoding);
+    valueFields.setTextValue2(mimeType + SEPARATOR + encoding);
 
     FileValue fileValue = serializer.readValue(valueFields, true);
 
     assertThat(fileValue.getFilename(), is(filename));
     assertThat(fileValue.getMimeType(), is(mimeType));
-    assertThat(fileValue.getEncoding(), is(Charset.forName("UTF-16")));
+    assertThat(fileValue.getEncoding(), is("UTF-16"));
+    assertThat(fileValue.getEncodingAsCharset(), is(Charset.forName("UTF-16")));
     checkStreamFromValue(fileValue, "text");
   }
 
@@ -230,7 +233,7 @@ public class FileValueSerializerTest {
   }
 
   @Test
-  public void testNameIsFile(){
+  public void testNameIsFile() {
     assertThat(serializer.getName(), is("file"));
   }
 
@@ -245,11 +248,11 @@ public class FileValueSerializerTest {
 
     assertThat(valueFields.getByteArrayValue().getBytes(), is(nullValue()));
     assertThat(valueFields.getTextValue(), is(filename));
-    assertThat(valueFields.getTextValue2(), is("\0" + encoding));
+    assertThat(valueFields.getTextValue2(), is(SEPARATOR + encoding));
   }
 
-  @Test(expected=NullValueException.class)
-  public void testSerializeFileValueWithoutName(){
+  @Test(expected = NullValueException.class)
+  public void testSerializeFileValueWithoutName() {
     Variables.fileValue((String) null).file("abc".getBytes()).create();
   }
 

@@ -54,7 +54,8 @@ public class FileValueProcessSerialiazationTest extends PluggableProcessEngineTe
 
     assertThat(value.getFilename(), is(filename));
     assertThat(value.getMimeType(), is(type));
-    assertThat(value.getEncoding(), is(Charset.forName("UTF-8")));
+    assertThat(value.getEncoding(), is("UTF-8"));
+    assertThat(value.getEncodingAsCharset(), is(Charset.forName("UTF-8")));
     Scanner scanner = new Scanner(value.getValue());
     assertThat(scanner.nextLine(), is("ABC"));
 
@@ -66,8 +67,7 @@ public class FileValueProcessSerialiazationTest extends PluggableProcessEngineTe
   @Deployment(resources = ONE_TASK_PROCESS)
   public void testSerializeNullMimeType() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("oneTaskProcess",
-        Variables.createVariables()
-          .putValue("fileVar", Variables.fileValue("test.txt").file("ABC".getBytes()).encoding("UTF-8").create()));
+        Variables.createVariables().putValue("fileVar", Variables.fileValue("test.txt").file("ABC".getBytes()).encoding("UTF-8").create()));
 
     FileValue fileVar = runtimeService.getVariableTyped(pi.getId(), "fileVar");
     assertNull(fileVar.getMimeType());
@@ -77,8 +77,7 @@ public class FileValueProcessSerialiazationTest extends PluggableProcessEngineTe
   @Deployment(resources = ONE_TASK_PROCESS)
   public void testSerializeNullMimeTypeAndNullEncoding() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("oneTaskProcess",
-        Variables.createVariables()
-          .putValue("fileVar", Variables.fileValue("test.txt").file("ABC".getBytes()).create()));
+        Variables.createVariables().putValue("fileVar", Variables.fileValue("test.txt").file("ABC".getBytes()).create()));
 
     FileValue fileVar = runtimeService.getVariableTyped(pi.getId(), "fileVar");
     assertNull(fileVar.getMimeType());
@@ -88,8 +87,7 @@ public class FileValueProcessSerialiazationTest extends PluggableProcessEngineTe
   @Deployment(resources = ONE_TASK_PROCESS)
   public void testSerializeNullEncoding() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("oneTaskProcess",
-        Variables.createVariables()
-          .putValue("fileVar", Variables.fileValue("test.txt").mimeType("some mimetype").file("ABC".getBytes()).create()));
+        Variables.createVariables().putValue("fileVar", Variables.fileValue("test.txt").mimeType("some mimetype").file("ABC".getBytes()).create()));
 
     FileValue fileVar = runtimeService.getVariableTyped(pi.getId(), "fileVar");
     assertNull(fileVar.getEncoding());
@@ -99,8 +97,7 @@ public class FileValueProcessSerialiazationTest extends PluggableProcessEngineTe
   @Deployment(resources = ONE_TASK_PROCESS)
   public void testSerializeNullValue() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("oneTaskProcess",
-        Variables.createVariables()
-          .putValue("fileVar", Variables.fileValue("test.txt").create()));
+        Variables.createVariables().putValue("fileVar", Variables.fileValue("test.txt").create()));
 
     FileValue fileVar = runtimeService.getVariableTyped(pi.getId(), "fileVar");
     assertNull(fileVar.getMimeType());
