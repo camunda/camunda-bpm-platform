@@ -21,6 +21,8 @@ import java.util.Map;
 import junit.framework.Assert;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
@@ -582,6 +584,43 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
   public void testGetHistoryLevel() {
     int historyLevel = managementService.getHistoryLevel();
     assertEquals(processEngineConfiguration.getHistoryLevel().getId(), historyLevel);
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/asyncTaskProcess.bpmn20.xml")
+  public void testSetJobPriority() {
+    // given
+    runtimeService
+      .createProcessInstanceByKey("asyncTaskProcess")
+      .startBeforeActivity("task")
+      .execute();
+
+    Job job = managementService.createJobQuery().singleResult();
+
+    // when
+    managementService.setJobPriority(job.getId(), 42);
+
+    // then
+    job = managementService.createJobQuery().singleResult();
+
+    assertEquals(42, (int) job.getPriority());
+  }
+
+  public void testSetJobPriorityForNonExistingJob() {
+    try {
+      managementService.setJobPriority("nonExistingJob", 42);
+      fail("should not succeed");
+    } catch (NotFoundException e) {
+      assertTextPresentIgnoreCase("No job found with id 'nonExistingJob'", e.getMessage());
+    }
+  }
+
+  public void testSetJobPriorityForNullJob() {
+    try {
+      managementService.setJobPriority(null, 42);
+      fail("should not succeed");
+    } catch (NullValueException e) {
+      assertTextPresentIgnoreCase("Job id must not be null", e.getMessage());
+    }
   }
 
   protected void cleanOpLog(String jobId) {

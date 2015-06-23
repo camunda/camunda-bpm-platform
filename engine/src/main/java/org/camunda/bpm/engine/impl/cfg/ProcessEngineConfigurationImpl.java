@@ -150,9 +150,11 @@ import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.CallerRunsRejectedJobsHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultFailedJobCommandFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobPriorityProvider;
 import org.camunda.bpm.engine.impl.jobexecutor.FailedJobCommandFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.JobPriorityProvider;
 import org.camunda.bpm.engine.impl.jobexecutor.ProcessEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.RejectedJobsHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateJobDefinitionHandler;
@@ -314,6 +316,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected List<JobHandler> customJobHandlers;
   protected Map<String, JobHandler> jobHandlers;
   protected JobExecutor jobExecutor;
+
+  protected JobPriorityProvider jobPriorityProvider;
 
   // MYBATIS SQL SESSION FACTORY //////////////////////////////////////////////
 
@@ -499,6 +503,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initServices();
     initIdGenerator();
     initDeployers();
+    initJobProvider();
     initJobExecutor();
     initDataSource();
     initTransactionFactory();
@@ -1117,6 +1122,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   }
 
+  protected void initJobProvider() {
+    if (producePrioritizedJobs && jobPriorityProvider == null) {
+      jobPriorityProvider = new DefaultJobPriorityProvider();
+    }
+  }
+
   // history //////////////////////////////////////////////////////////////////
 
   public void initHistoryLevel() {
@@ -1684,6 +1695,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public ProcessEngineConfigurationImpl setJobExecutor(JobExecutor jobExecutor) {
     this.jobExecutor = jobExecutor;
     return this;
+  }
+
+  public JobPriorityProvider getJobPriorityProvider() {
+    return jobPriorityProvider;
+  }
+
+  public void setJobPriorityProvider(JobPriorityProvider jobPriorityProvider) {
+    this.jobPriorityProvider = jobPriorityProvider;
   }
 
   public IdGenerator getIdGenerator() {

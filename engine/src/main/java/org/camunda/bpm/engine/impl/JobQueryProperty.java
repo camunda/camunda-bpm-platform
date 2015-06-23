@@ -31,5 +31,6 @@ public interface JobQueryProperty {
   public static final QueryProperty DUEDATE = new QueryPropertyImpl("DUEDATE_");
   public static final QueryProperty RETRIES = new QueryPropertyImpl("RETRIES_");
   public static final QueryProperty TYPE = new QueryPropertyImpl("TYPE_");
+  public static final QueryProperty PRIORITY = new QueryPropertyImpl("PRIORITY_");
 
 }

@@ -173,6 +173,7 @@ public class BpmnParse extends Parse {
   public static final String PROPERTYNAME_TYPE = "type";
   public static final String PROPERTYNAME_THROWS_COMPENSATION = "throwsCompensation";
   public static final String PROPERTYNAME_CONSUMES_COMPENSATION = "consumesCompensation";
+  public static final String PROPERTYNAME_JOB_PRIORITY = "jobPriority";
 
   /* process start authorization specific finals */
   protected static final String POTENTIAL_STARTER = "potentialStarter";
@@ -500,6 +501,7 @@ public class BpmnParse extends Parse {
     processDefinition.setProperty(PROPERTYNAME_DOCUMENTATION, parseDocumentation(processElement));
     processDefinition.setTaskDefinitions(new HashMap<String, TaskDefinition>());
     processDefinition.setDeploymentId(deployment.getId());
+    processDefinition.setProperty(PROPERTYNAME_JOB_PRIORITY, parseJobPriority(processElement));
 
     if (LOGGER.isLoggable(Level.FINE)) {
       LOGGER.fine("Parsing process " + processDefinition.getKey());
@@ -1459,6 +1461,8 @@ public class BpmnParse extends Parse {
     activity.setProperty("type", activityElement.getTagName());
     activity.setProperty("line", activityElement.getLine());
 
+    activity.setProperty(PROPERTYNAME_JOB_PRIORITY, parseJobPriority(activityElement));
+
     String isForCompensation = activityElement.attribute("isForCompensation");
     if(isForCompensation != null && (isForCompensation.equals("true")||isForCompensation.equals("TRUE"))) {
       activity.setProperty(PROPERTYNAME_IS_FOR_COMPENSATION, true);
@@ -1744,9 +1748,12 @@ public class BpmnParse extends Parse {
       MessageJobDeclaration messageJobDeclaration = new AsyncBeforeMessageJobDeclaration();
       messageJobDeclaration.setExclusive(exclusive);
       messageJobDeclaration.setActivityId(activity.getId());
+      messageJobDeclaration.setJobPriorityProvider(
+          (ParameterValueProvider) activity.getProperty(PROPERTYNAME_JOB_PRIORITY));
 
       addMessageJobDeclarationToActivity(messageJobDeclaration, activity);
       addJobDeclarationToProcessDefinition(messageJobDeclaration, activity.getProcessDefinition());
+
     }
 
     if(isAsyncAfter) {
@@ -1754,11 +1761,34 @@ public class BpmnParse extends Parse {
       MessageJobDeclaration messageJobDeclaration = new AsyncAfterMessageJobDeclaration();
       messageJobDeclaration.setExclusive(exclusive);
       messageJobDeclaration.setActivityId(activity.getId());
+      messageJobDeclaration.setJobPriorityProvider(
+          (ParameterValueProvider) activity.getProperty(PROPERTYNAME_JOB_PRIORITY));
 
       addMessageJobDeclarationToActivity(messageJobDeclaration, activity);
       addJobDeclarationToProcessDefinition(messageJobDeclaration, activity.getProcessDefinition());
+
     }
 
+  }
+
+  protected ParameterValueProvider parseJobPriority(Element element) {
+    String priorityAttribute = element.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "jobPriority");
+
+    if (priorityAttribute == null) {
+      return null;
+
+    } else {
+      // constant values must be valid integers
+      Integer value = null;
+      try {
+        value = Integer.parseInt(priorityAttribute);
+
+      } catch (NumberFormatException e) {
+        addError("Value '" + priorityAttribute + "' for attribute 'jobPriority' is not a valid number", element);
+      }
+
+      return new ConstantValueProvider(value);
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -2704,6 +2734,8 @@ public class BpmnParse extends Parse {
     timerDeclaration.setActivityId(timerActivity.getId());
     timerDeclaration.setJobConfiguration(type.toString() + ": " +expression.getExpressionText());
     addJobDeclarationToProcessDefinition(timerDeclaration, timerActivity.getProcessDefinition());
+
+    timerDeclaration.setJobPriorityProvider((ParameterValueProvider) timerActivity.getProperty(PROPERTYNAME_JOB_PRIORITY));
 
     return timerDeclaration;
   }

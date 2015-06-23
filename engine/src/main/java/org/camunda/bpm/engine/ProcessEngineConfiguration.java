@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.cfg.BeansConfigurationHelper;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.jobexecutor.JobPriorityProvider;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.variable.type.ValueTypeResolver;
 
@@ -133,6 +134,9 @@ public abstract class ProcessEngineConfiguration {
   protected boolean jobExecutorDeploymentAware = false;
   protected boolean jobExecutorPreferTimerJobs = false;
   protected boolean jobExecutorAcquireByDueDate = false;
+  protected boolean jobExecutorAcquireByPriority = false;
+
+  protected boolean producePrioritizedJobs = false;
 
   /**
    * The flag will be used inside the method "JobManager#send()". It will be used to decide whether to notify the
@@ -601,4 +605,21 @@ public abstract class ProcessEngineConfiguration {
     this.valueTypeResolver = valueTypeResolver;
     return this;
   }
+
+  public boolean isProducePrioritizedJobs() {
+    return producePrioritizedJobs;
+  }
+
+  public void setProducePrioritizedJobs(boolean producePrioritizedJobs) {
+    this.producePrioritizedJobs = producePrioritizedJobs;
+  }
+
+  public boolean isJobExecutorAcquireByPriority() {
+    return jobExecutorAcquireByPriority;
+  }
+
+  public void setJobExecutorAcquireByPriority(boolean jobExecutorAcquireByPriority) {
+    this.jobExecutorAcquireByPriority = jobExecutorAcquireByPriority;
+  }
+
 }

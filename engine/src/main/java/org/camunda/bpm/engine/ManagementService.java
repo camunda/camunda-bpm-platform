@@ -689,6 +689,14 @@ public interface ManagementService {
   void setJobDuedate(String jobId, Date newDuedate);
 
   /**
+   * Sets a new priority for the job with the provided id.
+   *
+   * @param jobId the id of the job to modify, must not be null
+   * @param priority the job's new priority
+   */
+  void setJobPriority(String jobId, int priority);
+
+  /**
    * Returns the full stacktrace of the exception that occurs when the job
    * with the given id was last executed. Returns null when the job has no
    * exception stacktrace.

@@ -24,6 +24,7 @@ public class JobExecutorAcquireJobsByTypeAndDueDateTest extends AbstractJobExecu
     ProcessEngineConfigurationImpl configuration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();
     assertTrue(configuration.isJobExecutorPreferTimerJobs());
     assertTrue(configuration.isJobExecutorAcquireByDueDate());
+    assertFalse(configuration.isJobExecutorAcquireByPriority());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml")

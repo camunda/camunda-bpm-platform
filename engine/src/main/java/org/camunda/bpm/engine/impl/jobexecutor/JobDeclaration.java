@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.jobexecutor;
 
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
@@ -41,6 +42,8 @@ public abstract class JobDeclaration<T extends JobEntity> implements Serializabl
   protected boolean exclusive = JobEntity.DEFAULT_EXCLUSIVE;
 
   protected String activityId;
+
+  protected ParameterValueProvider jobPriorityProvider;
 
   public JobDeclaration(String jobHandlerType) {
     this.jobHandlerType = jobHandlerType;
@@ -80,6 +83,15 @@ public abstract class JobDeclaration<T extends JobEntity> implements Serializabl
     job.setJobHandlerConfiguration(jobHandlerConfiguration);
     job.setExclusive(exclusive);
     job.setRetries(Context.getProcessEngineConfiguration().getDefaultNumberOfRetries());
+
+    if (Context.getProcessEngineConfiguration().isProducePrioritizedJobs()) {
+      int priority = Context
+          .getProcessEngineConfiguration()
+          .getJobPriorityProvider()
+          .determinePriority(execution, this);
+
+      job.setPriority(priority);
+    }
 
     return job;
   }
@@ -136,4 +148,11 @@ public abstract class JobDeclaration<T extends JobEntity> implements Serializabl
     this.jobConfiguration = jobConfiguration;
   }
 
+  public ParameterValueProvider getJobPriorityProvider() {
+    return jobPriorityProvider;
+  }
+
+  public void setJobPriorityProvider(ParameterValueProvider jobPriorityProvider) {
+    this.jobPriorityProvider = jobPriorityProvider;
+  }
 }

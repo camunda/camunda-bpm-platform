@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.JobPriorityProvider;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Incident;
@@ -95,6 +96,8 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
   protected String deploymentId;
 
   protected String jobDefinitionId;
+
+  protected int priority = JobPriorityProvider.DEFAULT_PRIORITY;
 
   // runtime state /////////////////////////////
   protected boolean executing = false;
@@ -190,6 +193,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     persistentState.put("jobDefinitionId", jobDefinitionId);
     persistentState.put("deploymentId", deploymentId);
     persistentState.put("jobHandlerConfiguration", jobHandlerConfiguration);
+    persistentState.put("priority", priority);
     if(exceptionByteArrayId != null) {
       persistentState.put("exceptionByteArrayId", exceptionByteArrayId);
     }
@@ -532,6 +536,14 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     this.activityId = activityId;
   }
 
+  public int getPriority() {
+    return priority;
+  }
+
+  public void setPriority(int priority) {
+    this.priority = priority;
+  }
+
   protected void ensureActivityIdInitialized() {
     if (activityId == null) {
       JobDefinition jobDefinition = getJobDefinition();
@@ -593,6 +605,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
            + ", exceptionByteArrayId=" + exceptionByteArrayId
            + ", exceptionMessage=" + exceptionMessage
            + ", deploymentId=" + deploymentId
+           + ", priority=" + priority
            + "]";
   }
 

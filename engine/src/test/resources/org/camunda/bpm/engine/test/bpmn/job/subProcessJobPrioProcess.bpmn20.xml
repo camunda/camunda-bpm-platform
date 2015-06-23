@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="subProcessJobPrioProcess" camunda:jobPriority="10">
+  
+    <startEvent id="start" />
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="subProcess" />
+    <subProcess id="subProcess" camunda:jobPriority="20">
+      <startEvent id="innerStart"/>
+      <sequenceFlow id="flow2" sourceRef="innerStart" targetRef="task1" />
+      <manualTask id="task1" camunda:asyncBefore="true" /> 
+      <sequenceFlow id="flow3" sourceRef="task1" targetRef="innerEnd" />   
+      <endEvent id="innerEnd" />
+    </subProcess>
+    <sequenceFlow id="flow4" sourceRef="subProcess" targetRef="end" />
+    <endEvent id="end" />
+    
+  </process>
+
+</definitions>

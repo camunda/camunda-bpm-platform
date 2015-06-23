@@ -42,7 +42,18 @@ public abstract class AbstractJobExecutorAcquireJobsTest extends AbstractProcess
       processEngineConfiguration.setJobExecutorAcquireByDueDate(true);
     }
 
+    if (isJobExecutorAcquireByPriority()) {
+      processEngineConfiguration.setProducePrioritizedJobs(true);
+      processEngineConfiguration.setJobExecutorAcquireByPriority(true);
+    }
+
+    configure(processEngineConfiguration);
+
     processEngine = processEngineConfiguration.buildProcessEngine();
+  }
+
+  protected void configure(ProcessEngineConfiguration configuration) {
+    // may be overriden for additional test-specific configuration
   }
 
   protected void closeDownProcessEngine() {
@@ -57,6 +68,10 @@ public abstract class AbstractJobExecutorAcquireJobsTest extends AbstractProcess
   }
 
   protected boolean isJobExecutorPreferOldJobs() {
+    return false;
+  }
+
+  protected boolean isJobExecutorAcquireByPriority() {
     return false;
   }
 
@@ -90,5 +105,18 @@ public abstract class AbstractJobExecutorAcquireJobsTest extends AbstractProcess
   protected void incrementClock(long seconds) {
     long time = ClockUtil.getCurrentTime().getTime();
     ClockUtil.setCurrentTime(new Date(time + seconds * 1000));
+  }
+
+  protected String startProcess(String processDefinitionKey, String activity) {
+    return runtimeService
+      .createProcessInstanceByKey(processDefinitionKey)
+      .startBeforeActivity(activity)
+      .execute().getId();
+  }
+
+  protected void startProcess(String processDefinitionKey, String activity, int times) {
+    for (int i = 0; i < times; i++) {
+      startProcess(processDefinitionKey, activity);
+    }
   }
 }

@@ -38,6 +38,7 @@ import org.camunda.bpm.engine.impl.cmd.RegisterDeploymentCmd;
 import org.camunda.bpm.engine.impl.cmd.RegisterProcessApplicationCmd;
 import org.camunda.bpm.engine.impl.cmd.ReportDbMetricsCmd;
 import org.camunda.bpm.engine.impl.cmd.SetJobDuedateCmd;
+import org.camunda.bpm.engine.impl.cmd.SetJobPriorityCmd;
 import org.camunda.bpm.engine.impl.cmd.SetJobRetriesCmd;
 import org.camunda.bpm.engine.impl.cmd.SetPropertyCmd;
 import org.camunda.bpm.engine.impl.cmd.SuspendJobCmd;
@@ -114,6 +115,10 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
 
   public void setJobDuedate(String jobId, Date newDuedate) {
     commandExecutor.execute(new SetJobDuedateCmd(jobId, newDuedate));
+  }
+
+  public void setJobPriority(String jobId, int priority) {
+    commandExecutor.execute(new SetJobPriorityCmd(jobId, priority));
   }
 
   public TablePageQuery createTablePageQuery() {
