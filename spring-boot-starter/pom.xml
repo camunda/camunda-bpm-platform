@@ -17,7 +17,6 @@
 
   <modules>
     <module>camunda-spring-boot-starter</module>
-    <module>camunda-cockpit-spring-boot-starter</module>
     <module>examples</module>
   </modules>
 
