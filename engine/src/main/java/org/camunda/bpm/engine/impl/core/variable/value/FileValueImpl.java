@@ -77,12 +77,10 @@ public class FileValueImpl implements FileValue {
     return type;
   }
 
-  @Override
   public void setEncoding(String encoding) {
     this.encoding = encoding;
   }
 
-  @Override
   public void setEncoding(Charset encoding) {
     this.encoding = encoding.name();
   }

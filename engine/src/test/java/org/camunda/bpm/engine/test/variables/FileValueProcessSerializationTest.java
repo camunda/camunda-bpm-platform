@@ -34,7 +34,7 @@ import org.junit.Test;
  * @author Ronny Bräunlich
  *
  */
-public class FileValueProcessSerialiazationTest extends PluggableProcessEngineTestCase {
+public class FileValueProcessSerializationTest extends PluggableProcessEngineTestCase {
 
   protected static final String ONE_TASK_PROCESS = "org/camunda/bpm/engine/test/variables/oneTaskProcess.bpmn20.xml";
 
@@ -81,6 +81,7 @@ public class FileValueProcessSerialiazationTest extends PluggableProcessEngineTe
 
     FileValue fileVar = runtimeService.getVariableTyped(pi.getId(), "fileVar");
     assertNull(fileVar.getMimeType());
+    assertNull(fileVar.getEncoding());
   }
 
   @Test

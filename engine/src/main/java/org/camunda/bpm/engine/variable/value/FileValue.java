@@ -44,8 +44,4 @@ public interface FileValue extends TypedValue {
   @Override
   InputStream getValue();
 
-  void setEncoding(String encoding);
-
-  void setEncoding(Charset encoding);
-
 }

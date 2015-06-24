@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -104,6 +105,26 @@ public class FileValueTypeImplTest {
     assertThat(value, is(instanceOf(FileValue.class)));
     assertThat(value.getType(), is(instanceOf(FileValueTypeImpl.class)));
     checkStreamFromValue(value, "text");
+  }
+
+  @Test
+  public void createValueWithProperties() {
+    // given
+    InputStream file = this.getClass().getClassLoader().getResourceAsStream("org/camunda/bpm/engine/test/variables/simpleFile.txt");
+    Map<String, Object> properties = new HashMap<String, Object>();
+    properties.put("filename", "someFileName");
+    properties.put("mimeType", "someMimeType");
+    properties.put("encoding", "someEncoding");
+
+    // when
+    TypedValue value = type.createValue(file, properties);
+
+    // then
+    assertThat(value, is(instanceOf(FileValue.class)));
+    FileValue fileValue = (FileValue) value;
+    assertThat(fileValue.getFilename(), is("someFileName"));
+    assertThat(fileValue.getMimeType(), is("someMimeType"));
+    assertThat(fileValue.getEncoding(), is("someEncoding"));
   }
 
   @Test(expected = IllegalArgumentException.class)
