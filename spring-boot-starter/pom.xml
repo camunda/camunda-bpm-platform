@@ -26,7 +26,6 @@
     <resteasy.version>3.0.8.Final</resteasy.version>
 
     <!-- camunda and spring use diffenrent properties ... -->
-    <version.java>1.7</version.java>
     <java.version>${version.java}</java.version>
   </properties>
 
