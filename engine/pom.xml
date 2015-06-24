@@ -371,6 +371,8 @@
                 <exclude>**/UserOperationLogAuthorizationTest.java</exclude>
                 <exclude>**/HistoricDetailAuthorizationTest.java</exclude>
                 <exclude>**/HistoricVariableInstanceAuthorizationTest.java</exclude>
+                <exclude>**/CompositeDbHistoryEventHandlerTest.java</exclude>
+                <exclude>**/CompositeHistoryEventHandlerTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -408,6 +410,8 @@
                 <exclude>**/UserOperationLogAuthorizationTest.java</exclude>
                 <exclude>**/HistoricDetailAuthorizationTest.java</exclude>
                 <exclude>**/HistoricVariableInstanceAuthorizationTest.java</exclude>
+                <exclude>**/CompositeDbHistoryEventHandlerTest.java</exclude>
+                <exclude>**/CompositeHistoryEventHandlerTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -445,6 +449,8 @@
                 <exclude>**/UserOperationLogAuthorizationTest.java</exclude>
                 <exclude>**/Historic*AuthorizationTest.java</exclude>
                 <exclude>**/DbDeadlockTest.java</exclude>
+                <exclude>**/CompositeDbHistoryEventHandlerTest.java</exclude>
+                <exclude>**/CompositeHistoryEventHandlerTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
