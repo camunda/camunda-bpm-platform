@@ -77,7 +77,7 @@ create table ACT_RU_JOB (
     DEPLOYMENT_ID_ varchar(64),
     SUSPENSION_STATE_ integer,
     JOB_DEF_ID_ varchar(64),
-    PRIORITY_ integer not null,
+    PRIORITY_ integer not null default 0,
     SEQUENCE_COUNTER_ bigint,
     primary key (ID_)
 );

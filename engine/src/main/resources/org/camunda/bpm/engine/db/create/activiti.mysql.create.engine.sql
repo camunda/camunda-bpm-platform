@@ -77,7 +77,7 @@ create table ACT_RU_JOB (
     DEPLOYMENT_ID_ varchar(64),
     SUSPENSION_STATE_ integer,
     JOB_DEF_ID_ varchar(64),
-    PRIORITY_ integer NOT NULL,
+    PRIORITY_ integer NOT NULL DEFAULT 0,
     SEQUENCE_COUNTER_ bigint,
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
