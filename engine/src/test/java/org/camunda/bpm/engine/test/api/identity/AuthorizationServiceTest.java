@@ -12,8 +12,29 @@
  */
 package org.camunda.bpm.engine.test.api.identity;
 
+import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GLOBAL;
+import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
+import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_REVOKE;
+import static org.camunda.bpm.engine.authorization.Permissions.ACCESS;
+import static org.camunda.bpm.engine.authorization.Permissions.ALL;
+import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
+import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
+import static org.camunda.bpm.engine.authorization.Permissions.NONE;
+import static org.camunda.bpm.engine.authorization.Permissions.READ;
+import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
@@ -21,9 +42,6 @@ import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-
-import static org.camunda.bpm.engine.authorization.Authorization.*;
-import static org.camunda.bpm.engine.authorization.Permissions.*;
 
 /**
  * @author Daniel Meyer
@@ -748,6 +766,54 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
 
     TestResource resource1 = new TestResource("resource1", 100);
     assertFalse(authorizationService.isUserAuthorized(null, null, UPDATE, resource1));
+
+  }
+
+  public void testConcurrentIsUserAuthorized() throws Exception {
+    int threadCount = 2;
+    int invocationCount = 500;
+    ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
+
+    Logger logger = Logger.getLogger("org.camunda");
+    Level originalLevel = logger.getLevel();
+
+    // reduce logging level
+    logger.setLevel(Level.WARNING);
+
+    try {
+      ArrayList<Callable<Exception>> callables = new ArrayList<Callable<Exception>>();
+
+      for (int i = 0; i < invocationCount; i++) {
+        callables.add(new Callable<Exception>() {
+          public Exception call() throws Exception {
+            try {
+              authorizationService.isUserAuthorized(null, null, null, null, null);
+            }
+            catch (Exception e) {
+              return e;
+            }
+            return null;
+          }
+        });
+      }
+
+      List<Future<Exception>> futures = executorService.invokeAll(callables);
+
+      for (Future<Exception> future : futures) {
+        Exception exception = future.get();
+        if (exception != null) {
+          fail("No exception expected: " + exception.getMessage());
+        }
+      }
+
+    }
+    finally {
+      // reset original logging level
+      logger.setLevel(originalLevel);
+
+      executorService.shutdownNow();
+      executorService.awaitTermination(10, TimeUnit.SECONDS);
+    }
 
   }
 

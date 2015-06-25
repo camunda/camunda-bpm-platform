@@ -29,8 +29,10 @@ import static org.camunda.bpm.engine.authorization.Resources.DEPLOYMENT;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Resources.TASK;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -139,6 +141,13 @@ public class AuthorizationManager extends AbstractManager {
 
   // authorization checks ///////////////////////////////////////////
 
+  public void checkAuthorization(PermissionCheck... permissionChecks) {
+    ensureNotNull("permissionChecks", permissionChecks);
+    ArrayList<PermissionCheck> permissionCheckList = new ArrayList<PermissionCheck>();
+    Collections.addAll(permissionCheckList, permissionChecks);
+    checkAuthorization(permissionCheckList);
+  }
+
   public void checkAuthorization(List<PermissionCheck> permissionChecks) {
     Authentication currentAuthentication = getCurrentAuthentication();
     CommandContext commandContext = getCommandContext();
@@ -220,7 +229,10 @@ public class AuthorizationManager extends AbstractManager {
     permCheck.setResource(resource);
     permCheck.setResourceId(resourceId);
 
-    return isAuthorized(userId, groupIds, Arrays.asList(permCheck));
+    ArrayList<PermissionCheck> permissionChecks = new ArrayList<PermissionCheck>();
+    permissionChecks.add(permCheck);
+
+    return isAuthorized(userId, groupIds, permissionChecks);
   }
 
   public boolean isAuthorized(String userId, List<String> groupIds, List<PermissionCheck> permissionChecks) {
@@ -408,7 +420,7 @@ public class AuthorizationManager extends AbstractManager {
     secondCheck.setResourceId(processDefinition.getKey());
     secondCheck.setAuthorizationNotFoundReturnValue(0l);
 
-    checkAuthorization(Arrays.asList(firstCheck, secondCheck));
+    checkAuthorization(firstCheck, secondCheck);
   }
 
   public void checkReadProcessInstance(JobEntity job) {
@@ -434,7 +446,7 @@ public class AuthorizationManager extends AbstractManager {
     secondCheck.setResourceId(job.getProcessDefinitionKey());
     secondCheck.setAuthorizationNotFoundReturnValue(0l);
 
-    checkAuthorization(Arrays.asList(firstCheck, secondCheck));
+    checkAuthorization(firstCheck, secondCheck);
   }
 
   public void checkReadHistoricJobLog(HistoricJobLogEventEntity historicJobLog) {
@@ -473,7 +485,7 @@ public class AuthorizationManager extends AbstractManager {
     secondCheck.setResourceId(processDefinition.getKey());
     secondCheck.setAuthorizationNotFoundReturnValue(0l);
 
-    checkAuthorization(Arrays.asList(firstCheck, secondCheck));
+    checkAuthorization(firstCheck, secondCheck);
   }
 
   public void checkUpdateProcessInstance(JobEntity job) {
@@ -499,7 +511,7 @@ public class AuthorizationManager extends AbstractManager {
     secondCheck.setResourceId(job.getProcessDefinitionKey());
     secondCheck.setAuthorizationNotFoundReturnValue(0l);
 
-    checkAuthorization(Arrays.asList(firstCheck, secondCheck));
+    checkAuthorization(firstCheck, secondCheck);
   }
 
   public void checkUpdateProcessInstanceByProcessDefinitionId(String processDefinitionId) {
@@ -528,7 +540,7 @@ public class AuthorizationManager extends AbstractManager {
     secondCheck.setResourceId(processDefinitionKey);
     secondCheck.setAuthorizationNotFoundReturnValue(0l);
 
-    checkAuthorization(Arrays.asList(firstCheck, secondCheck));
+    checkAuthorization(firstCheck, secondCheck);
   }
 
   // delete permission /////////////////////////////////////////////////
@@ -554,7 +566,7 @@ public class AuthorizationManager extends AbstractManager {
     secondCheck.setResourceId(processDefinition.getKey());
     secondCheck.setAuthorizationNotFoundReturnValue(0l);
 
-    checkAuthorization(Arrays.asList(firstCheck, secondCheck));
+    checkAuthorization(firstCheck, secondCheck);
   }
 
   public void checkDeleteHistoricProcessInstance(HistoricProcessInstance instance) {
@@ -596,7 +608,7 @@ public class AuthorizationManager extends AbstractManager {
       readTaskPermissionCheck.setResourceId(processDefinition.getKey());
       readTaskPermissionCheck.setAuthorizationNotFoundReturnValue(0l);
 
-      checkAuthorization(Arrays.asList(readPermissionCheck, readTaskPermissionCheck));
+      checkAuthorization(readPermissionCheck, readTaskPermissionCheck);
 
     } else {
 
@@ -645,7 +657,7 @@ public class AuthorizationManager extends AbstractManager {
       updateTaskPermissionCheck.setResourceId(processDefinition.getKey());
       updateTaskPermissionCheck.setAuthorizationNotFoundReturnValue(0l);
 
-      checkAuthorization(Arrays.asList(updatePermissionCheck, updateTaskPermissionCheck));
+      checkAuthorization(updatePermissionCheck, updateTaskPermissionCheck);
 
     } else {
 
