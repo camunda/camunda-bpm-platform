@@ -16,6 +16,7 @@ import static org.camunda.bpm.engine.variable.type.ValueType.BOOLEAN;
 import static org.camunda.bpm.engine.variable.type.ValueType.BYTES;
 import static org.camunda.bpm.engine.variable.type.ValueType.DATE;
 import static org.camunda.bpm.engine.variable.type.ValueType.DOUBLE;
+import static org.camunda.bpm.engine.variable.type.ValueType.FILE;
 import static org.camunda.bpm.engine.variable.type.ValueType.INTEGER;
 import static org.camunda.bpm.engine.variable.type.ValueType.LONG;
 import static org.camunda.bpm.engine.variable.type.ValueType.NULL;
@@ -57,6 +58,7 @@ public class ValueTypeResolverImpl implements ValueTypeResolver {
     addType(STRING);
     addType(OBJECT);
     addType(NUMBER);
+    addType(FILE);
   }
 
   public void addType(ValueType type) {

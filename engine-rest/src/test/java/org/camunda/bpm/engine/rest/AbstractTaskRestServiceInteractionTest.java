@@ -34,6 +34,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
@@ -126,6 +127,7 @@ import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 
 import com.jayway.restassured.http.ContentType;
@@ -712,6 +714,34 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     verify(formServiceMock).submitTaskForm(eq(EXAMPLE_TASK_ID), argThat(new EqualsMap()
       .matcher("aVariable", EqualsPrimitiveValue.bytesValue("someBytes".getBytes()))));
+  }
+
+  @SuppressWarnings({ "unchecked" })
+  @Test
+  public void testSubmitTaskFormWithFileValue() {
+    String variableKey = "aVariable";
+    String filename = "test.txt";
+    Map<String, Object> variables = VariablesBuilder.create().variable(variableKey, Base64.encodeBase64String("someBytes".getBytes()), "File")
+        .getVariables();
+    ((Map<String, Object>)variables.get(variableKey)).put("valueInfo", Collections.<String, Object>singletonMap("filename", filename));
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", variables);
+
+    given().pathParam("id", EXAMPLE_TASK_ID)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().post(SUBMIT_FORM_URL);
+
+    ArgumentCaptor<VariableMap> captor = ArgumentCaptor.forClass(VariableMap.class);
+    verify(formServiceMock).submitTaskForm(eq(EXAMPLE_TASK_ID), captor.capture());
+    VariableMap map = captor.getValue();
+    FileValue fileValue = (FileValue) map.getValueTyped(variableKey);
+    assertThat(fileValue, is(notNullValue()));
+    assertThat(fileValue.getFilename(), is(filename));
+    assertThat(IoUtil.readInputStream(fileValue.getValue(), null), is("someBytes".getBytes()));
   }
 
   @Test
@@ -3504,6 +3534,138 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     verify(taskServiceMock, never()).setVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey),
         eq(serializable));
+  }
+
+  @Test
+  public void testPostSingleLocalFileVariableWithEncodingAndMimeType() throws Exception {
+
+    byte[] value = "some text".getBytes();
+    String base64 = Base64.encodeBase64String(value);
+    String variableKey = "aVariableKey";
+    String encoding = "utf-8";
+    String filename = "test.txt";
+    String mimetype = MediaType.TEXT_PLAIN;
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .multiPart("data", base64, MediaType.TEXT_PLAIN)
+      .multiPart("filename", filename, MediaType.TEXT_PLAIN)
+      .multiPart("mimetype", mimetype, MediaType.TEXT_PLAIN)
+      .multiPart("encoding", encoding, MediaType.TEXT_PLAIN)
+      .header("accept", MediaType.APPLICATION_JSON)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(SINGLE_TASK_SINGLE_BINARY_VARIABLE_URL);
+
+    ArgumentCaptor<FileValue> captor = ArgumentCaptor.forClass(FileValue.class);
+    verify(taskServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_TASK_ID), eq(variableKey),
+        captor.capture());
+    FileValue captured = captor.getValue();
+    assertThat(captured.getEncoding(), is(encoding));
+    assertThat(captured.getFilename(), is(filename));
+    assertThat(captured.getMimeType(), is(mimetype));
+    assertThat(IoUtil.readInputStream(captured.getValue(), null), is(value));
+  }
+
+  @Test
+  public void testPostSingleLocalFileVariableWithMimeType() throws Exception {
+
+    byte[] value = "some text".getBytes();
+    String base64 = Base64.encodeBase64String(value);
+    String variableKey = "aVariableKey";
+    String filename = "test.txt";
+    String mimetype = MediaType.TEXT_PLAIN;
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .multiPart("data", base64, MediaType.TEXT_PLAIN)
+      .multiPart("filename", filename, MediaType.TEXT_PLAIN)
+      .multiPart("mimetype", mimetype, MediaType.TEXT_PLAIN)
+      .header("accept", MediaType.APPLICATION_JSON)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(SINGLE_TASK_SINGLE_BINARY_VARIABLE_URL);
+
+    ArgumentCaptor<FileValue> captor = ArgumentCaptor.forClass(FileValue.class);
+    verify(taskServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_TASK_ID), eq(variableKey),
+        captor.capture());
+    FileValue captured = captor.getValue();
+    assertThat(captured.getEncoding(), is(nullValue()));
+    assertThat(captured.getFilename(), is(filename));
+    assertThat(captured.getMimeType(), is(mimetype));
+    assertThat(IoUtil.readInputStream(captured.getValue(), null), is(value));
+  }
+
+  @Test
+  public void testPostSingleLocalFileVariableWithEncoding() throws Exception {
+
+    byte[] value = "some text".getBytes();
+    String base64 = Base64.encodeBase64String(value);
+    String variableKey = "aVariableKey";
+    String encoding = "utf-8";
+    String filename = "test.txt";
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .multiPart("data", base64, MediaType.TEXT_PLAIN)
+      .multiPart("filename", filename, MediaType.TEXT_PLAIN)
+      .multiPart("encoding", encoding, MediaType.TEXT_PLAIN)
+      .header("accept", MediaType.APPLICATION_JSON)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(SINGLE_TASK_SINGLE_BINARY_VARIABLE_URL);
+
+    ArgumentCaptor<FileValue> captor = ArgumentCaptor.forClass(FileValue.class);
+    verify(taskServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_TASK_ID), eq(variableKey),
+        captor.capture());
+    FileValue captured = captor.getValue();
+    assertThat(captured.getEncoding(), is(encoding));
+    assertThat(captured.getFilename(), is(filename));
+    assertThat(captured.getMimeType(), is(nullValue()));
+    assertThat(IoUtil.readInputStream(captured.getValue(), null), is(value));
+  }
+
+  @Test
+  public void testPostSingleLocalFileVariableOnlyFilename() throws Exception {
+
+    String variableKey = "aVariableKey";
+    String filename = "test.txt";
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .multiPart("filename", filename, MediaType.TEXT_PLAIN)
+      .header("accept", MediaType.APPLICATION_JSON)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(SINGLE_TASK_SINGLE_BINARY_VARIABLE_URL);
+
+    ArgumentCaptor<FileValue> captor = ArgumentCaptor.forClass(FileValue.class);
+    verify(taskServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_TASK_ID), eq(variableKey),
+        captor.capture());
+    FileValue captured = captor.getValue();
+    assertThat(captured.getEncoding(), is(nullValue()));
+    assertThat(captured.getFilename(), is(filename));
+    assertThat(captured.getMimeType(), is(nullValue()));
+    assertThat(captured.getValue(), is(nullValue()));
+  }
+
+  @Test
+  public void testPostSingleLocalFileVariableWithoutFilename() throws Exception {
+
+    String variableKey = "aVariableKey";
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .multiPart("filename", "", MediaType.TEXT_PLAIN)
+      .header("accept", MediaType.APPLICATION_JSON)
+    .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when()
+      .post(SINGLE_TASK_SINGLE_BINARY_VARIABLE_URL);
   }
 
   @Test

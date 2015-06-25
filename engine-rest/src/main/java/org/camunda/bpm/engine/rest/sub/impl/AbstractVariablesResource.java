@@ -13,7 +13,6 @@
 package org.camunda.bpm.engine.rest.sub.impl;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
@@ -162,7 +161,12 @@ public abstract class AbstractVariablesResource implements VariableResource {
       }
     } else {
       try {
-        setVariableEntity(variableKey, Variables.byteArrayValue(dataPart.getBinaryContent()));
+        FormPart filenamePart = payload.getNamedPart("filename");
+        if (filenamePart != null) {
+          setFileValueVariable(variableKey, payload, filenamePart);
+        } else {
+          setVariableEntity(variableKey, Variables.byteArrayValue(dataPart.getBinaryContent()));
+        }
       } catch (AuthorizationException e) {
         throw e;
       } catch (ProcessEngineException e) {
@@ -170,6 +174,37 @@ public abstract class AbstractVariablesResource implements VariableResource {
         throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
       }
     }
+  }
+
+  /**
+   * Sets a {@link FileValue} with the help of {@link #setVariableEntity(String, TypedValue)}.
+   *
+   * @throws RestException if the filename is empty
+   */
+  protected void setFileValueVariable(String variableKey, MultipartFormData payload, FormPart filenamePart) {
+    if ("".equals(filenamePart.getTextContent())) {
+      throw new RestException(Status.BAD_REQUEST, "Cannot put a file without filename!");
+    }
+    String encoding = getTextContentIfNamedPartIsPresent(payload, "encoding");
+    String mimetype = getTextContentIfNamedPartIsPresent(payload, "mimetype");
+    String data = getTextContentIfNamedPartIsPresent(payload, "data");
+    FileValue fileValue = Variables.fileValue(filenamePart.getTextContent()).mimeType(mimetype).encoding(encoding).file(Base64.decodeBase64(data)).create();
+    setVariableEntity(variableKey, fileValue);
+  }
+
+  /**
+   * Peeks into the {@link MultipartFormData} to see if the {@link FormPart} with the given name is present.
+   * If yes, the text content is returned, if no, null is returned.
+   * @param payload the payload, which could contain the needed value
+   * @param name the name of the {@link FormPart} to look for
+   * @return the text content according to the name or null
+   */
+  protected String getTextContentIfNamedPartIsPresent(MultipartFormData payload, String name) {
+    FormPart namedPart = payload.getNamedPart(name);
+    if (namedPart != null) {
+      return namedPart.getTextContent();
+    }
+    return null;
   }
 
   protected Object deserializeJsonObject(String className, byte[] data) {
