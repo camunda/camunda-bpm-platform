@@ -36,7 +36,7 @@ public class ProcessInstanceRestServiceInteractionTest extends AbstractProcessIn
   }
 
   @Test
-  @Ignore("see discussion in REST assured forum about handling of quoted parameters")
+  @Ignore("Ignored until REST assured issue #413 is closed and our version is upgraded accordingly")
   @Override
   public void testGetFileVariableDownloadWithTypeAndEncoding() {
     super.testGetFileVariableDownloadWithTypeAndEncoding();
