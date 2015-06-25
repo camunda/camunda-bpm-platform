@@ -1,7 +1,7 @@
 'use strict';
 
 var DashboardPage = require('./dashboard-view');
-var StartProcessPage = require('./start-process');
+var StartProcessPage = require('./start-process-modal');
 var TaskListPage = require('./tasklist/task-list');
 var TaskListSearchPage = require('./tasklist/task-search');
 var TaskListSortingPage = require('./tasklist/task-sorting');

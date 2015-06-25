@@ -1,40 +1,62 @@
-/* jshint node: true, unused: false */
-/* global __dirname: false, describe: false, beforeEach: false, before:false, it: false, browser: false,
-          element: false, expect: false, by: false, protractor: false */
 'use strict';
 
 var fs = require('fs');
+
 var ops = module.exports = {};
-
-
-// forms are located at:
-// /webapp/src/main/webapp/develop/
-
-// /webapp/src/test/js/e2e/tasklist/specs
-
-
-var developResources = __dirname + '/../../../../../main/runtime/develop/resources/pa';
-
 
 ops.deployment = {
   create: [{
-    deploymentName:  'embedded-form',
+    deploymentName:  'user-tasks',
     files:           [{
       name: 'user-tasks.bpmn',
-      content: fs.readFileSync(developResources + '/invoice-embedded-forms2.bpmn').toString()
+      content: fs.readFileSync(__dirname + '/../../resources/user-tasks.bpmn').toString()
     }]
-  },{
-    deploymentName:  'generic-form',
+  },
+  {
+    deploymentName:  'suspension-process',
     files:           [{
-      name: 'process-with-sub-process.bpmn',
-      content: fs.readFileSync(developResources + '/process-with-sub-process.bpmn').toString()
+      name: 'suspension-process.bpmn',
+      content: fs.readFileSync(__dirname + '/../../resources/suspension-process.bpmn').toString()
     }]
-  // },
-  // {
-  //   deploymentName:  'generated-form',
-  //   files:           [{
-  //     name: 'generated-form.bpmn',
-  //     content: fs.readFileSync(__dirname + '/../../resources/generated-form.bpmn').toString()
-  //   }]
+  }]
+};
+
+ops.filter = {
+  create: [{
+    name:         'All',
+    query: {},
+    properties: {
+      variables: [{
+        name: 'var_1',
+        label: 'var_1'
+      },
+      {
+        name: 'var_2',
+        label: 'var_2'
+      },
+      {
+        name: 'var_3',
+        label: 'var_3'
+      },
+      {
+        name: 'var_4',
+        label: 'var_4'
+      },
+      {
+        name: 'var_5',
+        label: 'var_5'
+      },
+      {
+        name: 'var_6',
+        label: 'var_6'
+      },
+      {
+        name: 'var_7',
+        label: 'var_7'
+      }],
+      priority: 10,
+      description:  'Show all Tasks'
+    },
+    resourceType: 'Task'
   }]
 };

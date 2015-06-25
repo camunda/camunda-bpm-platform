@@ -1,6 +1,6 @@
 'use strict';
 
-var Page = require('./../start-process');
+var Page = require('./../start-process-modal');
 
 module.exports = Page.extend({
 

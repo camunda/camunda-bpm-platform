@@ -8,7 +8,7 @@ module.exports = Page.extend({
 
   selectNavbarItem: function(navbarItem) {
     var index = [
-      'Layout',
+      'Task',
       'Process',
       'Engine',
       'Account',
@@ -19,10 +19,10 @@ module.exports = Page.extend({
 
     switch(index.indexOf(navbarItem)) {
       case 0:
-        cssElement = '[cam-layout-switcher]';
+        cssElement = '.create-task-action';
         break;
       case 1:
-        cssElement = '.process-definitions';
+        cssElement = '.start-process-action';
         break;
       case 2:
         cssElement = '.engine-select';

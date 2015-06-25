@@ -31,7 +31,6 @@ Page.extend = function(data) {
 Page.prototype.navigateTo = function(params) {
   browser.get(injectParams(this.url, params));
   browser.driver.manage().window().maximize();
-  browser.waitForAngular();
 };
 
 Page.prototype.isActive = function(params) {

@@ -49,6 +49,10 @@ module.exports = Page.extend({
     return this.taskList().get(taskItem).all(by.repeater('(delta, info) in variableDefinitions'));
   },
 
+  showMoreVariables: function(taskItem) {
+    this.taskList().get(taskItem).element(by.css('.shutter .glyphicon-chevron-down')).click();
+  },
+
   taskVariableNameElement: function(taskItem, variableItem) {
     browser.actions().mouseMove(this.taskVariables(taskItem).get(variableItem).element(by.css('.variable-label'))).perform();
 
