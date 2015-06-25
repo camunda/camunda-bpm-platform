@@ -48,4 +48,18 @@ public class TransitionInstantiationCmd extends AbstractInstantiationCmd {
   protected String getTargetElementId() {
     return transitionId;
   }
+
+  protected String describe() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("Start transition '");
+    sb.append(transitionId);
+    sb.append("'");
+    if (ancestorActivityInstanceId != null) {
+      sb.append(" with ancestor activity instance '");
+      sb.append(ancestorActivityInstanceId);
+      sb.append("'");
+    }
+
+    return sb.toString();
+  }
 }

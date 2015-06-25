@@ -68,4 +68,18 @@ public class ActivityBeforeInstantiationCmd extends AbstractInstantiationCmd {
     return activityId;
   }
 
+  protected String describe() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("Start before activity '");
+    sb.append(activityId);
+    sb.append("'");
+    if (ancestorActivityInstanceId != null) {
+      sb.append(" with ancestor activity instance '");
+      sb.append(ancestorActivityInstanceId);
+      sb.append("'");
+    }
+
+    return sb.toString();
+  }
+
 }

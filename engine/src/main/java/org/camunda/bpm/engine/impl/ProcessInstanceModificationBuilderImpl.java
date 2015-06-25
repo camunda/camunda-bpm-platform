@@ -66,7 +66,7 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
   }
 
   public ProcessInstanceModificationBuilderImpl(String processInstanceId) {
-    ensureNotNull("processInstanceId", processInstanceId);
+    ensureNotNull(NotValidException.class, "processInstanceId", processInstanceId);
     this.processInstanceId = processInstanceId;
   }
 
@@ -74,63 +74,63 @@ public class ProcessInstanceModificationBuilderImpl implements ProcessInstanceMo
   }
 
   public ProcessInstanceModificationBuilder cancelActivityInstance(String activityInstanceId) {
-    ensureNotNull("activityInstanceId", activityInstanceId);
+    ensureNotNull(NotValidException.class, "activityInstanceId", activityInstanceId);
     operations.add(new ActivityInstanceCancellationCmd(processInstanceId, activityInstanceId));
     return this;
   }
 
   public ProcessInstanceModificationBuilder cancelTransitionInstance(String transitionInstanceId) {
-    ensureNotNull("transitionInstanceId", transitionInstanceId);
+    ensureNotNull(NotValidException.class, "transitionInstanceId", transitionInstanceId);
     operations.add(new TransitionInstanceCancellationCmd(processInstanceId, transitionInstanceId));
     return this;
   }
 
   public ProcessInstanceModificationBuilder cancelAllForActivity(String activityId) {
-    ensureNotNull("activityId", activityId);
+    ensureNotNull(NotValidException.class, "activityId", activityId);
     operations.add(new ActivityCancellationCmd(processInstanceId, activityId));
     return this;
   }
 
   public ProcessInstanceModificationInstantiationBuilder startBeforeActivity(String activityId) {
-    ensureNotNull("activityId", activityId);
+    ensureNotNull(NotValidException.class, "activityId", activityId);
     AbstractInstantiationCmd currentInstantiation = new ActivityBeforeInstantiationCmd(processInstanceId, activityId);
     operations.add(currentInstantiation);
     return this;
   }
 
   public ProcessInstanceModificationInstantiationBuilder startBeforeActivity(String activityId, String ancestorActivityInstanceId) {
-    ensureNotNull("activityId", activityId);
-    ensureNotNull("ancestorActivityInstanceId", ancestorActivityInstanceId);
+    ensureNotNull(NotValidException.class, "activityId", activityId);
+    ensureNotNull(NotValidException.class, "ancestorActivityInstanceId", ancestorActivityInstanceId);
     AbstractInstantiationCmd currentInstantiation = new ActivityBeforeInstantiationCmd(processInstanceId, activityId, ancestorActivityInstanceId);
     operations.add(currentInstantiation);
     return this;
   }
 
   public ProcessInstanceModificationInstantiationBuilder startAfterActivity(String activityId) {
-    ensureNotNull("activityId", activityId);
+    ensureNotNull(NotValidException.class, "activityId", activityId);
     AbstractInstantiationCmd currentInstantiation = new ActivityAfterInstantiationCmd(processInstanceId, activityId);
     operations.add(currentInstantiation);
     return this;
   }
 
   public ProcessInstanceModificationInstantiationBuilder startAfterActivity(String activityId, String ancestorActivityInstanceId) {
-    ensureNotNull("activityId", activityId);
-    ensureNotNull("ancestorActivityInstanceId", ancestorActivityInstanceId);
+    ensureNotNull(NotValidException.class, "activityId", activityId);
+    ensureNotNull(NotValidException.class, "ancestorActivityInstanceId", ancestorActivityInstanceId);
     AbstractInstantiationCmd currentInstantiation = new ActivityAfterInstantiationCmd(processInstanceId, activityId, ancestorActivityInstanceId);
     operations.add(currentInstantiation);
     return this;
   }
 
   public ProcessInstanceModificationInstantiationBuilder startTransition(String transitionId) {
-    ensureNotNull("transitionId", transitionId);
+    ensureNotNull(NotValidException.class, "transitionId", transitionId);
     AbstractInstantiationCmd currentInstantiation = new TransitionInstantiationCmd(processInstanceId, transitionId);
     operations.add(currentInstantiation);
     return this;
   }
 
   public ProcessInstanceModificationInstantiationBuilder startTransition(String transitionId, String ancestorActivityInstanceId) {
-    ensureNotNull("transitionId", transitionId);
-    ensureNotNull("ancestorActivityInstanceId", ancestorActivityInstanceId);
+    ensureNotNull(NotValidException.class, "transitionId", transitionId);
+    ensureNotNull(NotValidException.class, "ancestorActivityInstanceId", ancestorActivityInstanceId);
     AbstractInstantiationCmd currentInstantiation = new TransitionInstantiationCmd(processInstanceId, transitionId, ancestorActivityInstanceId);
     operations.add(currentInstantiation);
     return this;

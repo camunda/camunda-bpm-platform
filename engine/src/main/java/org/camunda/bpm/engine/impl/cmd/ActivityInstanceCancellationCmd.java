@@ -14,9 +14,11 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.concurrent.Callable;
 
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.ActivityExecutionMapping;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 
 /**
@@ -46,9 +48,17 @@ public class ActivityInstanceCancellationCmd extends AbstractInstanceCancellatio
     });
 
     ActivityInstance instanceToCancel = findActivityInstance(instance, activityInstanceId);
+    EnsureUtil.ensureNotNull(NotValidException.class,
+        describeFailure("Activity instance '" + activityInstanceId + "' does not exist"),
+        "activityInstance",
+        instanceToCancel);
     ExecutionEntity scopeExecution = getScopeExecutionForActivityInstance(processInstance, mapping, instanceToCancel);
 
     return scopeExecution;
+  }
+
+  protected String describe() {
+    return "Cancel activity instance '" + activityInstanceId + "'";
   }
 
 

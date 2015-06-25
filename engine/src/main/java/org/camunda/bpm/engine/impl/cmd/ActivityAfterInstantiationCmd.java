@@ -13,13 +13,13 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.core.model.CoreModelElement;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 /**
  * @author Thorben Lindhauer
@@ -39,11 +39,23 @@ public class ActivityAfterInstantiationCmd extends AbstractInstantiationCmd {
     this.activityId = activityId;
   }
 
-  public Void execute(CommandContext commandContext) {
-    ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
-    ProcessDefinitionImpl processDefinition = processInstance.getProcessDefinition();
+  protected ScopeImpl getTargetFlowScope(ProcessDefinitionImpl processDefinition) {
+    TransitionImpl transition = findTransition(processDefinition);
 
+    return transition.getDestination().getFlowScope();
+  }
+
+  protected CoreModelElement getTargetElement(ProcessDefinitionImpl processDefinition) {
+    return findTransition(processDefinition);
+  }
+
+  protected TransitionImpl findTransition(ProcessDefinitionImpl processDefinition) {
     PvmActivity activity = processDefinition.findActivity(activityId);
+
+    EnsureUtil.ensureNotNull(NotValidException.class,
+        describeFailure("Activity '" + activityId + "' does not exist"),
+        "activity",
+        activity);
 
     if (activity.getOutgoingTransitions().isEmpty()) {
       throw new ProcessEngineException("Cannot start after activity " + activityId + "; activity "
@@ -54,24 +66,24 @@ public class ActivityAfterInstantiationCmd extends AbstractInstantiationCmd {
           + "activity has more than one outgoing sequence flow");
     }
 
-    return super.execute(commandContext);
-  }
-
-  protected ScopeImpl getTargetFlowScope(ProcessDefinitionImpl processDefinition) {
-    PvmActivity sourceActivity = processDefinition.findActivity(activityId);
-    TransitionImpl transition = (TransitionImpl) sourceActivity.getOutgoingTransitions().get(0);
-
-    return transition.getDestination().getFlowScope();
-  }
-
-  protected CoreModelElement getTargetElement(ProcessDefinitionImpl processDefinition) {
-    PvmActivity sourceActivity = processDefinition.findActivity(activityId);
-    TransitionImpl transition = (TransitionImpl) sourceActivity.getOutgoingTransitions().get(0);
-
-    return transition;
+    return (TransitionImpl) activity.getOutgoingTransitions().get(0);
   }
 
   protected String getTargetElementId() {
     return activityId;
+  }
+
+  protected String describe() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("Start after activity '");
+    sb.append(activityId);
+    sb.append("'");
+    if (ancestorActivityInstanceId != null) {
+      sb.append(" with ancestor activity instance '");
+      sb.append(ancestorActivityInstanceId);
+      sb.append("'");
+    }
+
+    return sb.toString();
   }
 }

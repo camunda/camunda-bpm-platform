@@ -136,4 +136,14 @@ public abstract class AbstractProcessInstanceModificationCommand implements Comm
 
     return retainedExecutionsForInstance.iterator().next();
   }
+
+  protected String describeFailure(String detailMessage) {
+    return "Cannot perform instruction: " + describe() + "; " + detailMessage;
+  }
+
+  protected abstract String describe();
+
+  public String toString() {
+    return describe();
+  }
 }

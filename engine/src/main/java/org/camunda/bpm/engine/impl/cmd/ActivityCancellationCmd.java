@@ -123,4 +123,8 @@ public class ActivityCancellationCmd extends AbstractProcessInstanceModification
 
     return instances;
   }
+
+  protected String describe() {
+    return "Cancel all instances of activity '" + activityId + "'";
+  }
 }

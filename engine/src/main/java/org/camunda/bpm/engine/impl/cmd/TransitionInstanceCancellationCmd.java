@@ -14,8 +14,10 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.concurrent.Callable;
 
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.TransitionInstance;
 
@@ -40,9 +42,18 @@ public class TransitionInstanceCancellationCmd extends AbstractInstanceCancellat
       }
     });
     TransitionInstance instanceToCancel = findTransitionInstance(instance, transitionInstanceId);
+    EnsureUtil.ensureNotNull(NotValidException.class,
+        describeFailure("Transition instance '" + transitionInstanceId + "' does not exist"),
+        "transitionInstance",
+        instanceToCancel);
+
     ExecutionEntity transitionExecution = commandContext.getExecutionManager().findExecutionById(instanceToCancel.getExecutionId());
 
     return transitionExecution;
+  }
+
+  protected String describe() {
+    return "Cancel transition instance '" + transitionInstanceId + "'";
   }
 
 

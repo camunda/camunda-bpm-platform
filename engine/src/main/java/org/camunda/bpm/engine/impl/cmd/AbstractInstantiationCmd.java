@@ -90,8 +90,10 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
 
     CoreModelElement elementToInstantiate = getTargetElement(processDefinition);
 
-    EnsureUtil.ensureNotNull(NotValidException.class, "Element '" + getTargetElementId() + "' does not exist in process " + processDefinition.getId(),
-        "element", elementToInstantiate);
+    EnsureUtil.ensureNotNull(NotValidException.class,
+        describeFailure("Element '" + getTargetElementId() + "' does not exist in process '" + processDefinition.getId() + "'"),
+        "element",
+        elementToInstantiate);
 
     // rebuild the mapping because the execution tree changes with every iteration
     final ActivityExecutionMapping mapping = new ActivityExecutionMapping(commandContext, processInstanceId);
@@ -146,6 +148,10 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
       });
 
       ActivityInstance ancestorInstance = findActivityInstance(tree, ancestorActivityInstanceId);
+      EnsureUtil.ensureNotNull(NotValidException.class,
+          describeFailure("Ancestor activity instance '" + ancestorActivityInstanceId + "' does not exist"),
+          "ancestorInstance",
+          ancestorInstance);
 
       // determine ancestor activity scope execution and activity
       final ExecutionEntity ancestorScopeExecution = getScopeExecutionForActivityInstance(processInstance,
@@ -165,8 +171,8 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
       Set<ExecutionEntity> flowScopeExecutions = mapping.getExecutions(walker.getCurrentElement());
 
       if (!flowScopeExecutions.contains(ancestorScopeExecution)) {
-        throw new ProcessEngineException("Could not find scope execution for " + ancestorActivityInstanceId +
-            " in parent hierarchy of flow element " + elementToInstantiate);
+        throw new NotValidException(describeFailure("Scope execution for '" + ancestorActivityInstanceId +
+            "' cannot be found in parent hierarchy of flow element '" + elementToInstantiate.getId() + "'"));
       }
 
       scopeExecution = ancestorScopeExecution;
