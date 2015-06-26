@@ -18,6 +18,12 @@ module.exports = Page.extend({
     return this.formElement().element(by.css('[ng-click="$dismiss()"]'));
   },
 
+  closeFilter: function() {
+    var theElement = this.formElement();
+    this.closeButton().click();
+    this.waitForElementToBeNotPresent(theElement, 5000);
+  },
+
   deleteFilterButton: function() {
     return this.formElement().element(by.css('[ng-click="confirmDeletion()"]'));
   }
