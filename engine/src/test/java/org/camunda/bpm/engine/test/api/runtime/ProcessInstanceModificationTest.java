@@ -284,18 +284,19 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     }
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstanceId);
+    String subProcessTaskId = getInstanceIdForActivity(tree, "subProcessTask");
 
     try {
       runtimeService
         .createProcessInstanceModification(processInstance.getId())
-        .startBeforeActivity("subProcess", getInstanceIdForActivity(tree, "subProcessTask"))
+        .startBeforeActivity("subProcess", subProcessTaskId)
         .execute();
       fail("should not succeed because subProcessTask is a child of subProcess");
     } catch (NotValidException e) {
       // happy path
       assertTextPresent("Cannot perform instruction: "
-          + "Start before activity 'subProcess' with ancestor activity instance '" + getInstanceIdForActivity(tree, "subProcessTask") + "'; "
-          + "Scope execution for '" + getInstanceIdForActivity(tree, "subProcessTask") + "' cannot be found in parent hierarchy of flow element 'subProcess'",
+          + "Start before activity 'subProcess' with ancestor activity instance '" + subProcessTaskId + "'; "
+          + "Scope execution for '" + subProcessTaskId + "' cannot be found in parent hierarchy of flow element 'subProcess'",
           e.getMessage());
     }
   }
@@ -534,18 +535,19 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     }
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstanceId);
+    String subProcessTaskId = getInstanceIdForActivity(tree, "subProcessTask");
 
     try {
       runtimeService
         .createProcessInstanceModification(processInstance.getId())
-        .startTransition("flow5", getInstanceIdForActivity(tree, "subProcessTask"))
+        .startTransition("flow5", subProcessTaskId)
         .execute();
       fail("should not succeed because subProcessTask is a child of subProcess");
     } catch (NotValidException e) {
       // happy path
       assertTextPresent("Cannot perform instruction: "
-          + "Start transition 'flow5' with ancestor activity instance '" + getInstanceIdForActivity(tree, "subProcessTask") + "'; "
-          + "Scope execution for '" + getInstanceIdForActivity(tree, "subProcessTask") + "' cannot be found in parent hierarchy of flow element 'flow5'",
+          + "Start transition 'flow5' with ancestor activity instance '" + subProcessTaskId + "'; "
+          + "Scope execution for '" + subProcessTaskId + "' cannot be found in parent hierarchy of flow element 'flow5'",
           e.getMessage());
     }
   }
@@ -787,18 +789,19 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
     }
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstanceId);
+    String subProcessTaskId = getInstanceIdForActivity(tree, "subProcessTask");
 
     try {
       runtimeService
         .createProcessInstanceModification(processInstance.getId())
-        .startAfterActivity("innerSubProcessStart", getInstanceIdForActivity(tree, "subProcessTask"))
+        .startAfterActivity("innerSubProcessStart", subProcessTaskId)
         .execute();
       fail("should not succeed because subProcessTask is a child of subProcess");
     } catch (NotValidException e) {
       // happy path
       assertTextPresent("Cannot perform instruction: "
-          + "Start after activity 'innerSubProcessStart' with ancestor activity instance '" + getInstanceIdForActivity(tree, "subProcessTask") + "'; "
-          + "Scope execution for '" + getInstanceIdForActivity(tree, "subProcessTask") + "' cannot be found in parent hierarchy of flow element 'flow5'",
+          + "Start after activity 'innerSubProcessStart' with ancestor activity instance '" + subProcessTaskId + "'; "
+          + "Scope execution for '" + subProcessTaskId + "' cannot be found in parent hierarchy of flow element 'flow5'",
           e.getMessage());
     }
   }
