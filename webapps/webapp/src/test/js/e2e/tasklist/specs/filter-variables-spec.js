@@ -7,7 +7,7 @@ var dashboardPage = require('../pages/dashboard');
 var editModalPage = dashboardPage.taskFilters.editFilterPage;
 
 
-describe.only('Tasklist Filter Variables Spec', function() {
+describe('Tasklist Filter Variables Spec', function() {
 
   before(function() {
     return testHelper(setupFile, function() {
