@@ -80,7 +80,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <executions>  
+        <executions>
           <execution>
             <id>unpack</id>
             <phase>generate-resources</phase>
@@ -362,7 +362,6 @@
 
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.5.4</version>
         <configuration>
           <descriptors>
             <descriptor>assembly.xml</descriptor>
