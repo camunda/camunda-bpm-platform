@@ -54,11 +54,12 @@ module.exports = Page.extend({
   },
 
   taskVariableNameElement: function(taskItem, variableItem) {
+
     browser.actions().mouseMove(this.taskVariables(taskItem).get(variableItem).element(by.css('.variable-label'))).perform();
 
     browser.sleep(1000);
 
-    return this.taskVariables(taskItem).get(variableItem).element(by.css('.variable-label')).getAttribute('tooltip');
+    return element(by.css('.tooltip'));
   },
 
   taskVariableName: function(taskItem, variableItem) {
@@ -66,11 +67,13 @@ module.exports = Page.extend({
   },
 
   taskVariableLabel: function(taskItem, variableItem) {
-    return this.taskVariables(taskItem).get(variableItem).element(by.css('.variable-label'));
+    return this.taskVariables(taskItem).get(variableItem)
+      .element(by.css('.variable-label'));
   },
 
   taskVariableValue: function(taskItem, variableItem) {
-    return this.taskVariables(taskItem).get(variableItem).element(by.css('.variable-value'));
+    return this.taskVariables(taskItem).get(variableItem)
+      .element(by.css('.variable-value'));
   }
 
 });
