@@ -33,6 +33,7 @@ import de.odysseus.el.ExpressionFactoryImpl;
 public class JuelScriptEngine extends AbstractScriptEngine implements Compilable {
 
   public static final String EL_CONTEXT_ATTRIBUTE = "elContext";
+
   protected ScriptEngineFactory scriptEngineFactory;
   protected ExpressionFactoryImpl expressionFactory;
 

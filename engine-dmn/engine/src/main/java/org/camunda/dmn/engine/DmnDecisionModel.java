@@ -25,6 +25,8 @@ public interface DmnDecisionModel {
 
   void addDecision(DmnDecision decision);
 
+  DmnDecisionResult evaluate(DmnDecisionContext decisionContext);
+
   DmnDecisionResult evaluate(String decisionId, DmnDecisionContext decisionContext);
 
 }

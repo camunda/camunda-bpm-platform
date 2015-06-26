@@ -32,7 +32,6 @@ import org.camunda.dmn.engine.impl.DmnDecisionOutputEntryImpl;
 import org.camunda.dmn.engine.impl.DmnDecisionOutputImpl;
 import org.camunda.dmn.engine.impl.DmnDecisionResultImpl;
 import org.camunda.dmn.engine.impl.DmnEngineLogger;
-import org.camunda.dmn.engine.impl.DmnRuleImpl;
 
 public class DmnDecisionContextImpl implements DmnDecisionContext {
 

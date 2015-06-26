@@ -39,6 +39,10 @@ public class DmnDecisionModelImpl implements DmnDecisionModel {
     decisions.put(decision.getId(), decision);
   }
 
+  public DmnDecisionResult evaluate(DmnDecisionContext decisionContext) {
+    return getDecisions().get(0).evaluate(decisionContext);
+  }
+
   public DmnDecisionResult evaluate(String decisionId, DmnDecisionContext decisionContext) {
     return getDecision(decisionId).evaluate(decisionContext);
   }
