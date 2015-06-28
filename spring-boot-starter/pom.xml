@@ -18,6 +18,7 @@
   <modules>
     <module>camunda-spring-boot-starter</module>
     <module>examples</module>
+    <module>camunda-spring-boot-starter-docs</module>
   </modules>
 
   <properties>
