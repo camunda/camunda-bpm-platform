@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.exception.NullValueException;
-import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.handler.CompositeDbHistoryEventHandler;
@@ -76,6 +75,7 @@ public class CompositeDbHistoryEventHandlerTest extends PluggableProcessEngineTe
     // process engine configuration object. The engine unit tests are not
     // isolated with respect to the engine configuration, meaning that when you
     // change the configuration it may affect following test cases.
+    cachedProcessEngine.close();
     cachedProcessEngine = null;
     super.tearDown();
   }
