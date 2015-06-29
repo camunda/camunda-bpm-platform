@@ -32,7 +32,6 @@ import static org.camunda.bpm.engine.authorization.Resources.TASK;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,6 +74,7 @@ import org.camunda.bpm.engine.impl.db.PermissionCheck;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
+import org.camunda.bpm.engine.impl.util.CollectionUtil;
 
 /**
  * @author Daniel Meyer
@@ -142,10 +142,12 @@ public class AuthorizationManager extends AbstractManager {
   // authorization checks ///////////////////////////////////////////
 
   public void checkAuthorization(PermissionCheck... permissionChecks) {
-    ensureNotNull("permissionChecks", permissionChecks);
-    ArrayList<PermissionCheck> permissionCheckList = new ArrayList<PermissionCheck>();
-    Collections.addAll(permissionCheckList, permissionChecks);
-    checkAuthorization(permissionCheckList);
+    ensureNotNull("permissionChecks", (Object[]) permissionChecks);
+    for (PermissionCheck permissionCheck : permissionChecks) {
+      ensureNotNull("permissionCheck", permissionCheck);
+    }
+
+    checkAuthorization(CollectionUtil.asArrayList(permissionChecks));
   }
 
   public void checkAuthorization(List<PermissionCheck> permissionChecks) {

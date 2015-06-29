@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,12 +12,15 @@
  */
 package org.camunda.bpm.engine.impl.util;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * helper/convience methods for working with collections.
- * 
+ *
  * @author Joram Barrez
  */
 public class CollectionUtil {
@@ -27,7 +30,7 @@ public class CollectionUtil {
 
   /**
    * Helper method that creates a singleton map.
-   * 
+   *
    * Alternative for Collections.singletonMap(), since that method returns a
    * generic typed map <K,T> depending on the input type, but we often need a
    * <String, Object> map.
@@ -37,5 +40,15 @@ public class CollectionUtil {
     map.put(key, value);
     return map;
   }
-  
+
+  /**
+   * Arrays.asList cannot be reliably used for SQL parameters on MyBatis < 3.3.0
+   */
+  public static <T> List<T> asArrayList(T[] values) {
+    ArrayList<T> result = new ArrayList<T>();
+    Collections.addAll(result, values);
+
+    return result;
+  }
+
 }

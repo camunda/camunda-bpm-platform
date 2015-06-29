@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.history.HistoricJobLogQuery;
 import org.camunda.bpm.engine.history.JobState;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.util.CollectionUtil;
 
 /**
  * @author Roman Smirnov
@@ -98,7 +99,7 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
   }
 
   public HistoricJobLogQuery activityIdIn(String... activityIds) {
-    List<String> activityIdList = Arrays.asList(activityIds);
+    List<String> activityIdList = CollectionUtil.asArrayList(activityIds);
     ensureNotContainsNull("activityIds", activityIdList);
     ensureNotContainsEmptyString("activityIds", activityIdList);
     this.activityIds = activityIds;
@@ -106,7 +107,7 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
   }
 
   public HistoricJobLogQuery executionIdIn(String... executionIds) {
-    List<String> executionIdList = Arrays.asList(executionIds);
+    List<String> executionIdList = CollectionUtil.asArrayList(executionIds);
     ensureNotContainsNull("executionIds", executionIdList);
     ensureNotContainsEmptyString("executionIds", executionIdList);
     this.executionIds = executionIds;
