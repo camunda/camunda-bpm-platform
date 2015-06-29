@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.TransitionInstance;
@@ -56,6 +57,7 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
   protected static final String NESTED_ASYNC_AFTER_END_EVENT_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.nestedParallelAsyncAfterEndEventProcess.bpmn20.xml";
 
   protected static final String ASYNC_AFTER_FAILING_TASK_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.asyncAfterFailingTaskProcess.bpmn20.xml";
+  protected static final String ASYNC_BEFORE_FAILING_TASK_PROCESS = "org/camunda/bpm/engine/test/api/runtime/ProcessInstanceModificationTest.asyncBeforeFailingTaskProcess.bpmn20.xml";
 
   @Deployment(resources = EXCLUSIVE_GATEWAY_ASYNC_BEFORE_TASK_PROCESS)
   public void testStartBeforeAsync() {
@@ -715,6 +717,309 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
     // when all jobs are executed
     executeAvailableJobs();
 
+  }
+
+
+  /**
+   * CAM-4090
+   */
+  @Deployment(resources = NESTED_ASYNC_BEFORE_TASK_PROCESS)
+  public void testCancelAllTransitionInstanceInScope() {
+    // given there are two transition instances in an inner scope
+    // and an active activity instance in an outer scope
+    ProcessInstance instance = runtimeService.createProcessInstanceByKey("nestedOneTaskProcess")
+      .startBeforeActivity("innerTask")
+      .startBeforeActivity("innerTask")
+      .startBeforeActivity("outerTask")
+      .execute();
+
+    ActivityInstance tree = runtimeService.getActivityInstance(instance.getId());
+
+    // when i cancel both transition instances
+    TransitionInstance[] transitionInstances = tree.getTransitionInstances("innerTask");
+
+    runtimeService.createProcessInstanceModification(instance.getId())
+      .cancelTransitionInstance(transitionInstances[0].getId())
+      .cancelTransitionInstance(transitionInstances[1].getId())
+      .execute();
+
+    // then the outer activity instance is the only one remaining
+    tree = runtimeService.getActivityInstance(instance.getId());
+
+    assertThat(tree).hasStructure(
+      describeActivityInstanceTree(instance.getProcessDefinitionId())
+        .activity("outerTask")
+      .done());
+
+    // assert executions
+    ExecutionTree executionTree = ExecutionTree.forExecution(instance.getId(), processEngine);
+
+    assertThat(executionTree)
+    .matches(
+      describeExecutionTree("outerTask").scope()
+      .done());
+  }
+
+  /**
+   * CAM-4090
+   */
+  @Deployment(resources = NESTED_PARALLEL_ASYNC_BEFORE_SCOPE_TASK_PROCESS)
+  public void testCancelStartCancelInScope() {
+    // given there are two transition instances in an inner scope
+    // and an active activity instance in an outer scope
+    ProcessInstance instance = runtimeService.createProcessInstanceByKey("nestedConcurrentTasksProcess")
+      .startBeforeActivity("innerTask1")
+      .startBeforeActivity("innerTask1")
+      .startBeforeActivity("outerTask")
+      .execute();
+
+    ActivityInstance tree = runtimeService.getActivityInstance(instance.getId());
+
+    // when i cancel both transition instances
+    TransitionInstance[] transitionInstances = tree.getTransitionInstances("innerTask1");
+
+    runtimeService.createProcessInstanceModification(instance.getId())
+      .cancelTransitionInstance(transitionInstances[0].getId()) // triggers tree compaction
+      .startBeforeActivity("innerTask2")                        // triggers tree expansion
+      .cancelTransitionInstance(transitionInstances[1].getId())
+      .execute();
+
+    // then the outer activity instance is the only one remaining
+    tree = runtimeService.getActivityInstance(instance.getId());
+
+    assertThat(tree).hasStructure(
+      describeActivityInstanceTree(instance.getProcessDefinitionId())
+        .activity("outerTask")
+        .beginScope("subProcess")
+          .transition("innerTask2")
+      .done());
+
+    // assert executions
+    ExecutionTree executionTree = ExecutionTree.forExecution(instance.getId(), processEngine);
+
+    assertThat(executionTree)
+    .matches(
+      describeExecutionTree(null).scope()
+        .child("outerTask").concurrent().noScope().up()
+        .child(null).concurrent().noScope()
+          .child("innerTask2").scope()
+      .done());
+  }
+
+  /**
+   * CAM-4090
+   */
+  @Deployment(resources = NESTED_PARALLEL_ASYNC_BEFORE_SCOPE_TASK_PROCESS)
+  public void testStartAndCancelAllForTransitionInstance() {
+    // given there is one transition instance in a scope
+    ProcessInstance instance = runtimeService.createProcessInstanceByKey("nestedConcurrentTasksProcess")
+      .startBeforeActivity("innerTask1")
+      .startBeforeActivity("innerTask1")
+      .startBeforeActivity("innerTask1")
+      .execute();
+
+    // when I start an activity in the same scope
+    // and cancel the first transition instance
+    runtimeService.createProcessInstanceModification(instance.getId())
+      .startBeforeActivity("innerTask2")
+      .cancelAllForActivity("innerTask1")
+      .execute();
+
+    // then the activity was successfully instantiated
+    ActivityInstance tree = runtimeService.getActivityInstance(instance.getId());
+
+    assertThat(tree).hasStructure(
+      describeActivityInstanceTree(instance.getProcessDefinitionId())
+        .beginScope("subProcess")
+          .transition("innerTask2")
+      .done());
+
+    // assert executions
+    ExecutionTree executionTree = ExecutionTree.forExecution(instance.getId(), processEngine);
+
+    assertThat(executionTree)
+    .matches(
+      describeExecutionTree(null).scope()
+        .child("innerTask2").scope()
+      .done());
+  }
+
+  /**
+   * CAM-4090
+   */
+  @Deployment(resources = NESTED_PARALLEL_ASYNC_BEFORE_SCOPE_TASK_PROCESS)
+  public void testRepeatedStartAndCancellationForTransitionInstance() {
+    // given there is one transition instance in a scope
+    ProcessInstance instance = runtimeService.createProcessInstanceByKey("nestedConcurrentTasksProcess")
+      .startBeforeActivity("innerTask1")
+      .execute();
+
+    ActivityInstance tree = runtimeService.getActivityInstance(instance.getId());
+    TransitionInstance transitionInstance = tree.getTransitionInstances("innerTask1")[0];
+
+    // when I start an activity in the same scope
+    // and cancel the first transition instance
+    runtimeService.createProcessInstanceModification(instance.getId())
+      .startBeforeActivity("innerTask2")  // expand tree
+      .cancelAllForActivity("innerTask2") // compact tree
+      .startBeforeActivity("innerTask2")  // expand tree
+      .cancelAllForActivity("innerTask2") // compact tree
+      .startBeforeActivity("innerTask2")  // expand tree
+      .cancelAllForActivity("innerTask2") // compact tree
+      .cancelTransitionInstance(transitionInstance.getId())
+      .execute();
+
+    // then the process has ended
+    assertProcessEnded(instance.getId());
+  }
+
+  /**
+   * CAM-4090
+   */
+  @Deployment(resources = NESTED_PARALLEL_ASYNC_BEFORE_SCOPE_TASK_PROCESS)
+  public void testRepeatedCancellationAndStartForTransitionInstance() {
+    // given there is one transition instance in a scope
+    ProcessInstance instance = runtimeService.createProcessInstanceByKey("nestedConcurrentTasksProcess")
+      .startBeforeActivity("innerTask1")
+      .startBeforeActivity("innerTask1")
+      .execute();
+
+    ActivityInstance tree = runtimeService.getActivityInstance(instance.getId());
+    TransitionInstance[] transitionInstances = tree.getTransitionInstances("innerTask1");
+
+    // when I start an activity in the same scope
+    // and cancel the first transition instance
+    runtimeService.createProcessInstanceModification(instance.getId())
+      .cancelTransitionInstance(transitionInstances[0].getId()) // compact tree
+      .startBeforeActivity("innerTask2")  // expand tree
+      .cancelAllForActivity("innerTask2") // compact tree
+      .startBeforeActivity("innerTask2")  // expand tree
+      .cancelAllForActivity("innerTask2") // compact tree
+      .startBeforeActivity("innerTask2")  // expand tree
+      .cancelTransitionInstance(transitionInstances[1].getId())
+      .execute();
+
+    // then there is only an activity instance for innerTask2
+    tree = runtimeService.getActivityInstance(instance.getId());
+
+    assertThat(tree).hasStructure(
+      describeActivityInstanceTree(instance.getProcessDefinitionId())
+        .beginScope("subProcess")
+          .transition("innerTask2")
+      .done());
+
+    // assert executions
+    ExecutionTree executionTree = ExecutionTree.forExecution(instance.getId(), processEngine);
+
+    assertThat(executionTree)
+    .matches(
+      describeExecutionTree(null).scope()
+        .child("innerTask2").scope()
+      .done());
+  }
+
+  /**
+   * CAM-4090
+   */
+  @Deployment(resources = NESTED_PARALLEL_ASYNC_BEFORE_SCOPE_TASK_PROCESS)
+  public void testStartBeforeAndCancelSingleTransitionInstance() {
+    // given there is one transition instance in a scope
+    ProcessInstance instance = runtimeService.createProcessInstanceByKey("nestedConcurrentTasksProcess")
+      .startBeforeActivity("innerTask1")
+      .execute();
+
+    ActivityInstance tree = runtimeService.getActivityInstance(instance.getId());
+    TransitionInstance transitionInstance = tree.getTransitionInstances("innerTask1")[0];
+
+    // when I start an activity in the same scope
+    // and cancel the first transition instance
+    runtimeService.createProcessInstanceModification(instance.getId())
+      .startBeforeActivity("innerTask2")
+      .cancelTransitionInstance(transitionInstance.getId())
+      .execute();
+
+    // then the activity was successfully instantiated
+    tree = runtimeService.getActivityInstance(instance.getId());
+
+    assertThat(tree).hasStructure(
+      describeActivityInstanceTree(instance.getProcessDefinitionId())
+        .beginScope("subProcess")
+          .transition("innerTask2")
+      .done());
+
+    // assert executions
+    ExecutionTree executionTree = ExecutionTree.forExecution(instance.getId(), processEngine);
+
+    assertThat(executionTree)
+    .matches(
+      describeExecutionTree(null).scope()
+        .child("innerTask2").scope()
+      .done());
+  }
+
+  /**
+   * CAM-4090
+   */
+  @Deployment(resources = NESTED_PARALLEL_ASYNC_BEFORE_SCOPE_TASK_PROCESS)
+  public void testStartBeforeSyncEndAndCancelSingleTransitionInstance() {
+    // given there is one transition instance in a scope and an outer activity instance
+    ProcessInstance instance = runtimeService.createProcessInstanceByKey("nestedConcurrentTasksProcess")
+      .startBeforeActivity("outerTask")
+      .startBeforeActivity("innerTask1")
+      .execute();
+
+    ActivityInstance tree = runtimeService.getActivityInstance(instance.getId());
+    TransitionInstance transitionInstance = tree.getTransitionInstances("innerTask1")[0];
+
+    // when I start an activity in the same scope that ends immediately
+    // and cancel the first transition instance
+    runtimeService.createProcessInstanceModification(instance.getId())
+      .startBeforeActivity("subProcessEnd2")
+      .cancelTransitionInstance(transitionInstance.getId())
+      .execute();
+
+    // then only the outer activity instance is left
+    tree = runtimeService.getActivityInstance(instance.getId());
+
+    assertThat(tree).hasStructure(
+      describeActivityInstanceTree(instance.getProcessDefinitionId())
+        .activity("outerTask")
+      .done());
+
+    // assert executions
+    ExecutionTree executionTree = ExecutionTree.forExecution(instance.getId(), processEngine);
+
+    assertThat(executionTree)
+    .matches(
+      describeExecutionTree("outerTask").scope()
+      .done());
+  }
+
+  @Deployment(resources = ASYNC_BEFORE_FAILING_TASK_PROCESS)
+  public void testRestartAFailedServiceTask() {
+    // given a failed job
+    ProcessInstance instance = runtimeService.createProcessInstanceByKey("failingAfterBeforeTask")
+      .startBeforeActivity("task2")
+      .execute();
+
+    executeAvailableJobs();
+    Incident incident = runtimeService.createIncidentQuery().singleResult();
+    assertNotNull(incident);
+
+    // when the service task is restarted
+    ActivityInstance tree = runtimeService.getActivityInstance(instance.getId());
+    runtimeService.createProcessInstanceModification(instance.getId())
+      .startBeforeActivity("task2")
+      .cancelTransitionInstance(tree.getTransitionInstances("task2")[0].getId())
+      .execute();
+
+    executeAvailableJobs();
+
+    // then executing the task has failed again and there is a new incident
+    Incident newIncident = runtimeService.createIncidentQuery().singleResult();
+    assertNotNull(newIncident);
+
+    assertNotSame(incident.getId(), newIncident.getId());
   }
 
 
