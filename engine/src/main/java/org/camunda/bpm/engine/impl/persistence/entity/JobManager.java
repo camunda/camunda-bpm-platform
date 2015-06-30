@@ -288,4 +288,11 @@ public class JobManager extends AbstractManager {
     getDbEntityManager().update(JobEntity.class, "updateFailedJobRetriesByParameters", parameters);
   }
 
+  public void updateJobPriorityByDefinitionId(String jobDefinitionId, int priority) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("jobDefinitionId", jobDefinitionId);
+    parameters.put("priority", priority);
+    getDbEntityManager().update(JobEntity.class, "updateJobPriorityByDefinitionId", parameters);
+  }
+
 }

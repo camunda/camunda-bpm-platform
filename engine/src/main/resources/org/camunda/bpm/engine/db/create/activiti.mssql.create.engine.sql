@@ -91,6 +91,7 @@ create table ACT_RU_JOBDEF (
     JOB_TYPE_ nvarchar(255) NOT NULL,
     JOB_CONFIGURATION_ nvarchar(255),
     SUSPENSION_STATE_ tinyint,
+    JOB_PRIORITY_ int,
     primary key (ID_)
 );
 

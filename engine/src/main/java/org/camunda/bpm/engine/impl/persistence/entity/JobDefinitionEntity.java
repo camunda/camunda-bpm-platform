@@ -54,6 +54,8 @@ public class JobDefinitionEntity implements JobDefinition, HasDbRevision, DbEnti
   // job definition is active by default
   protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
 
+  protected Integer jobPriority;
+
   public JobDefinitionEntity() {
   }
 
@@ -71,6 +73,7 @@ public class JobDefinitionEntity implements JobDefinition, HasDbRevision, DbEnti
     state.put("jobType", jobType);
     state.put("jobConfiguration", jobConfiguration);
     state.put("suspensionState", suspensionState);
+    state.put("jobPriority", jobPriority);
     return state;
   }
 
@@ -152,6 +155,14 @@ public class JobDefinitionEntity implements JobDefinition, HasDbRevision, DbEnti
 
   public void setSuspensionState(int state) {
     this.suspensionState = state;
+  }
+
+  public Integer getJobPriority() {
+    return jobPriority;
+  }
+
+  public void setJobPriority(Integer jobPriority) {
+    this.jobPriority = jobPriority;
   }
 
 }

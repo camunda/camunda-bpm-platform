@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.management;
 
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 
 /**
@@ -31,24 +32,24 @@ public interface JobDefinition {
   /**
    * @return the Id of the job definition.
    */
-  public abstract String getId();
+  String getId();
 
   /**
    * @return the id of the {@link ProcessDefinition} this job definition is associated with.
    */
-  public abstract String getProcessDefinitionId();
+  String getProcessDefinitionId();
 
   /**
    * @return the key of the {@link ProcessDefinition} this job definition is associated with.
    */
-  public abstract String getProcessDefinitionKey();
+  String getProcessDefinitionKey();
 
   /**
    * The Type of a job. Asynchronous continuation, timer, ...
    *
    * @return the type of a Job.
    */
-  public abstract String getJobType();
+  String getJobType();
 
   /**
    * The configuration of a job definition provides details about the jobs which will be created.
@@ -56,14 +57,14 @@ public interface JobDefinition {
    *
    * @return the configuration of this job definition.
    */
-  public abstract String getJobConfiguration();
+  String getJobConfiguration();
 
   /**
    * The Id of the activity (from BPMN 2.0 Xml) this Job Definition is associated with.
    *
    * @return the activity id for this Job Definition.
    */
-  public abstract String getActivityId();
+  String getActivityId();
 
 
   /**
@@ -73,5 +74,14 @@ public interface JobDefinition {
    * @return true if this Job Definition is currently suspended.
    */
   boolean isSuspended();
+
+  /**
+   * Returns the priority specified for jobs belonging to this definition if the job definition
+   * was overriden via the {@link ManagementService} API.
+   *
+   * @return the priority that overrides the default/BPMN XML priority or <code>null</code> if
+   *   the priority is not overridden
+   */
+  Integer getJobPriority();
 
 }

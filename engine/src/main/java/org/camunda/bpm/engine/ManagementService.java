@@ -697,6 +697,46 @@ public interface ManagementService {
   void setJobPriority(String jobId, int priority);
 
   /**
+   * <p>Sets an explicit default priority for jobs of the given job definition.
+   * Jobs created after invoking this method receive the given priority.
+   * This setting overrides any setting specified in the BPMN 2.0 XML.</p>
+   *
+   * <p>The job definition priority can be reset to the value specified in the BPMN 2.0
+   * XML by using the method {@link #resetJobDefinitionPriority(String)}</p>
+   *
+   * @param jobDefinitionId the id of the job definition to set the priority for
+   * @param priority the priority to set;
+   */
+  void setJobDefinitionPriority(String jobDefinitionId, int priority);
+
+  /**
+   * <p>Sets an explicit default priority for jobs of the given job definition.
+   * Jobs created after invoking this method receive the given priority.
+   * This setting overrides any setting specified in the BPMN 2.0 XML.</p>
+   *
+   * <p>If <code>cascade</code> is true, priorities of already existing jobs
+   * are changed accordingly.</p>
+   *
+   * <p>The job definition priority can be reset to the value specified in the BPMN 2.0
+   * XML by using the method {@link #resetJobDefinitionPriority(String)}</p>
+   *
+   * @param jobDefinitionId the id of the job definition to set the priority for
+   * @param priority the priority to set
+   * @param cascade if true, priorities of existing jobs of that definition are changed as well
+   */
+  void setJobDefinitionPriority(String jobDefinitionId, int priority, boolean cascade);
+
+  /**
+   * <p>Resets the job definition's priority back to default. New job's of that definition
+   * receive the priority as specified in the BPMN 2.0 XML or the global default priority.</p>
+   *
+   * <p>Existing job instance priorities remain unchanged</p>
+   *
+   * @param jobDefinitionId the id of the job definition for which to reset the priority
+   */
+  void resetJobDefinitionPriority(String jobDefinitionId);
+
+  /**
    * Returns the full stacktrace of the exception that occurs when the job
    * with the given id was last executed. Returns null when the job has no
    * exception stacktrace.
