@@ -43,6 +43,11 @@ module.exports = Page.extend({
     return item;
   },
 
+  logout: function() {
+    this.selectNavbarItem('Account');
+    element(by.css('.sign-out')).click();
+  },
+
   navigateLogout: function() {
     browser.get(this.url +'logout');
   }

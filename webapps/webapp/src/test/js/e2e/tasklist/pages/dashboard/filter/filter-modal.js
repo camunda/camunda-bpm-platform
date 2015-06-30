@@ -71,12 +71,112 @@ module.exports = Base.extend({
   },
 
   // permissions
+  permissionPageElement: function() {
+    return element(by.css('[cam-tasklist-filter-modal-form-permission]'));
+  },
+
+  permissionHelpText: function() {
+    return element(by.css('[is-open="accordion.permission"] .task-filter-hint.text-help')).getText();
+  },
+
+  accessibleByAllUsersCheckBox: function() {
+    return this.permissionPageElement()
+      .element(by.model('isGlobalReadAuthorization'));
+  },
+
+  newPermissionPageElement: function() {
+    return this.permissionPageElement()
+      .element(by.css('.new-permission'));
+  },
+
+  permissionList: function() {
+    return this.permissionPageElement()
+      .all(by.repeater('auth in getReadAuthorizations(authorizations)'));
+  },
+
   addPermissionButton: function() {
     return element(by.css('[ng-click="addReadPermission()"]'));
   },
 
-  authorizationnList: function() {
-    return this.formElement().all(by.repeater('(delta, authorization) in authorizations'));
+  addPermission: function(type, id) {
+    var that = this;
+
+    this.addPermissionButton().click().then(function() {
+      that.selectPermissionType(type);
+      that.permissionIdInput(id);
+    });
+  },
+
+  removePermissionButton: function(idx) {
+    return this.permissionList().get(idx)
+      .element(by.css('[ng-click="removeReadPermission(auth)"]'));
+  },
+
+  removePermission: function(idx) {
+    this.removePermissionButton(idx).click();
+  },
+
+  permissionTypeButton: function() {
+    return this.newPermissionPageElement()
+      .element(by.css('[ng-click="switchType()"]'));
+  },
+
+  selectPermissionType: function(permissionType) {
+    var that = this;
+
+    this.getPermissionType().then(function(currentType) {
+      if (currentType !== permissionType )  {
+        that.permissionTypeButton().click();
+      }
+    });
+  },
+
+  getPermissionType: function(idx) {
+    if (arguments.length === 1) {
+      return this.permissionList().get(idx)
+        .element(by.css('.fake-button .glyphicon'))
+        .getAttribute('class').then(function(classes) {
+          if (classes.indexOf('glyphicon-user') !== -1) {
+            return 'user';
+          } else {
+            return 'group';
+          }
+        });
+    } else {
+      return this.permissionTypeButton()
+        .getAttribute('tooltip').then(function(tooltips) {
+          if (tooltips.indexOf('user') !== -1) {
+            return 'user';
+          } else {
+            return 'group';
+          }
+        });
+    }
+  },
+
+  permissionIdInput: function(inputValue) {
+    var inputField = this.newPermissionPageElement()
+                      .element(by.model('newPermission.id'));
+
+    if (arguments.length === 1)
+      inputField.sendKeys(inputValue);
+
+    return inputField;
+  },
+
+  getPermissionId: function(idx) {
+    if (arguments.length === 1) {
+      return this.permissionList().get(idx)
+        .element(by.css('.form-control-static')).getText();
+    } else {
+      return this.permissionIdInput()
+        .getAttribute('value');
+    }
+  },
+
+  permissionIdHelpText: function() {
+    return this.newPermissionPageElement()
+      .element(by.css('.help-block:not(.ng-hide)')).getText();
   },
 
   // criteria
