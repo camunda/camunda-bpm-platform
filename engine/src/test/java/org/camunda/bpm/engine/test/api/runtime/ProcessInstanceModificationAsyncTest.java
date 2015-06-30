@@ -20,6 +20,7 @@ import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecution
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -758,6 +759,79 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
     .matches(
       describeExecutionTree("outerTask").scope()
       .done());
+  }
+
+  /**
+   * CAM-4090
+   */
+  @Deployment(resources = NESTED_ASYNC_BEFORE_TASK_PROCESS)
+  public void testCancelTransitionInstanceTwiceFails() {
+    // given there are two transition instances in an inner scope
+    // and an active activity instance in an outer scope
+    ProcessInstance instance = runtimeService.createProcessInstanceByKey("nestedOneTaskProcess")
+      .startBeforeActivity("innerTask")
+      .startBeforeActivity("innerTask")
+      .execute();
+
+    ActivityInstance tree = runtimeService.getActivityInstance(instance.getId());
+
+    // when i cancel both transition instances
+    TransitionInstance[] transitionInstances = tree.getTransitionInstances("innerTask");
+
+    // this test ensures that the replacedBy link of executions is not followed
+    // in case the original execution was actually removed/cancelled
+    String transitionInstanceId = transitionInstances[0].getId();
+    try {
+      runtimeService.createProcessInstanceModification(instance.getId())
+        .cancelTransitionInstance(transitionInstanceId)
+        .cancelTransitionInstance(transitionInstanceId)
+        .execute();
+      fail("should not be possible to cancel the first instance twice");
+    } catch (NotValidException e) {
+      assertTextPresentIgnoreCase("Cannot perform instruction: Cancel transition instance '" + transitionInstanceId
+          + "'; Transition instance '" + transitionInstanceId + "' does not exist: transitionInstance is null",
+          e.getMessage());
+    }
+  }
+
+  /**
+   * CAM-4090
+   */
+  @Deployment(resources = NESTED_ASYNC_BEFORE_TASK_PROCESS)
+  public void testCancelTransitionInstanceTwiceFailsCase2() {
+    // given there are two transition instances in an inner scope
+    // and an active activity instance in an outer scope
+    ProcessInstance instance = runtimeService.createProcessInstanceByKey("nestedOneTaskProcess")
+      .startBeforeActivity("innerTask")
+      .startBeforeActivity("innerTask")
+      .execute();
+
+    ActivityInstance tree = runtimeService.getActivityInstance(instance.getId());
+
+    // when i cancel both transition instances
+    TransitionInstance[] transitionInstances = tree.getTransitionInstances("innerTask");
+
+    // this test ensures that the replacedBy link of executions is not followed
+    // in case the original execution was actually removed/cancelled
+
+    try {
+      runtimeService.createProcessInstanceModification(instance.getId())
+        .cancelTransitionInstance(transitionInstances[0].getId()) // compacts the tree;
+                                                                  // => execution for transitionInstances[1] is replaced by scope execution
+        .startBeforeActivity("innerTask")                         // expand tree again
+                                                                  // => scope execution is replaced by a new concurrent execution
+        .startBeforeActivity("innerTask")
+        .cancelTransitionInstance(transitionInstances[1].getId()) // does not trigger compaction
+        .cancelTransitionInstance(transitionInstances[1].getId()) // should fail
+                                                                  // => execution for transitionInstances[1] should no longer have a replacedBy link
+        .execute();
+      fail("should not be possible to cancel the first instance twice");
+    } catch (NotValidException e) {
+      String transitionInstanceId = transitionInstances[1].getId();
+      assertTextPresentIgnoreCase("Cannot perform instruction: Cancel transition instance '" + transitionInstanceId
+          + "'; Transition instance '" + transitionInstanceId + "' does not exist: transitionInstance is null",
+          e.getMessage());
+    }
   }
 
   /**
