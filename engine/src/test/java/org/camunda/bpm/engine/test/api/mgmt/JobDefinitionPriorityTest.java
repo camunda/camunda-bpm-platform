@@ -172,6 +172,42 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
     assertEquals(72, newJob.getPriority());
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/jobPrioProcess.bpmn20.xml")
+  public void testRedeployOverridesSetJobDefinitionPriority() {
+    // given a process instance with a job with default priority and a corresponding job definition
+    ProcessInstance instance = runtimeService.createProcessInstanceByKey("jobPrioProcess")
+      .startBeforeActivity("task2")
+      .execute();
+
+    Job job = managementService.createJobQuery().singleResult();
+    JobDefinition jobDefinition = managementService.createJobDefinitionQuery()
+      .jobDefinitionId(job.getJobDefinitionId()).singleResult();
+
+    // when I set the job definition's priority
+    managementService.setJobDefinitionPriority(jobDefinition.getId(), 72, true);
+
+    // then the job definition's priority value has changed
+    JobDefinition updatedDefinition = managementService.createJobDefinitionQuery()
+      .jobDefinitionId(jobDefinition.getId()).singleResult();
+    assertEquals(72, (int) updatedDefinition.getJobPriority());
+
+    // the existing job's priority has changed as well
+    Job updatedExistingJob = managementService.createJobQuery().singleResult();
+    assertEquals(72, updatedExistingJob.getPriority());
+
+    // if the process definition is redeployed
+    String secondDeploymentId = repositoryService.createDeployment().addClasspathResource("org/camunda/bpm/engine/test/api/mgmt/jobPrioProcess.bpmn20.xml").deploy().getId();
+
+    // then a new job will have the priority from the BPMN xml
+    ProcessInstance secondInstance = runtimeService.createProcessInstanceByKey("jobPrioProcess")
+      .startBeforeActivity("task2")
+      .execute();
+
+    Job newJob = managementService.createJobQuery().processInstanceId(secondInstance.getId()).singleResult();
+    assertEquals(5, newJob.getPriority());
+
+    repositoryService.deleteDeployment(secondDeploymentId, true);
+  }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/asyncTaskProcess.bpmn20.xml")
   public void testResetJobDefinitionPriority() {
@@ -196,7 +232,7 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
       .execute();
 
     Job job = managementService.createJobQuery().singleResult();
-    assertEquals(0, job.getPriority());
+    assertEquals(EXPECTED_DEFAULT_PRIORITY, job.getPriority());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/asyncTaskProcess.bpmn20.xml")

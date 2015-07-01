@@ -1100,7 +1100,7 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
     try {
       // when
       managementService.setJobDefinitionPriority(jobDefinition.getId(), 42);
-      fail("Exception expected: It should not be possible to suspend a job definition");
+      fail("Exception expected: It should not be possible to change the job definition's priority");
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
