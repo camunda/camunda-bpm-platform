@@ -271,6 +271,22 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(procId);
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelReceiveTasks.bpmn20.xml")
+  public void testParallelReceiveTasksAssertEventSubscriptionRemoval() {
+    runtimeService.startProcessInstanceByKey("miParallelReceiveTasks");
+
+    assertEquals(3, runtimeService.createEventSubscriptionQuery().count());
+
+    List<Execution> receiveTaskExecutions = runtimeService
+        .createExecutionQuery().activityId("miTasks").list();
+
+    // signal one of the instances
+    runtimeService.messageEventReceived("message", receiveTaskExecutions.get(0).getId());
+
+    // now there should be two subscriptions left
+    assertEquals(2, runtimeService.createEventSubscriptionQuery().count());
+  }
+
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelUserTasks.bpmn20.xml"})
   public void testParallelUserTasksHistory() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("miParallelUserTasks");

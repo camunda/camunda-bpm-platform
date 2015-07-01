@@ -39,7 +39,6 @@ import org.camunda.bpm.engine.impl.core.variable.scope.CoreVariableStore;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
-import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.event.CompensationEventHandler;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
@@ -58,7 +57,6 @@ import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
 import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionStartContext;
-import org.camunda.bpm.engine.impl.pvm.runtime.OutgoingExecution;
 import org.camunda.bpm.engine.impl.pvm.runtime.ProcessInstanceStartContext;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.FoxAtomicOperationDeleteCascadeFireActivityEnd;
@@ -141,11 +139,6 @@ public class ExecutionEntity extends PvmExecutionImpl implements
   protected transient ExecutionEntityVariableStore variableStore = new ExecutionEntityVariableStore(this);
 
   // replaced by //////////////////////////////////////////////////////////////
-
-  /** when execution structure is pruned during a takeAll, then
-   * the original execution has to be resolved to the replaced execution.
-   * @see {@link #leaveActivityViaTransitions(List, List)} {@link OutgoingExecution} */
-  protected transient ExecutionEntity replacedBy;
 
   protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
 
@@ -892,8 +885,8 @@ public class ExecutionEntity extends PvmExecutionImpl implements
 
   public void removeEventSubscriptions() {
     for (EventSubscriptionEntity eventSubscription : getEventSubscriptions()) {
-      if (replacedBy != null) {
-        eventSubscription.setExecution(replacedBy);
+      if (getReplacedBy() != null) {
+        eventSubscription.setExecution(getReplacedBy());
       } else {
         eventSubscription.delete();
       }
@@ -902,8 +895,8 @@ public class ExecutionEntity extends PvmExecutionImpl implements
 
   private void removeJobs() {
     for (Job job: getJobs()) {
-      if (replacedBy!=null) {
-        ((JobEntity)job).setExecution(replacedBy);
+      if (isReplacedByParent()) {
+        ((JobEntity)job).setExecution(getReplacedBy());
       } else {
         ((JobEntity)job).delete();
       }
@@ -912,8 +905,8 @@ public class ExecutionEntity extends PvmExecutionImpl implements
 
   private void removeIncidents() {
     for (IncidentEntity incident: getIncidents()) {
-      if (replacedBy!=null) {
-        incident.setExecution(replacedBy);
+      if (isReplacedByParent()) {
+        incident.setExecution(getReplacedBy());
       } else {
         incident.delete();
       }
@@ -925,12 +918,12 @@ public class ExecutionEntity extends PvmExecutionImpl implements
       reason = TaskEntity.DELETE_REASON_DELETED;
     }
     for (TaskEntity task : getTasks()) {
-      if (replacedBy!=null) {
+      if (isReplacedByParent()) {
         if(task.getExecution() == null || task.getExecution() != replacedBy) {
           // All tasks should have been moved when "replacedBy" has been set. Just in case tasks where added,
           // wo do an additional check here and move it
           task.setExecution(replacedBy);
-          this.replacedBy.addTask(task);
+          this.getReplacedBy().addTask(task);
         }
       } else {
         task.delete(reason, false);
@@ -939,73 +932,39 @@ public class ExecutionEntity extends PvmExecutionImpl implements
   }
 
   public ExecutionEntity getReplacedBy() {
-    return replacedBy;
-  }
-
-  public void setReplacedBy(PvmExecutionImpl replacedBy) {
-    this.replacedBy = (ExecutionEntity) replacedBy;
-
-    CommandContext commandContext = Context.getCommandContext();
-    DbEntityManager dbEntityManger = commandContext.getDbEntityManager();
-
-    // update the related tasks
-    for (TaskEntity task: getTasks()) {
-      task.setExecutionId(replacedBy.getId());
-      task.setExecution(this.replacedBy);
-
-      // update the related local task variables
-      List<VariableInstanceEntity> variables = commandContext
-        .getVariableInstanceManager()
-        .findVariableInstancesByTaskId(task.getId());
-
-      for (VariableInstanceEntity variable : variables) {
-        variable.setExecution(this.replacedBy);
-      }
-
-      this.replacedBy.addTask(task);
-    }
-
-    // All tasks have been moved to 'replacedBy', safe to clear the list
-    this.tasks.clear();
-
-    List<TaskEntity> tasks = dbEntityManger.getCachedEntitiesByType(TaskEntity.class);
-    for (TaskEntity task: tasks) {
-      if (id.equals(task.getExecutionId())) {
-        task.setExecutionId(replacedBy.getId());
-      }
-    }
-
-    // update the related jobs
-    List<JobEntity> jobs = getJobs();
-    for (JobEntity job: jobs) {
-      job.setExecution((ExecutionEntity) replacedBy);
-    }
-
-    // update the related event subscriptions
-    List<EventSubscriptionEntity> eventSubscriptions = getEventSubscriptions();
-    for (EventSubscriptionEntity subscriptionEntity: eventSubscriptions) {
-      subscriptionEntity.setExecution((ExecutionEntity) replacedBy);
-    }
-
-    // update the related process variables
-    variableStore.ensureVariableInstancesInitialized();
-    for (CoreVariableInstance variable: variableStore.getVariableInstances().values()) {
-      ((VariableInstanceEntity) variable).setExecutionId(replacedBy.getId());
-    }
-
-    // TODO: fire UPDATE activity instance events with new execution?
-    super.setReplacedBy(replacedBy);
+    return (ExecutionEntity) replacedBy;
   }
 
   public void replace(PvmExecutionImpl execution) {
     ExecutionEntity replacedExecution = (ExecutionEntity) execution;
 
+    // update the related tasks
+    replacedExecution.moveTasksTo(this);
+
+    // update those jobs that are directly related to the argument execution's current activity
+    replacedExecution.moveActivityLocalJobsTo(this);
+
+    // only move variables when compacting the tree, but not when expanding
+    // this behavior should be changed when fixing CAM-3941
+    if (replacedExecution.getParent() == this) {
+      // update the related process variables
+      replacedExecution.moveVariablesTo(this);
+    }
+
+    // note: this method not move any event subscriptions since concurrent executions
+    //       do not have event subscriptions (and either one of the executions involved in this
+    //       operation is concurrent)
+
+    super.replace(replacedExecution);
+  }
+
+  protected void moveTasksTo(ExecutionEntity other) {
     CommandContext commandContext = Context.getCommandContext();
 
     // update the related tasks
-    for (TaskEntity task: replacedExecution.getTasksInternal()) {
-      task.setExecutionId(getId());
-      task.setExecution(this);
+    for (TaskEntity task : getTasksInternal()) {
+      task.setExecutionId(other.getId());
+      task.setExecution(other);
 
       // update the related local task variables
       List<VariableInstanceEntity> variables = commandContext
@@ -1013,26 +972,31 @@ public class ExecutionEntity extends PvmExecutionImpl implements
         .findVariableInstancesByTaskId(task.getId());
 
       for (VariableInstanceEntity variable : variables) {
-        variable.setExecution(this);
+        variable.setExecution(other);
       }
 
-      addTask(task);
+      other.addTask(task);
     }
-    replacedExecution.getTasksInternal().clear();
+    getTasksInternal().clear();
+  }
 
-    // update those jobs that are directly related to the argument execution's current activity
-    String replacedActivity = replacedExecution.getActivityId();
-    if (replacedActivity != null) {
-      for (JobEntity job : replacedExecution.getJobs()) {
+  protected void moveActivityLocalJobsTo(ExecutionEntity other) {
+    if (activityId != null) {
+      for (JobEntity job : getJobs()) {
 
-        if (replacedActivity.equals(job.getActivityId())) {
-          replacedExecution.removeJob(job);
-          job.setExecution(this);
+        if (activityId.equals(job.getActivityId())) {
+          removeJob(job);
+          job.setExecution(other);
         }
       }
     }
+  }
 
-    super.replace(replacedExecution);
+  protected void moveVariablesTo(ExecutionEntity other) {
+    variableStore.ensureVariableInstancesInitialized();
+    for (CoreVariableInstance variable: variableStore.getVariableInstances().values()) {
+      ((VariableInstanceEntity) variable).setExecutionId(other.getId());
+    }
   }
 
   // variables ////////////////////////////////////////////////////////////////

@@ -59,6 +59,14 @@
       </if>
     </where>
   </update>
+  
+  <update id="updateJobPriorityByDefinitionId" parameterType="java.util.Map">
+    <!-- this does not increment revision; it is ok if this update is overwritten by parallel operations -->
+    update ${prefix}ACT_RU_JOB set
+      PRIORITY_ = #{priority, jdbcType=INTEGER}
+    where
+      JOB_DEF_ID_ = #{jobDefinitionId, jdbcType=VARCHAR}
+  </update>
 
   <!-- JOB RESULTMAP (FOR TIMER AND MESSAGE) -->
 
