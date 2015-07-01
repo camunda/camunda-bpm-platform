@@ -12,7 +12,8 @@
     
      <properties>
       <property name="openjpa.Log" value="DefaultLevel=WARN, Tool=INFO"/>
-      <property name="openjpa.LockTimeout " value="30000"/>
+      <property name="openjpa.RuntimeUnenhancedClasses" value="supported"/>
+      <property name="openjpa.LockTimeout" value="30000"/>
       <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema(SchemaAction='add,deleteTableContents')"/>
     </properties>
     

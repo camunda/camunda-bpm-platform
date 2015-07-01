@@ -156,7 +156,7 @@ public class JPAVariableTest extends AbstractProcessEngineTestCase {
     manager.persist(bigDecimalIdJPAEntity);
 
     bigIntegerIdJPAEntity = new BigIntegerIdJPAEntity();
-    bigIntegerIdJPAEntity.setBigIntegerId(new BigInteger("12345678912345678912345678900000"));
+    bigIntegerIdJPAEntity.setBigIntegerId(new BigInteger("9223372036854775807"));
     manager.persist(bigIntegerIdJPAEntity);
 
     manager.flush();
@@ -345,7 +345,7 @@ public class JPAVariableTest extends AbstractProcessEngineTestCase {
       fail("Exception expected");
     } catch(ProcessEngineException ae) {
       assertTextPresent("Cannot find field or method with annotation @Id on class", ae.getMessage());
-      assertTextPresent("only single-valued primary keys are supported on JPA-enities", ae.getMessage());
+      assertTextPresent("only single-valued primary keys are supported on JPA-entities", ae.getMessage());
     }
 
     // Starting process instance with a variable that has null as ID-value
