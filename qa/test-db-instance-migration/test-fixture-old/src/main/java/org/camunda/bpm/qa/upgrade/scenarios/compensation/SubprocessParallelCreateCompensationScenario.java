@@ -24,42 +24,28 @@ import org.camunda.bpm.qa.upgrade.Times;
  * @author Thorben Lindhauer
  *
  */
-public class SubprocessParallelCompensationScenario {
+public class SubprocessParallelCreateCompensationScenario {
 
   @Deployment
   public static String deployProcess() {
-    return "org/camunda/bpm/qa/upgrade/compensation/subprocessParallelCompensationProcess.bpmn20.xml";
+    return "org/camunda/bpm/qa/upgrade/compensation/subprocessParallelCreateCompensationProcess.bpmn20.xml";
   }
 
   @DescribesScenario("init")
-  @Times(3)
+  @Times(2)
   public static ScenarioSetup instantiate() {
     return new ScenarioSetup() {
       public void execute(ProcessEngine engine, String scenarioName) {
         engine
           .getRuntimeService()
-          .startProcessInstanceByKey("SubprocessParallelCompensationScenario", scenarioName);
+          .startProcessInstanceByKey("SubprocessParallelCreateCompensationScenario", scenarioName);
 
-        // create the compensation event subscription and wait before throwing compensation
+        // create the compensation event subscription for the first user task
+        // execution continues from userTask1 to afterUserTask1
         Task userTask = engine.getTaskService().createTaskQuery()
-            .processInstanceBusinessKey(scenarioName).singleResult();
+            .processInstanceBusinessKey(scenarioName).taskDefinitionKey("userTask1").singleResult();
         engine.getTaskService().complete(userTask.getId());
       }
     };
   }
-
-  @DescribesScenario("init.triggerCompensation")
-  @ExtendsScenario("init")
-  @Times(3)
-  public static ScenarioSetup instantiateAndTriggerCompensation() {
-    return new ScenarioSetup() {
-      public void execute(ProcessEngine engine, String scenarioName) {
-        // throw compensation; the compensation handler for userTask should then be active
-        Task beforeCompensateTask = engine.getTaskService().createTaskQuery()
-            .processInstanceBusinessKey(scenarioName).taskDefinitionKey("beforeCompensate").singleResult();
-        engine.getTaskService().complete(beforeCompensateTask.getId());
-      }
-    };
-  }
-
 }

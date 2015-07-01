@@ -14,8 +14,10 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 
 
@@ -28,6 +30,11 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
   @Override
   public int determinePriority(ExecutionEntity execution, JobDeclaration<?> jobDeclaration) {
 
+    Integer jobDefinitionPriority = getJobDefinitionPriority(execution, jobDeclaration);
+    if (jobDefinitionPriority != null) {
+      return jobDefinitionPriority;
+    }
+
     Integer activityPriority = getActivityPriority(execution, jobDeclaration);
     if (activityPriority != null) {
       return activityPriority;
@@ -39,6 +46,21 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
     }
 
     return JobPriorityProvider.DEFAULT_PRIORITY;
+  }
+
+  protected Integer getJobDefinitionPriority(ExecutionEntity execution, JobDeclaration<?> jobDeclaration) {
+    String jobDefinitionId = jobDeclaration.getJobDefinitionId();
+
+    if (jobDefinitionId != null) {
+      JobDefinitionEntity jobDefinition = Context.getCommandContext()
+          .getJobDefinitionManager().findById(jobDefinitionId);
+
+      if (jobDefinition != null) {
+        return jobDefinition.getJobPriority();
+      }
+    }
+
+    return null;
   }
 
   protected Integer getProcessDefinitionPriority(ExecutionEntity execution, JobDeclaration<?> jobDeclaration) {

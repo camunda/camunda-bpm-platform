@@ -12,9 +12,13 @@
  */
 package org.camunda.bpm.engine.test.jobexecutor;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.impl.cmd.AcquireJobsCmd;
 import org.camunda.bpm.engine.impl.cmd.ExecuteJobsCmd;
+import org.camunda.bpm.engine.impl.cmd.SetJobDefinitionPriorityCmd;
+import org.camunda.bpm.engine.impl.cmd.SuspendJobCmd;
 import org.camunda.bpm.engine.impl.cmd.SuspendJobDefinitionCmd;
 import org.camunda.bpm.engine.impl.jobexecutor.AcquiredJobs;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
@@ -240,6 +244,77 @@ public class JobDefinitionFunctionalTest extends PluggableProcessEngineTestCase 
 
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml")
+  public void testUpdateJobDefinitionPriority() {
+    // given
+    // two running instances
+    runtimeService.startProcessInstanceByKey("simpleAsyncProcess");
+    runtimeService.startProcessInstanceByKey("simpleAsyncProcess");
+
+    // and a job definition
+    JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
+
+    // and two jobs
+    List<Job> jobs = managementService.createJobQuery().list();
+
+    // when the first job is executed but has not yet committed
+    JobExecutionThread executionThread = new JobExecutionThread(jobs.get(0).getId());
+    executionThread.startAndWaitUntilControlIsReturned();
+
+    // and the job priority is updated
+    JobDefinitionPriorityThread priorityThread = new JobDefinitionPriorityThread(jobDefinition.getId(), 42, true);
+    priorityThread.startAndWaitUntilControlIsReturned();
+
+    // and the priority threads commits first
+    priorityThread.proceedAndWaitTillDone();
+
+    // then both jobs priority has changed
+    List<Job> currentJobs = managementService.createJobQuery().list();
+    for (Job job : currentJobs) {
+      assertEquals(42, job.getPriority());
+    }
+
+    // and the execution thread can nevertheless successfully finish job execution
+    executionThread.proceedAndWaitTillDone();
+
+    assertNull(executionThread.exception);
+
+    // and ultimately only one job with an updated priority is left
+    Job remainingJob = managementService.createJobQuery().singleResult();
+    assertNotNull(remainingJob);
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml")
+  public void testParallelSuspensionAndPriorityUpdate() {
+    // given
+    // two running instances (ie two jobs)
+    runtimeService.startProcessInstanceByKey("simpleAsyncProcess");
+    runtimeService.startProcessInstanceByKey("simpleAsyncProcess");
+
+    // a job definition
+    JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
+
+    // when suspending the jobs is attempted
+    JobSuspensionByJobDefinitionThread suspensionThread = new JobSuspensionByJobDefinitionThread(jobDefinition.getId());
+    suspensionThread.startAndWaitUntilControlIsReturned();
+
+    // and updating the priority is attempted
+    JobDefinitionPriorityThread priorityUpdateThread = new JobDefinitionPriorityThread(jobDefinition.getId(), 42, true);
+    priorityUpdateThread.startAndWaitUntilControlIsReturned();
+
+    // and both commands overlap each other
+    suspensionThread.proceedAndWaitTillDone();
+    priorityUpdateThread.proceedAndWaitTillDone();
+
+    // then both updates have been performed
+    List<Job> updatedJobs = managementService.createJobQuery().list();
+    assertEquals(2, updatedJobs.size());
+    for (Job job : updatedJobs) {
+      assertEquals(42, job.getPriority());
+      assertTrue(job.isSuspended());
+    }
+  }
+
   protected AcquiredJobs acquireJobs() {
     return processEngineConfiguration.getCommandExecutorTxRequired()
       .execute(new AcquireJobsCmd(processEngineConfiguration.getJobExecutor()));
@@ -316,6 +391,59 @@ public class JobDefinitionFunctionalTest extends PluggableProcessEngineTestCase 
         this.exception = e;
       }
       log.fine(getName()+" ends");
+    }
+  }
+
+  public class JobSuspensionByJobDefinitionThread extends ControllableThread {
+    OptimisticLockingException exception;
+    String jobDefinitionId;
+
+    public JobSuspensionByJobDefinitionThread(String jobDefinitionId) {
+      this.jobDefinitionId = jobDefinitionId;
+    }
+
+    @Override
+    public synchronized void startAndWaitUntilControlIsReturned() {
+      activeThread = this;
+      super.startAndWaitUntilControlIsReturned();
+    }
+    public void run() {
+      try {
+        processEngineConfiguration.getCommandExecutorTxRequired()
+          .execute(new ControlledCommand(activeThread, new SuspendJobCmd(null, jobDefinitionId, null, null, null)));
+
+      } catch (OptimisticLockingException e) {
+        this.exception = e;
+      }
+      log.fine(getName()+" ends");
+    }
+  }
+
+  public class JobDefinitionPriorityThread extends ControllableThread {
+    OptimisticLockingException exception;
+    String jobDefinitionId;
+    Integer priority;
+    boolean cascade;
+
+    public JobDefinitionPriorityThread(String jobDefinitionId, Integer priority, boolean cascade) {
+      this.jobDefinitionId = jobDefinitionId;
+      this.priority = priority;
+      this.cascade = cascade;
+    }
+
+    @Override
+    public synchronized void startAndWaitUntilControlIsReturned() {
+      activeThread = this;
+      super.startAndWaitUntilControlIsReturned();
+    }
+    public void run() {
+      try {
+        processEngineConfiguration.getCommandExecutorTxRequired()
+          .execute(new ControlledCommand(activeThread, new SetJobDefinitionPriorityCmd(jobDefinitionId, priority, cascade)));
+
+      } catch (OptimisticLockingException e) {
+        this.exception = e;
+      }
     }
   }
 

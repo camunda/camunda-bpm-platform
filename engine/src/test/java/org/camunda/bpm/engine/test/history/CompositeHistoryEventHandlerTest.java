@@ -69,17 +69,13 @@ public class CompositeHistoryEventHandlerTest extends PluggableProcessEngineTest
     countCustomHistoryEventHandler = 0;
   }
 
-  /**
-   * Tears down the fixture.
-   */
-  protected void tearDown() throws Exception {
+  protected void closeDownProcessEngine() {
     // Clean the cachedProcessEngine since test cases make changes on the
     // process engine configuration object. The engine unit tests are not
     // isolated with respect to the engine configuration, meaning that when you
     // change the configuration it may affect following test cases.
     cachedProcessEngine.close();
     cachedProcessEngine = null;
-    super.tearDown();
   }
 
   /**

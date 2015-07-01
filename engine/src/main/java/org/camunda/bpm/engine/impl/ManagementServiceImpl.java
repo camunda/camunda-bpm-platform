@@ -37,6 +37,7 @@ import org.camunda.bpm.engine.impl.cmd.GetTableNameCmd;
 import org.camunda.bpm.engine.impl.cmd.RegisterDeploymentCmd;
 import org.camunda.bpm.engine.impl.cmd.RegisterProcessApplicationCmd;
 import org.camunda.bpm.engine.impl.cmd.ReportDbMetricsCmd;
+import org.camunda.bpm.engine.impl.cmd.SetJobDefinitionPriorityCmd;
 import org.camunda.bpm.engine.impl.cmd.SetJobDuedateCmd;
 import org.camunda.bpm.engine.impl.cmd.SetJobPriorityCmd;
 import org.camunda.bpm.engine.impl.cmd.SetJobRetriesCmd;
@@ -325,6 +326,18 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
 
   public void reportDbMetricsNow() {
     commandExecutor.execute(new ReportDbMetricsCmd());
+  }
+
+  public void setJobDefinitionPriority(String jobDefinitionId, int priority) {
+    commandExecutor.execute(new SetJobDefinitionPriorityCmd(jobDefinitionId, priority, false));
+  }
+
+  public void setJobDefinitionPriority(String jobDefinitionId, int priority, boolean cascade) {
+    commandExecutor.execute(new SetJobDefinitionPriorityCmd(jobDefinitionId, priority, true));
+  }
+
+  public void resetJobDefinitionPriority(String jobDefinitionId) {
+    commandExecutor.execute(new SetJobDefinitionPriorityCmd(jobDefinitionId, null, false));
   }
 
 

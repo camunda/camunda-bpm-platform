@@ -28,8 +28,8 @@ import org.junit.Test;
  * @author Thorben Lindhauer
  *
  */
-@ScenarioUnderTest("SubprocessParallelCompensationScenario")
-public class SubprocessParallelCompensationScenarioTest {
+@ScenarioUnderTest("SubprocessParallelThrowCompensationScenario")
+public class SubprocessParallelThrowCompensationScenarioTest {
 
   @Rule
   public UpgradeTestRule rule = new UpgradeTestRule();

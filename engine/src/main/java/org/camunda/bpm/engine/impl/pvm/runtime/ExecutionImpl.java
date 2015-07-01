@@ -74,8 +74,6 @@ public class ExecutionImpl extends PvmExecutionImpl implements
   /** reference to a subcaseinstance, not-null if currently subcase is started from this execution */
   protected CaseExecutionImpl subCaseInstance;
 
-  protected ExecutionImpl replacedBy;
-
   // variables/////////////////////////////////////////////////////////////////
 
   protected SimpleVariableStore variableStore = new SimpleVariableStore();
@@ -291,14 +289,8 @@ public class ExecutionImpl extends PvmExecutionImpl implements
     return variableStore;
   }
 
-  public PvmExecutionImpl getReplacedBy() {
-    return replacedBy;
-  }
-
-  public void setReplacedBy(PvmExecutionImpl replacedBy) {
-    this.replacedBy = (ExecutionImpl) replacedBy;
-    // set execution to this activity instance
-    super.setReplacedBy(replacedBy);
+  public ExecutionImpl getReplacedBy() {
+    return (ExecutionImpl) replacedBy;
   }
 
   public void setExecutions(List<ExecutionImpl> executions) {

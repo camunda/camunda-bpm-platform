@@ -55,6 +55,6 @@ public interface ActivityInstance extends ProcessElementInstance {
   /**
    * all descendant (children, grandchildren, etc.) transition instances that are leaving or entering the supplied activity
    */
-  TransitionInstance[] getTransitionInstances(String transitionId);
+  TransitionInstance[] getTransitionInstances(String activityId);
 
 }

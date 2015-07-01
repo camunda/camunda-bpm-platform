@@ -87,6 +87,8 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   /** the id of a case associated with this execution */
   protected String caseInstanceId;
 
+  protected PvmExecutionImpl replacedBy;
+
   // cascade deletion ////////////////////////////////////////////////////////
 
   protected boolean deleteRoot;
@@ -296,6 +298,11 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
     isActive = false;
     isEnded = true;
+
+    if (hasReplacedParent()) {
+      getParent().replacedBy = null;
+    }
+
     performOperation(PvmAtomicOperation.ACTIVITY_NOTIFY_LISTENER_END);
   }
 
@@ -347,6 +354,10 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
     isActive = false;
     isEnded = true;
+
+    if (hasReplacedParent()) {
+      getParent().replacedBy = null;
+    }
 
     removeEventScopes();
   }
@@ -448,7 +459,8 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
         if (!lastConcurrent.isScope()) {
           setActivity(lastConcurrent.getActivity());
           setTransition(lastConcurrent.getTransition());
-          lastConcurrent.setReplacedBy(this);
+          this.replace(lastConcurrent);
+//          lastConcurrent.setReplacedBy(this);
 
           // Move children of lastConcurrent one level up
           if (lastConcurrent.getExecutions().size() > 0) {
@@ -526,16 +538,76 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   // tree compaction & expansion ///////////////////////////////////////////
 
+  /**
+   * <p>Returns an execution that has replaced this execution for executing activities in their shared scope.</p>
+   * <p>Invariant: this execution and getReplacedBy() execute in the same scope.</p>
+   */
   public abstract PvmExecutionImpl getReplacedBy();
 
-  public void setReplacedBy(PvmExecutionImpl replacedBy) {
-    replacedBy.setActivityInstanceId(activityInstanceId);
+  public boolean hasReplacedParent() {
+    return getParent() != null && getParent().getReplacedBy() == this;
   }
 
+  public boolean isReplacedByParent() {
+    return getReplacedBy() != null && getReplacedBy() == this.getParent();
+  }
+
+  /**
+   * <p>Replace an execution by this execution. The replaced execution has a pointer ({@link #getReplacedBy()}) to this execution.
+   * This pointer is maintained until the replaced execution is removed or this execution is removed/ended.</p>
+   *
+   * <p>This is used for two cases: Execution tree expansion and execution tree compaction</p>
+   * <ul>
+   *   <li><b>expansion</b>: Before:
+   *     <pre>
+   *       -------
+   *       |  e1 |  scope
+   *       -------
+   *     </pre>
+   *     After:
+   *     <pre>
+   *       -------
+   *       |  e1 |  scope
+   *       -------
+   *          |
+   *       -------
+   *       |  e2 |  cc (no scope)
+   *       -------
+   *     </pre>
+   *     e2 replaces e1: it should receive all entities associated with the activity currently executed
+   *       by e1; these are tasks, (local) variables, jobs (specific for the activity, not the scope)
+   *   </li>
+   *   <li><b>compaction</b>: Before:
+   *     <pre>
+   *       -------
+   *       |  e1 |  scope
+   *       -------
+   *          |
+   *       -------
+   *       |  e2 |  cc (no scope)
+   *       -------
+   *     </pre>
+   *     After:
+   *     <pre>
+   *       -------
+   *       |  e1 |  scope
+   *       -------
+   *     </pre>
+   *     e1 replaces e2: it should receive all entities associated with the activity currently executed
+   *       by e2; these are tasks, (all) variables, all jobs
+   *   </li>
+   * </ul>
+   *
+   * @see #createConcurrentExecution()
+   * @see #tryPruneLastConcurrentChild()
+   */
   public void replace(PvmExecutionImpl execution) {
     // activity instance id handling
     this.activityInstanceId = execution.getActivityInstanceId();
     this.isActive = execution.isActive;
+
+    this.replacedBy = null;
+    execution.replacedBy = this;
 
     execution.leaveActivityInstance();
   }
