@@ -22,7 +22,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Thorben Lindhauer
  *
  */
-public class JobPrioritizationBpmnTest extends PluggableProcessEngineTestCase {
+public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngineTestCase {
 
   protected static final int EXPECTED_DEFAULT_PRIORITY = 0;
 
@@ -112,11 +112,11 @@ public class JobPrioritizationBpmnTest extends PluggableProcessEngineTestCase {
     assertEquals(10, (int) job.getPriority());
   }
 
-  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/timerJobPrioProcess.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/intermediateTimerJobPrioProcess.bpmn20.xml")
   public void testProcessDefinitionPrioritizationTimer() {
     // when
     runtimeService
-      .createProcessInstanceByKey("timerJobPrioProcess")
+      .createProcessInstanceByKey("intermediateTimerJobPrioProcess")
       .startBeforeActivity("timer1")
       .execute();
 
@@ -157,11 +157,11 @@ public class JobPrioritizationBpmnTest extends PluggableProcessEngineTestCase {
     assertEquals(5, (int) job.getPriority());
   }
 
-  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/timerJobPrioProcess.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/intermediateTimerJobPrioProcess.bpmn20.xml")
   public void testActivityPrioritizationTimer() {
     // when
     runtimeService
-      .createProcessInstanceByKey("timerJobPrioProcess")
+      .createProcessInstanceByKey("intermediateTimerJobPrioProcess")
       .startBeforeActivity("timer2")
       .execute();
 
@@ -210,5 +210,59 @@ public class JobPrioritizationBpmnTest extends PluggableProcessEngineTestCase {
 
     // cleanup
     repositoryService.deleteDeployment(deployment.getId());
+  }
+
+  public void testTimerStartEventPriorityOnProcessDefinition() {
+    // given a timer start job
+    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService
+        .createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/job/JobPrioritizationBpmnConstantValueTest.testTimerStartEventPriorityOnProcessDefinition.bpmn20.xml")
+        .deploy();
+
+    Job job = managementService.createJobQuery().singleResult();
+
+    // then the timer start job has the priority defined in the process definition
+    assertEquals(8, job.getPriority());
+
+    // cleanup
+    repositoryService.deleteDeployment(deployment.getId(), true);
+  }
+
+  public void testTimerStartEventPriorityOnActivity() {
+    // given a timer start job
+    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService
+        .createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/job/JobPrioritizationBpmnConstantValueTest.testTimerStartEventPriorityOnActivity.bpmn20.xml")
+        .deploy();
+
+    Job job = managementService.createJobQuery().singleResult();
+
+    // then the timer start job has the priority defined in the process definition
+    assertEquals(1515, job.getPriority());
+
+    // cleanup
+    repositoryService.deleteDeployment(deployment.getId(), true);
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/boundaryTimerJobPrioProcess.bpmn20.xml")
+  public void testBoundaryTimerEventPriority() {
+    // given an active boundary event timer
+    runtimeService.startProcessInstanceByKey("boundaryTimerJobPrioProcess");
+
+    Job job = managementService.createJobQuery().singleResult();
+
+    // then the job has the priority specified in the BPMN XML
+    assertEquals(20, job.getPriority());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/eventSubprocessTimerJobPrioProcess.bpmn20.xml")
+  public void testEventSubprocessTimerPriority() {
+    // given an active event subprocess timer
+    runtimeService.startProcessInstanceByKey("eventSubprocessTimerJobPrioProcess");
+
+    Job job = managementService.createJobQuery().singleResult();
+
+    // then the job has the priority specified in the BPMN XML
+    assertEquals(25, job.getPriority());
   }
 }

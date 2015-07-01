@@ -111,7 +111,15 @@ public class CommandContext {
     this.transactionContext = transactionContextFactory.openTransactionContext(this);
   }
 
-  public void performOperation(final AtomicOperation executionOperation, final ExecutionEntity execution) {
+  public void performOperation(AtomicOperation executionOperation, ExecutionEntity execution) {
+    performOperation(executionOperation, execution, false);
+  }
+
+  public void performOperationAsync(AtomicOperation executionOperation, ExecutionEntity execution) {
+    performOperation(executionOperation, execution, true);
+  }
+
+  public void performOperation(final AtomicOperation executionOperation, final ExecutionEntity execution, final boolean performAsync) {
 
     ProcessApplicationReference targetProcessApplication = getTargetProcessApplication(execution);
 
@@ -119,7 +127,7 @@ public class CommandContext {
 
       Context.executeWithinProcessApplication(new Callable<Void>() {
         public Void call() throws Exception {
-          performOperation(executionOperation, execution);
+          performOperation(executionOperation, execution, performAsync);
           return null;
         }
 
@@ -131,7 +139,12 @@ public class CommandContext {
         if (log.isLoggable(Level.FINEST)) {
           log.finest("AtomicOperation: " + executionOperation + " on " + this);
         }
-        executionOperation.execute(execution);
+        if (performAsync) {
+          execution.scheduleAtomicOperationAsync(executionOperation);
+        } else {
+          executionOperation.execute(execution);
+
+        }
       } finally {
         Context.removeExecutionContext();
       }

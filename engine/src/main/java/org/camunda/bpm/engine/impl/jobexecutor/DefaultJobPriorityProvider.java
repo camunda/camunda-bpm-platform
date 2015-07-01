@@ -64,8 +64,21 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
   }
 
   protected Integer getProcessDefinitionPriority(ExecutionEntity execution, JobDeclaration<?> jobDeclaration) {
+    ProcessDefinitionImpl processDefinition = null;
+
     if (execution != null) {
-      ProcessDefinitionImpl processDefinition = execution.getProcessDefinition();
+      processDefinition = execution.getProcessDefinition();
+    } else {
+      JobDefinitionEntity jobDefinition = getJobDefinitionFor(jobDeclaration);
+      if (jobDefinition != null) {
+        processDefinition = Context
+          .getProcessEngineConfiguration()
+          .getDeploymentCache()
+          .findDeployedProcessDefinitionById(jobDefinition.getProcessDefinitionId());
+      }
+    }
+
+    if (processDefinition != null) {
       ParameterValueProvider priorityProvider = (ParameterValueProvider) processDefinition.getProperty(BpmnParse.PROPERTYNAME_JOB_PRIORITY);
 
       if (priorityProvider != null) {
@@ -74,6 +87,12 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
     }
 
     return null;
+  }
+
+  protected JobDefinitionEntity getJobDefinitionFor(JobDeclaration<?> jobDeclaration) {
+    return Context.getCommandContext()
+        .getJobDefinitionManager()
+        .findById(jobDeclaration.getJobDefinitionId());
   }
 
   protected Integer getActivityPriority(ExecutionEntity execution, JobDeclaration<?> jobDeclaration) {
@@ -90,14 +109,33 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
   protected Integer evaluateValueProvider(ParameterValueProvider valueProvider, ExecutionEntity execution, JobDeclaration<?> jobDeclaration) {
     Object value = valueProvider.getValue(execution);
 
-    if (!(value instanceof Integer)) {
-      throw new ProcessEngineException("Priority for job " + jobDeclaration.getActivityId()
-          + "/" + jobDeclaration.getJobHandlerType() + " instantiated "
-          + "in context of " + execution + " is not an Integer");
+    if (!(value instanceof Number)) {
+      throw new ProcessEngineException(describeContext(jobDeclaration, execution)
+          + ": Priority value is not an Integer");
     }
     else {
-      return (Integer) value;
+      Number numberValue = (Number) value;
+      if (isValidIntegerValue(numberValue)) {
+        return numberValue.intValue();
+      }
+      else {
+        throw new ProcessEngineException(describeContext(jobDeclaration, execution)
+            + ": Priority value must be either Short, Integer, or Long in Integer range");
+      }
     }
+  }
+
+  protected String describeContext(JobDeclaration<?> jobDeclaration, ExecutionEntity executionEntity) {
+    return "Job " + jobDeclaration.getActivityId()
+            + "/" + jobDeclaration.getJobHandlerType() + " instantiated "
+            + "in context of " + executionEntity;
+  }
+
+  protected boolean isValidIntegerValue(Number value) {
+    return
+      value instanceof Short ||
+      value instanceof Integer ||
+      (value instanceof Long && ((long) value.intValue()) == value.longValue());
   }
 
 }

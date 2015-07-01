@@ -147,18 +147,15 @@ public class BpmnDeployer implements Deployer {
     DeploymentCache deploymentCache = Context.getProcessEngineConfiguration().getDeploymentCache();
     for (ProcessDefinitionEntity processDefinition : processDefinitions) {
 
+      ProcessDefinitionEntity latestProcessDefinition = processDefinitionManager.findLatestProcessDefinitionByKey(processDefinition.getKey());
+
       if (deployment.isNew()) {
-        ProcessDefinitionEntity latestProcessDefinition = processDefinitionManager.findLatestProcessDefinitionByKey(processDefinition.getKey());
 
         processDefinition.setDeploymentId(deployment.getId());
         processDefinition.setVersion(getVersionForNewProcessDefinition(deployment, processDefinition, latestProcessDefinition));
         processDefinition.setId(getProcessDefinitionId(deployment, processDefinition));
-
-        List<JobDeclaration<?>> declarations = jobDeclarations.get(processDefinition.getKey());
-        updateJobDeclarations(declarations, processDefinition, deployment.isNew());
-        adjustStartEventSubscriptions(processDefinition, latestProcessDefinition);
-
         processDefinitionManager.insertProcessDefinition(processDefinition);
+
 
       } else {
 
@@ -168,18 +165,26 @@ public class BpmnDeployer implements Deployer {
         processDefinition.setId(persistedProcessDefinition.getId());
         processDefinition.setVersion(persistedProcessDefinition.getVersion());
         processDefinition.setSuspensionState(persistedProcessDefinition.getSuspensionState());
-
-        List<JobDeclaration<?>> declarations = jobDeclarations.get(processDefinition.getKey());
-        updateJobDeclarations(declarations, processDefinition, deployment.isNew());
       }
+
+      List<JobDeclaration<?>> declarations = jobDeclarations.get(processDefinition.getKey());
+      updateJobDeclarations(declarations, processDefinition, deployment.isNew());
 
       // Add to cache
       deploymentCache.addProcessDefinition(processDefinition);
+
+      if (deployment.isNew()) {
+
+        adjustStartEventSubscriptions(processDefinition, latestProcessDefinition);
+      }
+
+
       // add "authorizations"
       addAuthorizations(processDefinition);
 
       // Add to deployment for further usage
       deployment.addDeployedArtifact(processDefinition);
+
     }
   }
 

@@ -4,7 +4,7 @@
   xmlns:camunda="http://camunda.org/bpmn"
   targetNamespace="Examples">
 
-  <process id="timerJobPrioProcess" camunda:jobPriority="8">
+  <process id="intermediateTimerJobPrioProcess" camunda:jobPriority="8">
   
     <startEvent id="start" />
     <sequenceFlow id="flow1" sourceRef="start" targetRef="timer1" />

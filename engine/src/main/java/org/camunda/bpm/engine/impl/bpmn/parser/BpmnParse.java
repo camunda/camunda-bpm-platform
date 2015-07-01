@@ -1819,16 +1819,18 @@ public class BpmnParse extends Parse {
       return null;
 
     } else {
-      // constant values must be valid integers
-      Integer value = null;
-      try {
-        value = Integer.parseInt(priorityAttribute);
+      Object value = priorityAttribute;
+      if (!StringUtil.isExpression(priorityAttribute)) {
+        // constant values must be valid integers
+        try {
+          value = Integer.parseInt(priorityAttribute);
 
-      } catch (NumberFormatException e) {
-        addError("Value '" + priorityAttribute + "' for attribute 'jobPriority' is not a valid number", element);
+        } catch (NumberFormatException e) {
+          addError("Value '" + priorityAttribute + "' for attribute 'jobPriority' is not a valid number", element);
+        }
       }
 
-      return new ConstantValueProvider(value);
+      return createParameterValueProvider(value, expressionManager);
     }
   }
 
@@ -3747,12 +3749,12 @@ public class BpmnParse extends Parse {
     }
   }
 
-  protected ParameterValueProvider createParameterValueProvider(String value, ExpressionManager expressionManager) {
+  protected ParameterValueProvider createParameterValueProvider(Object value, ExpressionManager expressionManager) {
     if (value == null) {
       return new NullValueProvider();
 
-    } else if (StringUtil.isExpression(value)) {
-      Expression expression = expressionManager.createExpression(value);
+    } else if (value instanceof String && StringUtil.isExpression((String) value)) {
+      Expression expression = expressionManager.createExpression((String) value);
       return new ElValueProvider(expression);
 
     } else {

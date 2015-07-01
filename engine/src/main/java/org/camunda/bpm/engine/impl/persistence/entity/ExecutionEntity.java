@@ -471,11 +471,15 @@ public class ExecutionEntity extends PvmExecutionImpl implements
 
   @SuppressWarnings("deprecation")
   public void performOperation(AtomicOperation executionOperation) {
-    if(executionOperation.isAsync(this)) {
-      scheduleAtomicOperationAsync(executionOperation);
-    } else {
-      performOperationSync(executionOperation);
+    boolean async = executionOperation.isAsync(this);
+
+    if (!async && requiresUnsuspendedExecution(executionOperation)) {
+      ensureNotSuspended();
     }
+
+    Context
+      .getCommandContext()
+      .performOperation(executionOperation, this, async);
   }
 
   @SuppressWarnings("deprecation")
@@ -513,7 +517,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
   }
 
   @SuppressWarnings({"unchecked", "deprecation"})
-  protected void scheduleAtomicOperationAsync(AtomicOperation executionOperation) {
+  public void scheduleAtomicOperationAsync(AtomicOperation executionOperation) {
 
     MessageJobDeclaration messageJobDeclaration = null;
 
