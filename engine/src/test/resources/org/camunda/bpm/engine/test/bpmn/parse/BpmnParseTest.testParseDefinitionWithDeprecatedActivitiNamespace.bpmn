@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://activiti.org/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:fox="http://www.camunda.com/fox" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_909qwBvREeWYHZni1EZ71A" exporter="camunda modeler" exporterVersion="2.7.0" targetNamespace="http://activiti.org/bpmn">
+  <bpmn2:process id="Process_1" isExecutable="true">
+    <bpmn2:startEvent id="StartEvent_1">
+      <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:serviceTask id="UserTask_1" camunda:class="org.camunda.bpm.engine.test.bpmn.servicetask.DummyServiceTask" name="Task">
+      <bpmn2:extensionElements>
+        <camunda:properties>
+          <camunda:property/>
+        </camunda:properties>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_3</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:sequenceFlow id="SequenceFlow_1" name="" sourceRef="StartEvent_1" targetRef="UserTask_1"/>
+    <bpmn2:serviceTask id="ServiceTask_1" camunda:class="org.camunda.bpm.engine.test.bpmn.servicetask.DummyServiceTask" camunda:async="true" camunda:asyncAfter="true" name="ConnectorTask" isForCompensation="true">
+      <bpmn2:extensionElements>
+        <camunda:connector>
+          <camunda:connectorId>connector</camunda:connectorId>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="in"/>
+            <camunda:outputParameter name="out"/>
+          </camunda:inputOutput>
+        </camunda:connector>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="Input">
+            <camunda:map>
+              <camunda:entry key="foo">bar</camunda:entry>
+            </camunda:map>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="Input2">text</camunda:inputParameter>
+          <camunda:inputParameter name="Input3">
+            <camunda:list>
+              <camunda:value><![CDATA["ABC"]]></camunda:value>
+            </camunda:list>
+          </camunda:inputParameter>
+          <camunda:inputParameter name="Input4">
+            <camunda:script scriptFormat="groovy"/>
+          </camunda:inputParameter>
+          <camunda:outputParameter name="out">out</camunda:outputParameter>
+        </camunda:inputOutput>
+        <fox:failedJobRetryTimeCycle>R3/PT10M</fox:failedJobRetryTimeCycle>
+        <camunda:field name="inject">
+          <camunda:string>ion</camunda:string>
+          <camunda:expression>${injection}</camunda:expression>
+        </camunda:field>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>SequenceFlow_3</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_4</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:sequenceFlow id="SequenceFlow_3" name="" sourceRef="UserTask_1" targetRef="ServiceTask_1"/>
+    <bpmn2:userTask id="UserTask_2" name="Form User Task">
+      <bpmn2:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="form" label="field" type="long" defaultValue="1">
+            <camunda:properties>
+              <camunda:property id="prop" value="prop"/>
+            </camunda:properties>
+            <camunda:validation>
+              <camunda:constraint name="min" config="1"/>
+            </camunda:validation>
+          </camunda:formField>
+        </camunda:formData>
+        <camunda:executionListener event="start" expression="${foo}"/>
+        <camunda:taskListener delegateExpression="${fooBar}" event="create"/>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>SequenceFlow_4</bpmn2:incoming>
+    </bpmn2:userTask>
+    <bpmn2:sequenceFlow id="SequenceFlow_4" name="" sourceRef="ServiceTask_1" targetRef="UserTask_2"/>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_3" bpmnElement="StartEvent_1">
+        <dc:Bounds height="36.0" width="36.0" x="139.0" y="192.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_UserTask_1" bpmnElement="UserTask_1">
+        <dc:Bounds height="80.0" width="100.0" x="225.0" y="170.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1" sourceElement="_BPMNShape_StartEvent_3" targetElement="_BPMNShape_UserTask_2">
+        <di:waypoint xsi:type="dc:Point" x="175.0" y="210.0"/>
+        <di:waypoint xsi:type="dc:Point" x="225.0" y="210.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_ServiceTask_2" bpmnElement="ServiceTask_1">
+        <dc:Bounds height="80.0" width="100.0" x="375.0" y="170.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_3" bpmnElement="SequenceFlow_3" sourceElement="_BPMNShape_UserTask_2" targetElement="_BPMNShape_ServiceTask_2">
+        <di:waypoint xsi:type="dc:Point" x="325.0" y="210.0"/>
+        <di:waypoint xsi:type="dc:Point" x="375.0" y="210.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_UserTask_2" bpmnElement="UserTask_2">
+        <dc:Bounds height="80.0" width="100.0" x="525.0" y="170.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_4" bpmnElement="SequenceFlow_4" sourceElement="_BPMNShape_ServiceTask_2" targetElement="_BPMNShape_UserTask_2">
+        <di:waypoint xsi:type="dc:Point" x="475.0" y="210.0"/>
+        <di:waypoint xsi:type="dc:Point" x="525.0" y="210.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

@@ -18,7 +18,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParser;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 
 
@@ -45,7 +44,7 @@ public class FormTypes {
     } else if ("enum".equals(typeText)) {
       // ACT-1023: Using linked hashmap to preserve the order in which the entries are defined
       Map<String, String> values = new LinkedHashMap<String, String>();
-      for (Element valueElement: formFieldElement.elementsNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS,"value")) {
+      for (Element valueElement: formFieldElement.elementsNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS,"value")) {
         String valueId = valueElement.attribute("id");
         String valueName = valueElement.attribute("name");
         values.put(valueId, valueName);

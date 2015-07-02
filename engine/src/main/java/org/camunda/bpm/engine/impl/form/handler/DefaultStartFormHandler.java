@@ -16,7 +16,6 @@ package org.camunda.bpm.engine.impl.form.handler;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParser;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.form.StartFormDataImpl;
@@ -42,7 +41,7 @@ public class DefaultStartFormHandler extends DefaultFormHandler implements Start
         .getProcessEngineConfiguration()
         .getExpressionManager();
 
-    String formKeyAttribute = activityElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "formKey");
+    String formKeyAttribute = activityElement.attributeNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "formKey");
 
     if (formKeyAttribute != null) {
       this.formKey = expressionManager.createExpression(formKeyAttribute);

@@ -131,6 +131,7 @@ import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.impl.util.ScriptUtil;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.impl.util.xml.Element;
+import org.camunda.bpm.engine.impl.util.xml.Namespace;
 import org.camunda.bpm.engine.impl.util.xml.Parse;
 import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -148,6 +149,7 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
  * @author Daniel Meyer
  * @author Saeid Mirzaei
  * @author Nico Rehwaldt
+ * @author Ronny Bräunlich
  */
 public class BpmnParse extends Parse {
 
@@ -183,6 +185,12 @@ public class BpmnParse extends Parse {
   protected static final String ATTRIBUTEVALUE_T_FORMAL_EXPRESSION = BpmnParser.BPMN20_NS + ":tFormalExpression";
 
   public static final String PROPERTYNAME_IS_MULTI_INSTANCE = "isMultiInstance";
+
+  public static final Namespace CAMUNDA_BPMN_EXTENSIONS_NS = new Namespace(BpmnParser.CAMUNDA_BPMN_EXTENSIONS_NS, BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS);
+  public static final Namespace XSI_NS = new Namespace(BpmnParser.XSI_NS);
+  public static final Namespace BPMN_DI_NS = new Namespace(BpmnParser.BPMN_DI_NS);
+  public static final Namespace OMG_DI_NS = new Namespace(BpmnParser.OMG_DI_NS);
+  public static final Namespace BPMN_DC_NS = new Namespace(BpmnParser.BPMN_DC_NS);
 
   /** The deployment to which the parsed process definitions will be added. */
   protected DeploymentEntity deployment;
@@ -618,7 +626,7 @@ public class BpmnParse extends Parse {
     // parse activiti:potentialStarters
     Element extentionsElement = scopeElement.element("extensionElements");
     if (extentionsElement != null) {
-      List<Element> potentialStarterElements = extentionsElement.elementsNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, POTENTIAL_STARTER);
+      List<Element> potentialStarterElements = extentionsElement.elementsNS(CAMUNDA_BPMN_EXTENSIONS_NS, POTENTIAL_STARTER);
 
       for (Element potentialStarterElement : potentialStarterElements) {
         parsePotentialStarterResourceAssignment(potentialStarterElement, processDefinition);
@@ -626,7 +634,7 @@ public class BpmnParse extends Parse {
     }
 
     // parse activiti:candidateStarterUsers
-    String candidateUsersString = scopeElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, CANDIDATE_STARTER_USERS_EXTENSION);
+    String candidateUsersString = scopeElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, CANDIDATE_STARTER_USERS_EXTENSION);
     if (candidateUsersString != null) {
       List<String> candidateUsers = parseCommaSeparatedList(candidateUsersString);
       for (String candidateUser : candidateUsers) {
@@ -635,7 +643,7 @@ public class BpmnParse extends Parse {
     }
 
     // Candidate activiti:candidateStarterGroups
-    String candidateGroupsString = scopeElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, CANDIDATE_STARTER_GROUPS_EXTENSION);
+    String candidateGroupsString = scopeElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, CANDIDATE_STARTER_GROUPS_EXTENSION);
     if (candidateGroupsString != null) {
       List<String> candidateGroups = parseCommaSeparatedList(candidateGroupsString);
       for (String candidateGroup : candidateGroups) {
@@ -762,7 +770,7 @@ public class BpmnParse extends Parse {
   protected void parseProcessDefinitionStartEvent(ActivityImpl startEventActivity, Element startEventElement, Element parentElement, ScopeImpl scope) {
     ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) scope;
 
-    String initiatorVariableName = startEventElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "initiator");
+    String initiatorVariableName = startEventElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "initiator");
     if (initiatorVariableName != null) {
       processDefinition.setProperty(PROPERTYNAME_INITIATOR_VARIABLE_NAME, initiatorVariableName);
     }
@@ -791,7 +799,7 @@ public class BpmnParse extends Parse {
         if(startEventElement.attribute("id").equals(processDefinition.getInitial().getId())) {
 
           StartFormHandler startFormHandler;
-          String startFormHandlerClassName = startEventElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "formHandlerClass");
+          String startFormHandlerClassName = startEventElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "formHandlerClass");
           if (startFormHandlerClassName != null) {
             startFormHandler = (StartFormHandler) ReflectUtil.instantiate(startFormHandlerClassName);
           } else {
@@ -921,7 +929,7 @@ public class BpmnParse extends Parse {
    * @param definition the errorEventDefintion that can get the errorCodeVariable value
    */
   protected void setErrorCodeVariableOnErrorEventDefinition(Element errorEventDefinition, ErrorEventDefinition definition) {
-    String errorCodeVar = errorEventDefinition.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "errorCodeVariable");
+    String errorCodeVar = errorEventDefinition.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "errorCodeVariable");
     if(errorCodeVar != null){
       definition.setErrorCodeVariable(errorCodeVar);
     }
@@ -1384,7 +1392,7 @@ public class BpmnParse extends Parse {
       }
 
       // activiti:collection
-      String collection = miLoopCharacteristics.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "collection");
+      String collection = miLoopCharacteristics.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "collection");
       if (collection != null) {
         if (collection.contains("{")) {
           behavior.setCollectionExpression(expressionManager.createExpression(collection));
@@ -1407,7 +1415,7 @@ public class BpmnParse extends Parse {
       }
 
       // activiti:elementVariable
-      String elementVariable = miLoopCharacteristics.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "elementVariable");
+      String elementVariable = miLoopCharacteristics.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "elementVariable");
       if (elementVariable != null) {
         behavior.setCollectionElementVariable(elementVariable);
       }
@@ -1635,10 +1643,10 @@ public class BpmnParse extends Parse {
     }
 
     // determine if result variable exists
-    String resultVariableName = scriptTaskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "resultVariable");
+    String resultVariableName = scriptTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "resultVariable");
     if (resultVariableName == null) {
       // for backwards compatible reasons
-      resultVariableName = scriptTaskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "resultVariableName");
+      resultVariableName = scriptTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "resultVariableName");
     }
 
     // determine script source
@@ -1647,7 +1655,7 @@ public class BpmnParse extends Parse {
     if (scriptElement != null) {
       scriptSource = scriptElement.getText();
     }
-    String scriptResource = scriptTaskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "resource");
+    String scriptResource = scriptTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "resource");
 
     try {
       ExecutableScript script = ScriptUtil.getScript(language, scriptSource, scriptResource, expressionManager);
@@ -1669,13 +1677,13 @@ public class BpmnParse extends Parse {
   public ActivityImpl parseServiceTaskLike(String elementName, Element serviceTaskElement, ScopeImpl scope) {
     ActivityImpl activity = createActivityOnScope(serviceTaskElement, scope);
 
-    String type = serviceTaskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "type");
-    String className = serviceTaskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "class");
-    String expression = serviceTaskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "expression");
-    String delegateExpression = serviceTaskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "delegateExpression");
-    String resultVariableName = serviceTaskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "resultVariable");
+    String type = serviceTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "type");
+    String className = serviceTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "class");
+    String expression = serviceTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "expression");
+    String delegateExpression = serviceTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "delegateExpression");
+    String resultVariableName = serviceTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "resultVariable");
     if (resultVariableName == null) {
-      resultVariableName = serviceTaskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "resultVariableName");
+      resultVariableName = serviceTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "resultVariableName");
     }
 
     parseAsynchronousContinuation(serviceTaskElement, activity);
@@ -1772,7 +1780,7 @@ public class BpmnParse extends Parse {
   }
 
   protected ParameterValueProvider parseJobPriority(Element element) {
-    String priorityAttribute = element.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "jobPriority");
+    String priorityAttribute = element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "jobPriority");
 
     if (priorityAttribute == null) {
       return null;
@@ -1828,7 +1836,7 @@ public class BpmnParse extends Parse {
       parseAsynchronousContinuation(sendTaskElement, activity);
 
       // for e-mail
-      String type = sendTaskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "type");
+      String type = sendTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "type");
 
       // for e-mail
       if (type != null) {
@@ -1916,7 +1924,7 @@ public class BpmnParse extends Parse {
                                               // subelement
       elementWithFieldInjections = element;
     }
-    List<Element> fieldDeclarationElements = elementWithFieldInjections.elementsNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "field");
+    List<Element> fieldDeclarationElements = elementWithFieldInjections.elementsNS(CAMUNDA_BPMN_EXTENSIONS_NS, "field");
     if (fieldDeclarationElements != null && !fieldDeclarationElements.isEmpty()) {
 
       for (Element fieldDeclarationElement : fieldDeclarationElements) {
@@ -1981,7 +1989,7 @@ public class BpmnParse extends Parse {
     String value = null;
 
     String attributeValue = element.attribute(attributeName);
-    Element childElement = element.elementNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, elementName);
+    Element childElement = element.elementNS(CAMUNDA_BPMN_EXTENSIONS_NS, elementName);
     String stringElementText = null;
 
     if (attributeValue != null && childElement != null) {
@@ -2106,7 +2114,7 @@ public class BpmnParse extends Parse {
 
   public TaskDefinition parseTaskDefinition(Element taskElement, String taskDefinitionKey, ProcessDefinitionEntity processDefinition) {
     TaskFormHandler taskFormHandler;
-    String taskFormHandlerClassName = taskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "formHandlerClass");
+    String taskFormHandlerClassName = taskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "formHandlerClass");
     if (taskFormHandlerClassName != null) {
       taskFormHandler = (TaskFormHandler) ReflectUtil.instantiate(taskFormHandlerClassName);
     } else {
@@ -2119,7 +2127,7 @@ public class BpmnParse extends Parse {
     taskDefinition.setKey(taskDefinitionKey);
     processDefinition.getTaskDefinitions().put(taskDefinitionKey, taskDefinition);
 
-    String formKeyAttribute = taskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "formKey");
+    String formKeyAttribute = taskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "formKey");
 
     if (formKeyAttribute != null) {
       taskDefinition.setFormKey(expressionManager.createExpression(formKeyAttribute));
@@ -2203,7 +2211,7 @@ public class BpmnParse extends Parse {
   protected void parseUserTaskCustomExtensions(Element taskElement, TaskDefinition taskDefinition) {
 
     // assignee
-    String assignee = taskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, ASSIGNEE_EXTENSION);
+    String assignee = taskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, ASSIGNEE_EXTENSION);
     if (assignee != null) {
       if (taskDefinition.getAssigneeExpression() == null) {
         taskDefinition.setAssigneeExpression(expressionManager.createExpression(assignee));
@@ -2213,7 +2221,7 @@ public class BpmnParse extends Parse {
     }
 
     // Candidate users
-    String candidateUsersString = taskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, CANDIDATE_USERS_EXTENSION);
+    String candidateUsersString = taskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, CANDIDATE_USERS_EXTENSION);
     if (candidateUsersString != null) {
       List<String> candidateUsers = parseCommaSeparatedList(candidateUsersString);
       for (String candidateUser : candidateUsers) {
@@ -2222,7 +2230,7 @@ public class BpmnParse extends Parse {
     }
 
     // Candidate groups
-    String candidateGroupsString = taskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, CANDIDATE_GROUPS_EXTENSION);
+    String candidateGroupsString = taskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, CANDIDATE_GROUPS_EXTENSION);
     if (candidateGroupsString != null) {
       List<String> candidateGroups = parseCommaSeparatedList(candidateGroupsString);
       for (String candidateGroup : candidateGroups) {
@@ -2234,19 +2242,19 @@ public class BpmnParse extends Parse {
     parseTaskListeners(taskElement, taskDefinition);
 
     // Due date
-    String dueDateExpression = taskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, DUE_DATE_EXTENSION);
+    String dueDateExpression = taskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, DUE_DATE_EXTENSION);
     if (dueDateExpression != null) {
       taskDefinition.setDueDateExpression(expressionManager.createExpression(dueDateExpression));
     }
 
     // follow up date
-    String followUpDateExpression = taskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, FOLLOW_UP_DATE_EXTENSION);
+    String followUpDateExpression = taskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, FOLLOW_UP_DATE_EXTENSION);
     if (followUpDateExpression != null) {
       taskDefinition.setFollowUpDateExpression(expressionManager.createExpression(followUpDateExpression));
     }
 
     // Priority
-    final String priorityExpression = taskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, PRIORITY_EXTENSION);
+    final String priorityExpression = taskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, PRIORITY_EXTENSION);
     if (priorityExpression != null) {
       taskDefinition.setPriorityExpression(expressionManager.createExpression(priorityExpression));
     }
@@ -2298,7 +2306,7 @@ public class BpmnParse extends Parse {
   protected void parseTaskListeners(Element userTaskElement, TaskDefinition taskDefinition) {
     Element extentionsElement = userTaskElement.element("extensionElements");
     if (extentionsElement != null) {
-      List<Element> taskListenerElements = extentionsElement.elementsNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "taskListener");
+      List<Element> taskListenerElements = extentionsElement.elementsNS(CAMUNDA_BPMN_EXTENSIONS_NS, "taskListener");
       for (Element taskListenerElement : taskListenerElements) {
         String eventName = taskListenerElement.attribute("event");
         if (eventName != null) {
@@ -2322,7 +2330,7 @@ public class BpmnParse extends Parse {
     String className = taskListenerElement.attribute("class");
     String expression = taskListenerElement.attribute("expression");
     String delegateExpression = taskListenerElement.attribute("delegateExpression");
-    Element scriptElement = taskListenerElement.elementNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "script");
+    Element scriptElement = taskListenerElement.elementNS(CAMUNDA_BPMN_EXTENSIONS_NS, "script");
 
     if (className != null) {
       taskListener = new ClassDelegateTaskListener(className, parseFieldDeclarations(taskListenerElement));
@@ -2680,7 +2688,7 @@ public class BpmnParse extends Parse {
         addError("Could not find signal with id '" + signalRef + "'", signalEventDefinitionElement);
       }
       EventSubscriptionDeclaration signalEventDefinition = new EventSubscriptionDeclaration(signalDefinition.getName(), "signal");
-      boolean asynch = "true".equals(signalEventDefinitionElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "async", "false"));
+      boolean asynch = "true".equals(signalEventDefinitionElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "async", "false"));
       signalEventDefinition.setAsync(asynch);
 
       return signalEventDefinition;
@@ -2727,7 +2735,7 @@ public class BpmnParse extends Parse {
     // TimerSession
     TimerDeclarationImpl timerDeclaration = new TimerDeclarationImpl(expression, type, jobHandlerType);
     timerDeclaration.setJobHandlerConfiguration(timerActivity.getId());
-    timerDeclaration.setExclusive("true".equals(timerEventDefinition.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "exclusive", String.valueOf(JobEntity.DEFAULT_EXCLUSIVE))));
+    timerDeclaration.setExclusive("true".equals(timerEventDefinition.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "exclusive", String.valueOf(JobEntity.DEFAULT_EXCLUSIVE))));
     if(timerActivity.getId() == null) {
       addError("Attribute \"id\" is required!",timerEventDefinition);
     }
@@ -2867,7 +2875,7 @@ public class BpmnParse extends Parse {
 
     // parse definition key (and behavior)
     String calledElement = callActivityElement.attribute("calledElement");
-    String caseRef = callActivityElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "caseRef");
+    String caseRef = callActivityElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "caseRef");
 
     if (calledElement == null && caseRef == null) {
       addError("Missing attribute 'calledElement' or 'caseRef'", callActivityElement);
@@ -2932,9 +2940,9 @@ public class BpmnParse extends Parse {
     String binding = null;
 
     if (isProcess) {
-      binding = callActivityElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "calledElementBinding");
+      binding = callActivityElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "calledElementBinding");
     } else {
-      binding = callActivityElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "caseBinding");
+      binding = callActivityElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "caseBinding");
     }
 
     if (CallableElementBinding.DEPLOYMENT.getValue().equals(binding)) {
@@ -2951,7 +2959,7 @@ public class BpmnParse extends Parse {
 
     CallableElementBinding binding = callableElement.getBinding();
     if (isProcess) {
-      version = callActivityElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "calledElementVersion");
+      version = callActivityElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "calledElementVersion");
 
       if (binding != null &&
           binding.equals(CallableElement.CallableElementBinding.VERSION) && version == null) {
@@ -2959,7 +2967,7 @@ public class BpmnParse extends Parse {
       }
 
     } else {
-      version = callActivityElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "caseVersion");
+      version = callActivityElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "caseVersion");
 
       if (binding != null &&
           binding.equals(CallableElement.CallableElementBinding.VERSION) && version == null) {
@@ -2976,7 +2984,7 @@ public class BpmnParse extends Parse {
 
     if (extensionsElement != null) {
       // input data elements
-      for (Element inElement : extensionsElement.elementsNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "in")) {
+      for (Element inElement : extensionsElement.elementsNS(CAMUNDA_BPMN_EXTENSIONS_NS, "in")) {
 
         String businessKey = inElement.attribute("businessKey");
 
@@ -3026,7 +3034,7 @@ public class BpmnParse extends Parse {
 
     if (extensionsElement != null) {
       // output data elements
-      for (Element outElement : extensionsElement.elementsNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "out")) {
+      for (Element outElement : extensionsElement.elementsNS(CAMUNDA_BPMN_EXTENSIONS_NS, "out")) {
 
         CallableElementParameter parameter = new CallableElementParameter();
         callableElement.addOutput(parameter);
@@ -3119,7 +3127,7 @@ public class BpmnParse extends Parse {
   public void parsePropertyCustomExtensions(ActivityImpl activity, Element propertyElement, String propertyName, String propertyType) {
 
     if (propertyType == null) {
-      String type = propertyElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "type");
+      String type = propertyElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "type");
       propertyType = type != null ? type : "string"; // default is string
     }
 
@@ -3127,34 +3135,34 @@ public class BpmnParse extends Parse {
     addVariableDeclaration(activity, variableDeclaration);
     activity.setScope(true);
 
-    String src = propertyElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "src");
+    String src = propertyElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "src");
     if (src != null) {
       variableDeclaration.setSourceVariableName(src);
     }
 
-    String srcExpr = propertyElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "srcExpr");
+    String srcExpr = propertyElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "srcExpr");
     if (srcExpr != null) {
       Expression sourceExpression = expressionManager.createExpression(srcExpr);
       variableDeclaration.setSourceExpression(sourceExpression);
     }
 
-    String dst = propertyElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "dst");
+    String dst = propertyElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "dst");
     if (dst != null) {
       variableDeclaration.setDestinationVariableName(dst);
     }
 
-    String destExpr = propertyElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "dstExpr");
+    String destExpr = propertyElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "dstExpr");
     if (destExpr != null) {
       Expression destinationExpression = expressionManager.createExpression(destExpr);
       variableDeclaration.setDestinationExpression(destinationExpression);
     }
 
-    String link = propertyElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "link");
+    String link = propertyElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "link");
     if (link != null) {
       variableDeclaration.setLink(link);
     }
 
-    String linkExpr = propertyElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "linkExpr");
+    String linkExpr = propertyElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "linkExpr");
     if (linkExpr != null) {
       Expression linkExpression = expressionManager.createExpression(linkExpr);
       variableDeclaration.setLinkExpression(linkExpression);
@@ -3218,10 +3226,10 @@ public class BpmnParse extends Parse {
       } else {
 
         if(getMultiInstanceScope(sourceActivity) != null) {
-          sourceActivity = (ActivityImpl) getMultiInstanceScope(sourceActivity);
+          sourceActivity = getMultiInstanceScope(sourceActivity);
         }
         if(getMultiInstanceScope(destinationActivity) != null) {
-          destinationActivity = (ActivityImpl) getMultiInstanceScope(destinationActivity);
+          destinationActivity = getMultiInstanceScope(destinationActivity);
         }
 
         TransitionImpl transition = sourceActivity.createOutgoingTransition(id);
@@ -3252,9 +3260,9 @@ public class BpmnParse extends Parse {
     Element conditionExprElement = seqFlowElement.element("conditionExpression");
     if (conditionExprElement != null) {
       String expression = conditionExprElement.getText().trim();
-      String type = conditionExprElement.attributeNS(BpmnParser.XSI_NS, "type");
+      String type = conditionExprElement.attributeNS(XSI_NS, "type");
       String language = conditionExprElement.attribute("language");
-      String resource = conditionExprElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "resource");
+      String resource = conditionExprElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "resource");
 
       if (type != null) {
         String value = type.contains(":") ? resolveName(type) : BpmnParser.BPMN20_NS + ":" + type;
@@ -3292,7 +3300,7 @@ public class BpmnParse extends Parse {
   public void parseExecutionListenersOnScope(Element scopeElement, ScopeImpl scope) {
     Element extentionsElement = scopeElement.element("extensionElements");
     if (extentionsElement != null) {
-      List<Element> listenerElements = extentionsElement.elementsNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "executionListener");
+      List<Element> listenerElements = extentionsElement.elementsNS(CAMUNDA_BPMN_EXTENSIONS_NS, "executionListener");
       for (Element listenerElement : listenerElements) {
         String eventName = listenerElement.attribute("event");
         if (isValidEventNameForScope(eventName, listenerElement)) {
@@ -3325,7 +3333,7 @@ public class BpmnParse extends Parse {
   public void parseExecutionListenersOnTransition(Element activitiElement, TransitionImpl activity) {
     Element extensionElements = activitiElement.element("extensionElements");
     if (extensionElements != null) {
-      List<Element> listenerElements = extensionElements.elementsNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "executionListener");
+      List<Element> listenerElements = extensionElements.elementsNS(CAMUNDA_BPMN_EXTENSIONS_NS, "executionListener");
       for (Element listenerElement : listenerElements) {
         ExecutionListener listener = parseExecutionListener(listenerElement);
         if (listener != null) {
@@ -3350,7 +3358,7 @@ public class BpmnParse extends Parse {
     String className = executionListenerElement.attribute("class");
     String expression = executionListenerElement.attribute("expression");
     String delegateExpression = executionListenerElement.attribute("delegateExpression");
-    Element scriptElement = executionListenerElement.elementNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "script");
+    Element scriptElement = executionListenerElement.elementNS(CAMUNDA_BPMN_EXTENSIONS_NS, "script");
 
     if (className != null) {
       executionListener = new ClassDelegateExecutionListener(className, parseFieldDeclarations(executionListenerElement));
@@ -3379,7 +3387,7 @@ public class BpmnParse extends Parse {
 
   public void parseDiagramInterchangeElements() {
     // Multiple BPMNDiagram possible
-    List<Element> diagrams = rootElement.elementsNS(BpmnParser.BPMN_DI_NS, "BPMNDiagram");
+    List<Element> diagrams = rootElement.elementsNS(BPMN_DI_NS, "BPMNDiagram");
     if (!diagrams.isEmpty()) {
       for (Element diagramElement : diagrams) {
         parseBPMNDiagram(diagramElement);
@@ -3389,7 +3397,7 @@ public class BpmnParse extends Parse {
 
   public void parseBPMNDiagram(Element bpmndiagramElement) {
     // Each BPMNdiagram needs to have exactly one BPMNPlane
-    Element bpmnPlane = bpmndiagramElement.elementNS(BpmnParser.BPMN_DI_NS, "BPMNPlane");
+    Element bpmnPlane = bpmndiagramElement.elementNS(BPMN_DI_NS, "BPMNPlane");
     if (bpmnPlane != null) {
       parseBPMNPlane(bpmnPlane);
     }
@@ -3403,12 +3411,12 @@ public class BpmnParse extends Parse {
         getProcessDefinition(bpmnElement).setGraphicalNotationDefined(true);
       }
 
-      List<Element> shapes = bpmnPlaneElement.elementsNS(BpmnParser.BPMN_DI_NS, "BPMNShape");
+      List<Element> shapes = bpmnPlaneElement.elementsNS(BPMN_DI_NS, "BPMNShape");
       for (Element shape : shapes) {
         parseBPMNShape(shape);
       }
 
-      List<Element> edges = bpmnPlaneElement.elementsNS(BpmnParser.BPMN_DI_NS, "BPMNEdge");
+      List<Element> edges = bpmnPlaneElement.elementsNS(BPMN_DI_NS, "BPMNEdge");
       for (Element edge : edges) {
         parseBPMNEdge(edge);
       }
@@ -3460,7 +3468,7 @@ public class BpmnParse extends Parse {
   }
 
   protected void parseDIBounds(Element bpmnShapeElement, HasDIBounds target) {
-    Element bounds = bpmnShapeElement.elementNS(BpmnParser.BPMN_DC_NS, "Bounds");
+    Element bounds = bpmnShapeElement.elementNS(BPMN_DC_NS, "Bounds");
     if (bounds != null) {
       target.setX(parseDoubleAttribute(bpmnShapeElement, "x", bounds.attribute("x"), true).intValue());
       target.setY(parseDoubleAttribute(bpmnShapeElement, "y", bounds.attribute("y"), true).intValue());
@@ -3477,7 +3485,7 @@ public class BpmnParse extends Parse {
       if (sequenceFlows != null && sequenceFlows.containsKey(sequenceFlowId)) {
 
         TransitionImpl sequenceFlow = sequenceFlows.get(sequenceFlowId);
-        List<Element> waypointElements = bpmnEdgeElement.elementsNS(BpmnParser.OMG_DI_NS, "waypoint");
+        List<Element> waypointElements = bpmnEdgeElement.elementsNS(OMG_DI_NS, "waypoint");
         if (waypointElements.size() >= 2) {
           List<Integer> waypoints = new ArrayList<Integer>();
           for (Element waypointElement : waypointElements) {
@@ -3587,23 +3595,23 @@ public class BpmnParse extends Parse {
   }
 
   protected boolean isExclusive(Element element) {
-    return "true".equals(element.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "exclusive", String.valueOf(JobEntity.DEFAULT_EXCLUSIVE)));
+    return "true".equals(element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "exclusive", String.valueOf(JobEntity.DEFAULT_EXCLUSIVE)));
   }
 
   protected boolean isAsyncBefore(Element element) {
-    return "true".equals(element.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "async"))
-        || "true".equals(element.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "asyncBefore"));
+    return "true".equals(element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "async"))
+        || "true".equals(element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "asyncBefore"));
   }
 
   protected boolean isAsyncAfter(Element element) {
-    return "true".equals(element.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "asyncAfter"));
+    return "true".equals(element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "asyncAfter"));
   }
 
   private boolean isServiceTaskLike(Element element) {
 
-    return element.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "class") != null
-        || element.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "expression") != null
-        || element.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "delegateExpression") != null;
+    return element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "class") != null
+        || element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "expression") != null
+        || element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "delegateExpression") != null;
   }
 
   public Map<String, List<JobDeclaration<?>>> getJobDeclarations() {

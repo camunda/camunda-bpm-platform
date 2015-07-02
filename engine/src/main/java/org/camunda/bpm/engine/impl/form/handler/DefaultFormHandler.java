@@ -23,7 +23,6 @@ import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.form.FormField;
 import org.camunda.bpm.engine.form.FormProperty;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParser;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.VariableMapImpl;
@@ -78,7 +77,7 @@ public class DefaultFormHandler implements FormHandler {
   }
 
   protected void parseFormData(BpmnParse bpmnParse, ExpressionManager expressionManager, Element extensionElement) {
-    Element formData = extensionElement.elementNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "formData");
+    Element formData = extensionElement.elementNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "formData");
     if(formData != null) {
       parseFormFields(formData, bpmnParse, expressionManager);
     }
@@ -86,7 +85,7 @@ public class DefaultFormHandler implements FormHandler {
 
   protected void parseFormFields(Element formData, BpmnParse bpmnParse, ExpressionManager expressionManager) {
     // parse fields:
-    List<Element> formFields = formData.elementsNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "formField");
+    List<Element> formFields = formData.elementsNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "formField");
     for (Element formField : formFields) {
       parseFormField(formField, bpmnParse, expressionManager);
     }
@@ -135,10 +134,10 @@ public class DefaultFormHandler implements FormHandler {
 
   protected void parseProperties(Element formField, FormFieldHandler formFieldHandler, BpmnParse bpmnParse, ExpressionManager expressionManager) {
 
-    Element propertiesElement = formField.elementNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "properties");
+    Element propertiesElement = formField.elementNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "properties");
 
     if(propertiesElement != null) {
-      List<Element> propertyElements = propertiesElement.elementsNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "property");
+      List<Element> propertyElements = propertiesElement.elementsNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "property");
 
       // use linked hash map to preserve item ordering as provided in XML
       Map<String, String> propertyMap = new LinkedHashMap<String, String>();
@@ -155,10 +154,10 @@ public class DefaultFormHandler implements FormHandler {
 
   protected void parseValidation(Element formField, FormFieldHandler formFieldHandler, BpmnParse bpmnParse, ExpressionManager expressionManager) {
 
-    Element validationElement = formField.elementNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "validation");
+    Element validationElement = formField.elementNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "validation");
 
     if(validationElement != null) {
-      List<Element> constraintElements = validationElement.elementsNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "constraint");
+      List<Element> constraintElements = validationElement.elementsNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "constraint");
 
       for (Element property : constraintElements) {
          FormFieldValidator validator = Context.getProcessEngineConfiguration()
@@ -190,7 +189,7 @@ public class DefaultFormHandler implements FormHandler {
   protected void parseFormProperties(BpmnParse bpmnParse, ExpressionManager expressionManager, Element extensionElement) {
     FormTypes formTypes = getFormTypes();
 
-    List<Element> formPropertyElements = extensionElement.elementsNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "formProperty");
+    List<Element> formPropertyElements = extensionElement.elementsNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "formProperty");
     for (Element formPropertyElement : formPropertyElements) {
       FormPropertyHandler formPropertyHandler = new FormPropertyHandler();
 

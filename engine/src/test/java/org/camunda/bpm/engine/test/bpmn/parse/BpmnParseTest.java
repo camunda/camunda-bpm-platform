@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.test.bpmn.parse;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -28,6 +29,7 @@ import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.test.Deployment;
+import org.junit.Test;
 
 
 /**
@@ -353,6 +355,20 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testParseDiagramInterchangeElementsForUnknownModelElements() {
+  }
+
+  /**
+   * We want to make sure that BPMNs created with the namespace http://activiti.org/bpmn still work.
+   */
+  @Test
+  @Deployment
+  public void testParseDefinitionWithDeprecatedActivitiNamespace(){
+
+  }
+
+  @Test
+  @Deployment
+  public void testParseDefinitionWithCamundaNamespace(){
 
   }
 
