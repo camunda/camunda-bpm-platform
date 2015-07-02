@@ -154,7 +154,7 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
     else {
       String expressionLanguage = expression.getExpressionLanguage();
       String expressionText = expression.getExpression();
-      ScriptEngine scriptEngine = getScriptEngineForName(expressionLanguage);
+      ScriptEngine scriptEngine = getScriptEngineForNameChecked(expressionLanguage);
       Bindings bindings = createBindings(scriptEngine);
 
       try {
@@ -192,6 +192,16 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
   public boolean isApplicable(DmnExpression expression, Map<String, Object> evaluationCache) {
     Object result = evaluate(expression, evaluationCache);
     return result != null && result.equals(true);
+  }
+
+  protected ScriptEngine getScriptEngineForNameChecked(String expressionLanguage) {
+    ScriptEngine scriptEngine = getScriptEngineForName(expressionLanguage);
+    if (scriptEngine != null) {
+      return scriptEngine;
+    }
+    else {
+      throw LOG.noScriptEngineFoundForLanguage(expressionLanguage);
+    }
   }
 
   protected ScriptEngine getScriptEngineForName(String expressionLanguage) {
