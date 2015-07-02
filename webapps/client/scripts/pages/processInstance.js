@@ -126,6 +126,20 @@ define([
         }
       });
 
+      // delete activity and activity instances which do not exist
+      for(var i = 0; i < activityIds.length; i++) {
+        if(!activityIdToInstancesMap[activityIds[i]]) {
+          activityIds.splice(i, 1);
+          i--;
+        }
+      }
+      for(i = 0; i < activityInstanceIds.length; i++) {
+        if(!instanceIdToInstanceMap[activityInstanceIds[i]]) {
+          activityInstanceIds.splice(i, 1);
+          i--;
+        }
+      }
+
       if (activityIds.length > 0) {
         var newScrollTo = activityIds[activityIds.length - 1];
 
