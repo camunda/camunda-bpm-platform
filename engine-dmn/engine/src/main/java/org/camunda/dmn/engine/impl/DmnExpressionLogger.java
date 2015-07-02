@@ -15,7 +15,6 @@ package org.camunda.dmn.engine.impl;
 
 import org.camunda.bpm.model.dmn.instance.Expression;
 import org.camunda.bpm.model.dmn.instance.LiteralExpression;
-import org.camunda.dmn.engine.DmnExpressionException;
 import org.camunda.dmn.engine.DmnParseException;
 
 public class DmnExpressionLogger extends DmnLogger {

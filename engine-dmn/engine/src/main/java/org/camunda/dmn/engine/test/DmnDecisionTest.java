@@ -16,8 +16,6 @@ package org.camunda.dmn.engine.test;
 import org.camunda.dmn.engine.DmnDecision;
 import org.camunda.dmn.engine.DmnEngine;
 import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
 import org.junit.Rule;
 
 public abstract class DmnDecisionTest {

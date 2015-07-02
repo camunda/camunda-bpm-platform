@@ -20,10 +20,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.camunda.dmn.engine.DmnDecision;
+import org.camunda.dmn.engine.DmnDecisionResult;
 import org.camunda.dmn.engine.DmnExpression;
 import org.camunda.dmn.engine.DmnRule;
 import org.camunda.dmn.engine.context.DmnDecisionContext;
-import org.camunda.dmn.engine.DmnDecisionResult;
 
 public class DmnDecisionImpl implements DmnDecision {
 

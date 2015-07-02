@@ -13,8 +13,6 @@
 
 package org.camunda.dmn.engine.impl;
 
-import org.camunda.bpm.model.dmn.DmnModelException;
-import org.camunda.commons.utils.IoUtilException;
 import org.camunda.dmn.engine.DmnEngineException;
 import org.camunda.dmn.engine.DmnExpressionException;
 import org.camunda.dmn.engine.DmnParseException;

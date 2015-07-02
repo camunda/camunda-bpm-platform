@@ -19,9 +19,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.dmn.engine.DmnDecision;
-import org.camunda.dmn.engine.context.DmnDecisionContext;
 import org.camunda.dmn.engine.DmnDecisionModel;
 import org.camunda.dmn.engine.DmnDecisionResult;
+import org.camunda.dmn.engine.context.DmnDecisionContext;
 
 public class DmnDecisionModelImpl implements DmnDecisionModel {
 

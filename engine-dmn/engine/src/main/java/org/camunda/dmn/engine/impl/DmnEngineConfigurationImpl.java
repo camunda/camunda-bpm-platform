@@ -19,7 +19,6 @@ import org.camunda.dmn.engine.context.DmnContextFactory;
 import org.camunda.dmn.engine.impl.context.DmnContextFactoryImpl;
 import org.camunda.dmn.engine.impl.transform.DmnElementHandlerRegistryImpl;
 import org.camunda.dmn.engine.impl.transform.DmnTransformerImpl;
-import org.camunda.dmn.engine.transform.DmnElementHandler;
 import org.camunda.dmn.engine.transform.DmnElementHandlerRegistry;
 import org.camunda.dmn.engine.transform.DmnTransformer;
 import org.camunda.dmn.juel.JuelScriptEngineFactory;

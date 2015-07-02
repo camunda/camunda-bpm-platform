@@ -15,7 +15,6 @@ package org.camunda.dmn.engine.impl;
 
 import org.camunda.bpm.model.dmn.instance.Clause;
 import org.camunda.bpm.model.dmn.instance.Decision;
-import org.camunda.bpm.model.dmn.instance.Expression;
 import org.camunda.dmn.engine.DmnParseException;
 
 public class DmnParseLogger extends DmnLogger {

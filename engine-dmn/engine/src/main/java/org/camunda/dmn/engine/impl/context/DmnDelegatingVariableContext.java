@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.dmn.engine.context.DmnVariableContext;
-import org.camunda.dmn.engine.impl.context.DmnVariableContextImpl;
 
 public class DmnDelegatingVariableContext extends DmnVariableContextImpl {
 

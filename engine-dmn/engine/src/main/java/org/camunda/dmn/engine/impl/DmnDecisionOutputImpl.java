@@ -13,6 +13,7 @@
 
 package org.camunda.dmn.engine.impl;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +22,9 @@ import java.util.Map;
 import org.camunda.dmn.engine.DmnDecisionOutput;
 import org.camunda.dmn.engine.DmnDecisionOutputEntry;
 
-public class DmnDecisionOutputImpl implements DmnDecisionOutput {
+public class DmnDecisionOutputImpl implements DmnDecisionOutput, Serializable {
+
+  private static final long serialVersionUID = 1L;
 
   protected Map<String, DmnDecisionOutputEntry> entries = new HashMap<String, DmnDecisionOutputEntry>();
 

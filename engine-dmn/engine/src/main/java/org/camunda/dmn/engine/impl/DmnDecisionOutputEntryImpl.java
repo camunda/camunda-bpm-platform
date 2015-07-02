@@ -13,9 +13,13 @@
 
 package org.camunda.dmn.engine.impl;
 
+import java.io.Serializable;
+
 import org.camunda.dmn.engine.DmnDecisionOutputEntry;
 
-public class DmnDecisionOutputEntryImpl implements DmnDecisionOutputEntry {
+public class DmnDecisionOutputEntryImpl implements DmnDecisionOutputEntry, Serializable {
+
+  private static final long serialVersionUID = 1L;
 
   protected String name;
   protected Object value;
