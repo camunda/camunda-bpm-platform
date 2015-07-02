@@ -6,6 +6,7 @@
     <groupId>org.camunda</groupId>
     <artifactId>camunda-release-parent</artifactId>
     <version>2.5</version>
+    <!-- DO NOT REMOVE EMPTY TAG https://issues.apache.org/jira/browse/MNG-4687 -->
     <relativePath/>
   </parent>
 
@@ -26,7 +27,7 @@
     <camunda.version>7.3.0</camunda.version>
     <resteasy.version>3.0.8.Final</resteasy.version>
 
-    <!-- camunda and spring use diffenrent properties ... -->
+    <!-- camunda and spring use different properties ... -->
     <java.version>${version.java}</java.version>
   </properties>
 
@@ -57,26 +58,41 @@
       </dependency>
 
       <dependency>
-        <groupId>org.camunda.bpm.webapp</groupId>
-        <artifactId>camunda-webapp</artifactId>
-        <version>${camunda.version}</version>
-        <classifier>classes</classifier>
-      </dependency>
-
-      <dependency>
-        <groupId>org.camunda.bpm.webapp</groupId>
-        <artifactId>camunda-webapp</artifactId>
-        <version>${camunda.version}</version>
-        <type>war</type>
-      </dependency>
-
-      <dependency>
         <groupId>org.camunda.bpm.extension</groupId>
         <artifactId>camunda-spring-boot-starter</artifactId>
         <version>${project.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <scm>
+    <connection>scm:git:git@github.com:camunda/camunda-spring-boot-starter.git</connection>
+    <url>scm:git:git@github.com:camunda/camunda-spring-boot-starter.git</url>
+    <developerConnection>scm:git:git@github.com:camunda/camunda-spring-boot-starter.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+
+  <!-- repositories used for distribution of releases and snapshots, DO NOT CHANGE -->
+  <distributionManagement>
+    <repository>
+      <id>camunda-nexus</id>
+      <name>camunda bpm community extensions</name>
+      <url>https://app.camunda.com/nexus/content/repositories/camunda-bpm-community-extensions</url>
+    </repository>
+    <snapshotRepository>
+      <id>camunda-nexus</id>
+      <name>camunda bpm community extensions snapshots</name>
+      <url>https://app.camunda.com/nexus/content/repositories/camunda-bpm-community-extensions-snapshots</url>
+      <uniqueVersion>true</uniqueVersion>
+    </snapshotRepository>
+  </distributionManagement>
 
   <repositories>
     <repository>
