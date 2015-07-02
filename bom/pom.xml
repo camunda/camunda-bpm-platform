@@ -130,6 +130,15 @@
         <classifier>classes</classifier>
       </dependency>
 
+      <!-- dmn engine -->
+      <dependency>
+        <groupId>org.camunda.dmn</groupId>
+        <artifactId>camunda-engine-dmn-bom</artifactId>
+        <version>${project.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+
       <dependency>
         <!--
             make sure everybody uses the same commons version

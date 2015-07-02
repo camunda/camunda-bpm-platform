@@ -27,6 +27,17 @@
     </dependency>
 
     <dependency>
+      <groupId>org.camunda.dmn</groupId>
+      <artifactId>camunda-scriptengine-dmn</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.camunda.dmn</groupId>
+          <artifactId>camunda-scriptengine-juel</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-email</artifactId>
     </dependency>
