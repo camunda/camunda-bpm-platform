@@ -14,6 +14,7 @@
 package org.camunda.dmn.engine.context;
 
 import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 
 public interface DmnScriptContext {
 
@@ -24,5 +25,7 @@ public interface DmnScriptContext {
   ScriptEngine getDefaultScriptEngine();
 
   ScriptEngine getScriptEngineForName(String name);
+
+  void setScriptEngineManager(ScriptEngineManager scriptEngineManager);
 
 }

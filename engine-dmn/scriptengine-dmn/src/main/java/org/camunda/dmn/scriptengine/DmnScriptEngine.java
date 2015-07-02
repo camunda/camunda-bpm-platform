@@ -20,6 +20,7 @@ import javax.script.Bindings;
 import javax.script.Compilable;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngineFactory;
+import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
@@ -35,6 +36,7 @@ import org.camunda.dmn.engine.impl.DmnEngineConfigurationImpl;
 public class DmnScriptEngine extends AbstractScriptEngine implements Compilable {
 
   public static final String DECISION_ID_ATTRIBUTE = "decisionId";
+  public static final String SCRIPT_ENGINE_MANAGER_ATTRIBUTE = "scriptEngineManager";
 
   protected ScriptEngineFactory scriptEngineFactory;
   protected DmnEngine dmnEngine;
@@ -189,13 +191,21 @@ public class DmnScriptEngine extends AbstractScriptEngine implements Compilable 
       variableContext.setVariables(bindings);
     }
 
+    if (context != null) {
+      // set script engine manager
+      ScriptEngineManager scriptEngineManager = (ScriptEngineManager) getScriptContextAttribute(context, SCRIPT_ENGINE_MANAGER_ATTRIBUTE);
+      if (scriptEngineManager != null) {
+        decisionContext.getScriptContext().setScriptEngineManager(scriptEngineManager);
+      }
+    }
+
     return decisionContext;
   }
 
   protected String getDecisionId(ScriptContext context) {
     String decisionId = null;
     if (context != null) {
-      decisionId = (String) context.getAttribute(DECISION_ID_ATTRIBUTE);
+      decisionId = (String) getScriptContextAttribute(context, DECISION_ID_ATTRIBUTE);
     }
     return decisionId;
   }
@@ -208,6 +218,14 @@ public class DmnScriptEngine extends AbstractScriptEngine implements Compilable 
   /* Hack to access this function from DmnCompiledScript */
   protected ScriptContext getScriptContext(Bindings bindings) {
     return super.getScriptContext(bindings);
+  }
+
+  protected Object getScriptContextAttribute(ScriptContext context, String name) {
+    Object attribute = context.getAttribute(name);
+    if (attribute == null) {
+      attribute = getContext().getAttribute(name);
+    }
+    return attribute;
   }
 
 }

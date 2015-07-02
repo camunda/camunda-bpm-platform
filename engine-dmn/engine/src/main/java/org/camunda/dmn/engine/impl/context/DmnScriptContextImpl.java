@@ -24,6 +24,7 @@ public class DmnScriptContextImpl implements DmnScriptContext {
   public static final String DEFAULT_SCRIPT_LANGUAGE = JuelScriptEngineFactory.NAME;
 
   protected String defaultScriptLanguage = DEFAULT_SCRIPT_LANGUAGE;
+  protected ScriptEngineManager scriptEngineManager;
 
   public void setDefaultScriptLanguage(String defaultScriptLanguage) {
     this.defaultScriptLanguage = defaultScriptLanguage;
@@ -38,7 +39,22 @@ public class DmnScriptContextImpl implements DmnScriptContext {
   }
 
   public ScriptEngine getScriptEngineForName(String name) {
-    return new ScriptEngineManager().getEngineByName(name.toLowerCase());
+    return getScriptEngineManager().getEngineByName(name.toLowerCase());
+  }
+
+  public void setScriptEngineManager(ScriptEngineManager scriptEngineManager) {
+    this.scriptEngineManager = scriptEngineManager;
+  }
+
+  public ScriptEngineManager getScriptEngineManager() {
+    if (scriptEngineManager == null) {
+      synchronized (this) {
+        if (scriptEngineManager == null) {
+          scriptEngineManager = new ScriptEngineManager();
+        }
+      }
+    }
+    return scriptEngineManager;
   }
 
 }
