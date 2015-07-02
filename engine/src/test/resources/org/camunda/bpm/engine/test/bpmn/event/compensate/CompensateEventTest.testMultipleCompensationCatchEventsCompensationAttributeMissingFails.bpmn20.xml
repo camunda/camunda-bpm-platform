@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions id="definitions" 
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:camunda="http://camunda.org/bpmn"
   targetNamespace="Examples">
 	
 	<process id="compensateProcess">
@@ -15,7 +15,7 @@
 		<sequenceFlow sourceRef="fork" targetRef="bookHotel" />
 		<sequenceFlow sourceRef="fork" targetRef="bookFlight" />
 		
-			<serviceTask id="bookHotel" activiti:expression="${true}">
+			<serviceTask id="bookHotel" camunda:expression="${true}">
 				<multiInstanceLoopCharacteristics isSequential="true">
 				  <loopCardinality>5</loopCardinality>
 				</multiInstanceLoopCharacteristics>
@@ -30,11 +30,11 @@
 				<compensateEventDefinition />
 			</boundaryEvent>	
 			
-			<serviceTask id="undoBookHotel" activiti:expression="${true}" />
-			<serviceTask id="undoBookHotel2" activiti:expression="${true}" />
+			<serviceTask id="undoBookHotel" camunda:expression="${true}" />
+			<serviceTask id="undoBookHotel2" camunda:expression="${true}" />
 			
 			
-			<serviceTask id="bookFlight" activiti:expression="${true}">
+			<serviceTask id="bookFlight" camunda:expression="${true}">
 				<multiInstanceLoopCharacteristics isSequential="true">
 				  <loopCardinality>5</loopCardinality>
 				</multiInstanceLoopCharacteristics>
@@ -44,7 +44,7 @@
 				<compensateEventDefinition  />
 			</boundaryEvent>		
 			
-			<serviceTask id="undoBookFlight" activiti:expression="${true}" />
+			<serviceTask id="undoBookFlight" camunda:expression="${true}" />
 			
 			<parallelGateway id="join" />
 
