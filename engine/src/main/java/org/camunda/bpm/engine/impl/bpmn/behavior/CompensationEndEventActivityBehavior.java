@@ -22,20 +22,25 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
 /**
- * @author Daniel Meyer
+ * Behavior for a compensation end event.
+ * 
+ * @see IntermediateThrowCompensationEventActivityBehavior
+ * 
+ * @author Philipp Ossler
+ *
  */
-public class IntermediateThrowCompensationEventActivityBehavior extends FlowNodeActivityBehavior {
+public class CompensationEndEventActivityBehavior extends FlowNodeActivityBehavior {
 
   protected final CompensateEventDefinition compensateEventDefinition;
 
-  public IntermediateThrowCompensationEventActivityBehavior(CompensateEventDefinition compensateEventDefinition) {
+  public CompensationEndEventActivityBehavior(CompensateEventDefinition compensateEventDefinition) {
     this.compensateEventDefinition = compensateEventDefinition;
   }
 
   @Override
   public void execute(ActivityExecution execution) throws Exception {
 
-    List<CompensateEventSubscriptionEntity> eventSubscriptions = collectEventSubscriptions(execution);
+    final List<CompensateEventSubscriptionEntity> eventSubscriptions = collectEventSubscriptions(execution);
     if (eventSubscriptions.isEmpty()) {
       leave(execution);
     } else {
@@ -55,7 +60,6 @@ public class IntermediateThrowCompensationEventActivityBehavior extends FlowNode
 
   @Override
   public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
-
     // join compensating executions
     if (execution.getExecutions().isEmpty()) {
       leave(execution);

@@ -34,7 +34,6 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.bpmn.event.compensate.helper.SetVariablesDelegate;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
 
-
 /**
  * @author Daniel Meyer
  */
@@ -75,19 +74,8 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
     List<Task> compensationHandlerTasks = taskService.createTaskQuery().taskDefinitionKey("undoBookHotel").list();
     assertEquals(5, compensationHandlerTasks.size());
 
-    assertThat(
-      describeActivityInstanceTree(processInstance.getId())
-        .activity("parallelTask")
-        .beginScope("throwCompensate")
-          .beginScope("scope")
-            .activity("undoBookHotel")
-            .activity("undoBookHotel")
-            .activity("undoBookHotel")
-            .activity("undoBookHotel")
-            .activity("undoBookHotel")
-        .done()
-        );
-
+    assertThat(describeActivityInstanceTree(processInstance.getId()).activity("parallelTask").beginScope("throwCompensate").beginScope("scope")
+        .activity("undoBookHotel").activity("undoBookHotel").activity("undoBookHotel").activity("undoBookHotel").activity("undoBookHotel").done());
 
     ActivityInstance rootActivityInstance = runtimeService.getActivityInstance(processInstance.getId());
     List<ActivityInstance> compensationHandlerInstances = getInstancesForActivityId(rootActivityInstance, "undoBookHotel");
@@ -223,18 +211,14 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(instance.getId());
   }
 
-  @Deployment(resources={
-          "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testCallActivityCompensationHandler.bpmn20.xml",
-          "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensationHandler.bpmn20.xml"
-  })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testCallActivityCompensationHandler.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensationHandler.bpmn20.xml" })
   public void testCallActivityCompensationHandler() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
 
-    if(!processEngineConfiguration.getHistory().equals(ProcessEngineConfiguration.HISTORY_NONE)) {
-      assertEquals(5, historyService.createHistoricActivityInstanceQuery()
-              .activityId("undoBookHotel")
-              .count());
+    if (!processEngineConfiguration.getHistory().equals(ProcessEngineConfiguration.HISTORY_NONE)) {
+      assertEquals(5, historyService.createHistoricActivityInstanceQuery().activityId("undoBookHotel").count());
     }
 
     runtimeService.signal(processInstance.getId());
@@ -242,9 +226,8 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
 
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
 
-    if(!processEngineConfiguration.getHistory().equals(ProcessEngineConfiguration.HISTORY_NONE)) {
-      assertEquals(6, historyService.createHistoricProcessInstanceQuery()
-              .count());
+    if (!processEngineConfiguration.getHistory().equals(ProcessEngineConfiguration.HISTORY_NONE)) {
+      assertEquals(6, historyService.createHistoricProcessInstanceQuery().count());
     }
 
   }
@@ -258,7 +241,7 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
 
-    if(!processEngineConfiguration.getHistory().equals(ProcessEngineConfiguration.HISTORY_NONE)) {
+    if (!processEngineConfiguration.getHistory().equals(ProcessEngineConfiguration.HISTORY_NONE)) {
       assertEquals(5, historyService.createHistoricActivityInstanceQuery().activityId("undoBookHotel").count());
     }
 
@@ -269,11 +252,11 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
   public void testMultipleCompensationCatchEventsFails() {
     try {
       repositoryService.createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testMultipleCompensationCatchEventsFails.bpmn20.xml")
-        .deploy();
+          .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testMultipleCompensationCatchEventsFails.bpmn20.xml")
+          .deploy();
       fail("exception expected");
     } catch (Exception e) {
-      if(!e.getMessage().contains("multiple boundary events with compensateEventDefinition not supported on same activity")) {
+      if (!e.getMessage().contains("multiple boundary events with compensateEventDefinition not supported on same activity")) {
         fail("different exception expected");
       }
     }
@@ -282,11 +265,12 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
   public void testMultipleCompensationCatchEventsCompensationAttributeMissingFails() {
     try {
       repositoryService.createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testMultipleCompensationCatchEventsCompensationAttributeMissingFails.bpmn20.xml")
-        .deploy();
+          .addClasspathResource(
+              "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testMultipleCompensationCatchEventsCompensationAttributeMissingFails.bpmn20.xml")
+          .deploy();
       fail("exception expected");
     } catch (Exception e) {
-      if(!e.getMessage().contains("compensation boundary catch must be connected to element with isForCompensation=true")) {
+      if (!e.getMessage().contains("compensation boundary catch must be connected to element with isForCompensation=true")) {
         fail("different exception expected");
       }
     }
@@ -295,55 +279,48 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
   public void testInvalidActivityRefFails() {
     try {
       repositoryService.createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testInvalidActivityRefFails.bpmn20.xml")
-        .deploy();
+          .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testInvalidActivityRefFails.bpmn20.xml").deploy();
       fail("exception expected");
     } catch (Exception e) {
-      if(!e.getMessage().contains("Invalid attribute value for 'activityRef':")) {
+      if (!e.getMessage().contains("Invalid attribute value for 'activityRef':")) {
         fail("different exception expected");
       }
     }
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensationTriggeredByEventSubProcessActivityRef.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensationTriggeredByEventSubProcessActivityRef.bpmn20.xml" })
   public void testCompensateActivityRefTriggeredByEventSubprocess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
     assertProcessEnded(processInstance.getId());
 
     HistoricVariableInstanceQuery historicVariableInstanceQuery = historyService.createHistoricVariableInstanceQuery()
-      .processInstanceId(processInstance.getId())
-      .variableName("undoBookHotel");
+        .processInstanceId(processInstance.getId()).variableName("undoBookHotel");
 
-    if(processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+    if (processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
       assertEquals(1, historicVariableInstanceQuery.count());
       assertEquals("undoBookHotel", historicVariableInstanceQuery.list().get(0).getVariableName());
       assertEquals(5, historicVariableInstanceQuery.list().get(0).getValue());
 
-      assertEquals(0, historyService.createHistoricVariableInstanceQuery()
-       .processInstanceId(processInstance.getId())
-       .variableName("undoBookFlight")
-       .count());
+      assertEquals(0, historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).variableName("undoBookFlight").count());
     }
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensationTriggeredByEventSubProcessInSubProcessActivityRef.bpmn20.xml"})
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensationTriggeredByEventSubProcessInSubProcessActivityRef.bpmn20.xml" })
   public void testCompensateActivityRefTriggeredByEventSubprocessInSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
     assertProcessEnded(processInstance.getId());
 
     HistoricVariableInstanceQuery historicVariableInstanceQuery = historyService.createHistoricVariableInstanceQuery()
-      .processInstanceId(processInstance.getId())
-      .variableName("undoBookHotel");
+        .processInstanceId(processInstance.getId()).variableName("undoBookHotel");
 
-    if(processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+    if (processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
       assertEquals(1, historicVariableInstanceQuery.count());
       assertEquals("undoBookHotel", historicVariableInstanceQuery.list().get(0).getVariableName());
       assertEquals(5, historicVariableInstanceQuery.list().get(0).getValue());
 
-      assertEquals(0, historyService.createHistoricVariableInstanceQuery()
-        .processInstanceId(processInstance.getId())
-        .variableName("undoBookFlight")
-        .count());
+      assertEquals(0, historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).variableName("undoBookFlight").count());
     }
   }
 
@@ -351,14 +328,13 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
 
     try {
       String id = repositoryService.createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testIllegalCompensateActivityRefParentScope.bpmn20.xml")
-        .deploy()
-        .getId();
+          .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testIllegalCompensateActivityRefParentScope.bpmn20.xml")
+          .deploy().getId();
       repositoryService.deleteDeployment(id, true);
       fail("Exception expected!");
 
     } catch (ProcessEngineException e) {
-      if(!e.getMessage().contains("Invalid attribute value for 'activityRef': no activity with id 'someServiceInMainProcess' in scope 'subProcess'")) {
+      if (!e.getMessage().contains("Invalid attribute value for 'activityRef': no activity with id 'someServiceInMainProcess' in scope 'subProcess'")) {
         fail("different exception expected");
       }
     }
@@ -369,67 +345,55 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
 
     try {
       String id = repositoryService.createDeployment()
-        .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testIllegalCompensateActivityRefNestedScope.bpmn20.xml")
-        .deploy()
-        .getId();
+          .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testIllegalCompensateActivityRefNestedScope.bpmn20.xml")
+          .deploy().getId();
       repositoryService.deleteDeployment(id, true);
       fail("Exception expected!");
 
     } catch (ProcessEngineException e) {
-      if(!e.getMessage().contains("Invalid attribute value for 'activityRef': no activity with id 'someServiceInNestedScope' in scope 'subProcess'")) {
+      if (!e.getMessage().contains("Invalid attribute value for 'activityRef': no activity with id 'someServiceInNestedScope' in scope 'subProcess'")) {
         fail("different exception expected");
       }
     }
 
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensationInEventSubProcessActivityRef.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensationInEventSubProcessActivityRef.bpmn20.xml" })
   public void testCompensateActivityRefInEventSubprocess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
     assertProcessEnded(processInstance.getId());
 
+    HistoricVariableInstanceQuery historicVariableInstanceQuery = historyService.createHistoricVariableInstanceQuery().variableName("undoBookSecondHotel");
 
-    HistoricVariableInstanceQuery historicVariableInstanceQuery = historyService.createHistoricVariableInstanceQuery()
-      .variableName("undoBookSecondHotel");
-
-    if(processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+    if (processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
       assertEquals(1, historicVariableInstanceQuery.count());
       assertEquals("undoBookSecondHotel", historicVariableInstanceQuery.list().get(0).getVariableName());
       assertEquals(5, historicVariableInstanceQuery.list().get(0).getValue());
 
-      assertEquals(0, historyService.createHistoricVariableInstanceQuery()
-        .processInstanceId(processInstance.getId())
-        .variableName("undoBookFlight")
-        .count());
+      assertEquals(0, historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).variableName("undoBookFlight").count());
 
-      assertEquals(0, historyService.createHistoricVariableInstanceQuery()
-        .processInstanceId(processInstance.getId())
-        .variableName("undoBookHotel")
-        .count());
+      assertEquals(0, historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).variableName("undoBookHotel").count());
     }
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensationInEventSubProcess.bpmn20.xml"})
+  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensationInEventSubProcess.bpmn20.xml" })
   public void testCompensateInEventSubprocess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
     assertProcessEnded(processInstance.getId());
 
-    HistoricVariableInstanceQuery historicVariableInstanceQuery = historyService.createHistoricVariableInstanceQuery()
-        .variableName("undoBookSecondHotel");
+    HistoricVariableInstanceQuery historicVariableInstanceQuery = historyService.createHistoricVariableInstanceQuery().variableName("undoBookSecondHotel");
 
-    if(processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+    if (processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
       assertEquals(1, historicVariableInstanceQuery.count());
       assertEquals("undoBookSecondHotel", historicVariableInstanceQuery.list().get(0).getVariableName());
       assertEquals(5, historicVariableInstanceQuery.list().get(0).getValue());
 
-      historicVariableInstanceQuery = historyService.createHistoricVariableInstanceQuery()
-          .variableName("undoBookFlight");
+      historicVariableInstanceQuery = historyService.createHistoricVariableInstanceQuery().variableName("undoBookFlight");
 
       assertEquals(1, historicVariableInstanceQuery.count());
       assertEquals(5, historicVariableInstanceQuery.list().get(0).getValue());
 
-      historicVariableInstanceQuery = historyService.createHistoricVariableInstanceQuery()
-          .variableName("undoBookHotel");
+      historicVariableInstanceQuery = historyService.createHistoricVariableInstanceQuery().variableName("undoBookHotel");
 
       assertEquals(1, historicVariableInstanceQuery.count());
       assertEquals(5, historicVariableInstanceQuery.list().get(0).getValue());
@@ -469,10 +433,7 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
 
     // then
     ActivityInstance tree = runtimeService.getActivityInstance(processInstanceId);
-    assertThat(tree).hasStructure(
-      describeActivityInstanceTree(instance.getProcessDefinitionId())
-        .activity("task")
-      .done());
+    assertThat(tree).hasStructure(describeActivityInstanceTree(instance.getProcessDefinitionId()).activity("task").done());
   }
 
   @Deployment
@@ -487,20 +448,11 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
 
     // then (1)
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
-    assertThat(executionTree)
-      .matches(
-        describeExecutionTree(null).scope()
-          .child("task1").concurrent().noScope().up()
-          .child("task2").concurrent().noScope().up()
-          .child("subProcess").eventScope().scope().up()
-        .done());
+    assertThat(executionTree).matches(describeExecutionTree(null).scope().child("task1").concurrent().noScope().up().child("task2").concurrent().noScope().up()
+        .child("subProcess").eventScope().scope().up().done());
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstanceId);
-    assertThat(tree).hasStructure(
-      describeActivityInstanceTree(instance.getProcessDefinitionId())
-        .activity("task1")
-        .activity("task2")
-      .done());
+    assertThat(tree).hasStructure(describeActivityInstanceTree(instance.getProcessDefinitionId()).activity("task1").activity("task2").done());
 
     // when (2)
     taskId = taskService.createTaskQuery().taskDefinitionKey("task1").singleResult().getId();
@@ -508,17 +460,10 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
 
     // then (2)
     executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
-    assertThat(executionTree)
-      .matches(
-        describeExecutionTree("task2").scope()
-          .child("subProcess").eventScope().scope().up()
-        .done());
+    assertThat(executionTree).matches(describeExecutionTree("task2").scope().child("subProcess").eventScope().scope().up().done());
 
     tree = runtimeService.getActivityInstance(processInstanceId);
-    assertThat(tree).hasStructure(
-      describeActivityInstanceTree(instance.getProcessDefinitionId())
-        .activity("task2")
-      .done());
+    assertThat(tree).hasStructure(describeActivityInstanceTree(instance.getProcessDefinitionId()).activity("task2").done());
 
     // when (3)
     taskId = taskService.createTaskQuery().taskDefinitionKey("task2").singleResult().getId();
@@ -526,6 +471,30 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
 
     // then (3)
     assertProcessEnded(processInstanceId);
+  }
+
+  @Deployment
+  public void testCompensationEndEventWithScope() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
+
+    if (!processEngineConfiguration.getHistory().equals(ProcessEngineConfiguration.HISTORY_NONE)) {
+      assertEquals(5, historyService.createHistoricActivityInstanceQuery().activityId("undoBookHotel").count());
+      assertEquals(5, historyService.createHistoricActivityInstanceQuery().activityId("undoBookFlight").count());
+    }
+
+    assertProcessEnded(processInstance.getId());
+  }
+
+  @Deployment
+  public void testCompensationEndEventWithActivityRef() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
+
+    if (!processEngineConfiguration.getHistory().equals(ProcessEngineConfiguration.HISTORY_NONE)) {
+      assertEquals(5, historyService.createHistoricActivityInstanceQuery().activityId("undoBookHotel").count());
+      assertEquals(0, historyService.createHistoricActivityInstanceQuery().activityId("undoBookFlight").count());
+    }
+
+    assertProcessEnded(processInstance.getId());
   }
 
 }
