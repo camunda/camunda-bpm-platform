@@ -17,10 +17,10 @@ import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 
@@ -61,7 +61,7 @@ public abstract class AbstractHistoricActivityStatisticsRestServiceQueryTest ext
     List<HistoricActivityStatistics> mocks = MockProvider.createMockHistoricActivityStatistics();
 
     historicActivityStatisticsQuery = mock(HistoricActivityStatisticsQuery.class);
-    when(processEngine.getHistoryService().createHistoricActivityStatisticsQuery(anyString())).thenReturn(historicActivityStatisticsQuery);
+    when(processEngine.getHistoryService().createHistoricActivityStatisticsQuery(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))).thenReturn(historicActivityStatisticsQuery);
     when(historicActivityStatisticsQuery.list()).thenReturn(mocks);
   }
 
@@ -77,7 +77,9 @@ public abstract class AbstractHistoricActivityStatisticsRestServiceQueryTest ext
 
   @Test
   public void testAdditionalCanceledOption() {
-    given().queryParam("canceled", "true")
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .queryParam("canceled", "true")
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
     .when().get(HISTORIC_ACTIVITY_STATISTICS_URL);
@@ -89,7 +91,9 @@ public abstract class AbstractHistoricActivityStatisticsRestServiceQueryTest ext
 
   @Test
   public void testAdditionalFinishedOption() {
-    given().queryParam("finished", "true")
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .queryParam("finished", "true")
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
     .when().get(HISTORIC_ACTIVITY_STATISTICS_URL);
@@ -101,7 +105,9 @@ public abstract class AbstractHistoricActivityStatisticsRestServiceQueryTest ext
 
   @Test
   public void testAdditionalCompleteScopeOption() {
-    given().queryParam("completeScope", "true")
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+    . queryParam("completeScope", "true")
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
     .when().get(HISTORIC_ACTIVITY_STATISTICS_URL);
@@ -114,6 +120,7 @@ public abstract class AbstractHistoricActivityStatisticsRestServiceQueryTest ext
   @Test
   public void testAdditionalCompleteScopeAndCanceledOption() {
     given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
       .queryParam("completeScope", "true")
       .queryParam("canceled", "true")
     .then().expect()
@@ -128,6 +135,7 @@ public abstract class AbstractHistoricActivityStatisticsRestServiceQueryTest ext
   @Test
   public void testAdditionalCompleteScopeAndFinishedOption() {
     given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
       .queryParam("completeScope", "true")
       .queryParam("finished", "true")
     .then().expect()
@@ -142,6 +150,7 @@ public abstract class AbstractHistoricActivityStatisticsRestServiceQueryTest ext
   @Test
   public void testAdditionalCanceledAndFinishedOption() {
     given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
       .queryParam("canceled", "true")
       .queryParam("finished", "true")
     .then().expect()
@@ -156,6 +165,7 @@ public abstract class AbstractHistoricActivityStatisticsRestServiceQueryTest ext
   @Test
   public void testAdditionalCompleteScopeAndFinishedAndCanceledOption() {
     given()
+    .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
       .queryParam("completeScope", "true")
       .queryParam("finished", "true")
       .queryParam("canceled", "true")
@@ -171,8 +181,10 @@ public abstract class AbstractHistoricActivityStatisticsRestServiceQueryTest ext
 
   @Test
   public void testSimpleTaskQuery() {
-    Response response = given().then().expect()
-        .statusCode(Status.OK.getStatusCode())
+    Response response = given()
+          .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+         .then().expect()
+           .statusCode(Status.OK.getStatusCode())
       .when().get(HISTORIC_ACTIVITY_STATISTICS_URL);
 
     String content = response.asString();
@@ -211,6 +223,7 @@ public abstract class AbstractHistoricActivityStatisticsRestServiceQueryTest ext
   @Test
   public void testSortByParameterOnly() {
     given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
       .queryParam("sortBy", "dueDate")
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
@@ -221,6 +234,7 @@ public abstract class AbstractHistoricActivityStatisticsRestServiceQueryTest ext
   @Test
   public void testSortOrderParameterOnly() {
     given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
       .queryParam("sortOrder", "asc")
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
@@ -231,6 +245,7 @@ public abstract class AbstractHistoricActivityStatisticsRestServiceQueryTest ext
   @Test
   public void testInvalidSortOrder() {
     given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
       .queryParam("sortOrder", "invalid")
       .queryParam("sortBy", "activityId")
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
@@ -242,6 +257,7 @@ public abstract class AbstractHistoricActivityStatisticsRestServiceQueryTest ext
   @Test
   public void testInvalidSortByParameterOnly() {
     given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
       .queryParam("sortOrder", "asc")
       .queryParam("sortBy", "invalid")
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
@@ -253,6 +269,7 @@ public abstract class AbstractHistoricActivityStatisticsRestServiceQueryTest ext
   @Test
   public void testValidSortingParameters() {
     given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
       .queryParam("sortOrder", "asc")
       .queryParam("sortBy", "activityId")
     .then().expect()
@@ -265,6 +282,7 @@ public abstract class AbstractHistoricActivityStatisticsRestServiceQueryTest ext
     inOrder.verify(historicActivityStatisticsQuery).asc();
 
     given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
       .queryParam("sortOrder", "desc")
       .queryParam("sortBy", "activityId")
     .then().expect()
