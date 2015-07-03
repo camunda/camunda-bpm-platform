@@ -1,21 +1,27 @@
 package org.camunda.bpm.container.impl.jmx.deployment;
 
-import org.camunda.bpm.container.impl.tomcat.deployment.TomcatParseBpmPlatformXmlStep;
-import org.junit.Rule;
-import org.junit.Test;
-import org.springframework.mock.jndi.SimpleNamingContext;
+import static org.camunda.bpm.container.impl.deployment.AbstractParseBpmPlatformXmlStep.BPM_PLATFORM_XML_FILE;
+import static org.camunda.bpm.container.impl.deployment.AbstractParseBpmPlatformXmlStep.BPM_PLATFORM_XML_LOCATION;
+import static org.camunda.bpm.container.impl.deployment.AbstractParseBpmPlatformXmlStep.BPM_PLATFORM_XML_SYSTEM_PROPERTY;
+import static org.camunda.bpm.container.impl.tomcat.deployment.TomcatParseBpmPlatformXmlStep.CATALINA_HOME;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLDecoder;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import static org.camunda.bpm.container.impl.deployment.AbstractParseBpmPlatformXmlStep.*;
-import static org.camunda.bpm.container.impl.tomcat.deployment.TomcatParseBpmPlatformXmlStep.CATALINA_HOME;
-import static org.junit.Assert.*;
+import org.camunda.bpm.container.impl.tomcat.deployment.TomcatParseBpmPlatformXmlStep;
+import org.junit.Rule;
+import org.junit.Test;
+import org.springframework.mock.jndi.SimpleNamingContext;
 
 /**
  * Checks the correct retrieval of bpm-platform.xml file through JNDI,
@@ -26,7 +32,7 @@ import static org.junit.Assert.*;
  */
 public class BpmPlatformXmlLocationTest {
 
-  private static final String BPM_PLATFORM_XML_LOCATION_PARENT_DIR = BpmPlatformXmlLocationTest.class.getProtectionDomain().getCodeSource().getLocation().getFile() + BpmPlatformXmlLocationTest.class.getPackage().getName().replace(".", File.separator);
+  private static final String BPM_PLATFORM_XML_LOCATION_PARENT_DIR = getBpmPlatformXmlLocationParentDir();
   private static final String BPM_PLATFORM_XML_LOCATION_ABSOLUTE_DIR = BPM_PLATFORM_XML_LOCATION_PARENT_DIR + File.separator + "conf";
   private static final String BPM_PLATFORM_XML_FILE_ABSOLUTE_LOCATION = BPM_PLATFORM_XML_LOCATION_ABSOLUTE_DIR + File.separator + BPM_PLATFORM_XML_FILE;
 
@@ -93,8 +99,8 @@ public class BpmPlatformXmlLocationTest {
 
   @Test
   public void checkValidBpmPlatformXmlResourceLocation() throws NamingException, MalformedURLException {
-      URL url = new TomcatParseBpmPlatformXmlStep().checkValidBpmPlatformXmlResourceLocation(BPM_PLATFORM_XML_FILE_ABSOLUTE_LOCATION);
-      assertEquals(new File(BPM_PLATFORM_XML_FILE_ABSOLUTE_LOCATION).toURI().toURL(), url);
+    URL url = new TomcatParseBpmPlatformXmlStep().checkValidBpmPlatformXmlResourceLocation(BPM_PLATFORM_XML_FILE_ABSOLUTE_LOCATION);
+    assertEquals(new File(BPM_PLATFORM_XML_FILE_ABSOLUTE_LOCATION).toURI().toURL(), url);
   }
 
   @Test
@@ -141,8 +147,7 @@ public class BpmPlatformXmlLocationTest {
 
   @Test
   public void getBpmPlatformXmlFromClasspath() {
-    String classPathResourceLocation =
-        BpmPlatformXmlLocationTest.class.getPackage().getName().replace(".", "/") + "/conf/" + BPM_PLATFORM_XML_FILE;
+    String classPathResourceLocation = BpmPlatformXmlLocationTest.class.getPackage().getName().replace(".", "/") + "/conf/" + BPM_PLATFORM_XML_FILE;
 
     URL url = new TomcatParseBpmPlatformXmlStep().lookupBpmPlatformXmlFromClassPath(classPathResourceLocation);
     assertNotNull("Url should point to a bpm-platform.xml file.", url);
@@ -169,6 +174,18 @@ public class BpmPlatformXmlLocationTest {
     URL url = new TomcatParseBpmPlatformXmlStep().lookupBpmPlatformXml();
 
     assertEquals(new File(BPM_PLATFORM_XML_FILE_ABSOLUTE_LOCATION).toURI().toURL(), url);
+  }
+  
+  private static String getBpmPlatformXmlLocationParentDir() {
+    String baseDir = BpmPlatformXmlLocationTest.class.getProtectionDomain().getCodeSource().getLocation().getFile();
+    try {
+      // replace escaped whitespaces in path
+      baseDir = URLDecoder.decode(baseDir, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      e.printStackTrace();
+    }
+    return baseDir
+        + BpmPlatformXmlLocationTest.class.getPackage().getName().replace(".", File.separator);
   }
 
 }
