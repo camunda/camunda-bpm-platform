@@ -1476,4 +1476,16 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     return Context.getProcessEngineConfiguration().getProcessEngine();
   }
 
+  public static void initializeVariables(Map<String, ExecutionEntity> executions, Collection<VariableInstanceEntity> variables) {
+    for (ExecutionEntity executionEntity : executions.values()) {
+      ExecutionEntityVariableStore variableStore = (ExecutionEntityVariableStore) executionEntity.getVariableStore();
+      variableStore.setVariableInstances(new HashMap<String, VariableInstanceEntity>());
+    }
+
+    for (VariableInstanceEntity variable : variables) {
+      ExecutionEntity executionEntity = executions.get(variable.getExecutionId());
+      executionEntity.getVariableStore().getVariableInstances().put(variable.getName(), variable);
+    }
+  }
+
 }
