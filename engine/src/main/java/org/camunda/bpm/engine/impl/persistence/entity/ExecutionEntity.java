@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -1047,31 +1048,97 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
    *
    */
   protected void ensureExecutionTreeInitialized() {
-    List<ExecutionEntity> executions = Context.getCommandContext().getExecutionManager().findChildExecutionsByProcessInstanceId(processInstanceId);
+    List<ExecutionEntity> executions = Context.getCommandContext()
+      .getExecutionManager()
+      .findChildExecutionsByProcessInstanceId(processInstanceId);
 
-    ExecutionEntity processInstance = null;
+    ExecutionEntity processInstance = isProcessInstanceExecution() ? this : null;
 
-    Map<String, ExecutionEntity> executionMap = new HashMap<String, ExecutionEntity>();
-    for (ExecutionEntity execution : executions) {
-      execution.executions = new ArrayList<ExecutionEntity>();
-      executionMap.put(execution.getId(), execution);
-      if (execution.isProcessInstanceExecution()) {
-        processInstance = execution;
+    if(processInstance == null) {
+      for (ExecutionEntity execution : executions) {
+        if (execution.isProcessInstanceExecution()) {
+          processInstance = execution;
+        }
       }
     }
 
+    processInstance.restoreProcessInstance(executions, null, null);
+  }
+
+  /**
+   * Restores a complete process instance tree including referenced entities.
+   * Note: currently only the restoring of variables and event subscriptions is supported.
+   *
+   * @param executions
+   *   the list of all executions that are part of this process instance.
+   *   Cannot be null, must include the process instance execution itself.
+   * @param eventSubscriptions
+   *   the list of all event subscriptions that are linked to executions which is part of this process instance
+   *   If null, event subscriptions are not initialized and lazy loaded on demand
+   * @param variables
+   *   the list of all variables that are linked to executions which are part of this process instance
+   *   If null, variables are not initialized and are lazy loaded on demand
+   */
+  public void restoreProcessInstance(Collection<ExecutionEntity> executions,
+      Collection<EventSubscriptionEntity> eventSubscriptions,
+      Collection<VariableInstanceEntity> variables) {
+
+    if(!isProcessInstanceExecution()) {
+      throw new ProcessEngineException("Can only restore the process instance - method must be called on a process instance execution.");
+    }
+
+    // index executions by id
+    Map<String, ExecutionEntity> executionsMap = new HashMap<String, ExecutionEntity>();
     for (ExecutionEntity execution : executions) {
+      executionsMap.put(execution.getId(), execution);
+    }
+
+    // restore execution tree
+    for (ExecutionEntity execution : executions) {
+      if (execution.executions == null) {
+        execution.executions = new ArrayList<ExecutionEntity>();
+      }
+      if(execution.eventSubscriptions == null && eventSubscriptions != null) {
+        execution.eventSubscriptions = new ArrayList<EventSubscriptionEntity>();
+      }
+      if(variableStore.getVariableInstancesDirect() == null && variables != null) {
+        variableStore.setVariableInstances(new HashMap<String, VariableInstanceEntity>());
+      }
       String parentId = execution.getParentId();
-      ExecutionEntity parent = executionMap.get(parentId);
+      ExecutionEntity parent = executionsMap.get(parentId);
       if (!execution.isProcessInstanceExecution()) {
-        execution.processInstance = processInstance;
+        execution.processInstance = this;
         execution.parent = parent;
+        if (parent.executions == null) {
+          parent.executions = new ArrayList<ExecutionEntity>();
+        }
         parent.executions.add(execution);
       } else {
         execution.processInstance = execution;
       }
     }
+
+    if(eventSubscriptions != null) {
+      // add event subscriptions to the right executions in the tree
+      for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
+        ExecutionEntity executionEntity = executionsMap.get(eventSubscription.getExecutionId());
+        if (executionEntity != null) {
+          executionEntity.addEventSubscription(eventSubscription);
+        }
+        else {
+          throw new ProcessEngineException("Unable to find execution for id " + eventSubscription.getExecutionId());
+        }
+      }
+    }
+
+    if(variables != null) {
+      for (VariableInstanceEntity variable : variables) {
+        ExecutionEntity executionEntity = executionsMap.get(variable.getExecutionId());
+        executionEntity.getVariableStore().getVariableInstances().put(variable.getName(), variable);
+      }
+    }
   }
+
 
   // persistent state /////////////////////////////////////////////////////////
 
@@ -1453,5 +1520,6 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   public ProcessEngineServices getProcessEngineServices() {
     return Context.getProcessEngineConfiguration().getProcessEngine();
   }
+
 
 }

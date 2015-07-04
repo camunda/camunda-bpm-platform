@@ -65,6 +65,11 @@ public abstract class AbstractPersistentVariableStore extends AbstractVariableSt
     return (Map) variableInstances;
   }
 
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  public Map<String, CoreVariableInstance> getVariableInstancesDirect() {
+    return (Map) variableInstances;
+  }
+
   public void setVariableInstances(Map<String, VariableInstanceEntity> variableInstances) {
     this.variableInstances = variableInstances;
   }
