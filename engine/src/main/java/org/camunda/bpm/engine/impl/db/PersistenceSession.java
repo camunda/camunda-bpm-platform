@@ -51,5 +51,9 @@ public interface PersistenceSession extends Session {
   void dbSchemaPrune();
 
   void dbSchemaUpdate();
+  
+  // listeners //////////////////////////////////////////
+  
+  void addEntityLoadListener(EntityLoadListener listener);
 
 }

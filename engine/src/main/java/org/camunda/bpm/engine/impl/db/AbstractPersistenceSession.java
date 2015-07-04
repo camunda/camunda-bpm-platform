@@ -13,6 +13,9 @@
 
 package org.camunda.bpm.engine.impl.db;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.WrongDbException;
@@ -27,6 +30,8 @@ import org.camunda.bpm.engine.impl.history.HistoryLevel;
  * @author Sebastian Menski
  */
 public abstract class AbstractPersistenceSession implements PersistenceSession {
+  
+  protected List<EntityLoadListener> listeners = new ArrayList<EntityLoadListener>(1);
 
   public void executeDbOperation(DbOperation operation) {
     switch(operation.getOperationType()) {
@@ -191,5 +196,19 @@ public abstract class AbstractPersistenceSession implements PersistenceSession {
       dbSchemaCreateCmmnHistory();
     }
 
+  }
+  
+  public void addEntityLoadListener(EntityLoadListener listener) {
+    this.listeners.add(listener);
+  }
+  
+
+  protected void fireEntityLoaded(Object result) {
+    if(result != null && result instanceof DbEntity) {
+      DbEntity entity = (DbEntity) result;
+      for (EntityLoadListener entityLoadListener : listeners) {
+        entityLoadListener.onEntityLoaded(entity);
+      }
+    }
   }
 }
