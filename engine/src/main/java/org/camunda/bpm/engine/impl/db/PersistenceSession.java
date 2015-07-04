@@ -51,6 +51,8 @@ public interface PersistenceSession extends Session {
   void dbSchemaPrune();
 
   void dbSchemaUpdate();
+
+  List<String> getTableNamesPresent();
   
   // listeners //////////////////////////////////////////
   

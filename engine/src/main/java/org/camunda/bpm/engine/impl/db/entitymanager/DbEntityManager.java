@@ -585,4 +585,9 @@ public class DbEntityManager implements Session, EntityLoadListener {
     }
     optimisticLockingListeners.add(optimisticLockingListener);
   }
+
+  public List<String> getTableNamesPresentInDatabase() {
+    return persistenceSession.getTableNamesPresent();
+  }
+
 }

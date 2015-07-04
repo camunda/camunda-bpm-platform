@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.impl.db;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngine;
@@ -197,7 +198,11 @@ public abstract class AbstractPersistenceSession implements PersistenceSession {
     }
 
   }
-  
+
+  public List<String> getTableNamesPresent() {
+    return Collections.emptyList();
+  }
+
   public void addEntityLoadListener(EntityLoadListener listener) {
     this.listeners.add(listener);
   }
