@@ -158,15 +158,28 @@ public class EventSubscriptionManager extends AbstractManager {
 
   public List<EventSubscriptionEntity> findEventSubscriptionsByNameAndExecution(String type, String eventName,
       String executionId, boolean lockResult) {
-    final String query = "selectEventSubscriptionsByNameAndExecution";
-    Map<String, Object> params = new HashMap<String, Object>();
-    params.put("eventType", type);
-    params.put("eventName", eventName);
-    params.put("executionId", executionId);
-    params.put("lockResult", lockResult);
-    return getDbEntityManager().selectList(query, params);
+    ExecutionEntity cachedExecution = getDbEntityManager().getCachedEntity(ExecutionEntity.class, executionId);
+    if(cachedExecution != null && !lockResult) {
+      List<EventSubscriptionEntity> eventSubscriptions = cachedExecution.getEventSubscriptions();
+      List<EventSubscriptionEntity> result = new ArrayList<EventSubscriptionEntity>();
+      for (EventSubscriptionEntity subscription : eventSubscriptions) {
+        if(subscription.getEventName().equals(eventName) && subscription.getEventType().equals(type)) {
+          result.add(subscription);
+        }
+      }
+      return result;
+    }
+    else {
+      final String query = "selectEventSubscriptionsByNameAndExecution";
+      Map<String, Object> params = new HashMap<String, Object>();
+      params.put("eventType", type);
+      params.put("eventName", eventName);
+      params.put("executionId", executionId);
+      params.put("lockResult", lockResult);
+      return getDbEntityManager().selectList(query, params);
+    }
   }
-
+  
   public MessageEventSubscriptionEntity findMessageStartEventSubscriptionByName(String messageName) {
     MessageEventSubscriptionEntity entity = (MessageEventSubscriptionEntity) getDbEntityManager().selectOne("selectMessageStartEventSubscriptionByName", messageName);
     return entity;
