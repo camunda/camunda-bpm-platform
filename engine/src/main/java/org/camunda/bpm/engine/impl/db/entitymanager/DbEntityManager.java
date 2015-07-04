@@ -93,7 +93,9 @@ public class DbEntityManager implements Session, EntityLoadListener {
   public DbEntityManager(IdGenerator idGenerator, PersistenceSession persistenceSession) {
     this.idGenerator = idGenerator;
     this.persistenceSession = persistenceSession;
-    this.persistenceSession.addEntityLoadListener(this);
+    if (persistenceSession != null) {
+      this.persistenceSession.addEntityLoadListener(this);
+    }
     initializeEntityCache();
     initializeOperationManager();
   }
