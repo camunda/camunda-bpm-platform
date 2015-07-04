@@ -83,20 +83,29 @@ public class DbSqlSession extends AbstractPersistenceSession {
 
   public List<?> selectList(String statement, Object parameter){
     statement = dbSqlSessionFactory.mapStatement(statement);
-    return sqlSession.selectList(statement, parameter);
+    List<Object> resultList = sqlSession.selectList(statement, parameter);
+    for (Object object : resultList) {
+      fireEntityLoaded(object);
+    }
+    return resultList;
   }
 
+  @SuppressWarnings("unchecked")
   public <T extends DbEntity> T selectById(Class<T> type, String id) {
     String selectStatement = dbSqlSessionFactory.getSelectStatement(type);
     selectStatement = dbSqlSessionFactory.mapStatement(selectStatement);
     ensureNotNull("no select statement for " + type + " in the ibatis mapping files", "selectStatement", selectStatement);
 
-    return (T) sqlSession.selectOne(selectStatement, id);
+    Object result = sqlSession.selectOne(selectStatement, id);
+    fireEntityLoaded(result);
+    return (T) result;
   }
 
   public Object selectOne(String statement, Object parameter) {
     statement = dbSqlSessionFactory.mapStatement(statement);
-    return sqlSession.selectOne(statement, parameter);
+    Object result = sqlSession.selectOne(statement, parameter);
+    fireEntityLoaded(result);
+    return result;
   }
 
   // lock ////////////////////////////////////////////

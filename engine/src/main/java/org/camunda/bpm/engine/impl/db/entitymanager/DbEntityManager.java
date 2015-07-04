@@ -54,6 +54,7 @@ import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImp
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.DbEntityLifecycleAware;
+import org.camunda.bpm.engine.impl.db.EntityLoadListener;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.db.PersistenceSession;
 import org.camunda.bpm.engine.impl.db.entitymanager.cache.CachedDbEntity;
@@ -75,7 +76,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorContext;
  *
  */
 @SuppressWarnings({ "rawtypes" })
-public class DbEntityManager implements Session {
+public class DbEntityManager implements Session, EntityLoadListener {
 
   private static Logger log = Logger.getLogger(DbEntityManager.class.getName());
 
@@ -92,6 +93,9 @@ public class DbEntityManager implements Session {
   public DbEntityManager(IdGenerator idGenerator, PersistenceSession persistenceSession) {
     this.idGenerator = idGenerator;
     this.persistenceSession = persistenceSession;
+    if (persistenceSession != null) {
+      this.persistenceSession.addEntityLoadListener(this);
+    }
     initializeEntityCache();
     initializeOperationManager();
   }
@@ -194,7 +198,7 @@ public class DbEntityManager implements Session {
     if (persistentObject==null) {
       return null;
     }
-    dbEntityCache.putPersistent(persistentObject);
+    // don't have to put object into the cache now. See onEntityLoaded() callback
     return persistentObject;
   }
 
@@ -222,21 +226,32 @@ public class DbEntityManager implements Session {
   }
 
   /** returns the object in the cache.  if this object was loaded before,
-   * then the original object is returned.  if this is the first time
-   * this object is loaded, then the loadedObject is added to the cache. */
+   * then the original object is returned. */
   protected DbEntity cacheFilter(DbEntity persistentObject) {
     DbEntity cachedPersistentObject = dbEntityCache.get(persistentObject.getClass(), persistentObject.getId());
     if (cachedPersistentObject!=null) {
       return cachedPersistentObject;
     }
-    dbEntityCache.putPersistent(persistentObject);
-
-    // invoke postLoad() lifecycle method
-    if (persistentObject instanceof DbEntityLifecycleAware) {
-      DbEntityLifecycleAware lifecycleAware = (DbEntityLifecycleAware) persistentObject;
-      lifecycleAware.postLoad();
+    else {
+      return persistentObject;
     }
-    return persistentObject;
+    
+  }
+  
+  public void onEntityLoaded(DbEntity entity) {
+    // we get a callback when the persistence session loads an object from the database
+    DbEntity cachedPersistentObject = dbEntityCache.get(entity.getClass(), entity.getId());
+    if(cachedPersistentObject == null) {
+      // only put into the cache if not already present
+      dbEntityCache.putPersistent(entity);
+
+      // invoke postLoad() lifecycle method
+      if (entity instanceof DbEntityLifecycleAware) {
+        DbEntityLifecycleAware lifecycleAware = (DbEntityLifecycleAware) entity;
+        lifecycleAware.postLoad();
+      }
+    }
+
   }
 
   public void lock(String statement) {
