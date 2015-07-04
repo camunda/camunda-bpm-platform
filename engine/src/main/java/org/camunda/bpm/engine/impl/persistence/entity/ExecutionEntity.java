@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -1047,24 +1048,49 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
     ExecutionEntity processInstance = null;
 
-    Map<String, ExecutionEntity> executionMap = new HashMap<String, ExecutionEntity>();
+    Map<String, ExecutionEntity> executionsMap = new HashMap<String, ExecutionEntity>();
     for (ExecutionEntity execution : executions) {
-      execution.executions = new ArrayList<ExecutionEntity>();
-      executionMap.put(execution.getId(), execution);
+      executionsMap.put(execution.getId(), execution);
       if (execution.isProcessInstanceExecution()) {
         processInstance = execution;
       }
     }
 
-    for (ExecutionEntity execution : executions) {
+    initializeExecutions(processInstance, executionsMap);
+  }
+
+  public static void initializeExecutions(ExecutionEntity processInstance, Map<String, ExecutionEntity> executions) {
+    for (ExecutionEntity execution : executions.values()) {
+      if (execution.executions == null) {
+        execution.executions = new ArrayList<ExecutionEntity>();
+      }
       String parentId = execution.getParentId();
-      ExecutionEntity parent = executionMap.get(parentId);
+      ExecutionEntity parent = executions.get(parentId);
       if (!execution.isProcessInstanceExecution()) {
         execution.processInstance = processInstance;
         execution.parent = parent;
+        if (parent.executions == null) {
+          parent.executions = new ArrayList<ExecutionEntity>();
+        }
         parent.executions.add(execution);
       } else {
         execution.processInstance = execution;
+      }
+    }
+  }
+
+  public static void initializeEventSubscription(Map<String, ExecutionEntity> executions, Collection<EventSubscriptionEntity> eventSubscriptions) {
+    for (ExecutionEntity executionEntity : executions.values()) {
+      // ensure event subscriptions list is initialized for all executions otherwise they will be fetched again
+      executionEntity.eventSubscriptions = new ArrayList<EventSubscriptionEntity>();
+    }
+    for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
+      ExecutionEntity executionEntity = executions.get(eventSubscription.getExecutionId());
+      if (executionEntity != null) {
+        executionEntity.addEventSubscription(eventSubscription);
+      }
+      else {
+        throw new ProcessEngineException("Unable to find execution for id " + eventSubscription.getExecutionId());
       }
     }
   }
