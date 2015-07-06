@@ -56,7 +56,7 @@ public class JobPrioritizationDuringDeploymentTest extends AbstractFoxPlatformIn
   // deploy this manually
   @Deployment(name="timerStart", managed = false)
   public static WebArchive createTimerStartDeployment() {
-    return initWebArchiveDeployment("pa.war", "org/camunda/bpm/integrationtest/jobexecutor/jobPriorityEngine.xml")
+    return initWebArchiveDeployment("pa1.war", "org/camunda/bpm/integrationtest/jobexecutor/jobPriorityEngine.xml")
       .addClass(PriorityBean.class)
       .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/JobPrioritizationDuringDeploymentTest.timerStart.bpmn20.xml");
 

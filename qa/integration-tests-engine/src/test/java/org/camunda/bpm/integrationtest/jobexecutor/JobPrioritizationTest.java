@@ -58,7 +58,7 @@ public class JobPrioritizationTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
   public static WebArchive createDeployment() {
-    return initWebArchiveDeployment("pa.war", "org/camunda/bpm/integrationtest/jobexecutor/jobPriorityEngine.xml")
+    return initWebArchiveDeployment("pa1.war", "org/camunda/bpm/integrationtest/jobexecutor/jobPriorityEngine.xml")
       .addClass(PriorityBean.class)
       .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/JobPrioritizationTest.serviceTask.bpmn20.xml")
       .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/JobPrioritizationTest.userTask.bpmn20.xml")

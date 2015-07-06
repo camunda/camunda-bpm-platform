@@ -17,5 +17,9 @@
   </process-engine>
   <process-archive name="archive1">
     <process-engine>engine1</process-engine>
+    
+    <properties>      
+      <property name="isDeleteUponUndeploy">true</property>
+    </properties>
   </process-archive>
 </process-application>
