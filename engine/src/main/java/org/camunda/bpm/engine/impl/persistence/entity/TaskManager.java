@@ -41,7 +41,7 @@ public class TaskManager extends AbstractManager {
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  public void deleteTasksByProcessInstanceId(String processInstanceId, String deleteReason, boolean cascade) {
+  public void deleteTasksByProcessInstanceId(String processInstanceId, String deleteReason, boolean cascade, boolean skipCustomListeners) {
     List<TaskEntity> tasks = (List) getDbEntityManager()
       .createTaskQuery()
       .processInstanceId(processInstanceId)
@@ -50,7 +50,7 @@ public class TaskManager extends AbstractManager {
     String reason = (deleteReason == null || deleteReason.length() == 0) ? TaskEntity.DELETE_REASON_DELETED : deleteReason;
 
     for (TaskEntity task: tasks) {
-      task.delete(reason, cascade);
+      task.delete(reason, cascade, skipCustomListeners);
     }
   }
 
@@ -64,11 +64,11 @@ public class TaskManager extends AbstractManager {
       String reason = (deleteReason == null || deleteReason.length() == 0) ? TaskEntity.DELETE_REASON_DELETED : deleteReason;
 
       for (TaskEntity task: tasks) {
-        task.delete(reason, cascade);
+        task.delete(reason, cascade, false);
       }
   }
 
-  public void deleteTask(TaskEntity task, String deleteReason, boolean cascade) {
+  public void deleteTask(TaskEntity task, String deleteReason, boolean cascade, boolean skipCustomListeners) {
     if (!task.isDeleted()) {
       task.setDeleted(true);
 
@@ -77,7 +77,7 @@ public class TaskManager extends AbstractManager {
 
       List<Task> subTasks = findTasksByParentTaskId(taskId);
       for (Task subTask: subTasks) {
-        ((TaskEntity) subTask).delete(deleteReason, cascade);
+        ((TaskEntity) subTask).delete(deleteReason, cascade, skipCustomListeners);
       }
 
       commandContext

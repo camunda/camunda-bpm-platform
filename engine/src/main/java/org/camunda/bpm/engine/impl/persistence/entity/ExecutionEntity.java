@@ -930,7 +930,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements
           this.getReplacedBy().addTask(task);
         }
       } else {
-        task.delete(reason, false);
+        task.delete(reason, false, skipCustomListeners);
       }
     }
   }

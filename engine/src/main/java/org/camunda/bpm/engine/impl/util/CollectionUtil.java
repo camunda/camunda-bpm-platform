@@ -51,4 +51,13 @@ public class CollectionUtil {
     return result;
   }
 
+  public static <S, T> void addToMapOfLists(Map<S, List<T>> map, S key, T value) {
+    List<T> list = map.get(key);
+    if (list == null) {
+      list = new ArrayList<T>();
+      map.put(key, list);
+    }
+    list.add(value);
+  }
+
 }

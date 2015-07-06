@@ -427,7 +427,7 @@ public class TaskDecoratorTest extends PluggableProcessEngineTestCase {
     public Void execute(CommandContext commandContext) {
       commandContext
         .getTaskManager()
-        .deleteTask(task, null, true);
+        .deleteTask(task, null, true, false);
 
       return null;
     }

@@ -37,6 +37,7 @@ import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
@@ -57,6 +58,7 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener;
 import org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
+import org.camunda.bpm.engine.test.examples.bpmn.tasklistener.RecorderTaskListener;
 import org.camunda.bpm.engine.test.util.TestExecutionListener;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
@@ -262,6 +264,32 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     // the custom listener is not invoked
     assertTrue(TestExecutionListener.collectedEvents.size() == 0);
     TestExecutionListener.reset();
+  }
+
+  @Deployment
+  public void testDeleteProcessInstanceSkipCustomTaskListeners() {
+
+    // given a process instance
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // and an empty task listener invocation storage
+    RecorderTaskListener.clear();
+
+    // if we do not skip the custom listeners
+    runtimeService.deleteProcessInstance(instance.getId(), null, false);
+
+    // then the the custom listener is invoked
+    assertEquals(1, RecorderTaskListener.getRecordedEvents().size());
+    assertEquals(TaskListener.EVENTNAME_DELETE, RecorderTaskListener.getRecordedEvents().get(0).getEvent());
+
+    // if we do skip the custom listeners
+    instance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    RecorderTaskListener.clear();
+
+    runtimeService.deleteProcessInstance(instance.getId(), null, true);
+
+    // then the the custom listener is not invoked
+    assertTrue(RecorderTaskListener.getRecordedEvents().isEmpty());
   }
 
   @Deployment(resources={

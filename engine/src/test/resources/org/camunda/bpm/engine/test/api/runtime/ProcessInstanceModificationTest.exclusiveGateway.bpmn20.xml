@@ -20,7 +20,7 @@
     <sequenceFlow id="flow4" sourceRef="fork" targetRef="task2">
       <conditionExpression xsi:type="tFormalExpression">${false}</conditionExpression>
     </sequenceFlow>
-    <userTask id="task2"/>
+    <userTask id="task2" camunda:assignee="kermit"/>
     <sequenceFlow id="flow5" sourceRef="task2" targetRef="join" />
     
     <exclusiveGateway id="join" />

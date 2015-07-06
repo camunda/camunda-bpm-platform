@@ -29,15 +29,15 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
  */
 public class TaskListenerInvocation extends DelegateInvocation {
 
-  protected final TaskListener executionListenerInstance;
+  protected final TaskListener taskListenerInstance;
   protected final DelegateTask delegateTask;
 
   public TaskListenerInvocation(TaskListener executionListenerInstance, DelegateTask delegateTask) {
     this(executionListenerInstance, delegateTask, null);
   }
 
-  public TaskListenerInvocation(TaskListener executionListenerInstance, DelegateTask delegateTask, BaseDelegateExecution contextExecution) {
-    this.executionListenerInstance = executionListenerInstance;
+  public TaskListenerInvocation(TaskListener taskListenerInstance, DelegateTask delegateTask, BaseDelegateExecution contextExecution) {
+    this.taskListenerInstance = taskListenerInstance;
     this.delegateTask = delegateTask;
     this.contextExecution = contextExecution;
   }
@@ -52,7 +52,7 @@ public class TaskListenerInvocation extends DelegateInvocation {
           Context.setExecutionContext((CaseExecutionEntity) contextExecution);
         }
       }
-      executionListenerInstance.notify(delegateTask);
+      taskListenerInstance.notify(delegateTask);
     }
     finally {
       if (executionContext == null) {
@@ -62,7 +62,7 @@ public class TaskListenerInvocation extends DelegateInvocation {
   }
 
   public Object getTarget() {
-    return executionListenerInstance;
+    return taskListenerInstance;
   }
 
 }
