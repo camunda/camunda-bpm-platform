@@ -24,8 +24,11 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,6 +37,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.WrongDbException;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.AbstractPersistenceSession;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
@@ -83,20 +87,29 @@ public class DbSqlSession extends AbstractPersistenceSession {
 
   public List<?> selectList(String statement, Object parameter){
     statement = dbSqlSessionFactory.mapStatement(statement);
-    return sqlSession.selectList(statement, parameter);
+    List<Object> resultList = sqlSession.selectList(statement, parameter);
+    for (Object object : resultList) {
+      fireEntityLoaded(object);
+    }
+    return resultList;
   }
 
+  @SuppressWarnings("unchecked")
   public <T extends DbEntity> T selectById(Class<T> type, String id) {
     String selectStatement = dbSqlSessionFactory.getSelectStatement(type);
     selectStatement = dbSqlSessionFactory.mapStatement(selectStatement);
     ensureNotNull("no select statement for " + type + " in the ibatis mapping files", "selectStatement", selectStatement);
 
-    return (T) sqlSession.selectOne(selectStatement, id);
+    Object result = sqlSession.selectOne(selectStatement, id);
+    fireEntityLoaded(result);
+    return (T) result;
   }
 
   public Object selectOne(String statement, Object parameter) {
     statement = dbSqlSessionFactory.mapStatement(statement);
-    return sqlSession.selectOne(statement, parameter);
+    Object result = sqlSession.selectOne(statement, parameter);
+    fireEntityLoaded(result);
+    return result;
   }
 
   // lock ////////////////////////////////////////////
@@ -426,6 +439,85 @@ public class DbSqlSession extends AbstractPersistenceSession {
       throw new ProcessEngineException("couldn't check if tables are already present using metadata: "+e.getMessage(), e);
     }
   }
+
+  public List<String> getTableNamesPresent() {
+    List<String> tableNames = new ArrayList<String>();
+
+    try {
+      ResultSet tablesRs = null;
+
+      try {
+        if (DbSqlSessionFactory.ORACLE.equals(getDbSqlSessionFactory().getDatabaseType())) {
+          tableNames = getTablesPresentInOracleDatabase();
+        } else {
+          Connection connection = getSqlSession().getConnection();
+          DatabaseMetaData databaseMetaData = connection.getMetaData();
+
+          log.fine("retrieving process engine tables from jdbc metadata");
+          String databaseTablePrefix = getDbSqlSessionFactory().getDatabaseTablePrefix();
+          String tableNameFilter = databaseTablePrefix+"ACT_%";
+
+          if (DbSqlSessionFactory.POSTGRES.equals(getDbSqlSessionFactory().getDatabaseType())) {
+            tableNameFilter = databaseTablePrefix+"act_%";
+          }
+          tablesRs = databaseMetaData.getTables(null, null, tableNameFilter, DbSqlSession.JDBC_METADATA_TABLE_TYPES);
+
+          while (tablesRs.next()) {
+            String tableName = tablesRs.getString("TABLE_NAME");
+            tableName = tableName.toUpperCase();
+            tableNames.add(tableName);
+            log.fine("  retrieved process engine table name "+tableName);
+          }
+        }
+      } catch (SQLException se) {
+        throw se;
+      } finally {
+        if (tablesRs != null) {
+          tablesRs.close();
+        }
+      }
+    } catch (Exception e) {
+      throw new ProcessEngineException("couldn't get process engine table names: "+e.getMessage(), e);
+    }
+
+    return tableNames;
+  }
+
+  protected List<String> getTablesPresentInOracleDatabase() throws SQLException {
+    List<String> tableNames = new ArrayList<String>();
+    Connection connection = null;
+    PreparedStatement prepStat = null;
+    ResultSet tablesRs = null;
+    String selectTableNamesFromOracle = "SELECT table_name FROM all_tables WHERE table_name LIKE ?";
+    String databaseTablePrefix = getDbSqlSessionFactory().getDatabaseTablePrefix();
+
+    try {
+      connection = Context.getProcessEngineConfiguration().getDataSource().getConnection();
+      prepStat = connection.prepareStatement(selectTableNamesFromOracle);
+      prepStat.setString(1, databaseTablePrefix + "ACT_%");
+      log.fine("retrieving process engine tables from oracle all_tables");
+      tablesRs = prepStat.executeQuery();
+      while (tablesRs.next()) {
+        String tableName = tablesRs.getString("TABLE_NAME");
+        tableName = tableName.toUpperCase();
+        tableNames.add(tableName);
+        log.fine("  retrieved process engine table name "+tableName);
+      }
+    } finally {
+      if (tablesRs != null) {
+        tablesRs.close();
+      }
+      if (prepStat != null) {
+        prepStat.close();
+      }
+      if (connection != null) {
+        connection.close();
+      }
+    }
+
+    return tableNames;
+  }
+
 
   protected String prependDatabaseTablePrefix(String tableName) {
     String prefixWithoutSchema = dbSqlSessionFactory.getDatabaseTablePrefix();

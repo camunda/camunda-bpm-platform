@@ -52,4 +52,10 @@ public interface PersistenceSession extends Session {
 
   void dbSchemaUpdate();
 
+  List<String> getTableNamesPresent();
+  
+  // listeners //////////////////////////////////////////
+  
+  void addEntityLoadListener(EntityLoadListener listener);
+
 }
