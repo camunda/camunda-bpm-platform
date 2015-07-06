@@ -74,8 +74,17 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
     List<Task> compensationHandlerTasks = taskService.createTaskQuery().taskDefinitionKey("undoBookHotel").list();
     assertEquals(5, compensationHandlerTasks.size());
 
-    assertThat(describeActivityInstanceTree(processInstance.getId()).activity("parallelTask").beginScope("throwCompensate").beginScope("scope")
-        .activity("undoBookHotel").activity("undoBookHotel").activity("undoBookHotel").activity("undoBookHotel").activity("undoBookHotel").done());
+    assertThat(
+        describeActivityInstanceTree(processInstance.getId())
+        .activity("parallelTask")
+        .beginScope("throwCompensate")
+          .beginScope("scope")
+            .activity("undoBookHotel")
+            .activity("undoBookHotel")
+            .activity("undoBookHotel")
+            .activity("undoBookHotel")
+            .activity("undoBookHotel")
+        .done());
 
     ActivityInstance rootActivityInstance = runtimeService.getActivityInstance(processInstance.getId());
     List<ActivityInstance> compensationHandlerInstances = getInstancesForActivityId(rootActivityInstance, "undoBookHotel");
@@ -433,7 +442,10 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
 
     // then
     ActivityInstance tree = runtimeService.getActivityInstance(processInstanceId);
-    assertThat(tree).hasStructure(describeActivityInstanceTree(instance.getProcessDefinitionId()).activity("task").done());
+    assertThat(tree).hasStructure(
+        describeActivityInstanceTree(instance.getProcessDefinitionId())
+          .activity("task")
+        .done());
   }
 
   @Deployment
@@ -448,11 +460,20 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
 
     // then (1)
     ExecutionTree executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
-    assertThat(executionTree).matches(describeExecutionTree(null).scope().child("task1").concurrent().noScope().up().child("task2").concurrent().noScope().up()
-        .child("subProcess").eventScope().scope().up().done());
+    assertThat(executionTree).matches(
+        describeExecutionTree(null)
+        .scope()
+          .child("task1").concurrent().noScope().up()
+          .child("task2").concurrent().noScope().up()
+          .child("subProcess").eventScope().scope().up()
+        .done());
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstanceId);
-    assertThat(tree).hasStructure(describeActivityInstanceTree(instance.getProcessDefinitionId()).activity("task1").activity("task2").done());
+    assertThat(tree).hasStructure(
+        describeActivityInstanceTree(instance.getProcessDefinitionId())
+          .activity("task1")
+          .activity("task2")
+        .done());
 
     // when (2)
     taskId = taskService.createTaskQuery().taskDefinitionKey("task1").singleResult().getId();
@@ -460,10 +481,17 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
 
     // then (2)
     executionTree = ExecutionTree.forExecution(processInstanceId, processEngine);
-    assertThat(executionTree).matches(describeExecutionTree("task2").scope().child("subProcess").eventScope().scope().up().done());
+    assertThat(executionTree).matches(
+        describeExecutionTree("task2")
+        .scope()
+          .child("subProcess").eventScope().scope().up()
+        .done());
 
     tree = runtimeService.getActivityInstance(processInstanceId);
-    assertThat(tree).hasStructure(describeActivityInstanceTree(instance.getProcessDefinitionId()).activity("task2").done());
+    assertThat(tree).hasStructure(
+        describeActivityInstanceTree(instance.getProcessDefinitionId())
+          .activity("task2")
+        .done());
 
     // when (3)
     taskId = taskService.createTaskQuery().taskDefinitionKey("task2").singleResult().getId();
@@ -495,6 +523,22 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
     }
 
     assertProcessEnded(processInstance.getId());
+  }
+  
+  @Deployment
+  public void testActivityInstanceTreeForCompensationEndEvent(){
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
+     
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+       describeActivityInstanceTree(processInstance.getProcessDefinitionId())          
+          .activity("undoBookHotel")
+          .activity("undoBookHotel")
+          .activity("undoBookHotel")
+          .activity("undoBookHotel")
+          .activity("undoBookHotel")
+          .activity("end")
+      .done());    
   }
 
 }
