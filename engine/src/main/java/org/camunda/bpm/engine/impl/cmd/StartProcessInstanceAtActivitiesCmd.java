@@ -15,6 +15,9 @@ package org.camunda.bpm.engine.impl.cmd;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import java.util.List;
+import java.util.logging.Logger;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.ProcessInstanceModificationBuilderImpl;
@@ -37,6 +40,9 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
  *
  */
 public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInstance> {
+
+  private static final Logger LOG = Logger.getLogger(StartProcessInstanceAtActivitiesCmd.class.getName());
+  protected static final String INSTRUCTION_LOG_FORMAT = "Starting process instance '%s': Instruction %s: %s";
 
   protected ProcessInstantiationBuilderImpl instantiationBuilder;
 
@@ -89,7 +95,12 @@ public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInsta
     processInstance.setPreserveScope(true);
 
     // apply modifications
-    for (AbstractProcessInstanceModificationCommand instruction : modificationBuilder.getModificationOperations()) {
+    List<AbstractProcessInstanceModificationCommand> instructions = modificationBuilder.getModificationOperations();
+
+    for (int i = 0; i < instructions.size(); i++) {
+      AbstractProcessInstanceModificationCommand instruction = instructions.get(i);
+      logInstruction(processInstance.getId(), i, instruction);
+
       instruction.setProcessInstanceId(processInstance.getId());
       instruction.setSkipCustomListeners(modificationBuilder.isSkipCustomListeners());
       instruction.setSkipIoMappings(modificationBuilder.isSkipIoMappings());
@@ -132,6 +143,10 @@ public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInsta
     }
 
     return null;
+  }
+
+  protected void logInstruction(String processInstanceId, int index, AbstractProcessInstanceModificationCommand instruction) {
+    LOG.info(String.format(INSTRUCTION_LOG_FORMAT, processInstanceId, index, instruction.describe()));
   }
 
 }
