@@ -111,73 +111,136 @@ public abstract class AbstractUserRestServiceQueryTest extends AbstractRestServi
     InOrder inOrder = inOrder(mockQuery);
     inOrder.verify(mockQuery).userFirstName(queryFirstName);
     inOrder.verify(mockQuery).list();
-    
-    String content = response.asString();
-    List<String> instances = from(content).getList("");
-    Assert.assertEquals("There should be one user returned.", 1, instances.size());
-    Assert.assertNotNull("The returned user should not be null.", instances.get(0));
-    
-    String returendLastName = from(content).getString("[0].lastName");
-    String returnedFirstName = from(content).getString("[0].firstName");
-    String returnedEmail = from(content).getString("[0].email");
-    
-    Assert.assertEquals(MockProvider.EXAMPLE_USER_FIRST_NAME, returnedFirstName);
-    Assert.assertEquals(MockProvider.EXAMPLE_USER_LAST_NAME, returendLastName);
-    Assert.assertEquals(MockProvider.EXAMPLE_USER_EMAIL, returnedEmail);
-    
+
+    verifyExampleUserResponse(response);
   }
-  
+
   @Test
   public void testCompleteGetParameters() {
-    
+
     Map<String, String> queryParameters = getCompleteStringQueryParameters();
     queryParameters.put("memberOfGroup", MockProvider.EXAMPLE_GROUP_ID);
-    
+
     RequestSpecification requestSpecification = given().contentType(POST_JSON_CONTENT_TYPE);
     for (Entry<String, String> paramEntry : queryParameters.entrySet()) {
       requestSpecification.parameter(paramEntry.getKey(), paramEntry.getValue());
     }
-    
+
     requestSpecification.expect().statusCode(Status.OK.getStatusCode())
       .when().get(USER_QUERY_URL);
-    
+
     verify(mockQuery).userEmail(MockProvider.EXAMPLE_USER_EMAIL);
     verify(mockQuery).userFirstName(MockProvider.EXAMPLE_USER_FIRST_NAME);
     verify(mockQuery).userLastName(MockProvider.EXAMPLE_USER_LAST_NAME);
     verify(mockQuery).memberOfGroup(MockProvider.EXAMPLE_GROUP_ID);
-    
+
     verify(mockQuery).list();
-    
+
+  }
+
+  @Test
+  public void testFirstNameLikeQuery() {
+    String[] testQueries = new String[] {"first%", "%Name", "%stNa%"};
+
+    for (String testQuery : testQueries) {
+      Response response = given()
+        .queryParam("firstNameLike", testQuery)
+        .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .get(USER_QUERY_URL);
+
+      InOrder inOrder = inOrder(mockQuery);
+      inOrder.verify(mockQuery).userFirstNameLike(testQuery);
+      inOrder.verify(mockQuery).list();
+
+      verifyExampleUserResponse(response);
+    }
+  }
+
+  @Test
+  public void testLastNameLikeQuery() {
+    String[] testQueries = new String[] {"last%", "%Name", "%stNa%"};
+
+    for (String testQuery : testQueries) {
+      Response response = given()
+        .queryParam("lastNameLike", testQuery)
+        .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .get(USER_QUERY_URL);
+
+      InOrder inOrder = inOrder(mockQuery);
+      inOrder.verify(mockQuery).userLastNameLike(testQuery);
+      inOrder.verify(mockQuery).list();
+
+      verifyExampleUserResponse(response);
+    }
+  }
+
+  @Test
+  public void testEmailLikeQuery() {
+    String[] testQueries = new String[] {"test@%", "%example.org", "%@%"};
+
+    for (String testQuery : testQueries) {
+      Response response = given()
+        .queryParam("emailLike", testQuery)
+        .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when()
+        .get(USER_QUERY_URL);
+
+      InOrder inOrder = inOrder(mockQuery);
+      inOrder.verify(mockQuery).userEmailLike(testQuery);
+      inOrder.verify(mockQuery).list();
+
+      verifyExampleUserResponse(response);
+    }
   }
 
   private Map<String, String> getCompleteStringQueryParameters() {
     Map<String, String> parameters = new HashMap<String, String>();
-    
+
     parameters.put("firstName", MockProvider.EXAMPLE_USER_FIRST_NAME);
     parameters.put("lastName", MockProvider.EXAMPLE_USER_LAST_NAME);
     parameters.put("email", MockProvider.EXAMPLE_USER_EMAIL);
-  
+
     return parameters;
   }
-  
+
   @Test
   public void testQueryCount() {
     expect().statusCode(Status.OK.getStatusCode())
       .body("count", equalTo(1))
       .when().get(USER_COUNT_QUERY_URL);
-    
+
     verify(mockQuery).count();
   }
-  
+
   @Test
-  public void testSuccessfulPagination() {    
+  public void testSuccessfulPagination() {
     int firstResult = 0;
     int maxResults = 10;
     given().queryParam("firstResult", firstResult).queryParam("maxResults", maxResults)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(USER_QUERY_URL);
-    
+
     verify(mockQuery).listPage(firstResult, maxResults);
+  }
+
+  protected void verifyExampleUserResponse(Response response) {
+    String content = response.asString();
+    List<String> instances = from(content).getList("");
+    Assert.assertEquals("There should be one user returned.", 1, instances.size());
+    Assert.assertNotNull("The returned user should not be null.", instances.get(0));
+
+    String returendLastName = from(content).getString("[0].lastName");
+    String returnedFirstName = from(content).getString("[0].firstName");
+    String returnedEmail = from(content).getString("[0].email");
+
+    Assert.assertEquals(MockProvider.EXAMPLE_USER_FIRST_NAME, returnedFirstName);
+    Assert.assertEquals(MockProvider.EXAMPLE_USER_LAST_NAME, returendLastName);
+    Assert.assertEquals(MockProvider.EXAMPLE_USER_EMAIL, returnedEmail);
   }
 
   
