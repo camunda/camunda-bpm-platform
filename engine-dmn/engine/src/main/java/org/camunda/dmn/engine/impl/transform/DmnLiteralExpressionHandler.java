@@ -28,9 +28,12 @@ public class DmnLiteralExpressionHandler implements DmnElementHandler<LiteralExp
     if (expressionLanguage != null) {
       dmnExpression.setExpressionLanguage(expressionLanguage.trim());
     }
-    String textContent = expression.getText().getTextContent();
-    if (textContent != null) {
-      dmnExpression.setExpression(textContent.trim());
+    String text = expression.getText();
+    if (text != null) {
+      String textContent = text.getTextContent();
+      if (textContent != null) {
+        dmnExpression.setExpression(textContent.trim());
+      }
     }
     return dmnExpression;
   }
