@@ -2,7 +2,7 @@
 
 <definitions id="definitions" 
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
   
   <process id="taskListenerDelegateExpression">
@@ -12,14 +12,14 @@
     
     <userTask id="task1" name="task1">
       <extensionElements>
-        <activiti:taskListener event="complete" expression="${myTaskListener.calledInExpression(task, task.eventName)}" />
+        <camunda:taskListener event="complete" expression="${myTaskListener.calledInExpression(task, task.eventName)}" />
       </extensionElements>
     </userTask>
     <sequenceFlow id="flow2" sourceRef="task1" targetRef="task2" />
     
     <userTask id="task2" name="task2">
        <extensionElements>
-        <activiti:taskListener event="complete" delegateExpression="${myTaskListener}" />
+        <camunda:taskListener event="complete" delegateExpression="${myTaskListener}" />
       </extensionElements>
     </userTask>
     <sequenceFlow id="flow3" sourceRef="task2" targetRef="task3" />

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions id="definitions"
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:activiti="http://activiti.org/bpmn" 
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn" 
   targetNamespace="Examples">
 
 
@@ -11,7 +11,7 @@
 
     <sequenceFlow sourceRef="start" targetRef="serviceTask" />
 
-    <serviceTask id="serviceTask" activiti:delegateExpression="${failingSLSB}" activiti:async="true" />
+    <serviceTask id="serviceTask" camunda:delegateExpression="${failingSLSB}" camunda:async="true" />
     
     <sequenceFlow sourceRef="serviceTask" targetRef="end" />
 

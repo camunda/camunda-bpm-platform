@@ -5,7 +5,7 @@
              xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" 
              xmlns:signavio="http://www.signavio.com" 
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-             xmlns:activiti="http://activiti.org/bpmn" 
+             xmlns:camunda="http://camunda.org/schema/1.0/bpmn" 
              expressionLanguage="http://www.w3.org/1999/XPath" 
              id="sid-996e5db9-6d63-4134-be9c-6b810964b27e" targetNamespace="Test" typeLanguage="http://www.w3.org/2001/XMLSchema" 
              xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
@@ -16,7 +16,7 @@
         <timeDuration id="sid-9764525c-4649-4842-8b72-52c6452d2a9d" xsi:type="tFormalExpression">PT1S</timeDuration>
       </timerEventDefinition>
     </intermediateCatchEvent>
-    <serviceTask id="sid-435B3DB1-9406-42D6-92B3-E75D2255C958" isForCompensation="false" name="Some Task" activiti:class="org.camunda.bpm.integrationtest.jobexecutor.beans.SampleServiceBean"></serviceTask>
+    <serviceTask id="sid-435B3DB1-9406-42D6-92B3-E75D2255C958" isForCompensation="false" name="Some Task" camunda:class="org.camunda.bpm.integrationtest.jobexecutor.beans.SampleServiceBean"></serviceTask>
     <endEvent id="sid-B20892A3-D34A-41F4-931F-6EDFECF6B6A6"></endEvent>
     <sequenceFlow id="sid-387EF3D6-D24E-4E5E-AFDF-8F1BC91C0414" sourceRef="sid-239F9BB2-874B-492C-93F5-5CFE5DFE7850" targetRef="sid-21E3409F-5A8A-40DD-93FA-2CB17E2BD666"></sequenceFlow>
     <sequenceFlow id="sid-77A13F21-D3D3-4E02-91C5-F4FB8881C20B" sourceRef="sid-21E3409F-5A8A-40DD-93FA-2CB17E2BD666" targetRef="sid-435B3DB1-9406-42D6-92B3-E75D2255C958"></sequenceFlow>
