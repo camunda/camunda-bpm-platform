@@ -14,6 +14,7 @@
 package org.camunda.dmn.engine.impl.transform;
 
 import org.camunda.bpm.model.dmn.instance.LiteralExpression;
+import org.camunda.bpm.model.dmn.instance.Text;
 import org.camunda.dmn.engine.DmnExpression;
 import org.camunda.dmn.engine.impl.DmnExpressionImpl;
 import org.camunda.dmn.engine.transform.DmnElementHandler;
@@ -28,7 +29,7 @@ public class DmnLiteralExpressionHandler implements DmnElementHandler<LiteralExp
     if (expressionLanguage != null) {
       dmnExpression.setExpressionLanguage(expressionLanguage.trim());
     }
-    String text = expression.getText();
+    Text text = expression.getText();
     if (text != null) {
       String textContent = text.getTextContent();
       if (textContent != null) {
