@@ -82,7 +82,7 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
   }
 
   protected void logInstruction(String processInstanceId, int index, AbstractProcessInstanceModificationCommand instruction) {
-    LOG.info(String.format(INSTRUCTION_LOG_FORMAT, processInstanceId, index, instruction.describe()));
+    LOG.info(String.format(INSTRUCTION_LOG_FORMAT, processInstanceId, index + 1, instruction.describe()));
   }
 
   protected String getLogEntryOperation() {

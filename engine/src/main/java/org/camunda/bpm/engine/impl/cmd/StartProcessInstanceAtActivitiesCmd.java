@@ -146,7 +146,7 @@ public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInsta
   }
 
   protected void logInstruction(String processInstanceId, int index, AbstractProcessInstanceModificationCommand instruction) {
-    LOG.info(String.format(INSTRUCTION_LOG_FORMAT, processInstanceId, index, instruction.describe()));
+    LOG.info(String.format(INSTRUCTION_LOG_FORMAT, processInstanceId, index + 1, instruction.describe()));
   }
 
 }
