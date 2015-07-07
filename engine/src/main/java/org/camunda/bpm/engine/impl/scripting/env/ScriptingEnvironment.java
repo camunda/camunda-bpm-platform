@@ -90,6 +90,7 @@ public class ScriptingEnvironment {
 
     // set the script engine manager for the dmn script engine
     if (scriptEngine instanceof DmnScriptEngine) {
+      // TODO: If we also want to set the decision id in the script context we should probably use an own script context per invocation
       scriptEngine.getContext().setAttribute(DmnScriptEngine.SCRIPT_ENGINE_MANAGER_ATTRIBUTE, scriptingEngines.getScriptEngineManager(), ScriptContext.ENGINE_SCOPE);
     }
 

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://activiti.org/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_UxYHsCCqEeWq_dTPinS7Nw" exporter="camunda modeler" exporterVersion="2.7.0" targetNamespace="http://activiti.org/bpmn">
+  <bpmn2:process id="testProcess" isExecutable="true">
+    <bpmn2:startEvent id="startEvent" name="New order&#xA;placed">
+      <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:scriptTask id="scriptTask" camunda:resource="Example.dmn10.xml" camunda:resultVariable="decisionResult" name="Check order" scriptFormat="dmn">
+      <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing>
+    </bpmn2:scriptTask>
+    <bpmn2:sequenceFlow id="SequenceFlow_1" name="" sourceRef="startEvent" targetRef="scriptTask"/>
+    <bpmn2:exclusiveGateway id="gateway" name="Check result?">
+      <bpmn2:incoming>SequenceFlow_2</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_3</bpmn2:outgoing>
+      <bpmn2:outgoing>SequenceFlow_4</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:sequenceFlow id="SequenceFlow_2" name="" sourceRef="scriptTask" targetRef="gateway"/>
+    <bpmn2:sequenceFlow id="SequenceFlow_3" name="notok" sourceRef="gateway" targetRef="rejectTask">
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">${decisionResult.getOutputs()[0].getValue('result') == 'notok'}</bpmn2:conditionExpression>
+    </bpmn2:sequenceFlow>
+    <bpmn2:userTask id="rejectTask" name="Reject order">
+      <bpmn2:incoming>SequenceFlow_3</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_7</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:sequenceFlow id="SequenceFlow_4" name="ok" sourceRef="gateway" targetRef="approveTask">
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">${decisionResult.getOutputs()[0].getValue('result') == 'ok'}</bpmn2:conditionExpression>
+    </bpmn2:sequenceFlow>
+    <bpmn2:userTask id="approveTask" name="Approve order">
+      <bpmn2:incoming>SequenceFlow_4</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_5</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:endEvent id="approvedEndEvent" name="Order&#xA;approved">
+      <bpmn2:incoming>SequenceFlow_5</bpmn2:incoming>
+    </bpmn2:endEvent>
+    <bpmn2:sequenceFlow id="SequenceFlow_5" name="" sourceRef="approveTask" targetRef="approvedEndEvent"/>
+    <bpmn2:endEvent id="rejectedEndEvent" name="Order&#xA;rejected">
+      <bpmn2:incoming>SequenceFlow_7</bpmn2:incoming>
+    </bpmn2:endEvent>
+    <bpmn2:sequenceFlow id="SequenceFlow_7" name="" sourceRef="rejectTask" targetRef="rejectedEndEvent"/>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="testProcess">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="startEvent">
+        <dc:Bounds height="36.0" width="36.0" x="460.0" y="223.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_ScriptTask_2" bpmnElement="scriptTask">
+        <dc:Bounds height="80.0" width="100.0" x="546.0" y="201.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1" sourceElement="_BPMNShape_StartEvent_2" targetElement="_BPMNShape_ScriptTask_2">
+        <di:waypoint xsi:type="dc:Point" x="496.0" y="241.0"/>
+        <di:waypoint xsi:type="dc:Point" x="546.0" y="241.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_ExclusiveGateway_2" bpmnElement="gateway" isMarkerVisible="true">
+        <dc:Bounds height="50.0" width="50.0" x="696.0" y="216.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="21.0" width="86.0" x="756.0" y="231.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_2" bpmnElement="SequenceFlow_2" sourceElement="_BPMNShape_ScriptTask_2" targetElement="_BPMNShape_ExclusiveGateway_2">
+        <di:waypoint xsi:type="dc:Point" x="646.0" y="241.0"/>
+        <di:waypoint xsi:type="dc:Point" x="696.0" y="241.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_ServiceTask_2" bpmnElement="rejectTask">
+        <dc:Bounds height="80.0" width="100.0" x="792.0" y="96.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_3" bpmnElement="SequenceFlow_3" sourceElement="_BPMNShape_ExclusiveGateway_2" targetElement="_BPMNShape_ServiceTask_2">
+        <di:waypoint xsi:type="dc:Point" x="721.0" y="216.0"/>
+        <di:waypoint xsi:type="dc:Point" x="721.0" y="136.0"/>
+        <di:waypoint xsi:type="dc:Point" x="792.0" y="136.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="21.0" width="38.0" x="732.0" y="182.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_ScriptTask_3" bpmnElement="approveTask">
+        <dc:Bounds height="80.0" width="100.0" x="792.0" y="312.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_4" bpmnElement="SequenceFlow_4" sourceElement="_BPMNShape_ExclusiveGateway_2" targetElement="_BPMNShape_ScriptTask_3">
+        <di:waypoint xsi:type="dc:Point" x="721.0" y="266.0"/>
+        <di:waypoint xsi:type="dc:Point" x="721.0" y="352.0"/>
+        <di:waypoint xsi:type="dc:Point" x="792.0" y="352.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="21.0" width="20.0" x="728.0" y="293.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_EndEvent_2" bpmnElement="approvedEndEvent">
+        <dc:Bounds height="36.0" width="36.0" x="942.0" y="334.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_5" bpmnElement="SequenceFlow_5" sourceElement="_BPMNShape_ScriptTask_3" targetElement="_BPMNShape_EndEvent_2">
+        <di:waypoint xsi:type="dc:Point" x="892.0" y="352.0"/>
+        <di:waypoint xsi:type="dc:Point" x="942.0" y="352.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_EndEvent_3" bpmnElement="rejectedEndEvent">
+        <dc:Bounds height="36.0" width="36.0" x="942.0" y="118.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_7" bpmnElement="SequenceFlow_7" sourceElement="_BPMNShape_ServiceTask_2" targetElement="_BPMNShape_EndEvent_3">
+        <di:waypoint xsi:type="dc:Point" x="892.0" y="136.0"/>
+        <di:waypoint xsi:type="dc:Point" x="942.0" y="136.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

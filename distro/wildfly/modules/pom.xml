@@ -190,6 +190,17 @@
                   </mapper>
                 </copy>
 
+                <delete dir="target/modules/org/camunda/dmn" />
+                <copy todir="target/modules" flatten="false">
+                  <fileset refid="maven.project.dependencies" />
+                  <mapper>
+                    <chainedmapper>
+                      <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
+                      <regexpmapper from="^(org.camunda.dmn.*)/((camunda-[A-Za-z-]*)[0-9\.]*).*.jar$$" to="\1/\3${project.version}.jar" handledirsep="yes" />
+                    </chainedmapper>
+                  </mapper>
+                </copy>
+
 
                 <copy todir="target/modules" flatten="false">
                   <fileset dir="src/main/modules" />

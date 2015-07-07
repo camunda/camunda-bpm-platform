@@ -25,10 +25,13 @@
     <module name="org.camunda.bpm.model.camunda-xml-model" />
     <module name="org.camunda.bpm.model.camunda-bpmn-model" />
     <module name="org.camunda.bpm.model.camunda-cmmn-model" />
+    <module name="org.camunda.bpm.model.camunda-dmn-model" />
 
     <module name="org.camunda.commons.camunda-commons-logging" />
     <module name="org.camunda.commons.camunda-commons-utils" />
     <module name="org.camunda.template-engines.camunda-template-engines-freemarker" services="import" />
+
+    <module name="org.camunda.dmn.camunda-scriptengine-dmn" services="import"/>
 
   </dependencies>
 </module>

@@ -32,5 +32,7 @@
     <module name="org.camunda.commons.camunda-commons-utils" />
     <module name="org.camunda.template-engines.camunda-template-engines-freemarker" services="import" />
 
+    <module name="org.camunda.dmn.camunda-scriptengine-dmn" services="import" />
+
   </dependencies>
 </module>

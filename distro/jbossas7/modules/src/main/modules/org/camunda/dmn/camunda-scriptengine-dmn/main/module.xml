@@ -1,0 +1,11 @@
+<module xmlns="urn:jboss:module:1.0" name="org.camunda.dmn.camunda-scriptengine-dmn">
+  <resources>
+    <resource-root path="camunda-scriptengine-dmn-@project.version@.jar" />
+  </resources>
+
+  <dependencies>
+    <module name="javax.api"/>
+    <module name="org.camunda.commons.camunda-commons-utils" />
+    <module name="org.camunda.dmn.camunda-engine-dmn" />
+  </dependencies>
+</module>
