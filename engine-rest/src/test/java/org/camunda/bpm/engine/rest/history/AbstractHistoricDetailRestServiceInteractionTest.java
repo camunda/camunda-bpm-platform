@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.rest.history;
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -32,7 +33,9 @@ import org.camunda.bpm.engine.rest.helper.MockObjectValue;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.helper.VariableTypeHelper;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
+import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -274,6 +277,36 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
   }
 
   @Test
+  public void testBinaryDataForFileVariable() {
+    String filename = "test.txt";
+    byte[] byteContent = "test".getBytes();
+    String encoding = "UTF-8";
+    FileValue variableValue = Variables.fileValue(filename).file(byteContent).mimeType(ContentType.TEXT.toString()).encoding(encoding).create();
+
+    MockHistoricVariableUpdateBuilder builder = MockProvider.mockHistoricVariableUpdate();
+
+    HistoricVariableUpdate detailMock = builder
+        .typedValue(variableValue)
+        .build();
+
+    when(historicDetailQueryMock.detailId(detailMock.getId())).thenReturn(historicDetailQueryMock);
+    when(historicDetailQueryMock.disableCustomObjectDeserialization()).thenReturn(historicDetailQueryMock);
+    when(historicDetailQueryMock.singleResult()).thenReturn(detailMock);
+
+    given().pathParam("id", MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_ID).log().all()
+    .then().expect().log().all()
+      .statusCode(Status.OK.getStatusCode())
+      . body(is(equalTo(new String(byteContent))))
+      .and()
+        .header("Content-Disposition", "attachment; filename="+filename)
+        .contentType(CoreMatchers.<String>either(equalTo(ContentType.TEXT.toString() + ";charset=UTF-8")).or(equalTo(ContentType.TEXT.toString() + "; charset=UTF-8")))
+    .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);
+
+    verify(historicDetailQueryMock, never()).disableBinaryFetching();
+
+  }
+
+  @Test
   public void testBinaryDataForNonBinaryVariable() {
     HistoricVariableUpdate detailMock =  MockProvider.createMockHistoricVariableUpdate();
 
@@ -284,7 +317,7 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
     given().pathParam("id", MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_ID)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body(containsString("Value of variable aHistoricVariableUpdateId is not a binary value"))
+      .body(containsString("Value of Historic detail aHistoricVariableUpdateId is not a binary value"))
     .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);
 
     verify(historicDetailQueryMock, never()).disableBinaryFetching();
@@ -302,7 +335,7 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
 
     given().pathParam("id", nonExistingId)
     .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
-    .body(containsString("Historic detail instance with Id '"+nonExistingId+"' does not exist"))
+    .body(containsString("Historic detail with Id '"+nonExistingId+"' does not exist"))
     .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);
 
     verify(historicDetailQueryMock, never()).disableBinaryFetching();

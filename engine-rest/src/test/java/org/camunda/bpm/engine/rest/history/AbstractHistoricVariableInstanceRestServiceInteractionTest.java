@@ -218,7 +218,7 @@ public abstract class AbstractHistoricVariableInstanceRestServiceInteractionTest
 
     given().pathParam("id", nonExistingId)
     .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
-    .body(containsString("Variable instance with Id 'nonExistingId' does not exist."))
+    .body(containsString("Historic variable instance with Id 'nonExistingId' does not exist."))
     .when().get(VARIABLE_INSTANCE_URL);
 
     verify(variableInstanceQueryMock, times(1)).disableBinaryFetching();
@@ -259,7 +259,7 @@ public abstract class AbstractHistoricVariableInstanceRestServiceInteractionTest
     given().pathParam("id", MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body(containsString("Value of variable "+variableInstanceMock.getId()+" is not a binary value"))
+      .body(containsString("Value of Historic variable instance "+variableInstanceMock.getId()+" is not a binary value"))
     .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);
 
     verify(variableInstanceQueryMock, never()).disableBinaryFetching();

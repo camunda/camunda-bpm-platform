@@ -12,28 +12,32 @@
  */
 package org.camunda.bpm.engine.rest.sub.history;
 
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import org.camunda.bpm.engine.rest.dto.history.HistoricVariableInstanceDto;
 import org.camunda.bpm.engine.rest.sub.VariableResource;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import java.io.InputStream;
 
 /**
  *
  * @author Daniel Meyer
+ * @author Ronny Bräunlich
  */
 public interface HistoricVariableInstanceResource {
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  public HistoricVariableInstanceDto getVariable(
+  public HistoricVariableInstanceDto getResource(
       @QueryParam(VariableResource.DESERIALIZE_VALUE_QUERY_PARAM) @DefaultValue("true") boolean deserializeValue);
 
 
   @GET
   @Path("/data")
-  @Produces(MediaType.APPLICATION_OCTET_STREAM)
-  public InputStream getBinaryVariable();
+  public Response getResourceBinary();
 
 }

@@ -12,83 +12,67 @@
  */
 package org.camunda.bpm.engine.rest.sub.history.impl;
 
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
+import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.rest.dto.history.HistoricDetailDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.sub.AbstractResourceProvider;
 import org.camunda.bpm.engine.rest.sub.history.HistoricDetailResource;
-import org.camunda.bpm.engine.variable.type.ValueType;
-
-import javax.ws.rs.core.Response.Status;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * @author Daniel Meyer
+ * @author Ronny Bräunlich
  *
  */
-public class HistoricDetailResourceImpl implements HistoricDetailResource {
-
-  protected String detailId;
-  protected ProcessEngine engine;
+public class HistoricDetailResourceImpl extends AbstractResourceProvider<HistoricDetailQuery, HistoricDetail, HistoricDetailDto> implements
+    HistoricDetailResource {
 
   public HistoricDetailResourceImpl(String detailId, ProcessEngine engine) {
-    this.detailId = detailId;
-    this.engine = engine;
+    super(detailId, engine);
   }
 
-  public HistoricDetailDto getDetail(boolean deserializeObjectValue) {
+  protected HistoricDetailQuery baseQuery() {
+    return engine.getHistoryService().createHistoricDetailQuery().detailId(getId());
+  }
+
+  @Override
+  protected Query<HistoricDetailQuery, HistoricDetail> baseQueryForBinaryVariable() {
+    return baseQuery().disableCustomObjectDeserialization();
+  }
+
+  @Override
+  protected Query<HistoricDetailQuery, HistoricDetail> baseQueryForVariable(boolean deserializeObjectValue) {
     HistoricDetailQuery query = baseQuery().disableBinaryFetching();
 
     if (!deserializeObjectValue) {
       query.disableCustomObjectDeserialization();
     }
-
-    HistoricDetail detail = query.singleResult();
-
-    if(detail != null) {
-      return HistoricDetailDto.fromHistoricDetail(detail);
-
-    } else {
-      throw new InvalidRequestException(Status.NOT_FOUND, "Historic detail with Id '"+detailId + "' does not exist.");
-
-    }
+    return query;
   }
 
-  public InputStream getBinaryVariable() {
-    HistoricDetail historicDetail = baseQuery()
-        .disableCustomObjectDeserialization()
-        .singleResult();
-    if(historicDetail != null) {
-      if(!(historicDetail instanceof HistoricVariableUpdate)) {
-        throw new InvalidRequestException(Status.BAD_REQUEST, "Historic detail with Id '"+detailId + "' is not a variable update.");
-      }
-
-      HistoricVariableUpdate update = (HistoricVariableUpdate) historicDetail;
-
-      if (ValueType.BYTES.getName().equals(update.getTypeName())) {
-        byte[] valueBytes = (byte[]) update.getValue();
-        if (valueBytes == null) {
-          valueBytes = new byte[0];
-        }
-
-        return new ByteArrayInputStream(valueBytes);
-      } else {
-        throw new InvalidRequestException(Status.BAD_REQUEST,
-            String.format("Value of variable %s is not a binary value.", detailId));
-      }
-
-    } else {
-      throw new InvalidRequestException(Status.NOT_FOUND, "Historic detail instance with Id '"+detailId + "' does not exist.");
+  @Override
+  protected TypedValue transformQueryResultIntoTypedValue(HistoricDetail queryResult) {
+    if (!(queryResult instanceof HistoricVariableUpdate)) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, "Historic detail with Id '" + getId() + "' is not a variable update.");
     }
+    HistoricVariableUpdate update = (HistoricVariableUpdate) queryResult;
+    return update.getTypedValue();
   }
 
-  protected HistoricDetailQuery baseQuery() {
-    return engine.getHistoryService()
-        .createHistoricDetailQuery()
-        .detailId(detailId);
+  @Override
+  protected HistoricDetailDto transformToDto(HistoricDetail queryResult) {
+    return HistoricDetailDto.fromHistoricDetail(queryResult);
+  }
+
+  @Override
+  protected String getResourceNameForErrorMessage() {
+    return "Historic detail";
   }
 
 }
