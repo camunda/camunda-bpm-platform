@@ -45,7 +45,7 @@ public class BpmnParser extends Parser {
   /**
    * The namespace of the camunda custom BPMN extensions.
    */
-  public static final String CAMUNDA_BPMN_EXTENSIONS_NS = "http://camunda.org/bpmn";
+  public static final String CAMUNDA_BPMN_EXTENSIONS_NS = "http://camunda.org/schema/1.0/bpmn";
 
   /**
    * The namespace of the Activiti custom BPMN extensions.
