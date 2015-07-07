@@ -146,30 +146,6 @@ public class TestDmnScriptEngine {
   }
 
   @Test
-  public void shouldEvalFirstDecisionWithDecisionContext() throws ScriptException {
-    DmnScriptEngine dmnScriptEngine = getDmnScriptEngine();
-
-    DmnDecisionContext decisionContext = dmnScriptEngine.getDmnDecisionContext(dmnScriptEngine.getContext());
-    DmnVariableContext variableContext = decisionContext.getVariableContextChecked();
-
-    variableContext.setVariable("status", "bronze");
-
-    DmnDecisionResult result = dmnScriptEngine.eval(EXAMPLE_DMN_SCRIPT, decisionContext);
-    assertThat(result).hasSingleOutput().hasEntry("result", "notok");
-
-    result = dmnScriptEngine.eval(getExampleDmnReader(), decisionContext);
-    assertThat(result).hasSingleOutput().hasEntry("result", "notok");
-
-    variableContext.setVariable("status", "gold");
-
-    result = dmnScriptEngine.eval(EXAMPLE_DMN_SCRIPT, decisionContext);
-    assertThat(result).hasSingleOutput().hasEntry("result", "ok");
-
-    result = dmnScriptEngine.eval(getExampleDmnReader(), decisionContext);
-    assertThat(result).hasSingleOutput().hasEntry("result", "ok");
-  }
-
-  @Test
   public void shouldEvalDecisionById() throws ScriptException {
     DmnScriptEngine dmnScriptEngine = getDmnScriptEngine();
 
@@ -315,42 +291,6 @@ public class TestDmnScriptEngine {
     assertThat(result).hasSingleOutput().hasEntry("result", "notok");
 
     result = dmnScriptEngine.eval(getExampleDmnReader(), SECOND_DECISION, scriptContext);
-    assertThat(result).hasSingleOutput().hasEntry("result", "notok");
-  }
-
-  @Test
-  public void shouldEvalDecisionByIdWithDecisionContext() throws ScriptException {
-    DmnScriptEngine dmnScriptEngine = getDmnScriptEngine();
-
-    DmnDecisionContext decisionContext = dmnScriptEngine.getDmnDecisionContext(dmnScriptEngine.getContext());
-    DmnVariableContext variableContext = decisionContext.getVariableContextChecked();
-
-    variableContext.setVariable("status", "bronze");
-
-    DmnDecisionResult result = dmnScriptEngine.eval(EXAMPLE_DMN_SCRIPT, FIRST_DECISION, decisionContext);
-    assertThat(result).hasSingleOutput().hasEntry("result", "notok");
-
-    result = dmnScriptEngine.eval(getExampleDmnReader(), FIRST_DECISION, decisionContext);
-    assertThat(result).hasSingleOutput().hasEntry("result", "notok");
-
-    result = dmnScriptEngine.eval(EXAMPLE_DMN_SCRIPT, SECOND_DECISION, decisionContext);
-    assertThat(result).hasSingleOutput().hasEntry("result", "ok");
-
-    result = dmnScriptEngine.eval(getExampleDmnReader(), SECOND_DECISION, decisionContext);
-    assertThat(result).hasSingleOutput().hasEntry("result", "ok");
-
-    variableContext.setVariable("status", "gold");
-
-    result = dmnScriptEngine.eval(EXAMPLE_DMN_SCRIPT, FIRST_DECISION, decisionContext);
-    assertThat(result).hasSingleOutput().hasEntry("result", "ok");
-
-    result = dmnScriptEngine.eval(getExampleDmnReader(), FIRST_DECISION, decisionContext);
-    assertThat(result).hasSingleOutput().hasEntry("result", "ok");
-
-    result = dmnScriptEngine.eval(EXAMPLE_DMN_SCRIPT, SECOND_DECISION, decisionContext);
-    assertThat(result).hasSingleOutput().hasEntry("result", "notok");
-
-    result = dmnScriptEngine.eval(getExampleDmnReader(), SECOND_DECISION, decisionContext);
     assertThat(result).hasSingleOutput().hasEntry("result", "notok");
   }
 

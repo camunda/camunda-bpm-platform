@@ -104,20 +104,13 @@ public class DmnScriptEngine extends AbstractScriptEngine implements Compilable 
 
   public DmnDecisionResult eval(String script, String decisionId, ScriptContext context) throws ScriptException {
     DmnDecisionContext decisionContext = getDmnDecisionContext(context);
-    return eval(script, decisionId, decisionContext);
-  }
-
-  public DmnDecisionResult eval(String script, DmnDecisionContext context) throws ScriptException {
-    return eval(script, null, context);
-  }
-
-  public DmnDecisionResult eval(String script, String decisionId, DmnDecisionContext context) throws ScriptException {
     DmnDecisionModel dmnDecisionModel = parseDmnDecisionModel(script);
+
     if (decisionId != null) {
-      return dmnDecisionModel.evaluate(decisionId, context);
+      return dmnDecisionModel.evaluate(decisionId, decisionContext);
     }
     else {
-      return dmnDecisionModel.evaluate(context);
+      return dmnDecisionModel.evaluate(decisionContext);
     }
   }
 
@@ -146,15 +139,6 @@ public class DmnScriptEngine extends AbstractScriptEngine implements Compilable 
   }
 
   public DmnDecisionResult eval(Reader reader, String decisionId, ScriptContext context) throws ScriptException {
-    DmnDecisionContext decisionContext = getDmnDecisionContext(context);
-    return eval(reader, decisionId, decisionContext);
-  }
-
-  public DmnDecisionResult eval(Reader reader, DmnDecisionContext context) throws ScriptException {
-    return eval(reader, null, context);
-  }
-
-  public DmnDecisionResult eval(Reader reader, String decisionId, DmnDecisionContext context) throws ScriptException {
     String script = getScriptFromReader(reader);
     return eval(script, decisionId, context);
   }
@@ -164,9 +148,11 @@ public class DmnScriptEngine extends AbstractScriptEngine implements Compilable 
   }
 
   public ScriptEngineFactory getFactory() {
-    synchronized (this) {
-      if (scriptEngineFactory == null) {
-        scriptEngineFactory = new DmnScriptEngineFactory();
+    if (scriptEngineFactory == null) {
+      synchronized (this) {
+        if (scriptEngineFactory == null) {
+          scriptEngineFactory = new DmnScriptEngineFactory();
+        }
       }
     }
     return scriptEngineFactory;
