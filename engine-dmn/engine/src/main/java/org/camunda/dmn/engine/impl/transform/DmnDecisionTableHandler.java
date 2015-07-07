@@ -62,15 +62,23 @@ public class DmnDecisionTableHandler implements DmnElementHandler<DecisionTable,
   }
 
   protected void transformClause(Clause clause) {
-    if (clause.getInputExpression() != null) {
+    if (isInputClause(clause)) {
       transformInputClause(clause);
     }
-    else if (clause.getOutputDefinition() != null) {
+    else if (isOutputClause(clause)) {
       transformOutputClause(clause);
     }
     else {
       LOG.ignoringClause(clause);
     }
+  }
+
+  protected boolean isInputClause(Clause clause) {
+    return clause.getInputExpression() != null || !clause.getInputEntries().isEmpty();
+  }
+
+  protected boolean isOutputClause(Clause clause) {
+    return clause.getOutputDefinition() != null || !clause.getOutputEntries().isEmpty();
   }
 
   protected void transformInputClause(Clause clause) {
