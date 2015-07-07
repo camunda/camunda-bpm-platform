@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.examples.bpmn.tasklistener.RecorderTaskListener;
 import org.camunda.bpm.engine.test.util.TestExecutionListener;
 
 /**
@@ -118,6 +119,29 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     assertTrue(TestExecutionListener.collectedEvents.size() == 0);
     TestExecutionListener.reset();
 
+  }
+
+  public void testDeleteDeploymentSkipCustomTaskListeners() {
+    DeploymentBuilder deploymentBuilder =
+        repositoryService
+          .createDeployment()
+          .addClasspathResource("org/camunda/bpm/engine/test/api/repository/RepositoryServiceTest.testDeleteProcessInstanceSkipCustomTaskListeners.bpmn20.xml");
+
+    String deploymentId = deploymentBuilder.deploy().getId();
+
+    runtimeService.startProcessInstanceByKey("testProcess");
+
+    repositoryService.deleteDeployment(deploymentId, true, false);
+    assertTrue(RecorderTaskListener.getRecordedEvents().size() == 1);
+    RecorderTaskListener.clear();
+
+    deploymentId = deploymentBuilder.deploy().getId();
+
+    runtimeService.startProcessInstanceByKey("testProcess");
+
+    repositoryService.deleteDeployment(deploymentId, true, true);
+    assertTrue(RecorderTaskListener.getRecordedEvents().isEmpty());
+    RecorderTaskListener.clear();
   }
 
   public void testDeleteDeploymentNullDeploymentId() {
