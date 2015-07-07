@@ -60,6 +60,7 @@ public class JobPrioritizationTest extends AbstractFoxPlatformIntegrationTest {
   public static WebArchive createDeployment() {
     return initWebArchiveDeployment("pa1.war", "org/camunda/bpm/integrationtest/jobexecutor/jobPriorityEngine.xml")
       .addClass(PriorityBean.class)
+      .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/JobPrioritizationTest.priorityProcess.bpmn20.xml")
       .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/JobPrioritizationTest.serviceTask.bpmn20.xml")
       .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/JobPrioritizationTest.userTask.bpmn20.xml")
       .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/JobPrioritizationTest.intermediateMessage.bpmn20.xml");
@@ -71,6 +72,18 @@ public class JobPrioritizationTest extends AbstractFoxPlatformIntegrationTest {
     if (processInstance != null) {
       runtimeService1.deleteProcessInstance(processInstance.getId(), "");
     }
+  }
+
+  @Test
+  public void testPriorityOnProcessElement() {
+    // given
+    processInstance = runtimeService1.startProcessInstanceByKey("priorityProcess");
+
+    Job job = managementService1.createJobQuery().singleResult();
+
+    // then
+    Assert.assertEquals(PriorityBean.PRIORITY, job.getPriority());
+
   }
 
   @Test
