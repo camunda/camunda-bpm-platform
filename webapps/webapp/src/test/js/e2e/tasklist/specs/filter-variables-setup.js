@@ -1,10 +1,17 @@
 'use strict';
 
-var fs = require('fs');
+var fs = require('fs'),
+    factory = require('../../setup-factory.js'),
+    combine = factory.combine,
+    operation = factory.operation;
 
-var ops = module.exports = {};
-ops.filter = {
-  create: [{
+module.exports = {
+
+  setup1:
+
+combine(
+  operation('filter', 'create', [
+  {
     name:         'Empty Filter',
     query: {},
     properties: {
@@ -25,21 +32,19 @@ ops.filter = {
       }],
     },
     resourceType: 'Task'
-  }]
-};
+  }]),
 
-ops.deployment = {
-  create: [{
+  operation('deployment', 'create', [
+  {
     deploymentName:  'user-tasks',
     files:           [{
       name: 'user-tasks.bpmn',
       content: fs.readFileSync(__dirname + '/../../resources/user-tasks.bpmn').toString()
     }]
-  }]
-};
+  }]),
 
-ops['process-definition'] = {
-  start: [{
+  operation('process-definition', 'start', [
+  {
     key: 'user-tasks',
     businessKey: 'Instance1',
     variables: {
@@ -56,5 +61,5 @@ ops['process-definition'] = {
           type: 'Long'
       }
     }
-  }]
-};
+  }])
+)};
