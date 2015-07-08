@@ -17,7 +17,7 @@ module.exports = function (operations, noReset, done) {
     // testHelper(function(){ console.log('setup complete'); });
     done = operations;
     noReset = false;
-    operations = {};
+    operations = [];
   } else if (arguments.length === 1 && typeof operations === 'object') {
     // testHelper(setupObject);
     noReset = false;
