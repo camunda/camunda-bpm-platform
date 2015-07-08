@@ -32,6 +32,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.repository.ResourceDefinitionEntity;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 
 
@@ -39,7 +40,7 @@ import org.camunda.bpm.engine.task.IdentityLinkType;
  * @author Tom Baeyens
  * @author Daniel Meyer
  */
-public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements ProcessDefinition, DbEntity, HasDbRevision {
+public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements ProcessDefinition, ResourceDefinitionEntity, DbEntity, HasDbRevision {
 
   private static final long serialVersionUID = 1L;
 

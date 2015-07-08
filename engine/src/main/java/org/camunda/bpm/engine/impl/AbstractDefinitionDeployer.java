@@ -1,0 +1,293 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.camunda.bpm.engine.impl;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
+
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.IdGenerator;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
+import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
+import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
+import org.camunda.bpm.engine.repository.ResourceDefinitionEntity;
+
+public abstract class AbstractDefinitionDeployer<DefinitionEntity extends ResourceDefinitionEntity> implements Deployer {
+
+  private static final Logger LOG = Logger.getLogger(AbstractDefinitionDeployer.class.getName());
+
+  public static final String[] DIAGRAM_SUFFIXES = new String[] { "png", "jpg", "gif", "svg" };
+
+  protected IdGenerator idGenerator;
+
+  public IdGenerator getIdGenerator() {
+    return idGenerator;
+  }
+
+  public void setIdGenerator(IdGenerator idGenerator) {
+    this.idGenerator = idGenerator;
+  }
+
+  public void deploy(DeploymentEntity deployment) {
+    LOG.fine("Processing deployment " + deployment.getName());
+    List<DefinitionEntity> definitions = parseDefinitionResources(deployment);
+    ensureNoDuplicateDefinitionKeys(definitions);
+    postProcessDefinitions(deployment, definitions);
+  }
+
+  protected List<DefinitionEntity> parseDefinitionResources(DeploymentEntity deployment) {
+    List<DefinitionEntity> definitions = new ArrayList<DefinitionEntity>();
+    for (ResourceEntity resource : deployment.getResources().values()) {
+      LOG.fine("Processing resource " + resource.getName());
+      if (isResourceHandled(resource)) {
+        definitions.addAll(transformResource(deployment, resource));
+      }
+    }
+    return definitions;
+  }
+
+  protected boolean isResourceHandled(ResourceEntity resource) {
+    String resourceName = resource.getName();
+
+    for (String suffix : getResourcesSuffixes()) {
+      if (resourceName.endsWith(suffix)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  protected abstract String[] getResourcesSuffixes();
+
+  protected Collection<? extends DefinitionEntity> transformResource(DeploymentEntity deployment, ResourceEntity resource) {
+    String resourceName = resource.getName();
+    List<DefinitionEntity> definitions = transformDefinitions(deployment, resource);
+
+    for (DefinitionEntity definition : definitions) {
+      definition.setResourceName(resourceName);
+
+      String diagramResourceName = getDiagramResourceForDefinition(deployment, resourceName, definition, deployment.getResources());
+      if (diagramResourceName != null) {
+        LOG.fine("Setting diagram for definition " + definition.getKey() + " to " + diagramResourceName);
+        definition.setDiagramResourceName(diagramResourceName);
+      }
+    }
+
+    return definitions;
+  }
+
+  protected abstract List<DefinitionEntity> transformDefinitions(DeploymentEntity deployment, ResourceEntity resource);
+
+  /**
+   * Returns the default name of the image resource for a certain definition.
+   *
+   * It will first look for an image resource which matches the definition
+   * specifically, before resorting to an image resource which matches the file
+   * containing the definition.
+   *
+   * Example: if the deployment contains a BPMN 2.0 xml resource called
+   * 'abc.bpmn20.xml' containing only one process with key 'myProcess', then
+   * this method will look for an image resources called 'abc.myProcess.png'
+   * (or .jpg, or .gif, etc.) or 'abc.png' if the previous one wasn't found.
+   *
+   * Example 2: if the deployment contains a BPMN 2.0 xml resource called
+   * 'abc.bpmn20.xml' containing three processes (with keys a, b and c),
+   * then this method will first look for an image resource called 'abc.a.png'
+   * before looking for 'abc.png' (likewise for b and c).
+   * Note that if abc.a.png, abc.b.png and abc.c.png don't exist, all
+   * processes will have the same image: abc.png.
+   *
+   * @return null if no matching image resource is found.
+   */
+  protected String getDiagramResourceForDefinition(DeploymentEntity deployment, String resourceName, DefinitionEntity definition, Map<String, ResourceEntity> resources) {
+    for (String diagramSuffix: getDiagramSuffixes()) {
+      String definitionDiagramResource = getDefinitionDiagramResourceName(resourceName, definition, diagramSuffix);
+      String diagramForFileResource = getGeneralDiagramResourceName(resourceName, definition, diagramSuffix);
+      if (resources.containsKey(definitionDiagramResource)) {
+        return definitionDiagramResource;
+      } else if (resources.containsKey(diagramForFileResource)) {
+        return diagramForFileResource;
+      }
+    }
+    return null;
+
+  }
+
+  protected String getDefinitionDiagramResourceName(String resourceName, DefinitionEntity definition, String diagramSuffix) {
+    String fileResourceBase = stripDefinitionFileSuffix(resourceName);
+    String definitionKey = definition.getKey();
+
+    return fileResourceBase + definitionKey + "." + diagramSuffix;
+  }
+
+  protected String getGeneralDiagramResourceName(String resourceName, DefinitionEntity definition, String diagramSuffix) {
+    String fileResourceBase = stripDefinitionFileSuffix(resourceName);
+
+    return fileResourceBase + diagramSuffix;
+  }
+
+  protected String stripDefinitionFileSuffix(String resourceName) {
+    for (String suffix : getResourcesSuffixes()) {
+      if(resourceName.endsWith(suffix)) {
+        return resourceName.substring(0, resourceName.length() - suffix.length());
+      }
+    }
+    return resourceName;
+  }
+
+  protected String[] getDiagramSuffixes() {
+    return DIAGRAM_SUFFIXES;
+  }
+
+  protected void ensureNoDuplicateDefinitionKeys(List<DefinitionEntity> definitions) {
+    Set<String> keys = new HashSet<String>();
+
+    for (DefinitionEntity definition : definitions) {
+
+      String key = definition.getKey();
+
+      if (keys.contains(key)) {
+        throw new ProcessEngineException("The deployment contains definitions with the same key '" + key + "' (id attribute), this is not allowed");
+      }
+
+      keys.add(key);
+    }
+  }
+
+  protected void postProcessDefinitions(DeploymentEntity deployment, List<DefinitionEntity> definitions) {
+    if (deployment.isNew()) {
+      // if the deployment is new persist the new definitions
+      persistDefinitions(deployment, definitions);
+    } else {
+      // if the current deployment is not a new one,
+      // then load the already existing definitions
+      loadDefinitions(deployment, definitions);
+    }
+  }
+
+  protected void persistDefinitions(DeploymentEntity deployment, List<DefinitionEntity> definitions) {
+    for (DefinitionEntity definition : definitions) {
+      String definitionKey = definition.getKey();
+
+      DefinitionEntity latestDefinition = findLatestDefinitionByKey(definitionKey);
+
+      updateDefinitionByLatestDefinition(deployment, definition, latestDefinition);
+
+      persistDefinition(definition);
+      registerDefinition(deployment, definition);
+    }
+  }
+
+  protected void updateDefinitionByLatestDefinition(DeploymentEntity deployment, DefinitionEntity definition, DefinitionEntity latestDefinition) {
+    definition.setVersion(getNextVersion(deployment, definition, latestDefinition));
+    definition.setId(generateDefinitionId(deployment, definition, latestDefinition));
+    definition.setDeploymentId(deployment.getId());
+  }
+
+  protected void loadDefinitions(DeploymentEntity deployment, List<DefinitionEntity> definitions) {
+    for (DefinitionEntity definition : definitions) {
+      String deploymentId = deployment.getId();
+      String definitionKey = definition.getKey();
+
+      DefinitionEntity persistedDefinition = findDefinitionByDeploymentAndKey(deploymentId, definitionKey);
+
+      updateDefinitionByPersistedDefinition(deployment, definition, persistedDefinition);
+
+      registerDefinition(deployment, definition);
+    }
+  }
+
+  protected void updateDefinitionByPersistedDefinition(DeploymentEntity deployment, DefinitionEntity definition, DefinitionEntity persistedDefinition) {
+    definition.setVersion(persistedDefinition.getVersion());
+    definition.setId(persistedDefinition.getId());
+    definition.setDeploymentId(deployment.getId());
+  }
+
+  protected abstract DefinitionEntity findDefinitionByDeploymentAndKey(String deploymentId, String definitionKey);
+
+  protected abstract DefinitionEntity findLatestDefinitionByKey(String definitionKey);
+
+  protected abstract void persistDefinition(DefinitionEntity definition);
+
+  protected void registerDefinition(DeploymentEntity deployment, DefinitionEntity definition) {
+    DeploymentCache deploymentCache = getDeploymentCache();
+
+    // Add to cache
+    addDefinitionToDeploymentCache(deploymentCache, definition);
+
+    // Add to deployment for further usage
+    deployment.addDeployedArtifact(definition);
+  }
+
+  protected abstract void addDefinitionToDeploymentCache(DeploymentCache deploymentCache, DefinitionEntity definition);
+
+  /**
+   * per default we increment the latest definition version by one - but you
+   * might want to hook in some own logic here, e.g. to align definition
+   * versions with deployment / build versions.
+   */
+  protected int getNextVersion(DeploymentEntity deployment, DefinitionEntity newDefinition, DefinitionEntity latestDefinition) {
+    int result = 1;
+    if (latestDefinition != null) {
+      int latestVersion = latestDefinition.getVersion();
+      result = latestVersion + 1;
+    }
+    return result;
+  }
+
+  /**
+   * create an id for the definition. The default is to ask the {@link IdGenerator}
+   * and add the definition key and version if that does not exceed 64 characters.
+   * You might want to hook in your own implementation here.
+   */
+  protected String generateDefinitionId(DeploymentEntity deployment, DefinitionEntity newDefinition, DefinitionEntity latestDefinition) {
+    String nextId = idGenerator.getNextId();
+
+    String definitionKey = newDefinition.getKey();
+    int definitionVersion = newDefinition.getVersion();
+
+    String definitionId = definitionKey
+      + ":" + definitionVersion
+      + ":" + nextId;
+
+    // ACT-115: maximum id length is 64 characters
+    if (definitionId.length() > 64) {
+      definitionId = nextId;
+    }
+    return definitionId;
+  }
+
+  protected ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
+    return Context.getProcessEngineConfiguration();
+  }
+
+  protected CommandContext getCommandContext() {
+    return Context.getCommandContext();
+  }
+
+  protected DeploymentCache getDeploymentCache() {
+    return getProcessEngineConfiguration().getDeploymentCache();
+  }
+
+}

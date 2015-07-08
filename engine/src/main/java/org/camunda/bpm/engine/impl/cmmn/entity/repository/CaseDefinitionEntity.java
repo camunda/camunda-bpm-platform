@@ -20,14 +20,16 @@ import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinition;
+import org.camunda.bpm.engine.repository.ResourceDefinitionEntity;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefinition, DbEntity, HasDbRevision {
+public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefinition, ResourceDefinitionEntity, DbEntity, HasDbRevision {
 
   private static final long serialVersionUID = 1L;
 
