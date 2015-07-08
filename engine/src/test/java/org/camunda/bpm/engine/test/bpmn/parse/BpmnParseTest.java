@@ -16,8 +16,8 @@ package org.camunda.bpm.engine.test.bpmn.parse;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.behavior.CompensationEndEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -371,16 +371,45 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testParseCompensationEndEvent() {
-    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    assertNotNull(processDefinition);
-
-    ProcessDefinitionEntity cachedProcessDefinition = processEngineConfiguration.getDeploymentCache().getProcessDefinitionCache()
-        .get(processDefinition.getId());
-    ActivityImpl endEvent = cachedProcessDefinition.findActivity("end");
+    ActivityImpl endEvent = findActivityInDeployedProcessDefinition("end");
 
     assertEquals("compensationEndEvent", endEvent.getProperty("type"));
     assertEquals(Boolean.TRUE, endEvent.getProperty(BpmnParse.PROPERTYNAME_THROWS_COMPENSATION));
     assertEquals(CompensationEndEventActivityBehavior.class, endEvent.getActivityBehavior().getClass());
+  }
+  
+  @Deployment
+  public void testParseAsyncMultiInstanceBody(){
+    ActivityImpl innerTask = findActivityInDeployedProcessDefinition("miTask");    
+    ActivityImpl miBody = innerTask.getParentFlowScopeActivity();
+    
+    assertTrue(miBody.isAsyncBefore());
+    assertTrue(miBody.isAsyncAfter());  
+    
+    assertFalse(innerTask.isAsyncBefore());
+    assertFalse(innerTask.isAsyncAfter());
+  }
+  
+  @Deployment
+  public void testParseAsyncActivityWrappedInMultiInstanceBody(){
+    ActivityImpl innerTask = findActivityInDeployedProcessDefinition("miTask");  
+    assertTrue(innerTask.isAsyncBefore());
+    assertTrue(innerTask.isAsyncAfter());  
+   
+    ActivityImpl miBody = innerTask.getParentFlowScopeActivity();
+    assertFalse(miBody.isAsyncBefore());
+    assertFalse(miBody.isAsyncAfter());
+  }
+  
+  @Deployment
+  public void testParseAsyncActivityWrappedInMultiInstanceBodyWithAsyncMultiInstance(){
+    ActivityImpl innerTask = findActivityInDeployedProcessDefinition("miTask");       
+    assertEquals(true, innerTask.isAsyncBefore());
+    assertEquals(false, innerTask.isAsyncAfter());  
+    
+    ActivityImpl miBody = innerTask.getParentFlowScopeActivity();    
+    assertEquals(false, miBody.isAsyncBefore());
+    assertEquals(true, miBody.isAsyncAfter());    
   }
 
   public void testParseSwitchedSourceAndTargetRefsForAssociations() {
@@ -404,6 +433,16 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     for (int i = 0; i < waypoints.length; i++) {
       assertEquals(waypoints[i], sequenceFlow.getWaypoints().get(i));
     }
+  }
+  
+  protected ActivityImpl findActivityInDeployedProcessDefinition(String activityId) {
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    assertNotNull(processDefinition);
+
+    ProcessDefinitionEntity cachedProcessDefinition = processEngineConfiguration.getDeploymentCache()
+                                                        .getProcessDefinitionCache()
+                                                        .get(processDefinition.getId());
+    return cachedProcessDefinition.findActivity(activityId);
   }
 
 }

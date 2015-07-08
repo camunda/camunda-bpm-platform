@@ -736,7 +736,7 @@ public class BpmnParse extends Parse {
     for (Element startEventElement : startEventElements) {
 
       ActivityImpl startEventActivity = createActivityOnScope(startEventElement, scope);
-      parseAsynchronousContinuation(startEventElement, startEventActivity);
+      parseAsynchronousContinuationForActivity(startEventElement, startEventActivity);
 
       if (scope instanceof ProcessDefinitionEntity) {
         parseProcessDefinitionStartEvent(startEventActivity, startEventElement, parentElement, scope);
@@ -1157,7 +1157,7 @@ public class BpmnParse extends Parse {
     // shared by all events except for link event
     IntermediateCatchEventActivityBehavior defaultCatchBehaviour = new IntermediateCatchEventActivityBehavior(eventBasedGateway != null);
 
-    parseAsynchronousContinuation(intermediateEventElement, nestedActivity);
+    parseAsynchronousContinuationForActivity(intermediateEventElement, nestedActivity);
 
     if (eventBasedGateway != null) {
       nestedActivity.setEventScope(eventBasedGateway);
@@ -1264,7 +1264,7 @@ public class BpmnParse extends Parse {
     ActivityImpl nestedActivityImpl = createActivityOnScope(intermediateEventElement, scopeElement);
     ActivityBehavior activityBehavior = null;
 
-    parseAsynchronousContinuation(intermediateEventElement, nestedActivityImpl);
+    parseAsynchronousContinuationForActivity(intermediateEventElement, nestedActivityImpl);
 
     if (signalEventDefinitionElement != null) {
       nestedActivityImpl.setProperty("type", "intermediateSignalThrow");
@@ -1546,7 +1546,7 @@ public class BpmnParse extends Parse {
     ActivityImpl activity = createActivityOnScope(exclusiveGwElement, scope);
     activity.setActivityBehavior(new ExclusiveGatewayActivityBehavior());
 
-    parseAsynchronousContinuation(exclusiveGwElement, activity);
+    parseAsynchronousContinuationForActivity(exclusiveGwElement, activity);
 
     parseExecutionListenersOnScope(exclusiveGwElement, activity);
 
@@ -1563,7 +1563,7 @@ public class BpmnParse extends Parse {
     ActivityImpl activity = createActivityOnScope(inclusiveGwElement, scope);
     activity.setActivityBehavior(new InclusiveGatewayActivityBehavior());
 
-    parseAsynchronousContinuation(inclusiveGwElement, activity);
+    parseAsynchronousContinuationForActivity(inclusiveGwElement, activity);
 
     parseExecutionListenersOnScope(inclusiveGwElement, activity);
 
@@ -1578,7 +1578,7 @@ public class BpmnParse extends Parse {
     activity.setActivityBehavior(new EventBasedGatewayActivityBehavior());
     activity.setScope(true);
 
-    parseAsynchronousContinuation(eventBasedGwElement, activity);
+    parseAsynchronousContinuationForActivity(eventBasedGwElement, activity);
 
     if (activity.isAsyncAfter()) {
       addError("'asyncAfter' not supported for " + eventBasedGwElement.getTagName() + " elements.", eventBasedGwElement);
@@ -1627,7 +1627,7 @@ public class BpmnParse extends Parse {
     ActivityImpl activity = createActivityOnScope(parallelGwElement, scope);
     activity.setActivityBehavior(new ParallelGatewayActivityBehavior());
 
-    parseAsynchronousContinuation(parallelGwElement, activity);
+    parseAsynchronousContinuationForActivity(parallelGwElement, activity);
 
     parseExecutionListenersOnScope(parallelGwElement, activity);
 
@@ -1646,7 +1646,7 @@ public class BpmnParse extends Parse {
     ScriptTaskActivityBehavior activityBehavior = parseScriptTaskElement(scriptTaskElement);
 
     if (activityBehavior != null) {
-      parseAsynchronousContinuation(scriptTaskElement, activity);
+      parseAsynchronousContinuationForActivity(scriptTaskElement, activity);
 
       activity.setActivityBehavior(activityBehavior);
 
@@ -1718,7 +1718,7 @@ public class BpmnParse extends Parse {
       resultVariableName = serviceTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "resultVariableName");
     }
 
-    parseAsynchronousContinuation(serviceTaskElement, activity);
+    parseAsynchronousContinuationForActivity(serviceTaskElement, activity);
 
     if (type != null) {
       if (type.equalsIgnoreCase("mail")) {
@@ -1768,19 +1768,39 @@ public class BpmnParse extends Parse {
     return parseServiceTaskLike("businessRuleTask", businessRuleTaskElement, scope);
   }
 
-  protected void parseAsynchronousContinuation(Element element, ActivityImpl activity) {
-
-    boolean isAsyncBefore = isAsyncBefore(element);
-    boolean isAsyncAfter = isAsyncAfter(element);
-    boolean exclusive = isExclusive(element);
-
-    // can't use #getMultiInstanceScope here to determine whether the task is
-    // multi-instance,
+  /**
+   * Parse async continuation of an activity and create async jobs for the activity. 
+   * <br/> <br/>
+   * When the activity is marked as multi instance, then async jobs create instead for the multi instance body.
+   * When the wrapped activity has async characteristics in 'multiInstanceLoopCharacteristics' element, 
+   * then async jobs create additionally for the wrapped activity. 
+   */
+  protected void parseAsynchronousContinuationForActivity(Element activityElement, ActivityImpl activity) {
+    // can't use #getMultiInstanceScope here to determine whether the task is multi-instance,
     // since the property hasn't been set yet (cf parseActivity)
     ActivityImpl parentFlowScopeActivity = activity.getParentFlowScopeActivity();
     if (parentFlowScopeActivity != null && parentFlowScopeActivity.getActivityBehavior() instanceof MultiInstanceActivityBehavior) {
-      activity = parentFlowScopeActivity;
+      
+      parseAsynchronousContinuation(activityElement, parentFlowScopeActivity);
+      
+      Element miLoopCharacteristics = activityElement.element("multiInstanceLoopCharacteristics");
+      parseAsynchronousContinuation(miLoopCharacteristics, activity);
+    } else {
+      parseAsynchronousContinuation(activityElement, activity);
     }
+  }
+  
+  /**
+   * Parse async continuation of the given element and create async jobs for the activity. 
+   * 
+   * @param element with async characteristics
+   * @param activity 
+   */
+  protected void parseAsynchronousContinuation(Element element, ActivityImpl activity) {
+  
+    boolean isAsyncBefore = isAsyncBefore(element);
+    boolean isAsyncAfter = isAsyncAfter(element);
+    boolean exclusive = isExclusive(element);
 
     // set properties on activity
     activity.setAsyncBefore(isAsyncBefore);
@@ -1795,7 +1815,6 @@ public class BpmnParse extends Parse {
 
       addMessageJobDeclarationToActivity(messageJobDeclaration, activity);
       addJobDeclarationToProcessDefinition(messageJobDeclaration, activity.getProcessDefinition());
-
     }
 
     if (isAsyncAfter) {
@@ -1807,9 +1826,22 @@ public class BpmnParse extends Parse {
 
       addMessageJobDeclarationToActivity(messageJobDeclaration, activity);
       addJobDeclarationToProcessDefinition(messageJobDeclaration, activity.getProcessDefinition());
-
     }
-
+  }
+  
+  /**
+   * Parse async continuation from 'multiInstanceLoopCharacteristics' element for an activity marked as multi instance. 
+   * Async jobs create for the activity wrapped in multi instance body.
+   * 
+   * @param activityElement activity element marked as multi instance
+   * @param activity activity wrapped in multi instance body
+   * 
+   * @see #parseAsynchronousContinuationForActivity(Element, ActivityImpl)
+   */
+  protected void parseAsynchronousContinuationForMultiInstanceActivity(Element activityElement, ActivityImpl activity) {
+    Element miLoopCharacteristics = activityElement.element("multiInstanceLoopCharacteristics");
+    
+    parseAsynchronousContinuation(miLoopCharacteristics, activity);
   }
 
   protected ParameterValueProvider parseJobPriority(Element element) {
@@ -1869,7 +1901,7 @@ public class BpmnParse extends Parse {
     } else {
       ActivityImpl activity = createActivityOnScope(sendTaskElement, scope);
 
-      parseAsynchronousContinuation(sendTaskElement, activity);
+      parseAsynchronousContinuationForActivity(sendTaskElement, activity);
 
       // for e-mail
       String type = sendTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "type");
@@ -2052,7 +2084,7 @@ public class BpmnParse extends Parse {
     ActivityImpl activity = createActivityOnScope(taskElement, scope);
     activity.setActivityBehavior(new TaskActivityBehavior());
 
-    parseAsynchronousContinuation(taskElement, activity);
+    parseAsynchronousContinuationForActivity(taskElement, activity);
 
     parseExecutionListenersOnScope(taskElement, activity);
 
@@ -2069,7 +2101,7 @@ public class BpmnParse extends Parse {
     ActivityImpl activity = createActivityOnScope(manualTaskElement, scope);
     activity.setActivityBehavior(new ManualTaskActivityBehavior());
 
-    parseAsynchronousContinuation(manualTaskElement, activity);
+    parseAsynchronousContinuationForActivity(manualTaskElement, activity);
 
     parseExecutionListenersOnScope(manualTaskElement, activity);
 
@@ -2086,7 +2118,7 @@ public class BpmnParse extends Parse {
     ActivityImpl activity = createActivityOnScope(receiveTaskElement, scope);
     activity.setActivityBehavior(new ReceiveTaskActivityBehavior());
 
-    parseAsynchronousContinuation(receiveTaskElement, activity);
+    parseAsynchronousContinuationForActivity(receiveTaskElement, activity);
 
     parseExecutionListenersOnScope(receiveTaskElement, activity);
 
@@ -2128,7 +2160,7 @@ public class BpmnParse extends Parse {
   public ActivityImpl parseUserTask(Element userTaskElement, ScopeImpl scope) {
     ActivityImpl activity = createActivityOnScope(userTaskElement, scope);
 
-    parseAsynchronousContinuation(userTaskElement, activity);
+    parseAsynchronousContinuationForActivity(userTaskElement, activity);
 
     TaskDefinition taskDefinition = parseTaskDefinition(userTaskElement, activity.getId(), (ProcessDefinitionEntity) scope.getProcessDefinition());
     TaskDecorator taskDecorator = new TaskDecorator(taskDefinition, expressionManager);
@@ -2462,7 +2494,7 @@ public class BpmnParse extends Parse {
         parseActivityInputOutput(endEventElement, activity);
       }
 
-      parseAsynchronousContinuation(endEventElement, activity);
+      parseAsynchronousContinuationForActivity(endEventElement, activity);
 
       for (BpmnParseListener parseListener : parseListeners) {
         parseListener.parseEndEvent(endEventElement, scope, activity);
@@ -2859,7 +2891,7 @@ public class BpmnParse extends Parse {
     ActivityImpl subProcessActivity = createActivityOnScope(subProcessElement, scope);
     subProcessActivity.setSubProcessScope(true);
 
-    parseAsynchronousContinuation(subProcessElement, subProcessActivity);
+    parseAsynchronousContinuationForActivity(subProcessElement, subProcessActivity);
 
     Boolean isTriggeredByEvent = parseBooleanAttribute(subProcessElement.attribute(PROPERTYNAME_TRIGGERED_BY_EVENT), false);
     subProcessActivity.setProperty(PROPERTYNAME_TRIGGERED_BY_EVENT, isTriggeredByEvent);
@@ -2883,7 +2915,7 @@ public class BpmnParse extends Parse {
   protected ActivityImpl parseTransaction(Element transactionElement, ScopeImpl scope) {
     ActivityImpl activity = createActivityOnScope(transactionElement, scope);
 
-    parseAsynchronousContinuation(transactionElement, activity);
+    parseAsynchronousContinuationForActivity(transactionElement, activity);
 
     activity.setScope(true);
     activity.setSubProcessScope(true);
@@ -2909,7 +2941,7 @@ public class BpmnParse extends Parse {
     ActivityImpl activity = createActivityOnScope(callActivityElement, scope);
 
     // parse async
-    parseAsynchronousContinuation(callActivityElement, activity);
+    parseAsynchronousContinuationForActivity(callActivityElement, activity);
 
     // parse definition key (and behavior)
     String calledElement = callActivityElement.attribute("calledElement");

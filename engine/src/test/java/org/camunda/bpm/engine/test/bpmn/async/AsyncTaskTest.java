@@ -99,16 +99,16 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
-  public void testAsyncServiceSequentialMultiInstance() {
+  public void testAsyncSequentialMultiInstanceWithServiceTask() {
     NUM_INVOCATIONS = 0;
     // start process
     runtimeService.startProcessInstanceByKey("asyncService");
-    // now there should be one job for the multi-instance body:
-    assertEquals(1, managementService.createJobQuery().count());
+   
     // the service was not invoked:
     assertEquals(0, NUM_INVOCATIONS);
 
-    executeAvailableJobs();
+    // now there should be one job for the multi-instance body to execute:
+    executeAvailableJobs(1);
 
     // the service was invoked
     assertEquals(5, NUM_INVOCATIONS);
@@ -118,16 +118,116 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
 
 
   @Deployment
-  public void testAsyncServiceParallelMultiInstance() {
+  public void testAsyncParallelMultiInstanceWithServiceTask() {
     NUM_INVOCATIONS = 0;
     // start process
     runtimeService.startProcessInstanceByKey("asyncService");
-    // now there should be one job for the multi-instance body:
-    assertEquals(1, managementService.createJobQuery().count());
+    
     // the service was not invoked:
     assertEquals(0, NUM_INVOCATIONS);
 
-    executeAvailableJobs();
+    // now there should be one job for the multi-instance body to execute:
+    executeAvailableJobs(1);
+
+    // the service was invoked
+    assertEquals(5, NUM_INVOCATIONS);
+    // and the job is done
+    assertEquals(0, managementService.createJobQuery().count());
+  }
+  
+  @Deployment
+  public void testAsyncServiceWrappedInSequentialMultiInstance() {
+    NUM_INVOCATIONS = 0;
+    // start process
+    runtimeService.startProcessInstanceByKey("asyncService");
+   
+    // the service was not invoked:
+    assertEquals(0, NUM_INVOCATIONS);
+
+    // now there should be one job for the first service task wrapped in the multi-instance body:
+    assertEquals(1, managementService.createJobQuery().count());
+    // execute all jobs - one for each service task:
+    executeAvailableJobs(5);
+
+    // the service was invoked
+    assertEquals(5, NUM_INVOCATIONS);
+    // and the job is done
+    assertEquals(0, managementService.createJobQuery().count());
+  }
+  
+  @Deployment
+  public void testAsyncServiceWrappedInParallelMultiInstance() {
+    NUM_INVOCATIONS = 0;
+    // start process
+    runtimeService.startProcessInstanceByKey("asyncService");
+   
+    // the service was not invoked:
+    assertEquals(0, NUM_INVOCATIONS);
+    
+    // now there should be one job for each service task wrapped in the multi-instance body:
+    assertEquals(5, managementService.createJobQuery().count());
+    // execute all jobs:
+    executeAvailableJobs(5);
+
+    // the service was invoked
+    assertEquals(5, NUM_INVOCATIONS);
+    // and the job is done
+    assertEquals(0, managementService.createJobQuery().count());
+  }
+  
+  @Deployment
+  public void testAsyncBeforeAndAfterOfServiceWrappedInParallelMultiInstance() {
+    NUM_INVOCATIONS = 0;
+    // start process
+    runtimeService.startProcessInstanceByKey("asyncService");
+   
+    // the service was not invoked:
+    assertEquals(0, NUM_INVOCATIONS);
+    
+    // now there should be one job for each service task wrapped in the multi-instance body:
+    assertEquals(5, managementService.createJobQuery().count());
+    // execute all jobs - one for asyncBefore and another for asyncAfter:
+    executeAvailableJobs(5+5);
+    
+    // the service was invoked
+    assertEquals(5, NUM_INVOCATIONS);
+    // and the job is done
+    assertEquals(0, managementService.createJobQuery().count());
+  }
+  
+  @Deployment
+  public void testAsyncBeforeSequentialMultiInstanceWithAsyncAfterServiceWrappedInMultiInstance() {
+    NUM_INVOCATIONS = 0;
+    // start process
+    runtimeService.startProcessInstanceByKey("asyncService");
+   
+    // the service was not invoked:
+    assertEquals(0, NUM_INVOCATIONS);
+    
+    // now there should be one job for the multi-instance body:
+    assertEquals(1, managementService.createJobQuery().count());
+    // execute all jobs - one for multi-instance body and one for each service task wrapped in the multi-instance body:
+    executeAvailableJobs(1+5);
+
+    // the service was invoked
+    assertEquals(5, NUM_INVOCATIONS);
+    // and the job is done
+    assertEquals(0, managementService.createJobQuery().count());
+  }
+  
+  @Deployment
+  public void testAsyncBeforeAndAfterParallelMultiInstanceWithAsyncBeforeAndAfterServiceWrappedInMultiInstance() {
+    NUM_INVOCATIONS = 0;
+    // start process
+    runtimeService.startProcessInstanceByKey("asyncService");
+   
+    // the service was not invoked:
+    assertEquals(0, NUM_INVOCATIONS);
+    
+    // now there should be one job for the multi-instance body:
+    assertEquals(1, managementService.createJobQuery().count());
+    // execute all jobs - two jobs (asyncBefore + asyncAfter) for multi-instance body and for each service task wrapped in the multi-instance body:
+    executeAvailableJobs(1+5+5+1);
 
     // the service was invoked
     assertEquals(5, NUM_INVOCATIONS);
