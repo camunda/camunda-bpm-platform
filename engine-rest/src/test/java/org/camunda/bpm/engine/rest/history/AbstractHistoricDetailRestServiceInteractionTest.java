@@ -341,4 +341,30 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
     verify(historicDetailQueryMock, never()).disableBinaryFetching();
 
   }
+
+  @Test
+  public void testGetBinaryDataForNullFileVariable() {
+    String filename = "test.txt";
+    byte[] byteContent = null;
+    FileValue variableValue = Variables.fileValue(filename).file(byteContent).mimeType(ContentType.TEXT.toString()).create();
+
+    MockHistoricVariableUpdateBuilder builder = MockProvider.mockHistoricVariableUpdate();
+
+    HistoricVariableUpdate detailMock = builder
+        .typedValue(variableValue)
+        .build();
+
+    when(historicDetailQueryMock.detailId(detailMock.getId())).thenReturn(historicDetailQueryMock);
+    when(historicDetailQueryMock.disableCustomObjectDeserialization()).thenReturn(historicDetailQueryMock);
+    when(historicDetailQueryMock.singleResult()).thenReturn(detailMock);
+
+    given().pathParam("id", MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_ID)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+    .and()
+      .contentType(equalTo(ContentType.TEXT.toString()))
+      .and()
+        .body(is(equalTo(new String())))
+    .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);
+
+  }
 }

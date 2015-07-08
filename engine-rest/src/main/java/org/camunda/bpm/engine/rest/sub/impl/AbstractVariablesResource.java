@@ -98,18 +98,23 @@ public abstract class AbstractVariablesResource implements VariableResource {
 
   public Response getVariableBinary(String variableName) {
     TypedValue typedValue = getTypedValueForVariable(variableName, false);
+
     if (typedValue instanceof BytesValue) {
       byte[] valueBytes = ((BytesValue) typedValue).getValue();
       if (valueBytes == null) {
         valueBytes = new byte[0];
       }
+
       return Response.ok(new ByteArrayInputStream(valueBytes), MediaType.APPLICATION_OCTET_STREAM).build();
-    } else if (typedValue instanceof FileValue) {
+    }
+    else if (typedValue instanceof FileValue) {
       FileValue fileValue = (FileValue) typedValue;
       String type = fileValue.getMimeType() != null ? fileValue.getMimeType() : MediaType.APPLICATION_OCTET_STREAM;
+
       if(fileValue.getEncoding() != null){
         type += "; charset=" + fileValue.getEncoding();
       }
+
       return Response.ok(fileValue.getValue(), type)
               .header("Content-Disposition", "attachment; filename=" + fileValue.getFilename())
               .build();

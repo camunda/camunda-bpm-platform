@@ -65,9 +65,9 @@ public abstract class AbstractResourceProvider<T extends Query<?, U>, U, DTO> {
     U queryResult = baseQueryForBinaryVariable().singleResult();
     if (queryResult != null) {
       TypedValue variableInstance = transformQueryResultIntoTypedValue(queryResult);
-      if (variableInstance.getType().equals(ValueType.BYTES)) {
+      if (ValueType.BYTES.equals(variableInstance.getType())) {
         return responseForByteVariable(variableInstance);
-      } else if (variableInstance.getType().equals(ValueType.FILE)) {
+      } else if (ValueType.FILE.equals(variableInstance.getType())) {
         return responseForFileVariable((FileValue) variableInstance);
       } else {
         throw new InvalidRequestException(Status.BAD_REQUEST, String.format("Value of %s %s is not a binary value.", getResourceNameForErrorMessage(), id));

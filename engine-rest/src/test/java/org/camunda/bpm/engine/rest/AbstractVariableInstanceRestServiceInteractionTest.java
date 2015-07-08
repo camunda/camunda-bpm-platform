@@ -305,4 +305,31 @@ public abstract class AbstractVariableInstanceRestServiceInteractionTest extends
 
   }
 
+  @Test
+  public void testGetBinaryDataForNullFileVariable() {
+    String filename = "test.txt";
+    byte[] byteContent = null;
+    FileValue variableValue = Variables.fileValue(filename).file(byteContent).mimeType(ContentType.TEXT.toString()).create();
+
+    MockVariableInstanceBuilder builder = MockProvider.mockVariableInstance();
+    VariableInstance variableInstanceMock =
+        builder
+          .typedValue(variableValue)
+          .build();
+
+    when(variableInstanceQueryMock.variableId(variableInstanceMock.getId())).thenReturn(variableInstanceQueryMock);
+    when(variableInstanceQueryMock.disableBinaryFetching()).thenReturn(variableInstanceQueryMock);
+    when(variableInstanceQueryMock.disableCustomObjectDeserialization()).thenReturn(variableInstanceQueryMock);
+    when(variableInstanceQueryMock.singleResult()).thenReturn(variableInstanceMock);
+
+    given().pathParam("id", MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+    .and()
+      .contentType(equalTo(ContentType.TEXT.toString()))
+      .and()
+        .body(is(equalTo(new String())))
+    .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);
+
+  }
+
 }
