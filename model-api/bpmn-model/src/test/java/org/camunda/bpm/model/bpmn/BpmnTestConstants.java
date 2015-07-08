@@ -66,5 +66,7 @@ public final class BpmnTestConstants {
   public static final String TEST_EXECUTION_EVENT_API = "end";
   public static final String TEST_TASK_EVENT_XML = "create";
   public static final String TEST_TASK_EVENT_API = "complete";
+  public static final String TEST_FLOW_NODE_JOB_PRIORITY = "${test}";
+  public static final String TEST_PROCESS_JOB_PRIORITY = "15";
 
 }

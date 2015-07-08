@@ -57,4 +57,9 @@ public abstract class AbstractProcessBuilder<B extends AbstractProcessBuilder<B>
     return myself;
   }
 
+  public B camundaJobPriority(String jobPriority) {
+    element.setCamundaJobPriority(jobPriority);
+    return myself;
+  }
+
 }

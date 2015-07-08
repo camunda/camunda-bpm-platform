@@ -16,6 +16,7 @@ package org.camunda.bpm.model.bpmn.builder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.CALL_ACTIVITY_ID;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.PROCESS_ID;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.SERVICE_TASK_ID;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.START_EVENT_ID;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.SUB_PROCESS_ID;
@@ -379,18 +380,32 @@ public class ProcessBuilderTest {
   }
 
   @Test
+  public void testProcessCamundaExtensions() {
+    modelInstance = Bpmn.createProcess(PROCESS_ID)
+      .camundaJobPriority("${somePriority}")
+      .startEvent()
+      .endEvent()
+      .done();
+
+    Process process = modelInstance.getModelElementById(PROCESS_ID);
+    assertThat(process.getCamundaJobPriority()).isEqualTo("${somePriority}");
+  }
+
+  @Test
   public void testTaskCamundaExtensions() {
     modelInstance = Bpmn.createProcess()
       .startEvent()
       .serviceTask(TASK_ID)
         .camundaAsyncBefore()
         .notCamundaExclusive()
+        .camundaJobPriority("${somePriority}")
       .endEvent()
       .done();
 
     ServiceTask serviceTask = modelInstance.getModelElementById(TASK_ID);
     assertThat(serviceTask.isCamundaAsyncBefore()).isTrue();
     assertThat(serviceTask.isCamundaExclusive()).isFalse();
+    assertThat(serviceTask.getCamundaJobPriority()).isEqualTo("${somePriority}");
   }
 
   @Test

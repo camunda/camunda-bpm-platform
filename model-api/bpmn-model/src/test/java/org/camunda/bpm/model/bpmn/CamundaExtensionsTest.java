@@ -48,6 +48,8 @@ import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_API;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_LIST_API;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_LIST_XML;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_XML;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_FLOW_NODE_JOB_PRIORITY;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_PROCESS_JOB_PRIORITY;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.USER_TASK_ID;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_ERROR_CODE_VARIABLE;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
@@ -194,6 +196,18 @@ public class CamundaExtensionsTest {
   }
 
   @Test
+  public void testFlowNodeJobPriority() {
+    assertThat(startEvent.getCamundaJobPriority()).isEqualTo(TEST_FLOW_NODE_JOB_PRIORITY);
+    assertThat(endEvent.getCamundaJobPriority()).isEqualTo(TEST_FLOW_NODE_JOB_PRIORITY);
+    assertThat(userTask.getCamundaJobPriority()).isEqualTo(TEST_FLOW_NODE_JOB_PRIORITY);
+    assertThat(parallelGateway.getCamundaJobPriority()).isEqualTo(TEST_FLOW_NODE_JOB_PRIORITY);
+  }
+
+  public void testProcessJobPriority() {
+    assertThat(process.getCamundaJobPriority()).isEqualTo(TEST_PROCESS_JOB_PRIORITY);
+  }
+
+  @Test
   public void testCalledElementBinding() {
     assertThat(callActivity.getCamundaCalledElementBinding()).isEqualTo(TEST_STRING_XML);
     callActivity.setCamundaCalledElementBinding(TEST_STRING_API);
@@ -281,7 +295,7 @@ public class CamundaExtensionsTest {
     userTask.setCamundaDueDate(TEST_DUE_DATE_API);
     assertThat(userTask.getCamundaDueDate()).isEqualTo(TEST_DUE_DATE_API);
   }
-  
+
   @Test
   public void testErrorCodeVariable(){
     ErrorEventDefinition errorEventDefinition = startEvent.getChildElementsByType(ErrorEventDefinition.class).iterator().next();

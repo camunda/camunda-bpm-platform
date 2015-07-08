@@ -8,7 +8,8 @@
 
   <process id="process"
       camunda:candidateStarterGroups="group1, ${group2(a, b)}, group3"
-      camunda:candidateStarterUsers="user1, ${user2(a, b)}, user3">
+      camunda:candidateStarterUsers="user1, ${user2(a, b)}, user3"
+      camunda:jobPriority="15">
     <extensionElements>
       <camunda:executionListener event="start" class="org.camunda.test.Test"/>
     </extensionElements>
@@ -18,7 +19,8 @@
         camunda:formHandlerClass="org.camunda.test.Test"
         camunda:formKey="test"
         camunda:asyncBefore="true"
-        camunda:asyncAfter="true">
+        camunda:asyncAfter="true"
+        camunda:jobPriority="${test}">
       <extensionElements>
         <camunda:executionListener event="start" expression="${test}"/>
         <camunda:potentialStarter>
@@ -50,7 +52,8 @@
         camunda:exclusive="false"
         camunda:formHandlerClass="org.camunda.test.Test"
         camunda:formKey="test"
-        camunda:priority="12">
+        camunda:priority="12"
+        camunda:jobPriority="${test}">
       <extensionElements>
         <camunda:taskListener event="create" class="org.camunda.test.Test" expression="${test}" delegateExpression="${org.camunda.test.Test}">
           <camunda:field name="test">
@@ -163,7 +166,8 @@
 
     <endEvent id="endEvent"
               camunda:asyncAfter="true"
-              camunda:asyncBefore="true">
+              camunda:asyncBefore="true"
+              camunda:jobPriority="${test}">
       <extensionElements>
         <camunda:properties>
           <camunda:property name="name1" value="value1"/>
@@ -176,7 +180,8 @@
     <parallelGateway id="parallelGateway"
                      camunda:async="true"
                      camunda:asyncBefore="true"
-                     camunda:asyncAfter="true">
+                     camunda:asyncAfter="true"
+                     camunda:jobPriority="${test}">
 
     </parallelGateway>
 

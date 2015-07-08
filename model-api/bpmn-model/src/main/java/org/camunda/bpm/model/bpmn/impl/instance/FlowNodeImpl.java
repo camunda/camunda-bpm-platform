@@ -48,6 +48,7 @@ public abstract class FlowNodeImpl extends FlowElementImpl implements FlowNode {
   protected static Attribute<Boolean> camundaAsyncAfter;
   protected static Attribute<Boolean> camundaAsyncBefore;
   protected static Attribute<Boolean> camundaExclusive;
+  protected static Attribute<String> camundaJobPriority;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(FlowNode.class, BPMN_ELEMENT_FLOW_NODE)
@@ -81,6 +82,10 @@ public abstract class FlowNodeImpl extends FlowElementImpl implements FlowNode {
       .namespace(CAMUNDA_NS)
       .defaultValue(true)
       .build();
+
+    camundaJobPriority = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_JOB_PRIORITY)
+       .namespace(CAMUNDA_NS)
+       .build();
 
     typeBuilder.build();
   }
@@ -164,5 +169,13 @@ public abstract class FlowNodeImpl extends FlowElementImpl implements FlowNode {
 
   public void setCamundaExclusive(boolean isCamundaExclusive) {
     camundaExclusive.setValue(this, isCamundaExclusive);
+  }
+
+  public String getCamundaJobPriority() {
+    return camundaJobPriority.getValue(this);
+  }
+
+  public void setCamundaJobPriority(String jobPriority) {
+    camundaJobPriority.setValue(this, jobPriority);
   }
 }

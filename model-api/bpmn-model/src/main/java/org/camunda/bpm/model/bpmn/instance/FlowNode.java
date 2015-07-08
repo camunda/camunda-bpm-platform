@@ -47,4 +47,8 @@ public interface FlowNode extends FlowElement {
 
   void setCamundaExclusive(boolean isCamundaExclusive);
 
+  String getCamundaJobPriority();
+
+  void setCamundaJobPriority(String jobPriority);
+
 }

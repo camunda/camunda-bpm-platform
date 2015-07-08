@@ -422,6 +422,7 @@ public final class BpmnModelConstants {
   public static final String CAMUNDA_ATTRIBUTE_FORM_KEY = "formKey";
   public static final String CAMUNDA_ATTRIBUTE_ID = "id";
   public static final String CAMUNDA_ATTRIBUTE_INITIATOR = "initiator";
+  public static final String CAMUNDA_ATTRIBUTE_JOB_PRIORITY = "jobPriority";
   public static final String CAMUNDA_ATTRIBUTE_KEY = "key";
   public static final String CAMUNDA_ATTRIBUTE_LABEL = "label";
   public static final String CAMUNDA_ATTRIBUTE_NAME = "name";

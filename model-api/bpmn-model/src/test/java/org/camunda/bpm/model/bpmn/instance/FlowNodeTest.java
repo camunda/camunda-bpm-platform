@@ -45,7 +45,8 @@ public class FlowNodeTest extends BpmnModelElementInstanceTest {
     return Arrays.asList(
       new AttributeAssumption(CAMUNDA_NS, "asyncAfter", false, false, false),
       new AttributeAssumption(CAMUNDA_NS, "asyncBefore", false, false, false),
-      new AttributeAssumption(CAMUNDA_NS, "exclusive", false, false, true)
+      new AttributeAssumption(CAMUNDA_NS, "exclusive", false, false, true),
+      new AttributeAssumption(CAMUNDA_NS, "jobPriority", false, false, null)
     );
   }
 
@@ -124,5 +125,15 @@ public class FlowNodeTest extends BpmnModelElementInstanceTest {
     task.setCamundaExclusive(false);
 
     assertThat(task.isCamundaExclusive()).isFalse();
+  }
+
+  @Test
+  public void testCamundaJobPriority() {
+    Task task = modelInstance.newInstance(Task.class);
+    assertThat(task.getCamundaJobPriority()).isNull();
+
+    task.setCamundaJobPriority("15");
+
+    assertThat(task.getCamundaJobPriority()).isEqualTo("15");
   }
 }

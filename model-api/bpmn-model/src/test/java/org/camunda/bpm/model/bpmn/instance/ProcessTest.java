@@ -13,13 +13,15 @@
 
 package org.camunda.bpm.model.bpmn.instance;
 
-import org.camunda.bpm.model.bpmn.ProcessType;
-import org.camunda.bpm.model.bpmn.impl.instance.Supports;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
 
 import java.util.Arrays;
 import java.util.Collection;
 
-import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
+import org.camunda.bpm.model.bpmn.ProcessType;
+import org.camunda.bpm.model.bpmn.impl.instance.Supports;
+import org.junit.Test;
 
 /**
  * @author Sebastian Menski
@@ -52,7 +54,18 @@ public class ProcessTest extends BpmnModelElementInstanceTest {
       // TODO: definitionalCollaborationRef
       /** camunda extensions */
       new AttributeAssumption(CAMUNDA_NS, "candidateStarterGroups"),
-      new AttributeAssumption(CAMUNDA_NS, "candidateStarterUsers")
+      new AttributeAssumption(CAMUNDA_NS, "candidateStarterUsers"),
+      new AttributeAssumption(CAMUNDA_NS, "jobPriority", false, false, null)
     );
+  }
+
+  @Test
+  public void testCamundaJobPriority() {
+    Process process = modelInstance.newInstance(Process.class);
+    assertThat(process.getCamundaJobPriority()).isNull();
+
+    process.setCamundaJobPriority("15");
+
+    assertThat(process.getCamundaJobPriority()).isEqualTo("15");
   }
 }

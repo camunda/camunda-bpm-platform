@@ -305,4 +305,9 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
     return myself;
   }
 
+  public B camundaJobPriority(String jobPriority) {
+    element.setCamundaJobPriority(jobPriority);
+    return myself;
+  }
+
 }

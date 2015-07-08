@@ -82,4 +82,8 @@ public interface Process extends CallableElement {
   List<String> getCamundaCandidateStarterUsersList();
 
   void setCamundaCandidateStarterUsersList(List<String> camundaCandidateStarterUsersList);
+
+  String getCamundaJobPriority();
+
+  void setCamundaJobPriority(String jobPriority);
 }
