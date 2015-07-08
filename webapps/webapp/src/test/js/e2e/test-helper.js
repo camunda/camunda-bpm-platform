@@ -48,22 +48,19 @@ module.exports = function (operations, noReset, done) {
     }
   ];
 
-  keys(operations).forEach(function (resourceName) {
-    keys(operations[resourceName]).forEach(function (methodName) {
-      operations[resourceName][methodName].forEach(function (data) {
-        var resource = new camClient.resource(resourceName);
-        callbacks.push(function (cb) {
-          console.info('doing '+resourceName+'.'+methodName);//, data);
-          resource[methodName](data, function(){
-            cb();
-          });
-        });
+  operations.forEach(function(operation) {
+    var resource = new camClient.resource(operation.module);
+    callbacks.push(function (cb) {
+      console.info('doing '+operation.module+'.'+operation.operation);//, operation.params);
+      resource[operation.operation](operation.params, function(){
+        cb();
       });
     });
   });
 
   CamSDK.utils.series(callbacks, function(err, result) {
     // now all process instances are started, we can start the jobs to create incidents
+    // This method sets retries to 0 for all jobs that were created in the test setup
     if(err) {
       done(err, result);
       deferred.reject();
