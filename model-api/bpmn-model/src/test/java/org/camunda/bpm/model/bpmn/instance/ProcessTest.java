@@ -55,7 +55,7 @@ public class ProcessTest extends BpmnModelElementInstanceTest {
       /** camunda extensions */
       new AttributeAssumption(CAMUNDA_NS, "candidateStarterGroups"),
       new AttributeAssumption(CAMUNDA_NS, "candidateStarterUsers"),
-      new AttributeAssumption(CAMUNDA_NS, "jobPriority", false, false, null)
+      new AttributeAssumption(CAMUNDA_NS, "jobPriority")
     );
   }
 

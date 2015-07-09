@@ -46,7 +46,7 @@ public class FlowNodeTest extends BpmnModelElementInstanceTest {
       new AttributeAssumption(CAMUNDA_NS, "asyncAfter", false, false, false),
       new AttributeAssumption(CAMUNDA_NS, "asyncBefore", false, false, false),
       new AttributeAssumption(CAMUNDA_NS, "exclusive", false, false, true),
-      new AttributeAssumption(CAMUNDA_NS, "jobPriority", false, false, null)
+      new AttributeAssumption(CAMUNDA_NS, "jobPriority")
     );
   }
 
