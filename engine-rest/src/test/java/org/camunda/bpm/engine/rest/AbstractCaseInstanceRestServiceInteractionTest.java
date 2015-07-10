@@ -47,7 +47,6 @@ import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.core.variable.type.ObjectTypeImpl;
-import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableNameDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -967,7 +966,7 @@ public abstract class AbstractCaseInstanceRestServiceInteractionTest extends Abs
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID).pathParam("varId", variableKey)
-      .multiPart("data", "unspecified", bytes)
+      .multiPart("data", null, bytes)
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
@@ -987,7 +986,7 @@ public abstract class AbstractCaseInstanceRestServiceInteractionTest extends Abs
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID).pathParam("varId", variableKey)
-      .multiPart("data", "unspecified", bytes)
+      .multiPart("data", null, bytes)
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
@@ -1084,7 +1083,6 @@ public abstract class AbstractCaseInstanceRestServiceInteractionTest extends Abs
   @Test
   public void testPostSingleFileVariableWithEncodingAndMimeType() throws Exception {
     byte[] value = "some text".getBytes();
-    String base64 = Base64.encodeBase64String(value);
     String variableKey = "aVariableKey";
     String encoding = "utf-8";
     String filename = "test.txt";
@@ -1092,11 +1090,7 @@ public abstract class AbstractCaseInstanceRestServiceInteractionTest extends Abs
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID).pathParam("varId", variableKey)
-      .multiPart("data", base64, MediaType.TEXT_PLAIN)
-      .multiPart("filename", filename, MediaType.TEXT_PLAIN)
-      .multiPart("mimetype", mimetype, MediaType.TEXT_PLAIN)
-      .multiPart("encoding", encoding, MediaType.TEXT_PLAIN)
-      .header("accept", MediaType.APPLICATION_JSON)
+      .multiPart("data", filename, value, mimetype + "; encoding="+encoding)
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
@@ -1116,16 +1110,13 @@ public abstract class AbstractCaseInstanceRestServiceInteractionTest extends Abs
   public void testPostSingleFileVariableWithMimeType() throws Exception {
 
     byte[] value = "some text".getBytes();
-    String base64 = Base64.encodeBase64String(value);
     String variableKey = "aVariableKey";
     String filename = "test.txt";
     String mimetype = MediaType.TEXT_PLAIN;
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID).pathParam("varId", variableKey)
-      .multiPart("data", base64, MediaType.TEXT_PLAIN)
-      .multiPart("filename", filename, MediaType.TEXT_PLAIN)
-      .multiPart("mimetype", mimetype, MediaType.TEXT_PLAIN)
+      .multiPart("data", filename, value, mimetype)
       .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
@@ -1146,30 +1137,19 @@ public abstract class AbstractCaseInstanceRestServiceInteractionTest extends Abs
   public void testPostSingleFileVariableWithEncoding() throws Exception {
 
     byte[] value = "some text".getBytes();
-    String base64 = Base64.encodeBase64String(value);
     String variableKey = "aVariableKey";
     String encoding = "utf-8";
     String filename = "test.txt";
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID).pathParam("varId", variableKey)
-      .multiPart("data", base64, MediaType.TEXT_PLAIN)
-      .multiPart("filename", filename, MediaType.TEXT_PLAIN)
-      .multiPart("encoding", encoding, MediaType.TEXT_PLAIN)
+      .multiPart("data", filename, value, "encoding="+encoding)
       .header("accept", MediaType.APPLICATION_JSON)
     .expect()
-      .statusCode(Status.NO_CONTENT.getStatusCode())
+    //when the user passes an encoding, he has to provide the type, too
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
     .when()
       .post(SINGLE_CASE_INSTANCE_BINARY_VARIABLE_URL);
-
-    ArgumentCaptor<FileValue> captor = ArgumentCaptor.forClass(FileValue.class);
-    verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_INSTANCE_ID);
-    verify(caseExecutionCommandBuilderMock).setVariable(eq(variableKey), captor.capture());
-    FileValue captured = captor.getValue();
-    assertThat(captured.getEncoding(), is(encoding));
-    assertThat(captured.getFilename(), is(filename));
-    assertThat(captured.getMimeType(), is(nullValue()));
-    assertThat(IoUtil.readInputStream(captured.getValue(), null), is(value));
   }
 
   @Test
@@ -1180,7 +1160,7 @@ public abstract class AbstractCaseInstanceRestServiceInteractionTest extends Abs
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID).pathParam("varId", variableKey)
-      .multiPart("filename", filename, MediaType.TEXT_PLAIN)
+      .multiPart("data", filename, new byte[0])
       .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
@@ -1193,23 +1173,8 @@ public abstract class AbstractCaseInstanceRestServiceInteractionTest extends Abs
     FileValue captured = captor.getValue();
     assertThat(captured.getEncoding(), is(nullValue()));
     assertThat(captured.getFilename(), is(filename));
-    assertThat(captured.getMimeType(), is(nullValue()));
-    assertThat(captured.getValue(), is(nullValue()));
-  }
-
-  @Test
-  public void testPostSingleLocalFileVariableWithoutFilename() throws Exception {
-
-    String variableKey = "aVariableKey";
-
-    given()
-      .pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID).pathParam("varId", variableKey)
-      .multiPart("filename", "", MediaType.TEXT_PLAIN)
-      .header("accept", MediaType.APPLICATION_JSON)
-    .expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode())
-    .when()
-      .post(SINGLE_CASE_INSTANCE_BINARY_VARIABLE_URL);
+    assertThat(captured.getMimeType(), is(MediaType.APPLICATION_OCTET_STREAM));
+    assertThat(captured.getValue().available(), is(0));
   }
 
   @Test

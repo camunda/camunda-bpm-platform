@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.activation.MimeType;
+import javax.activation.MimeTypeParseException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -26,7 +28,6 @@ import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 import org.camunda.bpm.engine.rest.dto.PatchVariablesDto;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -166,9 +167,8 @@ public abstract class AbstractVariablesResource implements VariableResource {
       }
     } else {
       try {
-        FormPart filenamePart = payload.getNamedPart("filename");
-        if (filenamePart != null) {
-          setFileValueVariable(variableKey, payload, filenamePart);
+        if (dataPart.getFileName() != null) {
+          setFileValueVariable(variableKey, dataPart);
         } else {
           setVariableEntity(variableKey, Variables.byteArrayValue(dataPart.getBinaryContent()));
         }
@@ -186,30 +186,19 @@ public abstract class AbstractVariablesResource implements VariableResource {
    *
    * @throws RestException if the filename is empty
    */
-  protected void setFileValueVariable(String variableKey, MultipartFormData payload, FormPart filenamePart) {
-    if ("".equals(filenamePart.getTextContent())) {
+  protected void setFileValueVariable(String variableKey, FormPart dataPart) {
+    if ("".equals(dataPart.getFileName().trim())) {
       throw new RestException(Status.BAD_REQUEST, "Cannot put a file without filename!");
     }
-    String encoding = getTextContentIfNamedPartIsPresent(payload, "encoding");
-    String mimetype = getTextContentIfNamedPartIsPresent(payload, "mimetype");
-    String data = getTextContentIfNamedPartIsPresent(payload, "data");
-    FileValue fileValue = Variables.fileValue(filenamePart.getTextContent()).mimeType(mimetype).encoding(encoding).file(Base64.decodeBase64(data)).create();
-    setVariableEntity(variableKey, fileValue);
-  }
-
-  /**
-   * Peeks into the {@link MultipartFormData} to see if the {@link FormPart} with the given name is present.
-   * If yes, the text content is returned, if no, null is returned.
-   * @param payload the payload, which could contain the needed value
-   * @param name the name of the {@link FormPart} to look for
-   * @return the text content according to the name or null
-   */
-  protected String getTextContentIfNamedPartIsPresent(MultipartFormData payload, String name) {
-    FormPart namedPart = payload.getNamedPart(name);
-    if (namedPart != null) {
-      return namedPart.getTextContent();
+    MimeType mimeType = null;
+    try {
+      mimeType = new MimeType(dataPart.getContentType());
+    } catch (MimeTypeParseException e) {
+      throw new RestException(Status.BAD_REQUEST, "Invalid mime type given");
     }
-    return null;
+    byte[] data = dataPart.getBinaryContent();
+    FileValue fileValue = Variables.fileValue(dataPart.getFileName()).mimeType(mimeType.getBaseType()).encoding(mimeType.getParameter("encoding")).file(data).create();
+    setVariableEntity(variableKey, fileValue);
   }
 
   protected Object deserializeJsonObject(String className, byte[] data) {
