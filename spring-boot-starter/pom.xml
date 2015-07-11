@@ -23,7 +23,7 @@
   </modules>
 
   <properties>
-    <spring-boot.version>1.2.4.RELEASE</spring-boot.version>
+    <spring-boot.version>1.2.5.RELEASE</spring-boot.version>
     <camunda.version>7.3.0</camunda.version>
     <resteasy.version>3.0.8.Final</resteasy.version>
 
