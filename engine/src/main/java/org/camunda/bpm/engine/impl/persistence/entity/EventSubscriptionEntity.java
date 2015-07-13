@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.event.EventHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.jobexecutor.ProcessEventJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.EventSubscriptionJobDeclaration;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -51,6 +51,7 @@ public abstract class EventSubscriptionEntity implements EventSubscription, DbEn
   // runtime state /////////////////////////////
   protected ExecutionEntity execution;
   protected ActivityImpl activity;
+  protected EventSubscriptionJobDeclaration jobDeclaration;
 
   /////////////////////////////////////////////
 
@@ -83,30 +84,17 @@ public abstract class EventSubscriptionEntity implements EventSubscription, DbEn
 
   protected void scheduleEventAsync(Serializable payload) {
 
-    final CommandContext commandContext = Context.getCommandContext();
+    EventSubscriptionJobDeclaration asyncDeclaration = getJobDeclaration();
 
-    MessageEntity message = new MessageEntity();
-
-    // initialize job
-    message.setJobHandlerConfiguration(id);
-    message.setJobHandlerType(ProcessEventJobHandler.TYPE);
-    message.setActivityId(activityId);
-    message.setExecutionId(executionId);
-    message.setProcessInstanceId(processInstanceId);
-
-    ExecutionEntity execution = getExecution();
-    if (execution != null) {
-      ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
-      message.setProcessDefinitionId(processDefinition.getId());
-      message.setProcessDefinitionKey(processDefinition.getKey());
+    if (asyncDeclaration == null) {
+      // fallback to sync if we couldn't find a job declaration
+      processEventSync(payload);
     }
-
-    // TODO: support payload
-    // if(payload != null) {
-    //   message.setEventPayload(payload);
-    // }
-
-    commandContext.getJobManager().send(message);
+    else {
+      MessageEntity message = asyncDeclaration.createJobInstance(this);
+      CommandContext commandContext = Context.getCommandContext();
+      commandContext.getJobManager().send(message);
+    }
   }
 
   // persistence behavior /////////////////////
@@ -184,6 +172,14 @@ public abstract class EventSubscriptionEntity implements EventSubscription, DbEn
     if(activity != null) {
       this.activityId = activity.getId();
     }
+  }
+
+  public EventSubscriptionJobDeclaration getJobDeclaration() {
+    if (jobDeclaration == null) {
+      jobDeclaration = EventSubscriptionJobDeclaration.findDeclarationForSubscription(this);
+    }
+
+    return jobDeclaration;
   }
 
   public String getId() {

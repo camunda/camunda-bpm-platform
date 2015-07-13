@@ -78,7 +78,7 @@ public class BpmnDeployer implements Deployer {
   public void deploy(DeploymentEntity deployment) {
     LOG.fine("Processing deployment " + deployment.getName());
 
-    Map<String, List<JobDeclaration<?>>> jobDeclarations = new HashMap<String, List<JobDeclaration<?>>>();
+    Map<String, List<JobDeclaration<?, ?>>> jobDeclarations = new HashMap<String, List<JobDeclaration<?, ?>>>();
     List<ProcessDefinitionEntity> processDefinitions = new ArrayList<ProcessDefinitionEntity>();
     Map<String, ResourceEntity> resources = deployment.getResources();
 
@@ -167,7 +167,7 @@ public class BpmnDeployer implements Deployer {
         processDefinition.setSuspensionState(persistedProcessDefinition.getSuspensionState());
       }
 
-      List<JobDeclaration<?>> declarations = jobDeclarations.get(processDefinition.getKey());
+      List<JobDeclaration<?, ?>> declarations = jobDeclarations.get(processDefinition.getKey());
       updateJobDeclarations(declarations, processDefinition, deployment.isNew());
 
       // Add to cache
@@ -188,7 +188,7 @@ public class BpmnDeployer implements Deployer {
     }
   }
 
-  protected void updateJobDeclarations(List<JobDeclaration<?>> jobDeclarations, ProcessDefinitionEntity processDefinition, boolean isNewDeployment) {
+  protected void updateJobDeclarations(List<JobDeclaration<?, ?>> jobDeclarations, ProcessDefinitionEntity processDefinition, boolean isNewDeployment) {
 
     if(jobDeclarations == null || jobDeclarations.isEmpty()) {
       return;
@@ -198,7 +198,7 @@ public class BpmnDeployer implements Deployer {
 
     if(isNewDeployment) {
       // create new job definitions:
-      for (JobDeclaration<?> jobDeclaration : jobDeclarations) {
+      for (JobDeclaration<?, ?> jobDeclaration : jobDeclarations) {
         createJobDefinition(processDefinition, jobDeclaration);
       }
 
@@ -208,7 +208,7 @@ public class BpmnDeployer implements Deployer {
 
       LegacyBehavior.migrateMultiInstanceJobDefinitions(processDefinition, existingDefinitions);
 
-      for (JobDeclaration<?> jobDeclaration : jobDeclarations) {
+      for (JobDeclaration<?, ?> jobDeclaration : jobDeclarations) {
         boolean jobDefinitionExists = false;
         for (JobDefinition jobDefinitionEntity : existingDefinitions) {
 
@@ -231,7 +231,7 @@ public class BpmnDeployer implements Deployer {
 
   }
 
-  protected void createJobDefinition(ProcessDefinition processDefinition, JobDeclaration<?> jobDeclaration) {
+  protected void createJobDefinition(ProcessDefinition processDefinition, JobDeclaration<?, ?> jobDeclaration) {
     final JobDefinitionManager jobDefinitionManager = Context.getCommandContext().getJobDefinitionManager();
 
     JobDefinitionEntity jobDefinitionEntity = new JobDefinitionEntity(jobDeclaration);

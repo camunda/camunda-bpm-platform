@@ -96,6 +96,7 @@ import org.camunda.bpm.engine.impl.form.handler.StartFormHandler;
 import org.camunda.bpm.engine.impl.form.handler.TaskFormHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.AsyncAfterMessageJobDeclaration;
 import org.camunda.bpm.engine.impl.jobexecutor.AsyncBeforeMessageJobDeclaration;
+import org.camunda.bpm.engine.impl.jobexecutor.EventSubscriptionJobDeclaration;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.jobexecutor.MessageJobDeclaration;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerCatchIntermediateEventJobHandler;
@@ -172,6 +173,7 @@ public class BpmnParse extends Parse {
   public static final String PROPERTYNAME_IS_FOR_COMPENSATION = "isForCompensation";
   public static final String PROPERTYNAME_ERROR_EVENT_DEFINITIONS = "errorEventDefinitions";
   public static final String PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION = "eventDefinitions";
+  public static final String PROPERTYNAME_EVENT_SUBSCRIPTION_JOB_DECLARATION = "eventJobDeclarations";
   public static final String PROPERTYNAME_TRIGGERED_BY_EVENT = "triggeredByEvent";
   public static final String PROPERTYNAME_TYPE = "type";
   public static final String PROPERTYNAME_THROWS_COMPENSATION = "throwsCompensation";
@@ -206,7 +208,7 @@ public class BpmnParse extends Parse {
    * Mapping from a process definition key to his containing list of job
    * declarations
    **/
-  protected Map<String, List<JobDeclaration<?>>> jobDeclarations = new HashMap<String, List<JobDeclaration<?>>>();
+  protected Map<String, List<JobDeclaration<?, ?>>> jobDeclarations = new HashMap<String, List<JobDeclaration<?, ?>>>();
 
   /** A map for storing sequence flow based on their id during parsing. */
   protected Map<String, TransitionImpl> sequenceFlows;
@@ -939,7 +941,7 @@ public class BpmnParse extends Parse {
   /**
    * Sets the value for "camunda:errorCodeVariable" on the passed definition if
    * it's present.
-   * 
+   *
    * @param errorEventDefinition
    *          the XML errorEventDefinition tag
    * @param definition
@@ -989,6 +991,17 @@ public class BpmnParse extends Parse {
       }
     }
     eventDefinitions.add(subscription);
+  }
+
+  protected void addEventSubscriptionJobDeclaration(EventSubscriptionJobDeclaration jobDeclaration, ActivityImpl activity, Element element) {
+    List<EventSubscriptionJobDeclaration> jobDeclarationsForActivity = (List<EventSubscriptionJobDeclaration>) activity.getProperty(PROPERTYNAME_EVENT_SUBSCRIPTION_JOB_DECLARATION);
+
+    if (jobDeclarationsForActivity == null) {
+      jobDeclarationsForActivity = new ArrayList<EventSubscriptionJobDeclaration>();
+      activity.setProperty(PROPERTYNAME_EVENT_SUBSCRIPTION_JOB_DECLARATION, jobDeclarationsForActivity);
+    }
+
+    jobDeclarationsForActivity.add(jobDeclaration);
   }
 
   /**
@@ -1769,35 +1782,35 @@ public class BpmnParse extends Parse {
   }
 
   /**
-   * Parse async continuation of an activity and create async jobs for the activity. 
+   * Parse async continuation of an activity and create async jobs for the activity.
    * <br/> <br/>
    * When the activity is marked as multi instance, then async jobs create instead for the multi instance body.
-   * When the wrapped activity has async characteristics in 'multiInstanceLoopCharacteristics' element, 
-   * then async jobs create additionally for the wrapped activity. 
+   * When the wrapped activity has async characteristics in 'multiInstanceLoopCharacteristics' element,
+   * then async jobs create additionally for the wrapped activity.
    */
   protected void parseAsynchronousContinuationForActivity(Element activityElement, ActivityImpl activity) {
     // can't use #getMultiInstanceScope here to determine whether the task is multi-instance,
     // since the property hasn't been set yet (cf parseActivity)
     ActivityImpl parentFlowScopeActivity = activity.getParentFlowScopeActivity();
     if (parentFlowScopeActivity != null && parentFlowScopeActivity.getActivityBehavior() instanceof MultiInstanceActivityBehavior) {
-      
+
       parseAsynchronousContinuation(activityElement, parentFlowScopeActivity);
-      
+
       Element miLoopCharacteristics = activityElement.element("multiInstanceLoopCharacteristics");
       parseAsynchronousContinuation(miLoopCharacteristics, activity);
     } else {
       parseAsynchronousContinuation(activityElement, activity);
     }
   }
-  
+
   /**
-   * Parse async continuation of the given element and create async jobs for the activity. 
-   * 
+   * Parse async continuation of the given element and create async jobs for the activity.
+   *
    * @param element with async characteristics
-   * @param activity 
+   * @param activity
    */
   protected void parseAsynchronousContinuation(Element element, ActivityImpl activity) {
-  
+
     boolean isAsyncBefore = isAsyncBefore(element);
     boolean isAsyncAfter = isAsyncAfter(element);
     boolean exclusive = isExclusive(element);
@@ -1828,19 +1841,19 @@ public class BpmnParse extends Parse {
       addJobDeclarationToProcessDefinition(messageJobDeclaration, activity.getProcessDefinition());
     }
   }
-  
+
   /**
-   * Parse async continuation from 'multiInstanceLoopCharacteristics' element for an activity marked as multi instance. 
+   * Parse async continuation from 'multiInstanceLoopCharacteristics' element for an activity marked as multi instance.
    * Async jobs create for the activity wrapped in multi instance body.
-   * 
+   *
    * @param activityElement activity element marked as multi instance
    * @param activity activity wrapped in multi instance body
-   * 
+   *
    * @see #parseAsynchronousContinuationForActivity(Element, ActivityImpl)
    */
   protected void parseAsynchronousContinuationForMultiInstanceActivity(Element activityElement, ActivityImpl activity) {
     Element miLoopCharacteristics = activityElement.element("multiInstanceLoopCharacteristics");
-    
+
     parseAsynchronousContinuation(miLoopCharacteristics, activity);
   }
 
@@ -1876,13 +1889,13 @@ public class BpmnParse extends Parse {
     messageJobDeclarations.add(messageJobDeclaration);
   }
 
-  protected void addJobDeclarationToProcessDefinition(JobDeclaration<?> jobDeclaration, ProcessDefinitionImpl processDefinition) {
+  protected void addJobDeclarationToProcessDefinition(JobDeclaration<?, ?> jobDeclaration, ProcessDefinitionImpl processDefinition) {
     ProcessDefinition definition = (ProcessDefinition) processDefinition;
     String key = definition.getKey();
 
-    List<JobDeclaration<?>> containingJobDeclarations = jobDeclarations.get(key);
+    List<JobDeclaration<?, ?>> containingJobDeclarations = jobDeclarations.get(key);
     if (containingJobDeclarations == null) {
-      containingJobDeclarations = new ArrayList<JobDeclaration<?>>();
+      containingJobDeclarations = new ArrayList<JobDeclaration<?, ?>>();
       jobDeclarations.put(key, containingJobDeclarations);
     }
 
@@ -2743,6 +2756,11 @@ public class BpmnParse extends Parse {
     signalDefinition.setActivityId(signalActivity.getId());
     addEventSubscriptionDeclaration(signalDefinition, signalActivity.getEventScope(), element);
 
+    EventSubscriptionJobDeclaration catchingAsyncDeclaration = new EventSubscriptionJobDeclaration(signalDefinition);
+    catchingAsyncDeclaration.setJobPriorityProvider((ParameterValueProvider) signalActivity.getProperty(PROPERTYNAME_JOB_PRIORITY));
+    signalDefinition.setJobDeclaration(catchingAsyncDeclaration);
+    addEventSubscriptionJobDeclaration(catchingAsyncDeclaration, signalActivity, element);
+
     for (BpmnParseListener parseListener : parseListeners) {
       parseListener.parseIntermediateSignalCatchEventDefinition(element, signalActivity);
     }
@@ -2759,8 +2777,9 @@ public class BpmnParse extends Parse {
         addError("Could not find signal with id '" + signalRef + "'", signalEventDefinitionElement);
       }
       EventSubscriptionDeclaration signalEventDefinition = new EventSubscriptionDeclaration(signalDefinition.getName(), "signal");
-      boolean asynch = "true".equals(signalEventDefinitionElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "async", "false"));
-      signalEventDefinition.setAsync(asynch);
+
+      boolean throwingAsynch = "true".equals(signalEventDefinitionElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "async", "false"));
+      signalEventDefinition.setAsync(throwingAsynch);
 
       return signalEventDefinition;
     }
@@ -3697,11 +3716,11 @@ public class BpmnParse extends Parse {
         || element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "delegateExpression") != null;
   }
 
-  public Map<String, List<JobDeclaration<?>>> getJobDeclarations() {
+  public Map<String, List<JobDeclaration<?, ?>>> getJobDeclarations() {
     return jobDeclarations;
   }
 
-  public List<JobDeclaration<?>> getJobDeclarationsByKey(String processDefinitionKey) {
+  public List<JobDeclaration<?, ?>> getJobDeclarationsByKey(String processDefinitionKey) {
     return jobDeclarations.get(processDefinitionKey);
   }
 

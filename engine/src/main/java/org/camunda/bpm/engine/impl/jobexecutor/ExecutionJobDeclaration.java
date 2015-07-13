@@ -13,21 +13,19 @@
 package org.camunda.bpm.engine.impl.jobexecutor;
 
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public interface JobPriorityProvider {
+public abstract class ExecutionJobDeclaration<T extends JobEntity> extends JobDeclaration<ExecutionEntity, T> {
 
-  public static int DEFAULT_PRIORITY = 0;
+  public ExecutionJobDeclaration(String jobHandlerType) {
+    super(jobHandlerType);
+  }
 
-  /**
-   *
-   * @param execution may be null when the job is not created in the context of a
-   *   running process instance (e.g. a timer start event)
-   * @param jobDeclaration
-   */
-  int determinePriority(ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration);
+  protected ExecutionEntity resolveExecution(ExecutionEntity context) {
+    return context;
+  }
 }

@@ -28,7 +28,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 public class DefaultJobPriorityProvider implements JobPriorityProvider {
 
   @Override
-  public int determinePriority(ExecutionEntity execution, JobDeclaration<?> jobDeclaration) {
+  public int determinePriority(ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
 
     Integer jobDefinitionPriority = getJobDefinitionPriority(execution, jobDeclaration);
     if (jobDefinitionPriority != null) {
@@ -48,7 +48,7 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
     return JobPriorityProvider.DEFAULT_PRIORITY;
   }
 
-  protected Integer getJobDefinitionPriority(ExecutionEntity execution, JobDeclaration<?> jobDeclaration) {
+  protected Integer getJobDefinitionPriority(ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
     String jobDefinitionId = jobDeclaration.getJobDefinitionId();
 
     if (jobDefinitionId != null) {
@@ -63,7 +63,7 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
     return null;
   }
 
-  protected Integer getProcessDefinitionPriority(ExecutionEntity execution, JobDeclaration<?> jobDeclaration) {
+  protected Integer getProcessDefinitionPriority(ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
     ProcessDefinitionImpl processDefinition = null;
 
     if (execution != null) {
@@ -89,13 +89,13 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
     return null;
   }
 
-  protected JobDefinitionEntity getJobDefinitionFor(JobDeclaration<?> jobDeclaration) {
+  protected JobDefinitionEntity getJobDefinitionFor(JobDeclaration<?, ?> jobDeclaration) {
     return Context.getCommandContext()
         .getJobDefinitionManager()
         .findById(jobDeclaration.getJobDefinitionId());
   }
 
-  protected Integer getActivityPriority(ExecutionEntity execution, JobDeclaration<?> jobDeclaration) {
+  protected Integer getActivityPriority(ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
     if (jobDeclaration != null) {
       ParameterValueProvider priorityProvider = jobDeclaration.getJobPriorityProvider();
       if (priorityProvider != null) {
@@ -106,7 +106,7 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
     return null;
   }
 
-  protected Integer evaluateValueProvider(ParameterValueProvider valueProvider, ExecutionEntity execution, JobDeclaration<?> jobDeclaration) {
+  protected Integer evaluateValueProvider(ParameterValueProvider valueProvider, ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
     Object value = valueProvider.getValue(execution);
 
     if (!(value instanceof Number)) {
@@ -125,7 +125,7 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
     }
   }
 
-  protected String describeContext(JobDeclaration<?> jobDeclaration, ExecutionEntity executionEntity) {
+  protected String describeContext(JobDeclaration<?, ?> jobDeclaration, ExecutionEntity executionEntity) {
     return "Job " + jobDeclaration.getActivityId()
             + "/" + jobDeclaration.getJobHandlerType() + " instantiated "
             + "in context of " + executionEntity;

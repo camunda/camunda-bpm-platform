@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.bpmn.job;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobPriorityProvider;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
 
@@ -264,5 +265,27 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
 
     // then the job has the priority specified in the BPMN XML
     assertEquals(25, job.getPriority());
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/job/intermediateSignalAsyncProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/job/intermediateSignalCatchJobPrioProcess.bpmn20.xml"})
+  public void testAsyncSignalThrowingEventActivityPriority() {
+    // given a receiving process instance with two subscriptions
+    runtimeService.startProcessInstanceByKey("intermediateSignalCatchJobPrioProcess");
+
+    // and a process instance that executes an async signal throwing event
+    runtimeService.startProcessInstanceByKey("intermediateSignalJobPrioProcess");
+
+    Execution signal1Execution = runtimeService.createExecutionQuery().activityId("signal1").singleResult();
+    Job signal1Job = managementService.createJobQuery().executionId(signal1Execution.getId()).singleResult();
+
+    Execution signal2Execution = runtimeService.createExecutionQuery().activityId("signal2").singleResult();
+    Job signal2Job = managementService.createJobQuery().executionId(signal2Execution.getId()).singleResult();
+
+    // then the jobs have the priority as specified for the receiving events, not the throwing
+    assertEquals(8, signal1Job.getPriority());
+    assertEquals(4, signal2Job.getPriority());
+
   }
 }
