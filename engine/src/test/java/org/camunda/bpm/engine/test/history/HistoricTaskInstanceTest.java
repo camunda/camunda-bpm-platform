@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -219,6 +220,34 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
 
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().finished().count());
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().unfinished().count());
+  }
+
+  @Deployment
+  public void testHistoricTaskInstanceQueryByProcessVariableValue() throws Exception {
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
+    if (historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+      Map<String, Object> variables = new HashMap<String, Object>();
+      variables.put("hallo", "steffen");
+
+      String processInstanceId = runtimeService.startProcessInstanceByKey("HistoricTaskInstanceTest", variables).getId();
+
+      Task runtimeTask = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
+      String taskId = runtimeTask.getId();
+
+      HistoricTaskInstance historicTaskInstance = historyService
+          .createHistoricTaskInstanceQuery()
+          .processVariableValueEquals("hallo", "steffen")
+          .singleResult();
+
+      assertNotNull(historicTaskInstance);
+      assertEquals(taskId, historicTaskInstance.getId());
+
+      taskService.complete(taskId);
+      assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskId(taskId).count());
+
+      historyService.deleteHistoricTaskInstance(taskId);
+      assertEquals(0, historyService.createHistoricTaskInstanceQuery().count());
+    }
   }
 
   public void testHistoricTaskInstanceAssignment() {
