@@ -2752,6 +2752,14 @@ public class BpmnParse extends Parse {
   protected void parseIntermediateSignalEventDefinition(Element element, ActivityImpl signalActivity) {
     signalActivity.setProperty("type", "intermediateSignalCatch");
 
+    parseSignalCatchEventDefinition(element, signalActivity);
+
+    for (BpmnParseListener parseListener : parseListeners) {
+      parseListener.parseIntermediateSignalCatchEventDefinition(element, signalActivity);
+    }
+  }
+
+  protected void parseSignalCatchEventDefinition(Element element, ActivityImpl signalActivity) {
     EventSubscriptionDeclaration signalDefinition = parseSignalEventDefinition(element);
     signalDefinition.setActivityId(signalActivity.getId());
     addEventSubscriptionDeclaration(signalDefinition, signalActivity.getEventScope(), element);
@@ -2760,10 +2768,6 @@ public class BpmnParse extends Parse {
     catchingAsyncDeclaration.setJobPriorityProvider((ParameterValueProvider) signalActivity.getProperty(PROPERTYNAME_JOB_PRIORITY));
     signalDefinition.setJobDeclaration(catchingAsyncDeclaration);
     addEventSubscriptionJobDeclaration(catchingAsyncDeclaration, signalActivity, element);
-
-    for (BpmnParseListener parseListener : parseListeners) {
-      parseListener.parseIntermediateSignalCatchEventDefinition(element, signalActivity);
-    }
   }
 
   protected EventSubscriptionDeclaration parseSignalEventDefinition(Element signalEventDefinitionElement) {
