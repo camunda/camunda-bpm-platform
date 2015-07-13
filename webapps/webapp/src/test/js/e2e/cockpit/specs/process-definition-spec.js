@@ -1,20 +1,19 @@
 /* jshint ignore:start */
 'use strict';
 
-var fs = require('fs');
-
 var testHelper = require('../../test-helper');
 var setupFile = require('./process-setup');
 
 var dashboardPage = require('../pages/dashboard');
 var definitionPage = require('../pages/process-definition');
 
+
 describe('Cockpit Process Definition Spec', function() {
 
   describe('page navigation', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
@@ -79,7 +78,7 @@ describe('Cockpit Process Definition Spec', function() {
   describe('diagram interaction', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
@@ -87,13 +86,16 @@ describe('Cockpit Process Definition Spec', function() {
       });
     });
 
-
     it('should display process diagram', function() {
+
+      // then
       expect(definitionPage.diagram.diagramElement().isDisplayed()).to.eventually.be.true;
     });
 
 
     it('should display the number of running process instances', function() {
+
+      // then
       expect(definitionPage.diagram.instancesBadgeFor('UserTask_1').getText()).to.eventually.eql('3');
     });
 

@@ -7,18 +7,18 @@ var dashboardPage = require('../pages/dashboard');
 var definitionPage = require('../pages/process-definition');
 var instancePage = require('../pages/process-instance');
 
+
 describe('Cockpit Process Definition Filter Spec', function() {
 
   describe('filter by variable', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
         dashboardPage.deployedProcessesList.selectProcess(0);
       });
     });
-
 
     it('should add new filter', function() {
 
@@ -70,13 +70,12 @@ describe('Cockpit Process Definition Filter Spec', function() {
   describe('filter by business key and variable', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
         dashboardPage.deployedProcessesList.selectProcess(0);
       });
     });
-
 
     it('should add new filter', function() {
 
@@ -121,7 +120,7 @@ describe('Cockpit Process Definition Filter Spec', function() {
   describe.skip('filtering with long expressions', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
         dashboardPage.deployedProcessesList.selectProcess(0);
@@ -159,7 +158,7 @@ describe('Cockpit Process Definition Filter Spec', function() {
   describe('filtering dates', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
         dashboardPage.deployedProcessesList.selectProcess(0);

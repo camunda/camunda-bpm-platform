@@ -1,18 +1,17 @@
 'use strict';
 
-var fs = require('fs');
-
 var testHelper = require('../../test-helper');
 var setupFile = require('./dashboard-setup');
 
 var dashboardPage = require('../pages/dashboard');
+
 
 describe('Cockpit Dashboard Spec', function() {
 
   describe('dashboard page navigation', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
@@ -24,10 +23,6 @@ describe('Cockpit Dashboard Spec', function() {
       // then
       dashboardPage.isActive();
       expect(dashboardPage.deployedProcessesList.processCountHeader()).to.eventually.eql('1 process deployed');
-
-/*      dashboardPage.deployedProcessesList.processCountHeader().then(function(headerText) {
-        expect(headerText.split(' ').shift()).to.equal('1');
-      });*/
     });
 
 
@@ -56,23 +51,8 @@ describe('Cockpit Dashboard Spec', function() {
     describe('start instance and validate', function() {
 
       before(function() {
-        var newSetup = {};
-        newSetup['process-definition'] = {
-          start: [{
-            key: 'failing-process',
-            businessKey: 'Instance1',
-            variables: {
-              test : {
-                value: 1,
-                type: 'Integer'
-              }
-            }
-          }]
-        };
-
-        return testHelper(newSetup, true);
+        return testHelper(setupFile.setup2, true);
       });
-
 
       it('should count number of processes', function() {
 
@@ -91,33 +71,8 @@ describe('Cockpit Dashboard Spec', function() {
     describe('deploy process and validate', function() {
 
       before(function() {
-        var newSetup = {};
-
-        newSetup.deployment = {
-          create: [{
-            deploymentName:  'process-with-subprocess',
-            files:           [{
-              name: 'process-with-sub-process.bpmn',
-              content: fs.readFileSync(__dirname + '/../../resources/process-with-sub-process.bpmn').toString()
-            }]
-          }]
-        };
-        newSetup['process-definition'] = {
-          start: [{
-            key: 'processWithSubProcess',
-            businessKey: 'Instance1',
-            variables: {
-              test : {
-                value: 1,
-                type: 'Integer'
-              }
-            }
-          }]
-        };
-
-        return testHelper(newSetup, true);
+        return testHelper(setupFile.setup3, true);
       });
-
 
       it('should validate process list', function() {
 

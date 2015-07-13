@@ -1,7 +1,5 @@
 'use strict';
 
-var fs = require('fs');
-
 var testHelper = require('../../test-helper');
 var setupFile = require('./suspension-setup');
 
@@ -9,19 +7,19 @@ var dashboardPage = require('../pages/dashboard');
 var definitionPage = require('../pages/process-definition');
 var instancePage = require('../pages/process-instance');
 
+
 describe('Cockpit Suspsension Spec', function() {
 
   describe('process definition suspension', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
         dashboardPage.deployedProcessesList.selectProcess(0);
       });
     });
-
 
     it('should suspend definition immediately', function() {
 
@@ -48,7 +46,7 @@ describe('Cockpit Suspsension Spec', function() {
   describe('process instance suspension', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
@@ -56,7 +54,6 @@ describe('Cockpit Suspsension Spec', function() {
         definitionPage.processInstancesTab.selectInstanceId(0);
       });
     });
-
 
     it('should suspend instance', function() {
 
@@ -97,7 +94,7 @@ describe('Cockpit Suspsension Spec', function() {
   describe('job suspension', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
@@ -105,7 +102,6 @@ describe('Cockpit Suspsension Spec', function() {
         definitionPage.jobDefinitionsTab.selectTab();
       });
     });
-
 
     it('should suspend job definition immediately', function() {
 

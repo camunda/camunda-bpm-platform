@@ -1,8 +1,6 @@
 /* jshint ignore:start */
 'use strict';
 
-var fs = require('fs');
-
 var testHelper = require('../../test-helper');
 var setupFile = require('./process-setup');
 
@@ -10,19 +8,19 @@ var dashboardPage = require('../pages/dashboard');
 var definitionPage = require('../pages/process-definition');
 var instancePage = require('../pages/process-instance');
 
+
 describe('Cockpit Process Instance Spec', function() {
 
   describe('page navigation', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
 
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
         dashboardPage.deployedProcessesList.selectProcess(0);
       });
     });
-
 
     it('should go to process instance view', function() {
 
@@ -87,14 +85,13 @@ describe('Cockpit Process Instance Spec', function() {
   describe('edit User Task assignee', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
         dashboardPage.deployedProcessesList.selectProcess(0);
         definitionPage.processInstancesTab.selectInstanceId(0);
       });
     });
-
 
     it('should open user tasks tab', function() {
 
@@ -132,7 +129,7 @@ describe('Cockpit Process Instance Spec', function() {
   describe('diagram interaction', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
         dashboardPage.deployedProcessesList.selectProcess(0);
@@ -140,8 +137,9 @@ describe('Cockpit Process Instance Spec', function() {
       });
     });
 
-
     it('should display process diagram', function() {
+
+      // then
       expect(instancePage.diagram.diagramElement().isDisplayed()).to.eventually.be.true;
     });
 
@@ -157,6 +155,8 @@ describe('Cockpit Process Instance Spec', function() {
 
 
     it('should display the number of concurrent activities', function() {
+
+      // then
       expect(instancePage.diagram.instancesBadgeFor('UserTask_1').getText()).to.eventually.eql('1');
     });
 
@@ -213,13 +213,12 @@ describe('Cockpit Process Instance Spec', function() {
   describe('cancel instance', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
         dashboardPage.deployedProcessesList.selectProcess(0);
       });
     });
-
 
     it('cancel instances', function() {
 

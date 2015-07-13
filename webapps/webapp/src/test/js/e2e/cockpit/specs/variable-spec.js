@@ -14,14 +14,13 @@ describe('Cockpit Variable Spec', function() {
   describe('work with variables', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
         dashboardPage.navigateToWebapp('Cockpit');
         dashboardPage.authentication.userLogin('admin', 'admin');
         dashboardPage.deployedProcessesList.selectProcess(0);
         definitionPage.processInstancesTab.selectInstanceId(0);
       });
     });
-
 
     it('should select variable scope', function() {
 
@@ -181,14 +180,13 @@ describe('Cockpit Variable Spec', function() {
     describe('validate add variables modal view', function() {
 
       before(function() {
-        return testHelper(setupFile, function() {
+        return testHelper(setupFile.setup1, function() {
           dashboardPage.navigateToWebapp('Cockpit');
           dashboardPage.authentication.userLogin('admin', 'admin');
           dashboardPage.deployedProcessesList.selectProcess(0);
           definitionPage.processInstancesTab.selectInstanceId(0);
         });
       });
-
 
       it('should open modal view', function() {
 
