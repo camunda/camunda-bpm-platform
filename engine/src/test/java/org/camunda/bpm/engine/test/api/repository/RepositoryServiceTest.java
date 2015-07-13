@@ -131,6 +131,8 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
 
     runtimeService.startProcessInstanceByKey("testProcess");
 
+    RecorderTaskListener.getRecordedEvents().clear();
+
     repositoryService.deleteDeployment(deploymentId, true, false);
     assertTrue(RecorderTaskListener.getRecordedEvents().size() == 1);
     RecorderTaskListener.clear();
