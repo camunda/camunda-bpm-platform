@@ -11,13 +11,12 @@ describe('Task Claiming Spec', function() {
   describe('claim and unclaim', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
 
         dashboardPage.navigateToWebapp('Tasklist');
         dashboardPage.authentication.userLogin('admin', 'admin');
       });
     });
-
 
     it('should claim a task', function() {
 
@@ -77,6 +76,7 @@ describe('Task Claiming Spec', function() {
       expect(dashboardPage.currentTask.history.operationUser(0)).to.eventually.eql('admin');
     });
 
+
     it('should check assignee in list of tasks - unclaim', function() {
 
       // then
@@ -89,19 +89,12 @@ describe('Task Claiming Spec', function() {
   describe('change assignee name', function() {
 
     before(function() {
-        setupFile.task.assignee = [];
-        setupFile.task.assignee.push({
-            taskId: '1',
-            userId: 'test'
-          });
-
-        return testHelper(setupFile, function() {
+        return testHelper(setupFile.setup2, function() {
 
           dashboardPage.navigateToWebapp('Tasklist');
           dashboardPage.authentication.userLogin('admin', 'admin');
       });
     });
-
 
     it('should validate assignee', function() {
 

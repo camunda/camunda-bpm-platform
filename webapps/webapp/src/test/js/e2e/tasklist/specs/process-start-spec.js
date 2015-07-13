@@ -9,16 +9,16 @@ var setupFile = require('./process-start-setup');
 var dashboardPage = require('../pages/dashboard');
 var startDialogPage = dashboardPage.startProcess;
 
+
 describe('Tasklist Start Spec', function () {
 
   before(function() {
-    return testHelper(setupFile, function() {
+    return testHelper(setupFile.setup1, function() {
 
       dashboardPage.navigateToWebapp('Tasklist');
       dashboardPage.authentication.userLogin('admin', 'admin');
     });
   });
-
 
   describe('start process dialog', function() {
 
@@ -240,7 +240,6 @@ describe('Tasklist Start Spec', function () {
       dashboardPage.navigateTo();
       dashboardPage.startProcess.openStartDialogAndSelectProcess('User Tasks');
     });
-
 
     it('should enter variables and business key', function() {
 

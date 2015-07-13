@@ -12,7 +12,7 @@ describe('Tasklist Filter Permissions Spec', function() {
   describe('the permissions page', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
 
         dashboardPage.navigateToWebapp('Tasklist');
         dashboardPage.authentication.userLogin('admin', 'admin');
@@ -122,7 +122,7 @@ describe('Tasklist Filter Permissions Spec', function() {
     describe('create user permission', function() {
 
       before(function() {
-        return testHelper(setupFile, function() {
+        return testHelper(setupFile.setup1, function() {
 
           dashboardPage.navigateToWebapp('Tasklist');
           dashboardPage.authentication.userLogin('admin', 'admin');
@@ -164,7 +164,7 @@ describe('Tasklist Filter Permissions Spec', function() {
     describe('create group permission', function() {
 
       before(function() {
-        return testHelper(setupFile, function() {
+        return testHelper(setupFile.setup1, function() {
 
           dashboardPage.navigateToWebapp('Tasklist');
           dashboardPage.authentication.userLogin('admin', 'admin');
@@ -206,7 +206,7 @@ describe('Tasklist Filter Permissions Spec', function() {
     describe('make filter accessible for all user', function() {
 
       before(function() {
-        return testHelper(setupFile, function() {
+        return testHelper(setupFile.setup1, function() {
 
           dashboardPage.navigateToWebapp('Tasklist');
           dashboardPage.authentication.userLogin('admin', 'admin');

@@ -19,7 +19,6 @@ describe('Tasklist Filter Basic Spec', function() {
       });
     });
 
-
     it('should validate default conditions', function() {
 
       // then
@@ -33,13 +32,12 @@ describe('Tasklist Filter Basic Spec', function() {
   describe('create filter', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
 
         dashboardPage.navigateToWebapp('Tasklist');
         dashboardPage.authentication.userLogin('test', 'test');
       });
     });
-
 
     it('should validate existing filter', function() {
 
@@ -111,13 +109,12 @@ describe('Tasklist Filter Basic Spec', function() {
   describe('delete filter', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
 
         dashboardPage.navigateToWebapp('Tasklist');
         dashboardPage.authentication.userLogin('test', 'test');
       });
     });
-
 
     it('should open delete page', function() {
 
@@ -173,16 +170,16 @@ describe('Tasklist Filter Basic Spec', function() {
 
   });
 
+
   describe('edit filter', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
 
         dashboardPage.navigateToWebapp('Tasklist');
         dashboardPage.authentication.userLogin('test', 'test');
       });
     });
-
 
     it('should open edit menu of My Tasks filter', function() {
 

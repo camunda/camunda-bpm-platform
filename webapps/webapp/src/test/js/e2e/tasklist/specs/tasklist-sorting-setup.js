@@ -1,132 +1,84 @@
 'use strict';
 
-var fs = require('fs');
+var fs = require('fs'),
+    factory = require('../../setup-factory.js'),
+    combine = factory.combine,
+    operation = factory.operation;
 
-var ops = module.exports = {};
-ops.filter = {
-  create: [{
-    name:         'All',
-    query: {},
-    properties: {
-      variables: [{
-        name: 'testVar',
-        label: 'varTest'
-      }],
-      showUndefinedVariable: true
-    },
-    resourceType: 'Task'
-  }]
-};
+module.exports = {
 
-ops.user = {
-  create: [{
-    'id': 'test',
-    'firstName': 'test',
-    'lastName': 'test',
-    'password': 'test'
-  }]
-};
+  setup1:
 
-ops.authorization = {
-  create: [
-    {
-      type : 1,
-      permissions: ['ALL'],
-      userId: 'test',
-      groupId: null,
-      resourceType: 0,
-      resourceId: 'tasklist'
-    },
-    {
-      type : 1,
-      permissions: ['ALL'],
-      userId: 'test',
-      groupId: null,
-      resourceType: 5,
-      resourceId: '*'
-    },
-    {
-      type : 1,
-      permissions: ['READ'],
-      userId: 'test',
-      groupId: null,
-      resourceType: 7,
-      resourceId: '*'
-    }]
-};
+    combine(
+      operation('filter', 'create', [{
+        name:         'All',
+        query: {},
+        resourceType: 'Task',
+        properties: {
+          variables: [{
+            name: 'testVar',
+            label: 'Test Variable'
+          }],
+          showUndefinedVariable: true
+        }
+      }]),
 
-ops.task = {
-  create: [
-    {
-      id: '1',
-      name: 'Task 1',
-      assignee: 'test',
-      due: '2016-09-15T15:45:48'
-    },
-    {
-      id: '2',
-      name: 'Task 2',
-      assignee: 'test',
-      due: '2016-09-16T15:45:48'
-    },
-    {
-      id: 'abc123',
-      name: 'My Task',
-      assignee: 'test',
-      due: '2016-09-15T15:46:48'
-    },
-  ],
+      operation('user', 'create', [{
+        id: 'test',
+        firstName: 'test',
+        lastName: 'test',
+        password: 'test'
+      }]),
 
-  localVariable: [
-    {
-      id: '1',
-      varId: 'testVar',
-      value: 42,
-      type: 'Integer'
-    }
-  ]
-};
+      operation('authorization', 'create', [{
+        type : 1,
+        permissions: ['ALL'],
+        userId: 'test',
+        groupId: null,
+        resourceType: 0,
+        resourceId: 'tasklist'
+      },
+      {
+        type : 1,
+        permissions: ['ALL'],
+        userId: 'test',
+        groupId: null,
+        resourceType: 5,
+        resourceId: '*'
+      },
+      {
+        type : 1,
+        permissions: ['READ'],
+        userId: 'test',
+        groupId: null,
+        resourceType: 7,
+        resourceId: '*'
+      }]),
 
-/*ops.deployment = {
-  create: [{
-    deploymentName:  'user-tasks',
-    files:           [{
-      name: 'user-tasks.bpmn',
-      content: fs.readFileSync(__dirname + '/../../resources/user-tasks.bpmn').toString()
-    }]
-  }]
-};
+      operation('task', 'create', [{
+        id: '1',
+        name: 'Task 1',
+        assignee: 'test',
+        due: '2016-09-15T15:45:48'
+      },
+      {
+        id: '2',
+        name: 'Task 2',
+        assignee: 'test',
+        due: '2016-09-16T15:45:48'
+      },
+      {
+        id: 'abc123',
+        name: 'My Task',
+        assignee: 'test',
+        due: '2016-09-15T15:46:48'
+      }]),
 
-ops['process-definition'] = {
-  start: [{
-    key: 'user-tasks',
-    businessKey: 'Instance1',
-    variables: {
-      testVar : {
-        value: 1,
+      operation('task', 'localVariable', [{
+        id: '1',
+        varId: 'testVar',
+        value: 42,
         type: 'Integer'
-      }
-    }
-  },
-  {
-    key: 'user-tasks',
-    businessKey: 'Instance1',
-    variables: {
-      testVar : {
-        value: 2,
-        type: 'Integer'
-      }
-    }
-  },
-  {
-    key: 'user-tasks',
-    businessKey: 'Instance1',
-    variables: {
-      testVar : {
-        value: 3,
-        type: 'Integer'
-      }
-    }
-  }]
-};*/
+      }])
 
+)};

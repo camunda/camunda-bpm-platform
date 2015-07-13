@@ -10,13 +10,12 @@ var editModalPage = dashboardPage.taskFilters.editFilterPage;
 describe('Tasklist Filter Variables Spec', function() {
 
   before(function() {
-    return testHelper(setupFile, function() {
+    return testHelper(setupFile.setup1, function() {
 
       dashboardPage.navigateToWebapp('Tasklist');
       dashboardPage.authentication.userLogin('admin', 'admin');
     });
   });
-
 
   describe('the filter variable page', function() {
 

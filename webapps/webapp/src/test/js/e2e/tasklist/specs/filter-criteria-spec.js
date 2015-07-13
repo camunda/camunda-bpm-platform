@@ -12,7 +12,7 @@ describe('Tasklist Filter Criteria Spec', function() {
   describe('the criteria page', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
 
         dashboardPage.navigateToWebapp('Tasklist');
         dashboardPage.authentication.userLogin('admin', 'admin');
@@ -138,7 +138,7 @@ describe('Tasklist Filter Criteria Spec', function() {
     describe('to filter by instance, definition and task', function() {
 
       before(function() {
-        return testHelper(setupFile, function() {
+        return testHelper(setupFile.setup1, function() {
           dashboardPage.navigateToWebapp('Tasklist');
           dashboardPage.authentication.userLogin('test', 'test');
           dashboardPage.taskList.taskSorting.changeSorting(0, 'Task name');
@@ -190,7 +190,7 @@ describe('Tasklist Filter Criteria Spec', function() {
     describe('to filter by User / Groups', function() {
 
       before(function() {
-        return testHelper(setupFile, function() {
+        return testHelper(setupFile.setup1, function() {
           dashboardPage.navigateToWebapp('Tasklist');
           dashboardPage.authentication.userLogin('test', 'test');
           dashboardPage.taskList.taskSorting.changeSorting(0, 'Task name');
@@ -246,8 +246,9 @@ describe('Tasklist Filter Criteria Spec', function() {
         editModalPage.saveFilter();
 
         // then
-        expect(dashboardPage.taskList.taskName(0)).to.eventually.eql('Task 1');
-        expect(dashboardPage.taskList.taskList().count()).to.eventually.eql(1);
+        expect(dashboardPage.taskList.taskName(0)).to.eventually.eql('Task 2');
+        expect(dashboardPage.taskList.taskName(1)).to.eventually.eql('Task 1');
+        expect(dashboardPage.taskList.taskList().count()).to.eventually.eql(2);
       });
 
     });
@@ -256,7 +257,7 @@ describe('Tasklist Filter Criteria Spec', function() {
     describe('to filter by dates', function() {
 
       before(function() {
-        return testHelper(setupFile, function() {
+        return testHelper(setupFile.setup1, function() {
 
           dashboardPage.navigateToWebapp('Tasklist');
           dashboardPage.authentication.userLogin('test', 'test');
@@ -296,7 +297,7 @@ describe('Tasklist Filter Criteria Spec', function() {
       it('should edit follow up criterion', function() {
 
         // when
-        editModalPage.editCriterion(0,'Dates', 'Follow Up After', '2014-08-25T11:00:02');
+        editModalPage.editCriterion(0, 'Dates', 'Follow Up After', '2014-08-25T11:00:02');
         editModalPage.saveFilter();
 
         // then

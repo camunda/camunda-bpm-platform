@@ -8,12 +8,12 @@ var setupFile = require('./tasklist-search-setup');
 
 var page = require('../pages/dashboard');
 
+
 describe('Tasklist Search', function() {
 
   before(function() {
-    return testHelper(setupFile);
+    return testHelper(setupFile.setup1);
   });
-
 
   it('should display all tasks initially', function() {
 
@@ -111,6 +111,7 @@ describe('Tasklist Search', function() {
       expect(page.taskList.taskName(0)).to.eventually.eql('Task 2');
     });
 
+
     it('should change String search value and find Task 1', function() {
 
       // when
@@ -156,7 +157,9 @@ describe('Tasklist Search', function() {
 
   });
 
+
   describe('search by label', function() {
+
     it('should find tasks by label', function() {
       // when
       page.taskList.taskSearch.createSearch('Task Variable', 'Test Variable', '=', '42');
@@ -166,6 +169,7 @@ describe('Tasklist Search', function() {
       expect(page.taskList.taskName(0)).to.eventually.eql('Task 1');
     });
 
+
     it('should remove label search', function() {
 
       // when
@@ -174,37 +178,57 @@ describe('Tasklist Search', function() {
       // then
       expect(page.taskList.taskList().count()).to.eventually.eql(3);
     });
+
   });
 
+
   describe('search task properties', function() {
+
     it('should search by name like per default', function() {
+
+      // when
       page.taskList.taskSearch.searchInputField().click();
       page.taskList.taskSearch.searchInputField().sendKeys('1', protractor.Key.ENTER);
 
+      // then
       expect(page.taskList.taskList().count()).to.eventually.eql(1);
       expect(page.taskList.taskName(0)).to.eventually.eql('Task 1');
     });
 
+
     it('should not find a task if search is changed to equal', function() {
+
+      // when
       page.taskList.taskSearch.changeOperator(0, '=');
 
+      // then
       expect(page.taskList.taskList().count()).to.eventually.eql(0);
     });
 
+
     it('should find tasks by assignee', function() {
+
+      // when
       page.taskList.taskSearch.deleteSearch(0);
       page.taskList.taskSearch.createSearch('Assignee', 'test', '=');
 
+      // then
       expect(page.taskList.taskList().count()).to.eventually.eql(1);
       expect(page.taskList.taskName(0)).to.eventually.eql('Task 3');
     });
 
+
     it('should allow to use expressions', function() {
+
+      // when
       page.taskList.taskSearch.deleteSearch(0);
       page.taskList.taskSearch.createSearch('Assignee', '${ currentUser() }', '=');
 
+      // then
       expect(page.taskList.taskList().count()).to.eventually.eql(1);
       expect(page.taskList.taskName(0)).to.eventually.eql('Task 3');
     });
+
   });
+
 });

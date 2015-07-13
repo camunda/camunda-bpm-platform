@@ -1,65 +1,74 @@
 'use strict';
 
-var fs = require('fs');
+var fs = require('fs'),
+    factory = require('../../setup-factory.js'),
+    combine = factory.combine,
+    operation = factory.operation;
 
-var ops = module.exports = {};
-ops.filter = {
-  create: [{
+var fragment1 = combine(
+  operation('filter', 'create', [{
     name:         'All',
     query: {},
     resourceType: 'Task',
     properties: {
-      variables: [
-        {name: 'testVar', label: 'Test Variable'},
-        {name: 'testString', label:'String Variable'}
-      ]
+      variables: [{
+        name: 'testVar',
+        label: 'Test Variable'
+      },
+      {
+        name: 'testString',
+        label:'String Variable'
+      }]
     }
-  }]
-};
+  }]),
 
-ops.user = {
-  create: [{
+  operation('user', 'create', [{
     id: 'test',
     firstName: 'Montgomery',
     lastName: 'QA',
     password: 'test'
-  }]
-};
+  }]),
 
-ops.authorization = {
-  create: [
-    {
-      type : 1,
-      permissions: ['ALL'],
-      userId: 'test',
-      groupId: null,
-      resourceType: 0,
-      resourceId: 'tasklist'
-    },
-    {
-      type : 1,
-      permissions: ['ALL'],
-      userId: 'test',
-      groupId: null,
-      resourceType: 5,
-      resourceId: '*'
-    },
-    {
-      type : 1,
-      permissions: ['READ'],
-      userId: 'test',
-      groupId: null,
-      resourceType: 7,
-      resourceId: '*'
-    }]
-};
+  operation('authorization', 'create', [{
+    type : 1,
+    permissions: ['ALL'],
+    userId: 'test',
+    groupId: null,
+    resourceType: 0,
+    resourceId: 'tasklist'
+  },
+  {
+    type : 1,
+    permissions: ['ALL'],
+    userId: 'test',
+    groupId: null,
+    resourceType: 5,
+    resourceId: '*'
+  },
+  {
+    type : 1,
+    permissions: ['READ'],
+    userId: 'test',
+    groupId: null,
+    resourceType: 7,
+    resourceId: '*'
+  }]),
 
-ops.task = {
-  create: [
-    {
-      id: '1',
-      name: 'Task 1'
-    }
-  ]
+  operation('task', 'create', [{
+    id: '1',
+    name: 'Task 1'
+  }])
+)
 
+var fragment2 = combine(
+  operation('task', 'assignee', [{
+    taskId: '1',
+    userId: 'test'
+  }])
+)
+
+module.exports = {
+
+  setup1: fragment1,
+  setup2: combine(fragment1, fragment2)
 };
