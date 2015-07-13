@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.integrationtest.jobexecutor.beans;
 
+import java.io.Serializable;
+
 import javax.ejb.Stateless;
 import javax.inject.Named;
 
@@ -21,7 +23,9 @@ import javax.inject.Named;
  */
 @Named
 @Stateless
-public class PriorityBean {
+public class PriorityBean implements Serializable {
+
+  private static final long serialVersionUID = 1L;
 
   public static final int PRIORITY = 52;
 

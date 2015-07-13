@@ -363,6 +363,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean enableScriptCompilation = true;
   protected boolean cmmnEnabled = true;
 
+  protected boolean enableGracefulDegradationOnContextSwitchFailure = true;
+
   protected BusinessCalendarManager businessCalendarManager;
 
   protected String wsSyncFactoryClassName = DEFAULT_WS_SYNC_FACTORY;
@@ -2470,6 +2472,24 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    */
   public boolean isEnableScriptCompilation() {
     return enableScriptCompilation;
+  }
+
+  public boolean isEnableGracefulDegradationOnContextSwitchFailure() {
+    return enableGracefulDegradationOnContextSwitchFailure;
+  }
+
+  /**
+   * <p>If set to true, the process engine will tolerate certain exceptions that may result
+   * from the fact that it cannot switch to the context of a process application that has made
+   * a deployment.</p>
+   *
+   * <p>Affects the following scenarios:</p>
+   * <ul>
+   *   <li><b>Determining job priorities</b>: uses a default priority in case an expression fails to evaluate</li>
+   * </ul>
+   */
+  public void setEnableGracefulDegradationOnContextSwitchFailure(boolean enableGracefulDegradationOnContextSwitchFailure) {
+    this.enableGracefulDegradationOnContextSwitchFailure = enableGracefulDegradationOnContextSwitchFailure;
   }
 
   /**

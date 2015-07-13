@@ -12,9 +12,13 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
@@ -26,6 +30,12 @@ import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
  *
  */
 public class DefaultJobPriorityProvider implements JobPriorityProvider {
+
+  private static final Logger LOG = Logger.getLogger(DefaultJobPriorityProvider.class.getName());
+
+  public static int DEFAULT_PRIORITY = 0;
+
+  public static int DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE = 0;
 
   @Override
   public int determinePriority(ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
@@ -45,7 +55,7 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
       return processDefinitionPriority;
     }
 
-    return JobPriorityProvider.DEFAULT_PRIORITY;
+    return DEFAULT_PRIORITY;
   }
 
   protected Integer getJobDefinitionPriority(ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
@@ -107,7 +117,23 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
   }
 
   protected Integer evaluateValueProvider(ParameterValueProvider valueProvider, ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
-    Object value = valueProvider.getValue(execution);
+    Object value = null;
+    try {
+      value = valueProvider.getValue(execution);
+
+    } catch (ProcessEngineException e) {
+
+      if (Context.getProcessEngineConfiguration().isEnableGracefulDegradationOnContextSwitchFailure()
+          && isSymptomOfContextSwitchFailure(e, execution)) {
+
+        LOG.log(Level.WARNING, "Could not determine priority for job created in context of execution " + execution
+            + ". Using default priority " + DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE, e);
+        value = DefaultJobPriorityProvider.DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE;
+      }
+      else {
+        throw e;
+      }
+    }
 
     if (!(value instanceof Number)) {
       throw new ProcessEngineException(describeContext(jobDeclaration, execution)
@@ -123,6 +149,12 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
             + ": Priority value must be either Short, Integer, or Long in Integer range");
       }
     }
+  }
+
+  protected boolean isSymptomOfContextSwitchFailure(Throwable t, ExecutionEntity contextExecution) {
+    // a context switch failure can occur, if the current engine has no PA registration for the deployment
+    // subclasses may assert the actual throwable to narrow down the diagnose
+    return ProcessApplicationContextUtil.getTargetProcessApplication(contextExecution) == null;
   }
 
   protected String describeContext(JobDeclaration<?, ?> jobDeclaration, ExecutionEntity executionEntity) {

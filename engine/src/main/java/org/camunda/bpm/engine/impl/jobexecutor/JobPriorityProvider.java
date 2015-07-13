@@ -21,8 +21,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
  */
 public interface JobPriorityProvider {
 
-  public static int DEFAULT_PRIORITY = 0;
-
   /**
    *
    * @param execution may be null when the job is not created in the context of a

@@ -32,8 +32,8 @@ import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobPriorityProvider;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
-import org.camunda.bpm.engine.impl.jobexecutor.JobPriorityProvider;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Incident;
@@ -97,7 +97,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
 
   protected String jobDefinitionId;
 
-  protected int priority = JobPriorityProvider.DEFAULT_PRIORITY;
+  protected int priority = DefaultJobPriorityProvider.DEFAULT_PRIORITY;
 
   // runtime state /////////////////////////////
   protected boolean executing = false;

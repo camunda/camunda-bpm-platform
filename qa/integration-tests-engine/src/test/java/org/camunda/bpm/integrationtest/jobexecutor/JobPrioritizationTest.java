@@ -64,7 +64,6 @@ public class JobPrioritizationTest extends AbstractFoxPlatformIntegrationTest {
       .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/JobPrioritizationTest.serviceTask.bpmn20.xml")
       .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/JobPrioritizationTest.userTask.bpmn20.xml")
       .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/JobPrioritizationTest.intermediateMessage.bpmn20.xml");
-
   }
 
   @After

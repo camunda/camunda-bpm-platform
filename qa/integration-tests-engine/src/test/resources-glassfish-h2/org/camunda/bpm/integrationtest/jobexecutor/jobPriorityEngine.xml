@@ -14,6 +14,12 @@
       <property name="producePrioritizedJobs">true</property>
       <property name="transactionManagerJndiName">java:appserver/TransactionManager</property>
     </properties>
+    
+    <plugins>
+      <plugin>
+        <class>org.camunda.spin.plugin.impl.SpinProcessEnginePlugin</class>
+      </plugin>
+    </plugins>
   </process-engine>
   <process-archive name="archive1">
     <process-engine>engine1</process-engine>

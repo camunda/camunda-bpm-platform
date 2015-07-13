@@ -13,6 +13,8 @@
 package org.camunda.bpm.engine.test.bpmn.job;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobPriorityProvider;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Job;
@@ -24,16 +26,29 @@ import org.camunda.bpm.engine.test.Deployment;
  */
 public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEngineTestCase {
 
-  protected static final int EXPECTED_DEFAULT_PRIORITY = 0;
+  protected static final int EXPECTED_DEFAULT_PRIORITY = 123;
+  protected static final int EXPECTED_DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE = 296;
+
+  protected int originalDefaultPriority;
+  protected int originalDefaultPriorityOnFailure;
 
   protected void setUp() throws Exception {
     processEngineConfiguration.setProducePrioritizedJobs(true);
     processEngineConfiguration.setJobPriorityProvider(new DefaultJobPriorityProvider());
+    originalDefaultPriority = DefaultJobPriorityProvider.DEFAULT_PRIORITY;
+    originalDefaultPriorityOnFailure = DefaultJobPriorityProvider.DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE;
+
+    DefaultJobPriorityProvider.DEFAULT_PRIORITY = EXPECTED_DEFAULT_PRIORITY;
+    DefaultJobPriorityProvider.DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE = EXPECTED_DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE;
   }
 
   protected void tearDown() throws Exception {
     processEngineConfiguration.setProducePrioritizedJobs(false);
     processEngineConfiguration.setJobPriorityProvider(null);
+
+    // reset default priorities
+    DefaultJobPriorityProvider.DEFAULT_PRIORITY = originalDefaultPriority;
+    DefaultJobPriorityProvider.DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE = originalDefaultPriorityOnFailure;
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioExpressionProcess.bpmn20.xml")
@@ -79,8 +94,11 @@ public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEn
     assertEquals(22, job.getPriority());
   }
 
+  /**
+   * Can't distinguish this case from the cases we have to tolerate due to CAM-4207
+   */
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioExpressionProcess.bpmn20.xml")
-  public void testVariableValueExpressionPrioritizationFailsWhenVariableMisses() {
+  public void FAILING_testVariableValueExpressionPrioritizationFailsWhenVariableMisses() {
     // when
     try {
       runtimeService
@@ -184,6 +202,51 @@ public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEn
     Job job = managementService.createJobQuery().activityId("task1").singleResult();
     assertNotNull(job);
     assertEquals(14, job.getPriority());
+  }
+
+  /**
+   * This test case asserts that a non-resolving expression does not fail job creation;
+   * This is a unit test scenario, where simply the variable misses (in general a human-made error), but
+   * the actual case covered by the behavior are missing beans (e.g. in the case the engine can't perform a
+   * context switch)
+   */
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioExpressionProcess.bpmn20.xml")
+  public void testDefaultPriorityWhenBeanMisses() {
+    // creating a job with a priority that can't be resolved does not fail entirely but uses a default priority
+    runtimeService
+      .createProcessInstanceByKey("jobPrioExpressionProcess")
+      .startBeforeActivity("task1")
+      .execute();
+
+    // then
+    Job job = managementService.createJobQuery().singleResult();
+    assertEquals(EXPECTED_DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE, job.getPriority());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioExpressionProcess.bpmn20.xml")
+  public void testDisableGracefulDegradation() {
+    try {
+      processEngineConfiguration.setEnableGracefulDegradationOnContextSwitchFailure(false);
+
+      try {
+        runtimeService
+          .createProcessInstanceByKey("jobPrioExpressionProcess")
+          .startBeforeActivity("task1")
+          .execute();
+        fail("should not succeed due to missing variable");
+      } catch (ProcessEngineException e) {
+        assertTextPresentIgnoreCase("unknown property used in expression", e.getMessage());
+      }
+
+    } finally {
+      processEngineConfiguration.setEnableGracefulDegradationOnContextSwitchFailure(true);
+    }
+  }
+
+  public void testDefaultEngineConfigurationSetting() {
+    ProcessEngineConfigurationImpl config = new StandaloneInMemProcessEngineConfiguration();
+
+    assertTrue(config.isEnableGracefulDegradationOnContextSwitchFailure());
   }
 
 }
