@@ -150,7 +150,7 @@ public abstract class ProcessEngineConfiguration {
   protected String mailServerPassword; // means no authentication for mail server
   protected int mailServerPort = 25;
   protected boolean useTLS = false;
-  protected String mailServerDefaultFrom = "activiti@localhost";
+  protected String mailServerDefaultFrom = "camunda@localhost";
 
   protected String databaseType;
   protected String databaseSchemaUpdate = DB_SCHEMA_UPDATE_FALSE;
