@@ -6,7 +6,8 @@ var setupFile = require('./authorizations-setup');
 var authorizationsPage = require('../pages/authorizations');
 var cockpitPage = require('../../cockpit/pages/dashboard');
 
-describe('Admin authorizations Spec', function() {
+
+describe('Admin Authorizations Spec', function() {
 
   function checkCreateNewState() {
 
@@ -46,18 +47,13 @@ describe('Admin authorizations Spec', function() {
   }
 
   function abortCreatingNewAuthorization() {
-
-     // when
     authorizationsPage.abortNewAuthorizationButton().click();
-
-    // then
-    // expect(authorizationsPage.createNewElement().isDisplayed()).to.eventually.be.false;
   }
 
-  describe('Application Authorizations', function() {
+  describe('application authorizations', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
 
         authorizationsPage.navigateToWebapp('Admin');
         authorizationsPage.authentication.userLogin('admin', 'admin');
@@ -65,7 +61,6 @@ describe('Admin authorizations Spec', function() {
         authorizationsPage.selectNavbarItem('Authorizations');
       });
     });
-
 
     it('should navigate to application page', function() {
 
@@ -117,7 +112,7 @@ describe('Admin authorizations Spec', function() {
   describe('Authorization Authorizations', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
 
         authorizationsPage.navigateToWebapp('Admin');
         authorizationsPage.authentication.userLogin('admin', 'admin');
@@ -125,7 +120,6 @@ describe('Admin authorizations Spec', function() {
         authorizationsPage.selectNavbarItem('Authorizations');
       });
     });
-
 
     it('should navigate to authorization page', function() {
 
@@ -166,7 +160,7 @@ describe('Admin authorizations Spec', function() {
   describe('Deployment Authorizations', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
 
         authorizationsPage.navigateToWebapp('Admin');
         authorizationsPage.authentication.userLogin('admin', 'admin');
@@ -174,7 +168,6 @@ describe('Admin authorizations Spec', function() {
         authorizationsPage.selectNavbarItem('Authorizations');
       });
     });
-
 
     it('should navigate to deployment page', function() {
 
@@ -214,7 +207,7 @@ describe('Admin authorizations Spec', function() {
   describe('Filter Authorizations', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
 
         authorizationsPage.navigateToWebapp('Admin');
         authorizationsPage.authentication.userLogin('admin', 'admin');
@@ -222,7 +215,6 @@ describe('Admin authorizations Spec', function() {
         authorizationsPage.selectNavbarItem('Authorizations');
       });
     });
-
 
     it('should navigate to filter page', function() {
 
@@ -262,7 +254,7 @@ describe('Admin authorizations Spec', function() {
   describe('Group Authorizations', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
 
         authorizationsPage.navigateToWebapp('Admin');
         authorizationsPage.authentication.userLogin('admin', 'admin');
@@ -270,7 +262,6 @@ describe('Admin authorizations Spec', function() {
         authorizationsPage.selectNavbarItem('Authorizations');
       });
     });
-
 
     it('should navigate to group page', function() {
 
@@ -311,7 +302,7 @@ describe('Admin authorizations Spec', function() {
   describe('Group Membership Authorizations', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
 
         authorizationsPage.navigateToWebapp('Admin');
         authorizationsPage.authentication.userLogin('admin', 'admin');
@@ -319,7 +310,6 @@ describe('Admin authorizations Spec', function() {
         authorizationsPage.selectNavbarItem('Authorizations');
       });
     });
-
 
     it('should navigate to group membership page', function() {
 
@@ -358,7 +348,7 @@ describe('Admin authorizations Spec', function() {
   describe('Process Definition Authorizations', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
 
         authorizationsPage.navigateToWebapp('Admin');
         authorizationsPage.authentication.userLogin('admin', 'admin');
@@ -366,7 +356,6 @@ describe('Admin authorizations Spec', function() {
         authorizationsPage.selectNavbarItem('Authorizations');
       });
     });
-
 
     it('should navigate to process definition page', function() {
 
@@ -422,7 +411,7 @@ describe('Admin authorizations Spec', function() {
   describe('Process Instance Authorizations', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
 
         authorizationsPage.navigateToWebapp('Admin');
         authorizationsPage.authentication.userLogin('admin', 'admin');
@@ -430,7 +419,6 @@ describe('Admin authorizations Spec', function() {
         authorizationsPage.selectNavbarItem('Authorizations');
       });
     });
-
 
     it('should navigate to process instance page', function() {
 
@@ -471,7 +459,7 @@ describe('Admin authorizations Spec', function() {
   describe('Task Authorizations', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
 
         authorizationsPage.navigateToWebapp('Admin');
         authorizationsPage.authentication.userLogin('admin', 'admin');
@@ -479,7 +467,6 @@ describe('Admin authorizations Spec', function() {
         authorizationsPage.selectNavbarItem('Authorizations');
       });
     });
-
 
     it('should navigate to task page', function() {
 
@@ -520,7 +507,7 @@ describe('Admin authorizations Spec', function() {
   describe('User Authorizations', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
 
         authorizationsPage.navigateToWebapp('Admin');
         authorizationsPage.authentication.userLogin('admin', 'admin');
@@ -528,7 +515,6 @@ describe('Admin authorizations Spec', function() {
         authorizationsPage.selectNavbarItem('Authorizations');
       });
     });
-
 
     it('should navigate to user page', function() {
 
@@ -565,20 +551,11 @@ describe('Admin authorizations Spec', function() {
 
   });
 
-  describe('Update', function() {
-    before(function() {
-      var authBatch = [];
-      for (var i = 0; i < 10; i++) {
-        authBatch.push({
-          type: 1, resourceType: 7, resourceId: '1', permissions: ['CREATE'], userId: 'a' + i
-        });
-      }
 
-      return testHelper({
-        authorization: {
-          create: authBatch
-        }
-      }, function () {
+  describe('Update', function() {
+
+    before(function() {
+      return testHelper(setupFile.setup2, function() {
         authorizationsPage.navigateToWebapp('Admin');
         authorizationsPage.authentication.userLogin('admin', 'admin');
 
@@ -589,6 +566,8 @@ describe('Admin authorizations Spec', function() {
     });
 
     it('can change user and group', function() {
+
+      // when
       authorizationsPage.editButton(2).click();
 
       authorizationsPage.userGroupButton(2).click();
@@ -596,41 +575,57 @@ describe('Admin authorizations Spec', function() {
 
       authorizationsPage.applyEditButton(2).click();
 
+      // then
       expect(authorizationsPage.authorizationIdentityType(2)).to.eventually.eql('Group');
       expect(authorizationsPage.authorizationIdentity(2)).to.eventually.eql('a2_test');
     });
 
+
     it('can add a permission', function() {
+
+      // when
       authorizationsPage.editButton(2).click();
 
       authorizationsPage.selectPermissionFor(2, 'UPDATE');
 
       authorizationsPage.applyEditButton(2).click();
 
+      // then
       expect(authorizationsPage.authorizationPermissions(2)).to.eventually.eql('CREATE, UPDATE');
     });
 
+
     it('can change the resource id', function() {
+
+      // when
       authorizationsPage.editButton(2).click();
 
       authorizationsPage.resourceInput(2).clear().sendKeys('foobar');
 
       authorizationsPage.applyEditButton(2).click();
 
+      // then
       expect(authorizationsPage.authorizationResource(2)).to.eventually.eql('foobar');
     });
 
+
     it('should restore previous state on cancel', function() {
+
+      // when
       authorizationsPage.editButton(3).click();
 
       authorizationsPage.userGroupInput(3).clear().sendKeys('a4');
 
       authorizationsPage.cancelEditButton(3).click();
 
+      // then
       expect(authorizationsPage.authorizationIdentity(3)).to.eventually.eql('a3');
     });
 
+
     it('should not apply conflicting updates', function() {
+
+      // when
       authorizationsPage.editButton(3).click();
 
       authorizationsPage.userGroupInput(3).clear().sendKeys('a4');
@@ -640,26 +635,17 @@ describe('Admin authorizations Spec', function() {
       // need sleep because update is successful until the server says otherwise
       browser.sleep(500);
 
+      // then
       expect(authorizationsPage.authorizationIdentity(3)).to.eventually.eql('a3');
     });
   });
 
 
   describe('Pagination', function () {
-    // create 45 authorizations... because we can.
-    before(function() {
-      var authBatch = [];
-      for (var i = 0; i < 45; i++) {
-        authBatch.push({
-          type: 1, resourceType: 7, resourceId: '1', permissions: ['CREATE'], userId: 'xxxxxxxxxxx' + i
-        });
-      }
 
-      return testHelper({
-        authorization: {
-          create: authBatch
-        }
-      }, function () {
+    before(function() {
+    // create 45 authorizations... because we can.
+      return testHelper(setupFile.setup3, function() {
         authorizationsPage.navigateToWebapp('Admin');
         authorizationsPage.authentication.userLogin('admin', 'admin');
 
@@ -670,10 +656,12 @@ describe('Admin authorizations Spec', function() {
     });
 
     it('displays a pager', function () {
-      expect(element(by.css('.pagination')).isPresent())
-        .to.eventually.eql(true);
-      expect(element.all(by.css('[ng-repeat="page in pages track by $index"]')).count())
-        .to.eventually.eql(2);
+
+      // then
+      expect(element(by.css('.pagination')).isPresent()).to.eventually.eql(true);
+      expect(element.all(by.css('[ng-repeat="page in pages track by $index"]')).count()).to.eventually.eql(2);
     });
+
   });
+
 });

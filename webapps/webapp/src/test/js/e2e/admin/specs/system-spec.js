@@ -6,10 +6,11 @@ var systemPage = require('../pages/system');
 
 var setupFile = require('./system-setup');
 
+
 describe('Admin system Spec', function() {
 
   before(function() {
-    return testHelper(setupFile, function() {
+    return testHelper(setupFile.setup1, function() {
 
       systemPage.navigateToWebapp('Admin');
       systemPage.authentication.userLogin('admin', 'admin');
@@ -41,6 +42,7 @@ describe('Admin system Spec', function() {
       expect(systemPage.general.boxHeader()).to.eventually.eql('General Settings');
     });
 
+
     it('should validate flow node count page', function() {
 
       // when
@@ -51,6 +53,7 @@ describe('Admin system Spec', function() {
       expect(systemPage.flowNodeCount.boxHeader()).to.eventually.eql('Flow Node Count');
       expect(systemPage.flowNodeCount.resultField()).to.eventually.eql('3');
     });
+
 
     it('should support time range', function() {
 
@@ -68,6 +71,7 @@ describe('Admin system Spec', function() {
       // then
       expect(systemPage.flowNodeCount.resultField()).to.eventually.eql('0');
     });
+
 
     xit('should validate license key page', function() {
 

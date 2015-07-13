@@ -12,7 +12,7 @@ describe('Admin Groups Spec', function() {
   describe('create new group', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
 
         usersPage.navigateToWebapp('Admin');
         usersPage.authentication.userLogin('admin', 'admin');
@@ -107,7 +107,7 @@ describe('Admin Groups Spec', function() {
   describe('update/delete group', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
 
         usersPage.navigateToWebapp('Admin');
         usersPage.authentication.userLogin('admin', 'admin');

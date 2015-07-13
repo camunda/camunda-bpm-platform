@@ -8,7 +8,7 @@ var usersPage = require('../pages/users');
 describe('Admin admin-user Spec', function() {
 
   before(function() {
-    return testHelper(setupFile);
+    return testHelper(setupFile.setup1);
   });
 
 

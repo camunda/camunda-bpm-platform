@@ -1,8 +1,12 @@
 'use strict';
 
-var ops = module.exports = {};
-ops.user = {
-  create: [{
+var fs = require('fs'),
+    factory = require('../../setup-factory.js'),
+    combine = factory.combine,
+    operation = factory.operation;
+
+var fragment1 = combine(
+  operation('user', 'create', [{
     id:         'john',
     password:   'MobyDick',
     firstName:  'John',
@@ -22,21 +26,41 @@ ops.user = {
     firstName:  'Ringo',
     lastName:   'Starr',
     email:      'ringo.starr@the-beatles.com'
-  }]
-};
-ops.group = {
-  create: [{
-    id:   'accounting',
-    name: 'Accounting',
-    type: 'WORKFLOW'
+  }]),
+
+  operation('group', 'create', [{
+    id:   "accounting",
+    name: "Accounting",
+    type: "WORKFLOW"
   },
   {
-    id:   'sales',
-    name: 'Sales',
-    type: 'WORKFLOW'
-  }],
-  createMember: [{
-    id:     'accounting',
-    userId: 'ringo'
-  }]
+    id:   "sales",
+    name: "Sales",
+    type: "WORKFLOW"
+  }]),
+
+  operation('group', 'createMember', [{
+    id:     "accounting",
+    userId: "ringo"
+  }])
+)
+
+var fragment2 = combine(
+  operation('group', 'create', [{
+    id: '/göäüp_name',
+      name: '/üöäüöäü/',
+      type: 'testgroup/üäö'
+    },
+    {
+      id: '\\göäüp_name',
+      name: '\\üöäüöäü\\',
+      type: 'testgroup\\üäö'
+    }])
+)
+
+
+module.exports = {
+
+  setup1: fragment1,
+  setup2: combine(fragment1, fragment2)
 };

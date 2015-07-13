@@ -3,28 +3,28 @@
 var testHelper = require('../../test-helper');
 var setupFile = require('./users-setup');
 
-var users = setupFile.user.create;
+var users = setupFile.setup1;
 
 var usersPage = require('../pages/users');
 var groupsPage = require('../pages/groups');
+
 
 describe('Admin Users Spec', function() {
 
   describe('user page navigation', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      console.log(setupFile.setup1[1].params.id);
+      return testHelper(setupFile.setup1, function() {
 
         usersPage.navigateToWebapp('Admin');
         usersPage.authentication.userLogin('admin', 'admin');
       });
     });
 
-
     beforeEach(function() {
       usersPage.navigateTo();
     });
-
 
     it('should validate users page', function() {
 
@@ -44,9 +44,9 @@ describe('Admin Users Spec', function() {
       usersPage.selectUserByNameLink(2);
 
       // then
-      usersPage.editUserProfile.isActive({ user: users[1].id });
-      expect(usersPage.editUserProfile.pageHeader()).to.eventually.eql((users[1].firstName + ' ' + users[1].lastName).toUpperCase());
-      expect(usersPage.editUserProfile.emailInput().getAttribute('value')).to.eventually.eql(users[1].email);
+      usersPage.editUserProfile.isActive({ user: users[1].params.id });
+      expect(usersPage.editUserProfile.pageHeader()).to.eventually.eql((users[1].params.firstName + ' ' + users[1].params.lastName).toUpperCase());
+      expect(usersPage.editUserProfile.emailInput().getAttribute('value')).to.eventually.eql(users[1].params.email);
     });
 
 
@@ -56,9 +56,9 @@ describe('Admin Users Spec', function() {
       usersPage.selectUserByEditLink(1);
 
       // then
-      usersPage.editUserProfile.isActive({ user: users[0].id });
-      expect(usersPage.editUserProfile.pageHeader()).to.eventually.eql((users[0].firstName + ' ' + users[0].lastName).toUpperCase());
-      expect(usersPage.editUserProfile.emailInput().getAttribute('value')).to.eventually.eql(users[0].email);
+      usersPage.editUserProfile.isActive({ user: users[0].params.id });
+      expect(usersPage.editUserProfile.pageHeader()).to.eventually.eql((users[0].params.firstName + ' ' + users[0].params.lastName).toUpperCase());
+      expect(usersPage.editUserProfile.emailInput().getAttribute('value')).to.eventually.eql(users[0].params.email);
     });
 
   })
@@ -67,13 +67,12 @@ describe('Admin Users Spec', function() {
   describe('create a new user', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
 
         usersPage.navigateToWebapp('Admin');
         usersPage.authentication.userLogin('admin', 'admin');
       });
     });
-
 
     it('should open Create New User page', function() {
 
@@ -130,13 +129,12 @@ describe('Admin Users Spec', function() {
   describe('delete a user', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
 
         usersPage.navigateToWebapp('Admin');
         usersPage.authentication.userLogin('admin', 'admin');
       });
     });
-
 
     it('should navigate to Account menu', function() {
 
@@ -165,18 +163,17 @@ describe('Admin Users Spec', function() {
   });
 
 
-  describe('update a user', function() {
+  describe('edit a user', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
 
         usersPage.navigateToWebapp('Admin');
         usersPage.authentication.userLogin('admin', 'admin');
       });
     });
 
-
-    describe('update user Profile?', function() {
+    describe('profile', function() {
 
       it('should validate profile page', function() {
 
@@ -198,18 +195,17 @@ describe('Admin Users Spec', function() {
 
         // then
         expect(usersPage.editUserProfile.pageHeader())
-          .to.eventually.eql((users[0].firstName + 'i' + ' ' + users[0].lastName).toUpperCase());
+          .to.eventually.eql((users[0].params.firstName + 'i' + ' ' + users[0].params.lastName).toUpperCase());
       });
 
     });
 
 
-    describe('update user Account', function() {
+    describe('account', function() {
 
       beforeEach(function() {
-        usersPage.editUserAccount.navigateTo({ user: users[2].id });
+        usersPage.editUserAccount.navigateTo({ user: users[2].params.id });
       });
-
 
       it('should validate account page', function() {
 
@@ -259,12 +255,14 @@ describe('Admin Users Spec', function() {
 
       it('should validate new password', function() {
 
-        // when
+        // given
         usersPage.logout();
-        usersPage.authentication.userLogin(users[2].id, 'asdfasdf');
+
+        // when
+        usersPage.authentication.userLogin(users[2].params.id, 'asdfasdf');
 
         // then
-        expect(usersPage.userFirstNameAndLastName(0)).to.eventually.eql(users[2].firstName + ' ' + users[2].lastName);
+        expect(usersPage.userFirstNameAndLastName(0)).to.eventually.eql(users[2].params.firstName + ' ' + users[2].params.lastName);
       });
 
     });
@@ -275,7 +273,7 @@ describe('Admin Users Spec', function() {
   describe('add/delete group', function() {
 
     before(function() {
-      return testHelper(setupFile, function() {
+      return testHelper(setupFile.setup1, function() {
 
         usersPage.navigateToWebapp('Admin');
         usersPage.authentication.userLogin('admin', 'admin');
@@ -289,9 +287,9 @@ describe('Admin Users Spec', function() {
       usersPage.editUserProfile.selectUserNavbarItem('Groups');
 
       // then
-      usersPage.editUserGroups.isActive({ user: users[2].id });
+      usersPage.editUserGroups.isActive({ user: users[2].params.id });
       expect(usersPage.editUserGroups.subHeader()).to.eventually
-        .eql(users[2].firstName + ' ' + users[2].lastName + '\'s' + ' ' + 'Groups');
+        .eql(users[2].params.firstName + ' ' + users[2].params.lastName + '\'s' + ' ' + 'Groups');
       expect(usersPage.editUserGroups.groupId(0)).to.eventually.eql('accounting');
       expect(usersPage.editUserGroups.groupList().count()).to.eventually.eql(1);
     });
@@ -354,29 +352,17 @@ describe('Admin Users Spec', function() {
     describe('use special group names', function() {
 
       before(function() {
-        setupFile.group.create.push({
-          id:   '/göäüp_name',
-          name: '/üöäüöäü/',
-          type: 'testgroup/üäö'
-        },
-        {
-          id:   '\\göäüp_name',
-          name: '\\üöäüöäü\\',
-          type: 'testgroup\\üäö'
-        });
-
-        return testHelper(setupFile, function() {
+        return testHelper(setupFile.setup2, function() {
 
           usersPage.navigateToWebapp('Admin');
           usersPage.authentication.userLogin('admin', 'admin');
         });
       });
 
-
       it('should validate group selection modal', function() {
 
         // given
-        usersPage.editUserGroups.navigateTo({ user: users[2].id });
+        usersPage.editUserGroups.navigateTo({ user: users[2].params.id });
 
         // when
         usersPage.editUserGroups.openAddGroupModal();
@@ -401,7 +387,7 @@ describe('Admin Users Spec', function() {
       it('should open group selection modal and validate the rest', function() {
 
         // given
-        usersPage.editUserGroups.navigateTo({ user: users[2].id });
+        usersPage.editUserGroups.navigateTo({ user: users[2].params.id });
 
         // when
         usersPage.editUserGroups.openAddGroupModal();
