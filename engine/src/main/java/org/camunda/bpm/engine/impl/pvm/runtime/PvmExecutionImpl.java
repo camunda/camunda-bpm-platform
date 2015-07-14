@@ -693,6 +693,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
     default:
       setActivity(activityImpl);
+      setActivityInstanceId(null);
       performOperation(PvmAtomicOperation.ACTIVITY_START_CREATE_SCOPE);
       break;
     }

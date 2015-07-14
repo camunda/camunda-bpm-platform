@@ -1842,21 +1842,6 @@ public class BpmnParse extends Parse {
     }
   }
 
-  /**
-   * Parse async continuation from 'multiInstanceLoopCharacteristics' element for an activity marked as multi instance.
-   * Async jobs create for the activity wrapped in multi instance body.
-   *
-   * @param activityElement activity element marked as multi instance
-   * @param activity activity wrapped in multi instance body
-   *
-   * @see #parseAsynchronousContinuationForActivity(Element, ActivityImpl)
-   */
-  protected void parseAsynchronousContinuationForMultiInstanceActivity(Element activityElement, ActivityImpl activity) {
-    Element miLoopCharacteristics = activityElement.element("multiInstanceLoopCharacteristics");
-
-    parseAsynchronousContinuation(miLoopCharacteristics, activity);
-  }
-
   protected ParameterValueProvider parseJobPriority(Element element) {
     String priorityAttribute = element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "jobPriority");
 

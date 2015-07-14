@@ -488,8 +488,8 @@ public class LegacyBehavior {
 
   /**
    * When deploying an async job definition for an activity wrapped in an miBody, set the activity id to the
-   * miBody except the wrapped activity is marked as async. 
-   * 
+   * miBody except the wrapped activity is marked as async.
+   *
    * Background: in <= 7.2 async job definitions were created for the inner activity, although the
    * semantics are that they are executed before the miBody is entered
    */
@@ -499,7 +499,7 @@ public class LegacyBehavior {
       String activityId = jobDefinition.getActivityId();
       if (activityId != null) {
         ActivityImpl activity = processDefinition.findActivity(jobDefinition.getActivityId());
-        
+
         if (!isAsync(activity) && isActivityWrappedInMultiInstanceBody(activity) && isAsyncJobDefinition(jobDefinition)) {
           jobDefinition.setActivityId(activity.getFlowScope().getId());
         }
@@ -510,17 +510,17 @@ public class LegacyBehavior {
   protected static boolean isAsync(ActivityImpl activity) {
     return activity.isAsyncBefore() || activity.isAsyncAfter();
   }
-  
+
   protected static boolean isAsyncJobDefinition(JobDefinitionEntity jobDefinition) {
     return AsyncContinuationJobHandler.TYPE.equals(jobDefinition.getJobType());
   }
-  
+
   protected static boolean isActivityWrappedInMultiInstanceBody(ActivityImpl activity) {
     ScopeImpl flowScope = activity.getFlowScope();
 
     if (flowScope != activity.getProcessDefinition()) {
       ActivityImpl flowScopeActivity = (ActivityImpl) flowScope;
-      
+
       return flowScopeActivity.getActivityBehavior() instanceof MultiInstanceActivityBehavior;
     } else {
       return false;
@@ -529,18 +529,18 @@ public class LegacyBehavior {
 
   /**
    * When executing an async job for an activity wrapped in an miBody, set the execution to the
-   * miBody except the wrapped activity is marked as async. 
-   * 
+   * miBody except the wrapped activity is marked as async.
+   *
    * Background: in <= 7.2 async jobs were created for the inner activity, although the
    * semantics are that they are executed before the miBody is entered
    */
   public static void repairMultiInstanceAsyncJob(ExecutionEntity execution) {
     ActivityImpl activity = execution.getActivity();
-    
+
     if (!isAsync(activity) && isActivityWrappedInMultiInstanceBody(activity)) {
-        execution.setActivity((ActivityImpl) activity.getFlowScope());
+      execution.setActivity((ActivityImpl) activity.getFlowScope());
     }
-  }  
+  }
 
   /**
    * With prior versions, the boundary event was already executed when compensation was performed; Thus, after

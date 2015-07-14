@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.engine.test.bpmn.async;
 
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,6 +27,7 @@ import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -121,6 +125,17 @@ public class AsyncStartEventTest extends PluggableProcessEngineTestCase {
       }
 
     }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/async/AsyncStartEventTest.testAsyncStartEvent.bpmn20.xml")
+  public void testAsyncStartEventActivityInstance() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncStartEvent");
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+          .transition("startEvent")
+        .done());
   }
 
   @Deployment
@@ -339,6 +354,18 @@ public class AsyncStartEventTest extends PluggableProcessEngineTestCase {
 
     assertEquals(0, runtimeService.createExecutionQuery().activityId("StartEvent_2").count());
     assertNotNull("The subprocess user task should have been reached", task);
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/async/AsyncStartEventTest.testAsyncSubProcessStartEvent.bpmn")
+  public void testAsyncSubProcessStartEventActivityInstance() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+          .beginScope("SubProcess_1")
+            .transition("StartEvent_2")
+        .done());
   }
 
 }
