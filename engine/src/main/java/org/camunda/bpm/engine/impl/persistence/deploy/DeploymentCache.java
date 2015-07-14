@@ -177,6 +177,7 @@ public class DeploymentCache {
 
   public void removeProcessDefinition(String processDefinitionId) {
     processDefinitionCache.remove(processDefinitionId);
+    bpmnModelInstanceCache.remove(processDefinitionId);
   }
 
   public void discardProcessDefinitionCache() {
@@ -323,6 +324,7 @@ public class DeploymentCache {
 
   public void removeCaseDefinition(String caseDefinitionId) {
     caseDefinitionCache.remove(caseDefinitionId);
+    cmmnModelInstanceCache.remove(caseDefinitionId);
   }
 
   public void discardCaseDefinitionCache() {

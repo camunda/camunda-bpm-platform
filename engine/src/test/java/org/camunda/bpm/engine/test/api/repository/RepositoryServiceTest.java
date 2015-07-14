@@ -176,6 +176,22 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     repositoryService.deleteDeployment(processDefinition.getDeploymentId(), true);
   }
 
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/repository/one.cmmn"})
+  public void testDeleteDeploymentClearsCache() {
+
+    // when
+    repositoryService.deleteDeployment(deploymentId, true);
+
+    // then the deployment cache is empty
+    assertTrue(processEngineConfiguration.getDeploymentCache().getProcessDefinitionCache().isEmpty());
+    assertTrue(processEngineConfiguration.getDeploymentCache().getBpmnModelInstanceCache().isEmpty());
+
+    assertTrue(processEngineConfiguration.getDeploymentCache().getCaseDefinitionCache().isEmpty());
+    assertTrue(processEngineConfiguration.getDeploymentCache().getCmmnModelInstanceCache().isEmpty());
+  }
+
   public void testFindDeploymentResourceNamesNullDeploymentId() {
     try {
       repositoryService.getDeploymentResourceNames(null);
