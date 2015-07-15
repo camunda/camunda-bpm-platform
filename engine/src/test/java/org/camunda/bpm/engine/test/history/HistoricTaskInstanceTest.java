@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -219,6 +220,58 @@ public class HistoricTaskInstanceTest extends PluggableProcessEngineTestCase {
 
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().finished().count());
     assertEquals(1, historyService.createHistoricTaskInstanceQuery().unfinished().count());
+  }
+
+  @Deployment
+  public void testHistoricTaskInstanceQueryByProcessVariableValue() throws Exception {
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
+    if (historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+      Map<String, Object> variables = new HashMap<String, Object>();
+      variables.put("hallo", "steffen");
+
+      String processInstanceId = runtimeService.startProcessInstanceByKey("HistoricTaskInstanceTest", variables).getId();
+
+      SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+
+      // Set priority to non-default value
+      Task runtimeTask = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
+      runtimeTask.setPriority(1234);
+
+      // Set due-date
+      Date dueDate = sdf.parse("01/02/2003 04:05:06");
+      runtimeTask.setDueDate(dueDate);
+      taskService.saveTask(runtimeTask);
+
+      String taskId = runtimeTask.getId();
+      String taskDefinitionKey = runtimeTask.getTaskDefinitionKey();
+
+      HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().processVariableValueEquals("hallo", "steffen")
+          .singleResult();
+
+      assertNotNull(historicTaskInstance);
+      assertEquals(taskId, historicTaskInstance.getId());
+      assertEquals(1234, historicTaskInstance.getPriority());
+      assertEquals("Clean up", historicTaskInstance.getName());
+      assertEquals("Schedule an engineering meeting for next week with the new hire.", historicTaskInstance.getDescription());
+      assertEquals(dueDate, historicTaskInstance.getDueDate());
+      assertEquals("kermit", historicTaskInstance.getAssignee());
+      assertEquals(taskDefinitionKey, historicTaskInstance.getTaskDefinitionKey());
+      assertNull(historicTaskInstance.getEndTime());
+      assertNull(historicTaskInstance.getDurationInMillis());
+
+      assertNull(historicTaskInstance.getCaseDefinitionId());
+      assertNull(historicTaskInstance.getCaseInstanceId());
+      assertNull(historicTaskInstance.getCaseExecutionId());
+
+      // the activity instance id is set
+      assertEquals(((TaskEntity) runtimeTask).getExecution().getActivityInstanceId(), historicTaskInstance.getActivityInstanceId());
+
+      taskService.complete(taskId);
+      assertEquals(1, historyService.createHistoricTaskInstanceQuery().taskId(taskId).count());
+
+      historyService.deleteHistoricTaskInstance(taskId);
+      assertEquals(0, historyService.createHistoricTaskInstanceQuery().count());
+    }
   }
 
   public void testHistoricTaskInstanceAssignment() {
