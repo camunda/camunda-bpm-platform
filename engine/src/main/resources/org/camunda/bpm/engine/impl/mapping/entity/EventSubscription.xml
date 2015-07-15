@@ -122,6 +122,14 @@
     	and (EVENT_NAME_ = #{parameter.eventName})
   </select>
 
+  <select id="selectSignalStartEventSubscriptionsByName" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+    select EVT.*
+    from ${prefix}ACT_RU_EVENT_SUBSCR EVT
+    where (EVENT_TYPE_ = 'signal')
+    	and (EVENT_NAME_ = #{parameter})
+    	and EXECUTION_ID_ is null
+  </select>
+
   <select id="selectEventSubscriptionsByExecution" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     select *
     from ${prefix}ACT_RU_EVENT_SUBSCR

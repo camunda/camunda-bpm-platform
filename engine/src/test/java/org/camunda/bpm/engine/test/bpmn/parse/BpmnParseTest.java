@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.bpmn.behavior.CompensationEndEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.NoneStartEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -419,6 +420,14 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
 
     repositoryService.deleteDeployment(repositoryService.createDeploymentQuery().singleResult().getId(), true);
+  }
+  
+  @Deployment
+  public void testParseSignalStartEvent(){
+    ActivityImpl signalStartActivity = findActivityInDeployedProcessDefinition("start");
+    
+    assertEquals("signalStartEvent", signalStartActivity.getProperty("type"));
+    assertEquals(NoneStartEventActivityBehavior.class, signalStartActivity.getActivityBehavior().getClass());
   }
 
   protected void assertActivityBounds(ActivityImpl activity, int x, int y, int width, int height) {

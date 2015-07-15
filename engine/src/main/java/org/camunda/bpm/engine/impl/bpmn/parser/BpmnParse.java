@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.text.StringCharacterIterator;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -764,8 +765,10 @@ public class BpmnParse extends Parse {
   protected void selectInitial(List<ActivityImpl> startEventActivities, ProcessDefinitionEntity processDefinition, Element parentElement) {
     ActivityImpl initial = null;
     // validate that there is s single none start event / timer start event:
+    List<String> exclusiveStartEventTypes = Arrays.asList("startEvent", "startTimerEvent");
+    
     for (ActivityImpl activityImpl : startEventActivities) {
-      if (!activityImpl.getProperty("type").equals("messageStartEvent")) {
+      if (exclusiveStartEventTypes.contains(activityImpl.getProperty("type"))) {
         if (initial == null) {
           initial = activityImpl;
         } else {
@@ -773,8 +776,7 @@ public class BpmnParse extends Parse {
         }
       }
     }
-    // if there is a single start event, select it as initial, regardless of
-    // it's type:
+    // if there is a single start event, select it as initial, regardless of it's type:
     if (initial == null && startEventActivities.size() == 1) {
       initial = startEventActivities.get(0);
     }
@@ -794,16 +796,24 @@ public class BpmnParse extends Parse {
 
     Element timerEventDefinition = startEventElement.element("timerEventDefinition");
     Element messageEventDefinition = startEventElement.element("messageEventDefinition");
+    Element signalEventDefinition = startEventElement.element("signalEventDefinition");
     if (timerEventDefinition != null) {
       parseTimerStartEventDefinition(timerEventDefinition, startEventActivity, processDefinition);
     } else if (messageEventDefinition != null) {
-      EventSubscriptionDeclaration messageDefinition = parseMessageEventDefinition(messageEventDefinition);
       startEventActivity.setProperty("type", "messageStartEvent");
+      
+      EventSubscriptionDeclaration messageDefinition = parseMessageEventDefinition(messageEventDefinition);
       messageDefinition.setActivityId(startEventActivity.getId());
-      // create message event subscription:
       messageDefinition.setStartEvent(true);
       addEventSubscriptionDeclaration(messageDefinition, processDefinition, startEventElement);
-    }
+    } else if (signalEventDefinition != null){
+      startEventActivity.setProperty("type", "signalStartEvent");
+      
+      EventSubscriptionDeclaration signalDefinition = parseSignalEventDefinition(signalEventDefinition);      
+      signalDefinition.setActivityId(startEventActivity.getActivityId());
+      signalDefinition.setStartEvent(true);
+      addEventSubscriptionDeclaration(signalDefinition, processDefinition, startEventElement);
+    } 
   }
 
   protected void parseStartFormHandlers(List<Element> startEventElements, ProcessDefinitionEntity processDefinition) {
@@ -978,19 +988,40 @@ public class BpmnParse extends Parse {
       eventDefinitions = new ArrayList<EventSubscriptionDeclaration>();
       scope.setProperty(PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION, eventDefinitions);
     } else {
-      // if this is a message event, validate that it is the only one with the
-      // provided name for this scope
-      if (subscription.getEventType().equals("message")) {
-        for (EventSubscriptionDeclaration eventDefinition : eventDefinitions) {
-          if (eventDefinition.getEventType().equals("message") && eventDefinition.getEventName().equals(subscription.getEventName())
-              && eventDefinition.isStartEvent() == subscription.isStartEvent()) {
-            addError("Cannot have more than one message event subscription with name '" + subscription.getEventName() + "' for scope '" + scope.getId() + "'",
-                element);
-          }
+      
+      // if this is a message event, validate that it is the only one with the provided name for this scope
+      if(hasMultipleMessageEventDefinitionsWithSameName(subscription, eventDefinitions)){
+        addError("Cannot have more than one message event subscription with name '" + subscription.getEventName() + "' for scope '" + scope.getId() + "'",
+            element);
+      }
+    
+      // if this is a signal event, validate that it is the only one with the provided name for this scope
+      if(hasMultipleSignalEventDefinitionsWithSameName(subscription, eventDefinitions)){
+        addError("Cannot have more than one signal event subscription with name '" + subscription.getEventName() + "' for scope '" + scope.getId() + "'",
+            element);
+      } 
+    }
+    eventDefinitions.add(subscription);
+  }
+
+  protected boolean hasMultipleMessageEventDefinitionsWithSameName(EventSubscriptionDeclaration subscription, List<EventSubscriptionDeclaration> eventDefinitions) {
+    return hasMultipleEventDefinitionsWithSameName(subscription, eventDefinitions, "message");
+  }
+  
+  protected boolean hasMultipleSignalEventDefinitionsWithSameName(EventSubscriptionDeclaration subscription, List<EventSubscriptionDeclaration> eventDefinitions) {
+    return hasMultipleEventDefinitionsWithSameName(subscription, eventDefinitions, "signal");
+  }
+
+  protected boolean hasMultipleEventDefinitionsWithSameName(EventSubscriptionDeclaration subscription, List<EventSubscriptionDeclaration> eventDefinitions, String eventType) {
+    if (subscription.getEventType().equals(eventType)) {
+      for (EventSubscriptionDeclaration eventDefinition : eventDefinitions) {
+        if (eventDefinition.getEventType().equals(eventType) && eventDefinition.getEventName().equals(subscription.getEventName())
+            && eventDefinition.isStartEvent() == subscription.isStartEvent()) {
+         return true;
         }
       }
     }
-    eventDefinitions.add(subscription);
+    return false;
   }
 
   protected void addEventSubscriptionJobDeclaration(EventSubscriptionJobDeclaration jobDeclaration, ActivityImpl activity, Element element) {

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:camunda="http://camunda.org/schema/1.0/bpmn" 
+	targetNamespace="Examples">
+
+	<signal id="alertSignal" name="alert" />
+	<signal id="abortSignal" name="abort" />
+
+	<process id="startByTwoSignals">
+
+		<startEvent id="start">
+			<signalEventDefinition signalRef="alertSignal" />
+		</startEvent>
+		
+		<sequenceFlow sourceRef="start" targetRef="alertTask" />
+
+		<userTask id="alertTask" />
+
+		<sequenceFlow sourceRef="alertTask" targetRef="end" />
+
+		<startEvent id="abortStart">
+			<signalEventDefinition signalRef="abortSignal" />
+		</startEvent>
+		
+		<sequenceFlow sourceRef="abortStart" targetRef="abortTask" />
+
+		<userTask id="abortTask" />
+		
+		<sequenceFlow sourceRef="abortStart" targetRef="end" />
+
+		<endEvent id="end" />
+
+	</process>
+	
+</definitions>

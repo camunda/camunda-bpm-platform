@@ -1314,26 +1314,28 @@ public interface RuntimeService {
 
   /**
    * Notifies the process engine that a signal event of name 'signalName' has
-   * been received. This method delivers the signal to all executions waiting on
-   * the signal.<p/>
+   * been received. Delivers the signal to all executions waiting on
+   * the signal and to all process definitions that can started by this signal. <p/>
    *
-   * <strong>NOTE:</strong> The waiting executions are notified synchronously.
+   * <strong>NOTE:</strong> Notification and instantiation happen synchronously.
    *
    * @param signalName
    *          the name of the signal event
    *
    * @throws AuthorizationException
-   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          <li>if notify an execution and the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.</li>
+   *          <li>if start a new process instance and the user has no {@link Permissions#CREATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#CREATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.</li>
    */
   void signalEventReceived(String signalName);
 
   /**
    * Notifies the process engine that a signal event of name 'signalName' has
-   * been received. This method delivers the signal to all executions waiting on
-   * the signal.<p/>
+   * been received. Delivers the signal to all executions waiting on
+   * the signal and to all process definitions that can started by this signal. <p/>
    *
-   * <strong>NOTE:</strong> The waiting executions are notified synchronously.
+   * <strong>NOTE:</strong> Notification and instantiation happen synchronously.
    *
    * @param signalName
    *          the name of the signal event
@@ -1341,8 +1343,10 @@ public interface RuntimeService {
    *          a map of variables added to the execution(s)
    *
    * @throws AuthorizationException
-   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *          <li>if notify an execution and the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.</li>
+   *          <li>if start a new process instance and the user has no {@link Permissions#CREATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#CREATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.</li>
    */
   void signalEventReceived(String signalName, Map<String, Object> processVariables);
 
