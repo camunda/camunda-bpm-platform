@@ -5,6 +5,7 @@
       <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>
     </bpmn2:startEvent>
     <bpmn2:userTask id="UserTask_1" camunda:candidateGroups="management, accounting" name="User Task 1">
+      <bpmn2:documentation>This task is for testing purpose only!!!</bpmn2:documentation>
       <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing>
     </bpmn2:userTask>

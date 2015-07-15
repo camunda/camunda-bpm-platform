@@ -8,6 +8,15 @@ module.exports = Page.extend({
     return element(by.css('[cam-tasklist-task]'));
   },
 
+  noTaskInfoText: function() {
+    return this.formElement().element(by.css('.no-task')).getText();
+  },
+
+  waitForTaskDetailView: function() {
+    var elementToWaitFor = this.taskName();
+    this.waitForElementToBeVisible(elementToWaitFor, 5000);
+  },
+
   taskName: function() {
     return this.formElement().element(by.binding('task.name')).getText();
   },
@@ -38,9 +47,15 @@ module.exports = Page.extend({
   },
 
   addComment: function(comment) {
+    var openDialogElement = this.commentInputField();
     this.addCommentButton().click();
+    this.waitForElementToBeVisible(openDialogElement, 5000);
+
     this.commentInputField(comment);
+
+    var closedDialogElement = this.commentSaveButton();
     this.commentSaveButton().click();
+    this.waitForElementToBeNotPresent(closedDialogElement, 5000);
   },
 
   claim: function() {

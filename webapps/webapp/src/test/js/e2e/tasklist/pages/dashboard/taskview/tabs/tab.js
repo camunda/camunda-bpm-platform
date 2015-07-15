@@ -9,7 +9,9 @@ module.exports = Tab.extend({
   },
 
   selectTab: function () {
-    this.tabs().get(this.tabIndex).click();
+    var theTabElement = this.tabs().get(this.tabIndex);
+    this.waitForElementToBeVisible(theTabElement, 5000);
+    theTabElement.click();
   }
 
 });
