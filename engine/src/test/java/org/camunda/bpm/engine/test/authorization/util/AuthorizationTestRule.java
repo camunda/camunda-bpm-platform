@@ -100,6 +100,8 @@ public class AuthorizationTestRule extends TestWatcher {
   }
 
   protected void finished(Description description) {
+    engineRule.getIdentityService().clearAuthentication();
+
     ProcessEngineConfigurationImpl engineConfiguration =
         (ProcessEngineConfigurationImpl) engineRule.getProcessEngine().getProcessEngineConfiguration();
 
