@@ -334,9 +334,9 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
     assertEquals(Integer.MAX_VALUE, (int) jobDefinition.getJobPriority());
 
     // it is possible to set the min integer value
-    managementService.setJobDefinitionPriority(jobDefinition.getId(), Integer.MIN_VALUE);
+    managementService.setJobDefinitionPriority(jobDefinition.getId(), Integer.MIN_VALUE + 1);
     jobDefinition = managementService.createJobDefinitionQuery().singleResult();
-    assertEquals(Integer.MIN_VALUE, (int) jobDefinition.getJobPriority());
+    assertEquals(Integer.MIN_VALUE + 1, (int) jobDefinition.getJobPriority());
   }
 
   protected Job getJobThatIsNot(Job other) {
