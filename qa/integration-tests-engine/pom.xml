@@ -676,6 +676,8 @@
                 <exclude>**/TestProcessEnginesXmlFails.java</exclude>
                 <exclude>**/*_JBOSS.java</exclude>
                 <exclude>**/jar/**</exclude>
+                <!-- CAM-4247 -->
+                <exclude>**/JobPrioritizationFailureTest.java</exclude>
               </excludes>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
