@@ -182,6 +182,7 @@ public class DeploymentCache {
 
   public void discardProcessDefinitionCache() {
     processDefinitionCache.clear();
+    bpmnModelInstanceCache.clear();
   }
 
   // CASE DEFINITION ////////////////////////////////////////////////////////////////////////////////
@@ -329,6 +330,7 @@ public class DeploymentCache {
 
   public void discardCaseDefinitionCache() {
     caseDefinitionCache.clear();
+    cmmnModelInstanceCache.clear();
   }
 
   // getters and setters //////////////////////////////////////////////////////
