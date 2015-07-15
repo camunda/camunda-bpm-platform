@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandler;
+import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
@@ -181,15 +182,28 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
       "org/camunda/bpm/engine/test/repository/one.cmmn"})
   public void testDeleteDeploymentClearsCache() {
 
-    // when
+    // fetch definition ids
+    String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
+    String caseDefinitionId = repositoryService.createCaseDefinitionQuery().singleResult().getId();
+    // fetch CMMN model to be placed to in the cache
+    repositoryService.getCmmnModelInstance(caseDefinitionId);
+
+    DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
+
+    // ensure definitions and models are part of the cache
+    assertTrue(deploymentCache.getProcessDefinitionCache().containsKey(processDefinitionId));
+    assertTrue(deploymentCache.getBpmnModelInstanceCache().containsKey(processDefinitionId));
+    assertTrue(deploymentCache.getCaseDefinitionCache().containsKey(caseDefinitionId));
+    assertTrue(deploymentCache.getCmmnModelInstanceCache().containsKey(caseDefinitionId));
+
+    // when the deployment is deleted
     repositoryService.deleteDeployment(deploymentId, true);
 
-    // then the deployment cache is empty
-    assertTrue(processEngineConfiguration.getDeploymentCache().getProcessDefinitionCache().isEmpty());
-    assertTrue(processEngineConfiguration.getDeploymentCache().getBpmnModelInstanceCache().isEmpty());
-
-    assertTrue(processEngineConfiguration.getDeploymentCache().getCaseDefinitionCache().isEmpty());
-    assertTrue(processEngineConfiguration.getDeploymentCache().getCmmnModelInstanceCache().isEmpty());
+    // then the definitions and models are removed from the cache
+    assertFalse(deploymentCache.getProcessDefinitionCache().containsKey(processDefinitionId));
+    assertFalse(deploymentCache.getBpmnModelInstanceCache().containsKey(processDefinitionId));
+    assertFalse(deploymentCache.getCaseDefinitionCache().containsKey(caseDefinitionId));
+    assertFalse(deploymentCache.getCmmnModelInstanceCache().containsKey(caseDefinitionId));
   }
 
   public void testFindDeploymentResourceNamesNullDeploymentId() {
