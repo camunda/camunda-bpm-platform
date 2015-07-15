@@ -36,11 +36,14 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.db.PersistenceSession;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.LogUtil.ThreadLogMode;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
@@ -49,6 +52,7 @@ import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.junit.Assert;
 
 import junit.framework.AssertionFailedError;
@@ -124,12 +128,49 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     } finally {
       TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, getClass(), getName());
       identityService.clearAuthentication();
+      assertAndEnsureCleanDeploymentCache();
       assertAndEnsureCleanDb();
       ClockUtil.reset();
 
       // Can't do this in the teardown, as the teardown will be called as part of the super.runBare
       closeDownProcessEngine();
       clearServiceReferences();
+    }
+  }
+
+  protected void assertAndEnsureCleanDeploymentCache() {
+    StringBuilder outputMessage = new StringBuilder();
+    DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
+
+    Map<String, ProcessDefinitionEntity> processDefinitionCache = deploymentCache.getProcessDefinitionCache();
+    if (!processDefinitionCache.isEmpty()) {
+      outputMessage.append("\tProcess Definition Cache: ").append(processDefinitionCache.keySet()).append("\n");
+      processDefinitionCache.clear();
+    }
+
+    Map<String, BpmnModelInstance> bpmnModelInstanceCache = deploymentCache.getBpmnModelInstanceCache();
+    if (!bpmnModelInstanceCache.isEmpty()) {
+      outputMessage.append("\tBPMN Model Instance Cache: ").append(bpmnModelInstanceCache.keySet()).append("\n");
+      bpmnModelInstanceCache.clear();
+    }
+
+    Map<String, CaseDefinitionEntity> caseDefinitionCache = deploymentCache.getCaseDefinitionCache();
+    if (!caseDefinitionCache.isEmpty()) {
+      outputMessage.append("\tCase Definition Cache: ").append(caseDefinitionCache.keySet()).append("\n");
+      caseDefinitionCache.clear();
+    }
+
+    Map<String, CmmnModelInstance> cmmnModelInstanceCache = deploymentCache.getCmmnModelInstanceCache();
+    if (!cmmnModelInstanceCache.isEmpty()) {
+      outputMessage.append("\tCMMN Model Instance Cache: ").append(cmmnModelInstanceCache.keySet()).append("\n");
+      cmmnModelInstanceCache.clear();
+    }
+
+    if (outputMessage.length() > 0) {
+      outputMessage.insert(0, "Deployment Cache not clean:\n");
+      log.severe(EMPTY_LINE);
+      log.severe(outputMessage.toString());
+      Assert.fail(outputMessage.toString());
     }
   }
 

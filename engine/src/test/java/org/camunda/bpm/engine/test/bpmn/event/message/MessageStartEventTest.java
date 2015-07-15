@@ -63,6 +63,9 @@ public class MessageStartEventTest extends PluggableProcessEngineTestCase {
     // clean db:
     repositoryService.deleteDeployment(deploymentId);
 
+    // Workaround for #CAM-4250: remove process definition of failed deployment from deployment cache
+    processEngineConfiguration.getDeploymentCache().getProcessDefinitionCache().clear();
+
   }
 
   // SEE: https://app.camunda.com/jira/browse/CAM-1448
