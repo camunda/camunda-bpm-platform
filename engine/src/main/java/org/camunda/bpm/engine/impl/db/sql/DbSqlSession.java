@@ -312,6 +312,9 @@ public class DbSqlSession extends AbstractPersistenceSession {
       if (dbSqlSessionFactory.isCmmnEnabled() && !isCmmnTablePresent()) {
         errorMessage = addMissingComponent(errorMessage, "case.engine");
       }
+      if (dbSqlSessionFactory.isDmnEnabled() && !isDmnTablePresent()) {
+        errorMessage = addMissingComponent(errorMessage, "decision.engine");
+      }
 
       if (errorMessage!=null) {
         throw new ProcessEngineException("Activiti database problem: "+errorMessage);
@@ -364,6 +367,10 @@ public class DbSqlSession extends AbstractPersistenceSession {
     executeMandatorySchemaResource("create", "case.history");
   }
 
+  protected void dbSchemaCreateDmn() {
+    executeMandatorySchemaResource("create", "decision.engine");
+  }
+
   protected void dbSchemaDropIdentity() {
     executeMandatorySchemaResource("drop", "identity");
   }
@@ -384,6 +391,9 @@ public class DbSqlSession extends AbstractPersistenceSession {
     executeMandatorySchemaResource("drop", "case.history");
   }
 
+  protected void dbSchemaDropDmn() {
+    executeMandatorySchemaResource("drop", "decision.engine");
+  }
 
   public void executeMandatorySchemaResource(String operation, String component) {
     executeSchemaResource(operation, component, getResourceForDbOperation(operation, operation, component), false);
@@ -407,6 +417,10 @@ public class DbSqlSession extends AbstractPersistenceSession {
 
   public boolean isCmmnHistoryTablePresent() {
     return isTablePresent("ACT_HI_CASEINST");
+  }
+
+  public boolean isDmnTablePresent() {
+    return isTablePresent("ACT_RE_DECISION_DEF");
   }
 
   public boolean isTablePresent(String tableName) {

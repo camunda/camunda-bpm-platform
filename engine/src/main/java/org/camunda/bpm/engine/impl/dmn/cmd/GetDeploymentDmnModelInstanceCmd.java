@@ -10,38 +10,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.cmd;
+package org.camunda.bpm.engine.impl.dmn.cmd;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
-import org.camunda.bpm.engine.exception.cmmn.CmmnModelInstanceNotFoundException;
+import org.camunda.bpm.engine.exception.dmn.DmnModelInstanceNotFoundException;
+import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceCmd;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.model.cmmn.CmmnModelInstance;
+import org.camunda.bpm.model.dmn.DmnModelInstance;
 
-/**
- * @author Daniel Meyer
- * @author Roman Smirnov
- *
- */
-public class GetDeploymentCmmnModelInstanceCmd implements Command<CmmnModelInstance> {
+public class GetDeploymentDmnModelInstanceCmd implements Command<DmnModelInstance> {
 
-  protected String caseDefinitionId;
+  protected String decisionDefinitionId;
 
-  public GetDeploymentCmmnModelInstanceCmd(String caseDefinitionId) {
-    this.caseDefinitionId = caseDefinitionId;
+  public GetDeploymentDmnModelInstanceCmd(String decisionDefinitionId) {
+    this.decisionDefinitionId = decisionDefinitionId;
   }
 
-  public CmmnModelInstance execute(CommandContext commandContext) {
-    ensureNotNull("caseDefinitionId", caseDefinitionId);
+  public DmnModelInstance execute(CommandContext commandContext) {
+    ensureNotNull("caseDefinitionId", decisionDefinitionId);
 
-    CmmnModelInstance modelInstance = Context
+    DmnModelInstance modelInstance = Context
         .getProcessEngineConfiguration()
         .getDeploymentCache()
-        .findCmmnModelInstanceForCaseDefinition(caseDefinitionId);
+        .findDmnModelInstanceForDecisionDefinition(decisionDefinitionId);
 
-    ensureNotNull(CmmnModelInstanceNotFoundException.class, "No CMMN model instance found for case definition id " + caseDefinitionId, "modelInstance", modelInstance);
+    ensureNotNull(DmnModelInstanceNotFoundException.class, "No DMN model instance found for decision definition id " + decisionDefinitionId, "modelInstance", modelInstance);
     return modelInstance;
   }
 

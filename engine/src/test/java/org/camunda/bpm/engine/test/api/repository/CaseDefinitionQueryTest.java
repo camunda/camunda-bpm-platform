@@ -15,9 +15,7 @@ package org.camunda.bpm.engine.test.api.repository;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 
@@ -25,58 +23,14 @@ import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
  * @author Roman Smirnov
  *
  */
-public class CaseDefinitionQueryTest extends PluggableProcessEngineTestCase {
+public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
 
-  private String deploymentOneId;
-  private String deploymentTwoId;
-  private String resourceOne = "org/camunda/bpm/engine/test/repository/one.cmmn";
-  private String resourceTwo = "org/camunda/bpm/engine/test/repository/two.cmmn";
-
-  @Override
-  protected void setUp() throws Exception {
-    deploymentOneId = repositoryService
-      .createDeployment()
-      .name("firstDeployment")
-      .addClasspathResource(resourceOne)
-      .addClasspathResource(resourceTwo)
-      .deploy()
-      .getId();
-
-    deploymentTwoId = repositoryService
-      .createDeployment()
-      .name("secondDeployment")
-      .addClasspathResource(resourceOne)
-      .deploy()
-      .getId();
-
-    super.setUp();
+  protected String getResourceOnePath() {
+    return "org/camunda/bpm/engine/test/repository/one.cmmn";
   }
 
-  @Override
-  protected void tearDown() throws Exception {
-    super.tearDown();
-    repositoryService.deleteDeployment(deploymentOneId, true);
-    repositoryService.deleteDeployment(deploymentTwoId, true);
-  }
-
-  private void verifyQueryResults(CaseDefinitionQuery query, int countExpected) {
-    assertEquals(countExpected, query.list().size());
-    assertEquals(countExpected, query.count());
-
-    if (countExpected == 1) {
-      assertNotNull(query.singleResult());
-    } else if (countExpected > 1){
-      verifySingleResultFails(query);
-    } else if (countExpected == 0) {
-      assertNull(query.singleResult());
-    }
-  }
-
-  private void verifySingleResultFails(CaseDefinitionQuery query) {
-    try {
-      query.singleResult();
-      fail();
-    } catch (ProcessEngineException e) {}
+  protected String getResourceTwoPath() {
+    return "org/camunda/bpm/engine/test/repository/two.cmmn";
   }
 
   public void testCaseDefinitionProperties() {
@@ -159,7 +113,9 @@ public class CaseDefinitionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.deploymentId(null);
       fail();
-    } catch (NotValidException e) {}
+    } catch (NotValidException e) {
+      // Expected exception
+    }
   }
 
   public void testQueryByName() {
@@ -187,7 +143,9 @@ public class CaseDefinitionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseDefinitionName(null);
       fail();
-    } catch (NotValidException e) {}
+    } catch (NotValidException e) {
+      // Expected exception
+    }
   }
 
   public void testQueryByNameLike() {
@@ -210,7 +168,9 @@ public class CaseDefinitionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseDefinitionNameLike(null);
       fail();
-    } catch (NotValidException e) {}
+    } catch (NotValidException e) {
+      // Expected exception
+    }
   }
 
   public void testQueryByKey() {
@@ -240,7 +200,9 @@ public class CaseDefinitionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseDefinitionKey(null);
       fail();
-    } catch (NotValidException e) {}
+    } catch (NotValidException e) {
+      // Expected exception
+    }
   }
 
   public void testQueryByKeyLike() {
@@ -263,7 +225,9 @@ public class CaseDefinitionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseDefinitionKeyLike(null);
       fail();
-    } catch (NotValidException e) {}
+    } catch (NotValidException e) {
+      // Expected exception
+    }
   }
 
   public void testQueryByCategory() {
@@ -286,7 +250,9 @@ public class CaseDefinitionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseDefinitionCategory(null);
       fail();
-    } catch (NotValidException e) {}
+    } catch (NotValidException e) {
+      // Expected exception
+    }
   }
 
   public void testQueryByCategoryLike() {
@@ -314,7 +280,9 @@ public class CaseDefinitionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseDefinitionCategoryLike(null);
       fail();
-    } catch (NotValidException e) {}
+    } catch (NotValidException e) {
+      // Expected exception
+    }
   }
 
   public void testQueryByVersion() {
@@ -342,12 +310,16 @@ public class CaseDefinitionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.caseDefinitionVersion(-1);
       fail();
-    } catch (NotValidException e) {}
+    } catch (NotValidException e) {
+      // Expected exception
+    }
 
     try {
       query.caseDefinitionVersion(null);
       fail();
-    } catch (NotValidException e) {}
+    } catch (NotValidException e) {
+      // Expected exception
+    }
   }
 
   public void testQueryByLatest() {
@@ -378,7 +350,9 @@ public class CaseDefinitionQueryTest extends PluggableProcessEngineTestCase {
         .latestVersion()
         .list();
       fail();
-    } catch (NotValidException e) {}
+    } catch (NotValidException e) {
+      // Expected exception
+    }
 
     try {
       query
@@ -386,7 +360,9 @@ public class CaseDefinitionQueryTest extends PluggableProcessEngineTestCase {
         .latestVersion()
         .list();
       fail();
-    } catch (NotValidException e) {}
+    } catch (NotValidException e) {
+      // Expected exception
+    }
 
     try {
       query
@@ -394,7 +370,9 @@ public class CaseDefinitionQueryTest extends PluggableProcessEngineTestCase {
         .latestVersion()
         .list();
       fail();
-    } catch (NotValidException e) {}
+    } catch (NotValidException e) {
+      // Expected exception
+    }
 
     try {
       query
@@ -402,7 +380,9 @@ public class CaseDefinitionQueryTest extends PluggableProcessEngineTestCase {
         .latestVersion()
         .list();
       fail();
-    } catch (NotValidException e) {}
+    } catch (NotValidException e) {
+      // Expected exception
+    }
 
     try {
       query
@@ -410,7 +390,9 @@ public class CaseDefinitionQueryTest extends PluggableProcessEngineTestCase {
         .latestVersion()
         .list();
       fail();
-    } catch (NotValidException e) {}
+    } catch (NotValidException e) {
+      // Expected exception
+    }
   }
 
   public void testQuerySorting() {

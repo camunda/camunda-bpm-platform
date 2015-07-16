@@ -22,11 +22,14 @@ import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionManager;
 import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.event.SignalEventHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
+import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.repository.CaseDefinition;
+import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
@@ -137,6 +140,8 @@ public class DeploymentManager extends AbstractManager {
 
     deleteCaseDeployment(deploymentId, cascade);
 
+    deleteDecisionDeployment(deploymentId, cascade);
+
     getResourceManager().deleteResourcesByDeploymentId(deploymentId);
 
     deleteAuthorizations(Resources.DEPLOYMENT, deploymentId);
@@ -172,6 +177,28 @@ public class DeploymentManager extends AbstractManager {
           .getProcessEngineConfiguration()
           .getDeploymentCache()
           .removeCaseDefinition(processDefinitionId);
+      }
+    }
+  }
+
+  protected void deleteDecisionDeployment(String deploymentId, boolean cascade) {
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    if (processEngineConfiguration.isDmnEnabled()) {
+      DecisionDefinitionManager decisionDefinitionManager = getDecisionDefinitionManager();
+      List<DecisionDefinition> decisionDefinitions = decisionDefinitionManager.findDecisionDefinitionByDeploymentId(deploymentId);
+
+      // delete case definitions from db
+      decisionDefinitionManager
+        .deleteDecisionDefinitionsByDeploymentId(deploymentId);
+
+      DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
+
+      for (DecisionDefinition decisionDefinition : decisionDefinitions) {
+        String decisionDefinitionId = decisionDefinition.getId();
+
+        // remove case definitions from cache:
+        deploymentCache
+          .removeDecisionDefinition(decisionDefinitionId);
       }
     }
   }

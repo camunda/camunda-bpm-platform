@@ -104,6 +104,10 @@ public abstract class AbstractPersistenceSession implements PersistenceSession {
     if (processEngineConfiguration.isCmmnEnabled() && processEngineConfiguration.isDbHistoryUsed()) {
       dbSchemaCreateCmmnHistory();
     }
+
+    if (processEngineConfiguration.isDmnEnabled()) {
+      dbSchemaCreateDmn();
+    }
   }
 
   protected abstract void dbSchemaCreateIdentity();
@@ -116,8 +120,15 @@ public abstract class AbstractPersistenceSession implements PersistenceSession {
 
   protected abstract void dbSchemaCreateCmmnHistory();
 
+  protected abstract void dbSchemaCreateDmn();
+
+
   public void dbSchemaDrop() {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+
+    if (processEngineConfiguration.isDmnEnabled()) {
+      dbSchemaDropDmn();
+    }
 
     if (processEngineConfiguration.isCmmnEnabled()) {
       dbSchemaDropCmmn();
@@ -148,6 +159,8 @@ public abstract class AbstractPersistenceSession implements PersistenceSession {
 
   protected abstract void dbSchemaDropCmmnHistory();
 
+  protected abstract void dbSchemaDropDmn();
+
   public void dbSchemaPrune() {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
     if (isHistoryTablePresent() && !processEngineConfiguration.isDbHistoryUsed()) {
@@ -159,8 +172,11 @@ public abstract class AbstractPersistenceSession implements PersistenceSession {
     if (isCmmnTablePresent() && !processEngineConfiguration.isCmmnEnabled()) {
       dbSchemaDropCmmn();
     }
-    if (isCmmnHistoryTablePresent() && !processEngineConfiguration.isCmmnEnabled()) {
-      dbSchemaCreateCmmnHistory();
+    if (isCmmnHistoryTablePresent() && (!processEngineConfiguration.isCmmnEnabled() || !processEngineConfiguration.isDbHistoryUsed())) {
+      dbSchemaDropCmmnHistory();
+    }
+    if (isDmnTablePresent() && !processEngineConfiguration.isDmnEnabled()) {
+      dbSchemaDropDmn();
     }
   }
 
@@ -173,6 +189,8 @@ public abstract class AbstractPersistenceSession implements PersistenceSession {
   public abstract boolean isCmmnTablePresent();
 
   public abstract boolean isCmmnHistoryTablePresent();
+
+  public abstract boolean isDmnTablePresent();
 
   public void dbSchemaUpdate() {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
@@ -195,6 +213,10 @@ public abstract class AbstractPersistenceSession implements PersistenceSession {
 
     if (!isCmmnHistoryTablePresent() && processEngineConfiguration.isCmmnEnabled() && processEngineConfiguration.isDbHistoryUsed()) {
       dbSchemaCreateCmmnHistory();
+    }
+
+    if (!isDmnTablePresent() && processEngineConfiguration.isDmnEnabled()) {
+      dbSchemaCreateDmn();
     }
 
   }

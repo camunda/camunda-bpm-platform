@@ -27,50 +27,38 @@
 
 package org.camunda.bpm.engine.test.api.repository;
 
+import java.util.Collection;
+
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.Event;
-import org.camunda.bpm.model.bpmn.instance.UserTask;
+import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
+import org.camunda.bpm.model.bpmn.instance.StartEvent;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
-
-import java.util.Collection;
 
 /**
  * @author Sebastian Menski
  */
 public class BpmnModelInstanceCmdTest extends PluggableProcessEngineTestCase {
 
-  private final static String PROCESS_KEY = "process";
-  private String deploymentId;
+  private final static String PROCESS_KEY = "one";
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/repository/one.bpmn20.xml")
   public void testRepositoryService() {
-    deployTestProcess();
-    runtimeService.startProcessInstanceByKey(PROCESS_KEY);
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().processDefinitionKey(PROCESS_KEY).singleResult().getId();
 
     BpmnModelInstance modelInstance = repositoryService.getBpmnModelInstance(processDefinitionId);
     assertNotNull(modelInstance);
+
     Collection<ModelElementInstance> events = modelInstance.getModelElementsByType(modelInstance.getModel().getType(Event.class));
     assertEquals(2, events.size());
-    Collection<ModelElementInstance> tasks = modelInstance.getModelElementsByType(modelInstance.getModel().getType(UserTask.class));
-    assertEquals(1, tasks.size());
 
-    Task task = taskService.createTaskQuery().singleResult();
-    UserTask userTask = modelInstance.getModelElementById(task.getTaskDefinitionKey());
-    assertNotNull(userTask);
+    Collection<ModelElementInstance> sequenceFlows = modelInstance.getModelElementsByType(modelInstance.getModel().getType(SequenceFlow.class));
+    assertEquals(1, sequenceFlows.size());
 
-    taskService.complete(task.getId());
+    StartEvent startEvent = modelInstance.getModelElementById("start");
+    assertNotNull(startEvent);
   }
 
-  private void deployTestProcess() {
-    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess(PROCESS_KEY)
-      .startEvent().userTask().endEvent().done();
-    deploymentId = repositoryService.createDeployment().addModelInstance("process.bpmn", modelInstance).deploy().getId();
-  }
-
-  public void tearDown() {
-    repositoryService.deleteDeployment(deploymentId, true);
-  }
 }

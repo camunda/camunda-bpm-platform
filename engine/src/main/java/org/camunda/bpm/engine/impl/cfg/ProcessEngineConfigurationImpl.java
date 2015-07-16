@@ -24,6 +24,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +34,6 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
@@ -102,6 +102,10 @@ import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.delegate.DefaultDelegateInterceptor;
 import org.camunda.bpm.engine.impl.digest.PasswordEncryptor;
 import org.camunda.bpm.engine.impl.digest.ShaHashDigest;
+import org.camunda.bpm.engine.impl.dmn.deployer.DmnDeployer;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionManager;
+import org.camunda.bpm.engine.impl.dmn.handler.DecisionDefinitionHandler;
+import org.camunda.bpm.engine.impl.dmn.handler.ProcessEngineDmnElementHandlerRegistry;
 import org.camunda.bpm.engine.impl.el.CommandContextFunctionMapper;
 import org.camunda.bpm.engine.impl.el.DateTimeFunctionMapper;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
@@ -240,6 +244,15 @@ import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.model.dmn.instance.Decision;
+import org.camunda.bpm.model.dmn.instance.DecisionTable;
+import org.camunda.dmn.engine.handler.DmnElementHandlerRegistry;
+import org.camunda.dmn.engine.impl.handler.DmnElementHandlerRegistryImpl;
+import org.camunda.dmn.engine.impl.transform.DmnTransformFactoryImpl;
+import org.camunda.dmn.engine.impl.transform.DmnTransformerImpl;
+import org.camunda.dmn.engine.transform.DmnTransformFactory;
+import org.camunda.dmn.engine.transform.DmnTransformListener;
+import org.camunda.dmn.engine.transform.DmnTransformer;
 
 
 /**
@@ -362,6 +375,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean autoStoreScriptVariables = false;
   protected boolean enableScriptCompilation = true;
   protected boolean cmmnEnabled = true;
+  protected boolean dmnEnabled = true;
 
   protected boolean enableGracefulDegradationOnContextSwitchFailure = true;
 
@@ -377,6 +391,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected CmmnTransformFactory cmmnTransformFactory;
   protected DefaultCmmnElementHandlerRegistry cmmnElementHandlerRegistry;
 
+  // dmn
+  protected DmnTransformFactory dmnTransformFactory;
+  protected DmnElementHandlerRegistry dmnElementHandlerRegistry;
+
   protected HistoryLevel historyLevel;
 
   /** a list of supported history levels */
@@ -390,6 +408,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected List<CmmnTransformListener> customPreCmmnTransformListeners;
   protected List<CmmnTransformListener> customPostCmmnTransformListeners;
+
+  protected List<DmnTransformListener> customPreDmnTransformListeners;
+  protected List<DmnTransformListener> customPostDmnTransformListeners;
 
   protected Map<Object, Object> beans;
 
@@ -905,6 +926,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       addSessionFactory(new GenericManagerFactory(CaseExecutionManager.class));
       addSessionFactory(new GenericManagerFactory(CaseSentryPartManager.class));
 
+      addSessionFactory(new GenericManagerFactory(DecisionDefinitionManager.class));
+
       sessionFactories.put(ReadOnlyIdentityProvider.class, identityProviderSessionFactory);
 
       // check whether identityProviderSessionFactory implements WritableIdentityProvider
@@ -990,6 +1013,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       defaultDeployers.add(cmmnDeployer);
     }
 
+    if (isDmnEnabled()) {
+      DmnDeployer dmnDeployer = getDmnDeployer();
+      defaultDeployers.add(dmnDeployer);
+    }
+
     return defaultDeployers;
   }
 
@@ -1065,6 +1093,38 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       defaultListener.add(new MetricsCmmnTransformListener());
     }
     return defaultListener;
+  }
+
+  protected DmnDeployer getDmnDeployer() {
+    DmnDeployer dmnDeployer = new DmnDeployer();
+    dmnDeployer.setIdGenerator(idGenerator);
+
+    if (dmnTransformFactory == null) {
+      dmnTransformFactory = new DmnTransformFactoryImpl();
+    }
+
+    if (dmnElementHandlerRegistry == null) {
+      dmnElementHandlerRegistry = new ProcessEngineDmnElementHandlerRegistry();
+    }
+
+    DmnTransformer dmnTransformer = new DmnTransformerImpl(dmnTransformFactory, dmnElementHandlerRegistry);
+
+    List<DmnTransformListener> transformListeners = dmnTransformer.getTransformListeners();
+    if (customPreDmnTransformListeners != null) {
+      transformListeners.addAll(customPreDmnTransformListeners);
+    }
+    transformListeners.addAll(getDefaultDmnTransformListeners());
+    if (customPostDmnTransformListeners != null) {
+      transformListeners.addAll(customPostDmnTransformListeners);
+    }
+
+    dmnDeployer.setTransformer(dmnTransformer);
+
+    return dmnDeployer;
+  }
+
+  protected List<DmnTransformListener> getDefaultDmnTransformListeners() {
+    return Collections.emptyList();
   }
 
   // job executor /////////////////////////////////////////////////////////////
@@ -2513,6 +2573,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setCmmnEnabled(boolean cmmnEnabled) {
     this.cmmnEnabled = cmmnEnabled;
+  }
+
+  public boolean isDmnEnabled() {
+    return dmnEnabled;
+  }
+
+  public void setDmnEnabled(boolean dmnEnabled) {
+    this.dmnEnabled = dmnEnabled;
   }
 
   public ScriptFactory getScriptFactory() {

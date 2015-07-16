@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.api.repository;
 import java.util.Collection;
 
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.camunda.bpm.model.cmmn.instance.Case;
 import org.camunda.bpm.model.cmmn.instance.HumanTask;
@@ -28,11 +29,9 @@ import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 public class CmmnModelElementInstanceCmdTest extends PluggableProcessEngineTestCase {
 
   private final static String CASE_KEY = "oneTaskCase";
-  private String deploymentId;
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn")
   public void testRepositoryService() {
-    deployTestCase();
-
     String caseDefinitionId = repositoryService
         .createCaseDefinitionQuery()
         .caseDefinitionKey(CASE_KEY)
@@ -51,19 +50,6 @@ public class CmmnModelElementInstanceCmdTest extends PluggableProcessEngineTestC
     Collection<ModelElementInstance> cases = modelInstance.getModelElementsByType(modelInstance.getModel().getType(Case.class));
     assertEquals(1, cases.size());
 
-  }
-
-  private void deployTestCase() {
-    String resource = "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn";
-    deploymentId = repositoryService
-        .createDeployment()
-        .addClasspathResource(resource)
-        .deploy()
-        .getId();
-  }
-
-  public void tearDown() {
-    repositoryService.deleteDeployment(deploymentId, true);
   }
 
 }

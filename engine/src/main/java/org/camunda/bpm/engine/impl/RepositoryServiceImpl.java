@@ -25,14 +25,14 @@ import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.exception.cmmn.CaseDefinitionNotFoundException;
 import org.camunda.bpm.engine.exception.cmmn.CmmnModelInstanceNotFoundException;
+import org.camunda.bpm.engine.exception.dmn.DecisionDefinitionNotFoundException;
+import org.camunda.bpm.engine.exception.dmn.DmnModelInstanceNotFoundException;
 import org.camunda.bpm.engine.impl.cmd.ActivateProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.AddIdentityLinkForProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteDeploymentCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteIdentityLinkForProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.DeployCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentBpmnModelInstanceCmd;
-import org.camunda.bpm.engine.impl.cmd.GetDeploymentCaseDiagramCmd;
-import org.camunda.bpm.engine.impl.cmd.GetDeploymentCmmnModelInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentProcessDiagramCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentProcessDiagramLayoutCmd;
@@ -44,13 +44,22 @@ import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourcesCmd;
 import org.camunda.bpm.engine.impl.cmd.GetIdentityLinksForProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmd.SuspendProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.GetDeploymentCaseDefinitionCmd;
+import org.camunda.bpm.engine.impl.cmmn.cmd.GetDeploymentCaseDiagramCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.GetDeploymentCaseModelCmd;
+import org.camunda.bpm.engine.impl.cmmn.cmd.GetDeploymentCmmnModelInstanceCmd;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImpl;
+import org.camunda.bpm.engine.impl.dmn.cmd.GetDeploymentDecisionDefinitionCmd;
+import org.camunda.bpm.engine.impl.dmn.cmd.GetDeploymentDecisionDiagramCmd;
+import org.camunda.bpm.engine.impl.dmn.cmd.GetDeploymentDecisionModelCmd;
+import org.camunda.bpm.engine.impl.dmn.cmd.GetDeploymentDmnModelInstanceCmd;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.pvm.ReadOnlyProcessDefinition;
 import org.camunda.bpm.engine.impl.repository.DeploymentBuilderImpl;
 import org.camunda.bpm.engine.impl.repository.ProcessApplicationDeploymentBuilderImpl;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
+import org.camunda.bpm.engine.repository.DecisionDefinition;
+import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
@@ -62,6 +71,7 @@ import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
+import org.camunda.bpm.model.dmn.DmnModelInstance;
 
 /**
  * @author Tom Baeyens
@@ -104,6 +114,10 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
 
   public CaseDefinitionQuery createCaseDefinitionQuery() {
     return new CaseDefinitionQueryImpl(commandExecutor);
+  }
+
+  public DecisionDefinitionQuery createDecisionDefinitionQuery() {
+    return new DecisionDefinitionQueryImpl(commandExecutor);
   }
 
   @SuppressWarnings("unchecked")
@@ -204,6 +218,22 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
     }
   }
 
+  public DmnModelInstance getDmnModelInstance(String decisionDefinitionId) {
+    try {
+      return commandExecutor.execute(new GetDeploymentDmnModelInstanceCmd(decisionDefinitionId));
+
+    } catch (NullValueException e) {
+      throw new NotValidException(e.getMessage(), e);
+
+    } catch (DmnModelInstanceNotFoundException e) {
+      throw new NotFoundException(e.getMessage(), e);
+
+    } catch (DeploymentResourceNotFoundException e) {
+      throw new NotFoundException(e.getMessage(), e);
+
+    }
+  }
+
   public void addCandidateStarterUser(String processDefinitionId, String userId) {
     commandExecutor.execute(new AddIdentityLinkForProcessDefinitionCmd(processDefinitionId, userId, null));
   }
@@ -252,6 +282,32 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
 
     }
 
+  }
+
+  public DecisionDefinition getDecisionDefinition(String decisionDefinitionId) {
+    try {
+      return commandExecutor.execute(new GetDeploymentDecisionDefinitionCmd(decisionDefinitionId));
+    } catch (NullValueException e) {
+      throw new NotValidException(e.getMessage(), e);
+    } catch (DecisionDefinitionNotFoundException e) {
+      throw new NotFoundException(e.getMessage(), e);
+    }
+  }
+
+  public InputStream getDecisionModel(String decisionDefinitionId) {
+    try {
+      return commandExecutor.execute(new GetDeploymentDecisionModelCmd(decisionDefinitionId));
+    } catch (NullValueException e) {
+      throw new NotValidException(e.getMessage(), e);
+    } catch (DecisionDefinitionNotFoundException e) {
+      throw new NotFoundException(e.getMessage(), e);
+    } catch (DeploymentResourceNotFoundException e) {
+      throw new NotFoundException(e.getMessage(), e);
+    }
+  }
+
+  public InputStream getDecisionDiagram(String decisionDefinitionId) {
+    return commandExecutor.execute(new GetDeploymentDecisionDiagramCmd(decisionDefinitionId));
   }
 
 }

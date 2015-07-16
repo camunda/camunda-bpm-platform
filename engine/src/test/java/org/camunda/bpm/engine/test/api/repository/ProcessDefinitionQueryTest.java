@@ -16,7 +16,6 @@ package org.camunda.bpm.engine.test.api.repository;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
@@ -27,36 +26,14 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 /**
  * @author Joram Barrez
  */
-public class ProcessDefinitionQueryTest extends PluggableProcessEngineTestCase {
+public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
 
-  private String deploymentOneId;
-  private String deploymentTwoId;
-
-  @Override
-  protected void setUp() throws Exception {
-    deploymentOneId = repositoryService
-      .createDeployment()
-      .name("org/camunda/bpm/engine/test/repository/one.bpmn20.xml")
-      .addClasspathResource("org/camunda/bpm/engine/test/repository/one.bpmn20.xml")
-      .addClasspathResource("org/camunda/bpm/engine/test/repository/two.bpmn20.xml")
-      .deploy()
-      .getId();
-
-    deploymentTwoId = repositoryService
-      .createDeployment()
-      .name("org/camunda/bpm/engine/test/repository/one.bpmn20.xml")
-      .addClasspathResource("org/camunda/bpm/engine/test/repository/one.bpmn20.xml")
-      .deploy()
-      .getId();
-
-    super.setUp();
+  protected String getResourceOnePath() {
+    return "org/camunda/bpm/engine/test/repository/one.bpmn20.xml";
   }
 
-  @Override
-  protected void tearDown() throws Exception {
-    super.tearDown();
-    repositoryService.deleteDeployment(deploymentOneId, true);
-    repositoryService.deleteDeployment(deploymentTwoId, true);
+  protected String getResourceTwoPath() {
+    return "org/camunda/bpm/engine/test/repository/two.bpmn20.xml";
   }
 
   public void testProcessDefinitionProperties() {
@@ -101,7 +78,9 @@ public class ProcessDefinitionQueryTest extends PluggableProcessEngineTestCase {
     try {
       repositoryService.createProcessDefinitionQuery().deploymentId(null);
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+      // Expected Exception
+    }
   }
 
   public void testQueryByName() {
@@ -119,7 +98,9 @@ public class ProcessDefinitionQueryTest extends PluggableProcessEngineTestCase {
     try {
       repositoryService.createProcessDefinitionQuery().processDefinitionName(null);
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+      // Expected Exception
+    }
   }
 
   public void testQueryByNameLike() {
@@ -149,7 +130,9 @@ public class ProcessDefinitionQueryTest extends PluggableProcessEngineTestCase {
     try {
       repositoryService.createProcessDefinitionQuery().processDefinitionKey(null);
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+      // Expected Exception
+    }
   }
 
   public void testQueryByKeyLike() {
@@ -164,7 +147,9 @@ public class ProcessDefinitionQueryTest extends PluggableProcessEngineTestCase {
     try {
       repositoryService.createProcessDefinitionQuery().processDefinitionKeyLike(null);
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+      // Expected Exception
+    }
   }
 
   public void testQueryByCategory() {
@@ -195,12 +180,16 @@ public class ProcessDefinitionQueryTest extends PluggableProcessEngineTestCase {
     try {
       repositoryService.createProcessDefinitionQuery().processDefinitionVersion(-1).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+      // Expected Exception
+    }
 
     try {
       repositoryService.createProcessDefinitionQuery().processDefinitionVersion(null).list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+      // Expected Exception
+    }
   }
 
   public void testQueryByKeyAndVersion() {
@@ -229,17 +218,23 @@ public class ProcessDefinitionQueryTest extends PluggableProcessEngineTestCase {
     try {
       repositoryService.createProcessDefinitionQuery().processDefinitionId("test").latestVersion().list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+      // Expected Exception
+    }
 
     try {
       repositoryService.createProcessDefinitionQuery().processDefinitionVersion(1).latestVersion().list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+      // Expected Exception
+    }
 
     try {
       repositoryService.createProcessDefinitionQuery().deploymentId("test").latestVersion().list();
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+      // Expected Exception
+    }
   }
 
   public void testQuerySorting() {
@@ -283,26 +278,6 @@ public class ProcessDefinitionQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(1, processDefinitions.get(1).getVersion());
     assertEquals("two", processDefinitions.get(2).getKey());
     assertEquals(1, processDefinitions.get(2).getVersion());
-  }
-
-  private void verifyQueryResults(ProcessDefinitionQuery query, int countExpected) {
-    assertEquals(countExpected, query.list().size());
-    assertEquals(countExpected, query.count());
-
-    if (countExpected == 1) {
-      assertNotNull(query.singleResult());
-    } else if (countExpected > 1){
-      verifySingleResultFails(query);
-    } else if (countExpected == 0) {
-      assertNull(query.singleResult());
-    }
-  }
-
-  private void verifySingleResultFails(ProcessDefinitionQuery query) {
-    try {
-      query.singleResult();
-      fail();
-    } catch (ProcessEngineException e) {}
   }
 
   public void testQueryByMessageSubscription() {
@@ -356,7 +331,9 @@ public class ProcessDefinitionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.incidentId(null);
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+      // Expected Exception
+    }
   }
 
   @org.camunda.bpm.engine.test.Deployment(resources={"org/camunda/bpm/engine/test/api/repository/failingProcessCreateOneIncident.bpmn20.xml"})
@@ -389,7 +366,9 @@ public class ProcessDefinitionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.incidentType(null);
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+      // Expected Exception
+    }
   }
 
   @org.camunda.bpm.engine.test.Deployment(resources={"org/camunda/bpm/engine/test/api/repository/failingProcessCreateOneIncident.bpmn20.xml"})
@@ -422,7 +401,9 @@ public class ProcessDefinitionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.incidentMessage(null);
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+      // Expected Exception
+    }
   }
 
   @org.camunda.bpm.engine.test.Deployment(resources={"org/camunda/bpm/engine/test/api/repository/failingProcessCreateOneIncident.bpmn20.xml"})
@@ -453,7 +434,9 @@ public class ProcessDefinitionQueryTest extends PluggableProcessEngineTestCase {
     try {
       query.incidentMessageLike(null);
       fail();
-    } catch (ProcessEngineException e) {}
+    } catch (ProcessEngineException e) {
+      // Expected Exception
+    }
   }
 
   public void testQueryByProcessDefinitionIds() {

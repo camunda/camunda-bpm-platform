@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.engine.repository;
 
-import org.camunda.bpm.engine.RepositoryService;
-
 /**
  * @author Roman Smirnov
  *

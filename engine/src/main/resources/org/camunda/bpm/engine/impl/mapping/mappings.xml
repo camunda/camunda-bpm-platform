@@ -50,5 +50,9 @@
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/CaseExecution.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/CaseSentryPart.xml" />
 
+    <!-- DMN -->
+
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/DecisionDefinition.xml" />
+
 	</mappers>
 </configuration>

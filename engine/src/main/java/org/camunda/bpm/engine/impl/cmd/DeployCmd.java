@@ -34,6 +34,7 @@ import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.cmmn.deployer.CmmnDeployer;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.dmn.deployer.DmnDeployer;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentFailListener;
@@ -315,6 +316,10 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
 
   protected boolean isCmmnResource(ResourceEntity resourceEntity) {
     return StringUtil.hasAnySuffix(resourceEntity.getName(), CmmnDeployer.CMMN_RESOURCE_SUFFIXES);
+  }
+
+  protected boolean isDmnResource(ResourceEntity resourceEntity) {
+    return StringUtil.hasAnySuffix(resourceEntity.getName(), DmnDeployer.DMN_RESOURCE_SUFFIXES);
   }
 
   protected Set<String> findDeploymentIdsForProcessDefinitions(CommandContext commandContext, Set<String> processDefinitionKeys) {

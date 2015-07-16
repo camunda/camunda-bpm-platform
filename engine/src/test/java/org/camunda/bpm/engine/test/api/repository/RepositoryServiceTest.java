@@ -30,6 +30,8 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
+import org.camunda.bpm.engine.repository.DecisionDefinition;
+import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
@@ -419,6 +421,69 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
       fail();
     } catch (NotValidException e) {
       assertTextPresent("caseDefinitionId is null", e.getMessage());
+    }
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/repository/one.dmn" })
+  public void testGetDecisionDefinition() {
+    DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
+
+    DecisionDefinition decisionDefinition = query.singleResult();
+    String decisionDefinitionId = decisionDefinition.getId();
+
+    DecisionDefinition definition = repositoryService.getDecisionDefinition(decisionDefinitionId);
+
+    assertNotNull(definition);
+    assertEquals(decisionDefinitionId, definition.getId());
+  }
+
+  public void testGetDecisionDefinitionByInvalidId() {
+    try {
+      repositoryService.getDecisionDefinition("invalid");
+      fail();
+    } catch (NotFoundException e) {
+      assertTextPresent("no deployed decision definition found with id 'invalid'", e.getMessage());
+    }
+
+    try {
+      repositoryService.getDecisionDefinition(null);
+      fail();
+    } catch (NotValidException e) {
+      assertTextPresent("decisionDefinitionId is null", e.getMessage());
+    }
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/repository/one.dmn" })
+  public void testGetDecisionModel() throws Exception {
+    DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
+
+    DecisionDefinition decisionDefinition = query.singleResult();
+    String decisionDefinitionId = decisionDefinition.getId();
+
+    InputStream decisionModel = repositoryService.getDecisionModel(decisionDefinitionId);
+
+    assertNotNull(decisionModel);
+
+    byte[] readInputStream = IoUtil.readInputStream(decisionModel, "decisionModel");
+    String model = new String(readInputStream, "UTF-8");
+
+    assertTrue(model.contains("<Decision id=\"one\" name=\"One\">"));
+
+    IoUtil.closeSilently(decisionModel);
+  }
+
+  public void testGetDecisionModelByInvalidId() throws Exception {
+    try {
+      repositoryService.getDecisionModel("invalid");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("no deployed decision definition found with id 'invalid'", e.getMessage());
+    }
+
+    try {
+      repositoryService.getDecisionModel(null);
+      fail();
+    } catch (NotValidException e) {
+      assertTextPresent("decisionDefinitionId is null", e.getMessage());
     }
   }
 

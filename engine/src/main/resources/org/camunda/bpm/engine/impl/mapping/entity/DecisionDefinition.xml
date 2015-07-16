@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity">
+
+  <!-- DECISIONDEFINITION INSERT -->
+
+  <insert id="insertDecisionDefinition" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity">
+    insert into ${prefix}ACT_RE_DECISION_DEF(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, DGRM_RESOURCE_NAME_, REV_)
+    values (#{id, jdbcType=VARCHAR},
+            #{category, jdbcType=VARCHAR},
+            #{name, jdbcType=VARCHAR},
+            #{key, jdbcType=VARCHAR},
+            #{version, jdbcType=INTEGER},
+            #{deploymentId, jdbcType=VARCHAR},
+            #{resourceName, jdbcType=VARCHAR},
+            #{diagramResourceName, jdbcType=VARCHAR},
+            1
+           )
+  </insert>
+
+  <!-- DECISIONDEFINITION UPDATE -->
+
+  <update id="updateDecisionDefinition" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity">
+    update ${prefix}ACT_RE_DECISION_DEF set
+      REV_ = #{revisionNext, jdbcType=INTEGER}
+    where ID_ = #{id, jdbcType=VARCHAR}
+      and REV_ = #{revision, jdbcType=INTEGER}
+  </update>
+
+  <!-- DECISIONDEFINITION DELETE -->
+
+  <delete id="deleteDecisionDefinitionsByDeploymentId" parameterType="string">
+    delete from ${prefix}ACT_RE_DECISION_DEF where DEPLOYMENT_ID_ = #{deploymentId}
+  </delete>
+
+  <!-- DECISIONDEFINITION RESULTMAP -->
+
+  <resultMap id="decisionDefinitionResultMap" type="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" />
+    <result property="category" column="CATEGORY_" />
+    <result property="name" column="NAME_" />
+    <result property="key" column="KEY_" jdbcType="VARCHAR" />
+    <result property="version" column="VERSION_" jdbcType="INTEGER"/>
+    <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR"/>
+    <result property="resourceName" column="RESOURCE_NAME_" jdbcType="VARCHAR"/>
+    <result property="diagramResourceName" column="DGRM_RESOURCE_NAME_" jdbcType="VARCHAR"/>
+  </resultMap>
+
+  <!-- DECISIONDEFINITION SELECT -->
+
+  <select id="selectDecisionDefinition" parameterType="string" resultMap="decisionDefinitionResultMap">
+    select * from ${prefix}ACT_RE_DECISION_DEF where ID_ = #{decisionDefinitionId}
+  </select>
+
+  <select id="selectDecisionDefinitionByDeploymentId" parameterType="string" resultMap="decisionDefinitionResultMap">
+    select * from ${prefix}ACT_RE_DECISION_DEF where DEPLOYMENT_ID_ = #{parameter}
+  </select>
+
+  <select id="selectDecisionDefinitionByDeploymentAndKey" parameterType="map" resultMap="decisionDefinitionResultMap">
+    select *
+    from ${prefix}ACT_RE_DECISION_DEF
+    where DEPLOYMENT_ID_ = #{deploymentId}
+      and KEY_ = #{decisionDefinitionKey}
+  </select>
+
+  <select id="selectLatestDecisionDefinitionByKey" parameterType="string" resultMap="decisionDefinitionResultMap">
+    select *
+    from ${prefix}ACT_RE_DECISION_DEF
+    where KEY_ = #{decisionDefinitionKey} and
+          VERSION_ = (select max(VERSION_) from ${prefix}ACT_RE_DECISION_DEF where KEY_ = #{decisionDefinitionKey})
+  </select>
+
+  <select id="selectDecisionDefinitionByKeyAndVersion" parameterType="map" resultMap="decisionDefinitionResultMap">
+    select *
+    from ${prefix}ACT_RE_DECISION_DEF
+    where KEY_ = #{decisionDefinitionKey}
+      and VERSION_ = #{decisionDefinitionVersion}
+  </select>
+
+  <select id="selectDecisionDefinitionsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionQueryImpl" resultMap="decisionDefinitionResultMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    select RES.*
+    ${limitBetween}
+    <include refid="selectDecisionDefinitionsByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <select id="selectDecisionDefinitionCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionQueryImpl" resultType="long">
+    select count(RES.ID_)
+    <include refid="selectDecisionDefinitionsByQueryCriteriaSql"/>
+  </select>
+
+  <!-- mysql specific sql -->
+  <select id="selectDecisionDefinitionsByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionQueryImpl" resultMap="decisionDefinitionResultMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    select distinct RES.*
+    ${limitBetween}
+    <include refid="selectDecisionDefinitionsByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <!-- mysql specific sql -->
+  <select id="selectDecisionDefinitionCountByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionQueryImpl" resultType="long">
+    select distinct count(RES.ID_)
+    <include refid="selectDecisionDefinitionsByQueryCriteriaSql"/>
+  </select>
+
+  <sql id="selectDecisionDefinitionsByQueryCriteriaSql">
+    from ${prefix}ACT_RE_DECISION_DEF RES
+    <where>
+      <if test="id != null">
+        RES.ID_ = #{id}
+      </if>
+      <if test="ids != null &amp;&amp; ids.length > 0">
+        and RES.ID_ in
+        <foreach item="item" index="index" collection="ids"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="category != null">
+        and RES.CATEGORY_ = #{category}
+      </if>
+      <if test="categoryLike != null">
+        and RES.CATEGORY_ like #{categoryLike}
+      </if>
+      <if test="name != null">
+        and RES.NAME_ = #{name}
+      </if>
+      <if test="nameLike != null">
+        and RES.NAME_ like #{nameLike}
+      </if>
+      <if test="key != null">
+        and RES.KEY_ = #{key}
+      </if>
+      <if test="keyLike != null">
+        and RES.KEY_ like #{keyLike}
+      </if>
+      <if test="resourceName != null">
+        and RES.RESOURCE_NAME_ = #{resourceName}
+      </if>
+      <if test="resourceNameLike != null">
+        and RES.RESOURCE_NAME_ like #{resourceNameLike}
+      </if>
+      <if test="version != null">
+        and RES.VERSION_ = #{version}
+      </if>
+      <if test="deploymentId != null">
+        and RES.DEPLOYMENT_ID_ = #{deploymentId}
+      </if>
+      <if test="latest">
+        and RES.VERSION_ = (select max(VERSION_) from ${prefix}ACT_RE_DECISION_DEF where KEY_ = RES.KEY_)
+      </if>
+    </where>
+  </sql>
+
+</mapper>

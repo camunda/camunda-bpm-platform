@@ -258,6 +258,7 @@ public class DbSqlSessionFactory implements SessionFactory {
   protected boolean isDbIdentityUsed = true;
   protected boolean isDbHistoryUsed = true;
   protected boolean cmmnEnabled = true;
+  protected boolean dmnEnabled = true;
 
   public Class< ? > getSessionType() {
     return DbSqlSession.class;
@@ -417,6 +418,14 @@ public class DbSqlSessionFactory implements SessionFactory {
 
   public void setCmmnEnabled(boolean cmmnEnabled) {
     this.cmmnEnabled = cmmnEnabled;
+  }
+
+  public boolean isDmnEnabled() {
+    return dmnEnabled;
+  }
+
+  public void setDmnEnabled(boolean dmnEnabled) {
+    this.dmnEnabled = dmnEnabled;
   }
 
   public void setDatabaseTablePrefix(String databaseTablePrefix) {

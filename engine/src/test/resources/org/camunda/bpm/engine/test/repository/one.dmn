@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Definitions xmlns="http://www.omg.org/spec/DMN/20130901"
+             xmlns:camunda="http://camunda.org/schema/1.0/dmn"
+             id="definitions"
+             name="camunda"
+             namespace="Examples">
+  <ItemDefinition id="itemDefinition1" name="Input">
+    <typeDefinition>string</typeDefinition>
+    <allowedValue id="allowedValue1">
+      <text>a</text>
+    </allowedValue>
+    <allowedValue id="allowedValue2">
+      <text>b</text>
+    </allowedValue>
+  </ItemDefinition>
+  <ItemDefinition id="itemDefinition2" name="Output">
+    <typeDefinition>string</typeDefinition>
+    <allowedValue id="allowedValue3">
+      <text>ok</text>
+    </allowedValue>
+    <allowedValue id="allowedValue4">
+      <text>notok</text>
+    </allowedValue>
+  </ItemDefinition>
+  <Decision id="one" name="One">
+    <DecisionTable id="decisionTable" isComplete="true" isConsistent="true">
+      <clause id="clause1" name="Input">
+        <inputExpression id="inputExpression1" name="Input">
+          <itemDefinition href="#itemDefinition1" />
+          <text>status</text>
+        </inputExpression>
+        <inputEntry id="inputEntry1">
+          <text>a</text>
+        </inputEntry>
+        <inputEntry id="inputEntry2">
+          <text>b</text>
+        </inputEntry>
+      </clause>
+      <clause id="clause2" name="Output" camunda:output="result">
+        <outputDefinition href="#itemDefinition2" />
+        <outputEntry id="outputEntry1">
+          <text>notok</text>
+        </outputEntry>
+        <outputEntry id="outputEntry2">
+          <text>ok</text>
+        </outputEntry>
+      </clause>
+      <rule id="rule1">
+        <condition>inputEntry1</condition>
+        <conclusion>outputEntry1</conclusion>
+      </rule>
+      <rule id="rule2">
+        <condition>inputEntry2</condition>
+        <conclusion>outputEntry2</conclusion>
+      </rule>
+    </DecisionTable>
+  </Decision>
+</Definitions>
