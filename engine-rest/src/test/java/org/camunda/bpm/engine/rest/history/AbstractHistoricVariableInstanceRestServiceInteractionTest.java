@@ -18,6 +18,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -250,6 +251,33 @@ public abstract class AbstractHistoricVariableInstanceRestServiceInteractionTest
     Assert.assertEquals(new String(byteContent), new String(responseBytes));
     verify(variableInstanceQueryMock, never()).disableBinaryFetching();
 
+  }
+
+  @Test
+  public void testBinaryDataForFileVariable() {
+
+    String filename = "test.txt";
+    byte[] byteContent = "test".getBytes();
+    String encoding = "UTF-8";
+    FileValue variableValue = Variables.fileValue(filename).file(byteContent).mimeType(ContentType.TEXT.toString()).encoding(encoding).create();
+    HistoricVariableInstance variableInstanceMock = MockProvider.mockHistoricVariableInstance().typedValue(variableValue).build();
+
+    when(variableInstanceQueryMock.variableId(variableInstanceMock.getId())).thenReturn(variableInstanceQueryMock);
+    when(variableInstanceQueryMock.disableCustomObjectDeserialization()).thenReturn(variableInstanceQueryMock);
+    when(variableInstanceQueryMock.singleResult()).thenReturn(variableInstanceMock);
+
+    Response response = given().pathParam("id", MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .and()
+      .body(is(equalTo(new String(byteContent))))
+      .header("Content-Disposition", "attachment; filename="+filename)
+    .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);
+    //due to some problems with wildfly we gotta check this separately
+    String contentType = response.getContentType();
+    assertThat(contentType, is(either(CoreMatchers.<Object>equalTo(ContentType.TEXT.toString() + "; charset=UTF-8")).or(CoreMatchers.<Object>equalTo(ContentType.TEXT.toString() + ";charset=UTF-8"))));
+
+    verify(variableInstanceQueryMock, never()).disableBinaryFetching();
   }
 
   @Test

@@ -14,8 +14,10 @@ package org.camunda.bpm.engine.rest.history;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.either;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -293,14 +295,16 @@ public abstract class AbstractHistoricDetailRestServiceInteractionTest extends A
     when(historicDetailQueryMock.disableCustomObjectDeserialization()).thenReturn(historicDetailQueryMock);
     when(historicDetailQueryMock.singleResult()).thenReturn(detailMock);
 
-    given().pathParam("id", MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_ID).log().all()
+    Response response = given().pathParam("id", MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_ID).log().all()
     .then().expect().log().all()
       .statusCode(Status.OK.getStatusCode())
       . body(is(equalTo(new String(byteContent))))
       .and()
         .header("Content-Disposition", "attachment; filename="+filename)
-        .contentType(CoreMatchers.<String>either(equalTo(ContentType.TEXT.toString() + ";charset=UTF-8")).or(equalTo(ContentType.TEXT.toString() + "; charset=UTF-8")))
     .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);
+    //due to some problems with wildfly we gotta check this separately
+    String contentType = response.getContentType();
+    assertThat(contentType, is(either(CoreMatchers.<Object>equalTo(ContentType.TEXT.toString() + "; charset=UTF-8")).or(CoreMatchers.<Object>equalTo(ContentType.TEXT.toString() + ";charset=UTF-8"))));
 
     verify(historicDetailQueryMock, never()).disableBinaryFetching();
 

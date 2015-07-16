@@ -18,6 +18,7 @@ import static org.hamcrest.CoreMatchers.either;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -295,14 +296,16 @@ public abstract class AbstractVariableInstanceRestServiceInteractionTest extends
     when(variableInstanceQueryMock.disableCustomObjectDeserialization()).thenReturn(variableInstanceQueryMock);
     when(variableInstanceQueryMock.singleResult()).thenReturn(variableInstanceMock);
 
-    given().pathParam("id", MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID)
+    Response response = given().pathParam("id", MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID)
     .then().expect().statusCode(Status.OK.getStatusCode())
     .and()
-      .contentType(either(CoreMatchers.<Object>equalTo(ContentType.TEXT.toString() + "; charset=UTF-8")).or(CoreMatchers.<Object>equalTo(ContentType.TEXT.toString() + ";charset=UTF-8")))
-      .and()
-        .body(is(equalTo(new String(byteContent))))
+      .header("Content-Disposition", "attachment; filename="+filename)
+    .and()
+      .body(is(equalTo(new String(byteContent))))
     .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);
-
+    //due to some problems with wildfly we gotta check this separately
+    String contentType = response.getContentType();
+    assertThat(contentType, is(either(CoreMatchers.<Object>equalTo(ContentType.TEXT.toString() + "; charset=UTF-8")).or(CoreMatchers.<Object>equalTo(ContentType.TEXT.toString() + ";charset=UTF-8"))));
   }
 
   @Test
