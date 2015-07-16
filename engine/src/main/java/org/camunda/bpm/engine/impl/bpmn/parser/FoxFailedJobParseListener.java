@@ -28,7 +28,13 @@ public class FoxFailedJobParseListener extends AbstractBpmnParseListener {
   protected static final String SIGNAL_EVENT_DEFINITION = "signalEventDefinition";
   protected static final String EXTENSION_ELEMENTS = "extensionElements";
   protected static final String FAILED_JOB_RETRY_TIME_CYCLE = "failedJobRetryTimeCycle";
+
+  /**
+   * deprecated since 7.4, use camunda ns.
+   */
+  @Deprecated
   public static final Namespace FOX_ENGINE_NS = new Namespace("http://www.camunda.com/fox");
+
   public static final String FOX_FAILED_JOB_CONFIGURATION = "FOX_FAILED_JOB_CONFIGURATION";
 
   @Override
