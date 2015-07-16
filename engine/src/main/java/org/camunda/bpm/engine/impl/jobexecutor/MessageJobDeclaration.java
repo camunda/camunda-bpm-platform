@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
  * @author Daniel Meyer
  *
  */
-public class MessageJobDeclaration extends ExecutionJobDeclaration<MessageEntity> {
+public class MessageJobDeclaration extends JobDeclaration<ExecutionEntity, MessageEntity> {
 
   public static final String ASYNC_BEFORE = "async-before";
   public static final String ASYNC_AFTER = "async-after";
@@ -67,6 +67,10 @@ public class MessageJobDeclaration extends ExecutionJobDeclaration<MessageEntity
       }
     }
     return false;
+  }
+
+  protected ExecutionEntity resolveExecution(ExecutionEntity context) {
+    return context;
   }
 
 

@@ -29,7 +29,7 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
  * @author Tom Baeyens
  * @author Daniel Meyer
  */
-public class TimerDeclarationImpl extends ExecutionJobDeclaration<TimerEntity> {
+public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerEntity> {
 
   private static final long serialVersionUID = 1L;
 
@@ -159,6 +159,10 @@ public class TimerDeclarationImpl extends ExecutionJobDeclaration<TimerEntity> {
       .getCommandContext()
       .getJobManager()
       .schedule(timer);
+  }
+
+  protected ExecutionEntity resolveExecution(ExecutionEntity context) {
+    return context;
   }
 
 }

@@ -25,8 +25,11 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 /**
  * <p>A job declaration is associated with an activity in the process definition graph.
- * It provides data about Jobs which are to be created when executing this activity.
+ * It provides data about jobs which are to be created when executing this activity.
  * It also acts as a factory for new Job Instances.</p>
+ *
+ * <p>Jobs are of a type T and are created in the context of type S (e.g. an execution or an event subscription).
+ * An instance of the context class is handed in when a job is created.</p>
  *
  * @author Daniel Meyer
  *

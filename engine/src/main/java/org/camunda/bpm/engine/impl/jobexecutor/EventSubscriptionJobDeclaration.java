@@ -25,8 +25,10 @@ import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.commons.utils.EnsureUtil;
 
 /**
- * @author Thorben Lindhauer
+ * <p>Describes and creates jobs for handling an event asynchronously.
+ * These jobs are created in the context of an {@link EventSubscriptionEntity} and are of type {@link MessageEntity}.</p>
  *
+ * @author Thorben Lindhauer
  */
 public class EventSubscriptionJobDeclaration extends JobDeclaration<EventSubscriptionEntity, MessageEntity> {
 
@@ -96,6 +98,9 @@ public class EventSubscriptionJobDeclaration extends JobDeclaration<EventSubscri
     }
   }
 
+  /**
+   * Assumes that an activity has at most one declaration of a eventName + eventType combination.
+   */
   public static EventSubscriptionJobDeclaration findDeclarationForSubscription(EventSubscriptionEntity eventSubscription) {
     List<EventSubscriptionJobDeclaration> declarations = getDeclarationsForActivity(eventSubscription.getActivity());
 
