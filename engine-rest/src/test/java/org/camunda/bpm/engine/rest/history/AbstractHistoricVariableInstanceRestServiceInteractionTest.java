@@ -254,8 +254,7 @@ public abstract class AbstractHistoricVariableInstanceRestServiceInteractionTest
   }
 
   @Test
-  public void testBinaryDataForFileVariable() {
-
+  public void testGetBinaryDataForFileVariable() {
     String filename = "test.txt";
     byte[] byteContent = "test".getBytes();
     String encoding = "UTF-8";
@@ -313,31 +312,6 @@ public abstract class AbstractHistoricVariableInstanceRestServiceInteractionTest
     .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);
 
     verify(variableInstanceQueryMock, never()).disableBinaryFetching();
-
-  }
-
-  @Test
-  public void testGetBinaryDataForFileVariable() {
-    String filename = "test.txt";
-    byte[] byteContent = "test".getBytes();
-    String encoding = "UTF-8";
-    FileValue variableValue = Variables.fileValue(filename).file(byteContent).mimeType(ContentType.TEXT.toString()).encoding(encoding).create();
-
-    HistoricVariableInstance variableInstanceMock = MockProvider.mockHistoricVariableInstance()
-        .typedValue(variableValue)
-        .build();
-
-    when(variableInstanceQueryMock.variableId(variableInstanceMock.getId())).thenReturn(variableInstanceQueryMock);
-    when(variableInstanceQueryMock.disableCustomObjectDeserialization()).thenReturn(variableInstanceQueryMock);
-    when(variableInstanceQueryMock.singleResult()).thenReturn(variableInstanceMock);
-
-    given().pathParam("id", MockProvider.EXAMPLE_VARIABLE_INSTANCE_ID)
-    .then().expect().statusCode(Status.OK.getStatusCode())
-    .and()
-      .contentType(either(CoreMatchers.<Object>equalTo(ContentType.TEXT.toString() + "; charset=UTF-8")).or(CoreMatchers.<Object>equalTo(ContentType.TEXT.toString() + ";charset=UTF-8")))
-      .and()
-        .body(is(equalTo(new String(byteContent))))
-    .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);
 
   }
 
