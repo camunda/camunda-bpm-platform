@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:camunda="http://camunda.org/schema/1.0/bpmn" 
+	targetNamespace="Examples">
+	
+	<signal id="alertSignal" name="alert" />
+
+	<process id="catchAlertTwiceAndTerminate">
+
+		<startEvent id="start" />
+		<sequenceFlow sourceRef="start" targetRef="gw" />
+    <parallelGateway id="gw"/>
+    
+    <!-- both signal catch events cancel each other -->
+    <sequenceFlow sourceRef="gw" targetRef="catchAlertSignal1" />
+    <intermediateCatchEvent id="catchAlertSignal1" name="Alert">
+      <signalEventDefinition signalRef="alertSignal" />
+    </intermediateCatchEvent>
+    <sequenceFlow sourceRef="catchAlertSignal1" targetRef="terminateEnd1" />
+    <endEvent id="terminateEnd1">
+      <extensionElements>
+        <camunda:executionListener
+            event="start"
+            class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener" />
+      </extensionElements>
+      <terminateEventDefinition id="terminateEndDefinition1"/>
+    </endEvent>
+    
+    <sequenceFlow sourceRef="gw" targetRef="catchAlertSignal2" />
+    <intermediateCatchEvent id="catchAlertSignal2" name="Alert">
+      <signalEventDefinition signalRef="alertSignal" />
+    </intermediateCatchEvent>
+		<sequenceFlow sourceRef="catchAlertSignal2" targetRef="terminateEnd2" />
+		<endEvent id="terminateEnd2">
+      <extensionElements>
+        <camunda:executionListener
+            event="start"
+            class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener" />
+      </extensionElements>
+      <terminateEventDefinition id="terminateEndDefinition2"/>
+    </endEvent>
+
+	</process>
+
+</definitions>
