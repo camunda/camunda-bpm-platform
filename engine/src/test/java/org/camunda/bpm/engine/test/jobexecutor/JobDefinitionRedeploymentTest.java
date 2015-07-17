@@ -66,7 +66,7 @@ public class JobDefinitionRedeploymentTest {
   public String processDefinitionResource;
 
   @Rule
-  public ProcessEngineRule rule = new ProcessEngineRule(PluggableProcessEngineTestCase.getProcessEngine());
+  public ProcessEngineRule rule = new ProcessEngineRule(PluggableProcessEngineTestCase.getProcessEngine(), true);
 
   protected ManagementService managementService;
   protected RepositoryService repositoryService;

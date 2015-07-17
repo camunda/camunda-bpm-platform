@@ -128,8 +128,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     } finally {
       TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, getClass(), getName());
       identityService.clearAuthentication();
-      assertAndEnsureCleanDeploymentCache();
-      assertAndEnsureCleanDb();
+      TestHelper.assertAndEnsureCleanDbAndCache(processEngine);
       ClockUtil.reset();
 
       // Can't do this in the teardown, as the teardown will be called as part of the super.runBare
@@ -137,89 +136,6 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
       clearServiceReferences();
     }
   }
-
-  protected void assertAndEnsureCleanDeploymentCache() {
-    StringBuilder outputMessage = new StringBuilder();
-    DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
-
-    Map<String, ProcessDefinitionEntity> processDefinitionCache = deploymentCache.getProcessDefinitionCache();
-    if (!processDefinitionCache.isEmpty()) {
-      outputMessage.append("\tProcess Definition Cache: ").append(processDefinitionCache.keySet()).append("\n");
-      processDefinitionCache.clear();
-    }
-
-    Map<String, BpmnModelInstance> bpmnModelInstanceCache = deploymentCache.getBpmnModelInstanceCache();
-    if (!bpmnModelInstanceCache.isEmpty()) {
-      outputMessage.append("\tBPMN Model Instance Cache: ").append(bpmnModelInstanceCache.keySet()).append("\n");
-      bpmnModelInstanceCache.clear();
-    }
-
-    Map<String, CaseDefinitionEntity> caseDefinitionCache = deploymentCache.getCaseDefinitionCache();
-    if (!caseDefinitionCache.isEmpty()) {
-      outputMessage.append("\tCase Definition Cache: ").append(caseDefinitionCache.keySet()).append("\n");
-      caseDefinitionCache.clear();
-    }
-
-    Map<String, CmmnModelInstance> cmmnModelInstanceCache = deploymentCache.getCmmnModelInstanceCache();
-    if (!cmmnModelInstanceCache.isEmpty()) {
-      outputMessage.append("\tCMMN Model Instance Cache: ").append(cmmnModelInstanceCache.keySet()).append("\n");
-      cmmnModelInstanceCache.clear();
-    }
-
-    if (outputMessage.length() > 0) {
-      outputMessage.insert(0, "Deployment Cache not clean:\n");
-      log.severe(EMPTY_LINE);
-      log.severe(outputMessage.toString());
-      Assert.fail(outputMessage.toString());
-    }
-  }
-
-  /** Each test is assumed to clean up all DB content it entered.
-   * After a test method executed, this method scans all tables to see if the DB is completely clean.
-   * It throws AssertionFailed in case the DB is not clean.
-   * If the DB is not clean, it is cleaned by performing a create a drop. */
-  protected void assertAndEnsureCleanDb() throws Throwable {
-    log.fine("verifying that db is clean after test");
-    Map<String, Long> tableCounts = managementService.getTableCount();
-
-    StringBuilder outputMessage = new StringBuilder();
-    for (String tableName : tableCounts.keySet()) {
-      String tableNameWithoutPrefix = tableName.replace(processEngineConfiguration.getDatabaseTablePrefix(), "");
-      if (!TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.contains(tableNameWithoutPrefix)) {
-        Long count = tableCounts.get(tableName);
-        if (count != 0L) {
-          outputMessage.append("  " + tableName + ": " + count + " record(s)\n");
-        }
-      }
-    }
-    if (outputMessage.length() > 0) {
-      outputMessage.insert(0, "DB NOT CLEAN: \n");
-      log.severe(EMPTY_LINE);
-      log.severe(outputMessage.toString());
-
-      log.info("dropping and recreating db");
-
-      CommandExecutor commandExecutor = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration().getCommandExecutorTxRequired();
-      commandExecutor.execute(new Command<Object>() {
-        @Override
-        public Object execute(CommandContext commandContext) {
-          PersistenceSession persistenceSession = commandContext.getSession(PersistenceSession.class);
-          persistenceSession.dbSchemaDrop();
-          persistenceSession.dbSchemaCreate();
-          return null;
-        }
-      });
-
-      if (exception != null) {
-        throw exception;
-      } else {
-        Assert.fail(outputMessage.toString());
-      }
-    } else {
-      log.info("database was clean");
-    }
-  }
-
 
   protected void initializeServices() {
     processEngineConfiguration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();

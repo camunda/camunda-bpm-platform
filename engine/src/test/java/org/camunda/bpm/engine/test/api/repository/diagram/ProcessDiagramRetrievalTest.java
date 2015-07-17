@@ -79,7 +79,7 @@ public class ProcessDiagramRetrievalTest {
   private static final boolean OVERWRITE_EXPECTED_HTML_FILES = false;
   
   @Rule
-  public ProcessEngineRule activitiRule = new ProcessEngineRule(PluggableProcessEngineTestCase.getProcessEngine());
+  public ProcessEngineRule activitiRule = new ProcessEngineRule(PluggableProcessEngineTestCase.getProcessEngine(), true);
 
   /**
    * Provides a list of parameters for

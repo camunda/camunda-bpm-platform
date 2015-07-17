@@ -83,6 +83,8 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
   protected String configurationResourceCompat = "activiti.cfg.xml";
   protected String deploymentId = null;
 
+  protected boolean ensureCleanAfterTest = false;
+
   protected ProcessEngine processEngine;
   protected RepositoryService repositoryService;
   protected RuntimeService runtimeService;
@@ -96,14 +98,29 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
   protected CaseService caseService;
 
   public ProcessEngineRule() {
+    this(false);
+  }
+
+  public ProcessEngineRule(boolean ensureCleanAfterTest) {
+    this.ensureCleanAfterTest = ensureCleanAfterTest;
   }
 
   public ProcessEngineRule(String configurationResource) {
+    this(configurationResource, false);
+  }
+
+  public ProcessEngineRule(String configurationResource, boolean ensureCleanAfterTest) {
     this.configurationResource = configurationResource;
+    this.ensureCleanAfterTest = ensureCleanAfterTest;
   }
 
   public ProcessEngineRule(ProcessEngine processEngine) {
+    this(processEngine, false);
+  }
+
+  public ProcessEngineRule(ProcessEngine processEngine, boolean ensureCleanAfterTest) {
     this.processEngine = processEngine;
+    this.ensureCleanAfterTest = ensureCleanAfterTest;
   }
 
   @Override
@@ -143,11 +160,29 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
     filterService = processEngine.getFilterService();
   }
 
+  protected void clearServiceReferences() {
+    repositoryService = null;
+    runtimeService = null;
+    taskService = null;
+    formService = null;
+    historyService = null;
+    identityService = null;
+    managementService = null;
+    authorizationService = null;
+    caseService = null;
+    filterService = null;
+  }
+
   @Override
   public void finished(Description description) {
     TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, description.getTestClass(), description.getMethodName());
+    if (ensureCleanAfterTest) {
+      TestHelper.assertAndEnsureCleanDbAndCache(processEngine);
+    }
 
     ClockUtil.reset();
+
+    clearServiceReferences();
   }
 
   public void setCurrentTime(Date currentTime) {
