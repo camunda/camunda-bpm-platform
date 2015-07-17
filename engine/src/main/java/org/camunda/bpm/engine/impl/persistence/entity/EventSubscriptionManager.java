@@ -22,6 +22,8 @@ import java.util.Set;
 
 import org.camunda.bpm.engine.impl.EventSubscriptionQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.event.SignalEventHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.ProcessEventJobHandler;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 
@@ -45,6 +47,12 @@ public class EventSubscriptionManager extends AbstractManager {
     getDbEntityManager().delete(persistentObject);
     if(persistentObject instanceof SignalEventSubscriptionEntity) {
       createdSignalSubscriptions.remove(persistentObject);
+    }
+
+    // if the event subscription has been triggered asynchronously but not yet executed
+    List<JobEntity> asyncJobs = getJobManager().findJobsByConfiguration(ProcessEventJobHandler.TYPE, persistentObject.getId());
+    for (JobEntity asyncJob : asyncJobs) {
+      asyncJob.delete();
     }
   }
 
@@ -110,21 +118,6 @@ public class EventSubscriptionManager extends AbstractManager {
     for (SignalEventSubscriptionEntity entity : createdSignalSubscriptions) {
       if(executionId.equals(entity.getExecutionId())
          && name.equals(entity.getEventName())) {
-        selectList.add(entity);
-      }
-    }
-
-    return new ArrayList<SignalEventSubscriptionEntity>(selectList);
-  }
-  
-  @SuppressWarnings("unchecked")
-  public List<SignalEventSubscriptionEntity> findSignalStartEventSubscriptionsByName(String signalName) {
-    final String query = "selectSignalStartEventSubscriptionsByName";
-    Set<SignalEventSubscriptionEntity> selectList = new HashSet<SignalEventSubscriptionEntity>( getDbEntityManager().selectList(query, signalName));
-
-    // add events created in this command (not visible yet in query)
-    for (SignalEventSubscriptionEntity entity : createdSignalSubscriptions) {
-      if(signalName.equals(entity.getEventName())) {
         selectList.add(entity);
       }
     }

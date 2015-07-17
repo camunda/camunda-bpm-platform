@@ -52,10 +52,9 @@ public class EventSubscriptionJobDeclaration extends JobDeclaration<EventSubscri
     message.setExecutionId(eventSubscription.getExecutionId());
     message.setProcessInstanceId(eventSubscription.getProcessInstanceId());
 
-    ExecutionEntity execution = eventSubscription.getExecution();
+    ProcessDefinitionEntity processDefinition = eventSubscription.getProcessDefinition();
 
-    if (execution != null) {
-      ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+    if (processDefinition != null) {
       message.setProcessDefinitionId(processDefinition.getId());
       message.setProcessDefinitionKey(processDefinition.getKey());
     }

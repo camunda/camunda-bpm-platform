@@ -158,13 +158,25 @@ public abstract class EventSubscriptionEntity implements EventSubscription, DbEn
 
   public ActivityImpl getActivity() {
     if(activity == null && activityId != null) {
-      ExecutionEntity execution = getExecution();
-      if(execution != null) {
-        ProcessDefinitionImpl processDefinition = execution.getProcessDefinition();
-        activity = processDefinition.findActivity(activityId);
-      }
+      ProcessDefinitionImpl processDefinition = getProcessDefinition();
+      activity = processDefinition.findActivity(activityId);
     }
     return activity;
+  }
+
+  public ProcessDefinitionEntity getProcessDefinition() {
+    if (executionId != null) {
+      ExecutionEntity execution = getExecution();
+      return (ProcessDefinitionEntity) execution.getProcessDefinition();
+    }
+    else {
+      // this assumes that start event subscriptions have the process definition id
+      // as their configuration (which holds for message and signal start events)
+      String processDefinitionId = getConfiguration();
+      return Context.getProcessEngineConfiguration()
+        .getDeploymentCache()
+        .findDeployedProcessDefinitionById(processDefinitionId);
+    }
   }
 
   public void setActivity(ActivityImpl activity) {

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,21 +34,21 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 /**
  * @author Daniel Meyer
  */
-public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnActivityBehavior {    
-  
+public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnActivityBehavior {
+
   private final static Logger LOGGER = Logger.getLogger(IntermediateThrowSignalEventActivityBehavior.class.getName());
-  
+
   protected final EventSubscriptionDeclaration signalDefinition;
 
   public IntermediateThrowSignalEventActivityBehavior(EventSubscriptionDeclaration signalDefinition) {
     this.signalDefinition = signalDefinition;
   }
-  
+
   @Override
   public void execute(ActivityExecution execution) throws Exception {
     final EventSubscriptionManager eventSubscriptionManager = Context.getCommandContext().getEventSubscriptionManager();
-    
-    // notify all executions waiting of this signal
+
+    // trigger all event subscriptions for the signal (start and intermediate)
     List<SignalEventSubscriptionEntity> catchSignalEventSubscription = eventSubscriptionManager
       .findSignalEventSubscriptionsByEventName(signalDefinition.getEventName());
     for (SignalEventSubscriptionEntity signalEventSubscriptionEntity : catchSignalEventSubscription) {
@@ -56,20 +56,13 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
         signalEventSubscriptionEntity.eventReceived(null, signalDefinition.isAsync());
       }
     }
-    
-    // start new process instances of process definitions that can started by this signal 
-    List<SignalEventSubscriptionEntity> startSignalEventSubscriptions = eventSubscriptionManager
-        .findSignalStartEventSubscriptionsByName(signalDefinition.getEventName());
-    for (SignalEventSubscriptionEntity eventSubscription : startSignalEventSubscriptions) {
-      startProcessInstanceBySignal(eventSubscription);
-    }
-    
-    leave(execution);        
+
+    leave(execution);
   }
 
   private boolean isActiveEventSubscription(SignalEventSubscriptionEntity signalEventSubscriptionEntity) {
     ExecutionEntity execution = signalEventSubscriptionEntity.getExecution();
-    return !execution.isEnded() && !execution.isCanceled();
+    return execution == null || (!execution.isEnded() && !execution.isCanceled());
   }
 
   protected void startProcessInstanceBySignal(SignalEventSubscriptionEntity eventSubscription) {
@@ -84,11 +77,11 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
       LOGGER.log(Level.FINE, "Found event subscription with {0} but process definition {1} could not be found.",
           new Object[] { eventSubscription, processDefinitionId });
     } else {
-      
+
       ActivityImpl signalStartEvent = processDefinition.findActivity(eventSubscription.getActivityId());
       PvmProcessInstance processInstance = processDefinition.createProcessInstanceForInitial(signalStartEvent);
       processInstance.start();
     }
-  } 
-  
+  }
+
 }

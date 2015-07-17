@@ -766,7 +766,7 @@ public class BpmnParse extends Parse {
     ActivityImpl initial = null;
     // validate that there is s single none start event / timer start event:
     List<String> exclusiveStartEventTypes = Arrays.asList("startEvent", "startTimerEvent");
-    
+
     for (ActivityImpl activityImpl : startEventActivities) {
       if (exclusiveStartEventTypes.contains(activityImpl.getProperty("type"))) {
         if (initial == null) {
@@ -801,19 +801,17 @@ public class BpmnParse extends Parse {
       parseTimerStartEventDefinition(timerEventDefinition, startEventActivity, processDefinition);
     } else if (messageEventDefinition != null) {
       startEventActivity.setProperty("type", "messageStartEvent");
-      
+
       EventSubscriptionDeclaration messageDefinition = parseMessageEventDefinition(messageEventDefinition);
       messageDefinition.setActivityId(startEventActivity.getId());
       messageDefinition.setStartEvent(true);
       addEventSubscriptionDeclaration(messageDefinition, processDefinition, startEventElement);
     } else if (signalEventDefinition != null){
       startEventActivity.setProperty("type", "signalStartEvent");
-      
-      EventSubscriptionDeclaration signalDefinition = parseSignalEventDefinition(signalEventDefinition);      
-      signalDefinition.setActivityId(startEventActivity.getActivityId());
-      signalDefinition.setStartEvent(true);
-      addEventSubscriptionDeclaration(signalDefinition, processDefinition, startEventElement);
-    } 
+      startEventActivity.setEventScope(scope);
+
+      parseSignalCatchEventDefinition(signalEventDefinition, startEventActivity, true);
+    }
   }
 
   protected void parseStartFormHandlers(List<Element> startEventElements, ProcessDefinitionEntity processDefinition) {
@@ -988,18 +986,18 @@ public class BpmnParse extends Parse {
       eventDefinitions = new ArrayList<EventSubscriptionDeclaration>();
       scope.setProperty(PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION, eventDefinitions);
     } else {
-      
+
       // if this is a message event, validate that it is the only one with the provided name for this scope
       if(hasMultipleMessageEventDefinitionsWithSameName(subscription, eventDefinitions)){
         addError("Cannot have more than one message event subscription with name '" + subscription.getEventName() + "' for scope '" + scope.getId() + "'",
             element);
       }
-    
+
       // if this is a signal event, validate that it is the only one with the provided name for this scope
       if(hasMultipleSignalEventDefinitionsWithSameName(subscription, eventDefinitions)){
         addError("Cannot have more than one signal event subscription with name '" + subscription.getEventName() + "' for scope '" + scope.getId() + "'",
             element);
-      } 
+      }
     }
     eventDefinitions.add(subscription);
   }
@@ -1007,7 +1005,7 @@ public class BpmnParse extends Parse {
   protected boolean hasMultipleMessageEventDefinitionsWithSameName(EventSubscriptionDeclaration subscription, List<EventSubscriptionDeclaration> eventDefinitions) {
     return hasMultipleEventDefinitionsWithSameName(subscription, eventDefinitions, "message");
   }
-  
+
   protected boolean hasMultipleSignalEventDefinitionsWithSameName(EventSubscriptionDeclaration subscription, List<EventSubscriptionDeclaration> eventDefinitions) {
     return hasMultipleEventDefinitionsWithSameName(subscription, eventDefinitions, "signal");
   }
@@ -2768,16 +2766,17 @@ public class BpmnParse extends Parse {
   protected void parseIntermediateSignalEventDefinition(Element element, ActivityImpl signalActivity) {
     signalActivity.setProperty("type", "intermediateSignalCatch");
 
-    parseSignalCatchEventDefinition(element, signalActivity);
+    parseSignalCatchEventDefinition(element, signalActivity, false);
 
     for (BpmnParseListener parseListener : parseListeners) {
       parseListener.parseIntermediateSignalCatchEventDefinition(element, signalActivity);
     }
   }
 
-  protected void parseSignalCatchEventDefinition(Element element, ActivityImpl signalActivity) {
+  protected void parseSignalCatchEventDefinition(Element element, ActivityImpl signalActivity, boolean isStartEvent) {
     EventSubscriptionDeclaration signalDefinition = parseSignalEventDefinition(element);
     signalDefinition.setActivityId(signalActivity.getId());
+    signalDefinition.setStartEvent(isStartEvent);
     addEventSubscriptionDeclaration(signalDefinition, signalActivity.getEventScope(), element);
 
     EventSubscriptionJobDeclaration catchingAsyncDeclaration = new EventSubscriptionJobDeclaration(signalDefinition);

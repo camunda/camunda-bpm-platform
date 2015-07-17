@@ -101,10 +101,10 @@
   <select id="selectSignalEventSubscriptionsByEventName" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     select EVT.*
     from ${prefix}ACT_RU_EVENT_SUBSCR EVT
-    inner join ${prefix}ACT_RU_EXECUTION EXC on EVT.EXECUTION_ID_ = EXC.ID_
+    left join ${prefix}ACT_RU_EXECUTION EXC on EVT.EXECUTION_ID_ = EXC.ID_
     where (EVENT_TYPE_ = 'signal')
-    	and (EVENT_NAME_ = #{parameter})
-    	and EXC.SUSPENSION_STATE_ = 1
+      and (EVENT_NAME_ = #{parameter})
+      and (EXC.SUSPENSION_STATE_ = 1 or EXC.SUSPENSION_STATE_ is null)
   </select>
 
   <select id="selectSignalEventSubscriptionsByExecution" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
@@ -120,14 +120,6 @@
     where (EVENT_TYPE_ = 'signal')
     	and (EXECUTION_ID_ = #{parameter.executionId})
     	and (EVENT_NAME_ = #{parameter.eventName})
-  </select>
-
-  <select id="selectSignalStartEventSubscriptionsByName" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
-    select EVT.*
-    from ${prefix}ACT_RU_EVENT_SUBSCR EVT
-    where (EVENT_TYPE_ = 'signal')
-    	and (EVENT_NAME_ = #{parameter})
-    	and EXECUTION_ID_ is null
   </select>
 
   <select id="selectEventSubscriptionsByExecution" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">

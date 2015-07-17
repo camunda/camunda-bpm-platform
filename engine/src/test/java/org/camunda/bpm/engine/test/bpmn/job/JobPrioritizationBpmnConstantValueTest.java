@@ -288,4 +288,18 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
     assertEquals(4, signal2Job.getPriority());
 
   }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/job/intermediateSignalAsyncProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/job/signalStartJobPrioProcess.bpmn20.xml"})
+  public void testAsyncSignalThrowingEventSignalStartActivityPriority() {
+    // given a process instance that executes an async signal throwing event
+    runtimeService.startProcessInstanceByKey("intermediateSignalJobPrioProcess");
+
+    // then there is an async job for the signal start event with the priority defined in the BPMN XML
+    assertEquals(1, managementService.createJobQuery().count());
+    Job signalStartJob = managementService.createJobQuery().singleResult();
+    assertNotNull(signalStartJob);
+    assertEquals(4, signalStartJob.getPriority());
+  }
 }

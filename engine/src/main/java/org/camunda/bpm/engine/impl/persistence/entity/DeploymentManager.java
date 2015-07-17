@@ -76,7 +76,7 @@ public class DeploymentManager extends AbstractManager {
       getIdentityLinkManager().deleteIdentityLinksByProcDef(processDefinitionId);
 
       // remove timer start events:
-      List<Job> timerStartJobs = getJobManager().findJobsByConfiguration(TimerStartEventJobHandler.TYPE, processDefinition.getKey());
+      List<JobEntity> timerStartJobs = getJobManager().findJobsByConfiguration(TimerStartEventJobHandler.TYPE, processDefinition.getKey());
 
       ProcessDefinitionEntity latestVersion = getProcessDefinitionManager().findLatestProcessDefinitionByKey(processDefinition.getKey());
 
@@ -93,6 +93,9 @@ public class DeploymentManager extends AbstractManager {
 
         // remove historic op log entries which are not related to a process instance
         getUserOperationLogManager().deleteOperationLogEntriesByProcessDefinitionId(processDefinitionId);
+
+        // remove historic job log entries not related to a process instance
+        getHistoricJobLogManager().deleteHistoricJobLogsByProcessDefinitionId(processDefinitionId);
       }
     }
 
@@ -118,11 +121,11 @@ public class DeploymentManager extends AbstractManager {
       List<EventSubscriptionEntity> messageEventSubscriptions = getEventSubscriptionManager()
         .findEventSubscriptionsByConfiguration(MessageEventHandler.EVENT_HANDLER_TYPE, processDefinitionId);
       eventSubscriptionsToRemove.addAll(messageEventSubscriptions);
-      
+
       // remove signal event subscriptions:
       List<EventSubscriptionEntity> signalEventSubscriptions = getEventSubscriptionManager().findEventSubscriptionsByConfiguration(SignalEventHandler.EVENT_HANDLER_TYPE , processDefinitionId);
       eventSubscriptionsToRemove.addAll(signalEventSubscriptions);
-      
+
       for (EventSubscriptionEntity eventSubscriptionEntity : eventSubscriptionsToRemove) {
         eventSubscriptionEntity.delete();
       }

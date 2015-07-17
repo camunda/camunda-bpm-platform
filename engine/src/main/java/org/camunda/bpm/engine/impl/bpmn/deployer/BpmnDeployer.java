@@ -45,6 +45,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IdentityLinkEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
@@ -54,7 +55,6 @@ import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 
 /**
@@ -301,12 +301,12 @@ public class BpmnDeployer implements Deployer {
   }
 
   protected void removeObsoleteTimers(ProcessDefinitionEntity processDefinition) {
-    List<Job> jobsToDelete = Context
+    List<JobEntity> jobsToDelete = Context
       .getCommandContext()
       .getJobManager()
       .findJobsByConfiguration(TimerStartEventJobHandler.TYPE, processDefinition.getKey());
 
-    for (Job job :jobsToDelete) {
+    for (JobEntity job :jobsToDelete) {
         new DeleteJobsCmd(job.getId()).execute(Context.getCommandContext());
     }
   }
@@ -337,7 +337,7 @@ public class BpmnDeployer implements Deployer {
     List<EventSubscriptionDeclaration> messageEventDefinitions = (List<EventSubscriptionDeclaration>) processDefinition
         .getProperty(BpmnParse.PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION);
     if (messageEventDefinitions != null) {
-      for (EventSubscriptionDeclaration messageEventDefinition : messageEventDefinitions) {        
+      for (EventSubscriptionDeclaration messageEventDefinition : messageEventDefinitions) {
         addEventSubscription(processDefinition, messageEventDefinition);
       }
     }
@@ -346,7 +346,7 @@ public class BpmnDeployer implements Deployer {
   protected void addEventSubscription(ProcessDefinitionEntity processDefinition, EventSubscriptionDeclaration messageEventDefinition) {
     if (messageEventDefinition.isStartEvent()) {
       String eventType = messageEventDefinition.getEventType();
-      
+
       if (eventType.equals(MessageEventHandler.EVENT_HANDLER_TYPE)) {
         addMessageEventSubscription(messageEventDefinition, processDefinition);
       } else if (eventType.equals(SignalEventHandler.EVENT_HANDLER_TYPE)) {
@@ -356,7 +356,7 @@ public class BpmnDeployer implements Deployer {
   }
 
   protected void addMessageEventSubscription(EventSubscriptionDeclaration messageEventDefinition, ProcessDefinitionEntity processDefinition) {
-    
+
     if(hasMessageEventSubscriptionForName(messageEventDefinition.getEventName())) {
       throw new ProcessEngineException("Cannot deploy process definition '" + processDefinition.getResourceName()
               + "': there already is a message event subscription for the message with name '" + messageEventDefinition.getEventName() + "'.");
@@ -372,7 +372,7 @@ public class BpmnDeployer implements Deployer {
 
   protected boolean hasMessageEventSubscriptionForName(String eventName) {
     CommandContext commandContext = Context.getCommandContext();
-    
+
     // look for subscriptions for the same name in db:
     List<EventSubscriptionEntity> subscriptionsForSameMessageName = commandContext
       .getEventSubscriptionManager()
@@ -394,7 +394,7 @@ public class BpmnDeployer implements Deployer {
 
     return !subscriptionsForSameMessageName.isEmpty();
   }
-  
+
   protected void addSignalEventSubscription(EventSubscriptionDeclaration signalEventDefinition, ProcessDefinitionEntity processDefinition) {
     SignalEventSubscriptionEntity newSubscription = new SignalEventSubscriptionEntity();
     newSubscription.setEventName(signalEventDefinition.getEventName());

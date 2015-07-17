@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.impl.cmd;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +44,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 public class SignalEventReceivedCmd implements Command<Void> {
 
   private final static Logger LOGGER = Logger.getLogger(SignalEventReceivedCmd.class.getName());
-  
+
   protected final String eventName;
   protected final String executionId;
   protected final Map<String, Object> variables;
@@ -58,19 +59,21 @@ public class SignalEventReceivedCmd implements Command<Void> {
   public Void execute(final CommandContext commandContext) {
     final EventSubscriptionManager eventSubscriptionManager = commandContext.getEventSubscriptionManager();
     final AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-   
+
     if(executionId == null) {
-      
-      List<SignalEventSubscriptionEntity> catchSignalEventSubscription = eventSubscriptionManager.findSignalEventSubscriptionsByEventName(eventName);
-      List<SignalEventSubscriptionEntity> startSignalEventSubscriptions = eventSubscriptionManager.findSignalStartEventSubscriptionsByName(eventName);
+
+      List<SignalEventSubscriptionEntity> signalEventSubscriptions = eventSubscriptionManager.findSignalEventSubscriptionsByEventName(eventName);
+
+      List<SignalEventSubscriptionEntity> catchSignalEventSubscription = filterIntermediateSubscriptions(signalEventSubscriptions);
+      List<SignalEventSubscriptionEntity> startSignalEventSubscriptions = filterStartSubscriptions(signalEventSubscriptions);
       Map<String, ProcessDefinitionEntity> processDefinitions = getProcessDefinitionsOfSubscriptions(startSignalEventSubscriptions);
-      
-      checkAuthorizationOfCatchSignals(authorizationManager, catchSignalEventSubscription);      
+
+      checkAuthorizationOfCatchSignals(authorizationManager, catchSignalEventSubscription);
       checkAuthorizationOfStartSignals(authorizationManager, startSignalEventSubscriptions, processDefinitions);
-          
-      notifyExecutions(catchSignalEventSubscription);      
+
+      notifyExecutions(catchSignalEventSubscription);
       startProcessInstances(startSignalEventSubscriptions, processDefinitions);
-      
+
     } else {
 
       ExecutionManager executionManager = commandContext.getExecutionManager();
@@ -79,25 +82,25 @@ public class SignalEventReceivedCmd implements Command<Void> {
 
       List<SignalEventSubscriptionEntity> signalEvents = eventSubscriptionManager.findSignalEventSubscriptionsByNameAndExecution(eventName, executionId);
       ensureNotEmpty("Execution '" + executionId + "' has not subscribed to a signal event with name '" + eventName + "'.", signalEvents);
-      
+
       checkAuthorizationOfCatchSignals(authorizationManager, signalEvents);
       notifyExecutions(signalEvents);
     }
 
     return null;
   }
-    
+
   protected Map<String, ProcessDefinitionEntity> getProcessDefinitionsOfSubscriptions(List<SignalEventSubscriptionEntity> startSignalEventSubscriptions) {
     DeploymentCache deploymentCache = Context.getProcessEngineConfiguration().getDeploymentCache();
-    
+
     Map<String, ProcessDefinitionEntity> processDefinitions = new HashMap<String, ProcessDefinitionEntity>();
-    
+
     for (SignalEventSubscriptionEntity eventSubscription : startSignalEventSubscriptions) {
 
       String processDefinitionId = eventSubscription.getConfiguration();
       ensureNotNull("Configuration of signal start event subscription '" + eventSubscription.getId() + "' contains no process definition id.",
           processDefinitionId);
-      
+
       ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
       if (processDefinition == null || processDefinition.isSuspended()) {
         // ignore event subscription
@@ -107,10 +110,10 @@ public class SignalEventReceivedCmd implements Command<Void> {
         processDefinitions.put(eventSubscription.getId(), processDefinition);
       }
     }
-    
-    return processDefinitions; 
+
+    return processDefinitions;
   }
-  
+
   protected void checkAuthorizationOfCatchSignals(final AuthorizationManager authorizationManager, List<SignalEventSubscriptionEntity> catchSignalEventSubscription) {
     // check authorization for each fetched signal event
     for (SignalEventSubscriptionEntity event : catchSignalEventSubscription) {
@@ -118,7 +121,7 @@ public class SignalEventReceivedCmd implements Command<Void> {
       authorizationManager.checkUpdateProcessInstanceById(processInstanceId);
     }
   }
-  
+
   private void checkAuthorizationOfStartSignals(final AuthorizationManager authorizationManager,
       List<SignalEventSubscriptionEntity> startSignalEventSubscriptions, Map<String, ProcessDefinitionEntity> processDefinitions) {
     // check authorization for process definition
@@ -142,22 +145,46 @@ public class SignalEventReceivedCmd implements Command<Void> {
       }
     }
   }
-  
+
   private boolean isActiveEventSubscription(SignalEventSubscriptionEntity signalEventSubscriptionEntity) {
     ExecutionEntity execution = signalEventSubscriptionEntity.getExecution();
     return !execution.isEnded() && !execution.isCanceled();
   }
-  
+
   private void startProcessInstances(List<SignalEventSubscriptionEntity> startSignalEventSubscriptions, Map<String, ProcessDefinitionEntity> processDefinitions) {
     for (SignalEventSubscriptionEntity signalStartEventSubscription : startSignalEventSubscriptions) {
       ProcessDefinitionEntity processDefinition = processDefinitions.get(signalStartEventSubscription.getId());
        if (processDefinition != null) {
-         
+
          ActivityImpl signalStartEvent = processDefinition.findActivity(signalStartEventSubscription.getActivityId());
          PvmProcessInstance processInstance = processDefinition.createProcessInstanceForInitial(signalStartEvent);
          processInstance.start(variables);
        }
      }
+  }
+
+  protected List<SignalEventSubscriptionEntity> filterIntermediateSubscriptions(List<SignalEventSubscriptionEntity> subscriptions) {
+    List<SignalEventSubscriptionEntity> result = new ArrayList<SignalEventSubscriptionEntity>();
+
+    for (SignalEventSubscriptionEntity subscription : subscriptions) {
+      if (subscription.getExecutionId() != null) {
+        result.add(subscription);
+      }
+    }
+
+    return result;
+  }
+
+  protected List<SignalEventSubscriptionEntity> filterStartSubscriptions(List<SignalEventSubscriptionEntity> subscriptions) {
+    List<SignalEventSubscriptionEntity> result = new ArrayList<SignalEventSubscriptionEntity>();
+
+    for (SignalEventSubscriptionEntity subscription : subscriptions) {
+      if (subscription.getExecutionId() == null) {
+        result.add(subscription);
+      }
+    }
+
+    return result;
   }
 
 }
