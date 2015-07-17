@@ -694,9 +694,11 @@ public interface ManagementService {
    * @param jobId the id of the job to modify, must not be null
    * @param priority the job's new priority
    *
-   * @throws AuthorizationException
-   *          If the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
-   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   * @throws AuthorizationException thrown if the current user does not possess any of the following permissions
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_INSTANCE}</li>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
    */
   void setJobPriority(String jobId, int priority);
 
@@ -733,9 +735,13 @@ public interface ManagementService {
    * @param priority the priority to set
    * @param cascade if true, priorities of existing jobs of that definition are changed as well
    *
-   * @throws AuthorizationException thrown if the current user does not possess any of the following permissions
+   * @throws AuthorizationException thrown if the current user does not possess
    *   <ul>
    *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
+   *
+   *   If cascade is <code>true</code>, the user must further possess one of the following permissions:
+   *   <ul>
    *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_INSTANCE}</li>
    *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
    *   </ul>

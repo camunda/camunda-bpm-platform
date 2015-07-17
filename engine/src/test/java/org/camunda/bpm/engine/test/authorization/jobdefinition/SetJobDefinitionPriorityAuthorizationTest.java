@@ -43,7 +43,7 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class SetJobDefinitionPriorityAuthorizationTest {
 
-  public ProcessEngineRule engineRule = new ProcessEngineRule(PluggableProcessEngineTestCase.getProcessEngine());
+  public ProcessEngineRule engineRule = new ProcessEngineRule(PluggableProcessEngineTestCase.getProcessEngine(), true);
   public AuthorizationTestRule authRule = new AuthorizationTestRule(engineRule);
 
   @Rule
@@ -90,16 +90,14 @@ public class SetJobDefinitionPriorityAuthorizationTest {
     // when
     authRule
       .init(scenario)
+      .withUser("userId")
       .bindResource("processDefinitionKey", "process")
       .start();
 
-    engineRule.getIdentityService().setAuthenticatedUserId("userId");
     engineRule.getManagementService().setJobDefinitionPriority(jobDefinition.getId(), 42);
 
     // then
-    authRule.assertScenario(scenario);
-
-    if (authRule.scenarioSuceeded()) {
+    if (authRule.assertScenario(scenario)) {
       JobDefinition updatedJobDefinition = engineRule.getManagementService().createJobDefinitionQuery().singleResult();
       Assert.assertEquals(42, (int) updatedJobDefinition.getJobPriority());
     }
@@ -116,16 +114,14 @@ public class SetJobDefinitionPriorityAuthorizationTest {
     // when
     authRule
       .init(scenario)
+      .withUser("userId")
       .bindResource("processDefinitionKey", "process")
       .start();
 
-    engineRule.getIdentityService().setAuthenticatedUserId("userId");
     engineRule.getManagementService().resetJobDefinitionPriority(jobDefinition.getId());
 
     // then
-    authRule.assertScenario(scenario);
-
-    if (authRule.scenarioSuceeded()) {
+    if (authRule.assertScenario(scenario)) {
       JobDefinition updatedJobDefinition = engineRule.getManagementService().createJobDefinitionQuery().singleResult();
       Assert.assertNull(updatedJobDefinition.getJobPriority());
     }

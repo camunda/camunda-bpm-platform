@@ -45,7 +45,7 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class SetJobDefinitionPriorityCascadeAuthorizationTest {
 
-  public ProcessEngineRule engineRule = new ProcessEngineRule(PluggableProcessEngineTestCase.getProcessEngine());
+  public ProcessEngineRule engineRule = new ProcessEngineRule(PluggableProcessEngineTestCase.getProcessEngine(), true);
   public AuthorizationTestRule authRule = new AuthorizationTestRule(engineRule);
 
   @Rule
@@ -113,17 +113,15 @@ public class SetJobDefinitionPriorityCascadeAuthorizationTest {
     // when
     authRule
       .init(scenario)
+      .withUser("userId")
       .bindResource("processDefinitionKey", "process")
       .bindResource("processInstanceId", instance.getId())
       .start();
 
-    engineRule.getIdentityService().setAuthenticatedUserId("userId");
     engineRule.getManagementService().setJobDefinitionPriority(jobDefinition.getId(), 42, true);
 
     // then
-    authRule.assertScenario(scenario);
-
-    if (authRule.scenarioSuceeded()) {
+    if (authRule.assertScenario(scenario)) {
       jobDefinition = engineRule.getManagementService().createJobDefinitionQuery().singleResult();
       Assert.assertEquals(42, (int) jobDefinition.getJobPriority());
 

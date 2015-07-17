@@ -280,7 +280,7 @@ public abstract class TestHelper {
       log.severe(outputMessage.toString());
 
       /** skip drop and recreate if a table prefix is used */
-      if (!databaseTablePrefix.isEmpty()) {
+      if (databaseTablePrefix.isEmpty()) {
         log.info("Dropping and recreating database");
 
         processEngineConfiguration

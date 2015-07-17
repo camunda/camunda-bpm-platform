@@ -49,33 +49,44 @@ public class AuthorizationTestRule extends TestWatcher {
   }
 
   public void start(AuthorizationScenario scenario) {
-    start(scenario, new HashMap<String, String>());
+    start(scenario, null, new HashMap<String, String>());
   }
 
-  public void start(AuthorizationScenario scenario, Map<String, String> resourceBindings) {
+  public void start(AuthorizationScenario scenario, String userId, Map<String, String> resourceBindings) {
     Assert.assertNull(interceptor.getLastException());
     scenarioInstance = new AuthorizationScenarioInstance(scenario, engineRule.getAuthorizationService(), resourceBindings);
-    enableAuthorization();
+    enableAuthorization(userId);
     interceptor.activate();
   }
 
-  public void enableAuthorization() {
+  public void enableAuthorization(String userId) {
     engineRule.getProcessEngine().getProcessEngineConfiguration().setAuthorizationEnabled(true);
+    if (userId != null) {
+      engineRule.getIdentityService().setAuthenticatedUserId(userId);
+    }
   }
 
-  public void assertScenario(AuthorizationScenario scenario) {
+  /**
+   * Assert the scenario conditions. If no exception or the expected one was thrown.
+   *
+   * @param scenario the scenario to assert on
+   * @return true if no exception was thrown, false otherwise
+   */
+  public boolean assertScenario(AuthorizationScenario scenario) {
 
     interceptor.deactivate();
     disableAuthorization();
     scenarioInstance.tearDown(engineRule.getAuthorizationService());
     scenarioInstance.assertAuthorizationException(interceptor.getLastException());
     scenarioInstance = null;
+
+    return scenarioSucceeded();
   }
 
   /**
    * No exception was expected and no was thrown
    */
-  public boolean scenarioSuceeded() {
+  public boolean scenarioSucceeded() {
     return interceptor.getLastException() == null;
   }
 
@@ -84,8 +95,8 @@ public class AuthorizationTestRule extends TestWatcher {
   }
 
   public void disableAuthorization() {
-
     engineRule.getProcessEngine().getProcessEngineConfiguration().setAuthorizationEnabled(false);
+    engineRule.getIdentityService().clearAuthentication();
   }
 
   protected void starting(Description description) {
@@ -153,7 +164,13 @@ public class AuthorizationTestRule extends TestWatcher {
   public static class AuthorizationScenarioInstanceBuilder {
     protected AuthorizationScenario scenario;
     protected AuthorizationTestRule rule;
+    protected String userId;
     protected Map<String, String> resourceBindings = new HashMap<String, String>();
+
+    public AuthorizationScenarioInstanceBuilder withUser(String userId) {
+      this.userId = userId;
+      return this;
+    }
 
     public AuthorizationScenarioInstanceBuilder bindResource(String key, String value) {
       resourceBindings.put(key, value);
@@ -161,7 +178,7 @@ public class AuthorizationTestRule extends TestWatcher {
     }
 
     public void start() {
-      rule.start(scenario, resourceBindings);
+      rule.start(scenario, userId, resourceBindings);
     }
   }
 
