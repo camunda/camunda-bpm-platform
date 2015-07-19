@@ -37,6 +37,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.AuthorizationExceptionInfo;
+import org.camunda.bpm.engine.AuthorizationExceptionInfo.Builder;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Groups;
@@ -75,6 +77,8 @@ import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
+import org.python.antlr.PythonParser.return_stmt_return;
+import org.python.antlr.ast.boolopType;
 
 /**
  * @author Daniel Meyer
@@ -159,36 +163,52 @@ public class AuthorizationManager extends AbstractManager {
       String userId = currentAuthentication.getUserId();
       boolean isAuthorized = isAuthorized(userId, currentAuthentication.getGroupIds(), permissionChecks);
       if (!isAuthorized) {
-
-        if (permissionChecks.size() == 1) {
-          PermissionCheck permissionCheck = permissionChecks.get(0);
-          String permissionName = permissionCheck.getPermission().getName();
-          String resourceType = permissionCheck.getResource().resourceName();
-          String resourceId = permissionCheck.getResourceId();
-          throw new AuthorizationException(userId, permissionName, resourceType, resourceId);
-        } else {
-
-          String message = "The user with id '" + userId +
-                           "' does not have one of the following permissions: ";
-
-          for (int i = 0; i < permissionChecks.size(); i++) {
-
-            if (i > 0) {
-              message = message + " or ";
-            }
-
-            PermissionCheck permissionCheck = permissionChecks.get(i);
-            String permissionName = permissionCheck.getPermission().getName();
-            String resourceType = permissionCheck.getResource().resourceName();
-            String resourceId = permissionCheck.getResourceId();
-
-            message = message + "'"+permissionName+"' permission " +
-                "on resource '" + (resourceId != null ? (resourceId+"' of type '") : "" ) + resourceType + "'";
+        
+        Builder builder = AuthorizationExceptionInfo.builder();
+        List<AuthorizationExceptionInfo> info = new ArrayList<AuthorizationExceptionInfo>();
+        StringBuilder sBuilder = new StringBuilder();
+        sBuilder.append("The user with id '");
+        sBuilder.append(userId);
+        sBuilder.append("' does not have one of the following permissions: ");
+        boolean first = true;
+        for (PermissionCheck check: permissionChecks) {
+          builder.permission(check.getPermission().getName());
+          builder.resource(check.getResource().resourceName());
+          builder.resourceId(check.getResourceId());
+          AuthorizationExceptionInfo exceptionInfo = builder.build();
+          info.add(exceptionInfo);
+          
+          if (!first) {
+            sBuilder.append(" or ");
+          } else {
+            first = false;
           }
-          throw new AuthorizationException(message);
+          sBuilder.append(generateExceptionInfoMessage(exceptionInfo));    
         }
+        
+        throw new AuthorizationException(userId, info, sBuilder.toString());
       }
     }
+  }
+
+  /**
+   * Appends the appropriate information for the AuthorizationExceptionInfo to the builder.
+   *
+   * @param exceptionInfo to use
+   */
+  private String generateExceptionInfoMessage(AuthorizationExceptionInfo exceptionInfo) {
+    StringBuilder builder = new StringBuilder();
+    String permissionName = exceptionInfo.getViolatedPermissionName();
+    String resourceType = exceptionInfo.getResourceType();
+    String resourceId = exceptionInfo.getResourceId();
+    builder.append("'");
+    builder.append(permissionName);
+    builder.append("' permission on resource '");
+    builder.append((resourceId != null ? (resourceId+"' of type '") : "" ));
+    builder.append(resourceType);
+    builder.append("'");
+    
+    return builder.toString();
   }
 
   public void checkAuthorization(Permission permission, Resource resource) {
@@ -204,7 +224,11 @@ public class AuthorizationManager extends AbstractManager {
 
       boolean isAuthorized = isAuthorized(currentAuthentication.getUserId(), currentAuthentication.getGroupIds(), permission, resource, resourceId);
       if (!isAuthorized) {
-        throw new AuthorizationException(currentAuthentication.getUserId(), permission.getName(), resource.resourceName(), resourceId);
+        Builder builder = AuthorizationExceptionInfo.builder();
+        builder.permission(permission.getName());
+        builder.resource(resource.resourceName());
+        builder.resourceId(resourceId);
+        throw new AuthorizationException(currentAuthentication.getUserId(), builder.build());
       }
     }
 

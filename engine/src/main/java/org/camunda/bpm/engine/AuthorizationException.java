@@ -12,6 +12,10 @@
  */
 package org.camunda.bpm.engine;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * <p>Exception thrown by the process engine in case a user tries to
  * interact with a resource in an unauthorized way.</p>
@@ -23,44 +27,64 @@ public class AuthorizationException extends ProcessEngineException {
 
   private static final long serialVersionUID = 1L;
 
-  protected final String resourceType;
-  protected final String permissionName;
   protected final String userId;
-  protected final String resourceId;
+  protected final List<AuthorizationExceptionInfo> info;
 
   public AuthorizationException(String message) {
     super(message);
-    this.resourceType = null;
-    this.permissionName = null;
     this.userId = null;
-    this.resourceId = null;
+    info = new ArrayList<AuthorizationExceptionInfo>();
   }
 
-  public AuthorizationException(String userId, String permissionName, String resourceType, String resourceId) {
+  public AuthorizationException(String userId, AuthorizationExceptionInfo exceptionInfo) {
     super(
         "The user with id '"+userId+
-        "' does not have '"+permissionName+"' permission " +
-        "on resource '" + (resourceId != null ? (resourceId+"' of type '") : "" ) + resourceType+"'.");
-    this.resourceType = resourceType;
-    this.permissionName = permissionName;
+        "' does not have '"+exceptionInfo.getViolatedPermissionName()+"' permission " +
+        "on resource '" + (exceptionInfo.getResourceId()!= null ? (exceptionInfo.getResourceId()+"' of type '") : "" ) +
+        exceptionInfo.getResourceType()+"'.");
     this.userId = userId;
-    this.resourceId = resourceId;
+    info = new ArrayList<AuthorizationExceptionInfo>();
+    info.add(exceptionInfo);
+    
+  }
+  
+  public AuthorizationException(String userId, List<AuthorizationExceptionInfo> info, String message) {
+    super(message);
+    this.userId = userId;
+    this.info = info;
   }
 
+  @Deprecated
   public String getResourceType() {
+    String resourceType = null;
+    if (info.size() == 1) {
+      resourceType = info.get(0).getResourceType();
+    }
     return resourceType;
   }
 
+  @Deprecated
   public String getViolatedPermissionName() {
-    return permissionName;
+    if (info.size() == 1) {
+      return info.get(0).getViolatedPermissionName();
+    }
+    return null;
   }
 
+  
   public String getUserId() {
     return userId;
   }
 
+  @Deprecated
   public String getResourceId() {
-    return resourceId;
+    if (info.size() == 1) {
+      return info.get(0).getResourceId();
+    }
+    return null;
   }
 
+  public List<AuthorizationExceptionInfo> getInfo() {
+    return Collections.unmodifiableList(info);
+  }
 }

@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.rest.dto;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.AuthorizationException;
 
 /**
@@ -26,6 +28,7 @@ public class AuthorizationExceptionDto extends ExceptionDto {
   protected String resourceName;
   protected String resourceId;
   protected String permissionName;
+  protected List<AuthorizationExceptionInfoDto> info;
   
   // transformer /////////////////////////////
   
@@ -36,6 +39,7 @@ public class AuthorizationExceptionDto extends ExceptionDto {
     dto.setType(AuthorizationException.class.getSimpleName());
     
     dto.setUserId(e.getUserId());
+    dto.setInfo(AuthorizationExceptionInfoDto.fromInfo(e.getInfo()));
     dto.setPermissionName(e.getViolatedPermissionName());
     dto.setResourceId(e.getResourceId());
     dto.setResourceName(e.getResourceType());
@@ -44,22 +48,27 @@ public class AuthorizationExceptionDto extends ExceptionDto {
   }
   
   // getter / setters ////////////////////////
-  
+  @Deprecated
   public String getResourceName() {
     return resourceName;
   }
+  @Deprecated
   public void setResourceName(String resourceName) {
     this.resourceName = resourceName;
   }
+  @Deprecated
   public String getResourceId() {
     return resourceId;
   }
+  @Deprecated
   public void setResourceId(String resourceId) {
     this.resourceId = resourceId;
   }
+  @Deprecated
   public String getPermissionName() {
     return permissionName;
   }
+  @Deprecated
   public void setPermissionName(String permissionName) {
     this.permissionName = permissionName;
   }
@@ -68,6 +77,11 @@ public class AuthorizationExceptionDto extends ExceptionDto {
   }
   public void setUserId(String userId) {
     this.userId = userId;
+  }
+  public List<AuthorizationExceptionInfoDto> getInfo() {
+    return info;
+  }
+  public void setInfo(List<AuthorizationExceptionInfoDto> info) {
+    this.info = info;
   }  
-  
 }

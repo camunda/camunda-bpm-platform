@@ -5,6 +5,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.AuthorizationExceptionInfo;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 
@@ -37,6 +38,10 @@ public class UnannotatedResource {
   @GET
   @Path("/authorizationException")
   public String throwAuthorizationException() throws Exception {
-    throw new AuthorizationException("someUser", "somePermission", "someResourceName", "someResourceId");
+    AuthorizationExceptionInfo.Builder builder = AuthorizationExceptionInfo.builder();
+    builder.permission("somePermission");
+    builder.resource("someResourceName");
+    builder.resourceId("someResourceId");
+    throw new AuthorizationException("someUser", builder.build());
   }
 }
