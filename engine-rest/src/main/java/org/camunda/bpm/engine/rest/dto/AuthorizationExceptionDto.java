@@ -12,11 +12,17 @@
  */
 package org.camunda.bpm.engine.rest.dto;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.AuthorizationException;
 
 /**
  * <p>Dto for {@link AuthorizationException}</p>
- * 
+ *
+ * <p>The exception contains a list of Missing authorizations. The List is a
+ * disjunction i.e. a user should have any of the authorization for the engine
+ * to continue the execution beyond the point where it failed.</p>
+ *
  * @author Daniel Meyer
  *
  */
@@ -26,6 +32,7 @@ public class AuthorizationExceptionDto extends ExceptionDto {
   protected String resourceName;
   protected String resourceId;
   protected String permissionName;
+  protected List<MissingAuthorizationDto> missingAuthorizations;
   
   // transformer /////////////////////////////
   
@@ -36,6 +43,7 @@ public class AuthorizationExceptionDto extends ExceptionDto {
     dto.setType(AuthorizationException.class.getSimpleName());
     
     dto.setUserId(e.getUserId());
+    dto.setMissingAuthorizations(MissingAuthorizationDto.fromInfo(e.getMissingAuthorizations()));
     dto.setPermissionName(e.getViolatedPermissionName());
     dto.setResourceId(e.getResourceId());
     dto.setResourceName(e.getResourceType());
@@ -44,22 +52,65 @@ public class AuthorizationExceptionDto extends ExceptionDto {
   }
   
   // getter / setters ////////////////////////
-  
+  /**
+   * @return the name of the resource if there
+   * is only one {@link MissingAuthorizationDto}, {@code null} otherwise
+   *
+   * @deprecated Use {@link #getMissingAuthorizations()} to get the name of the resource
+   * of the {@link MissingAuthorizationDto}(s). This method will be removed in future version.
+   */
+  @Deprecated
   public String getResourceName() {
     return resourceName;
   }
+
+  /**
+   * @deprecated Use {@link #setMissingAuthorizations(List)}} to set the
+   * the {@link MissingAuthorizationDto}(s). This method will be removed in future version.
+   */
+  @Deprecated
   public void setResourceName(String resourceName) {
     this.resourceName = resourceName;
   }
+
+  /**
+   * @return the id of the resource if there
+   * is only one {@link MissingAuthorizationDto}, {@code null} otherwise
+   *
+   * @deprecated Use {@link #getMissingAuthorizations()} to get the id of the resource
+   * of the {@link MissingAuthorizationDto}(s). This method will be removed in future version.
+   */
+  @Deprecated
   public String getResourceId() {
     return resourceId;
   }
+
+  /**
+   * @deprecated Use {@link #setMissingAuthorizations(List)}} to set the
+   * the {@link MissingAuthorizationDto}(s). This method will be removed in future version.
+   */
+  @Deprecated
   public void setResourceId(String resourceId) {
     this.resourceId = resourceId;
   }
+
+  /**
+   * @return the name of the violated permission if there
+   * is only one {@link MissingAuthorizationDto}, {@code null} otherwise
+   *
+   * @deprecated Use {@link #getMissingAuthorizations()} to get the name of the violated permission
+   * of the {@link MissingAuthorizationDto}(s). This method will be removed in future version.
+   */
+  @Deprecated
   public String getPermissionName() {
     return permissionName;
   }
+
+  /**
+   * @deprecated Use {@link #setMissingAuthorizations(List)}} to set the
+   * the {@link MissingAuthorizationDto}(s). This method will be removed in future version.
+   */
+  @Deprecated
   public void setPermissionName(String permissionName) {
     this.permissionName = permissionName;
   }
@@ -68,6 +119,15 @@ public class AuthorizationExceptionDto extends ExceptionDto {
   }
   public void setUserId(String userId) {
     this.userId = userId;
+  }
+  /**
+   * @return Disjunctive list of {@link MissingAuthorizationDto} from
+   * which a user needs to have at least one for the authorization to pass
+   */
+  public List<MissingAuthorizationDto> getMissingAuthorizations() {
+    return missingAuthorizations;
+  }
+  public void setMissingAuthorizations(List<MissingAuthorizationDto> info) {
+    this.missingAuthorizations = info;
   }  
-  
 }

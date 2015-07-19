@@ -15,8 +15,11 @@ package org.camunda.bpm.engine.test.authorization.util;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.camunda.bpm.engine.authorization.MissingAuthorization;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.authorization.Resources;
+
+import static junit.framework.TestCase.assertEquals;
 
 /**
  * @author Thorben Lindhauer
@@ -35,5 +38,20 @@ public class AuthorizationTestUtil {
 
   public static Resource getResourceByType(int type) {
     return resourcesByType.get(type);
+  }
+
+  /**
+   * Checks if the info has the expected parameters.
+   *
+   * @param expectedPermissionName to use
+   * @param expectedResourceName to use
+   * @param expectedResourceId to use
+   * @param info to check
+   */
+  public static void assertExceptionInfo(String expectedPermissionName, String expectedResourceName, String expectedResourceId,
+      MissingAuthorization info) {
+    assertEquals(expectedPermissionName, info.getViolatedPermissionName());
+    assertEquals(expectedResourceName, info.getResourceType());
+    assertEquals(expectedResourceId, info.getResourceId());
   }
 }

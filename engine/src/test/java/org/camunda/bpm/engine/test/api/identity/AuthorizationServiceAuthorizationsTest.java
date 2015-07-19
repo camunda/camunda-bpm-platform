@@ -21,10 +21,12 @@ import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Resources.AUTHORIZATION;
+import static org.camunda.bpm.engine.test.authorization.util.AuthorizationTestUtil.assertExceptionInfo;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.MissingAuthorization;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -67,10 +69,10 @@ public class AuthorizationServiceAuthorizationsTest extends PluggableProcessEngi
       fail("exception expected");
       
     } catch (AuthorizationException e) {
-      assertEquals(CREATE.getName(), e.getViolatedPermissionName());
+      assertEquals(1, e.getMissingAuthorizations().size());
+      MissingAuthorization info = e.getMissingAuthorizations().get(0);
       assertEquals(jonny2, e.getUserId());
-      assertEquals(AUTHORIZATION.resourceName(), e.getResourceType());
-      assertEquals(null, e.getResourceId());
+      assertExceptionInfo(CREATE.getName(), AUTHORIZATION.resourceName(), null, info);
     }
       
     // circumvent auth check to get new transient object
@@ -83,11 +85,11 @@ public class AuthorizationServiceAuthorizationsTest extends PluggableProcessEngi
       fail("exception expected");
       
     } catch (AuthorizationException e) {
-      assertEquals(CREATE.getName(), e.getViolatedPermissionName());
+      assertEquals(1, e.getMissingAuthorizations().size());
+      MissingAuthorization info = e.getMissingAuthorizations().get(0);
       assertEquals(jonny2, e.getUserId());
-      assertEquals(AUTHORIZATION.resourceName(), e.getResourceType());
-      assertEquals(null, e.getResourceId());
-    }    
+      assertExceptionInfo(CREATE.getName(), AUTHORIZATION.resourceName(), null, info);
+    }
   }
     
   public void testDeleteAuthorization() {
@@ -110,10 +112,10 @@ public class AuthorizationServiceAuthorizationsTest extends PluggableProcessEngi
       fail("exception expected");
       
     } catch (AuthorizationException e) {
-      assertEquals(DELETE.getName(), e.getViolatedPermissionName());
+      assertEquals(1, e.getMissingAuthorizations().size());
+      MissingAuthorization info = e.getMissingAuthorizations().get(0);
       assertEquals(jonny2, e.getUserId());
-      assertEquals(AUTHORIZATION.resourceName(), e.getResourceType());
-      assertEquals(basePerms.getId(), e.getResourceId());
+      assertExceptionInfo(DELETE.getName(), AUTHORIZATION.resourceName(), basePerms.getId(), info);
     }
   }
 
@@ -141,10 +143,10 @@ public class AuthorizationServiceAuthorizationsTest extends PluggableProcessEngi
       fail("exception expected");
       
     } catch (AuthorizationException e) {
-      assertEquals(UPDATE.getName(), e.getViolatedPermissionName());
+      assertEquals(1, e.getMissingAuthorizations().size());
+      MissingAuthorization info = e.getMissingAuthorizations().get(0);
       assertEquals(jonny2, e.getUserId());
-      assertEquals(AUTHORIZATION.resourceName(), e.getResourceType());
-      assertEquals(basePerms.getId(), e.getResourceId());
+      assertExceptionInfo(UPDATE.getName(), AUTHORIZATION.resourceName(), basePerms.getId(), info);
     }
 
     // but we can create a new auth    

@@ -21,9 +21,13 @@ import java.util.Set;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.MissingAuthorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resource;
+
+import static org.hamcrest.Matchers.containsInAnyOrder;
+
 import org.junit.Assert;
 
 /**
@@ -72,32 +76,31 @@ public class AuthorizationScenarioInstance {
   public void assertAuthorizationException(AuthorizationException e) {
     if (!missingAuthorizations.isEmpty() && e != null) {
       String message = e.getMessage();
-      String failureMessage = describeScenarioFailure("Expected an authorization exception but the message was wrong: " + e.getMessage());
+      String assertionFailureMessage = describeScenarioFailure("Expected an authorization exception but the message was wrong: " + e.getMessage());
+
+      List<MissingAuthorization> actualMissingAuthorizations = new ArrayList<MissingAuthorization>(e.getMissingAuthorizations());
+      List<MissingAuthorization> expectedMissingAuthorizations = MissingAuthorizationMatcher.asMissingAuthorizations(missingAuthorizations);
+
+      Assert.assertThat(actualMissingAuthorizations, containsInAnyOrder(MissingAuthorizationMatcher.asMatchers(expectedMissingAuthorizations)));
 
       for (Authorization missingAuthorization : missingAuthorizations) {
-        Assert.assertTrue(failureMessage, message.contains(missingAuthorization.getUserId()));
+        Assert.assertTrue(assertionFailureMessage, message.contains(missingAuthorization.getUserId()));
+        Assert.assertEquals(missingAuthorization.getUserId(), e.getUserId());
 
         for (Permission permission : missingAuthorization.getPermissions(Permissions.values())) {
           if (permission != Permissions.NONE) {
-            Assert.assertTrue(failureMessage, message.contains(permission.getName()));
+            Assert.assertTrue(assertionFailureMessage, message.contains(permission.getName()));
           }
         }
 
         if (!Authorization.ANY.equals(missingAuthorization.getResourceId())) {
           // missing ANY authorizations are not explicitly represented in the error message
-          Assert.assertTrue(failureMessage, message.contains(missingAuthorization.getResourceId()));
+          Assert.assertTrue(assertionFailureMessage, message.contains(missingAuthorization.getResourceId()));
         }
 
         Resource resource = AuthorizationTestUtil.getResourceByType(missingAuthorization.getResourceType());
-        Assert.assertTrue(failureMessage, message.contains(resource.resourceName()));
+        Assert.assertTrue(assertionFailureMessage, message.contains(resource.resourceName()));
       }
-
-      // TODO: properties are nicer for assertion, but are not always used
-//      Assert.assertEquals(firstMissingAuthorization.resourceId, e.getResourceId());
-//      Assert.assertEquals(firstMissingAuthorization.resource.resourceName(), e.getResourceType());
-//      Assert.assertEquals(firstMissingAuthorization.userId, e.getUserId());
-//      Assert.assertEquals(firstMissingAuthorization.permissions[0].getName(), e.getViolatedPermissionName());
-
     }
     else if (missingAuthorizations.isEmpty() && e == null) {
       // nothing to do
