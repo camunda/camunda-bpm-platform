@@ -3441,15 +3441,13 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByVariableInParallelBranch() throws Exception {
     runtimeService.startProcessInstanceByKey("parallelGateway");
 
-    // when there are two process variables of the same name but different types
+    // when there is a non-local processVariable set by a single Task
     Execution task1Execution = runtimeService.createExecutionQuery().activityId("task1").singleResult();
-    runtimeService.setVariableLocal(task1Execution.getId(), "var", 12345L);
-    Execution task2Execution = runtimeService.createExecutionQuery().activityId("task2").singleResult();
-    runtimeService.setVariableLocal(task2Execution.getId(), "var", 12345);
+    runtimeService.setVariable(task1Execution.getId(), "var", 12345);
 
-    // then the task query should be able to filter by both variables and return both tasks
+    // then the task query should find both variables
+    // refer to http://docs.camunda.org/latest/guides/user-guide/#process-engine-process-variables-variable-scopes-and-variable-visibility
     assertEquals(2, taskService.createTaskQuery().processVariableValueEquals("var", 12345).count());
-    assertEquals(2, taskService.createTaskQuery().processVariableValueEquals("var", 12345L).count());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml")

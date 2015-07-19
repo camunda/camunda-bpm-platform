@@ -436,10 +436,10 @@
 
             <choose>
               <when test="queryVariableValue.processInstanceVariable">
-                and RES.PROC_INST_ID_ = PROC_INST_ID_
+                and RES.PROC_INST_ID_ = EXECUTION_ID_
               </when>
               <otherwise>
-                and RES.CASE_INST_ID_ = CASE_INST_ID_
+                and RES.CASE_INST_ID_ = CASE_EXECUTION_ID_
               </otherwise>
             </choose>
 
