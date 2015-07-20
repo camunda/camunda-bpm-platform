@@ -161,7 +161,7 @@ public class DmnDecisionTableHandler implements DmnElementHandler<DecisionTable,
   }
 
   private String getVariableNameForClause(Clause clause) {
-    return clause.getAttributeValueNs(DmnModelConstants.CAMUNDA_NS, "name");
+    return clause.getAttributeValueNs(DmnModelConstants.CAMUNDA_NS, "output");
   }
 
   protected void transformRules(Collection<Rule> rules) {

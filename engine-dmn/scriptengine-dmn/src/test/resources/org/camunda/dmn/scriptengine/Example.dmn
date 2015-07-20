@@ -42,7 +42,7 @@
           <text>gold</text>
         </inputEntry>
       </clause>
-      <clause id="clause2" camunda:name="result">
+      <clause id="clause2" camunda:output="result">
         <outputDefinition href="#itemDefinition2" />
         <outputEntry id="outputEntry1">
           <text>notok</text>
@@ -82,7 +82,7 @@
           <text>gold</text>
         </inputEntry>
       </clause>
-      <clause id="clause4" camunda:name="result">
+      <clause id="clause4" camunda:output="result">
         <outputDefinition href="#itemDefinition2" />
         <outputEntry id="outputEntry3">
           <text>notok</text>

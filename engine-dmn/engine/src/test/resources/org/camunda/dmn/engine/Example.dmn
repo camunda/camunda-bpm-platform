@@ -57,7 +57,7 @@
           <text><![CDATA[>= 1000]]></text>
         </inputEntry>
       </clause>
-      <clause id="clause3" name="Check Result" camunda:name="result">
+      <clause id="clause3" name="Check Result" camunda:output="result">
         <outputDefinition href="#itemDefinition3" />
         <outputEntry id="outputEntry1">
           <text>notok</text>
@@ -66,7 +66,7 @@
           <text>ok</text>
         </outputEntry>
       </clause>
-      <clause id="clause4" name="Reason" camunda:name="reason">
+      <clause id="clause4" name="Reason" camunda:output="reason">
         <outputEntry id="outputEntry3">
           <text><![CDATA[work on your status first, as bronze you're not going to get anything]]></text>
         </outputEntry>
