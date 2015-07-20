@@ -60,6 +60,7 @@ public class JobDefinitionQueryDto extends AbstractQueryDto<JobDefinitionQuery> 
   protected String jobConfiguration;
   protected Boolean active;
   protected Boolean suspended;
+  protected Boolean withOverridingJobPriority;
 
   public JobDefinitionQueryDto() {}
 
@@ -107,6 +108,11 @@ public class JobDefinitionQueryDto extends AbstractQueryDto<JobDefinitionQuery> 
     this.suspended = suspended;
   }
 
+  @CamundaQueryParam(value="withOverridingJobPriority", converter = BooleanConverter.class)
+  public void setWithOverridingJobPriority(Boolean withOverridingJobPriority) {
+    this.withOverridingJobPriority = withOverridingJobPriority;
+  }
+
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
   }
@@ -146,6 +152,10 @@ public class JobDefinitionQueryDto extends AbstractQueryDto<JobDefinitionQuery> 
 
     if (suspended != null && suspended) {
       query.suspended();
+    }
+
+    if (withOverridingJobPriority != null && withOverridingJobPriority) {
+      query.withOverridingJobPriority();
     }
   }
 

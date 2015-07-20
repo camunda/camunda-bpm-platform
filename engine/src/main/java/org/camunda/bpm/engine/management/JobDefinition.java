@@ -77,7 +77,7 @@ public interface JobDefinition {
 
   /**
    * Returns the priority specified for jobs belonging to this definition if the job definition
-   * was overriden via the {@link ManagementService} API.
+   * was overridden via the {@link ManagementService} API.
    *
    * @return the priority that overrides the default/BPMN XML priority or <code>null</code> if
    *   the priority is not overridden

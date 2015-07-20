@@ -749,7 +749,7 @@ public interface ManagementService {
   void setJobDefinitionPriority(String jobDefinitionId, int priority, boolean cascade);
 
   /**
-   * <p>Resets the job definition's priority back to default. New job's of that definition
+   * <p>Resets the job definition's priority back to default. New jobs of that definition
    * receive the priority as specified in the BPMN 2.0 XML or the global default priority.</p>
    *
    * <p>Existing job instance priorities remain unchanged</p>

@@ -330,6 +330,7 @@ public abstract class AbstractJobDefinitionRestServiceQueryTest extends Abstract
     queryParameters.put("jobConfiguration", "aJobConfig");
     queryParameters.put("suspended", "true");
     queryParameters.put("active", "true");
+    queryParameters.put("withOverridingJobPriority", "true");
 
     given().queryParams(queryParameters)
       .expect().statusCode(Status.OK.getStatusCode())
@@ -343,6 +344,7 @@ public abstract class AbstractJobDefinitionRestServiceQueryTest extends Abstract
     verify(mockedQuery).jobConfiguration(queryParameters.get("jobConfiguration"));
     verify(mockedQuery).active();
     verify(mockedQuery).suspended();
+    verify(mockedQuery).withOverridingJobPriority();
     verify(mockedQuery).list();
   }
 
@@ -365,6 +367,7 @@ public abstract class AbstractJobDefinitionRestServiceQueryTest extends Abstract
     queryParameters.put("jobConfiguration", aJobConfig);
     queryParameters.put("suspended", "true");
     queryParameters.put("active", "true");
+    queryParameters.put("withOverridingJobPriority", "true");
 
     List<String> activityIdIn = new ArrayList<String>();
     activityIdIn.add(aActId);
@@ -383,6 +386,7 @@ public abstract class AbstractJobDefinitionRestServiceQueryTest extends Abstract
     verify(mockedQuery).jobConfiguration(aJobConfig);
     verify(mockedQuery).active();
     verify(mockedQuery).suspended();
+    verify(mockedQuery).withOverridingJobPriority();
     verify(mockedQuery).list();
   }
 
