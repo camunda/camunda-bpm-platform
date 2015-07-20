@@ -157,7 +157,7 @@ public class JobDefinitionEntity implements JobDefinition, HasDbRevision, DbEnti
     this.suspensionState = state;
   }
 
-  public Integer getJobPriority() {
+  public Integer getOverridingJobPriority() {
     return jobPriority;
   }
 

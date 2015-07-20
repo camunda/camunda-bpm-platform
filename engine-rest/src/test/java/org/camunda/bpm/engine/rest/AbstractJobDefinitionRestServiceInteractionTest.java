@@ -82,7 +82,7 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
         .body("jobConfiguration", equalTo(MockProvider.EXAMPLE_JOB_CONFIG))
         .body("activityId", equalTo(MockProvider.EXAMPLE_ACTIVITY_ID))
         .body("suspended", equalTo(MockProvider.EXAMPLE_JOB_DEFINITION_IS_SUSPENDED))
-        .body("jobPriority", equalTo(MockProvider.EXAMPLE_JOB_DEFINITION_PRIORITY))
+        .body("overridingJobPriority", equalTo(MockProvider.EXAMPLE_JOB_DEFINITION_PRIORITY))
     .when()
       .get(SINGLE_JOB_DEFINITION_RESOURCE_URL);
 
@@ -1198,7 +1198,7 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
     .when()
       .put(JOB_DEFINITION_PRIORITY_URL);
 
-    verify(mockManagementService).setJobDefinitionPriority(MockProvider.EXAMPLE_JOB_DEFINITION_ID,
+    verify(mockManagementService).setOverridingJobPriorityForJobDefinition(MockProvider.EXAMPLE_JOB_DEFINITION_ID,
         MockProvider.EXAMPLE_JOB_DEFINITION_PRIORITY, false);
   }
 
@@ -1218,7 +1218,7 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
     .when()
       .put(JOB_DEFINITION_PRIORITY_URL);
 
-    verify(mockManagementService).setJobDefinitionPriority(MockProvider.EXAMPLE_JOB_DEFINITION_ID,
+    verify(mockManagementService).setOverridingJobPriorityForJobDefinition(MockProvider.EXAMPLE_JOB_DEFINITION_ID,
         MockProvider.EXAMPLE_JOB_DEFINITION_PRIORITY, true);
   }
 
@@ -1228,7 +1228,7 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
 
     doThrow(new ProcessEngineException(expectedMessage))
       .when(mockManagementService)
-        .setJobDefinitionPriority(eq(MockProvider.EXAMPLE_JOB_DEFINITION_ID),
+        .setOverridingJobPriorityForJobDefinition(eq(MockProvider.EXAMPLE_JOB_DEFINITION_ID),
             eq(MockProvider.EXAMPLE_JOB_DEFINITION_PRIORITY), anyBoolean());
 
     Map<String, Object> priorityJson = new HashMap<String, Object>();
@@ -1246,7 +1246,7 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
     .when()
       .put(JOB_DEFINITION_PRIORITY_URL);
 
-    verify(mockManagementService).setJobDefinitionPriority(MockProvider.EXAMPLE_JOB_DEFINITION_ID,
+    verify(mockManagementService).setOverridingJobPriorityForJobDefinition(MockProvider.EXAMPLE_JOB_DEFINITION_ID,
         MockProvider.EXAMPLE_JOB_DEFINITION_PRIORITY, false);
   }
 
@@ -1256,7 +1256,7 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
 
     doThrow(new NotFoundException(expectedMessage))
       .when(mockManagementService)
-        .setJobDefinitionPriority(eq(MockProvider.NON_EXISTING_JOB_DEFINITION_ID),
+        .setOverridingJobPriorityForJobDefinition(eq(MockProvider.NON_EXISTING_JOB_DEFINITION_ID),
             eq(MockProvider.EXAMPLE_JOB_DEFINITION_PRIORITY), anyBoolean());
 
     Map<String, Object> priorityJson = new HashMap<String, Object>();
@@ -1280,7 +1280,7 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
     String expectedMessage = "expected exception message";
     doThrow(new AuthorizationException(expectedMessage))
       .when(mockManagementService)
-        .setJobDefinitionPriority(eq(MockProvider.EXAMPLE_JOB_DEFINITION_ID),
+        .setOverridingJobPriorityForJobDefinition(eq(MockProvider.EXAMPLE_JOB_DEFINITION_ID),
             eq(MockProvider.EXAMPLE_JOB_DEFINITION_PRIORITY), anyBoolean());
 
     Map<String, Object> priorityJson = new HashMap<String, Object>();
@@ -1314,7 +1314,7 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
     .when()
       .put(JOB_DEFINITION_PRIORITY_URL);
 
-    verify(mockManagementService).resetJobDefinitionPriority(MockProvider.EXAMPLE_JOB_DEFINITION_ID);
+    verify(mockManagementService).clearOverridingJobPriorityForJobDefinition(MockProvider.EXAMPLE_JOB_DEFINITION_ID);
   }
 
   @Test
@@ -1342,7 +1342,7 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
     String expectedMessage = "expected exception message";
 
     doThrow(new ProcessEngineException(expectedMessage))
-      .when(mockManagementService).resetJobDefinitionPriority(MockProvider.EXAMPLE_JOB_DEFINITION_ID);
+      .when(mockManagementService).clearOverridingJobPriorityForJobDefinition(MockProvider.EXAMPLE_JOB_DEFINITION_ID);
 
     Map<String, Object> priorityJson = new HashMap<String, Object>();
     priorityJson.put("priority", null);
@@ -1365,7 +1365,7 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
     String expectedMessage = "expected exception message";
 
     doThrow(new NotFoundException(expectedMessage))
-      .when(mockManagementService).resetJobDefinitionPriority(MockProvider.NON_EXISTING_JOB_DEFINITION_ID);
+      .when(mockManagementService).clearOverridingJobPriorityForJobDefinition(MockProvider.NON_EXISTING_JOB_DEFINITION_ID);
 
     Map<String, Object> priorityJson = new HashMap<String, Object>();
     priorityJson.put("priority", null);
@@ -1387,7 +1387,7 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
   public void testResetJobPriorityAuthorizationException() {
     String expectedMessage = "expected exception message";
     doThrow(new AuthorizationException(expectedMessage))
-    .when(mockManagementService).resetJobDefinitionPriority(MockProvider.EXAMPLE_JOB_DEFINITION_ID);
+    .when(mockManagementService).clearOverridingJobPriorityForJobDefinition(MockProvider.EXAMPLE_JOB_DEFINITION_ID);
 
     Map<String, Object> priorityJson = new HashMap<String, Object>();
     priorityJson.put("priority", null);

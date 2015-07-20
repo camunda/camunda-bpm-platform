@@ -78,7 +78,7 @@ public class MockJobDefinitionBuilder {
     when(mockJobDefinition.getId()).thenReturn(id);
     when(mockJobDefinition.getActivityId()).thenReturn(activityId);
     when(mockJobDefinition.getJobConfiguration()).thenReturn(jobConfiguration);
-    when(mockJobDefinition.getJobPriority()).thenReturn(jobPriority);
+    when(mockJobDefinition.getOverridingJobPriority()).thenReturn(jobPriority);
     when(mockJobDefinition.getJobType()).thenReturn(jobType);
     when(mockJobDefinition.getProcessDefinitionId()).thenReturn(processDefinitionId);
     when(mockJobDefinition.getProcessDefinitionKey()).thenReturn(processDefinitionKey);

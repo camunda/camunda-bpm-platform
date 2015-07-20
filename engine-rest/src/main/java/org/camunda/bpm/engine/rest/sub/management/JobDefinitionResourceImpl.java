@@ -80,7 +80,7 @@ public class JobDefinitionResourceImpl implements JobDefinitionResource {
       ManagementService managementService = engine.getManagementService();
 
       if (dto.getPriority() != null) {
-        managementService.setJobDefinitionPriority(jobDefinitionId, dto.getPriority(), dto.isIncludeJobs());
+        managementService.setOverridingJobPriorityForJobDefinition(jobDefinitionId, dto.getPriority(), dto.isIncludeJobs());
       }
       else {
         if (dto.isIncludeJobs()) {
@@ -88,7 +88,7 @@ public class JobDefinitionResourceImpl implements JobDefinitionResource {
               "Cannot reset priority for job definition " + jobDefinitionId + " with includeJobs=true");
         }
 
-        managementService.resetJobDefinitionPriority(jobDefinitionId);
+        managementService.clearOverridingJobPriorityForJobDefinition(jobDefinitionId);
       }
 
     } catch (AuthorizationException e) {

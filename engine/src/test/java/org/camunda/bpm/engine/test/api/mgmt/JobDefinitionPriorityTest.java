@@ -54,12 +54,12 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
       .jobDefinitionId(job.getJobDefinitionId()).singleResult();
 
     // when I set the job definition's priority
-    managementService.setJobDefinitionPriority(jobDefinition.getId(), 42);
+    managementService.setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), 42);
 
     // then the job definition's priority value has changed
     JobDefinition updatedDefinition = managementService.createJobDefinitionQuery()
         .jobDefinitionId(jobDefinition.getId()).singleResult();
-    assertEquals(42, (int) updatedDefinition.getJobPriority());
+    assertEquals(42, (int) updatedDefinition.getOverridingJobPriority());
 
     // the existing job's priority has not changed
     Job updatedExistingJob = managementService.createJobQuery().singleResult();
@@ -86,12 +86,12 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
       .jobDefinitionId(job.getJobDefinitionId()).singleResult();
 
     // when I set the job definition's priority
-    managementService.setJobDefinitionPriority(jobDefinition.getId(), 52, true);
+    managementService.setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), 52, true);
 
     // then the job definition's priority value has changed
     JobDefinition updatedDefinition = managementService.createJobDefinitionQuery()
         .jobDefinitionId(jobDefinition.getId()).singleResult();
-    assertEquals(52, (int) updatedDefinition.getJobPriority());
+    assertEquals(52, (int) updatedDefinition.getOverridingJobPriority());
 
     // the existing job's priority has changed as well
     Job updatedExistingJob = managementService.createJobQuery().singleResult();
@@ -118,12 +118,12 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
       .jobDefinitionId(job.getJobDefinitionId()).singleResult();
 
     // when I set the job definition's priority
-    managementService.setJobDefinitionPriority(jobDefinition.getId(), 62);
+    managementService.setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), 62);
 
     // then the job definition's priority value has changed
     JobDefinition updatedDefinition = managementService.createJobDefinitionQuery()
         .jobDefinitionId(jobDefinition.getId()).singleResult();
-    assertEquals(62, (int) updatedDefinition.getJobPriority());
+    assertEquals(62, (int) updatedDefinition.getOverridingJobPriority());
 
     // the existing job's priority is still the value as given in the BPMN XML
     Job updatedExistingJob = managementService.createJobQuery().singleResult();
@@ -151,12 +151,12 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
       .jobDefinitionId(job.getJobDefinitionId()).singleResult();
 
     // when I set the job definition's priority
-    managementService.setJobDefinitionPriority(jobDefinition.getId(), 72, true);
+    managementService.setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), 72, true);
 
     // then the job definition's priority value has changed
     JobDefinition updatedDefinition = managementService.createJobDefinitionQuery()
         .jobDefinitionId(jobDefinition.getId()).singleResult();
-    assertEquals(72, (int) updatedDefinition.getJobPriority());
+    assertEquals(72, (int) updatedDefinition.getOverridingJobPriority());
 
     // the existing job's priority has changed as well
     Job updatedExistingJob = managementService.createJobQuery().singleResult();
@@ -184,12 +184,12 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
       .jobDefinitionId(job.getJobDefinitionId()).singleResult();
 
     // when I set the job definition's priority
-    managementService.setJobDefinitionPriority(jobDefinition.getId(), 72, true);
+    managementService.setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), 72, true);
 
     // then the job definition's priority value has changed
     JobDefinition updatedDefinition = managementService.createJobDefinitionQuery()
       .jobDefinitionId(jobDefinition.getId()).singleResult();
-    assertEquals(72, (int) updatedDefinition.getJobPriority());
+    assertEquals(72, (int) updatedDefinition.getOverridingJobPriority());
 
     // the existing job's priority has changed as well
     Job updatedExistingJob = managementService.createJobQuery().singleResult();
@@ -216,15 +216,15 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
 
     // when I set a priority
-    managementService.setJobDefinitionPriority(jobDefinition.getId(), 1701);
+    managementService.setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), 1701);
 
     // and I reset the priority
-    managementService.resetJobDefinitionPriority(jobDefinition.getId());
+    managementService.clearOverridingJobPriorityForJobDefinition(jobDefinition.getId());
 
     // then the job definition priority is still null
     JobDefinition updatedDefinition = managementService.createJobDefinitionQuery()
         .jobDefinitionId(jobDefinition.getId()).singleResult();
-    assertNull(updatedDefinition.getJobPriority());
+    assertNull(updatedDefinition.getOverridingJobPriority());
 
     // and a new job instance does not receive the intermittently set priority
     runtimeService.createProcessInstanceByKey("asyncTaskProcess")
@@ -240,15 +240,15 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
 
     // given a job definition with null priority
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
-    assertNull(jobDefinition.getJobPriority());
+    assertNull(jobDefinition.getOverridingJobPriority());
 
     // when I set a priority
-    managementService.resetJobDefinitionPriority(jobDefinition.getId());
+    managementService.clearOverridingJobPriorityForJobDefinition(jobDefinition.getId());
 
     // then the priority remains unchanged
     JobDefinition updatedDefinition = managementService.createJobDefinitionQuery()
         .jobDefinitionId(jobDefinition.getId()).singleResult();
-    assertNull(updatedDefinition.getJobPriority());
+    assertNull(updatedDefinition.getOverridingJobPriority());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/jobPrioProcess.bpmn20.xml")
@@ -259,15 +259,15 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
     List<JobDefinition> jobDefinitions = managementService.createJobDefinitionQuery().list();
     assertEquals(4, jobDefinitions.size());
 
-    assertNull(jobDefinitions.get(0).getJobPriority());
-    assertNull(jobDefinitions.get(1).getJobPriority());
-    assertNull(jobDefinitions.get(2).getJobPriority());
-    assertNull(jobDefinitions.get(3).getJobPriority());
+    assertNull(jobDefinitions.get(0).getOverridingJobPriority());
+    assertNull(jobDefinitions.get(1).getOverridingJobPriority());
+    assertNull(jobDefinitions.get(2).getOverridingJobPriority());
+    assertNull(jobDefinitions.get(3).getOverridingJobPriority());
   }
 
   public void testSetNonExistingJobDefinitionPriority() {
     try {
-      managementService.setJobDefinitionPriority("someNonExistingJobDefinitionId", 42);
+      managementService.setOverridingJobPriorityForJobDefinition("someNonExistingJobDefinitionId", 42);
       fail("should not succeed");
     } catch (NotFoundException e) {
       // happy path
@@ -276,7 +276,7 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
     }
 
     try {
-      managementService.setJobDefinitionPriority("someNonExistingJobDefinitionId", 42, true);
+      managementService.setOverridingJobPriorityForJobDefinition("someNonExistingJobDefinitionId", 42, true);
       fail("should not succeed");
     } catch (NotFoundException e) {
       // happy path
@@ -287,7 +287,7 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
 
   public void testResetNonExistingJobDefinitionPriority() {
     try {
-      managementService.resetJobDefinitionPriority("someNonExistingJobDefinitionId");
+      managementService.clearOverridingJobPriorityForJobDefinition("someNonExistingJobDefinitionId");
       fail("should not succeed");
     } catch (NotFoundException e) {
       // happy path
@@ -298,7 +298,7 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
 
   public void testSetNullJobDefinitionPriority() {
     try {
-      managementService.setJobDefinitionPriority(null, 42);
+      managementService.setOverridingJobPriorityForJobDefinition(null, 42);
       fail("should not succeed");
     } catch (NotValidException e) {
       // happy path
@@ -306,7 +306,7 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
     }
 
     try {
-      managementService.setJobDefinitionPriority(null, 42, true);
+      managementService.setOverridingJobPriorityForJobDefinition(null, 42, true);
       fail("should not succeed");
     } catch (NotValidException e) {
       // happy path
@@ -316,7 +316,7 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
 
   public void testResetNullJobDefinitionPriority() {
     try {
-      managementService.resetJobDefinitionPriority(null);
+      managementService.clearOverridingJobPriorityForJobDefinition(null);
       fail("should not succeed");
     } catch (NotValidException e) {
       // happy path
@@ -329,14 +329,14 @@ public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
 
     // it is possible to set the max integer value
-    managementService.setJobDefinitionPriority(jobDefinition.getId(), Integer.MAX_VALUE);
+    managementService.setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), Integer.MAX_VALUE);
     jobDefinition = managementService.createJobDefinitionQuery().singleResult();
-    assertEquals(Integer.MAX_VALUE, (int) jobDefinition.getJobPriority());
+    assertEquals(Integer.MAX_VALUE, (int) jobDefinition.getOverridingJobPriority());
 
     // it is possible to set the min integer value
-    managementService.setJobDefinitionPriority(jobDefinition.getId(), Integer.MIN_VALUE + 1);
+    managementService.setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), Integer.MIN_VALUE + 1);
     jobDefinition = managementService.createJobDefinitionQuery().singleResult();
-    assertEquals(Integer.MIN_VALUE + 1, (int) jobDefinition.getJobPriority());
+    assertEquals(Integer.MIN_VALUE + 1, (int) jobDefinition.getOverridingJobPriority());
   }
 
   protected Job getJobThatIsNot(Job other) {

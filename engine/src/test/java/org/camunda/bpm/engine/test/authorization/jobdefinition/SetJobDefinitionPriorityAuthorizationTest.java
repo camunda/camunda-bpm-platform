@@ -94,12 +94,12 @@ public class SetJobDefinitionPriorityAuthorizationTest {
       .bindResource("processDefinitionKey", "process")
       .start();
 
-    engineRule.getManagementService().setJobDefinitionPriority(jobDefinition.getId(), 42);
+    engineRule.getManagementService().setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), 42);
 
     // then
     if (authRule.assertScenario(scenario)) {
       JobDefinition updatedJobDefinition = engineRule.getManagementService().createJobDefinitionQuery().singleResult();
-      Assert.assertEquals(42, (int) updatedJobDefinition.getJobPriority());
+      Assert.assertEquals(42, (int) updatedJobDefinition.getOverridingJobPriority());
     }
 
   }
@@ -109,7 +109,7 @@ public class SetJobDefinitionPriorityAuthorizationTest {
   public void testResetJobDefinitionPriority() {
     // given
     JobDefinition jobDefinition = engineRule.getManagementService().createJobDefinitionQuery().singleResult();
-    engineRule.getManagementService().setJobDefinitionPriority(jobDefinition.getId(), 42);
+    engineRule.getManagementService().setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), 42);
 
     // when
     authRule
@@ -118,12 +118,12 @@ public class SetJobDefinitionPriorityAuthorizationTest {
       .bindResource("processDefinitionKey", "process")
       .start();
 
-    engineRule.getManagementService().resetJobDefinitionPriority(jobDefinition.getId());
+    engineRule.getManagementService().clearOverridingJobPriorityForJobDefinition(jobDefinition.getId());
 
     // then
     if (authRule.assertScenario(scenario)) {
       JobDefinition updatedJobDefinition = engineRule.getManagementService().createJobDefinitionQuery().singleResult();
-      Assert.assertNull(updatedJobDefinition.getJobPriority());
+      Assert.assertNull(updatedJobDefinition.getOverridingJobPriority());
     }
   }
 

@@ -328,15 +328,15 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
     commandExecutor.execute(new ReportDbMetricsCmd());
   }
 
-  public void setJobDefinitionPriority(String jobDefinitionId, int priority) {
+  public void setOverridingJobPriorityForJobDefinition(String jobDefinitionId, int priority) {
     commandExecutor.execute(new SetJobDefinitionPriorityCmd(jobDefinitionId, priority, false));
   }
 
-  public void setJobDefinitionPriority(String jobDefinitionId, int priority, boolean cascade) {
+  public void setOverridingJobPriorityForJobDefinition(String jobDefinitionId, int priority, boolean cascade) {
     commandExecutor.execute(new SetJobDefinitionPriorityCmd(jobDefinitionId, priority, true));
   }
 
-  public void resetJobDefinitionPriority(String jobDefinitionId) {
+  public void clearOverridingJobPriorityForJobDefinition(String jobDefinitionId) {
     commandExecutor.execute(new SetJobDefinitionPriorityCmd(jobDefinitionId, null, false));
   }
 

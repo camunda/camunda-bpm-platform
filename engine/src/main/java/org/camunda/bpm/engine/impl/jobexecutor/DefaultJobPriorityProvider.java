@@ -66,7 +66,7 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
           .getJobDefinitionManager().findById(jobDefinitionId);
 
       if (jobDefinition != null) {
-        return jobDefinition.getJobPriority();
+        return jobDefinition.getOverridingJobPriority();
       }
     }
 
