@@ -3,6 +3,7 @@ package org.camunda.bpm.engine.rest;
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.doThrow;
@@ -25,6 +26,7 @@ import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.helper.MockJobDefinitionBuilder;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.junit.Before;
 import org.junit.Test;
@@ -75,12 +77,34 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
         .body("jobConfiguration", equalTo(MockProvider.EXAMPLE_JOB_CONFIG))
         .body("activityId", equalTo(MockProvider.EXAMPLE_ACTIVITY_ID))
         .body("suspended", equalTo(MockProvider.EXAMPLE_JOB_DEFINITION_IS_SUSPENDED))
+        .body("jobPriority", equalTo(MockProvider.EXAMPLE_JOB_DEFINITION_PRIORITY))
     .when()
       .get(SINGLE_JOB_DEFINITION_RESOURCE_URL);
 
     InOrder inOrder = inOrder(mockQuery);
     inOrder.verify(mockQuery).jobDefinitionId(MockProvider.EXAMPLE_JOB_DEFINITION_ID);
     inOrder.verify(mockQuery).singleResult();
+  }
+
+  @Test
+  public void testJobDefinitionGetNullJobPriority() {
+    // given
+    JobDefinition mockJobDefinition = new MockJobDefinitionBuilder()
+      .id(MockProvider.EXAMPLE_JOB_DEFINITION_ID)
+      .jobPriority(null)
+      .build();
+
+    when(mockQuery.singleResult()).thenReturn(mockJobDefinition);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_DEFINITION_ID)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("id", equalTo(MockProvider.EXAMPLE_JOB_DEFINITION_ID))
+        .body("jobPriority", nullValue())
+    .when()
+      .get(SINGLE_JOB_DEFINITION_RESOURCE_URL);
   }
 
   @Test

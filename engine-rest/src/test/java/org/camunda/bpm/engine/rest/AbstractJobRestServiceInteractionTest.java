@@ -70,9 +70,15 @@ public abstract class AbstractJobRestServiceInteractionTest extends AbstractRest
   public void setUpRuntimeData() {
 
     mockQuery = mock(JobQuery.class);
-    Job mockedJob = new MockJobBuilder().id(MockProvider.EXAMPLE_JOB_ID).processInstanceId(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
-        .executionId(MockProvider.EXAMPLE_EXECUTION_ID).retries(MockProvider.EXAMPLE_JOB_RETRIES)
-        .exceptionMessage(MockProvider.EXAMPLE_JOB_NO_EXCEPTION_MESSAGE).dueDate(new Date()).build();
+    Job mockedJob = new MockJobBuilder()
+      .id(MockProvider.EXAMPLE_JOB_ID)
+      .processInstanceId(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
+      .executionId(MockProvider.EXAMPLE_EXECUTION_ID)
+      .retries(MockProvider.EXAMPLE_JOB_RETRIES)
+      .exceptionMessage(MockProvider.EXAMPLE_JOB_NO_EXCEPTION_MESSAGE)
+      .dueDate(new Date())
+      .priority(MockProvider.EXAMPLE_JOB_PRIORITY)
+      .build();
 
     when(mockQuery.singleResult()).thenReturn(mockedJob);
     when(mockQuery.jobId(MockProvider.EXAMPLE_JOB_ID)).thenReturn(mockQuery);
@@ -160,8 +166,10 @@ public abstract class AbstractJobRestServiceInteractionTest extends AbstractRest
   public void testSimpleJobGet() {
     given().pathParam("id", MockProvider.EXAMPLE_JOB_ID).then().expect().statusCode(Status.OK.getStatusCode())
     .body("id", equalTo(MockProvider.EXAMPLE_JOB_ID))
-    .body("processInstanceId", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)).body("executionId", equalTo(MockProvider.EXAMPLE_EXECUTION_ID))
+    .body("processInstanceId", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
+    .body("executionId", equalTo(MockProvider.EXAMPLE_EXECUTION_ID))
     .body("exceptionMessage", equalTo(MockProvider.EXAMPLE_JOB_NO_EXCEPTION_MESSAGE))
+    .body("priority", equalTo(MockProvider.EXAMPLE_JOB_PRIORITY))
     .when().get(SINGLE_JOB_RESOURCE_URL);
 
     InOrder inOrder = inOrder(mockQuery);

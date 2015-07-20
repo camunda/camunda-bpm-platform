@@ -26,6 +26,7 @@ public class JobDefinitionDto {
   protected String jobConfiguration;
   protected String activityId;
   protected boolean suspended;
+  protected Integer jobPriority;
 
   public JobDefinitionDto() { }
 
@@ -50,6 +51,9 @@ public class JobDefinitionDto {
   public boolean isSuspended() {
     return suspended;
   }
+  public Integer getJobPriority() {
+    return jobPriority;
+  }
 
   public static JobDefinitionDto fromJobDefinition(JobDefinition definition) {
     JobDefinitionDto dto = new JobDefinitionDto();
@@ -61,6 +65,7 @@ public class JobDefinitionDto {
     dto.jobConfiguration = definition.getJobConfiguration();
     dto.activityId = definition.getActivityId();
     dto.suspended = definition.isSuspended();
+    dto.jobPriority = definition.getJobPriority();
 
     return dto;
   }

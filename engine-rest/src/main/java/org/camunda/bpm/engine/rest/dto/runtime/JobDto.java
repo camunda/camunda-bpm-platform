@@ -18,15 +18,16 @@ import java.util.Date;
 
 public class JobDto {
 
-  private String id;
-  private String processInstanceId;
-  private String processDefinitionId;
-  private String processDefinitionKey;
-  private String executionId;
-  private String exceptionMessage;
-  private int retries;
-  private Date dueDate;
-  private boolean suspended;
+  protected String id;
+  protected String processInstanceId;
+  protected String processDefinitionId;
+  protected String processDefinitionKey;
+  protected String executionId;
+  protected String exceptionMessage;
+  protected int retries;
+  protected Date dueDate;
+  protected boolean suspended;
+  protected int priority;
 
   public static JobDto fromJob(Job job) {
     JobDto dto = new JobDto();
@@ -39,6 +40,7 @@ public class JobDto {
     dto.retries = job.getRetries();
     dto.dueDate = job.getDuedate();
     dto.suspended = job.isSuspended();
+    dto.priority = job.getPriority();
     return dto;
   }
 
@@ -76,6 +78,10 @@ public class JobDto {
 
   public boolean isSuspended() {
     return suspended;
+  }
+
+  public int getPriority() {
+    return priority;
   }
 
 }

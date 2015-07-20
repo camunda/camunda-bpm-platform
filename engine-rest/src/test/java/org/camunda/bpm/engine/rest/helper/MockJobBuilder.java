@@ -21,15 +21,16 @@ import org.camunda.bpm.engine.runtime.Job;
 
 public class MockJobBuilder {
 
-	private String id;
-	private Date dueDate;
-	private String exceptionMessage;
-	private String executionId;
-	private String processInstanceId;
-	private String processDefinitionId;
-	private String processDefinitionKey;
-	private int retries;
-	private boolean suspended;
+  protected String id;
+	protected Date dueDate;
+	protected String exceptionMessage;
+	protected String executionId;
+	protected String processInstanceId;
+	protected String processDefinitionId;
+	protected String processDefinitionKey;
+	protected int retries;
+	protected boolean suspended;
+	protected int priority;
 
 	public MockJobBuilder id(String id) {
 		this.id = id;
@@ -71,6 +72,11 @@ public class MockJobBuilder {
     return this;
   }
 
+  public MockJobBuilder priority(int priority) {
+    this.priority = priority;
+    return this;
+  }
+
 	public MockJobBuilder retries(int retries) {
 		this.retries = retries;
 		return this;
@@ -87,6 +93,7 @@ public class MockJobBuilder {
 		when(mockJob.getProcessDefinitionKey()).thenReturn(processDefinitionKey);
 		when(mockJob.getRetries()).thenReturn(retries);
 		when(mockJob.isSuspended()).thenReturn(suspended);
+		when(mockJob.getPriority()).thenReturn(priority);
 		return mockJob;
 	}
 
