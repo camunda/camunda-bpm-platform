@@ -18,11 +18,14 @@ import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.rest.dto.management.JobDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.management.JobDefinitionSuspensionStateDto;
+import org.camunda.bpm.engine.rest.dto.runtime.JobDefinitionPriorityDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobRetriesDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
 
 /**
  * @author roman.smirnov
@@ -69,6 +72,33 @@ public class JobDefinitionResourceImpl implements JobDefinitionResource {
     } catch (ProcessEngineException e) {
       throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, e.getMessage());
     }
+  }
+
+  @Override
+  public void setJobPriority(JobDefinitionPriorityDto dto) {
+    try {
+      ManagementService managementService = engine.getManagementService();
+
+      if (dto.getPriority() != null) {
+        managementService.setJobDefinitionPriority(jobDefinitionId, dto.getPriority(), dto.isIncludeJobs());
+      }
+      else {
+        if (dto.isIncludeJobs()) {
+          throw new InvalidRequestException(Status.BAD_REQUEST,
+              "Cannot reset priority for job definition " + jobDefinitionId + " with includeJobs=true");
+        }
+
+        managementService.resetJobDefinitionPriority(jobDefinitionId);
+      }
+
+    } catch (AuthorizationException e) {
+      throw e;
+    } catch (NotFoundException e) {
+      throw new InvalidRequestException(Status.NOT_FOUND, e.getMessage());
+    } catch (ProcessEngineException e) {
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e.getMessage());
+    }
+
   }
 
 }
