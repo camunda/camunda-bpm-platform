@@ -69,4 +69,13 @@ public class AuthorizationExceptionInfo {
       return new AuthorizationExceptionInfo(this);
     }
   }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()
+        + "[permissionName=" + permissionName
+        + ", resourceType=" + resourceType
+        + ", resourceId=" + resourceId
+        + "]";
+  }
 }
