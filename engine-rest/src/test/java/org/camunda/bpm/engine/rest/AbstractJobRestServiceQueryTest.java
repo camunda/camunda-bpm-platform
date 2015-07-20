@@ -45,6 +45,7 @@ import static org.mockito.Mockito.*;
 public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServiceTest {
 
   protected static final String JOBS_RESOURCE_URL = TEST_RESOURCE_ROOT_PATH + "/job";
+  protected static final String JOBS_QUERY_COUNT_URL = JOBS_RESOURCE_URL + "/count";
 
   private JobQuery mockQuery;
   private static final int MAX_RESULTS_TEN = 10;
@@ -231,7 +232,7 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
         .statusCode(Status.OK.getStatusCode()).when()
         .get(JOBS_RESOURCE_URL);
 
-    verifyStringParameterQueryInvocations();
+    verifyParameterQueryInvocations();
     verify(mockQuery).list();
   }
 
@@ -306,6 +307,8 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
     parameters.put("noRetriesLeft", MockProvider.EXAMPLE_NO_RETRIES_LEFT);
     parameters.put("active", true);
     parameters.put("suspended", true);
+    parameters.put("priorityLowerThanOrEquals", 14);
+    parameters.put("priorityHigherThanOrEquals", 15);
     return parameters;
   }
 
@@ -317,12 +320,12 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
     .then().expect().statusCode(Status.OK.getStatusCode())
     .when().post(JOBS_RESOURCE_URL);
 
-    verifyStringParameterQueryInvocations();
+    verifyParameterQueryInvocations();
     verify(mockQuery).list();
   }
 
 
-  private void verifyStringParameterQueryInvocations() {
+  private void verifyParameterQueryInvocations() {
     Map<String, Object> parameters = getCompleteParameters();
 
     verify(mockQuery).jobId((String) parameters.get("jobId"));
@@ -339,6 +342,8 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
     verify(mockQuery).noRetriesLeft();
     verify(mockQuery).active();
     verify(mockQuery).suspended();
+    verify(mockQuery).priorityLowerThanOrEquals(14);
+    verify(mockQuery).priorityHigherThanOrEquals(15);
   }
 
   @Test
@@ -443,6 +448,12 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
     executeAndVerifySorting("jobDueDate", "desc", Status.OK);
     inOrder.verify(mockQuery).orderByJobDuedate();
     inOrder.verify(mockQuery).desc();
+
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("jobPriority", "asc", Status.OK);
+    inOrder.verify(mockQuery).orderByJobPriority();
+    inOrder.verify(mockQuery).asc();
+
   }
 
   private void executeAndVerifySorting(String sortBy, String sortOrder,
@@ -482,5 +493,29 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
         .get(JOBS_RESOURCE_URL);
 
     verify(mockQuery).listPage(firstResult, maxResults);
+  }
+
+  @Test
+  public void testQueryCount() {
+    given()
+      .header("accept", MediaType.APPLICATION_JSON)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("count", equalTo(1))
+      .when()
+        .get(JOBS_QUERY_COUNT_URL);
+
+    verify(mockQuery).count();
+  }
+
+  @Test
+  public void testQueryCountForPost() {
+    given().contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
+    .header("accept", MediaType.APPLICATION_JSON)
+    .expect().statusCode(Status.OK.getStatusCode())
+      .body("count", equalTo(1))
+      .when().post(JOBS_QUERY_COUNT_URL);
+
+    verify(mockQuery).count();
   }
 }
