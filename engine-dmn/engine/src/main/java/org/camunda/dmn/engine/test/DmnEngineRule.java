@@ -58,13 +58,13 @@ public class DmnEngineRule extends TestWatcher {
 
       resourcePath = expandResourcePath(description, resourcePath);
 
-      String decisionId = decisionResource.decisionId();
+      String decisionKey = decisionResource.decisionKey();
 
-      if (decisionId == null || decisionId.isEmpty()) {
+      if (decisionKey == null || decisionKey.isEmpty()) {
         return engine.parseDecision(resourcePath);
       }
       else {
-        return engine.parseDecision(resourcePath, decisionId);
+        return engine.parseDecision(resourcePath, decisionKey);
       }
     }
     else {

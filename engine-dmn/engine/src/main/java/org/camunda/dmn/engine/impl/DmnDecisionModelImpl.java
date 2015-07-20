@@ -14,37 +14,99 @@
 package org.camunda.dmn.engine.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.camunda.dmn.engine.DmnDecision;
 import org.camunda.dmn.engine.DmnDecisionModel;
-import org.camunda.dmn.engine.DmnDecisionResult;
-import org.camunda.dmn.engine.context.DmnDecisionContext;
+import org.camunda.dmn.engine.DmnItemDefinition;
+import org.camunda.dmn.engine.impl.context.DmnScriptContextImpl;
 
-public class DmnDecisionModelImpl implements DmnDecisionModel {
+public class DmnDecisionModelImpl extends DmnElementImpl implements DmnDecisionModel {
 
+  protected String expressionLanguage = DmnScriptContextImpl.DEFAULT_SCRIPT_LANGUAGE;
+  protected String typeLanguage;
+  protected String namespace;
+
+  protected Map<String, DmnItemDefinition> itemDefinitions = new HashMap<String, DmnItemDefinition>();
   protected Map<String, DmnDecision> decisions = new HashMap<String, DmnDecision>();
 
-  public List<DmnDecision> getDecisions() {
-    return new ArrayList<DmnDecision>(decisions.values());
+  public String getExpressionLanguage() {
+    return expressionLanguage;
   }
 
-  public DmnDecision getDecision(String decisionId) {
-    return decisions.get(decisionId);
+  public void setExpressionLanguage(String expressionLanguage) {
+    this.expressionLanguage = expressionLanguage;
+  }
+
+  public String getTypeLanguage() {
+    return typeLanguage;
+  }
+
+  public void setTypeLanguage(String typeLanguage) {
+    this.typeLanguage = typeLanguage;
+  }
+
+  public String getNamespace() {
+    return namespace;
+  }
+
+  public void setNamespace(String namespace) {
+    this.namespace = namespace;
+  }
+
+  public List<DmnItemDefinition> getItemDefinitions() {
+    return new ArrayList<DmnItemDefinition>(itemDefinitions.values());
+  }
+
+  public void setItemDefinitions(Collection<DmnItemDefinition> itemDefinitions) {
+    this.itemDefinitions.clear();
+    for (DmnItemDefinition itemDefinition : itemDefinitions) {
+      addItemDefinition(itemDefinition);
+    }
+  }
+
+  public void addItemDefinition(DmnItemDefinition itemDefinition) {
+    itemDefinitions.put(itemDefinition.getKey(), itemDefinition);
+  }
+
+  public DmnItemDefinition getItemDefinition(String itemDefinitionKey) {
+    return itemDefinitions.get(itemDefinitionKey);
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T extends DmnDecision> List<T> getDecisions() {
+    return new ArrayList<T>((Collection<T>) decisions.values());
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T extends DmnDecision> T getDecision(String decisionKey) {
+    return (T) decisions.get(decisionKey);
+  }
+
+  public void setDecisions(Collection<DmnDecision> decisions) {
+    this.decisions.clear();
+    for (DmnDecision decision : decisions) {
+      addDecision(decision);
+    }
   }
 
   public void addDecision(DmnDecision decision) {
-    decisions.put(decision.getId(), decision);
+    this.decisions.put(decision.getKey(), decision);
   }
 
-  public DmnDecisionResult evaluate(DmnDecisionContext decisionContext) {
-    return getDecisions().get(0).evaluate(decisionContext);
-  }
-
-  public DmnDecisionResult evaluate(String decisionId, DmnDecisionContext decisionContext) {
-    return getDecision(decisionId).evaluate(decisionContext);
+  public String toString() {
+    return "DmnDecisionModelImpl{" +
+      "key='" + key + '\'' +
+      ", name='" + name + '\'' +
+      ", expressionLanguage='" + expressionLanguage + '\'' +
+      ", typeLanguage='" + typeLanguage + '\'' +
+      ", namespace='" + namespace + '\'' +
+      ", itemDefinitions=" + itemDefinitions +
+      ", decisions=" + decisions +
+      '}';
   }
 
 }

@@ -38,4 +38,10 @@ public class DmnDecisionResultImpl implements DmnDecisionResult, Serializable {
     outputs.add(decisionOutput);
   }
 
+  public String toString() {
+    return "DmnDecisionResultImpl{" +
+      "outputs=" + outputs +
+      '}';
+  }
+
 }

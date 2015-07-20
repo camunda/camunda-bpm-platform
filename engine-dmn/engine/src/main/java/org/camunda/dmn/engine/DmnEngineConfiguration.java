@@ -13,27 +13,29 @@
 
 package org.camunda.dmn.engine;
 
+import java.util.List;
+
 import org.camunda.dmn.engine.context.DmnContextFactory;
-import org.camunda.dmn.engine.transform.DmnElementHandlerRegistry;
+import org.camunda.dmn.engine.handler.DmnElementHandlerRegistry;
+import org.camunda.dmn.engine.transform.DmnTransformFactory;
+import org.camunda.dmn.engine.transform.DmnTransformListener;
 import org.camunda.dmn.engine.transform.DmnTransformer;
 
 public interface DmnEngineConfiguration {
 
-  void setDmnTransformer(DmnTransformer transformer);
-
-  DmnTransformer getDmnTransformer();
-
-  void setDmnElementHandlerRegistry(DmnElementHandlerRegistry elementHandlerRegistry);
-
-  DmnElementHandlerRegistry getDmnElementHandlerRegistry();
-
-  void setDefaultExpressionLanguage(String expressionLanguage);
-
   String getDefaultExpressionLanguage();
 
-  void setDmnContextFactory(DmnContextFactory contextFactory);
-
   DmnContextFactory getDmnContextFactory();
+
+  DmnTransformer getTransformer();
+
+  DmnTransformFactory getTransformFactory();
+
+  DmnElementHandlerRegistry getElementHandlerRegistry();
+
+  List<DmnTransformListener> getCustomPreDmnTransformListeners();
+
+  List<DmnTransformListener> getCustomPostDmnTransformListeners();
 
   DmnEngine buildEngine();
 

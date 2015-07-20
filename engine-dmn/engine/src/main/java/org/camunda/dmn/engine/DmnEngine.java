@@ -33,10 +33,10 @@ public interface DmnEngine {
 
   DmnDecision parseDecision(DmnModelInstance modelInstance);
 
-  DmnDecision parseDecision(String filename, String decisionId);
+  DmnDecision parseDecision(String filename, String decisionKey);
 
-  DmnDecision parseDecision(InputStream inputStream, String decisionId);
+  DmnDecision parseDecision(InputStream inputStream, String decisionKey);
 
-  DmnDecision parseDecision(DmnModelInstance modelInstance, String decisionId);
+  DmnDecision parseDecision(DmnModelInstance modelInstance, String decisionKey);
 
 }

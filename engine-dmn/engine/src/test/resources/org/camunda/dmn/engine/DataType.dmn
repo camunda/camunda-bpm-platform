@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Definitions xmlns="http://www.omg.org/spec/DMN/20130901"
+             id="definitions"
+             name="camunda"
+             namespace="http://camunda.org/dmn">
+  <Decision id="decision">
+    <DecisionTable id="decisionTable" isComplete="true" isConsistent="true">
+      <clause id="clause1" name="Boolean">
+        <inputExpression id="inputExpression1">
+          <text>boolean</text>
+        </inputExpression>
+        <inputEntry id="inputEntry1">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="inputEntry2">
+          <text>false</text>
+        </inputEntry>
+      </clause>
+      <clause id="clause2" name="Integer">
+        <inputExpression id="inputExpression2">
+          <text>integer</text>
+        </inputExpression>
+        <inputEntry id="inputEntry3">
+          <text>9000</text>
+        </inputEntry>
+        <inputEntry id="inputEntry4">
+          <text><![CDATA[> 9000]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry5">
+          <text><![CDATA[< 9000]]></text>
+        </inputEntry>
+      </clause>
+      <clause id="clause3" name="Double">
+        <inputExpression id="inputExpression3">
+          <text>double</text>
+        </inputExpression>
+        <inputEntry id="inputEntry6">
+          <text>13.37</text>
+        </inputEntry>
+        <inputEntry id="inputEntry7">
+          <text><![CDATA[> 13.37]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry8">
+          <text><![CDATA[< 13.37]]></text>
+        </inputEntry>
+      </clause>
+      <clause id="clause4" name="Output">
+        <outputEntry id="outputEntry1">
+          <text><![CDATA[${boolean == true && integer == 9000 && double == 13.37}]]></text>
+        </outputEntry>
+        <outputEntry id="outputEntry2">
+          <text><![CDATA[${boolean == false && integer > 9000 && double > 13.37}]]></text>
+        </outputEntry>
+        <outputEntry id="outputEntry3">
+          <text><![CDATA[${boolean != false && integer < 9000 && double < 13.37}]]></text>
+        </outputEntry>
+      </clause>
+      <rule id="rule1">
+        <condition>inputEntry1 inputEntry3 inputEntry6</condition>
+        <conclusion>outputEntry1</conclusion>
+      </rule>
+      <rule id="rule2">
+        <condition>inputEntry2 inputEntry4 inputEntry7</condition>
+        <conclusion>outputEntry2</conclusion>
+      </rule>
+      <rule id="rule3">
+        <condition>inputEntry1 inputEntry5 inputEntry8</condition>
+        <conclusion>outputEntry3</conclusion>
+      </rule>
+    </DecisionTable>
+  </Decision>
+</Definitions>

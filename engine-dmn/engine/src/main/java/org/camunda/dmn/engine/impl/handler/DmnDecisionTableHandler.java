@@ -11,16 +11,16 @@
  * limitations under the License.
  */
 
-package org.camunda.dmn.engine;
+package org.camunda.dmn.engine.impl.handler;
 
-public class DmnParseException extends DmnEngineException {
+import org.camunda.bpm.model.dmn.instance.DecisionTable;
+import org.camunda.dmn.engine.handler.DmnElementHandlerContext;
+import org.camunda.dmn.engine.impl.DmnDecisionTableImpl;
 
-  public DmnParseException(String message, Throwable cause) {
-    super(message, cause);
-  }
+public class DmnDecisionTableHandler extends AbstractDmnDecisionTableHandler<DmnDecisionTableImpl> {
 
-  public DmnParseException(String message) {
-    super(message);
+  protected DmnDecisionTableImpl createElement(DmnElementHandlerContext context, DecisionTable element) {
+    return new DmnDecisionTableImpl();
   }
 
 }

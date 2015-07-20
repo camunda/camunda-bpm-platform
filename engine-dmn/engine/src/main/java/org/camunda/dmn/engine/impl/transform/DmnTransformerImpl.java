@@ -13,37 +13,58 @@
 
 package org.camunda.dmn.engine.impl.transform;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.camunda.bpm.model.dmn.instance.Decision;
-import org.camunda.bpm.model.dmn.instance.Definitions;
-import org.camunda.dmn.engine.DmnDecision;
-import org.camunda.dmn.engine.DmnDecisionModel;
-import org.camunda.dmn.engine.impl.DmnDecisionModelImpl;
-import org.camunda.dmn.engine.transform.DmnElementHandler;
-import org.camunda.dmn.engine.transform.DmnElementHandlerRegistry;
+import org.camunda.dmn.engine.handler.DmnElementHandlerRegistry;
+import org.camunda.dmn.engine.transform.DmnTransform;
+import org.camunda.dmn.engine.transform.DmnTransformFactory;
+import org.camunda.dmn.engine.transform.DmnTransformListener;
+import org.camunda.dmn.engine.transform.DmnTransformer;
 
-public class DmnTransformerImpl extends AbstractDmnTransformer {
+public class DmnTransformerImpl implements DmnTransformer {
 
-  public DmnTransformerImpl(DmnElementHandlerRegistry elementHandlerRegistry) {
-    super(elementHandlerRegistry);
+  protected DmnTransformFactory factory;
+  protected DmnElementHandlerRegistry elementHandlerRegistry;
+  protected List<DmnTransformListener> transformListeners = new ArrayList<DmnTransformListener>();
+
+  public DmnTransformerImpl(DmnTransformFactory factory, DmnElementHandlerRegistry elementHandlerRegistry) {
+    this.factory = factory;
+    this.elementHandlerRegistry = elementHandlerRegistry;
   }
 
-  protected DmnDecisionModel performTransform(Definitions definitions) {
-    Collection<Decision> decisions = definitions.getChildElementsByType(Decision.class);
+  public DmnTransformerImpl(DmnTransformFactory factory, DmnElementHandlerRegistry elementHandlerRegistry, List<DmnTransformListener> transformListeners) {
+    this.factory = factory;
+    this.elementHandlerRegistry = elementHandlerRegistry;
+    this.transformListeners = transformListeners;
+  }
 
-    DmnElementHandler<Decision, DmnDecision> decisionHandler = transformContext.getElementHandler(Decision.class);
+  public DmnTransformFactory getFactory() {
+    return factory;
+  }
 
-    DmnDecisionModelImpl decisionModel = new DmnDecisionModelImpl();
+  public void setFactory(DmnTransformFactory factory) {
+    this.factory = factory;
+  }
 
-    for (Decision decision : decisions) {
-      DmnDecision dmnDecision = decisionHandler.handleElement(transformContext, decision);
-      if (dmnDecision != null) {
-        decisionModel.addDecision(dmnDecision);
-      }
-    }
+  public DmnElementHandlerRegistry getElementHandlerRegistry() {
+    return elementHandlerRegistry;
+  }
 
-    return decisionModel;
+  public void setElementHandlerRegistry(DmnElementHandlerRegistry elementHandlerRegistry) {
+    this.elementHandlerRegistry = elementHandlerRegistry;
+  }
+
+  public List<DmnTransformListener> getTransformListeners() {
+    return transformListeners;
+  }
+
+  public void setTransformListeners(List<DmnTransformListener> transformListeners) {
+    this.transformListeners = transformListeners;
+  }
+
+  public DmnTransform createTransform() {
+    return factory.createTransform(this);
   }
 
 }

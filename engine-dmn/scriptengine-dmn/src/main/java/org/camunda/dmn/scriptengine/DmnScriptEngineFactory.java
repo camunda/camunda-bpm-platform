@@ -21,13 +21,12 @@ import javax.script.ScriptEngineFactory;
 
 public class DmnScriptEngineFactory implements ScriptEngineFactory {
 
+  public static final String NAME = "dmn";
+  public static final String VERSION = "1.0";
 
-  public final static String NAME = "dmn";
-  public final static String VERSION = "1.0";
-
-  public final static List<String> names;
-  public final static List<String> extensions;
-  public final static List<String> mimeTypes;
+  public static final List<String> names;
+  public static final List<String> extensions;
+  public static final List<String> mimeTypes;
 
   static {
     names = Collections.unmodifiableList(Arrays.asList(NAME, "Dmn", "DMN"));
@@ -90,7 +89,7 @@ public class DmnScriptEngineFactory implements ScriptEngineFactory {
   }
 
   public String getProgram(String... statements) {
-    throw new UnsupportedOperationException("getProgramm");
+    throw new UnsupportedOperationException("getProgram");
   }
 
   public ScriptEngine getScriptEngine() {

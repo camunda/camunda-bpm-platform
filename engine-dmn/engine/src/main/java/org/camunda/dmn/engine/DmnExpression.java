@@ -15,21 +15,9 @@ package org.camunda.dmn.engine;
 
 import org.camunda.dmn.engine.context.DmnDecisionContext;
 
-public interface DmnExpression {
-
-  void setId(String id);
-
-  String getId();
-
-  void setVariableName(String variableName);
-
-  String getVariableName();
-
-  void setExpression(String expression);
+public interface DmnExpression extends DmnElement {
 
   String getExpression();
-
-  void setExpressionLanguage(String expressionLanguage);
 
   String getExpressionLanguage();
 

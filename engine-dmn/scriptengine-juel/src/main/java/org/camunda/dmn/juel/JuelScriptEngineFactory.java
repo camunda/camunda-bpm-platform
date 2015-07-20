@@ -23,12 +23,12 @@ import org.camunda.commons.utils.StringUtil;
 
 public class JuelScriptEngineFactory implements ScriptEngineFactory {
 
-  public final static String NAME = "juel";
-  public final static String VERSION = "2.2.7";
+  public static final String NAME = "juel";
+  public static final String VERSION = "2.2.7";
 
-  public final static List<String> names;
-  public final static List<String> extensions;
-  public final static List<String> mimeTypes;
+  public static final List<String> names;
+  public static final List<String> extensions;
+  public static final List<String> mimeTypes;
 
   static {
     names = Collections.unmodifiableList(Arrays.asList(NAME, "Juel", "JUEL"));
@@ -94,7 +94,7 @@ public class JuelScriptEngineFactory implements ScriptEngineFactory {
   public String getProgram(String... statements) {
     StringBuilder builder = new StringBuilder();
     for (String statement : statements) {
-      builder.append("${" + statement + "} ");
+      builder.append("${").append(statement).append("} ");
     }
     return builder.toString().trim();
   }

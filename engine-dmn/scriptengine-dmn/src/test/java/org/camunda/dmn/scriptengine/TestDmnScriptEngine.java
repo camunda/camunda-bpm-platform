@@ -146,7 +146,7 @@ public class TestDmnScriptEngine {
   }
 
   @Test
-  public void shouldEvalDecisionById() throws ScriptException {
+  public void shouldEvalDecisionByKey() throws ScriptException {
     DmnScriptEngine dmnScriptEngine = getDmnScriptEngine();
 
     Bindings bindings = dmnScriptEngine.getBindings(ScriptContext.ENGINE_SCOPE);
@@ -180,7 +180,7 @@ public class TestDmnScriptEngine {
   }
 
   @Test
-  public void shouldEvalDecisionByIdWithBindings() throws ScriptException {
+  public void shouldEvalDecisionByKeyWithBindings() throws ScriptException {
     DmnScriptEngine dmnScriptEngine = getDmnScriptEngine();
 
     Bindings bindings = dmnScriptEngine.createBindings();
@@ -214,7 +214,7 @@ public class TestDmnScriptEngine {
   }
 
   @Test
-  public void shouldEvalDecisionByIdInScriptContext() throws ScriptException {
+  public void shouldEvalDecisionByKeyInScriptContext() throws ScriptException {
     DmnScriptEngine dmnScriptEngine = getDmnScriptEngine();
 
     Bindings bindings = dmnScriptEngine.createBindings();
@@ -258,7 +258,7 @@ public class TestDmnScriptEngine {
   }
 
   @Test
-  public void shouldEvalDecisionByIdWithScriptContext() throws ScriptException {
+  public void shouldEvalDecisionByKeyWithScriptContext() throws ScriptException {
     DmnScriptEngine dmnScriptEngine = getDmnScriptEngine();
 
     Bindings bindings = dmnScriptEngine.createBindings();
@@ -368,7 +368,7 @@ public class TestDmnScriptEngine {
   }
 
   @Test
-  public void shouldEvalDecisionOfCompiledScriptById() throws ScriptException {
+  public void shouldEvalDecisionOfCompiledScriptByKey() throws ScriptException {
     DmnScriptEngine dmnScriptEngine = getDmnScriptEngine();
     DmnCompiledScript compiledScript = dmnScriptEngine.compile(EXAMPLE_DMN_SCRIPT);
 
@@ -391,7 +391,7 @@ public class TestDmnScriptEngine {
   }
 
   @Test
-  public void shouldEvalDecisionOfCompiledScriptByIdWithBindings() throws ScriptException {
+  public void shouldEvalDecisionOfCompiledScriptByKeyWithBindings() throws ScriptException {
     DmnScriptEngine dmnScriptEngine = getDmnScriptEngine();
     DmnCompiledScript compiledScript = dmnScriptEngine.compile(EXAMPLE_DMN_SCRIPT);
 
@@ -414,7 +414,7 @@ public class TestDmnScriptEngine {
   }
 
   @Test
-  public void shouldEvalDecisionOfCompiledScriptByIdInScriptContext() throws ScriptException {
+  public void shouldEvalDecisionOfCompiledScriptByKeyInScriptContext() throws ScriptException {
     DmnScriptEngine dmnScriptEngine = getDmnScriptEngine();
     DmnCompiledScript compiledScript = dmnScriptEngine.compile(EXAMPLE_DMN_SCRIPT);
 
@@ -447,7 +447,7 @@ public class TestDmnScriptEngine {
   }
 
   @Test
-  public void shouldEvalDecisionOfCompiledScriptByIdWithScriptContext() throws ScriptException {
+  public void shouldEvalDecisionOfCompiledScriptByKeyWithScriptContext() throws ScriptException {
     DmnScriptEngine dmnScriptEngine = getDmnScriptEngine();
     DmnCompiledScript compiledScript = dmnScriptEngine.compile(EXAMPLE_DMN_SCRIPT);
 
@@ -473,7 +473,7 @@ public class TestDmnScriptEngine {
   }
 
   @Test
-  public void shouldEvalDecisionOfCompiledScriptByIdWithDecisionContext() throws ScriptException {
+  public void shouldEvalDecisionOfCompiledScriptByKeyWithDecisionContext() throws ScriptException {
     DmnScriptEngine dmnScriptEngine = getDmnScriptEngine();
     DmnCompiledScript compiledScript = dmnScriptEngine.compile(EXAMPLE_DMN_SCRIPT);
 

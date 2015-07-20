@@ -33,6 +33,6 @@ public @interface DecisionResource {
    * The id of the decision to use. If omitted the first decision
    * in the DMN resource is used.
    */
-  String decisionId() default "";
+  String decisionKey() default "";
 
 }

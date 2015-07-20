@@ -16,7 +16,6 @@ package org.camunda.dmn.engine.impl;
 import java.io.InputStream;
 import java.util.List;
 
-import org.camunda.bpm.model.dmn.Dmn;
 import org.camunda.bpm.model.dmn.DmnModelException;
 import org.camunda.bpm.model.dmn.DmnModelInstance;
 import org.camunda.commons.utils.IoUtil;
@@ -25,15 +24,18 @@ import org.camunda.dmn.engine.DmnDecision;
 import org.camunda.dmn.engine.DmnDecisionModel;
 import org.camunda.dmn.engine.DmnEngine;
 import org.camunda.dmn.engine.DmnEngineConfiguration;
+import org.camunda.dmn.engine.transform.DmnTransformer;
 
 public class DmnEngineImpl implements DmnEngine {
 
   protected static final DmnEngineLogger LOG = DmnLogger.ENGINE_LOGGER;
 
   protected DmnEngineConfiguration configuration;
+  protected DmnTransformer transformer;
 
   public DmnEngineImpl(DmnEngineConfiguration configuration) {
     this.configuration = configuration;
+    this.transformer = configuration.getTransformer();
   }
 
   public DmnEngineConfiguration getConfiguration() {
@@ -52,8 +54,7 @@ public class DmnEngineImpl implements DmnEngine {
 
   public DmnDecisionModel parseDecisionModel(InputStream inputStream) {
     try {
-      DmnModelInstance modelInstance = Dmn.readModelFromStream(inputStream);
-      return parseDecisionModel(modelInstance);
+      return transformer.createTransform().setModelInstance(inputStream).transform();
     }
     catch (DmnModelException e) {
       throw LOG.unableToReadInputStream(e);
@@ -61,7 +62,7 @@ public class DmnEngineImpl implements DmnEngine {
   }
 
   public DmnDecisionModel parseDecisionModel(DmnModelInstance modelInstance) {
-    return configuration.getDmnTransformer().transform(modelInstance);
+    return transformer.createTransform().setModelInstance(modelInstance).transform();
   }
 
   public DmnDecision parseDecision(String filename) {
@@ -94,33 +95,33 @@ public class DmnEngineImpl implements DmnEngine {
     }
   }
 
-  public DmnDecision parseDecision(String filename, String decisionId) {
-    DmnDecision decision = parseDecisionModel(filename).getDecision(decisionId);
+  public DmnDecision parseDecision(String filename, String decisionKey) {
+    DmnDecision decision = parseDecisionModel(filename).getDecision(decisionKey);
     if (decision != null) {
       return decision;
     }
     else {
-      throw LOG.unableToFinDecisionWithIdInFile(filename, decisionId);
+      throw LOG.unableToFinDecisionWithKeyInFile(filename, decisionKey);
     }
   }
 
-  public DmnDecision parseDecision(InputStream inputStream, String decisionId) {
-    DmnDecision decision = parseDecisionModel(inputStream).getDecision(decisionId);
+  public DmnDecision parseDecision(InputStream inputStream, String decisionKey) {
+    DmnDecision decision = parseDecisionModel(inputStream).getDecision(decisionKey);
     if (decision != null) {
       return decision;
     }
     else {
-      throw LOG.unableToFindDecisionWithId(decisionId);
+      throw LOG.unableToFindDecisionWithKey(decisionKey);
     }
   }
 
-  public DmnDecision parseDecision(DmnModelInstance modelInstance, String decisionId) {
-    DmnDecision decision = parseDecisionModel(modelInstance).getDecision(decisionId);
+  public DmnDecision parseDecision(DmnModelInstance modelInstance, String decisionKey) {
+    DmnDecision decision = parseDecisionModel(modelInstance).getDecision(decisionKey);
     if (decision != null) {
       return decision;
     }
     else {
-      throw LOG.unableToFindDecisionWithId(decisionId);
+      throw LOG.unableToFindDecisionWithKey(decisionKey);
     }
   }
 

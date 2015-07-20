@@ -13,21 +13,9 @@
 
 package org.camunda.dmn.engine;
 
-import java.util.List;
-
 import org.camunda.dmn.engine.context.DmnDecisionContext;
 
-public interface DmnDecision {
-
-  void setId(String id);
-
-  String getId();
-
-  void setRules(List<DmnRule> rules);
-
-  List<DmnRule> getRules();
-
-  void addRule(DmnRule rule);
+public interface DmnDecision extends DmnElement {
 
   DmnDecisionResult evaluate(DmnDecisionContext decisionContext);
 

@@ -54,46 +54,78 @@ public class TestEvaluateDecision extends DmnDecisionTest {
     assertThat(engine)
       .evaluates(decision)
       .withContext()
-        .setVariable("status", "bronze")
-        .setVariable("sum", 200)
-        .build()
+      .setVariable("status", "bronze")
+      .setVariable("sum", 200)
+      .build()
       .hasResult()
-        .hasSingleOutput()
-          .hasEntry("result", "notok")
-          .hasEntry("reason", "work on your status first, as bronze you're not going to get anything");
+      .hasSingleOutput()
+      .hasEntry("result", "notok")
+      .hasEntry("reason", "work on your status first, as bronze you're not going to get anything");
 
     assertThat(engine)
       .evaluates(decision)
       .withContext()
-        .setVariable("status", "silver")
-        .setVariable("sum", 200)
-        .build()
+      .setVariable("status", "silver")
+      .setVariable("sum", 200)
+      .build()
       .hasResult()
-        .hasSingleOutput()
-          .hasEntry("result", "ok")
-          .hasEntry("reason", "you little fish will get what you want");
+      .hasSingleOutput()
+      .hasEntry("result", "ok")
+      .hasEntry("reason", "you little fish will get what you want");
 
     assertThat(engine)
       .evaluates(decision)
       .withContext()
-        .setVariable("status", "silver")
-        .setVariable("sum", 1200)
-        .build()
+      .setVariable("status", "silver")
+      .setVariable("sum", 1200)
+      .build()
       .hasResult()
-        .hasSingleOutput()
-          .hasEntry("result", "notok")
-          .hasEntry("reason", "you took too much man, you took too much!");
+      .hasSingleOutput()
+      .hasEntry("result", "notok")
+      .hasEntry("reason", "you took too much man, you took too much!");
 
     assertThat(engine)
       .evaluates(decision)
       .withContext()
-        .setVariable("status", "gold")
-        .setVariable("sum", 200)
-        .build()
+      .setVariable("status", "gold")
+      .setVariable("sum", 200)
+      .build()
       .hasResult()
-        .hasSingleOutput()
-          .hasEntry("result", "ok")
-          .hasEntry("reason", "you get anything you want");
+      .hasSingleOutput()
+      .hasEntry("result", "ok")
+      .hasEntry("reason", "you get anything you want");
+  }
+
+  @Test
+  @DecisionResource(resource = DATA_TYPE_DMN)
+  public void shouldDetectDataTypes() {
+    assertThat(engine)
+      .evaluates(decision)
+      .withContext()
+        .setVariable("boolean", true)
+        .setVariable("integer", 9000)
+        .setVariable("double", 13.37)
+        .build()
+      .hasResult(true);
+
+    assertThat(engine)
+      .evaluates(decision)
+      .withContext()
+        .setVariable("boolean", false)
+        .setVariable("integer", 10000)
+        .setVariable("double", 21.42)
+        .build()
+      .hasResult(true);
+
+    assertThat(engine)
+      .evaluates(decision)
+      .withContext()
+        .setVariable("boolean", true)
+        .setVariable("integer", -9000)
+        .setVariable("double", -13.37)
+        .build()
+      .hasResult(true);
   }
 
 }
+

@@ -15,18 +15,20 @@ package org.camunda.dmn.engine;
 
 import java.util.List;
 
-import org.camunda.dmn.engine.context.DmnDecisionContext;
+public interface DmnDecisionModel extends DmnElement {
 
-public interface DmnDecisionModel {
+  String getExpressionLanguage();
 
-  List<DmnDecision> getDecisions();
+  String getTypeLanguage();
 
-  DmnDecision getDecision(String decisionId);
+  String getNamespace();
 
-  void addDecision(DmnDecision decision);
+  List<DmnItemDefinition> getItemDefinitions();
 
-  DmnDecisionResult evaluate(DmnDecisionContext decisionContext);
+  DmnItemDefinition getItemDefinition(String itemDefinitionKey);
 
-  DmnDecisionResult evaluate(String decisionId, DmnDecisionContext decisionContext);
+  <T extends DmnDecision> List<T> getDecisions();
+
+  <T  extends DmnDecision> T getDecision(String decisionKey);
 
 }

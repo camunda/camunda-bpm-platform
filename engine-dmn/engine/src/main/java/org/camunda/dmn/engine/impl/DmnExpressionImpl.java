@@ -16,32 +16,20 @@ package org.camunda.dmn.engine.impl;
 import org.camunda.dmn.engine.DmnExpression;
 import org.camunda.dmn.engine.context.DmnDecisionContext;
 
-public class DmnExpressionImpl implements DmnExpression {
+public class DmnExpressionImpl extends DmnElementImpl implements DmnExpression {
 
-  public static final String DEFAULT_INPUT_VARIABLE_NAME = "cellInput";
-
-  protected String id;
-  protected String variableName;
-  protected String expression = "";
   protected String expressionLanguage;
+  protected String expression;
 
   public DmnExpressionImpl() {
   }
 
-  public void setId(String id) {
-    this.id = id;
+  public void setKey(String id) {
+    this.key = id;
   }
 
-  public String getId() {
-    return id;
-  }
-
-  public void setVariableName(String variableName) {
-    this.variableName = variableName;
-  }
-
-  public String getVariableName() {
-    return variableName;
+  public String getKey() {
+    return key;
   }
 
   public void setExpression(String expression) {
@@ -62,6 +50,15 @@ public class DmnExpressionImpl implements DmnExpression {
 
   public <T> T evaluate(DmnDecisionContext decisionContext) {
     return decisionContext.evaluate(this);
+  }
+
+  public String toString() {
+    return "DmnExpressionImpl{" +
+      "key='" + key + '\'' +
+      ", name='" + name + '\'' +
+      ", expressionLanguage='" + expressionLanguage + '\'' +
+      ", expression='" + expression + '\'' +
+      '}';
   }
 
 }

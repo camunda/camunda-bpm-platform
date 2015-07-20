@@ -46,4 +46,11 @@ public class DmnDecisionOutputEntryImpl implements DmnDecisionOutputEntry, Seria
     return (T) value;
   }
 
+  public String toString() {
+    return "DmnDecisionOutputEntryImpl{" +
+      "name='" + name + '\'' +
+      ", value=" + value +
+      '}';
+  }
+
 }

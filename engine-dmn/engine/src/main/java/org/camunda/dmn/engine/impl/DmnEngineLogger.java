@@ -15,7 +15,7 @@ package org.camunda.dmn.engine.impl;
 
 import org.camunda.dmn.engine.DmnEngineException;
 import org.camunda.dmn.engine.DmnExpressionException;
-import org.camunda.dmn.engine.DmnParseException;
+import org.camunda.dmn.engine.DmnTransformException;
 
 public class DmnEngineLogger extends DmnLogger {
 
@@ -39,28 +39,28 @@ public class DmnEngineLogger extends DmnLogger {
     return new DmnEngineException(exceptionMessage("005", "Unable to find script engine for name '{}'.", name));
   }
 
-  public DmnParseException unableToReadFile(String filename, Throwable cause) {
-    return new DmnParseException(exceptionMessage("006", "Unable to read model from file '{}'.", filename), cause);
+  public DmnTransformException unableToReadFile(String filename, Throwable cause) {
+    return new DmnTransformException(exceptionMessage("006", "Unable to read model from file '{}'.", filename), cause);
   }
 
-  public DmnParseException unableToReadInputStream(Throwable cause) {
-    return new DmnParseException(exceptionMessage("007", "Unable to read model from input stream."), cause);
+  public DmnTransformException unableToReadInputStream(Throwable cause) {
+    return new DmnTransformException(exceptionMessage("007", "Unable to read model from input stream."), cause);
   }
 
-  public DmnParseException unableToFinDecisionWithIdInFile(String filename, String decisionId) {
-    return new DmnParseException(exceptionMessage("008", "Unable to find decision with id '{}' in file '{}'.", decisionId, filename));
+  public DmnTransformException unableToFinDecisionWithKeyInFile(String filename, String decisionKey) {
+    return new DmnTransformException(exceptionMessage("008", "Unable to find decision with id '{}' in file '{}'.", decisionKey, filename));
   }
 
-  public DmnParseException unableToFindDecisionWithId(String decisionId) {
-    return new DmnParseException(exceptionMessage("009", "Unable to find decision with id '{}' in model.", decisionId));
+  public DmnTransformException unableToFindDecisionWithKey(String decisionKey) {
+    return new DmnTransformException(exceptionMessage("009", "Unable to find decision with id '{}' in model.", decisionKey));
   }
 
-  public DmnParseException unableToFindAnyDecisionInFile(String filename) {
-    return new DmnParseException(exceptionMessage("010", "Unable to find any decision in file '{}'.", filename));
+  public DmnTransformException unableToFindAnyDecisionInFile(String filename) {
+    return new DmnTransformException(exceptionMessage("010", "Unable to find any decision in file '{}'.", filename));
   }
 
-  public DmnParseException unableToFindAnyDecision() {
-    return new DmnParseException(exceptionMessage("011", "Unable to find any decision in model."));
+  public DmnTransformException unableToFindAnyDecision() {
+    return new DmnTransformException(exceptionMessage("011", "Unable to find any decision in model."));
   }
 
   public DmnEngineException noVariableContextSetInDecisionContext() {

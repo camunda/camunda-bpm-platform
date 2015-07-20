@@ -60,8 +60,8 @@ public class DmnEngineAssertion extends AbstractAssert<DmnEngineAssertion, DmnEn
     return evaluates(decisions.get(0));
   }
 
-  public DmnEngineAssertion evaluates(DmnDecisionModel decisionModel, String decisionId) {
-    DmnDecision decision = decisionModel.getDecision(decisionId);
+  public DmnEngineAssertion evaluates(DmnDecisionModel decisionModel, String decisionKey) {
+    DmnDecision decision = decisionModel.getDecision(decisionKey);
     return evaluates(decision);
   }
 
@@ -124,7 +124,7 @@ public class DmnEngineAssertion extends AbstractAssert<DmnEngineAssertion, DmnEn
     return new DmnDecisionResultAssertion(result);
   }
 
-  public DmnDecisionOutputAssertion hasResult(String value) {
+  public DmnDecisionOutputAssertion hasResult(Object value) {
     isNotNull();
 
     if (decision == null) {

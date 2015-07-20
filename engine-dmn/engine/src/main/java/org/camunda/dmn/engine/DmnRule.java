@@ -14,23 +14,17 @@
 package org.camunda.dmn.engine;
 
 import java.util.List;
-import java.util.Map;
 
 import org.camunda.dmn.engine.context.DmnDecisionContext;
 
-public interface DmnRule {
+public interface DmnRule extends DmnElement {
 
-  String getId();
+  List<DmnClauseEntry> getConditions();
 
-  Map<String, DmnExpression> getInputExpressions();
-
-  Map<String, List<DmnExpression>> getConditions();
-
-  List<DmnExpression> getConclusions();
+  List<DmnClauseEntry> getConclusions();
 
   boolean isApplicable(DmnDecisionContext decisionContext);
 
   DmnDecisionOutput getOutput(DmnDecisionContext decisionContext);
-
 
 }

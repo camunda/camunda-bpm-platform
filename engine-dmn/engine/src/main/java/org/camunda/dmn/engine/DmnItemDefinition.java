@@ -11,12 +11,14 @@
  * limitations under the License.
  */
 
-package org.camunda.dmn.engine.transform;
+package org.camunda.dmn.engine;
 
-import org.camunda.bpm.model.dmn.instance.DmnModelElementInstance;
+import java.util.List;
 
-public interface DmnElementHandler<Source extends DmnModelElementInstance, Target> {
+public interface DmnItemDefinition extends DmnElement {
 
-  Target handleElement(DmnTransformContext context, Source element);
+  DmnTypeDefinition getTypeDefinition();
+
+  List<DmnExpression> getAllowedValues();
 
 }

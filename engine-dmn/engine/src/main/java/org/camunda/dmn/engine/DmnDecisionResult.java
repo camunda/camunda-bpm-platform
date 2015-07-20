@@ -17,10 +17,6 @@ import java.util.List;
 
 public interface DmnDecisionResult {
 
-  void setOutputs(List<DmnDecisionOutput> outputs);
-
   List<DmnDecisionOutput> getOutputs();
-
-  void addOutput(DmnDecisionOutput output);
 
 }

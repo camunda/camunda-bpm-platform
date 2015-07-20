@@ -58,4 +58,10 @@ public class DmnDecisionOutputImpl implements DmnDecisionOutput, Serializable {
     }
   }
 
+  public String toString() {
+    return "DmnDecisionOutputImpl{" +
+      "entries=" + entries +
+      '}';
+  }
+
 }

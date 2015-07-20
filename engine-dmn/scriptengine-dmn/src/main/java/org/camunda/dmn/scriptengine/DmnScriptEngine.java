@@ -25,6 +25,7 @@ import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
 import org.camunda.commons.utils.IoUtil;
+import org.camunda.dmn.engine.DmnDecision;
 import org.camunda.dmn.engine.DmnDecisionModel;
 import org.camunda.dmn.engine.DmnDecisionResult;
 import org.camunda.dmn.engine.DmnEngine;
@@ -35,7 +36,7 @@ import org.camunda.dmn.engine.impl.DmnEngineConfigurationImpl;
 
 public class DmnScriptEngine extends AbstractScriptEngine implements Compilable {
 
-  public static final String DECISION_ID_ATTRIBUTE = "decisionId";
+  public static final String DECISION_ID_ATTRIBUTE = "decisionKey";
   public static final String SCRIPT_ENGINE_MANAGER_ATTRIBUTE = "scriptEngineManager";
 
   protected ScriptEngineFactory scriptEngineFactory;
@@ -82,8 +83,8 @@ public class DmnScriptEngine extends AbstractScriptEngine implements Compilable 
     return eval(script, (String) null);
   }
 
-  public DmnDecisionResult eval(String script, String decisionId) throws ScriptException {
-    return eval(script, decisionId, context);
+  public DmnDecisionResult eval(String script, String decisionKey) throws ScriptException {
+    return eval(script, decisionKey, context);
   }
 
   @Override
@@ -91,26 +92,33 @@ public class DmnScriptEngine extends AbstractScriptEngine implements Compilable 
     return eval(script, null, bindings);
   }
 
-  public DmnDecisionResult eval(String script, String decisionId, Bindings bindings) throws ScriptException {
+  public DmnDecisionResult eval(String script, String decisionKey, Bindings bindings) throws ScriptException {
     ScriptContext scriptContext = getScriptContext(bindings);
-    return eval(script, decisionId, scriptContext);
+    return eval(script, decisionKey, scriptContext);
   }
 
   @Override
   public DmnDecisionResult eval(String script, ScriptContext context) throws ScriptException {
-    String decisionId = getDecisionId(context);
-    return eval(script, decisionId, context);
+    String decisionKey = getDecisionKey(context);
+    return eval(script, decisionKey, context);
   }
 
-  public DmnDecisionResult eval(String script, String decisionId, ScriptContext context) throws ScriptException {
+  public DmnDecisionResult eval(String script, String decisionKey, ScriptContext context) throws ScriptException {
     DmnDecisionContext decisionContext = getDmnDecisionContext(context);
     DmnDecisionModel dmnDecisionModel = parseDmnDecisionModel(script);
-
-    if (decisionId != null) {
-      return dmnDecisionModel.evaluate(decisionId, decisionContext);
+    DmnDecision decision;
+    if (decisionKey != null) {
+      decision = dmnDecisionModel.getDecision(decisionKey);
     }
     else {
-      return dmnDecisionModel.evaluate(decisionContext);
+      decision = dmnDecisionModel.getDecisions().get(0);
+    }
+
+    try {
+      return decision.evaluate(decisionContext);
+    }
+    catch (Exception e) {
+      throw new ScriptException(e);
     }
   }
 
@@ -119,8 +127,8 @@ public class DmnScriptEngine extends AbstractScriptEngine implements Compilable 
     return eval(reader, (String) null);
   }
 
-  public DmnDecisionResult eval(Reader reader, String decisionId) throws ScriptException {
-    return eval(reader, decisionId, context);
+  public DmnDecisionResult eval(Reader reader, String decisionKey) throws ScriptException {
+    return eval(reader, decisionKey, context);
   }
 
   @Override
@@ -128,19 +136,19 @@ public class DmnScriptEngine extends AbstractScriptEngine implements Compilable 
     return eval(reader, null, bindings);
   }
 
-  public DmnDecisionResult eval(Reader reader, String decisionId, Bindings bindings) throws ScriptException {
+  public DmnDecisionResult eval(Reader reader, String decisionKey, Bindings bindings) throws ScriptException {
     ScriptContext scriptContext = getScriptContext(bindings);
-    return eval(reader, decisionId, scriptContext);
+    return eval(reader, decisionKey, scriptContext);
   }
 
   public DmnDecisionResult eval(Reader reader, ScriptContext context) throws ScriptException {
-    String decisionId = getDecisionId(context);
-    return eval(reader, decisionId, context);
+    String decisionKey = getDecisionKey(context);
+    return eval(reader, decisionKey, context);
   }
 
-  public DmnDecisionResult eval(Reader reader, String decisionId, ScriptContext context) throws ScriptException {
+  public DmnDecisionResult eval(Reader reader, String decisionKey, ScriptContext context) throws ScriptException {
     String script = getScriptFromReader(reader);
-    return eval(script, decisionId, context);
+    return eval(script, decisionKey, context);
   }
 
   public Bindings createBindings() {
@@ -188,12 +196,12 @@ public class DmnScriptEngine extends AbstractScriptEngine implements Compilable 
     return decisionContext;
   }
 
-  protected String getDecisionId(ScriptContext context) {
-    String decisionId = null;
+  protected String getDecisionKey(ScriptContext context) {
+    String decisionKey = null;
     if (context != null) {
-      decisionId = (String) getScriptContextAttribute(context, DECISION_ID_ATTRIBUTE);
+      decisionKey = (String) getScriptContextAttribute(context, DECISION_ID_ATTRIBUTE);
     }
-    return decisionId;
+    return decisionKey;
   }
 
   protected DmnDecisionContext createDmnDecisionContext() {

@@ -13,19 +13,18 @@
 
 package org.camunda.dmn.engine.transform;
 
-import org.camunda.bpm.model.dmn.DmnModelInstance;
-import org.camunda.dmn.engine.DmnDecisionModel;
+import java.util.List;
+
+import org.camunda.dmn.engine.handler.DmnElementHandlerRegistry;
 
 public interface DmnTransformer {
 
-  void setTransformContext(DmnTransformContext transformContext);
-
-  DmnTransformContext getTransformContext();
-
-  void setElementHandlerRegistry(DmnElementHandlerRegistry elementHandlerRegistry);
+  DmnTransformFactory getFactory();
 
   DmnElementHandlerRegistry getElementHandlerRegistry();
 
-  DmnDecisionModel transform(DmnModelInstance modelInstance);
+  List<DmnTransformListener> getTransformListeners();
+
+  DmnTransform createTransform();
 
 }

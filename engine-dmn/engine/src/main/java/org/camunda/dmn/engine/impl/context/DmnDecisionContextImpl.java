@@ -20,9 +20,11 @@ import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
-import org.camunda.dmn.engine.DmnDecision;
+import org.camunda.dmn.engine.DmnClause;
+import org.camunda.dmn.engine.DmnClauseEntry;
 import org.camunda.dmn.engine.DmnDecisionOutput;
 import org.camunda.dmn.engine.DmnDecisionResult;
+import org.camunda.dmn.engine.DmnDecisionTable;
 import org.camunda.dmn.engine.DmnExpression;
 import org.camunda.dmn.engine.DmnRule;
 import org.camunda.dmn.engine.context.DmnDecisionContext;
@@ -74,11 +76,11 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
     }
   }
 
-  public DmnDecisionResult evaluate(DmnDecision decision) {
+  public DmnDecisionResult evaluate(DmnDecisionTable decision) {
     return evaluate(decision, new HashMap<String, Object>());
   }
 
-  public DmnDecisionResult evaluate(DmnDecision decision, Map<String, Object> evaluationCache) {
+  public DmnDecisionResult evaluate(DmnDecisionTable decision, Map<String, Object> evaluationCache) {
     DmnDecisionResultImpl decisionResult = new DmnDecisionResultImpl();
 
     for (DmnRule rule : decision.getRules()) {
@@ -100,44 +102,41 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
   }
 
   public boolean isApplicable(DmnRule rule, Map<String, Object> evaluationCache) {
-    // evaluate all conditions
-    boolean applicable = true;
-    Map<String, DmnExpression> inputExpressions = rule.getInputExpressions();
-    Map<String, List<DmnExpression>> disjunctions = rule.getConditions();
-    for (Map.Entry<String, List<DmnExpression>> disjunction : disjunctions.entrySet()) {
-      boolean disjunctionApplicable = false;
+    Map<String, Boolean> clauseSatisfied = new HashMap<String, Boolean>();
+    List<DmnClauseEntry> conditions = rule.getConditions();
 
-      // set new variable context for this rule evaluation
-      DmnVariableContext originalVariableContext = getVariableContextChecked();
+    // save variable context
+    DmnVariableContext originalVariableContext = getVariableContextChecked();
+
+    for (DmnClauseEntry condition : conditions) {
+      DmnClause clause = condition.getClause();
+      Boolean alreadySatisfied = clauseSatisfied.get(clause.getKey());
+      if (alreadySatisfied != null && alreadySatisfied) {
+        // skip condition if clause already satisfied
+        continue;
+      }
+
+      // set temporary evaluation variable cache
       DmnDelegatingVariableContext evaluationVariableContext = new DmnDelegatingVariableContext(originalVariableContext);
       setVariableContext(evaluationVariableContext);
-
-      String clauseId = disjunction.getKey();
-      DmnExpression inputExpression = inputExpressions.get(clauseId);
+      DmnExpression inputExpression = clause.getInputExpression();
       if (inputExpression != null) {
-        Object result = evaluate(inputExpression, evaluationCache);
-        String name = inputExpression.getVariableName();
-        evaluationVariableContext.setVariable(name, result);
+        Object inputExpressionResult = evaluate(inputExpression, evaluationCache);
+        String outputName = clause.getOutputName();
+        evaluationVariableContext.setVariable(outputName, inputExpressionResult);
       }
 
-      for (DmnExpression expression : disjunction.getValue()) {
-        if (isApplicable(expression, evaluationCache)) {
-          disjunctionApplicable = true;
-          break;
-        }
-      }
-
-      // reset variable context
-      setVariableContext(originalVariableContext);
-
-      if (!disjunctionApplicable) {
-        applicable = false;
-        break;
-      }
+      boolean applicable = isApplicable(condition, evaluationCache);
+      clauseSatisfied.put(clause.getKey(), applicable);
     }
 
-    return applicable;
+    // reset variable context
+    setVariableContext(originalVariableContext);
+
+    // the rule is applicable if all involved clauses are satisfied
+    return !clauseSatisfied.containsValue(false);
   }
+
 
   public <T> T evaluate(DmnExpression expression) {
     return evaluate(expression, null);
@@ -145,11 +144,11 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
 
   @SuppressWarnings("unchecked")
   public <T> T evaluate(DmnExpression expression, Map<String, Object> evaluationCache) {
-    String expressionId = expression.getId();
+    String expressionKey = expression.getKey();
     Object result;
 
-    if (evaluationCache != null && evaluationCache.containsKey(expressionId)) {
-      result = evaluationCache.get(expressionId);
+    if (evaluationCache != null && evaluationCache.containsKey(expressionKey)) {
+      result = evaluationCache.get(expressionKey);
     }
     else {
       String expressionLanguage = expression.getExpressionLanguage();
@@ -181,10 +180,10 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
 
   public DmnDecisionOutput getOutput(DmnRule rule, Map<String, Object> evaluationCache) {
     DmnDecisionOutputImpl output = new DmnDecisionOutputImpl();
-    for (DmnExpression expression : rule.getConclusions()) {
-      Object result = evaluate(expression, evaluationCache);
-      String variableName = expression.getVariableName();
-      output.addEntry(new DmnDecisionOutputEntryImpl(variableName, result));
+    for (DmnClauseEntry conclusion : rule.getConclusions()) {
+      Object result = evaluate(conclusion, evaluationCache);
+      String outputName = conclusion.getClause().getOutputName();
+      output.addEntry(new DmnDecisionOutputEntryImpl(outputName, result));
     }
     return output;
   }

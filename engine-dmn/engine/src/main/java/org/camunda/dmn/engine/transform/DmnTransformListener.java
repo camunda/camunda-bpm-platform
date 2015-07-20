@@ -13,11 +13,27 @@
 
 package org.camunda.dmn.engine.transform;
 
+import org.camunda.bpm.model.dmn.instance.Clause;
+import org.camunda.bpm.model.dmn.instance.Decision;
 import org.camunda.bpm.model.dmn.instance.Definitions;
+import org.camunda.bpm.model.dmn.instance.ItemDefinition;
+import org.camunda.bpm.model.dmn.instance.Rule;
+import org.camunda.dmn.engine.DmnClause;
+import org.camunda.dmn.engine.DmnDecision;
 import org.camunda.dmn.engine.DmnDecisionModel;
+import org.camunda.dmn.engine.DmnItemDefinition;
+import org.camunda.dmn.engine.DmnRule;
 
 public interface DmnTransformListener {
 
   void transformDefinitions(Definitions definitions, DmnDecisionModel decisionModel);
+
+  void transformDecision(Decision decision, DmnDecision dmnDecision);
+
+  void transformItemDefinition(ItemDefinition itemDefinition, DmnItemDefinition dmnItemDefinition);
+
+  void transformClause(Clause clause, DmnClause dmnClause);
+
+  void transformRule(Rule rule, DmnRule dmnRule);
 
 }

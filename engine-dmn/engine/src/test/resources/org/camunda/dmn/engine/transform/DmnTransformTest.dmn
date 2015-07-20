@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Definitions id="definitions" name="camunda" namespace="http://camunda.org/dmn" xmlns="http://www.omg.org/spec/DMN/20130901" xmlns:camunda="http://camunda.org/schema/1.0/dmn">
+  <ItemDefinition id="itemDefinition1" name="camunda" />
+  <ItemDefinition id="itemDefinition2">
+    <typeDefinition>string</typeDefinition>
+    <allowedValue id="allowedValue1" name="a">
+      <text>camunda</text>
+    </allowedValue>
+    <allowedValue id="allowedValue2" name="b">
+      <text>camunda</text>
+    </allowedValue>
+  </ItemDefinition>
+  <Decision id="decision1" name="camunda">
+    <DecisionTable id="decisionTable1" name="table">
+      <clause id="clause1" name="camunda" camunda:output="camunda">
+        <inputExpression id="inputExpression1">
+          <text>camunda</text>
+        </inputExpression>
+      </clause>
+      <clause id="clause2">
+        <inputExpression id="inputExpression2" name="camunda" expressionLanguage="camunda" />
+      </clause>
+      <clause id="clause3">
+        <inputExpression id="inputExpression3">
+          <text/>
+        </inputExpression>
+      </clause>
+      <clause id="clause4" isOrdered="true">
+        <inputEntry id="inputEntry1" name="camunda">
+          <itemDefinition href="#itemDefinition1"/>
+          <text>camunda</text>
+        </inputEntry>
+        <inputEntry id="inputEntry2" name="camunda" expressionLanguage="camunda">
+          <text/>
+        </inputEntry>
+        <inputEntry id="inputEntry3" />
+      </clause>
+      <clause id="clause5">
+        <outputDefinition href="#itemDefinition2"/>
+      </clause>
+      <clause id="clause6" name="camunda" isOrdered="true">
+        <outputEntry id="outputEntry1" name="camunda">
+          <itemDefinition href="#itemDefinition1"/>
+          <text>camunda</text>
+        </outputEntry>
+        <outputEntry id="outputEntry2" name="camunda" expressionLanguage="camunda">
+          <text/>
+        </outputEntry>
+        <outputEntry id="outputEntry3" />
+      </clause>
+      <clause id="clause7"/>
+      <rule id="rule1" name="camunda"/>
+      <rule id="rule2">
+        <condition>inputEntry1</condition>
+      </rule>
+      <rule id="rule3">
+        <condition>inputEntry1 inputEntry2</condition>
+        <conclusion>outputEntry1</conclusion>
+      </rule>
+      <rule id="rule4">
+        <condition>inputEntry1</condition>
+        <condition>inputEntry3</condition>
+        <conclusion>outputEntry1 outputEntry2</conclusion>
+      </rule>
+      <rule id="rule5">
+        <conclusion>outputEntry1</conclusion>
+        <conclusion>outputEntry3</conclusion>
+      </rule>
+    </DecisionTable>
+  </Decision>
+  <Decision id="decision2" name="ignored" />
+  <Decision id="decision3" name="camunda">
+    <DecisionTable id="decisionTable2" name="table" hitPolicy="FIRST"/>
+  </Decision>
+
+</Definitions>

@@ -15,15 +15,16 @@ package org.camunda.dmn.engine.impl;
 
 import org.camunda.bpm.model.dmn.instance.Expression;
 import org.camunda.bpm.model.dmn.instance.LiteralExpression;
-import org.camunda.dmn.engine.DmnParseException;
+import org.camunda.dmn.engine.DmnTransformException;
 
 public class DmnExpressionLogger extends DmnLogger {
 
-  public DmnParseException expressionTypeNotSupported(Expression expression) {
-    return new DmnParseException(exceptionMessage("001", "Expression from type '{}' are not supported.", expression.getClass().getSimpleName()));
+  public DmnTransformException expressionTypeNotSupported(Expression expression) {
+    return new DmnTransformException(exceptionMessage("001", "Expression from type '{}' are not supported.", expression.getClass().getSimpleName()));
   }
 
-  public DmnParseException expressionDoesNotContainText(LiteralExpression expression) {
-    return new DmnParseException(exceptionMessage("002", "Expression '{}' does not contain text element", expression.getId()));
+  public DmnTransformException expressionDoesNotContainText(LiteralExpression expression) {
+    return new DmnTransformException(exceptionMessage("002", "Expression '{}' does not contain text element", expression.getId()));
   }
+
 }

@@ -13,62 +13,127 @@
 
 package org.camunda.dmn.engine.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.camunda.dmn.engine.DmnEngine;
 import org.camunda.dmn.engine.DmnEngineConfiguration;
 import org.camunda.dmn.engine.context.DmnContextFactory;
+import org.camunda.dmn.engine.handler.DmnElementHandlerRegistry;
 import org.camunda.dmn.engine.impl.context.DmnContextFactoryImpl;
-import org.camunda.dmn.engine.impl.transform.DmnElementHandlerRegistryImpl;
+import org.camunda.dmn.engine.impl.handler.DmnElementHandlerRegistryImpl;
+import org.camunda.dmn.engine.impl.transform.DmnTransformFactoryImpl;
 import org.camunda.dmn.engine.impl.transform.DmnTransformerImpl;
-import org.camunda.dmn.engine.transform.DmnElementHandlerRegistry;
+import org.camunda.dmn.engine.transform.DmnTransformFactory;
+import org.camunda.dmn.engine.transform.DmnTransformListener;
 import org.camunda.dmn.engine.transform.DmnTransformer;
 import org.camunda.dmn.juel.JuelScriptEngineFactory;
 
 public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
 
-  protected DmnTransformer transformer;
   protected String defaultExpressionLanguage;
   protected DmnContextFactory contextFactory;
 
+  protected DmnTransformer transformer;
+  protected DmnTransformFactory transformFactory;
+  protected DmnElementHandlerRegistry elementHandlerRegistry;
+  protected List<DmnTransformListener> customPreDmnTransformListeners = new ArrayList<DmnTransformListener>();
+  protected List<DmnTransformListener> customPostDmnTransformListeners = new ArrayList<DmnTransformListener>();
+
   public DmnEngineConfigurationImpl() {
-    transformer = new DmnTransformerImpl(new DmnElementHandlerRegistryImpl());
     defaultExpressionLanguage = JuelScriptEngineFactory.NAME;
     contextFactory = new DmnContextFactoryImpl();
-  }
-
-  public void setDmnTransformer(DmnTransformer transformer) {
-    this.transformer = transformer;
-  }
-
-  public DmnTransformer getDmnTransformer() {
-    return transformer;
-  }
-
-  public void setDmnElementHandlerRegistry(DmnElementHandlerRegistry elementHandlerRegistry) {
-    this.transformer.setElementHandlerRegistry(elementHandlerRegistry);
-  }
-
-  public DmnElementHandlerRegistry getDmnElementHandlerRegistry() {
-    return transformer.getElementHandlerRegistry();
-  }
-
-  public void setDefaultExpressionLanguage(String expressionLanguage) {
-    this.defaultExpressionLanguage = expressionLanguage;
   }
 
   public String getDefaultExpressionLanguage() {
     return defaultExpressionLanguage;
   }
 
-  public void setDmnContextFactory(DmnContextFactory contextFactory) {
-    this.contextFactory = contextFactory;
+  public void setDefaultExpressionLanguage(String expressionLanguage) {
+    this.defaultExpressionLanguage = expressionLanguage;
   }
 
   public DmnContextFactory getDmnContextFactory() {
     return contextFactory;
   }
 
+  public void setDmnContextFactory(DmnContextFactory contextFactory) {
+    this.contextFactory = contextFactory;
+  }
+
+  public DmnTransformer getTransformer() {
+    return transformer;
+  }
+
+  public DmnTransformFactory getTransformFactory() {
+    return transformFactory;
+  }
+
+  public void setTransformFactory(DmnTransformFactory transformFactory) {
+    this.transformFactory = transformFactory;
+  }
+
+  public DmnElementHandlerRegistry getElementHandlerRegistry() {
+    return elementHandlerRegistry;
+  }
+
+  public void setElementHandlerRegistry(DmnElementHandlerRegistry elementHandlerRegistry) {
+    this.elementHandlerRegistry = elementHandlerRegistry;
+  }
+
+  public List<DmnTransformListener> getCustomPreDmnTransformListeners() {
+    return customPreDmnTransformListeners;
+  }
+
+  public void setCustomPreDmnTransformListeners(List<DmnTransformListener> customPreDmnTransformListeners) {
+    this.customPreDmnTransformListeners = customPreDmnTransformListeners;
+  }
+
+  public List<DmnTransformListener> getCustomPostDmnTransformListeners() {
+    return customPostDmnTransformListeners;
+  }
+
+  public void setCustomPostDmnTransformListeners(List<DmnTransformListener> customPostDmnTransformListeners) {
+    this.customPostDmnTransformListeners = customPostDmnTransformListeners;
+  }
+
   public DmnEngine buildEngine() {
+    init();
     return new DmnEngineImpl(this);
+  }
+
+  protected void init() {
+    initTransformFactory();
+    initElementHandlerRegistry();
+    initTransformer();
+  }
+
+  public void initTransformFactory() {
+    if (transformFactory == null) {
+      transformFactory = new DmnTransformFactoryImpl();
+    }
+  }
+
+  protected void initElementHandlerRegistry() {
+    if (elementHandlerRegistry == null) {
+      elementHandlerRegistry = new DmnElementHandlerRegistryImpl();
+    }
+  }
+
+  protected void initTransformer() {
+    transformer = new DmnTransformerImpl(transformFactory, elementHandlerRegistry);
+    if (customPreDmnTransformListeners != null) {
+      transformer.getTransformListeners().addAll(customPreDmnTransformListeners);
+    }
+    transformer.getTransformListeners().addAll(getDefaultDmnTransformListeners());
+    if (customPostDmnTransformListeners != null) {
+      transformer.getTransformListeners().addAll(customPostDmnTransformListeners);
+    }
+  }
+
+  protected List<DmnTransformListener> getDefaultDmnTransformListeners() {
+    return Collections.emptyList();
   }
 
 }

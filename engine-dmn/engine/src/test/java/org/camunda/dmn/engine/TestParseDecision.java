@@ -77,7 +77,7 @@ public class TestParseDecision {
       dmnEngine.parseDecision(NO_DECISION_DMN);
       fail("Exception expected");
     }
-    catch (DmnParseException e) {
+    catch (DmnTransformException e) {
       assertThat(e)
         .hasMessageContaining("Unable to find any decision")
         .hasMessageContaining("NoDecision.dmn");
@@ -85,12 +85,12 @@ public class TestParseDecision {
   }
 
   @Test
-  public void shouldFailIfDecisionIdIsUnknown() {
+  public void shouldFailIfDecisionKeyIsUnknown() {
     try {
       dmnEngine.parseDecision(NO_INPUT_DMN, "unknownDecision");
       fail("Exception expected");
     }
-    catch (DmnParseException e) {
+    catch (DmnTransformException e) {
       assertThat(e)
         .hasMessageContaining("Unable to find decision")
         .hasMessageContaining("unknownDecision")
@@ -103,7 +103,7 @@ public class TestParseDecision {
     try {
       dmnEngine.parseDecision(INVOCATION_DECISION_DMN);
     }
-    catch (DmnParseException e) {
+    catch (DmnTransformException e) {
       assertThat(e)
         .hasMessageContaining("Unable to find any decision")
         .hasMessageContaining("InvocationDecision.dmn");
@@ -112,7 +112,7 @@ public class TestParseDecision {
 
   protected void assertDecision(DmnDecision decision) {
     assertThat(decision).isNotNull();
-    assertThat(decision.getId()).isEqualTo("decision");
+    assertThat(decision.getKey()).isEqualTo("decision");
   }
 
 }
