@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.engine.impl;
 
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -24,6 +22,8 @@ import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
+
+import java.util.logging.Logger;
 
 /**
  * @author Tom Baeyens
@@ -72,14 +72,31 @@ public final class SchemaOperationsProcessEngineBuild implements Command<Object>
     log.info("Creating historyLevel property in database with value: " + processEngineConfiguration.getHistory());
   }
 
+  /**
+   *
+   * @param entityManager entoty manager for db query
+   * @return Integer value representing the history level or <code>null</code> if none found
+   */
+  public static Integer databaseHistoryLevel(DbEntityManager entityManager) {
+
+    try {
+      PropertyEntity historyLevelProperty = entityManager.selectById(PropertyEntity.class, "historyLevel");
+      return historyLevelProperty != null ? new Integer(historyLevelProperty.getValue()) : null;
+    } catch (Exception e) {
+      log.warning("could not select property historyLevel: " + e.getMessage());
+      return null;
+    }
+
+  }
+
   public void checkHistoryLevel(DbEntityManager entityManager) {
     HistoryLevel configuredHistoryLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
-    PropertyEntity historyLevelProperty = entityManager.selectById(PropertyEntity.class, "historyLevel");
-    if (historyLevelProperty == null) {
+
+    Integer databaseHistoryLevel = databaseHistoryLevel(entityManager);
+    if (databaseHistoryLevel == null) {
       log.info("No historyLevel property found in database.");
       dbCreateHistoryLevel(entityManager);
     } else {
-      Integer databaseHistoryLevel = new Integer(historyLevelProperty.getValue());
       if (!((Integer) configuredHistoryLevel.getId()).equals(databaseHistoryLevel)) {
         throw new ProcessEngineException("historyLevel mismatch: configuration says " + configuredHistoryLevel + " and database says " + databaseHistoryLevel);
       }

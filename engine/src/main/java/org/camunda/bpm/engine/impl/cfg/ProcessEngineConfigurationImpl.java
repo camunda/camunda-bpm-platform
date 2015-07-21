@@ -70,6 +70,7 @@ import org.camunda.bpm.engine.impl.ManagementServiceImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.RepositoryServiceImpl;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
+import org.camunda.bpm.engine.impl.SchemaOperationsProcessEngineBuild;
 import org.camunda.bpm.engine.impl.ServiceImpl;
 import org.camunda.bpm.engine.impl.TaskServiceImpl;
 import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
@@ -140,6 +141,8 @@ import org.camunda.bpm.engine.impl.identity.WritableIdentityProvider;
 import org.camunda.bpm.engine.impl.identity.db.DbIdentityServiceProvider;
 import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutorImpl;
@@ -1019,7 +1022,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected List<BpmnParseListener> getDefaultBPMNParseListeners() {
     List<BpmnParseListener> defaultListeners = new ArrayList<BpmnParseListener>();
-    if (!historyLevel.equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
+    if (!HistoryLevel.HISTORY_LEVEL_NONE.equals(historyLevel)) {
       defaultListeners.add(new HistoryParseListener(historyLevel, historyEventProducer));
     }
     if(isMetricsEnabled) {
@@ -1058,7 +1061,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected List<CmmnTransformListener> getDefaultCmmnTransformListeners() {
     List<CmmnTransformListener> defaultListener = new ArrayList<CmmnTransformListener>();
-    if (!historyLevel.equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
+    if (!HistoryLevel.HISTORY_LEVEL_NONE.equals(historyLevel)) {
       defaultListener.add(new CmmnHistoryTransformListener(historyLevel, cmmnHistoryEventProducer));
     }
     if(isMetricsEnabled) {
@@ -1158,10 +1161,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             this.historyLevel = historyLevel;
           }
         }
-
       }
 
-      if(historyLevel == null) {
+
+      // do allow null for history level in case of "auto"
+      if(historyLevel == null && !ProcessEngineConfiguration.HISTORY_AUTO.equals(history)) {
         throw new ProcessEngineException("invalid history level: "+history);
       }
     }
@@ -2592,6 +2596,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public ProcessEngineConfigurationImpl setCustomHistoryLevels(List<HistoryLevel> customHistoryLevels) {
     this.customHistoryLevels = customHistoryLevels;
     return this;
+  }
+
+  public List<HistoryLevel> getHistoryLevels() {
+    return historyLevels;
   }
 
   public List<HistoryLevel> getCustomHistoryLevels() {
