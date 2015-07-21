@@ -33,8 +33,6 @@ public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEn
   protected int originalDefaultPriorityOnFailure;
 
   protected void setUp() throws Exception {
-    processEngineConfiguration.setProducePrioritizedJobs(true);
-    processEngineConfiguration.setJobPriorityProvider(new DefaultJobPriorityProvider());
     originalDefaultPriority = DefaultJobPriorityProvider.DEFAULT_PRIORITY;
     originalDefaultPriorityOnFailure = DefaultJobPriorityProvider.DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE;
 
@@ -43,9 +41,6 @@ public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEn
   }
 
   protected void tearDown() throws Exception {
-    processEngineConfiguration.setProducePrioritizedJobs(false);
-    processEngineConfiguration.setJobPriorityProvider(null);
-
     // reset default priorities
     DefaultJobPriorityProvider.DEFAULT_PRIORITY = originalDefaultPriority;
     DefaultJobPriorityProvider.DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE = originalDefaultPriorityOnFailure;

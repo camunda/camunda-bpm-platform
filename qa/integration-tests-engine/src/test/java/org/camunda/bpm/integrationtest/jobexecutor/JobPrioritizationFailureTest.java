@@ -18,12 +18,6 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.camunda.bpm.BpmPlatform;
-import org.camunda.bpm.ProcessEngineService;
-import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobPriorityProvider;
 import org.camunda.bpm.engine.impl.util.IoUtil;
@@ -52,11 +46,6 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class JobPrioritizationFailureTest extends AbstractFoxPlatformIntegrationTest {
 
-  protected ProcessEngine engine1;
-  protected RuntimeService runtimeService1;
-  protected ManagementService managementService1;
-  protected TaskService taskService1;
-
   protected ProcessInstance processInstance;
 
   public static final String VARIABLE_CLASS_NAME = "org.camunda.bpm.integrationtest.jobexecutor.beans.PriorityBean";
@@ -64,26 +53,21 @@ public class JobPrioritizationFailureTest extends AbstractFoxPlatformIntegration
 
   @Before
   public void setEngines() {
-    ProcessEngineService engineService = BpmPlatform.getProcessEngineService();
-    engine1 = engineService.getProcessEngine("engine1");
-    runtimeService1 = engine1.getRuntimeService();
-    managementService1 = engine1.getManagementService();
-    taskService1 = engine1.getTaskService();
 
-    // deregister process application so that context cannot be performed
+    // unregister process application so that context switch cannot be performed
     unregisterProcessApplication();
   }
 
   protected void unregisterProcessApplication() {
     org.camunda.bpm.engine.repository.Deployment deployment =
-        engine1.getRepositoryService().createDeploymentQuery().singleResult();
+        processEngine.getRepositoryService().createDeploymentQuery().singleResult();
 
-    managementService1.unregisterProcessApplication(deployment.getId(), false);
+    managementService.unregisterProcessApplication(deployment.getId(), false);
   }
 
   @Deployment(order = 1)
   public static WebArchive createDeployment() {
-    return initWebArchiveDeployment("pa1.war", "org/camunda/bpm/integrationtest/jobexecutor/jobPriorityEngine-spin.xml")
+    return initWebArchiveDeployment()
       .addClass(PriorityBean.class)
       .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/JobPrioritizationTest.priorityProcess.bpmn20.xml");
   }
@@ -97,7 +81,7 @@ public class JobPrioritizationFailureTest extends AbstractFoxPlatformIntegration
   @After
   public void tearDown() {
     if (processInstance != null) {
-      runtimeService1.deleteProcessInstance(processInstance.getId(), "");
+      runtimeService.deleteProcessInstance(processInstance.getId(), "");
     }
   }
 
@@ -106,7 +90,7 @@ public class JobPrioritizationFailureTest extends AbstractFoxPlatformIntegration
   @OperateOnDeployment("dummy-client")
   public void testGracefulDegradationOnMissingBean() {
     // when
-    processInstance = runtimeService1.startProcessInstanceByKey("priorityProcess");
+    processInstance = runtimeService.startProcessInstanceByKey("priorityProcess");
 
     // then the job was created successfully and has the default priority on bean evaluation failure
     Job job = managementService.createJobQuery().singleResult();
@@ -125,7 +109,7 @@ public class JobPrioritizationFailureTest extends AbstractFoxPlatformIntegration
           .create());
 
     // when
-    processInstance = runtimeService1.startProcessInstanceByKey("priorityProcess", variables);
+    processInstance = runtimeService.startProcessInstanceByKey("priorityProcess", variables);
 
     // then the job was created successfully and has the default priority although
     // the bean could not be resolved due to a missing class
@@ -145,7 +129,7 @@ public class JobPrioritizationFailureTest extends AbstractFoxPlatformIntegration
           .create());
 
     // when
-    processInstance = runtimeService1.startProcessInstanceByKey("priorityProcess", variables);
+    processInstance = runtimeService.startProcessInstanceByKey("priorityProcess", variables);
 
     // then the job was created successfully and has the default priority although
     // the bean could not be resolved due to a missing class
@@ -168,7 +152,7 @@ public class JobPrioritizationFailureTest extends AbstractFoxPlatformIntegration
           .create());
 
     // when
-    processInstance = runtimeService1.startProcessInstanceByKey("priorityProcess", variables);
+    processInstance = runtimeService.startProcessInstanceByKey("priorityProcess", variables);
 
     // then the job was created successfully and has the default priority although
     // the bean could not be resolved due to a missing class

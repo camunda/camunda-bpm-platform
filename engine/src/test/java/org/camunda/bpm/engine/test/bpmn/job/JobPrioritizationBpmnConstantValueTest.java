@@ -13,7 +13,6 @@
 package org.camunda.bpm.engine.test.bpmn.job;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobPriorityProvider;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
@@ -26,16 +25,6 @@ import org.camunda.bpm.engine.test.Deployment;
 public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngineTestCase {
 
   protected static final int EXPECTED_DEFAULT_PRIORITY = 0;
-
-  protected void setUp() throws Exception {
-    processEngineConfiguration.setProducePrioritizedJobs(true);
-    processEngineConfiguration.setJobPriorityProvider(new DefaultJobPriorityProvider());
-  }
-
-  protected void tearDown() throws Exception {
-    processEngineConfiguration.setProducePrioritizedJobs(false);
-    processEngineConfiguration.setJobPriorityProvider(null);
-  }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/oneTaskProcess.bpmn20.xml")
   public void testDefaultPrioritizationAsyncBefore() {

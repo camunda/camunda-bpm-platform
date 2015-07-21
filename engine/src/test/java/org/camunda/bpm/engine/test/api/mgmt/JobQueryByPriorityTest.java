@@ -21,7 +21,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobPriorityProvider;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -33,16 +32,6 @@ import org.camunda.bpm.engine.variable.Variables;
  *
  */
 public class JobQueryByPriorityTest extends PluggableProcessEngineTestCase {
-
-  protected void setUp() throws Exception {
-    processEngineConfiguration.setProducePrioritizedJobs(true);
-    processEngineConfiguration.setJobPriorityProvider(new DefaultJobPriorityProvider());
-  }
-
-  protected void tearDown() throws Exception {
-    processEngineConfiguration.setProducePrioritizedJobs(false);
-    processEngineConfiguration.setJobPriorityProvider(null);
-  }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/jobPrioExpressionProcess.bpmn20.xml")
   public void testOrderByPriority() {

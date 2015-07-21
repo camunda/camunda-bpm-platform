@@ -17,7 +17,6 @@ import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
-import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobPriorityProvider;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Job;
@@ -31,16 +30,6 @@ import org.camunda.bpm.engine.test.Deployment;
 public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
 
   protected static final int EXPECTED_DEFAULT_PRIORITY = 0;
-
-  protected void setUp() throws Exception {
-    processEngineConfiguration.setProducePrioritizedJobs(true);
-    processEngineConfiguration.setJobPriorityProvider(new DefaultJobPriorityProvider());
-  }
-
-  protected void tearDown() throws Exception {
-    processEngineConfiguration.setProducePrioritizedJobs(false);
-    processEngineConfiguration.setJobPriorityProvider(null);
-  }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/asyncTaskProcess.bpmn20.xml")
   public void testSetJobDefinitionPriority() {

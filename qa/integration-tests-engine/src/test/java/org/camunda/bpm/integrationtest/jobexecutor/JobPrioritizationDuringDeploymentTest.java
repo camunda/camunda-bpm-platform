@@ -12,11 +12,6 @@
  */
 package org.camunda.bpm.integrationtest.jobexecutor;
 
-import org.camunda.bpm.BpmPlatform;
-import org.camunda.bpm.ProcessEngineService;
-import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.integrationtest.jobexecutor.beans.PriorityBean;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
@@ -41,10 +36,6 @@ import org.junit.runner.RunWith;
 @Ignore
 public class JobPrioritizationDuringDeploymentTest extends AbstractFoxPlatformIntegrationTest {
 
-  protected ProcessEngine engine1;
-  protected RuntimeService runtimeService1;
-  protected ManagementService managementService1;
-
   @ArquillianResource
   protected Deployer deployer;
 
@@ -56,7 +47,7 @@ public class JobPrioritizationDuringDeploymentTest extends AbstractFoxPlatformIn
   // deploy this manually
   @Deployment(name="timerStart", managed = false)
   public static WebArchive createTimerStartDeployment() {
-    return initWebArchiveDeployment("pa1.war", "org/camunda/bpm/integrationtest/jobexecutor/jobPriorityEngine.xml")
+    return initWebArchiveDeployment()
       .addClass(PriorityBean.class)
       .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/JobPrioritizationDuringDeploymentTest.timerStart.bpmn20.xml");
 
@@ -80,19 +71,10 @@ public class JobPrioritizationDuringDeploymentTest extends AbstractFoxPlatformIn
   @InSequence(2)
   public void testAssertPriority() {
 
-    lookupDeployedEngine();
-
     // then the timer start event job has the priority resolved from the bean
-    Job job = managementService1.createJobQuery().activityId("timerStart").singleResult();
+    Job job = managementService.createJobQuery().activityId("timerStart").singleResult();
 
     Assert.assertNotNull(job);
     Assert.assertEquals(PriorityBean.PRIORITY, job.getPriority());
-  }
-
-  protected void lookupDeployedEngine() {
-    ProcessEngineService engineService = BpmPlatform.getProcessEngineService();
-    engine1 = engineService.getProcessEngine("engine1");
-    runtimeService1 = engine1.getRuntimeService();
-    managementService1 = engine1.getManagementService();
   }
 }

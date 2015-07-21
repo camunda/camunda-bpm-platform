@@ -12,12 +12,6 @@
  */
 package org.camunda.bpm.integrationtest.jobexecutor;
 
-import org.camunda.bpm.BpmPlatform;
-import org.camunda.bpm.ProcessEngineService;
-import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.TransitionInstance;
@@ -29,7 +23,6 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -40,25 +33,11 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class JobPrioritizationTest extends AbstractFoxPlatformIntegrationTest {
 
-  protected ProcessEngine engine1;
-  protected RuntimeService runtimeService1;
-  protected ManagementService managementService1;
-  protected TaskService taskService1;
-
   protected ProcessInstance processInstance;
-
-  @Before
-  public void setEngines() {
-    ProcessEngineService engineService = BpmPlatform.getProcessEngineService();
-    engine1 = engineService.getProcessEngine("engine1");
-    runtimeService1 = engine1.getRuntimeService();
-    managementService1 = engine1.getManagementService();
-    taskService1 = engine1.getTaskService();
-  }
 
   @Deployment
   public static WebArchive createDeployment() {
-    return initWebArchiveDeployment("pa1.war", "org/camunda/bpm/integrationtest/jobexecutor/jobPriorityEngine.xml")
+    return initWebArchiveDeployment()
       .addClass(PriorityBean.class)
       .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/JobPrioritizationTest.priorityProcess.bpmn20.xml")
       .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/JobPrioritizationTest.serviceTask.bpmn20.xml")
@@ -69,16 +48,16 @@ public class JobPrioritizationTest extends AbstractFoxPlatformIntegrationTest {
   @After
   public void tearDown() {
     if (processInstance != null) {
-      runtimeService1.deleteProcessInstance(processInstance.getId(), "");
+      runtimeService.deleteProcessInstance(processInstance.getId(), "");
     }
   }
 
   @Test
   public void testPriorityOnProcessElement() {
     // given
-    processInstance = runtimeService1.startProcessInstanceByKey("priorityProcess");
+    processInstance = runtimeService.startProcessInstanceByKey("priorityProcess");
 
-    Job job = managementService1.createJobQuery().singleResult();
+    Job job = managementService.createJobQuery().singleResult();
 
     // then
     Assert.assertEquals(PriorityBean.PRIORITY, job.getPriority());
@@ -89,9 +68,9 @@ public class JobPrioritizationTest extends AbstractFoxPlatformIntegrationTest {
   public void testPriorityOnProcessStart() {
 
     // given
-    processInstance = runtimeService1.startProcessInstanceByKey("serviceTaskProcess");
+    processInstance = runtimeService.startProcessInstanceByKey("serviceTaskProcess");
 
-    Job job = managementService1.createJobQuery().singleResult();
+    Job job = managementService.createJobQuery().singleResult();
 
     // then
     Assert.assertEquals(PriorityBean.PRIORITY, job.getPriority());
@@ -101,19 +80,19 @@ public class JobPrioritizationTest extends AbstractFoxPlatformIntegrationTest {
   public void testPriorityOnModification() {
 
     // given
-    processInstance = runtimeService1.startProcessInstanceByKey("serviceTaskProcess");
+    processInstance = runtimeService.startProcessInstanceByKey("serviceTaskProcess");
 
-    TransitionInstance transitionInstance = runtimeService1.getActivityInstance(processInstance.getId())
+    TransitionInstance transitionInstance = runtimeService.getActivityInstance(processInstance.getId())
         .getTransitionInstances("serviceTask")[0];
 
     // when
-    runtimeService1.createProcessInstanceModification(processInstance.getId())
+    runtimeService.createProcessInstanceModification(processInstance.getId())
       .startBeforeActivity("serviceTask")
       .cancelTransitionInstance(transitionInstance.getId())
       .execute();
 
     // then
-    Job job = managementService1.createJobQuery().singleResult();
+    Job job = managementService.createJobQuery().singleResult();
     Assert.assertEquals(PriorityBean.PRIORITY, job.getPriority());
   }
 
@@ -121,39 +100,39 @@ public class JobPrioritizationTest extends AbstractFoxPlatformIntegrationTest {
   public void testPriorityOnInstantiationAtActivity() {
 
     // when
-    processInstance = runtimeService1.createProcessInstanceByKey("serviceTaskProcess")
+    processInstance = runtimeService.createProcessInstanceByKey("serviceTaskProcess")
       .startBeforeActivity("serviceTask")
       .execute();
 
     // then
-    Job job = managementService1.createJobQuery().singleResult();
+    Job job = managementService.createJobQuery().singleResult();
     Assert.assertEquals(PriorityBean.PRIORITY, job.getPriority());
   }
 
   @Test
   public void testPriorityOnAsyncAfterUserTask() {
     // given
-    processInstance = runtimeService1.startProcessInstanceByKey("userTaskProcess");
-    Task task = taskService1.createTaskQuery().singleResult();
+    processInstance = runtimeService.startProcessInstanceByKey("userTaskProcess");
+    Task task = taskService.createTaskQuery().singleResult();
 
     // when
-    taskService1.complete(task.getId());
+    taskService.complete(task.getId());
 
     // then
-    Job asyncAfterJob = managementService1.createJobQuery().singleResult();
+    Job asyncAfterJob = managementService.createJobQuery().singleResult();
     Assert.assertEquals(PriorityBean.PRIORITY, asyncAfterJob.getPriority());
   }
 
   @Test
   public void testPriorityOnAsyncAfterIntermediateCatchEvent() {
     // given
-    processInstance = runtimeService1.startProcessInstanceByKey("intermediateMessageProcess");
+    processInstance = runtimeService.startProcessInstanceByKey("intermediateMessageProcess");
 
     // when
-    runtimeService1.correlateMessage("Message");
+    runtimeService.correlateMessage("Message");
 
     // then
-    Job asyncAfterJob = managementService1.createJobQuery().singleResult();
+    Job asyncAfterJob = managementService.createJobQuery().singleResult();
     Assert.assertEquals(PriorityBean.PRIORITY, asyncAfterJob.getPriority());
   }
 

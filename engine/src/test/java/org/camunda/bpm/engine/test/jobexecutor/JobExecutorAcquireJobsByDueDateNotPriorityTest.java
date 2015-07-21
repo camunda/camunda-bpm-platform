@@ -2,7 +2,6 @@ package org.camunda.bpm.engine.test.jobexecutor;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.test.Deployment;
 
@@ -14,10 +13,6 @@ public class JobExecutorAcquireJobsByDueDateNotPriorityTest extends AbstractJobE
 
   protected boolean isJobExecutorPreferOldJobs() {
     return true;
-  }
-
-  protected void configure(ProcessEngineConfiguration configuration) {
-    configuration.setProducePrioritizedJobs(true);
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/jobexecutor/jobPrioProcess.bpmn20.xml")

@@ -136,7 +136,7 @@ public abstract class ProcessEngineConfiguration {
   protected boolean jobExecutorAcquireByDueDate = false;
   protected boolean jobExecutorAcquireByPriority = false;
 
-  protected boolean producePrioritizedJobs = false;
+  protected boolean producePrioritizedJobs = true;
 
   /**
    * The flag will be used inside the method "JobManager#send()". It will be used to decide whether to notify the
