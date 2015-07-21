@@ -41,6 +41,11 @@ public class ModelBuilderImpl extends ModelBuilder {
     model = new ModelImpl(modelName);
   }
 
+  public ModelBuilder alternativeNamespace(String alternativeNs, String actualNs) {
+    model.declareAlternativeNamespace(alternativeNs, actualNs);
+    return this;
+  }
+
   public ModelElementTypeBuilder defineType(Class<? extends ModelElementInstance> modelInstanceType, String typeName) {
     ModelElementTypeBuilderImpl typeBuilder = new ModelElementTypeBuilderImpl(modelInstanceType, typeName, model);
     typeBuilders.add(typeBuilder);

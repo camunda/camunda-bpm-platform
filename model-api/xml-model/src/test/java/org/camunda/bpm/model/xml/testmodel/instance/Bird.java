@@ -14,8 +14,11 @@ package org.camunda.bpm.model.xml.testmodel.instance;
 
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
+import org.camunda.bpm.model.xml.testmodel.TestModelConstants;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
+import org.camunda.bpm.model.xml.type.attribute.Attribute;
+import org.camunda.bpm.model.xml.type.child.ChildElement;
 import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 import org.camunda.bpm.model.xml.type.reference.ElementReference;
@@ -35,6 +38,8 @@ public class Bird extends FlyingAnimal {
   protected static ChildElementCollection<Egg> eggColl;
   protected static ElementReference<Bird, SpouseRef> spouseRefsColl;
   protected static ElementReferenceCollection<Egg, GuardEgg> guardEggRefCollection;
+  protected static Attribute<Boolean> canHazExtendedWings;
+  protected static ChildElement<Wings> wings;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Bird.class, ELEMENT_NAME_BIRD)
@@ -60,6 +65,13 @@ public class Bird extends FlyingAnimal {
     guardEggRefCollection = sequence.elementCollection(GuardEgg.class)
       .idsElementReferenceCollection(Egg.class)
       .build();
+
+    canHazExtendedWings = typeBuilder.booleanAttribute("canHazExtendedWings")
+    .namespace(TestModelConstants.NEWER_NAMESPACE)
+    .build();
+
+    wings = sequence.element(Wings.class)
+        .build();
 
     typeBuilder.build();
 
@@ -95,6 +107,22 @@ public class Bird extends FlyingAnimal {
 
   public Collection<GuardEgg> getGuardedEggRefs() {
     return guardEggRefCollection.getReferenceSourceCollection().get(this);
+  }
+
+  public Boolean canHazExtendedWings(){
+    return canHazExtendedWings.getValue(this);
+  }
+
+  public void setCanHazExtendedWings(boolean b){
+    canHazExtendedWings.setValue(this, b);
+  }
+
+  public Wings getWings(){
+    return wings.getChild(this);
+  }
+
+  public void setWings(Wings w){
+    wings.setChild(this, w);
   }
 
 }

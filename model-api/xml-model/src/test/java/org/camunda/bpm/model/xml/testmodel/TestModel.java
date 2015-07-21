@@ -47,6 +47,8 @@ public final class TestModel {
       Egg.registerType(modelBuilder);
       FlightInstructor.registerType(modelBuilder);
 
+      Wings.registerType(modelBuilder);
+
       model = modelBuilder.build();
     }
 

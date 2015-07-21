@@ -12,8 +12,16 @@
  */
 package org.camunda.bpm.model.xml.impl.instance;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.ModelException;
+import org.camunda.bpm.model.xml.impl.ModelImpl;
 import org.camunda.bpm.model.xml.impl.ModelInstanceImpl;
 import org.camunda.bpm.model.xml.impl.type.ModelElementTypeImpl;
 import org.camunda.bpm.model.xml.impl.type.attribute.AttributeImpl;
@@ -25,10 +33,6 @@ import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 import org.camunda.bpm.model.xml.type.attribute.Attribute;
 import org.camunda.bpm.model.xml.type.reference.Reference;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * Base class for implementing Model Elements.
@@ -111,17 +115,26 @@ public class ModelElementInstanceImpl implements ModelElementInstance {
   }
 
   public void setAttributeValueNs(String namespaceUri, String attributeName, String xmlValue, boolean isIdAttribute) {
-    String oldValue = getAttributeValueNs(namespaceUri, attributeName);
+    String namespaceForSetting = namespaceUri;
+    if (hasValueToBeSetForAlternativeNs(namespaceUri, attributeName)) {
+      namespaceForSetting = ((ModelImpl) modelInstance.getModel()).getAlternativeNamespace(namespaceUri);
+    }
+    String oldValue = getAttributeValueNs(namespaceForSetting, attributeName);
     if (isIdAttribute) {
-      domElement.setIdAttribute(namespaceUri, attributeName, xmlValue);
+      domElement.setIdAttribute(namespaceForSetting, attributeName, xmlValue);
     }
     else {
-      domElement.setAttribute(namespaceUri, attributeName, xmlValue);
+      domElement.setAttribute(namespaceForSetting, attributeName, xmlValue);
     }
     Attribute<?> attribute = elementType.getAttribute(attributeName);
     if (attribute != null) {
       ((AttributeImpl<?>) attribute).updateIncomingReferences(this, xmlValue, oldValue);
     }
+  }
+
+  private boolean hasValueToBeSetForAlternativeNs(String namespaceUri, String attributeName) {
+    String alternativeNs = ((ModelImpl) modelInstance.getModel()).getAlternativeNamespace(namespaceUri);
+    return getAttributeValueNs(namespaceUri, attributeName) == null && alternativeNs != null && getAttributeValueNs(alternativeNs, attributeName) != null;
   }
 
   public void removeAttribute(String attributeName) {
@@ -159,8 +172,8 @@ public class ModelElementInstanceImpl implements ModelElementInstance {
   }
 
   public ModelElementInstance getUniqueChildElementByNameNs(String namespaceUri, String elementName) {
-    List<DomElement> childElements = domElement.getChildElementsByNameNs(namespaceUri, elementName);
-
+    ModelImpl model = (ModelImpl) modelInstance.getModel();
+    List<DomElement> childElements = domElement.getChildElementsByNameNs(asSet(namespaceUri, model.getAlternativeNamespace(namespaceUri)), elementName);
     if(!childElements.isEmpty()) {
       return ModelUtil.getModelElement(childElements.get(0), modelInstance);
     } else {
@@ -258,7 +271,9 @@ public class ModelElementInstanceImpl implements ModelElementInstance {
     for (ModelElementType extendingType : childElementType.getExtendingTypes()) {
       instances.addAll(getChildElementsByType(extendingType));
     }
-    List<DomElement> elements = domElement.getChildElementsByNameNs(childElementType.getTypeNamespace(), childElementType.getTypeName());
+    ModelImpl model = (ModelImpl) modelInstance.getModel();
+    String alternativeNamespace = model.getAlternativeNamespace(childElementType.getTypeNamespace());
+    List<DomElement> elements = domElement.getChildElementsByNameNs(asSet(childElementType.getTypeNamespace(), alternativeNamespace), childElementType.getTypeName());
     instances.addAll(ModelUtil.getModelElementCollection(elements, modelInstance));
     return instances;
   }
@@ -330,6 +345,10 @@ public class ModelElementInstanceImpl implements ModelElementInstance {
         ((ModelElementInstanceImpl) childElement).unlinkAllReferences();
       }
     }
+  }
+
+  protected <T> Set<T> asSet(T... elements){
+    return new HashSet<T>(Arrays.asList(elements));
   }
 
   @Override

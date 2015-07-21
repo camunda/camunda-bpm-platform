@@ -20,12 +20,14 @@ public abstract class TestModelConstants {
 
   public static final String MODEL_NAME = "animals";
   public static final String MODEL_NAMESPACE = "http://camunda.org/animals";
+  public static final String NEWER_NAMESPACE = "http://camunda.org/electronic";
 
   public static final String TYPE_NAME_ANIMAL = "animal";
   public static final String TYPE_NAME_FLYING_ANIMAL = "flyingAnimal";
   public static final String TYPE_NAME_CHILD_RELATIONSHIP_DEFINITION = "childRelationshipDefinition";
   public static final String TYPE_NAME_FRIEND_RELATIONSHIP_DEFINITION = "friendRelationshipDefinition";
   public static final String TYPE_NAME_RELATIONSHIP_DEFINITION = "relationshipDefinition";
+  public static final String TYPE_NAME_WINGS = "wings";
 
   public static final String ELEMENT_NAME_ANIMALS = "animals";
   public static final String ELEMENT_NAME_BIRD = "bird";

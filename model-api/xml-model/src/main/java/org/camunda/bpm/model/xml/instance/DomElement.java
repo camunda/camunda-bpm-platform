@@ -14,6 +14,7 @@
 package org.camunda.bpm.model.xml.instance;
 
 import java.util.List;
+import java.util.Set;
 
 import org.camunda.bpm.model.xml.ModelException;
 import org.camunda.bpm.model.xml.impl.ModelInstanceImpl;
@@ -80,7 +81,14 @@ public interface DomElement {
    *
    * @return the list of child elements
    */
-  List<DomElement> getChildElementsByNameNs(String namespaceUri, String elementName);
+  List<DomElement> getChildElementsByNameNs(String namespaceUris, String elementName);
+
+  /**
+   * Returns all child elements of this element with specific namespaces + name.
+   *
+   * @return the list of child elements
+   */
+  List<DomElement> getChildElementsByNameNs(Set<String> namespaceUris, String elementName);
 
   /**
    * Returns all child elements of this element with a specific type.

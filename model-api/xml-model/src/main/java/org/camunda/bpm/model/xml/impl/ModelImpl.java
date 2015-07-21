@@ -12,16 +12,16 @@
  */
 package org.camunda.bpm.model.xml.impl;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.impl.util.ModelUtil;
 import org.camunda.bpm.model.xml.impl.util.QName;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * A model contains all defined types and the relationship between them.
@@ -35,12 +35,49 @@ public class ModelImpl implements Model {
   private final Map<Class<? extends ModelElementInstance>, ModelElementType> typesByClass = new HashMap<Class<? extends ModelElementInstance>, ModelElementType>();
   private final String modelName;
 
+  protected final Map<String, String> actualNsToAlternative = new HashMap<String, String>();
+  protected final Map<String, String> alternativeNsToActual = new HashMap<String, String>();
+
   /**
    * Create a new {@link Model} with a model name.
    * @param modelName  the model name to identify the model
    */
   public ModelImpl(String modelName) {
     this.modelName = modelName;
+  }
+
+  /**
+   * Declares an alternative namespace for an actual so that during lookup of elements/attributes both will be considered.
+   * This can be used if a newer namespaces replaces an older one but XML files with the old one should still be parseable.
+   * @param alternativeNs
+   * @param actualNs
+   * @throws IllegalArgumentException if the alternative is already used or if the actual namespace has an alternative
+   */
+  public void declareAlternativeNamespace(String alternativeNs, String actualNs) {
+    if(actualNsToAlternative.containsKey(actualNs) || alternativeNsToActual.containsKey(alternativeNs)){
+      throw new IllegalArgumentException("Cannot register two alternatives for one namespace! Actual Ns: " + actualNs + " second alternative: " + alternativeNs);
+    }
+    actualNsToAlternative.put(actualNs, alternativeNs);
+    alternativeNsToActual.put(alternativeNs, actualNs);
+  }
+
+  public void undeclareAlternativeNamespace(String alternativeNs){
+    if(!alternativeNsToActual.containsKey(alternativeNs)){
+      return;
+    }
+    String actual = alternativeNsToActual.remove(alternativeNs);
+    actualNsToAlternative.remove(actual);
+  }
+
+  public String getAlternativeNamespace(String actualNs) {
+    return actualNsToAlternative.get(actualNs);
+  }
+
+  public String getActualNamespace(String alternativeNs) {
+    if(alternativeNsToActual.containsKey(alternativeNs)){
+      return alternativeNsToActual.get(alternativeNs);
+    }
+    return alternativeNs;
   }
 
   public Collection<ModelElementType> getTypes() {
@@ -104,4 +141,5 @@ public class ModelImpl implements Model {
     }
     return true;
   }
+
 }

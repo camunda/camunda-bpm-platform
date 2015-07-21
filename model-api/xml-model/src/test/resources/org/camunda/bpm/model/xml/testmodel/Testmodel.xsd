@@ -18,6 +18,8 @@
     <sequence>
       <element ref="tns:relationshipDefinition" minOccurs="0" maxOccurs="unbounded"/>
       <element name="relationshipDefinitionRef" type="QName" minOccurs="0" maxOccurs="unbounded"/>
+      <!-- for the alternative ns test we need the chance to have children from other namespaces -->
+      <any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded" />
     </sequence>
     <attribute name="id" type="ID"/>
     <attribute name="name" type="string"/>

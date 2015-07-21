@@ -22,7 +22,9 @@ import org.camunda.bpm.model.xml.instance.DomElement;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.w3c.dom.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
 import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
@@ -112,6 +114,17 @@ public class DomElementImpl implements DomElement {
       NodeList childNodes = element.getChildNodes();
       return DomUtil.filterNodeListByName(childNodes, namespaceUri, elementName);
     }
+  }
+
+  @Override
+  public List<DomElement> getChildElementsByNameNs(Set<String> namespaceUris, String elementName) {
+    List<DomElement> result = new ArrayList<DomElement>();
+    for (String namespace : namespaceUris) {
+      if (namespace != null) {
+        result.addAll(getChildElementsByNameNs(namespace, elementName));
+      }
+    }
+    return result;
   }
 
   public List<DomElement> getChildElementsByType(ModelInstanceImpl modelInstance, Class<? extends ModelElementInstance> elementType) {

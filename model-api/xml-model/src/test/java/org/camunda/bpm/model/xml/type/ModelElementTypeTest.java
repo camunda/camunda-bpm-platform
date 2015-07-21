@@ -77,7 +77,7 @@ public class ModelElementTypeTest {
     assertThat(animalsType).hasNoAttributes();
     assertThat(animalType).hasAttributes("id", "name", "father", "mother", "isEndangered", "gender", "age");
     assertThat(flyingAnimalType).hasAttributes("wingspan");
-    assertThat(birdType).hasNoAttributes();
+    assertThat(birdType).hasAttributes("canHazExtendedWings");
   }
 
   @Test
