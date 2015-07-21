@@ -120,4 +120,8 @@ public final class DmnModelConstants {
   public static final String FEEL_ELEMENT_COLUMN = "column";
   public static final String FEEL_ELEMENT_CONTEXT_ENTRY = "contextEntry";
 
+  /** camunda extensions */
+
+  public static final String CAMUNDA_ATTRIBUTE_OUTPUT = "output";
+
 }

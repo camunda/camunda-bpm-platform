@@ -13,8 +13,12 @@
 
 package org.camunda.bpm.model.dmn.instance;
 
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.CAMUNDA_NS;
+
 import java.util.Arrays;
 import java.util.Collection;
+
+import org.camunda.bpm.model.dmn.impl.DmnModelConstants;
 
 public class ClauseTest extends DmnModelElementInstanceTest {
 
@@ -33,7 +37,9 @@ public class ClauseTest extends DmnModelElementInstanceTest {
 
   public Collection<AttributeAssumption> getAttributesAssumptions() {
     return Arrays.asList(
-      new AttributeAssumption("isOrdered", false, false, false)
+      new AttributeAssumption("isOrdered", false, false, false),
+      // camunda extensions
+      new AttributeAssumption(CAMUNDA_NS, "output")
     );
   }
 

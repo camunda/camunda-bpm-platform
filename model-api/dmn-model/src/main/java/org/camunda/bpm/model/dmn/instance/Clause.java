@@ -33,4 +33,10 @@ public interface Clause extends DmnElement {
 
   Collection<OutputEntry> getOutputEntries();
 
+  // camunda extensions
+
+  void setCamundaOutput(String output);
+
+  String getCamundaOutput();
+
 }

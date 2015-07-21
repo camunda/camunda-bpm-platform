@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.model.dmn.impl;
 
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.CAMUNDA_ATTRIBUTE_OUTPUT;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.CAMUNDA_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN10_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ATTRIBUTE_IS_ORDERED;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ATTRIBUTE_NAME;
@@ -44,6 +46,9 @@ public class ClauseImpl extends DmnElementImpl implements Clause {
   protected static ChildElementCollection<InputEntry> inputEntryCollection;
   protected static ElementReference<ItemDefinition, OutputDefinitionReference> outputDefinitionRefChild;
   protected static ChildElementCollection<OutputEntry> outputEntryCollection;
+
+  // camunda extensions
+  protected static Attribute<String> camundaOutput;
 
   public ClauseImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
@@ -81,6 +86,16 @@ public class ClauseImpl extends DmnElementImpl implements Clause {
     return outputEntryCollection.get(this);
   }
 
+  // camunda extensions
+
+  public void setCamundaOutput(String output) {
+    camundaOutput.setValue(this, output);
+  }
+
+  public String getCamundaOutput() {
+    return camundaOutput.getValue(this);
+  }
+
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Clause.class, DMN_ELEMENT_CLAUSE)
       .namespaceUri(DMN10_NS)
@@ -108,6 +123,12 @@ public class ClauseImpl extends DmnElementImpl implements Clause {
       .build();
 
     outputEntryCollection = sequenceBuilder.elementCollection(OutputEntry.class)
+      .build();
+
+    // camunda extensions
+
+    camundaOutput = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_OUTPUT)
+      .namespace(CAMUNDA_NS)
       .build();
 
     typeBuilder.build();
