@@ -177,10 +177,12 @@ public class DeploymentCache {
 
   public void removeProcessDefinition(String processDefinitionId) {
     processDefinitionCache.remove(processDefinitionId);
+    bpmnModelInstanceCache.remove(processDefinitionId);
   }
 
   public void discardProcessDefinitionCache() {
     processDefinitionCache.clear();
+    bpmnModelInstanceCache.clear();
   }
 
   // CASE DEFINITION ////////////////////////////////////////////////////////////////////////////////
@@ -323,10 +325,12 @@ public class DeploymentCache {
 
   public void removeCaseDefinition(String caseDefinitionId) {
     caseDefinitionCache.remove(caseDefinitionId);
+    cmmnModelInstanceCache.remove(caseDefinitionId);
   }
 
   public void discardCaseDefinitionCache() {
     caseDefinitionCache.clear();
+    cmmnModelInstanceCache.clear();
   }
 
   // getters and setters //////////////////////////////////////////////////////

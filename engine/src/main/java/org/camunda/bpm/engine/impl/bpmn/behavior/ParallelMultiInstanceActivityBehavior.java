@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
  */
 public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivityBehavior {
 
+  @Override
   protected void createInstances(ActivityExecution execution, int nrOfInstances) throws Exception {
     PvmActivity nestedActivity = execution.getActivity().getActivities().get(0);
 
@@ -58,6 +59,7 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
     scopeExecution.inactivate();
   }
 
+  @Override
   public void concurrentChildExecutionEnded(ActivityExecution scopeExecution, ActivityExecution endedExecution) {
 
     int nrOfCompletedInstances = getLoopVariable(scopeExecution, NUMBER_OF_COMPLETED_INSTANCES) + 1;
@@ -93,13 +95,15 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
   }
 
   protected boolean allExecutionsEnded(ActivityExecution scopeExecution, ActivityExecution endedExecution) {
-    return endedExecution.findInactiveConcurrentExecutions(endedExecution.getActivity()).size() == scopeExecution.getExecutions().size();
+    return getLocalLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES) <= 0;
   }
 
+  @Override
   public void complete(ActivityExecution scopeExecution) {
     // can't happen
   }
 
+  @Override
   public ActivityExecution initializeScope(ActivityExecution scopeExecution) {
 
     prepareScopeExecution(scopeExecution, 1);
@@ -114,6 +118,7 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
     return concurrentChild;
   }
 
+  @Override
   public void concurrentExecutionCreated(ActivityExecution scopeExecution, ActivityExecution concurrentExecution) {
     int nrOfInstances = getLoopVariable(scopeExecution, NUMBER_OF_INSTANCES);
     setLoopVariable(scopeExecution, NUMBER_OF_INSTANCES, nrOfInstances + 1);
@@ -123,6 +128,7 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
     setLoopVariable(concurrentExecution, LOOP_COUNTER, nrOfInstances);
   }
 
+  @Override
   public void concurrentExecutionDeleted(ActivityExecution scopeExecution, ActivityExecution concurrentExecution) {
     int nrOfActiveInstances = getLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES);
     setLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES, nrOfActiveInstances - 1);

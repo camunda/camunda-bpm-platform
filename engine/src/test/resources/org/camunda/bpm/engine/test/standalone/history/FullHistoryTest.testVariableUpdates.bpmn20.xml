@@ -1,35 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions id="definitions" 
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
   
   <process id="receiveTask">
   
     <extensionElements>
-      <activiti:executionListener class="org.camunda.bpm.engine.test.standalone.history.VariableUpdateExecutionListener" event="start">
-        <activiti:field name="varName" stringValue="zVar1" />
-      </activiti:executionListener>
+      <camunda:executionListener class="org.camunda.bpm.engine.test.standalone.history.VariableUpdateExecutionListener" event="start">
+        <camunda:field name="varName" stringValue="zVar1" />
+      </camunda:executionListener>
     </extensionElements>
   
     <startEvent id="theStart" />
     
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="serviceTask">
       <extensionElements>
-        <activiti:executionListener class="org.camunda.bpm.engine.test.standalone.history.VariableUpdateExecutionListener">
-          <activiti:field name="varName" stringValue="zVar2" />
-        </activiti:executionListener>
+        <camunda:executionListener class="org.camunda.bpm.engine.test.standalone.history.VariableUpdateExecutionListener">
+          <camunda:field name="varName" stringValue="zVar2" />
+        </camunda:executionListener>
       </extensionElements>
     </sequenceFlow>
 
-    <serviceTask id="serviceTask" activiti:class="org.camunda.bpm.engine.test.standalone.history.VariableUpdateDelegate">
+    <serviceTask id="serviceTask" camunda:class="org.camunda.bpm.engine.test.standalone.history.VariableUpdateDelegate">
       <extensionElements>
-        <activiti:executionListener class="org.camunda.bpm.engine.test.standalone.history.VariableUpdateExecutionListener" event="start">
-          <activiti:field name="varName" stringValue="zVar3" />
-        </activiti:executionListener>
-        <activiti:executionListener class="org.camunda.bpm.engine.test.standalone.history.VariableUpdateExecutionListener" event="end">
-          <activiti:field name="varName" stringValue="zVar4" />
-        </activiti:executionListener>
+        <camunda:executionListener class="org.camunda.bpm.engine.test.standalone.history.VariableUpdateExecutionListener" event="start">
+          <camunda:field name="varName" stringValue="zVar3" />
+        </camunda:executionListener>
+        <camunda:executionListener class="org.camunda.bpm.engine.test.standalone.history.VariableUpdateExecutionListener" event="end">
+          <camunda:field name="varName" stringValue="zVar4" />
+        </camunda:executionListener>
       </extensionElements>
     </serviceTask>
     

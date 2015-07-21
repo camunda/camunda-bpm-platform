@@ -2,7 +2,7 @@
 <definitions id="definitions" 
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples"
   xmlns:tns="Examples">
   
@@ -27,15 +27,15 @@
      </sequenceFlow>
      
      <endEvent id="expressionEnd">
-       <messageEventDefinition activiti:expression="#{endEventBean.getJavaDelegate().execute(execution)}" />
+       <messageEventDefinition camunda:expression="#{endEventBean.getJavaDelegate().execute(execution)}" />
      </endEvent>
 
      <endEvent id="delegateExpressionEnd">
-       <messageEventDefinition activiti:delegateExpression="#{endEventBean.getJavaDelegate()}" />
+       <messageEventDefinition camunda:delegateExpression="#{endEventBean.getJavaDelegate()}" />
      </endEvent>
   
      <endEvent id="classEnd">
-       <messageEventDefinition activiti:class="org.camunda.bpm.engine.test.bpmn.event.end.DummyServiceTask" />
+       <messageEventDefinition camunda:class="org.camunda.bpm.engine.test.bpmn.event.end.DummyServiceTask" />
      </endEvent>
     
   </process>

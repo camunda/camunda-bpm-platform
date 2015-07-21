@@ -120,8 +120,6 @@ import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.BooleanValue;
 import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.type.TypeFactory;
 import org.fest.assertions.Assertions;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
@@ -130,6 +128,8 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.path.json.JsonPath;
 import com.jayway.restassured.response.Response;
@@ -3432,7 +3432,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     given()
       .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
-      .multiPart("data", "unspecified", bytes)
+      .multiPart("data", null, bytes)
       .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
@@ -3451,7 +3451,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     given()
       .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
-      .multiPart("data", "unspecified", bytes)
+      .multiPart("data", null, bytes)
       .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
@@ -3540,7 +3540,6 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   public void testPostSingleLocalFileVariableWithEncodingAndMimeType() throws Exception {
 
     byte[] value = "some text".getBytes();
-    String base64 = Base64.encodeBase64String(value);
     String variableKey = "aVariableKey";
     String encoding = "utf-8";
     String filename = "test.txt";
@@ -3548,10 +3547,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     given()
       .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
-      .multiPart("data", base64, MediaType.TEXT_PLAIN)
-      .multiPart("filename", filename, MediaType.TEXT_PLAIN)
-      .multiPart("mimetype", mimetype, MediaType.TEXT_PLAIN)
-      .multiPart("encoding", encoding, MediaType.TEXT_PLAIN)
+      .multiPart("data", filename, value, mimetype + "; encoding="+encoding)
       .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
@@ -3579,9 +3575,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     given()
       .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
-      .multiPart("data", base64, MediaType.TEXT_PLAIN)
-      .multiPart("filename", filename, MediaType.TEXT_PLAIN)
-      .multiPart("mimetype", mimetype, MediaType.TEXT_PLAIN)
+      .multiPart("data", filename, value, mimetype)
       .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
@@ -3602,30 +3596,19 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
   public void testPostSingleLocalFileVariableWithEncoding() throws Exception {
 
     byte[] value = "some text".getBytes();
-    String base64 = Base64.encodeBase64String(value);
     String variableKey = "aVariableKey";
     String encoding = "utf-8";
     String filename = "test.txt";
 
     given()
       .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
-      .multiPart("data", base64, MediaType.TEXT_PLAIN)
-      .multiPart("filename", filename, MediaType.TEXT_PLAIN)
-      .multiPart("encoding", encoding, MediaType.TEXT_PLAIN)
+      .multiPart("data", filename, value, "encoding="+encoding)
       .header("accept", MediaType.APPLICATION_JSON)
     .expect()
-      .statusCode(Status.NO_CONTENT.getStatusCode())
+      //when the user passes an encoding, he has to provide the type, too
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
     .when()
       .post(SINGLE_TASK_SINGLE_BINARY_VARIABLE_URL);
-
-    ArgumentCaptor<FileValue> captor = ArgumentCaptor.forClass(FileValue.class);
-    verify(taskServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_TASK_ID), eq(variableKey),
-        captor.capture());
-    FileValue captured = captor.getValue();
-    assertThat(captured.getEncoding(), is(encoding));
-    assertThat(captured.getFilename(), is(filename));
-    assertThat(captured.getMimeType(), is(nullValue()));
-    assertThat(IoUtil.readInputStream(captured.getValue(), null), is(value));
   }
 
   @Test
@@ -3636,7 +3619,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
     given()
       .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
-      .multiPart("filename", filename, MediaType.TEXT_PLAIN)
+      .multiPart("data", filename, new byte[0])
       .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
@@ -3649,23 +3632,8 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     FileValue captured = captor.getValue();
     assertThat(captured.getEncoding(), is(nullValue()));
     assertThat(captured.getFilename(), is(filename));
-    assertThat(captured.getMimeType(), is(nullValue()));
-    assertThat(captured.getValue(), is(nullValue()));
-  }
-
-  @Test
-  public void testPostSingleLocalFileVariableWithoutFilename() throws Exception {
-
-    String variableKey = "aVariableKey";
-
-    given()
-      .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
-      .multiPart("filename", "", MediaType.TEXT_PLAIN)
-      .header("accept", MediaType.APPLICATION_JSON)
-    .expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode())
-    .when()
-      .post(SINGLE_TASK_SINGLE_BINARY_VARIABLE_URL);
+    assertThat(captured.getMimeType(), is(MediaType.APPLICATION_OCTET_STREAM));
+    assertThat(captured.getValue().available(), is(0));
   }
 
   @Test

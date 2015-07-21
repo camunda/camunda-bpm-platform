@@ -22,6 +22,8 @@ import java.util.Set;
 
 import org.camunda.bpm.engine.impl.EventSubscriptionQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.event.SignalEventHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.ProcessEventJobHandler;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 
@@ -45,6 +47,12 @@ public class EventSubscriptionManager extends AbstractManager {
     getDbEntityManager().delete(persistentObject);
     if(persistentObject instanceof SignalEventSubscriptionEntity) {
       createdSignalSubscriptions.remove(persistentObject);
+    }
+
+    // if the event subscription has been triggered asynchronously but not yet executed
+    List<JobEntity> asyncJobs = getJobManager().findJobsByConfiguration(ProcessEventJobHandler.TYPE, persistentObject.getId());
+    for (JobEntity asyncJob : asyncJobs) {
+      asyncJob.delete();
     }
   }
 

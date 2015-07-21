@@ -693,21 +693,32 @@ public interface ManagementService {
    *
    * @param jobId the id of the job to modify, must not be null
    * @param priority the job's new priority
+   *
+   * @throws AuthorizationException thrown if the current user does not possess any of the following permissions
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_INSTANCE}</li>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
    */
   void setJobPriority(String jobId, int priority);
 
   /**
-   * <p>Sets an explicit default priority for jobs of the given job definition.
+   * <p>Sets an explicit priority for jobs of the given job definition.
    * Jobs created after invoking this method receive the given priority.
    * This setting overrides any setting specified in the BPMN 2.0 XML.</p>
    *
-   * <p>The job definition priority can be reset to the value specified in the BPMN 2.0
-   * XML by using the method {@link #resetJobDefinitionPriority(String)}</p>
+   * <p>The overriding priority can be cleared by using the method
+   * {@link #clearOverridingJobPriorityForJobDefinition(String)}.</p>
    *
    * @param jobDefinitionId the id of the job definition to set the priority for
    * @param priority the priority to set;
+   *
+   * @throws AuthorizationException thrown if the current user does not possess any of the following permissions
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
    */
-  void setJobDefinitionPriority(String jobDefinitionId, int priority);
+  void setOverridingJobPriorityForJobDefinition(String jobDefinitionId, int priority);
 
   /**
    * <p>Sets an explicit default priority for jobs of the given job definition.
@@ -715,26 +726,43 @@ public interface ManagementService {
    * This setting overrides any setting specified in the BPMN 2.0 XML.</p>
    *
    * <p>If <code>cascade</code> is true, priorities of already existing jobs
-   * are changed accordingly.</p>
+   * are updated accordingly.</p>
    *
-   * <p>The job definition priority can be reset to the value specified in the BPMN 2.0
-   * XML by using the method {@link #resetJobDefinitionPriority(String)}</p>
+   * <p>The overriding priority can be cleared by using the method
+   * {@link #clearOverridingJobPriorityForJobDefinition(String)}.</p>
    *
    * @param jobDefinitionId the id of the job definition to set the priority for
    * @param priority the priority to set
-   * @param cascade if true, priorities of existing jobs of that definition are changed as well
+   * @param cascade if true, priorities of existing jobs of the given definition are changed as well
+   *
+   * @throws AuthorizationException thrown if the current user does not possess
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
+   *
+   *   If cascade is <code>true</code>, the user must further possess one of the following permissions:
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_INSTANCE}</li>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
    */
-  void setJobDefinitionPriority(String jobDefinitionId, int priority, boolean cascade);
+  void setOverridingJobPriorityForJobDefinition(String jobDefinitionId, int priority, boolean cascade);
 
   /**
-   * <p>Resets the job definition's priority back to default. New job's of that definition
-   * receive the priority as specified in the BPMN 2.0 XML or the global default priority.</p>
+   * <p>Clears the job definition's overriding job priority if set. After invoking this method,
+   * new jobs of the given definition receive the priority as specified in the BPMN 2.0 XML
+   * or the global default priority.</p>
    *
-   * <p>Existing job instance priorities remain unchanged</p>
+   * <p>Existing job instance priorities remain unchanged.</p>
    *
-   * @param jobDefinitionId the id of the job definition for which to reset the priority
+   * @param jobDefinitionId the id of the job definition for which to clear the overriding priority
+   *
+   * @throws AuthorizationException thrown if the current user does not possess any of the following permissions
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
    */
-  void resetJobDefinitionPriority(String jobDefinitionId);
+  void clearOverridingJobPriorityForJobDefinition(String jobDefinitionId);
 
   /**
    * Returns the full stacktrace of the exception that occurs when the job

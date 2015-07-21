@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions 
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
 
   <process id="exclusive">
@@ -15,11 +15,11 @@
     <sequenceFlow sourceRef="parallelGateway" targetRef="intermediateThrowEvent1" />
     <sequenceFlow sourceRef="parallelGateway" targetRef="intermediateThrowEvent2" />
 
-    <intermediateThrowEvent id="intermediateThrowEvent1" name="intermediateThrowEvent1" activiti:async="true">
+    <intermediateThrowEvent id="intermediateThrowEvent1" name="intermediateThrowEvent1" camunda:async="true">
       <messageEventDefinition id="testMessageDef1" messageRef="testMessage1" />
     </intermediateThrowEvent>
 
-    <intermediateThrowEvent id="intermediateThrowEvent2" name="intermediateThrowEvent2" activiti:async="true">
+    <intermediateThrowEvent id="intermediateThrowEvent2" name="intermediateThrowEvent2" camunda:async="true">
       <messageEventDefinition id="testMessageDef2" messageRef="testMessage2" />
     </intermediateThrowEvent>
 

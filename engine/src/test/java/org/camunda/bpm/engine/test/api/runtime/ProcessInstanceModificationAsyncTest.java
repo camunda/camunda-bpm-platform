@@ -1096,7 +1096,6 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
     assertNotSame(incident.getId(), newIncident.getId());
   }
 
-
   protected String getInstanceIdForActivity(ActivityInstance activityInstance, String activityId) {
     ActivityInstance instance = getChildInstanceForActivity(activityInstance, activityId);
     if (instance != null) {

@@ -36,6 +36,7 @@ public class JobDefinitionQueryImpl extends AbstractQuery<JobDefinitionQuery, Jo
   protected String jobType;
   protected String jobConfiguration;
   protected SuspensionState suspensionState;
+  protected Boolean withOverridingJobPriority;
 
   public JobDefinitionQueryImpl() {
   }
@@ -91,6 +92,11 @@ public class JobDefinitionQueryImpl extends AbstractQuery<JobDefinitionQuery, Jo
 
   public JobDefinitionQuery suspended() {
     this.suspensionState = SuspensionState.SUSPENDED;
+    return this;
+  }
+
+  public JobDefinitionQuery withOverridingJobPriority() {
+    this.withOverridingJobPriority = true;
     return this;
   }
 
@@ -164,6 +170,10 @@ public class JobDefinitionQueryImpl extends AbstractQuery<JobDefinitionQuery, Jo
 
   public SuspensionState getSuspensionState() {
     return suspensionState;
+  }
+
+  public Boolean getWithOverridingJobPriority() {
+    return withOverridingJobPriority;
   }
 
 }

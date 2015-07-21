@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions id="definitions" 
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
   
   <process id="fixSystemFailure" name="Fix system failure">
@@ -19,10 +19,10 @@
       <sequenceFlow id="flow3" sourceRef="subProcessFork" targetRef="task1" />
       <sequenceFlow id="flow4" sourceRef="subProcessFork" targetRef="task2" />
       
-      <userTask id="task1" name="Investigate hardware" activiti:candidateGroups="engineering" />
+      <userTask id="task1" name="Investigate hardware" camunda:candidateGroups="engineering" />
       <sequenceFlow id="flow5" sourceRef="task1" targetRef="subProcessJoin" />
       
-      <userTask id="task2" name="Investigate software" activiti:candidateGroups="engineering" />
+      <userTask id="task2" name="Investigate software" camunda:candidateGroups="engineering" />
       <sequenceFlow id="flow6" sourceRef="task2" targetRef="subProcessJoin" />
       
       <parallelGateway id="subProcessJoin" />
@@ -38,12 +38,12 @@
       </timerEventDefinition>
     </boundaryEvent>
     <sequenceFlow id="flow8" sourceRef="timer" targetRef="taskAfterTimer" />
-    <userTask id="taskAfterTimer" name="Hand over to Level 2 support" activiti:candidateGroups="management" />
+    <userTask id="taskAfterTimer" name="Hand over to Level 2 support" camunda:candidateGroups="management" />
     <sequenceFlow id="flow9" sourceRef="taskAfterTimer" targetRef="theEnd1" />
     <endEvent id="theEnd1" />
     
     <sequenceFlow id="flow10" sourceRef="subProcess" targetRef="taskAfterSubProcess" />
-    <userTask id="taskAfterSubProcess" name="Write report" activiti:candidateGroups="engineering" />
+    <userTask id="taskAfterSubProcess" name="Write report" camunda:candidateGroups="engineering" />
     <sequenceFlow id="flow11" sourceRef="taskAfterSubProcess" targetRef="theEnd" />
     <endEvent id="theEnd" />
     

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions id="taskListenerExample" 
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
 	targetNamespace="Examples">
 
   <message id="message1" name="message"/>
@@ -16,12 +16,12 @@
 		    Schedule a meeting with management.
 		  </documentation>
 		  <extensionElements>
-		    <activiti:taskListener event="create" class="org.camunda.bpm.engine.test.examples.bpmn.tasklistener.TaskCreateListener" />
-		    <activiti:taskListener event="complete" class="org.camunda.bpm.engine.test.examples.bpmn.tasklistener.TaskCompleteListener">
-		      <activiti:field name="greeter" stringValue="The Process" />
-          <activiti:field name="shortName" expression="${'Activiti'.substring(0,3)}" />
-		    </activiti:taskListener>
-        <activiti:taskListener event="delete" class="org.camunda.bpm.engine.test.examples.bpmn.tasklistener.TaskDeleteListener" />
+		    <camunda:taskListener event="create" class="org.camunda.bpm.engine.test.examples.bpmn.tasklistener.TaskCreateListener" />
+		    <camunda:taskListener event="complete" class="org.camunda.bpm.engine.test.examples.bpmn.tasklistener.TaskCompleteListener">
+		      <camunda:field name="greeter" stringValue="The Process" />
+          <camunda:field name="shortName" expression="${'Activiti'.substring(0,3)}" />
+		    </camunda:taskListener>
+        <camunda:taskListener event="delete" class="org.camunda.bpm.engine.test.examples.bpmn.tasklistener.TaskDeleteListener" />
 		  </extensionElements>
 		</userTask>
 
@@ -38,7 +38,7 @@
         Write meeting notes after meeting with management.
       </documentation>
       <extensionElements>
-        <activiti:taskListener event="create" expression="${execution.setVariable('greeting2', task.name)}" />
+        <camunda:taskListener event="create" expression="${execution.setVariable('greeting2', task.name)}" />
       </extensionElements>
     </userTask>
     

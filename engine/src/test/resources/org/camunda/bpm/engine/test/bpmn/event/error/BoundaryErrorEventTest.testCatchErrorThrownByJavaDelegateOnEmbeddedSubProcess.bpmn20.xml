@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions id="definitions" 
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
   
   <error id="myError" errorCode="23" />
@@ -15,7 +15,7 @@
     <subProcess id="subProcess">
       <startEvent id="subProcessStart"/>
       <sequenceFlow id="flow2" sourceRef="subProcessStart" targetRef="serviceTask" />
-	    <serviceTask id="serviceTask" activiti:class="org.camunda.bpm.engine.test.bpmn.event.error.ThrowBpmnErrorDelegate" />
+	    <serviceTask id="serviceTask" camunda:class="org.camunda.bpm.engine.test.bpmn.event.error.ThrowBpmnErrorDelegate" />
     </subProcess>
     
     <boundaryEvent id="catchError" attachedToRef="subProcess">

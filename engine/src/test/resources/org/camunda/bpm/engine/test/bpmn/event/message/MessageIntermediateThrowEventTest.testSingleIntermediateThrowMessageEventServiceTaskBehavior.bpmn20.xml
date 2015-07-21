@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions id="definitions"
              xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-             xmlns:activiti="http://activiti.org/bpmn"
+             xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
              targetNamespace="Examples"
              xmlns:tns="Examples">
 
@@ -12,7 +12,7 @@
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="messageThrow" />
 
     <intermediateThrowEvent id="messageThrow">
-      <messageEventDefinition activiti:class="org.camunda.bpm.engine.test.bpmn.event.message.DummyServiceTask" />
+      <messageEventDefinition camunda:class="org.camunda.bpm.engine.test.bpmn.event.message.DummyServiceTask" />
     </intermediateThrowEvent>
   	
     <sequenceFlow id="flow2" sourceRef="messageThrow" targetRef="theEnd" />

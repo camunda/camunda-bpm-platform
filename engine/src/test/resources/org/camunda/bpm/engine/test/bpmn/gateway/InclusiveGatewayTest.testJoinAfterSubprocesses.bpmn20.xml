@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.camunda.org/test">
   <process id="InclusiveGateway" name="InclusiveGateway">
     <documentation>Place documentation for the 'InclusiveGateway' process here.</documentation>
     <startEvent id="startevent1" name="Start"></startEvent>
@@ -7,14 +7,14 @@
     <sequenceFlow id="flow1" name="" sourceRef="startevent1" targetRef="inclusivegateway1"></sequenceFlow>
     <subProcess id="subprocess1" name="Sub Process1">
       <startEvent id="startevent2" name="Start"></startEvent>
-      <userTask id="usertask1" name="Task1" activiti:assignee="a"></userTask>
+      <userTask id="usertask1" name="Task1" camunda:assignee="a"></userTask>
       <sequenceFlow id="flow2" name="" sourceRef="startevent2" targetRef="usertask1"></sequenceFlow>
       <endEvent id="endevent1" name="End"></endEvent>
       <sequenceFlow id="flow3" name="" sourceRef="usertask1" targetRef="endevent1"></sequenceFlow>
     </subProcess>
     <subProcess id="subprocess2" name="Sub Process2">
       <startEvent id="startevent3" name="Start"></startEvent>
-      <userTask id="usertask2" name="Task2" activiti:assignee="b"></userTask>
+      <userTask id="usertask2" name="Task2" camunda:assignee="b"></userTask>
       <sequenceFlow id="flow4" name="" sourceRef="startevent3" targetRef="usertask2"></sequenceFlow>
       <endEvent id="endevent2" name="End"></endEvent>
       <sequenceFlow id="flow5" name="" sourceRef="usertask2" targetRef="endevent2"></sequenceFlow>
@@ -28,7 +28,7 @@
     <inclusiveGateway id="inclusivegateway2" name="Inclusive Gateway"></inclusiveGateway>
     <sequenceFlow id="flow8" name="" sourceRef="subprocess1" targetRef="inclusivegateway2"></sequenceFlow>
     <sequenceFlow id="flow9" name="" sourceRef="subprocess2" targetRef="inclusivegateway2"></sequenceFlow>
-    <userTask id="usertask3" name="Task3" activiti:assignee="c"></userTask>
+    <userTask id="usertask3" name="Task3" camunda:assignee="c"></userTask>
     <sequenceFlow id="flow10" name="" sourceRef="inclusivegateway2" targetRef="usertask3"></sequenceFlow>
     <endEvent id="endevent3" name="End"></endEvent>
     <sequenceFlow id="flow11" name="" sourceRef="usertask3" targetRef="endevent3"></sequenceFlow>

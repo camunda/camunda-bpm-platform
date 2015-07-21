@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions id="definitions" 
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
 	
 	<process id="compensateProcess">
@@ -23,7 +23,7 @@
 			
 			<sequenceFlow sourceRef="startInScope" targetRef="bookHotel" />
 
-			<serviceTask id="bookHotel" activiti:expression="${true}">
+			<serviceTask id="bookHotel" camunda:expression="${true}">
 				<multiInstanceLoopCharacteristics isSequential="true">
 				  <loopCardinality>5</loopCardinality>
 				</multiInstanceLoopCharacteristics>
@@ -34,9 +34,9 @@
 			</boundaryEvent>	
 			
 			<serviceTask id="undoBookHotel" isForCompensation="true"
-				activiti:class="org.camunda.bpm.engine.test.bpmn.event.compensate.helper.UndoService">
+				camunda:class="org.camunda.bpm.engine.test.bpmn.event.compensate.helper.UndoService">
 				<extensionElements>
-					<activiti:field name="counterName" stringValue="undoBookHotel" />
+					<camunda:field name="counterName" stringValue="undoBookHotel" />
 				</extensionElements>
 			</serviceTask>	
 			

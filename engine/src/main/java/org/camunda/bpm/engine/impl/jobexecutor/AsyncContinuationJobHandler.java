@@ -50,10 +50,12 @@ public class AsyncContinuationJobHandler implements JobHandler {
 
   }
 
+  @Override
   public String getType() {
     return TYPE;
   }
 
+  @Override
   public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext) {
 
     LegacyBehavior.repairMultiInstanceAsyncJob(execution);

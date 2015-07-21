@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions 
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
 
   <process id="asyncIntermediateThrowEvent">
@@ -10,9 +10,9 @@
     
     <sequenceFlow sourceRef="theStart" targetRef="intermediateThrowEvent" />
     
-    <intermediateThrowEvent id="intermediateThrowEvent" activiti:async="true">
+    <intermediateThrowEvent id="intermediateThrowEvent" camunda:async="true">
     	<extensionElements>
-			  <activiti:executionListener event="start" class="org.camunda.bpm.engine.test.bpmn.async.AsyncListener" />
+			  <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.bpmn.async.AsyncListener" />
 		  </extensionElements>
 
       <messageEventDefinition />

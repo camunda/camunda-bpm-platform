@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 
@@ -437,6 +438,24 @@ public class TestOrderingUtil {
       public boolean hasNullProperty(HistoricJobLog object) {
         return false;
       }
+    };
+  }
+
+  // jobs
+
+  public static NullTolerantComparator<Job> jobByPriority() {
+    return new NullTolerantComparator<Job>() {
+
+      @Override
+      public int compare(Job o1, Job o2) {
+        return o1.getPriority() - o2.getPriority();
+      }
+
+      @Override
+      public boolean hasNullProperty(Job object) {
+        return false;
+      }
+
     };
   }
 

@@ -1095,7 +1095,7 @@ public class ProcessInstanceModificationTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources = TASK_LISTENER_PROCESS)
-  public void FAILING_testSkipTaskListenerInvocation() {
+  public void testSkipTaskListenerInvocation() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
         "taskListenerProcess",
         Collections.<String, Object>singletonMap("listener", new RecorderTaskListener()));

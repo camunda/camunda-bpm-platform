@@ -12,9 +12,13 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
@@ -27,8 +31,14 @@ import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
  */
 public class DefaultJobPriorityProvider implements JobPriorityProvider {
 
+  private static final Logger LOG = Logger.getLogger(DefaultJobPriorityProvider.class.getName());
+
+  public static int DEFAULT_PRIORITY = 0;
+
+  public static int DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE = 0;
+
   @Override
-  public int determinePriority(ExecutionEntity execution, JobDeclaration<?> jobDeclaration) {
+  public int determinePriority(ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
 
     Integer jobDefinitionPriority = getJobDefinitionPriority(execution, jobDeclaration);
     if (jobDefinitionPriority != null) {
@@ -45,10 +55,10 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
       return processDefinitionPriority;
     }
 
-    return JobPriorityProvider.DEFAULT_PRIORITY;
+    return DEFAULT_PRIORITY;
   }
 
-  protected Integer getJobDefinitionPriority(ExecutionEntity execution, JobDeclaration<?> jobDeclaration) {
+  protected Integer getJobDefinitionPriority(ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
     String jobDefinitionId = jobDeclaration.getJobDefinitionId();
 
     if (jobDefinitionId != null) {
@@ -56,16 +66,29 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
           .getJobDefinitionManager().findById(jobDefinitionId);
 
       if (jobDefinition != null) {
-        return jobDefinition.getJobPriority();
+        return jobDefinition.getOverridingJobPriority();
       }
     }
 
     return null;
   }
 
-  protected Integer getProcessDefinitionPriority(ExecutionEntity execution, JobDeclaration<?> jobDeclaration) {
+  protected Integer getProcessDefinitionPriority(ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
+    ProcessDefinitionImpl processDefinition = null;
+
     if (execution != null) {
-      ProcessDefinitionImpl processDefinition = execution.getProcessDefinition();
+      processDefinition = execution.getProcessDefinition();
+    } else {
+      JobDefinitionEntity jobDefinition = getJobDefinitionFor(jobDeclaration);
+      if (jobDefinition != null) {
+        processDefinition = Context
+          .getProcessEngineConfiguration()
+          .getDeploymentCache()
+          .findDeployedProcessDefinitionById(jobDefinition.getProcessDefinitionId());
+      }
+    }
+
+    if (processDefinition != null) {
       ParameterValueProvider priorityProvider = (ParameterValueProvider) processDefinition.getProperty(BpmnParse.PROPERTYNAME_JOB_PRIORITY);
 
       if (priorityProvider != null) {
@@ -76,7 +99,13 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
     return null;
   }
 
-  protected Integer getActivityPriority(ExecutionEntity execution, JobDeclaration<?> jobDeclaration) {
+  protected JobDefinitionEntity getJobDefinitionFor(JobDeclaration<?, ?> jobDeclaration) {
+    return Context.getCommandContext()
+        .getJobDefinitionManager()
+        .findById(jobDeclaration.getJobDefinitionId());
+  }
+
+  protected Integer getActivityPriority(ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
     if (jobDeclaration != null) {
       ParameterValueProvider priorityProvider = jobDeclaration.getJobPriorityProvider();
       if (priorityProvider != null) {
@@ -87,17 +116,58 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
     return null;
   }
 
-  protected Integer evaluateValueProvider(ParameterValueProvider valueProvider, ExecutionEntity execution, JobDeclaration<?> jobDeclaration) {
-    Object value = valueProvider.getValue(execution);
+  protected Integer evaluateValueProvider(ParameterValueProvider valueProvider, ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
+    Object value = null;
+    try {
+      value = valueProvider.getValue(execution);
 
-    if (!(value instanceof Integer)) {
-      throw new ProcessEngineException("Priority for job " + jobDeclaration.getActivityId()
-          + "/" + jobDeclaration.getJobHandlerType() + " instantiated "
-          + "in context of " + execution + " is not an Integer");
+    } catch (ProcessEngineException e) {
+
+      if (Context.getProcessEngineConfiguration().isEnableGracefulDegradationOnContextSwitchFailure()
+          && isSymptomOfContextSwitchFailure(e, execution)) {
+
+        LOG.log(Level.WARNING, "Could not determine priority for job created in context of execution " + execution
+            + ". Using default priority " + DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE, e);
+        value = DefaultJobPriorityProvider.DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE;
+      }
+      else {
+        throw e;
+      }
+    }
+
+    if (!(value instanceof Number)) {
+      throw new ProcessEngineException(describeContext(jobDeclaration, execution)
+          + ": Priority value is not an Integer");
     }
     else {
-      return (Integer) value;
+      Number numberValue = (Number) value;
+      if (isValidIntegerValue(numberValue)) {
+        return numberValue.intValue();
+      }
+      else {
+        throw new ProcessEngineException(describeContext(jobDeclaration, execution)
+            + ": Priority value must be either Short, Integer, or Long in Integer range");
+      }
     }
+  }
+
+  protected boolean isSymptomOfContextSwitchFailure(Throwable t, ExecutionEntity contextExecution) {
+    // a context switch failure can occur, if the current engine has no PA registration for the deployment
+    // subclasses may assert the actual throwable to narrow down the diagnose
+    return ProcessApplicationContextUtil.getTargetProcessApplication(contextExecution) == null;
+  }
+
+  protected String describeContext(JobDeclaration<?, ?> jobDeclaration, ExecutionEntity executionEntity) {
+    return "Job " + jobDeclaration.getActivityId()
+            + "/" + jobDeclaration.getJobHandlerType() + " instantiated "
+            + "in context of " + executionEntity;
+  }
+
+  protected boolean isValidIntegerValue(Number value) {
+    return
+      value instanceof Short ||
+      value instanceof Integer ||
+      (value instanceof Long && ((long) value.intValue()) == value.longValue());
   }
 
 }

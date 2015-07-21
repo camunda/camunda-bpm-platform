@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" targetNamespace="Examples">
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" targetNamespace="Examples">
   <process id="testResolveBean" isExecutable="true">
     <startEvent id="theStart" name="Start">
       <outgoing>flow12</outgoing>
@@ -7,7 +7,7 @@
     <endEvent id="endevent1" name="End">
       <incoming>flow11</incoming>
     </endEvent>
-    <serviceTask id="servicetask1" activiti:delegateExpression="${exampleSignallableActivityBehaviorBean}" name="Service Task">
+    <serviceTask id="servicetask1" camunda:delegateExpression="${exampleSignallableActivityBehaviorBean}" name="Service Task">
       <incoming>flow12</incoming>
       <outgoing>flow11</outgoing>
     </serviceTask>

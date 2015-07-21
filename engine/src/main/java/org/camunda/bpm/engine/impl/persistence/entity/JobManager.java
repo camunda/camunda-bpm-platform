@@ -208,7 +208,7 @@ public class JobManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<Job> findJobsByConfiguration(String jobHandlerType, String jobHandlerConfiguration) {
+  public List<JobEntity> findJobsByConfiguration(String jobHandlerType, String jobHandlerConfiguration) {
     Map<String, String> params = new HashMap<String, String>();
     params.put("handlerType", jobHandlerType);
     params.put("handlerConfiguration", jobHandlerConfiguration);

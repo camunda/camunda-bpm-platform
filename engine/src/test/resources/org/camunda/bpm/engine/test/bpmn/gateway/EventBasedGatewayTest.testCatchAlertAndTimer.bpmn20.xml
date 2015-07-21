@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions id="definitions"
 	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-	xmlns:activiti="http://activiti.org/bpmn" 
+	xmlns:camunda="http://camunda.org/schema/1.0/bpmn" 
 	targetNamespace="Examples">
 
 	<signal id="alertSignal" name="alert" />
@@ -30,8 +30,8 @@
 			</timerEventDefinition>		
 		</intermediateCatchEvent>
 	
-		<userTask id="task1" name="afterTimer" activiti:assignee="kermit"/>
-		<userTask id="task2" name="afterSignal" activiti:assignee="kermit"/>
+		<userTask id="task1" name="afterTimer" camunda:assignee="kermit"/>
+		<userTask id="task2" name="afterSignal" camunda:assignee="kermit"/>
 		
 		
 		<sequenceFlow sourceRef="task1" targetRef="end" />

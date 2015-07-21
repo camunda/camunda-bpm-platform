@@ -1,15 +1,15 @@
 
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-	xmlns:activiti="http://activiti.org/bpmn" targetNamespace="Examples">
+	xmlns:camunda="http://camunda.org/schema/1.0/bpmn" targetNamespace="Examples">
 
-	<process id="potentialStarter" activiti:candidateStarterUsers="user1, user2"  activiti:candidateStarterGroups="group1">
+	<process id="potentialStarter" camunda:candidateStarterUsers="user1, user2"  camunda:candidateStarterGroups="group1">
 
 		<extensionElements>
-			<activiti:potentialStarter>
+			<camunda:potentialStarter>
 				<resourceAssignmentExpression>
 					<formalExpression>group2, group(group3), user(user3)</formalExpression>
 				</resourceAssignmentExpression>
-			</activiti:potentialStarter>
+			</camunda:potentialStarter>
 		</extensionElements>
 
 		<startEvent id="theStart" />

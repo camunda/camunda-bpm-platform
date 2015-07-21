@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+
+  <process id="jobPrioExpressionProcess">
+  
+    <startEvent id="start" />
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="task1" />
+    <manualTask id="task1" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:jobPriority="${priority}"/>    
+    <sequenceFlow id="flow2" sourceRef="task1" targetRef="task2" />
+    <manualTask id="task2" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:jobPriority="${15}" />    
+    <sequenceFlow id="flow3" sourceRef="task2" targetRef="task3" />
+    <manualTask id="task3" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:jobPriority="${execution.getVariable('priority')}" />    
+    <sequenceFlow id="flow4" sourceRef="task3" targetRef="task4" />
+    <manualTask id="task4" camunda:asyncBefore="true" camunda:asyncAfter="true" camunda:jobPriority="#{16}" />    
+    <sequenceFlow id="flow5" sourceRef="task4" targetRef="end" />
+    <endEvent id="end" />
+    
+  </process>
+
+</definitions>

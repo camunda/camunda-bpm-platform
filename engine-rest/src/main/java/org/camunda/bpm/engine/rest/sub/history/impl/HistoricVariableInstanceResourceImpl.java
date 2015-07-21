@@ -15,73 +15,56 @@ package org.camunda.bpm.engine.rest.sub.history.impl;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
+import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.rest.dto.history.HistoricVariableInstanceDto;
-import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.sub.AbstractResourceProvider;
 import org.camunda.bpm.engine.rest.sub.history.HistoricVariableInstanceResource;
-import org.camunda.bpm.engine.variable.type.ValueType;
-
-import javax.ws.rs.core.Response.Status;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * @author Daniel Meyer
+ * @author Ronny Bräunlich
  *
  */
-public class HistoricVariableInstanceResourceImpl implements HistoricVariableInstanceResource {
-
-  protected String variableId;
-  protected ProcessEngine engine;
+public class HistoricVariableInstanceResourceImpl extends
+    AbstractResourceProvider<HistoricVariableInstanceQuery, HistoricVariableInstance, HistoricVariableInstanceDto> implements HistoricVariableInstanceResource {
 
   public HistoricVariableInstanceResourceImpl(String variableId, ProcessEngine engine) {
-    this.variableId = variableId;
-    this.engine = engine;
+    super(variableId, engine);
   }
 
-  public HistoricVariableInstanceDto getVariable(boolean deserializeObjectValue) {
+  protected HistoricVariableInstanceQuery baseQuery() {
+    return getEngine().getHistoryService().createHistoricVariableInstanceQuery().variableId(getId());
+  }
+
+  @Override
+  protected Query<HistoricVariableInstanceQuery, HistoricVariableInstance> baseQueryForBinaryVariable() {
+    return baseQuery().disableCustomObjectDeserialization();
+  }
+
+  @Override
+  protected Query<HistoricVariableInstanceQuery, HistoricVariableInstance> baseQueryForVariable(boolean deserializeObjectValue) {
     HistoricVariableInstanceQuery query = baseQuery().disableBinaryFetching();
 
     if (!deserializeObjectValue) {
       query.disableCustomObjectDeserialization();
     }
-
-    HistoricVariableInstance variableInstance = query.singleResult();
-
-    if(variableInstance != null) {
-      return HistoricVariableInstanceDto.fromHistoricVariableInstance(variableInstance);
-
-    } else {
-      throw new InvalidRequestException(Status.NOT_FOUND, "Variable instance with Id '"+variableId + "' does not exist.");
-
-    }
+    return query;
   }
 
-  public InputStream getBinaryVariable() {
-    HistoricVariableInstance variableInstance = baseQuery()
-        .disableCustomObjectDeserialization()
-        .singleResult();
-    if(variableInstance != null) {
-      if (variableInstance.getTypeName().equals(ValueType.BYTES.getName())) {
-        byte[] valueBytes = (byte[]) variableInstance.getValue();
-        if (valueBytes == null) {
-          valueBytes = new byte[0];
-        }
-
-        return new ByteArrayInputStream(valueBytes);
-      } else {
-        throw new InvalidRequestException(Status.BAD_REQUEST,
-            String.format("Value of variable %s is not a binary value.", variableId));
-      }
-
-    } else {
-      throw new InvalidRequestException(Status.NOT_FOUND, "Historic variable instance with Id '"+variableId + "' does not exist.");
-    }
+  @Override
+  protected TypedValue transformQueryResultIntoTypedValue(HistoricVariableInstance queryResult) {
+    return queryResult.getTypedValue();
   }
 
-  protected HistoricVariableInstanceQuery baseQuery() {
-    return engine.getHistoryService()
-        .createHistoricVariableInstanceQuery()
-        .variableId(variableId);
+  @Override
+  protected HistoricVariableInstanceDto transformToDto(HistoricVariableInstance queryResult) {
+    return HistoricVariableInstanceDto.fromHistoricVariableInstance(queryResult);
+  }
+
+  @Override
+  protected String getResourceNameForErrorMessage() {
+    return "Historic variable instance";
   }
 
 }

@@ -282,6 +282,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_JOB_CONFIG = "aJobConfig";
   public static final boolean EXAMPLE_JOB_DEFINITION_IS_SUSPENDED = true;
   public static final String EXAMPLE_JOB_DEFINITION_DELAYED_EXECUTION = "2013-04-23T13:42:43";
+  public static final Integer EXAMPLE_JOB_DEFINITION_PRIORITY = 52;
 
   // Jobs
   public static final String EXAMPLE_JOB_ACTIVITY_ID = "aJobActivityId";
@@ -300,6 +301,7 @@ public abstract class MockProvider {
   public static final Boolean EXAMPLE_WITH_EXCEPTION = true;
   public static final Boolean EXAMPLE_NO_RETRIES_LEFT = true;
   public static final Boolean EXAMPLE_JOB_IS_SUSPENDED = true;
+  public static final int EXAMPLE_JOB_PRIORITY = 42;
 
   public static final String EXAMPLE_RESOURCE_TYPE_NAME = "exampleResource";
   public static final int EXAMPLE_RESOURCE_TYPE_ID = 12345678;
@@ -970,6 +972,7 @@ public abstract class MockProvider {
       .exceptionMessage(EXAMPLE_JOB_NO_EXCEPTION_MESSAGE)
       .dueDate(DateTimeUtil.parseDate(EXAMPLE_DUE_DATE))
       .suspended(EXAMPLE_JOB_IS_SUSPENDED)
+      .priority(EXAMPLE_JOB_PRIORITY)
       .build();
     return mock;
   }
@@ -1392,17 +1395,18 @@ public abstract class MockProvider {
   }
 
   public static JobDefinition createMockJobDefinition() {
-    JobDefinition jobDefinition = mock(JobDefinition.class);
 
-    when(jobDefinition.getId()).thenReturn(EXAMPLE_JOB_DEFINITION_ID);
-    when(jobDefinition.getProcessDefinitionId()).thenReturn(EXAMPLE_PROCESS_DEFINITION_ID);
-    when(jobDefinition.getProcessDefinitionKey()).thenReturn(EXAMPLE_PROCESS_DEFINITION_KEY);
-    when(jobDefinition.getJobType()).thenReturn(EXAMPLE_JOB_TYPE);
-    when(jobDefinition.getJobConfiguration()).thenReturn(EXAMPLE_JOB_CONFIG);
-    when(jobDefinition.getActivityId()).thenReturn(EXAMPLE_ACTIVITY_ID);
-    when(jobDefinition.isSuspended()).thenReturn(EXAMPLE_JOB_DEFINITION_IS_SUSPENDED);
+    return new MockJobDefinitionBuilder()
+      .id(EXAMPLE_JOB_DEFINITION_ID)
+      .activityId(EXAMPLE_ACTIVITY_ID)
+      .jobConfiguration(EXAMPLE_JOB_CONFIG)
+      .jobType(EXAMPLE_JOB_TYPE)
+      .jobPriority(EXAMPLE_JOB_DEFINITION_PRIORITY)
+      .suspended(EXAMPLE_JOB_DEFINITION_IS_SUSPENDED)
+      .processDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID)
+      .processDefinitionKey(EXAMPLE_PROCESS_DEFINITION_KEY)
+      .build();
 
-    return jobDefinition;
   }
 
   public static List<UserOperationLogEntry> createUserOperationLogEntries() {

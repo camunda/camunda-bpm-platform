@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <definitions id="definitions"
-             targetNamespace="http://activiti.org/bpmn20" 
+             targetNamespace="http://camunda.org/schema/1.0/bpmn20" 
              xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-             xmlns:activiti="http://activiti.org/bpmn">
+             xmlns:camunda="http://camunda.org/schema/1.0/bpmn">
   
   <process id="FormPropertyHandlingProcess">
   
     <startEvent id="start">
       <extensionElements>
-        <activiti:formProperty id="speaker" variable="SpeakerName"/>
-        <activiti:formProperty id="duration" type="long"/>
-        <activiti:formProperty id="free" type="boolean" />
+        <camunda:formProperty id="speaker" variable="SpeakerName"/>
+        <camunda:formProperty id="duration" type="long"/>
+        <camunda:formProperty id="free" type="boolean" />
       </extensionElements>
     </startEvent>
 
     <sequenceFlow id="flow1" sourceRef="start" targetRef="task" />
     
     <userTask id="task"
-              activiti:assignee="kermit">
+              camunda:assignee="kermit">
       <extensionElements>
-        <activiti:formProperty id="room" />
-        <activiti:formProperty id="duration" type="long"/>
-        <activiti:formProperty id="speaker" variable="SpeakerName" writable="false" />
-        <activiti:formProperty id="street" expression="#{address.street}" required="true" />
-        <activiti:formProperty id="free" type="boolean"/>
+        <camunda:formProperty id="room" />
+        <camunda:formProperty id="duration" type="long"/>
+        <camunda:formProperty id="speaker" variable="SpeakerName" writable="false" />
+        <camunda:formProperty id="street" expression="#{address.street}" required="true" />
+        <camunda:formProperty id="free" type="boolean"/>
       </extensionElements>
     </userTask>
 

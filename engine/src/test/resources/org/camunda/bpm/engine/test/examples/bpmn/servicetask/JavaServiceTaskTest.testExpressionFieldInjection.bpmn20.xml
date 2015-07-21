@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions id="definitions" 
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
   
   <process id="expressionFieldInjection">
@@ -12,14 +12,14 @@
     
     <serviceTask id="javaService" 
                  name="Java service invocation" 
-                 activiti:class="org.camunda.bpm.engine.test.examples.bpmn.servicetask.ReverseStringsFieldInjected">
+                 camunda:class="org.camunda.bpm.engine.test.examples.bpmn.servicetask.ReverseStringsFieldInjected">
       <extensionElements>
-        <activiti:field name="text1">
-          <activiti:expression>${genderBean.getGenderString(gender)}</activiti:expression>
-        </activiti:field>
-        <activiti:field name="text2">
-          <activiti:expression>Hello ${gender == 'male' ? 'Mr.' : 'Mrs.'} ${name}</activiti:expression>
-        </activiti:field>
+        <camunda:field name="text1">
+          <camunda:expression>${genderBean.getGenderString(gender)}</camunda:expression>
+        </camunda:field>
+        <camunda:field name="text2">
+          <camunda:expression>Hello ${gender == 'male' ? 'Mr.' : 'Mrs.'} ${name}</camunda:expression>
+        </camunda:field>
       </extensionElements>             
     </serviceTask>
     

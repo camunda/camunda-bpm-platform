@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+
+  <process id="boundaryTimerJobPrioProcess" camunda:jobPriority="8">
+  
+    <startEvent id="start"/>
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="task1" />
+    <userTask id="task1" />
+    <sequenceFlow id="flow2" sourceRef="task1" targetRef="end" />
+    <endEvent id="end" />
+    
+    <!-- boundary event -->
+    <boundaryEvent id="timerBoundaryEvent" attachedToRef="task1" cancelActivity="true" camunda:jobPriority="20">
+      <timerEventDefinition>
+        <timeCycle>R10/PT10H</timeCycle>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <sequenceFlow id="flow3" sourceRef="timerBoundaryEvent" targetRef="afterBoundaryEnd" />
+    <endEvent id="afterBoundaryEnd" />
+
+  </process>
+
+</definitions>

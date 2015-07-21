@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions id="definitions"
 	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-	xmlns:activiti="http://activiti.org/bpmn"
+	xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
 	xmlns:fox="http://www.camunda.com/fox"
 	targetNamespace="Examples">
 
@@ -10,7 +10,7 @@
 		<startEvent id="theStart" />
 		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="task" />
         
-        <userTask id="task" name="Task rigged with timer" activiti:async="true">
+        <userTask id="task" name="Task rigged with timer" camunda:async="true">
         	<extensionElements>
         		<fox:failedJobRetryTimeCycle>R5/PT5M</fox:failedJobRetryTimeCycle>
         	</extensionElements>
@@ -38,7 +38,7 @@
 		<startEvent id="start1" />
 		<sequenceFlow id="flowTransition11" sourceRef="start1" targetRef="asyncTaskWithoutFailedJobRetryTimeCycle" />
         
-        <userTask id="asyncTaskWithoutFailedJobRetryTimeCycle" name="Task rigged with timer" activiti:async="true" />
+        <userTask id="asyncTaskWithoutFailedJobRetryTimeCycle" name="Task rigged with timer" camunda:async="true" />
 		<sequenceFlow id="flowTransition21" sourceRef="asyncTaskWithoutFailedJobRetryTimeCycle" targetRef="end1" />
 		
 		<endEvent id="end1" />

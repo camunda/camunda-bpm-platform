@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions id="definitions"
-	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
 	xmlns:fox="http://www.camunda.com/fox" targetNamespace="Examples">
 
 	<process id="failedTask">
@@ -8,7 +8,7 @@
 		<startEvent id="theStart" />
 		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="failingTransaction" />
 
-		<transaction id="failingTransaction" activiti:async="true">
+		<transaction id="failingTransaction" camunda:async="true">
 			<extensionElements>
 				<fox:failedJobRetryTimeCycle>R5/PT5M</fox:failedJobRetryTimeCycle>
 			</extensionElements>
@@ -18,7 +18,7 @@
 			<sequenceFlow sourceRef="subStart" targetRef="service" />
 
 			<serviceTask id="service"
-				activiti:class="org.camunda.bpm.engine.test.cmd.FailingDelegate" />
+				camunda:class="org.camunda.bpm.engine.test.cmd.FailingDelegate" />
 
 			<sequenceFlow sourceRef="service" targetRef="subEnd" />
 

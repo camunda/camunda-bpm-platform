@@ -1,17 +1,17 @@
 
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-	xmlns:activiti="http://activiti.org/bpmn" targetNamespace="Examples">
+	xmlns:camunda="http://camunda.org/schema/1.0/bpmn" targetNamespace="Examples">
 
 	<process id="echoShellLinux">
 
 		<startEvent id="theStart" />
 		<sequenceFlow sourceRef="theStart" targetRef="shellEcho" />
 
-		<serviceTask id="shellEcho" activiti:type="shell">
+		<serviceTask id="shellEcho" camunda:type="shell">
 			<extensionElements>
-				<activiti:field name="command" stringValue="echo" />
-				<activiti:field name="arg1" stringValue="EchoTest" />
-				<activiti:field name="outputVariable"  stringValue="resultVar" />
+				<camunda:field name="command" stringValue="echo" />
+				<camunda:field name="arg1" stringValue="EchoTest" />
+				<camunda:field name="outputVariable"  stringValue="resultVar" />
 			</extensionElements>
 		</serviceTask>
 		

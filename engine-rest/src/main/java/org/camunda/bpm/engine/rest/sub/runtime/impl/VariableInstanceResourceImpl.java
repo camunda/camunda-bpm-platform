@@ -13,79 +13,61 @@
 package org.camunda.bpm.engine.rest.sub.runtime.impl;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableInstanceDto;
-import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.sub.AbstractResourceProvider;
 import org.camunda.bpm.engine.rest.sub.runtime.VariableInstanceResource;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
-import org.camunda.bpm.engine.variable.type.ValueType;
-
-import javax.ws.rs.core.Response.Status;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * @author Daniel Meyer
+ * @author Ronny Bräunlich
  *
  */
-public class VariableInstanceResourceImpl implements VariableInstanceResource {
-
-  protected String variableId;
-  protected ProcessEngine engine;
+public class VariableInstanceResourceImpl extends AbstractResourceProvider<VariableInstanceQuery, VariableInstance, VariableInstanceDto> implements
+    VariableInstanceResource {
 
   public VariableInstanceResourceImpl(String variableId, ProcessEngine engine) {
-    this.variableId = variableId;
-    this.engine = engine;
+    super(variableId, engine);
   }
 
-  public VariableInstanceDto getVariable(boolean deserializeObjectValue) {
+  protected VariableInstanceQuery baseQuery() {
+    return getEngine().getRuntimeService().createVariableInstanceQuery().variableId(getId());
+  }
+
+  @Override
+  protected Query<VariableInstanceQuery, VariableInstance> baseQueryForBinaryVariable() {
+    return baseQuery().disableCustomObjectDeserialization();
+  }
+
+  @Override
+  protected Query<VariableInstanceQuery, VariableInstance> baseQueryForVariable(boolean deserializeObjectValue) {
     VariableInstanceQuery baseQuery = baseQuery();
 
     // do not fetch byte arrays
     baseQuery.disableBinaryFetching();
 
-    if(!deserializeObjectValue) {
+    if (!deserializeObjectValue) {
       baseQuery.disableCustomObjectDeserialization();
     }
-
-    VariableInstance variableInstance = baseQuery.singleResult();
-
-    if(variableInstance != null) {
-      return VariableInstanceDto.fromVariableInstance(variableInstance);
-
-    } else {
-      throw new InvalidRequestException(Status.NOT_FOUND, "Variable instance with Id '"+variableId + "' does not exist.");
-
-    }
+    return baseQuery;
   }
 
-  public InputStream getBinaryVariable() {
-
-    VariableInstance variableInstance = baseQuery()
-        .disableCustomObjectDeserialization()
-        .singleResult();
-    if(variableInstance != null) {
-      if (variableInstance.getTypeName().equals(ValueType.BYTES.getName())) {
-        byte[] valueBytes = (byte[]) variableInstance.getValue();
-        if (valueBytes == null) {
-          valueBytes = new byte[0];
-        }
-
-        return new ByteArrayInputStream(valueBytes);
-      } else {
-        throw new InvalidRequestException(Status.BAD_REQUEST,
-            String.format("Value of variable %s is not a binary value.", variableId));
-      }
-
-    } else {
-      throw new InvalidRequestException(Status.NOT_FOUND, "Variable instance with Id '"+variableId + "' does not exist.");
-    }
+  @Override
+  protected TypedValue transformQueryResultIntoTypedValue(VariableInstance queryResult) {
+    return queryResult.getTypedValue();
   }
 
-  protected VariableInstanceQuery baseQuery() {
-    return engine.getRuntimeService()
-        .createVariableInstanceQuery()
-        .variableId(variableId);
+  @Override
+  protected VariableInstanceDto transformToDto(VariableInstance queryResult) {
+    return VariableInstanceDto.fromVariableInstance(queryResult);
+  }
+
+  @Override
+  protected String getResourceNameForErrorMessage() {
+    return "Variable instance";
   }
 
 }

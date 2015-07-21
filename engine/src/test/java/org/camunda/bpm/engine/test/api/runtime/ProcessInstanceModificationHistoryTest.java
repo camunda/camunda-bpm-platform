@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.test.api.runtime;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
@@ -249,6 +250,28 @@ public class ProcessInstanceModificationHistoryTest extends PluggableProcessEngi
 
     assertEquals(processInstanceId, instance.getId());
     assertNotNull(instance.getEndTime());
+  }
+
+  @Deployment(resources = EXCLUSIVE_GATEWAY_PROCESS)
+  public void testSkipCustomListenerEnsureHistoryWritten() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("exclusiveGateway").getId();
+
+    // when creating the task skipping custom listeners
+    runtimeService.createProcessInstanceModification(processInstanceId)
+      .startBeforeActivity("task2")
+      .execute(true, false);
+
+    // then the task assignment history (which uses a task listener) is written
+    Task task = taskService.createTaskQuery().taskDefinitionKey("task2").singleResult();
+
+    HistoricActivityInstance instance = historyService
+        .createHistoricActivityInstanceQuery()
+        .activityId("task2")
+        .singleResult();
+    assertNotNull(instance);
+    assertEquals(task.getId(), instance.getTaskId());
+    assertEquals("kermit", instance.getAssignee());
   }
 
   protected ActivityInstance getChildInstanceForActivity(ActivityInstance activityInstance, String activityId) {

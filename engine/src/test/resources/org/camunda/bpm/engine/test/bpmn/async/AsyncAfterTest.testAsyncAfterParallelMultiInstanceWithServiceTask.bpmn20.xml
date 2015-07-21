@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+
+  <process id="testProcess">
+
+    <startEvent id="start" />
+
+    <sequenceFlow id="flow1"  sourceRef="start" targetRef="service" />
+
+    <serviceTask id="service" camunda:expression="${execution.setVariable('behaviorInvoked', execution.getVariable('behaviorInvoked') + 1)}" camunda:asyncAfter="true">
+
+      <extensionElements>
+
+          <camunda:executionListener
+              event="start"
+              expression="${execution.setVariable('listenerStartInvoked', true)}" />
+
+          <camunda:executionListener
+              event="end"
+              expression="${execution.setVariable('listenerEndInvoked', true)}" />
+		 
+        </extensionElements>
+
+		<multiInstanceLoopCharacteristics isSequential="false">
+ 			<loopCardinality>5</loopCardinality>
+		</multiInstanceLoopCharacteristics>		
+
+    </serviceTask>
+
+    <sequenceFlow id="flow2" sourceRef="service" targetRef="end" />
+
+    <endEvent id="end" />
+
+  </process>
+
+</definitions>

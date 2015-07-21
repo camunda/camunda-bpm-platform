@@ -2,7 +2,7 @@
 <definitions id="definition" 
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
   
   <process id="parentProcess">
@@ -12,13 +12,13 @@
     
     <callActivity id="callActivity0" calledElement="midProcess">
       <extensionElements>
-        <activiti:in source="list" target="list"/>
+        <camunda:in source="list" target="list"/>
       </extensionElements>      
     </callActivity>
     
     <sequenceFlow id="flow02" sourceRef="callActivity0" targetRef="task01" />
 
-    <userTask id="task01" name="task" activiti:assignee="kermit"/>
+    <userTask id="task01" name="task" camunda:assignee="kermit"/>
     
     <sequenceFlow id="flow03" sourceRef="task01" targetRef="theEnd0" />
     
@@ -33,14 +33,14 @@
     
     <callActivity id="miCallActivity" calledElement="childProcess">
       <extensionElements>
-        <activiti:in source="element" target="element"/>
+        <camunda:in source="element" target="element"/>
       </extensionElements>
-      <multiInstanceLoopCharacteristics isSequential="false" activiti:collection="#{list}" activiti:elementVariable="element" />      
+      <multiInstanceLoopCharacteristics isSequential="false" camunda:collection="#{list}" camunda:elementVariable="element" />      
     </callActivity>
     
     <sequenceFlow id="flow2" sourceRef="miCallActivity" targetRef="task1" />
 
-    <userTask id="task1" name="task" activiti:assignee="kermit"/>
+    <userTask id="task1" name="task" camunda:assignee="kermit"/>
 
     <sequenceFlow id="flow3" sourceRef="task1" targetRef="theEnd" />
 
@@ -53,7 +53,7 @@
     <startEvent id="theStart2" />
     <sequenceFlow id="flow4" sourceRef="theStart2" targetRef="task2" />
 
-    <userTask id="task2" name="task" activiti:assignee="kermit"/>
+    <userTask id="task2" name="task" camunda:assignee="kermit"/>
     
     <sequenceFlow id="flow5" sourceRef="task2" targetRef="end2" />
     <endEvent id="end2" />     

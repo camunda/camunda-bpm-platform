@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions 
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
 
   <process id="asyncService">
@@ -12,7 +12,7 @@
     <subProcess id="subProcess">    
     	<startEvent id="subStart" />
     	<sequenceFlow sourceRef="subStart" targetRef="service" />
-    	<serviceTask id="service" activiti:class="org.camunda.bpm.engine.test.bpmn.async.AsyncService" activiti:async="true" />
+    	<serviceTask id="service" camunda:class="org.camunda.bpm.engine.test.bpmn.async.AsyncService" camunda:async="true" />
     	<sequenceFlow sourceRef="service" targetRef="subEnd" />
     	<endEvent id="subEnd" />    
     </subProcess>

@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" targetNamespace="http://www.activiti.org/test">
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" targetNamespace="http://www.camunda.org/test">
   <process id="configure-router" name="configure-router">
     <documentation id="Documentation_1">Place documentation for the 'ConfigureRouter' process here.</documentation>
     <startEvent id="startevent1" name="Start">
       <extensionElements>
-        <activiti:formProperty id="router" name="Router" required="true" type="string" writable="true"/>
-        <activiti:formProperty id="serialnumber" name="Serial Number" required="true" type="string" writable="true"/>
+        <camunda:formProperty id="router" name="Router" required="true" type="string" writable="true"/>
+        <camunda:formProperty id="serialnumber" name="Serial Number" required="true" type="string" writable="true"/>
       </extensionElements>
       <outgoing>flow1</outgoing>
     </startEvent>
     <endEvent id="endevent2" name="End">
       <incoming>flow5</incoming>
     </endEvent>
-    <serviceTask id="scripttask1" activiti:async="true" activiti:class="org.camunda.bpm.integrationtest.functional.transactions.UpdateRouterConfiguration" name="Update router configuration">
+    <serviceTask id="scripttask1" camunda:async="true" camunda:class="org.camunda.bpm.integrationtest.functional.transactions.UpdateRouterConfiguration" name="Update router configuration">
       <incoming>flow6</incoming>
       <outgoing>flow5</outgoing>
     </serviceTask>
-    <serviceTask id="scripttask2" activiti:async="true" activiti:class="org.camunda.bpm.integrationtest.functional.transactions.GetVersionInfoDelegate" name="Get version info">
+    <serviceTask id="scripttask2" camunda:async="true" camunda:class="org.camunda.bpm.integrationtest.functional.transactions.GetVersionInfoDelegate" name="Get version info">
       <incoming>flow1</incoming>
       <outgoing>flow6</outgoing>
     </serviceTask>

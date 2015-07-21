@@ -506,7 +506,7 @@ public class AuthorizationManager extends AbstractManager {
 
     // ... OR ...
 
-    // - READ_INSTANCE on PROCESS_DEFINITION
+    // - UPDATE_INSTANCE on PROCESS_DEFINITION
     PermissionCheck secondCheck = new PermissionCheck();
     secondCheck.setPermission(UPDATE_INSTANCE);
     secondCheck.setResource(PROCESS_DEFINITION);

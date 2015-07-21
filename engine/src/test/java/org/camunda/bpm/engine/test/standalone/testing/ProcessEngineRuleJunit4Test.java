@@ -36,7 +36,7 @@ import org.junit.Test;
 public class ProcessEngineRuleJunit4Test {
 
   @Rule
-  public ProcessEngineRule engineRule = new ProcessEngineRule();
+  public ProcessEngineRule engineRule = new ProcessEngineRule(true);
 
   @Test
   @Deployment

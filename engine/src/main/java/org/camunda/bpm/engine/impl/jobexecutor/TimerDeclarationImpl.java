@@ -29,7 +29,7 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
  * @author Tom Baeyens
  * @author Daniel Meyer
  */
-public class TimerDeclarationImpl extends JobDeclaration<TimerEntity> {
+public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerEntity> {
 
   private static final long serialVersionUID = 1L;
 
@@ -69,6 +69,15 @@ public class TimerDeclarationImpl extends JobDeclaration<TimerEntity> {
 
   protected TimerEntity newJobInstance(ExecutionEntity execution) {
 
+    TimerEntity timer = new TimerEntity(this);
+    if (execution != null) {
+      timer.setExecution(execution);
+    }
+
+    return timer;
+  }
+
+  protected void postInitialize(ExecutionEntity context, TimerEntity job) {
     BusinessCalendar businessCalendar = Context
         .getProcessEngineConfiguration()
         .getBusinessCalendarManager()
@@ -76,7 +85,7 @@ public class TimerDeclarationImpl extends JobDeclaration<TimerEntity> {
 
     if (description==null) {
       // Prevent NPE from happening in the next line
-      throw new ProcessEngineException("Timer '"+execution.getActivityId()+"' was not configured with a valid duration/time");
+      throw new ProcessEngineException("Timer '"+context.getActivityId()+"' was not configured with a valid duration/time");
     }
 
     String dueDateString = null;
@@ -84,7 +93,7 @@ public class TimerDeclarationImpl extends JobDeclaration<TimerEntity> {
 
     // ACT-1415: timer-declaration on start-event may contain expressions NOT
     // evaluating variables but other context, evaluating should happen nevertheless
-    VariableScope scopeForExpression = execution;
+    VariableScope scopeForExpression = context;
     if(scopeForExpression == null) {
       scopeForExpression = StartProcessVariableScope.getSharedInstance();
     }
@@ -97,29 +106,23 @@ public class TimerDeclarationImpl extends JobDeclaration<TimerEntity> {
       duedate = (Date)dueDateValue;
     }
     else {
-      throw new ProcessEngineException("Timer '"+execution.getActivityId()+"' was not configured with a valid duration/time, either hand in a java.util.Date or a String in format 'yyyy-MM-dd'T'hh:mm:ss'");
+      throw new ProcessEngineException("Timer '"+context.getActivityId()+"' was not configured with a valid duration/time, either hand in a java.util.Date or a String in format 'yyyy-MM-dd'T'hh:mm:ss'");
     }
 
     if (duedate==null) {
       duedate = businessCalendar.resolveDuedate(dueDateString);
     }
 
-    TimerEntity timer = new TimerEntity(this);
-    timer.setDuedate(duedate);
-    if (execution != null) {
-      timer.setExecution(execution);
-    }
+    job.setDuedate(duedate);
 
     if (type == TimerDeclarationType.CYCLE && jobHandlerType != TimerCatchIntermediateEventJobHandler.TYPE) {
 
       // See ACT-1427: A boundary timer with a cancelActivity='true', doesn't need to repeat itself
       if (!isInterruptingTimer) {
         String prepared = prepareRepeat(dueDateString);
-        timer.setRepeat(prepared);
+        job.setRepeat(prepared);
       }
     }
-
-    return timer;
   }
 
   protected String prepareRepeat(String dueDate) {
@@ -139,7 +142,7 @@ public class TimerDeclarationImpl extends JobDeclaration<TimerEntity> {
   }
 
   public TimerEntity createTimer(String deploymentId) {
-    TimerEntity timer = super.createJobInstance(null);
+    TimerEntity timer = super.createJobInstance((ExecutionEntity) null);
     timer.setDeploymentId(deploymentId);
     scheduleTimer(timer);
     return timer;
@@ -156,6 +159,10 @@ public class TimerDeclarationImpl extends JobDeclaration<TimerEntity> {
       .getCommandContext()
       .getJobManager()
       .schedule(timer);
+  }
+
+  protected ExecutionEntity resolveExecution(ExecutionEntity context) {
+    return context;
   }
 
 }

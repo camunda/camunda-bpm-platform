@@ -12,11 +12,14 @@
  */
 package org.camunda.bpm.engine.test.jobexecutor;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import org.camunda.bpm.engine.impl.jobexecutor.*;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
+import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.MessageJobDeclaration;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerCatchIntermediateEventJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
@@ -25,7 +28,7 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
 
 /**
- * <p>These testcases verify that job definitions are created upo n deployment of the process defintion</p>
+ * These testcases verify that job definitions are created upon deployment of the process definition.
  *
  * @author Daniel Meyer
  *
@@ -147,208 +150,35 @@ public class JobDefinitionDeploymentTest extends PluggableProcessEngineTestCase 
     assertEquals(MessageJobDeclaration.ASYNC_BEFORE, jobDefinition.getJobConfiguration());
     assertEquals(processDefinition.getId(), jobDefinition.getProcessDefinitionId());
   }
+  
+  @Deployment
+  public void testAsyncContinuationOfMultiInstance() {
+    // given
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    JobDefinition jobDefinition = managementService.createJobDefinitionQuery().processDefinitionKey("testProcess").singleResult();
 
-  // redeployment tests ////////////////////////////////////////////////////////////
-
-  public void testTimerStartEventRedeployment() {
-
-    // initially there are no job definitions:
-    assertEquals(0, managementService.createJobDefinitionQuery().count());
-
-    // initial deployment
-    String deploymentId = repositoryService.createDeployment()
-      .addClasspathResource("org/camunda/bpm/engine/test/jobexecutor/JobDefinitionDeploymentTest.testTimerStartEvent.bpmn20.xml")
-      .deploy()
-      .getId();
-
-    // this parses the process and created the Job definitions:
-    JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
+    // then assert
     assertNotNull(jobDefinition);
-
-    // now clear the cache:
-    processEngineConfiguration.getDeploymentCache().discardProcessDefinitionCache();
-
-    // if we start an instance of the process, the process will be parsed again:
-    runtimeService.startProcessInstanceByKey("testProcess");
-
-    // the job has the correct definitionId set:
-    Job job = managementService.createJobQuery().singleResult();
-    assertEquals(jobDefinition.getId(), job.getJobDefinitionId());
-
-    // delete the deployment
-    repositoryService.deleteDeployment(deploymentId, true);
+    assertEquals(AsyncContinuationJobHandler.TYPE, jobDefinition.getJobType());
+    assertEquals("theService" + BpmnParse.MULTI_INSTANCE_BODY_ID_SUFFIX, jobDefinition.getActivityId());
+    assertEquals(MessageJobDeclaration.ASYNC_AFTER, jobDefinition.getJobConfiguration());
+    assertEquals(processDefinition.getId(), jobDefinition.getProcessDefinitionId());
   }
+  
+  @Deployment
+  public void testAsyncContinuationOfActivityWrappedInMultiInstance() {
+    // given
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    JobDefinition jobDefinition = managementService.createJobDefinitionQuery().processDefinitionKey("testProcess").singleResult();
 
-  public void testTimerBoundaryEventRedeployment() {
-
-    // initially there are no job definitions:
-    assertEquals(0, managementService.createJobDefinitionQuery().count());
-
-    // initial deployment
-    String deploymentId = repositoryService.createDeployment()
-      .addClasspathResource("org/camunda/bpm/engine/test/jobexecutor/JobDefinitionDeploymentTest.testTimerBoundaryEvent.bpmn20.xml")
-      .deploy()
-      .getId();
-
-    // this parses the process and created the Job definitions:
-    JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
+    // then assert
     assertNotNull(jobDefinition);
-
-    // now clear the cache:
-    processEngineConfiguration.getDeploymentCache().discardProcessDefinitionCache();
-
-    // if we start an instance of the process, the process will be parsed again:
-    runtimeService.startProcessInstanceByKey("testProcess");
-
-    // no new definitions have been created:
-    assertEquals(jobDefinition.getId(), managementService.createJobDefinitionQuery().singleResult().getId());
-
-    // the job has the correct definitionId set:
-    Job job = managementService.createJobQuery().singleResult();
-    assertEquals(jobDefinition.getId(), job.getJobDefinitionId());
-
-    // delete the deployment
-    repositoryService.deleteDeployment(deploymentId, true);
+    assertEquals(AsyncContinuationJobHandler.TYPE, jobDefinition.getJobType());
+    assertEquals("theService", jobDefinition.getActivityId());
+    assertEquals(MessageJobDeclaration.ASYNC_AFTER, jobDefinition.getJobConfiguration());
+    assertEquals(processDefinition.getId(), jobDefinition.getProcessDefinitionId());
   }
-
-  public void testMultipleTimerBoundaryEventsRedeployment() {
-
-    // initially there are no job definitions:
-    assertEquals(0, managementService.createJobDefinitionQuery().count());
-
-    // initial deployment
-    String deploymentId = repositoryService.createDeployment()
-      .addClasspathResource("org/camunda/bpm/engine/test/jobexecutor/JobDefinitionDeploymentTest.testMultipleTimerBoundaryEvents.bpmn20.xml")
-      .deploy()
-      .getId();
-
-    // this parses the process and creates the Job definitions:
-    List<JobDefinition> jobDefinitions = managementService.createJobDefinitionQuery().list();
-    assertEquals(2, jobDefinitions.size());
-    Set<String> definitionIds = getJobDefinitionIds(jobDefinitions);
-
-    // now clear the cache:
-    processEngineConfiguration.getDeploymentCache().discardProcessDefinitionCache();
-
-    // if we start an instance of the process, the process will be parsed again:
-    runtimeService.startProcessInstanceByKey("testProcess");
-
-    // no new definitions were created
-    assertEquals(2, managementService.createJobDefinitionQuery().count());
-
-    // the job has the correct definitionId set:
-    List<Job> jobs = managementService.createJobQuery().list();
-    assertFalse("Both jobs were created from different job definitions",
-                jobs.get(0).getJobDefinitionId().equals(jobs.get(1).getJobDefinitionId()));
-    assertTrue(definitionIds.contains(jobs.get(0).getJobDefinitionId()));
-    assertTrue(definitionIds.contains(jobs.get(1).getJobDefinitionId()));
-
-    // delete the deployment
-    repositoryService.deleteDeployment(deploymentId, true);
-  }
-
-  public void testEventBasedGatewayRedeployment() {
-
-    // initially there are no job definitions:
-    assertEquals(0, managementService.createJobDefinitionQuery().count());
-
-    // initial deployment
-    String deploymentId = repositoryService.createDeployment()
-      .addClasspathResource("org/camunda/bpm/engine/test/jobexecutor/JobDefinitionDeploymentTest.testEventBasedGateway.bpmn20.xml")
-      .deploy()
-      .getId();
-
-    // this parses the process and creates the Job definitions:
-    List<JobDefinition> jobDefinitions = managementService.createJobDefinitionQuery().list();
-    assertEquals(2, jobDefinitions.size());
-    Set<String> definitionIds = getJobDefinitionIds(jobDefinitions);
-
-    // now clear the cache:
-    processEngineConfiguration.getDeploymentCache().discardProcessDefinitionCache();
-
-    // if we start an instance of the process, the process will be parsed again:
-    runtimeService.startProcessInstanceByKey("testProcess");
-
-    // no new definitions were created
-    assertEquals(2, managementService.createJobDefinitionQuery().count());
-
-    // the job has the correct definitionId set:
-    List<Job> jobs = managementService.createJobQuery().list();
-    assertFalse("Both jobs were created from different job definitions",
-                jobs.get(0).getJobDefinitionId().equals(jobs.get(1).getJobDefinitionId()));
-    assertTrue(definitionIds.contains(jobs.get(0).getJobDefinitionId()));
-    assertTrue(definitionIds.contains(jobs.get(1).getJobDefinitionId()));
-
-    // delete the deployment
-    repositoryService.deleteDeployment(deploymentId, true);
-  }
-
-  public void testTimerIntermediateEventRedeployment() {
-
-    // initially there are no job definitions:
-    assertEquals(0, managementService.createJobDefinitionQuery().count());
-
-    // initial deployment
-    String deploymentId = repositoryService.createDeployment()
-      .addClasspathResource("org/camunda/bpm/engine/test/jobexecutor/JobDefinitionDeploymentTest.testTimerIntermediateEvent.bpmn20.xml")
-      .deploy()
-      .getId();
-
-    // this parses the process and creates the Job definitions:
-    List<JobDefinition> jobDefinitions = managementService.createJobDefinitionQuery().list();
-    assertEquals(1, jobDefinitions.size());
-    Set<String> definitionIds = getJobDefinitionIds(jobDefinitions);
-
-    // now clear the cache:
-    processEngineConfiguration.getDeploymentCache().discardProcessDefinitionCache();
-
-    // if we start an instance of the process, the process will be parsed again:
-    runtimeService.startProcessInstanceByKey("testProcess");
-
-    // no new definitions were created
-    assertEquals(1, managementService.createJobDefinitionQuery().count());
-
-    // the job has the correct definitionId set:
-    List<Job> jobs = managementService.createJobQuery().list();
-    assertTrue(definitionIds.contains(jobs.get(0).getJobDefinitionId()));
-
-    // delete the deployment
-    repositoryService.deleteDeployment(deploymentId, true);
-  }
-
-  public void testAsyncContinuatioRedeployment() {
-
-    // initially there are no job definitions:
-    assertEquals(0, managementService.createJobDefinitionQuery().count());
-
-    // initial deployment
-    String deploymentId = repositoryService.createDeployment()
-      .addClasspathResource("org/camunda/bpm/engine/test/jobexecutor/JobDefinitionDeploymentTest.testAsyncContinuation.bpmn20.xml")
-      .deploy()
-      .getId();
-
-    // this parses the process and creates the Job definitions:
-    List<JobDefinition> jobDefinitions = managementService.createJobDefinitionQuery().list();
-    assertEquals(1, jobDefinitions.size());
-    Set<String> definitionIds = getJobDefinitionIds(jobDefinitions);
-
-    // now clear the cache:
-    processEngineConfiguration.getDeploymentCache().discardProcessDefinitionCache();
-
-    // if we start an instance of the process, the process will be parsed again:
-    runtimeService.startProcessInstanceByKey("testProcess");
-
-    // no new definitions were created
-    assertEquals(1, managementService.createJobDefinitionQuery().count());
-
-    // the job has the correct definitionId set:
-    List<Job> jobs = managementService.createJobQuery().list();
-    assertTrue(definitionIds.contains(jobs.get(0).getJobDefinitionId()));
-
-    // delete the deployment
-    repositoryService.deleteDeployment(deploymentId, true);
-  }
-
+  
   @Deployment(resources = {"org/camunda/bpm/engine/test/jobexecutor/JobDefinitionDeploymentTest.testAsyncContinuation.bpmn20.xml",
       "org/camunda/bpm/engine/test/jobexecutor/JobDefinitionDeploymentTest.testMultipleProcessesWithinDeployment.bpmn20.xml"})
   public void testMultipleProcessDeployment() {
@@ -358,14 +188,6 @@ public class JobDefinitionDeploymentTest extends PluggableProcessEngineTestCase 
 
     assertEquals(1, query.processDefinitionKey("testProcess").list().size());
     assertEquals(2, query.processDefinitionKey("anotherTestProcess").list().size());
-  }
-
-  protected Set<String> getJobDefinitionIds(List<JobDefinition> jobDefinitions) {
-    Set<String> definitionIds = new HashSet<String>();
-    for (JobDefinition definition : jobDefinitions) {
-      definitionIds.add(definition.getId());
-    }
-    return definitionIds;
   }
 
 }

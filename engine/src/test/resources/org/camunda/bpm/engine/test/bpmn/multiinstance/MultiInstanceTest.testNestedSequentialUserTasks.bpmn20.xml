@@ -2,7 +2,7 @@
 <definitions id="definition" 
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
   
   <process id="miNestedSequentialUserTasks">
@@ -25,7 +25,7 @@
           <startEvent id="subStart3" />
           <sequenceFlow id="flow4" sourceRef="subStart3" targetRef="miTasks" />
         
-          <userTask id="miTasks" name="My Task" activiti:assignee="kermit">
+          <userTask id="miTasks" name="My Task" camunda:assignee="kermit">
 			      <multiInstanceLoopCharacteristics isSequential="true">
 			        <loopCardinality>${3}</loopCardinality>
 			      </multiInstanceLoopCharacteristics>

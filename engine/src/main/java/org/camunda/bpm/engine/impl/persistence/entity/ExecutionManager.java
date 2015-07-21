@@ -71,7 +71,7 @@ public class ExecutionManager extends AbstractManager {
       throw new BadUserRequestException("No process instance found for id '" + processInstanceId + "'");
     }
 
-    getTaskManager().deleteTasksByProcessInstanceId(processInstanceId, deleteReason, cascade);
+    getTaskManager().deleteTasksByProcessInstanceId(processInstanceId, deleteReason, cascade, skipCustomListeners);
 
     // delete the execution BEFORE we delete the history, otherwise we will produce orphan HistoricVariableInstance instances
     execution.deleteCascade(deleteReason, skipCustomListeners);

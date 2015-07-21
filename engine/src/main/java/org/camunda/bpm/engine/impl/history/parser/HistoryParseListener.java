@@ -121,8 +121,8 @@ public class HistoryParseListener implements BpmnParseListener {
 
     if (historyLevel.isHistoryEventProduced(HistoryEventTypes.TASK_INSTANCE_CREATE, null)) {
       TaskDefinition taskDefinition = ((UserTaskActivityBehavior) activity.getActivityBehavior()).getTaskDefinition();
-      taskDefinition.addTaskListener(TaskListener.EVENTNAME_ASSIGNMENT, USER_TASK_ASSIGNMENT_HANDLER);
-      taskDefinition.addTaskListener(TaskListener.EVENTNAME_CREATE, USER_TASK_ID_HANDLER);
+      taskDefinition.addBuiltInTaskListener(TaskListener.EVENTNAME_ASSIGNMENT, USER_TASK_ASSIGNMENT_HANDLER);
+      taskDefinition.addBuiltInTaskListener(TaskListener.EVENTNAME_CREATE, USER_TASK_ID_HANDLER);
     }
   }
 

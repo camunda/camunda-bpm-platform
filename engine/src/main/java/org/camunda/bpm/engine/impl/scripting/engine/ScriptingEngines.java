@@ -70,6 +70,10 @@ public class ScriptingEngines {
     return enableScriptEngineCaching;
   }
 
+  public ScriptEngineManager getScriptEngineManager() {
+    return scriptEngineManager;
+  }
+
   public ScriptingEngines addScriptEngineFactory(ScriptEngineFactory scriptEngineFactory) {
     scriptEngineManager.registerEngineName(scriptEngineFactory.getEngineName(), scriptEngineFactory);
     return this;

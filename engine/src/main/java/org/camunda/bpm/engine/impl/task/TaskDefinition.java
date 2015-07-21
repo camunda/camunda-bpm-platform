@@ -22,6 +22,7 @@ import java.util.Set;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.form.handler.TaskFormHandler;
+import org.camunda.bpm.engine.impl.util.CollectionUtil;
 
 /**
  * Container for task definition information gathered at parsing time.
@@ -48,6 +49,7 @@ public class TaskDefinition {
 
   // task listeners
   protected Map<String, List<TaskListener>> taskListeners = new HashMap<String, List<TaskListener>>();
+  protected Map<String, List<TaskListener>> builtinTaskListeners = new HashMap<String, List<TaskListener>>();
 
   public TaskDefinition(TaskFormHandler taskFormHandler) {
     this.taskFormHandler = taskFormHandler;
@@ -139,22 +141,31 @@ public class TaskDefinition {
     return taskListeners;
   }
 
+  public Map<String, List<TaskListener>> getBuiltinTaskListeners() {
+    return builtinTaskListeners;
+  }
+
   public void setTaskListeners(Map<String, List<TaskListener>> taskListeners) {
     this.taskListeners = taskListeners;
   }
 
-  public List<TaskListener> getTaskListener(String eventName) {
+  public List<TaskListener> getTaskListeners(String eventName) {
     return taskListeners.get(eventName);
   }
 
-  public void addTaskListener(String eventName, TaskListener taskListener) {
-    List<TaskListener> taskEventListeners = taskListeners.get(eventName);
-    if (taskEventListeners == null) {
-      taskEventListeners = new ArrayList<TaskListener>();
-      taskListeners.put(eventName, taskEventListeners);
-    }
-    taskEventListeners.add(taskListener);
+  public List<TaskListener> getBuiltinTaskListeners(String eventName) {
+    return builtinTaskListeners.get(eventName);
   }
+
+  public void addTaskListener(String eventName, TaskListener taskListener) {
+    CollectionUtil.addToMapOfLists(taskListeners, eventName, taskListener);
+  }
+
+  public void addBuiltInTaskListener(String eventName, TaskListener taskListener) {
+    CollectionUtil.addToMapOfLists(taskListeners, eventName, taskListener);
+    CollectionUtil.addToMapOfLists(builtinTaskListeners, eventName, taskListener);
+  }
+
 
   public Expression getFormKey() {
     return formKey;

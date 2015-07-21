@@ -17,75 +17,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.exception.NullValueException;
-import org.camunda.bpm.engine.impl.history.HistoryLevel;
-import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
-import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.handler.CompositeHistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.handler.DbHistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 
 /**
  * @author Alexander Tyatenkov
  *
  */
-public class CompositeHistoryEventHandlerTest extends PluggableProcessEngineTestCase {
-
-  /**
-   * The counter used to check the amount of triggered events.
-   */
-  private int countCustomHistoryEventHandler;
-
-  /**
-   * A {@link HistoryEventHandler} implementation to count the history events.
-   */
-  private class CustomDbHistoryEventHandler implements HistoryEventHandler {
-    @Override
-    public void handleEvent(HistoryEvent historyEvent) {
-      // take into account only variable related events
-      if (historyEvent instanceof HistoricVariableUpdateEventEntity) {
-        // emulate the history event processing and persisting
-        countCustomHistoryEventHandler++;
-      }
-    }
-
-    @Override
-    public void handleEvents(List<HistoryEvent> historyEvents) {
-      for (HistoryEvent historyEvent : historyEvents) {
-        handleEvent(historyEvent);
-      }
-    }
-  }
-
-  /**
-   * Perform common setup.
-   */
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
-    // clear the event counter
-    countCustomHistoryEventHandler = 0;
-  }
-
-  protected void closeDownProcessEngine() {
-    // Clean the cachedProcessEngine since test cases make changes on the
-    // process engine configuration object. The engine unit tests are not
-    // isolated with respect to the engine configuration, meaning that when you
-    // change the configuration it may affect following test cases.
-    cachedProcessEngine.close();
-    cachedProcessEngine = null;
-  }
-
-  /**
-   * The helper method to execute the test task.
-   */
-  private void startProcessAndCompleteUserTask() {
-    runtimeService.startProcessInstanceByKey("HistoryLevelTest");
-    Task task = taskService.createTaskQuery().singleResult();
-    taskService.complete(task.getId());
-  }
+public class CompositeHistoryEventHandlerTest extends AbstractCompositeHistoryEventHandlerTest {
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/history/HistoryLevelTest.bpmn20.xml" })
   public void testDefaultHistoryEventHandler() {
@@ -108,7 +49,6 @@ public class CompositeHistoryEventHandlerTest extends PluggableProcessEngineTest
     assertEquals(0, historyService.createHistoricDetailQuery().count());
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/history/HistoryLevelTest.bpmn20.xml" })
   public void testCompositeHistoryEventHandlerNonArgumentConstructorAddNullEvent() {
     CompositeHistoryEventHandler compositeHistoryEventHandler = new CompositeHistoryEventHandler();
     try {
@@ -144,7 +84,6 @@ public class CompositeHistoryEventHandlerTest extends PluggableProcessEngineTest
     assertEquals(2, historyService.createHistoricDetailQuery().count());
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/history/HistoryLevelTest.bpmn20.xml" })
   public void testCompositeHistoryEventHandlerArgumentConstructorWithNullVarargs() {
     HistoryEventHandler historyEventHandler = null;
     try {
@@ -155,7 +94,6 @@ public class CompositeHistoryEventHandlerTest extends PluggableProcessEngineTest
     }
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/history/HistoryLevelTest.bpmn20.xml" })
   public void testCompositeHistoryEventHandlerArgumentConstructorWithNullTwoVarargs() {
     try {
       new CompositeHistoryEventHandler(null, null);
@@ -198,7 +136,6 @@ public class CompositeHistoryEventHandlerTest extends PluggableProcessEngineTest
     assertEquals(0, historyService.createHistoricDetailQuery().count());
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/history/HistoryLevelTest.bpmn20.xml" })
   public void testCompositeHistoryEventHandlerArgumentConstructorWithNotEmptyListNullTwoEvents() {
     // prepare the list with two null events
     List<HistoryEventHandler> historyEventHandlers = new ArrayList<HistoryEventHandler>();

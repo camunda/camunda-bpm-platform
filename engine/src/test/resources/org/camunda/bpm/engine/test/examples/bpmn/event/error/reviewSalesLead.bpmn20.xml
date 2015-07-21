@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
 	xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
 	xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
 	xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" 
@@ -12,14 +12,14 @@
 	
    <process id="reviewSaledLead" name="Review sales lead">
    
-      <startEvent id="theStart" activiti:initiator="initiator" />
+      <startEvent id="theStart" camunda:initiator="initiator" />
       <sequenceFlow id="flow1" sourceRef="theStart" targetRef="provideNewSalesLead"/>
       
-      <userTask id="provideNewSalesLead" name="Provide new sales lead" activiti:assignee="${initiator}">
+      <userTask id="provideNewSalesLead" name="Provide new sales lead" camunda:assignee="${initiator}">
         <extensionElements>
-          <activiti:formProperty id="customerName" name="Customer name" type="string" required="true"/>
-          <activiti:formProperty id="potentialProfit" name="Potential profit" type="long" />
-          <activiti:formProperty id="details" name="Details" type="string"/>
+          <camunda:formProperty id="customerName" name="Customer name" type="string" required="true"/>
+          <camunda:formProperty id="potentialProfit" name="Potential profit" type="long" />
+          <camunda:formProperty id="details" name="Details" type="string"/>
         </extensionElements>
       </userTask>
       <sequenceFlow id="flow2" sourceRef="provideNewSalesLead" targetRef="reviewSalesLeadSubProcess"/>
@@ -33,20 +33,20 @@
          <parallelGateway id="fork" />
          <sequenceFlow id="flow5" sourceRef="fork" targetRef="reviewCustomerRating"/>
          
-         <userTask id="reviewCustomerRating" name="Review customer rating" activiti:candidateGroups="accountancy" />
+         <userTask id="reviewCustomerRating" name="Review customer rating" camunda:candidateGroups="accountancy" />
          <sequenceFlow id="flow6" sourceRef="reviewCustomerRating" targetRef="subProcessEnd1"/>
          
          <endEvent id="subProcessEnd1" />
          
-         <userTask id="reviewProfitability" name="Review profitability" activiti:candidateGroups="management">
+         <userTask id="reviewProfitability" name="Review profitability" camunda:candidateGroups="management">
            <documentation>
              ${initiator} has published a new sales lead: ${customerName}. Details: ${details}
            </documentation> 
             <extensionElements>
-			        <activiti:formProperty id="notEnoughInformation" name="Do you believe this customer is profitable?" type="enum" required="true">
-			          <activiti:value id="false" name="Yes" />
-			          <activiti:value id="true" name="No (= request more info)" />
-			        </activiti:formProperty>
+			        <camunda:formProperty id="notEnoughInformation" name="Do you believe this customer is profitable?" type="enum" required="true">
+			          <camunda:value id="false" name="Yes" />
+			          <camunda:value id="true" name="No (= request more info)" />
+			        </camunda:formProperty>
 			      </extensionElements>
          </userTask>
          <sequenceFlow id="flow7" sourceRef="reviewProfitability" targetRef="enoughInformationCheck"/>
@@ -72,10 +72,10 @@
       </boundaryEvent>
       <sequenceFlow id="flow11" sourceRef="catchNotEnoughInformationError" targetRef="provideAdditionalDetails"/>
       
-      <userTask id="provideAdditionalDetails" name="Provide additional details" activiti:assignee="${initiator}">
+      <userTask id="provideAdditionalDetails" name="Provide additional details" camunda:assignee="${initiator}">
         <documentation>Provide additional details for ${customerName}.</documentation>
         <extensionElements>
-          <activiti:formProperty id="details" name="Additional details" type="string" required="true"/>
+          <camunda:formProperty id="details" name="Additional details" type="string" required="true"/>
         </extensionElements>
       </userTask>
       <sequenceFlow id="flow12" sourceRef="provideAdditionalDetails" targetRef="reviewSalesLeadSubProcess"/>

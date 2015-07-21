@@ -89,6 +89,11 @@ public class UserQueryDto extends AbstractQueryDto<UserQuery> {
   public void setLastName(String userLastName) {
     this.lastName = userLastName;
   }
+  
+  @CamundaQueryParam("lastNameLike")
+  public void setLastNameLike(String userLastNameLike) {
+    this.lastNameLike = userLastNameLike;
+  }
 
   @CamundaQueryParam("email")
   public void setEmail(String userEmail) {

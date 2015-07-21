@@ -12,23 +12,29 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor;
 
+import java.io.Serializable;
+import java.util.Date;
+
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
-
-import java.io.Serializable;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 /**
  * <p>A job declaration is associated with an activity in the process definition graph.
- * It provides data about Jobs which are to be created when executing this activity.
+ * It provides data about jobs which are to be created when executing this activity.
  * It also acts as a factory for new Job Instances.</p>
+ *
+ * <p>Jobs are of a type T and are created in the context of type S (e.g. an execution or an event subscription).
+ * An instance of the context class is handed in when a job is created.</p>
  *
  * @author Daniel Meyer
  *
  */
-public abstract class JobDeclaration<T extends JobEntity> implements Serializable {
+public abstract class JobDeclaration<S, T extends JobEntity> implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -56,11 +62,12 @@ public abstract class JobDeclaration<T extends JobEntity> implements Serializabl
    * @param execution can be null in case of a timer start event.
    * @return the created Job instances
    */
-  public T createJobInstance(ExecutionEntity execution) {
+  public T createJobInstance(S context) {
 
-    T job = newJobInstance(execution);
+    T job = newJobInstance(context);
 
     // set job definition id
+    String jobDefinitionId = resolveJobDefinitionId(context);
     job.setJobDefinitionId(jobDefinitionId);
 
     if(jobDefinitionId != null) {
@@ -79,28 +86,45 @@ public abstract class JobDeclaration<T extends JobEntity> implements Serializabl
 
     }
 
-    job.setJobHandlerType(jobHandlerType);
-    job.setJobHandlerConfiguration(jobHandlerConfiguration);
-    job.setExclusive(exclusive);
-    job.setRetries(Context.getProcessEngineConfiguration().getDefaultNumberOfRetries());
+    job.setJobHandlerConfiguration(resolveJobHandlerConfiguration(context));
+    job.setJobHandlerType(resolveJobHandlerType(context));
+    job.setExclusive(resolveExclusive(context));
+    job.setRetries(resolveRetries(context));
+    job.setDuedate(resolveDueDate(context));
+
+    ExecutionEntity contextExecution = resolveExecution(context);
 
     if (Context.getProcessEngineConfiguration().isProducePrioritizedJobs()) {
       int priority = Context
           .getProcessEngineConfiguration()
           .getJobPriorityProvider()
-          .determinePriority(execution, this);
+          .determinePriority(contextExecution, this);
 
       job.setPriority(priority);
     }
 
+    postInitialize(context, job);
+
     return job;
   }
 
-  protected abstract T newJobInstance(ExecutionEntity execution);
+  /**
+   * general callback to override any configuration after the defaults have been applied
+   */
+  protected void postInitialize(S context, T job) {
+  }
+
+  protected abstract ExecutionEntity resolveExecution(S context);
+
+  protected abstract T newJobInstance(S context);
 
   // Getter / Setters //////////////////////////////////////////
 
   public String getJobDefinitionId() {
+    return jobDefinitionId;
+  }
+
+  protected String resolveJobDefinitionId(S context) {
     return jobDefinitionId;
   }
 
@@ -112,12 +136,38 @@ public abstract class JobDeclaration<T extends JobEntity> implements Serializabl
     return jobHandlerType;
   }
 
+  protected String resolveJobHandlerType(S context) {
+    return jobHandlerType;
+  }
+
   public String getJobHandlerConfiguration() {
+    return jobHandlerConfiguration;
+  }
+
+  protected String resolveJobHandlerConfiguration(S context) {
     return jobHandlerConfiguration;
   }
 
   public void setJobHandlerConfiguration(String jobHandlerConfiguration) {
     this.jobHandlerConfiguration = jobHandlerConfiguration;
+  }
+
+  protected boolean resolveExclusive(S context) {
+    return exclusive;
+  }
+
+  protected int resolveRetries(S context) {
+    return Context.getProcessEngineConfiguration().getDefaultNumberOfRetries();
+  }
+
+  protected Date resolveDueDate(S context) {
+    ProcessEngineConfiguration processEngineConfiguration = Context.getProcessEngineConfiguration();
+    if (processEngineConfiguration != null && processEngineConfiguration.isJobExecutorAcquireByDueDate()) {
+      return ClockUtil.getCurrentTime();
+    }
+    else {
+      return null;
+    }
   }
 
   public boolean isExclusive() {

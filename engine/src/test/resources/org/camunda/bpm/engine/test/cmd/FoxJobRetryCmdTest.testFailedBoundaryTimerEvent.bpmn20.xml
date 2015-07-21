@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions id="definitions"
 	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-	xmlns:activiti="http://activiti.org/bpmn"
+	xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
 	xmlns:fox="http://www.camunda.com/fox"
 	targetNamespace="Examples">
 
@@ -27,7 +27,7 @@
 		
 		<sequenceFlow id="flow3" sourceRef="failingTimerEvent" targetRef="failingServiceTask" />
 		
-		<serviceTask id="failingServiceTask" activiti:class="org.camunda.bpm.engine.test.cmd.FailingDelegate"/>
+		<serviceTask id="failingServiceTask" camunda:class="org.camunda.bpm.engine.test.cmd.FailingDelegate"/>
 		<sequenceFlow id="flow4" sourceRef="failingServiceTask" targetRef="end" />
         
 		<endEvent id="end" />

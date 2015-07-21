@@ -2,7 +2,7 @@
 <definitions
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
 
   <process id="asyncExclusiveGateway">
@@ -10,9 +10,9 @@
     <startEvent id="theStart" />
     <sequenceFlow id="startFlow" sourceRef="theStart" targetRef="exclusiveGateway" />
 
-    <exclusiveGateway id="exclusiveGateway" name="exclusiveGateway" default="flow1" activiti:async="true">
+    <exclusiveGateway id="exclusiveGateway" name="exclusiveGateway" default="flow1" camunda:async="true">
       <extensionElements>
-        <activiti:executionListener event="start" class="org.camunda.bpm.engine.test.bpmn.async.AsyncListener" />
+        <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.bpmn.async.AsyncListener" />
       </extensionElements>
     </exclusiveGateway>
 

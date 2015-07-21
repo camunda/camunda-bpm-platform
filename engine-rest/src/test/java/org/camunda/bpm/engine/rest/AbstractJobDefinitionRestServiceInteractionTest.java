@@ -3,7 +3,9 @@ package org.camunda.bpm.engine.rest;
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
@@ -21,10 +23,13 @@ import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
+import org.camunda.bpm.engine.rest.helper.MockJobDefinitionBuilder;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,6 +44,8 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
   protected static final String SINGLE_JOB_DEFINITION_SUSPENDED_URL = SINGLE_JOB_DEFINITION_RESOURCE_URL + "/suspended";
   protected static final String JOB_DEFINITION_SUSPENDED_URL = JOB_DEFINITION_RESOURCE_URL + "/suspended";
   protected static final String JOB_DEFINITION_RETRIES_URL = SINGLE_JOB_DEFINITION_RESOURCE_URL + "/retries";
+  protected static final String JOB_DEFINITION_PRIORITY_URL = SINGLE_JOB_DEFINITION_RESOURCE_URL + "/jobPriority";
+
 
   private ProcessEngine namedProcessEngine;
   private ManagementService mockManagementService;
@@ -75,12 +82,34 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
         .body("jobConfiguration", equalTo(MockProvider.EXAMPLE_JOB_CONFIG))
         .body("activityId", equalTo(MockProvider.EXAMPLE_ACTIVITY_ID))
         .body("suspended", equalTo(MockProvider.EXAMPLE_JOB_DEFINITION_IS_SUSPENDED))
+        .body("overridingJobPriority", equalTo(MockProvider.EXAMPLE_JOB_DEFINITION_PRIORITY))
     .when()
       .get(SINGLE_JOB_DEFINITION_RESOURCE_URL);
 
     InOrder inOrder = inOrder(mockQuery);
     inOrder.verify(mockQuery).jobDefinitionId(MockProvider.EXAMPLE_JOB_DEFINITION_ID);
     inOrder.verify(mockQuery).singleResult();
+  }
+
+  @Test
+  public void testJobDefinitionGetNullJobPriority() {
+    // given
+    JobDefinition mockJobDefinition = new MockJobDefinitionBuilder()
+      .id(MockProvider.EXAMPLE_JOB_DEFINITION_ID)
+      .jobPriority(null)
+      .build();
+
+    when(mockQuery.singleResult()).thenReturn(mockJobDefinition);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_DEFINITION_ID)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("id", equalTo(MockProvider.EXAMPLE_JOB_DEFINITION_ID))
+        .body("jobPriority", nullValue())
+    .when()
+      .get(SINGLE_JOB_DEFINITION_RESOURCE_URL);
   }
 
   @Test
@@ -1153,5 +1182,228 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
     .when()
       .put(JOB_DEFINITION_RETRIES_URL);
   }
+
+  @Test
+  public void testSetJobPriority() {
+    Map<String, Object> priorityJson = new HashMap<String, Object>();
+    priorityJson.put("priority", MockProvider.EXAMPLE_JOB_DEFINITION_PRIORITY);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_DEFINITION_ID)
+      .contentType(ContentType.JSON)
+      .body(priorityJson)
+    .then()
+      .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .put(JOB_DEFINITION_PRIORITY_URL);
+
+    verify(mockManagementService).setOverridingJobPriorityForJobDefinition(MockProvider.EXAMPLE_JOB_DEFINITION_ID,
+        MockProvider.EXAMPLE_JOB_DEFINITION_PRIORITY, false);
+  }
+
+  @Test
+  public void testSetJobPriorityIncludeExistingJobs() {
+    Map<String, Object> priorityJson = new HashMap<String, Object>();
+    priorityJson.put("priority", MockProvider.EXAMPLE_JOB_DEFINITION_PRIORITY);
+    priorityJson.put("includeJobs", true);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_DEFINITION_ID)
+      .contentType(ContentType.JSON)
+      .body(priorityJson)
+    .then()
+      .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .put(JOB_DEFINITION_PRIORITY_URL);
+
+    verify(mockManagementService).setOverridingJobPriorityForJobDefinition(MockProvider.EXAMPLE_JOB_DEFINITION_ID,
+        MockProvider.EXAMPLE_JOB_DEFINITION_PRIORITY, true);
+  }
+
+  @Test
+  public void testSetJobPriorityExceptionExpected() {
+    String expectedMessage = "expected exception message";
+
+    doThrow(new ProcessEngineException(expectedMessage))
+      .when(mockManagementService)
+        .setOverridingJobPriorityForJobDefinition(eq(MockProvider.EXAMPLE_JOB_DEFINITION_ID),
+            eq(MockProvider.EXAMPLE_JOB_DEFINITION_PRIORITY), anyBoolean());
+
+    Map<String, Object> priorityJson = new HashMap<String, Object>();
+    priorityJson.put("priority", MockProvider.EXAMPLE_JOB_DEFINITION_PRIORITY);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_DEFINITION_ID)
+      .contentType(ContentType.JSON)
+      .body(priorityJson)
+    .then()
+      .expect()
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", equalTo(expectedMessage))
+    .when()
+      .put(JOB_DEFINITION_PRIORITY_URL);
+
+    verify(mockManagementService).setOverridingJobPriorityForJobDefinition(MockProvider.EXAMPLE_JOB_DEFINITION_ID,
+        MockProvider.EXAMPLE_JOB_DEFINITION_PRIORITY, false);
+  }
+
+  @Test
+  public void testSetNonExistingJobDefinitionPriority() {
+    String expectedMessage = "expected exception message";
+
+    doThrow(new NotFoundException(expectedMessage))
+      .when(mockManagementService)
+        .setOverridingJobPriorityForJobDefinition(eq(MockProvider.NON_EXISTING_JOB_DEFINITION_ID),
+            eq(MockProvider.EXAMPLE_JOB_DEFINITION_PRIORITY), anyBoolean());
+
+    Map<String, Object> priorityJson = new HashMap<String, Object>();
+    priorityJson.put("priority", MockProvider.EXAMPLE_JOB_DEFINITION_PRIORITY);
+
+    given()
+      .pathParam("id", MockProvider.NON_EXISTING_JOB_DEFINITION_ID)
+      .contentType(ContentType.JSON)
+      .body(priorityJson)
+    .then()
+      .expect()
+        .statusCode(Status.NOT_FOUND.getStatusCode())
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo(expectedMessage))
+    .when()
+      .put(JOB_DEFINITION_PRIORITY_URL);
+  }
+
+  @Test
+  public void testSetJobPriorityAuthorizationException() {
+    String expectedMessage = "expected exception message";
+    doThrow(new AuthorizationException(expectedMessage))
+      .when(mockManagementService)
+        .setOverridingJobPriorityForJobDefinition(eq(MockProvider.EXAMPLE_JOB_DEFINITION_ID),
+            eq(MockProvider.EXAMPLE_JOB_DEFINITION_PRIORITY), anyBoolean());
+
+    Map<String, Object> priorityJson = new HashMap<String, Object>();
+    priorityJson.put("priority", MockProvider.EXAMPLE_JOB_DEFINITION_PRIORITY);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_DEFINITION_ID)
+      .contentType(ContentType.JSON)
+      .body(priorityJson)
+    .then()
+      .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+        .body("message", equalTo(expectedMessage))
+    .when()
+      .put(JOB_DEFINITION_PRIORITY_URL);
+  }
+
+  @Test
+  public void testResetJobPriority() {
+    Map<String, Object> priorityJson = new HashMap<String, Object>();
+    priorityJson.put("priority", null);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_DEFINITION_ID)
+      .contentType(ContentType.JSON)
+      .body(priorityJson)
+    .then()
+      .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .put(JOB_DEFINITION_PRIORITY_URL);
+
+    verify(mockManagementService).clearOverridingJobPriorityForJobDefinition(MockProvider.EXAMPLE_JOB_DEFINITION_ID);
+  }
+
+  @Test
+  public void testResetJobPriorityIncludeJobsNotAllowed() {
+    Map<String, Object> priorityJson = new HashMap<String, Object>();
+    priorityJson.put("priority", null);
+    priorityJson.put("includeJobs", true);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_DEFINITION_ID)
+      .contentType(ContentType.JSON)
+      .body(priorityJson)
+    .then()
+      .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Cannot reset priority for job definition " + MockProvider.EXAMPLE_JOB_DEFINITION_ID
+            + " with includeJobs=true"))
+    .when()
+      .put(JOB_DEFINITION_PRIORITY_URL);
+  }
+
+  @Test
+  public void testResetJobPriorityExceptionExpected() {
+    String expectedMessage = "expected exception message";
+
+    doThrow(new ProcessEngineException(expectedMessage))
+      .when(mockManagementService).clearOverridingJobPriorityForJobDefinition(MockProvider.EXAMPLE_JOB_DEFINITION_ID);
+
+    Map<String, Object> priorityJson = new HashMap<String, Object>();
+    priorityJson.put("priority", null);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_DEFINITION_ID)
+      .contentType(ContentType.JSON)
+      .body(priorityJson)
+    .then()
+      .expect()
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", equalTo(expectedMessage))
+    .when()
+      .put(JOB_DEFINITION_PRIORITY_URL);
+  }
+
+  @Test
+  public void testResetNonExistingJobDefinitionPriority() {
+    String expectedMessage = "expected exception message";
+
+    doThrow(new NotFoundException(expectedMessage))
+      .when(mockManagementService).clearOverridingJobPriorityForJobDefinition(MockProvider.NON_EXISTING_JOB_DEFINITION_ID);
+
+    Map<String, Object> priorityJson = new HashMap<String, Object>();
+    priorityJson.put("priority", null);
+
+    given()
+      .pathParam("id", MockProvider.NON_EXISTING_JOB_DEFINITION_ID)
+      .contentType(ContentType.JSON)
+      .body(priorityJson)
+    .then()
+      .expect()
+        .statusCode(Status.NOT_FOUND.getStatusCode())
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo(expectedMessage))
+    .when()
+      .put(JOB_DEFINITION_PRIORITY_URL);
+  }
+
+  @Test
+  public void testResetJobPriorityAuthorizationException() {
+    String expectedMessage = "expected exception message";
+    doThrow(new AuthorizationException(expectedMessage))
+    .when(mockManagementService).clearOverridingJobPriorityForJobDefinition(MockProvider.EXAMPLE_JOB_DEFINITION_ID);
+
+    Map<String, Object> priorityJson = new HashMap<String, Object>();
+    priorityJson.put("priority", null);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_DEFINITION_ID)
+      .contentType(ContentType.JSON)
+      .body(priorityJson)
+    .then()
+      .expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode())
+        .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+        .body("message", equalTo(expectedMessage))
+    .when()
+      .put(JOB_DEFINITION_PRIORITY_URL);
+  }
+
 
 }

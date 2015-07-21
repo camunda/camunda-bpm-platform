@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions 
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
 
   <error id="Error_1" errorCode="error" name="error"/>
@@ -11,7 +11,7 @@
 
     <sequenceFlow sourceRef="theStart" targetRef="serviceTask" />
 
-    <serviceTask id="serviceTask" activiti:class="org.camunda.bpm.application.impl.event.AsyncThrowErrorService" />
+    <serviceTask id="serviceTask" camunda:class="org.camunda.bpm.application.impl.event.AsyncThrowErrorService" />
     <sequenceFlow sourceRef="serviceTask" targetRef="theEnd" />
 
     <boundaryEvent id="errorBoundary" attachedToRef="serviceTask">

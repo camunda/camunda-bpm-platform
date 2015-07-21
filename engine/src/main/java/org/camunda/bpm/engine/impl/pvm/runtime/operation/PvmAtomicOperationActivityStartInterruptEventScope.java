@@ -26,6 +26,7 @@ public class PvmAtomicOperationActivityStartInterruptEventScope extends PvmAtomi
   }
 
   protected void scopeInterrupted(PvmExecutionImpl execution) {
+    execution.setActivityInstanceId(null);
     execution.performOperation(ACTIVITY_START_CREATE_SCOPE);
   }
 

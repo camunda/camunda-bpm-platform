@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions id="definitions" 
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
   
   <process id="simpleSubProcess">
@@ -18,7 +18,7 @@
       
         <startEvent id="subProcess2Start" />
         <sequenceFlow id="flow3" sourceRef="subProcess2Start" targetRef="subProcessServiceTask" />
-        <serviceTask id="subProcessServiceTask" name="Service task in subprocess" activiti:class="org.camunda.bpm.engine.test.db.SetLocalVariableTask" />
+        <serviceTask id="subProcessServiceTask" name="Service task in subprocess" camunda:class="org.camunda.bpm.engine.test.db.SetLocalVariableTask" />
         <sequenceFlow id="flow4" sourceRef="subProcessServiceTask" targetRef="subProcessTask" />
         <userTask id="subProcessTask" name="Task in subprocess" />
         <sequenceFlow id="flow5" sourceRef="subProcessTask" targetRef="subProcessEnd2" />

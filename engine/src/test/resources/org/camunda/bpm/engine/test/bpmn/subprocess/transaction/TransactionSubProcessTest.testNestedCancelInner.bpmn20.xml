@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions id="definitions" 
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
 	
 	<process id="transactionProcess">
@@ -26,9 +26,9 @@
 			</boundaryEvent>	
 			
 			<serviceTask id="undoBookFlight" isForCompensation="true"
-				activiti:class="org.camunda.bpm.engine.test.bpmn.event.compensate.helper.UndoService">
+				camunda:class="org.camunda.bpm.engine.test.bpmn.event.compensate.helper.UndoService">
 				<extensionElements>
-					<activiti:field name="counterName" stringValue="undoBookFlight" />
+					<camunda:field name="counterName" stringValue="undoBookFlight" />
 				</extensionElements>
 			</serviceTask>	
 			
@@ -47,13 +47,13 @@
 				<sequenceFlow sourceRef="innerTxFork" targetRef="innerTxbookHotel" />
 				<sequenceFlow sourceRef="innerTxFork" targetRef="innerTxbookFlight" />
 	
-				<serviceTask id="innerTxbookHotel" activiti:expression="${true}">
+				<serviceTask id="innerTxbookHotel" camunda:expression="${true}">
 					<multiInstanceLoopCharacteristics isSequential="true">
 					  <loopCardinality>5</loopCardinality>
 					</multiInstanceLoopCharacteristics>
 				</serviceTask>		
 					
-				<serviceTask id="innerTxbookFlight" activiti:expression="${true}"/>
+				<serviceTask id="innerTxbookFlight" camunda:expression="${true}"/>
 				
 				<boundaryEvent id="innerTxcompensateBookHotelEvt" name="Boundary event" attachedToRef="innerTxbookHotel">
 					<compensateEventDefinition />
@@ -64,16 +64,16 @@
 				</boundaryEvent>
 
 				<serviceTask id="innerTxundoBookHotel" isForCompensation="true"
-					activiti:class="org.camunda.bpm.engine.test.bpmn.event.compensate.helper.UndoService">
+					camunda:class="org.camunda.bpm.engine.test.bpmn.event.compensate.helper.UndoService">
 					<extensionElements>
-						<activiti:field name="counterName" stringValue="innerTxundoBookHotel" />
+						<camunda:field name="counterName" stringValue="innerTxundoBookHotel" />
 					</extensionElements>
 				</serviceTask>
 				
 				<serviceTask id="innerTxundoBookFlight" isForCompensation="true"
-					activiti:class="org.camunda.bpm.engine.test.bpmn.event.compensate.helper.UndoService">
+					camunda:class="org.camunda.bpm.engine.test.bpmn.event.compensate.helper.UndoService">
 					<extensionElements>
-						<activiti:field name="counterName" stringValue="innerTxundoBookFlight" />
+						<camunda:field name="counterName" stringValue="innerTxundoBookFlight" />
 					</extensionElements>
 				</serviceTask>
 									            
@@ -83,7 +83,7 @@
 				
 				<sequenceFlow sourceRef="innerTxbookFlight" targetRef="innerTxaskCustomer" />
 				
-				<userTask id="innerTxaskCustomer" activiti:assignee="kermit" />
+				<userTask id="innerTxaskCustomer" camunda:assignee="kermit" />
 	
 				<exclusiveGateway id="innerTxconfirmed" />
 				

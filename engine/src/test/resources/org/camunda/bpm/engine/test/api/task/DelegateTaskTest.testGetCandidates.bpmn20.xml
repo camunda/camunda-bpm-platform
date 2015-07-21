@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions id="taskListenerExample"
-	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
 	targetNamespace="Examples">
 
 	<process id="DelegateTaskTest.testGetCandidates" name="Task  Listener Example">
@@ -9,10 +9,10 @@
 
 		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="task1" />
 
-		<userTask id="task1" activiti:candidateUsers="kermit, gonzo"
-			activiti:candidateGroups="management, accountancy">
+		<userTask id="task1" camunda:candidateUsers="kermit, gonzo"
+			camunda:candidateGroups="management, accountancy">
 			<extensionElements>
-				<activiti:taskListener event="create"
+				<camunda:taskListener event="create"
 					class="org.camunda.bpm.engine.test.api.task.DelegateTaskTestTaskListener" />
 			</extensionElements>
 		</userTask>

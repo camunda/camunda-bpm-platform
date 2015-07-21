@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <definitions id="definitions"
-             targetNamespace="http://activiti.org/bpmn20" 
+             targetNamespace="http://camunda.org/schema/1.0/bpmn20" 
              xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-             xmlns:activiti="http://activiti.org/bpmn">
+             xmlns:camunda="http://camunda.org/schema/1.0/bpmn">
   
   <process id="FormsProcess">
   
-    <startEvent id="start" activiti:formKey="org/camunda/bpm/engine/test/api/form/start.form" />
+    <startEvent id="start" camunda:formKey="org/camunda/bpm/engine/test/api/form/start.form" />
 
     <sequenceFlow id="flow1" sourceRef="start" targetRef="task" />
     
     <userTask id="task"
-              activiti:formKey="org/camunda/bpm/engine/test/api/form/task.form"
-              activiti:assignee="kermit" />
+              camunda:formKey="org/camunda/bpm/engine/test/api/form/task.form"
+              camunda:assignee="kermit" />
 
     <sequenceFlow id="flow2" sourceRef="task" targetRef="wait" />
     

@@ -33,7 +33,7 @@ public class FoxDeleteProcessInstanceCmd implements Command<Void>, Serializable 
 
     commandContext
       .getTaskManager()
-      .deleteTasksByProcessInstanceId(processInstanceId, deleteReason, false);
+      .deleteTasksByProcessInstanceId(processInstanceId, deleteReason, false, false);
 
     for (PvmExecutionImpl currentExecution : this.collectExecutionToDelete(execution)) {
       currentExecution.deleteCascade2(deleteReason);

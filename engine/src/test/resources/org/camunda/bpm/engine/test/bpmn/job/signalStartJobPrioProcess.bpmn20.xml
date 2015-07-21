@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+  
+  <signal id="signal" name="Signal" />
+
+  <process id="signalStartJobPrioProcess" camunda:jobPriority="8">
+  
+    <startEvent id="start" camunda:jobPriority="4">
+      <signalEventDefinition signalRef="signal" />      
+    </startEvent>
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="end" />
+    <endEvent id="end" />
+  </process>
+
+</definitions>

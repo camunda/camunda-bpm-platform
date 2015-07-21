@@ -622,6 +622,7 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
       .createProcessInstanceModification(processInstance.getId())
       .startBeforeActivity("miTasks", tree.getActivityInstances("miTasks#multiInstanceBody")[0].getId())
       .execute();
+      fail("expect exception");
     } catch (ProcessEngineException e) {
       assertTextPresent(e.getMessage(), "Concurrent instantiation not possible for activities "
           + "in scope miTasks#multiInstanceBody");
@@ -642,6 +643,7 @@ public class ProcessInstanceModificationMultiInstanceTest extends PluggableProce
         .createProcessInstanceModification(processInstance.getId())
         .startBeforeActivity("miSubProcess", tree.getActivityInstances("miSubProcess#multiInstanceBody")[0].getId())
         .execute();
+      fail("expect exception");
     } catch (ProcessEngineException e) {
       assertTextPresent(e.getMessage(), "Concurrent instantiation not possible for activities "
           + "in scope miSubProcess#multiInstanceBody");

@@ -19,7 +19,7 @@ import java.util.TreeMap;
 
 import org.camunda.bpm.engine.BpmnParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParser;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.mapping.InputParameter;
 import org.camunda.bpm.engine.impl.core.variable.mapping.IoMapping;
@@ -51,7 +51,7 @@ public final class BpmnParseUtil {
   public static Element findCamundaExtensionElement(Element element, String extensionElementName) {
     Element extensionElements = element.element("extensionElements");
     if(extensionElements != null) {
-      return extensionElements.elementNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, extensionElementName);
+      return extensionElements.elementNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, extensionElementName);
     } else {
       return null;
     }
@@ -65,7 +65,7 @@ public final class BpmnParseUtil {
    * @throws BpmnParseException if a input/output parameter element is malformed
    */
   public static IoMapping parseInputOutput(Element element) {
-    Element inputOutputElement = element.elementNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "inputOutput");
+    Element inputOutputElement = element.elementNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "inputOutput");
     if(inputOutputElement != null) {
       IoMapping ioMapping = new IoMapping();
       parseCamundaInputParameters(inputOutputElement, ioMapping);
@@ -84,7 +84,7 @@ public final class BpmnParseUtil {
    * @throws BpmnParseException if a input parameter element is malformed
    */
   public static void parseCamundaInputParameters(Element inputOutputElement, IoMapping ioMapping) {
-    List<Element> inputParameters = inputOutputElement.elementsNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "inputParameter");
+    List<Element> inputParameters = inputOutputElement.elementsNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "inputParameter");
     for (Element inputParameterElement : inputParameters) {
       parseInputParameterElement(inputParameterElement, ioMapping);
     }
@@ -99,7 +99,7 @@ public final class BpmnParseUtil {
    * @throws BpmnParseException if a output parameter element is malformed
    */
   public static void parseCamundaOutputParameters(Element inputOutputElement, IoMapping ioMapping) {
-    List<Element> outputParameters = inputOutputElement.elementsNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "outputParameter");
+    List<Element> outputParameters = inputOutputElement.elementsNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "outputParameter");
     for (Element outputParameterElement : outputParameters) {
       parseOutputParameterElement(outputParameterElement, ioMapping);
     }

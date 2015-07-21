@@ -2,14 +2,14 @@
 
 <definitions id="definitions" 
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
   
   <process id="historicFormPropertiesProcess">
   
     <startEvent id="start">
       <extensionElements>
-        <activiti:formProperty id="formProp1" 
+        <camunda:formProperty id="formProp1" 
           name="Property 1"
           variable="prop1" 
           type="string" />
@@ -17,7 +17,7 @@
     </startEvent>
     <sequenceFlow id="flow1" sourceRef="start" targetRef="task" />
 
-    <userTask id="task" name="Schedule meeting" activiti:assignee="kermit" />
+    <userTask id="task" name="Schedule meeting" camunda:assignee="kermit" />
     <sequenceFlow id="flow2" sourceRef="task" targetRef="end" />
     
     <endEvent id="end" />

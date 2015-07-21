@@ -537,7 +537,7 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
 
     assertEquals(1, taskDefinition.getTaskListeners().size());
 
-    List<TaskListener> createListeners = taskDefinition.getTaskListener(event);
+    List<TaskListener> createListeners = taskDefinition.getTaskListeners(event);
     assertEquals(1, createListeners.size());
     TaskListener listener = createListeners.get(0);
 
@@ -573,7 +573,7 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
 
     assertEquals(1, taskDefinition.getTaskListeners().size());
 
-    List<TaskListener> createListeners = taskDefinition.getTaskListener(event);
+    List<TaskListener> createListeners = taskDefinition.getTaskListeners(event);
     assertEquals(1, createListeners.size());
     TaskListener listener = createListeners.get(0);
 
@@ -609,7 +609,7 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
 
     assertEquals(1, taskDefinition.getTaskListeners().size());
 
-    List<TaskListener> createListeners = taskDefinition.getTaskListener(event);
+    List<TaskListener> createListeners = taskDefinition.getTaskListeners(event);
     assertEquals(1, createListeners.size());
     TaskListener listener = createListeners.get(0);
 
@@ -644,7 +644,7 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
 
     assertEquals(1, taskDefinition.getTaskListeners().size());
 
-    List<TaskListener> createListeners = taskDefinition.getTaskListener(event);
+    List<TaskListener> createListeners = taskDefinition.getTaskListeners(event);
     assertEquals(1, createListeners.size());
     TaskListener listener = createListeners.get(0);
 
@@ -680,7 +680,7 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
 
     assertEquals(1, taskDefinition.getTaskListeners().size());
 
-    List<TaskListener> createListeners = taskDefinition.getTaskListener(event);
+    List<TaskListener> createListeners = taskDefinition.getTaskListeners(event);
     assertEquals(1, createListeners.size());
     TaskListener listener = createListeners.get(0);
 
@@ -716,7 +716,7 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
 
     assertEquals(1, taskDefinition.getTaskListeners().size());
 
-    List<TaskListener> createListeners = taskDefinition.getTaskListener(event);
+    List<TaskListener> createListeners = taskDefinition.getTaskListeners(event);
     assertEquals(1, createListeners.size());
     TaskListener listener = createListeners.get(0);
 
@@ -751,7 +751,7 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
 
     assertEquals(1, taskDefinition.getTaskListeners().size());
 
-    List<TaskListener> createListeners = taskDefinition.getTaskListener(event);
+    List<TaskListener> createListeners = taskDefinition.getTaskListeners(event);
     assertEquals(1, createListeners.size());
     TaskListener listener = createListeners.get(0);
 
@@ -787,7 +787,7 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
 
     assertEquals(1, taskDefinition.getTaskListeners().size());
 
-    List<TaskListener> createListeners = taskDefinition.getTaskListener(event);
+    List<TaskListener> createListeners = taskDefinition.getTaskListeners(event);
     assertEquals(1, createListeners.size());
     TaskListener listener = createListeners.get(0);
 
@@ -823,7 +823,7 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
 
     assertEquals(1, taskDefinition.getTaskListeners().size());
 
-    List<TaskListener> createListeners = taskDefinition.getTaskListener(event);
+    List<TaskListener> createListeners = taskDefinition.getTaskListeners(event);
     assertEquals(1, createListeners.size());
     TaskListener listener = createListeners.get(0);
 
@@ -858,7 +858,7 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
 
     assertEquals(1, taskDefinition.getTaskListeners().size());
 
-    List<TaskListener> createListeners = taskDefinition.getTaskListener(event);
+    List<TaskListener> createListeners = taskDefinition.getTaskListeners(event);
     assertEquals(1, createListeners.size());
     TaskListener listener = createListeners.get(0);
 
@@ -894,7 +894,7 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
 
     assertEquals(1, taskDefinition.getTaskListeners().size());
 
-    List<TaskListener> createListeners = taskDefinition.getTaskListener(event);
+    List<TaskListener> createListeners = taskDefinition.getTaskListeners(event);
     assertEquals(1, createListeners.size());
     TaskListener listener = createListeners.get(0);
 
@@ -930,7 +930,7 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
 
     assertEquals(1, taskDefinition.getTaskListeners().size());
 
-    List<TaskListener> createListeners = taskDefinition.getTaskListener(event);
+    List<TaskListener> createListeners = taskDefinition.getTaskListeners(event);
     assertEquals(1, createListeners.size());
     TaskListener listener = createListeners.get(0);
 

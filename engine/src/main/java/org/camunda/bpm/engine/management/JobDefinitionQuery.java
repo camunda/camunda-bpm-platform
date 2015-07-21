@@ -45,6 +45,9 @@ public interface JobDefinitionQuery extends Query<JobDefinitionQuery, JobDefinit
   /** Only selects job definitions which are suspended **/
   JobDefinitionQuery suspended();
 
+  /** Only selects job definitions which have a job priority defined. */
+  JobDefinitionQuery withOverridingJobPriority();
+
   /** Order by id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   JobDefinitionQuery orderByJobDefinitionId();
 

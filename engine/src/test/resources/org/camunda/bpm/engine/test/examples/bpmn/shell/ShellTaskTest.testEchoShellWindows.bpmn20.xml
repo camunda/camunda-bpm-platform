@@ -1,20 +1,20 @@
 
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-	xmlns:activiti="http://activiti.org/bpmn" targetNamespace="Examples">
+	xmlns:camunda="http://camunda.org/schema/1.0/bpmn" targetNamespace="Examples">
 
 	<process id="echoShellWindows">
 
 		<startEvent id="theStart" />
 		<sequenceFlow sourceRef="theStart" targetRef="shellEcho" />
 
-		<serviceTask id="shellEcho" activiti:type="shell">
+		<serviceTask id="shellEcho" camunda:type="shell">
 			<extensionElements>
-				<activiti:field name="command" stringValue="cmd" />
-				<activiti:field name="arg1" stringValue="/c" />
-				<activiti:field name="arg2" stringValue="echo" />
-				<activiti:field name="arg3" stringValue="EchoTest" />
-				<activiti:field name="wait" stringValue="true" />
-				<activiti:field name="outputVariable" stringValue="resultVar"/> 
+				<camunda:field name="command" stringValue="cmd" />
+				<camunda:field name="arg1" stringValue="/c" />
+				<camunda:field name="arg2" stringValue="echo" />
+				<camunda:field name="arg3" stringValue="EchoTest" />
+				<camunda:field name="wait" stringValue="true" />
+				<camunda:field name="outputVariable" stringValue="resultVar"/> 
 			</extensionElements>
 		</serviceTask>
 		

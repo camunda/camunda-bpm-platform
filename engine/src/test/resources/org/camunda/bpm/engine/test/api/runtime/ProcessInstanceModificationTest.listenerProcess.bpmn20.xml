@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="org.camunda.bpm.engine.test.enginge.test.api.runtime">
 
   <process id="listenerProcess">
     <extensionElements>
-      <activiti:executionListener event="end" delegateExpression="${listener}" />
+      <camunda:executionListener event="end" delegateExpression="${listener}" />
     </extensionElements>
   
     <startEvent id="theStart" />
@@ -16,7 +16,7 @@
     <sequenceFlow id="flow2" sourceRef="fork" targetRef="outerTask" />
     <userTask id="outerTask">
       <extensionElements>
-        <activiti:executionListener event="end" delegateExpression="${listener}" />
+        <camunda:executionListener event="end" delegateExpression="${listener}" />
       </extensionElements>
     </userTask>    
     <sequenceFlow id="flow3" sourceRef="outerTask" targetRef="outerEnd" />
@@ -25,7 +25,7 @@
     
     <subProcess id="subProcess">
       <extensionElements>
-        <activiti:executionListener event="end" delegateExpression="${listener}" />
+        <camunda:executionListener event="end" delegateExpression="${listener}" />
       </extensionElements>
       
       <startEvent id="subProcessStart" />
@@ -34,7 +34,7 @@
       <sequenceFlow id="flow6" sourceRef="innerFork" targetRef="innerTask1" />
       <userTask id="innerTask1">
         <extensionElements>
-          <activiti:executionListener event="end" delegateExpression="${listener}" />
+          <camunda:executionListener event="end" delegateExpression="${listener}" />
         </extensionElements>
       </userTask>
       <sequenceFlow id="flow7" sourceRef="innerTask1" targetRef="innerJoin" />
@@ -42,7 +42,7 @@
       <sequenceFlow id="flow8" sourceRef="innerFork" targetRef="innerTask2" />
       <userTask id="innerTask2">
         <extensionElements>
-          <activiti:executionListener event="end" delegateExpression="${listener}" />
+          <camunda:executionListener event="end" delegateExpression="${listener}" />
         </extensionElements>
       </userTask>
       <sequenceFlow id="flow9" sourceRef="innerTask2" targetRef="innerJoin" />

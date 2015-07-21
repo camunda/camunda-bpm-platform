@@ -76,12 +76,13 @@ public interface JobDefinition {
   boolean isSuspended();
 
   /**
-   * Returns the priority specified for jobs belonging to this definition if the job definition
-   * was overriden via the {@link ManagementService} API.
+   * <p>Returns the execution priority for jobs of this definition, if it was set using the
+   * {@link ManagementService} API. When a job is assigned a priority, the job definition's overriding
+   * priority (if set) is used instead of the values defined in the BPMN XML.</p>
    *
    * @return the priority that overrides the default/BPMN XML priority or <code>null</code> if
-   *   the priority is not overridden
+   *   no overriding priority is set
    */
-  Integer getJobPriority();
+  Integer getOverridingJobPriority();
 
 }

@@ -59,7 +59,7 @@ public class JobDefinitionEntity implements JobDefinition, HasDbRevision, DbEnti
   public JobDefinitionEntity() {
   }
 
-  public JobDefinitionEntity(JobDeclaration<?> jobDeclaration) {
+  public JobDefinitionEntity(JobDeclaration<?, ?> jobDeclaration) {
     this.activityId = jobDeclaration.getActivityId();
     this.jobConfiguration = jobDeclaration.getJobConfiguration();
     this.jobType = jobDeclaration.getJobHandlerType();
@@ -157,7 +157,7 @@ public class JobDefinitionEntity implements JobDefinition, HasDbRevision, DbEnti
     this.suspensionState = state;
   }
 
-  public Integer getJobPriority() {
+  public Integer getOverridingJobPriority() {
     return jobPriority;
   }
 

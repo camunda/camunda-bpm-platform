@@ -278,6 +278,25 @@ public class JobDefinitionQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/JobDefinitionQueryTest.testBase.bpmn"})
+  public void testQueryWithOverridingJobPriority() {
+    // given
+    JobDefinition jobDefinition = managementService.createJobDefinitionQuery().listPage(0, 1).get(0);
+    managementService.setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), 42);
+
+    // when
+    JobDefinition queriedDefinition = managementService.createJobDefinitionQuery().withOverridingJobPriority().singleResult();
+
+    // then
+    assertNotNull(queriedDefinition);
+    assertEquals(jobDefinition.getId(), queriedDefinition.getId());
+    assertEquals(42, (int) queriedDefinition.getOverridingJobPriority());
+
+    // and
+    assertEquals(1, managementService.createJobDefinitionQuery().withOverridingJobPriority().count());
+
+  }
+
   // Test Helpers ////////////////////////////////////////////////////////
 
   private void verifyQueryResults(JobDefinitionQuery query, int countExpected) {

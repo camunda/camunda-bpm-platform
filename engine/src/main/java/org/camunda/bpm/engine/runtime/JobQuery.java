@@ -88,6 +88,16 @@ public interface JobQuery extends Query<JobQuery, Job> {
    */
   JobQuery duedateHigherThenOrEquals(Date date);
 
+  /**
+   * Only select jobs with a priority that is higher than or equal to the given priority.
+   */
+  JobQuery priorityHigherThanOrEquals(int priority);
+
+  /**
+   * Only select jobs with a priority that is lower than or equal to the given priority.
+   */
+  JobQuery priorityLowerThanOrEquals(int priority);
+
   /** Only select jobs that failed due to an exception. */
   JobQuery withException();
 
@@ -97,8 +107,10 @@ public interface JobQuery extends Query<JobQuery, Job> {
   /** Only select jobs which have no retries left */
   JobQuery noRetriesLeft();
 
+  /** Only select jobs that are not suspended. */
   JobQuery active();
 
+  /** Only select jobs that are suspended. */
   JobQuery suspended();
 
   //sorting //////////////////////////////////////////
@@ -112,6 +124,9 @@ public interface JobQuery extends Query<JobQuery, Job> {
   /** Order by retries (needs to be followed by {@link #asc()} or {@link #desc()}). */
   JobQuery orderByJobRetries();
 
+  /** Order by priority for execution (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  JobQuery orderByJobPriority();
+
   /** Order by process instance id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   JobQuery orderByProcessInstanceId();
 
@@ -123,5 +138,6 @@ public interface JobQuery extends Query<JobQuery, Job> {
 
   /** Order by execution id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   JobQuery orderByExecutionId();
+
 
 }

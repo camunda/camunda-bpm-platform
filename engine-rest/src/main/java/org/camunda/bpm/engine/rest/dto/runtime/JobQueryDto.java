@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.rest.dto.ConditionQueryParameterDto;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.ConditionListConverter;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
+import org.camunda.bpm.engine.rest.dto.converter.IntegerConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.runtime.JobQuery;
@@ -42,6 +43,7 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
   private static final String SORT_BY_PROCESS_DEFINITION_KEY_VALUE = "processDefinitionKey";
   private static final String SORT_BY_JOB_RETRIES_VALUE = "jobRetries";
   private static final String SORT_BY_JOB_DUEDATE_VALUE = "jobDueDate";
+  private static final String SORT_BY_JOB_PRIORITY_VALUE = "jobPriority";
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -53,25 +55,28 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_DEFINITION_KEY_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_JOB_RETRIES_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_JOB_DUEDATE_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_JOB_PRIORITY_VALUE);
   }
 
-  private String activityId;
-  private String jobId;
-  private String executionId;
-  private String processInstanceId;
-  private String processDefinitionId;
-  private String processDefinitionKey;
-  private Boolean withRetriesLeft;
-  private Boolean executable;
-  private Boolean timers;
-  private Boolean messages;
-  private Boolean withException;
-  private String exceptionMessage;
-  private Boolean noRetriesLeft;
-  private Boolean active;
-  private Boolean suspended;
+  protected String activityId;
+  protected String jobId;
+  protected String executionId;
+  protected String processInstanceId;
+  protected String processDefinitionId;
+  protected String processDefinitionKey;
+  protected Boolean withRetriesLeft;
+  protected Boolean executable;
+  protected Boolean timers;
+  protected Boolean messages;
+  protected Boolean withException;
+  protected String exceptionMessage;
+  protected Boolean noRetriesLeft;
+  protected Boolean active;
+  protected Boolean suspended;
+  protected Integer priorityHigherThanOrEquals;
+  protected Integer priorityLowerThanOrEquals;
 
-  private List<ConditionQueryParameterDto> dueDates;
+  protected List<ConditionQueryParameterDto> dueDates;
 
   public JobQueryDto() {}
 
@@ -159,6 +164,16 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
     this.suspended = suspended;
   }
 
+  @CamundaQueryParam(value="priorityHigherThanOrEquals", converter = IntegerConverter.class)
+  public void setPriorityHigherThanOrEquals(Integer priorityHigherThanOrEquals) {
+    this.priorityHigherThanOrEquals = priorityHigherThanOrEquals;
+  }
+
+  @CamundaQueryParam(value="priorityLowerThanOrEquals", converter = IntegerConverter.class)
+  public void setPriorityLowerThanOrEquals(Integer priorityLowerThanOrEquals) {
+    this.priorityLowerThanOrEquals = priorityLowerThanOrEquals;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -237,6 +252,14 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
       query.suspended();
     }
 
+    if (priorityHigherThanOrEquals != null) {
+      query.priorityHigherThanOrEquals(priorityHigherThanOrEquals);
+    }
+
+    if (priorityLowerThanOrEquals != null) {
+      query.priorityLowerThanOrEquals(priorityLowerThanOrEquals);
+    }
+
     if (dueDates != null) {
       DateConverter dateConverter = new DateConverter();
       dateConverter.setObjectMapper(objectMapper);
@@ -278,6 +301,8 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
       query.orderByJobRetries();
     } else if (sortBy.equals(SORT_BY_JOB_DUEDATE_VALUE)) {
       query.orderByJobDuedate();
+    } else if (sortBy.equals(SORT_BY_JOB_PRIORITY_VALUE)) {
+      query.orderByJobPriority();
     }
 
   }

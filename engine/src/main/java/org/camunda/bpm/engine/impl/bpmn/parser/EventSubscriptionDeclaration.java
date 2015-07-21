@@ -20,6 +20,7 @@ import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.event.SignalEventHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.EventSubscriptionJobDeclaration;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
@@ -46,6 +47,8 @@ public class EventSubscriptionDeclaration implements Serializable {
   protected String eventScopeActivityId = null;
   protected boolean isStartEvent;
   protected Boolean isParallelMultiInstance = null;
+
+  protected EventSubscriptionJobDeclaration jobDeclaration = null;
 
   public EventSubscriptionDeclaration(String eventName, String eventType) {
     this.eventName = eventName;
@@ -90,6 +93,10 @@ public class EventSubscriptionDeclaration implements Serializable {
 
   public String getEventType() {
     return eventType;
+  }
+
+  public void setJobDeclaration(EventSubscriptionJobDeclaration jobDeclaration) {
+    this.jobDeclaration = jobDeclaration;
   }
 
   public EventSubscriptionEntity createSubscription(ExecutionEntity execution) {

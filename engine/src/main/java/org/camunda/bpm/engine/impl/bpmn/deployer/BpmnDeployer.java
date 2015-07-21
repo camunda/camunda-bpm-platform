@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.impl.cmd.DeleteJobsCmd;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.event.MessageEventHandler;
+import org.camunda.bpm.engine.impl.event.SignalEventHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
@@ -44,15 +45,16 @@ import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IdentityLinkEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 
 /**
@@ -75,10 +77,11 @@ public class BpmnDeployer implements Deployer {
   protected BpmnParser bpmnParser;
   protected IdGenerator idGenerator;
 
+  @Override
   public void deploy(DeploymentEntity deployment) {
     LOG.fine("Processing deployment " + deployment.getName());
 
-    Map<String, List<JobDeclaration<?>>> jobDeclarations = new HashMap<String, List<JobDeclaration<?>>>();
+    Map<String, List<JobDeclaration<?, ?>>> jobDeclarations = new HashMap<String, List<JobDeclaration<?, ?>>>();
     List<ProcessDefinitionEntity> processDefinitions = new ArrayList<ProcessDefinitionEntity>();
     Map<String, ResourceEntity> resources = deployment.getResources();
 
@@ -147,18 +150,15 @@ public class BpmnDeployer implements Deployer {
     DeploymentCache deploymentCache = Context.getProcessEngineConfiguration().getDeploymentCache();
     for (ProcessDefinitionEntity processDefinition : processDefinitions) {
 
+      ProcessDefinitionEntity latestProcessDefinition = processDefinitionManager.findLatestProcessDefinitionByKey(processDefinition.getKey());
+
       if (deployment.isNew()) {
-        ProcessDefinitionEntity latestProcessDefinition = processDefinitionManager.findLatestProcessDefinitionByKey(processDefinition.getKey());
 
         processDefinition.setDeploymentId(deployment.getId());
         processDefinition.setVersion(getVersionForNewProcessDefinition(deployment, processDefinition, latestProcessDefinition));
         processDefinition.setId(getProcessDefinitionId(deployment, processDefinition));
-
-        List<JobDeclaration<?>> declarations = jobDeclarations.get(processDefinition.getKey());
-        updateJobDeclarations(declarations, processDefinition, deployment.isNew());
-        adjustStartEventSubscriptions(processDefinition, latestProcessDefinition);
-
         processDefinitionManager.insertProcessDefinition(processDefinition);
+
 
       } else {
 
@@ -168,22 +168,30 @@ public class BpmnDeployer implements Deployer {
         processDefinition.setId(persistedProcessDefinition.getId());
         processDefinition.setVersion(persistedProcessDefinition.getVersion());
         processDefinition.setSuspensionState(persistedProcessDefinition.getSuspensionState());
-
-        List<JobDeclaration<?>> declarations = jobDeclarations.get(processDefinition.getKey());
-        updateJobDeclarations(declarations, processDefinition, deployment.isNew());
       }
+
+      List<JobDeclaration<?, ?>> declarations = jobDeclarations.get(processDefinition.getKey());
+      updateJobDeclarations(declarations, processDefinition, deployment.isNew());
 
       // Add to cache
       deploymentCache.addProcessDefinition(processDefinition);
+
+      if (deployment.isNew()) {
+
+        adjustStartEventSubscriptions(processDefinition, latestProcessDefinition);
+      }
+
+
       // add "authorizations"
       addAuthorizations(processDefinition);
 
       // Add to deployment for further usage
       deployment.addDeployedArtifact(processDefinition);
+
     }
   }
 
-  protected void updateJobDeclarations(List<JobDeclaration<?>> jobDeclarations, ProcessDefinitionEntity processDefinition, boolean isNewDeployment) {
+  protected void updateJobDeclarations(List<JobDeclaration<?, ?>> jobDeclarations, ProcessDefinitionEntity processDefinition, boolean isNewDeployment) {
 
     if(jobDeclarations == null || jobDeclarations.isEmpty()) {
       return;
@@ -193,7 +201,7 @@ public class BpmnDeployer implements Deployer {
 
     if(isNewDeployment) {
       // create new job definitions:
-      for (JobDeclaration<?> jobDeclaration : jobDeclarations) {
+      for (JobDeclaration<?, ?> jobDeclaration : jobDeclarations) {
         createJobDefinition(processDefinition, jobDeclaration);
       }
 
@@ -203,7 +211,7 @@ public class BpmnDeployer implements Deployer {
 
       LegacyBehavior.migrateMultiInstanceJobDefinitions(processDefinition, existingDefinitions);
 
-      for (JobDeclaration<?> jobDeclaration : jobDeclarations) {
+      for (JobDeclaration<?, ?> jobDeclaration : jobDeclarations) {
         boolean jobDefinitionExists = false;
         for (JobDefinition jobDefinitionEntity : existingDefinitions) {
 
@@ -226,7 +234,7 @@ public class BpmnDeployer implements Deployer {
 
   }
 
-  protected void createJobDefinition(ProcessDefinition processDefinition, JobDeclaration<?> jobDeclaration) {
+  protected void createJobDefinition(ProcessDefinition processDefinition, JobDeclaration<?, ?> jobDeclaration) {
     final JobDefinitionManager jobDefinitionManager = Context.getCommandContext().getJobDefinitionManager();
 
     JobDefinitionEntity jobDefinitionEntity = new JobDefinitionEntity(jobDeclaration);
@@ -245,8 +253,8 @@ public class BpmnDeployer implements Deployer {
   	removeObsoleteTimers(newLatestProcessDefinition);
   	addTimerDeclarations(newLatestProcessDefinition);
 
-  	removeObsoleteMessageEventSubscriptions(newLatestProcessDefinition, oldLatestProcessDefinition);
-  	addMessageEventSubscriptions(newLatestProcessDefinition);
+  	removeObsoleteEventSubscriptions(newLatestProcessDefinition, oldLatestProcessDefinition);
+  	addEventSubscriptions(newLatestProcessDefinition);
   }
 
   /**
@@ -293,72 +301,107 @@ public class BpmnDeployer implements Deployer {
   }
 
   protected void removeObsoleteTimers(ProcessDefinitionEntity processDefinition) {
-    List<Job> jobsToDelete = Context
+    List<JobEntity> jobsToDelete = Context
       .getCommandContext()
       .getJobManager()
       .findJobsByConfiguration(TimerStartEventJobHandler.TYPE, processDefinition.getKey());
 
-    for (Job job :jobsToDelete) {
+    for (JobEntity job :jobsToDelete) {
         new DeleteJobsCmd(job.getId()).execute(Context.getCommandContext());
     }
   }
 
-  protected void removeObsoleteMessageEventSubscriptions(ProcessDefinitionEntity processDefinition, ProcessDefinitionEntity latestProcessDefinition) {
+  protected void removeObsoleteEventSubscriptions(ProcessDefinitionEntity processDefinition, ProcessDefinitionEntity latestProcessDefinition) {
     // remove all subscriptions for the previous version
-    if(latestProcessDefinition != null) {
+    if (latestProcessDefinition != null) {
       CommandContext commandContext = Context.getCommandContext();
 
-      List<EventSubscriptionEntity> subscriptionsToDelete = commandContext
-        .getEventSubscriptionManager()
-        .findEventSubscriptionsByConfiguration(MessageEventHandler.EVENT_HANDLER_TYPE, latestProcessDefinition.getId());
+      List<EventSubscriptionEntity> subscriptionsToDelete = new ArrayList<EventSubscriptionEntity>();
+
+      List<EventSubscriptionEntity> messageEventSubscriptions = commandContext.getEventSubscriptionManager()
+          .findEventSubscriptionsByConfiguration(MessageEventHandler.EVENT_HANDLER_TYPE, latestProcessDefinition.getId());
+      subscriptionsToDelete.addAll(messageEventSubscriptions);
+
+      List<EventSubscriptionEntity> signalEventSubscriptions = commandContext.getEventSubscriptionManager()
+          .findEventSubscriptionsByConfiguration(SignalEventHandler.EVENT_HANDLER_TYPE, latestProcessDefinition.getId());
+      subscriptionsToDelete.addAll(signalEventSubscriptions);
 
       for (EventSubscriptionEntity eventSubscriptionEntity : subscriptionsToDelete) {
         eventSubscriptionEntity.delete();
       }
-
     }
   }
 
   @SuppressWarnings("unchecked")
-  protected void addMessageEventSubscriptions(ProcessDefinitionEntity processDefinition) {
-    CommandContext commandContext = Context.getCommandContext();
-    List<EventSubscriptionDeclaration> messageEventDefinitions = (List<EventSubscriptionDeclaration>) processDefinition.getProperty(BpmnParse.PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION);
-    if(messageEventDefinitions != null) {
+  protected void addEventSubscriptions(ProcessDefinitionEntity processDefinition) {
+    List<EventSubscriptionDeclaration> messageEventDefinitions = (List<EventSubscriptionDeclaration>) processDefinition
+        .getProperty(BpmnParse.PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION);
+    if (messageEventDefinitions != null) {
       for (EventSubscriptionDeclaration messageEventDefinition : messageEventDefinitions) {
-        if(messageEventDefinition.isStartEvent()) {
-          // look for subscriptions for the same name in db:
-          List<EventSubscriptionEntity> subscriptionsForSameMessageName = commandContext
-            .getEventSubscriptionManager()
-            .findEventSubscriptionsByName(MessageEventHandler.EVENT_HANDLER_TYPE, messageEventDefinition.getEventName());
-          // also look for subscriptions created in the session:
-          List<MessageEventSubscriptionEntity> cachedSubscriptions = commandContext
-            .getDbEntityManager()
-            .getCachedEntitiesByType(MessageEventSubscriptionEntity.class);
-          for (MessageEventSubscriptionEntity cachedSubscription : cachedSubscriptions) {
-            if(messageEventDefinition.getEventName().equals(cachedSubscription.getEventName())
-                    && !subscriptionsForSameMessageName.contains(cachedSubscription)) {
-              subscriptionsForSameMessageName.add(cachedSubscription);
-            }
-          }
-          // remove subscriptions deleted in the same command
-          subscriptionsForSameMessageName = commandContext
-                  .getDbEntityManager()
-                  .pruneDeletedEntities(subscriptionsForSameMessageName);
-
-          if(!subscriptionsForSameMessageName.isEmpty()) {
-            throw new ProcessEngineException("Cannot deploy process definition '" + processDefinition.getResourceName()
-                    + "': there already is a message event subscription for the message with name '" + messageEventDefinition.getEventName() + "'.");
-          }
-
-          MessageEventSubscriptionEntity newSubscription = new MessageEventSubscriptionEntity();
-          newSubscription.setEventName(messageEventDefinition.getEventName());
-          newSubscription.setActivityId(messageEventDefinition.getActivityId());
-          newSubscription.setConfiguration(processDefinition.getId());
-
-          newSubscription.insert();
-        }
+        addEventSubscription(processDefinition, messageEventDefinition);
       }
     }
+  }
+
+  protected void addEventSubscription(ProcessDefinitionEntity processDefinition, EventSubscriptionDeclaration messageEventDefinition) {
+    if (messageEventDefinition.isStartEvent()) {
+      String eventType = messageEventDefinition.getEventType();
+
+      if (eventType.equals(MessageEventHandler.EVENT_HANDLER_TYPE)) {
+        addMessageEventSubscription(messageEventDefinition, processDefinition);
+      } else if (eventType.equals(SignalEventHandler.EVENT_HANDLER_TYPE)) {
+        addSignalEventSubscription(messageEventDefinition, processDefinition);
+      }
+    }
+  }
+
+  protected void addMessageEventSubscription(EventSubscriptionDeclaration messageEventDefinition, ProcessDefinitionEntity processDefinition) {
+
+    if(hasMessageEventSubscriptionForName(messageEventDefinition.getEventName())) {
+      throw new ProcessEngineException("Cannot deploy process definition '" + processDefinition.getResourceName()
+              + "': there already is a message event subscription for the message with name '" + messageEventDefinition.getEventName() + "'.");
+    }
+
+    MessageEventSubscriptionEntity newSubscription = new MessageEventSubscriptionEntity();
+    newSubscription.setEventName(messageEventDefinition.getEventName());
+    newSubscription.setActivityId(messageEventDefinition.getActivityId());
+    newSubscription.setConfiguration(processDefinition.getId());
+
+    newSubscription.insert();
+  }
+
+  protected boolean hasMessageEventSubscriptionForName(String eventName) {
+    CommandContext commandContext = Context.getCommandContext();
+
+    // look for subscriptions for the same name in db:
+    List<EventSubscriptionEntity> subscriptionsForSameMessageName = commandContext
+      .getEventSubscriptionManager()
+      .findEventSubscriptionsByName(MessageEventHandler.EVENT_HANDLER_TYPE, eventName);
+    // also look for subscriptions created in the session:
+    List<MessageEventSubscriptionEntity> cachedSubscriptions = commandContext
+      .getDbEntityManager()
+      .getCachedEntitiesByType(MessageEventSubscriptionEntity.class);
+    for (MessageEventSubscriptionEntity cachedSubscription : cachedSubscriptions) {
+      if(eventName.equals(cachedSubscription.getEventName())
+              && !subscriptionsForSameMessageName.contains(cachedSubscription)) {
+        subscriptionsForSameMessageName.add(cachedSubscription);
+      }
+    }
+    // remove subscriptions deleted in the same command
+    subscriptionsForSameMessageName = commandContext
+            .getDbEntityManager()
+            .pruneDeletedEntities(subscriptionsForSameMessageName);
+
+    return !subscriptionsForSameMessageName.isEmpty();
+  }
+
+  protected void addSignalEventSubscription(EventSubscriptionDeclaration signalEventDefinition, ProcessDefinitionEntity processDefinition) {
+    SignalEventSubscriptionEntity newSubscription = new SignalEventSubscriptionEntity();
+    newSubscription.setEventName(signalEventDefinition.getEventName());
+    newSubscription.setActivityId(signalEventDefinition.getActivityId());
+    newSubscription.setConfiguration(processDefinition.getId());
+
+    newSubscription.insert();
   }
 
   enum ExprType {

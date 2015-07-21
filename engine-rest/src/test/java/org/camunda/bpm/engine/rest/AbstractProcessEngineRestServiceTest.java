@@ -14,9 +14,9 @@ package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.junit.matchers.JUnitMatchers.hasItems;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
@@ -61,6 +61,7 @@ import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
+import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.User;
@@ -90,7 +91,11 @@ import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.FileValue;
+import org.hamcrest.CoreMatchers;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Matchers;
 
@@ -128,13 +133,15 @@ public abstract class AbstractProcessEngineRestServiceTest extends
   protected static final String HISTORY_ACTIVITY_INSTANCE_URL = HISTORY_URL + "/activity-instance";
   protected static final String HISTORY_PROCESS_INSTANCE_URL = HISTORY_URL + "/process-instance";
   protected static final String HISTORY_VARIABLE_INSTANCE_URL = HISTORY_URL + "/variable-instance";
+  protected static final String HISTORY_BINARY_VARIABLE_INSTANCE_URL = HISTORY_VARIABLE_INSTANCE_URL + "/{id}/data";
   protected static final String HISTORY_ACTIVITY_STATISTICS_URL = HISTORY_URL + "/process-definition/{id}/statistics";
   protected static final String HISTORY_DETAIL_URL = HISTORY_URL + "/detail";
+  protected static final String HISTORY_BINARY_DETAIL_URL = HISTORY_DETAIL_URL + "/data";
   protected static final String HISTORY_TASK_INSTANCE_URL = HISTORY_URL + "/task";
   protected static final String HISTORY_INCIDENT_URL = HISTORY_URL + "/incident";
   protected static final String HISTORY_JOB_LOG_URL = HISTORY_URL + "/job-log";
 
-  protected String EXAMPLE_ENGINE_NAME = "anEngineName";
+  protected static final String EXAMPLE_ENGINE_NAME = "anEngineName";
 
   private ProcessEngine namedProcessEngine;
   private RepositoryService mockRepoService;
@@ -587,6 +594,36 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     verifyZeroInteractions(processEngine);
   }
 
+  @Ignore
+  @Test
+  public void testHistoryServiceEngineAccess_HistoricVariableInstanceBinaryFile() {
+
+    HistoricVariableInstanceQuery query = mock(HistoricVariableInstanceQuery.class);
+    HistoricVariableInstance instance = mock(HistoricVariableInstance.class);
+    String filename = "test.txt";
+    byte[] byteContent = "test".getBytes();
+    String encoding = "UTF-8";
+    FileValue variableValue = Variables.fileValue(filename).file(byteContent).mimeType(ContentType.TEXT.toString()).encoding(encoding).create();
+    when(instance.getTypedValue()).thenReturn(variableValue);
+    when(query.singleResult()).thenReturn(instance);
+    when(mockHistoryService.createHistoricVariableInstanceQuery()).thenReturn(query);
+
+    given()
+      .pathParam("name", EXAMPLE_ENGINE_NAME)
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      . body(is(equalTo(new String(byteContent))))
+      .and()
+        .header("Content-Disposition", "attachment; filename="+filename)
+        .contentType(CoreMatchers.<String>either(equalTo(ContentType.TEXT.toString() + ";charset=UTF-8")).or(equalTo(ContentType.TEXT.toString() + " ;charset=UTF-8")))
+      .when()
+        .get(HISTORY_BINARY_VARIABLE_INSTANCE_URL);
+
+    verify(mockHistoryService).createHistoricVariableInstanceQuery();
+    verifyZeroInteractions(processEngine);
+  }
+
   @Test
   public void testHistoryServiceEngineAccess_HistoricActivityStatistics() {
     given()
@@ -625,6 +662,34 @@ public abstract class AbstractProcessEngineRestServiceTest extends
         .statusCode(Status.OK.getStatusCode())
       .when()
         .get(HISTORY_DETAIL_URL);
+
+    verify(mockHistoryService).createHistoricDetailQuery();
+    verifyZeroInteractions(processEngine);
+  }
+
+  @Ignore
+  @Test
+  public void testHistoryServiceEngineAccess_HistoricDetailBinaryFile() {
+    HistoricDetailQuery query = mock(HistoricDetailQuery.class);
+    HistoricVariableUpdate instance = mock(HistoricVariableUpdate.class);
+    String filename = "test.txt";
+    byte[] byteContent = "test".getBytes();
+    String encoding = "UTF-8";
+    FileValue variableValue = Variables.fileValue(filename).file(byteContent).mimeType(ContentType.TEXT.toString()).encoding(encoding).create();
+    when(instance.getTypedValue()).thenReturn(variableValue);
+    when(query.singleResult()).thenReturn(instance);
+    when(mockHistoryService.createHistoricDetailQuery()).thenReturn(query);
+
+    given()
+      .pathParam("name", EXAMPLE_ENGINE_NAME)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      . body(is(equalTo(new String(byteContent))))
+      .and()
+        .header("Content-Disposition", "attachment; filename="+filename)
+        .contentType(CoreMatchers.<String>either(equalTo(ContentType.TEXT.toString() + ";charset=UTF-8")).or(equalTo(ContentType.TEXT.toString() + " ;charset=UTF-8")))
+      .when()
+        .get(HISTORY_BINARY_DETAIL_URL);
 
     verify(mockHistoryService).createHistoricDetailQuery();
     verifyZeroInteractions(processEngine);

@@ -45,6 +45,7 @@
         <include>org.camunda.commons:*:jar</include>
 
         <include>org.camunda.bpm.model:*:jar</include>
+        <include>org.camunda.dmn:*:jar</include>
 
         <include>org.freemarker:*:jar</include>
         <include>org.camunda.template-engines:*:jar</include>
@@ -74,12 +75,14 @@
 
         <include>org.camunda.bpm.model:*:jar</include>
 
+        <include>org.camunda.dmn:*:jar</include>
+
         <include>org.freemarker:*:jar</include>
         <include>org.camunda.template-engines:*:jar</include>
       </includes>
     </dependencySet>
-  </dependencySets> 
-  
+  </dependencySets>
+
   <files>
     <file>
       <source>src/README.txt</source>

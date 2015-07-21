@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.authorization.Resources;
@@ -22,6 +23,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.event.MessageEventHandler;
+import org.camunda.bpm.engine.impl.event.SignalEventHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.repository.CaseDefinition;
@@ -74,7 +76,7 @@ public class DeploymentManager extends AbstractManager {
       getIdentityLinkManager().deleteIdentityLinksByProcDef(processDefinitionId);
 
       // remove timer start events:
-      List<Job> timerStartJobs = getJobManager().findJobsByConfiguration(TimerStartEventJobHandler.TYPE, processDefinition.getKey());
+      List<JobEntity> timerStartJobs = getJobManager().findJobsByConfiguration(TimerStartEventJobHandler.TYPE, processDefinition.getKey());
 
       ProcessDefinitionEntity latestVersion = getProcessDefinitionManager().findLatestProcessDefinitionByKey(processDefinition.getKey());
 
@@ -91,6 +93,9 @@ public class DeploymentManager extends AbstractManager {
 
         // remove historic op log entries which are not related to a process instance
         getUserOperationLogManager().deleteOperationLogEntriesByProcessDefinitionId(processDefinitionId);
+
+        // remove historic job log entries not related to a process instance
+        getHistoricJobLogManager().deleteHistoricJobLogsByProcessDefinitionId(processDefinitionId);
       }
     }
 
@@ -111,11 +116,17 @@ public class DeploymentManager extends AbstractManager {
         .getDeploymentCache()
         .removeProcessDefinition(processDefinitionId);
 
+      List<EventSubscriptionEntity> eventSubscriptionsToRemove = new ArrayList<EventSubscriptionEntity>();
       // remove message event subscriptions:
-      List<EventSubscriptionEntity> findEventSubscriptionsByConfiguration = getEventSubscriptionManager()
-        .findEventSubscriptionsByConfiguration(MessageEventHandler.EVENT_HANDLER_TYPE, processDefinition.getId());
+      List<EventSubscriptionEntity> messageEventSubscriptions = getEventSubscriptionManager()
+        .findEventSubscriptionsByConfiguration(MessageEventHandler.EVENT_HANDLER_TYPE, processDefinitionId);
+      eventSubscriptionsToRemove.addAll(messageEventSubscriptions);
 
-      for (EventSubscriptionEntity eventSubscriptionEntity : findEventSubscriptionsByConfiguration) {
+      // remove signal event subscriptions:
+      List<EventSubscriptionEntity> signalEventSubscriptions = getEventSubscriptionManager().findEventSubscriptionsByConfiguration(SignalEventHandler.EVENT_HANDLER_TYPE , processDefinitionId);
+      eventSubscriptionsToRemove.addAll(signalEventSubscriptions);
+
+      for (EventSubscriptionEntity eventSubscriptionEntity : eventSubscriptionsToRemove) {
         eventSubscriptionEntity.delete();
       }
 
@@ -194,9 +205,11 @@ public class DeploymentManager extends AbstractManager {
     return getDbEntityManager().selectList("selectResourceNamesByDeploymentId", deploymentId);
   }
 
+  @Override
   public void close() {
   }
 
+  @Override
   public void flush() {
   }
 

@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.bpmn.parser;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.util.xml.Element;
+import org.camunda.bpm.engine.impl.util.xml.Namespace;
 
 public class FoxFailedJobParseListener extends AbstractBpmnParseListener {
 
@@ -27,7 +28,13 @@ public class FoxFailedJobParseListener extends AbstractBpmnParseListener {
   protected static final String SIGNAL_EVENT_DEFINITION = "signalEventDefinition";
   protected static final String EXTENSION_ELEMENTS = "extensionElements";
   protected static final String FAILED_JOB_RETRY_TIME_CYCLE = "failedJobRetryTimeCycle";
-  public static final String FOX_ENGINE_NS = "http://www.camunda.com/fox";
+
+  /**
+   * deprecated since 7.4, use camunda ns.
+   */
+  @Deprecated
+  public static final Namespace FOX_ENGINE_NS = new Namespace("http://www.camunda.com/fox");
+
   public static final String FOX_FAILED_JOB_CONFIGURATION = "FOX_FAILED_JOB_CONFIGURATION";
 
   @Override
@@ -51,7 +58,7 @@ public class FoxFailedJobParseListener extends AbstractBpmnParseListener {
     String type = (String) activity.getProperty(TYPE);
     if (type != null && type.equals(INTERMEDIATE_SIGNAL_THROW)) {
       Element signalDefElement = intermediateEventElement.element(SIGNAL_EVENT_DEFINITION);
-      boolean asynch = "true".equals(signalDefElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "async", "false"));
+      boolean asynch = "true".equals(signalDefElement.attributeNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "async", "false"));
       if (asynch) {
         this.setFailedJobRetryTimeCycleValue(intermediateEventElement, activity);
       }
@@ -145,7 +152,7 @@ public class FoxFailedJobParseListener extends AbstractBpmnParseListener {
     if (extensionElements != null) {
       Element failedJobRetryTimeCycleElement = extensionElements.elementNS(FOX_ENGINE_NS, FAILED_JOB_RETRY_TIME_CYCLE);
       if (failedJobRetryTimeCycleElement == null) { // try to get it from the activiti namespace
-        failedJobRetryTimeCycleElement = extensionElements.elementNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, FAILED_JOB_RETRY_TIME_CYCLE);
+        failedJobRetryTimeCycleElement = extensionElements.elementNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, FAILED_JOB_RETRY_TIME_CYCLE);
       }
       if (failedJobRetryTimeCycleElement != null) {
         String failedJobRetryTimeCycleValue = failedJobRetryTimeCycleElement.getText();

@@ -2,7 +2,7 @@
 
 <definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
 
   <process id="noopProcess">
@@ -10,7 +10,7 @@
     <startEvent id="start" />
     <sequenceFlow id="flow1" sourceRef="start" targetRef="noop" />
     
-    <serviceTask id="noop" name="No operation" activiti:class="org.camunda.bpm.engine.test.history.Noop" />    
+    <serviceTask id="noop" name="No operation" camunda:class="org.camunda.bpm.engine.test.history.Noop" />    
     <sequenceFlow id="flow2" sourceRef="noop" targetRef="end" />
     
     <endEvent id="end" />

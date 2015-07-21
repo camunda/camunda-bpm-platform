@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_1339690990326" name="fox-invoice-2" targetNamespace="http://www.trisotech.com/definitions/_1339690990326">
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_1339690990326" name="fox-invoice-2" targetNamespace="http://www.trisotech.com/definitions/_1339690990326">
   <message id="_1339690990375" name="startMessageBPI"/>
   <process id="bpi-invoice">
     <laneSet id="lsProcess_Engine_1">
@@ -20,11 +20,11 @@
         <flowNodeRef>PDF_aus_SVN_entfernen_160</flowNodeRef>
       </lane>
     </laneSet>
-    <userTask id="Freigebenden_zuordnen_143" activiti:formKey="assignApprover" activiti:assignee="kermit" name="Freigebenden zuordnen" implementation="##unspecified">
+    <userTask id="Freigebenden_zuordnen_143" camunda:formKey="assignApprover" camunda:assignee="kermit" name="Freigebenden zuordnen" implementation="##unspecified">
       <incoming>sequenceFlow_187</incoming>
       <outgoing>sequenceFlow_178</outgoing>
     </userTask>
-    <userTask id="Rechnung_kl_ren_148" activiti:formKey="clarifyInvoice" activiti:assignee="kermit" name="Rechnung checken" implementation="##unspecified">
+    <userTask id="Rechnung_kl_ren_148" camunda:formKey="clarifyInvoice" camunda:assignee="kermit" name="Rechnung checken" implementation="##unspecified">
       <incoming>Nein_182</incoming>
       <outgoing>sequenceFlow_183</outgoing>
     </userTask>
@@ -40,7 +40,7 @@
       <outgoing>sequenceFlow_187</outgoing>
       <messageEventDefinition id="MessageEventDefinition_1" messageRef="_1339690990375"/>
     </startEvent>
-    <userTask id="Rechnung_freigeben_125" activiti:formKey="approveInvoice" activiti:assignee="#{approver}" name="Rechnung freigeben" implementation="##unspecified">
+    <userTask id="Rechnung_freigeben_125" camunda:formKey="approveInvoice" camunda:assignee="#{approver}" name="Rechnung freigeben" implementation="##unspecified">
       <incoming>sequenceFlow_178</incoming>
       <incoming>ja_186</incoming>
       <outgoing>sequenceFlow_180</outgoing>
@@ -50,14 +50,14 @@
       <outgoing>Ja_181</outgoing>
       <outgoing>Nein_182</outgoing>
     </exclusiveGateway>
-    <userTask id="zberweisung_vorbereiten_169" activiti:formKey="preparePayment" activiti:assignee="kermit" name="Bezahlung vorbereiten" implementation="##unspecified">
+    <userTask id="zberweisung_vorbereiten_169" camunda:formKey="preparePayment" camunda:assignee="kermit" name="Bezahlung vorbereiten" implementation="##unspecified">
       <incoming>Ja_181</incoming>
       <outgoing>sequenceFlow_179</outgoing>
     </userTask>
     <endEvent id="Rechnungseingang_abgearbeitet_174" name="Rechnungseingang abgearbeitet">
       <incoming>SequenceFlow_1</incoming>
     </endEvent>
-    <serviceTask id="PDF_aus_SVN_entfernen_160" activiti:class="com.camunda.fox.showcase.invoice.de.PDFToSVNDelegate" name="PDF in SVN ablegen" implementation="##WebService">
+    <serviceTask id="PDF_aus_SVN_entfernen_160" camunda:class="com.camunda.fox.showcase.invoice.de.PDFToSVNDelegate" name="PDF in SVN ablegen" implementation="##WebService">
       <incoming>sequenceFlow_179</incoming>
       <outgoing>SequenceFlow_1</outgoing>
     </serviceTask>

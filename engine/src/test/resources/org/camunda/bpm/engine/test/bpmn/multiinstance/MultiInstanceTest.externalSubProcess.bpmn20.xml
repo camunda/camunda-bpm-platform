@@ -2,7 +2,7 @@
 <definitions id="definition" 
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
   
   <process id="externalSubProcess">
@@ -14,11 +14,11 @@
     <sequenceFlow id="flow2" sourceRef="fork" targetRef="task1" />
     <sequenceFlow id="flow3" sourceRef="fork" targetRef="task2" />
             
-    <userTask id="task1" name="task one" activiti:assignee="kermit"/>
+    <userTask id="task1" name="task one" camunda:assignee="kermit"/>
     <sequenceFlow id="flow4" sourceRef="task1" targetRef="end1" />
     <endEvent id="end1" />  
             
-    <userTask id="task2" name="task two" activiti:assignee="kermit"/>
+    <userTask id="task2" name="task two" camunda:assignee="kermit"/>
     <sequenceFlow id="flow5" sourceRef="task2" targetRef="end2" />
     <endEvent id="end2" />   
     

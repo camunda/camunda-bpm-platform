@@ -1,6 +1,6 @@
 <definitions 
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
 
   <process id="sendMailExample" >
@@ -8,13 +8,13 @@
     <startEvent id="theStart" />
     <sequenceFlow sourceRef="theStart" targetRef="sendMail" />
     
-    <sendTask id="sendMail" activiti:type="mail">
+    <sendTask id="sendMail" camunda:type="mail">
       <extensionElements>
-        <activiti:field name="from" expression="${sender}" />
-        <activiti:field name="to" expression="${recipient}" />
-        <activiti:field name="subject" expression="Your order ${orderId} has been shipped" />
-        <activiti:field name="html">
-          <activiti:expression>
+        <camunda:field name="from" expression="${sender}" />
+        <camunda:field name="to" expression="${recipient}" />
+        <camunda:field name="subject" expression="Your order ${orderId} has been shipped" />
+        <camunda:field name="html">
+          <camunda:expression>
             <![CDATA[
               <html>
                 <body>
@@ -28,8 +28,8 @@
                 </body>
               </html>
             ]]>
-          </activiti:expression>
-        </activiti:field>      
+          </camunda:expression>
+        </camunda:field>      
       </extensionElements>
     </sendTask>
     <sequenceFlow sourceRef="sendMail" targetRef="theEnd" />

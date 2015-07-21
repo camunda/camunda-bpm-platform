@@ -44,127 +44,130 @@ import static org.mockito.Mockito.*;
 
 public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServiceTest {
 
-	protected static final String JOBS_RESOURCE_URL = TEST_RESOURCE_ROOT_PATH + "/job";
+  protected static final String JOBS_RESOURCE_URL = TEST_RESOURCE_ROOT_PATH + "/job";
+  protected static final String JOBS_QUERY_COUNT_URL = JOBS_RESOURCE_URL + "/count";
 
-	private JobQuery mockQuery;
-	private static final int MAX_RESULTS_TEN = 10;
-	private static final int FIRST_RESULTS_ZERO = 0;
+  private JobQuery mockQuery;
+  private static final int MAX_RESULTS_TEN = 10;
+  private static final int FIRST_RESULTS_ZERO = 0;
 
-	@Before
-	public void setUpRuntimeData() {
-		mockQuery = setUpMockJobQuery(MockProvider.createMockJobs());
-	}
+  @Before
+  public void setUpRuntimeData() {
+    mockQuery = setUpMockJobQuery(MockProvider.createMockJobs());
+  }
 
-	private JobQuery setUpMockJobQuery(List<Job> mockedJobs) {
-		JobQuery sampleJobQuery = mock(JobQuery.class);
+  private JobQuery setUpMockJobQuery(List<Job> mockedJobs) {
+    JobQuery sampleJobQuery = mock(JobQuery.class);
 
-		when(sampleJobQuery.list()).thenReturn(mockedJobs);
-		when(sampleJobQuery.count()).thenReturn((long) mockedJobs.size());
+    when(sampleJobQuery.list()).thenReturn(mockedJobs);
+    when(sampleJobQuery.count()).thenReturn((long) mockedJobs.size());
 
-		when(processEngine.getManagementService().createJobQuery()).thenReturn(sampleJobQuery);
+    when(processEngine.getManagementService().createJobQuery()).thenReturn(sampleJobQuery);
 
-		return sampleJobQuery;
-	}
+    return sampleJobQuery;
+  }
 
-	@Test
-	public void testEmptyQuery() {
-		String queryJobId = "";
-		given().queryParam("id", queryJobId).then().expect()
-				.statusCode(Status.OK.getStatusCode())
-				.when().get(JOBS_RESOURCE_URL);
-	}
+  @Test
+  public void testEmptyQuery() {
+    String queryJobId = "";
+    given().queryParam("id", queryJobId).then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .when().get(JOBS_RESOURCE_URL);
+  }
 
-	@Test
-	public void testNoParametersQuery() {
-		expect().statusCode(Status.OK.getStatusCode())
-		.when().get(JOBS_RESOURCE_URL);
+  @Test
+  public void testNoParametersQuery() {
+    expect().statusCode(Status.OK.getStatusCode())
+    .when().get(JOBS_RESOURCE_URL);
 
-		verify(mockQuery).list();
-		verifyNoMoreInteractions(mockQuery);
-	}
+    verify(mockQuery).list();
+    verifyNoMoreInteractions(mockQuery);
+  }
 
-	@Test
-	public void testSortByParameterOnly() {
-		given().queryParam("sortBy", "jobDueDate")
-				.then()
-				.expect()
-				.statusCode(Status.BAD_REQUEST.getStatusCode())
-				.contentType(ContentType.JSON)
-				.body("type",
-						equalTo(InvalidRequestException.class.getSimpleName()))
-				.body("message",
-						equalTo("Only a single sorting parameter specified. sortBy and sortOrder required"))
-				.when().get(JOBS_RESOURCE_URL);
-	}
+  @Test
+  public void testSortByParameterOnly() {
+    given().queryParam("sortBy", "jobDueDate")
+        .then()
+        .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("type",
+            equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message",
+            equalTo("Only a single sorting parameter specified. sortBy and sortOrder required"))
+        .when().get(JOBS_RESOURCE_URL);
+  }
 
-	@Test
-	public void testSortOrderParameterOnly() {
-		given().queryParam("sortOrder", "asc")
-				.then()
-				.expect()
-				.statusCode(Status.BAD_REQUEST.getStatusCode())
-				.contentType(ContentType.JSON)
-				.body("type",
-						equalTo(InvalidRequestException.class.getSimpleName()))
-				.body("message",
-						equalTo("Only a single sorting parameter specified. sortBy and sortOrder required"))
-				.when().get(JOBS_RESOURCE_URL);
-	}
+  @Test
+  public void testSortOrderParameterOnly() {
+    given().queryParam("sortOrder", "asc")
+        .then()
+        .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("type",
+            equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message",
+            equalTo("Only a single sorting parameter specified. sortBy and sortOrder required"))
+        .when().get(JOBS_RESOURCE_URL);
+  }
 
-	@Test
-	public void testSimpleJobQuery() {
-		String jobId = MockProvider.EXAMPLE_JOB_ID;
+  @Test
+  public void testSimpleJobQuery() {
+    String jobId = MockProvider.EXAMPLE_JOB_ID;
 
-		Response response = given().queryParam("jobId", jobId).then().expect()
-				.statusCode(Status.OK.getStatusCode()).when()
-				.get(JOBS_RESOURCE_URL);
+    Response response = given().queryParam("jobId", jobId).then().expect()
+        .statusCode(Status.OK.getStatusCode()).when()
+        .get(JOBS_RESOURCE_URL);
 
-		InOrder inOrder = inOrder(mockQuery);
-		inOrder.verify(mockQuery).jobId(jobId);
-		inOrder.verify(mockQuery).list();
+    InOrder inOrder = inOrder(mockQuery);
+    inOrder.verify(mockQuery).jobId(jobId);
+    inOrder.verify(mockQuery).list();
 
-		String content = response.asString();
-		List<String> instances = from(content).getList("");
-		Assert.assertEquals("There should be one job returned.", 1, instances.size());
-		Assert.assertNotNull("The returned job should not be null.", instances.get(0));
+    String content = response.asString();
+    List<String> instances = from(content).getList("");
+    Assert.assertEquals("There should be one job returned.", 1, instances.size());
+    Assert.assertNotNull("The returned job should not be null.", instances.get(0));
 
-		String returnedJobId = from(content).getString("[0].id");
-		String returnedProcessInstanceId = from(content).getString("[0].processInstanceId");
-		String returnedProcessDefinitionId = from(content).getString("[0].processDefinitionId");
-		String returnedProcessDefinitionKey = from(content).getString("[0].processDefinitionKey");
-		String returnedExecutionId = from(content).getString("[0].executionId");
-		String returnedExceptionMessage = from(content).getString("[0].exceptionMessage");
-		int returnedRetries = from(content).getInt("[0].retries");
-		Date returnedDueDate = DateTimeUtil.parseDate(from(content).getString("[0].dueDate"));
-		boolean returnedSuspended = from(content).getBoolean("[0].suspended");
+    String returnedJobId = from(content).getString("[0].id");
+    String returnedProcessInstanceId = from(content).getString("[0].processInstanceId");
+    String returnedProcessDefinitionId = from(content).getString("[0].processDefinitionId");
+    String returnedProcessDefinitionKey = from(content).getString("[0].processDefinitionKey");
+    String returnedExecutionId = from(content).getString("[0].executionId");
+    String returnedExceptionMessage = from(content).getString("[0].exceptionMessage");
+    int returnedRetries = from(content).getInt("[0].retries");
+    Date returnedDueDate = DateTimeUtil.parseDate(from(content).getString("[0].dueDate"));
+    boolean returnedSuspended = from(content).getBoolean("[0].suspended");
+    int returnedPriority = from(content).getInt("[0].priority");
 
-		Assert.assertEquals(MockProvider.EXAMPLE_JOB_ID, returnedJobId);
-		Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, returnedProcessInstanceId);
-		Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, returnedProcessDefinitionId);
-		Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, returnedProcessDefinitionKey);
-		Assert.assertEquals(MockProvider.EXAMPLE_EXECUTION_ID, returnedExecutionId);
-		Assert.assertEquals(MockProvider.EXAMPLE_JOB_NO_EXCEPTION_MESSAGE, returnedExceptionMessage);
-		Assert.assertEquals(MockProvider.EXAMPLE_JOB_RETRIES, returnedRetries);
-		Assert.assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_DUE_DATE), returnedDueDate);
-		Assert.assertEquals(MockProvider.EXAMPLE_JOB_IS_SUSPENDED, returnedSuspended);
-	}
+    Assert.assertEquals(MockProvider.EXAMPLE_JOB_ID, returnedJobId);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, returnedProcessInstanceId);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, returnedProcessDefinitionId);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, returnedProcessDefinitionKey);
+    Assert.assertEquals(MockProvider.EXAMPLE_EXECUTION_ID, returnedExecutionId);
+    Assert.assertEquals(MockProvider.EXAMPLE_JOB_NO_EXCEPTION_MESSAGE, returnedExceptionMessage);
+    Assert.assertEquals(MockProvider.EXAMPLE_JOB_RETRIES, returnedRetries);
+    Assert.assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_DUE_DATE), returnedDueDate);
+    Assert.assertEquals(MockProvider.EXAMPLE_JOB_IS_SUSPENDED, returnedSuspended);
+    Assert.assertEquals(MockProvider.EXAMPLE_JOB_PRIORITY, returnedPriority);
+  }
 
-	@Test
-	public void testInvalidDueDateComparator() {
+  @Test
+  public void testInvalidDueDateComparator() {
 
-		String variableValue = "2013-05-05T00:00:00";
-		String invalidComparator = "bt";
+    String variableValue = "2013-05-05T00:00:00";
+    String invalidComparator = "bt";
 
-		String queryValue = invalidComparator + "_" + variableValue;
-		given().queryParam("dueDates", queryValue)
-				.then()
-				.expect()
-				.statusCode(Status.BAD_REQUEST.getStatusCode())
-				.contentType(ContentType.JSON)
-				.body("type",equalTo(InvalidRequestException.class.getSimpleName()))
-				.body("message", equalTo("Invalid due date comparator specified: " + invalidComparator))
-				.when().get(JOBS_RESOURCE_URL);
-	}
+    String queryValue = invalidComparator + "_" + variableValue;
+    given().queryParam("dueDates", queryValue)
+        .then()
+        .expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode())
+        .contentType(ContentType.JSON)
+        .body("type",equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Invalid due date comparator specified: " + invalidComparator))
+        .when().get(JOBS_RESOURCE_URL);
+  }
 
   @Test
   public void testInvalidDueDateComperatorAsPost() {
@@ -221,17 +224,17 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
   }
 
 
-	@Test
-	public void testAdditionalParametersExcludingDueDates() {
-		Map<String, Object> parameters = getCompleteParameters();
+  @Test
+  public void testAdditionalParametersExcludingDueDates() {
+    Map<String, Object> parameters = getCompleteParameters();
 
-		given().queryParams(parameters).then().expect()
-				.statusCode(Status.OK.getStatusCode()).when()
-				.get(JOBS_RESOURCE_URL);
+    given().queryParams(parameters).then().expect()
+        .statusCode(Status.OK.getStatusCode()).when()
+        .get(JOBS_RESOURCE_URL);
 
-		verifyStringParameterQueryInvocations();
-		verify(mockQuery).list();
-	}
+    verifyParameterQueryInvocations();
+    verify(mockQuery).list();
+  }
 
   @Test
   public void testMessagesParameter() {
@@ -304,6 +307,8 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
     parameters.put("noRetriesLeft", MockProvider.EXAMPLE_NO_RETRIES_LEFT);
     parameters.put("active", true);
     parameters.put("suspended", true);
+    parameters.put("priorityLowerThanOrEquals", 14);
+    parameters.put("priorityHigherThanOrEquals", 15);
     return parameters;
   }
 
@@ -315,53 +320,55 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
     .then().expect().statusCode(Status.OK.getStatusCode())
     .when().post(JOBS_RESOURCE_URL);
 
-    verifyStringParameterQueryInvocations();
+    verifyParameterQueryInvocations();
     verify(mockQuery).list();
   }
 
 
-	private void verifyStringParameterQueryInvocations() {
-		Map<String, Object> parameters = getCompleteParameters();
+  private void verifyParameterQueryInvocations() {
+    Map<String, Object> parameters = getCompleteParameters();
 
-		verify(mockQuery).jobId((String) parameters.get("jobId"));
-		verify(mockQuery).processInstanceId((String) parameters.get("processInstanceId"));
-		verify(mockQuery).processDefinitionId((String) parameters.get("processDefinitionId"));
-		verify(mockQuery).processDefinitionKey((String) parameters.get("processDefinitionKey"));
-		verify(mockQuery).executionId((String) parameters.get("executionId"));
-		verify(mockQuery).activityId((String) parameters.get("activityId"));
-		verify(mockQuery).withRetriesLeft();
-		verify(mockQuery).executable();
-		verify(mockQuery).timers();
-		verify(mockQuery).withException();
-		verify(mockQuery).exceptionMessage((String) parameters.get("exceptionMessage"));
-		verify(mockQuery).noRetriesLeft();
-		verify(mockQuery).active();
-		verify(mockQuery).suspended();
-	}
+    verify(mockQuery).jobId((String) parameters.get("jobId"));
+    verify(mockQuery).processInstanceId((String) parameters.get("processInstanceId"));
+    verify(mockQuery).processDefinitionId((String) parameters.get("processDefinitionId"));
+    verify(mockQuery).processDefinitionKey((String) parameters.get("processDefinitionKey"));
+    verify(mockQuery).executionId((String) parameters.get("executionId"));
+    verify(mockQuery).activityId((String) parameters.get("activityId"));
+    verify(mockQuery).withRetriesLeft();
+    verify(mockQuery).executable();
+    verify(mockQuery).timers();
+    verify(mockQuery).withException();
+    verify(mockQuery).exceptionMessage((String) parameters.get("exceptionMessage"));
+    verify(mockQuery).noRetriesLeft();
+    verify(mockQuery).active();
+    verify(mockQuery).suspended();
+    verify(mockQuery).priorityLowerThanOrEquals(14);
+    verify(mockQuery).priorityHigherThanOrEquals(15);
+  }
 
-	@Test
-	public void testDueDateParameters() {
-		String variableValue = "2013-05-05T00:00:00";
-		Date date = DateTimeUtil.parseDate(variableValue);
+  @Test
+  public void testDueDateParameters() {
+    String variableValue = "2013-05-05T00:00:00";
+    Date date = DateTimeUtil.parseDate(variableValue);
 
-		String queryValue = "lt_" + variableValue;
-		given().queryParam("dueDates", queryValue).then().expect()
-				.statusCode(Status.OK.getStatusCode()).when()
-				.get(JOBS_RESOURCE_URL);
+    String queryValue = "lt_" + variableValue;
+    given().queryParam("dueDates", queryValue).then().expect()
+        .statusCode(Status.OK.getStatusCode()).when()
+        .get(JOBS_RESOURCE_URL);
 
-		InOrder inOrder = inOrder(mockQuery);
-		inOrder.verify(mockQuery).duedateLowerThan(date);
-		inOrder.verify(mockQuery).list();
+    InOrder inOrder = inOrder(mockQuery);
+    inOrder.verify(mockQuery).duedateLowerThan(date);
+    inOrder.verify(mockQuery).list();
 
-		queryValue = "gt_" + variableValue;
-		given().queryParam("dueDates", queryValue).then().expect()
-				.statusCode(Status.OK.getStatusCode()).when()
-				.get(JOBS_RESOURCE_URL);
+    queryValue = "gt_" + variableValue;
+    given().queryParam("dueDates", queryValue).then().expect()
+        .statusCode(Status.OK.getStatusCode()).when()
+        .get(JOBS_RESOURCE_URL);
 
-		inOrder = inOrder(mockQuery);
-		inOrder.verify(mockQuery).duedateHigherThan(date);
-		inOrder.verify(mockQuery).list();
-	}
+    inOrder = inOrder(mockQuery);
+    inOrder.verify(mockQuery).duedateHigherThan(date);
+    inOrder.verify(mockQuery).list();
+  }
 
   @Test
   public void testDueDateParametersAsPost() {
@@ -394,63 +401,69 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
     verify(mockQuery).duedateLowerThan(date);
   }
 
-	@Test
-	public void testMultipleDueDateParameters() {
-		String variableValue1 =  "2012-05-05T00:00:00";
-		String variableParameter1 = "gt_" + variableValue1;
+  @Test
+  public void testMultipleDueDateParameters() {
+    String variableValue1 =  "2012-05-05T00:00:00";
+    String variableParameter1 = "gt_" + variableValue1;
 
-		String variableValue2 = "2013-02-02T00:00:00";
-		String variableParameter2 = "lt_" + variableValue2;
+    String variableValue2 = "2013-02-02T00:00:00";
+    String variableParameter2 = "lt_" + variableValue2;
 
     Date date = DateTimeUtil.parseDate(variableValue1);
     Date anotherDate = DateTimeUtil.parseDate(variableValue2);
 
-		String queryValue = variableParameter1 + "," + variableParameter2;
+    String queryValue = variableParameter1 + "," + variableParameter2;
 
-		given().queryParam("dueDates", queryValue).then().expect()
-				.statusCode(Status.OK.getStatusCode()).when()
-				.get(JOBS_RESOURCE_URL);
+    given().queryParam("dueDates", queryValue).then().expect()
+        .statusCode(Status.OK.getStatusCode()).when()
+        .get(JOBS_RESOURCE_URL);
 
-		verify(mockQuery).duedateHigherThan(date);
-		verify(mockQuery).duedateLowerThan(anotherDate);
-	}
+    verify(mockQuery).duedateHigherThan(date);
+    verify(mockQuery).duedateLowerThan(anotherDate);
+  }
 
-	@Test
-	public void testSortingParameters() {
-		InOrder inOrder = Mockito.inOrder(mockQuery);
-		executeAndVerifySorting("jobId", "desc", Status.OK);
-		inOrder.verify(mockQuery).orderByJobId();
-		inOrder.verify(mockQuery).desc();
+  @Test
+  public void testSortingParameters() {
+    InOrder inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("jobId", "desc", Status.OK);
+    inOrder.verify(mockQuery).orderByJobId();
+    inOrder.verify(mockQuery).desc();
 
-		inOrder = Mockito.inOrder(mockQuery);
-		executeAndVerifySorting("processInstanceId", "asc", Status.OK);
-		inOrder.verify(mockQuery).orderByProcessInstanceId();
-		inOrder.verify(mockQuery).asc();
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("processInstanceId", "asc", Status.OK);
+    inOrder.verify(mockQuery).orderByProcessInstanceId();
+    inOrder.verify(mockQuery).asc();
 
-		inOrder = Mockito.inOrder(mockQuery);
-		executeAndVerifySorting("executionId", "desc", Status.OK);
-		inOrder.verify(mockQuery).orderByExecutionId();
-		inOrder.verify(mockQuery).desc();
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("executionId", "desc", Status.OK);
+    inOrder.verify(mockQuery).orderByExecutionId();
+    inOrder.verify(mockQuery).desc();
 
-		inOrder = Mockito.inOrder(mockQuery);
-		executeAndVerifySorting("jobRetries", "asc", Status.OK);
-		inOrder.verify(mockQuery).orderByJobRetries();
-		inOrder.verify(mockQuery).asc();
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("jobRetries", "asc", Status.OK);
+    inOrder.verify(mockQuery).orderByJobRetries();
+    inOrder.verify(mockQuery).asc();
 
-		inOrder = Mockito.inOrder(mockQuery);
-		executeAndVerifySorting("jobDueDate", "desc", Status.OK);
-		inOrder.verify(mockQuery).orderByJobDuedate();
-		inOrder.verify(mockQuery).desc();
-	}
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("jobDueDate", "desc", Status.OK);
+    inOrder.verify(mockQuery).orderByJobDuedate();
+    inOrder.verify(mockQuery).desc();
 
-	private void executeAndVerifySorting(String sortBy, String sortOrder,
-			Status expectedStatus) {
-		given().queryParam("sortBy", sortBy).queryParam("sortOrder", sortOrder)
-				.then().expect().statusCode(expectedStatus.getStatusCode())
-				.when().get(JOBS_RESOURCE_URL);
-	}
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("jobPriority", "asc", Status.OK);
+    inOrder.verify(mockQuery).orderByJobPriority();
+    inOrder.verify(mockQuery).asc();
 
-	@Test
+  }
+
+  private void executeAndVerifySorting(String sortBy, String sortOrder,
+      Status expectedStatus) {
+    given().queryParam("sortBy", sortBy).queryParam("sortOrder", sortOrder)
+        .then().expect().statusCode(expectedStatus.getStatusCode())
+        .when().get(JOBS_RESOURCE_URL);
+  }
+
+  @Test
   public void testSecondarySortingAsPost() {
     InOrder inOrder = Mockito.inOrder(mockQuery);
     Map<String, Object> json = new HashMap<String, Object>();
@@ -469,16 +482,40 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
     inOrder.verify(mockQuery).asc();
   }
 
-	@Test
-	public void testSuccessfulPagination() {
+  @Test
+  public void testSuccessfulPagination() {
 
-		int firstResult = FIRST_RESULTS_ZERO;
-		int maxResults = MAX_RESULTS_TEN;
-		given().queryParam("firstResult", firstResult)
-				.queryParam("maxResults", maxResults).then().expect()
-				.statusCode(Status.OK.getStatusCode()).when()
-				.get(JOBS_RESOURCE_URL);
+    int firstResult = FIRST_RESULTS_ZERO;
+    int maxResults = MAX_RESULTS_TEN;
+    given().queryParam("firstResult", firstResult)
+        .queryParam("maxResults", maxResults).then().expect()
+        .statusCode(Status.OK.getStatusCode()).when()
+        .get(JOBS_RESOURCE_URL);
 
-		verify(mockQuery).listPage(firstResult, maxResults);
-	}
+    verify(mockQuery).listPage(firstResult, maxResults);
+  }
+
+  @Test
+  public void testQueryCount() {
+    given()
+      .header("accept", MediaType.APPLICATION_JSON)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("count", equalTo(1))
+      .when()
+        .get(JOBS_QUERY_COUNT_URL);
+
+    verify(mockQuery).count();
+  }
+
+  @Test
+  public void testQueryCountForPost() {
+    given().contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
+    .header("accept", MediaType.APPLICATION_JSON)
+    .expect().statusCode(Status.OK.getStatusCode())
+      .body("count", equalTo(1))
+      .when().post(JOBS_QUERY_COUNT_URL);
+
+    verify(mockQuery).count();
+  }
 }

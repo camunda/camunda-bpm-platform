@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="5.4.0" id="sid-95c23b2e-60dc-4bea-86c9-98e9582989e0" targetNamespace="http://www.signavio.com/bpmn20" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="5.4.0" id="sid-95c23b2e-60dc-4bea-86c9-98e9582989e0" targetNamespace="http://www.signavio.com/bpmn20" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
    <collaboration id="sid-538283f5-5300-4cdd-a663-32586779d734">
       <participant id="Team-Assistenz_7" name="Team-Assistenz" processRef="Team-Assistenz_16">
          <extensionElements/>
@@ -236,7 +236,7 @@
             <flowNodeRef>PDF_aus_SVN_entfernen_160</flowNodeRef>
          </lane>
       </laneSet>
-      <userTask activiti:assignee="#{approver}" activiti:formKey="approveInvoice" completionQuantity="1" id="Rechnung_freigeben_125" isForCompensation="false" name="Rechnung&#10;freigeben" startQuantity="1">
+      <userTask camunda:assignee="#{approver}" camunda:formKey="approveInvoice" completionQuantity="1" id="Rechnung_freigeben_125" isForCompensation="false" name="Rechnung&#10;freigeben" startQuantity="1">
          <documentation id="sid-55047ae4-aa2a-43c7-a71b-c25a9999ea24">#{comment}</documentation>
          <extensionElements/>
          <incoming>sequenceFlow_178</incoming>
@@ -254,12 +254,12 @@
          <outgoing>sequenceFlow_187</outgoing>
          <messageEventDefinition id="sid-95acd6c4-27f0-4ceb-880f-d847c8328b7c"/>
       </startEvent>
-      <userTask activiti:assignee="kermit" activiti:formKey="assignApprover" completionQuantity="1" id="Freigebenden_zuordnen_143" isForCompensation="false" name="Freigebenden zuordnen" startQuantity="1">
+      <userTask camunda:assignee="kermit" camunda:formKey="assignApprover" completionQuantity="1" id="Freigebenden_zuordnen_143" isForCompensation="false" name="Freigebenden zuordnen" startQuantity="1">
          <extensionElements/>
          <incoming>sequenceFlow_187</incoming>
          <outgoing>sequenceFlow_178</outgoing>
       </userTask>
-      <userTask activiti:assignee="kermit" activiti:formKey="clarifyInvoice" completionQuantity="1" id="Rechnung_kl_ren_148" isForCompensation="false" name="Rechnung&#10;klären" startQuantity="1">
+      <userTask camunda:assignee="kermit" camunda:formKey="clarifyInvoice" completionQuantity="1" id="Rechnung_kl_ren_148" isForCompensation="false" name="Rechnung&#10;klären" startQuantity="1">
          <extensionElements/>
          <incoming>Nein_182</incoming>
          <outgoing>sequenceFlow_183</outgoing>
@@ -274,7 +274,7 @@
          <extensionElements/>
          <incoming>nein_185</incoming>
       </endEvent>
-      <userTask activiti:assignee="kermit" activiti:formKey="preparePayment" completionQuantity="1" id="zberweisung_vorbereiten_169" isForCompensation="false" name="Überweisung vorbereiten" startQuantity="1">
+      <userTask camunda:assignee="kermit" camunda:formKey="preparePayment" completionQuantity="1" id="zberweisung_vorbereiten_169" isForCompensation="false" name="Überweisung vorbereiten" startQuantity="1">
          <extensionElements/>
          <incoming>Ja_181</incoming>
          <outgoing>sequenceFlow_179</outgoing>
@@ -283,7 +283,7 @@
          <extensionElements/>
          <incoming>SequenceFlow_1</incoming>
       </endEvent>
-      <serviceTask activiti:delegateExpression="#{svnService}" completionQuantity="1" id="PDF_aus_SVN_entfernen_160" isForCompensation="false" name="PDF in SVN ablegen" startQuantity="1">
+      <serviceTask camunda:delegateExpression="#{svnService}" completionQuantity="1" id="PDF_aus_SVN_entfernen_160" isForCompensation="false" name="PDF in SVN ablegen" startQuantity="1">
          <extensionElements/>
          <incoming>sequenceFlow_179</incoming>
          <outgoing>SequenceFlow_1</outgoing>

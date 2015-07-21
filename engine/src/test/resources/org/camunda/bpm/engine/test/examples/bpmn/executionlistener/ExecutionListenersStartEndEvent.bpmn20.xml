@@ -1,6 +1,6 @@
 <definitions 
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
   
   <signal id="alertSignal" name="alert" />
@@ -10,9 +10,9 @@
     
     <startEvent id="theStart" name="Start Event">
       <extensionElements>
-        <activiti:executionListener class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener" event="end">
-          <activiti:field name="parameter" stringValue="Start Event Listener" />
-        </activiti:executionListener>
+        <camunda:executionListener class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener" event="end">
+          <camunda:field name="parameter" stringValue="Start Event Listener" />
+        </camunda:executionListener>
       </extensionElements>
     </startEvent>
 
@@ -20,9 +20,9 @@
     
     <intermediateThrowEvent  id="noneEvent" name="None Event">
       <extensionElements>
-        <activiti:executionListener class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener" event="end">
-          <activiti:field name="parameter" stringValue="Intermediate Catch Event Listener" />
-        </activiti:executionListener>
+        <camunda:executionListener class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener" event="end">
+          <camunda:field name="parameter" stringValue="Intermediate Catch Event Listener" />
+        </camunda:executionListener>
       </extensionElements>        
     </intermediateThrowEvent>
     
@@ -30,9 +30,9 @@
 
 	<intermediateThrowEvent id="signalEvent" name="Signal Event" >
         <extensionElements>
-          <activiti:executionListener class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener" event="start">
-            <activiti:field name="parameter" stringValue="Intermediate Throw Event Listener" />
-          </activiti:executionListener>
+          <camunda:executionListener class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener" event="start">
+            <camunda:field name="parameter" stringValue="Intermediate Throw Event Listener" />
+          </camunda:executionListener>
         </extensionElements>        
         <signalEventDefinition signalRef="alertSignal" />     
 	</intermediateThrowEvent>
@@ -41,9 +41,9 @@
 
     <endEvent id="theEnd" name="End Event">
       <extensionElements>
-        <activiti:executionListener class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener" event="start">
-          <activiti:field name="parameter" stringValue="End Event Listener" />
-        </activiti:executionListener>
+        <camunda:executionListener class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener" event="start">
+          <camunda:field name="parameter" stringValue="End Event Listener" />
+        </camunda:executionListener>
       </extensionElements>    
     </endEvent>
     

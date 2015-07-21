@@ -12,13 +12,10 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 /**
  * <p>Declaration of a Message Job (Asynchronous continuation job)</p>
@@ -26,7 +23,7 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
  * @author Daniel Meyer
  *
  */
-public class MessageJobDeclaration extends JobDeclaration<MessageEntity> {
+public class MessageJobDeclaration extends JobDeclaration<ExecutionEntity, MessageEntity> {
 
   public static final String ASYNC_BEFORE = "async-before";
   public static final String ASYNC_AFTER = "async-after";
@@ -43,8 +40,6 @@ public class MessageJobDeclaration extends JobDeclaration<MessageEntity> {
   protected MessageEntity newJobInstance(ExecutionEntity execution) {
     MessageEntity message = new MessageEntity();
     message.setExecution(execution);
-    message.setJobHandlerType(AsyncContinuationJobHandler.TYPE);
-    setMessageDueDate(message);
     return message;
   }
 
@@ -74,14 +69,9 @@ public class MessageJobDeclaration extends JobDeclaration<MessageEntity> {
     return false;
   }
 
-  protected void setMessageDueDate(MessageEntity message) {
-    ProcessEngineConfiguration processEngineConfiguration = Context.getProcessEngineConfiguration();
-    if (processEngineConfiguration != null && processEngineConfiguration.isJobExecutorAcquireByDueDate()) {
-      message.setDuedate(ClockUtil.getCurrentTime());
-    }
-    else {
-      message.setDuedate(null);
-    }
+  protected ExecutionEntity resolveExecution(ExecutionEntity context) {
+    return context;
   }
+
 
 }

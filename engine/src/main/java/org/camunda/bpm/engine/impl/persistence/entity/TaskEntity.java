@@ -124,6 +124,8 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
   protected transient AbstractPersistentVariableStore variableStore;
 
+  protected transient boolean skipCustomListeners = false;
+
   /**
    * contains all changed properties of this entity
    */
@@ -157,6 +159,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
     if (execution instanceof ExecutionEntity) {
       task.setExecution((DelegateExecution) execution);
+      task.skipCustomListeners = ((ExecutionEntity) execution).isSkipCustomListeners();
       task.insert((ExecutionEntity) execution);
       return task;
 
@@ -226,7 +229,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     Context
       .getCommandContext()
       .getTaskManager()
-      .deleteTask(this, TaskEntity.DELETE_REASON_COMPLETED, false);
+      .deleteTask(this, TaskEntity.DELETE_REASON_COMPLETED, false, skipCustomListeners);
 
     // if the task is associated with a
     // execution (and not a case execution)
@@ -250,7 +253,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     Context
       .getCommandContext()
       .getTaskManager()
-      .deleteTask(this, TaskEntity.DELETE_REASON_COMPLETED, false);
+      .deleteTask(this, TaskEntity.DELETE_REASON_COMPLETED, false, false);
   }
 
   public void delete(String deleteReason, boolean cascade) {
@@ -260,12 +263,17 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     Context
       .getCommandContext()
       .getTaskManager()
-      .deleteTask(this, deleteReason, cascade);
+      .deleteTask(this, deleteReason, cascade, skipCustomListeners);
 
     if (executionId != null) {
       ExecutionEntity execution = getExecution();
       execution.removeTask(this);
     }
+  }
+
+  public void delete(String deleteReason, boolean cascade, boolean skipCustomListeners) {
+    this.skipCustomListeners = skipCustomListeners;
+    delete(deleteReason, cascade);
   }
 
   public void delegate(String userId) {
@@ -767,29 +775,44 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   }
 
   public void fireEvent(String taskEventName) {
-    TaskDefinition taskDefinition = getTaskDefinition();
-    if (taskDefinition != null) {
-      List<TaskListener> taskEventListeners = getTaskDefinition().getTaskListener(taskEventName);
-      if (taskEventListeners != null) {
-        for (TaskListener taskListener : taskEventListeners) {
-          CoreExecution execution = getExecution();
-          if (execution == null) {
-            execution = getCaseExecution();
-          }
 
-          if (execution != null) {
-            setEventName(taskEventName);
-          }
-          try {
-            TaskListenerInvocation listenerInvocation = new TaskListenerInvocation(taskListener, this, execution);
-            Context.getProcessEngineConfiguration()
-              .getDelegateInterceptor()
-              .handleInvocation(listenerInvocation);
-          }catch (Exception e) {
-            throw new ProcessEngineException("Exception while invoking TaskListener: "+e.getMessage(), e);
-          }
+    List<TaskListener> taskEventListeners = getListenersForEvent(taskEventName);
+
+    if (taskEventListeners != null) {
+      for (TaskListener taskListener : taskEventListeners) {
+        CoreExecution execution = getExecution();
+        if (execution == null) {
+          execution = getCaseExecution();
+        }
+
+        if (execution != null) {
+          setEventName(taskEventName);
+        }
+        try {
+          TaskListenerInvocation listenerInvocation = new TaskListenerInvocation(taskListener, this, execution);
+          Context.getProcessEngineConfiguration()
+            .getDelegateInterceptor()
+            .handleInvocation(listenerInvocation);
+        } catch (Exception e) {
+          throw new ProcessEngineException("Exception while invoking TaskListener: "+e.getMessage(), e);
         }
       }
+    }
+  }
+
+  protected List<TaskListener> getListenersForEvent(String event) {
+    TaskDefinition resolvedTaskDefinition = getTaskDefinition();
+    if (resolvedTaskDefinition != null) {
+      if (skipCustomListeners) {
+        return resolvedTaskDefinition.getBuiltinTaskListeners(event);
+      }
+      else {
+        return resolvedTaskDefinition.getTaskListeners(event);
+      }
+
+    }
+    else {
+      return null;
     }
   }
 

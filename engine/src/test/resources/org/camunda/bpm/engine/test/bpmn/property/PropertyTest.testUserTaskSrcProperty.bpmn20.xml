@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions id="propertyTest" 
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
   
   <process id="testUserTaskSrcProperty">
@@ -11,7 +11,7 @@
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask" />
 
     <userTask id="theTask" name="My task">
-      <property id="myVar" activiti:src="inputVar" />
+      <property id="myVar" camunda:src="inputVar" />
     </userTask>
     
     <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theTask2" />

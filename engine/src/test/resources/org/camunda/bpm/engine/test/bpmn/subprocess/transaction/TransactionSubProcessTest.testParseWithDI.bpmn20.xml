@@ -2,7 +2,7 @@
 <bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
 	xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-	xmlns:activiti="http://activiti.org/bpmn"
+	xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
 	targetNamespace="Exemples"
 	id="Definitions_1">
 	<bpmn2:process id="TransactionSubProcessTest" name="Default Process">
@@ -28,7 +28,7 @@
 					<bpmn2:compensateEventDefinition id="CompensateEventDefinition_1" />
 				</bpmn2:boundaryEvent>
 				<bpmn2:serviceTask id="ServiceTask_1" name="Service Task" isForCompensation="true"
-					implementation="##unspecified" activiti:expression="${true}" />
+					implementation="##unspecified" camunda:expression="${true}" />
 				<bpmn2:exclusiveGateway id="ExclusiveGateway_1">
 					<bpmn2:incoming>SequenceFlow_4</bpmn2:incoming>
 					<bpmn2:outgoing>SequenceFlow_5</bpmn2:outgoing>

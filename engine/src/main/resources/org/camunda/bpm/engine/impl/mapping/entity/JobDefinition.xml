@@ -147,6 +147,9 @@
       <if test="suspensionState != null">
         and RES.SUSPENSION_STATE_ = #{suspensionState.stateCode}
       </if>
+      <if test="withOverridingJobPriority != null &amp;&amp; withOverridingJobPriority">
+        and RES.JOB_PRIORITY_ is not null
+      </if>
 
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
 
