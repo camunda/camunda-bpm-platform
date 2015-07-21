@@ -4,6 +4,7 @@ var testHelper = require('../../test-helper');
 var setupFile = require('./task-detail-view-setup');
 
 var page = require('../pages/dashboard');
+var tasklist = page.taskList;
 var taskview = page.currentTask;
 
 
@@ -17,7 +18,7 @@ describe('Tasklist Detail View Spec', function() {
     });
   });
 
-  describe('the task detail view', function() {
+  describe.skip('the task detail view', function() {
 
     it('should display info text when no task is selected', function() {
 
@@ -29,8 +30,8 @@ describe('Tasklist Detail View Spec', function() {
     it('should appear when a task is selected', function() {
 
       // when
-      page.taskList.selectTask(0);
-      page.waitForElementToBeVisible(taskview.taskName(), 5000);
+      tasklist.selectTask('Task 1');
+      page.waitForElementToBeVisible(taskview.taskName());
 
       // then
       expect(taskview.taskName()).to.eventually.eql('Task 1');
@@ -39,16 +40,16 @@ describe('Tasklist Detail View Spec', function() {
   });
 
 
-  describe('description tab', function() {
+  describe.skip('description tab', function() {
 
     before(function() {
-      page.taskList.selectTask(0);
+      tasklist.selectTask('Task 1');
     });
 
     it('should display description of a task', function() {
 
       // given
-      page.waitForElementToBeVisible(taskview.taskName(), 5000);
+      page.waitForElementToBeVisible(taskview.taskName());
 
       // when
       taskview.description.selectTab();
@@ -60,10 +61,10 @@ describe('Tasklist Detail View Spec', function() {
   });
 
 
-  describe('add a comment', function() {
+  describe.skip('add a comment', function() {
 
     before(function() {
-      page.taskList.selectTask(0);
+      tasklist.selectTask('Task 1');
     });
 
     it('should display comment in the history tab', function() {
@@ -93,7 +94,7 @@ describe('Tasklist Detail View Spec', function() {
   });
 
 
-  describe('form tab', function() {
+  describe.skip('form tab', function() {
 
     before(function() {
       return testHelper(setupFile.setup1, function() {
@@ -108,8 +109,8 @@ describe('Tasklist Detail View Spec', function() {
       it('should disable form elements', function() {
 
         // given
-        page.taskList.selectTask(0);
-        page.waitForElementToBeVisible(taskview.taskName(), 5000);
+        tasklist.selectTask('Task 1');
+        page.waitForElementToBeVisible(taskview.taskName());
 
         // when
         taskview.form.selectTab();
@@ -130,8 +131,8 @@ describe('Tasklist Detail View Spec', function() {
       it('should enable form elements', function() {
 
         // given
-        page.taskList.selectTask(0);
-        page.waitForElementToBeVisible(taskview.taskName(), 5000);
+        tasklist.selectTask('Task 1');
+        page.waitForElementToBeVisible(taskview.taskName());
 
         // when
         taskview.form.selectTab();
@@ -152,14 +153,14 @@ describe('Tasklist Detail View Spec', function() {
 
         page.navigateToWebapp('Tasklist');
         page.authentication.userLogin('admin', 'admin');
-        page.taskList.selectTask(0);
       });
     });
 
     it('should display the process and highlight current task', function() {
 
       // given
-      page.waitForElementToBeVisible(taskview.taskName(), 5000);
+      tasklist.selectTask('User Task 1');
+      page.waitForElementToBeVisible(taskview.taskName());
 
       // when
       taskview.diagram.selectTab();
