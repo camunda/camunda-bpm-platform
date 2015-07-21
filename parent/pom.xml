@@ -17,7 +17,7 @@
   </description>
 
   <properties>
-    <version.spring.framework>4.0.7.RELEASE</version.spring.framework>
+    <version.spring.framework>4.1.6.RELEASE</version.spring.framework>
     <version.cxf>2.6.1</version.cxf>
     <version.junit>4.11</version.junit>
     <version.assertj>1.5.0</version.assertj>
