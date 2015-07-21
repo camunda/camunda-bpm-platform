@@ -21,7 +21,6 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.cfg.BeansConfigurationHelper;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
-import org.camunda.bpm.engine.impl.jobexecutor.JobPriorityProvider;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.variable.type.ValueTypeResolver;
 
@@ -127,9 +126,20 @@ public abstract class ProcessEngineConfiguration {
    */
   public static final String HISTORY_FULL = "full";
 
+  /**
+   * Value for {@link #setHistory(String)}. Choosing auto causes the configuration to choose the level
+   * already present on the database. If none can be found, "audit" is taken.
+   */
+  public static final String HISTORY_AUTO = "auto";
+
+  /**
+   * The default history level that is used when no history level is configured
+   */
+  public static final String HISTORY_DEFAULT = HISTORY_AUDIT;
+
   protected String processEngineName = ProcessEngines.NAME_DEFAULT;
   protected int idBlockSize = 100;
-  protected String history = HISTORY_AUDIT;
+  protected String history = HISTORY_DEFAULT;
   protected boolean jobExecutorActivate;
   protected boolean jobExecutorDeploymentAware = false;
   protected boolean jobExecutorPreferTimerJobs = false;

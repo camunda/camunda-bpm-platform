@@ -1047,7 +1047,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected List<BpmnParseListener> getDefaultBPMNParseListeners() {
     List<BpmnParseListener> defaultListeners = new ArrayList<BpmnParseListener>();
-    if (!historyLevel.equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
+    if (!HistoryLevel.HISTORY_LEVEL_NONE.equals(historyLevel)) {
       defaultListeners.add(new HistoryParseListener(historyLevel, historyEventProducer));
     }
     if(isMetricsEnabled) {
@@ -1086,7 +1086,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected List<CmmnTransformListener> getDefaultCmmnTransformListeners() {
     List<CmmnTransformListener> defaultListener = new ArrayList<CmmnTransformListener>();
-    if (!historyLevel.equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
+    if (!HistoryLevel.HISTORY_LEVEL_NONE.equals(historyLevel)) {
       defaultListener.add(new CmmnHistoryTransformListener(historyLevel, cmmnHistoryEventProducer));
     }
     if(isMetricsEnabled) {
@@ -1218,10 +1218,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             this.historyLevel = historyLevel;
           }
         }
-
       }
 
-      if(historyLevel == null) {
+
+      // do allow null for history level in case of "auto"
+      if(historyLevel == null && !ProcessEngineConfiguration.HISTORY_AUTO.equalsIgnoreCase(history)) {
         throw new ProcessEngineException("invalid history level: "+history);
       }
     }
@@ -1570,6 +1571,18 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setHistoryLevel(HistoryLevel historyLevel) {
     this.historyLevel = historyLevel;
+  }
+
+  public HistoryLevel getDefaultHistoryLevel() {
+    if (historyLevels != null) {
+      for (HistoryLevel historyLevel : historyLevels) {
+        if (HISTORY_DEFAULT != null && HISTORY_DEFAULT.equalsIgnoreCase(historyLevel.getName())) {
+          return historyLevel;
+        }
+      }
+    }
+
+    return null;
   }
 
   public ProcessEngineConfigurationImpl setProcessEngineName(String processEngineName) {
@@ -2660,6 +2673,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public ProcessEngineConfigurationImpl setCustomHistoryLevels(List<HistoryLevel> customHistoryLevels) {
     this.customHistoryLevels = customHistoryLevels;
     return this;
+  }
+
+  public List<HistoryLevel> getHistoryLevels() {
+    return historyLevels;
   }
 
   public List<HistoryLevel> getCustomHistoryLevels() {
