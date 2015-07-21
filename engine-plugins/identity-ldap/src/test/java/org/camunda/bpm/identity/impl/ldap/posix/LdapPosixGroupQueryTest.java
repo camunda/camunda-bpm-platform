@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.identity.impl.ldap;
+package org.camunda.bpm.identity.impl.ldap.posix;
 
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * @author Tom Crossland
  */
-public class LdapPosixGroupQueryTest extends LdapPosixIdentityProviderTest {
+public class LdapPosixGroupQueryTest extends LdapPosixTest {
 
   public void testFilterByGroupId() {
     Group group = identityService.createGroupQuery().groupId("posix-group-without-members").singleResult();

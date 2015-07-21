@@ -6,9 +6,9 @@
 
   <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
 
-    <property name="processEngineName" value="LdapIdentityServiceTest-engine" />
+    <property name="processEngineName" value="LdapIdentityServiceTest-posix-engine" />
 
-    <property name="jdbcUrl" value="jdbc:h2:mem:LdapIdentityServiceTest;DB_CLOSE_DELAY=1000" />
+    <property name="jdbcUrl" value="jdbc:h2:mem:LdapIdentityServicePosixTest;DB_CLOSE_DELAY=1000" />
     <property name="jdbcDriver" value="org.h2.Driver" />
     <property name="jdbcUsername" value="sa" />
     <property name="jdbcPassword" value="" />
@@ -32,7 +32,7 @@
 
   <bean id="ldapIdentityProviderPlugin" class="org.camunda.bpm.identity.impl.ldap.plugin.LdapIdentityProviderPlugin">
 
-    <property name="serverUrl" value="ldap://localhost:${ldap.server.port}/" />
+    <property name="serverUrl" value="ldap://localhost:${ldap.server.port.posix}/" />
     <property name="managerDn" value="uid=daniel,ou=office-berlin,o=camunda,c=org" />
     <property name="managerPassword" value="daniel" />
     <property name="baseDn" value="o=camunda,c=org" />
