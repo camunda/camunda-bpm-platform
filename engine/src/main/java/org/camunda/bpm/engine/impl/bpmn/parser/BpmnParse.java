@@ -711,15 +711,32 @@ public class BpmnParse extends Parse {
         addError("Invalid reference targetRef '" + targetRef + "' of association element ", associationElement);
       } else {
         if (sourceActivity != null && sourceActivity.getProperty("type").equals("compensationBoundaryCatch")) {
-          Object isForCompensation = targetActivity.getProperty(PROPERTYNAME_IS_FOR_COMPENSATION);
-          if (isForCompensation == null || !(Boolean) isForCompensation) {
-            addError("compensation boundary catch must be connected to element with isForCompensation=true", associationElement);
-          } else {
-            ActivityImpl compensatedActivity = (ActivityImpl) sourceActivity.getEventScope();
-            compensatedActivity.setProperty(PROPERTYNAME_COMPENSATION_HANDLER_ID, targetActivity.getId());
-          }
+
+          parseAssociationOfCompensationBoundaryEvent(associationElement, sourceActivity, targetActivity);
         }
       }
+    }
+  }
+
+  protected void parseAssociationOfCompensationBoundaryEvent(Element associationElement, ActivityImpl sourceActivity, ActivityImpl targetActivity) {
+    Object isForCompensation = targetActivity.getProperty(PROPERTYNAME_IS_FOR_COMPENSATION);
+    if (isForCompensation == null || !(Boolean) isForCompensation) {
+      addError("compensation boundary catch must be connected to element with isForCompensation=true", associationElement);
+
+    } else {
+      ActivityImpl compensatedActivity = (ActivityImpl) sourceActivity.getEventScope();
+
+      String existingCompensationHandlerId = (String) compensatedActivity.getProperty(PROPERTYNAME_COMPENSATION_HANDLER_ID);
+      if (existingCompensationHandlerId != null) {
+
+        ActivityImpl compensationHandler = compensatedActivity.findActivity(existingCompensationHandlerId);
+        if ("compensationStartEvent".equals(compensationHandler.getProperty("type"))) {
+          addWarning("compensation boundary event and event subprocess with compensation start event are not supported on the same scope. "
+              + "event subprocess will be ignored", associationElement);
+        }
+      }
+
+      compensatedActivity.setProperty(PROPERTYNAME_COMPENSATION_HANDLER_ID, targetActivity.getId());
     }
   }
 
@@ -849,6 +866,7 @@ public class BpmnParse extends Parse {
     Element messageEventDefinition = startEventElement.element("messageEventDefinition");
     Element signalEventDefinition = startEventElement.element("signalEventDefinition");
     Element timerEventDefinition = startEventElement.element("timerEventDefinition");
+    Element compensateEventDefinition = startEventElement.element("compensateEventDefinition");
 
     Object triggeredByEvent = scopeActivity.getProperty(PROPERTYNAME_TRIGGERED_BY_EVENT);
     boolean isTriggeredByEvent = triggeredByEvent != null && ((Boolean) triggeredByEvent);
@@ -867,8 +885,7 @@ public class BpmnParse extends Parse {
         scopeActivity.setActivityStartBehavior(ActivityStartBehavior.CONCURRENT_IN_FLOW_SCOPE);
       }
 
-      // the event scope of the start event is the flow scope of the event
-      // subprocess
+      // the event scope of the start event is the flow scope of the event subprocess
       startEventActivity.setEventScope(scopeActivity.getFlowScope());
 
       if (errorEventDefinition != null) {
@@ -892,12 +909,14 @@ public class BpmnParse extends Parse {
       } else if (timerEventDefinition != null) {
         parseTimerStartEventDefinitionForEventSubprocess(timerEventDefinition, startEventActivity, isInterrupting);
 
+      } else if (compensateEventDefinition != null) {
+        parseCompensationEventSubprocess(startEventActivity, startEventElement, scopeActivity, compensateEventDefinition);
+
       } else {
-        addError("start event of event subprocess must be of type 'error', 'message', 'timer' or 'signal'", startEventElement);
+        addError("start event of event subprocess must be of type 'error', 'message', 'timer', 'signal' or 'compensation'", startEventElement);
       }
 
     } else { // "regular" subprocess
-      Element compensateEventDefinition = startEventElement.element("compensateEventDefinition");
       Element conditionalEventDefinition = startEventElement.element("conditionalEventDefinition");
       Element escalationEventDefinition = startEventElement.element("escalationEventDefinition");
 
@@ -926,6 +945,34 @@ public class BpmnParse extends Parse {
       startEventActivity.setActivityBehavior(new NoneStartEventActivityBehavior());
     }
 
+  }
+
+  protected void parseCompensationEventSubprocess(ActivityImpl startEventActivity, Element startEventElement, ActivityImpl scopeActivity, Element compensateEventDefinition) {
+    startEventActivity.setProperty("type", "compensationStartEvent");
+    scopeActivity.setProperty(PROPERTYNAME_IS_FOR_COMPENSATION, Boolean.TRUE);
+
+    if (scopeActivity.getFlowScope() instanceof ProcessDefinitionEntity) {
+      addError("event subprocess with compensation start event is only supported for embedded subprocess "
+          + "(since throwing compensation through a call activity-induced process hierarchy is not supported)", startEventElement);
+    }
+
+    ScopeImpl subprocess = scopeActivity.getFlowScope();
+    String existingCompensationHandlerId = (String) subprocess.getProperty(PROPERTYNAME_COMPENSATION_HANDLER_ID);
+    if (existingCompensationHandlerId == null) {
+      // add property to subprocess
+      subprocess.setProperty(PROPERTYNAME_COMPENSATION_HANDLER_ID, startEventActivity.getActivityId());
+    } else {
+
+      ActivityImpl compensationHandler = subprocess.findActivity(startEventActivity.getActivityId());
+      if ("compensationStartEvent".equals(compensationHandler.getProperty("type"))) {
+        addError("multiple event subprocesses with compensation start event are not supported on the same scope", startEventElement);
+      } else {
+        addWarning("compensation boundary event and event subprocess with compensation start event are not supported on the same scope. "
+            + "event subprocess will be ignored", startEventElement);
+      }
+    }
+
+    validateCatchCompensateEventDefinition(compensateEventDefinition);
   }
 
   protected void parseErrorStartEventDefinition(Element errorEventDefinition, ActivityImpl startEventActivity) {
@@ -1315,7 +1362,7 @@ public class BpmnParse extends Parse {
       activityBehavior = new IntermediateThrowSignalEventActivityBehavior(signalDefinition);
     } else if (compensateEventDefinitionElement != null) {
       nestedActivityImpl.setProperty("type", "intermediateCompensationThrowEvent");
-      CompensateEventDefinition compensateEventDefinition = parseCompensateEventDefinition(compensateEventDefinitionElement, scopeElement);
+      CompensateEventDefinition compensateEventDefinition = parseThrowCompensateEventDefinition(compensateEventDefinitionElement, scopeElement);
       activityBehavior = new IntermediateThrowCompensationEventActivityBehavior(compensateEventDefinition);
       nestedActivityImpl.setProperty(PROPERTYNAME_THROWS_COMPENSATION, true);
     } else if (messageEventDefinitionElement != null) {
@@ -1348,7 +1395,7 @@ public class BpmnParse extends Parse {
     return nestedActivityImpl;
   }
 
-  protected CompensateEventDefinition parseCompensateEventDefinition(Element compensateEventDefinitionElement, ScopeImpl scopeElement) {
+  protected CompensateEventDefinition parseThrowCompensateEventDefinition(Element compensateEventDefinitionElement, ScopeImpl scopeElement) {
     String activityRef = compensateEventDefinitionElement.attribute("activityRef");
     boolean waitForCompletion = "true".equals(compensateEventDefinitionElement.attribute("waitForCompletion", "true"));
 
@@ -1379,7 +1426,19 @@ public class BpmnParse extends Parse {
     return compensateEventDefinition;
   }
 
-  protected void parseCatchCompensateEventDefinition(Element compensateEventDefinition, ActivityImpl activity) {
+  protected void validateCatchCompensateEventDefinition(Element compensateEventDefinitionElement) {
+    String activityRef = compensateEventDefinitionElement.attribute("activityRef");
+    if (activityRef != null) {
+      addWarning("attribute 'activityRef' is not supported on catching compensation event. attribute will be ignored", compensateEventDefinitionElement);
+    }
+
+    String waitForCompletion = compensateEventDefinitionElement.attribute("waitForCompletion");
+    if (waitForCompletion != null) {
+      addWarning("attribute 'waitForCompletion' is not supported on catching compensation event. attribute will be ignored", compensateEventDefinitionElement);
+    }
+  }
+
+  protected void parseBoundaryCompensateEventDefinition(Element compensateEventDefinition, ActivityImpl activity) {
     activity.setProperty("type", "compensationBoundaryCatch");
 
     ScopeImpl hostActivity = activity.getEventScope();
@@ -1388,6 +1447,8 @@ public class BpmnParse extends Parse {
         addError("multiple boundary events with compensateEventDefinition not supported on same activity", compensateEventDefinition);
       }
     }
+
+    validateCatchCompensateEventDefinition(compensateEventDefinition);
   }
 
   protected ActivityBehavior parseBoundaryCancelEventDefinition(Element cancelEventDefinition, ActivityImpl activity) {
@@ -2509,7 +2570,7 @@ public class BpmnParse extends Parse {
         activity.setActivityBehavior(new SignalEndEventActivityBehavior(signalDefinition));
       } else if (compensateEventDefinitionElement != null) {
         activity.setProperty("type", "compensationEndEvent");
-        CompensateEventDefinition compensateEventDefinition = parseCompensateEventDefinition(compensateEventDefinitionElement, scope);
+        CompensateEventDefinition compensateEventDefinition = parseThrowCompensateEventDefinition(compensateEventDefinitionElement, scope);
         activity.setActivityBehavior(new CompensationEndEventActivityBehavior(compensateEventDefinition));
         activity.setProperty(PROPERTYNAME_THROWS_COMPENSATION, true);
       } else { // default: none end event
@@ -2620,7 +2681,7 @@ public class BpmnParse extends Parse {
         behavior = parseBoundaryCancelEventDefinition(cancelEventDefinition, boundaryEventActivity);
 
       } else if (compensateEventDefinition != null) {
-        parseCatchCompensateEventDefinition(compensateEventDefinition, boundaryEventActivity);
+        parseBoundaryCompensateEventDefinition(compensateEventDefinition, boundaryEventActivity);
 
       } else if (messageEventDefinition != null) {
         eventScopeActivity.setScope(true);

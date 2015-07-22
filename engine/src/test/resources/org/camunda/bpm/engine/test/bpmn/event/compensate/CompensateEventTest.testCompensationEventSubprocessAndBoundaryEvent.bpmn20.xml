@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+	
+	<process id="compensateProcess">
+
+		<startEvent id="start" />
+		
+		<sequenceFlow sourceRef="start"	targetRef="subprocess" />
+
+		<subProcess id="subprocess">
+		
+			<startEvent id="startInScope" />
+			
+			<sequenceFlow sourceRef="startInScope" targetRef="endInScope" />
+						
+			<endEvent id="endInScope" />
+			
+			<subProcess id="compensationScope" triggeredByEvent="true">
+			
+				<startEvent id="startIncompensationScope">
+					<compensateEventDefinition />
+				</startEvent>
+				
+				<sequenceFlow sourceRef="startIncompensationScope" targetRef="cancelHotel" />
+				
+				<userTask id="cancelHotel" name="Cancel Hotel"/>
+				
+				<sequenceFlow sourceRef="cancelHotel" targetRef="endIncompensationScope" />
+				
+				<endEvent id="endIncompensationScope" />
+				
+			</subProcess>
+			
+		</subProcess>
+    
+	    <boundaryEvent id="compensateSubProcess" name="Boundary event" attachedToRef="subprocess">
+	      <compensateEventDefinition />
+	    </boundaryEvent>
+	    
+	    <userTask id="cancelFlight" name="Cancel Flight" isForCompensation="true"/>
+	
+		<sequenceFlow sourceRef="subprocess" targetRef="throwCompensation" />
+		
+		<userTask id="throwCompensation" name="throw compensation" />
+		
+		<sequenceFlow sourceRef="throwCompensation" targetRef="throwingCompensation" />
+		
+		<intermediateThrowEvent id="throwingCompensation">
+			<compensateEventDefinition activityRef="subprocess" />
+		</intermediateThrowEvent>
+		
+		<sequenceFlow sourceRef="throwingCompensation" targetRef="end" />
+		
+		<endEvent id="end" />
+	    
+	    <association associationDirection="One" sourceRef="compensateSubProcess" targetRef="cancelFlight" />
+	</process>
+
+</definitions>

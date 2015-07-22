@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+	
+	<process id="compensateProcess">
+
+		<startEvent id="start" />
+		
+		<sequenceFlow sourceRef="start"	targetRef="scopeHotel" />
+		
+		<subProcess id="scopeHotel">
+
+			<startEvent id="startInScope" />
+			
+			<sequenceFlow sourceRef="startInScope" targetRef="bookHotel" />
+
+			<userTask id="bookHotel" name="Book Hotel" />
+							
+			<sequenceFlow sourceRef="bookHotel" targetRef="scopeFlight" />
+			
+			<subProcess id="scopeFlight">
+
+				<startEvent id="startInScopeFlight" />
+				
+				<sequenceFlow sourceRef="startInScopeFlight" targetRef="bookFlight" />
+	
+				<userTask id="bookFlight" name="Book Flight" />
+								
+				<sequenceFlow sourceRef="bookFlight" targetRef="endInScopeFlight" />
+				
+				<endEvent id="endInScopeFlight" />
+				
+				<subProcess id="compensationScopeFlight" triggeredByEvent="true">
+				
+					<startEvent id="startInCompensationScopeFlight">
+						<compensateEventDefinition />
+					</startEvent>
+					
+					<sequenceFlow sourceRef="startInCompensationScopeFlight" targetRef="undoBookFlight" />
+					
+					<userTask id="undoBookFlight" name="Cancel Flight"/>
+					
+					<sequenceFlow sourceRef="undoBookFlight" targetRef="endInCompensationScopeFlight" />
+					
+					<endEvent id="endInCompensationScopeFlight" />
+					
+				</subProcess>
+	
+			</subProcess>
+			
+			<sequenceFlow sourceRef="scopeFlight" targetRef="endInScope" />
+			
+			<endEvent id="endInScope" />
+			
+			<subProcess id="compensationScopeHotel" triggeredByEvent="true">
+			
+				<startEvent id="startInCompensationScope">
+					<compensateEventDefinition />
+				</startEvent>
+				
+				<sequenceFlow sourceRef="startInCompensationScope" targetRef="undoBookHotel" />
+				
+				<userTask id="undoBookHotel" name="Cancel Hotel" />
+				
+				<sequenceFlow sourceRef="undoBookHotel" targetRef="endInCompensationScope" />
+				
+				<endEvent id="endInCompensationScope" />
+				
+			</subProcess>
+
+		</subProcess>
+		
+		<sequenceFlow sourceRef="scopeHotel" targetRef="throwCompensation" />
+		
+		<userTask id="throwCompensation" name="throw compensation" />
+		
+		<sequenceFlow sourceRef="throwCompensation" targetRef="throwing" />
+		
+		<intermediateThrowEvent id="throwing">
+			<compensateEventDefinition />
+		</intermediateThrowEvent>  
+		
+		<sequenceFlow sourceRef="throwing" targetRef="end" />    
+		
+		<endEvent id="end" />
+		
+	</process>
+
+</definitions>

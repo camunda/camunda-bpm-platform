@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+	
+	<process id="compensateProcess">
+
+		<startEvent id="start" />
+		
+		<sequenceFlow sourceRef="start"	targetRef="scopeHotel" />
+		
+		<subProcess id="scopeHotel">
+
+			<startEvent id="startInScope" />
+			
+			<sequenceFlow sourceRef="startInScope" targetRef="bookHotel" />
+
+			<userTask id="bookHotel" name="Book Hotel" />
+			
+			<boundaryEvent id="compensateBookHotel" name="Boundary event" attachedToRef="bookHotel">
+				<compensateEventDefinition />
+			</boundaryEvent>
+			
+			<userTask id="undoBookHotel" name="Cancel Hotel" isForCompensation="true" />
+							
+			<sequenceFlow sourceRef="bookHotel" targetRef="scopeFlight" />
+			
+			<subProcess id="scopeFlight">
+
+				<startEvent id="startInScopeFlight" />
+				
+				<sequenceFlow sourceRef="startInScopeFlight" targetRef="bookFlight" />
+	
+				<userTask id="bookFlight" name="Book Flight" />
+				
+				<boundaryEvent id="compensateBookFlight" name="Boundary event" attachedToRef="bookFlight">
+					<compensateEventDefinition />
+				</boundaryEvent>
+				
+				<userTask id="undoBookFlight" name="Cancel Flight" isForCompensation="true" />
+				
+				<sequenceFlow sourceRef="bookFlight" targetRef="endInScopeFlight" />
+				
+				<endEvent id="endInScopeFlight" />		
+				
+				<association associationDirection="One" sourceRef="compensateBookFlight" targetRef="undoBookFlight" />
+				
+			</subProcess>
+			
+			<sequenceFlow sourceRef="scopeFlight" targetRef="endInScope" />
+			
+			<endEvent id="endInScope" />			
+
+			<association associationDirection="One" sourceRef="compensateBookHotel" targetRef="undoBookHotel" />
+
+		</subProcess>
+		
+		<sequenceFlow sourceRef="scopeHotel" targetRef="throwCompensation" />
+		
+		<userTask id="throwCompensation" name="throw compensation" />
+		
+		<sequenceFlow sourceRef="throwCompensation" targetRef="throwing" />
+		
+		<intermediateThrowEvent id="throwing">
+			<compensateEventDefinition />
+		</intermediateThrowEvent>  
+		
+		<sequenceFlow sourceRef="throwing" targetRef="end" />    
+		
+		<endEvent id="end" />
+		
+	</process>
+
+</definitions>

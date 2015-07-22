@@ -58,10 +58,13 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
    * the regular {@link FlowNodeActivityBehavior#leave(ActivityExecution)} is
    * called.
    */
+  @Override
   protected void leave(ActivityExecution execution) {
     PvmActivity currentActivity = execution.getActivity();
     ActivityImpl compensationHandler = getCompensationHandler(currentActivity);
-    if(compensationHandler != null) {
+
+    // subscription for compensation event subprocess is already created
+    if(compensationHandler != null && !isCompensationStartEvent(compensationHandler)) {
       createCompensateEventSubscription(execution, compensationHandler);
     }
     super.leave(execution);
@@ -75,6 +78,10 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
     else {
       return null;
     }
+  }
+
+  protected boolean isCompensationStartEvent(ActivityImpl compensationHandler) {
+    return "compensationStartEvent".equals(compensationHandler.getProperty("type"));
   }
 
   protected void createCompensateEventSubscription(ActivityExecution execution, ActivityImpl compensationHandler) {
@@ -245,11 +252,12 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
   }
 
   protected void signalCompensationDone(ActivityExecution execution, Object signalData) {
-    // default behavior is to join compensating executions and propagate the signal if all executions
-    // have compensated
+    // default behavior is to join compensating executions and propagate the signal if all executions have compensated
 
-    // join compensating executions
-    if(execution.getExecutions().isEmpty()) {
+    // only wait for non-event-scope executions cause a compensation event subprocess consume the compensation event and
+    // do not have to compensate embedded subprocesses (which are still non-event-scope executions)
+
+    if(((PvmExecutionImpl) execution).getNonEventScopeExecutions().isEmpty()) {
       if(execution.getParent() != null) {
         ActivityExecution parent = execution.getParent();
         execution.remove();
@@ -271,6 +279,7 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
       super(initialElement);
     }
 
+    @Override
     protected PvmExecutionImpl nextElement() {
       return currentElement.getProcessInstance().getSuperExecution();
     }
@@ -291,6 +300,7 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
 
     public WalkCondition<PvmExecutionImpl> declarationFound() {
       return new WalkCondition<PvmExecutionImpl>() {
+        @Override
         public boolean isFulfilled(PvmExecutionImpl element) {
           if (element == null || currentProcessInstanceErrorFinder.getErrorHandlerActivity() != null) {
             return true;
@@ -300,6 +310,7 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
       };
     }
 
+    @Override
     public void collect(PvmExecutionImpl obj) {
       // walk the scope hierarchy for the current process instance and search for an error handler
       currentProcessInstanceScopeExecutionMapping = obj.createActivityExecutionMapping();
@@ -344,12 +355,14 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
 
     public WalkCondition<ScopeImpl> declarationFound() {
       return new WalkCondition<ScopeImpl>() {
+        @Override
         public boolean isFulfilled(ScopeImpl element) {
           return element == null || errorHandlerActivity != null;
         }
       };
     }
 
+    @Override
     public void collect(ScopeImpl scope) {
       List<ErrorEventDefinition> errorEventDefinitions = (List) scope.getProperty(BpmnParse.PROPERTYNAME_ERROR_EVENT_DEFINITIONS);
       if(errorEventDefinitions != null) {
@@ -377,6 +390,7 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
 
     protected List<PvmExecutionImpl> processInstanceHierarchy = new ArrayList<PvmExecutionImpl>();
 
+    @Override
     public void collect(PvmExecutionImpl obj) {
       processInstanceHierarchy.add(obj.getProcessInstance());
     }

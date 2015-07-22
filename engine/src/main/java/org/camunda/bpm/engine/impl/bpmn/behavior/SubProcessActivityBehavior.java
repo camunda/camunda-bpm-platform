@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
  */
 public class SubProcessActivityBehavior extends AbstractBpmnActivityBehavior implements CompositeActivityBehavior {
 
+  @Override
   public void execute(ActivityExecution execution) throws Exception {
     PvmActivity activity = execution.getActivity();
     PvmActivity initialActivity = (PvmActivity) activity.getProperty(BpmnParse.PROPERTYNAME_INITIAL);
@@ -40,6 +41,7 @@ public class SubProcessActivityBehavior extends AbstractBpmnActivityBehavior imp
     execution.executeActivity(initialActivity);
   }
 
+  @Override
   public void concurrentChildExecutionEnded(ActivityExecution scopeExecution, ActivityExecution endedExecution) {
     // join
     endedExecution.remove();
@@ -47,12 +49,15 @@ public class SubProcessActivityBehavior extends AbstractBpmnActivityBehavior imp
     scopeExecution.forceUpdate();
   }
 
+  @Override
   public void complete(ActivityExecution scopeExecution) {
     leave(scopeExecution);
   }
 
+  @Override
   public void leave(ActivityExecution execution) {
     CompensationUtil.createEventScopeExecution((ExecutionEntity) execution);
+
     super.leave(execution);
   }
 

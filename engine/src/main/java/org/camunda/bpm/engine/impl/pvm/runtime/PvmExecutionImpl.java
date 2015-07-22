@@ -125,18 +125,22 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   // API ////////////////////////////////////////////////
 
   /** creates a new execution. properties processDefinition, processInstance and activity will be initialized. */
+  @Override
   public PvmExecutionImpl createExecution() {
     return createExecution(false);
   }
 
+  @Override
   public abstract PvmExecutionImpl createExecution(boolean initStartContext);
 
   // sub process instance
 
+  @Override
   public PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition) {
     return createSubProcessInstance(processDefinition, null);
   }
 
+  @Override
   public PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey) {
     PvmExecutionImpl processInstance = getProcessInstance();
 
@@ -148,6 +152,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     return createSubProcessInstance(processDefinition, businessKey, caseInstanceId);
   }
 
+  @Override
   public PvmExecutionImpl createSubProcessInstance(PvmProcessDefinition processDefinition, String businessKey, String caseInstanceId) {
     PvmExecutionImpl subProcessInstance = newExecution();
 
@@ -175,8 +180,10 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   // sub case instance
 
+  @Override
   public abstract CmmnExecution createSubCaseInstance(CmmnCaseDefinition caseDefinition);
 
+  @Override
   public abstract CmmnExecution createSubCaseInstance(CmmnCaseDefinition caseDefinition, String businessKey);
 
   public abstract void initialize();
@@ -196,10 +203,12 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   }
 
+  @Override
   public void start() {
     start(null);
   }
 
+  @Override
   public void start(Map<String, Object> variables) {
     startContext = new ProcessInstanceStartContext(getActivity());
 
@@ -227,6 +236,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   public abstract void fireHistoricProcessStartEvent();
 
+  @Override
   public void destroy() {
     log.fine("destroying "+this);
 
@@ -275,6 +285,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   /**
    * Interrupts an execution
    */
+  @Override
   public void interrupt(String reason) {
     interrupt(reason, false, false);
   }
@@ -292,6 +303,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
    *
    * @param completeScope true if ending the execution contributes to completing the BPMN 2.0 scope
    */
+  @Override
   public void end(boolean completeScope) {
 
     setCompleteScope(completeScope);
@@ -306,10 +318,18 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     performOperation(PvmAtomicOperation.ACTIVITY_NOTIFY_LISTENER_END);
   }
 
+  @Override
   public void endCompensation() {
     remove();
     performOperation(PvmAtomicOperation.FIRE_ACTIVITY_END);
-    getParent().signal("compensationDone", null);
+
+    PvmExecutionImpl parent = getParent();
+
+    if(parent.getActivity() == null){
+      parent.setActivity((PvmActivity) getActivity().getFlowScope());
+    }
+
+    parent.signal("compensationDone", null);
   }
 
   /**
@@ -331,6 +351,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     }
   }
 
+  @Override
   public void remove() {
     PvmExecutionImpl parent = getParent();
     if (parent!=null) {
@@ -451,6 +472,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     return concurrentExecution;
   }
 
+  @Override
   public boolean tryPruneLastConcurrentChild() {
 
     if (getNonEventScopeExecutions().size() == 1) {
@@ -494,6 +516,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   }
 
+  @Override
   public void deleteCascade(String deleteReason) {
     deleteCascade(deleteReason, false);
   }
@@ -614,6 +637,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   // methods that translate to operations /////////////////////////////////////
 
+  @Override
   public void signal(String signalName, Object signalData) {
     if (getActivity() == null) {
       throw new PvmException("cannot signal execution " + this.id + ": it has no current activity");
@@ -636,7 +660,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     if (transition==null) {
       throw new PvmException("transition is null");
     }
-    TransitionImpl transitionImpl = (TransitionImpl) transition;
+    TransitionImpl transitionImpl = transition;
     setActivity(transitionImpl.getSource());
     // while executing the transition, the activityInstance is 'null'
     // (we are not executing an activity)
@@ -662,6 +686,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
    *
    * @param the activity to start
    */
+  @Override
   public void executeActivity(PvmActivity activity) {
     if(!activity.getIncomingTransitions().isEmpty()) {
       throw new ProcessEngineException("Activity is contained in normal flow and cannot be executed using executeActivity().");
@@ -673,7 +698,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
             + "cannot be executed by non-scope execution.");
     }
 
-    PvmActivity activityImpl = (PvmActivity) activity;
+    PvmActivity activityImpl = activity;
     setActive(true);
     switch (activityStartBehavior) {
     case CONCURRENT_IN_FLOW_SCOPE:
@@ -772,11 +797,12 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       setVariables(variables);
       setVariablesLocal(localVariables);
       setActivity(targetTransition.getSource());
-      setTransition((TransitionImpl) targetTransition);
+      setTransition(targetTransition);
       performOperation(PvmAtomicOperation.TRANSITION_START_NOTIFY_LISTENER_TAKE);
     }
   }
 
+  @Override
   @SuppressWarnings({ "rawtypes", "unchecked" })
   public List<ActivityExecution> findInactiveConcurrentExecutions(PvmActivity activity) {
     List<PvmExecutionImpl> inactiveConcurrentExecutionsInActivity = new ArrayList<PvmExecutionImpl>();
@@ -815,10 +841,12 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     return childExecutions;
   }
 
+  @Override
   public void leaveActivityViaTransition(PvmTransition outgoingTransition) {
     leaveActivityViaTransitions(Arrays.asList(outgoingTransition), Collections.<ActivityExecution>emptyList());
   }
 
+  @Override
   public void leaveActivityViaTransitions(List<PvmTransition> _transitions, List<? extends ActivityExecution> _recyclableExecutions) {
     List<? extends ActivityExecution> recyclableExecutions = Collections.emptyList();
     if (_recyclableExecutions != null) {
@@ -881,12 +909,14 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     return findExecution(activityId)!=null;
   }
 
+  @Override
   public void inactivate() {
     this.isActive = false;
   }
 
   // executions ///////////////////////////////////////////////////////////////
 
+  @Override
   public abstract List<? extends PvmExecutionImpl> getExecutions();
 
   public List<? extends PvmExecutionImpl> getNonEventScopeExecutions() {
@@ -915,6 +945,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     return result;
   }
 
+  @Override
   public PvmExecutionImpl findExecution(String activityId) {
     if ( (getActivity()!=null)
          && (getActivity().getId().equals(activityId))
@@ -930,6 +961,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     return null;
   }
 
+  @Override
   public List<PvmExecution> findExecutions(String activityId) {
     List<PvmExecution> matchingExecutions = new ArrayList<PvmExecution>();
     collectExecutions(activityId, matchingExecutions);
@@ -949,6 +981,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     }
   }
 
+  @Override
   public List<String> findActiveActivityIds() {
     List<String> activeActivityIds = new ArrayList<String>();
     collectActiveActivityIds(activeActivityIds);
@@ -968,6 +1001,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   // business key /////////////////////////////////////////
 
+  @Override
   public String getProcessBusinessKey() {
     return getProcessInstance().getBusinessKey();
   }
@@ -985,6 +1019,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   // process instance /////////////////////////////////////////////////////////
 
   /** ensures initialization and returns the process instance. */
+  @Override
   public abstract PvmExecutionImpl getProcessInstance();
 
   public abstract void setProcessInstance(PvmExecutionImpl pvmExecutionImpl);
@@ -1002,6 +1037,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   // activity /////////////////////////////////////////////////////////////////
 
   /** ensures initialization and returns the activity */
+  @Override
   public ActivityImpl getActivity() {
     return activity;
   }
@@ -1015,6 +1051,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     }
   }
 
+  @Override
   public String getCurrentActivityName() {
     ActivityImpl activity = getActivity();
     if(activity != null) {
@@ -1024,14 +1061,17 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     }
   }
 
+  @Override
   public String getCurrentActivityId() {
     return getActivityId();
   }
 
+  @Override
   public void setActivity(PvmActivity activity) {
     this.activity = (ActivityImpl) activity;
   }
 
+  @Override
   public void enterActivityInstance() {
     ActivityImpl activity = getActivity();
 
@@ -1055,6 +1095,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   protected abstract String generateActivityInstanceId(String activityId);
 
+  @Override
   public void leaveActivityInstance() {
     if(activityInstanceId != null) {
 
@@ -1068,6 +1109,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     activityInstanceState = ActivityInstanceState.DEFAULT.getStateCode();
   }
 
+  @Override
   public String getParentActivityInstanceId() {
     if(isProcessInstanceExecution()) {
       return getId();
@@ -1090,10 +1132,12 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     activityInstanceId = generateActivityInstanceId(getActivity().getId());
   }
 
+  @Override
   public void setActivityInstanceId(String activityInstanceId) {
     this.activityInstanceId = activityInstanceId;
   }
 
+  @Override
   public String getActivityInstanceId() {
     return activityInstanceId;
   }
@@ -1101,8 +1145,10 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   // parent ///////////////////////////////////////////////////////////////////
 
   /** ensures initialization and returns the parent */
+  @Override
   public abstract PvmExecutionImpl getParent();
 
+  @Override
   public String getParentId() {
     PvmExecutionImpl parent = getParent();
     if(parent != null) {
@@ -1116,6 +1162,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   // super- and subprocess executions /////////////////////////////////////////
 
+  @Override
   public abstract PvmExecutionImpl getSuperExecution();
 
   public abstract void setSuperExecution(PvmExecutionImpl superExecution);
@@ -1151,10 +1198,12 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     return scope;
   }
 
+  @Override
   public boolean isScope() {
     return isScope;
   }
 
+  @Override
   public void setScope(boolean isScope) {
     this.isScope = isScope;
   }
@@ -1169,6 +1218,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
    * @param targetFlowScope scope activity or process definition for which the scope execution should be found
    * @return the scope execution for the provided targetFlowScope
    */
+  @Override
   public PvmExecutionImpl findExecutionForFlowScope(PvmScope targetFlowScope) {
     // if this execution is not a scope execution, use the parent
     final PvmExecutionImpl scopeExecution = isScope() ? this : getParent();
@@ -1199,6 +1249,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     return scopeExecution;
   }
 
+  @Override
   public Map<ScopeImpl, PvmExecutionImpl> createActivityExecutionMapping() {
     ScopeImpl currentActivity = getActivity();
     EnsureUtil.ensureNotNull("activity of current execution", currentActivity);
@@ -1260,13 +1311,13 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     }
 
     ScopeExecutionCollector scopeExecutionCollector = new ScopeExecutionCollector();
-    new ExecutionWalker((PvmExecutionImpl) this)
+    new ExecutionWalker(this)
       .addPreCollector(scopeExecutionCollector)
       .walkUntil();
     List<PvmExecutionImpl> scopeExecutions = scopeExecutionCollector.getExecutions();
 
     ScopeCollector scopeCollector = new ScopeCollector();
-    new FlowScopeWalker((ScopeImpl) currentScope)
+    new FlowScopeWalker(currentScope)
       .addPreCollector(scopeCollector)
       .walkUntil();
 
@@ -1287,6 +1338,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   // toString /////////////////////////////////////////////////////////////////
 
+  @Override
   public String toString() {
     if (isProcessInstanceExecution()) {
       return "ProcessInstance["+getToStringIdentity()+"]";
@@ -1306,6 +1358,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     return "execution";
   }
 
+  @Override
   public AbstractVariableScope getParentVariableScope() {
     return getParent();
   }
@@ -1338,6 +1391,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     return deleteRoot;
   }
 
+  @Override
   public TransitionImpl getTransition() {
     return transition;
   }
@@ -1350,6 +1404,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     this.transitionsToTake = transitionsToTake;
   }
 
+  @Override
   public String getCurrentTransitionId() {
     TransitionImpl transition = getTransition();
     if(transition != null) {
@@ -1363,26 +1418,32 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     this.transition = (TransitionImpl) transition;
   }
 
+  @Override
   public boolean isConcurrent() {
     return isConcurrent;
   }
 
+  @Override
   public void setConcurrent(boolean isConcurrent) {
     this.isConcurrent = isConcurrent;
   }
 
+  @Override
   public boolean isActive() {
     return isActive;
   }
 
+  @Override
   public void setActive(boolean isActive) {
     this.isActive = isActive;
   }
 
+  @Override
   public boolean isEnded() {
     return isEnded;
   }
 
+  @Override
   public boolean isCanceled() {
     return ActivityInstanceState.CANCELED.getStateCode() == activityInstanceState;
   }
@@ -1393,6 +1454,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     }
   }
 
+  @Override
   public boolean isCompleteScope() {
     return ActivityInstanceState.SCOPE_COMPLETE.getStateCode() == activityInstanceState;
   }
@@ -1435,10 +1497,12 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     startContext = null;
   }
 
+  @Override
   public PvmActivity getNextActivity() {
     return nextActivity;
   }
 
+  @Override
   public boolean isProcessInstanceExecution() {
     return getParent() == null;
   }

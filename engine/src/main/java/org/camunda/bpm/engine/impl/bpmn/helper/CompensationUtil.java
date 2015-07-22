@@ -97,7 +97,7 @@ public class CompensationUtil {
 
     List<CompensateEventSubscriptionEntity> eventSubscriptions = execution.getCompensateEventSubscriptions();
 
-    if (eventSubscriptions.size() > 0) {
+    if (eventSubscriptions.size() > 0 || hasCompensationEventSubprocess(activity)) {
 
       ExecutionEntity eventScopeExecution = levelOfSubprocessScopeExecution.createExecution();
       eventScopeExecution.setActivity(execution.getActivity());
@@ -132,6 +132,19 @@ public class CompensationUtil {
       eventSubscription.setConfiguration(eventScopeExecution.getId());
 
     }
+  }
+
+  protected static boolean hasCompensationEventSubprocess(PvmActivity activity) {
+    String compensationHandlerId = (String) activity.getProperty(BpmnParse.PROPERTYNAME_COMPENSATION_HANDLER_ID);
+    if (compensationHandlerId != null) {
+
+      PvmActivity compensationHandler = activity.findActivity(compensationHandlerId);
+      if (compensationHandler != null && "compensationStartEvent".equals(compensationHandler.getProperty("type"))) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**

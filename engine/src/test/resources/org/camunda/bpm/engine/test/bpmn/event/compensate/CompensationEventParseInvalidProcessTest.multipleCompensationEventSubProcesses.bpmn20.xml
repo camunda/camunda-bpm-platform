@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+	
+	<process id="compensateProcess">
+
+		<startEvent id="start" />
+		
+		<sequenceFlow sourceRef="start"	targetRef="scope" />
+		
+		<subProcess id="scope">
+
+			<startEvent id="startInScope" />
+			
+			<sequenceFlow sourceRef="startInScope" targetRef="bookHotel" />
+
+			<userTask id="bookHotel" />
+							
+			<sequenceFlow sourceRef="bookHotel" targetRef="endInScope" />
+			
+			<endEvent id="endInScope" />
+			
+			<subProcess id="compensationScope" triggeredByEvent="true">
+			
+				<startEvent id="startInCompensationScope">
+					<compensateEventDefinition />
+				</startEvent>
+				
+				<sequenceFlow sourceRef="startInCompensationScope" targetRef="undoBookHotel" />
+				
+				<userTask id="undoBookHotel" />
+				
+				<sequenceFlow sourceRef="undoBookHotel" targetRef="endInCompensationScope" />
+				
+				<endEvent id="endInCompensationScope" />
+				
+			</subProcess>
+			
+			<!-- multiple compensation sub processes in one scope are not supported -->
+			
+			<subProcess id="compensationScope2" triggeredByEvent="true">
+			
+				<startEvent id="startInCompensationScope2">
+					<compensateEventDefinition />
+				</startEvent>
+				
+				<sequenceFlow sourceRef="startInCompensationScope2" targetRef="endInCompensationScope2" />
+				
+				<endEvent id="endInCompensationScope2" />
+				
+			</subProcess>
+
+		</subProcess>
+		
+		<sequenceFlow sourceRef="scope" targetRef="end" />
+		
+		<endEvent id="end" />
+		
+	</process>
+
+</definitions>
