@@ -8,7 +8,6 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
-import org.camunda.bpm.engine.impl.history.HistoryLevelAudit;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.test.TestHelper;
@@ -66,19 +65,17 @@ public class DatabaseHistoryPropertyAutoTest {
 
   @Test
   public void uses_default_value_audit_when_no_value_is_configured() {
-    ProcessEngineConfigurationImpl config = config("true", ProcessEngineConfiguration.HISTORY_AUTO);
+    final ProcessEngineConfigurationImpl config = config("true", ProcessEngineConfiguration.HISTORY_AUTO);
     processEngineImpl = (ProcessEngineImpl) config.buildProcessEngine();
 
-    config.getCommandExecutorSchemaOperations().execute(new Command<Void>() {
+    final Integer level = config.getCommandExecutorSchemaOperations().execute(new Command<Integer>() {
       @Override
-      public Void execute(CommandContext commandContext) {
-        Integer level = SchemaOperationsProcessEngineBuild.databaseHistoryLevel(commandContext.getSession(DbEntityManager.class));
-
-        assertThat(level, equalTo(HistoryLevel.HISTORY_LEVEL_AUDIT.getId()));
-
-        return null;
+      public Integer execute(CommandContext commandContext) {
+        return SchemaOperationsProcessEngineBuild.databaseHistoryLevel(commandContext.getSession(DbEntityManager.class));
       }
     });
+
+    assertThat(level, equalTo(HistoryLevel.HISTORY_LEVEL_AUDIT.getId()));
 
   }
 

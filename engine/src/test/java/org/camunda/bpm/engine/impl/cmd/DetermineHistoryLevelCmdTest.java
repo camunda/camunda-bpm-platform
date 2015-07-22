@@ -8,11 +8,9 @@ import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.hamcrest.CoreMatchers;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.rules.ExternalResource;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -20,18 +18,13 @@ import java.util.UUID;
 
 import static org.junit.Assert.assertThat;
 
-public class OverwriteHistoryLevelCmdTest {
+public class DetermineHistoryLevelCmdTest {
 
 
-  private  final ProcessEngineConfigurationImpl config = config("true", ProcessEngineConfiguration.HISTORY_FULL);
-    private ProcessEngineImpl processEngineImpl;
+  private ProcessEngineImpl processEngineImpl;
 
-
-  @Rule
-  public final ExpectedException thrown = ExpectedException.none();
 
   private static ProcessEngineConfigurationImpl config(final String historyLevel) {
-
     return config("false", historyLevel);
   }
 
@@ -47,22 +40,30 @@ public class OverwriteHistoryLevelCmdTest {
 
 
   @Test
-  public void update_history_level_in_configuration() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+  public void readLevelFullfromDB() throws Exception {
+    final ProcessEngineConfigurationImpl config = config("true", ProcessEngineConfiguration.HISTORY_FULL);
 
+    // init the db with level=full
     processEngineImpl = (ProcessEngineImpl) config.buildProcessEngine();
 
-    // we have to invoke init(), or several NPE occur.
-    ProcessEngineConfigurationImpl secondConfig = config(ProcessEngineConfiguration.HISTORY_AUTO);
-    final Method init = ProcessEngineConfigurationImpl.class.getDeclaredMethod("init");
-    init.setAccessible(true);
-    init.invoke(secondConfig);
+    final HistoryLevel historyLevel = config.getCommandExecutorSchemaOperations().execute(new DetermineHistoryLevelCmd(config.getHistoryLevels()));
 
-    config.getCommandExecutorSchemaOperations().execute(new OverwriteHistoryLevelCmd(secondConfig));
-
-    assertThat(secondConfig.getHistoryLevel(), CoreMatchers.equalTo(HistoryLevel.HISTORY_LEVEL_FULL));
+    assertThat(historyLevel, CoreMatchers.equalTo(HistoryLevel.HISTORY_LEVEL_FULL));
   }
 
-  
+
+  @Test
+  public void use_default_level_audit() throws Exception {
+    final ProcessEngineConfigurationImpl config = config("true", ProcessEngineConfiguration.HISTORY_AUTO);
+
+    // init the db with level=auto -> audit
+    processEngineImpl = (ProcessEngineImpl) config.buildProcessEngine();
+
+    config.getCommandExecutorSchemaOperations().execute(new DetermineHistoryLevelCmd(config.getHistoryLevels()));
+
+    // the history Level has been overwritten with audit
+    assertThat(config.getHistoryLevel(), CoreMatchers.equalTo(HistoryLevel.HISTORY_LEVEL_AUDIT));
+  }
 
   @After
   public void after() {

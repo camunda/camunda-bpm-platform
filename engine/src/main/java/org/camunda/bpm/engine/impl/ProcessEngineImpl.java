@@ -30,7 +30,7 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.TransactionContextFactory;
-import org.camunda.bpm.engine.impl.cmd.OverwriteHistoryLevelCmd;
+import org.camunda.bpm.engine.impl.cmd.DetermineHistoryLevelCmd;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -71,9 +71,10 @@ public class ProcessEngineImpl implements ProcessEngine {
   public ProcessEngineImpl(final ProcessEngineConfigurationImpl processEngineConfiguration) {
 
     if (ProcessEngineConfiguration.HISTORY_AUTO.equals(processEngineConfiguration.getHistory())) {
-      processEngineConfiguration.getCommandExecutorSchemaOperations().execute(new OverwriteHistoryLevelCmd(processEngineConfiguration));
+      final HistoryLevel historyLevel = processEngineConfiguration.getCommandExecutorSchemaOperations().execute(new DetermineHistoryLevelCmd(processEngineConfiguration.getHistoryLevels()));
+      processEngineConfiguration.setHistory(historyLevel.getName());
+      processEngineConfiguration.setHistoryLevel(historyLevel);
     }
-
 
     this.processEngineConfiguration = processEngineConfiguration;
     this.name = processEngineConfiguration.getProcessEngineName();
