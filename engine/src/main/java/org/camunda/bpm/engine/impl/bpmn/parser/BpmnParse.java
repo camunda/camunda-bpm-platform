@@ -1913,7 +1913,7 @@ public class BpmnParse extends Parse {
 
       MessageJobDeclaration messageJobDeclaration = new AsyncBeforeMessageJobDeclaration();
       messageJobDeclaration.setExclusive(exclusive);
-      messageJobDeclaration.setActivityId(activity.getId());
+      messageJobDeclaration.setActivity(activity);
       messageJobDeclaration.setJobPriorityProvider((ParameterValueProvider) activity.getProperty(PROPERTYNAME_JOB_PRIORITY));
 
       addMessageJobDeclarationToActivity(messageJobDeclaration, activity);
@@ -1924,7 +1924,7 @@ public class BpmnParse extends Parse {
 
       MessageJobDeclaration messageJobDeclaration = new AsyncAfterMessageJobDeclaration();
       messageJobDeclaration.setExclusive(exclusive);
-      messageJobDeclaration.setActivityId(activity.getId());
+      messageJobDeclaration.setActivity(activity);
       messageJobDeclaration.setJobPriorityProvider((ParameterValueProvider) activity.getProperty(PROPERTYNAME_JOB_PRIORITY));
 
       addMessageJobDeclarationToActivity(messageJobDeclaration, activity);
@@ -2801,7 +2801,7 @@ public class BpmnParse extends Parse {
 
     TimerDeclarationImpl timerDeclaration = parseTimer(timerEventDefinition, timerActivity, TimerStartEventSubprocessJobHandler.TYPE);
 
-    timerDeclaration.setActivityId(timerActivity.getId());
+    timerDeclaration.setActivity(timerActivity);
     timerDeclaration.setEventScopeActivityId(timerActivity.getEventScope().getId());
     timerDeclaration.setJobHandlerConfiguration(timerActivity.getFlowScope().getId());
     timerDeclaration.setInterruptingTimer(interrupting);
@@ -2842,6 +2842,7 @@ public class BpmnParse extends Parse {
 
     EventSubscriptionJobDeclaration catchingAsyncDeclaration = new EventSubscriptionJobDeclaration(signalDefinition);
     catchingAsyncDeclaration.setJobPriorityProvider((ParameterValueProvider) signalActivity.getProperty(PROPERTYNAME_JOB_PRIORITY));
+    catchingAsyncDeclaration.setActivity(signalActivity);
     signalDefinition.setJobDeclaration(catchingAsyncDeclaration);
     addEventSubscriptionJobDeclaration(catchingAsyncDeclaration, signalActivity, element);
   }
@@ -2881,7 +2882,7 @@ public class BpmnParse extends Parse {
     }
   }
 
-  protected TimerDeclarationImpl parseTimer(Element timerEventDefinition, ScopeImpl timerActivity, String jobHandlerType) {
+  protected TimerDeclarationImpl parseTimer(Element timerEventDefinition, ActivityImpl timerActivity, String jobHandlerType) {
     // TimeDate
     TimerDeclarationType type = TimerDeclarationType.DATE;
     Expression expression = parseExpression(timerEventDefinition, "timeDate");
@@ -2909,7 +2910,7 @@ public class BpmnParse extends Parse {
     if(timerActivity.getId() == null) {
       addError("Attribute \"id\" is required!",timerEventDefinition);
     }
-    timerDeclaration.setActivityId(timerActivity.getId());
+    timerDeclaration.setActivity(timerActivity);
     timerDeclaration.setJobConfiguration(type.toString() + ": " + expression.getExpressionText());
     addJobDeclarationToProcessDefinition(timerDeclaration, timerActivity.getProcessDefinition());
 

@@ -59,34 +59,17 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
   }
 
   protected Integer getJobDefinitionPriority(ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
-    String jobDefinitionId = jobDeclaration.getJobDefinitionId();
+    JobDefinitionEntity jobDefinition = getJobDefinitionFor(jobDeclaration);
 
-    if (jobDefinitionId != null) {
-      JobDefinitionEntity jobDefinition = Context.getCommandContext()
-          .getJobDefinitionManager().findById(jobDefinitionId);
-
-      if (jobDefinition != null) {
-        return jobDefinition.getOverridingJobPriority();
-      }
+    if (jobDefinition != null) {
+      return jobDefinition.getOverridingJobPriority();
     }
 
     return null;
   }
 
   protected Integer getProcessDefinitionPriority(ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
-    ProcessDefinitionImpl processDefinition = null;
-
-    if (execution != null) {
-      processDefinition = execution.getProcessDefinition();
-    } else {
-      JobDefinitionEntity jobDefinition = getJobDefinitionFor(jobDeclaration);
-      if (jobDefinition != null) {
-        processDefinition = Context
-          .getProcessEngineConfiguration()
-          .getDeploymentCache()
-          .findDeployedProcessDefinitionById(jobDefinition.getProcessDefinitionId());
-      }
-    }
+    ProcessDefinitionImpl processDefinition = jobDeclaration.getProcessDefinition();
 
     if (processDefinition != null) {
       ParameterValueProvider priorityProvider = (ParameterValueProvider) processDefinition.getProperty(BpmnParse.PROPERTYNAME_JOB_PRIORITY);
@@ -100,9 +83,14 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
   }
 
   protected JobDefinitionEntity getJobDefinitionFor(JobDeclaration<?, ?> jobDeclaration) {
-    return Context.getCommandContext()
-        .getJobDefinitionManager()
-        .findById(jobDeclaration.getJobDefinitionId());
+    if (jobDeclaration.getJobDefinitionId() != null) {
+      return Context.getCommandContext()
+          .getJobDefinitionManager()
+          .findById(jobDeclaration.getJobDefinitionId());
+    }
+    else {
+      return null;
+    }
   }
 
   protected Integer getActivityPriority(ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {

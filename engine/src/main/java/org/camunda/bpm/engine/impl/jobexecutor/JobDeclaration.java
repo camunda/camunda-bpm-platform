@@ -21,6 +21,8 @@ import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValuePro
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 /**
@@ -47,7 +49,7 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
 
   protected boolean exclusive = JobEntity.DEFAULT_EXCLUSIVE;
 
-  protected String activityId;
+  protected ActivityImpl activity;
 
   protected ParameterValueProvider jobPriorityProvider;
 
@@ -183,11 +185,29 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
   }
 
   public String getActivityId() {
-    return activityId;
+    if (activity != null) {
+      return activity.getId();
+    }
+    else {
+      return null;
+    }
   }
 
-  public void setActivityId(String activityId) {
-    this.activityId = activityId;
+  public ActivityImpl getActivity() {
+    return activity;
+  }
+
+  public void setActivity(ActivityImpl activity) {
+    this.activity = activity;
+  }
+
+  public ProcessDefinitionImpl getProcessDefinition() {
+    if (activity != null) {
+      return activity.getProcessDefinition();
+    }
+    else {
+      return null;
+    }
   }
 
   public String getJobConfiguration() {
