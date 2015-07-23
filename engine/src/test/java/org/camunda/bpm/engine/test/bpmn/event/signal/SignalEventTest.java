@@ -348,17 +348,23 @@ public class SignalEventTest extends PluggableProcessEngineTestCase {
     assertEquals(1, taskService.createTaskQuery().count());
   }
 
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.catchAlertAndThrowAbortSignal.bpmn20.xml",
-      "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.catchAlertAndAbortSignal.bpmn20.xml" })
-  public void testThrowSignalFromMultipleSenders(){
-    runtimeService.startProcessInstanceByKey("catchAlertAndAbortSignal");
-    runtimeService.startProcessInstanceByKey("catchAlertAndThrowAbort");
+  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.catchAlertTwiceAndTerminate.bpmn20.xml" })
+  public void testThrowSignalMultipleCancellingReceivers(){
+    RecorderExecutionListener.clear();
 
-    // event subscription for signal start event
+    runtimeService.startProcessInstanceByKey("catchAlertTwiceAndTerminate");
+
+    // event subscription for intermediate signal events
     assertEquals(2, runtimeService.createEventSubscriptionQuery().eventType("signal").eventName("alert").count());
 
+    // try to send 'alert' signal to both executions
     runtimeService.signalEventReceived("alert");
+
+    // then only one terminate end event was executed
+    assertEquals(1, RecorderExecutionListener.getRecordedEvents().size());
+
+    // and instances ended successfully
+    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
   }
 
   @Deployment(resources = {
@@ -372,6 +378,7 @@ public class SignalEventTest extends PluggableProcessEngineTestCase {
     // event subscriptions for intermediate events
     assertEquals(2, runtimeService.createEventSubscriptionQuery().eventType("signal").eventName("alert").count());
 
+    // started process instance try to send 'alert' signal to both executions
     runtimeService.startProcessInstanceByKey("throwSignal");
 
     // then only one terminate end event was executed
