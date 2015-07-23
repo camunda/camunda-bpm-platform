@@ -20,6 +20,10 @@ import java.util.List;
  * <p>Exception thrown by the process engine in case a user tries to
  * interact with a resource in an unauthorized way.</p>
  *
+ * <p>The exception contains a list of Missing authorizations. The List is a
+ * disjunction i.e. a user should have any of the authorization for the engine
+ * to continue the execution beyond the point where it failed.</p>
+ *
  * @author Daniel Meyer
  *
  */
@@ -54,6 +58,13 @@ public class AuthorizationException extends ProcessEngineException {
     this.info = info;
   }
 
+  /**
+   * @return the type of the resource if there
+   * is only one {@link MissingAuthorization}, {@code null} otherwise
+   *
+   * @deprecated Use {@link #getInfo()} to get the type of the resource
+   * of the {@link MissingAuthorization}(s). This method will be removed in future version.
+   */
   @Deprecated
   public String getResourceType() {
     String resourceType = null;
@@ -63,6 +74,13 @@ public class AuthorizationException extends ProcessEngineException {
     return resourceType;
   }
 
+  /**
+   * @return the type of the violated permission name if there
+   * is only one {@link MissingAuthorization}, {@code null} otherwise
+   *
+   * @deprecated Use {@link #getInfo()} to get the violated permission name
+   * of the {@link MissingAuthorization}(s). This method will be removed in future version.
+   */
   @Deprecated
   public String getViolatedPermissionName() {
     if (info.size() == 1) {
@@ -76,6 +94,13 @@ public class AuthorizationException extends ProcessEngineException {
     return userId;
   }
 
+  /**
+   * @return the id of the resource if there
+   * is only one {@link MissingAuthorization}, {@code null} otherwise
+   *
+   * @deprecated Use {@link #getInfo()} to get the id of the resource
+   * of the {@link MissingAuthorization}(s). This method will be removed in future version.
+   */
   @Deprecated
   public String getResourceId() {
     if (info.size() == 1) {
@@ -84,6 +109,10 @@ public class AuthorizationException extends ProcessEngineException {
     return null;
   }
 
+  /**
+   * @return Disjunctive list of {@link MissingAuthorization} from
+   * which a user needs to have at least one for the authorization to pass
+   */
   public List<MissingAuthorization> getInfo() {
     return Collections.unmodifiableList(info);
   }
