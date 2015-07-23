@@ -9,6 +9,9 @@ import org.camunda.bpm.engine.AuthorizationExceptionInfo;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Does not declare produced media types.
  * @author Thorben Lindhauer
@@ -43,5 +46,21 @@ public class UnannotatedResource {
     builder.resource("someResourceName");
     builder.resourceId("someResourceId");
     throw new AuthorizationException("someUser", builder.build());
+  }
+
+  @GET
+  @Path("/authorizationExceptionMultiple")
+  public String throwAuthorizationExceptionMultiple() throws Exception {
+    List<AuthorizationExceptionInfo> missingAuthorizations = new ArrayList<AuthorizationExceptionInfo>();
+    AuthorizationExceptionInfo.Builder builder = AuthorizationExceptionInfo.builder();
+    builder.permission("somePermission1");
+    builder.resource("someResourceName1");
+    builder.resourceId("someResourceId1");
+    missingAuthorizations.add(builder.build());
+    builder.permission("somePermission2");
+    builder.resource("someResourceName2");
+    builder.resourceId("someResourceId2");
+    missingAuthorizations.add(builder.build());
+    throw new AuthorizationException("someUser", missingAuthorizations, "TestMessage");
   }
 }
