@@ -23,6 +23,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Date;
@@ -1094,6 +1095,26 @@ public abstract class AbstractJobRestServiceInteractionTest extends AbstractRest
     .when().put(JOB_RESOURCE_SET_PRIORITY_URL);
 
     verify(mockManagementService).setJobPriority(MockProvider.EXAMPLE_JOB_ID, MockProvider.EXAMPLE_JOB_PRIORITY);
+  }
+
+  @Test
+  public void testSetNullJobPriorityFailure() {
+    String expectedMessage = "Priority for job '" +  MockProvider.EXAMPLE_JOB_ID + "' cannot be null.";
+
+    Map<String, Object> priorityJson = new HashMap<String, Object>();
+    priorityJson.put("priority", null);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
+      .contentType(ContentType.JSON)
+      .body(priorityJson)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo(expectedMessage))
+    .when().put(JOB_RESOURCE_SET_PRIORITY_URL);
+
+    verifyNoMoreInteractions(mockManagementService);
   }
 
   @Test

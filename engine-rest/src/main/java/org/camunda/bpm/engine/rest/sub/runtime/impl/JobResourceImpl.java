@@ -109,6 +109,10 @@ public class JobResourceImpl implements JobResource {
 
   @Override
   public void setJobPriority(JobPriorityDto dto) {
+    if (dto.getPriority() == null) {
+      throw new RestException(Status.BAD_REQUEST, "Priority for job '" + jobId + "' cannot be null.");
+    }
+
     try {
       ManagementService managementService = engine.getManagementService();
       managementService.setJobPriority(jobId, dto.getPriority());

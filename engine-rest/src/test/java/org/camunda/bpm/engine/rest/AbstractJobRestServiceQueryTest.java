@@ -50,6 +50,8 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
   private JobQuery mockQuery;
   private static final int MAX_RESULTS_TEN = 10;
   private static final int FIRST_RESULTS_ZERO = 0;
+  protected static final int JOB_QUERY_MAX_PRIORITY = 15;
+  protected static final int JOB_QUERY_MIN_PRIORITY = 14;
 
   @Before
   public void setUpRuntimeData() {
@@ -307,8 +309,8 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
     parameters.put("noRetriesLeft", MockProvider.EXAMPLE_NO_RETRIES_LEFT);
     parameters.put("active", true);
     parameters.put("suspended", true);
-    parameters.put("priorityLowerThanOrEquals", 14);
-    parameters.put("priorityHigherThanOrEquals", 15);
+    parameters.put("priorityLowerThanOrEquals", JOB_QUERY_MAX_PRIORITY);
+    parameters.put("priorityHigherThanOrEquals", JOB_QUERY_MIN_PRIORITY);
     return parameters;
   }
 
@@ -342,8 +344,8 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
     verify(mockQuery).noRetriesLeft();
     verify(mockQuery).active();
     verify(mockQuery).suspended();
-    verify(mockQuery).priorityLowerThanOrEquals(14);
-    verify(mockQuery).priorityHigherThanOrEquals(15);
+    verify(mockQuery).priorityLowerThanOrEquals(JOB_QUERY_MAX_PRIORITY);
+    verify(mockQuery).priorityHigherThanOrEquals(JOB_QUERY_MIN_PRIORITY);
   }
 
   @Test
