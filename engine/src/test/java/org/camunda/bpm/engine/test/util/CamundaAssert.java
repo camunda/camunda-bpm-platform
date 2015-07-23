@@ -1,6 +1,6 @@
 package org.camunda.bpm.engine.test.util;
 
-import org.camunda.bpm.engine.AuthorizationExceptionInfo;
+import org.camunda.bpm.engine.MissingAuthorization;
 
 import static junit.framework.TestCase.assertEquals;
 
@@ -19,7 +19,7 @@ public class CamundaAssert {
    * @param info to check
    */
   public static void assertExceptionInfo(String expectedPermissionName, String expectedResourceName, String expectedResourceId,
-      AuthorizationExceptionInfo info) {
+      MissingAuthorization info) {
     assertEquals(expectedPermissionName, info.getViolatedPermissionName());
     assertEquals(expectedResourceName, info.getResourceType());
     assertEquals(expectedResourceId, info.getResourceId());

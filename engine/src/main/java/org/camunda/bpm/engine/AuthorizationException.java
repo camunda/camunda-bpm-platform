@@ -28,27 +28,27 @@ public class AuthorizationException extends ProcessEngineException {
   private static final long serialVersionUID = 1L;
 
   protected final String userId;
-  protected final List<AuthorizationExceptionInfo> info;
+  protected final List<MissingAuthorization> info;
 
   public AuthorizationException(String message) {
     super(message);
     this.userId = null;
-    info = new ArrayList<AuthorizationExceptionInfo>();
+    info = new ArrayList<MissingAuthorization>();
   }
 
-  public AuthorizationException(String userId, AuthorizationExceptionInfo exceptionInfo) {
+  public AuthorizationException(String userId, MissingAuthorization exceptionInfo) {
     super(
         "The user with id '"+userId+
         "' does not have '"+exceptionInfo.getViolatedPermissionName()+"' permission " +
         "on resource '" + (exceptionInfo.getResourceId()!= null ? (exceptionInfo.getResourceId()+"' of type '") : "" ) +
         exceptionInfo.getResourceType()+"'.");
     this.userId = userId;
-    info = new ArrayList<AuthorizationExceptionInfo>();
+    info = new ArrayList<MissingAuthorization>();
     info.add(exceptionInfo);
     
   }
   
-  public AuthorizationException(String userId, List<AuthorizationExceptionInfo> info, String message) {
+  public AuthorizationException(String userId, List<MissingAuthorization> info, String message) {
     super(message);
     this.userId = userId;
     this.info = info;
@@ -84,7 +84,7 @@ public class AuthorizationException extends ProcessEngineException {
     return null;
   }
 
-  public List<AuthorizationExceptionInfo> getInfo() {
+  public List<MissingAuthorization> getInfo() {
     return Collections.unmodifiableList(info);
   }
 }

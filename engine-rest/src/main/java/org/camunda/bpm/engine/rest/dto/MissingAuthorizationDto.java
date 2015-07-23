@@ -16,14 +16,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.camunda.bpm.engine.AuthorizationException;
-import org.camunda.bpm.engine.AuthorizationExceptionInfo;
+import org.camunda.bpm.engine.MissingAuthorization;
 
 /**
+ * * <p>Dto for {@link MissingAuthorization}</p>
  * @author Filip Hrisafov
  * 
  */
-public class AuthorizationExceptionInfoDto {
+public class MissingAuthorizationDto {
 
   private String permissionName;
   private String resourceName;
@@ -31,8 +31,8 @@ public class AuthorizationExceptionInfoDto {
 
   // transformer /////////////////////////////
 
-  public static AuthorizationExceptionInfoDto fromInfo(AuthorizationExceptionInfo info) {
-    AuthorizationExceptionInfoDto dto = new AuthorizationExceptionInfoDto();
+  public static MissingAuthorizationDto fromInfo(MissingAuthorization info) {
+    MissingAuthorizationDto dto = new MissingAuthorizationDto();
 
     dto.setPermissionName(info.getViolatedPermissionName());
     dto.setResourceId(info.getResourceId());
@@ -41,9 +41,9 @@ public class AuthorizationExceptionInfoDto {
     return dto;
   }
 
-  public static List<AuthorizationExceptionInfoDto> fromInfo(Collection<AuthorizationExceptionInfo> infos) {
-    List<AuthorizationExceptionInfoDto> dtos = new ArrayList<AuthorizationExceptionInfoDto>();
-    for (AuthorizationExceptionInfo info : infos) {
+  public static List<MissingAuthorizationDto> fromInfo(Collection<MissingAuthorization> infos) {
+    List<MissingAuthorizationDto> dtos = new ArrayList<MissingAuthorizationDto>();
+    for (MissingAuthorization info : infos) {
       dtos.add(fromInfo(info));
     }
     return dtos;

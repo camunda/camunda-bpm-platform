@@ -28,7 +28,7 @@ public class AuthorizationExceptionDto extends ExceptionDto {
   protected String resourceName;
   protected String resourceId;
   protected String permissionName;
-  protected List<AuthorizationExceptionInfoDto> info;
+  protected List<MissingAuthorizationDto> info;
   
   // transformer /////////////////////////////
   
@@ -39,7 +39,7 @@ public class AuthorizationExceptionDto extends ExceptionDto {
     dto.setType(AuthorizationException.class.getSimpleName());
     
     dto.setUserId(e.getUserId());
-    dto.setInfo(AuthorizationExceptionInfoDto.fromInfo(e.getInfo()));
+    dto.setInfo(MissingAuthorizationDto.fromInfo(e.getInfo()));
     dto.setPermissionName(e.getViolatedPermissionName());
     dto.setResourceId(e.getResourceId());
     dto.setResourceName(e.getResourceType());
@@ -78,10 +78,10 @@ public class AuthorizationExceptionDto extends ExceptionDto {
   public void setUserId(String userId) {
     this.userId = userId;
   }
-  public List<AuthorizationExceptionInfoDto> getInfo() {
+  public List<MissingAuthorizationDto> getInfo() {
     return info;
   }
-  public void setInfo(List<AuthorizationExceptionInfoDto> info) {
+  public void setInfo(List<MissingAuthorizationDto> info) {
     this.info = info;
   }  
 }

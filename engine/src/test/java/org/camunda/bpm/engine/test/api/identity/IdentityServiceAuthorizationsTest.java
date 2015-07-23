@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.AuthorizationException;
-import org.camunda.bpm.engine.AuthorizationExceptionInfo;
+import org.camunda.bpm.engine.MissingAuthorization;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
@@ -73,7 +73,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
     } catch (AuthorizationException e) {
       assertEquals(1, e.getInfo().size());
-      AuthorizationExceptionInfo info = e.getInfo().get(0);
+      MissingAuthorization info = e.getInfo().get(0);
       assertEquals(jonny2, e.getUserId());
       assertExceptionInfo(CREATE.getName(), USER.resourceName(), null, info);
     }
@@ -87,7 +87,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
     } catch (AuthorizationException e) {
       assertEquals(1, e.getInfo().size());
-      AuthorizationExceptionInfo info = e.getInfo().get(0);
+      MissingAuthorization info = e.getInfo().get(0);
       assertEquals(jonny2, e.getUserId());
       assertExceptionInfo(CREATE.getName(), USER.resourceName(), null, info);
     }
@@ -117,7 +117,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
     } catch (AuthorizationException e) {
       assertEquals(1, e.getInfo().size());
-      AuthorizationExceptionInfo info = e.getInfo().get(0);
+      MissingAuthorization info = e.getInfo().get(0);
       assertEquals(jonny2, e.getUserId());
       assertExceptionInfo(DELETE.getName(), USER.resourceName(), "jonny1", info);
     }
@@ -151,7 +151,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
     } catch (AuthorizationException e) {
       assertEquals(1, e.getInfo().size());
-      AuthorizationExceptionInfo info = e.getInfo().get(0);
+      MissingAuthorization info = e.getInfo().get(0);
       assertEquals(jonny2, e.getUserId());
       assertExceptionInfo(UPDATE.getName(), USER.resourceName(), "jonny1", info);
     }
@@ -181,7 +181,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
     } catch (AuthorizationException e) {
       assertEquals(1, e.getInfo().size());
-      AuthorizationExceptionInfo info = e.getInfo().get(0);
+      MissingAuthorization info = e.getInfo().get(0);
       assertEquals(jonny2, e.getUserId());
       assertExceptionInfo(CREATE.getName(), GROUP.resourceName(), null, info);
     }
@@ -195,7 +195,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
     } catch (AuthorizationException e) {
       assertEquals(1, e.getInfo().size());
-      AuthorizationExceptionInfo info = e.getInfo().get(0);
+      MissingAuthorization info = e.getInfo().get(0);
       assertEquals(jonny2, e.getUserId());
       assertExceptionInfo(CREATE.getName(), GROUP.resourceName(), null, info);
     }
@@ -225,7 +225,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
     } catch (AuthorizationException e) {
       assertEquals(1, e.getInfo().size());
-      AuthorizationExceptionInfo info = e.getInfo().get(0);
+      MissingAuthorization info = e.getInfo().get(0);
       assertEquals(jonny2, e.getUserId());
       assertExceptionInfo(DELETE.getName(), GROUP.resourceName(), "group1", info);
     }
@@ -261,7 +261,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
     } catch (AuthorizationException e) {
       assertEquals(1, e.getInfo().size());
-      AuthorizationExceptionInfo info = e.getInfo().get(0);
+      MissingAuthorization info = e.getInfo().get(0);
       assertEquals(jonny2, e.getUserId());
       assertExceptionInfo(UPDATE.getName(), GROUP.resourceName(), "group1", info);
     }
@@ -297,7 +297,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
     } catch (AuthorizationException e) {
       assertEquals(1, e.getInfo().size());
-      AuthorizationExceptionInfo info = e.getInfo().get(0);
+      MissingAuthorization info = e.getInfo().get(0);
       assertEquals(jonny2, e.getUserId());
       assertExceptionInfo(CREATE.getName(), GROUP_MEMBERSHIP.resourceName(), "group1", info);
     }
@@ -328,7 +328,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
     } catch (AuthorizationException e) {
       assertEquals(1, e.getInfo().size());
-      AuthorizationExceptionInfo info = e.getInfo().get(0);
+      MissingAuthorization info = e.getInfo().get(0);
       assertEquals(jonny2, e.getUserId());
       assertExceptionInfo(DELETE.getName(), GROUP_MEMBERSHIP.resourceName(), "group1", info);
     }

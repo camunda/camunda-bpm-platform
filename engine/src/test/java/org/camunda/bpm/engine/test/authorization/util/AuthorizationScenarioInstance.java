@@ -13,7 +13,6 @@
 package org.camunda.bpm.engine.test.authorization.util;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -21,7 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.engine.AuthorizationException;
-import org.camunda.bpm.engine.AuthorizationExceptionInfo;
+import org.camunda.bpm.engine.MissingAuthorization;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
@@ -78,7 +77,7 @@ public class AuthorizationScenarioInstance {
       String message = e.getMessage();
       String failureMessage = describeScenarioFailure("Expected an authorization exception but the message was wrong: " + e.getMessage());
 
-      List<AuthorizationExceptionInfo> infos = new ArrayList<AuthorizationExceptionInfo>(e.getInfo());
+      List<MissingAuthorization> infos = new ArrayList<MissingAuthorization>(e.getInfo());
       Assert.assertEquals(describeScenarioFailure("Expected " + missingAuthorizations.size() + " ExceptionInfo(s). Received: + " + infos),
           missingAuthorizations.size(), infos.size());
 
@@ -104,10 +103,10 @@ public class AuthorizationScenarioInstance {
         Resource resource = AuthorizationTestUtil.getResourceByType(missingAuthorization.getResourceType());
         String expectedResourceName = resource.resourceName();
         Assert.assertTrue(failureMessage, message.contains(expectedResourceName));
-        Iterator<AuthorizationExceptionInfo> iterator = infos.iterator();
+        Iterator<MissingAuthorization> iterator = infos.iterator();
         boolean found = false;
         while (iterator.hasNext()) {
-          AuthorizationExceptionInfo next = iterator.next();
+          MissingAuthorization next = iterator.next();
           try {
             CamundaAssert.assertExceptionInfo(expectedPermissionName, expectedResourceName, expectedResourceId, next);
             iterator.remove();

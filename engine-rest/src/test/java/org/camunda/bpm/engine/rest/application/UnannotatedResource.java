@@ -5,7 +5,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.AuthorizationException;
-import org.camunda.bpm.engine.AuthorizationExceptionInfo;
+import org.camunda.bpm.engine.MissingAuthorization;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 
@@ -41,7 +41,7 @@ public class UnannotatedResource {
   @GET
   @Path("/authorizationException")
   public String throwAuthorizationException() throws Exception {
-    AuthorizationExceptionInfo.Builder builder = AuthorizationExceptionInfo.builder();
+    MissingAuthorization.Builder builder = MissingAuthorization.builder();
     builder.permission("somePermission");
     builder.resource("someResourceName");
     builder.resourceId("someResourceId");
@@ -51,8 +51,8 @@ public class UnannotatedResource {
   @GET
   @Path("/authorizationExceptionMultiple")
   public String throwAuthorizationExceptionMultiple() throws Exception {
-    List<AuthorizationExceptionInfo> missingAuthorizations = new ArrayList<AuthorizationExceptionInfo>();
-    AuthorizationExceptionInfo.Builder builder = AuthorizationExceptionInfo.builder();
+    List<MissingAuthorization> missingAuthorizations = new ArrayList<MissingAuthorization>();
+    MissingAuthorization.Builder builder = MissingAuthorization.builder();
     builder.permission("somePermission1");
     builder.resource("someResourceName1");
     builder.resourceId("someResourceId1");

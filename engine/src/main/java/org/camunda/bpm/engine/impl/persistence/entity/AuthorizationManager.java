@@ -37,8 +37,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.AuthorizationException;
-import org.camunda.bpm.engine.AuthorizationExceptionInfo;
-import org.camunda.bpm.engine.AuthorizationExceptionInfo.Builder;
+import org.camunda.bpm.engine.MissingAuthorization;
+import org.camunda.bpm.engine.MissingAuthorization.Builder;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Groups;
@@ -77,8 +77,6 @@ import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
-import org.python.antlr.PythonParser.return_stmt_return;
-import org.python.antlr.ast.boolopType;
 
 /**
  * @author Daniel Meyer
@@ -164,8 +162,8 @@ public class AuthorizationManager extends AbstractManager {
       boolean isAuthorized = isAuthorized(userId, currentAuthentication.getGroupIds(), permissionChecks);
       if (!isAuthorized) {
         
-        Builder builder = AuthorizationExceptionInfo.builder();
-        List<AuthorizationExceptionInfo> info = new ArrayList<AuthorizationExceptionInfo>();
+        Builder builder = MissingAuthorization.builder();
+        List<MissingAuthorization> info = new ArrayList<MissingAuthorization>();
         StringBuilder sBuilder = new StringBuilder();
         sBuilder.append("The user with id '");
         sBuilder.append(userId);
@@ -175,7 +173,7 @@ public class AuthorizationManager extends AbstractManager {
           builder.permission(check.getPermission().getName());
           builder.resource(check.getResource().resourceName());
           builder.resourceId(check.getResourceId());
-          AuthorizationExceptionInfo exceptionInfo = builder.build();
+          MissingAuthorization exceptionInfo = builder.build();
           info.add(exceptionInfo);
           
           if (!first) {
@@ -196,7 +194,7 @@ public class AuthorizationManager extends AbstractManager {
    *
    * @param exceptionInfo to use
    */
-  private String generateExceptionInfoMessage(AuthorizationExceptionInfo exceptionInfo) {
+  private String generateExceptionInfoMessage(MissingAuthorization exceptionInfo) {
     StringBuilder builder = new StringBuilder();
     String permissionName = exceptionInfo.getViolatedPermissionName();
     String resourceType = exceptionInfo.getResourceType();
@@ -224,7 +222,7 @@ public class AuthorizationManager extends AbstractManager {
 
       boolean isAuthorized = isAuthorized(currentAuthentication.getUserId(), currentAuthentication.getGroupIds(), permission, resource, resourceId);
       if (!isAuthorized) {
-        Builder builder = AuthorizationExceptionInfo.builder();
+        Builder builder = MissingAuthorization.builder();
         builder.permission(permission.getName());
         builder.resource(resource.resourceName());
         builder.resourceId(resourceId);

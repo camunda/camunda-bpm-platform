@@ -24,7 +24,7 @@ import static org.camunda.bpm.engine.authorization.Resources.AUTHORIZATION;
 import static org.camunda.bpm.engine.test.util.CamundaAssert.assertExceptionInfo;
 
 import org.camunda.bpm.engine.AuthorizationException;
-import org.camunda.bpm.engine.AuthorizationExceptionInfo;
+import org.camunda.bpm.engine.MissingAuthorization;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Resources;
@@ -70,7 +70,7 @@ public class AuthorizationServiceAuthorizationsTest extends PluggableProcessEngi
       
     } catch (AuthorizationException e) {
       assertEquals(1, e.getInfo().size());
-      AuthorizationExceptionInfo info = e.getInfo().get(0);
+      MissingAuthorization info = e.getInfo().get(0);
       assertEquals(jonny2, e.getUserId());
       assertExceptionInfo(CREATE.getName(), AUTHORIZATION.resourceName(), null, info);
     }
@@ -86,7 +86,7 @@ public class AuthorizationServiceAuthorizationsTest extends PluggableProcessEngi
       
     } catch (AuthorizationException e) {
       assertEquals(1, e.getInfo().size());
-      AuthorizationExceptionInfo info = e.getInfo().get(0);
+      MissingAuthorization info = e.getInfo().get(0);
       assertEquals(jonny2, e.getUserId());
       assertExceptionInfo(CREATE.getName(), AUTHORIZATION.resourceName(), null, info);
     }
@@ -113,7 +113,7 @@ public class AuthorizationServiceAuthorizationsTest extends PluggableProcessEngi
       
     } catch (AuthorizationException e) {
       assertEquals(1, e.getInfo().size());
-      AuthorizationExceptionInfo info = e.getInfo().get(0);
+      MissingAuthorization info = e.getInfo().get(0);
       assertEquals(jonny2, e.getUserId());
       assertExceptionInfo(DELETE.getName(), AUTHORIZATION.resourceName(), basePerms.getId(), info);
     }
@@ -144,7 +144,7 @@ public class AuthorizationServiceAuthorizationsTest extends PluggableProcessEngi
       
     } catch (AuthorizationException e) {
       assertEquals(1, e.getInfo().size());
-      AuthorizationExceptionInfo info = e.getInfo().get(0);
+      MissingAuthorization info = e.getInfo().get(0);
       assertEquals(jonny2, e.getUserId());
       assertExceptionInfo(UPDATE.getName(), AUTHORIZATION.resourceName(), basePerms.getId(), info);
     }
