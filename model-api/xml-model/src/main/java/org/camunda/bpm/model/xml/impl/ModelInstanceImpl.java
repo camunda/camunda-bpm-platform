@@ -36,9 +36,9 @@ import java.util.List;
  */
 public class ModelInstanceImpl implements ModelInstance {
 
-  private final DomDocument document;
-  private ModelImpl model;
-  private final ModelBuilder modelBuilder;
+  protected final DomDocument document;
+  protected ModelImpl model;
+  protected final ModelBuilder modelBuilder;
 
   public ModelInstanceImpl(ModelImpl model, ModelBuilder modelBuilder, DomDocument document) {
     this.model = model;
