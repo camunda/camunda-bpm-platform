@@ -154,13 +154,13 @@ public class SignalEventReceivedCmd implements Command<Void> {
   private void startProcessInstances(List<SignalEventSubscriptionEntity> startSignalEventSubscriptions, Map<String, ProcessDefinitionEntity> processDefinitions) {
     for (SignalEventSubscriptionEntity signalStartEventSubscription : startSignalEventSubscriptions) {
       ProcessDefinitionEntity processDefinition = processDefinitions.get(signalStartEventSubscription.getId());
-       if (processDefinition != null) {
+      if (processDefinition != null) {
 
-         ActivityImpl signalStartEvent = processDefinition.findActivity(signalStartEventSubscription.getActivityId());
-         PvmProcessInstance processInstance = processDefinition.createProcessInstanceForInitial(signalStartEvent);
-         processInstance.start(variables);
-       }
-     }
+        ActivityImpl signalStartEvent = processDefinition.findActivity(signalStartEventSubscription.getActivityId());
+        PvmProcessInstance processInstance = processDefinition.createProcessInstanceForInitial(signalStartEvent);
+        processInstance.start(variables);
+      }
+    }
   }
 
   protected List<SignalEventSubscriptionEntity> filterIntermediateSubscriptions(List<SignalEventSubscriptionEntity> subscriptions) {

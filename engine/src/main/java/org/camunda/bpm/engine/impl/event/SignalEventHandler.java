@@ -60,4 +60,14 @@ public class SignalEventHandler extends AbstractEventHandler {
     }
   }
 
+  @Override
+  public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, CommandContext commandContext) {
+    if (eventSubscription.getExecutionId() != null) {
+      handleIntermediateEvent(eventSubscription, payload, commandContext);
+    }
+    else {
+      handleStartEvent(eventSubscription, payload, commandContext);
+    }
+  }
+
 }

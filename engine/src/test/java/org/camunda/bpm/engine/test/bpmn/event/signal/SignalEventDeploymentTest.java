@@ -15,16 +15,17 @@ package org.camunda.bpm.engine.test.bpmn.event.signal;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 
 /**
- * @author Philipp Ossler 
+ * @author Philipp Ossler
  */
 public class SignalEventDeploymentTest extends PluggableProcessEngineTestCase {
-  
+
   private static final String SIGNAL_START_EVENT_PROCESS = "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTest.signalStartEvent.bpmn20.xml";
   private static final String SIGNAL_START_EVENT_PROCESS_NEW_VERSION = "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTest.signalStartEvent_v2.bpmn20.xml";
 
@@ -32,7 +33,7 @@ public class SignalEventDeploymentTest extends PluggableProcessEngineTestCase {
     deploymentId = repositoryService.createDeployment()
         .addClasspathResource(SIGNAL_START_EVENT_PROCESS)
         .deploy().getId();
-    
+
     EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
     assertNotNull(eventSubscription);
 
@@ -40,7 +41,7 @@ public class SignalEventDeploymentTest extends PluggableProcessEngineTestCase {
     assertEquals("alert", eventSubscription.getEventName());
     assertEquals("start", eventSubscription.getActivityId());
   }
-  
+
   public void testUpdateEventSubscriptionOnDeployment(){
     deploymentId = repositoryService.createDeployment()
         .addClasspathResource(SIGNAL_START_EVENT_PROCESS)
@@ -57,17 +58,41 @@ public class SignalEventDeploymentTest extends PluggableProcessEngineTestCase {
 
     ProcessDefinition newProcessDefinition = repositoryService.createProcessDefinitionQuery().latestVersion().singleResult();
     assertEquals(2, newProcessDefinition.getVersion());
-    
+
     List<EventSubscription> newEventSubscriptions = runtimeService.createEventSubscriptionQuery().eventType("signal").list();
     // only one event subscription for the new version of the process definition
     assertEquals(1, newEventSubscriptions.size());
-    
+
     EventSubscriptionEntity newEventSubscription = (EventSubscriptionEntity) newEventSubscriptions.iterator().next();
     assertEquals(newProcessDefinition.getId(), newEventSubscription.getConfiguration());
     assertEquals("abort", newEventSubscription.getEventName());
-    
+
     // clean db
     repositoryService.deleteDeployment(newDeploymentId);
   }
- 
+
+  public void testAsyncSignalStartEventDeleteDeploymentWhileAsync() {
+    // given a deployment
+    org.camunda.bpm.engine.repository.Deployment deployment =
+        repositoryService.createDeployment()
+          .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTest.signalStartEvent.bpmn20.xml")
+          .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignalAsync.bpmn20.xml")
+          .deploy();
+
+    // and an active job for asynchronously triggering a signal start event
+    runtimeService.startProcessInstanceByKey("throwSignalAsync");
+
+    // then deleting the deployment succeeds
+    repositoryService.deleteDeployment(deployment.getId(), true);
+
+    assertEquals(0, repositoryService.createDeploymentQuery().count());
+
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
+    if (historyLevel >= HistoryLevel.HISTORY_LEVEL_FULL.getId()) {
+      // and there are no job logs left
+      assertEquals(0, historyService.createHistoricJobLogQuery().count());
+    }
+
+  }
+
 }

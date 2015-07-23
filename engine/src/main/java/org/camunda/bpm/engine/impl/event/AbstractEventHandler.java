@@ -17,7 +17,6 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessStartEventActivityBehavior;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
@@ -60,18 +59,6 @@ public abstract class AbstractEventHandler implements EventHandler {
 
   @Override
   public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, CommandContext commandContext) {
-    if (eventSubscription.getExecutionId() != null) {
-      handleIntermediateEvent(eventSubscription, payload, commandContext);
-    }
-    else {
-      handleStartEvent(eventSubscription, payload, commandContext);
-    }
-
-  }
-
-  protected void handleStartEvent(EventSubscriptionEntity eventSubscription, Object payload, CommandContext commandContext) {
-    throw new ProcessEngineException("Exception when triggering " + eventSubscription
-        + ". No start events for event type " + getEventHandlerType() + " supported.");
-
+    handleIntermediateEvent(eventSubscription, payload, commandContext);
   }
 }

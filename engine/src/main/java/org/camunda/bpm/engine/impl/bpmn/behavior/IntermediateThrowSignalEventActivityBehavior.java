@@ -60,9 +60,18 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
     leave(execution);
   }
 
-  private boolean isActiveEventSubscription(SignalEventSubscriptionEntity signalEventSubscriptionEntity) {
+  protected boolean isActiveEventSubscription(SignalEventSubscriptionEntity signalEventSubscriptionEntity) {
+    return isStartEventSubscription(signalEventSubscriptionEntity)
+        || isActiveIntermediateEventSubscription(signalEventSubscriptionEntity);
+  }
+
+  protected boolean isStartEventSubscription(SignalEventSubscriptionEntity signalEventSubscriptionEntity) {
+    return signalEventSubscriptionEntity.getExecutionId() == null;
+  }
+
+  protected boolean isActiveIntermediateEventSubscription(SignalEventSubscriptionEntity signalEventSubscriptionEntity) {
     ExecutionEntity execution = signalEventSubscriptionEntity.getExecution();
-    return execution == null || (!execution.isEnded() && !execution.isCanceled());
+    return execution != null && !execution.isEnded() && !execution.isCanceled();
   }
 
   protected void startProcessInstanceBySignal(SignalEventSubscriptionEntity eventSubscription) {

@@ -445,27 +445,4 @@ public class SignalEventTest extends PluggableProcessEngineTestCase {
     assertEquals(1, taskService.createTaskQuery().count());
   }
 
-  public void testAsyncSignalStartEventDeleteDeploymentWhileAsync() {
-    // given a deployment
-    org.camunda.bpm.engine.repository.Deployment deployment =
-        repositoryService.createDeployment()
-          .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTest.signalStartEvent.bpmn20.xml")
-          .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTests.throwAlertSignalAsync.bpmn20.xml")
-          .deploy();
-
-    // and an active job for asynchronously triggering a signal start event
-    runtimeService.startProcessInstanceByKey("throwSignalAsync");
-
-    // then deleting the deployment succeeds
-    repositoryService.deleteDeployment(deployment.getId(), true);
-
-    assertEquals(0, repositoryService.createDeploymentQuery().count());
-
-    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
-    if (historyLevel >= HistoryLevel.HISTORY_LEVEL_FULL.getId()) {
-      // and there are no job logs left
-      assertEquals(0, historyService.createHistoricJobLogQuery().count());
-    }
-
-  }
 }
