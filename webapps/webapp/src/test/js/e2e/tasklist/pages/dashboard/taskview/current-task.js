@@ -14,7 +14,7 @@ module.exports = Page.extend({
 
   waitForTaskDetailView: function() {
     var elementToWaitFor = this.taskName();
-    this.waitForElementToBeVisible(elementToWaitFor, 5000);
+    this.waitForElementToBeVisible(elementToWaitFor);
   },
 
   taskName: function() {
@@ -49,19 +49,19 @@ module.exports = Page.extend({
   addComment: function(comment) {
     var openDialogElement = this.commentInputField();
     this.addCommentButton().click();
-    this.waitForElementToBeVisible(openDialogElement, 5000);
+    this.waitForElementToBeVisible(openDialogElement);
 
     this.commentInputField(comment);
 
     var closedDialogElement = this.commentSaveButton();
     this.commentSaveButton().click();
-    this.waitForElementToBeNotPresent(closedDialogElement, 5000);
+    this.waitForElementToBeNotPresent(closedDialogElement);
   },
 
   claim: function() {
     var claimButton = element(by.css('[ng-click="claim()"]'));
     claimButton.click();
-    this.waitForElementToBeNotPresent(claimButton, 5000);
+    this.waitForElementToBeNotPresent(claimButton);
   },
 
   unclaim: function() {
@@ -99,30 +99,73 @@ module.exports = Page.extend({
     element(by.css('[ng-click="cancelChange($event)"]')).click();
   },
 
-  followUpDateFormElement: function() {
+  datePickerDialogElement: function() {
+    return element(by.css('.cam-widget-inline-field'));
+  },
+
+  editDate: function(newTime, newDate) {
+    var datePickerButton = element(by.css('.cam-widget-inline-field.btn-group'));
+    var datePickerField = element(by.css('.cam-widget-inline-field.field-control'));
+    this.waitForElementToBeVisible(datePickerField);
+
+    if (newTime) {
+      var timeValue = newTime.split(':')
+      var timePickerElement = datePickerField.element(by.css('.timepicker'));
+
+      timePickerElement.element(by.model('hours')).clear().sendKeys(timeValue[0]);
+      timePickerElement.element(by.model('minutes')).clear().sendKeys(timeValue[1]);
+
+      // ToDo: implement date editing
+    };
+
+    datePickerButton.element(by.css('[ng-click="applyChange($event)"]')).click();
+    this.waitForElementToBeNotPresent(datePickerField);
+  },
+
+  followUpDateElement: function() {
     return this.formElement().element(by.css('.followup-date'));
   },
 
-  setFollowUpDate: function() {
-    this.followUpDateFormElement().element(by.css('[ng-click="startEditing()"]')).click();
-    this.followUpDateFormElement().element(by.css('[ng-click="applyChange()"]')).click();
+  setFollowUpDate: function(newTime, newDate) {
+    this.followUpDateElement().element(by.css('[ng-click="startEditing()"]')).click();
+    this.editDate(newTime, newDate);
+    browser.sleep(500);
   },
 
-  followUpDateText: function() {
-    return this.followUpDateFormElement().element(by.css('[class="view-value ng-scope"] span[ng-if="varValue"], [class="view-value ng-scope"] a')).getText();
+  followUpDate: function() {
+    return this.followUpDateElement().element(by.css('.view-value')).getText();
   },
 
-  dueDateFormElement: function() {
+  followUpDateTooltip: function() {
+    var tooltipTriggerer = this.followUpDateElement().element(by.css('[am-time-ago="task.followUp"]'))
+    browser.actions().mouseMove(tooltipTriggerer).perform();
+
+    var tooltipWidget = element(by.css('body > [tooltip-popup]'));
+    this.waitForElementToBeVisible(tooltipWidget);
+    return tooltipWidget.getText();
+  },
+
+  dueDateElement: function() {
     return this.formElement().element(by.css('.due-date'));
   },
 
-  setDueDate: function() {
-    this.dueDateFormElement().element(by.css('[ng-click="startEditing()"]')).click();
-    this.dueDateFormElement().element(by.css('[ng-click="applyChange()"]')).click();
+  setDueDate: function(newTime, newDate) {
+    this.dueDateElement().element(by.css('[ng-click="startEditing()"]')).click();
+    this.editDate(newTime, newDate);
+    browser.sleep(500);
   },
 
-  dueDateText: function() {
-    return this.dueDateFormElement().element(by.css('[class="view-value ng-scope"] span[ng-if="varValue"], [class="view-value ng-scope"] a')).getText();
+  dueDate: function() {
+    return this.dueDateElement().element(by.css('.view-value')).getText();
+  },
+
+  dueDateTooltip: function() {
+    var tooltipTriggerer = this.dueDateElement().element(by.css('[am-time-ago="task.due"]'))
+    browser.actions().mouseMove(tooltipTriggerer).perform();
+
+    var tooltipWidget = element(by.css('body > [tooltip-popup]'));
+    this.waitForElementToBeVisible(tooltipWidget);
+    return tooltipWidget.getText();
   }
 
 });

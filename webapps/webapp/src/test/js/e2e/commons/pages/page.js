@@ -100,7 +100,7 @@ Page.prototype.findElementIndexInRepeater = function(repeaterName, elementSelect
     function noElementFound() {
       count --;
       if (count === 0) {
-        deferred.reject('element not found');
+        deferred.reject('element not found in repeater: ' + repeaterName);
       }
     }
 

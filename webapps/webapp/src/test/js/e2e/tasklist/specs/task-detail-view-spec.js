@@ -3,9 +3,9 @@
 var testHelper = require('../../test-helper');
 var setupFile = require('./task-detail-view-setup');
 
-var page = require('../pages/dashboard');
-var tasklist = page.taskList;
-var taskview = page.currentTask;
+var dashboardPage = require('../pages/dashboard');
+var taskListPage = dashboardPage.taskList;
+var taskViewPage = dashboardPage.currentTask;
 
 
 describe('Tasklist Detail View Spec', function() {
@@ -13,58 +13,58 @@ describe('Tasklist Detail View Spec', function() {
   before(function() {
     return testHelper(setupFile.setup1, function() {
 
-      page.navigateToWebapp('Tasklist');
-      page.authentication.userLogin('admin', 'admin');
+      dashboardPage.navigateToWebapp('Tasklist');
+      dashboardPage.authentication.userLogin('admin', 'admin');
     });
   });
 
-  describe.skip('the task detail view', function() {
+  describe('the task detail view', function() {
 
     it('should display info text when no task is selected', function() {
 
       // then
-      expect(taskview.noTaskInfoText()).to.eventually.eql('Select a task in the list.');
+      expect(taskViewPage.noTaskInfoText()).to.eventually.eql('Select a task in the list.');
     });
 
 
     it('should appear when a task is selected', function() {
 
       // when
-      tasklist.selectTask('Task 1');
-      page.waitForElementToBeVisible(taskview.taskName());
+      taskListPage.selectTask('Task 1');
+      dashboardPage.waitForElementToBeVisible(taskViewPage.taskName());
 
       // then
-      expect(taskview.taskName()).to.eventually.eql('Task 1');
+      expect(taskViewPage.taskName()).to.eventually.eql('Task 1');
     });
 
   });
 
 
-  describe.skip('description tab', function() {
+  describe('description tab', function() {
 
     before(function() {
-      tasklist.selectTask('Task 1');
+      taskListPage.selectTask('Task 1');
     });
 
     it('should display description of a task', function() {
 
       // given
-      page.waitForElementToBeVisible(taskview.taskName());
+      dashboardPage.waitForElementToBeVisible(taskViewPage.taskName());
 
       // when
-      taskview.description.selectTab();
+      taskViewPage.description.selectTab();
 
       // then
-      expect(taskview.description.descriptionField()).to.eventually.eql(setupFile.setup1[1].params.description);
+      expect(taskViewPage.description.descriptionField()).to.eventually.eql(setupFile.setup1[1].params.description);
     });
 
   });
 
 
-  describe.skip('add a comment', function() {
+  describe('add a comment', function() {
 
     before(function() {
-      tasklist.selectTask('Task 1');
+      taskListPage.selectTask('Task 1');
     });
 
     it('should display comment in the history tab', function() {
@@ -79,28 +79,28 @@ describe('Tasklist Detail View Spec', function() {
                          'Curabitur dapibus enim sit amet elit pharetra tincidunt feugiat nisl imperdiet. Ut convallis libero' +
                          'in urna ultrices accumsan. Donec sed odio eros. Donec viverra mi quis quam pulvinar ...';
 
-      page.waitForElementToBeVisible(taskview.taskName(), 5000);
+      dashboardPage.waitForElementToBeVisible(taskViewPage.taskName(), 5000);
 
       // when
-      taskview.addComment(commentText);
+      taskViewPage.addComment(commentText);
 
       // then
-      taskview.history.selectTab();
-      expect(taskview.history.eventType(0)).to.eventually.eql('Comment');
-      expect(taskview.history.commentMessage(0)).to.eventually.eql(commentText);
-      expect(taskview.history.operationUser(0)).to.eventually.eql('admin');
+      taskViewPage.history.selectTab();
+      expect(taskViewPage.history.eventType(0)).to.eventually.eql('Comment');
+      expect(taskViewPage.history.commentMessage(0)).to.eventually.eql(commentText);
+      expect(taskViewPage.history.operationUser(0)).to.eventually.eql('admin');
     });
 
   });
 
 
-  describe.skip('form tab', function() {
+  describe('form tab', function() {
 
     before(function() {
       return testHelper(setupFile.setup1, function() {
 
-        page.navigateToWebapp('Tasklist');
-        page.authentication.userLogin('admin', 'admin');
+        dashboardPage.navigateToWebapp('Tasklist');
+        dashboardPage.authentication.userLogin('admin', 'admin');
       });
     });
 
@@ -109,14 +109,14 @@ describe('Tasklist Detail View Spec', function() {
       it('should disable form elements', function() {
 
         // given
-        tasklist.selectTask('Task 1');
-        page.waitForElementToBeVisible(taskview.taskName());
+        taskListPage.selectTask('Task 1');
+        dashboardPage.waitForElementToBeVisible(taskViewPage.taskName());
 
         // when
-        taskview.form.selectTab();
+        taskViewPage.form.selectTab();
 
         // then
-        expect(taskview.form.completeButton().isEnabled()).to.eventually.be.false;
+        expect(taskViewPage.form.completeButton().isEnabled()).to.eventually.be.false;
       });
 
     });
@@ -131,14 +131,14 @@ describe('Tasklist Detail View Spec', function() {
       it('should enable form elements', function() {
 
         // given
-        tasklist.selectTask('Task 1');
-        page.waitForElementToBeVisible(taskview.taskName());
+        taskListPage.selectTask('Task 1');
+        dashboardPage.waitForElementToBeVisible(taskViewPage.taskName());
 
         // when
-        taskview.form.selectTab();
+        taskViewPage.form.selectTab();
 
         // then
-        expect(taskview.form.completeButton().isEnabled()).to.eventually.be.true;
+        expect(taskViewPage.form.completeButton().isEnabled()).to.eventually.be.true;
       });
 
     });
@@ -151,22 +151,22 @@ describe('Tasklist Detail View Spec', function() {
     before(function() {
       return testHelper(setupFile.setup3, function() {
 
-        page.navigateToWebapp('Tasklist');
-        page.authentication.userLogin('admin', 'admin');
+        dashboardPage.navigateToWebapp('Tasklist');
+        dashboardPage.authentication.userLogin('admin', 'admin');
       });
     });
 
     it('should display the process and highlight current task', function() {
 
       // given
-      tasklist.selectTask('User Task 1');
-      page.waitForElementToBeVisible(taskview.taskName());
+      taskListPage.selectTask('User Task 1');
+      dashboardPage.waitForElementToBeVisible(taskViewPage.taskName());
 
       // when
-      taskview.diagram.selectTab();
+      taskViewPage.diagram.selectTab();
 
       // then
-      expect(taskview.diagram.isActivitySelected('UserTask_1')).to.eventually.be.true;
+      expect(taskViewPage.diagram.isActivitySelected('UserTask_1')).to.eventually.be.true;
     });
 
   });
