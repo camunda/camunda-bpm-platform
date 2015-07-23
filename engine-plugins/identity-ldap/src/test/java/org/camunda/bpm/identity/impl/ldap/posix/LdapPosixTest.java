@@ -20,21 +20,25 @@ import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
  */
 public abstract class LdapPosixTest extends ResourceProcessEngineTestCase {
 
-    public LdapPosixTest() {
-        super("posix.camunda.cfg.xml");
-    }
+  public LdapPosixTest() {
+    super("posix.camunda.cfg.xml");
+  }
 
-    protected static LdapPosixTestEnvironment ldapTestEnvironment;
+  protected static LdapPosixTestEnvironment ldapTestEnvironment;
 
-    protected void setUp() throws Exception {
-        if(ldapTestEnvironment == null) {
-            ldapTestEnvironment = new LdapPosixTestEnvironment();
-            ldapTestEnvironment.init();
-        }
-        super.setUp();
+  protected void setUp() throws Exception {
+    if(ldapTestEnvironment == null) {
+      ldapTestEnvironment = new LdapPosixTestEnvironment();
+      ldapTestEnvironment.init();
     }
+    super.setUp();
+  }
 
-    protected void tearDown() throws Exception {
-        super.tearDown();
+  protected void tearDown() throws Exception {
+    if(ldapTestEnvironment != null) {
+      ldapTestEnvironment.shutdown();
+      ldapTestEnvironment = null;
     }
+    super.tearDown();
+  }
 }

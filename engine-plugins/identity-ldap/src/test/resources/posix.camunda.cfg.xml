@@ -32,7 +32,7 @@
 
   <bean id="ldapIdentityProviderPlugin" class="org.camunda.bpm.identity.impl.ldap.plugin.LdapIdentityProviderPlugin">
 
-    <property name="serverUrl" value="ldap://localhost:${ldap.server.port.posix}/" />
+    <property name="serverUrl" value="ldap://localhost:${ldap.server.port}/" />
     <property name="managerDn" value="uid=daniel,ou=office-berlin,o=camunda,c=org" />
     <property name="managerPassword" value="daniel" />
     <property name="baseDn" value="o=camunda,c=org" />

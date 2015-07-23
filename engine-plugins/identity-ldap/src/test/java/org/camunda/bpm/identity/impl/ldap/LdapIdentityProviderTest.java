@@ -31,6 +31,10 @@ public abstract class LdapIdentityProviderTest extends PluggableProcessEngineTes
   }
   
   protected void tearDown() throws Exception {
+    if(ldapTestEnvironment != null) {
+      ldapTestEnvironment.shutdown();
+      ldapTestEnvironment = null;
+    }
     super.tearDown();
   }
 

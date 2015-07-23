@@ -49,13 +49,7 @@ public class LdapTestEnvironment {
   protected LdapServer ldapService;
   protected String configFilePath = "ldap.properties";
 
-  public LdapTestEnvironment() {
-  }
-
-  public LdapTestEnvironment(String configFilePath) {
-    this();
-    this.configFilePath = configFilePath;
-  }
+  public LdapTestEnvironment() {}
 
   protected void initializeDirectory() throws Exception {
 
@@ -190,6 +184,7 @@ public class LdapTestEnvironment {
   public void shutdown() {
     try {
       service.shutdown();
+      ldapService.stop();
     } catch (Exception e) {
       LOG.log(Level.SEVERE, "exception while shutting down ldap", e);
     }

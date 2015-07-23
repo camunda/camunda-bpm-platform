@@ -13,7 +13,6 @@
 package org.camunda.bpm.identity.impl.ldap.posix;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.directory.server.core.DefaultDirectoryService;
 import org.apache.directory.server.core.entry.ServerEntry;
 import org.apache.directory.server.core.entry.ServerModification;
 import org.apache.directory.shared.ldap.entry.EntryAttribute;
@@ -33,7 +32,7 @@ import java.util.List;
 public class LdapPosixTestEnvironment extends LdapTestEnvironment {
 
   public LdapPosixTestEnvironment() {
-    super("ldap.posix.properties");
+    super();
   }
 
   public void init() throws Exception {
