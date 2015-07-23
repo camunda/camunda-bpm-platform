@@ -39,4 +39,8 @@ public class BpmnModelInstanceImpl extends ModelInstanceImpl implements BpmnMode
     setDocumentElement(definitions);
   }
 
+  public Object clone() {
+    return new BpmnModelInstanceImpl(model, modelBuilder, document.clone());
+  }
+
 }

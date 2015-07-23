@@ -43,8 +43,14 @@ public final class BpmnModelConstants {
 
   public static final String XPATH_NS = "http://www.w3.org/1999/XPath";
 
+  /**
+   * @deprecated use {@link #CAMUNDA_NS}
+   */
+  @Deprecated
+  public static final String ACTIVITI_NS = "http://activiti.org/bpmn";
+
   /** CAMUNDA_NS namespace */
-  public static final String CAMUNDA_NS = "http://activiti.org/bpmn";
+  public static final String CAMUNDA_NS = "http://camunda.org/schema/1.0/bpmn";
 
   // elements ////////////////////////////////////////
 

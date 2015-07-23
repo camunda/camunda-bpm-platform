@@ -53,6 +53,7 @@ import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_PROCESS_JOB_PRIO
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.USER_TASK_ID;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_ERROR_CODE_VARIABLE;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.ACTIVITI_NS;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,6 +62,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.camunda.bpm.model.bpmn.impl.BpmnModelInstanceImpl;
 import org.camunda.bpm.model.bpmn.instance.BaseElement;
 import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
 import org.camunda.bpm.model.bpmn.instance.CallActivity;
@@ -102,13 +104,17 @@ import org.camunda.bpm.model.bpmn.instance.camunda.CamundaValue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * @author Sebastian Menski
+ * @author Ronny Bräunlich
  */
+@RunWith(Parameterized.class)
 public class CamundaExtensionsTest {
 
-  private BpmnModelInstance modelInstance;
   private Process process;
   private StartEvent startEvent;
   private SequenceFlow sequenceFlow;
@@ -120,10 +126,27 @@ public class CamundaExtensionsTest {
   private EndEvent endEvent;
   private MessageEventDefinition messageEventDefinition;
   private ParallelGateway parallelGateway;
+  private String namespace;
+  private BpmnModelInstance originalModelInstance;
+  private BpmnModelInstance modelInstance;
+
+  @Parameters(name="Namespace: {0}")
+  public static Collection<Object[]> parameters(){
+    return Arrays.asList(new Object[][]{
+        {CAMUNDA_NS, Bpmn.readModelFromStream(CamundaExtensionsTest.class.getResourceAsStream("CamundaExtensionsTest.xml"))},
+        //for compatability reasons we gotta check the old namespace, too
+        {ACTIVITI_NS, Bpmn.readModelFromStream(CamundaExtensionsTest.class.getResourceAsStream("CamundaExtensionsCompatabilityTest.xml"))}
+    });
+  }
+
+  public CamundaExtensionsTest(String namespace, BpmnModelInstance modelInstance) {
+    this.namespace = namespace;
+    this.originalModelInstance = modelInstance;
+  }
 
   @Before
-  public void parseModel() {
-    modelInstance = Bpmn.readModelFromStream(getClass().getResourceAsStream(getClass().getSimpleName() + ".xml"));
+  public void setUp(){
+    modelInstance = (BpmnModelInstance) ((BpmnModelInstanceImpl)originalModelInstance).clone();
     process = modelInstance.getModelElementById(PROCESS_ID);
     startEvent = modelInstance.getModelElementById(START_EVENT_ID);
     sequenceFlow = modelInstance.getModelElementById(SEQUENCE_FLOW_ID);
@@ -299,7 +322,7 @@ public class CamundaExtensionsTest {
   @Test
   public void testErrorCodeVariable(){
     ErrorEventDefinition errorEventDefinition = startEvent.getChildElementsByType(ErrorEventDefinition.class).iterator().next();
-    assertThat(errorEventDefinition.getAttributeValueNs(CAMUNDA_NS, CAMUNDA_ATTRIBUTE_ERROR_CODE_VARIABLE)).isEqualTo("errorVariable");
+    assertThat(errorEventDefinition.getAttributeValueNs(namespace, CAMUNDA_ATTRIBUTE_ERROR_CODE_VARIABLE)).isEqualTo("errorVariable");
   }
 
   @Test
@@ -633,7 +656,7 @@ public class CamundaExtensionsTest {
 
   @Test
   public void testGetNonExistingCamundaCandidateUsers() {
-    userTask.removeAttributeNs(CAMUNDA_NS, "candidateUsers");
+    userTask.removeAttributeNs(namespace, "candidateUsers");
     assertThat(userTask.getCamundaCandidateUsers()).isNull();
     assertThat(userTask.getCamundaCandidateUsersList()).isEmpty();
   }

@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.model.bpmn;
 
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.ACTIVITI_NS;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN20_NS;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
 
@@ -73,7 +74,6 @@ import org.camunda.bpm.model.bpmn.impl.instance.di.ShapeImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.di.StyleImpl;
 import org.camunda.bpm.model.bpmn.impl.instance.di.WaypointImpl;
 import org.camunda.bpm.model.bpmn.instance.Definitions;
-import org.camunda.bpm.model.bpmn.instance.PotentialOwner;
 import org.camunda.bpm.model.bpmn.instance.Process;
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.ModelBuilder;
@@ -213,6 +213,7 @@ public class Bpmn {
    */
   protected Bpmn() {
     bpmnModelBuilder = ModelBuilder.createInstance("BPMN Model");
+    bpmnModelBuilder.alternativeNamespace(ACTIVITI_NS, CAMUNDA_NS);
     doRegisterTypes(bpmnModelBuilder);
     bpmnModel = bpmnModelBuilder.build();
   }
