@@ -555,6 +555,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_JOB_LOG_JOB_ID = "aJobId";
   public static final String EXAMPLE_HISTORIC_JOB_LOG_JOB_DUE_DATE = "2015-10-01T00:00:00";
   public static final int EXAMPLE_HISTORIC_JOB_LOG_JOB_RETRIES = 5;
+  public static final int EXAMPLE_HISTORIC_JOB_LOG_JOB_PRIORITY = 42;
   public static final String EXAMPLE_HISTORIC_JOB_LOG_JOB_EXCEPTION_MSG = "aJobExceptionMsg";
   public static final String EXAMPLE_HISTORIC_JOB_LOG_JOB_DEF_ID = "aJobDefId";
   public static final String EXAMPLE_HISTORIC_JOB_LOG_JOB_DEF_TYPE = "aJobDefType";
@@ -1762,6 +1763,7 @@ public abstract class MockProvider {
     when(mock.getJobId()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_JOB_ID);
     when(mock.getJobDueDate()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_JOB_LOG_JOB_DUE_DATE));
     when(mock.getJobRetries()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_JOB_RETRIES);
+    when(mock.getJobPriority()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_JOB_PRIORITY);
     when(mock.getJobExceptionMessage()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_JOB_EXCEPTION_MSG);
 
     when(mock.getJobDefinitionId()).thenReturn(EXAMPLE_HISTORIC_JOB_LOG_JOB_DEF_ID);

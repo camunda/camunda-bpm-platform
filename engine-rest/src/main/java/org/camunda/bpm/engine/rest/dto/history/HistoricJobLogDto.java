@@ -28,6 +28,7 @@ public class HistoricJobLogDto {
   protected String jobId;
   protected Date jobDueDate;
   protected int jobRetries;
+  protected int jobPriority;
   protected String jobExceptionMessage;
 
   protected String jobDefinitionId;
@@ -64,6 +65,10 @@ public class HistoricJobLogDto {
 
   public int getJobRetries() {
     return jobRetries;
+  }
+
+  public int getJobPriority() {
+    return jobPriority;
   }
 
   public String getJobExceptionMessage() {
@@ -131,6 +136,7 @@ public class HistoricJobLogDto {
     result.jobId = historicJobLog.getJobId();
     result.jobDueDate = historicJobLog.getJobDueDate();
     result.jobRetries = historicJobLog.getJobRetries();
+    result.jobPriority = historicJobLog.getJobPriority();
     result.jobExceptionMessage = historicJobLog.getJobExceptionMessage();
 
     result.jobDefinitionId = historicJobLog.getJobDefinitionId();

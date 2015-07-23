@@ -55,6 +55,9 @@ public abstract class AbstractHistoricJobLogRestServiceQueryTest extends Abstrac
   protected static final String HISTORIC_JOB_LOG_RESOURCE_URL = TEST_RESOURCE_ROOT_PATH + "/history/job-log";
   protected static final String HISTORIC_JOB_LOG_COUNT_RESOURCE_URL = HISTORIC_JOB_LOG_RESOURCE_URL + "/count";
 
+  protected static final int JOB_LOG_QUERY_MAX_PRIORITY = 15;
+  protected static final int JOB_LOG_QUERY_MIN_PRIORITY = 14;
+
   protected HistoricJobLogQuery mockedQuery;
 
   @Before
@@ -278,6 +281,16 @@ public abstract class AbstractHistoricJobLogRestServiceQueryTest extends Abstrac
     executeAndVerifySorting("occurrence", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderPartiallyByOccurrence();
     inOrder.verify(mockedQuery).desc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("jobPriority", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderByJobPriority();
+    inOrder.verify(mockedQuery).asc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("jobPriority", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderByJobPriority();
+    inOrder.verify(mockedQuery).desc();
   }
 
   @Test
@@ -398,6 +411,7 @@ public abstract class AbstractHistoricJobLogRestServiceQueryTest extends Abstrac
     String returnedJobId = from(content).getString("[0].jobId");
     String returnedJobDueDate = from(content).getString("[0].jobDueDate");
     int returnedJobRetries = from(content).getInt("[0].jobRetries");
+    int returnedJobPriority = from(content).getInt("[0].jobPriority");
     String returnedJobExceptionMessage = from(content).getString("[0].jobExceptionMessage");
     String returnedJobDefinitionId = from(content).getString("[0].jobDefinitionId");
     String returnedJobDefinitionType = from(content).getString("[0].jobDefinitionType");
@@ -418,6 +432,7 @@ public abstract class AbstractHistoricJobLogRestServiceQueryTest extends Abstrac
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_ID, returnedJobId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_DUE_DATE, returnedJobDueDate);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_RETRIES, returnedJobRetries);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_PRIORITY, returnedJobPriority);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_EXCEPTION_MSG, returnedJobExceptionMessage);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_DEF_ID, returnedJobDefinitionId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_DEF_TYPE, returnedJobDefinitionType);
@@ -464,6 +479,7 @@ public abstract class AbstractHistoricJobLogRestServiceQueryTest extends Abstrac
     String returnedJobId = from(content).getString("[0].jobId");
     String returnedJobDueDate = from(content).getString("[0].jobDueDate");
     int returnedJobRetries = from(content).getInt("[0].jobRetries");
+    int returnedJobPriority = from(content).getInt("[0].jobPriority");
     String returnedJobExceptionMessage = from(content).getString("[0].jobExceptionMessage");
     String returnedJobDefinitionId = from(content).getString("[0].jobDefinitionId");
     String returnedJobDefinitionType = from(content).getString("[0].jobDefinitionType");
@@ -484,6 +500,7 @@ public abstract class AbstractHistoricJobLogRestServiceQueryTest extends Abstrac
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_ID, returnedJobId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_DUE_DATE, returnedJobDueDate);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_RETRIES, returnedJobRetries);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_PRIORITY, returnedJobPriority);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_EXCEPTION_MSG, returnedJobExceptionMessage);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_DEF_ID, returnedJobDefinitionId);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_DEF_TYPE, returnedJobDefinitionType);
@@ -662,6 +679,54 @@ public abstract class AbstractHistoricJobLogRestServiceQueryTest extends Abstrac
     verify(mockedQuery).successLog();
     verify(mockedQuery).deletionLog();
     verify(mockedQuery).list();
+  }
+
+  @Test
+  public void testIntegerParameters() {
+    Map<String, Object> params = getCompleteIntegerQueryParameters();
+
+    given()
+      .queryParams(params)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(HISTORIC_JOB_LOG_RESOURCE_URL);
+
+    verifyIntegerParameterQueryInvocations();
+  }
+
+  @Test
+  public void testIntegerParametersAsPost() {
+    Map<String, Object> params = getCompleteIntegerQueryParameters();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(params)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .post(HISTORIC_JOB_LOG_RESOURCE_URL);
+
+    verifyIntegerParameterQueryInvocations();
+
+  }
+
+  protected Map<String, Object> getCompleteIntegerQueryParameters() {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+
+    parameters.put("jobPriorityLowerThanOrEquals", JOB_LOG_QUERY_MAX_PRIORITY);
+    parameters.put("jobPriorityHigherThanOrEquals", JOB_LOG_QUERY_MIN_PRIORITY);
+
+    return parameters;
+  }
+
+  protected void verifyIntegerParameterQueryInvocations() {
+    verify(mockedQuery).jobPriorityLowerThanOrEquals(JOB_LOG_QUERY_MAX_PRIORITY);
+    verify(mockedQuery).jobPriorityHigherThanOrEquals(JOB_LOG_QUERY_MIN_PRIORITY);
+    verify(mockedQuery).list();
+    verifyNoMoreInteractions(mockedQuery);
   }
 
 }
