@@ -26,7 +26,6 @@ import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resource;
-import org.camunda.bpm.engine.test.util.CamundaAssert;
 import org.junit.Assert;
 
 /**
@@ -108,7 +107,7 @@ public class AuthorizationScenarioInstance {
         while (iterator.hasNext()) {
           MissingAuthorization next = iterator.next();
           try {
-            CamundaAssert.assertExceptionInfo(expectedPermissionName, expectedResourceName, expectedResourceId, next);
+            AuthorizationTestUtil.assertExceptionInfo(expectedPermissionName, expectedResourceName, expectedResourceId, next);
             iterator.remove();
             found = true;
             break;

@@ -21,7 +21,7 @@ import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Resources.AUTHORIZATION;
-import static org.camunda.bpm.engine.test.util.CamundaAssert.assertExceptionInfo;
+import static org.camunda.bpm.engine.test.authorization.util.AuthorizationTestUtil.assertExceptionInfo;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.MissingAuthorization;
