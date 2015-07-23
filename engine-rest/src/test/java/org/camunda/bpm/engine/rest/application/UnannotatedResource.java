@@ -61,6 +61,6 @@ public class UnannotatedResource {
     builder.resource("someResourceName2");
     builder.resourceId("someResourceId2");
     missingAuthorizations.add(builder.build());
-    throw new AuthorizationException("someUser", missingAuthorizations, "TestMessage");
+    throw new AuthorizationException("someUser", missingAuthorizations);
   }
 }

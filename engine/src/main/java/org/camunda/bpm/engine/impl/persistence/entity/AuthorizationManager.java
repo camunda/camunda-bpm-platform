@@ -164,50 +164,20 @@ public class AuthorizationManager extends AbstractManager {
         
         Builder builder = MissingAuthorization.builder();
         List<MissingAuthorization> info = new ArrayList<MissingAuthorization>();
-        StringBuilder sBuilder = new StringBuilder();
-        sBuilder.append("The user with id '");
-        sBuilder.append(userId);
-        sBuilder.append("' does not have one of the following permissions: ");
-        boolean first = true;
+
         for (PermissionCheck check: permissionChecks) {
           builder.permission(check.getPermission().getName());
           builder.resource(check.getResource().resourceName());
           builder.resourceId(check.getResourceId());
           MissingAuthorization exceptionInfo = builder.build();
           info.add(exceptionInfo);
-          
-          if (!first) {
-            sBuilder.append(" or ");
-          } else {
-            first = false;
-          }
-          sBuilder.append(generateExceptionInfoMessage(exceptionInfo));    
         }
         
-        throw new AuthorizationException(userId, info, sBuilder.toString());
+        throw new AuthorizationException(userId, info);
       }
     }
   }
 
-  /**
-   * Appends the appropriate information for the AuthorizationExceptionInfo to the builder.
-   *
-   * @param exceptionInfo to use
-   */
-  private String generateExceptionInfoMessage(MissingAuthorization exceptionInfo) {
-    StringBuilder builder = new StringBuilder();
-    String permissionName = exceptionInfo.getViolatedPermissionName();
-    String resourceType = exceptionInfo.getResourceType();
-    String resourceId = exceptionInfo.getResourceId();
-    builder.append("'");
-    builder.append(permissionName);
-    builder.append("' permission on resource '");
-    builder.append((resourceId != null ? (resourceId+"' of type '") : "" ));
-    builder.append(resourceType);
-    builder.append("'");
-    
-    return builder.toString();
-  }
 
   public void checkAuthorization(Permission permission, Resource resource) {
     checkAuthorization(permission, resource, null);

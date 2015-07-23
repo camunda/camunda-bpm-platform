@@ -52,8 +52,8 @@ public class AuthorizationException extends ProcessEngineException {
     
   }
   
-  public AuthorizationException(String userId, List<MissingAuthorization> info, String message) {
-    super(message);
+  public AuthorizationException(String userId, List<MissingAuthorization> info) {
+    super(generateExceptionMessage(userId, info));
     this.userId = userId;
     this.info = info;
   }
@@ -115,5 +115,49 @@ public class AuthorizationException extends ProcessEngineException {
    */
   public List<MissingAuthorization> getInfo() {
     return Collections.unmodifiableList(info);
+  }
+
+  /**
+   * Generate exception message from the missing authorizations.
+   *
+   * @param userId to use
+   * @param missingAuthorizations to use
+   * @return The prepared exception message
+   */
+  private static String generateExceptionMessage(String userId, List<MissingAuthorization> missingAuthorizations) {
+    StringBuilder sBuilder = new StringBuilder();
+    sBuilder.append("The user with id '");
+    sBuilder.append(userId);
+    sBuilder.append("' does not have one of the following permissions: ");
+    boolean first = true;
+    for(MissingAuthorization missingAuthorization: missingAuthorizations) {
+      if (!first) {
+        sBuilder.append(" or ");
+      } else {
+        first = false;
+      }
+      sBuilder.append(generateMissingAuthorizationMessage(missingAuthorization));
+    }
+    return sBuilder.toString();
+  }
+
+  /**
+   * Generated exception message for the missing authorization.
+   *
+   * @param exceptionInfo to use
+   */
+  private static String generateMissingAuthorizationMessage(MissingAuthorization exceptionInfo) {
+    StringBuilder builder = new StringBuilder();
+    String permissionName = exceptionInfo.getViolatedPermissionName();
+    String resourceType = exceptionInfo.getResourceType();
+    String resourceId = exceptionInfo.getResourceId();
+    builder.append("'");
+    builder.append(permissionName);
+    builder.append("' permission on resource '");
+    builder.append((resourceId != null ? (resourceId+"' of type '") : "" ));
+    builder.append(resourceType);
+    builder.append("'");
+
+    return builder.toString();
   }
 }

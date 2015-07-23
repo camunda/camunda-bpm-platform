@@ -79,7 +79,9 @@ public abstract class AbstractExceptionHandlerTest extends AbstractRestServiceTe
     .expect().contentType(ContentType.JSON)
       .statusCode(Status.FORBIDDEN.getStatusCode())
       .body("type", equalTo(AuthorizationException.class.getSimpleName()))
-      .body("message", equalTo("TestMessage"))
+      .body("message", equalTo("The user with id 'someUser' does not have one of the following permissions: 'somePermission1' permission on resource "
+          + "'someResourceId1' of type 'someResourceName1' or 'somePermission2' permission on resource "
+          + "'someResourceId2' of type 'someResourceName2'"))
       .body("userId", equalTo("someUser"))
       .body("resourceName", equalTo(null))
       .body("resourceId", equalTo(null))
