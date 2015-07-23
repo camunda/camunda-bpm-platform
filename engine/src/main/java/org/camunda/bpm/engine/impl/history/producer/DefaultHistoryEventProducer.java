@@ -672,6 +672,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setJobId(jobEntity.getId());
     evt.setJobDueDate(jobEntity.getDuedate());
     evt.setJobRetries(jobEntity.getRetries());
+    evt.setJobPriority(jobEntity.getPriority());
 
     JobDefinition jobDefinition = jobEntity.getJobDefinition();
     if (jobDefinition != null) {

@@ -16,7 +16,6 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsEmpty
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.camunda.bpm.engine.exception.NotValidException;
@@ -48,6 +47,8 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
   protected String processDefinitionKey;
   protected String deploymentId;
   protected JobState state;
+  protected Integer jobPriorityHigherThanOrEqual;
+  protected Integer jobPriorityLowerThanOrEqual;
 
   public HistoricJobLogQueryImpl() {
   }
@@ -138,6 +139,16 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
     return this;
   }
 
+  public HistoricJobLogQuery jobPriorityHigherThanOrEquals(int priority) {
+    this.jobPriorityHigherThanOrEqual = priority;
+    return this;
+  }
+
+  public HistoricJobLogQuery jobPriorityLowerThanOrEquals(int priority) {
+    this.jobPriorityLowerThanOrEqual = priority;
+    return this;
+  }
+
   public HistoricJobLogQuery creationLog() {
     setState(JobState.CREATED);
     return this;
@@ -177,6 +188,11 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
 
   public HistoricJobLogQuery orderByJobRetries() {
     orderBy(HistoricJobLogQueryProperty.RETRIES);
+    return this;
+  }
+
+  public HistoricJobLogQuery orderByJobPriority() {
+    orderBy(HistoricJobLogQueryProperty.PRIORITY);
     return this;
   }
 

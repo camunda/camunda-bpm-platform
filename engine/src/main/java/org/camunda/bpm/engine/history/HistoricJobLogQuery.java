@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.history;
 
 import org.camunda.bpm.engine.query.Query;
+import org.camunda.bpm.engine.runtime.JobQuery;
 
 /**
  * @author Roman Smirnov
@@ -56,6 +57,22 @@ public interface HistoricJobLogQuery extends Query<HistoricJobLogQuery, Historic
   /** Only select historic job log entries with the deployment id. */
   HistoricJobLogQuery deploymentId(String deploymentId);
 
+  /**
+   * Only select log entries where the job had a priority higher than or
+   * equal to the given priority.
+   *
+   * @since 7.4
+   */
+  HistoricJobLogQuery jobPriorityHigherThanOrEquals(int priority);
+
+  /**
+   * Only select log entries where the job had a priority lower than or
+   * equal to the given priority.
+   *
+   * @since 7.4
+   */
+  HistoricJobLogQuery jobPriorityLowerThanOrEquals(int priority);
+
   /** Only select created historic job log entries. */
   HistoricJobLogQuery creationLog();
 
@@ -83,6 +100,13 @@ public interface HistoricJobLogQuery extends Query<HistoricJobLogQuery, Historic
   /** Order by job retries (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricJobLogQuery orderByJobRetries();
 
+  /**
+   * Order by job priority (needs to be followed by {@link #asc()} or {@link #desc()}).
+   *
+   * @since 7.4
+   */
+  HistoricJobLogQuery orderByJobPriority();
+
   /** Order by job definition id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricJobLogQuery orderByJobDefinitionId();
 
@@ -103,6 +127,7 @@ public interface HistoricJobLogQuery extends Query<HistoricJobLogQuery, Historic
 
   /** Order by deployment id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   HistoricJobLogQuery orderByDeploymentId();
+
 
   /**
    * <p>Sort the {@link HistoricJobLog historic job logs} in the order in which

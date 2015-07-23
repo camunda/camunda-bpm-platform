@@ -73,6 +73,7 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(job.getProcessDefinitionId(), historicJob.getProcessDefinitionId());
     assertEquals(job.getProcessDefinitionKey(), historicJob.getProcessDefinitionKey());
     assertEquals(job.getDeploymentId(), historicJob.getDeploymentId());
+    assertEquals(job.getPriority(), historicJob.getJobPriority());
 
     assertTrue(historicJob.isCreationLog());
     assertFalse(historicJob.isFailureLog());
@@ -116,6 +117,7 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(job.getProcessDefinitionKey(), historicJob.getProcessDefinitionKey());
     assertEquals(job.getDeploymentId(), historicJob.getDeploymentId());
     assertEquals(FailingDelegate.EXCEPTION_MESSAGE, historicJob.getJobExceptionMessage());
+    assertEquals(job.getPriority(), historicJob.getJobPriority());
 
     assertFalse(historicJob.isCreationLog());
     assertTrue(historicJob.isFailureLog());
@@ -155,6 +157,7 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(job.getProcessDefinitionId(), historicJob.getProcessDefinitionId());
     assertEquals(job.getProcessDefinitionKey(), historicJob.getProcessDefinitionKey());
     assertEquals(job.getDeploymentId(), historicJob.getDeploymentId());
+    assertEquals(job.getPriority(), historicJob.getJobPriority());
 
     assertFalse(historicJob.isCreationLog());
     assertFalse(historicJob.isFailureLog());
@@ -194,6 +197,7 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertEquals(job.getProcessDefinitionId(), historicJob.getProcessDefinitionId());
     assertEquals(job.getProcessDefinitionKey(), historicJob.getProcessDefinitionKey());
     assertEquals(job.getDeploymentId(), historicJob.getDeploymentId());
+    assertEquals(job.getPriority(), historicJob.getJobPriority());
 
     assertFalse(historicJob.isCreationLog());
     assertFalse(historicJob.isFailureLog());

@@ -12,6 +12,10 @@ ALTER TABLE ACT_RU_JOB
 ALTER TABLE ACT_RU_JOBDEF
   ADD JOB_PRIORITY_ integer;
 
+ALTER TABLE ACT_HI_JOB_LOG
+  ADD JOB_PRIORITY_ integer not null
+  DEFAULT 0;
+
 -- create decision definition table --
 create table ACT_RE_DECISION_DEF (
     ID_ varchar(64) not null,

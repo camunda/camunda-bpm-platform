@@ -64,6 +64,13 @@ public interface HistoricJobLog {
   int getJobRetries();
 
   /**
+   * Returns the priority of the associated job when <code>this</code> log entry was created.
+   *
+   * @since 7.4
+   */
+  int getJobPriority();
+
+  /**
    * Returns the message of the exception that occurred by executing the associated job.
    *
    * To get the full exception stacktrace,

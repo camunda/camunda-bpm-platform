@@ -31,6 +31,7 @@ public interface HistoricJobLogQueryProperty {
   public static final QueryProperty DEPLOYMENT_ID = new QueryPropertyImpl("DEPLOYMENT_ID_");
   public static final QueryProperty DUEDATE = new QueryPropertyImpl("JOB_DUEDATE_");
   public static final QueryProperty RETRIES = new QueryPropertyImpl("JOB_RETRIES_");
+  public static final QueryProperty PRIORITY = new QueryPropertyImpl("JOB_PRIORITY_");
   public static final QueryProperty SEQUENCE_COUNTER = new QueryPropertyImpl("SEQUENCE_COUNTER_");
 
 }

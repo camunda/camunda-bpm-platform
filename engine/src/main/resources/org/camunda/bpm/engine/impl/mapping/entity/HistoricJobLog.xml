@@ -13,6 +13,7 @@
             JOB_ID_,
             JOB_DUEDATE_,
             JOB_RETRIES_,
+            JOB_PRIORITY_,
             JOB_EXCEPTION_MSG_,
             JOB_EXCEPTION_STACK_ID_,
             JOB_STATE_,
@@ -32,6 +33,7 @@
             #{jobId, jdbcType=VARCHAR},
             #{jobDueDate, jdbcType=TIMESTAMP},
             #{jobRetries, jdbcType=INTEGER},
+            #{jobPriority, jdbcType=INTEGER},
             #{jobExceptionMessage, jdbcType=VARCHAR},
             #{exceptionByteArrayId, jdbcType=VARCHAR},
             #{state, jdbcType=INTEGER},
@@ -93,6 +95,7 @@
     <result property="jobId" column="JOB_ID_" jdbcType="VARCHAR" />
     <result property="jobDueDate" column="JOB_DUEDATE_" jdbcType="TIMESTAMP" />
     <result property="jobRetries" column="JOB_RETRIES_" jdbcType="INTEGER" />
+    <result property="jobPriority" column="JOB_PRIORITY_" jdbcType="INTEGER" />
     <result property="jobExceptionMessage" column="JOB_EXCEPTION_MSG_" jdbcType="VARCHAR" />
     <result property="exceptionByteArrayId" column="JOB_EXCEPTION_STACK_ID_" jdbcType="VARCHAR" />
     <result property="jobDefinitionId" column="JOB_DEF_ID_" jdbcType="VARCHAR" />
@@ -215,6 +218,12 @@
       </if>
       <if test="state != null">
         and RES.JOB_STATE_ = #{state.stateCode}
+      </if>
+      <if test="jobPriorityHigherThanOrEqual != null">
+        and RES.JOB_PRIORITY_ &gt;= #{jobPriorityHigherThanOrEqual}
+      </if>
+      <if test="jobPriorityLowerThanOrEqual != null">
+        and RES.JOB_PRIORITY_ &lt;= #{jobPriorityLowerThanOrEqual}
       </if>
       <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
         AND

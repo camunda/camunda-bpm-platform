@@ -18,6 +18,7 @@ import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicJ
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicJobLogByJobDefinitionId;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicJobLogByJobDueDate;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicJobLogByJobId;
+import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicJobLogByJobPriority;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicJobLogByJobRetries;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicJobLogByProcessDefinitionId;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicJobLogByProcessDefinitionKey;
@@ -26,12 +27,16 @@ import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicJ
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.historicJobLogPartiallyByOccurence;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.HistoricJobLogQuery;
 import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.MessageJobDeclaration;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.api.runtime.FailingDelegate;
 import org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil;
@@ -355,6 +360,55 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Deployment
+  public void testQueryByJobPriority() {
+    // given 5 process instances with 5 jobs
+    List<ProcessInstance> processInstances = new ArrayList<ProcessInstance>();
+
+    for (int i = 0; i < 5; i++) {
+      processInstances.add(runtimeService.startProcessInstanceByKey("process",
+          Variables.createVariables().putValue("priority", i)));
+    }
+
+    // then the creation logs can be filtered by priority of the jobs
+    // (1) lower than or equal a priority
+    List<HistoricJobLog> jobLogs = historyService.createHistoricJobLogQuery()
+        .jobPriorityLowerThanOrEquals(2)
+        .orderByJobPriority()
+        .asc()
+        .list();
+
+    assertEquals(3, jobLogs.size());
+    for (HistoricJobLog log : jobLogs) {
+      assertTrue(log.getJobPriority() <= 2);
+    }
+
+    // (2) higher than or equal a given priorty
+    jobLogs = historyService.createHistoricJobLogQuery()
+        .jobPriorityHigherThanOrEquals(3)
+        .orderByJobPriority()
+        .asc()
+        .list();
+
+    assertEquals(2, jobLogs.size());
+    for (HistoricJobLog log : jobLogs) {
+      assertTrue(log.getJobPriority() >= 3);
+    }
+
+    // (3) lower and higher than or equal
+    jobLogs = historyService.createHistoricJobLogQuery()
+        .jobPriorityHigherThanOrEquals(1)
+        .jobPriorityLowerThanOrEquals(3)
+        .orderByJobPriority()
+        .asc()
+        .list();
+
+    assertEquals(3, jobLogs.size());
+    for (HistoricJobLog log : jobLogs) {
+      assertTrue(log.getJobPriority() >= 1 && log.getJobPriority() <= 3);
+    }
+  }
+
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
   public void testQueryByCreationLog() {
     runtimeService.startProcessInstanceByKey("process");
@@ -485,6 +539,14 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
       .asc();
     verifyQueryWithOrdering(query, 10, historicJobLogByDeploymentId());
 
+    query = historyService.createHistoricJobLogQuery();
+
+    query
+      .orderByJobPriority()
+      .asc();
+
+    verifyQueryWithOrdering(query, 10, historicJobLogByJobPriority());
+
     // desc
     query
       .orderByTimestamp()
@@ -560,6 +622,14 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
       .orderByDeploymentId()
       .desc();
     verifyQueryWithOrdering(query, 10, inverted(historicJobLogByDeploymentId()));
+
+    query = historyService.createHistoricJobLogQuery();
+
+    query
+      .orderByJobPriority()
+      .desc();
+
+  verifyQueryWithOrdering(query, 10, inverted(historicJobLogByJobPriority()));
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})

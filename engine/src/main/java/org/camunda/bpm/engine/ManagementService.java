@@ -699,6 +699,8 @@ public interface ManagementService {
    *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_INSTANCE}</li>
    *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
    *   </ul>
+   *
+   * @since 7.4
    */
   void setJobPriority(String jobId, int priority);
 
@@ -717,6 +719,8 @@ public interface ManagementService {
    *   <ul>
    *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_DEFINITION}</li>
    *   </ul>
+   *
+   * @since 7.4
    */
   void setOverridingJobPriorityForJobDefinition(String jobDefinitionId, int priority);
 
@@ -745,6 +749,8 @@ public interface ManagementService {
    *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_INSTANCE}</li>
    *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
    *   </ul>
+   *
+   * @since 7.4
    */
   void setOverridingJobPriorityForJobDefinition(String jobDefinitionId, int priority, boolean cascade);
 
@@ -761,6 +767,8 @@ public interface ManagementService {
    *   <ul>
    *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_DEFINITION}</li>
    *   </ul>
+   *
+   * @since 7.4
    */
   void clearOverridingJobPriorityForJobDefinition(String jobDefinitionId);
 

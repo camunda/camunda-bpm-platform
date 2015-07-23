@@ -14,7 +14,7 @@
       camunda:asyncBefore="true" 
       camunda:asyncAfter="true" 
       camunda:class="org.camunda.bpm.engine.test.api.runtime.FailingDelegate"
-      camunda:jobPriority="15" />
+      camunda:jobPriority="${priority}" />
 
     <sequenceFlow id="flow1" sourceRef="serviceTask" targetRef="theEnd" />
 

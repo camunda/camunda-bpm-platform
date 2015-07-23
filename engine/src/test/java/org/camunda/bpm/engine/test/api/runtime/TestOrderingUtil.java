@@ -427,6 +427,18 @@ public class TestOrderingUtil {
     };
   }
 
+  public static NullTolerantComparator<HistoricJobLog> historicJobLogByJobPriority() {
+    return new NullTolerantComparator<HistoricJobLog>() {
+      public int compare(HistoricJobLog o1, HistoricJobLog o2) {
+        return Integer.valueOf(o1.getJobPriority()).compareTo(Integer.valueOf(o2.getJobPriority()));
+      }
+
+      public boolean hasNullProperty(HistoricJobLog object) {
+        return false;
+      }
+    };
+  }
+
   public static NullTolerantComparator<HistoricJobLog> historicJobLogPartiallyByOccurence() {
     return new NullTolerantComparator<HistoricJobLog>() {
       public int compare(HistoricJobLog o1, HistoricJobLog o2) {
@@ -448,7 +460,8 @@ public class TestOrderingUtil {
 
       @Override
       public int compare(Job o1, Job o2) {
-        return o1.getPriority() - o2.getPriority();
+        return Integer.valueOf(o1.getPriority())
+            .compareTo(Integer.valueOf(o2.getPriority()));
       }
 
       @Override

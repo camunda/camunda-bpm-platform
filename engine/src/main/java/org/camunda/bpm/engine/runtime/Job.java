@@ -94,6 +94,8 @@ public interface Job {
 
   /**
    * The job's priority that is a hint to job acquisition.
+   *
+   * @since 7.4
    */
   int getPriority();
 }

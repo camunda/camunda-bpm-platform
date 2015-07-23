@@ -191,6 +191,7 @@ create table ACT_HI_JOB_LOG (
     JOB_ID_ varchar(64) not null,
     JOB_DUEDATE_ timestamp NULL,
     JOB_RETRIES_ integer,
+    JOB_PRIORITY_ integer NOT NULL DEFAULT 0,
     JOB_EXCEPTION_MSG_ varchar(4000),
     JOB_EXCEPTION_STACK_ID_ varchar(64),
     JOB_STATE_ integer,
