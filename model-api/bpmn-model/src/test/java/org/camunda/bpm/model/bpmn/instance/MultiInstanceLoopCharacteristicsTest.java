@@ -30,6 +30,7 @@ public class MultiInstanceLoopCharacteristicsTest extends BpmnModelElementInstan
   public TypeAssumption getTypeAssumption() {
     return new TypeAssumption(LoopCharacteristics.class, false);
   }
+
   @Override
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
     return Arrays.asList(
