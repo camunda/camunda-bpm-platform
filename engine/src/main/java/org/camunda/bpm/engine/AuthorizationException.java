@@ -43,9 +43,7 @@ public class AuthorizationException extends ProcessEngineException {
   public AuthorizationException(String userId, MissingAuthorization exceptionInfo) {
     super(
         "The user with id '"+userId+
-        "' does not have '"+exceptionInfo.getViolatedPermissionName()+"' permission " +
-        "on resource '" + (exceptionInfo.getResourceId()!= null ? (exceptionInfo.getResourceId()+"' of type '") : "" ) +
-        exceptionInfo.getResourceType()+"'.");
+        "' does not have "+generateMissingAuthorizationMessage(exceptionInfo)+".");
     this.userId = userId;
     info = new ArrayList<MissingAuthorization>();
     info.add(exceptionInfo);
