@@ -37,6 +37,14 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
 
   public static int DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE = 0;
 
+  public static int getDefaultPriority() {
+    return DEFAULT_PRIORITY;
+  }
+
+  public static int getDefaultPriorityOnResolutionFailure() {
+    return DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE;
+  }
+
   @Override
   public int determinePriority(ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
 
@@ -55,7 +63,7 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
       return processDefinitionPriority;
     }
 
-    return DEFAULT_PRIORITY;
+    return getDefaultPriority();
   }
 
   protected Integer getJobDefinitionPriority(ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
@@ -105,7 +113,7 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
   }
 
   protected Integer evaluateValueProvider(ParameterValueProvider valueProvider, ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
-    Object value = null;
+    Object value;
     try {
       value = valueProvider.getValue(execution);
 
@@ -114,9 +122,10 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
       if (Context.getProcessEngineConfiguration().isEnableGracefulDegradationOnContextSwitchFailure()
           && isSymptomOfContextSwitchFailure(e, execution)) {
 
+        value = getDefaultPriorityOnResolutionFailure();
+
         LOG.log(Level.WARNING, "Could not determine priority for job created in context of execution " + execution
-            + ". Using default priority " + DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE, e);
-        value = DefaultJobPriorityProvider.DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE;
+            + ". Using default priority " + value, e);
       }
       else {
         throw e;
