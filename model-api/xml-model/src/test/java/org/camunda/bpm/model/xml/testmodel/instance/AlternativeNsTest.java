@@ -13,26 +13,43 @@
 
 package org.camunda.bpm.model.xml.testmodel.instance;
 
+import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import javax.xml.XMLConstants;
+
 import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.impl.ModelImpl;
+import org.camunda.bpm.model.xml.impl.ModelInstanceImpl;
+import org.camunda.bpm.model.xml.impl.instance.DomElementImpl;
 import org.camunda.bpm.model.xml.impl.parser.AbstractModelParser;
+import org.camunda.bpm.model.xml.impl.util.DomUtil;
 import org.camunda.bpm.model.xml.instance.DomElement;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.testmodel.Gender;
 import org.camunda.bpm.model.xml.testmodel.TestModelConstants;
 import org.camunda.bpm.model.xml.testmodel.TestModelTest;
+import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 /**
  * @author Ronny Bräunlich
@@ -131,4 +148,58 @@ public class AlternativeNsTest extends TestModelTest {
     List<DomElement> childElementsByNameNs = bird.getDomElement().getChildElementsByNameNs(TestModelConstants.NEWER_NAMESPACE, "wings");
     assertThat(childElementsByNameNs.size(), is(1));
   }
+
+  @Test
+  @Ignore
+  public void setAttribute() {
+    Bird hedwig = modelInstance.getModelElementById("hedwig");
+    assertFalse(hedwig.canHazExtendedWings());
+
+    hedwig.setCanHazExtendedWings(true);
+    assertTrue(hedwig.canHazExtendedWings());
+
+    hedwig.setAttributeValueNs(TestModelConstants.NEWER_NAMESPACE, "canHazExtendedWings", "false");
+    assertFalse(hedwig.canHazExtendedWings());
+
+    hedwig.setAttributeValueNs(MECHANICAL_NS, "canHazExtendedWings", "true");
+    assertTrue(hedwig.canHazExtendedWings());
+  }
+
+  @Test
+  @Ignore
+  public void createElement() {
+    Bird plucky = modelInstance.getModelElementById("plucky");
+    assertNull(plucky.getWings());
+
+    ModelElementType mechanicalWingsType = ((ModelInstanceImpl) modelInstance).registerGenericType(MECHANICAL_NS, "wings");
+    ModelElementInstance mechanicalWings = modelInstance.newInstance(mechanicalWingsType);
+
+    plucky.addChildElement(mechanicalWings);
+
+    assertNotNull(plucky.getWings());
+  }
+
+  @Test
+  @Ignore
+  public void useExistingNamespace() {
+    assertThatThereIsNoNewerNamespaceUrl();
+
+    Bird plucky = modelInstance.getModelElementById("plucky");
+    plucky.setAttributeValueNs(MECHANICAL_NS, "canHazExtendedWings", "true");
+    assertTrue(plucky.canHazExtendedWings());
+
+    assertThatThereIsNoNewerNamespaceUrl();
+  }
+
+  protected void assertThatThereIsNoNewerNamespaceUrl() {
+    Node rootElement = modelInstance.getDocument().getDomSource().getNode().getFirstChild();
+    NamedNodeMap attributes = rootElement.getAttributes();
+    for (int i = 0; i < attributes.getLength(); i++) {
+      Node item = attributes.item(i);
+      String nodeValue = item.getNodeValue();
+      assertNotEquals("Found newer namespace url which shouldn't exist", TestModelConstants.NEWER_NAMESPACE, nodeValue);
+    }
+  }
+
+
 }
