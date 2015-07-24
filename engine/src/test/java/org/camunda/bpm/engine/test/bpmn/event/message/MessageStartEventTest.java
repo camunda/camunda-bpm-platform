@@ -13,6 +13,10 @@
 
 package org.camunda.bpm.engine.test.bpmn.event.message;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -45,7 +49,7 @@ public class MessageStartEventTest extends PluggableProcessEngineTestCase {
   }
 
   public void testSameMessageNameFails() {
-    String deploymentId = repositoryService
+    repositoryService
       .createDeployment()
       .addClasspathResource("org/camunda/bpm/engine/test/bpmn/event/message/MessageStartEventTest.testSingleMessageStartEvent.bpmn20.xml")
       .deploy()
@@ -59,13 +63,16 @@ public class MessageStartEventTest extends PluggableProcessEngineTestCase {
     }catch (ProcessEngineException e) {
       assertTrue(e.getMessage().contains("there already is a message event subscription for the message with name"));
     }
-
+    finally{
     // clean db:
-    repositoryService.deleteDeployment(deploymentId);
-
-    // Workaround for #CAM-4250: remove process definition of failed deployment from deployment cache
-    processEngineConfiguration.getDeploymentCache().getProcessDefinitionCache().clear();
-
+      List<org.camunda.bpm.engine.repository.Deployment> deployments = repositoryService.createDeploymentQuery().list();
+      for (org.camunda.bpm.engine.repository.Deployment deployment : deployments) {
+        repositoryService.deleteDeployment(deployment.getId(), true);
+      }
+      // Workaround for #CAM-4250: remove process definition of failed
+      // deployment from deployment cache
+      processEngineConfiguration.getDeploymentCache().getProcessDefinitionCache().clear();
+    }
   }
 
   // SEE: https://app.camunda.com/jira/browse/CAM-1448
@@ -236,6 +243,90 @@ public class MessageStartEventTest extends PluggableProcessEngineTestCase {
       assertTrue("different exception expected, not " + e.getMessage(), e.getMessage().contains("has no default start activity"));
     }
 
+  }
+
+  @Deployment
+  public void testDeployStartAndIntermediateEventWithSameMessageInSameProcess() {
+    ProcessInstance pi = null;
+    try {
+      runtimeService.startProcessInstanceByMessage("message");
+      pi = runtimeService.createProcessInstanceQuery().singleResult();
+      assertThat(pi.isEnded(), is(false));
+
+      String deploymentId = repositoryService
+          .createDeployment()
+          .addClasspathResource(
+              "org/camunda/bpm/engine/test/bpmn/event/message/MessageStartEventTest.testDeployStartAndIntermediateEventWithSameMessageInSameProcess.bpmn")
+          .name("deployment2").deploy().getId();
+      assertThat(repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult(), is(notNullValue()));
+    } finally {
+      // clean db:
+      runtimeService.deleteProcessInstance(pi.getId(), "failure");
+      List<org.camunda.bpm.engine.repository.Deployment> deployments = repositoryService.createDeploymentQuery().list();
+      for (org.camunda.bpm.engine.repository.Deployment d : deployments) {
+        repositoryService.deleteDeployment(d.getId(), true);
+      }
+      // Workaround for #CAM-4250: remove process definition of failed
+      // deployment from deployment cache
+
+      processEngineConfiguration.getDeploymentCache().getProcessDefinitionCache().clear();
+    }
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/message/MessageStartEventTest.testDeployStartAndIntermediateEventWithSameMessageDifferentProcesses.bpmn"})
+  public void testDeployStartAndIntermediateEventWithSameMessageDifferentProcessesFirstStartEvent() {
+    ProcessInstance pi = null;
+    try {
+      runtimeService.startProcessInstanceByMessage("message");
+      pi = runtimeService.createProcessInstanceQuery().singleResult();
+      assertThat(pi.isEnded(), is(false));
+
+      String deploymentId = repositoryService
+          .createDeployment()
+          .addClasspathResource(
+              "org/camunda/bpm/engine/test/bpmn/event/message/MessageStartEventTest.testDeployStartAndIntermediateEventWithSameMessageDifferentProcesses2.bpmn")
+          .name("deployment2").deploy().getId();
+      assertThat(repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult(), is(notNullValue()));
+    } finally {
+      // clean db:
+      runtimeService.deleteProcessInstance(pi.getId(), "failure");
+      List<org.camunda.bpm.engine.repository.Deployment> deployments = repositoryService.createDeploymentQuery().list();
+      for (org.camunda.bpm.engine.repository.Deployment d : deployments) {
+        repositoryService.deleteDeployment(d.getId(), true);
+      }
+      // Workaround for #CAM-4250: remove process definition of failed
+      // deployment from deployment cache
+
+      processEngineConfiguration.getDeploymentCache().getProcessDefinitionCache().clear();
+    }
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/message/MessageStartEventTest.testDeployStartAndIntermediateEventWithSameMessageDifferentProcesses2.bpmn"})
+  public void testDeployStartAndIntermediateEventWithSameMessageDifferentProcessesFirstIntermediateEvent() {
+    ProcessInstance pi = null;
+    try {
+      runtimeService.startProcessInstanceByKey("Process_2");
+      pi = runtimeService.createProcessInstanceQuery().singleResult();
+      assertThat(pi.isEnded(), is(false));
+
+      String deploymentId = repositoryService
+          .createDeployment()
+          .addClasspathResource(
+              "org/camunda/bpm/engine/test/bpmn/event/message/MessageStartEventTest.testDeployStartAndIntermediateEventWithSameMessageDifferentProcesses.bpmn")
+          .name("deployment2").deploy().getId();
+      assertThat(repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult(), is(notNullValue()));
+    } finally {
+      // clean db:
+      runtimeService.deleteProcessInstance(pi.getId(), "failure");
+      List<org.camunda.bpm.engine.repository.Deployment> deployments = repositoryService.createDeploymentQuery().list();
+      for (org.camunda.bpm.engine.repository.Deployment d : deployments) {
+        repositoryService.deleteDeployment(d.getId(), true);
+      }
+      // Workaround for #CAM-4250: remove process definition of failed
+      // deployment from deployment cache
+
+      processEngineConfiguration.getDeploymentCache().getProcessDefinitionCache().clear();
+    }
   }
 
 }

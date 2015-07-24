@@ -308,7 +308,7 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
 
   protected void addMessageEventSubscription(EventSubscriptionDeclaration messageEventDefinition, ProcessDefinitionEntity processDefinition) {
 
-    if(hasMessageEventSubscriptionForName(messageEventDefinition.getEventName())) {
+    if(isSameMessageEventSubscriptionAlreadyPresent(messageEventDefinition)) {
       throw new ProcessEngineException("Cannot deploy process definition '" + processDefinition.getResourceName()
               + "': there already is a message event subscription for the message with name '" + messageEventDefinition.getEventName() + "'.");
     }
@@ -321,15 +321,15 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
     newSubscription.insert();
   }
 
-  protected boolean hasMessageEventSubscriptionForName(String eventName) {
+  protected boolean isSameMessageEventSubscriptionAlreadyPresent(EventSubscriptionDeclaration eventSubscription) {
     // look for subscriptions for the same name in db:
     List<EventSubscriptionEntity> subscriptionsForSameMessageName = getEventSubscriptionManager()
-      .findEventSubscriptionsByName(MessageEventHandler.EVENT_HANDLER_TYPE, eventName);
+      .findEventSubscriptionsByName(MessageEventHandler.EVENT_HANDLER_TYPE, eventSubscription.getEventName());
     // also look for subscriptions created in the session:
     List<MessageEventSubscriptionEntity> cachedSubscriptions = getDbEntityManager()
       .getCachedEntitiesByType(MessageEventSubscriptionEntity.class);
     for (MessageEventSubscriptionEntity cachedSubscription : cachedSubscriptions) {
-      if(eventName.equals(cachedSubscription.getEventName())
+      if(eventSubscription.getEventName().equals(cachedSubscription.getEventName())
               && !subscriptionsForSameMessageName.contains(cachedSubscription)) {
         subscriptionsForSameMessageName.add(cachedSubscription);
       }
@@ -337,8 +337,38 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
     // remove subscriptions deleted in the same command
     subscriptionsForSameMessageName = getDbEntityManager()
             .pruneDeletedEntities(subscriptionsForSameMessageName);
+    return !filterSubscriptionsOfDifferentType(eventSubscription, subscriptionsForSameMessageName).isEmpty();
+  }
 
-    return !subscriptionsForSameMessageName.isEmpty();
+  /**
+   * It is possible to deploy a process containing a start and intermediate
+   * message event that wait for the same message or to have two processes, one
+   * with a message start event and the other one with a message intermediate
+   * event, that subscribe for the same message. Therefore we have to find out
+   * if there are subscriptions for the other type of event and remove those.
+   *
+   * @param eventSubscription
+   * @param subscriptionsForSameMessageName
+   */
+  protected List<EventSubscriptionEntity> filterSubscriptionsOfDifferentType(EventSubscriptionDeclaration eventSubscription,
+      List<EventSubscriptionEntity> subscriptionsForSameMessageName) {
+    ArrayList<EventSubscriptionEntity> filteredSubscriptions = new ArrayList<EventSubscriptionEntity>(subscriptionsForSameMessageName);
+    for (EventSubscriptionEntity subscriptionEntity : new ArrayList<EventSubscriptionEntity>(subscriptionsForSameMessageName)) {
+      if (eventSubscription.isStartEvent() && isSubscriptionForIntermediateEvent(subscriptionEntity)) {
+        filteredSubscriptions.remove(subscriptionEntity);
+      } else if (!eventSubscription.isStartEvent() && isSubscriptionForStartEvent(subscriptionEntity)) {
+        filteredSubscriptions.remove(subscriptionEntity);
+      }
+    }
+    return filteredSubscriptions;
+  }
+
+  protected boolean isSubscriptionForStartEvent(EventSubscriptionEntity subscriptionEntity) {
+    return subscriptionEntity.getExecutionId() == null;
+  }
+
+  protected boolean isSubscriptionForIntermediateEvent(EventSubscriptionEntity subscriptionEntity) {
+    return subscriptionEntity.getExecutionId() != null;
   }
 
   protected void addSignalEventSubscription(EventSubscriptionDeclaration signalEventDefinition, ProcessDefinitionEntity processDefinition) {
