@@ -35,8 +35,9 @@ public class LdapPosixTestEnvironment extends LdapTestEnvironment {
     super();
   }
 
+  @Override
   public void init() throws Exception {
-    super.initializeDirectory();
+    initializeDirectory("target/ldap-posix-work");
 
     // Enable POSIX groups in ApacheDS
     LdapDN nis = new LdapDN("cn=nis,ou=schema");
@@ -50,11 +51,14 @@ public class LdapPosixTestEnvironment extends LdapTestEnvironment {
         modifications.add(new ServerModification(ModificationOperation.REPLACE_ATTRIBUTE, nisDisabled));
         service.getAdminSession().modify(nis, modifications);
         service.shutdown();
-        initializeDirectory(); // Note: This instantiates service again for schema modifications to take effect.
+        initializeDirectory("target/ldap-posix-work"); // Note: This instantiates service again for schema modifications to take effect.
       }
     }
 
     ldapService.start();
+
+    createGroup("office-berlin");
+    String dnDaniel = createUserUid("daniel", "office-berlin", "Daniel", "Meyer", "daniel@camunda.org");
 
     createGroup("people");
     createUserUid("ruecker", "people", "Bernd", "Ruecker", "ruecker@camunda.org");

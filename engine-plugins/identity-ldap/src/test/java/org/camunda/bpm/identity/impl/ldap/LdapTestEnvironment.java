@@ -48,16 +48,25 @@ public class LdapTestEnvironment {
   protected DirectoryService service;
   protected LdapServer ldapService;
   protected String configFilePath = "ldap.properties";
+  protected String workingDirectory = "target/ldap-work";
 
   public LdapTestEnvironment() {}
 
   protected void initializeDirectory() throws Exception {
+    initializeDirectory(null);
+  }
+
+  protected void initializeDirectory(String workingDirectory) throws Exception {
+
+    if(null == workingDirectory) {
+      workingDirectory = this.workingDirectory;
+    }
 
     Properties properties = loadTestProperties();
     String port = properties.getProperty("ldap.server.port");
 
     service = new DefaultDirectoryService();
-    service.setWorkingDirectory(new File("target/ldap-work"));
+    service.setWorkingDirectory(new File(workingDirectory));
 
     service.getChangeLog().setEnabled(false);
     service.setDenormalizeOpAttrsEnabled(true);
@@ -183,8 +192,8 @@ public class LdapTestEnvironment {
 
   public void shutdown() {
     try {
-      service.shutdown();
       ldapService.stop();
+      service.shutdown();
     } catch (Exception e) {
       LOG.log(Level.SEVERE, "exception while shutting down ldap", e);
     }
