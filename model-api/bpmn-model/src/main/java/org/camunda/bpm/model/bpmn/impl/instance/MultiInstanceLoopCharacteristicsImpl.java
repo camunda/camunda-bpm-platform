@@ -13,11 +13,15 @@
 package org.camunda.bpm.model.bpmn.impl.instance;
 
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN20_NS;
-import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ELEMENT_MULTI_INSTANCE_LOOP_CHARACTERISTICS;
-import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ELEMENT_IS_SEQUENTIAL;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ELEMENT_BEHAVIOR;
-import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ELEMENT_ONE_BEHAVIOR_EVENT_REF;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ELEMENT_IS_SEQUENTIAL;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ELEMENT_MULTI_INSTANCE_LOOP_CHARACTERISTICS;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ELEMENT_NONE_BEHAVIOR_EVENT_REF;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ELEMENT_ONE_BEHAVIOR_EVENT_REF;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_ASYNC_AFTER;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_ASYNC_BEFORE;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_EXCLUSIVE;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
 
 import java.util.Collection;
 
@@ -45,7 +49,7 @@ import org.camunda.bpm.model.xml.type.reference.ElementReference;
 
 /**
  * The BPMN 2.0 multiInstanceLoopCharacteristics element
- * 
+ *
  * @author Filip Hrisafov
  */
 public class MultiInstanceLoopCharacteristicsImpl extends LoopCharacteristicsImpl implements MultiInstanceLoopCharacteristics {
@@ -61,6 +65,9 @@ public class MultiInstanceLoopCharacteristicsImpl extends LoopCharacteristicsImp
   protected static ChildElement<OutputDataItem> outputDataItemChild;
   protected static ChildElementCollection<ComplexBehaviorDefinition> complexBehaviorDefinitionCollection;
   protected static ChildElement<CompletionCondition> completionConditionChild;
+  protected static Attribute<Boolean> camundaAsyncAfter;
+  protected static Attribute<Boolean> camundaAsyncBefore;
+  protected static Attribute<Boolean> camundaExclusive;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder
@@ -68,6 +75,7 @@ public class MultiInstanceLoopCharacteristicsImpl extends LoopCharacteristicsImp
       .namespaceUri(BPMN20_NS)
       .extendsType(LoopCharacteristics.class)
       .instanceProvider(new ModelTypeInstanceProvider<MultiInstanceLoopCharacteristics>() {
+        @Override
         public MultiInstanceLoopCharacteristics newInstance(ModelTypeInstanceContext instanceContext) {
           return new MultiInstanceLoopCharacteristicsImpl(instanceContext);
         }
@@ -114,6 +122,21 @@ public class MultiInstanceLoopCharacteristicsImpl extends LoopCharacteristicsImp
     completionConditionChild = sequenceBuilder.element(CompletionCondition.class)
       .build();
 
+    camundaAsyncAfter = typeBuilder.booleanAttribute(CAMUNDA_ATTRIBUTE_ASYNC_AFTER)
+        .namespace(CAMUNDA_NS)
+        .defaultValue(false)
+        .build();
+
+    camundaAsyncBefore = typeBuilder.booleanAttribute(CAMUNDA_ATTRIBUTE_ASYNC_BEFORE)
+        .namespace(CAMUNDA_NS)
+        .defaultValue(false)
+        .build();
+
+    camundaExclusive = typeBuilder.booleanAttribute(CAMUNDA_ATTRIBUTE_EXCLUSIVE)
+        .namespace(CAMUNDA_NS)
+        .defaultValue(true)
+        .build();
+
     typeBuilder.build();
   }
 
@@ -121,86 +144,107 @@ public class MultiInstanceLoopCharacteristicsImpl extends LoopCharacteristicsImp
     super(instanceContext);
   }
 
+  @Override
   public LoopCardinality getLoopCardinality() {
     return loopCardinalityChild.getChild(this);
   }
 
+  @Override
   public void setLoopCardinality(LoopCardinality loopCardinality) {
     loopCardinalityChild.setChild(this, loopCardinality);
   }
 
+  @Override
   public DataInput getLoopDataInputRef() {
     return loopDataInputRefChild.getReferenceTargetElement(this);
   }
 
+  @Override
   public void setLoopDataInputRef(DataInput loopDataInputRef) {
     loopDataInputRefChild.setReferenceTargetElement(this, loopDataInputRef);
   }
 
+  @Override
   public DataOutput getLoopDataOutputRef() {
     return loopDataOutputRefChild.getReferenceTargetElement(this);
   }
 
+  @Override
   public void setLoopDataOutputRef(DataOutput loopDataOutputRef) {
     loopDataOutputRefChild.setReferenceTargetElement(this, loopDataOutputRef);
   }
 
+  @Override
   public InputDataItem getInputDataItem() {
     return inputDataItemChild.getChild(this);
   }
 
+  @Override
   public void setInputDataItem(InputDataItem inputDataItem) {
     inputDataItemChild.setChild(this, inputDataItem);
   }
 
+  @Override
   public OutputDataItem getOutputDataItem() {
     return outputDataItemChild.getChild(this);
   }
 
+  @Override
   public void setOutputDataItem(OutputDataItem outputDataItem) {
     outputDataItemChild.setChild(this, outputDataItem);
   }
 
+  @Override
   public Collection<ComplexBehaviorDefinition> getComplexBehaviorDefinitions() {
     return complexBehaviorDefinitionCollection.get(this);
   }
 
+  @Override
   public CompletionCondition getCompletionCondition() {
     return completionConditionChild.getChild(this);
   }
 
+  @Override
   public void setCompletionCondition(CompletionCondition completionCondition) {
     completionConditionChild.setChild(this, completionCondition);
   }
 
+  @Override
   public boolean isSequential() {
     return isSequentialAttribute.getValue(this);
   }
 
+  @Override
   public void setSequential(boolean sequential) {
     isSequentialAttribute.setValue(this, sequential);
   }
 
+  @Override
   public MultiInstanceFlowCondition getBehavior() {
     return behaviorAttribute.getValue(this);
   }
 
+  @Override
   public void setBehavior(MultiInstanceFlowCondition behavior) {
     behaviorAttribute.setValue(this, behavior);
   }
 
+  @Override
   public EventDefinition getOneBehaviorEventRef() {
     return oneBehaviorEventRefAttribute.getReferenceTargetElement(this);
   }
 
+  @Override
   public void setOneBehaviorEventRef(EventDefinition oneBehaviorEventRef) {
     oneBehaviorEventRefAttribute.setReferenceTargetElement(this, oneBehaviorEventRef);
   }
 
+  @Override
   public EventDefinition getNoneBehaviorEventRef() {
     return noneBehaviorEventRefAttribute.getReferenceTargetElement(this);
   }
 
+  @Override
   public void setNoneBehaviorEventRef(EventDefinition noneBehaviorEventRef) {
     noneBehaviorEventRefAttribute.setReferenceTargetElement(this, noneBehaviorEventRef);
   }
