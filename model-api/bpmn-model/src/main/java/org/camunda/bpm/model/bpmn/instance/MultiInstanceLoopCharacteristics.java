@@ -66,4 +66,16 @@ public interface MultiInstanceLoopCharacteristics extends LoopCharacteristics {
 
   void setNoneBehaviorEventRef(EventDefinition noneBehaviorEventRef);
 
+  boolean isCamundaAsyncBefore();
+
+  void setCamundaAsyncBefore(boolean isCamundaAsyncBefore);
+
+  boolean isCamundaAsyncAfter();
+
+  void setCamundaAsyncAfter(boolean isCamundaAsyncAfter);
+
+  boolean isCamundaExclusive();
+
+  void setCamundaExclusive(boolean isCamundaExclusive);
+
 }
