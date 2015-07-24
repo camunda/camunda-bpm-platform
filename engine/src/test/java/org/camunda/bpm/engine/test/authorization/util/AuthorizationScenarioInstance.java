@@ -13,8 +13,8 @@
 package org.camunda.bpm.engine.test.authorization.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,6 +27,8 @@ import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.junit.Assert;
+
+import static org.hamcrest.Matchers.containsInAnyOrder;
 
 /**
  * @author Thorben Lindhauer
@@ -77,54 +79,27 @@ public class AuthorizationScenarioInstance {
       String failureMessage = describeScenarioFailure("Expected an authorization exception but the message was wrong: " + e.getMessage());
 
       List<MissingAuthorization> infos = new ArrayList<MissingAuthorization>(e.getInfo());
-      Assert.assertEquals(describeScenarioFailure("Expected " + missingAuthorizations.size() + " ExceptionInfo(s). Received: + " + infos),
-          missingAuthorizations.size(), infos.size());
+      //Cast is done due to method signature, if it is not explicitly casted there is compile time error.
+      Assert.assertThat(infos, containsInAnyOrder((Collection) MissingAuthorizationMatcher.asMatchers(missingAuthorizations)));
 
       for (Authorization missingAuthorization : missingAuthorizations) {
         Assert.assertTrue(failureMessage, message.contains(missingAuthorization.getUserId()));
         Assert.assertEquals(missingAuthorization.getUserId(), e.getUserId());
 
-        String expectedPermissionName = "";
         for (Permission permission : missingAuthorization.getPermissions(Permissions.values())) {
           if (permission != Permissions.NONE) {
-            expectedPermissionName = permission.getName();
-            Assert.assertTrue(failureMessage, message.contains(expectedPermissionName));
+            Assert.assertTrue(failureMessage, message.contains(permission.getName()));
           }
         }
 
-        String expectedResourceId = null;
         if (!Authorization.ANY.equals(missingAuthorization.getResourceId())) {
           // missing ANY authorizations are not explicitly represented in the error message
-          expectedResourceId = missingAuthorization.getResourceId();
-          Assert.assertTrue(failureMessage, message.contains(expectedResourceId));
+          Assert.assertTrue(failureMessage, message.contains(missingAuthorization.getResourceId()));
         }
 
         Resource resource = AuthorizationTestUtil.getResourceByType(missingAuthorization.getResourceType());
-        String expectedResourceName = resource.resourceName();
-        Assert.assertTrue(failureMessage, message.contains(expectedResourceName));
-        Iterator<MissingAuthorization> iterator = infos.iterator();
-        boolean found = false;
-        while (iterator.hasNext()) {
-          MissingAuthorization next = iterator.next();
-          try {
-            AuthorizationTestUtil.assertExceptionInfo(expectedPermissionName, expectedResourceName, expectedResourceId, next);
-            iterator.remove();
-            found = true;
-            break;
-          } catch (AssertionError error) {
-            //It might not be present
-          }
-        }
-        Assert.assertTrue(
-            describeScenarioFailure("Expected ExceptionInfo for missing authorization " + missingAuthorization + " but it was not found in ." + infos), found);
+        Assert.assertTrue(failureMessage, message.contains(resource.resourceName()));
       }
-
-      // TODO: properties are nicer for assertion, but are not always used
-//      Assert.assertEquals(firstMissingAuthorization.resourceId, e.getResourceId());
-//      Assert.assertEquals(firstMissingAuthorization.resource.resourceName(), e.getResourceType());
-//      Assert.assertEquals(firstMissingAuthorization.userId, e.getUserId());
-//      Assert.assertEquals(firstMissingAuthorization.permissions[0].getName(), e.getViolatedPermissionName());
-
     }
     else if (missingAuthorizations.isEmpty() && e == null) {
       // nothing to do
