@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda.bpm.wildfly9</groupId>
     <artifactId>camunda-wildfly9</artifactId>
-    <version>7.3.0-SNAPSHOT</version>
+    <version>7.4.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-bpm-wildfly9</artifactId>
