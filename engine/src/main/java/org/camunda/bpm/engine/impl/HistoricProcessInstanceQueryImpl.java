@@ -26,7 +26,7 @@ import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-
+import org.camunda.bpm.engine.impl.util.CompareUtil;
 
 /**
  * @author Tom Baeyens
@@ -174,6 +174,16 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   public HistoricProcessInstanceQuery caseInstanceId(String caseInstanceId) {
     this.caseInstanceId = caseInstanceId;
     return this;
+  }
+
+  @Override
+  protected boolean hasExcludingConditions() {
+    return super.hasExcludingConditions()
+      || (finished && unfinished)
+      || CompareUtil.areNotInAscendingOrder(startedAfter, startedBefore)
+      || CompareUtil.areNotInAscendingOrder(finishedAfter, finishedBefore)
+      || CompareUtil.elementIsContainedInList(processDefinitionKey, processKeyNotIn)
+      || CompareUtil.elementIsNotContainedInList(processInstanceId, processInstanceIds);
   }
 
 	public HistoricProcessInstanceQuery orderByProcessInstanceBusinessKey() {

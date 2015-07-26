@@ -155,6 +155,9 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
       assertEquals(variableValue, variableInstance.getValue());
       assertEquals("string", variableInstance.getTypeName());
     }
+
+    assertEquals(1, runtimeService.createVariableInstanceQuery().variableName("task").variableNameIn("task", "execution").count());
+    assertEquals(0, runtimeService.createVariableInstanceQuery().variableName("task").variableNameIn("process", "execution").count());
   }
 
   @Test

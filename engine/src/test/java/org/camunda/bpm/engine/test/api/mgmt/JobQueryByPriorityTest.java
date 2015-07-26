@@ -75,6 +75,21 @@ public class JobQueryByPriorityTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/jobPrioExpressionProcess.bpmn20.xml")
+  public void testFilterByJobPriorityLowerThanOrEqualsAndHigherThanOrEqual() {
+    // given five jobs with priorities from 1 to 5
+    List<ProcessInstance> instances = new ArrayList<ProcessInstance>();
+
+    for (int i = 0; i < 5; i++) {
+      instances.add(runtimeService.startProcessInstanceByKey("jobPrioExpressionProcess",
+          Variables.createVariables().putValue("priority", i)));
+    }
+
+    // when making a job query and filtering by disjunctive job priority
+    // then the no jobs are returned
+    assertEquals(0, managementService.createJobQuery().priorityLowerThanOrEquals(2).priorityHigherThanOrEquals(3).count());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/jobPrioExpressionProcess.bpmn20.xml")
   public void testFilterByJobPriorityHigherThanOrEquals() {
     // given five jobs with priorities from 1 to 5
     List<ProcessInstance> instances = new ArrayList<ProcessInstance>();

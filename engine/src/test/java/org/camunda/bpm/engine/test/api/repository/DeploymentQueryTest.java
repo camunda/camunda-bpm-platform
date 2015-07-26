@@ -220,6 +220,13 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
       .deploymentBefore(earlier)
       .count();
     assertEquals(0, count);
+
+    count = repositoryService
+        .createDeploymentQuery()
+        .deploymentAfter(later)
+        .deploymentBefore(earlier)
+        .count();
+    assertEquals(0, count);
   }
 
   public void testVerifyDeploymentProperties() {

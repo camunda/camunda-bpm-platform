@@ -364,6 +364,18 @@ public class JobQueryTest extends PluggableProcessEngineTestCase {
     verifyQueryResults(query, 0);
   }
 
+  public void testQueryByDuedateCombinations() {
+    JobQuery query = managementService.createJobQuery()
+        .duedateHigherThan(testStartTime)
+        .duedateLowerThan(new Date(timerThreeFireTime.getTime() + ONE_SECOND));
+    verifyQueryResults(query, 3);
+
+    query = managementService.createJobQuery()
+        .duedateHigherThan(new Date(timerThreeFireTime.getTime() + ONE_SECOND))
+        .duedateLowerThan(testStartTime);
+    verifyQueryResults(query, 0);
+  }
+
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
   public void testQueryByException() {
     JobQuery query = managementService.createJobQuery().withException();

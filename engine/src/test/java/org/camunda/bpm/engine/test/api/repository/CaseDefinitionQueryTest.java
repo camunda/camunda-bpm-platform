@@ -76,6 +76,8 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
 
     // collect all ids
     List<CaseDefinition> caseDefinitions = repositoryService.createCaseDefinitionQuery().list();
+    // no point of the test if the caseDefinitions is empty
+    assertFalse(caseDefinitions.isEmpty());
     List<String> ids = new ArrayList<String>();
     for (CaseDefinition caseDefinition : caseDefinitions) {
       ids.add(caseDefinition.getId());
@@ -91,6 +93,11 @@ public class CaseDefinitionQueryTest extends AbstractDefinitionQueryTest {
         fail("Expected to find case definition "+ caseDefinition);
       }
     }
+
+    assertEquals(0, repositoryService.createCaseDefinitionQuery()
+        .caseDefinitionIdIn(ids.toArray(new String[ids.size()]))
+        .caseDefinitionId("nonExistent")
+        .count());
   }
 
   public void testQueryByDeploymentId() {

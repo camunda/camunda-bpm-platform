@@ -22,7 +22,7 @@ import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.pvm.runtime.ActivityInstanceState;
-
+import org.camunda.bpm.engine.impl.util.CompareUtil;
 
 /**
  * @author Tom Baeyens
@@ -150,6 +150,13 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
   public HistoricActivityInstanceQueryImpl finishedBefore(Date date) {
     finishedBefore = date;
     return this;
+  }
+
+  @Override
+  protected boolean hasExcludingConditions() {
+    return super.hasExcludingConditions()
+      || CompareUtil.areNotInAscendingOrder(startedAfter, startedBefore)
+      || CompareUtil.areNotInAscendingOrder(finishedAfter, finishedBefore);
   }
 
   // ordering /////////////////////////////////////////////////////////////////
