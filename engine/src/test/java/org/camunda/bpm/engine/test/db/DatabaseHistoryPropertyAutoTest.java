@@ -45,7 +45,7 @@ public class DatabaseHistoryPropertyAutoTest {
 
 
   @Test
-  public void fail_when_second_engine_does_not_have_the_same_historyLevel() {
+  public void failWhenSecondEngineDoesNotHaveTheSameHistoryLevel() {
     processEngineImpl = (ProcessEngineImpl) config("true", ProcessEngineConfiguration.HISTORY_FULL).buildProcessEngine();
 
     thrown.expect(ProcessEngineException.class);
@@ -55,7 +55,7 @@ public class DatabaseHistoryPropertyAutoTest {
   }
 
   @Test
-  public void second_engine_copies_historyLevel_from_first() {
+  public void secondEngineCopiesHistoryLevelFromFirst() {
     processEngineImpl = (ProcessEngineImpl) config("true", ProcessEngineConfiguration.HISTORY_FULL).buildProcessEngine();
 
     final ProcessEngineImpl processEngine = (ProcessEngineImpl) config(ProcessEngineConfiguration.HISTORY_AUTO).buildProcessEngine();
@@ -64,7 +64,7 @@ public class DatabaseHistoryPropertyAutoTest {
   }
 
   @Test
-  public void uses_default_value_audit_when_no_value_is_configured() {
+  public void usesDefaultValueAuditWhenNoValueIsConfigured() {
     final ProcessEngineConfigurationImpl config = config("true", ProcessEngineConfiguration.HISTORY_AUTO);
     processEngineImpl = (ProcessEngineImpl) config.buildProcessEngine();
 
@@ -77,6 +77,7 @@ public class DatabaseHistoryPropertyAutoTest {
 
     assertThat(level, equalTo(HistoryLevel.HISTORY_LEVEL_AUDIT.getId()));
 
+    assertThat(processEngineImpl.getProcessEngineConfiguration().getHistoryLevel(), equalTo(HistoryLevel.HISTORY_LEVEL_AUDIT));
   }
 
   @After

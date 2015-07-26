@@ -1,10 +1,12 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventType;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.hamcrest.CoreMatchers;
 import org.junit.After;
@@ -12,14 +14,16 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.UUID;
 
 import static org.junit.Assert.assertThat;
 
 public class DetermineHistoryLevelCmdTest {
 
+  @Rule
+  public final ExpectedException thrown = ExpectedException.none();
 
   private ProcessEngineImpl processEngineImpl;
 
@@ -53,7 +57,7 @@ public class DetermineHistoryLevelCmdTest {
 
 
   @Test
-  public void use_default_level_audit() throws Exception {
+  public void useDefaultLevelAudit() throws Exception {
     final ProcessEngineConfigurationImpl config = config("true", ProcessEngineConfiguration.HISTORY_AUTO);
 
     // init the db with level=auto -> audit
@@ -63,6 +67,35 @@ public class DetermineHistoryLevelCmdTest {
 
     // the history Level has been overwritten with audit
     assertThat(config.getHistoryLevel(), CoreMatchers.equalTo(HistoryLevel.HISTORY_LEVEL_AUDIT));
+  }
+
+  @Test
+  public void failWhenExistingHistoryLevelIsNotRegistered() {
+    // init the db with custom level
+    HistoryLevel customLevel = new HistoryLevel() {
+      @Override
+      public int getId() {
+        return 99;
+      }
+
+      @Override
+      public String getName() {
+        return "custom";
+      }
+
+      @Override
+      public boolean isHistoryEventProduced(HistoryEventType eventType, Object entity) {
+        return false;
+      }
+    };
+    final ProcessEngineConfigurationImpl config = config("true", "custom");
+    config.setCustomHistoryLevels(Arrays.asList(customLevel));
+    processEngineImpl = (ProcessEngineImpl) config.buildProcessEngine();
+
+    thrown.expect(ProcessEngineException.class);
+    thrown.expectMessage("The configured history level with id='99' is not registered in this config.");
+
+    config.getCommandExecutorSchemaOperations().execute(new DetermineHistoryLevelCmd(Collections.EMPTY_LIST));
   }
 
   @After

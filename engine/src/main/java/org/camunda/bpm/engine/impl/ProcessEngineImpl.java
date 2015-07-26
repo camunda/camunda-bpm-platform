@@ -70,12 +70,6 @@ public class ProcessEngineImpl implements ProcessEngine {
 
   public ProcessEngineImpl(final ProcessEngineConfigurationImpl processEngineConfiguration) {
 
-    if (ProcessEngineConfiguration.HISTORY_AUTO.equals(processEngineConfiguration.getHistory())) {
-      final HistoryLevel historyLevel = processEngineConfiguration.getCommandExecutorSchemaOperations().execute(new DetermineHistoryLevelCmd(processEngineConfiguration.getHistoryLevels()));
-      processEngineConfiguration.setHistory(historyLevel.getName());
-      processEngineConfiguration.setHistoryLevel(historyLevel);
-    }
-
     this.processEngineConfiguration = processEngineConfiguration;
     this.name = processEngineConfiguration.getProcessEngineName();
     this.repositoryService = processEngineConfiguration.getRepositoryService();
