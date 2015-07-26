@@ -16,6 +16,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -31,6 +32,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.util.CompareUtil;
 import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
@@ -706,6 +708,19 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   public TaskQuery taskNameCaseInsensitive() {
     this.taskNameCaseInsensitive = true;
     return this;
+  }
+
+  @Override
+  public boolean isValid() {
+    boolean valid = super.isValid();
+    valid = valid && CompareUtil.validateOrder(minPriority, priority, maxPriority);
+    valid = valid && CompareUtil.validateOrder(dueAfter, dueDate, dueBefore);
+    valid = valid && CompareUtil.validateOrder(followUpAfter, followUpDate, followUpBefore);
+    valid = valid && CompareUtil.validateOrder(createTimeAfter, createTime, createTimeBefore);
+    valid = valid && CompareUtil.validateContains(key, taskDefinitionKeys);
+    valid = valid && CompareUtil.validateContains(processDefinitionKey, processDefinitionKeys);
+    valid = valid && CompareUtil.validateContains(processInstanceBusinessKey, processInstanceBusinessKeys);
+    return valid;
   }
 
   public List<String> getCandidateGroups() {

@@ -18,6 +18,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNull;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -28,7 +29,7 @@ import org.camunda.bpm.engine.history.HistoricCaseInstanceQuery;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-
+import org.camunda.bpm.engine.impl.util.CompareUtil;
 
 /**
  * @author Sebastian Menski
@@ -246,6 +247,16 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     return commandContext
       .getHistoricCaseInstanceManager()
       .findHistoricCaseInstancesByQueryCriteria(this, page);
+  }
+
+  @Override
+  public boolean isValid() {
+    boolean valid = super.isValid();
+    valid = valid && CompareUtil.validateOrder(createdAfter, createdBefore);
+    valid = valid && CompareUtil.validateOrder(closedAfter, closedBefore);
+    valid = valid && CompareUtil.validateContains(caseInstanceId, caseInstanceIds);
+    valid = valid && CompareUtil.validateNotContains(caseDefinitionKey, caseKeyNotIn);
+    return valid;
   }
 
   public String getBusinessKey() {

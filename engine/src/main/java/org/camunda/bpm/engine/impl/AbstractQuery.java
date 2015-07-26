@@ -175,7 +175,7 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   public long evaluateExpressionsAndExecuteCount(CommandContext commandContext) {
     validate();
     evaluateExpressions();
-    return executeCount(commandContext);
+    return isValid() ? executeCount(commandContext) : 0l;
   }
 
   public abstract long executeCount(CommandContext commandContext);
@@ -183,7 +183,19 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   public List<U> evaluateExpressionsAndExecuteList(CommandContext commandContext, Page page) {
     validate();
     evaluateExpressions();
-    return executeList(commandContext, page);
+    return isValid() ? executeList(commandContext, page) : new ArrayList<U>();
+  }
+
+  /**
+   * Whether or not the query is valid. If the query is invalid the SQL
+   * query is avoided and default result is returned. The returned
+   * result is the same as if the SQL was executed and there were no entries.
+   *
+   * @return Whether or not the query is valid
+   */
+  protected boolean isValid() {
+    checkQueryOk();
+    return true;
   }
 
   /**
@@ -193,7 +205,7 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   public abstract List<U> executeList(CommandContext commandContext, Page page);
 
   public U executeSingleResult(CommandContext commandContext) {
-    List<U> results = evaluateExpressionsAndExecuteList(commandContext, null);
+    List<U> results = isValid() ? evaluateExpressionsAndExecuteList(commandContext, null) : new ArrayList<U>();
     if (results.size() == 1) {
       return results.get(0);
     } else if (results.size() > 1) {
