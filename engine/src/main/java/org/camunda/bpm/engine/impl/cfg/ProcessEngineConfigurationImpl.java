@@ -46,6 +46,10 @@ import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
+import org.camunda.bpm.dmn.engine.DmnEngine;
+import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
+import org.camunda.bpm.dmn.engine.impl.DmnEngineConfigurationImpl;
+import org.camunda.bpm.dmn.scriptengine.DmnScriptEngineFactory;
 import org.camunda.bpm.engine.ArtifactFactory;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.CaseService;
@@ -102,6 +106,7 @@ import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.delegate.DefaultDelegateInterceptor;
 import org.camunda.bpm.engine.impl.digest.PasswordEncryptor;
 import org.camunda.bpm.engine.impl.digest.ShaHashDigest;
+import org.camunda.bpm.engine.impl.dmn.configuration.ProcessEngineDmnEngineConfiguration;
 import org.camunda.bpm.engine.impl.dmn.deployer.DmnDeployer;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionManager;
 import org.camunda.bpm.engine.impl.dmn.handler.DecisionDefinitionHandler;
@@ -392,8 +397,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected DefaultCmmnElementHandlerRegistry cmmnElementHandlerRegistry;
 
   // dmn
-  protected DmnTransformFactory dmnTransformFactory;
-  protected DmnElementHandlerRegistry dmnElementHandlerRegistry;
+  protected DmnEngineConfiguration dmnEngineConfiguration;
+  protected DmnEngine dmnEngine;
 
   protected HistoryLevel historyLevel;
 
@@ -408,9 +413,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected List<CmmnTransformListener> customPreCmmnTransformListeners;
   protected List<CmmnTransformListener> customPostCmmnTransformListeners;
-
-  protected List<DmnTransformListener> customPreDmnTransformListeners;
-  protected List<DmnTransformListener> customPostDmnTransformListeners;
 
   protected Map<Object, Object> beans;
 
@@ -519,6 +521,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initFormTypes();
     initFormFieldValidators();
     initScripting();
+    initDmnEngine();
     initBusinessCalendarManager();
     initCommandContextFactory();
     initTransactionContextFactory();
@@ -1098,33 +1101,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected DmnDeployer getDmnDeployer() {
     DmnDeployer dmnDeployer = new DmnDeployer();
     dmnDeployer.setIdGenerator(idGenerator);
-
-    if (dmnTransformFactory == null) {
-      dmnTransformFactory = new DmnTransformFactoryImpl();
-    }
-
-    if (dmnElementHandlerRegistry == null) {
-      dmnElementHandlerRegistry = new ProcessEngineDmnElementHandlerRegistry();
-    }
-
-    DmnTransformer dmnTransformer = new DmnTransformerImpl(dmnTransformFactory, dmnElementHandlerRegistry);
-
-    List<DmnTransformListener> transformListeners = dmnTransformer.getTransformListeners();
-    if (customPreDmnTransformListeners != null) {
-      transformListeners.addAll(customPreDmnTransformListeners);
-    }
-    transformListeners.addAll(getDefaultDmnTransformListeners());
-    if (customPostDmnTransformListeners != null) {
-      transformListeners.addAll(customPostDmnTransformListeners);
-    }
-
-    dmnDeployer.setTransformer(dmnTransformer);
-
+    dmnDeployer.setTransformer(dmnEngineConfiguration.getTransformer());
     return dmnDeployer;
-  }
-
-  protected List<DmnTransformListener> getDefaultDmnTransformListeners() {
-    return Collections.emptyList();
   }
 
   // job executor /////////////////////////////////////////////////////////////
@@ -1417,6 +1395,20 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     if(scriptingEnvironment == null) {
       scriptingEnvironment = new ScriptingEnvironment(scriptFactory, scriptEnvResolvers, scriptingEngines);
     }
+  }
+
+  protected void initDmnEngine() {
+    if (dmnEngine == null) {
+      if (dmnEngineConfiguration == null) {
+        dmnEngineConfiguration = new ProcessEngineDmnEngineConfiguration(scriptingEngines);
+      }
+      dmnEngine = dmnEngineConfiguration.buildEngine();
+    }
+    else if (dmnEngineConfiguration == null) {
+      dmnEngineConfiguration = dmnEngine.getConfiguration();
+    }
+
+    scriptingEngines.addScriptEngineFactory(new DmnScriptEngineFactory(dmnEngine));
   }
 
   protected void initExpressionManager() {
