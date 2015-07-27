@@ -246,13 +246,13 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.model.dmn.instance.Decision;
 import org.camunda.bpm.model.dmn.instance.DecisionTable;
-import org.camunda.dmn.engine.handler.DmnElementHandlerRegistry;
-import org.camunda.dmn.engine.impl.handler.DmnElementHandlerRegistryImpl;
-import org.camunda.dmn.engine.impl.transform.DmnTransformFactoryImpl;
-import org.camunda.dmn.engine.impl.transform.DmnTransformerImpl;
-import org.camunda.dmn.engine.transform.DmnTransformFactory;
-import org.camunda.dmn.engine.transform.DmnTransformListener;
-import org.camunda.dmn.engine.transform.DmnTransformer;
+import org.camunda.bpm.dmn.engine.handler.DmnElementHandlerRegistry;
+import org.camunda.bpm.dmn.engine.impl.handler.DmnElementHandlerRegistryImpl;
+import org.camunda.bpm.dmn.engine.impl.transform.DmnTransformFactoryImpl;
+import org.camunda.bpm.dmn.engine.impl.transform.DmnTransformerImpl;
+import org.camunda.bpm.dmn.engine.transform.DmnTransformFactory;
+import org.camunda.bpm.dmn.engine.transform.DmnTransformListener;
+import org.camunda.bpm.dmn.engine.transform.DmnTransformer;
 
 
 /**

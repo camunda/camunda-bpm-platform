@@ -27,11 +27,11 @@
     </dependency>
 
     <dependency>
-      <groupId>org.camunda.dmn</groupId>
+      <groupId>org.camunda.bpm.dmn</groupId>
       <artifactId>camunda-scriptengine-dmn</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>org.camunda.dmn</groupId>
+          <groupId>org.camunda.bpm.dmn</groupId>
           <artifactId>camunda-scriptengine-juel</artifactId>
         </exclusion>
       </exclusions>

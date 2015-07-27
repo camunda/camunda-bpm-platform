@@ -70,12 +70,12 @@
     </dependency>
 
     <dependency>
-      <groupId>org.camunda.dmn</groupId>
+      <groupId>org.camunda.bpm.dmn</groupId>
       <artifactId>camunda-engine-dmn</artifactId>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
-          <groupId>org.camunda.dmn</groupId>
+          <groupId>org.camunda.bpm.dmn</groupId>
           <artifactId>camunda-scriptengine-juel</artifactId>
         </exclusion>
       </exclusions>

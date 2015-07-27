@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
 import org.camunda.bpm.engine.impl.scripting.ScriptFactory;
 import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
-import org.camunda.dmn.scriptengine.DmnScriptEngine;
+import org.camunda.bpm.dmn.scriptengine.DmnScriptEngine;
 
 /**
  * <p>The scripting environment contains scripts that provide an environment to

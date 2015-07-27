@@ -22,7 +22,7 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
-import org.camunda.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -71,7 +71,7 @@ public class DmnScriptEngineSupportTest extends AbstractFoxPlatformIntegrationTe
   @Test
   public void testDmnClassesAvailable() {
     try {
-      Class.forName("org.camunda.dmn.engine.impl.DmnEngineImpl");
+      Class.forName("org.camunda.bpm.dmn.engine.impl.DmnEngineImpl");
     }
     catch (ClassNotFoundException e) {
       fail("DMN engine not available");
@@ -85,7 +85,7 @@ public class DmnScriptEngineSupportTest extends AbstractFoxPlatformIntegrationTe
     }
 
     try {
-      Class.forName("org.camunda.dmn.scriptengine.DmnScriptEngine");
+      Class.forName("org.camunda.bpm.dmn.scriptengine.DmnScriptEngine");
     }
     catch (ClassNotFoundException e) {
       fail("DMN scriptengine not available");

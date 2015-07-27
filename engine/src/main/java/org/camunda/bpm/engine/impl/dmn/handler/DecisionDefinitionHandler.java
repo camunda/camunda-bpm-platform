@@ -15,9 +15,9 @@ package org.camunda.bpm.engine.impl.dmn.handler;
 
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.model.dmn.instance.DecisionTable;
-import org.camunda.dmn.engine.DmnDecisionModel;
-import org.camunda.dmn.engine.handler.DmnElementHandlerContext;
-import org.camunda.dmn.engine.impl.handler.AbstractDmnDecisionTableHandler;
+import org.camunda.bpm.dmn.engine.DmnDecisionModel;
+import org.camunda.bpm.dmn.engine.handler.DmnElementHandlerContext;
+import org.camunda.bpm.dmn.engine.impl.handler.AbstractDmnDecisionTableHandler;
 
 public class DecisionDefinitionHandler extends AbstractDmnDecisionTableHandler<DecisionDefinitionEntity> {
 

@@ -1,4 +1,4 @@
-<module xmlns="urn:jboss:module:1.0" name="org.camunda.dmn.camunda-engine-dmn">
+<module xmlns="urn:jboss:module:1.0" name="org.camunda.bpm.dmn.camunda-engine-dmn">
   <resources>
     <resource-root path="camunda-engine-dmn-@project.version@.jar" />
   </resources>
