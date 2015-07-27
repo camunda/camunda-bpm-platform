@@ -18,6 +18,7 @@ import org.junit.Test;
  */
 public class DatabaseHistoryPropertyTest {
 
+
   private static ProcessEngineImpl processEngineImpl;
 
   // make sure schema is dropped

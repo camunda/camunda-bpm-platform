@@ -12,11 +12,10 @@
  */
 package org.camunda.bpm.engine.impl;
 
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cmd.DetermineHistoryLevelCmd;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.PersistenceSession;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
@@ -25,17 +24,19 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 
+import java.util.logging.Logger;
+
 /**
  * @author Tom Baeyens
  * @author Roman Smirnov
  * @author Sebastian Menski
  * @author Daniel Meyer
  */
-public final class SchemaOperationsProcessEngineBuild implements Command<Object> {
+public final class SchemaOperationsProcessEngineBuild implements Command<Void> {
 
   private final static Logger log = Logger.getLogger(SchemaOperationsProcessEngineBuild.class.getName());
 
-  public Object execute(CommandContext commandContext) {
+  public Void execute(final CommandContext commandContext) {
     String databaseSchemaUpdate = Context.getProcessEngineConfiguration().getDatabaseSchemaUpdate();
     PersistenceSession persistenceSession = commandContext.getSession(PersistenceSession.class);
     if (ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
@@ -72,14 +73,39 @@ public final class SchemaOperationsProcessEngineBuild implements Command<Object>
     log.info("Creating historyLevel property in database with value: " + processEngineConfiguration.getHistory());
   }
 
-  public void checkHistoryLevel(DbEntityManager entityManager) {
-    HistoryLevel configuredHistoryLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
-    PropertyEntity historyLevelProperty = entityManager.selectById(PropertyEntity.class, "historyLevel");
-    if (historyLevelProperty == null) {
+  /**
+   *
+   * @param entityManager entoty manager for db query
+   * @return Integer value representing the history level or <code>null</code> if none found
+   */
+  public static Integer databaseHistoryLevel(DbEntityManager entityManager) {
+
+    try {
+      PropertyEntity historyLevelProperty = entityManager.selectById(PropertyEntity.class, "historyLevel");
+      return historyLevelProperty != null ? new Integer(historyLevelProperty.getValue()) : null;
+    } catch (Exception e) {
+      log.warning("could not select property historyLevel: " + e.getMessage());
+      return null;
+    }
+
+  }
+
+  public void checkHistoryLevel(final DbEntityManager entityManager) {
+    final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+
+    if (ProcessEngineConfiguration.HISTORY_AUTO.equals(processEngineConfiguration.getHistory())) {
+      final HistoryLevel historyLevel = processEngineConfiguration.getCommandExecutorSchemaOperations().execute(new DetermineHistoryLevelCmd(processEngineConfiguration.getHistoryLevels()));
+      processEngineConfiguration.setHistory(historyLevel.getName());
+      processEngineConfiguration.setHistoryLevel(historyLevel);
+    }
+
+    HistoryLevel configuredHistoryLevel = processEngineConfiguration.getHistoryLevel();
+
+    Integer databaseHistoryLevel = databaseHistoryLevel(entityManager);
+    if (databaseHistoryLevel == null) {
       log.info("No historyLevel property found in database.");
       dbCreateHistoryLevel(entityManager);
     } else {
-      Integer databaseHistoryLevel = new Integer(historyLevelProperty.getValue());
       if (!((Integer) configuredHistoryLevel.getId()).equals(databaseHistoryLevel)) {
         throw new ProcessEngineException("historyLevel mismatch: configuration says " + configuredHistoryLevel + " and database says " + databaseHistoryLevel);
       }
