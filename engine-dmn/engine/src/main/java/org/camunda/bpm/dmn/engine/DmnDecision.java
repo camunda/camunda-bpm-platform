@@ -13,10 +13,6 @@
 
 package org.camunda.bpm.dmn.engine;
 
-import org.camunda.bpm.dmn.engine.context.DmnDecisionContext;
-
 public interface DmnDecision extends DmnElement {
-
-  DmnDecisionResult evaluate(DmnDecisionContext decisionContext);
 
 }

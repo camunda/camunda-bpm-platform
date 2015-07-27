@@ -19,6 +19,8 @@ import java.util.List;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 
+import org.camunda.bpm.dmn.engine.DmnEngine;
+
 public class DmnScriptEngineFactory implements ScriptEngineFactory {
 
   public static final String NAME = "dmn";
@@ -32,6 +34,16 @@ public class DmnScriptEngineFactory implements ScriptEngineFactory {
     names = Collections.unmodifiableList(Arrays.asList(NAME, "Dmn", "DMN"));
     extensions = Collections.unmodifiableList(Arrays.asList(NAME, "dmn10.xml"));
     mimeTypes = Collections.emptyList();
+  }
+
+  protected DmnEngine dmnEngine;
+
+  public DmnScriptEngineFactory() {
+
+  }
+
+  public DmnScriptEngineFactory(DmnEngine dmnEngine) {
+    this.dmnEngine = dmnEngine;
   }
 
   public String getEngineName() {
@@ -93,7 +105,12 @@ public class DmnScriptEngineFactory implements ScriptEngineFactory {
   }
 
   public ScriptEngine getScriptEngine() {
-    return new DmnScriptEngine(this);
+    if (dmnEngine != null) {
+      return new DmnScriptEngine(this, dmnEngine);
+    }
+    else {
+      return new DmnScriptEngine();
+    }
   }
 
 }

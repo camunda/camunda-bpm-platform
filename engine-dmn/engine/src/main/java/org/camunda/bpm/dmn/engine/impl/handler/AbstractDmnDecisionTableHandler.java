@@ -13,10 +13,10 @@
 
 package org.camunda.bpm.dmn.engine.impl.handler;
 
-import org.camunda.bpm.model.dmn.instance.Decision;
-import org.camunda.bpm.model.dmn.instance.DecisionTable;
 import org.camunda.bpm.dmn.engine.handler.DmnElementHandlerContext;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
+import org.camunda.bpm.model.dmn.instance.Decision;
+import org.camunda.bpm.model.dmn.instance.DecisionTable;
 
 public abstract class AbstractDmnDecisionTableHandler<E extends DmnDecisionTableImpl> extends AbstractDmnElementHandler<DecisionTable, E> {
 

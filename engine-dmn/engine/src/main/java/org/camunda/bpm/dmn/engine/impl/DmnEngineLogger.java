@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.dmn.engine.impl;
 
+import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnEngineException;
 import org.camunda.bpm.dmn.engine.DmnExpressionException;
 import org.camunda.bpm.dmn.engine.DmnTransformException;
@@ -78,4 +79,9 @@ public class DmnEngineLogger extends DmnLogger {
   public DmnExpressionException noScriptEngineFoundForLanguage(String expressionLanguage) {
     return new DmnExpressionException(exceptionMessage("015", "Unable to find script engine for expression language '{}'.", expressionLanguage));
   }
+
+  public DmnEngineException decisionTypeNotSupported(DmnDecision decision) {
+    return new DmnEngineException(exceptionMessage("016", "Decision type '{}' not supported by DMN engine.", decision.getClass()));
+  }
+
 }

@@ -13,9 +13,9 @@
 
 package org.camunda.bpm.dmn.engine.handler;
 
+import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnDecisionModel;
 import org.camunda.bpm.model.dmn.DmnModelInstance;
-import org.camunda.bpm.dmn.engine.DmnDecision;
 
 public interface DmnElementHandlerContext {
 

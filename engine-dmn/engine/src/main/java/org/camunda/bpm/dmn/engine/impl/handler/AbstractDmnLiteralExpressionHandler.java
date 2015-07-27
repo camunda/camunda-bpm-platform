@@ -13,13 +13,13 @@
 
 package org.camunda.bpm.dmn.engine.impl.handler;
 
-import org.camunda.bpm.dmn.engine.impl.context.DmnScriptContextImpl;
+import org.camunda.bpm.dmn.engine.handler.DmnElementHandlerContext;
+import org.camunda.bpm.dmn.engine.impl.DmnExpressionImpl;
+import org.camunda.bpm.dmn.engine.impl.context.DmnDecisionContextImpl;
+import org.camunda.bpm.dmn.juel.JuelScriptEngineFactory;
 import org.camunda.bpm.model.dmn.instance.LiteralExpression;
 import org.camunda.bpm.model.dmn.instance.Text;
 import org.camunda.commons.utils.StringUtil;
-import org.camunda.bpm.dmn.engine.handler.DmnElementHandlerContext;
-import org.camunda.bpm.dmn.engine.impl.DmnExpressionImpl;
-import org.camunda.bpm.dmn.juel.JuelScriptEngineFactory;
 
 public abstract class AbstractDmnLiteralExpressionHandler<E extends LiteralExpression, I extends DmnExpressionImpl> extends AbstractDmnElementHandler<E, I> {
 
@@ -59,7 +59,7 @@ public abstract class AbstractDmnLiteralExpressionHandler<E extends LiteralExpre
   protected boolean hasJuelExpressionLanguage(DmnExpressionImpl dmnExpression) {
     String expressionLanguage = dmnExpression.getExpressionLanguage();
     if (expressionLanguage == null) {
-      expressionLanguage = DmnScriptContextImpl.DEFAULT_SCRIPT_LANGUAGE;
+      expressionLanguage = DmnDecisionContextImpl.DEFAULT_SCRIPT_LANGUAGE;
     }
 
     return JuelScriptEngineFactory.NAME.equals(expressionLanguage);

@@ -17,22 +17,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.camunda.bpm.dmn.engine.context.DmnContextFactory;
-import org.camunda.bpm.dmn.engine.impl.handler.DmnElementHandlerRegistryImpl;
-import org.camunda.bpm.dmn.engine.transform.DmnTransformer;
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
+import org.camunda.bpm.dmn.engine.ScriptEngineResolver;
+import org.camunda.bpm.dmn.engine.context.DmnContextFactory;
 import org.camunda.bpm.dmn.engine.handler.DmnElementHandlerRegistry;
 import org.camunda.bpm.dmn.engine.impl.context.DmnContextFactoryImpl;
+import org.camunda.bpm.dmn.engine.impl.handler.DmnElementHandlerRegistryImpl;
 import org.camunda.bpm.dmn.engine.impl.transform.DmnTransformFactoryImpl;
 import org.camunda.bpm.dmn.engine.impl.transform.DmnTransformerImpl;
 import org.camunda.bpm.dmn.engine.transform.DmnTransformFactory;
 import org.camunda.bpm.dmn.engine.transform.DmnTransformListener;
-import org.camunda.bpm.dmn.juel.JuelScriptEngineFactory;
+import org.camunda.bpm.dmn.engine.transform.DmnTransformer;
 
 public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
 
-  protected String defaultExpressionLanguage;
   protected DmnContextFactory contextFactory;
 
   protected DmnTransformer transformer;
@@ -40,19 +39,7 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
   protected DmnElementHandlerRegistry elementHandlerRegistry;
   protected List<DmnTransformListener> customPreDmnTransformListeners = new ArrayList<DmnTransformListener>();
   protected List<DmnTransformListener> customPostDmnTransformListeners = new ArrayList<DmnTransformListener>();
-
-  public DmnEngineConfigurationImpl() {
-    defaultExpressionLanguage = JuelScriptEngineFactory.NAME;
-    contextFactory = new DmnContextFactoryImpl();
-  }
-
-  public String getDefaultExpressionLanguage() {
-    return defaultExpressionLanguage;
-  }
-
-  public void setDefaultExpressionLanguage(String expressionLanguage) {
-    this.defaultExpressionLanguage = expressionLanguage;
-  }
+  protected ScriptEngineResolver scriptEngineResolver;
 
   public DmnContextFactory getDmnContextFactory() {
     return contextFactory;
@@ -98,15 +85,31 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
     this.customPostDmnTransformListeners = customPostDmnTransformListeners;
   }
 
+  public ScriptEngineResolver getScriptEngineResolver() {
+    return scriptEngineResolver;
+  }
+
+  public void setScriptEngineResolver(ScriptEngineResolver scriptEngineResolver) {
+    this.scriptEngineResolver = scriptEngineResolver;
+  }
+
   public DmnEngine buildEngine() {
     init();
     return new DmnEngineImpl(this);
   }
 
   protected void init() {
+    initContextFactory();
     initTransformFactory();
     initElementHandlerRegistry();
     initTransformer();
+    initScriptEngineResolver();
+  }
+
+  protected void initContextFactory() {
+    if (contextFactory == null) {
+      contextFactory = new DmnContextFactoryImpl();
+    }
   }
 
   public void initTransformFactory() {
@@ -134,6 +137,12 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
 
   protected List<DmnTransformListener> getDefaultDmnTransformListeners() {
     return Collections.emptyList();
+  }
+
+  protected void initScriptEngineResolver() {
+    if (scriptEngineResolver == null) {
+      scriptEngineResolver = new DefaultScriptEngineResolver();
+    }
   }
 
 }

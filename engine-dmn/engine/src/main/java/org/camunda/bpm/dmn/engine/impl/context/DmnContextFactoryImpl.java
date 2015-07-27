@@ -15,7 +15,6 @@ package org.camunda.bpm.dmn.engine.impl.context;
 
 import org.camunda.bpm.dmn.engine.context.DmnContextFactory;
 import org.camunda.bpm.dmn.engine.context.DmnDecisionContext;
-import org.camunda.bpm.dmn.engine.context.DmnScriptContext;
 import org.camunda.bpm.dmn.engine.context.DmnVariableContext;
 
 public class DmnContextFactoryImpl implements DmnContextFactory {
@@ -23,16 +22,11 @@ public class DmnContextFactoryImpl implements DmnContextFactory {
   public DmnDecisionContext createDecisionContext() {
     DmnDecisionContextImpl decisionContext = new DmnDecisionContextImpl();
     decisionContext.setVariableContext(createVariableContext());
-    decisionContext.setScriptContext(createScriptContextContext());
     return decisionContext;
   }
 
   public DmnVariableContext createVariableContext() {
     return new DmnVariableContextImpl();
-  }
-
-  public DmnScriptContext createScriptContextContext() {
-    return new DmnScriptContextImpl();
   }
 
 }

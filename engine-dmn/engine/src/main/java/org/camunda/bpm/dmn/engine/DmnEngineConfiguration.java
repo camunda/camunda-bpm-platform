@@ -16,14 +16,12 @@ package org.camunda.bpm.dmn.engine;
 import java.util.List;
 
 import org.camunda.bpm.dmn.engine.context.DmnContextFactory;
-import org.camunda.bpm.dmn.engine.transform.DmnTransformer;
 import org.camunda.bpm.dmn.engine.handler.DmnElementHandlerRegistry;
 import org.camunda.bpm.dmn.engine.transform.DmnTransformFactory;
 import org.camunda.bpm.dmn.engine.transform.DmnTransformListener;
+import org.camunda.bpm.dmn.engine.transform.DmnTransformer;
 
 public interface DmnEngineConfiguration {
-
-  String getDefaultExpressionLanguage();
 
   DmnContextFactory getDmnContextFactory();
 
@@ -36,6 +34,8 @@ public interface DmnEngineConfiguration {
   List<DmnTransformListener> getCustomPreDmnTransformListeners();
 
   List<DmnTransformListener> getCustomPostDmnTransformListeners();
+
+  ScriptEngineResolver getScriptEngineResolver();
 
   DmnEngine buildEngine();
 

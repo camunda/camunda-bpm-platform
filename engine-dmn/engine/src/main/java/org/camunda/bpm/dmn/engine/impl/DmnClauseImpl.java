@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.dmn.engine.DmnClause;
-import org.camunda.bpm.dmn.engine.DmnExpression;
 import org.camunda.bpm.dmn.engine.DmnClauseEntry;
+import org.camunda.bpm.dmn.engine.DmnExpression;
 
 public class DmnClauseImpl extends DmnElementImpl implements DmnClause {
 

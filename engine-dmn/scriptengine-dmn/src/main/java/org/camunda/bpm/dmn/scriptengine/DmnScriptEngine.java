@@ -15,29 +15,27 @@ package org.camunda.bpm.dmn.scriptengine;
 
 import java.io.InputStream;
 import java.io.Reader;
+import java.util.HashMap;
+import java.util.Map;
 import javax.script.AbstractScriptEngine;
 import javax.script.Bindings;
 import javax.script.Compilable;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngineFactory;
-import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
-import org.camunda.commons.utils.IoUtil;
 import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnDecisionModel;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
-import org.camunda.bpm.dmn.engine.context.DmnDecisionContext;
-import org.camunda.bpm.dmn.engine.context.DmnVariableContext;
 import org.camunda.bpm.dmn.engine.impl.DmnEngineConfigurationImpl;
+import org.camunda.commons.utils.IoUtil;
 
 public class DmnScriptEngine extends AbstractScriptEngine implements Compilable {
 
   public static final String DECISION_ID_ATTRIBUTE = "decisionKey";
-  public static final String SCRIPT_ENGINE_MANAGER_ATTRIBUTE = "scriptEngineManager";
 
   protected ScriptEngineFactory scriptEngineFactory;
   protected DmnEngine dmnEngine;
@@ -58,6 +56,10 @@ public class DmnScriptEngine extends AbstractScriptEngine implements Compilable 
   public DmnScriptEngine(ScriptEngineFactory scriptEngineFactory, DmnEngine dmnEngine) {
     this.scriptEngineFactory = scriptEngineFactory;
     this.dmnEngine = dmnEngine;
+  }
+
+  public DmnEngine getDmnEngine() {
+    return dmnEngine;
   }
 
   public void setDmnEngine(DmnEngine dmnEngine) {
@@ -104,7 +106,8 @@ public class DmnScriptEngine extends AbstractScriptEngine implements Compilable 
   }
 
   public DmnDecisionResult eval(String script, String decisionKey, ScriptContext context) throws ScriptException {
-    DmnDecisionContext decisionContext = getDmnDecisionContext(context);
+    Map<String, Object> variables = getVariables(context);
+
     DmnDecisionModel dmnDecisionModel = parseDmnDecisionModel(script);
     DmnDecision decision;
     if (decisionKey != null) {
@@ -115,7 +118,7 @@ public class DmnScriptEngine extends AbstractScriptEngine implements Compilable 
     }
 
     try {
-      return decision.evaluate(decisionContext);
+      return dmnEngine.evaluate(decision, variables);
     }
     catch (Exception e) {
       throw new ScriptException(e);
@@ -175,25 +178,17 @@ public class DmnScriptEngine extends AbstractScriptEngine implements Compilable 
     return dmnEngine.parseDecisionModel(inputStream);
   }
 
-  protected DmnDecisionContext getDmnDecisionContext(ScriptContext context) {
-    DmnDecisionContext decisionContext = createDmnDecisionContext();
-    DmnVariableContext variableContext = decisionContext.getVariableContextChecked();
+  protected Map<String, Object> getVariables(ScriptContext context) {
+    Map<String, Object> variables = new HashMap<String, Object>();
+
     Integer[] scopes = new Integer[] {ScriptContext.GLOBAL_SCOPE, ScriptContext.ENGINE_SCOPE};
 
     for (Integer scope : scopes) {
       Bindings bindings = context.getBindings(scope);
-      variableContext.setVariables(bindings);
+      variables.putAll(bindings);
     }
 
-    if (context != null) {
-      // set script engine manager
-      ScriptEngineManager scriptEngineManager = (ScriptEngineManager) getScriptContextAttribute(context, SCRIPT_ENGINE_MANAGER_ATTRIBUTE);
-      if (scriptEngineManager != null) {
-        decisionContext.getScriptContext().setScriptEngineManager(scriptEngineManager);
-      }
-    }
-
-    return decisionContext;
+    return variables;
   }
 
   protected String getDecisionKey(ScriptContext context) {
@@ -202,10 +197,6 @@ public class DmnScriptEngine extends AbstractScriptEngine implements Compilable 
       decisionKey = (String) getScriptContextAttribute(context, DECISION_ID_ATTRIBUTE);
     }
     return decisionKey;
-  }
-
-  protected DmnDecisionContext createDmnDecisionContext() {
-    return dmnEngine.getConfiguration().getDmnContextFactory().createDecisionContext();
   }
 
   @Override

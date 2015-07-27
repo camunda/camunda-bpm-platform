@@ -13,11 +13,12 @@
 
 package org.camunda.bpm.dmn.engine.context;
 
+import org.camunda.bpm.dmn.engine.DmnDecision;
+import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
-import org.camunda.bpm.dmn.engine.DmnDecisionTable;
 import org.camunda.bpm.dmn.engine.DmnExpression;
 import org.camunda.bpm.dmn.engine.DmnRule;
-import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
+import org.camunda.bpm.dmn.engine.ScriptEngineResolver;
 
 public interface DmnDecisionContext {
 
@@ -27,13 +28,11 @@ public interface DmnDecisionContext {
 
   DmnVariableContext getVariableContextChecked();
 
-  void setScriptContext(DmnScriptContext scriptContext);
+  void setScriptEngineResolver(ScriptEngineResolver scriptEngineResolver);
 
-  DmnScriptContext getScriptContext();
+  ScriptEngineResolver getScriptEngineResolver();
 
-  DmnScriptContext getScriptContextChecked();
-
-  DmnDecisionResult evaluate(DmnDecisionTable decision);
+  DmnDecisionResult evaluate(DmnDecision decision);
 
   boolean isApplicable(DmnRule rule);
 

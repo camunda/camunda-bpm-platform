@@ -13,32 +13,26 @@
 
 package org.camunda.bpm.dmn.engine.test.asserts;
 
-import java.util.Arrays;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.assertj.core.api.AbstractAssert;
+import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnDecisionModel;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnEngine;
-import org.camunda.bpm.dmn.engine.context.DmnContextFactory;
-import org.camunda.bpm.dmn.engine.context.DmnDecisionContext;
-import org.camunda.bpm.dmn.engine.context.DmnDecisionContextBuilder;
-import org.camunda.bpm.dmn.engine.context.DmnScriptContext;
-import org.camunda.bpm.dmn.engine.context.DmnVariableContext;
-import org.camunda.bpm.dmn.engine.DmnDecision;
 
 public class DmnEngineAssertion extends AbstractAssert<DmnEngineAssertion, DmnEngine> {
 
   protected DmnDecision decision;
-  protected DmnDecisionContext decisionContext;
+  protected Map<String, Object> variables = new HashMap<String, Object>();
 
   protected DmnEngineAssertion(DmnEngine actual) {
     super(actual, DmnEngineAssertion.class);
   }
 
-  public DmnEngineAssertion evaluates(DmnDecision decision) {
+  public DmnEngineAssertion evaluates(DmnDecision decision, Map<String, Object> variables) {
     isNotNull();
 
     if (decision == null) {
@@ -46,66 +40,24 @@ public class DmnEngineAssertion extends AbstractAssert<DmnEngineAssertion, DmnEn
     }
 
     this.decision = decision;
+    this.variables = variables;
 
     return this;
   }
 
-  public DmnEngineAssertion evaluates(DmnDecisionModel decisionModel) {
+  public DmnEngineAssertion evaluates(DmnDecisionModel decisionModel, Map<String, Object> variables) {
     List<DmnDecision> decisions = decisionModel.getDecisions();
 
     if (decisions.isEmpty()) {
       failWithMessage("Expected at least one decision in model.");
     }
 
-    return evaluates(decisions.get(0));
+    return evaluates(decisions.get(0), variables);
   }
 
-  public DmnEngineAssertion evaluates(DmnDecisionModel decisionModel, String decisionKey) {
+  public DmnEngineAssertion evaluates(DmnDecisionModel decisionModel, String decisionKey, Map<String, Object> variables) {
     DmnDecision decision = decisionModel.getDecision(decisionKey);
-    return evaluates(decision);
-  }
-
-  public DmnEngineAssertionContextBuilder withContext() {
-    DmnContextFactory contextFactory = actual.getConfiguration().getDmnContextFactory();
-    DmnDecisionContext decisionContext = contextFactory.createDecisionContext();
-    return new DmnEngineAssertionContextBuilder(this, decisionContext);
-  }
-
-  public DmnEngineAssertion withContext(DmnDecisionContext decisionContext) {
-    isNotNull();
-
-    if (decisionContext == null) {
-      failWithMessage("Expected decision context not to be null.");
-    }
-
-    this.decisionContext = decisionContext;
-
-    return this;
-  }
-
-  public DmnEngineAssertion withContext(String name, Object value, Object... additionalVariablePairs) {
-    isNotNull();
-
-    if (additionalVariablePairs.length % 2 != 0) {
-      throw new DmnAssertionException("Additional context variables have to specified with name and value");
-    }
-
-    DmnEngineAssertionContextBuilder contextBuilder = withContext();
-    contextBuilder.setVariable(name, value);
-
-    Iterator<Object> variableIterator = Arrays.asList(additionalVariablePairs).iterator();
-    while (variableIterator.hasNext()) {
-      Object variableName =  variableIterator.next();
-      Object variableValue = variableIterator.next();
-      if (!(variableName instanceof String)) {
-        throw new DmnAssertionException("Additional context variables have to specify a name as String, was " + variableName + ".");
-      }
-      else {
-        contextBuilder.setVariable((String) variableName, variableValue);
-      }
-    }
-
-    return contextBuilder.build();
+    return evaluates(decision, variables);
   }
 
   public DmnDecisionResultAssertion hasResult() {
@@ -115,11 +67,7 @@ public class DmnEngineAssertion extends AbstractAssert<DmnEngineAssertion, DmnEn
       failWithMessage("Expected decision not to be null.");
     }
 
-    if (decisionContext == null) {
-      decisionContext = actual.getConfiguration().getDmnContextFactory().createDecisionContext();
-    }
-
-    DmnDecisionResult result = decision.evaluate(decisionContext);
+    DmnDecisionResult result = actual.evaluate(decision, variables);
 
     return new DmnDecisionResultAssertion(result);
   }
@@ -131,11 +79,7 @@ public class DmnEngineAssertion extends AbstractAssert<DmnEngineAssertion, DmnEn
       failWithMessage("Expected decision not to be null.");
     }
 
-    if (decisionContext == null) {
-      decisionContext = actual.getConfiguration().getDmnContextFactory().createDecisionContext();
-    }
-
-    DmnDecisionResult result = decision.evaluate(decisionContext);
+    DmnDecisionResult result = actual.evaluate(decision, variables);
 
     DmnDecisionResultAssertion resultAssertion = new DmnDecisionResultAssertion(result);
     return resultAssertion.hasSingleOutput().hasSingleEntry(value);
@@ -148,11 +92,7 @@ public class DmnEngineAssertion extends AbstractAssert<DmnEngineAssertion, DmnEn
       failWithMessage("Expected decision not to be null.");
     }
 
-    if (decisionContext == null) {
-      decisionContext = actual.getConfiguration().getDmnContextFactory().createDecisionContext();
-    }
-
-    DmnDecisionResult result = decision.evaluate(decisionContext);
+    DmnDecisionResult result = actual.evaluate(decision, variables);
 
     DmnDecisionResultAssertion resultAssertion = new DmnDecisionResultAssertion(result);
     return resultAssertion.hasSingleOutput().hasSingleEntry(name, value);
@@ -162,47 +102,6 @@ public class DmnEngineAssertion extends AbstractAssert<DmnEngineAssertion, DmnEn
     isNotNull();
 
     return hasResult().isEmpty();
-  }
-
-
-  public class DmnEngineAssertionContextBuilder implements DmnDecisionContextBuilder<DmnEngineAssertion> {
-
-    protected DmnEngineAssertion assertion;
-    protected DmnDecisionContext decisionContext;
-
-    public DmnEngineAssertionContextBuilder(DmnEngineAssertion assertion, DmnDecisionContext decisionContext) {
-      this.assertion = assertion;
-      this.decisionContext = decisionContext;
-    }
-
-    public DmnDecisionContextBuilder<DmnEngineAssertion> setVariableContext(DmnVariableContext variableContext) {
-      decisionContext.setVariableContext(variableContext);
-      return this;
-    }
-
-    public DmnDecisionContextBuilder<DmnEngineAssertion> setVariable(String name, Object value) {
-      decisionContext.getVariableContextChecked().setVariable(name, value);
-      return this;
-    }
-
-    public DmnDecisionContextBuilder<DmnEngineAssertion> setVariables(Map<String, Object> variables) {
-      decisionContext.getVariableContextChecked().setVariables(variables);
-      return this;
-    }
-
-    public DmnDecisionContextBuilder<DmnEngineAssertion> setScriptContext(DmnScriptContext scriptContext) {
-      decisionContext.setScriptContext(scriptContext);
-      return this;
-    }
-
-    public DmnDecisionContextBuilder<DmnEngineAssertion> setDefaultScriptLanguage(String defaultScriptLanguage) {
-      decisionContext.getScriptContextChecked().setDefaultScriptLanguage(defaultScriptLanguage);
-      return this;
-    }
-
-    public DmnEngineAssertion build() {
-      return assertion.withContext(decisionContext);
-    }
   }
 
 }

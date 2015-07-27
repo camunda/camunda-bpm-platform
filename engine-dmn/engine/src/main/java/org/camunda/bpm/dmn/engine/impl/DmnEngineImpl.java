@@ -15,16 +15,22 @@ package org.camunda.bpm.dmn.engine.impl;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
+import org.camunda.bpm.dmn.engine.DmnDecision;
+import org.camunda.bpm.dmn.engine.DmnDecisionModel;
+import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnEngine;
+import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
+import org.camunda.bpm.dmn.engine.ScriptEngineResolver;
+import org.camunda.bpm.dmn.engine.context.DmnContextFactory;
+import org.camunda.bpm.dmn.engine.context.DmnDecisionContext;
+import org.camunda.bpm.dmn.engine.context.DmnVariableContext;
+import org.camunda.bpm.dmn.engine.transform.DmnTransformer;
 import org.camunda.bpm.model.dmn.DmnModelException;
 import org.camunda.bpm.model.dmn.DmnModelInstance;
 import org.camunda.commons.utils.IoUtil;
 import org.camunda.commons.utils.IoUtilException;
-import org.camunda.bpm.dmn.engine.DmnDecision;
-import org.camunda.bpm.dmn.engine.DmnDecisionModel;
-import org.camunda.bpm.dmn.engine.DmnEngine;
-import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
-import org.camunda.bpm.dmn.engine.transform.DmnTransformer;
 
 public class DmnEngineImpl implements DmnEngine {
 
@@ -32,10 +38,14 @@ public class DmnEngineImpl implements DmnEngine {
 
   protected DmnEngineConfiguration configuration;
   protected DmnTransformer transformer;
+  protected DmnContextFactory contextFactory;
+  protected ScriptEngineResolver scriptEngineResolver;
 
   public DmnEngineImpl(DmnEngineConfiguration configuration) {
     this.configuration = configuration;
     this.transformer = configuration.getTransformer();
+    this.contextFactory = configuration.getDmnContextFactory();
+    this.scriptEngineResolver = configuration.getScriptEngineResolver();
   }
 
   public DmnEngineConfiguration getConfiguration() {
@@ -123,6 +133,24 @@ public class DmnEngineImpl implements DmnEngine {
     else {
       throw LOG.unableToFindDecisionWithKey(decisionKey);
     }
+  }
+
+  public DmnDecisionResult evaluate(DmnDecision decision, Map<String, Object> variables) {
+    DmnDecisionContext decisionContext = contextFactory.createDecisionContext();
+    DmnVariableContext variableContext = decisionContext.getVariableContextChecked();
+    variableContext.getVariables().putAll(variables);
+    decisionContext.setScriptEngineResolver(scriptEngineResolver);
+    return decisionContext.evaluate(decision);
+  }
+
+  public DmnDecisionResult evaluate(DmnDecisionModel decisionModel, Map<String, Object> variables) {
+    DmnDecision decision = decisionModel.getDecisions().get(0);
+    return evaluate(decision, variables);
+  }
+
+  public DmnDecisionResult evaluate(DmnDecisionModel decisionModel, String decisionKey, Map<String, Object> variables) {
+    DmnDecision decision = decisionModel.getDecision(decisionKey);
+    return evaluate(decision, variables);
   }
 
 }

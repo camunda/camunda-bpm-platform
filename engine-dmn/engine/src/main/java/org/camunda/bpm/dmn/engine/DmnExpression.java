@@ -13,14 +13,10 @@
 
 package org.camunda.bpm.dmn.engine;
 
-import org.camunda.bpm.dmn.engine.context.DmnDecisionContext;
-
 public interface DmnExpression extends DmnElement {
 
   String getExpression();
 
   String getExpressionLanguage();
-
-  <T> T evaluate(DmnDecisionContext decisionContext);
 
 }

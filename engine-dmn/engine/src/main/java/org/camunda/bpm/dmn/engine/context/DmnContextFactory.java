@@ -19,6 +19,4 @@ public interface DmnContextFactory {
 
   DmnVariableContext createVariableContext();
 
-  DmnScriptContext createScriptContextContext();
-
 }

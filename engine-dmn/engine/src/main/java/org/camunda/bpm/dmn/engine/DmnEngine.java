@@ -14,6 +14,7 @@
 package org.camunda.bpm.dmn.engine;
 
 import java.io.InputStream;
+import java.util.Map;
 
 import org.camunda.bpm.model.dmn.DmnModelInstance;
 
@@ -38,5 +39,11 @@ public interface DmnEngine {
   DmnDecision parseDecision(InputStream inputStream, String decisionKey);
 
   DmnDecision parseDecision(DmnModelInstance modelInstance, String decisionKey);
+
+  DmnDecisionResult evaluate(DmnDecision decision, Map<String, Object> variables);
+
+  DmnDecisionResult evaluate(DmnDecisionModel decisionModel, Map<String, Object> variables);
+
+  DmnDecisionResult evaluate(DmnDecisionModel decisionModel, String decisionKey, Map<String, Object> variables);
 
 }

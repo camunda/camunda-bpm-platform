@@ -14,7 +14,6 @@
 package org.camunda.bpm.dmn.engine.impl;
 
 import org.camunda.bpm.dmn.engine.DmnExpression;
-import org.camunda.bpm.dmn.engine.context.DmnDecisionContext;
 
 public class DmnExpressionImpl extends DmnElementImpl implements DmnExpression {
 
@@ -46,10 +45,6 @@ public class DmnExpressionImpl extends DmnElementImpl implements DmnExpression {
 
   public String getExpressionLanguage() {
     return expressionLanguage;
-  }
-
-  public <T> T evaluate(DmnDecisionContext decisionContext) {
-    return decisionContext.evaluate(this);
   }
 
   public String toString() {

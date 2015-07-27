@@ -18,22 +18,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.InputStream;
 import java.util.List;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionTable;
-import org.camunda.bpm.dmn.engine.DmnExpression;
-import org.camunda.bpm.dmn.engine.impl.context.DmnScriptContextImpl;
-import org.camunda.bpm.model.dmn.HitPolicy;
-import org.camunda.commons.utils.IoUtil;
 import org.camunda.bpm.dmn.engine.DmnClause;
 import org.camunda.bpm.dmn.engine.DmnClauseEntry;
 import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnDecisionModel;
+import org.camunda.bpm.dmn.engine.DmnDecisionTable;
 import org.camunda.bpm.dmn.engine.DmnEngine;
+import org.camunda.bpm.dmn.engine.DmnExpression;
 import org.camunda.bpm.dmn.engine.DmnItemDefinition;
 import org.camunda.bpm.dmn.engine.DmnRule;
 import org.camunda.bpm.dmn.engine.DmnTypeDefinition;
 import org.camunda.bpm.dmn.engine.impl.DmnClauseImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnEngineConfigurationImpl;
+import org.camunda.bpm.dmn.engine.impl.context.DmnDecisionContextImpl;
+import org.camunda.bpm.model.dmn.HitPolicy;
+import org.camunda.commons.utils.IoUtil;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -55,7 +55,7 @@ public class DmnTransformTest {
     assertThat(decisionModel.getKey()).isEqualTo("definitions");
     assertThat(decisionModel.getName()).isEqualTo("camunda");
     assertThat(decisionModel.getNamespace()).isEqualTo("http://camunda.org/dmn");
-    assertThat(decisionModel.getExpressionLanguage()).isEqualTo(DmnScriptContextImpl.DEFAULT_SCRIPT_LANGUAGE);
+    assertThat(decisionModel.getExpressionLanguage()).isEqualTo(DmnDecisionContextImpl.DEFAULT_SCRIPT_LANGUAGE);
   }
 
   @Test

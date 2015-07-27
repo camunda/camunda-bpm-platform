@@ -11,21 +11,22 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.dmn.engine.context;
+package org.camunda.bpm.dmn.engine.impl;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
-public interface DmnScriptContext {
+import org.camunda.bpm.dmn.engine.ScriptEngineResolver;
 
-  void setDefaultScriptLanguage(String defaultScriptLanguage);
+public class DefaultScriptEngineResolver implements ScriptEngineResolver {
+  protected ScriptEngineManager scriptEngineManager;
 
-  String getDefaultScriptLanguage();
+  public DefaultScriptEngineResolver() {
+    scriptEngineManager = new ScriptEngineManager();
+  }
 
-  ScriptEngine getDefaultScriptEngine();
-
-  ScriptEngine getScriptEngineForName(String name);
-
-  void setScriptEngineManager(ScriptEngineManager scriptEngineManager);
+  public ScriptEngine getScriptEngineForLanguage(String language) {
+    return scriptEngineManager.getEngineByName(language);
+  }
 
 }

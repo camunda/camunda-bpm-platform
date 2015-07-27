@@ -17,6 +17,8 @@ import static org.camunda.bpm.dmn.engine.test.asserts.DmnAssertions.assertThat;
 
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
 import javax.script.Bindings;
 import javax.script.CompiledScript;
 import javax.script.ScriptContext;
@@ -24,10 +26,8 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import org.camunda.commons.utils.IoUtil;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
-import org.camunda.bpm.dmn.engine.context.DmnDecisionContext;
-import org.camunda.bpm.dmn.engine.context.DmnVariableContext;
+import org.camunda.commons.utils.IoUtil;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -349,21 +349,19 @@ public class DmnScriptEngineTest {
   }
 
   @Test
-  public void shouldEvalFirstDecisionOfCompiledScriptWithDecisionContext() throws ScriptException {
+  public void shouldEvalFirstDecisionOfCompiledScriptWithVariables() throws ScriptException {
     DmnScriptEngine dmnScriptEngine = getDmnScriptEngine();
     DmnCompiledScript compiledScript = dmnScriptEngine.compile(EXAMPLE_DMN_SCRIPT);
 
-    DmnDecisionContext decisionContext = dmnScriptEngine.getDmnDecisionContext(dmnScriptEngine.getContext());
-    DmnVariableContext variableContext = decisionContext.getVariableContextChecked();
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("status", "bronze");
 
-    variableContext.setVariable("status", "bronze");
-
-    DmnDecisionResult result = compiledScript.eval(decisionContext);
+    DmnDecisionResult result = compiledScript.eval(variables);
     assertThat(result).hasSingleOutput().hasEntry("result", "notok");
 
-    variableContext.setVariable("status", "gold");
+    variables.put("status", "gold");
 
-    result = compiledScript.eval(decisionContext);
+    result = compiledScript.eval(variables);
     assertThat(result).hasSingleOutput().hasEntry("result", "ok");
   }
 
@@ -473,27 +471,25 @@ public class DmnScriptEngineTest {
   }
 
   @Test
-  public void shouldEvalDecisionOfCompiledScriptByKeyWithDecisionContext() throws ScriptException {
+  public void shouldEvalDecisionOfCompiledScriptByKeyWithVariables() throws ScriptException {
     DmnScriptEngine dmnScriptEngine = getDmnScriptEngine();
     DmnCompiledScript compiledScript = dmnScriptEngine.compile(EXAMPLE_DMN_SCRIPT);
 
-    DmnDecisionContext decisionContext = dmnScriptEngine.getDmnDecisionContext(dmnScriptEngine.getContext());
-    DmnVariableContext variableContext = decisionContext.getVariableContextChecked();
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("status", "bronze");
 
-    variableContext.setVariable("status", "bronze");
-
-    DmnDecisionResult result = compiledScript.eval(FIRST_DECISION, decisionContext);
+    DmnDecisionResult result = compiledScript.eval(FIRST_DECISION, variables);
     assertThat(result).hasSingleOutput().hasEntry("result", "notok");
 
-    result = compiledScript.eval(SECOND_DECISION, decisionContext);
+    result = compiledScript.eval(SECOND_DECISION, variables);
     assertThat(result).hasSingleOutput().hasEntry("result", "ok");
 
-    variableContext.setVariable("status", "gold");
+    variables.put("status", "gold");
 
-    result = compiledScript.eval(FIRST_DECISION, decisionContext);
+    result = compiledScript.eval(FIRST_DECISION, variables);
     assertThat(result).hasSingleOutput().hasEntry("result", "ok");
 
-    result = compiledScript.eval(SECOND_DECISION, decisionContext);
+    result = compiledScript.eval(SECOND_DECISION, variables);
     assertThat(result).hasSingleOutput().hasEntry("result", "notok");
   }
 

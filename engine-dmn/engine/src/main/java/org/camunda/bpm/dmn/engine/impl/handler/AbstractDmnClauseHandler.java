@@ -13,9 +13,9 @@
 
 package org.camunda.bpm.dmn.engine.impl.handler;
 
+import org.camunda.bpm.dmn.engine.handler.DmnElementHandlerContext;
 import org.camunda.bpm.dmn.engine.impl.DmnClauseEntryImpl;
 import org.camunda.bpm.model.dmn.instance.LiteralExpression;
-import org.camunda.bpm.dmn.engine.handler.DmnElementHandlerContext;
 
 public abstract class AbstractDmnClauseHandler<E extends LiteralExpression> extends AbstractDmnLiteralExpressionHandler<E, DmnClauseEntryImpl> {
 

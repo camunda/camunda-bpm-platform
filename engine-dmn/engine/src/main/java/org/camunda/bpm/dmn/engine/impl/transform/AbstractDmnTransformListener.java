@@ -14,7 +14,9 @@
 package org.camunda.bpm.dmn.engine.impl.transform;
 
 import org.camunda.bpm.dmn.engine.DmnClause;
+import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnDecisionModel;
+import org.camunda.bpm.dmn.engine.DmnItemDefinition;
 import org.camunda.bpm.dmn.engine.DmnRule;
 import org.camunda.bpm.dmn.engine.transform.DmnTransformListener;
 import org.camunda.bpm.model.dmn.instance.Clause;
@@ -22,8 +24,6 @@ import org.camunda.bpm.model.dmn.instance.Decision;
 import org.camunda.bpm.model.dmn.instance.Definitions;
 import org.camunda.bpm.model.dmn.instance.ItemDefinition;
 import org.camunda.bpm.model.dmn.instance.Rule;
-import org.camunda.bpm.dmn.engine.DmnDecision;
-import org.camunda.bpm.dmn.engine.DmnItemDefinition;
 
 /**
  * Abstract base class for implementing a {@link DmnTransformListener} without being forced to implement

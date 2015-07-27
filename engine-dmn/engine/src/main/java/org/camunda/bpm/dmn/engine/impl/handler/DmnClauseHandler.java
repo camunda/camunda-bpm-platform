@@ -13,9 +13,9 @@
 
 package org.camunda.bpm.dmn.engine.impl.handler;
 
-import org.camunda.bpm.model.dmn.instance.Clause;
 import org.camunda.bpm.dmn.engine.handler.DmnElementHandlerContext;
 import org.camunda.bpm.dmn.engine.impl.DmnClauseImpl;
+import org.camunda.bpm.model.dmn.instance.Clause;
 
 public class DmnClauseHandler extends AbstractDmnElementHandler<Clause, DmnClauseImpl> {
 

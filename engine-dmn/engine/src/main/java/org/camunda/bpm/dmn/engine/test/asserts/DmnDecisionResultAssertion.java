@@ -14,8 +14,8 @@
 package org.camunda.bpm.dmn.engine.test.asserts;
 
 import org.assertj.core.api.AbstractAssert;
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
+import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 
 public class DmnDecisionResultAssertion extends AbstractAssert<DmnDecisionResultAssertion, DmnDecisionResult> {
 

@@ -19,14 +19,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionModel;
-import org.camunda.bpm.dmn.engine.impl.context.DmnScriptContextImpl;
 import org.camunda.bpm.dmn.engine.DmnDecision;
+import org.camunda.bpm.dmn.engine.DmnDecisionModel;
 import org.camunda.bpm.dmn.engine.DmnItemDefinition;
+import org.camunda.bpm.dmn.engine.impl.context.DmnDecisionContextImpl;
 
 public class DmnDecisionModelImpl extends DmnElementImpl implements DmnDecisionModel {
 
-  protected String expressionLanguage = DmnScriptContextImpl.DEFAULT_SCRIPT_LANGUAGE;
+  protected String expressionLanguage = DmnDecisionContextImpl.DEFAULT_SCRIPT_LANGUAGE;
   protected String typeLanguage;
   protected String namespace;
 

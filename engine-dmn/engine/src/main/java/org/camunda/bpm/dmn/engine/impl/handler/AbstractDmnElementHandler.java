@@ -13,10 +13,10 @@
 
 package org.camunda.bpm.dmn.engine.impl.handler;
 
-import org.camunda.bpm.model.dmn.instance.DmnElement;
 import org.camunda.bpm.dmn.engine.handler.DmnElementHandler;
 import org.camunda.bpm.dmn.engine.handler.DmnElementHandlerContext;
 import org.camunda.bpm.dmn.engine.impl.DmnElementImpl;
+import org.camunda.bpm.model.dmn.instance.DmnElement;
 
 public abstract class AbstractDmnElementHandler<E extends DmnElement, I extends DmnElementImpl> implements DmnElementHandler<E, I> {
 

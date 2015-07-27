@@ -11,18 +11,13 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.dmn.engine.context;
+package org.camunda.bpm.dmn.engine;
 
-import java.util.Map;
+import javax.script.ScriptEngine;
 
-public interface DmnDecisionContextBuilder<T> {
+public interface ScriptEngineResolver {
 
-  DmnDecisionContextBuilder<T> setVariableContext(DmnVariableContext variableContext);
-
-  DmnDecisionContextBuilder<T> setVariable(String name, Object value);
-
-  DmnDecisionContextBuilder<T> setVariables(Map<String, Object> variables);
-
-  T build();
+  ScriptEngine getScriptEngineForLanguage(String language);
 
 }
+

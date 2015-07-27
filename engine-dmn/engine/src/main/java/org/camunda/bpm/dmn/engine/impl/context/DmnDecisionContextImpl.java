@@ -20,27 +20,31 @@ import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
+import org.camunda.bpm.dmn.engine.DmnClause;
+import org.camunda.bpm.dmn.engine.DmnClauseEntry;
+import org.camunda.bpm.dmn.engine.DmnDecision;
+import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTable;
 import org.camunda.bpm.dmn.engine.DmnExpression;
-import org.camunda.bpm.dmn.engine.impl.DmnEngineLogger;
-import org.camunda.bpm.dmn.engine.DmnClause;
-import org.camunda.bpm.dmn.engine.DmnClauseEntry;
-import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
 import org.camunda.bpm.dmn.engine.DmnRule;
+import org.camunda.bpm.dmn.engine.ScriptEngineResolver;
 import org.camunda.bpm.dmn.engine.context.DmnDecisionContext;
-import org.camunda.bpm.dmn.engine.context.DmnScriptContext;
 import org.camunda.bpm.dmn.engine.context.DmnVariableContext;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionOutputEntryImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionOutputImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionResultImpl;
+import org.camunda.bpm.dmn.engine.impl.DmnEngineLogger;
+import org.camunda.bpm.dmn.juel.JuelScriptEngineFactory;
 
 public class DmnDecisionContextImpl implements DmnDecisionContext {
 
   protected static final DmnEngineLogger LOG = DmnEngineLogger.ENGINE_LOGGER;
 
+  public static final String DEFAULT_SCRIPT_LANGUAGE = JuelScriptEngineFactory.NAME;
+
   protected DmnVariableContext variableContext;
-  protected DmnScriptContext scriptContext;
+  protected ScriptEngineResolver scriptEngineResolver;
 
   public void setVariableContext(DmnVariableContext variableContext) {
     this.variableContext = variableContext;
@@ -59,31 +63,27 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
     }
   }
 
-  public void setScriptContext(DmnScriptContext scriptContext) {
-    this.scriptContext = scriptContext;
+  public void setScriptEngineResolver(ScriptEngineResolver scriptEngineResolver) {
+    this.scriptEngineResolver = scriptEngineResolver;
   }
 
-  public DmnScriptContext getScriptContext() {
-    return scriptContext;
+  public ScriptEngineResolver getScriptEngineResolver() {
+    return scriptEngineResolver;
   }
 
-  public DmnScriptContext getScriptContextChecked() {
-    if (scriptContext != null) {
-      return scriptContext;
-    }
-    else {
-      throw LOG.noScriptContextSetInDecisionContext();
-    }
-  }
-
-  public DmnDecisionResult evaluate(DmnDecisionTable decision) {
+  public DmnDecisionResult evaluate(DmnDecision decision) {
     return evaluate(decision, new HashMap<String, Object>());
   }
 
-  public DmnDecisionResult evaluate(DmnDecisionTable decision, Map<String, Object> evaluationCache) {
+  public DmnDecisionResult evaluate(DmnDecision decision, Map<String, Object> evaluationCache) {
+    if (!(decision instanceof DmnDecisionTable)) {
+      throw LOG.decisionTypeNotSupported(decision);
+    }
+
+    DmnDecisionTable decisionTable = (DmnDecisionTable) decision;
     DmnDecisionResultImpl decisionResult = new DmnDecisionResultImpl();
 
-    for (DmnRule rule : decision.getRules()) {
+    for (DmnRule rule : decisionTable.getRules()) {
       if (isApplicable(rule, evaluationCache)) {
         DmnDecisionOutput output = getOutput(rule, evaluationCache);
         // TODO: notify Rule Listener
@@ -204,12 +204,10 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
   }
 
   protected ScriptEngine getScriptEngineForName(String expressionLanguage) {
-    if (expressionLanguage != null) {
-      return getScriptContextChecked().getScriptEngineForName(expressionLanguage);
+    if (expressionLanguage == null) {
+      expressionLanguage = DEFAULT_SCRIPT_LANGUAGE;
     }
-    else {
-      return getScriptContextChecked().getDefaultScriptEngine();
-    }
+    return scriptEngineResolver.getScriptEngineForLanguage(expressionLanguage);
   }
 
   protected Bindings createBindings(ScriptEngine scriptEngine) {
