@@ -14,6 +14,7 @@
 package org.camunda.bpm.model.bpmn;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.model.bpmn.BpmnTestConstants.BUSINESS_RULE_TASK;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.CALL_ACTIVITY_ID;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.END_EVENT_ID;
 import static org.camunda.bpm.model.bpmn.BpmnTestConstants.PROCESS_ID;
@@ -65,6 +66,7 @@ import java.util.List;
 import org.camunda.bpm.model.bpmn.impl.BpmnModelInstanceImpl;
 import org.camunda.bpm.model.bpmn.instance.BaseElement;
 import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
+import org.camunda.bpm.model.bpmn.instance.BusinessRuleTask;
 import org.camunda.bpm.model.bpmn.instance.CallActivity;
 import org.camunda.bpm.model.bpmn.instance.EndEvent;
 import org.camunda.bpm.model.bpmn.instance.ErrorEventDefinition;
@@ -123,6 +125,7 @@ public class CamundaExtensionsTest {
   private SendTask sendTask;
   private ScriptTask scriptTask;
   private CallActivity callActivity;
+  private BusinessRuleTask businessRuleTask;
   private EndEvent endEvent;
   private MessageEventDefinition messageEventDefinition;
   private ParallelGateway parallelGateway;
@@ -155,6 +158,7 @@ public class CamundaExtensionsTest {
     sendTask = modelInstance.getModelElementById(SEND_TASK_ID);
     scriptTask = modelInstance.getModelElementById(SCRIPT_TASK_ID);
     callActivity = modelInstance.getModelElementById(CALL_ACTIVITY_ID);
+    businessRuleTask = modelInstance.getModelElementById(BUSINESS_RULE_TASK);
     endEvent = modelInstance.getModelElementById(END_EVENT_ID);
     messageEventDefinition = (MessageEventDefinition) endEvent.getEventDefinitions().iterator().next();
     parallelGateway = modelInstance.getModelElementById("parallelGateway");
@@ -242,6 +246,27 @@ public class CamundaExtensionsTest {
     assertThat(callActivity.getCamundaCalledElementVersion()).isEqualTo(TEST_STRING_XML);
     callActivity.setCamundaCalledElementVersion(TEST_STRING_API);
     assertThat(callActivity.getCamundaCalledElementVersion()).isEqualTo(TEST_STRING_API);
+  }
+
+  @Test
+  public void testDecisionRef() {
+    assertThat(businessRuleTask.getCamundaDecisionRef()).isEqualTo(TEST_STRING_XML);
+    businessRuleTask.setCamundaDecisionRef(TEST_STRING_API);
+    assertThat(businessRuleTask.getCamundaDecisionRef()).isEqualTo(TEST_STRING_API);
+  }
+
+  @Test
+  public void testDecisionRefBinding() {
+    assertThat(businessRuleTask.getCamundaDecisionRefBinding()).isEqualTo(TEST_STRING_XML);
+    businessRuleTask.setCamundaDecisionRefBinding(TEST_STRING_API);
+    assertThat(businessRuleTask.getCamundaDecisionRefBinding()).isEqualTo(TEST_STRING_API);
+  }
+
+  @Test
+  public void testDecisionRefVersion() {
+    assertThat(businessRuleTask.getCamundaDecisionRefVersion()).isEqualTo(TEST_STRING_XML);
+    businessRuleTask.setCamundaDecisionRefVersion(TEST_STRING_API);
+    assertThat(businessRuleTask.getCamundaDecisionRefVersion()).isEqualTo(TEST_STRING_API);
   }
 
   @Test

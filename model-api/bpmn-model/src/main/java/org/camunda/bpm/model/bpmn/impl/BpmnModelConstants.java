@@ -414,6 +414,9 @@ public final class BpmnModelConstants {
   public static final String CAMUNDA_ATTRIBUTE_COLLECTION = "collection";
   public static final String CAMUNDA_ATTRIBUTE_CONFIG = "config";
   public static final String CAMUNDA_ATTRIBUTE_DATE_PATTERN = "datePattern";
+  public static final String CAMUNDA_ATTRIBUTE_DECISION_REF = "decisionRef";
+  public static final String CAMUNDA_ATTRIBUTE_DECISION_REF_BINDING = "decisionRefBinding";
+  public static final String CAMUNDA_ATTRIBUTE_DECISION_REF_VERSION = "decisionRefVersion";
   public static final String CAMUNDA_ATTRIBUTE_DEFAULT = "default";
   public static final String CAMUNDA_ATTRIBUTE_DEFAULT_VALUE = "defaultValue";
   public static final String CAMUNDA_ATTRIBUTE_DELEGATE_EXPRESSION = "delegateExpression";

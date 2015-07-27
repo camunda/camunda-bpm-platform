@@ -44,6 +44,9 @@ public class BusinessRuleTaskImpl extends TaskImpl implements BusinessRuleTask {
   protected static Attribute<String> camundaExpressionAttribute;
   protected static Attribute<String> camundaResultVariableAttribute;
   protected static Attribute<String> camundaTypeAttribute;
+  protected static Attribute<String> camundaDecisionRefAttribute;
+  protected static Attribute<String> camundaDecisionRefBindingAttribute;
+  protected static Attribute<String> camundaDecisionRefVersionAttribute;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(BusinessRuleTask.class, BPMN_ELEMENT_BUSINESS_RULE_TASK)
@@ -78,6 +81,18 @@ public class BusinessRuleTaskImpl extends TaskImpl implements BusinessRuleTask {
       .build();
 
     camundaTypeAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_TYPE)
+      .namespace(CAMUNDA_NS)
+      .build();
+
+    camundaDecisionRefAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_DECISION_REF)
+      .namespace(CAMUNDA_NS)
+      .build();
+
+    camundaDecisionRefBindingAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_DECISION_REF_BINDING)
+      .namespace(CAMUNDA_NS)
+      .build();
+
+    camundaDecisionRefVersionAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_DECISION_REF_VERSION)
       .namespace(CAMUNDA_NS)
       .build();
 
@@ -141,4 +156,29 @@ public class BusinessRuleTaskImpl extends TaskImpl implements BusinessRuleTask {
   public void setCamundaType(String camundaType) {
     camundaTypeAttribute.setValue(this, camundaType);
   }
+
+  public String getCamundaDecisionRef() {
+    return camundaDecisionRefAttribute.getValue(this);
+  }
+
+  public void setCamundaDecisionRef(String camundaDecisionRef) {
+    camundaDecisionRefAttribute.setValue(this, camundaDecisionRef);
+  }
+
+  public String getCamundaDecisionRefBinding() {
+    return camundaDecisionRefBindingAttribute.getValue(this);
+  }
+
+  public void setCamundaDecisionRefBinding(String camundaDecisionRefBinding) {
+    camundaDecisionRefBindingAttribute.setValue(this, camundaDecisionRefBinding);
+  }
+
+  public String getCamundaDecisionRefVersion() {
+    return camundaDecisionRefVersionAttribute.getValue(this);
+  }
+
+  public void setCamundaDecisionRefVersion(String camundaDecisionRefVersion) {
+    camundaDecisionRefVersionAttribute.setValue(this, camundaDecisionRefVersion);
+  }
+
 }

@@ -35,6 +35,7 @@ public final class BpmnTestConstants {
   public static final String DATA_INPUT_ASSOCIATION_ID = "dataInputAssociation";
   public static final String ASSOCIATION_ID = "association";
   public static final String CALL_ACTIVITY_ID = "callActivity";
+  public static final String BUSINESS_RULE_TASK = "businessRuleTask";
   public static final String END_EVENT_ID = "endEvent";
   public static final String EXCLUSIVE_GATEWAY = "exclusiveGateway";
   public static final String SUB_PROCESS_ID = "subProcess";

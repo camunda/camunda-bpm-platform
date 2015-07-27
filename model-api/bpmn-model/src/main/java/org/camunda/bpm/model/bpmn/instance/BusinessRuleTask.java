@@ -50,4 +50,16 @@ public interface BusinessRuleTask extends Task {
 
   void setCamundaType(String camundaType);
 
+  String getCamundaDecisionRef();
+
+  void setCamundaDecisionRef(String camundaDecisionRef);
+
+  String getCamundaDecisionRefBinding();
+
+  void setCamundaDecisionRefBinding(String camundaDecisionRefBinding);
+
+  String getCamundaDecisionRefVersion();
+
+  void setCamundaDecisionRefVersion(String camundaDecisionRefVersion);
+
 }
