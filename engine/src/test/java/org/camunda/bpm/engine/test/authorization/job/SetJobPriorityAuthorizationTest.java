@@ -59,7 +59,8 @@ public class SetJobPriorityAuthorizationTest {
       scenario()
         .withoutAuthorizations()
         .failsDueToRequired(
-          grant(Resources.PROCESS_INSTANCE, "processInstanceId", "userId", Permissions.UPDATE)),
+          grant(Resources.PROCESS_INSTANCE, "processInstanceId", "userId", Permissions.UPDATE),
+          grant(Resources.PROCESS_DEFINITION, "process", "userId", Permissions.UPDATE_INSTANCE)),
       scenario()
         .withAuthorizations(
           grant(Resources.PROCESS_INSTANCE, "processInstanceId", "userId", Permissions.UPDATE))

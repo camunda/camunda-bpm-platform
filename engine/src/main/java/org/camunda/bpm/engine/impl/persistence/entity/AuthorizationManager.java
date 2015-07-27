@@ -37,6 +37,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.MissingAuthorization;
+import org.camunda.bpm.engine.MissingAuthorization.Builder;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Groups;
@@ -159,37 +161,23 @@ public class AuthorizationManager extends AbstractManager {
       String userId = currentAuthentication.getUserId();
       boolean isAuthorized = isAuthorized(userId, currentAuthentication.getGroupIds(), permissionChecks);
       if (!isAuthorized) {
+        
+        Builder builder = MissingAuthorization.builder();
+        List<MissingAuthorization> info = new ArrayList<MissingAuthorization>();
 
-        if (permissionChecks.size() == 1) {
-          PermissionCheck permissionCheck = permissionChecks.get(0);
-          String permissionName = permissionCheck.getPermission().getName();
-          String resourceType = permissionCheck.getResource().resourceName();
-          String resourceId = permissionCheck.getResourceId();
-          throw new AuthorizationException(userId, permissionName, resourceType, resourceId);
-        } else {
-
-          String message = "The user with id '" + userId +
-                           "' does not have one of the following permissions: ";
-
-          for (int i = 0; i < permissionChecks.size(); i++) {
-
-            if (i > 0) {
-              message = message + " or ";
-            }
-
-            PermissionCheck permissionCheck = permissionChecks.get(i);
-            String permissionName = permissionCheck.getPermission().getName();
-            String resourceType = permissionCheck.getResource().resourceName();
-            String resourceId = permissionCheck.getResourceId();
-
-            message = message + "'"+permissionName+"' permission " +
-                "on resource '" + (resourceId != null ? (resourceId+"' of type '") : "" ) + resourceType + "'";
-          }
-          throw new AuthorizationException(message);
+        for (PermissionCheck check: permissionChecks) {
+          builder.permission(check.getPermission().getName());
+          builder.resource(check.getResource().resourceName());
+          builder.resourceId(check.getResourceId());
+          MissingAuthorization exceptionInfo = builder.build();
+          info.add(exceptionInfo);
         }
+        
+        throw new AuthorizationException(userId, info);
       }
     }
   }
+
 
   public void checkAuthorization(Permission permission, Resource resource) {
     checkAuthorization(permission, resource, null);
@@ -204,7 +192,11 @@ public class AuthorizationManager extends AbstractManager {
 
       boolean isAuthorized = isAuthorized(currentAuthentication.getUserId(), currentAuthentication.getGroupIds(), permission, resource, resourceId);
       if (!isAuthorized) {
-        throw new AuthorizationException(currentAuthentication.getUserId(), permission.getName(), resource.resourceName(), resourceId);
+        Builder builder = MissingAuthorization.builder();
+        builder.permission(permission.getName());
+        builder.resource(resource.resourceName());
+        builder.resourceId(resourceId);
+        throw new AuthorizationException(currentAuthentication.getUserId(), builder.build());
       }
     }
 

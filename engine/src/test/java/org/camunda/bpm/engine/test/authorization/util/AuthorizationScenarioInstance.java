@@ -13,18 +13,22 @@
 package org.camunda.bpm.engine.test.authorization.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.MissingAuthorization;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.junit.Assert;
+
+import static org.hamcrest.Matchers.containsInAnyOrder;
 
 /**
  * @author Thorben Lindhauer
@@ -74,8 +78,13 @@ public class AuthorizationScenarioInstance {
       String message = e.getMessage();
       String failureMessage = describeScenarioFailure("Expected an authorization exception but the message was wrong: " + e.getMessage());
 
+      List<MissingAuthorization> infos = new ArrayList<MissingAuthorization>(e.getInfo());
+      //Cast is done due to method signature, if it is not explicitly casted there is compile time error.
+      Assert.assertThat(infos, containsInAnyOrder((Collection) MissingAuthorizationMatcher.asMatchers(missingAuthorizations)));
+
       for (Authorization missingAuthorization : missingAuthorizations) {
         Assert.assertTrue(failureMessage, message.contains(missingAuthorization.getUserId()));
+        Assert.assertEquals(missingAuthorization.getUserId(), e.getUserId());
 
         for (Permission permission : missingAuthorization.getPermissions(Permissions.values())) {
           if (permission != Permissions.NONE) {
@@ -91,13 +100,6 @@ public class AuthorizationScenarioInstance {
         Resource resource = AuthorizationTestUtil.getResourceByType(missingAuthorization.getResourceType());
         Assert.assertTrue(failureMessage, message.contains(resource.resourceName()));
       }
-
-      // TODO: properties are nicer for assertion, but are not always used
-//      Assert.assertEquals(firstMissingAuthorization.resourceId, e.getResourceId());
-//      Assert.assertEquals(firstMissingAuthorization.resource.resourceName(), e.getResourceType());
-//      Assert.assertEquals(firstMissingAuthorization.userId, e.getUserId());
-//      Assert.assertEquals(firstMissingAuthorization.permissions[0].getName(), e.getViolatedPermissionName());
-
     }
     else if (missingAuthorizations.isEmpty() && e == null) {
       // nothing to do

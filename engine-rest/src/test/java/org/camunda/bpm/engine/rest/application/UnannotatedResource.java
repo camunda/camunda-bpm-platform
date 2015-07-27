@@ -5,8 +5,12 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.MissingAuthorization;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.rest.exception.RestException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Does not declare produced media types.
@@ -37,6 +41,26 @@ public class UnannotatedResource {
   @GET
   @Path("/authorizationException")
   public String throwAuthorizationException() throws Exception {
-    throw new AuthorizationException("someUser", "somePermission", "someResourceName", "someResourceId");
+    MissingAuthorization.Builder builder = MissingAuthorization.builder();
+    builder.permission("somePermission");
+    builder.resource("someResourceName");
+    builder.resourceId("someResourceId");
+    throw new AuthorizationException("someUser", builder.build());
+  }
+
+  @GET
+  @Path("/authorizationExceptionMultiple")
+  public String throwAuthorizationExceptionMultiple() throws Exception {
+    List<MissingAuthorization> missingAuthorizations = new ArrayList<MissingAuthorization>();
+    MissingAuthorization.Builder builder = MissingAuthorization.builder();
+    builder.permission("somePermission1");
+    builder.resource("someResourceName1");
+    builder.resourceId("someResourceId1");
+    missingAuthorizations.add(builder.build());
+    builder.permission("somePermission2");
+    builder.resource("someResourceName2");
+    builder.resourceId("someResourceId2");
+    missingAuthorizations.add(builder.build());
+    throw new AuthorizationException("someUser", missingAuthorizations);
   }
 }
