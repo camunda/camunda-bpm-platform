@@ -10,7 +10,7 @@
     <relativePath />
   </parent>
 
-  <groupId>org.camunda.dmn</groupId>
+  <groupId>org.camunda.bpm.dmn</groupId>
   <artifactId>camunda-engine-dmn-bom</artifactId>
   <version>7.4.0-SNAPSHOT</version>
   <name>camunda DMN - engine - bom</name>
@@ -20,19 +20,19 @@
     <dependencies>
 
       <dependency>
-        <groupId>org.camunda.dmn</groupId>
+        <groupId>org.camunda.bpm.dmn</groupId>
         <artifactId>camunda-engine-dmn</artifactId>
         <version>${project.version}</version>
       </dependency>
 
       <dependency>
-        <groupId>org.camunda.dmn</groupId>
+        <groupId>org.camunda.bpm.dmn</groupId>
         <artifactId>camunda-scriptengine-dmn</artifactId>
         <version>${project.version}</version>
       </dependency>
 
       <dependency>
-        <groupId>org.camunda.dmn</groupId>
+        <groupId>org.camunda.bpm.dmn</groupId>
         <artifactId>camunda-scriptengine-juel</artifactId>
         <version>${project.version}</version>
       </dependency>
