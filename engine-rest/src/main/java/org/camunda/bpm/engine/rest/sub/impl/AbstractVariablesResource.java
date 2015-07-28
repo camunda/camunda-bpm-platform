@@ -192,7 +192,8 @@ public abstract class AbstractVariablesResource implements VariableResource {
     }
     MimeType mimeType = null;
     try {
-      mimeType = new MimeType(dataPart.getContentType());
+      String contentType = dataPart.getContentType() == null ? MediaType.APPLICATION_OCTET_STREAM : dataPart.getContentType();
+      mimeType = new MimeType(contentType);
     } catch (MimeTypeParseException e) {
       throw new RestException(Status.BAD_REQUEST, "Invalid mime type given");
     }
