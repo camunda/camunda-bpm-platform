@@ -2,8 +2,8 @@
 define([], function() {
   'use strict';
   return [
-          '$scope', '$location', 'Notifications', 'ProcessInstanceResource', '$modalInstance', 'processInstance', 'processData',
-  function($scope,   $location,   Notifications,   ProcessInstanceResource,   $modalInstance,   processInstance,   processData) {
+          '$scope', '$location', 'Notifications', 'ProcessInstanceResource', '$modalInstance', 'processInstance', 'processData', 'Views',
+  function($scope,   $location,   Notifications,   ProcessInstanceResource,   $modalInstance,   processInstance,   processData,   Views) {
 
     var BEFORE_CANCEL = 'beforeCancellation',
         PERFORM_CANCEL = 'performCancellation',
@@ -61,9 +61,29 @@ define([], function() {
       $modalInstance.close(status);
 
       // if the cancellation of the process instance was successful,
-      // then redirect to the corresponding process definition overview.
       if (status === CANCEL_SUCCESS) {
-        $location.url('/process-definition/' + processInstance.definitionId);
+        var historyProvider = Views.getProvider({
+          id: 'history',
+          component: 'cockpit.processInstance.view'
+        });
+
+        var path;
+        var search;
+
+        if (historyProvider) {
+          // redirect to the corresponding historic process instance view
+          var currentPath = $location.path();
+          // keep search params
+          search = $location.search();
+          path = '/process-instance/' + processInstance.id + '/history';
+        }
+        else {
+          // or redirect to the corresponding process definition overview.
+          path = '/process-definition/' + processInstance.definitionId;
+        }
+
+        $location.path(path);
+        $location.search(search || {});
         $location.replace();
       }
     };
