@@ -12,12 +12,11 @@
  */
 package org.camunda.bpm.engine.exception.dmn;
 
-import org.camunda.bpm.engine.exception.cmmn.CaseException;
 import org.camunda.bpm.model.dmn.DmnModelInstance;
 
 
 /**
- * <p>This is exception is thrown when a {@link DmnModelInstance} is not found.</p>
+ * <p>This exception is thrown when a {@link DmnModelInstance} is not found.</p>
  */
 public class DmnModelInstanceNotFoundException extends DecisionException {
 
