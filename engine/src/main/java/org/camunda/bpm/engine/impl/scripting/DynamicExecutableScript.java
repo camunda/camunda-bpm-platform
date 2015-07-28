@@ -36,7 +36,7 @@ public abstract class DynamicExecutableScript extends ExecutableScript {
     this.scriptExpression = scriptExpression;
   }
 
-  public Object execute(ScriptEngine scriptEngine, VariableScope variableScope, Bindings bindings) {
+  public Object evaluate(ScriptEngine scriptEngine, VariableScope variableScope, Bindings bindings) {
     String source = getScriptSource(variableScope);
     try {
       return scriptEngine.eval(source, bindings);

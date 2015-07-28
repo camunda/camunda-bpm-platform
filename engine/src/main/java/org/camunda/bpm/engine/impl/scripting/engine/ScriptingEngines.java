@@ -19,7 +19,6 @@ import org.camunda.bpm.engine.delegate.VariableScope;
 
 import javax.script.*;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;

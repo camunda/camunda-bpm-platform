@@ -43,6 +43,7 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.CancelEndEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.CaseCallActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ClassDelegateActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.CompensationEndEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.DecisionRuleTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ErrorEndEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.EventBasedGatewayActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessActivityBehavior;
@@ -77,8 +78,9 @@ import org.camunda.bpm.engine.impl.bpmn.listener.ClassDelegateExecutionListener;
 import org.camunda.bpm.engine.impl.bpmn.listener.DelegateExpressionExecutionListener;
 import org.camunda.bpm.engine.impl.bpmn.listener.ExpressionExecutionListener;
 import org.camunda.bpm.engine.impl.bpmn.listener.ScriptExecutionListener;
+import org.camunda.bpm.engine.impl.core.model.BaseCallableElement;
+import org.camunda.bpm.engine.impl.core.model.BaseCallableElement.CallableElementBinding;
 import org.camunda.bpm.engine.impl.core.model.CallableElement;
-import org.camunda.bpm.engine.impl.core.model.CallableElement.CallableElementBinding;
 import org.camunda.bpm.engine.impl.core.model.CallableElementParameter;
 import org.camunda.bpm.engine.impl.core.variable.mapping.IoMapping;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ConstantValueProvider;
@@ -1775,13 +1777,8 @@ public class BpmnParse extends Parse {
     if (language == null) {
       language = ScriptingEngines.DEFAULT_SCRIPTING_LANGUAGE;
     }
+    String resultVariableName = parseResultVariable(scriptTaskElement);
 
-    // determine if result variable exists
-    String resultVariableName = scriptTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "resultVariable");
-    if (resultVariableName == null) {
-      // for backwards compatible reasons
-      resultVariableName = scriptTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "resultVariableName");
-    }
 
     // determine script source
     String scriptSource = null;
@@ -1800,6 +1797,16 @@ public class BpmnParse extends Parse {
     }
   }
 
+  protected String parseResultVariable(Element element) {
+    // determine if result variable exists
+    String resultVariableName = element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "resultVariable");
+    if (resultVariableName == null) {
+      // for backwards compatible reasons
+      resultVariableName = element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "resultVariableName");
+    }
+    return resultVariableName;
+  }
+
   /**
    * Parses a serviceTask declaration.
    */
@@ -1814,10 +1821,7 @@ public class BpmnParse extends Parse {
     String className = serviceTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "class");
     String expression = serviceTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "expression");
     String delegateExpression = serviceTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "delegateExpression");
-    String resultVariableName = serviceTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "resultVariable");
-    if (resultVariableName == null) {
-      resultVariableName = serviceTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "resultVariableName");
-    }
+    String resultVariableName = parseResultVariable(serviceTaskElement);
 
     parseAsynchronousContinuationForActivity(serviceTaskElement, activity);
 
@@ -1866,8 +1870,50 @@ public class BpmnParse extends Parse {
    * Parses a businessRuleTask declaration.
    */
   public ActivityImpl parseBusinessRuleTask(Element businessRuleTaskElement, ScopeImpl scope) {
-    return parseServiceTaskLike("businessRuleTask", businessRuleTaskElement, scope);
+    String decisionRef = businessRuleTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "decisionRef");
+    if (decisionRef != null) {
+      return parseDecisionBusinessRuleTask(businessRuleTaskElement, scope);
+    }
+    else {
+      return parseServiceTaskLike("businessRuleTask", businessRuleTaskElement, scope);
+    }
   }
+
+  /**
+   * Parse a Business Rule Task which references a decision.
+   */
+  protected ActivityImpl parseDecisionBusinessRuleTask(Element businessRuleTaskElement, ScopeImpl scope) {
+    ActivityImpl activity = createActivityOnScope(businessRuleTaskElement, scope);
+
+    parseAsynchronousContinuationForActivity(businessRuleTaskElement, activity);
+
+    String decisionRef = businessRuleTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "decisionRef");
+
+    BaseCallableElement callableElement = new BaseCallableElement();
+    callableElement.setDeploymentId(deployment.getId());
+
+    ParameterValueProvider definitionKeyProvider = createParameterValueProvider(decisionRef, expressionManager);
+    callableElement.setDefinitionKeyValueProvider(definitionKeyProvider);
+
+    parseBinding(businessRuleTaskElement, activity, callableElement, "decisionRefBinding");
+    parseVersion(businessRuleTaskElement, activity, callableElement, "decisionRefBinding", "decisionRefVersion");
+
+    String resultVariable = parseResultVariable(businessRuleTaskElement);
+
+    DecisionRuleTaskActivityBehavior behavior = new DecisionRuleTaskActivityBehavior(resultVariable);
+    behavior.setCallableElement(callableElement);
+
+    activity.setActivityBehavior(behavior);
+
+    parseExecutionListenersOnScope(businessRuleTaskElement, activity);
+
+    for (BpmnParseListener parseListener : parseListeners) {
+      parseListener.parseBusinessRuleTask(businessRuleTaskElement, scope, activity);
+    }
+
+    return activity;
+  }
+
 
   /**
    * Parse async continuation of an activity and create async jobs for the activity.
@@ -3052,7 +3098,8 @@ public class BpmnParse extends Parse {
       addError("The attributes 'calledElement' or 'caseRef' cannot be used together: Use either 'calledElement' or 'caseRef'", callActivityElement);
     }
 
-    boolean isProcess = false;
+    String bindingAttributeName = "calledElementBinding";
+    String versionAttributeName = "calledElementVersion";
 
     String deploymentId = deployment.getId();
 
@@ -3065,28 +3112,28 @@ public class BpmnParse extends Parse {
       behavior = new CallActivityBehavior();
       ParameterValueProvider definitionKeyProvider = createParameterValueProvider(calledElement, expressionManager);
       callableElement.setDefinitionKeyValueProvider(definitionKeyProvider);
-      isProcess = true;
 
     } else {
       behavior = new CaseCallActivityBehavior();
       ParameterValueProvider definitionKeyProvider = createParameterValueProvider(caseRef, expressionManager);
       callableElement.setDefinitionKeyValueProvider(definitionKeyProvider);
-      isProcess = false;
+      bindingAttributeName = "caseBinding";
+      versionAttributeName = "caseVersion";
     }
 
     behavior.setCallableElement(callableElement);
 
     // parse binding
-    parseBinding(callActivityElement, activity, callableElement, isProcess);
+    parseBinding(callActivityElement, activity, callableElement, bindingAttributeName);
 
     // parse version
-    parseVersion(callActivityElement, activity, callableElement, isProcess);
+    parseVersion(callActivityElement, activity, callableElement, bindingAttributeName, versionAttributeName);
 
     // parse input parameter
-    parseInputParameter(callActivityElement, activity, callableElement, isProcess);
+    parseInputParameter(callActivityElement, activity, callableElement);
 
     // parse output parameter
-    parseOutputParameter(callActivityElement, activity, callableElement, isProcess);
+    parseOutputParameter(callActivityElement, activity, callableElement);
 
     if (!isMultiInstance) {
       // turn activity into a scope unless it is a multi instance activity, in
@@ -3106,14 +3153,8 @@ public class BpmnParse extends Parse {
     return activity;
   }
 
-  protected void parseBinding(Element callActivityElement, ActivityImpl activity, CallableElement callableElement, boolean isProcess) {
-    String binding = null;
-
-    if (isProcess) {
-      binding = callActivityElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "calledElementBinding");
-    } else {
-      binding = callActivityElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "caseBinding");
-    }
+  protected void parseBinding(Element callActivityElement, ActivityImpl activity, BaseCallableElement callableElement, String bindingAttributeName) {
+    String binding = callActivityElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, bindingAttributeName);
 
     if (CallableElementBinding.DEPLOYMENT.getValue().equals(binding)) {
       callableElement.setBinding(CallableElementBinding.DEPLOYMENT);
@@ -3124,32 +3165,22 @@ public class BpmnParse extends Parse {
     }
   }
 
-  protected void parseVersion(Element callActivityElement, ActivityImpl activity, CallableElement callableElement, boolean isProcess) {
+  protected void parseVersion(Element callingActivityElement, ActivityImpl activity, BaseCallableElement callableElement, String bindingAttributeName, String versionAttributeName) {
     String version = null;
 
     CallableElementBinding binding = callableElement.getBinding();
-    if (isProcess) {
-      version = callActivityElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "calledElementVersion");
+    version = callingActivityElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, versionAttributeName);
 
-      if (binding != null && binding.equals(CallableElement.CallableElementBinding.VERSION) && version == null) {
-        addError("Missing attribute 'calledElementVersion' when 'calledElementBinding' has value '" + CallableElement.CallableElementBinding.VERSION.getValue()
-            + "'", callActivityElement);
-      }
-
-    } else {
-      version = callActivityElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "caseVersion");
-
-      if (binding != null && binding.equals(CallableElement.CallableElementBinding.VERSION) && version == null) {
-        addError("Missing attribute 'caseVersion' when 'caseBinding' has value '" + CallableElement.CallableElementBinding.VERSION.getValue() + "'",
-            callActivityElement);
-      }
+    if (binding != null && binding.equals(CallableElementBinding.VERSION) && version == null) {
+      addError("Missing attribute '" + versionAttributeName + "' when '" + bindingAttributeName + "' has value '" + CallableElementBinding.VERSION.getValue()
+        + "'", callingActivityElement);
     }
 
     ParameterValueProvider versionProvider = createParameterValueProvider(version, expressionManager);
     callableElement.setVersionValueProvider(versionProvider);
   }
 
-  protected void parseInputParameter(Element callActivityElement, ActivityImpl activity, CallableElement callableElement, boolean isProcess) {
+  protected void parseInputParameter(Element callActivityElement, ActivityImpl activity, CallableElement callableElement) {
     Element extensionsElement = callActivityElement.element("extensionElements");
 
     if (extensionsElement != null) {
@@ -3199,7 +3230,7 @@ public class BpmnParse extends Parse {
     }
   }
 
-  protected void parseOutputParameter(Element callActivityElement, ActivityImpl activity, CallableElement callableElement, boolean isProcess) {
+  protected void parseOutputParameter(Element callActivityElement, ActivityImpl activity, CallableElement callableElement) {
     Element extensionsElement = callActivityElement.element("extensionElements");
 
     if (extensionsElement != null) {

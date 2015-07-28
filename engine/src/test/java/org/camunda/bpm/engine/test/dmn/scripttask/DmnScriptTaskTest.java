@@ -11,15 +11,14 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.engine.test.dmn;
+package org.camunda.bpm.engine.test.dmn.scripttask;
 
+import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
-import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 
 public class DmnScriptTaskTest extends PluggableProcessEngineTestCase {
 
@@ -36,8 +35,8 @@ public class DmnScriptTaskTest extends PluggableProcessEngineTestCase {
   protected String processInstanceId;
 
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/DmnScriptTaskTest.bpmn20.xml",
-    "org/camunda/bpm/engine/test/dmn/Example.dmn10.xml"
+    "org/camunda/bpm/engine/test/dmn/scripttask/DmnScriptTaskTest.bpmn20.xml",
+    "org/camunda/bpm/engine/test/dmn/scripttask/DmnScriptTaskTest.dmn10.xml"
   })
   public void testDmnExampleWithScriptTask() {
     VariableMap variables = Variables.createVariables()
@@ -122,8 +121,7 @@ public class DmnScriptTaskTest extends PluggableProcessEngineTestCase {
   }
 
   protected DmnDecisionOutput getDecisionOutput() {
-    DmnDecisionResult decisionResult = (DmnDecisionResult) runtimeService.getVariable(processInstanceId, RESULT_VARIABLE);
-    return decisionResult.getOutputs().get(0);
+    return (DmnDecisionOutput) runtimeService.getVariable(processInstanceId, RESULT_VARIABLE);
   }
 
   protected void startProcess(VariableMap variables) {
