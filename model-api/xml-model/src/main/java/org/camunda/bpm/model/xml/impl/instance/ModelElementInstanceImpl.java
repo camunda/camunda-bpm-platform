@@ -19,9 +19,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.ModelException;
-import org.camunda.bpm.model.xml.impl.ModelImpl;
 import org.camunda.bpm.model.xml.impl.ModelInstanceImpl;
 import org.camunda.bpm.model.xml.impl.type.ModelElementTypeImpl;
 import org.camunda.bpm.model.xml.impl.type.attribute.AttributeImpl;
@@ -117,7 +117,10 @@ public class ModelElementInstanceImpl implements ModelElementInstance {
   public void setAttributeValueNs(String namespaceUri, String attributeName, String xmlValue, boolean isIdAttribute) {
     String namespaceForSetting = namespaceUri;
     if (hasValueToBeSetForAlternativeNs(namespaceUri, attributeName)) {
-      namespaceForSetting = ((ModelImpl) modelInstance.getModel()).getAlternativeNamespace(namespaceUri);
+      namespaceForSetting = modelInstance.getModel().getAlternativeNamespace(namespaceUri);
+    }
+    if (hasValueToBeSetForActualNs(namespaceUri, attributeName)){
+      namespaceForSetting = modelInstance.getModel().getActualNamespace(namespaceUri);
     }
     String oldValue = getAttributeValueNs(namespaceForSetting, attributeName);
     if (isIdAttribute) {
@@ -132,8 +135,13 @@ public class ModelElementInstanceImpl implements ModelElementInstance {
     }
   }
 
+  private boolean hasValueToBeSetForActualNs(String namespaceUri, String attributeName) {
+    String actualNs = modelInstance.getModel().getActualNamespace(namespaceUri);
+    return getAttributeValueNs(namespaceUri, attributeName) == null && actualNs != null && getAttributeValueNs(actualNs, attributeName) != null;
+  }
+
   private boolean hasValueToBeSetForAlternativeNs(String namespaceUri, String attributeName) {
-    String alternativeNs = ((ModelImpl) modelInstance.getModel()).getAlternativeNamespace(namespaceUri);
+    String alternativeNs = modelInstance.getModel().getAlternativeNamespace(namespaceUri);
     return getAttributeValueNs(namespaceUri, attributeName) == null && alternativeNs != null && getAttributeValueNs(alternativeNs, attributeName) != null;
   }
 
@@ -172,7 +180,7 @@ public class ModelElementInstanceImpl implements ModelElementInstance {
   }
 
   public ModelElementInstance getUniqueChildElementByNameNs(String namespaceUri, String elementName) {
-    ModelImpl model = (ModelImpl) modelInstance.getModel();
+    Model model = modelInstance.getModel();
     List<DomElement> childElements = domElement.getChildElementsByNameNs(asSet(namespaceUri, model.getAlternativeNamespace(namespaceUri)), elementName);
     if(!childElements.isEmpty()) {
       return ModelUtil.getModelElement(childElements.get(0), modelInstance);
@@ -271,7 +279,7 @@ public class ModelElementInstanceImpl implements ModelElementInstance {
     for (ModelElementType extendingType : childElementType.getExtendingTypes()) {
       instances.addAll(getChildElementsByType(extendingType));
     }
-    ModelImpl model = (ModelImpl) modelInstance.getModel();
+    Model model = modelInstance.getModel();
     String alternativeNamespace = model.getAlternativeNamespace(childElementType.getTypeNamespace());
     List<DomElement> elements = domElement.getChildElementsByNameNs(asSet(childElementType.getTypeNamespace(), alternativeNamespace), childElementType.getTypeName());
     instances.addAll(ModelUtil.getModelElementCollection(elements, modelInstance));

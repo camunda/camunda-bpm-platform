@@ -66,4 +66,8 @@ public interface Model {
    */
   String getModelName();
 
+  String getActualNamespace(String alternativeNs);
+
+  String getAlternativeNamespace(String actualNs);
+
 }

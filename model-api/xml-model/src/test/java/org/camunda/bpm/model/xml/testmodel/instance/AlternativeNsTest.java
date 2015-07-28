@@ -13,8 +13,6 @@
 
 package org.camunda.bpm.model.xml.testmodel.instance;
 
-import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertFalse;
@@ -28,14 +26,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import javax.xml.XMLConstants;
-
 import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.impl.ModelImpl;
 import org.camunda.bpm.model.xml.impl.ModelInstanceImpl;
-import org.camunda.bpm.model.xml.impl.instance.DomElementImpl;
 import org.camunda.bpm.model.xml.impl.parser.AbstractModelParser;
-import org.camunda.bpm.model.xml.impl.util.DomUtil;
 import org.camunda.bpm.model.xml.instance.DomElement;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.testmodel.Gender;
@@ -47,7 +41,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -150,7 +143,6 @@ public class AlternativeNsTest extends TestModelTest {
   }
 
   @Test
-  @Ignore
   public void setAttribute() {
     Bird hedwig = modelInstance.getModelElementById("hedwig");
     assertFalse(hedwig.canHazExtendedWings());
@@ -180,7 +172,6 @@ public class AlternativeNsTest extends TestModelTest {
   }
 
   @Test
-  @Ignore
   public void useExistingNamespace() {
     assertThatThereIsNoNewerNamespaceUrl();
 

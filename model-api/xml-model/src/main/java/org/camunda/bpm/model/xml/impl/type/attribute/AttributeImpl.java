@@ -12,15 +12,18 @@
  */
 package org.camunda.bpm.model.xml.impl.type.attribute;
 
-import org.camunda.bpm.model.xml.impl.ModelImpl;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.camunda.bpm.model.xml.Model;
+import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.impl.type.reference.ReferenceImpl;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.camunda.bpm.model.xml.type.attribute.Attribute;
 import org.camunda.bpm.model.xml.type.reference.Reference;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 /**
  * <p>Base class for implementing primitive value attributes</p>
@@ -82,24 +85,43 @@ public abstract class AttributeImpl<T> implements Attribute<T> {
    * @return the value of the attribute.
    */
   public T getValue(ModelElementInstance modelElement) {
-    String value;
-    if(namespaceUri == null) {
+    String value = null;
+    if (namespaceUri == null) {
       value = modelElement.getAttributeValue(attributeName);
     } else {
-      ModelImpl model = (ModelImpl) owningElementType.getModel();
+      // getAttributeValueNs() changes the underlying model if the namespace we
+      // are searching for isn't present by adding the namespace we search for
+      // to the root element therefore we gotta check which namespace we use
+      // before we can start
+      if (isNamespacePresentInModel(modelElement.getModelInstance(), namespaceUri)) {
+        value = modelElement.getAttributeValueNs(namespaceUri, attributeName);
+      }
+      Model model = owningElementType.getModel();
       String alternativeNamespace = model.getAlternativeNamespace(namespaceUri);
-      value = modelElement.getAttributeValueNs(namespaceUri, attributeName);
-      if(value == null) {
-          value = modelElement.getAttributeValueNs(alternativeNamespace, attributeName);
+      if (value == null && isNamespacePresentInModel(modelElement.getModelInstance(), alternativeNamespace)) {
+        value = modelElement.getAttributeValueNs(alternativeNamespace, attributeName);
       }
     }
 
     // default value
-    if(value == null && defaultValue != null) {
+    if (value == null && defaultValue != null) {
       return defaultValue;
     } else {
       return convertXmlValueToModelValue(value);
     }
+  }
+
+  private boolean isNamespacePresentInModel(ModelInstance modelInstance, String namespace) {
+    Node rootElement = modelInstance.getDocument().getDomSource().getNode().getFirstChild();
+    NamedNodeMap attributes = rootElement.getAttributes();
+    for (int i = 0; i < attributes.getLength(); i++) {
+      Node item = attributes.item(i);
+      String nodeValue = item.getNodeValue();
+      if(nodeValue.equals(namespace)){
+        return true;
+      }
+    }
+    return false;
   }
 
   /**

@@ -14,7 +14,6 @@ package org.camunda.bpm.model.xml.impl.util;
 
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.ModelException;
-import org.camunda.bpm.model.xml.impl.ModelImpl;
 import org.camunda.bpm.model.xml.impl.ModelInstanceImpl;
 import org.camunda.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
 import org.camunda.bpm.model.xml.impl.type.ModelElementTypeImpl;
@@ -43,7 +42,7 @@ public final class ModelUtil {
     ModelElementInstance modelElement = domElement.getModelElementInstance();
     if(modelElement == null) {
 
-      ModelImpl model = (ModelImpl) modelInstance.getModel();
+      Model model = modelInstance.getModel();
       String namespaceUri = model.getActualNamespace(domElement.getNamespaceURI());
 
       String localName = domElement.getLocalName();
