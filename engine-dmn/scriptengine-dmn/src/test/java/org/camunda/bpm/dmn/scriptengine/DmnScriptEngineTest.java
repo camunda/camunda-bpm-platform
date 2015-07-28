@@ -26,6 +26,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.commons.utils.IoUtil;
 import org.junit.BeforeClass;
@@ -69,11 +70,24 @@ public class DmnScriptEngineTest {
   @Test
   public void shouldCompileScript() throws ScriptException {
     DmnScriptEngine dmnScriptEngine = getDmnScriptEngine();
-    CompiledScript compiledScript = dmnScriptEngine.compile(EXAMPLE_DMN_SCRIPT);
+    Bindings bindings = dmnScriptEngine.getBindings(ScriptContext.ENGINE_SCOPE);
+    bindings.put("status", "bronze");
+
+    DmnCompiledScript compiledScript = dmnScriptEngine.compile(EXAMPLE_DMN_SCRIPT);
     assertThat(compiledScript).isNotNull();
+    DmnDecisionResult result = compiledScript.eval(bindings);
+    assertThat(result).hasSingleOutput().hasEntry("result", "notok");
 
     compiledScript = dmnScriptEngine.compile(getExampleDmnReader());
     assertThat(compiledScript).isNotNull();
+    result = compiledScript.eval(bindings);
+    assertThat(result).hasSingleOutput().hasEntry("result", "notok");
+
+    DmnDecision dmnDecision = dmnScriptEngine.getDmnEngine().parseDecision(EXAMPLE_DMN);
+    compiledScript = dmnScriptEngine.compile(dmnDecision);
+    assertThat(compiledScript).isNotNull();
+    result = compiledScript.eval(bindings);
+    assertThat(result).hasSingleOutput().hasEntry("result", "notok");
   }
 
   @Test

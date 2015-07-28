@@ -80,6 +80,10 @@ public class DmnScriptEngine extends AbstractScriptEngine implements Compilable 
     return compile(script);
   }
 
+  public DmnCompiledScript compile(DmnDecision decision) throws ScriptException {
+    return new DmnCompiledScript(this, decision);
+  }
+
   @Override
   public DmnDecisionResult eval(String script) throws ScriptException {
     return eval(script, (String) null);
