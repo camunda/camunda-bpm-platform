@@ -679,12 +679,73 @@ define([
       authentication: 'required',
       resolve: {
         processInstance: [
-                'ResourceResolver', 'ProcessInstanceResource',
-        function(ResourceResolver,   ProcessInstanceResource) {
+                'ResourceResolver', 'ProcessInstanceResource', 'Uri', 'Views', 'Notifications', '$route', '$http', '$location',
+        function(ResourceResolver,   ProcessInstanceResource,   Uri,   Views,   Notifications,   $route,   $http,   $location) {
+
           return ResourceResolver.getByRouteParam('id', {
-            name: 'process instance',
+            name: 'running process instance',
+
             resolve: function(id) {
               return ProcessInstanceResource.get({ id : id });
+            },
+
+            redirectTo: function (error) {
+              var id = $route.current.params['id'];
+
+              $http.get(Uri.appUri('engine://engine/:engine/history/process-instance/') + id)
+                .success (function(result) {
+
+                  var path;
+                  var search;
+
+                  var status = 'Unable to display running process instance';
+                  var message = 'Process instance with ID ' + id + ' has been completed. Redirecting to ';
+
+                  var historyProvider = Views.getProvider({
+                    id: 'history',
+                    component: 'cockpit.processInstance.view'
+                  });
+
+                  if (historyProvider) {
+                    var currentPath = $location.path();
+                    // keep search params
+                    search = $location.search();
+                    path = '/process-instance/' + id + '/history';
+
+                    message = message + 'historic process instance view.';
+                  }
+                  else {
+                    path = '/process-definition/' + result.processDefinitionId;
+
+                    message = message + 'process definition view.';
+                  }
+
+                  $location.path(path);
+                  $location.search(search || {});
+                  $location.replace();
+
+                  Notifications.addMessage({
+                    status: status,
+                    message: message,
+                    http: true,
+                    exclusive: [ 'http' ],
+                    duration: 5000
+                  });
+
+                })
+                .error (function(error) {
+
+                  $location.path('/dashboard');
+                  $location.search({});
+                  $location.replace();
+
+                  Notifications.addError({
+                    status: 'Failed to display running process instance',
+                    message: 'No running process instance with ID ' + id,
+                    http: true,
+                    exclusive: [ 'http' ]
+                  });
+                });
             }
           });
         }]
