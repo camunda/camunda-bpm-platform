@@ -36,6 +36,16 @@ public class AuthorizationException extends ProcessEngineException {
   protected final String userId;
   protected final List<MissingAuthorization> missingAuthorizations;
 
+  // these properties have been replaced by the list of missingAuthorizations
+  // and are only left because this is a public API package and users might
+  // have subclasses relying on these fields
+  @Deprecated
+  protected String resourceType;
+  @Deprecated
+  protected String permissionName;
+  @Deprecated
+  protected String resourceId;
+
   public AuthorizationException(String message) {
     super(message);
     this.userId = null;
@@ -54,6 +64,9 @@ public class AuthorizationException extends ProcessEngineException {
     missingAuthorizations = new ArrayList<MissingAuthorization>();
     missingAuthorizations.add(exceptionInfo);
 
+    this.resourceType = exceptionInfo.getResourceType();
+    this.permissionName = exceptionInfo.getViolatedPermissionName();
+    this.resourceId = exceptionInfo.getResourceId();
   }
 
   public AuthorizationException(String userId, List<MissingAuthorization> info) {
