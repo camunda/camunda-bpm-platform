@@ -13,10 +13,12 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 /**
@@ -24,6 +26,8 @@ import org.camunda.bpm.engine.impl.util.EnsureUtil;
  *
  */
 public class SetJobPriorityCmd implements Command<Void> {
+
+  public static final String JOB_PRIORITY_PROPERTY = "priority";
 
   protected String jobId;
   protected int priority;
@@ -42,8 +46,25 @@ public class SetJobPriorityCmd implements Command<Void> {
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     authorizationManager.checkUpdateProcessInstance(job);
 
+    int currentPriority = job.getPriority();
     job.setPriority(priority);
 
+    createOpLogEntry(commandContext, currentPriority, job);
+
     return null;
+  }
+
+  protected void createOpLogEntry(CommandContext commandContext, int previousPriority, JobEntity job) {
+    PropertyChange propertyChange = new PropertyChange(JOB_PRIORITY_PROPERTY, previousPriority, job.getPriority());
+    commandContext
+      .getOperationLogManager()
+      .logJobOperation(
+          UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY,
+          job.getId(),
+          job.getJobDefinitionId(),
+          job.getProcessInstanceId(),
+          job.getProcessDefinitionId(),
+          job.getProcessDefinitionKey(),
+          propertyChange);
   }
 }

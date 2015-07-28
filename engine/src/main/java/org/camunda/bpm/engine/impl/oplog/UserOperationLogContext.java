@@ -12,111 +12,29 @@
  */
 package org.camunda.bpm.engine.impl.oplog;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
-
 /**
- * Provides information about user operations.
+ * <p>Provides information about user operations.</p>
+ *
+ * <p>One context object can contain many entries. An entry represents one operation on a set of
+ * resources of the same type. One such operation can change multiple properties on these entities.
+ * For example, more than one entry is needed when a cascading command is logged. Then there is an entry
+ * for the changes performed on the addressed resource type as well as entries for those resource types that
+ * are affected by the cascading behavior.</p>
  *
  * @author Roman Smirnov
+ * @author Thorben Lindhauer
  */
 public class UserOperationLogContext {
 
-  protected String processDefinitionId;
-  protected String processDefinitionKey;
-  protected String processInstanceId;
-  protected String executionId;
-  protected String caseDefinitionId;
-  protected String caseInstanceId;
-  protected String caseExecutionId;
-  protected String taskId;
-  protected String operationType;
-  protected String entityType;
-  protected List<PropertyChange> propertyChanges;
-  protected String userId;
   protected String operationId;
-  protected String jobDefinitionId;
-  protected String jobId;
+  protected String userId;
+  protected List<UserOperationLogContextEntry> entries;
 
-  public String getProcessDefinitionId() {
-    return processDefinitionId;
-  }
-
-  public void setProcessDefinitionId(String processDefinitionId) {
-    this.processDefinitionId = processDefinitionId;
-  }
-
-  public String getProcessInstanceId() {
-    return processInstanceId;
-  }
-
-  public void setProcessInstanceId(String processInstanceId) {
-    this.processInstanceId = processInstanceId;
-  }
-
-  public String getExecutionId() {
-    return executionId;
-  }
-
-  public void setExecutionId(String executionId) {
-    this.executionId = executionId;
-  }
-
-  public String getCaseDefinitionId() {
-    return caseDefinitionId;
-  }
-
-  public void setCaseDefinitionId(String caseDefinitionId) {
-    this.caseDefinitionId = caseDefinitionId;
-  }
-
-  public String getCaseInstanceId() {
-    return caseInstanceId;
-  }
-
-  public void setCaseInstanceId(String caseInstanceId) {
-    this.caseInstanceId = caseInstanceId;
-  }
-
-  public String getCaseExecutionId() {
-    return caseExecutionId;
-  }
-
-  public void setCaseExecutionId(String caseExecutionId) {
-    this.caseExecutionId = caseExecutionId;
-  }
-
-  public String getTaskId() {
-    return taskId;
-  }
-
-  public void setTaskId(String taskId) {
-    this.taskId = taskId;
-  }
-
-  public String getOperationType() {
-    return operationType;
-  }
-
-  public void setOperationType(String operationType) {
-    this.operationType = operationType;
-  }
-
-  public String getEntityType() {
-    return entityType;
-  }
-
-  public void setEntityType(String entityType) {
-    this.entityType = entityType;
-  }
-
-  public List<PropertyChange> getPropertyChanges() {
-    return propertyChanges;
-  }
-
-  public void setPropertyChanges(List<PropertyChange> propertyChanges) {
-    this.propertyChanges = propertyChanges;
+  public UserOperationLogContext() {
+    this.entries = new ArrayList<UserOperationLogContextEntry>();
   }
 
   public String getUserId() {
@@ -135,27 +53,14 @@ public class UserOperationLogContext {
     this.operationId = operationId;
   }
 
-  public String getProcessDefinitionKey() {
-    return processDefinitionKey;
+  public void addEntry(UserOperationLogContextEntry entry) {
+    entries.add(entry);
   }
 
-  public void setProcessDefinitionKey(String processDefinitionKey) {
-    this.processDefinitionKey = processDefinitionKey;
+  public List<UserOperationLogContextEntry> getEntries() {
+    return entries;
   }
 
-  public String getJobDefinitionId() {
-    return jobDefinitionId;
-  }
 
-  public void setJobDefinitionId(String jobDefinitionId) {
-    this.jobDefinitionId = jobDefinitionId;
-  }
 
-  public String getJobId() {
-    return jobId;
-  }
-
-  public void setJobId(String jobId) {
-    this.jobId = jobId;
-  }
 }

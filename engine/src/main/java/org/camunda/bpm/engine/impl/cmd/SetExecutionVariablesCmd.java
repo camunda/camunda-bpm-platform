@@ -51,8 +51,8 @@ public class SetExecutionVariablesCmd extends AbstractSetVariableCmd {
 
   protected void logVariableOperation(AbstractVariableScope scope) {
     ExecutionEntity execution = (ExecutionEntity) scope;
-    commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), execution,
-      PropertyChange.EMPTY_CHANGE);
+    commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), execution.getId(),
+        null, PropertyChange.EMPTY_CHANGE);
   }
 }
 

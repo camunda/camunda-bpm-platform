@@ -25,7 +25,6 @@ import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.history.IncidentState;
 import org.camunda.bpm.engine.history.JobState;
-import org.camunda.bpm.engine.history.UserOperationLogContext;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
@@ -41,6 +40,8 @@ import org.camunda.bpm.engine.impl.history.event.HistoryEventType;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.oplog.UserOperationLogContext;
+import org.camunda.bpm.engine.impl.oplog.UserOperationLogContextEntry;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
@@ -222,22 +223,23 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     }
   }
 
-  protected void initUserOperationLogEvent(UserOperationLogEntryEventEntity evt, UserOperationLogContext context, PropertyChange propertyChange) {
+  protected void initUserOperationLogEvent(UserOperationLogEntryEventEntity evt, UserOperationLogContext context,
+      UserOperationLogContextEntry contextEntry, PropertyChange propertyChange) {
     // init properties
-    evt.setEntityType(context.getEntityType());
-    evt.setOperationType(context.getOperationType());
+    evt.setEntityType(contextEntry.getEntityType());
+    evt.setOperationType(contextEntry.getOperationType());
     evt.setOperationId(context.getOperationId());
     evt.setUserId(context.getUserId());
-    evt.setProcessDefinitionId(context.getProcessDefinitionId());
-    evt.setProcessDefinitionKey(context.getProcessDefinitionKey());
-    evt.setProcessInstanceId(context.getProcessInstanceId());
-    evt.setExecutionId(context.getExecutionId());
-    evt.setCaseDefinitionId(context.getCaseDefinitionId());
-    evt.setCaseInstanceId(context.getCaseInstanceId());
-    evt.setCaseExecutionId(context.getCaseExecutionId());
-    evt.setTaskId(context.getTaskId());
-    evt.setJobId(context.getJobId());
-    evt.setJobDefinitionId(context.getJobDefinitionId());
+    evt.setProcessDefinitionId(contextEntry.getProcessDefinitionId());
+    evt.setProcessDefinitionKey(contextEntry.getProcessDefinitionKey());
+    evt.setProcessInstanceId(contextEntry.getProcessInstanceId());
+    evt.setExecutionId(contextEntry.getExecutionId());
+    evt.setCaseDefinitionId(contextEntry.getCaseDefinitionId());
+    evt.setCaseInstanceId(contextEntry.getCaseInstanceId());
+    evt.setCaseExecutionId(contextEntry.getCaseExecutionId());
+    evt.setTaskId(contextEntry.getTaskId());
+    evt.setJobId(contextEntry.getJobId());
+    evt.setJobDefinitionId(contextEntry.getJobDefinitionId());
     evt.setTimestamp(ClockUtil.getCurrentTime());
 
     // init property value
@@ -546,12 +548,14 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     String operationId = Context.getProcessEngineConfiguration().getIdGenerator().getNextId();
     context.setOperationId(operationId);
 
-    for (PropertyChange propertyChange : context.getPropertyChanges()) {
-      UserOperationLogEntryEventEntity evt = new UserOperationLogEntryEventEntity();
+    for (UserOperationLogContextEntry entry : context.getEntries()) {
+      for (PropertyChange propertyChange : entry.getPropertyChanges()) {
+        UserOperationLogEntryEventEntity evt = new UserOperationLogEntryEventEntity();
 
-      initUserOperationLogEvent(evt, context, propertyChange);
+        initUserOperationLogEvent(evt, context, entry, propertyChange);
 
-      historyEvents.add(evt);
+        historyEvents.add(evt);
+      }
     }
 
     return historyEvents;
