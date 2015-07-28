@@ -72,11 +72,11 @@ public class OperationLogJobDefinitionTest extends PluggableProcessEngineTestCas
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
 
     // with an overriding priority
-    ClockUtil.setCurrentTime(new Date(0));
+    ClockUtil.setCurrentTime(new Date(System.currentTimeMillis()));
     managementService.setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), 42);
 
     // when I overwrite that priority
-    ClockUtil.setCurrentTime(new Date(10000));
+    ClockUtil.setCurrentTime(new Date(System.currentTimeMillis() + 10000));
     managementService.setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), 43);
 
     // then this is accessible via the op log
@@ -101,11 +101,11 @@ public class OperationLogJobDefinitionTest extends PluggableProcessEngineTestCas
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
 
     // with an overriding priority
-    ClockUtil.setCurrentTime(new Date(0));
+    ClockUtil.setCurrentTime(new Date(System.currentTimeMillis()));
     managementService.setOverridingJobPriorityForJobDefinition(jobDefinition.getId(), 42);
 
     // when I clear that priority
-    ClockUtil.setCurrentTime(new Date(10000));
+    ClockUtil.setCurrentTime(new Date(System.currentTimeMillis() + 10000));
     managementService.clearOverridingJobPriorityForJobDefinition(jobDefinition.getId());
 
     // then this is accessible via the op log
