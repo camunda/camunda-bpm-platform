@@ -15,8 +15,6 @@ package org.camunda.bpm.dmn.engine;
 
 import java.util.List;
 
-public interface DmnDecisionResult {
-
-  List<DmnDecisionOutput> getOutputs();
+public interface DmnDecisionResult extends List<DmnDecisionOutput> {
 
 }

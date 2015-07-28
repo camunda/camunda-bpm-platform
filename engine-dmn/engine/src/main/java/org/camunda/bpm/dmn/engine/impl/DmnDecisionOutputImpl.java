@@ -13,55 +13,25 @@
 
 package org.camunda.bpm.dmn.engine.impl;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
-import org.camunda.bpm.dmn.engine.DmnDecisionOutputEntry;
 
-public class DmnDecisionOutputImpl implements DmnDecisionOutput, Serializable {
+import java.util.HashMap;
 
-  private static final long serialVersionUID = 1L;
-
-  protected Map<String, DmnDecisionOutputEntry> entries = new HashMap<String, DmnDecisionOutputEntry>();
-
-  public void addEntry(DmnDecisionOutputEntry entry) {
-    entries.put(entry.getName(), entry);
-  }
-
-  public List<DmnDecisionOutputEntry> getEntries() {
-    return new ArrayList<DmnDecisionOutputEntry>(entries.values());
-  }
+public class DmnDecisionOutputImpl extends HashMap<String, Object> implements DmnDecisionOutput {
 
   @SuppressWarnings("unchecked")
   public <T> T getValue(String name) {
-    DmnDecisionOutputEntry outputEntry = entries.get(name);
-    if (outputEntry != null) {
-      return (T) outputEntry.getValue();
-    }
-    else {
-      return null;
-    }
+    return (T) super.get(name);
   }
 
   @SuppressWarnings("unchecked")
   public <T> T getValue() {
-    List<DmnDecisionOutputEntry> entries = getEntries();
-    if (!entries.isEmpty()) {
-      return (T) entries.get(0).getValue();
+    if (!isEmpty()) {
+      return (T) values().iterator().next();
     }
     else {
       return null;
     }
-  }
-
-  public String toString() {
-    return "DmnDecisionOutputImpl{" +
-      "entries=" + entries +
-      '}';
   }
 
 }

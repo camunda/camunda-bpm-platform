@@ -25,7 +25,7 @@ public class DmnDecisionOutputAssertion extends AbstractAssert<DmnDecisionOutput
   public DmnDecisionOutputAssertion hasSingleEntry() {
     isNotNull();
 
-    int entriesCount = actual.getEntries().size();
+    int entriesCount = actual.size();
     if (entriesCount != 1) {
       failWithMessage("Expected output to have exact one entry but has <%s>", entriesCount);
     }
@@ -58,7 +58,7 @@ public class DmnDecisionOutputAssertion extends AbstractAssert<DmnDecisionOutput
   public DmnDecisionOutputAssertion hasEntry(String name, Object expectedValue) {
     isNotNull();
 
-    Object actualValue = actual.getValue(name);
+    Object actualValue = actual.get(name);
 
     if (actualValue == null && expectedValue != null) {
       failWithMessage("Expected output value to be <%s> but was null", expectedValue);

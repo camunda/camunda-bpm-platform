@@ -13,14 +13,14 @@
 
 package org.camunda.bpm.dmn.engine;
 
-import java.util.List;
+import java.util.Map;
 
-public interface DmnDecisionOutput {
+public interface DmnDecisionOutput extends Map<String, Object> {
 
-  List<DmnDecisionOutputEntry> getEntries();
-
+  /** Returns entry for name if existing, otherwise null */
   <T> T getValue(String name);
 
+  /** Return single entry if existing, otherwise null */
   <T> T getValue();
 
 }

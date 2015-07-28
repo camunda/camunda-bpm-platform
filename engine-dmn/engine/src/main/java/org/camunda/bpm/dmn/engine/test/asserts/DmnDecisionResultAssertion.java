@@ -26,7 +26,7 @@ public class DmnDecisionResultAssertion extends AbstractAssert<DmnDecisionResult
   public DmnDecisionResultAssertion hasSize(int expectedSize) {
     isNotNull();
 
-    int actualSize = actual.getOutputs().size();
+    int actualSize = actual.size();
 
     if (actualSize != expectedSize) {
       if (expectedSize == 0) {
@@ -50,7 +50,7 @@ public class DmnDecisionResultAssertion extends AbstractAssert<DmnDecisionResult
     isNotNull();
     hasSize(1);
 
-    DmnDecisionOutput decisionOutput = actual.getOutputs().get(0);
+    DmnDecisionOutput decisionOutput = actual.get(0);
 
     return new DmnDecisionOutputAssertion(decisionOutput);
   }

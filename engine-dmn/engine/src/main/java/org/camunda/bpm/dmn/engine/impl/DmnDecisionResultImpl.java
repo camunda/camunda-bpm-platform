@@ -13,35 +13,12 @@
 
 package org.camunda.bpm.dmn.engine.impl;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 
-public class DmnDecisionResultImpl implements DmnDecisionResult, Serializable {
+import java.io.Serializable;
+import java.util.ArrayList;
 
-  private static final long serialVersionUID = 1L;
-
-  protected List<DmnDecisionOutput> outputs = new ArrayList<DmnDecisionOutput>();
-
-  public void setOutputs(List<DmnDecisionOutput> outputs) {
-    this.outputs = outputs;
-  }
-
-  public List<DmnDecisionOutput> getOutputs() {
-    return outputs;
-  }
-
-  public void addOutput(DmnDecisionOutput decisionOutput) {
-    outputs.add(decisionOutput);
-  }
-
-  public String toString() {
-    return "DmnDecisionResultImpl{" +
-      "outputs=" + outputs +
-      '}';
-  }
+public class DmnDecisionResultImpl extends ArrayList<DmnDecisionOutput> implements DmnDecisionResult, Serializable {
 
 }
