@@ -11,4 +11,11 @@
     <differenceType>7012</differenceType>
     <method>*</method>
   </difference>
+
+  <!-- 8001: class removed -->
+  <!-- class removed from public API due to CAM-4307 -->
+  <difference>
+    <differenceType>8001</differenceType>
+    <className>org/camunda/bpm/engine/history/UserOperationLogContext</className>
+  </difference>
 </differences>
