@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 /**
  * @author Philipp Ossler
@@ -28,11 +27,11 @@ public class BookFlightService implements JavaDelegate {
 
   @Override
   public void execute(DelegateExecution execution) throws Exception {
-      String flight = (String) execution.getVariable("flight");
+    String flight = (String) execution.getVariable("flight");
 
-      EnsureUtil.ensureNotNull("flight", flight);
-
+    if (flight != null) {
       bookedFlights.add(flight);
+    }
   }
 
 }

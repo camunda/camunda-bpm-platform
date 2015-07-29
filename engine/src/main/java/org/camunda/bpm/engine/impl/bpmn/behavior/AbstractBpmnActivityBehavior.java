@@ -64,7 +64,7 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
     ActivityImpl compensationHandler = getCompensationHandler(currentActivity);
 
     // subscription for compensation event subprocess is already created
-    if(compensationHandler != null && !isCompensationStartEvent(compensationHandler)) {
+    if(compensationHandler != null && !isCompensationEventSubprocess(compensationHandler)) {
       createCompensateEventSubscription(execution, compensationHandler);
     }
     super.leave(execution);
@@ -80,8 +80,8 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
     }
   }
 
-  protected boolean isCompensationStartEvent(ActivityImpl compensationHandler) {
-    return "compensationStartEvent".equals(compensationHandler.getProperty("type"));
+  protected boolean isCompensationEventSubprocess(ActivityImpl compensationHandler) {
+    return compensationHandler.isSubProcessScope();
   }
 
   protected void createCompensateEventSubscription(ActivityExecution execution, ActivityImpl compensationHandler) {

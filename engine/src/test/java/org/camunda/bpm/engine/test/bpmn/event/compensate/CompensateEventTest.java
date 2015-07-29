@@ -34,6 +34,7 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.bpmn.event.compensate.helper.BookFlightService;
 import org.camunda.bpm.engine.test.bpmn.event.compensate.helper.CancelFlightService;
+import org.camunda.bpm.engine.test.bpmn.event.compensate.helper.GetVariablesDelegate;
 import org.camunda.bpm.engine.test.bpmn.event.compensate.helper.SetVariablesDelegate;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
 
@@ -261,26 +262,44 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
 
   }
 
-  /**
-   * this test case need to be fixed
-   *
-   * @see https://app.camunda.com/jira/browse/CAM-4268
-   */
   @Deployment
   public void testCompensateMiSubprocessVariableSnapshots() {
-
     // see referenced java delegates in the process definition.
 
-    SetVariablesDelegate.variablesMap.clear();
+    List<String> hotels = Arrays.asList("Rupert", "Vogsphere", "Milliways", "Taunton", "Ysolldins");
 
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
+    SetVariablesDelegate.setValues(hotels);
+
+    // SetVariablesDelegate take the first element of static list and set the value as local variable
+    // GetVariablesDelegate read the variable and add the value to static list
+
+    runtimeService.startProcessInstanceByKey("compensateProcess");
 
     if (!processEngineConfiguration.getHistory().equals(ProcessEngineConfiguration.HISTORY_NONE)) {
       assertEquals(5, historyService.createHistoricActivityInstanceQuery().activityId("undoBookHotel").count());
     }
 
-    assertProcessEnded(processInstance.getId());
+    assertTrue(GetVariablesDelegate.values.containsAll(hotels));
+  }
 
+  @Deployment
+  public void testCompensateMiSubprocessWithCompensationEventSubprocessVariableSnapshots() {
+    // see referenced java delegates in the process definition.
+
+    List<String> hotels = Arrays.asList("Rupert", "Vogsphere", "Milliways", "Taunton", "Ysolldins");
+
+    SetVariablesDelegate.setValues(hotels);
+
+    // SetVariablesDelegate take the first element of static list and set the value as local variable
+    // GetVariablesDelegate read the variable and add the value to static list
+
+    runtimeService.startProcessInstanceByKey("compensateProcess");
+
+    if (!processEngineConfiguration.getHistory().equals(ProcessEngineConfiguration.HISTORY_NONE)) {
+      assertEquals(5, historyService.createHistoricActivityInstanceQuery().activityId("undoBookHotel").count());
+    }
+
+    assertTrue(GetVariablesDelegate.values.containsAll(hotels));
   }
 
   /**
@@ -521,20 +540,41 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
       .done());
   }
 
-  @Deployment
-  public void testCompensationEventSubProcess() {
+  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensationEventSubProcess.bpmn20.xml" })
+  public void testCompensationEventSubProcessWithScope() {
     String processInstanceId = runtimeService.startProcessInstanceByKey("bookingProcess").getId();
 
     completeTask("Book Flight");
     completeTask("Book Hotel");
 
-    // throw compensation event
+    // throw compensation event for current scope (without activityRef)
     completeTaskWithVariable("Validate Booking", "valid", false);
 
-    // execute compensation handlers
+    // first - compensate book flight
+    assertEquals(1, taskService.createTaskQuery().count());
     completeTask("Cancel Flight");
+    // second - compensate book hotel
+    assertEquals(1, taskService.createTaskQuery().count());
     completeTask("Cancel Hotel");
+    // third - additional compensation handler
     completeTask("Update Customer Record");
+
+    assertProcessEnded(processInstanceId);
+  }
+
+  @Deployment
+  public void testCompensationEventSubProcessWithActivityRef() {
+    String processInstanceId = runtimeService.startProcessInstanceByKey("bookingProcess").getId();
+
+    completeTask("Book Hotel");
+    completeTask("Book Flight");
+
+    // throw compensation event for specific scope (with activityRef = subprocess)
+    completeTaskWithVariable("Validate Booking", "valid", false);
+
+    // compensate the activity within this scope
+    assertEquals(1, taskService.createTaskQuery().count());
+    completeTask("Cancel Hotel");
 
     assertProcessEnded(processInstanceId);
   }
@@ -665,19 +705,6 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
     // execute compensation handler and consume compensation event
     completeTask("Cancel Hotel");
     // compensation handler at subprocess (Cancel Flight) should not be executed
-    assertProcessEnded(processInstanceId);
-  }
-
-  @Deployment
-  public void testCompensationEventSubprocessAndBoundaryEvent() {
-    String processInstanceId = runtimeService.startProcessInstanceByKey("compensateProcess").getId();
-
-    // throw compensation event
-    completeTask("throw compensation");
-
-    // execute compensation handler of compensation boundary event
-    completeTask("Cancel Flight");
-    // ignore compensation handler of compensation event subprocess
     assertProcessEnded(processInstanceId);
   }
 

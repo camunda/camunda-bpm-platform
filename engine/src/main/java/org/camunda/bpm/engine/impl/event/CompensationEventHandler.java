@@ -24,9 +24,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
-import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
 
 
 /**
@@ -47,59 +45,33 @@ public class CompensationEventHandler implements EventHandler {
     String configuration = eventSubscription.getConfiguration();
     ensureNotNull("Compensating execution not set for compensate event subscription with id " + eventSubscription.getId(), "configuration", configuration);
 
-    ExecutionEntity compensatingExecution = commandContext.getExecutionManager()
-      .findExecutionById(configuration);
+    ExecutionEntity compensatingExecution = commandContext.getExecutionManager().findExecutionById(configuration);
 
     ActivityImpl compensationHandler = eventSubscription.getActivity();
 
+    // activate execution
+    compensatingExecution.setActive(true);
+
     if (isScopedCompensationHandler(compensationHandler)) {
 
-      // activate execution
-      compensatingExecution.setActive(true);
-
-      if (isCompensationEventSubprocess(compensationHandler)) {
-
-        // start event subprocess with compensation start event
-        String compensationHandlerId = (String) compensationHandler.getProperty(BpmnParse.PROPERTYNAME_COMPENSATION_HANDLER_ID);
-        ActivityImpl compensationStartEvent = compensationHandler.findActivity(compensationHandlerId);
-        compensatingExecution.executeActivity((PvmActivity) compensationStartEvent.getFlowScope());
-
-      } else {
-
-        // descend into scope:
-        List<CompensateEventSubscriptionEntity> eventsForThisScope = compensatingExecution.getCompensateEventSubscriptions();
-        CompensationUtil.throwCompensationEvent(eventsForThisScope, compensatingExecution, false);
-      }
+      // descend into scope:
+      List<CompensateEventSubscriptionEntity> eventsForThisScope = compensatingExecution.getCompensateEventSubscriptions();
+      CompensationUtil.throwCompensationEvent(eventsForThisScope, compensatingExecution, false);
 
     } else {
       try {
 
-        compensatingExecution.setActivity(compensationHandler);
-
-        // executing the atomic operation makes sure activity start events are fired
-        compensatingExecution.performOperation(PvmAtomicOperation.ACTIVITY_START);
+        compensatingExecution.executeActivity(compensationHandler);
 
       } catch (Exception e) {
         throw new ProcessEngineException("Error while handling compensation event " + eventSubscription, e);
       }
-
     }
   }
 
   protected boolean isScopedCompensationHandler(ActivityImpl compensationHandler) {
     Boolean isForCompensation = (Boolean) compensationHandler.getProperty(BpmnParse.PROPERTYNAME_IS_FOR_COMPENSATION);
     return (isForCompensation == null || !(Boolean) isForCompensation) && compensationHandler.isScope();
-  }
-
-  protected boolean isCompensationEventSubprocess(ActivityImpl compensationHandler) {
-    String compensationHandlerId = (String) compensationHandler.getProperty(BpmnParse.PROPERTYNAME_COMPENSATION_HANDLER_ID);
-    if (compensationHandlerId != null) {
-      ActivityImpl compensationStartEvent = compensationHandler.findActivity(compensationHandlerId);
-      if (compensationStartEvent != null && "compensationStartEvent".equals(compensationStartEvent.getProperty("type"))) {
-        return true;
-      }
-    }
-    return false;
   }
 
 }

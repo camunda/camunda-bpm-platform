@@ -388,11 +388,11 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     assertEquals("compensationStartEvent", compensationStartEvent.getProperty("type"));
     assertEquals(EventSubProcessStartEventActivityBehavior.class, compensationStartEvent.getActivityBehavior().getClass());
 
-    ScopeImpl compensationEventSubProcess = compensationStartEvent.getFlowScope();
+    ActivityImpl compensationEventSubProcess = (ActivityImpl) compensationStartEvent.getFlowScope();
     assertEquals(Boolean.TRUE, compensationEventSubProcess.getProperty(BpmnParse.PROPERTYNAME_IS_FOR_COMPENSATION));
 
     ScopeImpl subprocess = compensationEventSubProcess.getFlowScope();
-    assertEquals(compensationStartEvent.getActivityId(), subprocess.getProperty(BpmnParse.PROPERTYNAME_COMPENSATION_HANDLER_ID));
+    assertEquals(compensationEventSubProcess.getActivityId(), subprocess.getProperty(BpmnParse.PROPERTYNAME_COMPENSATION_HANDLER_ID));
   }
 
   @Deployment

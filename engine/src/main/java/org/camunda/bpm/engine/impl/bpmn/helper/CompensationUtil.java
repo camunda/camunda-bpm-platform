@@ -127,8 +127,9 @@ public class CompensationUtil {
         execution.getExecutions().remove(childEventScopeExecution);
       }
 
+      ActivityImpl compensationHandler = getCompensationHandler(execution);
       CompensateEventSubscriptionEntity eventSubscription = CompensateEventSubscriptionEntity.createAndInsert(levelOfSubprocessScopeExecution,
-          execution.getActivity());
+          compensationHandler);
       eventSubscription.setConfiguration(eventScopeExecution.getId());
 
     }
@@ -139,12 +140,28 @@ public class CompensationUtil {
     if (compensationHandlerId != null) {
 
       PvmActivity compensationHandler = activity.findActivity(compensationHandlerId);
-      if (compensationHandler != null && "compensationStartEvent".equals(compensationHandler.getProperty("type"))) {
+      if (compensationHandler != null && compensationHandler.isSubProcessScope()) {
         return true;
       }
     }
 
     return false;
+  }
+
+  protected static ActivityImpl getCompensationHandler(ExecutionEntity execution) {
+    ActivityImpl activity = execution.getActivity();
+    String compensationHandlerId = (String) activity.getProperty(BpmnParse.PROPERTYNAME_COMPENSATION_HANDLER_ID);
+
+    if (compensationHandlerId != null) {
+      ActivityImpl compensationHandler = activity.findActivity(compensationHandlerId);
+      if (compensationHandler != null) {
+        // subprocess with inner compensation event subprocess
+        return compensationHandler;
+      }
+    }
+    // subprocess without compensation handler or
+    // subprocess with compensation boundary event
+    return activity;
   }
 
   /**
@@ -203,7 +220,7 @@ public class CompensationUtil {
     if (compensationHandlerId != null) {
       return compensationHandlerId;
     } else {
-      // HACK <!> backwards compatibility (?)
+      // if activityRef = subprocess and subprocess has no compensation handler
       return activityRef;
     }
   }

@@ -730,13 +730,12 @@ public class BpmnParse extends Parse {
       if (existingCompensationHandlerId != null) {
 
         ActivityImpl compensationHandler = compensatedActivity.findActivity(existingCompensationHandlerId);
-        if ("compensationStartEvent".equals(compensationHandler.getProperty("type"))) {
-          addWarning("compensation boundary event and event subprocess with compensation start event are not supported on the same scope. "
-              + "event subprocess will be ignored", associationElement);
+        if (compensationHandler.isSubProcessScope()) {
+          addError("compensation boundary event and event subprocess with compensation start event are not supported on the same scope", associationElement);
         }
+      } else {
+        compensatedActivity.setProperty(PROPERTYNAME_COMPENSATION_HANDLER_ID, targetActivity.getId());
       }
-
-      compensatedActivity.setProperty(PROPERTYNAME_COMPENSATION_HANDLER_ID, targetActivity.getId());
     }
   }
 
@@ -960,15 +959,14 @@ public class BpmnParse extends Parse {
     String existingCompensationHandlerId = (String) subprocess.getProperty(PROPERTYNAME_COMPENSATION_HANDLER_ID);
     if (existingCompensationHandlerId == null) {
       // add property to subprocess
-      subprocess.setProperty(PROPERTYNAME_COMPENSATION_HANDLER_ID, startEventActivity.getActivityId());
+      subprocess.setProperty(PROPERTYNAME_COMPENSATION_HANDLER_ID, scopeActivity.getActivityId());
     } else {
 
-      ActivityImpl compensationHandler = subprocess.findActivity(startEventActivity.getActivityId());
-      if ("compensationStartEvent".equals(compensationHandler.getProperty("type"))) {
+      ActivityImpl compensationHandler = subprocess.findActivity(existingCompensationHandlerId);
+      if (compensationHandler.isSubProcessScope()) {
         addError("multiple event subprocesses with compensation start event are not supported on the same scope", startEventElement);
       } else {
-        addWarning("compensation boundary event and event subprocess with compensation start event are not supported on the same scope. "
-            + "event subprocess will be ignored", startEventElement);
+        addError("compensation boundary event and event subprocess with compensation start event are not supported on the same scope", startEventElement);
       }
     }
 
