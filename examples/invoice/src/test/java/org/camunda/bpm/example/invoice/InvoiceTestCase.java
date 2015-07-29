@@ -1,5 +1,8 @@
 package org.camunda.bpm.example.invoice;
 
+import static org.camunda.bpm.engine.variable.Variables.fileValue;
+
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,19 +12,31 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineTestCase;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 
 public class InvoiceTestCase extends ProcessEngineTestCase {
 	
 	@Deployment(resources="invoice.bpmn")
 	public void testHappyPath() {
-		ProcessInstance pi = runtimeService.startProcessInstanceByKey("invoice");
+		InputStream invoiceInputStream = InvoiceProcessApplication.class.getClassLoader().getResourceAsStream("invoice.pdf");
+		VariableMap variables = Variables.createVariables()
+				.putValue("creditor", "Great Pizza for Everyone Inc.")
+				.putValue("amount", "30€")
+				.putValue("invoiceNumber", "GPFE-23232323")
+				.putValue("invoiceDocument", fileValue("invoice.pdf")
+						.file(invoiceInputStream)
+						.mimeType("application/pdf")
+						.create());
+
+		ProcessInstance pi = runtimeService.startProcessInstanceByKey("invoice", variables);
 		
 		List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
 		
 		assertEquals(1, tasks.size());
 		assertEquals("assignApprover", tasks.get(0).getTaskDefinitionKey());
-		
-		Map<String, Object> variables = new HashMap<String, Object>();
+
+		variables.clear();
 		variables.put("approver", "somebody");
 		taskService.complete(tasks.get(0).getId(), variables);
 
