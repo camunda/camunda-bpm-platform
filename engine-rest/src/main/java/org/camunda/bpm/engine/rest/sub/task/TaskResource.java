@@ -107,6 +107,9 @@ public interface TaskResource {
   @Path("/attachment")
   TaskAttachmentResource getAttachmentResource();
 
+  @Path("/variables")
+  VariableResource getVariables();
+
   @Path("/localVariables")
   VariableResource getLocalVariables();
 

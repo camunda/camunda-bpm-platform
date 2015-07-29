@@ -8,7 +8,6 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 import java.util.List;
-import java.util.Map;
 
 public class LocalTaskVariablesResource extends AbstractVariablesResource {
 
@@ -18,11 +17,6 @@ public class LocalTaskVariablesResource extends AbstractVariablesResource {
 
   protected String getResourceTypeName() {
     return "task";
-  }
-
-  protected void updateVariableEntities(Map<String, Object> modifications, List<String> deletions) {
-    TaskServiceImpl taskService = (TaskServiceImpl) engine.getTaskService();
-    taskService.updateVariablesLocal(resourceId, modifications, deletions);
   }
 
   protected void removeVariableEntity(String variableKey) {

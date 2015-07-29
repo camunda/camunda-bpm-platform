@@ -8367,6 +8367,223 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
   }
 
+  // TaskServiceImpl#updateVariables() (process task) ////////////////////////////////////////////
+
+  public void testProcessTaskUpdateVariablesWithoutAuthorization() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+
+    try {
+      // when (1)
+      ((TaskServiceImpl)taskService).updateVariables(taskId, getVariables(), null);
+      fail("Exception expected: It should not be to set a variable");
+    } catch (AuthorizationException e) {
+      // then (1)
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(UPDATE.getName(), message);
+      assertTextPresent(taskId, message);
+      assertTextPresent(TASK.resourceName(), message);
+      assertTextPresent(UPDATE_TASK.getName(), message);
+      assertTextPresent(PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
+
+    try {
+      // when (2)
+      ((TaskServiceImpl)taskService).updateVariables(taskId, null, Arrays.asList(VARIABLE_NAME));
+      fail("Exception expected: It should not be to set a variable");
+    } catch (AuthorizationException e) {
+      // then (2)
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(UPDATE.getName(), message);
+      assertTextPresent(taskId, message);
+      assertTextPresent(TASK.resourceName(), message);
+      assertTextPresent(UPDATE_TASK.getName(), message);
+      assertTextPresent(PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
+
+    try {
+      // when (3)
+      ((TaskServiceImpl)taskService).updateVariables(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
+      fail("Exception expected: It should not be to set a variable");
+    } catch (AuthorizationException e) {
+      // then (3)
+      String message = e.getMessage();
+      assertTextPresent(userId, message);
+      assertTextPresent(UPDATE.getName(), message);
+      assertTextPresent(taskId, message);
+      assertTextPresent(TASK.resourceName(), message);
+      assertTextPresent(UPDATE_TASK.getName(), message);
+      assertTextPresent(PROCESS_KEY, message);
+      assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
+    }
+  }
+
+  public void testProcessTaskUpdateVariablesWithReadPermissionOnTask() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(TASK, taskId, userId, UPDATE);
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
+
+    // when (1)
+    ((TaskServiceImpl)taskService).updateVariables(taskId, getVariables(), null);
+
+    // then (1)
+    disableAuthorization();
+    verifyQueryResults(query, 1);
+    enableAuthorization();
+
+    // when (2)
+    ((TaskServiceImpl)taskService).updateVariables(taskId, null, Arrays.asList(VARIABLE_NAME));
+
+    // then (2)
+    disableAuthorization();
+    verifyQueryResults(query, 0);
+    enableAuthorization();
+
+    // when (3)
+    ((TaskServiceImpl)taskService).updateVariables(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
+
+    // then (3)
+    disableAuthorization();
+    verifyQueryResults(query, 0);
+    enableAuthorization();
+  }
+
+  public void testProcessTaskUpdateVariablesWithReadPermissionOnAnyTask() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(TASK, ANY, userId, UPDATE);
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
+
+    // when (1)
+    ((TaskServiceImpl)taskService).updateVariables(taskId, getVariables(), null);
+
+    // then (1)
+    disableAuthorization();
+    verifyQueryResults(query, 1);
+    enableAuthorization();
+
+    // when (2)
+    ((TaskServiceImpl)taskService).updateVariables(taskId, null, Arrays.asList(VARIABLE_NAME));
+
+    // then (2)
+    disableAuthorization();
+    verifyQueryResults(query, 0);
+    enableAuthorization();
+
+    // when (3)
+    ((TaskServiceImpl)taskService).updateVariables(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
+
+    // then (3)
+    disableAuthorization();
+    verifyQueryResults(query, 0);
+    enableAuthorization();
+  }
+
+  public void testProcessTaskUpdateVariablesWithReadInstancePermissionOnProcessDefinition() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(PROCESS_DEFINITION, PROCESS_KEY, userId, UPDATE_TASK);
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
+
+    // when (1)
+    ((TaskServiceImpl)taskService).updateVariables(taskId, getVariables(), null);
+
+    // then (1)
+    disableAuthorization();
+    verifyQueryResults(query, 1);
+    enableAuthorization();
+
+    // when (2)
+    ((TaskServiceImpl)taskService).updateVariables(taskId, null, Arrays.asList(VARIABLE_NAME));
+
+    // then (2)
+    disableAuthorization();
+    verifyQueryResults(query, 0);
+    enableAuthorization();
+
+    // when (3)
+    ((TaskServiceImpl)taskService).updateVariables(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
+
+    // then (3)
+    disableAuthorization();
+    verifyQueryResults(query, 0);
+    enableAuthorization();
+  }
+
+  public void testProcessTaskUpdateVariablesWithReadInstancePermissionOnAnyProcessDefinition() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, UPDATE_TASK);
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
+
+    // when (1)
+    ((TaskServiceImpl)taskService).updateVariables(taskId, getVariables(), null);
+
+    // then (1)
+    disableAuthorization();
+    verifyQueryResults(query, 1);
+    enableAuthorization();
+
+    // when (2)
+    ((TaskServiceImpl)taskService).updateVariables(taskId, null, Arrays.asList(VARIABLE_NAME));
+
+    // then (2)
+    disableAuthorization();
+    verifyQueryResults(query, 0);
+    enableAuthorization();
+
+    // when (3)
+    ((TaskServiceImpl)taskService).updateVariables(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
+
+    // then (3)
+    disableAuthorization();
+    verifyQueryResults(query, 0);
+    enableAuthorization();
+  }
+
+  // TaskServiceImpl#updateVariablesLocal() (case task) ////////////////////////////////////////////
+
+  public void testCaseTaskUpdateVariables() {
+    // given
+    createCaseInstanceByKey(CASE_KEY);
+    String taskId = selectSingleTask().getId();
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
+
+    // when (1)
+    ((TaskServiceImpl)taskService).updateVariables(taskId, getVariables(), null);
+
+    // then (1)
+    disableAuthorization();
+    verifyQueryResults(query, 1);
+    enableAuthorization();
+
+    // when (2)
+    ((TaskServiceImpl)taskService).updateVariables(taskId, null, Arrays.asList(VARIABLE_NAME));
+
+    // then (2)
+    disableAuthorization();
+    verifyQueryResults(query, 0);
+    enableAuthorization();
+
+    // when (3)
+    ((TaskServiceImpl)taskService).updateVariables(taskId, getVariables(), Arrays.asList(VARIABLE_NAME));
+
+    // then (3)
+    disableAuthorization();
+    verifyQueryResults(query, 0);
+    enableAuthorization();
+  }
+
   // helper ////////////////////////////////////////////////////////////////////////////////
 
   protected void verifyQueryResults(TaskQuery query, int countExpected) {

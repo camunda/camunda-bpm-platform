@@ -10,26 +10,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.wink;
+package org.camunda.bpm.engine.rest.jersey;
 
-import org.camunda.bpm.engine.rest.AbstractTaskRestServiceInteractionTest;
-import org.camunda.bpm.engine.rest.util.WinkTomcatServerBootstrap;
+import org.camunda.bpm.engine.rest.AbstractTaskVariableRestResourceInteractionTest;
+import org.camunda.bpm.engine.rest.util.EmbeddedServerBootstrap;
+import org.camunda.bpm.engine.rest.util.JerseyServerBootstrap;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.rules.TemporaryFolder;
+import org.junit.Ignore;
+import org.junit.Test;
 
-public class TaskRestServiceInteractionTest extends AbstractTaskRestServiceInteractionTest {
+/**
+ * @author Daniel Meyer
+ *
+ */
+public class TaskVariableRestResourceInteractionTest extends AbstractTaskVariableRestResourceInteractionTest {
 
-  protected static WinkTomcatServerBootstrap serverBootstrap;
-
-  @ClassRule
-  public static TemporaryFolder temporaryFolder = new TemporaryFolder();
+  protected static EmbeddedServerBootstrap serverBootstrap;
 
   @BeforeClass
   public static void setUpEmbeddedRuntime() {
-    serverBootstrap = new WinkTomcatServerBootstrap();
-    serverBootstrap.setWorkingDir(temporaryFolder.getRoot().getAbsolutePath());
+    serverBootstrap = new JerseyServerBootstrap();
     serverBootstrap.start();
   }
 
@@ -37,4 +38,12 @@ public class TaskRestServiceInteractionTest extends AbstractTaskRestServiceInter
   public static void tearDownEmbeddedRuntime() {
     serverBootstrap.stop();
   }
+
+  @Test
+  @Ignore("Ignored until REST assured issue #413 is closed and our version is upgraded accordingly")
+  @Override
+  public void testGetFileVariableDownloadWithTypeAndEncoding() {
+    super.testGetFileVariableDownloadWithTypeAndEncoding();
+  }
+
 }

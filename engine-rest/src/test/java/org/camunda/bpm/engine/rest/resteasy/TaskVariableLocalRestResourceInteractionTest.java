@@ -10,27 +10,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.jersey;
+package org.camunda.bpm.engine.rest.resteasy;
 
-import org.camunda.bpm.engine.rest.AbstractTaskRestServiceInteractionTest;
+import org.camunda.bpm.engine.rest.AbstractTaskVariableLocalRestResourceInteractionTest;
 import org.camunda.bpm.engine.rest.util.EmbeddedServerBootstrap;
-import org.camunda.bpm.engine.rest.util.JerseyServerBootstrap;
+import org.camunda.bpm.engine.rest.util.ResteasyServerBootstrap;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 
-public class TaskRestServiceInteractionTest extends AbstractTaskRestServiceInteractionTest {
+/**
+ * @author Daniel Meyer
+ *
+ */
+public class TaskVariableLocalRestResourceInteractionTest extends AbstractTaskVariableLocalRestResourceInteractionTest {
 
   protected static EmbeddedServerBootstrap serverBootstrap;
 
   @BeforeClass
   public static void setUpEmbeddedRuntime() {
-    serverBootstrap = new JerseyServerBootstrap();
+    serverBootstrap = new ResteasyServerBootstrap();
     serverBootstrap.start();
   }
 
   @AfterClass
   public static void tearDownEmbeddedRuntime() {
     serverBootstrap.stop();
+  }
+
+  @Test
+  @Ignore("Ignored until REST assured issue #413 is closed and our version is upgraded accordingly")
+  @Override
+  public void testGetFileVariableDownloadWithTypeAndEncoding() {
+    super.testGetFileVariableDownloadWithTypeAndEncoding();
   }
 
 }

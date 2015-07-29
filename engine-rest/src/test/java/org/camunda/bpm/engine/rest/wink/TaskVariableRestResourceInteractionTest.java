@@ -12,14 +12,18 @@
  */
 package org.camunda.bpm.engine.rest.wink;
 
-import org.camunda.bpm.engine.rest.AbstractTaskRestServiceInteractionTest;
+import org.camunda.bpm.engine.rest.AbstractTaskVariableRestResourceInteractionTest;
 import org.camunda.bpm.engine.rest.util.WinkTomcatServerBootstrap;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.rules.TemporaryFolder;
 
-public class TaskRestServiceInteractionTest extends AbstractTaskRestServiceInteractionTest {
+/**
+ * @author Daniel Meyer
+ *
+ */
+public class TaskVariableRestResourceInteractionTest extends AbstractTaskVariableRestResourceInteractionTest {
 
   protected static WinkTomcatServerBootstrap serverBootstrap;
 
@@ -37,4 +41,5 @@ public class TaskRestServiceInteractionTest extends AbstractTaskRestServiceInter
   public static void tearDownEmbeddedRuntime() {
     serverBootstrap.stop();
   }
+
 }
