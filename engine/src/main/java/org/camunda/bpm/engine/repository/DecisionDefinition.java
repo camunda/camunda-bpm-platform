@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.engine.repository;
 
+/**
+ * Definition of a decision resource
+ */
 public interface DecisionDefinition extends ResourceDefinition {
 
 }

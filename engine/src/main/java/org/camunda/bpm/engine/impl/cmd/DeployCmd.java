@@ -318,10 +318,6 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
     return StringUtil.hasAnySuffix(resourceEntity.getName(), CmmnDeployer.CMMN_RESOURCE_SUFFIXES);
   }
 
-  protected boolean isDmnResource(ResourceEntity resourceEntity) {
-    return StringUtil.hasAnySuffix(resourceEntity.getName(), DmnDeployer.DMN_RESOURCE_SUFFIXES);
-  }
-
   protected Set<String> findDeploymentIdsForProcessDefinitions(CommandContext commandContext, Set<String> processDefinitionKeys) {
     Set<String> deploymentsToRegister = new HashSet<String>();
     for (String processDefinitionKey : processDefinitionKeys) {

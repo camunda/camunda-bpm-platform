@@ -96,7 +96,7 @@ public class ProcessApplicationScanningUtil {
     // decision resources
     boolean isDmnDiagram = checkDiagram(fileName, modelFileName, DmnDeployer.DIAGRAM_SUFFIXES, DmnDeployer.DMN_RESOURCE_SUFFIXES);
 
-    return isBpmnDiagram || isCmmnDiagram;
+    return isBpmnDiagram || isCmmnDiagram || isDmnDiagram;
   }
 
   /**

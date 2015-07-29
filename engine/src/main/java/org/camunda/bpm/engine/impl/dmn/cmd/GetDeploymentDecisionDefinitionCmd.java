@@ -22,6 +22,9 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 
+/**
+ * Gives access to a deployed decision definition instance.
+ */
 public class GetDeploymentDecisionDefinitionCmd implements Command<DecisionDefinition>, Serializable {
 
   private static final long serialVersionUID = 1L;

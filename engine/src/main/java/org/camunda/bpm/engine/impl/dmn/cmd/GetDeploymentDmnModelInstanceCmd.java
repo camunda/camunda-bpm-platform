@@ -21,6 +21,10 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.model.dmn.DmnModelInstance;
 
+/**
+ * Gives access to a deployed DMN model instance which can be accessed by
+ * the DMN model API.
+ */
 public class GetDeploymentDmnModelInstanceCmd implements Command<DmnModelInstance> {
 
   protected String decisionDefinitionId;

@@ -32,6 +32,10 @@ import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 import org.camunda.bpm.engine.repository.ResourceDefinitionEntity;
 
+/**
+ * {@link Deployer} responsible to parse resource files and create the proper entities.
+ * This class is extended by specific resource deployers.
+ */
 public abstract class AbstractDefinitionDeployer<DefinitionEntity extends ResourceDefinitionEntity> implements Deployer {
 
   private static final Logger LOG = Logger.getLogger(AbstractDefinitionDeployer.class.getName());
@@ -78,9 +82,12 @@ public abstract class AbstractDefinitionDeployer<DefinitionEntity extends Resour
     return false;
   }
 
+  /**
+   * @return the list of resource suffixes for this deployer
+   */
   protected abstract String[] getResourcesSuffixes();
 
-  protected Collection<? extends DefinitionEntity> transformResource(DeploymentEntity deployment, ResourceEntity resource) {
+  protected Collection<DefinitionEntity> transformResource(DeploymentEntity deployment, ResourceEntity resource) {
     String resourceName = resource.getName();
     List<DefinitionEntity> definitions = transformDefinitions(deployment, resource);
 
@@ -97,6 +104,14 @@ public abstract class AbstractDefinitionDeployer<DefinitionEntity extends Resour
     return definitions;
   }
 
+
+  /**
+   * Transform the resource entity into definition entities.
+   *
+   * @param deployment the deployment the resources belongs to
+   * @param resource the resource to transform
+   * @return a list of transformed definition entities
+   */
   protected abstract List<DefinitionEntity> transformDefinitions(DeploymentEntity deployment, ResourceEntity resource);
 
   /**
@@ -130,8 +145,22 @@ public abstract class AbstractDefinitionDeployer<DefinitionEntity extends Resour
         return diagramForFileResource;
       }
     }
-    return null;
 
+    return generateDiagramResourceForDefinition(deployment, resourceName, definition, resources);
+  }
+
+  /**
+   * Generate a diagram resource for a definition and return the name of the image resource.
+   *
+   * @param deployment the deployment entity
+   * @param resourceName the name of the definition resource
+   * @param definition the definition entity
+   * @param resources the resources of the deployment
+   * @return the name of the generated diagram resource or null if non was created
+   */
+  protected String generateDiagramResourceForDefinition(DeploymentEntity deployment, String resourceName, DefinitionEntity definition, Map<String, ResourceEntity> resources) {
+    // default don't generate diagram resources
+    return null;
   }
 
   protected String getDefinitionDiagramResourceName(String resourceName, DefinitionEntity definition, String diagramSuffix) {
@@ -212,6 +241,8 @@ public abstract class AbstractDefinitionDeployer<DefinitionEntity extends Resour
 
       DefinitionEntity persistedDefinition = findDefinitionByDeploymentAndKey(deploymentId, definitionKey);
 
+      persistedDefinitionLoaded(deployment, definition, persistedDefinition);
+
       updateDefinitionByPersistedDefinition(deployment, definition, persistedDefinition);
 
       registerDefinition(deployment, definition);
@@ -224,10 +255,36 @@ public abstract class AbstractDefinitionDeployer<DefinitionEntity extends Resour
     definition.setDeploymentId(deployment.getId());
   }
 
+  /**
+   * Called when a previous version of a definition was loaded from the persistent store.
+   *
+   * @param deployment the deployment of the definition
+   * @param definition the definition entity
+   * @param persistedDefinition the loaded definition entity
+   */
+  protected void persistedDefinitionLoaded(DeploymentEntity deployment, DefinitionEntity definition, DefinitionEntity persistedDefinition) {
+    // do nothing;
+  }
+
+  /**
+   * Find a definition entity by deployment id and definition key.
+   * @param deploymentId the deployment id
+   * @param definitionKey the definition key
+   * @return the corresponding definition entity or null if non is found
+   */
   protected abstract DefinitionEntity findDefinitionByDeploymentAndKey(String deploymentId, String definitionKey);
 
+  /**
+   * Find the last deployed definition entity by definition key.
+   * @param definitionKey the definition key
+   * @return the corresponding definition entity or null if non is found
+   */
   protected abstract DefinitionEntity findLatestDefinitionByKey(String definitionKey);
 
+  /**
+   * Persist definition entity into the database.
+   * @param definition the definition entity
+   */
   protected abstract void persistDefinition(DefinitionEntity definition);
 
   protected void registerDefinition(DeploymentEntity deployment, DefinitionEntity definition) {
@@ -236,11 +293,29 @@ public abstract class AbstractDefinitionDeployer<DefinitionEntity extends Resour
     // Add to cache
     addDefinitionToDeploymentCache(deploymentCache, definition);
 
+    definitionAddedToDeploymentCache(deployment, definition);
+
     // Add to deployment for further usage
     deployment.addDeployedArtifact(definition);
   }
 
+  /**
+   * Add a definition to the deployment cache
+   *
+   * @param deploymentCache the deployment cache
+   * @param definition the definition to add
+   */
   protected abstract void addDefinitionToDeploymentCache(DeploymentCache deploymentCache, DefinitionEntity definition);
+
+  /**
+   * Called after a definition was added to the deployment cache.
+   *
+   * @param deployment the deployment of the definition
+   * @param definition the definition entity
+   */
+  protected void definitionAddedToDeploymentCache(DeploymentEntity deployment, DefinitionEntity definition) {
+    // do nothing
+  }
 
   /**
    * per default we increment the latest definition version by one - but you

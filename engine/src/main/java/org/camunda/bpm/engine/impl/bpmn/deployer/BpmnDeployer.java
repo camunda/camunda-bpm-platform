@@ -125,16 +125,15 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
     deploymentCache.addProcessDefinition(definition);
   }
 
+
   @Override
-  protected String getDiagramResourceForDefinition(DeploymentEntity deployment, String resourceName, ProcessDefinitionEntity definition, Map<String, ResourceEntity> resources) {
-    String diagramResourceName = super.getDiagramResourceForDefinition(deployment, resourceName, definition, resources);
+  protected String generateDiagramResourceForDefinition(DeploymentEntity deployment, String resourceName, ProcessDefinitionEntity definition, Map<String, ResourceEntity> resources) {
+    String diagramResourceName = null;
 
     // Only generate the resource when deployment is new to prevent modification of deployment resources
     // after the process-definition is actually deployed. Also to prevent resource-generation failure every
     // time the process definition is added to the deployment-cache when diagram-generation has failed the first time.
-    if(deployment.isNew() && getProcessEngineConfiguration().isCreateDiagramOnDeploy()
-       && diagramResourceName == null && definition.isGraphicalNotationDefined()) {
-
+    if(deployment.isNew() && getProcessEngineConfiguration().isCreateDiagramOnDeploy() && definition.isGraphicalNotationDefined()) {
       try {
         byte[] diagramBytes = IoUtil.readInputStream(ProcessDiagramGenerator.generatePngDiagram(definition), null);
         diagramResourceName = getDefinitionDiagramResourceName(resourceName, definition, "png");
@@ -148,16 +147,11 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
   }
 
   @Override
-  protected void registerDefinition(DeploymentEntity deployment, ProcessDefinitionEntity definition) {
-    DeploymentCache deploymentCache = getDeploymentCache();
-
+  protected void definitionAddedToDeploymentCache(DeploymentEntity deployment, ProcessDefinitionEntity definition) {
     List<JobDeclaration<?, ?>> declarations = jobDeclarations.get(definition.getKey());
     updateJobDeclarations(declarations, definition, deployment.isNew());
 
     ProcessDefinitionEntity latestDefinition = findLatestDefinitionByKey(definition.getKey());
-
-    // Add to cache
-    addDefinitionToDeploymentCache(deploymentCache, definition);
 
     if (deployment.isNew()) {
       adjustStartEventSubscriptions(definition, latestDefinition);
@@ -165,14 +159,10 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
 
     // add "authorizations"
     addAuthorizations(definition);
-
-    // Add to deployment for further usage
-    deployment.addDeployedArtifact(definition);
   }
 
   @Override
-  protected void updateDefinitionByPersistedDefinition(DeploymentEntity deployment, ProcessDefinitionEntity definition, ProcessDefinitionEntity persistedDefinition) {
-    super.updateDefinitionByPersistedDefinition(deployment, definition, persistedDefinition);
+  protected void persistedDefinitionLoaded(DeploymentEntity deployment, ProcessDefinitionEntity definition, ProcessDefinitionEntity persistedDefinition) {
     definition.setSuspensionState(persistedDefinition.getSuspensionState());
   }
 
