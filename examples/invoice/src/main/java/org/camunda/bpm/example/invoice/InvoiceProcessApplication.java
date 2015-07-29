@@ -12,8 +12,9 @@
  */
 package org.camunda.bpm.example.invoice;
 
-import static org.camunda.bpm.engine.variable.Variables.createVariables;
+import static org.camunda.bpm.engine.variable.Variables.*;
 
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Calendar;
 
@@ -44,17 +45,28 @@ public class InvoiceProcessApplication extends ServletProcessApplication {
   }
 
   private void startProcessInstance(ProcessEngine processEngine) {
+
+    InputStream invoiceInputStream = InvoiceProcessApplication.class.getClassLoader().getResourceAsStream("invoice.pdf");
+
     // process instance 1
     processEngine.getRuntimeService().startProcessInstanceByKey("invoice", createVariables()
         .putValue("creditor", "Great Pizza for Everyone Inc.")
         .putValue("amount", "30€")
-        .putValue("invoiceNumber", "GPFE-23232323"));
+        .putValue("invoiceNumber", "GPFE-23232323")
+        .putValue("invoiceDocument", fileValue("invoice.pdf")
+            .file(invoiceInputStream)
+            .mimeType("application/pdf")
+            .create()));
 
     // process instance 2
     ProcessInstance pi = processEngine.getRuntimeService().startProcessInstanceByKey("invoice", createVariables()
         .putValue("creditor", "Bobby's Office Supplies")
         .putValue("amount", "312.99$")
-        .putValue("invoiceNumber", "BOS-43934"));
+        .putValue("invoiceNumber", "BOS-43934")
+        .putValue("invoiceDocument", fileValue("invoice.pdf")
+            .file(invoiceInputStream)
+            .mimeType("application/pdf")
+            .create()));
     try {
       Calendar calendar = Calendar.getInstance();
       calendar.add(Calendar.DAY_OF_MONTH, -14);
@@ -72,7 +84,11 @@ public class InvoiceProcessApplication extends ServletProcessApplication {
     pi = processEngine.getRuntimeService().startProcessInstanceByKey("invoice", createVariables()
         .putValue("creditor", "Papa Steve's all you can eat")
         .putValue("amount", "10.99$")
-        .putValue("invoiceNumber", "PSACE-5342"));
+        .putValue("invoiceNumber", "PSACE-5342")
+        .putValue("invoiceDocument", fileValue("invoice.pdf")
+            .file(invoiceInputStream)
+            .mimeType("application/pdf")
+            .create()));
     try {
       Calendar calendar = Calendar.getInstance();
       calendar.add(Calendar.DAY_OF_MONTH, -5);
