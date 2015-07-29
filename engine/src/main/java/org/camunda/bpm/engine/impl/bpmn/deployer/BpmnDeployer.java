@@ -315,19 +315,26 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
     // look for subscriptions for the same name in db:
     List<EventSubscriptionEntity> subscriptionsForSameMessageName = getEventSubscriptionManager()
       .findEventSubscriptionsByName(MessageEventHandler.EVENT_HANDLER_TYPE, eventSubscription.getEventName());
+
     // also look for subscriptions created in the session:
     List<MessageEventSubscriptionEntity> cachedSubscriptions = getDbEntityManager()
       .getCachedEntitiesByType(MessageEventSubscriptionEntity.class);
+
     for (MessageEventSubscriptionEntity cachedSubscription : cachedSubscriptions) {
+
       if(eventSubscription.getEventName().equals(cachedSubscription.getEventName())
-              && !subscriptionsForSameMessageName.contains(cachedSubscription)) {
+        && !subscriptionsForSameMessageName.contains(cachedSubscription)) {
         subscriptionsForSameMessageName.add(cachedSubscription);
       }
     }
+
     // remove subscriptions deleted in the same command
-    subscriptionsForSameMessageName = getDbEntityManager()
-            .pruneDeletedEntities(subscriptionsForSameMessageName);
-    return !filterSubscriptionsOfDifferentType(eventSubscription, subscriptionsForSameMessageName).isEmpty();
+    subscriptionsForSameMessageName = getDbEntityManager().pruneDeletedEntities(subscriptionsForSameMessageName);
+
+    // remove subscriptions for different type of event (i.e. remove intermediate message event subscriptions)
+    subscriptionsForSameMessageName = filterSubscriptionsOfDifferentType(eventSubscription, subscriptionsForSameMessageName);
+
+    return !subscriptionsForSameMessageName.isEmpty();
   }
 
   /**
@@ -343,14 +350,22 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
   protected List<EventSubscriptionEntity> filterSubscriptionsOfDifferentType(EventSubscriptionDeclaration eventSubscription,
       List<EventSubscriptionEntity> subscriptionsForSameMessageName) {
     ArrayList<EventSubscriptionEntity> filteredSubscriptions = new ArrayList<EventSubscriptionEntity>(subscriptionsForSameMessageName);
+
     for (EventSubscriptionEntity subscriptionEntity : new ArrayList<EventSubscriptionEntity>(subscriptionsForSameMessageName)) {
-      if (eventSubscription.isStartEvent() && isSubscriptionForIntermediateEvent(subscriptionEntity)) {
-        filteredSubscriptions.remove(subscriptionEntity);
-      } else if (!eventSubscription.isStartEvent() && isSubscriptionForStartEvent(subscriptionEntity)) {
+
+      if (isSubscriptionOfDifferentTypeAsDeclaration(subscriptionEntity, eventSubscription)) {
         filteredSubscriptions.remove(subscriptionEntity);
       }
     }
+
     return filteredSubscriptions;
+  }
+
+  protected boolean isSubscriptionOfDifferentTypeAsDeclaration(EventSubscriptionEntity subscriptionEntity,
+      EventSubscriptionDeclaration declaration) {
+
+    return (declaration.isStartEvent() && isSubscriptionForIntermediateEvent(subscriptionEntity))
+        || (!declaration.isStartEvent() && isSubscriptionForStartEvent(subscriptionEntity));
   }
 
   protected boolean isSubscriptionForStartEvent(EventSubscriptionEntity subscriptionEntity) {
