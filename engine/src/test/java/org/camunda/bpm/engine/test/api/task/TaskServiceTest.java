@@ -1684,7 +1684,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     deletions.add("variable4");
 
     try {
-      ((TaskServiceImpl) taskService).updateVariablesLocal(null, modifications, deletions);
+      ((TaskServiceImpl) taskService).updateVariables(null, modifications, deletions);
       fail("expected process engine exception");
     } catch (ProcessEngineException e) {
     }

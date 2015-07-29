@@ -155,6 +155,7 @@ public class AbstractTaskVariableRestResourceInteractionTest extends
       .when().get(SINGLE_TASK_VARIABLES_URL);
 
     // then
+    verify(taskServiceMock).getVariablesTyped(EXAMPLE_TASK_ID, true);
   }
 
   @Test
@@ -311,7 +312,6 @@ public class AbstractTaskVariableRestResourceInteractionTest extends
       .body("type", is("Integer"))
       .when().get(SINGLE_TASK_SINGLE_VARIABLE_URL);
   }
-
 
   @Test
   public void testGetSingleVariableData() {

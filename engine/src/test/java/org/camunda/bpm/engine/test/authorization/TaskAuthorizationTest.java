@@ -8206,7 +8206,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     }
   }
 
-  public void testProcessTaskUpdateVariablesLocalWithReadPermissionOnTask() {
+  public void testProcessTaskUpdateVariablesLocalWithUpdatePermissionOnTask() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -8238,7 +8238,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
   }
 
-  public void testProcessTaskUpdateVariablesLocalWithReadPermissionOnAnyTask() {
+  public void testProcessTaskUpdateVariablesLocalWithUpdatePermissionOnAnyTask() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -8270,7 +8270,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
   }
 
-  public void testProcessTaskUpdateVariablesLocalWithReadInstancePermissionOnProcessDefinition() {
+  public void testProcessTaskUpdateVariablesLocalWithUpdateTaskPermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -8302,7 +8302,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
   }
 
-  public void testProcessTaskUpdateVariablesLocalWithReadInstancePermissionOnAnyProcessDefinition() {
+  public void testProcessTaskUpdateVariablesLocalWithUpdateTaskPermissionOnAnyProcessDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -8423,7 +8423,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     }
   }
 
-  public void testProcessTaskUpdateVariablesWithReadPermissionOnTask() {
+  public void testProcessTaskUpdateVariablesWithUpdatePermissionOnTask() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -8455,7 +8455,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
   }
 
-  public void testProcessTaskUpdateVariablesWithReadPermissionOnAnyTask() {
+  public void testProcessTaskUpdateVariablesWithUpdatePermissionOnAnyTask() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -8487,7 +8487,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
   }
 
-  public void testProcessTaskUpdateVariablesWithReadInstancePermissionOnProcessDefinition() {
+  public void testProcessTaskUpdateVariablesWithUpdateTaskPermissionOnProcessDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
@@ -8519,7 +8519,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     enableAuthorization();
   }
 
-  public void testProcessTaskUpdateVariablesWithReadInstancePermissionOnAnyProcessDefinition() {
+  public void testProcessTaskUpdateVariablesWithUpdateTaskPermissionOnAnyProcessDefinition() {
     // given
     startProcessInstanceByKey(PROCESS_KEY);
     String taskId = selectSingleTask().getId();
