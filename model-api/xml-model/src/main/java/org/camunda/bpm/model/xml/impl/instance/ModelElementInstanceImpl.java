@@ -119,9 +119,6 @@ public class ModelElementInstanceImpl implements ModelElementInstance {
     if (hasValueToBeSetForAlternativeNs(namespaceUri, attributeName)) {
       namespaceForSetting = modelInstance.getModel().getAlternativeNamespace(namespaceUri);
     }
-    if (hasValueToBeSetForActualNs(namespaceUri, attributeName)){
-      namespaceForSetting = modelInstance.getModel().getActualNamespace(namespaceUri);
-    }
     String oldValue = getAttributeValueNs(namespaceForSetting, attributeName);
     if (isIdAttribute) {
       domElement.setIdAttribute(namespaceForSetting, attributeName, xmlValue);
@@ -133,11 +130,6 @@ public class ModelElementInstanceImpl implements ModelElementInstance {
     if (attribute != null) {
       ((AttributeImpl<?>) attribute).updateIncomingReferences(this, xmlValue, oldValue);
     }
-  }
-
-  private boolean hasValueToBeSetForActualNs(String namespaceUri, String attributeName) {
-    String actualNs = modelInstance.getModel().getActualNamespace(namespaceUri);
-    return getAttributeValueNs(namespaceUri, attributeName) == null && actualNs != null && getAttributeValueNs(actualNs, attributeName) != null;
   }
 
   private boolean hasValueToBeSetForAlternativeNs(String namespaceUri, String attributeName) {

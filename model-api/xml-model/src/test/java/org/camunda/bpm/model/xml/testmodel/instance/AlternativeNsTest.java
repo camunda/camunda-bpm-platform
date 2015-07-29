@@ -143,42 +143,14 @@ public class AlternativeNsTest extends TestModelTest {
   }
 
   @Test
-  public void setAttribute() {
-    Bird hedwig = modelInstance.getModelElementById("hedwig");
-    assertFalse(hedwig.canHazExtendedWings());
-
-    hedwig.setCanHazExtendedWings(true);
-    assertTrue(hedwig.canHazExtendedWings());
-
-    hedwig.setAttributeValueNs(TestModelConstants.NEWER_NAMESPACE, "canHazExtendedWings", "false");
-    assertFalse(hedwig.canHazExtendedWings());
-
-    hedwig.setAttributeValueNs(MECHANICAL_NS, "canHazExtendedWings", "true");
-    assertTrue(hedwig.canHazExtendedWings());
-  }
-
-  @Test
-  @Ignore
-  public void createElement() {
-    Bird plucky = modelInstance.getModelElementById("plucky");
-    assertNull(plucky.getWings());
-
-    ModelElementType mechanicalWingsType = ((ModelInstanceImpl) modelInstance).registerGenericType(MECHANICAL_NS, "wings");
-    ModelElementInstance mechanicalWings = modelInstance.newInstance(mechanicalWingsType);
-
-    plucky.addChildElement(mechanicalWings);
-
-    assertNotNull(plucky.getWings());
-  }
-
-  @Test
   public void useExistingNamespace() {
     assertThatThereIsNoNewerNamespaceUrl();
 
     Bird plucky = modelInstance.getModelElementById("plucky");
     plucky.setAttributeValueNs(MECHANICAL_NS, "canHazExtendedWings", "true");
-    assertTrue(plucky.canHazExtendedWings());
+    assertThatThereIsNoNewerNamespaceUrl();
 
+    assertTrue(plucky.canHazExtendedWings());
     assertThatThereIsNoNewerNamespaceUrl();
   }
 

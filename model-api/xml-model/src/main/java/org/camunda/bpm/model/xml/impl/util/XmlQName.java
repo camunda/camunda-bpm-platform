@@ -40,12 +40,12 @@ public class XmlQName {
     KNOWN_PREFIXES.put(XMLNS_ATTRIBUTE_NS_URI, "");
   }
 
-  private final DomElement rootElement;
-  private final DomElement element;
+  protected DomElement rootElement;
+  protected DomElement element;
 
-  private final String localName;
-  private final String namespaceUri;
-  private final String prefix;
+  protected String localName;
+  protected String namespaceUri;
+  protected String prefix;
 
   public XmlQName(DomDocument document, String namespaceUri, String localName) {
     this(document, null, namespaceUri, localName);
@@ -60,7 +60,7 @@ public class XmlQName {
     this.element = element;
     this.localName = localName;
     this.namespaceUri = namespaceUri;
-    this.prefix = determinePrefixAndNamespaceUri();
+    this.prefix = null;
   }
 
   public String getNamespaceUri() {
@@ -72,6 +72,13 @@ public class XmlQName {
   }
 
   public String getPrefixedName() {
+    if (prefix == null) {
+      synchronized (this) {
+        if (prefix == null) {
+          this.prefix = determinePrefixAndNamespaceUri();
+        }
+      }
+    }
     return QName.combine(prefix, localName);
   }
 
