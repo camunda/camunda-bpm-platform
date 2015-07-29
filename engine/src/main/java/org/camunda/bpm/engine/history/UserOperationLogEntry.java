@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.history;
 
 import java.util.Date;
+
 import org.camunda.bpm.engine.EntityTypes;
 
 
@@ -79,7 +80,6 @@ public interface UserOperationLogEntry {
   public static String OPERATION_TYPE_RESOLVE = "Resolve";
   public static String OPERATION_TYPE_SET_OWNER = "SetOwner";
   public static String OPERATION_TYPE_SET_PRIORITY = "SetPriority";
-  public static String OPERATION_TYPE_SET_OVERRIDING_PRIORITY = "SetPriority";
   public static String OPERATION_TYPE_UPDATE = "Update";
   public static String OPERATION_TYPE_ACTIVATE = "Activate";
   public static String OPERATION_TYPE_SUSPEND = "Suspend";

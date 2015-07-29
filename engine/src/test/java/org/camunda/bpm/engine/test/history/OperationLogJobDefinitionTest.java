@@ -53,7 +53,7 @@ public class OperationLogJobDefinitionTest extends PluggableProcessEngineTestCas
     assertEquals(EntityTypes.JOB_DEFINITION, userOperationLogEntry.getEntityType());
     assertEquals(jobDefinition.getId(), userOperationLogEntry.getJobDefinitionId());
 
-    assertEquals(UserOperationLogEntry.OPERATION_TYPE_SET_OVERRIDING_PRIORITY,
+    assertEquals(UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY,
         userOperationLogEntry.getOperationType());
 
     assertEquals("overridingPriority", userOperationLogEntry.getProperty());
@@ -87,7 +87,7 @@ public class OperationLogJobDefinitionTest extends PluggableProcessEngineTestCas
     assertEquals(EntityTypes.JOB_DEFINITION, userOperationLogEntry.getEntityType());
     assertEquals(jobDefinition.getId(), userOperationLogEntry.getJobDefinitionId());
 
-    assertEquals(UserOperationLogEntry.OPERATION_TYPE_SET_OVERRIDING_PRIORITY,
+    assertEquals(UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY,
         userOperationLogEntry.getOperationType());
 
     assertEquals("overridingPriority", userOperationLogEntry.getProperty());
@@ -116,7 +116,7 @@ public class OperationLogJobDefinitionTest extends PluggableProcessEngineTestCas
     assertEquals(EntityTypes.JOB_DEFINITION, userOperationLogEntry.getEntityType());
     assertEquals(jobDefinition.getId(), userOperationLogEntry.getJobDefinitionId());
 
-    assertEquals(UserOperationLogEntry.OPERATION_TYPE_SET_OVERRIDING_PRIORITY,
+    assertEquals(UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY,
         userOperationLogEntry.getOperationType());
 
     assertEquals("overridingPriority", userOperationLogEntry.getProperty());

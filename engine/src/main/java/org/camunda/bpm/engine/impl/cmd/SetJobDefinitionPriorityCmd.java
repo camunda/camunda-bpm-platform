@@ -91,7 +91,7 @@ public class SetJobDefinitionPriorityCmd implements Command<Void> {
         JOB_DEFINITION_OVERRIDING_PRIORITY, previousPriority, jobDefinition.getOverridingJobPriority());
 
     UserOperationLogContextEntry entry = UserOperationLogContextEntryBuilder
-        .entry(UserOperationLogEntry.OPERATION_TYPE_SET_OVERRIDING_PRIORITY, EntityTypes.JOB_DEFINITION)
+        .entry(UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY, EntityTypes.JOB_DEFINITION)
         .inContextOf(jobDefinition)
         .propertyChanges(propertyChange)
         .create();
