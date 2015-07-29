@@ -16,6 +16,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import java.util.Map;
+
+import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -93,13 +96,13 @@ public class DmnScriptEngineSupportTest extends AbstractFoxPlatformIntegrationTe
   }
 
   protected String getResultVariable(ProcessInstance processInstance) {
-    DmnDecisionResult decisionResult = (DmnDecisionResult) runtimeService.getVariable(processInstance.getId(), RESULT_VARIABLE);
-    return decisionResult.getOutputs().get(0).getValue("result");
+    DmnDecisionOutput result = (DmnDecisionOutput) runtimeService.getVariable(processInstance.getId(), RESULT_VARIABLE);
+    return result.getValue("result");
   }
 
-  private String getReasonVariable(ProcessInstance processInstance) {
-    DmnDecisionResult decisionResult = (DmnDecisionResult) runtimeService.getVariable(processInstance.getId(), RESULT_VARIABLE);
-    return decisionResult.getOutputs().get(0).getValue("reason");
+  protected String getReasonVariable(ProcessInstance processInstance) {
+    DmnDecisionOutput result = (DmnDecisionOutput) runtimeService.getVariable(processInstance.getId(), RESULT_VARIABLE);
+    return result.getValue("reason");
   }
 
 }

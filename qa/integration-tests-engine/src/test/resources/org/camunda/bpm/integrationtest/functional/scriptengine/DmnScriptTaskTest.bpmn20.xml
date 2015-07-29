@@ -16,14 +16,14 @@
     </bpmn2:exclusiveGateway>
     <bpmn2:sequenceFlow id="SequenceFlow_2" name="" sourceRef="scriptTask" targetRef="gateway"/>
     <bpmn2:sequenceFlow id="SequenceFlow_3" name="notok" sourceRef="gateway" targetRef="rejectTask">
-      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">${decisionResult.getOutputs()[0].getValue('result') == 'notok'}</bpmn2:conditionExpression>
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">${decisionResult.getValue('result') == 'notok'}</bpmn2:conditionExpression>
     </bpmn2:sequenceFlow>
     <bpmn2:userTask id="rejectTask" name="Reject order">
       <bpmn2:incoming>SequenceFlow_3</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_7</bpmn2:outgoing>
     </bpmn2:userTask>
     <bpmn2:sequenceFlow id="SequenceFlow_4" name="ok" sourceRef="gateway" targetRef="approveTask">
-      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">${decisionResult.getOutputs()[0].getValue('result') == 'ok'}</bpmn2:conditionExpression>
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">${decisionResult.getValue('result') == 'ok'}</bpmn2:conditionExpression>
     </bpmn2:sequenceFlow>
     <bpmn2:userTask id="approveTask" name="Approve order">
       <bpmn2:incoming>SequenceFlow_4</bpmn2:incoming>
