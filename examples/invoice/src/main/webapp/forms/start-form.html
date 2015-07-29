@@ -5,6 +5,30 @@
 
   <div class="control-group">
     <label class="control-label"
+           for="document">Upload your Invoice Document</label>
+    <div class="controls">
+      <input type="file"
+        id="invoiceDocumentUpload"
+        cam-variable-name="invoiceDocument"
+        cam-variable-type="File"
+        cam-max-filesize="10000000" />
+        (Required)
+    </div>
+  </div>
+
+  <script cam-script type="text/form-script">
+    camForm.on('submit', function(evt) {
+
+      var fileUpload = $('#invoiceDocumentUpload').get(0);
+
+      // prevent submit if user has not provided a file
+      evt.submitPrevented = (fileUpload.files.length == 0);
+
+    });
+  </script>
+
+  <div class="control-group">
+    <label class="control-label"
            for="creditor">Creditor</label>
     <div class="controls">
       <input cam-variable-name="creditor"
@@ -50,5 +74,6 @@
       </div>
     </div>
   </div>
+
 </form>
 

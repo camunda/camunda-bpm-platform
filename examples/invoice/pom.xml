@@ -71,6 +71,9 @@
             <!-- override processes.xml, providing custom process engine -->
             <directory>src/develop/resources</directory>
           </resource>
+          <resource>
+            <directory>src/main/resources</directory>
+          </resource>
         </resources>
         <plugins>
           <plugin>
@@ -81,8 +84,8 @@
               <webAppConfig>
                 <contextPath>/camunda</contextPath>
                 <resourceBases>
-                  <resourceBase>${project.basedir}/src/develop/webapp</resourceBase>
                   <resourceBase>${project.basedir}/src/main/webapp</resourceBase>
+                  <resourceBase>${project.basedir}/src/develop/webapp</resourceBase>
                 </resourceBases>
               </webAppConfig>
             </configuration>
@@ -90,6 +93,6 @@
         </plugins>
       </build>
     </profile>
-    </profiles>
+  </profiles>
 
 </project>
