@@ -190,9 +190,14 @@ public abstract class AbstractVariablesResource implements VariableResource {
     if ("".equals(dataPart.getFileName().trim())) {
       throw new RestException(Status.BAD_REQUEST, "Cannot put a file without filename!");
     }
+
+    String contentType = dataPart.getContentType();
+    if (contentType == null) {
+      contentType = MediaType.APPLICATION_OCTET_STREAM;
+    }
+
     MimeType mimeType = null;
     try {
-      String contentType = dataPart.getContentType() == null ? MediaType.APPLICATION_OCTET_STREAM : dataPart.getContentType();
       mimeType = new MimeType(contentType);
     } catch (MimeTypeParseException e) {
       throw new RestException(Status.BAD_REQUEST, "Invalid mime type given");
