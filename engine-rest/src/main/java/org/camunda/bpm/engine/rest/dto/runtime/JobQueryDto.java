@@ -75,6 +75,7 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
   protected Boolean suspended;
   protected Integer priorityHigherThanOrEquals;
   protected Integer priorityLowerThanOrEquals;
+  protected String jobDefinitionId;
 
   protected List<ConditionQueryParameterDto> dueDates;
 
@@ -174,6 +175,11 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
     this.priorityLowerThanOrEquals = priorityLowerThanOrEquals;
   }
 
+  @CamundaQueryParam("jobDefinitionId")
+  public void setJobDefinitionId(String jobDefinitionId) {
+    this.jobDefinitionId = jobDefinitionId;
+  }
+  
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -258,6 +264,10 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
 
     if (priorityLowerThanOrEquals != null) {
       query.priorityLowerThanOrEquals(priorityLowerThanOrEquals);
+    }
+    
+    if (jobDefinitionId != null) {
+      query.jobDefinitionId(jobDefinitionId);
     }
 
     if (dueDates != null) {

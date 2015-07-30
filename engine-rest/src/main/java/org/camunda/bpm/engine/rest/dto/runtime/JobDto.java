@@ -19,6 +19,7 @@ import java.util.Date;
 public class JobDto {
 
   protected String id;
+  protected String jobDefinitionId;
   protected String processInstanceId;
   protected String processDefinitionId;
   protected String processDefinitionKey;
@@ -32,6 +33,7 @@ public class JobDto {
   public static JobDto fromJob(Job job) {
     JobDto dto = new JobDto();
     dto.id = job.getId();
+    dto.jobDefinitionId = job.getJobDefinitionId();
     dto.processInstanceId = job.getProcessInstanceId();
     dto.processDefinitionId = job.getProcessDefinitionId();
     dto.processDefinitionKey = job.getProcessDefinitionKey();
@@ -48,6 +50,10 @@ public class JobDto {
     return id;
   }
 
+  public String getJobDefinitionId() {
+    return jobDefinitionId;
+  }
+  
   public String getProcessInstanceId() {
     return processInstanceId;
   }

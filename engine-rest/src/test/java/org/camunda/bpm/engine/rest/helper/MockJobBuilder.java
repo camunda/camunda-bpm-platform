@@ -31,6 +31,7 @@ public class MockJobBuilder {
 	protected int retries;
 	protected boolean suspended;
 	protected int priority;
+	protected String jobDefinitionId;
 
 	public MockJobBuilder id(String id) {
 		this.id = id;
@@ -81,6 +82,11 @@ public class MockJobBuilder {
 		this.retries = retries;
 		return this;
 	}
+	
+	public MockJobBuilder jobDefinitionId(String jobDefinitionId) {
+	  this.jobDefinitionId = jobDefinitionId;
+	  return this;
+	}
 
 	public Job build() {
 		Job mockJob = mock(Job.class);
@@ -94,6 +100,7 @@ public class MockJobBuilder {
 		when(mockJob.getRetries()).thenReturn(retries);
 		when(mockJob.isSuspended()).thenReturn(suspended);
 		when(mockJob.getPriority()).thenReturn(priority);
+		when(mockJob.getJobDefinitionId()).thenReturn(jobDefinitionId);
 		return mockJob;
 	}
 
