@@ -47,7 +47,7 @@ public class DmnApp {
 }
 ```
 
-## Usage with DMN as BPMN Business Rule Task
+## Use DMN Engine for implementing a BPMN Business Rule Task
 
 Add the following Maven Coordinates to your project:
 ```xml
@@ -64,7 +64,7 @@ Add the following Maven Coordinates to your project:
 </dependency>
 ```
 
-Next, we reference a DMN decision from a BPMN Business Rule Task:
+Next, reference a DMN decision from a BPMN Business Rule Task:
 
 ```xml
 <bpmn:businessRuleTask id="assignApprover"
@@ -73,8 +73,15 @@ Next, we reference a DMN decision from a BPMN Business Rule Task:
   name="Assign Approver Group(s)">
 </bpmn:businessRuleTask>
 ```
+The `camunda:decisionRef` attribute references the id of the decision in the DMN file:
 
-And start the BPMN process inside our application:
+```xml
+<dmn:Decision id="invoice-assign-approver">
+  ...
+</dmn:Decision>
+```
+
+Now you can start the BPMN process inside your application:
 
 ```java
 public class App {
