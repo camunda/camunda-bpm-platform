@@ -470,6 +470,48 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(instance.getId());
   }
 
+  @Deployment
+  public void testCompensateTransactionWithEventSubprocess() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("txProcess");
+    Task beforeCancelTask = taskService.createTaskQuery().singleResult();
+
+    // when the transaction is cancelled and handled by an event subprocess
+    taskService.complete(beforeCancelTask.getId());
+
+    // then completing compensation works
+    Task compensationHandler = taskService.createTaskQuery().singleResult();
+    assertNotNull(compensationHandler);
+    assertEquals("blackBoxCompensationHandler", compensationHandler.getTaskDefinitionKey());
+
+    taskService.complete(compensationHandler.getId());
+
+    assertProcessEnded(processInstance.getId());
+
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/subprocess/transaction/TransactionSubProcessTest.testCompensateTransactionWithEventSubprocess.bpmn20.xml")
+  public void testCompensateTransactionWithEventSubprocessActivityInstanceTree() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("txProcess");
+    Task beforeCancelTask = taskService.createTaskQuery().singleResult();
+
+    // when the transaction is cancelled and handled by an event subprocess
+    taskService.complete(beforeCancelTask.getId());
+
+    // then the activity instance tree is correct
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+          .beginScope("tx")
+            .activity("cancelEnd")
+            .beginScope("innerSubProcess")
+              .activity("blackBoxCompensationHandler")
+              .beginScope("eventSubProcess")
+                .activity("eventSubProcessThrowCompensation")
+       .done());
+  }
+
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/subprocess/transaction/TransactionSubProcessTest.testCompensateSubprocess.bpmn20.xml")
   public void testCompensateSubprocessNotTriggered() {
     // given

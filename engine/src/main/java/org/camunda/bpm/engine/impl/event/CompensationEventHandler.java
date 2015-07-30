@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
 
@@ -51,8 +52,11 @@ public class CompensationEventHandler implements EventHandler {
     // activate execution
     compensatingExecution.setActive(true);
 
-    if (compensationHandler.isScope() && !compensationHandler.isCompensationHandler()) {
+    if (compensatingExecution.getActivity().getActivityBehavior() instanceof CompositeActivityBehavior) {
+      compensatingExecution.getParent().setActivityInstanceId(compensatingExecution.getActivityInstanceId());
+    }
 
+    if (compensationHandler.isScope() && !compensationHandler.isCompensationHandler()) {
       // descend into scope:
       List<CompensateEventSubscriptionEntity> eventsForThisScope = compensatingExecution.getCompensateEventSubscriptions();
       CompensationUtil.throwCompensationEvent(eventsForThisScope, compensatingExecution, false);

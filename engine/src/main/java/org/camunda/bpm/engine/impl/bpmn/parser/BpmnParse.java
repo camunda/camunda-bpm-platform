@@ -1410,6 +1410,7 @@ public class BpmnParse extends Parse {
       CompensateEventDefinition compensateEventDefinition = parseThrowCompensateEventDefinition(compensateEventDefinitionElement, scopeElement);
       activityBehavior = new IntermediateThrowCompensationEventActivityBehavior(compensateEventDefinition);
       nestedActivityImpl.setProperty(PROPERTYNAME_THROWS_COMPENSATION, true);
+      nestedActivityImpl.setScope(true);
     } else if (messageEventDefinitionElement != null) {
       if (isServiceTaskLike(messageEventDefinitionElement)) {
 
@@ -2644,6 +2645,7 @@ public class BpmnParse extends Parse {
           activity.setActivityBehavior(new CancelEndEventActivityBehavior());
           activity.setActivityStartBehavior(ActivityStartBehavior.INTERRUPT_FLOW_SCOPE);
           activity.setProperty(PROPERTYNAME_THROWS_COMPENSATION, true);
+          activity.setScope(true);
         }
       } else if (terminateEventDefinition != null) {
         activity.setProperty("type", "terminateEndEvent");
@@ -2669,6 +2671,7 @@ public class BpmnParse extends Parse {
         CompensateEventDefinition compensateEventDefinition = parseThrowCompensateEventDefinition(compensateEventDefinitionElement, scope);
         activity.setActivityBehavior(new CompensationEndEventActivityBehavior(compensateEventDefinition));
         activity.setProperty(PROPERTYNAME_THROWS_COMPENSATION, true);
+        activity.setScope(true);
       } else { // default: none end event
         activity.setProperty("type", "noneEndEvent");
         activity.setActivityBehavior(new NoneEndEventActivityBehavior());

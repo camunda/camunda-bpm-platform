@@ -63,6 +63,7 @@ public class CompensationUtil {
 
         // move the compensating execution under this execution:
         compensatingExecution.setParent((PvmExecutionImpl) execution);
+        ((ExecutionEntity) execution).getExecutions().add(compensatingExecution);
         compensatingExecution.setEventScope(false);
       } else {
         compensatingExecution = (ExecutionEntity) execution.createExecution();

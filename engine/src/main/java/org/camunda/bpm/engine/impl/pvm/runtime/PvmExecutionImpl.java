@@ -46,10 +46,10 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.FoxAtomicOperationDeleteCascadeFireActivityEnd;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
+import org.camunda.bpm.engine.impl.tree.AncestorAwareScopeExecutionCollector;
 import org.camunda.bpm.engine.impl.tree.ExecutionWalker;
 import org.camunda.bpm.engine.impl.tree.FlowScopeWalker;
 import org.camunda.bpm.engine.impl.tree.ScopeCollector;
-import org.camunda.bpm.engine.impl.tree.ScopeExecutionCollector;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 /**
@@ -1117,16 +1117,34 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       return getId();
 
     } else {
-      PvmExecutionImpl parent = getParent();
-      // with compensation, the execution tree is misaligned to the activity
-      // (and therefore activity instance tree): the parent of a compensating execution is the compensation throwing execution,
-      // although the actual parent execution *should* the parent's parent
-      if (parent.isCompensationThrowing()) {
-        return parent.getParentActivityInstanceId();
-      }
-      else {
-        return parent.getActivityInstanceId();
-      }
+      return getParent().getActivityInstanceId();
+    }
+  }
+
+  /**
+   * Returns the activity instance id of the of the scope the current execution belongs to
+   *
+   * Limitation: this does not return the correct activity instance id in case of a
+   *   compensation handler execution that is the direct child of a compensation throwing execution
+   *   (background: in this case, multiple parent executions have to be skipped to
+   *   find the correct scope execution)
+   */
+  public String getScopeActivityInstanceId() {
+    PvmExecutionImpl scopeExecution = isScope ? this : getParent();
+
+    PvmActivity scopeActivity = scopeExecution.getActivity();
+    if (scopeActivity != null && scopeActivity.isScope()
+        && scopeExecution.getActivityInstanceId() != null
+        && !scopeExecution.isCompensationThrowing()) {
+      // take the execution's activity instance id if
+      //   * it is a leaf (scopeActivity != null)
+      //   * it executes a scope activity (scopeActivity != null)
+      //   * it actually executes the activity (activityInstanceId != null)
+      //   * that scope activity cannot have child executions (i.e. no compensation throwing event)
+      return scopeExecution.getActivityInstanceId();
+    }
+    else {
+      return scopeExecution.getParentActivityInstanceId();
     }
   }
 
@@ -1302,7 +1320,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       throw new ProcessEngineException("Current scope must be a scope.");
     }
 
-    ScopeExecutionCollector scopeExecutionCollector = new ScopeExecutionCollector();
+    AncestorAwareScopeExecutionCollector scopeExecutionCollector = new AncestorAwareScopeExecutionCollector(currentScope);
     new ExecutionWalker(this)
       .addPreCollector(scopeExecutionCollector)
       .walkUntil();

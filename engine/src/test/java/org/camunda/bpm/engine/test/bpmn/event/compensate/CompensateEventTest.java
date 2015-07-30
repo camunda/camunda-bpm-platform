@@ -693,13 +693,8 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(processInstanceId);
   }
 
-  /**
-   * enable test case when bug is fixed
-   *
-   * @see https://app.camunda.com/jira/browse/CAM-4285
-   */
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensationEventSubProcess.bpmn20.xml" })
-  public void FAILING_testActivityInstanceTreeForCompensationEventSubProcess() {
+  public void testActivityInstanceTreeForCompensationEventSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("bookingProcess");
 
     completeTask("Book Flight");
@@ -713,9 +708,9 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
           describeActivityInstanceTree(processInstance.getProcessDefinitionId())
             .activity("throwCompensation")
             .beginScope("booking-subprocess")
+              .activity("cancelFlight")
               .beginScope("compensationSubProcess")
                 .activity("compensateFlight")
-                .activity("cancelFlight")
          .done());
   }
 

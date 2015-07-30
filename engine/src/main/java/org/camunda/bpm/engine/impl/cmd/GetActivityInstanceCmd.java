@@ -100,36 +100,59 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
         continue;
       }
 
+      Map<ScopeImpl, PvmExecutionImpl> activityExecutionMapping = leaf.createActivityExecutionMapping();
+      Map<ScopeImpl, PvmExecutionImpl> scopeInstancesToCreate = new HashMap<ScopeImpl, PvmExecutionImpl>(activityExecutionMapping);
+
       // create an activity/transition instance for each leaf that executes a non-scope activity
+      // and does not throw compensation
       if (leaf.getActivityInstanceId() != null) {
-        ActivityInstanceImpl leafInstance = createActivityInstance(leaf,
-            leaf.getActivity(),
-            leaf.getActivityInstanceId(),
-            leaf.getParentActivityInstanceId());
-        activityInstances.put(leafInstance.getId(), leafInstance);
+
+        if (!(leaf.isCompensationThrowing())) {
+          String parentActivityInstanceId = null;
+
+          ActivityImpl leafActivity = leaf.getActivity();
+          if (leafActivity.isScope()) {
+            parentActivityInstanceId = activityExecutionMapping
+              .get(leaf.getActivity().getFlowScope())
+              .getActivityInstanceId();
+          }
+          else {
+            parentActivityInstanceId = activityExecutionMapping
+              .get(leaf.getActivity().getFlowScope())
+              .getParentActivityInstanceId();
+          }
+
+          ActivityInstanceImpl leafInstance = createActivityInstance(leaf,
+              leaf.getActivity(),
+              leaf.getActivityInstanceId(),
+              parentActivityInstanceId);
+          activityInstances.put(leafInstance.getId(), leafInstance);
+
+          scopeInstancesToCreate.remove(leaf.getActivity());
+        }
       }
       else {
         TransitionInstanceImpl transitionInstance = createTransitionInstance(leaf);
         transitionInstances.put(transitionInstance.getId(), transitionInstance);
+
+        scopeInstancesToCreate.remove(leaf.getActivity());
       }
 
-      // create an activity instance for each scope
-      Map<ScopeImpl, PvmExecutionImpl> activityExecutionMapping = leaf.createActivityExecutionMapping();
-      activityExecutionMapping.remove(leaf.getActivity());
-      activityExecutionMapping.remove(leaf.getProcessDefinition());
-      LegacyBehavior.removeLegacyNonScopesFromMapping(activityExecutionMapping);
+      scopeInstancesToCreate.remove(leaf.getProcessDefinition());
+      LegacyBehavior.removeLegacyNonScopesFromMapping(scopeInstancesToCreate);
 
-      for (Map.Entry<ScopeImpl, PvmExecutionImpl> scopeExecutionEntry : activityExecutionMapping.entrySet()) {
+      // create an activity instance for each scope
+      for (Map.Entry<ScopeImpl, PvmExecutionImpl> scopeExecutionEntry : scopeInstancesToCreate.entrySet()) {
         ScopeImpl scope = scopeExecutionEntry.getKey();
         PvmExecutionImpl scopeExecution = scopeExecutionEntry.getValue();
 
-        String activityInstanceId = getActivityInstanceId(scopeExecution);
-
+        String activityInstanceId = scopeExecution.getScopeActivityInstanceId();
         if (activityInstances.containsKey(activityInstanceId)) {
           continue;
         }
         else {
-          String parentActivityInstanceId = getParentActivityInstanceId(scopeExecution);
+          ScopeImpl parentFlowScope = scope.getFlowScope();
+          String parentActivityInstanceId = activityExecutionMapping.get(parentFlowScope).getScopeActivityInstanceId();
 
           // regardless of the tree structure (compacted or not), the scope's activity instance id
           // is the activity instance id of the parent execution and the parent activity instance id
@@ -148,25 +171,6 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     populateChildInstances(activityInstances, transitionInstances);
 
     return processActInst;
-  }
-
-  protected String getActivityInstanceId(PvmExecutionImpl scopeExecution) {
-    // for compensation, the rule that the scope execution's activity instance id is always set on the parent
-    // does not hold, because throwing compensation events are not scopes themselves
-    if (isForCompensation(scopeExecution)) {
-      return scopeExecution.getActivityInstanceId();
-    } else {
-      return scopeExecution.getParentActivityInstanceId();
-    }
-  }
-
-  protected String getParentActivityInstanceId(PvmExecutionImpl scopeExecution) {
-    PvmExecutionImpl parent = scopeExecution.getParent();
-    if (parent != null) {
-      return getActivityInstanceId(parent);
-    } else {
-      return null;
-    }
   }
 
   protected boolean isForCompensation(PvmExecutionImpl scopeExecution) {
