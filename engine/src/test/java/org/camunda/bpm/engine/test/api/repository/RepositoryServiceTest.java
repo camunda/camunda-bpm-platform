@@ -111,7 +111,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("testProcess");
 
     repositoryService.deleteDeployment(deploymentId, true, false);
-    assertTrue(TestExecutionListener.collectedEvents.size() == 1);
+    assertEquals(1, TestExecutionListener.collectedEvents.size());
     TestExecutionListener.reset();
 
     deploymentId = deploymentBuilder.deploy().getId();
@@ -119,7 +119,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("testProcess");
 
     repositoryService.deleteDeployment(deploymentId, true, true);
-    assertTrue(TestExecutionListener.collectedEvents.size() == 0);
+    assertTrue(TestExecutionListener.collectedEvents.isEmpty());
     TestExecutionListener.reset();
 
   }
@@ -137,7 +137,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     RecorderTaskListener.getRecordedEvents().clear();
 
     repositoryService.deleteDeployment(deploymentId, true, false);
-    assertTrue(RecorderTaskListener.getRecordedEvents().size() == 1);
+    assertEquals(1, RecorderTaskListener.getRecordedEvents().size());
     RecorderTaskListener.clear();
 
     deploymentId = deploymentBuilder.deploy().getId();
