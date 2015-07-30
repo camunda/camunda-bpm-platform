@@ -170,6 +170,8 @@ public class HistoryServiceTest extends PluggableProcessEngineTestCase {
     for (HistoricProcessInstance historicProcessInstance : processInstances) {
       assertTrue(processInstanceIds.contains(historicProcessInstance.getId()));
     }
+
+    assertEquals(0, processInstanceQuery.processInstanceId("dummy").count());
   }
 
   public void testHistoricProcessInstanceQueryByProcessInstanceIdsEmpty() {

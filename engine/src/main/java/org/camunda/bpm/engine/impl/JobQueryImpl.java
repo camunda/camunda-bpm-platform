@@ -206,7 +206,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
   @Override
   public boolean isValid() {
     boolean valid = super.isValid();
-    valid = valid && CompareUtil.validateOrder(priorityLowerThanOrEqual, priorityHigherThanOrEqual);
+    valid = valid && CompareUtil.validateOrder(priorityHigherThanOrEqual, priorityLowerThanOrEqual);
     valid = valid && validateQueryByDueDate();
     return valid;
   }

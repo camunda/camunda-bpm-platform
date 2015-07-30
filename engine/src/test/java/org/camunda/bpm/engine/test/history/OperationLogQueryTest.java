@@ -167,6 +167,7 @@ public class OperationLogQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(13, query().afterTimestamp(yesterday).count());
     // filter by time, created tomorrow
     assertEquals(5, query().afterTimestamp(today).count());
+    assertEquals(0, query().afterTimestamp(today).beforeTimestamp(yesterday).count());
 
     // remove log entries of manually created tasks
     processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Object>() {

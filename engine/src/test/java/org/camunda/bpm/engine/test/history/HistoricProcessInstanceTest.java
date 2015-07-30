@@ -87,12 +87,17 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     assertEquals(processInstance.getProcessDefinitionId(), historicProcessInstance.getProcessDefinitionId());
     assertEquals(noon, historicProcessInstance.getStartTime());
     assertEquals(twentyFiveSecsAfterNoon, historicProcessInstance.getEndTime());
-    assertEquals(new Long(25*1000), historicProcessInstance.getDurationInMillis());
-    assertTrue(((HistoricProcessInstanceEventEntity)historicProcessInstance).getDurationRaw() >= 25000);
+    assertEquals(new Long(25 * 1000), historicProcessInstance.getDurationInMillis());
+    assertTrue(((HistoricProcessInstanceEventEntity) historicProcessInstance).getDurationRaw() >= 25000);
     assertNull(historicProcessInstance.getCaseInstanceId());
 
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().unfinished().count());
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().finished().count());
+
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess", "myBusinessKey");
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().finished().count());
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().unfinished().count());
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().finished().unfinished().count());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
@@ -255,6 +260,7 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().startedBefore(hourAgo.getTime()).count());
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().startedAfter(hourAgo.getTime()).count());
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().startedAfter(hourFromNow.getTime()).count());
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().startedAfter(hourFromNow.getTime()).startedBefore(hourAgo.getTime()).count());
 
     // General fields
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().finished().count());
@@ -278,6 +284,7 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().processDefinitionKeyNotIn(exludeIds).count());
 
     exludeIds.add("oneTaskProcess");
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKey("oneTaskProcess").processDefinitionKeyNotIn(exludeIds).count());
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKeyNotIn(exludeIds).count());
 
     try {
@@ -296,6 +303,7 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().finishedBefore(hourFromNow.getTime()).count());
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().finishedAfter(hourAgo.getTime()).count());
     assertEquals(0, historyService.createHistoricProcessInstanceQuery().finishedAfter(hourFromNow.getTime()).count());
+    assertEquals(0, historyService.createHistoricProcessInstanceQuery().finishedAfter(hourFromNow.getTime()).finishedBefore(hourAgo.getTime()).count());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
