@@ -86,6 +86,8 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
 
   public Void execute(final CommandContext commandContext) {
     ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
+    ensureNotSuspended(processInstance);
+
     final ProcessDefinitionImpl processDefinition = processInstance.getProcessDefinition();
 
     CoreModelElement elementToInstantiate = getTargetElement(processDefinition);

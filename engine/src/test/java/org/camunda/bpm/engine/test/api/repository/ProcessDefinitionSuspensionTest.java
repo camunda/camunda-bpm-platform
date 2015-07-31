@@ -2360,39 +2360,31 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
     // try to cancel activity instance for suspended processDefinition
     try {
-      runtimeService.createProcessInstanceModification(processInstance.getId()).cancelActivityInstance("theTask:6").execute();
+      runtimeService.createProcessInstanceModification(processInstance.getId()).cancelAllForActivity("theTask").execute();
       fail("Exception is expected but not thrown");
     } catch(SuspendedEntityInteractionException e) {
       assertTextPresentIgnoreCase("is suspended", e.getMessage());
     }
 
-    //start new task before
-    runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("theTask").execute();
-
-    List<Task> tasks = taskService.createTaskQuery().list();
-    assertEquals(2, tasks.size());
-
+    // try to start before activity for suspended processDefinition
     try {
-      Task firstTask = tasks.get(0);
-      taskService.complete(firstTask.getId());
-      //TODO this is a bug! Process instance is suspended, but a task can be completed successful!
-      //fail("Exception is expected but not thrown");
+      runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("theTask").execute();
+      fail("Exception is expected but not thrown");
     } catch(SuspendedEntityInteractionException e) {
       assertTextPresentIgnoreCase("is suspended", e.getMessage());
     }
 
+    // try to start after activity for suspended processDefinition
     try {
-      Task secondTask = tasks.get(1);
-      taskService.complete(secondTask.getId());
+      runtimeService.createProcessInstanceModification(processInstance.getId()).startAfterActivity("theTask").execute();
       fail("Exception is expected but not thrown");
     } catch(SuspendedEntityInteractionException e) {
       assertTextPresentIgnoreCase("is suspended", e.getMessage());
     }
 
     try {
-      runtimeService.createProcessInstanceModification(processInstance.getId()).cancelActivityInstance("theTask:6").execute();
-      //TODO this is a bug! Process instance is suspended, but can be canceled!
-      //fail("Exception is expected but not thrown");
+      runtimeService.createProcessInstanceModification(processInstance.getId()).startTransition("test").execute();
+      fail("Exception is expected but not thrown");
     } catch(SuspendedEntityInteractionException e) {
       assertTextPresentIgnoreCase("is suspended", e.getMessage());
     }
