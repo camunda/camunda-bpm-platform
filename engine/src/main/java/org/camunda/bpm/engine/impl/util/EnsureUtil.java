@@ -51,6 +51,12 @@ public final class EnsureUtil {
     }
   }
 
+  public static void ensureNullOrEqual(Class<? extends ProcessEngineException> exceptionClass, String message, String variableName, Object value, Object equalTo) {
+    if (value != null && (!value.equals(equalTo))) {
+      throw generateException(exceptionClass, message, variableName, "is not equal to current search state");
+    }
+  }
+
   public static void ensureNotNull(String variableName, Object... values) {
     ensureNotNull("", variableName, values);
   }
