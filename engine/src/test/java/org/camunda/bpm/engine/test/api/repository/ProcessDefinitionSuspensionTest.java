@@ -276,7 +276,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     }
 
     try {
-      formService.submitStartFormData(processDefinition.getId(), "someKey", new HashMap<String, String>())
+      formService.submitStartFormData(processDefinition.getId(), "someKey", new HashMap<String, String>());
       fail();
     } catch (ProcessEngineException e) {
       assertTextPresentIgnoreCase("is suspended", e.getMessage());
