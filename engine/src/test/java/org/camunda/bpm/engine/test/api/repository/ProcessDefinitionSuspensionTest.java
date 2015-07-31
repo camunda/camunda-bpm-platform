@@ -244,7 +244,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
         taskService.complete(task.getId());
         fail("A suspended task shouldn't be able to be continued");
       } catch(SuspendedEntityInteractionException e) {
-        // This is good
+        assertTextPresentIgnoreCase("is suspended", e.getMessage());
       }
     }
     assertEquals(nrOfProcessInstances, runtimeService.createProcessInstanceQuery().count());
@@ -272,15 +272,14 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
       formService.submitStartFormData(processDefinition.getId(), new HashMap<String, String>());
       fail();
     } catch (ProcessEngineException e) {
-      // This is expected
+      assertTextPresentIgnoreCase("is suspended", e.getMessage());
     }
 
     try {
-      formService.submitStartFormData(processDefinition.getId(), "someKey", new HashMap<String, String>());
+      formService.submitStartFormData(processDefinition.getId(), "someKey", new HashMap<String, String>())
       fail();
     } catch (ProcessEngineException e) {
-      e.printStackTrace();
-      // This is expected
+      assertTextPresentIgnoreCase("is suspended", e.getMessage());
     }
 
   }
@@ -629,9 +628,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn"})
-  public void testSuspendByIdAndInludeInstancesFlag_shouldSuspendAlsoJobDefinitionAndRetainJob() {
-    // given
-
+  public void testSuspendByIdAndIncludeInstancesFlag_shouldSuspendAlsoJobDefinitionAndRetainJob() {
     // a process definition with a asynchronous continuation, so that there
     // exists a job definition
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -671,9 +668,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn"})
-  public void testSuspendByKeyAndInludeInstancesFlag_shouldSuspendAlsoJobDefinitionAndRetainJob() {
-    // given
-
+  public void testSuspendByKeyAndIncludeInstancesFlag_shouldSuspendAlsoJobDefinitionAndRetainJob() {
     // a process definition with a asynchronous continuation, so that there
     // exists a job definition
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -715,9 +710,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn"})
-  public void testSuspendByIdAndInludeInstancesFlag_shouldSuspendJobDefinitionAndJob() {
-    // given
-
+  public void testSuspendByIdAndIncludeInstancesFlag_shouldSuspendJobDefinitionAndJob() {
     // a process definition with a asynchronous continuation, so that there
     // exists a job definition
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -757,9 +750,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn"})
-  public void testSuspendByKeyAndInludeInstancesFlag_shouldSuspendJobDefinitionAndJob() {
-    // given
-
+  public void testSuspendByKeyAndIncludeInstancesFlag_shouldSuspendJobDefinitionAndJob() {
     // a process definition with a asynchronous continuation, so that there
     // exists a job definition
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -802,9 +793,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn"})
-  public void testDelayedSuspendByIdAndInludeInstancesFlag_shouldSuspendJobDefinitionAndRetainJob() {
-    // given
-
+  public void testDelayedSuspendByIdAndIncludeInstancesFlag_shouldSuspendJobDefinitionAndRetainJob() {
     Date startTime = new Date();
     ClockUtil.setCurrentTime(startTime);
     final long hourInMs = 60 * 60 * 1000;
@@ -870,9 +859,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn"})
-  public void testDelayedSuspendByKeyAndInludeInstancesFlag_shouldSuspendJobDefinitionAndRetainJob() {
-    // given
-
+  public void testDelayedSuspendByKeyAndIncludeInstancesFlag_shouldSuspendJobDefinitionAndRetainJob() {
     Date startTime = new Date();
     ClockUtil.setCurrentTime(startTime);
     final long hourInMs = 60 * 60 * 1000;
@@ -941,9 +928,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn"})
-  public void testDelayedSuspendByIdAndInludeInstancesFlag_shouldSuspendJobDefinitionAndJob() {
-    // given
-
+  public void testDelayedSuspendByIdAndIncludeInstancesFlag_shouldSuspendJobDefinitionAndJob() {
     Date startTime = new Date();
     ClockUtil.setCurrentTime(startTime);
     final long hourInMs = 60 * 60 * 1000;
@@ -1010,9 +995,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn"})
-  public void testDelayedSuspendByKeyAndInludeInstancesFlag_shouldSuspendJobDefinitionAndJob() {
-    // given
-
+  public void testDelayedSuspendByKeyAndIncludeInstancesFlag_shouldSuspendJobDefinitionAndJob() {
     Date startTime = new Date();
     ClockUtil.setCurrentTime(startTime);
     final long hourInMs = 60 * 60 * 1000;
@@ -1082,8 +1065,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
   }
 
   public void testMultipleSuspendByKey_shouldSuspendJobDefinitionAndRetainJob() {
-    // given
-
     String key = "oneFailingServiceTaskProcess";
 
     // Deploy five versions of the same process, so that there exists
@@ -1125,8 +1106,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
   }
 
   public void testMultipleSuspendByKeyAndIncludeInstances_shouldSuspendJobDefinitionAndRetainJob() {
-    // given
-
     String key = "oneFailingServiceTaskProcess";
 
     // Deploy five versions of the same process, so that there exists
@@ -1168,8 +1147,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
   }
 
   public void testMultipleSuspendByKeyAndIncludeInstances_shouldSuspendJobDefinitionAndJob() {
-    // given
-
     String key = "oneFailingServiceTaskProcess";
 
     // Deploy five versions of the same process, so that there exists
@@ -1211,8 +1188,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
   }
 
   public void testDelayedMultipleSuspendByKeyAndIncludeInstances_shouldSuspendJobDefinitionAndRetainJob() {
-    // given
-
     Date startTime = new Date();
     ClockUtil.setCurrentTime(startTime);
     final long hourInMs = 60 * 60 * 1000;
@@ -1275,8 +1250,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
   }
 
   public void testDelayedMultipleSuspendByKeyAndIncludeInstances_shouldSuspendJobDefinitionAndJob() {
-    // given
-
     Date startTime = new Date();
     ClockUtil.setCurrentTime(startTime);
     final long hourInMs = 60 * 60 * 1000;
@@ -1340,8 +1313,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn"})
   public void testActivationById_shouldActivateJobDefinitionAndRetainJob() {
-    // given
-
     // a process definition with a asynchronous continuation, so that there
     // exists a job definition
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -1391,8 +1362,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn"})
   public void testActivationByKey_shouldActivateJobDefinitionAndRetainJob() {
-    // given
-
     // a process definition with a asynchronous continuation, so that there
     // exists a job definition
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -1443,9 +1412,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn"})
-  public void testActivationByIdAndInludeInstancesFlag_shouldActivateAlsoJobDefinitionAndRetainJob() {
-    // given
-
+  public void testActivationByIdAndIncludeInstancesFlag_shouldActivateAlsoJobDefinitionAndRetainJob() {
     // a process definition with a asynchronous continuation, so that there
     // exists a job definition
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -1494,9 +1461,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn"})
-  public void testActivationByKeyAndInludeInstancesFlag_shouldActivateAlsoJobDefinitionAndRetainJob() {
-    // given
-
+  public void testActivationByKeyAndIncludeInstancesFlag_shouldActivateAlsoJobDefinitionAndRetainJob() {
     // a process definition with a asynchronous continuation, so that there
     // exists a job definition
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -1547,9 +1512,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn"})
-  public void testActivationByIdAndInludeInstancesFlag_shouldActivateJobDefinitionAndJob() {
-    // given
-
+  public void testActivationByIdAndIncludeInstancesFlag_shouldActivateJobDefinitionAndJob() {
     // a process definition with a asynchronous continuation, so that there
     // exists a job definition
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -1598,9 +1561,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn"})
-  public void testActivationByKeyAndInludeInstancesFlag_shouldActivateJobDefinitionAndJob() {
-    // given
-
+  public void testActivationByKeyAndIncludeInstancesFlag_shouldActivateJobDefinitionAndJob() {
     // a process definition with a asynchronous continuation, so that there
     // exists a job definition
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -1652,9 +1613,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn"})
-  public void testDelayedActivationByIdAndInludeInstancesFlag_shouldActivateJobDefinitionAndRetainJob() {
-    // given
-
+  public void testDelayedActivationByIdAndIncludeInstancesFlag_shouldActivateJobDefinitionAndRetainJob() {
     Date startTime = new Date();
     ClockUtil.setCurrentTime(startTime);
     final long hourInMs = 60 * 60 * 1000;
@@ -1729,9 +1688,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn"})
-  public void testDelayedActivationByKeyAndInludeInstancesFlag_shouldActivateJobDefinitionAndRetainJob() {
-    // given
-
+  public void testDelayedActivationByKeyAndIncludeInstancesFlag_shouldActivateJobDefinitionAndRetainJob() {
     Date startTime = new Date();
     ClockUtil.setCurrentTime(startTime);
     final long hourInMs = 60 * 60 * 1000;
@@ -1809,9 +1766,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn"})
-  public void testDelayedActivationByIdAndInludeInstancesFlag_shouldActivateJobDefinitionAndJob() {
-    // given
-
+  public void testDelayedActivationByIdAndIncludeInstancesFlag_shouldActivateJobDefinitionAndJob() {
     Date startTime = new Date();
     ClockUtil.setCurrentTime(startTime);
     final long hourInMs = 60 * 60 * 1000;
@@ -1887,9 +1842,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn"})
-  public void testDelayedActivationByKeyAndInludeInstancesFlag_shouldActivateJobDefinitionAndJob() {
-    // given
-
+  public void testDelayedActivationByKeyAndIncludeInstancesFlag_shouldActivateJobDefinitionAndJob() {
     Date startTime = new Date();
     ClockUtil.setCurrentTime(startTime);
     final long hourInMs = 60 * 60 * 1000;
@@ -1968,8 +1921,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
   }
 
   public void testMultipleActivationByKey_shouldActivateJobDefinitionAndRetainJob() {
-    // given
-
     String key = "oneFailingServiceTaskProcess";
 
     // Deploy five versions of the same process, so that there exists
@@ -2020,8 +1971,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
   }
 
   public void testMultipleActivationByKeyAndIncludeInstances_shouldActivateJobDefinitionAndRetainJob() {
-    // given
-
     String key = "oneFailingServiceTaskProcess";
 
     // Deploy five versions of the same process, so that there exists
@@ -2072,7 +2021,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
   }
 
   public void testMultipleActivationByKeyAndIncludeInstances_shouldActivateJobDefinitionAndJob() {
-    // given
 
     String key = "oneFailingServiceTaskProcess";
 
@@ -2124,8 +2072,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
   }
 
   public void testDelayedMultipleActivationByKeyAndIncludeInstances_shouldActivateJobDefinitionAndRetainJob() {
-    // given
-
     Date startTime = new Date();
     ClockUtil.setCurrentTime(startTime);
     final long hourInMs = 60 * 60 * 1000;
@@ -2197,8 +2143,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
   }
 
   public void testDelayedMultipleActivationByKeyAndIncludeInstances_shouldActivateJobDefinitionAndJob() {
-    // given
-
     Date startTime = new Date();
     ClockUtil.setCurrentTime(startTime);
     final long hourInMs = 60 * 60 * 1000;
@@ -2272,7 +2216,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testSuspendStartTimerOnProcessDefinitionSuspension.bpmn20.xml"})
   public void testSuspendStartTimerOnProcessDefinitionSuspensionByKey() {
-    // given
     Job startTimer = managementService.createJobQuery().timers().singleResult();
 
     assertFalse(startTimer.isSuspended());
@@ -2291,7 +2234,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testSuspendStartTimerOnProcessDefinitionSuspension.bpmn20.xml"})
   public void testSuspendStartTimerOnProcessDefinitionSuspensionById() {
-    // given
     ProcessDefinition pd = repositoryService.createProcessDefinitionQuery().singleResult();
 
     Job startTimer = managementService.createJobQuery().timers().singleResult();
@@ -2310,7 +2252,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testSuspendStartTimerOnProcessDefinitionSuspension.bpmn20.xml"})
   public void testActivateStartTimerOnProcessDefinitionSuspensionByKey() {
-    // given
     repositoryService.suspendProcessDefinitionByKey("process");
 
     Job startTimer = managementService.createJobQuery().timers().singleResult();
@@ -2329,7 +2270,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testSuspendStartTimerOnProcessDefinitionSuspension.bpmn20.xml"})
   public void testActivateStartTimerOnProcessDefinitionSuspensionById() {
-    // given
     ProcessDefinition pd = repositoryService.createProcessDefinitionQuery().singleResult();
     repositoryService.suspendProcessDefinitionById(pd.getId());
 
