@@ -148,6 +148,8 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
 
     assertCount(0, historicQuery().closedBefore(created));
     assertCount(1, historicQuery().closedBefore(afterClose));
+
+    assertCount(1, historicQuery().closedBefore(afterClose).closedAfter(created));
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/emptyStageCase.cmmn"})
