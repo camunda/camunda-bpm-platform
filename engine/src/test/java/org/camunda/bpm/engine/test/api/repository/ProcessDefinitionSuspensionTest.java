@@ -889,7 +889,8 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
     // when
     // the process definition will be suspended in 2 hours
-    repositoryService.suspendProcessDefinitionByKey(processDefinition.getKey(), false, new Date(startTime.getTime() + (2 * hourInMs)));
+    repositoryService.suspendProcessDefinitionByKey(processDefinition.getKey(), false,
+            new Date(startTime.getTime() + (2 * hourInMs)));
 
     // then
     // there exists a job to suspend process definition
@@ -959,7 +960,8 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
     // when
     // the process definition will be suspended in 2 hours
-    repositoryService.suspendProcessDefinitionById(processDefinition.getId(), true, new Date(startTime.getTime() + (2 * hourInMs)));
+    repositoryService.suspendProcessDefinitionById(processDefinition.getId(), true,
+            new Date(startTime.getTime() + (2 * hourInMs)));
 
     // then
     // there exists a job to suspend process definition
@@ -1027,7 +1029,8 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
     // when
     // the process definition will be suspended in 2 hours
-    repositoryService.suspendProcessDefinitionByKey(processDefinition.getKey(), true, new Date(startTime.getTime() + (2 * hourInMs)));
+    repositoryService.suspendProcessDefinitionByKey(processDefinition.getKey(), true,
+            new Date(startTime.getTime() + (2 * hourInMs)));
 
     // then
     // there exists a job to suspend process definition
@@ -1754,7 +1757,8 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
     // when
     // the process definition will be activated in 2 hours
-    repositoryService.activateProcessDefinitionByKey(processDefinition.getKey(), false, new Date(startTime.getTime() + (2 * hourInMs)));
+    repositoryService.activateProcessDefinitionByKey(processDefinition.getKey(), false,
+            new Date(startTime.getTime() + (2 * hourInMs)));
 
     // then
     // there exists a job to activate process definition
@@ -1833,7 +1837,8 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
     // when
     // the process definition will be activated in 2 hours
-    repositoryService.activateProcessDefinitionById(processDefinition.getId(), true, new Date(startTime.getTime() + (2 * hourInMs)));
+    repositoryService.activateProcessDefinitionById(processDefinition.getId(), true,
+            new Date(startTime.getTime() + (2 * hourInMs)));
 
     // then
     // there exists a job to activate process definition
@@ -1910,7 +1915,8 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
     // when
     // the process definition will be activated in 2 hours
-    repositoryService.activateProcessDefinitionByKey(processDefinition.getKey(), true, new Date(startTime.getTime() + (2 * hourInMs)));
+    repositoryService.activateProcessDefinitionByKey(processDefinition.getKey(), true,
+            new Date(startTime.getTime() + (2 * hourInMs)));
 
     // then
     // there exists a job to activate process definition
@@ -2339,5 +2345,56 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     // refresh job
     startTimer = managementService.createJobQuery().timers().singleResult();
     assertFalse(startTimer.isSuspended());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testModifiedProcessInstanceForSuspendProcessDefinition() {
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+
+    //start process instance
+    runtimeService.startProcessInstanceById(processDefinition.getId());
+    ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
+
+    // Suspend process definition
+    repositoryService.suspendProcessDefinitionById(processDefinition.getId(), true, null);
+
+    // try to cancel activity instance for suspended processDefinition
+    try {
+      runtimeService.createProcessInstanceModification(processInstance.getId()).cancelActivityInstance("theTask:6").execute();
+      fail("Exception is expected but not thrown");
+    } catch(SuspendedEntityInteractionException e) {
+      assertTextPresentIgnoreCase("is suspended", e.getMessage());
+    }
+
+    //start new task before
+    runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("theTask").execute();
+
+    List<Task> tasks = taskService.createTaskQuery().list();
+    assertEquals(2, tasks.size());
+
+    try {
+      Task firstTask = tasks.get(0);
+      taskService.complete(firstTask.getId());
+      //TODO this is a bug! Process instance is suspended, but a task can be completed successful!
+      //fail("Exception is expected but not thrown");
+    } catch(SuspendedEntityInteractionException e) {
+      assertTextPresentIgnoreCase("is suspended", e.getMessage());
+    }
+
+    try {
+      Task secondTask = tasks.get(1);
+      taskService.complete(secondTask.getId());
+      fail("Exception is expected but not thrown");
+    } catch(SuspendedEntityInteractionException e) {
+      assertTextPresentIgnoreCase("is suspended", e.getMessage());
+    }
+
+    try {
+      runtimeService.createProcessInstanceModification(processInstance.getId()).cancelActivityInstance("theTask:6").execute();
+      //TODO this is a bug! Process instance is suspended, but can be canceled!
+      //fail("Exception is expected but not thrown");
+    } catch(SuspendedEntityInteractionException e) {
+      assertTextPresentIgnoreCase("is suspended", e.getMessage());
+    }
   }
 }
