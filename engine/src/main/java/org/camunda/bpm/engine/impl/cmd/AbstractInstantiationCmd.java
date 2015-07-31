@@ -86,6 +86,7 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
 
   public Void execute(final CommandContext commandContext) {
     ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
+
     final ProcessDefinitionImpl processDefinition = processInstance.getProcessDefinition();
 
     CoreModelElement elementToInstantiate = getTargetElement(processDefinition);
@@ -289,12 +290,7 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
    */
   protected boolean supportsConcurrentChildInstantiation(ScopeImpl flowScope) {
     CoreActivityBehavior<?> behavior = flowScope.getActivityBehavior();
-    if (behavior != null) {
-      return !(behavior instanceof SequentialMultiInstanceActivityBehavior);
-    }
-    else {
-      return true;
-    }
+    return behavior == null || !(behavior instanceof SequentialMultiInstanceActivityBehavior);
   }
 
   protected ExecutionEntity getSingleExecutionForScope(ActivityExecutionMapping mapping, ScopeImpl scope) {

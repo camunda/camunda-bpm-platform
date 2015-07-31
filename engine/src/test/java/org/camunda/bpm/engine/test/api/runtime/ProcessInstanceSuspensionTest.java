@@ -1945,4 +1945,44 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     TestHelper.clearOpLog(processEngineConfiguration);
   }
 
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testStartBeforeActivityForSuspendProcessInstance() {
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+
+    //start process instance
+    runtimeService.startProcessInstanceById(processDefinition.getId());
+    ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
+
+    // Suspend process instance
+    runtimeService.suspendProcessInstanceById(processInstance.getId());
+
+    // try to start before activity for suspended processDefinition
+    try {
+      runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("theTask").execute();
+      fail("Exception is expected but not thrown");
+    } catch(SuspendedEntityInteractionException e) {
+      assertTextPresentIgnoreCase("is suspended", e.getMessage());
+    }
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testStartAfterActivityForSuspendProcessInstance() {
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+
+    //start process instance
+    runtimeService.startProcessInstanceById(processDefinition.getId());
+    ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
+
+    // Suspend process instance
+    runtimeService.suspendProcessInstanceById(processInstance.getId());
+
+    // try to start after activity for suspended processDefinition
+    try {
+      runtimeService.createProcessInstanceModification(processInstance.getId()).startAfterActivity("theTask").execute();
+      fail("Exception is expected but not thrown");
+    } catch(SuspendedEntityInteractionException e) {
+      assertTextPresentIgnoreCase("is suspended", e.getMessage());
+    }
+  }
+
 }
