@@ -16,7 +16,7 @@ package org.camunda.bpm.engine.impl;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsEmptyString;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNull;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNullOrEqual;
 
 import java.util.Date;
 import java.util.List;
@@ -172,37 +172,37 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
   }
 
   public HistoricCaseInstanceQuery active() {
-    ensureNull(NotValidException.class, "Already querying for case instance state '" + state + "'", "state", state);
+    ensureNullOrEqual(NotValidException.class, "Already querying for case instance state '" + state + "'", "state", state, CaseExecutionState.ACTIVE.getStateCode());
     this.state = CaseExecutionState.ACTIVE.getStateCode();
     return this;
   }
 
   public HistoricCaseInstanceQuery completed() {
-    ensureNull(NotValidException.class, "Already querying for case instance state '" + state + "'", "state", state);
+    ensureNullOrEqual(NotValidException.class, "Already querying for case instance state '" + state + "'", "state", state, CaseExecutionState.COMPLETED.getStateCode());
     this.state = CaseExecutionState.COMPLETED.getStateCode();
     return this;
   }
 
   public HistoricCaseInstanceQuery terminated() {
-    ensureNull(NotValidException.class, "Already querying for case instance state '" + state + "'", "state", state);
+    ensureNullOrEqual(NotValidException.class, "Already querying for case instance state '" + state + "'", "state", state, CaseExecutionState.TERMINATED.getStateCode());
     this.state = CaseExecutionState.TERMINATED.getStateCode();
     return this;
   }
 
   public HistoricCaseInstanceQuery failed() {
-    ensureNull(NotValidException.class, "Already querying for case instance state '" + state + "'", "state", state);
+    ensureNullOrEqual(NotValidException.class, "Already querying for case instance state '" + state + "'", "state", state, CaseExecutionState.FAILED.getStateCode());
     this.state = CaseExecutionState.FAILED.getStateCode();
     return this;
   }
 
   public HistoricCaseInstanceQuery suspended() {
-    ensureNull(NotValidException.class, "Already querying for case instance state '" + state + "'", "state", state);
+    ensureNullOrEqual(NotValidException.class, "Already querying for case instance state '" + state + "'", "state", state, CaseExecutionState.SUSPENDED.getStateCode());
     this.state = CaseExecutionState.SUSPENDED.getStateCode();
     return this;
   }
 
   public HistoricCaseInstanceQuery closed() {
-    ensureNull(NotValidException.class, "Already querying for case instance state '" + state + "'", "state", state);
+    ensureNullOrEqual(NotValidException.class, "Already querying for case instance state '" + state + "'", "state", state, CaseExecutionState.CLOSED.getStateCode());
     this.state = CaseExecutionState.CLOSED.getStateCode();
     return this;
   }

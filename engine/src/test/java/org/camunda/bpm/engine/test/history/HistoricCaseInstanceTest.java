@@ -64,6 +64,8 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
     assertTrue(historicCaseInstance.isActive());
     assertCount(1, historicQuery().active());
     assertCount(1, historicQuery().notClosed());
+    //Calling the same state twice is valid
+    assertCount(1, historicQuery().active().active());
 
     // start empty stage to complete case instance
     String stageExecutionId = queryCaseExecutionByActivityId("PI_Stage_1").getId();
@@ -73,6 +75,8 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
     assertTrue(historicCaseInstance.isCompleted());
     assertCount(1, historicQuery().completed());
     assertCount(1, historicQuery().notClosed());
+    //Calling the same state twice is valid
+    assertCount(1, historicQuery().completed().completed());
 
     // reactive and terminate case instance
     reactivate(caseInstanceId);
@@ -82,6 +86,8 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
     assertTrue(historicCaseInstance.isTerminated());
     assertCount(1, historicQuery().terminated());
     assertCount(1, historicQuery().notClosed());
+    //Calling the same state twice is valid
+    assertCount(1, historicQuery().terminated().terminated());
 
     // reactive and suspend case instance
     reactivate(caseInstanceId);
@@ -100,6 +106,8 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
     assertTrue(historicCaseInstance.isClosed());
     assertCount(1, historicQuery().closed());
     assertCount(0, historicQuery().notClosed());
+    //Calling the same state twice is valid
+    assertCount(1, historicQuery().closed().closed());
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/cmmn/emptyStageCase.cmmn"})
