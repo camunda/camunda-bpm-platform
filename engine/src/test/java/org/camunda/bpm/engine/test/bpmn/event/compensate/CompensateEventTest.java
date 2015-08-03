@@ -744,13 +744,8 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(processInstanceId);
   }
 
-  /**
-   * enable test case when bug is fixed
-   *
-   * @see https://app.camunda.com/jira/browse/CAM-4284
-   */
   @Deployment
-  public void FAILING_testCompensateParallelMiSubprocessWithCompensationEventSubProcess() {
+  public void testCompensateParallelMiSubprocessWithCompensationEventSubProcess() {
     Map<String, Object> variables = new HashMap<String, Object>();
     // multi instance collection
     variables.put("flights", Arrays.asList("STS-14", "STS-28"));
