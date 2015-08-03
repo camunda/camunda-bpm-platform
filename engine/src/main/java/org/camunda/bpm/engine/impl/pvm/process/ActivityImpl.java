@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
@@ -79,6 +80,7 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
     return namedOutgoingTransitions.get(transitionId);
   }
 
+  @Override
   public String toString() {
     return "Activity("+id+")";
   }
@@ -220,4 +222,37 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
     }
   }
 
+  /**
+   * Indicates whether activity is for compensation.
+   *
+   * @return true if this activity is for compensation.
+   */
+  public boolean isCompensationHandler() {
+    Boolean isForCompensation = (Boolean) getProperty(BpmnParse.PROPERTYNAME_IS_FOR_COMPENSATION);
+    return Boolean.TRUE.equals(isForCompensation);
+  }
+
+  /**
+   * Find the compensation handler of this activity.
+   *
+   * @return the compensation handler or <code>null</code>, if this activity has no compensation handler.
+   */
+  public ActivityImpl findCompensationHandler() {
+    String compensationHandlerId = (String) getProperty(BpmnParse.PROPERTYNAME_COMPENSATION_HANDLER_ID);
+    if(compensationHandlerId != null) {
+      return getProcessDefinition().findActivity(compensationHandlerId);
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * Indicates whether activity is a multi instance activity.
+   *
+   * @return true if this activity is a multi instance activity.
+   */
+  public boolean isMultiInstance() {
+    Boolean isMultiInstance = (Boolean) getProperty(BpmnParse.PROPERTYNAME_IS_MULTI_INSTANCE);
+    return Boolean.TRUE.equals(isMultiInstance);
+  }
 }

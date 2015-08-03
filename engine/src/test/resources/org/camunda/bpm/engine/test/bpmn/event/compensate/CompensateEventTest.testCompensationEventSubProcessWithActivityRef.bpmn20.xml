@@ -5,7 +5,7 @@
       <bpmn2:incoming>SequenceFlow_22</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_11</bpmn2:outgoing>
       <bpmn2:subProcess id="compensationSubProcess" name="Handle Compensation Flight" isForCompensation="true" triggeredByEvent="true">
-        <bpmn2:userTask id="cancelFlight" name="Cancel Flight" isForCompensation="true">
+        <bpmn2:userTask id="cancelFlight" name="Cancel Flight">
           <bpmn2:incoming>SequenceFlow_15</bpmn2:incoming>
           <bpmn2:outgoing>SequenceFlow_17</bpmn2:outgoing>
         </bpmn2:userTask>
@@ -61,7 +61,7 @@
         <bpmn2:endEvent id="EndEvent_2">
           <bpmn2:incoming>SequenceFlow_21</bpmn2:incoming>
         </bpmn2:endEvent>
-        <bpmn2:userTask id="cancelHotel" name="Cancel Hotel" isForCompensation="true">
+        <bpmn2:userTask id="cancelHotel" name="Cancel Hotel">
           <bpmn2:incoming>SequenceFlow_20</bpmn2:incoming>
           <bpmn2:outgoing>SequenceFlow_21</bpmn2:outgoing>
         </bpmn2:userTask>

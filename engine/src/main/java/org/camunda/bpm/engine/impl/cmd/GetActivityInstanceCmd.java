@@ -123,26 +123,13 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
         ScopeImpl scope = scopeExecutionEntry.getKey();
         PvmExecutionImpl scopeExecution = scopeExecutionEntry.getValue();
 
-
-        String activityInstanceId = null;
-        // for compensation, the rule that the scope execution's activity instance id is always set on the parent
-        // does not hold, because throwing compensation events are not scopes themselves
-        if (scopeExecution.getParent() != null && scopeExecution.getParent().isCompensationThrowing()) {
-          activityInstanceId = scopeExecution.getActivityInstanceId();
-        }
-        else {
-          activityInstanceId = scopeExecution.getParentActivityInstanceId();
-        }
+        String activityInstanceId = getActivityInstanceId(scopeExecution);
 
         if (activityInstances.containsKey(activityInstanceId)) {
           continue;
         }
         else {
-          String parentActivityInstanceId = null;
-          PvmExecutionImpl parent = scopeExecution.getParent();
-          if (parent != null) {
-            parentActivityInstanceId = parent.getParentActivityInstanceId();
-          }
+          String parentActivityInstanceId = getParentActivityInstanceId(scopeExecution);
 
           // regardless of the tree structure (compacted or not), the scope's activity instance id
           // is the activity instance id of the parent execution and the parent activity instance id
@@ -161,6 +148,38 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     populateChildInstances(activityInstances, transitionInstances);
 
     return processActInst;
+  }
+
+  protected String getActivityInstanceId(PvmExecutionImpl scopeExecution) {
+    // for compensation, the rule that the scope execution's activity instance id is always set on the parent
+    // does not hold, because throwing compensation events are not scopes themselves
+    if (isForCompensation(scopeExecution)) {
+      return scopeExecution.getActivityInstanceId();
+    } else {
+      return scopeExecution.getParentActivityInstanceId();
+    }
+  }
+
+  protected String getParentActivityInstanceId(PvmExecutionImpl scopeExecution) {
+    PvmExecutionImpl parent = scopeExecution.getParent();
+    if (parent != null) {
+      return getActivityInstanceId(parent);
+    } else {
+      return null;
+    }
+  }
+
+  protected boolean isForCompensation(PvmExecutionImpl scopeExecution) {
+    PvmExecutionImpl parent = scopeExecution.getParent();
+    if(parent == null) {
+      return false;
+    } else {
+      if(parent.isCompensationThrowing()) {
+        return true;
+      } else {
+        return isForCompensation(parent);
+      }
+    }
   }
 
   protected ActivityInstanceImpl createActivityInstance(PvmExecutionImpl scopeExecution, ScopeImpl scope,

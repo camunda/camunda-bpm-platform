@@ -77,7 +77,7 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
     if(completionConditionSatisfied(endedExecution) ||
         allExecutionsEnded(scopeExecution, endedExecution)) {
 
-      ArrayList<ActivityExecution> childExecutions = new ArrayList<ActivityExecution>(scopeExecution.getExecutions());
+      ArrayList<ActivityExecution> childExecutions = new ArrayList<ActivityExecution>(((PvmExecutionImpl) scopeExecution).getNonEventScopeExecutions());
       for (ActivityExecution childExecution : childExecutions) {
         // delete all not-ended instances; these are either active (for non-scope tasks) or inactive but have no activity id (for subprocesses, etc.)
         if (childExecution.isActive() || childExecution.getActivity() == null) {

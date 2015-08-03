@@ -39,7 +39,7 @@
               
               <sequenceFlow sourceRef="compensationStart" targetRef="undoBookHotel" />
               
-              <serviceTask id="undoBookHotel" isForCompensation="true" 
+              <serviceTask id="undoBookHotel" 
                     camunda:class="org.camunda.bpm.engine.test.bpmn.event.compensate.helper.GetVariablesDelegate">
                 <extensionElements>
                   <camunda:field name="variable" stringValue="hotel" />

@@ -438,6 +438,24 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     repositoryService.deleteDeployment(repositoryService.createDeploymentQuery().singleResult().getId(), true);
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.compensationMiActivity.bpmn20.xml")
+  public void testParseCompensationHandlerOfMiActivity() {
+    ActivityImpl miActivity = findActivityInDeployedProcessDefinition("undoBookHotel");
+    ScopeImpl flowScope = miActivity.getFlowScope();
+
+    assertEquals("multiInstanceBody", flowScope.getProperty(BpmnParse.PROPERTYNAME_TYPE));
+    assertEquals("bookHotel" + BpmnParse.MULTI_INSTANCE_BODY_ID_SUFFIX, ((ActivityImpl) flowScope).getActivityId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.compensationMiSubprocess.bpmn20.xml")
+  public void testParseCompensationHandlerOfMiSubprocess() {
+    ActivityImpl miActivity = findActivityInDeployedProcessDefinition("undoBookHotel");
+    ScopeImpl flowScope = miActivity.getFlowScope();
+
+    assertEquals("multiInstanceBody", flowScope.getProperty(BpmnParse.PROPERTYNAME_TYPE));
+    assertEquals("scope" + BpmnParse.MULTI_INSTANCE_BODY_ID_SUFFIX, ((ActivityImpl) flowScope).getActivityId());
+  }
+
   @Deployment
   public void testParseSignalStartEvent(){
     ActivityImpl signalStartActivity = findActivityInDeployedProcessDefinition("start");

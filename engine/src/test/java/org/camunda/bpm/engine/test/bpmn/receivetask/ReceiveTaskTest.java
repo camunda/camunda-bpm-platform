@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.test.bpmn.receivetask;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.impl.event.CompensationEventHandler;
 import org.camunda.bpm.engine.impl.event.MessageEventHandler;
@@ -21,8 +23,6 @@ import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
-
-import java.util.List;
 
 /**
  * see https://app.camunda.com/jira/browse/CAM-1612
@@ -352,8 +352,8 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
     // then: we can trigger the second event subscription
     runtimeService.messageEventReceived(subscriptions.get(1).getEventName(), subscriptions.get(1).getExecutionId());
 
-    // expect: there are two event subscriptions for compensation
-    assertEquals(2, runtimeService.createEventSubscriptionQuery()
+    // expect: there are three event subscriptions for compensation (two subscriptions for tasks and one for miBody)
+    assertEquals(3, runtimeService.createEventSubscriptionQuery()
         .eventType(CompensationEventHandler.EVENT_HANDLER_TYPE).count());
 
     // expect: one user task is created

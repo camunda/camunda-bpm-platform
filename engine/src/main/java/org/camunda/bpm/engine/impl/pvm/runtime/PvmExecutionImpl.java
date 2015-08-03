@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime;
 
+import static org.camunda.bpm.engine.impl.bpmn.helper.CompensationUtil.SIGNAL_COMPENSATION_DONE;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -329,7 +331,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       parent.setActivity((PvmActivity) getActivity().getFlowScope());
     }
 
-    parent.signal("compensationDone", null);
+    parent.signal(SIGNAL_COMPENSATION_DONE, null);
   }
 
   /**
@@ -1254,39 +1256,29 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     ScopeImpl currentActivity = getActivity();
     EnsureUtil.ensureNotNull("activity of current execution", currentActivity);
 
-    // if
-    // - this is a scope execution currently executing a non scope activity
-    // - or it is not scope but the current activity is (e.g. can happen during activity end, when the actual
-    //   scope execution has been removed and the concurrent parent has been set to the scope activity)
-    // - or it is asyncBefore/asyncAfter
     if (!currentActivity.isScope() || activityInstanceId == null || (currentActivity.isScope() && !isScope())) {
+      // if
+      // - this is a scope execution currently executing a non scope activity
+      // - or it is not scope but the current activity is (e.g. can happen during activity end, when the actual
+      //   scope execution has been removed and the concurrent parent has been set to the scope activity)
+      // - or it is asyncBefore/asyncAfter
+
       currentActivity = currentActivity.getFlowScope();
     }
 
     PvmExecutionImpl scopeExecution = getFlowScopeExecution();
-
     return scopeExecution.createActivityExecutionMapping(currentActivity);
   }
 
   protected PvmExecutionImpl getFlowScopeExecution() {
     ActivityImpl currentActivity = getActivity();
-    if (!isScope || (currentActivity != null && isCompensationHandler(currentActivity) && !currentActivity.isScope())) {
+    if (!isScope || (currentActivity != null && currentActivity.isCompensationHandler() && !currentActivity.isScope())) {
       // recursion is necessary since there may be more than one concurrent execution in the presence of compensating executions
       // that compensate non-scope activities contained in the same flow scope as the throwing compensation event
       return getParent().getFlowScopeExecution();
     }
     else {
       return this;
-    }
-  }
-
-  protected boolean isCompensationHandler(ScopeImpl activity) {
-    Boolean isForCompensation = (Boolean) activity.getProperty(BpmnParse.PROPERTYNAME_IS_FOR_COMPENSATION);
-    if (isForCompensation != null && isForCompensation) {
-      return true;
-    }
-    else {
-      return false;
     }
   }
 

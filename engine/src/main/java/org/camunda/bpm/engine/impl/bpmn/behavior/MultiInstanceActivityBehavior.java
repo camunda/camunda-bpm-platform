@@ -22,6 +22,8 @@ import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.Expression;
+import org.camunda.bpm.engine.impl.bpmn.helper.CompensationUtil;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
@@ -36,7 +38,7 @@ import org.camunda.bpm.engine.variable.value.IntegerValue;
  * @author Daniel Meyer
  * @author Thorben Lindhauer
  */
-public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBehavior implements CompositeActivityBehavior, ModificationObserverBehavior {
+public abstract class MultiInstanceActivityBehavior extends AbstractBpmnActivityBehavior implements CompositeActivityBehavior, ModificationObserverBehavior {
 
   protected static final Logger LOGGER = Logger.getLogger(MultiInstanceActivityBehavior.class.getName());
 
@@ -54,6 +56,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
   protected String collectionVariable;
   protected String collectionElementVariable;
 
+  @Override
   public void execute(ActivityExecution execution) throws Exception {
     int nrOfInstances = resolveNrOfInstances(execution);
     if (nrOfInstances == 0) {
@@ -158,6 +161,13 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
       return booleanValue;
     }
     return false;
+  }
+
+  @Override
+  protected void leave(ActivityExecution execution) {
+    CompensationUtil.createEventScopeExecution((ExecutionEntity) execution);
+
+    super.leave(execution);
   }
 
   protected void setLoopVariable(ActivityExecution execution, String variableName, Object value) {

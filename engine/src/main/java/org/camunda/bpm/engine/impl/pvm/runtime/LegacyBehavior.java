@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime;
 
+import static org.camunda.bpm.engine.impl.bpmn.helper.CompensationUtil.SIGNAL_COMPENSATION_DONE;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -547,7 +549,7 @@ public class LegacyBehavior {
    * compensation completes, the execution is signalled waiting at the boundary event.
    */
   public static boolean signalCancelBoundaryEvent(String signalName) {
-    return "compensationDone".equals(signalName);
+    return SIGNAL_COMPENSATION_DONE.equals(signalName);
   }
 
   /**

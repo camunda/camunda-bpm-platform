@@ -19,6 +19,7 @@ import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeAc
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -67,8 +68,14 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTestCase {
     Execution eventScopeExecution = runtimeService.createExecutionQuery().executionId(eventSubscriptionEntity.getConfiguration()).singleResult();
     assertNotNull(eventScopeExecution);
 
+    // there is a compensate event subscription for the miBody of 'bookHotel' activity
+    EventSubscriptionEntity miBodyEventSubscriptionEntity = (EventSubscriptionEntity) runtimeService.createEventSubscriptionQuery()
+        .eventType("compensate").activityId("bookHotel" + BpmnParse.MULTI_INSTANCE_BODY_ID_SUFFIX).executionId(eventScopeExecution.getId()).singleResult();
+    assertNotNull(miBodyEventSubscriptionEntity);
+    String miBodyEventScopeExecutionId = miBodyEventSubscriptionEntity.getConfiguration();
+
     // we still have compensate event subscriptions for the compensation handlers, only now they are part of the event scope
-    assertEquals(5, runtimeService.createEventSubscriptionQuery().eventType("compensate").activityId("undoBookHotel").executionId(eventScopeExecution.getId()).count());
+    assertEquals(5, runtimeService.createEventSubscriptionQuery().eventType("compensate").activityId("undoBookHotel").executionId(miBodyEventScopeExecutionId).count());
     assertEquals(1, runtimeService.createEventSubscriptionQuery().eventType("compensate").activityId("undoBookFlight").executionId(eventScopeExecution.getId()).count());
     assertEquals(1, runtimeService.createEventSubscriptionQuery().eventType("compensate").activityId("undoChargeCard").executionId(eventScopeExecution.getId()).count());
 

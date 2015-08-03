@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.bpmn.helper.CompensationUtil;
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
@@ -52,7 +51,7 @@ public class CompensationEventHandler implements EventHandler {
     // activate execution
     compensatingExecution.setActive(true);
 
-    if (isScopedCompensationHandler(compensationHandler)) {
+    if (compensationHandler.isScope() && !compensationHandler.isCompensationHandler()) {
 
       // descend into scope:
       List<CompensateEventSubscriptionEntity> eventsForThisScope = compensatingExecution.getCompensateEventSubscriptions();
@@ -67,11 +66,6 @@ public class CompensationEventHandler implements EventHandler {
         throw new ProcessEngineException("Error while handling compensation event " + eventSubscription, e);
       }
     }
-  }
-
-  protected boolean isScopedCompensationHandler(ActivityImpl compensationHandler) {
-    Boolean isForCompensation = (Boolean) compensationHandler.getProperty(BpmnParse.PROPERTYNAME_IS_FOR_COMPENSATION);
-    return (isForCompensation == null || !(Boolean) isForCompensation) && compensationHandler.isScope();
   }
 
 }

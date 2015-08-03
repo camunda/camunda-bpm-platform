@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
+import static org.camunda.bpm.engine.impl.bpmn.helper.CompensationUtil.SIGNAL_COMPENSATION_DONE;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +29,6 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
-import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SubProcessActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -37,8 +38,6 @@ import org.camunda.bpm.engine.impl.tree.Collector;
 import org.camunda.bpm.engine.impl.tree.FlowScopeWalker;
 import org.camunda.bpm.engine.impl.tree.TreeWalker;
 import org.camunda.bpm.engine.impl.tree.TreeWalker.WalkCondition;
-
-
 
 
 /**
@@ -61,7 +60,7 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
   @Override
   protected void leave(ActivityExecution execution) {
     PvmActivity currentActivity = execution.getActivity();
-    ActivityImpl compensationHandler = getCompensationHandler(currentActivity);
+    ActivityImpl compensationHandler = ((ActivityImpl) currentActivity).findCompensationHandler();
 
     // subscription for compensation event subprocess is already created
     if(compensationHandler != null && !isCompensationEventSubprocess(compensationHandler)) {
@@ -70,29 +69,16 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
     super.leave(execution);
   }
 
-  protected ActivityImpl getCompensationHandler(PvmActivity activity) {
-    String compensationHandlerId = (String) activity.getProperty(BpmnParse.PROPERTYNAME_COMPENSATION_HANDLER_ID);
-    if(compensationHandlerId != null) {
-      return (ActivityImpl) activity.getProcessDefinition().findActivity(compensationHandlerId);
-    }
-    else {
-      return null;
-    }
-  }
-
-  protected boolean isCompensationEventSubprocess(ActivityImpl compensationHandler) {
-    return compensationHandler.isSubProcessScope();
+  protected boolean isCompensationEventSubprocess(ActivityImpl activity) {
+    return activity.isCompensationHandler() && activity.isSubProcessScope();
   }
 
   protected void createCompensateEventSubscription(ActivityExecution execution, ActivityImpl compensationHandler) {
-
+    // the compensate event subscription is created at subprocess or miBody of the the current activity
     PvmActivity currentActivity = execution.getActivity();
-    PvmScope levelOfSubprocessScope = currentActivity.getLevelOfSubprocessScope();
+    ActivityExecution scopeExecution = execution.findExecutionForFlowScope(currentActivity.getFlowScope());
 
-    // the compensate event subscription is created "at the level of subprocess" of the the current activity.
-    ActivityExecution levelOfSubprocessScopeExecution = execution.findExecutionForFlowScope(levelOfSubprocessScope);
-
-    CompensateEventSubscriptionEntity.createAndInsert((ExecutionEntity) levelOfSubprocessScopeExecution, compensationHandler);
+    CompensateEventSubscriptionEntity.createAndInsert((ExecutionEntity) scopeExecution, compensationHandler);
   }
 
   protected void propagateExceptionAsError(Exception exception, ActivityExecution execution) throws Exception {
@@ -244,14 +230,14 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
 
   @Override
   public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
-    if("compensationDone".equals(signalName)) {
-      signalCompensationDone(execution, signalData);
+    if(SIGNAL_COMPENSATION_DONE.equals(signalName)) {
+      signalCompensationDone(execution);
     } else {
       super.signal(execution, signalName, signalData);
     }
   }
 
-  protected void signalCompensationDone(ActivityExecution execution, Object signalData) {
+  protected void signalCompensationDone(ActivityExecution execution) {
     // default behavior is to join compensating executions and propagate the signal if all executions have compensated
 
     // only wait for non-event-scope executions cause a compensation event subprocess consume the compensation event and
@@ -261,7 +247,7 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
       if(execution.getParent() != null) {
         ActivityExecution parent = execution.getParent();
         execution.remove();
-        parent.signal("compensationDone", signalData);
+        parent.signal(SIGNAL_COMPENSATION_DONE, null);
       }
     } else {
       ((ExecutionEntity)execution).forceUpdate();

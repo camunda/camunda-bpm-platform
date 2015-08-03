@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.impl.Condition;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
@@ -124,8 +125,7 @@ public class BpmnActivityBehavior {
 
       } else {
 
-        Object isForCompensation = execution.getActivity().getProperty(BpmnParse.PROPERTYNAME_IS_FOR_COMPENSATION);
-        if(isForCompensation != null && (Boolean) isForCompensation && isAncestorCompensationThrowing(execution)) {
+        if (((ActivityImpl) execution.getActivity()).isCompensationHandler() && isAncestorCompensationThrowing(execution)) {
 
          execution.endCompensation();
 

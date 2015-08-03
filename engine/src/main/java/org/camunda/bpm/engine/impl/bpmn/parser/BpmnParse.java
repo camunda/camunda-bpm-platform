@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -593,41 +594,61 @@ public class BpmnParse extends Parse {
     // Not yet supported on process level (PVM additions needed):
     // parseProperties(processElement);
 
-    HashMap<String, Element> postponedElements = new HashMap<String, Element>();
+    // filter activities that must be parsed separately
+    List<Element> activityElements = new ArrayList<Element>(scopeElement.elements());
+    Map<String, Element> intermediateCatchEvents = filterIntermediateCatchEvents(activityElements);
+    activityElements.removeAll(intermediateCatchEvents.values());
+    Map<String, Element> compensationHandlers = filterCompensationHandlers(activityElements);
+    activityElements.removeAll(compensationHandlers.values());
 
     parseStartEvents(scopeElement, parentScope);
-    parseActivities(scopeElement, parentScope, postponedElements);
-    parsePostponedElements(scopeElement, parentScope, postponedElements);
+    parseActivities(activityElements, scopeElement, parentScope);
+    parseIntermediateCatchEvents(scopeElement, parentScope, intermediateCatchEvents);
     parseEndEvents(scopeElement, parentScope);
     parseBoundaryEvents(scopeElement, parentScope);
-    parseSequenceFlow(scopeElement, parentScope);
+    parseSequenceFlow(scopeElement, parentScope, compensationHandlers);
     parseExecutionListenersOnScope(scopeElement, parentScope);
-    parseAssociations(scopeElement, parentScope);
+    parseAssociations(scopeElement, parentScope, compensationHandlers);
+    parseCompensationHandlers(parentScope, compensationHandlers);
 
     if (parentScope instanceof ProcessDefinition) {
       parseProcessDefinitionCustomExtensions(scopeElement, (ProcessDefinition) parentScope);
     }
-
-    postponedElements.clear();
   }
 
-  protected void parsePostponedElements(Element scopeElement, ScopeImpl parentScope, HashMap<String, Element> postponedElements) {
-    for (Element postponedElement : postponedElements.values()) {
-      if (parentScope.findActivity(postponedElement.attribute("id")) == null) { // check
-                                                                                // whether
-                                                                                // activity
-                                                                                // is
-                                                                                // already
-                                                                                // parsed
-        if (postponedElement.getTagName().equals("intermediateCatchEvent")) {
-          ActivityImpl activity = parseIntermediateCatchEvent(postponedElement, parentScope, null);
+  protected HashMap<String, Element> filterIntermediateCatchEvents(List<Element> activityElements) {
+    HashMap<String, Element> intermediateCatchEvents = new HashMap<String, Element>();
+    for(Element activityElement : activityElements) {
+      if (activityElement.getTagName().equals("intermediateCatchEvent")) {
+        intermediateCatchEvents.put(activityElement.attribute("id"), activityElement);
+      }
+    }
+    return intermediateCatchEvents;
+  }
 
-          if (activity != null) {
-            parseActivityInputOutput(postponedElement, activity);
-          }
+  protected HashMap<String, Element> filterCompensationHandlers(List<Element> activityElements) {
+    HashMap<String, Element> compensationHandlers = new HashMap<String, Element>();
+    for(Element activityElement : activityElements) {
+      if (isCompensationHandler(activityElement)) {
+        compensationHandlers.put(activityElement.attribute("id"), activityElement);
+      }
+    }
+    return compensationHandlers;
+  }
+
+  protected void parseIntermediateCatchEvents(Element scopeElement, ScopeImpl parentScope, Map<String, Element> intermediateCatchEventElements) {
+    for (Element intermediateCatchEventElement : intermediateCatchEventElements.values()) {
+
+      if (parentScope.findActivity(intermediateCatchEventElement.attribute("id")) == null) {
+        // check whether activity is already parsed
+        ActivityImpl activity = parseIntermediateCatchEvent(intermediateCatchEventElement, parentScope, null);
+
+        if (activity != null) {
+          parseActivityInputOutput(intermediateCatchEventElement, activity);
         }
       }
     }
+    intermediateCatchEventElements.clear();
   }
 
   protected void parseProcessDefinitionCustomExtensions(Element scopeElement, ProcessDefinition definition) {
@@ -689,7 +710,7 @@ public class BpmnParse extends Parse {
     }
   }
 
-  protected void parseAssociations(Element scopeElement, ScopeImpl parentScope) {
+  protected void parseAssociations(Element scopeElement, ScopeImpl parentScope, Map<String, Element> compensationHandlers) {
     for (Element associationElement : scopeElement.elements("association")) {
       String sourceRef = associationElement.attribute("sourceRef");
       if (sourceRef == null) {
@@ -703,42 +724,69 @@ public class BpmnParse extends Parse {
       ActivityImpl targetActivity = parentScope.findActivity(targetRef);
 
       // an association may reference elements that are not parsed as activities
-      // (like for instance
-      // text annotations so do not throw an exception if sourceActivity or
-      // targetActivity are null)
+      // (like for instance text annotations so do not throw an exception if sourceActivity or targetActivity are null)
       // However, we make sure they reference 'something':
       if (sourceActivity == null && !elementIds.contains(sourceRef)) {
         addError("Invalid reference sourceRef '" + sourceRef + "' of association element ", associationElement);
       } else if (targetActivity == null && !elementIds.contains(targetRef)) {
         addError("Invalid reference targetRef '" + targetRef + "' of association element ", associationElement);
       } else {
+
         if (sourceActivity != null && sourceActivity.getProperty("type").equals("compensationBoundaryCatch")) {
 
-          parseAssociationOfCompensationBoundaryEvent(associationElement, sourceActivity, targetActivity);
+          if (targetActivity == null && compensationHandlers.containsKey(targetRef)) {
+            targetActivity = parseCompensationHandlerForCompensationBoundaryEvent(parentScope, sourceActivity, targetRef, compensationHandlers);
+
+            compensationHandlers.remove(targetActivity.getId());
+          }
+
+          if (targetActivity != null) {
+            parseAssociationOfCompensationBoundaryEvent(associationElement, sourceActivity, targetActivity);
+          } else {
+            addError("referenced element of compensation boundary catch event '" + targetRef + "' not found", associationElement);
+          }
         }
       }
     }
   }
 
+  protected ActivityImpl parseCompensationHandlerForCompensationBoundaryEvent(ScopeImpl parentScope, ActivityImpl sourceActivity, String targetRef,
+      Map<String, Element> compensationHandlers) {
+
+    Element compensationHandler = compensationHandlers.get(targetRef);
+
+    ActivityImpl eventScope = (ActivityImpl) sourceActivity.getEventScope();
+    if (eventScope.isMultiInstance()) {
+      ScopeImpl miBody = eventScope.getFlowScope();
+      return parseActivity(compensationHandler, null, miBody);
+    } else {
+      return parseActivity(compensationHandler, null, parentScope);
+    }
+  }
+
   protected void parseAssociationOfCompensationBoundaryEvent(Element associationElement, ActivityImpl sourceActivity, ActivityImpl targetActivity) {
-    Object isForCompensation = targetActivity.getProperty(PROPERTYNAME_IS_FOR_COMPENSATION);
-    if (isForCompensation == null || !(Boolean) isForCompensation) {
+    if (!targetActivity.isCompensationHandler()) {
       addError("compensation boundary catch must be connected to element with isForCompensation=true", associationElement);
 
     } else {
       ActivityImpl compensatedActivity = (ActivityImpl) sourceActivity.getEventScope();
 
-      String existingCompensationHandlerId = (String) compensatedActivity.getProperty(PROPERTYNAME_COMPENSATION_HANDLER_ID);
-      if (existingCompensationHandlerId != null) {
-
-        ActivityImpl compensationHandler = compensatedActivity.findActivity(existingCompensationHandlerId);
-        if (compensationHandler.isSubProcessScope()) {
-          addError("compensation boundary event and event subprocess with compensation start event are not supported on the same scope", associationElement);
-        }
+      ActivityImpl compensationHandler = compensatedActivity.findCompensationHandler();
+      if (compensationHandler != null && compensationHandler.isSubProcessScope()) {
+        addError("compensation boundary event and event subprocess with compensation start event are not supported on the same scope", associationElement);
       } else {
+
         compensatedActivity.setProperty(PROPERTYNAME_COMPENSATION_HANDLER_ID, targetActivity.getId());
       }
     }
+  }
+
+  protected void parseCompensationHandlers(ScopeImpl parentScope, Map<String, Element> compensationHandlers) {
+    // compensation handlers attached to compensation boundary events should be already parsed
+    for (Element compensationHandler : new HashSet<Element>(compensationHandlers.values())) {
+      parseActivity(compensationHandler, null, parentScope);
+    }
+    compensationHandlers.clear();
   }
 
   /**
@@ -958,13 +1006,12 @@ public class BpmnParse extends Parse {
     }
 
     ScopeImpl subprocess = scopeActivity.getFlowScope();
-    String existingCompensationHandlerId = (String) subprocess.getProperty(PROPERTYNAME_COMPENSATION_HANDLER_ID);
-    if (existingCompensationHandlerId == null) {
+    ActivityImpl compensationHandler = ((ActivityImpl) subprocess).findCompensationHandler();
+    if (compensationHandler == null) {
       // add property to subprocess
       subprocess.setProperty(PROPERTYNAME_COMPENSATION_HANDLER_ID, scopeActivity.getActivityId());
     } else {
 
-      ActivityImpl compensationHandler = subprocess.findActivity(existingCompensationHandlerId);
       if (compensationHandler.isSubProcessScope()) {
         addError("multiple event subprocesses with compensation start event are not supported on the same scope", startEventElement);
       } else {
@@ -1084,20 +1131,20 @@ public class BpmnParse extends Parse {
    * Parses the activities of a certain level in the process (process,
    * subprocess or another scope).
    *
+   * @param activityElements
+   *          The list of activities to be parsed. This list may be filtered before.
    * @param parentElement
-   *          The 'parent' element that contains the activities (process,
-   *          subprocess).
+   *          The 'parent' element that contains the activities (process, subprocess).
    * @param scopeElement
    *          The {@link ScopeImpl} to which the activities must be added.
-   * @param postponedElements
    */
-  public void parseActivities(Element parentElement, ScopeImpl scopeElement, HashMap<String, Element> postponedElements) {
-    for (Element activityElement : parentElement.elements()) {
-      parseActivity(activityElement, parentElement, scopeElement, postponedElements);
+  public void parseActivities(List<Element> activityElements, Element parentElement, ScopeImpl scopeElement) {
+    for (Element activityElement : activityElements) {
+      parseActivity(activityElement, parentElement, scopeElement);
     }
   }
 
-  protected void parseActivity(Element activityElement, Element parentElement, ScopeImpl scopeElement, HashMap<String, Element> postponedElements) {
+  protected ActivityImpl parseActivity(Element activityElement, Element parentElement, ScopeImpl scopeElement) {
     ActivityImpl activity = null;
 
     boolean isMultiInstance = false;
@@ -1133,10 +1180,6 @@ public class BpmnParse extends Parse {
       activity = parseSubProcess(activityElement, scopeElement);
     } else if (activityElement.getTagName().equals("callActivity")) {
       activity = parseCallActivity(activityElement, scopeElement, isMultiInstance);
-    } else if (activityElement.getTagName().equals("intermediateCatchEvent")) {
-      // postpone all intermediate catch events (required for supporting
-      // event-based gw)
-      postponedElements.put(activityElement.attribute("id"), activityElement);
     } else if (activityElement.getTagName().equals("intermediateThrowEvent")) {
       activity = parseIntermediateThrowEvent(activityElement, scopeElement);
     } else if (activityElement.getTagName().equals("eventBasedGateway")) {
@@ -1154,6 +1197,8 @@ public class BpmnParse extends Parse {
     if (activity != null) {
       parseActivityInputOutput(activityElement, activity);
     }
+
+    return activity;
   }
 
   public void validateActivities(List<ActivityImpl> activities) {
@@ -1597,6 +1642,7 @@ public class BpmnParse extends Parse {
     if (LOGGER.isLoggable(Level.FINE)) {
       LOGGER.fine("Parsing activity " + id);
     }
+
     ActivityImpl activity = scopeElement.createActivity(id);
 
     activity.setProperty("name", activityElement.attribute("name"));
@@ -1607,8 +1653,7 @@ public class BpmnParse extends Parse {
 
     activity.setProperty(PROPERTYNAME_JOB_PRIORITY, parseJobPriority(activityElement));
 
-    String isForCompensation = activityElement.attribute("isForCompensation");
-    if (isForCompensation != null && (isForCompensation.equals("true") || isForCompensation.equals("TRUE"))) {
+    if (isCompensationHandler(activityElement)) {
       activity.setProperty(PROPERTYNAME_IS_FOR_COMPENSATION, true);
     }
 
@@ -1640,6 +1685,11 @@ public class BpmnParse extends Parse {
     }
 
     return builder.toString();
+  }
+
+  protected boolean isCompensationHandler(Element activityElement) {
+    String isForCompensation = activityElement.attribute("isForCompensation");
+    return isForCompensation != null && isForCompensation.equalsIgnoreCase("true");
   }
 
   /**
@@ -1926,12 +1976,14 @@ public class BpmnParse extends Parse {
     // can't use #getMultiInstanceScope here to determine whether the task is multi-instance,
     // since the property hasn't been set yet (cf parseActivity)
     ActivityImpl parentFlowScopeActivity = activity.getParentFlowScopeActivity();
-    if (parentFlowScopeActivity != null && parentFlowScopeActivity.getActivityBehavior() instanceof MultiInstanceActivityBehavior) {
+    if (parentFlowScopeActivity != null && parentFlowScopeActivity.getActivityBehavior() instanceof MultiInstanceActivityBehavior
+        && !activity.isCompensationHandler()) {
 
       parseAsynchronousContinuation(activityElement, parentFlowScopeActivity);
 
       Element miLoopCharacteristics = activityElement.element("multiInstanceLoopCharacteristics");
       parseAsynchronousContinuation(miLoopCharacteristics, activity);
+
     } else {
       parseAsynchronousContinuation(activityElement, activity);
     }
@@ -2686,12 +2738,12 @@ public class BpmnParse extends Parse {
         addError("Invalid reference in boundary event. Make sure that the referenced activity is " + "defined in the same scope as the boundary event",
             boundaryEventElement);
       }
+
       if (compensateEventDefinition == null) {
         ActivityImpl multiInstanceScope = getMultiInstanceScope(eventScopeActivity);
         if (multiInstanceScope != null) {
           // if the boundary event is attached to a multi instance activity,
-          // then the scope
-          // of the boundary event is the multi instance body.
+          // then the scope of the boundary event is the multi instance body.
           eventScopeActivity = multiInstanceScope;
         }
       }
@@ -2750,8 +2802,7 @@ public class BpmnParse extends Parse {
   }
 
   protected ActivityImpl getMultiInstanceScope(ActivityImpl activity) {
-    Boolean isMultiInstance = (Boolean) activity.getProperty(PROPERTYNAME_IS_MULTI_INSTANCE);
-    if (isMultiInstance != null && isMultiInstance) {
+    if (activity.isMultiInstance()) {
       return activity.getParentFlowScopeActivity();
     } else {
       return null;
@@ -2946,8 +2997,7 @@ public class BpmnParse extends Parse {
     }
 
     // Parse the timer declaration
-    // TODO move the timer declaration into the bpmn activity or next to the
-    // TimerSession
+    // TODO move the timer declaration into the bpmn activity or next to the TimerSession
     TimerDeclarationImpl timerDeclaration = new TimerDeclarationImpl(expression, type, jobHandlerType);
     timerDeclaration.setJobHandlerConfiguration(timerActivity.getId());
     timerDeclaration.setExclusive("true".equals(timerEventDefinition.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "exclusive", String.valueOf(JobEntity.DEFAULT_EXCLUSIVE))));
@@ -3381,8 +3431,9 @@ public class BpmnParse extends Parse {
    *          The 'process' element wherein the sequence flow are defined.
    * @param scope
    *          The scope to which the sequence flow must be added.
+   * @param compensationHandlers
    */
-  public void parseSequenceFlow(Element processElement, ScopeImpl scope) {
+  public void parseSequenceFlow(Element processElement, ScopeImpl scope, Map<String, Element> compensationHandlers) {
     for (Element sequenceFlowElement : processElement.elements("sequenceFlow")) {
 
       String id = sequenceFlowElement.attribute("id");
@@ -3412,7 +3463,15 @@ public class BpmnParse extends Parse {
       ActivityImpl sourceActivity = scope.findActivityAtLevelOfSubprocess(sourceRef);
       ActivityImpl destinationActivity = scope.findActivityAtLevelOfSubprocess(destinationRef);
 
-      if (sourceActivity == null) {
+      if ((sourceActivity == null && compensationHandlers.containsKey(sourceRef))
+          || (sourceActivity != null && sourceActivity.isCompensationHandler())) {
+        addError("Invalid outgoing sequence flow of compensation activity '" + sourceRef
+            + "'. A compensation activity should not have an incoming or outgoing sequence flow.", sequenceFlowElement);
+      } else if ((destinationActivity == null && compensationHandlers.containsKey(destinationRef))
+          || (destinationActivity != null && destinationActivity.isCompensationHandler())) {
+        addError("Invalid incoming sequence flow of compensation activity '" + destinationRef
+            + "'. A compensation activity should not have an incoming or outgoing sequence flow.", sequenceFlowElement);
+      } else if (sourceActivity == null) {
         addError("Invalid source '" + sourceRef + "' of sequence flow '" + id + "'", sequenceFlowElement);
       } else if (destinationActivity == null) {
         addError("Invalid destination '" + destinationRef + "' of sequence flow '" + id + "'", sequenceFlowElement);
@@ -3428,7 +3487,8 @@ public class BpmnParse extends Parse {
       } else if (destinationActivity.getActivityBehavior() instanceof SubProcessActivityBehavior
           && (Boolean) destinationActivity.getProperty(PROPERTYNAME_TRIGGERED_BY_EVENT)) {
         addError("Invalid incoming sequence flow of event subprocess", sequenceFlowElement);
-      } else {
+      }
+      else {
 
         if(getMultiInstanceScope(sourceActivity) != null) {
           sourceActivity = getMultiInstanceScope(sourceActivity);
