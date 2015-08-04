@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.CompensationBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
@@ -149,7 +150,7 @@ public class BpmnActivityBehavior {
   protected boolean isAncestorCompensationThrowing(ActivityExecution execution) {
     ActivityExecution parent = execution.getParent();
     while (parent != null) {
-      if (((PvmExecutionImpl) parent).isCompensationThrowing()) {
+      if (CompensationBehavior.isCompensationThrowing((PvmExecutionImpl) parent)) {
         return true;
       }
       parent = parent.getParent();

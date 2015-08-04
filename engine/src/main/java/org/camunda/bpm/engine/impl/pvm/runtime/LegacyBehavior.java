@@ -44,7 +44,7 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
-import org.camunda.bpm.engine.impl.tree.AncestorAwareScopeExecutionCollector;
+import org.camunda.bpm.engine.impl.tree.ActivityAwareScopeExecutionCollector;
 import org.camunda.bpm.engine.impl.tree.ExecutionWalker;
 import org.camunda.bpm.engine.impl.tree.FlowScopeWalker;
 import org.camunda.bpm.engine.impl.tree.ScopeCollector;
@@ -360,7 +360,7 @@ public class LegacyBehavior {
     }
 
     ScopeImpl flowScope = propagatingExecution.getActivity().getFlowScope();
-    AncestorAwareScopeExecutionCollector scopeExecutionCollector = new AncestorAwareScopeExecutionCollector(flowScope);
+    ActivityAwareScopeExecutionCollector scopeExecutionCollector = new ActivityAwareScopeExecutionCollector(flowScope);
     new ExecutionWalker(propagatingExecution)
       .addPreCollector(scopeExecutionCollector)
       .walkUntil();

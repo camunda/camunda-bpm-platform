@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
@@ -61,9 +62,13 @@ public class CompensationUtil {
       if (eventSubscription.getConfiguration() != null) {
         compensatingExecution = Context.getCommandContext().getExecutionManager().findExecutionById(eventSubscription.getConfiguration());
 
-        // move the compensating execution under this execution:
-        compensatingExecution.setParent((PvmExecutionImpl) execution);
-        ((ExecutionEntity) execution).getExecutions().add(compensatingExecution);
+        if (compensatingExecution.getParent() != execution) {
+          // move the compensating execution under this execution if this is not the case yet
+          compensatingExecution.getParent().getExecutions().remove(compensatingExecution);
+          ((ExecutionEntity) execution).getExecutions().add(compensatingExecution);
+          compensatingExecution.setParent((PvmExecutionImpl) execution);
+        }
+
         compensatingExecution.setEventScope(false);
       } else {
         compensatingExecution = (ExecutionEntity) execution.createExecution();

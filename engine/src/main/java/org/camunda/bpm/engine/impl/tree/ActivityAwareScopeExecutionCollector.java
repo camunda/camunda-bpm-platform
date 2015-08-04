@@ -29,13 +29,13 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
  * @author Thorben Lindhauer
  *
  */
-public class AncestorAwareScopeExecutionCollector implements Collector<PvmExecutionImpl> {
+public class ActivityAwareScopeExecutionCollector implements Collector<PvmExecutionImpl> {
 
   protected ScopeImpl commonChildScope;
   protected ScopeImpl currentActivity;
   protected List<PvmExecutionImpl> executions = new ArrayList<PvmExecutionImpl>();
 
-  public AncestorAwareScopeExecutionCollector(ScopeImpl commonChildScope) {
+  public ActivityAwareScopeExecutionCollector(ScopeImpl commonChildScope) {
     this.commonChildScope = commonChildScope;
     this.currentActivity = commonChildScope;
   }

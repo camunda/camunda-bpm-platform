@@ -46,7 +46,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.FoxAtomicOperationDeleteCascadeFireActivityEnd;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
-import org.camunda.bpm.engine.impl.tree.AncestorAwareScopeExecutionCollector;
+import org.camunda.bpm.engine.impl.tree.ActivityAwareScopeExecutionCollector;
 import org.camunda.bpm.engine.impl.tree.ExecutionWalker;
 import org.camunda.bpm.engine.impl.tree.FlowScopeWalker;
 import org.camunda.bpm.engine.impl.tree.ScopeCollector;
@@ -1135,12 +1135,13 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     PvmActivity scopeActivity = scopeExecution.getActivity();
     if (scopeActivity != null && scopeActivity.isScope()
         && scopeExecution.getActivityInstanceId() != null
-        && !scopeExecution.isCompensationThrowing()) {
+        && !CompensationBehavior.isCompensationThrowing(scopeExecution)
+        && !CompensationBehavior.executesDefaultCompensationHandler(scopeExecution)) {
       // take the execution's activity instance id if
       //   * it is a leaf (scopeActivity != null)
       //   * it executes a scope activity (scopeActivity != null)
       //   * it actually executes the activity (activityInstanceId != null)
-      //   * that scope activity cannot have child executions (i.e. no compensation throwing event)
+      //   * it cannot have child executions (i.e. no compensation throwing event)
       return scopeExecution.getActivityInstanceId();
     }
     else {
@@ -1300,18 +1301,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     }
   }
 
-  public boolean isCompensationThrowing() {
-    ActivityImpl currentActivity = getActivity();
-    if (currentActivity != null) {
-      Boolean isCompensationThrowing = (Boolean) currentActivity.getProperty(BpmnParse.PROPERTYNAME_THROWS_COMPENSATION);
-      if (isCompensationThrowing != null && isCompensationThrowing) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
   public Map<ScopeImpl, PvmExecutionImpl> createActivityExecutionMapping(ScopeImpl currentScope) {
     if(!isScope()) {
       throw new ProcessEngineException("Execution must be a scope execution");
@@ -1320,7 +1309,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       throw new ProcessEngineException("Current scope must be a scope.");
     }
 
-    AncestorAwareScopeExecutionCollector scopeExecutionCollector = new AncestorAwareScopeExecutionCollector(currentScope);
+    ActivityAwareScopeExecutionCollector scopeExecutionCollector = new ActivityAwareScopeExecutionCollector(currentScope);
     new ExecutionWalker(this)
       .addPreCollector(scopeExecutionCollector)
       .walkUntil();

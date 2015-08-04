@@ -623,13 +623,13 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
         describeActivityInstanceTree(processInstance.getProcessDefinitionId())
         .activity("parallelTask")
         .activity("throwCompensate")
-          .beginScope("scope")
-            .beginMiBody("bookHotel")
-              .activity("undoBookHotel")
-              .activity("undoBookHotel")
-              .activity("undoBookHotel")
-              .activity("undoBookHotel")
-              .activity("undoBookHotel")
+        .beginScope("scope")
+          .beginMiBody("bookHotel")
+            .activity("undoBookHotel")
+            .activity("undoBookHotel")
+            .activity("undoBookHotel")
+            .activity("undoBookHotel")
+            .activity("undoBookHotel")
         .done());
   }
 
@@ -654,7 +654,7 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
       .done());
   }
 
-  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testActivityInstanceTreeForCompensationEndEvent.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.activityWithCompensationEndEvent.bpmn20.xml")
   public void testCancelProcessInstanceWithActiveCompensation() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");

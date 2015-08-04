@@ -54,6 +54,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.CompensationBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
@@ -74,11 +75,8 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     String parentActivityInstanceId = null;
     ExecutionEntity parentExecution = execution.getParent();
 
-    if (parentExecution != null && parentExecution.isCompensationThrowing()) {
-      // TODO: move this to compensation fuck up behavior
-      Map<ScopeImpl, PvmExecutionImpl> activityExecutionMapping = execution.createActivityExecutionMapping();
-      PvmExecutionImpl parentScopeExecution = activityExecutionMapping.get(execution.getActivity().getFlowScope());
-      parentActivityInstanceId = parentScopeExecution.getParentActivityInstanceId();
+    if (parentExecution != null && CompensationBehavior.isCompensationThrowing(parentExecution)) {
+      parentActivityInstanceId = CompensationBehavior.getParentActivityInstanceId(execution);
     }
     else {
       parentActivityInstanceId = execution.getParentActivityInstanceId();

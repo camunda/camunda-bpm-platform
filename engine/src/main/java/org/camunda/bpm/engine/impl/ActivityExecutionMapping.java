@@ -22,6 +22,7 @@ import java.util.Set;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.CompensationBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
@@ -130,7 +131,7 @@ public class ActivityExecutionMapping {
    * event-scope executions are not considered in this mapping and must be ignored
    */
   protected boolean isLeaf(ExecutionEntity execution) {
-    if (execution.isCompensationThrowing()) {
+    if (CompensationBehavior.isCompensationThrowing(execution)) {
       return true;
     }
     else {

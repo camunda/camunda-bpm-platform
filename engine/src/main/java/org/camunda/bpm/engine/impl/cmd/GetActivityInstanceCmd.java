@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TransitionInstanceImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.CompensationBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -107,7 +108,7 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
       // and does not throw compensation
       if (leaf.getActivityInstanceId() != null) {
 
-        if (!(leaf.isCompensationThrowing())) {
+        if (!CompensationBehavior.isCompensationThrowing(leaf)) {
           String parentActivityInstanceId = null;
 
           ActivityImpl leafActivity = leaf.getActivity();
@@ -141,7 +142,7 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
       scopeInstancesToCreate.remove(leaf.getProcessDefinition());
       LegacyBehavior.removeLegacyNonScopesFromMapping(scopeInstancesToCreate);
 
-      // create an activity instance for each scope
+      // create an activity instance for each scope (including compensation throwing executions)
       for (Map.Entry<ScopeImpl, PvmExecutionImpl> scopeExecutionEntry : scopeInstancesToCreate.entrySet()) {
         ScopeImpl scope = scopeExecutionEntry.getKey();
         PvmExecutionImpl scopeExecution = scopeExecutionEntry.getValue();
@@ -171,19 +172,6 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     populateChildInstances(activityInstances, transitionInstances);
 
     return processActInst;
-  }
-
-  protected boolean isForCompensation(PvmExecutionImpl scopeExecution) {
-    PvmExecutionImpl parent = scopeExecution.getParent();
-    if(parent == null) {
-      return false;
-    } else {
-      if(parent.isCompensationThrowing()) {
-        return true;
-      } else {
-        return isForCompensation(parent);
-      }
-    }
   }
 
   protected ActivityInstanceImpl createActivityInstance(PvmExecutionImpl scopeExecution, ScopeImpl scope,
@@ -320,7 +308,7 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     for (ExecutionEntity execution : executionList) {
       // although executions executing throwing compensation events are not leaves in the tree,
       // they are treated as leaves since their child executions are logical children of their parent scope execution
-      if (execution.getNonEventScopeExecutions().isEmpty() || execution.isCompensationThrowing()) {
+      if (execution.getNonEventScopeExecutions().isEmpty() || CompensationBehavior.isCompensationThrowing(execution)) {
         leaves.add(execution);
       }
     }
