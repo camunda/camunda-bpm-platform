@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.test.bpmn.subprocess.transaction;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -191,11 +192,6 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTestCase {
     taskService.setVariable(task.getId(), "confirmed", false);
     taskService.complete(task.getId());
 
-    // now the process instance execution is sitting in the 'afterCancellation' task
-    // -> has left the transaction using the cancel boundary event
-    List<String> activeActivityIds = runtimeService.getActiveActivityIds(processInstance.getId());
-    assertTrue(activeActivityIds.contains("afterCancellation"));
-
     // we have no more compensate event subscriptions
     assertEquals(0,runtimeService.createEventSubscriptionQuery().eventType("compensate").count());
 
@@ -203,6 +199,17 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTestCase {
     assertEquals(5, runtimeService.getVariable(processInstance.getId(), "undoBookHotel"));
     assertEquals(1, runtimeService.getVariable(processInstance.getId(), "undoBookFlight"));
     assertEquals(1, runtimeService.getVariable(processInstance.getId(), "undoChargeCard"));
+
+    // signal compensation handler completion
+    List<Execution> compensationHandlerExecutions = collectExecutionsFor("undoBookHotel", "undoBookFlight", "undoChargeCard");
+    for (Execution execution : compensationHandlerExecutions) {
+      runtimeService.signal(execution.getId());
+    }
+
+    // now the process instance execution is sitting in the 'afterCancellation' task
+    // -> has left the transaction using the cancel boundary event
+    List<String> activeActivityIds = runtimeService.getActiveActivityIds(processInstance.getId());
+    assertTrue(activeActivityIds.contains("afterCancellation"));
 
     // if we have history, we check that the invocation of the compensation handlers is recorded in history.
     if(!processEngineConfiguration.getHistory().equals(ProcessEngineConfiguration.HISTORY_NONE)) {
@@ -243,17 +250,23 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTestCase {
     taskService.setVariable(task.getId(), "confirmed", false);
     taskService.complete(task.getId());
 
-    // now the process instance execution is sitting in the 'afterCancellation' task
-    // -> has left the transaction using the cancel boundary event
-    List<String> activeActivityIds = runtimeService.getActiveActivityIds(processInstance.getId());
-    assertTrue(activeActivityIds.contains("afterCancellation"));
-
     // we have no more compensate event subscriptions
     assertEquals(0,runtimeService.createEventSubscriptionQuery().eventType("compensate").count());
 
     // assert that the compensation handlers have been invoked:
     assertEquals(5, runtimeService.getVariable(processInstance.getId(), "undoBookHotel"));
     assertEquals(1, runtimeService.getVariable(processInstance.getId(), "undoBookFlight"));
+
+    // signal compensation handler completion
+    List<Execution> compensationHandlerExecutions = collectExecutionsFor("undoBookHotel", "undoBookFlight");
+    for (Execution execution : compensationHandlerExecutions) {
+      runtimeService.signal(execution.getId());
+    }
+
+    // now the process instance execution is sitting in the 'afterCancellation' task
+    // -> has left the transaction using the cancel boundary event
+    List<String> activeActivityIds = runtimeService.getActiveActivityIds(processInstance.getId());
+    assertTrue(activeActivityIds.contains("afterCancellation"));
 
     // if we have history, we check that the invocation of the compensation handlers is recorded in history.
     if(!processEngineConfiguration.getHistory().equals(ProcessEngineConfiguration.HISTORY_NONE)) {
@@ -292,11 +305,6 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTestCase {
     taskService.setVariable(taskInner.getId(), "confirmed", false);
     taskService.complete(taskInner.getId());
 
-    // now the process instance execution is sitting in the 'afterInnerCancellation' task
-    // -> has left the transaction using the cancel boundary event
-    List<String> activeActivityIds = runtimeService.getActiveActivityIds(processInstance.getId());
-    assertTrue(activeActivityIds.contains("afterInnerCancellation"));
-
     // we have no more compensate event subscriptions for the inner tx
     assertEquals(0,runtimeService.createEventSubscriptionQuery().eventType("compensate").activityId("innerTxundoBookHotel").count());
     assertEquals(0,runtimeService.createEventSubscriptionQuery().eventType("compensate").activityId("innerTxundoBookFlight").count());
@@ -307,6 +315,17 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTestCase {
     // assert that the compensation handlers have been invoked:
     assertEquals(5, runtimeService.getVariable(processInstance.getId(), "innerTxundoBookHotel"));
     assertEquals(1, runtimeService.getVariable(processInstance.getId(), "innerTxundoBookFlight"));
+
+    // signal compensation handler completion
+    List<Execution> compensationHandlerExecutions = collectExecutionsFor("innerTxundoBookFlight", "innerTxundoBookHotel");
+    for (Execution execution : compensationHandlerExecutions) {
+      runtimeService.signal(execution.getId());
+    }
+
+    // now the process instance execution is sitting in the 'afterInnerCancellation' task
+    // -> has left the transaction using the cancel boundary event
+    List<String> activeActivityIds = runtimeService.getActiveActivityIds(processInstance.getId());
+    assertTrue(activeActivityIds.contains("afterInnerCancellation"));
 
     // if we have history, we check that the invocation of the compensation handlers is recorded in history.
     if(!processEngineConfiguration.getHistory().equals(ProcessEngineConfiguration.HISTORY_NONE)) {
@@ -630,5 +649,15 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTestCase {
     taskService.complete(task.getId());
 
     assertProcessEnded(processInstance.getId());
+  }
+
+  protected List<Execution> collectExecutionsFor(String... activityIds) {
+    List<Execution> executions = new ArrayList<Execution>();
+
+    for (String activityId : activityIds) {
+      executions.addAll(runtimeService.createExecutionQuery().activityId(activityId).list());
+    }
+
+    return executions;
   }
 }
