@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+	
+	<process id="subProcessCompensationHandler">
+
+		<startEvent id="start" />
+		
+		<sequenceFlow sourceRef="start"	targetRef="activity" />
+    <userTask id="activity" />
+    <sequenceFlow sourceRef="activity" targetRef="throwCompensate" />
+    
+    <intermediateThrowEvent id="throwCompensate">
+      <compensateEventDefinition activityRef="activity" />
+    </intermediateThrowEvent>
+    
+    <sequenceFlow sourceRef="throwCompensate" targetRef="beforeEnd" />
+    <userTask id="beforeEnd" />
+    <sequenceFlow sourceRef="beforeEnd" targetRef="end" />
+    <endEvent id="end" />
+
+    <!-- subprocess compensation handler for "activity" -->
+    <boundaryEvent id="compensateBoundaryEvent" attachedToRef="activity">
+      <compensateEventDefinition />
+    </boundaryEvent>  
+    <subProcess id="compensationHandler" isForCompensation="true">
+      <startEvent id="subProcessStart" />
+      <sequenceFlow sourceRef="subProcessStart" targetRef="subProcessTask" />
+      <userTask id="subProcessTask" />
+      <sequenceFlow sourceRef="subProcessTask" targetRef="subProcessEnd" />
+      <endEvent id="subProcessEnd" />
+    </subProcess>  
+    <association associationDirection="One" sourceRef="compensateBoundaryEvent" targetRef="compensationHandler" />
+	</process>
+
+</definitions>

@@ -824,6 +824,71 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(processInstanceId);
   }
 
+  @Deployment
+  public void FAILING_testSubprocessCompensationHandler() {
+
+    // given a process instance
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessCompensationHandler");
+
+    // when throwing compensation
+    Task beforeCompensationTask = taskService.createTaskQuery().singleResult();
+    taskService.complete(beforeCompensationTask.getId());
+
+    // then the compensation handler has been activated
+    // and the user task in the sub process can be successfully completed
+    Task subProcessTask = taskService.createTaskQuery().singleResult();
+    assertNotNull(subProcessTask);
+    assertEquals("subProcessTask", subProcessTask.getTaskDefinitionKey());
+
+    taskService.complete(subProcessTask.getId());
+
+    // and the task following compensation should can be successfully completed
+    Task afterCompensationTask = taskService.createTaskQuery().singleResult();
+    assertNotNull(afterCompensationTask);
+    assertEquals("beforeEnd", afterCompensationTask.getTaskDefinitionKey());
+
+    taskService.complete(afterCompensationTask.getId());
+
+    // and the process has successfully ended
+    assertProcessEnded(processInstance.getId());
+
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testSubprocessCompensationHandler.bpmn20.xml")
+  public void FAILING_testSubprocessCompensationHandlerActivityInstanceTree() {
+
+    // given a process instance
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessCompensationHandler");
+
+    // when throwing compensation
+    Task beforeCompensationTask = taskService.createTaskQuery().singleResult();
+    taskService.complete(beforeCompensationTask.getId());
+
+    // then the activity instance tree is correct
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+          .activity("throwCompensate")
+          .beginScope("compensationHandler")
+            .activity("subProcessTask")
+       .done());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testSubprocessCompensationHandler.bpmn20.xml")
+  public void FAILING_testSubprocessCompensationHandlerDeleteProcessInstance() {
+
+    // given a process instance in compensation
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessCompensationHandler");
+    Task beforeCompensationTask = taskService.createTaskQuery().singleResult();
+    taskService.complete(beforeCompensationTask.getId());
+
+    // when deleting the process instance
+    runtimeService.deleteProcessInstance(processInstance.getId(), null);
+
+    // then the process instance is ended
+    assertProcessEnded(processInstance.getId());
+  }
+
   private void completeTask(String taskName) {
     completeTasks(taskName, 1);
   }
