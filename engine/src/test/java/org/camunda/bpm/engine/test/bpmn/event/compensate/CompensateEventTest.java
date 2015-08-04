@@ -654,6 +654,18 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
       .done());
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testActivityInstanceTreeForCompensationEndEvent.bpmn20.xml")
+  public void testCancelProcessInstanceWithActiveCompensation() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
+
+    // when
+    runtimeService.deleteProcessInstance(processInstance.getId(), null);
+
+    // then
+    assertProcessEnded(processInstance.getId());
+  }
+
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensationEventSubProcess.bpmn20.xml" })
   public void testCompensationEventSubProcessWithScope() {
     String processInstanceId = runtimeService.startProcessInstanceByKey("bookingProcess").getId();

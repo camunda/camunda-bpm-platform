@@ -423,6 +423,7 @@
                 <exclude>**/HistoricVariableInstanceAuthorizationTest.java</exclude>
                 <exclude>**/CompositeDbHistoryEventHandlerTest.java</exclude>
                 <exclude>**/CompositeHistoryEventHandlerTest.java</exclude>
+                <exclude>**/CompensateEventHistoryTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -462,6 +463,7 @@
                 <exclude>**/DbDeadlockTest.java</exclude>
                 <exclude>**/CompositeDbHistoryEventHandlerTest.java</exclude>
                 <exclude>**/CompositeHistoryEventHandlerTest.java</exclude>
+                <exclude>**/CompensateEventHistoryTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>

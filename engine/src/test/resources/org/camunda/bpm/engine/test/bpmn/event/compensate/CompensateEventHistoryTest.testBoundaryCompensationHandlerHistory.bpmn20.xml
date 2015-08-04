@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="boundaryHandlerProcess">
+
+    <startEvent id="start" />
+    
+    <sequenceFlow sourceRef="start" targetRef="activity" />
+    <serviceTask id="activity" camunda:expression="${true}" />
+    
+    <sequenceFlow sourceRef="activity" targetRef="beforeCompensate" />
+    <userTask id="beforeCompensate" />
+    
+    <sequenceFlow sourceRef="beforeCompensate" targetRef="throwCompensate" />
+    <intermediateThrowEvent id="throwCompensate">
+      <compensateEventDefinition  />
+    </intermediateThrowEvent>
+    
+    <sequenceFlow sourceRef="throwCompensate" targetRef="end" />
+    <endEvent id="end" />
+    
+    <!-- compensation handler for "activity" -->
+    <boundaryEvent id="compensateBoundaryEvt" attachedToRef="activity">
+      <compensateEventDefinition />
+    </boundaryEvent>
+    <userTask id="compensationHandler" isForCompensation="true" />
+    <association associationDirection="One" sourceRef="compensateBoundaryEvt" targetRef="compensationHandler" />
+  </process>
+
+</definitions>

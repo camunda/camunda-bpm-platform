@@ -19,6 +19,7 @@ import static org.camunda.bpm.engine.impl.util.StringUtil.toByteArray;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
@@ -52,6 +53,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
+import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Incident;
@@ -67,7 +70,19 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
     String activityId = execution.getActivityId();
     String activityInstanceId = execution.getActivityInstanceId();
-    String parentActivityInstanceId = execution.getParentActivityInstanceId();
+
+    String parentActivityInstanceId = null;
+    ExecutionEntity parentExecution = execution.getParent();
+
+    if (parentExecution != null && parentExecution.isCompensationThrowing()) {
+      // TODO: move this to compensation fuck up behavior
+      Map<ScopeImpl, PvmExecutionImpl> activityExecutionMapping = execution.createActivityExecutionMapping();
+      PvmExecutionImpl parentScopeExecution = activityExecutionMapping.get(execution.getActivity().getFlowScope());
+      parentActivityInstanceId = parentScopeExecution.getParentActivityInstanceId();
+    }
+    else {
+      parentActivityInstanceId = execution.getParentActivityInstanceId();
+    }
 
     evt.setId(activityInstanceId);
     evt.setEventType(eventType.getEventName());
