@@ -1,7 +1,5 @@
 /* global define: false */
-define([
-  'cockpit/util/routeUtil'
-  ], function(routeUtil) {
+define([], function() {
   'use strict';
 
   return [
@@ -10,7 +8,8 @@ define([
       '$scope',
       'Views',
       '$location',
-    function($scope, Views, $location) {
+      'routeUtil',
+    function($scope, Views, $location, routeUtil) {
       var providers = Views.getProviders({ component: $scope.id });
       $scope.providers = providers;
 
@@ -27,6 +26,7 @@ define([
         return '#' + routeUtil.replaceLastPathFragment(replacement, currentPath, currentSearch, keepSearchParams);
 
       };
+
     }];
 
     return {

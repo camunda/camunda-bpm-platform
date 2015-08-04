@@ -45,9 +45,6 @@ define([
 
       // update selection in case it has been provided earlier
       updateSelection(selection);
-
-      // update scroll to in case it has been provided earlier
-      scrollToBpmnElement(scrollToBpmnElementId);
     };
 
     var isElementSelectable = function(element) {

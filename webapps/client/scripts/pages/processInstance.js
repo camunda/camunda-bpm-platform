@@ -10,8 +10,8 @@ define([
     var module = angular.module('cam.cockpit.pages.processInstance', [camCommoms.name, dataDepend.name]);
 
   var Controller = [
-          '$scope', '$filter', '$rootScope', 'search', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'IncidentResource', 'Views', 'Data', 'Transform', 'processInstance', 'dataDepend', 'page', 'breadcrumbTrails',
-  function($scope,   $filter,   $rootScope,   search,   ProcessDefinitionResource,   ProcessInstanceResource,   IncidentResource,   Views,   Data,   Transform,   processInstance,   dataDepend,   page,   breadcrumbTrails) {
+          '$scope', '$filter', '$rootScope', '$location', 'search', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'IncidentResource', 'Views', 'Data', 'Transform', 'processInstance', 'dataDepend', 'page', 'breadcrumbTrails',
+  function($scope,   $filter,   $rootScope,   $location,   search,   ProcessDefinitionResource,   ProcessInstanceResource,   IncidentResource,   Views,   Data,   Transform,   processInstance,   dataDepend,   page,   breadcrumbTrails) {
 
     $scope.processInstance = processInstance;
 
@@ -24,6 +24,8 @@ define([
 
     $scope.$on('$routeChanged', function() {
       processData.set('filter', parseFilterFromUri());
+      // update tab selection
+      pageData.set('activeTab', getDefaultTab($scope.processInstanceTabs));
     });
 
     function parseFilterFromUri() {
@@ -391,7 +393,8 @@ define([
 
       crumbs.push({
         label: processDefinition.name || ((processDefinition.key || processDefinition.id).slice(0, 8) +'…'),
-        href: '#/process-definition/'+ (processDefinition.id) +'/runtime'
+        href: '#/process-definition/'+ (processDefinition.id) +'/runtime',
+        keepSearchParams : [ 'viewbox' ]
       });
       crumbs.push({
         divider: ':',
@@ -595,9 +598,17 @@ define([
 
     pageData.observe('activeTab', function(activeTab) {
       $scope.selectedTab = activeTab;
+
+      var replace = !search().detailsTab;
+
       search.updateSilently({
         detailsTab: activeTab && activeTab.id || null
       });
+
+      if (replace) {
+        $location.replace();
+      }
+
     });
 
     $scope.selectTab = function(tabProvider) {
@@ -758,7 +769,8 @@ define([
     ViewsProvider.registerDefaultView('cockpit.processInstance.view', {
       id: 'runtime',
       priority: 20,
-      label: 'Runtime'
+      label: 'Runtime',
+      keepSearchParams: [ 'viewbox' ]
     });
   }];
 

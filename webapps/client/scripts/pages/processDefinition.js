@@ -29,7 +29,7 @@ define([
     $scope.$on('$routeChanged', function() {
       processData.set('filter', parseFilterFromUri());
       // update tab selection
-      setDefaultTab($scope.processInstanceTabs);
+      setDefaultTab($scope.processDefinitionTabs);
     });
 
     function collect(elements, fn) {
@@ -633,7 +633,8 @@ define([
         'businessKey',
         'variables',
         'startedAfter',
-        'startedBefore'
+        'startedBefore',
+        'viewbox'
       ]
     });
   }];

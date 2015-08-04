@@ -25,7 +25,7 @@ define([], function() {
   utils.redirectToRuntime = function(params, currentPath, currentSearch) {
     var redirectUrl = currentPath + '/runtime';
 
-    return redirectTo(redirectUrl, currentSearch, true);
+    return utils.redirectTo(redirectUrl, currentSearch, true);
   };
 
   /**
@@ -41,10 +41,10 @@ define([], function() {
   utils.replaceLastPathFragment = function (replacement, currentPath, currentSearch, keepSearchParams) {
     var redirectUrl = currentPath.replace(/[^\/]*$/, replacement);
 
-    return redirectTo(redirectUrl, currentSearch, keepSearchParams);
+    return utils.redirectTo(redirectUrl, currentSearch, keepSearchParams);
   };
 
-  function redirectTo(redirectUrl, currentSearch, keepSearchParams) {
+  utils.redirectTo = function(redirectUrl, currentSearch, keepSearchParams) {
     var search = [],
         key;
 

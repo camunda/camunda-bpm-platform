@@ -4,14 +4,16 @@ define([
   './transform',
   './variables',
   './page',
-  './breadcrumbTrails'
+  './breadcrumbTrails',
+  './routeUtil'
 ], function(
   angular,
 
    transform,
    variables,
    page,
-   breadcrumbTrails
+   breadcrumbTrails,
+   routeUtil
 ) {
 
   'use strict';
@@ -22,6 +24,7 @@ define([
   servicesModule.factory('Variables', variables);
   servicesModule.service('page', page);
   servicesModule.factory('breadcrumbTrails', breadcrumbTrails);
+  servicesModule.factory('routeUtil', routeUtil);
 
   return servicesModule;
 

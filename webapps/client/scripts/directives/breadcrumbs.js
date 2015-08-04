@@ -1,9 +1,13 @@
 /* global require: false */
 /* jshint unused: false */
-define(['angular', 'text!./breadcrumbs.html'], function(angular, template) {
+define([
+  'angular',
+  'text!./breadcrumbs.html'
+],
+function(angular, template) {
   'use strict';
 
-  return [function () {
+  return ['$location', 'routeUtil', function ($location, routeUtil) {
     return {
       scope: {
         divider: '@'
@@ -18,6 +22,11 @@ define(['angular', 'text!./breadcrumbs.html'], function(angular, template) {
         scope.$on('page.breadcrumbs.changed', function(ev, breadcrumbs) {
           scope.breadcrumbs = breadcrumbs;
         });
+
+        scope.getHref = function (crumb) {
+          return routeUtil.redirectTo(crumb.href, $location.search(), crumb.keepSearchParams);
+        };
+
       },
 
       controller: [
