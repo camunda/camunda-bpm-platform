@@ -16,7 +16,7 @@
         <td class="state">
           <a state-circle
              incidents="processInstance.incidents"
-             ng-href="#/process-instance/{{ processInstance.id }}?detailsTab=incidents-tab"></a>
+             ng-href="{{ getProcessInstanceUrl(processInstance, { detailsTab: 'incidents-tab' }) }}"></a>
           <span class="badge badge-warning badge-suspended"
                 ng-show="processInstance.suspended"
                 tooltip="Currently suspended"
@@ -26,7 +26,7 @@
         </td>
 
         <td class="instance-id uuid">
-          <a href="#/process-instance/{{ processInstance.id }}" title="{{ processInstance.id }}">
+          <a ng-href="{{ getProcessInstanceUrl(processInstance) }}" title="{{ processInstance.id }}">
             {{ processInstance.id }}
           </a>
         </td>

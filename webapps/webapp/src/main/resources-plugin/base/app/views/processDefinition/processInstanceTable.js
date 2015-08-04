@@ -1,5 +1,9 @@
 /* global define: false, angular: false */
-define(['angular', 'text!./process-instance-table.html'], function(angular, template) {
+define([
+  'angular',
+  'text!./process-instance-table.html'
+],
+function(angular, template) {
   'use strict';
 
   return [ 'ViewsProvider', function(ViewsProvider) {
@@ -9,8 +13,8 @@ define(['angular', 'text!./process-instance-table.html'], function(angular, temp
       label: 'Process Instances',
       template: template,
       controller: [
-               '$scope', 'search', 'PluginProcessInstanceResource',
-      function ($scope,   search,   PluginProcessInstanceResource) {
+               '$scope', '$location', 'search', 'routeUtil', 'PluginProcessInstanceResource',
+      function ($scope,   $location,   search,   routeUtil,   PluginProcessInstanceResource) {
 
         var processData = $scope.processData.newChild($scope);
 
@@ -90,6 +94,19 @@ define(['angular', 'text!./process-instance-table.html'], function(angular, temp
             pages.total = data.count;
           });
         }
+
+        $scope.getProcessInstanceUrl = function(processInstance, params) {
+          var path = '#/process-instance/' + processInstance.id;
+          var searches = angular.extend({}, ($location.search() || {}), (params || {}));
+
+          var keepSearchParams = [ 'viewbox' ];
+          for (var i in params) {
+            keepSearchParams.push(i);
+          }
+
+          return routeUtil.redirectTo(path, searches, keepSearchParams);
+        };
+
       }],
       priority: 10
     });
