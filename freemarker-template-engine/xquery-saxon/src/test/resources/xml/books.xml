@@ -1,0 +1,38 @@
+<books>
+    <description>A list of books useful for people first learning how to build web XML web applications.</description>
+    <book>
+        <title>XQuery</title>
+        <author>Priscilla Walmsley</author>
+        <description>This book is a highly detailed, through and complete tour of the W3C Query language.  It covers all the
+        key aspects of the language as well as</description>
+        <format>Trade press</format>
+        <license>Commercial</license>
+        <list-price>49.95</list-price>
+    </book>
+    <book>
+        <title>XQuery Examples</title>
+        <author>Chris Wallace</author>
+        <author>Dan McCreary</author>
+        <description>This book provides a variety of XQuery example programs and is designed to work with the eXist open-source native XML application server.</description>
+        <format>Wiki-books</format>
+        <license>Creative Commons Sharealike 3.0 Attribution-Non-commercial</license>
+        <list-price>29.95</list-price>
+    </book>
+    <book>
+        <title>XForms Tutorial and Cookbook</title>
+        <author>Dan McCreary</author>
+        <description>This book is an excellent guide for anyone that is just beginning to learn the XForms standard.  The book
+        is focused on providing the reader with simple, but complete examples of how to create XForms web applications.</description>
+        <format>Wikibook</format>
+        <license>Creative Commons Sharealike 3.0 Attribution-Non-commercial</license>
+        <list-price>29.95</list-price>
+    </book>
+    <book>
+        <title>XRX: XForms, Rest and XQuery</title>
+        <author>Dan McCreary</author>
+        <description>This book is an overview of the key architectural and design patters.</description>
+        <format>Wikibook</format>
+        <license>Creative Commons Sharealike 3.0 Attribution-Non-commercial</license>
+        <list-price>29.95</list-price>
+    </book>
+</books>
