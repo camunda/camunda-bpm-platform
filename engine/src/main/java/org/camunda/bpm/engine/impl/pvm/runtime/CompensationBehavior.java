@@ -33,7 +33,7 @@ public class CompensationBehavior {
   public static boolean executesNonScopeCompensationHandler(PvmExecutionImpl execution) {
     ActivityImpl activity = execution.getActivity();
 
-    return execution.isScope() && activity != null && activity.isCompensationHandler();
+    return execution.isScope() && activity != null && activity.isCompensationHandler() && !activity.isScope();
   }
 
   public static boolean isCompensationThrowing(PvmExecutionImpl execution) {

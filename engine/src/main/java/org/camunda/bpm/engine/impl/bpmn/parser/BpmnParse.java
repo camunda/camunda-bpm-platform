@@ -1026,7 +1026,7 @@ public class BpmnParse extends Parse {
     startEventActivity.setProperty("type", "errorStartEvent");
     String errorRef = errorEventDefinition.attribute("errorRef");
     Error error = null;
-    // the error event defininition executes the event subprocess activity which
+    // the error event definition executes the event subprocess activity which
     // hosts the start event
     String eventSubProcessActivity = startEventActivity.getFlowScope().getId();
     ErrorEventDefinition definition = new ErrorEventDefinition(eventSubProcessActivity);

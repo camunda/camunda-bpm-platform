@@ -1290,8 +1290,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   }
 
   protected PvmExecutionImpl getFlowScopeExecution() {
-    ActivityImpl currentActivity = getActivity();
-    if (!isScope || (currentActivity != null && currentActivity.isCompensationHandler() && !currentActivity.isScope())) {
+    if (!isScope || CompensationBehavior.executesNonScopeCompensationHandler(this)) {
       // recursion is necessary since there may be more than one concurrent execution in the presence of compensating executions
       // that compensate non-scope activities contained in the same flow scope as the throwing compensation event
       return getParent().getFlowScopeExecution();

@@ -136,7 +136,7 @@ public class CompensationUtil {
         execution.getExecutions().remove(childEventScopeExecution);
       }
 
-      ActivityImpl compensationHandler = getCompensationHandler(execution);
+      ActivityImpl compensationHandler = getEventScopeCompensationHandler(execution);
       CompensateEventSubscriptionEntity eventSubscription = CompensateEventSubscriptionEntity.createAndInsert(scopeExecution,
           compensationHandler);
       eventSubscription.setConfiguration(eventScopeExecution.getId());
@@ -150,7 +150,13 @@ public class CompensationUtil {
     return compensationHandler != null && compensationHandler.isSubProcessScope();
   }
 
-  protected static ActivityImpl getCompensationHandler(ExecutionEntity execution) {
+  /**
+   * In the context when an event scope execution is created (i.e. a scope such as a subprocess has completed),
+   * this method returns the compensation handler activity that is going to be executed when by the event scope execution.
+   *
+   * This method is not relevant when the scope has a boundary compensation handler.
+   */
+  protected static ActivityImpl getEventScopeCompensationHandler(ExecutionEntity execution) {
     ActivityImpl activity = execution.getActivity();
 
     ActivityImpl compensationHandler = activity.findCompensationHandler();
@@ -159,7 +165,6 @@ public class CompensationUtil {
       return compensationHandler;
     } else {
       // subprocess without compensation handler or
-      // subprocess with compensation boundary event or
       // multi instance activity
       return activity;
     }
@@ -214,8 +219,7 @@ public class CompensationUtil {
   }
 
   private static String getSubscriptionActivityId(ActivityExecution execution, String activityRef) {
-    ExecutionEntity scopeExecution = (ExecutionEntity) (execution.isScope() ? execution : execution.getParent());
-    ActivityImpl activityToCompensate = scopeExecution.getProcessDefinition().findActivity(activityRef);
+    ActivityImpl activityToCompensate = ((ExecutionEntity) execution).getProcessDefinition().findActivity(activityRef);
 
     if (activityToCompensate.isMultiInstance()) {
 

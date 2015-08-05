@@ -643,14 +643,14 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
 
     ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
     assertThat(tree).hasStructure(
-       describeActivityInstanceTree(processInstance.getProcessDefinitionId())
-          .activity("throwingCompensation")
-          .beginMiBody("scope")
-            .activity("undoBookHotel")
-            .activity("undoBookHotel")
-            .activity("undoBookHotel")
-            .activity("undoBookHotel")
-            .activity("undoBookHotel")
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .activity("throwingCompensation")
+        .beginMiBody("scope")
+          .activity("undoBookHotel")
+          .activity("undoBookHotel")
+          .activity("undoBookHotel")
+          .activity("undoBookHotel")
+          .activity("undoBookHotel")
       .done());
   }
 
