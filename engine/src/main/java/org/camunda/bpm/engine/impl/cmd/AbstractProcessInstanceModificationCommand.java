@@ -161,7 +161,7 @@ public abstract class AbstractProcessInstanceModificationCommand implements Comm
       ExecutionEntity execution = Context.getCommandContext()
           .getExecutionManager()
           .findExecutionById(activityInstanceExecutionId);
-      if (execution.isConcurrent() && !execution.getExecutions().isEmpty()) {
+      if (execution.isConcurrent() && execution.hasChildren()) {
         // concurrent executions have at most one child
         ExecutionEntity child = execution.getExecutions().get(0);
         activityInstanceExecutions.add(child.getId());

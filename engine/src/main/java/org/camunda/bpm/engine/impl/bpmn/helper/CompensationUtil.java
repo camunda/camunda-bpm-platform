@@ -64,8 +64,6 @@ public class CompensationUtil {
 
         if (compensatingExecution.getParent() != execution) {
           // move the compensating execution under this execution if this is not the case yet
-          compensatingExecution.getParent().getExecutions().remove(compensatingExecution);
-          ((ExecutionEntity) execution).getExecutions().add(compensatingExecution);
           compensatingExecution.setParent((PvmExecutionImpl) execution);
         }
 
@@ -132,8 +130,6 @@ public class CompensationUtil {
       // (ensuring they don't get removed when 'execution' gets removed)
       for (PvmExecutionImpl childEventScopeExecution : execution.getEventScopeExecutions()) {
         childEventScopeExecution.setParent(eventScopeExecution);
-        eventScopeExecution.getExecutions().add((ExecutionEntity) childEventScopeExecution);
-        execution.getExecutions().remove(childEventScopeExecution);
       }
 
       ActivityImpl compensationHandler = getEventScopeCompensationHandler(execution);

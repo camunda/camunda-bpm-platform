@@ -28,7 +28,7 @@ public class CancelBoundaryEventActivityBehavior extends BoundaryEventActivityBe
 
     if (LegacyBehavior.signalCancelBoundaryEvent(signalName)) {
       // join compensating executions
-      if(execution.getExecutions().isEmpty()) {
+      if (!execution.hasChildren()) {
         leave(execution);
       }
       else {

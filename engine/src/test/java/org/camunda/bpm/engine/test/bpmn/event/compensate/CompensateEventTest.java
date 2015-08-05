@@ -446,7 +446,7 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
    * @see https://app.camunda.com/jira/browse/CAM-4304
    */
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensationInEventSubProcess.bpmn20.xml" })
-  public void FAILING_testCompensateInEventSubprocess() {
+  public void testCompensateInEventSubprocess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
     assertProcessEnded(processInstance.getId());
 

@@ -108,7 +108,7 @@ public class DbOperationsOrderingTest {
   @Test
   public void testInsertReferenceOrdering() {
 
-    execution2.setParent(execution3);
+    execution2.setParentExecution(execution3);
 
     entityManager.insert(execution2);
     entityManager.insert(execution3);
@@ -124,7 +124,7 @@ public class DbOperationsOrderingTest {
   @Test
   public void testInsertReferenceOrderingAndIdOrdering() {
 
-    execution2.setParent(execution3);
+    execution2.setParentExecution(execution3);
 
     entityManager.insert(execution2);
     entityManager.insert(execution3);
@@ -143,12 +143,12 @@ public class DbOperationsOrderingTest {
   public void testInsertReferenceOrderingMultipleTrees() {
 
     // tree1
-    execution3.setParent(execution4);
-    execution2.setParent(execution4);
-    execution5.setParent(execution3);
+    execution3.setParentExecution(execution4);
+    execution2.setParentExecution(execution4);
+    execution5.setParentExecution(execution3);
 
     // tree2
-    execution1.setParent(execution8);
+    execution1.setParentExecution(execution8);
 
     entityManager.insert(execution8);
     entityManager.insert(execution6);

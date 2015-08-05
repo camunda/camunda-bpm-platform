@@ -371,7 +371,6 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     for (ExecutionEntity execution : executions) {
       List<ExecutionEntity> children = executionsByParent.get(execution.getId());
       if (children != null) {
-        execution.setExecutions(children);
         for (ExecutionEntity child : children) {
           child.setParent(execution);
         }

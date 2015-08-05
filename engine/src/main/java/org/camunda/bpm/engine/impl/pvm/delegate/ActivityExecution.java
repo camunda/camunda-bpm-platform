@@ -123,8 +123,14 @@ public interface ActivityExecution extends DelegateExecution {
 
   /**
    * returns the list of execution of which this execution the parent of.
+   * This is a copy of the actual list, so a modification has no direct effect.
    */
   List<? extends ActivityExecution> getExecutions();
+
+  /**
+   * @return true if this execution has child executions (event scope executions or not)
+   */
+  boolean hasChildren();
 
   /**
    * ends this execution.

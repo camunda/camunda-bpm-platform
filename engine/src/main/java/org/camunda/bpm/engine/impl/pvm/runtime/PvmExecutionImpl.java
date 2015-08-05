@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
 import org.camunda.bpm.engine.impl.pvm.PvmExecution;
@@ -460,8 +461,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       concurrentReplacingExecution.setConcurrent(true);
       concurrentReplacingExecution.setScope(false);
       child.setParent(concurrentReplacingExecution);
-      ((List<PvmExecutionImpl>) concurrentReplacingExecution.getExecutions()).add(child);
-      this.getExecutions().remove(child);
       this.leaveActivityInstance();
       this.setActivity(null);
     }
@@ -484,16 +483,12 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
           setActivity(lastConcurrent.getActivity());
           setTransition(lastConcurrent.getTransition());
           this.replace(lastConcurrent);
-//          lastConcurrent.setReplacedBy(this);
 
           // Move children of lastConcurrent one level up
-          if (lastConcurrent.getExecutions().size() > 0) {
-            getExecutions().clear();
-            for (PvmExecutionImpl childExecution : lastConcurrent.getExecutions()) {
-              ((List) getExecutions()).add(childExecution);
+          if (lastConcurrent.hasChildren()) {
+            for (PvmExecutionImpl childExecution : lastConcurrent.getExecutionsAsCopy()) {
               childExecution.setParent(this);
             }
-            lastConcurrent.getExecutions().clear();
           }
 
           // Copy execution-local variables of lastConcurrent
@@ -875,38 +870,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     }
   }
 
-  protected boolean hasConcurrentSiblings(PvmExecutionImpl concurrentRoot) {
-    if(concurrentRoot.isProcessInstanceExecution()) {
-      return false;
-    } else {
-      List<? extends PvmExecutionImpl> executions = concurrentRoot.getParent().getExecutions();
-      for (PvmExecutionImpl executionImpl : executions) {
-        if(executionImpl != concurrentRoot
-            && !executionImpl.isEventScope()) {
-          return true;
-        }
-      }
-      return false;
-    }
-  }
-
-  protected boolean allExecutionsInSameActivity(List<PvmExecutionImpl> executions) {
-    if (executions.size() > 1) {
-      String activityId = executions.get(0).getActivityId();
-      for (PvmExecutionImpl execution : executions) {
-        String otherActivityId = execution.getActivityId();
-        if (!execution.isEnded) {
-          if ( (activityId == null && otherActivityId != null)
-                  || (activityId != null && otherActivityId == null)
-                  || (activityId != null && otherActivityId!= null && !otherActivityId.equals(activityId))) {
-            return false;
-          }
-        }
-      }
-    }
-    return true;
-  }
-
   public boolean isActive(String activityId) {
     return findExecution(activityId)!=null;
   }
@@ -920,6 +883,8 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   @Override
   public abstract List<? extends PvmExecutionImpl> getExecutions();
+
+  public abstract List<? extends PvmExecutionImpl> getExecutionsAsCopy();
 
   public List<? extends PvmExecutionImpl> getNonEventScopeExecutions() {
     List<? extends PvmExecutionImpl> children = getExecutions();
@@ -1179,7 +1144,33 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     }
   }
 
-  public abstract void setParent(PvmExecutionImpl parent);
+  public boolean hasChildren() {
+    return !getExecutions().isEmpty();
+  }
+
+  /**
+   * Sets the execution's parent and updates the old and new parents' set of
+   * child executions
+   */
+  @SuppressWarnings("unchecked")
+  public void setParent(PvmExecutionImpl parent) {
+    PvmExecutionImpl currentParent = getParent();
+
+    setParentExecution(parent);
+
+    if (currentParent != null) {
+      currentParent.getExecutions().remove(this);
+    }
+
+    if (parent != null) {
+      ((List<PvmExecutionImpl>) parent.getExecutions()).add(this);
+    }
+  }
+
+  /**
+   * Use #setParent to also update the child execution sets
+   */
+  public abstract void setParentExecution(PvmExecutionImpl parent);
 
   // super- and subprocess executions /////////////////////////////////////////
 
