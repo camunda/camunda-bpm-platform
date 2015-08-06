@@ -23,10 +23,10 @@ import org.camunda.bpm.engine.form.FormField;
 import org.camunda.bpm.engine.form.FormFieldValidationConstraint;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.impl.form.type.EnumFormType;
+import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.ProcessEngineTestCase;
 
 /**
  * <p>Testcase verifying support for form matadata provided using
@@ -35,7 +35,7 @@ import org.camunda.bpm.engine.test.ProcessEngineTestCase;
  * @author Daniel Meyer
  *
  */
-public class FormDataTest extends ProcessEngineTestCase {
+public class FormDataTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testGetFormFieldBasicProperties() {

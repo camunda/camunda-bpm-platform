@@ -46,7 +46,6 @@ public class ProcessApplicationEventListenerTest extends ResourceProcessEngineTe
   @Override
   protected void closeDownProcessEngine() {
     managementService.unregisterProcessApplication(deploymentId, false);
-    processEngine.close();
     super.closeDownProcessEngine();
   }
 

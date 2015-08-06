@@ -13,11 +13,11 @@
 
 package org.camunda.bpm.engine.test.bpmn.deployment;
 
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import java.io.InputStream;
+import java.util.List;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.RepositoryServiceImpl;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -32,10 +32,6 @@ import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
 
 
 /**
@@ -344,31 +340,6 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
       assertEquals(0, repositoryService.createDeploymentQuery().count());
       assertTrue(expected.getMessage().startsWith("Error while parsing process: "));
     }
-  }
-
-  /**
-   * Just assures that diagram creation actually creates something and does not crash.
-   * No qualitative evaluation of created diagram.
-   * @throws IOException
-   */
-  public void testProcessDiagramCreation() throws IOException {
-    ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("camunda.cfg.xml");
-    config.setCreateDiagramOnDeploy(true);
-    ProcessEngine engine = config.buildProcessEngine();
-    String deploymentId = engine.getRepositoryService().createDeployment()
-      .addClasspathResource("org/camunda/bpm/engine/test/bpmn/deployment/BpmnDeploymentTest.testProcessDiagramCreation.bpmn20.xml")
-      .deploy().getId();
-
-    ProcessDefinition definition = engine.getRepositoryService().createProcessDefinitionQuery().singleResult();
-    String expectedDiagramName = "org/camunda/bpm/engine/test/bpmn/deployment/BpmnDeploymentTest.testProcessDiagramCreation.processDiagramProcess.png";
-    assertEquals(expectedDiagramName, definition.getDiagramResourceName());
-
-    InputStream diagramStream = engine.getRepositoryService().getProcessDiagram(definition.getId());
-    assertNotNull(diagramStream);
-    diagramStream.close();
-
-    // clean db
-    engine.getRepositoryService().deleteDeployment(deploymentId);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/deployment/BpmnDeploymentTest.testGetBpmnXmlFileThroughService.bpmn20.xml"})

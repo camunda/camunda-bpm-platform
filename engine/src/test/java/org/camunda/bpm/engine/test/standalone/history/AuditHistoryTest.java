@@ -31,12 +31,6 @@ public class AuditHistoryTest extends ResourceProcessEngineTestCase {
     super("org/camunda/bpm/engine/test/standalone/history/audithistory.camunda.cfg.xml");
   }
 
-  @Override
-  protected void closeDownProcessEngine() {
-    processEngine.close();
-    super.closeDownProcessEngine();
-  }
-
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   public void testReceivesNoHistoricVariableUpdatesAsDetails() {
     // given

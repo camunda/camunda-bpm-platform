@@ -8,12 +8,6 @@ import org.camunda.bpm.engine.test.Deployment;
 
 
 public class IdGeneratorDataSourceTest extends ResourceProcessEngineTestCase {
-  
-  @Override
-  protected void closeDownProcessEngine() {
-    processEngine.close();
-    super.closeDownProcessEngine();
-  }
 
   public IdGeneratorDataSourceTest() {
     super("org/camunda/bpm/engine/test/db/IdGeneratorDataSourceTest.camunda.cfg.xml");
@@ -33,7 +27,7 @@ public class IdGeneratorDataSourceTest extends ResourceProcessEngineTestCase {
       thread.start();
       threads.add(thread);
     }
-    
+
     for (Thread thread: threads) {
       try {
         thread.join();

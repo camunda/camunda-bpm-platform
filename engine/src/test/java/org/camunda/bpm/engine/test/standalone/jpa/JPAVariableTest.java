@@ -24,7 +24,10 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
-import org.apache.ibatis.logging.LogFactory;
+import junit.extensions.TestSetup;
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -35,6 +38,7 @@ import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSessionF
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Assert;
+import org.junit.Ignore;
 
 
 /**
@@ -68,10 +72,20 @@ public class JPAVariableTest extends AbstractProcessEngineTestCase {
 
   private static EntityManagerFactory entityManagerFactory;
 
-  protected void initializeProcessEngine() {
-    if (cachedProcessEngine==null) {
+  // JUnit3-style beforeclass and afterclass
+  public static Test suite() {
+    return new JPAVariableTestSetup();
+  }
+
+  @Ignore
+  public static class JPAVariableTestSetup extends TestSetup {
+    public JPAVariableTestSetup() {
+      super(new TestSuite(JPAVariableTest.class));
+    }
+
+    protected void setUp() throws Exception {
       ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-        .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/standalone/jpa/camunda.cfg.xml");
+          .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/standalone/jpa/camunda.cfg.xml");
 
       cachedProcessEngine = processEngineConfiguration.buildProcessEngine();
 
@@ -81,6 +95,18 @@ public class JPAVariableTest extends AbstractProcessEngineTestCase {
 
       entityManagerFactory = entityManagerSessionFactory.getEntityManagerFactory();
     }
+
+    protected void tearDown() throws Exception {
+      cachedProcessEngine.close();
+      cachedProcessEngine = null;
+
+      entityManagerFactory.close();
+      entityManagerFactory = null;
+    }
+
+  }
+
+  protected void initializeProcessEngine() {
     processEngine = cachedProcessEngine;
   }
 

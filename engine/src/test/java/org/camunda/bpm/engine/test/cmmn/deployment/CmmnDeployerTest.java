@@ -14,10 +14,7 @@ package org.camunda.bpm.engine.test.cmmn.deployment;
 
 import java.io.InputStream;
 
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.CaseDefinition;
@@ -32,10 +29,7 @@ import org.camunda.bpm.engine.test.Deployment;
 public class CmmnDeployerTest extends PluggableProcessEngineTestCase {
 
   public void testCmmnDeployment() {
-    ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("camunda.cfg.xml");
-    ProcessEngine engine = config.buildProcessEngine();
-
-    String deploymentId = engine
+    String deploymentId = processEngine
         .getRepositoryService()
         .createDeployment()
         .addClasspathResource("org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testSimpleDeployment.cmmn")
@@ -43,19 +37,19 @@ public class CmmnDeployerTest extends PluggableProcessEngineTestCase {
         .getId();
 
     // there should be one deployment
-    RepositoryService repositoryService = engine.getRepositoryService();
+    RepositoryService repositoryService = processEngine.getRepositoryService();
     DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
 
     assertEquals(1, deploymentQuery.count());
 
     // there should be one case definition
-    CaseDefinitionQuery query = engine.getRepositoryService().createCaseDefinitionQuery();
+    CaseDefinitionQuery query = processEngine.getRepositoryService().createCaseDefinitionQuery();
     assertEquals(1, query.count());
 
     CaseDefinition caseDefinition = query.singleResult();
     assertEquals("Case_1", caseDefinition.getKey());
 
-    engine.getRepositoryService().deleteDeployment(deploymentId);
+    processEngine.getRepositoryService().deleteDeployment(deploymentId);
   }
 
   public void testDeployTwoCasesWithDuplicateIdAtTheSameTime() {

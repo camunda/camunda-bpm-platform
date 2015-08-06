@@ -78,12 +78,6 @@ public class ResourceAuthorizationProviderTest extends ResourceProcessEngineTest
     }
   }
 
-  @Override
-  protected void closeDownProcessEngine() {
-    processEngine.close();
-    super.closeDownProcessEngine();
-  }
-
   public void testNewTaskAssignee() {
     // given
     MyResourceAuthorizationProvider.clearProperties();

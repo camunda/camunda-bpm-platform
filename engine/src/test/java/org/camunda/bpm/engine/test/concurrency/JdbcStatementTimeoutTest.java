@@ -44,6 +44,12 @@ public class JdbcStatementTimeoutTest extends ConcurrencyTestCase {
         .buildProcessEngine();
   }
 
+  @Override
+  protected void closeDownProcessEngine() {
+    processEngine.close();
+    processEngine = null;
+  }
+
   public void testTimeoutOnUpdate() {
     createJobEntity();
 

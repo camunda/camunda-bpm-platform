@@ -284,33 +284,33 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
   }
 
   /**
-   * Execute all available jobs recursively till no more jobs found. 
+   * Execute all available jobs recursively till no more jobs found.
    */
   public void executeAvailableJobs() {
     executeAvailableJobs(0, Integer.MAX_VALUE, true);
   }
-  
+
   /**
-   * Execute all available jobs recursively till no more jobs found or the number of executions is higher than expected. 
-   * 
+   * Execute all available jobs recursively till no more jobs found or the number of executions is higher than expected.
+   *
    * @param expectedExecutions number of expected job executions
-   * 
+   *
    * @throws AssertionFailedError when execute less or more jobs than expected
-   * 
+   *
    * @see #executeAvailableJobs()
    */
   public void executeAvailableJobs(int expectedExecutions){
     executeAvailableJobs(0, expectedExecutions, false);
   }
-  
+
   private void executeAvailableJobs(int jobsExecuted, int expectedExecutions, boolean ignoreLessExecutions) {
     List<Job> jobs = managementService.createJobQuery().withRetriesLeft().list();
 
     if (jobs.isEmpty()) {
-      assertTrue("executed less jobs than expected. expected <" + expectedExecutions + "> actual <" + jobsExecuted + ">", 
+      assertTrue("executed less jobs than expected. expected <" + expectedExecutions + "> actual <" + jobsExecuted + ">",
           jobsExecuted == expectedExecutions || ignoreLessExecutions);
       return;
-    } 
+    }
 
     for (Job job : jobs) {
       try {
@@ -318,10 +318,10 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
         jobsExecuted += 1;
       } catch (Exception e) {}
     }
-    
-    assertTrue("executed more jobs than expected. expected <" + expectedExecutions + "> actual <" + jobsExecuted + ">", 
+
+    assertTrue("executed more jobs than expected. expected <" + expectedExecutions + "> actual <" + jobsExecuted + ">",
         jobsExecuted <= expectedExecutions);
-    
+
     executeAvailableJobs(jobsExecuted, expectedExecutions, ignoreLessExecutions);
   }
 

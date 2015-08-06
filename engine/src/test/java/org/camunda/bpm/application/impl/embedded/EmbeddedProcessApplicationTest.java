@@ -13,6 +13,7 @@
 package org.camunda.bpm.application.impl.embedded;
 
 import java.util.List;
+
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -28,15 +29,20 @@ import org.camunda.bpm.engine.repository.Resource;
  */
 public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCase {
 
-  RuntimeContainerDelegate runtimeContainerDelegate = null;
+  protected RuntimeContainerDelegate runtimeContainerDelegate = RuntimeContainerDelegate.INSTANCE.get();
+  protected boolean defaultEngineRegistered;
 
   public void registerProcessEngine() {
-    runtimeContainerDelegate = RuntimeContainerDelegate.INSTANCE.get();
     runtimeContainerDelegate.registerProcessEngine(processEngine);
+    defaultEngineRegistered = true;
+  }
+
+  protected void setUp() throws Exception {
+    defaultEngineRegistered = false;
   }
 
   public void tearDown() {
-    if (runtimeContainerDelegate != null) {
+    if (defaultEngineRegistered) {
       runtimeContainerDelegate.unregisterProcessEngine(processEngine);
     }
   }

@@ -32,7 +32,7 @@ public class ResourceProcessEngineTestCase extends AbstractProcessEngineTestCase
   @Override
   protected void closeDownProcessEngine() {
     super.closeDownProcessEngine();
-    ProcessEngines.unregister(processEngine);
+    processEngine.close();
     processEngine = null;
   }
 
