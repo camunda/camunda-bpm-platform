@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
@@ -47,7 +48,6 @@ import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
-import org.camunda.bpm.dmn.engine.impl.DmnEngineConfigurationImpl;
 import org.camunda.bpm.dmn.scriptengine.DmnScriptEngineFactory;
 import org.camunda.bpm.engine.ArtifactFactory;
 import org.camunda.bpm.engine.AuthorizationService;
@@ -108,8 +108,6 @@ import org.camunda.bpm.engine.impl.digest.ShaHashDigest;
 import org.camunda.bpm.engine.impl.dmn.configuration.ProcessEngineDmnEngineConfiguration;
 import org.camunda.bpm.engine.impl.dmn.deployer.DmnDeployer;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionManager;
-import org.camunda.bpm.engine.impl.dmn.handler.DecisionDefinitionHandler;
-import org.camunda.bpm.engine.impl.dmn.handler.ProcessEngineDmnElementHandlerRegistry;
 import org.camunda.bpm.engine.impl.el.CommandContextFunctionMapper;
 import org.camunda.bpm.engine.impl.el.DateTimeFunctionMapper;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
@@ -248,15 +246,6 @@ import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
-import org.camunda.bpm.model.dmn.instance.Decision;
-import org.camunda.bpm.model.dmn.instance.DecisionTable;
-import org.camunda.bpm.dmn.engine.handler.DmnElementHandlerRegistry;
-import org.camunda.bpm.dmn.engine.impl.handler.DmnElementHandlerRegistryImpl;
-import org.camunda.bpm.dmn.engine.impl.transform.DmnTransformFactoryImpl;
-import org.camunda.bpm.dmn.engine.impl.transform.DmnTransformerImpl;
-import org.camunda.bpm.dmn.engine.transform.DmnTransformFactory;
-import org.camunda.bpm.dmn.engine.transform.DmnTransformListener;
-import org.camunda.bpm.dmn.engine.transform.DmnTransformer;
 
 
 /**
@@ -497,6 +486,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   // buildProcessEngine ///////////////////////////////////////////////////////
 
+  @Override
   public ProcessEngine buildProcessEngine() {
     init();
     processEngine = new ProcessEngineImpl(this);
@@ -860,6 +850,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         Configuration configuration = parser.getConfiguration();
         configuration.setEnvironment(environment);
         configuration = parser.parse();
+
+        // TODO dynamic timeout
+        configuration.setDefaultStatementTimeout(jdbcStatementTimeout);
 
         sqlSessionFactory = new DefaultSqlSessionFactory(configuration);
 
@@ -1552,6 +1545,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   // getters and setters //////////////////////////////////////////////////////
 
+  @Override
   public String getProcessEngineName() {
     return processEngineName;
   }
@@ -1576,6 +1570,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return null;
   }
 
+  @Override
   public ProcessEngineConfigurationImpl setProcessEngineName(String processEngineName) {
     this.processEngineName = processEngineName;
     return this;

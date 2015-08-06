@@ -178,6 +178,8 @@ public abstract class ProcessEngineConfiguration {
   protected int jdbcPingConnectionNotUsedFor;
   protected DataSource dataSource;
   protected boolean transactionsExternallyManaged = false;
+  /** the number of seconds the jdbc driver will wait for a response from the database */
+  protected Integer jdbcStatementTimeout;
 
   protected String jpaPersistenceUnitName;
   protected Object jpaEntityManagerFactory;
@@ -472,6 +474,17 @@ public abstract class ProcessEngineConfiguration {
 
   public ProcessEngineConfiguration setJdbcPingConnectionNotUsedFor(int jdbcPingNotUsedFor) {
     this.jdbcPingConnectionNotUsedFor = jdbcPingNotUsedFor;
+    return this;
+  }
+
+  /** Gets the number of seconds the jdbc driver will wait for a response from the database. */
+  public Integer getJdbcStatementTimeout() {
+    return jdbcStatementTimeout;
+  }
+
+  /** Sets the number of seconds the jdbc driver will wait for a response from the database. */
+  public ProcessEngineConfiguration setJdbcStatementTimeout(Integer jdbcStatementTimeout) {
+    this.jdbcStatementTimeout = jdbcStatementTimeout;
     return this;
   }
 

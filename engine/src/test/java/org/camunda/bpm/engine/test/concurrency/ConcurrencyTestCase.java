@@ -26,11 +26,13 @@ public abstract class ConcurrencyTestCase extends PluggableProcessEngineTestCase
 
   protected List<ControllableCommand<?>> controllableCommands;
 
+  @Override
   protected void setUp() throws Exception {
     controllableCommands = new ArrayList<ControllableCommand<?>>();
     super.setUp();
   }
 
+  @Override
   protected void tearDown() throws Exception {
 
     // wait for all spawned threads to end
@@ -91,6 +93,10 @@ public abstract class ConcurrencyTestCase extends PluggableProcessEngineTestCase
     protected volatile Exception exception;
 
     public void waitForSync() {
+      waitForSync(Long.MAX_VALUE);
+    }
+
+    public void waitForSync(long timeout) {
       synchronized (this) {
         if(exception != null) {
           if (reportFailure) {
@@ -103,7 +109,7 @@ public abstract class ConcurrencyTestCase extends PluggableProcessEngineTestCase
         try {
           if(!syncAvailable) {
             try {
-              wait();
+              wait(timeout);
             } catch (InterruptedException e) {
               if (!reportFailure || exception == null) {
                 fail("unexpected interruption");

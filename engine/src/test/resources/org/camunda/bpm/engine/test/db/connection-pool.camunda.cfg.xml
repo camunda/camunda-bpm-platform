@@ -16,6 +16,7 @@
     <property name="jdbcMaxIdleConnections" value="10" />
     <property name="jdbcMaxCheckoutTime" value="30000" />
     <property name="jdbcMaxWaitTime" value="25000" />
+    <property name="jdbcStatementTimeout" value="300" />
     
     <!-- job executor configurations -->
     <property name="jobExecutorActivate" value="false" />
