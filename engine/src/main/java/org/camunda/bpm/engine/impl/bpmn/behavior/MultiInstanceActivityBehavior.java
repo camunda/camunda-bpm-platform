@@ -18,6 +18,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.helper.CompensationUtil;
@@ -26,6 +27,7 @@ import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ModificationObserverBehavior;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.variable.value.IntegerValue;
 
 
@@ -161,6 +163,24 @@ public abstract class MultiInstanceActivityBehavior extends AbstractBpmnActivity
     CompensationUtil.createEventScopeExecution((ExecutionEntity) execution);
 
     super.leave(execution);
+  }
+
+  /**
+   * Get the inner activity of the multi instance execution.
+   *
+   * @param execution
+   *          of multi instance activity
+   * @return inner activity
+   */
+  protected ActivityImpl getInnerActivity(ActivityExecution execution) {
+    for (PvmActivity activity : execution.getActivity().getActivities()) {
+      ActivityImpl innerActivity = (ActivityImpl) activity;
+      // note that miBody can contains also a compensation handler
+      if (!innerActivity.isCompensationHandler()) {
+        return innerActivity;
+      }
+    }
+    throw new ProcessEngineException("inner activity of multi instance execution '" + execution.getId() + "' not found");
   }
 
   protected void setLoopVariable(ActivityExecution execution, String variableName, Object value) {

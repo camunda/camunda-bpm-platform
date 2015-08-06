@@ -13,7 +13,9 @@
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
 /**
  *
@@ -24,13 +26,15 @@ public class SequentialMultiInstanceActivityBehavior extends MultiInstanceActivi
 
   protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BEHAVIOR_LOGGER;
 
+  @Override
   protected void createInstances(ActivityExecution execution, int nrOfInstances) throws Exception {
 
     setLoopVariable(execution, NUMBER_OF_INSTANCES, nrOfInstances);
     setLoopVariable(execution, NUMBER_OF_COMPLETED_INSTANCES, 0);
     setLoopVariable(execution, NUMBER_OF_ACTIVE_INSTANCES, 1);
 
-    performInstance(execution, execution.getActivity().getActivities().get(0), 0);
+    ActivityImpl innerActivity = getInnerActivity(execution);
+    performInstance(execution, innerActivity, 0);
   }
 
   public void complete(ActivityExecution scopeExecution) {
@@ -44,7 +48,8 @@ public class SequentialMultiInstanceActivityBehavior extends MultiInstanceActivi
       leave(scopeExecution);
     }
     else {
-      performInstance(scopeExecution, scopeExecution.getActivity().getActivities().get(0), loopCounter);
+      PvmActivity innerActivity = getInnerActivity(scopeExecution);
+      performInstance(scopeExecution, innerActivity, loopCounter);
     }
   }
 

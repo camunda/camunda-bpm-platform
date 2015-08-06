@@ -738,8 +738,6 @@ public class BpmnParse extends Parse {
 
           if (targetActivity != null) {
             parseAssociationOfCompensationBoundaryEvent(associationElement, sourceActivity, targetActivity);
-          } else {
-            addError("referenced element of compensation boundary catch event '" + targetRef + "' not found", associationElement);
           }
         }
       }

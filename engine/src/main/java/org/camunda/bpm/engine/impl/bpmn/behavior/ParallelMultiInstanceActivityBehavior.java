@@ -27,7 +27,7 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
 
   @Override
   protected void createInstances(ActivityExecution execution, int nrOfInstances) throws Exception {
-    PvmActivity nestedActivity = execution.getActivity().getActivities().get(0);
+    PvmActivity innerActivity = getInnerActivity(execution);
 
     prepareScopeExecution(execution, nrOfInstances);
 
@@ -45,7 +45,7 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
       ActivityExecution activityExecution = concurrentExecutions.get(i);
       // check for active execution: the completion condition may be satisfied before all executions are started
       if(activityExecution.isActive()) {
-        performInstance(activityExecution, nestedActivity, i);
+        performInstance(activityExecution, innerActivity, i);
       }
     }
   }
