@@ -32,6 +32,7 @@ import org.camunda.bpm.engine.runtime.Job;
 public class JdbcStatementTimeoutTest extends ConcurrencyTestCase {
 
   private static final int timeoutInMillis = 1000;
+  private static final String JOB_ENTITY_ID = "42";
 
   private ThreadControl thread1;
   private ThreadControl thread2;
@@ -82,7 +83,7 @@ public class JdbcStatementTimeoutTest extends ConcurrencyTestCase {
       @Override
       public JobEntity execute(CommandContext commandContext) {
         MessageEntity jobEntity = new MessageEntity();
-        jobEntity.setId("42");
+        jobEntity.setId(JOB_ENTITY_ID);
         jobEntity.insert();
 
         return jobEntity;
@@ -121,7 +122,7 @@ public class JdbcStatementTimeoutTest extends ConcurrencyTestCase {
       DbEntityManagerFactory dbEntityManagerFactory = new DbEntityManagerFactory(Context.getProcessEngineConfiguration().getIdGenerator());
       DbEntityManager entityManager = dbEntityManagerFactory.openSession();
 
-      JobEntity job = (JobEntity) entityManager.createJobQuery().singleResult();
+      JobEntity job = entityManager.selectById(JobEntity.class, JOB_ENTITY_ID);
       job.setLockOwner(lockOwner);
       entityManager.forceUpdate(job);
 

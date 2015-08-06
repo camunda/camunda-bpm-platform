@@ -851,7 +851,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         configuration.setEnvironment(environment);
         configuration = parser.parse();
 
-        // TODO dynamic timeout
         configuration.setDefaultStatementTimeout(jdbcStatementTimeout);
 
         sqlSessionFactory = new DefaultSqlSessionFactory(configuration);
