@@ -19,9 +19,9 @@ import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
 import org.apache.commons.mail.SimpleEmail;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.Expression;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
@@ -31,6 +31,8 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
  * @author Frederik Heremans
  */
 public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
+
+  protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BEHAVIOR_LOGGER;
 
   protected Expression to;
   protected Expression from;
@@ -64,7 +66,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
     try {
       email.send();
     } catch (EmailException e) {
-      throw new ProcessEngineException("Could not send e-mail", e);
+      throw LOG.sendingEmailException(toStr, e);
     }
     leave(execution);
   }
@@ -75,7 +77,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
     } else if (text != null) {
       return createTextOnlyEmail(text);
     } else {
-      throw new ProcessEngineException("'html' or 'text' is required to be defined when using the mail activity");
+      throw LOG.emailFormatException();
     }
   }
 
@@ -88,7 +90,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
       }
       return email;
     } catch (EmailException e) {
-      throw new ProcessEngineException("Could not create HTML email", e);
+      throw LOG.emailCreationException("HTML", e);
     }
   }
 
@@ -98,7 +100,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
       email.setMsg(text);
       return email;
     } catch (EmailException e) {
-      throw new ProcessEngineException("Could not create text-only email", e);
+      throw LOG.emailCreationException("text-only", e);
     }
   }
 
@@ -109,27 +111,27 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         try {
           email.addTo(t);
         } catch (EmailException e) {
-          throw new ProcessEngineException("Could not add " + t + " as recipient", e);
+          throw LOG.addRecipientException(t, e);
         }
       }
     } else {
-      throw new ProcessEngineException("No recipient could be found for sending email");
+      throw LOG.missingRecipientsException();
     }
   }
 
   protected void setFrom(Email email, String from) {
-    String fromAddres = null;
+    String fromAddress = null;
 
     if (from != null) {
-      fromAddres = from;
+      fromAddress = from;
     } else { // use default configured from address in process engine config
-      fromAddres = Context.getProcessEngineConfiguration().getMailServerDefaultFrom();
+      fromAddress = Context.getProcessEngineConfiguration().getMailServerDefaultFrom();
     }
 
     try {
-      email.setFrom(fromAddres);
+      email.setFrom(fromAddress);
     } catch (EmailException e) {
-      throw new ProcessEngineException("Could not set " + from + " as from address in email", e);
+      throw LOG.addSenderException(from, e);
     }
   }
 
@@ -140,7 +142,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         try {
           email.addCc(c);
         } catch (EmailException e) {
-          throw new ProcessEngineException("Could not add " + c + " as cc recipient", e);
+          throw LOG.addCcException(c, e);
         }
       }
     }
@@ -153,7 +155,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
         try {
           email.addBcc(b);
         } catch (EmailException e) {
-          throw new ProcessEngineException("Could not add " + b + " as bcc recipient", e);
+          throw LOG.addBccException(b, e);
         }
       }
     }

@@ -27,8 +27,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.BpmnParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -36,6 +34,7 @@ import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.Condition;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.CallActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.CallableElementActivityBehavior;
@@ -161,7 +160,7 @@ public class BpmnParse extends Parse {
 
   public static final String MULTI_INSTANCE_BODY_ID_SUFFIX = "#multiInstanceBody";
 
-  protected static final Logger LOGGER = Logger.getLogger(BpmnParse.class.getName());
+  protected static final BpmnParseLogger LOG = ProcessEngineLogger.PARSE_LOGGER;
 
   public static final String PROPERTYNAME_DOCUMENTATION = "documentation";
   public static final String PROPERTYNAME_INITIAL = "initial";
@@ -272,7 +271,7 @@ public class BpmnParse extends Parse {
       addError(e);
 
     } catch (Exception e) {
-      LOGGER.log(Level.SEVERE, "Unknown exception", e);
+      LOG.logParsingFailure(e);
 
       // ALL unexpected exceptions should bubble up since they are not handled
       // accordingly by underlying parse-methods and the process can't be
@@ -453,12 +452,10 @@ public class BpmnParse extends Parse {
       if (isExecutableStr != null) {
         if (!Boolean.parseBoolean(isExecutableStr)) {
           isExecutable = false;
-          LOGGER.info("Ignoring non-executable process with id='" + processElement.attribute("id")
-              + "'. Set the attribute isExecutable=\"true\" to deploy this process.");
+          LOG.logIgnoringNonExecutableProcess(processElement.attribute("id"));
         }
       } else {
-        LOGGER.info("Process with id='" + processElement.attribute("id")
-            + "' has no attribute isExecutable. Assuming it is executable. Better set the attribute explicitely, especially to be compatible with future engine versions which might change the default behavior.");
+        LOG.logMissingIsExecutableAttribute(processElement.attribute("id"));
       }
 
       // Only process executable processes
@@ -522,9 +519,8 @@ public class BpmnParse extends Parse {
     processDefinition.setDeploymentId(deployment.getId());
     processDefinition.setProperty(PROPERTYNAME_JOB_PRIORITY, parseJobPriority(processElement));
 
-    if (LOGGER.isLoggable(Level.FINE)) {
-      LOGGER.fine("Parsing process " + processDefinition.getKey());
-    }
+    LOG.logElementParsing("process", processDefinition.getKey());
+
     parseScope(processElement, processDefinition);
 
     // Parse any laneSets defined for this process
@@ -1540,9 +1536,9 @@ public class BpmnParse extends Parse {
       return null;
     } else {
       String id = activityElement.attribute("id");
-      if (LOGGER.isLoggable(Level.FINE)) {
-        LOGGER.fine("Parsing mi body for activity " + id);
-      }
+
+      LOG.logElementParsing("mi body for activity", id);
+
       id = getIdForMiBody(id);
       ActivityImpl miBodyScope = scope.createActivity(id);
       miBodyScope.setProperty(PROPERTYNAME_TYPE, "multiInstanceBody");
@@ -1640,10 +1636,8 @@ public class BpmnParse extends Parse {
    */
   public ActivityImpl createActivityOnScope(Element activityElement, ScopeImpl scopeElement) {
     String id = activityElement.attribute("id");
-    if (LOGGER.isLoggable(Level.FINE)) {
-      LOGGER.fine("Parsing activity " + id);
-    }
 
+    LOG.logElementParsing("activity", id);
     ActivityImpl activity = scopeElement.createActivity(id);
 
     activity.setProperty("name", activityElement.attribute("name"));
@@ -1829,7 +1823,6 @@ public class BpmnParse extends Parse {
       language = ScriptingEngines.DEFAULT_SCRIPTING_LANGUAGE;
     }
     String resultVariableName = parseResultVariable(scriptTaskElement);
-
 
     // determine script source
     String scriptSource = null;
@@ -2718,9 +2711,8 @@ public class BpmnParse extends Parse {
       // Representation structure-wise is a nested activity in the activity to
       // which its attached
       String id = boundaryEventElement.attribute("id");
-      if (LOGGER.isLoggable(Level.FINE)) {
-        LOGGER.fine("Parsing boundary event " + id);
-      }
+
+      LOG.logElementParsing("boundary event", id);
 
       // Depending on the sub-element definition, the correct activityBehavior
       // parsing is selected

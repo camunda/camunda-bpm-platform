@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
 
@@ -26,6 +26,8 @@ import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
  * @author Joram Barrez
  */
 public abstract class FlowNodeActivityBehavior implements SignallableActivityBehavior {
+
+  protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BEHAVIOR_LOGGER;
 
   protected BpmnActivityBehavior bpmnActivityBehavior = new BpmnActivityBehavior();
 
@@ -50,7 +52,8 @@ public abstract class FlowNodeActivityBehavior implements SignallableActivityBeh
 
   public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
     // concrete activity behaviors that do accept signals should override this method;
-    throw new ProcessEngineException("this activity doesn't accept signals");
+
+    throw LOG.unsupportedSignalException(execution.getActivity().getId());
   }
 
 }

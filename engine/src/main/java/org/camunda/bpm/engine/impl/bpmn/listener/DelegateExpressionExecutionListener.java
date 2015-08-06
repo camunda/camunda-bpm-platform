@@ -16,11 +16,12 @@ import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.applyFieldDecla
 
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.bpmn.behavior.BpmnBehaviorLogger;
 import org.camunda.bpm.engine.impl.bpmn.delegate.ExecutionListenerInvocation;
 import org.camunda.bpm.engine.impl.bpmn.delegate.JavaDelegateInvocation;
 import org.camunda.bpm.engine.impl.bpmn.parser.FieldDeclaration;
@@ -31,6 +32,8 @@ import org.camunda.bpm.engine.impl.context.Context;
  * @author Joram Barrez
  */
 public class DelegateExpressionExecutionListener implements ExecutionListener {
+
+  protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BEHAVIOR_LOGGER;
 
   protected Expression expression;
   private final List<FieldDeclaration> fieldDeclarations;
@@ -55,9 +58,7 @@ public class DelegateExpressionExecutionListener implements ExecutionListener {
         .getDelegateInterceptor()
         .handleInvocation(new JavaDelegateInvocation((JavaDelegate) delegate, execution));
     } else {
-      throw new ProcessEngineException("Delegate expression " + expression
-              + " did not resolve to an implementation of " + ExecutionListener.class
-              + " nor " + JavaDelegate.class);
+      throw LOG.resolveDelegateExpressionException(expression, ExecutionListener.class, JavaDelegate.class);
     }
   }
 

@@ -14,9 +14,8 @@
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
@@ -51,7 +50,7 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
  */
 public class ParallelGatewayActivityBehavior extends GatewayActivityBehavior {
 
-  private static Logger log = Logger.getLogger(ParallelGatewayActivityBehavior.class.getName());
+  protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BEHAVIOR_LOGGER;
 
   public void execute(ActivityExecution execution) throws Exception {
 
@@ -69,11 +68,11 @@ public class ParallelGatewayActivityBehavior extends GatewayActivityBehavior {
     if (nbrOfExecutionsJoined==nbrOfExecutionsToJoin) {
 
       // Fork
-      log.fine("parallel gateway '"+activity.getId()+"' activates: "+nbrOfExecutionsJoined+" of "+nbrOfExecutionsToJoin+" joined");
+      LOG.logActivityActivation(activity.getId(), nbrOfExecutionsJoined, nbrOfExecutionsToJoin);
       execution.leaveActivityViaTransitions(outgoingTransitions, joinedExecutions);
 
-    } else if (log.isLoggable(Level.FINE)){
-      log.fine("parallel gateway '"+activity.getId()+"' does not activate: "+nbrOfExecutionsJoined+" of "+nbrOfExecutionsToJoin+" joined");
+    } else {
+      LOG.logNoActivityActivation(activity.getId(), nbrOfExecutionsJoined, nbrOfExecutionsToJoin);
     }
   }
 

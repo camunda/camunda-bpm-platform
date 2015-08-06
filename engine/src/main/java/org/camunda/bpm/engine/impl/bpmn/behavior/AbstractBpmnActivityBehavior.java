@@ -19,10 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.BpmnError;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.ErrorEventDefinition;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -50,7 +50,7 @@ import org.camunda.bpm.engine.impl.tree.TreeWalker.WalkCondition;
  */
 public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
 
-  private static final Logger LOG = Logger.getLogger(AbstractBpmnActivityBehavior.class.getName());
+  protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BEHAVIOR_LOGGER;
 
   /**
    * Subclasses that call leave() will first pass through this method, before
@@ -90,13 +90,13 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
   }
 
   /**
-   * Takes the an {@link ActivityExecution} and an {@link Callable} and wraps
+   * Takes an {@link ActivityExecution} and an {@link Callable} and wraps
    * the call to the Callable with the proper error propagation. This method
    * also makes sure that exceptions not caught by following activities in the
    * process will be thrown and not propagated.
    *
    * @param execution
-   * @param behavior
+   * @param toExecute
    * @throws Exception
    */
   protected void executeWithErrorPropagation(ActivityExecution execution, Callable<Void> toExecute) throws Exception {
@@ -190,9 +190,8 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
     // process the error
     if (errorHandlingExecution == null) {
       if (origException == null) {
-        LOG.info(execution.getActivity().getId() + " throws error event with errorCode '"
-            + errorCode + "', but no catching boundary event was defined. "
-            +   "Execution is ended (none end event semantics).");
+
+        LOG.logMissingBoundaryCatchEvent(execution.getActivity().getId(), errorCode);
         execution.end(true);
       } else {
         // throw original exception

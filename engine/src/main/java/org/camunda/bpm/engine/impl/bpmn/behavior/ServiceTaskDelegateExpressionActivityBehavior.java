@@ -18,9 +18,9 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.delegate.ActivityBehaviorInvocation;
 import org.camunda.bpm.engine.impl.bpmn.delegate.JavaDelegateInvocation;
 import org.camunda.bpm.engine.impl.bpmn.parser.FieldDeclaration;
@@ -42,6 +42,8 @@ import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
  * @author Falko Menge
  */
 public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityBehavior {
+
+  protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BEHAVIOR_LOGGER;
 
   protected Expression expression;
   private final List<FieldDeclaration> fieldDeclarations;
@@ -111,9 +113,7 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
           leave(execution);
 
         } else {
-          throw new ProcessEngineException("Delegate expression " + expression
-                  + " did neither resolve to an implementation of " + ActivityBehavior.class
-                  + " nor " + JavaDelegate.class);
+          throw LOG.resolveDelegateExpressionException(expression, ActivityBehavior.class, JavaDelegate.class);
         }
         return null;
       }
@@ -128,8 +128,8 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
     } else if (delegateInstance instanceof JavaDelegate) {
       return new ServiceTaskJavaDelegateActivityBehavior((JavaDelegate) delegateInstance);
     } else {
-      throw new ProcessEngineException(delegateInstance.getClass().getName() + " doesn't implement " + JavaDelegate.class.getName() + " nor "
-          + ActivityBehavior.class.getName());
+      throw LOG.missingDelegateParentClassException(delegateInstance.getClass().getName(),
+        JavaDelegate.class.getName(), ActivityBehavior.class.getName());
     }
   }
 

@@ -19,10 +19,9 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.Condition;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
@@ -37,7 +36,7 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
  */
 public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
 
-  private static Logger log = Logger.getLogger(InclusiveGatewayActivityBehavior.class.getName());
+  protected static BpmnBehaviorLogger LOG = ProcessEngineLogger.BEHAVIOR_LOGGER;
 
   public void execute(ActivityExecution execution) throws Exception {
 
@@ -47,9 +46,7 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
     PvmActivity activity = execution.getActivity();
     if (!activeConcurrentExecutionsExist(execution)) {
 
-      if (log.isLoggable(Level.FINE)) {
-        log.fine("inclusive gateway '" + activity.getId() + "' activates");
-      }
+      LOG.logActivityActivation(activity.getId());
 
       List<ActivityExecution> joinedExecutions = execution.findInactiveConcurrentExecutions(activity);
       String defaultSequenceFlow = (String) execution.getActivity().getProperty("default");
@@ -70,24 +67,21 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
         if (defaultSequenceFlow != null) {
           PvmTransition defaultTransition = execution.getActivity().findOutgoingTransition(defaultSequenceFlow);
           if (defaultTransition == null) {
-            throw new ProcessEngineException("Default sequence flow '" + defaultSequenceFlow + "' could not be not found");
+            throw LOG.missingDefaultFlowException(execution.getActivity().getId(), defaultSequenceFlow);
           }
 
           transitionsToTake.add(defaultTransition);
 
         } else {
           // No sequence flow could be found, not even a default one
-          throw new ProcessEngineException("No outgoing sequence flow of the inclusive gateway '" + execution.getActivity().getId()
-                  + "' could be selected for continuing the process");
+          throw LOG.stuckExecutionException(execution.getActivity().getId());
         }
       }
 
       // take the flows found
       execution.leaveActivityViaTransitions(transitionsToTake, joinedExecutions);
     } else {
-      if (log.isLoggable(Level.FINE)) {
-        log.fine("Inclusive gateway '" + activity.getId() + "' does not activate");
-      }
+      LOG.logNoActivityActivation(activity.getId());
     }
   }
 
@@ -120,17 +114,13 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
           }
 
           if (reachable) {
-            if (log.isLoggable(Level.FINE)) {
-              log.fine("an active concurrent execution found: '" + concurrentExecution.getActivity());
-            }
+            LOG.logActiveConcurrentExecution(concurrentExecution.getActivity());
             return true;
           }
         }
       }
     } else if (execution.isActive()) { // is this ever true?
-      if (log.isLoggable(Level.FINE)) {
-        log.fine("an active concurrent execution found: '" + execution.getActivity());
-      }
+      LOG.logActiveConcurrentExecution(execution.getActivity());
       return true;
     }
 

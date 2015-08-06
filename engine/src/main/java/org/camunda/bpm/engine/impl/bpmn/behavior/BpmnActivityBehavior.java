@@ -16,11 +16,10 @@ package org.camunda.bpm.engine.impl.bpmn.behavior;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.Condition;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
@@ -38,7 +37,7 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
  */
 public class BpmnActivityBehavior {
 
-  private static Logger log = Logger.getLogger(BpmnActivityBehavior.class.getName());
+  protected static BpmnBehaviorLogger LOG = ProcessEngineLogger.BEHAVIOR_LOGGER;
 
   /**
    * Performs the default outgoing BPMN 2.0 behavior, which is having parallel
@@ -82,9 +81,7 @@ public class BpmnActivityBehavior {
   protected void performOutgoingBehavior(ActivityExecution execution,
           boolean checkConditions, boolean throwExceptionIfExecutionStuck, List<ActivityExecution> reusableExecutions) {
 
-    if (log.isLoggable(Level.FINE)) {
-      log.fine("Leaving activity '" + execution.getActivity().getId() + "'");
-    }
+    LOG.logLeavingActivtiy(execution.getActivity().getId());
 
     String defaultSequenceFlow = (String) execution.getActivity().getProperty("default");
     List<PvmTransition> transitionsToTake = new ArrayList<PvmTransition>();
@@ -118,11 +115,11 @@ public class BpmnActivityBehavior {
         if (defaultTransition != null) {
           execution.leaveActivityViaTransition(defaultTransition);
         } else {
-          throw new ProcessEngineException("Default sequence flow '" + defaultSequenceFlow + "' could not be not found");
+          throw LOG.missingDefaultFlowException(execution.getActivity().getId(), defaultSequenceFlow);
         }
 
       } else if (!outgoingTransitions.isEmpty()) {
-        throw new ProcessEngineException("No conditional sequence flow leaving the Flow Node '" + execution.getActivity().getId() + "' could be selected for continuing the process");
+        throw LOG.missingConditionalFlowException(execution.getActivity().getId());
 
       } else {
 
@@ -131,15 +128,11 @@ public class BpmnActivityBehavior {
          execution.endCompensation();
 
         } else {
-
-          if (log.isLoggable(Level.FINE)) {
-            log.fine("No outgoing sequence flow found for " + execution.getActivity().getId() + ". Ending execution.");
-          }
+          LOG.logMissingOutgoingSequenceFlow(execution.getActivity().getId());
           execution.end(true);
 
           if (throwExceptionIfExecutionStuck) {
-            throw new ProcessEngineException("No outgoing sequence flow of the inclusive gateway '" + execution.getActivity().getId()
-                  + "' could be selected for continuing the process");
+            throw LOG.stuckExecutionException(execution.getActivity().getId());
           }
         }
 

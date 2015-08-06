@@ -16,10 +16,11 @@ import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.instantiateDele
 
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.bpmn.behavior.BpmnBehaviorLogger;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ServiceTaskJavaDelegateActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.delegate.ExecutionListenerInvocation;
 import org.camunda.bpm.engine.impl.bpmn.parser.FieldDeclaration;
@@ -31,6 +32,8 @@ import org.camunda.bpm.engine.impl.delegate.ClassDelegate;
  *
  */
 public class ClassDelegateExecutionListener extends ClassDelegate implements ExecutionListener {
+
+  protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BEHAVIOR_LOGGER;
 
   public ClassDelegateExecutionListener(String className, List<FieldDeclaration> fieldDeclarations) {
     super(className, fieldDeclarations);
@@ -58,7 +61,8 @@ public class ClassDelegateExecutionListener extends ClassDelegate implements Exe
       return new ServiceTaskJavaDelegateActivityBehavior((JavaDelegate) delegateInstance);
 
     } else {
-      throw new ProcessEngineException(delegateInstance.getClass().getName()+" doesn't implement "+ExecutionListener.class+" nor "+JavaDelegate.class);
+      throw LOG.missingDelegateParentClassException(delegateInstance.getClass().getName(),
+        ExecutionListener.class.getName(), JavaDelegate.class.getName());
     }
   }
 
