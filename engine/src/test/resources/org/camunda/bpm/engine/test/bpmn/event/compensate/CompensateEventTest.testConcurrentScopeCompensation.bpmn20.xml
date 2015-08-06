@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="concurrentScopeCompensation">
+    <startEvent id="start" />
+    <sequenceFlow sourceRef="start" targetRef="fork" />
+
+    <parallelGateway id="fork" />
+    <sequenceFlow sourceRef="fork" targetRef="scope1" />
+    <subProcess id="scope1">
+      <startEvent id="scope1Start" />
+      <sequenceFlow sourceRef="scope1Start" targetRef="scope1Task" />
+      
+      <serviceTask id="scope1Task" camunda:expression="${true}"/>
+      <sequenceFlow sourceRef="scope1Task" targetRef="scope1End" />
+      
+      <endEvent id="scope1End" />
+      
+      <!-- synchronous compensation handler for scope1Task -->
+      <boundaryEvent id="compensateScope1TaskEvt" attachedToRef="scope1Task">
+        <compensateEventDefinition />
+      </boundaryEvent>
+  
+      <serviceTask id="compensateScope1Task" isForCompensation="true"
+        camunda:class="org.camunda.bpm.engine.test.bpmn.event.compensate.helper.UndoService">
+        <extensionElements>
+          <camunda:field name="counterName" stringValue="compensateScope1Task" />
+        </extensionElements>
+      </serviceTask>
+      
+      <association associationDirection="One" sourceRef="compensateScope1TaskEvt" targetRef="compensateScope1Task" />
+    </subProcess>
+    
+    <sequenceFlow sourceRef="fork" targetRef="scope2" />
+    <subProcess id="scope2">
+      <startEvent id="scope2Start" />
+      <sequenceFlow sourceRef="scope2Start" targetRef="scope2Task" />
+      
+      <serviceTask id="scope2Task" camunda:expression="${true}"/>
+      <sequenceFlow sourceRef="scope2Task" targetRef="scope2End" />
+      
+      <endEvent id="scope2End" />
+      
+      <!-- synchronous compensation handler for scope2Task -->
+      <boundaryEvent id="compensateScope2TaskEvt" attachedToRef="scope2Task">
+        <compensateEventDefinition />
+      </boundaryEvent>
+  
+      <serviceTask id="compensateScope2Task" isForCompensation="true"
+        camunda:class="org.camunda.bpm.engine.test.bpmn.event.compensate.helper.UndoService">
+        <extensionElements>
+          <camunda:field name="counterName" stringValue="compensateScope2Task" />
+        </extensionElements>
+      </serviceTask>
+      
+      <association associationDirection="One" sourceRef="compensateScope2TaskEvt" targetRef="compensateScope2Task" />
+    </subProcess>
+    
+    <sequenceFlow sourceRef="scope1" targetRef="join" />
+    <sequenceFlow sourceRef="scope2" targetRef="join" />
+    <parallelGateway id="join" />
+    
+    <sequenceFlow sourceRef="join" targetRef="compensationFork" />
+    <parallelGateway id="compensationFork" />
+
+    <sequenceFlow sourceRef="compensationFork" targetRef="beforeCompensationTask" />
+    <userTask id="beforeCompensationTask" />
+    
+    <sequenceFlow sourceRef="beforeCompensationTask" targetRef="compensationThrow" />
+    <intermediateThrowEvent id="compensationThrow">
+      <compensateEventDefinition />
+    </intermediateThrowEvent>
+    
+    <sequenceFlow sourceRef="compensationThrow" targetRef="end1" />
+    <endEvent id="end1" />
+    
+    <sequenceFlow sourceRef="compensationFork" targetRef="concurrentTask" />
+    <userTask id="concurrentTask" />
+    <sequenceFlow sourceRef="concurrentTask" targetRef="end2" />
+    <endEvent id="end2" />
+  </process>
+
+</definitions>

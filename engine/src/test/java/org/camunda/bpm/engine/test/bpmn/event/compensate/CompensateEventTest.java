@@ -889,6 +889,37 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(processInstance.getId());
   }
 
+  @Deployment
+  public void testConcurrentScopeCompensation() {
+    // given a process instance with two concurrent tasks, one of which is waiting
+    // before throwing compensation
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("concurrentScopeCompensation");
+    Task beforeCompensationTask = taskService.createTaskQuery().taskDefinitionKey("beforeCompensationTask").singleResult();
+    Task concurrentTask = taskService.createTaskQuery().taskDefinitionKey("concurrentTask").singleResult();
+
+    // when throwing compensation such that two subprocesses are compensated
+    taskService.complete(beforeCompensationTask.getId());
+
+    // then both compensation handlers have been executed
+    if (processEngineConfiguration.getHistoryLevel().getId() >= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+      HistoricVariableInstanceQuery historicVariableInstanceQuery = historyService
+          .createHistoricVariableInstanceQuery().variableName("compensateScope1Task");
+
+      assertEquals(1, historicVariableInstanceQuery.count());
+      assertEquals(1, historicVariableInstanceQuery.list().get(0).getValue());
+
+      historicVariableInstanceQuery = historyService
+          .createHistoricVariableInstanceQuery().variableName("compensateScope2Task");
+
+      assertEquals(1, historicVariableInstanceQuery.count());
+      assertEquals(1, historicVariableInstanceQuery.list().get(0).getValue());
+    }
+
+    // and after completing the concurrent task, the process instance ends successfully
+    taskService.complete(concurrentTask.getId());
+    assertProcessEnded(processInstance.getId());
+  }
+
   private void completeTask(String taskName) {
     completeTasks(taskName, 1);
   }
