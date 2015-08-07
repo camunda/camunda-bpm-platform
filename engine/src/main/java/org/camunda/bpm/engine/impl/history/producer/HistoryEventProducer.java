@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.runtime.Job;
  *
  * @author Daniel Meyer
  * @author Marcel Wieczorek
+ * @author Ingo Richtsmeier
  *
  */
 public interface HistoryEventProducer {
@@ -52,6 +53,15 @@ public interface HistoryEventProducer {
    * @return the history event
    */
   public HistoryEvent createProcessInstanceEndEvt(DelegateExecution execution);
+  
+  /**
+   * Creates the history event fired when the process instance is migrated to another 
+   * process definition version.
+   * 
+   * @param execution
+   * @return the history event
+   */
+  public HistoryEvent createProcessInstanceVersionModificationEvt(DelegateExecution execution);
 
 
   // Activity instances /////////////////////////////////////

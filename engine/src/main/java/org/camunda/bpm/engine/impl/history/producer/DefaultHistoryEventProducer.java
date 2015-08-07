@@ -58,6 +58,7 @@ import org.camunda.bpm.engine.runtime.Job;
 
 /**
  * @author Daniel Meyer
+ * @author Ingo Richtsmeier
  *
  */
 public class DefaultHistoryEventProducer implements HistoryEventProducer {
@@ -419,6 +420,21 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       evt.setDeleteReason(executionEntity.getDeleteReason());
     }
 
+    return evt;
+  }
+  
+  public HistoryEvent createProcessInstanceVersionModificationEvt(DelegateExecution execution) {
+    final ExecutionEntity executionEntity = (ExecutionEntity) execution;
+    
+    // create event instance
+    HistoricProcessInstanceEventEntity evt = loadProcessInstanceEventEntity(executionEntity);
+    
+    // initialize event
+    initProcessInstanceEvent(evt, executionEntity, HistoryEventTypes.PROCESS_INSTANCE_END);
+    
+    // set the new processDefnitionId
+    evt.setProcessDefinitionId(executionEntity.getProcessDefinitionId());
+    
     return evt;
   }
 
