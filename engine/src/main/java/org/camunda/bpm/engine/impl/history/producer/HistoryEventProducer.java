@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.runtime.Job;
  *
  * @author Daniel Meyer
  * @author Marcel Wieczorek
+ * @author Ingo Richtsmeier
  *
  */
 public interface HistoryEventProducer {
@@ -46,13 +47,20 @@ public interface HistoryEventProducer {
   public HistoryEvent createProcessInstanceStartEvt(DelegateExecution execution);
 
   /**
+   * Creates the history event fired when a process instance is <strong>updated</strong>.
+   *
+   * @param processExecution the current case execution
+   * @return the created history event
+   */
+  public HistoryEvent createProcessInstanceUpdateEvt(DelegateExecution execution);
+
+  /**
    * Creates the history event fired when a process instances is <strong>ended</strong>.
    *
    * @param execution the current execution.
    * @return the history event
    */
   public HistoryEvent createProcessInstanceEndEvt(DelegateExecution execution);
-
 
   // Activity instances /////////////////////////////////////
 

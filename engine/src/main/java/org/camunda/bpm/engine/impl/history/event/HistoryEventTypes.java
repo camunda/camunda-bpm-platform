@@ -16,12 +16,15 @@ package org.camunda.bpm.engine.impl.history.event;
  * The set of built-in history event types.
  *
  * @author Daniel Meyer
+ * @author Ingo Richtsmeier
  * @since 7.2
  */
 public enum HistoryEventTypes implements HistoryEventType {
 
   /** fired when a process instance is started. */
   PROCESS_INSTANCE_START("process-instance", "start"),
+  /** fired when a process instance is updated */
+  PROCESS_INSTANCE_UPDATE("process-instance-update", "update"),
   /** fired when a process instance is ended. */
   PROCESS_INSTANCE_END("process-instance", "end"),
 

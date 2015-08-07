@@ -24,18 +24,23 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
-import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
+import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
+import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
@@ -66,6 +71,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
  *
  * @see http://forums.activiti.org/en/viewtopic.php?t=2918
  * @author Falko Menge
+ * @author Ingo Richtsmeier
  */
 public class SetProcessDefinitionVersionCmd implements Command<Void>, Serializable {
 
@@ -83,6 +89,8 @@ public class SetProcessDefinitionVersionCmd implements Command<Void>, Serializab
   }
 
   public Void execute(CommandContext commandContext) {
+    ProcessEngineConfigurationImpl configuration = commandContext.getProcessEngineConfiguration();
+
     // check that the new process definition is just another version of the same
     // process definition that the process instance is using
     ExecutionManager executionManager = commandContext.getExecutionManager();
@@ -99,9 +107,7 @@ public class SetProcessDefinitionVersionCmd implements Command<Void>, Serializab
     }
     ProcessDefinitionImpl currentProcessDefinitionImpl = processInstance.getProcessDefinition();
 
-    DeploymentCache deploymentCache = Context
-      .getProcessEngineConfiguration()
-      .getDeploymentCache();
+    DeploymentCache deploymentCache = configuration.getDeploymentCache();
     ProcessDefinitionEntity currentProcessDefinition;
     if (currentProcessDefinitionImpl instanceof ProcessDefinitionEntity) {
       currentProcessDefinition = (ProcessDefinitionEntity) currentProcessDefinitionImpl;
@@ -114,11 +120,14 @@ public class SetProcessDefinitionVersionCmd implements Command<Void>, Serializab
 
     validateAndSwitchVersionOfExecution(commandContext, processInstance, newProcessDefinition);
 
-    // switch the historic process instance to the new process definition version
-    HistoricProcessInstanceManager historicProcessInstanceManager = commandContext.getHistoricProcessInstanceManager();
-    if (historicProcessInstanceManager.isHistoryEnabled()) {
-      HistoricProcessInstanceEntity historicProcessInstance = historicProcessInstanceManager.findHistoricProcessInstance(processInstanceId);
-      historicProcessInstance.setProcessDefinitionId(newProcessDefinition.getId());
+    HistoryLevel historyLevel = configuration.getHistoryLevel();
+    if(historyLevel.isHistoryEventProduced(HistoryEventTypes.PROCESS_INSTANCE_UPDATE, processInstance)) {
+      HistoryEventProducer eventFactory = configuration.getHistoryEventProducer();
+      HistoryEventHandler eventHandler = configuration.getHistoryEventHandler();
+
+      // publish event for historic process instance
+      HistoryEvent event = eventFactory.createProcessInstanceUpdateEvt(processInstance);
+      eventHandler.handleEvent(event);
     }
 
     // switch all sub-executions of the process instance to the new process definition version
@@ -145,6 +154,10 @@ public class SetProcessDefinitionVersionCmd implements Command<Void>, Serializab
     for (IncidentEntity incidentEntity : incidents) {
       switchVersionOfIncident(commandContext, incidentEntity, newProcessDefinition);
     }
+
+    // add an entry to the op log
+    PropertyChange change = new PropertyChange("processDefinitionVersion", currentProcessDefinition.getVersion(), processDefinitionVersion);
+    commandContext.getOperationLogManager().logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_MODIFY_PROCESS_INSTANCE, processInstanceId, null, null, change);
 
     return null;
   }

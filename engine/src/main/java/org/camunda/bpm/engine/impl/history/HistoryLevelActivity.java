@@ -23,6 +23,7 @@ import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.CASE_I
 import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.CASE_INSTANCE_UPDATE;
 import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.PROCESS_INSTANCE_END;
 import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.PROCESS_INSTANCE_START;
+import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.PROCESS_INSTANCE_UPDATE;
 import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.TASK_INSTANCE_COMPLETE;
 import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.TASK_INSTANCE_CREATE;
 import static org.camunda.bpm.engine.impl.history.event.HistoryEventTypes.TASK_INSTANCE_DELETE;
@@ -47,6 +48,7 @@ public class HistoryLevelActivity extends AbstractHistoryLevel {
 
   public boolean isHistoryEventProduced(HistoryEventType eventType, Object entity) {
     return PROCESS_INSTANCE_START == eventType
+        || PROCESS_INSTANCE_UPDATE == eventType
         || PROCESS_INSTANCE_END == eventType
 
         || TASK_INSTANCE_CREATE == eventType

@@ -17,8 +17,10 @@ import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.SetProcessDefinitionVersionCmd;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.MessageJobDeclaration;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -54,7 +56,7 @@ public class ProcessInstanceMigrationTest extends PluggableProcessEngineTestCase
 
   private static final String TEST_PROCESS_ONE_JOB = "org/camunda/bpm/engine/test/db/ProcessInstanceMigrationTest.oneJobProcess.bpmn20.xml";
   private static final String TEST_PROCESS_TWO_JOBS = "org/camunda/bpm/engine/test/db/ProcessInstanceMigrationTest.twoJobsProcess.bpmn20.xml";
-  
+
   private static final String TEST_PROCESS_ATTACHED_TIMER = "org/camunda/bpm/engine/test/db/ProcessInstanceMigrationTest.testAttachedTimer.bpmn20.xml";
 
   public void testSetProcessDefinitionVersionEmptyArguments() {
@@ -528,7 +530,7 @@ public class ProcessInstanceMigrationTest extends PluggableProcessEngineTestCase
 
     repositoryService.deleteDeployment(deployment.getId(), true);
   }
-  
+
   @Deployment(resources = TEST_PROCESS_ATTACHED_TIMER)
   public void testSetProcessDefinitionVersionAttachedTimer() {
     // given a process instance
@@ -554,5 +556,121 @@ public class ProcessInstanceMigrationTest extends PluggableProcessEngineTestCase
     assertEquals(newDefinition.getId(), job.getProcessDefinitionId());
 
     repositoryService.deleteDeployment(deployment.getId(), true);
+  }
+
+  public void testHistoryOfSetProcessDefinitionVersionCmd() {
+    // given
+    String resource = "org/camunda/bpm/engine/test/db/SetProcessDefinitionVersionCmdTest.bpmn";
+
+    // Deployments
+    org.camunda.bpm.engine.repository.Deployment firstDeployment = repositoryService
+        .createDeployment()
+        .addClasspathResource(resource)
+        .deploy();
+
+    org.camunda.bpm.engine.repository.Deployment secondDeployment = repositoryService
+        .createDeployment()
+        .addClasspathResource(resource)
+        .deploy();
+
+    // Process definitions
+    ProcessDefinition processDefinitionV1 = repositoryService
+        .createProcessDefinitionQuery()
+        .deploymentId(firstDeployment.getId())
+        .singleResult();
+
+    ProcessDefinition processDefinitionV2 = repositoryService
+        .createProcessDefinitionQuery()
+        .deploymentId(secondDeployment.getId())
+        .singleResult();
+
+    // start process instance
+    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinitionV1.getId());
+
+    // when
+    setProcessDefinitionVersion(processInstance.getId(), 2);
+
+    // then
+    ProcessInstance processInstanceAfterMigration = runtimeService
+        .createProcessInstanceQuery()
+        .processInstanceId(processInstance.getId())
+        .singleResult();
+    assertEquals(processDefinitionV2.getId(), processInstanceAfterMigration.getProcessDefinitionId());
+
+    if(processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      HistoricProcessInstance historicProcessInstance = historyService
+          .createHistoricProcessInstanceQuery()
+          .processInstanceId(processInstance.getId())
+          .singleResult();
+      assertEquals(processDefinitionV2.getId(), historicProcessInstance.getProcessDefinitionId());
+    }
+
+    // Clean up the test
+    repositoryService.deleteDeployment(firstDeployment.getId(), true);
+    repositoryService.deleteDeployment(secondDeployment.getId(), true);
+  }
+
+  public void testOpLogSetProcessDefinitionVersionCmd() {
+    // given
+    String resource = "org/camunda/bpm/engine/test/db/SetProcessDefinitionVersionCmdTest.bpmn";
+
+    // Deployments
+    org.camunda.bpm.engine.repository.Deployment firstDeployment = repositoryService
+        .createDeployment()
+        .addClasspathResource(resource)
+        .deploy();
+
+    org.camunda.bpm.engine.repository.Deployment secondDeployment = repositoryService
+        .createDeployment()
+        .addClasspathResource(resource)
+        .deploy();
+
+    // Process definitions
+    ProcessDefinition processDefinitionV1 = repositoryService
+        .createProcessDefinitionQuery()
+        .deploymentId(firstDeployment.getId())
+        .singleResult();
+
+    ProcessDefinition processDefinitionV2 = repositoryService
+        .createProcessDefinitionQuery()
+        .deploymentId(secondDeployment.getId())
+        .singleResult();
+
+    // start process instance
+    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinitionV1.getId());
+
+    // when
+    setProcessDefinitionVersion(processInstance.getId(), 2);
+
+    // then
+    ProcessInstance processInstanceAfterMigration = runtimeService
+        .createProcessInstanceQuery()
+        .processInstanceId(processInstance.getId())
+        .singleResult();
+    assertEquals(processDefinitionV2.getId(), processInstanceAfterMigration.getProcessDefinitionId());
+
+    if (processEngineConfiguration.getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_FULL)) {
+      List<UserOperationLogEntry> userOperations = historyService
+          .createUserOperationLogQuery()
+          .processInstanceId(processInstance.getId())
+          .list();
+
+      assertEquals(1, userOperations.size());
+
+      UserOperationLogEntry userOperationLogEntry = userOperations.get(0);
+      assertEquals(UserOperationLogEntry.OPERATION_TYPE_MODIFY_PROCESS_INSTANCE, userOperationLogEntry.getOperationType());
+      assertEquals("processDefinitionVersion", userOperationLogEntry.getProperty());
+      assertEquals("1", userOperationLogEntry.getOrgValue());
+      assertEquals("2", userOperationLogEntry.getNewValue());
+    }
+
+    // Clean up the test
+    repositoryService.deleteDeployment(firstDeployment.getId(), true);
+    repositoryService.deleteDeployment(secondDeployment.getId(), true);
+  }
+
+  protected void setProcessDefinitionVersion(String processInstanceId, int newProcessDefinitionVersion) {
+    CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequiresNew();
+    commandExecutor.execute(new SetProcessDefinitionVersionCmd(processInstanceId, newProcessDefinitionVersion));
   }
 }
