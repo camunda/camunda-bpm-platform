@@ -31,9 +31,9 @@ import org.camunda.bpm.engine.runtime.Job;
  */
 public class JdbcStatementTimeoutTest extends ConcurrencyTestCase {
 
-  private static final int STATEMENT_TIMEOUT_IN_SECONDS = 1000;
+  private static final int STATEMENT_TIMEOUT_IN_SECONDS = 1;
   // some databases (like mysql and oracle) need more time to cancel the statement
-  private static final int TEST_TIMEOUT_IN_MILLIES = 10000;
+  private static final int TEST_TIMEOUT_IN_MILLIS = 10000;
   private static final String JOB_ENTITY_ID = "42";
 
   private ThreadControl thread1;
@@ -42,7 +42,7 @@ public class JdbcStatementTimeoutTest extends ConcurrencyTestCase {
   @Override
   protected void initializeProcessEngine() {
     processEngine = ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("camunda.cfg.xml")
-        .setJdbcStatementTimeout(STATEMENT_TIMEOUT_IN_SECONDS / 1000)
+        .setJdbcStatementTimeout(STATEMENT_TIMEOUT_IN_SECONDS)
         .buildProcessEngine();
   }
 
@@ -72,7 +72,7 @@ public class JdbcStatementTimeoutTest extends ConcurrencyTestCase {
     thread2.makeContinue();
     // wait for thread 2 to cancel FLUSH because of timeout
     thread2.reportInterrupts();
-    thread2.waitForSync(TEST_TIMEOUT_IN_MILLIES);
+    thread2.waitForSync(TEST_TIMEOUT_IN_MILLIS);
 
     assertNotNull("expected timeout exception", thread2.getException());
   }
