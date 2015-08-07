@@ -12,8 +12,11 @@
  */
 package org.camunda.bpm.engine.test.cmd;
 
+import java.util.List;
+
 import org.apache.ibatis.logging.LogFactory;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cmd.SetProcessDefinitionVersionCmd;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.Deployment;
@@ -67,4 +70,37 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
     repositoryService.deleteDeployment(deployVersion2.getId(), true);
   }
   
+  public void testOpLogSetProcessDefinitionVersionCmd() {
+    String resource = "org/camunda/bpm/engine/test/cmd/SetProcessDefinitionVersionCmdTest.bpmn";
+    Deployment deployVersion1 = repositoryService
+        .createDeployment()
+        .addClasspathResource(resource)
+        .deploy();
+    Deployment deployVersion2 = repositoryService
+        .createDeployment()
+        .addClasspathResource(resource)
+        .enableDuplicateFiltering(false)
+        .deploy();
+    ProcessDefinition processDefinition = repositoryService
+        .createProcessDefinitionQuery()
+        .deploymentId(deployVersion1.getId())
+        .singleResult();
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+
+    SetProcessDefinitionVersionCmd command = new SetProcessDefinitionVersionCmd(processInstance.getId(), 2);
+    processEngineConfiguration.getCommandExecutorTxRequired().execute(command);
+
+    List<UserOperationLogEntry> userOperations = historyService.createUserOperationLogQuery().processInstanceId(processInstance.getId()).list();
+    assertEquals(1, userOperations.size());
+    assertEquals(UserOperationLogEntry.OPERATION_TYPE_MODIFY_PROCESS_INSTANCE, userOperations.get(0).getOperationType());
+    UserOperationLogEntry userOperationLogEntry = userOperations.get(0);
+    assertEquals("processDefinitionVersion", userOperationLogEntry.getProperty());
+    assertEquals("1", userOperationLogEntry.getOrgValue());
+    assertEquals("2", userOperationLogEntry.getNewValue());
+    
+    // Clean up the test
+    repositoryService.deleteDeployment(deployVersion1.getId(), true);
+    repositoryService.deleteDeployment(deployVersion2.getId(), true);
+  }
 }
