@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+  
+  <error id="error" errorCode="errorCode" name="ErrorCodeTest"/>
+ 
+  <process id="process">
+  
+    <startEvent id="start" />
+    
+    <sequenceFlow sourceRef="start" targetRef="outerGtw" />
+    
+    <parallelGateway id="outerGtw" />
+    
+    <sequenceFlow sourceRef="outerGtw" targetRef="subProcess" />
+    
+    <subProcess id="subProcess">
+    
+      <startEvent id="innerStart" />
+
+      <sequenceFlow sourceRef="innerStart" targetRef="service1" />
+
+      <serviceTask id="service1" camunda:expression="${true}" />
+
+      <sequenceFlow sourceRef="service1" targetRef="innerGtw" />
+
+      <parallelGateway id="innerGtw" />
+
+      <sequenceFlow sourceRef="innerGtw" targetRef="errorEvent" />
+      <endEvent id="errorEvent">
+        <errorEventDefinition errorRef="error" />
+      </endEvent>
+
+      <sequenceFlow sourceRef="innerGtw" targetRef="innerTask" />
+      <userTask id="innerTask" />
+      <sequenceFlow sourceRef="innerTask" targetRef="innerEnd" />
+      <endEvent id="innerEnd" />
+
+      <subProcess id="eventSubProcess" triggeredByEvent="true">
+
+        <startEvent id="eventStart">
+          <errorEventDefinition errorRef="error"/>
+        </startEvent>
+
+        <sequenceFlow sourceRef="eventStart" targetRef="receive" />
+      
+        <receiveTask id="receive" />
+
+        <sequenceFlow sourceRef="receive" targetRef="eventEnd" />
+      
+        <endEvent id="eventEnd" />
+
+      </subProcess>
+
+    </subProcess>
+    
+    <sequenceFlow sourceRef="subProcess" targetRef="outerEnd1" />
+    <endEvent id="outerEnd1" />
+
+    <sequenceFlow sourceRef="outerGtw" targetRef="outerTask" />
+    <userTask id="outerTask" />
+    <sequenceFlow sourceRef="outerTask" targetRef="outerEnd2" />
+    <endEvent id="outerEnd2" />
+  
+  </process>
+    
+</definitions>

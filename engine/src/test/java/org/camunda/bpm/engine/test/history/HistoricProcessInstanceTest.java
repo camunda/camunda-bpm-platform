@@ -841,4 +841,21 @@ public class HistoricProcessInstanceTest extends PluggableProcessEngineTestCase 
     assertEquals(key, instance.getProcessDefinitionKey());
   }
 
+  @Deployment
+  public void FAILING_testProcessInstanceShouldBeActive() {
+    // given
+
+    // when
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
+
+    // then
+    HistoricProcessInstance historicProcessInstance = historyService
+      .createHistoricProcessInstanceQuery()
+      .processInstanceId(processInstanceId)
+      .singleResult();
+
+    assertNull(historicProcessInstance.getEndTime());
+    assertNull(historicProcessInstance.getDurationInMillis());
+  }
+
 }

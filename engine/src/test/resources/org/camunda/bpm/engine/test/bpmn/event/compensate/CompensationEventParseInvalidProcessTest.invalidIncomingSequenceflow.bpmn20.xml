@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+	
+	<process id="compensateProcess">
+
+		<startEvent id="start" />
+		
+		<sequenceFlow sourceRef="start"	targetRef="task" />	
+		
+        <!-- compensation handler should not have an incoming sequence flow -->
+		<userTask id="task" isForCompensation="true" />
+		
+		<sequenceFlow sourceRef="task" targetRef="end" />
+		
+		<endEvent id="end" />
+    
+	</process>
+
+</definitions>

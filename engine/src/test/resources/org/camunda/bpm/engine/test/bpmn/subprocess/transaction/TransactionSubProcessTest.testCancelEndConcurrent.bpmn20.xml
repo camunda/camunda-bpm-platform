@@ -37,13 +37,13 @@
         <compensateEventDefinition />
       </boundaryEvent>  
       
-      <serviceTask id="undoBookHotel" isForCompensation="true" camunda:class="org.camunda.bpm.engine.test.bpmn.event.compensate.helper.UndoService">
+      <serviceTask id="undoBookHotel" isForCompensation="true" camunda:class="org.camunda.bpm.engine.test.bpmn.event.compensate.helper.WaitStateUndoService">
          <extensionElements>
               <camunda:field name="counterName" stringValue="undoBookHotel" />
          </extensionElements>        
       </serviceTask>
       
-      <serviceTask id="undoBookFlight" isForCompensation="true" camunda:class="org.camunda.bpm.engine.test.bpmn.event.compensate.helper.UndoService">
+      <serviceTask id="undoBookFlight" isForCompensation="true" camunda:class="org.camunda.bpm.engine.test.bpmn.event.compensate.helper.WaitStateUndoService">
          <extensionElements>
               <camunda:field name="counterName" stringValue="undoBookFlight" />
          </extensionElements>        

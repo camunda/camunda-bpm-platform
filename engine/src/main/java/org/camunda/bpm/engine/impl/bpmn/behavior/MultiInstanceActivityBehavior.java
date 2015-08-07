@@ -17,15 +17,17 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.Expression;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.bpmn.helper.CompensationUtil;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ModificationObserverBehavior;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.variable.value.IntegerValue;
 
 
@@ -36,9 +38,9 @@ import org.camunda.bpm.engine.variable.value.IntegerValue;
  * @author Daniel Meyer
  * @author Thorben Lindhauer
  */
-public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBehavior implements CompositeActivityBehavior, ModificationObserverBehavior {
+public abstract class MultiInstanceActivityBehavior extends AbstractBpmnActivityBehavior implements CompositeActivityBehavior, ModificationObserverBehavior {
 
-  protected static final Logger LOGGER = Logger.getLogger(MultiInstanceActivityBehavior.class.getName());
+  protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BEHAVIOR_LOGGER;
 
   // Variable names for mi-body scoped variables (as described in spec)
   public static final String NUMBER_OF_INSTANCES = "nrOfInstances";
@@ -54,14 +56,14 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
   protected String collectionVariable;
   protected String collectionElementVariable;
 
+  @Override
   public void execute(ActivityExecution execution) throws Exception {
     int nrOfInstances = resolveNrOfInstances(execution);
     if (nrOfInstances == 0) {
       leave(execution);
     }
     else if (nrOfInstances < 0) {
-      throw new ProcessEngineException("Invalid number of instances: must be positive integer value or zero"
-              + ", but was " + nrOfInstances);
+      throw LOG.invalidAmountException("instances", nrOfInstances);
     }
     else {
       createInstances(execution, nrOfInstances);
@@ -99,17 +101,17 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     } else if (collectionExpression != null) {
       Object obj = collectionExpression.getValue(execution);
       if (!(obj instanceof Collection)) {
-        throw new ProcessEngineException(collectionExpression.getExpressionText()+"' didn't resolve to a Collection");
+        throw LOG.unresolvableExpressionException(collectionExpression.getExpressionText(), "Collection");
       }
       nrOfInstances = ((Collection<?>) obj).size();
     } else if (collectionVariable != null) {
       Object obj = execution.getVariable(collectionVariable);
       if (!(obj instanceof Collection)) {
-        throw new ProcessEngineException("Variable " + collectionVariable+"' is not a Collection");
+        throw LOG.InvalidVariableTypeException(collectionVariable, "Collection");
       }
       nrOfInstances = ((Collection<?>) obj).size();
     } else {
-      throw new ProcessEngineException("Couldn't resolve collection expression nor variable reference");
+      throw LOG.resolveCollectionExpressionOrVariableReferenceException();
     }
     return nrOfInstances;
   }
@@ -138,8 +140,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     } else if (value instanceof String) {
       return Integer.valueOf((String) value);
     } else {
-      throw new ProcessEngineException("Could not resolve loopCardinality expression '"
-              +loopCardinalityExpression.getExpressionText()+"': not a number nor number String");
+      throw LOG.expressionNotANumberException("loopCardinality", loopCardinalityExpression.getExpressionText());
     }
   }
 
@@ -147,17 +148,39 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     if (completionConditionExpression != null) {
       Object value = completionConditionExpression.getValue(execution);
       if (! (value instanceof Boolean)) {
-        throw new ProcessEngineException("completionCondition '"
-                + completionConditionExpression.getExpressionText()
-                + "' does not evaluate to a boolean value");
+        throw LOG.expressionNotBooleanException("completionCondition", completionConditionExpression.getExpressionText());
       }
       Boolean booleanValue = (Boolean) value;
-      if (LOGGER.isLoggable(Level.FINE)) {
-        LOGGER.fine("Completion condition of multi-instance satisfied: " + booleanValue);
-      }
+
+      LOG.logMultiInstanceCompletionConditionState(booleanValue);
       return booleanValue;
     }
     return false;
+  }
+
+  @Override
+  protected void leave(ActivityExecution execution) {
+    CompensationUtil.createEventScopeExecution((ExecutionEntity) execution);
+
+    super.leave(execution);
+  }
+
+  /**
+   * Get the inner activity of the multi instance execution.
+   *
+   * @param execution
+   *          of multi instance activity
+   * @return inner activity
+   */
+  protected ActivityImpl getInnerActivity(ActivityExecution execution) {
+    for (PvmActivity activity : execution.getActivity().getActivities()) {
+      ActivityImpl innerActivity = (ActivityImpl) activity;
+      // note that miBody can contains also a compensation handler
+      if (!innerActivity.isCompensationHandler()) {
+        return innerActivity;
+      }
+    }
+    throw new ProcessEngineException("inner activity of multi instance execution '" + execution.getId() + "' not found");
   }
 
   protected void setLoopVariable(ActivityExecution execution, String variableName, Object value) {

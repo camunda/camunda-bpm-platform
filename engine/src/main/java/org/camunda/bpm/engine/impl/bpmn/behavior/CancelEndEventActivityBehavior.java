@@ -38,8 +38,9 @@ public class CancelEndEventActivityBehavior extends AbstractBpmnActivityBehavior
     EnsureUtil
     .ensureNotNull("Could not find cancel boundary event for cancel end event " + execution.getActivity(), "cancelBoundaryEvent", cancelBoundaryEvent);
 
-    ExecutionEntity executionEntity = (ExecutionEntity) execution;
-    List<CompensateEventSubscriptionEntity> compensateEventSubscriptions = executionEntity.getCompensateEventSubscriptions();
+    List<CompensateEventSubscriptionEntity> compensateEventSubscriptions =
+        CompensationUtil.collectCompensateEventSubscriptionsForScope(execution);
+
     if(compensateEventSubscriptions.isEmpty()) {
       leave(execution);
     }
@@ -60,7 +61,7 @@ public class CancelEndEventActivityBehavior extends AbstractBpmnActivityBehavior
   public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
 
     // join compensating executions
-    if(execution.getExecutions().isEmpty()) {
+    if(!execution.hasChildren()) {
       leave(execution);
     } else {
       ((ExecutionEntity)execution).forceUpdate();

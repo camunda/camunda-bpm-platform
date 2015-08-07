@@ -12,12 +12,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.Expression;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
 public class ShellActivityBehavior extends AbstractBpmnActivityBehavior {
+
+  protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BEHAVIOR_LOGGER;
 
   protected Expression command;
   protected Expression wait;
@@ -113,7 +115,7 @@ public class ShellActivityBehavior extends AbstractBpmnActivityBehavior {
 
       }
     } catch (Exception e) {
-      throw new ProcessEngineException("Could not execute shell command ", e);
+      throw LOG.shellExecutionException(e);
     }
 
     leave(execution);

@@ -13,8 +13,9 @@
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.impl.core.model.BaseCallableElement;
+import org.camunda.bpm.engine.impl.core.model.BaseCallableElement.CallableElementBinding;
 import org.camunda.bpm.engine.impl.core.model.CallableElement;
-import org.camunda.bpm.engine.impl.core.model.CallableElement.CallableElementBinding;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SubProcessActivityBehavior;
 import org.camunda.bpm.engine.variable.VariableMap;

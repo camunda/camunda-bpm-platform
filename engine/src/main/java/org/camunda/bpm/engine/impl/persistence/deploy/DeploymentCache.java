@@ -370,6 +370,45 @@ public class DeploymentCache {
     return decisionDefinition;
   }
 
+  public DecisionDefinition findDeployedLatestDecisionDefinitionByKey(String decisionDefinitionKey) {
+    ensureNotNull("Invalid decision definition key", "caseDefinitionKey", decisionDefinitionKey);
+
+    DecisionDefinitionEntity decisionDefinition = Context
+      .getCommandContext()
+      .getDecisionDefinitionManager()
+      .findLatestDecisionDefinitionByKey(decisionDefinitionKey);
+
+    ensureNotNull(DecisionDefinitionNotFoundException.class, "no decision definition deployed with key '" + decisionDefinitionKey + "'", "decisionDefinition", decisionDefinition);
+
+    decisionDefinition = resolveDecisionDefinition(decisionDefinition);
+
+    return decisionDefinition;
+  }
+
+  public DecisionDefinition findDeployedDecisionDefinitionByDeploymentAndKey(String deploymentId, String decisionDefinitionKey) {
+    DecisionDefinitionEntity decisionDefinition = Context
+      .getCommandContext()
+      .getDecisionDefinitionManager()
+      .findDecisionDefinitionByDeploymentAndKey(deploymentId, decisionDefinitionKey);
+
+    ensureNotNull(DecisionDefinitionNotFoundException.class, "no decision definition deployed with key = '" + decisionDefinitionKey + "' in deployment = '" + deploymentId + "'", "decisionDefinition", decisionDefinition);
+    decisionDefinition = resolveDecisionDefinition(decisionDefinition);
+
+    return decisionDefinition;
+  }
+
+  public DecisionDefinition findDeployedDecisionDefinitionByKeyAndVersion(String decisionDefinitionKey, Integer decisionDefinitionVersion) {
+    DecisionDefinitionEntity decisionDefinition = Context
+      .getCommandContext()
+      .getDecisionDefinitionManager()
+      .findDecisionDefinitionByKeyAndVersion(decisionDefinitionKey, decisionDefinitionVersion);
+
+    ensureNotNull(DecisionDefinitionNotFoundException.class, "no decision definition deployed with key = '" + decisionDefinitionKey + "' and version = '" + decisionDefinitionVersion + "'", "decisionDefinition", decisionDefinition);
+    decisionDefinition = resolveDecisionDefinition(decisionDefinition);
+
+    return decisionDefinition;
+  }
+
   public DecisionDefinitionEntity resolveDecisionDefinition(DecisionDefinitionEntity decisionDefinition) {
     String decisionDefinitionId = decisionDefinition.getId();
     String deploymentId = decisionDefinition.getDeploymentId();

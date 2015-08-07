@@ -64,12 +64,6 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
     super("org/camunda/bpm/engine/test/standalone/history/fullhistory.camunda.cfg.xml");
   }
 
-  @Override
-  protected void closeDownProcessEngine() {
-    processEngine.close();
-    super.closeDownProcessEngine();
-  }
-
   @Deployment
   public void testVariableUpdates() {
     Map<String, Object> variables = new HashMap<String, Object>();

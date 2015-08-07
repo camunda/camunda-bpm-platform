@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.parser.FieldDeclaration;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
@@ -40,6 +40,8 @@ import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
  * @author Roman Smirnov
  */
 public class ClassDelegateActivityBehavior extends AbstractBpmnActivityBehavior {
+
+  protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BEHAVIOR_LOGGER;
 
   protected String className;
   protected List<FieldDeclaration> fieldDeclarations;
@@ -88,7 +90,7 @@ public class ClassDelegateActivityBehavior extends AbstractBpmnActivityBehavior 
       ActivityBehavior delegate = behavior.getDelegateActivityBehavior();
 
       if (!(delegate instanceof SignallableActivityBehavior)) {
-        throw new ProcessEngineException("signal() can only be called on a " + SignallableActivityBehavior.class.getName() + " instance");
+        throw LOG.incorrectlyUsedSignalException(SignallableActivityBehavior.class.getName() );
       }
     }
     executeWithErrorPropagation(execution, new Callable<Void>() {
@@ -108,7 +110,11 @@ public class ClassDelegateActivityBehavior extends AbstractBpmnActivityBehavior 
     } else if (delegateInstance instanceof JavaDelegate) {
       return new ServiceTaskJavaDelegateActivityBehavior((JavaDelegate) delegateInstance);
     } else {
-      throw new ProcessEngineException(delegateInstance.getClass().getName()+" doesn't implement "+JavaDelegate.class.getName()+" nor "+ActivityBehavior.class.getName());
+      throw LOG.missingDelegateParentClassException(
+        delegateInstance.getClass().getName(),
+        JavaDelegate.class.getName(),
+        ActivityBehavior.class.getName()
+      );
     }
   }
 

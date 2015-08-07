@@ -132,7 +132,7 @@
 
       <!-- dmn engine -->
       <dependency>
-        <groupId>org.camunda.dmn</groupId>
+        <groupId>org.camunda.bpm.dmn</groupId>
         <artifactId>camunda-engine-dmn-bom</artifactId>
         <version>${project.version}</version>
         <scope>import</scope>

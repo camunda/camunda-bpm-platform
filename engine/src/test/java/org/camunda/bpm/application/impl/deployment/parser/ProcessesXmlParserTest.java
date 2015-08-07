@@ -245,7 +245,7 @@ public class ProcessesXmlParserTest extends TestCase {
         .sourceUrl(getStreamUrl("process_xml_engine_no_name.xml"))
         .execute();
       
-      fail("exceptoion expected");
+      fail("exception expected");
       
     } catch(ProcessEngineException e) {
       // expected

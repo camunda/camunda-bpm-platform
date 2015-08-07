@@ -141,6 +141,7 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
     Date returnedDueDate = DateTimeUtil.parseDate(from(content).getString("[0].dueDate"));
     boolean returnedSuspended = from(content).getBoolean("[0].suspended");
     int returnedPriority = from(content).getInt("[0].priority");
+    String returnedJobDefinitionId= from(content).getString("[0].jobDefinitionId");
 
     Assert.assertEquals(MockProvider.EXAMPLE_JOB_ID, returnedJobId);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, returnedProcessInstanceId);
@@ -152,6 +153,7 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
     Assert.assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_DUE_DATE), returnedDueDate);
     Assert.assertEquals(MockProvider.EXAMPLE_JOB_IS_SUSPENDED, returnedSuspended);
     Assert.assertEquals(MockProvider.EXAMPLE_JOB_PRIORITY, returnedPriority);
+    Assert.assertEquals(MockProvider.EXAMPLE_JOB_DEFINITION_ID, returnedJobDefinitionId);
   }
 
   @Test
@@ -311,6 +313,7 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
     parameters.put("suspended", true);
     parameters.put("priorityLowerThanOrEquals", JOB_QUERY_MAX_PRIORITY);
     parameters.put("priorityHigherThanOrEquals", JOB_QUERY_MIN_PRIORITY);
+    parameters.put("jobDefinitionId", MockProvider.EXAMPLE_JOB_DEFINITION_ID);
     return parameters;
   }
 
@@ -346,6 +349,7 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
     verify(mockQuery).suspended();
     verify(mockQuery).priorityLowerThanOrEquals(JOB_QUERY_MAX_PRIORITY);
     verify(mockQuery).priorityHigherThanOrEquals(JOB_QUERY_MIN_PRIORITY);
+    verify(mockQuery).jobDefinitionId(MockProvider.EXAMPLE_JOB_DEFINITION_ID);
   }
 
   @Test

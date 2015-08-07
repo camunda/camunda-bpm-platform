@@ -1,7 +1,14 @@
 <form class="form-horizontal"
       role="form">
 
-  <div class="panel panel-info">Who should approve this invoice?</div>
+  <div class="panel panel-info">Do you approve this invoice?</div>
+
+  <div class="control-group">
+    <label class="control-label">Invoice Document</label>
+    <div class="controls">
+      <a cam-file-download="invoiceDocument"></a>
+    </div>
+  </div>
 
   <div class="control-group">
     <label class="control-label">Creditor</label>
@@ -17,6 +24,16 @@
     <label class="control-label">Amount</label>
     <div class="controls">
       <input cam-variable-name="amount"
+             type="text"
+             name="amount"
+             readonly="true"
+             class="form-control" />
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label">Invoice Category</label>
+    <div class="controls">
+      <input cam-variable-name="invoiceCategory"
              type="text"
              name="amount"
              readonly="true"

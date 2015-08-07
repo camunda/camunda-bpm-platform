@@ -16,13 +16,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import java.util.Map;
+
+import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
-import org.camunda.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -71,7 +74,7 @@ public class DmnScriptEngineSupportTest extends AbstractFoxPlatformIntegrationTe
   @Test
   public void testDmnClassesAvailable() {
     try {
-      Class.forName("org.camunda.dmn.engine.impl.DmnEngineImpl");
+      Class.forName("org.camunda.bpm.dmn.engine.impl.DmnEngineImpl");
     }
     catch (ClassNotFoundException e) {
       fail("DMN engine not available");
@@ -85,7 +88,7 @@ public class DmnScriptEngineSupportTest extends AbstractFoxPlatformIntegrationTe
     }
 
     try {
-      Class.forName("org.camunda.dmn.scriptengine.DmnScriptEngine");
+      Class.forName("org.camunda.bpm.dmn.scriptengine.DmnScriptEngine");
     }
     catch (ClassNotFoundException e) {
       fail("DMN scriptengine not available");
@@ -93,13 +96,13 @@ public class DmnScriptEngineSupportTest extends AbstractFoxPlatformIntegrationTe
   }
 
   protected String getResultVariable(ProcessInstance processInstance) {
-    DmnDecisionResult decisionResult = (DmnDecisionResult) runtimeService.getVariable(processInstance.getId(), RESULT_VARIABLE);
-    return decisionResult.getOutputs().get(0).getValue("result");
+    DmnDecisionOutput result = (DmnDecisionOutput) runtimeService.getVariable(processInstance.getId(), RESULT_VARIABLE);
+    return result.getValue("result");
   }
 
-  private String getReasonVariable(ProcessInstance processInstance) {
-    DmnDecisionResult decisionResult = (DmnDecisionResult) runtimeService.getVariable(processInstance.getId(), RESULT_VARIABLE);
-    return decisionResult.getOutputs().get(0).getValue("reason");
+  protected String getReasonVariable(ProcessInstance processInstance) {
+    DmnDecisionOutput result = (DmnDecisionOutput) runtimeService.getVariable(processInstance.getId(), RESULT_VARIABLE);
+    return result.getValue("reason");
   }
 
 }

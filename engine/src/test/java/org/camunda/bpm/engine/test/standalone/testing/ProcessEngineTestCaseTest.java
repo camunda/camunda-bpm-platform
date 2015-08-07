@@ -43,4 +43,10 @@ public class ProcessEngineTestCaseTest extends ProcessEngineTestCase {
     }
   }
 
+  protected void tearDown() throws Exception {
+    super.tearDown();
+    processEngine.close();
+    processEngine = null;
+  }
+
 }

@@ -38,6 +38,6 @@ public class RemoveTaskVariablesCmd extends AbstractRemoveVariableCmd {
 
   protected void logVariableOperation(AbstractVariableScope scope) {
     TaskEntity task = (TaskEntity) scope;
-    commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), task, PropertyChange.EMPTY_CHANGE);
+    commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), null, task.getId(), PropertyChange.EMPTY_CHANGE);
   }
 }

@@ -18,14 +18,12 @@ import java.util.List;
 import java.util.Map;
 
 import javax.script.Bindings;
-import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
 import org.camunda.bpm.engine.impl.scripting.ScriptFactory;
 import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
-import org.camunda.dmn.scriptengine.DmnScriptEngine;
 
 /**
  * <p>The scripting environment contains scripts that provide an environment to
@@ -86,12 +84,6 @@ public class ScriptingEnvironment {
     List<ExecutableScript> envScripts = getEnvScripts(scriptLanguage);
     for (ExecutableScript envScript : envScripts) {
       envScript.execute(scriptEngine, scope, bindings);
-    }
-
-    // set the script engine manager for the dmn script engine
-    if (scriptEngine instanceof DmnScriptEngine) {
-      // TODO: If we also want to set the decision id in the script context we should probably use an own script context per invocation
-      scriptEngine.getContext().setAttribute(DmnScriptEngine.SCRIPT_ENGINE_MANAGER_ATTRIBUTE, scriptingEngines.getScriptEngineManager(), ScriptContext.ENGINE_SCOPE);
     }
 
     // next evaluate the actual script

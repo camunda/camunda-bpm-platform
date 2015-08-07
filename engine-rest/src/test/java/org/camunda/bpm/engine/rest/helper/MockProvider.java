@@ -974,6 +974,7 @@ public abstract class MockProvider {
       .dueDate(DateTimeUtil.parseDate(EXAMPLE_DUE_DATE))
       .suspended(EXAMPLE_JOB_IS_SUSPENDED)
       .priority(EXAMPLE_JOB_PRIORITY)
+      .jobDefinitionId(EXAMPLE_JOB_DEFINITION_ID)
       .build();
     return mock;
   }

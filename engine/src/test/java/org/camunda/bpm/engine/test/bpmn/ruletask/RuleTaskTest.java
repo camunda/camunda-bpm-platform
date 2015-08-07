@@ -22,7 +22,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Bernd Ruecker
  */
 public class RuleTaskTest extends PluggableProcessEngineTestCase {
-  
+
   @Deployment
   public void testJavaDelegate() {
     DummyServiceTask.wasExecuted = false;

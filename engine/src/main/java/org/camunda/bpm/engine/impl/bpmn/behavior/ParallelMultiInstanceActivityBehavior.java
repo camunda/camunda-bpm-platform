@@ -27,7 +27,7 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
 
   @Override
   protected void createInstances(ActivityExecution execution, int nrOfInstances) throws Exception {
-    PvmActivity nestedActivity = execution.getActivity().getActivities().get(0);
+    PvmActivity innerActivity = getInnerActivity(execution);
 
     prepareScopeExecution(execution, nrOfInstances);
 
@@ -45,7 +45,7 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
       ActivityExecution activityExecution = concurrentExecutions.get(i);
       // check for active execution: the completion condition may be satisfied before all executions are started
       if(activityExecution.isActive()) {
-        performInstance(activityExecution, nestedActivity, i);
+        performInstance(activityExecution, innerActivity, i);
       }
     }
   }
@@ -77,7 +77,7 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
     if(completionConditionSatisfied(endedExecution) ||
         allExecutionsEnded(scopeExecution, endedExecution)) {
 
-      ArrayList<ActivityExecution> childExecutions = new ArrayList<ActivityExecution>(scopeExecution.getExecutions());
+      ArrayList<ActivityExecution> childExecutions = new ArrayList<ActivityExecution>(((PvmExecutionImpl) scopeExecution).getNonEventScopeExecutions());
       for (ActivityExecution childExecution : childExecutions) {
         // delete all not-ended instances; these are either active (for non-scope tasks) or inactive but have no activity id (for subprocesses, etc.)
         if (childExecution.isActive() || childExecution.getActivity() == null) {

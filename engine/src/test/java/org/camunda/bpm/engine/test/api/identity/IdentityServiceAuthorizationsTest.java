@@ -24,12 +24,14 @@ import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Resources.GROUP;
 import static org.camunda.bpm.engine.authorization.Resources.GROUP_MEMBERSHIP;
 import static org.camunda.bpm.engine.authorization.Resources.USER;
+import static org.camunda.bpm.engine.test.authorization.util.AuthorizationTestUtil.assertExceptionInfo;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.MissingAuthorization;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
@@ -70,10 +72,10 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
       fail("exception expected");
 
     } catch (AuthorizationException e) {
-      assertEquals(CREATE.getName(), e.getViolatedPermissionName());
+      assertEquals(1, e.getMissingAuthorizations().size());
+      MissingAuthorization info = e.getMissingAuthorizations().get(0);
       assertEquals(jonny2, e.getUserId());
-      assertEquals(USER.resourceName(), e.getResourceType());
-      assertEquals(null, e.getResourceId());
+      assertExceptionInfo(CREATE.getName(), USER.resourceName(), null, info);
     }
 
     // circumvent auth check to get new transient userobject
@@ -84,10 +86,10 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
       fail("exception expected");
 
     } catch (AuthorizationException e) {
-      assertEquals(CREATE.getName(), e.getViolatedPermissionName());
+      assertEquals(1, e.getMissingAuthorizations().size());
+      MissingAuthorization info = e.getMissingAuthorizations().get(0);
       assertEquals(jonny2, e.getUserId());
-      assertEquals(USER.resourceName(), e.getResourceType());
-      assertEquals(null, e.getResourceId());
+      assertExceptionInfo(CREATE.getName(), USER.resourceName(), null, info);
     }
   }
 
@@ -114,10 +116,10 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
       fail("exception expected");
 
     } catch (AuthorizationException e) {
-      assertEquals(DELETE.getName(), e.getViolatedPermissionName());
+      assertEquals(1, e.getMissingAuthorizations().size());
+      MissingAuthorization info = e.getMissingAuthorizations().get(0);
       assertEquals(jonny2, e.getUserId());
-      assertEquals(USER.resourceName(), e.getResourceType());
-      assertEquals("jonny1", e.getResourceId());
+      assertExceptionInfo(DELETE.getName(), USER.resourceName(), "jonny1", info);
     }
   }
 
@@ -148,10 +150,10 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
       fail("exception expected");
 
     } catch (AuthorizationException e) {
-      assertEquals(UPDATE.getName(), e.getViolatedPermissionName());
+      assertEquals(1, e.getMissingAuthorizations().size());
+      MissingAuthorization info = e.getMissingAuthorizations().get(0);
       assertEquals(jonny2, e.getUserId());
-      assertEquals(USER.resourceName(), e.getResourceType());
-      assertEquals("jonny1", e.getResourceId());
+      assertExceptionInfo(UPDATE.getName(), USER.resourceName(), "jonny1", info);
     }
 
     // but I can create a new user:
@@ -178,10 +180,10 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
       fail("exception expected");
 
     } catch (AuthorizationException e) {
-      assertEquals(CREATE.getName(), e.getViolatedPermissionName());
+      assertEquals(1, e.getMissingAuthorizations().size());
+      MissingAuthorization info = e.getMissingAuthorizations().get(0);
       assertEquals(jonny2, e.getUserId());
-      assertEquals(GROUP.resourceName(), e.getResourceType());
-      assertEquals(null, e.getResourceId());
+      assertExceptionInfo(CREATE.getName(), GROUP.resourceName(), null, info);
     }
 
     // circumvent auth check to get new transient userobject
@@ -192,10 +194,10 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
       fail("exception expected");
 
     } catch (AuthorizationException e) {
-      assertEquals(CREATE.getName(), e.getViolatedPermissionName());
+      assertEquals(1, e.getMissingAuthorizations().size());
+      MissingAuthorization info = e.getMissingAuthorizations().get(0);
       assertEquals(jonny2, e.getUserId());
-      assertEquals(GROUP.resourceName(), e.getResourceType());
-      assertEquals(null, e.getResourceId());
+      assertExceptionInfo(CREATE.getName(), GROUP.resourceName(), null, info);
     }
   }
 
@@ -222,10 +224,10 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
       fail("exception expected");
 
     } catch (AuthorizationException e) {
-      assertEquals(DELETE.getName(), e.getViolatedPermissionName());
+      assertEquals(1, e.getMissingAuthorizations().size());
+      MissingAuthorization info = e.getMissingAuthorizations().get(0);
       assertEquals(jonny2, e.getUserId());
-      assertEquals(GROUP.resourceName(), e.getResourceType());
-      assertEquals("group1", e.getResourceId());
+      assertExceptionInfo(DELETE.getName(), GROUP.resourceName(), "group1", info);
     }
 
   }
@@ -258,10 +260,10 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
       fail("exception expected");
 
     } catch (AuthorizationException e) {
-      assertEquals(UPDATE.getName(), e.getViolatedPermissionName());
+      assertEquals(1, e.getMissingAuthorizations().size());
+      MissingAuthorization info = e.getMissingAuthorizations().get(0);
       assertEquals(jonny2, e.getUserId());
-      assertEquals(GROUP.resourceName(), e.getResourceType());
-      assertEquals("group1", e.getResourceId());
+      assertExceptionInfo(UPDATE.getName(), GROUP.resourceName(), "group1", info);
     }
 
     // but I can create a new group:
@@ -294,10 +296,10 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
       fail("exception expected");
 
     } catch (AuthorizationException e) {
-      assertEquals(CREATE.getName(), e.getViolatedPermissionName());
+      assertEquals(1, e.getMissingAuthorizations().size());
+      MissingAuthorization info = e.getMissingAuthorizations().get(0);
       assertEquals(jonny2, e.getUserId());
-      assertEquals(GROUP_MEMBERSHIP.resourceName(), e.getResourceType());
-      assertEquals("group1", e.getResourceId());
+      assertExceptionInfo(CREATE.getName(), GROUP_MEMBERSHIP.resourceName(), "group1", info);
     }
   }
 
@@ -325,10 +327,10 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
       fail("exception expected");
 
     } catch (AuthorizationException e) {
-      assertEquals(DELETE.getName(), e.getViolatedPermissionName());
+      assertEquals(1, e.getMissingAuthorizations().size());
+      MissingAuthorization info = e.getMissingAuthorizations().get(0);
       assertEquals(jonny2, e.getUserId());
-      assertEquals(GROUP_MEMBERSHIP.resourceName(), e.getResourceType());
-      assertEquals("group1", e.getResourceId());
+      assertExceptionInfo(DELETE.getName(), GROUP_MEMBERSHIP.resourceName(), "group1", info);
     }
   }
 

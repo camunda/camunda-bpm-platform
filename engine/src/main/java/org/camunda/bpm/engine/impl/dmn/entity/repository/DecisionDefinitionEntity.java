@@ -18,7 +18,7 @@ import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.ResourceDefinitionEntity;
-import org.camunda.dmn.engine.impl.DmnDecisionTableImpl;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
 
 public class DecisionDefinitionEntity extends DmnDecisionTableImpl implements DecisionDefinition, ResourceDefinitionEntity, DbEntity, HasDbRevision, Serializable {
 

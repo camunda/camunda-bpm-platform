@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.impl.bpmn.parser.CompensateEventDefinition;
 import org.camunda.bpm.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
+import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
  * @author Daniel Meyer
@@ -55,9 +56,11 @@ public class IntermediateThrowCompensationEventActivityBehavior extends FlowNode
 
   @Override
   public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
+    // join compensating executions -
+    // only wait for non-event-scope executions cause a compensation event subprocess consume the compensation event and
+    // do not have to compensate embedded subprocesses (which are still non-event-scope executions)
 
-    // join compensating executions
-    if (execution.getExecutions().isEmpty()) {
+    if (((PvmExecutionImpl) execution).getNonEventScopeExecutions().isEmpty()) {
       leave(execution);
     } else {
       ((ExecutionEntity) execution).forceUpdate();

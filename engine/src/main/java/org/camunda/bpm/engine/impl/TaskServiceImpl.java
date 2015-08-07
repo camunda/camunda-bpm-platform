@@ -288,6 +288,10 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     commandExecutor.execute(new PatchTaskVariablesCmd(taskId, modifications, deletions, true));
   }
 
+  public void updateVariables(String taskId, Map<String, ? extends Object> modifications, Collection<String> deletions) {
+    commandExecutor.execute(new PatchTaskVariablesCmd(taskId, modifications, deletions, false));
+  }
+
   public void removeVariable(String taskId, String variableName) {
     Collection<String> variableNames = new ArrayList<String>();
     variableNames.add(variableName);

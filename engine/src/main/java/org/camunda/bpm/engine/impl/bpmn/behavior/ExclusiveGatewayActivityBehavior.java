@@ -13,11 +13,9 @@
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.Condition;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
@@ -31,7 +29,7 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
  */
 public class ExclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
 
-  private static Logger log = Logger.getLogger(ExclusiveGatewayActivityBehavior.class.getName());
+  protected static BpmnBehaviorLogger LOG = ProcessEngineLogger.BEHAVIOR_LOGGER;
 
   /**
    * The default behaviour of BPMN, taking every outgoing sequence flow
@@ -49,9 +47,7 @@ public class ExclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
   @Override
   protected void leave(ActivityExecution execution) {
 
-    if (log.isLoggable(Level.FINE)) {
-      log.fine("Leaving activity '" + execution.getActivity().getId() + "'");
-    }
+    LOG.logLeavingActivtiy(execution.getActivity().getId());
 
     PvmTransition outgoingSeqFlow = null;
     String defaultSequenceFlow = (String) execution.getActivity().getProperty("default");
@@ -62,10 +58,8 @@ public class ExclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
       Condition condition = (Condition) seqFlow.getProperty(BpmnParse.PROPERTYNAME_CONDITION);
       if ( (condition == null && (defaultSequenceFlow == null || !defaultSequenceFlow.equals(seqFlow.getId())) )
               || (condition != null && condition.evaluate(execution)) ) {
-        if (log.isLoggable(Level.FINE)) {
-          log.fine("Sequence flow '" + seqFlow.getId() + " '"
-                  + "selected as outgoing sequence flow.");
-        }
+
+        LOG.logOutgoingSequenceFlow(seqFlow.getId());
         outgoingSeqFlow = seqFlow;
       }
     }
@@ -79,12 +73,11 @@ public class ExclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
         if (defaultTransition != null) {
           execution.leaveActivityViaTransition(defaultTransition);
         } else {
-          throw new ProcessEngineException("Default sequence flow '" + defaultSequenceFlow + "' not found");
+          throw LOG.missingDefaultFlowException(execution.getActivity().getId(), defaultSequenceFlow);
         }
       } else {
         //No sequence flow could be found, not even a default one
-        throw new ProcessEngineException("No outgoing sequence flow of the exclusive gateway '"
-              + execution.getActivity().getId() + "' could be selected for continuing the process");
+        throw LOG.stuckExecutionException(execution.getActivity().getId());
       }
     }
   }

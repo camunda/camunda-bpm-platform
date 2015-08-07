@@ -301,6 +301,10 @@ public class TaskResourceImpl implements TaskResource {
     return new LocalTaskVariablesResource(engine, taskId, objectMapper);
   }
 
+  public VariableResource getVariables() {
+    return new TaskVariablesResource(engine, taskId, objectMapper);
+  }
+
   public Map<String, VariableValueDto> getFormVariables(String variableNames, boolean deserializeValues) {
 
     final FormService formService = engine.getFormService();

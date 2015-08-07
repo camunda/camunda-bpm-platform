@@ -26,7 +26,7 @@
 			</boundaryEvent>	
 			
 			<serviceTask id="undoBookFlight" isForCompensation="true"
-				camunda:class="org.camunda.bpm.engine.test.bpmn.event.compensate.helper.UndoService">
+				camunda:class="org.camunda.bpm.engine.test.bpmn.event.compensate.helper.WaitStateUndoService">
 				<extensionElements>
 					<camunda:field name="counterName" stringValue="undoBookFlight" />
 				</extensionElements>
@@ -64,14 +64,14 @@
 				</boundaryEvent>
 
 				<serviceTask id="innerTxundoBookHotel" isForCompensation="true"
-					camunda:class="org.camunda.bpm.engine.test.bpmn.event.compensate.helper.UndoService">
+					camunda:class="org.camunda.bpm.engine.test.bpmn.event.compensate.helper.WaitStateUndoService">
 					<extensionElements>
 						<camunda:field name="counterName" stringValue="innerTxundoBookHotel" />
 					</extensionElements>
 				</serviceTask>
 				
 				<serviceTask id="innerTxundoBookFlight" isForCompensation="true"
-					camunda:class="org.camunda.bpm.engine.test.bpmn.event.compensate.helper.UndoService">
+					camunda:class="org.camunda.bpm.engine.test.bpmn.event.compensate.helper.WaitStateUndoService">
 					<extensionElements>
 						<camunda:field name="counterName" stringValue="innerTxundoBookFlight" />
 					</extensionElements>

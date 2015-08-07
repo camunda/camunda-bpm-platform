@@ -35,11 +35,12 @@ public class ResourceExecutableScript extends SourceExecutableScript {
     this.scriptResource = scriptResource;
   }
 
-  public Object execute(ScriptEngine engine, VariableScope variableScope, Bindings bindings) {
+  @Override
+  public Object evaluate(ScriptEngine engine, VariableScope variableScope, Bindings bindings) {
     if (scriptSource == null) {
       loadScriptSource();
     }
-    return super.execute(engine, variableScope, bindings);
+    return super.evaluate(engine, variableScope, bindings);
   }
 
   protected synchronized void loadScriptSource() {

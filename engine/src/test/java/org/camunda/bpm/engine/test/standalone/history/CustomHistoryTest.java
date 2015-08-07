@@ -31,12 +31,6 @@ public class CustomHistoryTest extends ResourceProcessEngineTestCase {
     super("org/camunda/bpm/engine/test/standalone/history/customhistory.camunda.cfg.xml");
   }
 
-  @Override
-  protected void closeDownProcessEngine() {
-    processEngine.close();
-    super.closeDownProcessEngine();
-  }
-
   @Deployment(resources = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
   public void testReceivesVariableUpdates() {
     // given

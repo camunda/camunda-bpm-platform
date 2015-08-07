@@ -388,11 +388,11 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     assertEquals("compensationStartEvent", compensationStartEvent.getProperty("type"));
     assertEquals(EventSubProcessStartEventActivityBehavior.class, compensationStartEvent.getActivityBehavior().getClass());
 
-    ScopeImpl compensationEventSubProcess = compensationStartEvent.getFlowScope();
+    ActivityImpl compensationEventSubProcess = (ActivityImpl) compensationStartEvent.getFlowScope();
     assertEquals(Boolean.TRUE, compensationEventSubProcess.getProperty(BpmnParse.PROPERTYNAME_IS_FOR_COMPENSATION));
 
     ScopeImpl subprocess = compensationEventSubProcess.getFlowScope();
-    assertEquals(compensationStartEvent.getActivityId(), subprocess.getProperty(BpmnParse.PROPERTYNAME_COMPENSATION_HANDLER_ID));
+    assertEquals(compensationEventSubProcess.getActivityId(), subprocess.getProperty(BpmnParse.PROPERTYNAME_COMPENSATION_HANDLER_ID));
   }
 
   @Deployment
@@ -436,6 +436,24 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
 
     repositoryService.deleteDeployment(repositoryService.createDeploymentQuery().singleResult().getId(), true);
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.compensationMiActivity.bpmn20.xml")
+  public void testParseCompensationHandlerOfMiActivity() {
+    ActivityImpl miActivity = findActivityInDeployedProcessDefinition("undoBookHotel");
+    ScopeImpl flowScope = miActivity.getFlowScope();
+
+    assertEquals("multiInstanceBody", flowScope.getProperty(BpmnParse.PROPERTYNAME_TYPE));
+    assertEquals("bookHotel" + BpmnParse.MULTI_INSTANCE_BODY_ID_SUFFIX, ((ActivityImpl) flowScope).getActivityId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.compensationMiSubprocess.bpmn20.xml")
+  public void testParseCompensationHandlerOfMiSubprocess() {
+    ActivityImpl miActivity = findActivityInDeployedProcessDefinition("undoBookHotel");
+    ScopeImpl flowScope = miActivity.getFlowScope();
+
+    assertEquals("multiInstanceBody", flowScope.getProperty(BpmnParse.PROPERTYNAME_TYPE));
+    assertEquals("scope" + BpmnParse.MULTI_INSTANCE_BODY_ID_SUFFIX, ((ActivityImpl) flowScope).getActivityId());
   }
 
   @Deployment

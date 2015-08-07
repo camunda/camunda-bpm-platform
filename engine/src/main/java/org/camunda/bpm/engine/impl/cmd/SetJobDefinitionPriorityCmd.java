@@ -14,18 +14,26 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.oplog.UserOperationLogContext;
+import org.camunda.bpm.engine.impl.oplog.UserOperationLogContextEntry;
+import org.camunda.bpm.engine.impl.oplog.UserOperationLogContextEntryBuilder;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 
 /**
  * @author Thorben Lindhauer
  *
  */
 public class SetJobDefinitionPriorityCmd implements Command<Void> {
+
+  public static final String JOB_DEFINITION_OVERRIDING_PRIORITY = "overridingPriority";
 
   protected String jobDefinitionId;
   protected Integer priority;
@@ -49,16 +57,23 @@ public class SetJobDefinitionPriorityCmd implements Command<Void> {
 
     checkAuthorization(commandContext, jobDefinition);
 
+    Integer currentPriority = jobDefinition.getOverridingJobPriority();
     jobDefinition.setJobPriority(priority);
+
+    UserOperationLogContext opLogContext = new UserOperationLogContext();
+    createJobDefinitionOperationLogEntry(opLogContext, currentPriority, jobDefinition);
 
     if (cascade && priority != null) {
       commandContext.getJobManager().updateJobPriorityByDefinitionId(jobDefinitionId, priority);
+      createCascadeJobsOperationLogEntry(opLogContext, jobDefinition);
     }
+
+    commandContext.getOperationLogManager().logUserOperations(opLogContext);
 
     return null;
   }
 
-  public void checkAuthorization(CommandContext commandContext, JobDefinitionEntity jobDefinition) {
+  protected void checkAuthorization(CommandContext commandContext, JobDefinitionEntity jobDefinition) {
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
 
     String processDefinitionKey = jobDefinition.getProcessDefinitionKey();
@@ -69,5 +84,33 @@ public class SetJobDefinitionPriorityCmd implements Command<Void> {
     }
   }
 
+  protected void createJobDefinitionOperationLogEntry(UserOperationLogContext opLogContext, Integer previousPriority,
+      JobDefinitionEntity jobDefinition) {
+
+    PropertyChange propertyChange = new PropertyChange(
+        JOB_DEFINITION_OVERRIDING_PRIORITY, previousPriority, jobDefinition.getOverridingJobPriority());
+
+    UserOperationLogContextEntry entry = UserOperationLogContextEntryBuilder
+        .entry(UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY, EntityTypes.JOB_DEFINITION)
+        .inContextOf(jobDefinition)
+        .propertyChanges(propertyChange)
+        .create();
+
+    opLogContext.addEntry(entry);
+  }
+
+  protected void createCascadeJobsOperationLogEntry(UserOperationLogContext opLogContext, JobDefinitionEntity jobDefinition) {
+    // old value is unknown
+    PropertyChange propertyChange = new PropertyChange(
+        SetJobPriorityCmd.JOB_PRIORITY_PROPERTY, null, jobDefinition.getOverridingJobPriority());
+
+    UserOperationLogContextEntry entry = UserOperationLogContextEntryBuilder
+        .entry(UserOperationLogEntry.OPERATION_TYPE_SET_PRIORITY, EntityTypes.JOB)
+        .inContextOf(jobDefinition)
+        .propertyChanges(propertyChange)
+        .create();
+
+    opLogContext.addEntry(entry);
+  }
 
 }

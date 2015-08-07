@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,19 +28,13 @@ public class ExpressionBeanAccessTest extends ResourceProcessEngineTestCase {
   public ExpressionBeanAccessTest() {
     super("org/camunda/bpm/engine/test/standalone/el/camunda.cfg.xml");
   }
-  
-  @Override
-  protected void closeDownProcessEngine() {
-    processEngine.close();
-    super.closeDownProcessEngine();
-  }
-  
+
   @Deployment
   public void testConfigurationBeanAccess() {
     // Exposed bean returns 'I'm exposed' when to-string is called in first service-task
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("expressionBeanAccess");
     assertEquals("I'm exposed", runtimeService.getVariable(pi.getId(), "exposedBeanResult"));
-    
+
     // After signaling, an expression tries to use a bean that is present in the configuration but
     // is not added to the beans-list
     try {

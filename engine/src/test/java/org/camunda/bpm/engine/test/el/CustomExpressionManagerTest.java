@@ -13,11 +13,13 @@
 
 package org.camunda.bpm.engine.test.el;
 
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.el.CommandContextFunctionMapper;
 import org.camunda.bpm.engine.impl.el.DateTimeFunctionMapper;
 import org.camunda.bpm.engine.impl.javax.el.FunctionMapper;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -25,6 +27,8 @@ import org.junit.Test;
  * @author Thorben Lindhauer
  */
 public class CustomExpressionManagerTest {
+
+  protected ProcessEngine engine;
 
   @Test
   public void testBuiltinFunctionMapperRegistration() {
@@ -37,7 +41,7 @@ public class CustomExpressionManagerTest {
     config.setExpressionManager(customExpressionManager);
 
     // when the engine is initialized
-    config.buildProcessEngine();
+    engine = config.buildProcessEngine();
 
     // then two default function mappers should be registered
     Assert.assertSame(customExpressionManager, config.getExpressionManager());
@@ -57,5 +61,13 @@ public class CustomExpressionManagerTest {
     }
 
     Assert.assertTrue(commandContextMapperFound && dateTimeMapperFound);
+  }
+
+  @After
+  public void tearDown() {
+    if (engine != null) {
+      engine.close();
+      engine = null;
+    }
   }
 }

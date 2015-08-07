@@ -21,14 +21,22 @@
 			<sequenceFlow sourceRef="startInScope" targetRef="bookHotel" />
 
 			<serviceTask id="bookHotel" 
-				camunda:class="org.camunda.bpm.engine.test.bpmn.event.compensate.helper.SetVariablesDelegate" />
+				camunda:class="org.camunda.bpm.engine.test.bpmn.event.compensate.helper.SetVariablesDelegate">
+              <extensionElements>
+                <camunda:field name="variable" stringValue="hotel" />
+              </extensionElements>
+            </serviceTask>
 				
 			<boundaryEvent id="compensateBookHotelEvt" name="Boundary event" attachedToRef="bookHotel">
 				<compensateEventDefinition />
 			</boundaryEvent>		
 			
 			<serviceTask id="undoBookHotel" isForCompensation="true" 
-				camunda:class="org.camunda.bpm.engine.test.bpmn.event.compensate.helper.GetVariablesDelegate" />
+				camunda:class="org.camunda.bpm.engine.test.bpmn.event.compensate.helper.GetVariablesDelegate">
+              <extensionElements>
+                <camunda:field name="variable" stringValue="hotel" />
+              </extensionElements>
+            </serviceTask>
 			
 			<sequenceFlow sourceRef="bookHotel" targetRef="endInScope" />
 			

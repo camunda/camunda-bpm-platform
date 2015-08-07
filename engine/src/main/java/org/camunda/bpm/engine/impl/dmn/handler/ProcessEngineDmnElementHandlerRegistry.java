@@ -14,7 +14,7 @@
 package org.camunda.bpm.engine.impl.dmn.handler;
 
 import org.camunda.bpm.model.dmn.instance.DecisionTable;
-import org.camunda.dmn.engine.impl.handler.DmnElementHandlerRegistryImpl;
+import org.camunda.bpm.dmn.engine.impl.handler.DmnElementHandlerRegistryImpl;
 
 public class ProcessEngineDmnElementHandlerRegistry extends DmnElementHandlerRegistryImpl {
 

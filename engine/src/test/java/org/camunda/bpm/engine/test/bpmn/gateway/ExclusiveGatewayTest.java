@@ -57,7 +57,7 @@ public class ExclusiveGatewayTest extends PluggableProcessEngineTestCase {
       runtimeService.startProcessInstanceByKey("exclusiveGwNoSeqFlowSelected", CollectionUtil.singletonMap("input", 4));
       fail();
     } catch (ProcessEngineException e) {
-      assertTextPresent("No outgoing sequence flow of the exclusive gateway " + "'exclusiveGw' could be selected for continuing the process", e.getMessage());
+      assertTextPresent("ENGINE-02004 No outgoing sequence flow for the element with id 'exclusiveGw' could be selected for continuing the process.", e.getMessage());
     }
   }
 

@@ -15,6 +15,9 @@ package org.camunda.bpm.engine.repository;
 
 import org.camunda.bpm.engine.RepositoryService;
 
+/**
+ * Entity of a deployed resource definition
+ */
 public interface ResourceDefinitionEntity extends ResourceDefinition {
 
   void setId(String id);

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="sid-0b0aaa25-3baf-4875-9d7a-0907d599a9ef" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="5.4.1" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL">
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://activiti.org/bpmn" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="sid-0b0aaa25-3baf-4875-9d7a-0907d599a9ef" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="5.4.1" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL">
   <dataStore id="FinancialAccountingSystem" isUnlimited="false" name="Financial Accounting System">
     <dataState id="DataState_1"/>
   </dataStore>
@@ -26,8 +26,18 @@
         <flowNodeRef>ServiceTask_1</flowNodeRef>
       </lane>
     </laneSet>
-    <userTask id="approveInvoice" camunda:formKey="embedded:app:forms/approve-invoice.html" camunda:assignee="${approver}" camunda:dueDate="${dateTime().plusWeeks(1).toDate()}" name="Approve Invoice">
+    <userTask id="approveInvoice" camunda:formKey="embedded:app:forms/approve-invoice.html" camunda:dueDate="${dateTime().plusWeeks(1).toDate()}" camunda:candidateGroups="${approverGroups}" name="Approve Invoice">
       <documentation>Approve the invoice (or not).</documentation>
+      <extensionElements>
+        <camunda:taskListener event="create">
+          <camunda:script scriptFormat="javascript"><![CDATA[if(!!task.getVariable('approver')) {
+  task.setAssignee(approver);
+}]]></camunda:script>
+        </camunda:taskListener>
+        <camunda:taskListener event="assignment">
+          <camunda:script scriptFormat="javascript"><![CDATA[task.setVariable('approver', task.getAssignee());]]></camunda:script>
+        </camunda:taskListener>
+      </extensionElements>
       <incoming>sequenceFlow_178</incoming>
       <incoming>reviewSuccessful</incoming>
       <outgoing>sequenceFlow_180</outgoing>
@@ -70,11 +80,10 @@ If data is missing, provide it.]]></documentation>
       <conditionExpression xsi:type="tFormalExpression">${clarified}</conditionExpression>
     </sequenceFlow>
     <dataStoreReference id="DataStoreReference_1" name="Financial Accounting System" dataStoreRef="FinancialAccountingSystem"/>
-    <userTask id="assignApprover" camunda:formKey="embedded:app:forms/assign-approver.html" camunda:assignee="demo" camunda:dueDate="${dateTime().plusDays(3).toDate()}" name="Assign Approver">
-      <documentation>Select the colleague who should approve this invoice.</documentation>
+    <businessRuleTask id="assignApprover" camunda:decisionRef="invoice-assign-approver" camunda:resultVariable="approverGroups" name="Assign Approver Group">
       <incoming>SequenceFlow_1</incoming>
       <outgoing>sequenceFlow_178</outgoing>
-    </userTask>
+    </businessRuleTask>
     <sequenceFlow id="sequenceFlow_178" isImmediate="true" sourceRef="assignApprover" targetRef="approveInvoice"/>
     <sequenceFlow id="SequenceFlow_2" name="" sourceRef="prepareBankTransfer" targetRef="ServiceTask_1"/>
     <startEvent id="StartEvent_1" camunda:formKey="embedded:app:forms/start-form.html" name="Invoice&#xA;received">

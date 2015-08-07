@@ -12,13 +12,13 @@
  */
 package org.camunda.bpm.engine.impl.scripting.engine;
 
+import org.camunda.bpm.dmn.engine.ScriptEngineResolver;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ScriptCompilationException;
 import org.camunda.bpm.engine.delegate.VariableScope;
 
 import javax.script.*;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
@@ -39,7 +39,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
  * @author Tom Baeyens
  * @author Daniel Meyer
  */
-public class ScriptingEngines {
+public class ScriptingEngines implements ScriptEngineResolver {
 
   private static Logger LOG = Logger.getLogger(ScriptingEngines.class.getName());
 

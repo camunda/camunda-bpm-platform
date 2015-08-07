@@ -52,7 +52,7 @@ public class SetTaskVariablesCmd extends AbstractSetVariableCmd {
 
   protected void logVariableOperation(AbstractVariableScope scope) {
     TaskEntity task = (TaskEntity) scope;
-    commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), task,
+    commandContext.getOperationLogManager().logVariableOperation(getLogEntryOperation(), null, task.getId(),
       PropertyChange.EMPTY_CHANGE);
   }
 }

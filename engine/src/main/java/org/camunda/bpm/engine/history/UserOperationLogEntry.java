@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.history;
 
 import java.util.Date;
+
 import org.camunda.bpm.engine.EntityTypes;
 
 
@@ -82,21 +83,27 @@ public interface UserOperationLogEntry {
   public static String OPERATION_TYPE_UPDATE = "Update";
   public static String OPERATION_TYPE_ACTIVATE = "Activate";
   public static String OPERATION_TYPE_SUSPEND = "Suspend";
+
   public static String OPERATION_TYPE_ADD_USER_LINK = "AddUserLink";
   public static String OPERATION_TYPE_DELETE_USER_LINK = "DeleteUserLink";
   public static String OPERATION_TYPE_ADD_GROUP_LINK = "AddGroupLink";
   public static String OPERATION_TYPE_DELETE_GROUP_LINK = "DeleteGroupLink";
+
   public static String OPERATION_TYPE_ADD_ATTACHMENT = "AddAttachment";
   public static String OPERATION_TYPE_DELETE_ATTACHMENT = "DeleteAttachment";
+
   public static String OPERATION_TYPE_SUSPEND_JOB_DEFINITION = "SuspendJobDefinition";
   public static String OPERATION_TYPE_ACTIVATE_JOB_DEFINITION = "ActivateJobDefinition";
   public static String OPERATION_TYPE_SUSPEND_PROCESS_DEFINITION = "SuspendProcessDefinition";
   public static String OPERATION_TYPE_ACTIVATE_PROCESS_DEFINITION = "ActivateProcessDefinition";
+
   public static String OPERATION_TYPE_MODIFY_PROCESS_INSTANCE = "ModifyProcessInstance";
+
   public static String OPERATION_TYPE_SUSPEND_JOB = "SuspendJob";
   public static String OPERATION_TYPE_ACTIVATE_JOB = "ActivateJob";
   public static String OPERATION_TYPE_SET_JOB_RETRIES = "SetJobRetries";
   public static String OPERATION_TYPE_SET_VARIABLE = "SetVariable";
+
   public static String OPERATION_TYPE_REMOVE_VARIABLE = "RemoveVariable";
   public static String OPERATION_TYPE_MODIFY_VARIABLE = "ModifyVariable";
 

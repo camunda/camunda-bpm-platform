@@ -12,8 +12,11 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
+import org.camunda.bpm.engine.impl.bpmn.behavior.CompensationEndEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateThrowCompensationEventActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
+import org.camunda.bpm.engine.impl.pvm.runtime.CompensationBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 
@@ -43,10 +46,16 @@ public abstract class PvmAtomicOperationActivityInstanceStart extends AbstractPv
     // if we start a scope activity, remember current activity instance in parent
     PvmExecutionImpl parent = execution.getParent();
     PvmActivity activity = execution.getActivity();
-    if(parent != null && execution.isScope() && activity.isScope() && (activity.getActivityBehavior() instanceof CompositeActivityBehavior)) {
+    if(parent != null && execution.isScope() && activity.isScope() && canHaveChildScopes(execution)) {
       parent.setActivityInstanceId(execution.getActivityInstanceId());
     }
 
+  }
+
+  protected boolean canHaveChildScopes(PvmExecutionImpl execution) {
+    PvmActivity activity = execution.getActivity();
+    return activity.getActivityBehavior() instanceof CompositeActivityBehavior
+        || CompensationBehavior.isCompensationThrowing(execution);
   }
 
 }

@@ -45,9 +45,8 @@ public class PvmAtomicOperationDeleteCascade implements PvmAtomicOperation {
   }
 
   protected PvmExecutionImpl findFirstLeaf(PvmExecutionImpl execution) {
-    List<? extends PvmExecutionImpl> executions = execution.getExecutions();
-    if (executions.size()>0) {
-      return findFirstLeaf(executions.get(0));
+    if (execution.hasChildren()) {
+      return findFirstLeaf(execution.getExecutions().get(0));
     }
     return execution;
   }

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  targetNamespace="Examples">
+  
+  <process id="compensateProcess">
+
+    <startEvent id="start" />
+    
+    <sequenceFlow sourceRef="start"  targetRef="bookHotel" />
+    
+    <userTask id="bookHotel" name="Book Hotel">
+      <multiInstanceLoopCharacteristics isSequential="false">
+        <loopCardinality>5</loopCardinality>
+      </multiInstanceLoopCharacteristics>
+    </userTask>    
+      
+    <boundaryEvent id="compensateBookHotelEvt" name="Boundary event" attachedToRef="bookHotel">
+      <compensateEventDefinition />
+    </boundaryEvent>  
+    
+    <userTask id="undoBookHotel" name="Cancel Hotel" isForCompensation="true" />
+
+    <sequenceFlow sourceRef="bookHotel" targetRef="task" />
+    
+    <userTask id="task" name="Request Vacation" />
+        
+    <sequenceFlow sourceRef="task" targetRef="exclusiveGateway" />
+    
+    <exclusiveGateway id="exclusiveGateway" default="acceptRequest" />
+    
+    <sequenceFlow id="acceptRequest" sourceRef="exclusiveGateway" targetRef="end" />
+        
+    <!-- throw compensation if vacation is not accepted -->
+    
+    <sequenceFlow id="rejectRequest" sourceRef="exclusiveGateway" targetRef="throwCompensate">
+      <conditionExpression xsi:type="tFormalExpression">${accept == false}</conditionExpression>
+    </sequenceFlow>
+    
+    <intermediateThrowEvent id="throwCompensate">
+      <compensateEventDefinition activityRef="bookHotel" waitForCompletion="true" />
+    </intermediateThrowEvent>
+    
+    <sequenceFlow sourceRef="throwCompensate" targetRef="end" />
+    
+    <endEvent id="end" />
+
+    <association associationDirection="One" sourceRef="compensateBookHotelEvt" targetRef="undoBookHotel" />
+        
+  </process>
+
+</definitions>

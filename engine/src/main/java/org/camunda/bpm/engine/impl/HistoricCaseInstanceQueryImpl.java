@@ -132,13 +132,23 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
   }
 
   public HistoricCaseInstanceQuery closedAfter(Date date) {
+    if (state!= null && (!state.equals(CaseExecutionState.CLOSED.getStateCode()))) {
+      throw new NotValidException("Already querying for case instance state '" + state + "'");
+    }
+
     closedAfter = date;
-    return closed();
+    state = CaseExecutionState.CLOSED.getStateCode();
+    return this;
   }
 
   public HistoricCaseInstanceQuery closedBefore(Date date) {
+    if (state!= null && (!state.equals(CaseExecutionState.CLOSED.getStateCode()))) {
+      throw new NotValidException("Already querying for case instance state '" + state + "'");
+    }
+
     closedBefore = date;
-    return closed();
+    state = CaseExecutionState.CLOSED.getStateCode();
+    return this;
   }
 
   public HistoricCaseInstanceQuery superCaseInstanceId(String superCaseInstanceId) {

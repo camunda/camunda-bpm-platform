@@ -43,7 +43,7 @@
         <include>org.camunda.bpm:camunda-engine:jar:*</include>
         <include>org.camunda.bpm.identity:camunda-identity-ldap:jar:*</include>
         <include>org.camunda.bpm.model:*:jar:*</include>
-        <include>org.camunda.dmn:*:jar:*</include>
+        <include>org.camunda.bpm.dmn:*:jar:*</include>
         <include>org.camunda.spin:*:jar</include>
         <include>org.camunda.connect:*:jar</include>
         <include>org.camunda.commons:*:jar</include>
@@ -90,7 +90,7 @@
         <include>org.camunda.bpm:camunda-engine:jar:*</include>
         <include>org.camunda.bpm.identity:camunda-identity-ldap:jar:*</include>
         <include>org.camunda.bpm.model:*:jar:*</include>
-        <include>org.camunda.dmn:*:jar:*</include>
+        <include>org.camunda.bpm.dmn:*:jar:*</include>
         <include>org.camunda.spin:*:jar</include>
         <include>org.camunda.connect:*:jar</include>
         <include>org.camunda.commons:*:jar</include>

@@ -92,7 +92,6 @@ public class ExecutionImpl extends PvmExecutionImpl implements
     createdExecution.setSequenceCounter(getSequenceCounter());
 
     // manage the bidirectional parent-child relation
-    getExecutions().add(createdExecution);
     createdExecution.setParent(this);
 
     // initialize the new execution
@@ -135,12 +134,15 @@ public class ExecutionImpl extends PvmExecutionImpl implements
     return parent;
   }
 
-  /** all updates need to go through this setter as subclasses can override this method */
-  public void setParent(PvmExecutionImpl parent) {
+  public void setParentExecution(PvmExecutionImpl parent) {
     this.parent = (ExecutionImpl) parent;
   }
 
   // executions ///////////////////////////////////////////////////////////////
+
+  public List<ExecutionImpl> getExecutionsAsCopy() {
+    return new ArrayList<ExecutionImpl>(getExecutions());
+  }
 
   /** ensures initialization and returns the non-null executions list */
   public List<ExecutionImpl> getExecutions() {

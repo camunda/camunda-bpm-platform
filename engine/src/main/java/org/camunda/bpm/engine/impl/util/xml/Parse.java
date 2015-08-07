@@ -24,6 +24,8 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.camunda.bpm.engine.BpmnParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseLogger;
 import org.camunda.bpm.engine.impl.util.io.InputStreamSource;
 import org.camunda.bpm.engine.impl.util.io.ResourceStreamSource;
 import org.camunda.bpm.engine.impl.util.io.StreamSource;
@@ -37,9 +39,10 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Tom Baeyens
  */
 public class Parse extends DefaultHandler {
-  
+
+  private static final BpmnParseLogger LOG = ProcessEngineLogger.PARSE_LOGGER;
   private static final Logger LOGGER = Logger.getLogger(Parse.class.getName());
-  
+
   private static final String JAXP_SCHEMA_SOURCE = "http://java.sun.com/xml/jaxp/properties/schemaSource";
   private static final String JAXP_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
   private static final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
@@ -87,7 +90,7 @@ public class Parse extends DefaultHandler {
     try {
       return sourceUrl(new URL(url));
     } catch (MalformedURLException e) {
-      throw new ProcessEngineException("malformed url: "+url, e);
+      throw LOG.malformedUrlException(url, e);
     }
   }
   
@@ -109,7 +112,7 @@ public class Parse extends DefaultHandler {
 
   protected void setStreamSource(StreamSource streamSource) {
     if (this.streamSource!=null) {
-      throw new ProcessEngineException("invalid: multiple sources "+this.streamSource+" and "+streamSource);
+      throw LOG.multipleSourcesException(this.streamSource, streamSource);
     }
     this.streamSource = streamSource;
   }
@@ -131,7 +134,7 @@ public class Parse extends DefaultHandler {
       saxParser.parse(inputStream, new ParseHandler(this));
       
     } catch (Exception e) { // any exception can happen (Activiti, Io, etc.)
-      throw new ProcessEngineException("couldn't parse '"+name+"': "+e.getMessage(), e);
+      throw LOG.parsingFailureException(name, e);
     }
     
     return this;
@@ -195,7 +198,7 @@ public class Parse extends DefaultHandler {
     try {
       saxParserFactory.setFeature("http://xml.org/sax/features/namespace-prefixes", true);
     } catch (Exception e) {
-      LOGGER.warning(e.getMessage());
+      LOG.logSettingSchemaResource(e);
     }
     this.schemaResource = schemaResource;
   }

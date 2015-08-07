@@ -15,6 +15,9 @@ package org.camunda.bpm.engine.repository;
 
 import org.camunda.bpm.engine.RepositoryService;
 
+/**
+ * Definition of a resource which was deployed
+ */
 public interface ResourceDefinition {
 
   /** unique identifier */

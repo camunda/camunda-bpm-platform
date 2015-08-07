@@ -12,10 +12,13 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime;
 
+import static org.camunda.bpm.engine.impl.bpmn.helper.CompensationUtil.SIGNAL_COMPENSATION_DONE;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -41,10 +44,10 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
+import org.camunda.bpm.engine.impl.tree.ActivityAwareScopeExecutionCollector;
 import org.camunda.bpm.engine.impl.tree.ExecutionWalker;
 import org.camunda.bpm.engine.impl.tree.FlowScopeWalker;
 import org.camunda.bpm.engine.impl.tree.ScopeCollector;
-import org.camunda.bpm.engine.impl.tree.ScopeExecutionCollector;
 
 /**
  * This class encapsulates legacy runtime behavior for the process engine.
@@ -356,14 +359,15 @@ public class LegacyBehavior {
       return propagatingExecution;
     }
 
-    ScopeExecutionCollector scopeExecutionCollector = new ScopeExecutionCollector();
+    ScopeImpl flowScope = propagatingExecution.getActivity().getFlowScope();
+    ActivityAwareScopeExecutionCollector scopeExecutionCollector = new ActivityAwareScopeExecutionCollector(flowScope);
     new ExecutionWalker(propagatingExecution)
       .addPreCollector(scopeExecutionCollector)
       .walkUntil();
     List<PvmExecutionImpl> scopeExecutions = scopeExecutionCollector.getExecutions();
 
     ScopeCollector scopeCollector = new ScopeCollector();
-    new FlowScopeWalker(propagatingExecution.getActivity().getFlowScope())
+    new FlowScopeWalker(flowScope)
       .addPreCollector(scopeCollector)
       .walkUntil();
 
@@ -547,7 +551,7 @@ public class LegacyBehavior {
    * compensation completes, the execution is signalled waiting at the boundary event.
    */
   public static boolean signalCancelBoundaryEvent(String signalName) {
-    return "compensationDone".equals(signalName);
+    return SIGNAL_COMPENSATION_DONE.equals(signalName);
   }
 
   /**

@@ -107,7 +107,7 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
       runtimeService.startProcessInstanceByKey("inclusiveGwNoSeqFlowSelected", CollectionUtil.singletonMap("input", 4));
       fail();
     } catch (ProcessEngineException e) {
-      assertTextPresent("No outgoing sequence flow of the inclusive gateway 'inclusiveGw' could be selected for continuing the process", e.getMessage());
+      assertTextPresent("ENGINE-02004 No outgoing sequence flow for the element with id 'inclusiveGw' could be selected for continuing the process.", e.getMessage());
     }
   }
 

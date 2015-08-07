@@ -24,7 +24,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +33,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
@@ -46,6 +46,9 @@ import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
+import org.camunda.bpm.dmn.engine.DmnEngine;
+import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
+import org.camunda.bpm.dmn.scriptengine.DmnScriptEngineFactory;
 import org.camunda.bpm.engine.ArtifactFactory;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.CaseService;
@@ -102,10 +105,9 @@ import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.delegate.DefaultDelegateInterceptor;
 import org.camunda.bpm.engine.impl.digest.PasswordEncryptor;
 import org.camunda.bpm.engine.impl.digest.ShaHashDigest;
+import org.camunda.bpm.engine.impl.dmn.configuration.ProcessEngineDmnEngineConfiguration;
 import org.camunda.bpm.engine.impl.dmn.deployer.DmnDeployer;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionManager;
-import org.camunda.bpm.engine.impl.dmn.handler.DecisionDefinitionHandler;
-import org.camunda.bpm.engine.impl.dmn.handler.ProcessEngineDmnElementHandlerRegistry;
 import org.camunda.bpm.engine.impl.el.CommandContextFunctionMapper;
 import org.camunda.bpm.engine.impl.el.DateTimeFunctionMapper;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
@@ -244,15 +246,6 @@ import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
-import org.camunda.bpm.model.dmn.instance.Decision;
-import org.camunda.bpm.model.dmn.instance.DecisionTable;
-import org.camunda.dmn.engine.handler.DmnElementHandlerRegistry;
-import org.camunda.dmn.engine.impl.handler.DmnElementHandlerRegistryImpl;
-import org.camunda.dmn.engine.impl.transform.DmnTransformFactoryImpl;
-import org.camunda.dmn.engine.impl.transform.DmnTransformerImpl;
-import org.camunda.dmn.engine.transform.DmnTransformFactory;
-import org.camunda.dmn.engine.transform.DmnTransformListener;
-import org.camunda.dmn.engine.transform.DmnTransformer;
 
 
 /**
@@ -392,8 +385,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected DefaultCmmnElementHandlerRegistry cmmnElementHandlerRegistry;
 
   // dmn
-  protected DmnTransformFactory dmnTransformFactory;
-  protected DmnElementHandlerRegistry dmnElementHandlerRegistry;
+  protected DmnEngineConfiguration dmnEngineConfiguration;
+  protected DmnEngine dmnEngine;
 
   protected HistoryLevel historyLevel;
 
@@ -408,9 +401,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected List<CmmnTransformListener> customPreCmmnTransformListeners;
   protected List<CmmnTransformListener> customPostCmmnTransformListeners;
-
-  protected List<DmnTransformListener> customPreDmnTransformListeners;
-  protected List<DmnTransformListener> customPostDmnTransformListeners;
 
   protected Map<Object, Object> beans;
 
@@ -496,6 +486,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   // buildProcessEngine ///////////////////////////////////////////////////////
 
+  @Override
   public ProcessEngine buildProcessEngine() {
     init();
     processEngine = new ProcessEngineImpl(this);
@@ -519,6 +510,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initFormTypes();
     initFormFieldValidators();
     initScripting();
+    initDmnEngine();
     initBusinessCalendarManager();
     initCommandContextFactory();
     initTransactionContextFactory();
@@ -859,6 +851,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         configuration.setEnvironment(environment);
         configuration = parser.parse();
 
+        configuration.setDefaultStatementTimeout(jdbcStatementTimeout);
+
         sqlSessionFactory = new DefaultSqlSessionFactory(configuration);
 
       } catch (Exception e) {
@@ -1047,7 +1041,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected List<BpmnParseListener> getDefaultBPMNParseListeners() {
     List<BpmnParseListener> defaultListeners = new ArrayList<BpmnParseListener>();
-    if (!historyLevel.equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
+    if (!HistoryLevel.HISTORY_LEVEL_NONE.equals(historyLevel)) {
       defaultListeners.add(new HistoryParseListener(historyLevel, historyEventProducer));
     }
     if(isMetricsEnabled) {
@@ -1086,7 +1080,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected List<CmmnTransformListener> getDefaultCmmnTransformListeners() {
     List<CmmnTransformListener> defaultListener = new ArrayList<CmmnTransformListener>();
-    if (!historyLevel.equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
+    if (!HistoryLevel.HISTORY_LEVEL_NONE.equals(historyLevel)) {
       defaultListener.add(new CmmnHistoryTransformListener(historyLevel, cmmnHistoryEventProducer));
     }
     if(isMetricsEnabled) {
@@ -1098,33 +1092,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected DmnDeployer getDmnDeployer() {
     DmnDeployer dmnDeployer = new DmnDeployer();
     dmnDeployer.setIdGenerator(idGenerator);
-
-    if (dmnTransformFactory == null) {
-      dmnTransformFactory = new DmnTransformFactoryImpl();
-    }
-
-    if (dmnElementHandlerRegistry == null) {
-      dmnElementHandlerRegistry = new ProcessEngineDmnElementHandlerRegistry();
-    }
-
-    DmnTransformer dmnTransformer = new DmnTransformerImpl(dmnTransformFactory, dmnElementHandlerRegistry);
-
-    List<DmnTransformListener> transformListeners = dmnTransformer.getTransformListeners();
-    if (customPreDmnTransformListeners != null) {
-      transformListeners.addAll(customPreDmnTransformListeners);
-    }
-    transformListeners.addAll(getDefaultDmnTransformListeners());
-    if (customPostDmnTransformListeners != null) {
-      transformListeners.addAll(customPostDmnTransformListeners);
-    }
-
-    dmnDeployer.setTransformer(dmnTransformer);
-
+    dmnDeployer.setTransformer(dmnEngineConfiguration.getTransformer());
     return dmnDeployer;
-  }
-
-  protected List<DmnTransformListener> getDefaultDmnTransformListeners() {
-    return Collections.emptyList();
   }
 
   // job executor /////////////////////////////////////////////////////////////
@@ -1218,10 +1187,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             this.historyLevel = historyLevel;
           }
         }
-
       }
 
-      if(historyLevel == null) {
+
+      // do allow null for history level in case of "auto"
+      if(historyLevel == null && !ProcessEngineConfiguration.HISTORY_AUTO.equalsIgnoreCase(history)) {
         throw new ProcessEngineException("invalid history level: "+history);
       }
     }
@@ -1418,6 +1388,20 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
   }
 
+  protected void initDmnEngine() {
+    if (dmnEngine == null) {
+      if (dmnEngineConfiguration == null) {
+        dmnEngineConfiguration = new ProcessEngineDmnEngineConfiguration(scriptingEngines);
+      }
+      dmnEngine = dmnEngineConfiguration.buildEngine();
+    }
+    else if (dmnEngineConfiguration == null) {
+      dmnEngineConfiguration = dmnEngine.getConfiguration();
+    }
+
+    scriptingEngines.addScriptEngineFactory(new DmnScriptEngineFactory(dmnEngine));
+  }
+
   protected void initExpressionManager() {
     if (expressionManager==null) {
       expressionManager = new ExpressionManager(beans);
@@ -1560,6 +1544,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   // getters and setters //////////////////////////////////////////////////////
 
+  @Override
   public String getProcessEngineName() {
     return processEngineName;
   }
@@ -1572,6 +1557,19 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.historyLevel = historyLevel;
   }
 
+  public HistoryLevel getDefaultHistoryLevel() {
+    if (historyLevels != null) {
+      for (HistoryLevel historyLevel : historyLevels) {
+        if (HISTORY_DEFAULT != null && HISTORY_DEFAULT.equalsIgnoreCase(historyLevel.getName())) {
+          return historyLevel;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  @Override
   public ProcessEngineConfigurationImpl setProcessEngineName(String processEngineName) {
     this.processEngineName = processEngineName;
     return this;
@@ -2660,6 +2658,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public ProcessEngineConfigurationImpl setCustomHistoryLevels(List<HistoryLevel> customHistoryLevels) {
     this.customHistoryLevels = customHistoryLevels;
     return this;
+  }
+
+  public List<HistoryLevel> getHistoryLevels() {
+    return historyLevels;
   }
 
   public List<HistoryLevel> getCustomHistoryLevels() {

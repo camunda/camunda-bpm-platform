@@ -7,6 +7,13 @@
   </div>
 
   <div class="control-group">
+    <label class="control-label">Invoice Document</label>
+    <div class="controls">
+      <a cam-file-download="invoiceDocument"></a>
+    </div>
+  </div>
+
+  <div class="control-group">
     <label class="control-label">Creditor</label>
     <div class="controls">
       <input cam-variable-name="creditor"
@@ -22,6 +29,16 @@
              type="text"
              name="amount"
              class="form-control" />
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label">Invoice Category</label>
+    <div class="controls">
+      <select cam-variable-name="invoiceCategory"
+              class="form-control">
+        <option>Travel Expenses</option>
+        <option>Misc</option>
+      </select>
     </div>
   </div>
   <div class="control-group">

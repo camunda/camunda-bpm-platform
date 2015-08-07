@@ -270,7 +270,7 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
         {
           // if all child executions have been cancelled
           // or this execution has ended executing its scope, it can be reused
-          if (scopeExecution.getExecutions().isEmpty() &&
+          if (!scopeExecution.hasChildren() &&
               (scopeExecution.getActivity() == null || scopeExecution.isEnded())) {
             // reuse the scope execution
             instantiate(scopeExecution, activitiesToInstantiate, elementToInstantiate);

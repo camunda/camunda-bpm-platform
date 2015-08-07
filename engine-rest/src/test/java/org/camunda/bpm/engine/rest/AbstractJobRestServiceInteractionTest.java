@@ -81,6 +81,7 @@ public abstract class AbstractJobRestServiceInteractionTest extends AbstractRest
       .exceptionMessage(MockProvider.EXAMPLE_JOB_NO_EXCEPTION_MESSAGE)
       .dueDate(new Date())
       .priority(MockProvider.EXAMPLE_JOB_PRIORITY)
+      .jobDefinitionId(MockProvider.EXAMPLE_JOB_DEFINITION_ID)
       .build();
 
     when(mockQuery.singleResult()).thenReturn(mockedJob);
@@ -173,6 +174,7 @@ public abstract class AbstractJobRestServiceInteractionTest extends AbstractRest
     .body("executionId", equalTo(MockProvider.EXAMPLE_EXECUTION_ID))
     .body("exceptionMessage", equalTo(MockProvider.EXAMPLE_JOB_NO_EXCEPTION_MESSAGE))
     .body("priority", equalTo(MockProvider.EXAMPLE_JOB_PRIORITY))
+    .body("jobDefinitionId", equalTo(MockProvider.EXAMPLE_JOB_DEFINITION_ID))
     .when().get(SINGLE_JOB_RESOURCE_URL);
 
     InOrder inOrder = inOrder(mockQuery);

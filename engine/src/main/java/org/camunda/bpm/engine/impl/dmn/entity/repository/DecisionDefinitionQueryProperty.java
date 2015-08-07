@@ -15,6 +15,9 @@ package org.camunda.bpm.engine.impl.dmn.entity.repository;
 import org.camunda.bpm.engine.impl.QueryPropertyImpl;
 import org.camunda.bpm.engine.query.QueryProperty;
 
+/**
+ * Properties to sort decision definition queries by
+ */
 public interface DecisionDefinitionQueryProperty {
 
   public static final QueryProperty DECISION_DEFINITION_ID = new QueryPropertyImpl("ID_");

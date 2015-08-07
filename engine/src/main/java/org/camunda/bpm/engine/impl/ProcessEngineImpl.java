@@ -64,9 +64,8 @@ public class ProcessEngineImpl implements ProcessEngine {
   protected TransactionContextFactory transactionContextFactory;
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
-
-
   public ProcessEngineImpl(ProcessEngineConfigurationImpl processEngineConfiguration) {
+
     this.processEngineConfiguration = processEngineConfiguration;
     this.name = processEngineConfiguration.getProcessEngineName();
     this.repositoryService = processEngineConfiguration.getRepositoryService();

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Definitions xmlns="http://www.omg.org/spec/DMN/20130901"
+             xmlns:camunda="http://camunda.org/schema/1.0/dmn"
+             id="definitions"
+             name="camunda"
+             namespace="http://camunda.org/dmn">
+  <Decision id="testDecision">
+    <DecisionTable id="table">
+      <clause id="result" camunda:output="result" >
+        <outputEntry id="output1">
+          <text>not okay</text>
+        </outputEntry>
+      </clause>
+      <rule id="rule">
+        <conclusion>output1</conclusion>
+      </rule>
+    </DecisionTable>
+  </Decision>
+</Definitions>
+

@@ -107,7 +107,7 @@ public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInsta
       instruction.execute(commandContext);
     }
 
-    if (processInstance.getExecutions().isEmpty() && processInstance.isEnded()) {
+    if (!processInstance.hasChildren() && processInstance.isEnded()) {
       // process instance has ended regularly but this has not been propagated yet
       // due to preserveScope setting
       processInstance.propagateEnd();

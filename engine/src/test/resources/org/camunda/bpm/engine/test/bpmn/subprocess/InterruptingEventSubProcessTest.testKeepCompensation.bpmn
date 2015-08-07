@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_vyCYMIHNEeOgYaPSoyiEDA" targetNamespace="http://camunda.org/schema/1.0/bpmn">
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_vyCYMIHNEeOgYaPSoyiEDA" exporter="camunda modeler" exporterVersion="2.7.0" targetNamespace="http://camunda.org/schema/1.0/bpmn">
   <bpmn2:process id="process" isExecutable="true">
     <bpmn2:startEvent id="start">
       <bpmn2:outgoing>SequenceFlow_10</bpmn2:outgoing>
@@ -19,13 +19,7 @@
       </bpmn2:endEvent>
       <bpmn2:sequenceFlow id="SequenceFlow_4" name="" sourceRef="taskAfterMessageStartEvent" targetRef="end2"/>
     </bpmn2:subProcess>
-    <bpmn2:userTask id="taskAfterCompensation" isForCompensation="true">
-      <bpmn2:outgoing>SequenceFlow_8</bpmn2:outgoing>
-    </bpmn2:userTask>
-    <bpmn2:endEvent id="end3">
-      <bpmn2:incoming>SequenceFlow_8</bpmn2:incoming>
-    </bpmn2:endEvent>
-    <bpmn2:sequenceFlow id="SequenceFlow_8" name="" sourceRef="taskAfterCompensation" targetRef="end3"/>
+    <bpmn2:userTask id="taskAfterCompensation" isForCompensation="true"/>
     <bpmn2:endEvent id="end1">
       <bpmn2:incoming>SequenceFlow_12</bpmn2:incoming>
     </bpmn2:endEvent>
@@ -96,13 +90,6 @@
       <bpmndi:BPMNShape id="_BPMNShape_UserTask_6" bpmnElement="taskAfterCompensation">
         <dc:Bounds height="80.0" width="100.0" x="409.0" y="246.0"/>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="_BPMNShape_EndEvent_6" bpmnElement="end3">
-        <dc:Bounds height="36.0" width="36.0" x="559.0" y="268.0"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_8" bpmnElement="SequenceFlow_8" sourceElement="_BPMNShape_UserTask_6" targetElement="_BPMNShape_EndEvent_6">
-        <di:waypoint xsi:type="dc:Point" x="509.0" y="286.0"/>
-        <di:waypoint xsi:type="dc:Point" x="559.0" y="286.0"/>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="_BPMNShape_ServiceTask_3" bpmnElement="ServiceTask_1">
         <dc:Bounds height="80.0" width="100.0" x="290.0" y="106.0"/>
       </bpmndi:BPMNShape>

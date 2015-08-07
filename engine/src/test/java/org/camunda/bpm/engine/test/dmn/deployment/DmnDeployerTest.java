@@ -55,6 +55,37 @@ public class DmnDeployerTest extends PluggableProcessEngineTestCase {
     repositoryService.deleteDeployment(deploymentId);
   }
 
+  public void testDmnDeploymentWithDmnSuffix() {
+    String resourceName = "org/camunda/bpm/engine/test/dmn/deployment/DmnDeployerTest.testDmnDeployment.dmn";
+    String deploymentId = repositoryService
+      .createDeployment()
+      .addClasspathResource(resourceName)
+      .deploy()
+      .getId();
+
+    // there should be one deployment
+    DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
+
+    assertEquals(1, deploymentQuery.count());
+
+    // there should be one case definition
+    DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
+    assertEquals(1, query.count());
+
+    DecisionDefinition decisionDefinition = query.singleResult();
+
+    assertTrue(decisionDefinition.getId().startsWith("decision:1:"));
+    assertEquals("http://camunda.org/dmn", decisionDefinition.getCategory());
+    assertEquals("CheckOrder", decisionDefinition.getName());
+    assertEquals("decision", decisionDefinition.getKey());
+    assertEquals(1, decisionDefinition.getVersion());
+    assertEquals(resourceName, decisionDefinition.getResourceName());
+    assertEquals(deploymentId, decisionDefinition.getDeploymentId());
+    assertNull(decisionDefinition.getDiagramResourceName());
+
+    repositoryService.deleteDeployment(deploymentId);
+  }
+
   @Deployment
   public void testLongDecisionDefinitionKey() {
     DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();

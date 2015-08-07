@@ -224,8 +224,6 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     createdExecution.setSequenceCounter(getSequenceCounter());
 
     // manage the bidirectional parent-child relation
-    ensureExecutionsInitialized();
-    executions.add(createdExecution);
     createdExecution.setParent(this);
 
     // initialize the new execution
@@ -560,10 +558,13 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   // executions ///////////////////////////////////////////////////////////////
 
-  /** ensures initialization and returns the non-null executions list */
   public List<ExecutionEntity> getExecutions() {
     ensureExecutionsInitialized();
     return executions;
+  }
+
+  public List<ExecutionEntity> getExecutionsAsCopy() {
+    return new ArrayList<ExecutionEntity>(getExecutions());
   }
 
   protected void ensureExecutionsInitialized() {
@@ -732,7 +733,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
   }
 
-  public void setParent(PvmExecutionImpl parent) {
+  public void setParentExecution(PvmExecutionImpl parent) {
     this.parent = (ExecutionEntity) parent;
 
     if (parent != null) {

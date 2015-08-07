@@ -140,7 +140,7 @@ public class DeploymentManager extends AbstractManager {
 
     deleteCaseDeployment(deploymentId, cascade);
 
-    deleteDecisionDeployment(deploymentId, cascade);
+    deleteDecisionDeployment(deploymentId);
 
     getResourceManager().deleteResourcesByDeploymentId(deploymentId);
 
@@ -181,7 +181,7 @@ public class DeploymentManager extends AbstractManager {
     }
   }
 
-  protected void deleteDecisionDeployment(String deploymentId, boolean cascade) {
+  protected void deleteDecisionDeployment(String deploymentId) {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
     if (processEngineConfiguration.isDmnEnabled()) {
       DecisionDefinitionManager decisionDefinitionManager = getDecisionDefinitionManager();

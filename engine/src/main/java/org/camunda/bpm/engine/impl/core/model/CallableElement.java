@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -26,31 +25,11 @@ import org.camunda.bpm.engine.variable.Variables;
  * @author Roman Smirnov
  *
  */
-public class CallableElement {
+public class CallableElement extends BaseCallableElement {
 
-  protected ParameterValueProvider definitionKeyValueProvider;
-  protected CallableElementBinding binding;
-  protected ParameterValueProvider versionValueProvider;
   protected ParameterValueProvider businessKeyValueProvider;
   protected List<CallableElementParameter> inputs;
   protected List<CallableElementParameter> outputs;
-  protected String deploymentId;
-
-  public enum CallableElementBinding {
-    LATEST("latest"),
-    DEPLOYMENT("deployment"),
-    VERSION("version");
-
-    private String value;
-
-    private CallableElementBinding(String value) {
-      this.value = value;
-    }
-
-    public String getValue() {
-      return value;
-    }
-  }
 
   public CallableElement() {
     this.inputs = new ArrayList<CallableElementParameter>();
@@ -59,74 +38,9 @@ public class CallableElement {
 
   // definitionKey ////////////////////////////////////////////////////////////////
 
-  public String getDefinitionKey(VariableScope variableScope) {
-    Object result = definitionKeyValueProvider.getValue(variableScope);
-
-    if (result != null && !(result instanceof String)) {
-      throw new ClassCastException("Cannot cast '"+result+"' to String");
-    }
-
-    return (String) result;
-  }
-
-  public ParameterValueProvider getDefinitionKeyValueProvider() {
-    return definitionKeyValueProvider;
-  }
-
-  public void setDefinitionKeyValueProvider(ParameterValueProvider definitionKey) {
-    this.definitionKeyValueProvider = definitionKey;
-  }
-
   // binding /////////////////////////////////////////////////////////////////////
 
-  public CallableElementBinding getBinding() {
-    return binding;
-  }
-
-  public void setBinding(CallableElementBinding binding) {
-    this.binding = binding;
-  }
-
-  public boolean isLatestBinding() {
-    CallableElementBinding binding = getBinding();
-    return binding == null || CallableElementBinding.LATEST.equals(binding);
-  }
-
-  public boolean isDeploymentBinding() {
-    CallableElementBinding binding = getBinding();
-    return CallableElementBinding.DEPLOYMENT.equals(binding);
-  }
-
-  public boolean isVersionBinding() {
-    CallableElementBinding binding = getBinding();
-    return CallableElementBinding.VERSION.equals(binding);
-  }
-
   // version //////////////////////////////////////////////////////////////////////
-
-  public Integer getVersion(VariableScope variableScope) {
-    Object result = versionValueProvider.getValue(variableScope);
-
-    if (result != null) {
-      if (result instanceof String) {
-        return Integer.valueOf((String) result);
-      } else if (result instanceof Integer) {
-        return (Integer) result;
-      } else {
-        throw new ProcessEngineException("It is not possible to transform '"+result+"' into an integer.");
-      }
-    }
-
-    return null;
-  }
-
-  public ParameterValueProvider getVersionValueProvider() {
-    return versionValueProvider;
-  }
-
-  public void setVersionValueProvider(ParameterValueProvider version) {
-    this.versionValueProvider = version;
-  }
 
   // businessKey /////////////////////////////////////////////////////////////////
 
@@ -213,13 +127,5 @@ public class CallableElement {
   }
 
   // deployment id //////////////////////////////////////////////////////////////
-
-  public String getDeploymentId() {
-    return deploymentId;
-  }
-
-  public void setDeploymentId(String deploymentId) {
-    this.deploymentId = deploymentId;
-  }
 
 }

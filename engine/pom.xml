@@ -27,14 +27,19 @@
     </dependency>
 
     <dependency>
-      <groupId>org.camunda.dmn</groupId>
+      <groupId>org.camunda.bpm.dmn</groupId>
       <artifactId>camunda-scriptengine-dmn</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>org.camunda.dmn</groupId>
+          <groupId>org.camunda.bpm.dmn</groupId>
           <artifactId>camunda-scriptengine-juel</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.commons</groupId>
+      <artifactId>camunda-commons-logging</artifactId>
     </dependency>
 
     <dependency>
@@ -167,7 +172,7 @@
 
 
   <properties>
-      <test.includes></test.includes>
+      <test.includes />
       <!-- without a special test profile we don't want to exclude anything, this expressions should never match -->
       <test.excludes>$.</test.excludes>
       <history.level>full</history.level>
@@ -423,6 +428,7 @@
                 <exclude>**/HistoricVariableInstanceAuthorizationTest.java</exclude>
                 <exclude>**/CompositeDbHistoryEventHandlerTest.java</exclude>
                 <exclude>**/CompositeHistoryEventHandlerTest.java</exclude>
+                <exclude>**/CompensateEventHistoryTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -462,6 +468,7 @@
                 <exclude>**/DbDeadlockTest.java</exclude>
                 <exclude>**/CompositeDbHistoryEventHandlerTest.java</exclude>
                 <exclude>**/CompositeHistoryEventHandlerTest.java</exclude>
+                <exclude>**/CompensateEventHistoryTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>

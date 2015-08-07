@@ -20,20 +20,20 @@
       <artifactId>camunda-engine</artifactId>
       <scope>provided</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
       <version>3.0.1</version>
       <scope>provided</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
@@ -53,5 +53,46 @@
       </plugin>
     </plugins>
   </build>
+
+   <profiles>
+    <profile>
+      <id>develop</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.camunda.bpm.webapp</groupId>
+          <artifactId>camunda-webapp-tomcat-standalone</artifactId>
+          <version>${project.version}</version>
+          <type>war</type>
+        </dependency>
+      </dependencies>
+      <build>
+        <resources>
+          <resource>
+            <!-- override processes.xml, providing custom process engine -->
+            <directory>src/develop/resources</directory>
+          </resource>
+          <resource>
+            <directory>src/main/resources</directory>
+          </resource>
+        </resources>
+        <plugins>
+          <plugin>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>jetty-maven-plugin</artifactId>
+            <version>8.1.14.v20131031</version>
+            <configuration>
+              <webAppConfig>
+                <contextPath>/camunda</contextPath>
+                <resourceBases>
+                  <resourceBase>${project.basedir}/src/main/webapp</resourceBase>
+                  <resourceBase>${project.basedir}/src/develop/webapp</resourceBase>
+                </resourceBases>
+              </webAppConfig>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>

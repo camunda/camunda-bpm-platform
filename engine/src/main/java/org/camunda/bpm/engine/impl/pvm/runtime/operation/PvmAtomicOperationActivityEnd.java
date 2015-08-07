@@ -39,12 +39,7 @@ public class PvmAtomicOperationActivityEnd implements PvmAtomicOperation {
   public void execute(PvmExecutionImpl execution) {
     // restore activity instance id
     if (execution.getActivityInstanceId() == null) {
-      if (execution.isProcessInstanceExecution()) {
-        execution.setActivityInstanceId(execution.getId());
-      }
-      else {
-        execution.setActivityInstanceId(execution.getParentActivityInstanceId());
-      }
+      execution.setActivityInstanceId(execution.getParentActivityInstanceId());
     }
 
     PvmActivity activity = execution.getActivity();
