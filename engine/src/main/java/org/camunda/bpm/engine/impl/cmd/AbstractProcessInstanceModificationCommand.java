@@ -19,7 +19,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.impl.ActivityExecutionMapping;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -187,12 +186,6 @@ public abstract class AbstractProcessInstanceModificationCommand implements Comm
 
   protected String describeFailure(String detailMessage) {
     return "Cannot perform instruction: " + describe() + "; " + detailMessage;
-  }
-
-  protected void ensureNotSuspended(ExecutionEntity processInstance) {
-    if (processInstance.isSuspended()) {
-      throw new SuspendedEntityInteractionException("Execution entity " + processInstance.getId() + " is suspended.");
-    }
   }
 
   protected abstract String describe();

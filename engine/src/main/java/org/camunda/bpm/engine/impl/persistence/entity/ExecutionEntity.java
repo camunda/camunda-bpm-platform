@@ -230,6 +230,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     createdExecution.setProcessDefinition(getProcessDefinition());
     createdExecution.setProcessInstance(getProcessInstance());
     createdExecution.setActivity(getActivity());
+    createdExecution.setSuspensionState(getSuspensionState());
 
     // make created execution start in same activity instance
     createdExecution.activityInstanceId = activityInstanceId;

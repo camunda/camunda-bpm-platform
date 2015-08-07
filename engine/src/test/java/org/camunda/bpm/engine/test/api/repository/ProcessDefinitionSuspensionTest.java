@@ -2288,7 +2288,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
-  public void testModifiedProcessInstanceForSuspendProcessDefinition() {
+  public void testStartBeforeActivityForSuspendProcessDefinition() {
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
 
     //start process instance
@@ -2298,14 +2298,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     // Suspend process definition
     repositoryService.suspendProcessDefinitionById(processDefinition.getId(), true, null);
 
-    // try to cancel activity instance for suspended processDefinition
-    try {
-      runtimeService.createProcessInstanceModification(processInstance.getId()).cancelAllForActivity("theTask").execute();
-      fail("Exception is expected but not thrown");
-    } catch(SuspendedEntityInteractionException e) {
-      assertTextPresentIgnoreCase("is suspended", e.getMessage());
-    }
-
     // try to start before activity for suspended processDefinition
     try {
       runtimeService.createProcessInstanceModification(processInstance.getId()).startBeforeActivity("theTask").execute();
@@ -2313,17 +2305,22 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     } catch(SuspendedEntityInteractionException e) {
       assertTextPresentIgnoreCase("is suspended", e.getMessage());
     }
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testStartAfterActivityForSuspendProcessDefinition() {
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+
+    //start process instance
+    runtimeService.startProcessInstanceById(processDefinition.getId());
+    ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
+
+    // Suspend process definition
+    repositoryService.suspendProcessDefinitionById(processDefinition.getId(), true, null);
 
     // try to start after activity for suspended processDefinition
     try {
       runtimeService.createProcessInstanceModification(processInstance.getId()).startAfterActivity("theTask").execute();
-      fail("Exception is expected but not thrown");
-    } catch(SuspendedEntityInteractionException e) {
-      assertTextPresentIgnoreCase("is suspended", e.getMessage());
-    }
-
-    try {
-      runtimeService.createProcessInstanceModification(processInstance.getId()).startTransition("test").execute();
       fail("Exception is expected but not thrown");
     } catch(SuspendedEntityInteractionException e) {
       assertTextPresentIgnoreCase("is suspended", e.getMessage());
