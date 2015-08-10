@@ -4,7 +4,9 @@
   xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
   
-  <process id="subProcessCompensationHandler">
+  <message id="messageId" name="Message" />
+  
+  <process id="subProcessCompensationHandlerWithEventSubprocess">
 
     <startEvent id="start" />
     
@@ -31,6 +33,19 @@
       <userTask id="subProcessTask" />
       <sequenceFlow sourceRef="subProcessTask" targetRef="subProcessEnd" />
       <endEvent id="subProcessEnd" />
+      
+      <!-- event subprocess -->
+      <subProcess id="eventSubProcess" triggeredByEvent="true">
+        <startEvent id="eventSubProcessStart" isInterrupting="true">
+          <messageEventDefinition messageRef="messageId" />
+        </startEvent>
+        <sequenceFlow sourceRef="eventSubProcessStart" targetRef="eventSubProcessTask" />
+        
+        <userTask id="eventSubProcessTask" />
+        <sequenceFlow sourceRef="eventSubProcessTask" targetRef="eventSubProcessEnd" />
+        
+        <endEvent id="eventSubProcessEnd" />
+      </subProcess>
     </subProcess>  
     <association associationDirection="One" sourceRef="compensateBoundaryEvent" targetRef="compensationHandler" />
   </process>

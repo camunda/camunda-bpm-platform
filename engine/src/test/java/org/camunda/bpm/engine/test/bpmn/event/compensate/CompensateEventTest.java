@@ -27,8 +27,10 @@ import java.util.Map;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.event.MessageEventHandler;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -842,7 +844,7 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
 
     taskService.complete(subProcessTask.getId());
 
-    // and the task following compensation should can be successfully completed
+    // and the task following compensation can be successfully completed
     Task afterCompensationTask = taskService.createTaskQuery().singleResult();
     assertNotNull(afterCompensationTask);
     assertEquals("beforeEnd", afterCompensationTask.getTaskDefinitionKey());
@@ -886,6 +888,79 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
     runtimeService.deleteProcessInstance(processInstance.getId(), null);
 
     // then the process instance is ended
+    assertProcessEnded(processInstance.getId());
+  }
+
+  /**
+   * CAM-4387
+   */
+  @Deployment
+  public void FAILING_testSubprocessCompensationHandlerWithEventSubprocess() {
+    // given a process instance in compensation
+    runtimeService.startProcessInstanceByKey("subProcessCompensationHandlerWithEventSubprocess");
+    Task beforeCompensationTask = taskService.createTaskQuery().singleResult();
+    taskService.complete(beforeCompensationTask.getId());
+
+    // when the event subprocess is triggered that is defined as part of the compensation handler
+    runtimeService.correlateMessage("Message");
+
+    // then activity instance tree is correct
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+    assertEquals("eventSubProcessTask", task.getTaskDefinitionKey());
+  }
+
+  /**
+   * CAM-4387
+   */
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testSubprocessCompensationHandlerWithEventSubprocess.bpmn20.xml")
+  public void FAILING_testSubprocessCompensationHandlerWithEventSubprocessActivityInstanceTree() {
+    // given a process instance in compensation
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessCompensationHandlerWithEventSubprocess");
+    Task beforeCompensationTask = taskService.createTaskQuery().singleResult();
+    taskService.complete(beforeCompensationTask.getId());
+
+    // when the event subprocess is triggered that is defined as part of the compensation handler
+    runtimeService.correlateMessage("Message");
+
+    // then the event subprocess has been triggered
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+          .activity("throwCompensate")
+          .beginScope("compensationHandler")
+            .beginScope("eventSubProcess")
+              .activity("eventSubProcessTask")
+       .done());
+  }
+
+  /**
+   * CAM-4387
+   */
+  @Deployment
+  public void FAILING_testReceiveTaskCompensationHandler() {
+    // given a process instance
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("receiveTaskCompensationHandler");
+
+    // when triggering compensation
+    Task beforeCompensationTask = taskService.createTaskQuery().singleResult();
+    taskService.complete(beforeCompensationTask.getId());
+
+    // then there is a message event subscription for the receive task compensation handler
+    EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
+    assertNotNull(eventSubscription);
+    assertEquals(MessageEventHandler.EVENT_HANDLER_TYPE, eventSubscription.getEventType());
+
+    // and triggering the message completes compensation
+    runtimeService.correlateMessage("Message");
+
+    Task afterCompensationTask = taskService.createTaskQuery().singleResult();
+    assertNotNull(afterCompensationTask);
+    assertEquals("beforeEnd", afterCompensationTask.getTaskDefinitionKey());
+
+    taskService.complete(afterCompensationTask.getId());
+
+    // and the process has successfully ended
     assertProcessEnded(processInstance.getId());
   }
 
