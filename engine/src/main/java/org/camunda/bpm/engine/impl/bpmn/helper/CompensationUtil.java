@@ -141,9 +141,9 @@ public class CompensationUtil {
   }
 
   protected static boolean hasCompensationEventSubprocess(ActivityImpl activity) {
-    PvmActivity compensationHandler = activity.findCompensationHandler();
+    ActivityImpl compensationHandler = activity.findCompensationHandler();
 
-    return compensationHandler != null && compensationHandler.isSubProcessScope();
+    return compensationHandler != null && compensationHandler.isSubProcessScope() && compensationHandler.isTriggeredByEvent();
   }
 
   /**

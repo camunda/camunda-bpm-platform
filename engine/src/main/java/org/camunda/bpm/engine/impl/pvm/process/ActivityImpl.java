@@ -255,4 +255,9 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
     Boolean isMultiInstance = (Boolean) getProperty(BpmnParse.PROPERTYNAME_IS_MULTI_INSTANCE);
     return Boolean.TRUE.equals(isMultiInstance);
   }
+
+  public boolean isTriggeredByEvent() {
+    Boolean isTriggeredByEvent = (Boolean) getProperty(BpmnParse.PROPERTYNAME_TRIGGERED_BY_EVENT);
+    return Boolean.TRUE.equals(isTriggeredByEvent);
+  }
 }

@@ -70,7 +70,7 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
   }
 
   protected boolean isCompensationEventSubprocess(ActivityImpl activity) {
-    return activity.isCompensationHandler() && activity.isSubProcessScope();
+    return activity.isCompensationHandler() && activity.isSubProcessScope() && activity.isTriggeredByEvent();
   }
 
   protected void createCompensateEventSubscription(ActivityExecution execution, ActivityImpl compensationHandler) {

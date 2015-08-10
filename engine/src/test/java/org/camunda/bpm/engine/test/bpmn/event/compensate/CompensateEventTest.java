@@ -825,7 +825,7 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
-  public void FAILING_testSubprocessCompensationHandler() {
+  public void testSubprocessCompensationHandler() {
 
     // given a process instance
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessCompensationHandler");
@@ -855,7 +855,7 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testSubprocessCompensationHandler.bpmn20.xml")
-  public void FAILING_testSubprocessCompensationHandlerActivityInstanceTree() {
+  public void testSubprocessCompensationHandlerActivityInstanceTree() {
 
     // given a process instance
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessCompensationHandler");
@@ -875,7 +875,7 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testSubprocessCompensationHandler.bpmn20.xml")
-  public void FAILING_testSubprocessCompensationHandlerDeleteProcessInstance() {
+  public void testSubprocessCompensationHandlerDeleteProcessInstance() {
 
     // given a process instance in compensation
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessCompensationHandler");

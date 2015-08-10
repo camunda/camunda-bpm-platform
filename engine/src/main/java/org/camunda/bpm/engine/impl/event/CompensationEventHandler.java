@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
 
 
 /**
@@ -64,7 +65,17 @@ public class CompensationEventHandler implements EventHandler {
     } else {
       try {
 
-        compensatingExecution.executeActivity(compensationHandler);
+
+        if (compensationHandler.isSubProcessScope() && compensationHandler.isTriggeredByEvent()) {
+          compensatingExecution.executeActivity(compensationHandler);
+        }
+        else {
+          // since we already have a scope execution, we don't need to create another one
+          // for a simple scoped compensation handler
+          compensatingExecution.setActivity(compensationHandler);
+          compensatingExecution.performOperation(PvmAtomicOperation.ACTIVITY_START);
+        }
+
 
       } catch (Exception e) {
         throw new ProcessEngineException("Error while handling compensation event " + eventSubscription, e);
