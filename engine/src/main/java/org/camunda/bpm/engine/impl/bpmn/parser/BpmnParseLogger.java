@@ -24,7 +24,7 @@ public class BpmnParseLogger extends ProcessEngineLogger {
   // LOGGING
 
   public void logElementParsing(String elementType, String elementId) {
-    logInfo("001", "Parsing element from type '{}' with id '{}'", elementType, elementId);
+    logDebug("001", "Parsing element from type '{}' with id '{}'", elementType, elementId);
   }
 
   public void logIgnoringNonExecutableProcess(String elementId) {

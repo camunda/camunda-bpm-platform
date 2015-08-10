@@ -28,7 +28,7 @@ public class BpmnBehaviorLogger extends ProcessEngineLogger {
 
 
   public void logMissingBoundaryCatchEvent(String executionId, String errorCode) {
-    logInfo(
+    logDebug(
       "001",
       "Execution with id '{}' throws an error event with errorCode '{}', but no catching boundary event was defined. " +
       "Execution is ended (none end event semantics).",
@@ -38,11 +38,11 @@ public class BpmnBehaviorLogger extends ProcessEngineLogger {
   }
 
   public void logLeavingActivtiy(String activityId) {
-    logInfo("002", "Leaving activity '{}'.", activityId);
+    logDebug("002", "Leaving activity '{}'.", activityId);
   }
 
   public void logMissingOutgoingSequenceFlow(String activityId) {
-    logInfo("003", "No outgoing sequence flow found for activity '{}'. Ending execution.", activityId);
+    logDebug("003", "No outgoing sequence flow found for activity '{}'. Ending execution.", activityId);
   }
 
   public ProcessEngineException stuckExecutionException(String activityId) {
@@ -80,7 +80,7 @@ public class BpmnBehaviorLogger extends ProcessEngineLogger {
   }
 
   public void logOutgoingSequenceFlow(String sequenceFlowId) {
-    logInfo("009", "Sequence flow with id '{}' was selected as outgoing sequence flow.", sequenceFlowId);
+    logDebug("009", "Sequence flow with id '{}' was selected as outgoing sequence flow.", sequenceFlowId);
   }
 
   public ProcessEngineException unsupportedSignalException(String activityId) {
@@ -88,19 +88,19 @@ public class BpmnBehaviorLogger extends ProcessEngineLogger {
   }
 
   public void logActivityActivation(String activityId) {
-    logInfo("011", "Element with id '{}' activates.", activityId);
+    logDebug("011", "Element with id '{}' activates.", activityId);
   }
 
   public void logNoActivityActivation(String activityId) {
-    logInfo("012", "Element with id '{}' does not activate.", activityId);
+    logDebug("012", "Element with id '{}' does not activate.", activityId);
   }
 
   public void logActiveConcurrentExecution(PvmActivity activity) {
-    logInfo("013", "An active concurrent execution with id '{}' was found.", activity);
+    logDebug("013", "An active concurrent execution with id '{}' was found.", activity);
   }
 
   public void logIgnoredEventSubscription(SignalEventSubscriptionEntity eventSubscription, String processDefinitionId) {
-    logInfo(
+    logDebug(
       "014",
       "Found event subscription '{}' but process definition with id '{}' could not be found.",
       eventSubscription.toString(),
@@ -184,11 +184,11 @@ public class BpmnBehaviorLogger extends ProcessEngineLogger {
   }
 
   public void logMultiInstanceCompletionConditionState(Boolean state) {
-    logInfo("029", "Completion condition of multi-instance satisfied: '{}'", state);
+    logDebug("029", "Completion condition of multi-instance satisfied: '{}'", state);
   }
 
   public void logActivityActivation(String activityId, int joinedExecutions, int availableExecution) {
-    logInfo(
+    logDebug(
       "030",
       "Element with id '{}' activates. Joined '{}' of '{}' available executions.",
       activityId,
@@ -198,7 +198,7 @@ public class BpmnBehaviorLogger extends ProcessEngineLogger {
   }
 
   public void logNoActivityActivation(String activityId, int joinedExecutions, int availableExecution) {
-    logInfo(
+    logDebug(
       "031",
       "Element with id '{}' does not activate. Joined '{}' of '{}' available executions.",
       activityId,
