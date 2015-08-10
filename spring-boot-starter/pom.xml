@@ -227,7 +227,7 @@
         <configuration>
           <fork>true</fork>
           <executable>${jdk_home}/bin/javac</executable>
-          <compilerVersion>1.6</compilerVersion>
+          <compilerVersion>${version.java}</compilerVersion>
         </configuration>
       </plugin>
       <plugin>
