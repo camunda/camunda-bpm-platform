@@ -1,6 +1,6 @@
 package org.camunda.bpm.engine.impl.jobexecutor;
 
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,119 +16,112 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
  */
 public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
 
-  private static Logger log = Logger.getLogger(AcquireJobsRunnable.class.getName());
+  private static Logger log = Logger.getLogger(SequentialJobAcquisitionRunnable.class.getName());
+
+  protected JobAcquisitionContext acquisitionContext;
 
   public SequentialJobAcquisitionRunnable(JobExecutor jobExecutor) {
     super(jobExecutor);
+    acquisitionContext = initializeAcquisitionContext();
   }
 
   public synchronized void run() {
     log.info(jobExecutor.getName() + " starting to acquire jobs");
 
-    int processEngineLoopCounter = 0;
-    List<String> idleEngines = new ArrayList<String>();
-    boolean jobExecutionFailed = false;
+    JobAcquisitionStrategy acquisitionStrategy = initializeAcquisitionStrategy();
 
     while (!isInterrupted) {
-      ProcessEngineImpl currentProcessEngine = null;
-      int maxJobsPerAcquisition = jobExecutor.getMaxJobsPerAcquisition();
+      acquisitionContext.reset();
+      acquisitionContext.setAcquisitionTime(System.currentTimeMillis());
+
+      Iterator<ProcessEngineImpl> engineIterator = jobExecutor.engineIterator();
 
       try {
-
-        List<ProcessEngineImpl> registeredProcessEngines = jobExecutor.getProcessEngines();
-
-        synchronized (registeredProcessEngines) {
-          if (registeredProcessEngines.size() > 0) {
-            if (registeredProcessEngines.size() <= processEngineLoopCounter) {
-              processEngineLoopCounter = 0;
-              isJobAdded = false;
-              idleEngines.clear();
-            }
-            currentProcessEngine = registeredProcessEngines.get(processEngineLoopCounter);
-            processEngineLoopCounter++;
+        while (engineIterator.hasNext()) {
+          ProcessEngineImpl currentProcessEngine = engineIterator.next();
+          if (!jobExecutor.hasRegisteredEngine(currentProcessEngine)) {
+            // if engine has been unregistered meanwhile
+            continue;
           }
-        }
 
+          AcquiredJobs acquiredJobs = acquireJobs(acquisitionContext, acquisitionStrategy, currentProcessEngine);
+          executeJobs(acquisitionContext, currentProcessEngine, acquiredJobs);
+        }
       } catch (Exception e) {
-        log.log(Level.SEVERE, "exception while determining next process engine: " + e.getMessage(), e);
+        log.log(Level.SEVERE, "exception during job acquisition: " + e.getMessage(), e);
+
+        acquisitionContext.setAcquisitionException(e);
       }
 
-      jobExecutionFailed = false;
+      acquisitionContext.setJobAdded(isJobAdded);
+      configureNextAcquisitionCycle(acquisitionContext, acquisitionStrategy);
 
-      if (currentProcessEngine != null) {
+      long waitTime = acquisitionStrategy.getWaitTime();
+      // wait the requested wait time minus the time that acquisition itself took
+      // this makes the intervals of job acquisition more constant and therefore predictable
+      waitTime = Math.max(0, (acquisitionContext.getAcquisitionTime() + waitTime) - System.currentTimeMillis());
 
-        try {
-          final CommandExecutor commandExecutor = currentProcessEngine.getProcessEngineConfiguration()
-              .getCommandExecutorTxRequired();
-
-          jobExecutor.logAcquisitionAttempt(currentProcessEngine);
-          AcquiredJobs acquiredJobs = commandExecutor.execute(jobExecutor.getAcquireJobsCmd());
-
-          jobExecutor.logAcquiredJobs(currentProcessEngine, acquiredJobs.size());
-          jobExecutor.logAcquisitionFailureJobs(currentProcessEngine, acquiredJobs.getNumberOfJobsFailedToLock());
-
-          for (List<String> jobIds : acquiredJobs.getJobIdBatches()) {
-            jobExecutor.executeJobs(jobIds, currentProcessEngine);
-          }
-
-          // add number of jobs which we attempted to acquire but could not obtain a lock for -> do not wait if we could not acquire jobs.
-          int jobsAcquired = acquiredJobs.getJobIdBatches().size() + acquiredJobs.getNumberOfJobsFailedToLock();
-          if (jobsAcquired < maxJobsPerAcquisition) {
-            idleEngines.add(currentProcessEngine.getName());
-          }
-
-        } catch (Exception e) {
-          log.log(Level.SEVERE, "exception during job acquisition: " + e.getMessage(), e);
-
-          jobExecutionFailed = true;
-
-          // if one of the engines fails: increase the wait time
-          if(millisToWait == 0) {
-            millisToWait = jobExecutor.getWaitTimeInMillis();
-          } else {
-            millisToWait *= waitIncreaseFactor;
-            if (millisToWait > maxWait) {
-              millisToWait = maxWait;
-            }
-          }
-        }
-      }
-
-      int numOfEngines = jobExecutor.getProcessEngines().size();
-      if(idleEngines.size() == numOfEngines) {
-        // if we have determined that none of the registered engines currently have jobs -> wait
-        millisToWait = jobExecutor.getWaitTimeInMillis();
-      } else {
-        if(!jobExecutionFailed) {
-          millisToWait = 0;
-        }
-      }
-
-      if (millisToWait > 0 && (!isJobAdded)) {
-
-        try {
-          log.fine("job acquisition thread sleeping for " + millisToWait + " millis");
-          synchronized (MONITOR) {
-            if(!isInterrupted) {
-              isWaiting.set(true);
-              MONITOR.wait(millisToWait);
-            }
-          }
-          log.fine("job acquisition thread woke up");
-          isJobAdded = false;
-        } catch (InterruptedException e) {
-          log.fine("job acquisition wait interrupted");
-        } finally {
-          isWaiting.set(false);
-        }
-      }
-
+      suspendAcquisition(waitTime);
     }
     log.info(jobExecutor.getName() + " stopped job acquisition");
   }
 
-  public boolean isJobAdded() {
-    return isJobAdded;
+  protected JobAcquisitionContext initializeAcquisitionContext() {
+    return new JobAcquisitionContext();
+  }
+
+  protected void configureNextAcquisitionCycle(JobAcquisitionContext acquisitionContext, JobAcquisitionStrategy acquisitionStrategy) {
+    acquisitionStrategy.reconfigure(acquisitionContext);
+  }
+
+  protected JobAcquisitionStrategy initializeAcquisitionStrategy() {
+    return new BackoffJobAcquisitionStrategy(jobExecutor);
+  }
+
+  public JobAcquisitionContext getAcquisitionContext() {
+    return acquisitionContext;
+
+  }
+
+  protected void executeJobs(JobAcquisitionContext context, ProcessEngineImpl currentProcessEngine, AcquiredJobs acquiredJobs) {
+    // submit those jobs first that we weren't able to execute last cycle
+    List<List<String>> additionalJobs = context.getAdditionalJobsByEngine().get(currentProcessEngine.getName());
+    if (additionalJobs != null) {
+      for (List<String> jobBatch : additionalJobs) {
+        jobExecutor.executeJobs(jobBatch, currentProcessEngine);
+      }
+    }
+
+    for (List<String> jobIds : acquiredJobs.getJobIdBatches()) {
+      jobExecutor.executeJobs(jobIds, currentProcessEngine);
+    }
+  }
+
+  protected AcquiredJobs acquireJobs(
+      JobAcquisitionContext context,
+      JobAcquisitionStrategy acquisitionStrategy,
+      ProcessEngineImpl currentProcessEngine) {
+    CommandExecutor commandExecutor = currentProcessEngine.getProcessEngineConfiguration()
+        .getCommandExecutorTxRequired();
+
+    int numJobsToAcquire = acquisitionStrategy.getNumJobsToAcquire(currentProcessEngine.getName());
+
+    AcquiredJobs acquiredJobs = null;
+
+    if (numJobsToAcquire > 0) {
+      jobExecutor.logAcquisitionAttempt(currentProcessEngine);
+      acquiredJobs = commandExecutor.execute(jobExecutor.getAcquireJobsCmd(numJobsToAcquire));
+    }
+    else {
+      acquiredJobs = new AcquiredJobs(numJobsToAcquire);
+    }
+
+    context.submitAcquiredJobs(currentProcessEngine.getName(), acquiredJobs);
+
+    jobExecutor.logAcquiredJobs(currentProcessEngine, acquiredJobs.size());
+    jobExecutor.logAcquisitionFailureJobs(currentProcessEngine, acquiredJobs.getNumberOfJobsFailedToLock());
+
+    return acquiredJobs;
   }
 
 }

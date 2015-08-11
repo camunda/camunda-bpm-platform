@@ -16,7 +16,8 @@ import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.concurrency.ControllableThread;
+import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestCase.ThreadControl;
+import org.camunda.bpm.engine.test.jobexecutor.ControllableJobExecutor;
 import org.camunda.bpm.engine.variable.Variables;
 
 
@@ -70,17 +71,22 @@ public class JobExecutorMetricsTest extends AbstractMetricsTest {
     ControllableJobExecutor jobExecutor1 = new ControllableJobExecutor((ProcessEngineImpl) processEngine);
     ControllableJobExecutor jobExecutor2 = new ControllableJobExecutor((ProcessEngineImpl) processEngine);
 
-    ControllableThread jobAcquisitionThread1 = jobExecutor1.getJobAcquisitionThread();
-    ControllableThread jobAcquisitionThread2 = jobExecutor2.getJobAcquisitionThread();
+    ThreadControl jobAcquisitionThread1 = jobExecutor1.getAcquisitionThreadControl();
+    ThreadControl jobAcquisitionThread2 = jobExecutor2.getAcquisitionThreadControl();
 
     // when both executors are waiting to finish acquisition
     jobExecutor1.start();
+    jobAcquisitionThread1.waitForSync(); // wait before starting acquisition
+    jobAcquisitionThread1.makeContinueAndWaitForSync(); // wait before finishing acquisition
+
     jobExecutor2.start();
+    jobAcquisitionThread2.waitForSync(); // wait before starting acquisition
+    jobAcquisitionThread2.makeContinueAndWaitForSync(); // wait before finishing acquisition
 
     // thread 1 is able to acquire all jobs
-    jobAcquisitionThread1.returnControlToControllableThreadAndWait();
+    jobAcquisitionThread1.makeContinueAndWaitForSync();
     // thread 2 cannot acquire any jobs since they have been locked (and executed) by thread1 meanwhile
-    jobAcquisitionThread2.returnControlToControllableThreadAndWait();
+    jobAcquisitionThread2.makeContinueAndWaitForSync();
 
     processEngineConfiguration.getDbMetricsReporter().reportNow();
 

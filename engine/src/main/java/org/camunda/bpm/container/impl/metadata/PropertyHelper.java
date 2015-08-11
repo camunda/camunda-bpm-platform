@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,13 +22,13 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 
 /**
- * 
+ *
  * @author Daniel Meyer
  *
  */
 public class PropertyHelper {
 
-  
+
   /**
    * Regex for Ant-style property placeholders
    */
@@ -53,24 +53,31 @@ public class PropertyHelper {
     Object propertyValue;
     if (clazz.isAssignableFrom(int.class)) {
       propertyValue = Integer.parseInt(value);
-    } else if (clazz.isAssignableFrom(boolean.class)) {
+    }
+    else if (clazz.isAssignableFrom(long.class)) {
+      propertyValue = Long.parseLong(value);
+    }
+    else if (clazz.isAssignableFrom(float.class)) {
+      propertyValue = Float.parseFloat(value);
+    }
+    else if (clazz.isAssignableFrom(boolean.class)) {
       propertyValue = Boolean.parseBoolean(value);
     } else {
       propertyValue = value;
     }
     return propertyValue;
   }
-  
+
   public static void applyProperty(Object configuration, String key, String stringValue) {
     Class<?> configurationClass = configuration.getClass();
-    
+
     Method setter = ReflectUtil.getSingleSetter(key, configurationClass);
-    
+
     if(setter != null) {
       try {
         Class<?> parameterClass = setter.getParameterTypes()[0];
         Object value = PropertyHelper.convertToClass(stringValue, parameterClass);
-        
+
         setter.invoke(configuration, value);
       } catch (Exception e) {
         throw new ProcessEngineException("Could not set value for property '"+key + "' on class " + configurationClass.getCanonicalName(), e);
@@ -79,11 +86,11 @@ public class PropertyHelper {
       throw new ProcessEngineException("Could not find setter for property '"+ key + "' on class " + configurationClass.getCanonicalName());
     }
   }
-  
+
   /**
    * Sets an objects fields via reflection from String values.
    * Depending on the field's type the respective values are converted to int or boolean.
-   * 
+   *
    * @param configuration
    * @param properties
    * @throws ProcessEngineException if a property is supplied that matches no field or
@@ -94,14 +101,14 @@ public class PropertyHelper {
       applyProperty(configuration, property.getKey(), property.getValue());
     }
   }
-  
+
 
   /**
    * Replaces Ant-style property references if the corresponding keys exist in the provided {@link Properties}.
-   * 
+   *
    * @param props contains possible replacements
    * @param original may contain Ant-style templates
-   * @return the original string with replaced properties or the unchanged original string if no placeholder found.  
+   * @return the original string with replaced properties or the unchanged original string if no placeholder found.
    */
   public static String resolveProperty(Properties props, String original) {
     Matcher matcher = PROPERTY_TEMPLATE.matcher(original);

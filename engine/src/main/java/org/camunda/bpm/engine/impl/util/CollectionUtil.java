@@ -59,5 +59,4 @@ public class CollectionUtil {
     }
     list.add(value);
   }
-
 }

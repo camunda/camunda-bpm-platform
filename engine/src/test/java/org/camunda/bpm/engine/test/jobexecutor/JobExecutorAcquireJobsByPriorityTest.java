@@ -9,6 +9,8 @@ import org.camunda.bpm.engine.test.Deployment;
 
 public class JobExecutorAcquireJobsByPriorityTest extends AbstractJobExecutorAcquireJobsTest {
 
+  protected boolean defaultAcquireByPriority = false;
+
   protected boolean isJobExecutorAcquireByPriority() {
     return true;
   }

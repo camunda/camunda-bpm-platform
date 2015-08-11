@@ -10,21 +10,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.jobexecutor;
 
-import java.util.List;
-
-import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 
 /**
+ * @author Thorben Lindhauer
  *
- * @author Daniel Meyer
  */
-public class CallerRunsRejectedJobsHandler implements RejectedJobsHandler {
+public interface AcquireJobsCommandFactory {
 
-  public void jobsRejected(List<String> jobIds, ProcessEngineImpl processEngine, JobExecutor jobExecutor) {
-    jobExecutor.getExecuteJobsRunnable(jobIds, processEngine).run();
-  }
-
+  Command<AcquiredJobs> getCommand(int numJobsToAcquire);
 }

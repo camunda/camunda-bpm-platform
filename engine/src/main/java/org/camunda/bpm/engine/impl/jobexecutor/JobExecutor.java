@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.impl.jobexecutor;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -20,7 +21,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
-import org.camunda.bpm.engine.impl.cmd.AcquireJobsCmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.management.Metrics;
@@ -45,7 +45,7 @@ public abstract class JobExecutor {
 
   protected String name = "JobExecutor["+getClass().getName()+"]";
   protected List<ProcessEngineImpl> processEngines = new CopyOnWriteArrayList<ProcessEngineImpl>();
-  protected Command<AcquiredJobs> acquireJobsCmd;
+  protected AcquireJobsCommandFactory acquireJobsCmdFactory;
   protected AcquireJobsRunnable acquireJobsRunnable;
   protected RejectedJobsHandler rejectedJobsHandler;
   protected Thread jobAcquisitionThread;
@@ -54,7 +54,22 @@ public abstract class JobExecutor {
   protected boolean isActive = false;
 
   protected int maxJobsPerAcquisition = 3;
+
+  // waiting when job acquisition is idle
   protected int waitTimeInMillis = 5 * 1000;
+  protected float waitIncreaseFactor = 2;
+  protected long maxWait = 60 * 1000;
+
+  // backoff when job acquisition fails to lock all jobs
+  protected int backoffTimeInMillis = 0;
+  protected long maxBackoff = 0;
+
+  /**
+   * The number of job acquisition cycles without locking failures
+   * until the backoff level is reduced.
+   */
+  protected int backoffDecreaseThreshold = 100;
+
   protected String lockOwner = UUID.randomUUID().toString();
   protected int lockTimeInMillis = 5 * 60 * 1000;
 
@@ -80,12 +95,12 @@ public abstract class JobExecutor {
   }
 
   protected void ensureInitialization() {
-    acquireJobsCmd = new AcquireJobsCmd(this);
+    acquireJobsCmdFactory = new DefaultAcquireJobsCommandFactory(this);
     acquireJobsRunnable = new SequentialJobAcquisitionRunnable(this);
   }
 
   protected void ensureCleanup() {
-    acquireJobsCmd = null;
+    acquireJobsCmdFactory = null;
     acquireJobsRunnable = null;
   }
 
@@ -159,6 +174,21 @@ public abstract class JobExecutor {
   }
 
   /**
+   * Must return an iterator of registered process engines
+   * that is independent of concurrent modifications
+   * to the underlying data structure of engines.
+   */
+  public Iterator<ProcessEngineImpl> engineIterator() {
+    // a CopyOnWriteArrayList's iterator is safe in the presence
+    // of modifications
+    return processEngines.iterator();
+  }
+
+  public boolean hasRegisteredEngine(ProcessEngineImpl engine) {
+    return processEngines.contains(engine);
+  }
+
+  /**
    * Deprecated: use {@link #getProcessEngines()} instead
    */
   @Deprecated
@@ -185,6 +215,14 @@ public abstract class JobExecutor {
 
   public void setWaitTimeInMillis(int waitTimeInMillis) {
     this.waitTimeInMillis = waitTimeInMillis;
+  }
+
+  public int getBackoffTimeInMillis() {
+    return backoffTimeInMillis;
+  }
+
+  public void setBackoffTimeInMillis(int backoffTimeInMillis) {
+    this.backoffTimeInMillis = backoffTimeInMillis;
   }
 
   public int getLockTimeInMillis() {
@@ -223,16 +261,52 @@ public abstract class JobExecutor {
     this.maxJobsPerAcquisition = maxJobsPerAcquisition;
   }
 
+  public float getWaitIncreaseFactor() {
+    return waitIncreaseFactor;
+  }
+
+  public void setWaitIncreaseFactor(float waitIncreaseFactor) {
+    this.waitIncreaseFactor = waitIncreaseFactor;
+  }
+
+  public long getMaxWait() {
+    return maxWait;
+  }
+
+  public void setMaxWait(long maxWait) {
+    this.maxWait = maxWait;
+  }
+
+  public long getMaxBackoff() {
+    return maxBackoff;
+  }
+
+  public void setMaxBackoff(long maxBackoff) {
+    this.maxBackoff = maxBackoff;
+  }
+
+  public int getBackoffDecreaseThreshold() {
+    return backoffDecreaseThreshold;
+  }
+
+  public void setBackoffDecreaseThreshold(int backoffDecreaseThreshold) {
+    this.backoffDecreaseThreshold = backoffDecreaseThreshold;
+  }
+
   public String getName() {
     return name;
   }
 
-  public Command<AcquiredJobs> getAcquireJobsCmd() {
-    return acquireJobsCmd;
+  public Command<AcquiredJobs> getAcquireJobsCmd(int numJobs) {
+    return acquireJobsCmdFactory.getCommand(numJobs);
   }
 
-  public void setAcquireJobsCmd(Command<AcquiredJobs> acquireJobsCmd) {
-    this.acquireJobsCmd = acquireJobsCmd;
+  public AcquireJobsCommandFactory getAcquireJobsCmdFactory() {
+    return acquireJobsCmdFactory;
+  }
+
+  public void setAcquireJobsCmdFactory(AcquireJobsCommandFactory acquireJobsCmdFactory) {
+    this.acquireJobsCmdFactory = acquireJobsCmdFactory;
   }
 
   public boolean isActive() {
@@ -268,6 +342,10 @@ public abstract class JobExecutor {
 
   public AcquireJobsRunnable getAcquireJobsRunnable() {
     return acquireJobsRunnable;
+  }
+
+  public Runnable getExecuteJobsRunnable(List<String> jobIds, ProcessEngineImpl processEngine) {
+    return new ExecuteJobsRunnable(jobIds, processEngine);
   }
 
 }

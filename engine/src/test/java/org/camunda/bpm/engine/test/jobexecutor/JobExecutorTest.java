@@ -105,7 +105,7 @@ public class JobExecutorTest extends JobExecutorTestCase {
     List<String> secondBatch = new ArrayList<String>(Arrays.asList("d", "e", "f"));
     List<String> thirdBatch = new ArrayList<String>(Arrays.asList("g"));
 
-    AcquiredJobs acquiredJobs = new AcquiredJobs();
+    AcquiredJobs acquiredJobs = new AcquiredJobs(0);
     acquiredJobs.addJobIdBatch(firstBatch);
     acquiredJobs.addJobIdBatch(secondBatch);
     acquiredJobs.addJobIdBatch(thirdBatch);

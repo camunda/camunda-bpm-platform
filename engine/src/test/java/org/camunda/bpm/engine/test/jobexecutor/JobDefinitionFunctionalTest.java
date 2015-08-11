@@ -316,8 +316,10 @@ public class JobDefinitionFunctionalTest extends PluggableProcessEngineTestCase 
   }
 
   protected AcquiredJobs acquireJobs() {
+    JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
+
     return processEngineConfiguration.getCommandExecutorTxRequired()
-      .execute(new AcquireJobsCmd(processEngineConfiguration.getJobExecutor()));
+      .execute(new AcquireJobsCmd(jobExecutor));
   }
 
   Thread testThread = Thread.currentThread();

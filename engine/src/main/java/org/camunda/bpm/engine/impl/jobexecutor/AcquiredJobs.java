@@ -25,10 +25,16 @@ import java.util.Set;
  */
 public class AcquiredJobs {
 
+  protected int numberOfJobsAttemptedToAcquire;
+
   protected List<List<String>> acquiredJobBatches = new ArrayList<List<String>>();
   protected Set<String> acquiredJobs = new HashSet<String>();
 
   protected int numberOfJobsFailedToLock = 0;
+
+  public AcquiredJobs(int numberOfJobsAttemptedToAcquire) {
+    this.numberOfJobsAttemptedToAcquire = numberOfJobsAttemptedToAcquire;
+  }
 
   public List<List<String>> getJobIdBatches() {
     return acquiredJobBatches;
@@ -67,6 +73,10 @@ public class AcquiredJobs {
 
   public int getNumberOfJobsFailedToLock() {
     return numberOfJobsFailedToLock;
+  }
+
+  public int getNumberOfJobsAttemptedToAcquire() {
+    return numberOfJobsAttemptedToAcquire;
   }
 
 }

@@ -92,7 +92,7 @@ public class JobExecutorCmdHappyTest extends JobExecutorTestCase {
 
     ClockUtil.setCurrentTime(new Date(SOME_TIME + (20 * SECOND)));
 
-    acquiredJobs = commandExecutor.execute(new AcquireJobsCmd(jobExecutor));
+    acquiredJobs = commandExecutor.execute(new AcquireJobsCmd(jobExecutor, jobExecutor.getMaxJobsPerAcquisition()));
     jobIdsList = acquiredJobs.getJobIdBatches();
     assertEquals(1, jobIdsList.size());
 

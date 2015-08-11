@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,7 +21,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.springframework.core.task.TaskExecutor;
 
 /**
- * 
+ *
  * <p>
  * This is a spring based implementation of the {@link JobExecutor} using spring abstraction {@link TaskExecutor}
  * for performing background task execution.
@@ -31,11 +31,11 @@ import org.springframework.core.task.TaskExecutor;
  * Application servers controller thread pools, for example using the commonj API. The use of unmanaged thread in application servers
  * is discouraged by the Java EE spec.
  * </p>
- * 
+ *
  * @author Pablo Ganga
  */
 public class SpringJobExecutor extends JobExecutor {
-	
+
 	private TaskExecutor taskExecutor;
 
 	public TaskExecutor getTaskExecutor() {
@@ -44,18 +44,18 @@ public class SpringJobExecutor extends JobExecutor {
 
 	/**
 	 * Required spring injected {@link TaskExecutor}} implementation that will be used to execute runnable jobs.
-	 * 
+	 *
 	 * @param taskExecutor
 	 */
 	public void setTaskExecutor(TaskExecutor taskExecutor) {
 		this.taskExecutor = taskExecutor;
 	}
-	
+
 	public void executeJobs(List<String> jobIds, ProcessEngineImpl processEngine) {
 	  try {
-      taskExecutor.execute(new ExecuteJobsRunnable(jobIds, processEngine));
+      taskExecutor.execute(getExecuteJobsRunnable(jobIds, processEngine));
     } catch (RejectedExecutionException e) {
-      rejectedJobsHandler.jobsRejected(jobIds, processEngine);
+      rejectedJobsHandler.jobsRejected(jobIds, processEngine, this);
     }
 	}
 

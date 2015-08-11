@@ -18,8 +18,6 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.Page;
-import org.camunda.bpm.engine.impl.cfg.TransactionState;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.OptimisticLockingListener;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbEntityOperation;
@@ -30,7 +28,6 @@ import org.camunda.bpm.engine.impl.jobexecutor.AcquiredJobs;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
-import org.camunda.bpm.engine.management.Metrics;
 
 
 /**
@@ -42,21 +39,27 @@ public class AcquireJobsCmd implements Command<AcquiredJobs>, OptimisticLockingL
   private final JobExecutor jobExecutor;
 
   protected AcquiredJobs acquiredJobs;
+  protected int numJobsToAcquire;
 
   public AcquireJobsCmd(JobExecutor jobExecutor) {
+    this(jobExecutor, jobExecutor.getMaxJobsPerAcquisition());
+  }
+
+  public AcquireJobsCmd(JobExecutor jobExecutor, int numJobsToAcquire) {
     this.jobExecutor = jobExecutor;
+    this.numJobsToAcquire = numJobsToAcquire;
   }
 
   public AcquiredJobs execute(CommandContext commandContext) {
 
     String lockOwner = jobExecutor.getLockOwner();
     int lockTimeInMillis = jobExecutor.getLockTimeInMillis();
-    int maxNonExclusiveJobsPerAcquisition = jobExecutor.getMaxJobsPerAcquisition();
 
-    acquiredJobs = new AcquiredJobs();
+    acquiredJobs = new AcquiredJobs(numJobsToAcquire);
+
     List<JobEntity> jobs = commandContext
       .getJobManager()
-      .findNextJobsToExecute(new Page(0, maxNonExclusiveJobsPerAcquisition));
+      .findNextJobsToExecute(new Page(0, numJobsToAcquire));
 
     for (JobEntity job: jobs) {
       List<String> jobIds = new ArrayList<String>();
