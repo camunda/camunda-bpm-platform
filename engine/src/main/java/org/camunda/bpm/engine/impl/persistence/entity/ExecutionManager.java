@@ -22,8 +22,10 @@ import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
+import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -33,6 +35,8 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
  * @author Tom Baeyens
  */
 public class ExecutionManager extends AbstractManager {
+
+  protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
   public void insertExecution(ExecutionEntity execution) {
     getDbEntityManager().insert(execution);
@@ -68,7 +72,7 @@ public class ExecutionManager extends AbstractManager {
     ExecutionEntity execution = findExecutionById(processInstanceId);
 
     if(execution == null) {
-      throw new BadUserRequestException("No process instance found for id '" + processInstanceId + "'");
+      throw LOG.requestedProcessInstanceNotFoundException(processInstanceId);
     }
 
     getTaskManager().deleteTasksByProcessInstanceId(processInstanceId, deleteReason, cascade, skipCustomListeners);

@@ -25,10 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngineServices;
-import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
@@ -36,6 +33,7 @@ import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
@@ -45,6 +43,7 @@ import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.core.variable.scope.CoreVariableStore;
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -69,6 +68,8 @@ import org.camunda.bpm.model.xml.type.ModelElementType;
  * @author Falko Menge
  */
 public class TaskEntity extends AbstractVariableScope implements Task, DelegateTask, Serializable, DbEntity, HasDbRevision, CommandContextListener {
+
+  protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
   public static final String DELETE_REASON_COMPLETED = "completed";
   public static final String DELETE_REASON_DELETED = "deleted";
@@ -348,14 +349,14 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
       ensureNotNull(NullValueException.class, "Parent task with id '"+parentTaskId+"' does not exist", "parentTask", parentTask);
 
       if (parentTask.suspensionState == SuspensionState.SUSPENDED.getStateCode()) {
-        throw new SuspendedEntityInteractionException("parent task " + id + " is suspended");
+        throw LOG.suspendedEntityException("parent task", id);
       }
     }
   }
 
   protected void ensureTaskActive() {
     if (suspensionState == SuspensionState.SUSPENDED.getStateCode()) {
-      throw new SuspendedEntityInteractionException("task " + id + " is suspended");
+      throw LOG.suspendedEntityException("task", id);
     }
   }
 
@@ -367,9 +368,8 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
         return (UserTask) modelElementInstance;
       } catch(ClassCastException e) {
         ModelElementType elementType = modelElementInstance.getElementType();
-        throw new ProcessEngineException("Cannot cast "+modelElementInstance+" to UserTask. "
-            + "Is of type "+elementType.getTypeName() + " Namespace "
-            + elementType.getTypeNamespace(), e);
+        throw LOG.castModelInstanceException(modelElementInstance, "UserTask", elementType.getTypeName(),
+          elementType.getTypeNamespace(), e);
       }
     } else {
       return null;
@@ -794,7 +794,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
             .getDelegateInterceptor()
             .handleInvocation(listenerInvocation);
         } catch (Exception e) {
-          throw new ProcessEngineException("Exception while invoking TaskListener: "+e.getMessage(), e);
+          throw LOG.invokeTaskListenerException(e);
         }
       }
     }
@@ -1049,7 +1049,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
 
   public String getFormKey() {
     if(!isFormKeyInitialized) {
-      throw new BadUserRequestException("The form key is not initialized. You must call initializeFormKeys() on the task query prior to retrieving the form key.");
+      throw LOG.uninitializedFormKeyException();
     }
     return formKey;
   }

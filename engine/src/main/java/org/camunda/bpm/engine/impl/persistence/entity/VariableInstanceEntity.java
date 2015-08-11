@@ -17,13 +17,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
 import org.camunda.bpm.engine.impl.core.variable.value.UntypedValueImpl;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.DbEntityLifecycleAware;
+import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextListener;
@@ -41,6 +42,8 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
  */
 public class VariableInstanceEntity implements VariableInstance, CoreVariableInstance, ValueFields, DbEntity, DbEntityLifecycleAware, HasDbRevision, Serializable,
   CommandContextListener {
+
+  protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
   private static final long serialVersionUID = 1L;
 
@@ -499,7 +502,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     if (serializerName != null && serializer == null) {
       serializer = getSerializers().getSerializerByName(serializerName);
       if (serializer == null) {
-        throw new ProcessEngineException("No serializer defined for variable instance '" + this + "'.");
+        throw LOG.serializerNotDefinedException(this);
       }
     }
   }
@@ -509,7 +512,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
       return Context.getProcessEngineConfiguration()
           .getVariableSerializers();
     } else {
-      throw new ProcessEngineException("Cannot work with serializers outside of command context.");
+      throw LOG.serializerOutOfContextException();
     }
   }
 

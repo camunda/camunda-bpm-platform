@@ -26,7 +26,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 
 
 /**
@@ -36,6 +38,8 @@ import org.camunda.bpm.engine.impl.db.DbEntity;
  *
  */
 public class DbEntityCache {
+
+  protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
   /**
    * The cache itself: maps entity types (classes) to maps indexed by id (primary key).
@@ -76,7 +80,7 @@ public class DbEntityCache {
       try {
         return (T) dbEntity;
       } catch(ClassCastException e) {
-        throw new ProcessEngineException("Could not lookup entity of type '"+type+"' and id '"+id+"': found entity of type '"+dbEntity.getClass()+"'.", e);
+        throw LOG.entityCacheLookupException(type, id, dbEntity.getClass(), e);
       }
     } else {
       return null;
@@ -117,9 +121,9 @@ public class DbEntityCache {
    */
   public CachedDbEntity getCachedEntity(Class<?> type, String id) {
     Class<?> cacheKey = cacheKeyMapping.getEntityCacheKey(type);
-    Map<String, CachedDbEntity> entitesByType = cachedEntites.get(cacheKey);
-    if(entitesByType != null) {
-      return entitesByType.get(id);
+    Map<String, CachedDbEntity> entitiesByType = cachedEntites.get(cacheKey);
+    if(entitiesByType != null) {
+      return entitiesByType.get(id);
     } else {
       return null;
     }
@@ -197,12 +201,12 @@ public class DbEntityCache {
       case TRANSIENT:
         // cannot put TRANSIENT entity if entity with same id already exists in cache.
         if(existingCachedEntity.getEntityState() == TRANSIENT) {
-          throw new ProcessEngineException("Same entity with Id "+entityToAdd.getEntity().getId()
-              + " and type "+entityToAdd.getEntity().getClass()+ " is inserted twice.");
+          throw LOG.entityCacheDuplicateEntryException("TRANSIENT", entityToAdd.getEntity().getId(),
+            entityToAdd.getEntity().getClass(), existingCachedEntity.getEntityState());
         }
         else {
-          throw new ProcessEngineException("Inserting entity with Id "+entityToAdd.getEntity().getId()
-              + " and type "+entityToAdd.getEntity().getClass()+ " wich is already marked " + existingCachedEntity.getEntityState());
+          throw LOG.alreadyMarkedEntityInEntityCacheException(entityToAdd.getEntity().getId(),
+            entityToAdd.getEntity().getClass(), existingCachedEntity.getEntityState());
         }
 
       case PERSISTENT:
@@ -218,9 +222,8 @@ public class DbEntityCache {
         }
 
         // otherwise fail:
-        throw new ProcessEngineException("Cannot add PERSISTENT entity with id "+entityToAdd.getEntity().getId()
-            + " and type "+entityToAdd.getEntity().getClass() + " into cache: entity with same Id and type is already "
-            + existingCachedEntity.getEntityState());
+        throw LOG.entityCacheDuplicateEntryException("PERSISTENT", entityToAdd.getEntity().getId(),
+          entityToAdd.getEntity().getClass(), existingCachedEntity.getEntityState());
 
       case MERGED:
         if(existingCachedEntity.getEntityState() == PERSISTENT
@@ -236,9 +239,8 @@ public class DbEntityCache {
         }
 
         // otherwise fail:
-        throw new ProcessEngineException("Cannot add MERGED entity with id "+entityToAdd.getEntity().getId()
-            + " and type "+entityToAdd.getEntity().getClass() + " into cache: entity with same Id and type is already "
-            + existingCachedEntity.getEntityState());
+        throw LOG.entityCacheDuplicateEntryException("MERGED", entityToAdd.getEntity().getId(),
+          entityToAdd.getEntity().getClass(), existingCachedEntity.getEntityState());
 
       default:
         // deletes are always added

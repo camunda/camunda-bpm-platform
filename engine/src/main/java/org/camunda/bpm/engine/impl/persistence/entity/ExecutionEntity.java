@@ -19,13 +19,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngineServices;
-import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -38,6 +35,7 @@ import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
 import org.camunda.bpm.engine.impl.core.variable.scope.CoreVariableStore;
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.event.CompensationEventHandler;
@@ -82,7 +80,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   private static final long serialVersionUID = 1L;
 
-  private static Logger log = Logger.getLogger(ExecutionEntity.class.getName());
+  protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
   // Persistent refrenced entities state //////////////////////////////////////
   public static final int EVENT_SUBSCRIPTIONS_STATE_BIT = 1;
@@ -243,9 +241,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     createdExecution.skipCustomListeners = this.skipCustomListeners;
     createdExecution.skipIoMapping = this.skipIoMapping;
 
-    if (log.isLoggable(Level.FINE)) {
-      log.fine("Child execution " + createdExecution + " created with parent " + this);
-    }
+    LOG.createChildExecution(createdExecution, this);
 
     return createdExecution;
   }
@@ -314,7 +310,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   @SuppressWarnings("unchecked")
   public void initialize() {
-    log.fine("initializing " + this);
+    LOG.initializeExecution(this);
 
     ScopeImpl scope = getScopeActivity();
     ensureParentInitialized();
@@ -342,7 +338,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   @SuppressWarnings("unchecked")
   public void initializeTimerDeclarations() {
-    log.fine("initializing timer declaration " + this);
+    LOG.initializeTimerDeclaration(this);
     ScopeImpl scope = getScopeActivity();
     List<TimerDeclarationImpl> timerDeclarations = (List<TimerDeclarationImpl>) scope.getProperty(BpmnParse.PROPERTYNAME_TIMER_DECLARATION);
     if (timerDeclarations != null) {
@@ -504,7 +500,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   protected void ensureNotSuspended() {
     if (isSuspended()) {
-      throw new SuspendedEntityInteractionException("Execution " + id + " is suspended.");
+      throw LOG.suspendedEntityException("Execution", id);
     }
   }
 
@@ -543,8 +539,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       Context.getCommandContext().getJobManager().send(message);
 
     } else {
-      throw new ProcessEngineException("Asynchronous continuation requires a message job declaration.");
-
+      throw LOG.requiredAsyncContinuationException(getActivity().getId());
     }
   }
 
@@ -1085,7 +1080,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       Collection<VariableInstanceEntity> variables) {
 
     if(!isProcessInstanceExecution()) {
-      throw new ProcessEngineException("Can only restore the process instance - method must be called on a process instance execution.");
+      throw LOG.restoreProcessInstanceException(this);
     }
 
     // index executions by id
@@ -1127,7 +1122,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
           executionEntity.addEventSubscription(eventSubscription);
         }
         else {
-          throw new ProcessEngineException("Unable to find execution for id " + eventSubscription.getExecutionId());
+          throw LOG.executionNotFoundException(eventSubscription.getExecutionId());
         }
       }
     }
@@ -1499,8 +1494,8 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
       } catch (ClassCastException e) {
         ModelElementType elementType = modelElementInstance.getElementType();
-        throw new ProcessEngineException("Cannot cast " + modelElementInstance + " to FlowElement. " + "Is of type " + elementType.getTypeName()
-            + " Namespace " + elementType.getTypeNamespace(), e);
+        throw LOG.castModelInstanceException(modelElementInstance, "FlowElement", elementType.getTypeName(),
+          elementType.getTypeNamespace(), e);
       }
 
     } else {

@@ -17,11 +17,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.DbEntityLifecycleAware;
+import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
 import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
@@ -36,6 +37,7 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
 public class HistoricVariableInstanceEntity implements ValueFields, HistoricVariableInstance, DbEntity, HasDbRevision, Serializable, DbEntityLifecycleAware {
 
   private static final long serialVersionUID = 1L;
+  protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
   protected String id;
 
@@ -161,7 +163,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     if (serializerName != null && serializer == null) {
       serializer = getSerializers().getSerializerByName(serializerName);
       if (serializer == null) {
-        throw new ProcessEngineException("No serializer defined for variable instance '" + this + "'.");
+        throw LOG.serializerNotDefinedException(this);
       }
     }
   }
@@ -171,7 +173,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
       return Context.getProcessEngineConfiguration()
           .getVariableSerializers();
     } else {
-      throw new ProcessEngineException("Cannot work with serializers outside of command context.");
+      throw LOG.serializerOutOfContextException();
     }
   }
 

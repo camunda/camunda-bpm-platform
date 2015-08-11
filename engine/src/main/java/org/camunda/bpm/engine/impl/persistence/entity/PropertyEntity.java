@@ -14,7 +14,8 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.io.Serializable;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 
@@ -25,6 +26,7 @@ import org.camunda.bpm.engine.impl.db.DbEntity;
  */
 public class PropertyEntity implements DbEntity, HasDbRevision, Serializable {
 
+  protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
   private static final long serialVersionUID = 1L;
 
   String name;
@@ -74,7 +76,7 @@ public class PropertyEntity implements DbEntity, HasDbRevision, Serializable {
   }
 
   public void setId(String id) {
-    throw new ProcessEngineException("only provided id generation allowed for properties");
+    throw LOG.notAllowedIdException(id);
   }
 
   public int getRevisionNext() {

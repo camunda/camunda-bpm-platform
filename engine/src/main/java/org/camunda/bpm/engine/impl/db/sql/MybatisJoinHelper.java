@@ -15,8 +15,9 @@ package org.camunda.bpm.engine.impl.db.sql;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.QueryOrderingProperty;
+import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.query.QueryProperty;
 
 /**
@@ -24,6 +25,7 @@ import org.camunda.bpm.engine.query.QueryProperty;
  */
 public class MybatisJoinHelper {
 
+  protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
   public static Map<String, MyBatisTableMapping> mappings = new HashMap<String, MyBatisTableMapping>();
 
   static {
@@ -98,7 +100,7 @@ public class MybatisJoinHelper {
     MyBatisTableMapping mapping = mappings.get(relation);
 
     if (mapping == null) {
-      throw new ProcessEngineException("No mapping for relation " + relation + " registered");
+      throw LOG.missingRelationMappingException(relation);
     }
 
     return mapping;

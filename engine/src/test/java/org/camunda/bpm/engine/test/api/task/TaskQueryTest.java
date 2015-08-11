@@ -4159,7 +4159,7 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
       task.getFormKey();
       fail("exception expected.");
     } catch (BadUserRequestException e) {
-      assertEquals("The form key is not initialized. You must call initializeFormKeys() on the task query prior to retrieving the form key.", e.getMessage());
+      assertEquals("ENGINE-03052 The form key is not initialized. You must call initializeFormKeys() on the task query before you can retrieve the form key.", e.getMessage());
     }
   }
 

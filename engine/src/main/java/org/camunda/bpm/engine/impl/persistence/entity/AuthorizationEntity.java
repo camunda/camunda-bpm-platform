@@ -17,11 +17,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resource;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 
@@ -31,6 +32,7 @@ import org.camunda.bpm.engine.impl.db.DbEntity;
  */
 public class AuthorizationEntity implements Authorization, DbEntity, HasDbRevision, Serializable {
 
+  protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
   private static final long serialVersionUID = 1L;
   
   protected String id;
@@ -67,8 +69,7 @@ public class AuthorizationEntity implements Authorization, DbEntity, HasDbRevisi
       this.permissions = Permissions.ALL.getValue();
       
     } else {
-      throw new ProcessEngineException("Unrecognized authorization type '"+authorizationType+"' Must be one of "
-          +AUTH_TYPE_GLOBAL+","+AUTH_TYPE_GRANT+", "+AUTH_TYPE_REVOKE);      
+      throw LOG.engineAuthorizationTypeException(authorizationType, AUTH_TYPE_GLOBAL, AUTH_TYPE_GRANT, AUTH_TYPE_REVOKE);
     }
   }
   
@@ -84,28 +85,28 @@ public class AuthorizationEntity implements Authorization, DbEntity, HasDbRevisi
   
   public boolean isPermissionGranted(Permission p) {
     if(AUTH_TYPE_REVOKE == authorizationType) {
-      throw new IllegalStateException("Method isPermissionGranted cannot be used for authorization type REVOKE.");
-    }        
+      throw LOG.permissionStateException("isPermissionGranted", "REVOKE");
+    }
     return (permissions & p.getValue()) == p.getValue();    
   }
   
   public boolean isPermissionRevoked(Permission p) {
     if(AUTH_TYPE_GRANT == authorizationType) {
-      throw new IllegalStateException("Method isPermissionRevoked cannot be used for authorization type GRANT.");
-    }    
+      throw LOG.permissionStateException("isPermissionRevoked", "GRANT");
+    }
     return (permissions & p.getValue()) != p.getValue();    
   }
 
   public boolean isEveryPermissionGranted() {
     if(AUTH_TYPE_REVOKE == authorizationType) {
-      throw new IllegalStateException("Method isEveryPermissionGranted cannot be used for authorization type REVOKE.");
+      throw LOG.permissionStateException("isEveryPermissionGranted", "REVOKE");
     }
     return permissions == Permissions.ALL.getValue();
   }
 
   public boolean isEveryPermissionRevoked() {
     if (authorizationType == AUTH_TYPE_GRANT) {
-      throw new IllegalStateException("Method isEveryPermissionRevoked cannot be used for authorization type GRANT.");
+      throw LOG.permissionStateException("isEveryPermissionRevoked", "GRANT");
     }
     return permissions == 0;
   }
@@ -159,7 +160,7 @@ public class AuthorizationEntity implements Authorization, DbEntity, HasDbRevisi
   
   public void setGroupId(String groupId) {
     if(groupId != null && authorizationType == AUTH_TYPE_GLOBAL) {
-      throw new ProcessEngineException("Cannot use groupId for GLOBAL authorization.");
+      throw LOG.notUsableGroupIdForGlobalAuthorizationException();
     }
     this.groupId = groupId;
   }
@@ -170,7 +171,7 @@ public class AuthorizationEntity implements Authorization, DbEntity, HasDbRevisi
 
   public void setUserId(String userId) {
     if(userId != null && authorizationType == AUTH_TYPE_GLOBAL && !ANY.equals(userId)) {
-      throw new ProcessEngineException("Illegal value "+userId+" for userId for GLOBAL authorization. must be '"+ANY+"'.");
+      throw LOG.illegalValueForUserIdException(userId, ANY);
     }
     this.userId = userId;
   }

@@ -13,7 +13,8 @@
 
 package org.camunda.bpm.engine.impl.persistence;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
@@ -23,6 +24,8 @@ import org.camunda.bpm.engine.impl.util.ReflectUtil;
  * @author Tom Baeyens
  */
 public class GenericManagerFactory implements SessionFactory {
+
+  protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
   protected Class<? extends Session> managerImplementation;
   
@@ -43,7 +46,7 @@ public class GenericManagerFactory implements SessionFactory {
     try {
       return managerImplementation.newInstance();
     } catch (Exception e) {
-      throw new ProcessEngineException("couldn't instantiate "+managerImplementation.getName()+": "+e.getMessage(), e);
+      throw LOG.instantiateSessionException(managerImplementation.getName(), e);
     }
   }
 }

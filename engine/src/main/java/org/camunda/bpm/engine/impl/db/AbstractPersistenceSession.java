@@ -18,8 +18,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.WrongDbException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbBulkOperation;
@@ -31,7 +31,8 @@ import org.camunda.bpm.engine.impl.history.HistoryLevel;
  * @author Sebastian Menski
  */
 public abstract class AbstractPersistenceSession implements PersistenceSession {
-  
+
+  protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
   protected List<EntityLoadListener> listeners = new ArrayList<EntityLoadListener>(1);
 
   public void executeDbOperation(DbOperation operation) {
@@ -77,7 +78,7 @@ public abstract class AbstractPersistenceSession implements PersistenceSession {
     if ( (!processEngineConfiguration.isDbHistoryUsed())
          && (!configuredHistoryLevel.equals(HistoryLevel.HISTORY_LEVEL_NONE))
        ) {
-      throw new ProcessEngineException("historyLevel config is higher then 'none' and dbHistoryUsed is set to false");
+      throw LOG.databaseHistoryLevelException(configuredHistoryLevel.getName());
     }
 
     if (isEngineTablePresent()) {

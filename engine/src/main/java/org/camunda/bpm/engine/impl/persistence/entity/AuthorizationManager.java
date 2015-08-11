@@ -65,12 +65,14 @@ import org.camunda.bpm.engine.impl.JobDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.JobQueryImpl;
 import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.ProcessDefinitionStatisticsQueryImpl;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.impl.UserOperationLogQueryImpl;
 import org.camunda.bpm.engine.impl.VariableInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.AuthorizationCheck;
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.PermissionCheck;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -84,6 +86,7 @@ import org.camunda.bpm.engine.impl.util.CollectionUtil;
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class AuthorizationManager extends AbstractManager {
 
+  protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
   public static final String DEFAULT_AUTHORIZATION_CHECK = "defaultAuthorizationCheck";
 
   public Authorization createNewAuthorization(int type) {
@@ -320,7 +323,7 @@ public class AuthorizationManager extends AbstractManager {
           .memberOfGroup(Groups.CAMUNDA_ADMIN)
           .count();
       if (count == 0) {
-        throw new AuthorizationException("The user '"+userId+"' is not a member of group '"+Groups.CAMUNDA_ADMIN+"'.");
+        throw LOG.notAMemberException(userId, Groups.CAMUNDA_ADMIN);
       }
     }
   }

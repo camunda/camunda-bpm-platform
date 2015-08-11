@@ -28,11 +28,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.camunda.bpm.engine.OptimisticLockingException;
-import org.camunda.bpm.engine.ProcessEngineException;
+
 import org.camunda.bpm.engine.impl.DeploymentQueryImpl;
 import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
 import org.camunda.bpm.engine.impl.GroupQueryImpl;
@@ -48,6 +45,7 @@ import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
 import org.camunda.bpm.engine.impl.UserQueryImpl;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImpl;
@@ -57,6 +55,7 @@ import org.camunda.bpm.engine.impl.db.DbEntityLifecycleAware;
 import org.camunda.bpm.engine.impl.db.EntityLoadListener;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.db.PersistenceSession;
+import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.entitymanager.cache.CachedDbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.cache.DbEntityCache;
 import org.camunda.bpm.engine.impl.db.entitymanager.cache.DbEntityState;
@@ -78,7 +77,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorContext;
 @SuppressWarnings({ "rawtypes" })
 public class DbEntityManager implements Session, EntityLoadListener {
 
-  private static Logger log = Logger.getLogger(DbEntityManager.class.getName());
+  protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
   protected List<OptimisticLockingListener> optimisticLockingListeners;
 
@@ -291,7 +290,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
         persistenceSession.executeDbOperation(dbOperation);
       }
       catch(Exception e) {
-        throw new ProcessEngineException(formatExceptionMessage(e, dbOperation, operationsToFlush), e);
+        throw LOG.flushDbOperationException(operationsToFlush, dbOperation, e);
       }
       if(dbOperation.isFailed()) {
         handleOptimisticLockingException(dbOperation);
@@ -308,6 +307,10 @@ public class DbEntityManager implements Session, EntityLoadListener {
     flushDbOperationManager();
   }
 
+  @Deprecated
+  /**
+   * See {EnginePersistenceLogger.flushDbOperationException} for string formation
+   */
   protected String formatExceptionMessage(Exception e, DbOperation dbOperation, List<DbOperation> operationsToFlush) {
     StringBuilder exceptionMessage = new StringBuilder();
     exceptionMessage.append("Exception while executing Database Operation: ");
@@ -338,7 +341,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
     }
 
     if(!isHandled) {
-      throw new OptimisticLockingException("Could not execute "+dbOperation + ". Entity was updated by another transaction concurrently");
+      throw LOG.concurrentUpdateDbEntityException(dbOperation);
     }
   }
 
@@ -353,13 +356,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
     }
 
     // log cache state after flush
-    if(log.isLoggable(Level.FINEST)) {
-      log.finest("cache state after flush: ");
-      cachedEntities = dbEntityCache.getCachedEntities();
-      for (CachedDbEntity cachedDbEntity : cachedEntities) {
-        log.finest("  "+cachedDbEntity);
-      }
-    }
+    LOG.flushedCacheState(dbEntityCache.getCachedEntities());
   }
 
   protected void flushCachedEntity(CachedDbEntity cachedDbEntity) {
@@ -411,7 +408,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
   public void merge(DbEntity dbEntity) {
 
     if(dbEntity.getId() == null) {
-      throw new ProcessEngineException("Cannot merge dbEntity without id" + dbEntity);
+      throw LOG.mergeDbEntityException(dbEntity);
     }
 
     // NOTE: a proper implementation of merge() would fetch the entity from the database
@@ -463,11 +460,9 @@ public class DbEntityManager implements Session, EntityLoadListener {
     dbOperationManager.addOperation(dbOperation);
   }
 
+  @Deprecated
   protected void logFlushSummary(Collection<DbOperation> operations) {
-    log.fine("Flush Summary:");
-    for (DbOperation dbOperation : operations) {
-      log.fine("  " + dbOperation);
-    }
+    LOG.databaseFlushSummary(operations);
   }
 
   public void close() {

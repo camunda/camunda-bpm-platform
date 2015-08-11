@@ -19,12 +19,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.delegate.Expression;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.form.handler.StartFormHandler;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -43,6 +43,7 @@ import org.camunda.bpm.engine.task.IdentityLinkType;
 public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements ProcessDefinition, ResourceDefinitionEntity, DbEntity, HasDbRevision {
 
   private static final long serialVersionUID = 1L;
+  protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
   protected String key;
   protected int revision = 1;
@@ -68,7 +69,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
 
   protected void ensureNotSuspended() {
     if (isSuspended()) {
-      throw new SuspendedEntityInteractionException("Process definition " + id + " is suspended.");
+      throw LOG.suspendedEntityException("Process Definition", id);
     }
   }
 
@@ -166,7 +167,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
    */
   public void updateModifiedFieldsFromEntity(ProcessDefinitionEntity updatingProcessDefinition) {
     if (!this.key.equals(updatingProcessDefinition.key) || !this.deploymentId.equals(updatingProcessDefinition.deploymentId)) {
-      throw new ProcessEngineException("Cannot update entity from an unrelated process definition");
+      throw LOG.updateUnrelatedProcessDefinitionEntityException();
     }
 
     // TODO: add a guard once the mismatch between revisions in deployment cache and database has been resolved

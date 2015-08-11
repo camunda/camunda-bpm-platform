@@ -30,16 +30,16 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.ibatis.session.SqlSession;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.WrongDbException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.AbstractPersistenceSession;
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbBulkOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbEntityOperation;
@@ -59,7 +59,7 @@ import org.camunda.bpm.engine.impl.util.ReflectUtil;
  */
 public class DbSqlSession extends AbstractPersistenceSession {
 
-  private static Logger log = Logger.getLogger(DbSqlSession.class.getName());
+  protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
   protected SqlSession sqlSession;
   protected DbSqlSessionFactory dbSqlSessionFactory;
@@ -143,9 +143,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
   }
 
   protected void executeInsertEntity(String insertStatement, Object parameter) {
-    if(log.isLoggable(Level.FINE)) {
-      log.fine("inserting: " + toString(parameter));
-    }
+    LOG.executeDatabaseOperation("INSERT", parameter);
     sqlSession.insert(insertStatement, parameter);
 
     // set revision of our copy to 1
@@ -169,9 +167,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
     String deleteStatement = dbSqlSessionFactory.getDeleteStatement(dbEntity.getClass());
     ensureNotNull("no delete statement for " + dbEntity.getClass() + " in the ibatis mapping files", "deleteStatement", deleteStatement);
 
-    if(log.isLoggable(Level.FINE)) {
-      log.fine("deleting: " + toString(dbEntity));
-    }
+    LOG.executeDatabaseOperation("DELETE", dbEntity);
 
     // execute the delete
     int nrOfRowsDeleted = executeDelete(deleteStatement, dbEntity);
@@ -200,9 +196,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
     String statement = operation.getStatement();
     Object parameter = operation.getParameter();
 
-    if(log.isLoggable(Level.FINE)) {
-      log.fine("deleting (bulk): " + statement + " " + parameter);
-    }
+    LOG.executeDatabaseBulkOperation("DELETE", statement, parameter);
 
     executeDelete(statement, parameter);
   }
@@ -216,9 +210,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
     String updateStatement = dbSqlSessionFactory.getUpdateStatement(dbEntity);
     ensureNotNull("no update statement for " + dbEntity.getClass() + " in the ibatis mapping files", "updateStatement", updateStatement);
 
-    if (log.isLoggable(Level.FINE)) {
-      log.fine("updating: " + toString(dbEntity));
-    }
+    LOG.executeDatabaseOperation("UPDATE", dbEntity);
 
     // execute update
     int numOfRowsUpdated = executeUpdate(updateStatement, dbEntity);
@@ -252,15 +244,18 @@ public class DbSqlSession extends AbstractPersistenceSession {
     String statement = operation.getStatement();
     Object parameter = operation.getParameter();
 
-    if(log.isLoggable(Level.FINE)) {
-      log.fine("updating (bulk): " + statement + " " + parameter);
-    }
+    LOG.executeDatabaseBulkOperation("UPDATE", statement, parameter);
 
     executeUpdate(statement, parameter);
   }
 
   // utils /////////////////////////////////////////
 
+
+  /**
+   * this is now done in {EnginePersistenceLogger.executeDatabaseOperation}
+   */
+  @Deprecated
   protected String toString(Object object) {
     if(object == null) {
       return "null";
@@ -292,6 +287,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
 
   // schema operations ////////////////////////////////////////////////////////
 
+  @Deprecated
   public void dbSchemaCheckVersion() {
     try {
       String dbVersion = getDbVersion();
@@ -331,8 +327,6 @@ public class DbSqlSession extends AbstractPersistenceSession {
         }
       }
     }
-
-    log.fine("database schema check successful");
   }
 
   protected String addMissingComponent(String missingComponents, String component) {
@@ -450,7 +444,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
       }
 
     } catch (Exception e) {
-      throw new ProcessEngineException("couldn't check if tables are already present using metadata: "+e.getMessage(), e);
+      throw LOG.checkDatabaseTableException(e);
     }
   }
 
@@ -467,7 +461,6 @@ public class DbSqlSession extends AbstractPersistenceSession {
           Connection connection = getSqlSession().getConnection();
           DatabaseMetaData databaseMetaData = connection.getMetaData();
 
-          log.fine("retrieving process engine tables from jdbc metadata");
           String databaseTablePrefix = getDbSqlSessionFactory().getDatabaseTablePrefix();
           String tableNameFilter = databaseTablePrefix+"ACT_%";
 
@@ -480,8 +473,10 @@ public class DbSqlSession extends AbstractPersistenceSession {
             String tableName = tablesRs.getString("TABLE_NAME");
             tableName = tableName.toUpperCase();
             tableNames.add(tableName);
-            log.fine("  retrieved process engine table name "+tableName);
+
           }
+          LOG.fetchDatabaseTables("jdbc metadata", tableNames);
+
         }
       } catch (SQLException se) {
         throw se;
@@ -491,7 +486,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
         }
       }
     } catch (Exception e) {
-      throw new ProcessEngineException("couldn't get process engine table names: "+e.getMessage(), e);
+      throw LOG.getDatabaseTableNameException(e);
     }
 
     return tableNames;
@@ -509,14 +504,15 @@ public class DbSqlSession extends AbstractPersistenceSession {
       connection = Context.getProcessEngineConfiguration().getDataSource().getConnection();
       prepStat = connection.prepareStatement(selectTableNamesFromOracle);
       prepStat.setString(1, databaseTablePrefix + "ACT_%");
-      log.fine("retrieving process engine tables from oracle all_tables");
+
       tablesRs = prepStat.executeQuery();
       while (tablesRs.next()) {
         String tableName = tablesRs.getString("TABLE_NAME");
         tableName = tableName.toUpperCase();
         tableNames.add(tableName);
-        log.fine("  retrieved process engine table name "+tableName);
       }
+      LOG.fetchDatabaseTables("oracle all_tables", tableNames);
+
     } finally {
       if (tablesRs != null) {
         tablesRs.close();
@@ -561,9 +557,9 @@ public class DbSqlSession extends AbstractPersistenceSession {
       inputStream = ReflectUtil.getResourceAsStream(resourceName);
       if (inputStream == null) {
         if (isOptional) {
-          log.fine("no schema resource "+resourceName+" for "+operation);
+          LOG.missingSchemaResource(resourceName, operation);
         } else {
-          throw new ProcessEngineException("resource '" + resourceName + "' is not available");
+          throw LOG.missingSchemaResourceException(resourceName, operation);
         }
       } else {
         executeSchemaResource(operation, component, resourceName, inputStream);
@@ -580,14 +576,13 @@ public class DbSqlSession extends AbstractPersistenceSession {
       inputStream = new FileInputStream(new File(schemaFileResourceName));
       executeSchemaResource("schema operation", "process engine", schemaFileResourceName, inputStream);
     } catch (FileNotFoundException e) {
-      throw new ProcessEngineException("Cannot find schema resource file '"+schemaFileResourceName,e);
+      throw LOG.missingSchemaResourceFileException(schemaFileResourceName, e);
     } finally {
       IoUtil.closeSilently(inputStream);
     }
   }
 
   private void executeSchemaResource(String operation, String component, String resourceName, InputStream inputStream) {
-    log.info("performing "+operation+" on "+component+" with resource "+resourceName);
     String sqlStatement = null;
     String exceptionSqlStatement = null;
     try {
@@ -597,13 +592,14 @@ public class DbSqlSession extends AbstractPersistenceSession {
       String ddlStatements = new String(bytes);
       BufferedReader reader = new BufferedReader(new StringReader(ddlStatements));
       String line = readNextTrimmedLine(reader);
+
+      List<String> logLines = new ArrayList<String>();
+
       while (line != null) {
         if (line.startsWith("# ")) {
-          log.fine(line.substring(2));
-
+          logLines.add(line.substring(2));
         } else if (line.startsWith("-- ")) {
-          log.fine(line.substring(3));
-
+          logLines.add(line.substring(3));
         } else if (line.length()>0) {
 
           if (line.endsWith(";")) {
@@ -611,7 +607,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
             Statement jdbcStatement = connection.createStatement();
             try {
               // no logging needed as the connection will log it
-              log.fine("SQL: "+sqlStatement);
+              logLines.add(sqlStatement);
               jdbcStatement.execute(sqlStatement);
               jdbcStatement.close();
             } catch (Exception e) {
@@ -619,7 +615,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
                 exception = e;
                 exceptionSqlStatement = sqlStatement;
               }
-              log.log(Level.SEVERE, "problem during schema " + operation + ", statement '" + sqlStatement, e);
+              LOG.failedDatabaseOperation(operation, sqlStatement, e);
             } finally {
               sqlStatement = null;
             }
@@ -630,15 +626,15 @@ public class DbSqlSession extends AbstractPersistenceSession {
 
         line = readNextTrimmedLine(reader);
       }
+      LOG.performedDatabaseOperation(operation, component, resourceName, logLines);
 
       if (exception != null) {
         throw exception;
       }
 
-      log.fine("database schema " + operation + " for component "+component+" successful");
-
+      LOG.successfulDatabaseOperation(operation, component);
     } catch (Exception e) {
-      throw new ProcessEngineException("couldn't "+operation+" db schema: "+exceptionSqlStatement, e);
+      throw LOG.performDatabaseOperationException(operation, exceptionSqlStatement, e);
     }
   }
 

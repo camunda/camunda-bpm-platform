@@ -40,7 +40,7 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent("The user 'test' is not a member of group 'camunda-admin'", message);
+      assertTextPresent("ENGINE-03029 The user with id 'test' is not a member of the group with id 'camunda-admin'", message);
     }
   }
 
@@ -68,7 +68,7 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent("The user 'test' is not a member of group 'camunda-admin'", message);
+      assertTextPresent("ENGINE-03029 The user with id 'test' is not a member of the group with id 'camunda-admin'", message);
     }
   }
 
@@ -96,7 +96,7 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent("The user 'test' is not a member of group 'camunda-admin'", message);
+      assertTextPresent("ENGINE-03029 The user with id 'test' is not a member of the group with id 'camunda-admin'", message);
     }
   }
 
@@ -124,7 +124,7 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent("The user 'test' is not a member of group 'camunda-admin'", message);
+      assertTextPresent("ENGINE-03029 The user with id 'test' is not a member of the group with id 'camunda-admin'", message);
     }
 
   }
@@ -153,7 +153,7 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent("The user 'test' is not a member of group 'camunda-admin'", message);
+      assertTextPresent("ENGINE-03029 The user with id 'test' is not a member of the group with id 'camunda-admin'", message);
     }
   }
 
@@ -181,7 +181,7 @@ public class ManagementAuthorizationTest extends AuthorizationTest {
     } catch (AuthorizationException e) {
       // then
       String message = e.getMessage();
-      assertTextPresent("The user 'test' is not a member of group 'camunda-admin'", message);
+      assertTextPresent("ENGINE-03029 The user with id 'test' is not a member of the group with id 'camunda-admin'", message);
     }
   }
 

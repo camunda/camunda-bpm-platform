@@ -15,10 +15,8 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.sql.*;
 import java.util.*;
-import java.util.logging.Logger;
 
 import org.apache.ibatis.session.RowBounds;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
@@ -29,8 +27,10 @@ import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.TablePageQueryImpl;
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.history.event.HistoricDetailEventEntity;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
@@ -50,7 +50,7 @@ import org.camunda.bpm.engine.task.Task;
  */
 public class TableDataManager extends AbstractManager {
 
-  private static Logger log = Logger.getLogger(TableDataManager.class.getName());
+  protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
   public static Map<Class<?>, String> apiTypeToTableNameMap = new HashMap<Class<?>, String>();
   public static Map<Class<? extends DbEntity>, String> persistentObjectToTableNameMap = new HashMap<Class<? extends DbEntity>, String>();
@@ -139,15 +139,15 @@ public class TableDataManager extends AbstractManager {
       for (String tableName: getDbEntityManager().getTableNamesPresentInDatabase()) {
         tableCount.put(tableName, getTableCount(tableName));
       }
-      log.fine("Number of rows per process engine table: "+tableCount);
+      LOG.countRowsPerProcessEngineTable(tableCount);
     } catch (Exception e) {
-      throw new ProcessEngineException("couldn't get table counts", e);
+      throw LOG.countTableRowsException(e);
     }
     return tableCount;
   }
 
   protected long getTableCount(String tableName) {
-    log.fine("selecting table count for "+tableName);
+    LOG.selectTableCountForTable(tableName);
     Long count = (Long) getDbEntityManager().selectOne("selectTableCount",
             Collections.singletonMap("tableName", tableName));
     return count;
@@ -219,7 +219,7 @@ public class TableDataManager extends AbstractManager {
         }
       }
     } catch (Exception e) {
-      throw new ProcessEngineException("Could not retrieve database metadata: " + e.getMessage());
+      throw LOG.retrieveMetadataException(e);
     }
 
     if(result.getColumnNames().size() == 0) {

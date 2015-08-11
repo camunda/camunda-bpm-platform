@@ -13,8 +13,9 @@
 
 package org.camunda.bpm.engine.impl.persistence;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 
 
@@ -23,6 +24,8 @@ import org.camunda.bpm.engine.impl.history.HistoryLevel;
  */
 public class AbstractHistoricManager extends AbstractManager {
 
+  protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
+
   protected HistoryLevel historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
 
   protected boolean isHistoryEnabled = !historyLevel.equals(HistoryLevel.HISTORY_LEVEL_NONE);
@@ -30,7 +33,7 @@ public class AbstractHistoricManager extends AbstractManager {
 
   protected void checkHistoryEnabled() {
     if (!isHistoryEnabled) {
-      throw new ProcessEngineException("history is not enabled");
+      throw LOG.disabledHistoryException();
     }
   }
 

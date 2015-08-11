@@ -68,7 +68,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
       fail("exception expected");
 
     } catch (Exception e) {
-      assertTextPresent("Illegal value something for userId for GLOBAL authorization. must be '*'", e.getMessage());
+      assertTextPresent("ENGINE-03028 Illegal value 'something' for userId for GLOBAL authorization. Must be '*'", e.getMessage());
 
     }
 
@@ -81,7 +81,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
       fail("exception expected");
 
     } catch (Exception e) {
-      assertTextPresent("Cannot use groupId for GLOBAL authorization", e.getMessage());
+      assertTextPresent("ENGINE-03027 Cannot use 'groupId' for GLOBAL authorization", e.getMessage());
     }
   }
 
@@ -513,7 +513,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
       authorization.isPermissionRevoked(READ);
       fail("Exception expected");
     } catch (IllegalStateException e) {
-      assertTextPresent("Method isPermissionRevoked cannot be used for authorization type GRANT.", e.getMessage());
+      assertTextPresent("ENGINE-03026 Method 'isPermissionRevoked' cannot be used for authorization with type 'GRANT'.", e.getMessage());
     }
 
   }
@@ -539,7 +539,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
       authorization.isPermissionRevoked(READ);
       fail("Exception expected");
     } catch (IllegalStateException e) {
-      assertTextPresent("Method isPermissionRevoked cannot be used for authorization type GRANT.", e.getMessage());
+      assertTextPresent("ENGINE-03026 Method 'isPermissionRevoked' cannot be used for authorization with type 'GRANT'.", e.getMessage());
     }
 
   }
@@ -561,7 +561,7 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
       authorization.isPermissionGranted(READ);
       fail("Exception expected");
     } catch (IllegalStateException e) {
-      assertTextPresent("Method isPermissionGranted cannot be used for authorization type REVOKE.", e.getMessage());
+      assertTextPresent("ENGINE-03026 Method 'isPermissionGranted' cannot be used for authorization with type 'REVOKE'.", e.getMessage());
     }
 
   }

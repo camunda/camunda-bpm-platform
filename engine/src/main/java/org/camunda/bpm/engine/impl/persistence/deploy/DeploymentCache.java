@@ -20,17 +20,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.cmmn.CaseDefinitionNotFoundException;
 import org.camunda.bpm.engine.exception.dmn.DecisionDefinitionNotFoundException;
 import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceCmd;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -53,7 +52,7 @@ import org.camunda.bpm.model.dmn.DmnModelInstance;
  */
 public class DeploymentCache {
 
-  private Logger LOGGER = Logger.getLogger(DeploymentCache.class.getName());
+  protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
   protected Map<String, ProcessDefinitionEntity> processDefinitionCache = new HashMap<String, ProcessDefinitionEntity>();
   protected Map<String, CaseDefinitionEntity> caseDefinitionCache = new HashMap<String, CaseDefinitionEntity>();
@@ -175,7 +174,7 @@ public class DeploymentCache {
       bpmnModelInstanceCache.put(processDefinitionEntity.getId(), bpmnModelInstance);
       return bpmnModelInstance;
     }catch(Exception e) {
-      throw new ProcessEngineException("Could not load Bpmn Model for process definition "+processDefinitionEntity.getId(), e);
+      throw LOG.loadModelException("BPMN", "process", processDefinitionEntity.getId(), e);
     }
   }
 
@@ -317,7 +316,7 @@ public class DeploymentCache {
       try {
         cmmnModelInstance = Cmmn.readModelFromStream(cmmnResourceInputStream);
       }catch(Exception e) {
-        throw new ProcessEngineException("Could not load Cmmn Model for case definition " + caseDefinitionId, e);
+        throw LOG.loadModelException("CMMN", "case", caseDefinitionId, e);
       }
 
       // put model instance into cache.
@@ -451,7 +450,7 @@ public class DeploymentCache {
       try {
         dmnModelInstance = Dmn.readModelFromStream(dmnResourceInputStream);
       }catch(Exception e) {
-        throw new ProcessEngineException("Could not load DMN Model for decision definition " + decisionDefinitionId, e);
+        throw LOG.loadModelException("DMN", "decision", decisionDefinitionId, e);
       }
 
       // put model instance into cache.
@@ -536,8 +535,7 @@ public class DeploymentCache {
         removeProcessDefinition(processDefinition.getId());
 
       } catch(Exception e) {
-        LOGGER.log(Level.WARNING, "Could not remove process definition with id '"+processDefinition.getId()+"' from the cache.", e);
-
+        LOG.removeEntryFromDeploymentCacheFailure("process", processDefinition.getId(), e);
       }
     }
   }
@@ -555,8 +553,7 @@ public class DeploymentCache {
         removeCaseDefinition(caseDefinition.getId());
 
       } catch(Exception e) {
-        LOGGER.log(Level.WARNING, "Could not remove case definition with id '"+caseDefinition.getId()+"' from the cache.", e);
-
+        LOG.removeEntryFromDeploymentCacheFailure("case", caseDefinition.getId(), e);
       }
     }
   }
@@ -573,7 +570,7 @@ public class DeploymentCache {
       try {
         removeDecisionDefinition(decisionDefinition.getId());
       } catch(Exception e) {
-        LOGGER.log(Level.WARNING, "Could not remove decision definition with id '" + decisionDefinition.getId() + "' from the cache.", e);
+        LOG.removeEntryFromDeploymentCacheFailure("decision", decisionDefinition.getId(), e);
       }
     }
   }

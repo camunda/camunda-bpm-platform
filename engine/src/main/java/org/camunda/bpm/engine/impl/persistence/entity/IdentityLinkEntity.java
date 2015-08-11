@@ -14,9 +14,10 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.io.Serializable;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.task.IdentityLink;
 
 
@@ -26,6 +27,7 @@ import org.camunda.bpm.engine.task.IdentityLink;
 public class IdentityLinkEntity implements Serializable, IdentityLink, DbEntity {
   
   private static final long serialVersionUID = 1L;
+  protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
   
   protected String id;
   
@@ -86,7 +88,7 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, DbEntity 
   
   public void setUserId(String userId) {
     if (this.groupId != null && userId != null) {
-      throw new ProcessEngineException("Cannot assign a userId to a task assignment that already has a groupId");
+      throw LOG.taskIsAlreadyAssignedException("userId", "groupId");
     }
     this.userId = userId;
   }
@@ -97,7 +99,7 @@ public class IdentityLinkEntity implements Serializable, IdentityLink, DbEntity 
   
   public void setGroupId(String groupId) {
     if (this.userId != null && groupId != null) {
-      throw new ProcessEngineException("Cannot assign a groupId to a task assignment that already has a userId");
+      throw LOG.taskIsAlreadyAssignedException("groupId", "userId");
     }
     this.groupId = groupId;
   }
