@@ -27,21 +27,21 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 public class BpmnBehaviorLogger extends ProcessEngineLogger {
 
 
-  public void logMissingBoundaryCatchEvent(String executionId, String errorCode) {
-    logDebug(
+  public void missingBoundaryCatchEvent(String executionId, String errorCode) {
+    logInfo(
       "001",
       "Execution with id '{}' throws an error event with errorCode '{}', but no catching boundary event was defined. " +
-      "Execution is ended (none end event semantics).",
+        "Execution is ended (none end event semantics).",
       executionId,
       errorCode
     );
   }
 
-  public void logLeavingActivtiy(String activityId) {
+  public void leavingActivity(String activityId) {
     logDebug("002", "Leaving activity '{}'.", activityId);
   }
 
-  public void logMissingOutgoingSequenceFlow(String activityId) {
+  public void missingOutgoingSequenceFlow(String activityId) {
     logDebug("003", "No outgoing sequence flow found for activity '{}'. Ending execution.", activityId);
   }
 
@@ -79,7 +79,7 @@ public class BpmnBehaviorLogger extends ProcessEngineLogger {
       exceptionMessage("008", "Class '{}' doesn't implement '{}' nor '{}'.", className, javaDelegate, activityBehavior));
   }
 
-  public void logOutgoingSequenceFlow(String sequenceFlowId) {
+  public void outgoingSequenceFlowSelected(String sequenceFlowId) {
     logDebug("009", "Sequence flow with id '{}' was selected as outgoing sequence flow.", sequenceFlowId);
   }
 
@@ -87,19 +87,19 @@ public class BpmnBehaviorLogger extends ProcessEngineLogger {
     return new ProcessEngineException(exceptionMessage("010", "The activity with id '{}' doesn't accept signals.", activityId));
   }
 
-  public void logActivityActivation(String activityId) {
+  public void activityActivation(String activityId) {
     logDebug("011", "Element with id '{}' activates.", activityId);
   }
 
-  public void logNoActivityActivation(String activityId) {
+  public void noActivityActivation(String activityId) {
     logDebug("012", "Element with id '{}' does not activate.", activityId);
   }
 
-  public void logActiveConcurrentExecution(PvmActivity activity) {
+  public void activeConcurrentExecutionFound(PvmActivity activity) {
     logDebug("013", "An active concurrent execution with id '{}' was found.", activity);
   }
 
-  public void logIgnoredEventSubscription(SignalEventSubscriptionEntity eventSubscription, String processDefinitionId) {
+  public void ignoringEventSubscription(SignalEventSubscriptionEntity eventSubscription, String processDefinitionId) {
     logDebug(
       "014",
       "Found event subscription '{}' but process definition with id '{}' could not be found.",
@@ -157,7 +157,7 @@ public class BpmnBehaviorLogger extends ProcessEngineLogger {
     );
   }
 
-  public ProcessEngineException InvalidVariableTypeException(String variable, String type) {
+  public ProcessEngineException invalidVariableTypeException(String variable, String type) {
     return new ProcessEngineException(exceptionMessage("025", "Variable '{}' is not from type '{}'.", variable, type));
   }
 
@@ -183,11 +183,11 @@ public class BpmnBehaviorLogger extends ProcessEngineLogger {
     ));
   }
 
-  public void logMultiInstanceCompletionConditionState(Boolean state) {
+  public void multiInstanceCompletionConditionState(Boolean state) {
     logDebug("029", "Completion condition of multi-instance satisfied: '{}'", state);
   }
 
-  public void logActivityActivation(String activityId, int joinedExecutions, int availableExecution) {
+  public void activityActivation(String activityId, int joinedExecutions, int availableExecution) {
     logDebug(
       "030",
       "Element with id '{}' activates. Joined '{}' of '{}' available executions.",
@@ -197,7 +197,7 @@ public class BpmnBehaviorLogger extends ProcessEngineLogger {
     );
   }
 
-  public void logNoActivityActivation(String activityId, int joinedExecutions, int availableExecution) {
+  public void noActivityActivation(String activityId, int joinedExecutions, int availableExecution) {
     logDebug(
       "031",
       "Element with id '{}' does not activate. Joined '{}' of '{}' available executions.",

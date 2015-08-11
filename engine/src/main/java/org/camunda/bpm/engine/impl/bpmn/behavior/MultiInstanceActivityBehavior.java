@@ -107,7 +107,7 @@ public abstract class MultiInstanceActivityBehavior extends AbstractBpmnActivity
     } else if (collectionVariable != null) {
       Object obj = execution.getVariable(collectionVariable);
       if (!(obj instanceof Collection)) {
-        throw LOG.InvalidVariableTypeException(collectionVariable, "Collection");
+        throw LOG.invalidVariableTypeException(collectionVariable, "Collection");
       }
       nrOfInstances = ((Collection<?>) obj).size();
     } else {
@@ -152,7 +152,7 @@ public abstract class MultiInstanceActivityBehavior extends AbstractBpmnActivity
       }
       Boolean booleanValue = (Boolean) value;
 
-      LOG.logMultiInstanceCompletionConditionState(booleanValue);
+      LOG.multiInstanceCompletionConditionState(booleanValue);
       return booleanValue;
     }
     return false;

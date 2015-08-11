@@ -82,7 +82,7 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
     ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
     if (processDefinition == null || processDefinition.isSuspended()) {
       // ignore event subscription
-      LOG.logIgnoredEventSubscription(eventSubscription, processDefinitionId);
+      LOG.ignoringEventSubscription(eventSubscription, processDefinitionId);
     } else {
 
       ActivityImpl signalStartEvent = processDefinition.findActivity(eventSubscription.getActivityId());

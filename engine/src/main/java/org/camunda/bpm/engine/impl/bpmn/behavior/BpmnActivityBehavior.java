@@ -81,7 +81,7 @@ public class BpmnActivityBehavior {
   protected void performOutgoingBehavior(ActivityExecution execution,
           boolean checkConditions, boolean throwExceptionIfExecutionStuck, List<ActivityExecution> reusableExecutions) {
 
-    LOG.logLeavingActivtiy(execution.getActivity().getId());
+    LOG.leavingActivity(execution.getActivity().getId());
 
     String defaultSequenceFlow = (String) execution.getActivity().getProperty("default");
     List<PvmTransition> transitionsToTake = new ArrayList<PvmTransition>();
@@ -128,7 +128,7 @@ public class BpmnActivityBehavior {
          execution.endCompensation();
 
         } else {
-          LOG.logMissingOutgoingSequenceFlow(execution.getActivity().getId());
+          LOG.missingOutgoingSequenceFlow(execution.getActivity().getId());
           execution.end(true);
 
           if (throwExceptionIfExecutionStuck) {

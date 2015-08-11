@@ -47,7 +47,7 @@ public class ExclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
   @Override
   protected void leave(ActivityExecution execution) {
 
-    LOG.logLeavingActivtiy(execution.getActivity().getId());
+    LOG.leavingActivity(execution.getActivity().getId());
 
     PvmTransition outgoingSeqFlow = null;
     String defaultSequenceFlow = (String) execution.getActivity().getProperty("default");
@@ -59,7 +59,7 @@ public class ExclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
       if ( (condition == null && (defaultSequenceFlow == null || !defaultSequenceFlow.equals(seqFlow.getId())) )
               || (condition != null && condition.evaluate(execution)) ) {
 
-        LOG.logOutgoingSequenceFlow(seqFlow.getId());
+        LOG.outgoingSequenceFlowSelected(seqFlow.getId());
         outgoingSeqFlow = seqFlow;
       }
     }

@@ -23,25 +23,25 @@ public class BpmnParseLogger extends ProcessEngineLogger {
 
   // LOGGING
 
-  public void logElementParsing(String elementType, String elementId) {
+  public void parsingElement(String elementType, String elementId) {
     logDebug("001", "Parsing element from type '{}' with id '{}'", elementType, elementId);
   }
 
-  public void logIgnoringNonExecutableProcess(String elementId) {
+  public void ignoringNonExecutableProcess(String elementId) {
     logInfo("002", "Ignoring non-executable process with id '{}'. Set the attribute isExecutable=\"true\" to deploy " +
       "this process.", elementId);
   }
 
-  public void logMissingIsExecutableAttribute(String elementId) {
-    logInfo("003", "Process with id '{}' has no attribute isExecutable. Better set the attribute explicitely, " +
+  public void missingIsExecutableAttribute(String elementId) {
+    logInfo("003", "Process with id '{}' has no attribute isExecutable. Better set the attribute explicitly, " +
       "especially to be compatible with future engine versions which might change the default behavior.", elementId);
   }
 
-  public void logParsingFailure(Throwable cause) {
+  public void parsingFailure(Throwable cause) {
     logError("004", "Unexpected Exception with message: {} ", cause.getMessage());
   }
 
-  public void logSettingSchemaResource(Throwable cause) {
+  public void unableToSetSchemaResource(Throwable cause) {
     logWarn("005", "Setting schema resource failed because of: '{}'", cause.getMessage());
   }
 
@@ -64,4 +64,9 @@ public class BpmnParseLogger extends ProcessEngineLogger {
   public ProcessEngineException parsingFailureException(String name, Throwable cause) {
     return new ProcessEngineException(exceptionMessage("008", "Could not parse '{}'.", name), cause);
   }
+
+  public ProcessEngineException parsingProcessException(Exception cause) {
+    return new ProcessEngineException(exceptionMessage("009", "Error while parsing process"), cause);
+  }
+
 }

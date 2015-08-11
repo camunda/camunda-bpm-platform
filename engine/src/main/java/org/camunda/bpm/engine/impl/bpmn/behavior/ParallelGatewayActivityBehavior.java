@@ -68,11 +68,11 @@ public class ParallelGatewayActivityBehavior extends GatewayActivityBehavior {
     if (nbrOfExecutionsJoined==nbrOfExecutionsToJoin) {
 
       // Fork
-      LOG.logActivityActivation(activity.getId(), nbrOfExecutionsJoined, nbrOfExecutionsToJoin);
+      LOG.activityActivation(activity.getId(), nbrOfExecutionsJoined, nbrOfExecutionsToJoin);
       execution.leaveActivityViaTransitions(outgoingTransitions, joinedExecutions);
 
     } else {
-      LOG.logNoActivityActivation(activity.getId(), nbrOfExecutionsJoined, nbrOfExecutionsToJoin);
+      LOG.noActivityActivation(activity.getId(), nbrOfExecutionsJoined, nbrOfExecutionsToJoin);
     }
   }
 

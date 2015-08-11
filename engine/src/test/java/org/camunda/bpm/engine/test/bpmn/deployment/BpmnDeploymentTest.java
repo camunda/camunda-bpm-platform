@@ -338,7 +338,7 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
     catch(ProcessEngineException expected) {
       // Check if no deployments are made
       assertEquals(0, repositoryService.createDeploymentQuery().count());
-      assertTrue(expected.getMessage().startsWith("Error while parsing process: "));
+      assertEquals("ENGINE-01009 Error while parsing process", expected.getMessage());
     }
   }
 

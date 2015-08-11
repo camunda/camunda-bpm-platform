@@ -191,7 +191,7 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
     if (errorHandlingExecution == null) {
       if (origException == null) {
 
-        LOG.logMissingBoundaryCatchEvent(execution.getActivity().getId(), errorCode);
+        LOG.missingBoundaryCatchEvent(execution.getActivity().getId(), errorCode);
         execution.end(true);
       } else {
         // throw original exception

@@ -16,8 +16,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.impl.Condition;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -46,7 +44,7 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
     PvmActivity activity = execution.getActivity();
     if (!activeConcurrentExecutionsExist(execution)) {
 
-      LOG.logActivityActivation(activity.getId());
+      LOG.activityActivation(activity.getId());
 
       List<ActivityExecution> joinedExecutions = execution.findInactiveConcurrentExecutions(activity);
       String defaultSequenceFlow = (String) execution.getActivity().getProperty("default");
@@ -81,7 +79,7 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
       // take the flows found
       execution.leaveActivityViaTransitions(transitionsToTake, joinedExecutions);
     } else {
-      LOG.logNoActivityActivation(activity.getId());
+      LOG.noActivityActivation(activity.getId());
     }
   }
 
@@ -114,13 +112,13 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
           }
 
           if (reachable) {
-            LOG.logActiveConcurrentExecution(concurrentExecution.getActivity());
+            LOG.activeConcurrentExecutionFound(concurrentExecution.getActivity());
             return true;
           }
         }
       }
     } else if (execution.isActive()) { // is this ever true?
-      LOG.logActiveConcurrentExecution(execution.getActivity());
+      LOG.activeConcurrentExecutionFound(execution.getActivity());
       return true;
     }
 

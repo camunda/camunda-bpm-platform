@@ -271,12 +271,12 @@ public class BpmnParse extends Parse {
       addError(e);
 
     } catch (Exception e) {
-      LOG.logParsingFailure(e);
+      LOG.parsingFailure(e);
 
       // ALL unexpected exceptions should bubble up since they are not handled
       // accordingly by underlying parse-methods and the process can't be
       // deployed
-      throw new ProcessEngineException("Error while parsing process: " + e.getMessage(), e);
+      throw LOG.parsingProcessException(e);
 
     } finally {
       if (hasWarnings()) {
@@ -452,10 +452,10 @@ public class BpmnParse extends Parse {
       if (isExecutableStr != null) {
         if (!Boolean.parseBoolean(isExecutableStr)) {
           isExecutable = false;
-          LOG.logIgnoringNonExecutableProcess(processElement.attribute("id"));
+          LOG.ignoringNonExecutableProcess(processElement.attribute("id"));
         }
       } else {
-        LOG.logMissingIsExecutableAttribute(processElement.attribute("id"));
+        LOG.missingIsExecutableAttribute(processElement.attribute("id"));
       }
 
       // Only process executable processes
@@ -519,7 +519,7 @@ public class BpmnParse extends Parse {
     processDefinition.setDeploymentId(deployment.getId());
     processDefinition.setProperty(PROPERTYNAME_JOB_PRIORITY, parseJobPriority(processElement));
 
-    LOG.logElementParsing("process", processDefinition.getKey());
+    LOG.parsingElement("process", processDefinition.getKey());
 
     parseScope(processElement, processDefinition);
 
@@ -1535,7 +1535,7 @@ public class BpmnParse extends Parse {
     } else {
       String id = activityElement.attribute("id");
 
-      LOG.logElementParsing("mi body for activity", id);
+      LOG.parsingElement("mi body for activity", id);
 
       id = getIdForMiBody(id);
       ActivityImpl miBodyScope = scope.createActivity(id);
@@ -1635,7 +1635,7 @@ public class BpmnParse extends Parse {
   public ActivityImpl createActivityOnScope(Element activityElement, ScopeImpl scopeElement) {
     String id = activityElement.attribute("id");
 
-    LOG.logElementParsing("activity", id);
+    LOG.parsingElement("activity", id);
     ActivityImpl activity = scopeElement.createActivity(id);
 
     activity.setProperty("name", activityElement.attribute("name"));
@@ -2710,7 +2710,7 @@ public class BpmnParse extends Parse {
       // which its attached
       String id = boundaryEventElement.attribute("id");
 
-      LOG.logElementParsing("boundary event", id);
+      LOG.parsingElement("boundary event", id);
 
       // Depending on the sub-element definition, the correct activityBehavior
       // parsing is selected

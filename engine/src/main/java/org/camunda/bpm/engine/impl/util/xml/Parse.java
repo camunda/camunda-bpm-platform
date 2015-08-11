@@ -198,7 +198,7 @@ public class Parse extends DefaultHandler {
     try {
       saxParserFactory.setFeature("http://xml.org/sax/features/namespace-prefixes", true);
     } catch (Exception e) {
-      LOG.logSettingSchemaResource(e);
+      LOG.unableToSetSchemaResource(e);
     }
     this.schemaResource = schemaResource;
   }
