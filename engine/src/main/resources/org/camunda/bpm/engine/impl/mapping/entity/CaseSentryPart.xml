@@ -29,7 +29,7 @@
       #{type, jdbcType=VARCHAR},
       #{standardEvent, jdbcType=VARCHAR},
       #{satisfied, jdbcType=BOOLEAN},
-      #{source, jdbcType=VARCHAR},
+      #{source, jdbcType=VARCHAR}
     )
   </insert>
 
