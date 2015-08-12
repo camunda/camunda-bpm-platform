@@ -18,8 +18,8 @@ import java.util.List;
 
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.AbstractVariableQueryImpl;
-import org.camunda.bpm.engine.impl.QueryOrderingProperty;
 import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.QueryOrderingProperty;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -46,6 +46,8 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
   // Not used by end-users, but needed for dynamic ibatis query
   protected Boolean required;
+  protected Boolean repeatable;
+  protected Boolean repetition;
 
   public CaseInstanceQueryImpl() {
   }
@@ -209,6 +211,14 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
   public Boolean isRequired() {
     return required;
+  }
+
+  public Boolean isRepeatable() {
+    return repeatable;
+  }
+
+  public Boolean isRepetition() {
+    return repetition;
   }
 
 }

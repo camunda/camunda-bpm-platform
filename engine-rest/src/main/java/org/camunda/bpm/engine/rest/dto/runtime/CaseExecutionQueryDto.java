@@ -55,6 +55,8 @@ public class CaseExecutionQueryDto extends AbstractQueryDto<CaseExecutionQuery> 
   protected String businessKey;
   protected String activityId;
   protected Boolean required;
+  protected Boolean repeatable;
+  protected Boolean repetition;
   protected Boolean enabled;
   protected Boolean active;
   protected Boolean disabled;
@@ -104,6 +106,16 @@ public class CaseExecutionQueryDto extends AbstractQueryDto<CaseExecutionQuery> 
     this.required = required;
   }
 
+  @CamundaQueryParam(value="repeatable", converter = BooleanConverter.class)
+  public void setRepeatable(Boolean repeatable) {
+    this.repeatable = repeatable;
+  }
+  
+  @CamundaQueryParam(value="repetition", converter = BooleanConverter.class)
+  public void setRepetition(Boolean repetition) {
+    this.repetition = repetition;
+  }
+  
   @CamundaQueryParam(value="enabled", converter = BooleanConverter.class)
   public void setEnabled(Boolean enabled) {
     this.enabled = enabled;
@@ -169,6 +181,14 @@ public class CaseExecutionQueryDto extends AbstractQueryDto<CaseExecutionQuery> 
       query.required();
     }
 
+    if (repeatable != null && repeatable == true) {
+      query.repeatable();
+    }
+    
+    if (repetition != null && repetition == true) {
+      query.repetition();
+    }
+    
     if (active != null && active == true) {
       query.active();
     }

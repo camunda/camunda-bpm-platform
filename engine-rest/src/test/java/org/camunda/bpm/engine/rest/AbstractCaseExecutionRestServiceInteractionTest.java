@@ -162,6 +162,8 @@ public abstract class AbstractCaseExecutionRestServiceInteractionTest extends Ab
         .body("activityType", equalTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_TYPE))
         .body("activityDescription", equalTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_DESCRIPTION))
         .body("required", equalTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_REQUIRED))
+        .body("repeatable", equalTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_REPEATABLE))
+        .body("repetition", equalTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_REPETITION))
         .body("active", equalTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_ACTIVE))
         .body("enabled", equalTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_ENABLED))
         .body("disabled", equalTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_DISABLED))

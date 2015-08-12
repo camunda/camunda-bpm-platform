@@ -88,6 +88,12 @@ public interface CaseExecutionQuery extends Query<CaseExecutionQuery, CaseExecut
   /** Only select case executions which are required. **/
   CaseExecutionQuery required();
 
+  /** Only select case executions which are repeatable. **/
+  CaseExecutionQuery repeatable();
+
+  /** Only select case executions which are repetitions. **/
+  CaseExecutionQuery repetition();
+
   /** Only select case executions which are available. **/
   CaseExecutionQuery available();
 

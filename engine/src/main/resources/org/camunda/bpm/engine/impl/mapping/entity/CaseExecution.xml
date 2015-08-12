@@ -180,7 +180,13 @@
       <if test="required">
         and RES.REQUIRED_ = ${trueConstant}
       </if>
-
+      <if test="repeatable">
+        and RES.REPEATABLE_ = ${trueConstant}
+      </if>
+      <if test="repetition">
+        and RES.REPETITION_ = ${trueConstant}
+      </if>
+      
       <if test="superProcessInstanceId != null">
         and RES.SUPER_EXEC_ IN (select ID_ from ${prefix}ACT_RU_EXECUTION where PROC_INST_ID_ = #{superProcessInstanceId})
       </if>

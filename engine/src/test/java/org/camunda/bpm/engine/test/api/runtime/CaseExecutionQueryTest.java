@@ -2535,4 +2535,45 @@ public class CaseExecutionQueryTest extends PluggableProcessEngineTestCase {
     assertNotNull(execution);
     assertTrue(execution.isRequired());
   }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/repetition/RepetitionRuleTest.testRepeatTask.cmmn")
+  public void testQueryByRepeatable() {
+    caseService.createCaseInstanceByKey("case");
+
+    CaseExecutionQuery query = caseService
+        .createCaseExecutionQuery()
+        .repeatable();
+
+    verifyQueryResults(query, 1);
+
+    CaseExecution execution = query.singleResult();
+    assertNotNull(execution);
+    assertTrue(execution.isRepeatable());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/repetition/RepetitionRuleTest.testRepeatTask.cmmn")
+  public void testQueryByRepetition() {
+    String caseInstanceId = caseService.createCaseInstanceByKey("case").getId();
+
+    String firstHumanTaskId = caseService
+        .createCaseExecutionQuery()
+        .caseInstanceId(caseInstanceId)
+        .activityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    caseService.manuallyStartCaseExecution(firstHumanTaskId);
+    caseService.completeCaseExecution(firstHumanTaskId);
+
+    CaseExecutionQuery query = caseService
+        .createCaseExecutionQuery()
+        .repetition();
+
+    verifyQueryResults(query, 1);
+
+    CaseExecution execution = query.singleResult();
+    assertNotNull(execution);
+    assertTrue(execution.isRepetition());
+  }
+
 }

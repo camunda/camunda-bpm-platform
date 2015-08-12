@@ -295,6 +295,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     );
     UserQuery sampleUserQuery = mock(UserQuery.class);
     when(sampleUserQuery.userIdIn(eq(EXAMPLE_TASK_ASSIGNEE_NAME), eq(EXAMPLE_TASK_OWNER))).thenReturn(sampleUserQuery);
+    when(sampleUserQuery.userIdIn(eq(EXAMPLE_TASK_OWNER), eq(EXAMPLE_TASK_ASSIGNEE_NAME))).thenReturn(sampleUserQuery);
     when(sampleUserQuery.listPage(eq(0), eq(2))).thenReturn(mockUsers);
     when(sampleUserQuery.count()).thenReturn((long) mockUsers.size());
     when(processEngine.getIdentityService().createUserQuery()).thenReturn(sampleUserQuery);
@@ -306,6 +307,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     );
     GroupQuery sampleGroupQuery = mock(GroupQuery.class);
     when(sampleGroupQuery.groupIdIn(eq(EXAMPLE_GROUP_ID), eq(EXAMPLE_GROUP_ID2))).thenReturn(sampleGroupQuery);
+    when(sampleGroupQuery.groupIdIn(eq(EXAMPLE_GROUP_ID2), eq(EXAMPLE_GROUP_ID))).thenReturn(sampleGroupQuery);
     when(sampleGroupQuery.listPage(eq(0), eq(2))).thenReturn(mockGroups);
     when(sampleGroupQuery.count()).thenReturn((long) mockGroups.size());
     when(processEngine.getIdentityService().createGroupQuery()).thenReturn(sampleGroupQuery);

@@ -534,6 +534,8 @@ public abstract class MockProvider {
   public static final String EXAMPLE_CASE_EXECUTION_ACTIVITY_TYPE = "anActivityType";
   public static final String EXAMPLE_CASE_EXECUTION_ACTIVITY_DESCRIPTION = "anActivityDescription";
   public static final boolean EXAMPLE_CASE_EXECUTION_IS_REQUIRED = true;
+  public static final boolean EXAMPLE_CASE_EXECUTION_IS_REPEATABLE = true;
+  public static final boolean EXAMPLE_CASE_EXECUTION_IS_REPETITION = true;
   public static final boolean EXAMPLE_CASE_EXECUTION_IS_ENABLED = true;
   public static final boolean EXAMPLE_CASE_EXECUTION_IS_ACTIVE = true;
   public static final boolean EXAMPLE_CASE_EXECUTION_IS_DISABLED = true;
@@ -1659,6 +1661,8 @@ public abstract class MockProvider {
     when(mock.getActivityType()).thenReturn(EXAMPLE_CASE_EXECUTION_ACTIVITY_TYPE);
     when(mock.getActivityDescription()).thenReturn(EXAMPLE_CASE_EXECUTION_ACTIVITY_DESCRIPTION);
     when(mock.isRequired()).thenReturn(EXAMPLE_CASE_EXECUTION_IS_REQUIRED);
+    when(mock.isRepeatable()).thenReturn(EXAMPLE_CASE_EXECUTION_IS_REPEATABLE);
+    when(mock.isRepetition()).thenReturn(EXAMPLE_CASE_EXECUTION_IS_REPETITION);
     when(mock.isActive()).thenReturn(EXAMPLE_CASE_EXECUTION_IS_ACTIVE);
     when(mock.isEnabled()).thenReturn(EXAMPLE_CASE_EXECUTION_IS_ENABLED);
     when(mock.isDisabled()).thenReturn(EXAMPLE_CASE_EXECUTION_IS_DISABLED);
