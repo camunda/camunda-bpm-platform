@@ -93,62 +93,6 @@ public class TestFixtureOld {
     // register test scenarios
     ScenarioRunner runner = new ScenarioRunner(processEngine);
 
-    // event subprocesses
-    runner.setupScenarios(InterruptingEventSubprocessScenario.class);
-    runner.setupScenarios(NonInterruptingEventSubprocessScenario.class);
-    runner.setupScenarios(NestedNonInterruptingEventSubprocessScenario.class);
-    runner.setupScenarios(ParallelNestedNonInterruptingEventSubprocessScenario.class);
-    runner.setupScenarios(NestedParallelNonInterruptingEventSubprocessScenario.class);
-    runner.setupScenarios(NestedNonInterruptingEventSubprocessNestedSubprocessScenario.class);
-    runner.setupScenarios(NestedInterruptingErrorEventSubprocessScenario.class);
-    runner.setupScenarios(TwoLevelNestedNonInterruptingEventSubprocessScenario.class);
-    runner.setupScenarios(NestedInterruptingEventSubprocessParallelScenario.class);
-
-    // multi instance
-    runner.setupScenarios(SequentialMultiInstanceSubprocessScenario.class);
-    runner.setupScenarios(NestedSequentialMultiInstanceSubprocessScenario.class);
-    runner.setupScenarios(MultiInstanceReceiveTaskScenario.class);
-    runner.setupScenarios(ParallelMultiInstanceSubprocessScenario.class);
-
-    // async
-    runner.setupScenarios(AsyncParallelMultiInstanceScenario.class);
-    runner.setupScenarios(AsyncSequentialMultiInstanceScenario.class);
-
-    // boundary event
-    runner.setupScenarios(NonInterruptingBoundaryEventScenario.class);
-    runner.setupScenarios(NestedNonInterruptingBoundaryEventOnInnerSubprocessScenario.class);
-    runner.setupScenarios(NestedNonInterruptingBoundaryEventOnOuterSubprocessScenario.class);
-
-    // compensation
-    runner.setupScenarios(SingleActivityCompensationScenario.class);
-    runner.setupScenarios(SubprocessCompensationScenario.class);
-    runner.setupScenarios(TransactionCancelCompensationScenario.class);
-    runner.setupScenarios(InterruptingEventSubprocessCompensationScenario.class);
-    runner.setupScenarios(SubprocessParallelThrowCompensationScenario.class);
-    runner.setupScenarios(SubprocessParallelCreateCompensationScenario.class);
-
-    // plain tasks
-    runner.setupScenarios(OneTaskScenario.class);
-    runner.setupScenarios(OneScopeTaskScenario.class);
-    runner.setupScenarios(ParallelTasksScenario.class);
-    runner.setupScenarios(ParallelScopeTasksScenario.class);
-
-    // event-based gateway
-    runner.setupScenarios(EventBasedGatewayScenario.class);
-
-    processEngine.close();
-
-    // process engine with authorization ////////////////////////////////////////////
-
-    processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResource("process-engine-config-authorization-enabled-old.xml");
-    processEngine = processEngineConfiguration.buildProcessEngine();
-
-    // register test scenarios
-    runner = new ScenarioRunner(processEngine);
-
-    runner.setupScenarios(AuthorizationScenario.class);
-
     processEngine.close();
   }
 
