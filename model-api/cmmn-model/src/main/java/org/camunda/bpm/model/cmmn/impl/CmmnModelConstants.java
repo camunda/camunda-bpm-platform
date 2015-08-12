@@ -144,6 +144,7 @@ public class CmmnModelConstants {
   public static final String CAMUNDA_ELEMENT_EXPRESSION = "expression";
   public static final String CAMUNDA_ELEMENT_STRING = "string";
   public static final String CAMUNDA_ELEMENT_SCRIPT = "script";
+  public static final String CAMUNDA_ELEMENT_REPETITION_CRITERION = "repetitionCriterion";
 
   // attributes /////////////////////////////////////////////////////////////////////////
 

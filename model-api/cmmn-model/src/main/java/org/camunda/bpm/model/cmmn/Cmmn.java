@@ -91,6 +91,7 @@ import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaExpressionImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaFieldImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaInImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaOutImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaRepititionCriterionImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaScriptImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaStringImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaTaskListenerImpl;
@@ -341,6 +342,7 @@ public class Cmmn {
     CamundaStringImpl.registerType(modelBuilder);
     CamundaTaskListenerImpl.registerType(modelBuilder);
     CamundaVariableListenerImpl.registerType(modelBuilder);
+    CamundaRepititionCriterionImpl.registerType(modelBuilder);
   }
 
   /**
