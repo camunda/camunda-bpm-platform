@@ -70,6 +70,16 @@ public interface CaseExecution {
   boolean isRequired();
 
   /**
+   * <p>Returns <code>true</code> if the case execution is repeatable.</p>
+   */
+  boolean isRepeatable();
+
+  /**
+   * <p>Returns <code>true</code> if the case execution is a repetition.</p>
+   */
+  boolean isRepetition();
+
+  /**
    * <p>Returns <code>true</code> if the case execution is available.</p>
    */
   boolean isAvailable();

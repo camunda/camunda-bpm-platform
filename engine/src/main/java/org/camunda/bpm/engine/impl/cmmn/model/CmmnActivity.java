@@ -45,8 +45,9 @@ public class CmmnActivity extends CoreActivity {
   protected Map<String, CmmnSentryDeclaration> sentryMap = new HashMap<String, CmmnSentryDeclaration>();
 
   protected List<CmmnSentryDeclaration> entryCriteria = new ArrayList<CmmnSentryDeclaration>();
-
   protected List<CmmnSentryDeclaration> exitCriteria = new ArrayList<CmmnSentryDeclaration>();
+
+  protected List<CmmnSentryDeclaration> repetitionCriteria = new ArrayList<CmmnSentryDeclaration>();
 
   // eventName => activity id => variable listeners
   protected Map<String, Map<String, List<VariableListener<?>>>> resolvedVariableListeners;
@@ -166,6 +167,20 @@ public class CmmnActivity extends CoreActivity {
 
   public void addExitCriteria(CmmnSentryDeclaration exitCriteria) {
     this.exitCriteria.add(exitCriteria);
+  }
+
+  // repetitionCriteria
+
+  public List<CmmnSentryDeclaration> getRepetitionCriteria() {
+    return repetitionCriteria;
+  }
+
+  public void setRepetitionCriteria(List<CmmnSentryDeclaration> repetitionCriteria) {
+    this.repetitionCriteria = repetitionCriteria;
+  }
+
+  public void addRepetitionCriterion(CmmnSentryDeclaration repetitionCriterion) {
+    repetitionCriteria.add(repetitionCriterion);
   }
 
   // variable listeners

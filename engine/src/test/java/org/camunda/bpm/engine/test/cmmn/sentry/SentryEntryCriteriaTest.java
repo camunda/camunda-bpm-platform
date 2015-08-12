@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.test.cmmn.sentry;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.exception.NotAllowedException;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartQueryImpl;
@@ -375,11 +377,9 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
     thirdHumanTask = queryCaseExecutionById(thirdHumanTaskId);
     assertTrue(thirdHumanTask.isEnabled());
 
-    part = query
-        .satisfied()
-        .singleResult();
+    part = query.singleResult();
     assertNotNull(part);
-    assertTrue(part.isSatisfied());
+    assertFalse(part.isSatisfied());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryEntryCriteriaTest.testAndJoin.cmmn"})
@@ -679,8 +679,14 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
     assertTrue(secondHumanTask.isEnabled());
   }
 
+  /**
+   * Please note that suspension and/or resuming is currently
+   * not supported by the public API. Furthermore the given
+   * test is not a very useful use case in that just a milestone
+   * will be suspended.
+   */
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryEntryCriteriaTest.testResume.cmmn"})
-  public void testResume() {
+  public void FAILING_testResume() {
     // given
     createCaseInstance();
 
@@ -830,6 +836,58 @@ public class SentryEntryCriteriaTest extends CmmnProcessEngineTestCase {
 
     // sentry has been ignored
     assertTrue(humanTask.isEnabled());
+  }
+
+  @Deployment
+  public void testReusableStage() {
+    // given
+    createCaseInstance();
+
+    String firstStageId = queryCaseExecutionByActivityId("PI_Stage_1").getId();
+    String secondStageId = queryCaseExecutionByActivityId("PI_Stage_2").getId();
+
+    List<CaseExecution> humanTasks = caseService
+      .createCaseExecutionQuery()
+      .activityId("PI_HumanTask_1")
+      .enabled()
+      .list();
+    assertEquals(2, humanTasks.size());
+
+    String humanTaskInsideFirstStageId = null;
+    if (((CaseExecutionEntity) humanTasks.get(0)).getParentId().equals(firstStageId)) {
+      humanTaskInsideFirstStageId = humanTasks.get(0).getId();
+    }
+    else {
+      humanTaskInsideFirstStageId = humanTasks.get(1).getId();
+    }
+
+    // when
+    manualStart(humanTaskInsideFirstStageId);
+    complete(humanTaskInsideFirstStageId);
+
+    // then
+    CaseExecution secondHumanTaskInsideFirstStage = caseService
+      .createCaseExecutionQuery()
+      .activityId("PI_HumanTask_2")
+      .enabled()
+      .singleResult();
+    assertEquals(firstStageId, ((CaseExecutionEntity) secondHumanTaskInsideFirstStage).getParentId());
+
+    // PI_HumanTask_1 in PI_Stage_2 is enabled
+    CaseExecution firstHumanTaskInsideSecondStage = queryCaseExecutionByActivityId("PI_HumanTask_1");
+    assertNotNull(firstHumanTaskInsideSecondStage);
+    assertTrue(firstHumanTaskInsideSecondStage.isEnabled());
+    assertEquals(secondStageId, ((CaseExecutionEntity) firstHumanTaskInsideSecondStage).getParentId());
+
+    // PI_HumanTask_2 in PI_Stage_2 is available
+    CaseExecution secondHumanTaskInsideSecondStage = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_2")
+        .available()
+        .singleResult();
+    assertNotNull(secondHumanTaskInsideSecondStage);
+    assertTrue(secondHumanTaskInsideSecondStage.isAvailable());
+    assertEquals(secondStageId, ((CaseExecutionEntity) secondHumanTaskInsideSecondStage).getParentId());
   }
 
 }

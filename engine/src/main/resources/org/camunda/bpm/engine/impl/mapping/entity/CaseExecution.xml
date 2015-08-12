@@ -20,6 +20,8 @@
       CURRENT_STATE_,
       PREV_STATE_,
       REQUIRED_,
+      REPEATABLE_,
+      REPETITION_,
       REV_
     )
     values
@@ -35,6 +37,8 @@
       #{state, jdbcType=INTEGER},
       #{previous, jdbcType=INTEGER},
       #{required, jdbcType=BOOLEAN},
+      #{repeatable, jdbcType=BOOLEAN},
+      #{repetition, jdbcType=BOOLEAN},
       1
     )
   </insert>
@@ -73,6 +77,8 @@
     <result property="state" column="CURRENT_STATE_" jdbcType="INTEGER" />
     <result property="previous" column="PREV_STATE_" jdbcType="INTEGER" />
     <result property="required" column="REQUIRED_" jdbcType="BOOLEAN" />
+    <result property="repeatable" column="REPEATABLE_" jdbcType="BOOLEAN" />
+    <result property="repetition" column="REPETITION_" jdbcType="BOOLEAN" />
   </resultMap>
 
   <!-- CASE EXECUTION SELECT -->

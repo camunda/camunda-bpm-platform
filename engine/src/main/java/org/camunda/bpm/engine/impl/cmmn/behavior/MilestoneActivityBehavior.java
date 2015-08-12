@@ -26,7 +26,7 @@ public class MilestoneActivityBehavior extends EventListenerOrMilestoneActivityB
   }
 
   public void created(CmmnActivityExecution execution) {
-    if (execution.isAvailable() && isAtLeastOneEntryCriteriaSatisfied(execution)) {
+    if (execution.isAvailable() && isAtLeastOneEntryCriterionSatisfied(execution)) {
       fireEntryCriteria(execution);
     }
   }

@@ -132,12 +132,12 @@ public abstract class EventListenerOrMilestoneActivityBehavior extends PlanItemD
 
   // sentry ///////////////////////////////////////////////////////////////
 
-  protected boolean isAtLeastOneExitCriteriaSatisfied(CmmnActivityExecution execution) {
+  protected boolean isAtLeastOneExitCriterionSatisfied(CmmnActivityExecution execution) {
     return false;
   }
 
   public void fireExitCriteria(CmmnActivityExecution execution) {
-    throw new CaseIllegalStateTransitionException("Cannot trigger case execution '"+execution.getId()+"': exit criteria are not allowed for event listener.");
+    throw new CaseIllegalStateTransitionException("Cannot trigger case execution '"+execution.getId()+"': exit criteria are not allowed for event listener or milestones.");
   }
 
   // helper ////////////////////////////////////////////////////////////////

@@ -368,9 +368,9 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
 
   // sentry ///////////////////////////////////////////////////////////////////////////////
 
-  protected boolean isAtLeastOneEntryCriteriaSatisfied(CmmnActivityExecution execution) {
+  protected boolean isAtLeastOneEntryCriterionSatisfied(CmmnActivityExecution execution) {
     if (!execution.isCaseInstanceExecution()) {
-      return super.isAtLeastOneEntryCriteriaSatisfied(execution);
+      return super.isAtLeastOneEntryCriterionSatisfied(execution);
     }
 
     return false;

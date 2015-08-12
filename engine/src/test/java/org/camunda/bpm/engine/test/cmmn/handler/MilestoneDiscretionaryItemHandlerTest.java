@@ -98,7 +98,7 @@ public class MilestoneDiscretionaryItemHandlerTest extends CmmnElementHandlerTes
     CmmnActivity activity = handler.handleElement(discretionaryItem, context);
 
     // then
-    assertEquals(description, (String) activity.getProperty(PROPERTY_ACTIVITY_DESCRIPTION));
+    assertEquals(description, activity.getProperty(PROPERTY_ACTIVITY_DESCRIPTION));
   }
 
   @Test
@@ -111,7 +111,7 @@ public class MilestoneDiscretionaryItemHandlerTest extends CmmnElementHandlerTes
     CmmnActivity activity = handler.handleElement(discretionaryItem, context);
 
     // then
-    assertEquals(description, (String) activity.getProperty(PROPERTY_ACTIVITY_DESCRIPTION));
+    assertEquals(description, activity.getProperty(PROPERTY_ACTIVITY_DESCRIPTION));
   }
 
   @Test

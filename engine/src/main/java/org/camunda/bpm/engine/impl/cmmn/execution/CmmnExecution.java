@@ -104,20 +104,33 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   /** current activity */
   protected transient CmmnActivity activity;
 
-  /** the activity which is to be started next */
-  protected transient CmmnActivity nextActivity;
-
   protected boolean required = false;
+
+  protected boolean repeatable = false;
+
+  protected boolean repetition = false;
 
   protected int previousState;
 
   protected int currentState = NEW.getStateCode();
 
-  protected List<String> satisfiedSentries;
-
   protected Queue<VariableEvent> variableEventsQueue;
 
   protected transient TaskEntity task;
+
+  /**
+   * This property will be used if <code>this</code>
+   * {@link CmmnExecution} is in state {@link CaseExecutionState#NEW}
+   * to note that an entry criterion is satisfied.
+   */
+  protected boolean entryCriterionSatisfied = false;
+
+  /**
+   * This property will be used if <code>this</code>
+   * {@link CmmnExecution} is in state {@link CaseExecutionState#NEW}
+   * to note that an entry criterion is satisfied.
+   */
+  protected boolean exitCriterionSatisfied = false;
 
   public CmmnExecution() {
   }
@@ -247,9 +260,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     ensureNotNull("The source of sentry '"+sentryDeclaration.getId()+"' is null.", "source", source);
 
     String sourceActivityId = source.getId();
-
-    CmmnExecution sourceCaseExecution = findCaseExecution(sourceActivityId);
-    sentryPart.setSourceCaseExecution(sourceCaseExecution);
+    sentryPart.setSource(sourceActivityId);
 
     // TODO: handle also sentryRef!!! (currently not implemented on purpose)
 
@@ -292,16 +303,18 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     // the returned list contains all satisfied sentries
     List<String> satisfiedSentries = getSatisfiedSentries(affectedSentries);
 
-    // Step 4: fire satisfied sentries
+    // Step 4: reset sentries -> satisfied == false
+    resetSentries(satisfiedSentries);
+
+    // Step 5: fire satisfied sentries
     fireSentries(satisfiedSentries);
 
     if (isActive()) {
       // the following steps are a workaround, because setVariable()
       // does not check nor fire a sentry!!!
 
-      // Step 5: get all not affected sentries to avoid that a
+      // Step 6: get all not affected sentries to avoid that a
       // sentry will be checked twice;
-      // notAffectedSentries = getSentries().keySet() / affectedSentries
       Map<String, List<CmmnSentryPart>> sentries = getSentries();
       List<String> notAffectedSentries = new ArrayList<String>();
       for (String sentryId : sentries.keySet()) {
@@ -311,10 +324,13 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
         }
       }
 
-      // Step 6: check each not affected sentry whether it is satisfied
+      // Step 7: check each not affected sentry whether it is satisfied
       satisfiedSentries = getSatisfiedSentries(notAffectedSentries);
 
-      // Step 7: fire satisfied sentries
+      // Step 8: reset sentries -> satisfied == false
+      resetSentries(satisfiedSentries);
+
+      // Step 9: fire satisfied sentries
       fireSentries(satisfiedSentries);
     }
 
@@ -327,9 +343,10 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
     for (CmmnSentryPart sentryPart : sentryParts) {
 
-      // check the ids not the references itself to avoid a select!
+      // necessary for backward compatibility
       String sourceCaseExecutionId = sentryPart.getSourceCaseExecutionId();
-      if (child.getId().equals(sourceCaseExecutionId)) {
+      String sourceRef = sentryPart.getSource();
+      if (child.getActivityId().equals(sourceRef) || child.getId().equals(sourceCaseExecutionId)) {
 
         String standardEvent = sentryPart.getStandardEvent();
 
@@ -388,6 +405,16 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     return result;
   }
 
+  protected void resetSentries(List<String> sentries) {
+    for (String sentry : sentries) {
+      List<CmmnSentryPart> parts = getSentries().get(sentry);
+
+      for (CmmnSentryPart part : parts) {
+        part.setSatisfied(false);
+      }
+    }
+  }
+
   protected void fireSentries(List<String> satisfiedSentries) {
     if (satisfiedSentries != null && !satisfiedSentries.isEmpty()) {
       // if there are satisfied sentries, trigger the associated
@@ -417,7 +444,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   }
 
   protected void checkAndFireExitCriteria(List<String> satisfiedSentries) {
-    if (!isNew() && !isCompleted() && !isTerminated()) {
+    if (!isCompleted() && !isTerminated()) {
       CmmnActivity activity = getActivity();
       ensureNotNull(PvmException.class, "Case execution '"+getId()+"': has no current activity.", "activity", activity);
 
@@ -426,7 +453,12 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
       for (CmmnSentryDeclaration sentryDeclaration : exitCriteria) {
 
         if (sentryDeclaration != null && satisfiedSentries.contains(sentryDeclaration.getId())) {
-          fireExitCriteria();
+          if (!isNew()) {
+            fireExitCriteria();
+          }
+          else {
+            exitCriterionSatisfied = true;
+          }
           break;
         }
       }
@@ -434,18 +466,29 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   }
 
   protected void checkAndFireEntryCriteria(List<String> satisfiedSentries) {
-    if (isAvailable()) {
+    if (isAvailable() || isNew()) {
       // do that only, when this child case execution
       // is available
 
       CmmnActivity activity = getActivity();
       ensureNotNull(PvmException.class, "Case execution '"+getId()+"': has no current activity.", "activity", activity);
 
-      List<CmmnSentryDeclaration> entryCriteria = activity.getEntryCriteria();
-      for (CmmnSentryDeclaration sentryDeclaration : entryCriteria) {
+      List<CmmnSentryDeclaration> criteria = activity.getEntryCriteria();
+      if (isRepetition()) {
+        List<CmmnSentryDeclaration> repetitionCriteria = activity.getRepetitionCriteria();
+        if (repetitionCriteria != null && !repetitionCriteria.isEmpty()){
+          criteria = repetitionCriteria;
+        }
+      }
 
+      for (CmmnSentryDeclaration sentryDeclaration : criteria) {
         if (sentryDeclaration != null && satisfiedSentries.contains(sentryDeclaration.getId())) {
-          fireEntryCriteria();
+          if (isAvailable()) {
+            fireEntryCriteria();
+          }
+          else {
+            entryCriterionSatisfied = true;
+          }
           break;
         }
       }
@@ -538,6 +581,14 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     return false;
   }
 
+  public boolean isEntryCriterionSatisfied() {
+    return entryCriterionSatisfied;
+  }
+
+  public boolean isExitCriterionSatisfied() {
+    return exitCriterionSatisfied;
+  }
+
   // business key ////////////////////////////////////////////////////////////
 
   public String getCaseBusinessKey() {
@@ -590,16 +641,6 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
     this.activity = activity;
   }
 
-  // next activity /////////////////////////////////////////////////////////////
-
-  public CmmnActivity getNextActivity() {
-    return nextActivity;
-  }
-
-  public void setNextActivity(CmmnActivity nextActivity) {
-    this.nextActivity = nextActivity;
-  }
-
   // variables ////////////////////////////////////////////
 
   @Override
@@ -632,6 +673,26 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
   public void setRequired(boolean required) {
     this.required = required;
+  }
+
+  // repeatable ////////////////////////////////////////////////
+
+  public boolean isRepeatable() {
+    return repeatable;
+  }
+
+  public void setRepeatable(boolean repeatable) {
+    this.repeatable = repeatable;
+  }
+
+  // repetition ////////////////////////////////////////////////
+
+  public boolean isRepetition() {
+    return repetition;
+  }
+
+  public void setRepetition(boolean repetition) {
+    this.repetition = repetition;
   }
 
   // state /////////////////////////////////////////////////////

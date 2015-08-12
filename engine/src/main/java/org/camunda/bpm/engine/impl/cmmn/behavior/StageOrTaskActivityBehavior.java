@@ -39,10 +39,10 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
   }
 
   public void created(CmmnActivityExecution execution) {
-    if (!execution.isCompleted() && !execution.isTerminated() && isAtLeastOneExitCriteriaSatisfied(execution)) {
+    if (!execution.isCompleted() && !execution.isTerminated() && isAtLeastOneExitCriterionSatisfied(execution)) {
       fireExitCriteria(execution);
 
-    } else if (execution.isAvailable() && isAtLeastOneEntryCriteriaSatisfied(execution)) {
+    } else if (execution.isAvailable() && isAtLeastOneEntryCriterionSatisfied(execution)) {
       fireEntryCriteria(execution);
     }
   }
@@ -206,7 +206,6 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
     String message = "It is not possible to occur case execution '"+id+"' which associated with a "+getTypeName()+".";
     throw createIllegalStateTransitionException("occur", message, execution);
   }
-
 
   // sentry ///////////////////////////////////////////////////////////////
 

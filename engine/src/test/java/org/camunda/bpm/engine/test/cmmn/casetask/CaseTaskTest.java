@@ -1579,7 +1579,7 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
   }
 
   protected CaseInstance createCaseInstanceByKey(String caseDefinitionKey) {
-    return createCaseInstanceByKey(caseDefinitionKey, null);
+    return createCaseInstanceByKey(caseDefinitionKey, null, null);
   }
 
   protected CaseInstance createCaseInstanceByKey(String caseDefinitionKey, String businessKey) {

@@ -42,4 +42,9 @@ public class AtomicOperationCaseExecutionEnable extends AbstractCmmnEventAtomicO
     return execution;
   }
 
+  protected void preTransitionNotification(CmmnExecution execution) {
+    CmmnActivityBehavior behavior = getActivityBehavior(execution);
+    behavior.repeat(execution);
+  }
+
 }

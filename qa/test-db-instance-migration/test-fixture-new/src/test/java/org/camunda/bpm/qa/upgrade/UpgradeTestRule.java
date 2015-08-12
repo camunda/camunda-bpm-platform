@@ -13,6 +13,8 @@
 package org.camunda.bpm.qa.upgrade;
 
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
+import org.camunda.bpm.engine.runtime.CaseInstance;
+import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
@@ -109,4 +111,23 @@ public class UpgradeTestRule extends ProcessEngineRule {
     Assert.assertTrue("Process instance for scenario " + scenarioName + " should have ended",
         processInstanceQuery().singleResult() == null);
   }
+  
+  // case //////////////////////////////////////////////////
+  
+  public CaseInstanceQuery caseInstanceQuery() {
+    return caseService
+        .createCaseInstanceQuery()
+        .caseInstanceBusinessKey(scenarioName);
+  }
+  
+  public CaseInstance caseInstance() {
+    CaseInstance instance = caseInstanceQuery().singleResult();
+
+    if (instance == null) {
+      throw new RuntimeException("There is no case instance for scenario " + scenarioName);
+    }
+
+    return instance;
+  }
+  
 }

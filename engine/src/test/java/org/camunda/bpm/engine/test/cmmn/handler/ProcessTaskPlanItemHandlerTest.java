@@ -16,6 +16,7 @@ import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTI
 import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_ACTIVITY_TYPE;
 import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_IS_BLOCKING;
 import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_MANUAL_ACTIVATION_RULE;
+import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_REPETITION_RULE;
 import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_REQUIRED_RULE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -52,6 +53,7 @@ import org.camunda.bpm.model.cmmn.instance.ManualActivationRule;
 import org.camunda.bpm.model.cmmn.instance.PlanItem;
 import org.camunda.bpm.model.cmmn.instance.PlanItemControl;
 import org.camunda.bpm.model.cmmn.instance.ProcessTask;
+import org.camunda.bpm.model.cmmn.instance.RepetitionRule;
 import org.camunda.bpm.model.cmmn.instance.RequiredRule;
 import org.camunda.bpm.model.cmmn.instance.Sentry;
 import org.camunda.bpm.model.cmmn.instance.camunda.CamundaIn;
@@ -133,7 +135,7 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity activity = handler.handleElement(planItem, context);
 
     // then
-    assertEquals(description, (String) activity.getProperty(PROPERTY_ACTIVITY_DESCRIPTION));
+    assertEquals(description, activity.getProperty(PROPERTY_ACTIVITY_DESCRIPTION));
   }
 
   @Test
@@ -146,7 +148,7 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity activity = handler.handleElement(planItem, context);
 
     // then
-    assertEquals(description, (String) activity.getProperty(PROPERTY_ACTIVITY_DESCRIPTION));
+    assertEquals(description, activity.getProperty(PROPERTY_ACTIVITY_DESCRIPTION));
   }
 
   @Test
@@ -885,6 +887,46 @@ public class ProcessTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
 
     // then
     Object rule = newActivity.getProperty(PROPERTY_REQUIRED_RULE);
+    assertNotNull(rule);
+    assertTrue(rule instanceof CaseControlRule);
+  }
+
+  @Test
+  public void testRepetitionRule() {
+    // given
+    ItemControl itemControl = createElement(planItem, "ItemControl_1", ItemControl.class);
+    RepetitionRule repetitionRule = createElement(itemControl, "RepititionRule_1", RepetitionRule.class);
+    ConditionExpression expression = createElement(repetitionRule, "Expression_1", ConditionExpression.class);
+    Body body = createElement(expression, Body.class);
+    body.setTextContent("${true}");
+
+    Cmmn.validateModel(modelInstance);
+
+    // when
+    CmmnActivity newActivity = handler.handleElement(planItem, context);
+
+    // then
+    Object rule = newActivity.getProperty(PROPERTY_REPETITION_RULE);
+    assertNotNull(rule);
+    assertTrue(rule instanceof CaseControlRule);
+  }
+
+  @Test
+  public void testRepetitionRuleByDefaultPlanItemControl() {
+    // given
+    PlanItemControl defaultControl = createElement(processTask, "DefaultControl_1", DefaultControl.class);
+    RepetitionRule repetitionRule = createElement(defaultControl, "RepititionRule_1", RepetitionRule.class);
+    ConditionExpression expression = createElement(repetitionRule, "Expression_1", ConditionExpression.class);
+    Body body = createElement(expression, Body.class);
+    body.setTextContent("${true}");
+
+    Cmmn.validateModel(modelInstance);
+
+    // when
+    CmmnActivity newActivity = handler.handleElement(planItem, context);
+
+    // then
+    Object rule = newActivity.getProperty(PROPERTY_REPETITION_RULE);
     assertNotNull(rule);
     assertTrue(rule instanceof CaseControlRule);
   }

@@ -15,9 +15,9 @@
       CASE_EXEC_ID_,
       SENTRY_ID_,
       TYPE_,
-      SOURCE_CASE_EXEC_ID_,
       STANDARD_EVENT_,
-      SATISFIED_
+      SATISFIED_,
+      SOURCE_
     )
     values
     (
@@ -27,9 +27,9 @@
       #{caseExecutionId, jdbcType=VARCHAR},
       #{sentryId, jdbcType=VARCHAR},
       #{type, jdbcType=VARCHAR},
-      #{sourceCaseExecutionId, jdbcType=VARCHAR},
       #{standardEvent, jdbcType=VARCHAR},
-      #{satisfied, jdbcType=BOOLEAN}
+      #{satisfied, jdbcType=BOOLEAN},
+      #{source, jdbcType=VARCHAR},
     )
   </insert>
 
@@ -60,6 +60,7 @@
     <result property="type" column="TYPE_" jdbcType="VARCHAR" />
     <result property="sourceCaseExecutionId" column="SOURCE_CASE_EXEC_ID_" jdbcType="VARCHAR" />
     <result property="standardEvent" column="STANDARD_EVENT_" jdbcType="VARCHAR" />
+    <result property="source" column="SOURCE_" jdbcType="VARCHAR" />
     <result property="satisfied" column="SATISFIED_" jdbcType="BOOLEAN" />
   </resultMap>
 

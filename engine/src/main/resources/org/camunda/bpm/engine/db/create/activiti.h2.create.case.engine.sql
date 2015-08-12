@@ -28,6 +28,8 @@ create table ACT_RU_CASE_EXECUTION (
     PREV_STATE_ integer,
     CURRENT_STATE_ integer,
     REQUIRED_ bit,
+    REPEATABLE_ bit,
+    REPETITION_ bit,
     primary key (ID_)
 );
 
@@ -42,6 +44,7 @@ create table ACT_RU_CASE_SENTRY_PART (
     TYPE_ varchar(255),
     SOURCE_CASE_EXEC_ID_ varchar(64),
     STANDARD_EVENT_ varchar(255),
+    SOURCE_ varchar(255),
     SATISFIED_ bit,
     primary key (ID_)
 );

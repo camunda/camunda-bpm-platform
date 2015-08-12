@@ -34,3 +34,16 @@ create table ACT_RE_DECISION_DEF (
 alter table ACT_RE_DECISION_DEF
     add constraint ACT_UNIQ_DECISION_DEF
     unique (KEY_,VERSION_);
+
+-- case execution repetition rule --
+
+ALTER TABLE ACT_RU_CASE_EXECUTION
+  ADD REPEATABLE_ tinyint;
+
+ALTER TABLE ACT_RU_CASE_EXECUTION
+  ADD REPETITION_ tinyint;
+    
+-- case sentry part source --
+
+ALTER TABLE ACT_RU_CASE_SENTRY_PART
+  ADD SOURCE_ nvarchar(255);

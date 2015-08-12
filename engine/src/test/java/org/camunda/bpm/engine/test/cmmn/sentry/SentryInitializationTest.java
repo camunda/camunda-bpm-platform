@@ -40,12 +40,6 @@ public class SentryInitializationTest extends CmmnProcessEngineTestCase {
         .create()
         .getId();
 
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
     // then
     List<CaseSentryPartEntity> parts = createCaseSentryPartQuery()
       .list();
@@ -58,10 +52,9 @@ public class SentryInitializationTest extends CmmnProcessEngineTestCase {
     assertEquals(caseInstanceId, part.getCaseInstanceId());
     assertEquals("Sentry_1", part.getSentryId());
     assertEquals(CmmnSentryDeclaration.PLAN_ITEM_ON_PART, part.getType());
-    assertEquals(humanTaskId, part.getSourceCaseExecutionId());
+    assertEquals("PI_HumanTask_1", part.getSource());
     assertEquals("complete", part.getStandardEvent());
     assertFalse(part.isSatisfied());
-
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryInitializationTest.testIfPart.cmmn"})
@@ -91,10 +84,9 @@ public class SentryInitializationTest extends CmmnProcessEngineTestCase {
     assertEquals(caseInstanceId, part.getCaseInstanceId());
     assertEquals("Sentry_1", part.getSentryId());
     assertEquals(CmmnSentryDeclaration.IF_PART, part.getType());
-    assertNull(part.getSourceCaseExecutionId());
+    assertNull(part.getSource());
     assertNull(part.getStandardEvent());
     assertFalse(part.isSatisfied());
-
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryInitializationTest.testOnPartAndIfPart.cmmn"})
@@ -112,12 +104,6 @@ public class SentryInitializationTest extends CmmnProcessEngineTestCase {
         .getId();
 
     // then
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
     CaseSentryPartQueryImpl query = createCaseSentryPartQuery();
 
     assertEquals(2, query.count());
@@ -130,7 +116,7 @@ public class SentryInitializationTest extends CmmnProcessEngineTestCase {
     assertEquals(caseInstanceId, part.getCaseInstanceId());
     assertEquals("Sentry_1", part.getSentryId());
     assertEquals(CmmnSentryDeclaration.IF_PART, part.getType());
-    assertNull(part.getSourceCaseExecutionId());
+    assertNull(part.getSource());
     assertNull(part.getStandardEvent());
     assertFalse(part.isSatisfied());
 
@@ -142,7 +128,7 @@ public class SentryInitializationTest extends CmmnProcessEngineTestCase {
     assertEquals(caseInstanceId, part.getCaseInstanceId());
     assertEquals("Sentry_1", part.getSentryId());
     assertEquals(CmmnSentryDeclaration.PLAN_ITEM_ON_PART, part.getType());
-    assertEquals(humanTaskId, part.getSourceCaseExecutionId());
+    assertEquals("PI_HumanTask_1", part.getSource());
     assertEquals("complete", part.getStandardEvent());
     assertFalse(part.isSatisfied());
   }
@@ -163,12 +149,6 @@ public class SentryInitializationTest extends CmmnProcessEngineTestCase {
         .getId();
 
     // then
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
     CaseSentryPartQueryImpl query = createCaseSentryPartQuery();
 
     assertEquals(2, query.count());
@@ -181,7 +161,7 @@ public class SentryInitializationTest extends CmmnProcessEngineTestCase {
     assertEquals(caseInstanceId, part.getCaseInstanceId());
     assertEquals("Sentry_1", part.getSentryId());
     assertEquals(CmmnSentryDeclaration.IF_PART, part.getType());
-    assertNull(part.getSourceCaseExecutionId());
+    assertNull(part.getSource());
     assertNull(part.getStandardEvent());
     assertFalse(part.isSatisfied());
 
@@ -193,10 +173,9 @@ public class SentryInitializationTest extends CmmnProcessEngineTestCase {
     assertEquals(caseInstanceId, part.getCaseInstanceId());
     assertEquals("Sentry_2", part.getSentryId());
     assertEquals(CmmnSentryDeclaration.PLAN_ITEM_ON_PART, part.getType());
-    assertEquals(humanTaskId, part.getSourceCaseExecutionId());
+    assertEquals("PI_HumanTask_1", part.getSource());
     assertEquals("complete", part.getStandardEvent());
     assertFalse(part.isSatisfied());
-
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/sentry/SentryInitializationTest.testMultipleSentriesWithinStage.cmmn"})
@@ -231,12 +210,6 @@ public class SentryInitializationTest extends CmmnProcessEngineTestCase {
       .manualStart();
 
     // then
-    String humanTaskId = caseService
-        .createCaseExecutionQuery()
-        .activityId("PI_HumanTask_1")
-        .singleResult()
-        .getId();
-
     assertEquals(2, query.count());
 
     CaseSentryPartEntity part = query
@@ -247,7 +220,7 @@ public class SentryInitializationTest extends CmmnProcessEngineTestCase {
     assertEquals(stageId, part.getCaseExecutionId());
     assertEquals("Sentry_1", part.getSentryId());
     assertEquals(CmmnSentryDeclaration.IF_PART, part.getType());
-    assertNull(part.getSourceCaseExecutionId());
+    assertNull(part.getSource());
     assertNull(part.getStandardEvent());
     assertFalse(part.isSatisfied());
 
@@ -259,7 +232,7 @@ public class SentryInitializationTest extends CmmnProcessEngineTestCase {
     assertEquals(stageId, part.getCaseExecutionId());
     assertEquals("Sentry_2", part.getSentryId());
     assertEquals(CmmnSentryDeclaration.PLAN_ITEM_ON_PART, part.getType());
-    assertEquals(humanTaskId, part.getSourceCaseExecutionId());
+    assertEquals("PI_HumanTask_1", part.getSource());
     assertEquals("complete", part.getStandardEvent());
     assertFalse(part.isSatisfied());
   }

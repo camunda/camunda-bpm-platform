@@ -25,6 +25,7 @@ public abstract class CmmnSentryPart implements Serializable {
   protected String type;
   protected String sentryId;
   protected String standardEvent;
+  protected String source;
   protected boolean satisfied = false;
 
   public abstract CmmnExecution getCaseInstance();
@@ -51,10 +52,30 @@ public abstract class CmmnSentryPart implements Serializable {
     this.type = type;
   }
 
+  public String getSource() {
+    return source;
+  }
+
+  public void setSource(String source) {
+    this.source = source;
+  }
+
+  /**
+   * @deprecated since 7.4 A new instance of a sentry
+   * does not reference the source case execution id anymore.
+   */
   public abstract String getSourceCaseExecutionId();
 
+  /**
+   * @deprecated since 7.4 A new instance of a sentry
+   * does not reference the source case execution id anymore.
+   */
   public abstract CmmnExecution getSourceCaseExecution();
 
+  /**
+   * @deprecated since 7.4 A new instance of a sentry
+   * does not reference the source case execution id anymore.
+   */
   public abstract void setSourceCaseExecution(CmmnExecution sourceCaseExecution);
 
   public String getStandardEvent() {

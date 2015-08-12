@@ -35,12 +35,20 @@ public class EventListenerActivityBehavior extends EventListenerOrMilestoneActiv
     return "event listener";
   }
 
-  protected boolean isAtLeastOneEntryCriteriaSatisfied(CmmnActivityExecution execution) {
+  protected boolean isAtLeastOneEntryCriterionSatisfied(CmmnActivityExecution execution) {
     return false;
   }
 
   public void fireEntryCriteria(CmmnActivityExecution execution) {
     throw new CaseIllegalStateTransitionException("Cannot trigger case execution '"+execution.getId()+"': entry criteria are not allowed for event listener.");
+  }
+
+  public void repeat(CmmnActivityExecution execution) {
+    // It is not possible to repeat a event listener
+  }
+
+  protected void evaluateRepetitionRule(CmmnActivityExecution execution) {
+    // It is not possible to define a repetition rule on an event listener
   }
 
 }

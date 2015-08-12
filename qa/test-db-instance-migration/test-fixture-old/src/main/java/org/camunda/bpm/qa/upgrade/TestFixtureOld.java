@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.qa.upgrade.scenarios.sentry.SentryScenario;
 
 /**
  * @author Daniel Meyer
@@ -62,6 +63,9 @@ public class TestFixtureOld {
 
     // register test scenarios
     ScenarioRunner runner = new ScenarioRunner(processEngine);
+    
+    // event subprocesses   
+    runner.setupScenarios(SentryScenario.class);
 
     processEngine.close();
   }

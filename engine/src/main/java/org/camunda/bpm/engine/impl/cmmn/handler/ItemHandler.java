@@ -57,6 +57,7 @@ import org.camunda.bpm.model.cmmn.instance.Sentry;
 import org.camunda.bpm.model.cmmn.instance.camunda.CamundaCaseExecutionListener;
 import org.camunda.bpm.model.cmmn.instance.camunda.CamundaExpression;
 import org.camunda.bpm.model.cmmn.instance.camunda.CamundaField;
+import org.camunda.bpm.model.cmmn.instance.camunda.CamundaRepetitionCriterion;
 import org.camunda.bpm.model.cmmn.instance.camunda.CamundaScript;
 import org.camunda.bpm.model.cmmn.instance.camunda.CamundaString;
 import org.camunda.bpm.model.cmmn.instance.camunda.CamundaVariableListener;
@@ -342,6 +343,19 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
     }
 
     if (repetitionRule != null) {
+
+      CmmnActivity parent = activity.getParent();
+      if (parent != null) {
+        List<CamundaRepetitionCriterion> repetitionCriteria = queryExtensionElementsByClass(repetitionRule, CamundaRepetitionCriterion.class);
+        for (CamundaRepetitionCriterion criteria : repetitionCriteria) {
+          String sentryId = criteria.getTextContent();
+          CmmnSentryDeclaration sentryDeclaration = parent.getSentry(sentryId);
+          if (sentryDeclaration != null) {
+            activity.addRepetitionCriterion(sentryDeclaration);
+          }
+        }
+      }
+
       ConditionExpression condition = repetitionRule.getCondition();
       if (condition != null) {
         String rule = condition.getBody();
@@ -352,7 +366,6 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
         }
       }
     }
-
   }
 
   protected void initializeCaseExecutionListeners(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {

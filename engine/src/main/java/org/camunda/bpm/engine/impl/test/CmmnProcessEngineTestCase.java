@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
  * Base class for CMMN test cases with helper methods.
@@ -48,13 +49,22 @@ public class CmmnProcessEngineTestCase extends PluggableProcessEngineTestCase {
   }
 
   protected CaseInstance createCaseInstanceByKey(String caseDefinitionKey) {
-    return createCaseInstanceByKey(caseDefinitionKey, null);
+    return createCaseInstanceByKey(caseDefinitionKey, null, null);
   }
 
   protected CaseInstance createCaseInstanceByKey(String caseDefinitionKey, String businessKey) {
+    return createCaseInstanceByKey(caseDefinitionKey, businessKey, null);
+  }
+
+  protected CaseInstance createCaseInstanceByKey(String caseDefinitionKey, VariableMap variables) {
+    return createCaseInstanceByKey(caseDefinitionKey, null, variables);
+  }
+
+  protected CaseInstance createCaseInstanceByKey(String caseDefinitionKey, String businessKey, VariableMap variables) {
     return caseService
       .withCaseDefinitionByKey(caseDefinitionKey)
       .businessKey(businessKey)
+      .setVariables(variables)
       .create();
   }
 
