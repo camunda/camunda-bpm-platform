@@ -144,6 +144,8 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 /**
  * Specific parsing of one BPMN 2.0 XML file, created by the {@link BpmnParser}.
  *
+ * Instances of this class should not be reused and are also not threadsafe.
+ *
  * @author Tom Baeyens
  * @author Bernd Ruecker
  * @author Joram Barrez
