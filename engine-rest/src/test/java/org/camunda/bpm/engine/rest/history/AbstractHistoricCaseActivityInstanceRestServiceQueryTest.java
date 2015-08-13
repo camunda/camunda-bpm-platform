@@ -314,6 +314,8 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceQueryTest e
     Date returnedEndTime = DateTimeUtil.parseDate(from(content).getString("[0].endTime"));
     long returnedDurationInMillis = from(content).getLong("[0].durationInMillis");
     boolean required = from(content).getBoolean("[0].required");
+    boolean repeatable = from(content).getBoolean("[0].repeatable");
+    boolean repetition = from(content).getBoolean("[0].repetition");
     boolean available = from(content).getBoolean("[0].available");
     boolean enabled = from(content).getBoolean("[0].enabled");
     boolean disabled = from(content).getBoolean("[0].disabled");
@@ -336,6 +338,8 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceQueryTest e
     Assert.assertEquals(DateTimeUtil.parseDate(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_END_TIME), returnedEndTime);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_DURATION, returnedDurationInMillis);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_REQUIRED, required);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_REPEATABLE, repeatable);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_REPETITION, repetition);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_AVAILABLE, available);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_ENABLED, enabled);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_DISABLED, disabled);
@@ -404,6 +408,8 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceQueryTest e
     Map<String, Boolean> parameters = new HashMap<String, Boolean>();
 
     parameters.put("required", MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_REQUIRED);
+    parameters.put("repeatable", MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_REPEATABLE);
+    parameters.put("repetition", MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_REPETITION);
     parameters.put("finished", MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_FINISHED);
     parameters.put("unfinished", MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_UNFINISHED);
     parameters.put("available", MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_AVAILABLE);
@@ -419,6 +425,8 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceQueryTest e
   protected void verifyBooleanParameterQueryInvocations() {
     Map<String, Boolean> booleanParams = getCompleteBooleanQueryParameters();
     Boolean required = booleanParams.get("required");
+    Boolean repeatable = booleanParams.get("repeatable");
+    Boolean repetition = booleanParams.get("repetition");
     Boolean finished = booleanParams.get("finished");
     Boolean unfinished = booleanParams.get("unfinished");
     Boolean available = booleanParams.get("available");
@@ -430,6 +438,12 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceQueryTest e
 
     if (required != null && required) {
       verify(mockedQuery).required();
+    }
+    if (repeatable != null && repeatable) {
+      verify(mockedQuery).repeatable();
+    }
+    if (repetition != null && repetition) {
+      verify(mockedQuery).repetition();
     }
     if (finished != null && finished) {
       verify(mockedQuery).ended();

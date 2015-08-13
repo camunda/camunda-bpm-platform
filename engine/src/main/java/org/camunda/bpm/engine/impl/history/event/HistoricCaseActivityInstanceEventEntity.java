@@ -59,6 +59,12 @@ public class HistoricCaseActivityInstanceEventEntity extends HistoricScopeInstan
   /** the flag whether this case activity is required */
   protected boolean required = false;
 
+  /** the flag whether this case activity is repeatable */
+  protected boolean repeatable = false;
+
+  /** the flag whether this case activity is a repetition */
+  protected boolean repetition = false;
+
   // getters and setters //////////////////////////////////////////////////////
 
   public String getCaseExecutionId() {
@@ -143,6 +149,22 @@ public class HistoricCaseActivityInstanceEventEntity extends HistoricScopeInstan
 
   public void setRequired(boolean required) {
     this.required = required;
+  }
+
+  public boolean isRepeatable() {
+    return repeatable;
+  }
+
+  public void setRepeatable(boolean repeatable) {
+    this.repeatable = repeatable;
+  }
+
+  public boolean isRepetition() {
+    return repetition;
+  }
+
+  public void setRepetition(boolean repetition) {
+    this.repetition = repetition;
   }
 
   public boolean isAvailable() {

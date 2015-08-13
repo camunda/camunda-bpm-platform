@@ -53,6 +53,8 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
   protected Boolean ended;
   protected Integer caseActivityInstanceState;
   protected Boolean required;
+  protected Boolean repeatable;
+  protected Boolean repetition;
 
   public HistoricCaseActivityInstanceQueryImpl() {
   }
@@ -147,6 +149,16 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
 
   public HistoricCaseActivityInstanceQuery required() {
     this.required = true;
+    return this;
+  }
+
+  public HistoricCaseActivityInstanceQuery repeatable() {
+    this.repeatable = true;
+    return this;
+  }
+
+  public HistoricCaseActivityInstanceQuery repetition() {
+    this.repetition = true;
     return this;
   }
 
@@ -306,6 +318,14 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
 
   public Boolean isRequired() {
     return required;
+  }
+
+  public Boolean isRepeatable() {
+    return repeatable;
+  }
+
+  public Boolean isRepetition() {
+    return repetition;
   }
 
 }

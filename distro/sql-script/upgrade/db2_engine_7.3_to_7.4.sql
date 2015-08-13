@@ -42,7 +42,15 @@ ALTER TABLE ACT_RU_CASE_EXECUTION
 
 ALTER TABLE ACT_RU_CASE_EXECUTION
   ADD REPETITION_ smallint check(REPETITION_ in (1,0));
-    
+
+-- historic case activity instance repetition rule --
+
+ALTER TABLE ACT_HI_CASEACTINST
+  ADD REPEATABLE_ smallint check(REPEATABLE_ in (1,0));
+
+ALTER TABLE ACT_HI_CASEACTINST
+  ADD REPETITION_ smallint check(REPETITION_ in (1,0));
+
 -- case sentry part source --
 
 ALTER TABLE ACT_RU_CASE_SENTRY_PART

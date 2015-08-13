@@ -185,6 +185,8 @@ public class DefaultCmmnHistoryEventProducer implements CmmnHistoryEventProducer
     evt.setCaseActivityInstanceState(caseExecutionEntity.getState());
 
     evt.setRequired(caseExecutionEntity.isRequired());
+    evt.setRepeatable(caseExecutionEntity.isRepeatable());
+    evt.setRepetition(caseExecutionEntity.isRepetition());
 
     evt.setCaseActivityId(caseExecutionEntity.getActivityId());
     evt.setCaseActivityName(caseExecutionEntity.getActivityName());

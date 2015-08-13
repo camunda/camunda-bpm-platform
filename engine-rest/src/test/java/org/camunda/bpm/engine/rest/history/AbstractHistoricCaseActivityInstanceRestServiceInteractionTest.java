@@ -84,6 +84,8 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceInteraction
     String returnedEndTime = from(content).getString("endTime");
     long returnedDurationInMillis = from(content).getLong("durationInMillis");
     boolean required = from(content).getBoolean("required");
+    boolean repeatable = from(content).getBoolean("repeatable");
+    boolean repetition = from(content).getBoolean("repetition");
     boolean available = from(content).getBoolean("available");
     boolean enabled = from(content).getBoolean("enabled");
     boolean disabled = from(content).getBoolean("disabled");
@@ -106,6 +108,8 @@ public abstract class AbstractHistoricCaseActivityInstanceRestServiceInteraction
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_END_TIME, returnedEndTime);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_DURATION, returnedDurationInMillis);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_REQUIRED, required);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_REPEATABLE, repeatable);
+    Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_REPETITION, repetition);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_AVAILABLE, available);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_ENABLED, enabled);
     Assert.assertEquals(MockProvider.EXAMPLE_HISTORIC_CASE_ACTIVITY_INSTANCE_IS_DISABLED, disabled);

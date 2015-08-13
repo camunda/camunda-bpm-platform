@@ -33,6 +33,8 @@ public class HistoricCaseActivityInstanceDto {
   private Date endTime;
   private Long durationInMillis;
   private Boolean required;
+  private Boolean repeatable;
+  private Boolean repetition;
   private Boolean available;
   private Boolean enabled;
   private Boolean disabled;
@@ -99,7 +101,15 @@ public class HistoricCaseActivityInstanceDto {
   public Boolean getRequired() {
     return required;
   }
+  
+  public Boolean getRepeatable() {
+    return repeatable;
+  }
 
+  public Boolean getRepetition() {
+    return repetition;
+  }
+  
   public Boolean getAvailable() {
     return available;
   }
@@ -143,6 +153,8 @@ public class HistoricCaseActivityInstanceDto {
     dto.endTime = historicCaseActivityInstance.getEndTime();
     dto.durationInMillis = historicCaseActivityInstance.getDurationInMillis();
     dto.required = historicCaseActivityInstance.isRequired();
+    dto.repeatable = historicCaseActivityInstance.isRepeatable();
+    dto.repetition = historicCaseActivityInstance.isRepetition();
     dto.available = historicCaseActivityInstance.isAvailable();
     dto.enabled = historicCaseActivityInstance.isEnabled();
     dto.disabled = historicCaseActivityInstance.isDisabled();

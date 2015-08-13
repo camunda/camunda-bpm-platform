@@ -42,7 +42,15 @@ ALTER TABLE ACT_RU_CASE_EXECUTION
 
 ALTER TABLE ACT_RU_CASE_EXECUTION
   ADD REPETITION_ boolean;
-    
+
+-- historic case activity instance repetition rule --
+
+ALTER TABLE ACT_HI_CASEACTINST
+  ADD REPEATABLE_ boolean;
+
+ALTER TABLE ACT_HI_CASEACTINST
+  ADD REPETITION_ boolean;
+
 -- case sentry part source --
 
 ALTER TABLE ACT_RU_CASE_SENTRY_PART

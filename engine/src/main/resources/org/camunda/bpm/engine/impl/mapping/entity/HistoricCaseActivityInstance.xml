@@ -36,7 +36,9 @@
         END_TIME_,
         DURATION_,
         STATE_,
-        REQUIRED_
+        REQUIRED_,
+        REPEATABLE_,
+        REPETITION_
       ) values (
         #{id, jdbcType=VARCHAR},
         #{parentCaseActivityInstanceId, jdbcType=VARCHAR},
@@ -52,7 +54,9 @@
         #{endTime, jdbcType=TIMESTAMP},
         #{durationInMillis, jdbcType=BIGINT},
         #{caseActivityInstanceState, jdbcType=INTEGER},
-        #{required, jdbcType=BOOLEAN}
+        #{required, jdbcType=BOOLEAN},
+        #{repeatable, jdbcType=BOOLEAN},
+        #{repetition, jdbcType=BOOLEAN}
       )
   </insert>
 
@@ -108,6 +112,8 @@
     <result property="durationInMillis" column="DURATION_" jdbcType="BIGINT" />
     <result property="caseActivityInstanceState" column="STATE_" jdbcType="INTEGER" />
     <result property="required" column="REQUIRED_" jdbcType="BOOLEAN" />
+    <result property="repeatable" column="REPEATABLE_" jdbcType="BOOLEAN" />
+    <result property="repetition" column="REPETITION_" jdbcType="BOOLEAN" />
   </resultMap>
 
   <!-- HISTORIC CASE ACTIVITY INSTANCE SELECT -->
@@ -175,6 +181,12 @@
       </if>
       <if test="required">
         and RES.REQUIRED_ = ${trueConstant}
+      </if>
+      <if test="repeatable">
+        and RES.REPEATABLE_ = ${trueConstant}
+      </if>
+      <if test="repetition">
+        and RES.REPETITION_ = ${trueConstant}
       </if>
     </where>
   </sql>

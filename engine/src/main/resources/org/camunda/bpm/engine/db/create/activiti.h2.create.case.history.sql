@@ -30,6 +30,8 @@ create table ACT_HI_CASEACTINST (
     DURATION_ bigint,
     STATE_ integer,
     REQUIRED_ bit,
+    REPEATABLE_ bit,
+    REPETITION_ bit,
     primary key (ID_)
 );
 

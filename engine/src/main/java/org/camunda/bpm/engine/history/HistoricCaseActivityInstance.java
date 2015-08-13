@@ -67,6 +67,12 @@ public interface HistoricCaseActivityInstance {
    /** Check if the case activity is required. */
    boolean isRequired();
 
+   /** Check if the case activity is repeatable. */
+   boolean isRepeatable();
+
+   /** Check if the case activity is a repetition. */
+   boolean isRepetition();
+
     /** Check if the case activity is available. */
    boolean isAvailable();
 
