@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.cdi.impl.event;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
@@ -23,8 +25,6 @@ import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
-
-import java.util.List;
 
 /**
  * {@link BpmnParseListener} registering the {@link CdiEventListener} for
@@ -244,6 +244,10 @@ public class CdiEventSupportBpmnParseListener implements BpmnParseListener {
 
   @Override
   public void parseBoundaryMessageEventDefinition(Element element, boolean interrupting, ActivityImpl messageActivity) {
+  }
+
+  @Override
+  public void parseBoundaryEscalationEventDefinition(Element escalationEventDefinition, boolean interrupting, ActivityImpl boundaryEventActivity) {
   }
 
 }
