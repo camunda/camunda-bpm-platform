@@ -24,18 +24,19 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
@@ -66,6 +67,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
  *
  * @see http://forums.activiti.org/en/viewtopic.php?t=2918
  * @author Falko Menge
+ * @author Ingo Richtsmeier
  */
 public class SetProcessDefinitionVersionCmd implements Command<Void>, Serializable {
 
@@ -115,11 +117,8 @@ public class SetProcessDefinitionVersionCmd implements Command<Void>, Serializab
     validateAndSwitchVersionOfExecution(commandContext, processInstance, newProcessDefinition);
 
     // switch the historic process instance to the new process definition version
-    HistoricProcessInstanceManager historicProcessInstanceManager = commandContext.getHistoricProcessInstanceManager();
-    if (historicProcessInstanceManager.isHistoryEnabled()) {
-      HistoricProcessInstanceEntity historicProcessInstance = historicProcessInstanceManager.findHistoricProcessInstance(processInstanceId);
-      historicProcessInstance.setProcessDefinitionId(newProcessDefinition.getId());
-    }
+    HistoryEvent processInstanceVersionModificationEvt = commandContext.getProcessEngineConfiguration().getHistoryEventProducer().createProcessInstanceVersionModificationEvt(processInstance);
+    commandContext.getProcessEngineConfiguration().getHistoryEventHandler().handleEvent(processInstanceVersionModificationEvt);
 
     // switch all sub-executions of the process instance to the new process definition version
     List<ExecutionEntity> childExecutions = executionManager
@@ -145,6 +144,10 @@ public class SetProcessDefinitionVersionCmd implements Command<Void>, Serializab
     for (IncidentEntity incidentEntity : incidents) {
       switchVersionOfIncident(commandContext, incidentEntity, newProcessDefinition);
     }
+
+    // add an entry to the op log
+    PropertyChange change = new PropertyChange("processDefinitionVersion", currentProcessDefinition.getVersion(), processDefinitionVersion);
+    commandContext.getOperationLogManager().logProcessInstanceOperation(UserOperationLogEntry.OPERATION_TYPE_MODIFY_PROCESS_INSTANCE, processInstanceId, null, null, change);
 
     return null;
   }
