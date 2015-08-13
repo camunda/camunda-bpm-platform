@@ -362,13 +362,13 @@ public class LegacyBehavior {
     ScopeImpl flowScope = propagatingExecution.getActivity().getFlowScope();
     ActivityAwareScopeExecutionCollector scopeExecutionCollector = new ActivityAwareScopeExecutionCollector(flowScope);
     new ExecutionWalker(propagatingExecution)
-      .addPreCollector(scopeExecutionCollector)
+      .addPreVisitor(scopeExecutionCollector)
       .walkUntil();
     List<PvmExecutionImpl> scopeExecutions = scopeExecutionCollector.getExecutions();
 
     ScopeCollector scopeCollector = new ScopeCollector();
     new FlowScopeWalker(flowScope)
-      .addPreCollector(scopeCollector)
+      .addPreVisitor(scopeCollector)
       .walkUntil();
 
     List<ScopeImpl> flowScopes = scopeCollector.getScopes();

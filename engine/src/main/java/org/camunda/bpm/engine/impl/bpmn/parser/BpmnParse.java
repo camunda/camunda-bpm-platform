@@ -53,6 +53,7 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.InclusiveGatewayActivityBehavio
 import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateCatchEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateCatchLinkEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateThrowCompensationEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateThrowEscalationEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateThrowNoneEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateThrowSignalEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.MailActivityBehavior;
@@ -177,6 +178,7 @@ public class BpmnParse extends Parse {
   public static final String PROPERTYNAME_COMPENSATION_HANDLER_ID = "compensationHandler";
   public static final String PROPERTYNAME_IS_FOR_COMPENSATION = "isForCompensation";
   public static final String PROPERTYNAME_ERROR_EVENT_DEFINITIONS = "errorEventDefinitions";
+  public static final String PROPERTYNAME_ESCALATION_EVENT_DEFINITIONS = "escalationEventDefinitions";
   public static final String PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION = "eventDefinitions";
   public static final String PROPERTYNAME_EVENT_SUBSCRIPTION_JOB_DECLARATION = "eventJobDeclarations";
   public static final String PROPERTYNAME_TRIGGERED_BY_EVENT = "triggeredByEvent";
@@ -208,6 +210,9 @@ public class BpmnParse extends Parse {
 
   /** Mapping of found errors in BPMN 2.0 file */
   protected Map<String, Error> errors = new HashMap<String, Error>();
+
+  /** Mapping of found escalation elements */
+  protected Map<String, Escalation> escalations = new HashMap<String, Escalation>();
 
   /**
    * Mapping from a process definition key to his containing list of job
@@ -300,8 +305,9 @@ public class BpmnParse extends Parse {
     parseDefinitionsAttributes();
     parseImports();
     parseMessages();
-    parseErrors();
     parseSignals();
+    parseErrors();
+    parseEscalations();
     parseProcessDefinitions();
     parseCollaboration();
 
@@ -441,6 +447,36 @@ public class BpmnParse extends Parse {
 
       errors.put(id, error);
     }
+  }
+
+  protected void parseEscalations() {
+    for (Element element : rootElement.elements("escalation")) {
+
+      String id = element.attribute("id");
+      if (id == null) {
+        addError("escalation must have an id", element);
+      } else {
+
+        Escalation escalation = createEscalation(id, element);
+        escalations.put(id, escalation);
+      }
+    }
+  }
+
+  protected Escalation createEscalation(String id, Element element) {
+
+    Escalation escalation = new Escalation(id);
+
+    String name = element.attribute("name");
+    if (name != null) {
+      escalation.setName(name);
+    }
+
+    String escalationCode = element.attribute("escalationCode");
+    if (escalationCode != null && !escalationCode.isEmpty()) {
+      escalation.setEscalationCode(escalationCode);
+    }
+    return escalation;
   }
 
   /**
@@ -1370,6 +1406,7 @@ public class BpmnParse extends Parse {
     Element compensateEventDefinitionElement = intermediateEventElement.element("compensateEventDefinition");
     Element linkEventDefinitionElement = intermediateEventElement.element("linkEventDefinition");
     Element messageEventDefinitionElement = intermediateEventElement.element("messageEventDefinition");
+    Element escalationEventDefinition = intermediateEventElement.element("escalationEventDefinition");
 
     // the link event gets a special treatment as a throwing link event (event
     // source)
@@ -1385,11 +1422,6 @@ public class BpmnParse extends Parse {
       // and done - no activity created
       return null;
     }
-
-    boolean otherUnsupportedThrowingIntermediateEvent = (intermediateEventElement.element("escalationEventDefinition") != null); //
-    // All other event definition types cannot be intermediate throwing
-    // (cancelEventDefinition, conditionalEventDefinition, errorEventDefinition,
-    // terminateEventDefinition, timerEventDefinition
 
     ActivityImpl nestedActivityImpl = createActivityOnScope(intermediateEventElement, scopeElement);
     ActivityBehavior activityBehavior = null;
@@ -1419,8 +1451,16 @@ public class BpmnParse extends Parse {
         nestedActivityImpl.setProperty("type", "intermediateNoneThrowEvent");
         activityBehavior = new IntermediateThrowNoneEventActivityBehavior();
       }
-    } else if (otherUnsupportedThrowingIntermediateEvent) {
-      addError("Unsupported intermediate throw event type", intermediateEventElement);
+    } else if (escalationEventDefinition != null) {
+      nestedActivityImpl.setProperty(PROPERTYNAME_TYPE, "intermediateEscalationThrowEvent");
+
+      Escalation escalation = findEscalationForEscalationEventDefinition(escalationEventDefinition);
+      if (escalation != null && escalation.getEscalationCode() == null) {
+        addError("throwing escalation event must have an 'escalationCode'", escalationEventDefinition);
+      }
+
+      activityBehavior = new IntermediateThrowEscalationEventActivityBehavior(escalation);
+
     } else { // None intermediate event
       nestedActivityImpl.setProperty("type", "intermediateNoneThrowEvent");
       activityBehavior = new IntermediateThrowNoneEventActivityBehavior();
@@ -2722,31 +2762,37 @@ public class BpmnParse extends Parse {
       Element cancelEventDefinition = boundaryEventElement.element("cancelEventDefinition");
       Element compensateEventDefinition = boundaryEventElement.element("compensateEventDefinition");
       Element messageEventDefinition = boundaryEventElement.element("messageEventDefinition");
+      Element escalationEventDefinition = boundaryEventElement.element("escalationEventDefinition");
 
       // create the boundary event activity
       ActivityImpl boundaryEventActivity = createActivityOnScope(boundaryEventElement, flowScope);
 
-      // determine the correct event scope (the scope in which the boundary
-      // event catches events)
-      ActivityImpl eventScopeActivity = flowScope.findActivityAtLevelOfSubprocess(attachedToRef);
-      if (eventScopeActivity == null) {
+      ActivityImpl attachedActivity = flowScope.findActivityAtLevelOfSubprocess(attachedToRef);
+      if (attachedActivity == null) {
         addError("Invalid reference in boundary event. Make sure that the referenced activity is " + "defined in the same scope as the boundary event",
             boundaryEventElement);
       }
 
+      // determine the correct event scope (the scope in which the boundary event catches events)
       if (compensateEventDefinition == null) {
-        ActivityImpl multiInstanceScope = getMultiInstanceScope(eventScopeActivity);
+        ActivityImpl multiInstanceScope = getMultiInstanceScope(attachedActivity);
         if (multiInstanceScope != null) {
           // if the boundary event is attached to a multi instance activity,
           // then the scope of the boundary event is the multi instance body.
-          eventScopeActivity = multiInstanceScope;
+          boundaryEventActivity.setEventScope(multiInstanceScope);
+        } else {
+          attachedActivity.setScope(true);
+          boundaryEventActivity.setEventScope(attachedActivity);
         }
+      } else {
+        boundaryEventActivity.setEventScope(attachedActivity);
       }
-      boundaryEventActivity.setEventScope(eventScopeActivity);
+
+      // except escalation, by default is assumed to abort the activity
+      String cancelActivityAttr = boundaryEventElement.attribute("cancelActivity", "true");
+      boolean isCancelActivity = Boolean.valueOf(cancelActivityAttr);
 
       // determine start behavior
-      String cancelActivityAttr = boundaryEventElement.attribute("cancelActivity", "true");
-      boolean isCancelActivity = cancelActivityAttr.equals("true");
       if (isCancelActivity) {
         boundaryEventActivity.setActivityStartBehavior(ActivityStartBehavior.CANCEL_EVENT_SCOPE);
       } else {
@@ -2756,27 +2802,30 @@ public class BpmnParse extends Parse {
       // Catch event behavior is the same for most types
       ActivityBehavior behavior = new BoundaryEventActivityBehavior();
       if (timerEventDefinition != null) {
-        eventScopeActivity.setScope(true);
         parseBoundaryTimerEventDefinition(timerEventDefinition, isCancelActivity, boundaryEventActivity);
 
       } else if (errorEventDefinition != null) {
-        eventScopeActivity.setScope(true);
         parseBoundaryErrorEventDefinition(errorEventDefinition, boundaryEventActivity);
 
       } else if (signalEventDefinition != null) {
-        eventScopeActivity.setScope(true);
         parseBoundarySignalEventDefinition(signalEventDefinition, isCancelActivity, boundaryEventActivity);
 
       } else if (cancelEventDefinition != null) {
-        eventScopeActivity.setScope(true);
         behavior = parseBoundaryCancelEventDefinition(cancelEventDefinition, boundaryEventActivity);
 
       } else if (compensateEventDefinition != null) {
         parseBoundaryCompensateEventDefinition(compensateEventDefinition, boundaryEventActivity);
 
       } else if (messageEventDefinition != null) {
-        eventScopeActivity.setScope(true);
         parseBoundaryMessageEventDefinition(messageEventDefinition, isCancelActivity, boundaryEventActivity);
+
+      } else if (escalationEventDefinition != null) {
+
+        if (attachedActivity.isSubProcessScope() || attachedActivity.getActivityBehavior() instanceof CallActivityBehavior) {
+          parseBoundaryEscalationEventDefinition(escalationEventDefinition, isCancelActivity, boundaryEventActivity);
+        } else {
+          addError("An escalation boundary event should only be attached to a subprocess or a call activity", boundaryEventElement);
+        }
 
       } else {
         addError("Unsupported boundary event type", boundaryEventElement);
@@ -3047,7 +3096,70 @@ public class BpmnParse extends Parse {
     Collections.sort(errorEventDefinitions, ErrorEventDefinition.comparator);
   }
 
-  @SuppressWarnings("unchecked")
+  protected void parseBoundaryEscalationEventDefinition(Element escalationEventDefinitionElement, boolean cancelActivity, ActivityImpl boundaryEventActivity) {
+    boundaryEventActivity.setProperty(PROPERTYNAME_TYPE, "boundaryEscalation");
+
+    EscalationEventDefinition escalationEventDefinition = createEscalationEventDefinitionForEscalationHandler(escalationEventDefinitionElement, boundaryEventActivity, cancelActivity);
+    addEscalationEventDefinition(boundaryEventActivity.getEventScope(), escalationEventDefinition, escalationEventDefinitionElement);
+
+    for (BpmnParseListener parseListener : parseListeners) {
+      parseListener.parseBoundaryEscalationEventDefinition(escalationEventDefinitionElement, cancelActivity, boundaryEventActivity);
+    }
+  }
+
+  /**
+   * Find the referenced escalation of the given escalation event definition.
+   * Add errors if the referenced escalation not found.
+   *
+   * @return referenced escalation or <code>null</code>, if referenced escalation not found
+   */
+  protected Escalation findEscalationForEscalationEventDefinition(Element escalationEventDefinition) {
+    String escalationRef = escalationEventDefinition.attribute("escalationRef");
+    if (escalationRef == null) {
+      addError("escalationEventDefinition does not have required attribute 'escalationRef'", escalationEventDefinition);
+    } else if (!escalations.containsKey(escalationRef)) {
+      addError("could not find escalation with id '" + escalationRef + "'", escalationEventDefinition);
+    } else {
+      return escalations.get(escalationRef);
+    }
+    return null;
+  }
+
+  protected EscalationEventDefinition createEscalationEventDefinitionForEscalationHandler(Element escalationEventDefinition, ActivityImpl escalationHandler, boolean cancelActivity) {
+    String escalationRef = escalationEventDefinition.attribute("escalationRef");
+    if (escalationRef != null) {
+      if (!escalations.containsKey(escalationRef)) {
+        addError("could not find escalation with id '" + escalationRef + "'", escalationEventDefinition);
+      } else {
+        Escalation escalation = escalations.get(escalationRef);
+        return new EscalationEventDefinition(escalationHandler, cancelActivity, escalation);
+      }
+    }
+    return new EscalationEventDefinition(escalationHandler, cancelActivity);
+  }
+
+  protected void addEscalationEventDefinition(ScopeImpl catchingScope, EscalationEventDefinition escalationEventDefinition, Element element) {
+    List<EscalationEventDefinition> escalationEventDefinitions = (List<EscalationEventDefinition>) catchingScope
+        .getProperty(PROPERTYNAME_ESCALATION_EVENT_DEFINITIONS);
+    if (escalationEventDefinitions == null) {
+      escalationEventDefinitions = new ArrayList<EscalationEventDefinition>();
+      catchingScope.setProperty(PROPERTYNAME_ESCALATION_EVENT_DEFINITIONS, escalationEventDefinitions);
+    }
+
+    // ensure there is only one escalation boundary event what can catch the escalation event
+    for (EscalationEventDefinition existingEscalationEventDefinition : escalationEventDefinitions) {
+      if (existingEscalationEventDefinition.getEscalationCode() == null || escalationEventDefinition.getEscalationCode() == null) {
+        addError("The same scope can not contains an escalation boundary event without escalation code and another one with escalation code. "
+            + "The escalation boundary event without escalation code catch all escalation events.", element);
+      } else if (existingEscalationEventDefinition.getEscalationCode().equals(escalationEventDefinition.getEscalationCode())) {
+        addError("multiple escalation boundary events with the same escalationCode '" + escalationEventDefinition.getEscalationCode()
+            + "' are not supported on same scope", element);
+      }
+    }
+
+    escalationEventDefinitions.add(escalationEventDefinition);
+  }
+
   protected void addTimerDeclaration(ScopeImpl scope, TimerDeclarationImpl timerDeclaration) {
     List<TimerDeclarationImpl> timerDeclarations = (List<TimerDeclarationImpl>) scope.getProperty(PROPERTYNAME_TIMER_DECLARATION);
     if (timerDeclarations == null) {

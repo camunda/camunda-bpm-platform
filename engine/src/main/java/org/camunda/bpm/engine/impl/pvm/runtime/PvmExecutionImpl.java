@@ -1301,13 +1301,13 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
     ActivityAwareScopeExecutionCollector scopeExecutionCollector = new ActivityAwareScopeExecutionCollector(currentScope);
     new ExecutionWalker(this)
-      .addPreCollector(scopeExecutionCollector)
+      .addPreVisitor(scopeExecutionCollector)
       .walkUntil();
     List<PvmExecutionImpl> scopeExecutions = scopeExecutionCollector.getExecutions();
 
     ScopeCollector scopeCollector = new ScopeCollector();
     new FlowScopeWalker(currentScope)
-      .addPreCollector(scopeCollector)
+      .addPreVisitor(scopeCollector)
       .walkUntil();
 
     List<ScopeImpl> scopes = scopeCollector.getScopes();

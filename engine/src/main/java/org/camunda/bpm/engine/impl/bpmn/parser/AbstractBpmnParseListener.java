@@ -12,7 +12,7 @@ import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
 /**
  * Abstract base class for implementing a {@link BpmnParseListener} without being forced to implement
  * all methods provided, which makes the implementation more robust to future changes.
- * 
+ *
  * @author ruecker
  */
 public class AbstractBpmnParseListener implements BpmnParseListener {
@@ -109,11 +109,14 @@ public class AbstractBpmnParseListener implements BpmnParseListener {
 
   public void parseBoundaryEvent(Element boundaryEventElement, ScopeImpl scopeElement, ActivityImpl nestedActivity) {
   }
-  
+
   public void parseIntermediateMessageCatchEventDefinition(Element messageEventDefinition, ActivityImpl nestedActivity) {
   }
 
   public void parseBoundaryMessageEventDefinition(Element element, boolean interrupting, ActivityImpl messageActivity) {
+  }
+
+  public void parseBoundaryEscalationEventDefinition(Element escalationEventDefinition, boolean interrupting, ActivityImpl boundaryEventActivity) {
   }
 
 }

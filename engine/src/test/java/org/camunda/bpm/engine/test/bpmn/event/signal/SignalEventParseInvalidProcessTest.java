@@ -18,10 +18,7 @@ import static org.junit.Assert.fail;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.junit.Before;
@@ -36,17 +33,17 @@ import junit.framework.AssertionFailedError;
 
 /**
  * Parse an invalid process definition and assert the error message.
- * 
+ *
  * @author Philipp Ossler
  */
 @RunWith(Parameterized.class)
 public class SignalEventParseInvalidProcessTest {
 
   private static final String PROCESS_DEFINITION_DIRECTORY = "org/camunda/bpm/engine/test/bpmn/event/signal/";
-  
+
   @Parameters(name = "{index}: process definition = {0}, expected error message = {1}")
   public static Collection<Object[]> data() {
-    return Arrays.asList(new Object[][] { 
+    return Arrays.asList(new Object[][] {
         { "InvalidProcessWithDuplicateSignalNames.bpmn20.xml", "duplicate signal name" },
         { "InvalidProcessWithNoSignalName.bpmn20.xml", "signal with id 'alertSignal' has no name" },
         { "InvalidProcessWithSignalNoId.bpmn20.xml", "signal must have an id" },
@@ -58,39 +55,33 @@ public class SignalEventParseInvalidProcessTest {
 
   @Parameter(0)
   public String processDefinitionResource;
-  
+
   @Parameter(1)
   public String expectedErrorMessage;
 
   @Rule
   public ProcessEngineRule rule = new ProcessEngineRule(PluggableProcessEngineTestCase.getProcessEngine(), true);
 
-  protected ManagementService managementService;
   protected RepositoryService repositoryService;
-  protected RuntimeService runtimeService;
-  protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
   @Before
-  public void initServices() {    
-    managementService = rule.getManagementService();
+  public void initServices() {
     repositoryService = rule.getRepositoryService();
-    runtimeService = rule.getRuntimeService();
-    processEngineConfiguration = (ProcessEngineConfigurationImpl) rule.getProcessEngine().getProcessEngineConfiguration();
   }
-  
+
   @Test
   public void testParseInvalidProcessDefinition() {
     try {
       repositoryService.createDeployment()
         .addClasspathResource(PROCESS_DEFINITION_DIRECTORY + processDefinitionResource)
         .deploy();
-      
+
       fail("exception expected: " + expectedErrorMessage);
     } catch (Exception e) {
       assertTextPresent(expectedErrorMessage, e.getMessage());
     }
   }
-  
+
   public void assertTextPresent(String expected, String actual) {
     if (actual == null || !actual.contains(expected)) {
       throw new AssertionFailedError("expected presence of [" + expected + "], but was [" + actual + "]");

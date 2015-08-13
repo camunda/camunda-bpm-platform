@@ -119,7 +119,7 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
     // prepare to walk up the flow scope hierarchy and collect the flow scope activities
     ActivityStackCollector stackCollector = new ActivityStackCollector();
     FlowScopeWalker walker = new FlowScopeWalker(targetFlowScope);
-    walker.addPreCollector(stackCollector);
+    walker.addPreVisitor(stackCollector);
 
     ExecutionEntity scopeExecution = null;
 

@@ -22,11 +22,11 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
  * @author Thorben Lindhauer
  *
  */
-public class ActivityStackCollector implements Collector<ScopeImpl> {
+public class ActivityStackCollector implements TreeVisitor<ScopeImpl> {
 
   protected List<PvmActivity> activityStack = new ArrayList<PvmActivity>();
 
-  public void collect(ScopeImpl scope) {
+  public void visit(ScopeImpl scope) {
     if (scope != null && PvmActivity.class.isAssignableFrom(scope.getClass())) {
       activityStack.add((PvmActivity) scope);
     }

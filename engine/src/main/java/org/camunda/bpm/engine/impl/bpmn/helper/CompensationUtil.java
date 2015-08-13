@@ -33,7 +33,7 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
-import org.camunda.bpm.engine.impl.tree.Collector;
+import org.camunda.bpm.engine.impl.tree.TreeVisitor;
 import org.camunda.bpm.engine.impl.tree.FlowScopeWalker;
 import org.camunda.bpm.engine.impl.tree.TreeWalker.WalkCondition;
 
@@ -177,15 +177,15 @@ public class CompensationUtil {
     // <LEGACY>: different flow scopes may have the same scope execution =>
     // collect subscriptions in a set
     final Set<CompensateEventSubscriptionEntity> subscriptions = new HashSet<CompensateEventSubscriptionEntity>();
-    Collector<ScopeImpl> eventSubscriptionCollector = new Collector<ScopeImpl>() {
+    TreeVisitor<ScopeImpl> eventSubscriptionCollector = new TreeVisitor<ScopeImpl>() {
       @Override
-      public void collect(ScopeImpl obj) {
+      public void visit(ScopeImpl obj) {
         PvmExecutionImpl execution = scopeExecutionMapping.get(obj);
         subscriptions.addAll(((ExecutionEntity) execution).getCompensateEventSubscriptions());
       }
     };
 
-    new FlowScopeWalker(activity).addPostCollector(eventSubscriptionCollector).walkUntil(new WalkCondition<ScopeImpl>() {
+    new FlowScopeWalker(activity).addPostVisitor(eventSubscriptionCollector).walkUntil(new WalkCondition<ScopeImpl>() {
       @Override
       public boolean isFulfilled(ScopeImpl element) {
         Boolean consumesCompensationProperty = (Boolean) element.getProperty(BpmnParse.PROPERTYNAME_CONSUMES_COMPENSATION);

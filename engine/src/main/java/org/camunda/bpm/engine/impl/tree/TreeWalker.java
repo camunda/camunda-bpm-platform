@@ -16,6 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Abstract class that walks through a tree hierarchy. The subclass define the
+ * type of tree and provide the concrete walking behavior.
+ *
  * @author Thorben Lindhauer
  *
  */
@@ -23,9 +26,9 @@ public abstract class TreeWalker<T> {
 
   protected T currentElement;
 
-  protected List<Collector<T>> preCollectors = new ArrayList<Collector<T>>();
+  protected List<TreeVisitor<T>> preVisitor = new ArrayList<TreeVisitor<T>>();
 
-  protected List<Collector<T>> postCollectors = new ArrayList<Collector<T>>();
+  protected List<TreeVisitor<T>> postVisitor = new ArrayList<TreeVisitor<T>>();
 
   protected abstract T nextElement();
 
@@ -33,13 +36,13 @@ public abstract class TreeWalker<T> {
     currentElement = initialElement;
   }
 
-  public TreeWalker<T> addPreCollector(Collector<T> collector) {
-    this.preCollectors.add(collector);
+  public TreeWalker<T> addPreVisitor(TreeVisitor<T> collector) {
+    this.preVisitor.add(collector);
     return this;
   }
 
-  public TreeWalker<T> addPostCollector(Collector<T> collector) {
-    this.postCollectors.add(collector);
+  public TreeWalker<T> addPostVisitor(TreeVisitor<T> collector) {
+    this.postVisitor.add(collector);
     return this;
   }
 
@@ -53,14 +56,14 @@ public abstract class TreeWalker<T> {
 
   public T walkWhile(WalkCondition<T> condition) {
     while (!condition.isFulfilled(currentElement)) {
-      for (Collector<T> collector : preCollectors) {
-        collector.collect(currentElement);
+      for (TreeVisitor<T> collector : preVisitor) {
+        collector.visit(currentElement);
       }
 
       currentElement = nextElement();
 
-      for (Collector<T> collector : postCollectors) {
-        collector.collect(currentElement);
+      for (TreeVisitor<T> collector : postVisitor) {
+        collector.visit(currentElement);
       }
     }
     return getCurrentElement();
@@ -68,14 +71,14 @@ public abstract class TreeWalker<T> {
 
   public T walkUntil(WalkCondition<T> condition) {
     do {
-      for (Collector<T> collector : preCollectors) {
-        collector.collect(currentElement);
+      for (TreeVisitor<T> collector : preVisitor) {
+        collector.visit(currentElement);
       }
 
       currentElement = nextElement();
 
-      for (Collector<T> collector : postCollectors) {
-        collector.collect(currentElement);
+      for (TreeVisitor<T> collector : postVisitor) {
+        collector.visit(currentElement);
       }
     } while (!condition.isFulfilled(currentElement));
     return getCurrentElement();

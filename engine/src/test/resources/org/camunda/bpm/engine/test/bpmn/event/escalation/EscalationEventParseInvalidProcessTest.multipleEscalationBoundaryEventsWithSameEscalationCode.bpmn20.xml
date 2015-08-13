@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+  
+  <!-- multiple escalation event definitions with same escalationCode -->
+  <escalation id="escalation1" name="escalation1" escalationCode="escalationCode" />
+  <escalation id="escalation2" name="escalation2" escalationCode="escalationCode" />
+
+  <process id="escalationProcess" isExecutable="true">
+  
+  <startEvent id="start" />
+  
+  <sequenceFlow sourceRef="start" targetRef="subProcess" />
+  
+   <subProcess id="subProcess">
+    <startEvent id="startSubProcess" />
+    <sequenceFlow sourceRef="startSubProcess" targetRef="mySubProcessUserTask" />
+    <userTask id="mySubProcessUserTask" />
+    <sequenceFlow sourceRef="mySubProcessUserTask" targetRef="endSubProcess" />
+    <endEvent id="endSubProcess" />
+   </subProcess>
+  
+  <sequenceFlow sourceRef="subProcess" targetRef="theEnd" />
+  
+  <boundaryEvent id="escalationBoundaryEvent1" attachedToRef="subProcess">
+    <escalationEventDefinition escalationRef="escalation1" />
+  </boundaryEvent>
+  
+  <boundaryEvent id="escalationBoundaryEvent2" attachedToRef="subProcess">
+    <escalationEventDefinition escalationRef="escalation2" />
+  </boundaryEvent>
+  
+  <sequenceFlow sourceRef="escalationBoundaryEvent1" targetRef="myUserTask" />
+  <sequenceFlow sourceRef="escalationBoundaryEvent2" targetRef="myUserTask" />
+  
+  <userTask id="myUserTask" />
+  
+  <sequenceFlow sourceRef="myUserTask" targetRef="theEnd" />
+  
+  <endEvent id="theEnd" />
+  
+
+  </process>
+
+</definitions>

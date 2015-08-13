@@ -55,7 +55,7 @@ public class ProcessInstanceStartContext extends ExecutionStartContext {
     if (instantiationStack == null) {
       FlowScopeWalker flowScopeWalker = new FlowScopeWalker(initial.getFlowScope());
       ScopeCollector scopeCollector = new ScopeCollector();
-      flowScopeWalker.addPreCollector(scopeCollector).walkWhile(new WalkCondition<ScopeImpl>() {
+      flowScopeWalker.addPreVisitor(scopeCollector).walkWhile(new WalkCondition<ScopeImpl>() {
         public boolean isFulfilled(ScopeImpl element) {
           return element == null || element == initial.getProcessDefinition();
         }

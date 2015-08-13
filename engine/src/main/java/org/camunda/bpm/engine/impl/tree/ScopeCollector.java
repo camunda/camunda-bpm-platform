@@ -21,11 +21,11 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
  * @author Daniel Meyer
  *
  */
-public class ScopeCollector implements Collector<ScopeImpl> {
+public class ScopeCollector implements TreeVisitor<ScopeImpl> {
 
   protected List<ScopeImpl> scopes = new ArrayList<ScopeImpl>();
 
-  public void collect(ScopeImpl obj) {
+  public void visit(ScopeImpl obj) {
     if(obj != null && obj.isScope()) {
       scopes.add(obj);
     }

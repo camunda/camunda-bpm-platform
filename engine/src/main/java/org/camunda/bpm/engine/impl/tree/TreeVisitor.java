@@ -13,10 +13,17 @@
 package org.camunda.bpm.engine.impl.tree;
 
 /**
+ * A visitor for {@link TreeWalker}.
+ *
  * @author Thorben Lindhauer
  *
  */
-public interface Collector<T> {
+public interface TreeVisitor<T> {
 
-  void collect(T obj);
+  /**
+   * Invoked for a node in tree.
+   *
+   * @param obj a reference to the node
+   */
+  void visit(T obj);
 }

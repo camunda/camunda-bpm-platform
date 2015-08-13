@@ -16,8 +16,10 @@ package org.camunda.bpm.engine.test.bpmn.parse;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.CompensationEndEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessStartEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateThrowEscalationEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.NoneStartEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -462,6 +464,22 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
 
     assertEquals("signalStartEvent", signalStartActivity.getProperty("type"));
     assertEquals(NoneStartEventActivityBehavior.class, signalStartActivity.getActivityBehavior().getClass());
+  }
+
+  @Deployment
+  public void testParseEscalationBoundaryEvent() {
+    ActivityImpl escalationBoundaryEvent = findActivityInDeployedProcessDefinition("escalationBoundaryEvent");
+
+    assertEquals("boundaryEscalation", escalationBoundaryEvent.getProperty(BpmnParse.PROPERTYNAME_TYPE));
+    assertEquals(BoundaryEventActivityBehavior.class, escalationBoundaryEvent.getActivityBehavior().getClass());
+  }
+
+  @Deployment
+  public void testParseEscalationIntermediateThrowingEvent() {
+    ActivityImpl escalationThrowingEvent = findActivityInDeployedProcessDefinition("escalationThrowingEvent");
+
+    assertEquals("intermediateEscalationThrowEvent", escalationThrowingEvent.getProperty(BpmnParse.PROPERTYNAME_TYPE));
+    assertEquals(IntermediateThrowEscalationEventActivityBehavior.class, escalationThrowingEvent.getActivityBehavior().getClass());
   }
 
   protected void assertActivityBounds(ActivityImpl activity, int x, int y, int width, int height) {

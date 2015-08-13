@@ -29,7 +29,7 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
  * @author Thorben Lindhauer
  *
  */
-public class ActivityAwareScopeExecutionCollector implements Collector<PvmExecutionImpl> {
+public class ActivityAwareScopeExecutionCollector implements TreeVisitor<PvmExecutionImpl> {
 
   protected ScopeImpl commonChildScope;
   protected ScopeImpl currentActivity;
@@ -40,7 +40,7 @@ public class ActivityAwareScopeExecutionCollector implements Collector<PvmExecut
     this.currentActivity = commonChildScope;
   }
 
-  public void collect(PvmExecutionImpl obj) {
+  public void visit(PvmExecutionImpl obj) {
     if (obj.getActivity() != null) {
       // if an execution has an activity set, take this as a hint to
       // where we are in the activity tree and reset the currentActivity
