@@ -135,7 +135,7 @@ public class FoxJobRetryCmd extends JobRetryCmd {
   }
 
   protected String getFailedJobRetryTimeCycle(ActivityImpl activity) {
-    return (String) activity.getProperty(FoxFailedJobParseListener.FOX_FAILED_JOB_CONFIGURATION);
+    return activity.getProperties().get(FoxFailedJobParseListener.FOX_FAILED_JOB_CONFIGURATION);
   }
 
   protected DurationHelper getDurationHelper(String failedJobRetryTimeCycle) throws Exception {

@@ -35,7 +35,7 @@ public abstract class CoreModelElement implements Serializable {
 
   protected String id;
   protected String name;
-  protected Map<String, Object> properties;
+  protected Properties properties = new Properties();
 
   /** contains built-in listeners */
   protected Map<String, List<DelegateListener<? extends BaseDelegateExecution>>> builtInListeners = new HashMap<String, List<DelegateListener<? extends BaseDelegateExecution>>>();
@@ -61,28 +61,30 @@ public abstract class CoreModelElement implements Serializable {
     return name;
   }
 
+  /**
+   * @see Properties#set(PropertyKey)
+   */
   public void setProperty(String name, Object value) {
-    if (properties==null) {
-      properties = new HashMap<String, Object>();
-    }
-    properties.put(name, value);
+    properties.set(new PropertyKey<Object>(name), value);
   }
 
+  /**
+   * @see Properties#get(PropertyKey)
+   */
   public Object getProperty(String name) {
-    if (properties==null) {
-      return null;
-    }
-    return properties.get(name);
+    return properties.get(new PropertyKey<Object>(name));
   }
 
-  public Map<String, Object> getProperties() {
-    if (properties==null) {
-      return Collections.emptyMap();
-    }
+  /**
+   * Returns the properties of the element.
+   *
+   * @return the properties
+   */
+  public Properties getProperties() {
     return properties;
   }
 
-  public void setProperties(Map<String, Object> properties) {
+  public void setProperties(Properties properties) {
     this.properties = properties;
   }
 

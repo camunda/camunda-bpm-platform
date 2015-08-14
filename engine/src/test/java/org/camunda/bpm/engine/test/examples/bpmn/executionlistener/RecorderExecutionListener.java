@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.impl.core.model.PropertyKey;
 import org.camunda.bpm.engine.impl.el.FixedValue;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
@@ -98,7 +99,7 @@ public class RecorderExecutionListener implements ExecutionListener, Serializabl
 
     String activityName = null;
     if (executionCasted.getActivity() != null) {
-      activityName = (String)executionCasted.getActivity().getProperties().get("name");
+      activityName = executionCasted.getActivity().getProperties().get(new PropertyKey<String>("name"));
     }
 
     recordedEvents.add( new RecordedEvent(

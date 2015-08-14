@@ -11,36 +11,20 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.engine.impl.pvm;
-
-import java.io.Serializable;
+package org.camunda.bpm.engine.impl.bpmn.helper;
 
 import org.camunda.bpm.engine.impl.core.model.Properties;
 
-
 /**
- * @author Tom Baeyens
+ * Properties of bpmn elements.
+ *
+ * @author Philipp Ossler
+ *
+ * @see Properties
+ *
  */
-public interface PvmProcessElement extends Serializable {
+public class BpmnProperties {
 
-  /**
-   * The id of the element
-   * @return the id
-   */
-  String getId();
+  // TODO add properties from BpmnParse
 
-  /**
-   * The process definition scope, root of the scope hierarchy.
-   * @return
-   */
-  PvmProcessDefinition getProcessDefinition();
-
-  Object getProperty(String name);
-
-  /**
-   * Returns the properties of the element.
-   *
-   * @return the properties
-   */
-  Properties getProperties();
 }

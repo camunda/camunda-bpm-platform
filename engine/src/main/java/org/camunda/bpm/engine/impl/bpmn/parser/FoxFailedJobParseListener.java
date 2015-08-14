@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.parser;
 
+import org.camunda.bpm.engine.impl.core.model.PropertyKey;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.util.xml.Element;
@@ -35,7 +36,7 @@ public class FoxFailedJobParseListener extends AbstractBpmnParseListener {
   @Deprecated
   public static final Namespace FOX_ENGINE_NS = new Namespace("http://www.camunda.com/fox");
 
-  public static final String FOX_FAILED_JOB_CONFIGURATION = "FOX_FAILED_JOB_CONFIGURATION";
+  public static final PropertyKey<String> FOX_FAILED_JOB_CONFIGURATION = new PropertyKey<String>("FOX_FAILED_JOB_CONFIGURATION");
 
   @Override
   public void parseStartEvent(Element startEventElement, ScopeImpl scope, ActivityImpl startEventActivity) {
@@ -156,7 +157,7 @@ public class FoxFailedJobParseListener extends AbstractBpmnParseListener {
       }
       if (failedJobRetryTimeCycleElement != null) {
         String failedJobRetryTimeCycleValue = failedJobRetryTimeCycleElement.getText();
-        activity.setProperty(FOX_FAILED_JOB_CONFIGURATION, failedJobRetryTimeCycleValue);
+        activity.getProperties().set(FOX_FAILED_JOB_CONFIGURATION, failedJobRetryTimeCycleValue);
       }
     }
   }

@@ -175,7 +175,7 @@ public class FoxFailedJobParseListenerTest extends PluggableProcessEngineTestCas
   }
 
   private void checkFoxFailedJobConfig(ActivityImpl activity) {
-    assertTrue(activity.getProperties().containsKey(FoxFailedJobParseListener.FOX_FAILED_JOB_CONFIGURATION));
+    assertTrue(activity.getProperties().contains(FoxFailedJobParseListener.FOX_FAILED_JOB_CONFIGURATION));
 
     Object value = activity.getProperties().get(FoxFailedJobParseListener.FOX_FAILED_JOB_CONFIGURATION);
     assertNotNull(value);
@@ -183,7 +183,7 @@ public class FoxFailedJobParseListenerTest extends PluggableProcessEngineTestCas
   }
 
   private void checkNotContainingFoxFailedJobConfig(ActivityImpl activity) {
-    assertFalse(activity.getProperties().containsKey(FoxFailedJobParseListener.FOX_FAILED_JOB_CONFIGURATION));
+    assertFalse(activity.getProperties().contains(FoxFailedJobParseListener.FOX_FAILED_JOB_CONFIGURATION));
   }
 
 }
