@@ -10,6 +10,18 @@
     <version>7.4.0-SNAPSHOT</version>
   </parent>
 
+  <dependencyManagement>
+      <dependencies>
+          <dependency>
+            <groupId>org.jboss.arquillian</groupId>
+            <artifactId>arquillian-bom</artifactId>
+            <version>${version.arquillian}</version>
+            <scope>import</scope>
+            <type>pom</type>
+          </dependency>
+      </dependencies>
+  </dependencyManagement>
+
   <dependencies>
     <dependency>
       <groupId>org.jboss.shrinkwrap.resolver</groupId>
@@ -41,7 +53,6 @@
     <dependency>
       <groupId>org.jboss.arquillian.junit</groupId>
       <artifactId>arquillian-junit-container</artifactId>
-      <version>${version.arquillian}</version>
       <scope>test</scope>
     </dependency>
 
@@ -189,7 +200,6 @@
         <dependency>
           <groupId>org.jboss.arquillian.protocol</groupId>
           <artifactId>arquillian-protocol-servlet</artifactId>
-          <version>${version.arquillian}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
@@ -272,7 +282,6 @@
         <dependency>
           <groupId>org.jboss.arquillian.protocol</groupId>
           <artifactId>arquillian-protocol-servlet</artifactId>
-          <version>${version.arquillian}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
@@ -374,17 +383,6 @@
 
     <profile>
       <id>wildfly</id>
-      <dependencyManagement>
-        <dependencies>
-          <dependency>
-            <groupId>org.jboss.arquillian</groupId>
-            <artifactId>arquillian-bom</artifactId>
-            <version>1.1.5.Final</version>
-            <scope>import</scope>
-            <type>pom</type>
-          </dependency>
-        </dependencies>
-      </dependencyManagement>
       <dependencies>
         <!-- redefine the dependencies so we get the correct version specified above -->
         <dependency>
@@ -477,17 +475,6 @@
 
     <profile>
       <id>wildfly-domain</id>
-      <dependencyManagement>
-        <dependencies>
-          <dependency>
-            <groupId>org.jboss.arquillian</groupId>
-            <artifactId>arquillian-bom</artifactId>
-            <version>1.1.5.Final</version>
-            <scope>import</scope>
-            <type>pom</type>
-          </dependency>
-        </dependencies>
-      </dependencyManagement>
       <dependencies>
         <!-- redefine the dependencies so we get the correct version specified above -->
         <dependency>
@@ -633,7 +620,6 @@
         <dependency>
           <groupId>org.jboss.arquillian.protocol</groupId>
           <artifactId>arquillian-protocol-servlet</artifactId>
-          <version>${version.arquillian}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
@@ -838,13 +824,13 @@
       <id>tomcat</id>
       <dependencyManagement>
         <dependencies>
-          <dependency>
+          <!--dependency>
             <groupId>org.jboss.shrinkwrap.resolver</groupId>
             <artifactId>shrinkwrap-resolver-bom</artifactId>
             <version>${version.shrinkwrap.resolvers}</version>
             <scope>import</scope>
             <type>pom</type>
-          </dependency>
+          </dependency-->
 
           <dependency>
             <groupId>org.jboss.bom</groupId>
@@ -874,7 +860,7 @@
         <dependency>
           <groupId>org.jboss.arquillian.container</groupId>
           <artifactId>arquillian-tomcat-managed-7</artifactId>
-          <version>1.0.0.CR5</version>
+          <version>1.0.0.CR7</version>
           <scope>test</scope>
         </dependency>
 
@@ -956,7 +942,6 @@
         <dependency>
           <groupId>org.jboss.arquillian.protocol</groupId>
           <artifactId>arquillian-protocol-servlet</artifactId>
-          <version>${version.arquillian}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>

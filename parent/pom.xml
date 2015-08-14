@@ -31,11 +31,10 @@
     <version.jboss.as>7.2.0.Final</version.jboss.as>
     <version.wildfly>8.2.0.Final</version.wildfly>
     <version.glassfish>3.1.2</version.glassfish>
-    <version.tomcat>7.0.62</version.tomcat>
+    <version.tomcat>8.0.24</version.tomcat>
 
-    <version.arquillian>1.0.0.Final</version.arquillian>
-    <version.arquillian.drone>1.0.0.Final</version.arquillian.drone>
-    <version.shrinkwrap.resolvers>2.0.0</version.shrinkwrap.resolvers>
+    <version.arquillian>1.1.8.Final</version.arquillian>
+    <version.shrinkwrap.resolvers>2.1.1</version.shrinkwrap.resolvers>
     <version.selenium>2.45.0</version.selenium>
 
     <version.jboss-javaee-spec>3.0.2.Final</version.jboss-javaee-spec>
@@ -545,7 +544,7 @@
         <plugin>
           <groupId>org.codehaus.cargo</groupId>
           <artifactId>cargo-maven2-plugin</artifactId>
-          <version>1.4.5</version>
+          <version>1.4.15</version>
         </plugin>
         <plugin>
           <groupId>net.kennychua</groupId>

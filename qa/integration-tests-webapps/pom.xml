@@ -9,7 +9,7 @@
     <artifactId>camunda-qa</artifactId>
     <version>7.4.0-SNAPSHOT</version>
   </parent>
-  
+
   <properties>
     <cargo.timeout>120000</cargo.timeout>
     <cargo.deploy.timeout>60000</cargo.deploy.timeout>
@@ -105,7 +105,7 @@
       <type>war</type>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-rest</artifactId>
@@ -145,7 +145,7 @@
           <scope>test</scope>
           <type>war</type>
           <version>${project.version}</version>
-        </dependency>        
+        </dependency>
       </dependencies>
 
       <build>
@@ -351,7 +351,7 @@
           <version>${project.version}</version>
           <type>pom</type>
         </dependency>
-        
+
         <dependency>
           <groupId>org.camunda.bpm.webapp</groupId>
           <artifactId>camunda-webapp-glassfish</artifactId>
@@ -359,7 +359,7 @@
           <type>war</type>
           <scope>test</scope>
         </dependency>
-        
+
         <dependency>
           <groupId>org.camunda.bpm</groupId>
           <artifactId>camunda-engine-rest</artifactId>
@@ -367,7 +367,7 @@
           <type>war</type>
           <scope>test</scope>
         </dependency>
-             
+
       </dependencies>
 
       <build>
@@ -525,7 +525,7 @@
               <!-- Container configuration -->
               <container>
                 <type>installed</type>
-                <containerId>tomcat7x</containerId>
+                <containerId>tomcat8x</containerId>
                 <append>false</append>
                 <home>${tomcat.runtime}</home>
                 <timeout>${cargo.timeout}</timeout>

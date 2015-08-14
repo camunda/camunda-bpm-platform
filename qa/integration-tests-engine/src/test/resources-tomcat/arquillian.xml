@@ -3,7 +3,7 @@
             xsi:schemaLocation="http://jboss.org/schema/arquillian http://jboss.org/schema/arquillian/arquillian-1.0.xsd">
 
   <defaultProtocol type="Servlet 3.0" />
-  
+
   <engine>
         <property name="deploymentExportPath">target/deployments</property>
   </engine>
@@ -11,9 +11,10 @@
   <container qualifier="tomcat" default="true">
     <configuration>
       <property name="catalinaHome">${tomcat6.runtime.location}</property>
+      <property name="catalinaBase">${tomcat6.runtime.location}</property>
       <property name="bindHttpPort">${tomcat6.connector.http.port}</property>
       <property name="user">arquillian</property>
-      <property name="pass">arquillian</property>     
+      <property name="pass">arquillian</property>
       <property name="jmxPort">8089</property>
       <property name="javaVmArguments">-Xmx512m -XX:MaxPermSize=192m</property>
 <!--       <property name="javaVmArguments">-Xmx512m -XX:MaxPermSize=192m -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=y</property> -->
