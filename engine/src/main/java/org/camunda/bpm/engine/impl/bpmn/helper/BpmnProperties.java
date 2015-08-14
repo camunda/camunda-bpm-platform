@@ -13,7 +13,10 @@
 
 package org.camunda.bpm.engine.impl.bpmn.helper;
 
+import org.camunda.bpm.engine.impl.bpmn.parser.EscalationEventDefinition;
 import org.camunda.bpm.engine.impl.core.model.Properties;
+import org.camunda.bpm.engine.impl.core.model.PropertyKey;
+import org.camunda.bpm.engine.impl.core.model.PropertyListKey;
 
 /**
  * Properties of bpmn elements.
@@ -25,6 +28,8 @@ import org.camunda.bpm.engine.impl.core.model.Properties;
  */
 public class BpmnProperties {
 
-  // TODO add properties from BpmnParse
+  public static final PropertyKey<String> TYPE = new PropertyKey<String>("type");
+
+  public static final PropertyListKey<EscalationEventDefinition> ESCALATION_EVENT_DEFINITIONS = new PropertyListKey<EscalationEventDefinition>("escalationEventDefinitions");
 
 }

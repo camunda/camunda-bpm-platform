@@ -53,7 +53,6 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.InclusiveGatewayActivityBehavio
 import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateCatchEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateCatchLinkEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateThrowCompensationEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateThrowEscalationEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateThrowNoneEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateThrowSignalEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.MailActivityBehavior;
@@ -73,8 +72,10 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.SignalEndEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.SubProcessActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.TaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.TerminateEndEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.ThrowEscalationEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.TransactionActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.bpmn.listener.ClassDelegateExecutionListener;
 import org.camunda.bpm.engine.impl.bpmn.listener.DelegateExpressionExecutionListener;
 import org.camunda.bpm.engine.impl.bpmn.listener.ExpressionExecutionListener;
@@ -178,14 +179,18 @@ public class BpmnParse extends Parse {
   public static final String PROPERTYNAME_COMPENSATION_HANDLER_ID = "compensationHandler";
   public static final String PROPERTYNAME_IS_FOR_COMPENSATION = "isForCompensation";
   public static final String PROPERTYNAME_ERROR_EVENT_DEFINITIONS = "errorEventDefinitions";
-  public static final String PROPERTYNAME_ESCALATION_EVENT_DEFINITIONS = "escalationEventDefinitions";
   public static final String PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION = "eventDefinitions";
   public static final String PROPERTYNAME_EVENT_SUBSCRIPTION_JOB_DECLARATION = "eventJobDeclarations";
   public static final String PROPERTYNAME_TRIGGERED_BY_EVENT = "triggeredByEvent";
-  public static final String PROPERTYNAME_TYPE = "type";
   public static final String PROPERTYNAME_THROWS_COMPENSATION = "throwsCompensation";
   public static final String PROPERTYNAME_CONSUMES_COMPENSATION = "consumesCompensation";
   public static final String PROPERTYNAME_JOB_PRIORITY = "jobPriority";
+
+  /**
+   * @deprecated use {@link BpmnProperties#TYPE}
+   */
+  @Deprecated
+  public static final String PROPERTYNAME_TYPE = BpmnProperties.TYPE.getName();
 
   /* process start authorization specific finals */
   protected static final String POTENTIAL_STARTER = "potentialStarter";
@@ -1452,14 +1457,14 @@ public class BpmnParse extends Parse {
         activityBehavior = new IntermediateThrowNoneEventActivityBehavior();
       }
     } else if (escalationEventDefinition != null) {
-      nestedActivityImpl.setProperty(PROPERTYNAME_TYPE, "intermediateEscalationThrowEvent");
+      nestedActivityImpl.getProperties().set(BpmnProperties.TYPE, "intermediateEscalationThrowEvent");
 
       Escalation escalation = findEscalationForEscalationEventDefinition(escalationEventDefinition);
       if (escalation != null && escalation.getEscalationCode() == null) {
         addError("throwing escalation event must have an 'escalationCode'", escalationEventDefinition);
       }
 
-      activityBehavior = new IntermediateThrowEscalationEventActivityBehavior(escalation);
+      activityBehavior = new ThrowEscalationEventActivityBehavior(escalation);
 
     } else { // None intermediate event
       nestedActivityImpl.setProperty("type", "intermediateNoneThrowEvent");
@@ -2656,6 +2661,8 @@ public class BpmnParse extends Parse {
       Element messageEventDefinitionElement = endEventElement.element("messageEventDefinition");
       Element signalEventDefinition = endEventElement.element("signalEventDefinition");
       Element compensateEventDefinitionElement = endEventElement.element("compensateEventDefinition");
+      Element escalationEventDefinition = endEventElement.element("escalationEventDefinition");
+
       if (errorEventDefinition != null) { // error end event
         String errorRef = errorEventDefinition.attribute("errorRef");
         if (errorRef == null || "".equals(errorRef)) {
@@ -2699,12 +2706,23 @@ public class BpmnParse extends Parse {
         activity.setProperty("type", "signalEndEvent");
         EventSubscriptionDeclaration signalDefinition = parseSignalEventDefinition(signalEventDefinition);
         activity.setActivityBehavior(new SignalEndEventActivityBehavior(signalDefinition));
+
       } else if (compensateEventDefinitionElement != null) {
         activity.setProperty("type", "compensationEndEvent");
         CompensateEventDefinition compensateEventDefinition = parseThrowCompensateEventDefinition(compensateEventDefinitionElement, scope);
         activity.setActivityBehavior(new CompensationEndEventActivityBehavior(compensateEventDefinition));
         activity.setProperty(PROPERTYNAME_THROWS_COMPENSATION, true);
         activity.setScope(true);
+
+      } else if(escalationEventDefinition != null) {
+        activity.getProperties().set(BpmnProperties.TYPE, "escalationEndEvent");
+
+        Escalation escalation = findEscalationForEscalationEventDefinition(escalationEventDefinition);
+        if (escalation != null && escalation.getEscalationCode() == null) {
+          addError("escalation end event must have an 'escalationCode'", escalationEventDefinition);
+        }
+        activity.setActivityBehavior(new ThrowEscalationEventActivityBehavior(escalation));
+
       } else { // default: none end event
         activity.setProperty("type", "noneEndEvent");
         activity.setActivityBehavior(new NoneEndEventActivityBehavior());
@@ -3097,7 +3115,7 @@ public class BpmnParse extends Parse {
   }
 
   protected void parseBoundaryEscalationEventDefinition(Element escalationEventDefinitionElement, boolean cancelActivity, ActivityImpl boundaryEventActivity) {
-    boundaryEventActivity.setProperty(PROPERTYNAME_TYPE, "boundaryEscalation");
+    boundaryEventActivity.getProperties().set(BpmnProperties.TYPE, "boundaryEscalation");
 
     EscalationEventDefinition escalationEventDefinition = createEscalationEventDefinitionForEscalationHandler(escalationEventDefinitionElement, boundaryEventActivity, cancelActivity);
     addEscalationEventDefinition(boundaryEventActivity.getEventScope(), escalationEventDefinition, escalationEventDefinitionElement);
@@ -3139,15 +3157,8 @@ public class BpmnParse extends Parse {
   }
 
   protected void addEscalationEventDefinition(ScopeImpl catchingScope, EscalationEventDefinition escalationEventDefinition, Element element) {
-    List<EscalationEventDefinition> escalationEventDefinitions = (List<EscalationEventDefinition>) catchingScope
-        .getProperty(PROPERTYNAME_ESCALATION_EVENT_DEFINITIONS);
-    if (escalationEventDefinitions == null) {
-      escalationEventDefinitions = new ArrayList<EscalationEventDefinition>();
-      catchingScope.setProperty(PROPERTYNAME_ESCALATION_EVENT_DEFINITIONS, escalationEventDefinitions);
-    }
-
     // ensure there is only one escalation boundary event what can catch the escalation event
-    for (EscalationEventDefinition existingEscalationEventDefinition : escalationEventDefinitions) {
+    for (EscalationEventDefinition existingEscalationEventDefinition : catchingScope.getProperties().get(BpmnProperties.ESCALATION_EVENT_DEFINITIONS)) {
       if (existingEscalationEventDefinition.getEscalationCode() == null || escalationEventDefinition.getEscalationCode() == null) {
         addError("The same scope can not contains an escalation boundary event without escalation code and another one with escalation code. "
             + "The escalation boundary event without escalation code catch all escalation events.", element);
@@ -3157,7 +3168,7 @@ public class BpmnParse extends Parse {
       }
     }
 
-    escalationEventDefinitions.add(escalationEventDefinition);
+    catchingScope.getProperties().addListItem(BpmnProperties.ESCALATION_EVENT_DEFINITIONS, escalationEventDefinition);
   }
 
   protected void addTimerDeclaration(ScopeImpl scope, TimerDeclarationImpl timerDeclaration) {

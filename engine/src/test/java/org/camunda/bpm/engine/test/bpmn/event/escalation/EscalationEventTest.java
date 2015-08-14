@@ -176,4 +176,27 @@ public class EscalationEventTest extends PluggableProcessEngineTestCase {
     assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation").count());
   }
 
+  @Deployment
+  public void testParallelEscalationEndEvent() {
+    runtimeService.startProcessInstanceByKey("escalationProcess");
+    // when throw an escalation end event inside the subprocess
+
+    assertEquals(2, taskService.createTaskQuery().count());
+    // the non-interrupting boundary event should catch the escalation event
+    assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation").count());
+    // and continue the parallel flow in subprocess
+    assertEquals(1, taskService.createTaskQuery().taskName("task in subprocess").count());
+  }
+
+  @Deployment
+  public void testEscalationEndEvent() {
+    runtimeService.startProcessInstanceByKey("escalationProcess");
+    // when throw an escalation end event inside the subprocess
+
+    // the subprocess should end and
+    // the non-interrupting boundary event should catch the escalation event
+    assertEquals(1, taskService.createTaskQuery().count());
+    assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation").count());
+  }
+
 }

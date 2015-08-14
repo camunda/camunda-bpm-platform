@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+  
+  <escalation id="escalation" name="escalation" escalationCode="escalationCode" />
+
+  <process id="escalationProcess" isExecutable="true">
+  
+  <startEvent id="start" />
+  
+  <sequenceFlow sourceRef="start" targetRef="subProcess" />
+  
+   <subProcess id="subProcess">
+    
+    <startEvent id="startSubProcess" />
+   
+    <sequenceFlow sourceRef="startSubProcess" targetRef="escalationEndEvent" />
+    
+    <endEvent id="escalationEndEvent">
+      <escalationEventDefinition escalationRef="escalation" />
+    </endEvent>
+   
+   </subProcess>
+  
+  <sequenceFlow sourceRef="subProcess" targetRef="theEnd" />
+  
+  <boundaryEvent id="escalationBoundaryEvent" attachedToRef="subProcess" cancelActivity="false">
+    <escalationEventDefinition escalationRef="escalation" />
+  </boundaryEvent>
+  
+  <sequenceFlow sourceRef="escalationBoundaryEvent" targetRef="taskAfterCatchedEscalation" />
+  
+  <userTask id="taskAfterCatchedEscalation" name="task after catched escalation" />
+  
+  <sequenceFlow sourceRef="taskAfterCatchedEscalation" targetRef="theEnd" />
+  
+  <endEvent id="theEnd" />
+  
+  </process>
+
+</definitions>

@@ -15,7 +15,7 @@ package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
+import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.bpmn.parser.Escalation;
 import org.camunda.bpm.engine.impl.bpmn.parser.EscalationEventDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
@@ -28,16 +28,16 @@ import org.camunda.bpm.engine.impl.tree.TreeVisitor;
 import org.camunda.bpm.engine.impl.tree.TreeWalker.WalkCondition;
 
 /**
- * The activity bahavior for an intermediate throwing escalation event.
+ * The activity bahavior for an intermediate throwing escalation event and an escalation end event.
  *
  * @author Philipp Ossler
  *
  */
-public class IntermediateThrowEscalationEventActivityBehavior extends AbstractBpmnActivityBehavior {
+public class ThrowEscalationEventActivityBehavior extends AbstractBpmnActivityBehavior {
 
   protected final Escalation escalation;
 
-  public IntermediateThrowEscalationEventActivityBehavior(Escalation escalation) {
+  public ThrowEscalationEventActivityBehavior(Escalation escalation) {
     this.escalation = escalation;
   }
 
@@ -96,11 +96,8 @@ public class IntermediateThrowEscalationEventActivityBehavior extends AbstractBp
     @Override
     public void visit(PvmScope scope) {
 
-      List<EscalationEventDefinition> escalationEventDefinitions = (List<EscalationEventDefinition>) scope
-          .getProperty(BpmnParse.PROPERTYNAME_ESCALATION_EVENT_DEFINITIONS);
-      if (escalationEventDefinitions != null) {
-        this.escalationEventDefinition = findMatchingEscalationEventDefinition(escalationEventDefinitions);
-      }
+      List<EscalationEventDefinition> escalationEventDefinitions = scope.getProperties().get(BpmnProperties.ESCALATION_EVENT_DEFINITIONS);
+      this.escalationEventDefinition = findMatchingEscalationEventDefinition(escalationEventDefinitions);
     }
 
     protected EscalationEventDefinition findMatchingEscalationEventDefinition(List<EscalationEventDefinition> escalationEventDefinitions) {

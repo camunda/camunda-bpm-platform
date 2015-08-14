@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+  
+  <!-- missing escalationCode for throwing escalation event -->
+  <escalation id="escalation" name="escalation" />
+
+  <process id="escalationProcess" isExecutable="true">
+  
+  <startEvent id="start" />
+   
+  <sequenceFlow sourceRef="start" targetRef="theEnd" />
+  
+  <endEvent id="theEnd">
+    <escalationEventDefinition escalationRef="escalation" />
+  </endEvent>
+  
+  </process>
+
+</definitions>
