@@ -43,7 +43,6 @@ import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbBulkOperation;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbEntityOperation;
-import org.camunda.bpm.engine.impl.util.ClassNameUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 
@@ -249,24 +248,6 @@ public class DbSqlSession extends AbstractPersistenceSession {
     executeUpdate(statement, parameter);
   }
 
-  // utils /////////////////////////////////////////
-
-
-  /**
-   * this is now done in {EnginePersistenceLogger.executeDatabaseOperation}
-   */
-  @Deprecated
-  protected String toString(Object object) {
-    if(object == null) {
-      return "null";
-    }
-    if(object instanceof DbEntity) {
-      DbEntity dbEntity = (DbEntity) object;
-      return ClassNameUtil.getClassNameWithoutPackage(dbEntity)+"["+dbEntity.getId()+"]";
-    }
-    return object.toString();
-  }
-
   // flush ////////////////////////////////////////////////////////////////////
 
   public void flush() {
@@ -287,7 +268,6 @@ public class DbSqlSession extends AbstractPersistenceSession {
 
   // schema operations ////////////////////////////////////////////////////////
 
-  @Deprecated
   public void dbSchemaCheckVersion() {
     try {
       String dbVersion = getDbVersion();

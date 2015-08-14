@@ -25,7 +25,6 @@ import static org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation
 import static org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperationType.UPDATE_BULK;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -282,7 +281,7 @@ public class DbEntityManager implements Session, EntityLoadListener {
   protected void flushDbOperationManager() {
     // obtain totally ordered operation list from operation manager
     List<DbOperation> operationsToFlush = dbOperationManager.calculateFlush();
-    logFlushSummary(operationsToFlush);
+    LOG.databaseFlushSummary(operationsToFlush);
 
     // execute the flush
     for (DbOperation dbOperation : operationsToFlush) {
@@ -305,26 +304,6 @@ public class DbEntityManager implements Session, EntityLoadListener {
     }
 
     flushDbOperationManager();
-  }
-
-  @Deprecated
-  /**
-   * See {EnginePersistenceLogger.flushDbOperationException} for string formation
-   */
-  protected String formatExceptionMessage(Exception e, DbOperation dbOperation, List<DbOperation> operationsToFlush) {
-    StringBuilder exceptionMessage = new StringBuilder();
-    exceptionMessage.append("Exception while executing Database Operation: ");
-    exceptionMessage.append(dbOperation.toString());
-    exceptionMessage.append(":");
-    exceptionMessage.append(e.getMessage());
-    exceptionMessage.append("\nFlush summary:\n[\n");
-    for (DbOperation op : operationsToFlush) {
-      exceptionMessage.append("  ");
-      exceptionMessage.append(op.toString());
-      exceptionMessage.append("\n");
-    }
-    exceptionMessage.append("]");
-    return exceptionMessage.toString();
   }
 
   protected void handleOptimisticLockingException(DbOperation dbOperation) {
@@ -458,11 +437,6 @@ public class DbEntityManager implements Session, EntityLoadListener {
     dbOperation.setEntity(cachedDbEntity.getEntity());
     dbOperation.setOperationType(type);
     dbOperationManager.addOperation(dbOperation);
-  }
-
-  @Deprecated
-  protected void logFlushSummary(Collection<DbOperation> operations) {
-    LOG.databaseFlushSummary(operations);
   }
 
   public void close() {
