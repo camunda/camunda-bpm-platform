@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
  */
 public class SequentialMultiInstanceActivityBehavior extends MultiInstanceActivityBehavior {
 
-  protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BEHAVIOR_LOGGER;
+  protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BPMN_BEHAVIOR_LOGGER;
 
   @Override
   protected void createInstances(ActivityExecution execution, int nrOfInstances) throws Exception {

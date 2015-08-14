@@ -70,6 +70,8 @@ import org.camunda.bpm.engine.delegate.CaseVariableListener;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.delegate.VariableListener;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnBehaviorLogger;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartEntity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
@@ -94,6 +96,8 @@ import org.camunda.bpm.engine.task.Task;
  *
  */
 public abstract class CmmnExecution extends CoreExecution implements CmmnCaseInstance {
+
+  protected static final CmmnBehaviorLogger LOG = ProcessEngineLogger.CMNN_BEHAVIOR_LOGGER;
 
   private static final long serialVersionUID = 1L;
 
@@ -983,7 +987,7 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
                   .getDelegateInterceptor()
                   .handleInvocation(invocation);
               } catch (Exception e) {
-                throw new ProcessEngineException("Variable listener invocation failed: "+e.getMessage(), e);
+                throw LOG.invokeVariableListenerException(e);
               }
             }
           }

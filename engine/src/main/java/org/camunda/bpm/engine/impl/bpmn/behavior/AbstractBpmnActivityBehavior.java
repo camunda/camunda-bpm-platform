@@ -50,7 +50,7 @@ import org.camunda.bpm.engine.impl.tree.TreeWalker.WalkCondition;
  */
 public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
 
-  protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BEHAVIOR_LOGGER;
+  protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BPMN_BEHAVIOR_LOGGER;
 
   /**
    * Subclasses that call leave() will first pass through this method, before

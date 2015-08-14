@@ -29,7 +29,7 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
  */
 public class ExclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
 
-  protected static BpmnBehaviorLogger LOG = ProcessEngineLogger.BEHAVIOR_LOGGER;
+  protected static BpmnBehaviorLogger LOG = ProcessEngineLogger.BPMN_BEHAVIOR_LOGGER;
 
   /**
    * The default behaviour of BPMN, taking every outgoing sequence flow

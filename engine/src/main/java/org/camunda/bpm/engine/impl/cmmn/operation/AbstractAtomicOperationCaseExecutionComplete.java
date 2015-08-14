@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnCompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.TransferVariablesActivityBehavior;
@@ -34,7 +35,7 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
  */
 public abstract class AbstractAtomicOperationCaseExecutionComplete extends AbstractCmmnEventAtomicOperation {
 
-  private static Logger log = Logger.getLogger(AbstractAtomicOperationCaseExecutionComplete.class.getName());
+  protected static final CmmnOperationLogger LOG = ProcessEngineLogger.CMMN_OPERATION_LOGGER;
 
   protected String getEventName() {
     return COMPLETE;
@@ -75,11 +76,11 @@ public abstract class AbstractAtomicOperationCaseExecutionComplete extends Abstr
         try {
           behavior.completing(superExecution, execution);
         } catch (RuntimeException e) {
-            log.log(Level.SEVERE, "Error while completing sub case of case execution " + execution, e);
-            throw e;
+          LOG.completingSubCaseError(execution, e);
+          throw e;
         } catch (Exception e) {
-            log.log(Level.SEVERE, "Error while completing sub case of case execution " + execution, e);
-            throw new ProcessEngineException("Error while completing sub case of case execution " + execution, e);
+          LOG.completingSubCaseError(execution, e);
+          throw LOG.completingSubCaseErrorException(execution, e);
         }
 
         // set sub case instance to null
@@ -88,11 +89,11 @@ public abstract class AbstractAtomicOperationCaseExecutionComplete extends Abstr
         try {
           behavior.completed(superExecution);
         } catch (RuntimeException e) {
-            log.log(Level.SEVERE, "Error while completing sub case of case execution " + execution, e);
-            throw e;
+          LOG.completingSubCaseError(execution, e);
+          throw e;
         } catch (Exception e) {
-            log.log(Level.SEVERE, "Error while completing sub case of case execution " + execution, e);
-            throw new ProcessEngineException("Error while completing sub case of case execution " + execution, e);
+          LOG.completingSubCaseError(execution, e);
+          throw LOG.completingSubCaseErrorException(execution, e);
         }
       }
 

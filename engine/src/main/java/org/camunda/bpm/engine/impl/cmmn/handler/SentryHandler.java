@@ -16,10 +16,12 @@ import java.util.Collection;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.delegate.Expression;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnIfPartDeclaration;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnOnPartDeclaration;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
+import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformerLogger;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.model.cmmn.PlanItemTransition;
 import org.camunda.bpm.model.cmmn.impl.instance.ConditionExpression;
@@ -36,7 +38,7 @@ import org.camunda.bpm.model.cmmn.instance.Sentry;
  */
 public class SentryHandler extends CmmnElementHandler<Sentry, CmmnSentryDeclaration> {
 
-  private static final Logger LOGGER = Logger.getLogger(SentryHandler.class.getName());
+  protected static final CmmnTransformerLogger LOG = ProcessEngineLogger.CMMN_TRANSFORMER_LOGGER;
 
   public CmmnSentryDeclaration handleElement(Sentry element, CmmnHandlerContext context) {
 
@@ -47,7 +49,7 @@ public class SentryHandler extends CmmnElementHandler<Sentry, CmmnSentryDeclarat
     if (ifPart == null || ifPart.getConditions().isEmpty()) {
 
       if (onParts == null || onParts.isEmpty()) {
-        LOGGER.info("Sentry with id '"+id+"' will be ignored because there are defined no ifPart nor onParts with a condition.");
+        LOG.ignoredSentryWithMissingCondition(id);
         return null;
       } else {
         boolean atLeastOneOnPartsValid = false;
@@ -63,7 +65,7 @@ public class SentryHandler extends CmmnElementHandler<Sentry, CmmnSentryDeclarat
         }
 
         if (!atLeastOneOnPartsValid) {
-          LOGGER.info("Sentry with id '"+id+"' will be ignored because the ifPart and all onParts are not valid.");
+          LOG.ignoredSentryWithInvalidParts(id);
           return null;
         }
       }
@@ -141,7 +143,7 @@ public class SentryHandler extends CmmnElementHandler<Sentry, CmmnSentryDeclarat
   protected void initializeOnPart(CaseFileItemOnPart onPart, Sentry sentry, CmmnHandlerContext context) {
     // not yet implemented
     String id = sentry.getId();
-    LOGGER.info("The onPart based on CaseFileItem of Sentry with id '"+id+"' is not supported and will be ignored.");
+    LOG.ignoredUnsupportedAttribute("onPart", "CaseFileItem", id);
   }
 
   protected void initializeIfPart(IfPart ifPart, CmmnSentryDeclaration sentryDeclaration, CmmnHandlerContext context) {
@@ -153,7 +155,7 @@ public class SentryHandler extends CmmnElementHandler<Sentry, CmmnSentryDeclarat
 
     if (conditions.size() > 1) {
       String id = sentryDeclaration.getId();
-      LOGGER.info("The ifPart of Sentry with id '"+id+"' has more than one condition: only the first condition will be used, the other conditions will be ignored.");
+      LOG.multipleIgnoredConditions(id);
     }
 
     ExpressionManager expressionManager = context.getExpressionManager();

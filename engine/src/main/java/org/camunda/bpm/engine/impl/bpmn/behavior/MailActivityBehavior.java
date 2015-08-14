@@ -32,7 +32,7 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
  */
 public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
 
-  protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BEHAVIOR_LOGGER;
+  protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BPMN_BEHAVIOR_LOGGER;
 
   protected Expression to;
   protected Expression from;

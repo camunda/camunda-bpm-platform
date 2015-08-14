@@ -50,7 +50,7 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
  */
 public class ParallelGatewayActivityBehavior extends GatewayActivityBehavior {
 
-  protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BEHAVIOR_LOGGER;
+  protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BPMN_BEHAVIOR_LOGGER;
 
   public void execute(ActivityExecution execution) throws Exception {
 

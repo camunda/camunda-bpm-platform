@@ -21,6 +21,8 @@ import java.util.Map;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.CmmnModelExecutionContext;
 import org.camunda.bpm.engine.delegate.ProcessEngineServicesAware;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnBehaviorLogger;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.core.variable.scope.CoreVariableStore;
@@ -36,6 +38,8 @@ import org.camunda.bpm.model.cmmn.instance.CmmnElement;
  *
  */
 public class CaseExecutionImpl extends CmmnExecution implements Serializable {
+
+  protected static final CmmnBehaviorLogger LOG = ProcessEngineLogger.CMNN_BEHAVIOR_LOGGER;
 
   private static final long serialVersionUID = 1L;
 
@@ -285,15 +289,15 @@ public class CaseExecutionImpl extends CmmnExecution implements Serializable {
   }
 
   public ProcessEngineServices getProcessEngineServices() {
-    throw new UnsupportedOperationException(ProcessEngineServicesAware.class.getName() +" is unsupported in transient CaseExecutionImpl");
+    throw LOG.unsupportedTransientOperationException(ProcessEngineServicesAware.class.getName());
   }
 
   public CmmnElement getCmmnModelElementInstance() {
-    throw new UnsupportedOperationException(CmmnModelExecutionContext.class.getName() +" is unsupported in transient CaseExecutionImpl");
+    throw LOG.unsupportedTransientOperationException(CmmnModelExecutionContext.class.getName());
   }
 
   public CmmnModelInstance getCmmnModelInstance() {
-    throw new UnsupportedOperationException(CmmnModelExecutionContext.class.getName() +" is unsupported in transient CaseExecutionImpl");
+    throw LOG.unsupportedTransientOperationException(CmmnModelExecutionContext.class.getName());
   }
 
 }

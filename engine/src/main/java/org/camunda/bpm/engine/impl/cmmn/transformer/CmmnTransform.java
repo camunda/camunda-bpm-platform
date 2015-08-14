@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.handler.CasePlanModelHandler;
 import org.camunda.bpm.engine.impl.cmmn.handler.CmmnElementHandler;
@@ -57,6 +57,8 @@ import org.camunda.bpm.model.cmmn.instance.Task;
  *
  */
 public class CmmnTransform implements Transform<CaseDefinitionEntity> {
+
+  protected static final CmmnTransformerLogger LOG = ProcessEngineLogger.CMMN_TRANSFORMER_LOGGER;
 
   protected CmmnTransformer transformer;
 
@@ -101,7 +103,7 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
       model = Cmmn.readModelFromStream(inputStream);
 
     } catch (CmmnModelException e) {
-      throw new ProcessEngineException("Couldn't transform '" + resourceName + "': " + e.getMessage(), e);
+      throw LOG.transformResourceException(resourceName, e);
     }
 
     // TODO: use model API to validate (ie.
@@ -118,7 +120,7 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
     } catch (Exception e) {
       // ALL unexpected exceptions should bubble up since they are not handled
       // accordingly by underlying parse-methods and the process can't be deployed
-      throw new ProcessEngineException("Error while parsing process: " + e.getMessage(), e);
+      throw LOG.parseProcessException(resourceName, e);
     }
 
     return caseDefinitions;

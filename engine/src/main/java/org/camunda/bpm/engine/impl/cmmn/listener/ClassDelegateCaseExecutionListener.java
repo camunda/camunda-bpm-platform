@@ -16,10 +16,11 @@ import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.instantiateDele
 
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.CaseExecutionListener;
 import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.parser.FieldDeclaration;
+import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnBehaviorLogger;
 import org.camunda.bpm.engine.impl.cmmn.delegate.CaseExecutionListenerInvocation;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.delegate.ClassDelegate;
@@ -29,6 +30,8 @@ import org.camunda.bpm.engine.impl.delegate.ClassDelegate;
  *
  */
 public class ClassDelegateCaseExecutionListener extends ClassDelegate implements CaseExecutionListener {
+
+  protected static final CmmnBehaviorLogger LOG = ProcessEngineLogger.CMNN_BEHAVIOR_LOGGER;
 
   public ClassDelegateCaseExecutionListener(String className, List<FieldDeclaration> fieldDeclarations) {
     super(className, fieldDeclarations);
@@ -52,7 +55,8 @@ public class ClassDelegateCaseExecutionListener extends ClassDelegate implements
     if (delegateInstance instanceof CaseExecutionListener) {
       return (CaseExecutionListener) delegateInstance;
     } else {
-      throw new ProcessEngineException(delegateInstance.getClass().getName()+" doesn't implement "+CaseExecutionListener.class);
+      throw LOG.missingDelegateParentClassException(delegateInstance.getClass().getName(),
+        CaseExecutionListener.class.getName());
     }
   }
 

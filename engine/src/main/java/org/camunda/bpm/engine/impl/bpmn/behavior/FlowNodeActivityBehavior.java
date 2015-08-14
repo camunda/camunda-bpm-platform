@@ -27,7 +27,7 @@ import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
  */
 public abstract class FlowNodeActivityBehavior implements SignallableActivityBehavior {
 
-  protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BEHAVIOR_LOGGER;
+  protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BPMN_BEHAVIOR_LOGGER;
 
   protected BpmnActivityBehavior bpmnActivityBehavior = new BpmnActivityBehavior();
 

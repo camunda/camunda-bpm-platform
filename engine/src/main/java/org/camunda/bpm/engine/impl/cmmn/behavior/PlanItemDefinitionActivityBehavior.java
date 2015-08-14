@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.camunda.bpm.engine.exception.cmmn.CaseIllegalStateTransitionException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmmn.CaseControlRule;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
@@ -36,6 +37,8 @@ import org.camunda.bpm.engine.impl.pvm.PvmException;
  *
  */
 public abstract class PlanItemDefinitionActivityBehavior implements CmmnActivityBehavior {
+
+  protected static final CmmnBehaviorLogger LOG = ProcessEngineLogger.CMNN_BEHAVIOR_LOGGER;
 
   public void execute(CmmnActivityExecution execution) throws Exception {
     // nothing to do!
@@ -124,18 +127,15 @@ public abstract class PlanItemDefinitionActivityBehavior implements CmmnActivity
     if (execution.isCaseInstanceExecution()) {
 
       if (execution.isClosed()) {
-        String message = "Case instance'"+id+"' is already closed.";
-        throw createIllegalStateTransitionException("close", message, execution);
+        throw LOG.alreadyClosedCaseException("close", id);
       }
 
       if (execution.isActive()) {
-        String message = "Case instance '"+id+"' must be {completed|terminated|suspended} to close it, but was 'active'.";
-        throw createIllegalStateTransitionException("close", message, execution);
+        throw LOG.wrongCaseStateException("close", id, "[completed|terminated|suspended]", "active");
       }
 
     } else {
-      String message = "It is not possible to close case execution '"+id+"' which is not a case instance.";
-      throw createIllegalStateTransitionException("close", message, execution);
+      throw LOG.notACaseInstanceException("close", id);
     }
   }
 
@@ -222,26 +222,23 @@ public abstract class PlanItemDefinitionActivityBehavior implements CmmnActivity
 
     // is the case execution already in the target state
     if (target.equals(currentState)) {
-      String message = "Case execution '"+id+"' is already "+target+".";
-      throw createIllegalStateTransitionException(transition, message, execution);
+      throw LOG.isAlreadyInStateException(transition, id, target);
 
     } else
     // is the case execution in the expected state
     if (!expected.equals(currentState)) {
-      String message = "Case execution '"+id+"' must be "+expected+" to "+transition+" it, but was "+currentState+".";
-      throw createIllegalStateTransitionException(transition, message, execution);
-
+      throw LOG.unexpectedStateException(transition, id, expected, currentState);
     }
   }
 
   protected void ensureNotCaseInstance(CmmnActivityExecution execution, String transition) {
     if (execution.isCaseInstanceExecution()) {
       String id = execution.getId();
-      String message = "It is not possible to "+transition+" case instance '"+id+"'.";
-      throw createIllegalStateTransitionException(transition, message, execution);
+      throw LOG.impossibleTransitionException(transition, id);
     }
   }
 
+  @Deprecated
   protected CaseIllegalStateTransitionException createIllegalStateTransitionException(String transition, String message, CmmnActivityExecution execution) {
     String id = execution.getId();
     String errorMessage = String.format("Could not perform transition '%s' on case execution '%s': %s", transition, id, message);

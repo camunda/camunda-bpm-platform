@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.behavior;
 
-import org.camunda.bpm.engine.exception.cmmn.CaseIllegalStateTransitionException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 
 /**
@@ -20,6 +20,8 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
  *
  */
 public class EventListenerActivityBehavior extends EventListenerOrMilestoneActivityBehavior {
+
+  protected static final CmmnBehaviorLogger LOG = ProcessEngineLogger.CMNN_BEHAVIOR_LOGGER;
 
   public void created(CmmnActivityExecution execution) {
     // TODO: implement this:
@@ -40,7 +42,7 @@ public class EventListenerActivityBehavior extends EventListenerOrMilestoneActiv
   }
 
   public void fireEntryCriteria(CmmnActivityExecution execution) {
-    throw new CaseIllegalStateTransitionException("Cannot trigger case execution '"+execution.getId()+"': entry criteria are not allowed for event listener.");
+    throw LOG.criteriaNotAllowedForEventListenerException("entry", execution.getId());
   }
 
   public void repeat(CmmnActivityExecution execution) {

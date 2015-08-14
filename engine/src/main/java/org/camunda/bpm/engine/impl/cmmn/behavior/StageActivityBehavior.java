@@ -27,19 +27,20 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureInstanceOf;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.exception.cmmn.CaseIllegalStateTransitionException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
-import org.camunda.bpm.engine.impl.pvm.PvmException;
 
 /**
  * @author Roman Smirnov
  *
  */
 public class StageActivityBehavior extends StageOrTaskActivityBehavior implements CmmnCompositeActivityBehavior {
+
+  protected static final CmmnBehaviorLogger LOG = ProcessEngineLogger.CMNN_BEHAVIOR_LOGGER;
 
   // start /////////////////////////////////////////////////////////////////////
 
@@ -70,14 +71,12 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
     String id = execution.getId();
 
     if (execution.isActive()) {
-      String message = "Case execution '"+id+"' is already active.";
-      throw createIllegalStateTransitionException("reactivate", message, execution);
+      throw LOG.alreadyActiveException("reactivate", id);
     }
 
     if (execution.isCaseInstanceExecution()) {
       if (execution.isClosed()) {
-        String message = "it is not possible to reactivate the closed case instance '"+id+"'.";
-        throw createIllegalStateTransitionException("reactivate", message, execution);
+        throw LOG.alreadyClosedCaseException("reactivate", id);
       }
     } else {
       ensureTransitionAllowed(execution, FAILED, ACTIVE, "reactivate");
@@ -136,8 +135,7 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
       if (child.isActive()) {
 
         if (throwException) {
-          String message = "At least one child case execution of case execution '"+id+"' is active.";
-          throw createIllegalStateTransitionException("complete", message, execution);
+          throw LOG.remainingChildException("complete", id, child.getId(), CaseExecutionState.ACTIVE);
         }
 
         return false;
@@ -152,8 +150,7 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
         if (child.isRequired() && !child.isDisabled() && !child.isCompleted() && !child.isTerminated()) {
 
           if (throwException) {
-            String message = "At least one required child case execution of case execution '"+id+"'is '"+ child.getCurrentState() +"'.";
-            throw createIllegalStateTransitionException("complete", message, execution);
+            throw LOG.remainingChildException("complete", id, child.getId(), child.getCurrentState());
           }
 
           return false;
@@ -167,8 +164,7 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
         if (!child.isDisabled() && !child.isCompleted() && !child.isTerminated()) {
 
           if (throwException) {
-            String message = "At least one required child case execution of case execution '"+id+"' is {available|enabled|suspended}.";
-            throw createIllegalStateTransitionException("complete", message, execution);
+            throw LOG.wrongChildStateException("complete", id, child.getId(), "[available|enabled|suspended]");
           }
 
           return false;
@@ -390,7 +386,7 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
       return;
     }
 
-    throw new CaseIllegalStateTransitionException("Cannot trigger case instance '"+execution.getId()+"': entry criteria are not allowed for a case instance.");
+    throw LOG.criteriaNotAllowedForCaseInstanceException("entry", execution.getId());
   }
 
   // handle child state changes ///////////////////////////////////////////////////////////
@@ -424,8 +420,7 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
         execution.performParentSuspension();
 
       } else {
-        throw new PvmException("Could not suspend case execution '"+id+"': excpected {terminatingOnTermination|terminatingOnExit}, but was " +currentState+ ".");
-
+        throw LOG.suspendCaseException(id, currentState);
       }
     }
   }
@@ -447,11 +442,10 @@ public class StageActivityBehavior extends StageOrTaskActivityBehavior implement
         execution.performExit();
 
       } else if (TERMINATING_ON_PARENT_TERMINATION.equals(currentState)) {
-        String message = "It is not possible to parentTerminate case execution '"+id+"' which associated with a "+getTypeName()+".";
-        throw createIllegalStateTransitionException("parentTerminate", message, execution);
+        throw LOG.illegalStateTransitionException("parentTerminate", id, getTypeName());
 
       } else {
-        throw new PvmException("Could not terminate case execution '"+id+"': excpected {terminatingOnTermination|terminatingOnExit}, but was " +currentState+ ".");
+        throw LOG.terminateCaseException(id, currentState);
 
       }
     }

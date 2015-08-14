@@ -18,6 +18,7 @@ import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.SUSP
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.TERMINATED;
 
 import org.camunda.bpm.engine.exception.cmmn.CaseIllegalStateTransitionException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 
 /**
@@ -25,6 +26,8 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
  *
  */
 public abstract class EventListenerOrMilestoneActivityBehavior extends PlanItemDefinitionActivityBehavior {
+
+  protected static final CmmnBehaviorLogger LOG = ProcessEngineLogger.CMNN_BEHAVIOR_LOGGER;
 
   // enable /////////////////////////////////////////////////////////////
 
@@ -72,11 +75,10 @@ public abstract class EventListenerOrMilestoneActivityBehavior extends PlanItemD
   }
 
   public void onParentTermination(CmmnActivityExecution execution) {
-    String id = execution.getId();
 
     if (execution.isCompleted()) {
-      String message = "Case execution '"+id+"' must be available or suspended, but was completed.";
-      throw createIllegalStateTransitionException("parentTerminate", message, execution);
+      String id = execution.getId();
+      throw LOG.executionAlreadyCompletedException("parentTerminate", id);
     }
 
     performParentTerminate(execution);
@@ -112,8 +114,7 @@ public abstract class EventListenerOrMilestoneActivityBehavior extends PlanItemD
     if (parent != null) {
       if (!parent.isActive()) {
         String id = execution.getId();
-        String message = "It is not possible to resume case execution '"+id+"' which parent is not active.";
-        throw createIllegalStateTransitionException("resume", message, execution);
+        throw LOG.resumeInactiveCaseException("resume", id);
       }
     }
 
@@ -137,15 +138,14 @@ public abstract class EventListenerOrMilestoneActivityBehavior extends PlanItemD
   }
 
   public void fireExitCriteria(CmmnActivityExecution execution) {
-    throw new CaseIllegalStateTransitionException("Cannot trigger case execution '"+execution.getId()+"': exit criteria are not allowed for event listener or milestones.");
+    throw LOG.criteriaNotAllowedForEventListenerOrMilestonesException("exit", execution.getId());
   }
 
   // helper ////////////////////////////////////////////////////////////////
 
   protected CaseIllegalStateTransitionException createIllegalStateTransitionException(String transition, CmmnActivityExecution execution) {
     String id = execution.getId();
-    String message = String.format("It is not possible to %s case execution '%s' which associated with a %s.", transition, id, getTypeName());
-    return createIllegalStateTransitionException(transition, message, execution);
+    return LOG.illegalStateTransitionException(transition, id, getTypeName());
   }
 
   protected abstract String getTypeName();

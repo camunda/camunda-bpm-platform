@@ -40,7 +40,7 @@ import org.camunda.bpm.engine.variable.value.IntegerValue;
  */
 public abstract class MultiInstanceActivityBehavior extends AbstractBpmnActivityBehavior implements CompositeActivityBehavior, ModificationObserverBehavior {
 
-  protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BEHAVIOR_LOGGER;
+  protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BPMN_BEHAVIOR_LOGGER;
 
   // Variable names for mi-body scoped variables (as described in spec)
   public static final String NUMBER_OF_INSTANCES = "nrOfInstances";

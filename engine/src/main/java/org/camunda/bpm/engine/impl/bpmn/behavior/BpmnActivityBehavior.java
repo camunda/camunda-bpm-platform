@@ -37,7 +37,7 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
  */
 public class BpmnActivityBehavior {
 
-  protected static BpmnBehaviorLogger LOG = ProcessEngineLogger.BEHAVIOR_LOGGER;
+  protected static BpmnBehaviorLogger LOG = ProcessEngineLogger.BPMN_BEHAVIOR_LOGGER;
 
   /**
    * Performs the default outgoing BPMN 2.0 behavior, which is having parallel

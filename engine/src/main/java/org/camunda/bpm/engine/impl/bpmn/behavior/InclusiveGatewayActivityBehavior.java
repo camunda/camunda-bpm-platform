@@ -34,7 +34,7 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
  */
 public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
 
-  protected static BpmnBehaviorLogger LOG = ProcessEngineLogger.BEHAVIOR_LOGGER;
+  protected static BpmnBehaviorLogger LOG = ProcessEngineLogger.BPMN_BEHAVIOR_LOGGER;
 
   public void execute(ActivityExecution execution) throws Exception {
 

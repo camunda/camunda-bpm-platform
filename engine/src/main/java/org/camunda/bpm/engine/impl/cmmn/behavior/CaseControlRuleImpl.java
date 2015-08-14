@@ -12,8 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.behavior;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.Expression;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmmn.CaseControlRule;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 
@@ -24,6 +24,8 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
  *
  */
 public class CaseControlRuleImpl implements CaseControlRule {
+
+  protected static final CmmnBehaviorLogger LOG = ProcessEngineLogger.CMNN_BEHAVIOR_LOGGER;
 
   protected Expression expression;
 
@@ -40,7 +42,7 @@ public class CaseControlRuleImpl implements CaseControlRule {
     ensureNotNull("rule expression returns null", "result", result);
 
     if (!(result instanceof Boolean)) {
-      throw new ProcessEngineException("rule expression returns non-Boolean: "+result+" ("+result.getClass().getName()+")");
+      throw LOG.ruleExpressionNotBooleanException(result);
     }
 
     return (Boolean) result;

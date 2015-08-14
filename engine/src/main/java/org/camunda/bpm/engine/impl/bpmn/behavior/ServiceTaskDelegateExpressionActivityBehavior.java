@@ -43,7 +43,7 @@ import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
  */
 public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityBehavior {
 
-  protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BEHAVIOR_LOGGER;
+  protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BPMN_BEHAVIOR_LOGGER;
 
   protected Expression expression;
   private final List<FieldDeclaration> fieldDeclarations;

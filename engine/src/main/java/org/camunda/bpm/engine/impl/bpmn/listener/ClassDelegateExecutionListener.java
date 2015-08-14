@@ -33,7 +33,7 @@ import org.camunda.bpm.engine.impl.delegate.ClassDelegate;
  */
 public class ClassDelegateExecutionListener extends ClassDelegate implements ExecutionListener {
 
-  protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BEHAVIOR_LOGGER;
+  protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BPMN_BEHAVIOR_LOGGER;
 
   public ClassDelegateExecutionListener(String className, List<FieldDeclaration> fieldDeclarations) {
     super(className, fieldDeclarations);

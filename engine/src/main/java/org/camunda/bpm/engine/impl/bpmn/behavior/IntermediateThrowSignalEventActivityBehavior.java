@@ -35,7 +35,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
  */
 public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnActivityBehavior {
 
-  protected final static BpmnBehaviorLogger LOG = ProcessEngineLogger.BEHAVIOR_LOGGER;
+  protected final static BpmnBehaviorLogger LOG = ProcessEngineLogger.BPMN_BEHAVIOR_LOGGER;
 
   protected final EventSubscriptionDeclaration signalDefinition;
 

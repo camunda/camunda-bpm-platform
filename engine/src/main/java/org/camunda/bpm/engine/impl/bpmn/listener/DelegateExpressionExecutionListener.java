@@ -33,7 +33,7 @@ import org.camunda.bpm.engine.impl.context.Context;
  */
 public class DelegateExpressionExecutionListener implements ExecutionListener {
 
-  protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BEHAVIOR_LOGGER;
+  protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BPMN_BEHAVIOR_LOGGER;
 
   protected Expression expression;
   private final List<FieldDeclaration> fieldDeclarations;

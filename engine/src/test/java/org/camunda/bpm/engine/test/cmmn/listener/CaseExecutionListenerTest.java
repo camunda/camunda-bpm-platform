@@ -2548,7 +2548,7 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
     } catch (Exception e) {
       // then
       String message = e.getMessage();
-      assertTextPresent("NotCaseExecutionListener doesn't implement "+CaseExecutionListener.class, message);
+      assertTextPresent("ENGINE-05016 Class 'org.camunda.bpm.engine.test.cmmn.listener.NotCaseExecutionListener' doesn't implement '" + CaseExecutionListener.class.getName() + "'", message);
     }
 
   }
