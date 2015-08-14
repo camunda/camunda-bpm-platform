@@ -31,7 +31,7 @@ public class ProcessEngineInitializationTest extends PvmTestCase {
       fail("expected exception");
     } catch (Exception e) {
       // OK
-      assertTextPresent("no activiti tables in db", e.getMessage());
+      assertTextPresent("ENGINE-03057 There are no activiti tables in the database.Hint: Set <property name=\"databaseSchemaUpdate\" to value=\"true\" or value=\"create-drop\" (use create-drop for testing only!) in bean processEngineConfiguration in camunda.cfg.xml for automatic schema creation", e.getMessage());
     }
   }
 

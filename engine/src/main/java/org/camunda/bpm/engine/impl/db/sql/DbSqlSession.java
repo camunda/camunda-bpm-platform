@@ -272,48 +272,42 @@ public class DbSqlSession extends AbstractPersistenceSession {
     try {
       String dbVersion = getDbVersion();
       if (!ProcessEngine.VERSION.equals(dbVersion)) {
-        throw new WrongDbException(ProcessEngine.VERSION, dbVersion);
+        throw LOG.wrongDbVersionException(ProcessEngine.VERSION, dbVersion);
       }
 
-      String errorMessage = null;
+      List<String> missingComponents = new ArrayList<String>();
       if (!isEngineTablePresent()) {
-        errorMessage = addMissingComponent(errorMessage, "engine");
+        missingComponents.add("engine");
+        //errorMessage = addMissingComponent(errorMessage, "engine");
       }
       if (dbSqlSessionFactory.isDbHistoryUsed() && !isHistoryTablePresent()) {
-        errorMessage = addMissingComponent(errorMessage, "history");
+        missingComponents.add("history");
       }
       if (dbSqlSessionFactory.isDbIdentityUsed() && !isIdentityTablePresent()) {
-        errorMessage = addMissingComponent(errorMessage, "identity");
+        missingComponents.add("identity");
       }
       if (dbSqlSessionFactory.isCmmnEnabled() && !isCmmnTablePresent()) {
-        errorMessage = addMissingComponent(errorMessage, "case.engine");
+        missingComponents.add("case.engine");
       }
       if (dbSqlSessionFactory.isDmnEnabled() && !isDmnTablePresent()) {
-        errorMessage = addMissingComponent(errorMessage, "decision.engine");
+        missingComponents.add("decision.engine");
       }
 
-      if (errorMessage!=null) {
-        throw new ProcessEngineException("Activiti database problem: "+errorMessage);
+      if (!missingComponents.isEmpty()) {
+        throw LOG.missingTableException(missingComponents);
       }
 
     } catch (Exception e) {
       if (isMissingTablesException(e)) {
-        throw new ProcessEngineException("no activiti tables in db.  set <property name=\"databaseSchemaUpdate\" to value=\"true\" or value=\"create-drop\" (use create-drop for testing only!) in bean processEngineConfiguration in camunda.cfg.xml for automatic schema creation", e);
+        throw LOG.missingActivitiTablesException();
       } else {
         if (e instanceof RuntimeException) {
           throw (RuntimeException) e;
         } else {
-          throw new ProcessEngineException("couldn't get db schema version", e);
+          throw LOG.unableToFetchDbSchemaVersion(e);
         }
       }
     }
-  }
-
-  protected String addMissingComponent(String missingComponents, String component) {
-    if (missingComponents==null) {
-      return "Tables missing for component(s) "+component;
-    }
-    return missingComponents+", "+component;
   }
 
   protected String getDbVersion() {

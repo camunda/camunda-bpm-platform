@@ -84,7 +84,7 @@ public abstract class AbstractPersistenceSession implements PersistenceSession {
     if (isEngineTablePresent()) {
       String dbVersion = getDbVersion();
       if (!ProcessEngine.VERSION.equals(dbVersion)) {
-        throw new WrongDbException(ProcessEngine.VERSION, dbVersion);
+        throw LOG.wrongDbVersionException(ProcessEngine.VERSION, dbVersion);
       }
     } else {
       dbSchemaCreateEngine();

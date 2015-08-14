@@ -34,6 +34,10 @@ import java.util.Map;
  */
 public class EnginePersistenceLogger extends ProcessEngineLogger {
 
+  protected final String hintText = "Hint: Set <property name=\"databaseSchemaUpdate\" to value=\"true\" or " +
+                                    "value=\"create-drop\" (use create-drop for testing only!) in bean " +
+                                    "processEngineConfiguration in camunda.cfg.xml for automatic schema creation";
+
   protected String buildStringFromList(Collection<?> list, Boolean isSQL) {
     StringBuilder message = new StringBuilder();
     message.append("[");
@@ -460,5 +464,35 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
       name,
       cause.getMessage()
     ), cause);
+  }
+
+  public WrongDbException wrongDbVersionException(String version, String dbVersion) {
+    return new WrongDbException(exceptionMessage(
+      "055",
+      "Version mismatch: activiti library version is '{}' and db version is '{}'. " +
+      hintText,
+      version,
+      dbVersion
+    ));
+  }
+
+  public ProcessEngineException missingTableException(List<String> components) {
+    return new ProcessEngineException(exceptionMessage(
+      "056",
+      "Tables are missing for the following components: {}",
+      buildStringFromList(components, false)
+    ));
+  }
+
+  public ProcessEngineException missingActivitiTablesException() {
+    return new ProcessEngineException(exceptionMessage(
+      "057",
+      "There are no activiti tables in the database." +
+        hintText
+    ));
+  }
+
+  public ProcessEngineException unableToFetchDbSchemaVersion(Throwable cause) {
+    return new ProcessEngineException(exceptionMessage("058", "Could not fetch the database schema version."), cause);
   }
 }
