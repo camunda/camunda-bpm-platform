@@ -473,7 +473,7 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
       hintText,
       version,
       dbVersion
-    ));
+    ), version, dbVersion);
   }
 
   public ProcessEngineException missingTableException(List<String> components) {
