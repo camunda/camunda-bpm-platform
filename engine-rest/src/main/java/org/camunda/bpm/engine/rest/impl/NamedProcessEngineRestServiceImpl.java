@@ -153,6 +153,12 @@ public class NamedProcessEngineRestServiceImpl extends AbstractProcessEngineRest
     return super.getMetricsRestService(engineName);
   }
 
+  @Override
+  @Path("/{name}" + DecisionDefinitionRestService.PATH)
+  public DecisionDefinitionRestService getDecisionDefinitionRestService(@PathParam("name") String engineName) {
+    return super.getDecisionDefinitionRestService(engineName);
+  }
+
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   public List<ProcessEngineDto> getProcessEngineNames() {

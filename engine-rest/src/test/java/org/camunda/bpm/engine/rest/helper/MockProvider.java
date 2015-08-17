@@ -68,6 +68,7 @@ import org.camunda.bpm.engine.management.MetricsQuery;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.repository.CaseDefinition;
+import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.Resource;
@@ -551,6 +552,16 @@ public abstract class MockProvider {
   public static final Query EXAMPLE_FILTER_QUERY = new TaskQueryImpl().taskName("test").processVariableValueEquals("foo", "bar").caseInstanceVariableValueEquals("foo", "bar").taskVariableValueEquals("foo", "bar");
   public static final TaskQueryDto EXAMPLE_FILTER_QUERY_DTO = TaskQueryDto.fromQuery(EXAMPLE_FILTER_QUERY);
   public static final Map<String, Object> EXAMPLE_FILTER_PROPERTIES = Collections.singletonMap("color", (Object) "#112233");
+
+  // decision definition
+  public static final String EXAMPLE_DECISION_DEFINITION_ID = "aDecisionDefinitionId";
+  public static final String EXAMPLE_DECISION_DEFINITION_KEY = "aDecisionDefinitionKey";
+  public static final int EXAMPLE_DECISION_DEFINITION_VERSION = 1;
+  public static final String EXAMPLE_DECISION_DEFINITION_CATEGORY = "aDecisionDefinitionCategory";
+  public static final String EXAMPLE_DECISION_DEFINITION_NAME = "aDecisionDefinitionName";
+  public static final String EXAMPLE_DECISION_DEFINITION_NAME_LIKE = "aDecisionDefinitionNameLike";
+  public static final String EXAMPLE_DECISION_DEFINITION_RESOURCE_NAME = "aDecisionDefinitionResourceName";
+  public static final String EXAMPLE_DECISION_DEFINITION_DIAGRAM_RESOURCE_NAME = "aResourceName.png";
 
   // historic job log
 
@@ -1060,7 +1071,7 @@ public abstract class MockProvider {
   }
 
   public static List<Authorization> createMockRevokeAuthorizations() {
-    return Arrays.asList(new Authorization[] { createMockRevokeAuthorization() });
+    return Arrays.asList(new Authorization[]{createMockRevokeAuthorization()});
   }
 
   public static List<Authorization> createMockGlobalAuthorizations() {
@@ -1753,6 +1764,28 @@ public abstract class MockProvider {
 
     return query;
 
+  }
+
+  // decision definition
+  public static List<DecisionDefinition> createMockDecisionDefinitions() {
+    List<DecisionDefinition> mocks = new ArrayList<DecisionDefinition>();
+    mocks.add(createMockDecisionDefinition());
+    return mocks;
+  }
+
+  public static DecisionDefinition createMockDecisionDefinition() {
+    MockDecisionDefinitionBuilder builder = new MockDecisionDefinitionBuilder();
+
+    return builder
+      .id(EXAMPLE_DECISION_DEFINITION_ID)
+      .category(EXAMPLE_DECISION_DEFINITION_CATEGORY)
+      .name(EXAMPLE_DECISION_DEFINITION_NAME)
+      .key(EXAMPLE_DECISION_DEFINITION_KEY)
+      .version(EXAMPLE_DECISION_DEFINITION_VERSION)
+      .resource(EXAMPLE_DECISION_DEFINITION_RESOURCE_NAME)
+      .diagram(EXAMPLE_DECISION_DEFINITION_DIAGRAM_RESOURCE_NAME)
+      .deploymentId(EXAMPLE_DEPLOYMENT_ID)
+      .build();
   }
 
   // Historic job log
