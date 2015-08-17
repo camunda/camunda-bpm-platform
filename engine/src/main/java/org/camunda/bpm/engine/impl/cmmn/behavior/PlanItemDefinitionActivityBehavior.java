@@ -238,13 +238,6 @@ public abstract class PlanItemDefinitionActivityBehavior implements CmmnActivity
     }
   }
 
-  @Deprecated
-  protected CaseIllegalStateTransitionException createIllegalStateTransitionException(String transition, String message, CmmnActivityExecution execution) {
-    String id = execution.getId();
-    String errorMessage = String.format("Could not perform transition '%s' on case execution '%s': %s", transition, id, message);
-    return new CaseIllegalStateTransitionException(errorMessage);
-  }
-
   protected CmmnActivity getActivity(CmmnActivityExecution execution) {
     String id = execution.getId();
     CmmnActivity activity = execution.getActivity();

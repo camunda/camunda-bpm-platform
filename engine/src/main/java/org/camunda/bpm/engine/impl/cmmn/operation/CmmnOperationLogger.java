@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
  * @author Stefan Hentschel.
  */
 public class CmmnOperationLogger extends ProcessEngineLogger {
+
   public void completingSubCaseError(CmmnExecution execution, Throwable cause) {
     logError(
       "001",
@@ -35,4 +36,5 @@ public class CmmnOperationLogger extends ProcessEngineLogger {
       execution
     ), cause);
   }
+
 }

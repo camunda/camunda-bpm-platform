@@ -70,8 +70,6 @@ public class CmmnBehaviorLogger extends ProcessEngineLogger {
     return criteriaNotAllowedException(criteria, id, "case instances");
   }
 
-
-
   CaseIllegalStateTransitionException executionAlreadyCompletedException(String transition, String id) {
     return new CaseIllegalStateTransitionException(exceptionMessage(
       "004",
@@ -261,4 +259,5 @@ public class CmmnBehaviorLogger extends ProcessEngineLogger {
       cause
     );
   }
+
 }

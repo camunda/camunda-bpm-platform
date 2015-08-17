@@ -59,4 +59,5 @@ public class CmmnTransformerLogger extends ProcessEngineLogger {
       id
     );
   }
+
 }
