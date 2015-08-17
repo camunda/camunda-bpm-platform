@@ -278,7 +278,6 @@ public class DbSqlSession extends AbstractPersistenceSession {
       List<String> missingComponents = new ArrayList<String>();
       if (!isEngineTablePresent()) {
         missingComponents.add("engine");
-        //errorMessage = addMissingComponent(errorMessage, "engine");
       }
       if (dbSqlSessionFactory.isDbHistoryUsed() && !isHistoryTablePresent()) {
         missingComponents.add("history");

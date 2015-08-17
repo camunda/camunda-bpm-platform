@@ -34,9 +34,9 @@ import java.util.Map;
  */
 public class EnginePersistenceLogger extends ProcessEngineLogger {
 
-  protected final String hintText = "Hint: Set <property name=\"databaseSchemaUpdate\" to value=\"true\" or " +
-                                    "value=\"create-drop\" (use create-drop for testing only!) in bean " +
-                                    "processEngineConfiguration in camunda.cfg.xml for automatic schema creation";
+  protected static final String HINT_TEXT = "Hint: Set <property name=\"databaseSchemaUpdate\" to value=\"true\" or " +
+                                            "value=\"create-drop\" (use create-drop for testing only!) in bean " +
+                                            "processEngineConfiguration in camunda.cfg.xml for automatic schema creation";
 
   protected String buildStringFromList(Collection<?> list, Boolean isSQL) {
     StringBuilder message = new StringBuilder();
@@ -420,7 +420,6 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
   public void countRowsPerProcessEngineTable(Map<String, Long> map) {
     if(isDebugEnabled()) {
       logDebug("047", "Number of rows per process engine table: {}", buildStringFromMap(map));
-      // log.fine("Number of rows per process engine table: "+tableCount);
     }
   }
 
@@ -470,7 +469,7 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
     return new WrongDbException(exceptionMessage(
       "055",
       "Version mismatch: activiti library version is '{}' and db version is '{}'. " +
-      hintText,
+      HINT_TEXT,
       version,
       dbVersion
     ), version, dbVersion);
@@ -488,7 +487,7 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
     return new ProcessEngineException(exceptionMessage(
       "057",
       "There are no activiti tables in the database." +
-        hintText
+        HINT_TEXT
     ));
   }
 
