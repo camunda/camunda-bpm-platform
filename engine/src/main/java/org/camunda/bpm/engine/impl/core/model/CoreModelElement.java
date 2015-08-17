@@ -62,7 +62,7 @@ public abstract class CoreModelElement implements Serializable {
   }
 
   /**
-   * @see Properties#set(PropertyKey)
+   * @see Properties#set(PropertyKey, Object)
    */
   public void setProperty(String name, Object value) {
     properties.set(new PropertyKey<Object>(name), value);
