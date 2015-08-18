@@ -3,6 +3,10 @@
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
   xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
+  
+  <!-- escalation event definitions without escalationCode catch all escalation events -->
+  <escalation id="escalation1" name="escalation1" />
+  <escalation id="escalation2" name="escalation2" escalationCode="escalationCode" />
 
   <process id="escalationProcess" isExecutable="true">
   
@@ -21,11 +25,11 @@
   <sequenceFlow sourceRef="subProcess" targetRef="theEnd" />
   
   <boundaryEvent id="escalationBoundaryEvent1" attachedToRef="subProcess">
-    <escalationEventDefinition />
+    <escalationEventDefinition escalationRef="escalation1" />
   </boundaryEvent>
   
   <boundaryEvent id="escalationBoundaryEvent2" attachedToRef="subProcess">
-    <escalationEventDefinition />
+    <escalationEventDefinition escalationRef="escalation2" />
   </boundaryEvent>
   
   <sequenceFlow sourceRef="escalationBoundaryEvent1" targetRef="myUserTask" />

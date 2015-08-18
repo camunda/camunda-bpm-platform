@@ -27,7 +27,7 @@ import org.camunda.bpm.engine.test.Deployment;
 public class EscalationActivityInstanceTreeTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.testThrowEscalationEventFromEmbeddedSubprocess.bpmn20.xml")
-  public void testActivityInstanceTreeForNonInterruptingEscalationBoundaryEvent(){
+  public void testNonInterruptingEscalationBoundaryEvent(){
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("escalationProcess");
     // an escalation event is thrown from embedded subprocess and caught by non-interrupting boundary event on subprocess
 
@@ -41,7 +41,7 @@ public class EscalationActivityInstanceTreeTest extends PluggableProcessEngineTe
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.testInterruptingEscalationBoundaryEvent.bpmn20.xml")
-  public void testActivityInstanceTreeForInterruptingEscalationBoundaryEvent(){
+  public void testInterruptingEscalationBoundaryEvent(){
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("escalationProcess");
     // an escalation event is thrown from embedded subprocess and caught by interrupting boundary event on subprocess
 
@@ -49,6 +49,51 @@ public class EscalationActivityInstanceTreeTest extends PluggableProcessEngineTe
     assertThat(tree).hasStructure(
         describeActivityInstanceTree(processInstance.getProcessDefinitionId())
           .activity("taskAfterCatchedEscalation")
+        .done());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testCatchEscalationEventInsideSubprocess.bpmn20.xml")
+  public void testNonInterruptingEscalationEventSubprocessInsideSubprocess() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("escalationProcess");
+    // an escalation event is thrown from embedded subprocess and caught by non-interrupting event subprocess inside the subprocess
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+          .beginScope("subProcess")
+            .activity("taskInSubprocess")
+            .beginScope("escalationEventSubprocess")
+              .activity("taskAfterCatchedEscalation")
+        .done());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testCatchEscalationEventFromEmbeddedSubprocess.bpmn20.xml")
+  public void testNonInterruptingEscalationEventSubprocessOutsideSubprocess() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("escalationProcess");
+    // an escalation event is thrown from embedded subprocess and caught by non-interrupting event subprocess outside the subprocess
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+          .beginScope("subProcess")
+            .activity("taskInSubprocess")
+            .endScope()
+          .beginScope("escalationEventSubprocess")
+            .activity("taskAfterCatchedEscalation")
+        .done());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testInterruptionEscalationEventSubprocess.bpmn20.xml")
+  public void testInterruptingEscalationEventSubprocessInsideSubprocess() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("escalationProcess");
+    // an escalation event is thrown from embedded subprocess and caught by interrupting event subprocess inside the subprocess
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+        describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+          .beginScope("subProcess")
+            .beginScope("escalationEventSubprocess")
+              .activity("taskAfterCatchedEscalation")
         .done());
   }
 

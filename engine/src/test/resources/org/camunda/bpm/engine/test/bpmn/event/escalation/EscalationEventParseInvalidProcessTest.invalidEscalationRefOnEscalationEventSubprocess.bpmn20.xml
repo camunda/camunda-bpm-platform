@@ -3,6 +3,8 @@
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
   xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
+  
+  <escalation id="escalation" name="escalation" escalationCode="escalationCode" />
 
   <process id="escalationProcess" isExecutable="true">
   
@@ -16,27 +18,25 @@
     <userTask id="mySubProcessUserTask" />
     <sequenceFlow sourceRef="mySubProcessUserTask" targetRef="endSubProcess" />
     <endEvent id="endSubProcess" />
+    
+    <subProcess triggeredByEvent="true">
+    
+      <startEvent id="escalationStartEvent">
+         <!-- no escalation with id exists -->
+         <escalationEventDefinition escalationRef="invalid-escalation" />
+      </startEvent>
+      
+      <sequenceFlow sourceRef="escalationStartEvent" targetRef="endInEscalationSubprocess" />
+      
+      <endEvent id="endInEscalationSubprocess" />
+    
+    </subProcess>
+    
    </subProcess>
   
   <sequenceFlow sourceRef="subProcess" targetRef="theEnd" />
-  
-  <boundaryEvent id="escalationBoundaryEvent1" attachedToRef="subProcess">
-    <escalationEventDefinition />
-  </boundaryEvent>
-  
-  <boundaryEvent id="escalationBoundaryEvent2" attachedToRef="subProcess">
-    <escalationEventDefinition />
-  </boundaryEvent>
-  
-  <sequenceFlow sourceRef="escalationBoundaryEvent1" targetRef="myUserTask" />
-  <sequenceFlow sourceRef="escalationBoundaryEvent2" targetRef="myUserTask" />
-  
-  <userTask id="myUserTask" />
-  
-  <sequenceFlow sourceRef="myUserTask" targetRef="theEnd" />
-  
-  <endEvent id="theEnd" />
-  
+    
+  <endEvent id="theEnd" />  
 
   </process>
 

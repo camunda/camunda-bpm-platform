@@ -43,8 +43,9 @@ public class ThrowEscalationEventActivityBehavior extends AbstractBpmnActivityBe
 
   @Override
   public void execute(ActivityExecution execution) throws Exception {
+    final PvmActivity currentActivity = execution.getActivity();
 
-    final EscalationEventDefinitionFinder escalationEventDefinitionFinder = new EscalationEventDefinitionFinder(escalation.getEscalationCode());
+    final EscalationEventDefinitionFinder escalationEventDefinitionFinder = new EscalationEventDefinitionFinder(escalation.getEscalationCode(), currentActivity);
     ActivityExecutionMappingCollector activityExecutionMappingCollector = new ActivityExecutionMappingCollector(execution);
 
     ActivityExecutionHierarchyWalker walker = new ActivityExecutionHierarchyWalker(execution);
@@ -70,7 +71,7 @@ public class ThrowEscalationEventActivityBehavior extends AbstractBpmnActivityBe
     }
 
     if (escalationEventDefinition == null || !escalationEventDefinition.isCancelActivity()) {
-      leave(execution);
+      leaveExecution(execution, currentActivity, escalationEventDefinition);
     }
   }
 
@@ -83,14 +84,40 @@ public class ThrowEscalationEventActivityBehavior extends AbstractBpmnActivityBe
     }
   }
 
-  public class EscalationEventDefinitionFinder implements TreeVisitor<PvmScope> {
+  protected void leaveExecution(ActivityExecution execution, final PvmActivity currentActivity, EscalationEventDefinition escalationEventDefinition) {
+
+    if (escalationEventDefinition != null && isEscalationEventSubprocessOnTheSameScope(escalationEventDefinition.getEscalationHandler(), currentActivity)) {
+      ActivityExecution childExecution = getChildExecutionForActivity(execution, currentActivity);
+      leave(childExecution);
+    } else {
+
+      leave(execution);
+    }
+  }
+
+  protected boolean isEscalationEventSubprocessOnTheSameScope(PvmActivity escalationHandler, final PvmActivity activity) {
+    return escalationHandler.isSubProcessScope() && escalationHandler.getFlowScope().equals(activity.getFlowScope());
+  }
+
+  protected ActivityExecution getChildExecutionForActivity(ActivityExecution execution, final PvmActivity activity) {
+    for (ActivityExecution childExecution : execution.getExecutions()) {
+      if (activity.equals(childExecution.getActivity())) {
+        return childExecution;
+      }
+    }
+    return null;
+  }
+
+  protected class EscalationEventDefinitionFinder implements TreeVisitor<PvmScope> {
 
     private EscalationEventDefinition escalationEventDefinition;
 
     private final String escalationCode;
+    private final PvmActivity throwEscalationActivity;
 
-    public EscalationEventDefinitionFinder(String escalationCode) {
+    public EscalationEventDefinitionFinder(String escalationCode, PvmActivity throwEscalationActivity) {
       this.escalationCode = escalationCode;
+      this.throwEscalationActivity = throwEscalationActivity;
     }
 
     @Override
@@ -102,11 +129,21 @@ public class ThrowEscalationEventActivityBehavior extends AbstractBpmnActivityBe
 
     protected EscalationEventDefinition findMatchingEscalationEventDefinition(List<EscalationEventDefinition> escalationEventDefinitions) {
       for (EscalationEventDefinition escalationEventDefinition : escalationEventDefinitions) {
-        if (escalationEventDefinition.getEscalationCode() == null || escalationEventDefinition.getEscalationCode().equals(escalationCode)) {
+        if (isMatchingEscalationCode(escalationEventDefinition) && !isReThrowingEscalationEventSubprocess(escalationEventDefinition)) {
           return escalationEventDefinition;
         }
       }
       return null;
+    }
+
+    private boolean isMatchingEscalationCode(EscalationEventDefinition escalationEventDefinition) {
+      String escalationCode = escalationEventDefinition.getEscalationCode();
+      return escalationCode == null || escalationCode.equals(this.escalationCode);
+    }
+
+    private boolean isReThrowingEscalationEventSubprocess(EscalationEventDefinition escalationEventDefinition) {
+      PvmActivity escalationHandler = escalationEventDefinition.getEscalationHandler();
+      return escalationHandler.isSubProcessScope() && escalationHandler.equals(throwEscalationActivity.getFlowScope());
     }
 
     public EscalationEventDefinition getEscalationEventDefinition() {

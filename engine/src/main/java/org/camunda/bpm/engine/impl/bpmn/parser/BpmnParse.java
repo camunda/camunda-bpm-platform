@@ -953,6 +953,7 @@ public class BpmnParse extends Parse {
     Element signalEventDefinition = startEventElement.element("signalEventDefinition");
     Element timerEventDefinition = startEventElement.element("timerEventDefinition");
     Element compensateEventDefinition = startEventElement.element("compensateEventDefinition");
+    Element escalationEventDefinitionElement = startEventElement.element("escalationEventDefinition");
 
     Object triggeredByEvent = scopeActivity.getProperty(PROPERTYNAME_TRIGGERED_BY_EVENT);
     boolean isTriggeredByEvent = triggeredByEvent != null && ((Boolean) triggeredByEvent);
@@ -998,13 +999,18 @@ public class BpmnParse extends Parse {
       } else if (compensateEventDefinition != null) {
         parseCompensationEventSubprocess(startEventActivity, startEventElement, scopeActivity, compensateEventDefinition);
 
+      } else if (escalationEventDefinitionElement != null) {
+        startEventActivity.getProperties().set(BpmnProperties.TYPE, "escalationStartEvent");
+
+        EscalationEventDefinition escalationEventDefinition = createEscalationEventDefinitionForEscalationHandler(escalationEventDefinitionElement, scopeActivity, isInterrupting);
+        addEscalationEventDefinition(startEventActivity.getEventScope(), escalationEventDefinition, escalationEventDefinitionElement);
+
       } else {
-        addError("start event of event subprocess must be of type 'error', 'message', 'timer', 'signal' or 'compensation'", startEventElement);
+        addError("start event of event subprocess must be of type 'error', 'message', 'timer', 'signal', 'compensation' or 'escalation'", startEventElement);
       }
 
     } else { // "regular" subprocess
       Element conditionalEventDefinition = startEventElement.element("conditionalEventDefinition");
-      Element escalationEventDefinition = startEventElement.element("escalationEventDefinition");
 
       if (conditionalEventDefinition != null) {
         addError("conditionalEventDefinition is not allowed on start event within a subprocess", conditionalEventDefinition);
@@ -1012,8 +1018,8 @@ public class BpmnParse extends Parse {
       if (timerEventDefinition != null) {
         addError("timerEventDefinition is not allowed on start event within a subprocess", timerEventDefinition);
       }
-      if (escalationEventDefinition != null) {
-        addError("escalationEventDefinition is not allowed on start event within a subprocess", escalationEventDefinition);
+      if (escalationEventDefinitionElement != null) {
+        addError("escalationEventDefinition is not allowed on start event within a subprocess", escalationEventDefinitionElement);
       }
       if (compensateEventDefinition != null) {
         addError("compensateEventDefinition is not allowed on start event within a subprocess", compensateEventDefinition);
@@ -3157,14 +3163,35 @@ public class BpmnParse extends Parse {
   }
 
   protected void addEscalationEventDefinition(ScopeImpl catchingScope, EscalationEventDefinition escalationEventDefinition, Element element) {
-    // ensure there is only one escalation boundary event what can catch the escalation event
+    // ensure there is only one escalation handler (e.g. escalation boundary event, escalation event subprocess) what can catch the escalation event
     for (EscalationEventDefinition existingEscalationEventDefinition : catchingScope.getProperties().get(BpmnProperties.ESCALATION_EVENT_DEFINITIONS)) {
-      if (existingEscalationEventDefinition.getEscalationCode() == null || escalationEventDefinition.getEscalationCode() == null) {
-        addError("The same scope can not contains an escalation boundary event without escalation code and another one with escalation code. "
-            + "The escalation boundary event without escalation code catch all escalation events.", element);
-      } else if (existingEscalationEventDefinition.getEscalationCode().equals(escalationEventDefinition.getEscalationCode())) {
-        addError("multiple escalation boundary events with the same escalationCode '" + escalationEventDefinition.getEscalationCode()
-            + "' are not supported on same scope", element);
+
+      if (existingEscalationEventDefinition.getEscalationHandler().isSubProcessScope()
+          && escalationEventDefinition.getEscalationHandler().isSubProcessScope()) {
+
+        if (existingEscalationEventDefinition.getEscalationCode() == null && escalationEventDefinition.getEscalationCode() == null) {
+          addError("The same scope can not contains more than one escalation event subprocess without escalation code. "
+              + "An escalation event subprocess without escalation code catch all escalation events.", element);
+        } else if (existingEscalationEventDefinition.getEscalationCode() == null || escalationEventDefinition.getEscalationCode() == null) {
+          addError("The same scope can not contains an escalation event subprocess without escalation code and another one with escalation code. "
+              + "The escalation event subprocess without escalation code catch all escalation events.", element);
+        } else if (existingEscalationEventDefinition.getEscalationCode().equals(escalationEventDefinition.getEscalationCode())) {
+          addError("multiple escalation event subprocesses with the same escalationCode '" + escalationEventDefinition.getEscalationCode()
+              + "' are not supported on same scope", element);
+        }
+      } else if (!existingEscalationEventDefinition.getEscalationHandler().isSubProcessScope()
+          && !escalationEventDefinition.getEscalationHandler().isSubProcessScope()) {
+
+        if (existingEscalationEventDefinition.getEscalationCode() == null && escalationEventDefinition.getEscalationCode() == null) {
+          addError("The same scope can not contains more than one escalation boundary event without escalation code. "
+              + "An escalation boundary event without escalation code catch all escalation events.", element);
+        } else if (existingEscalationEventDefinition.getEscalationCode() == null || escalationEventDefinition.getEscalationCode() == null) {
+          addError("The same scope can not contains an escalation boundary event without escalation code and another one with escalation code. "
+              + "The escalation boundary event without escalation code catch all escalation events.", element);
+        } else if (existingEscalationEventDefinition.getEscalationCode().equals(escalationEventDefinition.getEscalationCode())) {
+          addError("multiple escalation boundary events with the same escalationCode '" + escalationEventDefinition.getEscalationCode()
+              + "' are not supported on same scope", element);
+        }
       }
     }
 

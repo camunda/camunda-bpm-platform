@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+  
+  <escalation id="escalation1" name="escalation1" escalationCode="escalationCode1" />
+  <escalation id="escalation2" name="escalation2" escalationCode="escalationCode2" />
+
+  <process id="escalationProcess" isExecutable="true">
+  
+  <startEvent id="start" />
+  
+  <sequenceFlow sourceRef="start" targetRef="subProcess" />
+  
+   <subProcess id="subProcess">
+    
+    <startEvent id="startSubProcess" />
+   
+    <sequenceFlow sourceRef="startSubProcess" targetRef="escalationThrowingEvent" />
+   
+    <intermediateThrowEvent id="escalationThrowingEvent">
+      <escalationEventDefinition escalationRef="escalation1" />
+    </intermediateThrowEvent>
+    
+    <sequenceFlow sourceRef="escalationThrowingEvent" targetRef="taskInSubprocess" />
+    
+    <userTask id="taskInSubprocess" name="task in subprocess" />
+    
+    <sequenceFlow sourceRef="taskInSubprocess" targetRef="endSubProcess" />
+   
+    <endEvent id="endSubProcess" />
+    
+    <subProcess id="escalationEventSubprocess1" triggeredByEvent="true">
+      
+      <startEvent id="escalationStartEvent1" isInterrupting="false">
+        <escalationEventDefinition escalationRef="escalation1" />
+      </startEvent>
+      
+      <sequenceFlow sourceRef="escalationStartEvent1" targetRef="taskAfterCatchedEscalation1" />
+  
+      <userTask id="taskAfterCatchedEscalation1" name="task after catched escalation 1" />
+      
+      <sequenceFlow sourceRef="taskAfterCatchedEscalation1" targetRef="endInEscalationSubprocess1" />
+      
+      <endEvent id="endInEscalationSubprocess1" />
+      
+    </subProcess>
+    
+    <subProcess id="escalationEventSubprocess2" triggeredByEvent="true">
+      
+      <startEvent id="escalationStartEvent2" isInterrupting="false">
+        <escalationEventDefinition escalationRef="escalation2" />
+      </startEvent>
+      
+      <sequenceFlow sourceRef="escalationStartEvent2" targetRef="taskAfterCatchedEscalation2" />
+  
+      <userTask id="taskAfterCatchedEscalation2" name="task after catched escalation 2" />
+      
+      <sequenceFlow sourceRef="taskAfterCatchedEscalation2" targetRef="endInEscalationSubprocess2" />
+      
+      <endEvent id="endInEscalationSubprocess2" />
+      
+    </subProcess>
+   
+   </subProcess>
+  
+  <sequenceFlow sourceRef="subProcess" targetRef="theEnd" />
+  
+  <endEvent id="theEnd" />
+  
+  </process>
+
+</definitions>

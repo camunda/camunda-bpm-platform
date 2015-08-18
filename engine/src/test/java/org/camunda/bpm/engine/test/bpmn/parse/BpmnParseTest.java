@@ -491,6 +491,14 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
     assertEquals(ThrowEscalationEventActivityBehavior.class, escalationEndEvent.getActivityBehavior().getClass());
   }
 
+  @Deployment
+  public void testParseEscalationStartEvent() {
+    ActivityImpl escalationStartEvent = findActivityInDeployedProcessDefinition("escalationStartEvent");
+
+    assertEquals("escalationStartEvent", escalationStartEvent.getProperties().get(BpmnProperties.TYPE));
+    assertEquals(EventSubProcessStartEventActivityBehavior.class, escalationStartEvent.getActivityBehavior().getClass());
+  }
+
   protected void assertActivityBounds(ActivityImpl activity, int x, int y, int width, int height) {
     assertEquals(x, activity.getX());
     assertEquals(y, activity.getY());
