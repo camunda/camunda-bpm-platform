@@ -12,14 +12,12 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
-import org.apache.commons.mail.EmailException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
-import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 
 /**
  * @author Stefan Hentschel.
@@ -228,5 +226,9 @@ public class BpmnBehaviorLogger extends ProcessEngineLogger {
 
   public ProcessEngineException shellExecutionException(Throwable cause) {
     return new ProcessEngineException(exceptionMessage("034", "Could not execute shell command."), cause);
+  }
+
+  public void errorPropagationException(String activityId, Throwable cause) {
+    logError("035", "throw an exception while propagate error in activity with id '{}'", activityId, cause);
   }
 }

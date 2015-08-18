@@ -105,7 +105,16 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
       toExecute.call();
     } catch (Exception ex) {
       if (activityInstanceId.equals(execution.getActivityInstanceId())) {
-        propagateException(execution, ex);
+
+        try {
+          propagateException(execution, ex);
+        } catch (ErrorPropagationException e) {
+          LOG.errorPropagationException(activityInstanceId, e.getCause());
+          // re-throw the original execution so that it is logged
+          // and set as cause of the failure
+          throw ex;
+        }
+
       } else {
         throw ex;
       }
@@ -157,7 +166,7 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
     propagateError(error.getErrorCode(), null, execution);
   }
 
-  protected void propagateError(String errorCode, Exception origException, ActivityExecution execution) throws Exception {
+  protected void propagateError(String errorCode, Exception origException, ActivityExecution execution) throws Exception, ErrorPropagationException {
 
     ActivityExecutionHierarchyWalker walker = new ActivityExecutionHierarchyWalker(execution);
 
@@ -169,21 +178,28 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
     walker.addExecutionPreVisitor(activityExecutionMappingCollector);
     walker.addExecutionPreVisitor(processInstanceCollector);
 
-    walker.walkUntil(new WalkCondition<ActivityExecutionTuple>() {
+    try {
 
-      @Override
-      public boolean isFulfilled(ActivityExecutionTuple element) {
-        return errorDeclarationFinder.getErrorEventDefinition() != null || element == null;
+      walker.walkUntil(new WalkCondition<ActivityExecutionTuple>() {
+
+        @Override
+        public boolean isFulfilled(ActivityExecutionTuple element) {
+          return errorDeclarationFinder.getErrorEventDefinition() != null || element == null;
+        }
+      });
+
+      // map variables to super executions in the hierarchy of called process instances
+      for (PvmExecutionImpl processInstance : processInstanceCollector.getProcessInstanceHierarchy()) {
+
+        PvmExecutionImpl superExecution = processInstance.getSuperExecution();
+        ActivityImpl activity = superExecution.getActivity();
+        SubProcessActivityBehavior subProcessActivityBehavior = (SubProcessActivityBehavior) activity.getActivityBehavior();
+        subProcessActivityBehavior.completing(superExecution, processInstance);
       }
-    });
 
-    // map variables to super executions in the hierarchy of called process instances
-    for (PvmExecutionImpl processInstance : processInstanceCollector.getProcessInstanceHierarchy()) {
-
-      PvmExecutionImpl superExecution = processInstance.getSuperExecution();
-      ActivityImpl activity = superExecution.getActivity();
-      SubProcessActivityBehavior subProcessActivityBehavior = (SubProcessActivityBehavior) activity.getActivityBehavior();
-      subProcessActivityBehavior.completing(superExecution, processInstance);
+    } catch(Exception e) {
+      // separate the exception handling to support a fail-safe error propagation
+      throw new ErrorPropagationException(e);
     }
 
     PvmActivity errorHandlingActivity = errorDeclarationFinder.getErrorHandlerActivity();
@@ -291,6 +307,15 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
 
     public List<PvmExecutionImpl> getProcessInstanceHierarchy() {
       return processInstanceHierarchy;
+    }
+  }
+
+  private class ErrorPropagationException extends Exception {
+
+    private static final long serialVersionUID = 1L;
+
+    public ErrorPropagationException(Throwable cause) {
+      super(cause);
     }
   }
 
