@@ -110,7 +110,7 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
           propagateException(execution, ex);
         } catch (ErrorPropagationException e) {
           LOG.errorPropagationException(activityInstanceId, e.getCause());
-          // re-throw the original execution so that it is logged
+          // re-throw the original exception so that it is logged
           // and set as cause of the failure
           throw ex;
         }
@@ -166,7 +166,7 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
     propagateError(error.getErrorCode(), null, execution);
   }
 
-  protected void propagateError(String errorCode, Exception origException, ActivityExecution execution) throws Exception, ErrorPropagationException {
+  protected void propagateError(String errorCode, Exception origException, ActivityExecution execution) throws Exception {
 
     ActivityExecutionHierarchyWalker walker = new ActivityExecutionHierarchyWalker(execution);
 
