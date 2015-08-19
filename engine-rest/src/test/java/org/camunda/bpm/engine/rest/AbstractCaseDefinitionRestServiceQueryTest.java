@@ -361,7 +361,7 @@ public abstract class AbstractCaseDefinitionRestServiceQueryTest extends Abstrac
 
   @Test
   public void testCaseDefinitionRetrievalByEmptyList() {
-    Response response = given()
+    given()
       .queryParam("caseDefinitionIdIn", "")
       .then().expect()
         .statusCode(Status.OK.getStatusCode())

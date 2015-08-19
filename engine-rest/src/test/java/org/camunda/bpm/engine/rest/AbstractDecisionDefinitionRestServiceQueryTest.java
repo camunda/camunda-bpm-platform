@@ -332,7 +332,7 @@ public abstract class AbstractDecisionDefinitionRestServiceQueryTest extends Abs
 
   @Test
   public void testDecisionDefinitionRetrievalByEmptyList() {
-    Response response = given()
+    given()
       .queryParam("decisionDefinitionIdIn", "")
       .then().expect()
         .statusCode(Status.OK.getStatusCode())
