@@ -169,4 +169,45 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
     assertEquals(1, taskService.createTaskQuery().count());
     assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation").count());
   }
+
+  @Deployment
+  public void testRethrowingEscalationIsNotCatched() {
+    runtimeService.startProcessInstanceByKey("escalationProcess");
+    // when throw an escalation event inside the subprocess
+
+    assertEquals(2, taskService.createTaskQuery().count());
+    // the non-interrupting event subprocess inside the subprocess should catch the escalation event
+    assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation inside subprocess").count());
+    // and continue the subprocess
+    assertEquals(1, taskService.createTaskQuery().taskName("task in subprocess").count());
+
+    String taskId = taskService.createTaskQuery().taskName("task after catched escalation inside subprocess").singleResult().getId();
+    taskService.complete(taskId);
+
+    assertEquals(1, taskService.createTaskQuery().count());
+    // the non-interrupting event subprocess inside the subprocess should catch the escalation event
+    assertEquals(0, taskService.createTaskQuery().taskName("task after catched escalation inside subprocess").count());
+    // and continue the subprocess
+    assertEquals(1, taskService.createTaskQuery().taskName("task in subprocess").count());
+  }
+
+  @Deployment
+  public void testThrowingEscalationTriggersNextEventSubprocess() {
+    runtimeService.startProcessInstanceByKey("escalationProcess");
+    // when throw an escalation event inside the subprocess
+
+    assertEquals(2, taskService.createTaskQuery().count());
+    // the first non-interrupting event subprocess inside the subprocess should catch the escalation event
+    assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation inside subprocess1").count());
+    // and continue the subprocess
+    assertEquals(1, taskService.createTaskQuery().taskName("task in subprocess").count());
+
+    String taskId = taskService.createTaskQuery().taskName("task after catched escalation inside subprocess1").singleResult().getId();
+    taskService.complete(taskId);
+
+    assertEquals(2, taskService.createTaskQuery().count());
+    // the second non-interrupting event subprocess inside the subprocess should catch the escalation event
+    assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation inside subprocess2").count());
+    assertEquals(1, taskService.createTaskQuery().taskName("task in subprocess").count());
+  }
 }

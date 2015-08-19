@@ -28,7 +28,7 @@ import org.camunda.bpm.engine.impl.tree.TreeVisitor;
 import org.camunda.bpm.engine.impl.tree.TreeWalker.WalkCondition;
 
 /**
- * The activity bahavior for an intermediate throwing escalation event and an escalation end event.
+ * The activity behavior for an intermediate throwing escalation event and an escalation end event.
  *
  * @author Philipp Ossler
  *
@@ -110,10 +110,10 @@ public class ThrowEscalationEventActivityBehavior extends AbstractBpmnActivityBe
 
   protected class EscalationEventDefinitionFinder implements TreeVisitor<PvmScope> {
 
-    private EscalationEventDefinition escalationEventDefinition;
+    protected EscalationEventDefinition escalationEventDefinition;
 
-    private final String escalationCode;
-    private final PvmActivity throwEscalationActivity;
+    protected final String escalationCode;
+    protected final PvmActivity throwEscalationActivity;
 
     public EscalationEventDefinitionFinder(String escalationCode, PvmActivity throwEscalationActivity) {
       this.escalationCode = escalationCode;
@@ -122,7 +122,6 @@ public class ThrowEscalationEventActivityBehavior extends AbstractBpmnActivityBe
 
     @Override
     public void visit(PvmScope scope) {
-
       List<EscalationEventDefinition> escalationEventDefinitions = scope.getProperties().get(BpmnProperties.ESCALATION_EVENT_DEFINITIONS);
       this.escalationEventDefinition = findMatchingEscalationEventDefinition(escalationEventDefinitions);
     }
@@ -136,12 +135,12 @@ public class ThrowEscalationEventActivityBehavior extends AbstractBpmnActivityBe
       return null;
     }
 
-    private boolean isMatchingEscalationCode(EscalationEventDefinition escalationEventDefinition) {
+    protected boolean isMatchingEscalationCode(EscalationEventDefinition escalationEventDefinition) {
       String escalationCode = escalationEventDefinition.getEscalationCode();
       return escalationCode == null || escalationCode.equals(this.escalationCode);
     }
 
-    private boolean isReThrowingEscalationEventSubprocess(EscalationEventDefinition escalationEventDefinition) {
+    protected boolean isReThrowingEscalationEventSubprocess(EscalationEventDefinition escalationEventDefinition) {
       PvmActivity escalationHandler = escalationEventDefinition.getEscalationHandler();
       return escalationHandler.isSubProcessScope() && escalationHandler.equals(throwEscalationActivity.getFlowScope());
     }
