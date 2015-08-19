@@ -13,12 +13,18 @@
 package org.camunda.bpm.engine.rest.dto.converter;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class StringListConverter extends JacksonAwareStringToTypeConverter<List<String>> {
 
   @Override
   public List<String> convertQueryParameterToType(String value) {
-    return Arrays.asList(value.split(","));
+    if (value == null || value.trim().isEmpty()) {
+      return Collections.emptyList();
+    }
+    else {
+      return Arrays.asList(value.split(","));
+    }
   }
 }

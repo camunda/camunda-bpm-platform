@@ -18,6 +18,7 @@ import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -34,6 +35,7 @@ import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 import com.jayway.restassured.http.ContentType;
@@ -328,6 +330,48 @@ public abstract class AbstractCaseDefinitionRestServiceQueryTest extends Abstrac
     verify(mockedQuery).caseDefinitionResourceName(queryParameters.get("resourceName"));
     verify(mockedQuery).caseDefinitionResourceNameLike(queryParameters.get("resourceNameLike"));
     verify(mockedQuery).list();
+  }
+
+  @Test
+  public void testCaseDefinitionRetrievalByList() {
+    mockedQuery = createMockCaseDefinitionQuery(MockProvider.createMockTwoCaseDefinitions());
+
+    Response response = given()
+      .queryParam("caseDefinitionIdIn", MockProvider.EXAMPLE_CASE_DEFINITION_ID_LIST)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(CASE_DEFINITION_QUERY_URL);
+
+    // assert query invocation
+    InOrder inOrder = Mockito.inOrder(mockedQuery);
+    inOrder.verify(mockedQuery).caseDefinitionIdIn(MockProvider.EXAMPLE_CASE_DEFINITION_ID, MockProvider.ANOTHER_EXAMPLE_CASE_DEFINITION_ID);
+    inOrder.verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> definitions = from(content).getList("");
+    assertThat(definitions).hasSize(2);
+
+    String returnedDefinitionId1 = from(content).getString("[0].id");
+    String returnedDefinitionId2 = from(content).getString("[1].id");
+
+    assertThat(returnedDefinitionId1).isEqualTo(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+    assertThat(returnedDefinitionId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_CASE_DEFINITION_ID);
+  }
+
+  @Test
+  public void testCaseDefinitionRetrievalByEmptyList() {
+    Response response = given()
+      .queryParam("caseDefinitionIdIn", "")
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(CASE_DEFINITION_QUERY_URL);
+
+    // assert query invocation
+    InOrder inOrder = Mockito.inOrder(mockedQuery);
+    inOrder.verify(mockedQuery, never()).caseDefinitionIdIn(Matchers.<String[]>anyVararg());
+    inOrder.verify(mockedQuery).list();
   }
 
   @Test

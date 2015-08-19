@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.IntegerConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -50,6 +51,7 @@ public class DecisionDefinitionQueryDto extends AbstractQueryDto<DecisionDefinit
   }
 
   protected String decisionDefinitionId;
+  protected List<String> decisionDefinitionIdIn;
   protected String category;
   protected String categoryLike;
   protected String name;
@@ -71,6 +73,11 @@ public class DecisionDefinitionQueryDto extends AbstractQueryDto<DecisionDefinit
   @CamundaQueryParam("decisionDefinitionId")
   public void setDecisionDefinitionId(String decisionDefinitionId) {
     this.decisionDefinitionId = decisionDefinitionId;
+  }
+
+  @CamundaQueryParam(value = "decisionDefinitionIdIn", converter = StringListConverter.class)
+  public void setDecisionDefinitionIdIn(List<String> decisionDefinitionIdIn) {
+    this.decisionDefinitionIdIn = decisionDefinitionIdIn;
   }
 
   @CamundaQueryParam("category")
@@ -139,6 +146,9 @@ public class DecisionDefinitionQueryDto extends AbstractQueryDto<DecisionDefinit
   protected void applyFilters(DecisionDefinitionQuery query) {
     if (decisionDefinitionId != null) {
       query.decisionDefinitionId(decisionDefinitionId);
+    }
+    if (decisionDefinitionIdIn != null && !decisionDefinitionIdIn.isEmpty()) {
+      query.decisionDefinitionIdIn(decisionDefinitionIdIn.toArray(new String[decisionDefinitionIdIn.size()]));
     }
     if (category != null) {
       query.decisionDefinitionCategory(category);

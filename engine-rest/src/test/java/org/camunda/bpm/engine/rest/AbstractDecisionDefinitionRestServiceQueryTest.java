@@ -17,7 +17,9 @@ import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Matchers.anyVararg;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -33,7 +35,10 @@ import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
+import org.mockito.internal.matchers.Any;
+import org.mockito.internal.matchers.AnyVararg;
 
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
@@ -84,7 +89,7 @@ public abstract class AbstractDecisionDefinitionRestServiceQueryTest extends Abs
           .contentType(ContentType.JSON)
           .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
           .body("message", equalTo("Cannot set query parameter 'version' to value 'aString': "
-          + "Cannot convert value aString to java type java.lang.Integer"))
+            + "Cannot convert value aString to java type java.lang.Integer"))
       .when()
         .get(DECISION_DEFINITION_QUERY_URL);
   }
@@ -296,6 +301,48 @@ public abstract class AbstractDecisionDefinitionRestServiceQueryTest extends Abs
     assertThat(returnedVersion).isEqualTo(MockProvider.EXAMPLE_DECISION_DEFINITION_VERSION);
     assertThat(returnedResource).isEqualTo(MockProvider.EXAMPLE_DECISION_DEFINITION_RESOURCE_NAME);
     assertThat(returnedDeploymentId).isEqualTo(MockProvider.EXAMPLE_DEPLOYMENT_ID);
+  }
+
+  @Test
+  public void testDecisionDefinitionRetrievalByList() {
+    mockedQuery = createMockDecisionDefinitionQuery(MockProvider.createMockTwoDecisionDefinitions());
+
+    Response response = given()
+      .queryParam("decisionDefinitionIdIn", MockProvider.EXAMPLE_DECISION_DEFINITION_ID_LIST)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(DECISION_DEFINITION_QUERY_URL);
+
+    // assert query invocation
+    InOrder inOrder = Mockito.inOrder(mockedQuery);
+    inOrder.verify(mockedQuery).decisionDefinitionIdIn(MockProvider.EXAMPLE_DECISION_DEFINITION_ID, MockProvider.ANOTHER_EXAMPLE_DECISION_DEFINITION_ID);
+    inOrder.verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> definitions = from(content).getList("");
+    assertThat(definitions).hasSize(2);
+
+    String returnedDefinitionId1 = from(content).getString("[0].id");
+    String returnedDefinitionId2 = from(content).getString("[1].id");
+
+    assertThat(returnedDefinitionId1).isEqualTo(MockProvider.EXAMPLE_DECISION_DEFINITION_ID);
+    assertThat(returnedDefinitionId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_DECISION_DEFINITION_ID);
+  }
+
+  @Test
+  public void testDecisionDefinitionRetrievalByEmptyList() {
+    Response response = given()
+      .queryParam("decisionDefinitionIdIn", "")
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(DECISION_DEFINITION_QUERY_URL);
+
+    // assert query invocation
+    InOrder inOrder = Mockito.inOrder(mockedQuery);
+    inOrder.verify(mockedQuery, never()).decisionDefinitionIdIn(Matchers.<String[]>anyVararg());
+    inOrder.verify(mockedQuery).list();
   }
 
   @Test

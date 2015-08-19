@@ -217,6 +217,7 @@ public abstract class MockProvider {
   public static final boolean EXAMPLE_PROCESS_DEFINITION_IS_SUSPENDED = true;
 
   public static final String ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID = "aProcessDefinitionId:2";
+  public static final String EXAMPLE_PROCESS_DEFINTION_ID_LIST = EXAMPLE_PROCESS_DEFINITION_ID + "," + ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID;
 
   public static final String EXAMPLE_ACTIVITY_ID = "anActivity";
   public static final String ANOTHER_EXAMPLE_ACTIVITY_ID = "anotherActivity";
@@ -509,6 +510,8 @@ public abstract class MockProvider {
 
   // case definition
   public static final String EXAMPLE_CASE_DEFINITION_ID = "aCaseDefnitionId";
+  public static final String ANOTHER_EXAMPLE_CASE_DEFINITION_ID = "anotherCaseDefnitionId";
+  public static final String EXAMPLE_CASE_DEFINITION_ID_LIST = EXAMPLE_CASE_DEFINITION_ID + "," + ANOTHER_EXAMPLE_CASE_DEFINITION_ID;
   public static final String EXAMPLE_CASE_DEFINITION_KEY = "aCaseDefinitionKey";
   public static final int EXAMPLE_CASE_DEFINITION_VERSION = 1;
   public static final String EXAMPLE_CASE_DEFINITION_CATEGORY = "aCaseDefinitionCategory";
@@ -555,6 +558,8 @@ public abstract class MockProvider {
 
   // decision definition
   public static final String EXAMPLE_DECISION_DEFINITION_ID = "aDecisionDefinitionId";
+  public static final String ANOTHER_EXAMPLE_DECISION_DEFINITION_ID = "anotherDecisionDefinitionId";
+  public static final String EXAMPLE_DECISION_DEFINITION_ID_LIST = EXAMPLE_DECISION_DEFINITION_ID + "," + ANOTHER_EXAMPLE_DECISION_DEFINITION_ID;
   public static final String EXAMPLE_DECISION_DEFINITION_KEY = "aDecisionDefinitionKey";
   public static final int EXAMPLE_DECISION_DEFINITION_VERSION = 1;
   public static final String EXAMPLE_DECISION_DEFINITION_CATEGORY = "aDecisionDefinitionCategory";
@@ -886,12 +891,29 @@ public abstract class MockProvider {
     return mocks;
   }
 
+  public static List<ProcessDefinition> createMockTwoDefinitions() {
+    List<ProcessDefinition> mocks = new ArrayList<ProcessDefinition>();
+    mocks.add(createMockDefinition());
+    mocks.add(createMockAnotherDefinition());
+    return mocks;
+  }
+
   public static ProcessDefinition createMockDefinition() {
     MockDefinitionBuilder builder = new MockDefinitionBuilder();
     ProcessDefinition mockDefinition = builder.id(EXAMPLE_PROCESS_DEFINITION_ID).category(EXAMPLE_PROCESS_DEFINITION_CATEGORY)
         .name(EXAMPLE_PROCESS_DEFINITION_NAME).key(EXAMPLE_PROCESS_DEFINITION_KEY).description(EXAMPLE_PROCESS_DEFINITION_DESCRIPTION)
         .version(EXAMPLE_PROCESS_DEFINITION_VERSION).resource(EXAMPLE_PROCESS_DEFINITION_RESOURCE_NAME).deploymentId(EXAMPLE_DEPLOYMENT_ID)
         .diagram(EXAMPLE_PROCESS_DEFINITION_DIAGRAM_RESOURCE_NAME).suspended(EXAMPLE_PROCESS_DEFINITION_IS_SUSPENDED).build();
+
+    return mockDefinition;
+  }
+
+  public static ProcessDefinition createMockAnotherDefinition() {
+    MockDefinitionBuilder builder = new MockDefinitionBuilder();
+    ProcessDefinition mockDefinition = builder.id(ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID).category(EXAMPLE_PROCESS_DEFINITION_CATEGORY)
+      .name(EXAMPLE_PROCESS_DEFINITION_NAME).key(EXAMPLE_PROCESS_DEFINITION_KEY).description(EXAMPLE_PROCESS_DEFINITION_DESCRIPTION)
+      .version(EXAMPLE_PROCESS_DEFINITION_VERSION).resource(EXAMPLE_PROCESS_DEFINITION_RESOURCE_NAME).deploymentId(EXAMPLE_DEPLOYMENT_ID)
+      .diagram(EXAMPLE_PROCESS_DEFINITION_DIAGRAM_RESOURCE_NAME).suspended(EXAMPLE_PROCESS_DEFINITION_IS_SUSPENDED).build();
 
     return mockDefinition;
   }
@@ -1620,6 +1642,13 @@ public abstract class MockProvider {
     return mocks;
   }
 
+  public static List<CaseDefinition> createMockTwoCaseDefinitions() {
+    List<CaseDefinition> mocks = new ArrayList<CaseDefinition>();
+    mocks.add(createMockCaseDefinition());
+    mocks.add(createAnotherMockCaseDefinition());
+    return mocks;
+  }
+
   public static CaseDefinition createMockCaseDefinition() {
     MockCaseDefinitionBuilder builder = new MockCaseDefinitionBuilder();
 
@@ -1633,6 +1662,23 @@ public abstract class MockProvider {
         .diagram(EXAMPLE_CASE_DEFINITION_DIAGRAM_RESOURCE_NAME)
         .deploymentId(EXAMPLE_DEPLOYMENT_ID)
         .build();
+
+    return mockDefinition;
+  }
+
+  public static CaseDefinition createAnotherMockCaseDefinition() {
+    MockCaseDefinitionBuilder builder = new MockCaseDefinitionBuilder();
+
+    CaseDefinition mockDefinition = builder
+      .id(ANOTHER_EXAMPLE_CASE_DEFINITION_ID)
+      .category(EXAMPLE_CASE_DEFINITION_CATEGORY)
+      .name(EXAMPLE_CASE_DEFINITION_NAME)
+      .key(EXAMPLE_CASE_DEFINITION_KEY)
+      .version(EXAMPLE_CASE_DEFINITION_VERSION)
+      .resource(EXAMPLE_CASE_DEFINITION_RESOURCE_NAME)
+      .diagram(EXAMPLE_CASE_DEFINITION_DIAGRAM_RESOURCE_NAME)
+      .deploymentId(EXAMPLE_DEPLOYMENT_ID)
+      .build();
 
     return mockDefinition;
   }
@@ -1773,11 +1819,33 @@ public abstract class MockProvider {
     return mocks;
   }
 
+  public static List<DecisionDefinition> createMockTwoDecisionDefinitions() {
+    List<DecisionDefinition> mocks = new ArrayList<DecisionDefinition>();
+    mocks.add(createMockDecisionDefinition());
+    mocks.add(createAnotherMockDecisionDefinition());
+    return mocks;
+  }
+
   public static DecisionDefinition createMockDecisionDefinition() {
     MockDecisionDefinitionBuilder builder = new MockDecisionDefinitionBuilder();
 
     return builder
       .id(EXAMPLE_DECISION_DEFINITION_ID)
+      .category(EXAMPLE_DECISION_DEFINITION_CATEGORY)
+      .name(EXAMPLE_DECISION_DEFINITION_NAME)
+      .key(EXAMPLE_DECISION_DEFINITION_KEY)
+      .version(EXAMPLE_DECISION_DEFINITION_VERSION)
+      .resource(EXAMPLE_DECISION_DEFINITION_RESOURCE_NAME)
+      .diagram(EXAMPLE_DECISION_DEFINITION_DIAGRAM_RESOURCE_NAME)
+      .deploymentId(EXAMPLE_DEPLOYMENT_ID)
+      .build();
+  }
+
+  public static DecisionDefinition createAnotherMockDecisionDefinition() {
+    MockDecisionDefinitionBuilder builder = new MockDecisionDefinitionBuilder();
+
+    return builder
+      .id(ANOTHER_EXAMPLE_DECISION_DEFINITION_ID)
       .category(EXAMPLE_DECISION_DEFINITION_CATEGORY)
       .name(EXAMPLE_DECISION_DEFINITION_NAME)
       .key(EXAMPLE_DECISION_DEFINITION_KEY)

@@ -3,8 +3,10 @@ package org.camunda.bpm.engine.rest;
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -25,6 +27,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 import com.jayway.restassured.http.ContentType;
@@ -64,7 +67,7 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
       .body("message", equalTo("Cannot set query parameter 'version' to value 'aString': "
-          + "Cannot convert value aString to java type java.lang.Integer"))
+        + "Cannot convert value aString to java type java.lang.Integer"))
       .when().get(PROCESS_DEFINITION_QUERY_URL);
   }
 
@@ -84,7 +87,7 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
     executeAndVerifyFailingSorting("anInvalidSortByOption", "asc", Status.BAD_REQUEST,
         InvalidRequestException.class.getSimpleName(), "Cannot set query parameter 'sortBy' to value 'anInvalidSortByOption'");
     executeAndVerifyFailingSorting("category", "anInvalidSortOrderOption", Status.BAD_REQUEST,
-        InvalidRequestException.class.getSimpleName(), "Cannot set query parameter 'sortOrder' to value 'anInvalidSortOrderOption'");
+      InvalidRequestException.class.getSimpleName(), "Cannot set query parameter 'sortOrder' to value 'anInvalidSortOrderOption'");
   }
 
   protected void executeAndVerifySuccessfulSorting(String sortBy, String sortOrder, Status expectedStatus) {
@@ -161,6 +164,60 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
   }
 
   @Test
+  public void testProcessDefinitionRetrievalByList() {
+    mockedQuery = setUpMockDefinitionQuery(MockProvider.createMockTwoDefinitions());
+
+    Response response = given()
+      .queryParam("processDefinitionIdIn", MockProvider.EXAMPLE_PROCESS_DEFINTION_ID_LIST)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(PROCESS_DEFINITION_QUERY_URL);
+
+    // assert query invocation
+    InOrder inOrder = Mockito.inOrder(mockedQuery);
+    inOrder.verify(mockedQuery).processDefinitionIdIn(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, MockProvider.ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID);
+    inOrder.verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> definitions = from(content).getList("");
+    assertThat(definitions).hasSize(2);
+
+    String returnedDefinitionId1 = from(content).getString("[0].id");
+    String returnedDefinitionId2 = from(content).getString("[1].id");
+
+    assertThat(returnedDefinitionId1).isEqualTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+    assertThat(returnedDefinitionId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID);
+  }
+
+  @Test
+  public void testProcessDefinitionRetrievalByEmptyList() {
+    mockedQuery = setUpMockDefinitionQuery(MockProvider.createMockTwoDefinitions());
+
+    Response response = given()
+      .queryParam("processDefinitionIdIn", "")
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(PROCESS_DEFINITION_QUERY_URL);
+
+    // assert query invocation
+    InOrder inOrder = Mockito.inOrder(mockedQuery);
+    inOrder.verify(mockedQuery, never()).processDefinitionIdIn(Matchers.<String[]>anyVararg());
+    inOrder.verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> definitions = from(content).getList("");
+    assertThat(definitions).hasSize(2);
+
+    String returnedDefinitionId1 = from(content).getString("[0].id");
+    String returnedDefinitionId2 = from(content).getString("[1].id");
+
+    assertThat(returnedDefinitionId1).isEqualTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
+    assertThat(returnedDefinitionId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID);
+  }
+
+  @Test
   public void testIncompleteProcessDefinition() {
     setUpMockDefinitionQuery(createIncompleteMockDefinitions());
     Response response = expect().statusCode(Status.OK.getStatusCode())
@@ -205,6 +262,7 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
       .when().get(PROCESS_DEFINITION_QUERY_URL);
 
     // assert query invocation
+    verify(mockedQuery).processDefinitionId(queryParameters.get("processDefinitionId"));
     verify(mockedQuery).processDefinitionCategory(queryParameters.get("category"));
     verify(mockedQuery).processDefinitionCategoryLike(queryParameters.get("categoryLike"));
     verify(mockedQuery).processDefinitionName(queryParameters.get("name"));
@@ -229,6 +287,7 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
   private Map<String, String> getCompleteQueryParameters() {
     Map<String, String> parameters = new HashMap<String, String>();
 
+    parameters.put("processDefinitionId", "anId");
     parameters.put("category", "cat");
     parameters.put("categoryLike", "catlike");
     parameters.put("name", "name");

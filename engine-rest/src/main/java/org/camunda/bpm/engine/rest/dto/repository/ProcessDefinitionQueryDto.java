@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.IntegerConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -47,6 +48,8 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
     VALID_SORT_BY_VALUES.add(SORT_BY_DEPLOYMENT_ID_VALUE);
   }
 
+  private String processDefinitionId;
+  private List<String> processDefinitionIdIn;
   private String category;
   private String categoryLike;
   private String name;
@@ -72,6 +75,16 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
 
   public ProcessDefinitionQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
     super(objectMapper, queryParameters);
+  }
+
+  @CamundaQueryParam("processDefinitionId")
+  public void setProcessDefinitionId(String processDefinitionId) {
+    this.processDefinitionId = processDefinitionId;
+  }
+
+  @CamundaQueryParam(value = "processDefinitionIdIn", converter = StringListConverter.class)
+  public void setProcessDefinitionIdIn(List<String> processDefinitionIdIn) {
+    this.processDefinitionIdIn = processDefinitionIdIn;
   }
 
   @CamundaQueryParam("category")
@@ -194,6 +207,12 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
 
   @Override
   protected void applyFilters(ProcessDefinitionQuery query) {
+    if (processDefinitionId != null) {
+      query.processDefinitionId(processDefinitionId);
+    }
+    if (processDefinitionIdIn != null && !processDefinitionIdIn.isEmpty()) {
+      query.processDefinitionIdIn(processDefinitionIdIn.toArray(new String[processDefinitionIdIn.size()]));
+    }
     if (category != null) {
       query.processDefinitionCategory(category);
     }

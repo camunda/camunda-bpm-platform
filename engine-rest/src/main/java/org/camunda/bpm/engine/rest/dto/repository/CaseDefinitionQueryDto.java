@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.IntegerConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -56,6 +57,7 @@ public class CaseDefinitionQueryDto extends AbstractQueryDto<CaseDefinitionQuery
   }
 
   protected String caseDefinitionId;
+  protected List<String> caseDefinitionIdIn;
   protected String category;
   protected String categoryLike;
   protected String name;
@@ -77,6 +79,11 @@ public class CaseDefinitionQueryDto extends AbstractQueryDto<CaseDefinitionQuery
   @CamundaQueryParam("caseDefinitionId")
   public void setCaseDefinitionId(String caseDefinitionId) {
     this.caseDefinitionId = caseDefinitionId;
+  }
+
+  @CamundaQueryParam(value = "caseDefinitionIdIn", converter = StringListConverter.class)
+  public void setCaseDefinitionIdIn(List<String> caseDefinitionIdIn) {
+    this.caseDefinitionIdIn = caseDefinitionIdIn;
   }
 
   @CamundaQueryParam("category")
@@ -157,6 +164,9 @@ public class CaseDefinitionQueryDto extends AbstractQueryDto<CaseDefinitionQuery
   protected void applyFilters(CaseDefinitionQuery query) {
     if (caseDefinitionId != null) {
       query.caseDefinitionId(caseDefinitionId);
+    }
+    if (caseDefinitionIdIn != null && !caseDefinitionIdIn.isEmpty()) {
+      query.caseDefinitionIdIn(caseDefinitionIdIn.toArray(new String[caseDefinitionIdIn.size()]));
     }
     if (category != null) {
       query.caseDefinitionCategory(category);
