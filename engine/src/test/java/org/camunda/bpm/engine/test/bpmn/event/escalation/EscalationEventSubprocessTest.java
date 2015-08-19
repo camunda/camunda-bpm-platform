@@ -84,25 +84,6 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
   }
 
   @Deployment
-  public void testReThrowEscalationEventFromEscalationEventSubprocess() {
-    runtimeService.startProcessInstanceByKey("escalationProcess");
-    // when throw an escalation event inside the subprocess
-
-    // the non-interrupting event subprocess inside the subprocess should catch the escalation event
-    Task task = taskService.createTaskQuery().taskName("task after catched escalation inside subprocess").singleResult();
-    assertNotNull(task);
-
-    // when re-throw the escalation event from the escalation event subprocess
-    taskService.complete(task.getId());
-
-    assertEquals(2, taskService.createTaskQuery().count());
-    // the non-interrupting boundary event on subprocess should catch the escalation event
-    assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation on boundary event").count());
-    // and continue the process
-    assertEquals(1, taskService.createTaskQuery().taskName("task in subprocess").count());
-  }
-
-  @Deployment
   public void testPreferEscalationEventSubprocessToBoundaryEvent() {
     runtimeService.startProcessInstanceByKey("escalationProcess");
     // when throw an escalation event inside the subprocess
@@ -171,28 +152,81 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
   }
 
   @Deployment
-  public void testRethrowingEscalationIsNotCatched() {
+  public void testReThrowEscalationEventToBoundaryEvent() {
     runtimeService.startProcessInstanceByKey("escalationProcess");
     // when throw an escalation event inside the subprocess
 
+    // the non-interrupting event subprocess inside the subprocess should catch the escalation event
+    Task task = taskService.createTaskQuery().taskName("task after catched escalation inside subprocess").singleResult();
+    assertNotNull(task);
+
+    // when re-throw the escalation event from the escalation event subprocess
+    taskService.complete(task.getId());
+
     assertEquals(2, taskService.createTaskQuery().count());
-    // the non-interrupting event subprocess inside the subprocess should catch the escalation event
-    assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation inside subprocess").count());
-    // and continue the subprocess
-    assertEquals(1, taskService.createTaskQuery().taskName("task in subprocess").count());
-
-    String taskId = taskService.createTaskQuery().taskName("task after catched escalation inside subprocess").singleResult().getId();
-    taskService.complete(taskId);
-
-    assertEquals(1, taskService.createTaskQuery().count());
-    // the non-interrupting event subprocess inside the subprocess should catch the escalation event
-    assertEquals(0, taskService.createTaskQuery().taskName("task after catched escalation inside subprocess").count());
-    // and continue the subprocess
+    // the non-interrupting boundary event on subprocess should catch the escalation event
+    assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation on boundary event").count());
+    // and continue the process
     assertEquals(1, taskService.createTaskQuery().taskName("task in subprocess").count());
   }
 
   @Deployment
-  public void testThrowingEscalationTriggersNextEventSubprocess() {
+  public void testReThrowEscalationEventToBoundaryEventWithoutEscalationCode() {
+    runtimeService.startProcessInstanceByKey("escalationProcess");
+    // when throw an escalation event inside the subprocess
+
+    // the non-interrupting event subprocess inside the subprocess should catch the escalation event
+    Task task = taskService.createTaskQuery().taskName("task after catched escalation inside subprocess").singleResult();
+    assertNotNull(task);
+
+    // when re-throw the escalation event from the escalation event subprocess
+    taskService.complete(task.getId());
+
+    assertEquals(2, taskService.createTaskQuery().count());
+    // the non-interrupting boundary event on subprocess without escalationCode should catch the escalation event (and all other escalation events)
+    assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation on boundary event").count());
+    // and continue the process
+    assertEquals(1, taskService.createTaskQuery().taskName("task in subprocess").count());
+  }
+
+  @Deployment
+  public void testReThrowEscalationEventToEventSubprocess() {
+    runtimeService.startProcessInstanceByKey("escalationProcess");
+    // when throw an escalation event inside the subprocess
+
+    // the non-interrupting event subprocess inside the subprocess should catch the escalation event
+    Task task = taskService.createTaskQuery().taskName("task after catched escalation inside subprocess").singleResult();
+    assertNotNull(task);
+
+    // when re-throw the escalation event from the escalation event subprocess
+    taskService.complete(task.getId());
+
+    assertEquals(2, taskService.createTaskQuery().count());
+    // the non-interrupting event subprocess on process level should catch the escalation event
+    assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation on process level").count());
+    // and continue the process
+    assertEquals(1, taskService.createTaskQuery().taskName("task in subprocess").count());
+  }
+
+  @Deployment
+  public void testReThrowEscalationEventIsNotCatched() {
+    runtimeService.startProcessInstanceByKey("escalationProcess");
+    // when throw an escalation event inside the subprocess
+
+    // the non-interrupting event subprocess inside the subprocess should catch the escalation event
+    Task task = taskService.createTaskQuery().taskName("task after catched escalation inside subprocess").singleResult();
+    assertNotNull(task);
+
+    // when re-throw the escalation event from the escalation event subprocess
+    taskService.complete(task.getId());
+
+    // continue the subprocess, no activity should catch the re-thrown escalation event
+    assertEquals(1, taskService.createTaskQuery().count());
+    assertEquals(1, taskService.createTaskQuery().taskName("task in subprocess").count());
+  }
+
+  @Deployment
+  public void testThrowEscalationEventToEventSubprocess() {
     runtimeService.startProcessInstanceByKey("escalationProcess");
     // when throw an escalation event inside the subprocess
 
@@ -202,6 +236,7 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
     // and continue the subprocess
     assertEquals(1, taskService.createTaskQuery().taskName("task in subprocess").count());
 
+    // when throw a second escalation event from the first event subprocess
     String taskId = taskService.createTaskQuery().taskName("task after catched escalation inside subprocess1").singleResult().getId();
     taskService.complete(taskId);
 
