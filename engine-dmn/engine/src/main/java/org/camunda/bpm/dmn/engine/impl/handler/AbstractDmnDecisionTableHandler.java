@@ -26,10 +26,15 @@ public abstract class AbstractDmnDecisionTableHandler<E extends DmnDecisionTable
     initKey(context, decision, dmnElement);
     initName(context, decision, dmnElement);
     initHitPolicy(context, decisionTable, dmnElement);
+    initAggregator(context, decisionTable, dmnElement);
   }
 
   protected void initHitPolicy(DmnElementHandlerContext context, DecisionTable decisionTable, E dmnElement) {
     dmnElement.setHitPolicy(decisionTable.getHitPolicy());
+  }
+
+  protected void initAggregator(DmnElementHandlerContext context, DecisionTable decisionTable, E dmnElement) {
+    dmnElement.setAggregation(decisionTable.getAggregation());
   }
 
 }

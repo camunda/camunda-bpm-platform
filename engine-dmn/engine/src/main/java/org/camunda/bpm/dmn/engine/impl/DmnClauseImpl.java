@@ -19,6 +19,7 @@ import java.util.List;
 import org.camunda.bpm.dmn.engine.DmnClause;
 import org.camunda.bpm.dmn.engine.DmnClauseEntry;
 import org.camunda.bpm.dmn.engine.DmnExpression;
+import org.camunda.bpm.dmn.engine.DmnItemDefinition;
 
 public class DmnClauseImpl extends DmnElementImpl implements DmnClause {
 
@@ -30,6 +31,7 @@ public class DmnClauseImpl extends DmnElementImpl implements DmnClause {
 
   protected List<DmnClauseEntry> inputEntries = new ArrayList<DmnClauseEntry>();
   protected List<DmnExpression> outputEntries = new ArrayList<DmnExpression>();
+
 
   public DmnExpression getInputExpression() {
     return inputExpression;

@@ -11,21 +11,28 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.dmn.engine;
+package org.camunda.bpm.dmn.engine.impl.hitpolicy;
 
 import java.util.List;
 
-import org.camunda.bpm.model.dmn.BuiltinAggregator;
+import org.camunda.bpm.dmn.engine.DmnDecisionTable;
+import org.camunda.bpm.dmn.engine.DmnRule;
 import org.camunda.bpm.model.dmn.HitPolicy;
 
-public interface DmnDecisionTable extends DmnDecision {
+public class RuleOrderHitPolicyHandler extends AbstractDmnHitPolicyHandler {
 
-  HitPolicy getHitPolicy();
+  public static final HitPolicy HIT_POLICY = HitPolicy.RULE_ORDER;
 
-  BuiltinAggregator getAggregation();
+  public HitPolicy getHandledHitPolicy() {
+    return HIT_POLICY;
+  }
 
-  List<DmnClause> getClauses();
+  public boolean handlesHitPolicy(HitPolicy hitPolicy) {
+    return HIT_POLICY.equals(hitPolicy);
+  }
 
-  List<DmnRule> getRules();
+  public List<DmnRule> filterMatchingRules(DmnDecisionTable decisionTable, List<DmnRule> matchingRules) {
+    return matchingRules;
+  }
 
 }

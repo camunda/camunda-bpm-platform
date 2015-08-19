@@ -140,6 +140,7 @@ public class DmnEngineImpl implements DmnEngine {
     DmnVariableContext variableContext = decisionContext.getVariableContextChecked();
     variableContext.getVariables().putAll(variables);
     decisionContext.setScriptEngineResolver(scriptEngineResolver);
+    decisionContext.setHitPolicyHandlers(getConfiguration().getHitPolicyHandlers());
     return decisionContext.evaluate(decision);
   }
 

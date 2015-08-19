@@ -24,14 +24,16 @@ import org.camunda.bpm.dmn.engine.DmnRule;
 import org.camunda.bpm.dmn.engine.ScriptEngineResolver;
 import org.camunda.bpm.dmn.engine.context.DmnDecisionContext;
 import org.camunda.bpm.dmn.engine.context.DmnVariableContext;
+import org.camunda.bpm.dmn.engine.hitpolicy.DmnHitPolicyHandler;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionOutputImpl;
-import org.camunda.bpm.dmn.engine.impl.DmnDecisionResultImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnEngineLogger;
 import org.camunda.bpm.dmn.juel.JuelScriptEngineFactory;
+import org.camunda.bpm.model.dmn.HitPolicy;
 
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +46,7 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
 
   protected DmnVariableContext variableContext;
   protected ScriptEngineResolver scriptEngineResolver;
+  protected Map<HitPolicy, DmnHitPolicyHandler> hitPolicyHandlers;
 
   public void setVariableContext(DmnVariableContext variableContext) {
     this.variableContext = variableContext;
@@ -70,6 +73,33 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
     return scriptEngineResolver;
   }
 
+  public void setHitPolicyHandlers(Map<HitPolicy, DmnHitPolicyHandler> hitPolicyHandlers) {
+    this.hitPolicyHandlers = hitPolicyHandlers;
+  }
+
+  public Map<HitPolicy, DmnHitPolicyHandler> getHitPolicyHandlers() {
+    return hitPolicyHandlers;
+  }
+
+  public DmnHitPolicyHandler getHitPolicyHandler(HitPolicy hitPolicy) {
+    if (hitPolicyHandlers == null) {
+      return null;
+    }
+    else {
+      return hitPolicyHandlers.get(hitPolicy);
+    }
+  }
+
+  public DmnHitPolicyHandler getHitPolicyHandlerChecked(HitPolicy hitPolicy) {
+    DmnHitPolicyHandler hitPolicyHandler = getHitPolicyHandler(hitPolicy);
+    if (hitPolicyHandler != null) {
+      return hitPolicyHandler;
+    }
+    else {
+      throw LOG.unableToFindHitPolicyHandlerFor(hitPolicy);
+    }
+  }
+
   public DmnDecisionResult evaluate(DmnDecision decision) {
     return evaluate(decision, new HashMap<String, Object>());
   }
@@ -80,20 +110,28 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
     }
 
     DmnDecisionTable decisionTable = (DmnDecisionTable) decision;
-    DmnDecisionResultImpl decisionResult = new DmnDecisionResultImpl();
+    List<DmnRule> matchingRules = new ArrayList<DmnRule>();
 
     for (DmnRule rule : decisionTable.getRules()) {
       if (isApplicable(rule, evaluationCache)) {
-        DmnDecisionOutput output = getOutput(rule, evaluationCache);
-        // TODO: notify Rule Listener
-        decisionResult.add(output);
-      }
-      else {
-        // TODO: notify Rule Listener
+        matchingRules.add(rule);
       }
     }
 
-    return decisionResult;
+    return getDecisionOutput(decisionTable, matchingRules, evaluationCache);
+  }
+
+  protected DmnDecisionResult getDecisionOutput(DmnDecisionTable decisionTable, List<DmnRule> matchingRules, Map<String, Object> evaluationCache) {
+    DmnHitPolicyHandler hitPolicyHandler = getHitPolicyHandlerChecked(decisionTable.getHitPolicy());
+    List<DmnRule> outputRules = hitPolicyHandler.filterMatchingRules(decisionTable, matchingRules);
+    List<DmnDecisionOutput> decisionOutputs = new ArrayList<DmnDecisionOutput>();
+
+    for (DmnRule outputRule : outputRules) {
+      DmnDecisionOutput output = getOutput(outputRule, evaluationCache);
+      decisionOutputs.add(output);
+    }
+
+    return hitPolicyHandler.getDecisionResult(decisionTable, decisionOutputs);
   }
 
   public boolean isApplicable(DmnRule rule) {
@@ -136,10 +174,10 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
     return !clauseSatisfied.containsValue(false);
   }
 
-
   public <T> T evaluate(DmnExpression expression) {
     return evaluate(expression, null);
   }
+
 
   @SuppressWarnings("unchecked")
   public <T> T evaluate(DmnExpression expression, Map<String, Object> evaluationCache) {

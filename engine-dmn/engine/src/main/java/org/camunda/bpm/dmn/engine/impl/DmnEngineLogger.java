@@ -17,6 +17,7 @@ import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnEngineException;
 import org.camunda.bpm.dmn.engine.DmnExpressionException;
 import org.camunda.bpm.dmn.engine.DmnTransformException;
+import org.camunda.bpm.model.dmn.HitPolicy;
 
 public class DmnEngineLogger extends DmnLogger {
 
@@ -82,6 +83,10 @@ public class DmnEngineLogger extends DmnLogger {
 
   public DmnEngineException decisionTypeNotSupported(DmnDecision decision) {
     return new DmnEngineException(exceptionMessage("016", "Decision type '{}' not supported by DMN engine.", decision.getClass()));
+  }
+
+  public DmnEngineException unableToFindHitPolicyHandlerFor(HitPolicy hitPolicy) {
+    return new DmnEngineException(exceptionMessage("017", "Unable to find handler for hit policy '{}'.", hitPolicy));
   }
 
 }

@@ -19,6 +19,7 @@ import java.util.List;
 import org.camunda.bpm.dmn.engine.DmnClause;
 import org.camunda.bpm.dmn.engine.DmnDecisionTable;
 import org.camunda.bpm.dmn.engine.DmnRule;
+import org.camunda.bpm.model.dmn.BuiltinAggregator;
 import org.camunda.bpm.model.dmn.HitPolicy;
 
 public class DmnDecisionTableImpl extends DmnElementImpl implements DmnDecisionTable {
@@ -26,6 +27,7 @@ public class DmnDecisionTableImpl extends DmnElementImpl implements DmnDecisionT
   public static final HitPolicy DEFAULT_HIT_POLICY = HitPolicy.UNIQUE;
 
   protected HitPolicy hitPolicy = DEFAULT_HIT_POLICY;
+  protected BuiltinAggregator aggregation;
 
   protected List<DmnClause> clauses = new ArrayList<DmnClause>();
   protected List<DmnRule> rules = new ArrayList<DmnRule>();
@@ -36,6 +38,14 @@ public class DmnDecisionTableImpl extends DmnElementImpl implements DmnDecisionT
 
   public void setHitPolicy(HitPolicy hitPolicy) {
     this.hitPolicy = hitPolicy;
+  }
+
+  public BuiltinAggregator getAggregation() {
+    return aggregation;
+  }
+
+  public void setAggregation(BuiltinAggregator aggregation) {
+    this.aggregation = aggregation;
   }
 
   public List<DmnClause> getClauses() {

@@ -15,20 +15,31 @@ package org.camunda.bpm.dmn.engine.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.ScriptEngineResolver;
 import org.camunda.bpm.dmn.engine.context.DmnContextFactory;
 import org.camunda.bpm.dmn.engine.handler.DmnElementHandlerRegistry;
+import org.camunda.bpm.dmn.engine.hitpolicy.DmnHitPolicyHandler;
 import org.camunda.bpm.dmn.engine.impl.context.DmnContextFactoryImpl;
 import org.camunda.bpm.dmn.engine.impl.handler.DmnElementHandlerRegistryImpl;
+import org.camunda.bpm.dmn.engine.impl.hitpolicy.AnyHitPolicyHandler;
+import org.camunda.bpm.dmn.engine.impl.hitpolicy.CollectHitPolicyHandler;
+import org.camunda.bpm.dmn.engine.impl.hitpolicy.FirstHitPolicyHandler;
+import org.camunda.bpm.dmn.engine.impl.hitpolicy.OutputOrderHitPolicyHandler;
+import org.camunda.bpm.dmn.engine.impl.hitpolicy.PriorityHitPolicyHandler;
+import org.camunda.bpm.dmn.engine.impl.hitpolicy.RuleOrderHitPolicyHandler;
+import org.camunda.bpm.dmn.engine.impl.hitpolicy.UniqueHitPolicyHandler;
 import org.camunda.bpm.dmn.engine.impl.transform.DmnTransformFactoryImpl;
 import org.camunda.bpm.dmn.engine.impl.transform.DmnTransformerImpl;
 import org.camunda.bpm.dmn.engine.transform.DmnTransformFactory;
 import org.camunda.bpm.dmn.engine.transform.DmnTransformListener;
 import org.camunda.bpm.dmn.engine.transform.DmnTransformer;
+import org.camunda.bpm.model.dmn.HitPolicy;
 
 public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
 
@@ -39,6 +50,7 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
   protected DmnElementHandlerRegistry elementHandlerRegistry;
   protected List<DmnTransformListener> customPreDmnTransformListeners = new ArrayList<DmnTransformListener>();
   protected List<DmnTransformListener> customPostDmnTransformListeners = new ArrayList<DmnTransformListener>();
+  protected Map<HitPolicy, DmnHitPolicyHandler> hitPolicyHandlers;
   protected ScriptEngineResolver scriptEngineResolver;
 
   public DmnContextFactory getDmnContextFactory() {
@@ -85,6 +97,14 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
     this.customPostDmnTransformListeners = customPostDmnTransformListeners;
   }
 
+  public Map<HitPolicy, DmnHitPolicyHandler> getHitPolicyHandlers() {
+    return hitPolicyHandlers;
+  }
+
+  public void setHitPolicyHandlers(Map<HitPolicy, DmnHitPolicyHandler> hitPolicyHandlers) {
+    this.hitPolicyHandlers = hitPolicyHandlers;
+  }
+
   public ScriptEngineResolver getScriptEngineResolver() {
     return scriptEngineResolver;
   }
@@ -103,6 +123,7 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
     initTransformFactory();
     initElementHandlerRegistry();
     initTransformer();
+    initHitPolicyHandlers();
     initScriptEngineResolver();
   }
 
@@ -137,6 +158,24 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
 
   protected List<DmnTransformListener> getDefaultDmnTransformListeners() {
     return Collections.emptyList();
+  }
+
+  protected void initHitPolicyHandlers() {
+    if (hitPolicyHandlers == null) {
+      hitPolicyHandlers = getDefaultHitPolicyHandlers();
+    }
+  }
+
+  protected Map<HitPolicy, DmnHitPolicyHandler> getDefaultHitPolicyHandlers() {
+    Map<HitPolicy, DmnHitPolicyHandler> hitPolicyHandlers = new HashMap<HitPolicy, DmnHitPolicyHandler>();
+    hitPolicyHandlers.put(HitPolicy.UNIQUE, new UniqueHitPolicyHandler());
+    hitPolicyHandlers.put(HitPolicy.ANY, new AnyHitPolicyHandler());
+    hitPolicyHandlers.put(HitPolicy.PRIORITY, new PriorityHitPolicyHandler());
+    hitPolicyHandlers.put(HitPolicy.FIRST, new FirstHitPolicyHandler());
+    hitPolicyHandlers.put(HitPolicy.OUTPUT_ORDER, new OutputOrderHitPolicyHandler());
+    hitPolicyHandlers.put(HitPolicy.RULE_ORDER, new RuleOrderHitPolicyHandler());
+    hitPolicyHandlers.put(HitPolicy.COLLECT, new CollectHitPolicyHandler());
+    return hitPolicyHandlers;
   }
 
   protected void initScriptEngineResolver() {

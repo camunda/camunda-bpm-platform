@@ -14,12 +14,15 @@
 package org.camunda.bpm.dmn.engine;
 
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.context.DmnContextFactory;
 import org.camunda.bpm.dmn.engine.handler.DmnElementHandlerRegistry;
+import org.camunda.bpm.dmn.engine.hitpolicy.DmnHitPolicyHandler;
 import org.camunda.bpm.dmn.engine.transform.DmnTransformFactory;
 import org.camunda.bpm.dmn.engine.transform.DmnTransformListener;
 import org.camunda.bpm.dmn.engine.transform.DmnTransformer;
+import org.camunda.bpm.model.dmn.HitPolicy;
 
 public interface DmnEngineConfiguration {
 
@@ -34,6 +37,8 @@ public interface DmnEngineConfiguration {
   List<DmnTransformListener> getCustomPreDmnTransformListeners();
 
   List<DmnTransformListener> getCustomPostDmnTransformListeners();
+
+  Map<HitPolicy, DmnHitPolicyHandler> getHitPolicyHandlers();
 
   ScriptEngineResolver getScriptEngineResolver();
 
