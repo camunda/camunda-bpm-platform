@@ -15,9 +15,12 @@ define([
   var DirectiveController = ['$scope', '$compile', 'Views', '$timeout',
                     function( $scope,   $compile,   Views,   $timeout) {
 
-    $scope.overlayVars = { read: [ 'processData', 'bpmnElement', 'pageData' ] };
-    $scope.overlayProviders = Views.getProviders({ component:  $scope.providerComponent });
-    var overlay = '<div class="bpmn-overlay"><div view ng-repeat="overlayProvider in overlayProviders" provider="overlayProvider" vars="overlayVars"></div></div>';
+    $scope.vars = { read: [ 'processData', 'bpmnElement', 'pageData', 'viewer' ] };
+    
+    $scope.overlayProviders = Views.getProviders({ component:  $scope.overlayProviderComponent });
+
+    var overlay = '<div class="bpmn-overlay"><div view ng-repeat="overlayProvider in overlayProviders" provider="overlayProvider" vars="vars"></div></div>';
+    var actions = '<ul><li view ng-repeat="actionProvider in actionProviders" provider="actionProvider" vars="vars"></li></ul>';
 
     var bpmnElements,
         selection,
@@ -41,7 +44,12 @@ define([
     });
 
     $scope.onLoad = function() {
+      $scope.viewer = $scope.control.getViewer();
       decorateDiagram($scope.processDiagram.bpmnElements);
+
+      if ($scope.actionProviderComponent) {
+        addActions();
+      }
 
       // update selection in case it has been provided earlier
       updateSelection(selection);
@@ -115,6 +123,18 @@ define([
       }
     }
 
+    /*------------------- Add actions ------------------------------------*/
+
+    function addActions() {
+      $scope.actionProviders = Views.getProviders({ component:  $scope.actionProviderComponent });
+      var actionElement = angular.element(actions);
+      var childScope = $scope.$new();
+      $compile(actionElement)(childScope);
+      $scope.control.addAction( {
+        html : actionElement
+      });
+    }
+
     /*------------------- Handle selected activity id---------------------*/
 
     $scope.$watch('selection.activityIds', function(newValue, oldValue) {
@@ -178,7 +198,8 @@ define([
         selection: '=',
         processData: '=',
         pageData: '=',
-        providerComponent: '@',
+        overlayProviderComponent: '@',
+        actionProviderComponent: '@',
         selectAll: '&'
       },
       controller: DirectiveController,
