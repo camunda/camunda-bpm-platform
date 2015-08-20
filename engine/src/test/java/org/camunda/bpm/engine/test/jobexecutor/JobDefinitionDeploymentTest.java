@@ -74,20 +74,19 @@ public class JobDefinitionDeploymentTest extends PluggableProcessEngineTestCase 
 
     // given
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    List<JobDefinition> jobDefinitions = managementService.createJobDefinitionQuery().processDefinitionKey("testProcess").list();
+    JobDefinitionQuery jobDefinitionQuery = managementService.createJobDefinitionQuery().processDefinitionKey("testProcess");
 
     // then assert
+    assertEquals(2, jobDefinitionQuery.count());
 
-    // then assert
-    assertEquals(2, jobDefinitions.size());
-    JobDefinition jobDefinition = jobDefinitions.get(0);
+    JobDefinition jobDefinition = jobDefinitionQuery.activityIdIn("theBoundaryEvent1").singleResult();
     assertNotNull(jobDefinition);
     assertEquals(TimerExecuteNestedActivityJobHandler.TYPE, jobDefinition.getJobType());
     assertEquals("theBoundaryEvent1", jobDefinition.getActivityId());
     assertEquals("DATE: 2036-11-14T11:12:22", jobDefinition.getJobConfiguration());
     assertEquals(processDefinition.getId(), jobDefinition.getProcessDefinitionId());
 
-    jobDefinition = jobDefinitions.get(1);
+    jobDefinition = jobDefinitionQuery.activityIdIn("theBoundaryEvent2").singleResult();
     assertNotNull(jobDefinition);
     assertEquals(TimerExecuteNestedActivityJobHandler.TYPE, jobDefinition.getJobType());
     assertEquals("theBoundaryEvent2", jobDefinition.getActivityId());
@@ -100,20 +99,19 @@ public class JobDefinitionDeploymentTest extends PluggableProcessEngineTestCase 
 
     // given
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-    List<JobDefinition> jobDefinitions = managementService.createJobDefinitionQuery().processDefinitionKey("testProcess").list();
+    JobDefinitionQuery jobDefinitionQuery = managementService.createJobDefinitionQuery().processDefinitionKey("testProcess");
 
     // then assert
+    assertEquals(2, jobDefinitionQuery.count());
 
-    // then assert
-    assertEquals(2, jobDefinitions.size());
-    JobDefinition jobDefinition = jobDefinitions.get(0);
+    JobDefinition jobDefinition = jobDefinitionQuery.activityIdIn("timer1").singleResult();
     assertNotNull(jobDefinition);
     assertEquals(TimerCatchIntermediateEventJobHandler.TYPE, jobDefinition.getJobType());
     assertEquals("timer1", jobDefinition.getActivityId());
     assertEquals("DURATION: PT5M", jobDefinition.getJobConfiguration());
     assertEquals(processDefinition.getId(), jobDefinition.getProcessDefinitionId());
 
-    jobDefinition = jobDefinitions.get(1);
+    jobDefinition = jobDefinitionQuery.activityIdIn("timer2").singleResult();
     assertNotNull(jobDefinition);
     assertEquals(TimerCatchIntermediateEventJobHandler.TYPE, jobDefinition.getJobType());
     assertEquals("timer2", jobDefinition.getActivityId());
@@ -150,7 +148,7 @@ public class JobDefinitionDeploymentTest extends PluggableProcessEngineTestCase 
     assertEquals(MessageJobDeclaration.ASYNC_BEFORE, jobDefinition.getJobConfiguration());
     assertEquals(processDefinition.getId(), jobDefinition.getProcessDefinitionId());
   }
-  
+
   @Deployment
   public void testAsyncContinuationOfMultiInstance() {
     // given
@@ -164,7 +162,7 @@ public class JobDefinitionDeploymentTest extends PluggableProcessEngineTestCase 
     assertEquals(MessageJobDeclaration.ASYNC_AFTER, jobDefinition.getJobConfiguration());
     assertEquals(processDefinition.getId(), jobDefinition.getProcessDefinitionId());
   }
-  
+
   @Deployment
   public void testAsyncContinuationOfActivityWrappedInMultiInstance() {
     // given
@@ -178,7 +176,7 @@ public class JobDefinitionDeploymentTest extends PluggableProcessEngineTestCase 
     assertEquals(MessageJobDeclaration.ASYNC_AFTER, jobDefinition.getJobConfiguration());
     assertEquals(processDefinition.getId(), jobDefinition.getProcessDefinitionId());
   }
-  
+
   @Deployment(resources = {"org/camunda/bpm/engine/test/jobexecutor/JobDefinitionDeploymentTest.testAsyncContinuation.bpmn20.xml",
       "org/camunda/bpm/engine/test/jobexecutor/JobDefinitionDeploymentTest.testMultipleProcessesWithinDeployment.bpmn20.xml"})
   public void testMultipleProcessDeployment() {
