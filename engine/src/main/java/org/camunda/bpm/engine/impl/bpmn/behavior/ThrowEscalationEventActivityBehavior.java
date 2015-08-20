@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.tree.ActivityExecutionHierarchyWalker;
 import org.camunda.bpm.engine.impl.tree.ActivityExecutionMappingCollector;
 import org.camunda.bpm.engine.impl.tree.ActivityExecutionTuple;
+import org.camunda.bpm.engine.impl.tree.OutputVariablesPropagator;
 import org.camunda.bpm.engine.impl.tree.TreeVisitor;
 import org.camunda.bpm.engine.impl.tree.TreeWalker.WalkCondition;
 
@@ -51,6 +52,7 @@ public class ThrowEscalationEventActivityBehavior extends AbstractBpmnActivityBe
     ActivityExecutionHierarchyWalker walker = new ActivityExecutionHierarchyWalker(execution);
     walker.addScopePreVisitor(escalationEventDefinitionFinder);
     walker.addExecutionPreVisitor(activityExecutionMappingCollector);
+    walker.addExecutionPreVisitor(new OutputVariablesPropagator());
 
     walker.walkUntil(new WalkCondition<ActivityExecutionTuple>() {
 
@@ -65,7 +67,7 @@ public class ThrowEscalationEventActivityBehavior extends AbstractBpmnActivityBe
 
       PvmActivity escalationHandler = escalationEventDefinition.getEscalationHandler();
       PvmScope escalationScope = getScopeForEscalation(escalationEventDefinition);
-      ActivityExecution escalationExecution = activityExecutionMappingCollector.getExecutionForScope(escalationScope);
+      final ActivityExecution escalationExecution = activityExecutionMappingCollector.getExecutionForScope(escalationScope);
 
       escalationExecution.executeActivity(escalationHandler);
     }

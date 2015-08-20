@@ -178,7 +178,6 @@ public class BpmnParse extends Parse {
   public static final String PROPERTYNAME_START_TIMER = "timerStart";
   public static final String PROPERTYNAME_COMPENSATION_HANDLER_ID = "compensationHandler";
   public static final String PROPERTYNAME_IS_FOR_COMPENSATION = "isForCompensation";
-  public static final String PROPERTYNAME_ERROR_EVENT_DEFINITIONS = "errorEventDefinitions";
   public static final String PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION = "eventDefinitions";
   public static final String PROPERTYNAME_EVENT_SUBSCRIPTION_JOB_DECLARATION = "eventJobDeclarations";
   public static final String PROPERTYNAME_TRIGGERED_BY_EVENT = "triggeredByEvent";
@@ -191,6 +190,12 @@ public class BpmnParse extends Parse {
    */
   @Deprecated
   public static final String PROPERTYNAME_TYPE = BpmnProperties.TYPE.getName();
+
+  /**
+   * @deprecated use {@link BpmnProperties#ERROR_EVENT_DEFINITIONS}
+   */
+  @Deprecated
+  public static final String PROPERTYNAME_ERROR_EVENT_DEFINITIONS = BpmnProperties.ERROR_EVENT_DEFINITIONS.getName();
 
   /* process start authorization specific finals */
   protected static final String POTENTIAL_STARTER = "potentialStarter";
@@ -3111,12 +3116,9 @@ public class BpmnParse extends Parse {
   }
 
   protected void addErrorEventDefinition(ErrorEventDefinition errorEventDefinition, ScopeImpl catchingScope) {
-    List<ErrorEventDefinition> errorEventDefinitions = (List<ErrorEventDefinition>) catchingScope.getProperty(PROPERTYNAME_ERROR_EVENT_DEFINITIONS);
-    if (errorEventDefinitions == null) {
-      errorEventDefinitions = new ArrayList<ErrorEventDefinition>();
-      catchingScope.setProperty(PROPERTYNAME_ERROR_EVENT_DEFINITIONS, errorEventDefinitions);
-    }
-    errorEventDefinitions.add(errorEventDefinition);
+    catchingScope.getProperties().addListItem(BpmnProperties.ERROR_EVENT_DEFINITIONS, errorEventDefinition);
+
+    List<ErrorEventDefinition> errorEventDefinitions = catchingScope.getProperties().get(BpmnProperties.ERROR_EVENT_DEFINITIONS);
     Collections.sort(errorEventDefinitions, ErrorEventDefinition.comparator);
   }
 

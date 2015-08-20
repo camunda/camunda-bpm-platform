@@ -24,10 +24,14 @@ import org.camunda.bpm.engine.delegate.VariableScope;
  */
 public interface SubProcessActivityBehavior extends ActivityBehavior {
 
-  /** called before the process instance is destroyed to allow
-   * this activity to extract data from the sub process instance.
-   * No control flow should be done on the execution yet. */
-  void completing(VariableScope execution, VariableScope subProcessInstance) throws Exception;
+  /**
+   * Pass the output variables from the process instance of the subprocess to the given execution.
+   * This should be called before the process instance is destroyed.
+   *
+   * @param targetExecution execution of the calling process instance to pass the variables to
+   * @param subProcessInstance process instance of the subprocess where the variables extract from
+   */
+  void passOutputVariablesFromSubprocess(VariableScope targetExecution, VariableScope subProcessInstance);
 
   /** called after the process instance is destroyed for
    * this activity to perform its outgoing control flow logic. */

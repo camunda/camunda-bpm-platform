@@ -13,6 +13,9 @@
 
 package org.camunda.bpm.engine.test.bpmn.event.escalation;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -245,4 +248,33 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
     assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation inside subprocess2").count());
     assertEquals(1, taskService.createTaskQuery().taskName("task in subprocess").count());
   }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
+  "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testPropagateOutputVariablesWhileCatchEscalationOnCallActivity.bpmn20.xml"})
+  public void testPropagateOutputVariablesWhileCatchEscalationOnCallActivity() {
+    Map<String,Object> variables = new HashMap<String, Object>();
+    variables.put("input", "42");
+    String processInstanceId = runtimeService.startProcessInstanceByKey("catchEscalationProcess", variables).getId();
+    // when throw an escalation event on called process
+
+    // the non-interrupting event subprocess should catch the escalation event
+    assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation").count());
+    // and set the output variable of the called process to the process
+    assertEquals("42", runtimeService.getVariable(processInstanceId, "output"));
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
+  "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testPropagateOutputVariablesWhileCatchInterruptingEscalationOnCallActivity.bpmn20.xml"})
+  public void testPropagateOutputVariablesWhileCatchInterruptingEscalationOnCallActivity() {
+    Map<String,Object> variables = new HashMap<String, Object>();
+    variables.put("input", "42");
+    String processInstanceId = runtimeService.startProcessInstanceByKey("catchEscalationProcess", variables).getId();
+    // when throw an escalation event on called process
+
+    // the interrupting event subprocess should catch the escalation event
+    assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation").count());
+    // and set the output variable of the called process to the process
+    assertEquals("42", runtimeService.getVariable(processInstanceId, "output"));
+  }
+
 }

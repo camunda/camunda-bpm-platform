@@ -74,7 +74,7 @@ public abstract class AbstractAtomicOperationCaseExecutionComplete extends Abstr
         SubProcessActivityBehavior behavior = (SubProcessActivityBehavior) getActivityBehavior(superExecution);
 
         try {
-          behavior.completing(superExecution, execution);
+          behavior.passOutputVariablesFromSubprocess(superExecution, execution);
         } catch (RuntimeException e) {
           LOG.completingSubCaseError(execution, e);
           throw e;

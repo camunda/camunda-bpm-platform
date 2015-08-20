@@ -58,7 +58,7 @@ public class PvmAtomicOperationProcessEnd extends PvmAtomicOperationActivityInst
       PvmActivity activity = superExecution.getActivity();
       subProcessActivityBehavior = (SubProcessActivityBehavior) activity.getActivityBehavior();
       try {
-        subProcessActivityBehavior.completing(superExecution, execution);
+        subProcessActivityBehavior.passOutputVariablesFromSubprocess(superExecution, execution);
       } catch (RuntimeException e) {
           log.log(Level.SEVERE, "Error while completing sub process of execution " + execution, e);
           throw e;

@@ -42,7 +42,7 @@ public class ReusableSubProcess implements SubProcessActivityBehavior {
     subProcessInstance.start();
   }
 
-  public void completing(VariableScope execution, VariableScope subProcessInstance) throws Exception {
+  public void passOutputVariablesFromSubprocess(VariableScope execution, VariableScope subProcessInstance) {
     // TODO extract information from the subprocess and inject it into the superprocess
   }
 
