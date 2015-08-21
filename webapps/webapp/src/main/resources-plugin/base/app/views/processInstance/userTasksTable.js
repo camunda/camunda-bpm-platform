@@ -153,15 +153,24 @@ define(['angular', 'text!./identity-links-modal.html', 'text!./user-tasks-table.
         TaskResource.setAssignee(defaultParams, params).$promise.then(
           // success
           function (response) {
-            // copy.assignee = userTask.assignee = response.resource.userId;
-            copy.assignee = userTask.assignee = response.userId;
+            var assignee = copy.assignee = userTask.assignee = response.userId;
+
+            var message;
+            if (assignee) {
+              message = 'The assignee of the user task \'' +
+                         userTask.instance.name +
+                         '\' has been set to \'' +
+                         copy.assignee + '\' successfully.';
+            }
+            else {
+              message = 'The assignee of the user task \'' +
+                         userTask.instance.name +
+                         '\' has been reseted successfully.';
+            }
 
             Notifications.addMessage({
               status: 'Assignee',
-              message: 'The assignee of the user task \'' +
-                       userTask.instance.name +
-                       '\' has been set to \'' +
-                       copy.assignee + '\' successfully.',
+              message: message,
               duration: 5000
             });
 
@@ -170,12 +179,22 @@ define(['angular', 'text!./identity-links-modal.html', 'text!./user-tasks-table.
 
           // error
           function (error) {
+            var message;
+            if (userTask.assignee) {
+              message = 'The assignee of the user task \'' +
+                         userTask.instance.name +
+                         '\' could not be set to \'' + userTask.assignee +
+                         '\'. ' + error.data.message;
+            }
+            else {
+              message = 'The assignee of the user task \'' +
+                         userTask.instance.name +
+                         '\' could not be reseted. ' + error.data.message;
+            }
+
             var err = {
               status: 'Assignee',
-              message: 'The assignee of the user task \'' +
-                       userTask.instance.name +
-                       '\' could not be set to \'' + userTask.assignee +
-                       '\'. ' + error.data.message,
+              message: message,
               exclusive: true
             };
 
