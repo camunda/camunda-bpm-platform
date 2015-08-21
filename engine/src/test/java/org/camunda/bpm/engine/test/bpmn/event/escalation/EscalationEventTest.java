@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 
 /**
@@ -241,6 +242,32 @@ public class EscalationEventTest extends PluggableProcessEngineTestCase {
     // then the output variable of the called process should be set to the process
     // also if the escalation is not caught by the process
     assertEquals("42", runtimeService.getVariable(processInstanceId, "output"));
+  }
+
+  @Deployment
+  public void testRetrieveEscalationCodeVariableOnBoundaryEvent() {
+    runtimeService.startProcessInstanceByKey("escalationProcess");
+    // when throw an escalation event inside the subprocess
+
+    // the boundary event should catch the escalation event
+    Task task = taskService.createTaskQuery().taskName("task after catched escalation").singleResult();
+    assertNotNull(task);
+
+    // and set the escalationCode of the escalation event to the declared variable
+    assertEquals("escalationCode", runtimeService.getVariable(task.getExecutionId(), "escalationCodeVar"));
+  }
+
+  @Deployment
+  public void testRetrieveEscalationCodeVariableOnBoundaryEventWithoutEscalationCode() {
+    runtimeService.startProcessInstanceByKey("escalationProcess");
+    // when throw an escalation event inside the subprocess
+
+    // the boundary event without escalationCode should catch the escalation event
+    Task task = taskService.createTaskQuery().taskName("task after catched escalation").singleResult();
+    assertNotNull(task);
+
+    // and set the escalationCode of the escalation event to the declared variable
+    assertEquals("escalationCode", runtimeService.getVariable(task.getExecutionId(), "escalationCodeVar"));
   }
 
 }

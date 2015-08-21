@@ -27,12 +27,7 @@ public class EscalationEventDefinition {
   protected final boolean cancelActivity;
 
   protected String escalationCode;
-
-  public EscalationEventDefinition(PvmActivity escalationHandler, boolean cancelActivity, Escalation escalation) {
-    this.escalationHandler = escalationHandler;
-    this.cancelActivity = cancelActivity;
-    this.escalationCode = escalation.getEscalationCode();
-  }
+  protected String escalationCodeVariable;
 
   public EscalationEventDefinition(PvmActivity escalationHandler, boolean cancelActivity) {
     this.escalationHandler = escalationHandler;
@@ -54,4 +49,13 @@ public class EscalationEventDefinition {
   public void setEscalationCode(String escalationCode) {
     this.escalationCode = escalationCode;
   }
+
+  public String getEscalationCodeVariable() {
+    return escalationCodeVariable;
+  }
+
+  public void setEscalationCodeVariable(String escalationCodeVariable) {
+    this.escalationCodeVariable = escalationCodeVariable;
+  }
+
 }

@@ -3151,17 +3151,25 @@ public class BpmnParse extends Parse {
     return null;
   }
 
-  protected EscalationEventDefinition createEscalationEventDefinitionForEscalationHandler(Element escalationEventDefinition, ActivityImpl escalationHandler, boolean cancelActivity) {
-    String escalationRef = escalationEventDefinition.attribute("escalationRef");
+  protected EscalationEventDefinition createEscalationEventDefinitionForEscalationHandler(Element escalationEventDefinitionElement, ActivityImpl escalationHandler, boolean cancelActivity) {
+    EscalationEventDefinition escalationEventDefinition = new EscalationEventDefinition(escalationHandler, cancelActivity);
+
+    String escalationRef = escalationEventDefinitionElement.attribute("escalationRef");
     if (escalationRef != null) {
       if (!escalations.containsKey(escalationRef)) {
-        addError("could not find escalation with id '" + escalationRef + "'", escalationEventDefinition);
+        addError("could not find escalation with id '" + escalationRef + "'", escalationEventDefinitionElement);
       } else {
         Escalation escalation = escalations.get(escalationRef);
-        return new EscalationEventDefinition(escalationHandler, cancelActivity, escalation);
+        escalationEventDefinition.setEscalationCode(escalation.getEscalationCode());
       }
     }
-    return new EscalationEventDefinition(escalationHandler, cancelActivity);
+
+    String escalationCodeVariable = escalationEventDefinitionElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "escalationCodeVariable");
+    if(escalationCodeVariable != null) {
+      escalationEventDefinition.setEscalationCodeVariable(escalationCodeVariable);
+    }
+
+    return escalationEventDefinition;
   }
 
   protected void addEscalationEventDefinition(ScopeImpl catchingScope, EscalationEventDefinition escalationEventDefinition, Element element) {

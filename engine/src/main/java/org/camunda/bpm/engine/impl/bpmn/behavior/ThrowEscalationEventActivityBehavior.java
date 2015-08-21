@@ -64,17 +64,25 @@ public class ThrowEscalationEventActivityBehavior extends AbstractBpmnActivityBe
 
     EscalationEventDefinition escalationEventDefinition = escalationEventDefinitionFinder.getEscalationEventDefinition();
     if (escalationEventDefinition != null) {
-
-      PvmActivity escalationHandler = escalationEventDefinition.getEscalationHandler();
-      PvmScope escalationScope = getScopeForEscalation(escalationEventDefinition);
-      final ActivityExecution escalationExecution = activityExecutionMappingCollector.getExecutionForScope(escalationScope);
-
-      escalationExecution.executeActivity(escalationHandler);
+      executeEscalationHandler(escalationEventDefinition, activityExecutionMappingCollector);
     }
 
     if (escalationEventDefinition == null || !escalationEventDefinition.isCancelActivity()) {
       leaveExecution(execution, currentActivity, escalationEventDefinition);
     }
+  }
+
+  protected void executeEscalationHandler(EscalationEventDefinition escalationEventDefinition, ActivityExecutionMappingCollector activityExecutionMappingCollector) {
+
+    PvmActivity escalationHandler = escalationEventDefinition.getEscalationHandler();
+    PvmScope escalationScope = getScopeForEscalation(escalationEventDefinition);
+    ActivityExecution escalationExecution = activityExecutionMappingCollector.getExecutionForScope(escalationScope);
+
+    if (escalationEventDefinition.getEscalationCodeVariable() != null) {
+      escalationExecution.setVariable(escalationEventDefinition.getEscalationCodeVariable(), escalation.getEscalationCode());
+    }
+
+    escalationExecution.executeActivity(escalationHandler);
   }
 
   protected PvmScope getScopeForEscalation(EscalationEventDefinition escalationEventDefinition) {

@@ -277,4 +277,30 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
     assertEquals("42", runtimeService.getVariable(processInstanceId, "output"));
   }
 
+  @Deployment
+  public void testRetrieveEscalationCodeVariableOnEventSubprocess() {
+    runtimeService.startProcessInstanceByKey("escalationProcess");
+    // when throw an escalation event inside the subprocess
+
+    // the event subprocess should catch the escalation event
+    Task task = taskService.createTaskQuery().taskName("task after catched escalation").singleResult();
+    assertNotNull(task);
+
+    // and set the escalationCode of the escalation event to the declared variable
+    assertEquals("escalationCode", runtimeService.getVariable(task.getExecutionId(), "escalationCodeVar"));
+  }
+
+  @Deployment
+  public void testRetrieveEscalationCodeVariableOnEventSubprocessWithoutEscalationCode() {
+    runtimeService.startProcessInstanceByKey("escalationProcess");
+    // when throw an escalation event inside the subprocess
+
+    // the event subprocess without escalationCode should catch the escalation event
+    Task task = taskService.createTaskQuery().taskName("task after catched escalation").singleResult();
+    assertNotNull(task);
+
+    // and set the escalationCode of the escalation event to the declared variable
+    assertEquals("escalationCode", runtimeService.getVariable(task.getExecutionId(), "escalationCodeVar"));
+  }
+
 }
