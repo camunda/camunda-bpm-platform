@@ -27,6 +27,10 @@ public class PvmAtomicOperationActivityStartCreateScope extends PvmAtomicOperati
         && !execution.hasProcessInstanceStartContext();
   }
 
+  public boolean isAsyncCapable() {
+    return true;
+  }
+
   public String getCanonicalName() {
     return "activity-start-create-scope";
   }

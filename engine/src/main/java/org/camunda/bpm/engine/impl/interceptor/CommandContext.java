@@ -100,6 +100,11 @@ public class CommandContext {
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected FailedJobCommandFactory failedJobCommandFactory;
 
+  protected List<AtomicOperationInvocation> queuedInvocations = new ArrayList<AtomicOperationInvocation>();
+  protected BpmnStackTrace bpmnStackTrace = new BpmnStackTrace();
+
+  protected boolean isExecuting = false;
+
   protected List<CommandContextListener> commandContextListeners = new LinkedList<CommandContextListener>();
 
   public CommandContext(ProcessEngineConfigurationImpl processEngineConfiguration) {
@@ -122,36 +127,62 @@ public class CommandContext {
   }
 
   public void performOperation(final AtomicOperation executionOperation, final ExecutionEntity execution, final boolean performAsync) {
+    AtomicOperationInvocation invocation = new AtomicOperationInvocation(executionOperation, execution, performAsync);
+    queuedInvocations.add(0, invocation);
+    performNext();
+  }
 
-    ProcessApplicationReference targetProcessApplication = getTargetProcessApplication(execution);
+  protected void performNext() {
+    AtomicOperationInvocation nextInvocation = queuedInvocations.get(0);
 
+    if(nextInvocation.operation.isAsyncCapable() && isExecuting) {
+      // will be picked up by while loop below
+      return;
+    }
+
+    ProcessApplicationReference targetProcessApplication = getTargetProcessApplication((ExecutionEntity) nextInvocation.execution);
     if(requiresContextSwitch(targetProcessApplication)) {
 
       Context.executeWithinProcessApplication(new Callable<Void>() {
         public Void call() throws Exception {
-          performOperation(executionOperation, execution, performAsync);
+          performNext();
           return null;
         }
 
       }, targetProcessApplication);
-
-    } else {
-      try {
-        Context.setExecutionContext(execution);
-        if (log.isLoggable(Level.FINEST)) {
-          log.finest("AtomicOperation: " + executionOperation + " on " + this);
+    }
+    else {
+      if(!nextInvocation.operation.isAsyncCapable()) {
+        // if operation is not async capable, perform right away.
+        invokeNext();
+      }
+      else {
+        try  {
+          isExecuting = true;
+          while (!queuedInvocations.isEmpty()) {
+            // assumption: all operations are executed within the same process application...
+            nextInvocation = queuedInvocations.get(0);
+            invokeNext();
+          }
         }
-        if (performAsync) {
-          execution.scheduleAtomicOperationAsync(executionOperation);
-        } else {
-          executionOperation.execute(execution);
-
+        finally {
+          isExecuting = false;
         }
-      } finally {
-        Context.removeExecutionContext();
       }
     }
+  }
 
+  protected void invokeNext() {
+    AtomicOperationInvocation invocation = queuedInvocations.remove(0);
+    try {
+      invocation.execute(bpmnStackTrace);
+    }
+    catch(RuntimeException e) {
+      // log bpmn stacktrace
+      bpmnStackTrace.printStackTrace(Context.getProcessEngineConfiguration().isBpmnStacktraceVerbose());
+      // rethrow
+      throw e;
+    }
   }
 
   public void performOperation(final CmmnAtomicOperation executionOperation, final CaseExecutionEntity execution) {

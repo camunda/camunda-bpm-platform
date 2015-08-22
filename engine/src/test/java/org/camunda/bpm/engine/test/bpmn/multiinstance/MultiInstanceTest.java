@@ -447,6 +447,17 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertEquals(10, sum);
   }
 
+  @Deployment(resources="org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testSequentialScriptTasks.bpmn20.xml")
+  public void testSequentialScriptTasksNoStackOverflow() {
+    Map<String, Object> vars = new HashMap<String, Object>();
+    vars.put("sum", 0);
+    vars.put("nrOfLoops", 200);
+    runtimeService.startProcessInstanceByKey("miSequentialScriptTask", vars);
+    Execution waitStateExecution = runtimeService.createExecutionQuery().singleResult();
+    int sum = (Integer) runtimeService.getVariable(waitStateExecution.getId(), "sum");
+    assertEquals(19900, sum);
+  }
+
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testSequentialScriptTasks.bpmn20.xml"})
   public void testSequentialScriptTasksHistory() {
     Map<String, Object> vars = new HashMap<String, Object>();

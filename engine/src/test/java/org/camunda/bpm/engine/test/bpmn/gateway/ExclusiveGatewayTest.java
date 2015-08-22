@@ -236,7 +236,7 @@ public class ExclusiveGatewayTest extends PluggableProcessEngineTestCase {
 
   // see CAM-4172
   @Deployment
-  public void FAILING_testLoopWithManyIterations() {
+  public void testLoopWithManyIterations() {
     int numOfIterations = 1000;
 
     // this should not fail

@@ -496,6 +496,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean enableExpressionsInAdhocQueries = false;
   protected boolean enableExpressionsInStoredQueries = true;
 
+  protected boolean isBpmnStacktraceVerbose = false;
+
   // buildProcessEngine ///////////////////////////////////////////////////////
 
   @Override
@@ -2790,5 +2792,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setEnableExpressionsInStoredQueries(boolean enableExpressionsInStoredQueries) {
     this.enableExpressionsInStoredQueries = enableExpressionsInStoredQueries;
+  }
+
+  public ProcessEngineConfigurationImpl setBpmnStacktraceVerbose(boolean isBpmnStacktraceVerbose) {
+    this.isBpmnStacktraceVerbose = isBpmnStacktraceVerbose;
+    return this;
+  }
+
+  public boolean isBpmnStacktraceVerbose() {
+    return this.isBpmnStacktraceVerbose;
   }
 }
