@@ -50,4 +50,8 @@ public abstract class PvmAtomicOperationInterruptScope implements PvmAtomicOpera
     return false;
   }
 
+  public boolean isAsyncCapable() {
+    return false;
+  }
+
 }

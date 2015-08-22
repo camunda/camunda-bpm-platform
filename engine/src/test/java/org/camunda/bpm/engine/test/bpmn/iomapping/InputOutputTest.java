@@ -18,8 +18,10 @@ import static org.junit.Assert.assertThat;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -755,19 +757,24 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     variables.put("nrOfLoops", 2);
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("miParallelActivity", variables);
 
+    Set<Integer> counters = new HashSet<Integer>();
+
     // first mi execution
     Execution miExecution1 = runtimeService.createExecutionQuery().activityId("miTask")
         .variableValueEquals("loopCounter", 0).singleResult();
     assertNotNull(miExecution1);
     assertFalse(instance.getId().equals(miExecution1.getId()));
-    assertEquals(1, runtimeService.getVariableLocal(miExecution1.getId(), "miCounterValue"));
+    counters.add((Integer) runtimeService.getVariableLocal(miExecution1.getId(), "miCounterValue"));
 
     // second mi execution
     Execution miExecution2 = runtimeService.createExecutionQuery().activityId("miTask")
         .variableValueEquals("loopCounter", 1).singleResult();
     assertNotNull(miExecution2);
     assertFalse(instance.getId().equals(miExecution2.getId()));
-    assertEquals(2, runtimeService.getVariableLocal(miExecution2.getId(), "miCounterValue"));
+    counters.add((Integer) runtimeService.getVariableLocal(miExecution2.getId(), "miCounterValue"));
+
+    assertTrue(counters.contains(1));
+    assertTrue(counters.contains(2));
 
     assertEquals(2, runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
 
@@ -786,18 +793,23 @@ public class InputOutputTest extends PluggableProcessEngineTestCase {
     variables.put("nrOfLoops", 2);
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("miParallelSubprocess", variables);
 
+    Set<Integer> counters = new HashSet<Integer>();
+
     // first parallel mi execution
     Execution miScopeExecution1 = runtimeService.createExecutionQuery().activityId("task")
         .variableValueEquals("loopCounter", 0).singleResult();
     assertNotNull(miScopeExecution1);
-    assertEquals(1, runtimeService.getVariableLocal(miScopeExecution1.getId(), "miCounterValue"));
+    counters.add((Integer) runtimeService.getVariableLocal(miScopeExecution1.getId(), "miCounterValue"));
 
     // second parallel mi execution
     Execution miScopeExecution2 = runtimeService.createExecutionQuery().activityId("task")
         .variableValueEquals("loopCounter", 1).singleResult();
     assertNotNull(miScopeExecution2);
     assertFalse(instance.getId().equals(miScopeExecution2.getId()));
-    assertEquals(2, runtimeService.getVariableLocal(miScopeExecution2.getId(), "miCounterValue"));
+    counters.add((Integer) runtimeService.getVariableLocal(miScopeExecution2.getId(), "miCounterValue"));
+
+    assertTrue(counters.contains(1));
+    assertTrue(counters.contains(2));
 
     assertEquals(2, runtimeService.createVariableInstanceQuery().variableName("miCounterValue").count());
 

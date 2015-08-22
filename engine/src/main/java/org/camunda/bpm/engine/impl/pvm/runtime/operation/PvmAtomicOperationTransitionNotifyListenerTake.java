@@ -27,4 +27,8 @@ public class PvmAtomicOperationTransitionNotifyListenerTake extends AbstractPvmA
   public String getCanonicalName() {
     return "transition-notify-listener-take";
   }
+
+  public boolean isAsyncCapable() {
+    return true;
+  }
 }

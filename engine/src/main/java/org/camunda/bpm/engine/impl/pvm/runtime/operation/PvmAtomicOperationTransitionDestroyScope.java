@@ -13,13 +13,13 @@
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
-import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.OutgoingExecution;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
@@ -35,6 +35,10 @@ public class PvmAtomicOperationTransitionDestroyScope implements PvmAtomicOperat
   private static Logger log = Logger.getLogger(PvmAtomicOperationTransitionDestroyScope.class.getName());
 
   public boolean isAsync(PvmExecutionImpl instance) {
+    return false;
+  }
+
+  public boolean isAsyncCapable() {
     return false;
   }
 
@@ -100,7 +104,7 @@ public class PvmAtomicOperationTransitionDestroyScope implements PvmAtomicOperat
 
           if (i == 1 && !propagatingExecution.isConcurrent()) {
             outgoingExecutions.remove(0);
-            // get ahold of the concurrent execution that replaced the scope propagating execution
+            // get a hold of the concurrent execution that replaced the scope propagating execution
             PvmExecutionImpl replacingExecution = null;
             for (PvmExecutionImpl concurrentChild : scopeExecution.getNonEventScopeExecutions())  {
               if (!(concurrentChild == propagatingExecution)) {
@@ -115,6 +119,10 @@ public class PvmAtomicOperationTransitionDestroyScope implements PvmAtomicOperat
 
         outgoingExecutions.add(new OutgoingExecution(concurrentExecution, transition));
       }
+
+      // start executions in reverse order (order will be reversed again in command context with the effect that they are
+      // actually be started in correct order :) )
+      Collections.reverse(outgoingExecutions);
 
       for (OutgoingExecution outgoingExecution : outgoingExecutions) {
         outgoingExecution.take();

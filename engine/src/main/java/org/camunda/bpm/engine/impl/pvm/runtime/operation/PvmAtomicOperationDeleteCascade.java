@@ -13,8 +13,6 @@
 
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
-import java.util.List;
-
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 
@@ -24,6 +22,10 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 public class PvmAtomicOperationDeleteCascade implements PvmAtomicOperation {
 
   public boolean isAsync(PvmExecutionImpl execution) {
+    return false;
+  }
+
+  public boolean isAsyncCapable() {
     return false;
   }
 
@@ -64,4 +66,5 @@ public class PvmAtomicOperationDeleteCascade implements PvmAtomicOperation {
   public String getCanonicalName() {
     return "delete-cascade";
   }
+
 }

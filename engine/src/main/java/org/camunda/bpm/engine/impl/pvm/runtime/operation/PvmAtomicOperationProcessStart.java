@@ -32,6 +32,10 @@ public class PvmAtomicOperationProcessStart extends AbstractPvmEventAtomicOperat
     return startContext != null && startContext.isAsync();
   }
 
+  public boolean isAsyncCapable() {
+    return true;
+  }
+
   protected ScopeImpl getScope(PvmExecutionImpl execution) {
     return execution.getProcessDefinition();
   }

@@ -36,6 +36,10 @@ public class PvmAtomicOperationActivityEnd implements PvmAtomicOperation {
     return execution.getActivity().isAsyncAfter();
   }
 
+  public boolean isAsyncCapable() {
+    return false;
+  }
+
   public void execute(PvmExecutionImpl execution) {
     // restore activity instance id
     if (execution.getActivityInstanceId() == null) {

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,11 +31,11 @@ public class PvmParallelEndTest extends PvmTestCase {
    *                   +----+
    *              +--->|end1|
    *              |    +----+
-   *              |        
-   * +-----+   +----+      
-   * |start|-->|fork|      
-   * +-----+   +----+      
-   *              |        
+   *              |
+   * +-----+   +----+
+   * |start|-->|fork|
+   * +-----+   +----+
+   *              |
    *              |    +----+
    *              +--->|end2|
    *                   +----+
@@ -59,10 +59,10 @@ public class PvmParallelEndTest extends PvmTestCase {
         .behavior(new End())
       .endActivity()
     .buildProcessDefinition();
-    
-    PvmProcessInstance processInstance = processDefinition.createProcessInstance(); 
+
+    PvmProcessInstance processInstance = processDefinition.createProcessInstance();
     processInstance.start();
-    
+
     assertTrue(processInstance.isEnded());
   }
 }
