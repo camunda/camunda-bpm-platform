@@ -303,4 +303,56 @@ public class EscalationEventSubprocessTest extends PluggableProcessEngineTestCas
     assertEquals("escalationCode", runtimeService.getVariable(task.getExecutionId(), "escalationCodeVar"));
   }
 
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
+    "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testInterruptingRetrieveEscalationCodeInSuperProcess.bpmn20.xml"})
+  public void testInterruptingRetrieveEscalationCodeInSuperProcess() {
+    runtimeService.startProcessInstanceByKey("catchEscalationProcess");
+
+    // the event subprocess without escalationCode should catch the escalation event
+    Task task = taskService.createTaskQuery().taskDefinitionKey("taskAfterCatchedEscalation").singleResult();
+    assertNotNull(task);
+
+    // and set the escalationCode of the escalation event to the declared variable
+    assertEquals("escalationCode", runtimeService.getVariable(task.getExecutionId(), "escalationCodeVar"));
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
+    "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testInterruptingRetrieveEscalationCodeInSuperProcessWithoutEscalationCode.bpmn20.xml"})
+  public void testInterruptingRetrieveEscalationCodeInSuperProcessWithoutEscalationCode() {
+    runtimeService.startProcessInstanceByKey("catchEscalationProcess");
+
+    // the event subprocess without escalationCode should catch the escalation event
+    Task task = taskService.createTaskQuery().taskDefinitionKey("taskAfterCatchedEscalation").singleResult();
+    assertNotNull(task);
+
+    // and set the escalationCode of the escalation event to the declared variable
+    assertEquals("escalationCode", runtimeService.getVariable(task.getExecutionId(), "escalationCodeVar"));
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
+    "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testNonInterruptingRetrieveEscalationCodeInSuperProcess.bpmn20.xml"})
+  public void testNonInterruptingRetrieveEscalationCodeInSuperProcess() {
+    runtimeService.startProcessInstanceByKey("catchEscalationProcess");
+
+    // the event subprocess without escalationCode should catch the escalation event
+    Task task = taskService.createTaskQuery().taskDefinitionKey("taskAfterCatchedEscalation").singleResult();
+    assertNotNull(task);
+
+    // and set the escalationCode of the escalation event to the declared variable
+    assertEquals("escalationCode", runtimeService.getVariable(task.getExecutionId(), "escalationCodeVar"));
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
+    "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventSubprocessTest.testNonInterruptingRetrieveEscalationCodeInSuperProcessWithoutEscalationCode.bpmn20.xml"})
+  public void testNonInterruptingRetrieveEscalationCodeInSuperProcessWithoutEscalationCode() {
+    runtimeService.startProcessInstanceByKey("catchEscalationProcess");
+
+    // the event subprocess without escalationCode should catch the escalation event
+    Task task = taskService.createTaskQuery().taskDefinitionKey("taskAfterCatchedEscalation").singleResult();
+    assertNotNull(task);
+
+    // and set the escalationCode of the escalation event to the declared variable
+    assertEquals("escalationCode", runtimeService.getVariable(task.getExecutionId(), "escalationCodeVar"));
+  }
+
 }

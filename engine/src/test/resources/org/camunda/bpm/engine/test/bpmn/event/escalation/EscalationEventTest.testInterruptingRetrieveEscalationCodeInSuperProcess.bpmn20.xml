@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+
+  <escalation id="escalation" name="escalation" escalationCode="escalationCode" />
+
+  <process id="catchEscalationProcess" isExecutable="true">
+
+    <startEvent id="start" />
+
+    <sequenceFlow sourceRef="start" targetRef="throwEscalationProcess" />
+
+    <callActivity id="throwEscalationProcess" calledElement="throwEscalationProcess" /> 
+
+    <sequenceFlow sourceRef="throwEscalationProcess" targetRef="theEnd" />
+
+    <boundaryEvent id="escalationBoundaryEvent" attachedToRef="throwEscalationProcess" cancelActivity="true">
+      <escalationEventDefinition escalationRef="escalation" camunda:escalationCodeVariable="escalationCodeVar" />
+    </boundaryEvent>  
+
+    <sequenceFlow sourceRef="escalationBoundaryEvent" targetRef="taskAfterCatchedEscalation" />
+
+    <userTask id="taskAfterCatchedEscalation" />
+
+    <sequenceFlow sourceRef="taskAfterCatchedEscalation" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+
+  </process>
+
+</definitions>
