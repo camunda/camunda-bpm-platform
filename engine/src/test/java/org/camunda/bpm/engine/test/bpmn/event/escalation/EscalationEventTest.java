@@ -207,41 +207,64 @@ public class EscalationEventTest extends PluggableProcessEngineTestCase {
   "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.testPropagateOutputVariablesWhileCatchEscalationOnCallActivity.bpmn20.xml"})
   public void testPropagateOutputVariablesWhileCatchEscalationOnCallActivity() {
     Map<String,Object> variables = new HashMap<String, Object>();
-    variables.put("input", "42");
+    variables.put("input", 42);
     String processInstanceId = runtimeService.startProcessInstanceByKey("catchEscalationProcess", variables).getId();
     // when throw an escalation event on called process
 
     // the non-interrupting boundary event on call activity should catch the escalation event
     assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation").count());
     // and set the output variable of the called process to the process
-    assertEquals("42", runtimeService.getVariable(processInstanceId, "output"));
+    assertEquals(42, runtimeService.getVariable(processInstanceId, "output"));
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
+  "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.testPropagateOutputVariablesWhileCatchEscalationOnCallActivity.bpmn20.xml"})
+  public void testPropagateOutputVariablesTwoTimes() {
+    Map<String,Object> variables = new HashMap<String, Object>();
+    variables.put("input", 42);
+    String processInstanceId = runtimeService.startProcessInstanceByKey("catchEscalationProcess", variables).getId();
+    // when throw an escalation event on called process
+
+    Task taskInSuperProcess = taskService.createTaskQuery().taskDefinitionKey("taskAfterCatchedEscalation").singleResult();
+    assertNotNull(taskInSuperProcess);
+
+    // (1) the variables has been passed for the first time (from sub process to super process)
+    assertEquals(42, runtimeService.getVariable(processInstanceId, "output"));
+
+    // change variable "input" in sub process
+    Task taskInSubProcess = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
+    runtimeService.setVariable(taskInSubProcess.getProcessInstanceId(), "input", 999);
+    taskService.complete(taskInSubProcess.getId());
+
+    // (2) the variables has been passed for the second time (from sub process to super process)
+    assertEquals(999, runtimeService.getVariable(processInstanceId, "output"));
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
   "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.testPropagateOutputVariablesWhileCatchInterruptingEscalationOnCallActivity.bpmn20.xml"})
   public void testPropagateOutputVariablesWhileCatchInterruptingEscalationOnCallActivity() {
     Map<String,Object> variables = new HashMap<String, Object>();
-    variables.put("input", "42");
+    variables.put("input", 42);
     String processInstanceId = runtimeService.startProcessInstanceByKey("catchEscalationProcess", variables).getId();
     // when throw an escalation event on called process
 
     // the interrupting boundary event on call activity should catch the escalation event
     assertEquals(1, taskService.createTaskQuery().taskName("task after catched escalation").count());
     // and set the output variable of the called process to the process
-    assertEquals("42", runtimeService.getVariable(processInstanceId, "output"));
+    assertEquals(42, runtimeService.getVariable(processInstanceId, "output"));
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
   "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.testPropagateOutputVariablesWithoutCatchEscalation.bpmn20.xml"})
   public void testPropagateOutputVariablesWithoutCatchEscalation() {
     Map<String,Object> variables = new HashMap<String, Object>();
-    variables.put("input", "42");
+    variables.put("input", 42);
     String processInstanceId = runtimeService.startProcessInstanceByKey("catchEscalationProcess", variables).getId();
     // when throw an escalation event on called process
 
     // then the output variable of the called process should be set to the process
     // also if the escalation is not caught by the process
-    assertEquals("42", runtimeService.getVariable(processInstanceId, "output"));
+    assertEquals(42, runtimeService.getVariable(processInstanceId, "output"));
   }
 
   @Deployment

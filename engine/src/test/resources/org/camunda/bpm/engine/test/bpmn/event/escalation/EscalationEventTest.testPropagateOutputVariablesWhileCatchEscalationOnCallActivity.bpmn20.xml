@@ -3,34 +3,36 @@
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
   xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
   targetNamespace="Examples">
-  
+
   <escalation id="escalation" name="escalation" escalationCode="escalationCode" />
 
   <process id="catchEscalationProcess" isExecutable="true">
-  
-  <startEvent id="start" />
-  
-  <sequenceFlow sourceRef="start" targetRef="throwEscalationProcess" />
-  
-  <callActivity id="throwEscalationProcess" calledElement="throwEscalationProcess">
-    <extensionElements>
-      <camunda:in source="input" target="input" />
-      <camunda:out source="input" target="output" />
-    </extensionElements>
-  </callActivity> 
-  
-  <boundaryEvent id="escalationBoundaryEvent" attachedToRef="throwEscalationProcess" cancelActivity="false">
-    <escalationEventDefinition escalationRef="escalation" />
-  </boundaryEvent>
-  
-  <sequenceFlow sourceRef="escalationBoundaryEvent" targetRef="taskAfterCatchedEscalation" />
-  
-  <userTask id="taskAfterCatchedEscalation" name="task after catched escalation" />
-  
-  <sequenceFlow sourceRef="taskAfterCatchedEscalation" targetRef="theEnd" />
-  
-  <endEvent id="theEnd" />
-  
+
+    <startEvent id="start" />
+
+    <sequenceFlow sourceRef="start" targetRef="throwEscalationProcess" />
+
+    <callActivity id="throwEscalationProcess" calledElement="throwEscalationProcess">
+      <extensionElements>
+        <camunda:in source="input" target="input" />
+        <camunda:out source="input" target="output" />
+      </extensionElements>
+    </callActivity>
+
+    <sequenceFlow sourceRef="throwEscalationProcess" targetRef="theEnd" />
+
+    <boundaryEvent id="escalationBoundaryEvent" attachedToRef="throwEscalationProcess" cancelActivity="false">
+      <escalationEventDefinition escalationRef="escalation" />
+    </boundaryEvent>
+
+    <sequenceFlow sourceRef="escalationBoundaryEvent" targetRef="taskAfterCatchedEscalation" />
+
+    <userTask id="taskAfterCatchedEscalation" name="task after catched escalation" />
+
+    <sequenceFlow sourceRef="taskAfterCatchedEscalation" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+
   </process>
 
 </definitions>
