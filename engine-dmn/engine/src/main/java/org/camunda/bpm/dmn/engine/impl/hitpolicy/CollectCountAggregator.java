@@ -13,7 +13,6 @@
 
 package org.camunda.bpm.dmn.engine.impl.hitpolicy;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
@@ -29,59 +28,4 @@ public class CollectCountAggregator extends AbstractDmnHitPolicyAggregator {
     return createAggregatedDecisionResult(name, count);
   }
 
-  protected List<Integer> convertValuesToInteger(List<Object> values) {
-    List<Integer> intValues = new ArrayList<Integer>();
-    for (Object value : values) {
-      if (value instanceof Integer) {
-        intValues.add((Integer) value);
-      }
-      else {
-        try {
-          intValues.add(Integer.valueOf(value.toString()));
-        }
-        catch (NumberFormatException e) {
-          throw LOG.unableToConvertValueTo(Integer.class, value, e);
-        }
-      }
-    }
-    return intValues;
-  }
-
-  protected List<Long> convertValuesToLong(List<Object> values) {
-    List<Long> longValues = new ArrayList<Long>();
-    for (Object value : values) {
-      if (value instanceof Long) {
-        longValues.add((Long) value);
-      }
-      else {
-        try {
-          longValues.add(Long.valueOf(value.toString()));
-        }
-        catch (NumberFormatException e) {
-          throw LOG.unableToConvertValueTo(Long.class, value, e);
-        }
-      }
-    }
-    return longValues;
-  }
-
-  protected List<Double> convertValuesToDouble(List<Object> values) {
-    List<Double> doubleValues = new ArrayList<Double>();
-
-    for (Object value : values) {
-      if (value instanceof Double) {
-        doubleValues.add((Double) value);
-      }
-      else {
-        try {
-          doubleValues.add(Double.valueOf(value.toString()));
-        }
-        catch (NumberFormatException e) {
-          throw LOG.unableToConvertValueTo(Double.class, value, e);
-        }
-      }
-    }
-
-    return doubleValues;
-  }
 }
