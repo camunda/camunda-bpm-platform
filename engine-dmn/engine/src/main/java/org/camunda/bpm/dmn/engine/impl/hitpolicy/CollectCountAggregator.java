@@ -18,14 +18,20 @@ import java.util.List;
 import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTable;
+import org.camunda.bpm.dmn.engine.hitpolicy.DmnHitPolicyAggregator;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionOutputImpl;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionResultImpl;
 
-public class CollectCountAggregator extends AbstractDmnHitPolicyAggregator {
+public class CollectCountAggregator implements DmnHitPolicyAggregator {
 
-  public DmnDecisionResult aggregate(DmnDecisionTable decisionTable, List<DmnDecisionOutput> decisionOutputs) {
-    long count = collectSingleValues(decisionOutputs).size();
-    String name = getDecisionOutputName(decisionOutputs);
+  public DmnDecisionResult aggregate(String outputName, List<Object> outputValues) {
+    long count = outputValues.size();
 
-    return createAggregatedDecisionResult(name, count);
+    DmnDecisionOutputImpl decisionOutput = new DmnDecisionOutputImpl();
+    decisionOutput.put(outputName, count);
+    DmnDecisionResultImpl decisionResult = new DmnDecisionResultImpl();
+    decisionResult.add(decisionOutput);
+    return decisionResult;
   }
 
 }

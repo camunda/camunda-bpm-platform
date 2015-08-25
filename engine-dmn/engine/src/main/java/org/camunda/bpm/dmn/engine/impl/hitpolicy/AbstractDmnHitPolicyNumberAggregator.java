@@ -19,19 +19,22 @@ import java.util.List;
 import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTable;
+import org.camunda.bpm.dmn.engine.hitpolicy.DmnHitPolicyAggregator;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionOutputImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionResultImpl;
+import org.camunda.bpm.dmn.engine.impl.DmnLogger;
 
-public abstract class AbstractDmnHitPolicyNumberAggregator extends AbstractDmnHitPolicyAggregator {
+public abstract class AbstractDmnHitPolicyNumberAggregator implements DmnHitPolicyAggregator {
 
-  public DmnDecisionResult aggregate(DmnDecisionTable decisionTable, List<DmnDecisionOutput> decisionOutputs) {
-    List<Object> values = collectSingleValues(decisionOutputs);
-    if (values.isEmpty()) {
-      // return empty result if not values to aggregate
+  public final static DmnHitPolicyLogger LOG = DmnLogger.HIT_POLICY_LOGGER;
+
+  public DmnDecisionResult aggregate(String outputName, List<Object> outputValues) {
+    if (outputValues.isEmpty()) {
+      // return empty result if no values to aggregate
       return new DmnDecisionResultImpl();
     }
     else {
-      String name = getDecisionOutputName(decisionOutputs);
-      return aggregateNumberValues(name, values);
+      return aggregateNumberValues(outputName, outputValues);
     }
   }
 
@@ -124,4 +127,13 @@ public abstract class AbstractDmnHitPolicyNumberAggregator extends AbstractDmnHi
 
     return doubleValues;
   }
+
+  protected DmnDecisionResult createAggregatedDecisionResult(String name, Object value) {
+    DmnDecisionOutputImpl decisionOutput = new DmnDecisionOutputImpl();
+    decisionOutput.put(name, value);
+    DmnDecisionResultImpl decisionResult = new DmnDecisionResultImpl();
+    decisionResult.add(decisionOutput);
+    return decisionResult;
+  }
+
 }

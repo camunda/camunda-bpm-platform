@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.dmn.engine.impl.hitpolicy;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,12 +64,40 @@ public class CollectHitPolicyHandler extends AbstractDmnHitPolicyHandler {
 
   protected DmnDecisionResult getAggregatedDecisionResult(DmnDecisionTable decisionTable, BuiltinAggregator aggregation, List<DmnDecisionOutput> decisionOutputs) {
     DmnHitPolicyAggregator aggregator = AGGREGATORS.get(aggregation);
+    List<Object> outputValues = collectSingleValues(decisionOutputs);
+    String outputName = getDecisionOutputName(decisionOutputs);
     if (aggregator != null) {
-      return aggregator.aggregate(decisionTable, decisionOutputs);
+      return aggregator.aggregate(outputName, outputValues);
     }
     else {
       throw LOG.noAggregatorFoundFor(aggregation);
     }
+  }
+
+  protected List<Object> collectSingleValues(List<DmnDecisionOutput> decisionOutputs) {
+    List<Object> values = new ArrayList<Object>();
+    for (DmnDecisionOutput decisionOutput : decisionOutputs) {
+      if (decisionOutput.isEmpty()) {
+        continue; // skip empty output
+      }
+      else if (decisionOutput.size() == 1) {
+        values.add(decisionOutput.getValue());
+      }
+      else {
+        throw LOG.countAggregationNotApplicableOnCompoundOutput(decisionOutput);
+      }
+    }
+
+    return values;
+  }
+
+  protected String getDecisionOutputName(List<DmnDecisionOutput> decisionOutputs) {
+    for (DmnDecisionOutput decisionOutput : decisionOutputs) {
+      if (!decisionOutput.isEmpty()) {
+        return decisionOutput.keySet().iterator().next();
+      }
+    }
+    return null;
   }
 
 }
