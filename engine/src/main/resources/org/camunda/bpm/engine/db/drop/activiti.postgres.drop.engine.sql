@@ -104,6 +104,7 @@ drop index ACT_IDX_INC_EXID;
 drop index ACT_IDX_INC_PROCDEFID;
 drop index ACT_IDX_INC_PROCINSTID;
 drop index ACT_IDX_INC_ROOTCAUSEINCID;
+drop index ACT_IDX_AUTH_RESOURCE_ID;
 
 drop table ACT_GE_PROPERTY;
 drop table ACT_GE_BYTEARRAY;

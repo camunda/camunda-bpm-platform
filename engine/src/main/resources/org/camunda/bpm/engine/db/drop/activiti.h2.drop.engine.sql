@@ -90,6 +90,7 @@ drop index ACT_IDX_INC_PROCINSTID;
 drop index ACT_IDX_INC_ROOTCAUSEINCID;
 
 drop index ACT_IDX_METER_LOG;
+drop index ACT_IDX_AUTH_RESOURCE_ID;
 
 drop table ACT_GE_PROPERTY if exists;
 drop table ACT_GE_BYTEARRAY if exists;
