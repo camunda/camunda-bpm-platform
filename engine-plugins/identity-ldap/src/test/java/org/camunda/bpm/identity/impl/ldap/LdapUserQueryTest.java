@@ -76,7 +76,7 @@ public class LdapUserQueryTest extends LdapIdentityProviderTest {
     User user = identityService.createUserQuery().userLastName("The Crouch").singleResult();
     assertNotNull(user);
 
-    user = identityService.createUserQuery().userFirstNameLike("non-existing").singleResult();
+    user = identityService.createUserQuery().userLastName("non-existing").singleResult();
     assertNull(user);
   }
 
