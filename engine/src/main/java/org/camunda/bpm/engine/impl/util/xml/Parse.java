@@ -37,6 +37,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * @author Tom Baeyens
+ * @author Falko Menge
  */
 public class Parse extends DefaultHandler {
 
@@ -156,6 +157,10 @@ public class Parse extends DefaultHandler {
     errors.add(new Problem(errorMessage, name, element));
   }
 
+  public void addError(String errorMessage, String... elementIds) {
+    errors.add(new Problem(errorMessage, name, elementIds));
+  }
+
   public void addError(BpmnParseException e) {
     errors.add(new Problem(e, name));
   }
@@ -171,7 +176,11 @@ public class Parse extends DefaultHandler {
   public void addWarning(String errorMessage, Element element) {
     warnings.add(new Problem(errorMessage, name, element));
   }
-  
+
+  public void addWarning(String errorMessage, String... elementIds) {
+    warnings.add(new Problem(errorMessage, name, elementIds));
+  }
+
   public boolean hasWarnings() {
     return warnings != null && !warnings.isEmpty();
   }

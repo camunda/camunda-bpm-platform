@@ -42,6 +42,7 @@ import org.junit.Test;
 /**
  *
  * @author Joram Barrez
+ * @author Falko Menge
  */
 public class BpmnParseTest extends PluggableProcessEngineTestCase {
   public void testInvalidSubProcessWithTimerStartEvent() {
@@ -497,6 +498,16 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
 
     assertEquals("escalationStartEvent", escalationStartEvent.getProperties().get(BpmnProperties.TYPE));
     assertEquals(EventSubProcessStartEventActivityBehavior.class, escalationStartEvent.getActivityBehavior().getClass());
+  }
+  
+  public void testParseServiceTaskWithoutClass(){
+    try {
+      String resource = TestHelper.getBpmnProcessDefinitionResource(getClass(), "testParseServiceTaskWithoutClass");
+      repositoryService.createDeployment().name(resource).addClasspathResource(resource).deploy();
+      fail();
+    } catch (ProcessEngineException e) {
+      assertEquals("One of the attributes 'class', 'delegateExpression', 'type', or 'expression' is mandatory on serviceTask. | org/camunda/bpm/engine/test/bpmn/parse/BpmnParseTest.testParseServiceTaskWithoutClass.bpmn | line 4 | column 43 | element ServiceTask_1\n", e.getMessage());
+    }
   }
 
   protected void assertActivityBounds(ActivityImpl activity, int x, int y, int width, int height) {

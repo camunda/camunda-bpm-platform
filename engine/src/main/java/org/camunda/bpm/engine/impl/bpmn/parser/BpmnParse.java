@@ -1271,7 +1271,7 @@ public class BpmnParse extends Parse {
       for (PvmTransition transition : activity.getOutgoingTransitions()) {
         if (transition.getId() == null) {
           addError("Sequence flow with sourceRef='" + activity.getId() + "' must have an id, activity with id '" + activity.getId() + "' uses 'asyncAfter'.",
-              null);
+              activity.getId(), activity.getId() );
         }
       }
     }
@@ -1281,13 +1281,13 @@ public class BpmnParse extends Parse {
     if (activity.getOutgoingTransitions().size() == 0) {
       // TODO: double check if this is valid (I think in Activiti yes, since we
       // need start events we will need an end event as well)
-      addError("Exclusive Gateway '" + activity.getId() + "' has no outgoing sequence flows.", null);
+      addError("Exclusive Gateway '" + activity.getId() + "' has no outgoing sequence flows.", activity.getId());
     } else if (activity.getOutgoingTransitions().size() == 1) {
       PvmTransition flow = activity.getOutgoingTransitions().get(0);
       Condition condition = (Condition) flow.getProperty(BpmnParse.PROPERTYNAME_CONDITION);
       if (condition != null) {
         addError("Exclusive Gateway '" + activity.getId() + "' has only one outgoing sequence flow ('" + flow.getId()
-            + "'). This is not allowed to have a condition.", null);
+            + "'). This is not allowed to have a condition.", activity.getId() , flow.getId());
       }
     } else {
       String defaultSequenceFlow = (String) activity.getProperty("default");
@@ -1304,7 +1304,7 @@ public class BpmnParse extends Parse {
         }
         if (hasConditon && isDefaultFlow) {
           addError("Exclusive Gateway '" + activity.getId() + "' has outgoing sequence flow '" + flow.getId()
-              + "' which is the default flow but has a condition too.", null);
+              + "' which is the default flow but has a condition too.", activity.getId() , flow.getId());
         }
       }
       if (hasDefaultFlow || flowsWithoutCondition.size() > 1) {
@@ -1314,7 +1314,7 @@ public class BpmnParse extends Parse {
         for (PvmTransition flow : flowsWithoutCondition) {
           addError(
               "Exclusive Gateway '" + activity.getId() + "' has outgoing sequence flow '" + flow.getId() + "' without condition which is not the default flow.",
-              null);
+              activity.getId() , flow.getId());
         }
       } else if (flowsWithoutCondition.size() == 1) {
         // Havinf no default and exactly one flow without condition this is
@@ -1323,7 +1323,7 @@ public class BpmnParse extends Parse {
         addWarning(
             "Exclusive Gateway '" + activity.getId() + "' has outgoing sequence flow '" + flow.getId()
                 + "' without condition which is not the default flow. We assume it to be the default flow, but it is bad modeling practice, better set the default flow in your gateway.",
-            null);
+                activity.getId() , flow.getId());
       }
     }
   }

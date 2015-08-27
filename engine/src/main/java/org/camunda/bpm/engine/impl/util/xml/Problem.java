@@ -12,6 +12,12 @@
  */
 package org.camunda.bpm.engine.impl.util.xml;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+import org.apache.commons.lang.StringUtils;
 import org.camunda.bpm.engine.BpmnParseException;
 import org.xml.sax.SAXParseException;
 
@@ -19,6 +25,7 @@ import org.xml.sax.SAXParseException;
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
+ * @author Falko Menge
  */
 public class Problem {
 
@@ -26,6 +33,7 @@ public class Problem {
   protected String resource;
   protected int line;
   protected int column;
+  private Set<String> elementIds = new HashSet<String>();
 
   public Problem(SAXParseException e, String resource) {
     concatenateErrorMessages(e);
@@ -40,6 +48,18 @@ public class Problem {
     if (element!=null) {
       this.line = element.getLine();
       this.column = element.getColumn();
+      String id = element.attribute("id");
+      if (id != null && id.length() > 0) {
+        this.elementIds.add(id);
+      }
+    }
+  }
+
+  public Problem(String errorMessage, String resourceName, String[] elementIds) {
+    this.errorMessage = errorMessage;
+    this.resource = resourceName;
+    if (elementIds != null) {
+      this.elementIds.addAll(new HashSet<String>(Arrays.asList(elementIds)));
     }
   }
 
@@ -66,6 +86,29 @@ public class Problem {
   }
 
   public String toString() {
-    return errorMessage+(resource!=null ? " | "+resource : "")+" | line "+line+" | column "+column;
+    StringBuilder string = new StringBuilder(errorMessage); 
+    if (resource != null) {
+      string.append(" | " + resource);
+    }
+    if (line > 0) {
+      string.append(" | line " + line);
+    }
+    if (column > 0) {
+      string.append(" | column " + column);
+    }
+    if (elementIds.size() > 0) {
+      string.append(" | element");
+      if (elementIds.size() > 1) {
+        string.append('s');
+      }
+      string.append(' ');
+      for (Iterator iterator = elementIds.iterator(); iterator.hasNext();) {
+        string.append(iterator.next());
+        if (iterator.hasNext()) {
+          string.append(',');
+        }
+      }
+    }
+    return string.toString();
   }
 }
