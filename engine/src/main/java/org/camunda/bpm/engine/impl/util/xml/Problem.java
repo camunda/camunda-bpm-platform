@@ -17,7 +17,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.camunda.bpm.engine.BpmnParseException;
 import org.xml.sax.SAXParseException;
 
