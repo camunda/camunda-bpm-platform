@@ -1,4 +1,4 @@
-module.exports = function(config) {
+module.exports = function(config, requireJsConfig) {
   'use strict';
   var grunt = config.grunt;
   var commons = require('camunda-commons-ui');
@@ -15,15 +15,14 @@ module.exports = function(config) {
     'domReady'
   ];
 
-  var rConf = {
-    options: {
+  var options = {
       stubModules: ['text'],
 
       optimize: '<%= (buildTarget === "dist" ? "uglify2" : "none") %>',
       preserveLicenseComments: false,
       generateSourceMaps: true,
 
-      baseUrl: './<%= pkg.gruntConfig.clientDir %>',
+      baseUrl: './<%= pkg.gruntConfig.cockpitSourceDir %>',
 
       paths: _.extend(rjsConf.paths, {
         'cockpit':            'scripts',
@@ -65,29 +64,26 @@ module.exports = function(config) {
           main: 'routeUtil'
         }
       ])
-    },
+  };
 
 
-    dependencies: {
-      options: {
+  requireJsConfig.cockpit_dependencies = {
+      options: _.merge({}, options, {
         create: true,
-        name: '<%= pkg.name %>-deps',
-        out: '<%= buildTarget %>/scripts/deps.js',
+        name: 'camunda-cockpit-ui-deps',
+        out: '<%= pkg.gruntConfig.cockpitBuildTarget %>/scripts/deps.js',
         include: deps
-      }
-    },
+      })
+    };
 
-    scripts: {
-      options: {
-        name: '<%= pkg.name %>',
-        out: '<%= buildTarget %>/scripts/<%= pkg.name %>.js',
+  requireJsConfig.cockpit_scripts = {
+      options: _.merge({}, options, {
+        name: 'camunda-cockpit-ui',
+        out: '<%= pkg.gruntConfig.cockpitBuildTarget %>/scripts/camunda-cockpit-ui.js',
         exclude: deps,
         include: [],
 
         onModuleBundleComplete: commons.livereloadSnippet(grunt)
-      }
-    }
+    })
   };
-
-  return rConf;
 };
