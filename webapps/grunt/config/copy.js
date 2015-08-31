@@ -3,11 +3,11 @@
 var commentLineExp =  /^[\s]*<!-- (\/|#) (CE|EE)/;
 var requireConfExp =  /require-conf.js$/;
 
-module.exports = function(config) {
+module.exports = function(config, copyConf) {
   var grunt = config.grunt;
 
   function fileProcessing(content, srcpath) {
-    if(grunt.config('buildTarget') === 'dist') {
+    if(grunt.config('buildMode') === 'prod') {
       // removes the template comments
       content = content
                 .split('\n').filter(function(line) {
@@ -31,10 +31,7 @@ module.exports = function(config) {
     }
   }
 
-  return {
-    options: {},
-
-    index: {
+  copyConf.cockpit_index = {
       options: {
         process: function() {
           return fileProcessing.apply(grunt, arguments);
@@ -43,16 +40,16 @@ module.exports = function(config) {
       files: [
         {
           expand: true,
-          cwd: '<%= pkg.gruntConfig.clientDir %>/scripts/',
+          cwd: '<%= pkg.gruntConfig.cockpitSourceDir %>/scripts/',
           src: [
             'index.html'
           ],
-          dest: '<%= buildTarget %>/'
+          dest: '<%= pkg.gruntConfig.cockpitBuildTarget %>/'
         }
       ]
-    },
+  };
 
-    assets: {
+  copyConf.cockpit_assets = {
       process: function(content, srcpath) {
         grunt.log.ok('Copy '+ srcpath);
         return content;
@@ -61,65 +58,64 @@ module.exports = function(config) {
         // custom styles and/or other css files
         {
           expand: true,
-          cwd: '<%= pkg.gruntConfig.clientDir %>/styles',
+          cwd: '<%= pkg.gruntConfig.cockpitSourceDir %>/styles',
           src: ['*.css'],
-          dest: '<%= buildTarget %>/styles/'
+          dest: '<%= pkg.gruntConfig.cockpitBuildTarget %>/styles/'
         },
 
         // images, fonts & stuff
         {
           expand: true,
-          cwd: '<%= pkg.gruntConfig.clientDir %>/',
+          cwd: '<%= pkg.gruntConfig.cockpitSourceDir %>/',
           src:  [
             '{fonts,images}/**/*.*'
           ],
-          dest: '<%= buildTarget %>/assets'
+          dest: '<%= pkg.gruntConfig.cockpitBuildTarget %>/assets'
         },
 
         // dojo & dojox
         {
           expand: true,
-          cwd: '<%= pkg.gruntConfig.clientDir %>/vendor/dojo',
+          cwd: '<%= pkg.gruntConfig.cockpitSourceDir %>/vendor/dojo',
           src:  [
             '**/*.*'
           ],
-          dest: '<%= buildTarget %>/assets/vendor'
+          dest: '<%= pkg.gruntConfig.cockpitBuildTarget %>/assets/vendor'
         },
 
         // bootstrap fonts
         {
           expand: true,
-          cwd: 'node_modules/camunda-commons-ui/node_modules/bootstrap/fonts',
+          cwd: '<%= pkg.gruntConfig.cockpitSourceDir %>/../node_modules/camunda-commons-ui/node_modules/bootstrap/fonts',
           src: [
             '*.{eot,ttf,svg,woff}'
           ],
-          dest: '<%= buildTarget %>/fonts/'
+          dest: '<%= pkg.gruntConfig.cockpitBuildTarget %>/fonts/'
         },
         // bpmn fonts
         {
           expand: true,
-          cwd: 'node_modules/camunda-commons-ui/node_modules/bpmn-font/dist/font',
+          cwd: '<%= pkg.gruntConfig.cockpitSourceDir %>/../node_modules/camunda-commons-ui/node_modules/bpmn-font/dist/font',
           src: [
             '*.{eot,ttf,svg,woff}'
           ],
-          dest: '<%= buildTarget %>/fonts/'
+          dest: '<%= pkg.gruntConfig.cockpitBuildTarget %>/fonts/'
         },
         // open sans fonts
         {
           expand: true,
-          cwd: 'node_modules/camunda-commons-ui/vendor/fonts',
+          cwd: '<%= pkg.gruntConfig.cockpitSourceDir %>/../node_modules/camunda-commons-ui/vendor/fonts',
           src: ['*.{eot,svg,ttf,woff,woff2}'],
-          dest: '<%= buildTarget %>/fonts/'
+          dest: '<%= pkg.gruntConfig.cockpitBuildTarget %>/fonts/'
         },
 
         // placeholder shims
         {
           expand: true,
-          cwd: 'node_modules/camunda-commons-ui/vendor',
+          cwd: '<%= pkg.gruntConfig.cockpitSourceDir %>/../node_modules/camunda-commons-ui/vendor',
           src: ['placeholders.*'],
-          dest: '<%= buildTarget %>/scripts/'
+          dest: '<%= pkg.gruntConfig.cockpitBuildTarget %>/scripts/'
         }
       ]
-    },
-  };
+    };
 };

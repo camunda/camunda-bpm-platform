@@ -2,10 +2,6 @@
   "name": "camunda-cockpit-ui",
   "version": "7.4.0-SNAPSHOT",
   "private": true,
-  "scripts": {
-    "win-build-sdk": "cd \"node_modules\\grunt-cli\\bin\" && grunt --gruntfile=..\\..\\camunda-commons-ui\\node_modules\\camunda-bpm-sdk-js\\Gruntfile.js browserify:distAngular browserify:distTypeUtils",
-    "build-sdk": "node_modules/grunt-cli/bin/grunt --gruntfile=node_modules/camunda-commons-ui/node_modules/camunda-bpm-sdk-js/Gruntfile.js browserify:distAngular browserify:distTypeUtils"
-  },
   "gruntConfig": {
     "connectPort": 8030,
     "livereloadPort": 8031,
@@ -15,18 +11,5 @@
   },
   "dependencies": {
     "camunda-commons-ui": "git://github.com/camunda/camunda-commons-ui#master"
-  },
-  "devDependencies": {
-    "grunt": "0.4.5",
-    "grunt-cli": "0.1.13",
-    "grunt-contrib-clean": "0.5.0",
-    "grunt-contrib-copy": "0.5.0",
-    "grunt-contrib-jshint": "0.8.0",
-    "grunt-contrib-less": "0.9.0",
-    "grunt-contrib-requirejs": "0.4.4",
-    "grunt-contrib-watch": "0.5.0",
-    "grunt-mkdir": "0.1.1",
-    "grunt-newer": "0.6.1",
-    "load-grunt-tasks": "0.2.0"
   }
 }
