@@ -1,4 +1,4 @@
-module.exports = function(config) {
+module.exports = function(config, requireJsConfig) {
   'use strict';
   var commons = require('camunda-commons-ui');
   var _ = commons.utils._;
@@ -13,18 +13,16 @@ module.exports = function(config) {
     'angular-bootstrap'
   ];
 
-  var rConf = {
-    options: {
+  var options = {
       stubModules: [
         'json',
         'text'
       ],
 
-      optimize: '<%= (buildTarget === "dist" ? "uglify2" : "none") %>',
       preserveLicenseComments: false,
       generateSourceMaps: true,
 
-      baseUrl: './<%= pkg.gruntConfig.clientDir %>',
+      baseUrl: './<%= pkg.gruntConfig.tasklistSourceDir %>',
 
       paths: _.extend(rjsConf.paths, {
         'camunda-tasklist-ui': 'scripts/camunda-tasklist-ui',
@@ -74,22 +72,21 @@ module.exports = function(config) {
           main: 'index'
         }
       ])
-    },
+  };
 
-
-    dependencies: {
-      options: {
+  requireJsConfig.tasklist_dependencies = {
+    options: _.merge({}, options, {
         create: true,
-        name: '<%= pkg.name %>-deps',
-        out: '<%= buildTarget %>/scripts/deps.js',
+        name: 'camunda-tasklist-ui-deps',
+        out: '<%= pkg.gruntConfig.tasklistBuildTarget %>/scripts/deps.js',
         include: deps
-      }
-    },
+    })
+  };
 
-    scripts: {
-      options: {
+  requireJsConfig.tasklist_scripts = {
+    options: _.merge({}, options, {
         name: 'camunda-tasklist-ui',
-        out: '<%= buildTarget %>/scripts/<%= pkg.name %>.js',
+        out: '<%= pkg.gruntConfig.tasklistBuildTarget %>/scripts/camunda-tasklist-ui.js',
         exclude: deps,
         include: [
           'scripts/config/date',
@@ -115,9 +112,6 @@ module.exports = function(config) {
         ],
 
         onModuleBundleComplete: commons.livereloadSnippet(config.grunt)
-      }
-    }
+    })
   };
-
-  return rConf;
 };
