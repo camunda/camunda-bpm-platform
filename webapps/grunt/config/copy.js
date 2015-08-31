@@ -1,9 +1,9 @@
-module.exports = function(config) {
+module.exports = function(config, copyConf) {
   'use strict';
   var grunt = config.grunt;
   var productionRemoveExp = /<!-- #production-remove([\s\S.]*)\/production-remove -->/igm;
   function prod () {
-    return grunt.config('buildTarget') === 'dist';
+    return grunt.config('buildMode') === 'prod';
   }
 
 
@@ -49,79 +49,76 @@ module.exports = function(config) {
     return content;
   }
 
-  return {
-    options: {},
-
-    index: {
+  copyConf.tasklist_index = {
       options: {
         process: copyReplace
       },
       files: [
         {
           expand: true,
-          cwd: '<%= pkg.gruntConfig.clientDir %>',
+          cwd: '<%= pkg.gruntConfig.tasklistSourceDir %>',
           src: [
             'index.html'
           ],
-          dest: '<%= buildTarget %>/',
+          dest: '<%= pkg.gruntConfig.tasklistBuildTarget %>/',
         }
       ]
-    },
+  };
 
-    assets: {
+  copyConf.tasklist_assets = {
       files: [
         {
           expand: true,
-          cwd: '<%= pkg.gruntConfig.clientDir %>',
+          cwd: '<%= pkg.gruntConfig.tasklistSourceDir %>',
           src: [
             '*.{ico,txt}'
           ],
-          dest: '<%= buildTarget %>/',
+          dest: '<%= pkg.gruntConfig.tasklistBuildTarget %>/',
         },
         {
           expand: true,
-          cwd: 'node_modules/camunda-commons-ui/vendor/fonts',
+          cwd: '<%= pkg.gruntConfig.tasklistSourceDir %>/../node_modules/camunda-commons-ui/vendor/fonts',
           src: ['*.{eot,svg,ttf,woff,woff2}'],
-          dest: '<%= buildTarget %>/fonts/'
+          dest: '<%= pkg.gruntConfig.tasklistBuildTarget %>/fonts/'
         },
         {
           expand: true,
-          cwd: 'node_modules/camunda-commons-ui/node_modules/bootstrap/fonts',
+          cwd: '<%= pkg.gruntConfig.tasklistSourceDir %>/../node_modules/camunda-commons-ui/node_modules/bootstrap/fonts',
           src: ['**'],
-          dest: '<%= buildTarget %>/fonts/bootstrap/'
+          dest: '<%= pkg.gruntConfig.tasklistBuildTarget %>/fonts/bootstrap/'
         },
         {
           expand: true,
-          cwd: '<%= pkg.gruntConfig.clientDir %>/images',
+          cwd: '<%= pkg.gruntConfig.tasklistSourceDir %>/images',
           src: ['**'],
-          dest: '<%= buildTarget %>/images/'
+          dest: '<%= pkg.gruntConfig.tasklistBuildTarget %>/images/'
         },
         {
           expand: true,
-          cwd: '<%= pkg.gruntConfig.clientDir %>/styles',
+          cwd: '<%= pkg.gruntConfig.tasklistSourceDir %>/styles',
           src: ['*.css'],
-          dest: '<%= buildTarget %>/styles/'
+          dest: '<%= pkg.gruntConfig.tasklistBuildTarget %>/styles/'
         },
 
         // placeholder shims
         {
           expand: true,
-          cwd: 'node_modules/camunda-commons-ui/vendor',
+          cwd: '<%= pkg.gruntConfig.tasklistSourceDir %>/../node_modules/camunda-commons-ui/vendor',
           src: ['placeholders.*'],
-          dest: '<%= buildTarget %>/scripts/'
+          dest: '<%= pkg.gruntConfig.tasklistBuildTarget %>/scripts/'
         }
       ]
-    },
+  };
 
-    config: {
+  copyConf.tasklist_config = {
       files: [
         {
           expand: true,
-          cwd: '<%= pkg.gruntConfig.clientDir %>/scripts/config',
+          cwd: '<%= pkg.gruntConfig.tasklistSourceDir %>/scripts/config',
           src: ['config.js'],
-          dest: '<%= buildTarget %>/scripts/'
+          dest: '<%= pkg.gruntConfig.tasklistBuildTarget %>/scripts/'
         }
       ]
-    }
   };
+
 };
