@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -12,7 +11,7 @@
 
   <groupId>org.camunda.bpm.extension</groupId>
   <artifactId>camunda-bpm-spring-boot-starter-root</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0.0</version>
 
   <packaging>pom</packaging>
 
@@ -271,7 +270,7 @@
     <connection>scm:git:git@github.com:camunda/camunda-bpm-spring-boot-starter.git</connection>
     <url>scm:git:git@github.com:camunda/camunda-bpm-spring-boot-starter.git</url>
     <developerConnection>scm:git:git@github.com:camunda/camunda-bpm-spring-boot-starter.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>1.0.0</tag>
   </scm>
 
   <!-- repositories used for distribution of releases and snapshots, DO NOT
