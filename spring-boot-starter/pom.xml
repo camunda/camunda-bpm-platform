@@ -49,6 +49,7 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+        <version>${spring-boot.version}</version>
       </plugin>
     </plugins>
   </build>
@@ -88,17 +89,14 @@
   </dependencyManagement>
 
   <profiles>
-    <!-- this is only for jdk 1.6. you can remove this when using java version 
+    <!-- this is only for jdk 1.6. you can remove this when using java version
       later than 1.6 -->
     <profile>
       <id>java6</id>
       <activation>
-        <activeByDefault>true</activeByDefault>
+        <jdk>1.6</jdk>
       </activation>
       <properties>
-        <spring-boot.version>1.2.5.RELEASE</spring-boot.version>
-        <camunda.version>7.3.0</camunda.version>
-        <resteasy.version>3.0.8.Final</resteasy.version>
         <!-- camunda and spring use different properties ... -->
         <java.version>${version.java}</java.version>
         <!-- because of java 1.6 compatibility -->
@@ -216,7 +214,7 @@
       </dependencyManagement>
     </profile>
 
-    <!-- use this profile if you want to specify a specific jdk for compilation 
+    <!-- use this profile if you want to specify a specific jdk for compilation
       and tests -->
     <profile>
       <id>specific jdk location</id>
@@ -276,7 +274,7 @@
     <tag>HEAD</tag>
   </scm>
 
-  <!-- repositories used for distribution of releases and snapshots, DO NOT 
+  <!-- repositories used for distribution of releases and snapshots, DO NOT
     CHANGE -->
   <distributionManagement>
     <repository>
