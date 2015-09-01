@@ -78,6 +78,21 @@
     select * from ${prefix}ACT_RE_PROCDEF where DEPLOYMENT_ID_ = #{parameter}
   </select>
 
+  <select id="selectProcessDefinitionByKeyIn" resultMap="processDefinitionResultMap">
+    select *
+    from ${prefix}ACT_RE_PROCDEF
+    <if test="parameter != null &amp;&amp; parameter.length > 0">
+    where KEY_ in
+     <foreach item="key"
+              collection="parameter"
+              open="("
+              separator=","
+              close=")">
+       #{key}
+     </foreach>
+    </if>
+  </select>
+
   <select id="selectProcessDefinitionsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl" resultMap="processDefinitionResultMap">
   	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}

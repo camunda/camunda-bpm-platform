@@ -29,12 +29,10 @@ import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.DeploymentQueryImpl;
-import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.cmmn.deployer.CmmnDeployer;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.dmn.deployer.DmnDeployer;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentFailListener;
@@ -42,6 +40,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessApplicationDeploymentImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 import org.camunda.bpm.engine.impl.repository.DeploymentBuilderImpl;
 import org.camunda.bpm.engine.impl.repository.ProcessApplicationDeploymentBuilderImpl;
@@ -280,7 +279,9 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
     List<? extends ProcessDefinition> deployedProcessDefinitions = deployment.getDeployedArtifacts(ProcessDefinitionEntity.class);
     if (deployedProcessDefinitions == null) {
       // existing deployment
-      deployedProcessDefinitions = new ProcessDefinitionQueryImpl(Context.getCommandContext()).deploymentId(deployment.getId()).list();
+      CommandContext commandContext = Context.getCommandContext();
+      ProcessDefinitionManager manager = commandContext.getProcessDefinitionManager();
+      deployedProcessDefinitions = manager.findProcessDefinitionsByDeploymentId(deployment.getId());
     }
 
     return deployedProcessDefinitions;
@@ -320,15 +321,15 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
 
   protected Set<String> findDeploymentIdsForProcessDefinitions(CommandContext commandContext, Set<String> processDefinitionKeys) {
     Set<String> deploymentsToRegister = new HashSet<String>();
-    for (String processDefinitionKey : processDefinitionKeys) {
-      // query for process definitions with that key:
-      List<ProcessDefinition> previousVersionDefinition = new ProcessDefinitionQueryImpl(commandContext)
-        .processDefinitionKey(processDefinitionKey)
-        .list();
 
-      // add their deployment IDs to the set of deployments to register
-      for (ProcessDefinition processDefinition : previousVersionDefinition) {
-        deploymentsToRegister.add(processDefinition.getDeploymentId());
+    if (!processDefinitionKeys.isEmpty()) {
+
+      String[] keys = processDefinitionKeys.toArray(new String[processDefinitionKeys.size()]);
+      ProcessDefinitionManager processDefinitionManager = commandContext.getProcessDefinitionManager();
+      List<ProcessDefinition> previousDefinitions = processDefinitionManager.findProcessDefinitionsByKeyIn(keys);
+
+      for (ProcessDefinition definition : previousDefinitions) {
+        deploymentsToRegister.add(definition.getDeploymentId());
       }
     }
     return deploymentsToRegister;

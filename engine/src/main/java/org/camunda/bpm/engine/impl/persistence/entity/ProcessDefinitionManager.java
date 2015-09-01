@@ -108,6 +108,11 @@ public class ProcessDefinitionManager extends AbstractManager {
     return getDbEntityManager().selectList("selectProcessDefinitionByDeploymentId", deploymentId);
   }
 
+  @SuppressWarnings("unchecked")
+  public List<ProcessDefinition> findProcessDefinitionsByKeyIn(String... keys) {
+    return getDbEntityManager().selectList("selectProcessDefinitionByKeyIn", keys);
+  }
+
   // update ///////////////////////////////////////////////////////////
 
   public void updateProcessDefinitionSuspensionStateById(String processDefinitionId, SuspensionState suspensionState) {
