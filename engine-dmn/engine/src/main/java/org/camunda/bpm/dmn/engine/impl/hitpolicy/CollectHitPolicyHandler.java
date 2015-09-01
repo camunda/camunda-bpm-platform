@@ -18,17 +18,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTable;
-import org.camunda.bpm.dmn.engine.DmnRule;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableRule;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableValue;
 import org.camunda.bpm.dmn.engine.hitpolicy.DmnHitPolicyAggregator;
+import org.camunda.bpm.dmn.engine.hitpolicy.DmnHitPolicyHandler;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableResultImpl;
+import org.camunda.bpm.dmn.engine.impl.DmnLogger;
 import org.camunda.bpm.model.dmn.BuiltinAggregator;
-import org.camunda.bpm.model.dmn.HitPolicy;
 
-public class CollectHitPolicyHandler extends AbstractDmnHitPolicyHandler {
+public class CollectHitPolicyHandler implements DmnHitPolicyHandler {
 
-  public static final HitPolicy HIT_POLICY = HitPolicy.COLLECT;
+  public static final DmnHitPolicyLogger LOG = DmnLogger.HIT_POLICY_LOGGER;
 
   public static final Map<BuiltinAggregator, DmnHitPolicyAggregator> AGGREGATORS;
 
@@ -40,61 +42,51 @@ public class CollectHitPolicyHandler extends AbstractDmnHitPolicyHandler {
     AGGREGATORS.put(BuiltinAggregator.COUNT, new CollectCountAggregator());
   }
 
-  public HitPolicy getHandledHitPolicy() {
-    return HIT_POLICY;
-  }
-
-  public boolean handlesHitPolicy(HitPolicy hitPolicy) {
-    return HIT_POLICY.equals(hitPolicy);
-  }
-
-  public List<DmnRule> filterMatchingRules(DmnDecisionTable decisionTable, List<DmnRule> matchingRules) {
-    return matchingRules;
-  }
-
-  public DmnDecisionResult getDecisionResult(DmnDecisionTable decisionTable, List<DmnDecisionOutput> decisionOutputs) {
+  public DmnDecisionTableResult apply(DmnDecisionTable decisionTable, DmnDecisionTableResult decisionTableResult) {
     BuiltinAggregator aggregation = decisionTable.getAggregation();
     if (aggregation != null) {
-      return getAggregatedDecisionResult(decisionTable, aggregation, decisionOutputs);
+      aggregateDecisionTableResult(aggregation, (DmnDecisionTableResultImpl) decisionTableResult);
     }
-    else {
-      return super.getDecisionResult(decisionTable, decisionOutputs);
-    }
+    return decisionTableResult;
   }
 
-  protected DmnDecisionResult getAggregatedDecisionResult(DmnDecisionTable decisionTable, BuiltinAggregator aggregation, List<DmnDecisionOutput> decisionOutputs) {
+  protected void aggregateDecisionTableResult(BuiltinAggregator aggregation, DmnDecisionTableResultImpl decisionTableResult) {
     DmnHitPolicyAggregator aggregator = AGGREGATORS.get(aggregation);
-    List<Object> outputValues = collectSingleValues(decisionOutputs);
-    String outputName = getDecisionOutputName(decisionOutputs);
     if (aggregator != null) {
-      return aggregator.aggregate(outputName, outputValues);
+      List<DmnDecisionTableRule> matchingRules = decisionTableResult.getMatchingRules();
+      List<Object> outputValues = collectSingleValues(aggregation, matchingRules);
+      String outputName = getDecisionOutputName(matchingRules);
+      Object outputValue = aggregator.aggregate(outputValues);
+      decisionTableResult.setCollectResultName(outputName);
+      decisionTableResult.setCollectResultValue(outputValue);
     }
     else {
       throw LOG.noAggregatorFoundFor(aggregation);
     }
   }
 
-  protected List<Object> collectSingleValues(List<DmnDecisionOutput> decisionOutputs) {
+  protected List<Object> collectSingleValues(BuiltinAggregator aggregator, List<DmnDecisionTableRule> matchingRules) {
     List<Object> values = new ArrayList<Object>();
-    for (DmnDecisionOutput decisionOutput : decisionOutputs) {
-      if (decisionOutput.isEmpty()) {
+    for (DmnDecisionTableRule matchingRule : matchingRules) {
+      Map<String, DmnDecisionTableValue> outputs = matchingRule.getOutputs();
+      if (outputs.isEmpty()) {
         continue; // skip empty output
       }
-      else if (decisionOutput.size() == 1) {
-        values.add(decisionOutput.getValue());
+      else if (outputs.size() == 1) {
+        values.add(outputs.values().iterator().next().getValue());
       }
       else {
-        throw LOG.countAggregationNotApplicableOnCompoundOutput(decisionOutput);
+        throw LOG.aggregationNotApplicableOnCompoundOutput(aggregator, outputs);
       }
     }
-
     return values;
   }
 
-  protected String getDecisionOutputName(List<DmnDecisionOutput> decisionOutputs) {
-    for (DmnDecisionOutput decisionOutput : decisionOutputs) {
-      if (!decisionOutput.isEmpty()) {
-        return decisionOutput.keySet().iterator().next();
+  protected String getDecisionOutputName(List<DmnDecisionTableRule> matchingRules) {
+    for (DmnDecisionTableRule matchingRule : matchingRules) {
+      Map<String, DmnDecisionTableValue> outputs = matchingRule.getOutputs();
+      if (!outputs.isEmpty()) {
+        return outputs.values().iterator().next().getOutputName();
       }
     }
     return null;

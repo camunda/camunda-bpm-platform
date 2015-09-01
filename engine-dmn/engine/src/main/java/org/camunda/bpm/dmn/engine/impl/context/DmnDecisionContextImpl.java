@@ -13,30 +13,36 @@
 
 package org.camunda.bpm.dmn.engine.impl.context;
 
-import org.camunda.bpm.dmn.engine.DmnClause;
-import org.camunda.bpm.dmn.engine.DmnClauseEntry;
-import org.camunda.bpm.dmn.engine.DmnDecision;
-import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
-import org.camunda.bpm.dmn.engine.DmnDecisionTable;
-import org.camunda.bpm.dmn.engine.DmnExpression;
-import org.camunda.bpm.dmn.engine.DmnRule;
-import org.camunda.bpm.dmn.engine.ScriptEngineResolver;
-import org.camunda.bpm.dmn.engine.context.DmnDecisionContext;
-import org.camunda.bpm.dmn.engine.context.DmnVariableContext;
-import org.camunda.bpm.dmn.engine.hitpolicy.DmnHitPolicyHandler;
-import org.camunda.bpm.dmn.engine.impl.DmnDecisionOutputImpl;
-import org.camunda.bpm.dmn.engine.impl.DmnEngineLogger;
-import org.camunda.bpm.dmn.juel.JuelScriptEngineFactory;
-import org.camunda.bpm.model.dmn.HitPolicy;
-
-import javax.script.Bindings;
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.script.Bindings;
+import javax.script.ScriptEngine;
+import javax.script.ScriptException;
+
+import org.camunda.bpm.dmn.engine.DmnClause;
+import org.camunda.bpm.dmn.engine.DmnClauseEntry;
+import org.camunda.bpm.dmn.engine.DmnDecision;
+import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionTable;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableListener;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableRule;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableValue;
+import org.camunda.bpm.dmn.engine.DmnExpression;
+import org.camunda.bpm.dmn.engine.DmnRule;
+import org.camunda.bpm.dmn.engine.ScriptEngineResolver;
+import org.camunda.bpm.dmn.engine.context.DmnDecisionContext;
+import org.camunda.bpm.dmn.engine.hitpolicy.DmnHitPolicyHandler;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionOutputImpl;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionResultImpl;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableResultImpl;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableRuleImpl;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableValueImpl;
+import org.camunda.bpm.dmn.engine.impl.DmnEngineLogger;
+import org.camunda.bpm.dmn.juel.JuelScriptEngineFactory;
+import org.camunda.bpm.model.dmn.HitPolicy;
 
 public class DmnDecisionContextImpl implements DmnDecisionContext {
 
@@ -44,37 +50,16 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
 
   public static final String DEFAULT_SCRIPT_LANGUAGE = JuelScriptEngineFactory.NAME;
 
-  protected DmnVariableContext variableContext;
   protected ScriptEngineResolver scriptEngineResolver;
   protected Map<HitPolicy, DmnHitPolicyHandler> hitPolicyHandlers;
-
-  public void setVariableContext(DmnVariableContext variableContext) {
-    this.variableContext = variableContext;
-  }
-
-  public DmnVariableContext getVariableContext() {
-    return variableContext;
-  }
-
-  public DmnVariableContext getVariableContextChecked() {
-    if (variableContext != null) {
-      return variableContext;
-    }
-    else {
-      throw LOG.noVariableContextSetInDecisionContext();
-    }
-  }
-
-  public void setScriptEngineResolver(ScriptEngineResolver scriptEngineResolver) {
-    this.scriptEngineResolver = scriptEngineResolver;
-  }
+  protected List<DmnDecisionTableListener> decisionTableListeners = new ArrayList<DmnDecisionTableListener>();
 
   public ScriptEngineResolver getScriptEngineResolver() {
     return scriptEngineResolver;
   }
 
-  public void setHitPolicyHandlers(Map<HitPolicy, DmnHitPolicyHandler> hitPolicyHandlers) {
-    this.hitPolicyHandlers = hitPolicyHandlers;
+  public void setScriptEngineResolver(ScriptEngineResolver scriptEngineResolver) {
+    this.scriptEngineResolver = scriptEngineResolver;
   }
 
   public Map<HitPolicy, DmnHitPolicyHandler> getHitPolicyHandlers() {
@@ -100,110 +85,181 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
     }
   }
 
-  public DmnDecisionResult evaluate(DmnDecision decision) {
-    return evaluate(decision, new HashMap<String, Object>());
+  public void setHitPolicyHandlers(Map<HitPolicy, DmnHitPolicyHandler> hitPolicyHandlers) {
+    this.hitPolicyHandlers = hitPolicyHandlers;
   }
 
-  public DmnDecisionResult evaluate(DmnDecision decision, Map<String, Object> evaluationCache) {
-    if (!(decision instanceof DmnDecisionTable)) {
+  public List<DmnDecisionTableListener> getDecisionTableListeners() {
+    return decisionTableListeners;
+  }
+
+  public void setDecisionTableListeners(List<DmnDecisionTableListener> decisionTableListeners) {
+    this.decisionTableListeners = decisionTableListeners;
+  }
+
+  public DmnDecisionResult evaluateDecision(DmnDecision decision, Map<String, Object> variables) {
+    if (decision instanceof DmnDecisionTable) {
+      return evaluateDecisionTable((DmnDecisionTable) decision, variables);
+    }
+    else {
       throw LOG.decisionTypeNotSupported(decision);
     }
+  }
 
-    DmnDecisionTable decisionTable = (DmnDecisionTable) decision;
-    List<DmnRule> matchingRules = new ArrayList<DmnRule>();
+  protected DmnDecisionResult evaluateDecisionTable(DmnDecisionTable decisionTable, Map<String, Object> variables) {
+    Map<String, Object> evaluationCache = new HashMap<String, Object>();
 
+    DmnDecisionTableResultImpl decisionTableResult = new DmnDecisionTableResultImpl();
+    decisionTableResult.setEvaluationMetric(calculateEvaluationMetric(decisionTable));
+
+    // evaluate inputs
+    Map<String, DmnDecisionTableValue> inputs = evaluateDecisionTableInputs(decisionTable, variables, evaluationCache);
+    decisionTableResult.setInputs(inputs);
+
+    // evaluate rules
+    List<DmnDecisionTableRule> matchingRules = decisionTableResult.getMatchingRules();
     for (DmnRule rule : decisionTable.getRules()) {
-      if (isApplicable(rule, evaluationCache)) {
-        matchingRules.add(rule);
+      if (isRuleApplicable(rule, variables, inputs, evaluationCache)) {
+        DmnDecisionTableRuleImpl matchingRule = evaluateMatchingRule(rule, variables, evaluationCache);
+        matchingRules.add(matchingRule);
       }
     }
 
-    return getDecisionOutput(decisionTable, matchingRules, evaluationCache);
+    // generate result
+    return generateDecisionTableResult(decisionTable, decisionTableResult);
   }
 
-  protected DmnDecisionResult getDecisionOutput(DmnDecisionTable decisionTable, List<DmnRule> matchingRules, Map<String, Object> evaluationCache) {
+  protected DmnDecisionResult generateDecisionTableResult(DmnDecisionTable decisionTable, DmnDecisionTableResult decisionTableResult) {
+    // call hit policy handler
     DmnHitPolicyHandler hitPolicyHandler = getHitPolicyHandlerChecked(decisionTable.getHitPolicy());
-    List<DmnRule> outputRules = hitPolicyHandler.filterMatchingRules(decisionTable, matchingRules);
-    List<DmnDecisionOutput> decisionOutputs = new ArrayList<DmnDecisionOutput>();
+    decisionTableResult = hitPolicyHandler.apply(decisionTable, decisionTableResult);
 
-    for (DmnRule outputRule : outputRules) {
-      DmnDecisionOutput output = getOutput(outputRule, evaluationCache);
-      decisionOutputs.add(output);
+    // notify listeners
+    for (DmnDecisionTableListener decisionTableListener : decisionTableListeners) {
+      decisionTableListener.notify(decisionTable, decisionTableResult);
     }
 
-    return hitPolicyHandler.getDecisionResult(decisionTable, decisionOutputs);
+    // generate output
+    return generateDecisionResult(decisionTableResult);
   }
 
-  public boolean isApplicable(DmnRule rule) {
-    return isApplicable(rule, null);
+  protected DmnDecisionResult generateDecisionResult(DmnDecisionTableResult decisionTableResult) {
+    DmnDecisionResultImpl decisionResult = new DmnDecisionResultImpl();
+    if (decisionTableResult.getCollectResultName() != null || decisionTableResult.getCollectResultValue() != null) {
+      DmnDecisionOutputImpl decisionOutput = new DmnDecisionOutputImpl();
+      decisionOutput.put(decisionTableResult.getCollectResultName(), decisionTableResult.getCollectResultValue());
+      decisionResult.add(decisionOutput);
+    }
+    else {
+      for (DmnDecisionTableRule matchingRule : decisionTableResult.getMatchingRules()) {
+        DmnDecisionOutputImpl decisionOutput = new DmnDecisionOutputImpl();
+        for (DmnDecisionTableValue outputValue : matchingRule.getOutputs().values()) {
+          decisionOutput.put(outputValue.getOutputName(), outputValue.getValue());
+        }
+        decisionResult.add(decisionOutput);
+      }
+    }
+    return decisionResult;
   }
 
-  public boolean isApplicable(DmnRule rule, Map<String, Object> evaluationCache) {
+  protected long calculateEvaluationMetric(DmnDecisionTable decisionTable) {
+    return decisionTable.getClauses().size() * decisionTable.getRules().size();
+  }
+
+  protected Map<String, DmnDecisionTableValue> evaluateDecisionTableInputs(DmnDecisionTable decisionTable, Map<String, Object> variables, Map<String, Object> evaluationCache) {
+    Map<String, DmnDecisionTableValue> inputs = new HashMap<String, DmnDecisionTableValue>();
+    for (DmnClause clause : decisionTable.getClauses()) {
+      if (clause.isInputClause()) {
+        DmnDecisionTableValue input = evaluateInputClause(clause, variables, evaluationCache);
+        inputs.put(input.getKey(), input);
+      }
+    }
+    return inputs;
+  }
+
+  protected DmnDecisionTableValue evaluateInputClause(DmnClause clause, Map<String, Object> variables, Map<String, Object> evaluationCache) {
+    DmnDecisionTableValueImpl input = new DmnDecisionTableValueImpl(clause);
+    DmnExpression inputExpression = clause.getInputExpression();
+    if (inputExpression != null) {
+      Object value = evaluateExpression(inputExpression, variables, evaluationCache);
+      input.setValue(value);
+    }
+    return input;
+  }
+
+  protected boolean isRuleApplicable(DmnRule rule, Map<String, Object> variables, Map<String, DmnDecisionTableValue> inputs, Map<String, Object> evaluationCache) {
     Map<String, Boolean> clauseSatisfied = new HashMap<String, Boolean>();
     List<DmnClauseEntry> conditions = rule.getConditions();
 
-    // save variable context
-    DmnVariableContext originalVariableContext = getVariableContextChecked();
-
     for (DmnClauseEntry condition : conditions) {
-      DmnClause clause = condition.getClause();
-      Boolean alreadySatisfied = clauseSatisfied.get(clause.getKey());
+      String clauseKey = condition.getClause().getKey();
+      Boolean alreadySatisfied = clauseSatisfied.get(clauseKey);
       if (alreadySatisfied != null && alreadySatisfied) {
         // skip condition if clause already satisfied
         continue;
       }
 
       // set temporary evaluation variable cache
-      DmnDelegatingVariableContext evaluationVariableContext = new DmnDelegatingVariableContext(originalVariableContext);
-      setVariableContext(evaluationVariableContext);
-      DmnExpression inputExpression = clause.getInputExpression();
-      if (inputExpression != null) {
-        Object inputExpressionResult = evaluate(inputExpression, evaluationCache);
-        String outputName = clause.getOutputName();
-        evaluationVariableContext.setVariable(outputName, inputExpressionResult);
+      Map<String, Object> localVariables = new HashMap<String, Object>(variables);
+
+      // set input clause variable
+      if (inputs.containsKey(clauseKey)) {
+        DmnDecisionTableValue inputValue = inputs.get(clauseKey);
+        localVariables.put(inputValue.getOutputName(), inputValue.getValue());
       }
 
-      boolean applicable = isApplicable(condition, evaluationCache);
-      clauseSatisfied.put(clause.getKey(), applicable);
+      boolean applicable = isExpressionApplicable(condition, localVariables, evaluationCache);
+      clauseSatisfied.put(clauseKey, applicable);
     }
-
-    // reset variable context
-    setVariableContext(originalVariableContext);
 
     // the rule is applicable if all involved clauses are satisfied
     return !clauseSatisfied.containsValue(false);
   }
 
-  public <T> T evaluate(DmnExpression expression) {
-    return evaluate(expression, null);
+  protected DmnDecisionTableRuleImpl evaluateMatchingRule(DmnRule rule, Map<String, Object> variables, Map<String, Object> evaluationCache) {
+    DmnDecisionTableRuleImpl matchingRule = new DmnDecisionTableRuleImpl();
+    matchingRule.setKey(rule.getKey());
+    Map<String, DmnDecisionTableValue> ruleOutputs = evaluateRuleOutput(rule, variables, evaluationCache);
+    matchingRule.setOutputs(ruleOutputs);
+    return matchingRule;
   }
 
+  protected Map<String, DmnDecisionTableValue> evaluateRuleOutput(DmnRule rule, Map<String, Object> variables, Map<String, Object> evaluationCache) {
+    Map<String, DmnDecisionTableValue> outputs = new HashMap<String, DmnDecisionTableValue>();
+    for (DmnClauseEntry conclusion : rule.getConclusions()) {
+      DmnDecisionTableValueImpl output = new DmnDecisionTableValueImpl(conclusion.getClause());
+      Object value = evaluateExpression(conclusion, variables, evaluationCache);
+      output.setValue(value);
+      outputs.put(output.getKey(), output);
+    }
+    return outputs;
+  }
 
-  @SuppressWarnings("unchecked")
-  public <T> T evaluate(DmnExpression expression, Map<String, Object> evaluationCache) {
+  protected boolean isExpressionApplicable(DmnExpression expression, Map<String, Object> variables, Map<String, Object> evaluationCache) {
+    Object result = evaluateExpression(expression, variables, evaluationCache);
+    return result != null && result.equals(true);
+  }
+
+  protected Object evaluateExpression(DmnExpression expression, Map<String, Object> variables, Map<String, Object> evaluationCache) {
     String expressionKey = expression.getKey();
-    Object result;
-
     if (evaluationCache != null && evaluationCache.containsKey(expressionKey)) {
-      result = evaluationCache.get(expressionKey);
+      return evaluationCache.get(expressionKey);
     }
     else {
-      result = evaluateExpression(expression);
-    }
-
-    try {
-      return (T) result;
-    } catch (ClassCastException e) {
-      throw LOG.unableToCastExpressionResult(result, e);
+      Object value = evaluateExpression(expression, variables);
+      if (evaluationCache != null) {
+        evaluationCache.put(expressionKey, value);
+      }
+      return value;
     }
   }
 
-  protected Object evaluateExpression(DmnExpression expression) {
+  protected Object evaluateExpression(DmnExpression expression, Map<String, Object> variables) {
     String expressionText = expression.getExpression();
     if (expressionText != null) {
       String expressionLanguage = expression.getExpressionLanguage();
       ScriptEngine scriptEngine = getScriptEngineForNameChecked(expressionLanguage);
-      Bindings bindings = createBindings(scriptEngine);
+      Bindings bindings = createBindings(scriptEngine, variables);
 
       try {
         return scriptEngine.eval(expressionText, bindings);
@@ -214,29 +270,6 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
     else {
       return null;
     }
-  }
-
-  public boolean isApplicable(DmnExpression expression) {
-    return isApplicable(expression, null);
-  }
-
-  public DmnDecisionOutput getOutput(DmnRule rule) {
-    return getOutput(rule, null);
-  }
-
-  public DmnDecisionOutput getOutput(DmnRule rule, Map<String, Object> evaluationCache) {
-    DmnDecisionOutputImpl output = new DmnDecisionOutputImpl();
-    for (DmnClauseEntry conclusion : rule.getConclusions()) {
-      Object result = evaluate(conclusion, evaluationCache);
-      String outputName = conclusion.getClause().getOutputName();
-      output.put(outputName, result);
-    }
-    return output;
-  }
-
-  public boolean isApplicable(DmnExpression expression, Map<String, Object> evaluationCache) {
-    Object result = evaluate(expression, evaluationCache);
-    return result != null && result.equals(true);
   }
 
   protected ScriptEngine getScriptEngineForNameChecked(String expressionLanguage) {
@@ -256,9 +289,9 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
     return scriptEngineResolver.getScriptEngineForLanguage(expressionLanguage);
   }
 
-  protected Bindings createBindings(ScriptEngine scriptEngine) {
+  protected Bindings createBindings(ScriptEngine scriptEngine, Map<String, Object> variables) {
     Bindings bindings = scriptEngine.createBindings();
-    bindings.putAll(getVariableContextChecked().getVariables());
+    bindings.putAll(variables);
     return bindings;
   }
 

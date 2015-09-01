@@ -15,16 +15,10 @@ package org.camunda.bpm.dmn.engine;
 
 import java.util.List;
 
-import org.camunda.bpm.dmn.engine.context.DmnDecisionContext;
-
 public interface DmnRule extends DmnElement {
 
   List<DmnClauseEntry> getConditions();
 
   List<DmnClauseEntry> getConclusions();
-
-  boolean isApplicable(DmnDecisionContext decisionContext);
-
-  DmnDecisionOutput getOutput(DmnDecisionContext decisionContext);
 
 }

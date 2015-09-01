@@ -13,20 +13,18 @@
 
 package org.camunda.bpm.dmn.engine.impl.context;
 
+import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.context.DmnContextFactory;
 import org.camunda.bpm.dmn.engine.context.DmnDecisionContext;
-import org.camunda.bpm.dmn.engine.context.DmnVariableContext;
 
 public class DmnContextFactoryImpl implements DmnContextFactory {
 
-  public DmnDecisionContext createDecisionContext() {
+  public DmnDecisionContext createDecisionContext(DmnEngineConfiguration configuration) {
     DmnDecisionContextImpl decisionContext = new DmnDecisionContextImpl();
-    decisionContext.setVariableContext(createVariableContext());
+    decisionContext.setHitPolicyHandlers(configuration.getHitPolicyHandlers());
+    decisionContext.setScriptEngineResolver(configuration.getScriptEngineResolver());
+    decisionContext.setDecisionTableListeners(configuration.getCustomDmnDecisionTableListeners());
     return decisionContext;
-  }
-
-  public DmnVariableContext createVariableContext() {
-    return new DmnVariableContextImpl();
   }
 
 }

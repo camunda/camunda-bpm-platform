@@ -13,11 +13,11 @@
 
 package org.camunda.bpm.dmn.engine.impl;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
-
 import java.io.Serializable;
 import java.util.ArrayList;
+
+import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
+import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 
 public class DmnDecisionResultImpl extends ArrayList<DmnDecisionOutput> implements DmnDecisionResult, Serializable {
 

@@ -25,6 +25,10 @@ public interface DmnClause extends DmnElement {
 
   List<DmnClauseEntry> getInputEntries();
 
+  boolean isInputClause();
+
   List<DmnExpression> getOutputEntries();
+
+  boolean isOutputClause();
 
 }

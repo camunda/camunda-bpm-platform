@@ -13,30 +13,15 @@
 
 package org.camunda.bpm.dmn.engine.impl.hitpolicy;
 
-import java.util.Collections;
-import java.util.List;
-
-import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTable;
-import org.camunda.bpm.dmn.engine.DmnRule;
-import org.camunda.bpm.model.dmn.HitPolicy;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
+import org.camunda.bpm.dmn.engine.hitpolicy.DmnHitPolicyHandler;
 
-public class OutputOrderHitPolicyHandler extends AbstractDmnHitPolicyHandler {
+public class OutputOrderHitPolicyHandler implements DmnHitPolicyHandler {
 
-  public static final HitPolicy HIT_POLICY = HitPolicy.OUTPUT_ORDER;
-
-  public HitPolicy getHandledHitPolicy() {
-    return HIT_POLICY;
-  }
-
-  public boolean handlesHitPolicy(HitPolicy hitPolicy) {
-    return HIT_POLICY.equals(hitPolicy);
-  }
-
-  public List<DmnRule> filterMatchingRules(DmnDecisionTable decisionTable, List<DmnRule> matchingRules) {
+  public DmnDecisionTableResult apply(DmnDecisionTable decisionTable, DmnDecisionTableResult decisionTableResult) {
     // TODO: implement output ordering
-    return matchingRules;
+    return decisionTableResult;
   }
 
 }

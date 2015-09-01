@@ -38,10 +38,17 @@ public interface DmnEngineConfiguration {
 
   List<DmnTransformListener> getCustomPostDmnTransformListeners();
 
+  List<DmnDecisionTableListener> getCustomPreDmnDecisionTableListeners();
+
+  List<DmnDecisionTableListener> getCustomDmnDecisionTableListeners();
+
+  List<DmnDecisionTableListener> getCustomPostDmnDecisionTableListeners();
+
   Map<HitPolicy, DmnHitPolicyHandler> getHitPolicyHandlers();
 
   ScriptEngineResolver getScriptEngineResolver();
 
   DmnEngine buildEngine();
+
 
 }

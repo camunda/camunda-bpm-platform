@@ -15,38 +15,36 @@ package org.camunda.bpm.dmn.engine.impl.hitpolicy;
 
 import java.util.List;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
-
 public class CollectSumAggregator extends AbstractDmnHitPolicyNumberAggregator {
 
-  protected DmnDecisionResult aggregateIntegerValues(String name, List<Integer> intValues) {
+  protected Object aggregateIntegerValues(List<Integer> intValues) {
     int sum = 0;
     for (Integer intValue : intValues) {
       if (intValue != null) {
         sum += intValue;
       }
     }
-    return createAggregatedDecisionResult(name, sum);
+    return sum;
   }
 
-  protected DmnDecisionResult aggregateLongValues(String name, List<Long> longValues) {
+  protected Object aggregateLongValues(List<Long> longValues) {
     long sum = 0L;
     for (Long longValue : longValues) {
       if (longValue != null) {
         sum += longValue;
       }
     }
-    return createAggregatedDecisionResult(name, sum);
+    return sum;
   }
 
-  protected DmnDecisionResult aggregateDoubleValues(String name, List<Double> doubleValues) {
+  protected Object aggregateDoubleValues(List<Double> doubleValues) {
     double sum = 0.0;
     for (Double doubleValue : doubleValues) {
       if (doubleValue != null) {
         sum += doubleValue;
       }
     }
-    return createAggregatedDecisionResult(name, sum);
+    return sum;
   }
 
 }

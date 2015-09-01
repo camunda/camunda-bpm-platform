@@ -16,32 +16,27 @@ package org.camunda.bpm.dmn.engine.impl.hitpolicy;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
-import org.camunda.bpm.dmn.engine.DmnDecisionTable;
 import org.camunda.bpm.dmn.engine.hitpolicy.DmnHitPolicyAggregator;
-import org.camunda.bpm.dmn.engine.impl.DmnDecisionOutputImpl;
-import org.camunda.bpm.dmn.engine.impl.DmnDecisionResultImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnLogger;
 
 public abstract class AbstractDmnHitPolicyNumberAggregator implements DmnHitPolicyAggregator {
 
-  public final static DmnHitPolicyLogger LOG = DmnLogger.HIT_POLICY_LOGGER;
+  public static final DmnHitPolicyLogger LOG = DmnLogger.HIT_POLICY_LOGGER;
 
-  public DmnDecisionResult aggregate(String outputName, List<Object> outputValues) {
+  public Object aggregate(List<Object> outputValues) {
     if (outputValues.isEmpty()) {
-      // return empty result if no values to aggregate
-      return new DmnDecisionResultImpl();
+      // return null if no values to aggregate
+      return null;
     }
     else {
-      return aggregateNumberValues(outputName, outputValues);
+      return aggregateNumberValues(outputValues);
     }
   }
 
-  protected DmnDecisionResult aggregateNumberValues(String name, List<Object> values) {
+  protected Object aggregateNumberValues(List<Object> values) {
     try {
       List<Integer> intValues = convertValuesToInteger(values);
-      return aggregateIntegerValues(name, intValues);
+      return aggregateIntegerValues(intValues);
     }
     catch (DmnHitPolicyException e) {
       // ignore
@@ -49,7 +44,7 @@ public abstract class AbstractDmnHitPolicyNumberAggregator implements DmnHitPoli
 
     try {
       List<Long> longValues = convertValuesToLong(values);
-      return aggregateLongValues(name, longValues);
+      return aggregateLongValues(longValues);
     }
     catch (DmnHitPolicyException e) {
       // ignore
@@ -57,7 +52,7 @@ public abstract class AbstractDmnHitPolicyNumberAggregator implements DmnHitPoli
 
     try {
       List<Double> doubleValues = convertValuesToDouble(values);
-      return aggregateDoubleValues(name, doubleValues);
+      return aggregateDoubleValues(doubleValues);
     }
     catch (DmnHitPolicyException e) {
       // ignore
@@ -66,11 +61,11 @@ public abstract class AbstractDmnHitPolicyNumberAggregator implements DmnHitPoli
     throw LOG.unableToConvertValuesToAggregatableTypes(values, Integer.class, Long.class, Double.class);
   }
 
-  protected abstract DmnDecisionResult aggregateIntegerValues(String name, List<Integer> intValues);
+  protected abstract Object aggregateIntegerValues(List<Integer> intValues);
 
-  protected abstract DmnDecisionResult aggregateLongValues(String name, List<Long> longValues);
+  protected abstract Object aggregateLongValues(List<Long> longValues);
 
-  protected abstract DmnDecisionResult aggregateDoubleValues(String name, List<Double> doubleValues);
+  protected abstract Object aggregateDoubleValues(List<Double> doubleValues);
 
   protected List<Integer> convertValuesToInteger(List<Object> values) {
     List<Integer> intValues = new ArrayList<Integer>();
@@ -126,14 +121,6 @@ public abstract class AbstractDmnHitPolicyNumberAggregator implements DmnHitPoli
     }
 
     return doubleValues;
-  }
-
-  protected DmnDecisionResult createAggregatedDecisionResult(String name, Object value) {
-    DmnDecisionOutputImpl decisionOutput = new DmnDecisionOutputImpl();
-    decisionOutput.put(name, value);
-    DmnDecisionResultImpl decisionResult = new DmnDecisionResultImpl();
-    decisionResult.add(decisionOutput);
-    return decisionResult;
   }
 
 }

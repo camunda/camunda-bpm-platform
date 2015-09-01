@@ -15,30 +15,21 @@ package org.camunda.bpm.dmn.engine.impl.hitpolicy;
 
 import java.util.List;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTable;
-import org.camunda.bpm.dmn.engine.DmnRule;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableRule;
 import org.camunda.bpm.dmn.engine.hitpolicy.DmnHitPolicyHandler;
-import org.camunda.bpm.dmn.engine.impl.DmnDecisionResultImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnLogger;
-import org.camunda.bpm.model.dmn.HitPolicy;
 
-public class UniqueHitPolicyHandler extends AbstractDmnHitPolicyHandler {
+public class UniqueHitPolicyHandler implements DmnHitPolicyHandler {
 
-  public static final HitPolicy HIT_POLICY = HitPolicy.UNIQUE;
+  public static final DmnHitPolicyLogger LOG = DmnLogger.HIT_POLICY_LOGGER;
 
-  public HitPolicy getHandledHitPolicy() {
-    return HIT_POLICY;
-  }
+  public DmnDecisionTableResult apply(DmnDecisionTable decisionTable, DmnDecisionTableResult decisionTableResult) {
+    List<DmnDecisionTableRule> matchingRules = decisionTableResult.getMatchingRules();
 
-  public boolean handlesHitPolicy(HitPolicy hitPolicy) {
-    return HIT_POLICY.equals(hitPolicy);
-  }
-
-  public List<DmnRule> filterMatchingRules(DmnDecisionTable decisionTable, List<DmnRule> matchingRules) {
     if (matchingRules.size() < 2) {
-      return matchingRules;
+      return decisionTableResult;
     }
     else {
       throw LOG.uniqueHitPolicyOnlyAllowsSingleMatchingRule(matchingRules);

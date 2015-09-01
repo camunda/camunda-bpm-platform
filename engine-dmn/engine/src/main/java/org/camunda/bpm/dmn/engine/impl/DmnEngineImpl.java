@@ -22,10 +22,8 @@ import org.camunda.bpm.dmn.engine.DmnDecisionModel;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
-import org.camunda.bpm.dmn.engine.ScriptEngineResolver;
 import org.camunda.bpm.dmn.engine.context.DmnContextFactory;
 import org.camunda.bpm.dmn.engine.context.DmnDecisionContext;
-import org.camunda.bpm.dmn.engine.context.DmnVariableContext;
 import org.camunda.bpm.dmn.engine.transform.DmnTransformer;
 import org.camunda.bpm.model.dmn.DmnModelException;
 import org.camunda.bpm.model.dmn.DmnModelInstance;
@@ -39,13 +37,11 @@ public class DmnEngineImpl implements DmnEngine {
   protected DmnEngineConfiguration configuration;
   protected DmnTransformer transformer;
   protected DmnContextFactory contextFactory;
-  protected ScriptEngineResolver scriptEngineResolver;
 
   public DmnEngineImpl(DmnEngineConfiguration configuration) {
     this.configuration = configuration;
     this.transformer = configuration.getTransformer();
     this.contextFactory = configuration.getDmnContextFactory();
-    this.scriptEngineResolver = configuration.getScriptEngineResolver();
   }
 
   public DmnEngineConfiguration getConfiguration() {
@@ -136,12 +132,8 @@ public class DmnEngineImpl implements DmnEngine {
   }
 
   public DmnDecisionResult evaluate(DmnDecision decision, Map<String, Object> variables) {
-    DmnDecisionContext decisionContext = contextFactory.createDecisionContext();
-    DmnVariableContext variableContext = decisionContext.getVariableContextChecked();
-    variableContext.getVariables().putAll(variables);
-    decisionContext.setScriptEngineResolver(scriptEngineResolver);
-    decisionContext.setHitPolicyHandlers(getConfiguration().getHitPolicyHandlers());
-    return decisionContext.evaluate(decision);
+    DmnDecisionContext decisionContext = contextFactory.createDecisionContext(configuration);
+    return decisionContext.evaluateDecision(decision, variables);
   }
 
   public DmnDecisionResult evaluate(DmnDecisionModel decisionModel, Map<String, Object> variables) {

@@ -13,58 +13,48 @@
 
 package org.camunda.bpm.dmn.engine.impl.hitpolicy;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTable;
-import org.camunda.bpm.dmn.engine.DmnRule;
-import org.camunda.bpm.dmn.engine.impl.DmnDecisionResultImpl;
-import org.camunda.bpm.model.dmn.HitPolicy;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableRule;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableValue;
+import org.camunda.bpm.dmn.engine.hitpolicy.DmnHitPolicyHandler;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableResultImpl;
+import org.camunda.bpm.dmn.engine.impl.DmnLogger;
 
-public class AnyHitPolicyHandler extends AbstractDmnHitPolicyHandler {
+public class AnyHitPolicyHandler implements DmnHitPolicyHandler {
 
-  public static final HitPolicy HIT_POLICY = HitPolicy.ANY;
+  public static final DmnHitPolicyLogger LOG = DmnLogger.HIT_POLICY_LOGGER;
 
-  public HitPolicy getHandledHitPolicy() {
-    return HIT_POLICY;
-  }
+  public DmnDecisionTableResult apply(DmnDecisionTable decisionTable, DmnDecisionTableResult decisionTableResult) {
+    List<DmnDecisionTableRule> matchingRules = decisionTableResult.getMatchingRules();
 
-  public boolean handlesHitPolicy(HitPolicy hitPolicy) {
-    return HIT_POLICY.equals(hitPolicy);
-  }
-
-  public List<DmnRule> filterMatchingRules(DmnDecisionTable decisionTable, List<DmnRule> matchingRules) {
-    return matchingRules;
-  }
-
-  @Override
-  public DmnDecisionResult getDecisionResult(DmnDecisionTable decisionTable, List<DmnDecisionOutput> decisionOutputs) {
-    DmnDecisionResult decisionResult = new DmnDecisionResultImpl();
-    if (!decisionOutputs.isEmpty()) {
-      DmnDecisionOutput firstDecisionOutput = decisionOutputs.get(0);
-      if (allOutputsAreEqual(decisionOutputs)) {
-        decisionResult.add(firstDecisionOutput);
-      }
-      else {
-        throw LOG.anyHitPolicyRequiresThatAllOutputsAreEqual(decisionOutputs);
+    if (!matchingRules.isEmpty()) {
+      if (allOutputsAreEqual(matchingRules)) {
+        DmnDecisionTableRule firstMatchingRule = matchingRules.get(0);
+        ((DmnDecisionTableResultImpl) decisionTableResult).setMatchingRules(Collections.singletonList(firstMatchingRule));
+      } else {
+        throw LOG.anyHitPolicyRequiresThatAllOutputsAreEqual(matchingRules);
       }
     }
-    return decisionResult;
+
+    return decisionTableResult;
   }
 
-  protected boolean allOutputsAreEqual(List<DmnDecisionOutput> decisionOutputs) {
-    DmnDecisionOutput firstDecisionOutput = decisionOutputs.get(0);
-    if (firstDecisionOutput == null) {
-      for (int i = 1; i < decisionOutputs.size(); i++) {
-        if (decisionOutputs.get(i) != null) {
+  protected boolean allOutputsAreEqual(List<DmnDecisionTableRule> matchingRules) {
+    Map<String, DmnDecisionTableValue> firstOutputs = matchingRules.get(0).getOutputs();
+    if (firstOutputs == null) {
+      for (int i = 1; i < matchingRules.size(); i++) {
+        if (matchingRules.get(i).getOutputs() != null) {
           return false;
         }
       }
-    }
-    else {
-      for (int i = 1; i < decisionOutputs.size(); i++) {
-        if (!firstDecisionOutput.equals(decisionOutputs.get(i))) {
+    } else {
+      for (int i = 1; i < matchingRules.size(); i++) {
+        if (!firstOutputs.equals(matchingRules.get(i).getOutputs())) {
           return false;
         }
       }

@@ -11,20 +11,20 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.dmn.engine.context;
+package org.camunda.bpm.dmn.engine;
 
 import java.util.Map;
 
-public interface DmnVariableContext {
+public interface DmnDecisionTableRule {
 
-  void setVariables(Map<String, Object> variables);
+  /**
+   * @return the id of the rule from the DMN XML
+   */
+  String getKey();
 
-  Map<String, Object> getVariables();
-
-  void setVariable(String name, Object value);
-
-  <T> T getVariable(String name);
-
-  void removeVariable(String name);
+  /**
+   * @return the output values of this rule
+   */
+  Map<String, DmnDecisionTableValue> getOutputs();
 
 }

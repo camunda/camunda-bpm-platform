@@ -15,23 +15,12 @@ package org.camunda.bpm.dmn.engine.impl.hitpolicy;
 
 import java.util.List;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
-import org.camunda.bpm.dmn.engine.DmnDecisionTable;
 import org.camunda.bpm.dmn.engine.hitpolicy.DmnHitPolicyAggregator;
-import org.camunda.bpm.dmn.engine.impl.DmnDecisionOutputImpl;
-import org.camunda.bpm.dmn.engine.impl.DmnDecisionResultImpl;
 
 public class CollectCountAggregator implements DmnHitPolicyAggregator {
 
-  public DmnDecisionResult aggregate(String outputName, List<Object> outputValues) {
-    long count = outputValues.size();
-
-    DmnDecisionOutputImpl decisionOutput = new DmnDecisionOutputImpl();
-    decisionOutput.put(outputName, count);
-    DmnDecisionResultImpl decisionResult = new DmnDecisionResultImpl();
-    decisionResult.add(decisionOutput);
-    return decisionResult;
+  public Object aggregate(List<Object> outputValues) {
+    return (long) outputValues.size();
   }
 
 }

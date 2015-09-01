@@ -34,8 +34,8 @@ public abstract class DmnDecisionTest {
 
   @Before
   public void initEngineAndDecision() {
-    engine = dmnEngineRule.engine;
-    decision = dmnEngineRule.decision;
+    engine = dmnEngineRule.getEngine();
+    decision = dmnEngineRule.getDecision();
   }
 
 }

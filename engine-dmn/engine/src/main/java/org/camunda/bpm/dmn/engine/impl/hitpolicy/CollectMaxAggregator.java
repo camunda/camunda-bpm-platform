@@ -16,23 +16,18 @@ package org.camunda.bpm.dmn.engine.impl.hitpolicy;
 import java.util.Collections;
 import java.util.List;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
-
 public class CollectMaxAggregator extends AbstractDmnHitPolicyNumberAggregator {
 
-  protected DmnDecisionResult aggregateIntegerValues(String name, List<Integer> intValues) {
-    Integer max = Collections.max(intValues);
-    return createAggregatedDecisionResult(name, max);
+  protected Object aggregateIntegerValues(List<Integer> intValues) {
+    return Collections.max(intValues);
   }
 
-  protected DmnDecisionResult aggregateLongValues(String name, List<Long> longValues) {
-    Long max = Collections.max(longValues);
-    return createAggregatedDecisionResult(name, max);
+  protected Object aggregateLongValues(List<Long> longValues) {
+    return Collections.max(longValues);
   }
 
-  protected DmnDecisionResult aggregateDoubleValues(String name, List<Double> doubleValues) {
-    Double max = Collections.max(doubleValues);
-    return createAggregatedDecisionResult(name, max);
+  protected Object aggregateDoubleValues(List<Double> doubleValues) {
+    return Collections.max(doubleValues);
   }
 
 }

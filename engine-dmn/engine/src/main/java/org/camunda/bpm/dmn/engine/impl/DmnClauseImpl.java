@@ -19,7 +19,6 @@ import java.util.List;
 import org.camunda.bpm.dmn.engine.DmnClause;
 import org.camunda.bpm.dmn.engine.DmnClauseEntry;
 import org.camunda.bpm.dmn.engine.DmnExpression;
-import org.camunda.bpm.dmn.engine.DmnItemDefinition;
 
 public class DmnClauseImpl extends DmnElementImpl implements DmnClause {
 
@@ -69,6 +68,10 @@ public class DmnClauseImpl extends DmnElementImpl implements DmnClause {
     inputEntries.add(inputEntry);
   }
 
+  public boolean isInputClause() {
+    return inputExpression != null || (inputEntries != null && !inputEntries.isEmpty());
+  }
+
   public List<DmnExpression> getOutputEntries() {
     return outputEntries;
   }
@@ -79,6 +82,10 @@ public class DmnClauseImpl extends DmnElementImpl implements DmnClause {
 
   public void addOutputEntry(DmnExpression outputEntry) {
     outputEntries.add(outputEntry);
+  }
+
+  public boolean isOutputClause() {
+    return outputEntries != null && !outputEntries.isEmpty();
   }
 
   public String toString() {

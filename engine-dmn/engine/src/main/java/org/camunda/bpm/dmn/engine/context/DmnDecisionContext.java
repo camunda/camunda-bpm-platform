@@ -16,38 +16,10 @@ package org.camunda.bpm.dmn.engine.context;
 import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
-import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
-import org.camunda.bpm.dmn.engine.DmnExpression;
-import org.camunda.bpm.dmn.engine.DmnRule;
-import org.camunda.bpm.dmn.engine.ScriptEngineResolver;
-import org.camunda.bpm.dmn.engine.hitpolicy.DmnHitPolicyHandler;
-import org.camunda.bpm.model.dmn.HitPolicy;
 
 public interface DmnDecisionContext {
 
-  void setVariableContext(DmnVariableContext variableContext);
-
-  DmnVariableContext getVariableContext();
-
-  DmnVariableContext getVariableContextChecked();
-
-  void setScriptEngineResolver(ScriptEngineResolver scriptEngineResolver);
-
-  ScriptEngineResolver getScriptEngineResolver();
-
-  void setHitPolicyHandlers(Map<HitPolicy, DmnHitPolicyHandler> hitPolicyHandlers);
-
-  Map<HitPolicy, DmnHitPolicyHandler> getHitPolicyHandlers();
-
-  DmnDecisionResult evaluate(DmnDecision decision);
-
-  boolean isApplicable(DmnRule rule);
-
-  <T> T evaluate(DmnExpression expression);
-
-  boolean isApplicable(DmnExpression expression);
-
-  DmnDecisionOutput getOutput(DmnRule rule);
+  DmnDecisionResult evaluateDecision(DmnDecision decision, Map<String, Object> variables);
 
 }

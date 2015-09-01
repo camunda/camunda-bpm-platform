@@ -13,39 +13,22 @@
 
 package org.camunda.bpm.dmn.engine.impl.hitpolicy;
 
-import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTable;
-import org.camunda.bpm.dmn.engine.DmnRule;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableRule;
 import org.camunda.bpm.dmn.engine.hitpolicy.DmnHitPolicyHandler;
-import org.camunda.bpm.dmn.engine.impl.DmnLogger;
-import org.camunda.bpm.dmn.engine.impl.context.DmnDecisionContextImpl;
-import org.camunda.bpm.model.dmn.HitPolicy;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableResultImpl;
 
-public class FirstHitPolicyHandler extends AbstractDmnHitPolicyHandler {
+public class FirstHitPolicyHandler implements DmnHitPolicyHandler {
 
-  public static final HitPolicy HIT_POLICY = HitPolicy.FIRST;
-
-  public HitPolicy getHandledHitPolicy() {
-    return HIT_POLICY;
-  }
-
-  public boolean handlesHitPolicy(HitPolicy hitPolicy) {
-    return HIT_POLICY.equals(hitPolicy);
-  }
-
-  public List<DmnRule> filterMatchingRules(DmnDecisionTable decisionTable, List<DmnRule> matchingRules) {
-    if (!matchingRules.isEmpty()) {
-      return Collections.singletonList(matchingRules.get(0));
+  public DmnDecisionTableResult apply(DmnDecisionTable decisionTable, DmnDecisionTableResult decisionTableResult) {
+    if (!decisionTableResult.getMatchingRules().isEmpty()) {
+      DmnDecisionTableRule firstMatchedRule = decisionTableResult.getMatchingRules().get(0);
+      ((DmnDecisionTableResultImpl) decisionTableResult).setMatchingRules(Collections.singletonList(firstMatchedRule));
     }
-    else {
-      return Collections.emptyList();
-    }
+    return decisionTableResult;
   }
 
 }

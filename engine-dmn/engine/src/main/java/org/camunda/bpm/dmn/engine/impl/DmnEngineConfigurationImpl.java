@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.dmn.engine.DmnDecisionTableListener;
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.ScriptEngineResolver;
@@ -50,6 +51,9 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
   protected DmnElementHandlerRegistry elementHandlerRegistry;
   protected List<DmnTransformListener> customPreDmnTransformListeners = new ArrayList<DmnTransformListener>();
   protected List<DmnTransformListener> customPostDmnTransformListeners = new ArrayList<DmnTransformListener>();
+  protected List<DmnDecisionTableListener> customPreDmnDecisionTableListeners = new ArrayList<DmnDecisionTableListener>();
+  protected List<DmnDecisionTableListener> customDmnDecisionTableListeners = new ArrayList<DmnDecisionTableListener>();
+  protected List<DmnDecisionTableListener> customPostDmnDecisionTableListeners = new ArrayList<DmnDecisionTableListener>();
   protected Map<HitPolicy, DmnHitPolicyHandler> hitPolicyHandlers;
   protected ScriptEngineResolver scriptEngineResolver;
 
@@ -97,6 +101,30 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
     this.customPostDmnTransformListeners = customPostDmnTransformListeners;
   }
 
+  public List<DmnDecisionTableListener> getCustomPreDmnDecisionTableListeners() {
+    return customPreDmnDecisionTableListeners;
+  }
+
+  public List<DmnDecisionTableListener> getCustomDmnDecisionTableListeners() {
+    return customDmnDecisionTableListeners;
+  }
+
+  public void setCustomPreDmnDecisionTableListeners(List<DmnDecisionTableListener> customPreDmnDecisionTableListeners) {
+    this.customPreDmnDecisionTableListeners = customPreDmnDecisionTableListeners;
+  }
+
+  public void setCustomDmnDecisionTableListeners(List<DmnDecisionTableListener> customDmnDecisionTableListeners) {
+    this.customDmnDecisionTableListeners = customDmnDecisionTableListeners;
+  }
+
+  public List<DmnDecisionTableListener> getCustomPostDmnDecisionTableListeners() {
+    return customPostDmnDecisionTableListeners;
+  }
+
+  public void setCustomPostDmnDecisionTableListeners(List<DmnDecisionTableListener> customPostDmnDecisionTableListeners) {
+    this.customPostDmnDecisionTableListeners = customPostDmnDecisionTableListeners;
+  }
+
   public Map<HitPolicy, DmnHitPolicyHandler> getHitPolicyHandlers() {
     return hitPolicyHandlers;
   }
@@ -123,6 +151,7 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
     initTransformFactory();
     initElementHandlerRegistry();
     initTransformer();
+    initDmnDecisionTableListeners();
     initHitPolicyHandlers();
     initScriptEngineResolver();
   }
@@ -157,6 +186,22 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
   }
 
   protected List<DmnTransformListener> getDefaultDmnTransformListeners() {
+    return Collections.emptyList();
+  }
+
+  protected void initDmnDecisionTableListeners() {
+    List<DmnDecisionTableListener> listeners = new ArrayList<DmnDecisionTableListener>();
+    if (customPreDmnDecisionTableListeners != null) {
+      listeners.addAll(customPreDmnDecisionTableListeners);
+    }
+    listeners.addAll(getDefaultDmnDecisionTableListeners());
+    if (customPostDmnDecisionTableListeners != null) {
+      listeners.addAll(customPostDmnDecisionTableListeners);
+    }
+    setCustomDmnDecisionTableListeners(listeners);
+  }
+
+  protected List<DmnDecisionTableListener> getDefaultDmnDecisionTableListeners() {
     return Collections.emptyList();
   }
 

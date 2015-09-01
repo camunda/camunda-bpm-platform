@@ -17,9 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.dmn.engine.DmnClauseEntry;
-import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
 import org.camunda.bpm.dmn.engine.DmnRule;
-import org.camunda.bpm.dmn.engine.context.DmnDecisionContext;
 
 public class DmnRuleImpl extends DmnElementImpl implements DmnRule {
 
@@ -48,14 +46,6 @@ public class DmnRuleImpl extends DmnElementImpl implements DmnRule {
 
   public void addConclusion(DmnClauseEntry conclusion) {
     conclusions.add(conclusion);
-  }
-
-  public boolean isApplicable(DmnDecisionContext decisionContext) {
-    return decisionContext.isApplicable(this);
-  }
-
-  public DmnDecisionOutput getOutput(DmnDecisionContext decisionContext) {
-    return decisionContext.getOutput(this);
   }
 
   public String toString() {

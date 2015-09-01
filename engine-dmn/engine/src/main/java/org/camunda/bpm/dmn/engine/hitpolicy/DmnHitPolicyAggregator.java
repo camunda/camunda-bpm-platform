@@ -15,9 +15,6 @@ package org.camunda.bpm.dmn.engine.hitpolicy;
 
 import java.util.List;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
-import org.camunda.bpm.dmn.engine.DmnDecisionTable;
 import org.camunda.bpm.dmn.engine.impl.hitpolicy.DmnHitPolicyException;
 
 public interface DmnHitPolicyAggregator {
@@ -25,11 +22,10 @@ public interface DmnHitPolicyAggregator {
   /**
    * Aggregates the decision output to the decision result.
    *
-   * @param outputName the name of the decision output
    * @param outputValues the values of the decision outputs
-   * @return the aggregated decision result
+   * @return the aggregated result value
    * @throws DmnHitPolicyException if the aggregation fails, e.g. it is not applicable to the decision outputs
    */
-  DmnDecisionResult aggregate(String outputName, List<Object> outputValues);
+  Object aggregate(List<Object> outputValues);
 
 }

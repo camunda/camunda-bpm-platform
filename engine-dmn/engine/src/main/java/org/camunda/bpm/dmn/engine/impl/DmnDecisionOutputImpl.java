@@ -13,9 +13,9 @@
 
 package org.camunda.bpm.dmn.engine.impl;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
-
 import java.util.HashMap;
+
+import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
 
 public class DmnDecisionOutputImpl extends HashMap<String, Object> implements DmnDecisionOutput {
 

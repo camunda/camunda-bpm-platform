@@ -11,12 +11,31 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.dmn.engine.context;
+package org.camunda.bpm.dmn.engine;
 
-import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
+/**
+ * The value of a clause of a decision table.
+ */
+public interface DmnDecisionTableValue {
 
-public interface DmnContextFactory {
+  /**
+   * @return the id of the clause from the DMN XML
+   */
+  String getKey();
 
-  DmnDecisionContext createDecisionContext(DmnEngineConfiguration engineConfiguration);
+  /**
+   * @return the name of the clause from the DMN xml or null if non set
+   */
+  String getName();
+
+  /**
+    * @return the output name of this clause
+   */
+  String getOutputName();
+
+  /**
+   * @return the value of the evaluated clause expression or null if no expression given
+   */
+  Object getValue();
 
 }

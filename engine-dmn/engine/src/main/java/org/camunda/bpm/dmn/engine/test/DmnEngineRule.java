@@ -90,5 +90,12 @@ public class DmnEngineRule extends TestWatcher {
     }
   }
 
+  public DmnEngine getEngine() {
+    return engine;
+  }
+
+  public DmnDecision getDecision() {
+    return decision;
+  }
 
 }
