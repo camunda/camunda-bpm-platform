@@ -12,16 +12,32 @@
  */
 package org.camunda.bpm.engine.impl.scripting.engine;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
+
+import javax.script.Bindings;
+import javax.script.Compilable;
+import javax.script.CompiledScript;
+import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineFactory;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
+import org.camunda.bpm.application.ProcessApplicationInterface;
+import org.camunda.bpm.application.ProcessApplicationReference;
+import org.camunda.bpm.application.ProcessApplicationUnavailableException;
 import org.camunda.bpm.dmn.engine.ScriptEngineResolver;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ScriptCompilationException;
 import org.camunda.bpm.engine.delegate.VariableScope;
-
-import javax.script.*;
-import java.util.*;
-import java.util.logging.Logger;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import org.camunda.bpm.engine.impl.context.Context;
 
 /**
  * <p>Manager for JSR-223 {@link ScriptEngine} handling.</p>
@@ -139,6 +155,32 @@ public class ScriptingEngines implements ScriptEngineResolver {
       language = language.toLowerCase();
     }
 
+    ProcessApplicationReference pa = Context.getCurrentProcessApplication();
+
+    ScriptEngine engine = null;
+    if(pa != null) {
+      engine = getPaScriptEngine(language, pa);
+    }
+
+    if(engine == null) {
+      engine = getGlobalScriptEngine(language);
+    }
+
+    return engine;
+  }
+
+  protected ScriptEngine getPaScriptEngine(String language, ProcessApplicationReference pa) {
+    try {
+      ProcessApplicationInterface processApplication = pa.getProcessApplication();
+      return processApplication.getScriptEngineForName(language, enableScriptEngineCaching);
+    }
+    catch (ProcessApplicationUnavailableException e) {
+      throw new ProcessEngineException("Process Application is unavailable.", e);
+    }
+  }
+
+  protected ScriptEngine getGlobalScriptEngine(String language) {
+
     ScriptEngine scriptEngine = null;
 
     if (enableScriptEngineCaching) {
@@ -152,7 +194,6 @@ public class ScriptingEngines implements ScriptEngineResolver {
     ensureNotNull("Can't find scripting engine for '" + language + "'", "scriptEngine", scriptEngine);
 
     return scriptEngine;
-
   }
 
   public Set<String> getAllSupportedLanguages() {

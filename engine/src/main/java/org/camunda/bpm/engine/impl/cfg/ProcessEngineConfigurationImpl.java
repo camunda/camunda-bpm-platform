@@ -367,6 +367,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected ScriptFactory scriptFactory;
   protected boolean autoStoreScriptVariables = false;
   protected boolean enableScriptCompilation = true;
+  protected boolean enableScriptEngineCaching = true;
   protected boolean cmmnEnabled = true;
   protected boolean dmnEnabled = true;
 
@@ -1377,6 +1378,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
     if (scriptingEngines==null) {
       scriptingEngines = new ScriptingEngines(new ScriptBindingsFactory(resolverFactories));
+      scriptingEngines.setEnableScriptEngineCaching(enableScriptEngineCaching);
     }
     if(scriptFactory == null) {
       scriptFactory = new ScriptFactory();
@@ -2727,5 +2729,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setMetricsReporterIdProvider(MetricsReporterIdProvider metricsReporterIdProvider) {
     this.metricsReporterIdProvider = metricsReporterIdProvider;
+  }
+
+  public ProcessEngineConfigurationImpl setEnableScriptEngineCaching(boolean enableScriptEngineCaching) {
+    this.enableScriptEngineCaching = enableScriptEngineCaching;
+    return this;
+  }
+
+  public boolean isEnableScriptEngineCaching() {
+    return enableScriptEngineCaching;
   }
 }

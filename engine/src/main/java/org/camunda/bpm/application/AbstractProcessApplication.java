@@ -18,7 +18,10 @@ import java.util.ServiceLoader;
 import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
+import javax.script.ScriptEngine;
+
 import org.camunda.bpm.application.impl.DefaultElResolverLookup;
+import org.camunda.bpm.application.impl.ProcessApplicationScriptEngineResolver;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.TaskListener;
@@ -38,6 +41,7 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
 
   protected ELResolver processApplicationElResolver;
   protected BeanELResolver processApplicationBeanElResolver;
+  protected ProcessApplicationScriptEngineResolver processApplicationScriptEngineResolver;
 
   protected boolean isDeployed = false;
 
@@ -170,6 +174,17 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
 
   public TaskListener getTaskListener() {
     return null;
+  }
+
+  public ScriptEngine getScriptEngineForName(String scriptEngineName, boolean cache) {
+    if(processApplicationScriptEngineResolver == null) {
+      synchronized (this) {
+        if(processApplicationScriptEngineResolver == null) {
+          processApplicationScriptEngineResolver = new ProcessApplicationScriptEngineResolver(getProcessApplicationClassloader());
+        }
+      }
+    }
+    return processApplicationScriptEngineResolver.getScriptEngine(scriptEngineName, cache);
   }
 
 }
