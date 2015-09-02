@@ -18,7 +18,6 @@ module.exports = function(config, requireJsConfig) {
   var options = {
       stubModules: ['text'],
 
-      optimize: '<%= (buildTarget === "dist" ? "uglify2" : "none") %>',
       preserveLicenseComments: false,
       generateSourceMaps: true,
 
