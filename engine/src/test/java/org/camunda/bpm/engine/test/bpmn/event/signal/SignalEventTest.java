@@ -445,4 +445,23 @@ public class SignalEventTest extends PluggableProcessEngineTestCase {
     assertEquals(1, taskService.createTaskQuery().count());
   }
 
+  /**
+   * CAM-4527
+   */
+  @Deployment
+  public void FAILING_testNoContinuationWhenSignalInterruptsThrowingActivity() {
+
+    // given a process instance
+    runtimeService.startProcessInstanceByKey("signalEventSubProcess");
+
+    // when throwing a signal in the sub process that interrupts the subprocess
+    Task subProcessTask = taskService.createTaskQuery().singleResult();
+    taskService.complete(subProcessTask.getId());
+
+    // then execution should not have been continued after the subprocess
+    assertEquals(1, taskService.createTaskQuery().count());
+    assertEquals(0, taskService.createTaskQuery().taskDefinitionKey("afterSubProcessTask").count());
+    assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").count());
+  }
+
 }
