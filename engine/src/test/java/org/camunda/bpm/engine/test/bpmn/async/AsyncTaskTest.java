@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener;
+import org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
 import org.camunda.bpm.engine.variable.Variables;
 
 /**
@@ -629,7 +630,7 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
    * CAM-3707
    */
   @Deployment
-  public void FAILING_testDeleteShouldNotInvokeListeners() {
+  public void testDeleteShouldNotInvokeListeners() {
     RecorderExecutionListener.clear();
 
     // given
@@ -648,10 +649,36 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
   }
 
   /**
+   * CAM-3707
+   */
+  @Deployment
+  public void testDeleteInScopeShouldNotInvokeListeners() {
+    RecorderExecutionListener.clear();
+
+    // given
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("asyncListenerSubProcess",
+        Variables.createVariables().putValue("listener", new RecorderExecutionListener()));
+    assertEquals(1, managementService.createJobQuery().count());
+
+    // when deleting the process instance
+    runtimeService.deleteProcessInstance(instance.getId(), "");
+
+    // then the async task end listener has not been executed but the listeners of the sub
+    // process and the process
+
+    List<RecordedEvent> recordedEvents = RecorderExecutionListener.getRecordedEvents();
+    assertEquals(2, recordedEvents.size());
+    assertEquals("subProcess", recordedEvents.get(0).getActivityId());
+    assertNull(recordedEvents.get(1).getActivityId()); // process instance end event has no activity id
+
+    RecorderExecutionListener.clear();
+  }
+
+  /**
    * CAM-3708
    */
   @Deployment
-  public void FAILING_testDeleteShouldNotInvokeOutputMapping() {
+  public void testDeleteShouldNotInvokeOutputMapping() {
     // given
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("asyncOutputMapping");
     assertEquals(1, managementService.createJobQuery().count());
@@ -665,6 +692,29 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
       assertEquals(0, historyService.createHistoricVariableInstanceQuery().count());
     }
 
+  }
+
+  /**
+   * CAM-3708
+   */
+  @Deployment
+  public void testDeleteInScopeShouldNotInvokeOutputMapping() {
+    // given
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("asyncOutputMappingSubProcess");
+    assertEquals(1, managementService.createJobQuery().count());
+
+    // when
+    runtimeService.deleteProcessInstance(instance.getId(), "");
+
+    // then
+    if (processEngineConfiguration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_AUDIT.getId()) {
+      // the output mapping of the task has not been executed because the
+      // activity was not active yet
+      assertEquals(0, historyService.createHistoricVariableInstanceQuery().variableName("taskOutputMappingExecuted").count());
+
+      // but the containing sub process output mapping was executed
+      assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableName("subProcessOutputMappingExecuted").count());
+    }
   }
 
 }

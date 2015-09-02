@@ -13,11 +13,8 @@
 
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
-import org.camunda.bpm.engine.impl.pvm.delegate.ModificationObserverBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.CompensationBehavior;
@@ -29,10 +26,6 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
  * @author Daniel Meyer
  */
 public class PvmAtomicOperationDeleteCascadeFireActivityEnd extends PvmAtomicOperationActivityInstanceEnd {
-
-  protected boolean isSkipNotifyListeners(PvmExecutionImpl execution) {
-    return false;
-  }
 
   @Override
   protected PvmExecutionImpl eventNotificationsStarted(PvmExecutionImpl execution) {
@@ -62,14 +55,13 @@ public class PvmAtomicOperationDeleteCascadeFireActivityEnd extends PvmAtomicOpe
   @Override
   protected void eventNotificationsCompleted(PvmExecutionImpl execution) {
 
-    super.eventNotificationsCompleted(execution);
-
     PvmActivity activity = execution.getActivity();
 
     if (execution.isScope()
-        && executesNonScopeActivity(execution)
+        && (executesNonScopeActivity(execution) || isAsyncBeforeActivity(execution))
         && !CompensationBehavior.executesNonScopeCompensationHandler(execution))  {
       // case this is a scope execution and the activity is not a scope
+      execution.leaveActivityInstance();
       execution.setActivity(getFlowScopeActivity(activity));
       execution.performOperation(DELETE_CASCADE_FIRE_ACTIVITY_END);
 
@@ -108,6 +100,10 @@ public class PvmAtomicOperationDeleteCascadeFireActivityEnd extends PvmAtomicOpe
   protected boolean executesNonScopeActivity(PvmExecutionImpl execution) {
     ActivityImpl activity = execution.getActivity();
     return activity!=null && !activity.isScope();
+  }
+
+  protected boolean isAsyncBeforeActivity(PvmExecutionImpl execution) {
+    return execution.getActivityId() != null && execution.getActivityInstanceId() == null;
   }
 
   protected ActivityImpl getFlowScopeActivity(PvmActivity activity) {

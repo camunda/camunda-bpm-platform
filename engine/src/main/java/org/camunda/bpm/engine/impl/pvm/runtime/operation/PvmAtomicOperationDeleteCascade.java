@@ -13,8 +13,6 @@
 
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
-import java.util.List;
-
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 

@@ -55,5 +55,4 @@ public abstract class FlowNodeActivityBehavior implements SignallableActivityBeh
 
     throw LOG.unsupportedSignalException(execution.getActivity().getId());
   }
-
 }

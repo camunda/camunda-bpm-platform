@@ -5,15 +5,14 @@
   targetNamespace="Examples">
 
   <process id="asyncListener">
-  
     <startEvent id="theStart" />
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask" />
     
     <userTask id="theTask" camunda:asyncBefore="true">
-  		<extensionElements>
-  			<camunda:executionListener event="end" class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener" />
-  		</extensionElements>
-  	</userTask>
+      <extensionElements>
+        <camunda:executionListener event="end" class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener" />
+      </extensionElements>
+    </userTask>
     
     <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theEnd" />
         

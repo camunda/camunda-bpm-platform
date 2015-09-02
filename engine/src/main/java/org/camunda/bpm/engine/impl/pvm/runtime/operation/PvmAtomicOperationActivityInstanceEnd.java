@@ -15,8 +15,6 @@ package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.camunda.bpm.engine.impl.bpmn.behavior.CompensationEndEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateThrowCompensationEventActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.CompensationBehavior;
