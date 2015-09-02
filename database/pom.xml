@@ -18,13 +18,13 @@
   <properties>
 
     <!-- database driver versions -->
-    <version.h2>1.3.168</version.h2>
+    <version.h2>1.3.176</version.h2>
     <version.oracle-12>12.1.0.2</version.oracle-12>
     <version.oracle-11>11.2.0.4</version.oracle-11>
     <version.oracle-10>10.2.0.5</version.oracle-10>
     <version.oracle>${version.oracle-11}</version.oracle>
     <version.mariadb>1.1.8</version.mariadb>
-    <version.mysql>5.1.21</version.mysql>
+    <version.mysql>5.1.35</version.mysql>
     <version.sqlserver.oss>1.3.1</version.sqlserver.oss>
     <version.sqlserver>4.0</version.sqlserver>
     <version.db2-10.5>10.5.0.5</version.db2-10.5>
