@@ -111,9 +111,9 @@ module.exports = function(config, copyConf) {
         // open sans fonts
         {
           expand: true,
-          cwd: 'node_modules/camunda-commons-ui/vendor/fonts',
+          cwd: '<%= pkg.gruntConfig.adminSourceDir %>/../node_modules/camunda-commons-ui/vendor/fonts',
           src: ['*.{eot,svg,ttf,woff,woff2}'],
-          dest: '<%= buildTarget %>/fonts/'
+          dest: '<%= pkg.gruntConfig.adminBuildTarget %>/fonts/'
         },
 
         // placeholder shims
