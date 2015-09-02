@@ -38,13 +38,12 @@ public class DefaultJobExecutor extends ThreadPoolJobExecutor {
 
   protected int queueSize = 3;
   protected int corePoolSize = 3;
-  private int maxPoolSize = 10;
+  protected int maxPoolSize = 10;
 
   protected void startExecutingJobs() {
 
-    BlockingQueue<Runnable> threadPoolQueue = new ArrayBlockingQueue<Runnable>(queueSize);
-
     if (threadPoolExecutor==null || threadPoolExecutor.isShutdown()) {
+      BlockingQueue<Runnable> threadPoolQueue = new ArrayBlockingQueue<Runnable>(queueSize);
       threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, 0L, TimeUnit.MILLISECONDS, threadPoolQueue);
       threadPoolExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
     }

@@ -39,6 +39,8 @@ public class ThreadPoolJobExecutor extends JobExecutor {
       threadPoolExecutor.execute(getExecuteJobsRunnable(jobIds, processEngine));
 
     } catch (RejectedExecutionException e) {
+
+      logRejectedExecution(processEngine, jobIds.size());
       rejectedJobsHandler.jobsRejected(jobIds, processEngine, this);
 
     }

@@ -69,11 +69,6 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     // with an upgrade of mybatis, this might have to become org.mybatis.generator.logging.LogFactory.forceJavaLogging();
   }
 
-  private static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Arrays.asList(
-    "ACT_GE_PROPERTY",
-    "ACT_RU_METER_LOG"
-  );
-
   protected ProcessEngine processEngine;
   protected ThreadLogMode threadRenderingMode = DEFAULT_THREAD_LOG_MODE;
 

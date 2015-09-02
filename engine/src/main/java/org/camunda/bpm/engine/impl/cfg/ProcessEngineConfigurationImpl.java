@@ -153,7 +153,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.DelegateInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
-import org.camunda.bpm.engine.impl.jobexecutor.CallerRunsRejectedJobsHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultFailedJobCommandFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobPriorityProvider;
@@ -1284,6 +1283,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     metricsRegistry.createMeter(Metrics.JOB_SUCCESSFUL);
     metricsRegistry.createMeter(Metrics.JOB_FAILED);
     metricsRegistry.createMeter(Metrics.JOB_LOCKED_EXCLUSIVE);
+    metricsRegistry.createMeter(Metrics.JOB_EXECUTION_REJECTED);
   }
 
   protected void initSerialization() {

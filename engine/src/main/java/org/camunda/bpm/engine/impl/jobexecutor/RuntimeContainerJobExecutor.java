@@ -53,6 +53,7 @@ public class RuntimeContainerJobExecutor extends JobExecutor {
     // delegate job execution to runtime container
     if(!executorService.schedule(executeJobsRunnable, false)) {
 
+      logRejectedExecution(processEngine, jobIds.size());
       rejectedJobsHandler.jobsRejected(jobIds, processEngine, this);
     }
   }

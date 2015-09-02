@@ -55,6 +55,8 @@ public class SpringJobExecutor extends JobExecutor {
 	  try {
       taskExecutor.execute(getExecuteJobsRunnable(jobIds, processEngine));
     } catch (RejectedExecutionException e) {
+
+      logRejectedExecution(processEngine, jobIds.size());
       rejectedJobsHandler.jobsRejected(jobIds, processEngine, this);
     }
 	}

@@ -12,8 +12,18 @@
  */
 package org.camunda.bpm.engine.test.metrics;
 
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.impl.jobexecutor.CallerRunsRejectedJobsHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.ThreadPoolJobExecutor;
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestCase.ThreadControl;
@@ -28,6 +38,7 @@ import org.camunda.bpm.engine.variable.Variables;
 public class JobExecutorMetricsTest extends AbstractMetricsTest {
 
   protected JobExecutor jobExecutor;
+  protected ThreadPoolExecutor jobThreadPoolExecutor;
 
   protected void setUp() throws Exception {
     super.setUp();
@@ -163,6 +174,44 @@ public class JobExecutorMetricsTest extends AbstractMetricsTest {
     long exclusiveFollowupJobs = managementService.createMetricsQuery()
         .name(Metrics.JOB_LOCKED_EXCLUSIVE).sum();
     assertEquals(3, exclusiveFollowupJobs);
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/metrics/asyncServiceTaskProcess.bpmn20.xml")
+  public void testJobRejectedExecutionMetricReporting() {
+    // replace job executor with one that rejects all jobs
+    RejectingJobExecutor rejectingExecutor = new RejectingJobExecutor();
+    processEngineConfiguration.setJobExecutor(rejectingExecutor);
+    rejectingExecutor.registerProcessEngine((ProcessEngineImpl) processEngine);
+
+    // given three jobs
+    for (int i = 0; i < 3; i++) {
+      runtimeService.startProcessInstanceByKey("asyncServiceTaskProcess");
+    }
+
+    // when executing the jobs
+    waitForJobExecutorToProcessAllJobs(5000L);
+
+    // then all of them were rejected by the job executor which is reflected by the metric
+    long numRejectedJobs = managementService.createMetricsQuery().name(Metrics.JOB_EXECUTION_REJECTED).sum();
+
+    assertEquals(3, numRejectedJobs);
+  }
+
+  public static class RejectingJobExecutor extends DefaultJobExecutor {
+
+    public RejectingJobExecutor() {
+      BlockingQueue<Runnable> threadPoolQueue = new ArrayBlockingQueue<Runnable>(queueSize);
+      threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, 0L, TimeUnit.MILLISECONDS, threadPoolQueue) {
+
+        @Override
+        public void execute(Runnable command) {
+          throw new RejectedExecutionException();
+        }
+      };
+      threadPoolExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
+
+      rejectedJobsHandler = new CallerRunsRejectedJobsHandler();
+    }
   }
 
 }

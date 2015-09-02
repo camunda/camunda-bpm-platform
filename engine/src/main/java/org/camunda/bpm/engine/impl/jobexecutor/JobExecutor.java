@@ -167,6 +167,14 @@ public abstract class JobExecutor {
     }
   }
 
+  public void logRejectedExecution(ProcessEngineImpl engine, int numJobs) {
+    if (engine != null && engine.getProcessEngineConfiguration().isMetricsEnabled()) {
+      engine.getProcessEngineConfiguration()
+        .getMetricsRegistry()
+        .markOccurrence(Metrics.JOB_EXECUTION_REJECTED, numJobs);
+    }
+  }
+
   // getters and setters //////////////////////////////////////////////////////
 
   public List<ProcessEngineImpl> getProcessEngines() {
