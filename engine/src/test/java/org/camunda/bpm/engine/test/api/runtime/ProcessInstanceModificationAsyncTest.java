@@ -463,11 +463,8 @@ public class ProcessInstanceModificationAsyncTest extends PluggableProcessEngine
     assertProcessEnded(processInstanceId);
   }
 
-  /**
-   * TODO: re-add when CAM-3707 and CAM-3708 are fixed
-   */
   @Deployment(resources = NESTED_ASYNC_BEFORE_IO_LISTENER_PROCESS)
-  public void FAILING_testCancelTransitionInstanceShouldNotInvokeIoMappingAndListenersOfTargetActivity() {
+  public void testCancelTransitionInstanceShouldNotInvokeIoMappingAndListenersOfTargetActivity() {
     RecorderExecutionListener.clear();
 
     // given a process instance with an async task in a subprocess
