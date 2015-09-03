@@ -1,6 +1,3 @@
--- index for deadlock problem - https://app.camunda.com/jira/browse/CAM-4440 --
-create index ACT_IDX_AUTH_RESOURCE_ID on ACT_RU_AUTHORIZATION(RESOURCE_ID_);
-
 -- indexes to improve deployment
 create index ACT_IDX_BYTEARRAY_NAME on ACT_GE_BYTEARRAY(NAME_);
 create index ACT_IDX_DEPLOYMENT_NAME on ACT_RE_DEPLOYMENT(NAME_);
