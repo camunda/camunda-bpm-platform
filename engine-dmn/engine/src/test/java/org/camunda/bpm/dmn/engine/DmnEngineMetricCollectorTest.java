@@ -24,33 +24,52 @@ import org.junit.Test;
 
 public class DmnEngineMetricCollectorTest extends DmnDecisionTest {
 
+  public static final Map<String, Object> VARIABLES = new HashMap<String, Object>();
+
+  static {
+    VARIABLES.put("status", "bronze");
+    VARIABLES.put("sum", 1000);
+  }
+
   @Test
   public void testInitialExecutedDecisionElementsValue() {
-    assertThat(getExecutedDecisionElements()).isEqualTo(0);
+    assertThat(getExecutedDecisionElements()).isEqualTo(0l);
   }
 
   @Test
   @DecisionResource(resource = EXAMPLE_DMN)
   public void testExecutedDecisionElementsValue() {
-    Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("status", "bronze");
-    variables.put("sum", 1000);
+    assertThat(getExecutedDecisionElements()).isEqualTo(0l);
 
-    assertThat(getExecutedDecisionElements()).isEqualTo(0);
+    engine.evaluate(decision, VARIABLES);
+    assertThat(getExecutedDecisionElements()).isEqualTo(16l);
 
-    engine.evaluate(decision, variables);
-    assertThat(getExecutedDecisionElements()).isEqualTo(16);
+    engine.evaluate(decision, VARIABLES);
+    assertThat(getExecutedDecisionElements()).isEqualTo(32l);
 
-    engine.evaluate(decision, variables);
-    assertThat(getExecutedDecisionElements()).isEqualTo(32);
+    engine.evaluate(decision, VARIABLES);
+    engine.evaluate(decision, VARIABLES);
+    assertThat(getExecutedDecisionElements()).isEqualTo(64l);
+  }
 
-    engine.evaluate(decision, variables);
-    engine.evaluate(decision, variables);
-    assertThat(getExecutedDecisionElements()).isEqualTo(64);
+  @Test
+  @DecisionResource(resource = EXAMPLE_DMN)
+  public void testClearExecutedDecisionElementsValue() {
+    assertThat(getExecutedDecisionElements()).isEqualTo(0l);
+
+    engine.evaluate(decision, VARIABLES);
+    assertThat(getExecutedDecisionElements()).isEqualTo(16l);
+    assertThat(clearExecutedDecisionElements()).isEqualTo(16l);
+
+    assertThat(getExecutedDecisionElements()).isEqualTo(0l);
   }
 
   protected long getExecutedDecisionElements() {
     return engine.getConfiguration().getEngineMetricCollector().getExecutedDecisionElements();
+  }
+
+  protected long clearExecutedDecisionElements() {
+    return engine.getConfiguration().getEngineMetricCollector().clearExecutedDecisionElements();
   }
 
 }

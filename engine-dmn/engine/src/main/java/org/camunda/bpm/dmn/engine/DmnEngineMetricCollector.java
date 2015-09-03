@@ -25,4 +25,11 @@ public interface DmnEngineMetricCollector extends DmnDecisionTableListener {
    */
   long getExecutedDecisionElements();
 
+  /**
+   * Resets the executed decision elements to 0.
+   *
+   * @return the number of executed decision elements before resetting.
+   */
+  long clearExecutedDecisionElements();
+
 }

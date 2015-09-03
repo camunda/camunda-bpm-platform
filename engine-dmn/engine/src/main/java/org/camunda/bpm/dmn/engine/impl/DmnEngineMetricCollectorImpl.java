@@ -16,7 +16,6 @@ package org.camunda.bpm.dmn.engine.impl;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionTable;
-import org.camunda.bpm.dmn.engine.DmnDecisionTableListener;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnEngineMetricCollector;
 
@@ -31,6 +30,10 @@ public class DmnEngineMetricCollectorImpl implements DmnEngineMetricCollector {
 
   public long getExecutedDecisionElements() {
     return executedDecisionElements.get();
+  }
+
+  public long clearExecutedDecisionElements() {
+    return executedDecisionElements.getAndSet(0);
   }
 
 }
