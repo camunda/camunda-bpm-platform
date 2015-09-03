@@ -30,7 +30,7 @@ public class MockJobBuilder {
 	protected String processDefinitionKey;
 	protected int retries;
 	protected boolean suspended;
-	protected int priority;
+	protected long priority;
 	protected String jobDefinitionId;
 
 	public MockJobBuilder id(String id) {
@@ -73,7 +73,7 @@ public class MockJobBuilder {
     return this;
   }
 
-  public MockJobBuilder priority(int priority) {
+  public MockJobBuilder priority(long priority) {
     this.priority = priority;
     return this;
   }
@@ -82,7 +82,7 @@ public class MockJobBuilder {
 		this.retries = retries;
 		return this;
 	}
-	
+
 	public MockJobBuilder jobDefinitionId(String jobDefinitionId) {
 	  this.jobDefinitionId = jobDefinitionId;
 	  return this;

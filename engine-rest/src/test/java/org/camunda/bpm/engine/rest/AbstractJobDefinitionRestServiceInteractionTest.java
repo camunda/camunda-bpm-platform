@@ -82,7 +82,7 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
         .body("jobConfiguration", equalTo(MockProvider.EXAMPLE_JOB_CONFIG))
         .body("activityId", equalTo(MockProvider.EXAMPLE_ACTIVITY_ID))
         .body("suspended", equalTo(MockProvider.EXAMPLE_JOB_DEFINITION_IS_SUSPENDED))
-        .body("overridingJobPriority", equalTo(MockProvider.EXAMPLE_JOB_DEFINITION_PRIORITY))
+        .body("overridingJobPriority", equalTo(MockProvider.EXAMPLE_JOB_DEFINITION_PRIORITY.intValue()))
     .when()
       .get(SINGLE_JOB_DEFINITION_RESOURCE_URL);
 
@@ -1200,6 +1200,25 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
 
     verify(mockManagementService).setOverridingJobPriorityForJobDefinition(MockProvider.EXAMPLE_JOB_DEFINITION_ID,
         MockProvider.EXAMPLE_JOB_DEFINITION_PRIORITY, false);
+  }
+
+  @Test
+  public void testSetJobPriorityToExtremeValue() {
+    Map<String, Object> priorityJson = new HashMap<String, Object>();
+    priorityJson.put("priority", Long.MAX_VALUE);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_DEFINITION_ID)
+      .contentType(ContentType.JSON)
+      .body(priorityJson)
+    .then()
+      .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .put(JOB_DEFINITION_PRIORITY_URL);
+
+    verify(mockManagementService).setOverridingJobPriorityForJobDefinition(MockProvider.EXAMPLE_JOB_DEFINITION_ID,
+        Long.MAX_VALUE, false);
   }
 
   @Test

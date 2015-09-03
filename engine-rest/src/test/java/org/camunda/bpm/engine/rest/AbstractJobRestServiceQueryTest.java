@@ -50,8 +50,8 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
   private JobQuery mockQuery;
   private static final int MAX_RESULTS_TEN = 10;
   private static final int FIRST_RESULTS_ZERO = 0;
-  protected static final int JOB_QUERY_MAX_PRIORITY = 15;
-  protected static final int JOB_QUERY_MIN_PRIORITY = 14;
+  protected static final long JOB_QUERY_MAX_PRIORITY = Long.MAX_VALUE;
+  protected static final long JOB_QUERY_MIN_PRIORITY = Long.MIN_VALUE;
 
   @Before
   public void setUpRuntimeData() {

@@ -173,7 +173,7 @@ public abstract class AbstractJobRestServiceInteractionTest extends AbstractRest
     .body("processInstanceId", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
     .body("executionId", equalTo(MockProvider.EXAMPLE_EXECUTION_ID))
     .body("exceptionMessage", equalTo(MockProvider.EXAMPLE_JOB_NO_EXCEPTION_MESSAGE))
-    .body("priority", equalTo(MockProvider.EXAMPLE_JOB_PRIORITY))
+    .body("priority", equalTo((int) MockProvider.EXAMPLE_JOB_PRIORITY))
     .body("jobDefinitionId", equalTo(MockProvider.EXAMPLE_JOB_DEFINITION_ID))
     .when().get(SINGLE_JOB_RESOURCE_URL);
 
@@ -1051,6 +1051,22 @@ public abstract class AbstractJobRestServiceInteractionTest extends AbstractRest
     .when().put(JOB_RESOURCE_SET_PRIORITY_URL);
 
     verify(mockManagementService).setJobPriority(MockProvider.EXAMPLE_JOB_ID, MockProvider.EXAMPLE_JOB_PRIORITY);
+  }
+
+  @Test
+  public void testSetJobPriorityToExtremeValue() {
+    Map<String, Object> priorityJson = new HashMap<String, Object>();
+    priorityJson.put("priority", Long.MAX_VALUE);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_JOB_ID)
+      .contentType(ContentType.JSON)
+      .body(priorityJson)
+    .then().expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when().put(JOB_RESOURCE_SET_PRIORITY_URL);
+
+    verify(mockManagementService).setJobPriority(MockProvider.EXAMPLE_JOB_ID, Long.MAX_VALUE);
   }
 
   @Test

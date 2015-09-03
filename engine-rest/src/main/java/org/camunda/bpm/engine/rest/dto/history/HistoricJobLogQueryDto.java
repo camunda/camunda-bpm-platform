@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.history.HistoricJobLogQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
-import org.camunda.bpm.engine.rest.dto.converter.IntegerConverter;
+import org.camunda.bpm.engine.rest.dto.converter.LongConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -83,8 +83,8 @@ public class HistoricJobLogQueryDto extends AbstractQueryDto<HistoricJobLogQuery
   protected Boolean failureLog;
   protected Boolean successLog;
   protected Boolean deletionLog;
-  protected Integer jobPriorityHigherThanOrEquals;
-  protected Integer jobPriorityLowerThanOrEquals;
+  protected Long jobPriorityHigherThanOrEquals;
+  protected Long jobPriorityLowerThanOrEquals;
 
   public HistoricJobLogQueryDto() {}
 
@@ -172,13 +172,13 @@ public class HistoricJobLogQueryDto extends AbstractQueryDto<HistoricJobLogQuery
     this.deletionLog = deletionLog;
   }
 
-  @CamundaQueryParam(value="jobPriorityHigherThanOrEquals", converter = IntegerConverter.class)
-  public void setJobPriorityHigherThanOrEquals(Integer jobPriorityHigherThanOrEquals) {
+  @CamundaQueryParam(value="jobPriorityHigherThanOrEquals", converter = LongConverter.class)
+  public void setJobPriorityHigherThanOrEquals(Long jobPriorityHigherThanOrEquals) {
     this.jobPriorityHigherThanOrEquals = jobPriorityHigherThanOrEquals;
   }
 
-  @CamundaQueryParam(value="jobPriorityLowerThanOrEquals", converter = IntegerConverter.class)
-  public void setJobPriorityLowerThanOrEquals(Integer jobPriorityLowerThanOrEquals) {
+  @CamundaQueryParam(value="jobPriorityLowerThanOrEquals", converter = LongConverter.class)
+  public void setJobPriorityLowerThanOrEquals(Long jobPriorityLowerThanOrEquals) {
     this.jobPriorityLowerThanOrEquals = jobPriorityLowerThanOrEquals;
   }
 

@@ -33,32 +33,32 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
 
   private static final Logger LOG = Logger.getLogger(DefaultJobPriorityProvider.class.getName());
 
-  public static int DEFAULT_PRIORITY = 0;
+  public static long DEFAULT_PRIORITY = 0;
 
-  public static int DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE = 0;
+  public static long DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE = 0;
 
-  public static int getDefaultPriority() {
+  public long getDefaultPriority() {
     return DEFAULT_PRIORITY;
   }
 
-  public static int getDefaultPriorityOnResolutionFailure() {
+  public long getDefaultPriorityOnResolutionFailure() {
     return DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE;
   }
 
   @Override
-  public int determinePriority(ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
+  public long determinePriority(ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
 
-    Integer jobDefinitionPriority = getJobDefinitionPriority(execution, jobDeclaration);
+    Long jobDefinitionPriority = getJobDefinitionPriority(execution, jobDeclaration);
     if (jobDefinitionPriority != null) {
       return jobDefinitionPriority;
     }
 
-    Integer activityPriority = getActivityPriority(execution, jobDeclaration);
+    Long activityPriority = getActivityPriority(execution, jobDeclaration);
     if (activityPriority != null) {
       return activityPriority;
     }
 
-    Integer processDefinitionPriority = getProcessDefinitionPriority(execution, jobDeclaration);
+    Long processDefinitionPriority = getProcessDefinitionPriority(execution, jobDeclaration);
     if (processDefinitionPriority != null) {
       return processDefinitionPriority;
     }
@@ -66,7 +66,7 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
     return getDefaultPriority();
   }
 
-  protected Integer getJobDefinitionPriority(ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
+  protected Long getJobDefinitionPriority(ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
     JobDefinitionEntity jobDefinition = getJobDefinitionFor(jobDeclaration);
 
     if (jobDefinition != null) {
@@ -76,7 +76,7 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
     return null;
   }
 
-  protected Integer getProcessDefinitionPriority(ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
+  protected Long getProcessDefinitionPriority(ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
     ProcessDefinitionImpl processDefinition = jobDeclaration.getProcessDefinition();
 
     if (processDefinition != null) {
@@ -101,7 +101,7 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
     }
   }
 
-  protected Integer getActivityPriority(ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
+  protected Long getActivityPriority(ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
     if (jobDeclaration != null) {
       ParameterValueProvider priorityProvider = jobDeclaration.getJobPriorityProvider();
       if (priorityProvider != null) {
@@ -112,7 +112,7 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
     return null;
   }
 
-  protected Integer evaluateValueProvider(ParameterValueProvider valueProvider, ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
+  protected Long evaluateValueProvider(ParameterValueProvider valueProvider, ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration) {
     Object value;
     try {
       value = valueProvider.getValue(execution);
@@ -138,12 +138,12 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
     }
     else {
       Number numberValue = (Number) value;
-      if (isValidIntegerValue(numberValue)) {
-        return numberValue.intValue();
+      if (isValidLongValue(numberValue)) {
+        return numberValue.longValue();
       }
       else {
         throw new ProcessEngineException(describeContext(jobDeclaration, execution)
-            + ": Priority value must be either Short, Integer, or Long in Integer range");
+            + ": Priority value must be either Short, Integer, or Long");
       }
     }
   }
@@ -160,11 +160,11 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
             + "in context of " + executionEntity;
   }
 
-  protected boolean isValidIntegerValue(Number value) {
+  protected boolean isValidLongValue(Number value) {
     return
       value instanceof Short ||
       value instanceof Integer ||
-      (value instanceof Long && ((long) value.intValue()) == value.longValue());
+      value instanceof Long;
   }
 
 }

@@ -27,5 +27,5 @@ public interface JobPriorityProvider {
    *   running process instance (e.g. a timer start event)
    * @param jobDeclaration
    */
-  int determinePriority(ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration);
+  long determinePriority(ExecutionEntity execution, JobDeclaration<?, ?> jobDeclaration);
 }

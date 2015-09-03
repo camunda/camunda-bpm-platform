@@ -76,7 +76,7 @@ create table ACT_RU_JOB (
     HANDLER_CFG_ nvarchar(4000),
     DEPLOYMENT_ID_ nvarchar(64),
     SUSPENSION_STATE_ tinyint,
-    PRIORITY_ int NOT NULL DEFAULT 0,
+    PRIORITY_ numeric(19,0) NOT NULL DEFAULT 0,
     JOB_DEF_ID_ nvarchar(64),
     SEQUENCE_COUNTER_ numeric(19,0),
     primary key (ID_)
@@ -91,7 +91,7 @@ create table ACT_RU_JOBDEF (
     JOB_TYPE_ nvarchar(255) NOT NULL,
     JOB_CONFIGURATION_ nvarchar(255),
     SUSPENSION_STATE_ tinyint,
-    JOB_PRIORITY_ int,
+    JOB_PRIORITY_ numeric(19,0),
     primary key (ID_)
 );
 

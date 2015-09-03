@@ -6,14 +6,14 @@ ALTER TABLE ACT_RU_METER_LOG
 -- job prioritization --
   
 ALTER TABLE ACT_RU_JOB
-  ADD PRIORITY_ integer not null
+  ADD PRIORITY_ bigint not null
   DEFAULT 0;
 
 ALTER TABLE ACT_RU_JOBDEF
-  ADD JOB_PRIORITY_ integer;
+  ADD JOB_PRIORITY_ bigint;
 
 ALTER TABLE ACT_HI_JOB_LOG
-  ADD JOB_PRIORITY_ integer not null
+  ADD JOB_PRIORITY_ bigint not null
   DEFAULT 0;
 
 -- create decision definition table --

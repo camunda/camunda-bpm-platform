@@ -28,7 +28,7 @@ public class JobDto {
   protected int retries;
   protected Date dueDate;
   protected boolean suspended;
-  protected int priority;
+  protected long priority;
 
   public static JobDto fromJob(Job job) {
     JobDto dto = new JobDto();
@@ -53,7 +53,7 @@ public class JobDto {
   public String getJobDefinitionId() {
     return jobDefinitionId;
   }
-  
+
   public String getProcessInstanceId() {
     return processInstanceId;
   }
@@ -86,7 +86,7 @@ public class JobDto {
     return suspended;
   }
 
-  public int getPriority() {
+  public long getPriority() {
     return priority;
   }
 

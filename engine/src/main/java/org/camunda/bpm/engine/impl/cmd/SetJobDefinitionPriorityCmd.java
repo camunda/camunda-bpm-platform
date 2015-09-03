@@ -36,10 +36,10 @@ public class SetJobDefinitionPriorityCmd implements Command<Void> {
   public static final String JOB_DEFINITION_OVERRIDING_PRIORITY = "overridingPriority";
 
   protected String jobDefinitionId;
-  protected Integer priority;
+  protected Long priority;
   protected boolean cascade = false;
 
-  public SetJobDefinitionPriorityCmd(String jobDefinitionId, Integer priority, boolean cascade) {
+  public SetJobDefinitionPriorityCmd(String jobDefinitionId, Long priority, boolean cascade) {
     this.jobDefinitionId = jobDefinitionId;
     this.priority = priority;
     this.cascade = cascade;
@@ -57,7 +57,7 @@ public class SetJobDefinitionPriorityCmd implements Command<Void> {
 
     checkAuthorization(commandContext, jobDefinition);
 
-    Integer currentPriority = jobDefinition.getOverridingJobPriority();
+    Long currentPriority = jobDefinition.getOverridingJobPriority();
     jobDefinition.setJobPriority(priority);
 
     UserOperationLogContext opLogContext = new UserOperationLogContext();
@@ -84,7 +84,7 @@ public class SetJobDefinitionPriorityCmd implements Command<Void> {
     }
   }
 
-  protected void createJobDefinitionOperationLogEntry(UserOperationLogContext opLogContext, Integer previousPriority,
+  protected void createJobDefinitionOperationLogEntry(UserOperationLogContext opLogContext, Long previousPriority,
       JobDefinitionEntity jobDefinition) {
 
     PropertyChange propertyChange = new PropertyChange(

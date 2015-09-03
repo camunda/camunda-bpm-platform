@@ -6,14 +6,14 @@ ALTER TABLE ACT_RU_METER_LOG
 -- job prioritization --
   
 ALTER TABLE ACT_RU_JOB
-  ADD PRIORITY_ int NOT NULL
+  ADD PRIORITY_ numeric(19,0) NOT NULL
   DEFAULT 0;
 
 ALTER TABLE ACT_RU_JOBDEF
-  ADD JOB_PRIORITY_ int;
+  ADD JOB_PRIORITY_ numeric(19,0);
   
 ALTER TABLE ACT_HI_JOB_LOG
-  ADD JOB_PRIORITY_ int NOT NULL
+  ADD JOB_PRIORITY_ numeric(19,0) NOT NULL
   DEFAULT 0;
 
 -- create decision definition table --

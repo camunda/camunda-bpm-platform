@@ -97,7 +97,7 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
     ExecutionEntity contextExecution = resolveExecution(context);
 
     if (Context.getProcessEngineConfiguration().isProducePrioritizedJobs()) {
-      int priority = Context
+      long priority = Context
           .getProcessEngineConfiguration()
           .getJobPriorityProvider()
           .determinePriority(contextExecution, this);

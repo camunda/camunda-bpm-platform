@@ -23,7 +23,7 @@ public class MockJobDefinitionBuilder {
   protected String activityId;
   protected String jobConfiguration;
   protected String jobType;
-  protected Integer jobPriority;
+  protected Long jobPriority;
   protected String processDefinitionKey;
   protected String processDefinitionId;
   protected boolean suspended;
@@ -48,13 +48,8 @@ public class MockJobDefinitionBuilder {
     return this;
   }
 
-  public MockJobDefinitionBuilder jobPriority(Integer priority) {
+  public MockJobDefinitionBuilder jobPriority(Long priority) {
     this.jobPriority = priority;
-    return this;
-  }
-
-  public MockJobDefinitionBuilder processInstanceId(Integer jobPriority) {
-    this.jobPriority = jobPriority;
     return this;
   }
 

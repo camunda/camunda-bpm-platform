@@ -118,7 +118,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
     commandExecutor.execute(new SetJobDuedateCmd(jobId, newDuedate));
   }
 
-  public void setJobPriority(String jobId, int priority) {
+  public void setJobPriority(String jobId, long priority) {
     commandExecutor.execute(new SetJobPriorityCmd(jobId, priority));
   }
 
@@ -328,11 +328,11 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
     commandExecutor.execute(new ReportDbMetricsCmd());
   }
 
-  public void setOverridingJobPriorityForJobDefinition(String jobDefinitionId, int priority) {
+  public void setOverridingJobPriorityForJobDefinition(String jobDefinitionId, long priority) {
     commandExecutor.execute(new SetJobDefinitionPriorityCmd(jobDefinitionId, priority, false));
   }
 
-  public void setOverridingJobPriorityForJobDefinition(String jobDefinitionId, int priority, boolean cascade) {
+  public void setOverridingJobPriorityForJobDefinition(String jobDefinitionId, long priority, boolean cascade) {
     commandExecutor.execute(new SetJobDefinitionPriorityCmd(jobDefinitionId, priority, true));
   }
 

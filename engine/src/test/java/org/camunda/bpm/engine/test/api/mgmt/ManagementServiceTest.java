@@ -18,8 +18,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.Assert;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
@@ -46,6 +44,7 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.junit.Assert;
 
 
 /**
@@ -623,6 +622,26 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     } catch (NullValueException e) {
       assertTextPresentIgnoreCase("Job id must not be null", e.getMessage());
     }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/asyncTaskProcess.bpmn20.xml")
+  public void testSetJobPriorityToExtremeValues() {
+    runtimeService
+      .createProcessInstanceByKey("asyncTaskProcess")
+      .startBeforeActivity("task")
+      .execute();
+
+    Job job = managementService.createJobQuery().singleResult();
+
+    // it is possible to set the max integer value
+    managementService.setJobPriority(job.getId(), Long.MAX_VALUE);
+    job = managementService.createJobQuery().singleResult();
+    assertEquals(Long.MAX_VALUE, (long) job.getPriority());
+
+    // it is possible to set the min integer value
+    managementService.setJobPriority(job.getId(), Long.MIN_VALUE + 1); // +1 for informix
+    job = managementService.createJobQuery().singleResult();
+    assertEquals(Long.MIN_VALUE + 1, (long) job.getPriority());
   }
 
   protected void cleanOpLog(String jobId) {

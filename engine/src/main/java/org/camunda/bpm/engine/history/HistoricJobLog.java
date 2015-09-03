@@ -68,7 +68,7 @@ public interface HistoricJobLog {
    *
    * @since 7.4
    */
-  int getJobPriority();
+  long getJobPriority();
 
   /**
    * Returns the message of the exception that occurred by executing the associated job.

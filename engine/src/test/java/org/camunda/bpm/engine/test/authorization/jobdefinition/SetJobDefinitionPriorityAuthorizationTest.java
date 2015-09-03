@@ -99,7 +99,7 @@ public class SetJobDefinitionPriorityAuthorizationTest {
     // then
     if (authRule.assertScenario(scenario)) {
       JobDefinition updatedJobDefinition = engineRule.getManagementService().createJobDefinitionQuery().singleResult();
-      Assert.assertEquals(42, (int) updatedJobDefinition.getOverridingJobPriority());
+      Assert.assertEquals(42, (long) updatedJobDefinition.getOverridingJobPriority());
     }
 
   }

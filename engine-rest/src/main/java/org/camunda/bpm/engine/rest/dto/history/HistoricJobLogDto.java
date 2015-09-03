@@ -28,7 +28,7 @@ public class HistoricJobLogDto {
   protected String jobId;
   protected Date jobDueDate;
   protected int jobRetries;
-  protected int jobPriority;
+  protected long jobPriority;
   protected String jobExceptionMessage;
 
   protected String jobDefinitionId;
@@ -67,7 +67,7 @@ public class HistoricJobLogDto {
     return jobRetries;
   }
 
-  public int getJobPriority() {
+  public long getJobPriority() {
     return jobPriority;
   }
 

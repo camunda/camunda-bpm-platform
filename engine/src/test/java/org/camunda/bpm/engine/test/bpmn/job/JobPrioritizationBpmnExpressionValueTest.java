@@ -29,8 +29,8 @@ public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEn
   protected static final int EXPECTED_DEFAULT_PRIORITY = 123;
   protected static final int EXPECTED_DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE = 296;
 
-  protected int originalDefaultPriority;
-  protected int originalDefaultPriorityOnFailure;
+  protected long originalDefaultPriority;
+  protected long originalDefaultPriorityOnFailure;
 
   protected void setUp() throws Exception {
     originalDefaultPriority = DefaultJobPriorityProvider.DEFAULT_PRIORITY;
@@ -165,19 +165,7 @@ public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEn
         .execute();
       fail("this should not succeed since the priority must be integer");
     } catch (ProcessEngineException e) {
-      assertTextPresentIgnoreCase("Priority value must be either Short, Integer, or Long in Integer range",
-          e.getMessage());
-    }
-
-    try {
-      runtimeService
-        .createProcessInstanceByKey("jobPrioExpressionProcess")
-        .startBeforeActivity("task3")
-        .setVariable("priority", Long.MAX_VALUE)
-        .execute();
-      fail("this should not succeed since the priority must be integer");
-    } catch (ProcessEngineException e) {
-      assertTextPresentIgnoreCase("Priority value must be either Short, Integer, or Long in Integer range",
+      assertTextPresentIgnoreCase("Priority value must be either Short, Integer, or Long",
           e.getMessage());
     }
   }

@@ -86,7 +86,7 @@ public class JobQueryByPriorityTest extends PluggableProcessEngineTestCase {
 
     // when making a job query and filtering by job priority
     // then the correct jobs are returned
-    List<Job> jobs = managementService.createJobQuery().priorityHigherThanOrEquals(2).list();
+    List<Job> jobs = managementService.createJobQuery().priorityHigherThanOrEquals(2L).list();
     assertEquals(3, jobs.size());
 
     Set<String> processInstanceIds = new HashSet<String>();
@@ -112,8 +112,8 @@ public class JobQueryByPriorityTest extends PluggableProcessEngineTestCase {
 
     // when making a job query and filtering by job priority
     // then the correct job is returned
-    Job job = managementService.createJobQuery().priorityHigherThanOrEquals(2)
-        .priorityLowerThanOrEquals(2).singleResult();
+    Job job = managementService.createJobQuery().priorityHigherThanOrEquals(2L)
+        .priorityLowerThanOrEquals(2L).singleResult();
     assertNotNull(job);
     assertEquals(2, job.getPriority());
     assertEquals(instances.get(2).getId(), job.getProcessInstanceId());

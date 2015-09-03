@@ -27,7 +27,7 @@ import org.camunda.bpm.engine.rest.dto.ConditionQueryParameterDto;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.ConditionListConverter;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
-import org.camunda.bpm.engine.rest.dto.converter.IntegerConverter;
+import org.camunda.bpm.engine.rest.dto.converter.LongConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.runtime.JobQuery;
@@ -73,8 +73,8 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
   protected Boolean noRetriesLeft;
   protected Boolean active;
   protected Boolean suspended;
-  protected Integer priorityHigherThanOrEquals;
-  protected Integer priorityLowerThanOrEquals;
+  protected Long priorityHigherThanOrEquals;
+  protected Long priorityLowerThanOrEquals;
   protected String jobDefinitionId;
 
   protected List<ConditionQueryParameterDto> dueDates;
@@ -165,13 +165,13 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
     this.suspended = suspended;
   }
 
-  @CamundaQueryParam(value="priorityHigherThanOrEquals", converter = IntegerConverter.class)
-  public void setPriorityHigherThanOrEquals(Integer priorityHigherThanOrEquals) {
+  @CamundaQueryParam(value="priorityHigherThanOrEquals", converter = LongConverter.class)
+  public void setPriorityHigherThanOrEquals(Long priorityHigherThanOrEquals) {
     this.priorityHigherThanOrEquals = priorityHigherThanOrEquals;
   }
 
-  @CamundaQueryParam(value="priorityLowerThanOrEquals", converter = IntegerConverter.class)
-  public void setPriorityLowerThanOrEquals(Integer priorityLowerThanOrEquals) {
+  @CamundaQueryParam(value="priorityLowerThanOrEquals", converter = LongConverter.class)
+  public void setPriorityLowerThanOrEquals(Long priorityLowerThanOrEquals) {
     this.priorityLowerThanOrEquals = priorityLowerThanOrEquals;
   }
 
@@ -179,7 +179,7 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
   public void setJobDefinitionId(String jobDefinitionId) {
     this.jobDefinitionId = jobDefinitionId;
   }
-  
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -265,7 +265,7 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
     if (priorityLowerThanOrEquals != null) {
       query.priorityLowerThanOrEquals(priorityLowerThanOrEquals);
     }
-    
+
     if (jobDefinitionId != null) {
       query.jobDefinitionId(jobDefinitionId);
     }

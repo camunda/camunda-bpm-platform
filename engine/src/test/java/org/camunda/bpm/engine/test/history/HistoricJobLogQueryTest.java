@@ -373,7 +373,7 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     // then the creation logs can be filtered by priority of the jobs
     // (1) lower than or equal a priority
     List<HistoricJobLog> jobLogs = historyService.createHistoricJobLogQuery()
-        .jobPriorityLowerThanOrEquals(2)
+        .jobPriorityLowerThanOrEquals(2L)
         .orderByJobPriority()
         .asc()
         .list();
@@ -385,7 +385,7 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
 
     // (2) higher than or equal a given priorty
     jobLogs = historyService.createHistoricJobLogQuery()
-        .jobPriorityHigherThanOrEquals(3)
+        .jobPriorityHigherThanOrEquals(3L)
         .orderByJobPriority()
         .asc()
         .list();
@@ -397,8 +397,8 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
 
     // (3) lower and higher than or equal
     jobLogs = historyService.createHistoricJobLogQuery()
-        .jobPriorityHigherThanOrEquals(1)
-        .jobPriorityLowerThanOrEquals(3)
+        .jobPriorityHigherThanOrEquals(1L)
+        .jobPriorityLowerThanOrEquals(3L)
         .orderByJobPriority()
         .asc()
         .list();

@@ -97,5 +97,5 @@ public interface Job {
    *
    * @since 7.4
    */
-  int getPriority();
+  long getPriority();
 }

@@ -30,9 +30,9 @@ public class SetJobPriorityCmd implements Command<Void> {
   public static final String JOB_PRIORITY_PROPERTY = "priority";
 
   protected String jobId;
-  protected int priority;
+  protected long priority;
 
-  public SetJobPriorityCmd(String jobId, int priority) {
+  public SetJobPriorityCmd(String jobId, long priority) {
     this.jobId = jobId;
     this.priority = priority;
   }
@@ -46,7 +46,7 @@ public class SetJobPriorityCmd implements Command<Void> {
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     authorizationManager.checkUpdateProcessInstance(job);
 
-    int currentPriority = job.getPriority();
+    long currentPriority = job.getPriority();
     job.setPriority(priority);
 
     createOpLogEntry(commandContext, currentPriority, job);
@@ -54,7 +54,7 @@ public class SetJobPriorityCmd implements Command<Void> {
     return null;
   }
 
-  protected void createOpLogEntry(CommandContext commandContext, int previousPriority, JobEntity job) {
+  protected void createOpLogEntry(CommandContext commandContext, long previousPriority, JobEntity job) {
     PropertyChange propertyChange = new PropertyChange(JOB_PRIORITY_PROPERTY, previousPriority, job.getPriority());
     commandContext
       .getOperationLogManager()

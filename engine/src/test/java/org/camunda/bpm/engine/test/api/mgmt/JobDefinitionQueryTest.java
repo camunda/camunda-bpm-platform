@@ -290,7 +290,7 @@ public class JobDefinitionQueryTest extends PluggableProcessEngineTestCase {
     // then
     assertNotNull(queriedDefinition);
     assertEquals(jobDefinition.getId(), queriedDefinition.getId());
-    assertEquals(42, (int) queriedDefinition.getOverridingJobPriority());
+    assertEquals(42L, (long) queriedDefinition.getOverridingJobPriority());
 
     // and
     assertEquals(1, managementService.createJobDefinitionQuery().withOverridingJobPriority().count());

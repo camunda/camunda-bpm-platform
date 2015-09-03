@@ -24,7 +24,7 @@
       #{activityId, jdbcType=VARCHAR},
       #{jobType, jdbcType=VARCHAR},
       #{jobConfiguration, jdbcType=VARCHAR},
-      #{jobPriority, jdbcType=INTEGER},
+      #{jobPriority, jdbcType=BIGINT},
       #{suspensionState, jdbcType=INTEGER},
       1
     )
@@ -40,7 +40,7 @@
       ACT_ID_ = #{activityId, jdbcType=VARCHAR},
       JOB_TYPE_ = #{jobType, jdbcType=VARCHAR},
       JOB_CONFIGURATION_ = #{jobConfiguration, jdbcType=VARCHAR},
-      JOB_PRIORITY_ = #{jobPriority, jdbcType=INTEGER},
+      JOB_PRIORITY_ = #{jobPriority, jdbcType=BIGINT},
       SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER}
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
@@ -90,7 +90,7 @@
     <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR" />
     <result property="jobType" column="JOB_TYPE_" jdbcType="VARCHAR" />
     <result property="jobConfiguration" column="JOB_CONFIGURATION_" jdbcType="VARCHAR" />
-    <result property="jobPriority" column="JOB_PRIORITY_" jdbcType="INTEGER" />
+    <result property="jobPriority" column="JOB_PRIORITY_" jdbcType="BIGINT" />
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER" />
   </resultMap>
 

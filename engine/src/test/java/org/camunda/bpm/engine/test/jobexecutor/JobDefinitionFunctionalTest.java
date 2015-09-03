@@ -262,7 +262,7 @@ public class JobDefinitionFunctionalTest extends PluggableProcessEngineTestCase 
     executionThread.startAndWaitUntilControlIsReturned();
 
     // and the job priority is updated
-    JobDefinitionPriorityThread priorityThread = new JobDefinitionPriorityThread(jobDefinition.getId(), 42, true);
+    JobDefinitionPriorityThread priorityThread = new JobDefinitionPriorityThread(jobDefinition.getId(), 42L, true);
     priorityThread.startAndWaitUntilControlIsReturned();
 
     // and the priority threads commits first
@@ -299,7 +299,7 @@ public class JobDefinitionFunctionalTest extends PluggableProcessEngineTestCase 
     suspensionThread.startAndWaitUntilControlIsReturned();
 
     // and updating the priority is attempted
-    JobDefinitionPriorityThread priorityUpdateThread = new JobDefinitionPriorityThread(jobDefinition.getId(), 42, true);
+    JobDefinitionPriorityThread priorityUpdateThread = new JobDefinitionPriorityThread(jobDefinition.getId(), 42L, true);
     priorityUpdateThread.startAndWaitUntilControlIsReturned();
 
     // and both commands overlap each other
@@ -424,10 +424,10 @@ public class JobDefinitionFunctionalTest extends PluggableProcessEngineTestCase 
   public class JobDefinitionPriorityThread extends ControllableThread {
     OptimisticLockingException exception;
     String jobDefinitionId;
-    Integer priority;
+    Long priority;
     boolean cascade;
 
-    public JobDefinitionPriorityThread(String jobDefinitionId, Integer priority, boolean cascade) {
+    public JobDefinitionPriorityThread(String jobDefinitionId, Long priority, boolean cascade) {
       this.jobDefinitionId = jobDefinitionId;
       this.priority = priority;
       this.cascade = cascade;

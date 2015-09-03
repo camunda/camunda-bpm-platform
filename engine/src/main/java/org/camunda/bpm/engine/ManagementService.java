@@ -702,7 +702,7 @@ public interface ManagementService {
    *
    * @since 7.4
    */
-  void setJobPriority(String jobId, int priority);
+  void setJobPriority(String jobId, long priority);
 
   /**
    * <p>Sets an explicit priority for jobs of the given job definition.
@@ -722,7 +722,7 @@ public interface ManagementService {
    *
    * @since 7.4
    */
-  void setOverridingJobPriorityForJobDefinition(String jobDefinitionId, int priority);
+  void setOverridingJobPriorityForJobDefinition(String jobDefinitionId, long priority);
 
   /**
    * <p>Sets an explicit default priority for jobs of the given job definition.
@@ -752,7 +752,7 @@ public interface ManagementService {
    *
    * @since 7.4
    */
-  void setOverridingJobPriorityForJobDefinition(String jobDefinitionId, int priority, boolean cascade);
+  void setOverridingJobPriorityForJobDefinition(String jobDefinitionId, long priority, boolean cascade);
 
   /**
    * <p>Clears the job definition's overriding job priority if set. After invoking this method,

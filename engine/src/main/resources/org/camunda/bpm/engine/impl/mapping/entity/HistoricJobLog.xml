@@ -33,7 +33,7 @@
             #{jobId, jdbcType=VARCHAR},
             #{jobDueDate, jdbcType=TIMESTAMP},
             #{jobRetries, jdbcType=INTEGER},
-            #{jobPriority, jdbcType=INTEGER},
+            #{jobPriority, jdbcType=BIGINT},
             #{jobExceptionMessage, jdbcType=VARCHAR},
             #{exceptionByteArrayId, jdbcType=VARCHAR},
             #{state, jdbcType=INTEGER},
@@ -95,7 +95,7 @@
     <result property="jobId" column="JOB_ID_" jdbcType="VARCHAR" />
     <result property="jobDueDate" column="JOB_DUEDATE_" jdbcType="TIMESTAMP" />
     <result property="jobRetries" column="JOB_RETRIES_" jdbcType="INTEGER" />
-    <result property="jobPriority" column="JOB_PRIORITY_" jdbcType="INTEGER" />
+    <result property="jobPriority" column="JOB_PRIORITY_" jdbcType="BIGINT" />
     <result property="jobExceptionMessage" column="JOB_EXCEPTION_MSG_" jdbcType="VARCHAR" />
     <result property="exceptionByteArrayId" column="JOB_EXCEPTION_STACK_ID_" jdbcType="VARCHAR" />
     <result property="jobDefinitionId" column="JOB_DEF_ID_" jdbcType="VARCHAR" />

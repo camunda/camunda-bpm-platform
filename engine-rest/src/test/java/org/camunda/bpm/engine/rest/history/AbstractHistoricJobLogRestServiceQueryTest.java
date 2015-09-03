@@ -55,8 +55,8 @@ public abstract class AbstractHistoricJobLogRestServiceQueryTest extends Abstrac
   protected static final String HISTORIC_JOB_LOG_RESOURCE_URL = TEST_RESOURCE_ROOT_PATH + "/history/job-log";
   protected static final String HISTORIC_JOB_LOG_COUNT_RESOURCE_URL = HISTORIC_JOB_LOG_RESOURCE_URL + "/count";
 
-  protected static final int JOB_LOG_QUERY_MAX_PRIORITY = 15;
-  protected static final int JOB_LOG_QUERY_MIN_PRIORITY = 14;
+  protected static final long JOB_LOG_QUERY_MAX_PRIORITY = Long.MAX_VALUE;
+  protected static final long JOB_LOG_QUERY_MIN_PRIORITY = Long.MIN_VALUE;
 
   protected HistoricJobLogQuery mockedQuery;
 

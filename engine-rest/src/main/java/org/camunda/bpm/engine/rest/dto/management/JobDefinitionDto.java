@@ -26,7 +26,7 @@ public class JobDefinitionDto {
   protected String jobConfiguration;
   protected String activityId;
   protected boolean suspended;
-  protected Integer overridingJobPriority;
+  protected Long overridingJobPriority;
 
   public JobDefinitionDto() { }
 
@@ -51,7 +51,7 @@ public class JobDefinitionDto {
   public boolean isSuspended() {
     return suspended;
   }
-  public Integer getOverridingJobPriority() {
+  public Long getOverridingJobPriority() {
     return overridingJobPriority;
   }
 

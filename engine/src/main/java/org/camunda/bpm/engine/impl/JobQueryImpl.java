@@ -50,8 +50,8 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
   protected Date duedateLowerThan;
   protected Date duedateHigherThanOrEqual;
   protected Date duedateLowerThanOrEqual;
-  protected Integer priorityHigherThanOrEqual;
-  protected Integer priorityLowerThanOrEqual;
+  protected Long priorityHigherThanOrEqual;
+  protected Long priorityLowerThanOrEqual;
   protected boolean withException;
   protected String exceptionMessage;
   protected boolean noRetriesLeft;
@@ -169,12 +169,12 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
   }
 
 
-  public JobQuery priorityHigherThanOrEquals(int priority) {
+  public JobQuery priorityHigherThanOrEquals(long priority) {
     this.priorityHigherThanOrEqual = priority;
     return this;
   }
 
-  public JobQuery priorityLowerThanOrEquals(int priority) {
+  public JobQuery priorityLowerThanOrEquals(long priority) {
     this.priorityLowerThanOrEqual = priority;
     return this;
   }

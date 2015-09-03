@@ -85,6 +85,6 @@ public interface JobDefinition {
    *
    * @since 7.4
    */
-  Integer getOverridingJobPriority();
+  Long getOverridingJobPriority();
 
 }

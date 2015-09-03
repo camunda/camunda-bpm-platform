@@ -63,7 +63,7 @@ public interface HistoricJobLogQuery extends Query<HistoricJobLogQuery, Historic
    *
    * @since 7.4
    */
-  HistoricJobLogQuery jobPriorityHigherThanOrEquals(int priority);
+  HistoricJobLogQuery jobPriorityHigherThanOrEquals(long priority);
 
   /**
    * Only select log entries where the job had a priority lower than or
@@ -71,7 +71,7 @@ public interface HistoricJobLogQuery extends Query<HistoricJobLogQuery, Historic
    *
    * @since 7.4
    */
-  HistoricJobLogQuery jobPriorityLowerThanOrEquals(int priority);
+  HistoricJobLogQuery jobPriorityLowerThanOrEquals(long priority);
 
   /** Only select created historic job log entries. */
   HistoricJobLogQuery creationLog();

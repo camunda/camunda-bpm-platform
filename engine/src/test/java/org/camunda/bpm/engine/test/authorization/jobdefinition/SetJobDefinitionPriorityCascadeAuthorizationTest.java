@@ -123,10 +123,10 @@ public class SetJobDefinitionPriorityCascadeAuthorizationTest {
     // then
     if (authRule.assertScenario(scenario)) {
       jobDefinition = engineRule.getManagementService().createJobDefinitionQuery().singleResult();
-      Assert.assertEquals(42, (int) jobDefinition.getOverridingJobPriority());
+      Assert.assertEquals(42L, (long) jobDefinition.getOverridingJobPriority());
 
       job = engineRule.getManagementService().createJobQuery().singleResult();
-      Assert.assertEquals(42, job.getPriority());
+      Assert.assertEquals(42L, job.getPriority());
     }
 
   }

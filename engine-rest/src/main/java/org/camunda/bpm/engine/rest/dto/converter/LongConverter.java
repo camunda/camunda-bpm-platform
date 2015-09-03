@@ -10,26 +10,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.dto.runtime;
+package org.camunda.bpm.engine.rest.dto.converter;
 
-public class JobDefinitionPriorityDto {
+public class LongConverter extends JacksonAwareStringToTypeConverter<Long> {
 
-  protected Long priority;
-  protected boolean includeJobs = false;
-
-  public Long getPriority() {
-    return priority;
-  }
-
-  public void setPriority(Long priority) {
-    this.priority = priority;
-  }
-
-  public boolean isIncludeJobs() {
-    return includeJobs;
-  }
-
-  public void setIncludeJobs(boolean includeJobs) {
-    this.includeJobs = includeJobs;
+  @Override
+  public Long convertQueryParameterToType(String value) {
+    return mapToType(value, Long.class);
   }
 }

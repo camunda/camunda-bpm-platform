@@ -36,7 +36,7 @@ public class HistoricJobLogEvent extends HistoryEvent {
 
   protected int jobRetries;
 
-  protected int jobPriority;
+  protected long jobPriority;
 
   protected String jobExceptionMessage;
 
@@ -86,11 +86,11 @@ public class HistoricJobLogEvent extends HistoryEvent {
     this.jobRetries = jobRetries;
   }
 
-  public int getJobPriority() {
+  public long getJobPriority() {
     return jobPriority;
   }
 
-  public void setJobPriority(int jobPriority) {
+  public void setJobPriority(long jobPriority) {
     this.jobPriority = jobPriority;
   }
 

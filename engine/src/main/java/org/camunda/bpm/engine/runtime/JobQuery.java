@@ -93,14 +93,14 @@ public interface JobQuery extends Query<JobQuery, Job> {
    *
    * @since 7.4
    */
-  JobQuery priorityHigherThanOrEquals(int priority);
+  JobQuery priorityHigherThanOrEquals(long priority);
 
   /**
    * Only select jobs with a priority that is lower than or equal to the given priority.
    *
    * @since 7.4
    */
-  JobQuery priorityLowerThanOrEquals(int priority);
+  JobQuery priorityLowerThanOrEquals(long priority);
 
   /** Only select jobs that failed due to an exception. */
   JobQuery withException();

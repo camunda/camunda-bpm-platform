@@ -268,7 +268,7 @@ public abstract class AbstractJobDefinitionRestServiceQueryTest extends Abstract
     String returnedJobType = from(content).getString("[0].jobType");
     String returnedJobConfiguration = from(content).getString("[0].jobConfiguration");
     boolean returnedSuspensionState = from(content).getBoolean("[0].suspended");
-    Integer returnedJobPriority = from(content).getObject("[0].overridingJobPriority", Integer.class);
+    Long returnedJobPriority = from(content).getObject("[0].overridingJobPriority", Long.class);
 
     assertThat(returnedId).isEqualTo(MockProvider.EXAMPLE_JOB_DEFINITION_ID);
     assertThat(returnedProcessDefinitionId).isEqualTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);

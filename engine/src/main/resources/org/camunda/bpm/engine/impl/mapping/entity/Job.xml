@@ -89,7 +89,7 @@
     <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR" />
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER"/>
     <result property="jobDefinitionId" column="JOB_DEF_ID_" jdbcType="VARCHAR" />
-    <result property="priority" column="PRIORITY_" jdbcType="INTEGER" />
+    <result property="priority" column="PRIORITY_" jdbcType="BIGINT" />
     <result property="sequenceCounter" column="SEQUENCE_COUNTER_" jdbcType="BIGINT" />
     <discriminator javaType="string" column="TYPE_">
       <case value="message" resultMap="messageResultMap"/>
@@ -332,7 +332,7 @@
             #{deploymentId, jdbcType=VARCHAR},
             #{suspensionState, jdbcType=INTEGER},
             #{jobDefinitionId, jdbcType=VARCHAR},
-            #{priority, jdbcType=INTEGER},
+            #{priority, jdbcType=BIGINT},
             #{sequenceCounter, jdbcType=BIGINT},
             1
     )
@@ -356,7 +356,7 @@
        JOB_DEF_ID_ = #{jobDefinitionId, jdbcType=VARCHAR},
        DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR},
        HANDLER_CFG_ = #{jobHandlerConfiguration, jdbcType=VARCHAR},
-       PRIORITY_ = #{priority, jdbcType=INTEGER},
+       PRIORITY_ = #{priority, jdbcType=BIGINT},
        SEQUENCE_COUNTER_ = #{sequenceCounter, jdbcType=BIGINT}
     </set>
     where ID_= #{id, jdbcType=VARCHAR}
@@ -428,7 +428,7 @@
             #{deploymentId, jdbcType=VARCHAR},
             #{suspensionState, jdbcType=INTEGER},
             #{jobDefinitionId, jdbcType=VARCHAR},
-            #{priority, jdbcType=INTEGER},
+            #{priority, jdbcType=BIGINT},
             #{sequenceCounter, jdbcType=BIGINT},
             1
     )
@@ -451,7 +451,7 @@
        JOB_DEF_ID_ = #{jobDefinitionId, jdbcType=VARCHAR},
        DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR},
        HANDLER_CFG_ = #{jobHandlerConfiguration, jdbcType=VARCHAR},
-       PRIORITY_ = #{priority, jdbcType=INTEGER},
+       PRIORITY_ = #{priority, jdbcType=BIGINT},
        SEQUENCE_COUNTER_ = #{sequenceCounter, jdbcType=BIGINT}
     </set>
     where ID_= #{id, jdbcType=VARCHAR}

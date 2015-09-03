@@ -81,7 +81,7 @@ public abstract class AbstractHistoricJobLogRestServiceInteractionTest extends A
         .body("jobId", equalTo(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_ID))
         .body("jobDueDate", equalTo(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_DUE_DATE))
         .body("jobRetries", equalTo(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_RETRIES))
-        .body("jobPriority", equalTo(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_PRIORITY))
+        .body("jobPriority", equalTo((int) MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_PRIORITY))
         .body("jobExceptionMessage", equalTo(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_EXCEPTION_MSG))
         .body("jobDefinitionId", equalTo(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_DEF_ID))
         .body("jobDefinitionType", equalTo(MockProvider.EXAMPLE_HISTORIC_JOB_LOG_JOB_DEF_TYPE))

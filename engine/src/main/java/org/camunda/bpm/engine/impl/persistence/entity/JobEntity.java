@@ -97,7 +97,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
 
   protected String jobDefinitionId;
 
-  protected int priority = DefaultJobPriorityProvider.DEFAULT_PRIORITY;
+  protected long priority = DefaultJobPriorityProvider.DEFAULT_PRIORITY;
 
   // runtime state /////////////////////////////
   protected boolean executing = false;
@@ -536,11 +536,11 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     this.activityId = activityId;
   }
 
-  public int getPriority() {
+  public long getPriority() {
     return priority;
   }
 
-  public void setPriority(int priority) {
+  public void setPriority(long priority) {
     this.priority = priority;
   }
 
