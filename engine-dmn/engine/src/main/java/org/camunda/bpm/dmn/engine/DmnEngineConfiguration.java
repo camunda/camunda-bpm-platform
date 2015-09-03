@@ -34,6 +34,8 @@ public interface DmnEngineConfiguration {
 
   DmnElementHandlerRegistry getElementHandlerRegistry();
 
+  DmnEngineMetricCollector getEngineMetricCollector();
+
   List<DmnTransformListener> getCustomPreDmnTransformListeners();
 
   List<DmnTransformListener> getCustomPostDmnTransformListeners();

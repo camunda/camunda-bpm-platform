@@ -22,6 +22,7 @@ import java.util.Map;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableListener;
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
+import org.camunda.bpm.dmn.engine.DmnEngineMetricCollector;
 import org.camunda.bpm.dmn.engine.ScriptEngineResolver;
 import org.camunda.bpm.dmn.engine.context.DmnContextFactory;
 import org.camunda.bpm.dmn.engine.handler.DmnElementHandlerRegistry;
@@ -49,6 +50,7 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
   protected DmnTransformer transformer;
   protected DmnTransformFactory transformFactory;
   protected DmnElementHandlerRegistry elementHandlerRegistry;
+  protected DmnEngineMetricCollector engineMetricCollector;
   protected List<DmnTransformListener> customPreDmnTransformListeners = new ArrayList<DmnTransformListener>();
   protected List<DmnTransformListener> customPostDmnTransformListeners = new ArrayList<DmnTransformListener>();
   protected List<DmnDecisionTableListener> customPreDmnDecisionTableListeners = new ArrayList<DmnDecisionTableListener>();
@@ -83,6 +85,14 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
 
   public void setElementHandlerRegistry(DmnElementHandlerRegistry elementHandlerRegistry) {
     this.elementHandlerRegistry = elementHandlerRegistry;
+  }
+
+  public DmnEngineMetricCollector getEngineMetricCollector() {
+    return engineMetricCollector;
+  }
+
+  public void setEngineMetricCollector(DmnEngineMetricCollector engineMetricCollector) {
+    this.engineMetricCollector = engineMetricCollector;
   }
 
   public List<DmnTransformListener> getCustomPreDmnTransformListeners() {
@@ -150,6 +160,7 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
     initContextFactory();
     initTransformFactory();
     initElementHandlerRegistry();
+    initMetricCollector();
     initTransformer();
     initDmnDecisionTableListeners();
     initHitPolicyHandlers();
@@ -171,6 +182,12 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
   protected void initElementHandlerRegistry() {
     if (elementHandlerRegistry == null) {
       elementHandlerRegistry = new DmnElementHandlerRegistryImpl();
+    }
+  }
+
+  protected void initMetricCollector() {
+    if (engineMetricCollector == null) {
+      engineMetricCollector = new DmnEngineMetricCollectorImpl();
     }
   }
 
@@ -202,7 +219,9 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
   }
 
   protected List<DmnDecisionTableListener> getDefaultDmnDecisionTableListeners() {
-    return Collections.emptyList();
+    List<DmnDecisionTableListener> defaultListeners = new ArrayList<DmnDecisionTableListener>();
+    defaultListeners.add(engineMetricCollector);
+    return defaultListeners;
   }
 
   protected void initHitPolicyHandlers() {
