@@ -1,5 +1,11 @@
 package org.camunda.bpm.pa;
 
+import static org.camunda.bpm.engine.variable.Variables.createVariables;
+import static org.camunda.bpm.engine.variable.Variables.fileValue;
+
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,8 +18,10 @@ import org.camunda.bpm.engine.CaseService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.rest.dto.identity.UserCredentialsDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserProfileDto;
@@ -130,8 +138,6 @@ public class DevProcessApplication extends ServletProcessApplication {
     runtimeService.startProcessInstanceByKey("CallActivity");
     ClockUtil.setCurrentTime(createArtificalDate(8));
     runtimeService.startProcessInstanceByKey("CallActivity");
-
-    runtimeService.startProcessInstanceByKey("invoice");
 
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("value1", "a");
@@ -252,6 +258,8 @@ public class DevProcessApplication extends ServletProcessApplication {
     taskService.setVariable(standaloneTaskId, "aVariable", "abc");
     taskService.setVariable(standaloneTaskId, "anotherVariable", 123456l);
 
+    startInvoiceInstances(engine);
+
     new Thread(){
       public void run() {
         ((ProcessEngineImpl) engine).getProcessEngineConfiguration().getJobExecutor().start();
@@ -287,5 +295,64 @@ public class DevProcessApplication extends ServletProcessApplication {
     dt = dt.minusMinutes(offset);
     dt = dt.minusSeconds(offset);
     return dt.toDate();
+  }
+
+
+  private void startInvoiceInstances(ProcessEngine processEngine) {
+
+    InputStream invoiceInputStream = getClass().getClassLoader().getResourceAsStream("invoice.pdf");
+
+    // process instance 1
+    processEngine.getRuntimeService().startProcessInstanceByKey("invoice", createVariables()
+        .putValue("creditor", "Great Pizza for Everyone Inc.")
+        .putValue("amount", 30.00d)
+        .putValue("invoiceCategory", "Travel Expenses")
+        .putValue("invoiceNumber", "GPFE-23232323")
+        .putValue("invoiceDocument", fileValue("invoice.pdf")
+            .file(invoiceInputStream)
+            .mimeType("application/pdf")
+            .create()));
+
+    IoUtil.closeSilently(invoiceInputStream);
+    invoiceInputStream = getClass().getClassLoader().getResourceAsStream("invoice.pdf");
+
+    // process instance 2
+    ProcessInstance pi = processEngine.getRuntimeService().startProcessInstanceByKey("invoice", createVariables()
+        .putValue("creditor", "Bobby's Office Supplies")
+        .putValue("amount", 900.00d)
+        .putValue("invoiceCategory", "Misc")
+        .putValue("invoiceNumber", "BOS-43934")
+        .putValue("invoiceDocument", fileValue("invoice.pdf")
+            .file(invoiceInputStream)
+            .mimeType("application/pdf")
+            .create()));
+    try {
+      Calendar calendar = Calendar.getInstance();
+      calendar.add(Calendar.DAY_OF_MONTH, -14);
+      ClockUtil.setCurrentTime(calendar.getTime());
+      processEngine.getIdentityService().setAuthentication("demo", Arrays.asList(Groups.CAMUNDA_ADMIN));
+      Task task = processEngine.getTaskService().createTaskQuery().processInstanceId(pi.getId()).singleResult();
+      processEngine.getTaskService().claim(task.getId(), "demo");
+      processEngine.getTaskService().complete(task.getId(), createVariables().putValue("approved", true));
+    }
+    finally{
+      ClockUtil.reset();
+      processEngine.getIdentityService().clearAuthentication();
+    }
+
+    IoUtil.closeSilently(invoiceInputStream);
+    invoiceInputStream = getClass().getClassLoader().getResourceAsStream("invoice.pdf");
+
+    // process instance 3
+    pi = processEngine.getRuntimeService().startProcessInstanceByKey("invoice", createVariables()
+        .putValue("creditor", "Papa Steve's all you can eat")
+        .putValue("amount", 10.99d)
+        .putValue("invoiceCategory", "Travel Expenses")
+        .putValue("invoiceNumber", "PSACE-5342")
+        .putValue("invoiceDocument", fileValue("invoice.pdf")
+            .file(invoiceInputStream)
+            .mimeType("application/pdf")
+            .create()));
+
   }
 }

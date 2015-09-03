@@ -1,0 +1,99 @@
+<form role="form" name="invoiceForm"
+      class="form-horizontal">
+
+  <div class="panel panel-info">Please fill in the details for the invoice you received</div>
+
+  <div class="control-group">
+    <label class="control-label"
+           for="document">Upload your Invoice Document (Required)</label>
+    <div class="controls">
+      <input type="file"
+        id="invoiceDocumentUpload"
+        cam-variable-name="invoiceDocument"
+        cam-variable-type="File"
+        cam-max-filesize="10000000"
+        class="form-control"/>
+    </div>
+  </div>
+
+  <script cam-script type="text/form-script">
+    camForm.on('submit', function(evt) {
+
+      var fileUpload = $('#invoiceDocumentUpload').get(0);
+
+      // prevent submit if user has not provided a file
+      evt.submitPrevented = (fileUpload.files.length == 0);
+
+    });
+  </script>
+
+  <div class="control-group">
+    <label class="control-label"
+           for="creditor">Creditor</label>
+    <div class="controls">
+      <input cam-variable-name="creditor"
+             cam-variable-type="String"
+             id="creditor"
+             class="form-control"
+             type="text"
+             required />
+      <div class="help">
+        (e.g. &quot;Great Pizza for Everyone Inc.&quot;)
+      </div>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <label class="control-label"
+           for="amount">Amount</label>
+    <div class="controls">
+      <input cam-variable-name="amount"
+             cam-variable-type="Double"
+             id="amount"
+             name="amount"
+             class="form-control"
+             type="text"
+             required />
+      <div class="help">
+        (e.g. &quot;30.00&quot;)
+      </div>
+
+      <p ng-show="invoiceForm.amount.$error.camVariableType">
+        Note: Input must be a 'Double'.
+      </p>
+
+    </div>
+  </div>
+
+  <div class="control-group">
+    <label class="control-label"
+           for="amount">Invoice Category</label>
+    <div class="controls">
+      <select cam-variable-name="invoiceCategory"
+              cam-variable-type="String"
+              class="form-control">
+        <option>Travel Expenses</option>
+        <option>Misc</option>
+      </select>
+
+    </div>
+  </div>
+
+  <div class="control-group">
+    <label class="control-label"
+           for="invoiceNumber">Invoice Number</label>
+    <div class="controls">
+      <input cam-variable-name="invoiceNumber"
+             cam-variable-type="String"
+             id="invoiceNumber"
+             class="form-control"
+             type="text"
+             required />
+      <div class="help">
+        (e.g. &quot;I-12345&quot;)
+      </div>
+    </div>
+  </div>
+
+</form>
+
