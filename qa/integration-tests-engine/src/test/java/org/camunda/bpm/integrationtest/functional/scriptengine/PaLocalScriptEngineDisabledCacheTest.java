@@ -14,7 +14,7 @@ package org.camunda.bpm.integrationtest.functional.scriptengine;
 
 import static org.junit.Assert.assertNotEquals;
 
-import org.camunda.bpm.application.ProcessApplicationInterface;
+import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.integrationtest.functional.scriptengine.engine.DummyScriptEngine;
 import org.camunda.bpm.integrationtest.functional.scriptengine.engine.DummyScriptEngineFactory;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -40,7 +40,7 @@ public class PaLocalScriptEngineDisabledCacheTest extends AbstractPaLocalScriptE
 
   @Test
   public void shouldNotCacheScriptEngine() {
-    ProcessApplicationInterface processApplication = getProcessApplication();
+    AbstractProcessApplication processApplication = (AbstractProcessApplication) getProcessApplication();
     assertNotEquals(processApplication.getScriptEngineForName(SCRIPT_FORMAT, false), processApplication.getScriptEngineForName(SCRIPT_FORMAT, false));
   }
 

@@ -30,6 +30,7 @@ import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
@@ -172,7 +173,13 @@ public class ScriptingEngines implements ScriptEngineResolver {
   protected ScriptEngine getPaScriptEngine(String language, ProcessApplicationReference pa) {
     try {
       ProcessApplicationInterface processApplication = pa.getProcessApplication();
-      return processApplication.getScriptEngineForName(language, enableScriptEngineCaching);
+      ProcessApplicationInterface rawObject = processApplication.getRawObject();
+
+      if (rawObject instanceof AbstractProcessApplication) {
+        AbstractProcessApplication abstractProcessApplication = (AbstractProcessApplication) rawObject;
+        return abstractProcessApplication.getScriptEngineForName(language, enableScriptEngineCaching);
+      }
+      return null;
     }
     catch (ProcessApplicationUnavailableException e) {
       throw new ProcessEngineException("Process Application is unavailable.", e);

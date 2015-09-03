@@ -76,7 +76,7 @@ public abstract class AbstractPaLocalScriptEngineTest extends AbstractFoxPlatfor
       fail("Could not retrieve process application");
     }
 
-    return processApplication;
+    return processApplication.getRawObject();
   }
 
 }

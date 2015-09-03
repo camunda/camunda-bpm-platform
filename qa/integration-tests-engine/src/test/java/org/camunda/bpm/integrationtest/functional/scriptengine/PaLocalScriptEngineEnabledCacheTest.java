@@ -14,7 +14,7 @@ package org.camunda.bpm.integrationtest.functional.scriptengine;
 
 import static org.junit.Assert.assertEquals;
 
-import org.camunda.bpm.application.ProcessApplicationInterface;
+import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.integrationtest.functional.scriptengine.engine.DummyScriptEngine;
 import org.camunda.bpm.integrationtest.functional.scriptengine.engine.DummyScriptEngineFactory;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -40,7 +40,7 @@ public class PaLocalScriptEngineEnabledCacheTest extends AbstractPaLocalScriptEn
 
   @Test
   public void shouldCacheScriptEngine() {
-    ProcessApplicationInterface processApplication = getProcessApplication();
+    AbstractProcessApplication processApplication = (AbstractProcessApplication) getProcessApplication();
     assertEquals(processApplication.getScriptEngineForName(SCRIPT_FORMAT, true), processApplication.getScriptEngineForName(SCRIPT_FORMAT, true));
   }
 
