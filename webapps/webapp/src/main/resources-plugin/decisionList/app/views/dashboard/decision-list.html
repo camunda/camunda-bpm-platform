@@ -1,0 +1,31 @@
+<!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/decisionList/app/views/dashboard/decision-list.html -->
+<div class="deployed-decisions">
+  <h3 ng-if="decisionCount">
+    {{decisionCount}} {{ (statistics.length > 1 ? 'decisions' : 'decision') }} deployed
+  </h3>
+
+  <table class="decision-definitions-list cam-table" ng-if="decisionCount">
+    <thead>
+      <tr>
+        <th class="instances">Executed Instances</th>
+        <th class="name">Name</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr ng-repeat="decision in decisions">
+        <td class="instances">
+          ???
+        </td>
+
+        <td class="name">
+          <a href="#/decision-definition/{{ decision.id }}">
+            {{ decision.name }}
+          </a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+<!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/decisionList/app/views/dashboard/decision-list.html -->

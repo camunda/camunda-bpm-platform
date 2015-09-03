@@ -13,6 +13,8 @@ module.exports = function(config, requireJsConf) {
 
     paths: {
       'angular': 'empty:',
+      'angular-data-depend': 'empty:',
+      'camunda-bpm-sdk-js': 'empty:',
       'text': '<%= pkg.gruntConfig.pluginSourceDir.split("/").map(function () { return ".." }).join("/") %>/node_modules/requirejs-text/text'
     }
   };
@@ -42,6 +44,15 @@ module.exports = function(config, requireJsConf) {
       include: ['standaloneTask/app/plugin'],
       exclude: ['text'],
       insertRequire: ['standaloneTask/app/plugin']
+    })
+  };
+
+  requireJsConf.webapp_decisionList = {
+    options: _.extend({}, options, {
+      out: '<%= pkg.gruntConfig.pluginBuildTarget %>/decisionList/app/plugin.js',
+      include: ['decisionList/app/plugin'],
+      exclude: ['text'],
+      insertRequire: ['decisionList/app/plugin']
     })
   };
 

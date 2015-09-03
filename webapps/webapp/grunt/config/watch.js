@@ -33,4 +33,14 @@ module.exports = function(config, watchConf) {
       'requirejs:webapp_standaloneTask'
     ]
   };
+
+  watchConf.webapp_decisionList = {
+    options: options,
+    files: [
+      '<%= pkg.gruntConfig.pluginSourceDir %>/decisionList/**/*.*'
+    ],
+    tasks: [
+      'requirejs:webapp_decisionList'
+    ]
+  };
 };
