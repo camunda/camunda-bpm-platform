@@ -174,6 +174,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHand
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
 import org.camunda.bpm.engine.impl.metrics.MetricsReporterIdProvider;
 import org.camunda.bpm.engine.impl.metrics.SimpleIpBasedProvider;
+import org.camunda.bpm.engine.impl.metrics.dmn.MetricsDecisionTableListener;
 import org.camunda.bpm.engine.impl.metrics.parser.MetricsBpmnParseListener;
 import org.camunda.bpm.engine.impl.metrics.parser.MetricsCmmnTransformListener;
 import org.camunda.bpm.engine.impl.metrics.reporter.DbMetricsReporter;
@@ -1097,6 +1098,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return dmnDeployer;
   }
 
+  public DmnEngine getDmnEngine() {
+    return dmnEngine;
+  }
+
+  public DmnEngineConfiguration getDmnEngineConfiguration() {
+    return dmnEngineConfiguration;
+  }
+
   // job executor /////////////////////////////////////////////////////////////
 
   protected void initJobExecutor() {
@@ -1285,6 +1294,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     metricsRegistry.createMeter(Metrics.JOB_FAILED);
     metricsRegistry.createMeter(Metrics.JOB_LOCKED_EXCLUSIVE);
     metricsRegistry.createMeter(Metrics.JOB_EXECUTION_REJECTED);
+
+    metricsRegistry.createMeter(Metrics.EXECUTED_DECISION_ELEMENTS);
   }
 
   protected void initSerialization() {

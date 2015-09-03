@@ -35,6 +35,8 @@ import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
 import org.camunda.bpm.dmn.engine.ScriptEngineResolver;
+import org.camunda.bpm.dmn.scriptengine.DmnScriptEngine;
+import org.camunda.bpm.dmn.scriptengine.DmnScriptEngineFactory;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ScriptCompilationException;
 import org.camunda.bpm.engine.delegate.VariableScope;
@@ -159,7 +161,7 @@ public class ScriptingEngines implements ScriptEngineResolver {
     ProcessApplicationReference pa = Context.getCurrentProcessApplication();
 
     ScriptEngine engine = null;
-    if(pa != null) {
+    if(pa != null && !DmnScriptEngineFactory.names.contains(language)) {
       engine = getPaScriptEngine(language, pa);
     }
 
@@ -265,7 +267,7 @@ public class ScriptingEngines implements ScriptEngineResolver {
   }
 
   /** override to build a spring aware ScriptingEngines
-   * @param engineBindings
+   * @param engineBindin
    * @param scriptEngine */
   public Bindings createBindings(ScriptEngine scriptEngine, VariableScope variableScope) {
     return scriptBindingsFactory.createBindings(variableScope, scriptEngine.createBindings());

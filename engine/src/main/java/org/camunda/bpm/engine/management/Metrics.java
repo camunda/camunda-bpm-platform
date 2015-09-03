@@ -50,4 +50,9 @@ public class Metrics {
    */
   public final static String JOB_LOCKED_EXCLUSIVE = "job-locked-exclusive";
 
+  /**
+   * Number of executed decision elements in the DMN engine.
+   */
+  public final static String EXECUTED_DECISION_ELEMENTS = "executed-decision-elements";
+
 }

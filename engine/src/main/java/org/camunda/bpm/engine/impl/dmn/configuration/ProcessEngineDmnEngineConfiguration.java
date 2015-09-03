@@ -16,11 +16,13 @@ package org.camunda.bpm.engine.impl.dmn.configuration;
 import org.camunda.bpm.dmn.engine.ScriptEngineResolver;
 import org.camunda.bpm.dmn.engine.impl.DmnEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.dmn.handler.ProcessEngineDmnElementHandlerRegistry;
+import org.camunda.bpm.engine.impl.metrics.dmn.MetricsDecisionTableListener;
 
 public class ProcessEngineDmnEngineConfiguration extends DmnEngineConfigurationImpl {
 
   public ProcessEngineDmnEngineConfiguration(ScriptEngineResolver scriptEngineResolver) {
     this.scriptEngineResolver = scriptEngineResolver;
+    this.customPostDmnDecisionTableListeners.add(new MetricsDecisionTableListener());
   }
 
   protected void initElementHandlerRegistry() {
