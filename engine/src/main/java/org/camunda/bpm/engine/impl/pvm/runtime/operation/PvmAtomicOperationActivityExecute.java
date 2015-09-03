@@ -50,4 +50,8 @@ public class PvmAtomicOperationActivityExecute implements PvmAtomicOperation {
   public String getCanonicalName() {
     return "activity-execute";
   }
+
+  public boolean isAsyncCapable() {
+    return false;
+  }
 }

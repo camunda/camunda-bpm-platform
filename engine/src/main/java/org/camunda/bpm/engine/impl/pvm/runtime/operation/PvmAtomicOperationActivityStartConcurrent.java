@@ -31,4 +31,8 @@ public class PvmAtomicOperationActivityStartConcurrent extends PvmAtomicOperatio
     return "activity-start-concurrent";
   }
 
+  public boolean isAsyncCapable() {
+    return false;
+  }
+
 }

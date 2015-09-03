@@ -56,6 +56,7 @@ public abstract class PvmAtomicOperationCancelActivity implements PvmAtomicOpera
 
     propagatingExecution.setActivity(cancellingActivity);
     propagatingExecution.setActive(true);
+    propagatingExecution.setEnded(false);
     activityCancelled(propagatingExecution);
   }
 

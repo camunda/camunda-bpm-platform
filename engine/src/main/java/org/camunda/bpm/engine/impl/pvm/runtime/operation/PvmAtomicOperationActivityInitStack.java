@@ -61,4 +61,7 @@ public class PvmAtomicOperationActivityInitStack implements PvmAtomicOperation {
     return execution;
   }
 
+  public boolean isAsyncCapable() {
+    return false;
+  }
 }

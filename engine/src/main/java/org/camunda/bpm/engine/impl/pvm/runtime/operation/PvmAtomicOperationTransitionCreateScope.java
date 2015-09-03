@@ -34,4 +34,8 @@ public class PvmAtomicOperationTransitionCreateScope extends PvmAtomicOperationC
     execution.performOperation(TRANSITION_NOTIFY_LISTENER_START);
 
   }
+
+  public boolean isAsyncCapable() {
+    return true;
+  }
 }

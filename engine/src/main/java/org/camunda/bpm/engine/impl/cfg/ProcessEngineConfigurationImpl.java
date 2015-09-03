@@ -484,6 +484,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected MetricsReporterIdProvider metricsReporterIdProvider;
 
+  protected boolean isBpmnStacktraceVerbose = false;
+
   // buildProcessEngine ///////////////////////////////////////////////////////
 
   @Override
@@ -2727,5 +2729,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setMetricsReporterIdProvider(MetricsReporterIdProvider metricsReporterIdProvider) {
     this.metricsReporterIdProvider = metricsReporterIdProvider;
+  }
+
+  public ProcessEngineConfigurationImpl setBpmnStacktraceVerbose(boolean isBpmnStacktraceVerbose) {
+    this.isBpmnStacktraceVerbose = isBpmnStacktraceVerbose;
+    return this;
+  }
+
+  public boolean isBpmnStacktraceVerbose() {
+    return this.isBpmnStacktraceVerbose;
   }
 }

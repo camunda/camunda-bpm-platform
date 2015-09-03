@@ -22,13 +22,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
@@ -75,11 +73,13 @@ public class CompensationUtil {
       compensatingExecution.setConcurrent(true);
     }
 
-    // signal compensation events in reverse order of their 'created' timestamp
+    // signal compensation events in order of their 'created' timestamp
+    // order will be reversed again in command context with the effect that they are
+    // actually be started in correct order :)
     Collections.sort(eventSubscriptions, new Comparator<EventSubscriptionEntity>() {
       @Override
       public int compare(EventSubscriptionEntity o1, EventSubscriptionEntity o2) {
-        return o2.getCreated().compareTo(o1.getCreated());
+        return o1.getCreated().compareTo(o2.getCreated());
       }
     });
 

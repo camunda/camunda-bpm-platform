@@ -18,7 +18,6 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.cmd.FoxDeleteProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.pvm.ProcessDefinitionBuilder;
-import org.camunda.bpm.engine.impl.pvm.PvmExecution;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionImpl;
@@ -212,11 +211,11 @@ public class PvmEventTest extends PvmTestCase {
     expectedEvents.add("end on Activity(start)");
     expectedEvents.add("start on Activity(fork)");
     expectedEvents.add("end on Activity(fork)");
-    expectedEvents.add("start on Activity(c1)");
-    expectedEvents.add("end on Activity(c1)");
-    expectedEvents.add("start on Activity(join)");
     expectedEvents.add("start on Activity(c2)");
     expectedEvents.add("end on Activity(c2)");
+    expectedEvents.add("start on Activity(join)");
+    expectedEvents.add("start on Activity(c1)");
+    expectedEvents.add("end on Activity(c1)");
     expectedEvents.add("start on Activity(join)");
     expectedEvents.add("end on Activity(join)");
     expectedEvents.add("end on Activity(join)");
