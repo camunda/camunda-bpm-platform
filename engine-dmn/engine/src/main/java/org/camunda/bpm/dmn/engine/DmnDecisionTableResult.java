@@ -44,8 +44,8 @@ public interface DmnDecisionTableResult {
   Object getCollectResultValue();
 
   /**
-   * @return the value of the metric for the cost of this evaluation
+   * @return the number of executed decision elements during the evaluation
    */
-  long getEvaluationMetric();
+  long getExecutedDecisionElements();
 
 }

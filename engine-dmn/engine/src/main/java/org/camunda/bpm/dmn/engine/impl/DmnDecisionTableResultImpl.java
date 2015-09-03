@@ -28,7 +28,7 @@ public class DmnDecisionTableResultImpl implements DmnDecisionTableResult {
   protected List<DmnDecisionTableRule> matchingRules = new ArrayList<DmnDecisionTableRule>();
   protected String collectResultName;
   protected Object collectResultValue;
-  protected long evaluationMetric = 0;
+  protected long executedDecisionElements = 0;
 
   public Map<String, DmnDecisionTableValue> getInputs() {
     return inputs;
@@ -62,20 +62,21 @@ public class DmnDecisionTableResultImpl implements DmnDecisionTableResult {
     this.collectResultValue = collectResultValue;
   }
 
-  public long getEvaluationMetric() {
-    return evaluationMetric;
+  public long getExecutedDecisionElements() {
+    return executedDecisionElements;
   }
 
-  public void setEvaluationMetric(long evaluationMetric) {
-    this.evaluationMetric = evaluationMetric;
+  public void setExecutedDecisionElements(long executedDecisionElements) {
+    this.executedDecisionElements = executedDecisionElements;
   }
 
   public String toString() {
     return "DmnDecisionTableResultImpl{" +
       "inputs=" + inputs +
       ", matchingRules=" + matchingRules +
-      ", collectResult=" + collectResultValue +
-      ", evaluationMetric=" + evaluationMetric +
+      ", collectResultName='" + collectResultName + '\'' +
+      ", collectResultValue=" + collectResultValue +
+      ", executedDecisionElements=" + executedDecisionElements +
       '}';
   }
 

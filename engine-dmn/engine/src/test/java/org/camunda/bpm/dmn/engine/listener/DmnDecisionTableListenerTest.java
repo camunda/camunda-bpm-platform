@@ -65,16 +65,16 @@ public class DmnDecisionTableListenerTest {
 
   @Test
   @DecisionResource(resource = DMN_FILE)
-  public void testEvaluationMetric() {
-    // metric should be independent from input and result
+  public void testExecutedDecisionElements() {
+    // the number should be independent from input and result
     evaluateDecision(true, "foo", false, "hello");
-    assertThat(listener.result.getEvaluationMetric()).isEqualTo(36);
+    assertThat(listener.result.getExecutedDecisionElements()).isEqualTo(36);
 
     evaluateDecision(false, "bar", true, "hello");
-    assertThat(listener.result.getEvaluationMetric()).isEqualTo(36);
+    assertThat(listener.result.getExecutedDecisionElements()).isEqualTo(36);
 
     evaluateDecision(false, "false", true, "hello");
-    assertThat(listener.result.getEvaluationMetric()).isEqualTo(36);
+    assertThat(listener.result.getExecutedDecisionElements()).isEqualTo(36);
   }
 
   @Test
