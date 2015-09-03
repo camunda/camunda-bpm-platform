@@ -38,6 +38,7 @@
     "chai-as-promised": "4.2.0",
     "mocha": "2.1.0",
     "xunit-file": "0.0.6",
+    "source-map": "0.4.4",
     "lodash": "2.4.1"
   }
 }
