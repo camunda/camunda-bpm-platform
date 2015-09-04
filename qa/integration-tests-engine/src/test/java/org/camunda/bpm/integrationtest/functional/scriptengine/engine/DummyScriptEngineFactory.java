@@ -66,7 +66,10 @@ public class DummyScriptEngineFactory implements ScriptEngineFactory {
   }
 
   public Object getParameter(String key) {
-    throw new UnsupportedOperationException("getParameter");
+    if (key.equals("THREADING")) {
+      return "MULTITHREADED";
+    }
+    return null;
   }
 
   public String getMethodCallSyntax(String obj, String m, String... args) {

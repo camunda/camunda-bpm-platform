@@ -33,14 +33,40 @@ public class ProcessApplicationScriptEngineResolver {
   }
 
   public ScriptEngine getScriptEngine(String name, boolean cache) {
+    ScriptEngine scriptEngine = null;
+
+    if (cache) {
+      scriptEngine = getCachedScriptEngine(name);
+
+    }
+    else {
+      scriptEngine = scriptEngineManager.getEngineByName(name);
+
+    }
+
+    return scriptEngine;
+  }
+
+  protected ScriptEngine getCachedScriptEngine(String name) {
     ScriptEngine scriptEngine = cachedEngines.get(name);
+
     if(scriptEngine == null) {
       scriptEngine = scriptEngineManager.getEngineByName(name);
-      if(scriptEngine != null && cache) {
-        cachedEngines.put(name, scriptEngine);
+
+      if(scriptEngine != null) {
+        if(isCachable(scriptEngine)) {
+          cachedEngines.put(name, scriptEngine);
+        }
       }
     }
+
     return scriptEngine;
+  }
+
+  protected boolean isCachable(ScriptEngine scriptEngine) {
+    // Check if script-engine supports multithreading. If true it can be cached.
+    Object threadingParameter = scriptEngine.getFactory().getParameter("THREADING");
+    return threadingParameter != null;
   }
 
 }
