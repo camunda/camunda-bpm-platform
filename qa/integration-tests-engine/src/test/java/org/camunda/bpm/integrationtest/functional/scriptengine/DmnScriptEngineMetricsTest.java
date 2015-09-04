@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.integrationtest.functional.scriptengine;
 
+import org.camunda.bpm.dmn.engine.DmnEngineMetricCollector;
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -38,16 +39,20 @@ public class DmnScriptEngineMetricsTest extends AbstractFoxPlatformIntegrationTe
   }
 
   @Test
-  public void testDeployProcessArchive() {
+  public void testExecutedDecisionElements() {
+    DmnEngineMetricCollector metricCollector = processEngineConfiguration.getDmnEngineConfiguration().getEngineMetricCollector();
+
+    // clear metrics
+    metricCollector.clearExecutedDecisionElements();
+    processEngineConfiguration.getMetricsRegistry().getMeterByName(Metrics.EXECTUED_DECISION_ELEMENTS).getAndClear();
 
     VariableMap variables = Variables.createVariables().putValue("status", "bronze").putValue("sum", 100);
-
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", variables);
 
     long executedDecisionElements = managementService.createMetricsQuery().name(Metrics.EXECUTED_DECISION_ELEMENTS).sum();
     assertEquals(16l, executedDecisionElements);
 
-    executedDecisionElements = processEngineConfiguration.getDmnEngineConfiguration().getEngineMetricCollector().getExecutedDecisionElements();
+    executedDecisionElements = metricCollector.getExecutedDecisionElements();
     assertEquals(16l, executedDecisionElements);
   }
 
