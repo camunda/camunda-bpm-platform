@@ -3,19 +3,21 @@ define([
 
   './dashboard',
   './processDefinition',
-  './processInstance'
+  './processInstance',
+  './decisionDefinition'
 
 ], function(
   angular,
 
    dashboard,
    processDefinitionModule,
-   processInstanceModule
+   processInstanceModule,
+   decisionDefinitionModule
 ) {
 
   'use strict';
 
-  var pagesModule = angular.module('cam.cockpit.pages', [processDefinitionModule.name, processInstanceModule.name]);
+  var pagesModule = angular.module('cam.cockpit.pages', [processDefinitionModule.name, processInstanceModule.name, decisionDefinitionModule.name]);
 
   pagesModule.config(dashboard);
 

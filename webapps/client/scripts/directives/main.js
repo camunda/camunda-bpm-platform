@@ -5,6 +5,7 @@ define([
   './numeric',
   './date',
   './processDiagram',
+  './decisionTable',
   './processDiagramPreview',
   './activityInstanceTree',
   './sidebarContainer',
@@ -24,6 +25,7 @@ define([
   numeric,
   date,
   processDiagram,
+  decisionTable,
   processDiagramPreview,
   activityInstanceTree,
   sidebarContainer,
@@ -46,6 +48,7 @@ define([
   directivesModule.directive('numeric', numeric);
   directivesModule.directive('date', date);
   directivesModule.directive('processDiagram', processDiagram);
+  directivesModule.directive('decisionTable', decisionTable);
   directivesModule.directive('processDiagramPreview', processDiagramPreview);
   directivesModule.directive('activityInstanceTree', activityInstanceTree);
   directivesModule.directive('ctnCollapsableParent', sidebarContainer);

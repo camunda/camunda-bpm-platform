@@ -1,0 +1,67 @@
+<!-- # CE - camunda-cockpit-ui/client/scripts/pages/decision-definition.html -->
+<div class="ctn-fixed-view">
+
+  <div class="ctn-header">
+    <h1>
+      <span class="process-name-prefix">
+        <span>Decision</span>
+        <span>definition</span>
+      </span>
+
+      {{ decisionDefinition.name || decisionDefinition.key }}
+
+    </h1>
+  </div>
+
+
+  <div class="ctn-content-container"
+       ctn-collapsable-parent="sidebar">
+
+    <!-- tool bar -->
+    <div class="ctn-toolbar">
+      <!-- space to add plugins later -->
+    </div>
+
+    <!-- sidebar -->
+    <div class="ctn-column ctn-sidebar ctn-scroll"
+         ctn-collapsable="left">
+
+      <div class="filters">
+        <div class="version-filter filter">
+          <span class="name">
+            Version
+          </span>
+          <span ng-if="!decisionDefinition"
+                class="glyphicon glyphicon-refresh animate-spin"></span>
+
+          <span ng-if="decisionDefinition">
+            {{ decisionDefinition.version }}
+          </span>
+        </div>
+
+      </div>
+
+      <a class="hide-collapsable pull-right"></a>
+    </div>
+
+
+    <div class="ctn-column ctn-content"
+         ctn-collapsable-parent="tabs">
+
+      <!-- content top pane -->
+      <div class="ctn-row ctn-content-top">
+        <div decision-table="tableXml" style="height: 100%;"></div>
+      </div>
+
+      <!-- content bottom pane -->
+      <div class="ctn-row ctn-content-bottom ctn-tabbed"
+           ctn-collapsable="bottom">
+      </div>
+
+      <a class="show-collapsable"></a>
+    </div>
+
+  </div>
+
+</div><!-- end .ctn-fixed-view -->
+<!-- / CE - camunda-cockpit-ui/client/scripts/pages/decision-definition.html -->

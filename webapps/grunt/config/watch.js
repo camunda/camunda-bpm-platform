@@ -50,7 +50,6 @@ module.exports = function(config, watchConf) {
         '<%= pkg.gruntConfig.cockpitSourceDir %>/../node_modules/camunda-commons-ui/node_modules/camunda-bpm-sdk-js/dist/**/*.js',
       ],
       tasks: [
-        'requirejs:cockpit_dependencies',
         'requirejs:cockpit_scripts'
       ]
   };
