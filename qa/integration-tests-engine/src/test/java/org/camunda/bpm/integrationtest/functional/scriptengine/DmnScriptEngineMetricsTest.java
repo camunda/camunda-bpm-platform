@@ -44,7 +44,7 @@ public class DmnScriptEngineMetricsTest extends AbstractFoxPlatformIntegrationTe
 
     // clear metrics
     metricCollector.clearExecutedDecisionElements();
-    processEngineConfiguration.getMetricsRegistry().getMeterByName(Metrics.EXECTUED_DECISION_ELEMENTS).getAndClear();
+    processEngineConfiguration.getMetricsRegistry().getMeterByName(Metrics.EXECUTED_DECISION_ELEMENTS).getAndClear();
 
     VariableMap variables = Variables.createVariables().putValue("status", "bronze").putValue("sum", 100);
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", variables);
