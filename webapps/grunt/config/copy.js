@@ -101,7 +101,7 @@ module.exports = function(config, copyConf) {
           ],
           dest: '<%= pkg.gruntConfig.cockpitBuildTarget %>/fonts/'
         },
-        // open sans fonts
+        // open sans and dmn fonts
         {
           expand: true,
           cwd: '<%= pkg.gruntConfig.cockpitSourceDir %>/../node_modules/camunda-commons-ui/vendor/fonts',
