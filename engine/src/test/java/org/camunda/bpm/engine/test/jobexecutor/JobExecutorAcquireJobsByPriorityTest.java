@@ -45,19 +45,19 @@ public class JobExecutorAcquireJobsByPriorityTest extends AbstractJobExecutorAcq
     List<JobEntity> acquirableJobs = findAcquirableJobs();
     assertEquals(20, acquirableJobs.size());
     for (int i = 0; i < 5; i++) {
-      assertEquals(10, (int) acquirableJobs.get(i).getPriority());
+      assertEquals(10, acquirableJobs.get(i).getPriority());
     }
 
     for (int i = 5; i < 10; i++) {
-      assertEquals(8, (int) acquirableJobs.get(i).getPriority());
+      assertEquals(8, acquirableJobs.get(i).getPriority());
     }
 
     for (int i = 10; i < 15; i++) {
-      assertEquals(5, (int) acquirableJobs.get(i).getPriority());
+      assertEquals(5, acquirableJobs.get(i).getPriority());
     }
 
     for (int i = 15; i < 20; i++) {
-      assertEquals(4, (int) acquirableJobs.get(i).getPriority());
+      assertEquals(4, acquirableJobs.get(i).getPriority());
     }
   }
 

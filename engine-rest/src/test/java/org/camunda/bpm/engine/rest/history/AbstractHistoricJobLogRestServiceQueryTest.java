@@ -411,7 +411,7 @@ public abstract class AbstractHistoricJobLogRestServiceQueryTest extends Abstrac
     String returnedJobId = from(content).getString("[0].jobId");
     String returnedJobDueDate = from(content).getString("[0].jobDueDate");
     int returnedJobRetries = from(content).getInt("[0].jobRetries");
-    int returnedJobPriority = from(content).getInt("[0].jobPriority");
+    long returnedJobPriority = from(content).getLong("[0].jobPriority");
     String returnedJobExceptionMessage = from(content).getString("[0].jobExceptionMessage");
     String returnedJobDefinitionId = from(content).getString("[0].jobDefinitionId");
     String returnedJobDefinitionType = from(content).getString("[0].jobDefinitionType");
@@ -479,7 +479,7 @@ public abstract class AbstractHistoricJobLogRestServiceQueryTest extends Abstrac
     String returnedJobId = from(content).getString("[0].jobId");
     String returnedJobDueDate = from(content).getString("[0].jobDueDate");
     int returnedJobRetries = from(content).getInt("[0].jobRetries");
-    int returnedJobPriority = from(content).getInt("[0].jobPriority");
+    long returnedJobPriority = from(content).getLong("[0].jobPriority");
     String returnedJobExceptionMessage = from(content).getString("[0].jobExceptionMessage");
     String returnedJobDefinitionId = from(content).getString("[0].jobDefinitionId");
     String returnedJobDefinitionType = from(content).getString("[0].jobDefinitionType");

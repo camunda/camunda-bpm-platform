@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.test.Deployment;
  */
 public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngineTestCase {
 
-  protected static final int EXPECTED_DEFAULT_PRIORITY = 0;
+  protected static final long EXPECTED_DEFAULT_PRIORITY = 0;
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/oneTaskProcess.bpmn20.xml")
   public void testDefaultPrioritizationAsyncBefore() {
@@ -82,7 +82,7 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
     // then
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
-    assertEquals(10, (int) job.getPriority());
+    assertEquals(10, job.getPriority());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioProcess.bpmn20.xml")
@@ -99,7 +99,7 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
     // then
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
-    assertEquals(10, (int) job.getPriority());
+    assertEquals(10, job.getPriority());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/intermediateTimerJobPrioProcess.bpmn20.xml")
@@ -113,7 +113,7 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
     // then
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
-    assertEquals(8, (int) job.getPriority());
+    assertEquals(8, job.getPriority());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioProcess.bpmn20.xml")
@@ -127,7 +127,7 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
     // then
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
-    assertEquals(5, (int) job.getPriority());
+    assertEquals(5, job.getPriority());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/jobPrioProcess.bpmn20.xml")
@@ -144,7 +144,7 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
     // then
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
-    assertEquals(5, (int) job.getPriority());
+    assertEquals(5, job.getPriority());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/intermediateTimerJobPrioProcess.bpmn20.xml")
@@ -158,7 +158,7 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
     // then
     Job job = managementService.createJobQuery().singleResult();
     assertNotNull(job);
-    assertEquals(4, (int) job.getPriority());
+    assertEquals(4, job.getPriority());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/job/subProcessJobPrioProcess.bpmn20.xml")
@@ -173,7 +173,7 @@ public class JobPrioritizationBpmnConstantValueTest extends PluggableProcessEngi
     // then the job for that activity has priority 10 which is the process definition's
     // priority; the sub process priority is not inherited
     Job job = managementService.createJobQuery().singleResult();
-    assertEquals(10, (int) job.getPriority());
+    assertEquals(10, job.getPriority());
   }
 
   public void testFailOnMalformedInput() {

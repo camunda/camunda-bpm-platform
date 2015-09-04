@@ -603,7 +603,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     // then
     job = managementService.createJobQuery().singleResult();
 
-    assertEquals(42, (int) job.getPriority());
+    assertEquals(42, job.getPriority());
   }
 
   public void testSetJobPriorityForNonExistingJob() {
@@ -636,12 +636,12 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     // it is possible to set the max integer value
     managementService.setJobPriority(job.getId(), Long.MAX_VALUE);
     job = managementService.createJobQuery().singleResult();
-    assertEquals(Long.MAX_VALUE, (long) job.getPriority());
+    assertEquals(Long.MAX_VALUE, job.getPriority());
 
     // it is possible to set the min integer value
     managementService.setJobPriority(job.getId(), Long.MIN_VALUE + 1); // +1 for informix
     job = managementService.createJobQuery().singleResult();
-    assertEquals(Long.MIN_VALUE + 1, (long) job.getPriority());
+    assertEquals(Long.MIN_VALUE + 1, job.getPriority());
   }
 
   protected void cleanOpLog(String jobId) {

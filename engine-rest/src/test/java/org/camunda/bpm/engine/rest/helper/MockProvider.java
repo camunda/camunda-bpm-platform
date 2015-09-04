@@ -284,7 +284,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_JOB_CONFIG = "aJobConfig";
   public static final boolean EXAMPLE_JOB_DEFINITION_IS_SUSPENDED = true;
   public static final String EXAMPLE_JOB_DEFINITION_DELAYED_EXECUTION = "2013-04-23T13:42:43";
-  public static final Long EXAMPLE_JOB_DEFINITION_PRIORITY = 52L;
+  public static final long EXAMPLE_JOB_DEFINITION_PRIORITY = Integer.MAX_VALUE + 52l;
 
   // Jobs
   public static final String EXAMPLE_JOB_ACTIVITY_ID = "aJobActivityId";
@@ -303,7 +303,7 @@ public abstract class MockProvider {
   public static final Boolean EXAMPLE_WITH_EXCEPTION = true;
   public static final Boolean EXAMPLE_NO_RETRIES_LEFT = true;
   public static final Boolean EXAMPLE_JOB_IS_SUSPENDED = true;
-  public static final long EXAMPLE_JOB_PRIORITY = 42;
+  public static final long EXAMPLE_JOB_PRIORITY = Integer.MAX_VALUE + 42l;
 
   public static final String EXAMPLE_RESOURCE_TYPE_NAME = "exampleResource";
   public static final int EXAMPLE_RESOURCE_TYPE_ID = 12345678;
@@ -575,7 +575,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_JOB_LOG_JOB_ID = "aJobId";
   public static final String EXAMPLE_HISTORIC_JOB_LOG_JOB_DUE_DATE = "2015-10-01T00:00:00";
   public static final int EXAMPLE_HISTORIC_JOB_LOG_JOB_RETRIES = 5;
-  public static final long EXAMPLE_HISTORIC_JOB_LOG_JOB_PRIORITY = 42L;
+  public static final long EXAMPLE_HISTORIC_JOB_LOG_JOB_PRIORITY = Integer.MAX_VALUE + 42l;
   public static final String EXAMPLE_HISTORIC_JOB_LOG_JOB_EXCEPTION_MSG = "aJobExceptionMsg";
   public static final String EXAMPLE_HISTORIC_JOB_LOG_JOB_DEF_ID = "aJobDefId";
   public static final String EXAMPLE_HISTORIC_JOB_LOG_JOB_DEF_TYPE = "aJobDefType";

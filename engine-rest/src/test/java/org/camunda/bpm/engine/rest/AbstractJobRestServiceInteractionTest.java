@@ -173,7 +173,7 @@ public abstract class AbstractJobRestServiceInteractionTest extends AbstractRest
     .body("processInstanceId", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
     .body("executionId", equalTo(MockProvider.EXAMPLE_EXECUTION_ID))
     .body("exceptionMessage", equalTo(MockProvider.EXAMPLE_JOB_NO_EXCEPTION_MESSAGE))
-    .body("priority", equalTo((int) MockProvider.EXAMPLE_JOB_PRIORITY))
+    .body("priority", equalTo(MockProvider.EXAMPLE_JOB_PRIORITY))
     .body("jobDefinitionId", equalTo(MockProvider.EXAMPLE_JOB_DEFINITION_ID))
     .when().get(SINGLE_JOB_RESOURCE_URL);
 

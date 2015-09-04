@@ -140,7 +140,7 @@ public abstract class AbstractJobRestServiceQueryTest extends AbstractRestServic
     int returnedRetries = from(content).getInt("[0].retries");
     Date returnedDueDate = DateTimeUtil.parseDate(from(content).getString("[0].dueDate"));
     boolean returnedSuspended = from(content).getBoolean("[0].suspended");
-    int returnedPriority = from(content).getInt("[0].priority");
+    long returnedPriority = from(content).getLong("[0].priority");
     String returnedJobDefinitionId= from(content).getString("[0].jobDefinitionId");
 
     Assert.assertEquals(MockProvider.EXAMPLE_JOB_ID, returnedJobId);

@@ -26,8 +26,8 @@ import org.camunda.bpm.engine.test.Deployment;
  */
 public class JobPrioritizationBpmnExpressionValueTest extends PluggableProcessEngineTestCase {
 
-  protected static final int EXPECTED_DEFAULT_PRIORITY = 123;
-  protected static final int EXPECTED_DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE = 296;
+  protected static final long EXPECTED_DEFAULT_PRIORITY = 123;
+  protected static final long EXPECTED_DEFAULT_PRIORITY_ON_RESOLUTION_FAILURE = 296;
 
   protected long originalDefaultPriority;
   protected long originalDefaultPriorityOnFailure;

@@ -29,7 +29,7 @@ import org.camunda.bpm.engine.test.Deployment;
  */
 public class JobDefinitionPriorityTest extends PluggableProcessEngineTestCase {
 
-  protected static final int EXPECTED_DEFAULT_PRIORITY = 0;
+  protected static final long EXPECTED_DEFAULT_PRIORITY = 0;
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/asyncTaskProcess.bpmn20.xml")
   public void testSetJobDefinitionPriority() {

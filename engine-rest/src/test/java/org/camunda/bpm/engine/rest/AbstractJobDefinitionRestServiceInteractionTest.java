@@ -82,7 +82,7 @@ public abstract class AbstractJobDefinitionRestServiceInteractionTest extends Ab
         .body("jobConfiguration", equalTo(MockProvider.EXAMPLE_JOB_CONFIG))
         .body("activityId", equalTo(MockProvider.EXAMPLE_ACTIVITY_ID))
         .body("suspended", equalTo(MockProvider.EXAMPLE_JOB_DEFINITION_IS_SUSPENDED))
-        .body("overridingJobPriority", equalTo(MockProvider.EXAMPLE_JOB_DEFINITION_PRIORITY.intValue()))
+        .body("overridingJobPriority", equalTo(MockProvider.EXAMPLE_JOB_DEFINITION_PRIORITY))
     .when()
       .get(SINGLE_JOB_DEFINITION_RESOURCE_URL);
 
