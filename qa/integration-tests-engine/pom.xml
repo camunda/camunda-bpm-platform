@@ -676,6 +676,8 @@
                 <exclude>**/TestProcessEnginesXmlFails.java</exclude>
                 <exclude>**/*_JBOSS.java</exclude>
                 <exclude>**/jar/**</exclude>
+
+                <exclude>**/PythonPaClassImportTest.java</exclude>
               </excludes>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
@@ -776,6 +778,8 @@
                 <exclude>**/context/**</exclude>
                 <exclude>**/jar/**</exclude>
                 <exclude>**/*_JBOSS.java</exclude>
+
+                <exclude>**/PythonPaClassImportTest.java</exclude>
               </excludes>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
@@ -933,6 +937,8 @@
 
                 <exclude>**/*_JBOSS.java</exclude>
                 <exclude>**/EjbPALifecycleCallbacksTest.java</exclude>
+
+                <exclude>**/PythonPaClassImportTest.java</exclude>
               </excludes>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
