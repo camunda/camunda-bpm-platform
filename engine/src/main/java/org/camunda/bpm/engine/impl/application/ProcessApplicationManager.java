@@ -129,6 +129,13 @@ public class ProcessApplicationManager {
   // logger ////////////////////////////////////////////////////////////////////////////
 
   protected void logRegistration(Set<String> deploymentIds, ProcessApplicationReference reference) {
+    Level logLevel = Level.INFO;
+
+    if (!LOGGER.isLoggable(logLevel)) {
+      // building the log message is expensive (db queries) so we avoid it if we can
+      return;
+    }
+
     try {
       StringBuilder builder = new StringBuilder();
       builder.append("ProcessApplication '");
@@ -167,7 +174,7 @@ public class ProcessApplicationManager {
         logCaseDefinitionRegistrations(builder, caseDefinitions);
       }
 
-      LOGGER.info(builder.toString());
+      LOGGER.log(logLevel, builder.toString());
 
     } catch(Throwable e) {
       // ignore
