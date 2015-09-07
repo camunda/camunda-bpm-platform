@@ -85,13 +85,24 @@ define([
       }
     }]);
 
-/*
-    processData.provide('processDefinition', processDefinition);
+    decisionData.provide('allDefinitions', [ 'decisionDefinition', function(decisionDefinition) {
+      if (!decisionDefinition) {
+        return null;
+      } else {
+        var deferred = $q.defer();
 
-    processData.provide('filter', parseFilterFromUri());
+        decisionDefinitionService.list({ key: decisionDefinition.key }, function(err, data) {
+          if(!err) {
+            deferred.resolve(data);
+          } else {
+            deferred.reject(err);
+          }
+        });
 
-    processData.provide('parentId', [ 'filter', function(filter) { return filter.parentProcessDefinitionId; } ]);
-*/
+        return deferred.promise;
+      }
+    }]);
+
     // end data definition /////////////////////////
 
 
@@ -99,6 +110,9 @@ define([
 
     decisionData.observe(['decisionDefinition'], function(decisionDefinition) {
       $scope.decisionDefinition = decisionDefinition;
+    });
+    decisionData.observe(['allDefinitions'], function(allDefinitions) {
+      $scope.allDefinitions = allDefinitions;
     });
 
     // BREADCRUMBS

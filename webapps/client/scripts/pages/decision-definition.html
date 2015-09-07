@@ -31,10 +31,27 @@
           <span class="name">
             Version
           </span>
-          <span ng-if="!decisionDefinition"
+
+          <span ng-if="!allDefinitions || !decisionDefinition"
                 class="glyphicon glyphicon-refresh animate-spin"></span>
 
-          <span ng-if="decisionDefinition">
+          <div class="btn-group dropdown"
+               ng-if="allDefinitions && allDefinitions.length > 1">
+            <button class="btn btn-default dropdown-toggle"
+                    data-toggle="dropdown">
+              {{ decisionDefinition.version }} <span class="caret"></span>
+            </button>
+
+            <ul class="dropdown-menu">
+              <li ng-repeat="definition in allDefinitions">
+                <a ng-href="#/decision-definition/{{ definition.id }}">
+                  {{ definition.version }}
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <span ng-if="allDefinitions && allDefinitions.length < 2 && decisionDefinition">
             {{ decisionDefinition.version }}
           </span>
         </div>
