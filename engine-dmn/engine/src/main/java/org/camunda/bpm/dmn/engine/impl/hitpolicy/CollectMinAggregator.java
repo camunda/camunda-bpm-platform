@@ -18,15 +18,15 @@ import java.util.List;
 
 public class CollectMinAggregator extends AbstractDmnHitPolicyNumberAggregator {
 
-  protected Object aggregateIntegerValues(List<Integer> intValues) {
+  protected Number aggregateIntegerValues(List<Integer> intValues) {
     return Collections.min(intValues);
   }
 
-  protected Object aggregateLongValues(List<Long> longValues) {
+  protected Number aggregateLongValues(List<Long> longValues) {
     return Collections.min(longValues);
   }
 
-  protected Object aggregateDoubleValues(List<Double> doubleValues) {
+  protected Number aggregateDoubleValues(List<Double> doubleValues) {
     return Collections.min(doubleValues);
   }
 

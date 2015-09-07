@@ -23,7 +23,7 @@ public abstract class AbstractDmnHitPolicyNumberAggregator implements DmnHitPoli
 
   public static final DmnHitPolicyLogger LOG = DmnLogger.HIT_POLICY_LOGGER;
 
-  public Object aggregate(List<Object> outputValues) {
+  public Number aggregate(List<Object> outputValues) {
     if (outputValues.isEmpty()) {
       // return null if no values to aggregate
       return null;
@@ -33,7 +33,7 @@ public abstract class AbstractDmnHitPolicyNumberAggregator implements DmnHitPoli
     }
   }
 
-  protected Object aggregateNumberValues(List<Object> values) {
+  protected Number aggregateNumberValues(List<Object> values) {
     try {
       List<Integer> intValues = convertValuesToInteger(values);
       return aggregateIntegerValues(intValues);
@@ -61,11 +61,11 @@ public abstract class AbstractDmnHitPolicyNumberAggregator implements DmnHitPoli
     throw LOG.unableToConvertValuesToAggregatableTypes(values, Integer.class, Long.class, Double.class);
   }
 
-  protected abstract Object aggregateIntegerValues(List<Integer> intValues);
+  protected abstract Number aggregateIntegerValues(List<Integer> intValues);
 
-  protected abstract Object aggregateLongValues(List<Long> longValues);
+  protected abstract Number aggregateLongValues(List<Long> longValues);
 
-  protected abstract Object aggregateDoubleValues(List<Double> doubleValues);
+  protected abstract Number aggregateDoubleValues(List<Double> doubleValues);
 
   protected List<Integer> convertValuesToInteger(List<Object> values) {
     List<Integer> intValues = new ArrayList<Integer>();

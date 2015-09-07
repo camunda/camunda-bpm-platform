@@ -27,7 +27,7 @@ public class DmnDecisionTableResultImpl implements DmnDecisionTableResult {
   protected Map<String, DmnDecisionTableValue> inputs = new HashMap<String, DmnDecisionTableValue>();
   protected List<DmnDecisionTableRule> matchingRules = new ArrayList<DmnDecisionTableRule>();
   protected String collectResultName;
-  protected Object collectResultValue;
+  protected Number collectResultValue;
   protected long executedDecisionElements = 0;
 
   public Map<String, DmnDecisionTableValue> getInputs() {
@@ -54,11 +54,11 @@ public class DmnDecisionTableResultImpl implements DmnDecisionTableResult {
     this.collectResultName = collectResultName;
   }
 
-  public Object getCollectResultValue() {
+  public Number getCollectResultValue() {
     return collectResultValue;
   }
 
-  public void setCollectResultValue(Object collectResultValue) {
+  public void setCollectResultValue(Number collectResultValue) {
     this.collectResultValue = collectResultValue;
   }
 

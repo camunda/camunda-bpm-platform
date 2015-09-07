@@ -19,7 +19,7 @@ import org.camunda.bpm.dmn.engine.hitpolicy.DmnHitPolicyAggregator;
 
 public class CollectCountAggregator implements DmnHitPolicyAggregator {
 
-  public Object aggregate(List<Object> outputValues) {
+  public Number aggregate(List<Object> outputValues) {
     return (long) outputValues.size();
   }
 

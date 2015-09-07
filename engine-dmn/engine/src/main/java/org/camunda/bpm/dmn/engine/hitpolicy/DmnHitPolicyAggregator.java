@@ -26,6 +26,6 @@ public interface DmnHitPolicyAggregator {
    * @return the aggregated result value
    * @throws DmnHitPolicyException if the aggregation fails, e.g. it is not applicable to the decision outputs
    */
-  Object aggregate(List<Object> outputValues);
+  Number aggregate(List<Object> outputValues);
 
 }

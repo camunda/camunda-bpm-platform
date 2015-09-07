@@ -41,7 +41,7 @@ public interface DmnDecisionTableResult {
   /**
    * @return the result value of the collect operation if the {@link HitPolicy#COLLECT} was used with an aggregator otherwise null
    */
-  Object getCollectResultValue();
+  Number getCollectResultValue();
 
   /**
    * @return the number of executed decision elements during the evaluation

@@ -56,7 +56,7 @@ public class CollectHitPolicyHandler implements DmnHitPolicyHandler {
       List<DmnDecisionTableRule> matchingRules = decisionTableResult.getMatchingRules();
       List<Object> outputValues = collectSingleValues(aggregation, matchingRules);
       String outputName = getDecisionOutputName(matchingRules);
-      Object outputValue = aggregator.aggregate(outputValues);
+      Number outputValue = aggregator.aggregate(outputValues);
       decisionTableResult.setCollectResultName(outputName);
       decisionTableResult.setCollectResultValue(outputValue);
     }
