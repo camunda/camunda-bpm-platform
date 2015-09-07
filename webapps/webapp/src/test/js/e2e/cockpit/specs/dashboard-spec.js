@@ -98,6 +98,25 @@ describe('Cockpit Dashboard Spec', function() {
 
     });
 
+    describe('deploy decision and validate', function() {
+
+      before(function() {
+        return testHelper(setupFile.setup4, true);
+      });
+
+      it('should show deployed decision', function() {
+
+        // when
+        dashboardPage.navigateTo();
+
+        // then
+        expect(dashboardPage.deployedDecisionsList.decisionCountHeader()).to.eventually.eql('1 decision deployed');
+        expect(dashboardPage.deployedDecisionsList.decisionsList().count()).to.eventually.eql(1);
+        expect(dashboardPage.deployedDecisionsList.decisionName(0)).to.eventually.eql('Assign Approver');
+      });
+
+    });
+
   });
 
 });

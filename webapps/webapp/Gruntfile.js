@@ -178,5 +178,5 @@ module.exports = function(grunt) {
 
   grunt.registerTask('default', ['build']);
 
-  grunt.registerTask('test-e2e', ['build', 'protractor:e2e']);
+  grunt.registerTask('test-e2e', ['protractor:e2e']);
 };

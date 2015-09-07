@@ -13,7 +13,7 @@ var fragment1 = combine(
       content: fs.readFileSync(__dirname + '/../../resources/failing-process.bpmn').toString()
     }]
   }])
-)
+);
 
 var fragment2 = combine(
   operation('process-definition', 'start', [{
@@ -26,7 +26,7 @@ var fragment2 = combine(
       }
     }
   }])
-)
+);
 
 var fragment3 = combine(
   operation('deployment', 'create', [{
@@ -47,11 +47,20 @@ var fragment3 = combine(
       }
     }
   }])
-)
+);
+
+var dmnFragment = operation('deployment', 'create', [{
+  deploymentName: 'assign-approver',
+  files: [{
+    name: 'assign-approver-groups.dmn',
+    content: fs.readFileSync(__dirname + '/../../resources/assign-approver-groups.dmn').toString()
+  }]
+}]);
 
 module.exports = {
 
   setup1: fragment1,
   setup2: fragment2,
-  setup3: fragment3
+  setup3: fragment3,
+  setup4: dmnFragment
 };
