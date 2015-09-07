@@ -35,11 +35,11 @@ import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
 import org.camunda.bpm.dmn.engine.ScriptEngineResolver;
-import org.camunda.bpm.dmn.scriptengine.DmnScriptEngine;
 import org.camunda.bpm.dmn.scriptengine.DmnScriptEngineFactory;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ScriptCompilationException;
 import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 
 /**
@@ -121,7 +121,13 @@ public class ScriptingEngines implements ScriptEngineResolver {
    */
   public CompiledScript compile(String language, String src) {
     ScriptEngine scriptEngine = getScriptEngineForLanguage(language);
+    return compile(scriptEngine, language, src);
+  }
 
+  /**
+   * @see #compile(String, String)
+   */
+  public CompiledScript compile(ScriptEngine scriptEngine, String language, String src) {
     if(scriptEngine instanceof Compilable && !scriptEngine.getFactory().getLanguageName().equalsIgnoreCase("ecmascript")) {
       Compilable compilingEngine = (Compilable) scriptEngine;
 
@@ -140,7 +146,6 @@ public class ScriptingEngines implements ScriptEngineResolver {
     } else {
       // engine does not support compilation
       return null;
-
     }
 
   }
@@ -159,10 +164,13 @@ public class ScriptingEngines implements ScriptEngineResolver {
     }
 
     ProcessApplicationReference pa = Context.getCurrentProcessApplication();
+    ProcessEngineConfigurationImpl config = Context.getProcessEngineConfiguration();
 
     ScriptEngine engine = null;
-    if(pa != null && !DmnScriptEngineFactory.names.contains(language)) {
-      engine = getPaScriptEngine(language, pa);
+    if (config.isEnableFetchScriptEngineFromProcessApplication()) {
+      if(pa != null && !DmnScriptEngineFactory.names.contains(language)) {
+        engine = getPaScriptEngine(language, pa);
+      }
     }
 
     if(engine == null) {

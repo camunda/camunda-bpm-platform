@@ -174,7 +174,6 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHand
 import org.camunda.bpm.engine.impl.metrics.MetricsRegistry;
 import org.camunda.bpm.engine.impl.metrics.MetricsReporterIdProvider;
 import org.camunda.bpm.engine.impl.metrics.SimpleIpBasedProvider;
-import org.camunda.bpm.engine.impl.metrics.dmn.MetricsDecisionTableListener;
 import org.camunda.bpm.engine.impl.metrics.parser.MetricsBpmnParseListener;
 import org.camunda.bpm.engine.impl.metrics.parser.MetricsCmmnTransformListener;
 import org.camunda.bpm.engine.impl.metrics.reporter.DbMetricsReporter;
@@ -369,6 +368,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean autoStoreScriptVariables = false;
   protected boolean enableScriptCompilation = true;
   protected boolean enableScriptEngineCaching = true;
+  protected boolean enableFetchScriptEngineFromProcessApplication = true;
+
   protected boolean cmmnEnabled = true;
   protected boolean dmnEnabled = true;
 
@@ -2742,12 +2743,22 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.metricsReporterIdProvider = metricsReporterIdProvider;
   }
 
+  public boolean isEnableScriptEngineCaching() {
+    return enableScriptEngineCaching;
+  }
+
   public ProcessEngineConfigurationImpl setEnableScriptEngineCaching(boolean enableScriptEngineCaching) {
     this.enableScriptEngineCaching = enableScriptEngineCaching;
     return this;
   }
 
-  public boolean isEnableScriptEngineCaching() {
-    return enableScriptEngineCaching;
+  public boolean isEnableFetchScriptEngineFromProcessApplication() {
+    return enableFetchScriptEngineFromProcessApplication;
   }
+
+  public ProcessEngineConfigurationImpl setEnableFetchScriptEngineFromProcessApplication(boolean enable) {
+    this.enableFetchScriptEngineFromProcessApplication = enable;
+    return this;
+  }
+
 }

@@ -76,6 +76,27 @@ public class ScriptCompilationTest extends PluggableProcessEngineTestCase {
     processEngineConfiguration.setEnableScriptCompilation(true);
   }
 
+  public void testDisableScriptCompilationByDisabledScriptEngineCaching() {
+    // when script engine caching is disabled and a script is created
+    processEngineConfiguration.setEnableScriptEngineCaching(false);
+    SourceExecutableScript script = createScript(SCRIPT_LANGUAGE, EXAMPLE_SCRIPT);
+    assertNotNull(script);
+
+    // then it should not be compiled on creation
+    assertTrue(script.isShouldBeCompiled());
+    assertNull(script.getCompiledScript());
+
+    // and after first execution
+    executeScript(script);
+
+    // it was also not compiled
+    assertFalse(script.isShouldBeCompiled());
+    assertNull(script.getCompiledScript());
+
+    // re-enable script engine caching
+    processEngineConfiguration.setEnableScriptEngineCaching(true);
+  }
+
   public void testOverrideScriptSource() {
     // when a script is created and executed
     SourceExecutableScript script = createScript(SCRIPT_LANGUAGE, EXAMPLE_SCRIPT);

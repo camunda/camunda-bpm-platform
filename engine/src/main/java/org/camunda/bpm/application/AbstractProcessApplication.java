@@ -13,6 +13,7 @@
 package org.camunda.bpm.application;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.concurrent.Callable;
@@ -21,12 +22,13 @@ import java.util.logging.Logger;
 import javax.script.ScriptEngine;
 
 import org.camunda.bpm.application.impl.DefaultElResolverLookup;
-import org.camunda.bpm.application.impl.ProcessApplicationScriptEngineResolver;
+import org.camunda.bpm.application.impl.ProcessApplicationScriptEnvironment;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.javax.el.BeanELResolver;
 import org.camunda.bpm.engine.impl.javax.el.ELResolver;
+import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
 import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 
@@ -41,7 +43,7 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
 
   protected ELResolver processApplicationElResolver;
   protected BeanELResolver processApplicationBeanElResolver;
-  protected ProcessApplicationScriptEngineResolver processApplicationScriptEngineResolver;
+  protected ProcessApplicationScriptEnvironment processApplicationScriptEnvironment;
 
   protected boolean isDeployed = false;
 
@@ -177,26 +179,28 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
   }
 
   /**
-   * <p>Returns an instance of {@link ScriptEngine} for the given <code>scriptEngineName</code>.</p>
-   *
-   * <p>Iff the given parameter <code>cache</code> is set <code>true</code>,
-   * then the instance {@link ScriptEngine} will be cached.</p>
-   *
-   * @param scriptEngineName the name of the {@link ScriptEngine} to return
-   * @param cache a boolean value which indicates whether the {@link ScriptEngine} should
-   *              be cached or not.
-   *
-   * @return a {@link ScriptEngine}
+   * see {@link ProcessApplicationScriptEnvironment#getScriptEngineForName(String, boolean)}
    */
-  public ScriptEngine getScriptEngineForName(String scriptEngineName, boolean cache) {
-    if(processApplicationScriptEngineResolver == null) {
+  public ScriptEngine getScriptEngineForName(String name, boolean cache) {
+    return getProcessApplicationScriptEnvironment().getScriptEngineForName(name, cache);
+  }
+
+  /**
+   * see {@link ProcessApplicationScriptEnvironment#getEnvironmentScripts()}
+   */
+  public Map<String, List<ExecutableScript>> getEnvironmentScripts() {
+    return getProcessApplicationScriptEnvironment().getEnvironmentScripts();
+  }
+
+  protected ProcessApplicationScriptEnvironment getProcessApplicationScriptEnvironment() {
+    if (processApplicationScriptEnvironment == null) {
       synchronized (this) {
-        if(processApplicationScriptEngineResolver == null) {
-          processApplicationScriptEngineResolver = new ProcessApplicationScriptEngineResolver(getProcessApplicationClassloader());
+        if (processApplicationScriptEnvironment == null) {
+          processApplicationScriptEnvironment = new ProcessApplicationScriptEnvironment(this);
         }
       }
     }
-    return processApplicationScriptEngineResolver.getScriptEngine(scriptEngineName, cache);
+    return processApplicationScriptEnvironment;
   }
 
 }
