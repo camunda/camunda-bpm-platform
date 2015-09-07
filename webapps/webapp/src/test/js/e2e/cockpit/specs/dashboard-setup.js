@@ -55,6 +55,12 @@ var dmnFragment = operation('deployment', 'create', [{
     name: 'assign-approver-groups.dmn',
     content: fs.readFileSync(__dirname + '/../../resources/assign-approver-groups.dmn').toString()
   }]
+  },{
+  deploymentName: 'assign-approver',
+  files: [{
+    name: 'assign-approver-groups-changed.dmn',
+    content: fs.readFileSync(__dirname + '/../../resources/assign-approver-groups-changed.dmn').toString()
+  }]
 }]);
 
 module.exports = {

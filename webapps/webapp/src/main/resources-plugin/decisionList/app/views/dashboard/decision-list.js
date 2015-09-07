@@ -24,7 +24,7 @@ define([
         var decisionDefinitionService = client.resource('decision-definition');
 
         // get ALL the decisions
-        decisionDefinitionService.list({}, function(err, data) {
+        decisionDefinitionService.list({latestVersion: true}, function(err, data) {
           $scope.decisionCount = data.length;
           $scope.decisions = data;
         });

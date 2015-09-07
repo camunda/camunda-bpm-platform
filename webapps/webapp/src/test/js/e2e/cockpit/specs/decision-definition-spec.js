@@ -58,4 +58,36 @@ describe('Cockpit Decision Definition Spec', function() {
 
   });
 
+  describe('version interaction', function() {
+    before(function() {
+      return testHelper(setupFile.setup2, function() {
+
+        dashboardPage.navigateToWebapp('Cockpit');
+        dashboardPage.authentication.userLogin('admin', 'admin');
+        dashboardPage.deployedDecisionsList.selectDecision(0);
+      });
+    });
+
+    it('should display the most recent version initially', function() {
+      expect(definitionPage.version.getVersion()).to.eventually.eql('2');
+    });
+
+    it('should list all available versions', function() {
+      // when
+      definitionPage.version.getDropdownButton().click();
+
+      // then
+      expect(definitionPage.version.getDropdownOptions().count()).to.eventually.eql(2);
+    });
+
+    it('should load the requested version on selection', function() {
+      // when
+      definitionPage.version.getDropdownOption(0).click();
+
+      // then
+      expect(definitionPage.version.getVersion()).to.eventually.eql('1');
+    });
+
+  });
+
 });
