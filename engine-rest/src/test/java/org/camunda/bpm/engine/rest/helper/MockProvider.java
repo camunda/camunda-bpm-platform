@@ -31,6 +31,7 @@ import java.util.Set;
 
 import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.engine.EntityTypes;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
@@ -46,6 +47,9 @@ import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityStatistics;
 import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
+import org.camunda.bpm.engine.history.HistoricDecisionInputInstance;
+import org.camunda.bpm.engine.history.HistoricDecisionInstance;
+import org.camunda.bpm.engine.history.HistoricDecisionOutputInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricFormField;
 import org.camunda.bpm.engine.history.HistoricIncident;
@@ -89,6 +93,8 @@ import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.BytesValue;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.StringValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
@@ -590,6 +596,31 @@ public abstract class MockProvider {
   public static final boolean EXAMPLE_HISTORIC_JOB_LOG_IS_FAILURE_LOG = true;
   public static final boolean EXAMPLE_HISTORIC_JOB_LOG_IS_SUCCESS_LOG = true;
   public static final boolean EXAMPLE_HISTORIC_JOB_LOG_IS_DELETION_LOG = true;
+
+  // historic decision instance
+
+  public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_ID = "aHistoricDecisionInstanceId";
+  public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_ID_IN = "aHistoricDecisionInstanceId,anotherHistoricDecisionInstanceId";
+  public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_ACTIVITY_ID = "aHistoricDecisionInstanceActivityId";
+  public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_ACTIVITY_ID_IN = "aHistoricDecisionInstanceActivityId,anotherHistoricDecisionInstanceActivityId";
+  public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_ACTIVITY_INSTANCE_ID = "aHistoricDecisionInstanceActivityInstanceId";
+  public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_ACTIVITY_INSTANCE_ID_IN = "aHistoricDecisionInstanceActivityInstanceId,anotherHistoricDecisionInstanceActivityInstanceId";
+  public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_EVALUATION_TIME = "2015-09-07T11:00:00";
+  public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_EVALUATED_BEFORE = "2015-09-08T11:00:00";
+  public static final String EXAMPLE_HISTORIC_DECISION_INSTANCE_EVALUATED_AFTER = "2015-09-06T11:00:00";
+  public static final Double EXAMPLE_HISTORIC_DECISION_INSTANCE_COLLECT_RESULT_VALUE = 42.0;
+  public static final String EXAMPLE_HISTORIC_DECISION_INPUT_INSTANCE_ID = "aDecisionInputInstanceId";
+  public static final String EXAMPLE_HISTORIC_DECISION_INPUT_INSTANCE_CLAUSE_ID = "aDecisionInputClauseId";
+  public static final String EXAMPLE_HISTORIC_DECISION_INPUT_INSTANCE_CLAUSE_NAME = "aDecisionInputClauseName";
+  public static final String EXAMPLE_HISTORIC_DECISION_OUTPUT_INSTANCE_ID = "aDecisionInputInstanceId";
+  public static final String EXAMPLE_HISTORIC_DECISION_OUTPUT_INSTANCE_VARIABLE_NAME = "aDecisionInputInstanceName";
+  public static final String EXAMPLE_HISTORIC_DECISION_OUTPUT_INSTANCE_CLAUSE_ID = "aDecisionInputClauseId";
+  public static final String EXAMPLE_HISTORIC_DECISION_OUTPUT_INSTANCE_CLAUSE_NAME = "aDecisionInputClauseName";
+  public static final String EXAMPLE_HISTORIC_DECISION_OUTPUT_INSTANCE_RULE_ID = "aDecisionInputRuleId";
+  public static final Integer EXAMPLE_HISTORIC_DECISION_OUTPUT_INSTANCE_RULE_ORDER = 12;
+  public static final ObjectValue EXAMPLE_HISTORIC_DECISION_SERIALIZED_VALUE = MockObjectValue.fromObjectValue(Variables.objectValue("test").serializationDataFormat("aDataFormat").create()).objectTypeName("aTypeName");
+  public static final BytesValue EXAMPLE_HISTORIC_DECISION_BYTE_ARRAY_VALUE = Variables.byteArrayValue("test".getBytes());
+  public static final StringValue EXAMPLE_HISTORIC_DECISION_STRING_VALUE = Variables.stringValue("test");
 
   // metrics
   public static final String EXAMPLE_METRICS_START_DATE = "2015-01-01T00:00:00";
@@ -1893,4 +1924,107 @@ public abstract class MockProvider {
 
     return mock;
   }
+
+  // Historic decision instance
+
+  public static List<HistoricDecisionInstance> createMockHistoricDecisionInstances() {
+    List<HistoricDecisionInstance> mockList = new ArrayList<HistoricDecisionInstance>();
+    mockList.add(createMockHistoricDecisionInstance());
+    return mockList;
+  }
+
+  public static HistoricDecisionInstance createMockHistoricDecisionInstanceBase() {
+    HistoricDecisionInstance mock = mock(HistoricDecisionInstance.class);
+
+    when(mock.getId()).thenReturn(EXAMPLE_HISTORIC_DECISION_INSTANCE_ID);
+    when(mock.getDecisionDefinitionId()).thenReturn(EXAMPLE_DECISION_DEFINITION_ID);
+    when(mock.getDecisionDefinitionKey()).thenReturn(EXAMPLE_DECISION_DEFINITION_KEY);
+    when(mock.getDecisionDefinitionName()).thenReturn(EXAMPLE_DECISION_DEFINITION_NAME);
+    when(mock.getProcessDefinitionId()).thenReturn(EXAMPLE_PROCESS_DEFINITION_ID);
+    when(mock.getProcessDefinitionKey()).thenReturn(EXAMPLE_PROCESS_DEFINITION_KEY);
+    when(mock.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
+    when(mock.getActivityId()).thenReturn(EXAMPLE_HISTORIC_DECISION_INSTANCE_ACTIVITY_ID);
+    when(mock.getActivityInstanceId()).thenReturn(EXAMPLE_HISTORIC_DECISION_INSTANCE_ACTIVITY_INSTANCE_ID);
+    when(mock.getEvaluationTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_DECISION_INSTANCE_EVALUATION_TIME));
+    when(mock.getCollectResultValue()).thenReturn(EXAMPLE_HISTORIC_DECISION_INSTANCE_COLLECT_RESULT_VALUE);
+
+    return mock;
+  }
+
+  public static HistoricDecisionInstance createMockHistoricDecisionInstance() {
+    HistoricDecisionInstance mock = createMockHistoricDecisionInstanceBase();
+    when(mock.getInputs()).thenThrow(new ProcessEngineException("ENGINE-03060 The input instances for the historic decision instance are not fetched. You must call 'includeInputs()' on the query to enable fetching."));
+    when(mock.getOutputs()).thenThrow(new ProcessEngineException("ENGINE-03061 The output instances for the historic decision instance are not fetched. You must call 'includeOutputs()' on the query to enable fetching."));
+    return mock;
+  }
+
+  public static HistoricDecisionInstance createMockHistoricDecisionInstanceWithInputs() {
+    List<HistoricDecisionInputInstance> inputs = createMockHistoricDecisionInputInstances();
+
+    HistoricDecisionInstance mock = createMockHistoricDecisionInstanceBase();
+    when(mock.getInputs()).thenReturn(inputs);
+    when(mock.getOutputs()).thenThrow(new ProcessEngineException("ENGINE-03061 The output instances for the historic decision instance are not fetched. You must call 'includeOutputs()' on the query to enable fetching."));
+    return mock;
+  }
+
+  public static HistoricDecisionInstance createMockHistoricDecisionInstanceWithOutputs() {
+    List<HistoricDecisionOutputInstance> outputs = createMockHistoricDecisionOutputInstances();
+
+    HistoricDecisionInstance mock = createMockHistoricDecisionInstanceBase();
+    when(mock.getInputs()).thenThrow(new ProcessEngineException("ENGINE-03060 The input instances for the historic decision instance are not fetched. You must call 'includeInputs()' on the query to enable fetching."));
+    when(mock.getOutputs()).thenReturn(outputs);
+    return mock;
+  }
+
+  public static HistoricDecisionInstance createMockHistoricDecisionInstanceWithInputsAndOutputs() {
+    List<HistoricDecisionInputInstance> inputs = createMockHistoricDecisionInputInstances();
+    List<HistoricDecisionOutputInstance> outputs = createMockHistoricDecisionOutputInstances();
+
+    HistoricDecisionInstance mock = createMockHistoricDecisionInstanceBase();
+    when(mock.getInputs()).thenReturn(inputs);
+    when(mock.getOutputs()).thenReturn(outputs);
+    return mock;
+  }
+
+  public static List<HistoricDecisionInputInstance> createMockHistoricDecisionInputInstances() {
+    List<HistoricDecisionInputInstance> mockInputs = new ArrayList<HistoricDecisionInputInstance>();
+    mockInputs.add(createMockHistoricDecisionInput(EXAMPLE_HISTORIC_DECISION_STRING_VALUE));
+    mockInputs.add(createMockHistoricDecisionInput(EXAMPLE_HISTORIC_DECISION_BYTE_ARRAY_VALUE));
+    mockInputs.add(createMockHistoricDecisionInput(EXAMPLE_HISTORIC_DECISION_SERIALIZED_VALUE));
+    return mockInputs;
+  }
+
+  public static HistoricDecisionInputInstance createMockHistoricDecisionInput(TypedValue typedValue) {
+    HistoricDecisionInputInstance input = mock(HistoricDecisionInputInstance.class);
+    when(input.getId()).thenReturn(EXAMPLE_HISTORIC_DECISION_INPUT_INSTANCE_ID);
+    when(input.getDecisionInstanceId()).thenReturn(EXAMPLE_HISTORIC_DECISION_INSTANCE_ID);
+    when(input.getClauseId()).thenReturn(EXAMPLE_HISTORIC_DECISION_INPUT_INSTANCE_CLAUSE_ID);
+    when(input.getClauseName()).thenReturn(EXAMPLE_HISTORIC_DECISION_INPUT_INSTANCE_CLAUSE_NAME);
+    when(input.getTypedValue()).thenReturn(typedValue);
+    when(input.getErrorMessage()).thenReturn(null);
+    return input;
+  }
+
+  public static List<HistoricDecisionOutputInstance> createMockHistoricDecisionOutputInstances() {
+    List<HistoricDecisionOutputInstance> mockOutputs = new ArrayList<HistoricDecisionOutputInstance>();
+    mockOutputs.add(createMockHistoricDecisionOutput(EXAMPLE_HISTORIC_DECISION_STRING_VALUE));
+    mockOutputs.add(createMockHistoricDecisionOutput(EXAMPLE_HISTORIC_DECISION_BYTE_ARRAY_VALUE));
+    mockOutputs.add(createMockHistoricDecisionOutput(EXAMPLE_HISTORIC_DECISION_SERIALIZED_VALUE));
+    return mockOutputs;
+  }
+
+  public static HistoricDecisionOutputInstance createMockHistoricDecisionOutput(TypedValue typedValue) {
+    HistoricDecisionOutputInstance output = mock(HistoricDecisionOutputInstance.class);
+    when(output.getId()).thenReturn(EXAMPLE_HISTORIC_DECISION_OUTPUT_INSTANCE_ID);
+    when(output.getDecisionInstanceId()).thenReturn(EXAMPLE_HISTORIC_DECISION_INSTANCE_ID);
+    when(output.getClauseId()).thenReturn(EXAMPLE_HISTORIC_DECISION_OUTPUT_INSTANCE_CLAUSE_ID);
+    when(output.getClauseName()).thenReturn(EXAMPLE_HISTORIC_DECISION_OUTPUT_INSTANCE_CLAUSE_NAME);
+    when(output.getRuleId()).thenReturn(EXAMPLE_HISTORIC_DECISION_OUTPUT_INSTANCE_RULE_ID);
+    when(output.getRuleOrder()).thenReturn(EXAMPLE_HISTORIC_DECISION_OUTPUT_INSTANCE_RULE_ORDER);
+    when(output.getVariableName()).thenReturn(EXAMPLE_HISTORIC_DECISION_OUTPUT_INSTANCE_VARIABLE_NAME);
+    when(output.getTypedValue()).thenReturn(typedValue);
+    when(output.getErrorMessage()).thenReturn(null);
+    return output;
+  }
+
 }

@@ -19,7 +19,9 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,6 +31,7 @@ import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricDecisionInputInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
@@ -106,31 +109,22 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     query = historyService.createHistoricDecisionInstanceQuery();
 
     try {
-      query.decisionInstanceIds(null);
+      query.decisionInstanceIdIn(null);
       fail("Exception expected");
     }
-    catch (NotValidException e) {
-      assertThat(e.getMessage(), containsString("decisionInstanceIds is null"));
+    catch (NullValueException e) {
+      assertThat(e.getMessage(), containsString("decisionInstanceIdIn is null"));
     }
 
-    Set<String> decisionInstanceIds = new HashSet<String>();
+    List<String> decisionInstanceIdIn = new ArrayList<String>();
+    decisionInstanceIdIn.add(decisionInstanceId1);
+    assertThat(query.decisionInstanceIdIn(decisionInstanceIdIn.toArray(new String[decisionInstanceIdIn.size()])).count(), is(1l));
 
-    try {
-      query.decisionInstanceIds(decisionInstanceIds);
-      fail("Exception expected");
-    }
-    catch (NotValidException e) {
-      assertThat(e.getMessage(), containsString("decisionInstanceIds is empty"));
-    }
+    decisionInstanceIdIn.add(decisionInstanceId2);
+    assertThat(query.decisionInstanceIdIn(decisionInstanceIdIn.toArray(new String[decisionInstanceIdIn.size()])).count(), is(2l));
 
-    decisionInstanceIds.add(decisionInstanceId1);
-    assertThat(query.decisionInstanceIds(decisionInstanceIds).count(), is(1l));
-
-    decisionInstanceIds.add(decisionInstanceId2);
-    assertThat(query.decisionInstanceIds(decisionInstanceIds).count(), is(2l));
-
-    decisionInstanceIds.remove(decisionInstanceId1);
-    assertThat(query.decisionInstanceIds(decisionInstanceIds).count(), is(1l));
+    decisionInstanceIdIn.remove(decisionInstanceId1);
+    assertThat(query.decisionInstanceIdIn(decisionInstanceIdIn.toArray(new String[decisionInstanceIdIn.size()])).count(), is(1l));
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })

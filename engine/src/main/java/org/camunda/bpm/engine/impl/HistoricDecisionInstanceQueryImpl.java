@@ -18,7 +18,6 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
@@ -34,7 +33,7 @@ public class HistoricDecisionInstanceQueryImpl extends AbstractQuery<HistoricDec
   private static final long serialVersionUID = 1L;
 
   protected String decisionInstanceId;
-  protected Set<String> decisionInstanceIds;
+  protected String[] decisionInstanceIdIn;
 
   protected String decisionDefinitionId;
   protected String decisionDefinitionKey;
@@ -74,9 +73,9 @@ public class HistoricDecisionInstanceQueryImpl extends AbstractQuery<HistoricDec
     return this;
   }
 
-  public HistoricDecisionInstanceQuery decisionInstanceIds(Set<String> decisionInstanceIds) {
-    ensureNotEmpty(NotValidException.class, "decisionInstanceIds", decisionInstanceIds);
-    this.decisionInstanceIds = decisionInstanceIds;
+  public HistoricDecisionInstanceQuery decisionInstanceIdIn(String... decisionInstanceIdIn) {
+    ensureNotNull("decisionInstanceIdIn", (Object[]) decisionInstanceIdIn);
+    this.decisionInstanceIdIn = decisionInstanceIdIn;
     return this;
   }
 

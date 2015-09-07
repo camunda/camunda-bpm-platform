@@ -117,9 +117,9 @@
       <if test="decisionInstanceId != null">
         RES.ID_ = #{decisionInstanceId}
       </if>
-      <if test="decisionInstanceIds != null and !decisionInstanceIds.isEmpty()">
+      <if test="decisionInstanceIdIn != null and decisionInstanceIdIn.length > 0">
         and RES.ID_ in
-        <foreach item="item" index="index" collection="decisionInstanceIds" open="(" separator="," close=")">
+        <foreach item="item" index="index" collection="decisionInstanceIdIn" open="(" separator="," close=")">
           #{item}
         </foreach>
       </if>
