@@ -24,16 +24,16 @@ import java.util.logging.Logger;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
-import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImpl;
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionManager;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentFailListener;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 
@@ -190,11 +190,8 @@ public class ProcessApplicationManager {
 
     if (entities == null) {
       String deploymentId = deployment.getId();
-
-      // query db
-      return new ProcessDefinitionQueryImpl(commandContext)
-        .deploymentId(deploymentId)
-        .list();
+      ProcessDefinitionManager manager = commandContext.getProcessDefinitionManager();
+      return manager.findProcessDefinitionsByDeploymentId(deploymentId);
     }
 
     return new ArrayList<ProcessDefinition>(entities);
@@ -209,11 +206,8 @@ public class ProcessApplicationManager {
 
     if (entities == null) {
       String deploymentId = deployment.getId();
-
-      // query db
-      return new CaseDefinitionQueryImpl(commandContext)
-        .deploymentId(deploymentId)
-        .list();
+      CaseDefinitionManager caseDefinitionManager = commandContext.getCaseDefinitionManager();
+      return caseDefinitionManager.findCaseDefinitionByDeploymentId(deploymentId);
     }
 
     return new ArrayList<CaseDefinition>(entities);
