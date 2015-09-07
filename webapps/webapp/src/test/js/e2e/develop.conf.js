@@ -41,6 +41,7 @@ exports.config = {
     'admin/specs/authorizations-spec.js',
     'cockpit/specs/dashboard-spec.js',
     'cockpit/specs/process-definition-spec.js',
+    'cockpit/specs/decision-definition-spec.js',
     'cockpit/specs/process-instance-spec.js',
     'cockpit/specs/process-definition-filter-spec.js',
     'cockpit/specs/variable-spec.js',
