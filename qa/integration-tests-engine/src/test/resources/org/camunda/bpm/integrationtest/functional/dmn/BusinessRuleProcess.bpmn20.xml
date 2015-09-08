@@ -14,9 +14,13 @@
                       camunda:decisionRef="decision"
                       camunda:resultVariable="decisionResult" />
 
-    <sequenceFlow sourceRef="task" targetRef="end" />
-    
-    <endEvent id="end" camunda:asyncBefore="true" />
+    <sequenceFlow sourceRef="task" targetRef="wait" />
+
+    <userTask id="wait" />
+
+    <sequenceFlow sourceRef="wait" targetRef="end" />
+
+    <endEvent id="end" />
 
   </process>
 

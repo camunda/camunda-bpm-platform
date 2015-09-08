@@ -17,6 +17,8 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
@@ -45,7 +47,7 @@ public class DmnHistoryTest extends AbstractFoxPlatformIntegrationTest {
   public void testHistoricDecisionInstance() {
 
     VariableMap variables = Variables.createVariables().putValue("status", "bronze").putValue("sum", 100);
-    runtimeService.startProcessInstanceByKey("testProcess", variables);
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess", variables);
 
     HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery().includeInputs().includeOutputs().singleResult();
     assertThat(historicDecisionInstance, is(notNullValue()));
@@ -54,6 +56,9 @@ public class DmnHistoryTest extends AbstractFoxPlatformIntegrationTest {
 
     assertThat(historicDecisionInstance.getInputs().size(), is(2));
     assertThat(historicDecisionInstance.getOutputs().size(), is(2));
+
+    Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+    taskService.complete(task.getId());
   }
 
 }

@@ -17,6 +17,7 @@ import static org.junit.Assert.assertEquals;
 import org.camunda.bpm.dmn.engine.DmnEngineMetricCollector;
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
@@ -54,6 +55,9 @@ public class DmnScriptEngineMetricsTest extends AbstractFoxPlatformIntegrationTe
 
     executedDecisionElements = metricCollector.getExecutedDecisionElements();
     assertEquals(16l, executedDecisionElements);
+
+    Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+    taskService.complete(task.getId());
   }
 
 
