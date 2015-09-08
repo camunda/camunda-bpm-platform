@@ -24,8 +24,8 @@ create table ACT_HI_DEC_IN (
     BYTEARRAY_ID_ NVARCHAR2(64),
     DOUBLE_ NUMBER(*,10),
     LONG_ NUMBER(19,0),
-    TEXT_ NVARCHAR2(4000),
-    TEXT2_ NVARCHAR2(4000),    
+    TEXT_ NVARCHAR2(2000),
+    TEXT2_ NVARCHAR2(2000),    
     primary key (ID_)
 );
 
@@ -42,8 +42,8 @@ create table ACT_HI_DEC_OUT (
     BYTEARRAY_ID_ NVARCHAR2(64),
     DOUBLE_ NUMBER(*,10),
     LONG_ NUMBER(19,0),
-    TEXT_ NVARCHAR2(4000),
-    TEXT2_ NVARCHAR2(4000),
+    TEXT_ NVARCHAR2(2000),
+    TEXT2_ NVARCHAR2(2000),
     primary key (ID_)
 );
 
