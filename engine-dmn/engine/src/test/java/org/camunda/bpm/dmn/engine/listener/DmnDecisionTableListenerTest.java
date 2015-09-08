@@ -185,9 +185,7 @@ public class DmnDecisionTableListenerTest {
   @Test
   @DecisionResource(resource = DMN_FILE)
   public void testCollectResult() {
-    DmnDecisionTableImpl decisionTable = (DmnDecisionTableImpl) this.decision;
-    decisionTable.setHitPolicy(HitPolicy.COLLECT);
-
+    setDecisionTableHitPolicy(HitPolicy.COLLECT, null);
     evaluateDecision(true, "bar", true, "hello");
     assertThat(listener.result.getCollectResultName()).isNull();
     assertThat(listener.result.getCollectResultValue()).isNull();
@@ -197,45 +195,61 @@ public class DmnDecisionTableListenerTest {
     assertThat(matchingRules.get(1).getKey()).isEqualTo("rule4");
     assertThat(matchingRules.get(2).getKey()).isEqualTo("rule5");
     assertThat(matchingRules.get(3).getKey()).isEqualTo("rule6");
+  }
 
-    decisionTable.setAggregation(BuiltinAggregator.COUNT);
+  @Test
+  @DecisionResource(resource = DMN_FILE)
+  public void testCollectCountResult() {
+    setDecisionTableHitPolicy(HitPolicy.COLLECT, BuiltinAggregator.COUNT);
     evaluateDecision(true, "bar", true, "hello");
     assertThat(listener.result.getCollectResultName()).isEqualTo("collectMe");
-    assertThat(listener.result.getCollectResultValue()).isEqualTo(3l);
-    matchingRules = listener.result.getMatchingRules();
+    assertThat(listener.result.getCollectResultValue()).isEqualTo(3L);
+    List<DmnDecisionTableRule> matchingRules = listener.result.getMatchingRules();
     assertThat(matchingRules).hasSize(4);
     assertThat(matchingRules.get(0).getKey()).isEqualTo("rule3");
     assertThat(matchingRules.get(1).getKey()).isEqualTo("rule4");
     assertThat(matchingRules.get(2).getKey()).isEqualTo("rule5");
     assertThat(matchingRules.get(3).getKey()).isEqualTo("rule6");
+  }
 
-    decisionTable.setAggregation(BuiltinAggregator.SUM);
+  @Test
+  @DecisionResource(resource = DMN_FILE)
+  public void testCollectSumResult() {
+    setDecisionTableHitPolicy(HitPolicy.COLLECT, BuiltinAggregator.SUM);
     evaluateDecision(true, "bar", true, "hello");
     assertThat(listener.result.getCollectResultName()).isEqualTo("collectMe");
     assertThat(listener.result.getCollectResultValue()).isEqualTo(90);
-    matchingRules = listener.result.getMatchingRules();
+    List<DmnDecisionTableRule> matchingRules = listener.result.getMatchingRules();
     assertThat(matchingRules).hasSize(4);
     assertThat(matchingRules.get(0).getKey()).isEqualTo("rule3");
     assertThat(matchingRules.get(1).getKey()).isEqualTo("rule4");
     assertThat(matchingRules.get(2).getKey()).isEqualTo("rule5");
     assertThat(matchingRules.get(3).getKey()).isEqualTo("rule6");
+  }
 
-    decisionTable.setAggregation(BuiltinAggregator.MAX);
+  @Test
+  @DecisionResource(resource = DMN_FILE)
+  public void testCollectMaxResult() {
+    setDecisionTableHitPolicy(HitPolicy.COLLECT, BuiltinAggregator.MAX);
     evaluateDecision(true, "bar", true, "hello");
     assertThat(listener.result.getCollectResultName()).isEqualTo("collectMe");
     assertThat(listener.result.getCollectResultValue()).isEqualTo(50);
-    matchingRules = listener.result.getMatchingRules();
+    List<DmnDecisionTableRule> matchingRules = listener.result.getMatchingRules();
     assertThat(matchingRules).hasSize(4);
     assertThat(matchingRules.get(0).getKey()).isEqualTo("rule3");
     assertThat(matchingRules.get(1).getKey()).isEqualTo("rule4");
     assertThat(matchingRules.get(2).getKey()).isEqualTo("rule5");
     assertThat(matchingRules.get(3).getKey()).isEqualTo("rule6");
+  }
 
-    decisionTable.setAggregation(BuiltinAggregator.MIN);
+  @Test
+  @DecisionResource(resource = DMN_FILE)
+  public void testCollectMinResult() {
+    setDecisionTableHitPolicy(HitPolicy.COLLECT, BuiltinAggregator.MIN);
     evaluateDecision(true, "bar", true, "hello");
     assertThat(listener.result.getCollectResultName()).isEqualTo("collectMe");
     assertThat(listener.result.getCollectResultValue()).isEqualTo(10);
-    matchingRules = listener.result.getMatchingRules();
+    List<DmnDecisionTableRule> matchingRules = listener.result.getMatchingRules();
     assertThat(matchingRules).hasSize(4);
     assertThat(matchingRules.get(0).getKey()).isEqualTo("rule3");
     assertThat(matchingRules.get(1).getKey()).isEqualTo("rule4");
@@ -244,6 +258,12 @@ public class DmnDecisionTableListenerTest {
   }
 
   // helper
+
+  public void setDecisionTableHitPolicy(HitPolicy hitPolicy, BuiltinAggregator aggregator) {
+    DmnDecisionTableImpl decisionTable = (DmnDecisionTableImpl) this.decision;
+    decisionTable.setHitPolicy(hitPolicy);
+    decisionTable.setAggregation(aggregator);
+  }
 
   public DmnDecisionResult evaluateDecision(Object input1, Object input2, Object input3, Object output1) {
     Map<String, Object> variables = createVariables(input1, input2, input3, output1);

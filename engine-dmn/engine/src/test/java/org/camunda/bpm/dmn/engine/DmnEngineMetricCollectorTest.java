@@ -33,35 +33,35 @@ public class DmnEngineMetricCollectorTest extends DmnDecisionTest {
 
   @Test
   public void testInitialExecutedDecisionElementsValue() {
-    assertThat(getExecutedDecisionElements()).isEqualTo(0l);
+    assertThat(getExecutedDecisionElements()).isEqualTo(0L);
   }
 
   @Test
   @DecisionResource(resource = EXAMPLE_DMN)
   public void testExecutedDecisionElementsValue() {
-    assertThat(getExecutedDecisionElements()).isEqualTo(0l);
+    assertThat(getExecutedDecisionElements()).isEqualTo(0L);
 
     engine.evaluate(decision, VARIABLES);
-    assertThat(getExecutedDecisionElements()).isEqualTo(16l);
+    assertThat(getExecutedDecisionElements()).isEqualTo(16L);
 
     engine.evaluate(decision, VARIABLES);
-    assertThat(getExecutedDecisionElements()).isEqualTo(32l);
+    assertThat(getExecutedDecisionElements()).isEqualTo(32L);
 
     engine.evaluate(decision, VARIABLES);
     engine.evaluate(decision, VARIABLES);
-    assertThat(getExecutedDecisionElements()).isEqualTo(64l);
+    assertThat(getExecutedDecisionElements()).isEqualTo(64L);
   }
 
   @Test
   @DecisionResource(resource = EXAMPLE_DMN)
   public void testClearExecutedDecisionElementsValue() {
-    assertThat(getExecutedDecisionElements()).isEqualTo(0l);
+    assertThat(getExecutedDecisionElements()).isEqualTo(0L);
 
     engine.evaluate(decision, VARIABLES);
-    assertThat(getExecutedDecisionElements()).isEqualTo(16l);
-    assertThat(clearExecutedDecisionElements()).isEqualTo(16l);
+    assertThat(getExecutedDecisionElements()).isEqualTo(16L);
+    assertThat(clearExecutedDecisionElements()).isEqualTo(16L);
 
-    assertThat(getExecutedDecisionElements()).isEqualTo(0l);
+    assertThat(getExecutedDecisionElements()).isEqualTo(0L);
   }
 
   protected long getExecutedDecisionElements() {
