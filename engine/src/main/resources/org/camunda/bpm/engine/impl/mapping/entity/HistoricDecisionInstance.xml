@@ -65,23 +65,6 @@
     select count(RES.ID_)
     <include refid="selectHistoricDecisionInstancesByQueryCriteriaSql"/>
   </select>
-
-  <!-- mysql specific sql -->
-  
-  <select id="selectHistoricDecisionInstancesByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.HistoricDecisionInstanceQueryImpl" resultMap="historicDecisionInstanceResultMap">
-    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
-    ${limitBefore}
-    select distinct RES.*
-    ${limitBetween}
-    <include refid="selectHistoricDecisionInstancesByQueryCriteriaSql"/>
-    ${orderBy}
-    ${limitAfter}
-  </select>
-
-  <select id="selectHistoricDecisionInstanceCountByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.HistoricDecisionInstanceQueryImpl" resultType="long">
-    select distinct count(RES.ID_)
-    <include refid="selectHistoricDecisionInstancesByQueryCriteriaSql"/>
-  </select>
   
   <!-- native queries -->
   
@@ -95,6 +78,12 @@
     </if>
   </select>
 
+  <select id="selectHistoricDecisionInstanceCountByNativeQuery" parameterType="java.util.Map" resultType="long">
+    ${sql}
+  </select>
+  
+  <!-- special nativ query for mssql and db2 -->
+  
   <select id="selectHistoricDecisionInstancesByNativeQuery_mssql_or_db2" parameterType="java.util.Map" resultMap="historicDecisionInstanceResultMap">
     <if test="resultType == 'LIST_PAGE'">
         ${limitBeforeNativeQuery}
@@ -103,10 +92,6 @@
     <if test="resultType == 'LIST_PAGE'">
       ${limitAfter}
     </if>
-  </select>
-
-  <select id="selectHistoricDecisionInstanceCountByNativeQuery" parameterType="java.util.Map" resultType="long">
-    ${sql}
   </select>
   
   <!-- sql query -->
