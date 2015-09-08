@@ -5,6 +5,7 @@ var Base = require('./../base');
 module.exports = Base.extend({
 
   getVersion: function() {
+    this.waitForElementToBeVisible(element(by.css('.version-filter > .ng-scope')));
     return element(by.css('.version-filter')).getText().then(function(text) {
       return text.replace('Version\n', '');
     });
