@@ -23,6 +23,8 @@ import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
 import org.camunda.bpm.engine.history.HistoricCaseActivityInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
 import org.camunda.bpm.engine.history.HistoricCaseInstanceQuery;
+import org.camunda.bpm.engine.history.HistoricDecisionInstance;
+import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricDetailQuery;
 import org.camunda.bpm.engine.history.HistoricIncident;
@@ -38,6 +40,7 @@ import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricActivityInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricCaseActivityInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricCaseInstanceQuery;
+import org.camunda.bpm.engine.history.NativeHistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.NativeHistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
@@ -89,6 +92,14 @@ public interface HistoryService {
   HistoricCaseActivityInstanceQuery createHistoricCaseActivityInstanceQuery();
 
   /**
+   * Creates a new programmatic query to search for {@link HistoricDecisionInstance}s.
+   *
+   * If the user has no {@link Permissions#READ_HISTORY} permission on {@link Resources#DECISION_DEFINITION}
+   * then the result of the query is empty.
+   */
+  HistoricDecisionInstanceQuery createHistoricDecisionInstanceQuery();
+
+  /**
    * Deletes historic task instance.  This might be useful for tasks that are
    * {@link TaskService#newTask() dynamically created} and then {@link TaskService#complete(String) completed}.
    * If the historic task instance doesn't exist, no exception is thrown and the
@@ -123,6 +134,18 @@ public interface HistoryService {
   void deleteHistoricCaseInstance(String caseInstanceId);
 
   /**
+   * Deletes historic decision instances of a decision definition. All historic
+   * decision inputs and outputs are deleted as well.
+   *
+   * @param decisionDefinitionKey
+   *          the key of the decision definition
+   *
+   * @throws AuthorizationException
+   *          If the user has no {@link Permissions#DELETE_HISTORY} permission on {@link Resources#DECISION_DEFINITION}.
+   */
+  void deleteHistoricDecisionInstance(String decisionDefinitionKey);
+
+  /**
    * creates a native query to search for {@link HistoricProcessInstance}s via SQL
    */
   NativeHistoricProcessInstanceQuery createNativeHistoricProcessInstanceQuery();
@@ -146,6 +169,11 @@ public interface HistoryService {
    * creates a native query to search for {@link HistoricCaseActivityInstance}s via SQL
    */
   NativeHistoricCaseActivityInstanceQuery createNativeHistoricCaseActivityInstanceQuery();
+
+  /**
+   * creates a native query to search for {@link HistoricDecisionInstance}s via SQL
+   */
+  NativeHistoricDecisionInstanceQuery createNativeHistoricDecisionInstanceQuery();
 
   /**
    * Creates a new programmatic query to search for {@link HistoricJobLog historic job logs}.

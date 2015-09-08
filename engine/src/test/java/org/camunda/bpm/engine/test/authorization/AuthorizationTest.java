@@ -31,9 +31,9 @@ import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.test.TestHelper;
+import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -58,6 +58,7 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
   protected static final String VARIABLE_NAME = "aVariableName";
   protected static final String VARIABLE_VALUE = "aVariableValue";
 
+  @Override
   protected void setUp() throws Exception {
     user = createUser(userId);
     group = createGroup(groupId);
@@ -68,6 +69,7 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     processEngineConfiguration.setAuthorizationEnabled(true);
   }
 
+  @Override
   public void tearDown() {
     processEngineConfiguration.setAuthorizationEnabled(false);
     for (User user : identityService.createUserQuery().list()) {
@@ -183,6 +185,7 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     return processInstance;
   }
 
+  @Override
   public void executeAvailableJobs() {
     disableAuthorization();
     super.executeAvailableJobs();
@@ -432,7 +435,7 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
 
   // verify query results ////////////////////////////////////////////////////////
 
-  protected void verifyQueryResults(AbstractQuery<?, ?> query, int countExpected) {
+  protected void verifyQueryResults(Query<?, ?> query, int countExpected) {
     assertEquals(countExpected, query.list().size());
     assertEquals(countExpected, query.count());
 
@@ -445,7 +448,7 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  protected void verifySingleResultFails(AbstractQuery<?, ?> query) {
+  protected void verifySingleResultFails(Query<?, ?> query) {
     try {
       query.singleResult();
       fail();

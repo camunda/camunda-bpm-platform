@@ -25,6 +25,7 @@ import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.UPDATE_TASK;
 import static org.camunda.bpm.engine.authorization.Resources.AUTHORIZATION;
+import static org.camunda.bpm.engine.authorization.Resources.DECISION_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.DEPLOYMENT;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import static org.camunda.bpm.engine.authorization.Resources.PROCESS_INSTANCE;
@@ -54,6 +55,7 @@ import org.camunda.bpm.engine.impl.DeploymentStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.EventSubscriptionQueryImpl;
 import org.camunda.bpm.engine.impl.HistoricActivityInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.HistoricActivityStatisticsQueryImpl;
+import org.camunda.bpm.engine.impl.HistoricDecisionInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.HistoricDetailQueryImpl;
 import org.camunda.bpm.engine.impl.HistoricIncidentQueryImpl;
 import org.camunda.bpm.engine.impl.HistoricJobLogQueryImpl;
@@ -94,6 +96,7 @@ public class AuthorizationManager extends AbstractManager {
     return new AuthorizationEntity(type);
   }
 
+  @Override
   public void insert(DbEntity authorization) {
     checkAuthorization(CREATE, AUTHORIZATION, null);
     getDbEntityManager().insert(authorization);
@@ -137,6 +140,7 @@ public class AuthorizationManager extends AbstractManager {
     getDbEntityManager().merge(authorization);
   }
 
+  @Override
   public void delete(DbEntity authorization) {
     checkAuthorization(DELETE, AUTHORIZATION, authorization.getId());
     deleteAuthorizationsByResourceId(AUTHORIZATION, authorization.getId());
@@ -183,6 +187,7 @@ public class AuthorizationManager extends AbstractManager {
     checkAuthorization(permission, resource, null);
   }
 
+  @Override
   public void checkAuthorization(Permission permission, Resource resource, String resourceId) {
 
     final Authentication currentAuthentication = getCurrentAuthentication();
@@ -262,6 +267,7 @@ public class AuthorizationManager extends AbstractManager {
     }
   }
 
+  @Override
   public void configureQuery(AbstractQuery query, Resource resource) {
     configureQuery(query, resource, "RES.ID_");
   }
@@ -714,6 +720,10 @@ public class AuthorizationManager extends AbstractManager {
     }
   }
 
+  public void checkDeleteHistoricDecisionInstance(String decisionDefinitionKey) {
+    checkAuthorization(DELETE_HISTORY, DECISION_DEFINITION, decisionDefinitionKey);
+  }
+
   /* QUERIES */
 
   // deployment query ////////////////////////////////////////
@@ -870,6 +880,10 @@ public class AuthorizationManager extends AbstractManager {
 
   public void configureHistoricActivityStatisticsQuery(HistoricActivityStatisticsQueryImpl query) {
     configureQuery(query, PROCESS_DEFINITION, "PROC_DEF_KEY_", READ_HISTORY);
+  }
+
+  public void configureHistoricDecisionInstanceQuery(HistoricDecisionInstanceQueryImpl query) {
+    configureQuery(query, DECISION_DEFINITION, "DEC_DEF_KEY_", READ_HISTORY);
   }
 
   // user operation log query ///////////////////////////////

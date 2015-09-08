@@ -133,12 +133,16 @@ import org.camunda.bpm.engine.impl.form.validator.MinValidator;
 import org.camunda.bpm.engine.impl.form.validator.ReadOnlyValidator;
 import org.camunda.bpm.engine.impl.form.validator.RequiredValidator;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceManager;
 import org.camunda.bpm.engine.impl.history.handler.DbHistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
+import org.camunda.bpm.engine.impl.history.parser.HistoryDecisionTableListener;
 import org.camunda.bpm.engine.impl.history.parser.HistoryParseListener;
 import org.camunda.bpm.engine.impl.history.producer.CacheAwareCmmnHistoryEventProducer;
 import org.camunda.bpm.engine.impl.history.producer.CacheAwareHistoryEventProducer;
 import org.camunda.bpm.engine.impl.history.producer.CmmnHistoryEventProducer;
+import org.camunda.bpm.engine.impl.history.producer.DefaultDmnHistoryEventProducer;
+import org.camunda.bpm.engine.impl.history.producer.DmnHistoryEventProducer;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.history.transformer.CmmnHistoryTransformListener;
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
@@ -451,6 +455,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected CmmnHistoryEventProducer cmmnHistoryEventProducer;
 
+  protected DmnHistoryEventProducer dmnHistoryEventProducer;
+
   protected HistoryEventHandler historyEventHandler;
 
   protected boolean isExecutionTreePrefetchEnabled = true;
@@ -505,6 +511,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initHistoryLevel();
     initHistoryEventProducer();
     initCmmnHistoryEventProducer();
+    initDmnHistoryEventProducer();
     initHistoryEventHandler();
     initExpressionManager();
     initBeans();
@@ -924,6 +931,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       addSessionFactory(new GenericManagerFactory(CaseSentryPartManager.class));
 
       addSessionFactory(new GenericManagerFactory(DecisionDefinitionManager.class));
+      addSessionFactory(new GenericManagerFactory(HistoricDecisionInstanceManager.class));
 
       sessionFactories.put(ReadOnlyIdentityProvider.class, identityProviderSessionFactory);
 
@@ -1406,7 +1414,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected void initDmnEngine() {
     if (dmnEngine == null) {
       if (dmnEngineConfiguration == null) {
-        dmnEngineConfiguration = new ProcessEngineDmnEngineConfiguration(scriptingEngines);
+        dmnEngineConfiguration = new ProcessEngineDmnEngineConfiguration(scriptingEngines, new HistoryDecisionTableListener(dmnHistoryEventProducer, historyLevel));
       }
       dmnEngine = dmnEngineConfiguration.buildEngine();
     }
@@ -1525,6 +1533,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected void initCmmnHistoryEventProducer() {
     if(cmmnHistoryEventProducer == null) {
       cmmnHistoryEventProducer = new CacheAwareCmmnHistoryEventProducer();
+    }
+  }
+
+  protected void initDmnHistoryEventProducer() {
+    if(dmnHistoryEventProducer == null) {
+      dmnHistoryEventProducer = new DefaultDmnHistoryEventProducer();
     }
   }
 
@@ -2486,6 +2500,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public CmmnHistoryEventProducer getCmmnHistoryEventProducer() {
     return cmmnHistoryEventProducer;
+  }
+
+  public ProcessEngineConfigurationImpl setDmnHistoryEventProducer(DmnHistoryEventProducer dmnHistoryEventProducer) {
+    this.dmnHistoryEventProducer = dmnHistoryEventProducer;
+    return this;
+  }
+
+  public DmnHistoryEventProducer getDmnHistoryEventProducer() {
+    return dmnHistoryEventProducer;
   }
 
   public Map<String, Class<? extends FormFieldValidator>> getCustomFormFieldValidators() {

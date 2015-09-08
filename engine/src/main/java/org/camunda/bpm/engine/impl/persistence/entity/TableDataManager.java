@@ -13,14 +13,20 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.session.RowBounds;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
 import org.camunda.bpm.engine.history.HistoricCaseInstance;
+import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricFormProperty;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
@@ -32,6 +38,7 @@ import org.camunda.bpm.engine.impl.TablePageQueryImpl;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
+import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricDetailEventEntity;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.management.TableMetaData;
@@ -95,6 +102,7 @@ public class TableDataManager extends AbstractManager {
     persistentObjectToTableNameMap.put(HistoricVariableInstanceEntity.class, "ACT_HI_DETAIL");
     persistentObjectToTableNameMap.put(HistoricDetailEventEntity.class, "ACT_HI_DETAIL");
 
+    persistentObjectToTableNameMap.put(HistoricDecisionInstanceEntity.class, "ACT_HI_DECINST");
 
     // Identity module
     persistentObjectToTableNameMap.put(GroupEntity.class, "ACT_ID_GROUP");
@@ -130,6 +138,8 @@ public class TableDataManager extends AbstractManager {
     apiTypeToTableNameMap.put(HistoricCaseInstance.class, "ACT_HI_CASEINST");
     apiTypeToTableNameMap.put(HistoricCaseActivityInstance.class, "ACT_HI_CASEACTINST");
 
+    apiTypeToTableNameMap.put(HistoricDecisionInstance.class, "ACT_HI_DECINST");
+
     // TODO: Identity skipped for the moment as no SQL injection is provided here
   }
 
@@ -164,7 +174,7 @@ public class TableDataManager extends AbstractManager {
 
     tablePage.setTableName(tablePageQuery.getTableName());
     tablePage.setTotal(getTableCount(tablePageQuery.getTableName()));
-    tablePage.setRows((List<Map<String,Object>>)tableData);
+    tablePage.setRows(tableData);
     tablePage.setFirstResult(firstResult);
 
     return tablePage;

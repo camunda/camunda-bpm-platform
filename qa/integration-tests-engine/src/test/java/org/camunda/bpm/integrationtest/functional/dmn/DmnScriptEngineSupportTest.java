@@ -10,22 +10,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.integrationtest.functional.scriptengine;
+package org.camunda.bpm.integrationtest.functional.dmn;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-import java.util.Map;
-
 import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
-import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -43,8 +38,8 @@ public class DmnScriptEngineSupportTest extends AbstractFoxPlatformIntegrationTe
   public static WebArchive processArchive() {
 
     return initWebArchiveDeployment()
-      .addAsResource("org/camunda/bpm/integrationtest/functional/scriptengine/DmnScriptTaskTest.bpmn20.xml", "DmnScriptTaskTest.bpmn20.xml")
-      .addAsResource("org/camunda/bpm/integrationtest/functional/scriptengine/Example.dmn10.xml", "Example.dmn10.xml");
+      .addAsResource("org/camunda/bpm/integrationtest/functional/dmn/DmnScriptTaskTest.bpmn20.xml", "DmnScriptTaskTest.bpmn20.xml")
+      .addAsResource("org/camunda/bpm/integrationtest/functional/dmn/Example.dmn10.xml", "Example.dmn10.xml");
   }
 
   @Test

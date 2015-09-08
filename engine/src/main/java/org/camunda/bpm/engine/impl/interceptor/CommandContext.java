@@ -42,6 +42,7 @@ import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSession;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionManager;
+import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceManager;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.identity.WritableIdentityProvider;
@@ -468,6 +469,10 @@ public class CommandContext {
 
   public DecisionDefinitionManager getDecisionDefinitionManager() {
     return getSession(DecisionDefinitionManager.class);
+  }
+
+  public HistoricDecisionInstanceManager getHistoricDecisionInstanceManager() {
+    return getSession(HistoricDecisionInstanceManager.class);
   }
 
   // Filter ////////////////////////////////////////////////////////////////////

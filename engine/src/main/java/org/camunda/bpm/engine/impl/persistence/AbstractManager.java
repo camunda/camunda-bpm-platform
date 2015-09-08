@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSession;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionManager;
+import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceManager;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.Session;
@@ -103,6 +104,10 @@ public abstract class AbstractManager implements Session {
 
   protected DecisionDefinitionManager getDecisionDefinitionManager() {
     return getSession(DecisionDefinitionManager.class);
+  }
+
+  protected HistoricDecisionInstanceManager getHistoricDecisionInstanceManager() {
+    return getSession(HistoricDecisionInstanceManager.class);
   }
 
   protected CaseExecutionManager getCaseInstanceManager() {

@@ -140,7 +140,7 @@ public class DeploymentManager extends AbstractManager {
 
     deleteCaseDeployment(deploymentId, cascade);
 
-    deleteDecisionDeployment(deploymentId);
+    deleteDecisionDeployment(deploymentId, cascade);
 
     getResourceManager().deleteResourcesByDeploymentId(deploymentId);
 
@@ -181,11 +181,18 @@ public class DeploymentManager extends AbstractManager {
     }
   }
 
-  protected void deleteDecisionDeployment(String deploymentId) {
+  protected void deleteDecisionDeployment(String deploymentId, boolean cascade) {
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
     if (processEngineConfiguration.isDmnEnabled()) {
       DecisionDefinitionManager decisionDefinitionManager = getDecisionDefinitionManager();
       List<DecisionDefinition> decisionDefinitions = decisionDefinitionManager.findDecisionDefinitionByDeploymentId(deploymentId);
+
+      if(cascade) {
+        // delete historic decision instances
+        for(DecisionDefinition decisionDefinition : decisionDefinitions) {
+          getHistoricDecisionInstanceManager().deleteHistoricDecisionInstancesByDecisionDefinitionKey(decisionDefinition.getKey());
+        }
+      }
 
       // delete case definitions from db
       decisionDefinitionManager

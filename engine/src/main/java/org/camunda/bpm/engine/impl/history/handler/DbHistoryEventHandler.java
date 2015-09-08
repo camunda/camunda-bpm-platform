@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
+import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricScopeInstanceEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
@@ -36,6 +37,8 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
 
     if (historyEvent instanceof HistoricVariableUpdateEventEntity) {
       insertHistoricVariableUpdateEntity((HistoricVariableUpdateEventEntity) historyEvent);
+    } else if(historyEvent instanceof HistoricDecisionInstanceEntity) {
+      insertHistoricDecisionInstanceEntity((HistoricDecisionInstanceEntity) historyEvent);
     } else {
       insertOrUpdate(historyEvent);
     }
@@ -126,6 +129,14 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
 
   }
 
+  protected void insertHistoricDecisionInstanceEntity(HistoricDecisionInstanceEntity historicDecisionInstanceEntity) {
+
+    Context
+      .getCommandContext()
+      .getHistoricDecisionInstanceManager()
+      .insertHistoricDecisionInstance(historicDecisionInstanceEntity);
+  }
+
 
   protected boolean isInitialEvent(String eventType) {
     return HistoryEventTypes.ACTIVITY_INSTANCE_START.getEventName().equals(eventType)
@@ -134,6 +145,7 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
         || HistoryEventTypes.FORM_PROPERTY_UPDATE.getEventName().equals(eventType)
         || HistoryEventTypes.INCIDENT_CREATE.getEventName().equals(eventType)
         || HistoryEventTypes.CASE_INSTANCE_CREATE.getEventName().equals(eventType)
+        || HistoryEventTypes.DMN_DECISION_EVALUATE.getEventName().equals(eventType)
         ;
   }
 

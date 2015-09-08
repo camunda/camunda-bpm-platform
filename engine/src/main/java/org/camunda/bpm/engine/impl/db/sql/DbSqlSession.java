@@ -33,8 +33,6 @@ import java.util.List;
 
 import org.apache.ibatis.session.SqlSession;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.WrongDbException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.AbstractPersistenceSession;
@@ -125,6 +123,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
 
   // insert //////////////////////////////////////////
 
+  @Override
   protected void insertEntity(DbEntityOperation operation) {
 
     final DbEntity dbEntity = operation.getEntity();
@@ -158,6 +157,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
 
   // delete ///////////////////////////////////////////
 
+  @Override
   protected void deleteEntity(DbEntityOperation operation) {
 
     final DbEntity dbEntity = operation.getEntity();
@@ -191,6 +191,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
     // nothing to do
   }
 
+  @Override
   protected void deleteBulk(DbBulkOperation operation) {
     String statement = operation.getStatement();
     Object parameter = operation.getParameter();
@@ -202,6 +203,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
 
   // update ////////////////////////////////////////
 
+  @Override
   protected void updateEntity(DbEntityOperation operation) {
 
     final DbEntity dbEntity = operation.getEntity();
@@ -239,6 +241,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
     // nothing to do
   }
 
+  @Override
   protected void updateBulk(DbBulkOperation operation) {
     String statement = operation.getStatement();
     Object parameter = operation.getParameter();
@@ -309,57 +312,81 @@ public class DbSqlSession extends AbstractPersistenceSession {
     }
   }
 
+  @Override
   protected String getDbVersion() {
     String selectSchemaVersionStatement = dbSqlSessionFactory.mapStatement("selectDbSchemaVersion");
     return (String) sqlSession.selectOne(selectSchemaVersionStatement);
   }
 
+  @Override
   protected void dbSchemaCreateIdentity() {
     executeMandatorySchemaResource("create", "identity");
   }
 
+  @Override
   protected void dbSchemaCreateHistory() {
     executeMandatorySchemaResource("create", "history");
   }
 
+  @Override
   protected void dbSchemaCreateEngine() {
     executeMandatorySchemaResource("create", "engine");
   }
 
+  @Override
   protected void dbSchemaCreateCmmn() {
     executeMandatorySchemaResource("create", "case.engine");
   }
 
+  @Override
   protected void dbSchemaCreateCmmnHistory() {
     executeMandatorySchemaResource("create", "case.history");
   }
 
+  @Override
   protected void dbSchemaCreateDmn() {
     executeMandatorySchemaResource("create", "decision.engine");
   }
 
+
+  @Override
+  protected void dbSchemaCreateDmnHistory() {
+    executeMandatorySchemaResource("create", "decision.history");
+  }
+
+  @Override
   protected void dbSchemaDropIdentity() {
     executeMandatorySchemaResource("drop", "identity");
   }
 
+  @Override
   protected void dbSchemaDropHistory() {
     executeMandatorySchemaResource("drop", "history");
   }
 
+  @Override
   protected void dbSchemaDropEngine() {
     executeMandatorySchemaResource("drop", "engine");
   }
 
+  @Override
   protected void dbSchemaDropCmmn() {
     executeMandatorySchemaResource("drop", "case.engine");
   }
 
+  @Override
   protected void dbSchemaDropCmmnHistory() {
     executeMandatorySchemaResource("drop", "case.history");
   }
 
+  @Override
   protected void dbSchemaDropDmn() {
     executeMandatorySchemaResource("drop", "decision.engine");
+  }
+
+  @Override
+  protected void dbSchemaDropDmnHistory() {
+    executeMandatorySchemaResource("drop", "decision.history");
   }
 
   public void executeMandatorySchemaResource(String operation, String component) {
@@ -368,26 +395,37 @@ public class DbSqlSession extends AbstractPersistenceSession {
 
   public static String[] JDBC_METADATA_TABLE_TYPES = {"TABLE"};
 
+  @Override
   public boolean isEngineTablePresent(){
     return isTablePresent("ACT_RU_EXECUTION");
   }
+  @Override
   public boolean isHistoryTablePresent(){
     return isTablePresent("ACT_HI_PROCINST");
   }
+  @Override
   public boolean isIdentityTablePresent(){
     return isTablePresent("ACT_ID_USER");
   }
 
+  @Override
   public boolean isCmmnTablePresent() {
     return isTablePresent("ACT_RE_CASE_DEF");
   }
 
+  @Override
   public boolean isCmmnHistoryTablePresent() {
     return isTablePresent("ACT_HI_CASEINST");
   }
 
+  @Override
   public boolean isDmnTablePresent() {
     return isTablePresent("ACT_RE_DECISION_DEF");
+  }
+
+  @Override
+  public boolean isDmnHistoryTablePresent() {
+    return isTablePresent("ACT_HI_DECINST");
   }
 
   public boolean isTablePresent(String tableName) {
@@ -421,6 +459,7 @@ public class DbSqlSession extends AbstractPersistenceSession {
     }
   }
 
+  @Override
   public List<String> getTableNamesPresent() {
     List<String> tableNames = new ArrayList<String>();
 

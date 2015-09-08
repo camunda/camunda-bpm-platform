@@ -103,7 +103,14 @@ public enum HistoryEventTypes implements HistoryEventType {
    *
    * @since 7.3
    */
-  JOB_DELETE("job", "delete");
+  JOB_DELETE("job", "delete"),
+
+  /**
+   * fired when a decision is evaluated.
+   *
+   * @since 7.4
+   */
+  DMN_DECISION_EVALUATE("decision", "evaluate");
 
   private HistoryEventTypes(String entityType, String eventName) {
     this.entityType = eventName;

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.camunda.bpm.engine.impl.history.event.HistoricDecisionInputInstanceEntity">
+
+ <!-- insert -->
+ 
+  <insert id="insertHistoricDecisionInputInstance" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricDecisionInputInstanceEntity">
+     insert into ${prefix}ACT_HI_DEC_IN(
+          ID_, 
+          DEC_INST_ID_, 
+          CLAUSE_ID_, 
+          CLAUSE_NAME_,
+          VAR_TYPE_,
+          BYTEARRAY_ID_,
+          DOUBLE_,
+          LONG_,
+          TEXT_,
+          TEXT2_
+      ) values ( 
+          #{id, jdbcType=VARCHAR},
+          #{decisionInstanceId, jdbcType=VARCHAR},
+          #{clauseId, jdbcType=VARCHAR},
+          #{clauseName, jdbcType=VARCHAR},
+          #{typeName, jdbcType=VARCHAR},
+          #{byteArrayValueId, jdbcType=VARCHAR},
+          #{doubleValue, jdbcType=DOUBLE},
+          #{longValue, jdbcType=BIGINT},
+          #{textValue, jdbcType=VARCHAR},
+          #{textValue2, jdbcType=VARCHAR}
+      )
+  </insert>
+  
+  <!-- delete -->
+  
+  <delete id="deleteHistoricDecisionInputInstance" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricDecisionInputInstanceEntity">
+    delete from ${prefix}ACT_HI_DEC_IN where ID_ = #{id}
+  </delete>
+
+  <!-- result map -->
+
+  <resultMap id="historicDecisionInputInstanceResultMap" type="org.camunda.bpm.engine.impl.history.event.HistoricDecisionInputInstanceEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="decisionInstanceId" column="DEC_INST_ID_" jdbcType="VARCHAR"/>
+    <result property="clauseId" column="CLAUSE_ID_" jdbcType="VARCHAR"/>
+    <result property="clauseName" column="CLAUSE_NAME_" jdbcType="VARCHAR"/>
+    <result property="typeName" column="VAR_TYPE_" jdbcType="VARCHAR"/>
+    <result property="byteArrayValueId" column="BYTEARRAY_ID_" jdbcType="VARCHAR" />
+    <result property="doubleValue" column="DOUBLE_" jdbcType="DOUBLE" />
+    <result property="textValue" column="TEXT_" jdbcType="VARCHAR" />
+    <result property="textValue2" column="TEXT2_" jdbcType="VARCHAR" />
+    <result property="longValue" column="LONG_" jdbcType="BIGINT" />
+  </resultMap>
+  
+  <!-- select -->
+
+  <select id="selectHistoricDecisionInputInstancesByDecisionInstanceId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="historicDecisionInputInstanceResultMap">
+    select * from ${prefix}ACT_HI_DEC_IN 
+    where DEC_INST_ID_ = #{parameter, jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectHistoricDecisionInputInstancesByDecisionInstanceIds" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="historicDecisionInputInstanceResultMap">
+    select * from ${prefix}ACT_HI_DEC_IN 
+    where DEC_INST_ID_ in
+    <foreach collection="parameter" index="index" item="decisionInstanceId" open="(" separator="," close=")">
+      #{decisionInstanceId}
+    </foreach>
+    order by CLAUSE_ID_
+  </select>
+  
+</mapper>

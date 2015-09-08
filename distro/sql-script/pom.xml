@@ -122,27 +122,27 @@
                 <mkdir dir="target/sql/create" />
 
                 <concat destfile="target/sql/create/db2_engine_${project.version}.sql" fixlastline="yes">
-                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.db2.create.engine.sql activiti.db2.create.case.engine.sql activiti.db2.create.decision.engine.sql activiti.db2.create.history.sql activiti.db2.create.case.history.sql" />
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.db2.create.engine.sql activiti.db2.create.case.engine.sql activiti.db2.create.decision.engine.sql activiti.db2.create.history.sql activiti.db2.create.case.history.sql activiti.db2.create.decision.history.sql" />
                 </concat>
 
                 <concat destfile="target/sql/create/h2_engine_${project.version}.sql" fixlastline="yes">
-                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.h2.create.engine.sql activiti.h2.create.case.engine.sql activiti.h2.create.decision.engine.sql activiti.h2.create.history.sql activiti.h2.create.case.history.sql" />
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.h2.create.engine.sql activiti.h2.create.case.engine.sql activiti.h2.create.decision.engine.sql activiti.h2.create.history.sql activiti.h2.create.case.history.sql activiti.h2.create.decision.history.sql" />
                 </concat>
 
                 <concat destfile="target/sql/create/mssql_engine_${project.version}.sql" fixlastline="yes">
-                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.mssql.create.engine.sql activiti.mssql.create.case.engine.sql activiti.mssql.create.decision.engine.sql activiti.mssql.create.history.sql activiti.mssql.create.case.history.sql" />
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.mssql.create.engine.sql activiti.mssql.create.case.engine.sql activiti.mssql.create.decision.engine.sql activiti.mssql.create.history.sql activiti.mssql.create.case.history.sql activiti.mssql.create.decision.history.sql" />
                 </concat>
 
                 <concat destfile="target/sql/create/mysql_engine_${project.version}.sql" fixlastline="yes">
-                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.mysql.create.engine.sql activiti.mysql.create.case.engine.sql activiti.mysql.create.decision.engine.sql activiti.mysql.create.history.sql activiti.mysql.create.case.history.sql" />
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.mysql.create.engine.sql activiti.mysql.create.case.engine.sql activiti.mysql.create.decision.engine.sql activiti.mysql.create.history.sql activiti.mysql.create.case.history.sql activiti.mysql.create.decision.history.sql" />
                 </concat>
 
                 <concat destfile="target/sql/create/oracle_engine_${project.version}.sql" fixlastline="yes">
-                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.oracle.create.engine.sql activiti.oracle.create.case.engine.sql activiti.oracle.create.decision.engine.sql activiti.oracle.create.history.sql activiti.oracle.create.case.history.sql" />
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.oracle.create.engine.sql activiti.oracle.create.case.engine.sql activiti.oracle.create.decision.engine.sql activiti.oracle.create.history.sql activiti.oracle.create.case.history.sql activiti.oracle.create.decision.history.sql" />
                 </concat>
 
                 <concat destfile="target/sql/create/postgres_engine_${project.version}.sql" fixlastline="yes">
-                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.postgres.create.engine.sql activiti.postgres.create.case.engine.sql activiti.postgres.create.decision.engine.sql activiti.postgres.create.history.sql activiti.postgres.create.case.history.sql" />
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.postgres.create.engine.sql activiti.postgres.create.case.engine.sql activiti.postgres.create.decision.engine.sql activiti.postgres.create.history.sql activiti.postgres.create.case.history.sql activiti.postgres.create.decision.history.sql" />
                 </concat>
 
                 <!-- add identity create files -->
@@ -160,27 +160,27 @@
                 <mkdir dir="target/sql/drop" />
 
                 <concat destfile="target/sql/drop/db2_engine_${project.version}.sql" fixlastline="yes">
-                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.db2.drop.decision.engine.sql activiti.db2.drop.case.engine.sql activiti.db2.drop.engine.sql activiti.db2.drop.case.history.sql activiti.db2.drop.history.sql" />
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.db2.drop.decision.engine.sql activiti.db2.drop.case.engine.sql activiti.db2.drop.engine.sql activiti.db2.drop.decision.history.sql activiti.db2.drop.case.history.sql activiti.db2.drop.history.sql" />
                 </concat>
 
                 <concat destfile="target/sql/drop/h2_engine_${project.version}.sql" fixlastline="yes">
-                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.h2.drop.decision.engine.sql activiti.h2.drop.case.engine.sql activiti.h2.drop.engine.sql activiti.h2.drop.case.history.sql activiti.h2.drop.history.sql" />
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.h2.drop.decision.engine.sql activiti.h2.drop.case.engine.sql activiti.h2.drop.engine.sql activiti.h2.drop.decision.history.sql activiti.h2.drop.case.history.sql activiti.h2.drop.history.sql" />
                 </concat>
 
                 <concat destfile="target/sql/drop/mssql_engine_${project.version}.sql" fixlastline="yes">
-                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.mssql.drop.decision.engine.sql activiti.mssql.drop.case.engine.sql activiti.mssql.drop.engine.sql activiti.mssql.drop.case.history.sql activiti.mssql.drop.history.sql" />
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.mssql.drop.decision.engine.sql activiti.mssql.drop.case.engine.sql activiti.mssql.drop.engine.sql activiti.mssql.drop.decision.history.sql activiti.mssql.drop.case.history.sql activiti.mssql.drop.history.sql" />
                 </concat>
 
                 <concat destfile="target/sql/drop/mysql_engine_${project.version}.sql" fixlastline="yes">
-                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.mysql.drop.decision.engine.sql activiti.mysql.drop.case.engine.sql activiti.mysql.drop.engine.sql activiti.mysql.drop.case.history.sql activiti.mysql.drop.history.sql" />
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.mysql.drop.decision.engine.sql activiti.mysql.drop.case.engine.sql activiti.mysql.drop.engine.sql activiti.mysql.drop.decision.history.sql activiti.mysql.drop.case.history.sql activiti.mysql.drop.history.sql" />
                 </concat>
 
                 <concat destfile="target/sql/drop/oracle_engine_${project.version}.sql" fixlastline="yes">
-                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.oracle.drop.decision.engine.sql activiti.oracle.drop.case.engine.sql activiti.oracle.drop.engine.sql activiti.oracle.drop.case.history.sql activiti.oracle.drop.history.sql" />
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.oracle.drop.decision.engine.sql activiti.oracle.drop.case.engine.sql activiti.oracle.drop.engine.sql activiti.oracle.drop.decision.history.sql activiti.oracle.drop.case.history.sql activiti.oracle.drop.history.sql" />
                 </concat>
 
                 <concat destfile="target/sql/drop/postgres_engine_${project.version}.sql" fixlastline="yes">
-                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.postgres.drop.decision.engine.sql activiti.postgres.drop.case.engine.sql activiti.postgres.drop.engine.sql activiti.postgres.drop.case.history.sql activiti.postgres.drop.history.sql" />
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.postgres.drop.decision.engine.sql activiti.postgres.drop.case.engine.sql activiti.postgres.drop.engine.sql activiti.postgres.drop.decision.history.sql activiti.postgres.drop.case.history.sql activiti.postgres.drop.history.sql" />
                 </concat>
 
                 <!-- add identity drop files -->
