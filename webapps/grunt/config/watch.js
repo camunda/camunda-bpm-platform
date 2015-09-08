@@ -58,10 +58,10 @@ module.exports = function(config, watchConf) {
         '<%= pkg.gruntConfig.tasklistSourceDir %>/../node_modules/camunda-commons-ui/lib/**/*.{js,html}',
         '<%= pkg.gruntConfig.tasklistSourceDir %>/../node_modules/camunda-commons-ui/{resources,lib/*}/locales/**/*.json',
         '<%= pkg.gruntConfig.tasklistSourceDir %>/../node_modules/camunda-commons-ui/node_modules/camunda-bpm-sdk-js/dist/**/*.js',
+        '../../camunda-bpm-platform-ee/webapps/camunda-webapp/plugins/target/classes/plugin-webapp/**/*.{js,html}'
       ],
       tasks: [
         'localescompile:tasklist_locales',
-        'requirejs:tasklist_dependencies',
         'requirejs:tasklist_scripts'
       ]
   };
