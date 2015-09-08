@@ -42,21 +42,27 @@ public class EnvScriptCachingTest extends PluggableProcessEngineTestCase {
   protected static final String SCRIPT_LANGUAGE = "groovy";
   protected static final String SCRIPT = "println 'hello world'";
   protected static final String ENV_SCRIPT = "println 'hello world from env script'";
+  protected static final ScriptEnvResolver RESOLVER;
+
+  static {
+    RESOLVER = new ScriptEnvResolver() {
+      public String[] resolve(String language) {
+        return new String[] { ENV_SCRIPT };
+      }
+    };
+  }
 
   protected ScriptFactory scriptFactory;
 
   public void setUp() throws Exception {
     super.setUp();
     scriptFactory = processEngineConfiguration.getScriptFactory();
-    processEngineConfiguration.getEnvScriptResolvers().add(new ScriptEnvResolver() {
-      public String[] resolve(String language) {
-        return new String[] { ENV_SCRIPT };
-      }
-    });
+    processEngineConfiguration.getEnvScriptResolvers().add(RESOLVER);
   }
 
-  public void tearDown() {
-    processEngineConfiguration.getEnvScriptResolvers().clear();
+  protected void tearDown() throws Exception {
+    super.tearDown();
+    processEngineConfiguration.getEnvScriptResolvers().remove(RESOLVER);
   }
 
   public void testEnabledPaEnvScriptCaching() {
@@ -78,7 +84,7 @@ public class EnvScriptCachingTest extends PluggableProcessEngineTestCase {
 
     assertNotNull(groovyEnvScripts);
     assertFalse(groovyEnvScripts.isEmpty());
-    assertEquals(1, groovyEnvScripts.size());
+    assertEquals(processEngineConfiguration.getEnvScriptResolvers().size(), groovyEnvScripts.size());
 
     repositoryService.deleteDeployment(deployment.getId(), true);
   }
