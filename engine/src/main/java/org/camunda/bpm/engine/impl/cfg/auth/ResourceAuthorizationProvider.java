@@ -16,6 +16,7 @@ import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
+import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -190,5 +191,14 @@ public interface ResourceAuthorizationProvider {
    *          a group identity link has been deleted.
    */
   public AuthorizationEntity[] deleteTaskGroupIdentityLink(Task task, String groupId, String type);
+
+  /**
+   * <p>Invoked whenever a new decision definition is created.</p>
+   *
+   * @param decisionDefinition the newly created decision definition
+   * @return a list of authorizations to be automatically added when a new
+   *         {@link DecisionDefinition} is created.
+   */
+  public AuthorizationEntity[] newDecisionDefinition(DecisionDefinition decisionDefinition);
 
 }

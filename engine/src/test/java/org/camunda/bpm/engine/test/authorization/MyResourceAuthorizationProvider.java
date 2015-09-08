@@ -17,6 +17,7 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
+import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -133,6 +134,11 @@ public class MyResourceAuthorizationProvider implements ResourceAuthorizationPro
     DELETE_USER_IDENTITY_LINK_USER = null;
     DELETE_GROUP_IDENTITY_LINK_TYPE = null;
     DELETE_GROUP_IDENTITY_LINK_GROUP = null;
+  }
+
+  @Override
+  public AuthorizationEntity[] newDecisionDefinition(DecisionDefinition decisionDefinition) {
+    return null;
   }
 
 }

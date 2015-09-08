@@ -38,6 +38,7 @@ import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
+import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -218,6 +219,11 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
 
   public AuthorizationEntity[] deleteTaskGroupIdentityLink(Task task, String groupId, String type) {
     // an existing authorization will not be deleted in such a case
+    return null;
+  }
+
+  public AuthorizationEntity[] newDecisionDefinition(DecisionDefinition decisionDefinition) {
+    // no default authorizations on decision definitions.
     return null;
   }
 

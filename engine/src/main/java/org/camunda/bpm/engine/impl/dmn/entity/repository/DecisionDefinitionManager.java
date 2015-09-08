@@ -17,13 +17,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 
 public class DecisionDefinitionManager extends AbstractManager {
 
   public void insertDecisionDefinition(DecisionDefinitionEntity decisionDefinition) {
     getDbEntityManager().insert(decisionDefinition);
+    createDefaultAuthorizations(decisionDefinition);
   }
 
   public void deleteDecisionDefinitionsByDeploymentId(String deploymentId) {
@@ -66,4 +69,11 @@ public class DecisionDefinitionManager extends AbstractManager {
     return getDbEntityManager().selectList("selectDecisionDefinitionByDeploymentId", deploymentId);
   }
 
+  protected void createDefaultAuthorizations(DecisionDefinition decisionDefinition) {
+    if(isAuthorizationEnabled()) {
+      ResourceAuthorizationProvider provider = getResourceAuthorizationProvider();
+      AuthorizationEntity[] authorizations = provider.newDecisionDefinition(decisionDefinition);
+      saveDefaultAuthorizations(authorizations);
+    }
+  }
 }
