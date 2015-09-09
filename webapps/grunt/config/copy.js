@@ -86,7 +86,7 @@ module.exports = function(config, copyConf) {
         // bootstrap fonts
         {
           expand: true,
-          cwd: '<%= pkg.gruntConfig.cockpitSourceDir %>/../node_modules/camunda-commons-ui/node_modules/bootstrap/fonts',
+          cwd: '<%= pkg.gruntConfig.cockpitSourceDir %>/../../camunda-commons-ui/node_modules/bootstrap/fonts',
           src: [
             '*.{eot,ttf,svg,woff}'
           ],
@@ -95,7 +95,7 @@ module.exports = function(config, copyConf) {
         // bpmn fonts
         {
           expand: true,
-          cwd: '<%= pkg.gruntConfig.cockpitSourceDir %>/../node_modules/camunda-commons-ui/node_modules/bpmn-font/dist/font',
+          cwd: '<%= pkg.gruntConfig.cockpitSourceDir %>/../../camunda-commons-ui/node_modules/bpmn-font/dist/font',
           src: [
             '*.{eot,ttf,svg,woff}'
           ],
@@ -104,7 +104,7 @@ module.exports = function(config, copyConf) {
         // open sans and dmn fonts
         {
           expand: true,
-          cwd: '<%= pkg.gruntConfig.cockpitSourceDir %>/../node_modules/camunda-commons-ui/vendor/fonts',
+          cwd: '<%= pkg.gruntConfig.cockpitSourceDir %>/../../camunda-commons-ui/vendor/fonts',
           src: ['*.{eot,svg,ttf,woff,woff2}'],
           dest: '<%= pkg.gruntConfig.cockpitBuildTarget %>/fonts/'
         },
@@ -112,7 +112,7 @@ module.exports = function(config, copyConf) {
         // placeholder shims
         {
           expand: true,
-          cwd: '<%= pkg.gruntConfig.cockpitSourceDir %>/../node_modules/camunda-commons-ui/vendor',
+          cwd: '<%= pkg.gruntConfig.cockpitSourceDir %>/../../camunda-commons-ui/vendor',
           src: ['placeholders.*'],
           dest: '<%= pkg.gruntConfig.cockpitBuildTarget %>/scripts/'
         }
