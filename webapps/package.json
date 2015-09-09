@@ -7,8 +7,5 @@
     "clientDir": "client",
     "prodTarget": "dist",
     "devTarget": "dist/app/tasklist"
-  },
-  "dependencies": {
-    "camunda-commons-ui": "git://github.com/camunda/camunda-commons-ui#master"
   }
 }
