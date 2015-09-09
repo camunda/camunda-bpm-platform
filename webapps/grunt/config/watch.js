@@ -22,8 +22,8 @@ module.exports = function(config, watchConf) {
   watchConf.cockpit_styles = {
       options: options,
       files: [
-        '<%= pkg.gruntConfig.cockpitSourceDir %>/../node_modules/camunda-commons-ui/lib/**/*.less',
-        '<%= pkg.gruntConfig.cockpitSourceDir %>/../node_modules/camunda-commons-ui/resources/less/**/*.less',
+        '<%= pkg.gruntConfig.cockpitSourceDir %>/../../camunda-commons-ui/lib/**/*.less',
+        '<%= pkg.gruntConfig.cockpitSourceDir %>/../../camunda-commons-ui/resources/less/**/*.less',
         '<%= pkg.gruntConfig.cockpitSourceDir %>/styles/**/*.{css,less}',
         '<%= pkg.gruntConfig.cockpitSourceDir %>/scripts/**/*.{css,less}'
       ],
@@ -45,9 +45,9 @@ module.exports = function(config, watchConf) {
   watchConf.cockpit_dependencies = {
       options: options,
       files: [
-        '<%= pkg.gruntConfig.cockpitSourceDir %>/../node_modules/camunda-commons-ui/lib/**/*.{js,html}',
-        '<%= pkg.gruntConfig.cockpitSourceDir %>/../node_modules/camunda-commons-ui/{resources,lib/*}/locales/**/*.json',
-        '<%= pkg.gruntConfig.cockpitSourceDir %>/../node_modules/camunda-commons-ui/node_modules/camunda-bpm-sdk-js/dist/**/*.js',
+        '<%= pkg.gruntConfig.cockpitSourceDir %>/../../camunda-commons-ui/lib/**/*.{js,html}',
+        '<%= pkg.gruntConfig.cockpitSourceDir %>/../../camunda-commons-ui/{resources,lib/*}/locales/**/*.json',
+        '<%= pkg.gruntConfig.cockpitSourceDir %>/../../camunda-commons-ui/node_modules/camunda-bpm-sdk-js/dist/**/*.js',
         '../../camunda-bpm-platform-ee/webapps/camunda-webapp/plugins/target/classes/plugin-webapp/**/*.{js,html}'
       ],
       tasks: [
