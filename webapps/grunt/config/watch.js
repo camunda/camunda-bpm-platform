@@ -21,8 +21,8 @@ module.exports = function(config, watchConf) {
   watchConf.tasklist_styles = {
       options: options,
       files: [
-        '<%= pkg.gruntConfig.tasklistSourceDir %>/../node_modules/camunda-commons-ui/lib/**/*.less',
-        '<%= pkg.gruntConfig.tasklistSourceDir %>/../node_modules/camunda-commons-ui/resources/less/**/*.less',
+        '<%= pkg.gruntConfig.tasklistSourceDir %>/../../camunda-commons-ui/lib/**/*.less',
+        '<%= pkg.gruntConfig.tasklistSourceDir %>/../../camunda-commons-ui/resources/less/**/*.less',
         '<%= pkg.gruntConfig.tasklistSourceDir %>/styles/**/*.{css,less}',
         '<%= pkg.gruntConfig.tasklistSourceDir %>/scripts/**/*.{css,less}'
       ],
@@ -55,9 +55,9 @@ module.exports = function(config, watchConf) {
   watchConf.tasklist_dependencies = {
       options: options,
       files: [
-        '<%= pkg.gruntConfig.tasklistSourceDir %>/../node_modules/camunda-commons-ui/lib/**/*.{js,html}',
-        '<%= pkg.gruntConfig.tasklistSourceDir %>/../node_modules/camunda-commons-ui/{resources,lib/*}/locales/**/*.json',
-        '<%= pkg.gruntConfig.tasklistSourceDir %>/../node_modules/camunda-commons-ui/node_modules/camunda-bpm-sdk-js/dist/**/*.js',
+        '<%= pkg.gruntConfig.tasklistSourceDir %>/../../camunda-commons-ui/lib/**/*.{js,html}',
+        '<%= pkg.gruntConfig.tasklistSourceDir %>/../../camunda-commons-ui/{resources,lib/*}/locales/**/*.json',
+        '<%= pkg.gruntConfig.tasklistSourceDir %>/../../camunda-commons-ui/node_modules/camunda-bpm-sdk-js/dist/**/*.js',
         '../../camunda-bpm-platform-ee/webapps/camunda-webapp/plugins/target/classes/plugin-webapp/**/*.{js,html}'
       ],
       tasks: [
