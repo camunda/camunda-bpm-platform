@@ -389,6 +389,8 @@
                 <exclude>**/HistoricVariableInstanceAuthorizationTest.java</exclude>
                 <exclude>**/CompositeDbHistoryEventHandlerTest.java</exclude>
                 <exclude>**/CompositeHistoryEventHandlerTest.java</exclude>
+                <exclude>**/HistoricDecisionInstanceAuthorizationTest.java</exclude>
+                <exclude>**/HistoricDecisionInstanceTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -429,6 +431,8 @@
                 <exclude>**/CompositeDbHistoryEventHandlerTest.java</exclude>
                 <exclude>**/CompositeHistoryEventHandlerTest.java</exclude>
                 <exclude>**/CompensateEventHistoryTest.java</exclude>
+                <exclude>**/HistoricDecisionInstanceAuthorizationTest.java</exclude>
+                <exclude>**/HistoricDecisionInstanceTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>
