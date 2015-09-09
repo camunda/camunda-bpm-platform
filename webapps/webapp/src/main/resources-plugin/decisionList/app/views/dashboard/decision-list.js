@@ -1,9 +1,7 @@
 define([
-  'text!./decision-list.html',
-  'camunda-bpm-sdk-js'
+  'text!./decision-list.html'
 ], function(
-  template,
-  CamSDK
+  template
 ) {
   'use strict';
 
@@ -13,15 +11,10 @@ define([
       label: 'Deployed Decisions',
       template: template,
       controller: [
-              '$scope', 'Uri',
-      function($scope,   Uri) {
+              '$scope', 'camAPI',
+      function($scope,   camAPI) {
 
-        var client = new CamSDK.Client({
-          apiUri: Uri.appUri('engine://'),
-          engine: Uri.appUri(':engine')
-        });
-
-        var decisionDefinitionService = client.resource('decision-definition');
+        var decisionDefinitionService = camAPI.resource('decision-definition');
 
         // get ALL the decisions
         decisionDefinitionService.list({latestVersion: true}, function(err, data) {
