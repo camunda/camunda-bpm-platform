@@ -27,7 +27,7 @@ import java.util.List;
  * @author Roman Smirnov
  *
  */
-@Path(HistoricVariableInstanceRestService.PATH)
+@Path(HistoricTaskInstanceRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
 public interface HistoricTaskInstanceRestService {
 
