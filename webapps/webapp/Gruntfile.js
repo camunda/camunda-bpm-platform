@@ -29,24 +29,24 @@ module.exports = function(grunt) {
   require('camunda-tasklist-ui/grunt/config/copy')(config, copyConf);
 
   var lessConf = { };
-  require('camunda-admin-ui/node_modules/camunda-commons-ui/grunt/config/less')(config, lessConf, {
+  require('camunda-commons-ui/grunt/config/less')(config, lessConf, {
     appName: 'admin',
     sourceDir: pkg.gruntConfig.adminSourceDir,
     buildTarget: pkg.gruntConfig.adminBuildTarget,
   });
-  require('camunda-cockpit-ui/node_modules/camunda-commons-ui/grunt/config/less')(config, lessConf, {
+  require('camunda-commons-ui/grunt/config/less')(config, lessConf, {
     appName: 'cockpit',
     sourceDir: pkg.gruntConfig.cockpitSourceDir,
     buildTarget: pkg.gruntConfig.cockpitBuildTarget,
   });
-  require('camunda-tasklist-ui/node_modules/camunda-commons-ui/grunt/config/less')(config, lessConf, {
+  require('camunda-commons-ui/grunt/config/less')(config, lessConf, {
     appName: 'tasklist',
     sourceDir: pkg.gruntConfig.tasklistSourceDir,
     buildTarget: pkg.gruntConfig.tasklistBuildTarget,
   });
 
   var localesConf = { };
-  require('camunda-tasklist-ui/node_modules/camunda-commons-ui/grunt/config/localescompile')(config, localesConf, {
+  require('camunda-commons-ui/grunt/config/localescompile')(config, localesConf, {
     appName: 'tasklist',
     sourceDir: pkg.gruntConfig.tasklistSourceDir,
     buildTarget: pkg.gruntConfig.tasklistBuildTarget,
@@ -59,42 +59,19 @@ module.exports = function(grunt) {
   require('camunda-admin-ui/grunt/config/watch')(config, watchConf);
 
   // watch the SDK
-  watchConf.tasklist_sdk = {
+  watchConf.watchSdk = {
     options: {
       livereload: false
     },
-    files: ['node_modules/camunda-tasklist-ui/node_modules/camunda-commons-ui/node_modules/camunda-bpm-sdk-js/lib/**/*.js'],
-    tasks: ['grunt:buildSdkTasklist']
+    files: ['node_modules/camunda-commons-ui/node_modules/camunda-bpm-sdk-js/lib/**/*.js'],
+    tasks: ['grunt:buildSdk']
   };
-  watchConf.cockpit_sdk = {
-    options: {
-      livereload: false
-    },
-    files: ['node_modules/camunda-cockpit-ui/node_modules/camunda-commons-ui/node_modules/camunda-bpm-sdk-js/lib/**/*.js'],
-    tasks: ['grunt:buildSdkCockpit']
-  };
-  watchConf.tasklist_sdk = {
-    options: {
-      livereload: false
-    },
-    files: ['node_modules/camunda-admin-ui/node_modules/camunda-commons-ui/node_modules/camunda-bpm-sdk-js/lib/**/*.js'],
-    tasks: ['grunt:buildSdkAdmin']
-  };
-
 
   var gruntConf = {
-    buildSdkTasklist: {
-      gruntfile: 'node_modules/camunda-tasklist-ui/node_modules/camunda-commons-ui/node_modules/camunda-bpm-sdk-js/Gruntfile.js',
+    buildSdk: {
+      gruntfile: 'node_modules/camunda-commons-ui/node_modules/camunda-bpm-sdk-js/Gruntfile.js',
       tasks: ['browserify:distAngular', 'browserify:distTypeUtils']
-    },
-    buildSdkCockpit: {
-      gruntfile: 'node_modules/camunda-cockpit-ui/node_modules/camunda-commons-ui/node_modules/camunda-bpm-sdk-js/Gruntfile.js',
-      tasks: ['browserify:distAngular', 'browserify:distTypeUtils']
-    },
-    buildSdkAdmin: {
-      gruntfile: 'node_modules/camunda-admin-ui/node_modules/camunda-commons-ui/node_modules/camunda-bpm-sdk-js/Gruntfile.js',
-      tasks: ['browserify:distAngular', 'browserify:distTypeUtils']
-    },
+    }
   };
 
 
@@ -120,7 +97,7 @@ module.exports = function(grunt) {
     grunt:            gruntConf
   });
 
-  require('camunda-tasklist-ui/node_modules/camunda-commons-ui/grunt/tasks/localescompile')(grunt);
+  require('camunda-commons-ui/grunt/tasks/localescompile')(grunt);
 
   grunt.registerTask('build', function(mode, app) {
 
@@ -132,7 +109,8 @@ module.exports = function(grunt) {
         var obj = objs[i];
         for (var key in obj) {
           if (obj.hasOwnProperty(key) && key.toLowerCase().indexOf(app) === -1 && key !== 'options' &&
-                                         key.toLowerCase().indexOf('webapp') === -1) {
+                                         key.toLowerCase().indexOf('webapp') === -1 &&
+                                         key.toLowerCase().indexOf('Sdk') === -1) {
               delete obj[key];
           }
         }

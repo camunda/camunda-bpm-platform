@@ -17,7 +17,8 @@
   "dependencies": {
     "camunda-tasklist-ui": "git://github.com/camunda/camunda-tasklist-ui#master",
     "camunda-admin-ui": "git://github.com/camunda/camunda-admin-ui#master",
-    "camunda-cockpit-ui": "git://github.com/camunda/camunda-cockpit-ui#master"
+    "camunda-cockpit-ui": "git://github.com/camunda/camunda-cockpit-ui#master",
+    "camunda-commons-ui": "git://github.com/camunda/camunda-commons-ui#master"
   },
   "devDependencies": {
     "grunt": "0.4.5",
