@@ -1,30 +1,15 @@
 /* global define: false */
 define([
-  'angular',
-  'jquery',
   'text!./decisionTable.html'
-], function(angular, $, template) {
+], function(template) {
   'use strict';
-  /* jshint unused: false */
-  var _unique = 0;
-  function unique(prefix) {
-    _unique++;
-    return (prefix ? prefix +'_' : '') + _unique;
-  }
 
-  var DirectiveController = ['$scope', '$compile', 'Views', '$timeout',
-                    function( $scope,   $compile,   Views,   $timeout) {
-
-    $scope.$watch('decisionTable', function(newValue) {
-      if(newValue) {
-        // render the dmn table
-        // console.log('new value for decisionTable', newValue);
-      }
-    });
+  var DirectiveController = ['$scope',
+                    function( $scope) {
 
   }];
 
-  var Directive = function ($compile, Views) {
+  var Directive = function ($compile) {
     return {
       restrict: 'EAC',
       scope: {
@@ -39,7 +24,7 @@ define([
     };
   };
 
-  Directive.$inject = [ '$compile', 'Views'];
+  Directive.$inject = [ '$compile'];
 
   return Directive;
 });

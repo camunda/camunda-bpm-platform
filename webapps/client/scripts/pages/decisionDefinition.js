@@ -4,14 +4,12 @@ define([
   'cockpit/util/routeUtil',
   'angular-data-depend',
   'camunda-commons-ui',
-  'camunda-bpm-sdk-js',
   'text!./decision-definition.html'],
   function(
   angular,
   routeUtil,
   dataDepend,
   camCommons,
-  CamSDK,
   template) {
 
   'use strict';
@@ -19,88 +17,51 @@ define([
   var module = angular.module('cam.cockpit.pages.decisionDefinition', [dataDepend.name, camCommons.name]);
 
   var Controller = [
-          '$scope', '$rootScope', '$route', '$q', 'Uri', 'search', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'Views', 'Data', 'Transform', 'Variables', 'dataDepend', 'page',
-  function($scope,   $rootScope,   $route,   $q,   Uri,   search,   ProcessDefinitionResource,   ProcessInstanceResource,   Views,   Data,   Transform,   Variables,   dataDepend,   page
+          '$scope', '$rootScope', '$q', 'dataDepend', 'page', 'camAPI', 'decisionDefinition',
+  function($scope,   $rootScope,   $q,   dataDepend,   page,   camAPI,   decisionDefinition
   ) {
 
     var decisionData = $scope.decisionData = dataDepend.create($scope);
 
     // utilities ///////////////////////
 
-    var sdk_client = new CamSDK.Client({
-      apiUri: Uri.appUri('engine://'),
-      engine: Uri.appUri(':engine')
-    });
-
-    var decisionDefinitionService = sdk_client.resource('decision-definition');
-
-/*
-    $scope.$on('$routeChanged', function() {
-      processData.set('filter', parseFilterFromUri());
-      // update tab selection
-      setDefaultTab($scope.processDefinitionTabs);
-    });
-*/
+    var decisionDefinitionService = camAPI.resource('decision-definition');
 
     // end utilities ///////////////////////
 
 
     // begin data definition //////////////////////
 
-    decisionData.provide('decisionDefinitionId', $route.current.params.id);
+    decisionData.provide('decisionDefinition', decisionDefinition);
 
-    decisionData.provide('decisionDefinition', [ 'decisionDefinitionId', function(decisionDefinitionId) {
-      if (!decisionDefinitionId) {
-        return null;
-      } else {
-        var deferred = $q.defer();
+    decisionData.provide('tableXml', ['decisionDefinition', function(decisionDefinition) {
+      var deferred = $q.defer();
 
-        decisionDefinitionService.get(decisionDefinitionId, function(err, data) {
-          if(!err) {
-            deferred.resolve(data);
-          } else {
-            deferred.reject(err);
-          }
-        });
+      var decisionDefinitionId = decisionDefinition.id;
 
-        return deferred.promise;
-      }
-    }]);
+      decisionDefinitionService.getXml(decisionDefinitionId, function(err, data) {
+        if(!err) {
+          deferred.resolve(data.dmnXml);
+        } else {
+          deferred.reject(err);
+        }
+      });
 
-    decisionData.provide('tableXml', ['decisionDefinitionId', function(decisionDefinitionId) {
-      if (!decisionDefinitionId) {
-        return null;
-      } else {
-        var deferred = $q.defer();
-
-        decisionDefinitionService.getXml(decisionDefinitionId, function(err, data) {
-          if(!err) {
-            deferred.resolve(data.dmnXml);
-          } else {
-            deferred.reject(err);
-          }
-        });
-
-        return deferred.promise;
-      }
+      return deferred.promise;
     }]);
 
     decisionData.provide('allDefinitions', [ 'decisionDefinition', function(decisionDefinition) {
-      if (!decisionDefinition) {
-        return null;
-      } else {
-        var deferred = $q.defer();
+      var deferred = $q.defer();
 
-        decisionDefinitionService.list({ key: decisionDefinition.key }, function(err, data) {
-          if(!err) {
-            deferred.resolve(data);
-          } else {
-            deferred.reject(err);
-          }
-        });
+      decisionDefinitionService.list({ key: decisionDefinition.key }, function(err, data) {
+        if(!err) {
+          deferred.resolve(data);
+        } else {
+          deferred.reject(err);
+        }
+      });
 
-        return deferred.promise;
-      }
+      return deferred.promise;
     }]);
 
     // end data definition /////////////////////////
@@ -171,37 +132,31 @@ define([
       controller: Controller,
       authentication: 'required',
       resolve: {
-        /*processDefinition: [ 'ResourceResolver', 'ProcessDefinitionResource',
-          function(ResourceResolver, ProcessDefinitionResource) {
-            return ResourceResolver.getByRouteParam('id', {
-              name: 'process definition',
-              resolve: function(id) {
-                return ProcessDefinitionResource.get({ id : id });
-              }
-            });
-          }]*/
+        decisionDefinition: [ 'ResourceResolver', 'camAPI', '$q', 
+        function (ResourceResolver, camAPI, $q) {
+          return ResourceResolver.getByRouteParam('id', {
+            name: 'decision definition',
+            resolve: function (id) {
+              var deferred = $q.defer();
+
+              var decisionDefinitionService = camAPI.resource('decision-definition');
+
+              decisionDefinitionService.get(id, function(err, data) {
+                if(!err) {
+                  deferred.resolve(data);
+                } else {
+                  deferred.reject(err);
+                }
+              });
+
+              return deferred.promise;
+            }
+          })
+        }]
       },
       reloadOnSearch: false
     });
   }];
-
-/*
-  var ViewConfig = [ 'ViewsProvider', function(ViewsProvider) {
-    ViewsProvider.registerDefaultView('cockpit.processDefinition.view', {
-      id: 'runtime',
-      priority: 20,
-      label: 'Runtime',
-      keepSearchParams: [
-        'parentProcessDefinitionId',
-        'businessKey',
-        'variables',
-        'startedAfter',
-        'startedBefore',
-        'viewbox'
-      ]
-    });
-  }];
-*/
 
   module
     .config(RouteConfig)
