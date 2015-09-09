@@ -111,6 +111,42 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
   protected HistoricVariableInstanceQuery createNewQuery(ProcessEngine engine) {
     return engine.getHistoryService().createHistoricVariableInstanceQuery();
   }
+  
+  public String getProcessInstanceId() {
+		return processInstanceId;
+	}
+
+	public String getCaseInstanceId() {
+		return caseInstanceId;
+	}
+
+	public String getVariableName() {
+		return variableName;
+	}
+
+	public String getVariableNameLike() {
+		return variableNameLike;
+	}
+
+	public Object getVariableValue() {
+		return variableValue;
+	}
+
+	public String[] getExecutionIdIn() {
+		return executionIdIn;
+	}
+
+	public String[] getTaskIdIn() {
+		return taskIdIn;
+	}
+
+	public String[] getActivityInstanceIdIn() {
+		return activityInstanceIdIn;
+	}
+
+	public String[] getCaseExecutionIdIn() {
+		return caseExecutionIdIn;
+	}
 
   @Override
   protected void applyFilters(HistoricVariableInstanceQuery query) {
