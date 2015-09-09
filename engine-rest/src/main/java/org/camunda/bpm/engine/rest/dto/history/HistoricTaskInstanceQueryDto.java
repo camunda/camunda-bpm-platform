@@ -327,6 +327,154 @@ public class HistoricTaskInstanceQueryDto extends AbstractQueryDto<HistoricTaskI
   protected HistoricTaskInstanceQuery createNewQuery(ProcessEngine engine) {
     return engine.getHistoryService().createHistoricTaskInstanceQuery();
   }
+  
+  public String getTaskId() {
+		return taskId;
+	}
+
+	public String getTaskParentTaskId() {
+		return taskParentTaskId;
+	}
+
+	public String getProcessInstanceId() {
+		return processInstanceId;
+	}
+
+	public String getExecutionId() {
+		return executionId;
+	}
+
+	public String[] getActivityInstanceIdIn() {
+		return activityInstanceIdIn;
+	}
+
+	public String getProcessDefinitionId() {
+		return processDefinitionId;
+	}
+
+	public String getProcessDefinitionKey() {
+		return processDefinitionKey;
+	}
+
+	public String getProcessDefinitionName() {
+		return processDefinitionName;
+	}
+
+	public String getTaskName() {
+		return taskName;
+	}
+
+	public String getTaskNameLike() {
+		return taskNameLike;
+	}
+
+	public String getTaskDescription() {
+		return taskDescription;
+	}
+
+	public String getTaskDescriptionLike() {
+		return taskDescriptionLike;
+	}
+
+	public String getTaskDefinitionKey() {
+		return taskDefinitionKey;
+	}
+
+	public String getTaskDeleteReason() {
+		return taskDeleteReason;
+	}
+
+	public String getTaskDeleteReasonLike() {
+		return taskDeleteReasonLike;
+	}
+
+	public String getTaskAssignee() {
+		return taskAssignee;
+	}
+
+	public String getTaskAssigneeLike() {
+		return taskAssigneeLike;
+	}
+
+	public String getTaskOwner() {
+		return taskOwner;
+	}
+
+	public String getTaskOwnerLike() {
+		return taskOwnerLike;
+	}
+
+	public Integer getTaskPriority() {
+		return taskPriority;
+	}
+
+	public Boolean getFinished() {
+		return finished;
+	}
+
+	public Boolean getUnfinished() {
+		return unfinished;
+	}
+
+	public Boolean getProcessFinished() {
+		return processFinished;
+	}
+
+	public Boolean getProcessUnfinished() {
+		return processUnfinished;
+	}
+
+	public Date getTaskDueDate() {
+		return taskDueDate;
+	}
+
+	public Date getTaskDueDateBefore() {
+		return taskDueDateBefore;
+	}
+
+	public Date getTaskDueDateAfter() {
+		return taskDueDateAfter;
+	}
+
+	public Date getTaskFollowUpDate() {
+		return taskFollowUpDate;
+	}
+
+	public Date getTaskFollowUpDateBefore() {
+		return taskFollowUpDateBefore;
+	}
+
+	public Date getTaskFollowUpDateAfter() {
+		return taskFollowUpDateAfter;
+	}
+
+	public String getCaseDefinitionId() {
+		return caseDefinitionId;
+	}
+
+	public String getCaseDefinitionKey() {
+		return caseDefinitionKey;
+	}
+
+	public String getCaseDefinitionName() {
+		return caseDefinitionName;
+	}
+
+	public String getCaseInstanceId() {
+		return caseInstanceId;
+	}
+
+	public String getCaseExecutionId() {
+		return caseExecutionId;
+	}
+
+	public List<VariableQueryParameterDto> getTaskVariables() {
+		return taskVariables;
+	}
+
+	public List<VariableQueryParameterDto> getProcessVariables() {
+		return processVariables;
+	}
 
   @Override
   protected void applyFilters(HistoricTaskInstanceQuery query) {
