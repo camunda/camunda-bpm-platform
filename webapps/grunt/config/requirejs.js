@@ -1,7 +1,7 @@
 module.exports = function(config, requireJsConfig) {
   'use strict';
   var grunt = config.grunt;
-  var commons = require('camunda-commons-ui');
+  var commons = require('./../../../camunda-commons-ui');
   var _ = commons.utils._;
   var rjsConf = commons.requirejs();
 

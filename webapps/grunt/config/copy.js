@@ -102,7 +102,7 @@ module.exports = function(config, copyConf) {
         // bootstrap fonts
         {
           expand: true,
-          cwd: '<%= pkg.gruntConfig.adminSourceDir %>/../node_modules/camunda-commons-ui/node_modules/bootstrap/fonts',
+          cwd: '<%= pkg.gruntConfig.adminSourceDir %>/../../camunda-commons-ui/node_modules/bootstrap/fonts',
           src: [
             '*.{eot,ttf,svg,woff}'
           ],
@@ -111,7 +111,7 @@ module.exports = function(config, copyConf) {
         // open sans fonts
         {
           expand: true,
-          cwd: '<%= pkg.gruntConfig.adminSourceDir %>/../node_modules/camunda-commons-ui/vendor/fonts',
+          cwd: '<%= pkg.gruntConfig.adminSourceDir %>/../../camunda-commons-ui/vendor/fonts',
           src: ['*.{eot,svg,ttf,woff,woff2}'],
           dest: '<%= pkg.gruntConfig.adminBuildTarget %>/fonts/'
         },
@@ -119,7 +119,7 @@ module.exports = function(config, copyConf) {
         // placeholder shims
         {
           expand: true,
-          cwd: '<%= pkg.gruntConfig.adminSourceDir %>/../node_modules/camunda-commons-ui/vendor',
+          cwd: '<%= pkg.gruntConfig.adminSourceDir %>/../../camunda-commons-ui/vendor',
           src: ['placeholders.*'],
           dest: '<%= pkg.gruntConfig.adminBuildTarget %>/scripts/'
         }

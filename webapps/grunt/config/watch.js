@@ -21,8 +21,8 @@ module.exports = function(config, watchConf) {
   watchConf.admin_styles = {
       options: options,
       files: [
-        '<%= pkg.gruntConfig.adminSourceDir %>/../node_modules/camunda-commons-ui/lib/**/*.less',
-        '<%= pkg.gruntConfig.adminSourceDir %>/../node_modules/camunda-commons-ui/resources/less/**/*.less',
+        '<%= pkg.gruntConfig.adminSourceDir %>/../../camunda-commons-ui/lib/**/*.less',
+        '<%= pkg.gruntConfig.adminSourceDir %>/../../camunda-commons-ui/resources/less/**/*.less',
         '<%= pkg.gruntConfig.adminSourceDir %>/styles/**/*.{css,less}',
         '<%= pkg.gruntConfig.adminSourceDir %>/scripts/**/*.{css,less}'
       ],
@@ -44,9 +44,9 @@ module.exports = function(config, watchConf) {
   watchConf.admin_dependencies = {
       options: options,
       files: [
-        '<%= pkg.gruntConfig.adminSourceDir %>/../node_modules/camunda-commons-ui/lib/**/*.{js,html}',
-        '<%= pkg.gruntConfig.adminSourceDir %>/../node_modules/camunda-commons-ui/{resources,lib/*}/locales/**/*.json',
-        '<%= pkg.gruntConfig.adminSourceDir %>/../node_modules/camunda-commons-ui/node_modules/camunda-bpm-sdk-js/dist/**/*.js',
+        '<%= pkg.gruntConfig.adminSourceDir %>/../../camunda-commons-ui/lib/**/*.{js,html}',
+        '<%= pkg.gruntConfig.adminSourceDir %>/../../camunda-commons-ui/{resources,lib/*}/locales/**/*.json',
+        '<%= pkg.gruntConfig.adminSourceDir %>/../../camunda-commons-ui/node_modules/camunda-bpm-sdk-js/dist/**/*.js',
         '../../camunda-bpm-platform-ee/webapps/camunda-webapp/plugins/target/classes/plugin-webapp/**/*.{js,html}'
       ],
       tasks: [
