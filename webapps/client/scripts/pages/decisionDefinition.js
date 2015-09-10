@@ -17,8 +17,8 @@ define([
   var module = angular.module('cam.cockpit.pages.decisionDefinition', [dataDepend.name, camCommons.name]);
 
   var Controller = [
-          '$scope', '$rootScope', '$q', 'dataDepend', 'page', 'camAPI', 'decisionDefinition',
-  function($scope,   $rootScope,   $q,   dataDepend,   page,   camAPI,   decisionDefinition
+          '$scope', '$rootScope', '$q', 'dataDepend', 'page', 'camAPI', 'decisionDefinition', 'Views', 'search',
+  function($scope,   $rootScope,   $q,   dataDepend,   page,   camAPI,   decisionDefinition,   Views,   search
   ) {
 
     var decisionData = $scope.decisionData = dataDepend.create($scope);
@@ -99,24 +99,57 @@ define([
       $scope.tableXml = tableXml;
     });
 
-/*
-    $scope.instanceStatistics = processData.observe([ 'instances.all', 'instances.current' ], function(allCount, currentCount) {
-      $scope.instanceStatistics.all = allCount;
-      $scope.instanceStatistics.current = currentCount;
-    });
-*/
+    $scope.decisionDefinitionVars = { read: [ 'decisionDefinition', 'decisionData' ] };
+    $scope.decisionDefinitionTabs = Views.getProviders({ component: 'cockpit.decisionDefinition.tab' });
 
 
     // INITIALIZE PLUGINS
 
-/*
-    var processPlugins = (
-        Views.getProviders({ component: 'cockpit.processDefinition.runtime.tab' })).concat(
-        Views.getProviders({ component: 'cockpit.processDefinition.runtime.action' })).concat(
-        Views.getProviders({ component: 'cockpit.processDefinition.view' })).concat(
-        Views.getProviders({ component: 'cockpit.processDefinition.diagram.overlay' })).concat(
-        Views.getProviders({ component: 'cockpit.jobDefinition.action' }));
-*/
+    var decisionPlugins = Views.getProviders({ component: 'cockpit.decisionDefinition.tab' });
+
+    var initData = {
+      decisionDefinition : $scope.decisionDefinitionService,
+      decisionData       : decisionData
+    };
+
+    for(var i = 0; i < decisionPlugins.length; i++) {
+      if(typeof decisionPlugins[i].initialize === 'function') {
+         decisionPlugins[i].initialize(initData);
+      }
+    }
+
+    $scope.selectTab = function(tabProvider) {
+      $scope.selectedTab = tabProvider;
+
+      search.updateSilently({
+        detailsTab: tabProvider.id
+      });
+    };
+
+    function setDefaultTab(tabs) {
+      var selectedTabId = search().detailsTab;
+
+      if (!tabs || !tabs.length) {
+        return;
+      }
+
+      if (selectedTabId) {
+        var provider = Views.getProvider({ component: 'cockpit.decisionDefinition.tab', id: selectedTabId });
+        if (provider && tabs.indexOf(provider) != -1) {
+          $scope.selectedTab = provider;
+          return;
+        }
+      }
+
+      search.updateSilently({
+        detailsTab: null
+      });
+
+      $scope.selectedTab = tabs[0];
+    }
+
+    setDefaultTab($scope.decisionDefinitionTabs);
+
   }];
 
   var RouteConfig = [
@@ -132,7 +165,7 @@ define([
       controller: Controller,
       authentication: 'required',
       resolve: {
-        decisionDefinition: [ 'ResourceResolver', 'camAPI', '$q', 
+        decisionDefinition: [ 'ResourceResolver', 'camAPI', '$q',
         function (ResourceResolver, camAPI, $q) {
           return ResourceResolver.getByRouteParam('id', {
             name: 'decision definition',
@@ -151,7 +184,7 @@ define([
 
               return deferred.promise;
             }
-          })
+          });
         }]
       },
       reloadOnSearch: false
