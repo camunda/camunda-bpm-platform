@@ -110,7 +110,7 @@ module.exports = function(grunt) {
         for (var key in obj) {
           if (obj.hasOwnProperty(key) && key.toLowerCase().indexOf(app) === -1 && key !== 'options' &&
                                          key.toLowerCase().indexOf('webapp') === -1 &&
-                                         key.toLowerCase().indexOf('Sdk') === -1) {
+                                         key.toLowerCase().indexOf('sdk') === -1) {
               delete obj[key];
           }
         }
