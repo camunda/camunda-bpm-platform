@@ -7,17 +7,12 @@
   <table class="decision-definitions-list cam-table" ng-if="decisionCount">
     <thead>
       <tr>
-        <th class="instances">Executed Instances</th>
         <th class="name">Name</th>
       </tr>
     </thead>
 
     <tbody>
       <tr ng-repeat="decision in decisions">
-        <td class="instances">
-          ???
-        </td>
-
         <td class="name">
           <a href="#/decision-definition/{{ decision.id }}">
             {{ decision.name }}

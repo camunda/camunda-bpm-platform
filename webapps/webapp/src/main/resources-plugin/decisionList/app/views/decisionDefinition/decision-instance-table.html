@@ -1,0 +1,53 @@
+<!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/decisionList/app/views/decisionDefinition/decision-instance-table.html -->
+<div cam-widget-loader
+     loading-state="{{ loadingState }}"
+     text-empty="No decision instances matched by current filter.">
+  <table class="decision-instances cam-table">
+    <thead>
+      <tr>
+        <th class="instance-id uuid">ID</th>
+        <th class="start-time">Evaluation Time</th>
+        <th class="process-definition-key">Process Definition Key</th>
+        <th class="activity-id">Activity ID</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="decisionInstance in decisionInstances">
+        <td class="instance-id uuid">
+          <a ng-href="#/decision-instance/{{ decisionInstance.id }}" title="{{ processInstance.id }}">
+            {{ decisionInstance.id }}
+          </a>
+        </td>
+
+        <td class="start-time">
+          {{ decisionInstance.evaluationTime | camDate }}
+        </td>
+
+        <td class="process-definition-key">
+          <a ng-href="#/process-definition/{{ decisionInstance.processDefinitionId }}">
+            {{ decisionInstance.processDefinitionKey }}
+          </a>
+        </td>
+
+        <td class="activity-id">
+          <a ng-href="#/process-instance/{{ decisionInstance.processInstanceId }}">
+            {{ decisionInstance.activityId }}
+          </a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <pagination ng-if="pages.total > pages.size"
+              class="pagination-sm"
+
+              page="pages.current"
+              ng-model="pages.current"
+
+              total-items="pages.total"
+              items-per-page="pages.size"
+
+              max-size="7"
+              boundary-links="true"></pagination>
+</div>
+<!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/decisionList/app/views/decisionDefinition/decision-instance-table.html -->

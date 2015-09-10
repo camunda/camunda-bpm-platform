@@ -9,12 +9,16 @@ define([
   // dashboard
   './dashboard/decision-list',
 
-], function(angular, decisionList) {
+  // decision definition
+  './decisionDefinition/decisionInstanceTable'
+
+], function(angular, decisionList, decisionInstanceTable) {
 
   'use strict';
   var ngModule = angular.module('cockpit.plugin.decisionList.views', []);
 
   ngModule.config(decisionList);
+  ngModule.config(decisionInstanceTable);
 
   return ngModule;
 });
