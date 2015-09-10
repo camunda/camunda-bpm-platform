@@ -145,6 +145,16 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
+  public void testQueryIncludeInputsForNonExistingDecision() {
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().includeInputs();
+    assertThat(query.singleResult(), is(nullValue()));
+
+    startProcessInstanceAndEvaluateDecision();
+
+    assertThat(query.decisionInstanceId("nonExisting").singleResult(), is(nullValue()));
+  }
+
+  @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
   public void testQueryIncludeOutputs() {
 
     startProcessInstanceAndEvaluateDecision();
@@ -159,6 +169,16 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     }
 
     assertThat(query.includeOutputs().singleResult().getOutputs().size(), is(1));
+  }
+
+  @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
+  public void testQueryIncludeOutputsForNonExistingDecision() {
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().includeOutputs();
+    assertThat(query.singleResult(), is(nullValue()));
+
+    startProcessInstanceAndEvaluateDecision();
+
+    assertThat(query.decisionInstanceId("nonExisting").singleResult(), is(nullValue()));
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })

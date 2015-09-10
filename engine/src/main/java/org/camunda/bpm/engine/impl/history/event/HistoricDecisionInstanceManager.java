@@ -114,11 +114,11 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
         decisionInstancesById.put(decisionInstance.getId(), (HistoricDecisionInstanceEntity) decisionInstance);
       }
 
-      if (query.isIncludeInput()) {
+      if (!decisionInstances.isEmpty() && query.isIncludeInput()) {
         appendHistoricDecisionInputInstances(decisionInstancesById, query);
       }
 
-      if(query.isIncludeOutputs()) {
+      if(!decisionInstances.isEmpty() && query.isIncludeOutputs()) {
         appendHistoricDecisionOutputInstances(decisionInstancesById, query);
       }
 
