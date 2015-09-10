@@ -9,6 +9,7 @@ The structure is as follows:
 
 * `core` - camunda core application and plugin infrastructure
 * `webapp` - camunda web application
+* `webjar` - stripped down webjar for use in embedded containers (like spring boot)
 * `distro/{container}` - projects that produce camunda web application for the different bpm platform containers
 
 ## Webapps
