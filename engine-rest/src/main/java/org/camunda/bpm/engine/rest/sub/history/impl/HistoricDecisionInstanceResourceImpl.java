@@ -17,6 +17,7 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
+import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.rest.dto.history.HistoricDecisionInstanceDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.history.HistoricDecisionInstanceResource;
@@ -31,9 +32,24 @@ public class HistoricDecisionInstanceResourceImpl implements HistoricDecisionIns
     this.decisionInstanceId = decisionInstanceId;
   }
 
-  public HistoricDecisionInstanceDto getHistoricDecisionInstance() {
+  public HistoricDecisionInstanceDto getHistoricDecisionInstance(Boolean includeInputs, Boolean includeOutputs, Boolean disableBinaryFetching, Boolean disableCustomObjectDeserialization) {
     HistoryService historyService = engine.getHistoryService();
-    HistoricDecisionInstance instance = historyService.createHistoricDecisionInstanceQuery().decisionInstanceId(decisionInstanceId).singleResult();
+
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery().decisionInstanceId(decisionInstanceId);
+    if (includeInputs != null && includeInputs) {
+      query.includeInputs();
+    }
+    if (includeOutputs != null && includeOutputs) {
+      query.includeOutputs();
+    }
+    if (disableBinaryFetching != null && disableBinaryFetching) {
+      query.disableBinaryFetching();
+    }
+    if (disableCustomObjectDeserialization != null && disableCustomObjectDeserialization) {
+      query.disableCustomObjectDeserialization();
+    }
+
+    HistoricDecisionInstance instance = query.singleResult();
 
     if (instance == null) {
       throw new InvalidRequestException(Status.NOT_FOUND, "Historic decision instance with id '" + decisionInstanceId + "' does not exist");
@@ -41,5 +57,4 @@ public class HistoricDecisionInstanceResourceImpl implements HistoricDecisionIns
 
     return HistoricDecisionInstanceDto.fromHistoricDecisionInstance(instance);
   }
-
 }

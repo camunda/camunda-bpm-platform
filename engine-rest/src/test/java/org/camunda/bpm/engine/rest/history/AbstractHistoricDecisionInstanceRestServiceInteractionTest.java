@@ -15,14 +15,20 @@ package org.camunda.bpm.engine.rest.history;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Map;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.HistoryService;
@@ -35,6 +41,7 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InOrder;
 
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
@@ -72,6 +79,10 @@ public abstract class AbstractHistoricDecisionInstanceRestServiceInteractionTest
       .when()
         .get(HISTORIC_SINGLE_DECISION_INSTANCE_URL);
 
+    InOrder inOrder = inOrder(historicQueryMock);
+    inOrder.verify(historicQueryMock).decisionInstanceId(MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_ID);
+    inOrder.verify(historicQueryMock).singleResult();
+
     String content = response.asString();
 
     String returnedHistoricDecisionInstanceId = from(content).getString("id");
@@ -84,8 +95,8 @@ public abstract class AbstractHistoricDecisionInstanceRestServiceInteractionTest
     String returnedProcessInstanceId = from(content).getString("processInstanceId");
     String returnedActivityId = from(content).getString("activityId");
     String returnedActivityInstanceId = from(content).getString("activityInstanceId");
-    List<HistoricDecisionInputInstanceDto> returnedInputs = from(content).getList("inputs");
-    List<HistoricDecisionOutputInstanceDto> returnedOutputs = from(content).getList("outputs");
+    List<Map<String, Object>> returnedInputs = from(content).getList("inputs");
+    List<Map<String, Object>> returnedOutputs = from(content).getList("outputs");
     Double returnedCollectResultValue = from(content).getDouble("collectResultValue");
 
     assertThat(returnedHistoricDecisionInstanceId, is(MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_ID));
@@ -101,6 +112,130 @@ public abstract class AbstractHistoricDecisionInstanceRestServiceInteractionTest
     assertThat(returnedInputs, is(nullValue()));
     assertThat(returnedOutputs, is(nullValue()));
     assertThat(returnedCollectResultValue, is(MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_COLLECT_RESULT_VALUE));
+  }
+
+  @Test
+  public void testGetSingleHistoricDecisionInstanceWithInputs() {
+    historicInstanceMock = MockProvider.createMockHistoricDecisionInstanceWithInputs();
+    when(historicQueryMock.singleResult()).thenReturn(historicInstanceMock);
+
+    Response response = given()
+        .pathParam("id", MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_ID)
+        .queryParam("includeInputs", true)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(HISTORIC_SINGLE_DECISION_INSTANCE_URL);
+
+    InOrder inOrder = inOrder(historicQueryMock);
+    inOrder.verify(historicQueryMock).decisionInstanceId(MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_ID);
+    inOrder.verify(historicQueryMock).includeInputs();
+    inOrder.verify(historicQueryMock, never()).includeOutputs();
+    inOrder.verify(historicQueryMock).singleResult();
+
+    String content = response.asString();
+
+    List<Map<String, Object>> returnedInputs = from(content).getList("inputs");
+    List<Map<String, Object>> returnedOutputs = from(content).getList("outputs");
+    assertThat(returnedInputs, is(notNullValue()));
+    assertThat(returnedInputs, hasSize(3));
+    assertThat(returnedOutputs, is(nullValue()));
+  }
+
+  @Test
+  public void testGetSingleHistoricDecisionInstanceWithOutputs() {
+    historicInstanceMock = MockProvider.createMockHistoricDecisionInstanceWithOutputs();
+    when(historicQueryMock.singleResult()).thenReturn(historicInstanceMock);
+
+    Response response = given()
+        .pathParam("id", MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_ID)
+        .queryParam("includeOutputs", true)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(HISTORIC_SINGLE_DECISION_INSTANCE_URL);
+
+    InOrder inOrder = inOrder(historicQueryMock);
+    inOrder.verify(historicQueryMock).decisionInstanceId(MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_ID);
+    inOrder.verify(historicQueryMock, never()).includeInputs();
+    inOrder.verify(historicQueryMock).includeOutputs();
+    inOrder.verify(historicQueryMock).singleResult();
+
+    String content = response.asString();
+
+    List<Map<String, Object>> returnedInputs = from(content).getList("inputs");
+    List<Map<String, Object>> returnedOutputs = from(content).getList("outputs");
+    assertThat(returnedInputs, is(nullValue()));
+    assertThat(returnedOutputs, is(notNullValue()));
+    assertThat(returnedOutputs, hasSize(3));
+  }
+
+  @Test
+  public void testGetSingleHistoricDecisionInstanceWithInputsAndOutputs() {
+    historicInstanceMock = MockProvider.createMockHistoricDecisionInstanceWithInputsAndOutputs();
+    when(historicQueryMock.singleResult()).thenReturn(historicInstanceMock);
+
+    Response response = given()
+        .pathParam("id", MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_ID)
+        .queryParam("includeInputs", true)
+        .queryParam("includeOutputs", true)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(HISTORIC_SINGLE_DECISION_INSTANCE_URL);
+
+    InOrder inOrder = inOrder(historicQueryMock);
+    inOrder.verify(historicQueryMock).decisionInstanceId(MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_ID);
+    inOrder.verify(historicQueryMock).includeInputs();
+    inOrder.verify(historicQueryMock).includeOutputs();
+    inOrder.verify(historicQueryMock).singleResult();
+
+    String content = response.asString();
+
+    List<Map<String, Object>> returnedInputs = from(content).getList("inputs");
+    List<Map<String, Object>> returnedOutputs = from(content).getList("outputs");
+    assertThat(returnedInputs, is(notNullValue()));
+    assertThat(returnedInputs, hasSize(3));
+    assertThat(returnedOutputs, is(notNullValue()));
+    assertThat(returnedOutputs, hasSize(3));
+  }
+
+  @Test
+  public void testGetSingleHistoricDecisionInstanceWithDisabledBinaryFetching() {
+    historicInstanceMock = MockProvider.createMockHistoricDecisionInstanceWithInputsAndOutputs();
+    when(historicQueryMock.singleResult()).thenReturn(historicInstanceMock);
+
+    given()
+        .pathParam("id", MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_ID)
+        .queryParam("disableBinaryFetching", true)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(HISTORIC_SINGLE_DECISION_INSTANCE_URL);
+
+    InOrder inOrder = inOrder(historicQueryMock);
+    inOrder.verify(historicQueryMock).decisionInstanceId(MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_ID);
+    inOrder.verify(historicQueryMock).disableBinaryFetching();
+    inOrder.verify(historicQueryMock).singleResult();
+  }
+
+  @Test
+  public void testGetSingleHistoricDecisionInstanceWithDisabledCustomObjectDeserialization() {
+    historicInstanceMock = MockProvider.createMockHistoricDecisionInstanceWithInputsAndOutputs();
+    when(historicQueryMock.singleResult()).thenReturn(historicInstanceMock);
+
+    given()
+        .pathParam("id", MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_ID)
+        .queryParam("disableCustomObjectDeserialization", true)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(HISTORIC_SINGLE_DECISION_INSTANCE_URL);
+
+    InOrder inOrder = inOrder(historicQueryMock);
+    inOrder.verify(historicQueryMock).decisionInstanceId(MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_ID);
+    inOrder.verify(historicQueryMock).disableCustomObjectDeserialization();
+    inOrder.verify(historicQueryMock).singleResult();
   }
 
   @Test
