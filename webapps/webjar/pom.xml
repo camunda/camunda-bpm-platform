@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.camunda.bpm.webapp</groupId>
+    <artifactId>camunda-webapp-root</artifactId>
+    <version>7.4.0-SNAPSHOT</version>
+  </parent>
+
+  <groupId>org.camunda.bpm.webapp</groupId>
+  <artifactId>camunda-webapp-webjar</artifactId>
+  <packaging>jar</packaging>
+  <name>camunda BPM - webapp - webjar</name>
+
+  <properties>
+    <skipTests>true</skipTests>
+  </properties>
+
+  <!-- add dependency so this is run after the war was build -->
+  <dependencies>
+    <dependency>
+      <groupId>org.camunda.bpm.webapp</groupId>
+      <artifactId>camunda-webapp</artifactId>
+      <version>${project.parent.version}</version>
+      <type>jar</type>
+      <classifier>classes</classifier>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!-- first fetch and unpack the war -->
+      <plugin>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack</id>
+            <phase>process-sources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.camunda.bpm.webapp</groupId>
+                  <artifactId>camunda-webapp</artifactId>
+                  <version>${project.parent.version}</version>
+                  <type>war</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                  <excludes>META-INF/**</excludes>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- then remove the WEB-INF part except the security.json -->
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <execution>
+            <phase>generate-resources</phase>
+            <configuration>
+              <target>
+                <move file="${project.build.outputDirectory}/WEB-INF/securityFilterRules.json" todir="${project.build.outputDirectory}"/>
+                <delete dir="${project.build.outputDirectory}/WEB-INF"/>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
