@@ -38,6 +38,34 @@ describe('Cockpit Decision Definition Spec', function() {
 
   });
 
+  describe('instance list', function() {
+    before(function() {
+      return testHelper(setupFile.setup1, function() {
+
+        dashboardPage.navigateToWebapp('Cockpit');
+        dashboardPage.authentication.userLogin('admin', 'admin');
+        dashboardPage.deployedDecisionsList.selectDecision(0);
+      });
+    });
+
+    it('should display a list of evaluated decision instances', function() {
+      expect(definitionPage.decisionInstancesTab.isTabSelected()).to.eventually.be.true;
+      expect(definitionPage.decisionInstancesTab.table().count()).to.eventually.eql(1);
+    });
+
+    it('should go to the process definition page on click on process definition key', function() {
+      definitionPage.decisionInstancesTab.selectProcessDefinitionKey(0);
+      expect(browser.getCurrentUrl()).to.eventually.contain('#/process-definition/');
+    });
+
+    it('should go to the process instance page on click on activity instance id', function() {
+      browser.navigate().back();
+      definitionPage.decisionInstancesTab.selectActivityId(0);
+      expect(browser.getCurrentUrl()).to.eventually.contain('#/process-instance/');
+    });
+
+  });
+
 
   describe('table interaction', function() {
 

@@ -5,13 +5,33 @@ var fs = require('fs'),
     combine = factory.combine,
     operation = factory.operation;
 
-var deployFirst = operation('deployment', 'create', [{
+var deployFirst = combine(
+
+operation('deployment', 'create', [{
   deploymentName: 'assign-approver',
   files: [{
     name: 'assign-approver-groups.dmn',
     content: fs.readFileSync(__dirname + '/../../resources/assign-approver-groups.dmn').toString()
   }]
-}]);
+},{
+  deploymentName: 'invoice',
+  files: [{
+    name: 'invoice.bpmn',
+    content: fs.readFileSync(__dirname + '/../../resources/invoice.bpmn').toString()
+  }]
+}
+]),
+
+operation('process-definition', 'start', [{
+  key: 'invoice',
+  businessKey: 'invoice1',
+  variables: {
+    amount: { value: 100 },
+    invoiceCategory: { value: 'travelExpenses' }
+  }
+}])
+
+);
 
 var deploySecond = operation('deployment', 'create', [{
   deploymentName: 'assign-approver',
