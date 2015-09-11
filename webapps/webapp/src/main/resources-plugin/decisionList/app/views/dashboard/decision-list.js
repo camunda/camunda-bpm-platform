@@ -24,7 +24,7 @@ define([
 
       }],
 
-      priority: 0
+      priority: -5 // display below the process definition list
     });
   }];
 });

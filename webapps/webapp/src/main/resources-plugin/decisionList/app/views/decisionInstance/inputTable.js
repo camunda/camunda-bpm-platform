@@ -24,7 +24,7 @@ function(angular, template) {
         }
 
       }],
-      priority: 10
+      priority: 20
     });
   }];
 });
