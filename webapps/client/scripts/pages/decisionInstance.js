@@ -162,10 +162,12 @@ define([
                 disableBinaryFetching: true,
                 disableCustomObjectDeserialization: true
               }, function(err, data) {
-                if(!err) {
+                if(!err && data.length) {
                   deferred.resolve(data[0]);
                 } else {
-                  deferred.reject(err);
+                  deferred.reject(err || {
+                    status: 404
+                  });
                 }
               });
 
