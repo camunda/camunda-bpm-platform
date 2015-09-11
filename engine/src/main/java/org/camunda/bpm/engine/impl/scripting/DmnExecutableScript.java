@@ -12,22 +12,16 @@
  */
 package org.camunda.bpm.engine.impl.scripting;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptException;
+
 import org.camunda.bpm.dmn.engine.DmnDecision;
-import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.scriptengine.DmnCompiledScript;
 import org.camunda.bpm.dmn.scriptengine.DmnScriptEngine;
 import org.camunda.bpm.dmn.scriptengine.DmnScriptEngineFactory;
 import org.camunda.bpm.engine.ScriptCompilationException;
-import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.scripting.engine.ScriptingEngines;
-
-import javax.script.Bindings;
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class DmnExecutableScript extends CompiledExecutableScript {
 

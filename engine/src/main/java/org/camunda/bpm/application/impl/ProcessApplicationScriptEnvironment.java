@@ -17,9 +17,11 @@ import java.util.List;
 import java.util.Map;
 
 import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
+import org.camunda.bpm.engine.impl.scripting.engine.ScriptEngineResolver;
 
 /**
  * @author Roman Smirnov
@@ -29,7 +31,7 @@ public class ProcessApplicationScriptEnvironment {
 
   protected ProcessApplicationInterface processApplication;
 
-  protected ProcessApplicationScriptEngineResolver processApplicationScriptEngineResolver;
+  protected ScriptEngineResolver processApplicationScriptEngineResolver;
   protected Map<String, List<ExecutableScript>> environmentScripts = new HashMap<String, List<ExecutableScript>>();
 
   public ProcessApplicationScriptEnvironment(ProcessApplicationInterface processApplication) {
@@ -52,7 +54,7 @@ public class ProcessApplicationScriptEnvironment {
     if(processApplicationScriptEngineResolver == null) {
       synchronized (this) {
         if(processApplicationScriptEngineResolver == null) {
-          processApplicationScriptEngineResolver = new ProcessApplicationScriptEngineResolver(getProcessApplicationClassloader());
+          processApplicationScriptEngineResolver = new ScriptEngineResolver(new ScriptEngineManager(getProcessApplicationClassloader()));
         }
       }
     }

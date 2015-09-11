@@ -363,7 +363,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected Charset defaultCharset = null;
 
   protected ExpressionManager expressionManager;
-  protected List<String> customScriptingEngineClasses;
   protected ScriptingEngines scriptingEngines;
   protected List<ResolverFactory> resolverFactories;
   protected ScriptingEnvironment scriptingEnvironment;
@@ -1981,17 +1980,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setCustomFormTypes(List<AbstractFormFieldType> customFormTypes) {
     this.customFormTypes = customFormTypes;
-    return this;
-  }
-
-
-  public List<String> getCustomScriptingEngineClasses() {
-    return customScriptingEngineClasses;
-  }
-
-
-  public ProcessEngineConfigurationImpl setCustomScriptingEngineClasses(List<String> customScriptingEngineClasses) {
-    this.customScriptingEngineClasses = customScriptingEngineClasses;
     return this;
   }
 
