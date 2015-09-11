@@ -56,4 +56,28 @@ describe('Cockpit Decision Instance Spec', function() {
 
   });
 
+  describe.only('in-/outputs', function() {
+    before(function() {
+      return testHelper(setupFile.setup1, function() {
+
+        dashboardPage.navigateToWebapp('Cockpit');
+        dashboardPage.authentication.userLogin('admin', 'admin');
+        dashboardPage.deployedDecisionsList.selectDecision(0);
+        definitionPage.decisionInstancesTab.selectInstanceId(0);
+      });
+    });
+
+    it('show inputs for the decision instance', function() {
+      instancePage.inputsTab.selectTab();
+
+      expect(instancePage.inputsTab.variableValue(0)).to.eventually.eql('100');
+    });
+
+    it('show outputs for the decision instance', function() {
+      instancePage.outputsTab.selectTab();
+
+      expect(instancePage.outputsTab.variableValue(0)).to.eventually.eql('accounting');
+    });
+  });
+
 });
