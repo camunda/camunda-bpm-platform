@@ -56,7 +56,7 @@ public class JobAcquisitionTest extends PluggableProcessEngineTestCase {
   public void testJobLockingFailure() {
     int numberOfInstances = 3;
 
-    // when starting a number of process instances process instance
+    // when starting a number of process instances
     for (int i = 0; i < numberOfInstances; i++) {
       runtimeService.startProcessInstanceByKey("simpleAsyncProcess").getId();
     }

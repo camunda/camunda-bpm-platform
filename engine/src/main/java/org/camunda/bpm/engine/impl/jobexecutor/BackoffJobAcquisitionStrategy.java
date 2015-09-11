@@ -163,6 +163,9 @@ public class BackoffJobAcquisitionStrategy implements JobAcquisitionStrategy {
     executionSaturated = allSubmittedJobsRejected(context);
   }
 
+  /**
+   * @return true, if all acquired jobs (spanning all engines) were rejected for execution
+   */
   protected boolean allSubmittedJobsRejected(JobAcquisitionContext context) {
     for (Map.Entry<String, AcquiredJobs> acquiredJobsForEngine : context.getAcquiredJobsByEngine().entrySet()) {
       String engineName = acquiredJobsForEngine.getKey();

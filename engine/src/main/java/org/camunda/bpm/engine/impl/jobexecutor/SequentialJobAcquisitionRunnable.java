@@ -12,6 +12,19 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 /**
  * <p>{@link AcquireJobsRunnable} able to serve multiple process engines.</p>
  *
+ * <p>
+ *   Continuously acquires jobs for all registered process engines until interruption.
+ *   For every such <i>acquisition cycle</i>, jobs are acquired and submitted for execution.
+ * </p>
+ *
+ * <p>
+ *   For one cycle, all acquisition-related events (acquired jobs by engine, rejected jobs by engine,
+ *   exceptions during acquisition, etc.) are collected in an instance of {@link JobAcquisitionContext}.
+ *   The context is then handed to a {@link JobAcquisitionStrategy} that
+ *   determines the there is before the next acquisition cycles begins and how many jobs
+ *   are to be acquired next.
+ * </p>
+ *
  * @author Daniel Meyer
  */
 public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
@@ -63,6 +76,7 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
 
       suspendAcquisition(waitTime);
     }
+
     log.info(jobExecutor.getName() + " stopped job acquisition");
   }
 
@@ -70,6 +84,11 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
     return new JobAcquisitionContext();
   }
 
+  /**
+   * Reconfigure the acquisition strategy based on the current cycle's acquisition context.
+   * A strategy implementation may update internal data structure to calculate a different wait time
+   * before the next cycle of acquisition is performed.
+   */
   protected void configureNextAcquisitionCycle(JobAcquisitionContext acquisitionContext, JobAcquisitionStrategy acquisitionStrategy) {
     acquisitionStrategy.reconfigure(acquisitionContext);
   }
@@ -84,7 +103,7 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
   }
 
   protected void executeJobs(JobAcquisitionContext context, ProcessEngineImpl currentProcessEngine, AcquiredJobs acquiredJobs) {
-    // submit those jobs first that we weren't able to execute last cycle
+    // submit those jobs that were acquired in previous cycles but could not be scheduled for execution
     List<List<String>> additionalJobs = context.getAdditionalJobsByEngine().get(currentProcessEngine.getName());
     if (additionalJobs != null) {
       for (List<String> jobBatch : additionalJobs) {
@@ -92,6 +111,7 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
       }
     }
 
+    // submit those jobs that were acquired in the current cycle
     for (List<String> jobIds : acquiredJobs.getJobIdBatches()) {
       jobExecutor.executeJobs(jobIds, currentProcessEngine);
     }
