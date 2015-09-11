@@ -13,25 +13,18 @@
 
 package org.camunda.bpm.engine.test.history;
 
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.exception.NotValidException;
-import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricDecisionInputInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
@@ -82,49 +75,6 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     assertThat(historicDecisionInstance.getActivityInstanceId(), is(activityInstanceId));
 
     assertThat(historicDecisionInstance.getEvaluationTime(), is(notNullValue()));
-  }
-
-  @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
-  public void testHistoricDecisionInstanceQuery() {
-    ProcessInstance pi1 = startProcessInstanceAndEvaluateDecision();
-    ProcessInstance pi2 = startProcessInstanceAndEvaluateDecision();
-
-    String decisionInstanceId1 = historyService.createHistoricDecisionInstanceQuery().processInstanceId(pi1.getId()).singleResult().getId();
-    String decisionInstanceId2 = historyService.createHistoricDecisionInstanceQuery().processInstanceId(pi2.getId()).singleResult().getId();
-
-    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
-
-    assertThat(query.decisionInstanceId(decisionInstanceId1).count(), is(1l));
-    assertThat(query.decisionInstanceId(decisionInstanceId2).count(), is(1l));
-    assertThat(query.decisionInstanceId("unknown").count(), is(0l));
-
-    try {
-      query.decisionInstanceId(null);
-      fail("Exception expected");
-    }
-    catch (NotValidException e) {
-      assertThat(e.getMessage(), containsString("decisionInstanceId is null"));
-    }
-
-    query = historyService.createHistoricDecisionInstanceQuery();
-
-    try {
-      query.decisionInstanceIdIn(null);
-      fail("Exception expected");
-    }
-    catch (NullValueException e) {
-      assertThat(e.getMessage(), containsString("decisionInstanceIdIn is null"));
-    }
-
-    List<String> decisionInstanceIdIn = new ArrayList<String>();
-    decisionInstanceIdIn.add(decisionInstanceId1);
-    assertThat(query.decisionInstanceIdIn(decisionInstanceIdIn.toArray(new String[decisionInstanceIdIn.size()])).count(), is(1l));
-
-    decisionInstanceIdIn.add(decisionInstanceId2);
-    assertThat(query.decisionInstanceIdIn(decisionInstanceIdIn.toArray(new String[decisionInstanceIdIn.size()])).count(), is(2l));
-
-    decisionInstanceIdIn.remove(decisionInstanceId1);
-    assertThat(query.decisionInstanceIdIn(decisionInstanceIdIn.toArray(new String[decisionInstanceIdIn.size()])).count(), is(1l));
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
@@ -419,6 +369,36 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
 
     List<HistoricDecisionInstance> orderDesc = historyService.createHistoricDecisionInstanceQuery().orderByEvaluationTime().desc().list();
     assertThat(orderDesc.get(0).getEvaluationTime().after(orderDesc.get(1).getEvaluationTime()), is(true));
+  }
+
+  @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
+  public void testQueryByDecisionInstanceId() {
+    ProcessInstance pi1 = startProcessInstanceAndEvaluateDecision();
+    ProcessInstance pi2 = startProcessInstanceAndEvaluateDecision();
+
+    String decisionInstanceId1 = historyService.createHistoricDecisionInstanceQuery().processInstanceId(pi1.getId()).singleResult().getId();
+    String decisionInstanceId2 = historyService.createHistoricDecisionInstanceQuery().processInstanceId(pi2.getId()).singleResult().getId();
+
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
+
+    assertThat(query.decisionInstanceId(decisionInstanceId1).count(), is(1L));
+    assertThat(query.decisionInstanceId(decisionInstanceId2).count(), is(1L));
+    assertThat(query.decisionInstanceId("unknown").count(), is(0L));
+  }
+
+  @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
+  public void testQueryByDecisionInstanceIds() {
+    ProcessInstance pi1 = startProcessInstanceAndEvaluateDecision();
+    ProcessInstance pi2 = startProcessInstanceAndEvaluateDecision();
+
+    String decisionInstanceId1 = historyService.createHistoricDecisionInstanceQuery().processInstanceId(pi1.getId()).singleResult().getId();
+    String decisionInstanceId2 = historyService.createHistoricDecisionInstanceQuery().processInstanceId(pi2.getId()).singleResult().getId();
+
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
+
+    assertThat(query.decisionInstanceIdIn(decisionInstanceId1).count(), is(1L));
+    assertThat(query.decisionInstanceIdIn(decisionInstanceId2).count(), is(1L));
+    assertThat(query.decisionInstanceIdIn(decisionInstanceId1, decisionInstanceId2).count(), is(2L));
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
