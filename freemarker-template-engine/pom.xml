@@ -16,6 +16,7 @@
     <module>bom</module>
     <module>freemarker</module>
     <module>velocity</module>
+    <module>xquery-saxon</module>
   </modules>
 
   <dependencyManagement>
@@ -57,6 +58,12 @@
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
         <version>1.1.2</version>
+      </dependency>
+
+      <dependency>
+		<groupId>net.sf.saxon</groupId>
+		<artifactId>Saxon-HE</artifactId>
+		<version>9.6.0-6</version>
       </dependency>
 
     </dependencies>
