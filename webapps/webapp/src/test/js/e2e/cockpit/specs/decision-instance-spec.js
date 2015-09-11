@@ -1,0 +1,59 @@
+/* jshint ignore:start */
+'use strict';
+
+var testHelper = require('../../test-helper');
+var setupFile = require('./decision-setup');
+
+var dashboardPage = require('../pages/dashboard');
+var definitionPage = require('../pages/decision-definition');
+var instancePage = require('../pages/decision-instance');
+
+
+describe('Cockpit Decision Instance Spec', function() {
+
+  describe('page navigation', function() {
+
+    before(function() {
+      return testHelper(setupFile.setup1, function() {
+
+        dashboardPage.navigateToWebapp('Cockpit');
+        dashboardPage.authentication.userLogin('admin', 'admin');
+        dashboardPage.deployedDecisionsList.selectDecision(0);
+      });
+    });
+
+    it('should go to process instance view', function() {
+
+      // given
+      definitionPage.decisionInstancesTab.instanceId(0).then(function(instanceId) {
+
+        // when
+        definitionPage.decisionInstancesTab.selectInstanceId(0);
+
+        // then
+        expect(instancePage.pageHeaderDecisionInstanceId()).to.eventually.eql(instanceId);
+      });
+    });
+
+  });
+
+  describe('table interaction', function() {
+
+    before(function() {
+      return testHelper(setupFile.setup1, function() {
+
+        dashboardPage.navigateToWebapp('Cockpit');
+        dashboardPage.authentication.userLogin('admin', 'admin');
+        dashboardPage.deployedDecisionsList.selectDecision(0);
+        definitionPage.decisionInstancesTab.selectInstanceId(0);
+      });
+    });
+
+    it('should display decision table', function() {
+      // then
+      expect(instancePage.table.tableElement().isDisplayed()).to.eventually.be.true;
+    });
+
+  });
+
+});

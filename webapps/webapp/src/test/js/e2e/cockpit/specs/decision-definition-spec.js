@@ -24,7 +24,6 @@ describe('Cockpit Decision Definition Spec', function() {
     it('should go to decision definition view', function() {
 
       // given
-      //var runningInstances = dashboardPage.deployedProcessesList.runningInstances(0);
       dashboardPage.deployedDecisionsList.decisionName(0).then(function(decisionName) {
 
         // when
