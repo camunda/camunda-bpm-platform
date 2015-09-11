@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
@@ -31,6 +32,7 @@ import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableRule;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableValue;
 import org.camunda.bpm.dmn.engine.DmnExpression;
+import org.camunda.bpm.dmn.engine.DmnItemDefinition;
 import org.camunda.bpm.dmn.engine.DmnRule;
 import org.camunda.bpm.dmn.engine.ScriptEngineResolver;
 import org.camunda.bpm.dmn.engine.context.DmnDecisionContext;
@@ -229,7 +231,9 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
     for (DmnClauseEntry conclusion : rule.getConclusions()) {
       DmnDecisionTableValueImpl output = new DmnDecisionTableValueImpl(conclusion.getClause());
       Object value = evaluateExpression(conclusion, variables, evaluationCache);
-      output.setValue(value);
+
+      Object transformedValue = transformValueForOutputClause(conclusion, value);
+      output.setValue(transformedValue);
       outputs.put(output.getKey(), output);
     }
     return outputs;
@@ -250,6 +254,15 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
       if (evaluationCache != null) {
         evaluationCache.put(expressionKey, value);
       }
+      return value;
+    }
+  }
+
+  protected Object transformValueForOutputClause(DmnClauseEntry conclusion, Object value) {
+    DmnItemDefinition outputDefinition = conclusion.getClause().getOutputDefinition();
+    if(outputDefinition != null) {
+      return outputDefinition.getTypeDefinition().transform(value);
+    } else {
       return value;
     }
   }

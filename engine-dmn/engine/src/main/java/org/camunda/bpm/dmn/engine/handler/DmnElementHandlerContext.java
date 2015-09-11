@@ -15,6 +15,7 @@ package org.camunda.bpm.dmn.engine.handler;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnDecisionModel;
+import org.camunda.bpm.dmn.engine.type.DataTypeTransformerFactory;
 import org.camunda.bpm.model.dmn.DmnModelInstance;
 
 public interface DmnElementHandlerContext {
@@ -26,5 +27,7 @@ public interface DmnElementHandlerContext {
   Object getParent();
 
   DmnDecision getDecision();
+
+  DataTypeTransformerFactory getDataTypeTransformerFactory();
 
 }

@@ -13,11 +13,15 @@
 
 package org.camunda.bpm.dmn.engine.test.asserts;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.assertj.core.api.AbstractAssert;
+import org.assertj.core.api.Assertions;
+import org.assertj.core.api.ThrowableAssert;
 import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnDecisionModel;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
@@ -102,6 +106,26 @@ public class DmnEngineAssertion extends AbstractAssert<DmnEngineAssertion, DmnEn
     isNotNull();
 
     return hasResult().isEmpty();
+  }
+
+  public <T extends Exception> ThrowableAssert thrown(Class<T> expectedException) {
+    isNotNull();
+
+    if (decision == null) {
+      failWithMessage("Expected decision not to be null.");
+    }
+
+    try {
+      actual.evaluate(decision, variables);
+      failWithMessage("<%s> expected but no exception was thrown",expectedException.getName());
+    } catch (Exception e) {
+      if(expectedException.isInstance(e)){
+        return (ThrowableAssert) Assertions.assertThat(e);
+      } else {
+        failWithMessage("<%s> expected but was <%s>", expectedException, e.getClass());
+      }
+    }
+    return null;
   }
 
 }

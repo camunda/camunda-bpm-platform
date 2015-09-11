@@ -19,6 +19,7 @@ import java.util.List;
 import org.camunda.bpm.dmn.engine.DmnClause;
 import org.camunda.bpm.dmn.engine.DmnClauseEntry;
 import org.camunda.bpm.dmn.engine.DmnExpression;
+import org.camunda.bpm.dmn.engine.DmnItemDefinition;
 
 public class DmnClauseImpl extends DmnElementImpl implements DmnClause {
 
@@ -31,6 +32,7 @@ public class DmnClauseImpl extends DmnElementImpl implements DmnClause {
   protected List<DmnClauseEntry> inputEntries = new ArrayList<DmnClauseEntry>();
   protected List<DmnExpression> outputEntries = new ArrayList<DmnExpression>();
 
+  protected DmnItemDefinition outputDefinition;
 
   public DmnExpression getInputExpression() {
     return inputExpression;
@@ -88,6 +90,15 @@ public class DmnClauseImpl extends DmnElementImpl implements DmnClause {
     return outputEntries != null && !outputEntries.isEmpty();
   }
 
+  public DmnItemDefinition getOutputDefinition() {
+    return outputDefinition;
+  }
+
+  public void setOutputDefinition(DmnItemDefinition outputDefinition) {
+    this.outputDefinition = outputDefinition;
+  }
+
+  @Override
   public String toString() {
     return "DmnClauseImpl{" +
       "key='" + key + '\'' +
@@ -96,6 +107,7 @@ public class DmnClauseImpl extends DmnElementImpl implements DmnClause {
       ", outputName='" + outputName + '\'' +
       ", isOrdered=" + isOrdered +
       ", inputEntries=" + inputEntries +
+      ", outputDefinition=" + outputDefinition +
       ", outputEntries=" + outputEntries +
       "} ";
   }

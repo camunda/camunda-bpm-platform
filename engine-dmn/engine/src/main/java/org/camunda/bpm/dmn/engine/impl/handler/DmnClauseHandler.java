@@ -19,10 +19,12 @@ import org.camunda.bpm.model.dmn.instance.Clause;
 
 public class DmnClauseHandler extends AbstractDmnElementHandler<Clause, DmnClauseImpl> {
 
+  @Override
   protected DmnClauseImpl createElement(DmnElementHandlerContext context, Clause clause) {
     return new DmnClauseImpl();
   }
 
+  @Override
   protected void initElement(DmnElementHandlerContext context, Clause clause, DmnClauseImpl dmnClause) {
     super.initElement(context, clause, dmnClause);
     initIsOrdered(context, clause, dmnClause);

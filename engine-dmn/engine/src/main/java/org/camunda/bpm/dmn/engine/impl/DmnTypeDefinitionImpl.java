@@ -13,11 +13,39 @@
 
 package org.camunda.bpm.dmn.engine.impl;
 
+import static org.camunda.commons.utils.EnsureUtil.ensureNotNull;
+
 import org.camunda.bpm.dmn.engine.DmnTypeDefinition;
+import org.camunda.bpm.dmn.engine.type.DataTypeTransformer;
 
 public class DmnTypeDefinitionImpl implements DmnTypeDefinition {
 
+  protected static final DmnEngineLogger LOG = DmnLogger.ENGINE_LOGGER;
+
   protected String typeName;
+
+  protected DataTypeTransformer transformer;
+
+  @Override
+  public Object transform(Object value) {
+    if (value == null) {
+      return value;
+    } else {
+      return transformNotNullValue(value);
+    }
+  }
+
+  protected Object transformNotNullValue(Object value) {
+    ensureNotNull("transformer", transformer);
+
+    try {
+
+      return transformer.transform(value);
+
+    } catch (IllegalArgumentException e) {
+      throw LOG.invalidOutputValue(typeName, value);
+    }
+  }
 
   public String getTypeName() {
     return typeName;
@@ -27,6 +55,11 @@ public class DmnTypeDefinitionImpl implements DmnTypeDefinition {
     this.typeName = typeName;
   }
 
+  public void setTransformer(DataTypeTransformer transformer) {
+    this.transformer = transformer;
+  }
+
+  @Override
   public String toString() {
     return "DmnTypeDefinitionImpl{" +
       "typeName='" + typeName + '\'' +

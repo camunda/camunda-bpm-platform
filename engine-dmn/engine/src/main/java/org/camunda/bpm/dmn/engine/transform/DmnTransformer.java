@@ -16,6 +16,7 @@ package org.camunda.bpm.dmn.engine.transform;
 import java.util.List;
 
 import org.camunda.bpm.dmn.engine.handler.DmnElementHandlerRegistry;
+import org.camunda.bpm.dmn.engine.type.DataTypeTransformerFactory;
 
 public interface DmnTransformer {
 
@@ -24,6 +25,8 @@ public interface DmnTransformer {
   DmnElementHandlerRegistry getElementHandlerRegistry();
 
   List<DmnTransformListener> getTransformListeners();
+
+  DataTypeTransformerFactory getDataTypeTransformerFactory();
 
   DmnTransform createTransform();
 

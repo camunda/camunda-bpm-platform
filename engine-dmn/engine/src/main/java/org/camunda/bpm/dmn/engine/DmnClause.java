@@ -31,4 +31,5 @@ public interface DmnClause extends DmnElement {
 
   boolean isOutputClause();
 
+  DmnItemDefinition getOutputDefinition();
 }

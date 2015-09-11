@@ -89,4 +89,12 @@ public class DmnEngineLogger extends DmnLogger {
     return new DmnEngineException(exceptionMessage("017", "Unable to find handler for hit policy '{}'.", hitPolicy));
   }
 
+  public DmnEngineException invalidOutputValue(String typeName, Object value) {
+    return new DmnEngineException(exceptionMessage("018", "Invalid value '{}' for output clause with type '{}'.", value, typeName));
+  }
+
+  public void unsupportedOutputDefinitionType(String typeName) {
+    logWarn("019", "Unsupported type '{}' for output clause. Values of this clause will not transform into another type.", typeName);
+  }
+
 }

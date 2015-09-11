@@ -13,9 +13,13 @@
 
 package org.camunda.bpm.dmn.engine.impl.handler;
 
+import static org.camunda.commons.utils.EnsureUtil.ensureNotNull;
+
 import org.camunda.bpm.dmn.engine.handler.DmnElementHandler;
 import org.camunda.bpm.dmn.engine.handler.DmnElementHandlerContext;
 import org.camunda.bpm.dmn.engine.impl.DmnTypeDefinitionImpl;
+import org.camunda.bpm.dmn.engine.type.DataTypeTransformer;
+import org.camunda.bpm.dmn.engine.type.DataTypeTransformerFactory;
 import org.camunda.bpm.model.dmn.instance.TypeDefinition;
 
 public class DmnTypeDefinitionHandler implements DmnElementHandler<TypeDefinition, DmnTypeDefinitionImpl> {
@@ -32,11 +36,21 @@ public class DmnTypeDefinitionHandler implements DmnElementHandler<TypeDefinitio
 
   protected void initElement(DmnElementHandlerContext context, TypeDefinition typeDefinition, DmnTypeDefinitionImpl dmnTypeDefinition) {
     initTypeName(context, typeDefinition, dmnTypeDefinition);
+    initDataTypeTransformer(context, typeDefinition, dmnTypeDefinition);
   }
 
   protected void initTypeName(DmnElementHandlerContext context, TypeDefinition typeDefinition, DmnTypeDefinitionImpl dmnTypeDefinition) {
     dmnTypeDefinition.setTypeName(typeDefinition.getTextContent());
   }
 
+  protected void initDataTypeTransformer(DmnElementHandlerContext context, TypeDefinition typeDefinition, DmnTypeDefinitionImpl dmnTypeDefinition) {
+    DataTypeTransformerFactory factory = context.getDataTypeTransformerFactory();
+    ensureNotNull("data type transformer factory", factory);
+
+    DataTypeTransformer transformer = factory.getTransformerForType(dmnTypeDefinition.getTypeName());
+    ensureNotNull("data type transformer", transformer);
+
+    dmnTypeDefinition.setTransformer(transformer);
+  }
 
 }

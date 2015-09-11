@@ -38,9 +38,11 @@ import org.camunda.bpm.dmn.engine.impl.hitpolicy.RuleOrderHitPolicyHandler;
 import org.camunda.bpm.dmn.engine.impl.hitpolicy.UniqueHitPolicyHandler;
 import org.camunda.bpm.dmn.engine.impl.transform.DmnTransformFactoryImpl;
 import org.camunda.bpm.dmn.engine.impl.transform.DmnTransformerImpl;
+import org.camunda.bpm.dmn.engine.impl.type.DefaultDataTypeTransformerFactory;
 import org.camunda.bpm.dmn.engine.transform.DmnTransformFactory;
 import org.camunda.bpm.dmn.engine.transform.DmnTransformListener;
 import org.camunda.bpm.dmn.engine.transform.DmnTransformer;
+import org.camunda.bpm.dmn.engine.type.DataTypeTransformerFactory;
 import org.camunda.bpm.model.dmn.HitPolicy;
 
 public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
@@ -51,13 +53,16 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
   protected DmnTransformFactory transformFactory;
   protected DmnElementHandlerRegistry elementHandlerRegistry;
   protected DmnEngineMetricCollector engineMetricCollector;
+
   protected List<DmnTransformListener> customPreDmnTransformListeners = new ArrayList<DmnTransformListener>();
   protected List<DmnTransformListener> customPostDmnTransformListeners = new ArrayList<DmnTransformListener>();
   protected List<DmnDecisionTableListener> customPreDmnDecisionTableListeners = new ArrayList<DmnDecisionTableListener>();
   protected List<DmnDecisionTableListener> customDmnDecisionTableListeners = new ArrayList<DmnDecisionTableListener>();
   protected List<DmnDecisionTableListener> customPostDmnDecisionTableListeners = new ArrayList<DmnDecisionTableListener>();
+
   protected Map<HitPolicy, DmnHitPolicyHandler> hitPolicyHandlers;
   protected ScriptEngineResolver scriptEngineResolver;
+  protected DataTypeTransformerFactory dataTypeTransformerFactory;
 
   public DmnContextFactory getDmnContextFactory() {
     return contextFactory;
@@ -151,6 +156,14 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
     this.scriptEngineResolver = scriptEngineResolver;
   }
 
+  public DataTypeTransformerFactory getDataTypeTransformerFactory() {
+    return dataTypeTransformerFactory;
+  }
+
+  public void setDataTypeTransformerFactory(DataTypeTransformerFactory dataTypeTransformerFactory) {
+    this.dataTypeTransformerFactory = dataTypeTransformerFactory;
+  }
+
   public DmnEngine buildEngine() {
     init();
     return new DmnEngineImpl(this);
@@ -161,6 +174,7 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
     initTransformFactory();
     initElementHandlerRegistry();
     initMetricCollector();
+    initDataTypeTransformerFactory();
     initTransformer();
     initDmnDecisionTableListeners();
     initHitPolicyHandlers();
@@ -192,7 +206,7 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
   }
 
   protected void initTransformer() {
-    transformer = new DmnTransformerImpl(transformFactory, elementHandlerRegistry);
+    transformer = new DmnTransformerImpl(transformFactory, elementHandlerRegistry, dataTypeTransformerFactory);
     if (customPreDmnTransformListeners != null) {
       transformer.getTransformListeners().addAll(customPreDmnTransformListeners);
     }
@@ -245,6 +259,12 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
   protected void initScriptEngineResolver() {
     if (scriptEngineResolver == null) {
       scriptEngineResolver = new DefaultScriptEngineResolver();
+    }
+  }
+
+  protected void initDataTypeTransformerFactory() {
+    if (dataTypeTransformerFactory == null) {
+      dataTypeTransformerFactory = new DefaultDataTypeTransformerFactory();
     }
   }
 

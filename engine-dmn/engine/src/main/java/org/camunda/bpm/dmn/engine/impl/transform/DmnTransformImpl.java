@@ -41,6 +41,7 @@ import org.camunda.bpm.dmn.engine.impl.DmnTypeDefinitionImpl;
 import org.camunda.bpm.dmn.engine.transform.DmnTransform;
 import org.camunda.bpm.dmn.engine.transform.DmnTransformListener;
 import org.camunda.bpm.dmn.engine.transform.DmnTransformer;
+import org.camunda.bpm.dmn.engine.type.DataTypeTransformerFactory;
 import org.camunda.bpm.model.dmn.Dmn;
 import org.camunda.bpm.model.dmn.DmnModelException;
 import org.camunda.bpm.model.dmn.DmnModelInstance;
@@ -67,6 +68,8 @@ public class DmnTransformImpl implements DmnTransform, DmnElementHandlerContext 
   protected DmnElementHandlerRegistry elementHandlerRegistry;
   protected List<DmnTransformListener> transformListeners;
 
+  protected DataTypeTransformerFactory dataTypeTransformerFactory;
+
   // context
   protected DmnModelInstance modelInstance;
   protected DmnDecisionModelImpl decisionModel;
@@ -80,6 +83,7 @@ public class DmnTransformImpl implements DmnTransform, DmnElementHandlerContext 
     this.transformer = transformer;
     this.elementHandlerRegistry = transformer.getElementHandlerRegistry();
     this.transformListeners = transformer.getTransformListeners();
+    this.dataTypeTransformerFactory = transformer.getDataTypeTransformerFactory();
   }
 
   public DmnTransform setModelInstance(File file) {
@@ -259,6 +263,14 @@ public class DmnTransformImpl implements DmnTransform, DmnElementHandlerContext 
 
     DmnClauseImpl dmnClause = clauseHandler.handleElement(this, clause);
 
+    if(clause.getOutputDefinition() != null) {
+      String itemDefinitionRef = clause.getOutputDefinition().getId();
+      DmnItemDefinition itemDefinition = decisionModel.getItemDefinition(itemDefinitionRef);
+      if(itemDefinition != null) {
+        dmnClause.setOutputDefinition(itemDefinition);
+      }
+    }
+
     for (OutputEntry outputEntry : clause.getOutputEntries()) {
       parent = dmnClause;
       DmnClauseEntryImpl dmnOutputEntry = outputEntryHandler.handleElement(this, outputEntry);
@@ -377,6 +389,10 @@ public class DmnTransformImpl implements DmnTransform, DmnElementHandlerContext 
 
   public DmnDecision getDecision() {
     return decision;
+  }
+
+  public DataTypeTransformerFactory getDataTypeTransformerFactory() {
+    return dataTypeTransformerFactory;
   }
 
 }

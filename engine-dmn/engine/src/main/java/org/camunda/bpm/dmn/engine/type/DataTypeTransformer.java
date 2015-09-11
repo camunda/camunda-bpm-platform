@@ -2,7 +2,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,19 +10,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.camunda.bpm.dmn.engine.type;
 
-package org.camunda.bpm.dmn.engine;
-
-public interface DmnTypeDefinition {
-
-  String getTypeName();
+/**
+ * Transform a value into a specific type.
+ *
+ * @author Philipp Ossler
+ */
+public interface DataTypeTransformer {
 
   /**
-   * Transform the given value into the type specified by the type name.
+   * Transform the given value.
    *
-   * @param value to transform into the specified type
-   * @return value of specified type
-   * @throws IllegalArgumentException if the value can not be transformed
+   * @param value of any type
+   * @return value of the specific type
+   * @throws IllegalArgumentException
+   *           if the value can not be transformed
    */
   Object transform(Object value) throws IllegalArgumentException;
 

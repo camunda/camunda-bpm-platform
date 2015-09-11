@@ -21,22 +21,26 @@ import org.camunda.bpm.dmn.engine.transform.DmnTransform;
 import org.camunda.bpm.dmn.engine.transform.DmnTransformFactory;
 import org.camunda.bpm.dmn.engine.transform.DmnTransformListener;
 import org.camunda.bpm.dmn.engine.transform.DmnTransformer;
+import org.camunda.bpm.dmn.engine.type.DataTypeTransformerFactory;
 
 public class DmnTransformerImpl implements DmnTransformer {
 
   protected DmnTransformFactory factory;
   protected DmnElementHandlerRegistry elementHandlerRegistry;
   protected List<DmnTransformListener> transformListeners = new ArrayList<DmnTransformListener>();
+  protected DataTypeTransformerFactory dataTypeTransformerFactory;
 
-  public DmnTransformerImpl(DmnTransformFactory factory, DmnElementHandlerRegistry elementHandlerRegistry) {
+  public DmnTransformerImpl(DmnTransformFactory factory, DmnElementHandlerRegistry elementHandlerRegistry, DataTypeTransformerFactory dataTypeTransformerFactory) {
     this.factory = factory;
     this.elementHandlerRegistry = elementHandlerRegistry;
+    this.dataTypeTransformerFactory = dataTypeTransformerFactory;
   }
 
-  public DmnTransformerImpl(DmnTransformFactory factory, DmnElementHandlerRegistry elementHandlerRegistry, List<DmnTransformListener> transformListeners) {
+  public DmnTransformerImpl(DmnTransformFactory factory, DmnElementHandlerRegistry elementHandlerRegistry, List<DmnTransformListener> transformListeners, DataTypeTransformerFactory dataTypeTransformerFactory) {
     this.factory = factory;
     this.elementHandlerRegistry = elementHandlerRegistry;
     this.transformListeners = transformListeners;
+    this.dataTypeTransformerFactory = dataTypeTransformerFactory;
   }
 
   public DmnTransformFactory getFactory() {
@@ -61,6 +65,14 @@ public class DmnTransformerImpl implements DmnTransformer {
 
   public void setTransformListeners(List<DmnTransformListener> transformListeners) {
     this.transformListeners = transformListeners;
+  }
+
+  public DataTypeTransformerFactory getDataTypeTransformerFactory() {
+    return dataTypeTransformerFactory;
+  }
+
+  public void setDataTypeTransformerFactory(DataTypeTransformerFactory dataTypeTransformerFactory) {
+    this.dataTypeTransformerFactory = dataTypeTransformerFactory;
   }
 
   public DmnTransform createTransform() {

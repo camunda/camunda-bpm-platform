@@ -240,6 +240,18 @@ public class DmnTransformTest {
   }
 
   @Test
+  public void shouldTransformOutputDefinition() {
+    List<DmnClause> clauses = getClausesForDecision("decision1");
+
+    assertThat(clauses.get(0).getOutputDefinition()).isNull();
+
+    DmnItemDefinition outputDefinition = clauses.get(4).getOutputDefinition();
+    assertThat(outputDefinition).isNotNull();
+    assertThat(outputDefinition.getTypeDefinition()).isNotNull();
+    assertThat(outputDefinition.getTypeDefinition().getTypeName()).isEqualTo("string");
+  }
+
+  @Test
   public void shouldTransformOutputEntries() {
     List<DmnClause> clauses = getClausesForDecision("decision1");
 
