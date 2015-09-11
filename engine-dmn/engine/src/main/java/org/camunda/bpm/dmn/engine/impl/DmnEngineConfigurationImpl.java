@@ -23,7 +23,7 @@ import org.camunda.bpm.dmn.engine.DmnDecisionTableListener;
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.DmnEngineMetricCollector;
-import org.camunda.bpm.dmn.engine.ScriptEngineResolver;
+import org.camunda.bpm.dmn.engine.DmnScriptEngineResolver;
 import org.camunda.bpm.dmn.engine.context.DmnContextFactory;
 import org.camunda.bpm.dmn.engine.handler.DmnElementHandlerRegistry;
 import org.camunda.bpm.dmn.engine.hitpolicy.DmnHitPolicyHandler;
@@ -61,7 +61,7 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
   protected List<DmnDecisionTableListener> customPostDmnDecisionTableListeners = new ArrayList<DmnDecisionTableListener>();
 
   protected Map<HitPolicy, DmnHitPolicyHandler> hitPolicyHandlers;
-  protected ScriptEngineResolver scriptEngineResolver;
+  protected DmnScriptEngineResolver scriptEngineResolver;
   protected DataTypeTransformerFactory dataTypeTransformerFactory;
 
   public DmnContextFactory getDmnContextFactory() {
@@ -148,11 +148,11 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
     this.hitPolicyHandlers = hitPolicyHandlers;
   }
 
-  public ScriptEngineResolver getScriptEngineResolver() {
+  public DmnScriptEngineResolver getScriptEngineResolver() {
     return scriptEngineResolver;
   }
 
-  public void setScriptEngineResolver(ScriptEngineResolver scriptEngineResolver) {
+  public void setScriptEngineResolver(DmnScriptEngineResolver scriptEngineResolver) {
     this.scriptEngineResolver = scriptEngineResolver;
   }
 

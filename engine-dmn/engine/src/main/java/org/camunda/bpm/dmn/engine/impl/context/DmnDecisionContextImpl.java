@@ -34,7 +34,7 @@ import org.camunda.bpm.dmn.engine.DmnDecisionTableValue;
 import org.camunda.bpm.dmn.engine.DmnExpression;
 import org.camunda.bpm.dmn.engine.DmnItemDefinition;
 import org.camunda.bpm.dmn.engine.DmnRule;
-import org.camunda.bpm.dmn.engine.ScriptEngineResolver;
+import org.camunda.bpm.dmn.engine.DmnScriptEngineResolver;
 import org.camunda.bpm.dmn.engine.context.DmnDecisionContext;
 import org.camunda.bpm.dmn.engine.hitpolicy.DmnHitPolicyHandler;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionOutputImpl;
@@ -52,15 +52,15 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
 
   public static final String DEFAULT_SCRIPT_LANGUAGE = JuelScriptEngineFactory.NAME;
 
-  protected ScriptEngineResolver scriptEngineResolver;
+  protected DmnScriptEngineResolver scriptEngineResolver;
   protected Map<HitPolicy, DmnHitPolicyHandler> hitPolicyHandlers;
   protected List<DmnDecisionTableListener> decisionTableListeners = new ArrayList<DmnDecisionTableListener>();
 
-  public ScriptEngineResolver getScriptEngineResolver() {
+  public DmnScriptEngineResolver getScriptEngineResolver() {
     return scriptEngineResolver;
   }
 
-  public void setScriptEngineResolver(ScriptEngineResolver scriptEngineResolver) {
+  public void setScriptEngineResolver(DmnScriptEngineResolver scriptEngineResolver) {
     this.scriptEngineResolver = scriptEngineResolver;
   }
 

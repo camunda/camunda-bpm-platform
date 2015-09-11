@@ -15,7 +15,7 @@ package org.camunda.bpm.dmn.engine;
 
 import javax.script.ScriptEngine;
 
-public interface ScriptEngineResolver {
+public interface DmnScriptEngineResolver {
 
   ScriptEngine getScriptEngineForLanguage(String language);
 

@@ -49,7 +49,7 @@ public interface DmnEngineConfiguration {
 
   Map<HitPolicy, DmnHitPolicyHandler> getHitPolicyHandlers();
 
-  ScriptEngineResolver getScriptEngineResolver();
+  DmnScriptEngineResolver getScriptEngineResolver();
 
   DataTypeTransformerFactory getDataTypeTransformerFactory();
 

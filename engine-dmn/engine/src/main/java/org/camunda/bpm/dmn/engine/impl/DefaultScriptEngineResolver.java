@@ -16,9 +16,9 @@ package org.camunda.bpm.dmn.engine.impl;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
-import org.camunda.bpm.dmn.engine.ScriptEngineResolver;
+import org.camunda.bpm.dmn.engine.DmnScriptEngineResolver;
 
-public class DefaultScriptEngineResolver implements ScriptEngineResolver {
+public class DefaultScriptEngineResolver implements DmnScriptEngineResolver {
   protected ScriptEngineManager scriptEngineManager;
 
   public DefaultScriptEngineResolver() {
