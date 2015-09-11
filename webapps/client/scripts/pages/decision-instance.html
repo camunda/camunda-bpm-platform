@@ -1,0 +1,61 @@
+<!-- # CE - camunda-cockpit-ui/client/scripts/pages/decision-instance.html -->
+<div class="ctn-fixed-view">
+
+  <div class="ctn-header">
+    <h1>
+      <span class="process-name-prefix">
+        <span>Decision</span>
+        <span>instance</span>
+      </span>
+
+      {{ decisionInstance.decisionDefinitionName || decisionInstance.decisionDefinitionKey }}
+
+      <span title="Decision instance id, as it appears in the database">
+        &lt;{{ decisionInstance.id }}&gt;
+      </span>
+
+    </h1>
+  </div>
+
+
+  <div class="ctn-content-container">
+
+    <!-- tool bar -->
+    <div class="ctn-toolbar">
+      <!-- space to add plugins later -->
+    </div>
+
+    <div class="ctn-column ctn-content"
+         style="left: 0;"
+         ctn-collapsable-parent="tabs">
+
+      <!-- content top pane -->
+      <div class="ctn-row ctn-content-top">
+        <div decision-table="tableXml" style="height: 100%;"></div>
+      </div>
+
+      <!-- content bottom pane -->
+      <div class="ctn-row ctn-content-bottom ctn-tabbed"
+           ctn-collapsable="bottom">
+        <div ng-show="decisionInstanceTabs.length">
+          <ul class="nav nav-tabs">
+            <li ng-class="{ active: selectedTab == tabProvider }"
+                ng-repeat="tabProvider in decisionInstanceTabs">
+              <a href ng-click="selectTab(tabProvider)">{{ tabProvider.label }}</a>
+            </li>
+          </ul>
+
+          <div class="ctn-tabbed-content ctn-scroll">
+            <view provider="selectedTab"
+                  vars="decisionInstanceVars" />
+          </div>
+        </div>
+      </div>
+
+      <a class="show-collapsable"></a>
+    </div>
+
+  </div>
+
+</div><!-- end .ctn-fixed-view -->
+<!-- / CE - camunda-cockpit-ui/client/scripts/pages/decision-instance.html -->

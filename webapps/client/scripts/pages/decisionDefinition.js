@@ -170,6 +170,7 @@ define([
           return ResourceResolver.getByRouteParam('id', {
             name: 'decision definition',
             resolve: function (id) {
+
               var deferred = $q.defer();
 
               var decisionDefinitionService = camAPI.resource('decision-definition');
