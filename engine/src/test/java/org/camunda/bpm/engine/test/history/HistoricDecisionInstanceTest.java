@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.history.NativeHistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
@@ -276,8 +277,6 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     assertThat(output.getRuleOrder(), is(1));
 
     assertThat(output.getVariableName(), is("result"));
-    assertThat(output.getTypeName(), is("string"));
-    assertThat(output.getValue(), is((Object) "okay"));
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_MULTIPLE_OUTPUT_DMN })
@@ -326,6 +325,63 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     assertThat(secondOutput.getRuleOrder(), is(1));
     assertThat(secondOutput.getVariableName(), is("result2"));
     assertThat(secondOutput.getValue(), is((Object) "not okay"));
+  }
+
+  @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
+  public void testDecisionOutputInstanceStringValue() {
+
+    startProcessInstanceAndEvaluateDecision("a");
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery().includeOutputs().singleResult();
+    List<HistoricDecisionOutputInstance> outputs = historicDecisionInstance.getOutputs();
+    assertThat(outputs.size(), is(1));
+
+    HistoricDecisionOutputInstance output = outputs.iterator().next();
+    assertThat(output.getTypeName(), is("string"));
+    assertThat(output.getValue(), is((Object) "a"));
+  }
+
+  @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
+  public void testDecisionOutputInstanceLongValue() {
+
+    startProcessInstanceAndEvaluateDecision(1L);
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery().includeOutputs().singleResult();
+    List<HistoricDecisionOutputInstance> outputs = historicDecisionInstance.getOutputs();
+    assertThat(outputs.size(), is(1));
+
+    HistoricDecisionOutputInstance output = outputs.iterator().next();
+    assertThat(output.getTypeName(), is("long"));
+    assertThat(output.getValue(), is((Object) 1L));
+  }
+
+  @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
+  public void testDecisionOutputInstanceDoubleValue() {
+
+    startProcessInstanceAndEvaluateDecision(2.5);
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery().includeOutputs().singleResult();
+    List<HistoricDecisionOutputInstance> outputs = historicDecisionInstance.getOutputs();
+    assertThat(outputs.size(), is(1));
+
+    HistoricDecisionOutputInstance output = outputs.iterator().next();
+    assertThat(output.getTypeName(), is("double"));
+    assertThat(output.getValue(), is((Object) 2.5));
+  }
+
+  @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
+  public void testDecisionOutputInstanceByteValue() {
+
+    byte[] bytes = "object".getBytes();
+    startProcessInstanceAndEvaluateDecision(bytes);
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery().includeOutputs().singleResult();
+    List<HistoricDecisionOutputInstance> outputs = historicDecisionInstance.getOutputs();
+    assertThat(outputs.size(), is(1));
+
+    HistoricDecisionOutputInstance output = outputs.iterator().next();
+    assertThat(output.getTypeName(), is("bytes"));
+    assertThat(output.getValue(), is((Object) bytes));
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_COLLECT_SUM_DMN })
@@ -588,7 +644,8 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
 
     assertThat(query.count(), is(1L));
 
-    historyService.deleteHistoricDecisionInstance("testDecision");
+    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
+    historyService.deleteHistoricDecisionInstance(decisionDefinition.getId());
 
     assertThat(query.count(), is(0L));
   }

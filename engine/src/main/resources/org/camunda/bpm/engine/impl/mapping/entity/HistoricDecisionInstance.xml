@@ -46,9 +46,9 @@
 
   <!-- select -->
   
-  <select id="selectHistoricDecisionInstancesByDecisionDefinitionKey" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="historicDecisionInstanceResultMap">
+  <select id="selectHistoricDecisionInstancesByDecisionDefinitionId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="historicDecisionInstanceResultMap">
     select * from ${prefix}ACT_HI_DECINST 
-    where DEC_DEF_KEY_ = #{parameter, jdbcType=VARCHAR}
+    where DEC_DEF_ID_ = #{parameter, jdbcType=VARCHAR}
   </select>
 
   <select id="selectHistoricDecisionInstancesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricDecisionInstanceQueryImpl" resultMap="historicDecisionInstanceResultMap">

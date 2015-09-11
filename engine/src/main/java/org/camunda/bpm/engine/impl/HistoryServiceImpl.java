@@ -107,8 +107,8 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
     commandExecutor.execute(new DeleteHistoricCaseInstanceCmd(caseInstanceId));
   }
 
-  public void deleteHistoricDecisionInstance(String decisionDefinitionKey) {
-    commandExecutor.execute(new DeleteHistoricDecisionInstanceCmd(decisionDefinitionKey));
+  public void deleteHistoricDecisionInstance(String decisionDefinitionId) {
+    commandExecutor.execute(new DeleteHistoricDecisionInstanceCmd(decisionDefinitionId));
   }
 
   public NativeHistoricProcessInstanceQuery createNativeHistoricProcessInstanceQuery() {

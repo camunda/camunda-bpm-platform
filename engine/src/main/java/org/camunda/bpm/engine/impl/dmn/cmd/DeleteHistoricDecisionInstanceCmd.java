@@ -15,34 +15,40 @@ package org.camunda.bpm.engine.impl.dmn.cmd;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 
 /**
- * Deletes historic decision instances with the given key of the decision definition.
+ * Deletes historic decision instances with the given id of the decision definition.
  *
  * @author Philipp Ossler
  *
  */
 public class DeleteHistoricDecisionInstanceCmd implements Command<Object> {
 
-  protected final String decisionDefinitionKey;
+  protected final String decisionDefinitionId;
 
-  public DeleteHistoricDecisionInstanceCmd(String decisionDefinitionKey) {
-    this.decisionDefinitionKey = decisionDefinitionKey;
+  public DeleteHistoricDecisionInstanceCmd(String decisionDefinitionId) {
+    this.decisionDefinitionId = decisionDefinitionId;
   }
 
   @Override
   public Object execute(CommandContext commandContext) {
-    ensureNotNull("decisionDefinitionKey", decisionDefinitionKey);
+    ensureNotNull("decisionDefinitionId", decisionDefinitionId);
+
+    DecisionDefinitionEntity decisionDefinition = commandContext
+        .getDecisionDefinitionManager()
+        .findDecisionDefinitionById(decisionDefinitionId);
+    ensureNotNull("No decision definition found with id: " + decisionDefinitionId, "decisionDefinition", decisionDefinition);
 
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
-    authorizationManager.checkDeleteHistoricDecisionInstance(decisionDefinitionKey);
+    authorizationManager.checkDeleteHistoricDecisionInstance(decisionDefinition.getKey());
 
     commandContext
       .getHistoricDecisionInstanceManager()
-      .deleteHistoricDecisionInstancesByDecisionDefinitionKey(decisionDefinitionKey);
+      .deleteHistoricDecisionInstancesByDecisionDefinitionId(decisionDefinitionId);
 
     return null;
   }

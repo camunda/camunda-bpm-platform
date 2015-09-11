@@ -16,7 +16,7 @@
       </clause>
       <clause id="out" name="output" camunda:output="result" >
         <outputEntry id="output1">
-          <text>okay</text>
+          <text>${input1}</text>
         </outputEntry>
       </clause>
       <rule id="rule">

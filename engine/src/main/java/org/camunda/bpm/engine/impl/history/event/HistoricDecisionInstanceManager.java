@@ -35,40 +35,40 @@ import org.camunda.bpm.engine.variable.type.ValueType;
  */
 public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
 
-  public void deleteHistoricDecisionInstancesByDecisionDefinitionKey(String decisionDefinitionKey) {
+  public void deleteHistoricDecisionInstancesByDecisionDefinitionId(String decisionDefinitionId) {
     if (isHistoryEnabled()) {
-      List<HistoricDecisionInstanceEntity> decisionInstances = findHistoricDecisionInstancesByDecisionDefinitionKey(decisionDefinitionKey);
+      List<HistoricDecisionInstanceEntity> decisionInstances = findHistoricDecisionInstancesByDecisionDefinitionId(decisionDefinitionId);
 
-      Set<String> decisionInstanceKeys = new HashSet<String>();
+      Set<String> decisionInstanceIds = new HashSet<String>();
       for(HistoricDecisionInstanceEntity decisionInstance : decisionInstances) {
-        decisionInstanceKeys.add(decisionInstance.getId());
+        decisionInstanceIds.add(decisionInstance.getId());
         // delete decision instance
         decisionInstance.delete();
       }
 
-      if(!decisionInstanceKeys.isEmpty()) {
-        deleteHistoricDecisionInputInstancesByDecisionInstanceKeys(decisionInstanceKeys);
+      if(!decisionInstanceIds.isEmpty()) {
+        deleteHistoricDecisionInputInstancesByDecisionInstanceIds(decisionInstanceIds);
 
-        deleteHistoricDecisionOutputInstancesByDecisionInstanceKeys(decisionInstanceKeys);
+        deleteHistoricDecisionOutputInstancesByDecisionInstanceIds(decisionInstanceIds);
       }
     }
   }
 
   @SuppressWarnings("unchecked")
-  protected List<HistoricDecisionInstanceEntity> findHistoricDecisionInstancesByDecisionDefinitionKey(String decisionDefinitionKey) {
-    return getDbEntityManager().selectList("selectHistoricDecisionInstancesByDecisionDefinitionKey", decisionDefinitionKey);
+  protected List<HistoricDecisionInstanceEntity> findHistoricDecisionInstancesByDecisionDefinitionId(String decisionDefinitionId) {
+    return getDbEntityManager().selectList("selectHistoricDecisionInstancesByDecisionDefinitionId", decisionDefinitionId);
   }
 
-  protected void deleteHistoricDecisionInputInstancesByDecisionInstanceKeys(Set<String> decisionInstanceKeys) {
-    List<HistoricDecisionInputInstanceEntity> decisionInputInstances = findHistoricDecisionInputInstancesByDecisionInstanceIds(decisionInstanceKeys);
+  protected void deleteHistoricDecisionInputInstancesByDecisionInstanceIds(Set<String> decisionInstanceIds) {
+    List<HistoricDecisionInputInstanceEntity> decisionInputInstances = findHistoricDecisionInputInstancesByDecisionInstanceIds(decisionInstanceIds);
     for (HistoricDecisionInputInstanceEntity decisionInputInstance : decisionInputInstances) {
       // delete input instance and byte array value if exists
       decisionInputInstance.delete();
     }
   }
 
-  protected void deleteHistoricDecisionOutputInstancesByDecisionInstanceKeys(Set<String> decisionInstanceKeys) {
-    List<HistoricDecisionOutputInstanceEntity> decisionOutputInstances = findHistoricDecisionOutputInstancesByDecisionInstanceIds(decisionInstanceKeys);
+  protected void deleteHistoricDecisionOutputInstancesByDecisionInstanceIds(Set<String> decisionInstanceIds) {
+    List<HistoricDecisionOutputInstanceEntity> decisionOutputInstances = findHistoricDecisionOutputInstancesByDecisionInstanceIds(decisionInstanceIds);
     for (HistoricDecisionOutputInstanceEntity decisionOutputInstance : decisionOutputInstances) {
       // delete output instance and byte array value if exists
       decisionOutputInstance.delete();

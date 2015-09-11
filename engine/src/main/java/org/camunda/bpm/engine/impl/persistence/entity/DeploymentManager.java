@@ -190,7 +190,7 @@ public class DeploymentManager extends AbstractManager {
       if(cascade) {
         // delete historic decision instances
         for(DecisionDefinition decisionDefinition : decisionDefinitions) {
-          getHistoricDecisionInstanceManager().deleteHistoricDecisionInstancesByDecisionDefinitionKey(decisionDefinition.getKey());
+          getHistoricDecisionInstanceManager().deleteHistoricDecisionInstancesByDecisionDefinitionId(decisionDefinition.getId());
         }
       }
 
