@@ -146,7 +146,7 @@ public class LdapUserQueryTest extends LdapIdentityProviderTest {
   public void testFilterByGroupIdAndEmailLike() {
     List<User> result = identityService.createUserQuery()
         .memberOfGroup("development")
-        .userEmail("*@camunda.org")
+        .userEmailLike("*@camunda.org")
         .list();
     assertEquals(3, result.size());
   }
