@@ -19,6 +19,8 @@ import java.util.Map;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 
 /**
  * @author Sebastian Menski
@@ -58,6 +60,25 @@ public class ConditionalScriptSequenceFlowTest extends PluggableProcessEngineTes
       taskService.complete(task.getId());
     }
 
+  }
+
+  @Deployment(resources = {
+    "org/camunda/bpm/engine/test/bpmn/sequenceflow/ConditionalScriptSequenceFlowTest.testDmnCondition.bpmn20.xml",
+    "org/camunda/bpm/engine/test/bpmn/sequenceflow/ConditionalScriptSequenceFlowTest.condition-left.dmn10.xml",
+    "org/camunda/bpm/engine/test/bpmn/sequenceflow/ConditionalScriptSequenceFlowTest.condition-right.dmn10.xml"
+  })
+  public void testDmnCondition() {
+    String[] directions = new String[] { "left", "right" };
+    Map<String, Object> variables = new HashMap<String, Object>();
+
+    for (String direction : directions) {
+      variables.put("direction", direction);
+      runtimeService.startProcessInstanceByKey("process", variables);
+
+      Task task = taskService.createTaskQuery().singleResult();
+      assertEquals(direction, task.getTaskDefinitionKey());
+      taskService.complete(task.getId());
+    }
   }
 
 }

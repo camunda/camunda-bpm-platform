@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+
+  <process id="process">
+
+    <startEvent id="start" />
+
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="left">
+      <conditionExpression xsi:type="tFormalExpression" language="dmn" camunda:resource="org/camunda/bpm/engine/test/bpmn/sequenceflow/ConditionalScriptSequenceFlowTest.condition-left.dmn10.xml" />
+    </sequenceFlow>
+
+    <sequenceFlow id="flow2" sourceRef="start" targetRef="right">
+      <conditionExpression xsi:type="tFormalExpression" language="dmn" camunda:resource="org/camunda/bpm/engine/test/bpmn/sequenceflow/ConditionalScriptSequenceFlowTest.condition-right.dmn10.xml" />
+    </sequenceFlow>
+
+    <userTask id="left" name="task left" />
+
+    <userTask id="right" name="task right" />
+
+  </process>
+
+</definitions>
