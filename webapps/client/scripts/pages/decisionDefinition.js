@@ -164,6 +164,13 @@ define([
 
     $routeProvider
     .when('/decision-definition/:id', {
+      redirectTo: function(params, currentPath, currentSearch) {
+        var redirectUrl = currentPath + '/history';
+
+        return routeUtil.redirectTo(redirectUrl, currentSearch, true);
+      }
+    })
+    .when('/decision-definition/:id/history', {
       template: template,
 
       controller: Controller,
@@ -196,8 +203,18 @@ define([
     });
   }];
 
+  var ViewConfig = [ 'ViewsProvider', function(ViewsProvider) {
+    ViewsProvider.registerDefaultView('cockpit.decisionDefinition.view', {
+      id: 'history',
+      priority: 20,
+      label: 'History',
+      keepSearchParams: []
+    });
+  }];
+
   module
     .config(RouteConfig)
+    .config(ViewConfig)
   ;
 
   return module;

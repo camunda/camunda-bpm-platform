@@ -143,8 +143,16 @@ define([
     $routeProvider
   ) {
 
+    $routeProvider.when('/decision-instance/:id', {
+      redirectTo: function(params, currentPath, currentSearch) {
+        var redirectUrl = currentPath + '/history';
+
+        return routeUtil.redirectTo(redirectUrl, currentSearch, true);
+      }
+    });
+
     $routeProvider
-    .when('/decision-instance/:id', {
+    .when('/decision-instance/:id/history', {
       template: template,
 
       controller: Controller,
@@ -184,8 +192,18 @@ define([
     });
   }];
 
+  var ViewConfig = [ 'ViewsProvider', function(ViewsProvider) {
+    ViewsProvider.registerDefaultView('cockpit.decisionInstance.view', {
+      id: 'history',
+      priority: 20,
+      label: 'History',
+      keepSearchParams: []
+    });
+  }];
+
   module
     .config(RouteConfig)
+    .config(ViewConfig)
   ;
 
   return module;
