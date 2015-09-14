@@ -14,9 +14,10 @@ define([
 
   // decision instance
   './decisionInstance/inputTable',
-  './decisionInstance/outputTable'
+  './decisionInstance/outputTable',
+  './decisionInstance/gotoProcessInstanceAction'
 
-], function(angular, decisionList, decisionInstanceTable, inputTable, outputTable) {
+], function(angular, decisionList, decisionInstanceTable, inputTable, outputTable, gotoProcessInstanceAction) {
 
   'use strict';
   var ngModule = angular.module('cockpit.plugin.decisionList.views', []);
@@ -25,6 +26,8 @@ define([
   ngModule.config(decisionInstanceTable);
   ngModule.config(inputTable);
   ngModule.config(outputTable);
+
+  gotoProcessInstanceAction(ngModule);
 
   return ngModule;
 });

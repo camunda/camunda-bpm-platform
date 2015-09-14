@@ -13,8 +13,32 @@ function(angular, template) {
       label: 'Decision Instances',
       template: template,
       controller: [
-               '$scope', '$location', 'search', 'routeUtil', 'camAPI',
-      function ($scope,   $location,   search,   routeUtil,   camAPI) {
+               '$scope', '$location', 'search', 'routeUtil', 'camAPI', 'Views',
+      function ($scope,   $location,   search,   routeUtil,   camAPI,   Views) {
+
+        var processInstancePlugins = Views.getProviders({ component: 'cockpit.processInstance.view' });
+
+        var hasHistoryPlugin = processInstancePlugins.filter(function(plugin) {
+          return plugin.id === 'history';
+        }).length > 0;
+
+        $scope.getProcessDefinitionLink = function(decisionInstance) {
+          if(hasHistoryPlugin) {
+            return '#/process-definition/' + decisionInstance.processDefinitionId + '/history';
+          } else {
+            return '#/process-definition/' + decisionInstance.processDefinitionId;
+          }
+        };
+        $scope.getProcessInstanceLink = function(decisionInstance) {
+          if(hasHistoryPlugin) {
+            return '#/process-instance/' + decisionInstance.processInstanceId + '/history' +
+            '?activityInstanceIds=' + decisionInstance.activityInstanceId +
+            '&activityIds=' + decisionInstance.activityId;
+          } else {
+            return '#/process-instance/' + decisionInstance.processInstanceId;
+          }
+        };
+
 
         $scope.$on('$routeChanged', function() {
           pages.current = search().page || 1;

@@ -8,6 +8,7 @@
         <th class="instance-id uuid">ID</th>
         <th class="start-time">Evaluation Time</th>
         <th class="process-definition-key">Process Definition Key</th>
+        <th class="process-instance-id">Process Instance Id</th>
         <th class="activity-id">Activity ID</th>
       </tr>
     </thead>
@@ -24,15 +25,19 @@
         </td>
 
         <td class="process-definition-key">
-          <a ng-href="#/process-definition/{{ decisionInstance.processDefinitionId }}">
+          <a ng-href="{{ getProcessDefinitionLink(decisionInstance) }}">
             {{ decisionInstance.processDefinitionKey }}
           </a>
         </td>
 
-        <td class="activity-id">
-          <a ng-href="#/process-instance/{{ decisionInstance.processInstanceId }}">
-            {{ decisionInstance.activityId }}
+        <td class="process-instance-id uuid">
+          <a ng-href="{{ getProcessInstanceLink(decisionInstance) }}">
+            {{ decisionInstance.processInstanceId }}
           </a>
+        </td>
+
+        <td class="activity-id">
+            {{ decisionInstance.activityId }}
         </td>
       </tr>
     </tbody>
