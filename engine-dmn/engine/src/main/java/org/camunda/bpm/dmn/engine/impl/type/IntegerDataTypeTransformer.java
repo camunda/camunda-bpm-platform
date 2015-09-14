@@ -19,7 +19,7 @@ import org.camunda.bpm.dmn.engine.type.DataTypeTransformer;
  *
  * @author Philipp Ossler
  */
-public class IntegerDatatTypeTransformer implements DataTypeTransformer {
+public class IntegerDataTypeTransformer implements DataTypeTransformer {
 
   @Override
   public Object transform(Object value) throws IllegalArgumentException {

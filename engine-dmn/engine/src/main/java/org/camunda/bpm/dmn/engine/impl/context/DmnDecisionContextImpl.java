@@ -112,7 +112,7 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
     Map<String, Object> evaluationCache = new HashMap<String, Object>();
 
     DmnDecisionTableResultImpl decisionTableResult = new DmnDecisionTableResultImpl();
-    decisionTableResult.setExecutedDecisionElements(calculateExectuedDecisionElements(decisionTable));
+    decisionTableResult.setExecutedDecisionElements(calculateExecutedDecisionElements(decisionTable));
 
     // evaluate inputs
     Map<String, DmnDecisionTableValue> inputs = evaluateDecisionTableInputs(decisionTable, variables, evaluationCache);
@@ -164,7 +164,7 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
     return decisionResult;
   }
 
-  protected long calculateExectuedDecisionElements(DmnDecisionTable decisionTable) {
+  protected long calculateExecutedDecisionElements(DmnDecisionTable decisionTable) {
     return decisionTable.getClauses().size() * decisionTable.getRules().size();
   }
 

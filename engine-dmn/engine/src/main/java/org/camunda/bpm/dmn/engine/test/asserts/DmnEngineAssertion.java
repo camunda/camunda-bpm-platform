@@ -13,8 +13,6 @@
 
 package org.camunda.bpm.dmn.engine.test.asserts;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

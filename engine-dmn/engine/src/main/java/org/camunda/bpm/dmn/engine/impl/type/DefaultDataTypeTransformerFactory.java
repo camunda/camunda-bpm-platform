@@ -47,7 +47,7 @@ public class DefaultDataTypeTransformerFactory implements DataTypeTransformerFac
 
     transformers.put("string", new StringDataTypeTransformer());
     transformers.put("boolean", new BooleanDataTypeTransformer());
-    transformers.put("integer", new IntegerDatatTypeTransformer());
+    transformers.put("integer", new IntegerDataTypeTransformer());
     transformers.put("long", new LongDataTypeTransformer());
     transformers.put("double", new DoubleDataTypeTransformer());
 
