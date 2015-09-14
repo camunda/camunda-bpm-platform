@@ -56,7 +56,7 @@ describe('Cockpit Decision Instance Spec', function() {
 
   });
 
-  describe.only('in-/outputs', function() {
+  describe('in-/outputs', function() {
     before(function() {
       return testHelper(setupFile.setup1, function() {
 
