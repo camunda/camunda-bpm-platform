@@ -80,4 +80,22 @@ describe('Cockpit Decision Instance Spec', function() {
     });
   });
 
+  describe('actions', function() {
+    before(function() {
+      return testHelper(setupFile.setup1, function() {
+
+        dashboardPage.navigateToWebapp('Cockpit');
+        dashboardPage.authentication.userLogin('admin', 'admin');
+        dashboardPage.deployedDecisionsList.selectDecision(0);
+        definitionPage.decisionInstancesTab.selectInstanceId(0);
+      });
+    });
+
+    it('go to the process instance page', function() {
+      instancePage.gotoProcessInstanceAction.gotoProcessInstance();
+      expect(browser.getCurrentUrl()).to.eventually.contain('#/process-instance/');
+    });
+
+  });
+
 });
