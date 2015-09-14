@@ -100,7 +100,7 @@ public class OutputValueTypeTest extends DmnDecisionTest {
 
     assertThat(engine).evaluates(decision, outputClause().type("integer").value("4")).hasResult(4);
     assertThat(engine).evaluates(decision, outputClause().type("integer").value(2L)).hasResult(2);
-    assertThat(engine).evaluates(decision, outputClause().type("integer").value(4.2)).hasResult(4);
+    assertThat(engine).evaluates(decision, outputClause().type("integer").value(4.0)).hasResult(4);
   }
 
   @Test
@@ -115,6 +115,16 @@ public class OutputValueTypeTest extends DmnDecisionTest {
       .evaluates(decision, outputClause().type("integer").value(true))
       .thrown(DmnEngineException.class)
       .hasMessageContaining("Invalid value 'true' for output clause with type 'integer'");
+
+    assertThat(engine)
+      .evaluates(decision, outputClause().type("integer").value(4.2))
+      .thrown(DmnEngineException.class)
+      .hasMessageContaining("Invalid value '4.2' for output clause with type 'integer'");
+
+    assertThat(engine)
+      .evaluates(decision, outputClause().type("integer").value(Long.MAX_VALUE))
+      .thrown(DmnEngineException.class)
+      .hasMessageContaining("Invalid value '" + Long.MAX_VALUE + "' for output clause with type 'integer'");
   }
 
   @Test
@@ -124,7 +134,7 @@ public class OutputValueTypeTest extends DmnDecisionTest {
 
     assertThat(engine).evaluates(decision, outputClause().type("long").value("2")).hasResult(2L);
     assertThat(engine).evaluates(decision, outputClause().type("long").value(4)).hasResult(4L);
-    assertThat(engine).evaluates(decision, outputClause().type("long").value(4.2)).hasResult(4L);
+    assertThat(engine).evaluates(decision, outputClause().type("long").value(4.0)).hasResult(4L);
   }
 
   @Test
@@ -139,6 +149,11 @@ public class OutputValueTypeTest extends DmnDecisionTest {
       .evaluates(decision, outputClause().type("long").value(true))
       .thrown(DmnEngineException.class)
       .hasMessageContaining("Invalid value 'true' for output clause with type 'long'");
+
+    assertThat(engine)
+      .evaluates(decision, outputClause().type("long").value(4.2))
+      .thrown(DmnEngineException.class)
+      .hasMessageContaining("Invalid value '4.2' for output clause with type 'long'");
   }
 
   @Test

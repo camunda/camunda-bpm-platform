@@ -36,7 +36,16 @@ public class LongDataTypeTransformer implements DataTypeTransformer {
   }
 
   protected Long transformNumber(Number value) {
-    return value.longValue();
+    if(isLong(value)) {
+      return value.longValue();
+    } else {
+      throw new IllegalArgumentException();
+    }
+  }
+
+  protected boolean isLong(Number value) {
+    double doubleValue = value.doubleValue();
+    return doubleValue == (long) doubleValue;
   }
 
   protected Long transformString(String value) {

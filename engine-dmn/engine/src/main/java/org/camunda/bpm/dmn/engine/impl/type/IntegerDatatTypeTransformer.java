@@ -35,7 +35,16 @@ public class IntegerDatatTypeTransformer implements DataTypeTransformer {
   }
 
   protected Integer transformNumber(Number value) {
-    return value.intValue();
+    if(isInteger(value)){
+      return value.intValue();
+    } else {
+      throw new IllegalArgumentException();
+    }
+  }
+
+  protected boolean isInteger(Number value) {
+    double doubleValue = value.doubleValue();
+    return doubleValue == (int) doubleValue;
   }
 
   protected Integer transformString(String value) {
