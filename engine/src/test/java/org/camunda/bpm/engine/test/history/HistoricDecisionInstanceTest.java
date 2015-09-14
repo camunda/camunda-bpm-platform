@@ -142,7 +142,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     assertThat(inputs, is(notNullValue()));
     assertThat(inputs.size(), is(1));
 
-    HistoricDecisionInputInstance input = inputs.iterator().next();
+    HistoricDecisionInputInstance input = inputs.get(0);
     assertThat(input.getDecisionInstanceId(), is(historicDecisionInstance.getId()));
     assertThat(input.getClauseId(), is("in"));
     assertThat(input.getClauseName(), is("input"));
@@ -195,7 +195,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     List<HistoricDecisionInputInstance> inputs = historicDecisionInstance.getInputs();
     assertThat(inputs.size(), is(1));
 
-    HistoricDecisionInputInstance input = inputs.iterator().next();
+    HistoricDecisionInputInstance input = inputs.get(0);
     assertThat(input.getTypeName(), is("string"));
     assertThat(input.getValue(), is((Object) "a"));
   }
@@ -209,7 +209,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     List<HistoricDecisionInputInstance> inputs = historicDecisionInstance.getInputs();
     assertThat(inputs.size(), is(1));
 
-    HistoricDecisionInputInstance input = inputs.iterator().next();
+    HistoricDecisionInputInstance input = inputs.get(0);
     assertThat(input.getTypeName(), is("long"));
     assertThat(input.getValue(), is((Object) 1L));
   }
@@ -223,7 +223,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     List<HistoricDecisionInputInstance> inputs = historicDecisionInstance.getInputs();
     assertThat(inputs.size(), is(1));
 
-    HistoricDecisionInputInstance input = inputs.iterator().next();
+    HistoricDecisionInputInstance input = inputs.get(0);
     assertThat(input.getTypeName(), is("double"));
     assertThat(input.getValue(), is((Object) 2.5));
   }
@@ -238,7 +238,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     List<HistoricDecisionInputInstance> inputs = historicDecisionInstance.getInputs();
     assertThat(inputs.size(), is(1));
 
-    HistoricDecisionInputInstance input = inputs.iterator().next();
+    HistoricDecisionInputInstance input = inputs.get(0);
     assertThat(input.getTypeName(), is("bytes"));
     assertThat(input.getValue(), is((Object) bytes));
   }
@@ -253,7 +253,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     List<HistoricDecisionInputInstance> inputs = historicDecisionInstance.getInputs();
     assertThat(inputs.size(), is(1));
 
-    HistoricDecisionInputInstance input = inputs.iterator().next();
+    HistoricDecisionInputInstance input = inputs.get(0);
     assertThat(input.getTypeName(), is("bytes"));
     assertThat(input.getValue(), is(nullValue()));
   }
@@ -268,7 +268,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     assertThat(outputs, is(notNullValue()));
     assertThat(outputs.size(), is(1));
 
-    HistoricDecisionOutputInstance output = outputs.iterator().next();
+    HistoricDecisionOutputInstance output = outputs.get(0);
     assertThat(output.getDecisionInstanceId(), is(historicDecisionInstance.getId()));
     assertThat(output.getClauseId(), is("out"));
     assertThat(output.getClauseName(), is("output"));
@@ -336,7 +336,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     List<HistoricDecisionOutputInstance> outputs = historicDecisionInstance.getOutputs();
     assertThat(outputs.size(), is(1));
 
-    HistoricDecisionOutputInstance output = outputs.iterator().next();
+    HistoricDecisionOutputInstance output = outputs.get(0);
     assertThat(output.getTypeName(), is("string"));
     assertThat(output.getValue(), is((Object) "a"));
   }
@@ -350,7 +350,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     List<HistoricDecisionOutputInstance> outputs = historicDecisionInstance.getOutputs();
     assertThat(outputs.size(), is(1));
 
-    HistoricDecisionOutputInstance output = outputs.iterator().next();
+    HistoricDecisionOutputInstance output = outputs.get(0);
     assertThat(output.getTypeName(), is("long"));
     assertThat(output.getValue(), is((Object) 1L));
   }
@@ -364,7 +364,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     List<HistoricDecisionOutputInstance> outputs = historicDecisionInstance.getOutputs();
     assertThat(outputs.size(), is(1));
 
-    HistoricDecisionOutputInstance output = outputs.iterator().next();
+    HistoricDecisionOutputInstance output = outputs.get(0);
     assertThat(output.getTypeName(), is("double"));
     assertThat(output.getValue(), is((Object) 2.5));
   }
@@ -379,7 +379,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     List<HistoricDecisionOutputInstance> outputs = historicDecisionInstance.getOutputs();
     assertThat(outputs.size(), is(1));
 
-    HistoricDecisionOutputInstance output = outputs.iterator().next();
+    HistoricDecisionOutputInstance output = outputs.get(0);
     assertThat(output.getTypeName(), is("bytes"));
     assertThat(output.getValue(), is((Object) bytes));
   }
@@ -646,6 +646,32 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
 
     DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
     historyService.deleteHistoricDecisionInstance(decisionDefinition.getId());
+
+    assertThat(query.count(), is(0L));
+  }
+
+  public void deleteHistoricDecisionInstanceByUndeployment() {
+    String firstDeploymentId = repositoryService.createDeployment()
+      .addClasspathResource(DECISION_PROCESS)
+      .addClasspathResource(DECISION_SINGLE_OUTPUT_DMN)
+      .deploy().getId();
+
+    startProcessInstanceAndEvaluateDecision();
+
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
+
+    assertThat(query.count(), is(1L));
+
+    String secondDeploymentId = repositoryService.createDeployment()
+      .addClasspathResource(DECISION_PROCESS)
+      .addClasspathResource(DECISION_MULTIPLE_OUTPUT_DMN)
+      .deploy().getId();
+
+    repositoryService.deleteDeployment(secondDeploymentId, true);
+
+    assertThat(query.count(), is(1L));
+
+    repositoryService.deleteDeployment(firstDeploymentId, true);
 
     assertThat(query.count(), is(0L));
   }
