@@ -17,8 +17,8 @@ module.exports = Table.extend({
     this.tableItem(idx, by.binding('decisionInstance.processDefinitionKey')).click();
   },
 
-  selectActivityId: function(idx) {
-    this.tableItem(idx, by.binding('decisionInstance.activityId')).click();
+  selectProcessInstanceId: function(idx) {
+    this.tableItem(idx, by.binding('decisionInstance.processInstanceId')).click();
   },
 
   instanceId: function(idx) {
