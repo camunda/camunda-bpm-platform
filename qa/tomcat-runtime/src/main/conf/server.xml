@@ -57,7 +57,7 @@
               url="${database.url}"
               username="${database.username}"
               password="${database.password}"
-              maxTotal="20"
+              maxActive="20"
               minIdle="5" />
               
     <Resource name="global/camunda-bpm-platform/process-engine/ProcessEngineService!org.camunda.bpm.ProcessEngineService" auth="Container"
