@@ -52,6 +52,9 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
  */
 public class DefaultFormHandler implements FormHandler {
 
+  public static final String FORM_FIELD_ELEMENT = "formField";
+  public static final String FORM_PROPERTY_ELEMENT = "formProperty";
+
   protected String deploymentId;
 
   protected List<FormPropertyHandler> formPropertyHandlers = new ArrayList<FormPropertyHandler>();
@@ -85,7 +88,7 @@ public class DefaultFormHandler implements FormHandler {
 
   protected void parseFormFields(Element formData, BpmnParse bpmnParse, ExpressionManager expressionManager) {
     // parse fields:
-    List<Element> formFields = formData.elementsNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "formField");
+    List<Element> formFields = formData.elementsNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, FORM_FIELD_ELEMENT);
     for (Element formField : formFields) {
       parseFormField(formField, bpmnParse, expressionManager);
     }
@@ -189,7 +192,7 @@ public class DefaultFormHandler implements FormHandler {
   protected void parseFormProperties(BpmnParse bpmnParse, ExpressionManager expressionManager, Element extensionElement) {
     FormTypes formTypes = getFormTypes();
 
-    List<Element> formPropertyElements = extensionElement.elementsNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "formProperty");
+    List<Element> formPropertyElements = extensionElement.elementsNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, FORM_PROPERTY_ELEMENT);
     for (Element formPropertyElement : formPropertyElements) {
       FormPropertyHandler formPropertyHandler = new FormPropertyHandler();
 

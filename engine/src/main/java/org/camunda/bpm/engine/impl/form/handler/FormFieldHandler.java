@@ -51,9 +51,11 @@ public class FormFieldHandler {
 
     // set label (evaluate expression)
     VariableScope variableScope = executionEntity != null ? executionEntity : StartProcessVariableScope.getSharedInstance();
-    Object labelValueObject = label.getValue(variableScope);
-    if(labelValueObject != null) {
-      formField.setLabel(labelValueObject.toString());
+    if (label != null) {
+      Object labelValueObject = label.getValue(variableScope);
+      if(labelValueObject != null) {
+        formField.setLabel(labelValueObject.toString());
+      }
     }
 
     // set type
@@ -63,6 +65,7 @@ public class FormFieldHandler {
     Object defaultValue = null;
     if(defaultValueExpression != null) {
       defaultValue = defaultValueExpression.getValue(variableScope);
+
       if(defaultValue != null) {
         formField.setDefaultValue(type.convertFormValueToModelValue(defaultValue));
       } else {

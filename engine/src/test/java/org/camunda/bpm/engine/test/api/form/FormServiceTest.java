@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.form.FormField;
 import org.camunda.bpm.engine.form.FormProperty;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.form.TaskFormData;
@@ -887,4 +888,74 @@ public class FormServiceTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Deployment
+  public void testGetTaskFormWithoutLabels() {
+    runtimeService.startProcessInstanceByKey("testProcess");
+
+    Task task = taskService.createTaskQuery().singleResult();
+
+    // form data can be retrieved
+    TaskFormData formData = formService.getTaskFormData(task.getId());
+
+    List<FormField> formFields = formData.getFormFields();
+    assertEquals(3, formFields.size());
+
+    List<String> formFieldIds = new ArrayList<String>();
+    for (FormField field : formFields) {
+      assertNull(field.getLabel());
+      formFieldIds.add(field.getId());
+    }
+
+    assertTrue(formFieldIds.containsAll(Arrays.asList("stringField", "customField", "longField")));
+
+    // the form can be rendered
+    Object startForm = formService.getRenderedTaskForm(task.getId());
+    assertNotNull(startForm);
+  }
+
+  public void testDeployTaskFormWithoutFieldTypes() {
+    try {
+      repositoryService
+        .createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/api/form/FormServiceTest.testDeployTaskFormWithoutFieldTypes.bpmn20.xml")
+        .deploy();
+    } catch (ProcessEngineException e) {
+      assertTextPresent("form field must have a 'type' attribute", e.getMessage());
+    }
+  }
+
+  @Deployment
+  public void testGetStartFormWithoutLabels() {
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    runtimeService.startProcessInstanceById(processDefinition.getId());
+
+    // form data can be retrieved
+    StartFormData formData = formService.getStartFormData(processDefinition.getId());
+
+    List<FormField> formFields = formData.getFormFields();
+    assertEquals(3, formFields.size());
+
+    List<String> formFieldIds = new ArrayList<String>();
+    for (FormField field : formFields) {
+      assertNull(field.getLabel());
+      formFieldIds.add(field.getId());
+    }
+
+    assertTrue(formFieldIds.containsAll(Arrays.asList("stringField", "customField", "longField")));
+
+    // the form can be rendered
+    Object startForm = formService.getRenderedStartForm(processDefinition.getId());
+    assertNotNull(startForm);
+  }
+
+  public void testDeployStartFormWithoutFieldTypes() {
+    try {
+      repositoryService
+        .createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/api/form/FormServiceTest.testDeployStartFormWithoutFieldTypes.bpmn20.xml")
+        .deploy();
+    } catch (ProcessEngineException e) {
+      assertTextPresent("form field must have a 'type' attribute", e.getMessage());
+    }
+  }
 }

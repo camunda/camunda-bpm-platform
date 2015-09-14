@@ -18,6 +18,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
+import org.camunda.bpm.engine.impl.form.handler.DefaultFormHandler;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 
 
@@ -37,6 +38,10 @@ public class FormTypes {
 
     String typeText = formFieldElement.attribute("type");
     String datePatternText = formFieldElement.attribute("datePattern");
+
+    if (typeText == null && DefaultFormHandler.FORM_FIELD_ELEMENT.equals(formFieldElement.getTagName())) {
+      bpmnParse.addError("form field must have a 'type' attribute", formFieldElement);
+    }
 
     if ("date".equals(typeText) && datePatternText!=null) {
       formType = new DateFormType(datePatternText);
