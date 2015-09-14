@@ -101,11 +101,15 @@ define([
 
     $scope.decisionDefinitionVars = { read: [ 'decisionDefinition', 'decisionData' ] };
     $scope.decisionDefinitionTabs = Views.getProviders({ component: 'cockpit.decisionDefinition.tab' });
+    $scope.decisionDefinitionActions = Views.getProviders({ component: 'cockpit.decisionDefinition.action' });
 
 
     // INITIALIZE PLUGINS
 
-    var decisionPlugins = Views.getProviders({ component: 'cockpit.decisionDefinition.tab' });
+    var decisionPlugins = (
+      Views.getProviders({ component: 'cockpit.decisionDefinition.tab' })).concat(
+      Views.getProviders({ component: 'cockpit.decisionDefinition.action' })
+    );
 
     var initData = {
       decisionDefinition : $scope.decisionDefinitionService,

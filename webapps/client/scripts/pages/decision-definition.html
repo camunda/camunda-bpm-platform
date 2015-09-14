@@ -19,7 +19,13 @@
 
     <!-- tool bar -->
     <div class="ctn-toolbar">
-      <!-- space to add plugins later -->
+
+      <!-- Toolbar actions are provided by plugins -->
+      <span ng-repeat="tabProvider in decisionDefinitionActions">
+        <view provider="tabProvider"
+              vars="decisionInstanceVars" />
+      </span>
+
     </div>
 
     <!-- sidebar -->
