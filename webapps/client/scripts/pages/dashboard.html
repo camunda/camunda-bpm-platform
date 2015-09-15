@@ -1,8 +1,16 @@
 <!-- # CE - camunda-cockpit-ui/client/scripts/pages/dashboard.html -->
 <div class="ctn-view">
 
+  <ul class="dashboard-menu">
+    <li ng-repeat="dashboardProvider in dashboardProviders">
+      <a ng-click="scrollToPlugin(dashboardProvider)">{{ dashboardProvider.dashboardMenuLabel }}</a>
+    </li>
+  </ul>
+
+
   <div ng-repeat="dashboardProvider in dashboardProviders"
-       class="dashboard-view">
+       class="dashboard-view"
+       data-plugin-id="{{ dashboardProvider.id }}">
     <view vars="dashboardVars"
           provider="dashboardProvider"></view>
   </div>

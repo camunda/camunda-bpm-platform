@@ -1,6 +1,7 @@
 /* global define: false */
 define(['angular', 'text!./dashboard.html'], function(angular, template) {
   'use strict';
+  var $ = angular.element;
 
   var Controller = [
     '$scope',
@@ -22,6 +23,13 @@ define(['angular', 'text!./dashboard.html'], function(angular, template) {
 
     $scope.dashboardVars = { read: [ 'processData' ] };
     $scope.dashboardProviders = Views.getProviders({ component: 'cockpit.dashboard'});
+
+    $scope.scrollToPlugin = function (clickedPlugin) {
+      var targeted = $('[data-plugin-id="'  + clickedPlugin.id + '"]');
+      if (targeted[0]) {
+        targeted[0].scrollIntoView();
+      }
+    };
 
     Data.instantiateProviders('cockpit.dashboard.data', {$scope: $scope, processData : processData});
 
