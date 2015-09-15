@@ -650,7 +650,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     assertThat(query.count(), is(0L));
   }
 
-  public void deleteHistoricDecisionInstanceByUndeployment() {
+  public void testDeleteHistoricDecisionInstanceByUndeployment() {
     String firstDeploymentId = repositoryService.createDeployment()
       .addClasspathResource(DECISION_PROCESS)
       .addClasspathResource(DECISION_SINGLE_OUTPUT_DMN)
@@ -658,21 +658,18 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
 
     startProcessInstanceAndEvaluateDecision();
 
-    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
+    String secondDeploymentId = repositoryService.createDeployment()
+        .addClasspathResource(DECISION_PROCESS)
+        .addClasspathResource(DECISION_MULTIPLE_OUTPUT_DMN)
+        .deploy().getId();
 
+    HistoricDecisionInstanceQuery query = historyService.createHistoricDecisionInstanceQuery();
     assertThat(query.count(), is(1L));
 
-    String secondDeploymentId = repositoryService.createDeployment()
-      .addClasspathResource(DECISION_PROCESS)
-      .addClasspathResource(DECISION_MULTIPLE_OUTPUT_DMN)
-      .deploy().getId();
-
     repositoryService.deleteDeployment(secondDeploymentId, true);
-
     assertThat(query.count(), is(1L));
 
     repositoryService.deleteDeployment(firstDeploymentId, true);
-
     assertThat(query.count(), is(0L));
   }
 
