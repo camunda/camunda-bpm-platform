@@ -43,10 +43,6 @@ public class CaseSentryPartQueryImpl extends AbstractQuery<CaseSentryPartQueryIm
   public CaseSentryPartQueryImpl() {
   }
 
-  public CaseSentryPartQueryImpl(CommandContext commandContext) {
-    super(commandContext);
-  }
-
   public CaseSentryPartQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }

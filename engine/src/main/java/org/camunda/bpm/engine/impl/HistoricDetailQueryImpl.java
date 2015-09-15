@@ -53,10 +53,6 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
   public HistoricDetailQueryImpl() {
   }
 
-  public HistoricDetailQueryImpl(CommandContext commandContext) {
-    super(commandContext);
-  }
-
   public HistoricDetailQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }

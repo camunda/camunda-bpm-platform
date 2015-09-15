@@ -71,10 +71,6 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   public ProcessDefinitionQueryImpl() {
   }
 
-  public ProcessDefinitionQueryImpl(CommandContext commandContext) {
-    super(commandContext);
-  }
-
   public ProcessDefinitionQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }

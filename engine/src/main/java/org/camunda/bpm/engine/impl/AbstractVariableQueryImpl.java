@@ -40,10 +40,6 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?,?>, U> extends
   public AbstractVariableQueryImpl() {
   }
 
-  public AbstractVariableQueryImpl(CommandContext commandContext) {
-    super(commandContext);
-  }
-
   public AbstractVariableQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }

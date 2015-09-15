@@ -13,7 +13,6 @@
 
 package org.camunda.bpm.engine.impl;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.Date;
@@ -57,10 +56,6 @@ public class HistoricDecisionInstanceQueryImpl extends AbstractQuery<HistoricDec
   protected boolean isCustomObjectDeserializationEnabled = true;
 
   public HistoricDecisionInstanceQueryImpl() {
-  }
-
-  public HistoricDecisionInstanceQueryImpl(CommandContext commandContext) {
-    super(commandContext);
   }
 
   public HistoricDecisionInstanceQueryImpl(CommandExecutor commandExecutor) {

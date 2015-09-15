@@ -356,7 +356,7 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
   protected List<ExecutionEntity> loadFromDb(final String processInstanceId, final CommandContext commandContext) {
     List<ExecutionEntity> executions = commandContext.runWithoutAuthorization(new Callable<List<ExecutionEntity>>() {
       public List<ExecutionEntity> call() throws Exception {
-        return (List) new ExecutionQueryImpl(commandContext)
+        return (List) new ExecutionQueryImpl()
           .processInstanceId(processInstanceId)
           .list();
       }

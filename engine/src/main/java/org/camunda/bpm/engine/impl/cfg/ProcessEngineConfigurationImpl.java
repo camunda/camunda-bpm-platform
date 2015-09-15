@@ -492,6 +492,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected MetricsReporterIdProvider metricsReporterIdProvider;
 
+  /** handling of expressions submitted via API; can be used as guards against remote code execution */
+  protected boolean enableExpressionsInAdhocQueries = false;
+  protected boolean enableExpressionsInStoredQueries = true;
+
   // buildProcessEngine ///////////////////////////////////////////////////////
 
   @Override
@@ -2772,4 +2776,19 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
+  public boolean isEnableExpressionsInAdhocQueries() {
+    return enableExpressionsInAdhocQueries;
+  }
+
+  public void setEnableExpressionsInAdhocQueries(boolean enableExpressionsInAdhocQueries) {
+    this.enableExpressionsInAdhocQueries = enableExpressionsInAdhocQueries;
+  }
+
+  public boolean isEnableExpressionsInStoredQueries() {
+    return enableExpressionsInStoredQueries;
+  }
+
+  public void setEnableExpressionsInStoredQueries(boolean enableExpressionsInStoredQueries) {
+    this.enableExpressionsInStoredQueries = enableExpressionsInStoredQueries;
+  }
 }

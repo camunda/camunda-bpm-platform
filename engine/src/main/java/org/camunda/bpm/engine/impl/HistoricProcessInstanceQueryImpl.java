@@ -62,10 +62,6 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   public HistoricProcessInstanceQueryImpl() {
   }
 
-  public HistoricProcessInstanceQueryImpl(CommandContext commandContext) {
-    super(commandContext);
-  }
-
   public HistoricProcessInstanceQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }

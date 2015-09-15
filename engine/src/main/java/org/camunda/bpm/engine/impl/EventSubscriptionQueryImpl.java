@@ -13,14 +13,15 @@
 
 package org.camunda.bpm.engine.impl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
 import java.util.List;
+
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -39,8 +40,7 @@ public class EventSubscriptionQueryImpl
   protected String processInstanceId;
   protected String activityId;
 
-  public EventSubscriptionQueryImpl(CommandContext commandContext) {
-    super(commandContext);
+  public EventSubscriptionQueryImpl() {
   }
 
   public EventSubscriptionQueryImpl(CommandExecutor commandExecutor) {

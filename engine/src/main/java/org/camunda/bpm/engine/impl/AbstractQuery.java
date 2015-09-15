@@ -20,11 +20,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.impl.QueryValidators.AdhocQueryValidator;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -51,7 +54,6 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
     LIST, LIST_PAGE, SINGLE_RESULT, COUNT
   }
   protected transient CommandExecutor commandExecutor;
-  protected transient CommandContext commandContext;
 
   protected ResultType resultType;
 
@@ -59,15 +61,18 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
 
   protected Map<String, String> expressions = new HashMap<String, String>();
 
+  protected Set<Validator<AbstractQuery<?, ?>>> validators = new HashSet<Validator<AbstractQuery<?, ?>>>();
+
   protected AbstractQuery() {
   }
 
   protected AbstractQuery(CommandExecutor commandExecutor) {
     this.commandExecutor = commandExecutor;
-  }
 
-  public AbstractQuery(CommandContext commandContext) {
-    this.commandContext = commandContext;
+    // all queries that are created with a dedicated command executor
+    // are treated as adhoc queries (i.e. queries not created in the context
+    // of a command)
+    addValidator(AdhocQueryValidator.<AbstractQuery<?, ?>>get());
   }
 
   public AbstractQuery<T, U> setCommandExecutor(CommandExecutor commandExecutor) {
@@ -168,6 +173,7 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   }
 
   public long evaluateExpressionsAndExecuteCount(CommandContext commandContext) {
+    validate();
     evaluateExpressions();
     return executeCount(commandContext);
   }
@@ -175,6 +181,7 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   public abstract long executeCount(CommandContext commandContext);
 
   public List<U> evaluateExpressionsAndExecuteList(CommandContext commandContext, Page page) {
+    validate();
     evaluateExpressions();
     return executeList(commandContext, page);
   }
@@ -295,5 +302,24 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
     }
     extendedQuery.setExpressions(mergedExpressions);
   }
+
+  public void validate() {
+    for (Validator<AbstractQuery<?, ?>> validator : validators) {
+      validate(validator);
+    }
+  }
+
+  public void validate(Validator<AbstractQuery<?, ?>> validator) {
+    validator.validate(this);
+  }
+
+  public void addValidator(Validator<AbstractQuery<?, ?>> validator) {
+    validators.add(validator);
+  }
+
+  public void removeValidator(Validator<AbstractQuery<?, ?>> validator) {
+    validators.remove(validator);
+  }
+
 
 }

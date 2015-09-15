@@ -38,10 +38,6 @@ public class FilterQueryImpl extends AbstractQuery<FilterQuery, Filter> implemen
   public FilterQueryImpl() {
   }
 
-  public FilterQueryImpl(CommandContext commandContext) {
-    super(commandContext);
-  }
-
   public FilterQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }

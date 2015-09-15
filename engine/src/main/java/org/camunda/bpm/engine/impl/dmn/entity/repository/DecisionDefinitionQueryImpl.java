@@ -46,10 +46,6 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
   public DecisionDefinitionQueryImpl() {
   }
 
-  public DecisionDefinitionQueryImpl(CommandContext commandContext) {
-    super(commandContext);
-  }
-
   public DecisionDefinitionQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }

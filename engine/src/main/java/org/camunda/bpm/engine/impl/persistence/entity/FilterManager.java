@@ -24,6 +24,8 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.util.List;
 
 import org.camunda.bpm.engine.filter.Filter;
+import org.camunda.bpm.engine.impl.AbstractQuery;
+import org.camunda.bpm.engine.impl.QueryValidators.StoredQueryValidator;
 import org.camunda.bpm.engine.impl.filter.FilterQueryImpl;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 
@@ -38,6 +40,9 @@ public class FilterManager extends AbstractManager {
   }
 
   public Filter insertOrUpdateFilter(Filter filter) {
+
+    AbstractQuery<?, ?> query = filter.getQuery();
+    query.validate(StoredQueryValidator.get());
 
     if (filter.getId() == null) {
       checkAuthorization(CREATE, FILTER, ANY);
@@ -64,7 +69,7 @@ public class FilterManager extends AbstractManager {
     getDbEntityManager().delete(filter);
   }
 
-  public Filter findFilterById(String filterId) {
+  public FilterEntity findFilterById(String filterId) {
     ensureNotNull("Invalid filter id", "filterId", filterId);
     checkAuthorization(READ, FILTER, filterId);
     return findFilterByIdInternal(filterId);

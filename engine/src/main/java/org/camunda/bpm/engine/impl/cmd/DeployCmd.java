@@ -267,7 +267,7 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
    * @return a set of deployment ids
    */
   protected Set<String> resumePreviousByDeploymentName(CommandContext commandContext, DeploymentEntity deployment) {
-    List<Deployment> previousDeployments = new DeploymentQueryImpl(commandContext).deploymentName(deployment.getName()).list();
+    List<Deployment> previousDeployments = new DeploymentQueryImpl().deploymentName(deployment.getName()).list();
     Set<String> deploymentIds = new HashSet<String>(previousDeployments.size());
     for (Deployment d : previousDeployments) {
       deploymentIds.add(d.getId());

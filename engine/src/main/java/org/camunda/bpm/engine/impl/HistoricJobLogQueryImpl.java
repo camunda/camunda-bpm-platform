@@ -53,10 +53,6 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
   public HistoricJobLogQueryImpl() {
   }
 
-  public HistoricJobLogQueryImpl(CommandContext commandContext) {
-    super(commandContext);
-  }
-
   public HistoricJobLogQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }

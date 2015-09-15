@@ -45,10 +45,6 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
   public HistoricIncidentQueryImpl() {
   }
 
-  public HistoricIncidentQueryImpl(CommandContext commandContext) {
-    super(commandContext);
-  }
-
   public HistoricIncidentQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }

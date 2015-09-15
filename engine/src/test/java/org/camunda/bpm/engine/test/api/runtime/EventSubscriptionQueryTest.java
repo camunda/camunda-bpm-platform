@@ -222,7 +222,7 @@ public class EventSubscriptionQueryTest extends PluggableProcessEngineTestCase {
     processEngineConfiguration.getCommandExecutorTxRequired()
     .execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
-        final List<EventSubscription> subscriptions = new EventSubscriptionQueryImpl(commandContext).list();
+        final List<EventSubscription> subscriptions = new EventSubscriptionQueryImpl().list();
         for (EventSubscription eventSubscriptionEntity : subscriptions) {
           ((EventSubscriptionEntity) eventSubscriptionEntity).delete();
         }

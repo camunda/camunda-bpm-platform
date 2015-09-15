@@ -52,7 +52,7 @@ public class DbReadOnlyIdentityServiceProvider extends AbstractManager implement
   }
 
   public UserQueryImpl createUserQuery(CommandContext commandContext) {
-    return new DbUserQueryImpl(commandContext);
+    return new DbUserQueryImpl();
   }
 
   public long findUserCountByQueryCriteria(DbUserQueryImpl query) {
@@ -92,7 +92,7 @@ public class DbReadOnlyIdentityServiceProvider extends AbstractManager implement
   }
 
   public GroupQuery createGroupQuery(CommandContext commandContext) {
-    return new DbGroupQueryImpl(commandContext);
+    return new DbGroupQueryImpl();
   }
 
   public long findGroupCountByQueryCriteria(DbGroupQueryImpl query) {

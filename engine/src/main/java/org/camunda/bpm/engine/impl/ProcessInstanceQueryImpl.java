@@ -60,10 +60,6 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   public ProcessInstanceQueryImpl() {
   }
 
-  public ProcessInstanceQueryImpl(CommandContext commandContext) {
-    super(commandContext);
-  }
-
   public ProcessInstanceQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }

@@ -41,10 +41,6 @@ public class IncidentQueryImpl extends AbstractQuery<IncidentQuery, Incident> im
   public IncidentQueryImpl() {
   }
 
-  public IncidentQueryImpl(CommandContext commandContext) {
-    super(commandContext);
-  }
-
   public IncidentQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }

@@ -13,12 +13,11 @@
 
 package org.camunda.bpm.engine.impl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -39,10 +38,6 @@ public abstract class UserQueryImpl extends AbstractQuery<UserQuery, User> imple
   protected String procDefId;
 
   public UserQueryImpl() {
-  }
-
-  public UserQueryImpl(CommandContext commandContext) {
-    super(commandContext);
   }
 
   public UserQueryImpl(CommandExecutor commandExecutor) {

@@ -17,12 +17,10 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureOnlyOneNotNull;
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.cmd.StartProcessInstanceAtActivitiesCmd;
-import org.camunda.bpm.engine.impl.core.variable.VariableMapImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
-import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
  * Simply wraps a modification builder because their API is equivalent.

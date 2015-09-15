@@ -42,10 +42,6 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
   public DeploymentQueryImpl() {
   }
 
-  public DeploymentQueryImpl(CommandContext commandContext) {
-    super(commandContext);
-  }
-
   public DeploymentQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }

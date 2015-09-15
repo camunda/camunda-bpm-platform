@@ -57,10 +57,6 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
   public ExecutionQueryImpl() {
   }
 
-  public ExecutionQueryImpl(CommandContext commandContext) {
-    super(commandContext);
-  }
-
   public ExecutionQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }

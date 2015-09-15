@@ -22,7 +22,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.TaskQueryImpl;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.task.Task;
@@ -34,13 +34,17 @@ import org.junit.Before;
 /**
  * @author Sebastian Menski
  */
-public class TaskQueryExpressionTest extends PluggableProcessEngineTestCase {
+public class TaskQueryExpressionTest extends ResourceProcessEngineTestCase {
 
   protected Task task;
   protected User user;
   protected User anotherUser;
   protected User userWithoutGroups;
   protected Group group1;
+
+  public TaskQueryExpressionTest() {
+    super("org/camunda/bpm/engine/test/api/task/task-query-expression-test.camunda.cfg.xml");
+  }
 
   @Before
   public void setUp() {
@@ -388,7 +392,7 @@ public class TaskQueryExpressionTest extends PluggableProcessEngineTestCase {
       .taskAssigneeLikeExpression(testStringExpression)
       .taskAssigneeLike(queryString)
       .taskOwnerExpression(expressionString)
-      .taskOwnerExpression(queryString)
+      .taskOwner(queryString)
       .taskInvolvedUserExpression(expressionString)
       .taskInvolvedUser(queryString)
       .taskCreatedBeforeExpression(testDateExpression)

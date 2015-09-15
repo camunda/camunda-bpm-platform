@@ -59,10 +59,6 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
   public HistoricCaseActivityInstanceQueryImpl() {
   }
 
-  public HistoricCaseActivityInstanceQueryImpl(CommandContext commandContext) {
-    super(commandContext);
-  }
-
   public HistoricCaseActivityInstanceQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }

@@ -60,10 +60,6 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
   public JobQueryImpl() {
   }
 
-  public JobQueryImpl(CommandContext commandContext) {
-    super(commandContext);
-  }
-
   public JobQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }

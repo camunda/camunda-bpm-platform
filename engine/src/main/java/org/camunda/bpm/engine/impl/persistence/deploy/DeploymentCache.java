@@ -524,7 +524,7 @@ public class DeploymentCache {
 
     List<ProcessDefinition> allDefinitionsForDeployment = commandContext.runWithoutAuthorization(new Callable<List<ProcessDefinition>>() {
       public List<ProcessDefinition> call() throws Exception {
-        return new ProcessDefinitionQueryImpl(commandContext)
+        return new ProcessDefinitionQueryImpl()
           .deploymentId(deploymentId)
           .list();
       }
@@ -542,9 +542,8 @@ public class DeploymentCache {
 
   protected void removeAllCaseDefinitionsByDeploymentId(String deploymentId) {
     // remove all case definitions for a specific deployment
-    CommandContext commandContext = Context.getCommandContext();
 
-    List<CaseDefinition> allDefinitionsForDeployment = new CaseDefinitionQueryImpl(commandContext)
+    List<CaseDefinition> allDefinitionsForDeployment = new CaseDefinitionQueryImpl()
         .deploymentId(deploymentId)
         .list();
 
@@ -560,9 +559,8 @@ public class DeploymentCache {
 
   protected void removeAllDecisionDefinitionsByDeploymentId(String deploymentId) {
     // remove all case definitions for a specific deployment
-    CommandContext commandContext = Context.getCommandContext();
 
-    List<DecisionDefinition> allDefinitionsForDeployment = new DecisionDefinitionQueryImpl(commandContext)
+    List<DecisionDefinition> allDefinitionsForDeployment = new DecisionDefinitionQueryImpl()
       .deploymentId(deploymentId)
       .list();
 

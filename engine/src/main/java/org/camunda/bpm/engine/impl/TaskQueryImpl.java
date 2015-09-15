@@ -110,10 +110,6 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   public TaskQueryImpl() {
   }
 
-  public TaskQueryImpl(CommandContext commandContext) {
-    super(commandContext);
-  }
-
   public TaskQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }
@@ -1147,6 +1143,11 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   public TaskQuery extend(TaskQuery extending) {
     TaskQueryImpl extendingQuery = (TaskQueryImpl) extending;
     TaskQueryImpl extendedQuery = new TaskQueryImpl();
+
+    // only add add the base query's validators to the new query;
+    // this is because the extending query's validators may not be applicable to the base
+    // query and should therefore be executed before extending the query
+    extendedQuery.validators = new HashSet<Validator<AbstractQuery<?, ?>>>(validators);
 
     if (extendingQuery.getName() != null) {
       extendedQuery.taskName(extendingQuery.getName());

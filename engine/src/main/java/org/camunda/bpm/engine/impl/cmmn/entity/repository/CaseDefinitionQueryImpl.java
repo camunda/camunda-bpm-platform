@@ -50,10 +50,6 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
   public CaseDefinitionQueryImpl() {
   }
 
-  public CaseDefinitionQueryImpl(CommandContext commandContext) {
-    super(commandContext);
-  }
-
   public CaseDefinitionQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }

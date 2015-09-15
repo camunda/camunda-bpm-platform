@@ -52,10 +52,6 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
   public CaseInstanceQueryImpl() {
   }
 
-  public CaseInstanceQueryImpl(CommandContext commandContext) {
-    super(commandContext);
-  }
-
   public CaseInstanceQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }

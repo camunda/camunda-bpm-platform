@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,7 +17,6 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
 
@@ -25,7 +24,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
  * @author Joram Barrez
  */
 public abstract class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> implements GroupQuery {
-  
+
   private static final long serialVersionUID = 1L;
   protected String id;
   protected String[] ids;
@@ -34,13 +33,9 @@ public abstract class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> im
   protected String type;
   protected String userId;
   protected String procDefId;
-  
+
 
   public GroupQueryImpl() {
-  }
-
-  public GroupQueryImpl(CommandContext commandContext) {
-    super(commandContext);
   }
 
   public GroupQueryImpl(CommandExecutor commandExecutor) {
@@ -58,25 +53,25 @@ public abstract class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> im
     this.ids = ids;
     return this;
   }
-  
+
   public GroupQuery groupName(String name) {
     ensureNotNull("Provided name", name);
     this.name = name;
     return this;
   }
-  
+
   public GroupQuery groupNameLike(String nameLike) {
     ensureNotNull("Provided nameLike", nameLike);
     this.nameLike = nameLike;
     return this;
   }
-  
+
   public GroupQuery groupType(String type) {
     ensureNotNull("Provided type", type);
     this.type = type;
     return this;
   }
-  
+
   public GroupQuery groupMember(String userId) {
     ensureNotNull("Provided userId", userId);
     this.userId = userId;
@@ -87,25 +82,25 @@ public abstract class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> im
     ensureNotNull("Provided processDefinitionId", procDefId);
     this.procDefId = procDefId;
     return this;
-    
+
   }
-  
+
   //sorting ////////////////////////////////////////////////////////
-  
+
   public GroupQuery orderByGroupId() {
     return orderBy(GroupQueryProperty.GROUP_ID);
   }
-  
+
   public GroupQuery orderByGroupName() {
     return orderBy(GroupQueryProperty.NAME);
   }
-  
+
   public GroupQuery orderByGroupType() {
     return orderBy(GroupQueryProperty.TYPE);
   }
-  
+
   //getters ////////////////////////////////////////////////////////
-  
+
   public String getId() {
     return id;
   }
@@ -122,5 +117,5 @@ public abstract class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> im
     return userId;
   }
 
-  
+
 }

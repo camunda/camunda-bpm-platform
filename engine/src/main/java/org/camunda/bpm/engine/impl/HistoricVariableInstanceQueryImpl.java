@@ -54,10 +54,6 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
   public HistoricVariableInstanceQueryImpl() {
   }
 
-  public HistoricVariableInstanceQueryImpl(CommandContext commandContext) {
-    super(commandContext);
-  }
-
   public HistoricVariableInstanceQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }
