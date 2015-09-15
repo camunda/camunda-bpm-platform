@@ -184,9 +184,19 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
     DmnExpression inputExpression = clause.getInputExpression();
     if (inputExpression != null) {
       Object value = evaluateExpression(inputExpression, variables, evaluationCache);
+
+      if (hasItemDefinitionWithTypeDefinition(inputExpression)) {
+        value = inputExpression.getItemDefinition().getTypeDefinition().transform(value);
+      }
+
       input.setValue(value);
     }
     return input;
+  }
+
+  protected boolean hasItemDefinitionWithTypeDefinition(DmnExpression expression) {
+    DmnItemDefinition itemDefinition = expression.getItemDefinition();
+    return itemDefinition != null && itemDefinition.getTypeDefinition() != null;
   }
 
   protected boolean isRuleApplicable(DmnRule rule, Map<String, Object> variables, Map<String, DmnDecisionTableValue> inputs, Map<String, Object> evaluationCache) {
@@ -232,8 +242,11 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
       DmnDecisionTableValueImpl output = new DmnDecisionTableValueImpl(conclusion.getClause());
       Object value = evaluateExpression(conclusion, variables, evaluationCache);
 
-      Object transformedValue = transformValueForOutputClause(conclusion, value);
-      output.setValue(transformedValue);
+      if(hasOutputDefinitionWithTypeDefinition(conclusion)) {
+        value = conclusion.getClause().getOutputDefinition().getTypeDefinition().transform(value);
+      }
+
+      output.setValue(value);
       outputs.put(output.getKey(), output);
     }
     return outputs;
@@ -258,13 +271,9 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
     }
   }
 
-  protected Object transformValueForOutputClause(DmnClauseEntry conclusion, Object value) {
+  protected boolean hasOutputDefinitionWithTypeDefinition(DmnClauseEntry conclusion) {
     DmnItemDefinition outputDefinition = conclusion.getClause().getOutputDefinition();
-    if(outputDefinition != null) {
-      return outputDefinition.getTypeDefinition().transform(value);
-    } else {
-      return value;
-    }
+    return outputDefinition != null && outputDefinition.getTypeDefinition() != null;
   }
 
   protected Object evaluateExpression(DmnExpression expression, Map<String, Object> variables) {

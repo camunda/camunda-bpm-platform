@@ -32,7 +32,8 @@ import org.junit.Test;
  */
 public class CustomDataTypeTransformerFactoryTest {
 
-  private static final String DMN_FILE = "org/camunda/bpm/dmn/engine/type/OutputDefinition.dmn";
+  protected static final String DMN_OUTPUT_FILE = "org/camunda/bpm/dmn/engine/type/OutputDefinition.dmn";
+  protected static final String DMN_INPUT_FILE = "org/camunda/bpm/dmn/engine/type/CustomInputDefinition.dmn";
 
   protected DmnEngine engine;
   protected DmnDecision decision;
@@ -47,15 +48,25 @@ public class CustomDataTypeTransformerFactoryTest {
   }
 
   @Test
-  @DecisionResource(resource = DMN_FILE)
-  public void customTransformer() {
+  @DecisionResource(resource = DMN_OUTPUT_FILE)
+  public void customOutputTransformer() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("type", "custom");
-    variables.put("output", 42);
+    variables.put("output", 21);
 
     assertThat(engine)
       .evaluates(decision, variables)
       .hasResult(CustomDataTypeTransformer.CUSTOM_OBJECT);
+  }
+
+  @Test
+  @DecisionResource(resource = DMN_INPUT_FILE)
+  public void customInputTransformer() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("type", "custom");
+    variables.put("input", 21);
+
+    assertThat(engine).evaluates(decision, variables).hasResult("isCustom");
   }
 
   protected static DmnEngineConfigurationImpl customConfiguration() {
@@ -79,7 +90,7 @@ public class CustomDataTypeTransformerFactoryTest {
 
   protected static class CustomDataTypeTransformer implements DataTypeTransformer {
 
-    protected static final Object CUSTOM_OBJECT = "custom object";
+    protected static final Object CUSTOM_OBJECT = 42;
 
     @Override
     public Object transform(Object value) throws IllegalArgumentException {

@@ -23,11 +23,13 @@ import org.camunda.commons.utils.StringUtil;
 
 public abstract class AbstractDmnLiteralExpressionHandler<E extends LiteralExpression, I extends DmnExpressionImpl> extends AbstractDmnElementHandler<E, I> {
 
+  @Override
   @SuppressWarnings("unchecked")
   protected I createElement(DmnElementHandlerContext context, E expression) {
     return (I) new DmnExpressionImpl();
   }
 
+  @Override
   protected void initElement(DmnElementHandlerContext context, E expression, I dmnExpression) {
     super.initElement(context, expression, dmnExpression);
     initExpressionLanguage(context, expression, dmnExpression);

@@ -187,6 +187,8 @@ public class DmnTransformTest {
     assertThat(inputExpression.getName()).isNull();
     assertThat(inputExpression.getExpressionLanguage()).isNull();
     assertThat(inputExpression.getExpression()).isEqualTo("${camunda}");
+    assertThat(inputExpression.getItemDefinition()).isNotNull();
+    assertThat(inputExpression.getItemDefinition().getTypeDefinition()).isNull();
 
     inputExpression = clauses.get(1).getInputExpression();
     assertThat(inputExpression).isNotNull();
@@ -194,6 +196,9 @@ public class DmnTransformTest {
     assertThat(inputExpression.getName()).isEqualTo("camunda");
     assertThat(inputExpression.getExpressionLanguage()).isEqualTo("camunda");
     assertThat(inputExpression.getExpression()).isNull();
+    assertThat(inputExpression.getItemDefinition()).isNotNull();
+    assertThat(inputExpression.getItemDefinition().getTypeDefinition()).isNotNull();
+    assertThat(inputExpression.getItemDefinition().getTypeDefinition().getTypeName()).isEqualTo("string");
 
     inputExpression = clauses.get(2).getInputExpression();
     assertThat(inputExpression).isNotNull();
@@ -201,6 +206,7 @@ public class DmnTransformTest {
     assertThat(inputExpression.getName()).isNull();
     assertThat(inputExpression.getExpressionLanguage()).isNull();
     assertThat(inputExpression.getExpression()).isNull();
+    assertThat(inputExpression.getItemDefinition()).isNull();
 
     inputExpression = clauses.get(3).getInputExpression();
     assertThat(inputExpression).isNull();

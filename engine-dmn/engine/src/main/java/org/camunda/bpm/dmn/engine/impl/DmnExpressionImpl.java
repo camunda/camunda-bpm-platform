@@ -14,19 +14,23 @@
 package org.camunda.bpm.dmn.engine.impl;
 
 import org.camunda.bpm.dmn.engine.DmnExpression;
+import org.camunda.bpm.dmn.engine.DmnItemDefinition;
 
 public class DmnExpressionImpl extends DmnElementImpl implements DmnExpression {
 
   protected String expressionLanguage;
   protected String expression;
+  protected DmnItemDefinition itemDefinition;
 
   public DmnExpressionImpl() {
   }
 
+  @Override
   public void setKey(String id) {
     this.key = id;
   }
 
+  @Override
   public String getKey() {
     return key;
   }
@@ -47,12 +51,22 @@ public class DmnExpressionImpl extends DmnElementImpl implements DmnExpression {
     return expressionLanguage;
   }
 
+  public DmnItemDefinition getItemDefinition() {
+    return itemDefinition;
+  }
+
+  public void setItemDefinition(DmnItemDefinition itemDefinition) {
+    this.itemDefinition = itemDefinition;
+  }
+
+  @Override
   public String toString() {
     return "DmnExpressionImpl{" +
       "key='" + key + '\'' +
       ", name='" + name + '\'' +
       ", expressionLanguage='" + expressionLanguage + '\'' +
       ", expression='" + expression + '\'' +
+      ", itemDefinition='" + itemDefinition + '\'' +
       '}';
   }
 

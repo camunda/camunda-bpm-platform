@@ -14,11 +14,14 @@
     <DecisionTable id="decisionTable1" name="table">
       <clause id="clause1" name="camunda" camunda:output="camunda">
         <inputExpression id="inputExpression1">
+          <itemDefinition href="#itemDefinition1" />
           <text>camunda</text>
         </inputExpression>
       </clause>
       <clause id="clause2">
-        <inputExpression id="inputExpression2" name="camunda" expressionLanguage="camunda" />
+        <inputExpression id="inputExpression2" name="camunda" expressionLanguage="camunda">
+          <itemDefinition href="#itemDefinition2" />
+        </inputExpression>
       </clause>
       <clause id="clause3">
         <inputExpression id="inputExpression3">

@@ -23,6 +23,7 @@ import java.util.Map;
 import org.camunda.bpm.dmn.engine.DmnClause;
 import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnDecisionModel;
+import org.camunda.bpm.dmn.engine.DmnExpression;
 import org.camunda.bpm.dmn.engine.DmnItemDefinition;
 import org.camunda.bpm.dmn.engine.DmnRule;
 import org.camunda.bpm.dmn.engine.handler.DmnElementHandler;
@@ -229,7 +230,6 @@ public class DmnTransformImpl implements DmnTransform, DmnElementHandlerContext 
 
   protected DmnClause transformInputClause(Clause clause) {
     DmnElementHandler<Clause, DmnClauseImpl> clauseHandler = getElementHandler(Clause.class);
-    DmnElementHandler<InputExpression, DmnExpressionImpl> inputExpressionHandler = getElementHandler(InputExpression.class);
     DmnElementHandler<InputEntry, DmnClauseEntryImpl> inputEntryHandler = getElementHandler(InputEntry.class);
 
     DmnClauseImpl dmnClause = clauseHandler.handleElement(this, clause);
@@ -242,7 +242,7 @@ public class DmnTransformImpl implements DmnTransform, DmnElementHandlerContext 
     InputExpression inputExpression = clause.getInputExpression();
     if (inputExpression != null) {
       parent = dmnClause;
-      DmnExpressionImpl dmnInputExpression = inputExpressionHandler.handleElement(this, inputExpression);
+      DmnExpression dmnInputExpression = transformInputExpression(inputExpression);
       dmnClause.setInputExpression(dmnInputExpression);
     }
 
@@ -255,6 +255,22 @@ public class DmnTransformImpl implements DmnTransform, DmnElementHandlerContext 
     }
 
     return dmnClause;
+  }
+
+  protected DmnExpression transformInputExpression(InputExpression inputExpression) {
+    DmnElementHandler<InputExpression, DmnExpressionImpl> inputExpressionHandler = getElementHandler(InputExpression.class);
+
+    DmnExpressionImpl dmnInputExpression = inputExpressionHandler.handleElement(this, inputExpression);
+
+    if(inputExpression.getItemDefinition() != null) {
+      String itemDefinitionRef = inputExpression.getItemDefinition().getId();
+      DmnItemDefinition itemDefinition = decisionModel.getItemDefinition(itemDefinitionRef);
+      if(itemDefinition != null) {
+        dmnInputExpression.setItemDefinition(itemDefinition);
+      }
+    }
+
+    return dmnInputExpression;
   }
 
   protected DmnClause transformOutputClause(Clause clause) {
