@@ -45,7 +45,7 @@ define(['angular', 'text!./dashboard.html'], function(angular, template) {
     page.breadcrumbsClear();
 
     page.titleSet([
-      'camunda Cockpit',
+      'Camunda Cockpit',
       'Dashboard'
     ].join(' | '));
   }];
