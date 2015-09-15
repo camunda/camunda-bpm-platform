@@ -28,10 +28,13 @@ describe('Cockpit Decision Instance Spec', function() {
       definitionPage.decisionInstancesTab.instanceId(0).then(function(instanceId) {
 
         // when
-        definitionPage.decisionInstancesTab.selectInstanceId(0);
+        definitionPage.decisionInstancesTab.selectInstanceId(0).then(function() {
 
-        // then
-        expect(instancePage.pageHeaderDecisionInstanceId()).to.eventually.eql(instanceId);
+          // then
+          expect(instancePage.pageHeaderDecisionInstanceId()).to.eventually.eql(instanceId);
+
+        });
+
       });
     });
 

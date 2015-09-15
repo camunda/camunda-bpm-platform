@@ -7,6 +7,7 @@ module.exports = Base.extend({
   url: '/camunda/app/cockpit/default/#/decision-instance/:decision',
 
   pageHeader: function() {
+    this.waitForElementToBeVisible(element(by.binding('decisionInstance.id')));
     return element(by.binding('decisionInstance.id'));
   },
 

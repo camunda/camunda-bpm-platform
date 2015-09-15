@@ -10,15 +10,18 @@ module.exports = Table.extend({
   tableRepeater: 'decisionInstance in decisionInstances',
 
   selectInstanceId: function(idx) {
-    this.tableItem(idx, by.binding('decisionInstance.id')).click();
+    this.waitForElementToBeVisible(element(by.repeater(this.tableRepeater)));
+    return this.tableItem(idx, by.binding('decisionInstance.id')).click();
   },
 
   selectProcessDefinitionKey: function(idx) {
-    this.tableItem(idx, by.binding('decisionInstance.processDefinitionKey')).click();
+    this.waitForElementToBeVisible(element(by.repeater(this.tableRepeater)));
+    return this.tableItem(idx, by.binding('decisionInstance.processDefinitionKey')).click();
   },
 
   selectProcessInstanceId: function(idx) {
-    this.tableItem(idx, by.binding('decisionInstance.processInstanceId')).click();
+    this.waitForElementToBeVisible(element(by.repeater(this.tableRepeater)));
+    return this.tableItem(idx, by.binding('decisionInstance.processInstanceId')).click();
   },
 
   instanceId: function(idx) {
