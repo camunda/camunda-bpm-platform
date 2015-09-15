@@ -1,7 +1,7 @@
 <!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/decisionList/app/views/dashboard/decision-list.html -->
 <div class="deployed-decisions">
   <h3 ng-if="decisionCount">
-    {{decisionCount}} {{ (statistics.length > 1 ? 'decisions' : 'decision') }} deployed
+    {{decisionCount}} decision {{ (statistics.length > 1 ? 'tables' : 'table') }}  deployed
   </h3>
 
   <table class="decision-definitions-list cam-table" ng-if="decisionCount">

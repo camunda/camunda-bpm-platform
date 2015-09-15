@@ -8,7 +8,8 @@ define([
   return [ 'ViewsProvider', function (ViewsProvider) {
     ViewsProvider.registerDefaultView('cockpit.dashboard', {
       id: 'process-definition',
-      label: 'Deployed Processes',
+      label: 'Deployed Process Definitions',
+      dashboardMenuLabel: 'BPMN Workflows',
       template: template,
       controller: [
               '$scope',
