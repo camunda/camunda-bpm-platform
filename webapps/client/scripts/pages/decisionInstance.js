@@ -71,7 +71,7 @@ define([
     });
 
     page.titleSet([
-      'camunda Cockpit',
+      'Camunda Cockpit',
       decisionInstance.id.slice(0, 8) +'…',
       'Instance View'
     ].join(' | '));

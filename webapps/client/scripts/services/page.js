@@ -18,7 +18,7 @@ define(['angular'], function(angular) {
   ) {
 
     var page = {
-      title: 'camunda',
+      title: 'Camunda',
       breadcrumbs: []
     };
 
