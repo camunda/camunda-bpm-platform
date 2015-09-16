@@ -13,7 +13,12 @@ define([
       template: template,
       controller: [
               '$scope',
-      function($scope) {
+              'Views',
+      function($scope, Views) {
+        var processInstancePlugins = Views.getProviders({ component: 'cockpit.processInstance.view' });
+        $scope.hasHistoryPlugin = processInstancePlugins.filter(function(plugin) {
+          return plugin.id === 'history';
+        }).length > 0;
 
         var processData = $scope.processData.newChild($scope);
 

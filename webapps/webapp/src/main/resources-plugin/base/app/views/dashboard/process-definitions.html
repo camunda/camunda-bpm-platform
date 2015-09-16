@@ -13,6 +13,8 @@
             <th class="state">State</th>
             <th class="instances">Running Instances</th>
             <th class="name">Name</th>
+            <th ng-if="hasHistoryPlugin"
+                class="history-link">History view</th>
           </tr>
         </thead>
 
@@ -30,6 +32,13 @@
             <td class="name">
               <a href="#/process-definition/{{ statistic.definition.id }}">
                 {{ statistic.definition.name }}
+              </a>
+            </td>
+
+            <td ng-if="hasHistoryPlugin"
+                class="history-link">
+              <a href="#/process-definition/{{ statistic.definition.id }}/history">
+                History view
               </a>
             </td>
           </tr>
