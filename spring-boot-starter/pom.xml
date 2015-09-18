@@ -19,12 +19,14 @@
     <module>camunda-spring-boot-starter</module>
     <module>examples</module>
     <module>camunda-spring-boot-starter-docs</module>
+    <!--<module>camunda-spring-boot-embedded-webapp</module>-->
+    <module>camunda-spring-boot-starter-rest</module>
+    <!--<module>camunda-spring-boot-crash-commands</module>-->
   </modules>
 
   <properties>
     <spring-boot.version>1.2.5.RELEASE</spring-boot.version>
     <camunda.version>7.3.0</camunda.version>
-    <resteasy.version>3.0.8.Final</resteasy.version>
 
     <!-- camunda and spring use different properties ... -->
     <java.version>${version.java}</java.version>
@@ -51,6 +53,21 @@
         <version>${spring-boot.version}</version>
       </plugin>
     </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <configuration>
+            <archive>
+              <manifest>
+                <addDefaultImplementationEntries/>
+              </manifest>
+            </archive>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 
   <dependencyManagement>
@@ -71,12 +88,6 @@
         <version>${spring-boot.version}</version>
         <type>pom</type>
         <scope>import</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>org.jboss.resteasy</groupId>
-        <artifactId>resteasy-jaxrs</artifactId>
-        <version>${resteasy.version}</version>
       </dependency>
 
       <dependency>
