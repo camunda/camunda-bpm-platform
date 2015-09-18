@@ -16,12 +16,9 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>camunda-spring-boot-starter</module>
+    <module>extension</module>
     <module>examples</module>
-    <module>camunda-spring-boot-starter-docs</module>
-    <!--<module>camunda-spring-boot-embedded-webapp</module>-->
-    <module>camunda-spring-boot-starter-rest</module>
-    <!--<module>camunda-spring-boot-crash-commands</module>-->
+    <module>docs</module>
   </modules>
 
   <properties>
