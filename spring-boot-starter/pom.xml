@@ -30,26 +30,6 @@
   </properties>
 
   <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <version>2.18.1</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>integration-test</goal>
-              <goal>verify</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
-        <version>${spring-boot.version}</version>
-      </plugin>
-    </plugins>
     <pluginManagement>
       <plugins>
         <plugin>
@@ -65,35 +45,23 @@
         </plugin>
       </plugins>
     </pluginManagement>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>2.18.1</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <!-- Import dependency management from camunda -->
-        <groupId>org.camunda.bpm</groupId>
-        <artifactId>camunda-bom</artifactId>
-        <version>${camunda.version}</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
-
-      <dependency>
-        <!-- Import dependency management from Spring Boot -->
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-dependencies</artifactId>
-        <version>${spring-boot.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>org.camunda.bpm.extension</groupId>
-        <artifactId>camunda-bpm-spring-boot-starter</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <profiles>
     <!-- this is only for jdk 1.6. you can remove this when using java version
@@ -216,7 +184,6 @@
               </exclusion>
             </exclusions>
           </dependency>
-
         </dependencies>
       </dependencyManagement>
     </profile>
@@ -266,7 +233,6 @@
     </profile>
   </profiles>
 
-
   <licenses>
     <license>
       <name>The Apache Software License, Version 2.0</name>
@@ -281,8 +247,7 @@
     <tag>HEAD</tag>
   </scm>
 
-  <!-- repositories used for distribution of releases and snapshots, DO NOT
-    CHANGE -->
+  <!-- repositories used for distribution of releases and snapshots, DO NOT CHANGE -->
   <distributionManagement>
     <repository>
       <id>camunda-nexus</id>
