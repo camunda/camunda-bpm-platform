@@ -138,7 +138,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
   }
 
   public UserQueryImpl createUserQuery(CommandContext commandContext) {
-    return new LdapUserQueryImpl(commandContext);
+    return new LdapUserQueryImpl();
   }
 
   public long findUserCountByQueryCriteria(LdapUserQueryImpl query) {
@@ -355,7 +355,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
   }
 
   public GroupQuery createGroupQuery(CommandContext commandContext) {
-    return new LdapGroupQuery(commandContext);
+    return new LdapGroupQuery();
   }
 
   public long findGroupCountByQueryCriteria(LdapGroupQuery ldapGroupQuery) {

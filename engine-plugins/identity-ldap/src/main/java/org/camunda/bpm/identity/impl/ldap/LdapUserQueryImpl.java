@@ -33,10 +33,6 @@ public class LdapUserQueryImpl extends UserQueryImpl {
     super();
   }
 
-  public LdapUserQueryImpl(CommandContext commandContext) {
-    super(commandContext);
-  }
-
   public LdapUserQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }
