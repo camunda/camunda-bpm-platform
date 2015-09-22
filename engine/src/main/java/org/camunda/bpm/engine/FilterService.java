@@ -64,6 +64,11 @@ public interface FilterService {
    * @return return the saved filter
    * @throws AuthorizationException if the user has no {@link Permissions#CREATE} permissions on {@link Resources#FILTER} (save new filter)
    * or if user has no {@link Permissions#UPDATE} permissions on {@link Resources#FILTER} (update existing filter).
+   * @throws BadUserRequestException
+   *  <ul><li>When the filter query uses expressions and expression evaluation is deactivated for stored queries.
+   *  Expression evaluation can be activated by setting the process engine configuration properties
+   *  <code>enableExpressionsInAdhocQueries</code> (default <code>false</code>) and
+   *  <code>enableExpressionsInStoredQueries</code> (default <code>true</code>) to <code>true</code>.
    */
   Filter saveFilter(Filter filter);
 
@@ -90,6 +95,11 @@ public interface FilterService {
    * @param filterId the the id of the filter
    * @return the query result as list
    * @throws AuthorizationException if the user has no {@link Permissions#READ} permissions on {@link Resources#FILTER}.
+   * @throws BadUserRequestException
+   *   <ul><li>When the filter query uses expressions and expression evaluation is deactivated for stored queries.
+   *  Expression evaluation can be activated by setting the process engine configuration properties
+   *  <code>enableExpressionsInAdhocQueries</code> (default <code>false</code>) and
+   *  <code>enableExpressionsInStoredQueries</code> (default <code>true</code>) to <code>true</code>.
    */
   <T> List<T> list(String filterId);
 
@@ -100,6 +110,12 @@ public interface FilterService {
    * @param extendingQuery additional query to extend the filter query
    * @return the query result as list
    * @throws AuthorizationException if the user has no {@link Permissions#READ} permissions on {@link Resources#FILTER}.
+   * @throws BadUserRequestException
+   *   <ul><li>When the filter query uses expressions and expression evaluation is deactivated for stored queries.
+   *   <li>When the extending query uses expressions and expression evaluation is deactivated for adhoc queries.
+   *  Expression evaluation can be activated by setting the process engine configuration properties
+   *  <code>enableExpressionsInAdhocQueries</code> (default <code>false</code>) and
+   *  <code>enableExpressionsInStoredQueries</code> (default <code>true</code>) to <code>true</code>.
    */
   <T, Q extends Query<?, T>> List<T> list(String filterId, Q extendingQuery);
 
@@ -111,6 +127,11 @@ public interface FilterService {
    * @param maxResults maximal number of results
    * @return the query result as list
    * @throws AuthorizationException if the user has no {@link Permissions#READ} permissions on {@link Resources#FILTER}.
+   * @throws BadUserRequestException
+   *  <ul><li>When the filter query uses expressions and expression evaluation is deactivated for stored queries.
+   *  Expression evaluation can be activated by setting the process engine configuration properties
+   *  <code>enableExpressionsInAdhocQueries</code> (default <code>false</code>) and
+   *  <code>enableExpressionsInStoredQueries</code> (default <code>true</code>) to <code>true</code>.
    */
   <T> List<T> listPage(String filterId, int firstResult, int maxResults);
 
@@ -123,6 +144,12 @@ public interface FilterService {
    * @param maxResults maximal number of results
    * @return the query result as list
    * @throws AuthorizationException if the user has no {@link Permissions#READ} permissions on {@link Resources#FILTER}.
+   * @throws BadUserRequestException
+   *  <ul><li>When the filter query uses expressions and expression evaluation is deactivated for stored queries.
+   *  <li>When the extending query uses expressions and expression evaluation is deactivated for adhoc queries.
+   *  Expression evaluation can be activated by setting the process engine configuration properties
+   *  <code>enableExpressionsInAdhocQueries</code> (default <code>false</code>) and
+   *  <code>enableExpressionsInStoredQueries</code> (default <code>true</code>) to <code>true</code>.
    */
   <T, Q extends Query<?, T>> List<T> listPage(String filterId, Q extendingQuery, int firstResult, int maxResults);
 
@@ -132,6 +159,11 @@ public interface FilterService {
    * @param filterId the the id of the filter
    * @return the single query result
    * @throws AuthorizationException if the user has no {@link Permissions#READ} permissions on {@link Resources#FILTER}.
+   * @throws BadUserRequestException
+   *  <ul><li>When the filter query uses expressions and expression evaluation is deactivated for stored queries.
+   *  Expression evaluation can be activated by setting the process engine configuration properties
+   *  <code>enableExpressionsInAdhocQueries</code> (default <code>false</code>) and
+   *  <code>enableExpressionsInStoredQueries</code> (default <code>true</code>) to <code>true</code>.
    */
   <T> T singleResult(String filterId);
 
@@ -142,6 +174,12 @@ public interface FilterService {
    * @param extendingQuery additional query to extend the filter query
    * @return the single query result
    * @throws AuthorizationException if the user has no {@link Permissions#READ} permissions on {@link Resources#FILTER}.
+   * @throws BadUserRequestException
+   *  <ul><li>When the filter query uses expressions and expression evaluation is deactivated for stored queries.
+   *  <li>When the extending query uses expressions and expression evaluation is deactivated for adhoc queries.
+   *  Expression evaluation can be activated by setting the process engine configuration properties
+   *  <code>enableExpressionsInAdhocQueries</code> (default <code>false</code>) and
+   *  <code>enableExpressionsInStoredQueries</code> (default <code>true</code>) to <code>true</code>.
    */
   <T, Q extends Query<?, T>> T singleResult(String filterId, Q extendingQuery);
 
@@ -151,6 +189,11 @@ public interface FilterService {
    * @param filterId the the id of the filter
    * @return the result count
    * @throws AuthorizationException if the user has no {@link Permissions#READ} permissions on {@link Resources#FILTER}.
+   * @throws BadUserRequestException
+   *  <ul><li>When the filter query uses expressions and expression evaluation is deactivated for stored queries.
+   *  Expression evaluation can be activated by setting the process engine configuration properties
+   *  <code>enableExpressionsInAdhocQueries</code> (default <code>false</code>) and
+   *  <code>enableExpressionsInStoredQueries</code> (default <code>true</code>) to <code>true</code>.
    */
   Long count(String filterId);
 
@@ -161,6 +204,12 @@ public interface FilterService {
    * @param extendingQuery additional query to extend the filter query
    * @return the result count
    * @throws AuthorizationException if the user has no {@link Permissions#READ} permissions on {@link Resources#FILTER}.
+   * @throws BadUserRequestException
+   *  <ul><li>When the filter query uses expressions and expression evaluation is deactivated for stored queries.
+   *  <li>When the extending query uses expressions and expression evaluation is deactivated for adhoc queries.
+   *  Expression evaluation can be activated by setting the process engine configuration properties
+   *  <code>enableExpressionsInAdhocQueries</code> (default <code>false</code>) and
+   *  <code>enableExpressionsInStoredQueries</code> (default <code>true</code>) to <code>true</code>.
    */
   Long count(String filterId, Query<?, ?> extendingQuery);
 
