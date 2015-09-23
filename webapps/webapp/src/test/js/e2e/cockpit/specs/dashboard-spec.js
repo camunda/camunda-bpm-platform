@@ -22,7 +22,7 @@ describe('Cockpit Dashboard Spec', function() {
 
       // then
       dashboardPage.isActive();
-      expect(dashboardPage.deployedProcessesList.processCountHeader()).to.eventually.eql('1 process deployed');
+      expect(dashboardPage.deployedProcessesList.processCountHeader()).to.eventually.eql('1 process definition deployed');
     });
 
 
@@ -60,7 +60,7 @@ describe('Cockpit Dashboard Spec', function() {
         dashboardPage.navigateTo();
 
         // then
-        expect(dashboardPage.deployedProcessesList.processCountHeader()).to.eventually.eql('1 process deployed');
+        expect(dashboardPage.deployedProcessesList.processCountHeader()).to.eventually.eql('1 process definition deployed');
         expect(dashboardPage.deployedProcessesList.processesList().count()).to.eventually.eql(1);
         expect(dashboardPage.deployedProcessesList.runningInstances(0)).to.eventually.eql('1');
       });
@@ -80,7 +80,7 @@ describe('Cockpit Dashboard Spec', function() {
         dashboardPage.navigateTo();
 
         // then
-        expect(dashboardPage.deployedProcessesList.processCountHeader()).to.eventually.eql('2 processes deployed');
+        expect(dashboardPage.deployedProcessesList.processCountHeader()).to.eventually.eql('2 process definitions deployed');
         expect(dashboardPage.deployedProcessesList.processesList().count()).to.eventually.eql(2);
         expect(dashboardPage.deployedProcessesList.runningInstances(1)).to.eventually.eql('1');
         expect(dashboardPage.deployedProcessesList.processName(1)).to.eventually.eql('processWithSubProcess')
@@ -110,7 +110,7 @@ describe('Cockpit Dashboard Spec', function() {
         dashboardPage.navigateTo();
 
         // then
-        expect(dashboardPage.deployedDecisionsList.decisionCountHeader()).to.eventually.eql('1 decision deployed');
+        expect(dashboardPage.deployedDecisionsList.decisionCountHeader()).to.eventually.eql('1 decision table deployed');
         expect(dashboardPage.deployedDecisionsList.decisionsList().count()).to.eventually.eql(1);
         expect(dashboardPage.deployedDecisionsList.decisionName(0)).to.eventually.eql('Assign Approver');
       });

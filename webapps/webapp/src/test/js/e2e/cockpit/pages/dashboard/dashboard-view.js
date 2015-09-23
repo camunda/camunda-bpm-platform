@@ -7,7 +7,7 @@ module.exports = Base.extend({
   url: '/camunda/app/cockpit/default/#/dashboard',
 
   pluginList: function () {
-    return element.all(by.repeater('dashboardProvider in dashboardProviders'));
+    return element.all(by.css('.dashboard-view'));
   }
 
 
