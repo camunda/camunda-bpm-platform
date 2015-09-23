@@ -55,6 +55,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.DeploymentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskManager;
 import org.camunda.bpm.engine.impl.persistence.entity.FilterManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseActivityInstanceManager;
@@ -510,6 +511,12 @@ public class CommandContext {
 
   public FilterManager getFilterManager() {
     return getSession(FilterManager.class);
+  }
+
+  // External Tasks ////////////////////////////////////////////////////////////
+
+  public ExternalTaskManager getExternalTaskManager() {
+    return getSession(ExternalTaskManager.class);
   }
 
   // getters and setters //////////////////////////////////////////////////////

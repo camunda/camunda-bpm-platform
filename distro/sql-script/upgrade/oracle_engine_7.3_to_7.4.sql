@@ -120,3 +120,23 @@ create index ACT_IDX_HI_DEC_OUT_RULE on ACT_HI_DEC_OUT(RULE_ORDER_, CLAUSE_ID_);
 -- add grant authorization for group camunda-admin:
 INSERT INTO ACT_RU_AUTHORIZATION (ID_, TYPE_, GROUP_ID_, RESOURCE_TYPE_, RESOURCE_ID_, PERMS_, REV_) 
   VALUES ('camunda-admin-grant-decision-definition', 1, 'camunda-admin', 10, '*', 2147483647, 1);
+
+-- external tasks --
+
+create table ACT_RU_EXT_TASK (
+  ID_ NVARCHAR2(64) not null,
+  REV_ integer not null,
+  WORKER_ID_ NVARCHAR2(255),
+  TOPIC_NAME_ NVARCHAR2(255),
+  LOCK_EXP_TIME_ TIMESTAMP(6),
+  EXECUTION_ID_ NVARCHAR2(64),
+  primary key (ID_)
+);
+
+alter table ACT_RU_EXT_TASK
+  add constraint ACT_FK_EXT_TASK_EXE 
+  foreign key (EXECUTION_ID_) 
+  references ACT_RU_EXECUTION (ID_);
+  
+create index ACT_IDX_EXT_TASK_TOPIC on ACT_RU_EXT_TASK(TOPIC_NAME_);
+  

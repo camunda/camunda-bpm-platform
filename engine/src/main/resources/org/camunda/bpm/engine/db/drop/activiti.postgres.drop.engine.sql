@@ -21,6 +21,7 @@ drop index ACT_IDX_IDENT_LNK_GROUP;
 drop index ACT_IDX_VARIABLE_TASK_ID;
 
 drop index ACT_IDX_METER_LOG;
+drop index ACT_IDX_EXT_TASK_TOPIC;
 
 alter table ACT_GE_BYTEARRAY
     drop constraint ACT_FK_BYTEARR_DEPL;
@@ -94,6 +95,9 @@ alter table ACT_RU_AUTHORIZATION
 alter table ACT_RU_VARIABLE
     drop constraint ACT_UNIQ_VARIABLE;
 
+alter table ACT_RU_EXT_TASK
+    drop constraint ACT_FK_EXT_TASK_EXE;
+
 drop index ACT_IDX_EVENT_SUBSCR_CONFIG_;
 drop index ACT_IDX_EVENT_SUBSCR;
 drop index ACT_IDX_ATHRZ_PROCEDEF;
@@ -128,4 +132,5 @@ drop table ACT_RU_INCIDENT;
 drop table ACT_RU_AUTHORIZATION;
 drop table ACT_RU_FILTER;
 drop table ACT_RU_METER_LOG;
+drop table ACT_RU_EXT_TASK;
 

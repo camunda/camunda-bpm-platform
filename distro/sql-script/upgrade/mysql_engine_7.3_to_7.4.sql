@@ -125,3 +125,21 @@ INSERT INTO
 VALUES
   ('camunda-admin-grant-decision-definition', 1, 'camunda-admin', 10, '*', 2147483647, 1);
   
+-- external tasks --
+
+create table ACT_RU_EXT_TASK (
+  ID_ varchar(64) not null,
+  REV_ integer not null,
+  WORKER_ID_ varchar(255),
+  TOPIC_NAME_ varchar(255),
+  LOCK_EXP_TIME_ timestamp,
+  EXECUTION_ID_ varchar(64),
+  primary key (ID_)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
+
+alter table ACT_RU_EXT_TASK
+    add constraint ACT_FK_EXT_TASK_EXE 
+    foreign key (EXECUTION_ID_) 
+    references ACT_RU_EXECUTION (ID_);
+
+create index ACT_IDX_EXT_TASK_TOPIC on ACT_RU_EXT_TASK(TOPIC_NAME_);

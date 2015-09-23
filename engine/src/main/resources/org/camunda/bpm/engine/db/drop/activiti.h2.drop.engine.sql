@@ -78,6 +78,9 @@ alter table ACT_RU_AUTHORIZATION
 
 alter table ACT_RU_VARIABLE
     drop constraint ACT_UNIQ_VARIABLE;
+    
+alter table ACT_RU_EXT_TASK
+    drop constraint ACT_FK_EXT_TASK_EXE;
 
 drop index ACT_IDX_EVENT_SUBSCR_CONFIG_;
 drop index ACT_IDX_ATHRZ_PROCEDEF;
@@ -91,6 +94,7 @@ drop index ACT_IDX_INC_ROOTCAUSEINCID;
 
 drop index ACT_IDX_METER_LOG;
 drop index ACT_IDX_AUTH_RESOURCE_ID;
+drop index ACT_IDX_EXT_TASK_TOPIC;
 
 drop index ACT_IDX_BYTEARRAY_NAME;
 drop index ACT_IDX_DEPLOYMENT_NAME;
@@ -114,4 +118,5 @@ drop table ACT_RU_INCIDENT if exists;
 drop table ACT_RU_AUTHORIZATION if exists;
 drop table ACT_RU_FILTER if exists;
 drop table ACT_RU_METER_LOG if exists;
+drop table ACT_RU_EXT_TASK if exists;
 

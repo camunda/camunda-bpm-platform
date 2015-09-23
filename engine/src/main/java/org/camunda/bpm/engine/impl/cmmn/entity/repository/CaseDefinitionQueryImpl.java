@@ -111,7 +111,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
 
   public CaseDefinitionQuery caseDefinitionVersion(Integer caseDefinitionVersion) {
     ensureNotNull(NotValidException.class, "version", caseDefinitionVersion);
-    ensurePositive(NotValidException.class, "version", caseDefinitionVersion);
+    ensurePositive(NotValidException.class, "version", caseDefinitionVersion.longValue());
     this.version = caseDefinitionVersion;
     return this;
   }

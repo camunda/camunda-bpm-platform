@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity">
+
+  <resultMap id="externalTaskResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR"/>
+    <result property="revision" column="REV_" jdbcType="INTEGER"/>
+    <result property="topicName" column="TOPIC_NAME_" jdbcType="VARCHAR"/>
+    <result property="workerId" column="WORKER_ID_" jdbcType="VARCHAR" />
+    <result property="lockExpirationTime" column="LOCK_EXP_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <insert id="insertExternalTask" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity">
+    insert into ${prefix}ACT_RU_EXT_TASK (
+      ID_,
+      WORKER_ID_,
+      TOPIC_NAME_,
+      LOCK_EXP_TIME_,
+      EXECUTION_ID_,
+      REV_
+    ) values (
+      #{id, jdbcType=VARCHAR},
+      #{workerId, jdbcType=VARCHAR},
+      #{topicName, jdbcType=VARCHAR},
+      #{lockExpirationTime, jdbcType=TIMESTAMP},
+      #{executionId, jdbcType=VARCHAR},
+      1
+    )
+  </insert>
+  
+  <update id="updateExternalTask" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity">
+    update ${prefix}ACT_RU_EXT_TASK
+    <set>
+      REV_ = #{revisionNext, jdbcType=INTEGER},
+      WORKER_ID_ = #{workerId, jdbcType=VARCHAR},
+      TOPIC_NAME_ = #{topicName, jdbcType=VARCHAR},
+      LOCK_EXP_TIME_ = #{lockExpirationTime, jdbcType=TIMESTAMP},
+      EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR}
+    </set>
+    where ID_= #{id, jdbcType=VARCHAR}
+      and REV_ = #{revision, jdbcType=INTEGER}
+  </update>
+  
+  <delete id="deleteExternalTask" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity">
+    delete from ${prefix}ACT_RU_EXT_TASK where ID_ = #{id} and REV_ = #{revision}
+  </delete>
+  
+  <select id="selectExternalTask" parameterType="string" resultMap="externalTaskResultMap">
+   select * from ${prefix}ACT_RU_EXT_TASK where ID_ = #{id, jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectExternalTasksByExecutionId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="externalTaskResultMap">
+    select * from ${prefix}ACT_RU_EXT_TASK where EXECUTION_ID_ = #{parameter, jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectExternalTasksForTopics" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="externalTaskResultMap">
+    ${limitBefore}
+    select RES.* ${limitBetween}
+    from ${prefix}ACT_RU_EXT_TASK RES
+    <where>
+      (RES.LOCK_EXP_TIME_ is null or RES.LOCK_EXP_TIME_ &lt;= #{parameter.now, jdbcType=TIMESTAMP})
+      <if test="parameter != null">
+        and RES.TOPIC_NAME_ in 
+        <foreach collection="parameter.topics" open="(" close=")" separator="," item="topicName">
+          #{topicName}
+        </foreach>
+      </if>
+    </where>
+    ${limitAfter}
+  </select>
+</mapper>

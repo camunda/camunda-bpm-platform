@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.CompensateEventSubscriptio
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IdentityLinkEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
@@ -69,6 +70,8 @@ public class EntityTypeComparatorForModifications implements Comparator<Class<?>
     typeOrder.put(MembershipEntity.class, 1);
 
     typeOrder.put(CaseSentryPartEntity.class, 1);
+
+    typeOrder.put(ExternalTaskEntity.class, 1);
 
     // 2
     typeOrder.put(GroupEntity.class, 2);

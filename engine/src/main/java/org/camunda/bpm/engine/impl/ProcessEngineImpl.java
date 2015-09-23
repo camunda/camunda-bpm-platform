@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.CaseService;
+import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
@@ -44,6 +45,7 @@ public class ProcessEngineImpl implements ProcessEngine {
   private static Logger log = Logger.getLogger(ProcessEngineImpl.class.getName());
 
   protected String name;
+
   protected RepositoryService repositoryService;
   protected RuntimeService runtimeService;
   protected HistoryService historicDataService;
@@ -54,6 +56,8 @@ public class ProcessEngineImpl implements ProcessEngine {
   protected AuthorizationService authorizationService;
   protected CaseService caseService;
   protected FilterService filterService;
+  protected ExternalTaskService externalTaskService;
+
   protected String databaseSchemaUpdate;
   protected JobExecutor jobExecutor;
   protected CommandExecutor commandExecutor;
@@ -68,6 +72,7 @@ public class ProcessEngineImpl implements ProcessEngine {
 
     this.processEngineConfiguration = processEngineConfiguration;
     this.name = processEngineConfiguration.getProcessEngineName();
+
     this.repositoryService = processEngineConfiguration.getRepositoryService();
     this.runtimeService = processEngineConfiguration.getRuntimeService();
     this.historicDataService = processEngineConfiguration.getHistoryService();
@@ -78,6 +83,8 @@ public class ProcessEngineImpl implements ProcessEngine {
     this.authorizationService = processEngineConfiguration.getAuthorizationService();
     this.caseService = processEngineConfiguration.getCaseService();
     this.filterService = processEngineConfiguration.getFilterService();
+    this.externalTaskService = processEngineConfiguration.getExternalTaskService();
+
     this.databaseSchemaUpdate = processEngineConfiguration.getDatabaseSchemaUpdate();
     this.jobExecutor = processEngineConfiguration.getJobExecutor();
     this.commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
@@ -179,6 +186,10 @@ public class ProcessEngineImpl implements ProcessEngine {
 
   public FilterService getFilterService() {
     return filterService;
+  }
+
+  public ExternalTaskService getExternalTaskService() {
+    return externalTaskService;
   }
 
   public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {

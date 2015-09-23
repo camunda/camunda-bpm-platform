@@ -227,6 +227,16 @@ create table ACT_RU_METER_LOG (
   primary key (ID_)
 );
 
+create table ACT_RU_EXT_TASK (
+  ID_ varchar(64) not null,
+  REV_ integer not null,
+  WORKER_ID_ varchar(255),
+  TOPIC_NAME_ varchar(255),
+  LOCK_EXP_TIME_ timestamp,
+  EXECUTION_ID_ varchar(64),
+  primary key (ID_)
+);
+
 create index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION(BUSINESS_KEY_);
 create index ACT_IDX_TASK_CREATE on ACT_RU_TASK(CREATE_TIME_);
 create index ACT_IDX_TASK_ASSIGNEE on ACT_RU_TASK(ASSIGNEE_);
@@ -237,6 +247,7 @@ create index ACT_IDX_VARIABLE_TASK_ID on ACT_RU_VARIABLE(TASK_ID_);
 create index ACT_IDX_INC_CONFIGURATION on ACT_RU_INCIDENT(CONFIGURATION_);
 create index ACT_IDX_JOB_PROCINST on ACT_RU_JOB(PROCESS_INSTANCE_ID_);
 create index ACT_IDX_METER_LOG on ACT_RU_METER_LOG(NAME_,TIMESTAMP_);
+create index ACT_IDX_EXT_TASK_TOPIC on ACT_RU_EXT_TASK(TOPIC_NAME_);
 
 create index ACT_IDX_BYTEAR_DEPL on ACT_GE_BYTEARRAY(DEPLOYMENT_ID_);
 alter table ACT_GE_BYTEARRAY
@@ -369,6 +380,11 @@ alter table ACT_RU_AUTHORIZATION
 alter table ACT_RU_VARIABLE
     add constraint ACT_UNIQ_VARIABLE
     unique (VAR_SCOPE_, NAME_);
+
+alter table ACT_RU_EXT_TASK
+    add constraint ACT_FK_EXT_TASK_EXE 
+    foreign key (EXECUTION_ID_) 
+    references ACT_RU_EXECUTION (ID_);
 
 -- indexes for deadlock problems - https://app.camunda.com/jira/browse/CAM-2567 --
 create index ACT_IDX_INC_CAUSEINCID on ACT_RU_INCIDENT(CAUSE_INCIDENT_ID_);

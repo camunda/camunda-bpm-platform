@@ -49,6 +49,7 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.EventBasedGatewayActivityBehavi
 import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessStartEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ExclusiveGatewayActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.ExternalTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.InclusiveGatewayActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateCatchEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateCatchLinkEventActivityBehavior;
@@ -1930,6 +1931,8 @@ public class BpmnParse extends Parse {
         parseEmailServiceTask(activity, serviceTaskElement, parseFieldDeclarations(serviceTaskElement));
       } else if (type.equalsIgnoreCase("shell")) {
         parseShellServiceTask(activity, serviceTaskElement, parseFieldDeclarations(serviceTaskElement));
+      } else if (type.equalsIgnoreCase("external")) {
+        parseExternalServiceTask(activity, serviceTaskElement);
       } else {
         addError("Invalid usage of type attribute on " + elementName + ": '" + type + "'", serviceTaskElement);
       }
@@ -2168,6 +2171,18 @@ public class BpmnParse extends Parse {
   protected void parseShellServiceTask(ActivityImpl activity, Element serviceTaskElement, List<FieldDeclaration> fieldDeclarations) {
     validateFieldDeclarationsForShell(serviceTaskElement, fieldDeclarations);
     activity.setActivityBehavior((ActivityBehavior) instantiateDelegate(ShellActivityBehavior.class, fieldDeclarations));
+  }
+
+  protected void parseExternalServiceTask(ActivityImpl activity, Element serviceTaskElement) {
+    activity.setScope(true);
+
+    String topicName = serviceTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "topic");
+
+    if (topicName == null) {
+      addError("External tasks must specify a 'topic' attribute in the camunda namespace", serviceTaskElement);
+    }
+
+    activity.setActivityBehavior(new ExternalTaskActivityBehavior(topicName));
   }
 
   protected void validateFieldDeclarationsForEmail(Element serviceTaskElement, List<FieldDeclaration> fieldDeclarations) {

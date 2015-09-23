@@ -90,6 +90,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   public static final int VARIABLES_STATE_BIT = 5;
   public static final int SUB_PROCESS_INSTANCE_STATE_BIT = 6;
   public static final int SUB_CASE_INSTANCE_STATE_BIT = 7;
+  public static final int EXTERNAL_TASKS_BIT = 8;
 
   // current position /////////////////////////////////////////////////////////
 
@@ -136,6 +137,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   protected transient List<EventSubscriptionEntity> eventSubscriptions;
   protected transient List<JobEntity> jobs;
   protected transient List<TaskEntity> tasks;
+  protected transient List<ExternalTaskEntity> externalTasks;
   protected transient List<IncidentEntity> incidents;
   protected int cachedEntityState;
 
@@ -356,6 +358,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     execution.eventSubscriptions = new ArrayList<EventSubscriptionEntity>();
     execution.jobs = new ArrayList<JobEntity>();
     execution.tasks = new ArrayList<TaskEntity>();
+    execution.externalTasks = new ArrayList<ExternalTaskEntity>();
     execution.incidents = new ArrayList<IncidentEntity>();
 
     // Cached entity-state initialized to null, all bits are zero, indicating NO
@@ -421,6 +424,9 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
     // delete all the tasks
     removeTasks(null);
+
+    // delete external tasks
+    removeExternalTasks();
 
     // remove all jobs
     removeJobs();
@@ -894,7 +900,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
   }
 
-  private void removeTasks(String reason) {
+  protected void removeTasks(String reason) {
     if (reason == null) {
       reason = TaskEntity.DELETE_REASON_DELETED;
     }
@@ -913,6 +919,12 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
   }
 
+  protected void removeExternalTasks() {
+    for (ExternalTaskEntity externalTask : getExternalTasks()) {
+      externalTask.delete();
+    }
+  }
+
   public ExecutionEntity getReplacedBy() {
     return (ExecutionEntity) replacedBy;
   }
@@ -922,6 +934,8 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
     // update the related tasks
     replacedExecution.moveTasksTo(this);
+
+    replacedExecution.moveExternalTasksTo(this);
 
     // update those jobs that are directly related to the argument execution's
     // current activity
@@ -961,6 +975,17 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       other.addTask(task);
     }
     getTasksInternal().clear();
+  }
+
+  protected void moveExternalTasksTo(ExecutionEntity other) {
+    for (ExternalTaskEntity externalTask : getExternalTasksInternal()) {
+      externalTask.setExecutionId(other.getId());
+      externalTask.setExecution(other);
+
+      other.addExternalTask(externalTask);
+    }
+
+    getExternalTasksInternal().clear();
   }
 
   protected void moveActivityLocalJobsTo(ExecutionEntity other) {
@@ -1340,6 +1365,31 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     getTasksInternal().remove(task);
   }
 
+  // external tasks
+
+  protected void ensureExternalTasksInitialized() {
+    if (externalTasks == null) {
+      externalTasks = (List) Context.getCommandContext().getExternalTaskManager().findExternalTasksByExecutionId(id);
+    }
+  }
+
+  protected List<ExternalTaskEntity> getExternalTasksInternal() {
+    ensureExternalTasksInitialized();
+    return externalTasks;
+  }
+
+  public void addExternalTask(ExternalTaskEntity externalTask) {
+    getExternalTasksInternal().add(externalTask);
+  }
+
+  public void removeExternalTask(ExternalTaskEntity externalTask) {
+    getExternalTasksInternal().remove(externalTask);
+  }
+
+  public List<ExternalTaskEntity> getExternalTasks() {
+    return new ArrayList<ExternalTaskEntity>(getExternalTasksInternal());
+  }
+
   // variables /////////////////////////////////////////////////////////
 
   protected CoreVariableStore getVariableStore() {
@@ -1369,6 +1419,9 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     if (variableStore.getVariableInstancesWithoutInitialization() == null && !BitMaskUtil.isBitOn(cachedEntityState, VARIABLES_STATE_BIT)) {
       variableStore.setVariableInstances(new HashMap<String, VariableInstanceEntity>());
     }
+    if (externalTasks == null && !BitMaskUtil.isBitOn(cachedEntityState, EXTERNAL_TASKS_BIT)) {
+      externalTasks = new ArrayList<ExternalTaskEntity>();
+    }
     shouldQueryForSubprocessInstance = BitMaskUtil.isBitOn(cachedEntityState, SUB_PROCESS_INSTANCE_STATE_BIT);
     shouldQueryForSubCaseInstance = BitMaskUtil.isBitOn(cachedEntityState, SUB_CASE_INSTANCE_STATE_BIT);
   }
@@ -1387,6 +1440,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     cachedEntityState = BitMaskUtil.setBit(cachedEntityState, VARIABLES_STATE_BIT, (variableInstances == null || variableInstances.size() > 0));
     cachedEntityState = BitMaskUtil.setBit(cachedEntityState, SUB_PROCESS_INSTANCE_STATE_BIT, shouldQueryForSubprocessInstance);
     cachedEntityState = BitMaskUtil.setBit(cachedEntityState, SUB_CASE_INSTANCE_STATE_BIT, shouldQueryForSubCaseInstance);
+    cachedEntityState = BitMaskUtil.setBit(cachedEntityState, EXTERNAL_TASKS_BIT, (externalTasks == null || externalTasks.size() > 0));
 
     return cachedEntityState;
   }

@@ -14,16 +14,17 @@
 package org.camunda.bpm.engine.impl.test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 
+import junit.framework.AssertionFailedError;
+
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.CaseService;
+import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
@@ -36,14 +37,7 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
-import org.camunda.bpm.engine.impl.db.PersistenceSession;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
-import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
-import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.LogUtil.ThreadLogMode;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
@@ -52,10 +46,6 @@ import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.camunda.bpm.model.cmmn.CmmnModelInstance;
-import org.junit.Assert;
-
-import junit.framework.AssertionFailedError;
 
 
 /**
@@ -86,6 +76,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
   protected AuthorizationService authorizationService;
   protected CaseService caseService;
   protected FilterService filterService;
+  protected ExternalTaskService externalTaskService;
 
   protected abstract void initializeProcessEngine();
 
@@ -144,6 +135,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     authorizationService = processEngine.getAuthorizationService();
     caseService = processEngine.getCaseService();
     filterService = processEngine.getFilterService();
+    externalTaskService = processEngine.getExternalTaskService();
   }
 
   protected void clearServiceReferences() {
@@ -158,6 +150,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     authorizationService = null;
     caseService = null;
     filterService = null;
+    externalTaskService = null;
   }
 
   public void assertProcessEnded(final String processInstanceId) {

@@ -212,4 +212,17 @@ public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTestCa
 
   }
 
+  @Deployment
+  public void testExecutionExternalTask() {
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+
+    ExecutionEntity execution = (ExecutionEntity) runtimeService
+        .createExecutionQuery()
+        .activityId("externalTask")
+        .singleResult();
+
+    assertEquals(BitMaskUtil.getMaskForBit(ExecutionEntity.EXTERNAL_TASKS_BIT), execution.getCachedEntityStateRaw());
+
+  }
+
 }

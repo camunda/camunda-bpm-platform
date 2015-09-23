@@ -139,22 +139,36 @@ public final class EnsureUtil {
     }
   }
 
-  public static void ensurePositive(String variableName, Integer value) {
+  public static void ensurePositive(String variableName, Long value) {
     ensurePositive("", variableName, value);
   }
 
-  public static void ensurePositive(Class<? extends ProcessEngineException> exceptionClass, String variableName, Integer value) {
+  public static void ensurePositive(Class<? extends ProcessEngineException> exceptionClass, String variableName, Long value) {
     ensurePositive(exceptionClass, null, variableName, value);
   }
 
-  public static void ensurePositive(String message, String variableName, Integer value) {
+  public static void ensurePositive(String message, String variableName, Long value) {
     ensurePositive(ProcessEngineException.class, message, variableName, value);
   }
 
-  public static void ensurePositive(Class<? extends ProcessEngineException> exceptionClass, String message, String variableName, Integer value) {
+  public static void ensurePositive(Class<? extends ProcessEngineException> exceptionClass, String message, String variableName, Long value) {
     ensureNotNull(exceptionClass, variableName, value);
     if (value <= 0) {
       throw generateException(exceptionClass, message, variableName, "is not positive");
+    }
+  }
+
+  public static void ensureGreaterThanOrEqual(String variableName, int value1, int value2) {
+    ensureGreaterThanOrEqual("", variableName, value1, value2);
+  }
+
+  public static void ensureGreaterThanOrEqual(String message, String variableName, int value1, int value2) {
+    ensureGreaterThanOrEqual(ProcessEngineException.class, message, variableName, value1, value2);
+  }
+
+  public static void ensureGreaterThanOrEqual(Class<? extends ProcessEngineException> exceptionClass, String message, String variableName, int value1, int value2) {
+    if (value1 < value2) {
+      throw generateException(exceptionClass, message, variableName, "is not greater than or equal to " + value2);
     }
   }
 

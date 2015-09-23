@@ -52,6 +52,7 @@ import org.camunda.bpm.dmn.scriptengine.DmnScriptEngineFactory;
 import org.camunda.bpm.engine.ArtifactFactory;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.CaseService;
+import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
@@ -65,6 +66,7 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.AuthorizationServiceImpl;
 import org.camunda.bpm.engine.impl.DefaultArtifactFactory;
+import org.camunda.bpm.engine.impl.ExternalTaskServiceImpl;
 import org.camunda.bpm.engine.impl.FilterServiceImpl;
 import org.camunda.bpm.engine.impl.FormServiceImpl;
 import org.camunda.bpm.engine.impl.HistoryServiceImpl;
@@ -191,6 +193,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.CommentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskManager;
 import org.camunda.bpm.engine.impl.persistence.entity.FilterManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseActivityInstanceManager;
@@ -283,6 +286,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected AuthorizationService authorizationService = new AuthorizationServiceImpl();
   protected CaseService caseService = new CaseServiceImpl();
   protected FilterService filterService = new FilterServiceImpl();
+  protected ExternalTaskService externalTaskService = new ExternalTaskServiceImpl();
 
   // COMMAND EXECUTORS ////////////////////////////////////////////////////////
 
@@ -697,6 +701,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initService(authorizationService);
     initService(caseService);
     initService(filterService);
+    initService(externalTaskService);
   }
 
   protected void initService(Object service) {
@@ -930,6 +935,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       addSessionFactory(new GenericManagerFactory(AuthorizationManager.class));
       addSessionFactory(new GenericManagerFactory(FilterManager.class));
       addSessionFactory(new GenericManagerFactory(MeterLogManager.class));
+      addSessionFactory(new GenericManagerFactory(ExternalTaskManager.class));
 
       addSessionFactory(new GenericManagerFactory(CaseDefinitionManager.class));
       addSessionFactory(new GenericManagerFactory(CaseExecutionManager.class));
@@ -1762,6 +1768,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setFilterService(FilterService filterService) {
     this.filterService = filterService;
+  }
+
+  public ExternalTaskService getExternalTaskService() {
+    return externalTaskService;
+  }
+
+  public void setExternalTaskService(ExternalTaskService externalTaskService) {
+    this.externalTaskService = externalTaskService;
   }
 
   public Map<Class< ? >, SessionFactory> getSessionFactories() {

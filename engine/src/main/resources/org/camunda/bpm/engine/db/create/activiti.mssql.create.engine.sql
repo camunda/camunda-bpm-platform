@@ -227,6 +227,16 @@ create table ACT_RU_METER_LOG (
   primary key (ID_)
 );
 
+create table ACT_RU_EXT_TASK (
+  ID_ nvarchar(64) not null,
+  REV_ integer not null,
+  WORKER_ID_ nvarchar(255),
+  TOPIC_NAME_ nvarchar(255),
+  LOCK_EXP_TIME_ datetime2,
+  EXECUTION_ID_ nvarchar(64),
+  primary key (ID_)
+);
+
 create index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION(BUSINESS_KEY_);
 create index ACT_IDX_TASK_CREATE on ACT_RU_TASK(CREATE_TIME_);
 create index ACT_IDX_TASK_ASSIGNEE on ACT_RU_TASK(ASSIGNEE_);
@@ -241,6 +251,7 @@ create unique index ACT_UNIQ_AUTH_USER on ACT_RU_AUTHORIZATION (TYPE_,USER_ID_,R
 create unique index ACT_UNIQ_AUTH_GROUP on ACT_RU_AUTHORIZATION (TYPE_,GROUP_ID_,RESOURCE_TYPE_,RESOURCE_ID_) where GROUP_ID_ is not null;
 create unique index ACT_UNIQ_VARIABLE on ACT_RU_VARIABLE(VAR_SCOPE_, NAME_);
 create index ACT_IDX_METER_LOG on ACT_RU_METER_LOG(NAME_,TIMESTAMP_);
+create index ACT_IDX_EXT_TASK_TOPIC on ACT_RU_EXT_TASK(TOPIC_NAME_);
 
 alter table ACT_GE_BYTEARRAY
     add constraint ACT_FK_BYTEARR_DEPL 
@@ -340,6 +351,11 @@ alter table ACT_RU_INCIDENT
     add constraint ACT_FK_INC_RCAUSE 
     foreign key (ROOT_CAUSE_INCIDENT_ID_) 
     references ACT_RU_INCIDENT (ID_);
+    
+alter table ACT_RU_EXT_TASK
+    add constraint ACT_FK_EXT_TASK_EXE 
+    foreign key (EXECUTION_ID_) 
+    references ACT_RU_EXECUTION (ID_);
 
 -- indexes for concurrency problems - https://app.camunda.com/jira/browse/CAM-1646 --
 create index ACT_IDX_EXECUTION_PROC on ACT_RU_EXECUTION(PROC_DEF_ID_);

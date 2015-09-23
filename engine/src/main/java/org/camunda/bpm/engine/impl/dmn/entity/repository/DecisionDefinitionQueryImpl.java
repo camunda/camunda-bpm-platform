@@ -107,7 +107,7 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
 
   public DecisionDefinitionQuery decisionDefinitionVersion(Integer decisionDefinitionVersion) {
     ensureNotNull(NotValidException.class, "version", decisionDefinitionVersion);
-    ensurePositive(NotValidException.class, "version", decisionDefinitionVersion);
+    ensurePositive(NotValidException.class, "version", decisionDefinitionVersion.longValue());
     this.version = decisionDefinitionVersion;
     return this;
   }
