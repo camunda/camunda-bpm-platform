@@ -9,7 +9,7 @@ define([
     ViewsProvider.registerDefaultView('cockpit.dashboard', {
       id: 'decision-list',
       label: 'Deployed Decision Tables',
-      dashboardMenuLabel: 'DMN Tables',
+      dashboardMenuLabel: 'DMN Decisions',
       template: template,
       controller: [
               '$scope', 'camAPI',
