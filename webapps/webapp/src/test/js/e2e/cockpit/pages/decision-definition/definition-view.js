@@ -7,11 +7,7 @@ module.exports = Base.extend({
   url: '/camunda/app/cockpit/default/#/decision-definition/:decision',
 
   pageHeader: function() {
-    return element(by.binding('decisionDefinition.key'));
-  },
-
-  fullPageHeaderDecisionDefinitionName: function() {
-    return this.pageHeader().getText();
+    return element(by.css('.ctn-header h1'));
   },
 
   pageHeaderDecisionDefinitionName: function() {
