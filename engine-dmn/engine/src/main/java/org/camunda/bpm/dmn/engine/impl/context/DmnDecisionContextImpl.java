@@ -300,7 +300,7 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
       return scriptEngine;
     }
     else {
-      throw LOG.noScriptEngineFoundForLanguage(expressionLanguage);
+      throw LOG.noScriptEngineFoundForLanguage(expressionLanguage, DEFAULT_SCRIPT_LANGUAGE);
     }
   }
 

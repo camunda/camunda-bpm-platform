@@ -20,7 +20,7 @@ Add the following Maven Coordinates to your project:
 <dependency>
   <groupId>org.camunda.bpm.dmn</groupId>
   <artifactId>camunda-engine-dmn</artifactId>
-  <version>${version.camunda}</versions>
+  <version>${version.camunda}</version>
 </dependency>
 ```
 
