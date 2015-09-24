@@ -2,139 +2,17 @@
 <div cam-widget-loader
      loading-state="{{ loadingState }}"
      text-empty="No process variables">
-  <table class="variable-instances-tab cam-table">
-    <thead>
-      <tr>
-        <th class="variable-name">Name</th>
-        <th class="variable-value">Value</th>
-        <th class="variable-type">Type</th>
-        <th class="variable-scope">Scope</th>
-      </tr>
-    </thead>
+  <!-- <div cam-widget-debug debugged="variables"></div> -->
 
-    <tbody>
-      <tr ng-repeat="variable in variables"
-          data-variable-name="{{ variable.name }}"
-          data-variable-type="{{ variable.value.type }}"
-          ng-class="'variable-type-' + variable.value.type + (variable.inEditMode ? ' editing' : '')">
-        <td class="variable-name">
-          {{ variable.name }}
-        </td>
+  <div cam-widget-variables-table
+       on-save="saveVariable"
+       on-edit="editVariable"
+       on-upload="uploadVariable"
+       on-delete="deleteVariable"
+       cam-variables="variables"
+       cam-editable="['type', 'value']"
+       cam-headers="{ name: 'Name', value: 'Value', type: 'Type', scope: 'Scope' }"></div>
 
-        <td class="variable-value">
-          <div ng-if="isPrimitive(variable) && !variable.inEditMode && !variable.errorMessage">
-            {{ variable.value }}
-            <span ng-if="isEditable(variable)"
-                  class="edit-toggle"
-                  ng-click="editVariable(variable)">
-              <span class="glyphicon glyphicon-pencil"></span>
-            </span>
-          </div>
-
-          <div ng-if="!!variable.errorMessage" class="text-muted">
-            <span
-              tooltip="Object which cannot be de-serialized"
-              tooltip-placement="right">
-                Serialized Java Object
-            </span>
-          </div>
-
-          <!-- binary variables -->
-          <div ng-if="isBinary(variable)">
-            <a class="text-muted"
-               href="{{getBinaryVariableDownloadLink(variable)}}"
-               target="_blank"
-               tooltip="Click to Download"
-               tooltip-placement="right">
-              Binary Content
-            </a>
-            <a class="edit-toggle"
-               href
-               ng-click="openUploadDialog(variable)"
-               tooltip="Upload"
-               tooltip-placement="right">
-              <span class="glyphicon glyphicon-upload"></span>
-            </a>
-          </div>
-
-          <!-- object variable -->
-          <div ng-if="isObject(variable) && !variable.errorMessage">
-            <a class="text-muted"
-               ng-click="openInspectDialog(variable)"
-               href
-               tooltip="Click to Inspect"
-               tooltip-placement="right">
-              {{ variable.valueInfo.objectTypeName }}
-            </a>
-          </div>
-
-          <form class="inline-edit"
-                name="editVariableForm"
-                ng-if="variable.inEditMode"
-                ng-submit="submit(variable, this.editVariableForm)"
-                novalidate
-                request-aware>
-
-            <fieldset>
-              <div variable="getCopy(variable.id)"
-                   inline-edit
-                   autofocus></div>
-            </fieldset>
-
-            <div class="inline-edit-footer">
-
-              <p class="invalid"
-                 ng-show="this.editVariableForm.editDateValue.$error.date">
-                Invalid date: The date should have the pattern 'yyyy-MM-ddTHH:mm:ss'.
-              </p>
-
-              <p class="invalid"
-                 ng-show="this.editVariableForm.editIntegerValue.$error.numeric || this.editVariableForm.editFloatValue.$error.numeric">
-                Invalid value: Only a {{ getCopy(variable.id).type }} value is allowed.
-              </p>
-
-              <p class="invalid"
-                 ng-show="getExceptionForVariableId(variable.id)">
-                The passed value could not be stored, see error message: {{ getExceptionForVariableId(variable.id).message }}.
-              </p>
-
-              <div class="btn-group">
-                <button type="submit"
-                        class="btn btn-sm btn-primary"
-                        ng-disabled="!isValid(this.editVariableForm)">
-                  <span class="glyphicon glyphicon-ok"></span>
-                </button>
-                <button type="button"
-                        class="btn btn-sm btn-default"
-                        ng-click="closeInPlaceEditing(variable)">
-                  <span class="glyphicon glyphicon-ban-circle"></span>
-                </button>
-              </div>
-            </div>
-
-          </form>
-        </td>
-
-        <td class="variable-type">
-          <select ng-show="variable.inEditMode"
-                  name="variableType"
-                  ng-options="variableType for variableType in variableTypes"
-                  ng-model="getCopy(variable.id).type"
-                  class="form-control select-variable-type">
-          </select>
-          <span ng-hide="variable.inEditMode">{{ variable.type }}</span>
-        </td>
-
-        <td class="variable-scope">
-          <a cam-select-activity-instance="variable.instance.id"
-             ng-href="#/process-instance/{{ processInstance.id }}?detailsTab=variables-tab&amp;activityInstanceIds={{ variable.instance.id }}"
-             title="{{ variable.instance.id }}">
-            {{ variable.instance.name }}
-          </a>
-        </td>
-      </tr>
-    </tbody>
-  </table>
 
   <pagination ng-if="pages.total > pages.size"
               class="pagination-sm"

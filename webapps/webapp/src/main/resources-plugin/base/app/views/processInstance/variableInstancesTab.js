@@ -1,12 +1,12 @@
 /* global define: false, angular: false */
-define(['angular', 'text!./variable-instance-upload-dialog.html', 'text!./variable-instance-inspect-dialog.html', 'text!./variable-instances-tab.html'],
-function(angular, uploadTemplate, inspectTemplate, instancesTemplate) {
+define(['text!./variable-instance-upload-dialog.html', 'text!./variable-instance-inspect-dialog.html', 'text!./variable-instances-tab.html'],
+function(uploadTemplate, inspectTemplate, instancesTemplate) {
   'use strict';
 
   return function(ngModule) {
     ngModule.controller('VariableInstancesController', [
-              '$scope', '$http', 'search', 'Uri', 'LocalExecutionVariableResource', 'Notifications', '$modal',
-      function($scope,   $http,   search,   Uri,   LocalExecutionVariableResource,   Notifications,   $modal) {
+              '$scope', '$sce', '$http', 'search', 'Uri', 'LocalExecutionVariableResource', 'Notifications', '$modal', '$q', 'camAPI',
+      function($scope,   $sce,   $http,   search,   Uri,   LocalExecutionVariableResource,   Notifications,   $modal,   $q,   camAPI) {
 
         // input: processInstance, processData
 
@@ -15,15 +15,7 @@ function(angular, uploadTemplate, inspectTemplate, instancesTemplate) {
             variableInstanceIdexceptionMessageMap,
             variableCopies;
 
-        $scope.variableTypes = [
-                              'String',
-                              'Boolean',
-                              'Short',
-                              'Integer',
-                              'Long',
-                              'Double',
-                              'Date'
-                            ];
+        var executionService = camAPI.resource('execution');
 
         var DEFAULT_PAGES = { size: 50, total: 0, current: 1 };
 
@@ -44,6 +36,114 @@ function(angular, uploadTemplate, inspectTemplate, instancesTemplate) {
 
           updateView(newFilter, instanceIdToInstanceMap);
         });
+
+        $scope.uploadVariable = function(info) {
+          var promise = $q.defer();
+          $modal.open({
+            resolve: {
+              variableInstance: function() { return info.variable; }
+            },
+            controller: 'VariableInstanceUploadController',
+            template: uploadTemplate
+          })
+          .result.then(function() {
+            // updated the variable, need to get the new data
+            // reject the promise anyway
+            promise.reject();
+
+            // but then update the filter to force re-get of variables
+            variableInstanceData.set('filter', angular.copy($scope.filter));
+          }, function() {
+            // did not update the variable, reject the promise
+            promise.reject();
+          });
+
+          return promise.promise;
+        };
+
+        $scope.deleteVariable = function(info) {
+          var promise = $q.defer();
+
+          executionService.deleteVariable({
+            id: info.variable.executionId,
+            varId: info.variable.name
+          }, function() {
+            promise.resolve(info.variable);
+          });
+
+          return promise.promise;
+        };
+
+        $scope.editVariable = function(info) {
+          var promise = $q.defer();
+
+          $modal.open({
+            template: inspectTemplate,
+
+            controller: 'VariableInstanceInspectController',
+
+            windowClass: 'cam-widget-variable-dialog',
+
+            resolve: {
+              variableInstance: function () { return info.variable; }
+            }
+          })
+          .result.then(function() {
+            // updated the variable, need to get the new data
+            // reject the promise anyway
+            promise.reject();
+
+            // but then update the filter to force re-get of variables
+            variableInstanceData.set('filter', angular.copy($scope.filter));
+          }, function() {
+            // did not update the variable, reject the promise
+            promise.reject();
+          });
+
+          return promise.promise;
+        };
+
+        $scope.saveVariable = function (info) {
+          var promise = $q.defer();
+          var variable = info.variable;
+          var modifiedVariable = {};
+
+          var newValue = variable.value;//$scope.getCopy(variable.id).value;
+          var newType = variable.type;//$scope.getCopy(variable.id).type;
+
+          var newVariable = { value: newValue, type: newType };
+          modifiedVariable[variable.name] = newVariable;
+
+          LocalExecutionVariableResource.updateVariables({
+            executionId: variable.executionId
+          }, {
+            modifications : modifiedVariable
+          }).$promise.then(
+            // success
+            function() {
+              Notifications.addMessage({
+                status: 'Variable',
+                message: 'The variable \'' + variable.name + '\' has been changed successfully.',
+                duration: 5000
+              });
+              angular.extend(variable, newVariable);
+              promise.resolve(info.variable);
+              // $scope.closeInPlaceEditing(variable);
+            },
+            // error
+            function (error) {
+              // set the exception
+              Notifications.addError({
+                status: 'Variable',
+                message: 'The variable \'' + variable.name + '\' could not be changed successfully.',
+                exclusive: true,
+                duration: 5000
+              });
+              variableInstanceIdexceptionMessageMap[variable.id] = error.data;
+              promise.reject();
+            });
+          return promise.promise;
+        };
 
         function updateView(newFilter, instanceIdToInstanceMap) {
           filter = $scope.filter = angular.copy(newFilter);
@@ -85,74 +185,39 @@ function(angular, uploadTemplate, inspectTemplate, instancesTemplate) {
 
           $http.post(Uri.appUri('engine://engine/:engine/variable-instance/'), params, { params: pagingParams }).success(function(data) {
 
-            angular.forEach(data, function(currentVariable) {
-              var instance = instanceIdToInstanceMap[currentVariable.activityInstanceId];
-              currentVariable.instance = instance;
+            $scope.variables = data.map(function (item) {
+              var instance = instanceIdToInstanceMap[item.activityInstanceId];
+              item.instance = instance;
+              variableCopies[item.id] = angular.copy(item);
 
-              // creates initially a copy of the current variable instance
-              variableCopies[currentVariable.id] = angular.copy(currentVariable);
+              return {
+                variable: {
+                  id:           item.id,
+                  name:         item.name,
+                  type:         item.type,
+                  value:        item.value,
+                  valueInfo:    item.valueInfo,
+                  executionId:  item.executionId
+                },
+                additions: {
+                  scope: $sce.trustAsHtml('<a cam-select-activity-instance="' +
+                                      instance.id +
+                                      '" href="#/process-instance/' +
+                                      processInstance.id +
+                                      '?detailsTab=variables-tab&activityInstanceIds=' +
+                                      instance.id +
+                                      '" title="' +
+                                      instance.id +
+                                      '">' +
+                                      instance.name +
+                                      '</a>')
+                }
+              };
             });
-            $scope.variables = data;
+
             $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
           });
         }
-
-        $scope.editVariable = function (variable) {
-          variable.inEditMode = true;
-        };
-
-        $scope.closeInPlaceEditing = function (variable) {
-          delete variable.inEditMode;
-
-          // clear the exception for the passed variable
-          variableInstanceIdexceptionMessageMap[variable.id] = null;
-
-          // reset the values of the copy
-          var copy = $scope.getCopy(variable.id);
-          copy.value = variable.value;
-          copy.type = variable.type;
-        };
-
-        var isValid = $scope.isValid = function (form) {
-          return !form.$invalid;
-        };
-
-        $scope.submit = function (variable, form) {
-          if (!isValid(form)) {
-            return;
-          }
-
-          var newValue = $scope.getCopy(variable.id).value,
-              newType = $scope.getCopy(variable.id).type;
-
-          // If the value did not change then there is nothing to do!
-          if (newValue === variable.value && newType === variable.type) {
-            $scope.closeInPlaceEditing(variable);
-            return;
-          }
-
-          var modifiedVariable = {};
-          var newVariable = { value: newValue, type: newType };
-          modifiedVariable[variable.name] = newVariable;
-
-          LocalExecutionVariableResource.updateVariables({ executionId: variable.executionId }, { modifications : modifiedVariable }).$promise.then(
-            // success
-            function() {
-              Notifications.addMessage({ status: 'Variable', message: 'The variable \'' + variable.name + '\' has been changed successfully.', duration: 5000 });
-              angular.extend(variable, newVariable);
-              $scope.closeInPlaceEditing(variable);
-            },
-            // error
-            function (error) {
-              // set the exception
-              Notifications.addError({ status: 'Variable', message: 'The variable \'' + variable.name + '\' could not be changed successfully.', exclusive: true, duration: 5000 });
-              variableInstanceIdexceptionMessageMap[variable.id] = error.data;
-            });
-        };
-
-        $scope.getExceptionForVariableId = function (variableId) {
-          return variableInstanceIdexceptionMessageMap[variableId];
-        };
 
         $scope.getCopy = function (variableId) {
           var copy = variableCopies[variableId];
@@ -162,68 +227,8 @@ function(angular, uploadTemplate, inspectTemplate, instancesTemplate) {
           return copy;
         };
 
-        var isBoolean = $scope.isBoolean = function (variable) {
-          return variable.type === 'boolean' || variable.type === 'Boolean';
-        };
-
-        var isInteger = $scope.isInteger = function (variable) {
-          return variable.type === 'integer' || variable.type === 'Integer';
-        };
-
-        var isShort = $scope.isShort = function (variable) {
-          return variable.type === 'short' || variable.type === 'Short';
-        };
-
-        var isLong = $scope.isLong = function (variable) {
-          return variable.type === 'long' || variable.type === 'Long';
-        };
-
-        var isDouble = $scope.isDouble = function (variable) {
-          return variable.type === 'double' || variable.type === 'Double';
-        };
-
-        var isFloat = $scope.isFloat = function (variable) {
-          return variable.type === 'float' || variable.type === 'Float';
-        };
-
-        var isString = $scope.isString = function (variable) {
-          return variable.type === 'string' || variable.type === 'String';
-        };
-
-        var isDate = $scope.isDate = function (variable) {
-          return variable.type === 'date' || variable.type === 'Date';
-        };
-
         var isNull = $scope.isNull = function (variable) {
           return variable.type === 'null' || variable.type === 'Null';
-        };
-
-        var isBinary = $scope.isBinary = function (variable) {
-          return variable.type === 'bytes' || variable.type === 'Bytes';
-        };
-
-        var isObject = $scope.isObject = function (variable) {
-          return variable.type === 'object' || variable.type === 'Object';
-        };
-
-        var isPrimitive = $scope.isPrimitive = function (variable) {
-          return isInteger(variable) ||
-            isShort(variable) ||
-            isLong(variable) ||
-            isDouble(variable) ||
-            isFloat(variable) ||
-            isString(variable) ||
-            isDate(variable) ||
-            isBoolean(variable) ||
-            isNull(variable);
-        };
-
-        $scope.isEditable = function (param) {
-          return !isObject(param) && !isBinary(param);
-        };
-
-        $scope.isDateValueValid = function (param) {
-          // console.log(param);
         };
 
         $scope.getBinaryVariableDownloadLink = function (variable) {
@@ -267,6 +272,4 @@ function(angular, uploadTemplate, inspectTemplate, instancesTemplate) {
       Configuration.$inject = ['ViewsProvider'];
       ngModule.config(Configuration);
   };
-
-
 });
