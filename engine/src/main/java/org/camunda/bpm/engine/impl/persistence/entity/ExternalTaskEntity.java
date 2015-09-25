@@ -149,5 +149,8 @@ public class ExternalTaskEntity implements DbEntity, HasDbRevision {
         + ", executionId=" + executionId + "]";
   }
 
-
+  public void unlock() {
+    workerId = null;
+    lockExpirationTime = null;
+  }
 }

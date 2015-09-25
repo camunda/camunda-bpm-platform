@@ -603,6 +603,48 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(processInstance.getId());
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testUnlock() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+      .topic(TOPIC_NAME, LOCK_TIME)
+      .execute();
+
+    LockedExternalTask task = externalTasks.get(0);
+
+    // when unlocking the task
+    externalTaskService.unlock(task.getId());
+
+    // then it can be acquired again
+    externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+      .topic(TOPIC_NAME, LOCK_TIME)
+      .execute();
+
+    assertEquals(1, externalTasks.size());
+    LockedExternalTask reAcquiredTask = externalTasks.get(0);
+    assertEquals(task.getId(), reAcquiredTask.getId());
+  }
+
+  public void testUnlockNullTaskId() {
+    try {
+      externalTaskService.unlock(null);
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("externalTaskId is null", e.getMessage());
+    }
+  }
+
+  public void testUnlockNonExistingTask() {
+    try {
+      externalTaskService.unlock("nonExistingId");
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Cannot find external task with id nonExistingId", e.getMessage());
+    }
+  }
+
   protected Date nowPlus(long millis) {
     return new Date(ClockUtil.getCurrentTime().getTime() + millis);
   }

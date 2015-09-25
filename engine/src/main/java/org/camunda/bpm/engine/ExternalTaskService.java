@@ -74,4 +74,11 @@ public interface ExternalTaskService {
    * @throws BadUserRequestException if the task is assigned to a different worker
    */
   public void complete(String externalTaskId, String workerId, Map<String, Object> variables);
+
+  /**
+   * Unlocks an external task instance.
+   *
+   * @param externalTaskId the id of the task to unlock
+   */
+  public void unlock(String externalTaskId);
 }

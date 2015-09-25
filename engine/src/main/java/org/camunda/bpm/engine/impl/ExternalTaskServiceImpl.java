@@ -17,6 +17,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
 import org.camunda.bpm.engine.impl.cmd.CompleteExternalTaskCmd;
+import org.camunda.bpm.engine.impl.cmd.UnlockExternalTaskCmd;
 import org.camunda.bpm.engine.impl.externaltask.ExternalTaskQueryBuilderImpl;
 
 /**
@@ -36,6 +37,11 @@ public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTask
 
   public void complete(String externalTaskId, String workerId, Map<String, Object> variables) {
     commandExecutor.execute(new CompleteExternalTaskCmd(externalTaskId, workerId, variables));
+  }
+
+  public void unlock(String externalTaskId) {
+    commandExecutor.execute(new UnlockExternalTaskCmd(externalTaskId));
+
   }
 
 }
