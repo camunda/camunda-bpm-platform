@@ -55,7 +55,22 @@
     </plugins>
   </process-engine>
 
-  <process-archive name="test-processes">
-
+  <process-archive name="first-test-processes">
+    <properties>
+      <property name="resourceRootPath">pa:pa1</property>
+    </properties>
   </process-archive>
+  
+  <process-archive name="second-test-processes">
+    <properties>
+      <property name="resourceRootPath">pa:pa2</property>
+    </properties>
+  </process-archive>
+
+  <process-archive name="third-test-processes">
+    <properties>
+      <property name="resourceRootPath">pa:pa3</property>
+    </properties>
+  </process-archive>
+
 </process-application>
