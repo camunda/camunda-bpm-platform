@@ -38,6 +38,7 @@ exports.config = {
     'cockpit/specs/process-definition-filter-spec.js',
     'cockpit/specs/variable-spec.js',
     'cockpit/specs/suspension-spec.js',
+    'cockpit/specs/repository-spec.js',
     'tasklist/specs/filter-basic-spec.js',
     'tasklist/specs/filter-permissions-spec.js',
     'tasklist/specs/filter-criteria-spec.js',
