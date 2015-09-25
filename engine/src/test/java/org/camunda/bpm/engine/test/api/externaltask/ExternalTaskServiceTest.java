@@ -250,6 +250,91 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     assertTrue(task.getVariables().isEmpty());
   }
 
+  @Deployment
+  public void testFetchMultipleTopics() {
+    // given a process instance with external tasks for topics "topic1", "topic2", and "topic3"
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess");
+
+    // when fetching tasks for two topics
+    List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+      .topic("topic1", LOCK_TIME)
+      .topic("topic2", LOCK_TIME * 2)
+      .execute();
+
+    // then those two tasks are locked
+    assertEquals(2, tasks.size());
+    LockedExternalTask topic1Task = "topic1".equals(tasks.get(0).getTopicName()) ? tasks.get(0) : tasks.get(1);
+    LockedExternalTask topic2Task = "topic2".equals(tasks.get(0).getTopicName()) ? tasks.get(0) : tasks.get(1);
+
+    assertEquals("topic1", topic1Task.getTopicName());
+    assertEquals(nowPlus(LOCK_TIME), topic1Task.getLockExpirationTime());
+
+    assertEquals("topic2", topic2Task.getTopicName());
+    assertEquals(nowPlus(LOCK_TIME * 2), topic2Task.getLockExpirationTime());
+
+    // and the third task can still be fetched
+    tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+      .topic("topic1", LOCK_TIME)
+      .topic("topic2", LOCK_TIME * 2)
+      .topic("topic3", LOCK_TIME * 3)
+      .execute();
+
+    assertEquals(1, tasks.size());
+
+    LockedExternalTask topic3Task = tasks.get(0);
+    assertEquals("topic3", topic3Task.getTopicName());
+    assertEquals(nowPlus(LOCK_TIME * 3), topic3Task.getLockExpirationTime());
+  }
+
+  @Deployment
+  public void testFetchMultipleTopicsWithVariables() {
+    // given a process instance with external tasks for topics "topic1" and "topic2"
+    // both have local variables "var1" and "var2"
+    runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess",
+        Variables.createVariables().putValue("var1", 0).putValue("var2", 0));
+
+    // when
+    List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+      .topic("topic1", LOCK_TIME).variables("var1", "var2")
+      .topic("topic2", LOCK_TIME).variables("var1")
+      .execute();
+
+    LockedExternalTask topic1Task = "topic1".equals(tasks.get(0).getTopicName()) ? tasks.get(0) : tasks.get(1);
+    LockedExternalTask topic2Task = "topic2".equals(tasks.get(0).getTopicName()) ? tasks.get(0) : tasks.get(1);
+
+    assertEquals("topic1", topic1Task.getTopicName());
+    assertEquals("topic2", topic2Task.getTopicName());
+
+    // then the correct variables have been fetched
+    VariableMap topic1Variables = topic1Task.getVariables();
+    assertEquals(2, topic1Variables.size());
+    assertEquals(1L, topic1Variables.get("var1"));
+    assertEquals(1L, topic1Variables.get("var2"));
+
+    VariableMap topic2Variables = topic2Task.getVariables();
+    assertEquals(1, topic2Variables.size());
+    assertEquals(2L, topic2Variables.get("var1"));
+
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/ExternalTaskServiceTest.testFetchMultipleTopics.bpmn20.xml")
+  public void testFetchMultipleTopicsMaxTasks() {
+    // given
+    for (int i = 0; i < 10; i++) {
+      runtimeService.startProcessInstanceByKey("parallelExternalTaskProcess");
+    }
+
+    // when
+    List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+        .topic("topic1", LOCK_TIME)
+        .topic("topic2", LOCK_TIME)
+        .topic("topic3", LOCK_TIME)
+        .execute();
+
+    // then 5 tasks were returned in total, not per topic
+    assertEquals(5, tasks.size());
+  }
+
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml")
   public void testComplete() {
     // given
@@ -358,9 +443,6 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
   public void testLocking() {
-    // * test lock time in interface
-    // * during lock time, this task should not be returned in the query
-
     // given
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
 
