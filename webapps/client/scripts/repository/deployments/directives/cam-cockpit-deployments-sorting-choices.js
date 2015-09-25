@@ -1,0 +1,82 @@
+define([
+  'text!./cam-cockpit-deployments-sorting-choices.html',
+  'angular'
+], function(
+  template,
+  angular
+) {
+  'use strict';
+
+  return [function() {
+
+    return {
+
+      restrict: 'A',
+      scope: {
+        deploymentsData: '='
+      },
+
+      template: template,
+
+      controller: [
+        '$scope',
+        'search',
+      function (
+        $scope,
+        search
+      ) {
+
+        var deploymentsSortingData = $scope.deploymentsSortingData = $scope.deploymentsData.newChild($scope);
+
+        var uniqueProps = $scope.uniqueProps = {
+          id:               'Id',
+          name:             'Name',
+          deploymentTime:   'Deployment Time'
+        };
+       
+
+        // utilities /////////////////////////////////////////////////////////////////
+
+        var updateSilently = function(params) {
+          search.updateSilently(params);
+        }
+
+        var updateSorting = function(searchParam, value) {
+          var search = {};
+          search[searchParam] = value;
+          updateSilently(search);
+          deploymentsSortingData.changed('deploymentsSorting');
+        }
+
+        // observe data /////////////////////////////////////////////////////////////
+
+        deploymentsSortingData.observe('deploymentsSorting', function (pagination) {
+          $scope.sorting = angular.copy(pagination);
+        });
+
+
+        // label ///////////////////////////////////////////////////////////////////
+
+        $scope.byLabel = function(sortBy) {
+          return uniqueProps[sortBy];
+        };
+
+
+        // sort order //////////////////////////////////////////////////////////////
+
+        $scope.changeOrder = function() {
+          var value = $scope.sorting.sortOrder === 'asc' ? 'desc' : 'asc'
+          updateSorting('deploymentsSortOrder', value);
+        };
+
+
+        // sort by /////////////////////////////////////////////////////////////////
+
+        $scope.changeBy = function(by) {
+          updateSorting('deploymentsSortBy', by);
+        };
+
+      }]
+    };
+  }];
+});

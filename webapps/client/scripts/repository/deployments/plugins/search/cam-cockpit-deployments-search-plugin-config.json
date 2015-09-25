@@ -1,0 +1,87 @@
+{
+  "types": [
+    {
+      "id": {
+        "key": "id",
+        "value": "ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "name",
+        "value": "Name"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        },
+        {
+          "key": "Like",
+          "value": "like"
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "deploymentTime",
+        "value": "Deployment Time"
+      },
+      "operators": [
+        {
+          "key": "Before",
+          "value": "before"
+        },
+        {
+          "key": "After",
+          "value": "after"
+        }
+      ],
+      "allowDates": true,
+      "enforceDates": true
+    }
+  ],
+  "operators": {
+    "undefined":  [
+      {
+        "key": "eq",
+        "value": "="
+      }
+    ],
+    "string":     [
+      {
+        "key": "eq",
+        "value": "="
+      },
+      {
+        "key": "like",
+        "value": "like"
+      }
+    ],
+    "date":       [
+      {
+        "key": "lteq",
+        "value": "before"
+      },
+      {
+        "key": "gteq",
+        "value": "after"
+      }
+    ]
+  },
+  "tooltips": {
+    "inputPlaceholder": "Add criteria",
+    "invalid": "This search query is not valid",
+    "deleteSearch": "Remove search",
+    "type": "Type",
+    "name": "Property",
+    "operator": "Operator",
+    "value": "Value"
+  }
+}

@@ -61,6 +61,10 @@ module.exports = function(config, requireJsConfig) {
           name: 'util',
           location: './scripts/util',
           main: 'routeUtil'
+        },
+        {
+          name: 'repository',
+          location: './scripts/repository',
         }
       ])
   };

@@ -1,0 +1,335 @@
+@color-shift:                       4%;
+@column-left-bg:                    darken(@body-bg, @color-shift * 6.18);
+@column-center-bg:                  darken(@body-bg, @color-shift * (6.18 * 0.618));
+@column-right-bg:                   darken(@body-bg, @color-shift * 0);
+@column-top-height:                 22px;
+
+@hover-color-bg:                    mix(@column-center-bg, @column-right-bg, 50%);
+
+@layout-transition-timing:          ease-in-out;//cubic-bezier(0.49,-0.5,0.56,1.52);
+@layout-transition-duration:        0.536s;//2.18s;
+
+.gradient(@origin: top, @start: rgba(255, 255, 255, 0), @stop: rgba(255, 255, 255, 1)) {
+  background-color: @start;
+  background-image: -webkit-linear-gradient(@origin, @start, @stop);
+  background-image:    -moz-linear-gradient(@origin, @start, @stop);
+  background-image:      -o-linear-gradient(@origin, @start, @stop);
+  background-image:     -ms-linear-gradient(@origin, @start, @stop);
+  background-image:         linear-gradient(@origin, @start, @stop);
+}
+
+.layout(@left-width: 200px, @center-width: 300px) {
+
+  .ctn-content-container {
+
+    > .ctn-column {
+
+      &.deployments {
+        width: @left-width;
+      }
+
+      &.resources {
+        left: @left-width;
+        right: 100%;
+        margin-right: (0 - (@left-width + @center-width + (@grid-gutter-width * 0)));ground-color: mix(@brand-primary, @column-center-bg, 8%);
+      }
+
+      &.resource-details {
+        left: (@left-width + @center-width);
+        margin-left: 0;
+      }
+    }
+  }
+}
+
+[cam-repository] {
+
+  // S
+  @media (min-width: @screen-sm-min) and (max-width: @screen-sm-max) {
+    .layout(180px, 300px);
+  }
+
+
+  // M
+  @media (min-width: @screen-md-min) and (max-width: @screen-md-max) {
+    .layout(200px, 320px);
+  }
+
+
+  // L
+  @media (min-width: @screen-lg-min) {
+    .layout(220px, 360px);
+  }
+
+
+  .ctn-column {
+    overflow: auto;
+  }
+
+  
+  .ctn-content-container {
+    overflow: auto;
+    overflow-x: hidden;
+    border-top: 0;
+    top: -30px;
+  }
+
+  .cell {
+    &.top {
+      min-height: (@column-top-height + @grid-gutter-width);
+      padding: (@grid-gutter-width / 2);
+      margin: (0 - (@grid-gutter-width * 0.5))
+              (0 - (@grid-gutter-width * 0.5))
+              (@grid-gutter-width * 0.5)
+              (0 - (@grid-gutter-width * 0.5));
+
+
+      > button,
+      > div {
+        float: left;
+        vertical-align: middle;
+        margin-top: 0;
+        margin-bottom: 0;
+        padding: 0;
+        height: @column-top-height;
+        line-height: @column-top-height;
+      }
+    }
+  }
+
+  .ctn-column {
+    &.deployments {
+      z-index: 3;
+      background-color: @column-left-bg;
+      .cell.top {
+        background-color: mix(@brand-primary, @column-left-bg, 8%);
+      }
+
+      [cam-widget-search] {
+        position: relative;
+        z-index: 15;
+        padding-bottom: (@grid-gutter-width / 2);
+        overflow: visible;
+      }
+    }
+
+    &.resources {
+      z-index: 2;
+      background-color: @column-center-bg;
+      .cell.top {
+        background-color: mix(@brand-primary, @column-center-bg, 8%);
+      }
+    }
+
+    &.resource-details {
+      z-index: 3;
+      background-color: @column-right-bg;
+      .cell.top {
+        background-color: mix(@brand-primary, @column-right-bg, 8%);
+      }
+    }
+  }
+
+
+  .ctn-column {
+    transition: left @layout-transition-duration @layout-transition-timing,
+                right @layout-transition-duration @layout-transition-timing,
+                margin-left @layout-transition-duration @layout-transition-timing,
+                margin-right @layout-transition-duration @layout-transition-timing;
+
+    > .cell {
+      position: relative;
+      z-index: 1;
+      position: absolute;
+      top: (@column-top-height + @grid-gutter-width);
+      bottom: 0;
+      left: 0;
+      right: 0;
+
+      &.content {
+        padding: (@grid-gutter-width / 2);
+        transition: opacity @layout-transition-duration @layout-transition-timing;
+
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+    }
+  }
+
+  .cell.top {
+    z-index: 2;
+    top: 0;
+    bottom: auto;
+    overflow: visible;
+    margin: 0;
+
+    > *:last-child {
+      float: right;
+    }
+  }
+
+  section.ctn-column {
+    > .cell {
+      &.top {
+        .transition(height 0.218s ease);
+      }
+      &.content {
+        .transition(top 0.218s ease);
+      }
+    }
+  }
+}
+
+
+[cam-deployments] {
+
+  .deployment-wrapper {
+    position: relative;
+  }
+
+  .deployment {
+    margin: (@grid-gutter-width / 2) 0;
+    padding: 12px 0;
+
+    text-align: right;
+    background-color: @gray-lighter;
+    position: relative;
+    z-index: 1;
+
+    h4 {
+      cursor: pointer;
+      color: @gray-darker;
+      padding-left: (@grid-gutter-width / 2);
+      padding-right: (@grid-gutter-width / 2);
+      margin-bottom: 7px;
+      word-wrap: break-word;
+    }
+  }
+
+  .active > .deployment:after {
+    border-bottom: (@grid-gutter-width / 3) solid transparent;
+    border-right: (@grid-gutter-width / 3) solid @column-center-bg;
+    border-top: (@grid-gutter-width / 3) solid transparent;
+    content: ' ';
+    display: block;
+    height: 0px;
+    margin-top: -(@grid-gutter-width / 3);
+    position: absolute;
+    right: 0 - (@grid-gutter-width / 2);
+    top: 50%;
+    width: 0px;
+  }
+
+}
+
+
+[cam-resources] {
+
+  // NOTE: the .shutter is defined in the variables
+  ol.resources {
+    > li {
+      margin: 0;
+      border-top: 1px @line-style @line-color;
+      padding: (@grid-gutter-width / 2) 0;
+
+      min-height: 90px;
+      position: relative;
+
+      &:after {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: (0 - (@grid-gutter-width / 5));
+        right: (0 - (@grid-gutter-width / 2));
+        content: ' ';
+        z-index: 1;
+      }
+
+
+      &:hover {
+        &:after {
+          background-color: @hover-color-bg;
+        }
+
+        .shutter {
+          .gradient(top, fade(@hover-color-bg, 0), @hover-color-bg);
+        }
+
+        .names > h4 a {
+          display: inline-block;
+        }
+      }
+
+
+      &.active {
+        position: relative;
+        background-color: @column-right-bg;
+        overflow: visible;
+
+        &:after {
+          background-color: @column-right-bg;
+        }
+
+        .names {
+          font-style: italic;
+        }
+
+        .shutter {
+          .gradient(top, fade(@column-right-bg, 0), @column-right-bg);
+        }
+      }
+
+      > div {
+        position: relative;
+        z-index: 4;
+      }
+
+      .clickable {
+        cursor: pointer;
+        margin: (0 - (@grid-gutter-width / 2)) 0;
+        padding: (@grid-gutter-width / 2) 0;
+        &:focus {
+          outline: none;
+        }
+      }
+
+      .name > h4 {
+        line-height: 20px;
+        margin-top: 0;
+        outline: none;
+      }
+    }
+
+    &:focus {
+      outline: none;
+    }
+
+  }
+
+  div:focus,
+  &:focus {
+    outline: none;
+  }
+
+}
+
+[cam-resource] {
+  header {
+    position: relative;
+    z-index: 15;
+  }
+
+  .name {
+    h2 {
+      margin-top: 0;
+    }
+    h4:empty {
+      display: none;
+    }
+  }
+
+  .nav-tabs .glyphicon {
+    margin-left: 5px;
+  }
+
+}

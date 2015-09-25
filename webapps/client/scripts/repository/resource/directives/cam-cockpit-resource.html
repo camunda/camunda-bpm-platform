@@ -1,0 +1,46 @@
+<div ng-show="!state.$loaded"
+     class="loader">
+  <span class="animate-spin glyphicon glyphicon-refresh"></span>
+  Loading
+</div>
+
+<div ng-show="state.$loaded">
+
+  <div ng-hide="resource">
+    <div class="no-resource well">
+      <span class="glyphicon glyphicon-info-sign"></span>
+      Select a resource in the list of resources.
+    </div>
+  </div>
+
+  <section ng-if="resource" class="resource-card">
+    <header class="row">
+      <div class="col-xs-12">
+        <div class="names">
+          <h2 class="resource">{{ resource.name || resource.id }}</h2>
+        </div>
+
+        <div cam-resource-meta
+             resource-data="resourceData"></div>
+      </div>
+    </header>
+
+    <div class="row tabbed-content">
+
+      <div ng-show="resourceDetailTabs.length" class="col-xs-12">
+        <ul class="nav nav-tabs">
+          <li ng-class="{ active: selectedResourceDetailTab == resourceDetailTab }" ng-repeat="resourceDetailTab in resourceDetailTabs">
+            <a href ng-click="selectResourceDetailTab(resourceDetailTab)">{{ resourceDetailTab.label }}</a>
+          </li>
+        </ul>
+
+        <div class="tab-content">
+          <view provider="selectedResourceDetailTab" vars="resourceVars" />
+        </div>
+
+      </div>
+    </div>
+
+  </section>
+
+</div>

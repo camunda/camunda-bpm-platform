@@ -1,0 +1,43 @@
+<div ng-show="!state.$loaded && !state.$error"
+     class="loader">
+  <span class="animate-spin glyphicon glyphicon-refresh"></span>
+  Loading
+</div>
+
+<div ng-show="state.$error" class="alert alert-danger" role="alert">
+  <span class="glyphicon glyphicon-exclamation-sign"></span>
+  <strong class="status">Failure:</strong>
+  <span class="message">Loading the resources finished with failures. Try to refresh the page to try again.</span>
+</div>
+
+<div ng-show="state.$loaded && !state.$error">
+
+  <div ng-hide="resources.length"
+       class="well">
+    <span class="glyphicon glyphicon-info-sign"></span>
+    No resources available.
+  </div>
+
+  <div ng-show="resources.length"
+       tabindex="0"
+       ng-keydown="handleKeydown($event)">
+    <ol class="resources list-unstyled">
+      <li class="resource"
+          ng-repeat="(delta, resource) in resources"
+          ng-class="{active: currentResourceId === resource.id}">
+
+        <div class="clickable"
+             ng-click="focus($event, resource)">
+          <div class="names">
+            <h4 class="resource">
+              <a href
+                 ng-click="focus($event, resource)">
+                {{ resource.name || resource.id }}
+              </a>
+            </h4>
+          </div>
+       </div>
+      </li>
+    </ol>
+  </div>
+</div>

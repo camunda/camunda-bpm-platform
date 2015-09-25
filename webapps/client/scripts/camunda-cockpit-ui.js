@@ -1,4 +1,5 @@
 define('camunda-cockpit-ui', [
+  './repository/main',
   './directives/main',
   './filters/main',
   './pages/main',
@@ -32,6 +33,7 @@ define('camunda-cockpit-ui', [
       'ng',
       'ngResource',
       require('camunda-commons-ui').name,
+      require('./repository/main').name,
       require('./directives/main').name,
       require('./filters/main').name,
       require('./pages/main').name,
