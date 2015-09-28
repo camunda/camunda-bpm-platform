@@ -70,6 +70,7 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(TOPIC_NAME, externalTask.getTopicName());
     assertNull(externalTask.getWorkerId());
     assertNull(externalTask.getLockExpirationTime());
+    assertFalse(externalTask.isSuspended());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
@@ -381,6 +382,29 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     tasks = externalTaskService.createExternalTaskQuery().orderByLockExpirationTime().desc().list();
     assertEquals(10, tasks.size());
     verifySorting(tasks, inverted(externalTaskByLockExpirationTime()));
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testQueryBySuspensionState() {
+    // given
+    startInstancesByKey("oneExternalTaskProcess", 5);
+    suspendInstances(3);
+
+    // when
+    List<ExternalTask> suspendedTasks = externalTaskService.createExternalTaskQuery().suspended().list();
+    List<ExternalTask> activeTasks = externalTaskService.createExternalTaskQuery().active().list();
+
+    // then
+    assertEquals(3, suspendedTasks.size());
+    for (ExternalTask task : suspendedTasks) {
+      assertTrue(task.isSuspended());
+    }
+
+    assertEquals(2, activeTasks.size());
+    for (ExternalTask task : activeTasks) {
+      assertFalse(task.isSuspended());
+      assertFalse(suspendedTasks.contains(task));
+    }
   }
 
   protected List<ProcessInstance> startInstancesByKey(String processDefinitionKey, int number) {

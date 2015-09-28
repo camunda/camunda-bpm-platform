@@ -16,6 +16,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
@@ -62,20 +63,25 @@ public abstract class AbstractSetProcessInstanceStateCmd extends AbstractSetStat
   protected void updateSuspensionState(CommandContext commandContext, SuspensionState suspensionState) {
     ExecutionManager executionManager = commandContext.getExecutionManager();
     TaskManager taskManager = commandContext.getTaskManager();
+    ExternalTaskManager externalTaskManager = commandContext.getExternalTaskManager();
 
     if (processInstanceId != null) {
       executionManager.updateExecutionSuspensionStateByProcessInstanceId(processInstanceId, suspensionState);
       taskManager.updateTaskSuspensionStateByProcessInstanceId(processInstanceId, suspensionState);
+      externalTaskManager.updateExternalTaskSuspensionState(processInstanceId, null, null, suspensionState);
     } else
 
     if (processDefinitionId != null) {
       executionManager.updateExecutionSuspensionStateByProcessDefinitionId(processDefinitionId, suspensionState);
       taskManager.updateTaskSuspensionStateByProcessDefinitionId(processDefinitionId, suspensionState);
+      externalTaskManager.updateExternalTaskSuspensionState(null, processDefinitionId, null, suspensionState);
     } else
 
     if (processDefinitionKey != null) {
       executionManager.updateExecutionSuspensionStateByProcessDefinitionKey(processDefinitionKey, suspensionState);
       taskManager.updateTaskSuspensionStateByProcessDefinitionKey(processDefinitionKey, suspensionState);
+      externalTaskManager.updateExternalTaskSuspensionState(null, null, processDefinitionKey, suspensionState);
+
     }
   }
 

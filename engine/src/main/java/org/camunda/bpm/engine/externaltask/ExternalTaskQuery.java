@@ -75,6 +75,16 @@ public interface ExternalTaskQuery extends Query<ExternalTaskQuery, ExternalTask
   ExternalTaskQuery activityId(String activityId);
 
   /**
+   * Only select external tasks that are currently suspended
+   */
+  ExternalTaskQuery suspended();
+
+  /**
+   * Only select external tasks that are currently not suspended
+   */
+  ExternalTaskQuery active();
+
+  /**
    * Order by external task id (needs to be followed by {@link #asc()} or {@link #desc()}).
    */
   ExternalTaskQuery orderById();
@@ -99,5 +109,6 @@ public interface ExternalTaskQuery extends Query<ExternalTaskQuery, ExternalTask
    * Order by process definition key (needs to be followed by {@link #asc()} or {@link #desc()}).
    */
   ExternalTaskQuery orderByProcessDefinitionKey();
+
 
 }

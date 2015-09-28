@@ -34,5 +34,6 @@ public class EntityTypes {
   public static final String VARIABLE = "Variable";
   public static final String DEPLOYMENT = "Deployment";
   public static final String DECISION_DEFINITION = "DecisionDefinition";
+  public static final String EXTERNAL_TASK = "ExternalTask";
 
 }

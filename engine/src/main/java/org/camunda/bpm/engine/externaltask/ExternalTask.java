@@ -70,4 +70,10 @@ public interface ExternalTask {
    */
   String getProcessDefinitionKey();
 
+  /**
+   * @return true if the external task is suspended; a suspended external task
+   * cannot be completed, thereby preventing process continuation
+   */
+  boolean isSuspended();
+
 }

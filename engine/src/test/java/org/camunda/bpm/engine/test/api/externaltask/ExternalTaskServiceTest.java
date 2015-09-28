@@ -335,6 +335,32 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(5, tasks.size());
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testFetchSuspendedTask() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+
+    // when suspending the process instance
+    runtimeService.suspendProcessInstanceById(processInstance.getId());
+
+    // then the external task cannot be fetched
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+      .topic(TOPIC_NAME, LOCK_TIME)
+      .execute();
+
+    assertEquals(0, externalTasks.size());
+
+    // when activating the process instance
+    runtimeService.activateProcessInstanceById(processInstance.getId());
+
+    // then the task can be fetched
+    externalTasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    assertEquals(1, externalTasks.size());
+  }
+
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml")
   public void testComplete() {
     // given
@@ -439,6 +465,38 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {
       assertTextPresent("workerId is null", e.getMessage());
     }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testCompleteSuspendedTask() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    LockedExternalTask task = externalTasks.get(0);
+
+    // when suspending the process instance
+    runtimeService.suspendProcessInstanceById(processInstance.getId());
+
+    // then the external task cannot be completed
+    try {
+      externalTaskService.complete(task.getId(), WORKER_ID);
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("ExternalTask with id '" + task.getId() + "' is suspended", e.getMessage());
+    }
+
+    assertProcessNotEnded(processInstance.getId());
+
+    // when activating the process instance again
+    runtimeService.activateProcessInstanceById(processInstance.getId());
+
+    // then the task can be completed
+    externalTaskService.complete(task.getId(), WORKER_ID);
+
+    assertProcessEnded(processInstance.getId());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")

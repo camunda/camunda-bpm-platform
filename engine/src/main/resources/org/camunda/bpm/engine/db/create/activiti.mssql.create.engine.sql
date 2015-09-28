@@ -233,6 +233,7 @@ create table ACT_RU_EXT_TASK (
   WORKER_ID_ nvarchar(255),
   TOPIC_NAME_ nvarchar(255),
   LOCK_EXP_TIME_ datetime2,
+  SUSPENSION_STATE_ tinyint,
   EXECUTION_ID_ nvarchar(64),
   PROC_INST_ID_ nvarchar(64),
   PROC_DEF_ID_ nvarchar(64),

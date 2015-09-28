@@ -17,8 +17,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.externaltask.ExternalTask;
+import org.camunda.bpm.engine.EntityTypes;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
@@ -29,12 +32,16 @@ import org.camunda.bpm.engine.impl.util.EnsureUtil;
  */
 public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision {
 
+  protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
+
   protected String id;
   protected int revision;
+
   protected String topicName;
   protected String workerId;
   protected Date lockExpirationTime;
 
+  protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
   protected String executionId;
   protected String processInstanceId;
   protected String processDefinitionId;
@@ -43,6 +50,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   protected String activityInstanceId;
 
   protected ExecutionEntity execution;
+
 
   public String getId() {
     return id;
@@ -74,18 +82,6 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   public void setExecutionId(String executionId) {
     this.executionId = executionId;
   }
-  public String getProcessInstanceId() {
-    return processInstanceId;
-  }
-  public void setProcessInstanceId(String processInstanceId) {
-    this.processInstanceId = processInstanceId;
-  }
-  public String getProcessDefinitionId() {
-    return processDefinitionId;
-  }
-  public void setProcessDefinitionId(String processDefinitionId) {
-    this.processDefinitionId = processDefinitionId;
-  }
   public String getProcessDefinitionKey() {
     return processDefinitionKey;
   }
@@ -113,6 +109,27 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   public int getRevisionNext() {
     return revision + 1;
   }
+  public int getSuspensionState() {
+    return suspensionState;
+  }
+  public void setSuspensionState(int suspensionState) {
+    this.suspensionState = suspensionState;
+  }
+  public boolean isSuspended() {
+    return suspensionState == SuspensionState.SUSPENDED.getStateCode();
+  }
+  public String getProcessInstanceId() {
+    return processInstanceId;
+  }
+  public void setProcessInstanceId(String processInstanceId) {
+    this.processInstanceId = processInstanceId;
+  }
+  public String getProcessDefinitionId() {
+    return processDefinitionId;
+  }
+  public void setProcessDefinitionId(String processDefinitionId) {
+    this.processDefinitionId = processDefinitionId;
+  }
 
   public Object getPersistentState() {
     Map<String, Object> persistentState = new  HashMap<String, Object>();
@@ -125,6 +142,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     persistentState.put("processDefinitionKey", processDefinitionKey);
     persistentState.put("activityId", activityId);
     persistentState.put("activityInstanceId", activityInstanceId);
+    persistentState.put("suspensionState", suspensionState);
 
     return persistentState;
   }
@@ -146,6 +164,8 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   }
 
   public void complete(Map<String, Object> variables) {
+    ensureActive();
+
     ExecutionEntity associatedExecution = getExecution();
 
     if (variables != null) {
@@ -181,6 +201,12 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     }
   }
 
+  protected void ensureActive() {
+    if (suspensionState == SuspensionState.SUSPENDED.getStateCode()) {
+      throw LOG.suspendedEntityException(EntityTypes.EXTERNAL_TASK, id);
+    }
+  }
+
   public String toString() {
     return "ExternalTaskEntity ["
         + "id=" + id
@@ -203,11 +229,11 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     externalTask.setExecutionId(execution.getId());
     externalTask.setProcessInstanceId(execution.getProcessInstanceId());
     externalTask.setProcessDefinitionId(execution.getProcessDefinitionId());
+    externalTask.setActivityId(execution.getActivityId());
+    externalTask.setActivityInstanceId(execution.getActivityInstanceId());
 
     ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
     externalTask.setProcessDefinitionKey(processDefinition.getKey());
-    externalTask.setActivityId(execution.getActivityId());
-    externalTask.setActivityInstanceId(execution.getActivityInstanceId());
 
     externalTask.insert();
 

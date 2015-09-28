@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 /**
@@ -41,6 +42,7 @@ public class ExternalTaskQueryImpl extends AbstractQuery<ExternalTaskQuery, Exte
   protected String processInstanceId;
   protected String processDefinitionId;
   protected String activityId;
+  protected SuspensionState suspensionState;
 
   public ExternalTaskQueryImpl() {
   }
@@ -108,6 +110,16 @@ public class ExternalTaskQueryImpl extends AbstractQuery<ExternalTaskQuery, Exte
   public ExternalTaskQuery activityId(String activityId) {
     ensureNotNull("activityId", activityId);
     this.activityId = activityId;
+    return this;
+  }
+
+  public ExternalTaskQuery suspended() {
+    this.suspensionState = SuspensionState.SUSPENDED;
+    return this;
+  }
+
+  public ExternalTaskQuery active() {
+    this.suspensionState = SuspensionState.ACTIVE;
     return this;
   }
 
@@ -183,6 +195,10 @@ public class ExternalTaskQueryImpl extends AbstractQuery<ExternalTaskQuery, Exte
 
   public String getActivityId() {
     return activityId;
+  }
+
+  public SuspensionState getSuspensionState() {
+    return suspensionState;
   }
 
   public Date getNow() {

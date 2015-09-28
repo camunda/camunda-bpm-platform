@@ -65,4 +65,14 @@ public class ExternalTaskManager extends AbstractManager {
   public long findExternalTaskCountByQueryCriteria(ExternalTaskQueryImpl externalTaskQuery) {
     return (Long) getDbEntityManager().selectOne("selectExternalTaskCountByQueryCriteria", externalTaskQuery);
   }
+
+  public void updateExternalTaskSuspensionState(String processInstanceId,
+      String processDefinitionId, String processDefinitionKey, SuspensionState suspensionState) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("processInstanceId", processInstanceId);
+    parameters.put("processDefinitionId", processDefinitionId);
+    parameters.put("processDefinitionKey", processDefinitionKey);
+    parameters.put("suspensionState", suspensionState.getStateCode());
+    getDbEntityManager().update(ExternalTaskEntity.class, "updateExternalTaskSuspensionStateByParameters", parameters);
+  }
 }

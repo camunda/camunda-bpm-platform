@@ -20,6 +20,7 @@ import java.util.List;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.SuspendedEntityInteractionException;
+import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.test.TestHelper;
@@ -1985,4 +1986,105 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     }
   }
 
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+  "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml"})
+  public void testSuspensionByIdCascadesToExternalTasks() {
+    // given
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
+
+    ExternalTask task1 = externalTaskService.createExternalTaskQuery()
+        .processInstanceId(processInstance1.getId()).singleResult();
+    assertFalse(task1.isSuspended());
+
+    // when the process instance is suspended
+    runtimeService.suspendProcessInstanceById(processInstance1.getId());
+
+    // then the task is suspended
+    task1 = externalTaskService.createExternalTaskQuery()
+        .processInstanceId(processInstance1.getId()).singleResult();
+    assertTrue(task1.isSuspended());
+
+    // the other task is not
+    ExternalTask task2 = externalTaskService.createExternalTaskQuery()
+        .processInstanceId(processInstance2.getId()).singleResult();
+    assertFalse(task2.isSuspended());
+
+    // when it is activated again
+    runtimeService.activateProcessInstanceById(processInstance1.getId());
+
+    // then the task is activated too
+    task1 = externalTaskService.createExternalTaskQuery()
+        .processInstanceId(processInstance1.getId()).singleResult();
+    assertFalse(task1.isSuspended());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+  "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml"})
+  public void testSuspensionByProcessDefinitionIdCascadesToExternalTasks() {
+    // given
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
+
+    ExternalTask task1 = externalTaskService.createExternalTaskQuery()
+        .processInstanceId(processInstance1.getId()).singleResult();
+    assertFalse(task1.isSuspended());
+
+    // when the process instance is suspended
+    runtimeService.suspendProcessInstanceByProcessDefinitionId(processInstance1.getProcessDefinitionId());
+
+    // then the task is suspended
+    task1 = externalTaskService.createExternalTaskQuery()
+        .processInstanceId(processInstance1.getId()).singleResult();
+    assertTrue(task1.isSuspended());
+
+    // the other task is not
+    ExternalTask task2 = externalTaskService.createExternalTaskQuery()
+        .processInstanceId(processInstance2.getId()).singleResult();
+    assertFalse(task2.isSuspended());
+
+    // when it is activated again
+    runtimeService.activateProcessInstanceByProcessDefinitionId(processInstance1.getProcessDefinitionId());
+
+    // then the task is activated too
+    task1 = externalTaskService.createExternalTaskQuery()
+        .processInstanceId(processInstance1.getId()).singleResult();
+    assertFalse(task1.isSuspended());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml"})
+  public void testSuspensionByProcessDefinitionKeyCascadesToExternalTasks() {
+    // given
+    ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
+
+    ExternalTask task1 = externalTaskService.createExternalTaskQuery()
+        .processInstanceId(processInstance1.getId()).singleResult();
+    assertFalse(task1.isSuspended());
+
+    // when the process instance is suspended
+    runtimeService.suspendProcessInstanceByProcessDefinitionKey("oneExternalTaskProcess");
+
+    // then the task is suspended
+    task1 = externalTaskService.createExternalTaskQuery()
+        .processInstanceId(processInstance1.getId()).singleResult();
+    assertTrue(task1.isSuspended());
+
+    // the other task is not
+    ExternalTask task2 = externalTaskService.createExternalTaskQuery()
+        .processInstanceId(processInstance2.getId()).singleResult();
+    assertFalse(task2.isSuspended());
+
+    // when it is activated again
+    runtimeService.activateProcessInstanceByProcessDefinitionKey("oneExternalTaskProcess");
+
+    // then the task is activated too
+    task1 = externalTaskService.createExternalTaskQuery()
+        .processInstanceId(processInstance1.getId()).singleResult();
+    assertFalse(task1.isSuspended());
+
+    // db cleanup
+    TestHelper.clearOpLog(processEngineConfiguration);
+  }
 }
