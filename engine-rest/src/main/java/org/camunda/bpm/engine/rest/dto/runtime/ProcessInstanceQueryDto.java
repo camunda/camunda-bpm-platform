@@ -46,6 +46,7 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     VALID_SORT_BY_VALUES.add(SORT_BY_DEFINITION_ID_VALUE);
   }
 
+  private String deploymentId;
   private String processDefinitionKey;
   private String businessKey;
   private String caseInstanceId;
@@ -79,6 +80,11 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
   @CamundaQueryParam(value = "processInstanceIds", converter = StringSetConverter.class)
   public void setProcessInstanceIds(Set<String> processInstanceIds) {
 		this.processInstanceIds = processInstanceIds;
+  }
+
+  @CamundaQueryParam("deploymentId")
+  public void setDeploymentId(String deploymentId) {
+    this.deploymentId = deploymentId;
   }
 
   @CamundaQueryParam("processDefinitionKey")
@@ -174,6 +180,9 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     }
     if (processDefinitionKey != null) {
       query.processDefinitionKey(processDefinitionKey);
+    }
+    if (deploymentId != null) {
+      query.deploymentId(deploymentId);
     }
     if (businessKey != null) {
       query.processInstanceBusinessKey(businessKey);

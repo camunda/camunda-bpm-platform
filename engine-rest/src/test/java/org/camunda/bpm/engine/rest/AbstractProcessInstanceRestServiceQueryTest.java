@@ -198,6 +198,7 @@ public abstract class AbstractProcessInstanceRestServiceQueryTest extends
     verify(mockedQuery).processInstanceBusinessKey(queryParameters.get("businessKey"));
     verify(mockedQuery).processDefinitionKey(queryParameters.get("processDefinitionKey"));
     verify(mockedQuery).processDefinitionId(queryParameters.get("processDefinitionId"));
+    verify(mockedQuery).deploymentId(queryParameters.get("deploymentId"));
     verify(mockedQuery).superProcessInstanceId(queryParameters.get("superProcessInstance"));
     verify(mockedQuery).subProcessInstanceId(queryParameters.get("subProcessInstance"));
     verify(mockedQuery).superCaseInstanceId(queryParameters.get("superCaseInstance"));
@@ -217,6 +218,7 @@ public abstract class AbstractProcessInstanceRestServiceQueryTest extends
     parameters.put("businessKey", "aBusinessKey");
     parameters.put("processDefinitionKey", "aProcDefKey");
     parameters.put("processDefinitionId", "aProcDefId");
+    parameters.put("deploymentId", "deploymentId");
     parameters.put("superProcessInstance", "aSuperProcInstId");
     parameters.put("subProcessInstance", "aSubProcInstId");
     parameters.put("superCaseInstance", "aSuperCaseInstId");
@@ -393,6 +395,7 @@ public abstract class AbstractProcessInstanceRestServiceQueryTest extends
     verify(mockedQuery).processInstanceBusinessKey(queryParameters.get("businessKey"));
     verify(mockedQuery).processDefinitionKey(queryParameters.get("processDefinitionKey"));
     verify(mockedQuery).processDefinitionId(queryParameters.get("processDefinitionId"));
+    verify(mockedQuery).deploymentId(queryParameters.get("deploymentId"));
     verify(mockedQuery).superProcessInstanceId(queryParameters.get("superProcessInstance"));
     verify(mockedQuery).subProcessInstanceId(queryParameters.get("subProcessInstance"));
     verify(mockedQuery).superCaseInstanceId(queryParameters.get("superCaseInstance"));

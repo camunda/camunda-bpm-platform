@@ -1644,8 +1644,31 @@ public class ProcessInstanceQueryTest extends PluggableProcessEngineTestCase {
     instances = runtimeService.createProcessInstanceQuery()
         .variableValueNotEquals("var", "a String Value").list();
     verifyResultContainsExactly(instances, asSet(processInstance1.getId(), processInstance2.getId(), processInstance4.getId()));
+  }
 
+  public void testQueryByDeploymentId() {
+    String deploymentId = repositoryService
+        .createDeploymentQuery()
+        .singleResult()
+        .getId();
 
+    ProcessInstanceQuery query = runtimeService
+        .createProcessInstanceQuery()
+        .deploymentId(deploymentId);
+
+    assertEquals(5, query.count());
+    assertEquals(5, query.list().size());
+  }
+
+  public void testQueryByInvalidDeploymentId() {
+    assertEquals(0, runtimeService.createProcessInstanceQuery().deploymentId("invalid").count());
+
+    try {
+      runtimeService.createProcessInstanceQuery().deploymentId(null).count();
+      fail();
+    } catch(ProcessEngineException e) {
+      // expected
+    }
   }
 
   protected <T> Set<T> asSet(T... elements) {
