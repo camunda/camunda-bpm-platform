@@ -362,6 +362,7 @@ public abstract class AbstractCaseInstanceRestServiceQueryTest extends AbstractR
     queryParameters.put("caseInstanceId", "aCaseInstanceId");
     queryParameters.put("caseDefinitionId", "aCaseDefId");
     queryParameters.put("caseDefinitionKey", "aCaseDefKey");
+    queryParameters.put("deploymentId", "aDeploymentId");
     queryParameters.put("businessKey", "aBusinessKey");
     queryParameters.put("superProcessInstance", "aSuperProcInstId");
     queryParameters.put("subProcessInstance", "aSubProcInstId");
@@ -382,6 +383,7 @@ public abstract class AbstractCaseInstanceRestServiceQueryTest extends AbstractR
     verify(mockedQuery).caseInstanceId(queryParameters.get("caseInstanceId"));
     verify(mockedQuery).caseDefinitionId(queryParameters.get("caseDefinitionId"));
     verify(mockedQuery).caseDefinitionKey(queryParameters.get("caseDefinitionKey"));
+    verify(mockedQuery).deploymentId(queryParameters.get("deploymentId"));
     verify(mockedQuery).caseInstanceBusinessKey(queryParameters.get("businessKey"));
     verify(mockedQuery).superProcessInstanceId(queryParameters.get("superProcessInstance"));
     verify(mockedQuery).subProcessInstanceId(queryParameters.get("subProcessInstance"));
@@ -398,6 +400,7 @@ public abstract class AbstractCaseInstanceRestServiceQueryTest extends AbstractR
     String aCaseInstanceId = "aCaseInstanceId";
     String aCaseDefId = "aCaseDefId";
     String aCaseDefKey = "aCaseDefKey";
+    String aDeploymentId = "aDeploymentId";
     String aBusinessKey = "aBusinessKey";
     String aSuperProcInstId = "aSuperProcInstId";
     String aSubProcInstId = "aSubProcInstId";
@@ -409,6 +412,7 @@ public abstract class AbstractCaseInstanceRestServiceQueryTest extends AbstractR
     queryParameters.put("caseInstanceId", aCaseInstanceId);
     queryParameters.put("caseDefinitionId", aCaseDefId);
     queryParameters.put("caseDefinitionKey", aCaseDefKey);
+    queryParameters.put("deploymentId", aDeploymentId);
     queryParameters.put("businessKey", aBusinessKey);
     queryParameters.put("superProcessInstance", aSuperProcInstId);
     queryParameters.put("subProcessInstance", aSubProcInstId);
@@ -430,6 +434,7 @@ public abstract class AbstractCaseInstanceRestServiceQueryTest extends AbstractR
     verify(mockedQuery).caseInstanceId(aCaseInstanceId);
     verify(mockedQuery).caseDefinitionId(aCaseDefId);
     verify(mockedQuery).caseDefinitionKey(aCaseDefKey);
+    verify(mockedQuery).deploymentId(aDeploymentId);
     verify(mockedQuery).caseInstanceBusinessKey(aBusinessKey);
     verify(mockedQuery).superProcessInstanceId(aSuperProcInstId);
     verify(mockedQuery).subProcessInstanceId(aSubProcInstId);
