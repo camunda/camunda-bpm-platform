@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.repository.DeploymentResource;
 import org.camunda.bpm.engine.rest.sub.repository.DeploymentResourcesResource;
 
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
@@ -56,12 +57,19 @@ public class DeploymentResourceImpl implements DeploymentResource {
     if (deployment == null) {
       throw new InvalidRequestException(Status.NOT_FOUND, "Deployment with id '" + deploymentId + "' do not exist");
     }
-    boolean cascade = false;
-    if (uriInfo.getQueryParameters().containsKey(CASCADE)
-        && (uriInfo.getQueryParameters().get(CASCADE).size() > 0)
-        && "true".equals(uriInfo.getQueryParameters().get(CASCADE).get(0))) {
-      cascade = true;
-    }
-    repositoryService.deleteDeployment(deploymentId, cascade);  
+
+    boolean cascade = isQueryPropertyEnabled(uriInfo, CASCADE);
+    boolean skipCustomListeners = isQueryPropertyEnabled(uriInfo, "skipCustomListeners");
+
+    repositoryService.deleteDeployment(deploymentId, cascade, skipCustomListeners);
   }
+
+  protected boolean isQueryPropertyEnabled(UriInfo uriInfo, String property) {
+    MultivaluedMap<String,String> queryParams = uriInfo.getQueryParameters();
+
+    return queryParams.containsKey(property)
+        && queryParams.get(property).size() > 0
+        && "true".equals(queryParams.get(property).get(0));
+  }
+
 }

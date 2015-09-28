@@ -419,7 +419,7 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
     .when()
       .delete(DEPLOYMENT_URL);
 
-    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, false);
+    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, false, false);
   }
 
   @Test
@@ -433,7 +433,7 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
     .when()
       .delete(DEPLOYMENT_URL);
 
-    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, true);
+    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, true, false);
   }
 
   @Test
@@ -447,7 +447,7 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
     .when()
       .delete(DEPLOYMENT_URL);
 
-    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, false);
+    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, false, false);
   }
 
   @Test
@@ -461,7 +461,64 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
     .when()
       .delete(DEPLOYMENT_URL);
 
-    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, false);
+    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, false, false);
+  }
+
+  @Test
+  public void testDeleteDeploymentSkipCustomListeners() {
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
+      .queryParam("skipCustomListeners", true)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .delete(DEPLOYMENT_URL);
+
+    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, false, true);
+  }
+
+  @Test
+  public void testDeleteDeploymentSkipCustomListenersNonsense() {
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
+      .queryParam("skipCustomListeners", "bla")
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .delete(DEPLOYMENT_URL);
+
+    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, false, false);
+  }
+
+  @Test
+  public void testDeleteDeploymentSkipCustomListenersFalse() {
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
+      .queryParam("skipCustomListeners", false)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .delete(DEPLOYMENT_URL);
+
+    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, false, false);
+  }
+
+  @Test
+  public void testDeleteDeploymentSkipCustomListenersAndCascade() {
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
+      .queryParam("cascade", true)
+      .queryParam("skipCustomListeners", true)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .delete(DEPLOYMENT_URL);
+
+    verify(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, true, true);
   }
 
   @Test
@@ -482,7 +539,7 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
   @Test
   public void testDeleteDeploymentThrowsAuthorizationException() {
     String message = "expected exception";
-    doThrow(new AuthorizationException(message)).when(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, false);
+    doThrow(new AuthorizationException(message)).when(mockRepositoryService).deleteDeployment(MockProvider.EXAMPLE_DEPLOYMENT_ID, false, false);
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
