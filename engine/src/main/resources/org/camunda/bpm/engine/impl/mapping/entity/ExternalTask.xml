@@ -11,6 +11,11 @@
     <result property="workerId" column="WORKER_ID_" jdbcType="VARCHAR" />
     <result property="lockExpirationTime" column="LOCK_EXP_TIME_" jdbcType="TIMESTAMP"/>
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
+    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
+    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
+    <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR" />
+    <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
   </resultMap>
 
   <insert id="insertExternalTask" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity">
@@ -20,6 +25,11 @@
       TOPIC_NAME_,
       LOCK_EXP_TIME_,
       EXECUTION_ID_,
+      PROC_INST_ID_,
+      PROC_DEF_ID_,
+      PROC_DEF_KEY_,
+      ACT_ID_,
+      ACT_INST_ID_,
       REV_
     ) values (
       #{id, jdbcType=VARCHAR},
@@ -27,6 +37,11 @@
       #{topicName, jdbcType=VARCHAR},
       #{lockExpirationTime, jdbcType=TIMESTAMP},
       #{executionId, jdbcType=VARCHAR},
+      #{processInstanceId, jdbcType=VARCHAR},
+      #{processDefinitionId, jdbcType=VARCHAR},
+      #{processDefinitionKey, jdbcType=VARCHAR},
+      #{activityId, jdbcType=VARCHAR},
+      #{activityInstanceId, jdbcType=VARCHAR},
       1
     )
   </insert>
@@ -38,7 +53,12 @@
       WORKER_ID_ = #{workerId, jdbcType=VARCHAR},
       TOPIC_NAME_ = #{topicName, jdbcType=VARCHAR},
       LOCK_EXP_TIME_ = #{lockExpirationTime, jdbcType=TIMESTAMP},
-      EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR}
+      EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
+      PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR},
+      PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+      PROC_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR},
+      ACT_ID_ = #{activityId, jdbcType=VARCHAR},
+      ACT_INST_ID_ = #{activityInstanceId, jdbcType=VARCHAR}
     </set>
     where ID_= #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
@@ -71,4 +91,73 @@
     </where>
     ${limitAfter}
   </select>
+  
+  <select id="selectExternalTaskByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ExternalTaskQueryImpl" resultMap="externalTaskResultMap">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
+    ${limitBefore}
+    select distinct
+    <include refid="columnSelection"/>
+    ${limitBetween}
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.orderBySelection"/> 
+    <include refid="selectExternalTaskByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <select id="selectExternalTaskCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ExternalTaskQueryImpl" resultType="long">
+    select count(distinct RES.ID_)
+    <include refid="selectExternalTaskByQueryCriteriaSql"/>
+  </select>
+  
+  <sql id="selectExternalTaskByQueryCriteriaSql">
+    from ${prefix}ACT_RU_EXT_TASK RES
+    <where>
+      <if test="workerId != null">
+        and RES.WORKER_ID_ = #{workerId}
+      </if>
+      <if test="lockExpirationBefore != null">
+        and RES.LOCK_EXP_TIME_ &lt; #{lockExpirationBefore}
+      </if>
+      <if test="lockExpirationAfter != null">
+        and RES.LOCK_EXP_TIME_ &gt; #{lockExpirationAfter}
+      </if>
+      <if test="topicName != null">
+        and RES.TOPIC_NAME_ = #{topicName}
+      </if>
+      <if test="locked != null &amp;&amp; locked">
+        and RES.LOCK_EXP_TIME_ is not null
+        and RES.LOCK_EXP_TIME_ &gt; #{now, jdbcType=TIMESTAMP}
+      </if>
+      <if test="notLocked != null &amp;&amp; notLocked">
+        and (RES.LOCK_EXP_TIME_ is null
+        or RES.LOCK_EXP_TIME_ &lt; #{now, jdbcType=TIMESTAMP})
+      </if>
+      <if test="executionId != null">
+        and RES.EXECUTION_ID_ = #{executionId}
+      </if>
+      <if test="processInstanceId != null">
+        and RES.PROC_INST_ID_ = #{processInstanceId}
+      </if>
+      <if test="processDefinitionId != null">
+        and RES.PROC_DEF_ID_ = #{processDefinitionId}
+      </if>
+      <if test="activityId != null">
+        and RES.ACT_ID_ = #{activityId}
+      </if>
+    </where>
+  </sql>
+  
+  <sql id="columnSelection">
+    RES.REV_, 
+    RES.ID_, 
+    RES.TOPIC_NAME_, 
+    RES.WORKER_ID_, 
+    RES.LOCK_EXP_TIME_,
+    RES.EXECUTION_ID_,
+    RES.PROC_INST_ID_,
+    RES.PROC_DEF_ID_,
+    RES.PROC_DEF_KEY_,
+    RES.ACT_ID_,
+    RES.ACT_INST_ID_
+  </sql>
 </mapper>

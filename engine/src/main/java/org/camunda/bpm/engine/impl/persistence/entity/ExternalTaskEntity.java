@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
@@ -26,7 +27,7 @@ import org.camunda.bpm.engine.impl.util.EnsureUtil;
  * @author Thorben Lindhauer
  *
  */
-public class ExternalTaskEntity implements DbEntity, HasDbRevision {
+public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision {
 
   protected String id;
   protected int revision;
@@ -35,6 +36,12 @@ public class ExternalTaskEntity implements DbEntity, HasDbRevision {
   protected Date lockExpirationTime;
 
   protected String executionId;
+  protected String processInstanceId;
+  protected String processDefinitionId;
+  protected String processDefinitionKey;
+  protected String activityId;
+  protected String activityInstanceId;
+
   protected ExecutionEntity execution;
 
   public String getId() {
@@ -67,6 +74,36 @@ public class ExternalTaskEntity implements DbEntity, HasDbRevision {
   public void setExecutionId(String executionId) {
     this.executionId = executionId;
   }
+  public String getProcessInstanceId() {
+    return processInstanceId;
+  }
+  public void setProcessInstanceId(String processInstanceId) {
+    this.processInstanceId = processInstanceId;
+  }
+  public String getProcessDefinitionId() {
+    return processDefinitionId;
+  }
+  public void setProcessDefinitionId(String processDefinitionId) {
+    this.processDefinitionId = processDefinitionId;
+  }
+  public String getProcessDefinitionKey() {
+    return processDefinitionKey;
+  }
+  public void setProcessDefinitionKey(String processDefinitionKey) {
+    this.processDefinitionKey = processDefinitionKey;
+  }
+  public String getActivityId() {
+    return activityId;
+  }
+  public void setActivityId(String activityId) {
+    this.activityId = activityId;
+  }
+  public String getActivityInstanceId() {
+    return activityInstanceId;
+  }
+  public void setActivityInstanceId(String activityInstanceId) {
+    this.activityInstanceId = activityInstanceId;
+  }
   public int getRevision() {
     return revision;
   }
@@ -83,6 +120,11 @@ public class ExternalTaskEntity implements DbEntity, HasDbRevision {
     persistentState.put("workerId", workerId);
     persistentState.put("lockExpirationTime", lockExpirationTime);
     persistentState.put("executionId", executionId);
+    persistentState.put("processInstanceId", processInstanceId);
+    persistentState.put("processDefinitionId", processDefinitionId);
+    persistentState.put("processDefinitionKey", processDefinitionKey);
+    persistentState.put("activityId", activityId);
+    persistentState.put("activityInstanceId", activityInstanceId);
 
     return persistentState;
   }
@@ -152,5 +194,23 @@ public class ExternalTaskEntity implements DbEntity, HasDbRevision {
   public void unlock() {
     workerId = null;
     lockExpirationTime = null;
+  }
+
+  public static ExternalTaskEntity createAndInsert(ExecutionEntity execution, String topic) {
+    ExternalTaskEntity externalTask = new ExternalTaskEntity();
+
+    externalTask.setTopicName(topic);
+    externalTask.setExecutionId(execution.getId());
+    externalTask.setProcessInstanceId(execution.getProcessInstanceId());
+    externalTask.setProcessDefinitionId(execution.getProcessDefinitionId());
+
+    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+    externalTask.setProcessDefinitionKey(processDefinition.getKey());
+    externalTask.setActivityId(execution.getActivityId());
+    externalTask.setActivityInstanceId(execution.getActivityInstanceId());
+
+    externalTask.insert();
+
+    return externalTask;
   }
 }

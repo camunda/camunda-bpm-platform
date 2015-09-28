@@ -134,6 +134,11 @@ create table ACT_RU_EXT_TASK (
   TOPIC_NAME_ varchar(255),
   LOCK_EXP_TIME_ timestamp,
   EXECUTION_ID_ varchar(64),
+  PROC_INST_ID_ varchar(64),
+  PROC_DEF_ID_ varchar(64),
+  PROC_DEF_KEY_ varchar(255),
+  ACT_ID_ varchar(255),
+  ACT_INST_ID_ varchar(64),
   primary key (ID_)
 );
 

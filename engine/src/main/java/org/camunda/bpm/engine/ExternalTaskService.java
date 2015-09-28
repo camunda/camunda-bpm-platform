@@ -14,6 +14,7 @@ package org.camunda.bpm.engine;
 
 import java.util.Map;
 
+import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
 
 /**
@@ -81,4 +82,10 @@ public interface ExternalTaskService {
    * @param externalTaskId the id of the task to unlock
    */
   public void unlock(String externalTaskId);
+
+  /**
+   * @return a new {@link ExternalTaskQuery} that can be used to dynamically
+   * query for external tasks.
+   */
+  public ExternalTaskQuery createExternalTaskQuery();
 }

@@ -91,18 +91,14 @@ public class LockedExternalTaskImpl implements LockedExternalTask {
     result.workerId = externalTaskEntity.getWorkerId();
     result.lockExpirationTime = externalTaskEntity.getLockExpirationTime();
 
-    ExecutionEntity execution = externalTaskEntity.getExecution();
-    result.processInstanceId = execution.getProcessInstanceId();
-    result.executionId = execution.getId();
-    result.activityId = execution.getActivityId();
-    result.activityInstanceId = execution.getActivityInstanceId();
-    result.processDefinitionId = execution.getProcessDefinitionId();
-    result.processDefinitionKey = Context
-        .getProcessEngineConfiguration()
-        .getDeploymentCache()
-        .findDeployedProcessDefinitionById(execution.getProcessDefinitionId())
-        .getKey();
+    result.processInstanceId = externalTaskEntity.getProcessInstanceId();
+    result.executionId = externalTaskEntity.getExecutionId();
+    result.activityId = externalTaskEntity.getActivityId();
+    result.activityInstanceId = externalTaskEntity.getActivityInstanceId();
+    result.processDefinitionId = externalTaskEntity.getProcessDefinitionId();
+    result.processDefinitionKey = externalTaskEntity.getProcessDefinitionKey();
 
+    ExecutionEntity execution = externalTaskEntity.getExecution();
     result.variables = new VariableMapImpl();
     execution.collectVariables(result.variables, variablesToFetch, false, false);
 

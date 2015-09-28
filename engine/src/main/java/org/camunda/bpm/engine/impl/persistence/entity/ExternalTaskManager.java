@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.externaltask.ExternalTask;
+import org.camunda.bpm.engine.impl.ExternalTaskQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -54,5 +56,13 @@ public class ExternalTaskManager extends AbstractManager {
     parameters.put("now", ClockUtil.getCurrentTime());
 
     return getDbEntityManager().selectList("selectExternalTasksForTopics", parameters, new Page(0, maxResults));
+  }
+
+  public List<ExternalTask> findExtenralTasksByQueryCriteria(ExternalTaskQueryImpl externalTaskQuery) {
+    return getDbEntityManager().selectList("selectExternalTaskByQueryCriteria", externalTaskQuery);
+  }
+
+  public long findExternalTaskCountByQueryCriteria(ExternalTaskQueryImpl externalTaskQuery) {
+    return (Long) getDbEntityManager().selectOne("selectExternalTaskCountByQueryCriteria", externalTaskQuery);
   }
 }

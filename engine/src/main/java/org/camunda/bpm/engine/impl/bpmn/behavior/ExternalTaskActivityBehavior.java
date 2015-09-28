@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
@@ -29,10 +30,7 @@ public class ExternalTaskActivityBehavior extends AbstractBpmnActivityBehavior {
 
   public void execute(ActivityExecution execution) throws Exception {
 
-    ExternalTaskEntity externalTask = new ExternalTaskEntity();
-    externalTask.setTopicName(topicName);
-    externalTask.setExecutionId(execution.getId());
-    externalTask.insert();
+    ExternalTaskEntity.createAndInsert((ExecutionEntity) execution, topicName);
   }
 
   public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
