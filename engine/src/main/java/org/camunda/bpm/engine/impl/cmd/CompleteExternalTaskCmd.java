@@ -17,6 +17,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
@@ -46,6 +47,9 @@ public class CompleteExternalTaskCmd implements Command<Void> {
       throw new BadUserRequestException("External Task " + externalTaskId + " cannot be completed by worker '" + workerId
           + "'. It is locked by worker '" + externalTask.getWorkerId() + "'.");
     }
+
+    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+    authorizationManager.checkUpdateProcessInstanceById(externalTask.getProcessInstanceId());
 
     externalTask.complete(variables);
     return null;
