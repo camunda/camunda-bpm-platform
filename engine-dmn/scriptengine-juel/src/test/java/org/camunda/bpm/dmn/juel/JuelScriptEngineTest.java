@@ -23,7 +23,7 @@ import javax.script.ScriptException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class TestJuelScriptEngine {
+public class JuelScriptEngineTest {
 
   protected static ScriptEngineManager scriptEngineManager;
 
@@ -54,7 +54,7 @@ public class TestJuelScriptEngine {
   public void shouldEvaluateConstant() throws ScriptException {
     ScriptEngine scriptEngine = scriptEngineManager.getEngineByName("juel");
     String test = (String) scriptEngine.eval("${'test'}");
-    assertThat(test).isEqualTo(test);
+    assertThat(test).isEqualTo("test");
   }
 
   @Test
