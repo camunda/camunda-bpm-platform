@@ -21,8 +21,8 @@ module.exports = {
       {
         deploymentName:  'second-deployment',
         files: [{
-          name: 'invoice.bpmn',
-          content: fs.readFileSync(__dirname + '/../../resources/invoice.bpmn').toString()
+          name: 'suspension-process.bpmn',
+          content: fs.readFileSync(__dirname + '/../../resources/suspension-process.bpmn').toString()
         }]
       },
       {
@@ -31,5 +31,15 @@ module.exports = {
           name: 'failing-process.bpmn',
           content: fs.readFileSync(__dirname + '/../../resources/failing-process.bpmn').toString()
         }]
-      }])
+      }]),
+
+    operation('process-definition', 'start', [{
+      key: 'user-tasks'
+    },
+    {
+      key: 'suspension-process'
+    },
+    {
+      key: 'failing-process'
+    }])
 )};

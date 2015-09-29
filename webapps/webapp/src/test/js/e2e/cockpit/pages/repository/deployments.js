@@ -15,8 +15,29 @@ module.exports = Page.extend({
     return this.formElement().all(by.repeater('(delta, deployment) in deployments'));
   },
 
-  deploymentName: function(index) {
-    return this.deploymentList().get(index).element(by.css('.name')).getText();
+  deploymentName: function(idx) {
+    return this.deploymentList().get(idx).element(by.css('.name')).getText();
+  },
+
+  deploymentNameElement: function(idx) {
+    return this.deploymentList().get(idx).element(by.binding('deployment.name'));
+  },
+
+  selectDeployment: function(idx) {
+    this.deploymentList().get(idx).element(by.css('[class="deployment"]')).click();
+  },
+
+  deploymentStatus: function(idx) {
+    return this.deploymentList().get(idx).getAttribute('class');
+  },
+
+  isDeploymentSelected: function(idx) {
+    return this.deploymentStatus(idx).then(function(matcher) {
+      if (matcher.indexOf('active') !== -1) {
+        return true;
+      }
+      return false;
+    });
   },
 
   // sorting //////////////////////////////////////////////
@@ -122,7 +143,67 @@ module.exports = Page.extend({
     }
 
     this.searchList().get(index).element(by.model('editValue')).sendKeys(value, protractor.Key.ENTER);
-  }
+  },
 
+
+  // delete deployment modal ///////////////////////////////////
+
+  openDeleteDeployment: function(idx) {
+    var self = this;
+
+    browser.actions().mouseMove(this.deploymentNameElement(idx)).perform().then(function() {
+      var elem = self.deploymentList().get(idx).element(by.css('[ng-click="deleteDeployment($event, deployment)"]'));
+      elem.click();
+      self.waitForElementToBeVisible(elem, 5000);
+    });
+  },
+
+  modalHeader: function() {
+    return element(by.css('.modal-header'));
+  },
+
+  modalTitle: function() {
+    return this.modalHeader().element(by.css('.modal-title')).getText();
+  },
+
+  modalContent: function() {
+    return element(by.css('.modal-body'));
+  },
+
+  modalFooter: function() {
+    return element(by.css('.modal-footer'));
+  },
+
+  closeButton: function() {
+    return this.modalFooter().element(by.css('[ng-click="$dismiss()"]'));
+  },
+
+  closeModal: function() {
+    var theElement = this.modalContent();
+    this.closeButton().click();
+    this.waitForElementToBeNotPresent(theElement, 5000);
+  },
+
+  deleteButton: function() {
+    return this.modalFooter().element(by.css('[ng-click="deleteDeployment()"]'));
+  },
+
+  deleteDeployment: function() {
+    var theElement = this.modalContent();
+    this.deleteButton().click();
+    this.waitForElementToBeNotPresent(theElement, 5000);
+  },
+
+  infobox: function() {
+    return this.modalContent().element(by.css('.alert.alert-info'));
+  },
+
+  cascadeCheckbox: function () {
+    return this.modalContent().element(by.css('[name="cascade"'));
+  },
+
+  skipCustomListenersCheckbox: function () {
+    return this.modalContent().element(by.css('[name="skipCustomListeners"]'));
+  }
 
 });

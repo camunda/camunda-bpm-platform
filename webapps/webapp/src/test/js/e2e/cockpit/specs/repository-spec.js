@@ -173,4 +173,121 @@ describe('Repository Spec', function() {
 
   });
 
+  describe('deployment selection', function() {
+
+    before(function() {
+      return testHelper(setupFile.setup1, function() {
+        repositoryPage.navigateToWebapp('Cockpit');
+        repositoryPage.authentication.userLogin('admin', 'admin');
+        repositoryPage.navigateTo();
+      });
+    });
+
+
+    it('should initially select first deployment', function() {
+      // then
+      expect(deploymentsPage.isDeploymentSelected(0)).to.eventually.be.true;
+    });
+
+
+    it('should select a deployment', function() {
+      // given
+      expect(deploymentsPage.isDeploymentSelected(0)).to.eventually.be.true;
+      expect(deploymentsPage.isDeploymentSelected(1)).to.eventually.be.false;
+      expect(deploymentsPage.isDeploymentSelected(2)).to.eventually.be.false;
+
+      // when
+      deploymentsPage.selectDeployment(2);
+
+      // then
+      expect(deploymentsPage.isDeploymentSelected(0)).to.eventually.be.false;
+      expect(deploymentsPage.isDeploymentSelected(1)).to.eventually.be.false;
+      expect(deploymentsPage.isDeploymentSelected(2)).to.eventually.be.true;
+    });
+
+  });
+
+  describe('delete deployment', function() {
+
+    before(function() {
+      return testHelper(setupFile.setup1, function() {
+        repositoryPage.navigateToWebapp('Cockpit');
+        repositoryPage.authentication.userLogin('admin', 'admin');
+        repositoryPage.navigateTo();
+      });
+    });
+
+
+    it('should open delete deployment modal', function() {
+      // given
+      deploymentsPage.deploymentName(2).then(function(name) {
+
+        // when
+        deploymentsPage.selectDeployment(2);
+        deploymentsPage.openDeleteDeployment(2);
+
+        // then
+        expect(deploymentsPage.modalTitle()).to.eventually.eql('Delete Deployment: ' + name);
+
+        expect(deploymentsPage.infobox().isPresent()).to.eventually.be.true
+
+        expect(deploymentsPage.cascadeCheckbox().isSelected()).to.eventually.be.false;
+        expect(deploymentsPage.skipCustomListenersCheckbox().isSelected()).to.eventually.be.true;
+
+        expect(deploymentsPage.deleteButton().isPresent()).to.eventually.be.true;
+        expect(deploymentsPage.deleteButton().isEnabled()).to.eventually.be.false;
+
+        expect(deploymentsPage.closeButton().isPresent()).to.eventually.be.true;
+      });
+
+    });
+
+
+    it('should close delete deployment modal', function() {
+
+      // when
+      deploymentsPage.closeModal();
+
+      // then
+      expect(deploymentsPage.modalContent().isPresent()).to.eventually.be.false;
+    });
+
+
+    it('should enable delete button', function() {
+      // given
+      deploymentsPage.selectDeployment(2);
+      deploymentsPage.openDeleteDeployment(2);
+
+      expect(deploymentsPage.cascadeCheckbox().isSelected()).to.eventually.be.false;
+
+      expect(deploymentsPage.deleteButton().isPresent()).to.eventually.be.true;
+      expect(deploymentsPage.deleteButton().isEnabled()).to.eventually.be.false;
+
+
+      // when
+      deploymentsPage.cascadeCheckbox().click();
+
+      // then
+      expect(deploymentsPage.cascadeCheckbox().isSelected()).to.eventually.be.true;
+      expect(deploymentsPage.deleteButton().isEnabled()).to.eventually.be.true;
+    });
+
+
+    it('should delete deployment', function() {
+
+      // when
+      deploymentsPage.deleteDeployment();
+
+      // then
+      expect(deploymentsPage.deploymentList().count()).to.eventually.eql(2);
+    });
+
+
+    it('should initially select first deployment', function() {
+      // then
+      expect(deploymentsPage.isDeploymentSelected(0)).to.eventually.be.true;
+    });
+
+  });
+
 });
