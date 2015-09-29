@@ -30,11 +30,11 @@ define([
 
         var resourceMetaData = $scope.resourceData.newChild($scope);
 
-        $scope.state = resourceMetaData.observe('resource', function(resource) {
+        resourceMetaData.observe('resource', function(resource) {
           $scope.resource = resource;
         });
 
-        resourceMetaData.observe('resourceBinary', function(binary) {
+        $scope.state = resourceMetaData.observe('binary', function(binary) {
           $scope.binary = binary;
         });
 

@@ -37,7 +37,7 @@ define([
 
         var resourceData = $scope.resourceData = $scope.repositoryData.newChild($scope);
 
-        resourceData.provide('resourceBinary', [ 'resource', 'currentDeployment', function(resource, deployment) {
+        resourceData.provide('binary', [ 'resource', 'currentDeployment', function(resource, deployment) {
           var deferred = $q.defer();
           
           if (!resource) {
