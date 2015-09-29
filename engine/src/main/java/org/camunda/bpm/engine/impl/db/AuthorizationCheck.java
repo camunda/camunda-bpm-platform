@@ -45,7 +45,7 @@ public class AuthorizationCheck implements Serializable {
    * can be found.*/
   protected int authDefaultPerm = Permissions.ALL.getValue();
 
-  protected List<PermissionCheck> permissionChecks = new ArrayList<PermissionCheck>();
+  protected CompositePermissionCheck permissionChecks = new CompositePermissionCheck();
 
   // getters / setters /////////////////////////////////////////
 
@@ -83,16 +83,19 @@ public class AuthorizationCheck implements Serializable {
 
   // authorization check parameters
 
-  public List<PermissionCheck> getPermissionChecks() {
+  public CompositePermissionCheck getPermissionChecks() {
     return permissionChecks;
   }
 
-  public void setPermissionChecks(List<PermissionCheck> permissionChecks) {
+  public void setAtomicPermissionChecks(List<PermissionCheck> permissionChecks) {
+    this.permissionChecks.setAtomicChecks(permissionChecks);
+  }
+
+  public void addAtomicPermissionCheck(PermissionCheck permissionCheck) {
+    permissionChecks.addAtomicCheck(permissionCheck);
+  }
+
+  public void setPermissionChecks(CompositePermissionCheck permissionChecks) {
     this.permissionChecks = permissionChecks;
   }
-
-  public void addPermissionCheck(PermissionCheck permissionCheck) {
-    permissionChecks.add(permissionCheck);
-  }
-
 }

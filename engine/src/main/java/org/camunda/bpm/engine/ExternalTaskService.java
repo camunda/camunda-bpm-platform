@@ -14,6 +14,8 @@ package org.camunda.bpm.engine;
 
 import java.util.Map;
 
+import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
 
@@ -43,6 +45,20 @@ public interface ExternalTaskService {
    * unlocked tasks matching the provided topics or if parallel fetching by other workers
    * results in locking failures.</p>
    *
+   * <p>
+   *   Returns only tasks that the currently authenticated user has at least one
+   *   permission out of all of the following groups for:
+   *
+   *   <ul>
+   *     <li>{@link Permissions#READ} on {@link Resources#PROCESS_INSTANCE}</li>
+   *     <li>{@link Permissions#READ_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_INSTANCE}</li>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
+   * </p>
+   *
    * @param maxTasks the maximum number of tasks to return
    * @param workerId the id of the worker to lock the tasks for
    * @return a builder to define and execute an external task fetching operation
@@ -58,6 +74,11 @@ public interface ExternalTaskService {
    * @throws ProcessEngineException if the task does not exist anymore or an error
    *   occurs in the following process execution
    * @throws BadUserRequestException if the task is assigned to a different worker
+   * @throws AuthorizationException thrown if the current user does not possess any of the following permissions:
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_INSTANCE}</li>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
    */
   public void complete(String externalTaskId, String workerId);
 
@@ -73,6 +94,11 @@ public interface ExternalTaskService {
    * @throws ProcessEngineException if the task does not exist anymore or an error
    *   occurs in the following process execution
    * @throws BadUserRequestException if the task is assigned to a different worker
+   * @throws AuthorizationException thrown if the current user does not possess any of the following permissions:
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_INSTANCE}</li>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
    */
   public void complete(String externalTaskId, String workerId, Map<String, Object> variables);
 
@@ -80,10 +106,25 @@ public interface ExternalTaskService {
    * Unlocks an external task instance.
    *
    * @param externalTaskId the id of the task to unlock
+   * @throws AuthorizationException thrown if the current user does not possess any of the following permissions:
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_INSTANCE}</li>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
    */
   public void unlock(String externalTaskId);
 
   /**
+   * <p>
+   *   Queries for tasks that the currently authenticated user has at least one
+   *   of the following permissions for:
+   *
+   *   <ul>
+   *     <li>{@link Permissions#READ} on {@link Resources#PROCESS_INSTANCE}</li>
+   *     <li>{@link Permissions#READ_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
+   * </p>
+   *
    * @return a new {@link ExternalTaskQuery} that can be used to dynamically
    * query for external tasks.
    */

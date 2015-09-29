@@ -164,13 +164,13 @@
 
   <select id="isUserAuthorizedForResource" resultType="integer">
 
-    <if test="permissionChecks != null &amp;&amp; permissionChecks.size() > 1">
+    <if test="permissionChecks != null &amp;&amp; permissionChecks.atomicChecks.size() > 1">
       SELECT
     </if>
 
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authorizationCheck" />
 
-   <if test="permissionChecks != null &amp;&amp; permissionChecks.size() > 1">
+   <if test="permissionChecks != null &amp;&amp; permissionChecks.atomicChecks.size() > 1">
       ${dbSpecificDummyTable}
     </if>
 
@@ -494,27 +494,129 @@
     </if>
   </sql>
 
+  <!-- 
+    input: "permissionChecks": an instance of CompositePermissionCheck
+  
+    limitation 1: can only handle at most two levels of composition (e.g. "(a or b) and (c or d)"); 
+      more levels are currently not implemented because MyBatis cannot process circular include statements
+      
+    limitation 2: can only a CompositePermissionCheck instance that contains atomic checks or composite cheks,
+      not a mixture of both (i.e. if you need "a or (b and c)", wrap "a" in another CompositePermissionCheck 
+   -->
   <sql id="authorizationCheck">
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.atomicChecks" />
+    <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.compositeChecks" />
+  </sql>
+  
+  <!-- 
+    input: "permissionChecks": an instance of CompositePermissionCheck
+   -->
+  <sql id="atomicChecks">
+    <if test="permissionChecks.atomicChecks != null &amp;&amp; permissionChecks.atomicChecks.size() == 1">
 
-    <if test="permissionChecks != null &amp;&amp; permissionChecks.size() == 1">
-
-      <bind name="permCheck" value="permissionChecks[0]" />
+      <bind name="permCheck" value="permissionChecks.atomicChecks[0]" />
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>
 
     </if>
 
-    <if test="permissionChecks != null &amp;&amp; permissionChecks.size() > 1">
-      COALESCE (
-
-      <foreach item="permCheck" index="index" collection="permissionChecks" separator=",">
-
-        (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
-
-      </foreach>
-
-      , 0)
+    <if test="permissionChecks.atomicChecks != null &amp;&amp; permissionChecks.atomicChecks.size() > 1">
+      <if test="permissionChecks.disjunctive">
+        <bind name="atomicChecks" value="permissionChecks.atomicChecks" />
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.disjunctiveAtomicChecks" />
+      </if>
+      <if test="!permissionChecks.disjunctive">
+        <bind name="atomicChecks" value="permissionChecks.atomicChecks" />
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.conjunctiveAtomicChecks" />
+      </if>
     </if>
+  </sql>
+  
+  <!-- 
+    input: "permissionChecks": an instance of CompositePermissionCheck
+   -->
+  <sql id="compositeChecks">
+    <if test="permissionChecks.compositeChecks != null &amp;&amp; permissionChecks.compositeChecks.size() > 1">
+      <if test="permissionChecks.disjunctive">
+        <bind name="compositeChecks" value="permissionChecks.compositeChecks" />
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.disjunctiveCompositeChecks"/>
+      </if>
+      <if test="!permissionChecks.disjunctive">
+        <bind name="compositeChecks" value="permissionChecks.compositeChecks" />
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.conjunctiveCompositeChecks"/>
+      </if>
+    </if>
+  </sql>
+  
+  <!-- 
+    input: "atomicChecks": list of PermissionCheck objects
+   -->
+  <sql id="disjunctiveAtomicChecks">
+    COALESCE (
+  
+    <foreach item="permCheck" index="index" collection="atomicChecks" separator=",">
 
+      (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
+
+    </foreach>
+
+    , 0)
+  </sql>
+  
+  <!-- 
+    input: "compositeChecks": a list of CompositePermissionCheck objects
+   -->
+  <sql id="disjunctiveCompositeChecks">
+    COALESCE (
+    <foreach item="permissionChecks" index="index" collection="compositeChecks" separator=",">
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.atomicChecks" />
+    </foreach> 
+    , 0)
+  </sql>
+  
+  <!-- 
+    input: "atomicChecks": list of PermissionCheck objects
+   -->
+  <sql id="conjunctiveAtomicChecks">
+    <!-- the BITAND function on databases like Oracle and DB2 takes exactly two arguments;
+      Instead of BITAND(a, b, c), we generate BITAND(BITAND(a, b), c)) instead -->
+    <foreach index="index" collection="atomicChecks">
+      <if test="index &lt; atomicChecks.size - 1">
+        ${bitand1}
+      </if>
+    </foreach>
+    <foreach  item="permCheck" index="i" collection="atomicChecks">
+      COALESCE(
+        <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>
+      , 0)
+      <if test="i &gt; 0">
+        ${bitand3}
+      </if>
+      <if test="i &lt; atomicChecks.size - 1">
+        ${bitand2}
+      </if>
+    </foreach>
+  </sql>
+  
+  <!-- 
+    input: "compositeChecks": a list of CompositePermissionCheck objects
+   -->
+  <sql id="conjunctiveCompositeChecks">
+    <!-- the BITAND function on databases like Oracle and DB2 takes exactly two arguments;
+      Instead of BITAND(a, b, c), we generate BITAND(BITAND(a, b), c)) instead -->
+    <foreach index="index" collection="compositeChecks">
+      <if test="index &lt; compositeChecks.size - 1">
+        ${bitand1}
+      </if>
+    </foreach>
+    <foreach  item="permissionChecks" index="i" collection="compositeChecks">
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.atomicChecks" />
+      <if test="i &gt; 0">
+        ${bitand3}
+      </if>
+      <if test="i &lt; compositeChecks.size - 1">
+        ${bitand2}
+      </if>
+    </foreach>
   </sql>
 
   <sql id="contextualAuthorizationCheck">

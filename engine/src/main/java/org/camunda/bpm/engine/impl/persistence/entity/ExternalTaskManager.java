@@ -20,7 +20,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.impl.ExternalTaskQueryImpl;
-import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
@@ -55,14 +55,19 @@ public class ExternalTaskManager extends AbstractManager {
     parameters.put("topics", topics);
     parameters.put("now", ClockUtil.getCurrentTime());
 
-    return getDbEntityManager().selectList("selectExternalTasksForTopics", parameters, new Page(0, maxResults));
+    ListQueryParameterObject parameter = new ListQueryParameterObject(parameters, 0, maxResults);
+    configureAuthorizationCheck(parameter);
+
+    return getDbEntityManager().selectList("selectExternalTasksForTopics", parameter);
   }
 
   public List<ExternalTask> findExtenralTasksByQueryCriteria(ExternalTaskQueryImpl externalTaskQuery) {
+    configureAuthorizationCheck(externalTaskQuery);
     return getDbEntityManager().selectList("selectExternalTaskByQueryCriteria", externalTaskQuery);
   }
 
   public long findExternalTaskCountByQueryCriteria(ExternalTaskQueryImpl externalTaskQuery) {
+    configureAuthorizationCheck(externalTaskQuery);
     return (Long) getDbEntityManager().selectOne("selectExternalTaskCountByQueryCriteria", externalTaskQuery);
   }
 
@@ -74,5 +79,13 @@ public class ExternalTaskManager extends AbstractManager {
     parameters.put("processDefinitionKey", processDefinitionKey);
     parameters.put("suspensionState", suspensionState.getStateCode());
     getDbEntityManager().update(ExternalTaskEntity.class, "updateExternalTaskSuspensionStateByParameters", parameters);
+  }
+
+  protected void configureAuthorizationCheck(ExternalTaskQueryImpl query) {
+    getAuthorizationManager().configureExternalTaskQuery(query);
+  }
+
+  protected void configureAuthorizationCheck(ListQueryParameterObject parameter) {
+    getAuthorizationManager().configureExternalTaskFetch(parameter);
   }
 }
