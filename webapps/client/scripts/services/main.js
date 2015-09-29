@@ -6,7 +6,8 @@ define([
   './page',
   './breadcrumbTrails',
   './routeUtil',
-  './cam-api'
+  './cam-api',
+  './cam-api-http-client'
 ], function(
   angular,
 
@@ -15,7 +16,8 @@ define([
    page,
    breadcrumbTrails,
    routeUtil,
-   camAPI
+   camAPI,
+   camAPIHttpClient
 ) {
 
   'use strict';
@@ -27,6 +29,7 @@ define([
   servicesModule.service('page', page);
   servicesModule.factory('breadcrumbTrails', breadcrumbTrails);
   servicesModule.factory('routeUtil', routeUtil);
+  servicesModule.factory('camAPIHttpClient', camAPIHttpClient);
   servicesModule.factory('camAPI', camAPI);
 
   return servicesModule;

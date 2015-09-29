@@ -5,9 +5,10 @@ define([
 function(CamSDK) {
   'use strict';
 
-  return ['Uri', function(Uri) {
+  return ['Uri', 'camAPIHttpClient', function(Uri, camAPIHttpClient) {
 
     return new CamSDK.Client({
+      HttpClient: camAPIHttpClient,
       apiUri: Uri.appUri('engine://'),
       engine: Uri.appUri(':engine')
     });
