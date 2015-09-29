@@ -34,8 +34,16 @@
 
     <div class="deployment"
          ng-click="focus(deployment)">
-      <h4 class="name">{{ deployment.name }}</h4>
+
+      <a ng-click="deleteDeployment($event, deployment)"
+         class="delete-deployment">
+        <span class="glyphicon glyphicon-remove"></span>
+        <span class="hidden-sm hidden-xs hidden-md">Delete Deployment</span>
+      </a>
+
+      <h4 class="name">{{ deployment.name || deployment.id }}</h4>
       <h6>Deployment Time: {{ deployment.deploymentTime }}</h6>
+
     </div>
   </div>
 </div>

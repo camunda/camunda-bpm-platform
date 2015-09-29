@@ -1,8 +1,10 @@
 define([
   'text!./cam-cockpit-deployments.html',
+  'text!./../modals/cam-cockpit-delete-deployment-modal.html',
   'angular'
 ], function(
   template,
+  modalTemplate,
   angular
 ) {
   'use strict';
@@ -21,10 +23,12 @@ define([
       controller: [
         '$scope',
         '$location',
+        '$modal',
         'search',
       function (
         $scope,
         $location,
+        $modal,
         search
       ) {
 
@@ -96,6 +100,24 @@ define([
 
         var isFocused = $scope.isFocused = function(deployment) {
           return deployment && $scope.currentDeployment && deployment.id === $scope.currentDeployment.id;
+        };
+
+        // delete deployment ////////////////////////////////////////////////////////
+
+        $scope.deleteDeployment = function ($event, deployment) {
+          $event.stopPropagation();
+
+          $modal.open({
+            controller: 'camDeleteDeploymentModalCtrl',
+            template: modalTemplate,
+            resolve: {
+              'deploymentsListData': function() { return deploymentsListData; },
+              'deployment': function() { return deployment; }
+            }
+          }).result.then(function() {
+            deploymentsListData.changed('deployments');
+          });
+
         };
 
       }]

@@ -204,6 +204,23 @@
       margin-bottom: 7px;
       word-wrap: break-word;
     }
+
+    .delete-deployment {
+      display: inline-block;
+      position: absolute;
+      padding: 0 4px;
+      font-size: 90%;
+    }
+
+    .delete-deployment {
+      display: none;
+      left: 2px;
+      bottom: 2px;
+    }
+    &:hover .delete-deployment {
+      z-index: 10;
+      display: inline-block;
+    }
   }
 
   .active > .deployment:after {

@@ -9,7 +9,10 @@ define([
   './directives/cam-cockpit-deployments-sorting-choices',
 
   /* plugins */
-  './plugins/search/cam-cockpit-deployments-search-plugin'
+  './plugins/search/cam-cockpit-deployments-search-plugin',
+
+  /* modals */
+  './modals/cam-cockpit-delete-deployment-modal-ctrl'
 
 ], function(
   angular,
@@ -22,7 +25,10 @@ define([
   camCockpitDeploymentsSortingChoices,
 
   /* plugins */
-  camCockpitDeploymentsSearchPlugin
+  camCockpitDeploymentsSearchPlugin,
+
+  /* modals */
+  camCockpitDeleteDeploymentModalCtrl
 ) {
   'use strict';
 
@@ -38,7 +44,10 @@ define([
   deploymentsModule.directive('camDeploymentsSortingChoices', camCockpitDeploymentsSortingChoices);
 
   /* plugins */
-  deploymentsModule.config(camCockpitDeploymentsSearchPlugin);  
+  deploymentsModule.config(camCockpitDeploymentsSearchPlugin);
+
+  /* modals */
+  deploymentsModule.controller('camDeleteDeploymentModalCtrl', camCockpitDeleteDeploymentModalCtrl);
 
   return deploymentsModule;
 });
