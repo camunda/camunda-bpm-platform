@@ -17,7 +17,7 @@ define([
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('cam.cockpit.repository.resouce.detail', {
+    ViewsProvider.registerDefaultView('cam.cockpit.repository.resouce.detail.not.valid', {
       id: 'resource-details',
       label: 'Details',
       template: template,
