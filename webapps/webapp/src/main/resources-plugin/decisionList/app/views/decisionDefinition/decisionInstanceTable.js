@@ -78,14 +78,12 @@ function(angular, template) {
           }, function(err, data) {
             $scope.decisionInstances = data;
             $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
-            $scope.$apply();
           });
 
           historyService.decisionInstanceCount({
             decisionDefinitionId: $scope.decisionDefinition.id
           }, function(err, data) {
             pages.total = data.count;
-            $scope.$apply();
           });
         }
 
