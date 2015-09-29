@@ -17,11 +17,14 @@ define([
   var module = angular.module('cam.cockpit.pages.processDefinition', [dataDepend.name, camCommons.name]);
 
   var Controller = [
-          '$scope', '$rootScope', 'search', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'Views', 'Data', 'Transform', 'Variables', 'dataDepend', 'processDefinition', 'page',
-  function($scope,   $rootScope,   search,   ProcessDefinitionResource,   ProcessInstanceResource,   Views,   Data,   Transform,   Variables,   dataDepend,   processDefinition,   page
+          '$scope', '$rootScope', '$q', 'camAPI', 'search', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'Views', 'Data', 'Transform', 'Variables', 'dataDepend', 'processDefinition', 'page',
+  function($scope,   $rootScope,   $q,   camAPI,   search,   ProcessDefinitionResource,   ProcessInstanceResource,   Views,   Data,   Transform,   Variables,   dataDepend,   processDefinition,   page
   ) {
 
     var processData = $scope.processData = dataDepend.create($scope);
+
+    var Deployment = camAPI.resource('deployment');
+    var resource;
 
 
     // utilities ///////////////////////
@@ -237,6 +240,32 @@ define([
       return diagram;
     }]);
 
+    processData.provide('resources', [ 'processDefinition', function(processDefinition) {
+      var deferred = $q.defer();
+
+      Deployment.getResources(processDefinition.deploymentId, function(err, res) {
+        if(err) {
+          deferred.reject(err);
+        }
+        else {
+          deferred.resolve(res);
+        }
+      });
+
+      return deferred.promise;
+    }]);
+
+    processData.provide('resource', [ 'processDefinition', 'resources', function(processDefinition, resources) {
+      var resource;
+      for (var i = 0, _resource; !!(_resource = resources[i]); i++) {
+        if (_resource.name === processDefinition.resource) {
+          resource = _resource;
+          break;
+        }
+      }
+      return resource;
+    }]);
+
     // end data definition /////////////////////////
 
 
@@ -279,6 +308,10 @@ define([
     });
 
     processData.observe('filter', autoCompleteFilter);
+
+    processData.observe('resource', function(_resource) {
+      resource = _resource;
+    });
 
     $scope.handleBpmnElementSelection = function(activityId, event) {
       var newFilter = angular.copy(currentFilter),
@@ -371,6 +404,24 @@ define([
     }
 
     setDefaultTab($scope.processDefinitionTabs);
+
+    $scope.getDeploymentUrl = function() {
+      var path = '#/repository';
+
+      var deploymentId = processDefinition.deploymentId;
+      var searches = {
+        deployment: deploymentId,
+        resource: resource ? resource.id : null,
+        deploymentsQuery: JSON.stringify([{
+          type     : 'id',
+          operator : 'eq',
+          value    : deploymentId
+        }])
+      };
+
+      return routeUtil.redirectTo(path, searches, [ 'deployment', 'resource', 'deploymentsQuery' ]);
+    };
+
   }];
 
   var ProcessDefinitionFilterController = [
