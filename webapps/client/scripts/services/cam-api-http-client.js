@@ -17,10 +17,6 @@ function(CamSDK) {
           return;
         }
 
-        if (!$rootScope.authentication) {
-          return options.done(new Error('Not authenticated'));
-        }
-
         var original = options.done;
 
         options.done = function(err, result) {
