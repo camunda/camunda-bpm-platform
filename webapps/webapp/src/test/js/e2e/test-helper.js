@@ -42,8 +42,14 @@ module.exports = function (operations, noReset, done) {
         if (err) {
           return cb(err);
         }
-        body = JSON.parse(body);
-        cb(null, body);
+
+        try {
+          body = JSON.parse(body);
+          cb(null, body);
+        }
+        catch (err) {
+          cb(err);
+        }
       });
     }
   ];
