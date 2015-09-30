@@ -19,10 +19,16 @@ import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
+import org.camunda.bpm.engine.history.HistoricIncident;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -703,7 +709,403 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testHandleFailure() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+
+    List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+      .topic(TOPIC_NAME, LOCK_TIME)
+      .execute();
+
+    LockedExternalTask task = tasks.get(0);
+
+    // when submitting a failure (after a simulated processing time of three seconds)
+    ClockUtil.setCurrentTime(nowPlus(3000L));
+
+    String errorMessage = "errorMessage";
+    externalTaskService.handleFailure(task.getId(), WORKER_ID, errorMessage, 5, 3000L);
+
+    // then the task cannot be immediately acquired again
+    tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+    assertEquals(0, tasks.size());
+
+    // and no incident exists because there are still retries left
+    assertEquals(0, runtimeService.createIncidentQuery().count());
+
+    // but when the retry time expires, the task is available again
+    ClockUtil.setCurrentTime(nowPlus(4000L));
+
+    tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+    assertEquals(1, tasks.size());
+
+    // and the retries and error message are accessible
+    task = tasks.get(0);
+    assertEquals(errorMessage, task.getErrorMessage());
+    assertEquals(5, (int) task.getRetries());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testHandleFailureZeroRetries() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+
+    List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+      .topic(TOPIC_NAME, LOCK_TIME)
+      .execute();
+
+    LockedExternalTask task = tasks.get(0);
+
+    // when reporting a failure and setting retries to 0
+    ClockUtil.setCurrentTime(nowPlus(3000L));
+
+    String errorMessage = "errorMessage";
+    externalTaskService.handleFailure(task.getId(), WORKER_ID, errorMessage, 0, 3000L);
+
+    // then the task cannot be fetched anymore even when the lock expires
+    ClockUtil.setCurrentTime(nowPlus(4000L));
+
+    tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+    assertEquals(0, tasks.size());
+
+    // and an incident has been created
+    Incident incident = runtimeService.createIncidentQuery().singleResult();
+
+    assertNotNull(incident);
+    assertNotNull(incident.getId());
+    assertEquals(errorMessage, incident.getIncidentMessage());
+    assertEquals(task.getExecutionId(), incident.getExecutionId());
+    assertEquals("externalTask", incident.getActivityId());
+    assertEquals(incident.getId(), incident.getCauseIncidentId());
+    assertEquals("failedExternalTask", incident.getIncidentType());
+    assertEquals(task.getProcessDefinitionId(), incident.getProcessDefinitionId());
+    assertEquals(task.getProcessInstanceId(), incident.getProcessInstanceId());
+    assertEquals(incident.getId(), incident.getRootCauseIncidentId());
+    assertEquals(nowMinus(4000L), incident.getIncidentTimestamp());
+    assertEquals(task.getId(), incident.getConfiguration());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testHandleFailureAndDeleteProcessInstance() {
+    // given a failed external task with incident
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+
+    List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+      .topic(TOPIC_NAME, LOCK_TIME)
+      .execute();
+
+    LockedExternalTask task = tasks.get(0);
+
+    externalTaskService.handleFailure(task.getId(), WORKER_ID, "someError", 0, LOCK_TIME);
+
+    // when
+    runtimeService.deleteProcessInstance(processInstance.getId(), null);
+
+    // then
+    assertProcessEnded(processInstance.getId());
+  }
+
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml")
+  public void testHandleFailureThenComplete() {
+    // given a failed external task with incident
+    runtimeService.startProcessInstanceByKey("twoExternalTaskProcess");
+
+    List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+      .topic(TOPIC_NAME, LOCK_TIME)
+      .execute();
+
+    LockedExternalTask task = tasks.get(0);
+
+    externalTaskService.handleFailure(task.getId(), WORKER_ID, "someError", 0, LOCK_TIME);
+
+    // when
+    externalTaskService.complete(task.getId(), WORKER_ID);
+
+    // then the task has been completed nonetheless
+    Task followingTask = taskService.createTaskQuery().singleResult();
+    assertNotNull(followingTask);
+    assertEquals("afterExternalTask", followingTask.getTaskDefinitionKey());
+
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testHandleFailureWithWrongWorkerId() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+
+    // when
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+      .topic(TOPIC_NAME, LOCK_TIME)
+      .execute();
+
+    // then it is not possible to complete the task with a different worker id
+    try {
+      externalTaskService.handleFailure(externalTasks.get(0).getId(), "someCrazyWorkerId", "error", 5, LOCK_TIME);
+      fail("exception expected");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Failure of External Task " + externalTasks.get(0).getId()
+          + " cannot be reported by worker 'someCrazyWorkerId'. It is locked by worker '" + WORKER_ID + "'.",
+        e.getMessage());
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testHandleFailureNonExistingTask() {
+    try {
+      externalTaskService.handleFailure("nonExistingTaskId", WORKER_ID, "error", 5, LOCK_TIME);
+      fail("exception expected");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Cannot find external task with id nonExistingTaskId", e.getMessage());
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testHandleFailureNullTaskId() {
+    try {
+      externalTaskService.handleFailure(null, WORKER_ID, "error", 5, LOCK_TIME);
+      fail("exception expected");
+    } catch (NullValueException e) {
+      assertTextPresent("externalTaskId is null", e.getMessage());
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testHandleFailureNullWorkerId() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+
+    // when
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+      .topic(TOPIC_NAME, LOCK_TIME)
+      .execute();
+
+    // then
+    try {
+      externalTaskService.handleFailure(externalTasks.get(0).getId(), null, "error", 5, LOCK_TIME);
+      fail("exception expected");
+    } catch (NullValueException e) {
+      assertTextPresent("workerId is null", e.getMessage());
+    }
+
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testHandleFailureNegativeLockDuration() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+
+    // when
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+      .topic(TOPIC_NAME, LOCK_TIME)
+      .execute();
+
+    // then
+    try {
+      externalTaskService.handleFailure(externalTasks.get(0).getId(), WORKER_ID, "error", 5, - LOCK_TIME);
+      fail("exception expected");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("retryDuration is not greater than or equal to 0", e.getMessage());
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testHandleFailureNegativeRetries() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+
+    // when
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+      .topic(TOPIC_NAME, LOCK_TIME)
+      .execute();
+
+    // then
+    try {
+      externalTaskService.handleFailure(externalTasks.get(0).getId(), WORKER_ID, "error", -5, LOCK_TIME);
+      fail("exception expected");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("retries is not greater than or equal to 0", e.getMessage());
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testHandleFailureNullErrorMessage() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
+      .topic(TOPIC_NAME, LOCK_TIME)
+      .execute();
+
+    // when
+    externalTaskService.handleFailure(externalTasks.get(0).getId(), WORKER_ID, null, 5, LOCK_TIME);
+
+    // then the failure was reported successfully and the error message is null
+    ExternalTask task = externalTaskService.createExternalTaskQuery().singleResult();
+
+    assertEquals(5, (int) task.getRetries());
+    assertNull(task.getErrorMessage());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testHandleFailureSuspendedTask() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    LockedExternalTask task = externalTasks.get(0);
+
+    // when suspending the process instance
+    runtimeService.suspendProcessInstanceById(processInstance.getId());
+
+    // then a failure cannot be reported
+    try {
+      externalTaskService.handleFailure(externalTasks.get(0).getId(), WORKER_ID, "error", 5, LOCK_TIME);
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("ExternalTask with id '" + task.getId() + "' is suspended", e.getMessage());
+    }
+
+    assertProcessNotEnded(processInstance.getId());
+
+    // when activating the process instance again
+    runtimeService.activateProcessInstanceById(processInstance.getId());
+
+    // then the failure can be reported successfully
+    externalTaskService.handleFailure(externalTasks.get(0).getId(), WORKER_ID, "error", 5, LOCK_TIME);
+
+    ExternalTask updatedTask = externalTaskService.createExternalTaskQuery().singleResult();
+    assertEquals(5, (int) updatedTask.getRetries());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testSetRetries() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    // when
+    externalTaskService.setRetries(externalTasks.get(0).getId(), 5);
+
+    // then
+    ExternalTask task = externalTaskService.createExternalTaskQuery().singleResult();
+
+    assertEquals(5, (int) task.getRetries());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testSetRetriesResolvesFailureIncident() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    LockedExternalTask lockedTask = externalTasks.get(0);
+    externalTaskService.handleFailure(lockedTask.getId(), WORKER_ID, "error", 0, LOCK_TIME);
+
+    Incident incident = runtimeService.createIncidentQuery().singleResult();
+
+    // when
+    externalTaskService.setRetries(lockedTask.getId(), 5);
+
+    // then the incident is resolved
+    assertEquals(0, runtimeService.createIncidentQuery().count());
+
+    if (processEngineConfiguration.getHistoryLevel().getId() >= HistoryLevel.HISTORY_LEVEL_FULL.getId()) {
+
+      HistoricIncident historicIncident = historyService.createHistoricIncidentQuery().singleResult();
+      assertNotNull(historicIncident);
+      assertEquals(incident.getId(), historicIncident.getId());
+      assertTrue(historicIncident.isResolved());
+    }
+
+    // and the task can be fetched again
+    ClockUtil.setCurrentTime(nowPlus(LOCK_TIME + 3000L));
+
+    externalTasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    assertEquals(1, externalTasks.size());
+    assertEquals(lockedTask.getId(), externalTasks.get(0).getId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testSetRetriesToZero() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    LockedExternalTask lockedTask = externalTasks.get(0);
+
+    // when
+    externalTaskService.setRetries(lockedTask.getId(), 0);
+
+    // then
+    Incident incident = runtimeService.createIncidentQuery().singleResult();
+    assertNotNull(incident);
+    assertEquals(lockedTask.getId(), incident.getConfiguration());
+
+    // and resetting the retries removes the incident again
+    externalTaskService.setRetries(lockedTask.getId(), 5);
+
+    assertEquals(0, runtimeService.createIncidentQuery().count());
+
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testSetRetriesNegative() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(5, WORKER_ID)
+        .topic(TOPIC_NAME, LOCK_TIME)
+        .execute();
+
+    try {
+      // when
+      externalTaskService.setRetries(externalTasks.get(0).getId(), -5);
+      fail("exception expected");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("retries is not greater than or equal to 0", e.getMessage());
+    }
+  }
+
+  public void testSetRetriesNonExistingTask() {
+    try {
+      externalTaskService.setRetries("someExternalTaskId", 5);
+      fail("expected exception");
+    } catch (NotFoundException e) {
+      assertTextPresent("externalTask is null", e.getMessage());
+    }
+  }
+
+  public void testSetRetriesNullTaskId() {
+    try {
+      externalTaskService.setRetries(null, 5);
+      fail("expected exception");
+    } catch (NullValueException e) {
+      assertTextPresent("externalTaskId is null", e.getMessage());
+    }
+  }
+
   protected Date nowPlus(long millis) {
     return new Date(ClockUtil.getCurrentTime().getTime() + millis);
+  }
+
+  protected Date nowMinus(long millis) {
+    return new Date(ClockUtil.getCurrentTime().getTime() - millis);
   }
 }

@@ -16,7 +16,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.VariableMapImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
@@ -32,6 +31,8 @@ public class LockedExternalTaskImpl implements LockedExternalTask {
   protected String topicName;
   protected String workerId;
   protected Date lockExpirationTime;
+  protected Integer retries;
+  protected String errorMessage;
   protected String processInstanceId;
   protected String executionId;
   protected String activityId;
@@ -54,6 +55,14 @@ public class LockedExternalTaskImpl implements LockedExternalTask {
 
   public Date getLockExpirationTime() {
     return lockExpirationTime;
+  }
+
+  public Integer getRetries() {
+    return retries;
+  }
+
+  public String getErrorMessage() {
+    return errorMessage;
   }
 
   public String getProcessInstanceId() {
@@ -90,6 +99,8 @@ public class LockedExternalTaskImpl implements LockedExternalTask {
     result.topicName = externalTaskEntity.getTopicName();
     result.workerId = externalTaskEntity.getWorkerId();
     result.lockExpirationTime = externalTaskEntity.getLockExpirationTime();
+    result.retries = externalTaskEntity.getRetries();
+    result.errorMessage = externalTaskEntity.getErrorMessage();
 
     result.processInstanceId = externalTaskEntity.getProcessInstanceId();
     result.executionId = externalTaskEntity.getExecutionId();

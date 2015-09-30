@@ -12,12 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.incident;
 
-import java.util.List;
-
-import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
-import org.camunda.bpm.engine.runtime.Incident;
-
 /**
  * A incident handler that logs incidents of type <code>failedJob</code>
  * as instances of {@link Incident} to the engine database.
@@ -33,52 +27,11 @@ import org.camunda.bpm.engine.runtime.Incident;
  * @author roman.smirnov
  * @author Falko Menge
  */
-public class FailedJobIncidentHandler implements IncidentHandler {
+public class FailedJobIncidentHandler extends AbstractIncidentHandler {
 
   public final static String INCIDENT_HANDLER_TYPE = "failedJob";
 
-  public String getIncidentHandlerType() {
-    return INCIDENT_HANDLER_TYPE;
+  public FailedJobIncidentHandler() {
+    super(INCIDENT_HANDLER_TYPE);
   }
-
-  public void handleIncident(String processDefinitionId, String activityId, String executionId, String jobId, String message) {
-    createIncident(processDefinitionId, activityId, executionId, jobId, message);
-  }
-
-  public Incident createIncident(String processDefinitionId, String activityId, String executionId, String jobId, String message) {
-    IncidentEntity newIncident;
-    if(executionId != null) {
-      newIncident = IncidentEntity.createAndInsertIncident(INCIDENT_HANDLER_TYPE, executionId, jobId, message);
-      newIncident.createRecursiveIncidents();
-
-    } else {
-      newIncident = IncidentEntity.createAndInsertIncident(INCIDENT_HANDLER_TYPE, processDefinitionId, activityId, jobId, message);
-    }
-    return newIncident;
-  }
-
-  public void resolveIncident(String processDefinitionId, String activityId, String executionId, String configuration) {
-    removeIncident(processDefinitionId, activityId, executionId, configuration, true);
-  }
-
-  public void deleteIncident(String processDefinitionId, String activityId, String executionId, String configuration) {
-    removeIncident(processDefinitionId, activityId, executionId, configuration, false);
-  }
-
-  protected void removeIncident(String processDefinitionId, String activityId, String executionId, String configuration, boolean incidentResolved) {
-    List<Incident> incidents = Context
-        .getCommandContext()
-        .getIncidentManager()
-        .findIncidentByConfiguration(configuration);
-
-    for (Incident currentIncident : incidents) {
-      IncidentEntity incident = (IncidentEntity) currentIncident;
-      if (incidentResolved) {
-        incident.resolve();
-      } else {
-        incident.delete();
-      }
-    }
-  }
-
 }

@@ -43,6 +43,7 @@ public class ExternalTaskQueryImpl extends AbstractQuery<ExternalTaskQuery, Exte
   protected String processDefinitionId;
   protected String activityId;
   protected SuspensionState suspensionState;
+  protected Boolean retriesLeft;
 
   public ExternalTaskQueryImpl() {
   }
@@ -80,10 +81,6 @@ public class ExternalTaskQueryImpl extends AbstractQuery<ExternalTaskQuery, Exte
     return this;
   }
 
-  /* (non-Javadoc)
-   * @see org.camunda.bpm.engine.externaltask.ExternalTaskQuery#notLocked()
-   */
-  @Override
   public ExternalTaskQuery notLocked() {
     this.notLocked = Boolean.TRUE;
     return this;
@@ -120,6 +117,16 @@ public class ExternalTaskQueryImpl extends AbstractQuery<ExternalTaskQuery, Exte
 
   public ExternalTaskQuery active() {
     this.suspensionState = SuspensionState.ACTIVE;
+    return this;
+  }
+
+  public ExternalTaskQuery withRetriesLeft() {
+    this.retriesLeft = Boolean.TRUE;
+    return this;
+  }
+
+  public ExternalTaskQuery noRetriesLeft() {
+    this.retriesLeft = Boolean.FALSE;
     return this;
   }
 
@@ -199,6 +206,10 @@ public class ExternalTaskQueryImpl extends AbstractQuery<ExternalTaskQuery, Exte
 
   public SuspensionState getSuspensionState() {
     return suspensionState;
+  }
+
+  public Boolean getRetriesLeft() {
+    return retriesLeft;
   }
 
   public Date getNow() {

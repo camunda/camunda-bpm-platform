@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
 
@@ -103,6 +104,31 @@ public interface ExternalTaskService {
   public void complete(String externalTaskId, String workerId, Map<String, Object> variables);
 
   /**
+   * <p>Signals that an external task could not be successfully executed. The task must be assigned to
+   * the given worker. The number of retries left can be specified. In addition, a timeout can be
+   * provided, such that the task cannot be fetched before <code>now + retryTimeout</code> again.</p>
+   *
+   * <p>If <code>retries</code> is 0, an incident with the given error message is created. The incident gets resolved,
+   * once the number of retries is increased again.</p>
+   *
+   * @param externalTaskId the id of the external task to report a failure for
+   * @param workerId the id of the worker that reports the failure
+   * @param errorMessage the error message related to this failure. This message can be retrieved via
+   *   {@link ExternalTask#getErrorMessage()} and is used as the incident message in case <code>retries</code> is <code>null</code>.
+   *   May be <code>null</code>.
+   * @param retries the number of retries left. External tasks with 0 retries cannot be fetched anymore unless
+   *   the number of retries is increased via API. Must be >= 0.
+   * @param retryTimeout the timeout before the task can be fetched again. Must be >= 0.
+   *
+   * @throws AuthorizationException thrown if the current user does not possess any of the following permissions:
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_INSTANCE}</li>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
+   */
+  public void handleFailure(String externalTaskId, String workerId, String errorMessage, int retries, long retryTimeout);
+
+  /**
    * Unlocks an external task instance.
    *
    * @param externalTaskId the id of the task to unlock
@@ -113,6 +139,16 @@ public interface ExternalTaskService {
    *   </ul>
    */
   public void unlock(String externalTaskId);
+
+  /**
+   * Sets the retries for an external task. If the new value is 0, a new incident with a <code>null</code>
+   * message is created. If the old value is 0 and the new value is greater than 0, an existing incident
+   * is resolved.
+   *
+   * @param externalTaskId the id of the task to set the
+   * @param retries
+   */
+  public void setRetries(String externalTaskId, int retries);
 
   /**
    * <p>
@@ -129,4 +165,5 @@ public interface ExternalTaskService {
    * query for external tasks.
    */
   public ExternalTaskQuery createExternalTaskQuery();
+
 }

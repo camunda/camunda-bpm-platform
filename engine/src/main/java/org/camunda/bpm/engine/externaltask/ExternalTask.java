@@ -14,6 +14,8 @@ package org.camunda.bpm.engine.externaltask;
 
 import java.util.Date;
 
+import org.camunda.bpm.engine.ExternalTaskService;
+
 /**
  * @author Thorben Lindhauer
  *
@@ -71,9 +73,25 @@ public interface ExternalTask {
   String getProcessDefinitionKey();
 
   /**
+   * @return the number of retries left. The number of retries is provided by
+   *   a task client, therefore the initial value is <code>null</code>.
+   */
+  Integer getRetries();
+
+  /**
+   * @return the error message submitted with the latest reported failure executing this task;
+   *   <code>null</code> if no failure was reported previously or if no error message
+   *   was submitted
+   *
+   * @see ExternalTaskService#handleFailure(String, String, String, int, long)
+   */
+  String getErrorMessage();
+
+  /**
    * @return true if the external task is suspended; a suspended external task
    * cannot be completed, thereby preventing process continuation
    */
   boolean isSuspended();
+
 
 }

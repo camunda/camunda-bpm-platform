@@ -158,15 +158,15 @@ public final class EnsureUtil {
     }
   }
 
-  public static void ensureGreaterThanOrEqual(String variableName, int value1, int value2) {
+  public static void ensureGreaterThanOrEqual(String variableName, long value1, long value2) {
     ensureGreaterThanOrEqual("", variableName, value1, value2);
   }
 
-  public static void ensureGreaterThanOrEqual(String message, String variableName, int value1, int value2) {
+  public static void ensureGreaterThanOrEqual(String message, String variableName, long value1, long value2) {
     ensureGreaterThanOrEqual(ProcessEngineException.class, message, variableName, value1, value2);
   }
 
-  public static void ensureGreaterThanOrEqual(Class<? extends ProcessEngineException> exceptionClass, String message, String variableName, int value1, int value2) {
+  public static void ensureGreaterThanOrEqual(Class<? extends ProcessEngineException> exceptionClass, String message, String variableName, long value1, long value2) {
     if (value1 < value2) {
       throw generateException(exceptionClass, message, variableName, "is not greater than or equal to " + value2);
     }

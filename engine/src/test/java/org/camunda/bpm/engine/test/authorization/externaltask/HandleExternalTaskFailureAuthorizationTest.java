@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -43,7 +44,7 @@ import org.junit.runners.Parameterized.Parameters;
  *
  */
 @RunWith(Parameterized.class)
-public class CompleteExternalTaskAuthorizationTest {
+public class HandleExternalTaskFailureAuthorizationTest {
 
   public ProcessEngineRule engineRule = new ProcessEngineRule(PluggableProcessEngineTestCase.getProcessEngine(), true);
   public AuthorizationTestRule authRule = new AuthorizationTestRule(engineRule);
@@ -93,7 +94,7 @@ public class CompleteExternalTaskAuthorizationTest {
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externalTask/oneExternalTaskProcess.bpmn20.xml")
-  public void testCompleteExternalTask() {
+  public void testHandleExternalTaskFailure() {
 
     // given
     ProcessInstance processInstance = engineRule.getRuntimeService().startProcessInstanceByKey("oneExternalTaskProcess");
@@ -112,11 +113,15 @@ public class CompleteExternalTaskAuthorizationTest {
       .bindResource("processDefinitionKey", "oneExternalTaskProcess")
       .start();
 
-    engineRule.getExternalTaskService().complete(task.getId(), "workerId");
+    engineRule.getExternalTaskService().handleFailure(task.getId(), "workerId", "error", 5, 5000L);
 
     // then
     if (authRule.assertScenario(scenario)) {
-      Assert.assertEquals(0, engineRule.getExternalTaskService().createExternalTaskQuery().count());
+      ExternalTask externalTask = engineRule.getExternalTaskService()
+          .createExternalTaskQuery().singleResult();
+
+      Assert.assertEquals(5, (int) externalTask.getRetries());
+      Assert.assertEquals("error", externalTask.getErrorMessage());
     }
 
   }

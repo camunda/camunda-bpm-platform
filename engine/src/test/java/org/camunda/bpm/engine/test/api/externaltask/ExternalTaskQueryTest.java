@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
+import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -407,6 +408,35 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testQueryByRetries() {
+    // given
+    startInstancesByKey("oneExternalTaskProcess", 5);
+
+    List<LockedExternalTask> tasks = lockInstances(TOPIC_NAME, 10000L, 3, WORKER_ID);
+    failInstances(tasks.subList(0, 2), "error", 0, 5000L);  // two tasks have no retries left
+    failInstances(tasks.subList(2, 3), "error", 4, 5000L);  // one task has retries left
+
+    // when
+    List<ExternalTask> tasksWithRetries = externalTaskService
+        .createExternalTaskQuery().withRetriesLeft().list();
+    List<ExternalTask> tasksWithoutRetries = externalTaskService
+        .createExternalTaskQuery().noRetriesLeft().list();
+
+    // then
+    assertEquals(3, tasksWithRetries.size());
+    for (ExternalTask task : tasksWithRetries) {
+      assertTrue(task.getRetries() == null || task.getRetries() > 0);
+    }
+
+    assertEquals(2, tasksWithoutRetries.size());
+    for (ExternalTask task : tasksWithoutRetries) {
+      assertTrue(task.getRetries() == 0);
+    }
+
+
+  }
+
   protected List<ProcessInstance> startInstancesByKey(String processDefinitionKey, int number) {
     List<ProcessInstance> processInstances = new ArrayList<ProcessInstance>();
     for (int i = 0; i < number; i++) {
@@ -433,8 +463,14 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  protected void lockInstances(String topic, long duration, int number, String workerId) {
-    externalTaskService.fetchAndLock(number, workerId).topic(topic, duration).execute();
+  protected List<LockedExternalTask> lockInstances(String topic, long duration, int number, String workerId) {
+    return externalTaskService.fetchAndLock(number, workerId).topic(topic, duration).execute();
+  }
+
+  protected void failInstances(List<LockedExternalTask> tasks, String errorMessage, int retries, long retryTimeout) {
+    for (LockedExternalTask task : tasks) {
+      externalTaskService.handleFailure(task.getId(), task.getWorkerId(), errorMessage, retries, retryTimeout);
+    }
   }
 
 }

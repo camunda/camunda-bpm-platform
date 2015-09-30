@@ -85,6 +85,16 @@ public interface ExternalTaskQuery extends Query<ExternalTaskQuery, ExternalTask
   ExternalTaskQuery active();
 
   /**
+   * Only select external tasks that have retries > 0
+   */
+  ExternalTaskQuery withRetriesLeft();
+
+  /**
+   * Only select external tasks that have retries = 0
+   */
+  ExternalTaskQuery noRetriesLeft();
+
+  /**
    * Order by external task id (needs to be followed by {@link #asc()} or {@link #desc()}).
    */
   ExternalTaskQuery orderById();
@@ -109,6 +119,4 @@ public interface ExternalTaskQuery extends Query<ExternalTaskQuery, ExternalTask
    * Order by process definition key (needs to be followed by {@link #asc()} or {@link #desc()}).
    */
   ExternalTaskQuery orderByProcessDefinitionKey();
-
-
 }

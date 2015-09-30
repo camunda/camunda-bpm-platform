@@ -9,6 +9,8 @@
     <result property="revision" column="REV_" jdbcType="INTEGER"/>
     <result property="topicName" column="TOPIC_NAME_" jdbcType="VARCHAR"/>
     <result property="workerId" column="WORKER_ID_" jdbcType="VARCHAR" />
+    <result property="retries" column="RETRIES_" jdbcType="INTEGER" />
+    <result property="errorMessage" column="ERROR_MSG_" jdbcType="VARCHAR"/>
     <result property="lockExpirationTime" column="LOCK_EXP_TIME_" jdbcType="TIMESTAMP"/>
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
@@ -25,6 +27,8 @@
       WORKER_ID_,
       TOPIC_NAME_,
       LOCK_EXP_TIME_,
+      RETRIES_,
+      ERROR_MSG_,
       SUSPENSION_STATE_,
       EXECUTION_ID_,
       PROC_INST_ID_,
@@ -38,6 +42,8 @@
       #{workerId, jdbcType=VARCHAR},
       #{topicName, jdbcType=VARCHAR},
       #{lockExpirationTime, jdbcType=TIMESTAMP},
+      #{retries, jdbcType=INTEGER},
+      #{errorMessage, jdbcType=VARCHAR},
       #{suspensionState, jdbcType=INTEGER},
       #{executionId, jdbcType=VARCHAR},
       #{processInstanceId, jdbcType=VARCHAR},
@@ -56,6 +62,8 @@
       WORKER_ID_ = #{workerId, jdbcType=VARCHAR},
       TOPIC_NAME_ = #{topicName, jdbcType=VARCHAR},
       LOCK_EXP_TIME_ = #{lockExpirationTime, jdbcType=TIMESTAMP},
+      RETRIES_ = #{retries, jdbcType=INTEGER},
+      ERROR_MSG_ = #{errorMessage, jdbcType=VARCHAR},
       EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
       PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR},
       PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
@@ -104,7 +112,8 @@
     from ${prefix}ACT_RU_EXT_TASK RES
     <where>
       (RES.LOCK_EXP_TIME_ is null or RES.LOCK_EXP_TIME_ &lt;= #{parameter.now, jdbcType=TIMESTAMP})
-      and (RES.SUSPENSION_STATE_ = 1 or RES.SUSPENSION_STATE_ is null)
+      and (RES.SUSPENSION_STATE_ is null or RES.SUSPENSION_STATE_ = 1)
+      and (RES.RETRIES_ is null or RES.RETRIES_ > 0)
       <if test="parameter != null">
         and RES.TOPIC_NAME_ in 
         <foreach collection="parameter.topics" open="(" close=")" separator="," item="topicName">
@@ -168,6 +177,14 @@
       <if test="activityId != null">
         and RES.ACT_ID_ = #{activityId}
       </if>
+      <if test="retriesLeft != null &amp;&amp; retriesLeft">
+        and (RES.RETRIES_ is null
+        or RES.RETRIES_ &gt; 0)
+      </if>
+      <if test="retriesLeft != null &amp;&amp; !retriesLeft">
+        and RES.RETRIES_ is not null
+        and RES.RETRIES_ = 0
+      </if>
       <if test="suspensionState != null">
         <if test="suspensionState.stateCode == 1">
             and RES.SUSPENSION_STATE_ = 1
@@ -186,6 +203,8 @@
     RES.TOPIC_NAME_, 
     RES.WORKER_ID_, 
     RES.LOCK_EXP_TIME_,
+    RES.RETRIES_,
+    RES.ERROR_MSG_,
     RES.EXECUTION_ID_,
     RES.PROC_INST_ID_,
     RES.PROC_DEF_ID_,
