@@ -22,14 +22,14 @@
           <text>${input2}</text>
         </inputExpression>
         <inputEntry id="inputEntry3">
-          <text>foo</text>
+          <text>"foo"</text>
         </inputEntry>
         <inputEntry id="inputEntry4">
-          <text>bar</text>
+          <text>"bar"</text>
         </inputEntry>
       </clause>
       <clause id="input3">
-        <inputEntry id="inputEntry5">
+        <inputEntry id="inputEntry5" expressionLanguage="juel">
           <text>${input3}</text>
         </inputEntry>
       </clause>
@@ -40,7 +40,7 @@
       </clause>
       <clause id="output2">
         <outputEntry id="outputEntry2">
-          <text>camunda</text>
+          <text>"camunda"</text>
         </outputEntry>
       </clause>
       <clause id="output3" name="Collect Outputs" camunda:output="collectMe">

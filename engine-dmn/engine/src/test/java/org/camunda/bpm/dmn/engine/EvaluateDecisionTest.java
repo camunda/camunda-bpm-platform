@@ -25,6 +25,11 @@ import org.junit.Test;
 
 public class EvaluateDecisionTest extends DmnDecisionTest {
 
+  public static final String NO_INPUT_DMN = "org/camunda/bpm/dmn/engine/NoInput.dmn";
+  public static final String ONE_RULE_DMN = "org/camunda/bpm/dmn/engine/OneRule.dmn";
+  public static final String EXAMPLE_DMN = "org/camunda/bpm/dmn/engine/Example.dmn";
+  public static final String DATA_TYPE_DMN = "org/camunda/bpm/dmn/engine/DataType.dmn";
+
   @Test
   @DecisionResource(resource = NO_INPUT_DMN)
   public void shouldEvaluateRuleWithoutInput() {

@@ -13,16 +13,9 @@
 
 package org.camunda.bpm.dmn.engine.impl.handler;
 
-import org.camunda.bpm.dmn.engine.handler.DmnElementHandlerContext;
 import org.camunda.bpm.dmn.engine.impl.DmnExpressionImpl;
 import org.camunda.bpm.model.dmn.instance.InputExpression;
 
 public class DmnInputExpressionHandler extends AbstractDmnLiteralExpressionHandler<InputExpression, DmnExpressionImpl> {
-
-  protected void postProcessExpressionText(DmnElementHandlerContext context, InputExpression expression, DmnExpressionImpl dmnExpression) {
-    if (hasJuelExpressionLanguage(dmnExpression) && !isExpression(dmnExpression)) {
-      dmnExpression.setExpression("${" + dmnExpression.getExpression() + "}");
-    }
-  }
 
 }

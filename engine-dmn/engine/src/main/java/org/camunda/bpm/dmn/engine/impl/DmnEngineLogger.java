@@ -77,13 +77,8 @@ public class DmnEngineLogger extends DmnLogger {
     return new DmnExpressionException(exceptionMessage("014", "Unable to cast result '{}' to expected type", result), cause);
   }
 
-  public DmnExpressionException noScriptEngineFoundForLanguage(String expressionLanguage, String defaultExpressionLanguage) {
-    if (expressionLanguage != null) {
-      return new DmnExpressionException(exceptionMessage("015", "Unable to find script engine for expression language '{}'.", expressionLanguage));
-    }
-    else {
-      return new DmnExpressionException(exceptionMessage("015", "Unable to find script engine for default expression language '{}'.", defaultExpressionLanguage));
-    }
+  public DmnExpressionException noScriptEngineFoundForLanguage(String expressionLanguage) {
+    return new DmnExpressionException(exceptionMessage("015", "Unable to find script engine for expression language '{}'.", expressionLanguage));
   }
 
   public DmnEngineException decisionTypeNotSupported(DmnDecision decision) {

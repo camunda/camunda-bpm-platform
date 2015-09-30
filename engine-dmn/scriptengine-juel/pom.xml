@@ -11,10 +11,6 @@
   <artifactId>camunda-scriptengine-juel</artifactId>
   <name>camunda DMN - scriptengine JUEL</name>
 
-  <properties>
-    <version.juel>2.2.7</version.juel>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.camunda.commons</groupId>
@@ -28,19 +24,16 @@
     <dependency>
       <groupId>de.odysseus.juel</groupId>
       <artifactId>juel-api</artifactId>
-      <version>${version.juel}</version>
     </dependency>
 
     <dependency>
       <groupId>de.odysseus.juel</groupId>
       <artifactId>juel-impl</artifactId>
-      <version>${version.juel}</version>
     </dependency>
 
     <dependency>
       <groupId>de.odysseus.juel</groupId>
       <artifactId>juel-spi</artifactId>
-      <version>${version.juel}</version>
     </dependency>
 
     <dependency>

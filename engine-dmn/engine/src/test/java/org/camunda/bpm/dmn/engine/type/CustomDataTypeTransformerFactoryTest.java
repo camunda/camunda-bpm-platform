@@ -17,36 +17,28 @@ import static org.camunda.bpm.dmn.engine.test.asserts.DmnAssertions.assertThat;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.dmn.engine.DmnDecision;
-import org.camunda.bpm.dmn.engine.DmnEngine;
+import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.impl.DmnEngineConfigurationImpl;
 import org.camunda.bpm.dmn.engine.impl.type.DefaultDataTypeTransformerFactory;
 import org.camunda.bpm.dmn.engine.test.DecisionResource;
-import org.camunda.bpm.dmn.engine.test.DmnEngineRule;
+import org.camunda.bpm.dmn.engine.test.DmnDecisionTest;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.TypedValue;
-import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * @author Philipp Ossler
  */
-public class CustomDataTypeTransformerFactoryTest {
+public class CustomDataTypeTransformerFactoryTest extends DmnDecisionTest {
 
   protected static final String DMN_INPUT_FILE = "org/camunda/bpm/dmn/engine/type/CustomInputDefinition.dmn";
   protected static final String DMN_OUTPUT_FILE = "org/camunda/bpm/dmn/engine/type/CustomOutputDefinition.dmn";
 
-  protected DmnEngine engine;
-  protected DmnDecision decision;
-
-  @Rule
-  public DmnEngineRule dmnEngineRule = new DmnEngineRule(customConfiguration());
-
-  @Before
-  public void initEngineAndDecision() {
-    engine = dmnEngineRule.getEngine();
-    decision = dmnEngineRule.getDecision();
+  @Override
+  public DmnEngineConfiguration createDmnEngineConfiguration() {
+    DmnEngineConfigurationImpl configuration = new DmnEngineConfigurationImpl();
+    configuration.setDataTypeTransformerFactory(new CustomDataTypeTransformerFactory());
+    return configuration;
   }
 
   @Test
@@ -65,12 +57,6 @@ public class CustomDataTypeTransformerFactoryTest {
     variables.put("input", 21);
 
     assertThat(engine).evaluates(decision, variables).hasResultValue("isCustom");
-  }
-
-  protected static DmnEngineConfigurationImpl customConfiguration() {
-    DmnEngineConfigurationImpl configuration = new DmnEngineConfigurationImpl();
-    configuration.setDataTypeTransformerFactory(new CustomDataTypeTransformerFactory());
-    return configuration;
   }
 
   protected static class CustomDataTypeTransformerFactory implements DataTypeTransformerFactory {

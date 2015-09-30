@@ -24,15 +24,12 @@ import static org.mockito.Mockito.when;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.dmn.engine.DmnDecision;
-import org.camunda.bpm.dmn.engine.DmnEngine;
+import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.impl.DmnEngineConfigurationImpl;
 import org.camunda.bpm.dmn.engine.test.DecisionResource;
-import org.camunda.bpm.dmn.engine.test.DmnEngineRule;
+import org.camunda.bpm.dmn.engine.test.DmnDecisionTest;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.TypedValue;
-import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -41,7 +38,7 @@ import org.junit.Test;
  *
  * @author Philipp Ossler
  */
-public class DataTypeTransformerIntegerationTest {
+public class DataTypeTransformerIntegrationTest extends DmnDecisionTest {
 
   protected static final String DMN_OUTPUT_FILE = "org/camunda/bpm/dmn/engine/type/DataTypeTransformerTest-Output.dmn";
   protected static final String DMN_INPUT_FILE = "org/camunda/bpm/dmn/engine/type/DataTypeTransformerTest-Input.dmn";
@@ -49,19 +46,8 @@ public class DataTypeTransformerIntegerationTest {
 
   protected static final TypedValue TRANSFORMED_VALUE = Variables.integerValue(42);
 
-  protected DmnEngine engine;
-  protected DmnDecision decision;
-
   protected static DataTypeTransformer dataTypeTransformerMock;
 
-  @Rule
-  public DmnEngineRule dmnEngineRule = new DmnEngineRule(configurationWithMockDataTypeTransformer());
-
-  @Before
-  public void initEngineAndDecision() {
-    engine = dmnEngineRule.getEngine();
-    decision = dmnEngineRule.getDecision();
-  }
 
   @Test
   @DecisionResource(resource = DMN_OUTPUT_FILE)
@@ -121,7 +107,7 @@ public class DataTypeTransformerIntegerationTest {
     verify(dataTypeTransformerMock, never()).transform(any());
   }
 
-  protected static DmnEngineConfigurationImpl configurationWithMockDataTypeTransformer() {
+  public DmnEngineConfiguration createDmnEngineConfiguration() {
     DmnEngineConfigurationImpl configuration = new DmnEngineConfigurationImpl();
 
     dataTypeTransformerMock = mock(DataTypeTransformer.class);

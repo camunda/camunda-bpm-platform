@@ -13,14 +13,12 @@
 
 package org.camunda.bpm.dmn.scriptengine;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.dmn.engine.test.asserts.DmnAssertions.assertThat;
 
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.script.Bindings;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;

@@ -27,7 +27,7 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
  *
  * @author Philipp Ossler
  */
-public class LocalTimeDataTypeTransformator implements DataTypeTransformer {
+public class LocalTimeDataTypeTransformer implements DataTypeTransformer {
 
   protected SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
 

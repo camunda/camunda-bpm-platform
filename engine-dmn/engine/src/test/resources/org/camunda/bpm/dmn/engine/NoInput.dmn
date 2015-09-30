@@ -11,7 +11,7 @@
       <clause id="clause" name="Result">
         <outputDefinition href="#itemDefinition1" />
         <outputEntry id="outputEntry1">
-          <text>ok</text>
+          <text>"ok"</text>
         </outputEntry>
       </clause>
       <rule id="rule1">

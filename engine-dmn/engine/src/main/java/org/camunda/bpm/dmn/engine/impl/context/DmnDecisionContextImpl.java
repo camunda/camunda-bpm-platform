@@ -13,11 +13,12 @@
 
 package org.camunda.bpm.dmn.engine.impl.context;
 
+import static org.camunda.commons.utils.EnsureUtil.ensureNotNull;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
@@ -41,24 +42,30 @@ import org.camunda.bpm.dmn.engine.impl.DmnDecisionResultImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableResultImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableRuleImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableValueImpl;
+import org.camunda.bpm.dmn.engine.impl.DmnEngineConfigurationImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnEngineLogger;
-import org.camunda.bpm.dmn.juel.JuelScriptEngineFactory;
+import org.camunda.bpm.dmn.feel.FeelEngine;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.NumberValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.bpm.model.dmn.HitPolicy;
+import org.camunda.commons.utils.StringUtil;
 
 public class DmnDecisionContextImpl implements DmnDecisionContext {
-
-  public static final String DEFAULT_SCRIPT_LANGUAGE = JuelScriptEngineFactory.NAME;
 
   protected static final DmnEngineLogger LOG = DmnEngineLogger.ENGINE_LOGGER;
 
   protected static final String TYPED_INPUT_VALUE_POSTFIX = "_typed";
 
   protected DmnScriptEngineResolver scriptEngineResolver;
+  protected FeelEngine feelEngine;
   protected Map<HitPolicy, DmnHitPolicyHandler> hitPolicyHandlers;
   protected List<DmnDecisionTableListener> decisionTableListeners = new ArrayList<DmnDecisionTableListener>();
+
+  protected String defaultAllowedValueExpressionLanguage;
+  protected String defaultInputEntryExpressionLanguage;
+  protected String defaultInputExpressionExpressionLanguage;
+  protected String defaultOutputEntryExpressionLanguage;
 
   public DmnScriptEngineResolver getScriptEngineResolver() {
     return scriptEngineResolver;
@@ -66,6 +73,14 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
 
   public void setScriptEngineResolver(DmnScriptEngineResolver scriptEngineResolver) {
     this.scriptEngineResolver = scriptEngineResolver;
+  }
+
+  public FeelEngine getFeelEngine() {
+    return feelEngine;
+  }
+
+  public void setFeelEngine(FeelEngine feelEngine) {
+    this.feelEngine = feelEngine;
   }
 
   public Map<HitPolicy, DmnHitPolicyHandler> getHitPolicyHandlers() {
@@ -99,6 +114,38 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
 
   public void setDecisionTableListeners(List<DmnDecisionTableListener> decisionTableListeners) {
     this.decisionTableListeners = decisionTableListeners;
+  }
+
+  public String getDefaultAllowedValueExpressionLanguage() {
+    return defaultAllowedValueExpressionLanguage;
+  }
+
+  public void setDefaultAllowedValueExpressionLanguage(String defaultAllowedValueExpressionLanguage) {
+    this.defaultAllowedValueExpressionLanguage = defaultAllowedValueExpressionLanguage;
+  }
+
+  public String getDefaultInputEntryExpressionLanguage() {
+    return defaultInputEntryExpressionLanguage;
+  }
+
+  public void setDefaultInputEntryExpressionLanguage(String defaultInputEntryExpressionLanguage) {
+    this.defaultInputEntryExpressionLanguage = defaultInputEntryExpressionLanguage;
+  }
+
+  public String getDefaultInputExpressionExpressionLanguage() {
+    return defaultInputExpressionExpressionLanguage;
+  }
+
+  public void setDefaultInputExpressionExpressionLanguage(String defaultInputExpressionExpressionLanguage) {
+    this.defaultInputExpressionExpressionLanguage = defaultInputExpressionExpressionLanguage;
+  }
+
+  public String getDefaultOutputEntryExpressionLanguage() {
+    return defaultOutputEntryExpressionLanguage;
+  }
+
+  public void setDefaultOutputEntryExpressionLanguage(String defaultOutputEntryExpressionLanguage) {
+    this.defaultOutputEntryExpressionLanguage = defaultOutputEntryExpressionLanguage;
   }
 
   public DmnDecisionResult evaluateDecision(DmnDecision decision, Map<String, Object> variables) {
@@ -173,7 +220,7 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
       Map<String, Object> evaluationCache) {
     Map<String, DmnDecisionTableValue> inputs = new HashMap<String, DmnDecisionTableValue>();
     for (DmnClause clause : decisionTable.getClauses()) {
-      if (clause.isInputClause()) {
+      if (clause.isInputClause() && isNonEmptyExpression(clause.getInputExpression())) {
         DmnDecisionTableValue input = evaluateInputClause(clause, variables, evaluationCache);
         inputs.put(input.getKey(), input);
       }
@@ -186,7 +233,7 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
     DmnExpression inputExpression = clause.getInputExpression();
 
     if (inputExpression != null) {
-      Object value = evaluateExpression(inputExpression, variables, evaluationCache);
+      Object value = evaluateInputExpression(inputExpression, variables, evaluationCache);
       TypedValue typedValue = inputExpression.getItemDefinition().getTypeDefinition().transform(value);
       input.setValue(typedValue);
 
@@ -221,7 +268,7 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
         localVariables.put(inputValue.getOutputName() + TYPED_INPUT_VALUE_POSTFIX, typedValue);
       }
 
-      boolean applicable = isExpressionApplicable(condition, localVariables, evaluationCache);
+      boolean applicable = isConditionApplicable(condition, localVariables, evaluationCache);
       clauseSatisfied.put(clauseKey, applicable);
     }
 
@@ -240,41 +287,129 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
   protected Map<String, DmnDecisionTableValue> evaluateRuleOutput(DmnRule rule, Map<String, Object> variables, Map<String, Object> evaluationCache) {
     Map<String, DmnDecisionTableValue> outputs = new HashMap<String, DmnDecisionTableValue>();
     for (DmnClauseEntry conclusion : rule.getConclusions()) {
+      if (isNonEmptyExpression(conclusion)) {
+        DmnDecisionTableValueImpl output = new DmnDecisionTableValueImpl(conclusion.getClause());
+        Object value = evaluateOutputEntry(conclusion, variables, evaluationCache);
+        TypedValue typedValue = conclusion.getClause().getOutputDefinition().getTypeDefinition().transform(value);
 
-      DmnDecisionTableValueImpl output = new DmnDecisionTableValueImpl(conclusion.getClause());
-      Object value = evaluateExpression(conclusion, variables, evaluationCache);
-      TypedValue typedValue = conclusion.getClause().getOutputDefinition().getTypeDefinition().transform(value);
-
-      output.setValue(typedValue);
-      outputs.put(output.getKey(), output);
+        output.setValue(typedValue);
+        outputs.put(output.getKey(), output);
+      }
     }
     return outputs;
   }
 
-  protected boolean isExpressionApplicable(DmnExpression expression, Map<String, Object> variables, Map<String, Object> evaluationCache) {
-    Object result = evaluateExpression(expression, variables, evaluationCache);
+  protected boolean isConditionApplicable(DmnClauseEntry condition, Map<String, Object> variables, Map<String, Object> evaluationCache) {
+    Object result = evaluateInputEntry(condition, variables, evaluationCache);
     return result != null && result.equals(true);
   }
 
-  protected Object evaluateExpression(DmnExpression expression, Map<String, Object> variables, Map<String, Object> evaluationCache) {
-    String expressionKey = expression.getKey();
-    if (evaluationCache != null && evaluationCache.containsKey(expressionKey)) {
+  protected Object evaluateInputExpression(DmnExpression inputExpression, Map<String, Object> variables, Map<String, Object> evaluationCache) {
+    ensureNotNull("evaluationCache", evaluationCache);
+    String expressionKey = inputExpression.getKey();
+    if (evaluationCache.containsKey(expressionKey)) {
       return evaluationCache.get(expressionKey);
     } else {
-      Object value = evaluateExpression(expression, variables);
-      if (evaluationCache != null) {
-        evaluationCache.put(expressionKey, value);
-      }
+      Object value = evaluateInputExpression(inputExpression, variables);
+      evaluationCache.put(expressionKey, value);
       return value;
     }
   }
 
-  protected Object evaluateExpression(DmnExpression expression, Map<String, Object> variables) {
-    String expressionText = expression.getExpression();
+  protected Object evaluateInputExpression(DmnExpression inputExpression, Map<String, Object> variables) {
+    String expressionLanguage = inputExpression.getExpressionLanguage();
+    if (expressionLanguage == null) {
+      expressionLanguage = getDefaultInputExpressionExpressionLanguage();
+    }
+    if (DmnEngineConfigurationImpl.FEEL_EXPRESSION_LANGUAGE.equals(expressionLanguage)) {
+      return evaluateFeelSimpleExpression(inputExpression, variables);
+    }
+    else {
+      return evaluateExpression(expressionLanguage, inputExpression, variables);
+    }
+  }
+
+  private Object evaluateInputEntry(DmnClauseEntry inputEntry, Map<String, Object> variables, Map<String, Object> evaluationCache) {
+    ensureNotNull("evaluationCache", evaluationCache);
+    String expressionKey = inputEntry.getKey();
+    if (evaluationCache.containsKey(expressionKey)) {
+      return evaluationCache.get(expressionKey);
+    } else {
+      Object value = evaluateInputEntry(inputEntry, variables);
+      evaluationCache.put(expressionKey, value);
+      return value;
+    }
+  }
+
+  protected Object evaluateInputEntry(DmnClauseEntry inputEntry, Map<String, Object> variables) {
+    if (isNonEmptyExpression(inputEntry)) {
+      String expressionLanguage = inputEntry.getExpressionLanguage();
+      if (expressionLanguage == null) {
+        expressionLanguage = getDefaultInputEntryExpressionLanguage();
+      }
+      if (DmnEngineConfigurationImpl.FEEL_EXPRESSION_LANGUAGE.equals(expressionLanguage)) {
+        return evaluateFeelSimpleUnaryTests(inputEntry, variables);
+      } else {
+        return evaluateExpression(expressionLanguage, inputEntry, variables);
+      }
+    }
+    else {
+      return true; // input entries without expressions are true
+    }
+  }
+
+  protected Object evaluateOutputEntry(DmnClauseEntry outputEntry, Map<String, Object> variables, Map<String, Object> evaluationCache) {
+    ensureNotNull("evaluationCache", evaluationCache);
+    String expressionKey = outputEntry.getKey();
+    if (evaluationCache.containsKey(expressionKey)) {
+      return evaluationCache.get(expressionKey);
+    } else {
+      Object value = evaluateOutputEntry(outputEntry, variables);
+      evaluationCache.put(expressionKey, value);
+      return value;
+    }
+  }
+
+  protected Object evaluateOutputEntry(DmnClauseEntry outputEntry, Map<String, Object> variables) {
+    String expressionLanguage = outputEntry.getExpressionLanguage();
+    if (expressionLanguage == null) {
+      expressionLanguage = getDefaultOutputEntryExpressionLanguage();
+    }
+    if (DmnEngineConfigurationImpl.FEEL_EXPRESSION_LANGUAGE.equals(expressionLanguage)) {
+      return evaluateFeelSimpleExpression(outputEntry, variables);
+    }
+    else {
+      return evaluateExpression(expressionLanguage, outputEntry, variables);
+    }
+  }
+
+  protected Object evaluateFeelSimpleExpression(DmnExpression feelExpression, Map<String, Object> variables) {
+    String feelSimpleExpression = feelExpression.getExpression();
+    if (feelSimpleExpression != null) {
+      return feelEngine.evaluateSimpleExpression(feelSimpleExpression, variables);
+    }
+    else {
+      return null;
+    }
+  }
+
+  protected Object evaluateFeelSimpleUnaryTests(DmnClauseEntry feelExpression, Map<String, Object> variables) {
+    String feelSimpleUnaryTests = feelExpression.getExpression();
+    if (feelSimpleUnaryTests != null) {
+      String inputVariableName = feelExpression.getClause().getOutputName() + TYPED_INPUT_VALUE_POSTFIX;
+      return feelEngine.evaluateSimpleUnaryTests(feelSimpleUnaryTests, inputVariableName, variables);
+    }
+    else {
+      return null;
+    }
+  }
+
+  protected Object evaluateExpression(String expressionLanguage, DmnExpression expression, Map<String, Object> variables) {
+    String expressionText = getExpressionTextForLanguage(expression, expressionLanguage);
     if (expressionText != null) {
-      String expressionLanguage = expression.getExpressionLanguage();
-      ScriptEngine scriptEngine = getScriptEngineForNameChecked(expressionLanguage);
-      Bindings bindings = createBindings(scriptEngine, variables);
+      ScriptEngine scriptEngine = getScriptEngineForName(expressionLanguage);
+      Bindings bindings = scriptEngine.createBindings();
+      bindings.putAll(variables);
 
       try {
         return scriptEngine.eval(expressionText, bindings);
@@ -286,26 +421,34 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
     }
   }
 
-  protected ScriptEngine getScriptEngineForNameChecked(String expressionLanguage) {
-    ScriptEngine scriptEngine = getScriptEngineForName(expressionLanguage);
+  protected ScriptEngine getScriptEngineForName(String expressionLanguage) {
+    ensureNotNull("expressionLanguage", expressionLanguage);
+    ScriptEngine scriptEngine = scriptEngineResolver.getScriptEngineForLanguage(expressionLanguage);
     if (scriptEngine != null) {
       return scriptEngine;
-    } else {
-      throw LOG.noScriptEngineFoundForLanguage(expressionLanguage, DEFAULT_SCRIPT_LANGUAGE);
+    }
+    else {
+      throw LOG.noScriptEngineFoundForLanguage(expressionLanguage);
     }
   }
 
-  protected ScriptEngine getScriptEngineForName(String expressionLanguage) {
-    if (expressionLanguage == null) {
-      expressionLanguage = DEFAULT_SCRIPT_LANGUAGE;
+  protected String getExpressionTextForLanguage(DmnExpression expression, String expressionLanguage) {
+    String expressionText = expression.getExpression();
+    if (expressionText != null) {
+      if (DmnEngineConfigurationImpl.JUEL_EXPRESSION_LANGUAGE.equals(expressionLanguage) && !StringUtil.isExpression(expressionText)) {
+        return "${" + expressionText + "}";
+      }
+      else {
+        return expressionText;
+      }
     }
-    return scriptEngineResolver.getScriptEngineForLanguage(expressionLanguage);
+    else {
+      return null;
+    }
   }
 
-  protected Bindings createBindings(ScriptEngine scriptEngine, Map<String, Object> variables) {
-    Bindings bindings = scriptEngine.createBindings();
-    bindings.putAll(variables);
-    return bindings;
+  protected boolean isNonEmptyExpression(DmnExpression expression) {
+    return expression != null && expression.getExpression() != null && !expression.getExpression().trim().isEmpty();
   }
 
 }

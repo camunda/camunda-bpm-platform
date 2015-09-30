@@ -33,7 +33,6 @@ import org.camunda.bpm.dmn.engine.impl.DefaultTypeDefinition;
 import org.camunda.bpm.dmn.engine.impl.DmnClauseImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnEngineConfigurationImpl;
-import org.camunda.bpm.dmn.engine.impl.context.DmnDecisionContextImpl;
 import org.camunda.bpm.model.dmn.HitPolicy;
 import org.camunda.commons.utils.IoUtil;
 import org.junit.BeforeClass;
@@ -57,7 +56,7 @@ public class DmnTransformTest {
     assertThat(decisionModel.getKey()).isEqualTo("definitions");
     assertThat(decisionModel.getName()).isEqualTo("camunda");
     assertThat(decisionModel.getNamespace()).isEqualTo("http://camunda.org/dmn");
-    assertThat(decisionModel.getExpressionLanguage()).isEqualTo(DmnDecisionContextImpl.DEFAULT_SCRIPT_LANGUAGE);
+    assertThat(decisionModel.getExpressionLanguage()).isEqualTo(null);
   }
 
   @Test
@@ -188,7 +187,7 @@ public class DmnTransformTest {
     assertThat(inputExpression.getKey()).isEqualTo("inputExpression1");
     assertThat(inputExpression.getName()).isNull();
     assertThat(inputExpression.getExpressionLanguage()).isNull();
-    assertThat(inputExpression.getExpression()).isEqualTo("${camunda}");
+    assertThat(inputExpression.getExpression()).isEqualTo("camunda");
     assertThat(inputExpression.getItemDefinition()).isNotNull();
     assertThat(inputExpression.getItemDefinition().getTypeDefinition()).isEqualTo(new DefaultTypeDefinition());
 
@@ -229,7 +228,7 @@ public class DmnTransformTest {
     assertThat(inputEntry.getKey()).isEqualTo("inputEntry1");
     assertThat(inputEntry.getName()).isEqualTo("camunda");
     assertThat(inputEntry.getExpressionLanguage()).isNull();
-    assertThat(inputEntry.getExpression()).isEqualTo("${cellInput=='camunda'}");
+    assertThat(inputEntry.getExpression()).isEqualTo("camunda");
     assertThat(inputEntry.getClause().getKey()).isEqualTo("clause4");
 
     inputEntry = inputEntries.get(1);

@@ -20,7 +20,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.camunda.bpm.dmn.engine.test.DmnDecisionTest;
-import org.camunda.bpm.dmn.engine.test.DmnEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.junit.Before;
@@ -36,16 +35,13 @@ import org.junit.rules.ExpectedException;
 public class DataTypeTransformerTest extends DmnDecisionTest {
 
   @Rule
-  public DmnEngineRule dmnEngineRule = new DmnEngineRule();
-
-  @Rule
   public ExpectedException thrown = ExpectedException.none();
 
   protected DataTypeTransformerFactory factory;
 
   @Before
   public void setup() {
-    factory = dmnEngineRule.getEngine().getConfiguration().getDataTypeTransformerFactory();
+    factory = engine.getConfiguration().getDataTypeTransformerFactory();
   }
 
   @Test
@@ -196,7 +192,7 @@ public class DataTypeTransformerTest extends DmnDecisionTest {
     assertThat(typeTransformer.transform(Double.MIN_VALUE), is((TypedValue) Variables.doubleValue(Double.MIN_VALUE)));
     assertThat(typeTransformer.transform(Double.MAX_VALUE), is((TypedValue) Variables.doubleValue(Double.MAX_VALUE)));
     assertThat(typeTransformer.transform(-Double.MAX_VALUE), is((TypedValue) Variables.doubleValue(-Double.MAX_VALUE)));
-    assertThat(typeTransformer.transform(Long.MAX_VALUE), is((TypedValue) Variables.doubleValue(Double.valueOf(Long.MAX_VALUE))));
+    assertThat(typeTransformer.transform(Long.MAX_VALUE), is((TypedValue) Variables.doubleValue((double) Long.MAX_VALUE)));
   }
 
   @Test

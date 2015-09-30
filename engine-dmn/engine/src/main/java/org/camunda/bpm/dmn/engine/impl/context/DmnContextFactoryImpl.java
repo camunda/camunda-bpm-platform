@@ -23,7 +23,12 @@ public class DmnContextFactoryImpl implements DmnContextFactory {
     DmnDecisionContextImpl decisionContext = new DmnDecisionContextImpl();
     decisionContext.setHitPolicyHandlers(configuration.getHitPolicyHandlers());
     decisionContext.setScriptEngineResolver(configuration.getScriptEngineResolver());
+    decisionContext.setFeelEngine(configuration.getFeelEngineProvider().createInstance());
     decisionContext.setDecisionTableListeners(configuration.getCustomDmnDecisionTableListeners());
+    decisionContext.setDefaultAllowedValueExpressionLanguage(configuration.getDefaultAllowedValueExpressionLanguage());
+    decisionContext.setDefaultInputEntryExpressionLanguage(configuration.getDefaultInputEntryExpressionLanguage());
+    decisionContext.setDefaultInputExpressionExpressionLanguage(configuration.getDefaultInputExpressionExpressionLanguage());
+    decisionContext.setDefaultOutputEntryExpressionLanguage(configuration.getDefaultOutputEntryExpressionLanguage());
     return decisionContext;
   }
 

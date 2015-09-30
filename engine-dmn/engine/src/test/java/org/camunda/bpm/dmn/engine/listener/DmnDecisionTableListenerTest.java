@@ -19,41 +19,36 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTable;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableListener;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableRule;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableValue;
-import org.camunda.bpm.dmn.engine.DmnEngine;
+import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnEngineConfigurationImpl;
 import org.camunda.bpm.dmn.engine.test.DecisionResource;
-import org.camunda.bpm.dmn.engine.test.DmnEngineRule;
+import org.camunda.bpm.dmn.engine.test.DmnDecisionTest;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.dmn.BuiltinAggregator;
 import org.camunda.bpm.model.dmn.HitPolicy;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 
-public class DmnDecisionTableListenerTest {
+public class DmnDecisionTableListenerTest extends DmnDecisionTest {
 
   public static final String DMN_FILE = "org/camunda/bpm/dmn/engine/listener/DmnDecisionTableListenerTest.test.dmn";
 
-  @Rule
-  public DmnEngineRule dmnEngineRule = new DmnEngineRule(new DmnDecisionTableListenerEngineConfiguration());
-
-  public DmnEngine engine;
-  public DmnDecision decision;
   public TestDmnDecisionTableListener listener;
 
+  @Override
+  public DmnEngineConfiguration createDmnEngineConfiguration() {
+    return new DmnDecisionTableListenerEngineConfiguration();
+  }
 
   @Before
-  public void initEngineAndDecision() {
-    engine = dmnEngineRule.getEngine();
-    decision = dmnEngineRule.getDecision();
+  public void initListener() {
     listener = ((DmnDecisionTableListenerEngineConfiguration) engine.getConfiguration()).testDecisionTableListener;
   }
 
@@ -84,8 +79,8 @@ public class DmnDecisionTableListenerTest {
   public void testInputValues() {
     evaluateDecision(true, "foo", "test", "hello");
     Map<String, DmnDecisionTableValue> inputs = listener.result.getInputs();
-    assertThat(inputs).hasSize(3)
-      .containsOnlyKeys("input1", "input2", "input3");
+    assertThat(inputs).hasSize(2)
+      .containsOnlyKeys("input1", "input2");
 
     DmnDecisionTableValue input1 = inputs.get("input1");
     assertThat(input1.getKey()).isEqualTo("input1");
@@ -98,12 +93,6 @@ public class DmnDecisionTableListenerTest {
     assertThat(input2.getName()).isNull();
     assertThat(input2.getOutputName()).isEqualTo("x");
     assertThat(input2.getValue()).isEqualTo(Variables.untypedValue("foo"));
-
-    DmnDecisionTableValue input3 = inputs.get("input3");
-    assertThat(input3.getKey()).isEqualTo("input3");
-    assertThat(input3.getName()).isNull();
-    assertThat(input3.getOutputName()).isEqualTo("cellInput");
-    assertThat(input3.getValue()).isEqualTo(Variables.untypedNullValue());
   }
 
   @Test

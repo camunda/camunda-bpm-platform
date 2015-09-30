@@ -27,6 +27,7 @@ import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
 import org.camunda.commons.utils.IoUtil;
+import org.camunda.commons.utils.StringUtil;
 
 import de.odysseus.el.ExpressionFactoryImpl;
 
@@ -47,8 +48,7 @@ public class JuelScriptEngine extends AbstractScriptEngine implements Compilable
   }
 
   public CompiledScript compile(String script) throws ScriptException {
-    ValueExpression expression = createExpression(script, context);
-    return new JuelCompiledScript(this, expression);
+    return new JuelCompiledScript(this, script);
   }
 
   public CompiledScript compile(Reader reader) throws ScriptException {
@@ -97,6 +97,9 @@ public class JuelScriptEngine extends AbstractScriptEngine implements Compilable
   public ValueExpression createExpression(String expression, ScriptContext context) throws ScriptException {
     ELContext elContext = createElContext(context);
     try {
+      if (!StringUtil.isExpression(expression)) {
+        expression = "${" + expression + "}";
+      }
       return expressionFactory.createValueExpression(elContext, expression, Object.class);
     }
     catch (ELException e) {

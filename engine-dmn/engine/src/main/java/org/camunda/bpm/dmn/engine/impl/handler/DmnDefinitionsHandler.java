@@ -15,7 +15,7 @@ package org.camunda.bpm.dmn.engine.impl.handler;
 
 import org.camunda.bpm.dmn.engine.handler.DmnElementHandlerContext;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionModelImpl;
-import org.camunda.bpm.model.dmn.impl.DmnModelConstants;
+import org.camunda.bpm.dmn.engine.impl.DmnEngineConfigurationImpl;
 import org.camunda.bpm.model.dmn.instance.Definitions;
 
 public class DmnDefinitionsHandler extends AbstractDmnElementHandler<Definitions, DmnDecisionModelImpl> {
@@ -41,8 +41,9 @@ public class DmnDefinitionsHandler extends AbstractDmnElementHandler<Definitions
 
   protected void initExpressionLanguage(DmnElementHandlerContext context, Definitions definitions, DmnDecisionModelImpl dmnDecisionModel) {
     String expressionLanguage = definitions.getExpressionLanguage();
-    // override default feel expression language with JUEL
-    if (!DmnModelConstants.FEEL_NS.equals(expressionLanguage)) {
+    // ignore default FEEL expression language, if you want to use FEEL as
+    // default for all expressions you have to set FEEL as default on DMN engine configuration
+    if (!DmnEngineConfigurationImpl.FEEL_EXPRESSION_LANGUAGE.equals(expressionLanguage)) {
       dmnDecisionModel.setExpressionLanguage(expressionLanguage);
     }
   }

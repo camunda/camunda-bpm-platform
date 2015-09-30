@@ -13,7 +13,6 @@
 
 package org.camunda.bpm.dmn.juel;
 
-import javax.el.ValueExpression;
 import javax.script.CompiledScript;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
@@ -22,15 +21,15 @@ import javax.script.ScriptException;
 public class JuelCompiledScript extends CompiledScript {
 
   protected JuelScriptEngine scriptEngine;
-  protected ValueExpression expression;
+  protected String expression;
 
-  public JuelCompiledScript(JuelScriptEngine scriptEngine, ValueExpression expression) {
+  public JuelCompiledScript(JuelScriptEngine scriptEngine, String expression) {
     this.scriptEngine = scriptEngine;
     this.expression = expression;
   }
 
   public Object eval(ScriptContext context) throws ScriptException {
-    return scriptEngine.evaluateExpression(expression, context);
+    return scriptEngine.eval(expression, context);
   }
 
   public ScriptEngine getEngine() {

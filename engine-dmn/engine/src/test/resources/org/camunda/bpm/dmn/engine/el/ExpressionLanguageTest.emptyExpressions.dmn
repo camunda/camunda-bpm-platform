@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Definitions xmlns="http://www.omg.org/spec/DMN/20130901"
+             id="definitions"
+             name="camunda"
+             namespace="http://camunda.org/dmn">
+  <Decision id="decision1">
+    <DecisionTable id="decisionTable1" isComplete="true" isConsistent="true">
+      <clause id="clause1">
+        <inputExpression id="inputExpression1">
+          <text></text>
+        </inputExpression>
+        <inputEntry id="inputEntry1">
+          <text></text>
+        </inputEntry>
+      </clause>
+      <clause id="clause2">
+        <inputExpression id="inputExpression2">
+          <text>    </text>
+        </inputExpression>
+        <inputEntry id="inputEntry2">
+          <text>    </text>
+        </inputEntry>
+      </clause>
+      <clause id="clause3">
+        <outputEntry id="outputEntry1">
+          <text></text>
+        </outputEntry>
+      </clause>
+      <clause id="clause4">
+        <outputEntry id="outputEntry2">
+          <text>     </text>
+        </outputEntry>
+      </clause>
+      <clause id="clause5">
+        <outputEntry id="outputEntry3">
+          <text>true</text>
+        </outputEntry>
+      </clause>
+      <rule id="rule1">
+        <condition>inputEntry1 inputEntry2</condition>
+        <conclusion>outputEntry1 outputEntry2 outputEntry3</conclusion>
+      </rule>
+    </DecisionTable>
+  </Decision>
+  <Decision id="decision2">
+    <DecisionTable id="decisionTable2" isComplete="true" isConsistent="true">
+      <clause id="clause6">
+        <inputExpression id="inputExpression3">
+          <text></text>
+        </inputExpression>
+        <inputEntry id="inputEntry3">
+          <text>10</text>
+        </inputEntry>
+      </clause>
+      <clause id="clause7">
+        <outputEntry id="outputEntry4">
+          <text>true</text>
+        </outputEntry>
+      </clause>
+      <rule id="rule2">
+        <condition>inputEntry3</condition>
+        <conclusion>outputEntry4</conclusion>
+      </rule>
+    </DecisionTable>
+  </Decision>
+</Definitions>

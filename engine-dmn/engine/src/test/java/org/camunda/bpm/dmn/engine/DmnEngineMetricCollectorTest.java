@@ -24,6 +24,7 @@ import org.junit.Test;
 
 public class DmnEngineMetricCollectorTest extends DmnDecisionTest {
 
+  public static final String EXAMPLE_DMN = "org/camunda/bpm/dmn/engine/Example.dmn";
   public static final Map<String, Object> VARIABLES = new HashMap<String, Object>();
 
   static {

@@ -11,15 +11,19 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.dmn.engine.test.asserts;
+package org.camunda.bpm.dmn.feel;
 
-public class DmnAssertionException extends RuntimeException {
+/**
+ * Exception which is thrown if a error occurs during the
+ * evaluation of a FEEL expression.
+ */
+public class FeelException extends RuntimeException {
 
-  public DmnAssertionException(String message) {
+  public FeelException(String message) {
     super(message);
   }
 
-  public DmnAssertionException(String message, Throwable cause) {
+  public FeelException(String message, Throwable cause) {
     super(message, cause);
   }
 

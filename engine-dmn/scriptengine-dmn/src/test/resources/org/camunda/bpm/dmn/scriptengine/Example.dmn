@@ -7,22 +7,22 @@
   <ItemDefinition id="itemDefinition1" name="StatusType">
     <typeDefinition>string</typeDefinition>
     <allowedValue id="allowedValue1">
-      <text>gold</text>
+      <text>"gold"</text>
     </allowedValue>
     <allowedValue id="allowedValue2">
-      <text>silver</text>
+      <text>"silver"</text>
     </allowedValue>
     <allowedValue id="allowedValue3">
-      <text>bronze</text>
+      <text>"bronze"</text>
     </allowedValue>
   </ItemDefinition>
   <ItemDefinition id="itemDefinition2" name="ResultType">
     <typeDefinition>string</typeDefinition>
     <allowedValue id="allowedValue4">
-      <text>ok</text>
+      <text>"ok"</text>
     </allowedValue>
     <allowedValue id="allowedValue5">
-      <text>notok</text>
+      <text>"notok"</text>
     </allowedValue>
   </ItemDefinition>
   <Decision id="decision1">
@@ -33,22 +33,22 @@
           <text>status</text>
         </inputExpression>
         <inputEntry id="inputEntry1">
-          <text>bronze</text>
+          <text>"bronze"</text>
         </inputEntry>
         <inputEntry id="inputEntry2">
-          <text>silver</text>
+          <text>"silver"</text>
         </inputEntry>
         <inputEntry id="inputEntry3">
-          <text>gold</text>
+          <text>"gold"</text>
         </inputEntry>
       </clause>
       <clause id="clause2" camunda:output="result">
         <outputDefinition href="#itemDefinition2" />
         <outputEntry id="outputEntry1">
-          <text>notok</text>
+          <text>"notok"</text>
         </outputEntry>
         <outputEntry id="outputEntry2">
-          <text>ok</text>
+          <text>"ok"</text>
         </outputEntry>
       </clause>
       <rule id="rule1">
@@ -73,22 +73,22 @@
           <text>status</text>
         </inputExpression>
         <inputEntry id="inputEntry4">
-          <text>bronze</text>
+          <text>"bronze"</text>
         </inputEntry>
         <inputEntry id="inputEntry5">
-          <text>silver</text>
+          <text>"silver"</text>
         </inputEntry>
         <inputEntry id="inputEntry6">
-          <text>gold</text>
+          <text>"gold"</text>
         </inputEntry>
       </clause>
       <clause id="clause4" camunda:output="result">
         <outputDefinition href="#itemDefinition2" />
         <outputEntry id="outputEntry3">
-          <text>notok</text>
+          <text>"notok"</text>
         </outputEntry>
         <outputEntry id="outputEntry4">
-          <text>ok</text>
+          <text>"ok"</text>
         </outputEntry>
       </clause>
       <rule id="rule4">

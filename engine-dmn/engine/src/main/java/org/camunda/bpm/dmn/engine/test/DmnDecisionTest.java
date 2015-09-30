@@ -15,22 +15,22 @@ package org.camunda.bpm.dmn.engine.test;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnEngine;
+import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
+import org.camunda.bpm.dmn.engine.impl.DmnEngineConfigurationImpl;
 import org.junit.Before;
 import org.junit.Rule;
 
 public abstract class DmnDecisionTest {
 
-  public static final String NO_INPUT_DMN = "org/camunda/bpm/dmn/engine/NoInput.dmn";
-  public static final String ONE_RULE_DMN = "org/camunda/bpm/dmn/engine/OneRule.dmn";
-  public static final String EXAMPLE_DMN = "org/camunda/bpm/dmn/engine/Example.dmn";
-  public static final String DATA_TYPE_DMN = "org/camunda/bpm/dmn/engine/DataType.dmn";
-
   @Rule
-  public DmnEngineRule dmnEngineRule = new DmnEngineRule();
+  public DmnEngineRule dmnEngineRule = new DmnEngineRule(createDmnEngineConfiguration());
 
   public DmnEngine engine;
   public DmnDecision decision;
 
+  public DmnEngineConfiguration createDmnEngineConfiguration() {
+    return new DmnEngineConfigurationImpl();
+  }
 
   @Before
   public void initEngineAndDecision() {

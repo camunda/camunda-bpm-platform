@@ -15,11 +15,8 @@ package org.camunda.bpm.dmn.engine.impl.handler;
 
 import org.camunda.bpm.dmn.engine.handler.DmnElementHandlerContext;
 import org.camunda.bpm.dmn.engine.impl.DmnExpressionImpl;
-import org.camunda.bpm.dmn.engine.impl.context.DmnDecisionContextImpl;
-import org.camunda.bpm.dmn.juel.JuelScriptEngineFactory;
 import org.camunda.bpm.model.dmn.instance.LiteralExpression;
 import org.camunda.bpm.model.dmn.instance.Text;
-import org.camunda.commons.utils.StringUtil;
 
 public abstract class AbstractDmnLiteralExpressionHandler<E extends LiteralExpression, I extends DmnExpressionImpl> extends AbstractDmnElementHandler<E, I> {
 
@@ -38,8 +35,12 @@ public abstract class AbstractDmnLiteralExpressionHandler<E extends LiteralExpre
 
   protected void initExpressionLanguage(DmnElementHandlerContext context, E expression, DmnExpressionImpl dmnExpression) {
     String expressionLanguage = expression.getExpressionLanguage();
+    String globalExpressionLanguage = context.getDecisionModel().getExpressionLanguage();
     if (expressionLanguage != null) {
       dmnExpression.setExpressionLanguage(expressionLanguage.trim());
+    }
+    else if (globalExpressionLanguage != null) {
+      dmnExpression.setExpressionLanguage(globalExpressionLanguage);
     }
   }
 
@@ -49,26 +50,13 @@ public abstract class AbstractDmnLiteralExpressionHandler<E extends LiteralExpre
       String textContent = text.getTextContent();
       if (textContent != null && !textContent.trim().isEmpty()) {
         dmnExpression.setExpression(textContent.trim());
-        postProcessExpressionText(context, expression, dmnExpression);
       }
     }
+    postProcessExpressionText(context, expression, dmnExpression);
   }
 
   protected void postProcessExpressionText(DmnElementHandlerContext context, E expression, DmnExpressionImpl dmnExpression) {
     // do nothing
-  }
-
-  protected boolean hasJuelExpressionLanguage(DmnExpressionImpl dmnExpression) {
-    String expressionLanguage = dmnExpression.getExpressionLanguage();
-    if (expressionLanguage == null) {
-      expressionLanguage = DmnDecisionContextImpl.DEFAULT_SCRIPT_LANGUAGE;
-    }
-
-    return JuelScriptEngineFactory.NAME.equals(expressionLanguage);
-  }
-
-  protected boolean isExpression(DmnExpressionImpl dmnExpression) {
-    return StringUtil.isExpression(dmnExpression.getExpression());
   }
 
 }

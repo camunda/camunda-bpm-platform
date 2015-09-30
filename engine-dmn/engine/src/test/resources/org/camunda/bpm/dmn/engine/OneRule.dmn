@@ -17,13 +17,13 @@
           <text>input</text>
         </inputExpression>
         <inputEntry id="inputEntry1">
-          <text>ok</text>
+          <text>"ok"</text>
         </inputEntry>
       </clause>
       <clause id="clause2" name="Result">
         <outputDefinition href="#itemDefinition1" />
         <outputEntry id="outputEntry1">
-          <text>ok</text>
+          <text>"ok"</text>
         </outputEntry>
       </clause>
       <rule id="rule1">

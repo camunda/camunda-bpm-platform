@@ -43,9 +43,15 @@ import org.camunda.bpm.dmn.engine.transform.DmnTransformFactory;
 import org.camunda.bpm.dmn.engine.transform.DmnTransformListener;
 import org.camunda.bpm.dmn.engine.transform.DmnTransformer;
 import org.camunda.bpm.dmn.engine.type.DataTypeTransformerFactory;
+import org.camunda.bpm.dmn.feel.FeelEngineProvider;
+import org.camunda.bpm.dmn.feel.impl.FeelEngineProviderImpl;
 import org.camunda.bpm.model.dmn.HitPolicy;
+import org.camunda.bpm.model.dmn.impl.DmnModelConstants;
 
 public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
+
+  public static final String FEEL_EXPRESSION_LANGUAGE = DmnModelConstants.FEEL_NS;
+  public static final String JUEL_EXPRESSION_LANGUAGE = "juel";
 
   protected DmnContextFactory contextFactory;
 
@@ -62,7 +68,13 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
 
   protected Map<HitPolicy, DmnHitPolicyHandler> hitPolicyHandlers;
   protected DmnScriptEngineResolver scriptEngineResolver;
+  protected FeelEngineProvider feelEngineProvider;
   protected DataTypeTransformerFactory dataTypeTransformerFactory;
+
+  protected String defaultAllowedValueExpressionLanguage = JUEL_EXPRESSION_LANGUAGE;
+  protected String defaultInputEntryExpressionLanguage = FEEL_EXPRESSION_LANGUAGE;
+  protected String defaultInputExpressionExpressionLanguage = JUEL_EXPRESSION_LANGUAGE;
+  protected String defaultOutputEntryExpressionLanguage = JUEL_EXPRESSION_LANGUAGE;
 
   public DmnContextFactory getDmnContextFactory() {
     return contextFactory;
@@ -156,12 +168,52 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
     this.scriptEngineResolver = scriptEngineResolver;
   }
 
+  public FeelEngineProvider getFeelEngineProvider() {
+    return feelEngineProvider;
+  }
+
+  public void setFeelEngineProvider(FeelEngineProvider feelEngineProvider) {
+    this.feelEngineProvider = feelEngineProvider;
+  }
+
   public DataTypeTransformerFactory getDataTypeTransformerFactory() {
     return dataTypeTransformerFactory;
   }
 
   public void setDataTypeTransformerFactory(DataTypeTransformerFactory dataTypeTransformerFactory) {
     this.dataTypeTransformerFactory = dataTypeTransformerFactory;
+  }
+
+  public String getDefaultAllowedValueExpressionLanguage() {
+    return defaultAllowedValueExpressionLanguage;
+  }
+
+  public void setDefaultAllowedValueExpressionLanguage(String defaultAllowedValueExpressionLanguage) {
+    this.defaultAllowedValueExpressionLanguage = defaultAllowedValueExpressionLanguage;
+  }
+
+  public String getDefaultInputEntryExpressionLanguage() {
+    return defaultInputEntryExpressionLanguage;
+  }
+
+  public void setDefaultInputEntryExpressionLanguage(String defaultInputEntryExpressionLanguage) {
+    this.defaultInputEntryExpressionLanguage = defaultInputEntryExpressionLanguage;
+  }
+
+  public String getDefaultInputExpressionExpressionLanguage() {
+    return defaultInputExpressionExpressionLanguage;
+  }
+
+  public void setDefaultInputExpressionExpressionLanguage(String defaultInputExpressionExpressionLanguage) {
+    this.defaultInputExpressionExpressionLanguage = defaultInputExpressionExpressionLanguage;
+  }
+
+  public String getDefaultOutputEntryExpressionLanguage() {
+    return defaultOutputEntryExpressionLanguage;
+  }
+
+  public void setDefaultOutputEntryExpressionLanguage(String defaultOutputEntryExpressionLanguage) {
+    this.defaultOutputEntryExpressionLanguage = defaultOutputEntryExpressionLanguage;
   }
 
   public DmnEngine buildEngine() {
@@ -179,6 +231,7 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
     initDmnDecisionTableListeners();
     initHitPolicyHandlers();
     initScriptEngineResolver();
+    initFeelEngineProvider();
   }
 
   protected void initContextFactory() {
@@ -259,6 +312,12 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
   protected void initScriptEngineResolver() {
     if (scriptEngineResolver == null) {
       scriptEngineResolver = new DefaultScriptEngineResolver();
+    }
+  }
+
+  protected void initFeelEngineProvider() {
+    if (feelEngineProvider == null) {
+      feelEngineProvider = new FeelEngineProviderImpl();
     }
   }
 

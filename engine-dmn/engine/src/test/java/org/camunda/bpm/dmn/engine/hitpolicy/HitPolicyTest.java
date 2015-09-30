@@ -13,7 +13,6 @@
 
 package org.camunda.bpm.dmn.engine.hitpolicy;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.camunda.bpm.dmn.engine.test.asserts.DmnAssertions.assertThat;
 
@@ -87,7 +86,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04001");
+      assertThat(e).hasMessageStartingWith("DMN-03001");
     }
 
     try {
@@ -95,7 +94,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04001");
+      assertThat(e).hasMessageStartingWith("DMN-03001");
     }
 
     try {
@@ -103,7 +102,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04001");
+      assertThat(e).hasMessageStartingWith("DMN-03001");
     }
 
     try {
@@ -111,7 +110,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04001");
+      assertThat(e).hasMessageStartingWith("DMN-03001");
     }
   }
 
@@ -143,7 +142,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04001");
+      assertThat(e).hasMessageStartingWith("DMN-03001");
     }
 
     try {
@@ -151,7 +150,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04001");
+      assertThat(e).hasMessageStartingWith("DMN-03001");
     }
 
     try {
@@ -159,7 +158,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04001");
+      assertThat(e).hasMessageStartingWith("DMN-03001");
     }
 
     try {
@@ -167,7 +166,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04001");
+      assertThat(e).hasMessageStartingWith("DMN-03001");
     }
   }
 
@@ -199,7 +198,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04001");
+      assertThat(e).hasMessageStartingWith("DMN-03001");
     }
 
     try {
@@ -207,7 +206,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04001");
+      assertThat(e).hasMessageStartingWith("DMN-03001");
     }
 
     try {
@@ -215,7 +214,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04001");
+      assertThat(e).hasMessageStartingWith("DMN-03001");
     }
 
     try {
@@ -223,7 +222,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04001");
+      assertThat(e).hasMessageStartingWith("DMN-03001");
     }
   }
 
@@ -255,7 +254,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04001");
+      assertThat(e).hasMessageStartingWith("DMN-03001");
     }
 
     try {
@@ -263,7 +262,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04001");
+      assertThat(e).hasMessageStartingWith("DMN-03001");
     }
 
     try {
@@ -271,7 +270,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04001");
+      assertThat(e).hasMessageStartingWith("DMN-03001");
     }
 
     try {
@@ -279,7 +278,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04001");
+      assertThat(e).hasMessageStartingWith("DMN-03001");
     }
   }
 
@@ -311,7 +310,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04002");
+      assertThat(e).hasMessageStartingWith("DMN-03002");
     }
 
     try {
@@ -319,7 +318,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04002");
+      assertThat(e).hasMessageStartingWith("DMN-03002");
     }
 
     try {
@@ -327,7 +326,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04002");
+      assertThat(e).hasMessageStartingWith("DMN-03002");
     }
 
     try {
@@ -335,7 +334,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04002");
+      assertThat(e).hasMessageStartingWith("DMN-03002");
     }
 
     DmnDecisionResult result = startDecision(true, true, false, "a", "a", "a");
@@ -379,7 +378,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04002");
+      assertThat(e).hasMessageStartingWith("DMN-03002");
     }
 
     try {
@@ -387,7 +386,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04002");
+      assertThat(e).hasMessageStartingWith("DMN-03002");
     }
 
     try {
@@ -395,7 +394,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04002");
+      assertThat(e).hasMessageStartingWith("DMN-03002");
     }
 
     try {
@@ -403,7 +402,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04002");
+      assertThat(e).hasMessageStartingWith("DMN-03002");
     }
 
     DmnDecisionResult result = startDecision(true, true, false, "a", "a", "a");
@@ -970,7 +969,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04006");
+      assertThat(e).hasMessageStartingWith("DMN-03006");
     }
   }
 
@@ -1030,7 +1029,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04006");
+      assertThat(e).hasMessageStartingWith("DMN-03006");
     }
   }
 
@@ -1049,7 +1048,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04004");
+      assertThat(e).hasMessageStartingWith("DMN-03004");
     }
 
     try {
@@ -1057,7 +1056,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04004");
+      assertThat(e).hasMessageStartingWith("DMN-03004");
     }
 
     try {
@@ -1065,7 +1064,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04004");
+      assertThat(e).hasMessageStartingWith("DMN-03004");
     }
   }
 
@@ -1077,7 +1076,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04004");
+      assertThat(e).hasMessageStartingWith("DMN-03004");
     }
 
     try {
@@ -1085,7 +1084,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04004");
+      assertThat(e).hasMessageStartingWith("DMN-03004");
     }
 
     try {
@@ -1093,7 +1092,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04004");
+      assertThat(e).hasMessageStartingWith("DMN-03004");
     }
 
     try {
@@ -1101,7 +1100,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04004");
+      assertThat(e).hasMessageStartingWith("DMN-03004");
     }
   }
 
@@ -1156,7 +1155,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04006");
+      assertThat(e).hasMessageStartingWith("DMN-03006");
     }
   }
 
@@ -1216,7 +1215,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04006");
+      assertThat(e).hasMessageStartingWith("DMN-03006");
     }
   }
 
@@ -1235,7 +1234,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04004");
+      assertThat(e).hasMessageStartingWith("DMN-03004");
     }
 
     try {
@@ -1243,7 +1242,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04004");
+      assertThat(e).hasMessageStartingWith("DMN-03004");
     }
 
     try {
@@ -1251,7 +1250,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04004");
+      assertThat(e).hasMessageStartingWith("DMN-03004");
     }
   }
 
@@ -1263,7 +1262,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04004");
+      assertThat(e).hasMessageStartingWith("DMN-03004");
     }
 
     try {
@@ -1271,7 +1270,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04004");
+      assertThat(e).hasMessageStartingWith("DMN-03004");
     }
 
     try {
@@ -1279,7 +1278,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04004");
+      assertThat(e).hasMessageStartingWith("DMN-03004");
     }
 
     try {
@@ -1287,7 +1286,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04004");
+      assertThat(e).hasMessageStartingWith("DMN-03004");
     }
   }
 
@@ -1342,7 +1341,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04006");
+      assertThat(e).hasMessageStartingWith("DMN-03006");
     }
   }
 
@@ -1402,7 +1401,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04006");
+      assertThat(e).hasMessageStartingWith("DMN-03006");
     }
   }
 
@@ -1421,7 +1420,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04004");
+      assertThat(e).hasMessageStartingWith("DMN-03004");
     }
 
     try {
@@ -1429,7 +1428,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04004");
+      assertThat(e).hasMessageStartingWith("DMN-03004");
     }
 
     try {
@@ -1437,7 +1436,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04004");
+      assertThat(e).hasMessageStartingWith("DMN-03004");
     }
   }
 
@@ -1449,7 +1448,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04004");
+      assertThat(e).hasMessageStartingWith("DMN-03004");
     }
 
     try {
@@ -1457,7 +1456,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04004");
+      assertThat(e).hasMessageStartingWith("DMN-03004");
     }
 
     try {
@@ -1465,7 +1464,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04004");
+      assertThat(e).hasMessageStartingWith("DMN-03004");
     }
 
     try {
@@ -1473,7 +1472,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04004");
+      assertThat(e).hasMessageStartingWith("DMN-03004");
     }
   }
 
@@ -1528,7 +1527,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04004");
+      assertThat(e).hasMessageStartingWith("DMN-03004");
     }
 
     try {
@@ -1536,7 +1535,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04004");
+      assertThat(e).hasMessageStartingWith("DMN-03004");
     }
 
     try {
@@ -1544,7 +1543,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04004");
+      assertThat(e).hasMessageStartingWith("DMN-03004");
     }
   }
 
@@ -1556,7 +1555,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04004");
+      assertThat(e).hasMessageStartingWith("DMN-03004");
     }
 
     try {
@@ -1564,7 +1563,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04004");
+      assertThat(e).hasMessageStartingWith("DMN-03004");
     }
 
     try {
@@ -1572,7 +1571,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04004");
+      assertThat(e).hasMessageStartingWith("DMN-03004");
     }
 
     try {
@@ -1580,7 +1579,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-04004");
+      assertThat(e).hasMessageStartingWith("DMN-03004");
     }
   }
 

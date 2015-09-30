@@ -23,6 +23,7 @@ import org.camunda.bpm.dmn.engine.transform.DmnTransformFactory;
 import org.camunda.bpm.dmn.engine.transform.DmnTransformListener;
 import org.camunda.bpm.dmn.engine.transform.DmnTransformer;
 import org.camunda.bpm.dmn.engine.type.DataTypeTransformerFactory;
+import org.camunda.bpm.dmn.feel.FeelEngineProvider;
 import org.camunda.bpm.model.dmn.HitPolicy;
 
 public interface DmnEngineConfiguration {
@@ -51,7 +52,17 @@ public interface DmnEngineConfiguration {
 
   DmnScriptEngineResolver getScriptEngineResolver();
 
+  FeelEngineProvider getFeelEngineProvider();
+
   DataTypeTransformerFactory getDataTypeTransformerFactory();
+
+  String getDefaultAllowedValueExpressionLanguage();
+
+  String getDefaultInputEntryExpressionLanguage();
+
+  String getDefaultInputExpressionExpressionLanguage();
+
+  String getDefaultOutputEntryExpressionLanguage();
 
   DmnEngine buildEngine();
 

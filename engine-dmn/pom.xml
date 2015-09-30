@@ -15,9 +15,21 @@
   <modules>
     <module>bom</module>
     <module>engine</module>
+    <module>feel</module>
     <module>scriptengine-dmn</module>
     <module>scriptengine-juel</module>
   </modules>
+
+  <properties>
+    <version.assertj>1.7.1</version.assertj>
+    <version.commons>1.2.0-alpha2</version.commons>
+    <version.groovy>2.4.3</version.groovy>
+    <version.juel>2.2.7</version.juel>
+    <version.junit>4.12</version.junit>
+    <version.joda-time>2.1</version.joda-time>
+    <version.logback>1.1.2</version.logback>
+    <version.mockito>1.9.5</version.mockito>
+  </properties>
 
 
   <dependencyManagement>
@@ -26,9 +38,15 @@
       <dependency>
         <groupId>org.camunda.commons</groupId>
         <artifactId>camunda-commons-bom</artifactId>
-        <version>1.2.0-alpha2</version>
+        <version>${version.commons}</version>
         <type>pom</type>
         <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-typed-value</artifactId>
+        <version>${project.version}</version>
       </dependency>
 
       <dependency>
@@ -36,37 +54,61 @@
         <artifactId>camunda-dmn-model</artifactId>
         <version>${project.version}</version>
       </dependency>
-      
+
+      <dependency>
+        <groupId>de.odysseus.juel</groupId>
+        <artifactId>juel-api</artifactId>
+        <version>${version.juel}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>de.odysseus.juel</groupId>
+        <artifactId>juel-impl</artifactId>
+        <version>${version.juel}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>de.odysseus.juel</groupId>
+        <artifactId>juel-spi</artifactId>
+        <version>${version.juel}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>joda-time</groupId>
+        <artifactId>joda-time</artifactId>
+        <version>${version.joda-time}</version>
+      </dependency>
+
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>4.12</version>
+        <version>${version.junit}</version>
       </dependency>
 
       <dependency>
         <groupId>org.assertj</groupId>
         <artifactId>assertj-core</artifactId>
-        <version>1.7.1</version>
-      </dependency>
-      
-      <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-core</artifactId>
-        <version>1.9.5</version>
+        <version>${version.assertj}</version>
       </dependency>
 
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
-        <version>1.9.5</version>
+        <version>${version.mockito}</version>
       </dependency>
 
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
-        <version>1.1.2</version>
+        <version>${version.logback}</version>
       </dependency>
-     
+
+      <dependency>
+        <groupId>org.codehaus.groovy</groupId>
+        <artifactId>groovy-all</artifactId>
+        <version>${version.groovy}</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 

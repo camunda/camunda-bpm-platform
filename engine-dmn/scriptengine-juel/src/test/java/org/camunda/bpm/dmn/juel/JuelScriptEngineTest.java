@@ -16,6 +16,7 @@ package org.camunda.bpm.dmn.juel;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.script.Bindings;
+import javax.script.CompiledScript;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
@@ -68,6 +69,52 @@ public class JuelScriptEngineTest {
 
     bindings.put("test", "notok");
     result = (Boolean) scriptEngine.eval("${test == 'ok'}", bindings);
+    assertThat(result).isFalse();
+  }
+
+  @Test
+  public void shouldEvaluateCompiledExpression() throws ScriptException {
+    JuelScriptEngine scriptEngine = (JuelScriptEngine) scriptEngineManager.getEngineByName("juel");
+    Bindings bindings = scriptEngine.createBindings();
+
+    CompiledScript compiledExpression = scriptEngine.compile("${test == 'ok'}");
+
+    bindings.put("test", "ok");
+    Boolean result = (Boolean) compiledExpression.eval(bindings);
+    assertThat(result).isTrue();
+
+    bindings.put("test", "notok");
+    result = (Boolean) compiledExpression.eval(bindings);
+    assertThat(result).isFalse();
+  }
+
+  @Test
+  public void shouldEvaluateExpressionWithoutSurrounding() throws ScriptException {
+    ScriptEngine scriptEngine = scriptEngineManager.getEngineByName("juel");
+    Bindings bindings = scriptEngine.createBindings();
+
+    bindings.put("test", "ok");
+    Boolean result = (Boolean) scriptEngine.eval("test == 'ok'", bindings);
+    assertThat(result).isTrue();
+
+    bindings.put("test", "notok");
+    result = (Boolean) scriptEngine.eval("test == 'ok'", bindings);
+    assertThat(result).isFalse();
+  }
+
+  @Test
+  public void shouldEvaluateCompiledExpressionWithoutSurrounding() throws ScriptException {
+    JuelScriptEngine scriptEngine = (JuelScriptEngine) scriptEngineManager.getEngineByName("juel");
+    Bindings bindings = scriptEngine.createBindings();
+
+    CompiledScript compiledExpression = scriptEngine.compile("test == 'ok'");
+
+    bindings.put("test", "ok");
+    Boolean result = (Boolean) compiledExpression.eval(bindings);
+    assertThat(result).isTrue();
+
+    bindings.put("test", "notok");
+    result = (Boolean) compiledExpression.eval(bindings);
     assertThat(result).isFalse();
   }
 
