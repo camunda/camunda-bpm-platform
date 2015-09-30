@@ -13,8 +13,8 @@ function(angular, template) {
       label: 'Decision Instances',
       template: template,
       controller: [
-               '$scope', '$location', 'search', 'routeUtil', 'camAPI', 'Views',
-      function ($scope,   $location,   search,   routeUtil,   camAPI,   Views) {
+               '$scope', '$location', 'search', 'routeUtil', 'camAPI', 'Views', '$rootScope',
+      function ($scope,   $location,   search,   routeUtil,   camAPI,   Views,   $rootScope) {
 
         var processInstancePlugins = Views.getProviders({ component: 'cockpit.processInstance.view' });
 
@@ -78,12 +78,24 @@ function(angular, template) {
           }, function(err, data) {
             $scope.decisionInstances = data;
             $scope.loadingState = data.length ? 'LOADED' : 'EMPTY';
+
+            var phase = $rootScope.$$phase;
+            if(phase !== '$apply' && phase !== '$digest') {
+              $scope.$apply();
+            }
+
           });
 
           historyService.decisionInstanceCount({
             decisionDefinitionId: $scope.decisionDefinition.id
           }, function(err, data) {
             pages.total = data.count;
+
+            var phase = $rootScope.$$phase;
+            if(phase !== '$apply' && phase !== '$digest') {
+              $scope.$apply();
+            }
+
           });
         }
 
