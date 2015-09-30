@@ -1647,17 +1647,37 @@ public class ProcessInstanceQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByDeploymentId() {
-    String deploymentId = repositoryService
+    // given
+    String firstDeploymentId = repositoryService
         .createDeploymentQuery()
         .singleResult()
         .getId();
 
+    // make a second deployment and start an instance
+    org.camunda.bpm.engine.repository.Deployment secondDeployment = repositoryService.createDeployment()
+      .addClasspathResource("org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
+      .deploy();
+
+    ProcessInstance secondProcessInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+    // when
     ProcessInstanceQuery query = runtimeService
         .createProcessInstanceQuery()
-        .deploymentId(deploymentId);
+        .deploymentId(firstDeploymentId);
 
+    // then the instance belonging to the second deployment is not returned
     assertEquals(5, query.count());
-    assertEquals(5, query.list().size());
+
+    List<ProcessInstance> instances = query.list();
+    assertEquals(5, instances.size());
+
+    for (ProcessInstance returnedInstance : instances) {
+      assertTrue(!returnedInstance.getId().equals(secondProcessInstance.getId()));
+    }
+
+    // cleanup
+    repositoryService.deleteDeployment(secondDeployment.getId(), true);
+
   }
 
   public void testQueryByInvalidDeploymentId() {
