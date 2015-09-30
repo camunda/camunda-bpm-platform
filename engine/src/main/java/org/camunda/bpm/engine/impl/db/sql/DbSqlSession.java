@@ -638,7 +638,8 @@ public class DbSqlSession extends AbstractPersistenceSession {
 
         line = readNextTrimmedLine(reader);
       }
-      LOG.performedDatabaseOperation(operation, component, resourceName, logLines);
+      LOG.performingDatabaseOperation(operation, component, resourceName);
+      LOG.executingDDL(logLines);
 
       if (exception != null) {
         throw exception;
