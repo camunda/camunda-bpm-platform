@@ -2,12 +2,34 @@
 
 var Table = require('./../../table');
 
+var Variable = require('camunda-commons-ui/lib/widgets/variables-table/test/cam-widget-variables-table.page').Variable;
+
+
 module.exports = Table.extend({
 
   tabRepeater: 'tabProvider in processInstanceTabs',
   tabIndex: 0,
   tabLabel: 'Variables',
-  tableRepeater: 'variable in variables',
+  tableRepeater: '(v, info) in variables',
+
+
+  //------------------------------------------------------------------
+
+  variableAt: function (index) {
+    if (typeof index !== 'number') {
+      return new Variable(index);
+    }
+    return new Variable(this.tableItem(index));
+  },
+
+
+  variableByName: function (varName) {
+    return new Variable(element(by.cssContainingText('td.col-name', varName)).element(by.xpath('..')));
+  },
+
+
+  //------------------------------------------------------------------
+
 
   variableName: function(item) {
     return this.tableItem(item, '.variable-name');
@@ -22,7 +44,7 @@ module.exports = Table.extend({
   },
 
   variableScope: function(item) {
-    return this.tableItem(item, by.binding('variable.instance.name'));
+    return this.tableItem(item, by.css('.col-scope'));
   },
 
   inlineEditRow: function() {
@@ -56,6 +78,17 @@ module.exports = Table.extend({
 
   editVariableCancelButton: function() {
     return this.inlineEditRow().element(by.css('[ng-click="closeInPlaceEditing(variable)"]'));
+  },
+
+  deleteVariable: function (index) {
+    var varObj;
+    if (typeof index === 'string') {
+      varObj = element(by.cssContainingText('td.col-name', index)).element(by.xpath('..'));
+    }
+    else {
+      varObj = this.variableAt(index);
+    }
+    return varObj.deleteButton().click();
   }
 
 });

@@ -27,13 +27,18 @@ module.exports = Table.extend({
   },
 
   table: function() {
-    return element.all(by.repeater(this.tableRepeater));
+    return element.all(by.css('tbody tr'));
   },
 
   tableItem: function(item, elementSelector) {
+    if (arguments.length === 1) {
+      return this.table().get(item);
+    }
+
     if (typeof elementSelector === 'string') {
       elementSelector = by.css(elementSelector);
     }
+
     return this.table().get(item).element(elementSelector);
   }
 

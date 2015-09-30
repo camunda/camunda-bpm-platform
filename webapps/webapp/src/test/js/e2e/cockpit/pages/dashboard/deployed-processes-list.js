@@ -7,19 +7,19 @@ module.exports = Base.extend({
   tabLabel: 'List',
 
   listObject: function() {
-    return this.pluginObject().element(by.css('.process-definitions-list'));
+    return element(by.css('.process-definitions-list'));
   },
 
   processesList: function() {
-    return this.listObject().all(by.repeater('statistic in statistics'));
+    return this.listObject().all(by.css('tbody tr'));
   },
 
   selectProcess: function(item) {
-    return this.processesList().get(item).element(by.binding('{{ statistic.definition.name }}')).click();
+    return this.processesList().get(item).element(by.css('.name a')).click();
   },
 
   processName: function(item) {
-    return this.processesList().get(item).element(by.binding('{{ statistic.definition.name }}')).getText();
+    return this.processesList().get(item).element(by.css('.name a')).getText();
   },
 
   runningInstances: function(item) {
