@@ -26,7 +26,6 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.Scanner;
 
-import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.core.variable.type.FileValueTypeImpl;
 import org.camunda.bpm.engine.impl.core.variable.value.UntypedValueImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
@@ -251,7 +250,7 @@ public class FileValueSerializerTest {
     assertThat(valueFields.getTextValue2(), is(SEPARATOR + encoding));
   }
 
-  @Test(expected = NullValueException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void testSerializeFileValueWithoutName() {
     Variables.fileValue((String) null).file("abc".getBytes()).create();
   }

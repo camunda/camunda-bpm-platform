@@ -19,10 +19,12 @@ import java.util.Map.Entry;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.type.FileValueType;
 import org.camunda.bpm.engine.variable.type.PrimitiveValueType;
 import org.camunda.bpm.engine.variable.type.SerializableValueType;
 import org.camunda.bpm.engine.variable.type.ValueType;
@@ -108,11 +110,27 @@ public class VariableValueDto {
         }
         return ((SerializableValueType) valueType).createValueFromSerialized((String) value, valueInfo);
       }
-      else {
+      else if(valueType instanceof FileValueType) {
+        TypedValue typedValue = valueType.createValue(value, valueInfo);
+        if (typedValue instanceof FileValue && value instanceof String) {
+          return fileValueWithDecodedString((FileValue) typedValue, (String) value);
+        } else {
+          return typedValue;
+        }
+
+      } else {
         return valueType.createValue(value, valueInfo);
       }
     }
 
+  }
+
+  protected FileValue fileValueWithDecodedString(FileValue fileValue, String value) {
+    return Variables.fileValue(fileValue.getFilename())
+                    .file(Base64.decodeBase64(value))
+                    .mimeType(fileValue.getMimeType())
+                    .encoding(fileValue.getEncoding())
+                    .create();
   }
 
   public static VariableMap toMap(Map<String, VariableValueDto> variables, ProcessEngine processEngine, ObjectMapper objectMapper) {

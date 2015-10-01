@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.core.variable.type;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
@@ -34,6 +33,7 @@ public abstract class AbstractValueTypeImpl implements ValueType {
     return name;
   }
 
+  @Override
   public String toString() {
     return name;
   }
@@ -54,8 +54,8 @@ public abstract class AbstractValueTypeImpl implements ValueType {
     throw unsupportedConversion(typedValue.getType());
   }
 
-  protected ProcessEngineException unsupportedConversion(ValueType typeToConvertTo) {
-    return new ProcessEngineException("The type " + getName() + " supports no conversion from type: " + typeToConvertTo.getName());
+  protected IllegalArgumentException unsupportedConversion(ValueType typeToConvertTo) {
+    return new IllegalArgumentException("The type " + getName() + " supports no conversion from type: " + typeToConvertTo.getName());
   }
 
 }

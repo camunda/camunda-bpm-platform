@@ -1,0 +1,43 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <name>camunda BPM - engine</name>
+  <artifactId>camunda-typed-value</artifactId>
+
+  <parent>
+    <groupId>org.camunda.bpm</groupId>
+    <artifactId>camunda-parent</artifactId>
+    <relativePath>../parent</relativePath>
+    <version>7.4.0-SNAPSHOT</version>
+  </parent>
+
+  <dependencies>
+
+    <!-- camunda dependencies -->
+    <dependency>
+      <groupId>org.camunda.commons</groupId>
+      <artifactId>camunda-commons-utils</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-library</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+ 
+
+</project>

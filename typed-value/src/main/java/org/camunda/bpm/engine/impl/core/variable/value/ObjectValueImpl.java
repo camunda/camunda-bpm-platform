@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.core.variable.value;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.variable.type.SerializableValueType;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
@@ -78,6 +77,7 @@ public class ObjectValueImpl extends AbstractTypedValue<Object> implements Objec
     return isDeserialized;
   }
 
+  @Override
   public Object getValue() {
     if(isDeserialized) {
       return super.getValue();
@@ -94,7 +94,7 @@ public class ObjectValueImpl extends AbstractTypedValue<Object> implements Objec
       return (T) value;
     }
     else {
-      throw new ProcessEngineException("Value '"+value+"' is not of type '"+type+"'.");
+      throw new IllegalArgumentException("Value '"+value+"' is not of type '"+type+"'.");
     }
   }
 
@@ -109,6 +109,7 @@ public class ObjectValueImpl extends AbstractTypedValue<Object> implements Objec
     }
   }
 
+  @Override
   public SerializableValueType getType() {
     return (SerializableValueType) super.getType();
   }

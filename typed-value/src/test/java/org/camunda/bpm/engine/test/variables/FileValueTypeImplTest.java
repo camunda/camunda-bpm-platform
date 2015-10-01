@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.core.variable.type.FileValueTypeImpl;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.FileValue;
@@ -75,7 +74,7 @@ public class FileValueTypeImplTest {
     assertThat(type.canConvertFromTypedValue(null), is(false));
   }
 
-  @Test(expected = ProcessEngineException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void convertingThrowsException() {
     type.convertFromTypedValue(Variables.untypedNullValue());
   }

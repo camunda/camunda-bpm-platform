@@ -12,8 +12,11 @@
  */
 package org.camunda.bpm.engine.rest;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.ServiceLoader;
@@ -185,5 +188,9 @@ public abstract class AbstractRestServiceTest {
     RestAssured.port = PORT;
   }
 
+  protected File getFile(String path) throws URISyntaxException {
+    URI uri = this.getClass().getResource(path).toURI();
+    return new File(uri);
+  }
 
 }
