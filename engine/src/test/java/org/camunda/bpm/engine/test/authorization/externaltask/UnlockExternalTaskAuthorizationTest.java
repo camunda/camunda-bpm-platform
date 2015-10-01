@@ -93,7 +93,7 @@ public class UnlockExternalTaskAuthorizationTest {
   }
 
   @Test
-  @Deployment(resources = "org/camunda/bpm/engine/test/api/externalTask/oneExternalTaskProcess.bpmn20.xml")
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
   public void testSetJobPriority() {
 
     // given
