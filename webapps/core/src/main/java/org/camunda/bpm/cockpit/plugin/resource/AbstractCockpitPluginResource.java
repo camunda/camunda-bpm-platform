@@ -98,7 +98,7 @@ public class AbstractCockpitPluginResource extends AbstractAppPluginResource<Coc
     permCheck.setResource(resource);
     permCheck.setResourceIdQueryParam(queryParam);
     permCheck.setPermission(permission);
-    query.addPermissionCheck(permCheck);
+    query.addAtomicPermissionCheck(permCheck);
   }
 
 }
