@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
@@ -72,8 +73,7 @@ public interface ExternalTaskService {
    *
    * @param externalTaskId the id of the external to complete
    * @param workerId the id of the worker that completes the task
-   * @throws ProcessEngineException if the task does not exist anymore or an error
-   *   occurs in the following process execution
+   * @throws NotFoundException if no external task with the given id exists
    * @throws BadUserRequestException if the task is assigned to a different worker
    * @throws AuthorizationException thrown if the current user does not possess any of the following permissions:
    *   <ul>
@@ -92,8 +92,8 @@ public interface ExternalTaskService {
    * @param workerId the id of the worker that completes the task
    * @param variables a map of variables to set on the execution (non-local)
    *   the external task is assigned to
-   * @throws ProcessEngineException if the task does not exist anymore or an error
-   *   occurs in the following process execution
+   *
+   * @throws NotFoundException if no external task with the given id exists
    * @throws BadUserRequestException if the task is assigned to a different worker
    * @throws AuthorizationException thrown if the current user does not possess any of the following permissions:
    *   <ul>
@@ -120,6 +120,8 @@ public interface ExternalTaskService {
    *   the number of retries is increased via API. Must be >= 0.
    * @param retryTimeout the timeout before the task can be fetched again. Must be >= 0.
    *
+   * @throws NotFoundException if no external task with the given id exists
+   * @throws BadUserRequestException if the task is assigned to a different worker
    * @throws AuthorizationException thrown if the current user does not possess any of the following permissions:
    *   <ul>
    *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_INSTANCE}</li>
@@ -132,6 +134,7 @@ public interface ExternalTaskService {
    * Unlocks an external task instance.
    *
    * @param externalTaskId the id of the task to unlock
+   * @throws NotFoundException if no external task with the given id exists
    * @throws AuthorizationException thrown if the current user does not possess any of the following permissions:
    *   <ul>
    *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_INSTANCE}</li>
@@ -147,6 +150,7 @@ public interface ExternalTaskService {
    *
    * @param externalTaskId the id of the task to set the
    * @param retries
+   * @throws NotFoundException if no external task with the given id exists
    */
   public void setRetries(String externalTaskId, int retries);
 

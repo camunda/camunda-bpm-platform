@@ -18,6 +18,7 @@ import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeAc
 import java.util.Date;
 import java.util.List;
 
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
@@ -432,7 +433,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     try {
       externalTaskService.complete(externalTasks.get(0).getId(), "someCrazyWorkerId");
       fail("exception expected");
-    } catch (ProcessEngineException e) {
+    } catch (BadUserRequestException e) {
       assertTextPresent("cannot be completed by worker 'someCrazyWorkerId'. It is locked by worker '" + WORKER_ID + "'.", e.getMessage());
     }
   }
@@ -441,7 +442,8 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     try {
       externalTaskService.complete("nonExistingTaskId", WORKER_ID);
       fail("exception expected");
-    } catch (ProcessEngineException e) {
+    } catch (NotFoundException e) {
+      // not found exception lets client distinguish this from other failures
       assertTextPresent("Cannot find external task with id nonExistingTaskId", e.getMessage());
     }
   }
@@ -704,7 +706,8 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     try {
       externalTaskService.unlock("nonExistingId");
       fail("expected exception");
-    } catch (ProcessEngineException e) {
+    } catch (NotFoundException e) {
+      // not found exception lets client distinguish this from other failures
       assertTextPresent("Cannot find external task with id nonExistingId", e.getMessage());
     }
   }
@@ -849,7 +852,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     try {
       externalTaskService.handleFailure(externalTasks.get(0).getId(), "someCrazyWorkerId", "error", 5, LOCK_TIME);
       fail("exception expected");
-    } catch (ProcessEngineException e) {
+    } catch (BadUserRequestException e) {
       assertTextPresent("Failure of External Task " + externalTasks.get(0).getId()
           + " cannot be reported by worker 'someCrazyWorkerId'. It is locked by worker '" + WORKER_ID + "'.",
         e.getMessage());
@@ -861,7 +864,8 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     try {
       externalTaskService.handleFailure("nonExistingTaskId", WORKER_ID, "error", 5, LOCK_TIME);
       fail("exception expected");
-    } catch (ProcessEngineException e) {
+    } catch (NotFoundException e) {
+      // not found exception lets client distinguish this from other failures
       assertTextPresent("Cannot find external task with id nonExistingTaskId", e.getMessage());
     }
   }
@@ -1088,6 +1092,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
       externalTaskService.setRetries("someExternalTaskId", 5);
       fail("expected exception");
     } catch (NotFoundException e) {
+      // not found exception lets client distinguish this from other failures
       assertTextPresent("externalTask is null", e.getMessage());
     }
   }
