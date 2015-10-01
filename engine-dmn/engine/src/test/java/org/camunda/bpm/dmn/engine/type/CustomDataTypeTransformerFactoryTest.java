@@ -32,8 +32,8 @@ import org.junit.Test;
  */
 public class CustomDataTypeTransformerFactoryTest {
 
-  protected static final String DMN_OUTPUT_FILE = "org/camunda/bpm/dmn/engine/type/OutputDefinition.dmn";
   protected static final String DMN_INPUT_FILE = "org/camunda/bpm/dmn/engine/type/CustomInputDefinition.dmn";
+  protected static final String DMN_OUTPUT_FILE = "org/camunda/bpm/dmn/engine/type/CustomOutputDefinition.dmn";
 
   protected DmnEngine engine;
   protected DmnDecision decision;
@@ -51,19 +51,15 @@ public class CustomDataTypeTransformerFactoryTest {
   @DecisionResource(resource = DMN_OUTPUT_FILE)
   public void customOutputTransformer() {
     Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("type", "custom");
     variables.put("output", 21);
 
-    assertThat(engine)
-      .evaluates(decision, variables)
-      .hasResult(CustomDataTypeTransformer.CUSTOM_OBJECT);
+    assertThat(engine).evaluates(decision, variables).hasResult(CustomDataTypeTransformer.CUSTOM_OBJECT);
   }
 
   @Test
   @DecisionResource(resource = DMN_INPUT_FILE)
   public void customInputTransformer() {
     Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("type", "custom");
     variables.put("input", 21);
 
     assertThat(engine).evaluates(decision, variables).hasResult("isCustom");
@@ -75,15 +71,17 @@ public class CustomDataTypeTransformerFactoryTest {
     return configuration;
   }
 
-  protected static class CustomDataTypeTransformerFactory extends DefaultDataTypeTransformerFactory {
+  protected static class CustomDataTypeTransformerFactory implements DataTypeTransformerFactory {
+
+    protected final DataTypeTransformerFactory defaultFactory = new DefaultDataTypeTransformerFactory();
 
     @Override
     public DataTypeTransformer getTransformerForType(String typeName) {
 
-      if(typeName.equals("custom")) {
+      if (typeName.equals("custom")) {
         return new CustomDataTypeTransformer();
       } else {
-        return super.getTransformerForType(typeName);
+        return defaultFactory.getTransformerForType(typeName);
       }
     }
   }
