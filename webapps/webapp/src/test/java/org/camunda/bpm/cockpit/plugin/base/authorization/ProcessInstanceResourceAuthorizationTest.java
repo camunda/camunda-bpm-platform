@@ -216,13 +216,13 @@ public class ProcessInstanceResourceAuthorizationTest extends AuthorizationTest 
     firstPermCheck.setResource(PROCESS_INSTANCE);
     firstPermCheck.setResourceIdQueryParam("EXEC1.PROC_INST_ID_");
     firstPermCheck.setPermission(READ);
-    query.addPermissionCheck(firstPermCheck);
+    query.addAtomicPermissionCheck(firstPermCheck);
 
     PermissionCheck secondPermCheck = new PermissionCheck();
     secondPermCheck.setResource(PROCESS_DEFINITION);
     secondPermCheck.setResourceIdQueryParam("PROCDEF.KEY_");
     secondPermCheck.setPermission(READ_INSTANCE);
-    query.addPermissionCheck(secondPermCheck);
+    query.addAtomicPermissionCheck(secondPermCheck);
 
     return getQueryService().executeQuery("selectCalledProcessInstances", query);
   }
