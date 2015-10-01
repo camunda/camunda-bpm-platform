@@ -232,6 +232,8 @@ create table ACT_RU_EXT_TASK (
   REV_ integer not null,
   WORKER_ID_ varchar(255),
   TOPIC_NAME_ varchar(255),
+  RETRIES_ integer,
+  ERROR_MSG_ varchar(4000),
   LOCK_EXP_TIME_ timestamp,
   SUSPENSION_STATE_ integer,
   EXECUTION_ID_ varchar(64),
