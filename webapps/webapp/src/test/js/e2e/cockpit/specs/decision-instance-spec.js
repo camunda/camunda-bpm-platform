@@ -74,6 +74,10 @@ describe('Cockpit Decision Instance Spec', function() {
       expect(instancePage.table.tableElement().isDisplayed()).to.eventually.be.true;
     });
 
+    it('should highlight fired rules', function() {
+      expect(instancePage.table.row(0).getAttribute('class')).to.eventually.contain('fired');
+    });
+
   });
 
 
