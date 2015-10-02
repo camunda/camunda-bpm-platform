@@ -1,4 +1,4 @@
-/* global define: false, require: false */
+  /* global define: false, require: false */
 define([
   'angular',
   'cockpit/util/routeUtil',
@@ -20,6 +20,8 @@ define([
           '$scope', '$rootScope', '$q', 'dataDepend', 'page', 'camAPI', 'decisionInstance', 'Views', 'search',
   function($scope,   $rootScope,   $q,   dataDepend,   page,   camAPI,   decisionInstance,   Views,   search
   ) {
+
+    $scope.control = {};
 
     $scope.decisionInstance = decisionInstance;
 
@@ -79,6 +81,12 @@ define([
     decisionData.observe(['tableXml'], function(tableXml) {
       $scope.tableXml = tableXml;
     });
+
+    $scope.highlightFiredRules = function() {
+      for(var i = 0; i < decisionInstance.outputs.length; i++) {
+        $scope.control.highlightRow(decisionInstance.outputs[i].ruleId, 'fired');
+      }
+    };
 
     $scope.decisionInstanceVars = { read: [ 'decisionInstance', 'decisionData' ] };
     $scope.decisionInstanceTabs = Views.getProviders({ component: 'cockpit.decisionInstance.tab' });

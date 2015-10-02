@@ -7,6 +7,8 @@ define([
   var DirectiveController = ['$scope',
                     function( $scope) {
 
+    $scope.control = {};
+
   }];
 
   var Directive = function ($compile) {
@@ -14,6 +16,8 @@ define([
       restrict: 'EAC',
       scope: {
         decisionTable: '=',
+        control: '=?',
+        onLoad: '&'
       },
       controller: DirectiveController,
       template: template,
