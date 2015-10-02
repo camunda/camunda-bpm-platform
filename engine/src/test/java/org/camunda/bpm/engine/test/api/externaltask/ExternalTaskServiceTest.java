@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.AssertUtil;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.joda.time.DateTime;
@@ -83,7 +84,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(activityInstance.getId(), task.getActivityInstanceId());
     assertEquals(activityInstance.getExecutionIds()[0], task.getExecutionId());
 
-    assertEquals(nowPlus(LOCK_TIME), task.getLockExpirationTime());
+    AssertUtil.assertEqualsSecondPrecision(nowPlus(LOCK_TIME), task.getLockExpirationTime());
 
     assertEquals(WORKER_ID, task.getWorkerId());
   }
@@ -274,10 +275,10 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     LockedExternalTask topic2Task = "topic2".equals(tasks.get(0).getTopicName()) ? tasks.get(0) : tasks.get(1);
 
     assertEquals("topic1", topic1Task.getTopicName());
-    assertEquals(nowPlus(LOCK_TIME), topic1Task.getLockExpirationTime());
+    AssertUtil.assertEqualsSecondPrecision(nowPlus(LOCK_TIME), topic1Task.getLockExpirationTime());
 
     assertEquals("topic2", topic2Task.getTopicName());
-    assertEquals(nowPlus(LOCK_TIME * 2), topic2Task.getLockExpirationTime());
+    AssertUtil.assertEqualsSecondPrecision(nowPlus(LOCK_TIME * 2), topic2Task.getLockExpirationTime());
 
     // and the third task can still be fetched
     tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
@@ -290,7 +291,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
 
     LockedExternalTask topic3Task = tasks.get(0);
     assertEquals("topic3", topic3Task.getTopicName());
-    assertEquals(nowPlus(LOCK_TIME * 3), topic3Task.getLockExpirationTime());
+    AssertUtil.assertEqualsSecondPrecision(nowPlus(LOCK_TIME * 3), topic3Task.getLockExpirationTime());
   }
 
   @Deployment
@@ -521,7 +522,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(1, externalTasks.size());
 
     LockedExternalTask task = externalTasks.get(0);
-    assertEquals(nowPlus(LOCK_TIME), task.getLockExpirationTime());
+    AssertUtil.assertEqualsSecondPrecision(nowPlus(LOCK_TIME), task.getLockExpirationTime());
 
     // and cannot be retrieved by another query
     externalTasks = externalTaskService.fetchAndLock(1, WORKER_ID)
@@ -790,7 +791,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(task.getProcessDefinitionId(), incident.getProcessDefinitionId());
     assertEquals(task.getProcessInstanceId(), incident.getProcessInstanceId());
     assertEquals(incident.getId(), incident.getRootCauseIncidentId());
-    assertEquals(nowMinus(4000L), incident.getIncidentTimestamp());
+    AssertUtil.assertEqualsSecondPrecision(nowMinus(4000L), incident.getIncidentTimestamp());
     assertEquals(task.getId(), incident.getConfiguration());
   }
 
