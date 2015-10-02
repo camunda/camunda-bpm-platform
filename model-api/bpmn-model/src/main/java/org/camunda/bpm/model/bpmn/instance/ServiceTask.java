@@ -53,4 +53,8 @@ public interface ServiceTask extends Task {
   String getCamundaType();
 
   void setCamundaType(String camundaType);
+
+  String getCamundaTopic();
+
+  void setCamundaTopic(String camundaTopic);
 }

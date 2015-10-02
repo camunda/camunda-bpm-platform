@@ -40,7 +40,9 @@ public class MessageEventDefinitionTest extends AbstractEventDefinitionTest {
       new AttributeAssumption(CAMUNDA_NS, "class"),
       new AttributeAssumption(CAMUNDA_NS, "delegateExpression"),
       new AttributeAssumption(CAMUNDA_NS, "expression"),
-      new AttributeAssumption(CAMUNDA_NS, "resultVariable")
+      new AttributeAssumption(CAMUNDA_NS, "resultVariable"),
+      new AttributeAssumption(CAMUNDA_NS, "topic"),
+      new AttributeAssumption(CAMUNDA_NS, "type")
     );
   }
 

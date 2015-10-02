@@ -417,6 +417,7 @@ public class ProcessBuilderTest {
         .camundaDelegateExpression(TEST_DELEGATE_EXPRESSION_API)
         .camundaExpression(TEST_EXPRESSION_API)
         .camundaResultVariable(TEST_STRING_API)
+        .camundaTopic(TEST_STRING_API)
         .camundaType(TEST_STRING_API)
       .done();
 
@@ -425,6 +426,7 @@ public class ProcessBuilderTest {
     assertThat(serviceTask.getCamundaDelegateExpression()).isEqualTo(TEST_DELEGATE_EXPRESSION_API);
     assertThat(serviceTask.getCamundaExpression()).isEqualTo(TEST_EXPRESSION_API);
     assertThat(serviceTask.getCamundaResultVariable()).isEqualTo(TEST_STRING_API);
+    assertThat(serviceTask.getCamundaTopic()).isEqualTo(TEST_STRING_API);
     assertThat(serviceTask.getCamundaType()).isEqualTo(TEST_STRING_API);
   }
 
@@ -437,6 +439,7 @@ public class ProcessBuilderTest {
         .camundaDelegateExpression(TEST_DELEGATE_EXPRESSION_API)
         .camundaExpression(TEST_EXPRESSION_API)
         .camundaResultVariable(TEST_STRING_API)
+        .camundaTopic(TEST_STRING_API)
         .camundaType(TEST_STRING_API)
       .endEvent()
       .done();
@@ -446,6 +449,7 @@ public class ProcessBuilderTest {
     assertThat(sendTask.getCamundaDelegateExpression()).isEqualTo(TEST_DELEGATE_EXPRESSION_API);
     assertThat(sendTask.getCamundaExpression()).isEqualTo(TEST_EXPRESSION_API);
     assertThat(sendTask.getCamundaResultVariable()).isEqualTo(TEST_STRING_API);
+    assertThat(sendTask.getCamundaTopic()).isEqualTo(TEST_STRING_API);
     assertThat(sendTask.getCamundaType()).isEqualTo(TEST_STRING_API);
   }
 
@@ -487,6 +491,7 @@ public class ProcessBuilderTest {
         .camundaDelegateExpression(TEST_DELEGATE_EXPRESSION_API)
         .camundaExpression(TEST_EXPRESSION_API)
         .camundaResultVariable(TEST_STRING_API)
+        .camundaTopic(TEST_STRING_API)
         .camundaType(TEST_STRING_API)
       .endEvent()
       .done();
@@ -496,6 +501,7 @@ public class ProcessBuilderTest {
     assertThat(businessRuleTask.getCamundaDelegateExpression()).isEqualTo(TEST_DELEGATE_EXPRESSION_API);
     assertThat(businessRuleTask.getCamundaExpression()).isEqualTo(TEST_EXPRESSION_API);
     assertThat(businessRuleTask.getCamundaResultVariable()).isEqualTo(TEST_STRING_API);
+    assertThat(businessRuleTask.getCamundaTopic()).isEqualTo(TEST_STRING_API);
     assertThat(businessRuleTask.getCamundaType()).isEqualTo(TEST_STRING_API);
   }
 

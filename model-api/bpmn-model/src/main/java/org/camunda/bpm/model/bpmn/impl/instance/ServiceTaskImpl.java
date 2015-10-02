@@ -43,6 +43,7 @@ public class ServiceTaskImpl extends TaskImpl implements ServiceTask {
   protected static Attribute<String> camundaDelegateExpressionAttribute;
   protected static Attribute<String> camundaExpressionAttribute;
   protected static Attribute<String> camundaResultVariableAttribute;
+  protected static Attribute<String> camundaTopicAttribute;
   protected static Attribute<String> camundaTypeAttribute;
 
   public static void registerType(ModelBuilder modelBuilder) {
@@ -80,6 +81,10 @@ public class ServiceTaskImpl extends TaskImpl implements ServiceTask {
     camundaResultVariableAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_RESULT_VARIABLE)
       .namespace(CAMUNDA_NS)
       .build();
+
+    camundaTopicAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_TOPIC)
+        .namespace(CAMUNDA_NS)
+        .build();
 
     camundaTypeAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_TYPE)
       .namespace(CAMUNDA_NS)
@@ -145,6 +150,14 @@ public class ServiceTaskImpl extends TaskImpl implements ServiceTask {
 
   public void setCamundaResultVariable(String camundaResultVariable) {
     camundaResultVariableAttribute.setValue(this, camundaResultVariable);
+  }
+
+  public String getCamundaTopic() {
+    return camundaTopicAttribute.getValue(this);
+  }
+
+  public void setCamundaTopic(String camundaTopic) {
+    camundaTopicAttribute.setValue(this, camundaTopic);
   }
 
   public String getCamundaType() {

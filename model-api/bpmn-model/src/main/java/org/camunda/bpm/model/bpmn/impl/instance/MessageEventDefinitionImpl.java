@@ -42,6 +42,8 @@ public class MessageEventDefinitionImpl extends EventDefinitionImpl implements M
   protected static Attribute<String> camundaDelegateExpressionAttribute;
   protected static Attribute<String> camundaExpressionAttribute;
   protected static Attribute<String> camundaResultVariableAttribute;
+  protected static Attribute<String> camundaTopicAttribute;
+  protected static Attribute<String> camundaTypeAttribute;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(MessageEventDefinition.class, BPMN_ELEMENT_MESSAGE_EVENT_DEFINITION)
@@ -80,6 +82,14 @@ public class MessageEventDefinitionImpl extends EventDefinitionImpl implements M
     camundaResultVariableAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_RESULT_VARIABLE)
       .namespace(CAMUNDA_NS)
       .build();
+
+    camundaTopicAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_TOPIC)
+        .namespace(CAMUNDA_NS)
+        .build();
+
+    camundaTypeAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_TYPE)
+        .namespace(CAMUNDA_NS)
+        .build();
 
     typeBuilder.build();
   }
@@ -136,6 +146,22 @@ public class MessageEventDefinitionImpl extends EventDefinitionImpl implements M
 
   public void setCamundaResultVariable(String camundaResultVariable) {
     camundaResultVariableAttribute.setValue(this, camundaResultVariable);
+  }
+
+  public String getCamundaTopic() {
+    return camundaTopicAttribute.getValue(this);
+  }
+
+  public void setCamundaTopic(String camundaTopic) {
+    camundaTopicAttribute.setValue(this, camundaTopic);
+  }
+
+  public String getCamundaType() {
+    return camundaTypeAttribute.getValue(this);
+  }
+
+  public void setCamundaType(String camundaType) {
+    camundaTypeAttribute.setValue(this, camundaType);
   }
 
 }

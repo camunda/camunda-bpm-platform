@@ -422,8 +422,22 @@ public class CamundaExtensionsTest {
   @Test
   public void testType() {
     assertThat(serviceTask.getCamundaType()).isEqualTo(TEST_TYPE_XML);
+    assertThat(messageEventDefinition.getCamundaType()).isEqualTo(TEST_STRING_XML);
     serviceTask.setCamundaType(TEST_TYPE_API);
+    messageEventDefinition.setCamundaType(TEST_STRING_API);
     assertThat(serviceTask.getCamundaType()).isEqualTo(TEST_TYPE_API);
+    assertThat(messageEventDefinition.getCamundaType()).isEqualTo(TEST_STRING_API);
+
+  }
+
+  @Test
+  public void testTopic() {
+    assertThat(serviceTask.getCamundaTopic()).isEqualTo(TEST_STRING_XML);
+    assertThat(messageEventDefinition.getCamundaTopic()).isEqualTo(TEST_STRING_XML);
+    serviceTask.setCamundaTopic(TEST_TYPE_API);
+    messageEventDefinition.setCamundaTopic(TEST_STRING_API);
+    assertThat(serviceTask.getCamundaTopic()).isEqualTo(TEST_TYPE_API);
+    assertThat(messageEventDefinition.getCamundaTopic()).isEqualTo(TEST_STRING_API);
   }
 
   @Test

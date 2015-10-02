@@ -445,6 +445,7 @@ public final class BpmnModelConstants {
   public static final String CAMUNDA_ATTRIBUTE_SOURCE_EXPRESSION = "sourceExpression";
   public static final String CAMUNDA_ATTRIBUTE_STRING_VALUE = "stringValue";
   public static final String CAMUNDA_ATTRIBUTE_TARGET = "target";
+  public static final String CAMUNDA_ATTRIBUTE_TOPIC = "topic";
   public static final String CAMUNDA_ATTRIBUTE_TYPE = "type";
   public static final String CAMUNDA_ATTRIBUTE_VALUE = "value";
   public static final String CAMUNDA_ATTRIBUTE_VARIABLE = "variable";

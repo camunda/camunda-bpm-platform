@@ -47,4 +47,12 @@ public interface MessageEventDefinition extends EventDefinition {
 
   void setCamundaResultVariable(String camundaResultVariable);
 
+  String getCamundaTopic();
+
+  void setCamundaTopic(String camundaTopic);
+
+  String getCamundaType();
+
+  void setCamundaType(String camundaType);
+
 }

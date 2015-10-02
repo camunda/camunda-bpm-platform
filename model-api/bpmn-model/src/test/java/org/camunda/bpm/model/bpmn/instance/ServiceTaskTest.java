@@ -40,6 +40,7 @@ public class ServiceTaskTest extends BpmnModelElementInstanceTest {
       new AttributeAssumption(CAMUNDA_NS, "delegateExpression"),
       new AttributeAssumption(CAMUNDA_NS, "expression"),
       new AttributeAssumption(CAMUNDA_NS, "resultVariable"),
+      new AttributeAssumption(CAMUNDA_NS, "topic"),
       new AttributeAssumption(CAMUNDA_NS, "type")
     );
   }

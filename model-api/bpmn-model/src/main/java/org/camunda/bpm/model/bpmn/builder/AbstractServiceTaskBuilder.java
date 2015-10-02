@@ -83,6 +83,18 @@ public abstract class AbstractServiceTaskBuilder<B extends AbstractServiceTaskBu
   }
 
   /**
+   * Sets the camunda topic attribute. This is only meaningful when
+   * the {@link #camundaType(String)} attribute has the value <code>external</code>.
+   *
+   * @param camundaTopic the
+   * @return
+   */
+  public B camundaTopic(String camundaTopic) {
+    element.setCamundaTopic(camundaTopic);
+    return myself;
+  }
+
+  /**
    * Sets the camunda type attribute.
    *
    * @param camundaType  the type of the service task

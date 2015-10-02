@@ -43,6 +43,7 @@ public class BusinessRuleTaskImpl extends TaskImpl implements BusinessRuleTask {
   protected static Attribute<String> camundaDelegateExpressionAttribute;
   protected static Attribute<String> camundaExpressionAttribute;
   protected static Attribute<String> camundaResultVariableAttribute;
+  protected static Attribute<String> camundaTopicAttribute;
   protected static Attribute<String> camundaTypeAttribute;
   protected static Attribute<String> camundaDecisionRefAttribute;
   protected static Attribute<String> camundaDecisionRefBindingAttribute;
@@ -77,6 +78,10 @@ public class BusinessRuleTaskImpl extends TaskImpl implements BusinessRuleTask {
       .build();
 
     camundaResultVariableAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_RESULT_VARIABLE)
+      .namespace(CAMUNDA_NS)
+      .build();
+
+    camundaTopicAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_TOPIC)
       .namespace(CAMUNDA_NS)
       .build();
 
@@ -147,6 +152,14 @@ public class BusinessRuleTaskImpl extends TaskImpl implements BusinessRuleTask {
 
   public void setCamundaResultVariable(String camundaResultVariable) {
     camundaResultVariableAttribute.setValue(this, camundaResultVariable);
+  }
+
+  public String getCamundaTopic() {
+    return camundaTopicAttribute.getValue(this);
+  }
+
+  public void setCamundaTopic(String camundaTopic) {
+    camundaTopicAttribute.setValue(this, camundaTopic);
   }
 
   public String getCamundaType() {
