@@ -15,9 +15,12 @@ define([
   // decision instance
   './decisionInstance/inputTable',
   './decisionInstance/outputTable',
-  './decisionInstance/gotoProcessInstanceAction'
+  './decisionInstance/gotoProcessInstanceAction',
 
-], function(angular, decisionList, decisionInstanceTable, inputTable, outputTable, gotoProcessInstanceAction) {
+  // decision instance table
+  './decisionInstance/highlightRules'
+
+], function(angular, decisionList, decisionInstanceTable, inputTable, outputTable, gotoProcessInstanceAction, highlightRules) {
 
   'use strict';
   var ngModule = angular.module('cockpit.plugin.decisionList.views', []);
@@ -26,6 +29,7 @@ define([
   ngModule.config(decisionInstanceTable);
   ngModule.config(inputTable);
   ngModule.config(outputTable);
+  ngModule.config(highlightRules);
 
   gotoProcessInstanceAction(ngModule);
 
