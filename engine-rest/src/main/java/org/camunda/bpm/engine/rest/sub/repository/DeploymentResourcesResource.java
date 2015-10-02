@@ -13,15 +13,16 @@
 
 package org.camunda.bpm.engine.rest.sub.repository;
 
-import org.camunda.bpm.engine.rest.dto.repository.DeploymentResourceDto;
+import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.io.InputStream;
-import java.util.List;
+import javax.ws.rs.core.Response;
+
+import org.camunda.bpm.engine.rest.dto.repository.DeploymentResourceDto;
 
 /**
  * @author Sebastian Menski
@@ -39,7 +40,6 @@ public interface DeploymentResourcesResource {
 
   @GET
   @Path("/{resourceId}/data")
-  @Produces(MediaType.APPLICATION_OCTET_STREAM)
-  InputStream getDeploymentResourceData(@PathParam("resourceId") String resourceId);
+  Response getDeploymentResourceData(@PathParam("resourceId") String resourceId);
 
 }

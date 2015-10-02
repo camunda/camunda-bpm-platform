@@ -14,8 +14,33 @@ package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT_BPMN_RESOURCE_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT_BPMN_XML_RESOURCE_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT_CMMN_RESOURCE_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT_CMMN_XML_RESOURCE_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT_DMN_RESOURCE_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT_DMN_XML_RESOURCE_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT_GIF_RESOURCE_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT_GROOVY_RESOURCE_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT_HTML_RESOURCE_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT_JAVA_RESOURCE_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT_JPEG_RESOURCE_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT_JPE_RESOURCE_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT_JPG_RESOURCE_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT_JSON_RESOURCE_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT_JS_RESOURCE_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT_PHP_RESOURCE_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT_PNG_RESOURCE_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT_PYTHON_RESOURCE_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT_RESOURCE_FILENAME_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT_RESOURCE_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT_RUBY_RESOURCE_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT_SVG_RESOURCE_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT_TIFF_RESOURCE_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT_TIF_RESOURCE_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT_TXT_RESOURCE_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT_XML_RESOURCE_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.NON_EXISTING_DEPLOYMENT_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.NON_EXISTING_DEPLOYMENT_RESOURCE_ID;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -31,6 +56,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,6 +81,7 @@ import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.path.json.JsonPath;
 import com.jayway.restassured.response.Response;
 
@@ -109,6 +136,13 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
     InputStream bpmn20XmlIn = ReflectUtil.getResourceAsStream("processes/fox-invoice_en_long_id.bpmn");
     assertNotNull(bpmn20XmlIn);
     return bpmn20XmlIn;
+  }
+
+  private InputStream createMockDeploymentResourceSvgData() {
+    // do not close the input stream, will be done in implementation
+    InputStream image = ReflectUtil.getResourceAsStream("processes/diagram.svg");
+    assertNotNull(image);
+    return image;
   }
 
   @Test
@@ -242,12 +276,686 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
     Response response = given()
         .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
         .pathParam("resourceId", EXAMPLE_DEPLOYMENT_RESOURCE_ID)
-      .then().expect().statusCode(Status.OK.getStatusCode())
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+          .contentType("application/octet-stream")
+          .header("Content-Disposition", "attachment; filename=" + MockProvider.EXAMPLE_DEPLOYMENT_RESOURCE_NAME)
       .when().get(SINGLE_RESOURCE_DATA_URL);
 
     String responseContent = response.asString();
     assertTrue(responseContent.contains("<?xml"));
 
+  }
+
+  @Test
+  public void testGetDeploymentSvgResourceData() {
+    Resource resource = MockProvider.createMockDeploymentSvgResource();
+
+    List<Resource> resources = new ArrayList<Resource>();
+    resources.add(resource);
+
+    when(mockRepositoryService.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(resources);
+    when(mockRepositoryService.getResourceAsStreamById(eq(EXAMPLE_DEPLOYMENT_ID), eq(EXAMPLE_DEPLOYMENT_SVG_RESOURCE_ID))).thenReturn(createMockDeploymentResourceSvgData());
+
+    Response response = given()
+        .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+        .pathParam("resourceId", EXAMPLE_DEPLOYMENT_SVG_RESOURCE_ID)
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+          .contentType("image/svg+xml")
+          .header("Content-Disposition", "attachment; filename=" + MockProvider.EXAMPLE_DEPLOYMENT_SVG_RESOURCE_NAME)
+      .when().get(SINGLE_RESOURCE_DATA_URL);
+
+    String responseContent = response.asString();
+    assertTrue(responseContent.contains("<?xml"));
+  }
+
+  @Test
+  public void testGetDeploymentPngResourceData() {
+    Resource resource = MockProvider.createMockDeploymentPngResource();
+
+    List<Resource> resources = new ArrayList<Resource>();
+    resources.add(resource);
+
+    InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
+
+    when(mockRepositoryService.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(resources);
+    when(mockRepositoryService.getResourceAsStreamById(eq(EXAMPLE_DEPLOYMENT_ID), eq(EXAMPLE_DEPLOYMENT_PNG_RESOURCE_ID))).thenReturn(input);
+
+    Response response = given()
+        .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+        .pathParam("resourceId", EXAMPLE_DEPLOYMENT_PNG_RESOURCE_ID)
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+          .contentType("image/png")
+          .header("Content-Disposition", "attachment; filename=" + MockProvider.EXAMPLE_DEPLOYMENT_PNG_RESOURCE_NAME)
+      .when().get(SINGLE_RESOURCE_DATA_URL);
+
+    String responseContent = response.asString();
+    assertNotNull(responseContent);
+  }
+
+  @Test
+  public void testGetDeploymentGifResourceData() {
+    Resource resource = MockProvider.createMockDeploymentGifResource();
+
+    List<Resource> resources = new ArrayList<Resource>();
+    resources.add(resource);
+
+    InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
+
+    when(mockRepositoryService.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(resources);
+    when(mockRepositoryService.getResourceAsStreamById(eq(EXAMPLE_DEPLOYMENT_ID), eq(EXAMPLE_DEPLOYMENT_GIF_RESOURCE_ID))).thenReturn(input);
+
+    Response response = given()
+        .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+        .pathParam("resourceId", EXAMPLE_DEPLOYMENT_GIF_RESOURCE_ID)
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+          .contentType("image/gif")
+          .header("Content-Disposition", "attachment; filename=" + MockProvider.EXAMPLE_DEPLOYMENT_GIF_RESOURCE_NAME)
+      .when().get(SINGLE_RESOURCE_DATA_URL);
+
+    String responseContent = response.asString();
+    assertNotNull(responseContent);
+  }
+
+  @Test
+  public void testGetDeploymentJpgResourceData() {
+    Resource resource = MockProvider.createMockDeploymentJpgResource();
+
+    List<Resource> resources = new ArrayList<Resource>();
+    resources.add(resource);
+
+    InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
+
+    when(mockRepositoryService.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(resources);
+    when(mockRepositoryService.getResourceAsStreamById(eq(EXAMPLE_DEPLOYMENT_ID), eq(EXAMPLE_DEPLOYMENT_JPG_RESOURCE_ID))).thenReturn(input);
+
+    Response response = given()
+        .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+        .pathParam("resourceId", EXAMPLE_DEPLOYMENT_JPG_RESOURCE_ID)
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+          .contentType("image/jpeg")
+          .header("Content-Disposition", "attachment; filename=" + MockProvider.EXAMPLE_DEPLOYMENT_JPG_RESOURCE_NAME)
+      .when().get(SINGLE_RESOURCE_DATA_URL);
+
+    String responseContent = response.asString();
+    assertNotNull(responseContent);
+  }
+
+  @Test
+  public void testGetDeploymentJpegResourceData() {
+    Resource resource = MockProvider.createMockDeploymentJpegResource();
+
+    List<Resource> resources = new ArrayList<Resource>();
+    resources.add(resource);
+
+    InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
+
+    when(mockRepositoryService.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(resources);
+    when(mockRepositoryService.getResourceAsStreamById(eq(EXAMPLE_DEPLOYMENT_ID), eq(EXAMPLE_DEPLOYMENT_JPEG_RESOURCE_ID))).thenReturn(input);
+
+    Response response = given()
+        .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+        .pathParam("resourceId", EXAMPLE_DEPLOYMENT_JPEG_RESOURCE_ID)
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+          .contentType("image/jpeg")
+          .header("Content-Disposition", "attachment; filename=" + MockProvider.EXAMPLE_DEPLOYMENT_JPEG_RESOURCE_NAME)
+      .when().get(SINGLE_RESOURCE_DATA_URL);
+
+    String responseContent = response.asString();
+    assertNotNull(responseContent);
+  }
+
+  @Test
+  public void testGetDeploymentJpeResourceData() {
+    Resource resource = MockProvider.createMockDeploymentJpeResource();
+
+    List<Resource> resources = new ArrayList<Resource>();
+    resources.add(resource);
+
+    InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
+
+    when(mockRepositoryService.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(resources);
+    when(mockRepositoryService.getResourceAsStreamById(eq(EXAMPLE_DEPLOYMENT_ID), eq(EXAMPLE_DEPLOYMENT_JPE_RESOURCE_ID))).thenReturn(input);
+
+    Response response = given()
+        .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+        .pathParam("resourceId", EXAMPLE_DEPLOYMENT_JPE_RESOURCE_ID)
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+          .contentType("image/jpeg")
+          .header("Content-Disposition", "attachment; filename=" + MockProvider.EXAMPLE_DEPLOYMENT_JPE_RESOURCE_NAME)
+      .when().get(SINGLE_RESOURCE_DATA_URL);
+
+    String responseContent = response.asString();
+    assertNotNull(responseContent);
+  }
+
+  @Test
+  public void testGetDeploymentTifResourceData() {
+    Resource resource = MockProvider.createMockDeploymentTifResource();
+
+    List<Resource> resources = new ArrayList<Resource>();
+    resources.add(resource);
+
+    InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
+
+    when(mockRepositoryService.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(resources);
+    when(mockRepositoryService.getResourceAsStreamById(eq(EXAMPLE_DEPLOYMENT_ID), eq(EXAMPLE_DEPLOYMENT_TIF_RESOURCE_ID))).thenReturn(input);
+
+    Response response = given()
+        .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+        .pathParam("resourceId", EXAMPLE_DEPLOYMENT_TIF_RESOURCE_ID)
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+          .contentType("image/tiff")
+          .header("Content-Disposition", "attachment; filename=" + MockProvider.EXAMPLE_DEPLOYMENT_TIF_RESOURCE_NAME)
+      .when().get(SINGLE_RESOURCE_DATA_URL);
+
+    String responseContent = response.asString();
+    assertNotNull(responseContent);
+  }
+
+  @Test
+  public void testGetDeploymentTiffResourceData() {
+    Resource resource = MockProvider.createMockDeploymentTiffResource();
+
+    List<Resource> resources = new ArrayList<Resource>();
+    resources.add(resource);
+
+    InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
+
+    when(mockRepositoryService.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(resources);
+    when(mockRepositoryService.getResourceAsStreamById(eq(EXAMPLE_DEPLOYMENT_ID), eq(EXAMPLE_DEPLOYMENT_TIFF_RESOURCE_ID))).thenReturn(input);
+
+    Response response = given()
+        .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+        .pathParam("resourceId", EXAMPLE_DEPLOYMENT_TIFF_RESOURCE_ID)
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+          .contentType("image/tiff")
+          .header("Content-Disposition", "attachment; filename=" + MockProvider.EXAMPLE_DEPLOYMENT_TIFF_RESOURCE_NAME)
+      .when().get(SINGLE_RESOURCE_DATA_URL);
+
+    String responseContent = response.asString();
+    assertNotNull(responseContent);
+  }
+
+  @Test
+  public void testGetDeploymentBpmnResourceData() {
+    Resource resource = MockProvider.createMockDeploymentBpmnResource();
+
+    List<Resource> resources = new ArrayList<Resource>();
+    resources.add(resource);
+
+    when(mockRepositoryService.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(resources);
+    when(mockRepositoryService.getResourceAsStreamById(eq(EXAMPLE_DEPLOYMENT_ID), eq(EXAMPLE_DEPLOYMENT_BPMN_RESOURCE_ID))).thenReturn(createMockDeploymentResourceBpmnData());
+
+    Response response = given()
+        .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+        .pathParam("resourceId", EXAMPLE_DEPLOYMENT_BPMN_RESOURCE_ID)
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+          .contentType(ContentType.XML)
+          .header("Content-Disposition", "attachment; filename=" + MockProvider.EXAMPLE_DEPLOYMENT_BPMN_RESOURCE_NAME)
+      .when().get(SINGLE_RESOURCE_DATA_URL);
+
+    String responseContent = response.asString();
+    assertNotNull(responseContent);
+  }
+
+  @Test
+  public void testGetDeploymentBpmnXmlResourceData() {
+    Resource resource = MockProvider.createMockDeploymentBpmnXmlResource();
+
+    List<Resource> resources = new ArrayList<Resource>();
+    resources.add(resource);
+
+    when(mockRepositoryService.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(resources);
+    when(mockRepositoryService.getResourceAsStreamById(eq(EXAMPLE_DEPLOYMENT_ID), eq(EXAMPLE_DEPLOYMENT_BPMN_XML_RESOURCE_ID))).thenReturn(createMockDeploymentResourceBpmnData());
+
+    Response response = given()
+        .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+        .pathParam("resourceId", EXAMPLE_DEPLOYMENT_BPMN_XML_RESOURCE_ID)
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+          .contentType(ContentType.XML)
+          .header("Content-Disposition", "attachment; filename=" + MockProvider.EXAMPLE_DEPLOYMENT_BPMN_XML_RESOURCE_NAME)
+      .when().get(SINGLE_RESOURCE_DATA_URL);
+
+    String responseContent = response.asString();
+    assertNotNull(responseContent);
+  }
+
+  @Test
+  public void testGetDeploymentCmmnResourceData() {
+    Resource resource = MockProvider.createMockDeploymentCmmnResource();
+
+    List<Resource> resources = new ArrayList<Resource>();
+    resources.add(resource);
+
+    InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
+
+    when(mockRepositoryService.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(resources);
+    when(mockRepositoryService.getResourceAsStreamById(eq(EXAMPLE_DEPLOYMENT_ID), eq(EXAMPLE_DEPLOYMENT_CMMN_RESOURCE_ID))).thenReturn(input);
+
+    Response response = given()
+        .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+        .pathParam("resourceId", EXAMPLE_DEPLOYMENT_CMMN_RESOURCE_ID)
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+          .contentType(ContentType.XML)
+          .header("Content-Disposition", "attachment; filename=" + MockProvider.EXAMPLE_DEPLOYMENT_CMMN_RESOURCE_NAME)
+      .when().get(SINGLE_RESOURCE_DATA_URL);
+
+    String responseContent = response.asString();
+    assertNotNull(responseContent);
+  }
+
+  @Test
+  public void testGetDeploymentCmmnXmlResourceData() {
+    Resource resource = MockProvider.createMockDeploymentCmmnXmlResource();
+
+    List<Resource> resources = new ArrayList<Resource>();
+    resources.add(resource);
+
+    InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
+
+    when(mockRepositoryService.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(resources);
+    when(mockRepositoryService.getResourceAsStreamById(eq(EXAMPLE_DEPLOYMENT_ID), eq(EXAMPLE_DEPLOYMENT_CMMN_XML_RESOURCE_ID))).thenReturn(input);
+
+    Response response = given()
+        .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+        .pathParam("resourceId", EXAMPLE_DEPLOYMENT_CMMN_XML_RESOURCE_ID)
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+          .contentType(ContentType.XML)
+          .header("Content-Disposition", "attachment; filename=" + MockProvider.EXAMPLE_DEPLOYMENT_CMMN_XML_RESOURCE_NAME)
+      .when().get(SINGLE_RESOURCE_DATA_URL);
+
+    String responseContent = response.asString();
+    assertNotNull(responseContent);
+  }
+
+  @Test
+  public void testGetDeploymentDmnResourceData() {
+    Resource resource = MockProvider.createMockDeploymentDmnResource();
+
+    List<Resource> resources = new ArrayList<Resource>();
+    resources.add(resource);
+
+    InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
+
+    when(mockRepositoryService.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(resources);
+    when(mockRepositoryService.getResourceAsStreamById(eq(EXAMPLE_DEPLOYMENT_ID), eq(EXAMPLE_DEPLOYMENT_DMN_RESOURCE_ID))).thenReturn(input);
+
+    Response response = given()
+        .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+        .pathParam("resourceId", EXAMPLE_DEPLOYMENT_DMN_RESOURCE_ID)
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+          .contentType(ContentType.XML)
+          .header("Content-Disposition", "attachment; filename=" + MockProvider.EXAMPLE_DEPLOYMENT_DMN_RESOURCE_NAME)
+      .when().get(SINGLE_RESOURCE_DATA_URL);
+
+    String responseContent = response.asString();
+    assertNotNull(responseContent);
+  }
+
+  @Test
+  public void testGetDeploymentDmnXmlResourceData() {
+    Resource resource = MockProvider.createMockDeploymentDmnXmlResource();
+
+    List<Resource> resources = new ArrayList<Resource>();
+    resources.add(resource);
+
+    InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
+
+    when(mockRepositoryService.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(resources);
+    when(mockRepositoryService.getResourceAsStreamById(eq(EXAMPLE_DEPLOYMENT_ID), eq(EXAMPLE_DEPLOYMENT_DMN_XML_RESOURCE_ID))).thenReturn(input);
+
+    Response response = given()
+        .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+        .pathParam("resourceId", EXAMPLE_DEPLOYMENT_DMN_XML_RESOURCE_ID)
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+          .contentType(ContentType.XML)
+          .header("Content-Disposition", "attachment; filename=" + MockProvider.EXAMPLE_DEPLOYMENT_DMN_XML_RESOURCE_NAME)
+      .when().get(SINGLE_RESOURCE_DATA_URL);
+
+    String responseContent = response.asString();
+    assertNotNull(responseContent);
+  }
+
+  @Test
+  public void testGetDeploymentXmlResourceData() {
+    Resource resource = MockProvider.createMockDeploymentXmlResource();
+
+    List<Resource> resources = new ArrayList<Resource>();
+    resources.add(resource);
+
+    InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
+
+    when(mockRepositoryService.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(resources);
+    when(mockRepositoryService.getResourceAsStreamById(eq(EXAMPLE_DEPLOYMENT_ID), eq(EXAMPLE_DEPLOYMENT_XML_RESOURCE_ID))).thenReturn(input);
+
+    Response response = given()
+        .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+        .pathParam("resourceId", EXAMPLE_DEPLOYMENT_XML_RESOURCE_ID)
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+          .contentType(ContentType.XML)
+          .header("Content-Disposition", "attachment; filename=" + MockProvider.EXAMPLE_DEPLOYMENT_XML_RESOURCE_NAME)
+      .when().get(SINGLE_RESOURCE_DATA_URL);
+
+    String responseContent = response.asString();
+    assertNotNull(responseContent);
+  }
+
+  @Test
+  public void testGetDeploymentJsonResourceData() {
+    Resource resource = MockProvider.createMockDeploymentJsonResource();
+
+    List<Resource> resources = new ArrayList<Resource>();
+    resources.add(resource);
+
+    InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
+
+    when(mockRepositoryService.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(resources);
+    when(mockRepositoryService.getResourceAsStreamById(eq(EXAMPLE_DEPLOYMENT_ID), eq(EXAMPLE_DEPLOYMENT_JSON_RESOURCE_ID))).thenReturn(input);
+
+    Response response = given()
+        .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+        .pathParam("resourceId", EXAMPLE_DEPLOYMENT_JSON_RESOURCE_ID)
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+          .contentType(ContentType.JSON)
+          .header("Content-Disposition", "attachment; filename=" + MockProvider.EXAMPLE_DEPLOYMENT_JSON_RESOURCE_NAME)
+      .when().get(SINGLE_RESOURCE_DATA_URL);
+
+    String responseContent = response.asString();
+    assertNotNull(responseContent);
+  }
+
+  @Test
+  public void testGetDeploymentGroovyResourceData() {
+    Resource resource = MockProvider.createMockDeploymentGroovyResource();
+
+    List<Resource> resources = new ArrayList<Resource>();
+    resources.add(resource);
+
+    InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
+
+    when(mockRepositoryService.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(resources);
+    when(mockRepositoryService.getResourceAsStreamById(eq(EXAMPLE_DEPLOYMENT_ID), eq(EXAMPLE_DEPLOYMENT_GROOVY_RESOURCE_ID))).thenReturn(input);
+
+    Response response = given()
+        .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+        .pathParam("resourceId", EXAMPLE_DEPLOYMENT_GROOVY_RESOURCE_ID)
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+          .contentType(ContentType.TEXT)
+          .header("Content-Disposition", "attachment; filename=" + MockProvider.EXAMPLE_DEPLOYMENT_GROOVY_RESOURCE_NAME)
+      .when().get(SINGLE_RESOURCE_DATA_URL);
+
+    String responseContent = response.asString();
+    assertNotNull(responseContent);
+  }
+
+  @Test
+  public void testGetDeploymentJavaResourceData() {
+    Resource resource = MockProvider.createMockDeploymentJavaResource();
+
+    List<Resource> resources = new ArrayList<Resource>();
+    resources.add(resource);
+
+    InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
+
+    when(mockRepositoryService.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(resources);
+    when(mockRepositoryService.getResourceAsStreamById(eq(EXAMPLE_DEPLOYMENT_ID), eq(EXAMPLE_DEPLOYMENT_JAVA_RESOURCE_ID))).thenReturn(input);
+
+    Response response = given()
+        .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+        .pathParam("resourceId", EXAMPLE_DEPLOYMENT_JAVA_RESOURCE_ID)
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+          .contentType(ContentType.TEXT)
+          .header("Content-Disposition", "attachment; filename=" + MockProvider.EXAMPLE_DEPLOYMENT_JAVA_RESOURCE_NAME)
+      .when().get(SINGLE_RESOURCE_DATA_URL);
+
+    String responseContent = response.asString();
+    assertNotNull(responseContent);
+  }
+
+  @Test
+  public void testGetDeploymentJsResourceData() {
+    Resource resource = MockProvider.createMockDeploymentJsResource();
+
+    List<Resource> resources = new ArrayList<Resource>();
+    resources.add(resource);
+
+    InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
+
+    when(mockRepositoryService.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(resources);
+    when(mockRepositoryService.getResourceAsStreamById(eq(EXAMPLE_DEPLOYMENT_ID), eq(EXAMPLE_DEPLOYMENT_JS_RESOURCE_ID))).thenReturn(input);
+
+    Response response = given()
+        .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+        .pathParam("resourceId", EXAMPLE_DEPLOYMENT_JS_RESOURCE_ID)
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+          .contentType(ContentType.TEXT)
+          .header("Content-Disposition", "attachment; filename=" + MockProvider.EXAMPLE_DEPLOYMENT_JS_RESOURCE_NAME)
+      .when().get(SINGLE_RESOURCE_DATA_URL);
+
+    String responseContent = response.asString();
+    assertNotNull(responseContent);
+  }
+
+  @Test
+  public void testGetDeploymentPythonResourceData() {
+    Resource resource = MockProvider.createMockDeploymentPythonResource();
+
+    List<Resource> resources = new ArrayList<Resource>();
+    resources.add(resource);
+
+    InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
+
+    when(mockRepositoryService.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(resources);
+    when(mockRepositoryService.getResourceAsStreamById(eq(EXAMPLE_DEPLOYMENT_ID), eq(EXAMPLE_DEPLOYMENT_PYTHON_RESOURCE_ID))).thenReturn(input);
+
+    Response response = given()
+        .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+        .pathParam("resourceId", EXAMPLE_DEPLOYMENT_PYTHON_RESOURCE_ID)
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+          .contentType(ContentType.TEXT)
+          .header("Content-Disposition", "attachment; filename=" + MockProvider.EXAMPLE_DEPLOYMENT_PYTHON_RESOURCE_NAME)
+      .when().get(SINGLE_RESOURCE_DATA_URL);
+
+    String responseContent = response.asString();
+    assertNotNull(responseContent);
+  }
+
+  @Test
+  public void testGetDeploymentRubyResourceData() {
+    Resource resource = MockProvider.createMockDeploymentRubyResource();
+
+    List<Resource> resources = new ArrayList<Resource>();
+    resources.add(resource);
+
+    InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
+
+    when(mockRepositoryService.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(resources);
+    when(mockRepositoryService.getResourceAsStreamById(eq(EXAMPLE_DEPLOYMENT_ID), eq(EXAMPLE_DEPLOYMENT_RUBY_RESOURCE_ID))).thenReturn(input);
+
+    Response response = given()
+        .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+        .pathParam("resourceId", EXAMPLE_DEPLOYMENT_RUBY_RESOURCE_ID)
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+          .contentType(ContentType.TEXT)
+          .header("Content-Disposition", "attachment; filename=" + MockProvider.EXAMPLE_DEPLOYMENT_RUBY_RESOURCE_NAME)
+      .when().get(SINGLE_RESOURCE_DATA_URL);
+
+    String responseContent = response.asString();
+    assertNotNull(responseContent);
+  }
+
+  @Test
+  public void testGetDeploymentPhpResourceData() {
+    Resource resource = MockProvider.createMockDeploymentPhpResource();
+
+    List<Resource> resources = new ArrayList<Resource>();
+    resources.add(resource);
+
+    InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
+
+    when(mockRepositoryService.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(resources);
+    when(mockRepositoryService.getResourceAsStreamById(eq(EXAMPLE_DEPLOYMENT_ID), eq(EXAMPLE_DEPLOYMENT_PHP_RESOURCE_ID))).thenReturn(input);
+
+    Response response = given()
+        .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+        .pathParam("resourceId", EXAMPLE_DEPLOYMENT_PHP_RESOURCE_ID)
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+          .contentType(ContentType.TEXT)
+          .header("Content-Disposition", "attachment; filename=" + MockProvider.EXAMPLE_DEPLOYMENT_PHP_RESOURCE_NAME)
+      .when().get(SINGLE_RESOURCE_DATA_URL);
+
+    String responseContent = response.asString();
+    assertNotNull(responseContent);
+  }
+
+  @Test
+  public void testGetDeploymentHtmlpResourceData() {
+    Resource resource = MockProvider.createMockDeploymentHtmlResource();
+
+    List<Resource> resources = new ArrayList<Resource>();
+    resources.add(resource);
+
+    InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
+
+    when(mockRepositoryService.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(resources);
+    when(mockRepositoryService.getResourceAsStreamById(eq(EXAMPLE_DEPLOYMENT_ID), eq(EXAMPLE_DEPLOYMENT_HTML_RESOURCE_ID))).thenReturn(input);
+
+    Response response = given()
+        .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+        .pathParam("resourceId", EXAMPLE_DEPLOYMENT_HTML_RESOURCE_ID)
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+          .contentType(ContentType.HTML)
+          .header("Content-Disposition", "attachment; filename=" + MockProvider.EXAMPLE_DEPLOYMENT_HTML_RESOURCE_NAME)
+      .when().get(SINGLE_RESOURCE_DATA_URL);
+
+    String responseContent = response.asString();
+    assertNotNull(responseContent);
+  }
+
+  @Test
+  public void testGetDeploymentTxtResourceData() {
+    Resource resource = MockProvider.createMockDeploymentTxtResource();
+
+    List<Resource> resources = new ArrayList<Resource>();
+    resources.add(resource);
+
+    InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
+
+    when(mockRepositoryService.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(resources);
+    when(mockRepositoryService.getResourceAsStreamById(eq(EXAMPLE_DEPLOYMENT_ID), eq(EXAMPLE_DEPLOYMENT_TXT_RESOURCE_ID))).thenReturn(input);
+
+    Response response = given()
+        .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+        .pathParam("resourceId", EXAMPLE_DEPLOYMENT_TXT_RESOURCE_ID)
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+          .contentType(ContentType.TEXT)
+          .header("Content-Disposition", "attachment; filename=" + MockProvider.EXAMPLE_DEPLOYMENT_TXT_RESOURCE_NAME)
+      .when().get(SINGLE_RESOURCE_DATA_URL);
+
+    String responseContent = response.asString();
+    assertNotNull(responseContent);
+  }
+
+  @Test
+  public void testGetDeploymentResourceDataFilename() {
+    Resource resource = MockProvider.createMockDeploymentResourceFilename();
+
+    List<Resource> resources = new ArrayList<Resource>();
+    resources.add(resource);
+
+    InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
+
+    when(mockRepositoryService.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(resources);
+    when(mockRepositoryService.getResourceAsStreamById(eq(EXAMPLE_DEPLOYMENT_ID), eq(EXAMPLE_DEPLOYMENT_RESOURCE_FILENAME_ID))).thenReturn(input);
+
+    Response response = given()
+        .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+        .pathParam("resourceId", EXAMPLE_DEPLOYMENT_RESOURCE_FILENAME_ID)
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+          .contentType(ContentType.XML)
+          .header("Content-Disposition", "attachment; filename=" + MockProvider.EXAMPLE_DEPLOYMENT_RESOURCE_FILENAME_NAME)
+      .when().get(SINGLE_RESOURCE_DATA_URL);
+
+    String responseContent = response.asString();
+    assertNotNull(responseContent);
+  }
+
+  @Test
+  public void testGetDeploymentResourceDataFilenameBackslash() {
+    Resource resource = MockProvider.createMockDeploymentResourceFilenameBackslash();
+
+    List<Resource> resources = new ArrayList<Resource>();
+    resources.add(resource);
+
+    InputStream input = new ByteArrayInputStream(createMockDeploymentResourceByteData());
+
+    when(mockRepositoryService.getDeploymentResources(eq(EXAMPLE_DEPLOYMENT_ID))).thenReturn(resources);
+    when(mockRepositoryService.getResourceAsStreamById(eq(EXAMPLE_DEPLOYMENT_ID), eq(EXAMPLE_DEPLOYMENT_RESOURCE_FILENAME_ID))).thenReturn(input);
+
+    Response response = given()
+        .pathParam("id", EXAMPLE_DEPLOYMENT_ID)
+        .pathParam("resourceId", EXAMPLE_DEPLOYMENT_RESOURCE_FILENAME_ID)
+      .then()
+        .expect()
+          .statusCode(Status.OK.getStatusCode())
+          .contentType(ContentType.XML)
+          .header("Content-Disposition", "attachment; filename=" + MockProvider.EXAMPLE_DEPLOYMENT_RESOURCE_FILENAME_NAME)
+      .when().get(SINGLE_RESOURCE_DATA_URL);
+
+    String responseContent = response.asString();
+    assertNotNull(responseContent);
   }
 
   @Test
