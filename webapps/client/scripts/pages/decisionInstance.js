@@ -82,9 +82,18 @@ define([
       $scope.tableXml = tableXml;
     });
 
-    $scope.highlightFiredRules = function() {
-      for(var i = 0; i < decisionInstance.outputs.length; i++) {
-        $scope.control.highlightRow(decisionInstance.outputs[i].ruleId, 'fired');
+    $scope.initializeTablePlugins = function() {
+      var tablePlugins = Views.getProviders({ component: 'cockpit.decisionInstance.table' });
+
+      var initData = {
+        decisionInstance   : decisionInstance,
+        tableControl       : $scope.control
+      };
+
+      for(var i = 0; i < tablePlugins.length; i++) {
+        if(typeof tablePlugins[i].initialize === 'function') {
+           tablePlugins[i].initialize(initData);
+        }
       }
     };
 
