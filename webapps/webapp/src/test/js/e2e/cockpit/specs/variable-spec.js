@@ -21,7 +21,7 @@ describe('Cockpit Variable Spec', function() {
     });
 
 
-    // What is that???
+    // skipped due to CAM-4671
     xit('should select variable scope', function() {
 
       // given
@@ -334,7 +334,9 @@ describe('Cockpit Variable Spec', function() {
       var variable;
 
       before(function () {
-        variable = instancePage.variablesTab.variableAt(0);
+        // NEVER select a variable by index as you get no guarantee on  a consistent order
+        // select variable by name instead
+        variable = instancePage.variablesTab.variableByName('myString');
       });
 
 
