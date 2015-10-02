@@ -9,11 +9,11 @@ module.exports = Table.extend({
   tabLabel: 'Outputs',
 
   variableName: function(idx) {
-    return element.all(by.repeater('variable in variables')).get(idx).element(by.css('.name')).getText();
+    return element.all(by.repeater('(v, info) in variables')).get(idx).element(by.css('[ng-switch-when="name"]')).getText();
   },
 
   variableValue: function(idx) {
-    return element.all(by.repeater('variable in variables')).get(idx).element(by.css('.value')).getText();
+    return element.all(by.repeater('(v, info) in variables')).get(idx).element(by.css('[ng-switch-when="value"]')).getText();
   }
 
 

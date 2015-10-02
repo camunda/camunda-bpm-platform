@@ -27,7 +27,7 @@ module.exports = Table.extend({
   },
 
   table: function() {
-    return element.all(by.css('tbody tr'));
+    return element(by.css('.ctn-tabbed-content')).all(by.repeater(this.tableRepeater));
   },
 
   tableItem: function(item, elementSelector) {
