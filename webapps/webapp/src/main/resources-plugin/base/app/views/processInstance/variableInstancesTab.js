@@ -15,7 +15,9 @@ function(uploadTemplate, inspectTemplate, instancesTemplate) {
             variableInstanceIdexceptionMessageMap,
             variableCopies;
 
-        var executionService = camAPI.resource('execution');
+        var executionService = camAPI.resource('execution'),
+            taskService = camAPI.resource('task');
+
 
         var DEFAULT_PAGES = { size: 50, total: 0, current: 1 };
 
@@ -64,12 +66,21 @@ function(uploadTemplate, inspectTemplate, instancesTemplate) {
         $scope.deleteVariable = function(info) {
           var promise = $q.defer();
 
-          executionService.deleteVariable({
-            id: info.variable.executionId,
-            varId: info.variable.name
-          }, function() {
-            promise.resolve(info.variable);
-          });
+          if(info.original.taskId) {
+            taskService.deleteVariable({
+              id: info.original.taskId,
+              varId: info.variable.name
+            }, function(){
+              promise.resolve(info.variable);
+            });
+          } else {
+            executionService.deleteVariable({
+              id: info.variable.executionId,
+              varId: info.variable.name
+            }, function() {
+              promise.resolve(info.variable);
+            });
+          }
 
           return promise.promise;
         };
@@ -114,25 +125,8 @@ function(uploadTemplate, inspectTemplate, instancesTemplate) {
           var newVariable = { value: newValue, type: newType };
           modifiedVariable[variable.name] = newVariable;
 
-          LocalExecutionVariableResource.updateVariables({
-            executionId: variable.executionId
-          }, {
-            modifications : modifiedVariable
-          }).$promise.then(
-            // success
-            function() {
-              Notifications.addMessage({
-                status: 'Variable',
-                message: 'The variable \'' + variable.name + '\' has been changed successfully.',
-                duration: 5000
-              });
-              angular.extend(variable, newVariable);
-              promise.resolve(info.variable);
-              // $scope.closeInPlaceEditing(variable);
-            },
-            // error
-            function (error) {
-              // set the exception
+          var callback = function(error, data) {
+            if(error) {
               Notifications.addError({
                 status: 'Variable',
                 message: 'The variable \'' + variable.name + '\' could not be changed successfully.',
@@ -141,7 +135,29 @@ function(uploadTemplate, inspectTemplate, instancesTemplate) {
               });
               variableInstanceIdexceptionMessageMap[variable.id] = error.data;
               promise.reject();
-            });
+            } else {
+              Notifications.addMessage({
+                status: 'Variable',
+                message: 'The variable \'' + variable.name + '\' has been changed successfully.',
+                duration: 5000
+              });
+              angular.extend(variable, newVariable);
+              promise.resolve(info.variable);
+            }
+          };
+
+          if(info.original.taskId) {
+            taskService.modifyVariables({
+              id: info.original.taskId,
+              modifications: modifiedVariable
+            }, callback);
+          } else {
+            executionService.modifyVariables({
+              id: variable.executionId,
+              modifications: modifiedVariable
+            }, callback);
+          }
+
           return promise.promise;
         };
 
@@ -199,6 +215,7 @@ function(uploadTemplate, inspectTemplate, instancesTemplate) {
                   valueInfo:    item.valueInfo,
                   executionId:  item.executionId
                 },
+                original: item,
                 additions: {
                   scope: {
                     html:  '<a cam-select-activity-instance="\'' +
