@@ -38,6 +38,15 @@
     <div class="ctn-column ctn-sidebar ctn-scroll"
          ctn-collapsable="left">
 
+      <div class="definition-details">
+        <div class="key">
+          <span class="name">
+            Key
+          </span>
+          {{ processDefinition.key }}
+        </div>
+      </div>
+
       <div class="filters"
            ng-controller="ProcessDefinitionFilterController">
         <div class="version-filter filter">
