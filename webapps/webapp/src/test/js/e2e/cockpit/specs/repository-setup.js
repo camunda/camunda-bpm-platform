@@ -42,4 +42,46 @@ module.exports = {
     {
       key: 'failing-process'
     }])
-)};
+  ),
+
+  setup2:
+
+    combine(
+      operation('deployment', 'create', [{
+        deploymentName: 'bpmn',
+        files: [{
+          name: 'user-tasks.bpmn',
+          content: fs.readFileSync(__dirname + '/../../resources/user-tasks.bpmn').toString()
+        }]
+      },
+      {
+        deploymentName: 'cmmn',
+        files: [{
+          name: 'loan-application.cmmn',
+          content: fs.readFileSync(__dirname + '/../../resources/loan-application.cmmn').toString()
+        }]
+      },
+      {
+        deploymentName: 'dmn',
+        files: [{
+          name: 'assign-approver-groups.dmn',
+          content: fs.readFileSync(__dirname + '/../../resources/assign-approver-groups.dmn').toString()
+        }]
+      },
+      {
+        deploymentName: 'image',
+        files: [{
+          name: 'diagram.svg',
+          content: fs.readFileSync(__dirname + '/../../resources/diagram.svg').toString()
+        }]
+      },
+      {
+        deploymentName: 'script',
+        files: [{
+          name: 'my-script.groovy',
+          content: fs.readFileSync(__dirname + '/../../resources/my-script.groovy').toString()
+        }]
+      }])
+
+    )
+};

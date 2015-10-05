@@ -5,6 +5,8 @@ var setupFile = require('./repository-setup');
 
 var repositoryPage = require('../pages/repository');
 var deploymentsPage = repositoryPage.deployments;
+var resourcesPage = repositoryPage.resources;
+var resourcePage = repositoryPage.resource;
 
 describe('Repository Spec', function() {
 
@@ -286,6 +288,149 @@ describe('Repository Spec', function() {
     it('should initially select first deployment', function() {
       // then
       expect(deploymentsPage.isDeploymentSelected(0)).to.eventually.be.true;
+    });
+
+  });
+
+  describe('resource details view', function () {
+
+    before(function() {
+      return testHelper(setupFile.setup1, function() {
+        repositoryPage.navigateToWebapp('Cockpit');
+        repositoryPage.authentication.userLogin('admin', 'admin');
+        repositoryPage.navigateTo();
+      });
+    });
+
+
+    it('should display info text when no resource is selected', function() {
+
+      // then
+      expect(resourcePage.noResourceInfoText()).to.eventually.eql('Select a resource in the list.');
+    });
+
+
+    it('should appear when a resource is selected', function() {
+
+      // when
+      resourcesPage.resourceName(0).then(function(name) {
+
+        resourcesPage.selectResource(0);
+
+        // then
+        expect(resourcePage.resourceName()).to.eventually.eql(name);
+
+      });
+
+    });
+  });
+
+  describe('diagram', function() {
+
+    before(function() {
+      return testHelper(setupFile.setup2, function() {
+        repositoryPage.navigateToWebapp('Cockpit');
+        repositoryPage.authentication.userLogin('admin', 'admin');
+        repositoryPage.navigateTo();
+      });
+    });
+
+
+    it('should display bpmn diagram', function() {
+      // given
+      expect(resourcePage.bpmnDiagramFormElement().isPresent()).to.eventually.be.false;
+
+      // when
+      deploymentsPage.selectDeployment('bpmn');
+      resourcesPage.selectResource(0);
+
+      // then
+      expect(resourcePage.bpmnDiagramFormElement().isPresent()).to.eventually.be.true;
+
+    });
+
+
+    it('should display cmmn diagram', function() {
+      // given
+      expect(resourcePage.cmmnDiagramFormElement().isPresent()).to.eventually.be.false;
+
+      // when
+      deploymentsPage.selectDeployment('cmmn');
+      resourcesPage.selectResource(0);
+
+      // then
+      expect(resourcePage.cmmnDiagramFormElement().isPresent()).to.eventually.be.true;
+      
+    });
+
+
+    it('should display dmn diagram', function() {
+      // given
+      expect(resourcePage.dmnDiagramFormElement().isPresent()).to.eventually.be.false;
+
+      // when
+      deploymentsPage.selectDeployment('dmn');
+      resourcesPage.selectResource(0);
+
+      // then
+      expect(resourcePage.dmnDiagramFormElement().isPresent()).to.eventually.be.true;
+
+    });
+
+
+    it('should display image', function() {
+      // given
+      expect(resourcePage.imageFormElement().isPresent()).to.eventually.be.false;
+
+      // when
+      deploymentsPage.selectDeployment('image');
+      resourcesPage.selectResource(0);
+
+      // then
+      expect(resourcePage.imageFormElement().isPresent()).to.eventually.be.true;
+      
+    });
+
+
+    it('should display script', function() {
+      // given
+      expect(resourcePage.unkownResourceFormElement().isPresent()).to.eventually.be.false;
+
+      // when
+      deploymentsPage.selectDeployment('script');
+      resourcesPage.selectResource(0);
+
+      // then
+      expect(resourcePage.unkownResourceFormElement().isPresent()).to.eventually.be.true;
+      
+    });
+
+  });
+
+  describe('download button', function() {
+
+    before(function() {
+      return testHelper(setupFile.setup1, function() {
+        repositoryPage.navigateToWebapp('Cockpit');
+        repositoryPage.authentication.userLogin('admin', 'admin');
+        repositoryPage.navigateTo();
+      });
+    });
+
+
+    it('should not display download button', function() {
+
+      // then
+      expect(resourcePage.downloadButton().isPresent()).to.eventually.be.false;
+    });
+
+
+    it('should display download button', function() {
+      // whe
+      resourcesPage.selectResource(0);
+
+      // then
+      expect(resourcePage.downloadButton().isPresent()).to.eventually.be.true;
     });
 
   });

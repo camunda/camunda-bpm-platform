@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<definitions name="Loan Application" 
+                  xmlns="http://www.omg.org/spec/CMMN/20131201/MODEL"
+                  xmlns:camunda="http://camunda.org/schema/1.0/cmmn"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  targetNamespace="Examples">
+
+  <case id="loanApplicationCase" name="Loan Application">
+
+    <casePlanModel exitCriteriaRefs="Sentry_3">
+
+      <planItem definitionRef="collectDataStage" id="PI_collectDataStage" />
+      <planItem definitionRef="dataCollectedMilestone" entryCriteriaRefs="Sentry_1" id="PI_dataCollectedMilestone" />
+      <planItem definitionRef="decideHumanTask" entryCriteriaRefs="Sentry_2" id="PI_decideHumanTask" />
+      <planItem definitionRef="customerRetiredUserEvent" id="PI_customerRetiredUserEvent" />
+      
+      <sentry id="Sentry_1">
+        <planItemOnPart sourceRef="PI_collectDataStage">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      
+      <sentry id="Sentry_2">
+        <planItemOnPart sourceRef="PI_dataCollectedMilestone">
+          <standardEvent>occur</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      
+      <sentry id="Sentry_3">
+        <planItemOnPart sourceRef="PI_customerRetiredUserEvent">
+          <standardEvent>occur</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      
+      <stage autoComplete="false" name="Collect Data" id="collectDataStage">
+        <planItem definitionRef="captureAppDataHumanTask" id="PI_captureAppDataHumanTask" />
+        <planItem definitionRef="obtainCreditWorthinessHumanTask" id="PI_obtainCreditWorthinessHumanTask" />
+        <planItem definitionRef="reviewDocumentsHumanTask" id="PI_reviewDocumentsHumanTask" />
+        <planItem definitionRef="obtainSchufaInfoProcessTask" id="PI_obtainSchufaInfoProcessTask" />
+      </stage>
+      
+      <processTask name="Obtain Schufa-Information" id="obtainSchufaInfoProcessTask" processRef="obtainSchufa" />
+
+      <humanTask name="Decide About Loan Application" id="decideHumanTask" camunda:assignee="jonny1">
+        <defaultControl>
+          <manualActivationRule>
+            <condition>
+              <body>${false}</body>
+            </condition>
+          </manualActivationRule>
+        </defaultControl>
+      </humanTask>
+      <humanTask name="Capture Application Data" id="captureAppDataHumanTask" camunda:assignee="jonny1" />
+      <humanTask name="Obtain Credit-worthiness" id="obtainCreditWorthinessHumanTask" camunda:assignee="jonny1" />
+      <humanTask name="Request Missing Documents" id="requestMissingDocumentsHumanTask" camunda:assignee="jonny1" />
+      <humanTask name="Review Documents" id="reviewDocumentsHumanTask">
+        <planningTable id="PT_reviewDocumentsHumanTask">
+          <discretionaryItem definitionRef="requestMissingDocumentsHumanTask" id="DI_requestMissingDocumentsHumanTask"  />
+        </planningTable>
+      </humanTask>
+
+      <milestone name="Data collected" id="dataCollectedMilestone" />
+
+      <userEvent name="Customer retired" id="customerRetiredUserEvent" />
+
+    </casePlanModel>
+
+  </case>
+
+</definitions>

@@ -23,8 +23,25 @@ module.exports = Page.extend({
     return this.deploymentList().get(idx).element(by.binding('deployment.name'));
   },
 
-  selectDeployment: function(idx) {
-    this.deploymentList().get(idx).element(by.css('[class="deployment"]')).click();
+  selectDeployment: function(idxOrName) {
+    // this.deploymentList().get(idx).element(by.css('[class="deployment"]')).click();
+
+    function callPageObject(idx) {
+      this.deploymentList().get(idx).element(by.css('[class="deployment"]')).click();
+      this.waitForElementToBeVisible(element(by.css('[cam-resources] .resources')));
+    }
+
+    if (typeof idxOrName === 'number') {
+      callPageObject.call(this, idxOrName);
+    } else {
+      this.getDeploymentIndex(idxOrName).then(callPageObject.bind(this));
+    }
+  },
+
+  getDeploymentIndex: function(deploymentName) {
+    return this.findElementIndexInRepeater('(delta, deployment) in deployments', by.css('.deployment .name'), deploymentName).then(function(idx) {
+      return idx;
+    });
   },
 
   deploymentStatus: function(idx) {
