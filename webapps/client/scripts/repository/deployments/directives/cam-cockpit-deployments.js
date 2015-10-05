@@ -34,7 +34,7 @@ define([
 
         var deploymentsListData = $scope.deploymentsListData = $scope.deploymentsData.newChild($scope);
 
-       
+
         // utilities /////////////////////////////////////////////////////////////////
 
         var updateSilently = function(params) {
@@ -46,7 +46,7 @@ define([
           return search[property] || null;
         }
 
-        
+
         // pagination ////////////////////////////////////////////////////////////////
 
         $scope.pageNum = 1;

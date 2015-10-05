@@ -1,3 +1,4 @@
+<!-- # cockpit client/scripts/repository/resources/directives/cam-cockpit-resources.html -->
 <div ng-show="!state.$loaded && !state.$error"
      class="loader">
   <span class="animate-spin glyphicon glyphicon-refresh"></span>
@@ -24,20 +25,13 @@
     <ol class="resources list-unstyled">
       <li class="resource"
           ng-repeat="(delta, resource) in resources"
-          ng-class="{active: currentResourceId === resource.id}">
-
-        <div class="clickable"
-             ng-click="focus($event, resource)">
-          <div class="name">
-            <h4 class="resource">
-              <a href
-                 ng-click="focus($event, resource)">
-                {{ resource.name || resource.id }}
-              </a>
-            </h4>
-          </div>
-       </div>
+          ng-class="{active: currentResourceId === resource.id, clickable: true}"
+          ng-click="focus($event, resource)">
+        <a href>
+          {{ resource.name || resource.id }}
+        </a>
       </li>
     </ol>
   </div>
 </div>
+<!-- / cockpit client/scripts/repository/resources/directives/cam-cockpit-resources.html -->

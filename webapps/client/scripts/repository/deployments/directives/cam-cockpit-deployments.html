@@ -1,3 +1,4 @@
+<!-- # cockpit client/scripts/repository/deployments/directives/cam-cockpit-deployments.html -->
 <div ng-show="!state.$loaded && !state.$error"
      class="loader">
   <span class="animate-spin glyphicon glyphicon-refresh"></span>
@@ -28,23 +29,19 @@
 
   <div ng-show="totalItems"
        ng-repeat="(delta, deployment) in deployments"
-       class="deployment-wrapper"
-       ng-class="{active: isFocused(deployment)}"
-       ng-style="{'z-index': ((deployments.length + 10) - delta) }">
+       ng-class="{active: isFocused(deployment), deployment: true}"
+       ng-style="{'z-index': ((deployments.length + 10) - delta) }"
+       ng-click="focus(deployment)">
 
-    <div class="deployment"
-         ng-click="focus(deployment)">
+    <a ng-click="deleteDeployment($event, deployment)"
+       class="delete-deployment"
+       tooltip="Delete Deployment">
+      <span class="glyphicon glyphicon-trash"></span>
+    </a>
 
-      <a ng-click="deleteDeployment($event, deployment)"
-         class="delete-deployment">
-        <span class="glyphicon glyphicon-remove"></span>
-        <span class="hidden-sm hidden-xs hidden-md">Delete Deployment</span>
-      </a>
+    <h4 class="name">{{ deployment.name || deployment.id }}</h4>
+    <div class="time">Deployment Time:<br/>{{ deployment.deploymentTime | camDate:'normal' }}</div>
 
-      <h4 class="name">{{ deployment.name || deployment.id }}</h4>
-      <h6>Deployment Time: {{ deployment.deploymentTime }}</h6>
-
-    </div>
   </div>
 </div>
 
@@ -64,3 +61,4 @@
             last-text="&raquo;"
             previous-text="&lsaquo;"
             first-text="&laquo;"></pagination>
+<!-- / cockpit client/scripts/repository/deployments/directives/cam-cockpit-deployments.html -->

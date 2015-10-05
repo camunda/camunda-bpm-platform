@@ -1,7 +1,8 @@
+<!-- # cockpit client/scripts/repository/resource/directives/cam-cockpit-resource-content.html -->
 <section ng-if="binary || (resource && isImageResource(resource))" class="resource-content">
   <header class="row">
 
-    <div class="col-xs-12">
+    <div class="col-xs-12 resource-wrapper">
 
       <div ng-if="isBpmnResource(resource)"
            cam-widget-bpmn-viewer
@@ -46,3 +47,4 @@
   </header>
 
 </section>
+<!-- / cockpit client/scripts/repository/resource/directives/cam-cockpit-resource-content.html -->
