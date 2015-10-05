@@ -61,17 +61,23 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class PrimitiveValueTest {
 
+  protected static final Date DATE_VALUE = new Date();
+  protected static final LocalDate LOCAL_DATE_VALUE = LocalDate.now();
+  protected static final LocalTime LOCAL_TIME_VALUE = LocalTime.now();
   protected static final byte[] BYTES_VALUE = "a".getBytes();
 
   @Parameters(name = "{index}: {0} = {1}")
   public static Collection<Object[]> data() {
     return Arrays.asList(new Object[][] {
         { STRING, "someString", stringValue("someString"), stringValue(null) },
-        { INTEGER, 1, integerValue(1), integerValue(null) }, { BOOLEAN, true, booleanValue(true), booleanValue(null) },
-        { NULL, null, untypedNullValue(), untypedNullValue() }, { SHORT, (short) 1, shortValue((short) 1), shortValue(null) },
-        { DOUBLE, 1d, doubleValue(1d), doubleValue(null) }, { DATE, new Date(0), dateValue(new Date(0)), dateValue(null) },
-        { LOCAL_DATE, LocalDate.now(), localDateValue(LocalDate.now()), localDateValue(null) },
-        { LOCAL_TIME, LocalTime.now(), localTimeValue(LocalTime.now()), localTimeValue(null) },
+        { INTEGER, 1, integerValue(1), integerValue(null) },
+        { BOOLEAN, true, booleanValue(true), booleanValue(null) },
+        { NULL, null, untypedNullValue(), untypedNullValue() },
+        { SHORT, (short) 1, shortValue((short) 1), shortValue(null) },
+        { DOUBLE, 1d, doubleValue(1d), doubleValue(null) },
+        { DATE, DATE_VALUE, dateValue(DATE_VALUE), dateValue(null) },
+        { LOCAL_DATE, LOCAL_DATE_VALUE, localDateValue(LOCAL_DATE_VALUE), localDateValue(null) },
+        { LOCAL_TIME, LOCAL_TIME_VALUE, localTimeValue(LOCAL_TIME_VALUE), localTimeValue(null) },
         { PERIOD, Period.days(21), periodValue(Period.days(21)), periodValue(null) },
         { BYTES, BYTES_VALUE, byteArrayValue(BYTES_VALUE), byteArrayValue(null) }
       });
