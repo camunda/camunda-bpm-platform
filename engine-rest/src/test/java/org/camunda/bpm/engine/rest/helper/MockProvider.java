@@ -37,6 +37,7 @@ import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
+import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.filter.FilterQuery;
 import org.camunda.bpm.engine.form.FormField;
@@ -2344,6 +2345,12 @@ public abstract class MockProvider {
 
   public static ExternalTask createMockExternalTask() {
     return mockExternalTask().buildExternalTask();
+  }
+
+  public static LockedExternalTask createMockLockedExternalTask() {
+    return mockExternalTask()
+      .variable(EXAMPLE_VARIABLE_INSTANCE_NAME, EXAMPLE_PRIMITIVE_VARIABLE_VALUE)
+      .buildLockedExternalTask();
   }
 
   public static List<ExternalTask> createMockExternalTasks() {

@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
-public class JobRetriesDto {
+public class RetriesDto {
 
   private int retries;
 

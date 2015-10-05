@@ -19,6 +19,9 @@ import java.util.Date;
 
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * @author Thorben Lindhauer
@@ -39,6 +42,7 @@ public class MockExternalTaskBuilder {
   protected boolean suspended;
   protected String topicName;
   protected String workerId;
+  protected VariableMap variables = Variables.createVariables();
 
   public MockExternalTaskBuilder activityId(String activityId) {
     this.activityId = activityId;
@@ -105,6 +109,11 @@ public class MockExternalTaskBuilder {
     return this;
   }
 
+  public MockExternalTaskBuilder variable(String variableName, TypedValue value) {
+    this.variables.putValueTyped(variableName, value);
+    return this;
+  }
+
   public ExternalTask buildExternalTask() {
     ExternalTask task = mock(ExternalTask.class);
     when(task.getActivityId()).thenReturn(activityId);
@@ -138,6 +147,7 @@ public class MockExternalTaskBuilder {
     when(task.getRetries()).thenReturn(retries);
     when(task.getTopicName()).thenReturn(topicName);
     when(task.getWorkerId()).thenReturn(workerId);
+    when(task.getVariables()).thenReturn(variables);
 
     return task;
 

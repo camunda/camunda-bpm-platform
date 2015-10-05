@@ -22,7 +22,7 @@ import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.rest.dto.runtime.JobDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobDuedateDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobPriorityDto;
-import org.camunda.bpm.engine.rest.dto.runtime.JobRetriesDto;
+import org.camunda.bpm.engine.rest.dto.runtime.RetriesDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobSuspensionStateDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
@@ -65,7 +65,7 @@ public class JobResourceImpl implements JobResource {
   }
 
   @Override
-  public void setJobRetries(JobRetriesDto dto) {
+  public void setJobRetries(RetriesDto dto) {
     try {
       ManagementService managementService = engine.getManagementService();
       managementService.setJobRetries(jobId, dto.getRetries());

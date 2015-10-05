@@ -45,7 +45,7 @@ import com.jayway.restassured.response.Response;
  * @author Thorben Lindhauer
  *
  */
-public class AbstractExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
+public abstract class AbstractExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
 
   protected static final String EXTERNAL_TASK_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/external-task";
   protected static final String EXTERNAL_TASK_COUNT_QUERY_URL = EXTERNAL_TASK_QUERY_URL + "/count";

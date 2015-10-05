@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
+import java.util.Map;
+
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 

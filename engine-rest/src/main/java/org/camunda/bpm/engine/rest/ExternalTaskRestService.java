@@ -18,6 +18,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -27,6 +28,9 @@ import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskQueryDto;
+import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksDto;
+import org.camunda.bpm.engine.rest.dto.externaltask.LockedExternalTaskDto;
+import org.camunda.bpm.engine.rest.sub.externaltask.ExternalTaskResource;
 
 /**
  * @author Thorben Lindhauer
@@ -59,4 +63,13 @@ public interface ExternalTaskRestService {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   CountResultDto queryExternalTasksCount(ExternalTaskQueryDto query);
+
+  @POST
+  @Path("/fetchAndLock")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  List<LockedExternalTaskDto> fetchAndLock(FetchExternalTasksDto fetchingDto);
+
+  @Path("/{id}")
+  ExternalTaskResource getExternalTask(@PathParam("id") String externalTaskId);
 }

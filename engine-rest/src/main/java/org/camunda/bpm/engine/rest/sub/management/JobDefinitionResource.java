@@ -15,7 +15,7 @@ package org.camunda.bpm.engine.rest.sub.management;
 import org.camunda.bpm.engine.rest.dto.management.JobDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.management.JobDefinitionSuspensionStateDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobDefinitionPriorityDto;
-import org.camunda.bpm.engine.rest.dto.runtime.JobRetriesDto;
+import org.camunda.bpm.engine.rest.dto.runtime.RetriesDto;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -37,7 +37,7 @@ public interface JobDefinitionResource {
   @PUT
   @Path("/retries")
   @Consumes(MediaType.APPLICATION_JSON)
-  void setJobRetries(JobRetriesDto dto);
+  void setJobRetries(RetriesDto dto);
 
   @PUT
   @Path("/jobPriority")

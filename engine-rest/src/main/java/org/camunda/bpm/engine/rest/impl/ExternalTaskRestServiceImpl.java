@@ -20,10 +20,18 @@ import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
+import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
+import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
+import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.rest.ExternalTaskRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskQueryDto;
+import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksDto;
+import org.camunda.bpm.engine.rest.dto.externaltask.FetchExternalTasksDto.FetchExternalTaskTopicDto;
+import org.camunda.bpm.engine.rest.dto.externaltask.LockedExternalTaskDto;
+import org.camunda.bpm.engine.rest.sub.externaltask.ExternalTaskResource;
+import org.camunda.bpm.engine.rest.sub.externaltask.impl.ExternalTaskResourceImpl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -91,6 +99,35 @@ public class ExternalTaskRestServiceImpl extends AbstractRestProcessEngineAware 
     result.setCount(count);
 
     return result;
+  }
+
+  @Override
+  public List<LockedExternalTaskDto> fetchAndLock(FetchExternalTasksDto fetchingDto) {
+    ExternalTaskQueryBuilder fetchBuilder = processEngine
+      .getExternalTaskService()
+      .fetchAndLock(fetchingDto.getMaxTasks(), fetchingDto.getWorkerId());
+
+    if (fetchingDto.getTopics() != null) {
+      for (FetchExternalTaskTopicDto topicDto : fetchingDto.getTopics()) {
+        ExternalTaskQueryTopicBuilder topicFetchBuilder =
+            fetchBuilder.topic(topicDto.getTopicName(), topicDto.getLockDuration());
+
+        if (topicDto.getVariables() != null) {
+          topicFetchBuilder.variables(topicDto.getVariables());
+          fetchBuilder = topicFetchBuilder;
+        }
+      }
+    }
+
+    List<LockedExternalTask> tasks = fetchBuilder.execute();
+
+    return LockedExternalTaskDto.fromLockedExternalTasks(tasks);
+  }
+
+  @Override
+  public ExternalTaskResource getExternalTask(String externalTaskId) {
+    return new ExternalTaskResourceImpl(getProcessEngine(), externalTaskId, getObjectMapper());
+
   }
 
 }

@@ -10,55 +10,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.sub.runtime;
+package org.camunda.bpm.engine.rest.sub.externaltask;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.camunda.bpm.engine.rest.dto.runtime.JobDto;
-import org.camunda.bpm.engine.rest.dto.runtime.JobDuedateDto;
-import org.camunda.bpm.engine.rest.dto.runtime.JobPriorityDto;
+import org.camunda.bpm.engine.rest.dto.externaltask.CompleteExternalTaskDto;
+import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskFailureDto;
 import org.camunda.bpm.engine.rest.dto.runtime.RetriesDto;
-import org.camunda.bpm.engine.rest.dto.runtime.JobSuspensionStateDto;
 
-public interface JobResource {
-
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  JobDto getJob();
-
-  @GET
-  @Path("/stacktrace")
-  @Produces(MediaType.TEXT_PLAIN)
-  String getStacktrace();
+/**
+ * @author Thorben Lindhauer
+ *
+ */
+public interface ExternalTaskResource {
 
   @PUT
   @Path("/retries")
   @Consumes(MediaType.APPLICATION_JSON)
-  void setJobRetries(RetriesDto dto);
+  void setRetries(RetriesDto dto);
 
   @POST
-  @Path("/execute")
-  void executeJob();
-
-  @PUT
-  @Path("/duedate")
+  @Path("/complete")
   @Consumes(MediaType.APPLICATION_JSON)
-  void setJobDuedate(JobDuedateDto dto);
+  void complete(CompleteExternalTaskDto dto);
 
-  @PUT
-  @Path("/suspended")
+  @POST
+  @Path("/failure")
   @Consumes(MediaType.APPLICATION_JSON)
-  void updateSuspensionState(JobSuspensionStateDto dto);
+  void handleFailure(ExternalTaskFailureDto dto);
 
-  @PUT
-  @Path("/priority")
-  @Consumes(MediaType.APPLICATION_JSON)
-  void setJobPriority(JobPriorityDto dto);
-
+  @POST
+  @Path("/unlock")
+  void unlock();
 }
