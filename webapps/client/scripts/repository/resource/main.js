@@ -11,7 +11,7 @@ define([
   './directives/cam-cockpit-source',
 
   /* plugins */
-  './plugins/details/cam-cockpit-details-plugin',
+  './plugins/details/definitions/cam-cockpit-definitions-plugin',
   './plugins/actions/download/cam-cockpit-resource-action-download-plugin',
 
 ], function(
@@ -27,7 +27,7 @@ define([
   camCockpitSource,
 
   /* plugins */
-  camCockpitDetailsPlugin,
+  camCockpitDefinitionsPlugin,
   camCockpitResourceDownloadPlugin
 ) {
   'use strict';
@@ -44,7 +44,7 @@ define([
   resourceModule.directive('camSource', camCockpitSource);
 
   /* plugins */
-  resourceModule.config(camCockpitDetailsPlugin);
+  resourceModule.config(camCockpitDefinitionsPlugin);
   resourceModule.config(camCockpitResourceDownloadPlugin);
 
   return resourceModule;

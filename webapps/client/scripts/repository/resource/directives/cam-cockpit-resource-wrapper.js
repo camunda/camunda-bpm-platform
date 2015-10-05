@@ -54,7 +54,7 @@ define([
 
         // plugins ///////////////////////////////////////////////////////////////////////
 
-        $scope.resourceVars = { read: [ 'deployment', 'resource', 'resourceData' ] };
+        $scope.resourceVars = { read: [ 'control', 'deployment', 'resource', 'resourceData' ] };
         $scope.resourceDetailTabs = Views.getProviders({ component: PLUGIN_DETAILS_COMPONENT });
 
         $scope.selectedResourceDetailTab = $scope.resourceDetailTabs[0];

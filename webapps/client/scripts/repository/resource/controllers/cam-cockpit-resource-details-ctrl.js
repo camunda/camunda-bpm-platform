@@ -17,6 +17,8 @@ define([], function() {
 
     // utilities ///////////////////////////////////////////////////
 
+    var isObject = angular.isObject;
+
     var checkResource = function(name, pattern) {
       return pattern.test(name.toLowerCase());
     };
@@ -40,20 +42,31 @@ define([], function() {
 
     // type of a resource //////////////////////////////////////////
 
+    var getResourceName = function(resource) {
+      if (isObject(resource)) {
+        return resource.name;
+      }
+      return resource;
+    }
+
     var isBpmnResource = control.isBpmnResource = $scope.isBpmnResource = function(resource) {
-      return checkResource(resource.name, BPMN_PATTERN);
+      var resourceName = getResourceName(resource);
+      return checkResource(resourceName, BPMN_PATTERN);
     };
 
     var isCmmnResource = control.isCmmnResource = $scope.isCmmnResource = function(resource) {
-      return checkResource(resource.name, CMMN_PATTERN);
+      var resourceName = getResourceName(resource);
+      return checkResource(resourceName, CMMN_PATTERN);
     };
 
     var isDmnResource = control.isDmnResource = $scope.isDmnResource = function(resource) {
-      return checkResource(resource.name, DMN_PATTERN);
+      var resourceName = getResourceName(resource);
+      return checkResource(resourceName, DMN_PATTERN);
     };
 
     var isImageResource = control.isImageResource = $scope.isImageResource = function(resource) {
-      return checkResource(resource.name, IMAGE_PATTERN);
+      var resourceName = getResourceName(resource);
+      return checkResource(resourceName, IMAGE_PATTERN);
     };
 
     var isUnkownResource = control.isUnkownResource = $scope.isUnkownResource = function(resource) {
