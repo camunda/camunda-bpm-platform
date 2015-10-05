@@ -36,6 +36,7 @@ import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.filter.FilterQuery;
 import org.camunda.bpm.engine.form.FormField;
@@ -227,6 +228,7 @@ public abstract class MockProvider {
 
   public static final String EXAMPLE_ACTIVITY_ID = "anActivity";
   public static final String ANOTHER_EXAMPLE_ACTIVITY_ID = "anotherActivity";
+  public static final String EXAMPLE_ACTIVITY_INSTANCE_ID = "anActivityInstanceId";
   public static final String EXAMPLE_ACTIVITY_NAME = "anActivityName";
   public static final String EXAMPLE_ACTIVITY_TYPE = "anActivityType";
   public static final String EXAMPLE_PROCESS_DEFINITION_DELAYED_EXECUTION = "2013-04-23T13:42:43";
@@ -702,6 +704,15 @@ public abstract class MockProvider {
   // metrics
   public static final String EXAMPLE_METRICS_START_DATE = "2015-01-01T00:00:00";
   public static final String EXAMPLE_METRICS_END_DATE = "2015-02-01T00:00:00";
+
+  // external task
+  public static final String EXTERNAL_TASK_ID = "anExternalTaskId";
+  public static final String EXTERNAL_TASK_ERROR_MESSAGE = "some error";
+  public static final String EXTERNAL_TASK_LOCK_EXPIRATION_TIME = "2015-10-05T13:25:00";
+  public static final Integer EXTERNAL_TASK_RETRIES = new Integer(5);
+  public static final boolean EXTERNAL_TASK_SUSPENDED = true;
+  public static final String EXTERNAL_TASK_TOPIC_NAME = "aTopic";
+  public static final String EXTERNAL_TASK_WORKER_ID = "aWorkerId";
 
   // tasks
   public static Task createMockTask() {
@@ -2310,6 +2321,35 @@ public abstract class MockProvider {
     when(output.getTypedValue()).thenReturn(typedValue);
     when(output.getErrorMessage()).thenReturn(null);
     return output;
+  }
+
+  // external task
+
+  public static MockExternalTaskBuilder mockExternalTask() {
+    return new MockExternalTaskBuilder()
+      .id(EXTERNAL_TASK_ID)
+      .activityId(EXAMPLE_ACTIVITY_ID)
+      .activityInstanceId(EXAMPLE_ACTIVITY_INSTANCE_ID)
+      .errorMessage(EXTERNAL_TASK_ERROR_MESSAGE)
+      .executionId(EXAMPLE_EXECUTION_ID)
+      .lockExpirationTime(DateTimeUtil.parseDate(EXTERNAL_TASK_LOCK_EXPIRATION_TIME))
+      .processDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID)
+      .processDefinitionKey(EXAMPLE_PROCESS_DEFINITION_KEY)
+      .processInstanceId(EXAMPLE_PROCESS_INSTANCE_ID)
+      .retries(EXTERNAL_TASK_RETRIES)
+      .suspended(EXTERNAL_TASK_SUSPENDED)
+      .topicName(EXTERNAL_TASK_TOPIC_NAME)
+      .workerId(EXTERNAL_TASK_WORKER_ID);
+  }
+
+  public static ExternalTask createMockExternalTask() {
+    return mockExternalTask().buildExternalTask();
+  }
+
+  public static List<ExternalTask> createMockExternalTasks() {
+    List<ExternalTask> mocks = new ArrayList<ExternalTask>();
+    mocks.add(createMockExternalTask());
+    return mocks;
   }
 
 }

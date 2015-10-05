@@ -35,6 +35,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.CaseService;
+import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
@@ -43,6 +44,8 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.externaltask.ExternalTask;
+import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.filter.FilterQuery;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
@@ -120,6 +123,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
   protected static final String AUTHORIZATION_CHECK_URL = AUTHORIZATION_URL + "/check";
   protected static final String DEPLOYMENT_REST_SERVICE_URL = SINGLE_ENGINE_URL + DeploymentRestService.PATH;
   protected static final String DEPLOYMENT_URL = DEPLOYMENT_REST_SERVICE_URL + "/{id}";
+  protected static final String EXTERNAL_TASKS_URL = SINGLE_ENGINE_URL + "/external-task";
 
   protected static final String JOB_DEFINITION_URL = SINGLE_ENGINE_URL + "/job-definition";
 
@@ -150,6 +154,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
   private IdentityService mockIdentityService;
   private ManagementService mockManagementService;
   private HistoryService mockHistoryService;
+  private ExternalTaskService mockExternalTaskService;
   private CaseService mockCaseService;
   private FilterService mockFilterService;
   private MessageCorrelationBuilder mockMessageCorrelationBuilder;
@@ -165,6 +170,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     mockHistoryService = mock(HistoryService.class);
     mockCaseService = mock(CaseService.class);
     mockFilterService = mock(FilterService.class);
+    mockExternalTaskService = mock(ExternalTaskService.class);
 
     when(namedProcessEngine.getRepositoryService()).thenReturn(mockRepoService);
     when(namedProcessEngine.getRuntimeService()).thenReturn(mockRuntimeService);
@@ -174,6 +180,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     when(namedProcessEngine.getHistoryService()).thenReturn(mockHistoryService);
     when(namedProcessEngine.getCaseService()).thenReturn(mockCaseService);
     when(namedProcessEngine.getFilterService()).thenReturn(mockFilterService);
+    when(namedProcessEngine.getExternalTaskService()).thenReturn(mockExternalTaskService);
 
     createProcessDefinitionMock();
     createProcessInstanceMock();
@@ -189,6 +196,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     createCaseInstanceMock();
     createCaseExecutionMock();
     createFilterMock();
+    createExternalTaskMock();
 
     createHistoricActivityInstanceMock();
     createHistoricProcessInstanceMock();
@@ -413,6 +421,13 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     List<HistoricJobLog> historicJobLogs = MockProvider.createMockHistoricJobLogs();
     when(mockHistoricJobLogQuery.list()).thenReturn(historicJobLogs);
     when(mockHistoryService.createHistoricJobLogQuery()).thenReturn(mockHistoricJobLogQuery);
+  }
+
+  private void createExternalTaskMock() {
+    ExternalTaskQuery query = mock(ExternalTaskQuery.class);
+    List<ExternalTask> tasks = MockProvider.createMockExternalTasks();
+    when(query.list()).thenReturn(tasks);
+    when(mockExternalTaskService.createExternalTaskQuery()).thenReturn(query);
   }
 
   @Test
@@ -816,6 +831,20 @@ public abstract class AbstractProcessEngineRestServiceTest extends
         .get(HISTORY_JOB_LOG_URL);
 
     verify(mockHistoryService).createHistoricJobLogQuery();
+    verifyZeroInteractions(processEngine);
+  }
+
+  @Test
+  public void testExternalTaskAccess() {
+    given()
+      .pathParam("name", EXAMPLE_ENGINE_NAME)
+    .then()
+      .expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when()
+        .get(EXTERNAL_TASKS_URL);
+
+    verify(mockExternalTaskService).createExternalTaskQuery();
     verifyZeroInteractions(processEngine);
   }
 }

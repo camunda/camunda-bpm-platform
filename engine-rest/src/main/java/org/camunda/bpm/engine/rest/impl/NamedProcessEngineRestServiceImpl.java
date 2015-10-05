@@ -25,6 +25,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
+
 import java.net.URI;
 import java.util.*;
 
@@ -157,6 +158,11 @@ public class NamedProcessEngineRestServiceImpl extends AbstractProcessEngineRest
   @Path("/{name}" + DecisionDefinitionRestService.PATH)
   public DecisionDefinitionRestService getDecisionDefinitionRestService(@PathParam("name") String engineName) {
     return super.getDecisionDefinitionRestService(engineName);
+  }
+
+  @Path("/{name}" + ExternalTaskRestService.PATH)
+  public ExternalTaskRestService getExternalTaskRestService(@PathParam("name") String engineName) {
+    return super.getExternalTaskRestService(engineName);
   }
 
   @GET
