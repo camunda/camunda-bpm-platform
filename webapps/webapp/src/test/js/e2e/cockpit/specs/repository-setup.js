@@ -81,6 +81,23 @@ module.exports = {
           name: 'my-script.groovy',
           content: fs.readFileSync(__dirname + '/../../resources/my-script.groovy').toString()
         }]
+      }]),
+
+      operation('process-definition', 'start', [{
+        key: 'user-tasks'
+      },
+      {
+        key: 'user-tasks'
+      }]),
+
+      operation('case-definition', 'create', [{
+        key: 'loanApplicationCase'
+      },
+      {
+        key: 'loanApplicationCase'
+      },
+      {
+        key: 'loanApplicationCase'
       }])
 
     )

@@ -435,4 +435,73 @@ describe('Repository Spec', function() {
 
   });
 
+  describe('definitions tab', function() {
+
+    before(function() {
+      return testHelper(setupFile.setup2, function() {
+        repositoryPage.navigateToWebapp('Cockpit');
+        repositoryPage.authentication.userLogin('admin', 'admin');
+        repositoryPage.navigateTo();
+      });
+    });
+
+
+    it('should display deployed process definitions', function() {
+
+      // when
+      deploymentsPage.selectDeployment('bpmn');
+      resourcesPage.selectResource(0);
+
+      // then
+      expect(resourcePage.definitions.isTabSelected()).to.eventually.be.true;
+      expect(resourcePage.definitions.table().count()).to.eventually.eql(1);
+
+      expect(resourcePage.definitions.name(0).getText()).to.eventually.eql('User Tasks');
+      expect(resourcePage.definitions.key(0).getText()).to.eventually.eql('user-tasks');
+      expect(resourcePage.definitions.instanceCount(0).getText()).to.eventually.eql('2');
+    });
+
+
+    it('should be empty', function() {
+
+      // when
+      deploymentsPage.selectDeployment('script');
+      resourcesPage.selectResource(0);
+
+      // then
+      expect(resourcePage.definitions.isTabSelected()).to.eventually.be.true;
+      expect(resourcePage.definitions.table().count()).to.eventually.eql(0);
+    });
+
+    it('should display deployed case definitions', function() {
+
+      // when
+      deploymentsPage.selectDeployment('cmmn');
+      resourcesPage.selectResource(0);
+
+      // then
+      expect(resourcePage.definitions.isTabSelected()).to.eventually.be.true;
+      expect(resourcePage.definitions.table().count()).to.eventually.eql(1);
+
+      expect(resourcePage.definitions.name(0).getText()).to.eventually.eql('Loan Application');
+      expect(resourcePage.definitions.key(0).getText()).to.eventually.eql('loanApplicationCase');
+      expect(resourcePage.definitions.instanceCount(0).getText()).to.eventually.eql('3');
+    });
+
+    it('should display deployed decision definitions', function() {
+
+      // when
+      deploymentsPage.selectDeployment('dmn');
+      resourcesPage.selectResource(0);
+
+      // then
+      expect(resourcePage.definitions.isTabSelected()).to.eventually.be.true;
+      expect(resourcePage.definitions.table().count()).to.eventually.eql(1);
+
+      expect(resourcePage.definitions.name(0).getText()).to.eventually.eql('Assign Approver');
+      expect(resourcePage.definitions.key(0).getText()).to.eventually.eql('invoice-assign-approver');
+    });
+
+  });
+
 });
