@@ -47,6 +47,10 @@ module.exports = Table.extend({
     return this.tableItem(item, by.css('.col-scope'));
   },
 
+  variableScopeLink: function(item) {
+    return this.variableScope(item).element(by.css('a'));
+  },
+
   inlineEditRow: function() {
     return element(by.css('.editing'));
   },

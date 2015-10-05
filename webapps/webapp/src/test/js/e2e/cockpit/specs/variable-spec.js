@@ -22,13 +22,13 @@ describe('Cockpit Variable Spec', function() {
 
 
     // skipped due to CAM-4671
-    xit('should select variable scope', function() {
+    it('should select variable scope', function() {
 
       // given
       expect(instancePage.instanceTree.instanceSelectionLabel().getText()).to.eventually.eql('Nothing');
 
       // when
-      instancePage.variablesTab.variableScope(1).click();
+      instancePage.variablesTab.variableScopeLink(1).click();
 
       // then
       expect(instancePage.instanceTree.isInstanceSelected('User Tasks')).to.eventually.be.true;
