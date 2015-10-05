@@ -31,6 +31,7 @@
 
     <module name="org.camunda.commons.camunda-commons-logging" />
     <module name="org.camunda.commons.camunda-commons-utils" />
+    <module name="org.camunda.commons.camunda-commons-typed-values" export="true" />
     <module name="org.camunda.template-engines.camunda-template-engines-freemarker" services="import" />
 
     <module name="org.camunda.bpm.dmn.camunda-engine-dmn" />

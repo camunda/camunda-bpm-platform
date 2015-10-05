@@ -38,13 +38,13 @@
     </dependency>
     
     <dependency>
-      <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-typed-value</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-logging</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.camunda.commons</groupId>
+      <artifactId>camunda-commons-typed-values</artifactId>
     </dependency>
 
     <dependency>

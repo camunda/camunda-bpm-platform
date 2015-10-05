@@ -35,7 +35,7 @@
     <version.mybatis>3.2.8</version.mybatis>
     <version.joda-time>2.1</version.joda-time>
     <version.uuid-generator>3.1.2</version.uuid-generator>
-    <version.camunda.commons>1.0.6</version.camunda.commons>
+    <version.camunda.commons>1.2.0-alpha1</version.camunda.commons>
     <version.camunda.connect>1.0.1</version.camunda.connect>
     <version.camunda.spin>1.1.0</version.camunda.spin>
     <version.camunda.template-engines>1.0.1</version.camunda.template-engines>
@@ -128,11 +128,6 @@
         <artifactId>camunda-engine-rest</artifactId>
         <version>${project.version}</version>
         <classifier>classes</classifier>
-      </dependency>
-      <dependency>
-        <groupId>org.camunda.bpm</groupId>
-        <artifactId>camunda-typed-value</artifactId>
-        <version>${project.version}</version>
       </dependency>
 
       <!-- dmn engine -->
