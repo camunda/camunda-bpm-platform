@@ -200,17 +200,22 @@ function(uploadTemplate, inspectTemplate, instancesTemplate) {
                   executionId:  item.executionId
                 },
                 additions: {
-                  scope: $sce.trustAsHtml('<a cam-select-activity-instance="' +
+                  scope: {
+                    html:  '<a cam-select-activity-instance="\'' +
                                       instance.id +
-                                      '" href="#/process-instance/' +
+                                      '\'" ng-href="#/process-instance/' +
                                       processInstance.id +
                                       '?detailsTab=variables-tab&activityInstanceIds=' +
                                       instance.id +
                                       '" title="' +
                                       instance.id +
                                       '">' +
-                                      instance.name +
-                                      '</a>')
+                                        instance.name  +
+                                      '</a>',
+                    scopeVariables: {
+                      processData: $scope.processData
+                    }
+                  }
                 }
               };
             });
