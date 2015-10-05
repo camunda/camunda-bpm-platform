@@ -24,17 +24,16 @@ module.exports = Page.extend({
   },
 
   selectDeployment: function(idxOrName) {
-    // this.deploymentList().get(idx).element(by.css('[class="deployment"]')).click();
-
+    var that = this;
     function callPageObject(idx) {
-      this.deploymentList().get(idx).element(by.css('[class="deployment"]')).click();
-      this.waitForElementToBeVisible(element(by.css('[cam-resources] .resources')));
+      that.deploymentList().get(idx).click();
+      that.waitForElementToBeVisible(element(by.css('[cam-resources] .resources')));
     }
 
     if (typeof idxOrName === 'number') {
-      callPageObject.call(this, idxOrName);
+      callPageObject(idxOrName);
     } else {
-      this.getDeploymentIndex(idxOrName).then(callPageObject.bind(this));
+      this.getDeploymentIndex(idxOrName).then(callPageObject);
     }
   },
 

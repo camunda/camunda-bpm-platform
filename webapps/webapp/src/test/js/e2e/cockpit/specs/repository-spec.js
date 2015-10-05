@@ -231,7 +231,7 @@ describe('Repository Spec', function() {
         // then
         expect(deploymentsPage.modalTitle()).to.eventually.eql('Delete Deployment: ' + name);
 
-        expect(deploymentsPage.infobox().isPresent()).to.eventually.be.true
+        expect(deploymentsPage.infobox().isPresent()).to.eventually.be.true;
 
         expect(deploymentsPage.cascadeCheckbox().isSelected()).to.eventually.be.false;
         expect(deploymentsPage.skipCustomListenersCheckbox().isSelected()).to.eventually.be.true;
@@ -360,7 +360,7 @@ describe('Repository Spec', function() {
 
       // then
       expect(resourcePage.cmmnDiagramFormElement().isPresent()).to.eventually.be.true;
-      
+
     });
 
 
@@ -388,7 +388,7 @@ describe('Repository Spec', function() {
 
       // then
       expect(resourcePage.imageFormElement().isPresent()).to.eventually.be.true;
-      
+
     });
 
 
@@ -402,7 +402,7 @@ describe('Repository Spec', function() {
 
       // then
       expect(resourcePage.unkownResourceFormElement().isPresent()).to.eventually.be.true;
-      
+
     });
 
   });
