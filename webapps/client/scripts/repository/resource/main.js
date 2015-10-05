@@ -1,32 +1,51 @@
 define([
   'angular',
 
+  /* controllers */
+  './controllers/cam-cockpit-resource-details-ctrl',
+
   /* directives */
-  './directives/cam-cockpit-resource',
+  './directives/cam-cockpit-resource-wrapper',
   './directives/cam-cockpit-resource-meta',
+  './directives/cam-cockpit-resource-content',
+  './directives/cam-cockpit-source',
 
   /* plugins */
   './plugins/details/cam-cockpit-details-plugin',
+  './plugins/actions/download/cam-cockpit-resource-action-download-plugin',
 
 ], function(
   angular,
 
+  /* controllers */
+  camResourceDetailsCtrl,
+
   /* directives */
-  camCockpitResource,
+  camCockpitResourceWrapper,
   camCockpitResourceMeta,
+  camCockpitResourceContent,
+  camCockpitSource,
 
   /* plugins */
-  camCockpitDetailsPlugin
+  camCockpitDetailsPlugin,
+  camCockpitResourceDownloadPlugin
 ) {
   'use strict';
 
   var resourceModule = angular.module('cam.cockpit.repository.resource', []);
 
-  /* directives */
-  resourceModule.directive('camResource', camCockpitResource);
-  resourceModule.directive('camResourceMeta', camCockpitResourceMeta);
+  /* controllers */
+  resourceModule.controller('camResourceDetailsCtrl', camResourceDetailsCtrl);
 
+  /* directives */
+  resourceModule.directive('camResourceWrapper', camCockpitResourceWrapper);
+  resourceModule.directive('camResourceMeta', camCockpitResourceMeta);
+  resourceModule.directive('camResourceContent', camCockpitResourceContent);
+  resourceModule.directive('camSource', camCockpitSource);
+
+  /* plugins */
   resourceModule.config(camCockpitDetailsPlugin);
+  resourceModule.config(camCockpitResourceDownloadPlugin);
 
   return resourceModule;
 });

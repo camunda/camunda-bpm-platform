@@ -1,0 +1,48 @@
+<section ng-if="binary || (resource && isImageResource(resource))" class="resource-content">
+  <header class="row">
+
+    <div class="col-xs-12">
+
+      <div ng-if="isBpmnResource(resource)"
+           cam-widget-bpmn-viewer
+           diagram-data="binary"
+           style="height: 100%">
+      </div>
+
+
+      <div ng-if="isDmnResource(resource)"
+           cam-widget-dmn-viewer
+           table-xml="binary"
+           style="height: 100%">
+      </div>
+
+
+      <div ng-if="isCmmnResource(resource)"
+           class="cmmn-resource">
+        <div cam-source
+             name="resource.name"
+             source="binary">
+        </div>
+      </div>
+
+
+      <div ng-if="isImageResource(resource)"
+           class="image-resource">
+        <img ng-src="{{ imageLink(deployment, resource) }}">
+      </div>
+
+
+      <div ng-if="isUnkownResource(resource)"
+           class="unkown-resource">
+        <div cam-source
+             name="resource.name"
+             source="binary">
+        </div>
+      </div>
+
+      <div>
+
+    </div>
+  </header>
+
+</section>

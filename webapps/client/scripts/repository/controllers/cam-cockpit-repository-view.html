@@ -43,14 +43,21 @@
 
 
     <!-- # resource-details column -->
-    <section class="ctn-column resource-details">
+    <section class="ctn-column resource-details"
+             ng-controller="camResourceDetailsCtrl">
 
       <header class="cell top">
+        <div class="resource-actions"
+             ng-if="resource"
+             ng-repeat="resourceAction in resourceActions">
+          <view provider="resourceAction" vars="resourceVars">
+        </div>
       </header>
 
       <div class="cell content">
-        <div cam-resource
-             repository-data="repositoryData"></div>
+        <div cam-resource-wrapper
+             resource-details-data="resourceDetailsData"
+             control="control"></div>
       </div>
 
     </section>

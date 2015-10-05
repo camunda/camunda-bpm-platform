@@ -1,27 +1,33 @@
-<div ng-show="!state.$loaded"
+<div ng-show="!resourceState.$loaded"
      class="loader">
   <span class="animate-spin glyphicon glyphicon-refresh"></span>
   Loading
 </div>
 
-<div ng-show="state.$loaded">
+<div ng-show="resourceState.$loaded">
 
-  <div ng-hide="resource">
+  <div ng-if="!resource">
     <div class="no-resource well">
       <span class="glyphicon glyphicon-info-sign"></span>
-      Select a resource in the list of resources.
+      Select a resource in the list.
     </div>
   </div>
 
-  <section ng-if="resource" class="resource-card">
+  <section ng-if="resource" class="resource">
+
     <header class="row">
       <div class="col-xs-12">
-        <div class="names">
-          <h2 class="resource">{{ resource.name || resource.id }}</h2>
-        </div>
 
         <div cam-resource-meta
-             resource-data="resourceData"></div>
+             resource-data="resourceData"
+             control="control">
+        </div>
+
+        <div cam-resource-content
+             resource-data="resourceData"
+             control="control">
+        </div>
+
       </div>
     </header>
 
@@ -39,6 +45,7 @@
         </div>
 
       </div>
+
     </div>
 
   </section>

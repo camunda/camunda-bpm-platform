@@ -127,11 +127,17 @@
       .cell.top {
         background-color: mix(@brand-primary, @column-right-bg, 8%);
       }
+
+      > .resource-actions {
+        float: right;
+        text-align: right;
+      }
     }
   }
 
 
   .ctn-column {
+    padding: (@grid-gutter-width / 2);
     transition: left @layout-transition-duration @layout-transition-timing,
                 right @layout-transition-duration @layout-transition-timing,
                 margin-left @layout-transition-duration @layout-transition-timing,
@@ -272,7 +278,7 @@
           .gradient(top, fade(@hover-color-bg, 0), @hover-color-bg);
         }
 
-        .names > h4 a {
+        .name > h4 a {
           display: inline-block;
         }
       }
@@ -287,7 +293,7 @@
           background-color: @column-right-bg;
         }
 
-        .names {
+        .name {
           font-style: italic;
         }
 
@@ -330,7 +336,9 @@
 
 }
 
-[cam-resource] {
+[cam-resource-wrapper] {
+  height: 100%;
+
   header {
     position: relative;
     z-index: 15;
@@ -340,13 +348,33 @@
     h2 {
       margin-top: 0;
     }
-    h4:empty {
-      display: none;
-    }
   }
 
   .nav-tabs .glyphicon {
     margin-left: 5px;
+  }
+
+  .resource-content {
+    height: 400px;
+    > header {
+      height: 100%;
+      > div {
+        height: 100%;
+      }
+    }
+
+    .cmmn-resource,
+    .unkown-resource,
+    .image-resource {
+      height: 100%;
+      overflow: auto;
+    }
+
+    .image-resource {
+      > img {
+        max-width: 100%;
+      }
+    }
   }
 
 }

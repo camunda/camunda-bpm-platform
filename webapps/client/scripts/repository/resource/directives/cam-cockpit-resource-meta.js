@@ -8,16 +8,12 @@ define([
   'use strict';
 
   return [
-    '$modal',
-    'camAPI',
-  function(
-    $modal,
-    camAPI
-  ) {
+  function() {
 
     return {
       scope: {
-        resourceData: '='
+        resourceData: '=',
+        control: '='
       },
 
       template: template,
@@ -28,14 +24,15 @@ define([
         $scope
       ){
 
+        // fields ////////////////////////////////////////////////////
+
         var resourceMetaData = $scope.resourceData.newChild($scope);
+
+
+        // observe //////////////////////////////////////////////////
 
         resourceMetaData.observe('resource', function(resource) {
           $scope.resource = resource;
-        });
-
-        $scope.state = resourceMetaData.observe('binary', function(binary) {
-          $scope.binary = binary;
         });
 
       }

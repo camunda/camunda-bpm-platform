@@ -88,7 +88,8 @@ define([
         $scope.focus = function(deployment) {
           if (!isFocused(deployment)) {
             search.updateSilently({
-              resource: null
+              resource: null,
+              viewbox: null
             });
           }
 

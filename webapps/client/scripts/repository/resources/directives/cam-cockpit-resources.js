@@ -64,10 +64,19 @@ define([
             $event.preventDefault();
           }
 
-          var resourceId = resource.id;        
-          updateSilently({
-            resource: resourceId
-          });
+          var resourceId = resource.id;
+
+          if ($scope.currentResourceId === resourceId) {
+            updateSilently({
+              resource: resourceId
+            });
+          }
+          else {
+            updateSilently({
+              resource: resourceId,
+              viewbox: null
+            });
+          }
           
           resourcesData.changed('resourceId');
         };

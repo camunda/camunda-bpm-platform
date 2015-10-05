@@ -1,6 +1,6 @@
 define([
   'angular',
-  'text!./cam-cockpit-resource.html'
+  'text!./cam-cockpit-resource-wrapper.html'
 ], function(
   angular,
   template
@@ -12,7 +12,8 @@ define([
     return {
       restrict: 'A',
       scope: {
-        repositoryData: '='
+        resourceDetailsData: '=',
+        control: '=?'
       },
 
       template: template,
@@ -31,48 +32,30 @@ define([
         search
       ) {
 
-        // setup /////////////////////////////////////////////////////////////////////
+        // fielda /////////////////////////////////////////////////////////////////////
 
         var Deployment = camAPI.resource('deployment');
 
-        var resourceData = $scope.resourceData = $scope.repositoryData.newChild($scope);
+        var resourceData = $scope.resourceData = $scope.resourceDetailsData.newChild($scope);
 
-        resourceData.provide('binary', [ 'resource', 'currentDeployment', function(resource, deployment) {
-          var deferred = $q.defer();
-          
-          if (!resource) {
-            deferred.resolve(null);
-          }
-          else if (!deployment || deployment.id === null) {
-            deferred.resolve(null);
-          }
-          else {
-            Deployment.getResourceData(deployment.id, resource.id, function(err, res) {
-              if(err) {
-                deferred.reject(err);
-              }
-              else {
-                deferred.resolve(res);
-              }
+        var PLUGIN_DETAILS_COMPONENT = 'cockpit.repository.resource.detail';
 
-            });
-          }
 
-          return deferred.promise;
-        }]);
+        // observe /////////////////////////////////////////////////////////////////////
 
         resourceData.observe('currentDeployment', function(deployment) {
           $scope.deployment = deployment;
         });
 
-        $scope.state = resourceData.observe('resource', function(resource) {
+        $scope.resourceState = resourceData.observe([ 'resource', 'binary', function(resource, binary) {
           $scope.resource = resource;
-        });
+        }]);
 
-        // plugins //////////////////////////////////////////////////////////////
+
+        // plugins ///////////////////////////////////////////////////////////////////////
 
         $scope.resourceVars = { read: [ 'deployment', 'resource', 'resourceData' ] };
-        $scope.resourceDetailTabs = Views.getProviders({ component: 'cam.cockpit.repository.resouce.detail' });
+        $scope.resourceDetailTabs = Views.getProviders({ component: PLUGIN_DETAILS_COMPONENT });
 
         $scope.selectedResourceDetailTab = $scope.resourceDetailTabs[0];
 
@@ -92,7 +75,7 @@ define([
           }
 
           if (selectedResourceId) {
-            var provider = Views.getProvider({ component: 'cam.cockpit.repository.resouce.detail', id: selectedResourceId });
+            var provider = Views.getProvider({ component: PLUGIN_DETAILS_COMPONENT, id: selectedResourceId });
             if (provider && tabs.indexOf(provider) != -1) {
               $scope.selectedResourceDetailTab = provider;
               return;

@@ -136,7 +136,8 @@ define([
         if (focused.id !== _deploymentId) {
           updateSilently({
             deployment: focused.id,
-            resource: null
+            resource: null,
+            viewbox: null
           });
           $location.replace();
         }
@@ -145,7 +146,8 @@ define([
       else {
         updateSilently({
           deployment: null,
-          resource: null
+          resource: null,
+          viewbox: null
         });
         $location.replace();
       }
