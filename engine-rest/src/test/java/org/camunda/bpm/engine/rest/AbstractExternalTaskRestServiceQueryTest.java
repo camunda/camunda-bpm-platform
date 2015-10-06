@@ -317,13 +317,27 @@ public abstract class AbstractExternalTaskRestServiceQueryTest extends AbstractR
   }
 
   @Test
-  public void testPagination() {
+  public void testPaginationGET() {
     int firstResult = 0;
     int maxResults = 10;
     given().queryParam("firstResult", firstResult).queryParam("maxResults", maxResults)
       .header("accept", MediaType.APPLICATION_JSON)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(EXTERNAL_TASK_QUERY_URL);
+
+    verify(mockQuery).listPage(firstResult, maxResults);
+  }
+
+  @Test
+  public void testPaginationPOST() {
+    int firstResult = 0;
+    int maxResults = 10;
+    given()
+      .queryParam("firstResult", firstResult).queryParam("maxResults", maxResults)
+      .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
+      .header("accept", MediaType.APPLICATION_JSON)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().post(EXTERNAL_TASK_QUERY_URL);
 
     verify(mockQuery).listPage(firstResult, maxResults);
   }
