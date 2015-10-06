@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Matchers.any;
@@ -40,6 +41,8 @@ import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.externaltask.ExternalTask;
+import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryTopicBuilder;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.rest.exception.RestException;
@@ -73,18 +76,31 @@ public abstract class AbstractExternalTaskRestServiceInteractionTest extends Abs
   protected LockedExternalTask lockedExternalTaskMock;
   protected ExternalTaskQueryTopicBuilder fetchBuilder;
 
+  protected ExternalTask externalTaskMock;
+  protected ExternalTaskQuery externalTaskQueryMock;
+
   @Before
   public void setUpRuntimeData() {
     externalTaskService = mock(ExternalTaskService.class);
     when(processEngine.getExternalTaskService()).thenReturn(externalTaskService);
 
+    // locked external task
     lockedExternalTaskMock = MockProvider.createMockLockedExternalTask();
 
+    // fetching
     fetchBuilder = mock(ExternalTaskQueryTopicBuilder.class);
     when(externalTaskService.fetchAndLock(anyInt(), any(String.class))).thenReturn(fetchBuilder);
     when(fetchBuilder.topic(any(String.class), anyLong())).thenReturn(fetchBuilder);
     when(fetchBuilder.variables(anyListOf(String.class))).thenReturn(fetchBuilder);
     when(fetchBuilder.variables(any(String[].class))).thenReturn(fetchBuilder);
+
+    // querying
+    externalTaskQueryMock = mock(ExternalTaskQuery.class);
+    when(externalTaskQueryMock.externalTaskId(any(String.class))).thenReturn(externalTaskQueryMock);
+    when(externalTaskService.createExternalTaskQuery()).thenReturn(externalTaskQueryMock);
+
+    // external task
+    externalTaskMock = MockProvider.createMockExternalTask();
   }
 
   @Test
@@ -497,5 +513,46 @@ public abstract class AbstractExternalTaskRestServiceInteractionTest extends Abs
       .body("message", equalTo("aMessage"))
     .when()
       .put(RETRIES_EXTERNAL_TASK_URL);
+  }
+
+  @Test
+  public void testGetSingleExternalTask() {
+    when(externalTaskQueryMock.singleResult()).thenReturn(externalTaskMock);
+
+    given()
+      .pathParam("id", "anExternalTaskId")
+    .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("activityId", equalTo(MockProvider.EXAMPLE_ACTIVITY_ID))
+      .body("activityInstanceId", equalTo(MockProvider.EXAMPLE_ACTIVITY_INSTANCE_ID))
+      .body("errorMessage", equalTo(MockProvider.EXTERNAL_TASK_ERROR_MESSAGE))
+      .body("executionId", equalTo(MockProvider.EXAMPLE_EXECUTION_ID))
+      .body("id", equalTo(MockProvider.EXTERNAL_TASK_ID))
+      .body("lockExpirationTime", equalTo(MockProvider.EXTERNAL_TASK_LOCK_EXPIRATION_TIME))
+      .body("processDefinitionId", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
+      .body("processDefinitionKey", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY))
+      .body("processInstanceId", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
+      .body("retries", equalTo(MockProvider.EXTERNAL_TASK_RETRIES))
+      .body("suspended", equalTo(MockProvider.EXTERNAL_TASK_SUSPENDED))
+      .body("topicName", equalTo(MockProvider.EXTERNAL_TASK_TOPIC_NAME))
+      .body("workerId", equalTo(MockProvider.EXTERNAL_TASK_WORKER_ID))
+    .when()
+      .get(SINGLE_EXTERNAL_TASK_URL);
+  }
+
+  @Test
+  public void testGetNonExistingExternalTask() {
+    when(externalTaskQueryMock.singleResult()).thenReturn(null);
+
+    given()
+      .pathParam("id", "anExternalTaskId")
+    .then()
+      .expect()
+      .statusCode(Status.NOT_FOUND.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("External task with id anExternalTaskId does not exist"))
+    .when()
+      .get(SINGLE_EXTERNAL_TASK_URL);
   }
 }

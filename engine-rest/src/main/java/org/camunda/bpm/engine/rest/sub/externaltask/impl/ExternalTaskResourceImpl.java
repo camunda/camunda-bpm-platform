@@ -18,8 +18,10 @@ import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.CompleteExternalTaskDto;
+import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskFailureDto;
 import org.camunda.bpm.engine.rest.dto.runtime.RetriesDto;
 import org.camunda.bpm.engine.rest.exception.RestException;
@@ -42,6 +44,21 @@ public class ExternalTaskResourceImpl implements ExternalTaskResource {
     this.engine = engine;
     this.externalTaskId = externalTaskId;
     this.objectMapper = objectMapper;
+  }
+
+  @Override
+  public ExternalTaskDto getExternalTask() {
+    ExternalTask task = engine
+        .getExternalTaskService()
+        .createExternalTaskQuery()
+        .externalTaskId(externalTaskId)
+        .singleResult();
+
+    if (task == null) {
+      throw new RestException(Status.NOT_FOUND, "External task with id " + externalTaskId + " does not exist");
+    }
+
+    return ExternalTaskDto.fromExternalTask(task);
   }
 
   @Override

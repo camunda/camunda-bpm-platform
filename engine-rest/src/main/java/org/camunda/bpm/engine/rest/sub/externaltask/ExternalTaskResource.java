@@ -13,12 +13,15 @@
 package org.camunda.bpm.engine.rest.sub.externaltask;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.camunda.bpm.engine.rest.dto.externaltask.CompleteExternalTaskDto;
+import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.ExternalTaskFailureDto;
 import org.camunda.bpm.engine.rest.dto.runtime.RetriesDto;
 
@@ -27,6 +30,10 @@ import org.camunda.bpm.engine.rest.dto.runtime.RetriesDto;
  *
  */
 public interface ExternalTaskResource {
+
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  ExternalTaskDto getExternalTask();
 
   @PUT
   @Path("/retries")
