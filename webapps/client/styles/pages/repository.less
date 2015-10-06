@@ -328,7 +328,7 @@
 }
 
 [cam-resource-wrapper] {
-  height: 100%;
+  max-height: 100%;
 
   header {
     position: relative;
@@ -339,33 +339,36 @@
     margin-top: 0;
   }
 
-  .nav-tabs .glyphicon {
-    margin-left: 5px;
+  .cmmn-resource,
+  .unkown-resource,
+  .image-resource {
+    // max-height: 400px;
+    overflow: auto;
   }
 
-  .resource-content {
+  [cam-widget-bpmn-viewer],
+  [cam-widget-dmn-viewer] {
     height: 400px;
-    > header {
-      height: 100%;
-      > div {
-        height: 100%;
-      }
-    }
+  }
 
-    .cmmn-resource,
-    .unkown-resource,
-    .image-resource {
-      min-height: 100%;
-      overflow: auto;
-    }
+  .cmmn-resource pre {
+    max-height: 400px;
+  }
 
-    .image-resource {
-      > img {
-        max-width: 100%;
-      }
+  .image-resource {
+    overflow: hidden;
+    > img {
+      max-width: 100%;
     }
   }
 
+  .nav-tabs {
+    margin-top: @grid-gutter-width;
+    margin-bottom: (@grid-gutter-width * 0.5);
+    .glyphicon {
+      margin-left: 5px;
+    }
+  }
 }
 
 .navigate-deployment {

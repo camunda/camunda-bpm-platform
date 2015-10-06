@@ -17,37 +17,39 @@
   <section ng-if="resource" class="resource">
 
     <header class="row">
-      <div class="col-xs-12">
-
-        <div cam-resource-meta
-             resource-data="resourceData"
-             control="control">
-        </div>
-
-        <div cam-resource-content
-             resource-data="resourceData"
-             control="control">
-        </div>
-
+      <div class="col-xs-12"
+           cam-resource-meta
+           resource-data="resourceData"
+           control="control">
       </div>
     </header>
 
-    <div class="row ctn-tabbed-content">
+    <div class="section-content row">
+      <div class="col-xs-12"
+           cam-resource-content
+           resource-data="resourceData"
+           control="control">
+      </div>
 
-      <div ng-show="resourceDetailTabs.length" class="col-xs-12">
+      <div ng-show="resourceDetailTabs.length"
+           class="col-xs-12">
+
         <ul class="nav nav-tabs">
-          <li ng-class="{ active: selectedResourceDetailTab == resourceDetailTab }" ng-repeat="resourceDetailTab in resourceDetailTabs">
-            <a href ng-click="selectResourceDetailTab(resourceDetailTab)">{{ resourceDetailTab.label }}</a>
+          <li ng-class="{ active: selectedResourceDetailTab == resourceDetailTab }"
+              ng-repeat="resourceDetailTab in resourceDetailTabs">
+            <a href
+               ng-click="selectResourceDetailTab(resourceDetailTab)">{{ resourceDetailTab.label }}</a>
           </li>
         </ul>
 
         <div class="tab-content">
-          <view provider="selectedResourceDetailTab" vars="resourceVars" />
+          <view provider="selectedResourceDetailTab"
+                vars="resourceVars" />
         </div>
 
-      </div>
+      </div><!-- / !!resourceDetailTabs -->
 
-    </div>
+    </div><!-- / .section-content -->
 
   </section>
 
