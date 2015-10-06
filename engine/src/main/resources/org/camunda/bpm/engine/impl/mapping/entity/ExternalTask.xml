@@ -145,6 +145,9 @@
   <sql id="selectExternalTaskByQueryCriteriaSql">
     from ${prefix}ACT_RU_EXT_TASK RES
     <where>
+      <if test="externalTaskId != null">
+        and RES.ID_ = #{externalTaskId}
+      </if>
       <if test="workerId != null">
         and RES.WORKER_ID_ = #{workerId}
       </if>

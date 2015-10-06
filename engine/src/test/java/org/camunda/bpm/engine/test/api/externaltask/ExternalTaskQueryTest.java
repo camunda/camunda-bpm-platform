@@ -276,6 +276,13 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
 
   public void testQueryWithNullValues() {
     try {
+      externalTaskService.createExternalTaskQuery().externalTaskId(null).list();
+      fail("expected exception");
+    } catch (NullValueException e) {
+      assertTextPresent("externalTaskId is null", e.getMessage());
+    }
+
+    try {
       externalTaskService.createExternalTaskQuery().activityId(null).list();
       fail("expected exception");
     } catch (NullValueException e) {
@@ -433,8 +440,28 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     for (ExternalTask task : tasksWithoutRetries) {
       assertTrue(task.getRetries() == 0);
     }
+  }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testQueryById() {
+    // given
+    List<ProcessInstance> processInstances = startInstancesByKey("oneExternalTaskProcess", 2);
+    List<ExternalTask> tasks = externalTaskService.createExternalTaskQuery().list();
 
+    ProcessInstance firstInstance = processInstances.get(0);
+    ExternalTask firstTask = tasks.get(0);
+    if (!firstTask.getProcessInstanceId().equals(firstInstance.getId())) {
+      firstTask = tasks.get(1);
+    }
+
+    // when
+    ExternalTask resultTask =
+        externalTaskService.createExternalTaskQuery()
+          .externalTaskId(firstTask.getId())
+          .singleResult();
+
+    // then
+    assertEquals(firstTask.getId(), resultTask.getId());
   }
 
   protected List<ProcessInstance> startInstancesByKey(String processDefinitionKey, int number) {

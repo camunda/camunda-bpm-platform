@@ -32,6 +32,7 @@ public class ExternalTaskQueryImpl extends AbstractQuery<ExternalTaskQuery, Exte
 
   private static final long serialVersionUID = 1L;
 
+  protected String externalTaskId;
   protected String workerId;
   protected Date lockExpirationBefore;
   protected Date lockExpirationAfter;
@@ -50,6 +51,12 @@ public class ExternalTaskQueryImpl extends AbstractQuery<ExternalTaskQuery, Exte
 
   public ExternalTaskQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
+  }
+
+  public ExternalTaskQuery externalTaskId(String externalTaskId) {
+    ensureNotNull("externalTaskId", externalTaskId);
+    this.externalTaskId = externalTaskId;
+    return this;
   }
 
   public ExternalTaskQuery workerId(String workerId) {
@@ -162,6 +169,10 @@ public class ExternalTaskQueryImpl extends AbstractQuery<ExternalTaskQuery, Exte
     return commandContext
       .getExternalTaskManager()
       .findExtenralTasksByQueryCriteria(this);
+  }
+
+  public String getExternalTaskId() {
+    return externalTaskId;
   }
 
   public String getWorkerId() {

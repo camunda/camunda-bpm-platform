@@ -23,6 +23,11 @@ import org.camunda.bpm.engine.query.Query;
 public interface ExternalTaskQuery extends Query<ExternalTaskQuery, ExternalTask> {
 
   /**
+   * Only select the external task with the given id
+   */
+  ExternalTaskQuery externalTaskId(String externalTaskId);
+
+  /**
    * Only select external tasks that was most recently locked by the given worker
    */
   ExternalTaskQuery workerId(String workerId);

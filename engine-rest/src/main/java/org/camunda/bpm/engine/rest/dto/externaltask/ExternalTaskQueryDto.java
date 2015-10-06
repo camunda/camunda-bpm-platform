@@ -50,6 +50,7 @@ public class ExternalTaskQueryDto extends AbstractQueryDto<ExternalTaskQuery> {
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_DEFINITION_KEY);
   }
 
+  protected String externalTaskId;
   protected String activityId;
   protected Date lockExpirationBefore;
   protected Date lockExpirationAfter;
@@ -70,6 +71,11 @@ public class ExternalTaskQueryDto extends AbstractQueryDto<ExternalTaskQuery> {
 
   public ExternalTaskQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
     super(objectMapper, queryParameters);
+  }
+
+  @CamundaQueryParam("externalTaskId")
+  public void setExternalTaskId(String externalTaskId) {
+    this.externalTaskId = externalTaskId;
   }
 
   @CamundaQueryParam("activityId")
@@ -154,6 +160,9 @@ public class ExternalTaskQueryDto extends AbstractQueryDto<ExternalTaskQuery> {
 
   @Override
   protected void applyFilters(ExternalTaskQuery query) {
+    if (externalTaskId != null) {
+      query.externalTaskId(externalTaskId);
+    }
     if (activityId != null) {
       query.activityId(activityId);
     }

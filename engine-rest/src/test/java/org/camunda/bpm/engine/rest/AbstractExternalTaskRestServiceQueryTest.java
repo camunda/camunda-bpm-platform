@@ -145,6 +145,7 @@ public abstract class AbstractExternalTaskRestServiceQueryTest extends AbstractR
   public void testCompleteGETQuery() {
     Map<String, String> parameters = new HashMap<String, String>();
 
+    parameters.put("externalTaskId", "someExternalTaskId");
     parameters.put("activityId", "someActivityId");
     parameters.put("lockExpirationBefore", "2013-01-23T14:42:42");
     parameters.put("lockExpirationAfter", "2013-01-23T15:52:52");
@@ -166,6 +167,7 @@ public abstract class AbstractExternalTaskRestServiceQueryTest extends AbstractR
       .expect().statusCode(Status.OK.getStatusCode())
       .when().get(EXTERNAL_TASK_QUERY_URL);
 
+    verify(mockQuery).externalTaskId("someExternalTaskId");
     verify(mockQuery).activityId("someActivityId");
     verify(mockQuery).lockExpirationBefore(DateTimeUtil.parseDate("2013-01-23T14:42:42"));
     verify(mockQuery).lockExpirationAfter(DateTimeUtil.parseDate("2013-01-23T15:52:52"));
@@ -186,6 +188,7 @@ public abstract class AbstractExternalTaskRestServiceQueryTest extends AbstractR
   public void testCompletePOSTQuery() {
     Map<String, String> parameters = new HashMap<String, String>();
 
+    parameters.put("externalTaskId", "someExternalTaskId");
     parameters.put("activityId", "someActivityId");
     parameters.put("lockExpirationBefore", "2013-01-23T14:42:42");
     parameters.put("lockExpirationAfter", "2013-01-23T15:52:52");
@@ -208,6 +211,7 @@ public abstract class AbstractExternalTaskRestServiceQueryTest extends AbstractR
       .expect().statusCode(Status.OK.getStatusCode())
       .when().post(EXTERNAL_TASK_QUERY_URL);
 
+    verify(mockQuery).externalTaskId("someExternalTaskId");
     verify(mockQuery).activityId("someActivityId");
     verify(mockQuery).lockExpirationBefore(DateTimeUtil.parseDate("2013-01-23T14:42:42"));
     verify(mockQuery).lockExpirationAfter(DateTimeUtil.parseDate("2013-01-23T15:52:52"));
