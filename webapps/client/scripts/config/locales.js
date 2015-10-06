@@ -57,7 +57,8 @@ define(['moment', 'angular'], function(moment, angular) {
           suffix: '.json',
           callback: function(err, data, locale) {
             if(!err && data && data.dateLocales) {
-              moment.lang(locale || fallback, data.dateLocales);
+              // Deprecation warning: moment.lang is deprecated. Use moment.locale instead.
+              moment.locale(locale || fallback, data.dateLocales);
             }
           }
         });
