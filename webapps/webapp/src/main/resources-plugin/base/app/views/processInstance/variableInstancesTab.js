@@ -66,20 +66,35 @@ function(uploadTemplate, inspectTemplate, instancesTemplate) {
         $scope.deleteVariable = function(info) {
           var promise = $q.defer();
 
+          var callback = function(error) {
+            if(error) {
+              Notifications.addError({
+                status: 'Variable',
+                message: 'The variable \'' + info.variable.name + '\' could not be deleted successfully.',
+                exclusive: true,
+                duration: 5000
+              });
+              promise.reject();
+            } else {
+              Notifications.addMessage({
+                status: 'Variable',
+                message: 'The variable \'' + info.variable.name + '\' has been deleted successfully.',
+                duration: 5000
+              });
+              promise.resolve(info.variable);
+            }
+          };
+
           if(info.original.taskId) {
             taskService.deleteVariable({
               id: info.original.taskId,
               varId: info.variable.name
-            }, function(){
-              promise.resolve(info.variable);
-            });
+            }, callback);
           } else {
             executionService.deleteVariable({
               id: info.variable.executionId,
               varId: info.variable.name
-            }, function() {
-              promise.resolve(info.variable);
-            });
+            }, callback);
           }
 
           return promise.promise;
