@@ -20,18 +20,15 @@ import org.camunda.bpm.engine.variable.value.BooleanValue;
 import org.camunda.bpm.engine.variable.value.BytesValue;
 import org.camunda.bpm.engine.variable.value.DateValue;
 import org.camunda.bpm.engine.variable.value.DoubleValue;
-import org.camunda.bpm.engine.variable.value.PeriodValue;
 import org.camunda.bpm.engine.variable.value.IntegerValue;
 import org.camunda.bpm.engine.variable.value.LocalDateValue;
 import org.camunda.bpm.engine.variable.value.LocalTimeValue;
 import org.camunda.bpm.engine.variable.value.LongValue;
 import org.camunda.bpm.engine.variable.value.NumberValue;
+import org.camunda.bpm.engine.variable.value.PeriodValue;
 import org.camunda.bpm.engine.variable.value.PrimitiveValue;
 import org.camunda.bpm.engine.variable.value.ShortValue;
 import org.camunda.bpm.engine.variable.value.StringValue;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
-import org.joda.time.Period;
 
 /**
  * @author Daniel Meyer
@@ -67,7 +64,7 @@ public class PrimitiveTypeValueImpl<T> extends AbstractTypedValue<T> implements 
       return false;
     if (getClass() != obj.getClass())
       return false;
-    PrimitiveTypeValueImpl other = (PrimitiveTypeValueImpl) obj;
+    PrimitiveTypeValueImpl<?> other = (PrimitiveTypeValueImpl<?>) obj;
     if (type == null) {
       if (other.type != null)
         return false;
@@ -111,29 +108,29 @@ public class PrimitiveTypeValueImpl<T> extends AbstractTypedValue<T> implements 
     }
   }
 
-  public static class LocalDateValueImpl extends PrimitiveTypeValueImpl<LocalDate> implements LocalDateValue {
+  public static class LocalDateValueImpl extends PrimitiveTypeValueImpl<String> implements LocalDateValue {
 
     private static final long serialVersionUID = 1L;
 
-    public LocalDateValueImpl(LocalDate value) {
+    public LocalDateValueImpl(String value) {
       super(value, ValueType.LOCAL_DATE);
     }
   }
 
-  public static class LocalTimeValueImpl extends PrimitiveTypeValueImpl<LocalTime> implements LocalTimeValue {
+  public static class LocalTimeValueImpl extends PrimitiveTypeValueImpl<String> implements LocalTimeValue {
 
     private static final long serialVersionUID = 1L;
 
-    public LocalTimeValueImpl(LocalTime value) {
+    public LocalTimeValueImpl(String value) {
       super(value, ValueType.LOCAL_TIME);
     }
   }
 
-  public static class PeriodValueImpl extends PrimitiveTypeValueImpl<Period> implements PeriodValue {
+  public static class PeriodValueImpl extends PrimitiveTypeValueImpl<String> implements PeriodValue {
 
     private static final long serialVersionUID = 1L;
 
-    public PeriodValueImpl(Period value) {
+    public PeriodValueImpl(String value) {
       super(value, ValueType.PERIOD);
     }
   }
