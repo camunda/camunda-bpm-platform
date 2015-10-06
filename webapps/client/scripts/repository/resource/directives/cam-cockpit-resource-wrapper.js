@@ -21,18 +21,58 @@ define([
       controller : [
         '$scope',
         '$q',
+        '$location',
         'camAPI',
         'Views',
+        'Notifications',
         'search',
       function(
         $scope,
         $q,
+        $location,
         camAPI,
         Views,
+        Notifications,
         search
       ) {
 
-        // fielda /////////////////////////////////////////////////////////////////////
+        // utilities ///////////////////////////////////////////////////////////////////
+
+        var errorNotification = function(src, err) {
+          if (err.message) {
+            var idx = err.message.indexOf('<-');
+            if (idx !== -1) {
+              err.message = err.message.split('<-')[1].trim();
+            }
+          }
+          Notifications.addError({
+            status: src,
+            message: (err ? err.message : ''),
+            exclusive: true,
+            scope: $scope
+          });
+        };
+
+        var enhanceErrorMessage = function(msg) {
+          if (msg) {
+
+            if(msg.indexOf('does not exist') === -1) {
+              return 'The deployment resource does not exist anymore';
+            }
+
+          }
+          return 'Could not load deployment resource';
+        };
+
+        var clearResource = function() {
+          var search = $location.search() || {};
+          delete search.resource;
+          delete search.resourceName;
+          $location.search(angular.copy(search));
+          $location.replace();
+        };
+
+        // fields /////////////////////////////////////////////////////////////////////
 
         var Deployment = camAPI.resource('deployment');
 
@@ -51,6 +91,13 @@ define([
           $scope.resource = resource;
         }]);
 
+        $scope.$watch('resourceState.$error', function (err) {
+          if (err) {
+            var src = enhanceErrorMessage(err.message);
+            errorNotification(src, err);
+            clearResource();
+          }
+        });
 
         // plugins ///////////////////////////////////////////////////////////////////////
 

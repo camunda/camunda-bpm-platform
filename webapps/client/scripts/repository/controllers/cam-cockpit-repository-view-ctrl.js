@@ -50,6 +50,7 @@ define([
     var deploymentsPage = getPropertyFromLocation('deploymentsPage');
     var deploymentId = getPropertyFromLocation('deployment');
     var resourceId = getPropertyFromLocation('resource');
+    var resourceName = getPropertyFromLocation('resourceName');
 
 
     // provide data //////////////////////////////////////////////////////////////////
@@ -137,6 +138,7 @@ define([
           updateSilently({
             deployment: focused.id,
             resource: null,
+            resourceName: null,
             viewbox: null
           });
           $location.replace();
@@ -147,6 +149,7 @@ define([
         updateSilently({
           deployment: null,
           resource: null,
+          resourceName: null,
           viewbox: null
         });
         $location.replace();
@@ -174,11 +177,30 @@ define([
       return deferred.promise;
     }]);
 
-    repositoryData.provide('resourceId', [ 'currentDeployment', function (currentDeployment) {
-      resourceId = getPropertyFromLocation('resource')
+    repositoryData.provide('resourceId', [ 'resources', function(resources) {
+      resourceId = getPropertyFromLocation('resource');
+      resourceName = getPropertyFromLocation('resourceName');
+
+      if (resourceId) {
+        return {
+          resourceId: resourceId
+        };
+      }
+      else if (resourceName) {
+
+        for(var i=0, resource; !!(resource = resources[i]); i++) {
+          if (resource.name === resourceName) {
+            return {
+              resourceId: resource.id
+            };
+          }
+        }
+      }
+
       return {
-        resourceId: resourceId
+        resourceId: null
       };
+
     }]);
 
     repositoryData.provide('resource', ['resourceId', 'currentDeployment', function(resourceId, deployment) {
@@ -214,12 +236,14 @@ define([
       var oldDeploymentsPage = deploymentsPage;
       var oldDeploymentId = deploymentId;
       var oldResourceId = resourceId;
+      var oldResourceName = resourceName;
 
       deploymentsSortBy = getPropertyFromLocation('deploymentsSortBy');
       deploymentsSortOrder = getPropertyFromLocation('deploymentsSortOrder');
       deploymentsPage = getPropertyFromLocation('deploymentsPage');
       deploymentId = getPropertyFromLocation('deployment');
       resourceId = getPropertyFromLocation('resource');
+      resourceName = getPropertyFromLocation('resourceName');
 
       if (oldDeploymentsSortBy !== deploymentsSortBy || oldDeploymentsSortOrder !== deploymentsSortOrder) {
         repositoryData.changed('deploymentsSorting');
@@ -231,7 +255,7 @@ define([
       else if (oldDeploymentId !== deploymentId) {
         repositoryData.changed('currentDeployment');
       }
-      else if (oldResourceId !== resourceId) {
+      else if (oldResourceId !== resourceId || oldResourceName !== resourceName) {
         repositoryData.changed('resourceId');
       }
     });

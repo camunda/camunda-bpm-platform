@@ -89,6 +89,7 @@ define([
           if (!isFocused(deployment)) {
             search.updateSilently({
               resource: null,
+              resourceName: null,
               viewbox: null
             });
           }

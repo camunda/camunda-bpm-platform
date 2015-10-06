@@ -26,9 +26,6 @@ define([
     // utilities ///////////////////////
 
     var decisionDefinitionService = camAPI.resource('decision-definition');
-    var Deployment = camAPI.resource('deployment');
-
-    var resource;
 
     // end utilities ///////////////////////
 
@@ -67,32 +64,6 @@ define([
       return deferred.promise;
     }]);
 
-    decisionData.provide('resources', [ 'decisionDefinition', function(decisionDefinition) {
-      var deferred = $q.defer();
-
-      Deployment.getResources(decisionDefinition.deploymentId, function(err, res) {
-        if(err) {
-          deferred.reject(err);
-        }
-        else {
-          deferred.resolve(res);
-        }
-      });
-
-      return deferred.promise;
-    }]);
-
-    decisionData.provide('resource', [ 'decisionDefinition', 'resources', function(decisionDefinition, resources) {
-      var resource;
-      for (var i = 0, _resource; !!(_resource = resources[i]); i++) {
-        if (_resource.name === decisionDefinition.resource) {
-          resource = _resource;
-          break;
-        }
-      }
-      return resource;
-    }]);
-
     // end data definition /////////////////////////
 
 
@@ -103,9 +74,6 @@ define([
     });
     decisionData.observe(['allDefinitions'], function(allDefinitions) {
       $scope.allDefinitions = allDefinitions;
-    });
-    decisionData.observe('resource', function(_resource) {
-      resource = _resource;
     });
 
     // BREADCRUMBS
@@ -192,7 +160,7 @@ define([
       var deploymentId = decisionDefinition.deploymentId;
       var searches = {
         deployment: deploymentId,
-        resource: resource ? resource.id : null,
+        resourceName: decisionDefinition.resource,
         deploymentsQuery: JSON.stringify([{
           type     : 'id',
           operator : 'eq',
@@ -200,7 +168,7 @@ define([
         }])
       };
 
-      return routeUtil.redirectTo(path, searches, [ 'deployment', 'resource', 'deploymentsQuery' ]);
+      return routeUtil.redirectTo(path, searches, [ 'deployment', 'resourceName', 'deploymentsQuery' ]);
     };
 
   }];
