@@ -4,7 +4,8 @@
     <button type="button"
             class="navbar-toggle"
             data-toggle="collapse"
-            data-target=".navbar-collapse">
+            data-target=".navbar-collapse"
+            ng-click="navbarOpen = !navbarOpen">
       <span class="sr-only"
             translate="TOGGLE_NAVIGATION">Toggle navigation</span>
       <span class="icon-bar"></span>
@@ -20,7 +21,8 @@
   </div>
 
   <!-- Collect the nav links, forms, and other content for toggling -->
-  <div class="collapse navbar-collapse"
+  <div ng-class="{collapse: !navbarOpen}"
+       class="collapse navbar-collapse"
        id="cam-tasklist-navigation">
     <ul class="nav navbar-nav navbar-right">
 
