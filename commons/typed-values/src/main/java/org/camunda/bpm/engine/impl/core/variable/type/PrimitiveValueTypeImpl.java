@@ -25,18 +25,15 @@ import org.camunda.bpm.engine.variable.value.BooleanValue;
 import org.camunda.bpm.engine.variable.value.BytesValue;
 import org.camunda.bpm.engine.variable.value.DateValue;
 import org.camunda.bpm.engine.variable.value.DoubleValue;
-import org.camunda.bpm.engine.variable.value.PeriodValue;
 import org.camunda.bpm.engine.variable.value.IntegerValue;
 import org.camunda.bpm.engine.variable.value.LocalDateValue;
 import org.camunda.bpm.engine.variable.value.LocalTimeValue;
 import org.camunda.bpm.engine.variable.value.LongValue;
 import org.camunda.bpm.engine.variable.value.NumberValue;
+import org.camunda.bpm.engine.variable.value.PeriodValue;
 import org.camunda.bpm.engine.variable.value.ShortValue;
 import org.camunda.bpm.engine.variable.value.StringValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
-import org.joda.time.Period;
 
 /**
  * Implementation of the primitive variable value types
@@ -125,11 +122,11 @@ public abstract class PrimitiveValueTypeImpl extends AbstractValueTypeImpl imple
     private static final long serialVersionUID = 1L;
 
     public LocalDateTypeImpl() {
-      super(LocalDate.class);
+      super("Local Date", String.class);
     }
 
     public LocalDateValue createValue(Object value, Map<String, Object> valueInfo) {
-      return Variables.localDateValue((LocalDate) value);
+      return Variables.localDateValue((String) value);
     }
 
   }
@@ -139,11 +136,11 @@ public abstract class PrimitiveValueTypeImpl extends AbstractValueTypeImpl imple
     private static final long serialVersionUID = 1L;
 
     public LocalTimeTypeImpl() {
-      super(LocalTime.class);
+      super("Local Time", String.class);
     }
 
     public LocalTimeValue createValue(Object value, Map<String, Object> valueInfo) {
-      return Variables.localTimeValue((LocalTime) value);
+      return Variables.localTimeValue((String) value);
     }
 
   }
@@ -153,11 +150,11 @@ public abstract class PrimitiveValueTypeImpl extends AbstractValueTypeImpl imple
     private static final long serialVersionUID = 1L;
 
     public PeriodTypeImpl() {
-      super(Period.class);
+      super("Period", String.class);
     }
 
     public PeriodValue createValue(Object value, Map<String, Object> valueInfo) {
-      return Variables.periodValue((Period) value);
+      return Variables.periodValue((String) value);
     }
 
   }

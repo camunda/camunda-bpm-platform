@@ -25,12 +25,12 @@ import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.Bo
 import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.BytesValueImpl;
 import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.DateValueImpl;
 import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.DoubleValueImpl;
-import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.PeriodValueImpl;
 import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.IntegerValueImpl;
 import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.LocalDateValueImpl;
 import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.LocalTimeValueImpl;
 import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.LongValueImpl;
 import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.NumberValueImpl;
+import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.PeriodValueImpl;
 import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.ShortValueImpl;
 import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.StringValueImpl;
 import org.camunda.bpm.engine.impl.core.variable.value.UntypedValueImpl;
@@ -41,13 +41,13 @@ import org.camunda.bpm.engine.variable.value.BooleanValue;
 import org.camunda.bpm.engine.variable.value.BytesValue;
 import org.camunda.bpm.engine.variable.value.DateValue;
 import org.camunda.bpm.engine.variable.value.DoubleValue;
-import org.camunda.bpm.engine.variable.value.PeriodValue;
 import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.engine.variable.value.IntegerValue;
 import org.camunda.bpm.engine.variable.value.LocalDateValue;
 import org.camunda.bpm.engine.variable.value.LocalTimeValue;
 import org.camunda.bpm.engine.variable.value.LongValue;
 import org.camunda.bpm.engine.variable.value.NumberValue;
+import org.camunda.bpm.engine.variable.value.PeriodValue;
 import org.camunda.bpm.engine.variable.value.SerializationDataFormat;
 import org.camunda.bpm.engine.variable.value.ShortValue;
 import org.camunda.bpm.engine.variable.value.StringValue;
@@ -56,9 +56,6 @@ import org.camunda.bpm.engine.variable.value.builder.FileValueBuilder;
 import org.camunda.bpm.engine.variable.value.builder.ObjectValueBuilder;
 import org.camunda.bpm.engine.variable.value.builder.SerializedObjectValueBuilder;
 import org.camunda.bpm.engine.variable.value.builder.TypedValueBuilder;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
-import org.joda.time.Period;
 
 /**
  * <p>This class is the entry point to the process engine's typed variables API.
@@ -177,15 +174,15 @@ public class Variables {
     return new DateValueImpl(date);
   }
 
-  public static LocalDateValue localDateValue(LocalDate localDate) {
+  public static LocalDateValue localDateValue(String localDate) {
     return new LocalDateValueImpl(localDate);
   }
 
-  public static LocalTimeValue localTimeValue(LocalTime localTime) {
+  public static LocalTimeValue localTimeValue(String localTime) {
     return new LocalTimeValueImpl(localTime);
   }
 
-  public static PeriodValue periodValue(Period period) {
+  public static PeriodValue periodValue(String period) {
     return new PeriodValueImpl(period);
   }
 

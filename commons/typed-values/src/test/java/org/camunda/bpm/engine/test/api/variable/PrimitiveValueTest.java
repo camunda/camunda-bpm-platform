@@ -46,9 +46,6 @@ import org.camunda.bpm.engine.impl.core.variable.value.NullValueImpl;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.TypedValue;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
-import org.joda.time.Period;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -62,8 +59,9 @@ import org.junit.runners.Parameterized.Parameters;
 public class PrimitiveValueTest {
 
   protected static final Date DATE_VALUE = new Date();
-  protected static final LocalDate LOCAL_DATE_VALUE = LocalDate.now();
-  protected static final LocalTime LOCAL_TIME_VALUE = LocalTime.now();
+  protected static final String LOCAL_DATE_VALUE = "2015-09-18";
+  protected static final String LOCAL_TIME_VALUE = "10:00:00";
+  protected static final String PERIOD_VALUE = "P14D";
   protected static final byte[] BYTES_VALUE = "a".getBytes();
 
   @Parameters(name = "{index}: {0} = {1}")
@@ -78,7 +76,7 @@ public class PrimitiveValueTest {
         { DATE, DATE_VALUE, dateValue(DATE_VALUE), dateValue(null) },
         { LOCAL_DATE, LOCAL_DATE_VALUE, localDateValue(LOCAL_DATE_VALUE), localDateValue(null) },
         { LOCAL_TIME, LOCAL_TIME_VALUE, localTimeValue(LOCAL_TIME_VALUE), localTimeValue(null) },
-        { PERIOD, Period.days(21), periodValue(Period.days(21)), periodValue(null) },
+        { PERIOD, PERIOD_VALUE, periodValue(PERIOD_VALUE), periodValue(null) },
         { BYTES, BYTES_VALUE, byteArrayValue(BYTES_VALUE), byteArrayValue(null) }
       });
   }

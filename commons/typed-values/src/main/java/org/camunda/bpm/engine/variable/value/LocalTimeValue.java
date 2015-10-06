@@ -12,16 +12,14 @@
  */
 package org.camunda.bpm.engine.variable.value;
 
-import org.joda.time.LocalTime;
-
 /**
  * <p>
- * A {@link PrimitiveValue} corresponding to the Java type {@link LocalTime}.
+ * A {@link PrimitiveValue} corresponding to a local time as {@link String}.
  * </p>
  *
  * @author Philipp Ossler
  * @since 7.4
  */
-public interface LocalTimeValue extends PrimitiveValue<LocalTime> {
+public interface LocalTimeValue extends PrimitiveValue<String> {
 
 }
