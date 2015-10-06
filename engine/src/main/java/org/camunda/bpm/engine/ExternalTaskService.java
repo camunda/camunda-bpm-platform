@@ -151,6 +151,11 @@ public interface ExternalTaskService {
    * @param externalTaskId the id of the task to set the
    * @param retries
    * @throws NotFoundException if no external task with the given id exists
+   * @throws AuthorizationException thrown if the current user does not possess any of the following permissions:
+   *   <ul>
+   *     <li>{@link Permissions#UPDATE} on {@link Resources#PROCESS_INSTANCE}</li>
+   *     <li>{@link Permissions#UPDATE_INSTANCE} on {@link Resources#PROCESS_DEFINITION}</li>
+   *   </ul>
    */
   public void setRetries(String externalTaskId, int retries);
 

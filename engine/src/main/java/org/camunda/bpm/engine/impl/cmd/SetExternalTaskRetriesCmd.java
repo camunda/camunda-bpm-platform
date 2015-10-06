@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.cmd;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
@@ -40,6 +41,9 @@ public class SetExternalTaskRetriesCmd implements Command<Void> {
 
     EnsureUtil.ensureNotNull(NotFoundException.class, "External task with id '" + externalTaskId + "' not found",
         "externalTask", externalTask);
+
+    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+    authorizationManager.checkUpdateProcessInstanceById(externalTask.getProcessInstanceId());
 
     externalTask.setRetriesAndManageIncidents(retries);
 
