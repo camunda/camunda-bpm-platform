@@ -52,7 +52,7 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
   protected static final String ADMIN_APP_NAME = "admin";
   protected static final String TASKLIST_APP_NAME = "tasklist";
 
-  protected static final String DEFAULT_APP = COCKPIT_APP_NAME;
+  protected static final String DEFAULT_APP = TASKLIST_APP_NAME;
   protected static final String INDEX_PAGE = "index.html";
 
   protected static final String SETUP_PAGE = "setup/";
