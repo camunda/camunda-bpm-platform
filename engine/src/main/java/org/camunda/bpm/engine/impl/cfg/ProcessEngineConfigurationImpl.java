@@ -503,6 +503,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected boolean isBpmnStacktraceVerbose = false;
 
+  protected boolean forceCloseMybatisConnectionPool = true;
+
   // buildProcessEngine ///////////////////////////////////////////////////////
 
   @Override
@@ -2728,7 +2730,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   }
 
   public void close() {
-    if (dataSource instanceof PooledDataSource) {
+    if (forceCloseMybatisConnectionPool
+        && dataSource instanceof PooledDataSource) {
+
       // ACT-233: connection pool of Ibatis is not properely initialized if this is not called!
       ((PooledDataSource)dataSource).forceCloseAll();
     }
@@ -2820,4 +2824,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public boolean isBpmnStacktraceVerbose() {
     return this.isBpmnStacktraceVerbose;
   }
+
+  public boolean isForceCloseMybatisConnectionPool() {
+    return forceCloseMybatisConnectionPool;
+  }
+
+  public ProcessEngineConfigurationImpl setForceCloseMybatisConnectionPool(boolean forceCloseMybatisConnectionPool) {
+    this.forceCloseMybatisConnectionPool = forceCloseMybatisConnectionPool;
+    return this;
+  }
+
+
 }
