@@ -551,26 +551,26 @@
     input: "atomicChecks": list of PermissionCheck objects
    -->
   <sql id="disjunctiveAtomicChecks">
-    COALESCE (
-  
     <foreach item="permCheck" index="index" collection="atomicChecks" separator=",">
-
-      (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
-
+      ${dbSpecificIfNullFunction}((<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
     </foreach>
-
-    , 0)
+    , 0
+    <foreach item="permCheck" index="index" collection="atomicChecks">
+      )
+    </foreach>
   </sql>
   
   <!-- 
     input: "compositeChecks": a list of CompositePermissionCheck objects
    -->
   <sql id="disjunctiveCompositeChecks">
-    COALESCE (
     <foreach item="permissionChecks" index="index" collection="compositeChecks" separator=",">
-      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.atomicChecks" />
+      ${dbSpecificIfNullFunction}(<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.atomicChecks" />
+    </foreach>
+    , 0
+    <foreach item="permissionChecks" index="index" collection="compositeChecks">
+      )
     </foreach> 
-    , 0)
   </sql>
   
   <!-- 
@@ -585,7 +585,7 @@
       </if>
     </foreach>
     <foreach  item="permCheck" index="i" collection="atomicChecks">
-      COALESCE(
+      ${dbSpecificIfNullFunction}(
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>
       , 0)
       <if test="i &gt; 0">

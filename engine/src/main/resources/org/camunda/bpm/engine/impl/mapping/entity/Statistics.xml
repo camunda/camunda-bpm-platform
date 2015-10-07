@@ -105,11 +105,15 @@
 
                     <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
                     and
-                        (COALESCE (
+                        (
                         <foreach item="permCheck" collection="processInstancePermissionChecks" separator=",">
-                          (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
+                          ${dbSpecificIfNullFunction}((<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
                         </foreach>
-                          , 0) ) = 1
+                          , 0
+                        <foreach item="permCheck" collection="processInstancePermissionChecks">
+                          )
+                        </foreach>
+                        ) = 1
                     </if>
 
                 group by
@@ -133,11 +137,15 @@
 
                     <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
                     and
-                        (COALESCE (
+                        (
                         <foreach item="permCheck" collection="jobPermissionChecks" separator=",">
-                          (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
+                          ${dbSpecificIfNullFunction}((<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
                         </foreach>
-                          , 0) ) = 1
+                          , 0
+                        <foreach item="permCheck" collection="jobPermissionChecks">
+                          )
+                        </foreach>
+                        ) = 1
                     </if>
 
                 group by
@@ -173,11 +181,15 @@
 
                   <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
                   and
-                      (COALESCE (
+                      (
                       <foreach item="permCheck" collection="incidentPermissionChecks" separator=",">
-                        (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
+                        ${dbSpecificIfNullFunction}((<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
                       </foreach>
-                        , 0) ) = 1
+                        , 0
+                      <foreach item="permCheck" collection="incidentPermissionChecks">
+                        )
+                      </foreach>
+                      ) = 1
                   </if>
 
                 </where>
@@ -246,11 +258,15 @@
 
                     <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
                     and
-                        (COALESCE (
+                        (
                         <foreach item="permCheck" collection="processInstancePermissionChecks" separator=",">
-                          (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
+                          ${dbSpecificIfNullFunction}((<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
                         </foreach>
-                          , 0) ) = 1
+                          , 0
+                        <foreach item="permCheck" collection="processInstancePermissionChecks">
+                          )
+                        </foreach>
+                        ) = 1
                     </if>
 
                   group by
@@ -275,11 +291,15 @@
 
                     <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
                     and
-                        (COALESCE (
+                        (
                         <foreach item="permCheck" collection="jobPermissionChecks" separator=",">
-                          (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
+                          ${dbSpecificIfNullFunction}((<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
                         </foreach>
-                          , 0) ) = 1
+                          , 0
+                        <foreach item="permCheck" collection="jobPermissionChecks">
+                          )
+                        </foreach>
+                        ) = 1
                     </if>
 
                   group by
@@ -310,11 +330,15 @@
 
                     <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
                     and
-                        (COALESCE (
+                        (
                         <foreach item="permCheck" collection="incidentPermissionChecks" separator=",">
-                          (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
+                          ${dbSpecificIfNullFunction}((<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
                         </foreach>
-                          , 0) ) = 1
+                          , 0
+                        <foreach item="permCheck" collection="incidentPermissionChecks">
+                          )
+                        </foreach>
+                        ) = 1
                     </if>
 
                   group by
@@ -351,7 +375,7 @@
   </select>
 
   <sql id="selectActivityStatisticsByQueryCriteriaSql">
-	  from ( select ACTID.ACT_ID_ as ID_,
+      from ( select ACTID.ACT_ID_ as ID_,
         INSTANCE.INSTANCE_COUNT_
       <if test="failedJobsToInclude">
       , JOB.FAILED_JOBS_COUNT_
@@ -361,7 +385,7 @@
       , INC.INCIDENT_COUNT_
       </if>
 
-	    from
+        from
 
           <!-- collect activity ids -->
           (
@@ -382,15 +406,18 @@
                   where
                       E.PROC_DEF_ID_ = #{processDefinitionId}
                       and E.IS_ACTIVE_ = ${trueConstant}
-                      and E.ACT_ID_ is not null
 
                       <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
                       and
-                          (COALESCE (
+                          (
                           <foreach item="permCheck" index="index" collection="processInstancePermissionChecks" separator=",">
-                            (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
+                            ${dbSpecificIfNullFunction}((<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
                           </foreach>
-                            , 0) ) = 1
+                            , 0
+                          <foreach item="permCheck" index="index" collection="processInstancePermissionChecks">
+                            )
+                          </foreach>
+                          ) = 1
                       </if>
 
                   <if test="failedJobsToInclude">
@@ -408,11 +435,15 @@
                           and JOB.RETRIES_ = 0
                           <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
                           and
-                              (COALESCE (
+                              (
                               <foreach item="permCheck" index="index" collection="jobPermissionChecks" separator=",">
-                                (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
+                                ${dbSpecificIfNullFunction}((<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
                               </foreach>
-                                , 0) ) = 1
+                                , 0
+                              <foreach item="permCheck" index="index" collection="jobPermissionChecks">
+                                )
+                              </foreach>
+                              ) = 1
                           </if>
                   </if>
 
@@ -437,11 +468,15 @@
 
                           <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
                           and
-                              (COALESCE (
+                              (
                               <foreach item="permCheck" index="index" collection="incidentPermissionChecks" separator=",">
-                                (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
+                                ${dbSpecificIfNullFunction}((<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
                               </foreach>
-                                , 0) ) = 1
+                                , 0
+                              <foreach item="permCheck" index="index" collection="incidentPermissionChecks">
+                                )
+                              </foreach>
+                              ) = 1
                           </if>
                   </if>
 
@@ -450,14 +485,14 @@
 
           left outer join
 
-        	    <!-- Count and group all activity instances by activity ids.
-        	    The executions that are actual activity instances can be found with the IS_ACTIVE_.
-        	    This will not count parent executions such as the process instance itself. -->
-    	        (
+                <!-- Count and group all activity instances by activity ids.
+                The executions that are actual activity instances can be found with the IS_ACTIVE_.
+                This will not count parent executions such as the process instance itself. -->
+                (
                  select
                      E.ACT_ID_
                    , count(E.PROC_INST_ID_) as INSTANCE_COUNT_
-    	           from
+                   from
                     ${prefix}ACT_RU_EXECUTION E
                   <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
                   inner join
@@ -465,29 +500,33 @@
                   on
                       E.PROC_DEF_ID_ = P.ID_
                   </if>
-    	           where
+                   where
                     E.PROC_DEF_ID_ = #{processDefinitionId}
                     and E.IS_ACTIVE_ = ${trueConstant}
                     <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
                     and
-                        (COALESCE (
+                        (
                         <foreach item="permCheck" index="index" collection="processInstancePermissionChecks" separator=",">
-                          (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
+                          ${dbSpecificIfNullFunction}((<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
                         </foreach>
-                          , 0) ) = 1
+                          , 0
+                        <foreach item="permCheck" index="index" collection="processInstancePermissionChecks">
+                          )
+                        </foreach>
+                        ) = 1
                     </if>
-    	           group by
+                   group by
                     E.ACT_ID_
                ) INSTANCE
           on
               ACTID.ACT_ID_ = INSTANCE.ACT_ID_
 
           <!-- failedJobs -->
-    	    <if test="failedJobsToInclude">
-    	    left outer join
+            <if test="failedJobsToInclude">
+            left outer join
 
-        	    <!-- Sum all failed jobs grouped by activity id -->
-        	    (
+                <!-- Sum all failed jobs grouped by activity id -->
+                (
                 select
                     JOBDEF.ACT_ID_
                   , count(JOB.ID_) as FAILED_JOBS_COUNT_
@@ -502,18 +541,22 @@
                     and JOB.RETRIES_ = 0
                     <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
                     and
-                        (COALESCE (
+                        (
                         <foreach item="permCheck" index="index" collection="jobPermissionChecks" separator=",">
-                          (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
+                          ${dbSpecificIfNullFunction}((<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
                         </foreach>
-                          , 0) ) = 1
+                          , 0
+                        <foreach item="permCheck" index="index" collection="jobPermissionChecks">
+                          )
+                        </foreach>
+                        ) = 1
                     </if>
                 group by
                     JOBDEF.ACT_ID_
               ) JOB
 
-    	    on ACTID.ACT_ID_ = JOB.ACT_ID_
-    	    </if>
+            on ACTID.ACT_ID_ = JOB.ACT_ID_
+            </if>
 
         <!-- incidents -->
         <if test="incidentsToInclude">
@@ -540,11 +583,15 @@
                   </if>
                   <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
                   and
-                      (COALESCE (
+                      (
                       <foreach item="permCheck" index="index" collection="incidentPermissionChecks" separator=",">
-                        (<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
+                        ${dbSpecificIfNullFunction}((<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
                       </foreach>
-                        , 0) ) = 1
+                        , 0
+                      <foreach item="permCheck" index="index" collection="incidentPermissionChecks">
+                        )
+                      </foreach>
+                      ) = 1
                   </if>
               group by
                   I.ACTIVITY_ID_, I.INCIDENT_TYPE_
@@ -552,7 +599,7 @@
 
         on ACTID.ACT_ID_ = INC.ACTIVITY_ID_
         </if>
-	    ) RES
+       ) RES
   </sql>
 
 </mapper>
