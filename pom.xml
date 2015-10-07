@@ -145,6 +145,17 @@
     </profile>
 
     <profile>
+      <id>distro-wildfly9</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>javaee/ejb-client</module>
+        <module>distro/wildfly9</module>
+      </modules>
+    </profile>
+
+    <profile>
       <!-- profile for running process-engine unit tests in QA -->
       <id>check-engine</id>
       <modules>
