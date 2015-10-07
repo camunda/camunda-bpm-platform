@@ -258,7 +258,7 @@ public class DevProcessApplication extends ServletProcessApplication {
     taskService.setVariable(standaloneTaskId, "aVariable", "abc");
     taskService.setVariable(standaloneTaskId, "anotherVariable", 123456l);
 
-//    startInvoiceInstances(engine);
+    startInvoiceInstances(engine);
 
     new Thread(){
       public void run() {
