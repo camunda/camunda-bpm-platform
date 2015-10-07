@@ -119,7 +119,7 @@ public class FetchExternalTaskAuthorizationTest extends AuthorizationTest {
 
   public void testFetchWithUpdateInstanceOnProcessDefinition() {
     // given
-    createGrantAuthorization(PROCESS_DEFINITION, "oneExternalTaskProcess", userId, READ_INSTANCE);
+    createGrantAuthorization(PROCESS_DEFINITION, "oneExternalTaskProcess", userId, UPDATE_INSTANCE);
 
     // when
     List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(5, WORKER_ID)
