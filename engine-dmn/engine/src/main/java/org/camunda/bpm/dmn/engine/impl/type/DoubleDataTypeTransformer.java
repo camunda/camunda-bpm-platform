@@ -13,32 +13,37 @@
 package org.camunda.bpm.dmn.engine.impl.type;
 
 import org.camunda.bpm.dmn.engine.type.DataTypeTransformer;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.DoubleValue;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
- * Transform values of type {@link Number} and {@link String} into {@link Double}.
+ * Transform values of type {@link Number} and {@link String} into {@link DoubleValue}.
  *
  * @author Philipp Ossler
  */
 public class DoubleDataTypeTransformer implements DataTypeTransformer {
 
   @Override
-  public Object transform(Object value) throws IllegalArgumentException {
+  public TypedValue transform(Object value) throws IllegalArgumentException {
     if (value instanceof Number) {
-      return transformNumber((Number) value);
+      double doubleValue = transformNumber((Number) value);
+      return Variables.doubleValue(doubleValue);
 
     } else if (value instanceof String) {
-      return transformString((String) value);
+      double doubleValue = transformString((String) value);
+      return Variables.doubleValue(doubleValue);
 
     } else {
       throw new IllegalArgumentException();
     }
   }
 
-  protected Double transformNumber(Number value) {
+  protected double transformNumber(Number value) {
     return value.doubleValue();
   }
 
-  protected Double transformString(String value) {
+  protected double transformString(String value) {
     return Double.valueOf(value);
   }
 

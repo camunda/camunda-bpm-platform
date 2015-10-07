@@ -30,7 +30,7 @@ public class EvaluateDecisionTest extends DmnDecisionTest {
   public void shouldEvaluateRuleWithoutInput() {
     assertThat(engine)
       .evaluates(decision, Collections.<String, Object>emptyMap())
-      .hasResult("ok");
+      .hasResultValue("ok");
   }
 
   @Test
@@ -41,11 +41,7 @@ public class EvaluateDecisionTest extends DmnDecisionTest {
 
     assertThat(engine)
       .evaluates(decision, variables)
-      .hasResult("ok");
-
-    assertThat(engine)
-      .evaluates(decision, variables)
-      .hasResult(null, "ok");
+      .hasResultValue("ok");
 
     variables.put("input", "notok");
 
@@ -65,8 +61,8 @@ public class EvaluateDecisionTest extends DmnDecisionTest {
       .evaluates(decision, variables)
       .hasResult()
       .hasSingleOutput()
-      .hasEntry("result", "notok")
-      .hasEntry("reason", "work on your status first, as bronze you're not going to get anything");
+      .hasEntryWithValue("result", "notok")
+      .hasEntryWithValue("reason", "work on your status first, as bronze you're not going to get anything");
 
     variables.put("status", "silver");
 
@@ -74,8 +70,8 @@ public class EvaluateDecisionTest extends DmnDecisionTest {
       .evaluates(decision, variables)
       .hasResult()
       .hasSingleOutput()
-      .hasEntry("result", "ok")
-      .hasEntry("reason", "you little fish will get what you want");
+      .hasEntryWithValue("result", "ok")
+      .hasEntryWithValue("reason", "you little fish will get what you want");
 
     variables.put("sum", 1200);
 
@@ -83,8 +79,8 @@ public class EvaluateDecisionTest extends DmnDecisionTest {
       .evaluates(decision, variables)
       .hasResult()
       .hasSingleOutput()
-      .hasEntry("result", "notok")
-      .hasEntry("reason", "you took too much man, you took too much!");
+      .hasEntryWithValue("result", "notok")
+      .hasEntryWithValue("reason", "you took too much man, you took too much!");
 
     variables.put("status", "gold");
     variables.put("sum", 200);
@@ -93,8 +89,8 @@ public class EvaluateDecisionTest extends DmnDecisionTest {
       .evaluates(decision, variables)
       .hasResult()
       .hasSingleOutput()
-      .hasEntry("result", "ok")
-      .hasEntry("reason", "you get anything you want");
+      .hasEntryWithValue("result", "ok")
+      .hasEntryWithValue("reason", "you get anything you want");
   }
 
   @Test
@@ -108,7 +104,7 @@ public class EvaluateDecisionTest extends DmnDecisionTest {
 
     assertThat(engine)
       .evaluates(decision, variables)
-      .hasResult(true);
+      .hasResultValue(true);
 
     variables.put("boolean", false);
     variables.put("integer", 10000);
@@ -116,7 +112,7 @@ public class EvaluateDecisionTest extends DmnDecisionTest {
 
     assertThat(engine)
       .evaluates(decision, variables)
-      .hasResult(true);
+      .hasResultValue(true);
 
     variables.put("boolean", true);
     variables.put("integer", -9000);
@@ -124,7 +120,7 @@ public class EvaluateDecisionTest extends DmnDecisionTest {
 
     assertThat(engine)
       .evaluates(decision, variables)
-      .hasResult(true);
+      .hasResultValue(true);
   }
 
 }

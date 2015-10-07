@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.dmn.engine.type;
 
+import org.camunda.bpm.engine.variable.value.TypedValue;
+
 /**
  * Transform a value into a specific type.
  *
@@ -27,6 +29,6 @@ public interface DataTypeTransformer {
    * @throws IllegalArgumentException
    *           if the value can not be transformed
    */
-  Object transform(Object value) throws IllegalArgumentException;
+  TypedValue transform(Object value) throws IllegalArgumentException;
 
 }

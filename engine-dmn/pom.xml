@@ -26,7 +26,7 @@
       <dependency>
         <groupId>org.camunda.commons</groupId>
         <artifactId>camunda-commons-bom</artifactId>
-        <version>1.1.0</version>
+        <version>1.2.0-alpha2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -36,7 +36,7 @@
         <artifactId>camunda-dmn-model</artifactId>
         <version>${project.version}</version>
       </dependency>
-
+      
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
@@ -49,6 +49,12 @@
         <version>1.7.1</version>
       </dependency>
       
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>1.9.5</version>
+      </dependency>
+
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>

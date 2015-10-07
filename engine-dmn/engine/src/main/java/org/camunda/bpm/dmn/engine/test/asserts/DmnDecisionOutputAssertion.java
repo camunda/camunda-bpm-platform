@@ -15,6 +15,7 @@ package org.camunda.bpm.dmn.engine.test.asserts;
 
 import org.assertj.core.api.AbstractAssert;
 import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 public class DmnDecisionOutputAssertion extends AbstractAssert<DmnDecisionOutputAssertion, DmnDecisionOutput> {
 
@@ -33,39 +34,50 @@ public class DmnDecisionOutputAssertion extends AbstractAssert<DmnDecisionOutput
     return this;
   }
 
-  public DmnDecisionOutputAssertion hasSingleEntry(Object expectedValue) {
+  public DmnDecisionOutputAssertion hasSingleEntryValue(Object expectedValue) {
     hasSingleEntry();
 
-    Object actualValue = actual.getValue();
+    assertEquals(expectedValue, actual.getValue().getValue());
 
+    return this;
+  }
+
+  public DmnDecisionOutputAssertion hasSingleEntry(TypedValue expectedValue) {
+    hasSingleEntry();
+
+    assertEquals(expectedValue, actual.getValue());
+
+    return this;
+  }
+
+  private void assertEquals(Object expectedValue, Object actualValue) {
     if (actualValue == null && expectedValue != null) {
       failWithMessage("Expected output value to be <%s> but was null", expectedValue);
     }
     else if (actualValue != null && !actualValue.equals(expectedValue)) {
       failWithMessage("Expected output value <%s> to be equal to <%s>", actualValue, expectedValue);
     }
+  }
+
+  public DmnDecisionOutputAssertion hasEntryWithValue(String name, Object expectedValue) {
+    isNotNull();
+
+    assertEquals(expectedValue, actual.get(name));
 
     return this;
   }
 
-  public DmnDecisionOutputAssertion hasSingleEntry(String name, Object expectedValue) {
+  public DmnDecisionOutputAssertion hasSingleEntry(String name, TypedValue expectedValue) {
     isNotNull();
     hasSingleEntry();
 
     return hasEntry(name, expectedValue);
   }
 
-  public DmnDecisionOutputAssertion hasEntry(String name, Object expectedValue) {
+  public DmnDecisionOutputAssertion hasEntry(String name, TypedValue expectedValue) {
     isNotNull();
 
-    Object actualValue = actual.get(name);
-
-    if (actualValue == null && expectedValue != null) {
-      failWithMessage("Expected output value to be <%s> but was null", expectedValue);
-    }
-    else if (actualValue != null && !actualValue.equals(expectedValue)) {
-      failWithMessage("Expected output value <%s> to be equal to <%s>", actualValue, expectedValue);
-    }
+    assertEquals(expectedValue, actual.getValueTyped(name));
 
     return this;
   }

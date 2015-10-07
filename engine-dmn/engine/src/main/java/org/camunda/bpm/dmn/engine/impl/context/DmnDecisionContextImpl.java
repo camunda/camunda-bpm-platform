@@ -32,7 +32,6 @@ import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableRule;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableValue;
 import org.camunda.bpm.dmn.engine.DmnExpression;
-import org.camunda.bpm.dmn.engine.DmnItemDefinition;
 import org.camunda.bpm.dmn.engine.DmnRule;
 import org.camunda.bpm.dmn.engine.DmnScriptEngineResolver;
 import org.camunda.bpm.dmn.engine.context.DmnDecisionContext;
@@ -44,6 +43,9 @@ import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableRuleImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableValueImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnEngineLogger;
 import org.camunda.bpm.dmn.juel.JuelScriptEngineFactory;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.NumberValue;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.bpm.model.dmn.HitPolicy;
 
 public class DmnDecisionContextImpl implements DmnDecisionContext {
@@ -71,8 +73,7 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
   public DmnHitPolicyHandler getHitPolicyHandler(HitPolicy hitPolicy) {
     if (hitPolicyHandlers == null) {
       return null;
-    }
-    else {
+    } else {
       return hitPolicyHandlers.get(hitPolicy);
     }
   }
@@ -81,8 +82,7 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
     DmnHitPolicyHandler hitPolicyHandler = getHitPolicyHandler(hitPolicy);
     if (hitPolicyHandler != null) {
       return hitPolicyHandler;
-    }
-    else {
+    } else {
       throw LOG.unableToFindHitPolicyHandlerFor(hitPolicy);
     }
   }
@@ -102,8 +102,7 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
   public DmnDecisionResult evaluateDecision(DmnDecision decision, Map<String, Object> variables) {
     if (decision instanceof DmnDecisionTable) {
       return evaluateDecisionTable((DmnDecisionTable) decision, variables);
-    }
-    else {
+    } else {
       throw LOG.decisionTypeNotSupported(decision);
     }
   }
@@ -149,14 +148,14 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
     DmnDecisionResultImpl decisionResult = new DmnDecisionResultImpl();
     if (decisionTableResult.getCollectResultName() != null || decisionTableResult.getCollectResultValue() != null) {
       DmnDecisionOutputImpl decisionOutput = new DmnDecisionOutputImpl();
-      decisionOutput.put(decisionTableResult.getCollectResultName(), decisionTableResult.getCollectResultValue());
+      NumberValue resultValue = Variables.numberValue(decisionTableResult.getCollectResultValue());
+      decisionOutput.putValueTyped(decisionTableResult.getCollectResultName(), resultValue);
       decisionResult.add(decisionOutput);
-    }
-    else {
+    } else {
       for (DmnDecisionTableRule matchingRule : decisionTableResult.getMatchingRules()) {
         DmnDecisionOutputImpl decisionOutput = new DmnDecisionOutputImpl();
         for (DmnDecisionTableValue outputValue : matchingRule.getOutputs().values()) {
-          decisionOutput.put(outputValue.getOutputName(), outputValue.getValue());
+          decisionOutput.putValueTyped(outputValue.getOutputName(), outputValue.getValue());
         }
         decisionResult.add(decisionOutput);
       }
@@ -168,7 +167,8 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
     return decisionTable.getClauses().size() * decisionTable.getRules().size();
   }
 
-  protected Map<String, DmnDecisionTableValue> evaluateDecisionTableInputs(DmnDecisionTable decisionTable, Map<String, Object> variables, Map<String, Object> evaluationCache) {
+  protected Map<String, DmnDecisionTableValue> evaluateDecisionTableInputs(DmnDecisionTable decisionTable, Map<String, Object> variables,
+      Map<String, Object> evaluationCache) {
     Map<String, DmnDecisionTableValue> inputs = new HashMap<String, DmnDecisionTableValue>();
     for (DmnClause clause : decisionTable.getClauses()) {
       if (clause.isInputClause()) {
@@ -182,24 +182,20 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
   protected DmnDecisionTableValue evaluateInputClause(DmnClause clause, Map<String, Object> variables, Map<String, Object> evaluationCache) {
     DmnDecisionTableValueImpl input = new DmnDecisionTableValueImpl(clause);
     DmnExpression inputExpression = clause.getInputExpression();
+
     if (inputExpression != null) {
       Object value = evaluateExpression(inputExpression, variables, evaluationCache);
+      TypedValue typedValue = inputExpression.getItemDefinition().getTypeDefinition().transform(value);
+      input.setValue(typedValue);
 
-      if (hasItemDefinitionWithTypeDefinition(inputExpression)) {
-        value = inputExpression.getItemDefinition().getTypeDefinition().transform(value);
-      }
-
-      input.setValue(value);
+    } else {
+      input.setValue(Variables.untypedNullValue());
     }
     return input;
   }
 
-  protected boolean hasItemDefinitionWithTypeDefinition(DmnExpression expression) {
-    DmnItemDefinition itemDefinition = expression.getItemDefinition();
-    return itemDefinition != null && itemDefinition.getTypeDefinition() != null;
-  }
-
-  protected boolean isRuleApplicable(DmnRule rule, Map<String, Object> variables, Map<String, DmnDecisionTableValue> inputs, Map<String, Object> evaluationCache) {
+  protected boolean isRuleApplicable(DmnRule rule, Map<String, Object> variables, Map<String, DmnDecisionTableValue> inputs,
+      Map<String, Object> evaluationCache) {
     Map<String, Boolean> clauseSatisfied = new HashMap<String, Boolean>();
     List<DmnClauseEntry> conditions = rule.getConditions();
 
@@ -239,14 +235,12 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
   protected Map<String, DmnDecisionTableValue> evaluateRuleOutput(DmnRule rule, Map<String, Object> variables, Map<String, Object> evaluationCache) {
     Map<String, DmnDecisionTableValue> outputs = new HashMap<String, DmnDecisionTableValue>();
     for (DmnClauseEntry conclusion : rule.getConclusions()) {
+
       DmnDecisionTableValueImpl output = new DmnDecisionTableValueImpl(conclusion.getClause());
       Object value = evaluateExpression(conclusion, variables, evaluationCache);
+      TypedValue typedValue = conclusion.getClause().getOutputDefinition().getTypeDefinition().transform(value);
 
-      if(hasOutputDefinitionWithTypeDefinition(conclusion)) {
-        value = conclusion.getClause().getOutputDefinition().getTypeDefinition().transform(value);
-      }
-
-      output.setValue(value);
+      output.setValue(typedValue);
       outputs.put(output.getKey(), output);
     }
     return outputs;
@@ -261,19 +255,13 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
     String expressionKey = expression.getKey();
     if (evaluationCache != null && evaluationCache.containsKey(expressionKey)) {
       return evaluationCache.get(expressionKey);
-    }
-    else {
+    } else {
       Object value = evaluateExpression(expression, variables);
       if (evaluationCache != null) {
         evaluationCache.put(expressionKey, value);
       }
       return value;
     }
-  }
-
-  protected boolean hasOutputDefinitionWithTypeDefinition(DmnClauseEntry conclusion) {
-    DmnItemDefinition outputDefinition = conclusion.getClause().getOutputDefinition();
-    return outputDefinition != null && outputDefinition.getTypeDefinition() != null;
   }
 
   protected Object evaluateExpression(DmnExpression expression, Map<String, Object> variables) {
@@ -288,8 +276,7 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
       } catch (ScriptException e) {
         throw LOG.unableToEvaluateExpression(expressionText, scriptEngine.getFactory().getLanguageName(), e);
       }
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -298,8 +285,7 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
     ScriptEngine scriptEngine = getScriptEngineForName(expressionLanguage);
     if (scriptEngine != null) {
       return scriptEngine;
-    }
-    else {
+    } else {
       throw LOG.noScriptEngineFoundForLanguage(expressionLanguage, DEFAULT_SCRIPT_LANGUAGE);
     }
   }

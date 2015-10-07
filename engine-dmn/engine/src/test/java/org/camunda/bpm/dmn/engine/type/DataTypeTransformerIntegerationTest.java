@@ -29,6 +29,8 @@ import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.dmn.engine.impl.DmnEngineConfigurationImpl;
 import org.camunda.bpm.dmn.engine.test.DecisionResource;
 import org.camunda.bpm.dmn.engine.test.DmnEngineRule;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,7 +47,7 @@ public class DataTypeTransformerIntegerationTest {
   protected static final String DMN_INPUT_FILE = "org/camunda/bpm/dmn/engine/type/DataTypeTransformerTest-Input.dmn";
   protected static final String DMN_NO_TYPE_FILE = "org/camunda/bpm/dmn/engine/type/DataTypeTransformerTest-NoTypes.dmn";
 
-  protected static final int TRANSFORMED_VALUE = 42;
+  protected static final TypedValue TRANSFORMED_VALUE = Variables.integerValue(42);
 
   protected DmnEngine engine;
   protected DmnDecision decision;
@@ -78,7 +80,7 @@ public class DataTypeTransformerIntegerationTest {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("output", null);
 
-    assertThat(engine).evaluates(decision, variables).hasResult(null);
+    assertThat(engine).evaluates(decision, variables).hasResult(Variables.untypedNullValue());
 
     verify(dataTypeTransformerMock, never()).transform(any());
   }
@@ -89,7 +91,7 @@ public class DataTypeTransformerIntegerationTest {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("input", 21);
 
-    assertThat(engine).evaluates(decision, variables).hasResult("is transformed");
+    assertThat(engine).evaluates(decision, variables).hasResultValue("is transformed");
 
     verify(dataTypeTransformerMock, atLeastOnce()).transform(21);
   }
@@ -100,7 +102,7 @@ public class DataTypeTransformerIntegerationTest {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("input", null);
 
-    assertThat(engine).evaluates(decision, variables).hasResult("is not transformed");
+    assertThat(engine).evaluates(decision, variables).hasResultValue("is not transformed");
 
     verify(dataTypeTransformerMock, never()).transform(any());
   }
@@ -114,7 +116,7 @@ public class DataTypeTransformerIntegerationTest {
     // no output definition for output clause
     variables.put("output", 42);
 
-    assertThat(engine).evaluates(decision, variables).hasResult(42);
+    assertThat(engine).evaluates(decision, variables).hasResultValue(42);
 
     verify(dataTypeTransformerMock, never()).transform(any());
   }

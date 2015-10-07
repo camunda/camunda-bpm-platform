@@ -24,6 +24,7 @@ import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnDecisionModel;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnEngine;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 public class DmnEngineAssertion extends AbstractAssert<DmnEngineAssertion, DmnEngine> {
 
@@ -74,7 +75,20 @@ public class DmnEngineAssertion extends AbstractAssert<DmnEngineAssertion, DmnEn
     return new DmnDecisionResultAssertion(result);
   }
 
-  public DmnDecisionOutputAssertion hasResult(Object value) {
+  public DmnDecisionOutputAssertion hasResultValue(Object value) {
+    isNotNull();
+
+    if (decision == null) {
+      failWithMessage("Expected decision not to be null.");
+    }
+
+    DmnDecisionResult result = actual.evaluate(decision, variables);
+
+    DmnDecisionResultAssertion resultAssertion = new DmnDecisionResultAssertion(result);
+    return resultAssertion.hasSingleOutput().hasSingleEntryValue(value);
+  }
+
+  public DmnDecisionOutputAssertion hasResult(TypedValue value) {
     isNotNull();
 
     if (decision == null) {
@@ -85,19 +99,6 @@ public class DmnEngineAssertion extends AbstractAssert<DmnEngineAssertion, DmnEn
 
     DmnDecisionResultAssertion resultAssertion = new DmnDecisionResultAssertion(result);
     return resultAssertion.hasSingleOutput().hasSingleEntry(value);
-  }
-
-  public DmnDecisionOutputAssertion hasResult(String name, String value) {
-    isNotNull();
-
-    if (decision == null) {
-      failWithMessage("Expected decision not to be null.");
-    }
-
-    DmnDecisionResult result = actual.evaluate(decision, variables);
-
-    DmnDecisionResultAssertion resultAssertion = new DmnDecisionResultAssertion(result);
-    return resultAssertion.hasSingleOutput().hasSingleEntry(name, value);
   }
 
   public DmnDecisionResultAssertion hasEmptyResult() {

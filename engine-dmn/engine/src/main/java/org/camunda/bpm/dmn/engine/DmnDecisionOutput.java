@@ -13,14 +13,15 @@
 
 package org.camunda.bpm.dmn.engine;
 
-import java.util.Map;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
-public interface DmnDecisionOutput extends Map<String, Object> {
+public interface DmnDecisionOutput extends VariableMap {
 
   /** Returns entry for name if existing, otherwise null */
   <T> T getValue(String name);
 
   /** Return single entry if existing, otherwise null */
-  <T> T getValue();
+  TypedValue getValue();
 
 }

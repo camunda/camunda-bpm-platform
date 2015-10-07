@@ -20,7 +20,7 @@ public class DmnExpressionImpl extends DmnElementImpl implements DmnExpression {
 
   protected String expressionLanguage;
   protected String expression;
-  protected DmnItemDefinition itemDefinition;
+  protected DmnItemDefinition itemDefinition = new DefaultItemDefinition();
 
   public DmnExpressionImpl() {
   }

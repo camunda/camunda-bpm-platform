@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.dmn.engine.hitpolicy;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.camunda.bpm.dmn.engine.test.asserts.DmnAssertions.assertThat;
 
@@ -69,13 +70,13 @@ public class HitPolicyTest extends DmnDecisionTest {
   @DecisionResource(resource = DEFAULT_SINGLE)
   public void testDefaultHitPolicySingleOutputSingleMatchingRule() {
     DmnDecisionResult result = startDecision(true, false, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry("a");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("a");
 
     result = startDecision(false, true, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry("b");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("b");
 
     result = startDecision(false, false, true, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry("c");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("c");
   }
 
   @Test
@@ -125,13 +126,13 @@ public class HitPolicyTest extends DmnDecisionTest {
   @DecisionResource(resource = DEFAULT_COMPOUND)
   public void testDefaultHitPolicyCompoundOutputSingleMatchingRule() {
     DmnDecisionResult result = startDecision(true, false, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "a").hasEntry("out2", "a").hasEntry("out3", "a");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "a").hasEntryWithValue("out2", "a").hasEntryWithValue("out3", "a");
 
     result = startDecision(false, true, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "b").hasEntry("out2", "b").hasEntry("out3", "b");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "b").hasEntryWithValue("out2", "b").hasEntryWithValue("out3", "b");
 
     result = startDecision(false, false, true, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "c").hasEntry("out2", "c").hasEntry("out3", "c");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "c").hasEntryWithValue("out2", "c").hasEntryWithValue("out3", "c");
   }
 
   @Test
@@ -181,13 +182,13 @@ public class HitPolicyTest extends DmnDecisionTest {
   @DecisionResource(resource = UNIQUE_SINGLE)
   public void testUniqueHitPolicySingleOutputSingleMatchingRule() {
     DmnDecisionResult result = startDecision(true, false, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry("a");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("a");
 
     result = startDecision(false, true, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry("b");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("b");
 
     result = startDecision(false, false, true, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry("c");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("c");
   }
 
   @Test
@@ -237,13 +238,13 @@ public class HitPolicyTest extends DmnDecisionTest {
   @DecisionResource(resource = UNIQUE_COMPOUND)
   public void testUniqueHitPolicyCompoundOutputSingleMatchingRule() {
     DmnDecisionResult result = startDecision(true, false, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "a").hasEntry("out2", "a").hasEntry("out3", "a");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "a").hasEntryWithValue("out2", "a").hasEntryWithValue("out3", "a");
 
     result = startDecision(false, true, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "b").hasEntry("out2", "b").hasEntry("out3", "b");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "b").hasEntryWithValue("out2", "b").hasEntryWithValue("out3", "b");
 
     result = startDecision(false, false, true, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "c").hasEntry("out2", "c").hasEntry("out3", "c");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "c").hasEntryWithValue("out2", "c").hasEntryWithValue("out3", "c");
   }
 
   @Test
@@ -293,13 +294,13 @@ public class HitPolicyTest extends DmnDecisionTest {
   @DecisionResource(resource = ANY_SINGLE)
   public void testAnyHitPolicySingleOutputSingleMatchingRule() {
     DmnDecisionResult result = startDecision(true, false, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry("a");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("a");
 
     result = startDecision(false, true, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry("b");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("b");
 
     result = startDecision(false, false, true, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry("c");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("c");
   }
 
   @Test
@@ -338,16 +339,16 @@ public class HitPolicyTest extends DmnDecisionTest {
     }
 
     DmnDecisionResult result = startDecision(true, true, false, "a", "a", "a");
-    assertThat(result).hasSingleOutput().hasSingleEntry("a");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("a");
 
     result = startDecision(true, false, true, "a", "a", "a");
-    assertThat(result).hasSingleOutput().hasSingleEntry("a");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("a");
 
     result = startDecision(false, true, true, "a", "a", "a");
-    assertThat(result).hasSingleOutput().hasSingleEntry("a");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("a");
 
     result = startDecision(true, true, true, "a", "a", "a");
-    assertThat(result).hasSingleOutput().hasSingleEntry("a");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("a");
   }
 
   @Test
@@ -361,13 +362,13 @@ public class HitPolicyTest extends DmnDecisionTest {
   @DecisionResource(resource = ANY_COMPOUND)
   public void testAnyHitPolicyCompoundOutputSingleMatchingRule() {
     DmnDecisionResult result = startDecision(true, false, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "a").hasEntry("out2", "a").hasEntry("out3", "a");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "a").hasEntryWithValue("out2", "a").hasEntryWithValue("out3", "a");
 
     result = startDecision(false, true, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "b").hasEntry("out2", "b").hasEntry("out3", "b");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "b").hasEntryWithValue("out2", "b").hasEntryWithValue("out3", "b");
 
     result = startDecision(false, false, true, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "c").hasEntry("out2", "c").hasEntry("out3", "c");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "c").hasEntryWithValue("out2", "c").hasEntryWithValue("out3", "c");
   }
 
   @Test
@@ -406,16 +407,16 @@ public class HitPolicyTest extends DmnDecisionTest {
     }
 
     DmnDecisionResult result = startDecision(true, true, false, "a", "a", "a");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "a").hasEntry("out2", "a").hasEntry("out3", "a");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "a").hasEntryWithValue("out2", "a").hasEntryWithValue("out3", "a");
 
     result = startDecision(true, false, true, "a", "a", "a");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "a").hasEntry("out2", "a").hasEntry("out3", "a");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "a").hasEntryWithValue("out2", "a").hasEntryWithValue("out3", "a");
 
     result = startDecision(false, true, true, "a", "a", "a");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "a").hasEntry("out2", "a").hasEntry("out3", "a");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "a").hasEntryWithValue("out2", "a").hasEntryWithValue("out3", "a");
 
     result = startDecision(true, true, true, "a", "a", "a");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "a").hasEntry("out2", "a").hasEntry("out3", "a");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "a").hasEntryWithValue("out2", "a").hasEntryWithValue("out3", "a");
   }
 
   @Test
@@ -429,13 +430,13 @@ public class HitPolicyTest extends DmnDecisionTest {
   @DecisionResource(resource = PRIORITY_SINGLE)
   public void testPriorityHitPolicySingleOutputSingleMatchingRule() {
     DmnDecisionResult result = startDecision(true, false, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry("a");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("a");
 
     result = startDecision(false, true, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry("b");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("b");
 
     result = startDecision(false, false, true, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry("c");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("c");
   }
 
   @Test
@@ -443,28 +444,28 @@ public class HitPolicyTest extends DmnDecisionTest {
   @DecisionResource(resource = PRIORITY_SINGLE)
   public void testPriorityHitPolicySingleOutputMultipleMatchingRules() {
     DmnDecisionResult result = startDecision(true, true, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry("a");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("a");
 
     result = startDecision(true, true, false, "c", "b", "a");
-    assertThat(result).hasSingleOutput().hasSingleEntry("b");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("b");
 
     result = startDecision(true, false, true, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry("a");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("a");
 
     result = startDecision(true, false, true, "c", "b", "a");
-    assertThat(result).hasSingleOutput().hasSingleEntry("a");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("a");
 
     result = startDecision(false, true, true, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry("b");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("b");
 
     result = startDecision(false, true, true, "c", "b", "a");
-    assertThat(result).hasSingleOutput().hasSingleEntry("b");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("b");
 
     result = startDecision(true, true, true, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry("a");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("a");
 
     result = startDecision(true, true, true, "c", "b", "a");
-    assertThat(result).hasSingleOutput().hasSingleEntry("a");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("a");
   }
 
   @Test
@@ -478,13 +479,13 @@ public class HitPolicyTest extends DmnDecisionTest {
   @DecisionResource(resource = PRIORITY_COMPOUND)
   public void testPriorityHitPolicyCompoundOutputSingleMatchingRule() {
     DmnDecisionResult result = startDecision(true, false, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "a").hasEntry("out2", "a").hasEntry("out3", "a");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "a").hasEntryWithValue("out2", "a").hasEntryWithValue("out3", "a");
 
     result = startDecision(false, true, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "b").hasEntry("out2", "b").hasEntry("out3", "b");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "b").hasEntryWithValue("out2", "b").hasEntryWithValue("out3", "b");
 
     result = startDecision(false, false, true, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "c").hasEntry("out2", "c").hasEntry("out3", "c");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "c").hasEntryWithValue("out2", "c").hasEntryWithValue("out3", "c");
   }
 
   @Test
@@ -492,28 +493,28 @@ public class HitPolicyTest extends DmnDecisionTest {
   @DecisionResource(resource = PRIORITY_COMPOUND)
   public void testPriorityHitPolicyCompoundOutputMultipleMatchingRules() {
     DmnDecisionResult result = startDecision(true, true, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "a").hasEntry("out2", "a").hasEntry("out3", "a");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "a").hasEntryWithValue("out2", "a").hasEntryWithValue("out3", "a");
 
     result = startDecision(true, true, false, "c", "b", "a");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "b").hasEntry("out2", "b").hasEntry("out3", "b");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "b").hasEntryWithValue("out2", "b").hasEntryWithValue("out3", "b");
 
     result = startDecision(true, false, true, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "a").hasEntry("out2", "a").hasEntry("out3", "a");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "a").hasEntryWithValue("out2", "a").hasEntryWithValue("out3", "a");
 
     result = startDecision(true, false, true, "c", "b", "a");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "a").hasEntry("out2", "a").hasEntry("out3", "a");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "a").hasEntryWithValue("out2", "a").hasEntryWithValue("out3", "a");
 
     result = startDecision(false, true, true, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "b").hasEntry("out2", "b").hasEntry("out3", "b");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "b").hasEntryWithValue("out2", "b").hasEntryWithValue("out3", "b");
 
     result = startDecision(false, true, true, "c", "b", "a");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "b").hasEntry("out2", "b").hasEntry("out3", "b");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "b").hasEntryWithValue("out2", "b").hasEntryWithValue("out3", "b");
 
     result = startDecision(true, true, true, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "a").hasEntry("out2", "a").hasEntry("out3", "a");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "a").hasEntryWithValue("out2", "a").hasEntryWithValue("out3", "a");
 
     result = startDecision(true, true, true, "c", "b", "a");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "a").hasEntry("out2", "a").hasEntry("out3", "a");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "a").hasEntryWithValue("out2", "a").hasEntryWithValue("out3", "a");
   }
 
   @Test
@@ -527,41 +528,41 @@ public class HitPolicyTest extends DmnDecisionTest {
   @DecisionResource(resource = FIRST_SINGLE)
   public void testFirstHitPolicySingleOutputSingleMatchingRule() {
     DmnDecisionResult result = startDecision(true, false, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry("a");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("a");
 
     result = startDecision(false, true, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry("b");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("b");
 
     result = startDecision(false, false, true, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry("c");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("c");
   }
 
   @Test
   @DecisionResource(resource = FIRST_SINGLE)
   public void testFirstHitPolicySingleOutputMultipleMatchingRules() {
     DmnDecisionResult result = startDecision(true, true, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry("a");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("a");
 
     result = startDecision(true, true, false, "c", "b", "a");
-    assertThat(result).hasSingleOutput().hasSingleEntry("c");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("c");
 
     result = startDecision(true, false, true, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry("a");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("a");
 
     result = startDecision(true, false, true, "c", "b", "a");
-    assertThat(result).hasSingleOutput().hasSingleEntry("c");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("c");
 
     result = startDecision(false, true, true, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry("b");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("b");
 
     result = startDecision(false, true, true, "c", "b", "a");
-    assertThat(result).hasSingleOutput().hasSingleEntry("b");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("b");
 
     result = startDecision(true, true, true, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry("a");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("a");
 
     result = startDecision(true, true, true, "c", "b", "a");
-    assertThat(result).hasSingleOutput().hasSingleEntry("c");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("c");
   }
 
   @Test
@@ -575,41 +576,41 @@ public class HitPolicyTest extends DmnDecisionTest {
   @DecisionResource(resource = FIRST_COMPOUND)
   public void testFirstHitPolicyCompoundOutputSingleMatchingRule() {
     DmnDecisionResult result = startDecision(true, false, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "a").hasEntry("out2", "a").hasEntry("out3", "a");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "a").hasEntryWithValue("out2", "a").hasEntryWithValue("out3", "a");
 
     result = startDecision(false, true, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "b").hasEntry("out2", "b").hasEntry("out3", "b");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "b").hasEntryWithValue("out2", "b").hasEntryWithValue("out3", "b");
 
     result = startDecision(false, false, true, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "c").hasEntry("out2", "c").hasEntry("out3", "c");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "c").hasEntryWithValue("out2", "c").hasEntryWithValue("out3", "c");
   }
 
   @Test
   @DecisionResource(resource = FIRST_COMPOUND)
   public void testFirstHitPolicyCompoundOutputMultipleMatchingRules() {
     DmnDecisionResult result = startDecision(true, true, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "a").hasEntry("out2", "a").hasEntry("out3", "a");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "a").hasEntryWithValue("out2", "a").hasEntryWithValue("out3", "a");
 
     result = startDecision(true, true, false, "c", "b", "a");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "c").hasEntry("out2", "c").hasEntry("out3", "c");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "c").hasEntryWithValue("out2", "c").hasEntryWithValue("out3", "c");
 
     result = startDecision(true, false, true, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "a").hasEntry("out2", "a").hasEntry("out3", "a");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "a").hasEntryWithValue("out2", "a").hasEntryWithValue("out3", "a");
 
     result = startDecision(true, false, true, "c", "b", "a");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "c").hasEntry("out2", "c").hasEntry("out3", "c");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "c").hasEntryWithValue("out2", "c").hasEntryWithValue("out3", "c");
 
     result = startDecision(false, true, true, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "b").hasEntry("out2", "b").hasEntry("out3", "b");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "b").hasEntryWithValue("out2", "b").hasEntryWithValue("out3", "b");
 
     result = startDecision(false, true, true, "c", "b", "a");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "b").hasEntry("out2", "b").hasEntry("out3", "b");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "b").hasEntryWithValue("out2", "b").hasEntryWithValue("out3", "b");
 
     result = startDecision(true, true, true, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "a").hasEntry("out2", "a").hasEntry("out3", "a");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "a").hasEntryWithValue("out2", "a").hasEntryWithValue("out3", "a");
 
     result = startDecision(true, true, true, "c", "b", "a");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "c").hasEntry("out2", "c").hasEntry("out3", "c");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "c").hasEntryWithValue("out2", "c").hasEntryWithValue("out3", "c");
   }
 
   @Test
@@ -623,13 +624,13 @@ public class HitPolicyTest extends DmnDecisionTest {
   @DecisionResource(resource = OUTPUT_ORDER_SINGLE)
   public void testOutputOrderHitPolicySingleOutputSingleMatchingRule() {
     DmnDecisionResult result = startDecision(true, false, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry("a");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("a");
 
     result = startDecision(false, true, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry("b");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("b");
 
     result = startDecision(false, false, true, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry("c");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("c");
   }
 
   @Test
@@ -680,13 +681,13 @@ public class HitPolicyTest extends DmnDecisionTest {
   @DecisionResource(resource = OUTPUT_ORDER_COMPOUND)
   public void testOutputOrderHitPolicyCompoundOutputSingleMatchingRule() {
     DmnDecisionResult result = startDecision(true, false, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "a").hasEntry("out2", "a").hasEntry("out3", "a");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "a").hasEntryWithValue("out2", "a").hasEntryWithValue("out3", "a");
 
     result = startDecision(false, true, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "b").hasEntry("out2", "b").hasEntry("out3", "b");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "b").hasEntryWithValue("out2", "b").hasEntryWithValue("out3", "b");
 
     result = startDecision(false, false, true, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "c").hasEntry("out2", "c").hasEntry("out3", "c");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "c").hasEntryWithValue("out2", "c").hasEntryWithValue("out3", "c");
   }
 
   @Test
@@ -695,45 +696,45 @@ public class HitPolicyTest extends DmnDecisionTest {
   public void testOutputOrderHitPolicyCompoundOutputMultipleMatchingRules() {
     DmnDecisionResult result = startDecision(true, true, false, "a", "b", "c");
     assertThat(result).hasSize(2);
-    assertThat(result.get(0)).hasEntry("out1", "a").hasEntry("out2", "a").hasEntry("out3", "a");
-    assertThat(result.get(1)).hasEntry("out1", "b").hasEntry("out2", "b").hasEntry("out3", "b");
+    assertThat(result.get(0)).hasEntryWithValue("out1", "a").hasEntryWithValue("out2", "a").hasEntryWithValue("out3", "a");
+    assertThat(result.get(1)).hasEntryWithValue("out1", "b").hasEntryWithValue("out2", "b").hasEntryWithValue("out3", "b");
 
     result = startDecision(true, true, false, "c", "b", "a");
     assertThat(result).hasSize(2);
-    assertThat(result.get(0)).hasEntry("out1", "b").hasEntry("out2", "b").hasEntry("out3", "b");
-    assertThat(result.get(1)).hasEntry("out1", "c").hasEntry("out2", "c").hasEntry("out3", "c");
+    assertThat(result.get(0)).hasEntryWithValue("out1", "b").hasEntryWithValue("out2", "b").hasEntryWithValue("out3", "b");
+    assertThat(result.get(1)).hasEntryWithValue("out1", "c").hasEntryWithValue("out2", "c").hasEntryWithValue("out3", "c");
 
     result = startDecision(true, false, true, "a", "b", "c");
     assertThat(result).hasSize(2);
-    assertThat(result.get(0)).hasEntry("out1", "a").hasEntry("out2", "a").hasEntry("out3", "a");
-    assertThat(result.get(1)).hasEntry("out1", "c").hasEntry("out2", "c").hasEntry("out3", "c");
+    assertThat(result.get(0)).hasEntryWithValue("out1", "a").hasEntryWithValue("out2", "a").hasEntryWithValue("out3", "a");
+    assertThat(result.get(1)).hasEntryWithValue("out1", "c").hasEntryWithValue("out2", "c").hasEntryWithValue("out3", "c");
 
     result = startDecision(true, false, true, "c", "b", "a");
     assertThat(result).hasSize(2);
-    assertThat(result.get(0)).hasEntry("out1", "a").hasEntry("out2", "a").hasEntry("out3", "a");
-    assertThat(result.get(1)).hasEntry("out1", "c").hasEntry("out2", "c").hasEntry("out3", "c");
+    assertThat(result.get(0)).hasEntryWithValue("out1", "a").hasEntryWithValue("out2", "a").hasEntryWithValue("out3", "a");
+    assertThat(result.get(1)).hasEntryWithValue("out1", "c").hasEntryWithValue("out2", "c").hasEntryWithValue("out3", "c");
 
     result = startDecision(false, true, true, "a", "b", "c");
     assertThat(result).hasSize(2);
-    assertThat(result.get(0)).hasEntry("out1", "b").hasEntry("out2", "b").hasEntry("out3", "b");
-    assertThat(result.get(1)).hasEntry("out1", "c").hasEntry("out2", "c").hasEntry("out3", "c");
+    assertThat(result.get(0)).hasEntryWithValue("out1", "b").hasEntryWithValue("out2", "b").hasEntryWithValue("out3", "b");
+    assertThat(result.get(1)).hasEntryWithValue("out1", "c").hasEntryWithValue("out2", "c").hasEntryWithValue("out3", "c");
 
     result = startDecision(false, true, true, "c", "b", "a");
     assertThat(result).hasSize(2);
-    assertThat(result.get(0)).hasEntry("out1", "a").hasEntry("out2", "a").hasEntry("out3", "a");
-    assertThat(result.get(1)).hasEntry("out1", "b").hasEntry("out2", "b").hasEntry("out3", "b");
+    assertThat(result.get(0)).hasEntryWithValue("out1", "a").hasEntryWithValue("out2", "a").hasEntryWithValue("out3", "a");
+    assertThat(result.get(1)).hasEntryWithValue("out1", "b").hasEntryWithValue("out2", "b").hasEntryWithValue("out3", "b");
 
     result = startDecision(true, true, true, "a", "b", "c");
     assertThat(result).hasSize(3);
-    assertThat(result.get(0)).hasEntry("out1", "a").hasEntry("out2", "a").hasEntry("out3", "a");
-    assertThat(result.get(1)).hasEntry("out1", "b").hasEntry("out2", "b").hasEntry("out3", "b");
-    assertThat(result.get(2)).hasEntry("out1", "c").hasEntry("out2", "c").hasEntry("out3", "c");
+    assertThat(result.get(0)).hasEntryWithValue("out1", "a").hasEntryWithValue("out2", "a").hasEntryWithValue("out3", "a");
+    assertThat(result.get(1)).hasEntryWithValue("out1", "b").hasEntryWithValue("out2", "b").hasEntryWithValue("out3", "b");
+    assertThat(result.get(2)).hasEntryWithValue("out1", "c").hasEntryWithValue("out2", "c").hasEntryWithValue("out3", "c");
 
     result = startDecision(true, true, true, "c", "b", "a");
     assertThat(result).hasSize(3);
-    assertThat(result.get(0)).hasEntry("out1", "a").hasEntry("out2", "a").hasEntry("out3", "a");
-    assertThat(result.get(1)).hasEntry("out1", "b").hasEntry("out2", "b").hasEntry("out3", "b");
-    assertThat(result.get(2)).hasEntry("out1", "c").hasEntry("out2", "c").hasEntry("out3", "c");
+    assertThat(result.get(0)).hasEntryWithValue("out1", "a").hasEntryWithValue("out2", "a").hasEntryWithValue("out3", "a");
+    assertThat(result.get(1)).hasEntryWithValue("out1", "b").hasEntryWithValue("out2", "b").hasEntryWithValue("out3", "b");
+    assertThat(result.get(2)).hasEntryWithValue("out1", "c").hasEntryWithValue("out2", "c").hasEntryWithValue("out3", "c");
   }
 
   @Test
@@ -747,13 +748,13 @@ public class HitPolicyTest extends DmnDecisionTest {
   @DecisionResource(resource = RULE_ORDER_SINGLE)
   public void testRuleOrderHitPolicySingleOutputSingleMatchingRule() {
     DmnDecisionResult result = startDecision(true, false, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry("a");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("a");
 
     result = startDecision(false, true, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry("b");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("b");
 
     result = startDecision(false, false, true, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry("c");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("c");
   }
 
   @Test
@@ -803,13 +804,13 @@ public class HitPolicyTest extends DmnDecisionTest {
   @DecisionResource(resource = RULE_ORDER_COMPOUND)
   public void testRuleOrderHitPolicyCompoundOutputSingleMatchingRule() {
     DmnDecisionResult result = startDecision(true, false, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "a").hasEntry("out2", "a").hasEntry("out3", "a");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "a").hasEntryWithValue("out2", "a").hasEntryWithValue("out3", "a");
 
     result = startDecision(false, true, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "b").hasEntry("out2", "b").hasEntry("out3", "b");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "b").hasEntryWithValue("out2", "b").hasEntryWithValue("out3", "b");
 
     result = startDecision(false, false, true, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "c").hasEntry("out2", "c").hasEntry("out3", "c");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "c").hasEntryWithValue("out2", "c").hasEntryWithValue("out3", "c");
   }
 
   @Test
@@ -817,45 +818,45 @@ public class HitPolicyTest extends DmnDecisionTest {
   public void testRuleOrderHitPolicyCompoundOutputMultipleMatchingRules() {
     DmnDecisionResult result = startDecision(true, true, false, "a", "b", "c");
     assertThat(result).hasSize(2);
-    assertThat(result.get(0)).hasEntry("out1", "a").hasEntry("out2", "a").hasEntry("out3", "a");
-    assertThat(result.get(1)).hasEntry("out1", "b").hasEntry("out2", "b").hasEntry("out3", "b");
+    assertThat(result.get(0)).hasEntryWithValue("out1", "a").hasEntryWithValue("out2", "a").hasEntryWithValue("out3", "a");
+    assertThat(result.get(1)).hasEntryWithValue("out1", "b").hasEntryWithValue("out2", "b").hasEntryWithValue("out3", "b");
 
     result = startDecision(true, true, false, "c", "b", "a");
     assertThat(result).hasSize(2);
-    assertThat(result.get(0)).hasEntry("out1", "c").hasEntry("out2", "c").hasEntry("out3", "c");
-    assertThat(result.get(1)).hasEntry("out1", "b").hasEntry("out2", "b").hasEntry("out3", "b");
+    assertThat(result.get(0)).hasEntryWithValue("out1", "c").hasEntryWithValue("out2", "c").hasEntryWithValue("out3", "c");
+    assertThat(result.get(1)).hasEntryWithValue("out1", "b").hasEntryWithValue("out2", "b").hasEntryWithValue("out3", "b");
 
     result = startDecision(true, false, true, "a", "b", "c");
     assertThat(result).hasSize(2);
-    assertThat(result.get(0)).hasEntry("out1", "a").hasEntry("out2", "a").hasEntry("out3", "a");
-    assertThat(result.get(1)).hasEntry("out1", "c").hasEntry("out2", "c").hasEntry("out3", "c");
+    assertThat(result.get(0)).hasEntryWithValue("out1", "a").hasEntryWithValue("out2", "a").hasEntryWithValue("out3", "a");
+    assertThat(result.get(1)).hasEntryWithValue("out1", "c").hasEntryWithValue("out2", "c").hasEntryWithValue("out3", "c");
 
     result = startDecision(true, false, true, "c", "b", "a");
     assertThat(result).hasSize(2);
-    assertThat(result.get(0)).hasEntry("out1", "c").hasEntry("out2", "c").hasEntry("out3", "c");
-    assertThat(result.get(1)).hasEntry("out1", "a").hasEntry("out2", "a").hasEntry("out3", "a");
+    assertThat(result.get(0)).hasEntryWithValue("out1", "c").hasEntryWithValue("out2", "c").hasEntryWithValue("out3", "c");
+    assertThat(result.get(1)).hasEntryWithValue("out1", "a").hasEntryWithValue("out2", "a").hasEntryWithValue("out3", "a");
 
     result = startDecision(false, true, true, "a", "b", "c");
     assertThat(result).hasSize(2);
-    assertThat(result.get(0)).hasEntry("out1", "b").hasEntry("out2", "b").hasEntry("out3", "b");
-    assertThat(result.get(1)).hasEntry("out1", "c").hasEntry("out2", "c").hasEntry("out3", "c");
+    assertThat(result.get(0)).hasEntryWithValue("out1", "b").hasEntryWithValue("out2", "b").hasEntryWithValue("out3", "b");
+    assertThat(result.get(1)).hasEntryWithValue("out1", "c").hasEntryWithValue("out2", "c").hasEntryWithValue("out3", "c");
 
     result = startDecision(false, true, true, "c", "b", "a");
     assertThat(result).hasSize(2);
-    assertThat(result.get(0)).hasEntry("out1", "b").hasEntry("out2", "b").hasEntry("out3", "b");
-    assertThat(result.get(1)).hasEntry("out1", "a").hasEntry("out2", "a").hasEntry("out3", "a");
+    assertThat(result.get(0)).hasEntryWithValue("out1", "b").hasEntryWithValue("out2", "b").hasEntryWithValue("out3", "b");
+    assertThat(result.get(1)).hasEntryWithValue("out1", "a").hasEntryWithValue("out2", "a").hasEntryWithValue("out3", "a");
 
     result = startDecision(true, true, true, "a", "b", "c");
     assertThat(result).hasSize(3);
-    assertThat(result.get(0)).hasEntry("out1", "a").hasEntry("out2", "a").hasEntry("out3", "a");
-    assertThat(result.get(1)).hasEntry("out1", "b").hasEntry("out2", "b").hasEntry("out3", "b");
-    assertThat(result.get(2)).hasEntry("out1", "c").hasEntry("out2", "c").hasEntry("out3", "c");
+    assertThat(result.get(0)).hasEntryWithValue("out1", "a").hasEntryWithValue("out2", "a").hasEntryWithValue("out3", "a");
+    assertThat(result.get(1)).hasEntryWithValue("out1", "b").hasEntryWithValue("out2", "b").hasEntryWithValue("out3", "b");
+    assertThat(result.get(2)).hasEntryWithValue("out1", "c").hasEntryWithValue("out2", "c").hasEntryWithValue("out3", "c");
 
     result = startDecision(true, true, true, "c", "b", "a");
     assertThat(result).hasSize(3);
-    assertThat(result.get(0)).hasEntry("out1", "c").hasEntry("out2", "c").hasEntry("out3", "c");
-    assertThat(result.get(1)).hasEntry("out1", "b").hasEntry("out2", "b").hasEntry("out3", "b");
-    assertThat(result.get(2)).hasEntry("out1", "a").hasEntry("out2", "a").hasEntry("out3", "a");
+    assertThat(result.get(0)).hasEntryWithValue("out1", "c").hasEntryWithValue("out2", "c").hasEntryWithValue("out3", "c");
+    assertThat(result.get(1)).hasEntryWithValue("out1", "b").hasEntryWithValue("out2", "b").hasEntryWithValue("out3", "b");
+    assertThat(result.get(2)).hasEntryWithValue("out1", "a").hasEntryWithValue("out2", "a").hasEntryWithValue("out3", "a");
   }
 
   @Test
@@ -869,13 +870,13 @@ public class HitPolicyTest extends DmnDecisionTest {
   @DecisionResource(resource = COLLECT_SINGLE)
   public void testCollectHitPolicySingleOutputSingleMatchingRule() {
     DmnDecisionResult result = startDecision(true, false, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry("a");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("a");
 
     result = startDecision(false, true, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry("b");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("b");
 
     result = startDecision(false, false, true, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry("c");
+    assertThat(result).hasSingleOutput().hasSingleEntryValue("c");
   }
 
   @Test
@@ -909,13 +910,13 @@ public class HitPolicyTest extends DmnDecisionTest {
   @DecisionResource(resource = COLLECT_COMPOUND)
   public void testCollectHitPolicyCompoundOutputSingleMatchingRule() {
     DmnDecisionResult result = startDecision(true, false, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "a").hasEntry("out2", "a").hasEntry("out3", "a");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "a").hasEntryWithValue("out2", "a").hasEntryWithValue("out3", "a");
 
     result = startDecision(false, true, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "b").hasEntry("out2", "b").hasEntry("out3", "b");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "b").hasEntryWithValue("out2", "b").hasEntryWithValue("out3", "b");
 
     result = startDecision(false, false, true, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasEntry("out1", "c").hasEntry("out2", "c").hasEntry("out3", "c");
+    assertThat(result).hasSingleOutput().hasEntryWithValue("out1", "c").hasEntryWithValue("out2", "c").hasEntryWithValue("out3", "c");
   }
 
   @Test
@@ -929,40 +930,40 @@ public class HitPolicyTest extends DmnDecisionTest {
   @DecisionResource(resource = COLLECT_SUM_SINGLE)
   public void testCollectSumHitPolicySingleOutputSingleMatchingRule() {
     DmnDecisionResult result = startDecision(true, false, false, 10, 20L, 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntry(10);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(10);
 
     result = startDecision(false, true, false, 10, 20L, 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntry(20);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(20);
 
     result = startDecision(false, false, true, 10, 20L, 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntry(30.034);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(30.034);
 
     result = startDecision(true, false, false, Integer.MAX_VALUE, Long.MAX_VALUE, Double.MAX_VALUE);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Integer.MAX_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(Integer.MAX_VALUE);
 
     result = startDecision(true, false, false, Integer.MIN_VALUE, Long.MIN_VALUE, DOUBLE_MIN);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Integer.MIN_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(Integer.MIN_VALUE);
 
     result = startDecision(false, true, false, Integer.MAX_VALUE, Long.MAX_VALUE, Double.MAX_VALUE);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Long.MAX_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(Long.MAX_VALUE);
 
     result = startDecision(false, true, false, Integer.MIN_VALUE, Long.MIN_VALUE, DOUBLE_MIN);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Long.MIN_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(Long.MIN_VALUE);
 
     result = startDecision(false, false, true, Integer.MAX_VALUE, Long.MAX_VALUE, Double.MAX_VALUE);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Double.MAX_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(Double.MAX_VALUE);
 
     result = startDecision(false, false, true, Integer.MIN_VALUE, Long.MIN_VALUE, DOUBLE_MIN);
-    assertThat(result).hasSingleOutput().hasSingleEntry(DOUBLE_MIN);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(DOUBLE_MIN);
 
     result = startDecision(true, false, false, (byte) 1, (short) 2, 3f);
-    assertThat(result).hasSingleOutput().hasSingleEntry(1);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(1);
 
     result = startDecision(false, true, false, (byte) 1, (short) 2, 3f);
-    assertThat(result).hasSingleOutput().hasSingleEntry(2);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(2);
 
     result = startDecision(false, false, true, (byte) 1, (short) 2, 3f);
-    assertThat(result).hasSingleOutput().hasSingleEntry(3.0);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(3.0);
 
     try {
       startDecision(false, false, true, 10, 20L, "c");
@@ -977,52 +978,52 @@ public class HitPolicyTest extends DmnDecisionTest {
   @DecisionResource(resource = COLLECT_SUM_SINGLE)
   public void testCollectSumHitPolicySingleOutputMultipleMatchingRules() {
     DmnDecisionResult result = startDecision(true, true, false, 10, 20L, 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntry(30);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(30);
 
     result = startDecision(true, false, true, 10, 20L, 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntry(40.034);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(40.034);
 
     result = startDecision(false, true, true, 10, 20L, 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntry(50.034);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(50.034);
 
     result = startDecision(true, true, true, 10, 20L, 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntry(60.034);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(60.034);
 
     result = startDecision(true, true, false, Integer.MAX_VALUE, Long.MAX_VALUE - Integer.MAX_VALUE, Double.MAX_VALUE);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Long.MAX_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(Long.MAX_VALUE);
 
     result = startDecision(true, true, false, Integer.MIN_VALUE, Long.MIN_VALUE - Integer.MIN_VALUE, DOUBLE_MIN);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Long.MIN_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(Long.MIN_VALUE);
 
     result = startDecision(true, false, true, Integer.MAX_VALUE, Long.MAX_VALUE, Double.MAX_VALUE - Integer.MAX_VALUE);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Double.MAX_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(Double.MAX_VALUE);
 
     result = startDecision(true, false, true, Integer.MIN_VALUE, Long.MIN_VALUE, DOUBLE_MIN - Integer.MIN_VALUE);
-    assertThat(result).hasSingleOutput().hasSingleEntry(DOUBLE_MIN);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(DOUBLE_MIN);
 
     result = startDecision(false, true, true, Integer.MAX_VALUE, Long.MAX_VALUE, Double.MAX_VALUE - Long.MAX_VALUE);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Double.MAX_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(Double.MAX_VALUE);
 
     result = startDecision(false, true, true, Integer.MIN_VALUE, Long.MIN_VALUE, DOUBLE_MIN - Long.MIN_VALUE);
-    assertThat(result).hasSingleOutput().hasSingleEntry(DOUBLE_MIN);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(DOUBLE_MIN);
 
     result = startDecision(true, true, true, Integer.MAX_VALUE, Long.MAX_VALUE, Double.MAX_VALUE - Integer.MAX_VALUE - Long.MAX_VALUE);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Double.MAX_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(Double.MAX_VALUE);
 
     result = startDecision(true, true, true, Integer.MIN_VALUE, Long.MIN_VALUE, DOUBLE_MIN - Integer.MIN_VALUE - Long.MIN_VALUE);
-    assertThat(result).hasSingleOutput().hasSingleEntry(DOUBLE_MIN);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(DOUBLE_MIN);
 
     result = startDecision(true, true, false, (byte) 1, (short) 2, 3f);
-    assertThat(result).hasSingleOutput().hasSingleEntry(3);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(3);
 
     result = startDecision(true, false, true, (byte) 1, (short) 2, 3f);
-    assertThat(result).hasSingleOutput().hasSingleEntry(4.0);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(4.0);
 
     result = startDecision(false, true, true, (byte) 1, (short) 2, 3f);
-    assertThat(result).hasSingleOutput().hasSingleEntry(5.0);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(5.0);
 
     result = startDecision(true, true, true, (byte) 1, (short) 2, 3f);
-    assertThat(result).hasSingleOutput().hasSingleEntry(6.0);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(6.0);
 
     try {
       startDecision(true, true, true, 10, 20L, true);
@@ -1115,40 +1116,40 @@ public class HitPolicyTest extends DmnDecisionTest {
   @DecisionResource(resource = COLLECT_MIN_SINGLE)
   public void testCollectMinHitPolicySingleOutputSingleMatchingRule() {
     DmnDecisionResult result = startDecision(true, false, false, 10, 20L, 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntry(10);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(10);
 
     result = startDecision(false, true, false, 10, 20L, 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntry(20);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(20);
 
     result = startDecision(false, false, true, 10, 20L, 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntry(30.034);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(30.034);
 
     result = startDecision(true, false, false, Integer.MAX_VALUE, Long.MAX_VALUE, Double.MAX_VALUE);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Integer.MAX_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(Integer.MAX_VALUE);
 
     result = startDecision(true, false, false, Integer.MIN_VALUE, Long.MIN_VALUE, DOUBLE_MIN);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Integer.MIN_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(Integer.MIN_VALUE);
 
     result = startDecision(false, true, false, Integer.MAX_VALUE, Long.MAX_VALUE, Double.MAX_VALUE);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Long.MAX_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(Long.MAX_VALUE);
 
     result = startDecision(false, true, false, Integer.MIN_VALUE, Long.MIN_VALUE, DOUBLE_MIN);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Long.MIN_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(Long.MIN_VALUE);
 
     result = startDecision(false, false, true, Integer.MAX_VALUE, Long.MAX_VALUE, Double.MAX_VALUE);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Double.MAX_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(Double.MAX_VALUE);
 
     result = startDecision(false, false, true, Integer.MIN_VALUE, Long.MIN_VALUE, DOUBLE_MIN);
-    assertThat(result).hasSingleOutput().hasSingleEntry(DOUBLE_MIN);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(DOUBLE_MIN);
 
     result = startDecision(true, false, false, (byte) 1, (short) 2, 3f);
-    assertThat(result).hasSingleOutput().hasSingleEntry(1);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(1);
 
     result = startDecision(false, true, false, (byte) 1, (short) 2, 3f);
-    assertThat(result).hasSingleOutput().hasSingleEntry(2);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(2);
 
     result = startDecision(false, false, true, (byte) 1, (short) 2, 3f);
-    assertThat(result).hasSingleOutput().hasSingleEntry(3.0);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(3.0);
 
     try {
       startDecision(false, false, true, 10, 20L, "c");
@@ -1163,52 +1164,52 @@ public class HitPolicyTest extends DmnDecisionTest {
   @DecisionResource(resource = COLLECT_MIN_SINGLE)
   public void testCollectMinHitPolicySingleOutputMultipleMatchingRules() {
     DmnDecisionResult result = startDecision(true, true, false, 10, 20L, 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntry(10);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(10);
 
     result = startDecision(true, false, true, 10, 20L, 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntry(10.0);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(10.0);
 
     result = startDecision(false, true, true, 10, 20L, 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntry(20.0);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(20.0);
 
     result = startDecision(true, true, true, 10, 20L, 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntry(10.0);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(10.0);
 
     result = startDecision(true, true, false, Integer.MAX_VALUE, Long.MAX_VALUE, Double.MAX_VALUE);
-    assertThat(result).hasSingleOutput().hasSingleEntry((long) Integer.MAX_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue((long) Integer.MAX_VALUE);
 
     result = startDecision(true, true, false, Integer.MIN_VALUE, Long.MIN_VALUE, DOUBLE_MIN);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Long.MIN_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(Long.MIN_VALUE);
 
     result = startDecision(true, false, true, Integer.MAX_VALUE, Long.MAX_VALUE, Double.MAX_VALUE);
-    assertThat(result).hasSingleOutput().hasSingleEntry((double) Integer.MAX_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue((double) Integer.MAX_VALUE);
 
     result = startDecision(true, false, true, Integer.MIN_VALUE, Long.MIN_VALUE, DOUBLE_MIN);
-    assertThat(result).hasSingleOutput().hasSingleEntry(DOUBLE_MIN);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(DOUBLE_MIN);
 
     result = startDecision(false, true, true, Integer.MAX_VALUE, Long.MAX_VALUE, Double.MAX_VALUE);
-    assertThat(result).hasSingleOutput().hasSingleEntry((double) Long.MAX_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue((double) Long.MAX_VALUE);
 
     result = startDecision(false, true, true, Integer.MIN_VALUE, Long.MIN_VALUE, DOUBLE_MIN);
-    assertThat(result).hasSingleOutput().hasSingleEntry(DOUBLE_MIN);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(DOUBLE_MIN);
 
     result = startDecision(true, true, true, Integer.MAX_VALUE, Long.MAX_VALUE, Double.MAX_VALUE);
-    assertThat(result).hasSingleOutput().hasSingleEntry((double) Integer.MAX_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue((double) Integer.MAX_VALUE);
 
     result = startDecision(true, true, true, Integer.MIN_VALUE, Long.MIN_VALUE, DOUBLE_MIN);
-    assertThat(result).hasSingleOutput().hasSingleEntry(DOUBLE_MIN);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(DOUBLE_MIN);
 
     result = startDecision(true, true, false, (byte) 1, (short) 2, 3f);
-    assertThat(result).hasSingleOutput().hasSingleEntry(1);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(1);
 
     result = startDecision(true, false, true, (byte) 1, (short) 2, 3f);
-    assertThat(result).hasSingleOutput().hasSingleEntry(1.0);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(1.0);
 
     result = startDecision(false, true, true, (byte) 1, (short) 2, 3f);
-    assertThat(result).hasSingleOutput().hasSingleEntry(2.0);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(2.0);
 
     result = startDecision(true, true, true, (byte) 1, (short) 2, 3f);
-    assertThat(result).hasSingleOutput().hasSingleEntry(1.0);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(1.0);
 
     try {
       startDecision(true, true, true, 10, 20L, true);
@@ -1301,40 +1302,40 @@ public class HitPolicyTest extends DmnDecisionTest {
   @DecisionResource(resource = COLLECT_MAX_SINGLE)
   public void testCollectMaxHitPolicySingleOutputSingleMatchingRule() {
     DmnDecisionResult result = startDecision(true, false, false, 10, 20L, 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntry(10);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(10);
 
     result = startDecision(false, true, false, 10, 20L, 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntry(20);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(20);
 
     result = startDecision(false, false, true, 10, 20L, 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntry(30.034);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(30.034);
 
     result = startDecision(true, false, false, Integer.MAX_VALUE, Long.MAX_VALUE, Double.MAX_VALUE);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Integer.MAX_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(Integer.MAX_VALUE);
 
     result = startDecision(true, false, false, Integer.MIN_VALUE, Long.MIN_VALUE, DOUBLE_MIN);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Integer.MIN_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(Integer.MIN_VALUE);
 
     result = startDecision(false, true, false, Integer.MAX_VALUE, Long.MAX_VALUE, Double.MAX_VALUE);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Long.MAX_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(Long.MAX_VALUE);
 
     result = startDecision(false, true, false, Integer.MIN_VALUE, Long.MIN_VALUE, DOUBLE_MIN);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Long.MIN_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(Long.MIN_VALUE);
 
     result = startDecision(false, false, true, Integer.MAX_VALUE, Long.MAX_VALUE, Double.MAX_VALUE);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Double.MAX_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(Double.MAX_VALUE);
 
     result = startDecision(false, false, true, Integer.MIN_VALUE, Long.MIN_VALUE, DOUBLE_MIN);
-    assertThat(result).hasSingleOutput().hasSingleEntry(DOUBLE_MIN);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(DOUBLE_MIN);
 
     result = startDecision(true, false, false, (byte) 1, (short) 2, 3f);
-    assertThat(result).hasSingleOutput().hasSingleEntry(1);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(1);
 
     result = startDecision(false, true, false, (byte) 1, (short) 2, 3f);
-    assertThat(result).hasSingleOutput().hasSingleEntry(2);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(2);
 
     result = startDecision(false, false, true, (byte) 1, (short) 2, 3f);
-    assertThat(result).hasSingleOutput().hasSingleEntry(3.0);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(3.0);
 
     try {
       startDecision(false, false, true, 10, 20L, "c");
@@ -1349,52 +1350,52 @@ public class HitPolicyTest extends DmnDecisionTest {
   @DecisionResource(resource = COLLECT_MAX_SINGLE)
   public void testCollectMaxHitPolicySingleOutputMultipleMatchingRules() {
     DmnDecisionResult result = startDecision(true, true, false, 10, 20L, 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntry(20);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(20);
 
     result = startDecision(true, false, true, 10, 20L, 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntry(30.034);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(30.034);
 
     result = startDecision(false, true, true, 10, 20L, 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntry(30.034);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(30.034);
 
     result = startDecision(true, true, true, 10, 20L, 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntry(30.034);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(30.034);
 
     result = startDecision(true, true, false, Integer.MAX_VALUE, Long.MAX_VALUE, Double.MAX_VALUE);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Long.MAX_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(Long.MAX_VALUE);
 
     result = startDecision(true, true, false, Integer.MIN_VALUE, Long.MIN_VALUE, DOUBLE_MIN);
-    assertThat(result).hasSingleOutput().hasSingleEntry((long) Integer.MIN_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue((long) Integer.MIN_VALUE);
 
     result = startDecision(true, false, true, Integer.MAX_VALUE, Long.MAX_VALUE, Double.MAX_VALUE);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Double.MAX_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(Double.MAX_VALUE);
 
     result = startDecision(true, false, true, Integer.MIN_VALUE, Long.MIN_VALUE, DOUBLE_MIN);
-    assertThat(result).hasSingleOutput().hasSingleEntry((double) Integer.MIN_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue((double) Integer.MIN_VALUE);
 
     result = startDecision(false, true, true, Integer.MAX_VALUE, Long.MAX_VALUE, Double.MAX_VALUE);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Double.MAX_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(Double.MAX_VALUE);
 
     result = startDecision(false, true, true, Integer.MIN_VALUE, Long.MIN_VALUE, DOUBLE_MIN);
-    assertThat(result).hasSingleOutput().hasSingleEntry((double) Long.MIN_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue((double) Long.MIN_VALUE);
 
     result = startDecision(true, true, true, Integer.MAX_VALUE, Long.MAX_VALUE, Double.MAX_VALUE);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Double.MAX_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(Double.MAX_VALUE);
 
     result = startDecision(true, true, true, Integer.MIN_VALUE, Long.MIN_VALUE, DOUBLE_MIN);
-    assertThat(result).hasSingleOutput().hasSingleEntry((double) Integer.MIN_VALUE);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue((double) Integer.MIN_VALUE);
 
     result = startDecision(true, true, false, (byte) 1, (short) 2, 3f);
-    assertThat(result).hasSingleOutput().hasSingleEntry(2);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(2);
 
     result = startDecision(true, false, true, (byte) 1, (short) 2, 3f);
-    assertThat(result).hasSingleOutput().hasSingleEntry(3.0);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(3.0);
 
     result = startDecision(false, true, true, (byte) 1, (short) 2, 3f);
-    assertThat(result).hasSingleOutput().hasSingleEntry(3.0);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(3.0);
 
     result = startDecision(true, true, true, (byte) 1, (short) 2, 3f);
-    assertThat(result).hasSingleOutput().hasSingleEntry(3.0);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(3.0);
 
     try {
       startDecision(true, true, true, 10, 20L, true);
@@ -1480,43 +1481,43 @@ public class HitPolicyTest extends DmnDecisionTest {
   @DecisionResource(resource = COLLECT_COUNT_SINGLE)
   public void testCollectCountHitPolicySingleOutputNoMatchingRule() {
     DmnDecisionResult result = startDecision(false, false, false, 10, "b", 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntry(0L);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(0L);
   }
 
   @Test
   @DecisionResource(resource = COLLECT_COUNT_SINGLE)
   public void testCollectCountHitPolicySingleOutputSingleMatchingRule() {
     DmnDecisionResult result = startDecision(true, false, false, 10, "b", 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntry(1L);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(1L);
 
     result = startDecision(false, true, false, 10, "b", 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntry(1L);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(1L);
 
     result = startDecision(false, false, true, 10, "b", 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntry(1L);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(1L);
   }
 
   @Test
   @DecisionResource(resource = COLLECT_COUNT_SINGLE)
   public void testCollectCountHitPolicySingleOutputMultipleMatchingRules() {
     DmnDecisionResult result = startDecision(true, true, false, 10, "b", 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntry(2L);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(2L);
 
     result = startDecision(true, false, true, 10, "b", 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntry(2L);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(2L);
 
     result = startDecision(false, true, true, 10, "b", 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntry(2L);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(2L);
 
     result = startDecision(true, true, true, 10, "b", 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntry(3L);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(3L);
   }
 
   @Test
   @DecisionResource(resource = COLLECT_COUNT_COMPOUND)
   public void testCollectCountHitPolicyCompoundOutputNoMatchingRule() {
     DmnDecisionResult result = startDecision(false, false, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntry(0L);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(0L);
   }
 
   @Test
@@ -1589,7 +1590,7 @@ public class HitPolicyTest extends DmnDecisionTest {
   public List<Object> collectSingleOutputValues(DmnDecisionResult result) {
     List<Object> values = new ArrayList<Object>();
     for (DmnDecisionOutput dmnDecisionOutput : result) {
-      values.add(dmnDecisionOutput.getValue());
+      values.add(dmnDecisionOutput.getValue().getValue());
     }
     return values;
   }

@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.dmn.engine;
 
+import org.camunda.bpm.engine.variable.value.TypedValue;
+
 public interface DmnTypeDefinition {
 
   String getTypeName();
@@ -24,6 +26,6 @@ public interface DmnTypeDefinition {
    * @return value of specified type
    * @throws IllegalArgumentException if the value can not be transformed
    */
-  Object transform(Object value) throws IllegalArgumentException;
+  TypedValue transform(Object value) throws IllegalArgumentException;
 
 }

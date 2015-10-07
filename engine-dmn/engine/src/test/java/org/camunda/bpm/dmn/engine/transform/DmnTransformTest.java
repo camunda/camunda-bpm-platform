@@ -28,6 +28,8 @@ import org.camunda.bpm.dmn.engine.DmnExpression;
 import org.camunda.bpm.dmn.engine.DmnItemDefinition;
 import org.camunda.bpm.dmn.engine.DmnRule;
 import org.camunda.bpm.dmn.engine.DmnTypeDefinition;
+import org.camunda.bpm.dmn.engine.impl.DefaultItemDefinition;
+import org.camunda.bpm.dmn.engine.impl.DefaultTypeDefinition;
 import org.camunda.bpm.dmn.engine.impl.DmnClauseImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnEngineConfigurationImpl;
@@ -74,7 +76,7 @@ public class DmnTransformTest {
   @Test
   public void shouldTransformTypeDefinitions() {
     DmnTypeDefinition typeDefinition = decisionModel.getItemDefinition("itemDefinition1").getTypeDefinition();
-    assertThat(typeDefinition).isNull();
+    assertThat(typeDefinition).isEqualTo(new DefaultTypeDefinition());
 
     typeDefinition = decisionModel.getItemDefinition("itemDefinition2").getTypeDefinition();
     assertThat(typeDefinition).isNotNull();
@@ -188,7 +190,7 @@ public class DmnTransformTest {
     assertThat(inputExpression.getExpressionLanguage()).isNull();
     assertThat(inputExpression.getExpression()).isEqualTo("${camunda}");
     assertThat(inputExpression.getItemDefinition()).isNotNull();
-    assertThat(inputExpression.getItemDefinition().getTypeDefinition()).isNull();
+    assertThat(inputExpression.getItemDefinition().getTypeDefinition()).isEqualTo(new DefaultTypeDefinition());
 
     inputExpression = clauses.get(1).getInputExpression();
     assertThat(inputExpression).isNotNull();
@@ -206,7 +208,7 @@ public class DmnTransformTest {
     assertThat(inputExpression.getName()).isNull();
     assertThat(inputExpression.getExpressionLanguage()).isNull();
     assertThat(inputExpression.getExpression()).isNull();
-    assertThat(inputExpression.getItemDefinition()).isNull();
+    assertThat(inputExpression.getItemDefinition()).isEqualTo(new DefaultItemDefinition());
 
     inputExpression = clauses.get(3).getInputExpression();
     assertThat(inputExpression).isNull();
@@ -249,7 +251,7 @@ public class DmnTransformTest {
   public void shouldTransformOutputDefinition() {
     List<DmnClause> clauses = getClausesForDecision("decision1");
 
-    assertThat(clauses.get(0).getOutputDefinition()).isNull();
+    assertThat(clauses.get(0).getOutputDefinition()).isEqualTo(new DefaultItemDefinition());
 
     DmnItemDefinition outputDefinition = clauses.get(4).getOutputDefinition();
     assertThat(outputDefinition).isNotNull();

@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.dmn.engine;
 
+import org.camunda.bpm.engine.variable.value.TypedValue;
+
 /**
  * The value of a clause of a decision table.
  */
@@ -36,6 +38,6 @@ public interface DmnDecisionTableValue {
   /**
    * @return the value of the evaluated clause expression or null if no expression given
    */
-  Object getValue();
+  TypedValue getValue();
 
 }

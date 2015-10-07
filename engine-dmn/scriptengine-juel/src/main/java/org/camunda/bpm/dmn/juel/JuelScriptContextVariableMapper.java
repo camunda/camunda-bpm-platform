@@ -18,6 +18,8 @@ import javax.el.ValueExpression;
 import javax.el.VariableMapper;
 import javax.script.ScriptContext;
 
+import org.camunda.bpm.engine.variable.value.TypedValue;
+
 public class JuelScriptContextVariableMapper extends VariableMapper {
 
   protected ScriptContext context;
@@ -28,6 +30,7 @@ public class JuelScriptContextVariableMapper extends VariableMapper {
     this.expressionFactory = expressionFactory;
   }
 
+  @Override
   public ValueExpression resolveVariable(String variableName) {
     int scope = context.getAttributesScope(variableName);
     if (scope != -1) {
@@ -37,6 +40,11 @@ public class JuelScriptContextVariableMapper extends VariableMapper {
         return (ValueExpression) value;
       }
       else {
+
+        if(value instanceof TypedValue) {
+          value = ((TypedValue) value).getValue();
+        }
+
         // Create a new ValueExpression based on the variable value
         return expressionFactory.createValueExpression(value, Object.class);
       }
@@ -46,6 +54,7 @@ public class JuelScriptContextVariableMapper extends VariableMapper {
     }
   }
 
+  @Override
   public ValueExpression setVariable(String name, ValueExpression value) {
     ValueExpression previousValue = resolveVariable(name);
     context.setAttribute(name, value, ScriptContext.ENGINE_SCOPE);

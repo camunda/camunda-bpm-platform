@@ -31,6 +31,7 @@ import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnEngineConfigurationImpl;
 import org.camunda.bpm.dmn.engine.test.DecisionResource;
 import org.camunda.bpm.dmn.engine.test.DmnEngineRule;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.dmn.BuiltinAggregator;
 import org.camunda.bpm.model.dmn.HitPolicy;
 import org.junit.Before;
@@ -40,6 +41,7 @@ import org.junit.Test;
 public class DmnDecisionTableListenerTest {
 
   public static final String DMN_FILE = "org/camunda/bpm/dmn/engine/listener/DmnDecisionTableListenerTest.test.dmn";
+
   @Rule
   public DmnEngineRule dmnEngineRule = new DmnEngineRule(new DmnDecisionTableListenerEngineConfiguration());
 
@@ -89,19 +91,19 @@ public class DmnDecisionTableListenerTest {
     assertThat(input1.getKey()).isEqualTo("input1");
     assertThat(input1.getName()).isEqualTo("Input");
     assertThat(input1.getOutputName()).isEqualTo("cellInput");
-    assertThat(input1.getValue()).isEqualTo(true);
+    assertThat(input1.getValue()).isEqualTo(Variables.untypedValue(true));
 
     DmnDecisionTableValue input2 = inputs.get("input2");
     assertThat(input2.getKey()).isEqualTo("input2");
     assertThat(input2.getName()).isNull();
     assertThat(input2.getOutputName()).isEqualTo("x");
-    assertThat(input2.getValue()).isEqualTo("foo");
+    assertThat(input2.getValue()).isEqualTo(Variables.untypedValue("foo"));
 
     DmnDecisionTableValue input3 = inputs.get("input3");
     assertThat(input3.getKey()).isEqualTo("input3");
     assertThat(input3.getName()).isNull();
     assertThat(input3.getOutputName()).isEqualTo("cellInput");
-    assertThat(input3.getValue()).isNull();
+    assertThat(input3.getValue()).isEqualTo(Variables.untypedNullValue());
   }
 
   @Test
@@ -161,13 +163,13 @@ public class DmnDecisionTableListenerTest {
     assertThat(output1.getKey()).isEqualTo("output1");
     assertThat(output1.getName()).isEqualTo("Output 1");
     assertThat(output1.getOutputName()).isEqualTo("out1");
-    assertThat(output1.getValue()).isEqualTo("hello");
+    assertThat(output1.getValue()).isEqualTo(Variables.untypedValue("hello"));
 
     DmnDecisionTableValue output2 = outputs.get("output2");
     assertThat(output2.getKey()).isEqualTo("output2");
     assertThat(output2.getName()).isNull();
     assertThat(output2.getOutputName()).isNull();
-    assertThat(output2.getValue()).isEqualTo("camunda");
+    assertThat(output2.getValue()).isEqualTo(Variables.untypedValue("camunda"));
 
     evaluateDecision(false, "bar", "test", "hello");
     matchingRules = listener.result.getMatchingRules();
@@ -179,7 +181,7 @@ public class DmnDecisionTableListenerTest {
     assertThat(output2.getKey()).isEqualTo("output2");
     assertThat(output2.getName()).isNull();
     assertThat(output2.getOutputName()).isNull();
-    assertThat(output2.getValue()).isEqualTo("camunda");
+    assertThat(output2.getValue()).isEqualTo(Variables.untypedValue("camunda"));
   }
 
   @Test

@@ -23,6 +23,8 @@ import org.camunda.bpm.dmn.engine.impl.DmnEngineConfigurationImpl;
 import org.camunda.bpm.dmn.engine.impl.type.DefaultDataTypeTransformerFactory;
 import org.camunda.bpm.dmn.engine.test.DecisionResource;
 import org.camunda.bpm.dmn.engine.test.DmnEngineRule;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -62,7 +64,7 @@ public class CustomDataTypeTransformerFactoryTest {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("input", 21);
 
-    assertThat(engine).evaluates(decision, variables).hasResult("isCustom");
+    assertThat(engine).evaluates(decision, variables).hasResultValue("isCustom");
   }
 
   protected static DmnEngineConfigurationImpl customConfiguration() {
@@ -88,10 +90,10 @@ public class CustomDataTypeTransformerFactoryTest {
 
   protected static class CustomDataTypeTransformer implements DataTypeTransformer {
 
-    protected static final Object CUSTOM_OBJECT = 42;
+    protected static final TypedValue CUSTOM_OBJECT = Variables.integerValue(42);
 
     @Override
-    public Object transform(Object value) throws IllegalArgumentException {
+    public TypedValue transform(Object value) throws IllegalArgumentException {
       return CUSTOM_OBJECT;
     }
   }

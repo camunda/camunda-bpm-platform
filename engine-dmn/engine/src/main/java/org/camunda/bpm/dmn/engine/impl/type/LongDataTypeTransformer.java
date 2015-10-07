@@ -13,9 +13,12 @@
 package org.camunda.bpm.dmn.engine.impl.type;
 
 import org.camunda.bpm.dmn.engine.type.DataTypeTransformer;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.LongValue;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
- * Transform values of type {@link Number} and {@link String} into {@link Long}.
+ * Transform values of type {@link Number} and {@link String} into {@link LongValue}.
  *
  * @author Philipp Ossler
  *
@@ -23,19 +26,21 @@ import org.camunda.bpm.dmn.engine.type.DataTypeTransformer;
 public class LongDataTypeTransformer implements DataTypeTransformer {
 
   @Override
-  public Object transform(Object value) throws IllegalArgumentException {
+  public TypedValue transform(Object value) throws IllegalArgumentException {
     if (value instanceof Number) {
-      return transformNumber((Number) value);
+      long longValue = transformNumber((Number) value);
+      return Variables.longValue(longValue);
 
     } else if (value instanceof String) {
-      return transformString((String) value);
+      long longValue = transformString((String) value);
+      return Variables.longValue(longValue);
 
     } else {
       throw new IllegalArgumentException();
     }
   }
 
-  protected Long transformNumber(Number value) {
+  protected long transformNumber(Number value) {
     if(isLong(value)) {
       return value.longValue();
     } else {
@@ -48,7 +53,7 @@ public class LongDataTypeTransformer implements DataTypeTransformer {
     return doubleValue == (long) doubleValue;
   }
 
-  protected Long transformString(String value) {
+  protected long transformString(String value) {
     return Long.parseLong(value);
   }
 

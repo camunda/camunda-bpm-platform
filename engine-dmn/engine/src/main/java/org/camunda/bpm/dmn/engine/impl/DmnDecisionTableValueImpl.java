@@ -15,13 +15,14 @@ package org.camunda.bpm.dmn.engine.impl;
 
 import org.camunda.bpm.dmn.engine.DmnClause;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableValue;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 public class DmnDecisionTableValueImpl implements DmnDecisionTableValue {
 
   protected String key;
   protected String name;
   protected String outputName;
-  protected Object value;
+  protected TypedValue value;
 
   public DmnDecisionTableValueImpl() {
 
@@ -57,14 +58,15 @@ public class DmnDecisionTableValueImpl implements DmnDecisionTableValue {
     this.outputName = outputName;
   }
 
-  public Object getValue() {
+  public TypedValue getValue() {
     return value;
   }
 
-  public void setValue(Object value) {
+  public void setValue(TypedValue value) {
     this.value = value;
   }
 
+  @Override
   public String toString() {
     return "DmnDecisionTableValueImpl{" +
       "key='" + key + '\'' +
@@ -74,6 +76,7 @@ public class DmnDecisionTableValueImpl implements DmnDecisionTableValue {
       '}';
   }
 
+  @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
@@ -87,6 +90,7 @@ public class DmnDecisionTableValueImpl implements DmnDecisionTableValue {
 
   }
 
+  @Override
   public int hashCode() {
     int result = key != null ? key.hashCode() : 0;
     result = 31 * result + (name != null ? name.hashCode() : 0);

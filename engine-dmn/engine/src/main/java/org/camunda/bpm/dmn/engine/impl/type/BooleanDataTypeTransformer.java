@@ -13,28 +13,32 @@
 package org.camunda.bpm.dmn.engine.impl.type;
 
 import org.camunda.bpm.dmn.engine.type.DataTypeTransformer;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.BooleanValue;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
- * Transform values of type {@link String} into {@link Boolean}.
+ * Transform values of type {@link String} into {@link BooleanValue}.
  *
  * @author Philipp Ossler
  */
 public class BooleanDataTypeTransformer implements DataTypeTransformer {
 
   @Override
-  public Object transform(Object value) throws IllegalArgumentException {
+  public TypedValue transform(Object value) throws IllegalArgumentException {
     if (value instanceof Boolean) {
-      return value;
+      return Variables.booleanValue((Boolean) value);
 
     } else if (value instanceof String) {
-      return transformString((String) value);
+      boolean booleanValue = transformString((String) value);
+      return Variables.booleanValue(booleanValue);
 
     } else {
       throw new IllegalArgumentException();
     }
   }
 
-  protected Boolean transformString(String value) {
+  protected boolean transformString(String value) {
     if (value.equalsIgnoreCase("true")) {
       return true;
     } else if (value.equalsIgnoreCase("false")) {

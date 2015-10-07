@@ -26,6 +26,7 @@ import org.camunda.bpm.dmn.engine.hitpolicy.DmnHitPolicyAggregator;
 import org.camunda.bpm.dmn.engine.hitpolicy.DmnHitPolicyHandler;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableResultImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnLogger;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.bpm.model.dmn.BuiltinAggregator;
 
 public class CollectHitPolicyHandler implements DmnHitPolicyHandler {
@@ -73,7 +74,8 @@ public class CollectHitPolicyHandler implements DmnHitPolicyHandler {
         continue; // skip empty output
       }
       else if (outputs.size() == 1) {
-        values.add(outputs.values().iterator().next().getValue());
+        TypedValue typedValue = outputs.values().iterator().next().getValue();
+        values.add(typedValue.getValue());
       }
       else {
         throw LOG.aggregationNotApplicableOnCompoundOutput(aggregator, outputs);

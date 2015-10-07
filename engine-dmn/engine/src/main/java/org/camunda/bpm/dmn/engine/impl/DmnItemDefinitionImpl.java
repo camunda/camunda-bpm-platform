@@ -22,7 +22,7 @@ import org.camunda.bpm.dmn.engine.DmnTypeDefinition;
 
 public class DmnItemDefinitionImpl extends DmnElementImpl implements DmnItemDefinition {
 
-  protected DmnTypeDefinition typeDefinition;
+  protected DmnTypeDefinition typeDefinition = new DefaultTypeDefinition();
   protected List<DmnExpression> allowedValues = new ArrayList<DmnExpression>();
 
   public DmnTypeDefinition getTypeDefinition() {
@@ -45,6 +45,7 @@ public class DmnItemDefinitionImpl extends DmnElementImpl implements DmnItemDefi
     allowedValues.add(allowedValue);
   }
 
+  @Override
   public String toString() {
     return "DmnItemDefinitionImpl{" +
       "key='" + key + '\'' +

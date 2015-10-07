@@ -13,17 +13,21 @@
 package org.camunda.bpm.dmn.engine.impl.type;
 
 import org.camunda.bpm.dmn.engine.type.DataTypeTransformer;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.StringValue;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
- * Transform values of type {@link Object} into {@link String}.
+ * Transform values of type {@link Object} into {@link StringValue}.
  *
  * @author Philipp Ossler
  */
 public class StringDataTypeTransformer implements DataTypeTransformer {
 
   @Override
-  public Object transform(Object value) throws IllegalArgumentException {
-    return String.valueOf(value);
+  public TypedValue transform(Object value) throws IllegalArgumentException {
+    String stringValue = String.valueOf(value);
+    return Variables.stringValue(stringValue);
   }
 
 }

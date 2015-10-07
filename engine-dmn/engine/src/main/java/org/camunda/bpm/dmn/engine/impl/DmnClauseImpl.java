@@ -32,7 +32,7 @@ public class DmnClauseImpl extends DmnElementImpl implements DmnClause {
   protected List<DmnClauseEntry> inputEntries = new ArrayList<DmnClauseEntry>();
   protected List<DmnExpression> outputEntries = new ArrayList<DmnExpression>();
 
-  protected DmnItemDefinition outputDefinition;
+  protected DmnItemDefinition outputDefinition = new DefaultItemDefinition();
 
   public DmnExpression getInputExpression() {
     return inputExpression;

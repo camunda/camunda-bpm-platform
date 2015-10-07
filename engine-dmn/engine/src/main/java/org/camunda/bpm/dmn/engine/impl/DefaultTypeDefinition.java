@@ -10,22 +10,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.dmn.engine.impl.type;
+package org.camunda.bpm.dmn.engine.impl;
 
-import org.camunda.bpm.dmn.engine.type.DataTypeTransformer;
+import org.camunda.bpm.dmn.engine.DmnTypeDefinition;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
- * Transform the given value into untyped value.
- *
  * @author Philipp Ossler
  */
-public class IdentityDataTypeTransformer implements DataTypeTransformer {
+public class DefaultTypeDefinition implements DmnTypeDefinition {
 
   @Override
   public TypedValue transform(Object value) throws IllegalArgumentException {
     return Variables.untypedValue(value);
+  }
+
+  @Override
+  public String getTypeName() {
+    return "untyped";
+  }
+
+  @Override
+  public String toString() {
+    return "DefaultTypeDefinition []";
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    return true;
   }
 
 }

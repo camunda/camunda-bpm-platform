@@ -13,28 +13,33 @@
 package org.camunda.bpm.dmn.engine.impl.type;
 
 import org.camunda.bpm.dmn.engine.type.DataTypeTransformer;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.IntegerValue;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
- * Transform values of type {@link Number} and {@link String} into {@link Integer}.
+ * Transform values of type {@link Number} and {@link String} into {@link IntegerValue}.
  *
  * @author Philipp Ossler
  */
 public class IntegerDataTypeTransformer implements DataTypeTransformer {
 
   @Override
-  public Object transform(Object value) throws IllegalArgumentException {
+  public TypedValue transform(Object value) throws IllegalArgumentException {
     if (value instanceof Number) {
-      return transformNumber((Number) value);
+      int intValue = transformNumber((Number) value);
+      return Variables.integerValue(intValue);
 
     } else if (value instanceof String) {
-      return transformString((String) value);
+      int intValue = transformString((String) value);
+      return Variables.integerValue(intValue);
 
     } else {
       throw new IllegalArgumentException();
     }
   }
 
-  protected Integer transformNumber(Number value) {
+  protected int transformNumber(Number value) {
     if(isInteger(value)){
       return value.intValue();
     } else {
@@ -47,7 +52,7 @@ public class IntegerDataTypeTransformer implements DataTypeTransformer {
     return doubleValue == (int) doubleValue;
   }
 
-  protected Integer transformString(String value) {
+  protected int transformString(String value) {
     return Integer.parseInt(value);
   }
 

@@ -17,6 +17,8 @@ import static org.camunda.commons.utils.EnsureUtil.ensureNotNull;
 
 import org.camunda.bpm.dmn.engine.DmnTypeDefinition;
 import org.camunda.bpm.dmn.engine.type.DataTypeTransformer;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 public class DmnTypeDefinitionImpl implements DmnTypeDefinition {
 
@@ -27,15 +29,15 @@ public class DmnTypeDefinitionImpl implements DmnTypeDefinition {
   protected DataTypeTransformer transformer;
 
   @Override
-  public Object transform(Object value) {
+  public TypedValue transform(Object value) {
     if (value == null) {
-      return value;
+      return Variables.untypedNullValue();
     } else {
       return transformNotNullValue(value);
     }
   }
 
-  protected Object transformNotNullValue(Object value) {
+  protected TypedValue transformNotNullValue(Object value) {
     ensureNotNull("transformer", transformer);
 
     try {
