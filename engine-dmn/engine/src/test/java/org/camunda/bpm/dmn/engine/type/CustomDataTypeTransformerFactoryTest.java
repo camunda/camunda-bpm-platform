@@ -55,7 +55,7 @@ public class CustomDataTypeTransformerFactoryTest {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("output", 21);
 
-    assertThat(engine).evaluates(decision, variables).hasResult(CustomDataTypeTransformer.CUSTOM_OBJECT);
+    assertThat(engine).evaluates(decision, variables).hasResultValue(CustomDataTypeTransformer.CUSTOM_OBJECT.getValue());
   }
 
   @Test

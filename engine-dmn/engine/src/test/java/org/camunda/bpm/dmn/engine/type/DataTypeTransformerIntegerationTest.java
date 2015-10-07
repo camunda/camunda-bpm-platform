@@ -69,7 +69,7 @@ public class DataTypeTransformerIntegerationTest {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("output", 21);
 
-    assertThat(engine).evaluates(decision, variables).hasResult(TRANSFORMED_VALUE);
+    assertThat(engine).evaluates(decision, variables).hasResultValue(TRANSFORMED_VALUE.getValue());
 
     verify(dataTypeTransformerMock, atLeastOnce()).transform(21);
   }
@@ -80,7 +80,7 @@ public class DataTypeTransformerIntegerationTest {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("output", null);
 
-    assertThat(engine).evaluates(decision, variables).hasResult(Variables.untypedNullValue());
+    assertThat(engine).evaluates(decision, variables).hasResultValue(null);
 
     verify(dataTypeTransformerMock, never()).transform(any());
   }
