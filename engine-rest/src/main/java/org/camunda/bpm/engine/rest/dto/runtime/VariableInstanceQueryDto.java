@@ -123,6 +123,46 @@ public class VariableInstanceQueryDto extends AbstractQueryDto<VariableInstanceQ
   protected VariableInstanceQuery createNewQuery(ProcessEngine engine) {
     return engine.getRuntimeService().createVariableInstanceQuery();
   }
+  
+  public String getVariableName() {
+		return variableName;
+	}
+
+	public String getVariableNameLike() {
+		return variableNameLike;
+	}
+
+	public List<VariableQueryParameterDto> getVariableValues() {
+		return variableValues;
+	}
+
+	public String[] getExecutionIdIn() {
+		return executionIdIn;
+	}
+
+	public String[] getProcessInstanceIdIn() {
+		return processInstanceIdIn;
+	}
+
+	public String[] getCaseExecutionIdIn() {
+		return caseExecutionIdIn;
+	}
+
+	public String[] getCaseInstanceIdIn() {
+		return caseInstanceIdIn;
+	}
+
+	public String[] getTaskIdIn() {
+		return taskIdIn;
+	}
+
+	public String[] getVariableScopeIdIn() {
+		return variableScopeIdIn;
+	}
+
+	public String[] getActivityInstanceIdIn() {
+		return activityInstanceIdIn;
+	}
 
   @Override
   protected void applyFilters(VariableInstanceQuery query) {
