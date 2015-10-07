@@ -50,9 +50,11 @@ import org.camunda.bpm.model.dmn.HitPolicy;
 
 public class DmnDecisionContextImpl implements DmnDecisionContext {
 
+  public static final String DEFAULT_SCRIPT_LANGUAGE = JuelScriptEngineFactory.NAME;
+
   protected static final DmnEngineLogger LOG = DmnEngineLogger.ENGINE_LOGGER;
 
-  public static final String DEFAULT_SCRIPT_LANGUAGE = JuelScriptEngineFactory.NAME;
+  protected static final String TYPED_INPUT_VALUE_POSTFIX = "_typed";
 
   protected DmnScriptEngineResolver scriptEngineResolver;
   protected Map<HitPolicy, DmnHitPolicyHandler> hitPolicyHandlers;
@@ -213,7 +215,10 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
       // set input clause variable
       if (inputs.containsKey(clauseKey)) {
         DmnDecisionTableValue inputValue = inputs.get(clauseKey);
-        localVariables.put(inputValue.getOutputName(), inputValue.getValue());
+        TypedValue typedValue = inputValue.getValue();
+        // set variable as typed and as unboxed value
+        localVariables.put(inputValue.getOutputName(), typedValue.getValue());
+        localVariables.put(inputValue.getOutputName() + TYPED_INPUT_VALUE_POSTFIX, typedValue);
       }
 
       boolean applicable = isExpressionApplicable(condition, localVariables, evaluationCache);
