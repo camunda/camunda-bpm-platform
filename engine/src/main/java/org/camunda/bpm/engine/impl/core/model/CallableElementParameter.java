@@ -12,9 +12,13 @@
  */
 package org.camunda.bpm.engine.impl.core.model;
 
+import java.util.Map;
+
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ConstantValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableScopeLocalAdapter;
+import org.camunda.bpm.engine.variable.VariableMap;
 
 /**
  * @author Roman Smirnov
@@ -25,18 +29,36 @@ public class CallableElementParameter {
   protected ParameterValueProvider sourceValueProvider;
   protected String target;
   protected boolean allVariables;
+  protected boolean readLocal = false;
 
   // source ////////////////////////////////////////////////////////
 
   public Object getSource(VariableScope variableScope) {
     if (sourceValueProvider instanceof ConstantValueProvider) {
       String variableName = (String) sourceValueProvider.getValue(variableScope);
+
       return variableScope.getVariableTyped(variableName);
 
     } else {
+
       return sourceValueProvider.getValue(variableScope);
     }
 
+  }
+
+  public void applyTo(VariableScope variableScope, VariableMap variables) {
+    if (readLocal) {
+      variableScope = new VariableScopeLocalAdapter(variableScope);
+    }
+
+    if (allVariables) {
+      Map<String, Object> allVariables = variableScope.getVariables();
+      variables.putAll(allVariables);
+
+    } else {
+      Object value = getSource(variableScope);
+      variables.put(target, value);
+    }
   }
 
   public ParameterValueProvider getSourceValueProvider() {
@@ -65,6 +87,16 @@ public class CallableElementParameter {
 
   public void setAllVariables(boolean allVariables) {
     this.allVariables = allVariables;
+  }
+
+  // local
+
+  public void setReadLocal(boolean readLocal) {
+    this.readLocal = readLocal;
+  }
+
+  public boolean isReadLocal() {
+    return readLocal;
   }
 
 }

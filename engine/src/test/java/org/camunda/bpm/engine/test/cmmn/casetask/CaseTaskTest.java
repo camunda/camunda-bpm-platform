@@ -798,6 +798,34 @@ public class CaseTaskTest extends CmmnProcessEngineTestCase {
   }
 
   @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/casetask/CaseTaskTest.testInputAllLocal.cmmn",
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
+    })
+  public void testInputAllLocal() {
+    // given
+    createCaseInstanceByKey(ONE_CASE_TASK_CASE).getId();
+    String caseTaskId = queryCaseExecutionByActivityId(CASE_TASK).getId();
+
+    // when
+    caseService
+      .withCaseExecution(caseTaskId)
+      .setVariable("aVariable", "abc")
+      .setVariableLocal("aLocalVariable", "def")
+      .manualStart();
+
+    // then only the local variable is mapped to the subCaseInstance
+    CaseInstance subCaseInstance = queryOneTaskCaseInstance();
+
+    List<VariableInstance> variables = runtimeService
+        .createVariableInstanceQuery()
+        .caseInstanceIdIn(subCaseInstance.getId())
+        .list();
+
+    assertEquals(1, variables.size());
+    assertEquals("aLocalVariable", variables.get(0).getName());
+  }
+
+  @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/cmmn/oneCaseTaskCase.cmmn"
     })
   public void testCaseNotFound() {

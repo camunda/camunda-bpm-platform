@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 import org.camunda.bpm.engine.runtime.Job;
@@ -50,7 +51,7 @@ import org.camunda.bpm.model.bpmn.instance.camunda.CamundaOut;
  * @author Bernd Ruecker
  * @author Falko Menge
  */
-public class CallActivityAdvancedTest extends PluggableProcessEngineTestCase {
+public class CallActivityTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcess.bpmn20.xml",
@@ -896,6 +897,200 @@ public class CallActivityAdvancedTest extends PluggableProcessEngineTestCase {
     assertEquals(0, runtimeService.createExecutionQuery().list().size());
   }
 
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessLocalInputAllVariables.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
+  public void testSubProcessLocalInputAllVariables() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessLocalInputAllVariables");
+    Task beforeCallActivityTask = taskService.createTaskQuery().singleResult();
+
+    // when setting a variable in a process instance
+    runtimeService.setVariable(processInstance.getId(), "callingProcessVar1", "val1");
+
+    // and executing the call activity
+    taskService.complete(beforeCallActivityTask.getId());
+
+    // then only the local variable specified in the io mapping is passed to the called instance
+    ProcessInstance calledInstance = runtimeService.createProcessInstanceQuery()
+      .superProcessInstanceId(processInstance.getId())
+      .singleResult();
+
+    Map<String, Object> calledInstanceVariables = runtimeService.getVariables(calledInstance.getId());
+    assertEquals(1, calledInstanceVariables.size());
+    assertEquals("val2", calledInstanceVariables.get("inputParameter"));
+
+    // when setting a variable in the called process instance
+    runtimeService.setVariable(calledInstance.getId(), "calledProcessVar1", 42L);
+
+    // and completing it
+    Task calledProcessInstanceTask = taskService.createTaskQuery().singleResult();
+    taskService.complete(calledProcessInstanceTask.getId());
+
+    // then the call activity output variable has been mapped to the process instance execution
+    // and the output mapping variable as well
+    Map<String, Object> callingInstanceVariables = runtimeService.getVariables(processInstance.getId());
+    assertEquals(3, callingInstanceVariables.size());
+    assertEquals("val1", callingInstanceVariables.get("callingProcessVar1"));
+    assertEquals(42L, callingInstanceVariables.get("calledProcessVar1"));
+    assertEquals(43L, callingInstanceVariables.get("outputParameter"));
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessLocalInputSingleVariable.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
+  public void testSubProcessLocalInputSingleVariable() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessLocalInputSingleVariable");
+    Task beforeCallActivityTask = taskService.createTaskQuery().singleResult();
+
+    // when setting a variable in a process instance
+    runtimeService.setVariable(processInstance.getId(), "callingProcessVar1", "val1");
+
+    // and executing the call activity
+    taskService.complete(beforeCallActivityTask.getId());
+
+    // then the local variable specified in the io mapping is passed to the called instance
+    ProcessInstance calledInstance = runtimeService.createProcessInstanceQuery()
+      .superProcessInstanceId(processInstance.getId())
+      .singleResult();
+
+    Map<String, Object> calledInstanceVariables = runtimeService.getVariables(calledInstance.getId());
+    assertEquals(1, calledInstanceVariables.size());
+    assertEquals("val2", calledInstanceVariables.get("mappedInputParameter"));
+
+    // when setting a variable in the called process instance
+    runtimeService.setVariable(calledInstance.getId(), "calledProcessVar1", 42L);
+
+    // and completing it
+    Task calledProcessInstanceTask = taskService.createTaskQuery().singleResult();
+    taskService.complete(calledProcessInstanceTask.getId());
+
+    // then the call activity output variable has been mapped to the process instance execution
+    // and the output mapping variable as well
+    Map<String, Object> callingInstanceVariables = runtimeService.getVariables(processInstance.getId());
+    assertEquals(4, callingInstanceVariables.size());
+    assertEquals("val1", callingInstanceVariables.get("callingProcessVar1"));
+    assertEquals("val2", calledInstanceVariables.get("mappedInputParameter"));
+    assertEquals(42L, callingInstanceVariables.get("calledProcessVar1"));
+    assertEquals(43L, callingInstanceVariables.get("outputParameter"));
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessLocalInputSingleVariableExpression.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
+  public void testSubProcessLocalInputSingleVariableExpression() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessLocalInputSingleVariableExpression");
+    Task beforeCallActivityTask = taskService.createTaskQuery().singleResult();
+
+    // when executing the call activity
+    taskService.complete(beforeCallActivityTask.getId());
+
+    // then the local input parameter can be resolved because its source expression variable
+    // is defined in the call activity's input mapping
+    ProcessInstance calledInstance = runtimeService.createProcessInstanceQuery()
+      .superProcessInstanceId(processInstance.getId())
+      .singleResult();
+
+    Map<String, Object> calledInstanceVariables = runtimeService.getVariables(calledInstance.getId());
+    assertEquals(1, calledInstanceVariables.size());
+    assertEquals(43L, calledInstanceVariables.get("mappedInputParameter"));
+
+    //
+    Task callActivityTask = taskService.createTaskQuery().singleResult();
+    taskService.complete(callActivityTask.getId());
+
+    // and executing a call activity in parameter where the source variable is not mapped by an activity
+    // input parameter fails
+
+    Task beforeSecondCallActivityTask = taskService.createTaskQuery().singleResult();
+    runtimeService.setVariable(processInstance.getId(), "globalVariable", "42");
+
+    try {
+      taskService.complete(beforeSecondCallActivityTask.getId());
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Cannot resolve identifier 'globalVariable'", e.getMessage());
+    }
+
+
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessLocalOutputAllVariables.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
+  public void testSubProcessLocalOutputAllVariables() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessLocalOutputAllVariables");
+    Task beforeCallActivityTask = taskService.createTaskQuery().singleResult();
+
+    // when setting a variable in a process instance
+    runtimeService.setVariable(processInstance.getId(), "callingProcessVar1", "val1");
+
+    // and executing the call activity
+    taskService.complete(beforeCallActivityTask.getId());
+
+    // then all variables have been mapped into the called instance
+    ProcessInstance calledInstance = runtimeService.createProcessInstanceQuery()
+      .superProcessInstanceId(processInstance.getId())
+      .singleResult();
+
+    Map<String, Object> calledInstanceVariables = runtimeService.getVariables(calledInstance.getId());
+    assertEquals(2, calledInstanceVariables.size());
+    assertEquals("val1", calledInstanceVariables.get("callingProcessVar1"));
+    assertEquals("val2", calledInstanceVariables.get("inputParameter"));
+
+    // when setting a variable in the called process instance
+    runtimeService.setVariable(calledInstance.getId(), "calledProcessVar1", 42L);
+
+    // and completing it
+    Task calledProcessInstanceTask = taskService.createTaskQuery().singleResult();
+    taskService.complete(calledProcessInstanceTask.getId());
+
+    // then only the output mapping variable has been mapped into the calling process instance
+    Map<String, Object> callingInstanceVariables = runtimeService.getVariables(processInstance.getId());
+    assertEquals(2, callingInstanceVariables.size());
+    assertEquals("val1", callingInstanceVariables.get("callingProcessVar1"));
+    assertEquals(43L, callingInstanceVariables.get("outputParameter"));
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessLocalOutputSingleVariable.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
+  public void testSubProcessLocalOutputSingleVariable() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessLocalOutputSingleVariable");
+    Task beforeCallActivityTask = taskService.createTaskQuery().singleResult();
+
+    // when setting a variable in a process instance
+    runtimeService.setVariable(processInstance.getId(), "callingProcessVar1", "val1");
+
+    // and executing the call activity
+    taskService.complete(beforeCallActivityTask.getId());
+
+    // then all variables have been mapped into the called instance
+    ProcessInstance calledInstance = runtimeService.createProcessInstanceQuery()
+      .superProcessInstanceId(processInstance.getId())
+      .singleResult();
+
+    Map<String, Object> calledInstanceVariables = runtimeService.getVariables(calledInstance.getId());
+    assertEquals(2, calledInstanceVariables.size());
+    assertEquals("val1", calledInstanceVariables.get("callingProcessVar1"));
+    assertEquals("val2", calledInstanceVariables.get("inputParameter"));
+
+    // when setting a variable in the called process instance
+    runtimeService.setVariable(calledInstance.getId(), "calledProcessVar1", 42L);
+
+    // and completing it
+    Task calledProcessInstanceTask = taskService.createTaskQuery().singleResult();
+    taskService.complete(calledProcessInstanceTask.getId());
+
+    // then only the output mapping variable has been mapped into the calling process instance
+    Map<String, Object> callingInstanceVariables = runtimeService.getVariables(processInstance.getId());
+    assertEquals(2, callingInstanceVariables.size());
+    assertEquals("val1", callingInstanceVariables.get("callingProcessVar1"));
+    assertEquals(43L, callingInstanceVariables.get("outputParameter"));
+  }
+
+  // TODO: test mit expression auf einzelner variable => nur lokale Variable sollte verfügbar sein
+  // TODO: also for CMMN (useful there?)
+
   /**
    * Test case for handing businessKey to a sub process
    */
@@ -1275,5 +1470,27 @@ public class CallActivityAdvancedTest extends PluggableProcessEngineTestCase {
     repositoryService.deleteDeployment(secondDeploymentId, true);
     repositoryService.deleteDeployment(thirdDeploymentId, true);
   }
+
+  @Deployment(resources={
+      "org/camunda/bpm/engine/test/examples/bpmn/callactivity/orderProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/examples/bpmn/callactivity/checkCreditProcess.bpmn20.xml"
+    })
+    public void testOrderProcessWithCallActivity() {
+      // After the process has started, the 'verify credit history' task should be active
+      ProcessInstance pi = runtimeService.startProcessInstanceByKey("orderProcess");
+      TaskQuery taskQuery = taskService.createTaskQuery();
+      Task verifyCreditTask = taskQuery.singleResult();
+      assertEquals("Verify credit history", verifyCreditTask.getName());
+
+      // Verify with Query API
+      ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(pi.getId()).singleResult();
+      assertNotNull(subProcessInstance);
+      assertEquals(pi.getId(), runtimeService.createProcessInstanceQuery().subProcessInstanceId(subProcessInstance.getId()).singleResult().getId());
+
+      // Completing the task with approval, will end the subprocess and continue the original process
+      taskService.complete(verifyCreditTask.getId(), CollectionUtil.singletonMap("creditApproved", true));
+      Task prepareAndShipTask = taskQuery.singleResult();
+      assertEquals("Prepare and Ship", prepareAndShipTask.getName());
+    }
 
 }

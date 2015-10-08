@@ -14,7 +14,6 @@ package org.camunda.bpm.engine.impl.core.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
@@ -30,10 +29,12 @@ public class CallableElement extends BaseCallableElement {
   protected ParameterValueProvider businessKeyValueProvider;
   protected List<CallableElementParameter> inputs;
   protected List<CallableElementParameter> outputs;
+  protected List<CallableElementParameter> outputsLocal;
 
   public CallableElement() {
     this.inputs = new ArrayList<CallableElementParameter>();
     this.outputs = new ArrayList<CallableElementParameter>();
+    this.outputsLocal = new ArrayList<CallableElementParameter>();
   }
 
   // definitionKey ////////////////////////////////////////////////////////////////
@@ -91,8 +92,16 @@ public class CallableElement extends BaseCallableElement {
     return outputs;
   }
 
+  public List<CallableElementParameter> getOutputsLocal() {
+    return outputsLocal;
+  }
+
   public void addOutput(CallableElementParameter output) {
     outputs.add(output);
+  }
+
+  public void addOutputLocal(CallableElementParameter output) {
+    outputsLocal.add(output);
   }
 
   public void addOutputs(List<CallableElementParameter> outputs) {
@@ -104,23 +113,18 @@ public class CallableElement extends BaseCallableElement {
     return getVariables(outputs, variableScope);
   }
 
+  public VariableMap getOutputVariablesLocal(VariableScope variableScope) {
+    List<CallableElementParameter> outputs = getOutputsLocal();
+    return getVariables(outputs, variableScope);
+  }
+
   // variables //////////////////////////////////////////////////////////////////
 
   protected VariableMap getVariables(List<CallableElementParameter> params, VariableScope variableScope) {
     VariableMap result = Variables.createVariables();
 
     for (CallableElementParameter param : params) {
-
-      if (param.isAllVariables()) {
-        Map<String, Object> allVariables = variableScope.getVariables();
-        result.putAll(allVariables);
-
-      } else {
-        String targetVariableName = param.getTarget();
-        Object value = param.getSource(variableScope);
-        result.put(targetVariableName, value);
-      }
-
+      param.applyTo(variableScope, result);
     }
 
     return result;

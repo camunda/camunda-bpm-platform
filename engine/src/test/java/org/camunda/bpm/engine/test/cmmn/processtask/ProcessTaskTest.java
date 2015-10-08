@@ -855,6 +855,34 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
 
   }
 
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/cmmn/processtask/ProcessTaskTest.testInputAllLocal.cmmn",
+      "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"
+    })
+  public void testInputAllLocal() {
+    // given
+    createCaseInstanceByKey(ONE_PROCESS_TASK_CASE).getId();
+    String caseTaskId = queryCaseExecutionByActivityId(PROCESS_TASK).getId();
+
+    // when
+    caseService
+      .withCaseExecution(caseTaskId)
+      .setVariable("aVariable", "abc")
+      .setVariableLocal("aLocalVariable", "def")
+      .manualStart();
+
+    // then only the local variable is mapped to the sub process instance
+    ProcessInstance subProcessInstance = queryProcessInstance();
+
+    List<VariableInstance> variables = runtimeService
+        .createVariableInstanceQuery()
+        .processInstanceIdIn(subProcessInstance.getId())
+        .list();
+
+    assertEquals(1, variables.size());
+    assertEquals("aLocalVariable", variables.get(0).getName());
+  }
+
 
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/cmmn/processtask/ProcessTaskTest.testInputOverlapping.cmmn",
@@ -1396,7 +1424,7 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     assertCaseEnded(caseInstanceId);
 
   }
-  
+
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/cmmn/processtask/ProcessTaskTest.testInputOutputAll.cmmn",
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"
@@ -1422,7 +1450,7 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     assertThat(value, is(variableValue));
     value = runtimeService.getVariableTyped(processInstanceId, variableName2);
     assertThat(value, is(variableValue2));
-    
+
     String taskId = queryTask().getId();
 
     TypedValue variableValue3 = Variables.integerValue(1);
@@ -1442,7 +1470,7 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     close(caseInstanceId);
     assertCaseEnded(caseInstanceId);
   }
-  
+
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/cmmn/processtask/ProcessTaskTest.testVariablesRoundtrip.cmmn",
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"
@@ -1465,7 +1493,7 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     assertThat(value, is(caseVariableValue));
     value = runtimeService.getVariableTyped(processInstanceId, variableName2);
     assertThat(value, is(caseVariableValue2));
-    
+
 
     TypedValue processVariableValue = Variables.stringValue("cba");
     TypedValue processVariableValue2 = Variables.booleanValue(null);
@@ -1487,7 +1515,7 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     assertCaseEnded(caseInstanceId);
 
   }
-  
+
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/api/cmmn/oneProcessTaskCase.cmmn",
       "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"
@@ -1898,7 +1926,7 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     // then
     assertEquals("processTask", processTask.getActivityType());
   }
-  
+
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/processtask/ProcessTaskTest.testOutputAll.cmmn",
       "org/camunda/bpm/engine/test/cmmn/processtask/subProcessWithError.bpmn"})
   public void testOutputWhenErrorOccurs() {
@@ -1918,7 +1946,7 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     assertThat(variable, is(notNullValue()));
     assertThat(variable, is(variableValue));
   }
-  
+
   @Deployment(resources = {"org/camunda/bpm/engine/test/cmmn/processtask/ProcessTaskTest.testOutputAll.cmmn",
   "org/camunda/bpm/engine/test/cmmn/processtask/subProcessWithThrownError.bpmn"})
   public void testOutputWhenThrownBpmnErrorOccurs() {
@@ -1933,7 +1961,7 @@ public class ProcessTaskTest extends CmmnProcessEngineTestCase {
     Object variableValue = "bar";
     runtimeService.setVariable(task.getProcessInstanceId(), variableName, variableValue);
     taskService.complete(task.getId());
-    
+
     Object variable = caseService.getVariable(caseInstanceId, variableName);
     assertThat(variable, is(notNullValue()));
     assertThat(variable, is(variableValue));
