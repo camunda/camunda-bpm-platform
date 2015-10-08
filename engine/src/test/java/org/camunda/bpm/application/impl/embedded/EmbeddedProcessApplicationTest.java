@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
 import org.camunda.bpm.engine.repository.Resource;
 
 /**
@@ -140,6 +141,20 @@ public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCa
 
     processApplication.undeploy();
     assertEquals(0, repositoryService.createDeploymentQuery().count());
+  }
+
+  public void testDeploymentSourceProperty() {
+    registerProcessEngine();
+
+    TestApplicationWithResources processApplication = new TestApplicationWithResources();
+    processApplication.deploy();
+
+    Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
+
+    assertNotNull(deployment);
+    assertEquals(ProcessApplicationDeployment.PROCESS_APPLICATION_DEPLOYMENT_SOURCE, deployment.getSource());
+
+    processApplication.undeploy();
   }
 
 }

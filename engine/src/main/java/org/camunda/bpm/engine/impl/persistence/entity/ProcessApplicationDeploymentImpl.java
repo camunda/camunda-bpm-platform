@@ -44,6 +44,10 @@ public class ProcessApplicationDeploymentImpl implements ProcessApplicationDeplo
     return deployment.getDeploymentTime();
   }
 
+  public String getSource() {
+    return deployment.getSource();
+  }
+
   public ProcessApplicationRegistration getProcessApplicationRegistration() {
     return registration;
   }

@@ -151,3 +151,8 @@ alter table ACT_RU_EXT_TASK
     references ACT_RU_EXECUTION (ID_);
 
 create index ACT_IDX_EXT_TASK_TOPIC ON ACT_RU_EXT_TASK(TOPIC_NAME_);
+
+-- deployment --
+
+ALTER TABLE ACT_RE_DEPLOYMENT 
+  ADD SOURCE_ varchar(255);

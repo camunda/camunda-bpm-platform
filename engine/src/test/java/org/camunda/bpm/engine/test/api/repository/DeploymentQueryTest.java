@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
+import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
 
 
 /**
@@ -40,6 +41,7 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
       .createDeployment()
       .name("org/camunda/bpm/engine/test/repository/one.bpmn20.xml")
       .addClasspathResource("org/camunda/bpm/engine/test/repository/one.bpmn20.xml")
+      .source(ProcessApplicationDeployment.PROCESS_APPLICATION_DEPLOYMENT_SOURCE)
       .deploy()
       .getId();
 
@@ -168,6 +170,33 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  public void testQueryBySource() {
+    DeploymentQuery query = repositoryService
+        .createDeploymentQuery()
+        .deploymentSource(ProcessApplicationDeployment.PROCESS_APPLICATION_DEPLOYMENT_SOURCE);
+
+    assertEquals(1, query.list().size());
+    assertEquals(1, query.count());
+  }
+
+  public void testQueryByNullSource() {
+    DeploymentQuery query = repositoryService
+        .createDeploymentQuery()
+        .deploymentSource(null);
+
+    assertEquals(1, query.list().size());
+    assertEquals(1, query.count());
+  }
+
+  public void testQueryByInvalidSource() {
+    DeploymentQuery query = repositoryService
+        .createDeploymentQuery()
+        .deploymentSource("invalid");
+
+    assertEquals(0, query.list().size());
+    assertEquals(0, query.count());
+  }
+
   public void testQueryDeploymentBetween() throws Exception {
     Date later = DateTimeUtil.now().plus(10 * 3600).toDate();
     Date earlier = DateTimeUtil.now().minus(10 * 3600).toDate();
@@ -202,10 +231,12 @@ public class DeploymentQueryTest extends PluggableProcessEngineTestCase {
     Deployment deploymentOne = deployments.get(0);
     assertEquals("org/camunda/bpm/engine/test/repository/one.bpmn20.xml", deploymentOne.getName());
     assertEquals(deploymentOneId, deploymentOne.getId());
+    assertEquals(ProcessApplicationDeployment.PROCESS_APPLICATION_DEPLOYMENT_SOURCE, deploymentOne.getSource());
 
     Deployment deploymentTwo = deployments.get(1);
     assertEquals("org/camunda/bpm/engine/test/repository/two.bpmn20.xml", deploymentTwo.getName());
     assertEquals(deploymentTwoId, deploymentTwo.getId());
+    assertNull(deploymentTwo.getSource());
 
     deployments = repositoryService.createDeploymentQuery()
       .deploymentNameLike("%one%")

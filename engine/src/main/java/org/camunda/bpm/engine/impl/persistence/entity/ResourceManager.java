@@ -54,10 +54,11 @@ public class ResourceManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public Map<String, ResourceEntity> findLatestResourcesByDeploymentName(String deploymentName, Set<String> resourcesToFind) {
+  public Map<String, ResourceEntity> findLatestResourcesByDeploymentName(String deploymentName, Set<String> resourcesToFind, String source) {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("deploymentName", deploymentName);
     params.put("resourcesToFind", resourcesToFind);
+    params.put("source", source);
 
     List<ResourceEntity> resources = getDbEntityManager().selectList("selectLatestResourcesByDeploymentName", params);
 

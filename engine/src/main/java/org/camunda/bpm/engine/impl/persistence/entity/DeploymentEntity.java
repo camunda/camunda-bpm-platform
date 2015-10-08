@@ -38,6 +38,7 @@ public class DeploymentEntity implements Serializable, Deployment, DbEntity {
   protected Date deploymentTime;
   protected boolean validatingSchema = true;
   protected boolean isNew;
+  protected String source;
 
   /**
    * Will only be used during actual deployment to pass deployed artifacts (eg process definitions).
@@ -151,6 +152,14 @@ public class DeploymentEntity implements Serializable, Deployment, DbEntity {
     this.isNew = isNew;
   }
 
+  public String getSource() {
+    return source;
+  }
+
+  public void setSource(String source) {
+    this.source = source;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -160,6 +169,7 @@ public class DeploymentEntity implements Serializable, Deployment, DbEntity {
            + ", deploymentTime=" + deploymentTime
            + ", validatingSchema=" + validatingSchema
            + ", isNew=" + isNew
+           + ", source=" + source
            + "]";
   }
 }

@@ -238,6 +238,7 @@ public abstract class MockProvider {
   public static final String NON_EXISTING_DEPLOYMENT_ID = "aNonExistingDeploymentId";
   public static final String EXAMPLE_DEPLOYMENT_NAME = "aName";
   public static final String EXAMPLE_DEPLOYMENT_NAME_LIKE = "aNameLike";
+  public static final String EXAMPLE_DEPLOYMENT_SOURCE = "aDeploymentSource";
   public static final String EXAMPLE_DEPLOYMENT_TIME = "2013-01-23T13:59:43";
   public static final String EXAMPLE_DEPLOYMENT_TIME_BEFORE = "2013-01-03T13:59:43";
   public static final String EXAMPLE_DEPLOYMENT_TIME_AFTER = "2013-03-23T13:59:43";
@@ -1050,6 +1051,7 @@ public abstract class MockProvider {
     when(mockDeployment.getId()).thenReturn(EXAMPLE_DEPLOYMENT_ID);
     when(mockDeployment.getName()).thenReturn(EXAMPLE_DEPLOYMENT_NAME);
     when(mockDeployment.getDeploymentTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_DEPLOYMENT_TIME));
+    when(mockDeployment.getSource()).thenReturn(EXAMPLE_DEPLOYMENT_SOURCE);
 
     return mockDeployment;
   }

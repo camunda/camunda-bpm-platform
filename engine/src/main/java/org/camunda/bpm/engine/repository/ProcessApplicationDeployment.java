@@ -20,6 +20,8 @@ import org.camunda.bpm.application.ProcessApplicationRegistration;
  */
 public interface ProcessApplicationDeployment extends Deployment {
 
+  public static final String PROCESS_APPLICATION_DEPLOYMENT_SOURCE = "process application";
+
   /**
    * @return the {@link ProcessApplicationRegistration} performed for this process application deployment.
    */

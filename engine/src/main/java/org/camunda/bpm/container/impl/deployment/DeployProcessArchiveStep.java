@@ -106,6 +106,9 @@ public class DeployProcessArchiveStep extends DeploymentOperationStep {
     }
     deploymentBuilder.name(deploymentName);
 
+    // set the source of the deployment
+    deploymentBuilder.source(ProcessApplicationDeployment.PROCESS_APPLICATION_DEPLOYMENT_SOURCE);
+
     // enable duplicate filtering
     deploymentBuilder.enableDuplicateFiltering(PropertyHelper.getBooleanProperty(processArchive.getProperties(), ProcessArchiveXml.PROP_IS_DEPLOY_CHANGED_ONLY, false));
 

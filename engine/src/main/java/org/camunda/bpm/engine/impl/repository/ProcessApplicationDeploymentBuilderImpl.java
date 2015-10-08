@@ -93,6 +93,11 @@ public class ProcessApplicationDeploymentBuilderImpl extends DeploymentBuilderIm
   }
 
   @Override
+  public ProcessApplicationDeploymentBuilderImpl source(String source) {
+    return (ProcessApplicationDeploymentBuilderImpl) super.source(source);
+  }
+
+  @Override
   public ProcessApplicationDeploymentBuilderImpl enableDuplicateFiltering() {
     return (ProcessApplicationDeploymentBuilderImpl) super.enableDuplicateFiltering();
   }

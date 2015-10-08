@@ -82,6 +82,11 @@ public interface DeploymentBuilder {
   DeploymentBuilder activateProcessDefinitionsOn(Date date);
 
   /**
+   * Sets the source of a deployment.
+   */
+  DeploymentBuilder source(String source);
+
+  /**
    * Deploys all provided sources to the process engine.
    *
    * @throws AuthorizationException

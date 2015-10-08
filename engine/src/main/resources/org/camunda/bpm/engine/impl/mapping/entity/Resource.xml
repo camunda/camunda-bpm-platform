@@ -64,6 +64,14 @@
         inner join ${prefix}ACT_RE_DEPLOYMENT D
         on B.DEPLOYMENT_ID_ = D.ID_
       where D.NAME_ = #{parameter.deploymentName}
+        and
+        <if test="parameter.source != null">
+          (D.SOURCE_ = #{parameter.source} or
+        </if>
+          D.SOURCE_ is null
+        <if test="parameter.source != null">
+          )
+        </if>
       <if test="parameter.resourcesToFind != null &amp;&amp; parameter.resourcesToFind.size > 0">
         and B.NAME_ in 
         <foreach item="resourceName" index="index" collection="parameter.resourcesToFind"
@@ -78,6 +86,14 @@
     on B.DEPLOYMENT_ID_ = D.ID_
     and D.DEPLOY_TIME_ = LAST_RESOURCE.DEPLOY_TIME_ 
     and D.NAME_ = #{parameter.deploymentName}
+    and
+    <if test="parameter.source != null">
+      (D.SOURCE_ = #{parameter.source} or
+    </if>
+      D.SOURCE_ is null
+    <if test="parameter.source != null">
+      )
+    </if>
   </sql>
 
   <!-- postgresql specific -->

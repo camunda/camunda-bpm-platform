@@ -6,9 +6,9 @@ import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -116,10 +116,12 @@ public abstract class AbstractDeploymentRestServiceQueryTest extends AbstractRes
 
     String returnedId = from(content).getString("[0].id");
     String returnedName = from(content).getString("[0].name");
+    String returnedSource = from(content).getString("[0].source");
     String returnedDeploymentTime  = from(content).getString("[0].deploymentTime");
 
     Assert.assertEquals(MockProvider.EXAMPLE_DEPLOYMENT_ID, returnedId);
     Assert.assertEquals(MockProvider.EXAMPLE_DEPLOYMENT_NAME, returnedName);
+    Assert.assertEquals(MockProvider.EXAMPLE_DEPLOYMENT_SOURCE, returnedSource);
     Assert.assertEquals(MockProvider.EXAMPLE_DEPLOYMENT_TIME, returnedDeploymentTime);
   }
 
@@ -143,7 +145,37 @@ public abstract class AbstractDeploymentRestServiceQueryTest extends AbstractRes
     verify(mockedQuery).deploymentName(queryParameters.get("name"));
     verify(mockedQuery).deploymentNameLike(queryParameters.get("nameLike"));
     verify(mockedQuery).deploymentId(queryParameters.get("id"));
+    verify(mockedQuery).deploymentSource(queryParameters.get("source"));
     verify(mockedQuery).list();
+  }
+
+  @Test
+  public void testWithoutSourceParameter() {
+
+    given()
+      .queryParam("withoutSource", true)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(DEPLOYMENT_QUERY_URL);
+
+    // assert query invocation
+    verify(mockedQuery).deploymentSource(null);
+    verify(mockedQuery).list();
+  }
+
+  @Test
+  public void testSourceAndWithoutSource() {
+    given()
+      .queryParam("withoutSource", true)
+      .queryParam("source", "source")
+    .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("The query parameters \"withoutSource\" and \"source\" cannot be used in combination."))
+    .when()
+      .get(DEPLOYMENT_QUERY_URL);
   }
 
   @Test
@@ -178,6 +210,7 @@ public abstract class AbstractDeploymentRestServiceQueryTest extends AbstractRes
     parameters.put("id", "depId");
     parameters.put("name", "name");
     parameters.put("nameLike", "nameLike");
+    parameters.put("source", "source");
 
     return parameters;
   }

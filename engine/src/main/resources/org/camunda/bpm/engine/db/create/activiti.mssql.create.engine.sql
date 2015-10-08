@@ -31,6 +31,7 @@ create table ACT_RE_DEPLOYMENT (
     ID_ nvarchar(64),
     NAME_ nvarchar(255),
     DEPLOY_TIME_ datetime2,
+    SOURCE_ nvarchar(255),
     primary key (ID_)
 );
 

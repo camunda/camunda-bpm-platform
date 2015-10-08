@@ -1069,6 +1069,25 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
   }
 
   @Test
+  public void testCreateDeploymentWithDeploymentSource() throws Exception {
+
+    resourceNames.addAll( Arrays.asList("data", "more-data") );
+
+    // deploy-changed-only should override enable-duplicate-filtering
+    given()
+      .multiPart("data", "unspecified", createMockDeploymentResourceByteData())
+      .multiPart("enable-duplicate-filtering", "false")
+      .multiPart("deployment-source", "my-deployment-source")
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(CREATE_DEPLOYMENT_URL);
+
+    verify(mockDeploymentBuilder).source("my-deployment-source");
+
+  }
+
+  @Test
   public void testCreateDeploymentOnlyWithBytes() throws Exception {
 
     resourceNames.addAll(Arrays.asList("data", "more-data"));

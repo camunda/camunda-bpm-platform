@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.repository;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Collection;
@@ -19,6 +21,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.RepositoryServiceImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
@@ -29,8 +32,6 @@ import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Tom Baeyens
@@ -118,6 +119,11 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
 
   public DeploymentBuilder activateProcessDefinitionsOn(Date date) {
     this.processDefinitionsActivationDate = date;
+    return this;
+  }
+
+  public DeploymentBuilder source(String source) {
+    deployment.setSource(source);
     return this;
   }
 
