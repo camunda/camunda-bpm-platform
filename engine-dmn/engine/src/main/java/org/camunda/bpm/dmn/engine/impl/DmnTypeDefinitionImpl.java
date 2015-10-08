@@ -45,7 +45,7 @@ public class DmnTypeDefinitionImpl implements DmnTypeDefinition {
       return transformer.transform(value);
 
     } catch (IllegalArgumentException e) {
-      throw LOG.invalidOutputValue(typeName, value);
+      throw LOG.invalidValueForTypeDefinition(typeName, value);
     }
   }
 
