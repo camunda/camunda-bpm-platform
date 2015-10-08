@@ -34,7 +34,9 @@
             <div class="operation-time"
                  tooltip-placement="left"
                  tooltip="{{ event.time | camDate:'long' }}">{{ event.time | date:'HH:mm' }}</div>
-            <div class="operation-user">{{ event.userId }}</div>
+            <div class="operation-user"
+                 tooltip-placement="top"
+                 tooltip="{{ event.userId }}">{{ event.userId }}</div>
           </div>
 
           <div class="col-xs-10 operation-detail">
