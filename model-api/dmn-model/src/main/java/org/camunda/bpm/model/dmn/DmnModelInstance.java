@@ -29,4 +29,13 @@ public interface DmnModelInstance extends ModelInstance {
    * @param definitions the {@link Definitions} element to set
    * */
   void setDefinitions(Definitions definitions);
+
+  /**
+   * Copies the DMN model instance but not the model. So only the wrapped DOM document is cloned.
+   * Changes of the model are persistent between multiple model instances.
+   *
+   * @return the new DMN model instance
+   */
+  DmnModelInstance clone();
+
 }
