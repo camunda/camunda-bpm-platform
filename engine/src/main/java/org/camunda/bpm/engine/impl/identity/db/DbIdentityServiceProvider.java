@@ -103,10 +103,12 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
 
   public void createMembership(String userId, String groupId) {
     checkAuthorization(Permissions.CREATE, Resources.GROUP_MEMBERSHIP, groupId);
-    Map<String, Object> parameters = new HashMap<String, Object>();
-    parameters.put("userId", userId);
-    parameters.put("groupId", groupId);
-    getDbSqlSession().getSqlSession().insert("insertMembership", parameters);
+    UserEntity user = findUserById(userId);
+    GroupEntity group = findGroupById(groupId);
+    MembershipEntity membership = new MembershipEntity();
+    membership.setUser(user);
+    membership.setGroup(group);
+    getDbEntityManager().insert(membership);
     createDefaultMembershipAuthorizations(userId, groupId);
   }
 
