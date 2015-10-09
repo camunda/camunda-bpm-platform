@@ -37,4 +37,9 @@ public class CmmnModelInstanceImpl extends ModelInstanceImpl implements CmmnMode
     setDocumentElement(definitions);
   }
 
+  @Override
+  public CmmnModelInstance clone() {
+    return new CmmnModelInstanceImpl(model, modelBuilder, document.clone());
+  }
+
 }

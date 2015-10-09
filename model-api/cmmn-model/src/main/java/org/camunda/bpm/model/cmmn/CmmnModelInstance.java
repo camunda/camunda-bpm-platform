@@ -32,4 +32,12 @@ public interface CmmnModelInstance extends ModelInstance {
    * */
   void setDefinitions(Definitions definitions);
 
+  /**
+   * Copies the CMMN model instance but not the model. So only the wrapped DOM document is cloned.
+   * Changes of the model are persistent between multiple model instances.
+   *
+   * @return the new CMMN model instance
+   */
+  CmmnModelInstance clone();
+
 }
