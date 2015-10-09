@@ -18,10 +18,13 @@ import static org.camunda.bpm.engine.variable.type.ValueType.DATE;
 import static org.camunda.bpm.engine.variable.type.ValueType.DOUBLE;
 import static org.camunda.bpm.engine.variable.type.ValueType.FILE;
 import static org.camunda.bpm.engine.variable.type.ValueType.INTEGER;
+import static org.camunda.bpm.engine.variable.type.ValueType.LOCAL_DATE;
+import static org.camunda.bpm.engine.variable.type.ValueType.LOCAL_TIME;
 import static org.camunda.bpm.engine.variable.type.ValueType.LONG;
 import static org.camunda.bpm.engine.variable.type.ValueType.NULL;
 import static org.camunda.bpm.engine.variable.type.ValueType.NUMBER;
 import static org.camunda.bpm.engine.variable.type.ValueType.OBJECT;
+import static org.camunda.bpm.engine.variable.type.ValueType.PERIOD;
 import static org.camunda.bpm.engine.variable.type.ValueType.SHORT;
 import static org.camunda.bpm.engine.variable.type.ValueType.STRING;
 
@@ -50,6 +53,9 @@ public class ValueTypeResolverImpl implements ValueTypeResolver {
     addType(BOOLEAN);
     addType(BYTES);
     addType(DATE);
+    addType(LOCAL_DATE);
+    addType(LOCAL_TIME);
+    addType(PERIOD);
     addType(DOUBLE);
     addType(INTEGER);
     addType(LONG);
