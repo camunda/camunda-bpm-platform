@@ -42,4 +42,8 @@ public interface CamundaIn extends BpmnModelElementInstance {
 
   void setCamundaBusinessKey(String camundaBusinessKey);
 
+  boolean getCamundaLocal();
+
+  void setCamundaLocal(boolean camundaLocal);
+
 }

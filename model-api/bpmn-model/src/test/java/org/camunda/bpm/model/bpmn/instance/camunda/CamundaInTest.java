@@ -39,7 +39,8 @@ public class CamundaInTest extends BpmnModelElementInstanceTest {
       new AttributeAssumption(CAMUNDA_NS, "sourceExpression"),
       new AttributeAssumption(CAMUNDA_NS, "variables"),
       new AttributeAssumption(CAMUNDA_NS, "target"),
-      new AttributeAssumption(CAMUNDA_NS, "businessKey")
+      new AttributeAssumption(CAMUNDA_NS, "businessKey"),
+      new AttributeAssumption(CAMUNDA_NS, "local")
     );
   }
 }

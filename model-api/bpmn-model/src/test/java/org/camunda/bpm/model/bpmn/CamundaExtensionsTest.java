@@ -601,16 +601,19 @@ public class CamundaExtensionsTest {
     assertThat(in.getCamundaVariables()).isEqualTo(TEST_STRING_XML);
     assertThat(in.getCamundaTarget()).isEqualTo(TEST_STRING_XML);
     assertThat(in.getCamundaBusinessKey()).isEqualTo(TEST_EXPRESSION_XML);
+    assertThat(in.getCamundaLocal()).isTrue();
     in.setCamundaSource(TEST_STRING_API);
     in.setCamundaSourceExpression(TEST_EXPRESSION_API);
     in.setCamundaVariables(TEST_STRING_API);
     in.setCamundaTarget(TEST_STRING_API);
     in.setCamundaBusinessKey(TEST_EXPRESSION_API);
+    in.setCamundaLocal(false);
     assertThat(in.getCamundaSource()).isEqualTo(TEST_STRING_API);
     assertThat(in.getCamundaSourceExpression()).isEqualTo(TEST_EXPRESSION_API);
     assertThat(in.getCamundaVariables()).isEqualTo(TEST_STRING_API);
     assertThat(in.getCamundaTarget()).isEqualTo(TEST_STRING_API);
     assertThat(in.getCamundaBusinessKey()).isEqualTo(TEST_EXPRESSION_API);
+    assertThat(in.getCamundaLocal()).isFalse();
   }
 
   @Test
@@ -620,14 +623,17 @@ public class CamundaExtensionsTest {
     assertThat(out.getCamundaSourceExpression()).isEqualTo(TEST_EXPRESSION_XML);
     assertThat(out.getCamundaVariables()).isEqualTo(TEST_STRING_XML);
     assertThat(out.getCamundaTarget()).isEqualTo(TEST_STRING_XML);
+    assertThat(out.getCamundaLocal()).isTrue();
     out.setCamundaSource(TEST_STRING_API);
     out.setCamundaSourceExpression(TEST_EXPRESSION_API);
     out.setCamundaVariables(TEST_STRING_API);
     out.setCamundaTarget(TEST_STRING_API);
+    out.setCamundaLocal(false);
     assertThat(out.getCamundaSource()).isEqualTo(TEST_STRING_API);
     assertThat(out.getCamundaSourceExpression()).isEqualTo(TEST_EXPRESSION_API);
     assertThat(out.getCamundaVariables()).isEqualTo(TEST_STRING_API);
     assertThat(out.getCamundaTarget()).isEqualTo(TEST_STRING_API);
+    assertThat(out.getCamundaLocal()).isFalse();
   }
 
   @Test

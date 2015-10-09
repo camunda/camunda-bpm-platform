@@ -160,8 +160,8 @@
                   camunda:calledElementVersion="test"
                   camunda:exclusive="false">
       <extensionElements>
-        <camunda:in source="test" sourceExpression="${test}" variables="test" businessKey="${test}" target="test"/>
-        <camunda:out source="test" sourceExpression="${test}" variables="test" target="test"/>
+        <camunda:in source="test" sourceExpression="${test}" variables="test" businessKey="${test}" target="test" local="true"/>
+        <camunda:out source="test" sourceExpression="${test}" variables="test" target="test" local="true"/>
       </extensionElements>
     </callActivity>
 

@@ -34,6 +34,7 @@ public class CamundaOutImpl extends BpmnModelElementInstanceImpl implements Camu
   protected static Attribute<String> camundaSourceExpressionAttribute;
   protected static Attribute<String> camundaVariablesAttribute;
   protected static Attribute<String> camundaTargetAttribute;
+  protected static Attribute<Boolean> camundaLocalAttribute;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(CamundaOut.class, CAMUNDA_ELEMENT_OUT)
@@ -57,6 +58,10 @@ public class CamundaOutImpl extends BpmnModelElementInstanceImpl implements Camu
       .build();
 
     camundaTargetAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_TARGET)
+      .namespace(CAMUNDA_NS)
+      .build();
+
+    camundaLocalAttribute = typeBuilder.booleanAttribute(CAMUNDA_ATTRIBUTE_LOCAL)
       .namespace(CAMUNDA_NS)
       .build();
 
@@ -97,6 +102,14 @@ public class CamundaOutImpl extends BpmnModelElementInstanceImpl implements Camu
 
   public void setCamundaTarget(String camundaTarget) {
     camundaTargetAttribute.setValue(this, camundaTarget);
+  }
+
+  public boolean getCamundaLocal() {
+    return camundaLocalAttribute.getValue(this);
+  }
+
+  public void setCamundaLocal(boolean camundaLocal) {
+    camundaLocalAttribute.setValue(this, camundaLocal);
   }
 
 }

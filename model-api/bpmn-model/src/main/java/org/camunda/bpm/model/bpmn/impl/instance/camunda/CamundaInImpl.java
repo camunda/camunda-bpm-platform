@@ -35,6 +35,7 @@ public class CamundaInImpl extends BpmnModelElementInstanceImpl implements Camun
   protected static Attribute<String> camundaVariablesAttribute;
   protected static Attribute<String> camundaTargetAttribute;
   protected static Attribute<String> camundaBusinessKeyAttribute;
+  protected static Attribute<Boolean> camundaLocalAttribute;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(CamundaIn.class, CAMUNDA_ELEMENT_IN)
@@ -62,6 +63,10 @@ public class CamundaInImpl extends BpmnModelElementInstanceImpl implements Camun
       .build();
 
     camundaBusinessKeyAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_BUSINESS_KEY)
+      .namespace(CAMUNDA_NS)
+      .build();
+
+    camundaLocalAttribute = typeBuilder.booleanAttribute(CAMUNDA_ATTRIBUTE_LOCAL)
       .namespace(CAMUNDA_NS)
       .build();
 
@@ -110,6 +115,14 @@ public class CamundaInImpl extends BpmnModelElementInstanceImpl implements Camun
 
   public void setCamundaBusinessKey(String camundaBusinessKey) {
     camundaBusinessKeyAttribute.setValue(this, camundaBusinessKey);
+  }
+
+  public boolean getCamundaLocal() {
+    return camundaLocalAttribute.getValue(this);
+  }
+
+  public void setCamundaLocal(boolean camundaLocal) {
+    camundaLocalAttribute.setValue(this, camundaLocal);
   }
 
 }

@@ -434,6 +434,7 @@ public final class BpmnModelConstants {
   public static final String CAMUNDA_ATTRIBUTE_JOB_PRIORITY = "jobPriority";
   public static final String CAMUNDA_ATTRIBUTE_KEY = "key";
   public static final String CAMUNDA_ATTRIBUTE_LABEL = "label";
+  public static final String CAMUNDA_ATTRIBUTE_LOCAL = "local";
   public static final String CAMUNDA_ATTRIBUTE_NAME = "name";
   public static final String CAMUNDA_ATTRIBUTE_PRIORITY = "priority";
   public static final String CAMUNDA_ATTRIBUTE_READABLE = "readable";

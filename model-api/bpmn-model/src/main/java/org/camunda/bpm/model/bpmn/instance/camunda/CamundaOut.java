@@ -38,4 +38,8 @@ public interface CamundaOut extends BpmnModelElementInstance {
 
   void setCamundaTarget(String camundaTarget);
 
+  boolean getCamundaLocal();
+
+  void setCamundaLocal(boolean camundaLocal);
+
 }
