@@ -13,6 +13,7 @@
 package org.camunda.bpm.model.cmmn.impl.instance.camunda;
 
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_BUSINESS_KEY;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_LOCAL;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_SOURCE;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_SOURCE_EXPRESSION;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_TARGET;
@@ -40,6 +41,7 @@ public class CamundaInImpl extends CmmnModelElementInstanceImpl implements Camun
   protected static Attribute<String> camundaVariablesAttribute;
   protected static Attribute<String> camundaTargetAttribute;
   protected static Attribute<String> camundaBusinessKeyAttribute;
+  protected static Attribute<Boolean> camundaLocalAttribute;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(CamundaIn.class, CAMUNDA_ELEMENT_IN)
@@ -67,6 +69,10 @@ public class CamundaInImpl extends CmmnModelElementInstanceImpl implements Camun
       .build();
 
     camundaBusinessKeyAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_BUSINESS_KEY)
+      .namespace(CAMUNDA_NS)
+      .build();
+
+    camundaLocalAttribute = typeBuilder.booleanAttribute(CAMUNDA_ATTRIBUTE_LOCAL)
       .namespace(CAMUNDA_NS)
       .build();
 
@@ -115,6 +121,14 @@ public class CamundaInImpl extends CmmnModelElementInstanceImpl implements Camun
 
   public void setCamundaBusinessKey(String camundaBusinessKey) {
     camundaBusinessKeyAttribute.setValue(this, camundaBusinessKey);
+  }
+
+  public boolean getCamundaLocal() {
+    return camundaLocalAttribute.getValue(this);
+  }
+
+  public void setCamundaLocal(boolean local) {
+    camundaLocalAttribute.setValue(this, local);
   }
 
 }

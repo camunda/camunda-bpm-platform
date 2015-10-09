@@ -197,6 +197,7 @@ public class CmmnModelConstants {
   public static final String CAMUNDA_ATTRIBUTE_SOURCE = "source";
   public static final String CAMUNDA_ATTRIBUTE_SOURCE_EXPRESSION = "sourceExpression";
   public static final String CAMUNDA_ATTRIBUTE_BUSINESS_KEY = "businessKey";
+  public static final String CAMUNDA_ATTRIBUTE_LOCAL = "local";
   public static final String CAMUNDA_ATTRIBUTE_TARGET = "target";
   public static final String CAMUNDA_ATTRIBUTE_VARIABLES = "variables";
   public static final String CAMUNDA_ATTRIBUTE_PROCESS_BINDING = "processBinding";
