@@ -124,11 +124,13 @@
       background-color: @column-right-bg;
       .cell.top {
         background-color: mix(@brand-primary, @column-right-bg, 8%);
+        text-align: right;
       }
 
-      > .resource-actions {
-        float: right;
-        text-align: right;
+      .resource-actions {
+        display: inline-block;
+        float: none;
+        margin-left: (@grid-gutter-width * 0.5);
       }
     }
   }

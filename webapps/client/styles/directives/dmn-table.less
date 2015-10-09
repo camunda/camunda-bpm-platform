@@ -1,7 +1,85 @@
+@import (reference) "dmn-js/styles/dmn-variables";
+
+@import "dmn-js/styles/dmn-variables";
+@import "dmn-js/styles/dmn-mixins";
+@import "dmn-js/styles/dmn-normalize";
+
+@import "dmn-js/styles/dmn-font";
+
+@import "dmn-js/styles/dmn-table";
+
+@import "dmn-js/styles/dmn-choice";
+@import "dmn-js/styles/dmn-controls";
+@import "dmn-js/styles/dmn-contextmenu";
+@import "dmn-js/styles/dmn-clausevalues-setter";
+@import "dmn-js/styles/dmn-clauseexpression-setter";
+@import "dmn-js/styles/dmn-combobox";
+
+
+.edit-dmn-modal {
+  //
+}
+
+
+.confirm-dmn-modal {
+  .glyphicon-fire {
+    color: @brand-danger;
+  }
+
+  .help-block {
+    padding: (@grid-gutter-width * 0.5);
+    color: @state-warning-text;
+    background-color: @state-warning-bg;
+    border: 1px solid @state-warning-border;
+    margin: 0 0 (@grid-gutter-width * 0.5) 0;
+  }
+
+  .deployment-name {
+    display: table;
+    table-layout: fixed;
+    margin: (@grid-gutter-width * 0.5) 0;
+    width: 100%;
+
+    > label,
+    > div {
+      display: table-cell;
+    }
+
+    > label {
+      padding-right: (@grid-gutter-width * 0.5);
+      width: 210px;
+    }
+
+    > div {
+      // width: 100%;
+      .form-control {
+        width: 100%;
+      }
+    }
+  }
+}
+
+
+// yes we can
 .dmn-table thead th[data-element-id="cell_annotations_ioLabel"] .dmn-js-logo {
   display: none;
 }
+
+
+
 .ctn-tabbed-content [cam-widget-variable][display] {
   margin-left: 0;
   margin-right: 0;
+}
+
+
+.dmn-context-menu,
+.dmn-clauseexpression-setter,
+.dmn-clausevalues-setter {
+  z-index: 99 + @zindex-modal;
+}
+
+
+.dmn-combobox-suggestions {
+  z-index: 100 + @zindex-modal;
 }
