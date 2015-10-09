@@ -149,7 +149,7 @@ public class CamundaExtensionsTest {
 
   @Before
   public void setUp(){
-    modelInstance = (BpmnModelInstance) ((BpmnModelInstanceImpl)originalModelInstance).clone();
+    modelInstance = originalModelInstance.clone();
     process = modelInstance.getModelElementById(PROCESS_ID);
     startEvent = modelInstance.getModelElementById(START_EVENT_ID);
     sequenceFlow = modelInstance.getModelElementById(SEQUENCE_FLOW_ID);

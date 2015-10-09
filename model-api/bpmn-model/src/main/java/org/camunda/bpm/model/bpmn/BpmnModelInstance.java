@@ -34,4 +34,12 @@ public interface BpmnModelInstance extends ModelInstance {
    * */
   void setDefinitions(Definitions definitions);
 
+  /**
+   * Copies the BPMN model instance but not the model. So only the wrapped DOM document is cloned.
+   * Changes of the model are persistent between multiple model instances.
+   *
+   * @return the new BPMN model instance
+   */
+  BpmnModelInstance clone();
+
 }
