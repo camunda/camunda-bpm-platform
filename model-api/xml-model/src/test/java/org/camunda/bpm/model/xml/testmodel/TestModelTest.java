@@ -43,7 +43,7 @@ public abstract class TestModelTest {
   }
 
   public ModelInstance cloneModelInstance() {
-    return (ModelInstance) ((ModelInstanceImpl) testModelInstance).clone();
+    return testModelInstance.clone();
   }
 
   protected static Object[] parseModel(Class<?> test) {

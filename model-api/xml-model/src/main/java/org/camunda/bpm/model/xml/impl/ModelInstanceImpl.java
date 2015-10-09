@@ -123,13 +123,9 @@ public class ModelInstanceImpl implements ModelInstance {
     return (Collection<T>) getModelElementsByType(getModel().getType(referencingClass));
   }
 
-  /**
-   * Clones the model instance but not the model. So only the wrapped DOM document is cloned.
-   * Changes of the model are persistent between multiple model instances.
-   *
-   * @return the new model instance
-   */
-  public Object clone() {
-    return new ModelInstanceImpl(model, modelBuilder, document.clone());
+  @Override
+  public ModelInstance clone() {
+      return new ModelInstanceImpl(model, modelBuilder, document.clone());
   }
+
 }

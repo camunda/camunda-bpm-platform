@@ -98,4 +98,12 @@ public interface ModelInstance {
    */
   <T extends ModelElementInstance> Collection<T> getModelElementsByType(Class<T> referencingClass);
 
+  /**
+   * Copies the model instance but not the model. So only the wrapped DOM document is cloned.
+   * Changes of the model are persistent between multiple model instances.
+   *
+   * @return the new model instance
+   */
+  ModelInstance clone();
+
 }
