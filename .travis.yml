@@ -1,0 +1,10 @@
+branches:
+  only:
+    - master
+sudo: false # enables container based builds for travis
+language: java
+jdk:
+  - oraclejdk7
+install: mvn install -Ptomcat,h2,engine-integration -pl qa/integration-tests-engine -am -DskipTests -s settings/maven/nexus-settings.xml -B -q
+script:
+- mvn verify -Ptomcat,h2,engine-integration -pl qa/integration-tests-engine -am -s settings/maven/nexus-settings.xml
