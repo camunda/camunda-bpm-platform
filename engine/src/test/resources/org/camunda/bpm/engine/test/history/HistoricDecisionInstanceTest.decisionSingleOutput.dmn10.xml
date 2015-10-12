@@ -11,7 +11,7 @@
         <text>${input1}</text>
       </inputExpression>
         <inputEntry id="input1">
-          <text>a</text>
+          <text>"a"</text>
         </inputEntry>
       </clause>
       <clause id="out" name="output" camunda:output="result" >
