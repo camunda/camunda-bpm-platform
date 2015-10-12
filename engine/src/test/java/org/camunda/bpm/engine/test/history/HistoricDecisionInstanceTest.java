@@ -18,7 +18,6 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +36,7 @@ import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.joda.time.DateTime;
 
 /**
  * @author Philipp Ossler
@@ -152,6 +152,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
   public void testMultipleDecisionInstances() {
 
     startProcessInstanceAndEvaluateDecision("a");
+    waitASignificantAmountOfTime();
     startProcessInstanceAndEvaluateDecision("b");
 
     List<HistoricDecisionInstance> historicDecisionInstances = historyService
@@ -411,13 +412,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
   public void testQuerySortByEvaluationTime() {
 
     startProcessInstanceAndEvaluateDecision();
-
-    // evaluate second decision after 10s
-    Calendar calendar = Calendar.getInstance();
-    calendar.setTime(ClockUtil.getCurrentTime());
-    calendar.add(Calendar.SECOND, 10);
-    ClockUtil.setCurrentTime(calendar.getTime());
-
+    waitASignificantAmountOfTime();
     startProcessInstanceAndEvaluateDecision();
 
     List<HistoricDecisionInstance> orderAsc = historyService.createHistoricDecisionInstanceQuery().orderByEvaluationTime().asc().list();
@@ -555,9 +550,9 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
   public void testQueryByEvaluatedBefore() {
-    Date beforeEvaluated = new Date(1441612000);
-    Date evaluated = new Date(1441613000);
-    Date afterEvaluated = new Date(1441614000);
+    Date evaluated = ClockUtil.getCurrentTime();
+    Date beforeEvaluated = new DateTime(evaluated.getTime()).minusSeconds(10).toDate();
+    Date afterEvaluated = new DateTime(evaluated.getTime()).plusSeconds(10).toDate();
 
     ClockUtil.setCurrentTime(evaluated);
     startProcessInstanceAndEvaluateDecision();
@@ -566,15 +561,13 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     assertThat(query.evaluatedBefore(afterEvaluated).count(), is(1L));
     assertThat(query.evaluatedBefore(evaluated).count(), is(1L));
     assertThat(query.evaluatedBefore(beforeEvaluated).count(), is(0L));
-
-    ClockUtil.reset();
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
   public void testQueryByEvaluatedAfter() {
-    Date beforeEvaluated = new Date(1441612000);
-    Date evaluated = new Date(1441613000);
-    Date afterEvaluated = new Date(1441614000);
+    Date evaluated = ClockUtil.getCurrentTime();
+    Date beforeEvaluated = new DateTime(evaluated.getTime()).minusSeconds(10).toDate();
+    Date afterEvaluated = new DateTime(evaluated.getTime()).plusSeconds(10).toDate();
 
     ClockUtil.setCurrentTime(evaluated);
     startProcessInstanceAndEvaluateDecision();
@@ -583,8 +576,6 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     assertThat(query.evaluatedAfter(beforeEvaluated).count(), is(1L));
     assertThat(query.evaluatedAfter(evaluated).count(), is(1L));
     assertThat(query.evaluatedAfter(afterEvaluated).count(), is(0L));
-
-    ClockUtil.reset();
   }
 
   public void testTableNames() {
@@ -682,6 +673,14 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("input1", input);
     return runtimeService.startProcessInstanceByKey("testProcess", variables);
+  }
+
+  /**
+   * Use between two rule evaluations to ensure the expected order by evaluation time.
+   */
+  protected void waitASignificantAmountOfTime() {
+    DateTime now = new DateTime(ClockUtil.getCurrentTime());
+    ClockUtil.setCurrentTime(now.plusSeconds(10).toDate());
   }
 
 }
