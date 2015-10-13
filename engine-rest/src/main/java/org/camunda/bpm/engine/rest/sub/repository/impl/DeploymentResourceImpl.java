@@ -13,9 +13,14 @@
 package org.camunda.bpm.engine.rest.sub.repository.impl;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.repository.RedeploymentBuilder;
 import org.camunda.bpm.engine.rest.dto.repository.DeploymentDto;
+import org.camunda.bpm.engine.rest.dto.repository.RedeploymentDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.repository.DeploymentResource;
 import org.camunda.bpm.engine.rest.sub.repository.DeploymentResourcesResource;
@@ -48,7 +53,33 @@ public class DeploymentResourceImpl implements DeploymentResource {
   public DeploymentResourcesResource getDeploymentResources() {
     return new DeploymentResourcesResourceImpl(engine, deploymentId);
   }
-  
+
+  public DeploymentDto redeploy(RedeploymentDto redeployment) {
+    RepositoryService repositoryService = engine.getRepositoryService();
+
+    Deployment deployment = null;
+    try {
+
+      RedeploymentBuilder builder = repositoryService.createRedeployment(deploymentId);
+
+      if (redeployment != null) {
+        builder.source(redeployment.getSource());
+        builder.addResourceIds(redeployment.getResourceIds());
+        builder.addResourceNames(redeployment.getResourceNames());
+      }
+
+      deployment = builder.redeploy();
+
+    } catch (NotFoundException e) {
+      throw createInvalidRequestException("redeploy", Status.NOT_FOUND, e);
+
+    } catch (NotValidException e) {
+      throw createInvalidRequestException("redeploy", Status.BAD_REQUEST, e);
+    }
+
+    return DeploymentDto.fromDeployment(deployment);
+  }
+
   @Override
   public void deleteDeployment(String deploymentId, UriInfo uriInfo) {
     RepositoryService repositoryService = engine.getRepositoryService();
@@ -70,6 +101,11 @@ public class DeploymentResourceImpl implements DeploymentResource {
     return queryParams.containsKey(property)
         && queryParams.get(property).size() > 0
         && "true".equals(queryParams.get(property).get(0));
+  }
+
+  protected InvalidRequestException createInvalidRequestException(String action, Status status, ProcessEngineException cause) {
+    String errorMessage = String.format("Cannot %s deployment '%s': %s", action, deploymentId, cause.getMessage());
+    return new InvalidRequestException(status, cause, errorMessage);
   }
 
 }

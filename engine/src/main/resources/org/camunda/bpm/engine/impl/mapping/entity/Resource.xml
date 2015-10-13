@@ -36,15 +36,75 @@
   </select>
   
   <select id="selectResourceByDeploymentIdAndResourceName" parameterType="map" resultMap="resourceResultMap">
-    select * from ${prefix}ACT_GE_BYTEARRAY 
-    where DEPLOYMENT_ID_ = #{deploymentId}
-          AND NAME_ = #{resourceName}
+    select
+          *
+    from
+          ${prefix}ACT_GE_BYTEARRAY
+    where
+          DEPLOYMENT_ID_ = #{deploymentId}
+    and
+          NAME_ = #{resourceName}
+  </select>
+
+  <select id="selectResourceByDeploymentIdAndResourceNames" parameterType="map" resultMap="resourceResultMap">
+    select
+          *
+    from
+          ${prefix}ACT_GE_BYTEARRAY
+    where
+          DEPLOYMENT_ID_ = #{parameter.deploymentId}
+    <if test="parameter.resourceNames != null">
+    and
+          <if test="parameter.resourceNames.length == 1">
+          NAME_ = #{parameter.resourceNames[0]}
+          </if>
+          <if test="parameter.resourceNames.length > 1">
+          NAME_ in
+            <foreach item="resourceName"
+                      collection="parameter.resourceNames"
+                      open="("
+                      separator=","
+                      close=")">
+              #{resourceName}
+            </foreach>
+          </if>
+    </if>
   </select>
 
   <select id="selectResourceByDeploymentIdAndResourceId" parameterType="map" resultMap="resourceResultMap">
-    select * from ${prefix}ACT_GE_BYTEARRAY 
-    where DEPLOYMENT_ID_ = #{deploymentId}
-          AND ID_ = #{resourceId}
+    select
+          *
+    from
+          ${prefix}ACT_GE_BYTEARRAY
+    where
+          DEPLOYMENT_ID_ = #{deploymentId}
+    and
+          ID_ = #{resourceId}
+  </select>
+
+  <select id="selectResourceByDeploymentIdAndResourceIds" parameterType="map" resultMap="resourceResultMap">
+    select
+          *
+    from
+          ${prefix}ACT_GE_BYTEARRAY
+    where
+          DEPLOYMENT_ID_ = #{parameter.deploymentId}
+    <if test="parameter.resourceIds != null">
+    and
+          <if test="parameter.resourceIds.length == 1">
+          ID_ = #{parameter.resourceIds[0]}
+          </if>
+          <if test="parameter.resourceIds.length > 1">
+          ID_ in
+            <foreach item="resourceId"
+                      collection="parameter.resourceIds"
+                      open="("
+                      separator=","
+                      close=")">
+              #{resourceId}
+            </foreach>
+          </if>
+    </if>
   </select>
 
   <select id="selectResourcesByDeploymentId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="resourceResultMap">

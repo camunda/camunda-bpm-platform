@@ -13,12 +13,12 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import org.camunda.bpm.engine.impl.persistence.AbstractManager;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 
 
 /**
@@ -41,11 +41,27 @@ public class ResourceManager extends AbstractManager {
     return (ResourceEntity) getDbEntityManager().selectOne("selectResourceByDeploymentIdAndResourceName", params);
   }
 
+  @SuppressWarnings("unchecked")
+  public List<ResourceEntity> findResourceByDeploymentIdAndResourceNames(String deploymentId, String... resourceNames) {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("deploymentId", deploymentId);
+    params.put("resourceNames", resourceNames);
+    return getDbEntityManager().selectList("selectResourceByDeploymentIdAndResourceNames", params);
+  }
+
   public ResourceEntity findResourceByDeploymentIdAndResourceId(String deploymentId, String resourceId) {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("deploymentId", deploymentId);
     params.put("resourceId", resourceId);
     return (ResourceEntity) getDbEntityManager().selectOne("selectResourceByDeploymentIdAndResourceId", params);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<ResourceEntity> findResourceByDeploymentIdAndResourceIds(String deploymentId, String... resourceIds) {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("deploymentId", deploymentId);
+    params.put("resourceIds", resourceIds);
+    return getDbEntityManager().selectList("selectResourceByDeploymentIdAndResourceIds", params);
   }
 
   @SuppressWarnings("unchecked")

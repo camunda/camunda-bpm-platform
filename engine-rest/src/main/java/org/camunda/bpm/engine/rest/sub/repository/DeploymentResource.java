@@ -13,8 +13,14 @@
 package org.camunda.bpm.engine.rest.sub.repository;
 
 import org.camunda.bpm.engine.rest.dto.repository.DeploymentDto;
+import org.camunda.bpm.engine.rest.dto.repository.RedeploymentDto;
 
-import javax.ws.rs.*;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
@@ -30,6 +36,11 @@ public interface DeploymentResource {
   @Path("/resources")
   DeploymentResourcesResource getDeploymentResources();
 
+  @POST
+  @Path("/redeploy")
+  @Produces(MediaType.APPLICATION_JSON)
+  DeploymentDto redeploy(RedeploymentDto redeployment);
+
   @DELETE
-  void deleteDeployment(@PathParam("id") String deploymentId, @Context UriInfo uriInfo); 
+  void deleteDeployment(@PathParam("id") String deploymentId, @Context UriInfo uriInfo);
 }

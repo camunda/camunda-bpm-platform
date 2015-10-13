@@ -149,6 +149,7 @@ public abstract class MockProvider {
   // form data
   public static final String EXAMPLE_FORM_KEY = "aFormKey";
   public static final String EXAMPLE_DEPLOYMENT_ID = "aDeploymentId";
+  public static final String EXAMPLE_RE_DEPLOYMENT_ID = "aReDeploymentId";
 
   // form property data
   public static final String EXAMPLE_FORM_PROPERTY_ID = "aFormPropertyId";
@@ -1049,6 +1050,16 @@ public abstract class MockProvider {
   public static Deployment createMockDeployment() {
     Deployment mockDeployment = mock(Deployment.class);
     when(mockDeployment.getId()).thenReturn(EXAMPLE_DEPLOYMENT_ID);
+    when(mockDeployment.getName()).thenReturn(EXAMPLE_DEPLOYMENT_NAME);
+    when(mockDeployment.getDeploymentTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_DEPLOYMENT_TIME));
+    when(mockDeployment.getSource()).thenReturn(EXAMPLE_DEPLOYMENT_SOURCE);
+
+    return mockDeployment;
+  }
+
+  public static Deployment createMockRedeployment() {
+    Deployment mockDeployment = mock(Deployment.class);
+    when(mockDeployment.getId()).thenReturn(EXAMPLE_RE_DEPLOYMENT_ID);
     when(mockDeployment.getName()).thenReturn(EXAMPLE_DEPLOYMENT_NAME);
     when(mockDeployment.getDeploymentTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_DEPLOYMENT_TIME));
     when(mockDeployment.getSource()).thenReturn(EXAMPLE_DEPLOYMENT_SOURCE);

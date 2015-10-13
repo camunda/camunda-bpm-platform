@@ -44,15 +44,18 @@ import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT
 import static org.camunda.bpm.engine.rest.helper.MockProvider.NON_EXISTING_DEPLOYMENT_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.NON_EXISTING_DEPLOYMENT_RESOURCE_ID;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -62,24 +65,30 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
+import org.camunda.bpm.engine.repository.RedeploymentBuilder;
 import org.camunda.bpm.engine.repository.Resource;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.junit.Before;
 import org.junit.Test;
+
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.Response.Status;
 
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.path.json.JsonPath;
@@ -87,12 +96,13 @@ import com.jayway.restassured.response.Response;
 
 public abstract class AbstractDeploymentRestServiceInteractionTest extends AbstractRestServiceTest {
 
-  protected static final String RESEOURCE_URL = TEST_RESOURCE_ROOT_PATH + "/deployment";
-  protected static final String DEPLOYMENT_URL = RESEOURCE_URL + "/{id}";
+  protected static final String RESOURCE_URL = TEST_RESOURCE_ROOT_PATH + "/deployment";
+  protected static final String DEPLOYMENT_URL = RESOURCE_URL + "/{id}";
   protected static final String RESOURCES_URL = DEPLOYMENT_URL + "/resources";
   protected static final String SINGLE_RESOURCE_URL = RESOURCES_URL + "/{resourceId}";
   protected static final String SINGLE_RESOURCE_DATA_URL = SINGLE_RESOURCE_URL + "/data";
-  protected static final String CREATE_DEPLOYMENT_URL = TEST_RESOURCE_ROOT_PATH + "/deployment/create";
+  protected static final String CREATE_DEPLOYMENT_URL = RESOURCE_URL + "/create";
+  protected static final String REDEPLOY_DEPLOYMENT_URL = DEPLOYMENT_URL + "/redeploy";
 
   protected RepositoryService mockRepositoryService;
   protected Deployment mockDeployment;
@@ -100,6 +110,7 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
   protected Resource mockDeploymentResource;
   protected DeploymentQuery mockDeploymentQuery;
   protected DeploymentBuilder mockDeploymentBuilder;
+  protected RedeploymentBuilder mockRedeploymentBuilder;
   protected Collection<String> resourceNames = new ArrayList<String>();
 
   @Before
@@ -125,6 +136,14 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
     when(mockDeploymentBuilder.addInputStream(anyString(), any(InputStream.class))).thenReturn(mockDeploymentBuilder);
     when(mockDeploymentBuilder.getResourceNames()).thenReturn(resourceNames);
     when(mockDeploymentBuilder.deploy()).thenReturn(mockDeployment);
+
+    Deployment redeployment = MockProvider.createMockRedeployment();
+    mockRedeploymentBuilder = mock(RedeploymentBuilder.class);
+    when(mockRepositoryService.createRedeployment(anyString())).thenReturn(mockRedeploymentBuilder);
+    when(mockRedeploymentBuilder.source(anyString())).thenReturn(mockRedeploymentBuilder);
+    when(mockRedeploymentBuilder.addResourceIds(anyListOf(String.class))).thenReturn(mockRedeploymentBuilder);
+    when(mockRedeploymentBuilder.addResourceNames(anyListOf(String.class))).thenReturn(mockRedeploymentBuilder);
+    when(mockRedeploymentBuilder.redeploy()).thenReturn(redeployment);
   }
 
   private byte[] createMockDeploymentResourceByteData() {
@@ -1278,6 +1297,248 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
        .delete(DEPLOYMENT_URL);
   }
 
+  @Test
+  public void testRedeployDeployment() {
+    Map<String, Object> json = new HashMap<String, Object>();
+
+    List<String> resourceIds = new ArrayList<String>();
+    resourceIds.add("first-resource-id");
+    resourceIds.add("second-resource-id");
+    json.put("resourceIds", resourceIds);
+
+    List<String> resourceNames = new ArrayList<String>();
+    resourceNames.add("first-resource-name");
+    resourceNames.add("second-resource-name");
+    json.put("resourceNames", resourceNames);
+
+    json.put("source", MockProvider.EXAMPLE_DEPLOYMENT_SOURCE);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("id", equalTo(MockProvider.EXAMPLE_RE_DEPLOYMENT_ID))
+      .body("name", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_NAME))
+      .body("source", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_SOURCE))
+      .body("deploymentTime", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_TIME))
+    .when()
+      .post(REDEPLOY_DEPLOYMENT_URL);
+
+    verify(mockRedeploymentBuilder, never()).addResourceId(anyString());
+    verify(mockRedeploymentBuilder).addResourceIds(eq(resourceIds));
+    verify(mockRedeploymentBuilder, never()).addResourceName(anyString());
+    verify(mockRedeploymentBuilder).addResourceNames(eq(resourceNames));
+    verify(mockRedeploymentBuilder).source(MockProvider.EXAMPLE_DEPLOYMENT_SOURCE);
+    verify(mockRedeploymentBuilder).redeploy();
+  }
+
+  @Test
+  public void testRedeployDeploymentWithoutRequestBody() {
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
+      .contentType(POST_JSON_CONTENT_TYPE)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("id", equalTo(MockProvider.EXAMPLE_RE_DEPLOYMENT_ID))
+      .body("name", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_NAME))
+      .body("source", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_SOURCE))
+      .body("deploymentTime", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_TIME))
+    .when()
+      .post(REDEPLOY_DEPLOYMENT_URL);
+
+    verify(mockRedeploymentBuilder, never()).addResourceId(anyString());
+    verify(mockRedeploymentBuilder, never()).addResourceIds(anyListOf(String.class));
+    verify(mockRedeploymentBuilder, never()).addResourceName(anyString());
+    verify(mockRedeploymentBuilder, never()).addResourceNames(anyListOf(String.class));
+    verify(mockRedeploymentBuilder, never()).source(anyString());
+    verify(mockRedeploymentBuilder).redeploy();
+  }
+
+  @Test
+  public void testRedeployDeploymentEmptyRequestBody() {
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body("{}")
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("id", equalTo(MockProvider.EXAMPLE_RE_DEPLOYMENT_ID))
+      .body("name", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_NAME))
+      .body("source", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_SOURCE))
+      .body("deploymentTime", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_TIME))
+    .when()
+      .post(REDEPLOY_DEPLOYMENT_URL);
+
+    verify(mockRedeploymentBuilder, never()).addResourceId(anyString());
+    verify(mockRedeploymentBuilder).addResourceIds(null);
+    verify(mockRedeploymentBuilder, never()).addResourceName(anyString());
+    verify(mockRedeploymentBuilder).addResourceNames(null);
+    verify(mockRedeploymentBuilder).source(null);
+    verify(mockRedeploymentBuilder).redeploy();
+  }
+
+  @Test
+  public void testRedeployDeploymentResourceIds() {
+    Map<String, Object> json = new HashMap<String, Object>();
+
+    List<String> resourceIds = new ArrayList<String>();
+    resourceIds.add("first-resource-id");
+    resourceIds.add("second-resource-id");
+    json.put("resourceIds", resourceIds);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("id", equalTo(MockProvider.EXAMPLE_RE_DEPLOYMENT_ID))
+      .body("name", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_NAME))
+      .body("source", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_SOURCE))
+      .body("deploymentTime", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_TIME))
+    .when()
+      .post(REDEPLOY_DEPLOYMENT_URL);
+
+    verify(mockRedeploymentBuilder, never()).addResourceId(anyString());
+    verify(mockRedeploymentBuilder).addResourceIds(eq(resourceIds));
+    verify(mockRedeploymentBuilder, never()).addResourceName(anyString());
+    verify(mockRedeploymentBuilder).addResourceNames(null);
+    verify(mockRedeploymentBuilder).source(null);
+    verify(mockRedeploymentBuilder).redeploy();
+  }
+
+  @Test
+  public void testRedeployDeploymentResourceNames() {
+    Map<String, Object> json = new HashMap<String, Object>();
+
+    List<String> resourceNames = new ArrayList<String>();
+    resourceNames.add("first-resource-name");
+    resourceNames.add("second-resource-name");
+    json.put("resourceNames", resourceNames);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("id", equalTo(MockProvider.EXAMPLE_RE_DEPLOYMENT_ID))
+      .body("name", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_NAME))
+      .body("source", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_SOURCE))
+      .body("deploymentTime", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_TIME))
+    .when()
+      .post(REDEPLOY_DEPLOYMENT_URL);
+
+    verify(mockRedeploymentBuilder, never()).addResourceId(anyString());
+    verify(mockRedeploymentBuilder).addResourceIds(null);
+    verify(mockRedeploymentBuilder, never()).addResourceName(anyString());
+    verify(mockRedeploymentBuilder).addResourceNames(eq(resourceNames));
+    verify(mockRedeploymentBuilder).source(null);
+    verify(mockRedeploymentBuilder).redeploy();
+  }
+
+  @Test
+  public void testRedeployDeploymentSource() {
+    Map<String, String> json = new HashMap<String, String>();
+    json.put("source", MockProvider.EXAMPLE_DEPLOYMENT_SOURCE);
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(json)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("id", equalTo(MockProvider.EXAMPLE_RE_DEPLOYMENT_ID))
+      .body("name", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_NAME))
+      .body("source", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_SOURCE))
+      .body("deploymentTime", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_TIME))
+    .when()
+      .post(REDEPLOY_DEPLOYMENT_URL);
+
+    verify(mockRedeploymentBuilder, never()).addResourceId(anyString());
+    verify(mockRedeploymentBuilder).addResourceIds(null);
+    verify(mockRedeploymentBuilder, never()).addResourceName(anyString());
+    verify(mockRedeploymentBuilder).addResourceNames(null);
+    verify(mockRedeploymentBuilder).source(MockProvider.EXAMPLE_DEPLOYMENT_SOURCE);
+    verify(mockRedeploymentBuilder).redeploy();
+  }
+
+  @Test
+  public void testRedeployThrowsNotFoundException() {
+    String message = "deployment not found";
+    doThrow(new NotFoundException(message)).when(mockRedeploymentBuilder).redeploy();
+
+    String expected = "Cannot redeploy deployment '" + MockProvider.EXAMPLE_DEPLOYMENT_ID + "': " + message;
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
+      .contentType(POST_JSON_CONTENT_TYPE)
+    .expect()
+      .statusCode(Status.NOT_FOUND.getStatusCode())
+      .body("type", is(InvalidRequestException.class.getSimpleName()))
+      .body("message", is(expected))
+    .when()
+      .post(REDEPLOY_DEPLOYMENT_URL);
+  }
+
+  @Test
+  public void testRedeployThrowsNotValidException() {
+    String message = "not valid";
+    doThrow(new NotValidException(message)).when(mockRedeploymentBuilder).redeploy();
+
+    String expected = "Cannot redeploy deployment '" + MockProvider.EXAMPLE_DEPLOYMENT_ID + "': " + message;
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
+      .contentType(POST_JSON_CONTENT_TYPE)
+    .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", is(InvalidRequestException.class.getSimpleName()))
+      .body("message", is(expected))
+    .when()
+      .post(REDEPLOY_DEPLOYMENT_URL);
+  }
+
+  @Test
+  public void testRedeployThrowsProcessEngineException() {
+    String message = "something went wrong";
+    doThrow(new ProcessEngineException(message)).when(mockRedeploymentBuilder).redeploy();
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
+      .contentType(POST_JSON_CONTENT_TYPE)
+    .expect()
+      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .body("type", is(ProcessEngineException.class.getSimpleName()))
+      .body("message", is(message))
+    .when()
+      .post(REDEPLOY_DEPLOYMENT_URL);
+  }
+
+  @Test
+  public void testRedeployThrowsAuthorizationException() {
+    String message = "missing authorization";
+    doThrow(new AuthorizationException(message)).when(mockRedeploymentBuilder).redeploy();
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
+      .contentType(POST_JSON_CONTENT_TYPE)
+    .expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .body("type", is(AuthorizationException.class.getSimpleName()))
+      .body("message", is(message))
+    .when()
+      .post(REDEPLOY_DEPLOYMENT_URL);
+  }
+
   private void verifyDeployment(Deployment mockDeployment, Response response) {
     String content = response.asString();
     verifyDeploymentValues(mockDeployment, content);
@@ -1306,7 +1567,7 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
 
     Map<String, String> returnedLink = returnedLinks.get(0);
     assertEquals(HttpMethod.GET, returnedLink.get("method"));
-    assertTrue(returnedLink.get("href").endsWith(RESEOURCE_URL + "/" + mockDeployment.getId()));
+    assertTrue(returnedLink.get("href").endsWith(RESOURCE_URL + "/" + mockDeployment.getId()));
     assertEquals("self", returnedLink.get("rel"));
   }
 
