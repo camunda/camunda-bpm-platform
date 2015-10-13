@@ -12,35 +12,41 @@
  */
 package org.camunda.bpm.engine.rest.sub.repository.impl;
 
-import org.camunda.bpm.engine.ProcessEngine;
+import java.net.URI;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.RedeploymentBuilder;
+import org.camunda.bpm.engine.rest.DeploymentRestService;
 import org.camunda.bpm.engine.rest.dto.repository.DeploymentDto;
 import org.camunda.bpm.engine.rest.dto.repository.RedeploymentDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.impl.AbstractRestProcessEngineAware;
 import org.camunda.bpm.engine.rest.sub.repository.DeploymentResource;
 import org.camunda.bpm.engine.rest.sub.repository.DeploymentResourcesResource;
 
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
-public class DeploymentResourceImpl implements DeploymentResource {
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-  private ProcessEngine engine;
-  private String deploymentId;
+public class DeploymentResourceImpl extends AbstractRestProcessEngineAware implements DeploymentResource {
 
-  public DeploymentResourceImpl(ProcessEngine engine, String deploymentId) {
-    this.engine = engine;
+  protected String deploymentId;
+
+  public DeploymentResourceImpl(String processEngineName, String deploymentId, String rootResourcePath, ObjectMapper objectMapper) {
+    super(processEngineName, objectMapper);
     this.deploymentId = deploymentId;
+    this.relativeRootResourcePath = rootResourcePath;
   }
 
   public DeploymentDto getDeployment() {
-    RepositoryService repositoryService = engine.getRepositoryService();
+    RepositoryService repositoryService = getProcessEngine().getRepositoryService();
     Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
 
     if (deployment == null) {
@@ -51,11 +57,11 @@ public class DeploymentResourceImpl implements DeploymentResource {
   }
 
   public DeploymentResourcesResource getDeploymentResources() {
-    return new DeploymentResourcesResourceImpl(engine, deploymentId);
+    return new DeploymentResourcesResourceImpl(getProcessEngine(), deploymentId);
   }
 
-  public DeploymentDto redeploy(RedeploymentDto redeployment) {
-    RepositoryService repositoryService = engine.getRepositoryService();
+  public DeploymentDto redeploy(UriInfo uriInfo, RedeploymentDto redeployment) {
+    RepositoryService repositoryService = getProcessEngine().getRepositoryService();
 
     Deployment deployment = null;
     try {
@@ -77,12 +83,23 @@ public class DeploymentResourceImpl implements DeploymentResource {
       throw createInvalidRequestException("redeploy", Status.BAD_REQUEST, e);
     }
 
-    return DeploymentDto.fromDeployment(deployment);
+    DeploymentDto deploymentDto = DeploymentDto.fromDeployment(deployment);
+
+    URI uri = uriInfo.getBaseUriBuilder()
+      .path(relativeRootResourcePath)
+      .path(DeploymentRestService.PATH)
+      .path(deployment.getId())
+      .build();
+
+    // GET /
+    deploymentDto.addReflexiveLink(uri, HttpMethod.GET, "self");
+
+    return deploymentDto;
   }
 
   @Override
   public void deleteDeployment(String deploymentId, UriInfo uriInfo) {
-    RepositoryService repositoryService = engine.getRepositoryService();
+    RepositoryService repositoryService = getProcessEngine().getRepositoryService();
     Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
 
     if (deployment == null) {

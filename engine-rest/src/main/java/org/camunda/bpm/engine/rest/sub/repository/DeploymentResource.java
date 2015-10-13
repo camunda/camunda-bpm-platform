@@ -39,7 +39,7 @@ public interface DeploymentResource {
   @POST
   @Path("/redeploy")
   @Produces(MediaType.APPLICATION_JSON)
-  DeploymentDto redeploy(RedeploymentDto redeployment);
+  DeploymentDto redeploy(@Context UriInfo uriInfo, RedeploymentDto redeployment);
 
   @DELETE
   void deleteDeployment(@PathParam("id") String deploymentId, @Context UriInfo uriInfo);

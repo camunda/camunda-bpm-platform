@@ -44,7 +44,6 @@ import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT
 import static org.camunda.bpm.engine.rest.helper.MockProvider.NON_EXISTING_DEPLOYMENT_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.NON_EXISTING_DEPLOYMENT_RESOURCE_ID;
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -106,6 +105,7 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
 
   protected RepositoryService mockRepositoryService;
   protected Deployment mockDeployment;
+  protected Deployment mockRedeployment;
   protected List<Resource> mockDeploymentResources;
   protected Resource mockDeploymentResource;
   protected DeploymentQuery mockDeploymentQuery;
@@ -137,13 +137,13 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
     when(mockDeploymentBuilder.getResourceNames()).thenReturn(resourceNames);
     when(mockDeploymentBuilder.deploy()).thenReturn(mockDeployment);
 
-    Deployment redeployment = MockProvider.createMockRedeployment();
+    mockRedeployment = MockProvider.createMockRedeployment();
     mockRedeploymentBuilder = mock(RedeploymentBuilder.class);
     when(mockRepositoryService.createRedeployment(anyString())).thenReturn(mockRedeploymentBuilder);
     when(mockRedeploymentBuilder.source(anyString())).thenReturn(mockRedeploymentBuilder);
     when(mockRedeploymentBuilder.addResourceIds(anyListOf(String.class))).thenReturn(mockRedeploymentBuilder);
     when(mockRedeploymentBuilder.addResourceNames(anyListOf(String.class))).thenReturn(mockRedeploymentBuilder);
-    when(mockRedeploymentBuilder.redeploy()).thenReturn(redeployment);
+    when(mockRedeploymentBuilder.redeploy()).thenReturn(mockRedeployment);
   }
 
   private byte[] createMockDeploymentResourceByteData() {
@@ -1313,17 +1313,13 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
 
     json.put("source", MockProvider.EXAMPLE_DEPLOYMENT_SOURCE);
 
-    given()
+    Response response = given()
       .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(json)
     .expect()
       .statusCode(Status.OK.getStatusCode())
       .contentType(ContentType.JSON)
-      .body("id", equalTo(MockProvider.EXAMPLE_RE_DEPLOYMENT_ID))
-      .body("name", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_NAME))
-      .body("source", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_SOURCE))
-      .body("deploymentTime", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_TIME))
     .when()
       .post(REDEPLOY_DEPLOYMENT_URL);
 
@@ -1333,20 +1329,18 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
     verify(mockRedeploymentBuilder).addResourceNames(eq(resourceNames));
     verify(mockRedeploymentBuilder).source(MockProvider.EXAMPLE_DEPLOYMENT_SOURCE);
     verify(mockRedeploymentBuilder).redeploy();
+
+    verifyDeployment(mockRedeployment, response);
   }
 
   @Test
   public void testRedeployDeploymentWithoutRequestBody() {
-    given()
+    Response response = given()
       .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
       .contentType(POST_JSON_CONTENT_TYPE)
     .expect()
       .statusCode(Status.OK.getStatusCode())
       .contentType(ContentType.JSON)
-      .body("id", equalTo(MockProvider.EXAMPLE_RE_DEPLOYMENT_ID))
-      .body("name", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_NAME))
-      .body("source", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_SOURCE))
-      .body("deploymentTime", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_TIME))
     .when()
       .post(REDEPLOY_DEPLOYMENT_URL);
 
@@ -1356,21 +1350,19 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
     verify(mockRedeploymentBuilder, never()).addResourceNames(anyListOf(String.class));
     verify(mockRedeploymentBuilder, never()).source(anyString());
     verify(mockRedeploymentBuilder).redeploy();
+
+    verifyDeployment(mockRedeployment, response);
   }
 
   @Test
   public void testRedeployDeploymentEmptyRequestBody() {
-    given()
+    Response response = given()
       .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
       .contentType(POST_JSON_CONTENT_TYPE)
       .body("{}")
     .expect()
       .statusCode(Status.OK.getStatusCode())
       .contentType(ContentType.JSON)
-      .body("id", equalTo(MockProvider.EXAMPLE_RE_DEPLOYMENT_ID))
-      .body("name", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_NAME))
-      .body("source", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_SOURCE))
-      .body("deploymentTime", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_TIME))
     .when()
       .post(REDEPLOY_DEPLOYMENT_URL);
 
@@ -1380,6 +1372,8 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
     verify(mockRedeploymentBuilder).addResourceNames(null);
     verify(mockRedeploymentBuilder).source(null);
     verify(mockRedeploymentBuilder).redeploy();
+
+    verifyDeployment(mockRedeployment, response);
   }
 
   @Test
@@ -1391,17 +1385,13 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
     resourceIds.add("second-resource-id");
     json.put("resourceIds", resourceIds);
 
-    given()
+    Response response = given()
       .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(json)
     .expect()
       .statusCode(Status.OK.getStatusCode())
       .contentType(ContentType.JSON)
-      .body("id", equalTo(MockProvider.EXAMPLE_RE_DEPLOYMENT_ID))
-      .body("name", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_NAME))
-      .body("source", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_SOURCE))
-      .body("deploymentTime", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_TIME))
     .when()
       .post(REDEPLOY_DEPLOYMENT_URL);
 
@@ -1411,6 +1401,8 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
     verify(mockRedeploymentBuilder).addResourceNames(null);
     verify(mockRedeploymentBuilder).source(null);
     verify(mockRedeploymentBuilder).redeploy();
+
+    verifyDeployment(mockRedeployment, response);
   }
 
   @Test
@@ -1422,17 +1414,13 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
     resourceNames.add("second-resource-name");
     json.put("resourceNames", resourceNames);
 
-    given()
+    Response response = given()
       .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(json)
     .expect()
       .statusCode(Status.OK.getStatusCode())
       .contentType(ContentType.JSON)
-      .body("id", equalTo(MockProvider.EXAMPLE_RE_DEPLOYMENT_ID))
-      .body("name", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_NAME))
-      .body("source", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_SOURCE))
-      .body("deploymentTime", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_TIME))
     .when()
       .post(REDEPLOY_DEPLOYMENT_URL);
 
@@ -1442,6 +1430,8 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
     verify(mockRedeploymentBuilder).addResourceNames(eq(resourceNames));
     verify(mockRedeploymentBuilder).source(null);
     verify(mockRedeploymentBuilder).redeploy();
+
+    verifyDeployment(mockRedeployment, response);
   }
 
   @Test
@@ -1449,17 +1439,13 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
     Map<String, String> json = new HashMap<String, String>();
     json.put("source", MockProvider.EXAMPLE_DEPLOYMENT_SOURCE);
 
-    given()
+    Response response = given()
       .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(json)
     .expect()
       .statusCode(Status.OK.getStatusCode())
       .contentType(ContentType.JSON)
-      .body("id", equalTo(MockProvider.EXAMPLE_RE_DEPLOYMENT_ID))
-      .body("name", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_NAME))
-      .body("source", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_SOURCE))
-      .body("deploymentTime", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_TIME))
     .when()
       .post(REDEPLOY_DEPLOYMENT_URL);
 
@@ -1469,6 +1455,8 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
     verify(mockRedeploymentBuilder).addResourceNames(null);
     verify(mockRedeploymentBuilder).source(MockProvider.EXAMPLE_DEPLOYMENT_SOURCE);
     verify(mockRedeploymentBuilder).redeploy();
+
+    verifyDeployment(mockRedeployment, response);
   }
 
   @Test

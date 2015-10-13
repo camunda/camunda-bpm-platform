@@ -19,10 +19,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
@@ -36,6 +32,10 @@ import org.camunda.bpm.engine.rest.mapper.MultipartFormData;
 import org.camunda.bpm.engine.rest.mapper.MultipartFormData.FormPart;
 import org.camunda.bpm.engine.rest.sub.repository.DeploymentResource;
 import org.camunda.bpm.engine.rest.sub.repository.impl.DeploymentResourceImpl;
+
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -60,7 +60,7 @@ public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware im
   }
 
   public DeploymentResource getDeployment(String deploymentId) {
-    return new DeploymentResourceImpl(getProcessEngine(), deploymentId);
+    return new DeploymentResourceImpl(getProcessEngine().getName(), deploymentId, relativeRootResourcePath, getObjectMapper());
   }
 
   public List<DeploymentDto> getDeployments(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
