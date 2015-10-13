@@ -550,9 +550,9 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
   public void testQueryByEvaluatedBefore() {
-    Date evaluated = ClockUtil.getCurrentTime();
-    Date beforeEvaluated = new DateTime(evaluated.getTime()).minusSeconds(10).toDate();
-    Date afterEvaluated = new DateTime(evaluated.getTime()).plusSeconds(10).toDate();
+    Date beforeEvaluated = new Date(1441612000);
+    Date evaluated = new Date(1441613000);
+    Date afterEvaluated = new Date(1441614000);
 
     ClockUtil.setCurrentTime(evaluated);
     startProcessInstanceAndEvaluateDecision();
@@ -561,13 +561,15 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     assertThat(query.evaluatedBefore(afterEvaluated).count(), is(1L));
     assertThat(query.evaluatedBefore(evaluated).count(), is(1L));
     assertThat(query.evaluatedBefore(beforeEvaluated).count(), is(0L));
+
+    ClockUtil.reset();
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
   public void testQueryByEvaluatedAfter() {
-    Date evaluated = ClockUtil.getCurrentTime();
-    Date beforeEvaluated = new DateTime(evaluated.getTime()).minusSeconds(10).toDate();
-    Date afterEvaluated = new DateTime(evaluated.getTime()).plusSeconds(10).toDate();
+    Date beforeEvaluated = new Date(1441612000);
+    Date evaluated = new Date(1441613000);
+    Date afterEvaluated = new Date(1441614000);
 
     ClockUtil.setCurrentTime(evaluated);
     startProcessInstanceAndEvaluateDecision();
@@ -576,6 +578,8 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     assertThat(query.evaluatedAfter(beforeEvaluated).count(), is(1L));
     assertThat(query.evaluatedAfter(evaluated).count(), is(1L));
     assertThat(query.evaluatedAfter(afterEvaluated).count(), is(0L));
+
+    ClockUtil.reset();
   }
 
   public void testTableNames() {
