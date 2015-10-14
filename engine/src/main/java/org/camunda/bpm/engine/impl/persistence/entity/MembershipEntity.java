@@ -26,17 +26,23 @@ public class MembershipEntity implements Serializable, DbEntity {
 
   protected UserEntity user;
   protected GroupEntity group;
+  
+  /** To Handle an MemberhipEntity inside the cache, a id is necessary.
+  * Even though it will not be saved inside the database
+  * */
+  protected String id;
 
   public Object getPersistentState() {
     // membership is not updatable
     return MembershipEntity.class;
   }
   public String getId() {
-    // membership doesn't have an id
-    return null;
+    // For the sake of Entity caching the id is necessary
+    return id;
   }
   public void setId(String id) {
-    // membership doesn't have an id
+    // For the sake of Entity caching the id is necessary
+    this.id = id;
   }
 
   public UserEntity getUser() {
@@ -50,6 +56,22 @@ public class MembershipEntity implements Serializable, DbEntity {
   }
   public void setGroup(GroupEntity group) {
     this.group = group;
+  }
+  
+  /**
+   * Necessary for the DB Driver due to he works with Reflection to fill the Tables
+   * @return the UserId
+   */
+  public String getUserId(){
+	  return user.getId();
+  }
+  
+  /**
+   * Necessary for the DB Driver due to he works with Reflection to fill the Tables
+   * @return the GroupId
+   */
+  public String getGroupId(){
+	  return group.getId();
   }
 
   @Override
