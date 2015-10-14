@@ -83,7 +83,7 @@ public class SetProcessDefinitionVersionCmd implements Command<Void>, Serializab
   public SetProcessDefinitionVersionCmd(String processInstanceId, Integer processDefinitionVersion) {
     ensureNotEmpty("The process instance id is mandatory", "processInstanceId", processInstanceId);
     ensureNotNull("The process definition version is mandatory", "processDefinitionVersion", processDefinitionVersion);
-    ensurePositive("The process definition version must be positive", "processDefinitionVersion", processDefinitionVersion);
+    ensurePositive("The process definition version must be positive", "processDefinitionVersion", processDefinitionVersion.longValue());
     this.processInstanceId = processInstanceId;
     this.processDefinitionVersion = processDefinitionVersion;
   }

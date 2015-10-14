@@ -40,4 +40,8 @@ public class PvmAtomicOperationActivityStartCancelScope extends PvmAtomicOperati
     return execution.getNextActivity();
   }
 
+  public boolean isAsyncCapable() {
+    return false;
+  }
+
 }

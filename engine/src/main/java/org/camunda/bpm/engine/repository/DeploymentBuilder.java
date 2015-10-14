@@ -82,6 +82,18 @@ public interface DeploymentBuilder {
   DeploymentBuilder activateProcessDefinitionsOn(Date date);
 
   /**
+   * <p>Sets the source of a deployment.</p>
+   *
+   * <p>
+   * Furthermore if duplicate check of deployment resources is enabled (by calling
+   * {@link #enableDuplicateFiltering(boolean)}) then only previous deployments
+   * with the same given source (or where the source is equal to <code>null</code>) are
+   * considered to perform the duplicate check.
+   * </p>
+   */
+  DeploymentBuilder source(String source);
+
+  /**
    * Deploys all provided sources to the process engine.
    *
    * @throws AuthorizationException

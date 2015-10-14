@@ -44,6 +44,14 @@ public interface DeploymentQuery extends Query<DeploymentQuery, Deployment>{
   /** Only select deployments with a name like the given string. */
   DeploymentQuery deploymentNameLike(String nameLike);
 
+  /**
+   * Iff the given <code>source</code> is <code>null</code>,
+   * then deployments are returned where source is equal to null.
+   * Otherwise only deployments with the given source are
+   * selected.
+   */
+  DeploymentQuery deploymentSource(String source);
+
   /** Only select deployments deployed before the given date */
   DeploymentQuery deploymentBefore(Date before);
 

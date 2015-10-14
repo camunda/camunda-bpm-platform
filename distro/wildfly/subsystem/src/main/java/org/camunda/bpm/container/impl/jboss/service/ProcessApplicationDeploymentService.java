@@ -150,6 +150,9 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
       }
       deploymentBuilder.name(deploymentName);
 
+      // set the source of the deployment
+      deploymentBuilder.source(ProcessApplicationDeployment.PROCESS_APPLICATION_DEPLOYMENT_SOURCE);
+
       // add deployment resources
       for (Entry<String, byte[]> resource : deploymentMap.entrySet()) {
         deploymentBuilder.addInputStream(resource.getKey(), new ByteArrayInputStream(resource.getValue()));
@@ -201,11 +204,11 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
       throw new IllegalArgumentException(b.toString());
     }
   }
-  
+
   protected boolean isValidValueForResumePreviousBy(String resumePreviousBy) {
     return resumePreviousBy.equals(ResumePreviousBy.RESUME_BY_DEPLOYMENT_NAME) || resumePreviousBy.equals(ResumePreviousBy.RESUME_BY_PROCESS_DEFINITION_KEY);
   }
-  
+
   /**
    * @param deploymentMap2
    * @param deploymentName

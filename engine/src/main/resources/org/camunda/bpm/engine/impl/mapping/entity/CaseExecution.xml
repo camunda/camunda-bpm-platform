@@ -162,6 +162,9 @@
       <if test="caseDefinitionKey != null">
         and P.KEY_ = #{caseDefinitionKey}
       </if>
+      <if test="deploymentId != null">
+        and P.DEPLOYMENT_ID_ = #{deploymentId}
+      </if>
       <if test="activityId != null">
         and RES.ACT_ID_ = #{activityId}
       </if>

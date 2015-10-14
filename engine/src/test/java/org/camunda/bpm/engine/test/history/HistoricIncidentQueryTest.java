@@ -14,7 +14,7 @@ package org.camunda.bpm.engine.test.history;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricIncidentQuery;
-import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
+import org.camunda.bpm.engine.impl.incident.DefaultIncidentHandler;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -60,7 +60,7 @@ public class HistoricIncidentQueryTest extends PluggableProcessEngineTestCase {
     startProcessInstance(PROCESS_DEFINITION_KEY);
 
     HistoricIncidentQuery query = historyService.createHistoricIncidentQuery()
-        .incidentType(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE);
+        .incidentType(DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE);
 
     assertEquals(1, query.list().size());
     assertEquals(1, query.count());

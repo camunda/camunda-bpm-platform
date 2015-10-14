@@ -19,7 +19,6 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.junit.After;
 import org.junit.Before;
 
 public class DmnScriptOutputTest extends PluggableProcessEngineTestCase {

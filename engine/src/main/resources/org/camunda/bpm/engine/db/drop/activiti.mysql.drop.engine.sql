@@ -8,6 +8,7 @@ drop index ACT_IDX_INC_CONFIGURATION on ACT_RU_INCIDENT;
 drop index ACT_IDX_JOB_PROCINST on ACT_RU_JOB;
 
 drop index ACT_IDX_METER_LOG on ACT_RU_METER_LOG;
+drop index ACT_IDX_EXT_TASK_TOPIC on ACT_RU_EXT_TASK;
 
 alter table ACT_GE_BYTEARRAY 
     drop FOREIGN KEY ACT_FK_BYTEARR_DEPL;
@@ -69,6 +70,9 @@ alter table ACT_RU_INCIDENT
 alter table ACT_RU_INCIDENT
     drop FOREIGN KEY ACT_FK_INC_RCAUSE; 
     
+alter table ACT_RU_EXT_TASK
+    drop FOREIGN KEY ACT_FK_EXT_TASK_EXE;
+    
 drop index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK;
 drop index ACT_IDX_EVENT_SUBSCR_CONFIG_ on ACT_RU_EVENT_SUBSCR;
 
@@ -102,3 +106,4 @@ drop table if exists ACT_RU_INCIDENT;
 drop table if exists ACT_RU_AUTHORIZATION;
 drop table if exists ACT_RU_FILTER;
 drop table if exists ACT_RU_METER_LOG;
+drop table if exists ACT_RU_EXT_TASK;

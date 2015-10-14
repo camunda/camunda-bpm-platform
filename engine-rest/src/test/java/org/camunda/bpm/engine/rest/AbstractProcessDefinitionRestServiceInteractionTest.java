@@ -17,10 +17,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -207,11 +209,11 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
   }
 
   @Test
-  public void testProcessDiagramRetrieval() throws FileNotFoundException {
+  public void testProcessDiagramRetrieval() throws FileNotFoundException, URISyntaxException {
     // setup additional mock behavior
-    String fileName = this.getClass().getResource("/processes/todo-process.png").getFile();
+    File file = getFile("/processes/todo-process.png");
     when(repositoryServiceMock.getProcessDiagram(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
-        .thenReturn(new FileInputStream(fileName));
+        .thenReturn(new FileInputStream(file));
 
     // call method
     byte[] actual = given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -227,18 +229,18 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     verify(repositoryServiceMock).getProcessDiagram(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
 
     // compare input stream with response body bytes
-    byte[] expected = IoUtil.readInputStream(new FileInputStream(fileName), "process diagram");
+    byte[] expected = IoUtil.readInputStream(new FileInputStream(file), "process diagram");
     Assert.assertArrayEquals(expected, actual);
   }
 
   @Test
-  public void testProcessDiagramNullFilename() throws FileNotFoundException {
+  public void testProcessDiagramNullFilename() throws FileNotFoundException, URISyntaxException {
     // setup additional mock behavior
-    String fileName = this.getClass().getResource("/processes/todo-process.png").getFile();
+    File file = getFile("/processes/todo-process.png");
     when(repositoryServiceMock.getProcessDefinition(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID).getDiagramResourceName())
       .thenReturn(null);
     when(repositoryServiceMock.getProcessDiagram(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
-      .thenReturn(new FileInputStream(fileName));
+      .thenReturn(new FileInputStream(file));
 
     // call method
     byte[] actual = given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
@@ -252,7 +254,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     verify(repositoryServiceMock).getProcessDiagram(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
 
     // compare input stream with response body bytes
-    byte[] expected = IoUtil.readInputStream(new FileInputStream(fileName), "process diagram");
+    byte[] expected = IoUtil.readInputStream(new FileInputStream(file), "process diagram");
     Assert.assertArrayEquals(expected, actual);
   }
 

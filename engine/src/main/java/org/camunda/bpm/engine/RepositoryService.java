@@ -32,8 +32,10 @@ import org.camunda.bpm.engine.repository.DeploymentQuery;
 import org.camunda.bpm.engine.repository.DiagramLayout;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
+import org.camunda.bpm.engine.repository.ProcessApplicationRedeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
+import org.camunda.bpm.engine.repository.RedeploymentBuilder;
 import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -61,6 +63,18 @@ public interface RepositoryService {
    * @see ProcessApplicationDeploymentBuilder
    */
   ProcessApplicationDeploymentBuilder createDeployment(ProcessApplicationReference processApplication);
+
+  /**
+   * Starts re-deployment of a deployment.
+   */
+  RedeploymentBuilder createRedeployment(String deploymentId);
+
+  /**
+   * Starts re-deployment of {@link ProcessApplicationDeployment}.
+   *
+   * @see ProcessApplicationRedeploymentBuilder
+   */
+  ProcessApplicationRedeploymentBuilder createRedeployment(String deploymentId, ProcessApplicationReference processApplicationReference);
 
   /**
    * Deletes the given deployment.
@@ -103,7 +117,7 @@ public interface RepositoryService {
    * history process instances and jobs.
    *
    * @param deploymentId id of the deployment, cannot be null.
-   * @param cascade if set to true, all process instances (incuding) history are deleted
+   * @param cascade if set to true, all process instances (including) history are deleted
    * @param skipCustomListeners if true, only the built-in {@link ExecutionListener}s
    * are notified with the {@link ExecutionListener#EVENTNAME_END} event.
    *

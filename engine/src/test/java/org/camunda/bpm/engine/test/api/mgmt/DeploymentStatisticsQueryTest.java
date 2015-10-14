@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
+import org.camunda.bpm.engine.impl.incident.DefaultIncidentHandler;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.DeploymentStatistics;
 import org.camunda.bpm.engine.management.IncidentStatistics;
@@ -141,7 +141,7 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
     assertEquals(1, incidentStatistics.size());
 
     IncidentStatistics incident = incidentStatistics.get(0);
-    assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, incident.getIncidentType());
+    assertEquals(DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE, incident.getIncidentType());
     assertEquals(1, incident.getIncidentCount());
   }
 
@@ -174,7 +174,7 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
     assertEquals(1, incidentStatistics.size());
 
     IncidentStatistics incident = incidentStatistics.get(0);
-    assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, incident.getIncidentType());
+    assertEquals(DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE, incident.getIncidentType());
     assertEquals(1, incident.getIncidentCount());
   }
 
@@ -238,7 +238,7 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
     assertEquals(1, incidentStatistics.size());
 
     IncidentStatistics incident = incidentStatistics.get(0);
-    assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, incident.getIncidentType());
+    assertEquals(DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE, incident.getIncidentType());
     assertEquals(1, incident.getIncidentCount());
   }
 
@@ -269,7 +269,7 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
     assertEquals(1, incidentStatistics.size());
 
     IncidentStatistics incident = incidentStatistics.get(0);
-    assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, incident.getIncidentType());
+    assertEquals(DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE, incident.getIncidentType());
     assertEquals(2, incident.getIncidentCount()); // ...but two incidents
   }
 
@@ -313,7 +313,7 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
 
     IncidentStatistics incidentStatistic = incidentStatistics.get(0);
     assertEquals(1, incidentStatistic.getIncidentCount());
-    assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, incidentStatistic.getIncidentType());
+    assertEquals(DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE, incidentStatistic.getIncidentType());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testFailedTimerStartEvent.bpmn20.xml")
@@ -324,7 +324,7 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
     List<DeploymentStatistics> statistics =
         managementService
         .createDeploymentStatisticsQuery()
-        .includeIncidentsForType(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE)
+        .includeIncidentsForType(DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE)
         .list();
 
     assertEquals(1, statistics.size());
@@ -341,7 +341,7 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
 
     IncidentStatistics incidentStatistic = incidentStatistics.get(0);
     assertEquals(1, incidentStatistic.getIncidentCount());
-    assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, incidentStatistic.getIncidentType());
+    assertEquals(DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE, incidentStatistic.getIncidentType());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testFailedTimerStartEvent.bpmn20.xml")
@@ -393,6 +393,6 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
 
     IncidentStatistics incidentStatistic = incidentStatistics.get(0);
     assertEquals(1, incidentStatistic.getIncidentCount());
-    assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, incidentStatistic.getIncidentType());
+    assertEquals(DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE, incidentStatistic.getIncidentType());
   }
 }

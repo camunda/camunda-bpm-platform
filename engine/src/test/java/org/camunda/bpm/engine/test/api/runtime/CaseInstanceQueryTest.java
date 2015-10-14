@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.Variables;
 
@@ -1570,6 +1571,34 @@ public class CaseInstanceQueryTest extends PluggableProcessEngineTestCase {
 
     try {
       query.subCaseInstanceId(null);
+      fail();
+    } catch (NotValidException e) {
+      // expected
+    }
+  }
+
+  public void testQueryByDeploymentId() {
+    String deploymentId = repositoryService
+        .createDeploymentQuery()
+        .singleResult()
+        .getId();
+
+    CaseInstanceQuery query = caseService
+        .createCaseInstanceQuery()
+        .deploymentId(deploymentId);
+
+    verifyQueryResults(query, 5);
+  }
+
+  public void testQueryByInvalidDeploymentId() {
+    CaseInstanceQuery query = caseService
+        .createCaseInstanceQuery()
+        .deploymentId("invalid");
+
+    verifyQueryResults(query, 0);
+
+    try {
+      query.deploymentId(null);
       fail();
     } catch (NotValidException e) {
       // expected

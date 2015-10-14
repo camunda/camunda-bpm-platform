@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.engine.CaseService;
+import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
@@ -64,6 +65,7 @@ public class MockedProcessEngineProvider implements ProcessEngineProvider {
     ManagementService managementService = mock(ManagementService.class);
     CaseService caseService = mock(CaseService.class);
     FilterService filterService = mock(FilterService.class);
+    ExternalTaskService externalTaskService = mock(ExternalTaskService.class);
 
     when(engine.getRepositoryService()).thenReturn(repoService);
     when(engine.getIdentityService()).thenReturn(identityService);
@@ -74,6 +76,7 @@ public class MockedProcessEngineProvider implements ProcessEngineProvider {
     when(engine.getManagementService()).thenReturn(managementService);
     when(engine.getCaseService()).thenReturn(caseService);
     when(engine.getFilterService()).thenReturn(filterService);
+    when(engine.getExternalTaskService()).thenReturn(externalTaskService);
   }
 
   protected void mockProcessEngineConfiguration(ProcessEngine engine) {

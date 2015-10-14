@@ -73,6 +73,8 @@ public abstract class MultiInstanceActivityBehavior extends AbstractBpmnActivity
   protected void performInstance(ActivityExecution execution, PvmActivity activity, int loopCounter) {
     setLoopVariable(execution, LOOP_COUNTER, loopCounter);
     evaluateCollectionVariable(execution, loopCounter);
+    execution.setEnded(false);
+    execution.setActive(true);
     execution.executeActivity(activity);
   }
 

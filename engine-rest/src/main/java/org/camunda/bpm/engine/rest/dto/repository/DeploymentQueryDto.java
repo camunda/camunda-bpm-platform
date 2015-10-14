@@ -18,12 +18,15 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
+import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -44,6 +47,8 @@ public class DeploymentQueryDto extends AbstractQueryDto<DeploymentQuery> {
   private String id;
   private String name;
   private String nameLike;
+  private String source;
+  private Boolean withoutSource;
   private Date before;
   private Date after;
 
@@ -69,6 +74,16 @@ public class DeploymentQueryDto extends AbstractQueryDto<DeploymentQuery> {
     this.nameLike = nameLike;
   }
 
+  @CamundaQueryParam("source")
+  public void setSource(String source) {
+    this.source = source;
+  }
+
+  @CamundaQueryParam(value = "withoutSource", converter = BooleanConverter.class)
+  public void setWithoutSource(Boolean withoutSource) {
+    this.withoutSource = withoutSource;
+  }
+
   @CamundaQueryParam(value = "before", converter = DateConverter.class)
   public void setDeploymentBefore(Date deploymentBefore) {
     this.before = deploymentBefore;
@@ -91,6 +106,10 @@ public class DeploymentQueryDto extends AbstractQueryDto<DeploymentQuery> {
 
   @Override
   protected void applyFilters(DeploymentQuery query) {
+    if (withoutSource != null && withoutSource && source != null) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, "The query parameters \"withoutSource\" and \"source\" cannot be used in combination.");
+    }
+
     if (id != null) {
       query.deploymentId(id);
     }
@@ -99,6 +118,12 @@ public class DeploymentQueryDto extends AbstractQueryDto<DeploymentQuery> {
     }
     if (nameLike != null) {
       query.deploymentNameLike(nameLike);
+    }
+    if (withoutSource != null && withoutSource) {
+      query.deploymentSource(null);
+    }
+    if (source != null) {
+      query.deploymentSource(source);
     }
     if (before != null) {
       query.deploymentBefore(before);

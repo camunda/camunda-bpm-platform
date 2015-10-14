@@ -22,9 +22,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
+
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.RepositoryService;
@@ -170,11 +173,11 @@ public abstract class AbstractDecisionDefinitionRestServiceInteractionTest exten
   }
 
   @Test
-  public void testDecisionDiagramRetrieval() throws FileNotFoundException {
+  public void testDecisionDiagramRetrieval() throws FileNotFoundException, URISyntaxException {
     // setup additional mock behavior
-    String fileName = this.getClass().getResource("/processes/todo-process.png").getFile();
+    File file = getFile("/processes/todo-process.png");
     when(repositoryServiceMock.getDecisionDiagram(MockProvider.EXAMPLE_DECISION_DEFINITION_ID))
-        .thenReturn(new FileInputStream(fileName));
+        .thenReturn(new FileInputStream(file));
 
     // call method
     byte[] actual = given().pathParam("id", MockProvider.EXAMPLE_DECISION_DEFINITION_ID)
@@ -190,18 +193,18 @@ public abstract class AbstractDecisionDefinitionRestServiceInteractionTest exten
     verify(repositoryServiceMock).getDecisionDiagram(MockProvider.EXAMPLE_DECISION_DEFINITION_ID);
 
     // compare input stream with response body bytes
-    byte[] expected = IoUtil.readInputStream(new FileInputStream(fileName), "decision diagram");
+    byte[] expected = IoUtil.readInputStream(new FileInputStream(file), "decision diagram");
     Assert.assertArrayEquals(expected, actual);
   }
 
   @Test
-  public void testDecisionDiagramNullFilename() throws FileNotFoundException {
+  public void testDecisionDiagramNullFilename() throws FileNotFoundException, URISyntaxException {
     // setup additional mock behavior
-    String fileName = this.getClass().getResource("/processes/todo-process.png").getFile();
+    File file = getFile("/processes/todo-process.png");
     when(repositoryServiceMock.getDecisionDefinition(MockProvider.EXAMPLE_DECISION_DEFINITION_ID).getDiagramResourceName())
       .thenReturn(null);
     when(repositoryServiceMock.getDecisionDiagram(MockProvider.EXAMPLE_DECISION_DEFINITION_ID))
-        .thenReturn(new FileInputStream(fileName));
+        .thenReturn(new FileInputStream(file));
 
     // call method
     byte[] actual = given().pathParam("id", MockProvider.EXAMPLE_DECISION_DEFINITION_ID)
@@ -215,7 +218,7 @@ public abstract class AbstractDecisionDefinitionRestServiceInteractionTest exten
     verify(repositoryServiceMock).getDecisionDiagram(MockProvider.EXAMPLE_DECISION_DEFINITION_ID);
 
     // compare input stream with response body bytes
-    byte[] expected = IoUtil.readInputStream(new FileInputStream(fileName), "decision diagram");
+    byte[] expected = IoUtil.readInputStream(new FileInputStream(file), "decision diagram");
     Assert.assertArrayEquals(expected, actual);
   }
 

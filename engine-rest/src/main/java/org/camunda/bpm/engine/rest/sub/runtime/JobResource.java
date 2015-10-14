@@ -23,7 +23,7 @@ import javax.ws.rs.core.MediaType;
 import org.camunda.bpm.engine.rest.dto.runtime.JobDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobDuedateDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobPriorityDto;
-import org.camunda.bpm.engine.rest.dto.runtime.JobRetriesDto;
+import org.camunda.bpm.engine.rest.dto.runtime.RetriesDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobSuspensionStateDto;
 
 public interface JobResource {
@@ -40,7 +40,7 @@ public interface JobResource {
   @PUT
   @Path("/retries")
   @Consumes(MediaType.APPLICATION_JSON)
-  void setJobRetries(JobRetriesDto dto);
+  void setJobRetries(RetriesDto dto);
 
   @POST
   @Path("/execute")

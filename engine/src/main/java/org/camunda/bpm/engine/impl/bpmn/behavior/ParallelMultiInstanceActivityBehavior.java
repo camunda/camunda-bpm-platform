@@ -41,12 +41,11 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
     }
 
     // start the concurrent child executions
-    for (int i = 0; i < nrOfInstances; i++) {
+    // start executions in reverse order (order will be reversed again in command context with the effect that they are
+    // actually be started in correct order :) )
+    for (int i = (nrOfInstances - 1); i >= 0; i--) {
       ActivityExecution activityExecution = concurrentExecutions.get(i);
-      // check for active execution: the completion condition may be satisfied before all executions are started
-      if(activityExecution.isActive()) {
-        performInstance(activityExecution, innerActivity, i);
-      }
+      performInstance(activityExecution, innerActivity, i);
     }
   }
 

@@ -46,4 +46,5 @@ public interface AtomicOperation extends CoreAtomicOperation<PvmExecutionImpl> {
   AtomicOperation DELETE_CASCADE = PvmAtomicOperation.DELETE_CASCADE;
   AtomicOperation DELETE_CASCADE_FIRE_ACTIVITY_END = PvmAtomicOperation.DELETE_CASCADE_FIRE_ACTIVITY_END;
 
+  boolean isAsyncCapable();
 }

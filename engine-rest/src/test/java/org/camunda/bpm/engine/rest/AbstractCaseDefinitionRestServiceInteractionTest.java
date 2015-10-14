@@ -24,9 +24,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -458,11 +460,11 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
   }
 
   @Test
-  public void testCaseDiagramRetrieval() throws FileNotFoundException {
+  public void testCaseDiagramRetrieval() throws FileNotFoundException, URISyntaxException {
     // setup additional mock behavior
-    String fileName = this.getClass().getResource("/processes/todo-process.png").getFile();
+    File file = getFile("/processes/todo-process.png");
     when(repositoryServiceMock.getCaseDiagram(MockProvider.EXAMPLE_CASE_DEFINITION_ID))
-        .thenReturn(new FileInputStream(fileName));
+        .thenReturn(new FileInputStream(file));
 
     // call method
     byte[] actual = given().pathParam("id", MockProvider.EXAMPLE_CASE_DEFINITION_ID)
@@ -478,18 +480,18 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
     verify(repositoryServiceMock).getCaseDiagram(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
 
     // compare input stream with response body bytes
-    byte[] expected = IoUtil.readInputStream(new FileInputStream(fileName), "case diagram");
+    byte[] expected = IoUtil.readInputStream(new FileInputStream(file), "case diagram");
     Assert.assertArrayEquals(expected, actual);
   }
 
   @Test
-  public void testCaseDiagramNullFilename() throws FileNotFoundException {
+  public void testCaseDiagramNullFilename() throws FileNotFoundException, URISyntaxException {
     // setup additional mock behavior
-    String fileName = this.getClass().getResource("/processes/todo-process.png").getFile();
+    File file = getFile("/processes/todo-process.png");
     when(repositoryServiceMock.getCaseDefinition(MockProvider.EXAMPLE_CASE_DEFINITION_ID).getDiagramResourceName())
       .thenReturn(null);
     when(repositoryServiceMock.getCaseDiagram(MockProvider.EXAMPLE_CASE_DEFINITION_ID))
-        .thenReturn(new FileInputStream(fileName));
+        .thenReturn(new FileInputStream(file));
 
     // call method
     byte[] actual = given().pathParam("id", MockProvider.EXAMPLE_CASE_DEFINITION_ID)
@@ -503,7 +505,7 @@ public abstract class AbstractCaseDefinitionRestServiceInteractionTest extends A
     verify(repositoryServiceMock).getCaseDiagram(MockProvider.EXAMPLE_CASE_DEFINITION_ID);
 
     // compare input stream with response body bytes
-    byte[] expected = IoUtil.readInputStream(new FileInputStream(fileName), "case diagram");
+    byte[] expected = IoUtil.readInputStream(new FileInputStream(file), "case diagram");
     Assert.assertArrayEquals(expected, actual);
   }
 

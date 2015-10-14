@@ -69,6 +69,9 @@ alter table ACT_RU_INCIDENT
 
 alter table ACT_RU_INCIDENT
     drop foreign key ACT_FK_INC_RCAUSE;
+    
+alter table ACT_RU_EXT_TASK
+    drop foreign key ACT_FK_EXT_TASK_EXE;
 
 drop index ACT_IDX_EVENT_SUBSCR_CONFIG_;
 drop index ACT_IDX_ATHRZ_PROCEDEF;
@@ -95,6 +98,7 @@ drop index ACT_IDX_TASK_PROCINST;
 drop index ACT_IDX_TASK_PROC_DEF_ID;
 drop index ACT_IDX_METER_LOG;
 drop index ACT_IDX_AUTH_RESOURCE_ID;
+drop index ACT_IDX_EXT_TASK_TOPIC;
 
 drop index ACT_IDX_BYTEARRAY_NAME;
 drop index ACT_IDX_DEPLOYMENT_NAME;
@@ -118,4 +122,5 @@ drop table ACT_RU_INCIDENT;
 drop table ACT_RU_AUTHORIZATION;
 drop table ACT_RU_FILTER;
 drop table ACT_RU_METER_LOG;
+drop table ACT_RU_EXT_TASK;
 

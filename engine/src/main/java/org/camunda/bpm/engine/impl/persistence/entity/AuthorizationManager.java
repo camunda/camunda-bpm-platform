@@ -53,6 +53,7 @@ import org.camunda.bpm.engine.impl.AuthorizationQueryImpl;
 import org.camunda.bpm.engine.impl.DeploymentQueryImpl;
 import org.camunda.bpm.engine.impl.DeploymentStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.EventSubscriptionQueryImpl;
+import org.camunda.bpm.engine.impl.ExternalTaskQueryImpl;
 import org.camunda.bpm.engine.impl.HistoricActivityInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.HistoricActivityStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.HistoricDecisionInstanceQueryImpl;
@@ -75,7 +76,10 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.AuthorizationCheck;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
+import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.db.PermissionCheck;
+import org.camunda.bpm.engine.impl.db.CompositePermissionCheck;
+import org.camunda.bpm.engine.impl.db.PermissionCheckBuilder;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
@@ -238,13 +242,13 @@ public class AuthorizationManager extends AbstractManager {
     AuthorizationCheck authCheck = new AuthorizationCheck();
     authCheck.setAuthUserId(userId);
     authCheck.setAuthGroupIds(groupIds);
-    authCheck.setPermissionChecks(permissionChecks);
+    authCheck.setAtomicPermissionChecks(permissionChecks);
     return getDbEntityManager().selectBoolean("isUserAuthorizedForResource", authCheck);
   }
 
   // authorization checks on queries ////////////////////////////////
 
-  public void configureQuery(AbstractQuery query) {
+  public void configureQuery(ListQueryParameterObject query) {
     final Authentication currentAuthentication = getCurrentAuthentication();
     CommandContext commandContext = getCommandContext();
 
@@ -281,7 +285,7 @@ public class AuthorizationManager extends AbstractManager {
     addPermissionCheck(query, resource, queryParam, permission);
   }
 
-  protected void addPermissionCheck(AbstractQuery query, Resource resource, String queryParam, Permission permission) {
+  protected void addPermissionCheck(ListQueryParameterObject query, Resource resource, String queryParam, Permission permission) {
     CommandContext commandContext = getCommandContext();
     if (isAuthorizationEnabled() && getCurrentAuthentication() != null && commandContext.isAuthorizationCheckEnabled()) {
       PermissionCheck permCheck = new PermissionCheck();
@@ -289,7 +293,14 @@ public class AuthorizationManager extends AbstractManager {
       permCheck.setResourceIdQueryParam(queryParam);
       permCheck.setPermission(permission);
 
-      query.addPermissionCheck(permCheck);
+      query.addAtomicPermissionCheck(permCheck);
+    }
+  }
+
+  protected void addPermissionCheck(AuthorizationCheck authCheck, CompositePermissionCheck compositeCheck) {
+    CommandContext commandContext = getCommandContext();
+    if (isAuthorizationEnabled() && getCurrentAuthentication() != null && commandContext.isAuthorizationCheckEnabled()) {
+      authCheck.setPermissionChecks(compositeCheck);
     }
   }
 
@@ -1075,6 +1086,32 @@ public class AuthorizationManager extends AbstractManager {
 
       }
     }
+  }
+
+  public void configureExternalTaskQuery(ExternalTaskQueryImpl query) {
+    configureQuery(query);
+    addPermissionCheck(query, PROCESS_INSTANCE, "RES.PROC_INST_ID_", READ);
+    addPermissionCheck(query, PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_INSTANCE);
+  }
+
+  public void configureExternalTaskFetch(ListQueryParameterObject parameter) {
+    configureQuery(parameter);
+
+    CompositePermissionCheck permissionCheck = new PermissionCheckBuilder()
+      .conjunctive()
+      .composite()
+        .disjunctive()
+        .atomicCheck(PROCESS_INSTANCE, "RES.PROC_INST_ID_", READ)
+        .atomicCheck(PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", READ_INSTANCE)
+        .done()
+      .composite()
+        .disjunctive()
+        .atomicCheck(PROCESS_INSTANCE, "RES.PROC_INST_ID_", UPDATE)
+        .atomicCheck(PROCESS_DEFINITION, "RES.PROC_DEF_KEY_", UPDATE_INSTANCE)
+        .done()
+      .build();
+
+    addPermissionCheck(parameter, permissionCheck);
   }
 
 }

@@ -36,15 +36,75 @@
   </select>
   
   <select id="selectResourceByDeploymentIdAndResourceName" parameterType="map" resultMap="resourceResultMap">
-    select * from ${prefix}ACT_GE_BYTEARRAY 
-    where DEPLOYMENT_ID_ = #{deploymentId}
-          AND NAME_ = #{resourceName}
+    select
+          *
+    from
+          ${prefix}ACT_GE_BYTEARRAY
+    where
+          DEPLOYMENT_ID_ = #{deploymentId}
+    and
+          NAME_ = #{resourceName}
+  </select>
+
+  <select id="selectResourceByDeploymentIdAndResourceNames" parameterType="map" resultMap="resourceResultMap">
+    select
+          *
+    from
+          ${prefix}ACT_GE_BYTEARRAY
+    where
+          DEPLOYMENT_ID_ = #{parameter.deploymentId}
+    <if test="parameter.resourceNames != null">
+    and
+          <if test="parameter.resourceNames.length == 1">
+          NAME_ = #{parameter.resourceNames[0]}
+          </if>
+          <if test="parameter.resourceNames.length > 1">
+          NAME_ in
+            <foreach item="resourceName"
+                      collection="parameter.resourceNames"
+                      open="("
+                      separator=","
+                      close=")">
+              #{resourceName}
+            </foreach>
+          </if>
+    </if>
   </select>
 
   <select id="selectResourceByDeploymentIdAndResourceId" parameterType="map" resultMap="resourceResultMap">
-    select * from ${prefix}ACT_GE_BYTEARRAY 
-    where DEPLOYMENT_ID_ = #{deploymentId}
-          AND ID_ = #{resourceId}
+    select
+          *
+    from
+          ${prefix}ACT_GE_BYTEARRAY
+    where
+          DEPLOYMENT_ID_ = #{deploymentId}
+    and
+          ID_ = #{resourceId}
+  </select>
+
+  <select id="selectResourceByDeploymentIdAndResourceIds" parameterType="map" resultMap="resourceResultMap">
+    select
+          *
+    from
+          ${prefix}ACT_GE_BYTEARRAY
+    where
+          DEPLOYMENT_ID_ = #{parameter.deploymentId}
+    <if test="parameter.resourceIds != null">
+    and
+          <if test="parameter.resourceIds.length == 1">
+          ID_ = #{parameter.resourceIds[0]}
+          </if>
+          <if test="parameter.resourceIds.length > 1">
+          ID_ in
+            <foreach item="resourceId"
+                      collection="parameter.resourceIds"
+                      open="("
+                      separator=","
+                      close=")">
+              #{resourceId}
+            </foreach>
+          </if>
+    </if>
   </select>
 
   <select id="selectResourcesByDeploymentId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="resourceResultMap">
@@ -64,6 +124,14 @@
         inner join ${prefix}ACT_RE_DEPLOYMENT D
         on B.DEPLOYMENT_ID_ = D.ID_
       where D.NAME_ = #{parameter.deploymentName}
+        and
+        <if test="parameter.source != null">
+          (D.SOURCE_ = #{parameter.source} or
+        </if>
+          D.SOURCE_ is null
+        <if test="parameter.source != null">
+          )
+        </if>
       <if test="parameter.resourcesToFind != null &amp;&amp; parameter.resourcesToFind.size > 0">
         and B.NAME_ in 
         <foreach item="resourceName" index="index" collection="parameter.resourcesToFind"
@@ -78,6 +146,14 @@
     on B.DEPLOYMENT_ID_ = D.ID_
     and D.DEPLOY_TIME_ = LAST_RESOURCE.DEPLOY_TIME_ 
     and D.NAME_ = #{parameter.deploymentName}
+    and
+    <if test="parameter.source != null">
+      (D.SOURCE_ = #{parameter.source} or
+    </if>
+      D.SOURCE_ is null
+    <if test="parameter.source != null">
+      )
+    </if>
   </sql>
 
   <!-- postgresql specific -->
@@ -97,12 +173,64 @@
   </select>
 
   <!-- postgresql specific -->
+  <select id="selectResourceByDeploymentIdAndResourceNames_postgres" parameterType="map" resultMap="resourceResultMap_postgres">
+    select
+          *
+    from
+          ${prefix}ACT_GE_BYTEARRAY
+    where
+          DEPLOYMENT_ID_ = #{parameter.deploymentId}
+    <if test="parameter.resourceNames != null">
+    and
+          <if test="parameter.resourceNames.length == 1">
+          NAME_ = #{parameter.resourceNames[0]}
+          </if>
+          <if test="parameter.resourceNames.length > 1">
+          NAME_ in
+            <foreach item="resourceName"
+                      collection="parameter.resourceNames"
+                      open="("
+                      separator=","
+                      close=")">
+              #{resourceName}
+            </foreach>
+          </if>
+    </if>
+  </select>
+
+  <!-- postgresql specific -->
   <select id="selectResourceByDeploymentIdAndResourceId_postgres" parameterType="map" resultMap="resourceResultMap_postgres">
     select * from ${prefix}ACT_GE_BYTEARRAY 
     where DEPLOYMENT_ID_ = #{deploymentId}
           AND ID_ = #{resourceId}
   </select>
-  
+
+  <!-- postgresql specific -->
+  <select id="selectResourceByDeploymentIdAndResourceIds_postgres" parameterType="map" resultMap="resourceResultMap_postgres">
+    select
+          *
+    from
+          ${prefix}ACT_GE_BYTEARRAY
+    where
+          DEPLOYMENT_ID_ = #{parameter.deploymentId}
+    <if test="parameter.resourceIds != null">
+    and
+          <if test="parameter.resourceIds.length == 1">
+          ID_ = #{parameter.resourceIds[0]}
+          </if>
+          <if test="parameter.resourceIds.length > 1">
+          ID_ in
+            <foreach item="resourceId"
+                      collection="parameter.resourceIds"
+                      open="("
+                      separator=","
+                      close=")">
+              #{resourceId}
+            </foreach>
+          </if>
+    </if>
+  </select>
+
   <!-- postgresql specific -->
   <select id="selectResourcesByDeploymentId_postgres" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="resourceResultMap_postgres">
     select * from ${prefix}ACT_GE_BYTEARRAY where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc

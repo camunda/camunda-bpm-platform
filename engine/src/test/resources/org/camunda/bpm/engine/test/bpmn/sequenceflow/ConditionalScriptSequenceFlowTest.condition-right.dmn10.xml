@@ -14,10 +14,10 @@
           <text>direction</text>
         </inputExpression>
         <inputEntry id="left">
-          <text>left</text>
+          <text>"left"</text>
         </inputEntry>
         <inputEntry id="right">
-          <text>right</text>
+          <text>"right"</text>
         </inputEntry>
       </clause>
       <clause id="result" camunda:output="result">

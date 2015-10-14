@@ -18,7 +18,6 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +36,7 @@ import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.joda.time.DateTime;
 
 /**
  * @author Philipp Ossler
@@ -152,6 +152,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
   public void testMultipleDecisionInstances() {
 
     startProcessInstanceAndEvaluateDecision("a");
+    waitASignificantAmountOfTime();
     startProcessInstanceAndEvaluateDecision("b");
 
     List<HistoricDecisionInstance> historicDecisionInstances = historyService
@@ -411,13 +412,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
   public void testQuerySortByEvaluationTime() {
 
     startProcessInstanceAndEvaluateDecision();
-
-    // evaluate second decision after 10s
-    Calendar calendar = Calendar.getInstance();
-    calendar.setTime(ClockUtil.getCurrentTime());
-    calendar.add(Calendar.SECOND, 10);
-    ClockUtil.setCurrentTime(calendar.getTime());
-
+    waitASignificantAmountOfTime();
     startProcessInstanceAndEvaluateDecision();
 
     List<HistoricDecisionInstance> orderAsc = historyService.createHistoricDecisionInstanceQuery().orderByEvaluationTime().asc().list();
@@ -682,6 +677,14 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("input1", input);
     return runtimeService.startProcessInstanceByKey("testProcess", variables);
+  }
+
+  /**
+   * Use between two rule evaluations to ensure the expected order by evaluation time.
+   */
+  protected void waitASignificantAmountOfTime() {
+    DateTime now = new DateTime(ClockUtil.getCurrentTime());
+    ClockUtil.setCurrentTime(now.plusSeconds(10).toDate());
   }
 
 }

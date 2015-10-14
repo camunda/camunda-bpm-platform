@@ -121,6 +121,10 @@ public abstract class ProcessOrCaseTaskItemHandler extends TaskItemHandler {
         CallableElementParameter parameter = new CallableElementParameter();
         callableElement.addInput(parameter);
 
+        if (input.getCamundaLocal()) {
+          parameter.setReadLocal(true);
+        }
+
         // all variables
         String variables = input.getCamundaVariables();
         if ("all".equals(variables)) {

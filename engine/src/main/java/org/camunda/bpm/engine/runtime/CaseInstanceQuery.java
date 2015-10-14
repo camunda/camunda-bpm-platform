@@ -63,6 +63,13 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
   CaseInstanceQuery caseDefinitionId(String caseDefinitionId);
 
   /**
+   * Selects the case instances which belong to the given deployment id.
+   *
+   * @since 7.4
+   */
+  CaseInstanceQuery deploymentId(String deploymentId);
+
+  /**
    * Select the case instances which are a sub case instance of the given
    * super process instance.
    *

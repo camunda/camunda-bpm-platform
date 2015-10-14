@@ -38,6 +38,9 @@ public abstract class CallableElementActivityBehavior extends AbstractBpmnActivi
     // only data. no control flow available on this execution.
     VariableMap variabes = getOutputVariables(subInstance);
     execution.setVariables(variabes);
+
+    VariableMap localVariables = getOutputVariablesLocal(subInstance);
+    execution.setVariablesLocal(localVariables);
   }
 
   public void completed(ActivityExecution execution) throws Exception {
@@ -63,6 +66,10 @@ public abstract class CallableElementActivityBehavior extends AbstractBpmnActivi
 
   protected VariableMap getOutputVariables(VariableScope variableScope) {
     return getCallableElement().getOutputVariables(variableScope);
+  }
+
+  protected VariableMap getOutputVariablesLocal(VariableScope variableScope) {
+    return getCallableElement().getOutputVariablesLocal(variableScope);
   }
 
   protected Integer getVersion(ActivityExecution execution) {

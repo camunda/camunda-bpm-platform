@@ -49,6 +49,7 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.EventBasedGatewayActivityBehavi
 import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessStartEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ExclusiveGatewayActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.ExternalTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.InclusiveGatewayActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateCatchEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateCatchLinkEventActivityBehavior;
@@ -1930,6 +1931,8 @@ public class BpmnParse extends Parse {
         parseEmailServiceTask(activity, serviceTaskElement, parseFieldDeclarations(serviceTaskElement));
       } else if (type.equalsIgnoreCase("shell")) {
         parseShellServiceTask(activity, serviceTaskElement, parseFieldDeclarations(serviceTaskElement));
+      } else if (type.equalsIgnoreCase("external")) {
+        parseExternalServiceTask(activity, serviceTaskElement);
       } else {
         addError("Invalid usage of type attribute on " + elementName + ": '" + type + "'", serviceTaskElement);
       }
@@ -2168,6 +2171,18 @@ public class BpmnParse extends Parse {
   protected void parseShellServiceTask(ActivityImpl activity, Element serviceTaskElement, List<FieldDeclaration> fieldDeclarations) {
     validateFieldDeclarationsForShell(serviceTaskElement, fieldDeclarations);
     activity.setActivityBehavior((ActivityBehavior) instantiateDelegate(ShellActivityBehavior.class, fieldDeclarations));
+  }
+
+  protected void parseExternalServiceTask(ActivityImpl activity, Element serviceTaskElement) {
+    activity.setScope(true);
+
+    String topicName = serviceTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "topic");
+
+    if (topicName == null) {
+      addError("External tasks must specify a 'topic' attribute in the camunda namespace", serviceTaskElement);
+    }
+
+    activity.setActivityBehavior(new ExternalTaskActivityBehavior(topicName));
   }
 
   protected void validateFieldDeclarationsForEmail(Element serviceTaskElement, List<FieldDeclaration> fieldDeclarations) {
@@ -3400,36 +3415,13 @@ public class BpmnParse extends Parse {
 
         } else {
 
-          CallableElementParameter parameter = new CallableElementParameter();
+          CallableElementParameter parameter = parseCallableElementProvider(inElement);
+
+          if (attributeValueEquals(inElement, "local", "true")) {
+            parameter.setReadLocal(true);
+          }
+
           callableElement.addInput(parameter);
-
-          String variables = inElement.attribute("variables");
-
-          if ("all".equals(variables)) {
-            parameter.setAllVariables(true);
-            continue;
-          }
-
-          ParameterValueProvider sourceValueProvider = new NullValueProvider();
-          String source = inElement.attribute("source");
-          if (source != null && !source.isEmpty()) {
-            sourceValueProvider = new ConstantValueProvider(source);
-          } else {
-
-            source = inElement.attribute("sourceExpression");
-
-            if (source != null && !source.isEmpty()) {
-              Expression expression = expressionManager.createExpression(source);
-              sourceValueProvider = new ElValueProvider(expression);
-            }
-          }
-          parameter.setSourceValueProvider(sourceValueProvider);
-
-          String target = inElement.attribute("target");
-          if (source != null && !source.isEmpty() && target == null) {
-            addError("Missing attribute 'target' when attribute 'source' or 'sourceExpression' is set", inElement);
-          }
-          parameter.setTarget(target);
         }
       }
     }
@@ -3442,38 +3434,59 @@ public class BpmnParse extends Parse {
       // output data elements
       for (Element outElement : extensionsElement.elementsNS(CAMUNDA_BPMN_EXTENSIONS_NS, "out")) {
 
-        CallableElementParameter parameter = new CallableElementParameter();
-        callableElement.addOutput(parameter);
+        CallableElementParameter parameter = parseCallableElementProvider(outElement);
 
-        String variables = outElement.attribute("variables");
-
-        if ("all".equals(variables)) {
-          parameter.setAllVariables(true);
-          continue;
+        if (attributeValueEquals(outElement, "local", "true")) {
+          callableElement.addOutputLocal(parameter);
+        }
+        else {
+          callableElement.addOutput(parameter);
         }
 
-        ParameterValueProvider sourceValueProvider = new NullValueProvider();
-        String source = outElement.attribute("source");
-        if (source != null && !source.isEmpty()) {
-          sourceValueProvider = new ConstantValueProvider(source);
-        } else {
-
-          source = outElement.attribute("sourceExpression");
-
-          if (source != null && !source.isEmpty()) {
-            Expression expression = expressionManager.createExpression(source);
-            sourceValueProvider = new ElValueProvider(expression);
-          }
-        }
-        parameter.setSourceValueProvider(sourceValueProvider);
-
-        String target = outElement.attribute("target");
-        if (source != null && !source.isEmpty() && target == null) {
-          addError("Missing attribute 'target' when attribute 'source' or 'sourceExpression' is set", outElement);
-        }
-        parameter.setTarget(target);
       }
     }
+  }
+
+  protected boolean attributeValueEquals(Element element, String attribute, String comparisonValue) {
+    String value = element.attribute(attribute);
+
+    return comparisonValue.equals(value);
+  }
+
+  protected CallableElementParameter parseCallableElementProvider(Element parameterElement) {
+    CallableElementParameter parameter = new CallableElementParameter();
+
+    String variables = parameterElement.attribute("variables");
+
+    if ("all".equals(variables)) {
+      parameter.setAllVariables(true);
+    }
+    else {
+
+      ParameterValueProvider sourceValueProvider = new NullValueProvider();
+      String source = parameterElement.attribute("source");
+      if (source != null && !source.isEmpty()) {
+        sourceValueProvider = new ConstantValueProvider(source);
+      } else {
+
+        source = parameterElement.attribute("sourceExpression");
+
+        if (source != null && !source.isEmpty()) {
+          Expression expression = expressionManager.createExpression(source);
+          sourceValueProvider = new ElValueProvider(expression);
+        }
+      }
+      parameter.setSourceValueProvider(sourceValueProvider);
+
+      String target = parameterElement.attribute("target");
+      if (source != null && !source.isEmpty() && target == null) {
+        addError("Missing attribute 'target' when attribute 'source' or 'sourceExpression' is set", parameterElement);
+      }
+      parameter.setTarget(target);
+    }
+
+    return parameter;
+
   }
 
   /**
@@ -4087,7 +4100,11 @@ public class BpmnParse extends Parse {
   protected boolean checkActivityInputOutputSupported(Element activityElement, ActivityImpl activity, IoMapping inputOutput) {
     String tagName = activityElement.getTagName();
 
-    if (!(tagName.contains("Task") || tagName.contains("Event") || tagName.equals("transaction") || tagName.equals("subProcess"))) {
+    if (!(tagName.contains("Task")
+        || tagName.contains("Event")
+        || tagName.equals("transaction")
+        || tagName.equals("subProcess")
+        || tagName.equals("callActivity"))) {
       addError("camunda:inputOutput mapping unsupported for element type '" + tagName + "'.", activityElement);
       return false;
     }

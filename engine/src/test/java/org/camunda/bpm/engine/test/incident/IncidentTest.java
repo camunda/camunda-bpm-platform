@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
+import org.camunda.bpm.engine.impl.incident.DefaultIncidentHandler;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -47,7 +47,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
 
     assertNotNull(incident.getId());
     assertNotNull(incident.getIncidentTimestamp());
-    assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, incident.getIncidentType());
+    assertEquals(DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE, incident.getIncidentType());
     assertEquals("Exception expected.", incident.getIncidentMessage());
     assertEquals(processInstance.getId(), incident.getExecutionId());
     assertEquals("theServiceTask", incident.getActivityId());
@@ -138,7 +138,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
 
     assertNotNull(incident.getId());
     assertNotNull(incident.getIncidentTimestamp());
-    assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, incident.getIncidentType());
+    assertEquals(DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE, incident.getIncidentType());
     assertEquals("Exception expected.", incident.getIncidentMessage());
     assertEquals(executionIdOfNestedFailingExecution, incident.getExecutionId());
     assertEquals("theServiceTask", incident.getActivityId());
@@ -174,7 +174,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
 
     assertNotNull(causeIncident.getId());
     assertNotNull(causeIncident.getIncidentTimestamp());
-    assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, causeIncident.getIncidentType());
+    assertEquals(DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE, causeIncident.getIncidentType());
     assertEquals("Exception expected.", causeIncident.getIncidentMessage());
     assertEquals(job.getExecutionId(), causeIncident.getExecutionId());
     assertEquals("theServiceTask", causeIncident.getActivityId());
@@ -192,7 +192,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
 
     assertNotNull(recursiveCreatedIncident.getId());
     assertNotNull(recursiveCreatedIncident.getIncidentTimestamp());
-    assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, recursiveCreatedIncident.getIncidentType());
+    assertEquals(DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE, recursiveCreatedIncident.getIncidentType());
     assertNull(recursiveCreatedIncident.getIncidentMessage());
     assertEquals(theCallActivityExecution.getId(), recursiveCreatedIncident.getExecutionId());
     assertEquals("theCallActivity", recursiveCreatedIncident.getActivityId());
@@ -226,7 +226,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
 
     assertNotNull(rootCauseIncident.getId());
     assertNotNull(rootCauseIncident.getIncidentTimestamp());
-    assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, rootCauseIncident.getIncidentType());
+    assertEquals(DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE, rootCauseIncident.getIncidentType());
     assertEquals("Exception expected.", rootCauseIncident.getIncidentMessage());
     assertEquals(job.getExecutionId(), rootCauseIncident.getExecutionId());
     assertEquals("theServiceTask", rootCauseIncident.getActivityId());
@@ -247,7 +247,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
 
     assertNotNull(causeIncident.getId());
     assertNotNull(causeIncident.getIncidentTimestamp());
-    assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, causeIncident.getIncidentType());
+    assertEquals(DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE, causeIncident.getIncidentType());
     assertNull(causeIncident.getIncidentMessage());
     assertEquals(theCallActivityExecution.getId(), causeIncident.getExecutionId());
     assertEquals("theCallActivity", causeIncident.getActivityId());
@@ -265,7 +265,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
 
     assertNotNull(topLevelIncident.getId());
     assertNotNull(topLevelIncident.getIncidentTimestamp());
-    assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, topLevelIncident.getIncidentType());
+    assertEquals(DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE, topLevelIncident.getIncidentType());
     assertNull(topLevelIncident.getIncidentMessage());
     assertEquals(theCallingCallActivity.getId(), topLevelIncident.getExecutionId());
     assertEquals("theCallingCallActivity", topLevelIncident.getActivityId());

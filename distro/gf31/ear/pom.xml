@@ -75,6 +75,13 @@
       <scope>provided</scope>
     </dependency>
     
+    <!-- exclude commons typed values (part of shared lib) -->
+    <dependency>
+      <groupId>org.camunda.commons</groupId>
+      <artifactId>camunda-commons-typed-values</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-plugin-connect</artifactId>

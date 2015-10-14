@@ -11,35 +11,35 @@
           <text>input</text>
         </inputExpression>
         <inputEntry id="input1">
-          <text>no output</text>
+          <text>"no output"</text>
         </inputEntry>
         <inputEntry id="input2">
-          <text>empty output</text>
+          <text>"empty output"</text>
         </inputEntry>
         <inputEntry id="input3">
-          <text>empty map</text>
+          <text>"empty map"</text>
         </inputEntry>
         <inputEntry id="input4">
-          <text>single entry</text>
+          <text>"single entry"</text>
         </inputEntry>
         <inputEntry id="input5">
-          <text>multiple entries</text>
+          <text>"multiple entries"</text>
         </inputEntry>
         <inputEntry id="input6">
-          <text>single entry list</text>
+          <text>"single entry list"</text>
         </inputEntry>
         <inputEntry id="input7">
-          <text>multiple entries list</text>
+          <text>"multiple entries list"</text>
         </inputEntry>
       </clause>
       <clause id="result1" camunda:output="result1" >
         <outputEntry id="output1">
-          <text>foo</text>
+          <text>"foo"</text>
         </outputEntry>
       </clause>
       <clause id="result2" camunda:output="result2" >
         <outputEntry id="output2">
-          <text>foo</text>
+          <text>"foo"</text>
         </outputEntry>
       </clause>
       <rule id="ruleEmptyResult">

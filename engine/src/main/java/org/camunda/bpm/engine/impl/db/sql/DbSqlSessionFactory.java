@@ -55,6 +55,8 @@ public class DbSqlSessionFactory implements SessionFactory {
 
   public static final Map<String, String> databaseSpecificDummyTable = new HashMap<String, String>();
 
+  public static final Map<String, String> databaseSpecificIfNull = new HashMap<String, String>();
+
   public static final Map<String, String> databaseSpecificTrueConstant = new HashMap<String, String>();
   public static final Map<String, String> databaseSpecificFalseConstant = new HashMap<String, String>();
 
@@ -79,6 +81,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificDummyTable.put(H2, "");
     databaseSpecificTrueConstant.put(H2, "1");
     databaseSpecificFalseConstant.put(H2, "0");
+    databaseSpecificIfNull.put(H2, "IFNULL");
 
     HashMap<String, String> constants = new HashMap<String, String>();
     constants.put("constant.event", "'event'");
@@ -101,6 +104,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificDummyTable.put(MYSQL, "");
     databaseSpecificTrueConstant.put(MYSQL, "1");
     databaseSpecificFalseConstant.put(MYSQL, "0");
+    databaseSpecificIfNull.put(MYSQL, "IFNULL");
     addDatabaseSpecificStatement(MYSQL, "selectProcessDefinitionsByQueryCriteria", "selectProcessDefinitionsByQueryCriteria_mysql");
     addDatabaseSpecificStatement(MYSQL, "selectProcessDefinitionCountByQueryCriteria", "selectProcessDefinitionCountByQueryCriteria_mysql");
     addDatabaseSpecificStatement(MYSQL, "selectDeploymentsByQueryCriteria", "selectDeploymentsByQueryCriteria_mysql");
@@ -127,11 +131,14 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificDummyTable.put(POSTGRES, "");
     databaseSpecificTrueConstant.put(POSTGRES, "true");
     databaseSpecificFalseConstant.put(POSTGRES, "false");
+    databaseSpecificIfNull.put(POSTGRES, "COALESCE");
     addDatabaseSpecificStatement(POSTGRES, "insertByteArray", "insertByteArray_postgres");
     addDatabaseSpecificStatement(POSTGRES, "updateByteArray", "updateByteArray_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectByteArray", "selectByteArray_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectResourceByDeploymentIdAndResourceName", "selectResourceByDeploymentIdAndResourceName_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "selectResourceByDeploymentIdAndResourceNames", "selectResourceByDeploymentIdAndResourceNames_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectResourceByDeploymentIdAndResourceId", "selectResourceByDeploymentIdAndResourceId_postgres");
+    addDatabaseSpecificStatement(POSTGRES, "selectResourceByDeploymentIdAndResourceIds", "selectResourceByDeploymentIdAndResourceIds_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectResourcesByDeploymentId", "selectResourcesByDeploymentId_postgres");
     addDatabaseSpecificStatement(POSTGRES, "selectLatestResourcesByDeploymentName", "selectLatestResourcesByDeploymentName_postgres");
     addDatabaseSpecificStatement(POSTGRES, "insertIdentityInfo", "insertIdentityInfo_postgres");
@@ -170,6 +177,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificBitAnd3.put(ORACLE, ")");
     databaseSpecificTrueConstant.put(ORACLE, "1");
     databaseSpecificFalseConstant.put(ORACLE, "0");
+    databaseSpecificIfNull.put(ORACLE, "NVL");
 
     constants = new HashMap<String, String>();
     constants.put("constant.event", "cast('event' as nvarchar2(255))");
@@ -192,6 +200,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificDummyTable.put(DB2, "FROM SYSIBM.SYSDUMMY1");
     databaseSpecificTrueConstant.put(DB2, "1");
     databaseSpecificFalseConstant.put(DB2, "0");
+    databaseSpecificIfNull.put(DB2, "NVL");
     addDatabaseSpecificStatement(DB2, "selectExecutionByNativeQuery", "selectExecutionByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(DB2, "selectHistoricActivityInstanceByNativeQuery", "selectHistoricActivityInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(DB2, "selectHistoricCaseActivityInstanceByNativeQuery", "selectHistoricCaseActivityInstanceByNativeQuery_mssql_or_db2");
@@ -208,7 +217,6 @@ public class DbSqlSessionFactory implements SessionFactory {
     dbSpecificConstants.put(DB2, constants);
 
     // mssql
-
     databaseSpecificLimitBeforeStatements.put(MSSQL, "SELECT SUB.* FROM (");
     databaseSpecificInnerLimitAfterStatements.put(MSSQL, ")RES ) SUB WHERE SUB.rnk >= #{firstRow} AND SUB.rnk < #{lastRow}");
     databaseSpecificLimitAfterStatements.put(MSSQL, databaseSpecificInnerLimitAfterStatements.get(MSSQL) + " ORDER BY SUB.rnk");
@@ -223,6 +231,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificDummyTable.put(MSSQL, "");
     databaseSpecificTrueConstant.put(MSSQL, "1");
     databaseSpecificFalseConstant.put(MSSQL, "0");
+    databaseSpecificIfNull.put(MSSQL, "ISNULL");
     addDatabaseSpecificStatement(MSSQL, "selectExecutionByNativeQuery", "selectExecutionByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(MSSQL, "selectHistoricActivityInstanceByNativeQuery", "selectHistoricActivityInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement(MSSQL, "selectHistoricCaseActivityInstanceByNativeQuery", "selectHistoricCaseActivityInstanceByNativeQuery_mssql_or_db2");

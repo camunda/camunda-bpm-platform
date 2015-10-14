@@ -150,6 +150,9 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
       }
       deploymentBuilder.name(deploymentName);
 
+      // set the source of the deployment
+      deploymentBuilder.source(ProcessApplicationDeployment.PROCESS_APPLICATION_DEPLOYMENT_SOURCE);
+
       // add deployment resources
       for (Entry<String, byte[]> resource : deploymentMap.entrySet()) {
         deploymentBuilder.addInputStream(resource.getKey(), new ByteArrayInputStream(resource.getValue()));
@@ -184,7 +187,7 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
       }
     }
   }
-  
+
   protected void enableResumingOfPreviousVersions(ProcessApplicationDeploymentBuilder deploymentBuilder) throws IllegalArgumentException {
     deploymentBuilder.resumePreviousVersions();
     String resumePreviousBy = processArchive.getProperties().get(ProcessArchiveXml.PROP_RESUME_PREVIOUS_BY);

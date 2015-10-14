@@ -52,6 +52,7 @@ import org.camunda.bpm.dmn.scriptengine.DmnScriptEngineFactory;
 import org.camunda.bpm.engine.ArtifactFactory;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.CaseService;
+import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
@@ -65,6 +66,7 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.AuthorizationServiceImpl;
 import org.camunda.bpm.engine.impl.DefaultArtifactFactory;
+import org.camunda.bpm.engine.impl.ExternalTaskServiceImpl;
 import org.camunda.bpm.engine.impl.FilterServiceImpl;
 import org.camunda.bpm.engine.impl.FormServiceImpl;
 import org.camunda.bpm.engine.impl.HistoryServiceImpl;
@@ -148,8 +150,8 @@ import org.camunda.bpm.engine.impl.history.transformer.CmmnHistoryTransformListe
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.identity.WritableIdentityProvider;
 import org.camunda.bpm.engine.impl.identity.db.DbIdentityServiceProvider;
-import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
+import org.camunda.bpm.engine.impl.incident.DefaultIncidentHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutorImpl;
@@ -191,6 +193,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.CommentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskManager;
 import org.camunda.bpm.engine.impl.persistence.entity.FilterManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricCaseActivityInstanceManager;
@@ -237,8 +240,11 @@ import org.camunda.bpm.engine.impl.variable.serializer.DoubleValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.FileValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.IntegerValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.JavaObjectSerializer;
+import org.camunda.bpm.engine.impl.variable.serializer.LocalDateSerializer;
+import org.camunda.bpm.engine.impl.variable.serializer.LocalTimeSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.LongValueSerlializer;
 import org.camunda.bpm.engine.impl.variable.serializer.NullValueSerializer;
+import org.camunda.bpm.engine.impl.variable.serializer.PeriodSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.ShortValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.StringValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
@@ -283,6 +289,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected AuthorizationService authorizationService = new AuthorizationServiceImpl();
   protected CaseService caseService = new CaseServiceImpl();
   protected FilterService filterService = new FilterServiceImpl();
+  protected ExternalTaskService externalTaskService = new ExternalTaskServiceImpl();
 
   // COMMAND EXECUTORS ////////////////////////////////////////////////////////
 
@@ -496,6 +503,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean enableExpressionsInAdhocQueries = false;
   protected boolean enableExpressionsInStoredQueries = true;
 
+  protected boolean isBpmnStacktraceVerbose = false;
+
+  protected boolean forceCloseMybatisConnectionPool = true;
+
   // buildProcessEngine ///////////////////////////////////////////////////////
 
   @Override
@@ -593,8 +604,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     if (incidentHandlers == null) {
       incidentHandlers = new HashMap<String, IncidentHandler>();
 
-      FailedJobIncidentHandler failedJobIncidentHandler = new FailedJobIncidentHandler();
+      DefaultIncidentHandler failedJobIncidentHandler = new DefaultIncidentHandler(DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE);
       incidentHandlers.put(failedJobIncidentHandler.getIncidentHandlerType(), failedJobIncidentHandler);
+
+      DefaultIncidentHandler failedExternalTaskIncidentHandler = new DefaultIncidentHandler(DefaultIncidentHandler.EXTERNAL_TASK_HANDLER_TYPE);
+      incidentHandlers.put(failedExternalTaskIncidentHandler.getIncidentHandlerType(), failedExternalTaskIncidentHandler);
     }
     if(customIncidentHandlers != null) {
       for (IncidentHandler incidentHandler : customIncidentHandlers) {
@@ -695,6 +709,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initService(authorizationService);
     initService(caseService);
     initService(filterService);
+    initService(externalTaskService);
   }
 
   protected void initService(Object service) {
@@ -852,6 +867,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
           properties.put("falseConstant", DbSqlSessionFactory.databaseSpecificFalseConstant.get(databaseType));
 
           properties.put("dbSpecificDummyTable" , DbSqlSessionFactory.databaseSpecificDummyTable.get(databaseType));
+          properties.put("dbSpecificIfNullFunction", DbSqlSessionFactory.databaseSpecificIfNull.get(databaseType));
 
           Map<String, String> constants = DbSqlSessionFactory.dbSpecificConstants.get(databaseType);
           for (Entry<String, String> entry : constants.entrySet()) {
@@ -928,6 +944,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       addSessionFactory(new GenericManagerFactory(AuthorizationManager.class));
       addSessionFactory(new GenericManagerFactory(FilterManager.class));
       addSessionFactory(new GenericManagerFactory(MeterLogManager.class));
+      addSessionFactory(new GenericManagerFactory(ExternalTaskManager.class));
 
       addSessionFactory(new GenericManagerFactory(CaseDefinitionManager.class));
       addSessionFactory(new GenericManagerFactory(CaseExecutionManager.class));
@@ -1328,6 +1345,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       variableSerializers.addSerializer(new IntegerValueSerializer());
       variableSerializers.addSerializer(new LongValueSerlializer());
       variableSerializers.addSerializer(new DateValueSerializer());
+      variableSerializers.addSerializer(new LocalDateSerializer());
+      variableSerializers.addSerializer(new LocalTimeSerializer());
+      variableSerializers.addSerializer(new PeriodSerializer());
       variableSerializers.addSerializer(new DoubleValueSerializer());
       variableSerializers.addSerializer(new ByteArrayValueSerializer());
       variableSerializers.addSerializer(new JavaObjectSerializer());
@@ -1760,6 +1780,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setFilterService(FilterService filterService) {
     this.filterService = filterService;
+  }
+
+  public ExternalTaskService getExternalTaskService() {
+    return externalTaskService;
+  }
+
+  public void setExternalTaskService(ExternalTaskService externalTaskService) {
+    this.externalTaskService = externalTaskService;
   }
 
   public Map<Class< ? >, SessionFactory> getSessionFactories() {
@@ -2708,7 +2736,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   }
 
   public void close() {
-    if (dataSource instanceof PooledDataSource) {
+    if (forceCloseMybatisConnectionPool
+        && dataSource instanceof PooledDataSource) {
+
       // ACT-233: connection pool of Ibatis is not properely initialized if this is not called!
       ((PooledDataSource)dataSource).forceCloseAll();
     }
@@ -2791,4 +2821,24 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public void setEnableExpressionsInStoredQueries(boolean enableExpressionsInStoredQueries) {
     this.enableExpressionsInStoredQueries = enableExpressionsInStoredQueries;
   }
+
+  public ProcessEngineConfigurationImpl setBpmnStacktraceVerbose(boolean isBpmnStacktraceVerbose) {
+    this.isBpmnStacktraceVerbose = isBpmnStacktraceVerbose;
+    return this;
+  }
+
+  public boolean isBpmnStacktraceVerbose() {
+    return this.isBpmnStacktraceVerbose;
+  }
+
+  public boolean isForceCloseMybatisConnectionPool() {
+    return forceCloseMybatisConnectionPool;
+  }
+
+  public ProcessEngineConfigurationImpl setForceCloseMybatisConnectionPool(boolean forceCloseMybatisConnectionPool) {
+    this.forceCloseMybatisConnectionPool = forceCloseMybatisConnectionPool;
+    return this;
+  }
+
+
 }

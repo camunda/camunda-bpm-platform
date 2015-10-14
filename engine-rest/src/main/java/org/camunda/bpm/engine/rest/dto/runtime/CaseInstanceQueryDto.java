@@ -52,6 +52,7 @@ public class CaseInstanceQueryDto extends AbstractQueryDto<CaseInstanceQuery> {
   protected String businessKey;
   protected String caseDefinitionKey;
   protected String caseDefinitionId;
+  protected String deploymentId;
   protected String superProcessInstance;
   protected String subProcessInstance;
   protected String superCaseInstance;
@@ -87,6 +88,11 @@ public class CaseInstanceQueryDto extends AbstractQueryDto<CaseInstanceQuery> {
   @CamundaQueryParam("caseDefinitionId")
   public void setCaseDefinitionId(String caseDefinitionId) {
     this.caseDefinitionId = caseDefinitionId;
+  }
+
+  @CamundaQueryParam("deploymentId")
+  public void setDeploymentId(String deploymentId) {
+    this.deploymentId = deploymentId;
   }
 
   @CamundaQueryParam("superProcessInstance")
@@ -152,6 +158,9 @@ public class CaseInstanceQueryDto extends AbstractQueryDto<CaseInstanceQuery> {
     }
     if (caseDefinitionId != null) {
       query.caseDefinitionId(caseDefinitionId);
+    }
+    if (deploymentId != null) {
+      query.deploymentId(deploymentId );
     }
     if (superProcessInstance != null) {
       query.superProcessInstanceId(superProcessInstance);

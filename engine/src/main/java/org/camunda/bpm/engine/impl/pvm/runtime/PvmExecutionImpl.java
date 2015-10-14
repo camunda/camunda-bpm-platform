@@ -24,12 +24,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
 import org.camunda.bpm.engine.impl.pvm.PvmExecution;
@@ -855,11 +853,13 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       execution.end(_transitions.isEmpty());
     }
 
-    // ending a recyclable execution might have replaced this execution as well
     PvmExecutionImpl propagatingExecution = this;
     if (getReplacedBy() != null) {
       propagatingExecution = getReplacedBy();
     }
+
+    propagatingExecution.isActive = true;
+    propagatingExecution.isEnded = false;
 
     if (_transitions.isEmpty()) {
       propagatingExecution.end(!propagatingExecution.isConcurrent());
@@ -1427,6 +1427,10 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     this.isActive = isActive;
   }
 
+  public void setEnded(boolean isEnded) {
+    this.isEnded = isEnded;
+  }
+
   @Override
   public boolean isEnded() {
     return isEnded;
@@ -1540,5 +1544,4 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       }
     }
   }
-
 }

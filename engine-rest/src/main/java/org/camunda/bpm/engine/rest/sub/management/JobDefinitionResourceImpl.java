@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.rest.dto.management.JobDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.management.JobDefinitionSuspensionStateDto;
 import org.camunda.bpm.engine.rest.dto.runtime.JobDefinitionPriorityDto;
-import org.camunda.bpm.engine.rest.dto.runtime.JobRetriesDto;
+import org.camunda.bpm.engine.rest.dto.runtime.RetriesDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 
@@ -63,7 +63,7 @@ public class JobDefinitionResourceImpl implements JobDefinitionResource {
 
   }
 
-  public void setJobRetries(JobRetriesDto dto) {
+  public void setJobRetries(RetriesDto dto) {
     try {
       ManagementService managementService = engine.getManagementService();
       managementService.setJobRetriesByJobDefinitionId(jobDefinitionId, dto.getRetries());

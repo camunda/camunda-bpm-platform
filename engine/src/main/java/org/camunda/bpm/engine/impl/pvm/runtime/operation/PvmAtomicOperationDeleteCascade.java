@@ -25,6 +25,10 @@ public class PvmAtomicOperationDeleteCascade implements PvmAtomicOperation {
     return false;
   }
 
+  public boolean isAsyncCapable() {
+    return false;
+  }
+
   public void execute(PvmExecutionImpl execution) {
     PvmExecutionImpl firstLeaf = findFirstLeaf(execution);
 
@@ -62,4 +66,5 @@ public class PvmAtomicOperationDeleteCascade implements PvmAtomicOperation {
   public String getCanonicalName() {
     return "delete-cascade";
   }
+
 }

@@ -12,17 +12,12 @@
  */
 package org.camunda.bpm.engine.test.metrics;
 
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.management.Metrics;
-import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.BusinessRuleTask;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class ExecutedDecisionElementsMetricsTest extends AbstractMetricsTest {
 

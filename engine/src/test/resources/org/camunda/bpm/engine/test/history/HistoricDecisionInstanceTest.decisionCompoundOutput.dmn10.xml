@@ -11,17 +11,17 @@
         <text>${input1}</text>
       </inputExpression>
         <inputEntry id="input1">
-          <text>a</text>
+          <text>"a"</text>
         </inputEntry>
       </clause>
       <clause id="out1" name="output1" camunda:output="result1" >
         <outputEntry id="output1">
-          <text>okay</text>
+          <text>"okay"</text>
         </outputEntry>
       </clause>
       <clause id="out2" name="output2" camunda:output="result2" >
         <outputEntry id="output2">
-          <text>not okay</text>
+          <text>"not okay"</text>
         </outputEntry>
       </clause>
       <rule id="rule1">

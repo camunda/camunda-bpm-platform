@@ -35,7 +35,7 @@
     <version.mybatis>3.2.8</version.mybatis>
     <version.joda-time>2.1</version.joda-time>
     <version.uuid-generator>3.1.2</version.uuid-generator>
-    <version.camunda.commons>1.0.6</version.camunda.commons>
+    <version.camunda.commons>1.2.0-alpha2</version.camunda.commons>
     <version.camunda.connect>1.0.1</version.camunda.connect>
     <version.camunda.spin>1.1.0</version.camunda.spin>
     <version.camunda.template-engines>1.0.1</version.camunda.template-engines>

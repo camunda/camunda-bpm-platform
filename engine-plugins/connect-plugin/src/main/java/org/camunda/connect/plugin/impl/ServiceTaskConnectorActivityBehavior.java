@@ -56,10 +56,11 @@ public class ServiceTaskConnectorActivityBehavior extends TaskActivityBehavior {
         // execute the request and obtain a response:
         ConnectorResponse response = request.execute();
         applyOutputParameters(execution, response);
+        leave(execution);
         return null;
       }
     });
-    leave(execution);
+
   }
 
   protected void applyInputParameters(ActivityExecution execution, ConnectorRequest<?> request) {

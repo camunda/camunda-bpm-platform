@@ -8,7 +8,7 @@
     <DecisionTable id="table">
       <clause id="result" camunda:output="result" >
         <outputEntry id="output1">
-          <text>okay</text>
+          <text>"okay"</text>
         </outputEntry>
       </clause>
       <rule id="rule">
