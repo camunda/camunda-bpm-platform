@@ -493,6 +493,9 @@ public class ProcessBuilderTest {
         .camundaResultVariable(TEST_STRING_API)
         .camundaTopic(TEST_STRING_API)
         .camundaType(TEST_STRING_API)
+        .camundaDecisionRef(TEST_STRING_API)
+        .camundaDecisionRefBinding(TEST_STRING_API)
+        .camundaDecisionRefVersion(TEST_STRING_API)
       .endEvent()
       .done();
 
@@ -503,6 +506,9 @@ public class ProcessBuilderTest {
     assertThat(businessRuleTask.getCamundaResultVariable()).isEqualTo(TEST_STRING_API);
     assertThat(businessRuleTask.getCamundaTopic()).isEqualTo(TEST_STRING_API);
     assertThat(businessRuleTask.getCamundaType()).isEqualTo(TEST_STRING_API);
+    assertThat(businessRuleTask.getCamundaDecisionRef()).isEqualTo(TEST_STRING_API);
+    assertThat(businessRuleTask.getCamundaDecisionRefBinding()).isEqualTo(TEST_STRING_API);
+    assertThat(businessRuleTask.getCamundaDecisionRefVersion()).isEqualTo(TEST_STRING_API);
   }
 
   @Test

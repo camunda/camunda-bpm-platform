@@ -105,4 +105,37 @@ public abstract class AbstractBusinessRuleTaskBuilder<B extends AbstractBusiness
     return myself;
   }
 
+  /**
+   * Sets the camunda decisionRef attribute.
+   *
+   * @param camundaDecisionRef the decisionRef to set
+   * @return the builder object
+   */
+  public B camundaDecisionRef(String camundaDecisionRef) {
+    element.setCamundaDecisionRef(camundaDecisionRef);
+    return myself;
+  }
+
+  /**
+   * Sets the camunda decisionRefBinding attribute.
+   *
+   * @param camundaDecisionRefBinding the decisionRefBinding to set
+   * @return the builder object
+   */
+  public B camundaDecisionRefBinding(String camundaDecisionRefBinding) {
+    element.setCamundaDecisionRefBinding(camundaDecisionRefBinding);
+    return myself;
+  }
+
+  /**
+   * Sets the camunda decisionRefVersion attribute.
+   *
+   * @param camundaDecisionRefVersion the decisionRefVersion to set
+   * @return the builder object
+   */
+  public B camundaDecisionRefVersion(String camundaDecisionRefVersion) {
+    element.setCamundaDecisionRefVersion(camundaDecisionRefVersion);
+    return myself;
+  }
+
 }
