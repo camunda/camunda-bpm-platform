@@ -14,7 +14,7 @@
   <dependencies>
     <dependency>
       <groupId>org.camunda.commons</groupId>
-      <artifactId>camunda-commons-utils</artifactId>
+      <artifactId>camunda-commons-logging</artifactId>
     </dependency>
 
     <dependency>
