@@ -56,7 +56,8 @@ define([
         var pageChange = $scope.pageChange = function (page) {
           // update query
           updateSilently({
-            deploymentsPage: page
+            deploymentsPage: page,
+            editMode: null
           });
           deploymentsListData.changed('deploymentsPagination');
         };
@@ -90,7 +91,8 @@ define([
             search.updateSilently({
               resource: null,
               resourceName: null,
-              viewbox: null
+              viewbox: null,
+              editMode: true
             });
           }
 

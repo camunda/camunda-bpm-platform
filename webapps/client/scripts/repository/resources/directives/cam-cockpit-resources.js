@@ -69,14 +69,16 @@ define([
           if ($scope.currentResourceId === resourceId) {
             updateSilently({
               resource: resourceId,
-              resourceName: null
+              resourceName: null,
+              editMode: null
             });
           }
           else {
             updateSilently({
               resource: resourceId,
               resourceName: null,
-              viewbox: null
+              viewbox: null,
+              editMode: null
             });
           }
           

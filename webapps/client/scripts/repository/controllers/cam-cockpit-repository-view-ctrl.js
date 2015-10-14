@@ -139,7 +139,8 @@ define([
             deployment: focused.id,
             resource: null,
             resourceName: null,
-            viewbox: null
+            viewbox: null,
+            editMode: null
           });
           $location.replace();
         }
@@ -150,7 +151,8 @@ define([
           deployment: null,
           resource: null,
           resourceName: null,
-          viewbox: null
+          viewbox: null,
+          editMode: null
         });
         $location.replace();
       }
