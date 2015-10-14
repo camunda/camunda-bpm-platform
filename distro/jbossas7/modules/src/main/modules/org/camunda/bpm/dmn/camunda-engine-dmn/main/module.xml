@@ -11,5 +11,6 @@
     <module name="org.camunda.commons.camunda-commons-logging" />
     <module name="org.camunda.commons.camunda-commons-typed-values" export="true" />
     <module name="org.camunda.bpm.model.camunda-dmn-model" />
+    <module name="org.camunda.bpm.dmn.camunda-engine-feel" />
   </dependencies>
 </module>
