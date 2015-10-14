@@ -18,15 +18,15 @@
         <inputExpression id="inputExpression2">
           <text>invoiceCategory</text>
         </inputExpression>
-        <inputEntry id="LiteralExpression_13rxf3l">        <text>Travel Expenses</text>
+        <inputEntry id="LiteralExpression_13rxf3l">        <text>"Travel Expenses"</text>
 </inputEntry>
       </clause>
       <clause id="clause3" name="Approver Group" camunda:output="result">
-        <outputEntry id="LiteralExpression_046antl">        <text>accounting</text>
+        <outputEntry id="LiteralExpression_046antl">        <text>"accounting"</text>
 </outputEntry>
-        <outputEntry id="LiteralExpression_05xxvip">        <text>sales</text>
+        <outputEntry id="LiteralExpression_05xxvip">        <text>"sales"</text>
 </outputEntry>
-        <outputEntry id="LiteralExpression_1bq8m03">        <text>management</text>
+        <outputEntry id="LiteralExpression_1bq8m03">        <text>"management"</text>
 </outputEntry>
       </clause>
       <rule id="DecisionRule_1of5a87">
