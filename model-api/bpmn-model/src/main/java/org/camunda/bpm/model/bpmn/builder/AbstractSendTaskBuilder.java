@@ -108,7 +108,7 @@ public abstract class AbstractSendTaskBuilder<B extends AbstractSendTaskBuilder<
   /**
    * Sets the camunda topic attribute.
    *
-   * @param camundaType  the type of the service task
+   * @param camundaTopic  the topic to set
    * @return the builder object
    */
   public B camundaTopic(String camundaTopic) {

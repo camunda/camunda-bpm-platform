@@ -86,8 +86,8 @@ public abstract class AbstractBusinessRuleTaskBuilder<B extends AbstractBusiness
    * Sets the camunda topic attribute. This is only meaningful when
    * the {@link #camundaType(String)} attribute has the value <code>external</code>.
    *
-   * @param camundaTopic the
-   * @return
+   * @param camundaTopic the topic to set
+   * @return the builder object
    */
   public B camundaTopic(String camundaTopic) {
     element.setCamundaTopic(camundaTopic);
