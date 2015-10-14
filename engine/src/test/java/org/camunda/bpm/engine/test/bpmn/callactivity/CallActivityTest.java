@@ -969,7 +969,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     Map<String, Object> callingInstanceVariables = runtimeService.getVariables(processInstance.getId());
     assertEquals(4, callingInstanceVariables.size());
     assertEquals("val1", callingInstanceVariables.get("callingProcessVar1"));
-    assertEquals("val2", calledInstanceVariables.get("mappedInputParameter"));
+    assertEquals("val2", callingInstanceVariables.get("mappedInputParameter"));
     assertEquals(42L, callingInstanceVariables.get("calledProcessVar1"));
     assertEquals(43L, callingInstanceVariables.get("outputParameter"));
   }
@@ -994,7 +994,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     assertEquals(1, calledInstanceVariables.size());
     assertEquals(43L, calledInstanceVariables.get("mappedInputParameter"));
 
-    //
+    // and completing it
     Task callActivityTask = taskService.createTaskQuery().singleResult();
     taskService.complete(callActivityTask.getId());
 
@@ -1010,8 +1010,6 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException e) {
       assertTextPresent("Cannot resolve identifier 'globalVariable'", e.getMessage());
     }
-
-
   }
 
   @Deployment(resources = {
@@ -1087,9 +1085,6 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     assertEquals("val1", callingInstanceVariables.get("callingProcessVar1"));
     assertEquals(43L, callingInstanceVariables.get("outputParameter"));
   }
-
-  // TODO: test mit expression auf einzelner variable => nur lokale Variable sollte verfügbar sein
-  // TODO: also for CMMN (useful there?)
 
   /**
    * Test case for handing businessKey to a sub process

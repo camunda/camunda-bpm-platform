@@ -18,6 +18,7 @@ import static org.junit.Assert.assertThat;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.cmmn.CaseDefinitionNotFoundException;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
@@ -1063,14 +1064,14 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
       .setVariable(variableName2, variableValue2)
       .execute();
     complete(caseInstance.getId());
-    
+
     Task task = taskService.createTaskQuery().singleResult();
     TypedValue value = runtimeService.getVariableTyped(task.getProcessInstanceId(), variableName);
     assertThat(value, is(variableValue));
     value = runtimeService.getVariableTyped(task.getProcessInstanceId(), variableName2);
     assertThat(value, is(variableValue2));
   }
-  
+
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivityTest.testCallCaseAsConstant.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn"
@@ -1224,6 +1225,195 @@ public class CaseCallActivityTest extends CmmnProcessEngineTestCase {
 
     assertEquals(superProcessInstanceId, task.getProcessInstanceId());
     assertEquals("userTask", task.getTaskDefinitionKey());
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivity.testSubProcessLocalInputAllVariables.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
+  public void testSubProcessLocalInputAllVariables() {
+    ProcessInstance processInstance = startProcessInstanceByKey("subProcessLocalInputAllVariables");
+    Task beforeCallActivityTask = taskService.createTaskQuery().singleResult();
+
+    // when setting a variable in a process instance
+    runtimeService.setVariable(processInstance.getId(), "callingProcessVar1", "val1");
+
+    // and executing the call activity
+    taskService.complete(beforeCallActivityTask.getId());
+
+    // then only the local variable specified in the io mapping is passed to the called instance
+    CaseExecutionEntity calledInstance = (CaseExecutionEntity) queryOneTaskCaseInstance();
+    assertNotNull(calledInstance);
+
+    Map<String, Object> calledInstanceVariables = caseService.getVariables(calledInstance.getId());
+    assertEquals(1, calledInstanceVariables.size());
+    assertEquals("val2", calledInstanceVariables.get("inputParameter"));
+
+    // when setting a variable in the called instance
+    caseService.setVariable(calledInstance.getId(), "calledCaseVar1", 42L);
+
+    // and completing it
+    String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
+    manualStart(humanTaskId);
+    complete(humanTaskId);
+
+    // then the call activity output variable has been mapped to the process instance execution
+    // and the output mapping variable as well
+    Map<String, Object> callingInstanceVariables = runtimeService.getVariables(processInstance.getId());
+    assertEquals(3, callingInstanceVariables.size());
+    assertEquals("val1", callingInstanceVariables.get("callingProcessVar1"));
+    assertEquals(42L, callingInstanceVariables.get("calledCaseVar1"));
+    assertEquals(43L, callingInstanceVariables.get("outputParameter"));
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivity.testSubProcessLocalInputSingleVariable.bpmn20.xml",
+  "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
+  public void testSubProcessLocalInputSingleVariable() {
+    ProcessInstance processInstance = startProcessInstanceByKey("subProcessLocalInputSingleVariable");
+    Task beforeCallActivityTask = taskService.createTaskQuery().singleResult();
+
+    // when setting a variable in a process instance
+    runtimeService.setVariable(processInstance.getId(), "callingProcessVar1", "val1");
+
+    // and executing the call activity
+    taskService.complete(beforeCallActivityTask.getId());
+
+    // then the local variable specified in the io mapping is passed to the called instance
+    CaseExecutionEntity calledInstance = (CaseExecutionEntity) queryOneTaskCaseInstance();
+    assertNotNull(calledInstance);
+
+    Map<String, Object> calledInstanceVariables = caseService.getVariables(calledInstance.getId());
+    assertEquals(1, calledInstanceVariables.size());
+    assertEquals("val2", calledInstanceVariables.get("mappedInputParameter"));
+
+    // when setting a variable in the called instance
+    caseService.setVariable(calledInstance.getId(), "calledCaseVar1", 42L);
+
+    // and completing it
+    String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
+    manualStart(humanTaskId);
+    complete(humanTaskId);
+
+    // then the call activity output variable has been mapped to the process instance execution
+    // and the output mapping variable as well
+    Map<String, Object> callingInstanceVariables = runtimeService.getVariables(processInstance.getId());
+    assertEquals(4, callingInstanceVariables.size());
+    assertEquals("val1", callingInstanceVariables.get("callingProcessVar1"));
+    assertEquals("val2", callingInstanceVariables.get("mappedInputParameter"));
+    assertEquals(42L, callingInstanceVariables.get("calledCaseVar1"));
+    assertEquals(43L, callingInstanceVariables.get("outputParameter"));
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivity.testSubProcessLocalInputSingleVariableExpression.bpmn20.xml",
+  "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
+  public void testSubProcessLocalInputSingleVariableExpression() {
+    ProcessInstance processInstance = startProcessInstanceByKey("subProcessLocalInputSingleVariableExpression");
+    Task beforeCallActivityTask = taskService.createTaskQuery().singleResult();
+
+    // when executing the call activity
+    taskService.complete(beforeCallActivityTask.getId());
+
+    // then the local input parameter can be resolved because its source expression variable
+    // is defined in the call activity's input mapping
+    CaseExecutionEntity calledInstance = (CaseExecutionEntity) queryOneTaskCaseInstance();
+    assertNotNull(calledInstance);
+
+    Map<String, Object> calledInstanceVariables = caseService.getVariables(calledInstance.getId());
+    assertEquals(1, calledInstanceVariables.size());
+    assertEquals(43L, calledInstanceVariables.get("mappedInputParameter"));
+
+    // and completing it
+    String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
+    manualStart(humanTaskId);
+    complete(humanTaskId);
+
+    // and executing a call activity in parameter where the source variable is not mapped by an activity
+    // input parameter fails
+
+    Task beforeSecondCallActivityTask = taskService.createTaskQuery().singleResult();
+    runtimeService.setVariable(processInstance.getId(), "globalVariable", "42");
+
+    try {
+      taskService.complete(beforeSecondCallActivityTask.getId());
+      fail("expected exception");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Cannot resolve identifier 'globalVariable'", e.getMessage());
+    }
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivity.testSubProcessLocalOutputAllVariables.bpmn20.xml",
+  "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
+  public void testSubProcessLocalOutputAllVariables() {
+    ProcessInstance processInstance = startProcessInstanceByKey("subProcessLocalOutputAllVariables");
+    Task beforeCallActivityTask = taskService.createTaskQuery().singleResult();
+
+    // when setting a variable in a process instance
+    runtimeService.setVariable(processInstance.getId(), "callingProcessVar1", "val1");
+
+    // and executing the call activity
+    taskService.complete(beforeCallActivityTask.getId());
+
+    // then all variables have been mapped into the called instance
+    CaseExecutionEntity calledInstance = (CaseExecutionEntity) queryOneTaskCaseInstance();
+    assertNotNull(calledInstance);
+
+    Map<String, Object> calledInstanceVariables = caseService.getVariables(calledInstance.getId());
+    assertEquals(2, calledInstanceVariables.size());
+    assertEquals("val1", calledInstanceVariables.get("callingProcessVar1"));
+    assertEquals("val2", calledInstanceVariables.get("inputParameter"));
+
+    // when setting a variable in the called instance
+    caseService.setVariable(calledInstance.getId(), "calledCaseVar1", 42L);
+
+    // and completing it
+    String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
+    manualStart(humanTaskId);
+    complete(humanTaskId);
+
+    // then only the output mapping variable has been mapped into the calling process instance
+    Map<String, Object> callingInstanceVariables = runtimeService.getVariables(processInstance.getId());
+    assertEquals(2, callingInstanceVariables.size());
+    assertEquals("val1", callingInstanceVariables.get("callingProcessVar1"));
+    assertEquals(43L, callingInstanceVariables.get("outputParameter"));
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/bpmn/callactivity/CaseCallActivity.testSubProcessLocalOutputSingleVariable.bpmn20.xml",
+  "org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn" })
+  public void testSubProcessLocalOutputSingleVariable() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessLocalOutputSingleVariable");
+    Task beforeCallActivityTask = taskService.createTaskQuery().singleResult();
+
+    // when setting a variable in a process instance
+    runtimeService.setVariable(processInstance.getId(), "callingProcessVar1", "val1");
+
+    // and executing the call activity
+    taskService.complete(beforeCallActivityTask.getId());
+
+    // then all variables have been mapped into the called instance
+    CaseExecutionEntity calledInstance = (CaseExecutionEntity) queryOneTaskCaseInstance();
+    assertNotNull(calledInstance);
+
+    Map<String, Object> calledInstanceVariables = caseService.getVariables(calledInstance.getId());
+    assertEquals(2, calledInstanceVariables.size());
+    assertEquals("val1", calledInstanceVariables.get("callingProcessVar1"));
+    assertEquals("val2", calledInstanceVariables.get("inputParameter"));
+
+    // when setting a variable in the called instance
+    caseService.setVariable(calledInstance.getId(), "calledCaseVar1", 42L);
+
+    // and completing it
+    String humanTaskId = queryCaseExecutionByActivityId(HUMAN_TASK_ID).getId();
+    manualStart(humanTaskId);
+    complete(humanTaskId);
+
+    // then only the output mapping variable has been mapped into the calling process instance
+    Map<String, Object> callingInstanceVariables = runtimeService.getVariables(processInstance.getId());
+    assertEquals(2, callingInstanceVariables.size());
+    assertEquals("val1", callingInstanceVariables.get("callingProcessVar1"));
+    assertEquals(43L, callingInstanceVariables.get("outputParameter"));
   }
 
   protected ProcessInstance startProcessInstanceByKey(String processDefinitionKey) {
