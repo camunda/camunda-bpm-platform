@@ -22,7 +22,7 @@ import org.camunda.bpm.cockpit.impl.plugin.base.resources.IncidentRestService;
 import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
+import org.camunda.bpm.engine.impl.incident.DefaultIncidentHandler;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Before;
@@ -70,7 +70,7 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
     IncidentDto incident = result.get(0);
 
     assertThat(incident.getId()).isNotNull();
-    assertThat(incident.getIncidentType()).isEqualTo(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE);
+    assertThat(incident.getIncidentType()).isEqualTo(DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE);
     assertThat(incident.getIncidentMessage()).isEqualTo("I am failing!");
     assertThat(incident.getIncidentTimestamp()).isNotNull();
     assertThat(incident.getActivityId()).isEqualTo("ServiceTask_1");
@@ -131,7 +131,7 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
     IncidentDto incident = result.get(0);
 
     assertThat(incident.getId()).isNotNull();
-    assertThat(incident.getIncidentType()).isEqualTo(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE);
+    assertThat(incident.getIncidentType()).isEqualTo(DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE);
     assertThat(incident.getIncidentMessage()).isEqualTo("I am failing!");
     assertThat(incident.getIncidentTimestamp()).isNotNull();
     assertThat(incident.getActivityId()).isEqualTo("theServiceTask1");
@@ -240,7 +240,7 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
     IncidentDto incident = result.get(0);
 
     assertThat(incident.getId()).isNotNull();
-    assertThat(incident.getIncidentType()).isEqualTo(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE);
+    assertThat(incident.getIncidentType()).isEqualTo(DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE);
     assertThat(incident.getIncidentMessage()).isNull();
     assertThat(incident.getIncidentTimestamp()).isNotNull();
     assertThat(incident.getActivityId()).isEqualTo("CallActivity_1");
