@@ -185,7 +185,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
         .execute();
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertTextPresent("lockTime is not positive", e.getMessage());
+      assertTextPresent("lockTime is not greater than 0", e.getMessage());
     }
   }
 
@@ -201,7 +201,7 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
         .execute();
       fail("expected exception");
     } catch (ProcessEngineException e) {
-      assertTextPresent("lockTime is not positive", e.getMessage());
+      assertTextPresent("lockTime is not greater than 0", e.getMessage());
     }
   }
 
@@ -1105,6 +1105,24 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
     } catch (NullValueException e) {
       assertTextPresent("externalTaskId is null", e.getMessage());
     }
+  }
+
+  @Deployment
+  public void testCancelExternalTaskWithBoundaryEvent() {
+    // given
+    runtimeService.startProcessInstanceByKey("boundaryExternalTaskProcess");
+    assertEquals(1, externalTaskService.createExternalTaskQuery().count());
+
+    // when the external task is cancelled by a boundary event
+    runtimeService.correlateMessage("Message");
+
+    // then the external task instance has been removed
+    assertEquals(0, externalTaskService.createExternalTaskQuery().count());
+
+    Task afterBoundaryTask = taskService.createTaskQuery().singleResult();
+    assertNotNull(afterBoundaryTask);
+    assertEquals("afterBoundaryTask", afterBoundaryTask.getTaskDefinitionKey());
+
   }
 
   protected Date nowPlus(long millis) {

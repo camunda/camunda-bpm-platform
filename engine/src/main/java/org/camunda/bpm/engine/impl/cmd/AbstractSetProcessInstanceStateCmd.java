@@ -68,19 +68,19 @@ public abstract class AbstractSetProcessInstanceStateCmd extends AbstractSetStat
     if (processInstanceId != null) {
       executionManager.updateExecutionSuspensionStateByProcessInstanceId(processInstanceId, suspensionState);
       taskManager.updateTaskSuspensionStateByProcessInstanceId(processInstanceId, suspensionState);
-      externalTaskManager.updateExternalTaskSuspensionState(processInstanceId, null, null, suspensionState);
+      externalTaskManager.updateExternalTaskSuspensionStateByProcessInstanceId(processInstanceId, suspensionState);
     } else
 
     if (processDefinitionId != null) {
       executionManager.updateExecutionSuspensionStateByProcessDefinitionId(processDefinitionId, suspensionState);
       taskManager.updateTaskSuspensionStateByProcessDefinitionId(processDefinitionId, suspensionState);
-      externalTaskManager.updateExternalTaskSuspensionState(null, processDefinitionId, null, suspensionState);
+      externalTaskManager.updateExternalTaskSuspensionStateByProcessDefinitionId(processDefinitionId, suspensionState);
     } else
 
     if (processDefinitionKey != null) {
       executionManager.updateExecutionSuspensionStateByProcessDefinitionKey(processDefinitionKey, suspensionState);
       taskManager.updateTaskSuspensionStateByProcessDefinitionKey(processDefinitionKey, suspensionState);
-      externalTaskManager.updateExternalTaskSuspensionState(null, null, processDefinitionKey, suspensionState);
+      externalTaskManager.updateExternalTaskSuspensionStateByProcessDefinitionKey(processDefinitionKey, suspensionState);
 
     }
   }

@@ -23,8 +23,8 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
-import org.camunda.bpm.engine.impl.incident.FailedExternalTaskIncidentHandler;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
+import org.camunda.bpm.engine.impl.incident.DefaultIncidentHandler;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
@@ -212,7 +212,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
       createIncident();
     }
     else if (!areRetriesLeft() && retries > 0) {
-      removeIncident(true);
+      removeIncident();
     }
 
     setRetries(retries);
@@ -221,21 +221,17 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   protected void createIncident() {
     IncidentHandler incidentHandler = Context
         .getProcessEngineConfiguration()
-        .getIncidentHandler(FailedExternalTaskIncidentHandler.INCIDENT_HANDLER_TYPE);
+        .getIncidentHandler(DefaultIncidentHandler.EXTERNAL_TASK_HANDLER_TYPE);
 
     incidentHandler.handleIncident(processDefinitionId, activityId, executionId, id, errorMessage);
   }
 
-  protected void removeIncident(boolean incidentResolved) {
+  protected void removeIncident() {
     IncidentHandler handler = Context
         .getProcessEngineConfiguration()
-        .getIncidentHandler(FailedExternalTaskIncidentHandler.INCIDENT_HANDLER_TYPE);
+        .getIncidentHandler(DefaultIncidentHandler.EXTERNAL_TASK_HANDLER_TYPE);
 
-    if (incidentResolved) {
-      handler.resolveIncident(getProcessDefinitionId(), null, executionId, id);
-    } else {
-      handler.deleteIncident(getProcessDefinitionId(), null, executionId, id);
-    }
+    handler.resolveIncident(getProcessDefinitionId(), null, executionId, id);
   }
 
   public void lock(String workerId, long lockDuration) {

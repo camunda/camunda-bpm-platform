@@ -61,7 +61,7 @@ public class ExternalTaskManager extends AbstractManager {
     return getDbEntityManager().selectList("selectExternalTasksForTopics", parameter);
   }
 
-  public List<ExternalTask> findExtenralTasksByQueryCriteria(ExternalTaskQueryImpl externalTaskQuery) {
+  public List<ExternalTask> findExternalTasksByQueryCriteria(ExternalTaskQueryImpl externalTaskQuery) {
     configureAuthorizationCheck(externalTaskQuery);
     return getDbEntityManager().selectList("selectExternalTaskByQueryCriteria", externalTaskQuery);
   }
@@ -71,7 +71,7 @@ public class ExternalTaskManager extends AbstractManager {
     return (Long) getDbEntityManager().selectOne("selectExternalTaskCountByQueryCriteria", externalTaskQuery);
   }
 
-  public void updateExternalTaskSuspensionState(String processInstanceId,
+  protected void updateExternalTaskSuspensionState(String processInstanceId,
       String processDefinitionId, String processDefinitionKey, SuspensionState suspensionState) {
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("processInstanceId", processInstanceId);
@@ -79,6 +79,18 @@ public class ExternalTaskManager extends AbstractManager {
     parameters.put("processDefinitionKey", processDefinitionKey);
     parameters.put("suspensionState", suspensionState.getStateCode());
     getDbEntityManager().update(ExternalTaskEntity.class, "updateExternalTaskSuspensionStateByParameters", parameters);
+  }
+
+  public void updateExternalTaskSuspensionStateByProcessInstanceId(String processInstanceId, SuspensionState suspensionState) {
+    updateExternalTaskSuspensionState(processInstanceId, null, null, suspensionState);
+  }
+
+  public void updateExternalTaskSuspensionStateByProcessDefinitionId(String processDefinitionId, SuspensionState suspensionState) {
+    updateExternalTaskSuspensionState(null, processDefinitionId, null, suspensionState);
+  }
+
+  public void updateExternalTaskSuspensionStateByProcessDefinitionKey(String processDefinitionKey, SuspensionState suspensionState) {
+    updateExternalTaskSuspensionState(null, null, processDefinitionKey, suspensionState);
   }
 
   protected void configureAuthorizationCheck(ExternalTaskQueryImpl query) {

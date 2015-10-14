@@ -19,14 +19,33 @@ import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
 import org.camunda.bpm.engine.runtime.Incident;
 
 /**
- * @author Thorben Lindhauer
+ * <p>
+ * An incident handler that logs incidents of a certain type
+ * as instances of {@link Incident} to the engine database.</p>
  *
+ * <p>
+ * By default, the process engine has two default handlers:
+ * <ul>
+ * <li>type <code>failedJob</code>: Indicates jobs without retries left. This incident handler is active by default and must be disabled
+ * via {@link org.camunda.bpm.engine.ProcessEngineConfiguration#setCreateIncidentOnFailedJobEnabled(boolean)}.
+ * <li>type <code>failedExternalTask</code>: Indicates external tasks without retries left
+ * </p>
+ *
+ * @see IncidentHandler
+ *
+ * @author nico.rehwaldt
+ * @author roman.smirnov
+ * @author Falko Menge
+ * @author Thorben Lindhauer
  */
-public abstract class AbstractIncidentHandler implements IncidentHandler {
+public class DefaultIncidentHandler implements IncidentHandler {
+
+  public static final String FAILED_JOB_HANDLER_TYPE = "failedJob";
+  public static final String EXTERNAL_TASK_HANDLER_TYPE = "failedExternalTask";
 
   protected String type;
 
-  public AbstractIncidentHandler(String type) {
+  public DefaultIncidentHandler(String type) {
     this.type = type;
   }
 

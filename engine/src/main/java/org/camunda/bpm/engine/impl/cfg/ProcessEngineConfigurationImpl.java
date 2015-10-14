@@ -150,9 +150,8 @@ import org.camunda.bpm.engine.impl.history.transformer.CmmnHistoryTransformListe
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.identity.WritableIdentityProvider;
 import org.camunda.bpm.engine.impl.identity.db.DbIdentityServiceProvider;
-import org.camunda.bpm.engine.impl.incident.FailedExternalTaskIncidentHandler;
-import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
+import org.camunda.bpm.engine.impl.incident.DefaultIncidentHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutorImpl;
@@ -605,10 +604,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     if (incidentHandlers == null) {
       incidentHandlers = new HashMap<String, IncidentHandler>();
 
-      FailedJobIncidentHandler failedJobIncidentHandler = new FailedJobIncidentHandler();
+      DefaultIncidentHandler failedJobIncidentHandler = new DefaultIncidentHandler(DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE);
       incidentHandlers.put(failedJobIncidentHandler.getIncidentHandlerType(), failedJobIncidentHandler);
 
-      FailedExternalTaskIncidentHandler failedExternalTaskIncidentHandler = new FailedExternalTaskIncidentHandler();
+      DefaultIncidentHandler failedExternalTaskIncidentHandler = new DefaultIncidentHandler(DefaultIncidentHandler.EXTERNAL_TASK_HANDLER_TYPE);
       incidentHandlers.put(failedExternalTaskIncidentHandler.getIncidentHandlerType(), failedExternalTaskIncidentHandler);
     }
     if(customIncidentHandlers != null) {

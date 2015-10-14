@@ -85,7 +85,7 @@ public class ProcessInstanceMigrationTest extends PluggableProcessEngineTestCase
       new SetProcessDefinitionVersionCmd("42", -1);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
-      assertTextPresent("The process definition version must be positive: processDefinitionVersion is not positive", ae.getMessage());
+      assertTextPresent("The process definition version must be positive: processDefinitionVersion is not greater than 0", ae.getMessage());
     }
   }
 

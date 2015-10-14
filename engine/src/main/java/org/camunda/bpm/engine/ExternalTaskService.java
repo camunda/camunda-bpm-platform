@@ -22,8 +22,11 @@ import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
 
 /**
- * @author Thorben Lindhauer
+ * Service that provides access to {@link ExternalTask} instances. External tasks
+ * represent work items that are processed externally and independently of the process
+ * engine.
  *
+ * @author Thorben Lindhauer
  */
 public interface ExternalTaskService {
 

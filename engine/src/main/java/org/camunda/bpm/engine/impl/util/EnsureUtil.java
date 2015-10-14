@@ -154,7 +154,7 @@ public final class EnsureUtil {
   public static void ensurePositive(Class<? extends ProcessEngineException> exceptionClass, String message, String variableName, Long value) {
     ensureNotNull(exceptionClass, variableName, value);
     if (value <= 0) {
-      throw generateException(exceptionClass, message, variableName, "is not positive");
+      throw generateException(exceptionClass, message, variableName, "is not greater than 0");
     }
   }
 

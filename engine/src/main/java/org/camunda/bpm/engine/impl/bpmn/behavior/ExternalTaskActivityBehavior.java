@@ -17,8 +17,10 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExternalTaskEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
 /**
- * @author Thorben Lindhauer
+ * Implements behavior of external task activities, i.e. all service-task-like
+ * activities that have camunda:type="external".
  *
+ * @author Thorben Lindhauer
  */
 public class ExternalTaskActivityBehavior extends AbstractBpmnActivityBehavior {
 

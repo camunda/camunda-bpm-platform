@@ -168,7 +168,7 @@ public class ExternalTaskQueryImpl extends AbstractQuery<ExternalTaskQuery, Exte
     checkQueryOk();
     return commandContext
       .getExternalTaskManager()
-      .findExtenralTasksByQueryCriteria(this);
+      .findExternalTasksByQueryCriteria(this);
   }
 
   public String getExternalTaskId() {
