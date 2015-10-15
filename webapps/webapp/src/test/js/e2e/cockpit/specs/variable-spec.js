@@ -21,7 +21,6 @@ describe('Cockpit Variable Spec', function() {
     });
 
 
-    // skipped due to CAM-4671
     it('should select variable scope', function() {
 
       // given

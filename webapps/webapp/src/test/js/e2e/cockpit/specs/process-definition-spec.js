@@ -8,7 +8,7 @@ var dashboardPage = require('../pages/dashboard');
 var definitionPage = require('../pages/process-definition');
 
 
-describe.only('Cockpit Process Definition Spec', function() {
+describe('Cockpit Process Definition Spec', function() {
 
   describe('page navigation', function() {
 
