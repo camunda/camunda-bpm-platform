@@ -13,14 +13,26 @@
 
 package org.camunda.bpm.engine.test.bpmn.event.message;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.util.StringUtil;
+import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.variables.FailingJavaSerializable;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.Variables.SerializationDataFormats;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
 
 
 /**
@@ -137,6 +149,49 @@ public class MessageIntermediateEventTest extends PluggableProcessEngineTestCase
     }catch (ProcessEngineException e) {
       assertTrue(e.getMessage().contains("Cannot have a message event subscription with an empty or missing name"));
     }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/message/MessageIntermediateEventTest.testSingleIntermediateMessageEvent.bpmn20.xml")
+  public void testSetSerializedVariableValues() throws IOException, ClassNotFoundException {
+
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    EventSubscription messageEventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
+
+    // when
+    FailingJavaSerializable javaSerializable = new FailingJavaSerializable("foo");
+
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    new ObjectOutputStream(baos).writeObject(javaSerializable);
+    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), processEngine);
+
+    // then it is not possible to deserialize the object
+    try {
+      new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray())).readObject();
+    } catch (RuntimeException e) {
+      assertTextPresent("Exception while deserializing object.", e.getMessage());
+    }
+
+    // but it can be set as a variable when delivering a message:
+    runtimeService
+      .messageEventReceived(
+          "newInvoiceMessage",
+          messageEventSubscription.getExecutionId(),
+          Variables.createVariables().putValueTyped("var",
+            Variables
+            .serializedObjectValue(serializedObject)
+            .objectTypeName(FailingJavaSerializable.class.getName())
+            .serializationDataFormat(SerializationDataFormats.JAVA)
+            .create()));
+
+    // then
+    ObjectValue variableTyped = runtimeService.getVariableTyped(processInstance.getId(), "var", false);
+    assertNotNull(variableTyped);
+    assertFalse(variableTyped.isDeserialized());
+    assertEquals(serializedObject, variableTyped.getValueSerialized());
+    assertEquals(FailingJavaSerializable.class.getName(), variableTyped.getObjectTypeName());
+    assertEquals(SerializationDataFormats.JAVA.getName(), variableTyped.getSerializationDataFormat());
   }
 
 }

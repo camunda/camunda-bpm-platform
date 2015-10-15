@@ -13,14 +13,20 @@
 
 package org.camunda.bpm.engine.test.bpmn.event.signal;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.EventSubscriptionQueryImpl;
-import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.camunda.bpm.engine.runtime.Job;
@@ -29,6 +35,10 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener;
+import org.camunda.bpm.engine.test.variables.FailingJavaSerializable;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.Variables.SerializationDataFormats;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
 
 
 /**
@@ -462,6 +472,46 @@ public class SignalEventTest extends PluggableProcessEngineTestCase {
     assertEquals(1, taskService.createTaskQuery().count());
     assertEquals(0, taskService.createTaskQuery().taskDefinitionKey("afterSubProcessTask").count());
     assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").count());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEventTest.signalStartEvent.bpmn20.xml")
+  public void testSetSerializedVariableValues() throws IOException, ClassNotFoundException {
+
+    // when
+    FailingJavaSerializable javaSerializable = new FailingJavaSerializable("foo");
+
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    new ObjectOutputStream(baos).writeObject(javaSerializable);
+    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), processEngine);
+
+    // then it is not possible to deserialize the object
+    try {
+      new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray())).readObject();
+    } catch (RuntimeException e) {
+      assertTextPresent("Exception while deserializing object.", e.getMessage());
+    }
+
+    // but it can be set as a variable when delivering a message:
+    runtimeService
+      .signalEventReceived(
+          "alert",
+          Variables.createVariables().putValueTyped("var",
+            Variables
+            .serializedObjectValue(serializedObject)
+            .objectTypeName(FailingJavaSerializable.class.getName())
+            .serializationDataFormat(SerializationDataFormats.JAVA)
+            .create()));
+
+    // then
+    ProcessInstance startedInstance = runtimeService.createProcessInstanceQuery().singleResult();
+    assertNotNull(startedInstance);
+
+    ObjectValue variableTyped = runtimeService.getVariableTyped(startedInstance.getId(), "var", false);
+    assertNotNull(variableTyped);
+    assertFalse(variableTyped.isDeserialized());
+    assertEquals(serializedObject, variableTyped.getValueSerialized());
+    assertEquals(FailingJavaSerializable.class.getName(), variableTyped.getObjectTypeName());
+    assertEquals(SerializationDataFormats.JAVA.getName(), variableTyped.getSerializationDataFormat());
   }
 
 }

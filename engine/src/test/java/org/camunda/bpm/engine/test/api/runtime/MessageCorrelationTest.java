@@ -13,6 +13,11 @@
 
 package org.camunda.bpm.engine.test.api.runtime;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,11 +25,17 @@ import java.util.Map;
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.variables.FailingJavaSerializable;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.Variables.SerializationDataFormats;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
 
 /**
  * @author Thorben Lindhauer
@@ -289,6 +300,87 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
 
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  public void testExecutionCorrelationSetSerializedVariableValue() throws IOException, ClassNotFoundException {
+
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    // when
+    FailingJavaSerializable javaSerializable = new FailingJavaSerializable("foo");
+
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    new ObjectOutputStream(baos).writeObject(javaSerializable);
+    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), processEngine);
+
+    // then it is not possible to deserialize the object
+    try {
+      new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray())).readObject();
+    } catch (RuntimeException e) {
+      assertTextPresent("Exception while deserializing object.", e.getMessage());
+    }
+
+    // but it can be set as a variable:
+    runtimeService
+      .createMessageCorrelation("newInvoiceMessage")
+      .setVariable("var",
+          Variables
+            .serializedObjectValue(serializedObject)
+            .objectTypeName(FailingJavaSerializable.class.getName())
+            .serializationDataFormat(SerializationDataFormats.JAVA)
+            .create())
+      .correlate();
+
+    // then
+    ObjectValue variableTyped = runtimeService.getVariableTyped(processInstance.getId(), "var", false);
+    assertNotNull(variableTyped);
+    assertFalse(variableTyped.isDeserialized());
+    assertEquals(serializedObject, variableTyped.getValueSerialized());
+    assertEquals(FailingJavaSerializable.class.getName(), variableTyped.getObjectTypeName());
+    assertEquals(SerializationDataFormats.JAVA.getName(), variableTyped.getSerializationDataFormat());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testCatchingMessageEventCorrelation.bpmn20.xml")
+  public void testExecutionCorrelationSetSerializedVariableValues() throws IOException, ClassNotFoundException {
+
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+
+    // when
+    FailingJavaSerializable javaSerializable = new FailingJavaSerializable("foo");
+
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    new ObjectOutputStream(baos).writeObject(javaSerializable);
+    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), processEngine);
+
+    // then it is not possible to deserialize the object
+    try {
+      new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray())).readObject();
+    } catch (RuntimeException e) {
+      assertTextPresent("Exception while deserializing object.", e.getMessage());
+    }
+
+    // but it can be set as a variable:
+    runtimeService
+      .createMessageCorrelation("newInvoiceMessage")
+      .setVariables(
+          Variables.createVariables().putValueTyped("var",
+            Variables
+              .serializedObjectValue(serializedObject)
+              .objectTypeName(FailingJavaSerializable.class.getName())
+              .serializationDataFormat(SerializationDataFormats.JAVA)
+              .create()))
+      .correlate();
+
+    // then
+    ObjectValue variableTyped = runtimeService.getVariableTyped(processInstance.getId(), "var", false);
+    assertNotNull(variableTyped);
+    assertFalse(variableTyped.isDeserialized());
+    assertEquals(serializedObject, variableTyped.getValueSerialized());
+    assertEquals(FailingJavaSerializable.class.getName(), variableTyped.getObjectTypeName());
+    assertEquals(SerializationDataFormats.JAVA.getName(), variableTyped.getSerializationDataFormat());
+  }
+
   @Deployment
   public void testMessageStartEventCorrelation() {
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -363,6 +455,87 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
     // assert that the business key is set correctly
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
     assertEquals(businessKey, processInstance.getBusinessKey());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMessageStartEventCorrelation.bpmn20.xml")
+  public void testMessageStartEventCorrelationSetSerializedVariableValue() throws IOException, ClassNotFoundException {
+
+    // when
+    FailingJavaSerializable javaSerializable = new FailingJavaSerializable("foo");
+
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    new ObjectOutputStream(baos).writeObject(javaSerializable);
+    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), processEngine);
+
+    // then it is not possible to deserialize the object
+    try {
+      new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray())).readObject();
+    } catch (RuntimeException e) {
+      assertTextPresent("Exception while deserializing object.", e.getMessage());
+    }
+
+    // but it can be set as a variable:
+    runtimeService
+      .createMessageCorrelation("newInvoiceMessage")
+      .setVariable("var",
+          Variables
+            .serializedObjectValue(serializedObject)
+            .objectTypeName(FailingJavaSerializable.class.getName())
+            .serializationDataFormat(SerializationDataFormats.JAVA)
+            .create())
+      .correlate();
+
+    // then
+    ProcessInstance startedInstance = runtimeService.createProcessInstanceQuery().singleResult();
+    assertNotNull(startedInstance);
+
+    ObjectValue variableTyped = runtimeService.getVariableTyped(startedInstance.getId(), "var", false);
+    assertNotNull(variableTyped);
+    assertFalse(variableTyped.isDeserialized());
+    assertEquals(serializedObject, variableTyped.getValueSerialized());
+    assertEquals(FailingJavaSerializable.class.getName(), variableTyped.getObjectTypeName());
+    assertEquals(SerializationDataFormats.JAVA.getName(), variableTyped.getSerializationDataFormat());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMessageStartEventCorrelation.bpmn20.xml")
+  public void testMessageStartEventCorrelationSetSerializedVariableValues() throws IOException, ClassNotFoundException {
+
+    // when
+    FailingJavaSerializable javaSerializable = new FailingJavaSerializable("foo");
+
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    new ObjectOutputStream(baos).writeObject(javaSerializable);
+    String serializedObject = StringUtil.fromBytes(Base64.encodeBase64(baos.toByteArray()), processEngine);
+
+    // then it is not possible to deserialize the object
+    try {
+      new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray())).readObject();
+    } catch (RuntimeException e) {
+      assertTextPresent("Exception while deserializing object.", e.getMessage());
+    }
+
+    // but it can be set as a variable:
+    runtimeService
+      .createMessageCorrelation("newInvoiceMessage")
+      .setVariables(
+          Variables.createVariables().putValueTyped("var",
+            Variables
+              .serializedObjectValue(serializedObject)
+              .objectTypeName(FailingJavaSerializable.class.getName())
+              .serializationDataFormat(SerializationDataFormats.JAVA)
+              .create()))
+      .correlate();
+
+    // then
+    ProcessInstance startedInstance = runtimeService.createProcessInstanceQuery().singleResult();
+    assertNotNull(startedInstance);
+
+    ObjectValue variableTyped = runtimeService.getVariableTyped(startedInstance.getId(), "var", false);
+    assertNotNull(variableTyped);
+    assertFalse(variableTyped.isDeserialized());
+    assertEquals(serializedObject, variableTyped.getValueSerialized());
+    assertEquals(FailingJavaSerializable.class.getName(), variableTyped.getObjectTypeName());
+    assertEquals(SerializationDataFormats.JAVA.getName(), variableTyped.getSerializationDataFormat());
   }
 
   /**
