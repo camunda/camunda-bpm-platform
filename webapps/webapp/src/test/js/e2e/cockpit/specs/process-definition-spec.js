@@ -8,7 +8,7 @@ var dashboardPage = require('../pages/dashboard');
 var definitionPage = require('../pages/process-definition');
 
 
-describe('Cockpit Process Definition Spec', function() {
+describe.only('Cockpit Process Definition Spec', function() {
 
   describe('page navigation', function() {
 
@@ -37,6 +37,13 @@ describe('Cockpit Process Definition Spec', function() {
           expect(definitionPage.processInstancesTab.table().count()).to.eventually.eql(parseInt(noOfInstances, 10));
         });
       });
+    });
+
+
+    it('should display definition key', function() {
+
+      // then
+      expect(definitionPage.filter.definitionKey()).to.eventually.contain('user-tasks');
     });
 
 

@@ -8,6 +8,10 @@ module.exports = Filter.extend({
     return element(by.css('.ctn-sidebar'));
   },
 
+  definitionKey: function() {
+    return this.filterSideBarElement().element(by.css('.key')).getText();
+  },
+
   addFilterButton: function() {
     return this.filterSideBarElement().all(by.css('.glyphicon-plus-sign')).get(0);
   },
