@@ -55,7 +55,7 @@ public class FeelEngineLogger extends FeelLogger {
   }
 
   public FeelException variableMapperIsReadOnly() {
-    return new FeelException(exceptionMessage("004", "The variable mapper is ready only."));
+    return new FeelException(exceptionMessage("004", "The variable mapper is read only."));
   }
 
   public FeelException unableToFindMethod(NoSuchMethodException e, String name, Class<?>... parameterTypes) {

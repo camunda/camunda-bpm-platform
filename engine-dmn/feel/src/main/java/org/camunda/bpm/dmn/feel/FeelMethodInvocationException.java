@@ -15,7 +15,7 @@ package org.camunda.bpm.dmn.feel;
 
 /**
  * Exception thrown if an error occurs during a method invocation
- * ina a FEEL expression.
+ * in a FEEL expression.
  */
 public class FeelMethodInvocationException extends FeelException {
 

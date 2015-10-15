@@ -16,7 +16,7 @@ package org.camunda.bpm.dmn.feel;
 public interface FeelEngineProvider {
 
   /**
-   * Create a instance of a {@link FeelEngine}.
+   * Create an instance of a {@link FeelEngine}.
    *
    * @return the instance of a {@link FeelEngine}
    */
