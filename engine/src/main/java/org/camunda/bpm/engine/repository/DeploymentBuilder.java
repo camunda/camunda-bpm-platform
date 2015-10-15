@@ -63,10 +63,10 @@ public interface DeploymentBuilder {
   DeploymentBuilder enableDuplicateFiltering();
 
   /**
-   * Check the resources for duplicates in the set of previous deployments.
-   * If no resources have changed in this deployment, its contained resources
-   * are not deployed at all. For further configuration, use the parameter
-   * <code>deployChangedOnly</code>.
+   * Check the resources for duplicates in the set of previous deployments with
+   * same deployment source. If no resources have changed in this deployment,
+   * its contained resources are not deployed at all. For further configuration,
+   * use the parameter <code>deployChangedOnly</code>.
    *
    * @param deployChangedOnly determines whether only those resources should be
    * deployed that have changed from the previous versions of the deployment.
@@ -87,8 +87,7 @@ public interface DeploymentBuilder {
    * <p>
    * Furthermore if duplicate check of deployment resources is enabled (by calling
    * {@link #enableDuplicateFiltering(boolean)}) then only previous deployments
-   * with the same given source (or where the source is equal to <code>null</code>) are
-   * considered to perform the duplicate check.
+   * with the same given source are considered to perform the duplicate check.
    * </p>
    */
   DeploymentBuilder source(String source);

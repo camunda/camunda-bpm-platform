@@ -47,6 +47,7 @@ import org.camunda.bpm.engine.impl.repository.ProcessApplicationDeploymentBuilde
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ResumePreviousBy;
@@ -145,9 +146,14 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
 
     if (deploymentBuilder.isDuplicateFilterEnabled()) {
 
+      String source = deployment.getSource();
+      if (source == null || source.isEmpty()) {
+        source = ProcessApplicationDeployment.PROCESS_APPLICATION_DEPLOYMENT_SOURCE;
+      }
+
       Map<String, ResourceEntity> existingResources = commandContext
           .getResourceManager()
-          .findLatestResourcesByDeploymentName(deployment.getName(), containedResources.keySet(), deployment.getSource());
+          .findLatestResourcesByDeploymentName(deployment.getName(), containedResources.keySet(), source);
 
       for (ResourceEntity deployedResource : containedResources.values()) {
         String resourceName = deployedResource.getName();

@@ -38,6 +38,7 @@ public class ProcessApplicationDeploymentBuilderImpl extends DeploymentBuilderIm
   public ProcessApplicationDeploymentBuilderImpl(RepositoryServiceImpl repositoryService, ProcessApplicationReference reference) {
     super(repositoryService);
     this.processApplicationReference = reference;
+    source(ProcessApplicationDeployment.PROCESS_APPLICATION_DEPLOYMENT_SOURCE);
   }
 
   public ProcessApplicationDeploymentBuilder resumePreviousVersions() {
