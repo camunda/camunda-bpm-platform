@@ -51,6 +51,7 @@ import org.camunda.bpm.model.dmn.impl.DmnModelConstants;
 public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
 
   public static final String FEEL_EXPRESSION_LANGUAGE = DmnModelConstants.FEEL_NS;
+  public static final String FEEL_EXPRESSION_LANGUAGE_ALTERNATIVE = "feel";
   public static final String JUEL_EXPRESSION_LANGUAGE = "juel";
 
   protected DmnContextFactory contextFactory;

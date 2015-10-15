@@ -43,6 +43,7 @@ public class DmnDefinitionsHandler extends AbstractDmnElementHandler<Definitions
     String expressionLanguage = definitions.getExpressionLanguage();
     // ignore default FEEL expression language, if you want to use FEEL as
     // default for all expressions you have to set FEEL as default on DMN engine configuration
+    // or set it in the XML to 'feel'
     if (!DmnEngineConfigurationImpl.FEEL_EXPRESSION_LANGUAGE.equals(expressionLanguage)) {
       dmnDecisionModel.setExpressionLanguage(expressionLanguage);
     }

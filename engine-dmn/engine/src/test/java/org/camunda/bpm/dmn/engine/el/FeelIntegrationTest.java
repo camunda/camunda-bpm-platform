@@ -46,9 +46,25 @@ public class FeelIntegrationTest extends DmnDecisionTest {
 
   @Test
   public void testDefaultEngineFeelInvocation() {
+    int numberOfInputEntries = 5;
+    int numberOfExampleInvocations = 4;
     assertExample(engine);
 
-    verify(feelEngine, times(20)).evaluateSimpleUnaryTests(anyString(), anyString(), anyMapOf(String.class, Object.class));
+    verify(feelEngine, times(numberOfInputEntries * numberOfExampleInvocations)).evaluateSimpleUnaryTests(anyString(), anyString(), anyMapOf(String.class, Object.class));
+  }
+
+  @Test
+  public void testFeelAlternativeName() {
+    int numberOfInputEntries = 5;
+    int numberOfExampleInvocations = 4;
+
+    DmnEngineConfigurationImpl dmnEngineConfiguration = (DmnEngineConfigurationImpl) createDmnEngineConfiguration();
+    dmnEngineConfiguration.setDefaultInputEntryExpressionLanguage("feel");
+    DmnEngine dmnEngine = dmnEngineConfiguration.buildEngine();
+
+    assertExample(dmnEngine);
+
+    verify(feelEngine, times(numberOfInputEntries * numberOfExampleInvocations)).evaluateSimpleUnaryTests(anyString(), anyString(), anyMapOf(String.class, Object.class));
   }
 
   @Test

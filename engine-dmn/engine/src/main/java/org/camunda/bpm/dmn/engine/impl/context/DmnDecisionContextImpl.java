@@ -321,7 +321,7 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
     if (expressionLanguage == null) {
       expressionLanguage = getDefaultInputExpressionExpressionLanguage();
     }
-    if (DmnEngineConfigurationImpl.FEEL_EXPRESSION_LANGUAGE.equals(expressionLanguage)) {
+    if (isFeelExpressionLanguage(expressionLanguage)) {
       return evaluateFeelSimpleExpression(inputExpression, variables);
     }
     else {
@@ -347,7 +347,7 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
       if (expressionLanguage == null) {
         expressionLanguage = getDefaultInputEntryExpressionLanguage();
       }
-      if (DmnEngineConfigurationImpl.FEEL_EXPRESSION_LANGUAGE.equals(expressionLanguage)) {
+      if (isFeelExpressionLanguage(expressionLanguage)) {
         return evaluateFeelSimpleUnaryTests(inputEntry, variables);
       } else {
         return evaluateExpression(expressionLanguage, inputEntry, variables);
@@ -375,7 +375,7 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
     if (expressionLanguage == null) {
       expressionLanguage = getDefaultOutputEntryExpressionLanguage();
     }
-    if (DmnEngineConfigurationImpl.FEEL_EXPRESSION_LANGUAGE.equals(expressionLanguage)) {
+    if (isFeelExpressionLanguage(expressionLanguage)) {
       return evaluateFeelSimpleExpression(outputEntry, variables);
     }
     else {
@@ -449,6 +449,12 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
 
   protected boolean isNonEmptyExpression(DmnExpression expression) {
     return expression != null && expression.getExpression() != null && !expression.getExpression().trim().isEmpty();
+  }
+
+  protected boolean isFeelExpressionLanguage(String expressionLanguage) {
+    ensureNotNull("expressionLanguage", expressionLanguage);
+    return expressionLanguage.equals(DmnEngineConfigurationImpl.FEEL_EXPRESSION_LANGUAGE) ||
+      expressionLanguage.toLowerCase().equals(DmnEngineConfigurationImpl.FEEL_EXPRESSION_LANGUAGE_ALTERNATIVE);
   }
 
 }
