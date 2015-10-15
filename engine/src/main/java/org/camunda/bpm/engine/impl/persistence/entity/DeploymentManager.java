@@ -223,6 +223,11 @@ public class DeploymentManager extends AbstractManager {
     return getDbEntityManager().selectById(DeploymentEntity.class, deploymentId);
   }
 
+  @SuppressWarnings("unchecked")
+  public List<DeploymentEntity> findDeploymentsByIds(String... deploymentsIds) {
+    return getDbEntityManager().selectList("selectDeploymentsByIds", deploymentsIds);
+  }
+
   public long findDeploymentCountByQueryCriteria(DeploymentQueryImpl deploymentQuery) {
     getAuthorizationManager().configureDeploymentQuery(deploymentQuery);
     return (Long) getDbEntityManager().selectOne("selectDeploymentCountByQueryCriteria", deploymentQuery);

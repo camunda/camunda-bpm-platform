@@ -79,7 +79,6 @@ import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
-import org.camunda.bpm.engine.repository.RedeploymentBuilder;
 import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
@@ -105,12 +104,10 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
 
   protected RepositoryService mockRepositoryService;
   protected Deployment mockDeployment;
-  protected Deployment mockRedeployment;
   protected List<Resource> mockDeploymentResources;
   protected Resource mockDeploymentResource;
   protected DeploymentQuery mockDeploymentQuery;
   protected DeploymentBuilder mockDeploymentBuilder;
-  protected RedeploymentBuilder mockRedeploymentBuilder;
   protected Collection<String> resourceNames = new ArrayList<String>();
 
   @Before
@@ -134,16 +131,11 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
     mockDeploymentBuilder = mock(DeploymentBuilder.class);
     when(mockRepositoryService.createDeployment()).thenReturn(mockDeploymentBuilder);
     when(mockDeploymentBuilder.addInputStream(anyString(), any(InputStream.class))).thenReturn(mockDeploymentBuilder);
+    when(mockDeploymentBuilder.addDeploymentResourcesById(anyString(), anyListOf(String.class))).thenReturn(mockDeploymentBuilder);
+    when(mockDeploymentBuilder.addDeploymentResourcesByName(anyString(), anyListOf(String.class))).thenReturn(mockDeploymentBuilder);
+    when(mockDeploymentBuilder.source(anyString())).thenReturn(mockDeploymentBuilder);
     when(mockDeploymentBuilder.getResourceNames()).thenReturn(resourceNames);
     when(mockDeploymentBuilder.deploy()).thenReturn(mockDeployment);
-
-    mockRedeployment = MockProvider.createMockRedeployment();
-    mockRedeploymentBuilder = mock(RedeploymentBuilder.class);
-    when(mockRepositoryService.createRedeployment(anyString())).thenReturn(mockRedeploymentBuilder);
-    when(mockRedeploymentBuilder.source(anyString())).thenReturn(mockRedeploymentBuilder);
-    when(mockRedeploymentBuilder.addResourceIds(anyListOf(String.class))).thenReturn(mockRedeploymentBuilder);
-    when(mockRedeploymentBuilder.addResourceNames(anyListOf(String.class))).thenReturn(mockRedeploymentBuilder);
-    when(mockRedeploymentBuilder.redeploy()).thenReturn(mockRedeployment);
   }
 
   private byte[] createMockDeploymentResourceByteData() {
@@ -1323,14 +1315,15 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
     .when()
       .post(REDEPLOY_DEPLOYMENT_URL);
 
-    verify(mockRedeploymentBuilder, never()).addResourceId(anyString());
-    verify(mockRedeploymentBuilder).addResourceIds(eq(resourceIds));
-    verify(mockRedeploymentBuilder, never()).addResourceName(anyString());
-    verify(mockRedeploymentBuilder).addResourceNames(eq(resourceNames));
-    verify(mockRedeploymentBuilder).source(MockProvider.EXAMPLE_DEPLOYMENT_SOURCE);
-    verify(mockRedeploymentBuilder).redeploy();
+    verify(mockDeploymentBuilder).nameFromDeployment(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID));
+    verify(mockDeploymentBuilder, never()).addDeploymentResourceById(anyString(), anyString());
+    verify(mockDeploymentBuilder).addDeploymentResourcesById(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID), eq(resourceIds));
+    verify(mockDeploymentBuilder, never()).addDeploymentResourceByName(anyString(), anyString());
+    verify(mockDeploymentBuilder).addDeploymentResourcesByName(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID), eq(resourceNames));
+    verify(mockDeploymentBuilder).source(MockProvider.EXAMPLE_DEPLOYMENT_SOURCE);
+    verify(mockDeploymentBuilder).deploy();
 
-    verifyDeployment(mockRedeployment, response);
+    verifyDeployment(mockDeployment, response);
   }
 
   @Test
@@ -1344,14 +1337,15 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
     .when()
       .post(REDEPLOY_DEPLOYMENT_URL);
 
-    verify(mockRedeploymentBuilder, never()).addResourceId(anyString());
-    verify(mockRedeploymentBuilder, never()).addResourceIds(anyListOf(String.class));
-    verify(mockRedeploymentBuilder, never()).addResourceName(anyString());
-    verify(mockRedeploymentBuilder, never()).addResourceNames(anyListOf(String.class));
-    verify(mockRedeploymentBuilder, never()).source(anyString());
-    verify(mockRedeploymentBuilder).redeploy();
+    verify(mockDeploymentBuilder).nameFromDeployment(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID));
+    verify(mockDeploymentBuilder, never()).addDeploymentResourceById(anyString(), anyString());
+    verify(mockDeploymentBuilder, never()).addDeploymentResourcesById(anyString(), anyListOf(String.class));
+    verify(mockDeploymentBuilder, never()).addDeploymentResourceByName(anyString(), anyString());
+    verify(mockDeploymentBuilder, never()).addDeploymentResourcesByName(anyString(), anyListOf(String.class));
+    verify(mockDeploymentBuilder, never()).source(anyString());
+    verify(mockDeploymentBuilder).deploy();
 
-    verifyDeployment(mockRedeployment, response);
+    verifyDeployment(mockDeployment, response);
   }
 
   @Test
@@ -1366,14 +1360,15 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
     .when()
       .post(REDEPLOY_DEPLOYMENT_URL);
 
-    verify(mockRedeploymentBuilder, never()).addResourceId(anyString());
-    verify(mockRedeploymentBuilder).addResourceIds(null);
-    verify(mockRedeploymentBuilder, never()).addResourceName(anyString());
-    verify(mockRedeploymentBuilder).addResourceNames(null);
-    verify(mockRedeploymentBuilder).source(null);
-    verify(mockRedeploymentBuilder).redeploy();
+    verify(mockDeploymentBuilder).nameFromDeployment(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID));
+    verify(mockDeploymentBuilder, never()).addDeploymentResourceById(anyString(), anyString());
+    verify(mockDeploymentBuilder, never()).addDeploymentResourcesById(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID), anyListOf(String.class));
+    verify(mockDeploymentBuilder, never()).addDeploymentResourceByName(anyString(), anyString());
+    verify(mockDeploymentBuilder, never()).addDeploymentResourcesByName(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID), anyListOf(String.class));
+    verify(mockDeploymentBuilder).source(null);
+    verify(mockDeploymentBuilder).deploy();
 
-    verifyDeployment(mockRedeployment, response);
+    verifyDeployment(mockDeployment, response);
   }
 
   @Test
@@ -1395,14 +1390,15 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
     .when()
       .post(REDEPLOY_DEPLOYMENT_URL);
 
-    verify(mockRedeploymentBuilder, never()).addResourceId(anyString());
-    verify(mockRedeploymentBuilder).addResourceIds(eq(resourceIds));
-    verify(mockRedeploymentBuilder, never()).addResourceName(anyString());
-    verify(mockRedeploymentBuilder).addResourceNames(null);
-    verify(mockRedeploymentBuilder).source(null);
-    verify(mockRedeploymentBuilder).redeploy();
+    verify(mockDeploymentBuilder).nameFromDeployment(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID));
+    verify(mockDeploymentBuilder, never()).addDeploymentResourceById(anyString(), anyString());
+    verify(mockDeploymentBuilder).addDeploymentResourcesById(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID), eq(resourceIds));
+    verify(mockDeploymentBuilder, never()).addDeploymentResourceByName(anyString(), anyString());
+    verify(mockDeploymentBuilder, never()).addDeploymentResourcesByName(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID), anyListOf(String.class));
+    verify(mockDeploymentBuilder).source(null);
+    verify(mockDeploymentBuilder).deploy();
 
-    verifyDeployment(mockRedeployment, response);
+    verifyDeployment(mockDeployment, response);
   }
 
   @Test
@@ -1424,14 +1420,15 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
     .when()
       .post(REDEPLOY_DEPLOYMENT_URL);
 
-    verify(mockRedeploymentBuilder, never()).addResourceId(anyString());
-    verify(mockRedeploymentBuilder).addResourceIds(null);
-    verify(mockRedeploymentBuilder, never()).addResourceName(anyString());
-    verify(mockRedeploymentBuilder).addResourceNames(eq(resourceNames));
-    verify(mockRedeploymentBuilder).source(null);
-    verify(mockRedeploymentBuilder).redeploy();
+    verify(mockDeploymentBuilder).nameFromDeployment(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID));
+    verify(mockDeploymentBuilder, never()).addDeploymentResourceById(anyString(), anyString());
+    verify(mockDeploymentBuilder, never()).addDeploymentResourcesById(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID), anyListOf(String.class));
+    verify(mockDeploymentBuilder, never()).addDeploymentResourceByName(anyString(), anyString());
+    verify(mockDeploymentBuilder).addDeploymentResourcesByName(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID), eq(resourceNames));
+    verify(mockDeploymentBuilder).source(null);
+    verify(mockDeploymentBuilder).deploy();
 
-    verifyDeployment(mockRedeployment, response);
+    verifyDeployment(mockDeployment, response);
   }
 
   @Test
@@ -1449,20 +1446,21 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
     .when()
       .post(REDEPLOY_DEPLOYMENT_URL);
 
-    verify(mockRedeploymentBuilder, never()).addResourceId(anyString());
-    verify(mockRedeploymentBuilder).addResourceIds(null);
-    verify(mockRedeploymentBuilder, never()).addResourceName(anyString());
-    verify(mockRedeploymentBuilder).addResourceNames(null);
-    verify(mockRedeploymentBuilder).source(MockProvider.EXAMPLE_DEPLOYMENT_SOURCE);
-    verify(mockRedeploymentBuilder).redeploy();
+    verify(mockDeploymentBuilder).nameFromDeployment(eq(MockProvider.EXAMPLE_DEPLOYMENT_ID));
+    verify(mockDeploymentBuilder, never()).addDeploymentResourceById(anyString(), anyString());
+    verify(mockDeploymentBuilder, never()).addDeploymentResourcesById(anyString(), anyListOf(String.class));
+    verify(mockDeploymentBuilder, never()).addDeploymentResourceByName(anyString(), anyString());
+    verify(mockDeploymentBuilder, never()).addDeploymentResourcesByName(anyString(), anyListOf(String.class));
+    verify(mockDeploymentBuilder).source(eq(MockProvider.EXAMPLE_DEPLOYMENT_SOURCE));
+    verify(mockDeploymentBuilder).deploy();
 
-    verifyDeployment(mockRedeployment, response);
+    verifyDeployment(mockDeployment, response);
   }
 
   @Test
   public void testRedeployThrowsNotFoundException() {
     String message = "deployment not found";
-    doThrow(new NotFoundException(message)).when(mockRedeploymentBuilder).redeploy();
+    doThrow(new NotFoundException(message)).when(mockDeploymentBuilder).deploy();
 
     String expected = "Cannot redeploy deployment '" + MockProvider.EXAMPLE_DEPLOYMENT_ID + "': " + message;
 
@@ -1480,7 +1478,7 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
   @Test
   public void testRedeployThrowsNotValidException() {
     String message = "not valid";
-    doThrow(new NotValidException(message)).when(mockRedeploymentBuilder).redeploy();
+    doThrow(new NotValidException(message)).when(mockDeploymentBuilder).deploy();
 
     String expected = "Cannot redeploy deployment '" + MockProvider.EXAMPLE_DEPLOYMENT_ID + "': " + message;
 
@@ -1498,7 +1496,7 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
   @Test
   public void testRedeployThrowsProcessEngineException() {
     String message = "something went wrong";
-    doThrow(new ProcessEngineException(message)).when(mockRedeploymentBuilder).redeploy();
+    doThrow(new ProcessEngineException(message)).when(mockDeploymentBuilder).deploy();
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)
@@ -1514,7 +1512,7 @@ public abstract class AbstractDeploymentRestServiceInteractionTest extends Abstr
   @Test
   public void testRedeployThrowsAuthorizationException() {
     String message = "missing authorization";
-    doThrow(new AuthorizationException(message)).when(mockRedeploymentBuilder).redeploy();
+    doThrow(new AuthorizationException(message)).when(mockDeploymentBuilder).deploy();
 
     given()
       .pathParam("id", MockProvider.EXAMPLE_DEPLOYMENT_ID)

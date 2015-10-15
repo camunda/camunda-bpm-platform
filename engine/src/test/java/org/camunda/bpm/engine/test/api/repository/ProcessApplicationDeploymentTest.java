@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.application.impl.EmbeddedProcessApplication;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
@@ -41,6 +42,26 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
 
   protected void setUp() throws Exception {
     processApplication = new EmbeddedProcessApplication();
+  }
+
+  public void testEmptyDeployment() {
+    try {
+      repositoryService
+        .createDeployment(processApplication.getReference())
+        .deploy();
+      fail("it should not be possible to deploy without deployment resources");
+    } catch (NotValidException e) {
+      // expected
+    }
+
+    try {
+      repositoryService
+        .createDeployment()
+        .deploy();
+      fail("it should not be possible to deploy without deployment resources");
+    } catch (NotValidException e) {
+      // expected
+    }
   }
 
   public void testSimpleProcessApplicationDeployment() {

@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.repository;
 
 import java.io.InputStream;
 import java.util.Date;
+import java.util.List;
 import java.util.zip.ZipInputStream;
 
 import org.camunda.bpm.application.ProcessApplication;
@@ -70,6 +71,8 @@ public interface ProcessApplicationDeploymentBuilder extends DeploymentBuilder {
   /* {@inheritDoc} */
   ProcessApplicationDeploymentBuilder name(String name);
   /* {@inheritDoc} */
+  ProcessApplicationDeploymentBuilder nameFromDeployment(String deploymentId);
+  /* {@inheritDoc} */
   ProcessApplicationDeploymentBuilder source(String source);
   /* {@inheritDoc} */
   @Deprecated
@@ -78,5 +81,18 @@ public interface ProcessApplicationDeploymentBuilder extends DeploymentBuilder {
   ProcessApplicationDeploymentBuilder enableDuplicateFiltering(boolean deployChangedOnly);
   /* {@inheritDoc} */
   ProcessApplicationDeploymentBuilder activateProcessDefinitionsOn(Date date);
+
+  /* {@inheritDoc} */
+  ProcessApplicationDeploymentBuilder addDeploymentResources(String deploymentId);
+
+  /* {@inheritDoc} */
+  ProcessApplicationDeploymentBuilder addDeploymentResourceById(String deploymentId, String resourceId);
+  /* {@inheritDoc} */
+  ProcessApplicationDeploymentBuilder addDeploymentResourcesById(String deploymentId, List<String> resourceIds);
+
+  /* {@inheritDoc} */
+  ProcessApplicationDeploymentBuilder addDeploymentResourceByName(String deploymentId, String resourceName);
+  /* {@inheritDoc} */
+  ProcessApplicationDeploymentBuilder addDeploymentResourcesByName(String deploymentId, List<String> resourceNames);
 
 }

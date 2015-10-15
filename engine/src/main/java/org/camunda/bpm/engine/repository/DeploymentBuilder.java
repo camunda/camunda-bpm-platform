@@ -15,11 +15,14 @@ package org.camunda.bpm.engine.repository;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.zip.ZipInputStream;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 /**
@@ -46,9 +49,55 @@ public interface DeploymentBuilder {
   DeploymentBuilder addZipInputStream(ZipInputStream zipInputStream);
 
   /**
+   * All existing resources contained by the given deployment
+   * will be added to the new deployment to re-deploy them.
+   */
+  DeploymentBuilder addDeploymentResources(String deploymentId);
+
+  /**
+   * A given resource specified by id and deployment id will be added
+   * to the new deployment to re-deploy the given resource.
+   *
+   * @throws NotValidException if either deployment id or resource id is null.
+   */
+  DeploymentBuilder addDeploymentResourceById(String deploymentId, String resourceId);
+
+  /**
+   * All given resources specified by id and deployment id will be added
+   * to the new deployment to re-deploy the given resource.
+   *
+   * @throws NotValidException if either deployment id or the list of resource ids is null.
+   */
+  DeploymentBuilder addDeploymentResourcesById(String deploymentId, List<String> resourceIds);
+
+  /**
+   * A given resource specified by name and deployment id will be added
+   * to the new deployment to re-deploy the given resource.
+   *
+   * @throws NotValidException if either deployment id or resource name is null.
+   */
+  DeploymentBuilder addDeploymentResourceByName(String deploymentId, String resourceName);
+
+  /**
+   * All given resources specified by name and deployment id will be added
+   * to the new deployment to re-deploy the given resource.
+   *
+   * @throws NotValidException if either deployment id or the list of resource names is null.
+   */
+  DeploymentBuilder addDeploymentResourcesByName(String deploymentId, List<String> resourceNames);
+
+  /**
    * Gives the deployment the given name.
+   *
+   * @throws NotValidException
+   *    if {@link #nameFromDeployment(String)} has been called before.
    */
   DeploymentBuilder name(String name);
+
+  /**
+   * Sets the deployment id to retrieve the deployment name from it.
+   */
+  DeploymentBuilder nameFromDeployment(String deploymentId);
 
   /**
    * <p>If set, this deployment will be compared to any previous deployment.
@@ -95,8 +144,21 @@ public interface DeploymentBuilder {
   /**
    * Deploys all provided sources to the process engine.
    *
+   * @throws NotFoundException thrown
+   *  <ul>
+   *    <li>if the deployment specified by {@link #nameFromDeployment(String)} does not exist or</li>
+   *    <li>if at least one of given deployments provided by {@link #addDeploymentResources(String)} does not exist.</li>
+   *  </ul>
+   *
+   * @throws NotValidException
+   *    if there are duplicate resource names from different deployments to re-deploy.
+   *
    * @throws AuthorizationException
-   *          If the user has no {@link Permissions#CREATE} permission on {@link Resources#DEPLOYMENT}.
+   *  thrown if the current user does not possess the following permissions:
+   *   <ul>
+   *     <li>{@link Permissions#CREATE} on {@link Resources#DEPLOYMENT}</li>
+   *     <li>{@link Permissions#READ} on {@link Resources#DEPLOYMENT} (if deployments are provided)</li>
+   *   </ul>
    */
   Deployment deploy();
 

@@ -13,13 +13,14 @@
 package org.camunda.bpm.engine.rest.sub.repository.impl;
 
 import java.net.URI;
+import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.repository.Deployment;
-import org.camunda.bpm.engine.repository.RedeploymentBuilder;
+import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.rest.DeploymentRestService;
 import org.camunda.bpm.engine.rest.dto.repository.DeploymentDto;
 import org.camunda.bpm.engine.rest.dto.repository.RedeploymentDto;
@@ -66,15 +67,25 @@ public class DeploymentResourceImpl extends AbstractRestProcessEngineAware imple
     Deployment deployment = null;
     try {
 
-      RedeploymentBuilder builder = repositoryService.createRedeployment(deploymentId);
+      DeploymentBuilder builder = repositoryService.createDeployment();
+      builder.nameFromDeployment(deploymentId);
 
       if (redeployment != null) {
         builder.source(redeployment.getSource());
-        builder.addResourceIds(redeployment.getResourceIds());
-        builder.addResourceNames(redeployment.getResourceNames());
+
+        List<String> resourceIds = redeployment.getResourceIds();
+        if (resourceIds != null && !resourceIds.isEmpty()) {
+          builder.addDeploymentResourcesById(deploymentId, resourceIds);
+        }
+
+        List<String> resourceNames = redeployment.getResourceNames();
+        if (resourceNames != null && !resourceNames.isEmpty()) {
+          builder.addDeploymentResourcesByName(deploymentId, resourceNames);
+        }
+
       }
 
-      deployment = builder.redeploy();
+      deployment = builder.deploy();
 
     } catch (NotFoundException e) {
       throw createInvalidRequestException("redeploy", Status.NOT_FOUND, e);

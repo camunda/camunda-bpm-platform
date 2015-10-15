@@ -15,6 +15,8 @@ package org.camunda.bpm.engine.test.authorization.deployment;
 import static org.camunda.bpm.engine.test.authorization.util.AuthorizationScenario.scenario;
 import static org.camunda.bpm.engine.test.authorization.util.AuthorizationSpec.grant;
 
+import java.util.Collection;
+
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.authorization.Authorization;
@@ -38,8 +40,6 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
-import java.util.Collection;
-
 /**
  * @author Roman Smirnov
  *
@@ -62,12 +62,12 @@ public class RedeployDeploymentAuthorizationTest {
       scenario()
         .withoutAuthorizations()
         .failsDueToRequired(
-          grant(Resources.DEPLOYMENT, "deploymentId", "userId", Permissions.READ)),
+          grant(Resources.DEPLOYMENT, "*", "userId", Permissions.CREATE)),
       scenario()
         .withAuthorizations(
-          grant(Resources.DEPLOYMENT, "deploymentId", "userId", Permissions.READ))
+          grant(Resources.DEPLOYMENT, "*", "userId", Permissions.CREATE))
         .failsDueToRequired(
-          grant(Resources.DEPLOYMENT, "*", "userId", Permissions.CREATE)),
+          grant(Resources.DEPLOYMENT, "deploymentId", "userId", Permissions.READ)),
       scenario()
         .withAuthorizations(
           grant(Resources.DEPLOYMENT, "deploymentId", "userId", Permissions.READ),
@@ -110,8 +110,9 @@ public class RedeployDeploymentAuthorizationTest {
       .start();
 
     Deployment deployment2 = repositoryService
-      .createRedeployment(deployment1.getId())
-      .redeploy();
+      .createDeployment()
+      .addDeploymentResources(deployment1.getId())
+      .deploy();
 
     // then
     if (authRule.assertScenario(scenario)) {
