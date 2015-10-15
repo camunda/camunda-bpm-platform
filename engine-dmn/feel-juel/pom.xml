@@ -8,10 +8,15 @@
     <version>7.4.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>camunda-engine-feel</artifactId>
-  <name>camunda DMN - engine FEEL</name>
+  <artifactId>camunda-engine-feel-juel</artifactId>
+  <name>camunda DMN - engine FEEL - JUEL</name>
 
   <dependencies>
+    <dependency>
+      <groupId>org.camunda.bpm.dmn</groupId>
+      <artifactId>camunda-engine-feel-api</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-logging</artifactId>
