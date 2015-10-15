@@ -18,11 +18,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.incident.DefaultIncidentHandler;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Assert;
@@ -81,7 +81,7 @@ public class ActivityStatisticsQueryTest extends PluggableProcessEngineTestCase 
     assertEquals(1, incidentStatistics.size());
 
     IncidentStatistics incident = incidentStatistics.get(0);
-    assertEquals(DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE, incident.getIncidentType());
+    assertEquals(Incident.FAILED_JOB_HANDLER_TYPE, incident.getIncidentType());
     assertEquals(1, incident.getIncidentCount());
   }
 
@@ -111,7 +111,7 @@ public class ActivityStatisticsQueryTest extends PluggableProcessEngineTestCase 
     assertEquals(1, incidentStatistics.size());
 
     IncidentStatistics incident = incidentStatistics.get(0);
-    assertEquals(DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE, incident.getIncidentType());
+    assertEquals(Incident.FAILED_JOB_HANDLER_TYPE, incident.getIncidentType());
     assertEquals(1, incident.getIncidentCount());
   }
 
@@ -166,7 +166,7 @@ public class ActivityStatisticsQueryTest extends PluggableProcessEngineTestCase 
     assertEquals(1, incidentStatistics.size());
 
     IncidentStatistics incident = incidentStatistics.get(0);
-    assertEquals(DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE, incident.getIncidentType());
+    assertEquals(Incident.FAILED_JOB_HANDLER_TYPE, incident.getIncidentType());
     assertEquals(1, incident.getIncidentCount()); //... but has one incident
   }
 
@@ -441,7 +441,7 @@ public class ActivityStatisticsQueryTest extends PluggableProcessEngineTestCase 
 
     IncidentStatistics incidentStatistic = incidentStatistics.get(0);
     assertEquals(1, incidentStatistic.getIncidentCount());
-    assertEquals(DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE, incidentStatistic.getIncidentType());
+    assertEquals(Incident.FAILED_JOB_HANDLER_TYPE, incidentStatistic.getIncidentType());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testFailedTimerStartEvent.bpmn20.xml")
@@ -458,7 +458,7 @@ public class ActivityStatisticsQueryTest extends PluggableProcessEngineTestCase 
     List<ActivityStatistics> statistics =
         managementService
         .createActivityStatisticsQuery(definition.getId())
-        .includeIncidentsForType(DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE)
+        .includeIncidentsForType(Incident.FAILED_JOB_HANDLER_TYPE)
         .list();
 
     assertEquals(1, statistics.size());
@@ -475,7 +475,7 @@ public class ActivityStatisticsQueryTest extends PluggableProcessEngineTestCase 
 
     IncidentStatistics incidentStatistic = incidentStatistics.get(0);
     assertEquals(1, incidentStatistic.getIncidentCount());
-    assertEquals(DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE, incidentStatistic.getIncidentType());
+    assertEquals(Incident.FAILED_JOB_HANDLER_TYPE, incidentStatistic.getIncidentType());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testFailedTimerStartEvent.bpmn20.xml")
@@ -539,7 +539,7 @@ public class ActivityStatisticsQueryTest extends PluggableProcessEngineTestCase 
 
     IncidentStatistics incidentStatistic = incidentStatistics.get(0);
     assertEquals(1, incidentStatistic.getIncidentCount());
-    assertEquals(DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE, incidentStatistic.getIncidentType());
+    assertEquals(Incident.FAILED_JOB_HANDLER_TYPE, incidentStatistic.getIncidentType());
   }
 
   @Test

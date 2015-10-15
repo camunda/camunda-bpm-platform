@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.incident.DefaultIncidentHandler;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Incident;
@@ -67,7 +66,7 @@ public class IncidentQueryTest extends PluggableProcessEngineTestCase {
   }
 
   public void testQueryByIncidentType() {
-    IncidentQuery query = runtimeService.createIncidentQuery().incidentType(DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE);
+    IncidentQuery query = runtimeService.createIncidentQuery().incidentType(Incident.FAILED_JOB_HANDLER_TYPE);
     assertEquals(4, query.count());
 
     List<Incident> incidents = query.list();
