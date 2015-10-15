@@ -54,125 +54,125 @@ public class FeelEngineTest {
     variables.putValue("primitive", 12L);
     variables.putValue("typed", Variables.longValue(12L));
 
-    assertTrue(Variables.longValue(12L), "<= typed");
-    assertTrue(Variables.longValue(12L), "<= primitive");
-    assertTrue(Variables.longValue(12L), "<= integer");
+    assertEvaluatesToTrue(Variables.longValue(12L), "<= typed");
+    assertEvaluatesToTrue(Variables.longValue(12L), "<= primitive");
+    assertEvaluatesToTrue(Variables.longValue(12L), "<= integer");
   }
 
   @Test
   public void testEndpointString() {
-    assertTrue("Hello World", "\"Hello World\"");
-    assertFalse("Hello World", "\"Hello Camunda\"");
-    assertFalse("Hello World", "\"\"");
-    assertTrue("", "\"\"");
-    assertTrue("123", "\"123\"");
-    assertTrue("Why.not?", "\"Why.not?\"");
+    assertEvaluatesToTrue("Hello World", "\"Hello World\"");
+    assertEvaluatesToFalse("Hello World", "\"Hello Camunda\"");
+    assertEvaluatesToFalse("Hello World", "\"\"");
+    assertEvaluatesToTrue("", "\"\"");
+    assertEvaluatesToTrue("123", "\"123\"");
+    assertEvaluatesToTrue("Why.not?", "\"Why.not?\"");
   }
 
   @Test
   public void testEndpointVariable() {
     variables.put("y", "a");
-    assertTrue("a", "y");
-    assertFalse("b", "y");
+    assertEvaluatesToTrue("a", "y");
+    assertEvaluatesToFalse("b", "y");
 
     variables.put("customer", Collections.singletonMap("name", "camunda"));
-    assertTrue("camunda", "customer.name");
-    assertFalse("hello", "customer.name");
+    assertEvaluatesToTrue("camunda", "customer.name");
+    assertEvaluatesToFalse("hello", "customer.name");
   }
 
   @Test
   public void testEndpointVariableGreater() {
     variables.put("y", 13.37);
-    assertTrue(12, "<y");
-    assertFalse(13.38, "<y");
+    assertEvaluatesToTrue(12, "<y");
+    assertEvaluatesToFalse(13.38, "<y");
   }
 
   @Test
   public void testEndpointVariableGreaterEqual() {
     variables.put("y", 13.37);
-    assertTrue(12, "<=y");
-    assertTrue(13.37, "<=y");
-    assertFalse(13.38, "<=y");
+    assertEvaluatesToTrue(12, "<=y");
+    assertEvaluatesToTrue(13.37, "<=y");
+    assertEvaluatesToFalse(13.38, "<=y");
   }
 
   @Test
   public void testEndpointVariableLess() {
     variables.put("y", 13.37);
-    assertFalse(12, ">y");
-    assertTrue(13.38, ">y");
+    assertEvaluatesToFalse(12, ">y");
+    assertEvaluatesToTrue(13.38, ">y");
   }
 
   @Test
   public void testEndpointVariableLessEqual() {
     variables.put("y", 13.37);
-    assertFalse(12, ">=y");
-    assertTrue(13.37, ">=y");
-    assertTrue(13.38, ">=y");
+    assertEvaluatesToFalse(12, ">=y");
+    assertEvaluatesToTrue(13.37, ">=y");
+    assertEvaluatesToTrue(13.38, ">=y");
   }
 
   @Test
   public void testEndpointBoolean() {
-    assertTrue(true, "true");
-    assertFalse(true, "false");
-    assertTrue(false, "false");
-    assertFalse(false, "true");
+    assertEvaluatesToTrue(true, "true");
+    assertEvaluatesToFalse(true, "false");
+    assertEvaluatesToTrue(false, "false");
+    assertEvaluatesToFalse(false, "true");
   }
 
   @Test
   public void testEndpointNumber() {
-    assertTrue(13, "13");
-    assertTrue(13.37, "13.37");
-    assertTrue(0.37, ".37");
-    assertFalse(13.37, "23.42");
-    assertFalse(0.42, ".37");
+    assertEvaluatesToTrue(13, "13");
+    assertEvaluatesToTrue(13.37, "13.37");
+    assertEvaluatesToTrue(0.37, ".37");
+    assertEvaluatesToFalse(13.37, "23.42");
+    assertEvaluatesToFalse(0.42, ".37");
   }
 
   @Test
   public void testEndpointNumberGreater() {
-    assertTrue(12, "<13");
-    assertTrue(13.35, "<13.37");
-    assertTrue(0.337, "<.37");
-    assertFalse(13.37, "<13.37");
-    assertFalse(0.37, "<.37");
+    assertEvaluatesToTrue(12, "<13");
+    assertEvaluatesToTrue(13.35, "<13.37");
+    assertEvaluatesToTrue(0.337, "<.37");
+    assertEvaluatesToFalse(13.37, "<13.37");
+    assertEvaluatesToFalse(0.37, "<.37");
   }
 
   @Test
   public void testEndpointNumberGreaterEqual() {
-    assertTrue(13.37, "<=13.37");
-    assertTrue(13.337, "<=13.37");
-    assertTrue(0.37, "<=.37");
-    assertTrue(0.337, "<=.37");
-    assertFalse(13.42, "<=13.37");
-    assertFalse(0.42, "<=.37");
+    assertEvaluatesToTrue(13.37, "<=13.37");
+    assertEvaluatesToTrue(13.337, "<=13.37");
+    assertEvaluatesToTrue(0.37, "<=.37");
+    assertEvaluatesToTrue(0.337, "<=.37");
+    assertEvaluatesToFalse(13.42, "<=13.37");
+    assertEvaluatesToFalse(0.42, "<=.37");
   }
 
   @Test
   public void testEndpointNumberLess() {
-    assertTrue(13.37, ">13");
-    assertTrue(13.42, ">13.37");
-    assertTrue(0.42, ">.37");
-    assertFalse(13.37, ">13.37");
-    assertFalse(0.37, ">.37");
+    assertEvaluatesToTrue(13.37, ">13");
+    assertEvaluatesToTrue(13.42, ">13.37");
+    assertEvaluatesToTrue(0.42, ">.37");
+    assertEvaluatesToFalse(13.37, ">13.37");
+    assertEvaluatesToFalse(0.37, ">.37");
   }
 
   @Test
   public void testEndpointNumberLessEqual() {
-    assertTrue(13.37, ">=13");
-    assertTrue(13.37, ">=13.37");
-    assertTrue(0.37, ">=.37");
-    assertTrue(0.42, ">=.37");
-    assertFalse(13.337, ">=13.37");
-    assertFalse(0.23, ">=.37");
+    assertEvaluatesToTrue(13.37, ">=13");
+    assertEvaluatesToTrue(13.37, ">=13.37");
+    assertEvaluatesToTrue(0.37, ">=.37");
+    assertEvaluatesToTrue(0.42, ">=.37");
+    assertEvaluatesToFalse(13.337, ">=13.37");
+    assertEvaluatesToFalse(0.23, ">=.37");
   }
 
   @Test
   @Ignore
   public void testEndpointDate() {
     LocalDateValue date = parseDate("2015-12-12");
-    assertTrue(date, "date(\"2015-12-12\")");
+    assertEvaluatesToTrue(date, "date(\"2015-12-12\")");
 
     variables.put("y", "2015-12-12");
-    assertTrue(date, "date(y)");
+    assertEvaluatesToTrue(date, "date(y)");
   }
 
   @Test
@@ -180,47 +180,47 @@ public class FeelEngineTest {
   public void testEndpointTime() {
     LocalTimeValue time = parseTime("22:12:53");
 
-    assertTrue(time, "time(\"22:12:53\")");
+    assertEvaluatesToTrue(time, "time(\"22:12:53\")");
 
     variables.put("y", "22:12:53");
-    assertTrue(time, "time(y)");
+    assertEvaluatesToTrue(time, "time(y)");
   }
 
   @Test
   public void testEndpointDateAndTime() {
     DateValue dateTime = parseDateTime("2015-12-12T22:12:53");
 
-    assertTrue(dateTime, "date and time(\"2015-12-12T22:12:53\")");
+    assertEvaluatesToTrue(dateTime, "date and time(\"2015-12-12T22:12:53\")");
 
     variables.put("y", "2015-12-12T22:12:53");
-    assertTrue(dateTime, "date and time(y)");
+    assertEvaluatesToTrue(dateTime, "date and time(y)");
   }
 
   @Test
   public void testIntervalNumber() {
-    assertTrue(0.23, "[.12...37]");
-    assertTrue(0.23, "[.12...37)");
-    assertTrue(0.23, "[.12...37[");
+    assertEvaluatesToTrue(0.23, "[.12...37]");
+    assertEvaluatesToTrue(0.23, "[.12...37)");
+    assertEvaluatesToTrue(0.23, "[.12...37[");
 
-    assertTrue(0.23, "(.12...37]");
-    assertTrue(0.23, "(.12...37)");
-    assertTrue(0.23, "(.12...37[");
+    assertEvaluatesToTrue(0.23, "(.12...37]");
+    assertEvaluatesToTrue(0.23, "(.12...37)");
+    assertEvaluatesToTrue(0.23, "(.12...37[");
 
-    assertTrue(0.23, "].12...37]");
-    assertTrue(0.23, "].12...37)");
-    assertTrue(0.23, "].12...37[");
+    assertEvaluatesToTrue(0.23, "].12...37]");
+    assertEvaluatesToTrue(0.23, "].12...37)");
+    assertEvaluatesToTrue(0.23, "].12...37[");
 
-    assertFalse(13.37, "[.12...37]");
-    assertFalse(13.37, "[.12...37)");
-    assertFalse(13.37, "[.12...37[");
+    assertEvaluatesToFalse(13.37, "[.12...37]");
+    assertEvaluatesToFalse(13.37, "[.12...37)");
+    assertEvaluatesToFalse(13.37, "[.12...37[");
 
-    assertFalse(13.37, "(.12...37]");
-    assertFalse(13.37, "(.12...37)");
-    assertFalse(13.37, "(.12...37[");
+    assertEvaluatesToFalse(13.37, "(.12...37]");
+    assertEvaluatesToFalse(13.37, "(.12...37)");
+    assertEvaluatesToFalse(13.37, "(.12...37[");
 
-    assertFalse(13.37, "].12...37]");
-    assertFalse(13.37, "].12...37)");
-    assertFalse(13.37, "].12...37[");
+    assertEvaluatesToFalse(13.37, "].12...37]");
+    assertEvaluatesToFalse(13.37, "].12...37)");
+    assertEvaluatesToFalse(13.37, "].12...37[");
   }
 
   @Test
@@ -228,81 +228,81 @@ public class FeelEngineTest {
     variables.put("a", 10);
     variables.put("b", 15);
 
-    assertTrue(13.37, "[a..b]");
-    assertTrue(13.37, "[a..b)");
-    assertTrue(13.37, "[a..b[");
+    assertEvaluatesToTrue(13.37, "[a..b]");
+    assertEvaluatesToTrue(13.37, "[a..b)");
+    assertEvaluatesToTrue(13.37, "[a..b[");
 
-    assertTrue(13.37, "(a..b]");
-    assertTrue(13.37, "(a..b)");
-    assertTrue(13.37, "(a..b[");
+    assertEvaluatesToTrue(13.37, "(a..b]");
+    assertEvaluatesToTrue(13.37, "(a..b)");
+    assertEvaluatesToTrue(13.37, "(a..b[");
 
-    assertTrue(13.37, "]a..b]");
-    assertTrue(13.37, "]a..b)");
-    assertTrue(13.37, "]a..b[");
+    assertEvaluatesToTrue(13.37, "]a..b]");
+    assertEvaluatesToTrue(13.37, "]a..b)");
+    assertEvaluatesToTrue(13.37, "]a..b[");
 
-    assertFalse(0.37, "[a..b]");
-    assertFalse(0.37, "[a..b)");
-    assertFalse(0.37, "[a..b[");
+    assertEvaluatesToFalse(0.37, "[a..b]");
+    assertEvaluatesToFalse(0.37, "[a..b)");
+    assertEvaluatesToFalse(0.37, "[a..b[");
 
-    assertFalse(0.37, "(a..b]");
-    assertFalse(0.37, "(a..b)");
-    assertFalse(0.37, "(a..b[");
+    assertEvaluatesToFalse(0.37, "(a..b]");
+    assertEvaluatesToFalse(0.37, "(a..b)");
+    assertEvaluatesToFalse(0.37, "(a..b[");
 
-    assertFalse(0.37, "]a..b]");
-    assertFalse(0.37, "]a..b)");
-    assertFalse(0.37, "]a..b[");
+    assertEvaluatesToFalse(0.37, "]a..b]");
+    assertEvaluatesToFalse(0.37, "]a..b)");
+    assertEvaluatesToFalse(0.37, "]a..b[");
   }
 
   @Test
   @Ignore
   public void testIntervalDate() {
     LocalDateValue date = parseDate("2016-03-03");
-    assertTrue(date, "[date(\"2015-12-12\")..date(\"2016-06-06\")]");
-    assertTrue(date, "[date(\"2015-12-12\")..date(\"2016-06-06\"))");
-    assertTrue(date, "[date(\"2015-12-12\")..date(\"2016-06-06\")[");
+    assertEvaluatesToTrue(date, "[date(\"2015-12-12\")..date(\"2016-06-06\")]");
+    assertEvaluatesToTrue(date, "[date(\"2015-12-12\")..date(\"2016-06-06\"))");
+    assertEvaluatesToTrue(date, "[date(\"2015-12-12\")..date(\"2016-06-06\")[");
 
-    assertTrue(date, "(date(\"2015-12-12\")..date(\"2016-06-06\")]");
-    assertTrue(date, "(date(\"2015-12-12\")..date(\"2016-06-06\"))");
-    assertTrue(date, "(date(\"2015-12-12\")..date(\"2016-06-06\")[");
+    assertEvaluatesToTrue(date, "(date(\"2015-12-12\")..date(\"2016-06-06\")]");
+    assertEvaluatesToTrue(date, "(date(\"2015-12-12\")..date(\"2016-06-06\"))");
+    assertEvaluatesToTrue(date, "(date(\"2015-12-12\")..date(\"2016-06-06\")[");
 
-    assertTrue(date, "]date(\"2015-12-12\")..date(\"2016-06-06\")]");
-    assertTrue(date, "]date(\"2015-12-12\")..date(\"2016-06-06\"))");
-    assertTrue(date, "]date(\"2015-12-12\")..date(\"2016-06-06\")[");
+    assertEvaluatesToTrue(date, "]date(\"2015-12-12\")..date(\"2016-06-06\")]");
+    assertEvaluatesToTrue(date, "]date(\"2015-12-12\")..date(\"2016-06-06\"))");
+    assertEvaluatesToTrue(date, "]date(\"2015-12-12\")..date(\"2016-06-06\")[");
 
     date = parseDate("2013-03-03");
-    assertFalse(date, "[date(\"2015-12-12\")..date(\"2016-06-06\")]");
-    assertFalse(date, "[date(\"2015-12-12\")..date(\"2016-06-06\"))");
-    assertFalse(date, "[date(\"2015-12-12\")..date(\"2016-06-06\")[");
+    assertEvaluatesToFalse(date, "[date(\"2015-12-12\")..date(\"2016-06-06\")]");
+    assertEvaluatesToFalse(date, "[date(\"2015-12-12\")..date(\"2016-06-06\"))");
+    assertEvaluatesToFalse(date, "[date(\"2015-12-12\")..date(\"2016-06-06\")[");
 
-    assertFalse(date, "(date(\"2015-12-12\")..date(\"2016-06-06\")]");
-    assertFalse(date, "(date(\"2015-12-12\")..date(\"2016-06-06\"))");
-    assertFalse(date, "(date(\"2015-12-12\")..date(\"2016-06-06\")[");
+    assertEvaluatesToFalse(date, "(date(\"2015-12-12\")..date(\"2016-06-06\")]");
+    assertEvaluatesToFalse(date, "(date(\"2015-12-12\")..date(\"2016-06-06\"))");
+    assertEvaluatesToFalse(date, "(date(\"2015-12-12\")..date(\"2016-06-06\")[");
 
-    assertFalse(date, "]date(\"2015-12-12\")..date(\"2016-06-06\")]");
-    assertFalse(date, "]date(\"2015-12-12\")..date(\"2016-06-06\"))");
-    assertFalse(date, "]date(\"2015-12-12\")..date(\"2016-06-06\")[");
+    assertEvaluatesToFalse(date, "]date(\"2015-12-12\")..date(\"2016-06-06\")]");
+    assertEvaluatesToFalse(date, "]date(\"2015-12-12\")..date(\"2016-06-06\"))");
+    assertEvaluatesToFalse(date, "]date(\"2015-12-12\")..date(\"2016-06-06\")[");
   }
 
   @Test
   public void testNot() {
     variables.put("y", 13.37);
 
-    assertTrue("Hello camunda", "not(\"Hello World\")");
-    assertTrue(0.37, "not(y)");
-    assertFalse(0.37, "not(<y)");
-    assertFalse(0.37, "not(<=y)");
-    assertTrue(0.37, "not(>y)");
-    assertTrue(0.37, "not(>=y)");
-    assertTrue(0.37, "not(13.37)");
-    assertFalse(0.37, "not(<13.37)");
-    assertFalse(0.37, "not(<=13.37)");
-    assertTrue(0.37, "not(>13.37)");
-    assertTrue(0.37, "not(>=13.37)");
-    assertFalse(0.37, "not(.37)");
-    assertTrue(0.37, "not(<.37)");
-    assertFalse(0.37, "not(<=.37)");
-    assertTrue(0.37, "not(>.37)");
-    assertFalse(0.37, "not(>=.37)");
+    assertEvaluatesToTrue("Hello camunda", "not(\"Hello World\")");
+    assertEvaluatesToTrue(0.37, "not(y)");
+    assertEvaluatesToFalse(0.37, "not(<y)");
+    assertEvaluatesToFalse(0.37, "not(<=y)");
+    assertEvaluatesToTrue(0.37, "not(>y)");
+    assertEvaluatesToTrue(0.37, "not(>=y)");
+    assertEvaluatesToTrue(0.37, "not(13.37)");
+    assertEvaluatesToFalse(0.37, "not(<13.37)");
+    assertEvaluatesToFalse(0.37, "not(<=13.37)");
+    assertEvaluatesToTrue(0.37, "not(>13.37)");
+    assertEvaluatesToTrue(0.37, "not(>=13.37)");
+    assertEvaluatesToFalse(0.37, "not(.37)");
+    assertEvaluatesToTrue(0.37, "not(<.37)");
+    assertEvaluatesToFalse(0.37, "not(<=.37)");
+    assertEvaluatesToTrue(0.37, "not(>.37)");
+    assertEvaluatesToFalse(0.37, "not(>=.37)");
   }
 
   @Test
@@ -310,52 +310,52 @@ public class FeelEngineTest {
     variables.put("a", "Hello camunda");
     variables.put("y", 0);
 
-    assertTrue("Hello World", "a,\"Hello World\"");
-    assertTrue("Hello camunda", "a,\"Hello World\"");
-    assertFalse("Hello unknown", "a,\"Hello World\"");
-    assertTrue(0, "y,12,13.37,.37");
-    assertTrue(12, "y,12,13.37,.37");
-    assertTrue(13.37, "y,12,13.37,.37");
-    assertTrue(0.37, "y,12,13.37,.37");
-    assertFalse(0.23, "y,12,13.37,.37");
-    assertTrue(-1, "<y,>13.37,>=.37");
-    assertTrue(0.37, "<y,>13.37,>=.37");
-    assertFalse(0, "<y,>13.37,>=.37");
+    assertEvaluatesToTrue("Hello World", "a,\"Hello World\"");
+    assertEvaluatesToTrue("Hello camunda", "a,\"Hello World\"");
+    assertEvaluatesToFalse("Hello unknown", "a,\"Hello World\"");
+    assertEvaluatesToTrue(0, "y,12,13.37,.37");
+    assertEvaluatesToTrue(12, "y,12,13.37,.37");
+    assertEvaluatesToTrue(13.37, "y,12,13.37,.37");
+    assertEvaluatesToTrue(0.37, "y,12,13.37,.37");
+    assertEvaluatesToFalse(0.23, "y,12,13.37,.37");
+    assertEvaluatesToTrue(-1, "<y,>13.37,>=.37");
+    assertEvaluatesToTrue(0.37, "<y,>13.37,>=.37");
+    assertEvaluatesToFalse(0, "<y,>13.37,>=.37");
   }
 
   @Test
   public void testNested() {
     variables.put("a", 23.42);
-    assertTrue(0.37, "not(>=a,13.37,].37...42),<.37)");
-    assertFalse(23.42, "not(>=a,13.37,].37...42),<.37)");
-    assertFalse(13.37, "not(>=a,13.37,].37...42),<.37)");
-    assertFalse(0.38, "not(>=a,13.37,].37...42),<.37)");
-    assertFalse(0, "not(>=a,13.37,].37...42),<.37)");
+    assertEvaluatesToTrue(0.37, "not(>=a,13.37,].37...42),<.37)");
+    assertEvaluatesToFalse(23.42, "not(>=a,13.37,].37...42),<.37)");
+    assertEvaluatesToFalse(13.37, "not(>=a,13.37,].37...42),<.37)");
+    assertEvaluatesToFalse(0.38, "not(>=a,13.37,].37...42),<.37)");
+    assertEvaluatesToFalse(0, "not(>=a,13.37,].37...42),<.37)");
   }
 
   @Test
   public void testDontCare() {
-    assertTrue(13.37, "-");
+    assertEvaluatesToTrue(13.37, "-");
   }
 
   @Test
   public void testWhitespace() {
-    assertTrue("Hello World", "'Hello World' ");
-    assertTrue("Hello World", " 'Hello World'");
-    assertTrue("Hello World", " 'Hello World' ");
-    assertTrue(12, " 12 ");
-    assertTrue(10.2, " <12 ");
-    assertTrue(0, "< 12 ");
-    assertTrue(12.3, "\t>=12 ");
-    assertTrue(0, " not( 13 ,\t>0)\t");
+    assertEvaluatesToTrue("Hello World", "'Hello World' ");
+    assertEvaluatesToTrue("Hello World", " 'Hello World'");
+    assertEvaluatesToTrue("Hello World", " 'Hello World' ");
+    assertEvaluatesToTrue(12, " 12 ");
+    assertEvaluatesToTrue(10.2, " <12 ");
+    assertEvaluatesToTrue(0, "< 12 ");
+    assertEvaluatesToTrue(12.3, "\t>=12 ");
+    assertEvaluatesToTrue(0, " not( 13 ,\t>0)\t");
   }
 
-  public void assertTrue(Object input, String feelExpression) {
+  public void assertEvaluatesToTrue(Object input, String feelExpression) {
     boolean result = evaluateFeel(input, feelExpression);
     assertThat(result).isTrue();
   }
 
-  public void assertFalse(Object input, String feelExpression) {
+  public void assertEvaluatesToFalse(Object input, String feelExpression) {
     boolean result = evaluateFeel(input, feelExpression);
     assertThat(result).isFalse();
   }
