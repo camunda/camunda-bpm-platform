@@ -1381,6 +1381,34 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
     deleteDeployments(deployment1, deployment2);
   }
 
+  public void testRedeployEnableDuplcateChecking() {
+    // given
+    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
+
+    BpmnModelInstance model1 = createProcessWithServiceTask(PROCESS_1_KEY);
+    Deployment deployment1 = repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addModelInstance(RESOURCE_1_NAME, model1)
+        .deploy();
+
+    verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 1);
+
+    // when
+    Deployment deployment2 = repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResources(deployment1.getId())
+        .enableDuplicateFiltering(true)
+        .deploy();
+
+    assertEquals(deployment1.getId(), deployment2.getId());
+
+    verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 1);
+
+    deleteDeployments(deployment1);
+  }
+
   public void testSimpleProcessApplicationDeployment() {
     // given
     EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication();

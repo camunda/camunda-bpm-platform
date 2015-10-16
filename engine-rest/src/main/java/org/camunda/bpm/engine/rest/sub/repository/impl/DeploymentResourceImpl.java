@@ -74,15 +74,28 @@ public class DeploymentResourceImpl extends AbstractRestProcessEngineAware imple
         builder.source(redeployment.getSource());
 
         List<String> resourceIds = redeployment.getResourceIds();
-        if (resourceIds != null && !resourceIds.isEmpty()) {
-          builder.addDeploymentResourcesById(deploymentId, resourceIds);
-        }
-
         List<String> resourceNames = redeployment.getResourceNames();
-        if (resourceNames != null && !resourceNames.isEmpty()) {
-          builder.addDeploymentResourcesByName(deploymentId, resourceNames);
-        }
 
+        boolean isResourceIdListEmpty = resourceIds == null || resourceIds.isEmpty();
+        boolean isResourceNameListEmpty = resourceNames == null || resourceNames.isEmpty();
+
+        if (isResourceIdListEmpty && isResourceNameListEmpty) {
+          builder.addDeploymentResources(deploymentId);
+        }
+        else {
+
+          if (!isResourceIdListEmpty) {
+            builder.addDeploymentResourcesById(deploymentId, resourceIds);
+          }
+
+          if (!isResourceNameListEmpty) {
+            builder.addDeploymentResourcesByName(deploymentId, resourceNames);
+          }
+
+        }
+      }
+      else {
+        builder.addDeploymentResources(deploymentId);
       }
 
       deployment = builder.deploy();
