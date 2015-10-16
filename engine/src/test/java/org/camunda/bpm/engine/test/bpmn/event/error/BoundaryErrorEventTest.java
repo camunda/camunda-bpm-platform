@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.VariableInstance;
@@ -350,6 +351,17 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
     taskService.complete(task.getId(), vars);
 
     assertProcessEnded(procId);
+  }
+  
+  @Deployment
+  public void testCatchErrorThrownBySignallableActivityBehaviour() {
+    String procId = runtimeService.startProcessInstanceByKey("catchErrorThrownBySignallableActivityBehaviour").getId();
+    assertNotNull("Didn't get a process id from runtime service", procId);
+    ActivityInstance processActivityInstance = runtimeService.getActivityInstance(procId);
+    ActivityInstance serviceTask = processActivityInstance.getChildActivityInstances()[0];
+    assertEquals("Expected the service task to be active after starting the process", "serviceTask", serviceTask.getActivityId());
+    runtimeService.signal(serviceTask.getExecutionIds()[0]);
+    assertThatErrorHasBeenCaught(procId);
   }
 
   @Deployment
