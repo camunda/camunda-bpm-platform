@@ -17,6 +17,7 @@ import java.util.Date;
 
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.CaseService;
+import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.FormService;
@@ -98,6 +99,7 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
   protected AuthorizationService authorizationService;
   protected CaseService caseService;
   protected ExternalTaskService externalTaskService;
+  protected DecisionService decisionService;
 
   public ProcessEngineRule() {
     this(false);
@@ -161,6 +163,7 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
     caseService = processEngine.getCaseService();
     filterService = processEngine.getFilterService();
     externalTaskService = processEngine.getExternalTaskService();
+    decisionService = processEngine.getDecisionService();
   }
 
   protected void clearServiceReferences() {
@@ -175,6 +178,7 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
     caseService = null;
     filterService = null;
     externalTaskService = null;
+    decisionService = null;
   }
 
   @Override
@@ -315,6 +319,15 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
 
   public void setExternalTaskService(ExternalTaskService externalTaskService) {
     this.externalTaskService = externalTaskService;
+  }
+
+  @Override
+  public DecisionService getDecisionService() {
+    return decisionService;
+  }
+
+  public void setDecisionService(DecisionService decisionService) {
+    this.decisionService = decisionService;
   }
 
 }

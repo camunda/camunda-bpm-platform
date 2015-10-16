@@ -47,7 +47,20 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     // create event instance
     HistoricDecisionInstanceEntity event = newDecisionInstanceEventEntity(executionEntity, decisionTable, decisionTableResult);
     // initialize event
-    initDecisionInstanceEvent(event, executionEntity, decisionTable, decisionTableResult, HistoryEventTypes.DMN_DECISION_EVALUATE);
+    initDecisionInstanceEvent(event, decisionTable, decisionTableResult, HistoryEventTypes.DMN_DECISION_EVALUATE);
+    setReferenceToProcessInstance(event, executionEntity);
+    // set current time as evaluation time
+    event.setEvaluationTime(ClockUtil.getCurrentTime());
+
+    return event;
+  }
+
+  @Override
+  public HistoryEvent createDecisionEvaluatedEvt(DmnDecisionTable decisionTable, DmnDecisionTableResult decisionTableResult) {
+    // create event instance
+    HistoricDecisionInstanceEntity event = newDecisionInstanceEventEntity(decisionTable, decisionTableResult);
+    // initialize event
+    initDecisionInstanceEvent(event, decisionTable, decisionTableResult, HistoryEventTypes.DMN_DECISION_EVALUATE);
     // set current time as evaluation time
     event.setEvaluationTime(ClockUtil.getCurrentTime());
 
@@ -58,20 +71,16 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     return new HistoricDecisionInstanceEntity();
   }
 
-  protected void initDecisionInstanceEvent(HistoricDecisionInstanceEntity event, ExecutionEntity execution, DmnDecisionTable decisionTable, DmnDecisionTableResult decisionTableResult, HistoryEventTypes eventType) {
+  protected HistoricDecisionInstanceEntity newDecisionInstanceEventEntity(DmnDecisionTable decisionTable, DmnDecisionTableResult decisionTableResult) {
+    return new HistoricDecisionInstanceEntity();
+  }
+
+  protected void initDecisionInstanceEvent(HistoricDecisionInstanceEntity event, DmnDecisionTable decisionTable, DmnDecisionTableResult decisionTableResult, HistoryEventTypes eventType) {
     event.setEventType(eventType.getEventName());
 
     event.setDecisionDefinitionId(((DecisionDefinition) decisionTable).getId());
     event.setDecisionDefinitionKey(decisionTable.getKey());
     event.setDecisionDefinitionName(decisionTable.getName());
-
-    event.setProcessDefinitionKey(getProcessDefinitionKey(execution));
-    event.setProcessDefinitionId(execution.getProcessDefinitionId());
-
-    event.setProcessInstanceId(execution.getProcessInstanceId());
-
-    event.setActivityId(execution.getActivityId());
-    event.setActivityInstanceId(execution.getActivityInstanceId());
 
     if(decisionTableResult.getCollectResultValue() != null) {
       double collectResultValue = decisionTableResult.getCollectResultValue().doubleValue();
@@ -83,15 +92,6 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
 
     List<HistoricDecisionOutputInstance> historicDecisionOutputInstances = createHistoricDecisionOutputInstances(decisionTableResult);
     event.setOutputs(historicDecisionOutputInstances);
-  }
-
-  protected String getProcessDefinitionKey(ExecutionEntity execution) {
-    ProcessDefinitionEntity definition = (ProcessDefinitionEntity) execution.getProcessDefinition();
-    if (definition != null) {
-      return definition.getKey();
-    } else {
-      return null;
-    }
   }
 
   protected List<HistoricDecisionInputInstance> createHistoricDecisionInputInstances(DmnDecisionTableResult decisionTableResult) {
@@ -141,6 +141,25 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     }
 
     return outputInstances;
+  }
+
+  protected void setReferenceToProcessInstance(HistoricDecisionInstanceEntity event, ExecutionEntity execution) {
+    event.setProcessDefinitionKey(getProcessDefinitionKey(execution));
+    event.setProcessDefinitionId(execution.getProcessDefinitionId());
+
+    event.setProcessInstanceId(execution.getProcessInstanceId());
+
+    event.setActivityId(execution.getActivityId());
+    event.setActivityInstanceId(execution.getActivityInstanceId());
+  }
+
+  protected String getProcessDefinitionKey(ExecutionEntity execution) {
+    ProcessDefinitionEntity definition = (ProcessDefinitionEntity) execution.getProcessDefinition();
+    if (definition != null) {
+      return definition.getKey();
+    } else {
+      return null;
+    }
   }
 
 }

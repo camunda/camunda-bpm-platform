@@ -20,10 +20,9 @@ import java.util.TimerTask;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 
-import junit.framework.AssertionFailedError;
-
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.CaseService;
+import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.FormService;
@@ -46,6 +45,8 @@ import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+
+import junit.framework.AssertionFailedError;
 
 
 /**
@@ -77,6 +78,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
   protected CaseService caseService;
   protected FilterService filterService;
   protected ExternalTaskService externalTaskService;
+  protected DecisionService decisionService;
 
   protected abstract void initializeProcessEngine();
 
@@ -136,6 +138,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     caseService = processEngine.getCaseService();
     filterService = processEngine.getFilterService();
     externalTaskService = processEngine.getExternalTaskService();
+    decisionService = processEngine.getDecisionService();
   }
 
   protected void clearServiceReferences() {
@@ -151,6 +154,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     caseService = null;
     filterService = null;
     externalTaskService = null;
+    decisionService = null;
   }
 
   public void assertProcessEnded(final String processInstanceId) {

@@ -52,6 +52,7 @@ import org.camunda.bpm.dmn.scriptengine.DmnScriptEngineFactory;
 import org.camunda.bpm.engine.ArtifactFactory;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.CaseService;
+import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.FormService;
@@ -65,6 +66,7 @@ import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.AuthorizationServiceImpl;
+import org.camunda.bpm.engine.impl.DecisionServiceImpl;
 import org.camunda.bpm.engine.impl.DefaultArtifactFactory;
 import org.camunda.bpm.engine.impl.ExternalTaskServiceImpl;
 import org.camunda.bpm.engine.impl.FilterServiceImpl;
@@ -291,6 +293,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected CaseService caseService = new CaseServiceImpl();
   protected FilterService filterService = new FilterServiceImpl();
   protected ExternalTaskService externalTaskService = new ExternalTaskServiceImpl();
+  protected DecisionService decisionService = new DecisionServiceImpl();
 
   // COMMAND EXECUTORS ////////////////////////////////////////////////////////
 
@@ -711,6 +714,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initService(caseService);
     initService(filterService);
     initService(externalTaskService);
+    initService(decisionService);
   }
 
   protected void initService(Object service) {
@@ -1789,6 +1793,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setExternalTaskService(ExternalTaskService externalTaskService) {
     this.externalTaskService = externalTaskService;
+  }
+
+  public DecisionService getDecisionService() {
+    return decisionService;
+  }
+
+  public void setDecisionService(DecisionService decisionService) {
+    this.decisionService = decisionService;
   }
 
   public Map<Class< ? >, SessionFactory> getSessionFactories() {
