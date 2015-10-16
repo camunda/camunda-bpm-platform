@@ -206,7 +206,7 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
       String[] resourceIdArray = resourceIds.toArray(new String[resourceIds.size()]);
       List<ResourceEntity> resources = resourceManager.findResourceByDeploymentIdAndResourceIds(deploymentId, resourceIdArray);
 
-      checkResourcesToDeployById(deploymentId, resourceIds, resources);
+      ensureResourcesWithIdsExist(deploymentId, resourceIds, resources);
 
       result.addAll(resources);
     }
@@ -225,7 +225,7 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
       String[] resourceNameArray = resourceNames.toArray(new String[resourceNames.size()]);
       List<ResourceEntity> resources = resourceManager.findResourceByDeploymentIdAndResourceNames(deploymentId, resourceNameArray);
 
-      checkResourcesToDeployByName(deploymentId, resourceNames, resources);
+      ensureResourcesWithNamesExist(deploymentId, resourceNames, resources);
 
       result.addAll(resources);
     }
@@ -286,31 +286,31 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
     }
   }
 
-  protected void checkResourcesToDeployById(String deploymentId, Set<String> expected, List<ResourceEntity> actual) {
+  protected void ensureResourcesWithIdsExist(String deploymentId, Set<String> expectedIds, List<ResourceEntity> actual) {
     Map<String, ResourceEntity> resources = new HashMap<String, ResourceEntity>();
     for (ResourceEntity resource : actual) {
       resources.put(resource.getId(), resource);
     }
-    checkResourcesToDeploy(deploymentId, expected, resources, "id");
+    ensureResourcesWithKeysExist(deploymentId, expectedIds, resources, "id");
   }
 
-  protected void checkResourcesToDeployByName(String deploymentId, Set<String> expected, List<ResourceEntity> actual) {
+  protected void ensureResourcesWithNamesExist(String deploymentId, Set<String> expectedNames, List<ResourceEntity> actual) {
     Map<String, ResourceEntity> resources = new HashMap<String, ResourceEntity>();
     for (ResourceEntity resource : actual) {
       resources.put(resource.getName(), resource);
     }
-    checkResourcesToDeploy(deploymentId, expected, resources, "name");
+    ensureResourcesWithKeysExist(deploymentId, expectedNames, resources, "name");
   }
 
-  protected void checkResourcesToDeploy(String deploymentId, Set<String> expected, Map<String, ResourceEntity> actual, String valueProperty) {
-    List<String> missingResources = getMissingElements(expected, actual);
+  protected void ensureResourcesWithKeysExist(String deploymentId, Set<String> expectedKeys, Map<String, ResourceEntity> actual, String valueProperty) {
+    List<String> missingResources = getMissingElements(expectedKeys, actual);
 
     if (!missingResources.isEmpty()) {
       StringBuilder builder = new StringBuilder();
 
       builder.append("The deployment with id '");
       builder.append(deploymentId);
-      builder.append("' does not contain one of the following resources with ");
+      builder.append("' does not contain the following resources with ");
       builder.append(valueProperty);
       builder.append(": ");
 
@@ -347,19 +347,13 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
     }
 
     Set<String> deployments = deploymentBuilder.getDeployments();
-    if (!deployments.isEmpty()) {
-      deploymentsToCheck.addAll(deployments);
-    }
+    deploymentsToCheck.addAll(deployments);
 
     deployments = deploymentBuilder.getDeploymentResourcesById().keySet();
-    if (!deployments.isEmpty()) {
-      deploymentsToCheck.addAll(deployments);
-    }
+    deploymentsToCheck.addAll(deployments);
 
     deployments = deploymentBuilder.getDeploymentResourcesByName().keySet();
-    if (!deployments.isEmpty()) {
-      deploymentsToCheck.addAll(deployments);
-    }
+    deploymentsToCheck.addAll(deployments);
 
     for (String deploymentId : deploymentsToCheck) {
       authorizationManager.checkReadDeployment(deploymentId);

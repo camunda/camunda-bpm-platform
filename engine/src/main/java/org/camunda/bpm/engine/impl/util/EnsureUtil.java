@@ -266,6 +266,10 @@ public final class EnsureUtil {
     ensureNotContainsNull(NullValueException.class, message, variableName, values);
   }
 
+  public static void ensureNotContainsNull(Class<? extends ProcessEngineException> exceptionClass, String variableName, Collection<?> values) {
+    ensureNotContainsNull(exceptionClass, null, variableName, values);
+  }
+
   public static void ensureNotContainsNull(Class<? extends ProcessEngineException> exceptionClass, String message, String variableName, Collection<?> values) {
     ensureNotNull(exceptionClass, message, variableName, values.toArray(new Object[values.size()]));
   }

@@ -51,6 +51,8 @@ public interface DeploymentBuilder {
   /**
    * All existing resources contained by the given deployment
    * will be added to the new deployment to re-deploy them.
+   *
+   * @throws NotValidException if deployment id is null.
    */
   DeploymentBuilder addDeploymentResources(String deploymentId);
 
@@ -96,6 +98,9 @@ public interface DeploymentBuilder {
 
   /**
    * Sets the deployment id to retrieve the deployment name from it.
+   *
+   * @throws NotValidException
+   *    if {@link #name(String)} has been called before.
    */
   DeploymentBuilder nameFromDeployment(String deploymentId);
 
@@ -157,7 +162,7 @@ public interface DeploymentBuilder {
    *  thrown if the current user does not possess the following permissions:
    *   <ul>
    *     <li>{@link Permissions#CREATE} on {@link Resources#DEPLOYMENT}</li>
-   *     <li>{@link Permissions#READ} on {@link Resources#DEPLOYMENT} (if deployments are provided)</li>
+   *     <li>{@link Permissions#READ} on {@link Resources#DEPLOYMENT} (if resources from previous deployments are redeployed)</li>
    *   </ul>
    */
   Deployment deploy();

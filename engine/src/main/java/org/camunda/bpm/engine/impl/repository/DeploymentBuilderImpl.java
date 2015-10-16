@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.repository;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
 
 import java.io.InputStream;
 import java.io.Serializable;
@@ -33,6 +34,7 @@ import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.RepositoryServiceImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
+import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.repository.Deployment;
@@ -123,12 +125,9 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
   public DeploymentBuilder addDeploymentResourceById(String deploymentId, String resourceId) {
     ensureNotNull(NotValidException.class, "deploymentId", deploymentId);
     ensureNotNull(NotValidException.class, "resourceId", resourceId);
-    Set<String> resources = deploymentResourcesById.get(deploymentId);
-    if (resources == null) {
-      resources = new HashSet<String>();
-      deploymentResourcesById.put(deploymentId, resources);
-    }
-    resources.add(resourceId);
+
+    CollectionUtil.addToMapOfSets(deploymentResourcesById, deploymentId, resourceId);
+
     return this;
   }
 
@@ -137,14 +136,10 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
 
     ensureNotNull(NotValidException.class, "resourceIds", resourceIds);
     ensureNotEmpty(NotValidException.class, "resourceIds", resourceIds);
-    ensureNotNull(NotValidException.class, "resourceIds", (Object[]) resourceIds.toArray(new String[resourceIds.size()]));
+    ensureNotContainsNull(NotValidException.class, "resourceIds", resourceIds);
 
-    Set<String> resources = deploymentResourcesById.get(deploymentId);
-    if (resources == null) {
-      resources = new HashSet<String>();
-      deploymentResourcesById.put(deploymentId, resources);
-    }
-    resources.addAll(resourceIds);
+    CollectionUtil.addCollectionToMapOfSets(deploymentResourcesById, deploymentId, resourceIds);
+
     return this;
   }
 
@@ -152,12 +147,8 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
     ensureNotNull(NotValidException.class, "deploymentId", deploymentId);
     ensureNotNull(NotValidException.class, "resourceName", resourceName);
 
-    Set<String> resources = deploymentResourcesByName.get(deploymentId);
-    if (resources == null) {
-      resources = new HashSet<String>();
-      deploymentResourcesByName.put(deploymentId, resources);
-    }
-    resources.add(resourceName);
+    CollectionUtil.addToMapOfSets(deploymentResourcesByName, deploymentId, resourceName);
+
     return this;
   }
 
@@ -166,14 +157,10 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
 
     ensureNotNull(NotValidException.class, "resourceNames", resourceNames);
     ensureNotEmpty(NotValidException.class, "resourceNames", resourceNames);
-    ensureNotNull(NotValidException.class, "resourceNames", (Object[]) resourceNames.toArray(new String[resourceNames.size()]));
+    ensureNotContainsNull(NotValidException.class, "resourceNames", resourceNames);
 
-    Set<String> resources = deploymentResourcesByName.get(deploymentId);
-    if (resources == null) {
-      resources = new HashSet<String>();
-      deploymentResourcesByName.put(deploymentId, resources);
-    }
-    resources.addAll(resourceNames);
+    CollectionUtil.addCollectionToMapOfSets(deploymentResourcesByName, deploymentId, resourceNames);
+
     return this;
   }
 
