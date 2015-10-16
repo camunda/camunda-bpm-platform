@@ -1381,6 +1381,34 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
     deleteDeployments(deployment1, deployment2);
   }
 
+  public void testRedeployAndAddNewResourceWithSameName() {
+    // given
+    BpmnModelInstance model1 = createProcessWithServiceTask(PROCESS_1_KEY);
+
+    Deployment deployment1 = repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME + "-1")
+        .addModelInstance(RESOURCE_1_NAME, model1)
+        .deploy();
+
+    // when
+    BpmnModelInstance model2 = createProcessWithReceiveTask(PROCESS_2_KEY);
+
+    try {
+      repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME + "-2")
+        .addModelInstance(RESOURCE_1_NAME, model2)
+        .addDeploymentResourceByName(deployment1.getId(), RESOURCE_1_NAME)
+        .deploy();
+      fail("It should not be possible to deploy different resources with same name.");
+    } catch (NotValidException e) {
+      // expected
+    }
+
+    deleteDeployments(deployment1);
+  }
+
   public void testRedeployEnableDuplcateChecking() {
     // given
     ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();

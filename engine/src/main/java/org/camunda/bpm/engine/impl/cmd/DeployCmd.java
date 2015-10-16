@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-
 import java.io.ByteArrayInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -94,9 +92,18 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
   }
 
   protected Deployment doExecute(final CommandContext commandContext) {
+    DeploymentManager deploymentManager = commandContext.getDeploymentManager();
+
+    Set<String> deploymentIds = getAllDeploymentIds(deploymentBuilder);
+    if (!deploymentIds.isEmpty()) {
+      String[] deploymentIdArray = deploymentIds.toArray(new String[deploymentIds.size()]);
+      List<DeploymentEntity> deployments = deploymentManager.findDeploymentsByIds(deploymentIdArray);
+      ensureDeploymentsWithIdsExists(deploymentIds, deployments);
+    }
+
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     authorizationManager.checkCreateDeployment();
-    checkReadDeployments(authorizationManager, deploymentBuilder);
+    checkReadDeployments(authorizationManager, deploymentIds);
 
     // set deployment name if it should retrieved from an existing deployment
     String nameFromDeployment = deploymentBuilder.getNameFromDeployment();
@@ -151,7 +158,6 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
     if (deploymentId != null && !deploymentId.isEmpty()) {
       DeploymentManager deploymentManager = commandContext.getDeploymentManager();
       DeploymentEntity deployment = deploymentManager.findDeploymentById(deploymentId);
-      ensureNotNull(NotFoundException.class, "No deployment found with id '" + deploymentId + "'", "deployment", deployment);
       deploymentBuilder.getDeployment().setName(deployment.getName());
     }
   }
@@ -180,12 +186,8 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
 
       DeploymentManager deploymentManager = commandContext.getDeploymentManager();
 
-      String[] deploymentIdArray = deploymentIds.toArray(new String[deploymentIds.size()]);
-      List<DeploymentEntity> deployments = deploymentManager.findDeploymentsByIds(deploymentIdArray);
-
-      checkDeploymentsToRedeploy(deploymentIds, deployments);
-
-      for (DeploymentEntity deployment : deployments) {
+      for (String deploymentId : deploymentIds) {
+        DeploymentEntity deployment = deploymentManager.findDeploymentById(deploymentId);
         Map<String, ResourceEntity> resources = deployment.getResources();
         Collection<ResourceEntity> values = resources.values();
         result.addAll(values);
@@ -234,8 +236,20 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
   }
 
   protected void addResources(List<ResourceEntity> resources, DeploymentBuilderImpl deploymentBuilder) {
+    DeploymentEntity deployment = deploymentBuilder.getDeployment();
+    Map<String, ResourceEntity> existingResources = deployment.getResources();
+
     for (ResourceEntity resource : resources) {
       String resourceName = resource.getName();
+
+      if (existingResources != null && existingResources.containsKey(resourceName)) {
+        String message = String.format("Cannot add resource with id '%s' and name '%s' from "
+            + "deployment with id '%s' to new deployment because the new deployment contains "
+            + "already a resource with same name.", resource.getId(), resourceName, resource.getDeploymentId());
+
+        throw new NotValidException(message);
+      }
+
       ByteArrayInputStream inputStream = new ByteArrayInputStream(resource.getBytes());
       deploymentBuilder.addInputStream(resourceName, inputStream);
     }
@@ -259,7 +273,7 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
     }
   }
 
-  protected void checkDeploymentsToRedeploy(Set<String> expected, List<DeploymentEntity> actual) {
+  protected void ensureDeploymentsWithIdsExists(Set<String> expected, List<DeploymentEntity> actual) {
     Map<String, DeploymentEntity> deploymentMap = new HashMap<String, DeploymentEntity>();
     for (DeploymentEntity deployment : actual) {
       deploymentMap.put(deployment.getId(), deployment);
@@ -338,24 +352,28 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
     return missingElements;
   }
 
-  protected void checkReadDeployments(AuthorizationManager authorizationManager, DeploymentBuilderImpl deploymentBuilder) {
-    Set<String> deploymentsToCheck = new HashSet<String>();
+  protected Set<String> getAllDeploymentIds(DeploymentBuilderImpl deploymentBuilder) {
+    Set<String> result = new HashSet<String>();
 
     String nameFromDeployment = deploymentBuilder.getNameFromDeployment();
     if (nameFromDeployment != null && !nameFromDeployment.isEmpty()) {
-      deploymentsToCheck.add(nameFromDeployment);
+      result.add(nameFromDeployment);
     }
 
     Set<String> deployments = deploymentBuilder.getDeployments();
-    deploymentsToCheck.addAll(deployments);
+    result.addAll(deployments);
 
     deployments = deploymentBuilder.getDeploymentResourcesById().keySet();
-    deploymentsToCheck.addAll(deployments);
+    result.addAll(deployments);
 
     deployments = deploymentBuilder.getDeploymentResourcesByName().keySet();
-    deploymentsToCheck.addAll(deployments);
+    result.addAll(deployments);
 
-    for (String deploymentId : deploymentsToCheck) {
+    return result;
+  }
+
+  protected void checkReadDeployments(AuthorizationManager authorizationManager, Set<String> deploymentIds) {
+    for (String deploymentId : deploymentIds) {
       authorizationManager.checkReadDeployment(deploymentId);
     }
   }

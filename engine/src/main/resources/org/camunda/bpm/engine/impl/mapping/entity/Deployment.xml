@@ -41,10 +41,6 @@
           ${prefix}ACT_RE_DEPLOYMENT
     <if test="parameter != null">
     where
-          <if test="parameter.length == 1">
-          ID_ = #{parameter[0]}
-          </if>
-          <if test="parameter.length > 1">
           ID_ in
             <foreach item="id"
                      collection="parameter"
@@ -53,7 +49,6 @@
                      close=")">
               #{id}
             </foreach>
-          </if>
     </if>
 
   </select>
