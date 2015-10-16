@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.test.dmn.scripttask;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
+import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -121,7 +122,7 @@ public class DmnScriptTaskTest extends PluggableProcessEngineTestCase {
   }
 
   protected DmnDecisionOutput getDecisionOutput() {
-    return (DmnDecisionOutput) runtimeService.getVariable(processInstanceId, RESULT_VARIABLE);
+    return (DmnDecisionOutput) ((DmnDecisionResult) runtimeService.getVariable(processInstanceId, RESULT_VARIABLE)).get(0);
   }
 
   protected void startProcess(VariableMap variables) {

@@ -14,9 +14,10 @@
 package org.camunda.bpm.engine.test.dmn;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
+import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.junit.Before;
@@ -25,6 +26,9 @@ public class DmnScriptOutputTest extends PluggableProcessEngineTestCase {
 
   public static final String TEST_PROCESS = "org/camunda/bpm/engine/test/dmn/DmnScriptOutputTest.bpmn20.xml";
   public static final String TEST_DECISION = "org/camunda/bpm/engine/test/dmn/DmnScriptOutputTest.dmn10.xml";
+
+  protected DmnDecisionResult ruleResult;
+  protected DmnDecisionResult scriptResult;
 
   @Before
   public void setUp() {
@@ -35,112 +39,84 @@ public class DmnScriptOutputTest extends PluggableProcessEngineTestCase {
   }
 
   public void testNoOutput() {
-    ProcessInstance processInstance = startTestProcess("no output");
+    startTestProcess("no output");
 
-    Object ruleResult = runtimeService.getVariable(processInstance.getId(), "ruleResult");
-    Object scriptResult = runtimeService.getVariable(processInstance.getId(), "scriptResult");
-
-    assertNull(ruleResult);
-    assertNull(scriptResult);
+    assertTrue("The decision result 'ruleResult' should be empty", ruleResult.isEmpty());
+    assertTrue("The decision result 'scriptResult' should be empty", scriptResult.isEmpty());
   }
 
   @SuppressWarnings("unchecked")
   public void testEmptyOutput() {
-    ProcessInstance processInstance = startTestProcess("empty output");
+    startTestProcess("empty output");
 
-    Map<String, Object> ruleResult = (Map<String, Object>) runtimeService.getVariable(processInstance.getId(), "ruleResult");
-    Map<String, Object> scriptResult = (Map<String, Object>) runtimeService.getVariable(processInstance.getId(), "scriptResult");
+    assertFalse("The decision result 'ruleResult' should not be empty", ruleResult.isEmpty());
+    assertFalse("The decision result 'scriptResult' should not be empty", scriptResult.isEmpty());
 
-    assertNotNull(ruleResult);
-    assertNotNull(scriptResult);
+    DmnDecisionOutput decisionOutput = ruleResult.get(0);
+    assertNull(decisionOutput.getFirstValue());
 
-    assertTrue(ruleResult.isEmpty());
-    assertTrue(scriptResult.isEmpty());
+    decisionOutput = scriptResult.get(0);
+    assertNull(decisionOutput.getFirstValue());
   }
 
   @SuppressWarnings("unchecked")
   public void testEmptyMap() {
-    ProcessInstance processInstance = startTestProcess("empty map");
-
-    List<Object> ruleResult = (List<Object>) runtimeService.getVariable(processInstance.getId(), "ruleResult");
-    List<Object> scriptResult = (List<Object>) runtimeService.getVariable(processInstance.getId(), "scriptResult");
-
-    assertNotNull(ruleResult);
-    assertNotNull(scriptResult);
+    startTestProcess("empty map");
 
     assertEquals(2, ruleResult.size());
     assertEquals(2, scriptResult.size());
 
-    for (Object output : ruleResult) {
-      assertNull(output);
+    for (DmnDecisionOutput output : ruleResult) {
+      assertTrue("The decision output should be empty", output.isEmpty());
     }
 
-    for (Object output : scriptResult) {
-      assertNull(output);
+    for (DmnDecisionOutput output : scriptResult) {
+      assertTrue("The decision output should be empty", output.isEmpty());
     }
   }
 
   public void testSingleEntry() {
-    ProcessInstance processInstance = startTestProcess("single entry");
+    startTestProcess("single entry");
 
-    String ruleResult = (String) runtimeService.getVariable(processInstance.getId(), "ruleResult");
-    String scriptResult = (String) runtimeService.getVariable(processInstance.getId(), "scriptResult");
+    DmnDecisionOutput firstOutput = ruleResult.get(0);
+    assertEquals("foo", firstOutput.getFirstValue());
 
-    assertNotNull(ruleResult);
-    assertNotNull(scriptResult);
-
-    assertEquals("foo", ruleResult);
-    assertEquals("foo", scriptResult);
+    firstOutput = scriptResult.get(0);
+    assertEquals("foo", firstOutput.getFirstValue());
   }
 
   @SuppressWarnings("unchecked")
   public void testMultipleEntries() {
-    ProcessInstance processInstance = startTestProcess("multiple entries");
+    startTestProcess("multiple entries");
 
-    Map<String, Object> ruleResult = (Map<String, Object>) runtimeService.getVariable(processInstance.getId(), "ruleResult");
-    Map<String, Object> scriptResult = (Map<String, Object>) runtimeService.getVariable(processInstance.getId(), "scriptResult");
+    DmnDecisionOutput firstOutput = ruleResult.get(0);
+    assertEquals("foo", firstOutput.getValue("result1"));
+    assertEquals("foo", firstOutput.getValue("result2"));
 
-    assertNotNull(ruleResult);
-    assertNotNull(scriptResult);
-
-    assertEquals("foo", ruleResult.get("result1"));
-    assertEquals("foo", ruleResult.get("result2"));
-
-    assertEquals("foo", scriptResult.get("result1"));
-    assertEquals("foo", scriptResult.get("result2"));
+    firstOutput = scriptResult.get(0);
+    assertEquals("foo", firstOutput.get("result1"));
+    assertEquals("foo", firstOutput.get("result2"));
   }
 
   @SuppressWarnings("unchecked")
   public void testSingleEntryList() {
-    ProcessInstance processInstance = startTestProcess("single entry list");
-
-    List<Object> ruleResult = (List<Object>) runtimeService.getVariable(processInstance.getId(), "ruleResult");
-    List<Object> scriptResult = (List<Object>) runtimeService.getVariable(processInstance.getId(), "scriptResult");
-
-    assertNotNull(ruleResult);
-    assertNotNull(scriptResult);
+    startTestProcess("single entry list");
 
     assertEquals(2, ruleResult.size());
     assertEquals(2, scriptResult.size());
 
-    for (Object output : ruleResult) {
-      assertEquals("foo", output);
+    for (DmnDecisionOutput output : ruleResult) {
+      assertEquals("foo", output.getFirstValue());
     }
 
-    for (Object output : scriptResult) {
-      assertEquals("foo", output);
+    for (DmnDecisionOutput output : scriptResult) {
+      assertEquals("foo", output.getFirstValue());
     }
   }
 
   @SuppressWarnings("unchecked")
   public void testMultipleEntriesList() {
-    ProcessInstance processInstance = startTestProcess("multiple entries list");
-
-    List<Map<String, Object>> ruleResult = (List<Map<String, Object>>) runtimeService.getVariable(processInstance.getId(), "ruleResult");
-    List<Map<String, Object>> scriptResult = (List<Map<String, Object>>) runtimeService.getVariable(processInstance.getId(), "scriptResult");
-
-    assertNotNull(ruleResult);
-    assertNotNull(scriptResult);
+    startTestProcess("multiple entries list");
 
     assertEquals(2, ruleResult.size());
     assertEquals(2, scriptResult.size());
@@ -159,7 +135,15 @@ public class DmnScriptOutputTest extends PluggableProcessEngineTestCase {
   }
 
   public ProcessInstance startTestProcess(String input) {
-    return runtimeService.startProcessInstanceByKey("testProcess", Collections.<String, Object>singletonMap("input", input));
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess", Collections.<String, Object>singletonMap("input", input));
+
+    ruleResult = (DmnDecisionResult) runtimeService.getVariable(processInstance.getId(), "ruleResult");
+    scriptResult = (DmnDecisionResult) runtimeService.getVariable(processInstance.getId(), "scriptResult");
+
+    assertNotNull(ruleResult);
+    assertNotNull(scriptResult);
+
+    return processInstance;
   }
 
 }

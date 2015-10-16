@@ -16,6 +16,8 @@ package org.camunda.bpm.engine.impl.scripting;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureInstanceOf;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
+import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
+import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.Condition;
@@ -50,6 +52,10 @@ public class ScriptCondition implements Condition {
 
     Object result = invocation.getInvocationResult();
 
+    if (result instanceof DmnDecisionResult) {
+      result = getDecisionResult((DmnDecisionResult) result);
+    }
+
     ensureNotNull("condition script returns null", "result", result);
     ensureInstanceOf("condition script returns non-Boolean", "result", result, Boolean.class);
 
@@ -58,6 +64,21 @@ public class ScriptCondition implements Condition {
 
   public ExecutableScript getScript() {
     return script;
+  }
+
+  public Object  getDecisionResult(DmnDecisionResult decisionResult) {
+    if (decisionResult.size() == 1) {
+      DmnDecisionOutput decisionOutput = decisionResult.getSingleOutput();
+      if (decisionOutput.size() == 1) {
+        return decisionOutput.getSingleValue();
+      }
+      else {
+        throw new ProcessEngineException("Condition decision does not return single output. Got: " + decisionResult);
+      }
+    }
+    else {
+      throw new ProcessEngineException("Condition decision does not return single result. Got: " + decisionResult);
+    }
   }
 
 }

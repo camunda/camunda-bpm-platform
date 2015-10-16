@@ -44,14 +44,14 @@ public class DecisionServiceTest extends PluggableProcessEngineTestCase {
 
     DmnDecisionResult decisionResult = decisionService.evaluateDecisionById(decisionDefinition.getId(), createVariables());
 
-    asserThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
+    assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
   }
 
   @Deployment(resources = DMN_FILE)
   public void testEvaluateDecisionByKey() {
     DmnDecisionResult decisionResult = decisionService.evaluateDecisionByKey(DECISION_DEFINITION_KEY, createVariables());
 
-    asserThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
+    assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
   }
 
   @Deployment(resources = DMN_FILE)
@@ -61,7 +61,7 @@ public class DecisionServiceTest extends PluggableProcessEngineTestCase {
 
       DmnDecisionResult decisionResult = decisionService.evaluateDecisionByKey(DECISION_DEFINITION_KEY, createVariables());
 
-      asserThatDecisionHasResult(decisionResult, RESULT_OF_SECOND_VERSION);
+      assertThatDecisionHasResult(decisionResult, RESULT_OF_SECOND_VERSION);
 
     } finally {
       repositoryService.deleteDeployment(secondDeploymentId, true);
@@ -75,7 +75,7 @@ public class DecisionServiceTest extends PluggableProcessEngineTestCase {
 
       DmnDecisionResult decisionResult = decisionService.evaluateDecisionByKeyAndVersion(DECISION_DEFINITION_KEY, 1, createVariables());
 
-      asserThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
+      assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
 
     } finally {
       repositoryService.deleteDeployment(secondDeploymentId, true);
@@ -89,7 +89,7 @@ public class DecisionServiceTest extends PluggableProcessEngineTestCase {
 
       DmnDecisionResult decisionResult = decisionService.evaluateDecisionByKeyAndVersion(DECISION_DEFINITION_KEY, null, createVariables());
 
-      asserThatDecisionHasResult(decisionResult, RESULT_OF_SECOND_VERSION);
+      assertThatDecisionHasResult(decisionResult, RESULT_OF_SECOND_VERSION);
 
     } finally {
       repositoryService.deleteDeployment(secondDeploymentId, true);
@@ -148,10 +148,11 @@ public class DecisionServiceTest extends PluggableProcessEngineTestCase {
     return Variables.createVariables().putValue("status", "silver").putValue("sum", 723);
   }
 
-  protected void asserThatDecisionHasResult(DmnDecisionResult decisionResult, Object expectedValue) {
+  protected void assertThatDecisionHasResult(DmnDecisionResult decisionResult, Object expectedValue) {
     assertThat(decisionResult, is(notNullValue()));
     assertThat(decisionResult.size(), is(1));
-    assertThat(decisionResult.get(0).<String> getValue(), is(expectedValue));
+    String value = decisionResult.getSingleOutput().getFirstValue();
+    assertThat(value, is(expectedValue));
   }
 
 }

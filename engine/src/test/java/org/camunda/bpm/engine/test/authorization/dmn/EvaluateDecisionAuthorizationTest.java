@@ -17,6 +17,7 @@ import static org.camunda.bpm.engine.test.authorization.util.AuthorizationSpec.g
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
 
@@ -101,7 +102,7 @@ public class EvaluateDecisionAuthorizationTest {
 
     // then
     if (authRule.assertScenario(scenario)) {
-      asserThatDecisionHasExpectedResult(decisionResult);
+      assertThatDecisionHasExpectedResult(decisionResult);
     }
   }
 
@@ -119,7 +120,7 @@ public class EvaluateDecisionAuthorizationTest {
 
     // then
     if (authRule.assertScenario(scenario)) {
-      asserThatDecisionHasExpectedResult(decisionResult);
+      assertThatDecisionHasExpectedResult(decisionResult);
     }
   }
 
@@ -138,7 +139,7 @@ public class EvaluateDecisionAuthorizationTest {
 
     // then
     if (authRule.assertScenario(scenario)) {
-      asserThatDecisionHasExpectedResult(decisionResult);
+      assertThatDecisionHasExpectedResult(decisionResult);
     }
   }
 
@@ -146,10 +147,11 @@ public class EvaluateDecisionAuthorizationTest {
     return Variables.createVariables().putValue("status", "silver").putValue("sum", 723);
   }
 
-  protected void asserThatDecisionHasExpectedResult(DmnDecisionResult decisionResult) {
+  protected void assertThatDecisionHasExpectedResult(DmnDecisionResult decisionResult) {
     assertThat(decisionResult, is(notNullValue()));
     assertThat(decisionResult.size(), is(1));
-    assertThat(decisionResult.get(0).<String> getValue(), is("ok"));
+    String value = decisionResult.getSingleOutput().getFirstValue();
+    assertThat(value, is("ok"));
   }
 
 }
