@@ -16,6 +16,8 @@ package org.camunda.bpm.engine;
 import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.Resources;
 
 /**
  * Service to evaluate decisions inside the DMN engine.
@@ -35,6 +37,10 @@ public interface DecisionService {
    *
    * @throws ProcessEngineException
    *           when no decision definition is deployed with the given id.
+   *
+   * @throws AuthorizationException
+   *           if the user has no {@link Permissions#CREATE_INSTANCE} permission
+   *           on {@link Resources#DECISION_DEFINITION}.
    */
   DmnDecisionResult evaluateDecisionById(String decisionDefinitionId, Map<String, Object> variables);
 
@@ -49,6 +55,10 @@ public interface DecisionService {
    *
    * @throws ProcessEngineException
    *           when no decision definition is deployed with the given key.
+   *
+   * @throws AuthorizationException
+   *           if the user has no {@link Permissions#CREATE_INSTANCE} permission
+   *           on {@link Resources#DECISION_DEFINITION}.
    */
   DmnDecisionResult evaluateDecisionByKey(String decisionDefinitionKey, Map<String, Object> variables);
 
@@ -69,6 +79,10 @@ public interface DecisionService {
    * @throws ProcessEngineException
    *           when no decision definition is deployed with the given key and
    *           version.
+   *
+   * @throws AuthorizationException
+   *           if the user has no {@link Permissions#CREATE_INSTANCE} permission
+   *           on {@link Resources#DECISION_DEFINITION}.
    */
   DmnDecisionResult evaluateDecisionByKeyAndVersion(String decisionDefinitionKey, Integer version, Map<String, Object> variables);
 

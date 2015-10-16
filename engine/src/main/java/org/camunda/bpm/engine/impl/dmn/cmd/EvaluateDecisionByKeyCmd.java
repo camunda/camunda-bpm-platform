@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 
 /**
@@ -57,6 +58,10 @@ public class EvaluateDecisionByKeyCmd implements Command<DmnDecisionResult> {
     DecisionDefinition decisionDefinition = getDecisionDefinition();
     ensureNotNull("No decision definition found for key '" + decisionDefinitionKey + "' and version '" + version + "'", "decisionDefinition",
         decisionDefinition);
+
+    // check authorization
+    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+    authorizationManager.checkEvaluateDecision(decisionDefinition.getKey());
 
     DmnDecisionResult decisionResult = dmnEngine.evaluate((DmnDecision) decisionDefinition, variables);
     return decisionResult;

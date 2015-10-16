@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntit
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 
 /**
  * Evaluates the decision with the given id.
@@ -49,6 +50,10 @@ public class EvaluateDecisionByIdCmd implements Command<DmnDecisionResult> {
 
     DecisionDefinitionEntity decisionDefinition = deploymentCache.findDeployedDecisionDefinitionById(decisionDefinitionId);
     ensureNotNull("No decision definition found for id '" + decisionDefinitionId + "'", "decisionDefinition", decisionDefinition);
+
+    // check authorization
+    AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+    authorizationManager.checkEvaluateDecision(decisionDefinition.getKey());
 
     DmnDecisionResult decisionResult = dmnEngine.evaluate(decisionDefinition, variables);
     return decisionResult;
