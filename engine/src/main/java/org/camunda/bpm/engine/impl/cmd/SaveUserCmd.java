@@ -23,6 +23,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Joram Barrez
+ * @author Sulaiman Alajlan
  */
 public class SaveUserCmd extends AbstractWritableIdentityServiceCmd<Void> implements Command<Void>, Serializable {
   
@@ -36,9 +37,26 @@ public class SaveUserCmd extends AbstractWritableIdentityServiceCmd<Void> implem
   protected Void executeCmd(CommandContext commandContext) {
     ensureNotNull("user", user);
 
+    if (user.getDelegatedUserId() != null && !user.getId().equals(user.getDelegatedUserId())){
+      User delegatedUser = commandContext
+              .getReadOnlyIdentityProvider()
+              .findUserById(user.getDelegatedUserId());
+
+      if (delegatedUser == null || (delegatedUser != null ? delegatedUser.getDelegatedUserId() == null : false)){
+        commandContext
+                .getWritableIdentityProvider()
+                .saveUser(user);
+
+        return null;
+      }
+    }
+
+    user.setDelegatedUserId(null);
+
     commandContext
-      .getWritableIdentityProvider()
-      .saveUser(user);
+            .getWritableIdentityProvider()
+            .saveUser(user);
+
 
     return null;
   }

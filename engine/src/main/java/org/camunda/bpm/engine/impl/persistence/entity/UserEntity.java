@@ -36,6 +36,7 @@ public class UserEntity implements User, Serializable, DbEntity, HasDbRevision {
   protected String email;
   protected String password;
   protected String newPassword;
+  protected String delegatedUserId;
 
   public UserEntity() {
   }
@@ -50,6 +51,7 @@ public class UserEntity implements User, Serializable, DbEntity, HasDbRevision {
     persistentState.put("lastName", lastName);
     persistentState.put("email", email);
     persistentState.put("password", password);
+    persistentState.put("delegatedUserId", delegatedUserId);
     return persistentState;
   }
 
@@ -87,6 +89,10 @@ public class UserEntity implements User, Serializable, DbEntity, HasDbRevision {
   public void setPassword(String password) {
     this.newPassword = password;
   }
+  public String getDelegatedUserId(){ return delegatedUserId; }
+  public void setDelegatedUserId(String delegatedUserId){
+    this.delegatedUserId = delegatedUserId;
+  }
   /**
    * Special setter for MyBatis.
    */
@@ -111,20 +117,21 @@ public class UserEntity implements User, Serializable, DbEntity, HasDbRevision {
       return null;
     } else {
       return Context.getProcessEngineConfiguration()
-        .getPasswordEncryptor()
-        .encrypt(password);
+              .getPasswordEncryptor()
+              .encrypt(password);
     }
   }
 
   public String toString() {
     return this.getClass().getSimpleName()
-           + "[id=" + id
-           + ", revision=" + revision
-           + ", firstName=" + firstName
-           + ", lastName=" + lastName
-           + ", email=" + email
-           + ", password=" + password
-           + "]";
+            + "[id=" + id
+            + ", revision=" + revision
+            + ", firstName=" + firstName
+            + ", lastName=" + lastName
+            + ", email=" + email
+            + ", password=" + password
+            + ", delegatedUserId=" + delegatedUserId
+            + "]";
   }
 
 }
