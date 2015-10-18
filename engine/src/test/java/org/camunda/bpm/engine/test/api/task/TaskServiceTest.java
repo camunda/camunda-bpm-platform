@@ -770,6 +770,27 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     taskService.deleteTask(task.getId(), true);
   }
 
+  public void testTaskSetAssigneeWithDelegateUser() {
+    User user = identityService.newUser("user");
+    user.setDelegatedUserId("salajlan");
+    identityService.saveUser(user);
+
+    Task task = taskService.newTask();
+    assertNull(task.getAssignee());
+    taskService.saveTask(task);
+
+    // Set assignee
+    task.setAssignee(user.getId());
+    taskService.saveTask(task);
+
+    // Fetch task again
+    task = taskService.createTaskQuery().taskId(task.getId()).singleResult();
+    assertEquals(user.getDelegatedUserId(), task.getAssignee());
+
+    identityService.deleteUser(user.getId());
+    taskService.deleteTask(task.getId(), true);
+  }
+
   public void testSetAssigneeWithUserIdAsString() {
 
     Task task = taskService.newTask();
