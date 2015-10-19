@@ -18,8 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.activation.MimeType;
-import javax.activation.MimeTypeParseException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -47,6 +45,8 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 
 
 public abstract class AbstractVariablesResource implements VariableResource {
+
+  protected static final String DEFAULT_BINARY_VALUE_TYPE = "Bytes";
 
   protected ProcessEngine engine;
   protected String resourceId;
@@ -148,15 +148,16 @@ public abstract class AbstractVariablesResource implements VariableResource {
 
   public void setBinaryVariable(String variableKey, MultipartFormData payload) {
     FormPart dataPart = payload.getNamedPart("data");
-    FormPart valueTypePart = payload.getNamedPart("type");
+    FormPart objectTypePart = payload.getNamedPart("type");
+    FormPart valueTypePart = payload.getNamedPart("valueType");
 
-    if(valueTypePart != null) {
+    if(objectTypePart != null) {
       Object object = null;
 
       if(dataPart.getContentType()!=null
           && dataPart.getContentType().toLowerCase().contains(MediaType.APPLICATION_JSON)) {
 
-        object = deserializeJsonObject(valueTypePart.getTextContent(), dataPart.getBinaryContent());
+        object = deserializeJsonObject(objectTypePart.getTextContent(), dataPart.getBinaryContent());
 
       } else {
         throw new InvalidRequestException(Status.BAD_REQUEST, "Unrecognized content type for serialized java type: "+dataPart.getContentType());
@@ -166,12 +167,22 @@ public abstract class AbstractVariablesResource implements VariableResource {
         setVariableEntity(variableKey, Variables.objectValue(object).create());
       }
     } else {
-      try {
-        if (dataPart.getFileName() != null) {
-          setFileValueVariable(variableKey, dataPart);
-        } else {
-          setVariableEntity(variableKey, Variables.byteArrayValue(dataPart.getBinaryContent()));
+
+      String valueTypeName = DEFAULT_BINARY_VALUE_TYPE;
+      if (valueTypePart != null) {
+        if (valueTypePart.getTextContent() == null) {
+          throw new InvalidRequestException(Status.BAD_REQUEST,
+              "Form part with name 'valueType' must have a text/plain value");
         }
+
+        valueTypeName = valueTypePart.getTextContent();
+      }
+
+      VariableValueDto valueDto = VariableValueDto.fromFormPart(valueTypeName, dataPart);
+      try {
+
+        TypedValue typedValue = valueDto.toTypedValue(engine, objectMapper);
+        setVariableEntity(variableKey, typedValue);
       } catch (AuthorizationException e) {
         throw e;
       } catch (ProcessEngineException e) {
@@ -179,32 +190,6 @@ public abstract class AbstractVariablesResource implements VariableResource {
         throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
       }
     }
-  }
-
-  /**
-   * Sets a {@link FileValue} with the help of {@link #setVariableEntity(String, TypedValue)}.
-   *
-   * @throws RestException if the filename is empty
-   */
-  protected void setFileValueVariable(String variableKey, FormPart dataPart) {
-    if ("".equals(dataPart.getFileName().trim())) {
-      throw new RestException(Status.BAD_REQUEST, "Cannot put a file without filename!");
-    }
-
-    String contentType = dataPart.getContentType();
-    if (contentType == null) {
-      contentType = MediaType.APPLICATION_OCTET_STREAM;
-    }
-
-    MimeType mimeType = null;
-    try {
-      mimeType = new MimeType(contentType);
-    } catch (MimeTypeParseException e) {
-      throw new RestException(Status.BAD_REQUEST, "Invalid mime type given");
-    }
-    byte[] data = dataPart.getBinaryContent();
-    FileValue fileValue = Variables.fileValue(dataPart.getFileName()).mimeType(mimeType.getBaseType()).encoding(mimeType.getParameter("encoding")).file(data).create();
-    setVariableEntity(variableKey, fileValue);
   }
 
   protected Object deserializeJsonObject(String className, byte[] data) {

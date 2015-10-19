@@ -16,12 +16,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.activation.MimeType;
+import javax.activation.MimeTypeParseException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.impl.core.variable.type.FileValueTypeImpl;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
+import org.camunda.bpm.engine.rest.mapper.MultipartFormData.FormPart;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.FileValueType;
@@ -192,6 +197,41 @@ public class VariableValueDto {
       result.put(name, fromTypedValue(variables.getValueTyped(name)));
     }
     return result;
+  }
+
+  public static VariableValueDto fromFormPart(String type, FormPart binaryDataFormPart) {
+    VariableValueDto dto = new VariableValueDto();
+
+    dto.type = type;
+    dto.value = binaryDataFormPart.getBinaryContent();
+
+    if (ValueType.FILE.getName().equals(fromRestApiTypeName(type))) {
+
+      String contentType = binaryDataFormPart.getContentType();
+      if (contentType == null) {
+        contentType = MediaType.APPLICATION_OCTET_STREAM;
+      }
+
+      dto.valueInfo = new HashMap<String, Object>();
+      dto.valueInfo.put(FileValueTypeImpl.VALUE_INFO_FILE_NAME, binaryDataFormPart.getFileName());
+      MimeType mimeType = null;
+      try {
+        mimeType = new MimeType(contentType);
+      } catch (MimeTypeParseException e) {
+        throw new RestException(Status.BAD_REQUEST, "Invalid mime type given");
+      }
+
+      dto.valueInfo.put(FileValueTypeImpl.VALUE_INFO_FILE_MIME_TYPE, mimeType.getBaseType());
+
+      String encoding = mimeType.getParameter("encoding");
+      if (encoding != null) {
+        dto.valueInfo.put(FileValueTypeImpl.VALUE_INFO_FILE_ENCODING, encoding);
+      }
+    }
+
+    return dto;
+
+
   }
 
 }

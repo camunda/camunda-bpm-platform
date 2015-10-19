@@ -2667,6 +2667,48 @@ public abstract class AbstractCaseExecutionRestServiceInteractionTest extends Ab
   }
 
   @Test
+  public void testPutSingleLocalBinaryVariableWithValueType() throws Exception {
+    byte[] bytes = "someContent".getBytes();
+
+    String variableKey = "aVariableKey";
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_CASE_EXECUTION_ID).pathParam("varId", variableKey)
+      .multiPart("data", null, bytes)
+      .multiPart("valueType", "Bytes", "text/plain")
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(SINGLE_CASE_EXECUTION_LOCAL_BINARY_VARIABLE_URL);
+
+    verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(variableKey),
+        argThat(EqualsPrimitiveValue.bytesValue(bytes)));
+    verify(caseExecutionCommandBuilderMock).execute();
+  }
+
+  @Test
+  public void testPutSingleBinaryVariableWithValueType() {
+    byte[] bytes = "someContent".getBytes();
+
+    String variableKey = "aVariableKey";
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_CASE_EXECUTION_ID).pathParam("varId", variableKey)
+      .multiPart("data", null, bytes)
+      .multiPart("valueType", "Bytes", "text/plain")
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(SINGLE_CASE_EXECUTION_LOCAL_BINARY_VARIABLE_URL);
+
+    verify(caseServiceMock).withCaseExecution(MockProvider.EXAMPLE_CASE_EXECUTION_ID);
+    verify(caseExecutionCommandBuilderMock).setVariableLocal(eq(variableKey),
+        argThat(EqualsPrimitiveValue.bytesValue(bytes)));
+    verify(caseExecutionCommandBuilderMock).execute();
+  }
+
+  @Test
   public void testPutSingleLocalBinaryVariableWithNoValue() throws Exception {
     byte[] bytes = new byte[0];
 
@@ -2894,6 +2936,7 @@ public abstract class AbstractCaseExecutionRestServiceInteractionTest extends Ab
       .pathParam("id", MockProvider.EXAMPLE_CASE_EXECUTION_ID)
       .pathParam("varId", variableKey)
       .multiPart("data", filename, value, mimetype + "; encoding="+encoding)
+      .multiPart("valueType", "File", "text/plain")
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
@@ -2921,6 +2964,7 @@ public abstract class AbstractCaseExecutionRestServiceInteractionTest extends Ab
     given()
       .pathParam("id", MockProvider.EXAMPLE_CASE_EXECUTION_ID).pathParam("varId", variableKey)
       .multiPart("data", filename, value, mimetype)
+      .multiPart("valueType", "File", "text/plain")
       .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
@@ -2949,6 +2993,7 @@ public abstract class AbstractCaseExecutionRestServiceInteractionTest extends Ab
     given()
       .pathParam("id", MockProvider.EXAMPLE_CASE_EXECUTION_ID).pathParam("varId", variableKey)
       .multiPart("data", filename, value, "encoding="+encoding)
+      .multiPart("valueType", "File", "text/plain")
       .header("accept", MediaType.APPLICATION_JSON)
     .expect()
     //when the user passes an encoding, he has to provide the type, too
@@ -2966,6 +3011,7 @@ public abstract class AbstractCaseExecutionRestServiceInteractionTest extends Ab
     given()
       .pathParam("id", MockProvider.EXAMPLE_CASE_EXECUTION_ID).pathParam("varId", variableKey)
       .multiPart("data", filename, new byte[0])
+      .multiPart("valueType", "File", "text/plain")
       .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
@@ -2996,6 +3042,7 @@ public abstract class AbstractCaseExecutionRestServiceInteractionTest extends Ab
       .pathParam("id", MockProvider.EXAMPLE_CASE_EXECUTION_ID).pathParam("varId", variableKey)
       .multiPart("data", filename, value, mimetype + "; encoding="+encoding)
       .header("accept", MediaType.APPLICATION_JSON)
+      .multiPart("valueType", "File", "text/plain")
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()

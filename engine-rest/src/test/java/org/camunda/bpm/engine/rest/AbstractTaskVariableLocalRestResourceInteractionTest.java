@@ -907,6 +907,26 @@ public class AbstractTaskVariableLocalRestResourceInteractionTest extends
   }
 
   @Test
+  public void testPostSingleLocalBinaryVariableWithValueType() throws Exception {
+    byte[] bytes = "someContent".getBytes();
+
+    String variableKey = "aVariableKey";
+
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
+      .multiPart("data", null, bytes)
+      .multiPart("valueType", "Bytes", "text/plain")
+      .header("accept", MediaType.APPLICATION_JSON)
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(SINGLE_TASK_SINGLE_BINARY_VARIABLE_URL);
+
+    verify(taskServiceMock).setVariableLocal(eq(EXAMPLE_TASK_ID), eq(variableKey),
+        argThat(EqualsPrimitiveValue.bytesValue(bytes)));
+  }
+
+  @Test
   public void testPostSingleLocalBinaryVariableWithNoValue() throws Exception {
     byte[] bytes = new byte[0];
 
@@ -1011,6 +1031,7 @@ public class AbstractTaskVariableLocalRestResourceInteractionTest extends
     given()
       .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
       .multiPart("data", filename, value, mimetype + "; encoding="+encoding)
+      .multiPart("valueType", "File", "text/plain")
       .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
@@ -1039,6 +1060,7 @@ public class AbstractTaskVariableLocalRestResourceInteractionTest extends
     given()
       .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
       .multiPart("data", filename, value, mimetype)
+      .multiPart("valueType", "File", "text/plain")
       .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
@@ -1066,6 +1088,7 @@ public class AbstractTaskVariableLocalRestResourceInteractionTest extends
     given()
       .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
       .multiPart("data", filename, value, "encoding="+encoding)
+      .multiPart("valueType", "File", "text/plain")
       .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       //when the user passes an encoding, he has to provide the type, too
@@ -1083,6 +1106,7 @@ public class AbstractTaskVariableLocalRestResourceInteractionTest extends
     given()
       .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
       .multiPart("data", filename, new byte[0])
+      .multiPart("valueType", "File", "text/plain")
       .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())

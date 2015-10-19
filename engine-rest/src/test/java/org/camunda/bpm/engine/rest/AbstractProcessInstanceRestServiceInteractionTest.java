@@ -1176,6 +1176,25 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   }
 
   @Test
+  public void testPutSingleBinaryVariableWithValueType() throws Exception {
+    byte[] bytes = "someContent".getBytes();
+
+    String variableKey = "aVariableKey";
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .multiPart("data", null, bytes)
+      .multiPart("valueType", "Bytes", "text/plain")
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(SINGLE_PROCESS_INSTANCE_BINARY_VARIABLE_URL);
+
+    verify(runtimeServiceMock).setVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey),
+        argThat(EqualsPrimitiveValue.bytesValue(bytes)));
+  }
+
+  @Test
   public void testPutSingleBinaryVariableWithNoValue() throws Exception {
     byte[] bytes = new byte[0];
 
@@ -1371,6 +1390,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     given()
       .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
       .multiPart("data", filename, value, mimetype + "; encoding="+encoding)
+      .multiPart("valueType", "File", "text/plain")
       .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
@@ -1398,6 +1418,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     given()
       .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
       .multiPart("data", filename, value, mimetype)
+      .multiPart("valueType", "File", "text/plain")
       .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
@@ -1425,6 +1446,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     given()
       .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
       .multiPart("data", filename, value, "encoding="+encoding)
+      .multiPart("valueType", "File", "text/plain")
       .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       //when the user passes an encoding, he has to provide the type, too
@@ -1442,6 +1464,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     given()
       .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
       .multiPart("data", filename, new byte[0])
+      .multiPart("valueType", "File", "text/plain")
       .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
