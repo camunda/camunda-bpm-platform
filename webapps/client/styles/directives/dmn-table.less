@@ -12,6 +12,30 @@
 @import "dmn-js/styles/dmn-clauseexpression-setter";
 @import "dmn-js/styles/dmn-combobox";
 
+
+.edit-dmn-modal,
+.confirm-dmn-modal {
+  > .modal-dialog {
+    width: auto;
+    margin-left: @grid-gutter-width * 0.5;
+    margin-right: @grid-gutter-width * 0.5;
+  }
+}
+
+
+.edit-dmn-modal {
+  .upload-new {
+    margin-top: @grid-gutter-width * 0.5;
+    margin-bottom: @grid-gutter-width;
+  }
+  .download-state {
+    margin-top: @grid-gutter-width;
+    margin-bottom: @grid-gutter-width * 0.5;
+  }
+}
+
+
+
 .confirm-dmn-modal {
   .glyphicon-fire {
     color: @brand-danger;
