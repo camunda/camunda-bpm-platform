@@ -14,6 +14,7 @@
 package org.camunda.bpm.dmn.engine.impl;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionTableRule;
@@ -22,7 +23,7 @@ import org.camunda.bpm.dmn.engine.DmnDecisionTableValue;
 public class DmnDecisionTableRuleImpl implements DmnDecisionTableRule {
 
   protected String key;
-  protected Map<String, DmnDecisionTableValue> outputs = new HashMap<String, DmnDecisionTableValue>();
+  protected Map<String, DmnDecisionTableValue> outputs = new LinkedHashMap<String, DmnDecisionTableValue>();
 
   public String getKey() {
     return key;
@@ -36,8 +37,8 @@ public class DmnDecisionTableRuleImpl implements DmnDecisionTableRule {
     return outputs;
   }
 
-  public void setOutputs(Map<String, DmnDecisionTableValue> outputs) {
-    this.outputs = outputs;
+  public void addOutput(DmnDecisionTableValue output) {
+    outputs.put(output.getKey(), output);
   }
 
   public String toString() {

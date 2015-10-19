@@ -1589,7 +1589,7 @@ public class HitPolicyTest extends DmnDecisionTest {
   public List<Object> collectSingleOutputValues(DmnDecisionResult result) {
     List<Object> values = new ArrayList<Object>();
     for (DmnDecisionOutput dmnDecisionOutput : result) {
-      values.add(dmnDecisionOutput.getValue());
+      values.add(dmnDecisionOutput.getSingleValue());
     }
     return values;
   }

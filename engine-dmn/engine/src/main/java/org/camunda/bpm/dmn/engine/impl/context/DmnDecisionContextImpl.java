@@ -277,15 +277,13 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
   }
 
   protected DmnDecisionTableRuleImpl evaluateMatchingRule(DmnRule rule, Map<String, Object> variables, Map<String, Object> evaluationCache) {
-    DmnDecisionTableRuleImpl matchingRule = new DmnDecisionTableRuleImpl();
-    matchingRule.setKey(rule.getKey());
-    Map<String, DmnDecisionTableValue> ruleOutputs = evaluateRuleOutput(rule, variables, evaluationCache);
-    matchingRule.setOutputs(ruleOutputs);
-    return matchingRule;
+    DmnDecisionTableRuleImpl ruleResult = new DmnDecisionTableRuleImpl();
+    ruleResult.setKey(rule.getKey());
+    evaluateRuleOutput(ruleResult, rule, variables, evaluationCache);
+    return ruleResult;
   }
 
-  protected Map<String, DmnDecisionTableValue> evaluateRuleOutput(DmnRule rule, Map<String, Object> variables, Map<String, Object> evaluationCache) {
-    Map<String, DmnDecisionTableValue> outputs = new HashMap<String, DmnDecisionTableValue>();
+  protected void evaluateRuleOutput(DmnDecisionTableRuleImpl ruleResult, DmnRule rule, Map<String, Object> variables, Map<String, Object> evaluationCache) {
     for (DmnClauseEntry conclusion : rule.getConclusions()) {
       if (isNonEmptyExpression(conclusion)) {
         DmnDecisionTableValueImpl output = new DmnDecisionTableValueImpl(conclusion.getClause());
@@ -293,10 +291,9 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
         TypedValue typedValue = conclusion.getClause().getOutputDefinition().getTypeDefinition().transform(value);
 
         output.setValue(typedValue);
-        outputs.put(output.getKey(), output);
+        ruleResult.addOutput(output);
       }
     }
-    return outputs;
   }
 
   protected boolean isConditionApplicable(DmnClauseEntry condition, Map<String, Object> variables, Map<String, Object> evaluationCache) {

@@ -37,7 +37,7 @@ public class DmnDecisionOutputAssertion extends AbstractAssert<DmnDecisionOutput
   public DmnDecisionOutputAssertion hasSingleEntryValue(Object expectedValue) {
     hasSingleEntry();
 
-    assertEquals(expectedValue, actual.getValue());
+    assertEquals(expectedValue, actual.getSingleValue());
 
     return this;
   }
@@ -45,7 +45,7 @@ public class DmnDecisionOutputAssertion extends AbstractAssert<DmnDecisionOutput
   public DmnDecisionOutputAssertion hasSingleEntry(TypedValue expectedValue) {
     hasSingleEntry();
 
-    assertEquals(expectedValue, actual.getValue());
+    assertEquals(expectedValue, actual.getSingleValue());
 
     return this;
   }

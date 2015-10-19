@@ -15,12 +15,41 @@ package org.camunda.bpm.dmn.engine;
 
 import java.util.Map;
 
+/**
+ * The output of one decision. In context of a decision table this
+ * represents the output of a matching decision rule. It is a
+ * mapping from the <code>camunda:output</code> attribute to
+ * output value. If no <code>camunda:output</code> was given
+ * the key is <code>null</code>.
+ */
 public interface DmnDecisionOutput extends Map<String, Object> {
 
-  /** Returns entry for name if existing, otherwise null */
+  /**
+   * Returns the value for a given output name.
+   *
+   * @param name the name of the output
+   * @param <T> the type of the output value
+   * @return the value for the given name or null if no value exists
+   *         for this name
+   */
   <T> T getValue(String name);
 
-  /** Return single entry if existing, otherwise null */
-  <T> T getValue();
+  /**
+   * Returns the value of the first output.
+   *
+   * @param <T> the type of the output value
+   * @return the first output value or null if none exists
+   */
+  <T> T getFirstValue();
+
+  /**
+   * Returns the single value of the output. Which asserts
+   * that the decision output only has one value.
+   *
+   * @param <T> the type of the output value
+   * @return the single output value or null if none exists
+   * @throws DmnResultException if more than one output value exists
+   */
+  <T> T getSingleValue();
 
 }

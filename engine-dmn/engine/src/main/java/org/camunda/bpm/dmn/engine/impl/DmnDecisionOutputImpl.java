@@ -13,26 +13,37 @@
 
 package org.camunda.bpm.dmn.engine.impl;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
 
-public class DmnDecisionOutputImpl extends HashMap<String, Object> implements DmnDecisionOutput {
+public class DmnDecisionOutputImpl extends LinkedHashMap<String, Object> implements DmnDecisionOutput {
+
+  public static final DmnEngineLogger LOG = DmnLogger.ENGINE_LOGGER;
 
   private static final long serialVersionUID = 1L;
 
   @SuppressWarnings("unchecked")
   public <T> T getValue(String name) {
-    return (T) super.get(name);
+    return (T) get(name);
   }
 
   @SuppressWarnings("unchecked")
-  public <T> T getValue() {
+  public <T> T getFirstValue() {
     if (!isEmpty()) {
       return (T) values().iterator().next();
     }
     else {
       return null;
+    }
+  }
+
+  public <T> T getSingleValue() {
+    if (size() > 1) {
+      throw LOG.decisionOutputHasMoreThanOneValue(this);
+    }
+    else {
+      return getFirstValue();
     }
   }
 
