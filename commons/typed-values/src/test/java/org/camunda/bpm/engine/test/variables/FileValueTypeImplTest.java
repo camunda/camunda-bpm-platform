@@ -114,6 +114,25 @@ public class FileValueTypeImplTest {
     InputStream file = this.getClass().getClassLoader().getResourceAsStream("org/camunda/bpm/engine/test/variables/simpleFile.txt");
     Map<String, Object> properties = new HashMap<String, Object>();
     properties.put("filename", "someFileName");
+    properties.put("mimeType", "someMimeType");
+    properties.put("encoding", "someEncoding");
+
+    TypedValue value = type.createValue(file, properties);
+
+    assertThat(value, is(instanceOf(FileValue.class)));
+    FileValue fileValue = (FileValue) value;
+    assertThat(fileValue.getFilename(), is("someFileName"));
+    assertThat(fileValue.getMimeType(), is("someMimeType"));
+    assertThat(fileValue.getEncoding(), is("someEncoding"));
+  }
+
+
+  @Test
+  public void createValueWithNullProperties() {
+    // given
+    InputStream file = this.getClass().getClassLoader().getResourceAsStream("org/camunda/bpm/engine/test/variables/simpleFile.txt");
+    Map<String, Object> properties = new HashMap<String, Object>();
+    properties.put("filename", "someFileName");
     properties.put("mimeType", null);
     properties.put("encoding", "someEncoding");
 
@@ -140,12 +159,6 @@ public class FileValueTypeImplTest {
       // then
       assertThat(e.getMessage(), containsString("The provided encoding is null. Set a non-null value info property with key 'encoding'"));
     }
-  }
-
-
-  @Test
-  public void createValueWithNullProperties() {
-
   }
 
   @Test(expected = IllegalArgumentException.class)
