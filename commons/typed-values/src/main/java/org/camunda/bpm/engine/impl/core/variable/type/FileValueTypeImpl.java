@@ -58,10 +58,22 @@ public class FileValueTypeImpl extends AbstractValueTypeImpl implements FileValu
     }
 
     if (valueInfo.containsKey(VALUE_INFO_FILE_MIME_TYPE)) {
-      builder.mimeType(valueInfo.get(VALUE_INFO_FILE_MIME_TYPE).toString());
+      Object mimeType = valueInfo.get(VALUE_INFO_FILE_MIME_TYPE);
+
+      if (mimeType == null) {
+        throw new IllegalArgumentException("The provided mime type is null. Set a non-null value info property with key '" + VALUE_INFO_FILE_NAME + "'");
+      }
+
+      builder.mimeType(mimeType.toString());
     }
     if (valueInfo.containsKey(VALUE_INFO_FILE_ENCODING)) {
-      builder.encoding(valueInfo.get(VALUE_INFO_FILE_ENCODING).toString());
+      Object encoding = valueInfo.get(VALUE_INFO_FILE_ENCODING);
+
+      if (encoding == null) {
+        throw new IllegalArgumentException("The provided encoding is null. Set a non-null value info property with key '" + VALUE_INFO_FILE_ENCODING + "'");
+      }
+
+      builder.encoding(encoding.toString());
     }
     return builder.create();
   }
