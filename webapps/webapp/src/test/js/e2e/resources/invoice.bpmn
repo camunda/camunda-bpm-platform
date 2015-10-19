@@ -26,7 +26,7 @@
         <flowNodeRef>ServiceTask_1</flowNodeRef>
       </lane>
     </laneSet>
-    <userTask id="approveInvoice" camunda:formKey="embedded:app:develop/invoice-forms/approve-invoice.html" camunda:dueDate="${dateTime().plusWeeks(1).toDate()}" camunda:candidateGroups="${approverGroups}" name="Approve Invoice">
+    <userTask id="approveInvoice" camunda:formKey="embedded:app:develop/invoice-forms/approve-invoice.html" camunda:dueDate="${dateTime().plusWeeks(1).toDate()}" camunda:candidateGroups="${approverGroups.collectOutputValues('result')}" name="Approve Invoice">
       <documentation>Approve the invoice (or not).</documentation>
       <extensionElements>
         <camunda:taskListener event="create">
