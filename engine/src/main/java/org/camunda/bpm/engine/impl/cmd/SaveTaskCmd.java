@@ -46,8 +46,7 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     String operation;
 
-    User user = commandContext.getReadOnlyIdentityProvider().findUserById(task.getAssignee());
-    task.setAssignee((user == null ? task.getAssignee() : (user.getDelegatedUserId() == null ? task.getAssignee() : user.getDelegatedUserId())));
+    task.setAssignee(task.getProperAssignee(task.getAssignee()));
 
     if (task.getRevision() == 0) {
 
