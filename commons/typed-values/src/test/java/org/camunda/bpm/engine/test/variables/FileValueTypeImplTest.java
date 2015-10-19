@@ -15,8 +15,10 @@ package org.camunda.bpm.engine.test.variables;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.collection.IsMapContaining.hasEntry;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -112,18 +114,38 @@ public class FileValueTypeImplTest {
     InputStream file = this.getClass().getClassLoader().getResourceAsStream("org/camunda/bpm/engine/test/variables/simpleFile.txt");
     Map<String, Object> properties = new HashMap<String, Object>();
     properties.put("filename", "someFileName");
-    properties.put("mimeType", "someMimeType");
+    properties.put("mimeType", null);
     properties.put("encoding", "someEncoding");
 
     // when
-    TypedValue value = type.createValue(file, properties);
+    try {
+      type.createValue(file, properties);
+      fail("expected exception");
+    } catch (IllegalArgumentException e) {
+      // then
+      assertThat(e.getMessage(), containsString("The provided mime type is null. Set a non-null value info property with key 'filename'"));
+    }
 
-    // then
-    assertThat(value, is(instanceOf(FileValue.class)));
-    FileValue fileValue = (FileValue) value;
-    assertThat(fileValue.getFilename(), is("someFileName"));
-    assertThat(fileValue.getMimeType(), is("someMimeType"));
-    assertThat(fileValue.getEncoding(), is("someEncoding"));
+    // given
+    file = this.getClass().getClassLoader().getResourceAsStream("org/camunda/bpm/engine/test/variables/simpleFile.txt");
+
+    properties.put("mimeType", "someMimetype");
+    properties.put("encoding", null);
+
+    // when
+    try {
+      type.createValue(file, properties);
+      fail("expected exception");
+    } catch (IllegalArgumentException e) {
+      // then
+      assertThat(e.getMessage(), containsString("The provided encoding is null. Set a non-null value info property with key 'encoding'"));
+    }
+  }
+
+
+  @Test
+  public void createValueWithNullProperties() {
+
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -164,6 +186,7 @@ public class FileValueTypeImplTest {
   public void doesNotHaveParent(){
     assertThat(type.getParent(), is(nullValue()));
   }
+
 
   private void checkStreamFromValue(TypedValue value, String expected) {
     InputStream stream = (InputStream) value.getValue();
