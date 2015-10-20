@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnEngine;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -45,8 +46,9 @@ public class EvaluateDecisionByIdCmd implements Command<DmnDecisionResult> {
   public DmnDecisionResult execute(CommandContext commandContext) {
     ensureNotNull("decision definition id is null", "processDefinitionId", decisionDefinitionId);
 
-    DeploymentCache deploymentCache = Context.getProcessEngineConfiguration().getDeploymentCache();
-    DmnEngine dmnEngine = commandContext.getProcessEngineConfiguration().getDmnEngine();
+    ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
+    DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
+    DmnEngine dmnEngine = processEngineConfiguration.getDmnEngine();
 
     DecisionDefinitionEntity decisionDefinition = deploymentCache.findDeployedDecisionDefinitionById(decisionDefinitionId);
     ensureNotNull("No decision definition found for id '" + decisionDefinitionId + "'", "decisionDefinition", decisionDefinition);
@@ -55,8 +57,7 @@ public class EvaluateDecisionByIdCmd implements Command<DmnDecisionResult> {
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     authorizationManager.checkEvaluateDecision(decisionDefinition.getKey());
 
-    DmnDecisionResult decisionResult = dmnEngine.evaluate(decisionDefinition, variables);
-    return decisionResult;
+    return dmnEngine.evaluate(decisionDefinition, variables);
   }
 
 }

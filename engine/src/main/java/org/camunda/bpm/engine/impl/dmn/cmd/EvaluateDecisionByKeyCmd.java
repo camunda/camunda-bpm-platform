@@ -55,7 +55,7 @@ public class EvaluateDecisionByKeyCmd implements Command<DmnDecisionResult> {
 
     DmnEngine dmnEngine = commandContext.getProcessEngineConfiguration().getDmnEngine();
 
-    DecisionDefinition decisionDefinition = getDecisionDefinition();
+    DecisionDefinition decisionDefinition = getDecisionDefinition(commandContext);
     ensureNotNull("No decision definition found for key '" + decisionDefinitionKey + "' and version '" + version + "'", "decisionDefinition",
         decisionDefinition);
 
@@ -63,12 +63,11 @@ public class EvaluateDecisionByKeyCmd implements Command<DmnDecisionResult> {
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     authorizationManager.checkEvaluateDecision(decisionDefinition.getKey());
 
-    DmnDecisionResult decisionResult = dmnEngine.evaluate((DmnDecision) decisionDefinition, variables);
-    return decisionResult;
+    return dmnEngine.evaluate((DmnDecision) decisionDefinition, variables);
   }
 
-  protected DecisionDefinition getDecisionDefinition() {
-    DeploymentCache deploymentCache = Context.getProcessEngineConfiguration().getDeploymentCache();
+  protected DecisionDefinition getDecisionDefinition(CommandContext commandContext) {
+    DeploymentCache deploymentCache = commandContext.getProcessEngineConfiguration().getDeploymentCache();
 
     if (version == null) {
       return deploymentCache.findDeployedLatestDecisionDefinitionByKey(decisionDefinitionKey);

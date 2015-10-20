@@ -105,12 +105,12 @@ public class DecisionServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  public void testEvaluateDecisionByUnexistingId() {
+  public void testEvaluateDecisionByNonExistingId() {
     try {
-      decisionService.evaluateDecisionById("unexisting", null);
+      decisionService.evaluateDecisionById("unknown", null);
       fail("expect exception");
     } catch (ProcessEngineException e) {
-      assertTextPresent("no deployed decision definition found with id 'unexisting'", e.getMessage());
+      assertTextPresent("no deployed decision definition found with id 'unknown'", e.getMessage());
     }
   }
 
@@ -123,17 +123,17 @@ public class DecisionServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  public void testEvaluateDecisionByUnexistingKey() {
+  public void testEvaluateDecisionByNonExistingKey() {
     try {
-      decisionService.evaluateDecisionByKey("unexisting", null);
+      decisionService.evaluateDecisionByKey("unknown", null);
       fail("expect exception");
     } catch (ProcessEngineException e) {
-      assertTextPresent("no decision definition deployed with key 'unexisting'", e.getMessage());
+      assertTextPresent("no decision definition deployed with key 'unknown'", e.getMessage());
     }
   }
 
   @Deployment(resources = DMN_FILE)
-  public void testEvaluateDecisionByKeyWithUnexistingVersion() {
+  public void testEvaluateDecisionByKeyWithNonExistingVersion() {
     DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
 
     try {
