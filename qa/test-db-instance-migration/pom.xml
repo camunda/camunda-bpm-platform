@@ -14,8 +14,10 @@
   </parent>
 
   <modules>
-    <module>test-fixture-old</module>
-    <module>test-fixture-new</module>
+    <module>test-scenario-util</module>
+    <module>test-fixture-72</module>
+    <module>test-fixture-73</module>
+    <module>test-migration</module>
   </modules>
 
 </project>
