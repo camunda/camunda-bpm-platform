@@ -51,10 +51,12 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
 
   protected final ValueFields valueFields;
 
+  protected boolean notifyOnImplicitUpdates = false;
   protected List<TypedValueUpdateListener> updateListeners;
 
-  public TypedValueField(ValueFields valueFields) {
+  public TypedValueField(ValueFields valueFields, boolean notifyOnImplicitUpdates) {
     this.valueFields = valueFields;
+    this.notifyOnImplicitUpdates = notifyOnImplicitUpdates;
     this.updateListeners = new ArrayList<TypedValueUpdateListener>();
   }
 
@@ -84,7 +86,7 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
       try {
         cachedValue = getSerializer().readValue(valueFields, deserializeValue);
 
-        if (isMutableValue(cachedValue)) {
+        if (notifyOnImplicitUpdates && isMutableValue(cachedValue)) {
           Context.getCommandContext().registerCommandContextListener(this);
         }
 
@@ -115,7 +117,7 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
 
     // ensure that we serialize the object on command context flush
     // if it can be implicitly changed
-    if (isMutableValue(cachedValue)) {
+    if (notifyOnImplicitUpdates && isMutableValue(cachedValue)) {
       Context.getCommandContext().registerCommandContextListener(this);
     }
 

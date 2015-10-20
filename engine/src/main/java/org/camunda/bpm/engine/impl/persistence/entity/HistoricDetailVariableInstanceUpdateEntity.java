@@ -37,7 +37,7 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariable
   private static final long serialVersionUID = 1L;
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
-  protected TypedValueField typedValueField = new TypedValueField(this);
+  protected TypedValueField typedValueField = new TypedValueField(this, false);
 
   protected ByteArrayField byteArrayField = new ByteArrayField(this);
 

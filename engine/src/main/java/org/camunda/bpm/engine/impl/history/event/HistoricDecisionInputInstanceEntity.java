@@ -38,7 +38,7 @@ public class HistoricDecisionInputInstanceEntity extends HistoryEvent implements
   protected String textValue2;
 
   protected ByteArrayField byteArrayField = new ByteArrayField(this);
-  protected TypedValueField typedValueField = new TypedValueField(this);
+  protected TypedValueField typedValueField = new TypedValueField(this, false);
 
   @Override
   public String getDecisionInstanceId() {

@@ -61,7 +61,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
 
   protected ByteArrayField byteArrayField = new ByteArrayField(this);
 
-  protected TypedValueField typedValueField = new TypedValueField(this);
+  protected TypedValueField typedValueField = new TypedValueField(this, true);
 
   boolean forcedUpdate;
 
