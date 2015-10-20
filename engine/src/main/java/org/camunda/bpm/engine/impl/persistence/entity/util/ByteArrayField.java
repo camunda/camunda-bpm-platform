@@ -64,7 +64,9 @@ public class ByteArrayField {
 
   public void setByteArrayValue(byte[] bytes) {
     if (bytes != null) {
-      if (this.byteArrayId != null && this.byteArrayValue != null) {
+      if (this.byteArrayId != null) {
+        getByteArrayValue();
+
         byteArrayValue.setBytes(bytes);
       }
       else {
