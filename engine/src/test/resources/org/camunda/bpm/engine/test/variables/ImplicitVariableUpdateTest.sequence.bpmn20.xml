@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  targetNamespace="Examples">
+
+  <process id="serviceTaskProcess">
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="task" />
+    <serviceTask id="task" name="my task" camunda:delegateExpression="${delegate}"/>
+    <sequenceFlow id="flow2" sourceRef="task" targetRef="task2" />
+    <userTask id="task2" name="my task" />
+    <sequenceFlow id="flow3" sourceRef="task2" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

@@ -98,7 +98,7 @@ public abstract class AbstractSerializableValueSerializer<T extends Serializable
   protected abstract void updateTypedValue(T value, String serializedStringValue);
 
   protected byte[] readSerializedValueFromFields(ValueFields valueFields) {
-    return ByteArrayValueSerializer.getBytes(valueFields);
+    return valueFields.getByteArrayValue();
   }
 
   protected String getSerializedStringValue(byte[] serializedByteValue) {

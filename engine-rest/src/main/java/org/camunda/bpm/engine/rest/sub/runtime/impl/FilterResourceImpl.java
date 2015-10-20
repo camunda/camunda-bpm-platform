@@ -505,7 +505,7 @@ public class FilterResourceImpl extends AbstractAuthorizedRestResource implement
     List<VariableInstance> variableInstances = queryVariablesInstancesByVariableScopeIds(variableNames, variableScopeIds);
     Map<String, List<VariableInstance>> sortedVariableInstances = new HashMap<String, List<VariableInstance>>();
     for (VariableInstance variableInstance : variableInstances) {
-      String variableScopeId = ((VariableInstanceEntity) variableInstance).getVariableScope();
+      String variableScopeId = ((VariableInstanceEntity) variableInstance).getVariableScopeId();
       if (!sortedVariableInstances.containsKey(variableScopeId)) {
         sortedVariableInstances.put(variableScopeId, new ArrayList<VariableInstance>());
       }

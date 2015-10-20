@@ -229,8 +229,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setDoubleValue(variableInstance.getDoubleValue());
     evt.setLongValue(variableInstance.getLongValue());
     if (variableInstance.getByteArrayValueId() != null) {
-      ByteArrayEntity byteArrayValue = variableInstance.getByteArrayValue();
-      evt.setByteValue(byteArrayValue.getBytes());
+      evt.setByteValue(variableInstance.getByteArrayValue());
     }
   }
 

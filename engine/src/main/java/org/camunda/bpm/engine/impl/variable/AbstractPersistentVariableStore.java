@@ -159,7 +159,7 @@ public abstract class AbstractPersistentVariableStore extends AbstractVariableSt
     variableInstances.clear();
   }
 
-  public void fireHistoricVariableInstanceDelete(VariableInstanceEntity variableInstance, AbstractVariableScope sourceActivityExecution) {
+  public static void fireHistoricVariableInstanceDelete(VariableInstanceEntity variableInstance, AbstractVariableScope sourceActivityExecution) {
 
     HistoryLevel historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
     if (historyLevel.isHistoryEventProduced(HistoryEventTypes.VARIABLE_INSTANCE_DELETE, variableInstance)) {
@@ -175,7 +175,7 @@ public abstract class AbstractPersistentVariableStore extends AbstractVariableSt
 
   }
 
-  public void fireHistoricVariableInstanceCreate(VariableInstanceEntity variableInstance, AbstractVariableScope sourceActivityExecution) {
+  public static void fireHistoricVariableInstanceCreate(VariableInstanceEntity variableInstance, AbstractVariableScope sourceActivityExecution) {
 
     HistoryLevel historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
     if (historyLevel.isHistoryEventProduced(HistoryEventTypes.VARIABLE_INSTANCE_CREATE, variableInstance)) {
@@ -191,7 +191,7 @@ public abstract class AbstractPersistentVariableStore extends AbstractVariableSt
 
   }
 
-  public void fireHistoricVariableInstanceUpdate(VariableInstanceEntity variableInstance, AbstractVariableScope sourceActivityExecution) {
+  public static void fireHistoricVariableInstanceUpdate(VariableInstanceEntity variableInstance, AbstractVariableScope sourceActivityExecution) {
     HistoryLevel historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
     if (historyLevel.isHistoryEventProduced(HistoryEventTypes.VARIABLE_INSTANCE_UPDATE, variableInstance)) {
 
@@ -205,7 +205,7 @@ public abstract class AbstractPersistentVariableStore extends AbstractVariableSt
     }
   }
 
-  protected void fireVariableEvent(VariableInstanceEntity variableInstance, String eventName, AbstractVariableScope sourceActivityExecution) {
+  protected static void fireVariableEvent(VariableInstanceEntity variableInstance, String eventName, AbstractVariableScope sourceActivityExecution) {
     sourceActivityExecution.dispatchEvent(new VariableEvent(variableInstance, eventName, sourceActivityExecution));
   }
 

@@ -67,7 +67,7 @@ public class FileValueSerializer extends AbstractTypedValueSerializer<FileValue>
   public FileValue readValue(ValueFields valueFields, boolean deserializeValue) {
     FileValueBuilder builder = Variables.fileValue(valueFields.getTextValue());
     if (valueFields.getByteArrayValue() != null) {
-      builder.file(valueFields.getByteArrayValue().getBytes());
+      builder.file(valueFields.getByteArrayValue());
     }
     // to ensure the same array size all the time
     if (valueFields.getTextValue2() != null) {

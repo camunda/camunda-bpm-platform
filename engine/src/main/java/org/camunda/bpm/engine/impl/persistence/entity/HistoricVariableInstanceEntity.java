@@ -153,7 +153,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     byteArrayField.setByteArrayId(byteArrayId);
   }
 
-  public ByteArrayEntity getByteArrayValue() {
+  public byte[] getByteArrayValue() {
     return byteArrayField.getByteArrayValue();
   }
 

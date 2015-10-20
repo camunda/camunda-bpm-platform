@@ -41,7 +41,7 @@
       #{longValue, jdbcType=BIGINT},
       #{textValue, jdbcType=VARCHAR},
       #{textValue2, jdbcType=VARCHAR},
-      #{variableScope, jdbcType=VARCHAR},
+      #{variableScopeId, jdbcType=VARCHAR},
       #{sequenceCounter, jdbcType=BIGINT},
       #{isConcurrentLocal, jdbcType=BOOLEAN},
       1

@@ -148,13 +148,13 @@ public class MockVariableInstanceBuilder {
   public VariableInstanceEntity buildEntity() {
     VariableInstanceEntity mockVariable = mock(VariableInstanceEntity.class);
     if (taskId != null) {
-      when(mockVariable.getVariableScope()).thenReturn(taskId);
+      when(mockVariable.getVariableScopeId()).thenReturn(taskId);
     }
     else if (executionId != null) {
-      when(mockVariable.getVariableScope()).thenReturn(executionId);
+      when(mockVariable.getVariableScopeId()).thenReturn(executionId);
     }
     else {
-      when(mockVariable.getVariableScope()).thenReturn(caseExecutionId);
+      when(mockVariable.getVariableScopeId()).thenReturn(caseExecutionId);
     }
     return build(mockVariable);
   }

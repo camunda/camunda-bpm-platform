@@ -43,7 +43,7 @@ public class ByteArrayField {
     this.byteArrayValue = null;
   }
 
-  public ByteArrayEntity getByteArrayValue() {
+  public byte[] getByteArrayValue() {
     if ((byteArrayValue == null) && (byteArrayId != null)) {
       // no lazy fetching outside of command context
       if (Context.getCommandContext() != null) {
@@ -53,28 +53,36 @@ public class ByteArrayField {
             .selectById(ByteArrayEntity.class, byteArrayId);
       }
     }
-    return byteArrayValue;
+
+    if (byteArrayValue != null) {
+      return byteArrayValue.getBytes();
+    }
+    else {
+      return null;
+    }
   }
 
   public void setByteArrayValue(byte[] bytes) {
-    deleteByteArrayValue();
-
-    ByteArrayEntity byteArrayValue = null;
     if (bytes != null) {
-      byteArrayValue = new ByteArrayEntity(valueFields.getName(), bytes);
-      Context.
-        getCommandContext()
-        .getDbEntityManager()
-        .insert(byteArrayValue);
+      if (this.byteArrayId != null && this.byteArrayValue != null) {
+        byteArrayValue.setBytes(bytes);
+      }
+      else {
+        deleteByteArrayValue();
+
+        byteArrayValue = new ByteArrayEntity(valueFields.getName(), bytes);
+        Context.
+          getCommandContext()
+          .getDbEntityManager()
+          .insert(byteArrayValue);
+
+        byteArrayId = byteArrayValue.getId();
+      }
+    }
+    else {
+      deleteByteArrayValue();
     }
 
-    this.byteArrayValue = byteArrayValue;
-
-    if (byteArrayValue != null) {
-      this.byteArrayId = byteArrayValue.getId();
-    } else {
-      this.byteArrayId = null;
-    }
   }
 
   public void deleteByteArrayValue() {
