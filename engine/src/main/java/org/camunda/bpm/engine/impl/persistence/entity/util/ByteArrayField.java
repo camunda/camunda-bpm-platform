@@ -44,15 +44,7 @@ public class ByteArrayField {
   }
 
   public byte[] getByteArrayValue() {
-    if ((byteArrayValue == null) && (byteArrayId != null)) {
-      // no lazy fetching outside of command context
-      if (Context.getCommandContext() != null) {
-        byteArrayValue = Context
-            .getCommandContext()
-            .getDbEntityManager()
-            .selectById(ByteArrayEntity.class, byteArrayId);
-      }
-    }
+    getByteArrayEntity();
 
     if (byteArrayValue != null) {
       return byteArrayValue.getBytes();
@@ -62,12 +54,28 @@ public class ByteArrayField {
     }
   }
 
+  protected ByteArrayEntity getByteArrayEntity() {
+    if (byteArrayValue == null) {
+      if (byteArrayId != null) {
+        // no lazy fetching outside of command context
+        if (Context.getCommandContext() != null) {
+          return byteArrayValue = Context
+              .getCommandContext()
+              .getDbEntityManager()
+              .selectById(ByteArrayEntity.class, byteArrayId);
+        }
+      }
+    }
+
+    return byteArrayValue;
+  }
+
   public void setByteArrayValue(byte[] bytes) {
     if (bytes != null) {
       // note: there can be cases where byteArrayId is not null
       //   but the corresponding byte array entity has been removed in parallel;
       //   thus we also need to check if the actual byte array entity still exists
-      if (this.byteArrayId != null && getByteArrayValue() != null) {
+      if (this.byteArrayId != null && getByteArrayEntity() != null) {
         byteArrayValue.setBytes(bytes);
       }
       else {
@@ -92,7 +100,7 @@ public class ByteArrayField {
     if (byteArrayId != null) {
       // the next apparently useless line is probably to ensure consistency in the DbSqlSession cache,
       // but should be checked and docked here (or removed if it turns out to be unnecessary)
-      getByteArrayValue();
+      getByteArrayEntity();
 
       Context
         .getCommandContext()
