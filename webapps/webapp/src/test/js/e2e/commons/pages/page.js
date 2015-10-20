@@ -121,4 +121,41 @@ Page.prototype.findElementIndexInRepeater = function(repeaterName, elementSelect
 };
 
 
+
+Page.prototype.headerWidget = function () {
+  return element(by.css('[cam-widget-header]'));
+};
+
+Page.prototype.hamburgerButton = function () {
+  return this.headerWidget().element(by.css('.navbar-toggle'));
+};
+
+
+Page.prototype.accountDropdown = function () {
+  return this.headerWidget().element(by.css('.account.dropdown'));
+};
+
+Page.prototype.accountDropdownButton = function () {
+  return this.accountDropdown().element(by.css('.dropdown-toggle'));
+};
+
+
+Page.prototype.engineSelectDropdown = function () {
+  return this.headerWidget().element(by.css('.engine-select.dropdown'));
+};
+
+Page.prototype.engineSelectDropdownButton = function () {
+  return this.engineSelectDropdown().element(by.css('.dropdown-toggle'));
+};
+
+
+Page.prototype.appSwitchDropdown = function () {
+  return this.headerWidget().element(by.css('.app-switch.dropdown'));
+};
+
+Page.prototype.appSwitchDropdownButton = function () {
+  return this.appSwitchDropdown().element(by.css('.dropdown-toggle'));
+};
+
+
 module.exports = Page;
