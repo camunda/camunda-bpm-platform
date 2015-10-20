@@ -45,7 +45,7 @@ public class HistoryDecisionTableListener implements DmnDecisionTableListener {
   }
 
   protected HistoryEvent createHistoryEvent(DmnDecisionTable decisionTable, DmnDecisionTableResult decisionTableResult) {
-    if(historyLevel.isHistoryEventProduced(HistoryEventTypes.DMN_DECISION_EVALUATE, null) && isDeployedDecisionTable(decisionTable)) {
+    if(isDeployedDecisionTable(decisionTable) && historyLevel.isHistoryEventProduced(HistoryEventTypes.DMN_DECISION_EVALUATE, decisionTable)) {
 
       if(Context.getBpmnExecutionContext() != null) {
         ExecutionEntity execution = Context.getBpmnExecutionContext().getExecution();
