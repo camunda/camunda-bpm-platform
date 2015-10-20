@@ -64,9 +64,10 @@ public class ByteArrayField {
 
   public void setByteArrayValue(byte[] bytes) {
     if (bytes != null) {
-      if (this.byteArrayId != null) {
-        getByteArrayValue();
-
+      // note: there can be cases where byteArrayId is not null
+      //   but the corresponding byte array entity has been removed in parallel;
+      //   thus we also need to check if the actual byte array entity still exists
+      if (this.byteArrayId != null && getByteArrayValue() != null) {
         byteArrayValue.setBytes(bytes);
       }
       else {
