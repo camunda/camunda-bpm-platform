@@ -12,12 +12,18 @@
  */
 package org.camunda.bpm.engine.rest.sub.repository;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
+import org.camunda.bpm.engine.rest.dto.dmn.DecisionResultDto;
+import org.camunda.bpm.engine.rest.dto.dmn.EvaluateDecisionDto;
 import org.camunda.bpm.engine.rest.dto.repository.DecisionDefinitionDiagramDto;
 import org.camunda.bpm.engine.rest.dto.repository.DecisionDefinitionDto;
 
@@ -35,5 +41,11 @@ public interface DecisionDefinitionResource {
   @GET
   @Path("/diagram")
   Response getDecisionDefinitionDiagram();
+
+  @POST
+  @Path("/evaluate")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  DecisionResultDto evaluateDecision(@Context UriInfo context, EvaluateDecisionDto parameters);
 
 }

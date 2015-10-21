@@ -14,9 +14,15 @@ package org.camunda.bpm.engine.rest.sub.repository.impl;
 
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.Map;
+
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
+import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnEngineException;
+import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
@@ -24,6 +30,9 @@ import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
+import org.camunda.bpm.engine.rest.dto.VariableValueDto;
+import org.camunda.bpm.engine.rest.dto.dmn.DecisionResultDto;
+import org.camunda.bpm.engine.rest.dto.dmn.EvaluateDecisionDto;
 import org.camunda.bpm.engine.rest.dto.repository.DecisionDefinitionDiagramDto;
 import org.camunda.bpm.engine.rest.dto.repository.DecisionDefinitionDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -105,6 +114,25 @@ public class DecisionDefinitionResourceImpl implements DecisionDefinitionResourc
       String fileName = definition.getDiagramResourceName();
       return Response.ok(decisionDiagram).header("Content-Disposition", "attachment; filename=" + fileName)
           .type(ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix(fileName)).build();
+    }
+  }
+
+  @Override
+  public DecisionResultDto evaluateDecision(UriInfo context, EvaluateDecisionDto parameters) {
+    DecisionService decisionService = engine.getDecisionService();
+
+    Map<String, Object> variables = VariableValueDto.toMap(parameters.getVariables(), engine, objectMapper);
+
+    try {
+      DmnDecisionResult decisionResult = decisionService.evaluateDecisionById(decisionDefinitionId, variables);
+      return DecisionResultDto.fromDecisionResult(decisionResult);
+
+    } catch (ProcessEngineException e) {
+      String errorMessage = String.format("Cannot evaluate decision %s: %s", decisionDefinitionId, e.getMessage());
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
+    } catch (DmnEngineException e) {
+      String errorMessage = String.format("Cannot evaluate decision %s: %s", decisionDefinitionId, e.getMessage());
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
     }
   }
 

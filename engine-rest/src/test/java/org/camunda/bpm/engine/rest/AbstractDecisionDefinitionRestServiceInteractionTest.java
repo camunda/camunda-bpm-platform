@@ -17,6 +17,8 @@ import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -27,17 +29,24 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
 import org.camunda.bpm.engine.rest.exception.RestException;
+import org.camunda.bpm.engine.rest.helper.MockDecisionResultBuilder;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.sub.repository.impl.ProcessDefinitionResourceImpl;
+import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,8 +65,12 @@ public abstract class AbstractDecisionDefinitionRestServiceInteractionTest exten
 
   protected static final String DIAGRAM_DEFINITION_URL = SINGLE_DECISION_DEFINITION_URL + "/diagram";
 
+  protected static final String EVALUATE_DECISION_URL = SINGLE_DECISION_DEFINITION_URL + "/evaluate";
+  protected static final String EVALUATE_DECISION_BY_KEY_URL = SINGLE_DECISION_DEFINITION_BY_KEY_URL + "/evaluate";
+
   private RepositoryService repositoryServiceMock;
   private DecisionDefinitionQuery decisionDefinitionQueryMock;
+  private DecisionService decisionServiceMock;
 
   @Before
   public void setUpRuntime() {
@@ -74,6 +87,9 @@ public abstract class AbstractDecisionDefinitionRestServiceInteractionTest exten
     when(decisionDefinitionQueryMock.latestVersion()).thenReturn(decisionDefinitionQueryMock);
     when(decisionDefinitionQueryMock.singleResult()).thenReturn(mockDecisionDefinition);
     when(repositoryServiceMock.createDecisionDefinitionQuery()).thenReturn(decisionDefinitionQueryMock);
+
+    decisionServiceMock = mock(DecisionService.class);
+    when(processEngine.getDecisionService()).thenReturn(decisionServiceMock);
   }
 
   private InputStream createMockDecisionDefinitionDmnXml() {
@@ -247,6 +263,140 @@ public abstract class AbstractDecisionDefinitionRestServiceInteractionTest exten
     Assert.assertEquals("image/gif", ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix("decision.gif"));
     Assert.assertEquals("image/bmp", ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix("decision.bmp"));
     Assert.assertEquals("application/octet-stream", ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix("decision.UNKNOWN"));
+  }
+
+  @Test
+  public void testEvaluateDecisionByKey() {
+    DmnDecisionResult decisionResult = MockProvider.createMockDecisionResult();
+
+    when(decisionServiceMock.evaluateDecisionById(eq(MockProvider.EXAMPLE_DECISION_DEFINITION_ID), anyMapOf(String.class, Object.class)))
+        .thenReturn(decisionResult);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables",
+        VariablesBuilder.create()
+          .variable("amount", 420)
+          .variable("invoiceCategory", "MISC")
+          .getVariables()
+    );
+
+    given().pathParam("key", MockProvider.EXAMPLE_DECISION_DEFINITION_KEY)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when().post(EVALUATE_DECISION_BY_KEY_URL);
+
+    Map<String, Object> expectedVariables = new HashMap<String, Object>();
+    expectedVariables.put("amount", 420);
+    expectedVariables.put("invoiceCategory", "MISC");
+
+    verify(decisionServiceMock).evaluateDecisionById(MockProvider.EXAMPLE_DECISION_DEFINITION_ID, expectedVariables);
+  }
+
+  @Test
+  public void testEvaluateDecisionById() {
+    DmnDecisionResult decisionResult = MockProvider.createMockDecisionResult();
+
+    when(decisionServiceMock.evaluateDecisionById(eq(MockProvider.EXAMPLE_DECISION_DEFINITION_ID), anyMapOf(String.class, Object.class)))
+        .thenReturn(decisionResult);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables",
+        VariablesBuilder.create()
+          .variable("amount", 420)
+          .variable("invoiceCategory", "MISC")
+          .getVariables()
+    );
+
+    given().pathParam("id", MockProvider.EXAMPLE_DECISION_DEFINITION_ID)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+      .when().post(EVALUATE_DECISION_URL);
+
+    Map<String, Object> expectedVariables = new HashMap<String, Object>();
+    expectedVariables.put("amount", 420);
+    expectedVariables.put("invoiceCategory", "MISC");
+
+    verify(decisionServiceMock).evaluateDecisionById(MockProvider.EXAMPLE_DECISION_DEFINITION_ID, expectedVariables);
+  }
+
+  @Test
+  public void testEvaluateDecisionSingleDecisionOutput() {
+    DmnDecisionResult decisionResult = new MockDecisionResultBuilder()
+        .decisionOutput()
+          .output("status", "gold")
+        .build();
+
+    when(decisionServiceMock.evaluateDecisionById(eq(MockProvider.EXAMPLE_DECISION_DEFINITION_ID), anyMapOf(String.class, Object.class)))
+        .thenReturn(decisionResult);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", Collections.emptyMap());
+
+    given().pathParam("id", MockProvider.EXAMPLE_DECISION_DEFINITION_ID)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("decisionOutputs.size()", is(1))
+        .body("decisionOutputs[0].outputValues.size()", is(1))
+        .body("decisionOutputs[0].outputValues.status", is(notNullValue()))
+        .body("decisionOutputs[0].outputValues.status.value", is("gold"))
+      .when().post(EVALUATE_DECISION_URL);
+  }
+
+  @Test
+  public void testEvaluateDecisionMultipleDecisionOutputs() {
+    DmnDecisionResult decisionResult = new MockDecisionResultBuilder()
+        .decisionOutput()
+          .output("status", "gold")
+        .decisionOutput()
+          .output("assignee", "manager")
+        .build();
+
+    when(decisionServiceMock.evaluateDecisionById(eq(MockProvider.EXAMPLE_DECISION_DEFINITION_ID), anyMapOf(String.class, Object.class)))
+        .thenReturn(decisionResult);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", Collections.emptyMap());
+
+    given().pathParam("id", MockProvider.EXAMPLE_DECISION_DEFINITION_ID)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("decisionOutputs.size()", is(2))
+        .body("decisionOutputs[0].outputValues.size()", is(1))
+        .body("decisionOutputs[0].outputValues.status.value", is("gold"))
+        .body("decisionOutputs[1].outputValues.size()", is(1))
+        .body("decisionOutputs[1].outputValues.assignee.value", is("manager"))
+
+      .when().post(EVALUATE_DECISION_URL);
+  }
+
+  @Test
+  public void testEvaluateDecisionMultipleDecisionValues() {
+    DmnDecisionResult decisionResult = new MockDecisionResultBuilder()
+        .decisionOutput()
+          .output("status", "gold")
+          .output("assignee", "manager")
+        .build();
+
+    when(decisionServiceMock.evaluateDecisionById(eq(MockProvider.EXAMPLE_DECISION_DEFINITION_ID), anyMapOf(String.class, Object.class)))
+        .thenReturn(decisionResult);
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", Collections.emptyMap());
+
+    given().pathParam("id", MockProvider.EXAMPLE_DECISION_DEFINITION_ID)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("decisionOutputs.size()", is(1))
+        .body("decisionOutputs[0].outputValues.size()", is(2))
+        .body("decisionOutputs[0].outputValues.status.value", is("gold"))
+        .body("decisionOutputs[0].outputValues.assignee.value", is("manager"))
+
+      .when().post(EVALUATE_DECISION_URL);
   }
 
 }

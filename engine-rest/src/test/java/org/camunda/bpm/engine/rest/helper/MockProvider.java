@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.application.ProcessApplicationInfo;
+import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Authorization;
@@ -655,6 +656,9 @@ public abstract class MockProvider {
   public static final String EXAMPLE_DECISION_DEFINITION_NAME_LIKE = "aDecisionDefinitionNameLike";
   public static final String EXAMPLE_DECISION_DEFINITION_RESOURCE_NAME = "aDecisionDefinitionResourceName";
   public static final String EXAMPLE_DECISION_DEFINITION_DIAGRAM_RESOURCE_NAME = "aResourceName.png";
+
+  public static final String EXAMPLE_DECISION_OUTPUT_KEY = "aDecisionOutput";
+  public static final String EXAMPLE_DECISION_OUTPUT_VALUE = "aDecisionOutputValue";
 
   // historic job log
 
@@ -2370,6 +2374,17 @@ public abstract class MockProvider {
     List<ExternalTask> mocks = new ArrayList<ExternalTask>();
     mocks.add(createMockExternalTask());
     return mocks;
+  }
+
+  public static MockDecisionResultBuilder mockDecisionResult() {
+    return new MockDecisionResultBuilder()
+        .decisionOutput()
+          .output(EXAMPLE_DECISION_OUTPUT_KEY, EXAMPLE_DECISION_OUTPUT_VALUE)
+          .endDecisionOutput();
+  }
+
+  public static DmnDecisionResult createMockDecisionResult() {
+    return mockDecisionResult().build();
   }
 
 }

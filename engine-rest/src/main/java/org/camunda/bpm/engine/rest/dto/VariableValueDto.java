@@ -159,9 +159,12 @@ public class VariableValueDto {
 
   public static void fromTypedValue(VariableValueDto dto, TypedValue typedValue) {
 
-    String typeName = typedValue.getType().getName();
-    dto.setType(toRestApiTypeName(typeName));
-    dto.setValueInfo(typedValue.getType().getValueInfo(typedValue));
+    ValueType type = typedValue.getType();
+    if (type != null) {
+      String typeName = type.getName();
+      dto.setType(toRestApiTypeName(typeName));
+      dto.setValueInfo(type.getValueInfo(typedValue));
+    }
 
     if(typedValue instanceof SerializableValue) {
       SerializableValue serializableValue = (SerializableValue) typedValue;
