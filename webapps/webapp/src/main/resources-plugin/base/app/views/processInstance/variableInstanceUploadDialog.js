@@ -14,6 +14,8 @@ define([], function() {
     $scope.variableInstance = variableInstance;
     $scope.status = BEFORE_UPLOAD;
 
+    var variableType = $scope.variableInstance.type;
+
     $scope.upload = function () {
 
       // progress listeners
@@ -44,6 +46,7 @@ define([], function() {
       // perform HTML 5 file opload (not supported by IE 9)
       var fd = new FormData();
       fd.append('data', $scope.file);
+      fd.append('valueType', variableType);
       var xhr = new XMLHttpRequest();
       xhr.upload.addEventListener('progress', uploadProgress, false);
       xhr.addEventListener('load', uploadComplete, false);
