@@ -10,6 +10,13 @@ LabelRow.prototype.getInputText = function(idx) {
   return this.node.all(by.css('td.input')).get(idx).getText();
 };
 
+var RuleRow = function(node) {
+  this.node = node;
+};
+RuleRow.prototype.getCellText = function(idx) {
+  return this.node.all(by.css('td')).get(idx).getText();
+};
+
 module.exports = Base.extend({
 
   tableElement: function() {
@@ -22,6 +29,10 @@ module.exports = Base.extend({
 
   labelRow: function() {
     return new LabelRow(this.tableElement().element(by.css('tr.labels')));
-  }
+  },
+
+  ruleRow: function(idx) {
+    return new RuleRow(this.row(idx));
+  },
 
 });

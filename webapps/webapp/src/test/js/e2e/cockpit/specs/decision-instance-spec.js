@@ -83,6 +83,10 @@ describe('Cockpit Decision Instance Spec', function() {
       expect(instancePage.table.labelRow().getInputText(1)).to.eventually.eql('Invoice Category = travelExpenses');
     });
 
+    it('should show the outputs on the table', function() {
+      expect(instancePage.table.ruleRow(0).getCellText(3)).to.eventually.eql('"accounting" = accounting');
+    });
+
   });
 
 
