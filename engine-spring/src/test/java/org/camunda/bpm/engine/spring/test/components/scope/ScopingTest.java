@@ -8,7 +8,6 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.spring.test.components.ProcessInitiatingPojo;
 import org.camunda.bpm.engine.task.Task;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,21 +46,26 @@ public class ScopingTest {
 	public void before() throws Throwable {
 	  this.repositoryService = this.processEngine.getRepositoryService();
 		this.taskService = this.processEngine.getTaskService();
-		
+
 		repositoryService.createDeployment()
 		  .addClasspathResource("org/camunda/bpm/engine/spring/test/autodeployment/autodeploy.b.bpmn20.xml")
 		  .addClasspathResource("org/camunda/bpm/engine/spring/test/components/waiter.bpmn20.xml")
 		  .addClasspathResource("org/camunda/bpm/engine/spring/test/components/spring-component-waiter.bpmn20.xml")
 		  .deploy();
 	}
-	
+
 	@After
 	public void after() {
 	  for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
 	    repositoryService.deleteDeployment(deployment.getId(), true);
 	  }
+	  processEngine.close();
+	  processEngine = null;
+	  repositoryService = null;
+	  taskService = null;
+	  processInitiatingPojo = null;
 	}
-	
+
 	static public long CUSTOMER_ID_PROC_VAR_VALUE = 343;
 
 	static public String customerIdProcVarName = "customerId";
@@ -122,6 +126,6 @@ public class ScopingTest {
 	public void testStartingAProcessWithScopedBeans() throws Throwable {
 		this.processInitiatingPojo.startScopedProcess(3243);
 	}
-	
+
 
 }
