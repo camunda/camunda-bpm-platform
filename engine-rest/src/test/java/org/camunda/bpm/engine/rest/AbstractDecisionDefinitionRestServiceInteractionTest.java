@@ -338,10 +338,10 @@ public abstract class AbstractDecisionDefinitionRestServiceInteractionTest exten
       .contentType(POST_JSON_CONTENT_TYPE).body(json)
       .then().expect()
         .statusCode(Status.OK.getStatusCode())
-        .body("decisionOutputs.size()", is(1))
-        .body("decisionOutputs[0].outputValues.size()", is(1))
-        .body("decisionOutputs[0].outputValues.status", is(notNullValue()))
-        .body("decisionOutputs[0].outputValues.status.value", is("gold"))
+        .body("size()", is(1))
+        .body("[0].size()", is(1))
+        .body("[0].status", is(notNullValue()))
+        .body("[0].status.value", is("gold"))
       .when().post(EVALUATE_DECISION_URL);
   }
 
@@ -364,11 +364,11 @@ public abstract class AbstractDecisionDefinitionRestServiceInteractionTest exten
       .contentType(POST_JSON_CONTENT_TYPE).body(json)
       .then().expect()
         .statusCode(Status.OK.getStatusCode())
-        .body("decisionOutputs.size()", is(2))
-        .body("decisionOutputs[0].outputValues.size()", is(1))
-        .body("decisionOutputs[0].outputValues.status.value", is("gold"))
-        .body("decisionOutputs[1].outputValues.size()", is(1))
-        .body("decisionOutputs[1].outputValues.assignee.value", is("manager"))
+        .body("size()", is(2))
+        .body("[0].size()", is(1))
+        .body("[0].status.value", is("gold"))
+        .body("[1].size()", is(1))
+        .body("[1].assignee.value", is("manager"))
 
       .when().post(EVALUATE_DECISION_URL);
   }
@@ -391,10 +391,10 @@ public abstract class AbstractDecisionDefinitionRestServiceInteractionTest exten
       .contentType(POST_JSON_CONTENT_TYPE).body(json)
       .then().expect()
         .statusCode(Status.OK.getStatusCode())
-        .body("decisionOutputs.size()", is(1))
-        .body("decisionOutputs[0].outputValues.size()", is(2))
-        .body("decisionOutputs[0].outputValues.status.value", is("gold"))
-        .body("decisionOutputs[0].outputValues.assignee.value", is("manager"))
+        .body("size()", is(1))
+        .body("[0].size()", is(2))
+        .body("[0].status.value", is("gold"))
+        .body("[0].assignee.value", is("manager"))
 
       .when().post(EVALUATE_DECISION_URL);
   }
