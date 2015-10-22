@@ -23,11 +23,8 @@ import org.camunda.bpm.dmn.feel.impl.el.FeelFunctionMapper;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.DateValue;
-import org.camunda.bpm.engine.variable.value.LocalDateValue;
-import org.camunda.bpm.engine.variable.value.LocalTimeValue;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class FeelEngineTest {
@@ -166,27 +163,6 @@ public class FeelEngineTest {
   }
 
   @Test
-  @Ignore
-  public void testEndpointDate() {
-    LocalDateValue date = parseDate("2015-12-12");
-    assertEvaluatesToTrue(date, "date(\"2015-12-12\")");
-
-    variables.put("y", "2015-12-12");
-    assertEvaluatesToTrue(date, "date(y)");
-  }
-
-  @Test
-  @Ignore
-  public void testEndpointTime() {
-    LocalTimeValue time = parseTime("22:12:53");
-
-    assertEvaluatesToTrue(time, "time(\"22:12:53\")");
-
-    variables.put("y", "22:12:53");
-    assertEvaluatesToTrue(time, "time(y)");
-  }
-
-  @Test
   public void testEndpointDateAndTime() {
     DateValue dateTime = parseDateTime("2015-12-12T22:12:53");
 
@@ -254,33 +230,49 @@ public class FeelEngineTest {
   }
 
   @Test
-  @Ignore
-  public void testIntervalDate() {
-    LocalDateValue date = parseDate("2016-03-03");
-    assertEvaluatesToTrue(date, "[date(\"2015-12-12\")..date(\"2016-06-06\")]");
-    assertEvaluatesToTrue(date, "[date(\"2015-12-12\")..date(\"2016-06-06\"))");
-    assertEvaluatesToTrue(date, "[date(\"2015-12-12\")..date(\"2016-06-06\")[");
+  public void testIntervalDateAndTime() {
+    DateValue dateAndTime = parseDateTime("2016-03-03T00:00:00");
+    assertEvaluatesToTrue(dateAndTime, "[date and time(\"2015-12-12T00:00:00\")..date and time(\"2016-06-06T00:00:00\")]");
+    assertEvaluatesToTrue(dateAndTime, "[date and time(\"2015-12-12T00:00:00\")..date and time(\"2016-06-06T00:00:00\"))");
+    assertEvaluatesToTrue(dateAndTime, "[date and time(\"2015-12-12T00:00:00\")..date and time(\"2016-06-06T00:00:00\")[");
 
-    assertEvaluatesToTrue(date, "(date(\"2015-12-12\")..date(\"2016-06-06\")]");
-    assertEvaluatesToTrue(date, "(date(\"2015-12-12\")..date(\"2016-06-06\"))");
-    assertEvaluatesToTrue(date, "(date(\"2015-12-12\")..date(\"2016-06-06\")[");
+    assertEvaluatesToTrue(dateAndTime, "(date and time(\"2015-12-12T00:00:00\")..date and time(\"2016-06-06T00:00:00\")]");
+    assertEvaluatesToTrue(dateAndTime, "(date and time(\"2015-12-12T00:00:00\")..date and time(\"2016-06-06T00:00:00\"))");
+    assertEvaluatesToTrue(dateAndTime, "(date and time(\"2015-12-12T00:00:00\")..date and time(\"2016-06-06T00:00:00\")[");
 
-    assertEvaluatesToTrue(date, "]date(\"2015-12-12\")..date(\"2016-06-06\")]");
-    assertEvaluatesToTrue(date, "]date(\"2015-12-12\")..date(\"2016-06-06\"))");
-    assertEvaluatesToTrue(date, "]date(\"2015-12-12\")..date(\"2016-06-06\")[");
+    assertEvaluatesToTrue(dateAndTime, "]date and time(\"2015-12-12T00:00:00\")..date and time(\"2016-06-06T00:00:00\")]");
+    assertEvaluatesToTrue(dateAndTime, "]date and time(\"2015-12-12T00:00:00\")..date and time(\"2016-06-06T00:00:00\"))");
+    assertEvaluatesToTrue(dateAndTime, "]date and time(\"2015-12-12T00:00:00\")..date and time(\"2016-06-06T00:00:00\")[");
 
-    date = parseDate("2013-03-03");
-    assertEvaluatesToFalse(date, "[date(\"2015-12-12\")..date(\"2016-06-06\")]");
-    assertEvaluatesToFalse(date, "[date(\"2015-12-12\")..date(\"2016-06-06\"))");
-    assertEvaluatesToFalse(date, "[date(\"2015-12-12\")..date(\"2016-06-06\")[");
+    assertEvaluatesToTrue(dateAndTime, "[date and time(\"2015-12-12T00:00:00\")..date and time(\"2016-03-03T00:00:00\")]");
+    assertEvaluatesToTrue(dateAndTime, "[date and time(\"2015-12-12T00:00:00\")..date and time(\"2016-03-03T00:00:01\")[");
+    assertEvaluatesToTrue(dateAndTime, "[date and time(\"2015-12-12T00:00:00\")..date and time(\"2016-03-03T00:00:01\"))");
 
-    assertEvaluatesToFalse(date, "(date(\"2015-12-12\")..date(\"2016-06-06\")]");
-    assertEvaluatesToFalse(date, "(date(\"2015-12-12\")..date(\"2016-06-06\"))");
-    assertEvaluatesToFalse(date, "(date(\"2015-12-12\")..date(\"2016-06-06\")[");
+    assertEvaluatesToTrue(dateAndTime, "[date and time(\"2016-03-03T00:00:00\")..date and time(\"2016-06-06T00:00:00\")]");
+    assertEvaluatesToTrue(dateAndTime, "]date and time(\"2016-03-02T23:59:59\")..date and time(\"2016-06-06T00:00:00\")]");
+    assertEvaluatesToTrue(dateAndTime, "(date and time(\"2016-03-02T23:59:59\")..date and time(\"2016-06-06T00:00:00\")]");
 
-    assertEvaluatesToFalse(date, "]date(\"2015-12-12\")..date(\"2016-06-06\")]");
-    assertEvaluatesToFalse(date, "]date(\"2015-12-12\")..date(\"2016-06-06\"))");
-    assertEvaluatesToFalse(date, "]date(\"2015-12-12\")..date(\"2016-06-06\")[");
+
+    dateAndTime = parseDateTime("2013-03-03T00:00:00");
+    assertEvaluatesToFalse(dateAndTime, "[date and time(\"2015-12-12T00:00:00\")..date and time(\"2016-06-06T00:00:00\")]");
+    assertEvaluatesToFalse(dateAndTime, "[date and time(\"2015-12-12T00:00:00\")..date and time(\"2016-06-06T00:00:00\"))");
+    assertEvaluatesToFalse(dateAndTime, "[date and time(\"2015-12-12T00:00:00\")..date and time(\"2016-06-06T00:00:00\")[");
+
+    assertEvaluatesToFalse(dateAndTime, "(date and time(\"2015-12-12T00:00:00\")..date and time(\"2016-06-06T00:00:00\")]");
+    assertEvaluatesToFalse(dateAndTime, "(date and time(\"2015-12-12T00:00:00\")..date and time(\"2016-06-06T00:00:00\"))");
+    assertEvaluatesToFalse(dateAndTime, "(date and time(\"2015-12-12T00:00:00\")..date and time(\"2016-06-06T00:00:00\")[");
+
+    assertEvaluatesToFalse(dateAndTime, "]date and time(\"2015-12-12T00:00:00\")..date and time(\"2016-06-06T00:00:00\")]");
+    assertEvaluatesToFalse(dateAndTime, "]date and time(\"2015-12-12T00:00:00\")..date and time(\"2016-06-06T00:00:00\"))");
+    assertEvaluatesToFalse(dateAndTime, "]date and time(\"2015-12-12T00:00:00\")..date and time(\"2016-06-06T00:00:00\")[");
+
+    assertEvaluatesToFalse(dateAndTime, "[date and time(\"2015-12-12T00:00:00\")..date and time(\"2016-03-02T23:59:59\")]");
+    assertEvaluatesToFalse(dateAndTime, "[date and time(\"2015-12-12T00:00:00\")..date and time(\"2016-03-03T00:00:00\")[");
+    assertEvaluatesToFalse(dateAndTime, "[date and time(\"2015-12-12T00:00:00\")..date and time(\"2016-03-03T00:00:00\"))");
+
+    assertEvaluatesToFalse(dateAndTime, "[date and time(\"2016-03-03T00:00:01\")..date and time(\"2016-06-06T00:00:00\")]");
+    assertEvaluatesToFalse(dateAndTime, "]date and time(\"2016-03-03T00:00:00\")..date and time(\"2016-06-06T00:00:00\")]");
+    assertEvaluatesToFalse(dateAndTime, "(date and time(\"2016-03-03T00:00:00\")..date and time(\"2016-06-06T00:00:00\")]");
   }
 
   @Test
@@ -363,14 +355,6 @@ public class FeelEngineTest {
   public boolean evaluateFeel(Object input, String feelExpression) {
     variables.putValue(INPUT_VARIABLE, input);
     return feelEngine.evaluateSimpleUnaryTests(feelExpression, INPUT_VARIABLE, variables);
-  }
-
-  protected LocalDateValue parseDate(String dateString) {
-    return Variables.localDateValue(dateString);
-  }
-
-  protected LocalTimeValue parseTime(String timeString) {
-    return Variables.localTimeValue(timeString);
   }
 
   protected DateValue parseDateTime(String dateTimeString) {

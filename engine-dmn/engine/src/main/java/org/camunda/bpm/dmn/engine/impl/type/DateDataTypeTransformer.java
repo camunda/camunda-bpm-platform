@@ -18,45 +18,40 @@ import java.util.Date;
 
 import org.camunda.bpm.dmn.engine.type.DataTypeTransformer;
 import org.camunda.bpm.engine.variable.Variables;
-import org.camunda.bpm.engine.variable.value.LocalDateValue;
+import org.camunda.bpm.engine.variable.value.DateValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * Transform values of type {@link Date} and {@link String} into
- * {@link LocalDateValue}. A String should have the format {@code yyyy-MM-dd}.
+ * {@link DateValue} which contains date and time. A String should have the format
+ * {@code yyyy-MM-dd'T'HH:mm:ss}.
  *
  * @author Philipp Ossler
  */
-public class LocalDateDataTypeTransformer implements DataTypeTransformer {
+public class DateDataTypeTransformer implements DataTypeTransformer {
 
-  protected SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+  protected SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
   @Override
   public TypedValue transform(Object value) throws IllegalArgumentException {
-    if (value instanceof String) {
-      String localDate = (String) value;
-      validateLocalDate(localDate);
-      return Variables.localDateValue(localDate);
+    if (value instanceof Date) {
+      return Variables.dateValue((Date) value);
 
-    } else if (value instanceof Date) {
-      String localDate = transformDate((Date) value);
-      return Variables.localDateValue(localDate);
+    } else if (value instanceof String) {
+      Date date = transformString((String) value);
+      return Variables.dateValue(date);
 
     } else {
       throw new IllegalArgumentException();
     }
   }
 
-  protected void validateLocalDate(String localDate) throws IllegalArgumentException {
+  protected Date transformString(String value) {
     try {
-      format.parse(localDate);
+      return format.parse(value);
     } catch (ParseException e) {
       throw new IllegalArgumentException(e);
     }
-  }
-
-  protected String transformDate(Date value) {
-    return format.format(value);
   }
 
 }

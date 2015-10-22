@@ -50,10 +50,7 @@ public class DefaultDataTypeTransformerFactory implements DataTypeTransformerFac
     transformers.put("integer", new IntegerDataTypeTransformer());
     transformers.put("long", new LongDataTypeTransformer());
     transformers.put("double", new DoubleDataTypeTransformer());
-    transformers.put("date and time", new DateTimeDataTypeTransformer());
-    transformers.put("date", new LocalDateDataTypeTransformer());
-    transformers.put("time", new LocalTimeDataTypeTransformer());
-    transformers.put("duration", new DurationDataTypeTransformer());
+    transformers.put("date", new DateDataTypeTransformer());
 
     return transformers;
   }
