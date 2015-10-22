@@ -9,7 +9,10 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
 import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
 
 public class ProcessApplicationContextUtil {
@@ -29,7 +32,7 @@ public class ProcessApplicationContextUtil {
       return null;
     }
 
-    ProcessApplicationReference processApplicationForDeployment = getTargetProcessApplication(execution.getProcessDefinition().getDeploymentId());
+    ProcessApplicationReference processApplicationForDeployment = getTargetProcessApplication((ProcessDefinitionEntity) execution.getProcessDefinition());
 
     // logg application context switch details
     if(LOGG.isLoggable(Level.FINE) && processApplicationForDeployment == null) {
@@ -44,7 +47,7 @@ public class ProcessApplicationContextUtil {
       return null;
     }
 
-    ProcessApplicationReference processApplicationForDeployment = getTargetProcessApplication(((CaseDefinitionEntity) execution.getCaseDefinition()).getDeploymentId());
+    ProcessApplicationReference processApplicationForDeployment = getTargetProcessApplication((CaseDefinitionEntity) execution.getCaseDefinition());
 
     // logg application context switch details
     if(LOGG.isLoggable(Level.FINE) && processApplicationForDeployment == null) {
@@ -52,6 +55,43 @@ public class ProcessApplicationContextUtil {
     }
 
     return processApplicationForDeployment;
+  }
+
+  public static ProcessApplicationReference getTargetProcessApplication(ProcessDefinitionEntity definition) {
+    return getTargetProcessApplication((ResourceDefinitionEntity) definition);
+  }
+
+  public static ProcessApplicationReference getTargetProcessApplication(CaseDefinitionEntity definition) {
+    return getTargetProcessApplication((ResourceDefinitionEntity) definition);
+  }
+
+  public static ProcessApplicationReference getTargetProcessApplication(DecisionDefinitionEntity definition) {
+    return getTargetProcessApplication((ResourceDefinitionEntity) definition);
+  }
+
+  protected static ProcessApplicationReference getTargetProcessApplication(ResourceDefinitionEntity definition) {
+    ProcessApplicationReference reference = getTargetProcessApplication(definition.getDeploymentId());
+
+    if (reference == null) {
+      ResourceDefinitionEntity previous = definition.getPreviousDefinition();
+
+      // do it in a iterative way instead of recursive to avoid
+      // a possible StackOverflowException in cases with a lot
+      // of versions of a definition
+      while (previous != null) {
+        reference = getTargetProcessApplication(previous.getDeploymentId());
+
+        if (reference == null) {
+          previous = previous.getPreviousDefinition();
+        }
+        else {
+          return reference;
+        }
+
+      }
+    }
+
+    return reference;
   }
 
   public static ProcessApplicationReference getTargetProcessApplication(String deploymentId) {

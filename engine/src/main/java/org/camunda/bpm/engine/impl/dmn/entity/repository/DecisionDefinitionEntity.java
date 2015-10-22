@@ -14,11 +14,15 @@ package org.camunda.bpm.engine.impl.dmn.entity.repository;
 
 import java.io.Serializable;
 
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
+import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
-import org.camunda.bpm.engine.repository.ResourceDefinitionEntity;
-import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
 
 public class DecisionDefinitionEntity extends DmnDecisionTableImpl implements DecisionDefinition, ResourceDefinitionEntity, DbEntity, HasDbRevision, Serializable {
 
@@ -33,6 +37,11 @@ public class DecisionDefinitionEntity extends DmnDecisionTableImpl implements De
   protected String deploymentId;
   protected String resourceName;
   protected String diagramResourceName;
+
+  // firstVersion is true, when version == 1 or when
+  // this definition does not have any previous definitions
+  protected boolean firstVersion = false;
+  protected String previousDecisionDefinitionId;
 
   public DecisionDefinitionEntity() {
 
@@ -88,6 +97,7 @@ public class DecisionDefinitionEntity extends DmnDecisionTableImpl implements De
 
   public void setVersion(int version) {
     this.version = version;
+    this.firstVersion = (this.version == 1);
   }
 
   public String getDeploymentId() {
@@ -116,6 +126,71 @@ public class DecisionDefinitionEntity extends DmnDecisionTableImpl implements De
 
   public Object getPersistentState() {
     return DecisionDefinitionEntity.class;
+  }
+
+  // previous decision definition //////////////////////////////////////////////
+
+  public DecisionDefinitionEntity getPreviousDefinition() {
+    DecisionDefinitionEntity previousDecisionDefinition = null;
+
+    String previousDecisionDefinitionId = getPreviousDecisionDefinitionId();
+    if (previousDecisionDefinitionId != null) {
+
+      previousDecisionDefinition = loadPreviousDecisionDefinition(previousDecisionDefinitionId);
+
+      if (previousDecisionDefinition == null) {
+        setPreviousDecisionDefinitionId(null);
+        previousDecisionDefinitionId = getPreviousDecisionDefinitionId();
+
+        if (previousDecisionDefinitionId != null) {
+          previousDecisionDefinition = loadPreviousDecisionDefinition(previousDecisionDefinitionId);
+        }
+      }
+    }
+
+    return previousDecisionDefinition;
+  }
+
+  protected DecisionDefinitionEntity loadPreviousDecisionDefinition(String previousDecisionDefinitionId) {
+    ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
+    DeploymentCache deploymentCache = configuration.getDeploymentCache();
+
+    DecisionDefinitionEntity previousDecisionDefinition = deploymentCache.findDecisionDefinitionFromCache(previousDecisionDefinitionId);
+
+    if (previousDecisionDefinition == null) {
+      CommandContext commandContext = Context.getCommandContext();
+      DecisionDefinitionManager decisionDefinitionManager = commandContext.getDecisionDefinitionManager();
+      previousDecisionDefinition = decisionDefinitionManager.findDecisionDefinitionById(previousDecisionDefinitionId);
+
+      if (previousDecisionDefinition != null) {
+        previousDecisionDefinition = deploymentCache.resolveDecisionDefinition(previousDecisionDefinition);
+      }
+    }
+
+    return previousDecisionDefinition;
+
+  }
+
+  public String getPreviousDecisionDefinitionId() {
+    ensurePreviousDecisionDefinitionIdInitialized();
+    return previousDecisionDefinitionId;
+  }
+
+  public void setPreviousDecisionDefinitionId(String previousDecisionDefinitionId) {
+    this.previousDecisionDefinitionId = previousDecisionDefinitionId;
+  }
+
+  protected void ensurePreviousDecisionDefinitionIdInitialized() {
+    if (previousDecisionDefinitionId == null && !firstVersion) {
+      previousDecisionDefinitionId = Context
+          .getCommandContext()
+          .getDecisionDefinitionManager()
+          .findPreviousDecisionDefinitionIdByKeyAndVersion(key, version);
+
+      if (previousDecisionDefinitionId == null) {
+        firstVersion = true;
+      }
+    }
   }
 
   @Override

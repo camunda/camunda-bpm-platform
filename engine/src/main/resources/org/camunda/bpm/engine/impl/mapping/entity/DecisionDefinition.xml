@@ -80,6 +80,13 @@
       and VERSION_ = #{decisionDefinitionVersion}
   </select>
 
+  <select id="selectPreviousDecisionDefinitionIdByKeyAndVersion" parameterType="map" resultType="string">
+    select RES.ID_
+      from ${prefix}ACT_RE_DECISION_DEF RES
+     where RES.KEY_ = #{key}
+       and RES.VERSION_ = (select MAX(VERSION_) from ${prefix}ACT_RE_DECISION_DEF where KEY_ = #{key} AND VERSION_ &lt; #{version})
+  </select>
+
   <select id="selectDecisionDefinitionsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionQueryImpl" resultMap="decisionDefinitionResultMap">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}

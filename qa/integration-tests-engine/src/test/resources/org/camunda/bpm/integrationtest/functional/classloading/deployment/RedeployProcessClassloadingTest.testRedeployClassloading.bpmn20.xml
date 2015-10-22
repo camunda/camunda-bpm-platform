@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_-LopAGqCEeSZ-7eTocbBBw" exporter="camunda modeler" exporterVersion="2.6.0" targetNamespace="http://camunda.org/schema/1.0/bpmn">
+  <process id="process" isExecutable="true">
+
+    <startEvent id="StartEvent_1" />
+
+    <sequenceFlow sourceRef="StartEvent_1" targetRef="ServiceTask_1"/>
+
+    <serviceTask id="ServiceTask_1" camunda:class="org.camunda.bpm.integrationtest.functional.classloading.deployment.beans.MyCustomDelegate" />
+
+    <sequenceFlow sourceRef="ServiceTask_1" targetRef="UserTask_1"/>
+    
+    <userTask id="UserTask_1" />
+
+    <sequenceFlow sourceRef="UserTask_1" targetRef="EndEvent_1"/>
+
+    <endEvent id="EndEvent_1" />
+    
+  </process>
+</definitions>

@@ -11,9 +11,9 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.engine.repository;
+package org.camunda.bpm.engine.impl.repository;
 
-import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.repository.ResourceDefinition;
 
 /**
  * Entity of a deployed resource definition
@@ -35,5 +35,7 @@ public interface ResourceDefinitionEntity extends ResourceDefinition {
   void setDeploymentId(String deploymentId);
 
   void setDiagramResourceName(String diagramResourceName);
+
+  ResourceDefinitionEntity getPreviousDefinition();
 
 }

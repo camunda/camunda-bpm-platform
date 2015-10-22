@@ -30,7 +30,7 @@ import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
-import org.camunda.bpm.engine.repository.ResourceDefinitionEntity;
+import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
 
 /**
  * {@link Deployer} responsible to parse resource files and create the proper entities.

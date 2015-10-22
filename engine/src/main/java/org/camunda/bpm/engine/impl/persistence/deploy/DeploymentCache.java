@@ -75,6 +75,10 @@ public class DeploymentCache {
 
   // PROCESS DEFINITION ////////////////////////////////////////////////////////////////////////////////
 
+  public ProcessDefinitionEntity findProcessDefinitionFromCache(String processDefinitionId) {
+    return processDefinitionCache.get(processDefinitionId);
+  }
+
   public ProcessDefinitionEntity findDeployedProcessDefinitionById(String processDefinitionId) {
     ensureNotNull("Invalid process definition id", "processDefinitionId", processDefinitionId);
     CommandContext commandContext = Context.getCommandContext();
@@ -193,6 +197,10 @@ public class DeploymentCache {
   }
 
   // CASE DEFINITION ////////////////////////////////////////////////////////////////////////////////
+
+  public CaseDefinitionEntity findCaseDefinitionFromCache(String caseDefinitionId) {
+    return caseDefinitionCache.get(caseDefinitionId);
+  }
 
   public CaseDefinitionEntity findDeployedCaseDefinitionById(String caseDefinitionId) {
     ensureNotNull("Invalid case definition id", "caseDefinitionId", caseDefinitionId);
@@ -341,6 +349,10 @@ public class DeploymentCache {
   }
 
   // DECISION DEFINITION ////////////////////////////////////////////////////////////////////////////
+
+  public DecisionDefinitionEntity findDecisionDefinitionFromCache(String decisionDefinitionId) {
+    return decisionDefinitionCache.get(decisionDefinitionId);
+  }
 
   public DecisionDefinitionEntity findDeployedDecisionDefinitionById(String decisionDefinitionId) {
     ensureNotNull("Invalid decision definition id", "decisionDefinitionId", decisionDefinitionId);

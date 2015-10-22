@@ -80,6 +80,13 @@
       and VERSION_ = #{caseDefinitionVersion}
   </select>
 
+  <select id="selectPreviousCaseDefinitionIdByKeyAndVersion" parameterType="map" resultType="string">
+    select RES.ID_
+      from ${prefix}ACT_RE_CASE_DEF RES
+     where RES.KEY_ = #{key}
+       and RES.VERSION_ = (select MAX(VERSION_) from ${prefix}ACT_RE_CASE_DEF where KEY_ = #{key} AND VERSION_ &lt; #{version})
+  </select>
+
   <select id="selectCaseDefinitionsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionQueryImpl" resultMap="caseDefinitionResultMap">
     <include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}

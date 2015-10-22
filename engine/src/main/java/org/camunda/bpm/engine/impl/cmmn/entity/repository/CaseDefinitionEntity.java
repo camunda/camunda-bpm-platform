@@ -14,16 +14,18 @@ package org.camunda.bpm.engine.impl.cmmn.entity.repository;
 
 import java.util.Map;
 
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.db.DbEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
+import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
+import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinition;
-import org.camunda.bpm.engine.repository.ResourceDefinitionEntity;
 
 /**
  * @author Roman Smirnov
@@ -41,6 +43,11 @@ public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefi
   protected String resourceName;
   protected String diagramResourceName;
   protected Map<String, TaskDefinition> taskDefinitions;
+
+  // firstVersion is true, when version == 1 or when
+  // this definition does not have any previous definitions
+  protected boolean firstVersion = false;
+  protected String previousCaseDefinitionId;
 
   public CaseDefinitionEntity() {
     super(null);
@@ -80,6 +87,7 @@ public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefi
 
   public void setVersion(int version) {
     this.version = version;
+    this.firstVersion = (this.version == 1);
   }
 
   public String getDeploymentId() {
@@ -112,6 +120,71 @@ public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefi
 
   public void setTaskDefinitions(Map<String, TaskDefinition> taskDefinitions) {
     this.taskDefinitions = taskDefinitions;
+  }
+
+  // previous case definition //////////////////////////////////////////////
+
+  public CaseDefinitionEntity getPreviousDefinition() {
+    CaseDefinitionEntity previousCaseDefinition = null;
+
+    String previousCaseDefinitionId = getPreviousCaseDefinitionId();
+    if (previousCaseDefinitionId != null) {
+
+      previousCaseDefinition = loadPreviousCaseDefinition(previousCaseDefinitionId);
+
+      if (previousCaseDefinition == null) {
+        setPreviousCaseDefinitionId(null);
+        previousCaseDefinitionId = getPreviousCaseDefinitionId();
+
+        if (previousCaseDefinitionId != null) {
+          previousCaseDefinition = loadPreviousCaseDefinition(previousCaseDefinitionId);
+        }
+      }
+    }
+
+    return previousCaseDefinition;
+  }
+
+  protected CaseDefinitionEntity loadPreviousCaseDefinition(String previousCaseDefinitionId) {
+    ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
+    DeploymentCache deploymentCache = configuration.getDeploymentCache();
+
+    CaseDefinitionEntity previousCaseDefinition = deploymentCache.findCaseDefinitionFromCache(previousCaseDefinitionId);
+
+    if (previousCaseDefinition == null) {
+      CommandContext commandContext = Context.getCommandContext();
+      CaseDefinitionManager caseDefinitionManager = commandContext.getCaseDefinitionManager();
+      previousCaseDefinition = caseDefinitionManager.findCaseDefinitionById(previousCaseDefinitionId);
+
+      if (previousCaseDefinition != null) {
+        previousCaseDefinition = deploymentCache.resolveCaseDefinition(previousCaseDefinition);
+      }
+    }
+
+    return previousCaseDefinition;
+
+  }
+
+  protected String getPreviousCaseDefinitionId() {
+    ensurePreviousCaseDefinitionIdInitialized();
+    return previousCaseDefinitionId;
+  }
+
+  protected void setPreviousCaseDefinitionId(String previousCaseDefinitionId) {
+    this.previousCaseDefinitionId = previousCaseDefinitionId;
+  }
+
+  protected void ensurePreviousCaseDefinitionIdInitialized() {
+    if (previousCaseDefinitionId == null && !firstVersion) {
+      previousCaseDefinitionId = Context
+          .getCommandContext()
+          .getCaseDefinitionManager()
+          .findPreviousCaseDefinitionIdByKeyAndVersion(key, version);
+
+      if (previousCaseDefinitionId == null) {
+        firstVersion = true;
+      }
+    }
   }
 
   @Override

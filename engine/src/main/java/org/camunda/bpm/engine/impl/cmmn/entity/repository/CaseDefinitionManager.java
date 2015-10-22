@@ -56,6 +56,13 @@ public class CaseDefinitionManager extends AbstractManager {
     return (CaseDefinitionEntity) getDbEntityManager().selectOne("selectCaseDefinitionByDeploymentAndKey", parameters);
   }
 
+  public String findPreviousCaseDefinitionIdByKeyAndVersion(String caseDefinitionKey, Integer version) {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("key", caseDefinitionKey);
+    params.put("version", version);
+    return (String) getDbEntityManager().selectOne("selectPreviousCaseDefinitionIdByKeyAndVersion", params);
+  }
+
   @SuppressWarnings("unchecked")
   public List<CaseDefinition> findCaseDefinitionsByQueryCriteria(CaseDefinitionQueryImpl caseDefinitionQuery, Page page) {
     return getDbEntityManager().selectList("selectCaseDefinitionsByQueryCriteria", caseDefinitionQuery, page);
