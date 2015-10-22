@@ -21,11 +21,8 @@ import org.camunda.bpm.engine.variable.value.BytesValue;
 import org.camunda.bpm.engine.variable.value.DateValue;
 import org.camunda.bpm.engine.variable.value.DoubleValue;
 import org.camunda.bpm.engine.variable.value.IntegerValue;
-import org.camunda.bpm.engine.variable.value.LocalDateValue;
-import org.camunda.bpm.engine.variable.value.LocalTimeValue;
 import org.camunda.bpm.engine.variable.value.LongValue;
 import org.camunda.bpm.engine.variable.value.NumberValue;
-import org.camunda.bpm.engine.variable.value.PeriodValue;
 import org.camunda.bpm.engine.variable.value.PrimitiveValue;
 import org.camunda.bpm.engine.variable.value.ShortValue;
 import org.camunda.bpm.engine.variable.value.StringValue;
@@ -105,33 +102,6 @@ public class PrimitiveTypeValueImpl<T> extends AbstractTypedValue<T> implements 
 
     public DateValueImpl(Date value) {
       super(value, ValueType.DATE);
-    }
-  }
-
-  public static class LocalDateValueImpl extends PrimitiveTypeValueImpl<String> implements LocalDateValue {
-
-    private static final long serialVersionUID = 1L;
-
-    public LocalDateValueImpl(String value) {
-      super(value, ValueType.LOCAL_DATE);
-    }
-  }
-
-  public static class LocalTimeValueImpl extends PrimitiveTypeValueImpl<String> implements LocalTimeValue {
-
-    private static final long serialVersionUID = 1L;
-
-    public LocalTimeValueImpl(String value) {
-      super(value, ValueType.LOCAL_TIME);
-    }
-  }
-
-  public static class PeriodValueImpl extends PrimitiveTypeValueImpl<String> implements PeriodValue {
-
-    private static final long serialVersionUID = 1L;
-
-    public PeriodValueImpl(String value) {
-      super(value, ValueType.PERIOD);
     }
   }
 
