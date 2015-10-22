@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.CompensationBehavior;
+import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 
@@ -41,7 +42,8 @@ public abstract class PvmAtomicOperationActivityInstanceEnd extends AbstractPvmE
     if (parent != null && execution.isScope() &&
         activity != null && activity.isScope() &&
         (activity.getActivityBehavior() instanceof CompositeActivityBehavior
-            || CompensationBehavior.isCompensationThrowing(execution))) {
+            || (CompensationBehavior.isCompensationThrowing(execution))
+              && !LegacyBehavior.isCompensationThrowing(execution))) {
 
       if(log.isLoggable(Level.FINE)) {
         log.fine("[LEAVE] "+ execution + ": "+execution.getActivityInstanceId() );

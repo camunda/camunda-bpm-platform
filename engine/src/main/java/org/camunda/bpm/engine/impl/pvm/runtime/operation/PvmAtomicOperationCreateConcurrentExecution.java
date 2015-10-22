@@ -12,10 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
-import java.util.List;
-
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
-import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**

@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.CompensationEndEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.CompensationEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessStartEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.NoneStartEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ThrowEscalationEventActivityBehavior;
@@ -381,7 +381,7 @@ public class BpmnParseTest extends PluggableProcessEngineTestCase {
 
     assertEquals("compensationEndEvent", endEvent.getProperty("type"));
     assertEquals(Boolean.TRUE, endEvent.getProperty(BpmnParse.PROPERTYNAME_THROWS_COMPENSATION));
-    assertEquals(CompensationEndEventActivityBehavior.class, endEvent.getActivityBehavior().getClass());
+    assertEquals(CompensationEventActivityBehavior.class, endEvent.getActivityBehavior().getClass());
   }
 
   @Deployment

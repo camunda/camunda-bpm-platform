@@ -26,9 +26,11 @@ import org.camunda.bpm.engine.test.Deployment;
 public class ScenarioRunner {
 
   protected ProcessEngine engine;
+  protected String engineVersion;
 
-  public ScenarioRunner(ProcessEngine engine) {
+  public ScenarioRunner(ProcessEngine engine, String engineVersion) {
     this.engine = engine;
+    this.engineVersion = engineVersion;
   }
 
   public void setupScenarios(Class<?> clazz) {
@@ -100,7 +102,18 @@ public class ScenarioRunner {
   }
 
   protected String createScenarioName(Class<?> declaringClass, String name) {
-    return declaringClass.getSimpleName() + "." + name;
+    StringBuilder sb = new StringBuilder();
+
+    if (engineVersion != null) {
+      sb.append(engineVersion);
+      sb.append(".");
+    }
+
+    sb.append(declaringClass.getSimpleName());
+    sb.append(".");
+    sb.append(name);
+
+    return sb.toString();
   }
 
   protected void setupScenario(Map<String, Scenario> scenarios, Scenario scenario) {

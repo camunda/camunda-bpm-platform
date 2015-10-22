@@ -19,7 +19,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.ActivityExecutionMapping;
+import org.camunda.bpm.engine.impl.ActivityExecutionTreeMapping;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -146,7 +146,7 @@ public abstract class AbstractProcessInstanceModificationCommand implements Comm
   }
 
   protected ExecutionEntity getScopeExecutionForActivityInstance(ExecutionEntity processInstance,
-      ActivityExecutionMapping mapping, ActivityInstance activityInstance) {
+      ActivityExecutionTreeMapping mapping, ActivityInstance activityInstance) {
     ensureNotNull("activityInstance", activityInstance);
 
     ProcessDefinitionImpl processDefinition = processInstance.getProcessDefinition();

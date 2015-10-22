@@ -20,7 +20,7 @@ import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
-import org.camunda.bpm.engine.impl.ActivityExecutionMapping;
+import org.camunda.bpm.engine.impl.ActivityExecutionTreeMapping;
 import org.camunda.bpm.engine.impl.bpmn.behavior.SequentialMultiInstanceActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.core.delegate.CoreActivityBehavior;
@@ -97,7 +97,7 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
         elementToInstantiate);
 
     // rebuild the mapping because the execution tree changes with every iteration
-    final ActivityExecutionMapping mapping = new ActivityExecutionMapping(commandContext, processInstanceId);
+    final ActivityExecutionTreeMapping mapping = new ActivityExecutionTreeMapping(commandContext, processInstanceId);
 
     // before instantiating an activity, two things have to be determined:
     //
@@ -293,7 +293,7 @@ public abstract class AbstractInstantiationCmd extends AbstractProcessInstanceMo
     return behavior == null || !(behavior instanceof SequentialMultiInstanceActivityBehavior);
   }
 
-  protected ExecutionEntity getSingleExecutionForScope(ActivityExecutionMapping mapping, ScopeImpl scope) {
+  protected ExecutionEntity getSingleExecutionForScope(ActivityExecutionTreeMapping mapping, ScopeImpl scope) {
     Set<ExecutionEntity> executions = mapping.getExecutions(scope);
 
     if (!executions.isEmpty()) {

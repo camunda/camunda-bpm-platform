@@ -52,12 +52,13 @@ import org.camunda.bpm.qa.upgrade.scenarios.task.ParallelScopeTasksScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.task.ParallelTasksScenario;
 
 /**
- * @author Daniel Meyer
+ * Sets up scenarios for migration from 7.3.0
  *
- * Drops and creates the old database.
- *
+ * @author Thorben Lindhauer
  */
 public class TestFixture {
+
+  public static final String ENGINE_VERSION = "7.2.0";
 
   protected ProcessEngine processEngine;
   protected RepositoryService repositoryService;
@@ -79,7 +80,7 @@ public class TestFixture {
     ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();
 
     // register test scenarios
-    ScenarioRunner runner = new ScenarioRunner(processEngine);
+    ScenarioRunner runner = new ScenarioRunner(processEngine, ENGINE_VERSION);
 
     // event subprocesses
     runner.setupScenarios(InterruptingEventSubprocessScenario.class);
@@ -131,7 +132,7 @@ public class TestFixture {
     processEngine = processEngineConfiguration.buildProcessEngine();
 
     // register test scenarios
-    runner = new ScenarioRunner(processEngine);
+    runner = new ScenarioRunner(processEngine, ENGINE_VERSION);
 
     runner.setupScenarios(AuthorizationScenario.class);
 

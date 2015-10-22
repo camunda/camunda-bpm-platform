@@ -656,6 +656,39 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
       .done());
   }
 
+  /**
+   * CAM-4903
+   */
+  @Deployment
+  public void FAILING_testActivityInstanceTreeForMiSubProcessDefaultHandler() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
+
+    completeTasks("Book Hotel", 5);
+    // throw compensation event
+    completeTask("throwCompensation");
+
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertThat(tree).hasStructure(
+      describeActivityInstanceTree(processInstance.getProcessDefinitionId())
+        .activity("throwingCompensation")
+        .beginMiBody("scope")
+          .beginScope("scope")
+            .activity("undoBookHotel")
+          .endScope()
+          .beginScope("scope")
+            .activity("undoBookHotel")
+          .endScope()
+          .beginScope("scope")
+            .activity("undoBookHotel")
+          .endScope()
+          .beginScope("scope")
+            .activity("undoBookHotel")
+          .endScope()
+          .beginScope("scope")
+            .activity("undoBookHotel")
+      .done());
+  }
+
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.activityWithCompensationEndEvent.bpmn20.xml")
   public void testCancelProcessInstanceWithActiveCompensation() {
     // given

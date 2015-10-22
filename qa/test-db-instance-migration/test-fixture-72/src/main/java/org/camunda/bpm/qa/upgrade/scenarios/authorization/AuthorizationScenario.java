@@ -54,7 +54,7 @@ public class AuthorizationScenario {
         identityService.createMembership("test", "accounting");
 
         // start a process instance
-        engine.getRuntimeService().startProcessInstanceByKey("oneTaskProcess");
+        engine.getRuntimeService().startProcessInstanceByKey("oneTaskProcess", scenarioName);
       }
     };
   }

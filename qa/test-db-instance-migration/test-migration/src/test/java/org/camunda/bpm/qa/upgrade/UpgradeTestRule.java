@@ -12,7 +12,10 @@
  */
 package org.camunda.bpm.qa.upgrade;
 
+import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
+import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
+import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
@@ -43,8 +46,8 @@ public class UpgradeTestRule extends ProcessEngineRule {
   }
 
   public void starting(Description description) {
+    Class<?> testClass = description.getTestClass();
     if (scenarioTestedByClass == null) {
-      Class<?> testClass = description.getTestClass();
       ScenarioUnderTest testScenarioClassAnnotation = testClass.getAnnotation(ScenarioUnderTest.class);
       if (testScenarioClassAnnotation != null) {
         scenarioTestedByClass = testScenarioClassAnnotation.value();
@@ -59,6 +62,16 @@ public class UpgradeTestRule extends ProcessEngineRule {
       else {
         scenarioName = testScenarioAnnotation.value();
       }
+    }
+
+    // method annotation overrides class annotation
+    Origin originAnnotation = description.getAnnotation(Origin.class);
+    if (originAnnotation == null) {
+      originAnnotation = testClass.getAnnotation(Origin.class);
+    }
+
+    if (originAnnotation != null) {
+      scenarioName = originAnnotation.value() + "." + scenarioName;
     }
 
     if (scenarioName == null) {
@@ -103,6 +116,19 @@ public class UpgradeTestRule extends ProcessEngineRule {
     return instance;
   }
 
+  public HistoricProcessInstance historicProcessInstance() {
+    HistoricProcessInstance historicProcessInstance = historyService
+      .createHistoricProcessInstanceQuery()
+      .processInstanceBusinessKey(scenarioName)
+      .singleResult();
+
+    if (historicProcessInstance == null) {
+      throw new RuntimeException("There is no historic process instance for scenario " + scenarioName);
+    }
+
+    return historicProcessInstance;
+  }
+
   public MessageCorrelationBuilder messageCorrelation(String messageName) {
     return runtimeService.createMessageCorrelation(messageName).processInstanceBusinessKey(scenarioName);
   }
@@ -117,6 +143,12 @@ public class UpgradeTestRule extends ProcessEngineRule {
   public CaseInstanceQuery caseInstanceQuery() {
     return caseService
         .createCaseInstanceQuery()
+        .caseInstanceBusinessKey(scenarioName);
+  }
+
+  public CaseExecutionQuery caseExecutionQuery() {
+    return caseService
+        .createCaseExecutionQuery()
         .caseInstanceBusinessKey(scenarioName);
   }
 

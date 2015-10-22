@@ -16,6 +16,8 @@
   </properties>
 
   <dependencies>
+    <!-- NOTE: this pulls transitive dependencies of version ${project.version} in unless
+      you declare them to be ${camunda.version.current} here -->
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>

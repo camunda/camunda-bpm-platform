@@ -20,8 +20,6 @@ import java.util.List;
 import java.util.Stack;
 
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
-import org.camunda.bpm.engine.impl.persistence.entity.ActivityInstanceImpl;
-import org.camunda.bpm.engine.impl.persistence.entity.TransitionInstanceImpl;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.TransitionInstance;
 import org.junit.Assert;
@@ -40,11 +38,11 @@ public class ActivityInstanceAssert {
       this.actual = actual;
     }
 
-    public void hasStructure(ActivityInstance expected) {
+    public void hasStructure(ExpectedActivityInstance expected) {
       assertTreeMatch(expected, actual);
     }
 
-    protected void assertTreeMatch(ActivityInstance expected, ActivityInstance actual) {
+    protected void assertTreeMatch(ExpectedActivityInstance expected, ActivityInstance actual) {
       boolean treesMatch = isTreeMatched(expected, actual);
       if (!treesMatch) {
         Assert.fail("Could not match expected tree \n" + expected +" \n\n with actual tree \n\n "+actual);
@@ -54,19 +52,19 @@ public class ActivityInstanceAssert {
 
 
     /** if anyone wants to improve this algorithm, feel welcome! */
-    protected boolean isTreeMatched(ActivityInstance actualInstance, ActivityInstance expectedInstance) {
-      if(!expectedInstance.getActivityId().equals(actualInstance.getActivityId())) {
+    protected boolean isTreeMatched(ExpectedActivityInstance expectedInstance, ActivityInstance actualInstance) {
+      if(!expectedInstance.getActivityIds().contains(actualInstance.getActivityId())) {
         return false;
       } else {
-        if(expectedInstance.getChildActivityInstances().length != actualInstance.getChildActivityInstances().length) {
+        if(expectedInstance.getChildActivityInstances().size() != actualInstance.getChildActivityInstances().length) {
           return false;
         } else {
 
-          List<ActivityInstance> unmatchedInstances = new ArrayList<ActivityInstance>(Arrays.asList(expectedInstance.getChildActivityInstances()));
+          List<ExpectedActivityInstance> unmatchedInstances = new ArrayList<ExpectedActivityInstance>(expectedInstance.getChildActivityInstances());
           for (ActivityInstance child1 : actualInstance.getChildActivityInstances()) {
             boolean matchFound = false;
-            for (ActivityInstance child2 : new ArrayList<ActivityInstance>(unmatchedInstances)) {
-              if (isTreeMatched(child1, child2)) {
+            for (ExpectedActivityInstance child2 : new ArrayList<ExpectedActivityInstance>(unmatchedInstances)) {
+              if (isTreeMatched(child2, child1)) {
                 unmatchedInstances.remove(child2);
                 matchFound = true;
                 break;
@@ -77,14 +75,14 @@ public class ActivityInstanceAssert {
             }
           }
 
-          List<TransitionInstance> unmatchedTransitionInstances =
-              new ArrayList<TransitionInstance>(Arrays.asList(expectedInstance.getChildTransitionInstances()));
+          List<ExpectedTransitionInstance> unmatchedTransitionInstances =
+              new ArrayList<ExpectedTransitionInstance>(expectedInstance.getChildTransitionInstances());
           for (TransitionInstance child : actualInstance.getChildTransitionInstances()) {
-            Iterator<TransitionInstance> expectedTransitionInstanceIt = unmatchedTransitionInstances.iterator();
+            Iterator<ExpectedTransitionInstance> expectedTransitionInstanceIt = unmatchedTransitionInstances.iterator();
 
             boolean matchFound = false;
             while (expectedTransitionInstanceIt.hasNext() && !matchFound) {
-              TransitionInstance expectedChild = expectedTransitionInstanceIt.next();
+              ExpectedTransitionInstance expectedChild = expectedTransitionInstanceIt.next();
               if (expectedChild.getActivityId().equals(child.getActivityId())) {
                 matchFound = true;
                 expectedTransitionInstanceIt.remove();
@@ -106,27 +104,27 @@ public class ActivityInstanceAssert {
 
   public static class ActivityInstanceTreeBuilder {
 
-    protected ActivityInstanceImpl rootInstance = null;
-    protected Stack<ActivityInstanceImpl> activityInstanceStack = new Stack<ActivityInstanceImpl>();
+    protected ExpectedActivityInstance rootInstance = null;
+    protected Stack<ExpectedActivityInstance> activityInstanceStack = new Stack<ExpectedActivityInstance>();
 
     public ActivityInstanceTreeBuilder() {
       this(null);
     }
 
     public ActivityInstanceTreeBuilder(String rootActivityId) {
-      rootInstance = new ActivityInstanceImpl();
+      rootInstance = new ExpectedActivityInstance();
       rootInstance.setActivityId(rootActivityId);
       activityInstanceStack.push(rootInstance);
     }
 
-    public ActivityInstanceTreeBuilder beginScope(String activityId) {
-      ActivityInstanceImpl newInstance = new ActivityInstanceImpl();
-      newInstance.setActivityId(activityId);
+    public ActivityInstanceTreeBuilder beginScope(String... activityIds) {
+      ExpectedActivityInstance newInstance = new ExpectedActivityInstance();
+      newInstance.setActivityIds(activityIds);
 
-      ActivityInstanceImpl parentInstance = activityInstanceStack.peek();
-      List<ActivityInstance> childInstances = new ArrayList<ActivityInstance>(Arrays.asList(parentInstance.getChildActivityInstances()));
+      ExpectedActivityInstance parentInstance = activityInstanceStack.peek();
+      List<ExpectedActivityInstance> childInstances = new ArrayList<ExpectedActivityInstance>(parentInstance.getChildActivityInstances());
       childInstances.add(newInstance);
-      parentInstance.setChildActivityInstances(childInstances.toArray(new ActivityInstance[childInstances.size()]));
+      parentInstance.setChildActivityInstances(childInstances);
 
       activityInstanceStack.push(newInstance);
 
@@ -147,14 +145,14 @@ public class ActivityInstanceAssert {
 
     public ActivityInstanceTreeBuilder transition(String activityId) {
 
-      TransitionInstanceImpl newInstance = new TransitionInstanceImpl();
+      ExpectedTransitionInstance newInstance = new ExpectedTransitionInstance();
       newInstance.setActivityId(activityId);
-      ActivityInstanceImpl parentInstance = activityInstanceStack.peek();
+      ExpectedActivityInstance parentInstance = activityInstanceStack.peek();
 
-      List<TransitionInstance> childInstances = new ArrayList<TransitionInstance>(
-          Arrays.asList(parentInstance.getChildTransitionInstances()));
+      List<ExpectedTransitionInstance> childInstances = new ArrayList<ExpectedTransitionInstance>(
+          parentInstance.getChildTransitionInstances());
       childInstances.add(newInstance);
-      parentInstance.setChildTransitionInstances(childInstances.toArray(new TransitionInstance[childInstances.size()]));
+      parentInstance.setChildTransitionInstances(childInstances);
 
       return this;
     }
@@ -164,7 +162,7 @@ public class ActivityInstanceAssert {
       return this;
     }
 
-    public ActivityInstance done() {
+    public ExpectedActivityInstance done() {
       return rootInstance;
     }
   }

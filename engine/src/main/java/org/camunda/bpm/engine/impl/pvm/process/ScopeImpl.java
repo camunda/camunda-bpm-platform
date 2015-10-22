@@ -107,6 +107,20 @@ public abstract class ScopeImpl extends CoreActivity implements PvmScope {
     return  activity;
   }
 
+  public boolean isAncestorFlowScopeOf(ScopeImpl other) {
+    ScopeImpl otherAncestor = other.getFlowScope();
+    while (otherAncestor != null) {
+      if (this == otherAncestor) {
+        return true;
+      }
+      else {
+        otherAncestor = otherAncestor.getFlowScope();
+      }
+    }
+
+    return false;
+  }
+
   public boolean contains(ActivityImpl activity) {
     if (namedFlowActivities.containsKey(activity.getId())) {
       return true;

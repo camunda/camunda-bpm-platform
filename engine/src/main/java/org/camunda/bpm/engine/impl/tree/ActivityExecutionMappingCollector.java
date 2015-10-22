@@ -19,6 +19,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
@@ -52,7 +53,7 @@ public class ActivityExecutionMappingCollector implements TreeVisitor<ActivityEx
   }
 
   private void appendActivityExecutionMapping(ActivityExecution execution) {
-    if (execution.getActivity() != null) {
+    if (execution.getActivity() != null && !LegacyBehavior.hasInvalidIntermediaryActivityId((PvmExecutionImpl) execution)) {
       activityExecutionMapping.putAll(execution.createActivityExecutionMapping());
     }
   }

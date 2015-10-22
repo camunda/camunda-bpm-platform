@@ -20,15 +20,25 @@ import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.qa.upgrade.scenarios.compensation.InterruptingEventSubProcessCompensationScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.compensation.InterruptingEventSubProcessNestedCompensationScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.compensation.NestedCompensationScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.compensation.NestedMultiInstanceCompensationScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.compensation.NonInterruptingEventSubProcessCompensationScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.compensation.ParallelMultiInstanceCompensationScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.compensation.SequentialMultiInstanceCompensationScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.compensation.SingleActivityCompensationScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.compensation.SingleActivityConcurrentCompensationScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.sentry.SentryScenario;
 
 /**
- * @author Daniel Meyer
+ * Sets up scenarios for migration from 7.3.0
  *
- * Drops and creates the old database.
- *
+ * @author Thorben Lindhauer
  */
 public class TestFixture {
+
+  public static final String ENGINE_VERSION = "7.3.0";
 
   protected ProcessEngine processEngine;
   protected RepositoryService repositoryService;
@@ -50,10 +60,21 @@ public class TestFixture {
     ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();
 
     // register test scenarios
-    ScenarioRunner runner = new ScenarioRunner(processEngine);
+    ScenarioRunner runner = new ScenarioRunner(processEngine, ENGINE_VERSION);
 
-    // event subprocesses
+    // cmmn sentries
     runner.setupScenarios(SentryScenario.class);
+
+    // compensation
+    runner.setupScenarios(SingleActivityCompensationScenario.class);
+    runner.setupScenarios(NestedCompensationScenario.class);
+    runner.setupScenarios(SingleActivityConcurrentCompensationScenario.class);
+    runner.setupScenarios(ParallelMultiInstanceCompensationScenario.class);
+    runner.setupScenarios(SequentialMultiInstanceCompensationScenario.class);
+    runner.setupScenarios(NestedMultiInstanceCompensationScenario.class);
+    runner.setupScenarios(InterruptingEventSubProcessCompensationScenario.class);
+    runner.setupScenarios(NonInterruptingEventSubProcessCompensationScenario.class);
+    runner.setupScenarios(InterruptingEventSubProcessNestedCompensationScenario.class);
 
     processEngine.close();
   }

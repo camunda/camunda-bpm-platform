@@ -16,7 +16,6 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.qa.upgrade.DescribesScenario;
-import org.camunda.bpm.qa.upgrade.ExtendsScenario;
 import org.camunda.bpm.qa.upgrade.ScenarioSetup;
 import org.camunda.bpm.qa.upgrade.Times;
 
