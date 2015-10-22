@@ -21,10 +21,7 @@ import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.Boo
 import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.BytesTypeImpl;
 import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.DateTypeImpl;
 import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.DoubleTypeImpl;
-import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.PeriodTypeImpl;
 import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.IntegerTypeImpl;
-import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.LocalDateTypeImpl;
-import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.LocalTimeTypeImpl;
 import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.LongTypeImpl;
 import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.NullTypeImpl;
 import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.NumberTypeImpl;
@@ -56,12 +53,6 @@ public interface ValueType extends Serializable {
   public static final PrimitiveValueType INTEGER = new IntegerTypeImpl();
 
   public static final PrimitiveValueType DATE = new DateTypeImpl();
-
-  public static final PrimitiveValueType LOCAL_DATE = new LocalDateTypeImpl();
-
-  public static final PrimitiveValueType LOCAL_TIME = new LocalTimeTypeImpl();
-
-  public static final PrimitiveValueType PERIOD = new PeriodTypeImpl();
 
   public static final PrimitiveValueType BYTES = new BytesTypeImpl();
 

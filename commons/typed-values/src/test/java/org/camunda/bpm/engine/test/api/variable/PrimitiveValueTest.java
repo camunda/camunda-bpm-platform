@@ -18,9 +18,6 @@ import static org.camunda.bpm.engine.variable.Variables.createVariables;
 import static org.camunda.bpm.engine.variable.Variables.dateValue;
 import static org.camunda.bpm.engine.variable.Variables.doubleValue;
 import static org.camunda.bpm.engine.variable.Variables.integerValue;
-import static org.camunda.bpm.engine.variable.Variables.localDateValue;
-import static org.camunda.bpm.engine.variable.Variables.localTimeValue;
-import static org.camunda.bpm.engine.variable.Variables.periodValue;
 import static org.camunda.bpm.engine.variable.Variables.shortValue;
 import static org.camunda.bpm.engine.variable.Variables.stringValue;
 import static org.camunda.bpm.engine.variable.Variables.untypedNullValue;
@@ -29,10 +26,7 @@ import static org.camunda.bpm.engine.variable.type.ValueType.BYTES;
 import static org.camunda.bpm.engine.variable.type.ValueType.DATE;
 import static org.camunda.bpm.engine.variable.type.ValueType.DOUBLE;
 import static org.camunda.bpm.engine.variable.type.ValueType.INTEGER;
-import static org.camunda.bpm.engine.variable.type.ValueType.LOCAL_DATE;
-import static org.camunda.bpm.engine.variable.type.ValueType.LOCAL_TIME;
 import static org.camunda.bpm.engine.variable.type.ValueType.NULL;
-import static org.camunda.bpm.engine.variable.type.ValueType.PERIOD;
 import static org.camunda.bpm.engine.variable.type.ValueType.SHORT;
 import static org.camunda.bpm.engine.variable.type.ValueType.STRING;
 import static org.junit.Assert.assertEquals;
@@ -74,9 +68,6 @@ public class PrimitiveValueTest {
         { SHORT, (short) 1, shortValue((short) 1), shortValue(null) },
         { DOUBLE, 1d, doubleValue(1d), doubleValue(null) },
         { DATE, DATE_VALUE, dateValue(DATE_VALUE), dateValue(null) },
-        { LOCAL_DATE, LOCAL_DATE_VALUE, localDateValue(LOCAL_DATE_VALUE), localDateValue(null) },
-        { LOCAL_TIME, LOCAL_TIME_VALUE, localTimeValue(LOCAL_TIME_VALUE), localTimeValue(null) },
-        { PERIOD, PERIOD_VALUE, periodValue(PERIOD_VALUE), periodValue(null) },
         { BYTES, BYTES_VALUE, byteArrayValue(BYTES_VALUE), byteArrayValue(null) }
       });
   }

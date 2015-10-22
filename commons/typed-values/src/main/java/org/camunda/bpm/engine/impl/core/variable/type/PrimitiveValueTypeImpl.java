@@ -26,11 +26,8 @@ import org.camunda.bpm.engine.variable.value.BytesValue;
 import org.camunda.bpm.engine.variable.value.DateValue;
 import org.camunda.bpm.engine.variable.value.DoubleValue;
 import org.camunda.bpm.engine.variable.value.IntegerValue;
-import org.camunda.bpm.engine.variable.value.LocalDateValue;
-import org.camunda.bpm.engine.variable.value.LocalTimeValue;
 import org.camunda.bpm.engine.variable.value.LongValue;
 import org.camunda.bpm.engine.variable.value.NumberValue;
-import org.camunda.bpm.engine.variable.value.PeriodValue;
 import org.camunda.bpm.engine.variable.value.ShortValue;
 import org.camunda.bpm.engine.variable.value.StringValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -113,48 +110,6 @@ public abstract class PrimitiveValueTypeImpl extends AbstractValueTypeImpl imple
 
     public DateValue createValue(Object value, Map<String, Object> valueInfo) {
       return Variables.dateValue((Date) value);
-    }
-
-  }
-
-  public static class LocalDateTypeImpl extends PrimitiveValueTypeImpl {
-
-    private static final long serialVersionUID = 1L;
-
-    public LocalDateTypeImpl() {
-      super("Local Date", String.class);
-    }
-
-    public LocalDateValue createValue(Object value, Map<String, Object> valueInfo) {
-      return Variables.localDateValue((String) value);
-    }
-
-  }
-
-  public static class LocalTimeTypeImpl extends PrimitiveValueTypeImpl {
-
-    private static final long serialVersionUID = 1L;
-
-    public LocalTimeTypeImpl() {
-      super("Local Time", String.class);
-    }
-
-    public LocalTimeValue createValue(Object value, Map<String, Object> valueInfo) {
-      return Variables.localTimeValue((String) value);
-    }
-
-  }
-
-  public static class PeriodTypeImpl extends PrimitiveValueTypeImpl {
-
-    private static final long serialVersionUID = 1L;
-
-    public PeriodTypeImpl() {
-      super("Period", String.class);
-    }
-
-    public PeriodValue createValue(Object value, Map<String, Object> valueInfo) {
-      return Variables.periodValue((String) value);
     }
 
   }
