@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:camunda="http://activiti.org/bpmn" targetNamespace="Examples"
+  xmlns:tns="Examples">
+  <message id="outerMessageId" name="OuterEventSubProcessMessage" />
+  <message id="innerMessageId" name="InnerEventSubProcessMessage" />
+  <error id="errorId" errorCode="ThrowBpmnErrorDelegate"/>
+
+  <process id="NestedNonInterruptingMessageEventSubprocessScenarioNestedSubprocess" isExecutable="true">
+    <startEvent id="theStart" />
+    <sequenceFlow sourceRef="theStart" targetRef="outerTask" />
+    <userTask id="outerTask" />
+    <sequenceFlow sourceRef="outerTask" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+
+    <!-- Outer event subprocess -->
+    <subProcess id="outerEventSubProcess"  triggeredByEvent="true">
+      <startEvent id="outerEventEventSubProcessStart" isInterrupting="false">
+        <messageEventDefinition messageRef="outerMessageId" />
+      </startEvent>
+      <sequenceFlow sourceRef="outerEventEventSubProcessStart" targetRef="subProcess" />
+
+      <!-- subprocess -->
+      <subProcess id="subProcess">
+        <startEvent id="subProcessStart" />
+        <sequenceFlow sourceRef="subProcessStart" targetRef="subProcessTask" />
+        <userTask id="subProcessTask" />
+        <sequenceFlow sourceRef="subProcessTask" targetRef="subProcessEnd" />
+        <endEvent id="subProcessEnd" />
+
+        <!-- inner event subprocess -->
+        <subProcess id="innerEventSubProcess" triggeredByEvent="true">
+          <startEvent id="innerEventSubProcessStart" isInterrupting="false">
+            <messageEventDefinition messageRef="innerMessageId" />
+          </startEvent>
+          <sequenceFlow sourceRef="innerEventSubProcessStart" targetRef="innerEventSubProcessTask" />
+          <userTask id="innerEventSubProcessTask" />
+          <sequenceFlow sourceRef="innerEventSubProcessTask" targetRef="throwErrorServiceTask" />
+          <serviceTask id="throwErrorServiceTask" camunda:class="org.camunda.bpm.qa.upgrade.util.ThrowBpmnErrorDelegate" />
+          <sequenceFlow sourceRef="throwErrorServiceTask" targetRef="innerEventSubProcessEnd" />
+          <endEvent id="innerEventSubProcessEnd" />
+        </subProcess>
+      </subProcess>
+    </subProcess>
+
+    <!-- Event subprocess catching the error -->
+    <subProcess id="errorEventSubProcess" triggeredByEvent="true">
+      <startEvent id="errorEventProcessStart" isInterrupting="true">
+        <errorEventDefinition errorRef="errorId"/>
+      </startEvent>
+      <sequenceFlow sourceRef="errorEventProcessStart" targetRef="errorEventSubProcessTask" />
+      <userTask id="errorEventSubProcessTask" />
+      <sequenceFlow sourceRef="errorEventSubProcessTask" targetRef="errorEventSubProcessEnd" />
+      <endEvent id="errorEventSubProcessEnd" />
+    </subProcess>
+  </process>
+</definitions>

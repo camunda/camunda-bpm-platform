@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:camunda="http://activiti.org/bpmn" targetNamespace="Examples"
+  xmlns:tns="Examples">
+  <message id="messageId" name="Message" />
+  <error id="errorId" errorCode="ThrowBpmnErrorDelegate"/>
+
+  <process id="SequentialMultiInstanceReceiveTask" isExecutable="true">
+    <startEvent id="theStart" />
+    <sequenceFlow sourceRef="theStart" targetRef="miReceiveTask" />
+
+    <receiveTask id="miReceiveTask" messageRef="messageId">
+      <extensionElements>
+        <camunda:executionListener
+            event="end"
+            class="org.camunda.bpm.qa.upgrade.util.ThrowBpmnErrorDelegate" />
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="true">
+        <loopCardinality>3</loopCardinality>
+      </multiInstanceLoopCharacteristics>
+    </receiveTask>
+
+    <sequenceFlow sourceRef="miReceiveTask" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+
+    <!-- Boundary event catching the error -->
+    <boundaryEvent id="catchError" attachedToRef="miReceiveTask">
+      <errorEventDefinition errorRef="errorId"/>
+    </boundaryEvent>
+    <sequenceFlow id="flow3" sourceRef="catchError" targetRef="escalatedTask" />
+    <userTask id="escalatedTask" />
+    <sequenceFlow id="flow5" sourceRef="escalatedTask" targetRef="escalatedEnd" />
+    <endEvent id="escalatedEnd" />
+  </process>
+</definitions>

@@ -22,6 +22,12 @@
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
     </dependency>
+    
+    <dependency>
+      <groupId>org.camunda.bpm.qa.upgrade</groupId>
+      <artifactId>camunda-qa-upgrade-scenario-util</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>junit</groupId>

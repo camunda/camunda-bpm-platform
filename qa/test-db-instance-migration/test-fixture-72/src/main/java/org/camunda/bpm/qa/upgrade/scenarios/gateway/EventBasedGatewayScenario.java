@@ -10,35 +10,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.qa.upgrade.scenarios.sentry;
+package org.camunda.bpm.qa.upgrade.scenarios.gateway;
 
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.qa.upgrade.DescribesScenario;
 import org.camunda.bpm.qa.upgrade.ScenarioSetup;
+import org.camunda.bpm.qa.upgrade.Times;
 
 /**
- * Just for testing
- *
  * @author Thorben Lindhauer
  *
  */
-public class OneTaskProcessScenario {
+public class EventBasedGatewayScenario {
 
   @Deployment
-  public static String deployOneTaskProcess() {
-    return "org/camunda/bpm/qa/upgrade/oneTaskProcess.bpmn20.xml";
+  public static String deployProcess() {
+    return "org/camunda/bpm/qa/upgrade/gateway/eventBasedGatewayProcess.bpmn20.xml";
   }
 
-  @DescribesScenario("simpleInstance")
-  public static ScenarioSetup triggerEntryCriterion() {
+  @DescribesScenario("init")
+  @Times(3)
+  public static ScenarioSetup instantiate() {
     return new ScenarioSetup() {
       public void execute(ProcessEngine engine, String scenarioName) {
-        RuntimeService runtimeService = engine.getRuntimeService();
-        runtimeService.startProcessInstanceByKey("oneTaskProcess", scenarioName);
+        engine
+          .getRuntimeService()
+          .startProcessInstanceByKey("EventBasedGatewayScenario", scenarioName);
       }
     };
   }
-
 }
