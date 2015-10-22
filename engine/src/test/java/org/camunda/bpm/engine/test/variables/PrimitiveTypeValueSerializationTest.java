@@ -56,10 +56,7 @@ public class PrimitiveTypeValueSerializationTest {
           { Variables.shortValue((short) 2), Variables.shortValue(null) },
           { Variables.longValue(6L), Variables.longValue(null) },
           { Variables.doubleValue(4.2), Variables.doubleValue(null) },
-          { Variables.dateValue(new Date()), Variables.dateValue(null) },
-          { Variables.localDateValue("2015-09-18"), Variables.localDateValue(null) },
-          { Variables.localTimeValue("10:00:00"), Variables.localTimeValue(null) },
-          { Variables.periodValue("P14D"), Variables.periodValue(null) }
+          { Variables.dateValue(new Date()), Variables.dateValue(null) }
         });
   }
 
