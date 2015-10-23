@@ -264,7 +264,7 @@ public class FeelExceptionTest {
   }
 
   @Test
-  public void testInvalidDateTimeFormat() {
+  public void testInvalidDateAndTimeFormat() {
     assertException("FEEL-01019",
       "date and time('camunda')",
       "date and time('2012-13-13')",

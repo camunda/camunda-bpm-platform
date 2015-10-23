@@ -119,7 +119,7 @@ public class FeelEngineLogger extends FeelLogger {
     return new FeelException(exceptionMessage("017", "Unable to evaluate expression '{}' as no input is set. Maybe the inputExpression is missing or empty.", simpleUnaryTests), e);
   }
 
-  public FeelMethodInvocationException invalidDateTimeFormat(String dateTimeString, Throwable cause) {
+  public FeelMethodInvocationException invalidDateAndTimeFormat(String dateTimeString, Throwable cause) {
     return new FeelMethodInvocationException(exceptionMessage("018", "Invalid date and time format in '{}'", dateTimeString), cause, "date and time", dateTimeString);
   }
 

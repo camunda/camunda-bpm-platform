@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Definitions xmlns="http://www.omg.org/spec/DMN/20130901"
+             xmlns:camunda="http://camunda.org/schema/1.0/dmn"
+             id="definitions"
+             namespace="http://camunda.org/dmn">
+  <ItemDefinition id="itemDefinition">
+    <typeDefinition>date</typeDefinition>
+  </ItemDefinition>
+  <Decision id="decision">
+    <DecisionTable id="decisionTable" isComplete="true" isConsistent="true">
+      <clause id="inputClause">
+        <inputExpression id="inputExpression">
+          <itemDefinition href="#itemDefinition" />
+          <text>dateString</text>
+        </inputExpression>
+        <inputEntry id="inputEntry">
+          <text>date and time(dateString)</text>
+        </inputEntry>
+      </clause>
+      <clause id="outputClause" camunda:output="dateResult">
+        <outputDefinition href="#itemDefinition" />
+        <outputEntry id="outputEntry">
+          <text>dateString</text>
+        </outputEntry>
+      </clause>
+      <rule id="rule">
+        <condition>inputEntry</condition>
+        <conclusion>outputEntry</conclusion>
+      </rule>
+    </DecisionTable>
+  </Decision>
+</Definitions>

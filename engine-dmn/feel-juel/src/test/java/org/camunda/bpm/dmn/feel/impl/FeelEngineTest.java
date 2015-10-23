@@ -164,7 +164,7 @@ public class FeelEngineTest {
 
   @Test
   public void testEndpointDateAndTime() {
-    DateValue dateTime = parseDateTime("2015-12-12T22:12:53");
+    DateValue dateTime = parseDateAndTime("2015-12-12T22:12:53");
 
     assertEvaluatesToTrue(dateTime, "date and time(\"2015-12-12T22:12:53\")");
 
@@ -231,7 +231,7 @@ public class FeelEngineTest {
 
   @Test
   public void testIntervalDateAndTime() {
-    DateValue dateAndTime = parseDateTime("2016-03-03T00:00:00");
+    DateValue dateAndTime = parseDateAndTime("2016-03-03T00:00:00");
     assertEvaluatesToTrue(dateAndTime, "[date and time(\"2015-12-12T00:00:00\")..date and time(\"2016-06-06T00:00:00\")]");
     assertEvaluatesToTrue(dateAndTime, "[date and time(\"2015-12-12T00:00:00\")..date and time(\"2016-06-06T00:00:00\"))");
     assertEvaluatesToTrue(dateAndTime, "[date and time(\"2015-12-12T00:00:00\")..date and time(\"2016-06-06T00:00:00\")[");
@@ -253,7 +253,7 @@ public class FeelEngineTest {
     assertEvaluatesToTrue(dateAndTime, "(date and time(\"2016-03-02T23:59:59\")..date and time(\"2016-06-06T00:00:00\")]");
 
 
-    dateAndTime = parseDateTime("2013-03-03T00:00:00");
+    dateAndTime = parseDateAndTime("2013-03-03T00:00:00");
     assertEvaluatesToFalse(dateAndTime, "[date and time(\"2015-12-12T00:00:00\")..date and time(\"2016-06-06T00:00:00\")]");
     assertEvaluatesToFalse(dateAndTime, "[date and time(\"2015-12-12T00:00:00\")..date and time(\"2016-06-06T00:00:00\"))");
     assertEvaluatesToFalse(dateAndTime, "[date and time(\"2015-12-12T00:00:00\")..date and time(\"2016-06-06T00:00:00\")[");
@@ -357,8 +357,8 @@ public class FeelEngineTest {
     return feelEngine.evaluateSimpleUnaryTests(feelExpression, INPUT_VARIABLE, variables);
   }
 
-  protected DateValue parseDateTime(String dateTimeString) {
-    Date date = FeelFunctionMapper.parseDateTime(dateTimeString);
+  protected DateValue parseDateAndTime(String dateAndTimeString) {
+    Date date = FeelFunctionMapper.parseDateAndTime(dateAndTimeString);
     return Variables.dateValue(date);
   }
 

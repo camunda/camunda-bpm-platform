@@ -28,10 +28,13 @@ public class FeelFunctionMapper extends FunctionMapper {
 
   public static final FeelEngineLogger LOG = FeelLogger.ENGINE_LOGGER;
 
+  public static final SimpleDateFormat FEEL_DATE_AND_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+  public static final String JUEL_DATE_AND_TIME_METHOD = "dateAndTime";
+
   protected static final Map<String, Method> methods = new HashMap<String, Method>();
 
   static {
-    methods.put("dateTime", getMethod("parseDateTime", String.class));
+    methods.put(JUEL_DATE_AND_TIME_METHOD, getMethod("parseDateAndTime", String.class));
   }
 
   public Method resolveFunction(String prefix, String localName) {
@@ -46,12 +49,11 @@ public class FeelFunctionMapper extends FunctionMapper {
     }
   }
 
-  public static Date parseDateTime(String dateTimeString) {
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+  public static Date parseDateAndTime(String dateAndTimeString) {
     try {
-      return simpleDateFormat.parse(dateTimeString);
+      return FEEL_DATE_AND_TIME_FORMAT.parse(dateAndTimeString);
     } catch (ParseException e) {
-      throw LOG.invalidDateTimeFormat(dateTimeString, e);
+      throw LOG.invalidDateAndTimeFormat(dateAndTimeString, e);
     }
   }
 

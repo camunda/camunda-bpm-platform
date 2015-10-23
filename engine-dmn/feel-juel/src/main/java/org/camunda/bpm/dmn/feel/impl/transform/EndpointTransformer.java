@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.dmn.feel.impl.transform;
 
+import static org.camunda.bpm.dmn.feel.impl.el.FeelFunctionMapper.JUEL_DATE_AND_TIME_METHOD;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,7 +29,7 @@ public class EndpointTransformer implements FeelToJuelTransformer {
   public String transform(FeelToJuelTransform transform, String feelExpression, String inputName) {
     Matcher matcher = DATE_AND_TIME_PATTERN.matcher(feelExpression);
     if (matcher.matches()) {
-      return "dateTime(" + matcher.group(1) + ")";
+      return JUEL_DATE_AND_TIME_METHOD + "(" + matcher.group(1) + ")";
     }
     else {
       return feelExpression;

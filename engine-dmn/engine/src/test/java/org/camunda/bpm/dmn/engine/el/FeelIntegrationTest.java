@@ -22,6 +22,12 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.logging.SimpleFormatter;
+
+import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
+import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.impl.DmnEngineConfigurationImpl;
@@ -31,6 +37,9 @@ import org.camunda.bpm.dmn.feel.FeelEngine;
 import org.camunda.bpm.dmn.feel.FeelEngineProvider;
 import org.camunda.bpm.dmn.feel.FeelException;
 import org.camunda.bpm.dmn.feel.impl.FeelEngineProviderImpl;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.DateValue;
 import org.junit.Test;
 
 public class FeelIntegrationTest extends DmnDecisionTest {
@@ -110,6 +119,27 @@ public class FeelIntegrationTest extends DmnDecisionTest {
       assertThat(e).hasMessageStartingWith("FEEL-01015");
       assertThat(e.getMessage()).doesNotContain("${");
     }
+  }
+
+  @Test
+  @DecisionResource()
+  public void testDateAndTimeIntegration() {
+    Date testDate = new Date(1445526087000L);
+    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
+    VariableMap variables = Variables.createVariables()
+      .putValue("dateString", format.format(testDate));
+
+    DmnDecisionResult result = engine.evaluate(decision, variables);
+    assertThat(result).hasSize(1);
+
+    DmnDecisionOutput output = result.getSingleOutput();
+    assertThat(output).hasSize(1);
+
+    // FIXME: result output should be typed Value (CAM-4725)
+    Date dateResult = output.getSingleValue();
+    DateValue expectedResult = Variables.dateValue(testDate);
+    assertThat(dateResult).isEqualTo(expectedResult.getValue());
   }
 
   public class TestFeelEngineProvider implements FeelEngineProvider {

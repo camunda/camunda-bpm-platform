@@ -204,6 +204,7 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
       for (DmnDecisionTableRule matchingRule : decisionTableResult.getMatchingRules()) {
         DmnDecisionOutputImpl decisionOutput = new DmnDecisionOutputImpl();
         for (DmnDecisionTableValue outputValue : matchingRule.getOutputs().values()) {
+          // FIXME: result output should be typed Value (CAM-4725)
           decisionOutput.put(outputValue.getOutputName(), outputValue.getValue().getValue());
         }
         decisionResult.add(decisionOutput);
