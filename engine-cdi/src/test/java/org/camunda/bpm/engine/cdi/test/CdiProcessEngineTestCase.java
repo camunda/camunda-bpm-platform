@@ -21,6 +21,11 @@ import javax.enterprise.inject.spi.BeanManager;
 
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
+import org.camunda.bpm.engine.AuthorizationService;
+import org.camunda.bpm.engine.CaseService;
+import org.camunda.bpm.engine.DecisionService;
+import org.camunda.bpm.engine.ExternalTaskService;
+import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
@@ -79,6 +84,12 @@ public abstract class CdiProcessEngineTestCase {
   protected RepositoryService repositoryService;
   protected RuntimeService runtimeService;
   protected TaskService taskService;
+  protected AuthorizationService authorizationService;
+  protected FilterService filterService;
+  protected ExternalTaskService externalTaskService;
+  protected CaseService caseService;
+  protected DecisionService decisionService;
+
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
   @Before
@@ -98,6 +109,11 @@ public abstract class CdiProcessEngineTestCase {
     repositoryService = processEngine.getRepositoryService();
     runtimeService = processEngine.getRuntimeService();
     taskService = processEngine.getTaskService();
+    authorizationService = processEngine.getAuthorizationService();
+    filterService = processEngine.getFilterService();
+    externalTaskService = processEngine.getExternalTaskService();
+    caseService = processEngine.getCaseService();
+    decisionService = processEngine.getDecisionService();
   }
 
   @After
@@ -113,6 +129,11 @@ public abstract class CdiProcessEngineTestCase {
     repositoryService = null;
     runtimeService = null;
     taskService = null;
+    authorizationService = null;
+    filterService = null;
+    externalTaskService = null;
+    caseService = null;
+    decisionService = null;
     processEngineRule = null;
   }
 

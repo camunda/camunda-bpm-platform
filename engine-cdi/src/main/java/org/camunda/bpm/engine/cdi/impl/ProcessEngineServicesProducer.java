@@ -19,6 +19,9 @@ import javax.inject.Named;
 
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.engine.AuthorizationService;
+import org.camunda.bpm.engine.CaseService;
+import org.camunda.bpm.engine.DecisionService;
+import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
@@ -71,5 +74,11 @@ public class ProcessEngineServicesProducer {
   @Produces @Named @ApplicationScoped public AuthorizationService authorizationService() { return processEngine().getAuthorizationService(); }
 
   @Produces @Named @ApplicationScoped public FilterService filterService() { return processEngine().getFilterService(); }
+
+  @Produces @Named @ApplicationScoped public ExternalTaskService externalTaskService() { return processEngine().getExternalTaskService(); }
+
+  @Produces @Named @ApplicationScoped public CaseService caseService() { return processEngine().getCaseService(); }
+
+  @Produces @Named @ApplicationScoped public DecisionService decisionService() { return processEngine().getDecisionService(); }
 
 }
