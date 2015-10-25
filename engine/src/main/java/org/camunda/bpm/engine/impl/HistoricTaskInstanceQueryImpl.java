@@ -291,7 +291,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   }
 
   @Override
-  public boolean hasExcludingConditions() {
+  protected boolean hasExcludingConditions() {
     boolean excluding = super.hasExcludingConditions();
     excluding = excluding || (finished && unfinished);
     excluding = excluding ||(processFinished && processUnfinished);

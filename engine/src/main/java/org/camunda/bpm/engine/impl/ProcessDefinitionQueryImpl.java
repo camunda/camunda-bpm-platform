@@ -208,7 +208,7 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   }
 
   @Override
-  public boolean hasExcludingConditions() {
+  protected boolean hasExcludingConditions() {
     return super.hasExcludingConditions() || CompareUtil.hasExcludingContains(id, ids);
   }
 

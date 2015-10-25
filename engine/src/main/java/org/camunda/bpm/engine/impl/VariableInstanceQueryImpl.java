@@ -146,7 +146,7 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
   }
 
   @Override
-  public boolean hasExcludingConditions() {
+  protected boolean hasExcludingConditions() {
     return super.hasExcludingConditions() || CompareUtil.hasExcludingContains(variableName, variableNames);
   }
 

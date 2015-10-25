@@ -165,7 +165,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
   }
 
   @Override
-  public boolean hasExcludingConditions() {
+  protected boolean hasExcludingConditions() {
     return super.hasExcludingConditions() || CompareUtil.hasExcludingContains(id, ids);
   }
 

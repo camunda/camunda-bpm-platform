@@ -249,7 +249,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
   }
 
   @Override
-  public boolean hasExcludingConditions() {
+  protected boolean hasExcludingConditions() {
     boolean excluding = super.hasExcludingConditions();
     excluding = excluding || CompareUtil.hasExcludingOrder(createdAfter, createdBefore);
     excluding = excluding || CompareUtil.hasExcludingOrder(closedAfter, closedBefore);

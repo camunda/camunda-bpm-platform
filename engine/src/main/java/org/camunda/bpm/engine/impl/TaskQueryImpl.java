@@ -710,7 +710,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   @Override
-  public boolean hasExcludingConditions() {
+  protected boolean hasExcludingConditions() {
     boolean excluding = super.hasExcludingConditions();
     excluding = excluding || CompareUtil.hasExcludingOrder(minPriority, priority, maxPriority);
     excluding = excluding || CompareUtil.hasExcludingOrder(dueAfter, dueDate, dueBefore);

@@ -204,7 +204,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
   }
 
   @Override
-  public boolean hasExcludingConditions() {
+  protected boolean hasExcludingConditions() {
     boolean excluding = super.hasExcludingConditions();
     excluding = excluding || CompareUtil.hasExcludingOrder(priorityHigherThanOrEqual, priorityLowerThanOrEqual);
     excluding = excluding || isExcludingDueDate();
