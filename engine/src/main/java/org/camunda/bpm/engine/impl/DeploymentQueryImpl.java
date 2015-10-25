@@ -86,8 +86,8 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
   }
 
   @Override
-  public boolean isValid() {
-    return super.isValid() && CompareUtil.validateOrder(deploymentAfter, deploymentBefore);
+  public boolean hasExcludingConditions() {
+    return super.hasExcludingConditions() || CompareUtil.hasExcludingOrder(deploymentAfter, deploymentBefore);
   }
 
   //sorting ////////////////////////////////////////////////////////

@@ -174,7 +174,7 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
   }
 
   @Override
-  public boolean isValid() {
-    return super.isValid() && CompareUtil.validateOrder(timestampAfter, timestampBefore);
+  public boolean hasExcludingConditions() {
+    return super.hasExcludingConditions() || CompareUtil.hasExcludingOrder(timestampAfter, timestampBefore);
   }
 }

@@ -212,11 +212,11 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
   }
 
   @Override
-  public boolean isValid() {
-    boolean valid = super.isValid();
-    valid = valid && CompareUtil.validateOrder(createdAfter, createdBefore);
-    valid = valid && CompareUtil.validateOrder(endedAfter, endedBefore);
-    return valid;
+  public boolean hasExcludingConditions() {
+    boolean excluding = super.hasExcludingConditions();
+    excluding = excluding || CompareUtil.hasExcludingOrder(createdAfter, createdBefore);
+    excluding = excluding || CompareUtil.hasExcludingOrder(endedAfter, endedBefore);
+    return excluding;
   }
 
   // ordering

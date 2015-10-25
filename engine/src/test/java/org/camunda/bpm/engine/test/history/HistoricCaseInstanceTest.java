@@ -151,8 +151,7 @@ public class HistoricCaseInstanceTest extends CmmnProcessEngineTestCase {
     assertCount(0, historicQuery().closedBefore(created));
     assertCount(1, historicQuery().closedBefore(afterClose));
 
-//    TODO method fails due to the call to closed() in the query
-//    assertCount(0, historicQuery().closedBefore(created).closedAfter(afterClose));
+    assertCount(0, historicQuery().closedBefore(created).closedAfter(afterClose));
 
     assertCount(1, historicQuery().closedBefore(afterClose).closedAfter(created));
   }

@@ -291,13 +291,13 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   }
 
   @Override
-  public boolean isValid() {
-    boolean valid = super.isValid();
-    valid = valid && !(finished && unfinished);
-    valid = valid && !(processFinished && processUnfinished);
-    valid = valid && CompareUtil.validateOrder(dueAfter, dueDate, dueBefore);
-    valid = valid && CompareUtil.validateOrder(followUpAfter, followUpDate, followUpBefore);
-    return valid;
+  public boolean hasExcludingConditions() {
+    boolean excluding = super.hasExcludingConditions();
+    excluding = excluding || (finished && unfinished);
+    excluding = excluding ||(processFinished && processUnfinished);
+    excluding = excluding || CompareUtil.hasExcludingOrder(dueAfter, dueDate, dueBefore);
+    excluding = excluding || CompareUtil.hasExcludingOrder(followUpAfter, followUpDate, followUpBefore);
+    return excluding;
   }
 
   // ordering /////////////////////////////////////////////////////////////////

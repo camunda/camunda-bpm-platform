@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.impl;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -147,8 +146,8 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
   }
 
   @Override
-  public boolean isValid() {
-    return super.isValid() && CompareUtil.validateContains(variableName, variableNames);
+  public boolean hasExcludingConditions() {
+    return super.hasExcludingConditions() || CompareUtil.hasExcludingContains(variableName, variableNames);
   }
 
   // results ////////////////////////////////////////////////////

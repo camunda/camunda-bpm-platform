@@ -16,7 +16,6 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -711,16 +710,16 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   @Override
-  public boolean isValid() {
-    boolean valid = super.isValid();
-    valid = valid && CompareUtil.validateOrder(minPriority, priority, maxPriority);
-    valid = valid && CompareUtil.validateOrder(dueAfter, dueDate, dueBefore);
-    valid = valid && CompareUtil.validateOrder(followUpAfter, followUpDate, followUpBefore);
-    valid = valid && CompareUtil.validateOrder(createTimeAfter, createTime, createTimeBefore);
-    valid = valid && CompareUtil.validateContains(key, taskDefinitionKeys);
-    valid = valid && CompareUtil.validateContains(processDefinitionKey, processDefinitionKeys);
-    valid = valid && CompareUtil.validateContains(processInstanceBusinessKey, processInstanceBusinessKeys);
-    return valid;
+  public boolean hasExcludingConditions() {
+    boolean excluding = super.hasExcludingConditions();
+    excluding = excluding || CompareUtil.hasExcludingOrder(minPriority, priority, maxPriority);
+    excluding = excluding || CompareUtil.hasExcludingOrder(dueAfter, dueDate, dueBefore);
+    excluding = excluding || CompareUtil.hasExcludingOrder(followUpAfter, followUpDate, followUpBefore);
+    excluding = excluding || CompareUtil.hasExcludingOrder(createTimeAfter, createTime, createTimeBefore);
+    excluding = excluding || CompareUtil.hasExcludingContains(key, taskDefinitionKeys);
+    excluding = excluding || CompareUtil.hasExcludingContains(processDefinitionKey, processDefinitionKeys);
+    excluding = excluding || CompareUtil.hasExcludingContains(processInstanceBusinessKey, processInstanceBusinessKeys);
+    return excluding;
   }
 
   public List<String> getCandidateGroups() {

@@ -204,14 +204,14 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
   }
 
   @Override
-  public boolean isValid() {
-    boolean valid = super.isValid();
-    valid = valid && CompareUtil.validateOrder(priorityHigherThanOrEqual, priorityLowerThanOrEqual);
-    valid = valid && validateQueryByDueDate();
-    return valid;
+  public boolean hasExcludingConditions() {
+    boolean excluding = super.hasExcludingConditions();
+    excluding = excluding || CompareUtil.hasExcludingOrder(priorityHigherThanOrEqual, priorityLowerThanOrEqual);
+    excluding = excluding || isExcludingDueDate();
+    return excluding;
   }
 
-  private boolean validateQueryByDueDate() {
+  private boolean isExcludingDueDate() {
     List<Date> dueDates = new ArrayList<Date>();
     if (duedateHigherThan != null && duedateHigherThanOrEqual != null) {
       if (duedateHigherThan.compareTo(duedateHigherThanOrEqual) <= 0) {
@@ -241,7 +241,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
       dueDates.add(duedateLowerThanOrEqual);
     }
 
-    return CompareUtil.validateOrder(dueDates);
+    return CompareUtil.hasExcludingOrder(dueDates);
   }
 
   //sorting //////////////////////////////////////////

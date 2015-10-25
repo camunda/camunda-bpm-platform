@@ -18,7 +18,6 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNull;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -250,13 +249,13 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
   }
 
   @Override
-  public boolean isValid() {
-    boolean valid = super.isValid();
-    valid = valid && CompareUtil.validateOrder(createdAfter, createdBefore);
-    valid = valid && CompareUtil.validateOrder(closedAfter, closedBefore);
-    valid = valid && CompareUtil.validateContains(caseInstanceId, caseInstanceIds);
-    valid = valid && CompareUtil.validateNotContains(caseDefinitionKey, caseKeyNotIn);
-    return valid;
+  public boolean hasExcludingConditions() {
+    boolean excluding = super.hasExcludingConditions();
+    excluding = excluding || CompareUtil.hasExcludingOrder(createdAfter, createdBefore);
+    excluding = excluding || CompareUtil.hasExcludingOrder(closedAfter, closedBefore);
+    excluding = excluding || CompareUtil.hasExcludingContains(caseInstanceId, caseInstanceIds);
+    excluding = excluding || CompareUtil.hasExcludingNotContains(caseDefinitionKey, caseKeyNotIn);
+    return excluding;
   }
 
   public String getBusinessKey() {

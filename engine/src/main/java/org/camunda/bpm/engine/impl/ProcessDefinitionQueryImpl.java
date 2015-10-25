@@ -208,8 +208,8 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   }
 
   @Override
-  public boolean isValid() {
-    return super.isValid() && CompareUtil.validateContains(id, ids);
+  public boolean hasExcludingConditions() {
+    return super.hasExcludingConditions() || CompareUtil.hasExcludingContains(id, ids);
   }
 
   //sorting ////////////////////////////////////////////

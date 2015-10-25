@@ -167,10 +167,10 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
   }
 
   @Override
-  protected boolean isValid() {
-    boolean valid = super.isValid();
-    valid = valid && CompareUtil.validateOrder(jobPriorityHigherThanOrEqual, jobPriorityLowerThanOrEqual);
-    return valid;
+  protected boolean hasExcludingConditions() {
+    boolean excluding = super.hasExcludingConditions();
+    excluding = excluding || CompareUtil.hasExcludingOrder(jobPriorityHigherThanOrEqual, jobPriorityLowerThanOrEqual);
+    return excluding;
   }
 
   // order by //////////////////////////////////////////////

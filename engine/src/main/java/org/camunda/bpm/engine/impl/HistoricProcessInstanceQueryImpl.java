@@ -177,14 +177,14 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   }
 
   @Override
-  public boolean isValid() {
-    boolean valid = super.isValid();
-    valid = valid && !(finished && unfinished);
-    valid = valid && CompareUtil.validateOrder(startedAfter, startedBefore);
-    valid = valid && CompareUtil.validateOrder(finishedAfter, finishedBefore);
-    valid = valid && CompareUtil.validateNotContains(processDefinitionKey, processKeyNotIn);
-    valid = valid && CompareUtil.validateContains(processInstanceId, processInstanceIds);
-    return valid;
+  public boolean hasExcludingConditions() {
+    boolean excluding = super.hasExcludingConditions();
+    excluding = excluding || (finished && unfinished);
+    excluding = excluding || CompareUtil.hasExcludingOrder(startedAfter, startedBefore);
+    excluding = excluding || CompareUtil.hasExcludingOrder(finishedAfter, finishedBefore);
+    excluding = excluding || CompareUtil.hasExcludingNotContains(processDefinitionKey, processKeyNotIn);
+    excluding = excluding || CompareUtil.hasExcludingContains(processInstanceId, processInstanceIds);
+    return excluding;
   }
 
 	public HistoricProcessInstanceQuery orderByProcessInstanceBusinessKey() {
