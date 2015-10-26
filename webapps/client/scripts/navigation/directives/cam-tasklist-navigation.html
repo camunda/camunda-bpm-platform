@@ -53,7 +53,7 @@
            class="dropdown-toggle"
            data-toggle="dropdown">
           <span class="glyphicon glyphicon-user"></span>
-          {{ authentication.name }}
+          {{ (userFullName || authentication.name) }}
         </a>
         <ul class="dropdown-menu">
           <li class="user-profile">
