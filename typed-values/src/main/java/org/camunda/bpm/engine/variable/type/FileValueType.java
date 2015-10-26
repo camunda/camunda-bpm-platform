@@ -18,4 +18,8 @@ package org.camunda.bpm.engine.variable.type;
  */
 public interface FileValueType extends ValueType {
 
+  static final String VALUE_INFO_FILE_NAME = "filename";
+  static final String VALUE_INFO_FILE_MIME_TYPE = "mimeType";
+  static final String VALUE_INFO_FILE_ENCODING = "encoding";
+
 }

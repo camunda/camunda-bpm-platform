@@ -34,9 +34,6 @@ import org.camunda.bpm.engine.variable.value.builder.FileValueBuilder;
 public class FileValueTypeImpl extends AbstractValueTypeImpl implements FileValueType {
 
   private static final long serialVersionUID = 1L;
-  public final static String VALUE_INFO_FILE_NAME = "filename";
-  public final static String VALUE_INFO_FILE_MIME_TYPE = "mimeType";
-  public static final String VALUE_INFO_FILE_ENCODING = "encoding";
 
   public FileValueTypeImpl() {
     super("file");
