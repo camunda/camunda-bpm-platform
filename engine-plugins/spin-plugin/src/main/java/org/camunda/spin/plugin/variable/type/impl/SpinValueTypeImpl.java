@@ -30,8 +30,6 @@ public abstract class SpinValueTypeImpl extends AbstractValueTypeImpl implements
 
   private static final long serialVersionUID = 1L;
 
-  public final static String VALUE_INFO_SERIALIZATION_DATA_FORMAT = "serializationDataFormat";
-
   public SpinValueTypeImpl(String name) {
     super(name);
   }

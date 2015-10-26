@@ -3,7 +3,7 @@ package org.camunda.bpm.engine.rest.util;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.core.variable.type.ObjectTypeImpl;
+import org.camunda.bpm.engine.variable.type.SerializableValueType;
 
 /**
  * <p>Builds maps that fulfill the camunda variable json format.</p>
@@ -102,8 +102,8 @@ public class VariablesBuilder {
     }
 
     Map<String, Object> typeInfo = new HashMap<String, Object>();
-    typeInfo.put(ObjectTypeImpl.VALUE_INFO_SERIALIZATION_DATA_FORMAT, serializationFormat);
-    typeInfo.put(ObjectTypeImpl.VALUE_INFO_OBJECT_TYPE_NAME, objectTypeName);
+    typeInfo.put(SerializableValueType.VALUE_INFO_SERIALIZATION_DATA_FORMAT, serializationFormat);
+    typeInfo.put(SerializableValueType.VALUE_INFO_OBJECT_TYPE_NAME, objectTypeName);
 
     serializedVariable.put("valueInfo", typeInfo);
 

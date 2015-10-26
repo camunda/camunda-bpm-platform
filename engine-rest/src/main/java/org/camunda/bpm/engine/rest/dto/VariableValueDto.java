@@ -22,7 +22,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.impl.core.variable.type.FileValueTypeImpl;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
@@ -216,7 +215,7 @@ public class VariableValueDto {
       }
 
       dto.valueInfo = new HashMap<String, Object>();
-      dto.valueInfo.put(FileValueTypeImpl.VALUE_INFO_FILE_NAME, binaryDataFormPart.getFileName());
+      dto.valueInfo.put(FileValueType.VALUE_INFO_FILE_NAME, binaryDataFormPart.getFileName());
       MimeType mimeType = null;
       try {
         mimeType = new MimeType(contentType);
@@ -224,11 +223,11 @@ public class VariableValueDto {
         throw new RestException(Status.BAD_REQUEST, "Invalid mime type given");
       }
 
-      dto.valueInfo.put(FileValueTypeImpl.VALUE_INFO_FILE_MIME_TYPE, mimeType.getBaseType());
+      dto.valueInfo.put(FileValueType.VALUE_INFO_FILE_MIME_TYPE, mimeType.getBaseType());
 
       String encoding = mimeType.getParameter("encoding");
       if (encoding != null) {
-        dto.valueInfo.put(FileValueTypeImpl.VALUE_INFO_FILE_ENCODING, encoding);
+        dto.valueInfo.put(FileValueType.VALUE_INFO_FILE_ENCODING, encoding);
       }
     }
 

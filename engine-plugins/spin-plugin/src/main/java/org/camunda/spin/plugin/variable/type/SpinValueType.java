@@ -22,8 +22,10 @@ import org.camunda.spin.plugin.variable.type.impl.XmlValueTypeImpl;
  */
 public interface SpinValueType extends SerializableValueType {
 
-  public static final SpinValueType JSON = new JsonValueTypeImpl();
+  static final String VALUE_INFO_SERIALIZATION_DATA_FORMAT = "serializationDataFormat";
 
-  public static final SpinValueType XML = new XmlValueTypeImpl();
+  static final SpinValueType JSON = new JsonValueTypeImpl();
+
+  static final SpinValueType XML = new XmlValueTypeImpl();
 
 }
