@@ -13,6 +13,7 @@ module.exports = {
     combine(
       operation('deployment', 'create', [{
         deploymentName:  'first-deployment',
+        deploymentSource: 'process application',
         files: [{
           name: 'user-tasks.bpmn',
           content: fs.readFileSync(__dirname + '/../../resources/user-tasks.bpmn').toString()
@@ -27,6 +28,7 @@ module.exports = {
       },
       {
         deploymentName:  'third-deployment',
+        deploymentSource: 'cockpit',
         files: [{
           name: 'failing-process.bpmn',
           content: fs.readFileSync(__dirname + '/../../resources/failing-process.bpmn').toString()

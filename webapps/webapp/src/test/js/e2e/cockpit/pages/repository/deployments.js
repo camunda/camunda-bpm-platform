@@ -23,6 +23,10 @@ module.exports = Page.extend({
     return this.deploymentList().get(idx).element(by.binding('deployment.name'));
   },
 
+  deploymentSource: function(idx) {
+    return this.deploymentList().get(idx).element(by.css('.source .value')).getText();
+  },
+
   selectDeployment: function(idxOrName) {
     var that = this;
     function callPageObject(idx) {

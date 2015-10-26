@@ -173,6 +173,41 @@ describe('Repository Spec', function() {
 
     });
 
+    describe('search by deployment source', function() {
+
+      it('should search by invalid deployment source', function() {
+
+        // when
+        deploymentsPage.createSearch('Deployment Source', '=', 'xyz');
+
+        //then
+        expect(deploymentsPage.deploymentList().count()).to.eventually.eql(0);
+      });
+
+      it('should search by process application deployment source', function() {
+
+        // when
+        deploymentsPage.changeValue(0, 'process application');
+
+        // then
+        expect(deploymentsPage.deploymentList().count()).to.eventually.eql(1);
+        expect(deploymentsPage.deploymentName(0)).to.eventually.eql('first-deployment');
+        expect(deploymentsPage.deploymentSource(0)).to.eventually.eql('process application');
+      });
+
+      it('should search for undefined deployment sources', function() {
+
+        // when
+        deploymentsPage.changeType(0, 'Deployment Source Undefined');
+
+        // then
+        expect(deploymentsPage.deploymentList().count()).to.eventually.eql(1);
+        expect(deploymentsPage.deploymentName(0)).to.eventually.eql('second-deployment');
+        expect(deploymentsPage.deploymentSource(0)).to.eventually.eql('<undefined>');
+      });
+
+    });
+
   });
 
   describe('deployment selection', function() {
