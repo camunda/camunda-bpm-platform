@@ -53,7 +53,7 @@ define([
     decisionData.provide('allDefinitions', [ 'decisionDefinition', function(decisionDefinition) {
       var deferred = $q.defer();
 
-      decisionDefinitionService.list({ key: decisionDefinition.key }, function(err, data) {
+      decisionDefinitionService.list({ key: decisionDefinition.key, sortBy: 'version', sortOrder: 'desc' }, function(err, data) {
         if(!err) {
           deferred.resolve(data);
         } else {
