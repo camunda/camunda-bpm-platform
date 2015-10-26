@@ -74,7 +74,8 @@
               <artifactSet>
                 <excludes>
                   <exclude>org.camunda.commons:*</exclude>
-                  <exclude>org.slf4j:*</exclude>
+                  <exclude>org.camunda.bpm.dmn:camunda-engine-feel-api</exclude>
+                  <exclude>org.slf4j:*</exclude>                  
                 </excludes>
               </artifactSet>
               <relocations>
