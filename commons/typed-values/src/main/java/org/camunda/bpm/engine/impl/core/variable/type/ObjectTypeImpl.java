@@ -29,9 +29,6 @@ import org.camunda.bpm.engine.variable.value.builder.SerializedObjectValueBuilde
  */
 public class ObjectTypeImpl extends AbstractValueTypeImpl implements SerializableValueType {
 
-  public final static String VALUE_INFO_OBJECT_TYPE_NAME = "objectTypeName";
-  public final static String VALUE_INFO_SERIALIZATION_DATA_FORMAT = "serializationDataFormat";
-
   private static final long serialVersionUID = 1L;
 
   public static final String TYPE_NAME = "object";
