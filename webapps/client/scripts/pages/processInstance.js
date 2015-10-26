@@ -407,7 +407,7 @@ define([
         .breadcrumbsAdd(crumbs);
 
       page.titleSet([
-        'camunda Cockpit',
+        'Camunda Cockpit',
         $scope.processDefinition.name || $scope.processDefinition.id,
         'Instance View'
       ].join(' | '));

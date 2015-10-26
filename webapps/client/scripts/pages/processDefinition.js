@@ -263,7 +263,7 @@ define([
       });
 
       page.titleSet([
-        'camunda Cockpit',
+        'Camunda Cockpit',
         definition.name || definition.key || definition.id,
         'Definition View'
       ].join(' | '));
