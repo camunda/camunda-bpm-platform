@@ -180,10 +180,10 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected boolean hasExcludingConditions() {
     boolean excluding = super.hasExcludingConditions();
     excluding = excluding || (finished && unfinished);
-    excluding = excluding || CompareUtil.hasExcludingOrder(startedAfter, startedBefore);
-    excluding = excluding || CompareUtil.hasExcludingOrder(finishedAfter, finishedBefore);
-    excluding = excluding || CompareUtil.hasExcludingNotContains(processDefinitionKey, processKeyNotIn);
-    excluding = excluding || CompareUtil.hasExcludingContains(processInstanceId, processInstanceIds);
+    excluding = excluding || CompareUtil.areNotInAnAscendingOrder(startedAfter, startedBefore);
+    excluding = excluding || CompareUtil.areNotInAnAscendingOrder(finishedAfter, finishedBefore);
+    excluding = excluding || CompareUtil.elementIsContainedInList(processDefinitionKey, processKeyNotIn);
+    excluding = excluding || CompareUtil.elementIsNotContainedInList(processInstanceId, processInstanceIds);
     return excluding;
   }
 

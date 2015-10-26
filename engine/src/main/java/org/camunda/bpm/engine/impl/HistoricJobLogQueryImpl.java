@@ -169,7 +169,7 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
   @Override
   protected boolean hasExcludingConditions() {
     boolean excluding = super.hasExcludingConditions();
-    excluding = excluding || CompareUtil.hasExcludingOrder(jobPriorityHigherThanOrEqual, jobPriorityLowerThanOrEqual);
+    excluding = excluding || CompareUtil.areNotInAnAscendingOrder(jobPriorityHigherThanOrEqual, jobPriorityLowerThanOrEqual);
     return excluding;
   }
 

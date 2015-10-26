@@ -87,7 +87,7 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
 
   @Override
   protected boolean hasExcludingConditions() {
-    return super.hasExcludingConditions() || CompareUtil.hasExcludingOrder(deploymentAfter, deploymentBefore);
+    return super.hasExcludingConditions() || CompareUtil.areNotInAnAscendingOrder(deploymentAfter, deploymentBefore);
   }
 
   //sorting ////////////////////////////////////////////////////////

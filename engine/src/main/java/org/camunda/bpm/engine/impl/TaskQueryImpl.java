@@ -712,13 +712,13 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   @Override
   protected boolean hasExcludingConditions() {
     boolean excluding = super.hasExcludingConditions();
-    excluding = excluding || CompareUtil.hasExcludingOrder(minPriority, priority, maxPriority);
-    excluding = excluding || CompareUtil.hasExcludingOrder(dueAfter, dueDate, dueBefore);
-    excluding = excluding || CompareUtil.hasExcludingOrder(followUpAfter, followUpDate, followUpBefore);
-    excluding = excluding || CompareUtil.hasExcludingOrder(createTimeAfter, createTime, createTimeBefore);
-    excluding = excluding || CompareUtil.hasExcludingContains(key, taskDefinitionKeys);
-    excluding = excluding || CompareUtil.hasExcludingContains(processDefinitionKey, processDefinitionKeys);
-    excluding = excluding || CompareUtil.hasExcludingContains(processInstanceBusinessKey, processInstanceBusinessKeys);
+    excluding = excluding || CompareUtil.areNotInAnAscendingOrder(minPriority, priority, maxPriority);
+    excluding = excluding || CompareUtil.areNotInAnAscendingOrder(dueAfter, dueDate, dueBefore);
+    excluding = excluding || CompareUtil.areNotInAnAscendingOrder(followUpAfter, followUpDate, followUpBefore);
+    excluding = excluding || CompareUtil.areNotInAnAscendingOrder(createTimeAfter, createTime, createTimeBefore);
+    excluding = excluding || CompareUtil.elementIsNotContainedInArray(key, taskDefinitionKeys);
+    excluding = excluding || CompareUtil.elementIsNotContainedInArray(processDefinitionKey, processDefinitionKeys);
+    excluding = excluding || CompareUtil.elementIsNotContainedInArray(processInstanceBusinessKey, processInstanceBusinessKeys);
     return excluding;
   }
 

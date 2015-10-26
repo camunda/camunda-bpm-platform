@@ -206,7 +206,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
   @Override
   protected boolean hasExcludingConditions() {
     boolean excluding = super.hasExcludingConditions();
-    excluding = excluding || CompareUtil.hasExcludingOrder(priorityHigherThanOrEqual, priorityLowerThanOrEqual);
+    excluding = excluding || CompareUtil.areNotInAnAscendingOrder(priorityHigherThanOrEqual, priorityLowerThanOrEqual);
     excluding = excluding || isExcludingDueDate();
     return excluding;
   }
@@ -241,7 +241,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
       dueDates.add(duedateLowerThanOrEqual);
     }
 
-    return CompareUtil.hasExcludingOrder(dueDates);
+    return CompareUtil.areNotInAnAscendingOrder(dueDates);
   }
 
   //sorting //////////////////////////////////////////

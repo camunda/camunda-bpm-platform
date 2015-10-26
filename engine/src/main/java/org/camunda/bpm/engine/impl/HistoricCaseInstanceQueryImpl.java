@@ -251,10 +251,10 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
   @Override
   protected boolean hasExcludingConditions() {
     boolean excluding = super.hasExcludingConditions();
-    excluding = excluding || CompareUtil.hasExcludingOrder(createdAfter, createdBefore);
-    excluding = excluding || CompareUtil.hasExcludingOrder(closedAfter, closedBefore);
-    excluding = excluding || CompareUtil.hasExcludingContains(caseInstanceId, caseInstanceIds);
-    excluding = excluding || CompareUtil.hasExcludingNotContains(caseDefinitionKey, caseKeyNotIn);
+    excluding = excluding || CompareUtil.areNotInAnAscendingOrder(createdAfter, createdBefore);
+    excluding = excluding || CompareUtil.areNotInAnAscendingOrder(closedAfter, closedBefore);
+    excluding = excluding || CompareUtil.elementIsNotContainedInList(caseInstanceId, caseInstanceIds);
+    excluding = excluding || CompareUtil.elementIsContainedInList(caseDefinitionKey, caseKeyNotIn);
     return excluding;
   }
 

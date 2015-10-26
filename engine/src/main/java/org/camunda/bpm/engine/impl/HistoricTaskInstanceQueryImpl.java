@@ -295,8 +295,8 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
     boolean excluding = super.hasExcludingConditions();
     excluding = excluding || (finished && unfinished);
     excluding = excluding ||(processFinished && processUnfinished);
-    excluding = excluding || CompareUtil.hasExcludingOrder(dueAfter, dueDate, dueBefore);
-    excluding = excluding || CompareUtil.hasExcludingOrder(followUpAfter, followUpDate, followUpBefore);
+    excluding = excluding || CompareUtil.areNotInAnAscendingOrder(dueAfter, dueDate, dueBefore);
+    excluding = excluding || CompareUtil.areNotInAnAscendingOrder(followUpAfter, followUpDate, followUpBefore);
     return excluding;
   }
 

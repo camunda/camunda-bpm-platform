@@ -175,6 +175,6 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
 
   @Override
   protected boolean hasExcludingConditions() {
-    return super.hasExcludingConditions() || CompareUtil.hasExcludingOrder(timestampAfter, timestampBefore);
+    return super.hasExcludingConditions() || CompareUtil.areNotInAnAscendingOrder(timestampAfter, timestampBefore);
   }
 }

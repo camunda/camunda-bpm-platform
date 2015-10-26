@@ -17,62 +17,62 @@ import static org.junit.Assert.assertThat;
 public class CompareUtilTest {
 
   @Test
-  public void testHasEcludingOrderDate() {
+  public void testDateNotInAnAscendingOrder() {
     Calendar calendar = Calendar.getInstance();
     calendar.set(2015, Calendar.MARCH, 15);
     Date first = calendar.getTime();
     calendar.set(2015, Calendar.AUGUST, 15);
     Date second = calendar.getTime();
     Date nullDate = null;
-    assertThat(CompareUtil.hasExcludingOrder(null, first, null, second), is(false));
-    assertThat(CompareUtil.hasExcludingOrder(null, first, null, first), is(false));
-    assertThat(CompareUtil.hasExcludingOrder(null, second, null, first), is(true));
-    assertThat(CompareUtil.hasExcludingOrder(nullDate, nullDate, nullDate), is(false));
+    assertThat(CompareUtil.areNotInAnAscendingOrder(null, first, null, second), is(false));
+    assertThat(CompareUtil.areNotInAnAscendingOrder(null, first, null, first), is(false));
+    assertThat(CompareUtil.areNotInAnAscendingOrder(null, second, null, first), is(true));
+    assertThat(CompareUtil.areNotInAnAscendingOrder(nullDate, nullDate, nullDate), is(false));
 
-    assertThat(CompareUtil.hasExcludingOrder(Arrays.asList(first, second)), is(false));
-    assertThat(CompareUtil.hasExcludingOrder(Arrays.asList(first, first)), is(false));
-    assertThat(CompareUtil.hasExcludingOrder(Arrays.asList(second, first)), is(true));
+    assertThat(CompareUtil.areNotInAnAscendingOrder(Arrays.asList(first, second)), is(false));
+    assertThat(CompareUtil.areNotInAnAscendingOrder(Arrays.asList(first, first)), is(false));
+    assertThat(CompareUtil.areNotInAnAscendingOrder(Arrays.asList(second, first)), is(true));
   }
 
   @Test
-  public void testHasExcludingContains() {
+  public void testIsNotContainedIn() {
     String element = "test";
     String [] values = {"test", "test1", "test2"};
     String [] values2 = {"test1", "test2"};
     String [] nullValues = null;
     List<String> nullList = null;
 
-    assertThat(CompareUtil.hasExcludingContains(element, values), is(false));
-    assertThat(CompareUtil.hasExcludingContains(element, values2), is(true));
-    assertThat(CompareUtil.hasExcludingContains(null, values), is(false));
-    assertThat(CompareUtil.hasExcludingContains(null, nullValues), is(false));
-    assertThat(CompareUtil.hasExcludingContains(element, nullValues), is(false));
+    assertThat(CompareUtil.elementIsNotContainedInArray(element, values), is(false));
+    assertThat(CompareUtil.elementIsNotContainedInArray(element, values2), is(true));
+    assertThat(CompareUtil.elementIsNotContainedInArray(null, values), is(false));
+    assertThat(CompareUtil.elementIsNotContainedInArray(null, nullValues), is(false));
+    assertThat(CompareUtil.elementIsNotContainedInArray(element, nullValues), is(false));
 
-    assertThat(CompareUtil.hasExcludingContains(element, Arrays.asList(values)), is(false));
-    assertThat(CompareUtil.hasExcludingContains(element, Arrays.asList(values2)), is(true));
-    assertThat(CompareUtil.hasExcludingContains(null, Arrays.asList(values)), is(false));
-    assertThat(CompareUtil.hasExcludingContains(null, nullList), is(false));
-    assertThat(CompareUtil.hasExcludingContains(element, nullList), is(false));
+    assertThat(CompareUtil.elementIsNotContainedInList(element, Arrays.asList(values)), is(false));
+    assertThat(CompareUtil.elementIsNotContainedInList(element, Arrays.asList(values2)), is(true));
+    assertThat(CompareUtil.elementIsNotContainedInList(null, Arrays.asList(values)), is(false));
+    assertThat(CompareUtil.elementIsNotContainedInList(null, nullList), is(false));
+    assertThat(CompareUtil.elementIsNotContainedInList(element, nullList), is(false));
   }
 
   @Test
-  public void testHasExcludingNotContains() {
+  public void testIsContainedIn() {
     String element = "test";
     String [] values = {"test", "test1", "test2"};
     String [] values2 = {"test1", "test2"};
     String [] nullValues = null;
     List<String> nullList = null;
 
-    assertThat(CompareUtil.hasExcludingNotContains(element, values), is(true));
-    assertThat(CompareUtil.hasExcludingNotContains(element, values2), is(false));
-    assertThat(CompareUtil.hasExcludingNotContains(null, values), is(false));
-    assertThat(CompareUtil.hasExcludingNotContains(null, nullValues), is(false));
-    assertThat(CompareUtil.hasExcludingNotContains(element, nullValues), is(false));
+    assertThat(CompareUtil.elementIsContainedInArray(element, values), is(true));
+    assertThat(CompareUtil.elementIsContainedInArray(element, values2), is(false));
+    assertThat(CompareUtil.elementIsContainedInArray(null, values), is(false));
+    assertThat(CompareUtil.elementIsContainedInArray(null, nullValues), is(false));
+    assertThat(CompareUtil.elementIsContainedInArray(element, nullValues), is(false));
 
-    assertThat(CompareUtil.hasExcludingNotContains(element, Arrays.asList(values)), is(true));
-    assertThat(CompareUtil.hasExcludingNotContains(element, Arrays.asList(values2)), is(false));
-    assertThat(CompareUtil.hasExcludingNotContains(null, Arrays.asList(values)), is(false));
-    assertThat(CompareUtil.hasExcludingNotContains(null, nullList), is(false));
-    assertThat(CompareUtil.hasExcludingNotContains(element, nullList), is(false));
+    assertThat(CompareUtil.elementIsContainedInList(element, Arrays.asList(values)), is(true));
+    assertThat(CompareUtil.elementIsContainedInList(element, Arrays.asList(values2)), is(false));
+    assertThat(CompareUtil.elementIsContainedInList(null, Arrays.asList(values)), is(false));
+    assertThat(CompareUtil.elementIsContainedInList(null, nullList), is(false));
+    assertThat(CompareUtil.elementIsContainedInList(element, nullList), is(false));
   }
 }

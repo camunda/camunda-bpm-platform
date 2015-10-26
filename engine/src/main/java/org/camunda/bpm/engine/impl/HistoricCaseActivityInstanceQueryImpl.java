@@ -214,8 +214,8 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
   @Override
   protected boolean hasExcludingConditions() {
     boolean excluding = super.hasExcludingConditions();
-    excluding = excluding || CompareUtil.hasExcludingOrder(createdAfter, createdBefore);
-    excluding = excluding || CompareUtil.hasExcludingOrder(endedAfter, endedBefore);
+    excluding = excluding || CompareUtil.areNotInAnAscendingOrder(createdAfter, createdBefore);
+    excluding = excluding || CompareUtil.areNotInAnAscendingOrder(endedAfter, endedBefore);
     return excluding;
   }
 
