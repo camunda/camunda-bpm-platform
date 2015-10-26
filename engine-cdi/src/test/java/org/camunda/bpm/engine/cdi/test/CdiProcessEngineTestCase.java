@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.cdi.impl.util.ProgrammaticBeanLookup;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.util.LogUtil;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -50,6 +51,10 @@ import org.junit.runner.RunWith;
  */
 @RunWith(Arquillian.class)
 public abstract class CdiProcessEngineTestCase {
+
+  static {
+    LogUtil.readJavaUtilLoggingConfigFromClasspath();
+  }
 
   protected Logger logger = Logger.getLogger(getClass().getName());
 
@@ -198,6 +203,7 @@ public abstract class CdiProcessEngineTestCase {
     public boolean isTimeLimitExceeded() {
       return timeLimitExceeded;
     }
+    @Override
     public void run() {
       timeLimitExceeded = true;
       thread.interrupt();
