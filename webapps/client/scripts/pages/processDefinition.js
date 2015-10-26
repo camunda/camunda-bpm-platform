@@ -221,7 +221,7 @@ define([
     }]);
 
     processData.provide('allProcessDefinitions', [ 'processDefinition', function(definition) {
-      return ProcessDefinitionResource.query({ 'key' : definition.key, 'sortBy': 'version', 'sortOrder': 'asc' }).$promise;
+      return ProcessDefinitionResource.query({ 'key' : definition.key, 'sortBy': 'version', 'sortOrder': 'desc' }).$promise;
     }]);
 
     // processDiagram /////////////////////
