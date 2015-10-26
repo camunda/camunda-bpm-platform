@@ -22,11 +22,15 @@ import org.camunda.bpm.engine.variable.value.SerializableValue;
  */
 public interface SerializableValueType extends ValueType {
 
+  static final String VALUE_INFO_OBJECT_TYPE_NAME = "objectTypeName";
+  static final String VALUE_INFO_SERIALIZATION_DATA_FORMAT = "serializationDataFormat";
+
+
   /**
    * Creates a new TypedValue using this type.
    * @param serializedValue the value in serialized form
    * @return the typed value for the value
    */
-  public SerializableValue createValueFromSerialized(String serializedValue, Map<String, Object> valueInfo);
+  SerializableValue createValueFromSerialized(String serializedValue, Map<String, Object> valueInfo);
 
 }
