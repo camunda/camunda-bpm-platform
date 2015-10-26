@@ -20,6 +20,9 @@ import javax.enterprise.inject.spi.InjectionPoint;
 
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.ProcessEngineService;
+import org.camunda.bpm.engine.AuthorizationService;
+import org.camunda.bpm.engine.DecisionService;
+import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
@@ -75,5 +78,11 @@ public class NamedProcessEngineServicesProducer {
   @Produces @ProcessEngineName("") public IdentityService identityService(InjectionPoint ip) { return processEngine(ip).getIdentityService(); }
 
   @Produces @ProcessEngineName("") public ManagementService managementService(InjectionPoint ip) { return processEngine(ip).getManagementService(); }
+
+  @Produces @ProcessEngineName("") public AuthorizationService authorizationService(InjectionPoint ip) { return processEngine(ip).getAuthorizationService(); }
+
+  @Produces @ProcessEngineName("") public FilterService filterService(InjectionPoint ip) { return processEngine(ip).getFilterService(); }
+
+  @Produces @ProcessEngineName("") public DecisionService decisionService(InjectionPoint ip) { return processEngine(ip).getDecisionService(); }
 
 }
