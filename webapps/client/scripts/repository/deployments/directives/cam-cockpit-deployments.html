@@ -41,6 +41,8 @@
 
     <h4 class="name">{{ deployment.name || deployment.id }}</h4>
     <div class="time">Deployment Time:<br/>{{ deployment.deploymentTime | camDate:'normal' }}</div>
+    <div class="source">Deployment Source:<br/><span class="value" ng-class="{ undefined: !deployment.source}">{{ deployment.source ? deployment.source : '&lt;undefined&gt;' }}</span>
+    </div>
 
   </div>
 </div>

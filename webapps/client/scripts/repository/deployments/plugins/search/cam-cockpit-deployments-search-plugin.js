@@ -56,6 +56,9 @@ define([
     };
 
     var getQueryValueBySearch = function(search) {
+      if (search.basic) {
+        return true;
+      }
       return sanitizeValue(parseValue(search.value.value), search.operator.value.key)
     };
 

@@ -46,6 +46,25 @@
       ],
       "allowDates": true,
       "enforceDates": true
+    },
+    {
+      "id": {
+        "key": "source",
+        "value": "Deployment Source"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },
+    {
+      "id": {
+        "key": "withoutSource",
+        "value": "Deployment Source Undefined"
+      },
+      "basic": true
     }
   ],
   "operators": {

@@ -199,7 +199,8 @@
 
 
     h4,
-    .time {
+    .time,
+    .source {
       padding: 0 (@grid-gutter-width / 2);
     }
 
@@ -213,6 +214,15 @@
     .time {
       font-size: small;
       color: @gray-light;
+    }
+
+    .source {
+      font-size: small;
+      color: @gray-light;
+
+      .undefined {
+        font-style: italic;
+      }
     }
 
     .delete-deployment {
