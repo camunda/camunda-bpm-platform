@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -21,6 +22,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.util.CompareUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 
@@ -199,6 +201,47 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
   public JobQuery suspended() {
     suspensionState = SuspensionState.SUSPENDED;
     return this;
+  }
+
+  @Override
+  protected boolean hasExcludingConditions() {
+    boolean excluding = super.hasExcludingConditions();
+    excluding = excluding || CompareUtil.areNotInAnAscendingOrder(priorityHigherThanOrEqual, priorityLowerThanOrEqual);
+    excluding = excluding || isExcludingDueDate();
+    return excluding;
+  }
+
+  private boolean isExcludingDueDate() {
+    List<Date> dueDates = new ArrayList<Date>();
+    if (duedateHigherThan != null && duedateHigherThanOrEqual != null) {
+      if (duedateHigherThan.compareTo(duedateHigherThanOrEqual) <= 0) {
+        dueDates.add(duedateHigherThan);
+        dueDates.add(duedateHigherThanOrEqual);
+      } else {
+        dueDates.add(duedateHigherThanOrEqual);
+        dueDates.add(duedateHigherThan);
+      }
+    } else if (duedateHigherThan != null) {
+      dueDates.add(duedateHigherThan);
+    } else if (duedateHigherThanOrEqual != null) {
+      dueDates.add(duedateHigherThanOrEqual);
+    }
+
+    if (duedateLowerThan != null && duedateLowerThanOrEqual != null) {
+      if (duedateLowerThan.compareTo(duedateLowerThanOrEqual) <= 0) {
+        dueDates.add(duedateLowerThan);
+        dueDates.add(duedateLowerThanOrEqual);
+      } else {
+        dueDates.add(duedateLowerThanOrEqual);
+        dueDates.add(duedateLowerThan);
+      }
+    } else if (duedateLowerThan != null) {
+      dueDates.add(duedateLowerThan);
+    } else if (duedateLowerThanOrEqual != null) {
+      dueDates.add(duedateLowerThanOrEqual);
+    }
+
+    return CompareUtil.areNotInAnAscendingOrder(dueDates);
   }
 
   //sorting //////////////////////////////////////////

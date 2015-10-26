@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.history.JobState;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
+import org.camunda.bpm.engine.impl.util.CompareUtil;
 
 /**
  * @author Roman Smirnov
@@ -163,6 +164,13 @@ public class HistoricJobLogQueryImpl extends AbstractQuery<HistoricJobLogQuery, 
   public HistoricJobLogQuery deletionLog() {
     setState(JobState.DELETED);
     return this;
+  }
+
+  @Override
+  protected boolean hasExcludingConditions() {
+    boolean excluding = super.hasExcludingConditions();
+    excluding = excluding || CompareUtil.areNotInAnAscendingOrder(jobPriorityHigherThanOrEqual, jobPriorityLowerThanOrEqual);
+    return excluding;
   }
 
   // order by //////////////////////////////////////////////

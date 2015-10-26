@@ -18,6 +18,7 @@ import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.util.CompareUtil;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
@@ -170,5 +171,10 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
     return commandContext
         .getOperationLogManager()
         .findOperationLogEntriesByQueryCriteria(this, page);
+  }
+
+  @Override
+  protected boolean hasExcludingConditions() {
+    return super.hasExcludingConditions() || CompareUtil.areNotInAnAscendingOrder(timestampAfter, timestampBefore);
   }
 }

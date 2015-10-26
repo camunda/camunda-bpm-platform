@@ -264,6 +264,9 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
     query = taskService.createTaskQuery().taskMaxPriority(3);
     assertEquals(6, query.list().size());
+
+    query = taskService.createTaskQuery().taskMinPriority(50).taskMaxPriority(10);
+    assertEquals(0, query.list().size());
   }
 
   public void testQueryByInvalidPriority() {
@@ -630,6 +633,9 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     // No task should be found with UnexistingKey
     Long count = taskService.createTaskQuery().taskDefinitionKeyIn("unexistingKey").count();
     assertEquals(0L, count.longValue());
+
+    count = taskService.createTaskQuery().taskDefinitionKey("unexistingKey").taskDefinitionKeyIn("taskKey1").count();
+    assertEquals(0l, count.longValue());
   }
 
   @Deployment
@@ -1300,6 +1306,10 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
     assertNotNull(tasks);
     assertEquals("theTask", task.getTaskDefinitionKey());
+
+    long count = taskService.createTaskQuery().processInstanceBusinessKeyIn("BUSINESS-KEY-1").processInstanceBusinessKey("NON-EXISTING-KEY")
+        .count();
+    assertEquals(0l, count);
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})

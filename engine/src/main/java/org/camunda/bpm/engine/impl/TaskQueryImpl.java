@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.util.CompareUtil;
 import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
@@ -706,6 +707,19 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   public TaskQuery taskNameCaseInsensitive() {
     this.taskNameCaseInsensitive = true;
     return this;
+  }
+
+  @Override
+  protected boolean hasExcludingConditions() {
+    boolean excluding = super.hasExcludingConditions();
+    excluding = excluding || CompareUtil.areNotInAnAscendingOrder(minPriority, priority, maxPriority);
+    excluding = excluding || CompareUtil.areNotInAnAscendingOrder(dueAfter, dueDate, dueBefore);
+    excluding = excluding || CompareUtil.areNotInAnAscendingOrder(followUpAfter, followUpDate, followUpBefore);
+    excluding = excluding || CompareUtil.areNotInAnAscendingOrder(createTimeAfter, createTime, createTimeBefore);
+    excluding = excluding || CompareUtil.elementIsNotContainedInArray(key, taskDefinitionKeys);
+    excluding = excluding || CompareUtil.elementIsNotContainedInArray(processDefinitionKey, processDefinitionKeys);
+    excluding = excluding || CompareUtil.elementIsNotContainedInArray(processInstanceBusinessKey, processInstanceBusinessKeys);
+    return excluding;
   }
 
   public List<String> getCandidateGroups() {

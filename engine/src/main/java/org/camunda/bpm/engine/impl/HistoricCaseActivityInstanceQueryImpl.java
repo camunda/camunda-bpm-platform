@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
 import org.camunda.bpm.engine.history.HistoricCaseActivityInstanceQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.util.CompareUtil;
 
 /**
  * @author Sebastian Menski
@@ -208,6 +209,14 @@ public class HistoricCaseActivityInstanceQueryImpl extends AbstractQuery<Histori
     ensureNull(NotValidException.class, "Already querying for case activity instance state '" + caseActivityInstanceState + "'", "caseActivityState", caseActivityInstanceState);
     this.caseActivityInstanceState = TERMINATED.getStateCode();
     return this;
+  }
+
+  @Override
+  protected boolean hasExcludingConditions() {
+    boolean excluding = super.hasExcludingConditions();
+    excluding = excluding || CompareUtil.areNotInAnAscendingOrder(createdAfter, createdBefore);
+    excluding = excluding || CompareUtil.areNotInAnAscendingOrder(endedAfter, endedBefore);
+    return excluding;
   }
 
   // ordering
