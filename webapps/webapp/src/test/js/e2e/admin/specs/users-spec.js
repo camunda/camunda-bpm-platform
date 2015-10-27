@@ -119,7 +119,7 @@ describe('Admin Users Spec', function() {
       usersPage.authentication.userLogin('Xäbi', 'password1234');
 
       // then
-      expect(usersPage.loggedInUser()).to.eventually.eql('Xäbi');
+      expect(usersPage.loggedInUser()).to.eventually.eql('Xäbi Älönsö');
       expect(usersPage.userList().count()).to.eventually.eql(1);
     });
 
