@@ -7,13 +7,17 @@ var BasePage = require('./page');
 
 var FrontPage = BasePage.extend({});
 
+var testHelper = require('./../../test-helper');
+
 var frontPage = new FrontPage();
 frontPage.authentication = new AuthenticationPage();
 
 module.exports = function (appName) {
   return function() {
-    before(function () {
-      frontPage.navigateToWebapp(appName);
+    before([], function () {
+      return testHelper(function () {
+        frontPage.navigateToWebapp(appName);
+      });
     });
 
 
