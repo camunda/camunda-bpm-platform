@@ -13,8 +13,12 @@ define(['angular'], function(angular) {
    * @module cam.cockpit.services.page
    */
 
-  return ['$rootScope', function(
-    $rootScope
+  return [
+    '$rootScope',
+    'camAPI',
+  function(
+    $rootScope,
+    camAPI
   ) {
 
     var page = {
@@ -30,6 +34,26 @@ define(['angular'], function(angular) {
     $rootScope.$on('page.title.changed', function() {
       headTitle.text(page.title);
     });
+
+    function getUserProfile(auth) {
+      if (!auth || !auth.name) {
+        $rootScope.userFullName = null;
+        return;
+      }
+
+      var userService = camAPI.resource('user');
+      userService.profile(auth.name, function (err, info) {
+        if (err) {
+          $rootScope.userFullName = null;
+          throw err;
+        }
+        $rootScope.userFullName = info.firstName + ' ' + info.lastName;
+      });
+    }
+    $rootScope.$on('authentication.changed', function (ev, auth) {
+      getUserProfile(auth);
+    });
+    getUserProfile($rootScope.authentication);
 
     return {
       /**
