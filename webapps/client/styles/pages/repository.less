@@ -29,7 +29,7 @@
       &.resources {
         left: @left-width;
         right: 100%;
-        margin-right: (0 - (@left-width + @center-width + (@grid-gutter-width * 0)));ground-color: mix(@brand-primary, @column-center-bg, 8%);
+        margin-right: (0 - (@left-width + @center-width + (@grid-gutter-width * 0)));
       }
 
       &.resource-details {
@@ -67,7 +67,7 @@
 
   .ctn-content-container {
     overflow: auto;
-    overflow-x: hidden;
+    overflow-x: visible;
     border-top: 0;
     top: -30px;
   }
@@ -99,8 +99,11 @@
     &.deployments {
       z-index: 3;
       background-color: @column-left-bg;
-      .cell.top {
-        background-color: mix(@brand-primary, @column-left-bg, 8%);
+      overflow: visible;
+      .cell {
+        &.top {
+          background-color: mix(@brand-primary, @column-left-bg, 8%);
+        }
       }
 
       [cam-widget-search] {
@@ -140,7 +143,6 @@
     padding: (@grid-gutter-width / 2);
 
     > .cell {
-      position: relative;
       z-index: 1;
       position: absolute;
       top: (@column-top-height + @grid-gutter-width);
@@ -150,9 +152,7 @@
 
       &.content {
         padding: (@grid-gutter-width / 2);
-
-        overflow-x: hidden;
-        overflow-y: auto;
+        overflow: visible;
       }
     }
   }
@@ -183,63 +183,90 @@
 
 
 [cam-deployments] {
+  z-index: 3;
+  width: 100%;
+  overflow: auto;
+  position: absolute;
+  top: 49px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: (@grid-gutter-width / 2);
 
   .deployment-wrapper {
     position: relative;
   }
 
-  .deployment {
-    margin: (@grid-gutter-width / 2) 0;
-    padding: 12px 0;
+  ul.deployments {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    > li {
+      margin: (@grid-gutter-width / 2) 0;
+      padding: 12px 0;
 
-    text-align: right;
-    background-color: @gray-lighter;
-    position: relative;
-    z-index: 1;
+      background-color: @gray-lighter;
+      position: relative;
+        text-align: right;
+      z-index: 1;
 
-
-    h4,
-    .time,
-    .source {
-      padding: 0 (@grid-gutter-width / 2);
-    }
-
-    h4 {
-      cursor: pointer;
-      color: @link-color;
-      margin-bottom: 7px;
-      word-wrap: break-word;
-    }
-
-    .time {
-      font-size: small;
-      color: @gray-light;
-    }
-
-    .source {
-      font-size: small;
-      color: @gray-light;
-
-      .undefined {
-        font-style: italic;
+      &:first-of-type {
+        margin-top: 0;
       }
-    }
 
-    .delete-deployment {
-      display: inline-block;
-      position: absolute;
-      padding: 0 4px;
-      font-size: 90%;
-    }
 
-    .delete-deployment {
-      display: none;
-      left: 2px;
-      bottom: 2px;
-    }
-    &:hover .delete-deployment {
-      z-index: 10;
-      display: inline-block;
+      h4,
+      dl {
+        padding: 0 (@grid-gutter-width / 2);
+      }
+
+      h4 {
+        cursor: pointer;
+        color: @link-color;
+        margin-bottom: 7px;
+        word-wrap: break-word;
+      }
+
+      dl {
+        color: @gray-light;
+        font-size: small;
+        margin-bottom: 8px;
+        overflow: hidden;
+        dt,
+        dd {
+          // float: left;
+          display: inline-block;
+        }
+        dt {
+          .font-regular;
+          clear: left;
+        }
+        dd {
+          clear: right;
+          color: @gray;
+          margin-bottom: 4px;
+        }
+        .undefined {
+          font-style: italic;
+        }
+      }
+
+      .delete-deployment {
+        display: inline-block;
+        position: absolute;
+        padding: 0 4px;
+        font-size: small;
+      }
+
+      .delete-deployment {
+        display: none;
+        left: 2px;
+        bottom: 2px;
+      }
+      &:hover .delete-deployment {
+        z-index: 10;
+        display: inline-block;
+      }
     }
   }
 
@@ -264,6 +291,13 @@
 
 
 [cam-resources] {
+  position: absolute;
+  width: 100%;
+  left: 0;
+  overflow-x: auto;
+  bottom: 0;
+  top: 0;
+  padding: (@grid-gutter-width / 2);
 
   ol.resources {
     > li {

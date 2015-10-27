@@ -22,29 +22,35 @@
   <div ng-show="totalItems && (!deployments || !deployments.length)" class="well">
     <span class="glyphicon glyphicon-info-sign"></span>
     The current search parameters could not retrieve any tasks. Try to reset the search parameters or to&nbsp;
-    <a ng-click="resetPage()">
-    reset page number.
-    </a>
+    <a ng-click="resetPage()">reset page number.</a>
   </div>
 
-  <div ng-show="totalItems"
-       ng-repeat="(delta, deployment) in deployments"
-       ng-class="{active: isFocused(deployment), deployment: true}"
-       ng-style="{'z-index': ((deployments.length + 10) - delta) }"
-       ng-click="focus(deployment)">
+  <ul class="deployments">
+    <li ng-show="totalItems"
+         ng-repeat="(delta, deployment) in deployments"
+         ng-class="{active: isFocused(deployment), deployment: true}"
+         ng-style="{'z-index': ((deployments.length + 10) - delta) }"
+         ng-click="focus(deployment)">
 
-    <a ng-click="deleteDeployment($event, deployment)"
-       class="delete-deployment"
-       tooltip="Delete Deployment">
-      <span class="glyphicon glyphicon-trash"></span>
-    </a>
+      <a ng-click="deleteDeployment($event, deployment)"
+         class="delete-deployment"
+         tooltip="Delete Deployment">
+        <span class="glyphicon glyphicon-trash"></span>
+      </a>
 
-    <h4 class="name">{{ deployment.name || deployment.id }}</h4>
-    <div class="time">Deployment Time:<br/>{{ deployment.deploymentTime | camDate:'normal' }}</div>
-    <div class="source">Deployment Source:<br/><span class="value" ng-class="{ undefined: !deployment.source}">{{ deployment.source ? deployment.source : '&lt;undefined&gt;' }}</span>
-    </div>
+      <h4 class="name">{{ deployment.name || deployment.id }}</h4>
 
-  </div>
+      <dl>
+        <dt>Time:</dt>
+        <dd>{{ deployment.deploymentTime | camDate:'normal' }}</dd>
+
+        <dt>Source:</dt>
+        <dd ng-class="{ undefined: !deployment.source}">
+          {{ deployment.source ? deployment.source : '&lt;undefined&gt;' }}
+        </dd>
+      </dl>
+    </li>
+  </ul>
 </div>
 
 <pagination ng-show="state.$loaded && totalItems > pageSize"
