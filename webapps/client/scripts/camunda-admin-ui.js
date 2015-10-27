@@ -83,6 +83,35 @@ define('camunda-admin-ui', [
 
     appNgModule.config(ModuleConfig);
 
+
+    appNgModule.controller('camAdminAppCtrl', [
+      '$scope',
+      'UserResource',
+    function (
+      $scope,
+      UserResource
+    ) {
+      function getUserProfile(auth) {
+        if (!auth || !auth.name) {
+          $scope.userFullName = null;
+          return;
+        }
+
+        UserResource.profile({
+          userId: auth.name
+        }).$promise.then(function(info) {
+          $scope.userFullName = info.firstName + ' ' + info.lastName;
+        });
+      }
+
+      $scope.$on('authentication.changed', function (ev, auth) {
+        getUserProfile(auth);
+      });
+
+      getUserProfile($scope.authentication);
+    }]);
+
+
     require([
       'domReady!'
     ], function () {
