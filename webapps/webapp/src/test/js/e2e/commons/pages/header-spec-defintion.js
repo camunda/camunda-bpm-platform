@@ -55,6 +55,10 @@ module.exports = function (appName) {
           expect(frontPage.accountDropdownButton().isDisplayed()).to.eventually.eql(true);
         });
 
+        it('shows the full name of the logged in user', function () {
+          expect(frontPage.accountDropdownButton().getText()).to.eventually.eql('Steve Hentschi');
+        });
+
         it('shows the engine selection', function () {
           expect(frontPage.engineSelectDropdown().isDisplayed()).to.eventually.eql(true);
           expect(frontPage.engineSelectDropdownButton().isDisplayed()).to.eventually.eql(true);
