@@ -109,7 +109,7 @@ describe('Cockpit Decision Definition Spec', function() {
 
     it('should load the requested version on selection', function() {
       // when
-      definitionPage.version.getDropdownOption(0).click();
+      definitionPage.version.getDropdownOption(1).click();
 
       // then
       expect(definitionPage.version.getVersion()).to.eventually.eql('1');
