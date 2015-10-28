@@ -19,7 +19,7 @@ import javax.el.VariableMapper;
 
 import org.camunda.bpm.dmn.feel.impl.FeelEngineLogger;
 import org.camunda.bpm.dmn.feel.impl.FeelLogger;
-import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.VariableContext;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 public class FeelTypedVariableMapper extends VariableMapper {
@@ -27,15 +27,15 @@ public class FeelTypedVariableMapper extends VariableMapper {
   public static final FeelEngineLogger LOG = FeelLogger.ENGINE_LOGGER;
 
   protected ExpressionFactory expressionFactory;
-  protected VariableMap variables;
+  protected VariableContext varCtx;
 
-  public FeelTypedVariableMapper(ExpressionFactory expressionFactory, VariableMap variables) {
+  public FeelTypedVariableMapper(ExpressionFactory expressionFactory, VariableContext varCtx) {
     this.expressionFactory = expressionFactory;
-    this.variables = variables;
+    this.varCtx = varCtx;
   }
 
   public ValueExpression resolveVariable(String variable) {
-    if (variables.containsKey(variable)) {
+    if (varCtx.containsVariable(variable)) {
       Object value = unpackVariable(variable);
       return expressionFactory.createValueExpression(value, Object.class);
     }
@@ -49,8 +49,11 @@ public class FeelTypedVariableMapper extends VariableMapper {
   }
 
   public Object unpackVariable(String variable) {
-    TypedValue valueTyped = variables.getValueTyped(variable);
-    return valueTyped.getValue();
+    TypedValue valueTyped = varCtx.resolve(variable);
+    if(valueTyped != null) {
+      return valueTyped.getValue();
+    }
+    return null;
   }
 
 }

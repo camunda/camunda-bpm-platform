@@ -16,6 +16,7 @@ package org.camunda.bpm.dmn.feel.impl.el;
 import javax.el.ELContext;
 import javax.el.ExpressionFactory;
 
+import org.camunda.bpm.engine.variable.VariableContext;
 import org.camunda.bpm.engine.variable.VariableMap;
 
 public interface ElContextFactory {
@@ -24,9 +25,9 @@ public interface ElContextFactory {
    * Create a {@link ELContext} for the given {@link ExpressionFactory} and {@link VariableMap}.
    *
    * @param expressionFactory the {@link ExpressionFactory} to use
-   * @param variables the {@link VariableMap} to use
+   * @param varCtx the {@link VariableMap} to use
    * @return the {@link ELContext} instance
    */
-  ELContext createContext(ExpressionFactory expressionFactory, VariableMap variables);
+  ELContext createContext(ExpressionFactory expressionFactory, VariableContext varCtx);
 
 }

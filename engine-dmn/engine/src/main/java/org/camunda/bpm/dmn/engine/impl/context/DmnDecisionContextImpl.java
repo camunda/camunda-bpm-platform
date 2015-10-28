@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
@@ -45,11 +46,15 @@ import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableValueImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnEngineConfigurationImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnEngineLogger;
 import org.camunda.bpm.dmn.feel.FeelEngine;
+import org.camunda.bpm.engine.variable.VariableContext;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.impl.context.CompositeVariableContext;
 import org.camunda.bpm.engine.variable.value.NumberValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.bpm.model.dmn.HitPolicy;
 import org.camunda.commons.utils.StringUtil;
+
+import static org.camunda.bpm.engine.variable.impl.context.SingleVariableContext.*;
 
 public class DmnDecisionContextImpl implements DmnDecisionContext {
 
@@ -148,29 +153,30 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
     this.defaultOutputEntryExpressionLanguage = defaultOutputEntryExpressionLanguage;
   }
 
-  public DmnDecisionResult evaluateDecision(DmnDecision decision, Map<String, Object> variables) {
+  public DmnDecisionResult evaluateDecision(DmnDecision decision, VariableContext varCtx) {
+    ensureNotNull("decision", decision);
     if (decision instanceof DmnDecisionTable) {
-      return evaluateDecisionTable((DmnDecisionTable) decision, variables);
+      return evaluateDecisionTable((DmnDecisionTable) decision, varCtx);
     } else {
       throw LOG.decisionTypeNotSupported(decision);
     }
   }
 
-  protected DmnDecisionResult evaluateDecisionTable(DmnDecisionTable decisionTable, Map<String, Object> variables) {
+  protected DmnDecisionResult evaluateDecisionTable(DmnDecisionTable decisionTable, VariableContext varCtx) {
     Map<String, Object> evaluationCache = new HashMap<String, Object>();
 
     DmnDecisionTableResultImpl decisionTableResult = new DmnDecisionTableResultImpl();
     decisionTableResult.setExecutedDecisionElements(calculateExecutedDecisionElements(decisionTable));
 
     // evaluate inputs
-    Map<String, DmnDecisionTableValue> inputs = evaluateDecisionTableInputs(decisionTable, variables, evaluationCache);
+    Map<String, DmnDecisionTableValue> inputs = evaluateDecisionTableInputs(decisionTable, varCtx, evaluationCache);
     decisionTableResult.setInputs(inputs);
 
     // evaluate rules
     List<DmnDecisionTableRule> matchingRules = decisionTableResult.getMatchingRules();
     for (DmnRule rule : decisionTable.getRules()) {
-      if (isRuleApplicable(rule, variables, inputs, evaluationCache)) {
-        DmnDecisionTableRuleImpl matchingRule = evaluateMatchingRule(rule, variables, evaluationCache);
+      if (isRuleApplicable(rule, varCtx, inputs, evaluationCache)) {
+        DmnDecisionTableRuleImpl matchingRule = evaluateMatchingRule(rule, varCtx, evaluationCache);
         matchingRules.add(matchingRule);
       }
     }
@@ -217,24 +223,24 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
     return decisionTable.getClauses().size() * decisionTable.getRules().size();
   }
 
-  protected Map<String, DmnDecisionTableValue> evaluateDecisionTableInputs(DmnDecisionTable decisionTable, Map<String, Object> variables,
+  protected Map<String, DmnDecisionTableValue> evaluateDecisionTableInputs(DmnDecisionTable decisionTable, VariableContext varCtx,
       Map<String, Object> evaluationCache) {
     Map<String, DmnDecisionTableValue> inputs = new HashMap<String, DmnDecisionTableValue>();
     for (DmnClause clause : decisionTable.getClauses()) {
       if (clause.isInputClause() && isNonEmptyExpression(clause.getInputExpression())) {
-        DmnDecisionTableValue input = evaluateInputClause(clause, variables, evaluationCache);
+        DmnDecisionTableValue input = evaluateInputClause(clause, varCtx, evaluationCache);
         inputs.put(input.getKey(), input);
       }
     }
     return inputs;
   }
 
-  protected DmnDecisionTableValue evaluateInputClause(DmnClause clause, Map<String, Object> variables, Map<String, Object> evaluationCache) {
+  protected DmnDecisionTableValue evaluateInputClause(DmnClause clause, VariableContext varCtx, Map<String, Object> evaluationCache) {
     DmnDecisionTableValueImpl input = new DmnDecisionTableValueImpl(clause);
     DmnExpression inputExpression = clause.getInputExpression();
 
     if (inputExpression != null) {
-      Object value = evaluateInputExpression(inputExpression, variables, evaluationCache);
+      Object value = evaluateInputExpression(inputExpression, varCtx, evaluationCache);
       TypedValue typedValue = inputExpression.getItemDefinition().getTypeDefinition().transform(value);
       input.setValue(typedValue);
 
@@ -244,7 +250,7 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
     return input;
   }
 
-  protected boolean isRuleApplicable(DmnRule rule, Map<String, Object> variables, Map<String, DmnDecisionTableValue> inputs,
+  protected boolean isRuleApplicable(DmnRule rule, VariableContext varCtx, Map<String, DmnDecisionTableValue> inputs,
       Map<String, Object> evaluationCache) {
     Map<String, Boolean> clauseSatisfied = new HashMap<String, Boolean>();
     List<DmnClauseEntry> conditions = rule.getConditions();
@@ -258,18 +264,23 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
       }
 
       // set temporary evaluation variable cache
-      Map<String, Object> localVariables = new HashMap<String, Object>(variables);
+      VariableContext localVariableContext = null;
 
       // set input clause variable
       if (inputs.containsKey(clauseKey)) {
         DmnDecisionTableValue inputValue = inputs.get(clauseKey);
-        TypedValue typedValue = inputValue.getValue();
-        // set variable as typed and as unboxed value
-        localVariables.put(inputValue.getOutputName(), typedValue.getValue());
-        localVariables.put(inputValue.getOutputName() + TYPED_INPUT_VALUE_POSTFIX, typedValue);
+
+        // compose local variable context out of global variable context enhanced with the value of the current input.
+        localVariableContext = CompositeVariableContext.compose(
+            singleVariable(inputValue.getOutputName(), inputValue.getValue()),
+            varCtx
+        );
+      }
+      else {
+        localVariableContext = varCtx;
       }
 
-      boolean applicable = isConditionApplicable(condition, localVariables, evaluationCache);
+      boolean applicable = isConditionApplicable(condition, localVariableContext, evaluationCache);
       clauseSatisfied.put(clauseKey, applicable);
     }
 
@@ -277,18 +288,18 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
     return !clauseSatisfied.containsValue(false);
   }
 
-  protected DmnDecisionTableRuleImpl evaluateMatchingRule(DmnRule rule, Map<String, Object> variables, Map<String, Object> evaluationCache) {
+  protected DmnDecisionTableRuleImpl evaluateMatchingRule(DmnRule rule, VariableContext varCtx, Map<String, Object> evaluationCache) {
     DmnDecisionTableRuleImpl ruleResult = new DmnDecisionTableRuleImpl();
     ruleResult.setKey(rule.getKey());
-    evaluateRuleOutput(ruleResult, rule, variables, evaluationCache);
+    evaluateRuleOutput(ruleResult, rule, varCtx, evaluationCache);
     return ruleResult;
   }
 
-  protected void evaluateRuleOutput(DmnDecisionTableRuleImpl ruleResult, DmnRule rule, Map<String, Object> variables, Map<String, Object> evaluationCache) {
+  protected void evaluateRuleOutput(DmnDecisionTableRuleImpl ruleResult, DmnRule rule, VariableContext varCtx, Map<String, Object> evaluationCache) {
     for (DmnClauseEntry conclusion : rule.getConclusions()) {
       if (isNonEmptyExpression(conclusion)) {
         DmnDecisionTableValueImpl output = new DmnDecisionTableValueImpl(conclusion.getClause());
-        Object value = evaluateOutputEntry(conclusion, variables, evaluationCache);
+        Object value = evaluateOutputEntry(conclusion, varCtx, evaluationCache);
         TypedValue typedValue = conclusion.getClause().getOutputDefinition().getTypeDefinition().transform(value);
 
         output.setValue(typedValue);
@@ -297,58 +308,58 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
     }
   }
 
-  protected boolean isConditionApplicable(DmnClauseEntry condition, Map<String, Object> variables, Map<String, Object> evaluationCache) {
-    Object result = evaluateInputEntry(condition, variables, evaluationCache);
+  protected boolean isConditionApplicable(DmnClauseEntry condition, VariableContext localVariableContext, Map<String, Object> evaluationCache) {
+    Object result = evaluateInputEntry(condition, localVariableContext, evaluationCache);
     return result != null && result.equals(true);
   }
 
-  protected Object evaluateInputExpression(DmnExpression inputExpression, Map<String, Object> variables, Map<String, Object> evaluationCache) {
+  protected Object evaluateInputExpression(DmnExpression inputExpression, VariableContext varCtx, Map<String, Object> evaluationCache) {
     ensureNotNull("evaluationCache", evaluationCache);
     String expressionKey = inputExpression.getKey();
     if (evaluationCache.containsKey(expressionKey)) {
       return evaluationCache.get(expressionKey);
     } else {
-      Object value = evaluateInputExpression(inputExpression, variables);
+      Object value = evaluateInputExpression(inputExpression, varCtx);
       evaluationCache.put(expressionKey, value);
       return value;
     }
   }
 
-  protected Object evaluateInputExpression(DmnExpression inputExpression, Map<String, Object> variables) {
+  protected Object evaluateInputExpression(DmnExpression inputExpression, VariableContext varCtx) {
     String expressionLanguage = inputExpression.getExpressionLanguage();
     if (expressionLanguage == null) {
       expressionLanguage = getDefaultInputExpressionExpressionLanguage();
     }
     if (isFeelExpressionLanguage(expressionLanguage)) {
-      return evaluateFeelSimpleExpression(inputExpression, variables);
+      return evaluateFeelSimpleExpression(inputExpression, varCtx);
     }
     else {
-      return evaluateExpression(expressionLanguage, inputExpression, variables);
+      return evaluateExpression(expressionLanguage, inputExpression, varCtx);
     }
   }
 
-  private Object evaluateInputEntry(DmnClauseEntry inputEntry, Map<String, Object> variables, Map<String, Object> evaluationCache) {
+  private Object evaluateInputEntry(DmnClauseEntry inputEntry, VariableContext varCtx, Map<String, Object> evaluationCache) {
     ensureNotNull("evaluationCache", evaluationCache);
     String expressionKey = inputEntry.getKey();
     if (evaluationCache.containsKey(expressionKey)) {
       return evaluationCache.get(expressionKey);
     } else {
-      Object value = evaluateInputEntry(inputEntry, variables);
+      Object value = evaluateInputEntry(inputEntry, varCtx);
       evaluationCache.put(expressionKey, value);
       return value;
     }
   }
 
-  protected Object evaluateInputEntry(DmnClauseEntry inputEntry, Map<String, Object> variables) {
+  protected Object evaluateInputEntry(DmnClauseEntry inputEntry, VariableContext varCtx) {
     if (isNonEmptyExpression(inputEntry)) {
       String expressionLanguage = inputEntry.getExpressionLanguage();
       if (expressionLanguage == null) {
         expressionLanguage = getDefaultInputEntryExpressionLanguage();
       }
       if (isFeelExpressionLanguage(expressionLanguage)) {
-        return evaluateFeelSimpleUnaryTests(inputEntry, variables);
+        return evaluateFeelSimpleUnaryTests(inputEntry, varCtx);
       } else {
-        return evaluateExpression(expressionLanguage, inputEntry, variables);
+        return evaluateExpression(expressionLanguage, inputEntry, varCtx);
       }
     }
     else {
@@ -356,62 +367,65 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
     }
   }
 
-  protected Object evaluateOutputEntry(DmnClauseEntry outputEntry, Map<String, Object> variables, Map<String, Object> evaluationCache) {
+  protected Object evaluateOutputEntry(DmnClauseEntry outputEntry, VariableContext varCtx, Map<String, Object> evaluationCache) {
     ensureNotNull("evaluationCache", evaluationCache);
     String expressionKey = outputEntry.getKey();
     if (evaluationCache.containsKey(expressionKey)) {
       return evaluationCache.get(expressionKey);
     } else {
-      Object value = evaluateOutputEntry(outputEntry, variables);
+      Object value = evaluateOutputEntry(outputEntry, varCtx);
       evaluationCache.put(expressionKey, value);
       return value;
     }
   }
 
-  protected Object evaluateOutputEntry(DmnClauseEntry outputEntry, Map<String, Object> variables) {
+  protected Object evaluateOutputEntry(DmnClauseEntry outputEntry, VariableContext varCtx) {
     String expressionLanguage = outputEntry.getExpressionLanguage();
     if (expressionLanguage == null) {
       expressionLanguage = getDefaultOutputEntryExpressionLanguage();
     }
     if (isFeelExpressionLanguage(expressionLanguage)) {
-      return evaluateFeelSimpleExpression(outputEntry, variables);
+      return evaluateFeelSimpleExpression(outputEntry, varCtx);
     }
     else {
-      return evaluateExpression(expressionLanguage, outputEntry, variables);
+      return evaluateExpression(expressionLanguage, outputEntry, varCtx);
     }
   }
 
-  protected Object evaluateFeelSimpleExpression(DmnExpression feelExpression, Map<String, Object> variables) {
+  protected Object evaluateFeelSimpleExpression(DmnExpression feelExpression, VariableContext varCtx) {
     String feelSimpleExpression = feelExpression.getExpression();
     if (feelSimpleExpression != null) {
-      return feelEngine.evaluateSimpleExpression(feelSimpleExpression, variables);
+      return feelEngine.evaluateSimpleExpression(feelSimpleExpression, varCtx);
     }
     else {
       return null;
     }
   }
 
-  protected Object evaluateFeelSimpleUnaryTests(DmnClauseEntry feelExpression, Map<String, Object> variables) {
+  protected Object evaluateFeelSimpleUnaryTests(DmnClauseEntry feelExpression, VariableContext varCtx) {
     String feelSimpleUnaryTests = feelExpression.getExpression();
     if (feelSimpleUnaryTests != null) {
-      String inputVariableName = feelExpression.getClause().getOutputName() + TYPED_INPUT_VALUE_POSTFIX;
-      return feelEngine.evaluateSimpleUnaryTests(feelSimpleUnaryTests, inputVariableName, variables);
+      String inputVariableName = feelExpression.getClause().getOutputName();
+      return feelEngine.evaluateSimpleUnaryTests(feelSimpleUnaryTests, inputVariableName, varCtx);
     }
     else {
       return null;
     }
   }
 
-  protected Object evaluateExpression(String expressionLanguage, DmnExpression expression, Map<String, Object> variables) {
+  protected Object evaluateExpression(String expressionLanguage, DmnExpression expression, VariableContext varCtx) {
     String expressionText = getExpressionTextForLanguage(expression, expressionLanguage);
     if (expressionText != null) {
       ScriptEngine scriptEngine = getScriptEngineForName(expressionLanguage);
-      Bindings bindings = scriptEngine.createBindings();
-      bindings.putAll(variables);
+      // wrap script engine bindings + variable context and pass enhanced
+      // bindings to the script engine.
+      Bindings bindings = VariableContextScriptBindings.wrap(scriptEngine.createBindings(), varCtx);
+      bindings.put("variableContext", varCtx);
 
       try {
         return scriptEngine.eval(expressionText, bindings);
-      } catch (ScriptException e) {
+      }
+      catch (ScriptException e) {
         throw LOG.unableToEvaluateExpression(expressionText, scriptEngine.getFactory().getLanguageName(), e);
       }
     } else {

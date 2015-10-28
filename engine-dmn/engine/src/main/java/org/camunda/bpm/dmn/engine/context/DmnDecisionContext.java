@@ -13,13 +13,12 @@
 
 package org.camunda.bpm.dmn.engine.context;
 
-import java.util.Map;
-
 import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.engine.variable.VariableContext;
 
 public interface DmnDecisionContext {
 
-  DmnDecisionResult evaluateDecision(DmnDecision decision, Map<String, Object> variables);
+  DmnDecisionResult evaluateDecision(DmnDecision decision, VariableContext variableContext);
 
 }

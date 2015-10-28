@@ -25,10 +25,14 @@ import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.context.DmnContextFactory;
 import org.camunda.bpm.dmn.engine.context.DmnDecisionContext;
 import org.camunda.bpm.dmn.engine.transform.DmnTransformer;
+import org.camunda.bpm.engine.variable.VariableContext;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.dmn.DmnModelException;
 import org.camunda.bpm.model.dmn.DmnModelInstance;
 import org.camunda.commons.utils.IoUtil;
 import org.camunda.commons.utils.IoUtilException;
+
+import static org.camunda.commons.utils.EnsureUtil.*;
 
 public class DmnEngineImpl implements DmnEngine {
 
@@ -131,19 +135,45 @@ public class DmnEngineImpl implements DmnEngine {
     }
   }
 
-  public DmnDecisionResult evaluate(DmnDecision decision, Map<String, Object> variables) {
+  public DmnDecisionResult evaluate(DmnDecision decision, VariableContext varCtx) {
+    ensureNotNull("decision", decision);
+    ensureNotNull("variables", varCtx);
     DmnDecisionContext decisionContext = contextFactory.createDecisionContext(configuration);
-    return decisionContext.evaluateDecision(decision, variables);
+    return decisionContext.evaluateDecision(decision, varCtx);
+  }
+
+  public DmnDecisionResult evaluate(DmnDecision decision, Map<String, Object> variables) {
+    ensureNotNull("decision", decision);
+    ensureNotNull("variables", variables);
+    return evaluate(decision, Variables.fromMap(variables).asVariableContext());
+  }
+
+  public DmnDecisionResult evaluate(DmnDecisionModel decisionModel, String decisionKey, VariableContext variableContext) {
+    ensureNotNull("decisionModel", decisionModel);
+    ensureNotNull("decisionKey", decisionKey);
+    ensureNotNull("variableContext", variableContext);
+    DmnDecision decision = decisionModel.getDecision(decisionKey);
+    return evaluate(decision, variableContext);
   }
 
   public DmnDecisionResult evaluate(DmnDecisionModel decisionModel, Map<String, Object> variables) {
+    ensureNotNull("decisionModel", decisionModel);
+    ensureNotNull("variables", variables);
+    return evaluate(decisionModel,  Variables.fromMap(variables).asVariableContext());
+  }
+
+  public DmnDecisionResult evaluate(DmnDecisionModel decisionModel, VariableContext variableContext) {
+    ensureNotNull("decisionModel", decisionModel);
+    ensureNotNull("variableContext", variableContext);
     DmnDecision decision = decisionModel.getDecisions().get(0);
-    return evaluate(decision, variables);
+    return evaluate(decision, variableContext);
   }
 
   public DmnDecisionResult evaluate(DmnDecisionModel decisionModel, String decisionKey, Map<String, Object> variables) {
-    DmnDecision decision = decisionModel.getDecision(decisionKey);
-    return evaluate(decision, variables);
+    ensureNotNull("decisionModel", decisionModel);
+    ensureNotNull("decisionKey", decisionKey);
+    ensureNotNull("variables", variables);
+    return evaluate(decisionModel, decisionKey, Variables.fromMap(variables).asVariableContext());
   }
 
 }

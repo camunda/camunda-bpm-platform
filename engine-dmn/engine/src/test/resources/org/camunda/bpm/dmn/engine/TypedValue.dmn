@@ -31,7 +31,7 @@
           <text>integer</text>
         </inputExpression>
         <inputEntry id="typedInteger" expressionLanguage="juel">
-          <text><![CDATA[${cellInput_typed.getValue() >= 42}]]></text>
+          <text><![CDATA[${variableContext.resolve('cellInput').getValue() >= 42}]]></text>
         </inputEntry>
         <inputEntry id="untypedInteger" expressionLanguage="juel">
           <text><![CDATA[${cellInput >= 42}]]></text>

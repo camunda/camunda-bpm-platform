@@ -14,6 +14,7 @@
 package org.camunda.bpm.dmn.feel.impl;
 
 import java.util.Map;
+
 import javax.el.ELContext;
 import javax.el.ELException;
 import javax.el.ExpressionFactory;
@@ -26,6 +27,7 @@ import org.camunda.bpm.dmn.feel.FeelMissingFunctionException;
 import org.camunda.bpm.dmn.feel.FeelMissingVariableException;
 import org.camunda.bpm.dmn.feel.impl.el.ElContextFactory;
 import org.camunda.bpm.dmn.feel.impl.transform.FeelToJuelTransform;
+import org.camunda.bpm.engine.variable.VariableContext;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 
@@ -43,20 +45,13 @@ public class FeelEngineImpl implements FeelEngine {
     this.elContextFactory = elContextFactory;
   }
 
-  public <T> T evaluateSimpleExpression(String simpleExpression, Map<String, Object> variables) {
+  public <T> T evaluateSimpleExpression(String simpleExpression, VariableContext variableContext) {
     throw LOG.simpleExpressionNotSupported();
   }
 
-  public boolean evaluateSimpleUnaryTests(String simpleUnaryTests, String inputName, Map<String, Object> variables) {
-    VariableMap variableMap = Variables.createVariables();
-    variableMap.putAll(variables);
-    return evaluateSimpleUnaryTests(simpleUnaryTests, inputName, variableMap);
-  }
-
-  @SuppressWarnings("unchecked")
-  public boolean evaluateSimpleUnaryTests(String simpleUnaryTests, String inputName, VariableMap variables) {
+  public boolean evaluateSimpleUnaryTests(String simpleUnaryTests, String inputName, VariableContext varCtx) {
     try {
-      ELContext elContext = createContext(variables);
+      ELContext elContext = createContext(varCtx);
       ValueExpression valueExpression = transformSimpleUnaryTests(simpleUnaryTests, inputName, elContext);
       return (Boolean) valueExpression.getValue(elContext);
     }
@@ -84,8 +79,8 @@ public class FeelEngineImpl implements FeelEngine {
     }
   }
 
-  protected ELContext createContext(VariableMap variables) {
-    return elContextFactory.createContext(expressionFactory, variables);
+  protected ELContext createContext(VariableContext varCtx) {
+    return elContextFactory.createContext(expressionFactory, varCtx);
   }
 
   protected ValueExpression transformSimpleUnaryTests(String simpleUnaryTests, String inputName, ELContext elContext) {

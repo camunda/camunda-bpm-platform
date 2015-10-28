@@ -13,7 +13,7 @@
 
 package org.camunda.bpm.dmn.feel;
 
-import java.util.Map;
+import org.camunda.bpm.engine.variable.VariableContext;
 
 public interface FeelEngine {
 
@@ -26,7 +26,7 @@ public interface FeelEngine {
    * @return the result of the simple expression
    * @throws FeelException if the expression cannot be evaluated
    */
-  <T> T evaluateSimpleExpression(String simpleExpression, Map<String, Object> variables);
+  <T> T evaluateSimpleExpression(String simpleExpression, VariableContext variableContext);
 
   /**
    * Evaluate a FEEL simple unary tests expression
@@ -37,6 +37,6 @@ public interface FeelEngine {
    * @return the result of the simple unary tests expression
    * @throws FeelException if the expression cannot be evaluated
    */
-  boolean evaluateSimpleUnaryTests(String simpleUnaryTests, String inputName, Map<String, Object> variables);
+  boolean evaluateSimpleUnaryTests(String simpleUnaryTests, String inputName, VariableContext variableContext);
 
 }

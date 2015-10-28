@@ -23,14 +23,15 @@ import javax.el.ListELResolver;
 import javax.el.MapELResolver;
 import javax.el.VariableMapper;
 
+import org.camunda.bpm.engine.variable.VariableContext;
 import org.camunda.bpm.engine.variable.VariableMap;
 
 public class FeelElContextFactory implements ElContextFactory {
 
-  public ELContext createContext(ExpressionFactory expressionFactory, VariableMap variables) {
+  public ELContext createContext(ExpressionFactory expressionFactory, VariableContext varCtx) {
     ELResolver elResolver = createElResolver();
     FunctionMapper functionMapper = createFunctionMapper();
-    VariableMapper variableMapper = createVariableMapper(expressionFactory, variables);
+    VariableMapper variableMapper = createVariableMapper(expressionFactory, varCtx);
     return new FeelElContext(elResolver, functionMapper, variableMapper);
   }
 
@@ -49,8 +50,8 @@ public class FeelElContextFactory implements ElContextFactory {
     return functionMapper;
   }
 
-  public VariableMapper createVariableMapper(ExpressionFactory expressionFactory, VariableMap variables) {
-    return new FeelTypedVariableMapper(expressionFactory, variables);
+  public VariableMapper createVariableMapper(ExpressionFactory expressionFactory, VariableContext varCtx) {
+    return new FeelTypedVariableMapper(expressionFactory, varCtx);
   }
 
 }

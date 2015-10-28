@@ -11,6 +11,13 @@
   <artifactId>camunda-engine-feel-api</artifactId>
   <name>camunda DMN - engine FEEL - API</name>
 
+  <dependencies>
+    <dependency>
+      <groupId>org.camunda.commons</groupId>
+      <artifactId>camunda-commons-typed-values</artifactId>
+    </dependency>
+  </dependencies>
+
   <build>
     <plugins>
       <plugin>

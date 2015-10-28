@@ -354,7 +354,7 @@ public class FeelEngineTest {
 
   public boolean evaluateFeel(Object input, String feelExpression) {
     variables.putValue(INPUT_VARIABLE, input);
-    return feelEngine.evaluateSimpleUnaryTests(feelExpression, INPUT_VARIABLE, variables);
+    return feelEngine.evaluateSimpleUnaryTests(feelExpression, INPUT_VARIABLE, variables.asVariableContext());
   }
 
   protected DateValue parseDateAndTime(String dateAndTimeString) {

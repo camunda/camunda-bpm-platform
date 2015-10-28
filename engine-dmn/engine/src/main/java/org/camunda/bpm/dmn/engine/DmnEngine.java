@@ -16,6 +16,7 @@ package org.camunda.bpm.dmn.engine;
 import java.io.InputStream;
 import java.util.Map;
 
+import org.camunda.bpm.engine.variable.VariableContext;
 import org.camunda.bpm.model.dmn.DmnModelInstance;
 
 public interface DmnEngine {
@@ -42,8 +43,14 @@ public interface DmnEngine {
 
   DmnDecisionResult evaluate(DmnDecision decision, Map<String, Object> variables);
 
+  DmnDecisionResult evaluate(DmnDecision decision, VariableContext ctx);
+
   DmnDecisionResult evaluate(DmnDecisionModel decisionModel, Map<String, Object> variables);
 
+  DmnDecisionResult evaluate(DmnDecisionModel decisionModel, VariableContext variableContext);
+
   DmnDecisionResult evaluate(DmnDecisionModel decisionModel, String decisionKey, Map<String, Object> variables);
+
+  DmnDecisionResult evaluate(DmnDecisionModel decisionModel, String decisionKey, VariableContext variableContext);
 
 }

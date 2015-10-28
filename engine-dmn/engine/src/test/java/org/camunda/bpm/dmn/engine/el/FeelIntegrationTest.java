@@ -16,7 +16,7 @@ package org.camunda.bpm.dmn.engine.el;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.camunda.bpm.dmn.engine.util.DmnExampleVerifier.assertExample;
-import static org.mockito.Matchers.anyMapOf;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -24,8 +24,6 @@ import static org.mockito.Mockito.verify;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.logging.SimpleFormatter;
-
 import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnEngine;
@@ -37,6 +35,7 @@ import org.camunda.bpm.dmn.feel.FeelEngine;
 import org.camunda.bpm.dmn.feel.FeelEngineProvider;
 import org.camunda.bpm.dmn.feel.FeelException;
 import org.camunda.bpm.dmn.feel.impl.FeelEngineProviderImpl;
+import org.camunda.bpm.engine.variable.VariableContext;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.DateValue;
@@ -59,7 +58,8 @@ public class FeelIntegrationTest extends DmnDecisionTest {
     int numberOfExampleInvocations = 4;
     assertExample(engine);
 
-    verify(feelEngine, times(numberOfInputEntries * numberOfExampleInvocations)).evaluateSimpleUnaryTests(anyString(), anyString(), anyMapOf(String.class, Object.class));
+    verify(feelEngine, times(numberOfInputEntries * numberOfExampleInvocations))
+      .evaluateSimpleUnaryTests(anyString(), anyString(), any(VariableContext.class));
   }
 
   @Test
@@ -73,7 +73,7 @@ public class FeelIntegrationTest extends DmnDecisionTest {
 
     assertExample(dmnEngine);
 
-    verify(feelEngine, times(numberOfInputEntries * numberOfExampleInvocations)).evaluateSimpleUnaryTests(anyString(), anyString(), anyMapOf(String.class, Object.class));
+    verify(feelEngine, times(numberOfInputEntries * numberOfExampleInvocations)).evaluateSimpleUnaryTests(anyString(), anyString(), any(VariableContext.class));
   }
 
   @Test
@@ -88,7 +88,7 @@ public class FeelIntegrationTest extends DmnDecisionTest {
     }
     catch (UnsupportedOperationException e) {
       assertThat(e).hasMessageStartingWith("FEEL-01016");
-      verify(feelEngine).evaluateSimpleExpression(anyString(), anyMapOf(String.class, Object.class));
+      verify(feelEngine).evaluateSimpleExpression(anyString(), any(VariableContext.class));
     }
   }
 
@@ -104,7 +104,7 @@ public class FeelIntegrationTest extends DmnDecisionTest {
     }
     catch (UnsupportedOperationException e) {
       assertThat(e).hasMessageStartingWith("FEEL-01016");
-      verify(feelEngine).evaluateSimpleExpression(anyString(), anyMapOf(String.class, Object.class));
+      verify(feelEngine).evaluateSimpleExpression(anyString(), any(VariableContext.class));
     }
   }
 

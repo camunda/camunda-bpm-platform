@@ -43,7 +43,7 @@ public class FeelExceptionTest {
   @Test
   public void testSimpleExpressionNotSupported() {
     try {
-      feelEngine.evaluateSimpleExpression("12 == 12", Variables.createVariables());
+      feelEngine.evaluateSimpleExpression("12 == 12", Variables.emptyVariableContext());
       fail("Exception expected as FEEL simple expressions are not supported");
     }
     catch (UnsupportedOperationException e) {
@@ -290,7 +290,7 @@ public class FeelExceptionTest {
   }
 
   public boolean evaluateFeel(String feelExpression) {
-    return feelEngine.evaluateSimpleUnaryTests(feelExpression, INPUT_VARIABLE, variables);
+    return feelEngine.evaluateSimpleUnaryTests(feelExpression, INPUT_VARIABLE, variables.asVariableContext());
   }
 
 }
