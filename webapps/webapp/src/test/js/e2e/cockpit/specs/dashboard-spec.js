@@ -6,7 +6,7 @@ var setupFile = require('./dashboard-setup');
 var dashboardPage = require('../pages/dashboard');
 
 
-describe.only('Cockpit Dashboard Spec', function() {
+describe('Cockpit Dashboard Spec', function() {
 
   describe('dashboard page navigation', function() {
 
