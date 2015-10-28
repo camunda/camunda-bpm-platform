@@ -60,6 +60,10 @@ module.exports = Page.extend({
     });
   },
 
+  focusDeployment: function(idx) {
+    return browser.actions().mouseMove(this.deploymentList().get(idx)).perform();
+  },
+
   // sorting //////////////////////////////////////////////
 
   sortingElement: function() {
@@ -171,7 +175,7 @@ module.exports = Page.extend({
   openDeleteDeployment: function(idx) {
     var self = this;
 
-    browser.actions().mouseMove(this.deploymentNameElement(idx)).perform().then(function() {
+    focusDeployment(idx).then(function() {
       var elem = self.deploymentList().get(idx).element(by.css('[ng-click="deleteDeployment($event, deployment)"]'));
       elem.click();
       self.waitForElementToBeVisible(elem, 5000);
