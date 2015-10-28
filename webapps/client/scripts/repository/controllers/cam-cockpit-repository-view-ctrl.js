@@ -28,12 +28,12 @@ define([
 
     var updateSilently = function (params) {
       search.updateSilently(params);
-    }
+    };
 
     var getPropertyFromLocation = function (property) {
       var search = $location.search() || {};
       return search[property] || null;
-    }
+    };
 
 
     // fields ///////////////////////////////////////////////////
@@ -58,7 +58,7 @@ define([
     repositoryData.provide('deploymentsSearchQuery', {});
 
     repositoryData.provide('deploymentsPagination', function() {
-      var deferred = $q.defer();      
+      var deferred = $q.defer();
       deploymentsPage = getPropertyFromLocation('deploymentsPage');
 
       // wait for angular to initialize the controllers, so that the search
@@ -82,6 +82,17 @@ define([
       };
     });
 
+    // responsible for refreshing the deployments list top position.
+    // nope. css can't do that (unless we drop support for IE9 and use flexbox)
+    function updateDeploymentsListTop() {
+      var filterContainer = angular.element('[ng-controller="camDeploymentsCtrl"] .content view');
+      $scope.deploymentsListTop = (
+                                    (filterContainer[0].offsetTop * 1) +
+                                    Math.max(49, (filterContainer.height() || 0))
+                                  ) + 'px';
+    }
+    $timeout(updateDeploymentsListTop, 200);
+
     repositoryData.provide('deploymentsQuery', [ 'deploymentsSearchQuery', 'deploymentsPagination', 'deploymentsSorting', function (query, pagination, sorting) {
       var deferred = $q.defer();
 
@@ -90,6 +101,8 @@ define([
       $timeout(function() {
         query = query || {};
         deferred.resolve(angular.extend({}, query, pagination, sorting));
+
+        updateDeploymentsListTop();
       });
 
       return deferred.promise;
@@ -144,7 +157,7 @@ define([
           });
           $location.replace();
         }
-        
+
       }
       else {
         updateSilently({
@@ -208,7 +221,7 @@ define([
     repositoryData.provide('resource', ['resourceId', 'currentDeployment', function(resourceId, deployment) {
       var deferred = $q.defer();
 
-      var resourceId = resourceId.resourceId;
+      resourceId = resourceId.resourceId;
 
       if(typeof resourceId !== 'string') {
         deferred.resolve(null);

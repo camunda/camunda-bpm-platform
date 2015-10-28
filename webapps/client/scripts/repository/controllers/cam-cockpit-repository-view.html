@@ -16,9 +16,11 @@
 
         <view ng-repeat="deploymentsPlugin in deploymentsPlugins"
               provider="deploymentsPlugin"
+              class="deployment-plugins"
               vars="deploymentsVars" />
 
         <div cam-deployments
+             ng-style="{top: deploymentsListTop}"
              deployments-data="deploymentsData"></div>
       </div>
 

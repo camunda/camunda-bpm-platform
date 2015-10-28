@@ -11,7 +11,8 @@
   <span class="message">Loading the deployments finished with failures. Try to refresh the page to try again.</span>
 </div>
 
-<div ng-show="state.$loaded && !state.$error">
+<div ng-show="state.$loaded && !state.$error"
+     class="wrapper">
 
   <div ng-hide="totalItems"
        class="well">
@@ -19,7 +20,8 @@
     No deployments available.
   </div>
 
-  <div ng-show="totalItems && (!deployments || !deployments.length)" class="well">
+  <div ng-show="totalItems && (!deployments || !deployments.length)"
+       class="well">
     <span class="glyphicon glyphicon-info-sign"></span>
     The current search parameters could not retrieve any tasks. Try to reset the search parameters or to&nbsp;
     <a ng-click="resetPage()">reset page number.</a>
@@ -27,10 +29,10 @@
 
   <ul class="deployments">
     <li ng-show="totalItems"
-         ng-repeat="(delta, deployment) in deployments"
-         ng-class="{active: isFocused(deployment), deployment: true}"
-         ng-style="{'z-index': ((deployments.length + 10) - delta) }"
-         ng-click="focus(deployment)">
+        ng-repeat="(delta, deployment) in deployments"
+        ng-class="{active: isFocused(deployment), deployment: true}"
+        ng-style="{'z-index': ((deployments.length + 10) - delta) }"
+        ng-click="focus(deployment)">
 
       <a ng-click="deleteDeployment($event, deployment)"
          class="delete-deployment"
@@ -42,10 +44,10 @@
 
       <dl>
         <dt>Time:</dt>
-        <dd>{{ deployment.deploymentTime | camDate:'normal' }}</dd>
+        <dd class="time">{{ deployment.deploymentTime | camDate:'normal' }}</dd>
 
         <dt>Source:</dt>
-        <dd ng-class="{ undefined: !deployment.source}">
+        <dd ng-class="{ undefined: !deployment.source}" class="source">
           {{ deployment.source ? deployment.source : '&lt;undefined&gt;' }}
         </dd>
       </dl>
@@ -61,9 +63,9 @@
 
             total-items="totalItems"
             items-per-page="pageSize"
-            max-size="5"
+            max-size="3"
 
-            boundary-links="true"
+            boundary-links="false"
 
             next-text="&rsaquo;"
             last-text="&raquo;"
