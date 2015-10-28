@@ -13,11 +13,11 @@ module.exports = Base.extend({
   },
 
   selectDecision: function(item) {
-    return this.decisionsList().get(item).element(by.binding('{{ decision.name }}')).click();
+    return this.decisionsList().get(item).element(by.binding('{{ decision.name || decision.key }}')).click();
   },
 
   decisionName: function(item) {
-    return this.decisionsList().get(item).element(by.binding('{{ decision.name }}')).getText();
+    return this.decisionsList().get(item).element(by.binding('{{ decision.name || decision.key }}')).getText();
   }
 
 });

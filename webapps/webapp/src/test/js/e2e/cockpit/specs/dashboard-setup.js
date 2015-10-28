@@ -49,7 +49,7 @@ var fragment3 = combine(
   }])
 );
 
-var dmnFragment = operation('deployment', 'create', [{
+var dmnFragment1 = operation('deployment', 'create', [{
   deploymentName: 'assign-approver',
   files: [{
     name: 'assign-approver-groups.dmn',
@@ -63,10 +63,19 @@ var dmnFragment = operation('deployment', 'create', [{
   }]
 }]);
 
+var dmnFragment2 = operation('deployment', 'create', [{
+  deploymentName: 'dmn-without-name',
+  files: [{
+    name: 'dmn-without-name.dmn',
+    content: fs.readFileSync(__dirname + '/../../resources/dmn-without-name.dmn').toString()
+  }]
+}]);
+
 module.exports = {
 
   setup1: fragment1,
   setup2: fragment2,
   setup3: fragment3,
-  setup4: dmnFragment
+  setup4: dmnFragment1,
+  setup5: dmnFragment2
 };

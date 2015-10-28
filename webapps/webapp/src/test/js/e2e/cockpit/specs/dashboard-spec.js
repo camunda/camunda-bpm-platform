@@ -6,7 +6,7 @@ var setupFile = require('./dashboard-setup');
 var dashboardPage = require('../pages/dashboard');
 
 
-describe('Cockpit Dashboard Spec', function() {
+describe.only('Cockpit Dashboard Spec', function() {
 
   describe('dashboard page navigation', function() {
 
@@ -113,6 +113,25 @@ describe('Cockpit Dashboard Spec', function() {
         expect(dashboardPage.deployedDecisionsList.decisionCountHeader()).to.eventually.eql('1 decision table deployed');
         expect(dashboardPage.deployedDecisionsList.decisionsList().count()).to.eventually.eql(1);
         expect(dashboardPage.deployedDecisionsList.decisionName(0)).to.eventually.eql('Assign Approver');
+      });
+
+    });
+
+    describe('deploy decision without name', function() {
+
+      before(function() {
+        return testHelper(setupFile.setup5, true);
+      });
+
+      it('should show decision key', function() {
+
+        // when
+        dashboardPage.navigateTo();
+
+        // then
+        expect(dashboardPage.deployedDecisionsList.decisionCountHeader()).to.eventually.eql('2 decision table deployed');
+        expect(dashboardPage.deployedDecisionsList.decisionsList().count()).to.eventually.eql(2);
+        expect(dashboardPage.deployedDecisionsList.decisionName(0)).to.eventually.eql('invoice-approver');
       });
 
     });
