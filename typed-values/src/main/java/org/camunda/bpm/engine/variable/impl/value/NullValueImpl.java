@@ -10,38 +10,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.core.variable.value;
+package org.camunda.bpm.engine.variable.impl.value;
 
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
+ * Untyped Null
+ *
  * @author Daniel Meyer
  *
  */
-public class AbstractTypedValue<T> implements TypedValue {
+public class NullValueImpl implements TypedValue {
 
   private static final long serialVersionUID = 1L;
 
-  protected T value;
+  // null is always null
+  public static final NullValueImpl INSTANCE = new NullValueImpl();
 
-  protected ValueType type;
-
-  public AbstractTypedValue(T value, ValueType type) {
-    this.value = value;
-    this.type = type;
+  private NullValueImpl() {
+    // hide
   }
 
-  public T getValue() {
-    return value;
+  public Object getValue() {
+    return null;
   }
 
   public ValueType getType() {
-    return type;
+    return ValueType.NULL;
   }
 
   public String toString() {
-    return "Value '" + value + "' of type '" + type + "'";
+    return "Untyped 'null' value";
   }
 
 }

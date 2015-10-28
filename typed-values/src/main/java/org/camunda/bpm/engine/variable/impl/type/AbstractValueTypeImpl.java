@@ -10,47 +10,59 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.core.variable.value;
+package org.camunda.bpm.engine.variable.impl.type;
 
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
- * Used when the type of an object has not been specified by the user and
- * needs to be autodetected.
- *
- * @author Daniel Meyer
+ * @author Thorben Lindhauer
  *
  */
-public class UntypedValueImpl implements TypedValue {
+public abstract class AbstractValueTypeImpl implements ValueType {
 
   private static final long serialVersionUID = 1L;
 
-  protected Object value;
+  protected String name;
 
-  public UntypedValueImpl(Object object) {
-    value = object;
+  public AbstractValueTypeImpl(String name) {
+    this.name = name;
   }
 
-  public Object getValue() {
-    return value;
-  }
-
-  public ValueType getType() {
-    // no type
-    return null;
+  public String getName() {
+    return name;
   }
 
   @Override
   public String toString() {
-    return "Untyped value '"+value+"'";
+    return name;
+  }
+
+  public boolean isAbstract() {
+    return false;
+  }
+
+  public ValueType getParent() {
+    return null;
+  }
+
+  public boolean canConvertFromTypedValue(TypedValue typedValue) {
+    return false;
+  }
+
+  public TypedValue convertFromTypedValue(TypedValue typedValue) {
+    throw unsupportedConversion(typedValue.getType());
+  }
+
+  protected IllegalArgumentException unsupportedConversion(ValueType typeToConvertTo) {
+    return new IllegalArgumentException("The type " + getName() + " supports no conversion from type: " + typeToConvertTo.getName());
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((value == null) ? 0 : value.hashCode());
+    result = prime * result + ((name == null) ? 0 : name.hashCode());
     return result;
   }
 
@@ -62,11 +74,11 @@ public class UntypedValueImpl implements TypedValue {
       return false;
     if (getClass() != obj.getClass())
       return false;
-    UntypedValueImpl other = (UntypedValueImpl) obj;
-    if (value == null) {
-      if (other.value != null)
+    AbstractValueTypeImpl other = (AbstractValueTypeImpl) obj;
+    if (name == null) {
+      if (other.name != null)
         return false;
-    } else if (!value.equals(other.value))
+    } else if (!name.equals(other.name))
       return false;
     return true;
   }
