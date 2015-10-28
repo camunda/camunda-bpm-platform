@@ -36,4 +36,10 @@ public interface VariableMap extends Map<String, Object> {
 
   <T extends TypedValue> T getValueTyped(String name);
 
+  /**
+   * Interprets the variable map as variable context
+   *
+   * @return A VariableContext which is capable of resolving all variables in the map
+   */
+  VariableContext asVariableContext();
 }

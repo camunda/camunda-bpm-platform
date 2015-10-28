@@ -12,17 +12,17 @@
  */
 package org.camunda.bpm.engine.test.api.variable;
 
-import static org.camunda.bpm.engine.variable.Variables.createVariables;
-import static org.camunda.bpm.engine.variable.Variables.integerValue;
-import static org.camunda.bpm.engine.variable.Variables.objectValue;
+import static org.camunda.bpm.engine.variable.Variables.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.camunda.bpm.engine.variable.VariableContext;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.Variables.SerializationDataFormats;
@@ -121,6 +121,36 @@ public class VariableApiTest {
 
     objectValue = objectValue(DESERIALIZED_OBJECT_VAR_VALUE).serializationDataFormat(SerializationDataFormats.XML).create();
     assertEquals(SerializationDataFormats.XML.getName(), objectValue.getSerializationDataFormat());
+  }
+
+  @Test
+  public void testEmptyVariableMapAsVariableContext() {
+    VariableContext varContext = createVariables().asVariableContext();
+    assertTrue(varContext.keySet().size() == 0);
+    assertNull(varContext.resolve("nonExisting"));
+    assertFalse(varContext.containsVariable("nonExisting"));
+  }
+
+  @Test
+  public void testEmptyVariableContext() {
+    VariableContext varContext = emptyVariableContext();
+    assertTrue(varContext.keySet().size() == 0);
+    assertNull(varContext.resolve("nonExisting"));
+    assertFalse(varContext.containsVariable("nonExisting"));
+  }
+
+  @Test
+  public void testVariableMapAsVariableContext() {
+    VariableContext varContext = createVariables()
+        .putValueTyped("someValue", integerValue(1)).asVariableContext();
+
+    assertTrue(varContext.keySet().size() == 1);
+
+    assertNull(varContext.resolve("nonExisting"));
+    assertFalse(varContext.containsVariable("nonExisting"));
+
+    assertEquals(1, varContext.resolve("someValue").getValue());
+    assertTrue(varContext.containsVariable("someValue"));
   }
 
 }

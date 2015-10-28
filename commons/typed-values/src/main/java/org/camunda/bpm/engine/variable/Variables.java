@@ -19,21 +19,22 @@ import java.util.Map;
 
 import javax.activation.MimetypesFileTypeMap;
 
-import org.camunda.bpm.engine.impl.core.variable.VariableMapImpl;
-import org.camunda.bpm.engine.impl.core.variable.value.NullValueImpl;
-import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.BooleanValueImpl;
-import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.BytesValueImpl;
-import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.DateValueImpl;
-import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.DoubleValueImpl;
-import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.IntegerValueImpl;
-import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.LongValueImpl;
-import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.NumberValueImpl;
-import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.ShortValueImpl;
-import org.camunda.bpm.engine.impl.core.variable.value.PrimitiveTypeValueImpl.StringValueImpl;
-import org.camunda.bpm.engine.impl.core.variable.value.UntypedValueImpl;
-import org.camunda.bpm.engine.impl.core.variable.value.builder.FileValueBuilderImpl;
-import org.camunda.bpm.engine.impl.core.variable.value.builder.ObjectVariableBuilderImpl;
-import org.camunda.bpm.engine.impl.core.variable.value.builder.SerializedObjectValueBuilderImpl;
+import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
+import org.camunda.bpm.engine.variable.impl.context.EmptyVariableContext;
+import org.camunda.bpm.engine.variable.impl.value.NullValueImpl;
+import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
+import org.camunda.bpm.engine.variable.impl.value.PrimitiveTypeValueImpl.BooleanValueImpl;
+import org.camunda.bpm.engine.variable.impl.value.PrimitiveTypeValueImpl.BytesValueImpl;
+import org.camunda.bpm.engine.variable.impl.value.PrimitiveTypeValueImpl.DateValueImpl;
+import org.camunda.bpm.engine.variable.impl.value.PrimitiveTypeValueImpl.DoubleValueImpl;
+import org.camunda.bpm.engine.variable.impl.value.PrimitiveTypeValueImpl.IntegerValueImpl;
+import org.camunda.bpm.engine.variable.impl.value.PrimitiveTypeValueImpl.LongValueImpl;
+import org.camunda.bpm.engine.variable.impl.value.PrimitiveTypeValueImpl.NumberValueImpl;
+import org.camunda.bpm.engine.variable.impl.value.PrimitiveTypeValueImpl.ShortValueImpl;
+import org.camunda.bpm.engine.variable.impl.value.PrimitiveTypeValueImpl.StringValueImpl;
+import org.camunda.bpm.engine.variable.impl.value.builder.FileValueBuilderImpl;
+import org.camunda.bpm.engine.variable.impl.value.builder.ObjectVariableBuilderImpl;
+import org.camunda.bpm.engine.variable.impl.value.builder.SerializedObjectValueBuilderImpl;
 import org.camunda.bpm.engine.variable.value.BooleanValue;
 import org.camunda.bpm.engine.variable.value.BytesValue;
 import org.camunda.bpm.engine.variable.value.DateValue;
@@ -221,6 +222,13 @@ public class Variables {
   public static FileValue fileValue(File file){
     String contentType = MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(file);
     return new FileValueBuilderImpl(file.getName()).file(file).mimeType(contentType).create();
+  }
+
+  /**
+   * @return an empty {@link VariableContext} (from which no variables can be resolved).
+   */
+  public static VariableContext emptyVariableContext() {
+    return EmptyVariableContext.INSTANCE;
   }
 
 }
