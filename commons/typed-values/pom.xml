@@ -11,13 +11,17 @@
     <version>1.2.0-SNAPSHOT</version>
   </parent>
 
+  <properties>
+    <version.old>1.2.0-alpha4</version.old>
+  </properties>
+
   <dependencies>
 
     <dependency>
       <groupId>org.camunda.commons</groupId>
       <artifactId>camunda-commons-utils</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -31,6 +35,53 @@
     </dependency>
 
   </dependencies>
- 
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <skipTests>true</skipTests>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>clirr-maven-plugin</artifactId>
+        <configuration>
+          <comparisonVersion>${version.old}</comparisonVersion>
+          <logResults>true</logResults>
+          <excludes>
+            <exclude>org/camunda/bpm/engine/impl/**</exclude>
+          </excludes>
+        </configuration>
+        <executions>
+          <execution>
+            <id>all</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>check-no-fork</goal>
+            </goals>
+            <configuration>
+              <textOutputFile>${project.build.directory}/clirr-all.txt</textOutputFile>
+              <failOnWarning>false</failOnWarning>
+              <failOnError>false</failOnError>
+            </configuration>
+          </execution>
+          <execution>
+            <id>restrictive</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>check-no-fork</goal>
+            </goals>
+            <configuration>
+              <textOutputFile>${project.build.directory}/clirr-restrictive.txt</textOutputFile>
+              <failOnWarning>true</failOnWarning>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
