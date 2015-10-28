@@ -15,18 +15,18 @@ package org.camunda.bpm.engine.variable.type;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.core.variable.type.FileValueTypeImpl;
-import org.camunda.bpm.engine.impl.core.variable.type.ObjectTypeImpl;
-import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.BooleanTypeImpl;
-import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.BytesTypeImpl;
-import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.DateTypeImpl;
-import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.DoubleTypeImpl;
-import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.IntegerTypeImpl;
-import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.LongTypeImpl;
-import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.NullTypeImpl;
-import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.NumberTypeImpl;
-import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.ShortTypeImpl;
-import org.camunda.bpm.engine.impl.core.variable.type.PrimitiveValueTypeImpl.StringTypeImpl;
+import org.camunda.bpm.engine.variable.impl.type.FileValueTypeImpl;
+import org.camunda.bpm.engine.variable.impl.type.ObjectTypeImpl;
+import org.camunda.bpm.engine.variable.impl.type.PrimitiveValueTypeImpl.BooleanTypeImpl;
+import org.camunda.bpm.engine.variable.impl.type.PrimitiveValueTypeImpl.BytesTypeImpl;
+import org.camunda.bpm.engine.variable.impl.type.PrimitiveValueTypeImpl.DateTypeImpl;
+import org.camunda.bpm.engine.variable.impl.type.PrimitiveValueTypeImpl.DoubleTypeImpl;
+import org.camunda.bpm.engine.variable.impl.type.PrimitiveValueTypeImpl.IntegerTypeImpl;
+import org.camunda.bpm.engine.variable.impl.type.PrimitiveValueTypeImpl.LongTypeImpl;
+import org.camunda.bpm.engine.variable.impl.type.PrimitiveValueTypeImpl.NullTypeImpl;
+import org.camunda.bpm.engine.variable.impl.type.PrimitiveValueTypeImpl.NumberTypeImpl;
+import org.camunda.bpm.engine.variable.impl.type.PrimitiveValueTypeImpl.ShortTypeImpl;
+import org.camunda.bpm.engine.variable.impl.type.PrimitiveValueTypeImpl.StringTypeImpl;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**

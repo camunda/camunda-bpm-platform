@@ -36,8 +36,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 
-import org.camunda.bpm.engine.impl.core.variable.value.NullValueImpl;
 import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.impl.value.NullValueImpl;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.junit.Test;

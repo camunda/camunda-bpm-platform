@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.core.variable.value;
+package org.camunda.bpm.engine.variable.impl.value;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

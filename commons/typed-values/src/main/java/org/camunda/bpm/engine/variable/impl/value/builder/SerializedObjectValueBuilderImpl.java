@@ -10,9 +10,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.core.variable.value.builder;
+package org.camunda.bpm.engine.variable.impl.value.builder;
 
-import org.camunda.bpm.engine.impl.core.variable.value.ObjectValueImpl;
+import org.camunda.bpm.engine.variable.impl.value.ObjectValueImpl;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.SerializationDataFormat;
 import org.camunda.bpm.engine.variable.value.builder.SerializedObjectValueBuilder;

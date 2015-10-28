@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.core.variable;
+package org.camunda.bpm.engine.variable.impl;
 
 import java.io.Serializable;
 import java.util.AbstractCollection;
@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.camunda.bpm.engine.variable.VariableContext;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -29,7 +30,7 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
  * @author Daniel Meyer
  *
  */
-public class VariableMapImpl implements VariableMap, Serializable {
+public class VariableMapImpl implements VariableMap, Serializable, VariableContext {
 
   private static final long serialVersionUID = 1L;
 
@@ -286,6 +287,18 @@ public class VariableMapImpl implements VariableMap, Serializable {
 
   public Map<String, Object> asValueMap() {
     return new HashMap<String, Object>(this);
+  }
+
+  public TypedValue resolve(String variableName) {
+    return getValueTyped(variableName);
+  }
+
+  public boolean containsVariable(String variableName) {
+    return containsKey(variableName);
+  }
+
+  public VariableContext asVariableContext() {
+    return this;
   }
 
 }

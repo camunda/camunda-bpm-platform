@@ -10,38 +10,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.core.variable.value;
+package org.camunda.bpm.engine.variable.impl.context;
 
-import org.camunda.bpm.engine.variable.type.ValueType;
+import java.util.Collections;
+import java.util.Set;
+
+import org.camunda.bpm.engine.variable.VariableContext;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
- * Untyped Null
+ * An empty variable context implementation which does
+ * not allow to resolve any variables.
  *
  * @author Daniel Meyer
  *
  */
-public class NullValueImpl implements TypedValue {
+public class EmptyVariableContext implements VariableContext {
 
-  private static final long serialVersionUID = 1L;
+  public final static EmptyVariableContext INSTANCE = new EmptyVariableContext();
 
-  // null is always null
-  public static final NullValueImpl INSTANCE = new NullValueImpl();
-
-  private NullValueImpl() {
-    // hide
+  EmptyVariableContext() {
+    // hidden
   }
 
-  public Object getValue() {
+  public TypedValue resolve(String variableName) {
     return null;
   }
 
-  public ValueType getType() {
-    return ValueType.NULL;
+  public boolean containsVariable(String variableName) {
+    return false;
   }
 
-  public String toString() {
-    return "Untyped 'null' value";
+  public Set<String> keySet() {
+    return Collections.emptySet();
   }
 
 }
