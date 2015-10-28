@@ -18,14 +18,17 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
-import org.camunda.bpm.dmn.engine.DmnEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
+import org.camunda.bpm.engine.impl.dmn.invocation.DecisionInvocation;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
+import org.camunda.bpm.engine.repository.DecisionDefinition;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 
 /**
  * Evaluates the decision with the given id.
@@ -35,11 +38,11 @@ import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 public class EvaluateDecisionByIdCmd implements Command<DmnDecisionResult> {
 
   protected String decisionDefinitionId;
-  protected Map<String, Object> variables;
+  protected VariableMap variables;
 
   public EvaluateDecisionByIdCmd(String decisionDefinitionId, Map<String, Object> variables) {
     this.decisionDefinitionId = decisionDefinitionId;
-    this.variables = variables;
+    this.variables = Variables.fromMap(variables);
   }
 
   @Override
@@ -48,7 +51,6 @@ public class EvaluateDecisionByIdCmd implements Command<DmnDecisionResult> {
 
     ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
     DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
-    DmnEngine dmnEngine = processEngineConfiguration.getDmnEngine();
 
     DecisionDefinitionEntity decisionDefinition = deploymentCache.findDeployedDecisionDefinitionById(decisionDefinitionId);
     ensureNotNull("No decision definition found for id '" + decisionDefinitionId + "'", "decisionDefinition", decisionDefinition);
@@ -57,7 +59,25 @@ public class EvaluateDecisionByIdCmd implements Command<DmnDecisionResult> {
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     authorizationManager.checkEvaluateDecision(decisionDefinition.getKey());
 
-    return dmnEngine.evaluate(decisionDefinition, variables);
+    return doEvaluateDecision(commandContext, decisionDefinition);
+  }
+
+
+  protected DmnDecisionResult doEvaluateDecision(CommandContext commandContext, DecisionDefinition decisionDefinition) {
+
+    final DecisionInvocation invocation = new DecisionInvocation(decisionDefinition, variables.asVariableContext());
+
+    try {
+      commandContext.getProcessEngineConfiguration()
+        .getDelegateInterceptor()
+        .handleInvocation(invocation);
+
+      return invocation.getInvocationResult();
+
+    }
+    catch (Exception e) {
+      throw new ProcessEngineException("Exception while evaluating decision with id '"+decisionDefinitionId+"'", e);
+    }
   }
 
 }

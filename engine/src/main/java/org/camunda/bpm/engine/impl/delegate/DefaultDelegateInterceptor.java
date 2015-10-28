@@ -20,11 +20,20 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
+import org.camunda.bpm.engine.impl.dmn.invocation.DecisionInvocation;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.DelegateInterceptor;
+import org.camunda.bpm.engine.repository.DecisionDefinition;
 
 /**
- * Default implementation, simply proceeding the call.
+ * The default implementation of the DelegateInterceptor.
+ *<p/>
+ * This implementation has the following features:
+ * <ul>
+ * <li>it performs context switch into the target process application (if applicable)</li>
+ * <li>it checks autorizations if {@link ProcessEngineConfigurationImpl#isAuthorizationEnabledForCustomCode()} is true</li>
+ * </ul>
  *
  * @author Daniel Meyer
  * @author Roman Smirnov
@@ -32,9 +41,8 @@ import org.camunda.bpm.engine.impl.interceptor.DelegateInterceptor;
 public class DefaultDelegateInterceptor implements DelegateInterceptor {
 
   public void handleInvocation(final DelegateInvocation invocation) throws Exception {
-    BaseDelegateExecution contextExecution = invocation.getContextExecution();
 
-    ProcessApplicationReference processApplication = ProcessApplicationContextUtil.getTargetProcessApplication((CoreExecution) contextExecution);
+    final ProcessApplicationReference processApplication = getProcessApplicationForInvocation(invocation);
 
     if (processApplication != null && ProcessApplicationContextUtil.requiresContextSwitch(processApplication)) {
       Context.executeWithinProcessApplication(new Callable<Void>() {
@@ -44,25 +52,44 @@ public class DefaultDelegateInterceptor implements DelegateInterceptor {
           return null;
         }
       }, processApplication);
-    } else {
+    }
+    else {
+      handleInvocationInContext(invocation);
+    }
 
-      CommandContext commandContext = Context.getCommandContext();
-      boolean oldValue = commandContext.isAuthorizationCheckEnabled();
+  }
 
-      ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
-      if (!configuration.isAuthorizationEnabledForCustomCode()) {
-        // the custom code should be executed without authorization
-        commandContext.disableAuthorizationCheck();
+  protected void handleInvocationInContext(final DelegateInvocation invocation) throws Exception {
+    CommandContext commandContext = Context.getCommandContext();
+    boolean oldValue = commandContext.isAuthorizationCheckEnabled();
+
+    ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
+    if (!configuration.isAuthorizationEnabledForCustomCode()) {
+      // the custom code should be executed without authorization
+      commandContext.disableAuthorizationCheck();
+    }
+
+    try {
+      invocation.proceed();
+    }
+    finally {
+      if (oldValue) {
+        // the last "one" set the flag back to true
+        commandContext.enableAuthorizationCheck();
       }
+    }
+  }
 
-      try {
-        invocation.proceed();
-      } finally {
-        if (oldValue) {
-          // the last "one" set the flag back to true
-          commandContext.enableAuthorizationCheck();
-        }
-      }
+  protected ProcessApplicationReference getProcessApplicationForInvocation(final DelegateInvocation invocation) {
+    if (invocation instanceof DecisionInvocation) {
+      DecisionInvocation decisionInvocation = (DecisionInvocation) invocation;
+      DecisionDefinition decisionDefinition = decisionInvocation.getDecisionDefinition();
+      return ProcessApplicationContextUtil.getTargetProcessApplication((DecisionDefinitionEntity) decisionDefinition);
+
+    }
+    else {
+      BaseDelegateExecution contextExecution = invocation.getContextExecution();
+      return ProcessApplicationContextUtil.getTargetProcessApplication((CoreExecution) contextExecution);
     }
   }
 

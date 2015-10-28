@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.test.dmn.businessruletask;
 
+import java.util.Collections;
+
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.engine.exception.dmn.DecisionDefinitionNotFoundException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -29,6 +31,7 @@ public class DmnBusinessRuleTaskTest extends PluggableProcessEngineTestCase {
   public static final String DECISION_PROCESS_VERSION = "org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionRefVersionBinding.bpmn20.xml";
   public static final String DECISION_OKAY_DMN = "org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionOkay.dmn10.xml";
   public static final String DECISION_NOT_OKAY_DMN = "org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testDecisionNotOkay.dmn10.xml";
+  public static final String DECISION_EL_INTEGRATION = "org/camunda/bpm/engine/test/dmn/businessruletask/DmnBusinessRuleTaskTest.testElIntegration.dmn10.xml";
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_PROCESS_EXPRESSION, DECISION_OKAY_DMN })
   public void testDecisionRef() {
@@ -116,6 +119,16 @@ public class DmnBusinessRuleTaskTest extends PluggableProcessEngineTestCase {
     repositoryService.deleteDeployment(secondDeploymentId, true);
     repositoryService.deleteDeployment(thirdDeploymentId, true);
   }
+
+  @Deployment( resources = {DECISION_EL_INTEGRATION} )
+  public void testElIntegrationDecisionService() {
+
+    decisionService.evaluateDecisionByKey("testDecision", Collections.<String, Object>emptyMap());
+
+
+  }
+
+
 
   protected ProcessInstance startExpressionProcess(Object decisionKey, Object version) {
     VariableMap variables = Variables.createVariables()

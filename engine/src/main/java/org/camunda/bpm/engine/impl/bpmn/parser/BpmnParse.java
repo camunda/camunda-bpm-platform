@@ -2003,8 +2003,7 @@ public class BpmnParse extends Parse {
 
     String resultVariable = parseResultVariable(businessRuleTaskElement);
 
-    DecisionRuleTaskActivityBehavior behavior = new DecisionRuleTaskActivityBehavior(resultVariable);
-    behavior.setCallableElement(callableElement);
+    DecisionRuleTaskActivityBehavior behavior = new DecisionRuleTaskActivityBehavior(resultVariable, callableElement);
 
     activity.setActivityBehavior(behavior);
 

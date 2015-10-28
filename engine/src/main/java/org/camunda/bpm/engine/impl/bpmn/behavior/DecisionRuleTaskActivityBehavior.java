@@ -13,45 +13,71 @@
 
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
+import java.util.concurrent.Callable;
+
+import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.model.BaseCallableElement;
-import org.camunda.bpm.engine.impl.core.model.CallableElement;
+import org.camunda.bpm.engine.impl.delegate.DelegateInvocation;
+import org.camunda.bpm.engine.impl.dmn.invocation.DecisionInvocation;
+import org.camunda.bpm.engine.impl.dmn.invocation.VariableScopeContext;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
-import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
-import org.camunda.bpm.engine.impl.scripting.ScriptFactory;
 import org.camunda.bpm.engine.impl.util.CallableElementUtil;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 
-public class DecisionRuleTaskActivityBehavior extends ScriptTaskActivityBehavior {
+/**
+ * Implementation of a Bpmn BusinessRuleTask executing a DMN Decision.
+ *
+ * The decision is resolved as a {@link BaseCallableElement}.
+ *
+ * The decision is executed in the context of the current {@link VariableScope}.
+ *
+ * @author Daniel Meyer
+ *
+ */
+public class DecisionRuleTaskActivityBehavior extends AbstractBpmnActivityBehavior {
 
-  protected BaseCallableElement callableElement;
+  protected final String resultVariable;
 
-  public DecisionRuleTaskActivityBehavior(String resultVariable) {
-    super(null, resultVariable);
-  }
+  protected final BaseCallableElement callableElement;
 
-  @Override
-  public void execute(ActivityExecution execution) throws Exception {
-    script = createScript(execution);
-    super.execute(execution);
-  }
-
-  public BaseCallableElement getCallableElement() {
-    return callableElement;
-  }
-
-  public void setCallableElement(BaseCallableElement callableElement) {
+  public DecisionRuleTaskActivityBehavior(String resultVariableName, BaseCallableElement callableElement) {
+    this.resultVariable = resultVariableName;
     this.callableElement = callableElement;
   }
 
-  protected ExecutableScript createScript(ActivityExecution execution) {
-    DecisionDefinition definition = CallableElementUtil.getDecisionDefinitionToCall(execution, getCallableElement());
-    ScriptFactory scriptFactory = getScriptFactory();
-    return scriptFactory.createScriptFromDecisionDefinition(definition);
+  @Override
+  public void execute(final ActivityExecution execution) throws Exception {
+
+    final DecisionDefinition decisionDefinition = resolveDecisionDefinition(execution);
+    final DelegateInvocation invocation = createInvocation(execution, decisionDefinition);
+
+    executeWithErrorPropagation(execution, new Callable<Void>() {
+
+      public Void call() throws Exception {
+
+        Context.getProcessEngineConfiguration()
+          .getDelegateInterceptor()
+          .handleInvocation(invocation);
+
+        Object result = invocation.getInvocationResult();
+        if (result != null && resultVariable != null) {
+          execution.setVariable(resultVariable, result);
+        }
+
+        leave(execution);
+        return null;
+      }
+
+    });
   }
 
-  protected ScriptFactory getScriptFactory() {
-    return Context.getProcessEngineConfiguration().getScriptFactory();
+  protected DelegateInvocation createInvocation(ActivityExecution execution, DecisionDefinition decisionDefinitionToCall) {
+    return new DecisionInvocation(decisionDefinitionToCall, VariableScopeContext.wrap(execution));
+  }
+
+  protected DecisionDefinition resolveDecisionDefinition(ActivityExecution execution) {
+    return CallableElementUtil.getDecisionDefinitionToCall(execution, callableElement);
   }
 
 }

@@ -17,15 +17,16 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.Map;
 
-import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
-import org.camunda.bpm.dmn.engine.DmnEngine;
-import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.dmn.invocation.DecisionInvocation;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 
 /**
  * Evaluates the decision with the given key and version. If no version is
@@ -37,12 +38,12 @@ public class EvaluateDecisionByKeyCmd implements Command<DmnDecisionResult> {
 
   protected String decisionDefinitionKey;
   protected Integer version;
-  protected Map<String, Object> variables;
+  protected VariableMap variables;
 
   public EvaluateDecisionByKeyCmd(String decisionDefinitionKey, Integer version, Map<String, Object> variables) {
     this.decisionDefinitionKey = decisionDefinitionKey;
     this.version = version;
-    this.variables = variables;
+    this.variables = Variables.fromMap(variables);
   }
 
   public EvaluateDecisionByKeyCmd(String decisionDefinitionKey, Map<String, Object> variables) {
@@ -53,8 +54,6 @@ public class EvaluateDecisionByKeyCmd implements Command<DmnDecisionResult> {
   public DmnDecisionResult execute(CommandContext commandContext) {
     ensureNotNull("decision definition key is null", "processDefinitionKey", decisionDefinitionKey);
 
-    DmnEngine dmnEngine = commandContext.getProcessEngineConfiguration().getDmnEngine();
-
     DecisionDefinition decisionDefinition = getDecisionDefinition(commandContext);
     ensureNotNull("No decision definition found for key '" + decisionDefinitionKey + "' and version '" + version + "'", "decisionDefinition",
         decisionDefinition);
@@ -63,7 +62,25 @@ public class EvaluateDecisionByKeyCmd implements Command<DmnDecisionResult> {
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     authorizationManager.checkEvaluateDecision(decisionDefinition.getKey());
 
-    return dmnEngine.evaluate((DmnDecision) decisionDefinition, variables);
+    return doEvaluateDecision(commandContext, decisionDefinition, variables);
+
+  }
+
+  protected DmnDecisionResult doEvaluateDecision(CommandContext commandContext, DecisionDefinition decisionDefinition, VariableMap variables) {
+
+    final DecisionInvocation invocation = new DecisionInvocation(decisionDefinition, variables.asVariableContext());
+
+    try {
+      commandContext.getProcessEngineConfiguration()
+        .getDelegateInterceptor()
+        .handleInvocation(invocation);
+
+      return invocation.getInvocationResult();
+
+    }
+    catch (Exception e) {
+      throw new ProcessEngineException("Exception while evaluating decision with key '"+decisionDefinitionKey+"'", e);
+    }
   }
 
   protected DecisionDefinition getDecisionDefinition(CommandContext commandContext) {

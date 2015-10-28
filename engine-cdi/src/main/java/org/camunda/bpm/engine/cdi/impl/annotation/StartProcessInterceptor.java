@@ -27,8 +27,8 @@ import org.camunda.bpm.engine.cdi.BusinessProcess;
 import org.camunda.bpm.engine.cdi.annotation.ProcessVariable;
 import org.camunda.bpm.engine.cdi.annotation.ProcessVariableTyped;
 import org.camunda.bpm.engine.cdi.annotation.StartProcess;
-import org.camunda.bpm.engine.impl.core.variable.VariableMapImpl;
 import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
 
 /**
  * implementation of the {@link StartProcess} annotation
