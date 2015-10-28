@@ -24,8 +24,8 @@ public class DecisionRuleTest extends DmnModelElementInstanceTest {
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
     return Arrays.asList(
-      new ChildElementAssumption(Condition.class),
-      new ChildElementAssumption(Conclusion.class)
+      new ChildElementAssumption(InputEntry.class),
+      new ChildElementAssumption(OutputEntry.class, 1)
     );
   }
 

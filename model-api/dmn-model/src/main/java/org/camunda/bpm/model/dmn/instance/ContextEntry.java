@@ -15,12 +15,10 @@ package org.camunda.bpm.model.dmn.instance;
 
 public interface ContextEntry extends DmnModelElementInstance {
 
-  // NOTE: variable
-  InformationItem getInformationItem();
+  Variable getVariable();
 
-  void setInformationItem(InformationItem informationItem);
+  void setVariable(Variable variable);
 
-  // NOTE: value
   Expression getExpression();
 
   void setExpression(Expression expression);

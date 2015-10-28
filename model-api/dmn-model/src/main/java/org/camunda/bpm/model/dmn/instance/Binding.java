@@ -15,7 +15,6 @@ package org.camunda.bpm.model.dmn.instance;
 
 public interface Binding extends DmnModelElementInstance {
 
-  // NOTE: bindingFormula
   Expression getExpression();
 
   void setExpression(Expression expression);

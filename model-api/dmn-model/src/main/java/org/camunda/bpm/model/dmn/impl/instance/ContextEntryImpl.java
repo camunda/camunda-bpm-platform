@@ -13,12 +13,12 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.FEEL_ELEMENT_CONTEXT_ENTRY;
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.FEEL_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_CONTEXT_ENTRY;
 
 import org.camunda.bpm.model.dmn.instance.ContextEntry;
 import org.camunda.bpm.model.dmn.instance.Expression;
-import org.camunda.bpm.model.dmn.instance.InformationItem;
+import org.camunda.bpm.model.dmn.instance.Variable;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
@@ -28,19 +28,19 @@ import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 
 public class ContextEntryImpl extends DmnModelElementInstanceImpl implements ContextEntry {
 
-  protected static ChildElement<InformationItem> informationItemChild;
+  protected static ChildElement<Variable> variableChild;
   protected static ChildElement<Expression> expressionChild;
 
   public ContextEntryImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
   }
 
-  public InformationItem getInformationItem() {
-    return informationItemChild.getChild(this);
+  public Variable getVariable() {
+    return variableChild.getChild(this);
   }
 
-  public void setInformationItem(InformationItem informationItem) {
-    informationItemChild.setChild(this, informationItem);
+  public void setVariable(Variable variable) {
+    variableChild.setChild(this, variable);
   }
 
   public Expression getExpression() {
@@ -52,8 +52,8 @@ public class ContextEntryImpl extends DmnModelElementInstanceImpl implements Con
   }
 
   public static void registerType(ModelBuilder modelBuilder) {
-    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(ContextEntry.class, FEEL_ELEMENT_CONTEXT_ENTRY)
-      .namespaceUri(FEEL_NS)
+    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(ContextEntry.class, DMN_ELEMENT_CONTEXT_ENTRY)
+      .namespaceUri(DMN11_NS)
       .instanceProvider(new ModelTypeInstanceProvider<ContextEntry>() {
         public ContextEntry newInstance(ModelTypeInstanceContext instanceContext) {
           return new ContextEntryImpl(instanceContext);
@@ -62,7 +62,7 @@ public class ContextEntryImpl extends DmnModelElementInstanceImpl implements Con
 
     SequenceBuilder sequenceBuilder = typeBuilder.sequence();
 
-    informationItemChild = sequenceBuilder.element(InformationItem.class)
+    variableChild = sequenceBuilder.element(Variable.class)
       .build();
 
     expressionChild = sequenceBuilder.element(Expression.class)

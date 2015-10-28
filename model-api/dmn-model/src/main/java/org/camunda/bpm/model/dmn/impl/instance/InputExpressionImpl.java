@@ -13,7 +13,7 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN10_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_INPUT_EXPRESSION;
 
 import org.camunda.bpm.model.dmn.instance.InputExpression;
@@ -31,7 +31,7 @@ public class InputExpressionImpl extends LiteralExpressionImpl implements InputE
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(InputExpression.class, DMN_ELEMENT_INPUT_EXPRESSION)
-      .namespaceUri(DMN10_NS)
+      .namespaceUri(DMN11_NS)
       .extendsType(LiteralExpression.class)
       .instanceProvider(new ModelTypeInstanceProvider<InputExpression>() {
         public InputExpression newInstance(ModelTypeInstanceContext instanceContext) {

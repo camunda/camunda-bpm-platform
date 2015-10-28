@@ -37,7 +37,7 @@ public class DmnParser extends AbstractModelParser {
 
   public DmnParser() {
     this.schemaFactory = SchemaFactory.newInstance(W3C_XML_SCHEMA);
-    URL cmmnSchema = ReflectUtil.getResource(DmnModelConstants.DMN_10_SCHEMA_LOCATION, DmnParser.class.getClassLoader());
+    URL cmmnSchema = ReflectUtil.getResource(DmnModelConstants.DMN_11_SCHEMA_LOCATION, DmnParser.class.getClassLoader());
     try {
       this.schema = schemaFactory.newSchema(cmmnSchema);
     } catch (SAXException e) {
@@ -48,7 +48,7 @@ public class DmnParser extends AbstractModelParser {
   @Override
   protected void configureFactory(DocumentBuilderFactory dbf) {
     dbf.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
-    dbf.setAttribute(JAXP_SCHEMA_SOURCE, ReflectUtil.getResource(DmnModelConstants.DMN_10_SCHEMA_LOCATION, DmnParser.class.getClassLoader()).toString());
+    dbf.setAttribute(JAXP_SCHEMA_SOURCE, ReflectUtil.getResource(DmnModelConstants.DMN_11_SCHEMA_LOCATION, DmnParser.class.getClassLoader()).toString());
     super.configureFactory(dbf);
   }
 

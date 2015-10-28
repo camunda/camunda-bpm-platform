@@ -23,8 +23,8 @@ public interface LiteralExpression extends Expression {
 
   void setText(Text text);
 
-  Import getImport();
+  ImportedValues getImportValues();
 
-  void setImport(Import importElement);
+  void setImportValues(ImportedValues importedValues);
 
 }

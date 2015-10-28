@@ -17,10 +17,8 @@ import java.util.Collection;
 
 public interface FunctionDefinition extends Expression {
 
-  // NOTE: formal parameters
-  Collection<InformationItem> getInformationItems();
+  Collection<FormalParameter> getFormalParameters();
 
-  // NOTE: body
   Expression getExpression();
 
   void setExpression(Expression expression);

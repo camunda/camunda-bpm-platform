@@ -13,7 +13,7 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN10_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_AUTHORITY_REQUIREMENT;
 
 import org.camunda.bpm.model.dmn.instance.AuthorityRequirement;
@@ -66,7 +66,7 @@ public class AuthorityRequirementImpl extends DmnModelElementInstanceImpl implem
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(AuthorityRequirement.class, DMN_ELEMENT_AUTHORITY_REQUIREMENT)
-      .namespaceUri(DMN10_NS)
+      .namespaceUri(DMN11_NS)
       .instanceProvider(new ModelTypeInstanceProvider<AuthorityRequirement>() {
         public AuthorityRequirement newInstance(ModelTypeInstanceContext instanceContext) {
           return new AuthorityRequirementImpl(instanceContext);

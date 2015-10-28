@@ -13,12 +13,12 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN10_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ATTRIBUTE_EXPRESSION_LANGUAGE;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_LITERAL_EXPRESSION;
 
 import org.camunda.bpm.model.dmn.instance.Expression;
-import org.camunda.bpm.model.dmn.instance.Import;
+import org.camunda.bpm.model.dmn.instance.ImportedValues;
 import org.camunda.bpm.model.dmn.instance.LiteralExpression;
 import org.camunda.bpm.model.dmn.instance.Text;
 import org.camunda.bpm.model.xml.ModelBuilder;
@@ -32,8 +32,9 @@ import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 public class LiteralExpressionImpl extends ExpressionImpl implements LiteralExpression {
 
   protected static Attribute<String> expressionLanguageAttribute;
+
   protected static ChildElement<Text> textChild;
-  protected static ChildElement<Import> importChild;
+  protected static ChildElement<ImportedValues> importedValuesChild;
 
   public LiteralExpressionImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
@@ -55,17 +56,17 @@ public class LiteralExpressionImpl extends ExpressionImpl implements LiteralExpr
     textChild.setChild(this, text);
   }
 
-  public Import getImport() {
-    return importChild.getChild(this);
+  public ImportedValues getImportValues() {
+    return importedValuesChild.getChild(this);
   }
 
-  public void setImport(Import importElement) {
-    importChild.setChild(this, importElement);
+  public void setImportValues(ImportedValues importedValues) {
+    importedValuesChild.setChild(this, importedValues);
   }
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(LiteralExpression.class, DMN_ELEMENT_LITERAL_EXPRESSION)
-      .namespaceUri(DMN10_NS)
+      .namespaceUri(DMN11_NS)
       .extendsType(Expression.class)
       .instanceProvider(new ModelTypeInstanceProvider<LiteralExpression>() {
         public LiteralExpression newInstance(ModelTypeInstanceContext instanceContext) {
@@ -81,7 +82,7 @@ public class LiteralExpressionImpl extends ExpressionImpl implements LiteralExpr
     textChild = sequenceBuilder.element(Text.class)
       .build();
 
-    importChild = sequenceBuilder.element(Import.class)
+    importedValuesChild = sequenceBuilder.element(ImportedValues.class)
       .build();
 
     typeBuilder.build();

@@ -13,7 +13,7 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN10_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_BUSINESS_KNOWLEDGE_MODEL;
 
 import java.util.Collection;
@@ -21,9 +21,9 @@ import java.util.Collection;
 import org.camunda.bpm.model.dmn.instance.AuthorityRequirement;
 import org.camunda.bpm.model.dmn.instance.BusinessKnowledgeModel;
 import org.camunda.bpm.model.dmn.instance.DrgElement;
-import org.camunda.bpm.model.dmn.instance.Expression;
-import org.camunda.bpm.model.dmn.instance.InformationItem;
+import org.camunda.bpm.model.dmn.instance.EncapsulatedLogic;
 import org.camunda.bpm.model.dmn.instance.KnowledgeRequirement;
+import org.camunda.bpm.model.dmn.instance.Variable;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
@@ -34,8 +34,8 @@ import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 
 public class BusinessKnowledgeModelImpl extends DrgElementImpl implements BusinessKnowledgeModel {
 
-  protected static ChildElementCollection<InformationItem> informationItemCollection;
-  protected static ChildElement<Expression> expressionChild;
+  protected static ChildElement<EncapsulatedLogic> encapsulatedLogicChild;
+  protected static ChildElement<Variable> variableChild;
   protected static ChildElementCollection<KnowledgeRequirement> knowledgeRequirementCollection;
   protected static ChildElementCollection<AuthorityRequirement> authorityRequirementCollection;
 
@@ -43,16 +43,20 @@ public class BusinessKnowledgeModelImpl extends DrgElementImpl implements Busine
     super(instanceContext);
   }
 
-  public Collection<InformationItem> getInformationItems() {
-    return informationItemCollection.get(this);
+  public EncapsulatedLogic getEncapsulatedLogic() {
+    return encapsulatedLogicChild.getChild(this);
   }
 
-  public Expression getExpression() {
-    return expressionChild.getChild(this);
+  public void setEncapsulatedLogic(EncapsulatedLogic encapsulatedLogic) {
+    encapsulatedLogicChild.setChild(this, encapsulatedLogic);
   }
 
-  public void setExpression(Expression expression) {
-    expressionChild.setChild(this, expression);
+  public Variable getVariable() {
+    return variableChild.getChild(this);
+  }
+
+  public void setVariable(Variable variable) {
+    variableChild.setChild(this, variable);
   }
 
   public Collection<KnowledgeRequirement> getKnowledgeRequirement() {
@@ -65,7 +69,7 @@ public class BusinessKnowledgeModelImpl extends DrgElementImpl implements Busine
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(BusinessKnowledgeModel.class, DMN_ELEMENT_BUSINESS_KNOWLEDGE_MODEL)
-      .namespaceUri(DMN10_NS)
+      .namespaceUri(DMN11_NS)
       .extendsType(DrgElement.class)
       .instanceProvider(new ModelTypeInstanceProvider<BusinessKnowledgeModel>() {
         public BusinessKnowledgeModel newInstance(ModelTypeInstanceContext instanceContext) {
@@ -75,10 +79,10 @@ public class BusinessKnowledgeModelImpl extends DrgElementImpl implements Busine
 
     SequenceBuilder sequenceBuilder = typeBuilder.sequence();
 
-    informationItemCollection = sequenceBuilder.elementCollection(InformationItem.class)
+    encapsulatedLogicChild = sequenceBuilder.element(EncapsulatedLogic.class)
       .build();
 
-    expressionChild = sequenceBuilder.element(Expression.class)
+    variableChild = sequenceBuilder.element(Variable.class)
       .build();
 
     knowledgeRequirementCollection = sequenceBuilder.elementCollection(KnowledgeRequirement.class)

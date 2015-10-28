@@ -13,59 +13,40 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN10_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ATTRIBUTE_TYPE_REF;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_EXPRESSION;
-
-import java.util.Collection;
 
 import org.camunda.bpm.model.dmn.instance.DmnElement;
 import org.camunda.bpm.model.dmn.instance.Expression;
-import org.camunda.bpm.model.dmn.instance.InformationItem;
-import org.camunda.bpm.model.dmn.instance.InputVariableReference;
-import org.camunda.bpm.model.dmn.instance.ItemDefinition;
-import org.camunda.bpm.model.dmn.instance.ItemDefinitionReference;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
-import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
-import org.camunda.bpm.model.xml.type.reference.ElementReference;
-import org.camunda.bpm.model.xml.type.reference.ElementReferenceCollection;
+import org.camunda.bpm.model.xml.type.attribute.Attribute;
 
 public abstract class ExpressionImpl extends DmnElementImpl implements Expression {
 
-  protected static ElementReferenceCollection<InformationItem, InputVariableReference> inputVariableRefCollection;
-  protected static ElementReference<ItemDefinition, ItemDefinitionReference> itemDefinitionRef;
+  protected static Attribute<String> typeRefAttribute;
 
   public ExpressionImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
   }
 
-  public Collection<InformationItem> getInputVariables() {
-    return inputVariableRefCollection.getReferenceTargetElements(this);
+  public String getTypeRef() {
+    return typeRefAttribute.getValue(this);
   }
 
-  public ItemDefinition getItemDefinition() {
-    return itemDefinitionRef.getReferenceTargetElement(this);
-  }
-
-  public void setItemDefinition(ItemDefinition itemDefinition) {
-    itemDefinitionRef.setReferenceTargetElement(this, itemDefinition);
+  public void setTypeRef(String typeRef) {
+    typeRefAttribute.setValue(this, typeRef);
   }
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Expression.class, DMN_ELEMENT_EXPRESSION)
-      .namespaceUri(DMN10_NS)
+      .namespaceUri(DMN11_NS)
       .extendsType(DmnElement.class)
       .abstractType();
 
-    SequenceBuilder sequenceBuilder = typeBuilder.sequence();
-
-    inputVariableRefCollection = sequenceBuilder.elementCollection(InputVariableReference.class)
-      .idElementReferenceCollection(InformationItem.class)
-      .build();
-
-    itemDefinitionRef = sequenceBuilder.element(ItemDefinitionReference.class)
-      .uriElementReference(ItemDefinition.class)
+    typeRefAttribute = typeBuilder.stringAttribute(DMN_ATTRIBUTE_TYPE_REF)
       .build();
 
     typeBuilder.build();

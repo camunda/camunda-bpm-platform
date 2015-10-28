@@ -27,7 +27,8 @@ public class DecisionTableTest extends DmnModelElementInstanceTest {
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
     return Arrays.asList(
-      new ChildElementAssumption(Clause.class),
+      new ChildElementAssumption(Input.class),
+      new ChildElementAssumption(Output.class, 1),
       new ChildElementAssumption(Rule.class)
     );
   }
@@ -37,8 +38,7 @@ public class DecisionTableTest extends DmnModelElementInstanceTest {
       new AttributeAssumption("hitPolicy", false, false, HitPolicy.UNIQUE),
       new AttributeAssumption("aggregation"),
       new AttributeAssumption("preferedOrientation", false, false, DecisionTableOrientation.Rule_as_Row),
-      new AttributeAssumption("isComplete", false, false, false),
-      new AttributeAssumption("isConsistent", false, false, false)
+      new AttributeAssumption("outputLabel")
     );
   }
 

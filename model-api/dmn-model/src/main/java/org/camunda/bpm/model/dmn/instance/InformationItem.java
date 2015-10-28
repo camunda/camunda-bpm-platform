@@ -13,10 +13,10 @@
 
 package org.camunda.bpm.model.dmn.instance;
 
-public interface InformationItem extends NamedDmnElement {
+public interface InformationItem extends NamedElement {
 
-  ItemDefinition getItemDefinition();
+  String getTypeRef();
 
-  void setItemDefinition(ItemDefinition itemDefinition);
+  void setTypeRef(String typeRef);
 
 }

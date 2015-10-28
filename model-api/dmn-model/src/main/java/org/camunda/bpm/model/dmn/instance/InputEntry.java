@@ -13,6 +13,6 @@
 
 package org.camunda.bpm.model.dmn.instance;
 
-public interface InputEntry extends LiteralExpression {
+public interface InputEntry extends UnaryTests {
 
 }

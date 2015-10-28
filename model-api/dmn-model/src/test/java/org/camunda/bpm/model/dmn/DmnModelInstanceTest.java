@@ -1,11 +1,11 @@
 package org.camunda.bpm.model.dmn;
 
-import org.camunda.bpm.model.dmn.instance.Definitions;
-import org.junit.Test;
-
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
+import org.camunda.bpm.model.dmn.instance.Definitions;
+import org.junit.Test;
 
 /**
  * @author Filip Hrisafov

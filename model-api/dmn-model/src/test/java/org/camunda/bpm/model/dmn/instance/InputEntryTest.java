@@ -18,7 +18,7 @@ import java.util.Collection;
 public class InputEntryTest extends DmnModelElementInstanceTest {
 
   public TypeAssumption getTypeAssumption() {
-    return new TypeAssumption(LiteralExpression.class, false);
+    return new TypeAssumption(UnaryTests.class, false);
   }
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {

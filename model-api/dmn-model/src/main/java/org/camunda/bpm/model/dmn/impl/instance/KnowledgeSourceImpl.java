@@ -13,7 +13,7 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN10_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ATTRIBUTE_LOCATION_URI;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_KNOWLEDGE_SOURCE;
 
@@ -38,9 +38,10 @@ import org.camunda.bpm.model.xml.type.reference.ElementReference;
 public class KnowledgeSourceImpl extends DrgElementImpl implements KnowledgeSource {
 
   protected static Attribute<String> locationUriAttribute;
+
   protected static ChildElementCollection<AuthorityRequirement> authorityRequirementCollection;
   protected static ChildElement<Type> typeChild;
-  protected static ElementReference<OrganizationUnit, OwnerReference> ownerRefChild;
+  protected static ElementReference<OrganizationUnit, OwnerReference> ownerRef;
 
   public KnowledgeSourceImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
@@ -58,36 +59,25 @@ public class KnowledgeSourceImpl extends DrgElementImpl implements KnowledgeSour
     return authorityRequirementCollection.get(this);
   }
 
-  public String getType() {
-    Type child = typeChild.getChild(this);
-    if (child != null) {
-      return child.getTextContent();
-    }
-    else {
-      return null;
-    }
+  public Type getType() {
+    return typeChild.getChild(this);
   }
 
-  public void setType(String type) {
-    Type child = typeChild.getChild(this);
-    if (child == null) {
-      child = modelInstance.newInstance(Type.class);
-      typeChild.setChild(this, child);
-    }
-    child.setTextContent(type);
+  public void setType(Type type) {
+    typeChild.setChild(this, type);
   }
 
   public OrganizationUnit getOwner() {
-    return ownerRefChild.getReferenceTargetElement(this);
+    return ownerRef.getReferenceTargetElement(this);
   }
 
   public void setOwner(OrganizationUnit owner) {
-    ownerRefChild.setReferenceTargetElement(this, owner);
+    ownerRef.setReferenceTargetElement(this, owner);
   }
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(KnowledgeSource.class, DMN_ELEMENT_KNOWLEDGE_SOURCE)
-      .namespaceUri(DMN10_NS)
+      .namespaceUri(DMN11_NS)
       .extendsType(DrgElement.class)
       .instanceProvider(new ModelTypeInstanceProvider<KnowledgeSource>() {
         public KnowledgeSource newInstance(ModelTypeInstanceContext instanceContext) {
@@ -106,7 +96,7 @@ public class KnowledgeSourceImpl extends DrgElementImpl implements KnowledgeSour
     typeChild = sequenceBuilder.element(Type.class)
       .build();
 
-    ownerRefChild = sequenceBuilder.element(OwnerReference.class)
+    ownerRef = sequenceBuilder.element(OwnerReference.class)
       .uriElementReference(OrganizationUnit.class)
       .build();
 

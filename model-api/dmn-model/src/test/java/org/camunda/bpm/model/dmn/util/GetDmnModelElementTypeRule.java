@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.model.dmn.util;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.camunda.bpm.model.dmn.Dmn;
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.ModelInstance;
@@ -32,8 +34,9 @@ public class GetDmnModelElementTypeRule extends TestWatcher implements GetModelE
   @SuppressWarnings("unchecked")
   protected void starting(Description description) {
     String className = description.getClassName();
-    className =  className.replaceAll("Test", "");
-    Class<? extends ModelElementInstance> instanceClass = null;
+    assertThat(className).endsWith("Test");
+    className = className.substring(0, className.length() - "Test".length());
+    Class<? extends ModelElementInstance> instanceClass;
     try {
       instanceClass = (Class<? extends ModelElementInstance>) Class.forName(className);
     } catch (ClassNotFoundException e) {

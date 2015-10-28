@@ -13,17 +13,16 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN10_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_TYPE_REF;
 
-import org.camunda.bpm.model.dmn.instance.DmnElementReference;
 import org.camunda.bpm.model.dmn.instance.TypeRef;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
 
-public class TypeRefImpl extends DmnElementReferenceImpl implements TypeRef {
+public class TypeRefImpl extends DmnModelElementInstanceImpl implements TypeRef {
 
   public TypeRefImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
@@ -31,8 +30,7 @@ public class TypeRefImpl extends DmnElementReferenceImpl implements TypeRef {
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(TypeRef.class, DMN_ELEMENT_TYPE_REF)
-      .namespaceUri(DMN10_NS)
-      .extendsType(DmnElementReference.class)
+      .namespaceUri(DMN11_NS)
       .instanceProvider(new ModelTypeInstanceProvider<TypeRef>() {
         public TypeRef newInstance(ModelTypeInstanceContext instanceContext) {
           return new TypeRefImpl(instanceContext);
@@ -41,4 +39,5 @@ public class TypeRefImpl extends DmnElementReferenceImpl implements TypeRef {
 
     typeBuilder.build();
   }
+
 }

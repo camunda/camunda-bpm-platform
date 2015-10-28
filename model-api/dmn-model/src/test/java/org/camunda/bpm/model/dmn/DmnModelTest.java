@@ -21,6 +21,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.camunda.bpm.model.dmn.instance.DmnElement;
 import org.camunda.bpm.model.dmn.instance.DmnModelElementInstance;
+import org.camunda.bpm.model.dmn.instance.NamedElement;
 import org.camunda.bpm.model.dmn.util.ParseDmnModelRule;
 import org.camunda.bpm.model.xml.impl.util.ReflectUtil;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
@@ -34,7 +35,7 @@ import org.w3c.dom.Document;
 
 public abstract class DmnModelTest {
 
-  public final static String TEST_URI = "http://camunda.org/dmn";
+  public final static String TEST_NAMESPACE = "http://camunda.org/schema/1.0/dmn";
 
   @Rule
   public final ParseDmnModelRule parseDmnModelRule = new ParseDmnModelRule();
@@ -42,27 +43,41 @@ public abstract class DmnModelTest {
   @Rule
   public TemporaryFolder tmpFolder = new TemporaryFolder();
 
-  protected DmnModelInstance dmnModelInstance;
+  protected DmnModelInstance modelInstance;
 
   @Before
   public void setup() {
-    dmnModelInstance = parseDmnModelRule.getDmnModel();
+    modelInstance = parseDmnModelRule.getDmnModel();
+  }
+
+  public <E extends NamedElement> E generateNamedElement(Class<E> elementClass) {
+    return generateNamedElement(elementClass, "");
+  }
+
+  public <E extends NamedElement> E generateNamedElement(Class<E> elementClass, Integer suffix) {
+    return generateNamedElement(elementClass, "", suffix);
+  }
+
+  public <E extends NamedElement> E generateNamedElement(Class<E> elementClass, String name) {
+    return generateNamedElement(elementClass, name, null);
+  }
+
+  public <E extends NamedElement> E generateNamedElement(Class<E> elementClass, String name, Integer suffix) {
+    E element = generateElement(elementClass, suffix);
+    element.setName(name);
+    return element;
   }
 
   public <E extends DmnModelElementInstance> E generateElement(Class<E> elementClass) {
     return generateElement(elementClass, null);
   }
 
-  public <E extends DmnModelElementInstance> E generateElement(Class<E> elementClass, int suffix) {
-    return generateElement(elementClass, String.valueOf(suffix));
-  }
-
-  public <E extends DmnModelElementInstance> E generateElement(Class<E> elementClass, String suffix) {
-    E element = dmnModelInstance.newInstance(elementClass);
+  public <E extends DmnModelElementInstance> E generateElement(Class<E> elementClass, Integer suffix) {
+    E element = modelInstance.newInstance(elementClass);
     if (element instanceof DmnElement) {
       String identifier = elementClass.getSimpleName();
       if (suffix != null) {
-        identifier += suffix;
+        identifier += suffix.toString();
       }
       identifier = Character.toLowerCase(identifier.charAt(0)) + identifier.substring(1);
       ((DmnElement) element).setId(identifier);
@@ -70,9 +85,9 @@ public abstract class DmnModelTest {
     return element;
   }
 
-  protected void assertModelEqualsFile(String expectedPath) throws Exception{
+  protected void assertModelEqualsFile(String expectedPath) throws Exception {
     File actualFile = tmpFolder.newFile();
-    Dmn.writeModelToFile(actualFile, dmnModelInstance);
+    Dmn.writeModelToFile(actualFile, modelInstance);
 
     File expectedFile = ReflectUtil.getResourceAsFile(expectedPath);
 
@@ -85,7 +100,7 @@ public abstract class DmnModelTest {
     if (!diff.similar()) {
       diff.overrideElementQualifier(new RecursiveElementNameAndTextQualifier());
       DetailedDiff detailedDiff = new DetailedDiff(diff);
-      String failMsg = "XML differs:\n" + detailedDiff.getAllDifferences() + "\n\nActual XML:\n" + Dmn.convertToString(dmnModelInstance);
+      String failMsg = "XML differs:\n" + detailedDiff.getAllDifferences() + "\n\nActual XML:\n" + Dmn.convertToString(modelInstance);
       fail(failMsg);
     }
   }
@@ -93,7 +108,7 @@ public abstract class DmnModelTest {
   protected void assertElementIsEqualToId(DmnModelElementInstance actualElement, String id) {
     assertThat(actualElement).isNotNull();
 
-    ModelElementInstance expectedElement = dmnModelInstance.getModelElementById(id);
+    ModelElementInstance expectedElement = modelInstance.getModelElementById(id);
     assertThat(expectedElement).isNotNull();
 
     assertThat(actualElement).isEqualTo(expectedElement);

@@ -13,26 +13,26 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.FEEL_ELEMENT_COLUMN;
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.FEEL_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_COLUMN;
 
 import org.camunda.bpm.model.dmn.instance.Column;
-import org.camunda.bpm.model.dmn.instance.ContextEntry;
+import org.camunda.bpm.model.dmn.instance.InformationItem;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
 
-public class ColumnImpl extends ContextEntryImpl implements Column {
+public class ColumnImpl extends InformationItemImpl implements Column {
 
   public ColumnImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
   }
 
   public static void registerType(ModelBuilder modelBuilder) {
-    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Column.class, FEEL_ELEMENT_COLUMN)
-      .namespaceUri(FEEL_NS)
-      .extendsType(ContextEntry.class)
+    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Column.class, DMN_ELEMENT_COLUMN)
+      .namespaceUri(DMN11_NS)
+      .extendsType(InformationItem.class)
       .instanceProvider(new ModelTypeInstanceProvider<Column>() {
         public Column newInstance(ModelTypeInstanceContext instanceContext) {
           return new ColumnImpl(instanceContext);

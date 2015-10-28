@@ -19,7 +19,7 @@ import java.util.Collection;
 public class BusinessContextElementTest extends DmnModelElementInstanceTest {
 
   public TypeAssumption getTypeAssumption() {
-    return new TypeAssumption(DmnElement.class, true);
+    return new TypeAssumption(NamedElement.class, true);
   }
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {

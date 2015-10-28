@@ -13,6 +13,6 @@
 
 package org.camunda.bpm.model.dmn.instance;
 
-public interface Column extends ContextEntry {
+public interface Column extends InformationItem {
 
 }

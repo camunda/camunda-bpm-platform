@@ -26,7 +26,7 @@ public class DecisionTest extends DmnModelElementInstanceTest {
     return Arrays.asList(
       new ChildElementAssumption(Question.class, 0, 1),
       new ChildElementAssumption(AllowedAnswers.class, 0, 1),
-      new ChildElementAssumption(OutputDefinitionReference.class, 0, 1),
+      new ChildElementAssumption(Variable.class, 0, 1),
       new ChildElementAssumption(InformationRequirement.class),
       new ChildElementAssumption(KnowledgeRequirement.class),
       new ChildElementAssumption(AuthorityRequirement.class),

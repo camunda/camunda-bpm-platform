@@ -13,7 +13,7 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN10_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_ORGANIZATION_UNIT;
 
 import java.util.Collection;
@@ -49,7 +49,7 @@ public class OrganizationUnitImpl extends BusinessContextElementImpl implements 
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(OrganizationUnit.class, DMN_ELEMENT_ORGANIZATION_UNIT)
-      .namespaceUri(DMN10_NS)
+      .namespaceUri(DMN11_NS)
       .extendsType(BusinessContextElement.class)
       .instanceProvider(new ModelTypeInstanceProvider<OrganizationUnit>() {
         public OrganizationUnit newInstance(ModelTypeInstanceContext instanceContext) {

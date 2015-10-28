@@ -13,7 +13,7 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN10_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_IMPACTING_DECISION;
 
 import org.camunda.bpm.model.dmn.instance.DmnElementReference;
@@ -31,7 +31,7 @@ public class ImpactingDecisionReferenceImpl extends DmnElementReferenceImpl impl
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(ImpactingDecisionReference.class, DMN_ELEMENT_IMPACTING_DECISION)
-      .namespaceUri(DMN10_NS)
+      .namespaceUri(DMN11_NS)
       .extendsType(DmnElementReference.class)
       .instanceProvider(new ModelTypeInstanceProvider<ImpactingDecisionReference>() {
         public ImpactingDecisionReference newInstance(ModelTypeInstanceContext instanceContext) {

@@ -15,11 +15,6 @@ package org.camunda.bpm.model.dmn.instance;
 
 public interface InformationRequirement extends DmnModelElementInstance {
 
-  // Note: variable
-  InformationItem getInformationItem();
-
-  void setInformationItem(InformationItem informationItem);
-
   Decision getRequiredDecision();
 
   void setRequiredDecision(Decision requiredDecision);

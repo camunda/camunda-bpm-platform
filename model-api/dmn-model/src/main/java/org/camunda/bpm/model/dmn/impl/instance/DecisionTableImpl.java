@@ -13,11 +13,10 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN10_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ATTRIBUTE_AGGREGATION;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ATTRIBUTE_HIT_POLICY;
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ATTRIBUTE_IS_COMPLETE;
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ATTRIBUTE_IS_CONSISTENT;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ATTRIBUTE_OUTPUT_LABEL;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ATTRIBUTE_PREFERED_ORIENTATION;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_DECISION_TABLE;
 
@@ -26,9 +25,10 @@ import java.util.Collection;
 import org.camunda.bpm.model.dmn.BuiltinAggregator;
 import org.camunda.bpm.model.dmn.DecisionTableOrientation;
 import org.camunda.bpm.model.dmn.HitPolicy;
-import org.camunda.bpm.model.dmn.instance.Clause;
 import org.camunda.bpm.model.dmn.instance.DecisionTable;
 import org.camunda.bpm.model.dmn.instance.Expression;
+import org.camunda.bpm.model.dmn.instance.Input;
+import org.camunda.bpm.model.dmn.instance.Output;
 import org.camunda.bpm.model.dmn.instance.Rule;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
@@ -43,10 +43,10 @@ public class DecisionTableImpl extends ExpressionImpl implements DecisionTable {
   protected static Attribute<HitPolicy> hitPolicyAttribute;
   protected static Attribute<BuiltinAggregator> aggregationAttribute;
   protected static Attribute<DecisionTableOrientation> preferedOrientationAttribute;
-  protected static Attribute<Boolean> isCompleteAttribute;
-  protected static Attribute<Boolean> isConsistentAttribute;
+  protected static Attribute<String> outputLabelAttribute;
 
-  protected static ChildElementCollection<Clause> clauseCollection;
+  protected static ChildElementCollection<Input> inputCollection;
+  protected static ChildElementCollection<Output> outputCollection;
   protected static ChildElementCollection<Rule> ruleCollection;
 
   public DecisionTableImpl(ModelTypeInstanceContext instanceContext) {
@@ -77,24 +77,20 @@ public class DecisionTableImpl extends ExpressionImpl implements DecisionTable {
     preferedOrientationAttribute.setValue(this, preferedOrientation);
   }
 
-  public boolean isComplete() {
-    return isCompleteAttribute.getValue(this);
+  public String getOutputLabel() {
+    return outputLabelAttribute.getValue(this);
   }
 
-  public void setComplete(boolean isComplete) {
-    isCompleteAttribute.setValue(this, isComplete);
+  public void setOutputLabel(String outputLabel) {
+    outputLabelAttribute.setValue(this, outputLabel);
   }
 
-  public boolean isConsistent() {
-    return isConsistentAttribute.getValue(this);
+  public Collection<Input> getInputs() {
+    return inputCollection.get(this);
   }
 
-  public void setConsistent(boolean isConsistent) {
-    isConsistentAttribute.setValue(this, isConsistent);
-  }
-
-  public Collection<Clause> getClauses() {
-    return clauseCollection.get(this);
+  public Collection<Output> getOutputs() {
+    return outputCollection.get(this);
   }
 
   public Collection<Rule> getRules() {
@@ -103,7 +99,7 @@ public class DecisionTableImpl extends ExpressionImpl implements DecisionTable {
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(DecisionTable.class, DMN_ELEMENT_DECISION_TABLE)
-      .namespaceUri(DMN10_NS)
+      .namespaceUri(DMN11_NS)
       .extendsType(Expression.class)
       .instanceProvider(new ModelTypeInstanceProvider<DecisionTable>() {
         public DecisionTable newInstance(ModelTypeInstanceContext instanceContext) {
@@ -122,17 +118,16 @@ public class DecisionTableImpl extends ExpressionImpl implements DecisionTable {
       .defaultValue(DecisionTableOrientation.Rule_as_Row)
       .build();
 
-    isCompleteAttribute = typeBuilder.booleanAttribute(DMN_ATTRIBUTE_IS_COMPLETE)
-      .defaultValue(false)
-      .build();
-
-    isConsistentAttribute = typeBuilder.booleanAttribute(DMN_ATTRIBUTE_IS_CONSISTENT)
-      .defaultValue(false)
+    outputLabelAttribute = typeBuilder.stringAttribute(DMN_ATTRIBUTE_OUTPUT_LABEL)
       .build();
 
     SequenceBuilder sequenceBuilder = typeBuilder.sequence();
 
-    clauseCollection = sequenceBuilder.elementCollection(Clause.class)
+    inputCollection = sequenceBuilder.elementCollection(Input.class)
+      .build();
+
+    outputCollection = sequenceBuilder.elementCollection(Output.class)
+      .required()
       .build();
 
     ruleCollection = sequenceBuilder.elementCollection(Rule.class)

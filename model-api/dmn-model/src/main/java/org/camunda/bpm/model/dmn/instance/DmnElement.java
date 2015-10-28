@@ -19,12 +19,16 @@ public interface DmnElement extends DmnModelElementInstance {
 
   void setId(String id);
 
-  String getName();
+  String getLabel();
 
-  void setName(String name);
+  void setLabel(String label);
 
-  String getDescription();
+  Description getDescription();
 
-  void setDescription(String description);
+  void setDescription(Description description);
+
+  ExtensionElements getExtensionElements();
+
+  void setExtensionElements(ExtensionElements extensionElements);
 
 }

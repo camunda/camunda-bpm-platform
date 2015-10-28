@@ -19,7 +19,7 @@ import java.util.Collection;
 public class ElementCollectionTest extends DmnModelElementInstanceTest {
 
   public TypeAssumption getTypeAssumption() {
-    return new TypeAssumption(DmnElement.class, false);
+    return new TypeAssumption(NamedElement.class, false);
   }
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {

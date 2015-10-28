@@ -16,17 +16,15 @@ package org.camunda.bpm.model.dmn.instance;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.camunda.bpm.model.dmn.impl.DmnModelConstants;
-
 public class ContextEntryTest extends DmnModelElementInstanceTest {
 
   public TypeAssumption getTypeAssumption() {
-    return new TypeAssumption(DmnModelConstants.FEEL_NS, false);
+    return new TypeAssumption(false);
   }
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
     return Arrays.asList(
-      new ChildElementAssumption(InformationItem.class, 0, 1),
+      new ChildElementAssumption(Variable.class, 0, 1),
       new ChildElementAssumption(Expression.class, 1, 1)
     );
   }

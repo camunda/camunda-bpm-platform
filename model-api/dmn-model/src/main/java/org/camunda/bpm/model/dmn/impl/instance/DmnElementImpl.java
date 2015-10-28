@@ -13,13 +13,14 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN10_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ATTRIBUTE_ID;
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ATTRIBUTE_NAME;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ATTRIBUTE_LABEL;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT;
 
 import org.camunda.bpm.model.dmn.instance.Description;
 import org.camunda.bpm.model.dmn.instance.DmnElement;
+import org.camunda.bpm.model.dmn.instance.ExtensionElements;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.impl.util.ModelUtil;
@@ -31,9 +32,10 @@ import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 public abstract class DmnElementImpl extends DmnModelElementInstanceImpl implements DmnElement {
 
   protected static Attribute<String> idAttribute;
-  protected static Attribute<String> nameAttribute;
+  protected static Attribute<String> labelAttribute;
 
   protected static ChildElement<Description> descriptionChild;
+  protected static ChildElement<ExtensionElements> extensionElementsChild;
 
   public DmnElementImpl (ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
@@ -47,52 +49,51 @@ public abstract class DmnElementImpl extends DmnModelElementInstanceImpl impleme
   }
 
   public void setId(String id) {
-    idAttribute.setValue(this, id);;
+    idAttribute.setValue(this, id);
   }
 
-  public String getName() {
-    return nameAttribute.getValue(this);
+  public String getLabel() {
+    return labelAttribute.getValue(this);
   }
 
-  public void setName(String name) {
-    nameAttribute.setValue(this, name);
+  public void setLabel(String label) {
+    labelAttribute.setValue(this, label);
   }
 
-  public String getDescription() {
-    Description child = descriptionChild.getChild(this);
-    if (child != null) {
-      return child.getTextContent();
-    }
-    else {
-      return null;
-    }
+  public Description getDescription() {
+    return descriptionChild.getChild(this);
   }
 
-  public void setDescription(String description) {
-    Description child = descriptionChild.getChild(this);
-    if (child == null) {
-      child = modelInstance.newInstance(Description.class);
-      descriptionChild.setChild(this, child);
-    }
-    child.setTextContent(description);
+  public void setDescription(Description description) {
+    descriptionChild.setChild(this, description);
+  }
+
+  public ExtensionElements getExtensionElements() {
+    return extensionElementsChild.getChild(this);
+  }
+
+  public void setExtensionElements(ExtensionElements extensionElements) {
+    extensionElementsChild.setChild(this, extensionElements);
   }
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(DmnElement.class, DMN_ELEMENT)
-      .namespaceUri(DMN10_NS)
+      .namespaceUri(DMN11_NS)
       .abstractType();
 
     idAttribute = typeBuilder.stringAttribute(DMN_ATTRIBUTE_ID)
       .idAttribute()
-      .required()
       .build();
 
-    nameAttribute = typeBuilder.stringAttribute(DMN_ATTRIBUTE_NAME)
+    labelAttribute = typeBuilder.stringAttribute(DMN_ATTRIBUTE_LABEL)
       .build();
 
     SequenceBuilder sequenceBuilder = typeBuilder.sequence();
 
     descriptionChild = sequenceBuilder.element(Description.class)
+      .build();
+
+    extensionElementsChild = sequenceBuilder.element(ExtensionElements.class)
       .build();
 
     typeBuilder.build();

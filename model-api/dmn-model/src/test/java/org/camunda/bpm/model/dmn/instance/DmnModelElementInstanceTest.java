@@ -30,7 +30,7 @@ public abstract class DmnModelElementInstanceTest extends AbstractModelElementIn
   }
 
   public String getDefaultNamespace() {
-    return DmnModelConstants.DMN10_NS;
+    return DmnModelConstants.DMN11_NS;
   }
 
 }

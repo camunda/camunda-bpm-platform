@@ -17,13 +17,13 @@ import java.util.Collection;
 
 public interface BusinessKnowledgeModel extends DrgElement {
 
-  // NOTE: parameters
-  Collection<InformationItem> getInformationItems();
+  EncapsulatedLogic getEncapsulatedLogic();
 
-  // NOTe: body
-  Expression getExpression();
+  void setEncapsulatedLogic(EncapsulatedLogic encapsulatedLogic);
 
-  void setExpression(Expression expression);
+  Variable getVariable();
+
+  void setVariable(Variable variable);
 
   Collection<KnowledgeRequirement> getKnowledgeRequirement();
   

@@ -13,50 +13,45 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN10_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ATTRIBUTE_TYPE_REF;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_INFORMATION_ITEM;
 
 import org.camunda.bpm.model.dmn.instance.InformationItem;
-import org.camunda.bpm.model.dmn.instance.ItemDefinition;
-import org.camunda.bpm.model.dmn.instance.ItemDefinitionReference;
-import org.camunda.bpm.model.dmn.instance.NamedDmnElement;
+import org.camunda.bpm.model.dmn.instance.NamedElement;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
-import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
-import org.camunda.bpm.model.xml.type.reference.ElementReference;
+import org.camunda.bpm.model.xml.type.attribute.Attribute;
 
-public class InformationItemImpl extends NamedDmnElementImpl implements InformationItem {
+public class InformationItemImpl extends NamedElementImpl implements InformationItem {
 
-  protected static ElementReference<ItemDefinition, ItemDefinitionReference> itemDefinitionRef;
+  protected static Attribute<String> typeRefAttribute;
 
   public InformationItemImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
   }
 
-  public ItemDefinition getItemDefinition() {
-    return itemDefinitionRef.getReferenceTargetElement(this);
+  public String getTypeRef() {
+    return typeRefAttribute.getValue(this);
   }
 
-  public void setItemDefinition(ItemDefinition itemDefinition) {
-    itemDefinitionRef.setReferenceTargetElement(this, itemDefinition);
+  public void setTypeRef(String typeRef) {
+    typeRefAttribute.setValue(this, typeRef);
   }
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(InformationItem.class, DMN_ELEMENT_INFORMATION_ITEM)
-      .namespaceUri(DMN10_NS)
-      .extendsType(NamedDmnElement.class)
+      .namespaceUri(DMN11_NS)
+      .extendsType(NamedElement.class)
       .instanceProvider(new ModelTypeInstanceProvider<InformationItem>() {
         public InformationItem newInstance(ModelTypeInstanceContext instanceContext) {
           return new InformationItemImpl(instanceContext);
         }
       });
 
-    SequenceBuilder sequenceBuilder = typeBuilder.sequence();
-
-    itemDefinitionRef = sequenceBuilder.element(ItemDefinitionReference.class)
-      .uriElementReference(ItemDefinition.class)
+    typeRefAttribute = typeBuilder.stringAttribute(DMN_ATTRIBUTE_TYPE_REF)
       .build();
 
     typeBuilder.build();

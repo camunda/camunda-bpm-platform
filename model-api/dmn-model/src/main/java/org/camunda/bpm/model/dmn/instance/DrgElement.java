@@ -13,6 +13,6 @@
 
 package org.camunda.bpm.model.dmn.instance;
 
-public interface DrgElement extends DmnElement {
+public interface DrgElement extends NamedElement {
 
 }

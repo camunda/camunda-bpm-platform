@@ -16,17 +16,15 @@ package org.camunda.bpm.model.dmn.instance;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.camunda.bpm.model.dmn.impl.DmnModelConstants;
-
 public class FunctionDefinitionTest extends DmnModelElementInstanceTest {
 
   public TypeAssumption getTypeAssumption() {
-    return new TypeAssumption(DmnModelConstants.FEEL_NS, Expression.class, false);
+    return new TypeAssumption(Expression.class, false);
   }
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
     return Arrays.asList(
-      new ChildElementAssumption(InformationItem.class),
+      new ChildElementAssumption(FormalParameter.class),
       new ChildElementAssumption(Expression.class, 0, 1)
     );
   }

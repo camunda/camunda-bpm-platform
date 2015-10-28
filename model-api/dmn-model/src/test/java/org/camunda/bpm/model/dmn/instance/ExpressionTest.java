@@ -23,14 +23,13 @@ public class ExpressionTest extends DmnModelElementInstanceTest {
   }
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
-    return Arrays.asList(
-      new ChildElementAssumption(InputVariableReference.class),
-      new ChildElementAssumption(ItemDefinitionReference.class, 0, 1)
-    );
+    return null;
   }
 
   public Collection<AttributeAssumption> getAttributesAssumptions() {
-    return null;
+    return Arrays.asList(
+      new AttributeAssumption("typeRef")
+    );
   }
 
 }

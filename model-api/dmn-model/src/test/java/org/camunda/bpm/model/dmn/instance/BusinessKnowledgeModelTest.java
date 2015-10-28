@@ -24,8 +24,8 @@ public class BusinessKnowledgeModelTest extends DmnModelElementInstanceTest {
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
     return Arrays.asList(
-      new ChildElementAssumption(InformationItem.class),
-      new ChildElementAssumption(Expression.class, 0, 1),
+      new ChildElementAssumption(EncapsulatedLogic.class, 0, 1),
+      new ChildElementAssumption(Variable.class, 0, 1),
       new ChildElementAssumption(KnowledgeRequirement.class),
       new ChildElementAssumption(AuthorityRequirement.class)
     );

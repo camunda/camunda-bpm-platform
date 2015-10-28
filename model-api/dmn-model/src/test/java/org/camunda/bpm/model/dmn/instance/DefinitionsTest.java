@@ -19,7 +19,7 @@ import java.util.Collection;
 public class DefinitionsTest extends DmnModelElementInstanceTest {
 
   public TypeAssumption getTypeAssumption() {
-    return new TypeAssumption(DmnElement.class, false);
+    return new TypeAssumption(NamedElement.class, false);
   }
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
@@ -27,6 +27,7 @@ public class DefinitionsTest extends DmnModelElementInstanceTest {
       new ChildElementAssumption(Import.class),
       new ChildElementAssumption(ItemDefinition.class),
       new ChildElementAssumption(DrgElement.class),
+      new ChildElementAssumption(Artifact.class),
       new ChildElementAssumption(ElementCollection.class),
       new ChildElementAssumption(BusinessContextElement.class)
     );
@@ -36,7 +37,9 @@ public class DefinitionsTest extends DmnModelElementInstanceTest {
     return Arrays.asList(
       new AttributeAssumption("expressionLanguage", false, false, "http://www.omg.org/spec/FEEL/20140401"),
       new AttributeAssumption("typeLanguage", false, false, "http://www.omg.org/spec/FEEL/20140401"),
-      new AttributeAssumption("namespace", false, true)
+      new AttributeAssumption("namespace", false, true),
+      new AttributeAssumption("exporter"),
+      new AttributeAssumption("exporterVersion")
     );
   }
 

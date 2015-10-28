@@ -13,6 +13,6 @@
 
 package org.camunda.bpm.model.dmn.instance;
 
-public interface TypeRef extends DmnElementReference {
+public interface TypeRef extends DmnModelElementInstance {
 
 }

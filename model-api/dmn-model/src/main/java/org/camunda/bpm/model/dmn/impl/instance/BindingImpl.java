@@ -13,7 +13,7 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN10_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_BINDING;
 
 import org.camunda.bpm.model.dmn.instance.Binding;
@@ -31,7 +31,7 @@ import org.camunda.bpm.model.xml.type.reference.ElementReference;
 public class BindingImpl extends DmnModelElementInstanceImpl implements Binding {
   
   protected static ChildElement<Expression> expressionChild;
-  protected static ElementReference<InformationItem, ParameterReference> parameterRefChild;
+  protected static ElementReference<InformationItem, ParameterReference> parameterRef;
   
   public BindingImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
@@ -46,16 +46,16 @@ public class BindingImpl extends DmnModelElementInstanceImpl implements Binding 
   }
 
   public InformationItem getParameter() {
-    return parameterRefChild.getReferenceTargetElement(this);
+    return parameterRef.getReferenceTargetElement(this);
   }
 
   public void setParameter(InformationItem parameter) {
-    parameterRefChild.setReferenceTargetElement(this, parameter);
+    parameterRef.setReferenceTargetElement(this, parameter);
   }
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Binding.class, DMN_ELEMENT_BINDING)
-      .namespaceUri(DMN10_NS)
+      .namespaceUri(DMN11_NS)
       .instanceProvider(new ModelTypeInstanceProvider<Binding>() {
         public Binding newInstance(ModelTypeInstanceContext instanceContext) {
           return new BindingImpl(instanceContext);
@@ -67,7 +67,7 @@ public class BindingImpl extends DmnModelElementInstanceImpl implements Binding 
     expressionChild = sequenceBuilder.element(Expression.class)
       .build();
 
-    parameterRefChild = sequenceBuilder.element(ParameterReference.class)
+    parameterRef = sequenceBuilder.element(ParameterReference.class)
       .required()
       .uriElementReference(InformationItem.class)
       .build();

@@ -19,6 +19,6 @@ public interface Relation extends Expression {
 
   Collection<Column> getColumns();
 
-  Collection<List> getLists();
+  Collection<Row> getRows();
 
 }

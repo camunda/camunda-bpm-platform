@@ -15,7 +15,7 @@ package org.camunda.bpm.model.dmn.instance;
 
 import java.util.Collection;
 
-public interface ElementCollection extends DmnElement {
+public interface ElementCollection extends NamedElement {
 
   Collection<DrgElement> getDrgElements();
 

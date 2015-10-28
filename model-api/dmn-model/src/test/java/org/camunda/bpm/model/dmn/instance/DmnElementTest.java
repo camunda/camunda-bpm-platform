@@ -24,14 +24,15 @@ public class DmnElementTest extends DmnModelElementInstanceTest {
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
     return Arrays.asList(
-      new ChildElementAssumption(Description.class, 0, 1)
+      new ChildElementAssumption(Description.class, 0, 1),
+      new ChildElementAssumption(ExtensionElements.class, 0, 1)
     );
   }
 
   public Collection<AttributeAssumption> getAttributesAssumptions() {
     return Arrays.asList(
-      new AttributeAssumption("id", true, true),
-      new AttributeAssumption("name")
+      new AttributeAssumption("id", true),
+      new AttributeAssumption("label")
     );
   }
 

@@ -24,7 +24,7 @@ public class InputDataTest extends DmnModelElementInstanceTest {
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
     return Arrays.asList(
-      new ChildElementAssumption(ItemDefinitionReference.class, 0, 1)
+      new ChildElementAssumption(InformationItem.class, 0, 1)
     );
   }
 

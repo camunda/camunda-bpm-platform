@@ -13,7 +13,7 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN10_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_DECISION_MADE;
 
 import org.camunda.bpm.model.dmn.instance.DecisionMadeReference;
@@ -31,7 +31,7 @@ public class DecisionMadeReferenceImpl extends DmnElementReferenceImpl implement
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(DecisionMadeReference.class, DMN_ELEMENT_DECISION_MADE)
-      .namespaceUri(DMN10_NS)
+      .namespaceUri(DMN11_NS)
       .extendsType(DmnElementReference.class)
       .instanceProvider(new ModelTypeInstanceProvider<DecisionMadeReference>() {
         public DecisionMadeReference newInstance(ModelTypeInstanceContext instanceContext) {

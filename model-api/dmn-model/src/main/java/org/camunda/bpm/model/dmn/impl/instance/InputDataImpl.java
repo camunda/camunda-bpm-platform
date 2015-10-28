@@ -13,39 +13,38 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN10_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_INPUT_DATA;
 
 import org.camunda.bpm.model.dmn.instance.DrgElement;
+import org.camunda.bpm.model.dmn.instance.InformationItem;
 import org.camunda.bpm.model.dmn.instance.InputData;
-import org.camunda.bpm.model.dmn.instance.ItemDefinition;
-import org.camunda.bpm.model.dmn.instance.ItemDefinitionReference;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
+import org.camunda.bpm.model.xml.type.child.ChildElement;
 import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
-import org.camunda.bpm.model.xml.type.reference.ElementReference;
 
 public class InputDataImpl extends DrgElementImpl implements InputData {
 
-  protected static ElementReference<ItemDefinition, ItemDefinitionReference> itemDefinitionRef;
+  protected static ChildElement<InformationItem> informationItemChild;
 
   public InputDataImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
   }
 
-  public ItemDefinition getItemDefinition() {
-    return itemDefinitionRef.getReferenceTargetElement(this);
+  public InformationItem getInformationItem() {
+    return informationItemChild.getChild(this);
   }
 
-  public void setItemDefinition(ItemDefinition itemDefinition) {
-    itemDefinitionRef.setReferenceTargetElement(this, itemDefinition);
+  public void setInformationItem(InformationItem informationItem) {
+    informationItemChild.setChild(this, informationItem);
   }
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(InputData.class, DMN_ELEMENT_INPUT_DATA)
-      .namespaceUri(DMN10_NS)
+      .namespaceUri(DMN11_NS)
       .extendsType(DrgElement.class)
       .instanceProvider(new ModelTypeInstanceProvider<InputData>() {
         public InputData newInstance(ModelTypeInstanceContext instanceContext) {
@@ -55,8 +54,7 @@ public class InputDataImpl extends DrgElementImpl implements InputData {
 
     SequenceBuilder sequenceBuilder = typeBuilder.sequence();
 
-    itemDefinitionRef = sequenceBuilder.element(ItemDefinitionReference.class)
-      .uriElementReference(ItemDefinition.class)
+    informationItemChild = sequenceBuilder.element(InformationItem.class)
       .build();
 
     typeBuilder.build();

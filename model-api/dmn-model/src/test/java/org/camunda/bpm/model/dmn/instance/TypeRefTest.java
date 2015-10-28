@@ -13,6 +13,20 @@
 
 package org.camunda.bpm.model.dmn.instance;
 
-public class TypeRefTest extends AbstractDmnElementReferenceTest {
+import java.util.Collection;
+
+public class TypeRefTest extends DmnModelElementInstanceTest {
+
+  public TypeAssumption getTypeAssumption() {
+    return new TypeAssumption(false);
+  }
+
+  public Collection<ChildElementAssumption> getChildElementAssumptions() {
+    return null;
+  }
+
+  public Collection<AttributeAssumption> getAttributesAssumptions() {
+    return null;
+  }
 
 }

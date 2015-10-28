@@ -13,18 +13,17 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN10_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ATTRIBUTE_IS_COLLECTION;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ATTRIBUTE_TYPE_LANGUAGE;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_ITEM_DEFINITION;
 
 import java.util.Collection;
 
-import org.camunda.bpm.model.dmn.instance.AllowedValue;
-import org.camunda.bpm.model.dmn.instance.DmnElement;
+import org.camunda.bpm.model.dmn.instance.AllowedValues;
 import org.camunda.bpm.model.dmn.instance.ItemComponent;
 import org.camunda.bpm.model.dmn.instance.ItemDefinition;
-import org.camunda.bpm.model.dmn.instance.TypeDefinition;
+import org.camunda.bpm.model.dmn.instance.NamedElement;
 import org.camunda.bpm.model.dmn.instance.TypeRef;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
@@ -35,14 +34,13 @@ import org.camunda.bpm.model.xml.type.child.ChildElement;
 import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 
-public class ItemDefinitionImpl extends DmnElementImpl implements ItemDefinition {
+public class ItemDefinitionImpl extends NamedElementImpl implements ItemDefinition {
 
   protected static Attribute<String> typeLanguageAttribute;
   protected static Attribute<Boolean> isCollectionAttribute;
 
-  protected static ChildElement<TypeDefinition> typeDefinitionChild;
   protected static ChildElement<TypeRef> typeRefChild;
-  protected static ChildElementCollection<AllowedValue> allowedValueCollection;
+  protected static ChildElement<AllowedValues> allowedValuesChild;
   protected static ChildElementCollection<ItemComponent> itemComponentCollection;
 
   public ItemDefinitionImpl(ModelTypeInstanceContext instanceContext) {
@@ -65,24 +63,20 @@ public class ItemDefinitionImpl extends DmnElementImpl implements ItemDefinition
     isCollectionAttribute.setValue(this, isCollection);
   }
 
-  public TypeDefinition getTypeDefinition() {
-    return typeDefinitionChild.getChild(this);
+  public TypeRef getTypeRef() {
+    return typeRefChild.getChild(this);
   }
 
-  public void setTypeDefinition(TypeDefinition typeDefinition) {
-    typeDefinitionChild.setChild(this, typeDefinition);
+  public void setTypeRef(TypeRef typeRef) {
+    typeRefChild.setChild(this, typeRef);
   }
 
-  public String getTypeRef() {
-    return typeRefChild.getChild(this).getHref();
+  public AllowedValues getAllowedValues() {
+    return allowedValuesChild.getChild(this);
   }
 
-  public void setTypeRef(String typeRef) {
-    typeRefChild.getChild(this).setHref(typeRef);
-  }
-
-  public Collection<AllowedValue> getAllowedValues() {
-    return allowedValueCollection.get(this);
+  public void setAllowedValues(AllowedValues allowedValues) {
+    allowedValuesChild.setChild(this, allowedValues);
   }
 
   public Collection<ItemComponent> getItemComponents() {
@@ -91,8 +85,8 @@ public class ItemDefinitionImpl extends DmnElementImpl implements ItemDefinition
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(ItemDefinition.class, DMN_ELEMENT_ITEM_DEFINITION)
-      .namespaceUri(DMN10_NS)
-      .extendsType(DmnElement.class)
+      .namespaceUri(DMN11_NS)
+      .extendsType(NamedElement.class)
       .instanceProvider(new ModelTypeInstanceProvider<ItemDefinition>() {
         public ItemDefinition newInstance(ModelTypeInstanceContext instanceContext) {
           return new ItemDefinitionImpl(instanceContext);
@@ -108,13 +102,10 @@ public class ItemDefinitionImpl extends DmnElementImpl implements ItemDefinition
 
     SequenceBuilder sequenceBuilder = typeBuilder.sequence();
 
-    typeDefinitionChild = sequenceBuilder.element(TypeDefinition.class)
-      .build();
-
     typeRefChild = sequenceBuilder.element(TypeRef.class)
       .build();
 
-    allowedValueCollection = sequenceBuilder.elementCollection(AllowedValue.class)
+    allowedValuesChild = sequenceBuilder.element(AllowedValues.class)
       .build();
 
     itemComponentCollection = sequenceBuilder.elementCollection(ItemComponent.class)

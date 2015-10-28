@@ -13,14 +13,14 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.FEEL_ELEMENT_FUNCTION_DEFINITION;
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.FEEL_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_FUNCTION_DEFINITION;
 
 import java.util.Collection;
 
 import org.camunda.bpm.model.dmn.instance.Expression;
+import org.camunda.bpm.model.dmn.instance.FormalParameter;
 import org.camunda.bpm.model.dmn.instance.FunctionDefinition;
-import org.camunda.bpm.model.dmn.instance.InformationItem;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
@@ -31,15 +31,15 @@ import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 
 public class FunctionDefinitionImpl extends ExpressionImpl implements FunctionDefinition {
 
-  protected static ChildElementCollection<InformationItem> informationItemCollection;
+  protected static ChildElementCollection<FormalParameter> formalParameterCollection;
   protected static ChildElement<Expression> expressionChild;
 
   public FunctionDefinitionImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
   }
 
-  public Collection<InformationItem> getInformationItems() {
-    return informationItemCollection.get(this);
+  public Collection<FormalParameter> getFormalParameters() {
+    return formalParameterCollection.get(this);
   }
 
   public Expression getExpression() {
@@ -51,8 +51,8 @@ public class FunctionDefinitionImpl extends ExpressionImpl implements FunctionDe
   }
 
   public static void registerType(ModelBuilder modelBuilder) {
-    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(FunctionDefinition.class, FEEL_ELEMENT_FUNCTION_DEFINITION)
-      .namespaceUri(FEEL_NS)
+    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(FunctionDefinition.class, DMN_ELEMENT_FUNCTION_DEFINITION)
+      .namespaceUri(DMN11_NS)
       .extendsType(Expression.class)
       .instanceProvider(new ModelTypeInstanceProvider<FunctionDefinition>() {
         public FunctionDefinition newInstance(ModelTypeInstanceContext instanceContext) {
@@ -62,7 +62,7 @@ public class FunctionDefinitionImpl extends ExpressionImpl implements FunctionDe
 
     SequenceBuilder sequenceBuilder = typeBuilder.sequence();
 
-    informationItemCollection = sequenceBuilder.elementCollection(InformationItem.class)
+    formalParameterCollection = sequenceBuilder.elementCollection(FormalParameter.class)
       .build();
 
     expressionChild = sequenceBuilder.element(Expression.class)

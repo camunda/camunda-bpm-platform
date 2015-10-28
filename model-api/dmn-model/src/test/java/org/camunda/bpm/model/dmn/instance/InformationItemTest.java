@@ -19,17 +19,17 @@ import java.util.Collection;
 public class InformationItemTest extends DmnModelElementInstanceTest {
 
   public TypeAssumption getTypeAssumption() {
-    return new TypeAssumption(NamedDmnElement.class, false);
+    return new TypeAssumption(NamedElement.class, false);
   }
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
-    return Arrays.asList(
-      new ChildElementAssumption(ItemDefinitionReference.class, 0, 1)
-    );
+    return null;
   }
 
   public Collection<AttributeAssumption> getAttributesAssumptions() {
-    return null;
+    return Arrays.asList(
+      new AttributeAssumption("typeRef")
+    );
   }
 
 }

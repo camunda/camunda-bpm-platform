@@ -33,15 +33,13 @@ public interface DecisionTable extends Expression {
   
   void setPreferedOrientation(DecisionTableOrientation preferedOrientation);
 
-  boolean isComplete();
+  String getOutputLabel();
 
-  void setComplete(boolean isComplete);
+  void setOutputLabel(String outputLabel);
 
-  boolean isConsistent();
+  Collection<Input> getInputs();
 
-  void setConsistent(boolean isConsistent);
-
-  Collection<Clause> getClauses();
+  Collection<Output> getOutputs();
 
   Collection<Rule> getRules();
 

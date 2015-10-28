@@ -13,7 +13,7 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN10_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_USING_TASK;
 
 import org.camunda.bpm.model.dmn.instance.DmnElementReference;
@@ -31,7 +31,7 @@ public class UsingTaskReferenceImpl extends DmnElementReferenceImpl implements U
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(UsingTaskReference.class, DMN_ELEMENT_USING_TASK)
-      .namespaceUri(DMN10_NS)
+      .namespaceUri(DMN11_NS)
       .extendsType(DmnElementReference.class)
       .instanceProvider(new ModelTypeInstanceProvider<UsingTaskReference>() {
         public UsingTaskReference newInstance(ModelTypeInstanceContext instanceContext) {

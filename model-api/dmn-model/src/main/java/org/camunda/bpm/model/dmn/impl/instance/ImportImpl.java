@@ -13,7 +13,7 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN10_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ATTRIBUTE_IMPORT_TYPE;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ATTRIBUTE_LOCATION_URI;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ATTRIBUTE_NAMESPACE;
@@ -62,7 +62,7 @@ public class ImportImpl extends DmnModelElementInstanceImpl implements Import {
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Import.class, DMN_ELEMENT_IMPORT)
-      .namespaceUri(DMN10_NS)
+      .namespaceUri(DMN11_NS)
       .instanceProvider(new ModelTypeInstanceProvider<Import>() {
         public Import newInstance(ModelTypeInstanceContext instanceContext) {
           return new ImportImpl(instanceContext);

@@ -13,7 +13,7 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN10_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_REQUIRED_INPUT;
 
 import org.camunda.bpm.model.dmn.instance.DmnElementReference;
@@ -31,7 +31,7 @@ public class RequiredInputReferenceImpl extends DmnElementReferenceImpl implemen
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(RequiredInputReference.class, DMN_ELEMENT_REQUIRED_INPUT)
-      .namespaceUri(DMN10_NS)
+      .namespaceUri(DMN11_NS)
       .extendsType(DmnElementReference.class)
       .instanceProvider(new ModelTypeInstanceProvider<RequiredInputReference>() {
         public RequiredInputReference newInstance(ModelTypeInstanceContext instanceContext) {

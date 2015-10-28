@@ -15,7 +15,7 @@ package org.camunda.bpm.model.dmn.instance;
 
 import java.util.Collection;
 
-public interface ItemDefinition extends DmnElement {
+public interface ItemDefinition extends NamedElement {
 
   String getTypeLanguage();
 
@@ -25,16 +25,13 @@ public interface ItemDefinition extends DmnElement {
 
   void setCollection(boolean isCollection);
 
-  TypeDefinition getTypeDefinition();
+  TypeRef getTypeRef();
 
-  void setTypeDefinition(TypeDefinition typeDefinition);
+  void setTypeRef(TypeRef typeRef);
 
-  // NOTE: in the XSD this is a DMNElementReference
-  String getTypeRef();
+  AllowedValues getAllowedValues();
 
-  void setTypeRef(String typeRef);
-
-  Collection<AllowedValue> getAllowedValues();
+  void setAllowedValues(AllowedValues allowedValues);
 
   Collection<ItemComponent> getItemComponents();
 

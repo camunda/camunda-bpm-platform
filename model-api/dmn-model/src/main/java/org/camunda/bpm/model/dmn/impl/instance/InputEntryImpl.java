@@ -13,17 +13,17 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN10_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_INPUT_ENTRY;
 
 import org.camunda.bpm.model.dmn.instance.InputEntry;
-import org.camunda.bpm.model.dmn.instance.LiteralExpression;
+import org.camunda.bpm.model.dmn.instance.UnaryTests;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
 
-public class InputEntryImpl extends LiteralExpressionImpl implements InputEntry {
+public class InputEntryImpl extends UnaryTestsImpl implements InputEntry {
 
   public InputEntryImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
@@ -31,8 +31,8 @@ public class InputEntryImpl extends LiteralExpressionImpl implements InputEntry 
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(InputEntry.class, DMN_ELEMENT_INPUT_ENTRY)
-      .namespaceUri(DMN10_NS)
-      .extendsType(LiteralExpression.class)
+      .namespaceUri(DMN11_NS)
+      .extendsType(UnaryTests.class)
       .instanceProvider(new ModelTypeInstanceProvider<InputEntry>() {
         public InputEntry newInstance(ModelTypeInstanceContext instanceContext) {
           return new InputEntryImpl(instanceContext);

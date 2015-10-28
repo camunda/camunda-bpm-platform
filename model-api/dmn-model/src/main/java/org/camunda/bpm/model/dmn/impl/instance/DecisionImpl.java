@@ -13,7 +13,7 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN10_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_DECISION;
 
 import java.util.Collection;
@@ -27,15 +27,14 @@ import org.camunda.bpm.model.dmn.instance.DrgElement;
 import org.camunda.bpm.model.dmn.instance.Expression;
 import org.camunda.bpm.model.dmn.instance.ImpactedPerformanceIndicatorReference;
 import org.camunda.bpm.model.dmn.instance.InformationRequirement;
-import org.camunda.bpm.model.dmn.instance.ItemDefinition;
 import org.camunda.bpm.model.dmn.instance.KnowledgeRequirement;
 import org.camunda.bpm.model.dmn.instance.OrganizationUnit;
-import org.camunda.bpm.model.dmn.instance.OutputDefinitionReference;
 import org.camunda.bpm.model.dmn.instance.PerformanceIndicator;
 import org.camunda.bpm.model.dmn.instance.Question;
 import org.camunda.bpm.model.dmn.instance.SupportedObjectiveReference;
 import org.camunda.bpm.model.dmn.instance.UsingProcessReference;
 import org.camunda.bpm.model.dmn.instance.UsingTaskReference;
+import org.camunda.bpm.model.dmn.instance.Variable;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
@@ -43,14 +42,13 @@ import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceP
 import org.camunda.bpm.model.xml.type.child.ChildElement;
 import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
-import org.camunda.bpm.model.xml.type.reference.ElementReference;
 import org.camunda.bpm.model.xml.type.reference.ElementReferenceCollection;
 
 public class DecisionImpl extends DrgElementImpl implements Decision {
 
   protected static ChildElement<Question> questionChild;
   protected static ChildElement<AllowedAnswers> allowedAnswersChild;
-  protected static ElementReference<ItemDefinition, OutputDefinitionReference> outputDefinitionRefChild;
+  protected static ChildElement<Variable> variableChild;
   protected static ChildElementCollection<InformationRequirement> informationRequirementCollection;
   protected static ChildElementCollection<KnowledgeRequirement> knowledgeRequirementCollection;
   protected static ChildElementCollection<AuthorityRequirement> authorityRequirementCollection;
@@ -66,51 +64,28 @@ public class DecisionImpl extends DrgElementImpl implements Decision {
     super(instanceContext);
   }
 
-  public String getQuestions() {
-    Question child = questionChild.getChild(this);
-    if (child != null) {
-      return child.getTextContent();
-    }
-    else {
-      return null;
-    }
+  public Question getQuestion() {
+    return questionChild.getChild(this);
   }
 
-  public void setQuestions(String question) {
-    Question child = questionChild.getChild(this);
-    if (child == null) {
-      child = modelInstance.newInstance(Question.class);
-      questionChild.setChild(this, child);
-    }
-    child.setTextContent(question);
+  public void setQuestion(Question question) {
+    questionChild.setChild(this, question);
   }
 
-  public String getAllowedAnswers() {
-    AllowedAnswers child = allowedAnswersChild.getChild(this);
-    if (child != null) {
-      return child.getTextContent();
-    }
-    else {
-      return null;
-    }
+  public AllowedAnswers getAllowedAnswers() {
+    return allowedAnswersChild.getChild(this);
   }
 
-  public void setAllowedAnswers(String allowedAnswers) {
-    AllowedAnswers child = allowedAnswersChild.getChild(this);
-    if (child == null) {
-      child = modelInstance.newInstance(AllowedAnswers.class);
-      allowedAnswersChild.setChild(this, child);
-    }
-    child.setTextContent(allowedAnswers);
-
+  public void setAllowedAnswers(AllowedAnswers allowedAnswers) {
+    allowedAnswersChild.setChild(this, allowedAnswers);
   }
 
-  public ItemDefinition getOutputDefinition() {
-    return outputDefinitionRefChild.getReferenceTargetElement(this);
+  public Variable getVariable() {
+    return variableChild.getChild(this);
   }
 
-  public void setOutputDefinition(ItemDefinition outputDefinition) {
-    outputDefinitionRefChild.setReferenceTargetElement(this, outputDefinition);
+  public void setVariable(Variable variable) {
+    variableChild.setChild(this, variable);
   }
 
   public Collection<InformationRequirement> getInformationRequirements() {
@@ -159,7 +134,7 @@ public class DecisionImpl extends DrgElementImpl implements Decision {
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Decision.class, DMN_ELEMENT_DECISION)
-      .namespaceUri(DMN10_NS)
+      .namespaceUri(DMN11_NS)
       .extendsType(DrgElement.class)
       .instanceProvider(new ModelTypeInstanceProvider<Decision>() {
         public Decision newInstance(ModelTypeInstanceContext instanceContext) {
@@ -175,8 +150,7 @@ public class DecisionImpl extends DrgElementImpl implements Decision {
     allowedAnswersChild = sequenceBuilder.element(AllowedAnswers.class)
       .build();
 
-    outputDefinitionRefChild = sequenceBuilder.element(OutputDefinitionReference.class)
-      .uriElementReference(ItemDefinition.class)
+    variableChild = sequenceBuilder.element(Variable.class)
       .build();
 
     informationRequirementCollection = sequenceBuilder.elementCollection(InformationRequirement.class)

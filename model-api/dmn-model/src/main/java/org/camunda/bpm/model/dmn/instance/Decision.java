@@ -17,17 +17,17 @@ import java.util.Collection;
 
 public interface Decision extends DrgElement {
 
-  String getQuestions();
+  Question getQuestion();
 
-  void setQuestions(String question);
+  void setQuestion(Question question);
 
-  String getAllowedAnswers();
+  AllowedAnswers getAllowedAnswers();
 
-  void setAllowedAnswers(String allowedAnswers);
+  void setAllowedAnswers(AllowedAnswers allowedAnswers);
 
-  ItemDefinition getOutputDefinition();
+  Variable getVariable();
 
-  void setOutputDefinition(ItemDefinition outputDefinition);
+  void setVariable(Variable variable);
 
   Collection<InformationRequirement> getInformationRequirements();
 
@@ -47,7 +47,6 @@ public interface Decision extends DrgElement {
 
   Collection<UsingTaskReference> getUsingTaskReferences();
 
-  // NOTE: decisionLogic
   Expression getExpression();
 
   void setExpression(Expression expression);

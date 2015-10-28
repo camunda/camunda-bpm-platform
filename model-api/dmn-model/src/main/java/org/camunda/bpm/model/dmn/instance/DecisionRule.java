@@ -17,8 +17,8 @@ import java.util.Collection;
 
 public interface DecisionRule extends DmnElement {
 
-  Collection<Expression> getConditions();
+  Collection<InputEntry> getInputEntries();
 
-  Collection<Expression> getConclusions();
+  Collection<OutputEntry> getOutputEntries();
 
 }

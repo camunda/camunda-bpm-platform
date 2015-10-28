@@ -28,6 +28,7 @@ import static org.camunda.bpm.model.dmn.HitPolicy.UNIQUE;
 import org.camunda.bpm.model.dmn.instance.Decision;
 import org.camunda.bpm.model.dmn.instance.DecisionTable;
 import org.camunda.bpm.model.dmn.instance.Definitions;
+import org.camunda.bpm.model.dmn.instance.Output;
 import org.camunda.bpm.model.dmn.util.DmnModelResource;
 import org.junit.Test;
 
@@ -40,54 +41,62 @@ public class ReadWriteTest extends DmnModelTest {
   @DmnModelResource(resource = DECISION_TABLE_ORIENTATION_DMN)
   public void shouldReadDecisionTableOrientation() {
     // Default
-    DecisionTable decisionTable = dmnModelInstance.getModelElementById("decisionTable1");
+    DecisionTable decisionTable = modelInstance.getModelElementById("decisionTable1");
     assertThat(decisionTable.getPreferedOrientation()).isEqualTo(Rule_as_Row);
 
     // Rule-as-Row
-    decisionTable = dmnModelInstance.getModelElementById("decisionTable2");
+    decisionTable = modelInstance.getModelElementById("decisionTable2");
     assertThat(decisionTable.getPreferedOrientation()).isEqualTo(Rule_as_Row);
 
     // Rule-as-Column
-    decisionTable = dmnModelInstance.getModelElementById("decisionTable3");
+    decisionTable = modelInstance.getModelElementById("decisionTable3");
     assertThat(decisionTable.getPreferedOrientation()).isEqualTo(Rule_as_Column);
 
     // CrossTable
-    decisionTable = dmnModelInstance.getModelElementById("decisionTable4");
+    decisionTable = modelInstance.getModelElementById("decisionTable4");
     assertThat(decisionTable.getPreferedOrientation()).isEqualTo(CrossTable);
   }
 
   @Test
   public void shouldWriteDecisionTableOrientation() throws Exception {
-    dmnModelInstance = Dmn.createEmptyModel();
-    Definitions definitions = generateElement(Definitions.class);
-    definitions.setNamespace(TEST_URI);
-    dmnModelInstance.setDocumentElement(definitions);
+    modelInstance = Dmn.createEmptyModel();
+    Definitions definitions = generateNamedElement(Definitions.class, "definitions");
+    definitions.setNamespace(TEST_NAMESPACE);
+    modelInstance.setDocumentElement(definitions);
 
     // Default
-    Decision decision = generateElement(Decision.class, 1);
+    Decision decision = generateNamedElement(Decision.class, "decision1", 1);
     DecisionTable decisionTable = generateElement(DecisionTable.class, 1);
     decision.setExpression(decisionTable);
+    Output output = generateElement(Output.class, 1);
+    decisionTable.getOutputs().add(output);
     definitions.addChildElement(decision);
 
     // Rule-as-Row
-    decision = generateElement(Decision.class, 2);
+    decision = generateNamedElement(Decision.class, "decision2", 2);
     decisionTable = generateElement(DecisionTable.class, 2);
     decisionTable.setPreferedOrientation(Rule_as_Row);
     decision.setExpression(decisionTable);
+    output = generateElement(Output.class, 2);
+    decisionTable.getOutputs().add(output);
     definitions.addChildElement(decision);
 
     // Rule-as-Column
-    decision = generateElement(Decision.class, 3);
+    decision = generateNamedElement(Decision.class, "decision3", 3);
     decisionTable = generateElement(DecisionTable.class, 3);
     decisionTable.setPreferedOrientation(Rule_as_Column);
     decision.setExpression(decisionTable);
+    output = generateElement(Output.class, 3);
+    decisionTable.getOutputs().add(output);
     definitions.addChildElement(decision);
 
     // CrossTable
-    decision = generateElement(Decision.class, 4);
+    decision = generateNamedElement(Decision.class, "decision4", 4);
     decisionTable = generateElement(DecisionTable.class, 4);
     decisionTable.setPreferedOrientation(CrossTable);
     decision.setExpression(decisionTable);
+    output = generateElement(Output.class, 4);
+    decisionTable.getOutputs().add(output);
     definitions.addChildElement(decision);
 
     assertModelEqualsFile(DECISION_TABLE_ORIENTATION_DMN);
@@ -97,99 +106,115 @@ public class ReadWriteTest extends DmnModelTest {
   @DmnModelResource(resource = HIT_POLICY_DMN)
   public void shouldReadHitPolicy() {
     // Default
-    DecisionTable decisionTable = dmnModelInstance.getModelElementById("decisionTable1");
+    DecisionTable decisionTable = modelInstance.getModelElementById("decisionTable1");
     assertThat(decisionTable.getHitPolicy()).isEqualTo(UNIQUE);
 
     // UNIQUE
-    decisionTable = dmnModelInstance.getModelElementById("decisionTable2");
+    decisionTable = modelInstance.getModelElementById("decisionTable2");
     assertThat(decisionTable.getHitPolicy()).isEqualTo(UNIQUE);
 
     // FIRST
-    decisionTable = dmnModelInstance.getModelElementById("decisionTable3");
+    decisionTable = modelInstance.getModelElementById("decisionTable3");
     assertThat(decisionTable.getHitPolicy()).isEqualTo(FIRST);
 
     // PRIORITY
-    decisionTable = dmnModelInstance.getModelElementById("decisionTable4");
+    decisionTable = modelInstance.getModelElementById("decisionTable4");
     assertThat(decisionTable.getHitPolicy()).isEqualTo(PRIORITY);
 
     // ANY
-    decisionTable = dmnModelInstance.getModelElementById("decisionTable5");
+    decisionTable = modelInstance.getModelElementById("decisionTable5");
     assertThat(decisionTable.getHitPolicy()).isEqualTo(ANY);
 
     // COLLECT
-    decisionTable = dmnModelInstance.getModelElementById("decisionTable6");
+    decisionTable = modelInstance.getModelElementById("decisionTable6");
     assertThat(decisionTable.getHitPolicy()).isEqualTo(COLLECT);
 
     // RULE ORDER
-    decisionTable = dmnModelInstance.getModelElementById("decisionTable7");
+    decisionTable = modelInstance.getModelElementById("decisionTable7");
     assertThat(decisionTable.getHitPolicy()).isEqualTo(RULE_ORDER);
 
     // OUTPUT ORDER
-    decisionTable = dmnModelInstance.getModelElementById("decisionTable8");
+    decisionTable = modelInstance.getModelElementById("decisionTable8");
     assertThat(decisionTable.getHitPolicy()).isEqualTo(OUTPUT_ORDER);
 
   }
 
   @Test
   public void shouldWriteHitPolicy() throws Exception {
-    dmnModelInstance = Dmn.createEmptyModel();
-    Definitions definitions = generateElement(Definitions.class);
-    definitions.setNamespace(TEST_URI);
-    dmnModelInstance.setDocumentElement(definitions);
+    modelInstance = Dmn.createEmptyModel();
+    Definitions definitions = generateNamedElement(Definitions.class, "definitions");
+    definitions.setNamespace(TEST_NAMESPACE);
+    modelInstance.setDocumentElement(definitions);
 
     // Default
-    Decision decision = generateElement(Decision.class, 1);
+    Decision decision = generateNamedElement(Decision.class, "decision1", 1);
     DecisionTable decisionTable = generateElement(DecisionTable.class, 1);
     decision.setExpression(decisionTable);
+    Output output = generateElement(Output.class, 1);
+    decisionTable.getOutputs().add(output);
     definitions.addChildElement(decision);
 
     // UNIQUE
-    decision = generateElement(Decision.class, 2);
+    decision = generateNamedElement(Decision.class, "decision2", 2);
     decisionTable = generateElement(DecisionTable.class, 2);
     decisionTable.setHitPolicy(UNIQUE);
     decision.setExpression(decisionTable);
+    output = generateElement(Output.class, 2);
+    decisionTable.getOutputs().add(output);
     definitions.addChildElement(decision);
 
     // FIRST
-    decision = generateElement(Decision.class, 3);
+    decision = generateNamedElement(Decision.class, "decision3", 3);
     decisionTable = generateElement(DecisionTable.class, 3);
     decisionTable.setHitPolicy(FIRST);
     decision.setExpression(decisionTable);
+    output = generateElement(Output.class, 3);
+    decisionTable.getOutputs().add(output);
     definitions.addChildElement(decision);
 
     // PRIORITY
-    decision = generateElement(Decision.class, 4);
+    decision = generateNamedElement(Decision.class, "decision4", 4);
     decisionTable = generateElement(DecisionTable.class, 4);
     decisionTable.setHitPolicy(PRIORITY);
     decision.setExpression(decisionTable);
+    output = generateElement(Output.class, 4);
+    decisionTable.getOutputs().add(output);
     definitions.addChildElement(decision);
 
     // ANY
-    decision = generateElement(Decision.class, 5);
+    decision = generateNamedElement(Decision.class, "decision5", 5);
     decisionTable = generateElement(DecisionTable.class, 5);
     decisionTable.setHitPolicy(ANY);
     decision.setExpression(decisionTable);
+    output = generateElement(Output.class, 5);
+    decisionTable.getOutputs().add(output);
     definitions.addChildElement(decision);
 
     // COLLECT
-    decision = generateElement(Decision.class, 6);
+    decision = generateNamedElement(Decision.class, "decision6", 6);
     decisionTable = generateElement(DecisionTable.class, 6);
     decisionTable.setHitPolicy(COLLECT);
     decision.setExpression(decisionTable);
+    output = generateElement(Output.class, 6);
+    decisionTable.getOutputs().add(output);
     definitions.addChildElement(decision);
 
     // RULE ORDER
-    decision = generateElement(Decision.class, 7);
+    decision = generateNamedElement(Decision.class, "decision7", 7);
     decisionTable = generateElement(DecisionTable.class, 7);
     decisionTable.setHitPolicy(RULE_ORDER);
     decision.setExpression(decisionTable);
+    output = generateElement(Output.class, 7);
+    decisionTable.getOutputs().add(output);
     definitions.addChildElement(decision);
 
     // OUTPUT ORDER
-    decision = generateElement(Decision.class, 8);
+    decision = generateNamedElement(Decision.class, "decision8", 8);
     decisionTable = generateElement(DecisionTable.class, 8);
     decisionTable.setHitPolicy(OUTPUT_ORDER);
     decision.setExpression(decisionTable);
+    output = generateElement(Output.class, 8);
+    decisionTable.getOutputs().add(output);
     definitions.addChildElement(decision);
 
     assertModelEqualsFile(HIT_POLICY_DMN);

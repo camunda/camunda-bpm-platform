@@ -19,14 +19,13 @@ import java.util.Collection;
 public class ItemDefinitionTest extends DmnModelElementInstanceTest {
 
   public TypeAssumption getTypeAssumption() {
-    return new TypeAssumption(DmnElement.class, false);
+    return new TypeAssumption(NamedElement.class, false);
   }
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
     return Arrays.asList(
-      new ChildElementAssumption(TypeDefinition.class, 0, 1),
       new ChildElementAssumption(TypeRef.class, 0, 1),
-      new ChildElementAssumption(AllowedValue.class),
+      new ChildElementAssumption(AllowedValues.class, 0, 1),
       new ChildElementAssumption(ItemComponent.class)
     );
   }

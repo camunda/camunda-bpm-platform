@@ -15,18 +15,15 @@ package org.camunda.bpm.model.dmn;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.camunda.bpm.model.dmn.instance.Clause;
+import org.camunda.bpm.model.dmn.instance.Input;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * @author Sebastian Menski
- */
 public class CamundaExtensionsTest {
 
   private DmnModelInstance modelInstance;
-  private Clause clause;
+  private Input clause;
 
   @Before
   public void parseModel() {

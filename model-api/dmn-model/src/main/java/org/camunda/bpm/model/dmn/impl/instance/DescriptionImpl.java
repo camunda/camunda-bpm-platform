@@ -13,7 +13,7 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN10_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_DESCRIPTION;
 
 import org.camunda.bpm.model.dmn.instance.Description;
@@ -30,7 +30,7 @@ public class DescriptionImpl extends DmnModelElementInstanceImpl implements Desc
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Description.class, DMN_ELEMENT_DESCRIPTION)
-      .namespaceUri(DMN10_NS)
+      .namespaceUri(DMN11_NS)
       .instanceProvider(new ModelTypeInstanceProvider<Description>() {
         public Description newInstance(ModelTypeInstanceContext instanceContext) {
           return new DescriptionImpl(instanceContext);

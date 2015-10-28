@@ -13,16 +13,16 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN10_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_DRG_ELEMENT;
 
-import org.camunda.bpm.model.dmn.instance.DmnElement;
 import org.camunda.bpm.model.dmn.instance.DrgElement;
+import org.camunda.bpm.model.dmn.instance.NamedElement;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 
-public abstract class DrgElementImpl extends DmnElementImpl implements DrgElement {
+public abstract class DrgElementImpl extends NamedElementImpl implements DrgElement {
 
   public DrgElementImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
@@ -30,8 +30,8 @@ public abstract class DrgElementImpl extends DmnElementImpl implements DrgElemen
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(DrgElement.class, DMN_ELEMENT_DRG_ELEMENT)
-      .namespaceUri(DMN10_NS)
-      .extendsType(DmnElement.class)
+      .namespaceUri(DMN11_NS)
+      .extendsType(NamedElement.class)
       .abstractType();
 
     typeBuilder.build();

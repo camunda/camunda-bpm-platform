@@ -13,7 +13,7 @@
 
 package org.camunda.bpm.model.dmn.instance;
 
-public interface BusinessContextElement extends DmnElement {
+public interface BusinessContextElement extends NamedElement {
 
   String getUri();
 

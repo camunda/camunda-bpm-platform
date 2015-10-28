@@ -23,9 +23,9 @@ public interface KnowledgeSource extends DrgElement {
 
   Collection<AuthorityRequirement> getAuthorityRequirement();
 
-  String getType();
+  Type getType();
 
-  void setType(String type);
+  void setType(Type type);
 
   OrganizationUnit getOwner();
 

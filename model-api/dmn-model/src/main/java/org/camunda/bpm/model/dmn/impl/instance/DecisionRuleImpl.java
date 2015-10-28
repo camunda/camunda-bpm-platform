@@ -13,43 +13,42 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN10_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_DECISION_RULE;
 
 import java.util.Collection;
 
-import org.camunda.bpm.model.dmn.instance.Conclusion;
-import org.camunda.bpm.model.dmn.instance.Condition;
 import org.camunda.bpm.model.dmn.instance.DecisionRule;
 import org.camunda.bpm.model.dmn.instance.DmnElement;
-import org.camunda.bpm.model.dmn.instance.Expression;
+import org.camunda.bpm.model.dmn.instance.InputEntry;
+import org.camunda.bpm.model.dmn.instance.OutputEntry;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
+import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
-import org.camunda.bpm.model.xml.type.reference.ElementReferenceCollection;
 
 public class DecisionRuleImpl extends DmnElementImpl implements DecisionRule {
-  
-  protected static ElementReferenceCollection<Expression, Condition> conditionRefCollection;
-  protected static ElementReferenceCollection<Expression, Conclusion> conclusionRefCollection;
+
+  protected static ChildElementCollection<InputEntry> inputEntryCollection;
+  protected static ChildElementCollection<OutputEntry> outputEntryCollection;
 
   public DecisionRuleImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
   }
 
-  public Collection<Expression> getConditions() {
-    return conditionRefCollection.getReferenceTargetElements(this);
+  public Collection<InputEntry> getInputEntries() {
+    return inputEntryCollection.get(this);
   }
 
-  public Collection<Expression> getConclusions() {
-    return conclusionRefCollection.getReferenceTargetElements(this);
+  public Collection<OutputEntry> getOutputEntries() {
+    return outputEntryCollection.get(this);
   }
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(DecisionRule.class, DMN_ELEMENT_DECISION_RULE)
-      .namespaceUri(DMN10_NS)
+      .namespaceUri(DMN11_NS)
       .extendsType(DmnElement.class)
       .instanceProvider(new ModelTypeInstanceProvider<DecisionRule>() {
         public DecisionRule newInstance(ModelTypeInstanceContext instanceContext) {
@@ -59,12 +58,11 @@ public class DecisionRuleImpl extends DmnElementImpl implements DecisionRule {
 
     SequenceBuilder sequenceBuilder = typeBuilder.sequence();
 
-    conditionRefCollection = sequenceBuilder.elementCollection(Condition.class)
-      .idsElementReferenceCollection(Expression.class)
+    inputEntryCollection = sequenceBuilder.elementCollection(InputEntry.class)
       .build();
 
-    conclusionRefCollection = sequenceBuilder.elementCollection(Conclusion.class)
-      .idsElementReferenceCollection(Expression.class)
+    outputEntryCollection = sequenceBuilder.elementCollection(OutputEntry.class)
+      .required()
       .build();
 
     typeBuilder.build();

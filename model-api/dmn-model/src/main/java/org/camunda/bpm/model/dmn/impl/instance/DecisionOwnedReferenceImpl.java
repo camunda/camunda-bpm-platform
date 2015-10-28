@@ -13,7 +13,7 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN10_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_DECISION_OWNED;
 
 import org.camunda.bpm.model.dmn.instance.DecisionOwnedReference;
@@ -31,7 +31,7 @@ public class DecisionOwnedReferenceImpl extends DmnElementReferenceImpl implemen
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(DecisionOwnedReference.class, DMN_ELEMENT_DECISION_OWNED)
-      .namespaceUri(DMN10_NS)
+      .namespaceUri(DMN11_NS)
       .extendsType(DmnElementReference.class)
       .instanceProvider(new ModelTypeInstanceProvider<DecisionOwnedReference>() {
         public DecisionOwnedReference newInstance(ModelTypeInstanceContext instanceContext) {

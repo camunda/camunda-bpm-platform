@@ -15,7 +15,7 @@ package org.camunda.bpm.model.dmn.instance;
 
 import java.util.Collection;
 
-public interface Definitions extends DmnElement {
+public interface Definitions extends NamedElement {
 
   String getExpressionLanguage();
 
@@ -29,9 +29,19 @@ public interface Definitions extends DmnElement {
 
   void setNamespace(String namespace);
 
+  String getExporter();
+
+  void setExporter(String exporter);
+
+  String getExporterVersion();
+
+  void setExporterVersion(String exporterVersion);
+
   Collection<Import> getImports();
 
   Collection<ItemDefinition> getItemDefinitions();
+
+  Collection<Artifact> getArtifacts();
 
   Collection<DrgElement> getDrgElements();
 

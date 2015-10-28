@@ -13,20 +13,18 @@
 
 package org.camunda.bpm.model.dmn.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.FEEL_NS;
-
 import java.util.Arrays;
 import java.util.Collection;
 
 public class ContextTest extends DmnModelElementInstanceTest {
 
   public TypeAssumption getTypeAssumption() {
-    return new TypeAssumption(FEEL_NS, Expression.class, false);
+    return new TypeAssumption(Expression.class, false);
   }
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
     return Arrays.asList(
-      new ChildElementAssumption(FEEL_NS, ContextEntry.class)
+      new ChildElementAssumption(ContextEntry.class)
     );
   }
 

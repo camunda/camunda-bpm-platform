@@ -15,8 +15,8 @@ package org.camunda.bpm.model.dmn.instance;
 
 public interface InputData extends DrgElement {
 
-  ItemDefinition getItemDefinition();
+  InformationItem getInformationItem();
 
-  void setItemDefinition(ItemDefinition itemDefinition);
+  void setInformationItem(InformationItem informationItem);
 
 }

@@ -13,14 +13,10 @@
 
 package org.camunda.bpm.model.dmn.instance;
 
-import java.util.Collection;
-
 public interface Expression extends DmnElement {
 
-  Collection<InformationItem> getInputVariables();
+  String getTypeRef();
 
-  ItemDefinition getItemDefinition();
-  
-  void setItemDefinition(ItemDefinition itemDefinition);
+  void setTypeRef(String typeRef);
 
 }

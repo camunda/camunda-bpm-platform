@@ -13,15 +13,15 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN10_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_ELEMENT_COLLECTION;
 
 import java.util.Collection;
 
-import org.camunda.bpm.model.dmn.instance.DmnElement;
 import org.camunda.bpm.model.dmn.instance.DrgElement;
 import org.camunda.bpm.model.dmn.instance.DrgElementReference;
 import org.camunda.bpm.model.dmn.instance.ElementCollection;
+import org.camunda.bpm.model.dmn.instance.NamedElement;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
@@ -29,7 +29,7 @@ import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceP
 import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 import org.camunda.bpm.model.xml.type.reference.ElementReferenceCollection;
 
-public class ElementCollectionImpl extends DmnElementImpl implements ElementCollection {
+public class ElementCollectionImpl extends NamedElementImpl implements ElementCollection {
 
   protected static ElementReferenceCollection<DrgElement, DrgElementReference> drgElementRefCollection;
 
@@ -43,8 +43,8 @@ public class ElementCollectionImpl extends DmnElementImpl implements ElementColl
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(ElementCollection.class, DMN_ELEMENT_ELEMENT_COLLECTION)
-      .namespaceUri(DMN10_NS)
-      .extendsType(DmnElement.class)
+      .namespaceUri(DMN11_NS)
+      .extendsType(NamedElement.class)
       .instanceProvider(new ModelTypeInstanceProvider<ElementCollection>() {
         public ElementCollection newInstance(ModelTypeInstanceContext instanceContext) {
           return new ElementCollectionImpl(instanceContext);

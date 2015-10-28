@@ -25,7 +25,7 @@ public class LiteralExpressionTest extends DmnModelElementInstanceTest {
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
     return Arrays.asList(
       new ChildElementAssumption(Text.class, 0, 1),
-      new ChildElementAssumption(Import.class, 0, 1)
+      new ChildElementAssumption(ImportedValues.class, 0, 1)
     );
   }
 

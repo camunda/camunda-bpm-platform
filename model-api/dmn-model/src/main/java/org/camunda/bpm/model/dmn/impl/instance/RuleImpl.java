@@ -13,7 +13,7 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN10_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_RULE;
 
 import org.camunda.bpm.model.dmn.instance.DecisionRule;
@@ -31,7 +31,7 @@ public class RuleImpl extends DecisionRuleImpl implements Rule {
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Rule.class, DMN_ELEMENT_RULE)
-      .namespaceUri(DMN10_NS)
+      .namespaceUri(DMN11_NS)
       .extendsType(DecisionRule.class)
       .instanceProvider(new ModelTypeInstanceProvider<Rule>() {
         public Rule newInstance(ModelTypeInstanceContext instanceContext) {

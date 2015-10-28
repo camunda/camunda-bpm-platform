@@ -15,12 +15,10 @@ package org.camunda.bpm.model.dmn.instance;
 
 import java.util.Collection;
 
-import org.camunda.bpm.model.dmn.impl.DmnModelConstants;
-
 public class ColumnTest extends DmnModelElementInstanceTest {
 
   public TypeAssumption getTypeAssumption() {
-    return new TypeAssumption(DmnModelConstants.FEEL_NS, ContextEntry.class, false);
+    return new TypeAssumption(InformationItem.class, false);
   }
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {

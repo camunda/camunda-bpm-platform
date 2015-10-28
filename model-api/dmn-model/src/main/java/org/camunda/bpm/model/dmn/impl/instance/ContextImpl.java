@@ -13,8 +13,8 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.FEEL_ELEMENT_CONTEXT;
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.FEEL_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_CONTEXT;
 
 import java.util.Collection;
 
@@ -41,8 +41,8 @@ public class ContextImpl extends ExpressionImpl implements Context {
   }
   
   public static void registerType(ModelBuilder modelBuilder) {
-    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Context.class, FEEL_ELEMENT_CONTEXT)
-      .namespaceUri(FEEL_NS)
+    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Context.class, DMN_ELEMENT_CONTEXT)
+      .namespaceUri(DMN11_NS)
       .extendsType(Expression.class)
       .instanceProvider(new ModelTypeInstanceProvider<Context>() {
         public Context newInstance(ModelTypeInstanceContext instanceContext) {

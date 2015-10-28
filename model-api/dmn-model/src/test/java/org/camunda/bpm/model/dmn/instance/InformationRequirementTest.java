@@ -24,7 +24,6 @@ public class InformationRequirementTest extends DmnModelElementInstanceTest {
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
     return Arrays.asList(
-      new ChildElementAssumption(InformationItem.class, 0, 1),
       new ChildElementAssumption(RequiredDecisionReference.class, 0, 1),
       new ChildElementAssumption(RequiredInputReference.class, 0, 1)
     );

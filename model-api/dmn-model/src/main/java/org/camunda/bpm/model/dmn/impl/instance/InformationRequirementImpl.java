@@ -13,11 +13,10 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN10_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_INFORMATION_REQUIREMENT;
 
 import org.camunda.bpm.model.dmn.instance.Decision;
-import org.camunda.bpm.model.dmn.instance.InformationItem;
 import org.camunda.bpm.model.dmn.instance.InformationRequirement;
 import org.camunda.bpm.model.dmn.instance.InputData;
 import org.camunda.bpm.model.dmn.instance.RequiredDecisionReference;
@@ -26,26 +25,16 @@ import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
-import org.camunda.bpm.model.xml.type.child.ChildElement;
 import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 import org.camunda.bpm.model.xml.type.reference.ElementReference;
 
 public class InformationRequirementImpl extends DmnModelElementInstanceImpl implements InformationRequirement {
 
-  protected static ChildElement<InformationItem> informationItemChild;
   protected static ElementReference<Decision, RequiredDecisionReference> requiredDecisionRef;
   protected static ElementReference<InputData, RequiredInputReference> requiredInputRef;
 
   public InformationRequirementImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
-  }
-
-  public InformationItem getInformationItem() {
-    return informationItemChild.getChild(this);
-  }
-
-  public void setInformationItem(InformationItem informationItem) {
-    informationItemChild.setChild(this, informationItem);
   }
 
   public Decision getRequiredDecision() {
@@ -66,7 +55,7 @@ public class InformationRequirementImpl extends DmnModelElementInstanceImpl impl
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(InformationRequirement.class, DMN_ELEMENT_INFORMATION_REQUIREMENT)
-      .namespaceUri(DMN10_NS)
+      .namespaceUri(DMN11_NS)
       .instanceProvider(new ModelTypeInstanceProvider<InformationRequirement>() {
         public InformationRequirement newInstance(ModelTypeInstanceContext instanceContext) {
           return new InformationRequirementImpl(instanceContext);
@@ -74,9 +63,6 @@ public class InformationRequirementImpl extends DmnModelElementInstanceImpl impl
       });
 
     SequenceBuilder sequenceBuilder = typeBuilder.sequence();
-
-    informationItemChild = sequenceBuilder.element(InformationItem.class)
-      .build();
 
     requiredDecisionRef = sequenceBuilder.element(RequiredDecisionReference.class)
       .uriElementReference(Decision.class)

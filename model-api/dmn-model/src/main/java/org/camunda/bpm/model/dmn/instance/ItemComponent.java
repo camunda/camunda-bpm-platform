@@ -13,14 +13,6 @@
 
 package org.camunda.bpm.model.dmn.instance;
 
-public interface ItemComponent extends DmnModelElementInstance {
-
-  String getName();
-
-  void setName(String name);
-
-  ItemDefinition getItemDefinition();
-
-  void setItemDefinition(ItemDefinition itemDefinition);
+public interface ItemComponent extends ItemDefinition {
 
 }

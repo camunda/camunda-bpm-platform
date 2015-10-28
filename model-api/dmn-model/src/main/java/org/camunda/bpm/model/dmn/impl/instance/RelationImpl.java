@@ -13,15 +13,15 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.FEEL_ELEMENT_RELATION;
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.FEEL_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_RELATION;
 
 import java.util.Collection;
 
 import org.camunda.bpm.model.dmn.instance.Column;
 import org.camunda.bpm.model.dmn.instance.Expression;
-import org.camunda.bpm.model.dmn.instance.List;
 import org.camunda.bpm.model.dmn.instance.Relation;
+import org.camunda.bpm.model.dmn.instance.Row;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
@@ -32,7 +32,7 @@ import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 public class RelationImpl extends ExpressionImpl implements Relation {
 
   protected static ChildElementCollection<Column> columnCollection;
-  protected static ChildElementCollection<List> listCollection;
+  protected static ChildElementCollection<Row> rowCollection;
 
   public RelationImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
@@ -42,13 +42,13 @@ public class RelationImpl extends ExpressionImpl implements Relation {
     return columnCollection.get(this);
   }
 
-  public Collection<List> getLists() {
-    return listCollection.get(this);
+  public Collection<Row> getRows() {
+    return rowCollection.get(this);
   }
 
   public static void registerType(ModelBuilder modelBuilder) {
-    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Relation.class, FEEL_ELEMENT_RELATION)
-      .namespaceUri(FEEL_NS)
+    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Relation.class, DMN_ELEMENT_RELATION)
+      .namespaceUri(DMN11_NS)
       .extendsType(Expression.class)
       .instanceProvider(new ModelTypeInstanceProvider<Relation>() {
         public Relation newInstance(ModelTypeInstanceContext instanceContext) {
@@ -61,7 +61,7 @@ public class RelationImpl extends ExpressionImpl implements Relation {
     columnCollection = sequenceBuilder.elementCollection(Column.class)
       .build();
 
-    listCollection = sequenceBuilder.elementCollection(List.class)
+    rowCollection = sequenceBuilder.elementCollection(Row.class)
       .build();
 
     typeBuilder.build();
