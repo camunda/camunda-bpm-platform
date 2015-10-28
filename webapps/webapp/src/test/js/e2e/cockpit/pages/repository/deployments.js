@@ -175,7 +175,7 @@ module.exports = Page.extend({
   openDeleteDeployment: function(idx) {
     var self = this;
 
-    focusDeployment(idx).then(function() {
+    this.focusDeployment(idx).then(function() {
       var elem = self.deploymentList().get(idx).element(by.css('[ng-click="deleteDeployment($event, deployment)"]'));
       elem.click();
       self.waitForElementToBeVisible(elem, 5000);
