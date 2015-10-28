@@ -98,7 +98,7 @@ public class RedeploymentRegistrationTest extends PluggableProcessEngineTestCase
       .addModelInstance(BPMN_RESOURCE_1, createProcessWithServiceTask(PROCESS_KEY_1))
       .deploy();
 
-    // first deployment
+    // second deployment
     Deployment deployment2 = repositoryService
       .createDeployment()
       .name(DEPLOYMENT_NAME)

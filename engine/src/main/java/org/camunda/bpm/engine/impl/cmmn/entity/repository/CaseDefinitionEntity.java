@@ -130,14 +130,14 @@ public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefi
     String previousCaseDefinitionId = getPreviousCaseDefinitionId();
     if (previousCaseDefinitionId != null) {
 
-      previousCaseDefinition = loadPreviousCaseDefinition(previousCaseDefinitionId);
+      previousCaseDefinition = loadCaseDefinition(previousCaseDefinitionId);
 
       if (previousCaseDefinition == null) {
-        setPreviousCaseDefinitionId(null);
+        resetPreviousCaseDefinitionId();
         previousCaseDefinitionId = getPreviousCaseDefinitionId();
 
         if (previousCaseDefinitionId != null) {
-          previousCaseDefinition = loadPreviousCaseDefinition(previousCaseDefinitionId);
+          previousCaseDefinition = loadCaseDefinition(previousCaseDefinitionId);
         }
       }
     }
@@ -145,23 +145,26 @@ public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefi
     return previousCaseDefinition;
   }
 
-  protected CaseDefinitionEntity loadPreviousCaseDefinition(String previousCaseDefinitionId) {
+  /**
+   * Returns the cached version if exists; does not update the entity from the database in that case
+   */
+  protected CaseDefinitionEntity loadCaseDefinition(String caseDefinitionId) {
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
     DeploymentCache deploymentCache = configuration.getDeploymentCache();
 
-    CaseDefinitionEntity previousCaseDefinition = deploymentCache.findCaseDefinitionFromCache(previousCaseDefinitionId);
+    CaseDefinitionEntity caseDefinition = deploymentCache.findCaseDefinitionFromCache(caseDefinitionId);
 
-    if (previousCaseDefinition == null) {
+    if (caseDefinition == null) {
       CommandContext commandContext = Context.getCommandContext();
       CaseDefinitionManager caseDefinitionManager = commandContext.getCaseDefinitionManager();
-      previousCaseDefinition = caseDefinitionManager.findCaseDefinitionById(previousCaseDefinitionId);
+      caseDefinition = caseDefinitionManager.findCaseDefinitionById(caseDefinitionId);
 
-      if (previousCaseDefinition != null) {
-        previousCaseDefinition = deploymentCache.resolveCaseDefinition(previousCaseDefinition);
+      if (caseDefinition != null) {
+        caseDefinition = deploymentCache.resolveCaseDefinition(caseDefinition);
       }
     }
 
-    return previousCaseDefinition;
+    return caseDefinition;
 
   }
 
@@ -172,6 +175,11 @@ public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefi
 
   protected void setPreviousCaseDefinitionId(String previousCaseDefinitionId) {
     this.previousCaseDefinitionId = previousCaseDefinitionId;
+  }
+
+  protected void resetPreviousCaseDefinitionId() {
+    previousCaseDefinitionId = null;
+    ensurePreviousCaseDefinitionIdInitialized();
   }
 
   protected void ensurePreviousCaseDefinitionIdInitialized() {

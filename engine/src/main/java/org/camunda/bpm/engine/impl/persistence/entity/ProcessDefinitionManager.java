@@ -102,14 +102,6 @@ public class ProcessDefinitionManager extends AbstractManager {
     return (String) getDbEntityManager().selectOne("selectPreviousProcessDefinitionIdByKeyAndVersion", params);
   }
 
-  public List<User> findProcessDefinitionPotentialStarterUsers() {
-    return null;
-  }
-
-  public List<Group> findProcessDefinitionPotentialStarterGroups() {
-    return null;
-  }
-
   @SuppressWarnings("unchecked")
   public List<ProcessDefinition> findProcessDefinitionsByDeploymentId(String deploymentId) {
     return getDbEntityManager().selectList("selectProcessDefinitionByDeploymentId", deploymentId);

@@ -192,14 +192,14 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     String previousProcessDefinitionId = getPreviousProcessDefinitionId();
     if (previousProcessDefinitionId != null) {
 
-      previousProcessDefinition = loadPreviousProcessDefinition(previousProcessDefinitionId);
+      previousProcessDefinition = loadProcessDefinition(previousProcessDefinitionId);
 
       if (previousProcessDefinition == null) {
-        setPreviousProcessDefinitionId(null);
+        resetPreviousProcessDefinitionId();
         previousProcessDefinitionId = getPreviousProcessDefinitionId();
 
         if (previousProcessDefinitionId != null) {
-          previousProcessDefinition = loadPreviousProcessDefinition(previousProcessDefinitionId);
+          previousProcessDefinition = loadProcessDefinition(previousProcessDefinitionId);
         }
       }
     }
@@ -207,29 +207,37 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     return previousProcessDefinition;
   }
 
-  protected ProcessDefinitionEntity loadPreviousProcessDefinition(String previousProcessDefinitionId) {
+  /**
+   * Returns the cached version if exists; does not update the entity from the database in that case
+   */
+  protected ProcessDefinitionEntity loadProcessDefinition(String processDefinitionId) {
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
     DeploymentCache deploymentCache = configuration.getDeploymentCache();
 
-    ProcessDefinitionEntity previousProcessDefinition = deploymentCache.findProcessDefinitionFromCache(previousProcessDefinitionId);
+    ProcessDefinitionEntity processDefinition = deploymentCache.findProcessDefinitionFromCache(processDefinitionId);
 
-    if (previousProcessDefinition == null) {
+    if (processDefinition == null) {
       CommandContext commandContext = Context.getCommandContext();
       ProcessDefinitionManager processDefinitionManager = commandContext.getProcessDefinitionManager();
-      previousProcessDefinition = processDefinitionManager.findLatestProcessDefinitionById(previousProcessDefinitionId);
+      processDefinition = processDefinitionManager.findLatestProcessDefinitionById(processDefinitionId);
 
-      if (previousProcessDefinition != null) {
-        previousProcessDefinition = deploymentCache.resolveProcessDefinition(previousProcessDefinition);
+      if (processDefinition != null) {
+        processDefinition = deploymentCache.resolveProcessDefinition(processDefinition);
       }
     }
 
-    return previousProcessDefinition;
+    return processDefinition;
 
   }
 
   protected String getPreviousProcessDefinitionId() {
     ensurePreviousProcessDefinitionIdInitialized();
     return previousProcessDefinitionId;
+  }
+
+  protected void resetPreviousProcessDefinitionId() {
+    previousProcessDefinitionId = null;
+    ensurePreviousProcessDefinitionIdInitialized();
   }
 
   protected void setPreviousProcessDefinitionId(String previousProcessDefinitionId) {

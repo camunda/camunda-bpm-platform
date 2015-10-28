@@ -9,7 +9,6 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
-import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
@@ -57,19 +56,7 @@ public class ProcessApplicationContextUtil {
     return processApplicationForDeployment;
   }
 
-  public static ProcessApplicationReference getTargetProcessApplication(ProcessDefinitionEntity definition) {
-    return getTargetProcessApplication((ResourceDefinitionEntity) definition);
-  }
-
-  public static ProcessApplicationReference getTargetProcessApplication(CaseDefinitionEntity definition) {
-    return getTargetProcessApplication((ResourceDefinitionEntity) definition);
-  }
-
-  public static ProcessApplicationReference getTargetProcessApplication(DecisionDefinitionEntity definition) {
-    return getTargetProcessApplication((ResourceDefinitionEntity) definition);
-  }
-
-  protected static ProcessApplicationReference getTargetProcessApplication(ResourceDefinitionEntity definition) {
+  public static ProcessApplicationReference getTargetProcessApplication(ResourceDefinitionEntity definition) {
     ProcessApplicationReference reference = getTargetProcessApplication(definition.getDeploymentId());
 
     if (reference == null) {

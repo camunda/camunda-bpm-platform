@@ -636,14 +636,6 @@ public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTe
     .done();
   }
 
-  protected BpmnModelInstance createProcessWithUserTask(String key) {
-    return Bpmn.createExecutableProcess(key)
-      .startEvent()
-      .userTask()
-      .endEvent()
-    .done();
-  }
-
   public class MyEmbeddedProcessApplication extends EmbeddedProcessApplication {
 
     protected ProcessApplicationReference reference;

@@ -136,14 +136,14 @@ public class DecisionDefinitionEntity extends DmnDecisionTableImpl implements De
     String previousDecisionDefinitionId = getPreviousDecisionDefinitionId();
     if (previousDecisionDefinitionId != null) {
 
-      previousDecisionDefinition = loadPreviousDecisionDefinition(previousDecisionDefinitionId);
+      previousDecisionDefinition = loadDecisionDefinition(previousDecisionDefinitionId);
 
       if (previousDecisionDefinition == null) {
-        setPreviousDecisionDefinitionId(null);
+        resetPreviousDecisionDefinitionId();
         previousDecisionDefinitionId = getPreviousDecisionDefinitionId();
 
         if (previousDecisionDefinitionId != null) {
-          previousDecisionDefinition = loadPreviousDecisionDefinition(previousDecisionDefinitionId);
+          previousDecisionDefinition = loadDecisionDefinition(previousDecisionDefinitionId);
         }
       }
     }
@@ -151,23 +151,26 @@ public class DecisionDefinitionEntity extends DmnDecisionTableImpl implements De
     return previousDecisionDefinition;
   }
 
-  protected DecisionDefinitionEntity loadPreviousDecisionDefinition(String previousDecisionDefinitionId) {
+  /**
+   * Returns the cached version if exists; does not update the entity from the database in that case
+   */
+  protected DecisionDefinitionEntity loadDecisionDefinition(String decisionDefinitionId) {
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
     DeploymentCache deploymentCache = configuration.getDeploymentCache();
 
-    DecisionDefinitionEntity previousDecisionDefinition = deploymentCache.findDecisionDefinitionFromCache(previousDecisionDefinitionId);
+    DecisionDefinitionEntity decisionDefinition = deploymentCache.findDecisionDefinitionFromCache(decisionDefinitionId);
 
-    if (previousDecisionDefinition == null) {
+    if (decisionDefinition == null) {
       CommandContext commandContext = Context.getCommandContext();
       DecisionDefinitionManager decisionDefinitionManager = commandContext.getDecisionDefinitionManager();
-      previousDecisionDefinition = decisionDefinitionManager.findDecisionDefinitionById(previousDecisionDefinitionId);
+      decisionDefinition = decisionDefinitionManager.findDecisionDefinitionById(decisionDefinitionId);
 
-      if (previousDecisionDefinition != null) {
-        previousDecisionDefinition = deploymentCache.resolveDecisionDefinition(previousDecisionDefinition);
+      if (decisionDefinition != null) {
+        decisionDefinition = deploymentCache.resolveDecisionDefinition(decisionDefinition);
       }
     }
 
-    return previousDecisionDefinition;
+    return decisionDefinition;
 
   }
 
@@ -178,6 +181,11 @@ public class DecisionDefinitionEntity extends DmnDecisionTableImpl implements De
 
   public void setPreviousDecisionDefinitionId(String previousDecisionDefinitionId) {
     this.previousDecisionDefinitionId = previousDecisionDefinitionId;
+  }
+
+  protected void resetPreviousDecisionDefinitionId() {
+    previousDecisionDefinitionId = null;
+    ensurePreviousDecisionDefinitionIdInitialized();
   }
 
   protected void ensurePreviousDecisionDefinitionIdInitialized() {
