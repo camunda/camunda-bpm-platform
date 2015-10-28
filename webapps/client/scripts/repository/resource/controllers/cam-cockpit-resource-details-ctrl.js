@@ -20,7 +20,7 @@ define([], function() {
     var isObject = angular.isObject;
 
     var checkResource = function(name, pattern) {
-      return pattern.test(name.toLowerCase());
+      return name && pattern.test(name.toLowerCase());
     };
 
 

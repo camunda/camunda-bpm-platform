@@ -43,9 +43,11 @@ define([
         var name = $scope.name;
 
         $scope.extension = function() {
-          var extension = (name.match(/\.(\w+)$/) || [,''])[1];
-          extension = extension && extension.toLowerCase();
-          return Extensions[extension] || extension;
+          if (name) {
+            var extension = (name.match(/\.(\w+)$/) || [,''])[1];
+            extension = extension && extension.toLowerCase();
+            return Extensions[extension] || extension;
+          }
         };
 
         $scope.$watch('source', function(source) {
