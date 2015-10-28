@@ -111,7 +111,7 @@ describe('Repository Spec', function() {
       it('should add Date search and find nothing', function() {
 
         // when
-        deploymentsPage.createSearch('Deployment Time', 'before', '2015-01-01T00:00:00', true);
+        deploymentsPage.createSearch('Time', 'before', '2015-01-01T00:00:00', true);
 
         // then
         expect(deploymentsPage.deploymentList().count()).to.eventually.eql(0);
@@ -178,7 +178,7 @@ describe('Repository Spec', function() {
       it('should search by invalid deployment source', function() {
 
         // when
-        deploymentsPage.createSearch('Deployment Source', '=', 'xyz');
+        deploymentsPage.createSearch('Source', '=', 'xyz');
 
         //then
         expect(deploymentsPage.deploymentList().count()).to.eventually.eql(0);
@@ -198,7 +198,7 @@ describe('Repository Spec', function() {
       it('should search for undefined deployment sources', function() {
 
         // when
-        deploymentsPage.changeType(0, 'Deployment Source Undefined');
+        deploymentsPage.changeType(0, 'Source Undefined');
 
         // then
         expect(deploymentsPage.deploymentList().count()).to.eventually.eql(1);

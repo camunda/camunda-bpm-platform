@@ -5,7 +5,7 @@ var Page = require('./repository-view');
 module.exports = Page.extend({
 
   formElement: function() {
-    return element(by.css('.deployments'));
+    return element(by.css('section.deployments'));
   },
 
 
@@ -24,7 +24,7 @@ module.exports = Page.extend({
   },
 
   deploymentSource: function(idx) {
-    return this.deploymentList().get(idx).element(by.css('.source .value')).getText();
+    return this.deploymentList().get(idx).element(by.css('.source')).getText();
   },
 
   selectDeployment: function(idxOrName) {
