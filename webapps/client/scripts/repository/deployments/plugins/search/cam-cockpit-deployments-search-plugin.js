@@ -87,7 +87,7 @@ define([
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
 
-    ViewsProvider.registerDefaultView('cam.cockpit.repository.deployments.list', {
+    ViewsProvider.registerDefaultView('cockpit.repository.deployments.list', {
       id: 'deployments-search',
       template: template,
       controller: Controller,

@@ -11,7 +11,7 @@ define([], function() {
 
     $scope.deploymentsData = $scope.repositoryData.newChild($scope);
     $scope.deploymentsVars = { read: [ 'deploymentsData' ] };
-    $scope.deploymentsPlugins = Views.getProviders({ component: 'cam.cockpit.repository.deployments.list' });
+    $scope.deploymentsPlugins = Views.getProviders({ component: 'cockpit.repository.deployments.list' });
 
   }];
 

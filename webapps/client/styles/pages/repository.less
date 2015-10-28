@@ -223,9 +223,9 @@ ul.deployments {
     }
   }
 
-  .delete-deployment {
+  .deployment-action {
     display: inline-block;
-    position: absolute;
+    /*position: absolute;*/
     padding: 0 4px;
     font-size: small;
     display: none;
@@ -246,7 +246,7 @@ ul.deployments {
       margin-top: 0;
     }
 
-    &:hover .delete-deployment {
+    &:hover .deployment-action {
       z-index: 10;
       display: inline-block;
     }
@@ -266,6 +266,7 @@ ul.deployments {
         top: 50%;
         width: 0px;
       }
+
     }
   }
 }

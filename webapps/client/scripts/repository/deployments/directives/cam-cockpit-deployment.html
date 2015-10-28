@@ -1,0 +1,16 @@
+<view class="deployment-action"
+      ng-repeat="deploymentPlugin in deploymentPlugins"
+      provider="deploymentPlugin"
+      vars="deploymentVars" />
+
+<h4 class="name">{{ deployment.name || deployment.id }}</h4>
+
+<dl>
+  <dt>Time:</dt>
+  <dd class="time">{{ deployment.deploymentTime | camDate:'normal' }}</dd>
+
+  <dt>Source:</dt>
+  <dd ng-class="{ undefined: !deployment.source}" class="source">
+    {{ deployment.source ? deployment.source : '&lt;undefined&gt;' }}
+  </dd>
+</dl>

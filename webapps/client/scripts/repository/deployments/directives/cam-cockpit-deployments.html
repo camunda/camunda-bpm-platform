@@ -34,23 +34,12 @@
         ng-style="{'z-index': ((deployments.length + 10) - delta) }"
         ng-click="focus(deployment)">
 
-      <a ng-click="deleteDeployment($event, deployment)"
-         class="delete-deployment"
-         tooltip="Delete Deployment">
-        <span class="glyphicon glyphicon-trash"></span>
-      </a>
+      <div cam-deployment
+           deployment="deployment"
+           deployments-list-data="deploymentsListData"
+           control="control">
+      </div>
 
-      <h4 class="name">{{ deployment.name || deployment.id }}</h4>
-
-      <dl>
-        <dt>Time:</dt>
-        <dd class="time">{{ deployment.deploymentTime | camDate:'normal' }}</dd>
-
-        <dt>Source:</dt>
-        <dd ng-class="{ undefined: !deployment.source}" class="source">
-          {{ deployment.source ? deployment.source : '&lt;undefined&gt;' }}
-        </dd>
-      </dl>
     </li>
   </ul>
 </div>

@@ -1,10 +1,8 @@
 define([
   'text!./cam-cockpit-deployments.html',
-  'text!./../modals/cam-cockpit-delete-deployment-modal.html',
   'angular'
 ], function(
   template,
-  modalTemplate,
   angular
 ) {
   'use strict';
@@ -23,13 +21,13 @@ define([
       controller: [
         '$scope',
         '$location',
-        '$modal',
         'search',
+        'Notifications',
       function (
         $scope,
         $location,
-        $modal,
-        search
+        search,
+        Notifications
       ) {
 
         var deploymentsListData = $scope.deploymentsListData = $scope.deploymentsData.newChild($scope);
@@ -45,6 +43,18 @@ define([
           var search = $location.search() || {};
           return search[property] || null;
         }
+
+
+        // control ///////////////////////////////////////////////////////////////////
+
+        var control = $scope.control = {};
+        control.addMessage = function (status, msg) {
+          Notifications.addMessage({
+            status: status,
+            message: msg,
+            scope: $scope
+          });
+        };
 
 
         // pagination ////////////////////////////////////////////////////////////////
@@ -104,24 +114,6 @@ define([
 
         var isFocused = $scope.isFocused = function(deployment) {
           return deployment && $scope.currentDeployment && deployment.id === $scope.currentDeployment.id;
-        };
-
-        // delete deployment ////////////////////////////////////////////////////////
-
-        $scope.deleteDeployment = function ($event, deployment) {
-          $event.stopPropagation();
-
-          $modal.open({
-            controller: 'camDeleteDeploymentModalCtrl',
-            template: modalTemplate,
-            resolve: {
-              'deploymentsListData': function() { return deploymentsListData; },
-              'deployment': function() { return deployment; }
-            }
-          }).result.then(function() {
-            deploymentsListData.changed('deployments');
-          });
-
         };
 
       }]

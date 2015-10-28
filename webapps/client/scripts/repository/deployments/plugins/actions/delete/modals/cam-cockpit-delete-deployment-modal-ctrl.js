@@ -11,14 +11,14 @@ define([
     '$q',
     'camAPI',
     'Notifications',
-    'deploymentsListData',
+    'deploymentData',
     'deployment',
   function(
     $scope,
     $q,
     camAPI,
     Notifications,
-    deploymentsListData,
+    deploymentData,
     deployment
   ) {
 
@@ -26,7 +26,7 @@ define([
     var ProcessInstance = camAPI.resource('process-instance');
     var CaseInstance = camAPI.resource('case-instance');
 
-    var deploymentData = deploymentsListData.newChild($scope);
+    var deleteDeploymentData = deploymentData.newChild($scope);
 
     var options = $scope.options = {
       cascade: false,
@@ -39,7 +39,7 @@ define([
 
     // provide /////////////////////////////////////////////////////////
 
-    deploymentData.provide('processInstanceCount', function() {
+    deleteDeploymentData.provide('processInstanceCount', function() {
       var deferred = $q.defer();
 
       ProcessInstance.count({
@@ -58,7 +58,7 @@ define([
       return deferred.promise;
     });
 
-    deploymentData.provide('caseInstanceCount', function() {
+    deleteDeploymentData.provide('caseInstanceCount', function() {
       var deferred = $q.defer();
 
       CaseInstance.count({
@@ -84,11 +84,11 @@ define([
 
     // observe /////////////////////////////////////////////////////////
 
-    $scope.processInstanceCountState = deploymentData.observe('processInstanceCount', function(count) {
+    $scope.processInstanceCountState = deleteDeploymentData.observe('processInstanceCount', function(count) {
       $scope.processInstanceCount = count;
     });
 
-    $scope.caseInstanceCountState = deploymentData.observe('caseInstanceCount', function(count) {
+    $scope.caseInstanceCountState = deleteDeploymentData.observe('caseInstanceCount', function(count) {
       $scope.caseInstanceCount = count;
     });
 

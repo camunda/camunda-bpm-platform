@@ -6,13 +6,15 @@ define([
 
   /* directives */
   './directives/cam-cockpit-deployments',
+  './directives/cam-cockpit-deployment',
   './directives/cam-cockpit-deployments-sorting-choices',
 
   /* plugins */
   './plugins/search/cam-cockpit-deployments-search-plugin',
+  './plugins/actions/delete/cam-cockpit-delete-deployment-plugin',
 
   /* modals */
-  './modals/cam-cockpit-delete-deployment-modal-ctrl'
+  './plugins/actions/delete/modals/cam-cockpit-delete-deployment-modal-ctrl'
 
 ], function(
   angular,
@@ -22,10 +24,12 @@ define([
 
   /* directives */
   camCockpitDeployments,
+  camCockpitDeployment,
   camCockpitDeploymentsSortingChoices,
 
   /* plugins */
   camCockpitDeploymentsSearchPlugin,
+  camCockpitDeleteDeploymentPlugin,
 
   /* modals */
   camCockpitDeleteDeploymentModalCtrl
@@ -41,10 +45,12 @@ define([
 
   /* directives */
   deploymentsModule.directive('camDeployments', camCockpitDeployments);
+  deploymentsModule.directive('camDeployment', camCockpitDeployment);
   deploymentsModule.directive('camDeploymentsSortingChoices', camCockpitDeploymentsSortingChoices);
 
   /* plugins */
   deploymentsModule.config(camCockpitDeploymentsSearchPlugin);
+  deploymentsModule.config(camCockpitDeleteDeploymentPlugin);
 
   /* modals */
   deploymentsModule.controller('camDeleteDeploymentModalCtrl', camCockpitDeleteDeploymentModalCtrl);
