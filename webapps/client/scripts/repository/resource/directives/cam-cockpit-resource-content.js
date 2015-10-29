@@ -54,7 +54,7 @@ define([
         });
 
         resourceContentData.observe('binary', function(binary) {
-          $scope.binary = binary;
+          $scope.binary = (binary || {}).data;
         });
 
       }

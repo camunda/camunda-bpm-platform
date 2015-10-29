@@ -101,7 +101,7 @@ define([], function() {
             deferred.reject(err);
           }
           else {
-            deferred.resolve(res);
+            deferred.resolve({data: res});
           }
 
         });
