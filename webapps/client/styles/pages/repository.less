@@ -301,6 +301,10 @@ section.deployments.ctn-column > .cell.content {
 
     // background-color: green;
 
+    .loader {
+      padding: (@grid-gutter-width / 2);
+    }
+
     .wrapper {
       overflow-x: hidden;
       overflow-y: auto;
@@ -437,7 +441,7 @@ section.deployments.ctn-column > .cell.content {
   .cmmn-resource,
   .unkown-resource,
   .image-resource {
-    // max-height: 400px;
+    max-height: 400px;
     overflow: auto;
   }
 
@@ -452,7 +456,6 @@ section.deployments.ctn-column > .cell.content {
   }
 
   .image-resource {
-    overflow: hidden;
     > img {
       max-width: 100%;
     }
