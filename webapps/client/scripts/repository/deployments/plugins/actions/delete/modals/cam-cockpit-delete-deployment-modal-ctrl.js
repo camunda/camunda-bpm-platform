@@ -36,6 +36,9 @@ define([
     $scope.deployment = deployment;
     $scope.status;
 
+    $scope.$on('$routeChangeStart', function () {
+      $scope.$dismiss();
+    });
 
     // provide /////////////////////////////////////////////////////////
 
