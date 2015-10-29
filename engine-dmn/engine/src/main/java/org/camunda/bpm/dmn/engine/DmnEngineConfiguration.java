@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.context.DmnContextFactory;
+import org.camunda.bpm.dmn.engine.el.ElProvider;
 import org.camunda.bpm.dmn.engine.handler.DmnElementHandlerRegistry;
 import org.camunda.bpm.dmn.engine.hitpolicy.DmnHitPolicyHandler;
 import org.camunda.bpm.dmn.engine.transform.DmnTransformFactory;
@@ -53,6 +54,8 @@ public interface DmnEngineConfiguration {
   DmnScriptEngineResolver getScriptEngineResolver();
 
   FeelEngineProvider getFeelEngineProvider();
+
+  ElProvider getElProvider();
 
   DataTypeTransformerFactory getDataTypeTransformerFactory();
 

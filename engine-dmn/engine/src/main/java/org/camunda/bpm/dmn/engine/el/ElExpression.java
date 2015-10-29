@@ -2,7 +2,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,23 +10,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.camunda.bpm.dmn.feel.impl.el;
-
-import javax.el.ELContext;
-import javax.el.ExpressionFactory;
+package org.camunda.bpm.dmn.engine.el;
 
 import org.camunda.bpm.engine.variable.VariableContext;
 
-public interface ElContextFactory {
+/**
+ * @author Daniel Meyer
+ *
+ */
+public interface ElExpression {
 
   /**
-   * Create a {@link ELContext} for the given {@link ExpressionFactory} and {@link VariableContext}.
+   * Execute the expression and return the value
    *
-   * @param expressionFactory the {@link ExpressionFactory} to use
-   * @param varCtx the {@link VariableContext} to use
-   * @return the {@link ELContext} instance
+   * @param variableContext the context in which the expression should be executed
+   * @return the value
    */
-  ELContext createContext(ExpressionFactory expressionFactory, VariableContext varCtx);
+  public Object getValue(VariableContext variableContext);
 
 }

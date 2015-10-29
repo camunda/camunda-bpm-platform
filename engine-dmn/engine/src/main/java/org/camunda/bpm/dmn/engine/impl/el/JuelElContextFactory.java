@@ -2,7 +2,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -10,23 +10,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.camunda.bpm.dmn.feel.impl.el;
+package org.camunda.bpm.dmn.engine.impl.el;
 
 import javax.el.ELContext;
-import javax.el.ExpressionFactory;
+import javax.el.ELResolver;
 
 import org.camunda.bpm.engine.variable.VariableContext;
 
-public interface ElContextFactory {
+import de.odysseus.el.util.SimpleContext;
 
-  /**
-   * Create a {@link ELContext} for the given {@link ExpressionFactory} and {@link VariableContext}.
-   *
-   * @param expressionFactory the {@link ExpressionFactory} to use
-   * @param varCtx the {@link VariableContext} to use
-   * @return the {@link ELContext} instance
-   */
-  ELContext createContext(ExpressionFactory expressionFactory, VariableContext varCtx);
+/**
+ * @author Daniel Meyer
+ *
+ */
+public class JuelElContextFactory {
+
+  protected final ELResolver resolver;
+
+  public JuelElContextFactory(ELResolver resolver) {
+    this.resolver = resolver;
+  }
+
+  public ELContext createElContext(VariableContext variableContext) {
+    SimpleContext ctx = new SimpleContext(resolver);
+    ctx.putContext(VariableContext.class, variableContext);
+    return ctx;
+  }
 
 }

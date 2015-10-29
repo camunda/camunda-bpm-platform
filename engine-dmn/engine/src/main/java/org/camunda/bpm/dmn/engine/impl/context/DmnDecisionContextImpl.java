@@ -37,6 +37,8 @@ import org.camunda.bpm.dmn.engine.DmnExpression;
 import org.camunda.bpm.dmn.engine.DmnRule;
 import org.camunda.bpm.dmn.engine.DmnScriptEngineResolver;
 import org.camunda.bpm.dmn.engine.context.DmnDecisionContext;
+import org.camunda.bpm.dmn.engine.el.ElProvider;
+import org.camunda.bpm.dmn.engine.el.ElExpression;
 import org.camunda.bpm.dmn.engine.hitpolicy.DmnHitPolicyHandler;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionOutputImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionResultImpl;
@@ -63,6 +65,7 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
   protected static final String TYPED_INPUT_VALUE_POSTFIX = "_typed";
 
   protected DmnScriptEngineResolver scriptEngineResolver;
+  protected ElProvider elProvider;
   protected FeelEngine feelEngine;
   protected Map<HitPolicy, DmnHitPolicyHandler> hitPolicyHandlers;
   protected List<DmnDecisionTableListener> decisionTableListeners = new ArrayList<DmnDecisionTableListener>();
@@ -78,6 +81,14 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
 
   public void setScriptEngineResolver(DmnScriptEngineResolver scriptEngineResolver) {
     this.scriptEngineResolver = scriptEngineResolver;
+  }
+
+  public void setElProvider(ElProvider elProvider) {
+    this.elProvider = elProvider;
+  }
+
+  public ElProvider getElProvider() {
+    return elProvider;
   }
 
   public FeelEngine getFeelEngine() {
@@ -416,21 +427,37 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
   protected Object evaluateExpression(String expressionLanguage, DmnExpression expression, VariableContext varCtx) {
     String expressionText = getExpressionTextForLanguage(expression, expressionLanguage);
     if (expressionText != null) {
-      ScriptEngine scriptEngine = getScriptEngineForName(expressionLanguage);
-      // wrap script engine bindings + variable context and pass enhanced
-      // bindings to the script engine.
-      Bindings bindings = VariableContextScriptBindings.wrap(scriptEngine.createBindings(), varCtx);
-      bindings.put("variableContext", varCtx);
-
-      try {
-        return scriptEngine.eval(expressionText, bindings);
+      if(isElExpression(expressionLanguage)) {
+        ElExpression elExpression = elProvider.createExpression(expressionText);
+        try {
+          return elExpression.getValue(varCtx);
+        }
+        // yes, we catch all exceptions
+        catch(Exception e) {
+          throw LOG.unableToEvaluateExpression(expressionText, expressionLanguage, e);
+        }
       }
-      catch (ScriptException e) {
-        throw LOG.unableToEvaluateExpression(expressionText, scriptEngine.getFactory().getLanguageName(), e);
+      else {
+        ScriptEngine scriptEngine = getScriptEngineForName(expressionLanguage);
+        // wrap script engine bindings + variable context and pass enhanced
+        // bindings to the script engine.
+        Bindings bindings = VariableContextScriptBindings.wrap(scriptEngine.createBindings(), varCtx);
+        bindings.put("variableContext", varCtx);
+
+        try {
+          return scriptEngine.eval(expressionText, bindings);
+        }
+        catch (ScriptException e) {
+          throw LOG.unableToEvaluateExpression(expressionText, scriptEngine.getFactory().getLanguageName(), e);
+        }
       }
     } else {
       return null;
     }
+  }
+
+  protected boolean isElExpression(String expressionLanguage) {
+    return DmnEngineConfigurationImpl.JUEL_EXPRESSION_LANGUAGE.equals(expressionLanguage);
   }
 
   protected ScriptEngine getScriptEngineForName(String expressionLanguage) {

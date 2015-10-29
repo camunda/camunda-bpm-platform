@@ -34,12 +34,12 @@
 
     <dependency>
       <groupId>de.odysseus.juel</groupId>
-      <artifactId>juel-impl</artifactId>
+      <artifactId>juel-spi</artifactId>
     </dependency>
 
     <dependency>
       <groupId>de.odysseus.juel</groupId>
-      <artifactId>juel-spi</artifactId>
+      <artifactId>juel-impl</artifactId>
     </dependency>
 
     <dependency>

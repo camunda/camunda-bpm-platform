@@ -14,6 +14,7 @@
 package org.camunda.bpm.dmn.engine.el;
 
 import static org.assertj.core.api.Assertions.fail;
+import static org.mockito.Matchers.*;
 import static org.camunda.bpm.dmn.engine.test.asserts.DmnAssertions.assertThat;
 import static org.camunda.bpm.dmn.engine.util.DmnExampleVerifier.assertExample;
 import static org.mockito.Mockito.never;
@@ -31,6 +32,7 @@ import org.camunda.bpm.dmn.engine.DmnExpression;
 import org.camunda.bpm.dmn.engine.DmnScriptEngineResolver;
 import org.camunda.bpm.dmn.engine.impl.DefaultScriptEngineResolver;
 import org.camunda.bpm.dmn.engine.impl.DmnEngineConfigurationImpl;
+import org.camunda.bpm.dmn.engine.impl.el.JuelElProvider;
 import org.camunda.bpm.dmn.engine.test.DecisionResource;
 import org.camunda.bpm.dmn.engine.test.DmnDecisionTest;
 import org.camunda.bpm.dmn.feel.FeelException;
@@ -51,13 +53,20 @@ public class ExpressionLanguageTest extends DmnDecisionTest {
   public static final int NUMBER_OF_FEEL_EXPRESSION = NUMBER_OF_INPUT_ENTRIES * NUMBER_OF_EXAMPLE_EXECUTIONS;
 
   protected DefaultScriptEngineResolver scriptEngineResolver;
+  protected JuelElProvider elProvider;
 
   public DmnEngineConfiguration createDmnEngineConfiguration() {
     DmnEngineConfigurationImpl dmnEngineConfiguration = new DmnEngineConfigurationImpl();
 
     dmnEngineConfiguration.setScriptEngineResolver(createScriptEngineResolver());
+    dmnEngineConfiguration.setElProvider(createElProvider());
 
     return dmnEngineConfiguration;
+  }
+
+  protected ElProvider createElProvider() {
+    elProvider = spy(new JuelElProvider());
+    return elProvider;
   }
 
   protected DmnScriptEngineResolver createScriptEngineResolver() {
@@ -94,7 +103,7 @@ public class ExpressionLanguageTest extends DmnDecisionTest {
   public void testExecuteDefaultDmnEngineConfiguration() {
     assertExample(engine);
 
-    verify(scriptEngineResolver, times(NUMBER_OF_EXPRESSIONS - NUMBER_OF_FEEL_EXPRESSION)).getScriptEngineForLanguage("juel");
+    verify(elProvider, times(NUMBER_OF_EXPRESSIONS - NUMBER_OF_FEEL_EXPRESSION)).createExpression(anyString());
   }
 
   @Test
@@ -103,7 +112,7 @@ public class ExpressionLanguageTest extends DmnDecisionTest {
     DmnEngine juelEngine = createEngineWithDefaultExpressionLanguage("juel");
     assertExample(juelEngine, decision);
 
-    verify(scriptEngineResolver, times(NUMBER_OF_EXPRESSIONS)).getScriptEngineForLanguage("juel");
+    verify(elProvider, times(NUMBER_OF_EXPRESSIONS)).createExpression(anyString());
   }
 
   @Test
@@ -130,7 +139,7 @@ public class ExpressionLanguageTest extends DmnDecisionTest {
   @DecisionResource(resource = EMPTY_EXPRESSIONS_DMN)
   public void testDefaultEmptyExpressions() {
     assertThat(engine).evaluates(decision, Variables.createVariables()).hasResultValue(true);
-    verify(scriptEngineResolver).getScriptEngineForLanguage("juel");
+    verify(elProvider).createExpression(anyString());
   }
 
   @Test
@@ -139,7 +148,7 @@ public class ExpressionLanguageTest extends DmnDecisionTest {
     DmnEngine juelEngine = createEngineWithDefaultExpressionLanguage("juel");
     assertThat(juelEngine).evaluates(decision, Variables.createVariables()).hasResultValue(true);
 
-    verify(scriptEngineResolver).getScriptEngineForLanguage("juel");
+    verify(elProvider).createExpression(anyString());
   }
 
   @Test

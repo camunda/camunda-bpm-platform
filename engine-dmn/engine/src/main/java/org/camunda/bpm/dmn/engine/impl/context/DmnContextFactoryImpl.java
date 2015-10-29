@@ -29,6 +29,7 @@ public class DmnContextFactoryImpl implements DmnContextFactory {
     decisionContext.setDefaultInputEntryExpressionLanguage(configuration.getDefaultInputEntryExpressionLanguage());
     decisionContext.setDefaultInputExpressionExpressionLanguage(configuration.getDefaultInputExpressionExpressionLanguage());
     decisionContext.setDefaultOutputEntryExpressionLanguage(configuration.getDefaultOutputEntryExpressionLanguage());
+    decisionContext.setElProvider(configuration.getElProvider());
     return decisionContext;
   }
 

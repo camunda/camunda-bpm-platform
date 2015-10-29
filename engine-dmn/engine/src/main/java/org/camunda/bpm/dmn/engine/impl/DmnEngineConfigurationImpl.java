@@ -25,9 +25,11 @@ import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.DmnEngineMetricCollector;
 import org.camunda.bpm.dmn.engine.DmnScriptEngineResolver;
 import org.camunda.bpm.dmn.engine.context.DmnContextFactory;
+import org.camunda.bpm.dmn.engine.el.ElProvider;
 import org.camunda.bpm.dmn.engine.handler.DmnElementHandlerRegistry;
 import org.camunda.bpm.dmn.engine.hitpolicy.DmnHitPolicyHandler;
 import org.camunda.bpm.dmn.engine.impl.context.DmnContextFactoryImpl;
+import org.camunda.bpm.dmn.engine.impl.el.JuelElProvider;
 import org.camunda.bpm.dmn.engine.impl.handler.DmnElementHandlerRegistryImpl;
 import org.camunda.bpm.dmn.engine.impl.hitpolicy.AnyHitPolicyHandler;
 import org.camunda.bpm.dmn.engine.impl.hitpolicy.CollectHitPolicyHandler;
@@ -70,6 +72,7 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
   protected Map<HitPolicy, DmnHitPolicyHandler> hitPolicyHandlers;
   protected DmnScriptEngineResolver scriptEngineResolver;
   protected FeelEngineProvider feelEngineProvider;
+  protected ElProvider elProvider;
   protected DataTypeTransformerFactory dataTypeTransformerFactory;
 
   protected String defaultAllowedValueExpressionLanguage = JUEL_EXPRESSION_LANGUAGE;
@@ -217,6 +220,14 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
     this.defaultOutputEntryExpressionLanguage = defaultOutputEntryExpressionLanguage;
   }
 
+  public void setElProvider(ElProvider elProvider) {
+    this.elProvider = elProvider;
+  }
+
+  public ElProvider getElProvider() {
+    return elProvider;
+  }
+
   public DmnEngine buildEngine() {
     init();
     return new DmnEngineImpl(this);
@@ -231,6 +242,7 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
     initTransformer();
     initDmnDecisionTableListeners();
     initHitPolicyHandlers();
+    initElProvider();
     initScriptEngineResolver();
     initFeelEngineProvider();
   }
@@ -310,6 +322,12 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
     return hitPolicyHandlers;
   }
 
+  protected void initElProvider() {
+    if(elProvider == null) {
+      elProvider = new JuelElProvider();
+    }
+  }
+
   protected void initScriptEngineResolver() {
     if (scriptEngineResolver == null) {
       scriptEngineResolver = new DefaultScriptEngineResolver();
@@ -327,5 +345,6 @@ public class DmnEngineConfigurationImpl implements DmnEngineConfiguration {
       dataTypeTransformerFactory = new DefaultDataTypeTransformerFactory();
     }
   }
+
 
 }
