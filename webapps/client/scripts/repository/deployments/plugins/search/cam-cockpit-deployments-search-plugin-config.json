@@ -32,7 +32,7 @@
     {
       "id": {
         "key": "deploymentTime",
-        "value": "Deployment Time"
+        "value": "Time"
       },
       "operators": [
         {
@@ -50,7 +50,7 @@
     {
       "id": {
         "key": "source",
-        "value": "Deployment Source"
+        "value": "Source"
       },
       "operators": [
         {
@@ -62,7 +62,7 @@
     {
       "id": {
         "key": "withoutSource",
-        "value": "Deployment Source Undefined"
+        "value": "Source Undefined"
       },
       "basic": true
     }
