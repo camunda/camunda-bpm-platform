@@ -653,15 +653,16 @@ public abstract class AbstractCaseInstanceRestServiceInteractionTest extends Abs
     when(caseServiceMock.getVariableTyped(eq(MockProvider.EXAMPLE_CASE_INSTANCE_ID), eq(variableKey), anyBoolean()))
     .thenReturn(variableValue);
 
-    given()
+    Response response = given()
       .pathParam("id", MockProvider.EXAMPLE_CASE_INSTANCE_ID)
       .pathParam("varId", variableKey)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
-      .contentType(either(CoreMatchers.<Object>equalTo(ContentType.TEXT.toString() + "; charset=UTF-8")).or(CoreMatchers.<Object>equalTo(ContentType.TEXT.toString() + ";charset=UTF-8")))
-    .and()
       .body(is(equalTo(new String(byteContent))))
     .when().get(SINGLE_CASE_INSTANCE_BINARY_VARIABLE_URL);
+
+    String contentType = response.contentType().replaceAll(" ", "");
+    assertThat(contentType, is(ContentType.TEXT + ";charset=" + encoding));
   }
 
   @Test

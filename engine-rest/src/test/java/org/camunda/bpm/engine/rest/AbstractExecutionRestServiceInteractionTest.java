@@ -714,15 +714,16 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
 
     when(runtimeServiceMock.getVariableLocalTyped(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey), anyBoolean())).thenReturn(variableValue);
 
-    given()
+    Response response = given()
       .pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID)
       .pathParam("varId", variableKey)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
-      .contentType(either(CoreMatchers.<Object>equalTo(ContentType.TEXT.toString() + "; charset=UTF-8")).or(CoreMatchers.<Object>equalTo(ContentType.TEXT.toString() + ";charset=UTF-8")))
-    .and()
       .body(is(equalTo(new String(byteContent))))
     .when().get(SINGLE_EXECUTION_LOCAL_BINARY_VARIABLE_URL);
+
+    String contentType = response.contentType().replaceAll(" ", "");
+    assertThat(contentType, is(ContentType.TEXT + ";charset=" + encoding));
   }
 
   @Test

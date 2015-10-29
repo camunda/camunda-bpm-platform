@@ -3,6 +3,7 @@ package org.camunda.bpm.engine.rest;
 import static com.jayway.restassured.RestAssured.given;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ID;
 import static org.hamcrest.CoreMatchers.either;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
@@ -301,15 +302,16 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     when(runtimeServiceMock.getVariableTyped(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey), anyBoolean()))
     .thenReturn(variableValue);
 
-    given()
+    Response response = given()
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
       .pathParam("varId", variableKey)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
-      .contentType(either(CoreMatchers.<Object>equalTo(ContentType.TEXT.toString() + "; charset=UTF-8")).or(CoreMatchers.<Object>equalTo(ContentType.TEXT.toString() + ";charset=UTF-8")))
-    .and()
       .body(is(equalTo(new String(byteContent))))
     .when().get(SINGLE_PROCESS_INSTANCE_BINARY_VARIABLE_URL);
+
+    String contentType = response.contentType().replaceAll(" ", "");
+    assertThat(contentType, is(ContentType.TEXT + ";charset=" + encoding));
   }
 
   @Test
