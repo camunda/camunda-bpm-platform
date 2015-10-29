@@ -402,7 +402,7 @@
                 <exclude>**/*TestCase.java</exclude>
                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
                 <exclude>**/TaskEventsTest.java</exclude>
-                <exclude>**/OperationLog*.java</exclude>
+                <exclude>**/UserOperationLog*.java</exclude>
                 <exclude>**/HistoricIncident*Test.java</exclude>
                 <exclude>**/HistoricJobLog*Test.java</exclude>
                 <exclude>**/ProcessInstanceModificationHistoryTest.java</exclude>
@@ -440,7 +440,7 @@
                 <exclude>**/HistoryServiceTest.java</exclude>
                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
                 <exclude>**/TaskEventsTest.java</exclude>
-                <exclude>**/OperationLog*.java</exclude>
+                <exclude>**/UserOperationLog*.java</exclude>
                 <exclude>**/HistoricIncident*Test.java</exclude>
                 <exclude>**/HistoricVariableDataFormatTest.java</exclude>
                 <exclude>**/HistoricVariableInstanceScopeTest.java</exclude>
@@ -482,7 +482,7 @@
                 <exclude>**/HistoryServiceTest.java</exclude>
                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
                 <exclude>**/TaskEventsTest.java</exclude>
-                <exclude>**/OperationLog*.java</exclude>
+                <exclude>**/UserOperationLog*.java</exclude>
                 <exclude>**/HistoricVariableInstanceScopeTest.java</exclude>
                 <exclude>**/HistoricIncident*Test.java</exclude>
                 <exclude>**/HistoricVariableDataFormatTest.java</exclude>
