@@ -10,13 +10,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.test.history;
+package org.camunda.bpm.engine.test.history.useroperationlog;
 
 import java.util.Date;
 
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.runtime.Job;
@@ -26,17 +25,7 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author Thorben Lindhauer
  *
  */
-public class OperationLogJobDefinitionTest extends PluggableProcessEngineTestCase {
-
-  public static final String USER_ID = "icke";
-
-  public void setUp() throws Exception {
-    identityService.setAuthenticatedUserId(USER_ID);
-  }
-
-  protected void tearDown() throws Exception {
-    identityService.clearAuthentication();
-  }
+public class UserOperationLogJobDefinitionTest extends AbstractUserOperationLogTest {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/asyncTaskProcess.bpmn20.xml"})
   public void testSetOverridingPriority() {

@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.test.history;
+package org.camunda.bpm.engine.test.history.useroperationlog;
 
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.ENTITY_TYPE_TASK;
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_CREATE;
@@ -38,15 +38,15 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.test.Deployment;
 
 /**
  * @author Danny Gräf
  */
-public class OperationLogTaskServiceAndBeanTest extends PluggableProcessEngineTestCase {
+public class UserOperationLogTaskServiceAndBeanTest extends AbstractUserOperationLogTest {
 
   public void testBeanPropertyChanges() {
     TaskEntity entity = new TaskEntity();
@@ -311,7 +311,6 @@ public class OperationLogTaskServiceAndBeanTest extends PluggableProcessEngineTe
 
     taskService.deleteTask(task.getId());
     cleanupHistory();
-
   }
 
   private UserOperationLogQuery queryOperationDetails(String type) {

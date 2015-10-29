@@ -400,6 +400,7 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
   protected void deleteDeployment(String deploymentId) {
     disableAuthorization();
     repositoryService.deleteDeployment(deploymentId, true);
+    TestHelper.clearOpLog(processEngineConfiguration);
     enableAuthorization();
   }
 

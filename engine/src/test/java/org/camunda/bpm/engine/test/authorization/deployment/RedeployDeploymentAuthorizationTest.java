@@ -18,11 +18,14 @@ import static org.camunda.bpm.engine.test.authorization.util.AuthorizationSpec.g
 import java.util.Collection;
 
 import org.camunda.bpm.engine.AuthorizationService;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.authorization.util.AuthorizationScenario;
@@ -125,9 +128,13 @@ public class RedeployDeploymentAuthorizationTest {
   }
 
   protected void deleteDeployments(Deployment... deployments){
+    ProcessEngine processEngine = engineRule.getProcessEngine();
+    ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
+
     for (Deployment deployment : deployments) {
       engineRule.getRepositoryService().deleteDeployment(deployment.getId(), true);
     }
+    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   protected void deleteAuthorizations() {

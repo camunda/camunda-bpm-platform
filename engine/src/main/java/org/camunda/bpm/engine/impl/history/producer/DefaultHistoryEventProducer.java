@@ -560,13 +560,6 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
   public List<HistoryEvent> createUserOperationLogEvents(UserOperationLogContext context) {
     List<HistoryEvent> historyEvents = new ArrayList<HistoryEvent>();
 
-    String userId = null;
-    CommandContext commandContext = Context.getCommandContext();
-    if (commandContext != null) {
-      userId = commandContext.getAuthenticatedUserId();
-    }
-    context.setUserId(userId);
-
     String operationId = Context.getProcessEngineConfiguration().getIdGenerator().getNextId();
     context.setOperationId(operationId);
 

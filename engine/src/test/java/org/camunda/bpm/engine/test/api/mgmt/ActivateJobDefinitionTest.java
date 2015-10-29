@@ -10,7 +10,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateJobDefinitionHandler;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
@@ -29,8 +28,6 @@ public class ActivateJobDefinitionTest extends PluggableProcessEngineTestCase {
         return null;
       }
     });
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   // Test ManagementService#activateJobDefinitionById() /////////////////////////

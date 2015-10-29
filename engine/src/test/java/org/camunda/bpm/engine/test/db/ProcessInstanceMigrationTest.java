@@ -612,61 +612,66 @@ public class ProcessInstanceMigrationTest extends PluggableProcessEngineTestCase
 
   public void testOpLogSetProcessDefinitionVersionCmd() {
     // given
-    String resource = "org/camunda/bpm/engine/test/db/SetProcessDefinitionVersionCmdTest.bpmn";
+    try {
+      identityService.setAuthenticatedUserId("demo");
+      String resource = "org/camunda/bpm/engine/test/db/SetProcessDefinitionVersionCmdTest.bpmn";
 
-    // Deployments
-    org.camunda.bpm.engine.repository.Deployment firstDeployment = repositoryService
-        .createDeployment()
-        .addClasspathResource(resource)
-        .deploy();
+      // Deployments
+      org.camunda.bpm.engine.repository.Deployment firstDeployment = repositoryService
+          .createDeployment()
+          .addClasspathResource(resource)
+          .deploy();
 
-    org.camunda.bpm.engine.repository.Deployment secondDeployment = repositoryService
-        .createDeployment()
-        .addClasspathResource(resource)
-        .deploy();
+      org.camunda.bpm.engine.repository.Deployment secondDeployment = repositoryService
+          .createDeployment()
+          .addClasspathResource(resource)
+          .deploy();
 
-    // Process definitions
-    ProcessDefinition processDefinitionV1 = repositoryService
-        .createProcessDefinitionQuery()
-        .deploymentId(firstDeployment.getId())
-        .singleResult();
+      // Process definitions
+      ProcessDefinition processDefinitionV1 = repositoryService
+          .createProcessDefinitionQuery()
+          .deploymentId(firstDeployment.getId())
+          .singleResult();
 
-    ProcessDefinition processDefinitionV2 = repositoryService
-        .createProcessDefinitionQuery()
-        .deploymentId(secondDeployment.getId())
-        .singleResult();
+      ProcessDefinition processDefinitionV2 = repositoryService
+          .createProcessDefinitionQuery()
+          .deploymentId(secondDeployment.getId())
+          .singleResult();
 
-    // start process instance
-    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinitionV1.getId());
+      // start process instance
+      ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinitionV1.getId());
 
-    // when
-    setProcessDefinitionVersion(processInstance.getId(), 2);
+      // when
+      setProcessDefinitionVersion(processInstance.getId(), 2);
 
-    // then
-    ProcessInstance processInstanceAfterMigration = runtimeService
-        .createProcessInstanceQuery()
-        .processInstanceId(processInstance.getId())
-        .singleResult();
-    assertEquals(processDefinitionV2.getId(), processInstanceAfterMigration.getProcessDefinitionId());
-
-    if (processEngineConfiguration.getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_FULL)) {
-      List<UserOperationLogEntry> userOperations = historyService
-          .createUserOperationLogQuery()
+      // then
+      ProcessInstance processInstanceAfterMigration = runtimeService
+          .createProcessInstanceQuery()
           .processInstanceId(processInstance.getId())
-          .list();
+          .singleResult();
+      assertEquals(processDefinitionV2.getId(), processInstanceAfterMigration.getProcessDefinitionId());
 
-      assertEquals(1, userOperations.size());
+      if (processEngineConfiguration.getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_FULL)) {
+        List<UserOperationLogEntry> userOperations = historyService
+            .createUserOperationLogQuery()
+            .processInstanceId(processInstance.getId())
+            .list();
 
-      UserOperationLogEntry userOperationLogEntry = userOperations.get(0);
-      assertEquals(UserOperationLogEntry.OPERATION_TYPE_MODIFY_PROCESS_INSTANCE, userOperationLogEntry.getOperationType());
-      assertEquals("processDefinitionVersion", userOperationLogEntry.getProperty());
-      assertEquals("1", userOperationLogEntry.getOrgValue());
-      assertEquals("2", userOperationLogEntry.getNewValue());
+        assertEquals(1, userOperations.size());
+
+        UserOperationLogEntry userOperationLogEntry = userOperations.get(0);
+        assertEquals(UserOperationLogEntry.OPERATION_TYPE_MODIFY_PROCESS_INSTANCE, userOperationLogEntry.getOperationType());
+        assertEquals("processDefinitionVersion", userOperationLogEntry.getProperty());
+        assertEquals("1", userOperationLogEntry.getOrgValue());
+        assertEquals("2", userOperationLogEntry.getNewValue());
+      }
+
+      // Clean up the test
+      repositoryService.deleteDeployment(firstDeployment.getId(), true);
+      repositoryService.deleteDeployment(secondDeployment.getId(), true);
+    } finally {
+      identityService.clearAuthentication();
     }
-
-    // Clean up the test
-    repositoryService.deleteDeployment(firstDeployment.getId(), true);
-    repositoryService.deleteDeployment(secondDeployment.getId(), true);
   }
 
   protected void setProcessDefinitionVersion(String processInstanceId, int newProcessDefinitionVersion) {

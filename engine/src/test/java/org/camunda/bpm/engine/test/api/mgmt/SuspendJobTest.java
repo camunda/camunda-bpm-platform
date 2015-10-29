@@ -193,8 +193,6 @@ public class SuspendJobTest extends PluggableProcessEngineTestCase {
 
     assertEquals(job.getId(), suspendedJob.getId());
     assertTrue(suspendedJob.isSuspended());
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   public void testMultipleSuspensionByProcessDefinitionKey_shouldSuspendJob() {
@@ -227,8 +225,6 @@ public class SuspendJobTest extends PluggableProcessEngineTestCase {
     for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
 }

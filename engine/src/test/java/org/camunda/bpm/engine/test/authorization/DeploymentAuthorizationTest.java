@@ -209,6 +209,8 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     DeploymentQuery query = repositoryService.createDeploymentQuery();
     verifyQueryResults(query, 0);
     enableAuthorization();
+
+    deleteDeployment(deploymentId);
   }
 
   public void testDeleteDeploymentWithDeletePermissionOnAnyDeployment() {
@@ -224,6 +226,8 @@ public class DeploymentAuthorizationTest extends AuthorizationTest {
     DeploymentQuery query = repositoryService.createDeploymentQuery();
     verifyQueryResults(query, 0);
     enableAuthorization();
+
+    deleteDeployment(deploymentId);
   }
 
   // get deployment resource names //////////////////////////////////

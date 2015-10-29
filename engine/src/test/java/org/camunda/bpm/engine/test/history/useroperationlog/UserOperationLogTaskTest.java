@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.test.history;
+package org.camunda.bpm.engine.test.history.useroperationlog;
 
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_ASSIGN;
 import static org.camunda.bpm.engine.history.UserOperationLogEntry.OPERATION_TYPE_CLAIM;
@@ -32,7 +32,6 @@ import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.calendar.DateTimeUtil;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -43,7 +42,7 @@ import org.camunda.bpm.engine.test.Deployment;
 /**
  * @author Danny Gräf
  */
-public class OperationLogTaskProcessTest extends PluggableProcessEngineTestCase {
+public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
 
   protected ProcessDefinition processDefinition;
   protected ProcessInstance process;
@@ -51,7 +50,6 @@ public class OperationLogTaskProcessTest extends PluggableProcessEngineTestCase 
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
   public void testCreateAndCompleteTask() {
-    identityService.setAuthenticatedUserId("icke");
     startTestProcess();
 
     // expect: no entry for the task creation by process engine
@@ -348,6 +346,31 @@ public class OperationLogTaskProcessTest extends PluggableProcessEngineTestCase 
 
     // then no op log entry should have been deleted
     assertEquals(1, historyService.createUserOperationLogQuery().count());
+  }
+
+  @Deployment
+  public void testOnlyTaskCompletionIsLogged() {
+    // given
+    String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
+
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    // when
+    taskService.complete(taskId);
+
+    // then
+    assertTrue((Boolean) runtimeService.getVariable(processInstanceId, "taskListenerCalled"));
+    assertTrue((Boolean) runtimeService.getVariable(processInstanceId, "serviceTaskCalled"));
+
+    UserOperationLogQuery query = historyService.createUserOperationLogQuery();
+
+    assertEquals(1, query.count());
+
+    UserOperationLogEntry log = query.singleResult();
+    assertEquals("process", log.getProcessDefinitionKey());
+    assertEquals(processInstanceId, log.getProcessInstanceId());
+    assertEquals(taskId, log.getTaskId());
+    assertEquals(UserOperationLogEntry.OPERATION_TYPE_COMPLETE, log.getOperationType());
   }
 
   protected void startTestProcess() {

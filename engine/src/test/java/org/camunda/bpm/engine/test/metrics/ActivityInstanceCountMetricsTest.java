@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.test.metrics;
 import java.util.List;
 
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
-import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.task.Task;
@@ -94,12 +93,6 @@ public class ActivityInstanceCountMetricsTest extends AbstractMetricsTest {
     if(hti!=null) {
       historyService.deleteHistoricTaskInstance(hti.getId());
     }
-
-    List<UserOperationLogEntry> uoles = historyService.createUserOperationLogQuery().list();
-    for (UserOperationLogEntry uole : uoles) {
-      historyService.deleteUserOperationLogEntry(uole.getId());
-    }
-
   }
 
   @Deployment

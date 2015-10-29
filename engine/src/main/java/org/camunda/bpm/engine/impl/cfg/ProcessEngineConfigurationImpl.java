@@ -504,6 +504,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean enableExpressionsInAdhocQueries = false;
   protected boolean enableExpressionsInStoredQueries = true;
 
+  protected boolean legacyUserOperationLogEnabled = false;
+
   protected boolean isBpmnStacktraceVerbose = false;
 
   protected boolean forceCloseMybatisConnectionPool = true;
@@ -2847,5 +2849,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
+  public boolean isLegacyUserOperationLogEnabled() {
+    return legacyUserOperationLogEnabled;
+  }
+
+  public ProcessEngineConfigurationImpl setLegacyUserOperationLogEnabled(boolean legacyUserOperationLogEnabled) {
+    this.legacyUserOperationLogEnabled = legacyUserOperationLogEnabled;
+    return this;
+  }
 
 }

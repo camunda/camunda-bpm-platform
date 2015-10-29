@@ -466,8 +466,6 @@ public class JobQueryTest extends PluggableProcessEngineTestCase {
 
     managementService.suspendJobDefinitionByProcessDefinitionKey("timerOnTask", true);
     verifyQueryResults(query, 3);
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   //sorting //////////////////////////////////////////

@@ -24,10 +24,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 
+import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.SchemaOperationsProcessEngineBuild;
@@ -39,6 +39,7 @@ import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.db.PersistenceSession;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.dmn.deployer.DmnDeployer;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
@@ -446,22 +447,13 @@ public abstract class TestHelper {
    * and therefore cannot be cleaned up automatically during undeployment.
    */
   public static void clearOpLog(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    processEngineConfiguration.getCommandExecutorTxRequired()
-      .execute(new Command<Void>() {
-
-        public Void execute(CommandContext commandContext) {
-          List<UserOperationLogEntry> logEntries =
-              commandContext.getOperationLogManager()
-                .findOperationLogEntriesByQueryCriteria(new UserOperationLogQueryImpl(), null);
-
-          for (UserOperationLogEntry entry : logEntries) {
-            commandContext.getOperationLogManager().deleteOperationLogEntryById(entry.getId());
-          }
-
-          return null;
-        }
-
-      });
+    if (processEngineConfiguration.getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_FULL)) {
+      HistoryService historyService = processEngineConfiguration.getHistoryService();
+      List<UserOperationLogEntry> logs = historyService.createUserOperationLogQuery().list();
+      for (UserOperationLogEntry log : logs) {
+        historyService.deleteUserOperationLogEntry(log.getId());
+      }
+    }
   }
 
 }

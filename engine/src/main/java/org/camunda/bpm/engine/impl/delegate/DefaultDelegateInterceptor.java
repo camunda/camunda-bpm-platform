@@ -69,10 +69,15 @@ public class DefaultDelegateInterceptor implements DelegateInterceptor {
       commandContext.disableAuthorizationCheck();
     }
 
+    commandContext.disableUserOperationLog();
+
     try {
       invocation.proceed();
     }
     finally {
+
+      commandContext.enableUserOperationLog();
+
       if (oldValue) {
         // the last "one" set the flag back to true
         commandContext.enableAuthorizationCheck();
