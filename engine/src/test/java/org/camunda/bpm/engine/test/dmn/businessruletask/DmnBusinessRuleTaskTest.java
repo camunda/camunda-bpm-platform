@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.engine.test.dmn.businessruletask;
 
-import java.util.Collections;
-
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.engine.exception.dmn.DecisionDefinitionNotFoundException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -119,16 +117,6 @@ public class DmnBusinessRuleTaskTest extends PluggableProcessEngineTestCase {
     repositoryService.deleteDeployment(secondDeploymentId, true);
     repositoryService.deleteDeployment(thirdDeploymentId, true);
   }
-
-  @Deployment( resources = {DECISION_EL_INTEGRATION} )
-  public void failing_testElIntegrationDecisionService() {
-
-    decisionService.evaluateDecisionByKey("testDecision", Collections.<String, Object>emptyMap());
-
-
-  }
-
-
 
   protected ProcessInstance startExpressionProcess(Object decisionKey, Object version) {
     VariableMap variables = Variables.createVariables()

@@ -1438,7 +1438,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected void initDmnEngine() {
     if (dmnEngine == null) {
       if (dmnEngineConfiguration == null) {
-        dmnEngineConfiguration = new ProcessEngineDmnEngineConfiguration(scriptingEngines, new HistoryDecisionTableListener(dmnHistoryEventProducer, historyLevel));
+        dmnEngineConfiguration = new ProcessEngineDmnEngineConfiguration(
+            scriptingEngines,
+            new HistoryDecisionTableListener(dmnHistoryEventProducer, historyLevel),
+            expressionManager);
       }
       dmnEngine = dmnEngineConfiguration.buildEngine();
     }
@@ -1447,6 +1450,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     scriptingEngines.addScriptEngineFactory(new DmnScriptEngineFactory(dmnEngine));
+
   }
 
   protected void initExpressionManager() {

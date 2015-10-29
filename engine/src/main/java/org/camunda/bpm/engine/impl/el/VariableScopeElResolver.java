@@ -43,7 +43,7 @@ public class VariableScopeElResolver extends ELResolver {
   public Object getValue(ELContext context, Object base, Object property)  {
 
     Object object = context.getContext(VariableScope.class);
-    if (object instanceof VariableScope) {
+    if(object != null) {
       VariableScope variableScope = (VariableScope) object;
       if (base == null) {
         String variable = (String) property; // according to javadoc, can only be a String
@@ -79,7 +79,7 @@ public class VariableScopeElResolver extends ELResolver {
     if (base == null) {
       String variable = (String) property;
       Object object = context.getContext(VariableScope.class);
-      return object instanceof VariableScope && !((VariableScope)object).hasVariable(variable);
+      return object != null && !((VariableScope)object).hasVariable(variable);
     }
     return true;
   }
@@ -88,7 +88,7 @@ public class VariableScopeElResolver extends ELResolver {
     if (base == null) {
       String variable = (String) property;
       Object object = context.getContext(VariableScope.class);
-      if (object instanceof VariableScope) {
+      if (object != null) {
         VariableScope variableScope = (VariableScope) object;
         if (variableScope.hasVariable(variable)) {
           variableScope.setVariable(variable, value);

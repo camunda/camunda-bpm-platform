@@ -31,8 +31,16 @@
       <artifactId>camunda-scriptengine-dmn</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>org.camunda.bpm.dmn</groupId>
-          <artifactId>camunda-scriptengine-juel</artifactId>
+          <groupId>de.odysseus.juel</groupId>
+          <artifactId>juel-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>de.odysseus.juel</groupId>
+          <artifactId>juel-spi</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>de.odysseus.juel</groupId>
+          <artifactId>juel-impl</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
