@@ -15,7 +15,7 @@ package org.camunda.spin.plugin.variable.type.impl;
 import java.util.Collections;
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.core.variable.type.AbstractValueTypeImpl;
+import org.camunda.bpm.engine.variable.impl.type.AbstractValueTypeImpl;
 import org.camunda.bpm.engine.variable.value.SerializableValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.spin.plugin.variable.type.SpinValueType;

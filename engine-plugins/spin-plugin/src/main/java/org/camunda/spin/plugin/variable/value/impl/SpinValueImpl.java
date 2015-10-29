@@ -14,7 +14,7 @@ package org.camunda.spin.plugin.variable.value.impl;
 
 import static org.camunda.spin.Spin.S;
 
-import org.camunda.bpm.engine.impl.core.variable.value.AbstractTypedValue;
+import org.camunda.bpm.engine.variable.impl.value.AbstractTypedValue;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.spin.DataFormats;
 import org.camunda.spin.Spin;
