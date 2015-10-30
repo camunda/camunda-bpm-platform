@@ -146,6 +146,9 @@ public abstract class AbstractModelElementInstanceTest {
     modelInstance = modelElementTypeRule.getModelInstance();
     model = modelElementTypeRule.getModel();
     modelElementType = modelElementTypeRule.getModelElementType();
+    assertThat(modelInstance).isNotNull();
+    assertThat(model).isNotNull();
+    assertThat(modelElementType).isNotNull();
   }
 
   public abstract String getDefaultNamespace();
