@@ -32,6 +32,7 @@ import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.DeploymentQueryImpl;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
@@ -46,8 +47,10 @@ import org.camunda.bpm.engine.impl.persistence.entity.DeploymentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessApplicationDeploymentImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
 import org.camunda.bpm.engine.impl.repository.DeploymentBuilderImpl;
 import org.camunda.bpm.engine.impl.repository.ProcessApplicationDeploymentBuilderImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -120,7 +123,7 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
     }
 
     // perform deployment
-    return commandContext.runWithoutAuthorization(new Callable<Deployment>() {
+    Deployment deployment = commandContext.runWithoutAuthorization(new Callable<Deployment>() {
       public Deployment call() throws Exception {
         acquireExclusiveLock(commandContext);
         DeploymentEntity deployment = initDeployment();
@@ -152,6 +155,26 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
         return deployment;
       }
     });
+
+    createUserOperationLog(deploymentBuilder, deployment, commandContext);
+
+    return deployment;
+  }
+
+  protected void createUserOperationLog(DeploymentBuilderImpl deploymentBuilder, Deployment deployment, CommandContext commandContext) {
+    UserOperationLogManager logManager = commandContext.getOperationLogManager();
+
+    List<PropertyChange> properties = new ArrayList<PropertyChange>();
+
+    PropertyChange filterDuplicate = new PropertyChange("duplicateFilterEnabled", null, deploymentBuilder.isDuplicateFilterEnabled());
+    properties.add(filterDuplicate);
+
+    if (deploymentBuilder.isDuplicateFilterEnabled()) {
+      PropertyChange deployChangedOnly = new PropertyChange("deployChangedOnly", null, deploymentBuilder.isDeployChangedOnly());
+      properties.add(deployChangedOnly);
+    }
+
+    logManager.logDeploymentOperation(UserOperationLogEntry.OPERATION_TYPE_CREATE, deployment.getId(), properties);
   }
 
   protected void setDeploymentName(String deploymentId, DeploymentBuilderImpl deploymentBuilder, CommandContext commandContext) {

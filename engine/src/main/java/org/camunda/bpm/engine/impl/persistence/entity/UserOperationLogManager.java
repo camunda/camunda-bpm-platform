@@ -302,6 +302,22 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     }
   }
 
+  public void logDeploymentOperation(String operation, String deploymentId, List<PropertyChange> propertyChanges) {
+    if(isUserOperationLogEnabled(operation)) {
+
+      UserOperationLogContext context = new UserOperationLogContext();
+
+      UserOperationLogContextEntryBuilder entryBuilder =
+          UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.DEPLOYMENT)
+          .deploymentId(deploymentId)
+          .propertyChanges(propertyChanges);
+
+      context.addEntry(entryBuilder.create());
+      fireUserOperationLog(context);
+    }
+
+  }
+
   protected boolean isUserOperationLogEnabled(String operation) {
     return isHistoryLevelFullEnabled() &&
         (isLegacyUserOperationLogEnabled() || (isUserOperationLogEnabledOnCommandContext() && isUserAuthenticated()) || isTaskEvent(operation));

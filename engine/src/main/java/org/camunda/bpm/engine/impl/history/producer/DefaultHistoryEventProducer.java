@@ -236,6 +236,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
   protected void initUserOperationLogEvent(UserOperationLogEntryEventEntity evt, UserOperationLogContext context,
       UserOperationLogContextEntry contextEntry, PropertyChange propertyChange) {
     // init properties
+    evt.setDeploymentId(contextEntry.getDeploymentId());
     evt.setEntityType(contextEntry.getEntityType());
     evt.setOperationType(contextEntry.getOperationType());
     evt.setOperationId(context.getOperationId());

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,12 +18,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
 
 public class UserOperationLogContextEntryBuilder {
 
@@ -40,6 +42,7 @@ public class UserOperationLogContextEntryBuilder {
     entry.setProcessInstanceId(job.getProcessInstanceId());
     entry.setProcessDefinitionId(job.getProcessDefinitionId());
     entry.setProcessDefinitionKey(job.getProcessDefinitionKey());
+    entry.setDeploymentId(job.getDeploymentId());
 
     return this;
   }
@@ -48,6 +51,14 @@ public class UserOperationLogContextEntryBuilder {
     entry.setJobDefinitionId(jobDefinition.getId());
     entry.setProcessDefinitionId(jobDefinition.getProcessDefinitionId());
     entry.setProcessDefinitionKey(jobDefinition.getProcessDefinitionKey());
+
+    if (jobDefinition.getProcessDefinitionId() != null) {
+      ProcessDefinitionEntity processDefinition = Context
+          .getProcessEngineConfiguration()
+          .getDeploymentCache()
+          .findDeployedProcessDefinitionById(jobDefinition.getProcessDefinitionId());
+      entry.setDeploymentId(processDefinition.getDeploymentId());
+    }
 
     return this;
   }
@@ -58,6 +69,7 @@ public class UserOperationLogContextEntryBuilder {
 
     ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
     entry.setProcessDefinitionKey(processDefinition.getKey());
+    entry.setDeploymentId(processDefinition.getDeploymentId());
 
     return this;
   }
@@ -65,6 +77,7 @@ public class UserOperationLogContextEntryBuilder {
   public UserOperationLogContextEntryBuilder inContextOf(ProcessDefinitionEntity processDefinition) {
     entry.setProcessDefinitionId(processDefinition.getId());
     entry.setProcessDefinitionKey(processDefinition.getKey());
+    entry.setDeploymentId(processDefinition.getDeploymentId());
 
     return this;
   }
@@ -78,9 +91,14 @@ public class UserOperationLogContextEntryBuilder {
     }
     entry.setPropertyChanges(propertyChanges);
 
-    ProcessDefinitionEntity definition = task.getProcessDefinition();
+    ResourceDefinitionEntity definition = task.getProcessDefinition();
     if (definition != null) {
       entry.setProcessDefinitionKey(definition.getKey());
+      entry.setDeploymentId(definition.getDeploymentId());
+    }
+    else if (task.getCaseDefinitionId() != null) {
+      definition = task.getCaseDefinition();
+      entry.setDeploymentId(definition.getDeploymentId());
     }
 
     entry.setProcessDefinitionId(task.getProcessDefinitionId());
@@ -132,6 +150,11 @@ public class UserOperationLogContextEntryBuilder {
 
   public UserOperationLogContextEntryBuilder processInstanceId(String processInstanceId) {
     entry.setProcessInstanceId(processInstanceId);
+    return this;
+  }
+
+  public UserOperationLogContextEntryBuilder deploymentId(String deploymentId) {
+    entry.setDeploymentId(deploymentId);
     return this;
   }
 }

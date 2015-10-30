@@ -146,6 +146,7 @@ create table ACT_HI_ATTACHMENT (
 
 create table ACT_HI_OP_LOG (
     ID_ nvarchar(64) not null,
+    DEPLOYMENT_ID_ nvarchar(64),
     PROC_DEF_ID_ nvarchar(64),
     PROC_DEF_KEY_ nvarchar(255),
     PROC_INST_ID_ nvarchar(64),

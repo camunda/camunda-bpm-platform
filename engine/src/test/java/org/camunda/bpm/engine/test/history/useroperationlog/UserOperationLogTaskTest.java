@@ -275,6 +275,7 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
     assertEquals(caseDefinitionId, entry.getCaseDefinitionId());
     assertEquals(caseInstanceId, entry.getCaseInstanceId());
     assertEquals(humanTaskId, entry.getCaseExecutionId());
+    assertEquals(deploymentId, entry.getDeploymentId());
 
     assertFalse(Boolean.valueOf(entry.getOrgValue()));
     assertTrue(Boolean.valueOf(entry.getNewValue()));
@@ -283,7 +284,7 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
-  public void testDeleteOpLogEntriesOnUndeployment() {
+  public void testKeepOpLogEntriesOnUndeployment() {
     // given
     startTestProcess();
     // an op log entry directly related to the process instance is created
@@ -372,6 +373,7 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
     UserOperationLogEntry log = query.singleResult();
     assertEquals("process", log.getProcessDefinitionKey());
     assertEquals(processInstanceId, log.getProcessInstanceId());
+    assertEquals(deploymentId, log.getDeploymentId());
     assertEquals(taskId, log.getTaskId());
     assertEquals(UserOperationLogEntry.OPERATION_TYPE_COMPLETE, log.getOperationType());
   }

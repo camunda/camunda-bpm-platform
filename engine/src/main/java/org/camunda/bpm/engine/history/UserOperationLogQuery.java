@@ -43,6 +43,9 @@ public interface UserOperationLogQuery extends Query<UserOperationLogQuery, User
    */
   UserOperationLogQuery operationType(String operationType);
 
+  /** Query entries which are existing for the given deployment id. */
+  UserOperationLogQuery deploymentId(String deploymentId);
+
   /** Query entries which are existing for the given process definition id. */
   UserOperationLogQuery processDefinitionId(String processDefinitionId);
 

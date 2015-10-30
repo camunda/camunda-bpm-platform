@@ -24,6 +24,7 @@ import java.util.List;
 public class UserOperationLogEntryDto {
 
   protected String id;
+  protected String deploymentId;
   protected String processDefinitionId;
   protected String processDefinitionKey;
   protected String processInstanceId;
@@ -47,6 +48,7 @@ public class UserOperationLogEntryDto {
     UserOperationLogEntryDto dto = new UserOperationLogEntryDto();
 
     dto.id = entry.getId();
+    dto.deploymentId = entry.getDeploymentId();
     dto.processDefinitionId = entry.getProcessDefinitionId();
     dto.processDefinitionKey = entry.getProcessDefinitionKey();
     dto.processInstanceId = entry.getProcessInstanceId();
@@ -79,6 +81,10 @@ public class UserOperationLogEntryDto {
 
   public String getId() {
     return id;
+  }
+
+  public String getDeploymentId() {
+    return deploymentId;
   }
 
   public String getProcessDefinitionId() {

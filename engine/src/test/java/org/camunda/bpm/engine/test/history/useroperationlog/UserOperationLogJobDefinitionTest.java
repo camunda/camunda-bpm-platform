@@ -53,6 +53,7 @@ public class UserOperationLogJobDefinitionTest extends AbstractUserOperationLogT
 
     assertEquals(jobDefinition.getProcessDefinitionId(), userOperationLogEntry.getProcessDefinitionId());
     assertEquals(jobDefinition.getProcessDefinitionKey(), userOperationLogEntry.getProcessDefinitionKey());
+    assertEquals(deploymentId, userOperationLogEntry.getDeploymentId());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/asyncTaskProcess.bpmn20.xml"})
@@ -116,6 +117,7 @@ public class UserOperationLogJobDefinitionTest extends AbstractUserOperationLogT
 
     assertEquals(jobDefinition.getProcessDefinitionId(), userOperationLogEntry.getProcessDefinitionId());
     assertEquals(jobDefinition.getProcessDefinitionKey(), userOperationLogEntry.getProcessDefinitionKey());
+    assertEquals(deploymentId, userOperationLogEntry.getDeploymentId());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/asyncTaskProcess.bpmn20.xml"})
@@ -162,5 +164,7 @@ public class UserOperationLogJobDefinitionTest extends AbstractUserOperationLogT
         jobOpLogEntry.getProcessInstanceId());
     assertEquals(job.getProcessDefinitionId(), jobOpLogEntry.getProcessDefinitionId());
     assertEquals(job.getProcessDefinitionKey(), jobOpLogEntry.getProcessDefinitionKey());
+    assertEquals(deploymentId, jobOpLogEntry.getDeploymentId());
   }
+
 }

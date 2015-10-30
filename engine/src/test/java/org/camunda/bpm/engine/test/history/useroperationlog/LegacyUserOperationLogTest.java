@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.history.useroperationlog;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.test.Deployment;
 
 /**
@@ -69,9 +70,10 @@ public class LegacyUserOperationLogTest extends ResourceProcessEngineTestCase {
     assertTrue((Boolean) runtimeService.getVariable(processInstanceId, "taskListenerCalled"));
     assertTrue((Boolean) runtimeService.getVariable(processInstanceId, "serviceTaskCalled"));
 
-    assertEquals(3, userOperationLogQuery().count());
+    assertEquals(4, userOperationLogQuery().count());
     assertEquals(1, userOperationLogQuery().operationType(UserOperationLogEntry.OPERATION_TYPE_COMPLETE).count());
     assertEquals(2, userOperationLogQuery().operationType(UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE).count());
+    assertEquals(1, userOperationLogQuery().operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE).count());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/history/useroperationlog/UserOperationLogTaskTest.testOnlyTaskCompletionIsLogged.bpmn20.xml")
@@ -83,8 +85,9 @@ public class LegacyUserOperationLogTest extends ResourceProcessEngineTestCase {
     runtimeService.setVariable(processInstanceId, "aVariable", "aValue");
 
     // then
-    assertEquals(1, userOperationLogQuery().count());
+    assertEquals(2, userOperationLogQuery().count());
     assertEquals(1, userOperationLogQuery().operationType(UserOperationLogEntry.OPERATION_TYPE_SET_VARIABLE).count());
+    assertEquals(1, userOperationLogQuery().operationType(UserOperationLogEntry.OPERATION_TYPE_CREATE).count());
   }
 
   protected UserOperationLogQuery userOperationLogQuery() {

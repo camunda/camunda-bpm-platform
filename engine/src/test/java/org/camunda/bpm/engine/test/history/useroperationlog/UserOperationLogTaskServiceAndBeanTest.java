@@ -34,19 +34,26 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.engine.test.Deployment;
 
 /**
  * @author Danny Gräf
  */
 public class UserOperationLogTaskServiceAndBeanTest extends AbstractUserOperationLogTest {
+
+  protected Task task;
+
+  protected void tearDown() throws Exception {
+    super.tearDown();
+
+    if (task != null) {
+      taskService.deleteTask(task.getId(), true);
+    }
+  }
 
   public void testBeanPropertyChanges() {
     TaskEntity entity = new TaskEntity();
@@ -133,8 +140,6 @@ public class UserOperationLogTaskServiceAndBeanTest extends AbstractUserOperatio
     assertEquals(73, changes.get(PRIORITY).getNewValue());
   }
 
-  private Task task;
-
   public void testDeleteTask() {
     // given: a single task
     task = taskService.newTask();
@@ -152,8 +157,6 @@ public class UserOperationLogTaskServiceAndBeanTest extends AbstractUserOperatio
     assertEquals(DELETE, delete.getProperty());
     assertFalse(Boolean.parseBoolean(delete.getOrgValue()));
     assertTrue(Boolean.parseBoolean(delete.getNewValue()));
-
-    cleanupHistory();
   }
 
   public void testCompositeBeanInteraction() {
@@ -182,10 +185,6 @@ public class UserOperationLogTaskServiceAndBeanTest extends AbstractUserOperatio
     List<UserOperationLogEntry> entries = queryOperationDetails(OPERATION_TYPE_UPDATE).list();
     assertEquals(2, entries.size());
     assertEquals(entries.get(0).getOperationId(), entries.get(1).getOperationId());
-
-    // clean up DB
-    taskService.deleteTask(task.getId());
-    cleanupHistory();
   }
 
   public void testMultipleValueChange() {
@@ -200,10 +199,6 @@ public class UserOperationLogTaskServiceAndBeanTest extends AbstractUserOperatio
     UserOperationLogEntry update = queryOperationDetails(OPERATION_TYPE_UPDATE).singleResult();
     assertNull(update.getOrgValue());
     assertEquals("to do", update.getNewValue());
-
-    // clean up DB
-    taskService.deleteTask(task.getId());
-    cleanupHistory();
   }
 
   public void testSetDateProperty() {
@@ -215,10 +210,6 @@ public class UserOperationLogTaskServiceAndBeanTest extends AbstractUserOperatio
 
     UserOperationLogEntry logEntry = historyService.createUserOperationLogQuery().singleResult();
     assertEquals(String.valueOf(now.getTime()), logEntry.getNewValue());
-
-    // clean up DB
-    taskService.deleteTask(task.getId());
-    cleanupHistory();
   }
 
   public void testResetChange() {
@@ -244,10 +235,6 @@ public class UserOperationLogTaskServiceAndBeanTest extends AbstractUserOperatio
     update = queryOperationDetails(OPERATION_TYPE_UPDATE).singleResult();
     assertNull(update.getOrgValue());
     assertEquals(name, update.getNewValue());
-
-    // clean up DB
-    taskService.deleteTask(task.getId());
-    cleanupHistory();
   }
 
   public void testConcurrentTaskChange() {
@@ -266,9 +253,6 @@ public class UserOperationLogTaskServiceAndBeanTest extends AbstractUserOperatio
     } catch (Exception e) {
       assertNotNull(e); // concurrent modification
     }
-
-    taskService.deleteTask(task.getId());
-    cleanupHistory();
   }
 
   public void testCaseInstanceId() {
@@ -308,22 +292,10 @@ public class UserOperationLogTaskServiceAndBeanTest extends AbstractUserOperatio
         assertEquals(CASE_INSTANCE_ID, currentEntry.getProperty());
       }
     }
-
-    taskService.deleteTask(task.getId());
-    cleanupHistory();
   }
 
   private UserOperationLogQuery queryOperationDetails(String type) {
     return historyService.createUserOperationLogQuery().operationType(type);
   }
 
-  private void cleanupHistory() {
-    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Object>() {
-      @Override
-      public Object execute(CommandContext commandContext) {
-        commandContext.getHistoricTaskInstanceManager().deleteHistoricTaskInstanceById(task.getId());
-        return null;
-      }
-    });
-  }
 }

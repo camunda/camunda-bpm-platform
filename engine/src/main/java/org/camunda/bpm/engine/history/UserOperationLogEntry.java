@@ -111,6 +111,9 @@ public interface UserOperationLogEntry {
   /** The unique identifier of this log entry. */
   String getId();
 
+  /** Deployment reference */
+  String getDeploymentId();
+
   /** Process definition reference. */
   String getProcessDefinitionId();
 

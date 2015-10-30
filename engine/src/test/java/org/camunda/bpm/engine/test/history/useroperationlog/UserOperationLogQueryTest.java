@@ -87,6 +87,14 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
   private Date tomorrow = new Date(((ClockUtil.getCurrentTime().getTime() + 86400000) / 1000) * 1000);
   private Date yesterday = new Date(((ClockUtil.getCurrentTime().getTime() - 86400000) / 1000) * 1000);
 
+  protected void tearDown() throws Exception {
+    super.tearDown();
+
+    if (userTask != null) {
+      historyService.deleteHistoricTaskInstance(userTask.getId());
+    }
+  }
+
   @Deployment(resources = {ONE_TASK_PROCESS})
   public void testQuery() {
     createLogEntries();
@@ -166,15 +174,6 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     // filter by time, created tomorrow
     assertEquals(5, query().afterTimestamp(today).count());
     assertEquals(0, query().afterTimestamp(today).beforeTimestamp(yesterday).count());
-
-    // remove log entries of manually created tasks
-    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Object>() {
-      @Override
-      public Object execute(CommandContext commandContext) {
-        commandContext.getHistoricTaskInstanceManager().deleteHistoricTaskInstanceById(userTask.getId());
-        return null;
-      }
-    });
   }
 
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -189,76 +188,6 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertEquals(4, query().entityType(ENTITY_TYPE_IDENTITY_LINK).count());
     assertEquals(2, query().entityType(ENTITY_TYPE_ATTACHMENT).count());
     assertEquals(0, query().entityType("unknown entity type").count());
-
-    // remove log entries of manually created tasks
-    processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Object>() {
-      @Override
-      public Object execute(CommandContext commandContext) {
-        commandContext.getHistoricTaskInstanceManager().deleteHistoricTaskInstanceById(userTask.getId());
-        return null;
-      }
-    });
-  }
-
-  private UserOperationLogQuery query() {
-    return historyService.createUserOperationLogQuery();
-  }
-
-  /**
-   * start process and operate on userTask to create some log entries for the query tests
-   */
-  private void createLogEntries() {
-    ClockUtil.setCurrentTime(yesterday);
-
-    // create a process with a userTask and work with it
-    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-    execution = processEngine.getRuntimeService().createExecutionQuery().processInstanceId(process.getId()).singleResult();
-    processTaskId = taskService.createTaskQuery().singleResult().getId();
-
-    // user "icke" works on the process userTask
-    identityService.setAuthenticatedUserId("icke");
-
-    // create and remove some links
-    taskService.addCandidateUser(processTaskId, "er");
-    taskService.deleteCandidateUser(processTaskId, "er");
-    taskService.addCandidateGroup(processTaskId, "wir");
-    taskService.deleteCandidateGroup(processTaskId, "wir");
-
-    // assign and reassign the userTask
-    ClockUtil.setCurrentTime(today);
-    taskService.setOwner(processTaskId, "icke");
-    taskService.claim(processTaskId, "icke");
-    taskService.setAssignee(processTaskId, "er");
-
-    // change priority of task
-    taskService.setPriority(processTaskId, 10);
-
-    // add and delete an attachment
-    Attachment attachment = taskService.createAttachment("image/ico", processTaskId, process.getId(), "favicon.ico", "favicon", "http://camunda.com/favicon.ico");
-    taskService.deleteAttachment(attachment.getId());
-
-    // complete the userTask to finish the process
-    taskService.complete(processTaskId);
-    assertProcessEnded(process.getId());
-
-    // user "er" works on the process userTask
-    identityService.setAuthenticatedUserId("er");
-
-    // create a standalone userTask
-    userTask = taskService.newTask();
-    userTask.setName("to do");
-    taskService.saveTask(userTask);
-
-    // change some properties manually to create an update event
-    ClockUtil.setCurrentTime(tomorrow);
-    userTask.setDescription("desc");
-    userTask.setOwner("icke");
-    userTask.setAssignee("er");
-    userTask.setDueDate(new Date());
-    taskService.saveTask(userTask);
-
-    // complete the userTask
-    taskService.complete(userTask.getId());
   }
 
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -285,6 +214,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertEquals(process.getId(), deleteEntry.getProcessInstanceId());
     assertNotNull(deleteEntry.getProcessDefinitionId());
     assertEquals("oneTaskProcess", deleteEntry.getProcessDefinitionKey());
+    assertEquals(deploymentId, deleteEntry.getDeploymentId());
 
       UserOperationLogEntry suspendEntry = query()
         .entityType(PROCESS_INSTANCE)
@@ -311,6 +241,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertEquals(process.getId(), activateEntry.getProcessInstanceId());
     assertNotNull(activateEntry.getProcessDefinitionId());
     assertEquals("oneTaskProcess", activateEntry.getProcessDefinitionKey());
+    assertEquals(deploymentId, activateEntry.getDeploymentId());
 
     assertEquals("suspensionState", activateEntry.getProperty());
     assertEquals("active", activateEntry.getNewValue());
@@ -339,6 +270,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertEquals(process.getProcessDefinitionId(), suspendEntry.getProcessDefinitionId());
     assertNull(suspendEntry.getProcessInstanceId());
     assertEquals("oneTaskProcess", suspendEntry.getProcessDefinitionKey());
+    assertEquals(deploymentId, suspendEntry.getDeploymentId());
 
     assertEquals("suspensionState", suspendEntry.getProperty());
     assertEquals("suspended", suspendEntry.getNewValue());
@@ -354,6 +286,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertNull(activateEntry.getProcessInstanceId());
     assertEquals("oneTaskProcess", activateEntry.getProcessDefinitionKey());
     assertEquals(process.getProcessDefinitionId(), activateEntry.getProcessDefinitionId());
+    assertEquals(deploymentId, activateEntry.getDeploymentId());
 
     assertEquals("suspensionState", activateEntry.getProperty());
     assertEquals("active", activateEntry.getNewValue());
@@ -382,6 +315,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertNull(suspendEntry.getProcessInstanceId());
     assertNull(suspendEntry.getProcessDefinitionId());
     assertEquals("oneTaskProcess", suspendEntry.getProcessDefinitionKey());
+    assertNull(suspendEntry.getDeploymentId());
 
     assertEquals("suspensionState", suspendEntry.getProperty());
     assertEquals("suspended", suspendEntry.getNewValue());
@@ -397,6 +331,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertNull(activateEntry.getProcessInstanceId());
     assertNull(activateEntry.getProcessDefinitionId());
     assertEquals("oneTaskProcess", activateEntry.getProcessDefinitionKey());
+    assertNull(activateEntry.getDeploymentId());
 
     assertEquals("suspensionState", activateEntry.getProperty());
     assertEquals("active", activateEntry.getNewValue());
@@ -428,6 +363,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertNotNull(suspendDefinitionEntry);
     assertEquals(process.getProcessDefinitionId(), suspendDefinitionEntry.getProcessDefinitionId());
     assertEquals("oneTaskProcess", suspendDefinitionEntry.getProcessDefinitionKey());
+    assertEquals(deploymentId, suspendDefinitionEntry.getDeploymentId());
 
     assertEquals("suspensionState", suspendDefinitionEntry.getProperty());
     assertEquals("suspended", suspendDefinitionEntry.getNewValue());
@@ -442,6 +378,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertNotNull(activateDefinitionEntry);
     assertEquals(process.getProcessDefinitionId(), activateDefinitionEntry.getProcessDefinitionId());
     assertEquals("oneTaskProcess", activateDefinitionEntry.getProcessDefinitionKey());
+    assertEquals(deploymentId, activateDefinitionEntry.getDeploymentId());
 
     assertEquals("suspensionState", activateDefinitionEntry.getProperty());
     assertEquals("active", activateDefinitionEntry.getNewValue());
@@ -473,6 +410,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertNotNull(suspendDefinitionEntry);
     assertNull(suspendDefinitionEntry.getProcessDefinitionId());
     assertEquals("oneTaskProcess", suspendDefinitionEntry.getProcessDefinitionKey());
+    assertNull(suspendDefinitionEntry.getDeploymentId());
 
     assertEquals("suspensionState", suspendDefinitionEntry.getProperty());
     assertEquals("suspended", suspendDefinitionEntry.getNewValue());
@@ -487,6 +425,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertNotNull(activateDefinitionEntry);
     assertNull(activateDefinitionEntry.getProcessDefinitionId());
     assertEquals("oneTaskProcess", activateDefinitionEntry.getProcessDefinitionKey());
+    assertNull(activateDefinitionEntry.getDeploymentId());
 
     assertEquals("suspensionState", activateDefinitionEntry.getProperty());
     assertEquals("active", activateDefinitionEntry.getNewValue());
@@ -517,6 +456,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
 
     assertNotNull(activeJobDefinitionEntry);
     assertEquals(process.getProcessDefinitionId(), activeJobDefinitionEntry.getProcessDefinitionId());
+    assertEquals(deploymentId, activeJobDefinitionEntry.getDeploymentId());
 
     assertEquals("suspensionState", activeJobDefinitionEntry.getProperty());
     assertEquals("active", activeJobDefinitionEntry.getNewValue());
@@ -531,6 +471,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
 
     assertNotNull(activateJobIdEntry);
     assertEquals(process.getProcessInstanceId(), activateJobIdEntry.getProcessInstanceId());
+    assertEquals(deploymentId, activateJobIdEntry.getDeploymentId());
 
     assertEquals("suspensionState", activateJobIdEntry.getProperty());
     assertEquals("active", activateJobIdEntry.getNewValue());
@@ -545,6 +486,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
 
     assertNotNull(suspendJobDefinitionEntry);
     assertEquals(process.getProcessDefinitionId(), suspendJobDefinitionEntry.getProcessDefinitionId());
+    assertEquals(deploymentId, suspendJobDefinitionEntry.getDeploymentId());
 
     assertEquals("suspensionState", suspendJobDefinitionEntry.getProperty());
     assertEquals("suspended", suspendJobDefinitionEntry.getNewValue());
@@ -559,6 +501,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
 
     assertNotNull(suspendedJobEntry);
     assertEquals(process.getProcessInstanceId(), suspendedJobEntry.getProcessInstanceId());
+    assertEquals(deploymentId, suspendedJobEntry.getDeploymentId());
 
     assertEquals("suspensionState", suspendedJobEntry.getProperty());
     assertEquals("suspended", suspendedJobEntry.getNewValue());
@@ -592,6 +535,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertEquals(job.getProcessInstanceId(), jobRetryEntry.getProcessInstanceId());
     assertEquals(job.getProcessDefinitionKey(), jobRetryEntry.getProcessDefinitionKey());
     assertEquals(job.getProcessDefinitionId(), jobRetryEntry.getProcessDefinitionId());
+    assertEquals(deploymentId, jobRetryEntry.getDeploymentId());
   }
 
   @Deployment(resources = {ONE_TASK_PROCESS})
@@ -730,6 +674,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertEquals(processInstanceId, logEntry.getProcessInstanceId());
     assertEquals(processInstance.getProcessDefinitionId(), logEntry.getProcessDefinitionId());
     assertEquals(definition.getKey(), logEntry.getProcessDefinitionKey());
+    assertEquals(deploymentId, logEntry.getDeploymentId());
     assertEquals(UserOperationLogEntry.OPERATION_TYPE_MODIFY_PROCESS_INSTANCE, logEntry.getOperationType());
     assertEquals(EntityTypes.PROCESS_INSTANCE, logEntry.getEntityType());
     assertNull(logEntry.getProperty());
@@ -1051,6 +996,40 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     verifyQueryResults(query, 1);
   }
 
+  public void testQueryByDeploymentId() {
+    // given
+    String deploymentId = repositoryService
+        .createDeployment()
+        .addClasspathResource(ONE_TASK_PROCESS)
+        .deploy()
+        .getId();
+
+    // when
+    UserOperationLogQuery query = historyService
+        .createUserOperationLogQuery()
+        .deploymentId(deploymentId);
+
+    // then
+    verifyQueryResults(query, 1);
+
+    repositoryService.deleteDeployment(deploymentId, true);
+  }
+
+  public void testQueryByInvalidDeploymentId() {
+    UserOperationLogQuery query = historyService
+        .createUserOperationLogQuery()
+        .deploymentId("invalid");
+
+    verifyQueryResults(query, 0);
+
+    try {
+      query.deploymentId(null);
+      fail();
+    } catch (ProcessEngineException e) {
+      // expected
+    }
+  }
+
   private void verifyQueryResults(UserOperationLogQuery query, int countExpected) {
     assertEquals(countExpected, query.list().size());
     assertEquals(countExpected, query.count());
@@ -1097,13 +1076,75 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
       for (UserOperationLogEntry logEntry : logEntryList) {
         assertEquals(process.getProcessDefinitionId(), logEntry.getProcessDefinitionId());
         assertEquals(process.getProcessInstanceId(), logEntry.getProcessInstanceId());
+        assertEquals(deploymentId, logEntry.getDeploymentId());
       }
     } else {
       UserOperationLogEntry logEntry = logQuery.singleResult();
       assertEquals(process.getProcessDefinitionId(), logEntry.getProcessDefinitionId());
       assertEquals(process.getProcessInstanceId(), logEntry.getProcessInstanceId());
+      assertEquals(deploymentId, logEntry.getDeploymentId());
     }
+  }
 
+  private UserOperationLogQuery query() {
+    return historyService.createUserOperationLogQuery();
+  }
+
+  /**
+   * start process and operate on userTask to create some log entries for the query tests
+   */
+  private void createLogEntries() {
+    ClockUtil.setCurrentTime(yesterday);
+
+    // create a process with a userTask and work with it
+    process = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    execution = processEngine.getRuntimeService().createExecutionQuery().processInstanceId(process.getId()).singleResult();
+    processTaskId = taskService.createTaskQuery().singleResult().getId();
+
+    // user "icke" works on the process userTask
+    identityService.setAuthenticatedUserId("icke");
+
+    // create and remove some links
+    taskService.addCandidateUser(processTaskId, "er");
+    taskService.deleteCandidateUser(processTaskId, "er");
+    taskService.addCandidateGroup(processTaskId, "wir");
+    taskService.deleteCandidateGroup(processTaskId, "wir");
+
+    // assign and reassign the userTask
+    ClockUtil.setCurrentTime(today);
+    taskService.setOwner(processTaskId, "icke");
+    taskService.claim(processTaskId, "icke");
+    taskService.setAssignee(processTaskId, "er");
+
+    // change priority of task
+    taskService.setPriority(processTaskId, 10);
+
+    // add and delete an attachment
+    Attachment attachment = taskService.createAttachment("image/ico", processTaskId, process.getId(), "favicon.ico", "favicon", "http://camunda.com/favicon.ico");
+    taskService.deleteAttachment(attachment.getId());
+
+    // complete the userTask to finish the process
+    taskService.complete(processTaskId);
+    assertProcessEnded(process.getId());
+
+    // user "er" works on the process userTask
+    identityService.setAuthenticatedUserId("er");
+
+    // create a standalone userTask
+    userTask = taskService.newTask();
+    userTask.setName("to do");
+    taskService.saveTask(userTask);
+
+    // change some properties manually to create an update event
+    ClockUtil.setCurrentTime(tomorrow);
+    userTask.setDescription("desc");
+    userTask.setOwner("icke");
+    userTask.setAssignee("er");
+    userTask.setDueDate(new Date());
+    taskService.saveTask(userTask);
+
+    // complete the userTask
+    taskService.complete(userTask.getId());
   }
 
 }

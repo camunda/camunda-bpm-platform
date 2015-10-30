@@ -29,6 +29,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQuery, UserOperationLogEntry> implements UserOperationLogQuery {
 
   private static final long serialVersionUID = 1L;
+  protected String deploymentId;
   protected String processDefinitionId;
   protected String processDefinitionKey;
   protected String processInstanceId;
@@ -52,6 +53,12 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
 
   public UserOperationLogQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
+  }
+
+  public UserOperationLogQuery deploymentId(String deploymentId) {
+    ensureNotNull("deploymentId", deploymentId);
+    this.deploymentId = deploymentId;
+    return this;
   }
 
   public UserOperationLogQuery processDefinitionId(String processDefinitionId) {
