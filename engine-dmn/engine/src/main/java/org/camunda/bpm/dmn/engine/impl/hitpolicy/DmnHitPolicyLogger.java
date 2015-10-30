@@ -19,6 +19,7 @@ import java.util.Map;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableRule;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableValue;
 import org.camunda.bpm.dmn.engine.impl.DmnLogger;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.bpm.model.dmn.BuiltinAggregator;
 import org.camunda.bpm.model.dmn.HitPolicy;
 
@@ -40,11 +41,7 @@ public class DmnHitPolicyLogger extends DmnLogger {
     return new DmnHitPolicyException(exceptionMessage("004", "Unable to execute aggregation '{}' on compound decision output '{}'. Only one output value allowed.", aggregator, outputs));
   }
 
-  public DmnHitPolicyException unableToConvertValueTo(Class<?> targetClass, Object value, NumberFormatException cause) {
-    return new DmnHitPolicyException(exceptionMessage("005", "Unable to convert '' to ''.", value, targetClass), cause);
-  }
-
-  public DmnHitPolicyException unableToConvertValuesToAggregatableTypes(List<Object> values, Class<?>... targetClasses) {
-    return new DmnHitPolicyException(exceptionMessage("006", "Unable to convert value '{}' to a support aggregatable type '{}'.", values, targetClasses));
+  public DmnHitPolicyException unableToConvertValuesToAggregatableTypes(List<TypedValue> values, Class<?>... targetClasses) {
+    return new DmnHitPolicyException(exceptionMessage("005", "Unable to convert value '{}' to a support aggregatable type '{}'.", values, targetClasses));
   }
 }

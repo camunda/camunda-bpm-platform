@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.dmn.engine.impl.context;
 
+import static org.camunda.bpm.engine.variable.impl.context.SingleVariableContext.singleVariable;
 import static org.camunda.commons.utils.EnsureUtil.ensureNotNull;
 
 import java.util.ArrayList;
@@ -37,8 +38,8 @@ import org.camunda.bpm.dmn.engine.DmnExpression;
 import org.camunda.bpm.dmn.engine.DmnRule;
 import org.camunda.bpm.dmn.engine.DmnScriptEngineResolver;
 import org.camunda.bpm.dmn.engine.context.DmnDecisionContext;
-import org.camunda.bpm.dmn.engine.el.ElProvider;
 import org.camunda.bpm.dmn.engine.el.ElExpression;
+import org.camunda.bpm.dmn.engine.el.ElProvider;
 import org.camunda.bpm.dmn.engine.hitpolicy.DmnHitPolicyHandler;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionOutputImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionResultImpl;
@@ -51,12 +52,9 @@ import org.camunda.bpm.dmn.feel.FeelEngine;
 import org.camunda.bpm.engine.variable.VariableContext;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.impl.context.CompositeVariableContext;
-import org.camunda.bpm.engine.variable.value.NumberValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.bpm.model.dmn.HitPolicy;
 import org.camunda.commons.utils.StringUtil;
-
-import static org.camunda.bpm.engine.variable.impl.context.SingleVariableContext.*;
 
 public class DmnDecisionContextImpl implements DmnDecisionContext {
 
@@ -214,15 +212,14 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
     DmnDecisionResultImpl decisionResult = new DmnDecisionResultImpl();
     if (decisionTableResult.getCollectResultName() != null || decisionTableResult.getCollectResultValue() != null) {
       DmnDecisionOutputImpl decisionOutput = new DmnDecisionOutputImpl();
-      NumberValue resultValue = Variables.numberValue(decisionTableResult.getCollectResultValue());
-      decisionOutput.put(decisionTableResult.getCollectResultName(), resultValue.getValue());
+      TypedValue resultValue = decisionTableResult.getCollectResultValue();
+      decisionOutput.putValue(decisionTableResult.getCollectResultName(), resultValue);
       decisionResult.add(decisionOutput);
     } else {
       for (DmnDecisionTableRule matchingRule : decisionTableResult.getMatchingRules()) {
         DmnDecisionOutputImpl decisionOutput = new DmnDecisionOutputImpl();
         for (DmnDecisionTableValue outputValue : matchingRule.getOutputs().values()) {
-          // FIXME: result output should be typed Value (CAM-4725)
-          decisionOutput.put(outputValue.getOutputName(), outputValue.getValue().getValue());
+          decisionOutput.putValue(outputValue.getOutputName(), outputValue.getValue());
         }
         decisionResult.add(decisionOutput);
       }

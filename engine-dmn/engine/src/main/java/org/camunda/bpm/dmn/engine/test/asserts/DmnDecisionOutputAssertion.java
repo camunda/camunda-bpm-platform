@@ -45,7 +45,7 @@ public class DmnDecisionOutputAssertion extends AbstractAssert<DmnDecisionOutput
   public DmnDecisionOutputAssertion hasSingleEntry(TypedValue expectedValue) {
     hasSingleEntry();
 
-    assertEquals(expectedValue, actual.getSingleValue());
+    assertEquals(expectedValue, actual.getSingleValueTyped());
 
     return this;
   }
@@ -62,7 +62,7 @@ public class DmnDecisionOutputAssertion extends AbstractAssert<DmnDecisionOutput
   public DmnDecisionOutputAssertion hasEntryWithValue(String name, Object expectedValue) {
     isNotNull();
 
-    assertEquals(expectedValue, actual.get(name));
+    assertEquals(expectedValue, actual.getValue(name));
 
     return this;
   }

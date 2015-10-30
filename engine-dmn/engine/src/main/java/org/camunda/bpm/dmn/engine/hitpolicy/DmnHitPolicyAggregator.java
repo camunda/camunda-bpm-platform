@@ -16,6 +16,7 @@ package org.camunda.bpm.dmn.engine.hitpolicy;
 import java.util.List;
 
 import org.camunda.bpm.dmn.engine.impl.hitpolicy.DmnHitPolicyException;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 public interface DmnHitPolicyAggregator {
 
@@ -26,6 +27,6 @@ public interface DmnHitPolicyAggregator {
    * @return the aggregated result value
    * @throws DmnHitPolicyException if the aggregation fails, e.g. it is not applicable to the decision outputs
    */
-  Number aggregate(List<Object> outputValues);
+  TypedValue aggregate(List<TypedValue> outputValues);
 
 }

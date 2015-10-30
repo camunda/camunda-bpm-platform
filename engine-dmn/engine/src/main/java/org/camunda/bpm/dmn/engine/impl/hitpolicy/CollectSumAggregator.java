@@ -17,7 +17,8 @@ import java.util.List;
 
 public class CollectSumAggregator extends AbstractDmnHitPolicyNumberAggregator {
 
-  protected Number aggregateIntegerValues(List<Integer> intValues) {
+  @Override
+  protected Integer aggregateIntegerValues(List<Integer> intValues) {
     int sum = 0;
     for (Integer intValue : intValues) {
       if (intValue != null) {
@@ -27,7 +28,8 @@ public class CollectSumAggregator extends AbstractDmnHitPolicyNumberAggregator {
     return sum;
   }
 
-  protected Number aggregateLongValues(List<Long> longValues) {
+  @Override
+  protected Long aggregateLongValues(List<Long> longValues) {
     long sum = 0L;
     for (Long longValue : longValues) {
       if (longValue != null) {
@@ -37,7 +39,8 @@ public class CollectSumAggregator extends AbstractDmnHitPolicyNumberAggregator {
     return sum;
   }
 
-  protected Number aggregateDoubleValues(List<Double> doubleValues) {
+  @Override
+  protected Double aggregateDoubleValues(List<Double> doubleValues) {
     double sum = 0.0;
     for (Double doubleValue : doubleValues) {
       if (doubleValue != null) {

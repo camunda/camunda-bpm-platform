@@ -21,13 +21,14 @@ import java.util.Map;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableRule;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableValue;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 public class DmnDecisionTableResultImpl implements DmnDecisionTableResult {
 
   protected Map<String, DmnDecisionTableValue> inputs = new HashMap<String, DmnDecisionTableValue>();
   protected List<DmnDecisionTableRule> matchingRules = new ArrayList<DmnDecisionTableRule>();
   protected String collectResultName;
-  protected Number collectResultValue;
+  protected TypedValue collectResultValue;
   protected long executedDecisionElements = 0;
 
   public Map<String, DmnDecisionTableValue> getInputs() {
@@ -54,12 +55,12 @@ public class DmnDecisionTableResultImpl implements DmnDecisionTableResult {
     this.collectResultName = collectResultName;
   }
 
-  public Number getCollectResultValue() {
+  public TypedValue getCollectResultValue() {
     return collectResultValue;
   }
 
-  public void setCollectResultValue(Number collectResultValue) {
-    this.collectResultValue = collectResultValue;
+  public void setCollectResultValue(TypedValue outputValue) {
+    this.collectResultValue = outputValue;
   }
 
   public long getExecutedDecisionElements() {
@@ -70,6 +71,7 @@ public class DmnDecisionTableResultImpl implements DmnDecisionTableResult {
     this.executedDecisionElements = executedDecisionElements;
   }
 
+  @Override
   public String toString() {
     return "DmnDecisionTableResultImpl{" +
       "inputs=" + inputs +

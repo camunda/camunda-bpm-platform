@@ -24,6 +24,7 @@ import static org.mockito.Mockito.verify;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
 import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnEngine;
@@ -134,12 +135,11 @@ public class FeelIntegrationTest extends DmnDecisionTest {
     assertThat(result).hasSize(1);
 
     DmnDecisionOutput output = result.getSingleOutput();
-    assertThat(output).hasSize(1);
+    assertThat(output.size()).isEqualTo(1);
 
-    // FIXME: result output should be typed Value (CAM-4725)
-    Date dateResult = output.getSingleValue();
+    DateValue dateResult = output.getSingleValueTyped();
     DateValue expectedResult = Variables.dateValue(testDate);
-    assertThat(dateResult).isEqualTo(expectedResult.getValue());
+    assertThat(dateResult).isEqualTo(expectedResult);
   }
 
   public class TestFeelEngineProvider implements FeelEngineProvider {

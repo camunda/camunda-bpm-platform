@@ -55,9 +55,9 @@ public class CollectHitPolicyHandler implements DmnHitPolicyHandler {
     DmnHitPolicyAggregator aggregator = AGGREGATORS.get(aggregation);
     if (aggregator != null) {
       List<DmnDecisionTableRule> matchingRules = decisionTableResult.getMatchingRules();
-      List<Object> outputValues = collectSingleValues(aggregation, matchingRules);
+      List<TypedValue> outputValues = collectSingleValues(aggregation, matchingRules);
       String outputName = getDecisionOutputName(matchingRules);
-      Number outputValue = aggregator.aggregate(outputValues);
+      TypedValue outputValue = aggregator.aggregate(outputValues);
       decisionTableResult.setCollectResultName(outputName);
       decisionTableResult.setCollectResultValue(outputValue);
     }
@@ -66,8 +66,8 @@ public class CollectHitPolicyHandler implements DmnHitPolicyHandler {
     }
   }
 
-  protected List<Object> collectSingleValues(BuiltinAggregator aggregator, List<DmnDecisionTableRule> matchingRules) {
-    List<Object> values = new ArrayList<Object>();
+  protected List<TypedValue> collectSingleValues(BuiltinAggregator aggregator, List<DmnDecisionTableRule> matchingRules) {
+    List<TypedValue> values = new ArrayList<TypedValue>();
     for (DmnDecisionTableRule matchingRule : matchingRules) {
       Map<String, DmnDecisionTableValue> outputs = matchingRule.getOutputs();
       if (outputs.isEmpty()) {
@@ -75,7 +75,7 @@ public class CollectHitPolicyHandler implements DmnHitPolicyHandler {
       }
       else if (outputs.size() == 1) {
         TypedValue typedValue = outputs.values().iterator().next().getValue();
-        values.add(typedValue.getValue());
+        values.add(typedValue);
       }
       else {
         throw LOG.aggregationNotApplicableOnCompoundOutput(aggregator, outputs);

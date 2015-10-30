@@ -13,18 +13,20 @@
 
 package org.camunda.bpm.dmn.engine.impl;
 
-import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 
-public class DmnDecisionResultImpl extends ArrayList<DmnDecisionOutput> implements DmnDecisionResult, Serializable {
+public class DmnDecisionResultImpl implements DmnDecisionResult {
+
+  private static final long serialVersionUID = 1L;
 
   public static final DmnEngineLogger LOG = DmnLogger.ENGINE_LOGGER;
 
-  private static final long serialVersionUID = 1L;
+  protected final List<DmnDecisionOutput> decisionOutputs = new ArrayList<DmnDecisionOutput>();
 
   public DmnDecisionOutput getFirstOutput() {
     if (size() > 0) {
@@ -55,6 +57,35 @@ public class DmnDecisionResultImpl extends ArrayList<DmnDecisionOutput> implemen
       outputValues.add((T) value);
     }
     return outputValues;
+  }
+
+  public void add(DmnDecisionOutput decisionOutput) {
+    decisionOutputs.add(decisionOutput);
+  }
+
+  @Override
+  public Iterator<DmnDecisionOutput> iterator() {
+    return decisionOutputs.iterator();
+  }
+
+  @Override
+  public int size() {
+    return decisionOutputs.size();
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return decisionOutputs.isEmpty();
+  }
+
+  @Override
+  public DmnDecisionOutput get(int index) {
+    return decisionOutputs.get(index);
+  }
+
+  @Override
+  public String toString() {
+    return decisionOutputs.toString();
   }
 
 }

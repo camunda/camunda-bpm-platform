@@ -18,108 +18,140 @@ import java.util.List;
 
 import org.camunda.bpm.dmn.engine.hitpolicy.DmnHitPolicyAggregator;
 import org.camunda.bpm.dmn.engine.impl.DmnLogger;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 public abstract class AbstractDmnHitPolicyNumberAggregator implements DmnHitPolicyAggregator {
 
   public static final DmnHitPolicyLogger LOG = DmnLogger.HIT_POLICY_LOGGER;
 
-  public Number aggregate(List<Object> outputValues) {
+  public TypedValue aggregate(List<TypedValue> outputValues) {
     if (outputValues.isEmpty()) {
       // return null if no values to aggregate
       return null;
     }
     else {
+
       return aggregateNumberValues(outputValues);
     }
   }
 
-  protected Number aggregateNumberValues(List<Object> values) {
+  protected TypedValue aggregateNumberValues(List<TypedValue> values) {
     try {
       List<Integer> intValues = convertValuesToInteger(values);
-      return aggregateIntegerValues(intValues);
+      return Variables.integerValue(aggregateIntegerValues(intValues));
     }
-    catch (DmnHitPolicyException e) {
+    catch (IllegalArgumentException e) {
       // ignore
     }
 
     try {
       List<Long> longValues = convertValuesToLong(values);
-      return aggregateLongValues(longValues);
+      return Variables.longValue(aggregateLongValues(longValues));
     }
-    catch (DmnHitPolicyException e) {
+    catch (IllegalArgumentException e) {
       // ignore
     }
 
     try {
       List<Double> doubleValues = convertValuesToDouble(values);
-      return aggregateDoubleValues(doubleValues);
+      return Variables.doubleValue(aggregateDoubleValues(doubleValues));
     }
-    catch (DmnHitPolicyException e) {
+    catch (IllegalArgumentException e) {
       // ignore
     }
 
     throw LOG.unableToConvertValuesToAggregatableTypes(values, Integer.class, Long.class, Double.class);
   }
 
-  protected abstract Number aggregateIntegerValues(List<Integer> intValues);
+  protected abstract Integer aggregateIntegerValues(List<Integer> intValues);
 
-  protected abstract Number aggregateLongValues(List<Long> longValues);
+  protected abstract Long aggregateLongValues(List<Long> longValues);
 
-  protected abstract Number aggregateDoubleValues(List<Double> doubleValues);
+  protected abstract Double aggregateDoubleValues(List<Double> doubleValues);
 
-  protected List<Integer> convertValuesToInteger(List<Object> values) {
+  protected List<Integer> convertValuesToInteger(List<TypedValue> typedValues) throws IllegalArgumentException {
     List<Integer> intValues = new ArrayList<Integer>();
-    for (Object value : values) {
-      if (value instanceof Integer) {
-        intValues.add((Integer) value);
-      }
-      else {
-        try {
-          intValues.add(Integer.valueOf(value.toString()));
+    for (TypedValue typedValue : typedValues) {
+
+      if (ValueType.INTEGER.equals(typedValue.getType())) {
+        intValues.add((Integer) typedValue.getValue());
+
+      } else if (typedValue.getType() == null) {
+        // check if it is an integer
+
+        Object value = typedValue.getValue();
+        if (value instanceof Integer) {
+          intValues.add((Integer) value);
+
+        } else {
+          throw new IllegalArgumentException();
         }
-        catch (NumberFormatException e) {
-          throw LOG.unableToConvertValueTo(Integer.class, value, e);
-        }
+
+      } else {
+        // reject other typed values
+        throw new IllegalArgumentException();
       }
+
     }
     return intValues;
   }
 
-  protected List<Long> convertValuesToLong(List<Object> values) {
+  protected List<Long> convertValuesToLong(List<TypedValue> typedValues) throws IllegalArgumentException {
     List<Long> longValues = new ArrayList<Long>();
-    for (Object value : values) {
-      if (value instanceof Long) {
-        longValues.add((Long) value);
-      }
-      else {
-        try {
-          longValues.add(Long.valueOf(value.toString()));
+    for (TypedValue typedValue : typedValues) {
+
+      if (ValueType.LONG.equals(typedValue.getType())) {
+        longValues.add((Long) typedValue.getValue());
+
+      } else if (typedValue.getType() == null) {
+        // check if it is a long or a string of a number
+
+        Object value = typedValue.getValue();
+        if (value instanceof Long) {
+          longValues.add((Long) value);
+
+        } else {
+          Long longValue = Long.valueOf(value.toString());
+          longValues.add(longValue);
         }
-        catch (NumberFormatException e) {
-          throw LOG.unableToConvertValueTo(Long.class, value, e);
-        }
+
+      } else {
+        // reject other typed values
+        throw new IllegalArgumentException();
       }
+
     }
     return longValues;
   }
 
-  protected List<Double> convertValuesToDouble(List<Object> values) {
+
+  protected List<Double> convertValuesToDouble(List<TypedValue> typedValues) throws IllegalArgumentException {
     List<Double> doubleValues = new ArrayList<Double>();
+    for (TypedValue typedValue : typedValues) {
 
-    for (Object value : values) {
-      if (value instanceof Double) {
-        doubleValues.add((Double) value);
-      }
-      else {
-        try {
-          doubleValues.add(Double.valueOf(value.toString()));
+      if (ValueType.DOUBLE.equals(typedValue.getType())) {
+        doubleValues.add((Double) typedValue.getValue());
+
+      } else if (typedValue.getType() == null) {
+        // check if it is a double or a string of a decimal number
+
+        Object value = typedValue.getValue();
+        if (value instanceof Double) {
+          doubleValues.add((Double) value);
+
+        } else {
+          Double doubleValue = Double.valueOf(value.toString());
+          doubleValues.add(doubleValue);
         }
-        catch (NumberFormatException e) {
-          throw LOG.unableToConvertValueTo(Double.class, value, e);
-        }
+
+      } else {
+        // reject other typed values
+        throw new IllegalArgumentException();
       }
+
     }
-
     return doubleValues;
   }
 

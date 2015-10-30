@@ -13,38 +13,119 @@
 
 package org.camunda.bpm.dmn.engine.impl;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
-public class DmnDecisionOutputImpl extends LinkedHashMap<String, Object> implements DmnDecisionOutput {
-
-  public static final DmnEngineLogger LOG = DmnLogger.ENGINE_LOGGER;
+public class DmnDecisionOutputImpl implements DmnDecisionOutput {
 
   private static final long serialVersionUID = 1L;
 
-  @SuppressWarnings("unchecked")
-  public <T> T getValue(String name) {
-    return (T) get(name);
+  public static final DmnEngineLogger LOG = DmnLogger.ENGINE_LOGGER;
+
+  protected final Map<String, TypedValue> outputValues = new LinkedHashMap<String, TypedValue>();
+
+  public void putValue(String name, TypedValue value) {
+    outputValues.put(name, value);
   }
 
   @SuppressWarnings("unchecked")
-  public <T> T getFirstValue() {
-    if (!isEmpty()) {
-      return (T) values().iterator().next();
-    }
-    else {
+  @Override
+  public <T extends TypedValue> T getValueTyped(String name) {
+    return (T) outputValues.get(name);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T extends TypedValue> T getFirstValueTyped() {
+    if (!outputValues.isEmpty()) {
+      return (T) outputValues.values().iterator().next();
+    } else {
       return null;
     }
   }
 
-  public <T> T getSingleValue() {
-    if (size() > 1) {
+  @Override
+  public <T extends TypedValue> T getSingleValueTyped() {
+    if (outputValues.size() > 1) {
       throw LOG.decisionOutputHasMoreThanOneValue(this);
+    } else {
+      return getFirstValueTyped();
     }
-    else {
-      return getFirstValue();
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T> T getValue(String name) {
+    if (outputValues.containsKey(name)) {
+      return (T) getValueTyped(name).getValue();
+    } else {
+      return null;
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T> T getFirstValue() {
+    if (!outputValues.isEmpty()) {
+      return (T) getFirstValueTyped().getValue();
+    } else {
+      return null;
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T> T getSingleValue() {
+    if (!outputValues.isEmpty()) {
+      return (T) getSingleValueTyped().getValue();
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  public int size() {
+    return outputValues.size();
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return outputValues.isEmpty();
+  }
+
+  @Override
+  public boolean containsKey(String key) {
+    return outputValues.containsKey(key);
+  }
+
+  @Override
+  public Set<String> keySet() {
+    return outputValues.keySet();
+  }
+
+  @Override
+  public Collection<Object> values() {
+    List<Object> values = new ArrayList<Object>();
+
+    for(TypedValue typedValue : outputValues.values()) {
+      values.add(typedValue.getValue());
+    }
+
+    return values();
+  }
+
+  @Override
+  public Collection<TypedValue> valuesTyped() {
+    return outputValues.values();
+  }
+
+  @Override
+  public String toString() {
+    return outputValues.toString();
   }
 
 }

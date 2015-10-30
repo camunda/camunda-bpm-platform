@@ -16,11 +16,14 @@ package org.camunda.bpm.dmn.engine.impl.hitpolicy;
 import java.util.List;
 
 import org.camunda.bpm.dmn.engine.hitpolicy.DmnHitPolicyAggregator;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 public class CollectCountAggregator implements DmnHitPolicyAggregator {
 
-  public Number aggregate(List<Object> outputValues) {
-    return (long) outputValues.size();
+  @Override
+  public TypedValue aggregate(List<TypedValue> outputValues) {
+    return Variables.integerValue(outputValues.size());
   }
 
 }

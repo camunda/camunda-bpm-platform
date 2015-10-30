@@ -13,15 +13,15 @@
 
 package org.camunda.bpm.dmn.engine;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
- * The result of one decision. Which is the list of its
- * decision outputs (see {@link DmnDecisionOutput}). In
- * context of a decision table this represents the output
- * of all matching decision rules.
+ * The result of one decision. Which is the list of its decision outputs (see
+ * {@link DmnDecisionOutput}). In context of a decision table this represents
+ * the output of all matching decision rules.
  */
-public interface DmnDecisionResult extends List<DmnDecisionOutput> {
+public interface DmnDecisionResult extends Iterable<DmnDecisionOutput>, Serializable {
 
   /**
    * Returns the first {@link DmnDecisionOutput}.
@@ -31,24 +31,48 @@ public interface DmnDecisionResult extends List<DmnDecisionOutput> {
   DmnDecisionOutput getFirstOutput();
 
   /**
-   * Returns the single {@link DmnDecisionOutput} of the result. Which
-   * asserts that only one decision output exist.
+   * Returns the single {@link DmnDecisionOutput} of the result. Which asserts
+   * that only one decision output exist.
    *
    * @return the single decision output or null if none exists
-   * @throws DmnResultException if  more than one decision output exists
+   * @throws DmnResultException
+   *           if more than one decision output exists
    */
   DmnDecisionOutput getSingleOutput();
 
   /**
-   * Collects the values for a output name. The list will contain
-   * the value for the output name of every {@link DmnDecisionOutput}.
-   * If the {@link DmnDecisionOutput} doesn't contain a value for the
-   * output name the value will be null.
+   * Collects the values for a output name. The list will contain the value for
+   * the output name of every {@link DmnDecisionOutput}. If the
+   * {@link DmnDecisionOutput} doesn't contain a value for the output name the
+   * value will be null.
    *
-   * @param outputName the name of the output to collect
-   * @param <T> the type of the output values
+   * @param outputName
+   *          the name of the output to collect
+   * @param <T>
+   *          the type of the output values
    * @return the list of collected output values
    */
   <T> List<T> collectOutputValues(String outputName);
+
+  /**
+   * @return the number of the decision outputs
+   */
+  int size();
+
+  /**
+   * @return <code>true</code>, if the decision result has no decision output
+   */
+  boolean isEmpty();
+
+  /**
+   * @param index
+   *          index of the decision output to return
+   * @return the decision output at the specified position in this decision
+   *         result
+   * @throws IndexOutOfBoundsException
+   *           if the index is out of range (
+   *           <tt>index &lt; 0 || index &gt;= size()</tt>)
+   */
+  DmnDecisionOutput get(int index);
 
 }

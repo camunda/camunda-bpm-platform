@@ -16,6 +16,7 @@ package org.camunda.bpm.dmn.engine;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.bpm.model.dmn.HitPolicy;
 
 /**
@@ -41,7 +42,7 @@ public interface DmnDecisionTableResult {
   /**
    * @return the result value of the collect operation if the {@link HitPolicy#COLLECT} was used with an aggregator otherwise null
    */
-  Number getCollectResultValue();
+  TypedValue getCollectResultValue();
 
   /**
    * @return the number of executed decision elements during the evaluation

@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.dmn.engine.hitpolicy;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.camunda.bpm.dmn.engine.test.asserts.DmnAssertions.assertThat;
 
@@ -932,7 +933,7 @@ public class HitPolicyTest extends DmnDecisionTest {
     assertThat(result).hasSingleOutput().hasSingleEntryValue(10);
 
     result = startDecision(false, true, false, 10, 20L, 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntryValue(20);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(20L);
 
     result = startDecision(false, false, true, 10, 20L, 30.034);
     assertThat(result).hasSingleOutput().hasSingleEntryValue(30.034);
@@ -956,10 +957,10 @@ public class HitPolicyTest extends DmnDecisionTest {
     assertThat(result).hasSingleOutput().hasSingleEntryValue(DOUBLE_MIN);
 
     result = startDecision(true, false, false, (byte) 1, (short) 2, 3f);
-    assertThat(result).hasSingleOutput().hasSingleEntryValue(1);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(1L);
 
     result = startDecision(false, true, false, (byte) 1, (short) 2, 3f);
-    assertThat(result).hasSingleOutput().hasSingleEntryValue(2);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(2L);
 
     result = startDecision(false, false, true, (byte) 1, (short) 2, 3f);
     assertThat(result).hasSingleOutput().hasSingleEntryValue(3.0);
@@ -969,7 +970,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-03006");
+      assertThat(e).hasMessageStartingWith("DMN-03005");
     }
   }
 
@@ -977,7 +978,7 @@ public class HitPolicyTest extends DmnDecisionTest {
   @DecisionResource(resource = COLLECT_SUM_SINGLE)
   public void testCollectSumHitPolicySingleOutputMultipleMatchingRules() {
     DmnDecisionResult result = startDecision(true, true, false, 10, 20L, 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntryValue(30);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(30L);
 
     result = startDecision(true, false, true, 10, 20L, 30.034);
     assertThat(result).hasSingleOutput().hasSingleEntryValue(40.034);
@@ -1013,7 +1014,7 @@ public class HitPolicyTest extends DmnDecisionTest {
     assertThat(result).hasSingleOutput().hasSingleEntryValue(DOUBLE_MIN);
 
     result = startDecision(true, true, false, (byte) 1, (short) 2, 3f);
-    assertThat(result).hasSingleOutput().hasSingleEntryValue(3);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(3L);
 
     result = startDecision(true, false, true, (byte) 1, (short) 2, 3f);
     assertThat(result).hasSingleOutput().hasSingleEntryValue(4.0);
@@ -1029,7 +1030,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-03006");
+      assertThat(e).hasMessageStartingWith("DMN-03005");
     }
   }
 
@@ -1118,7 +1119,7 @@ public class HitPolicyTest extends DmnDecisionTest {
     assertThat(result).hasSingleOutput().hasSingleEntryValue(10);
 
     result = startDecision(false, true, false, 10, 20L, 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntryValue(20);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(20L);
 
     result = startDecision(false, false, true, 10, 20L, 30.034);
     assertThat(result).hasSingleOutput().hasSingleEntryValue(30.034);
@@ -1142,10 +1143,10 @@ public class HitPolicyTest extends DmnDecisionTest {
     assertThat(result).hasSingleOutput().hasSingleEntryValue(DOUBLE_MIN);
 
     result = startDecision(true, false, false, (byte) 1, (short) 2, 3f);
-    assertThat(result).hasSingleOutput().hasSingleEntryValue(1);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(1L);
 
     result = startDecision(false, true, false, (byte) 1, (short) 2, 3f);
-    assertThat(result).hasSingleOutput().hasSingleEntryValue(2);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(2L);
 
     result = startDecision(false, false, true, (byte) 1, (short) 2, 3f);
     assertThat(result).hasSingleOutput().hasSingleEntryValue(3.0);
@@ -1155,7 +1156,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-03006");
+      assertThat(e).hasMessageStartingWith("DMN-03005");
     }
   }
 
@@ -1163,7 +1164,7 @@ public class HitPolicyTest extends DmnDecisionTest {
   @DecisionResource(resource = COLLECT_MIN_SINGLE)
   public void testCollectMinHitPolicySingleOutputMultipleMatchingRules() {
     DmnDecisionResult result = startDecision(true, true, false, 10, 20L, 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntryValue(10);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(10L);
 
     result = startDecision(true, false, true, 10, 20L, 30.034);
     assertThat(result).hasSingleOutput().hasSingleEntryValue(10.0);
@@ -1199,7 +1200,7 @@ public class HitPolicyTest extends DmnDecisionTest {
     assertThat(result).hasSingleOutput().hasSingleEntryValue(DOUBLE_MIN);
 
     result = startDecision(true, true, false, (byte) 1, (short) 2, 3f);
-    assertThat(result).hasSingleOutput().hasSingleEntryValue(1);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(1L);
 
     result = startDecision(true, false, true, (byte) 1, (short) 2, 3f);
     assertThat(result).hasSingleOutput().hasSingleEntryValue(1.0);
@@ -1215,7 +1216,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-03006");
+      assertThat(e).hasMessageStartingWith("DMN-03005");
     }
   }
 
@@ -1304,7 +1305,7 @@ public class HitPolicyTest extends DmnDecisionTest {
     assertThat(result).hasSingleOutput().hasSingleEntryValue(10);
 
     result = startDecision(false, true, false, 10, 20L, 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntryValue(20);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(20L);
 
     result = startDecision(false, false, true, 10, 20L, 30.034);
     assertThat(result).hasSingleOutput().hasSingleEntryValue(30.034);
@@ -1328,10 +1329,10 @@ public class HitPolicyTest extends DmnDecisionTest {
     assertThat(result).hasSingleOutput().hasSingleEntryValue(DOUBLE_MIN);
 
     result = startDecision(true, false, false, (byte) 1, (short) 2, 3f);
-    assertThat(result).hasSingleOutput().hasSingleEntryValue(1);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(1L);
 
     result = startDecision(false, true, false, (byte) 1, (short) 2, 3f);
-    assertThat(result).hasSingleOutput().hasSingleEntryValue(2);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(2L);
 
     result = startDecision(false, false, true, (byte) 1, (short) 2, 3f);
     assertThat(result).hasSingleOutput().hasSingleEntryValue(3.0);
@@ -1341,7 +1342,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-03006");
+      assertThat(e).hasMessageStartingWith("DMN-03005");
     }
   }
 
@@ -1349,7 +1350,7 @@ public class HitPolicyTest extends DmnDecisionTest {
   @DecisionResource(resource = COLLECT_MAX_SINGLE)
   public void testCollectMaxHitPolicySingleOutputMultipleMatchingRules() {
     DmnDecisionResult result = startDecision(true, true, false, 10, 20L, 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntryValue(20);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(20L);
 
     result = startDecision(true, false, true, 10, 20L, 30.034);
     assertThat(result).hasSingleOutput().hasSingleEntryValue(30.034);
@@ -1385,7 +1386,7 @@ public class HitPolicyTest extends DmnDecisionTest {
     assertThat(result).hasSingleOutput().hasSingleEntryValue((double) Integer.MIN_VALUE);
 
     result = startDecision(true, true, false, (byte) 1, (short) 2, 3f);
-    assertThat(result).hasSingleOutput().hasSingleEntryValue(2);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(2L);
 
     result = startDecision(true, false, true, (byte) 1, (short) 2, 3f);
     assertThat(result).hasSingleOutput().hasSingleEntryValue(3.0);
@@ -1401,7 +1402,7 @@ public class HitPolicyTest extends DmnDecisionTest {
       fail("Decision should not be evaluable");
     }
     catch (DmnHitPolicyException e) {
-      assertThat(e).hasMessageStartingWith("DMN-03006");
+      assertThat(e).hasMessageStartingWith("DMN-03005");
     }
   }
 
@@ -1480,43 +1481,43 @@ public class HitPolicyTest extends DmnDecisionTest {
   @DecisionResource(resource = COLLECT_COUNT_SINGLE)
   public void testCollectCountHitPolicySingleOutputNoMatchingRule() {
     DmnDecisionResult result = startDecision(false, false, false, 10, "b", 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntryValue(0L);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(0);
   }
 
   @Test
   @DecisionResource(resource = COLLECT_COUNT_SINGLE)
   public void testCollectCountHitPolicySingleOutputSingleMatchingRule() {
     DmnDecisionResult result = startDecision(true, false, false, 10, "b", 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntryValue(1L);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(1);
 
     result = startDecision(false, true, false, 10, "b", 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntryValue(1L);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(1);
 
     result = startDecision(false, false, true, 10, "b", 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntryValue(1L);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(1);
   }
 
   @Test
   @DecisionResource(resource = COLLECT_COUNT_SINGLE)
   public void testCollectCountHitPolicySingleOutputMultipleMatchingRules() {
     DmnDecisionResult result = startDecision(true, true, false, 10, "b", 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntryValue(2L);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(2);
 
     result = startDecision(true, false, true, 10, "b", 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntryValue(2L);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(2);
 
     result = startDecision(false, true, true, 10, "b", 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntryValue(2L);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(2);
 
     result = startDecision(true, true, true, 10, "b", 30.034);
-    assertThat(result).hasSingleOutput().hasSingleEntryValue(3L);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(3);
   }
 
   @Test
   @DecisionResource(resource = COLLECT_COUNT_COMPOUND)
   public void testCollectCountHitPolicyCompoundOutputNoMatchingRule() {
     DmnDecisionResult result = startDecision(false, false, false, "a", "b", "c");
-    assertThat(result).hasSingleOutput().hasSingleEntryValue(0L);
+    assertThat(result).hasSingleOutput().hasSingleEntryValue(0);
   }
 
   @Test
@@ -1582,7 +1583,6 @@ public class HitPolicyTest extends DmnDecisionTest {
       assertThat(e).hasMessageStartingWith("DMN-03004");
     }
   }
-
 
   // helper methods
 
