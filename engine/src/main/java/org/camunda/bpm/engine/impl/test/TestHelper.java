@@ -31,7 +31,6 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.SchemaOperationsProcessEngineBuild;
-import org.camunda.bpm.engine.impl.UserOperationLogQueryImpl;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmmn.deployer.CmmnDeployer;
@@ -264,6 +263,10 @@ public abstract class TestHelper {
     ProcessEngineConfigurationImpl processEngineConfiguration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();
     String databaseTablePrefix = processEngineConfiguration.getDatabaseTablePrefix().trim();
 
+    // clear user operation log in case some operations are
+    // executed with an authenticated user
+    clearUserOperationLog(processEngineConfiguration);
+
     log.fine("verifying that db is clean after test");
     Map<String, Long> tableCounts = processEngine.getManagementService().getTableCount();
 
@@ -441,12 +444,7 @@ public abstract class TestHelper {
       });
   }
 
-  /**
-   * Required when user operations are logged that are not directly associated with a single deployment
-   * (e.g. runtimeService.suspendProcessDefinitionByKey(..) with cascade to process instances)
-   * and therefore cannot be cleaned up automatically during undeployment.
-   */
-  public static void clearOpLog(ProcessEngineConfigurationImpl processEngineConfiguration) {
+  public static void clearUserOperationLog(ProcessEngineConfigurationImpl processEngineConfiguration) {
     if (processEngineConfiguration.getHistoryLevel().equals(HistoryLevel.HISTORY_LEVEL_FULL)) {
       HistoryService historyService = processEngineConfiguration.getHistoryService();
       List<UserOperationLogEntry> logs = historyService.createUserOperationLogQuery().list();

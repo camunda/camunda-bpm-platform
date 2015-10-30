@@ -94,9 +94,6 @@ public class DeploymentManager extends AbstractManager {
         // remove historic incidents which are not referenced to a process instance
         getHistoricIncidentManager().deleteHistoricIncidentsByProcessDefinitionId(processDefinitionId);
 
-        // remove historic op log entries which are not related to a process instance
-        getUserOperationLogManager().deleteOperationLogEntriesByProcessDefinitionId(processDefinitionId);
-
         // remove historic job log entries not related to a process instance
         getHistoricJobLogManager().deleteHistoricJobLogsByProcessDefinitionId(processDefinitionId);
       }

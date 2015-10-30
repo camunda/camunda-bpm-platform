@@ -34,15 +34,15 @@ public class EventSubscriptionAuthorizationTest extends AuthorizationTest {
   protected String deploymentId;
 
   public void setUp() throws Exception {
-    super.setUp();
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/api/oneMessageBoundaryEventProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/authorization/signalBoundaryEventProcess.bpmn20.xml").getId();
+    super.setUp();
   }
 
   public void tearDown() {
-    deleteDeployment(deploymentId);
     super.tearDown();
+    deleteDeployment(deploymentId);
   }
 
   public void testSimpleQueryWithoutAuthorization() {

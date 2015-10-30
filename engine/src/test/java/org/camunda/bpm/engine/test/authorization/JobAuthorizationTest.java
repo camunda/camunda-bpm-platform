@@ -47,14 +47,15 @@ public class JobAuthorizationTest extends AuthorizationTest {
   protected String deploymentId;
 
   public void setUp() throws Exception {
-    super.setUp();
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/authorization/timerStartEventProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/authorization/timerBoundaryEventProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/authorization/oneIncidentProcess.bpmn20.xml").getId();
+    super.setUp();
   }
 
   public void tearDown() {
+    super.tearDown();
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Object>() {
       public Object execute(CommandContext commandContext) {
@@ -63,7 +64,6 @@ public class JobAuthorizationTest extends AuthorizationTest {
       }
     });
     deleteDeployment(deploymentId);
-    super.tearDown();
   }
 
   // job query (jobs associated to a process) //////////////////////////////////////////////////
@@ -174,9 +174,6 @@ public class JobAuthorizationTest extends AuthorizationTest {
     assertNull(job.getProcessDefinitionKey());
 
     deleteJob(job.getId());
-
-    // clean operation log
-    clearOpLog();
   }
 
   // execute job ////////////////////////////////////////////////
@@ -285,9 +282,6 @@ public class JobAuthorizationTest extends AuthorizationTest {
     // then
     JobDefinition jobDefinition = selectJobDefinitionByProcessDefinitionKey(TIMER_START_PROCESS_KEY);
     assertTrue(jobDefinition.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   // delete job ////////////////////////////////////////////////
@@ -391,9 +385,6 @@ public class JobAuthorizationTest extends AuthorizationTest {
     // then
     Job job = selectJobById(jobId);
     assertNull(job);
-
-    // clean operation log
-    clearOpLog();
   }
 
   // set job retries ////////////////////////////////////////////////
@@ -504,9 +495,6 @@ public class JobAuthorizationTest extends AuthorizationTest {
     assertEquals(1, job.getRetries());
 
     deleteJob(jobId);
-
-    // clean operation log
-    clearOpLog();
   }
 
   // set job retries by job definition id ///////////////////////
@@ -713,9 +701,6 @@ public class JobAuthorizationTest extends AuthorizationTest {
     assertNull(job.getDuedate());
 
     deleteJob(jobId);
-
-    // clean operation log
-    clearOpLog();
   }
 
   // get exception stacktrace ///////////////////////////////////////////
@@ -822,9 +807,6 @@ public class JobAuthorizationTest extends AuthorizationTest {
     assertNull(jobExceptionStacktrace);
 
     deleteJob(jobId);
-
-    // clean operation log
-    clearOpLog();
   }
 
   // suspend job by id //////////////////////////////////////////
@@ -939,9 +921,6 @@ public class JobAuthorizationTest extends AuthorizationTest {
     assertTrue(job.isSuspended());
 
     deleteJob(jobId);
-
-    // clean operation log
-    clearOpLog();
   }
 
   // activate job by id //////////////////////////////////////////
@@ -1062,9 +1041,6 @@ public class JobAuthorizationTest extends AuthorizationTest {
     assertFalse(job.isSuspended());
 
     deleteJob(jobId);
-
-    // clean operation log
-    clearOpLog();
   }
 
   // suspend job by process instance id //////////////////////////////////////////
@@ -1679,9 +1655,6 @@ public class JobAuthorizationTest extends AuthorizationTest {
     Job job = selectJobByProcessInstanceId(processInstanceId);
     assertNotNull(job);
     assertTrue(job.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   public void testSuspendJobByProcessDefinitionKeyWihtUpdatePermissionOnProcessDefinition() {
@@ -1696,9 +1669,6 @@ public class JobAuthorizationTest extends AuthorizationTest {
     Job job = selectJobByProcessInstanceId(processInstanceId);
     assertNotNull(job);
     assertTrue(job.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   public void testSuspendJobByProcessDefinitionKeyWihtUpdatePermissionOnAnyProcessDefinition() {
@@ -1713,9 +1683,6 @@ public class JobAuthorizationTest extends AuthorizationTest {
     Job job = selectJobByProcessInstanceId(processInstanceId);
     assertNotNull(job);
     assertTrue(job.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   // activate job by process definition key //////////////////////////////////////////
@@ -1739,9 +1706,6 @@ public class JobAuthorizationTest extends AuthorizationTest {
       assertTextPresent(TIMER_BOUNDARY_PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
-
-    // clean operation log
-    clearOpLog();
   }
 
   public void testActivateJobByProcessDefinitionKeyWihtUpdatePermissionOnProcessInstance() {
@@ -1764,9 +1728,6 @@ public class JobAuthorizationTest extends AuthorizationTest {
       assertTextPresent(TIMER_BOUNDARY_PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
-
-    // clean operation log
-    clearOpLog();
   }
 
   public void testActivateJobByProcessDefinitionKeyWihtUpdatePermissionOnAnyProcessInstance() {
@@ -1782,9 +1743,6 @@ public class JobAuthorizationTest extends AuthorizationTest {
     Job job = selectJobByProcessInstanceId(processInstanceId);
     assertNotNull(job);
     assertFalse(job.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   public void testActivateJobByProcessDefinitionKeyWihtUpdatePermissionOnProcessDefinition() {
@@ -1800,9 +1758,6 @@ public class JobAuthorizationTest extends AuthorizationTest {
     Job job = selectJobByProcessInstanceId(processInstanceId);
     assertNotNull(job);
     assertFalse(job.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   public void testActivateJobByProcessDefinitionKeyWihtUpdatePermissionOnAnyProcessDefinition() {
@@ -1818,9 +1773,6 @@ public class JobAuthorizationTest extends AuthorizationTest {
     Job job = selectJobByProcessInstanceId(processInstanceId);
     assertNotNull(job);
     assertFalse(job.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   // helper /////////////////////////////////////////////////////

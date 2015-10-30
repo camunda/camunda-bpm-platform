@@ -58,7 +58,7 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
       Map<String, String> params = new HashMap<String, String>();
       params.put(key, value);
 
-      List<String> taskInstanceIds = (List<String>) getDbEntityManager()
+      List<String> taskInstanceIds = getDbEntityManager()
           .selectList("selectHistoricTaskInstanceIdsByParameters", params);
 
       for (String taskInstanceId : taskInstanceIds) {
@@ -118,10 +118,6 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
         commandContext
           .getAttachmentManager()
           .deleteAttachmentsByTaskId(taskId);
-
-        commandContext
-          .getOperationLogManager()
-          .deleteOperationLogEntriesByTaskId(taskId);
 
         getDbEntityManager().delete(historicTaskInstance);
       }

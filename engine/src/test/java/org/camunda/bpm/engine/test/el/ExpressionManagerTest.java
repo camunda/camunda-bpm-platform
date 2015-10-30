@@ -26,11 +26,6 @@ import org.camunda.bpm.engine.test.Deployment;
  */
 public class ExpressionManagerTest extends PluggableProcessEngineTestCase {
 
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
-  }
-
   @Deployment
   public void testMethodExpressions() {
     // Process contains 2 service tasks. one containing a method with no params, the other

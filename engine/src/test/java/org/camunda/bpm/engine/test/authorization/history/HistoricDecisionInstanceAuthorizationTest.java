@@ -38,19 +38,17 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
 
   @Override
   public void setUp() throws Exception {
-    super.setUp();
-
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.processWithBusinessRuleTask.bpmn20.xml",
         "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.decisionSingleOutput.dmn10.xml")
         .getId();
+    super.setUp();
   }
 
   @Override
   public void tearDown() {
-    deleteDeployment(deploymentId);
-
     super.tearDown();
+    deleteDeployment(deploymentId);
   }
 
   public void testQueryWithoutAuthorization() {

@@ -59,7 +59,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateJobDefinitionHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
-import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -402,8 +401,6 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertEquals("suspensionState", activateEntry.getProperty());
     assertEquals("active", activateEntry.getNewValue());
     assertNull(activateEntry.getOrgValue());
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   /**
@@ -494,8 +491,6 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertEquals("suspensionState", activateDefinitionEntry.getProperty());
     assertEquals("active", activateDefinitionEntry.getNewValue());
     assertNull(activateDefinitionEntry.getOrgValue());
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})
@@ -709,8 +704,6 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
         return null;
       }
     });
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   // ----- PROCESS INSTANCE MODIFICATION -----

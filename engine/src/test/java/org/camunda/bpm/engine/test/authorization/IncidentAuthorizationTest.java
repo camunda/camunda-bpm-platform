@@ -47,16 +47,16 @@ public class IncidentAuthorizationTest extends AuthorizationTest {
   protected String deploymentId;
 
   public void setUp() throws Exception {
-    super.setUp();
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/authorization/timerStartEventProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/authorization/oneIncidentProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/authorization/anotherOneIncidentProcess.bpmn20.xml").getId();
+    super.setUp();
   }
 
   public void tearDown() {
-    deleteDeployment(deploymentId);
     super.tearDown();
+    deleteDeployment(deploymentId);
   }
 
   public void testQueryForStandaloneIncidents() {
@@ -331,7 +331,6 @@ public class IncidentAuthorizationTest extends AuthorizationTest {
   }
 
   protected void clearDatabase() {
-    clearOpLog();
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Object>() {
       public Object execute(CommandContext commandContext) {

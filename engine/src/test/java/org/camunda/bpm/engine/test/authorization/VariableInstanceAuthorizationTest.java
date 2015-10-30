@@ -34,15 +34,15 @@ public class VariableInstanceAuthorizationTest extends AuthorizationTest {
   protected String deploymentId;
 
   public void setUp() throws Exception {
-    super.setUp();
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/authorization/oneTaskCase.cmmn").getId();
+    super.setUp();
   }
 
   public void tearDown() {
-    deleteDeployment(deploymentId);
     super.tearDown();
+    deleteDeployment(deploymentId);
   }
 
   public void testProcessVariableQueryWithoutAuthorization() {

@@ -38,15 +38,15 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
   protected String deploymentId;
 
   public void setUp() throws Exception {
-    super.setUp();
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/authorization/messageStartEventProcess.bpmn20.xml").getId();
+    super.setUp();
   }
 
   public void tearDown() {
-    deleteDeployment(deploymentId);
     super.tearDown();
+    deleteDeployment(deploymentId);
   }
 
   // historic process instance query //////////////////////////////////////////////////////////

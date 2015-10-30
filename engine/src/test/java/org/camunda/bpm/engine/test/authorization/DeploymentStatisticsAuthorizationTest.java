@@ -42,17 +42,17 @@ public class DeploymentStatisticsAuthorizationTest extends AuthorizationTest {
   protected String thirdDeploymentId;
 
   public void setUp() throws Exception {
-    super.setUp();
     firstDeploymentId = createDeployment("first", "org/camunda/bpm/engine/test/authorization/oneIncidentProcess.bpmn20.xml").getId();
     secondDeploymentId = createDeployment("second", "org/camunda/bpm/engine/test/authorization/timerStartEventProcess.bpmn20.xml").getId();
     thirdDeploymentId = createDeployment("third", "org/camunda/bpm/engine/test/authorization/timerBoundaryEventProcess.bpmn20.xml").getId();
+    super.setUp();
   }
 
   public void tearDown() {
+    super.tearDown();
     deleteDeployment(firstDeploymentId);
     deleteDeployment(secondDeploymentId);
     deleteDeployment(thirdDeploymentId);
-    super.tearDown();
   }
 
   // deployment statistics query without process instance authorizations /////////////////////////////////////////////

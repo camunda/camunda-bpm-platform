@@ -67,30 +67,6 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     return getDbEntityManager().selectList("selectUserOperationLogEntriesByQueryCriteria", query, page);
   }
 
-  public void deleteOperationLogEntriesByProcessInstanceId(String historicProcessInstanceId) {
-    getDbEntityManager().delete(UserOperationLogEntryEventEntity.class, "deleteUserOperationLogEntriesByProcessInstanceId", historicProcessInstanceId);
-  }
-
-  public void deleteOperationLogEntriesByCaseInstanceId(String caseInstanceId) {
-    getDbEntityManager().delete(UserOperationLogEntryEventEntity.class, "deleteUserOperationLogEntriesByCaseInstanceId", caseInstanceId);
-  }
-
-  public void deleteOperationLogEntriesByCaseDefinitionId(String caseInstanceId) {
-    getDbEntityManager().delete(UserOperationLogEntryEventEntity.class, "deleteUserOperationLogEntriesByCaseDefinitionId", caseInstanceId);
-  }
-
-  public void deleteOperationLogEntriesByTaskId(String taskId) {
-    getDbEntityManager().delete(UserOperationLogEntryEventEntity.class, "deleteUserOperationLogEntriesByTaskId", taskId);
-  }
-
-  public void deleteOperationLogEntriesByProcessDefinitionId(String processDefinitionId) {
-    getDbEntityManager().delete(UserOperationLogEntryEventEntity.class, "deleteUserOperationLogEntriesByProcessDefinitionId", processDefinitionId);
-  }
-
-  public void deleteOperationLogEntriesByProcessDefinitionKey(String processDefinitionKey) {
-    getDbEntityManager().delete(UserOperationLogEntryEventEntity.class, "deleteUserOperationLogEntriesByProcessDefinitionKey", processDefinitionKey);
-  }
-
   public void deleteOperationLogEntryById(String entryId) {
     if (isHistoryLevelFullEnabled()) {
       getDbEntityManager().delete(UserOperationLogEntryEventEntity.class, "deleteUserOperationLogEntryById", entryId);

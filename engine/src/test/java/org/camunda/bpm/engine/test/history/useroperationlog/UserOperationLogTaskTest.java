@@ -292,12 +292,15 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
     // and an op log entry with indirect reference to the process instance is created
     runtimeService.suspendProcessInstanceByProcessDefinitionId(processDefinition.getId());
 
-    // when...
-    // ...the deployment is deleted with cascade
+    // when
+    // the deployment is deleted with cascade
     repositoryService.deleteDeployment(deploymentId, true);
 
-    // then both op log entries are removed
-    assertEquals(0, historyService.createUserOperationLogQuery().count());
+    // then
+    UserOperationLogQuery query = historyService.createUserOperationLogQuery();
+    assertEquals(2, query.count());
+    assertEquals(1, query.operationType(UserOperationLogEntry.OPERATION_TYPE_SUSPEND).count());
+    assertEquals(1, query.operationType(UserOperationLogEntry.OPERATION_TYPE_RESOLVE).count());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})
