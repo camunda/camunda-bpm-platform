@@ -1,0 +1,15 @@
+<configuration>
+
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <layout class="ch.qos.logback.classic.PatternLayout">
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </layout>
+  </appender>
+  
+  <logger name="org.camunda" level="debug" />
+  
+  <root level="info">
+    <appender-ref ref="STDOUT" />
+  </root>
+  
+</configuration>

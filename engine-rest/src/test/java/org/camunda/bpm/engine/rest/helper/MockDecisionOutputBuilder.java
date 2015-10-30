@@ -14,7 +14,10 @@ package org.camunda.bpm.engine.rest.helper;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
@@ -27,20 +30,19 @@ public class MockDecisionOutputBuilder {
 
   protected final MockDecisionResultBuilder mockDecisionResultBuilder;
 
-  protected Map<String, Object> outputValues = new HashMap<String, Object>();
+  protected Map<String, TypedValue> outputValues = new HashMap<String, TypedValue>();
 
   public MockDecisionOutputBuilder(MockDecisionResultBuilder mockDecisionResultBuilder) {
     this.mockDecisionResultBuilder = mockDecisionResultBuilder;
   }
 
-  public MockDecisionOutputBuilder output(String key, Object value) {
+  public MockDecisionOutputBuilder output(String key, TypedValue value) {
     outputValues.put(key, value);
     return this;
   }
 
   public MockDecisionResultBuilder endDecisionOutput() {
-    SimpleDecisionOutput decisionOutput = new SimpleDecisionOutput();
-    decisionOutput.putAll(outputValues);
+    SimpleDecisionOutput decisionOutput = new SimpleDecisionOutput(outputValues);
 
     mockDecisionResultBuilder.addDecisionOutput(decisionOutput);
 
@@ -55,13 +57,20 @@ public class MockDecisionOutputBuilder {
     return endDecisionOutput().build();
   }
 
-  protected class SimpleDecisionOutput extends HashMap<String, Object>implements DmnDecisionOutput {
+  protected class SimpleDecisionOutput implements DmnDecisionOutput {
 
     private static final long serialVersionUID = 1L;
 
+    protected final Map<String, TypedValue> outputValues;
+
+    public SimpleDecisionOutput(Map<String, TypedValue> outputValues) {
+      this.outputValues = outputValues;
+    }
+
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T getValue(String name) {
-      throw new UnsupportedOperationException();
+      return (T) outputValues.get(name).getValue();
     }
 
     @Override
@@ -74,9 +83,10 @@ public class MockDecisionOutputBuilder {
       throw new UnsupportedOperationException();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends TypedValue> T getValueTyped(String name) {
-      throw new UnsupportedOperationException();
+      return (T) outputValues.get(name);
     }
 
     @Override
@@ -91,12 +101,37 @@ public class MockDecisionOutputBuilder {
 
     @Override
     public boolean containsKey(String key) {
-      return super.containsKey(key);
+      throw new UnsupportedOperationException();
     }
 
     @Override
     public Collection<TypedValue> valuesTyped() {
-      throw new UnsupportedOperationException();
+      return outputValues.values();
+    }
+
+    @Override
+    public int size() {
+      return outputValues.size();
+    }
+
+    @Override
+    public boolean isEmpty() {
+      return outputValues.isEmpty();
+    }
+
+    @Override
+    public Set<String> keySet() {
+      return outputValues.keySet();
+    }
+
+    @Override
+    public Collection<Object> values() {
+      List<Object> values = new LinkedList<Object>();
+
+      for(TypedValue typedValue : outputValues.values()) {
+        values.add(typedValue.getValue());
+      }
+      return values();
     }
 
   }

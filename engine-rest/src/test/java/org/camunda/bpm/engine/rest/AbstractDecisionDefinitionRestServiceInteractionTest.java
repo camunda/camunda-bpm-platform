@@ -47,6 +47,7 @@ import org.camunda.bpm.engine.rest.helper.MockDecisionResultBuilder;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.sub.repository.impl.ProcessDefinitionResourceImpl;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
+import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -325,7 +326,7 @@ public abstract class AbstractDecisionDefinitionRestServiceInteractionTest exten
   public void testEvaluateDecisionSingleDecisionOutput() {
     DmnDecisionResult decisionResult = new MockDecisionResultBuilder()
         .decisionOutput()
-          .output("status", "gold")
+          .output("status", Variables.stringValue("gold"))
         .build();
 
     when(decisionServiceMock.evaluateDecisionById(eq(MockProvider.EXAMPLE_DECISION_DEFINITION_ID), anyMapOf(String.class, Object.class)))
@@ -349,9 +350,9 @@ public abstract class AbstractDecisionDefinitionRestServiceInteractionTest exten
   public void testEvaluateDecisionMultipleDecisionOutputs() {
     DmnDecisionResult decisionResult = new MockDecisionResultBuilder()
         .decisionOutput()
-          .output("status", "gold")
+          .output("status", Variables.stringValue("gold"))
         .decisionOutput()
-          .output("assignee", "manager")
+          .output("assignee", Variables.stringValue("manager"))
         .build();
 
     when(decisionServiceMock.evaluateDecisionById(eq(MockProvider.EXAMPLE_DECISION_DEFINITION_ID), anyMapOf(String.class, Object.class)))
@@ -377,8 +378,8 @@ public abstract class AbstractDecisionDefinitionRestServiceInteractionTest exten
   public void testEvaluateDecisionMultipleDecisionValues() {
     DmnDecisionResult decisionResult = new MockDecisionResultBuilder()
         .decisionOutput()
-          .output("status", "gold")
-          .output("assignee", "manager")
+          .output("status", Variables.stringValue("gold"))
+          .output("assignee", Variables.stringValue("manager"))
         .build();
 
     when(decisionServiceMock.evaluateDecisionById(eq(MockProvider.EXAMPLE_DECISION_DEFINITION_ID), anyMapOf(String.class, Object.class)))

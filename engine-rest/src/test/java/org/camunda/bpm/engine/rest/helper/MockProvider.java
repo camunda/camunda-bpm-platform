@@ -658,7 +658,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_DECISION_DEFINITION_DIAGRAM_RESOURCE_NAME = "aResourceName.png";
 
   public static final String EXAMPLE_DECISION_OUTPUT_KEY = "aDecisionOutput";
-  public static final String EXAMPLE_DECISION_OUTPUT_VALUE = "aDecisionOutputValue";
+  public static final StringValue EXAMPLE_DECISION_OUTPUT_VALUE = Variables.stringValue("aDecisionOutputValue");
 
   // historic job log
 
