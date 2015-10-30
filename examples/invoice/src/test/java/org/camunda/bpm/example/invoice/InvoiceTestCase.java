@@ -3,12 +3,11 @@ package org.camunda.bpm.example.invoice;
 import static org.camunda.bpm.engine.variable.Variables.fileValue;
 
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.camunda.bpm.dmn.engine.impl.DmnDecisionOutputImpl;
-import org.camunda.bpm.dmn.engine.impl.DmnDecisionResultImpl;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.IdentityLink;
@@ -67,15 +66,6 @@ public class InvoiceTestCase extends ProcessEngineTestCase {
   public void testApproveInvoiceAssignment() {
     InputStream invoiceInputStream = InvoiceProcessApplication.class.getClassLoader().getResourceAsStream("invoice.pdf");
 
-    // create decision result
-    DmnDecisionResultImpl decisionResult = new DmnDecisionResultImpl();
-    DmnDecisionOutputImpl decisionOutput = new DmnDecisionOutputImpl();
-    decisionOutput.putValue("result", Variables.stringValue("sales"));
-    decisionResult.add(decisionOutput);
-    decisionOutput = new DmnDecisionOutputImpl();
-    decisionOutput.putValue("result", Variables.stringValue("accounting"));
-    decisionResult.add(decisionOutput);
-
     VariableMap variables = Variables.createVariables()
       .putValue("creditor", "Great Pizza for Everyone Inc.")
       .putValue("amount", 300.0d)
@@ -85,7 +75,7 @@ public class InvoiceTestCase extends ProcessEngineTestCase {
         .file(invoiceInputStream)
         .mimeType("application/pdf")
         .create())
-      .putValue("approverGroups", decisionResult);
+      .putValue("approverGroups", Arrays.asList("sales", "accounting"));
 
     ProcessInstance pi = runtimeService.createProcessInstanceByKey("invoice")
       .setVariables(variables)
