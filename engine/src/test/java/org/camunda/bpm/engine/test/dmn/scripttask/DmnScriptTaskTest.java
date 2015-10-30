@@ -13,8 +13,6 @@
 
 package org.camunda.bpm.engine.test.dmn.scripttask;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -23,15 +21,16 @@ import org.camunda.bpm.engine.variable.Variables;
 
 public class DmnScriptTaskTest extends PluggableProcessEngineTestCase {
 
-  public static final String RESULT_VARIABLE = "decisionResult";
+  protected static final String RESULT_VARIABLE = "result";
+  protected static final String REASON_VARIABLE = "reason";
 
-  public static final String RESULT_OK = "ok";
-  public static final String RESULT_NOTOK = "notok";
+  protected static final String RESULT_OK = "ok";
+  protected static final String RESULT_NOTOK = "notok";
 
-  public static final String REASON_BRONZE = "work on your status first, as bronze you're not going to get anything";
-  public static final String REASON_SILVER_OK = "you little fish will get what you want";
-  public static final String REASON_SILVER_NOTOK = "you took too much man, you took too much!";
-  public static final String REASON_GOLD = "you get anything you want";
+  protected static final String REASON_BRONZE = "work on your status first, as bronze you're not going to get anything";
+  protected static final String REASON_SILVER_OK = "you little fish will get what you want";
+  protected static final String REASON_SILVER_NOTOK = "you took too much man, you took too much!";
+  protected static final String REASON_GOLD = "you get anything you want";
 
   protected String processInstanceId;
 
@@ -114,15 +113,11 @@ public class DmnScriptTaskTest extends PluggableProcessEngineTestCase {
   }
 
   protected String getResultVariable() {
-    return getDecisionOutput().getValue("result");
+    return (String) runtimeService.getVariable(processInstanceId, RESULT_VARIABLE);
   }
 
   protected String getReasonVariable() {
-    return getDecisionOutput().getValue("reason");
-  }
-
-  protected DmnDecisionOutput getDecisionOutput() {
-    return (DmnDecisionOutput) ((DmnDecisionResult) runtimeService.getVariable(processInstanceId, RESULT_VARIABLE)).get(0);
+    return (String) runtimeService.getVariable(processInstanceId, REASON_VARIABLE);
   }
 
   protected void startProcess(VariableMap variables) {

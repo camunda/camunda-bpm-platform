@@ -14,136 +14,173 @@
 package org.camunda.bpm.engine.test.dmn;
 
 import java.util.Collections;
-import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.junit.Before;
+import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.variable.Variables;
 
 public class DmnScriptOutputTest extends PluggableProcessEngineTestCase {
 
-  public static final String TEST_PROCESS = "org/camunda/bpm/engine/test/dmn/DmnScriptOutputTest.bpmn20.xml";
-  public static final String TEST_DECISION = "org/camunda/bpm/engine/test/dmn/DmnScriptOutputTest.dmn10.xml";
+  protected static final String TEST_PROCESS = "org/camunda/bpm/engine/test/dmn/DmnScriptOutputTest.bpmn20.xml";
+  protected static final String TEST_DECISION = "org/camunda/bpm/engine/test/dmn/DmnScriptOutputTest.dmn10.xml";
+  protected static final String TEST_DECISION_COLLECT_SUM = "org/camunda/bpm/engine/test/dmn/DmnScriptOutputCollectSumHitPolicyTest.dmn10.xml";
+  protected static final String TEST_DECISION_COLLECT_COUNT = "org/camunda/bpm/engine/test/dmn/DmnScriptOutputCollectCountHitPolicyTest.dmn10.xml";
 
   protected DmnDecisionResult ruleResult;
-  protected DmnDecisionResult scriptResult;
 
-  @Before
-  public void setUp() {
-    deploymentId = repositoryService.createDeployment()
-      .addClasspathResource(TEST_PROCESS)
-      .addClasspathResource(TEST_DECISION)
-      .deploy().getId();
-  }
-
+  @Deployment(resources = { TEST_PROCESS, TEST_DECISION})
   public void testNoOutput() {
     startTestProcess("no output");
 
     assertTrue("The decision result 'ruleResult' should be empty", ruleResult.isEmpty());
-    assertTrue("The decision result 'scriptResult' should be empty", scriptResult.isEmpty());
   }
 
-  @SuppressWarnings("unchecked")
+  @Deployment(resources = { TEST_PROCESS, TEST_DECISION})
   public void testEmptyOutput() {
     startTestProcess("empty output");
 
     assertFalse("The decision result 'ruleResult' should not be empty", ruleResult.isEmpty());
-    assertFalse("The decision result 'scriptResult' should not be empty", scriptResult.isEmpty());
 
     DmnDecisionOutput decisionOutput = ruleResult.get(0);
     assertNull(decisionOutput.getFirstValue());
-
-    decisionOutput = scriptResult.get(0);
-    assertNull(decisionOutput.getFirstValue());
   }
 
-  @SuppressWarnings("unchecked")
+  @Deployment(resources = { TEST_PROCESS, TEST_DECISION})
   public void testEmptyMap() {
     startTestProcess("empty map");
 
     assertEquals(2, ruleResult.size());
-    assertEquals(2, scriptResult.size());
 
     for (DmnDecisionOutput output : ruleResult) {
       assertTrue("The decision output should be empty", output.isEmpty());
     }
-
-    for (DmnDecisionOutput output : scriptResult) {
-      assertTrue("The decision output should be empty", output.isEmpty());
-    }
   }
 
+  @Deployment(resources = { TEST_PROCESS, TEST_DECISION})
   public void testSingleEntry() {
     startTestProcess("single entry");
 
     DmnDecisionOutput firstOutput = ruleResult.get(0);
     assertEquals("foo", firstOutput.getFirstValue());
-
-    firstOutput = scriptResult.get(0);
-    assertEquals("foo", firstOutput.getFirstValue());
+    assertEquals(Variables.stringValue("foo"), firstOutput.getFirstValueTyped());
   }
 
-  @SuppressWarnings("unchecked")
+  @Deployment(resources = { TEST_PROCESS, TEST_DECISION})
   public void testMultipleEntries() {
     startTestProcess("multiple entries");
 
     DmnDecisionOutput firstOutput = ruleResult.get(0);
     assertEquals("foo", firstOutput.getValue("result1"));
-    assertEquals("foo", firstOutput.getValue("result2"));
+    assertEquals("bar", firstOutput.getValue("result2"));
 
-    firstOutput = scriptResult.get(0);
-    assertEquals("foo", firstOutput.get("result1"));
-    assertEquals("foo", firstOutput.get("result2"));
+    assertEquals(Variables.stringValue("foo"), firstOutput.getValueTyped("result1"));
+    assertEquals(Variables.stringValue("bar"), firstOutput.getValueTyped("result2"));
   }
 
-  @SuppressWarnings("unchecked")
+  @Deployment(resources = { TEST_PROCESS, TEST_DECISION})
   public void testSingleEntryList() {
     startTestProcess("single entry list");
 
     assertEquals(2, ruleResult.size());
-    assertEquals(2, scriptResult.size());
 
     for (DmnDecisionOutput output : ruleResult) {
       assertEquals("foo", output.getFirstValue());
-    }
-
-    for (DmnDecisionOutput output : scriptResult) {
-      assertEquals("foo", output.getFirstValue());
+      assertEquals(Variables.stringValue("foo"), output.getFirstValueTyped());
     }
   }
 
-  @SuppressWarnings("unchecked")
+  @Deployment(resources = { TEST_PROCESS, TEST_DECISION})
   public void testMultipleEntriesList() {
     startTestProcess("multiple entries list");
 
     assertEquals(2, ruleResult.size());
-    assertEquals(2, scriptResult.size());
 
-    for (Map<String, Object> output : ruleResult) {
+    for (DmnDecisionOutput output : ruleResult) {
       assertEquals(2, output.size());
-      assertEquals("foo", output.get("result1"));
-      assertEquals("foo", output.get("result2"));
-    }
+      assertEquals("foo", output.getValue("result1"));
+      assertEquals("bar", output.getValue("result2"));
 
-    for (Map<String, Object> output : scriptResult) {
-      assertEquals(2, output.size());
-      assertEquals("foo", output.get("result1"));
-      assertEquals("foo", output.get("result2"));
+      assertEquals(Variables.stringValue("foo"), output.getValueTyped("result1"));
+      assertEquals(Variables.stringValue("bar"), output.getValueTyped("result2"));
     }
   }
 
-  public ProcessInstance startTestProcess(String input) {
+  @Deployment(resources = { TEST_PROCESS, TEST_DECISION_COLLECT_COUNT })
+  public void testCollectCountHitPolicyNoOutput() {
+    startTestProcess("no output");
+
+    assertEquals(1, ruleResult.size());
+    DmnDecisionOutput firstOutput = ruleResult.get(0);
+
+    assertEquals(0, firstOutput.getFirstValue());
+    assertEquals(Variables.integerValue(0), firstOutput.getFirstValueTyped());
+  }
+
+  @Deployment(resources = { TEST_PROCESS, TEST_DECISION_COLLECT_SUM })
+  public void testCollectSumHitPolicyNoOutput() {
+    startTestProcess("no output");
+
+    assertTrue("The decision result 'ruleResult' should be empty", ruleResult.isEmpty());
+  }
+
+  @Deployment(resources = { TEST_PROCESS, TEST_DECISION_COLLECT_SUM })
+  public void testCollectSumHitPolicySingleEntry() {
+    startTestProcess("single entry");
+
+    assertEquals(1, ruleResult.size());
+    DmnDecisionOutput firstOutput = ruleResult.get(0);
+
+    assertEquals(12, firstOutput.getFirstValue());
+    assertEquals(Variables.integerValue(12), firstOutput.getFirstValueTyped());
+  }
+
+  @Deployment(resources = { TEST_PROCESS, TEST_DECISION_COLLECT_SUM })
+  public void testCollectSumHitPolicySingleEntryList() {
+    startTestProcess("single entry list");
+
+    assertEquals(1, ruleResult.size());
+    DmnDecisionOutput firstOutput = ruleResult.get(0);
+
+    assertEquals(33, firstOutput.getFirstValue());
+    assertEquals(Variables.integerValue(33), firstOutput.getFirstValueTyped());
+  }
+
+  @Deployment(resources = { TEST_PROCESS, TEST_DECISION })
+  public void testTransientDecisionResult() {
+    // when a decision is evaluated and the result is stored in a transient variable "ruleResult"
+    ProcessInstance processInstance = startTestProcess("single entry");
+
+    // then the variable should not be available outside the business rule task
+    assertNull(runtimeService.getVariable(processInstance.getId(), "ruleResult"));
+    // and should not create an entry in history since it is not persistent
+    assertNull(historyService.createHistoricVariableInstanceQuery().variableName("ruleResult").singleResult());
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/DmnScriptOutputMapping.bpmn20.xml", TEST_DECISION })
+  public void testDecisionResultOutputMapping() {
+    ProcessInstance processInstance = startTestProcess("single entry");
+
+    assertEquals("foo", runtimeService.getVariable(processInstance.getId(), "result"));
+    assertEquals(Variables.stringValue("foo"), runtimeService.getVariableTyped(processInstance.getId(), "result"));
+  }
+
+  protected ProcessInstance startTestProcess(String input) {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess", Collections.<String, Object>singletonMap("input", input));
 
-    ruleResult = (DmnDecisionResult) runtimeService.getVariable(processInstance.getId(), "ruleResult");
-    scriptResult = (DmnDecisionResult) runtimeService.getVariable(processInstance.getId(), "scriptResult");
-
+    // get the result from an execution listener that is invoked at the end of the business rule activity
+    ruleResult = DecisionResultTestListener.getDecisionResult();
     assertNotNull(ruleResult);
-    assertNotNull(scriptResult);
 
     return processInstance;
+  }
+
+  @Override
+  protected void tearDown() throws Exception {
+    // reset the invoked execution listener
+    DecisionResultTestListener.reset();
   }
 
 }

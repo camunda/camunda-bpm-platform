@@ -13,7 +13,14 @@
     <businessRuleTask id="task"
                       camunda:decisionRef="testDecision"
                       camunda:decisionRefBinding="deployment"
-                      camunda:resultVariable="decisionResult"/>
+                      camunda:resultVariable="decisionResult">
+                      
+      <extensionElements>
+        <camunda:inputOutput>
+          <camunda:outputParameter name="decisionResult">${decisionResult.getSingleOutput().getSingleValue()}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </extensionElements>
+    </businessRuleTask> 
     
     <sequenceFlow sourceRef="task" targetRef="end" />
 

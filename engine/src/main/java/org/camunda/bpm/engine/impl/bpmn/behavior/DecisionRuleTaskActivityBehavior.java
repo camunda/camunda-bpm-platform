@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.impl.core.model.BaseCallableElement;
 import org.camunda.bpm.engine.impl.delegate.DelegateInvocation;
 import org.camunda.bpm.engine.impl.dmn.invocation.DecisionInvocation;
 import org.camunda.bpm.engine.impl.dmn.invocation.VariableScopeContext;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.util.CallableElementUtil;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
@@ -62,7 +63,7 @@ public class DecisionRuleTaskActivityBehavior extends AbstractBpmnActivityBehavi
 
         Object result = invocation.getInvocationResult();
         if (result != null && resultVariable != null) {
-          execution.setVariable(resultVariable, result);
+          ((ExecutionEntity) execution).setVariableLocalTransient(resultVariable, result);
         }
 
         leave(execution);

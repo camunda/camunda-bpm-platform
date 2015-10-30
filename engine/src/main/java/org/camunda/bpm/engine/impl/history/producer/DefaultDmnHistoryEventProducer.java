@@ -23,6 +23,8 @@ import org.camunda.bpm.dmn.engine.DmnDecisionTableValue;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.history.HistoricDecisionInputInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionOutputInstance;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInputInstanceEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionOutputInstanceEntity;
@@ -33,12 +35,17 @@ import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.DoubleValue;
+import org.camunda.bpm.engine.variable.value.IntegerValue;
+import org.camunda.bpm.engine.variable.value.LongValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * @author Philipp Ossler
  */
 public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
+
+  protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
   @Override
   public HistoryEvent createDecisionEvaluatedEvt(DelegateExecution execution, DmnDecisionTable decisionTable, DmnDecisionTableResult decisionTableResult) {
@@ -83,7 +90,7 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     event.setDecisionDefinitionName(decisionTable.getName());
 
     if(decisionTableResult.getCollectResultValue() != null) {
-      double collectResultValue = decisionTableResult.getCollectResultValue().doubleValue();
+      Double collectResultValue = getCollectResultValue(decisionTableResult.getCollectResultValue());
       event.setCollectResultValue(collectResultValue);
     }
 
@@ -92,6 +99,23 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
 
     List<HistoricDecisionOutputInstance> historicDecisionOutputInstances = createHistoricDecisionOutputInstances(decisionTableResult);
     event.setOutputs(historicDecisionOutputInstances);
+  }
+
+  protected Double getCollectResultValue(TypedValue collectResultValue) {
+    // the built-in collect aggregators return only numbers
+
+    if(collectResultValue instanceof IntegerValue) {
+      return ((IntegerValue) collectResultValue).getValue().doubleValue();
+
+    } else if(collectResultValue instanceof LongValue) {
+      return ((LongValue) collectResultValue).getValue().doubleValue();
+
+    } else if(collectResultValue instanceof DoubleValue) {
+      return ((DoubleValue) collectResultValue).getValue().doubleValue();
+
+    } else {
+      throw LOG.collectResultValueOfUnsupportedTypeException(collectResultValue);
+    }
   }
 
   protected List<HistoricDecisionInputInstance> createHistoricDecisionInputInstances(DmnDecisionTableResult decisionTableResult) {

@@ -117,6 +117,7 @@ public abstract class AbstractPersistentVariableStore extends AbstractVariableSt
     return variable;
   }
 
+  @Override
   public void setVariableValue(CoreVariableInstance variableInstance, TypedValue value, AbstractVariableScope sourceActivityExecution) {
     VariableInstanceEntity variableInstanceEntity = (VariableInstanceEntity) variableInstance;
     variableInstanceEntity.setValue(value);
@@ -129,6 +130,7 @@ public abstract class AbstractPersistentVariableStore extends AbstractVariableSt
     fireVariableEvent(variableInstanceEntity, VariableListener.UPDATE, sourceActivityExecution);
   }
 
+  @Override
   public CoreVariableInstance createVariableInstance(String variableName, TypedValue value,
       AbstractVariableScope sourceActivityExecution) {
 
@@ -145,7 +147,6 @@ public abstract class AbstractPersistentVariableStore extends AbstractVariableSt
 
     return variableInstance;
   }
-
 
   protected boolean isAutoFireHistoryEvents() {
     return true;
@@ -207,6 +208,14 @@ public abstract class AbstractPersistentVariableStore extends AbstractVariableSt
 
   protected static void fireVariableEvent(VariableInstanceEntity variableInstance, String eventName, AbstractVariableScope sourceActivityExecution) {
     sourceActivityExecution.dispatchEvent(new VariableEvent(variableInstance, eventName, sourceActivityExecution));
+  }
+
+  public void createTransientVariable(String variableName, TypedValue value, AbstractVariableScope sourceActivityExecution) {
+    // only create the variable instance but do not insert it into the data base
+    VariableInstanceEntity variableInstance = VariableInstanceEntity.create(variableName, value);
+    variableInstance.setTransient(true);
+    initializeVariableInstanceBackPointer(variableInstance);
+    variableInstances.put(variableName, variableInstance);
   }
 
 }

@@ -42,6 +42,7 @@ import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.repository.DecisionDefinitionResource;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -144,11 +145,22 @@ public class DecisionDefinitionResourceImpl implements DecisionDefinitionResourc
     List<Map<String, VariableValueDto>> dto = new ArrayList<Map<String, VariableValueDto>>();
 
     for (DmnDecisionOutput decisionOutput : decisionResult) {
-      VariableMap variableMap = Variables.fromMap(decisionOutput);
-      dto.add(VariableValueDto.fromVariableMap(variableMap));
+      Map<String, VariableValueDto> decisionOutputDto = createDecisionOutputDto(decisionOutput);
+      dto.add(decisionOutputDto);
     }
 
     return dto;
+  }
+
+  protected Map<String, VariableValueDto> createDecisionOutputDto(DmnDecisionOutput decisionOutput) {
+    VariableMap variableMap = Variables.createVariables();
+
+    for(String key : decisionOutput.keySet()) {
+      TypedValue typedValue = decisionOutput.getValueTyped(key);
+      variableMap.putValueTyped(key, typedValue);
+    }
+
+    return VariableValueDto.fromVariableMap(variableMap);
   }
 
 }

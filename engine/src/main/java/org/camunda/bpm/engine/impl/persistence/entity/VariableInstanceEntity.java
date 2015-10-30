@@ -93,6 +93,11 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
    */
   protected boolean isConcurrentLocal = false;
 
+  /**
+   * Determines whether this variable is stored in the data base.
+   */
+  protected boolean isTransient = false;
+
   // Default constructor for SQL mapping
   public VariableInstanceEntity() {
     typedValueField.addImplicitUpdateListener(this);
@@ -121,15 +126,13 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   }
 
   public void delete() {
-
     // clear value
     clearValueFields();
 
-    // delete variable
-    Context
-      .getCommandContext()
-      .getDbEntityManager()
-      .delete(this);
+    if (!isTransient) {
+      // delete variable
+      Context.getCommandContext().getDbEntityManager().delete(this);
+    }
   }
 
   public Object getPersistentState() {
@@ -203,7 +206,11 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   }
 
   public void setByteArrayValue(byte[] bytes) {
-    byteArrayField.setByteArrayValue(bytes);
+    // avoid setting a byte array value for a transient variable because this
+    // would create and insert an entity in the data base
+    if (!isTransient) {
+      byteArrayField.setByteArrayValue(bytes);
+    }
   }
 
   protected void deleteByteArrayValue() {
@@ -503,5 +510,21 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     return true;
   }
 
+  /**
+   * @param isTransient
+   *          <code>true</code>, if the variable is not stored in the data base.
+   *          Default is <code>false</code>.
+   */
+  public void setTransient(boolean isTransient) {
+    this.isTransient = isTransient;
+  }
+
+  /**
+   * @return <code>true</code>, if the variable is transient. A transient
+   *         variable is not stored in the data base.
+   */
+  public boolean isTransient() {
+    return isTransient;
+  }
 
 }

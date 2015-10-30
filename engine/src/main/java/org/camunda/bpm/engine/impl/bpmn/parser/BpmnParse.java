@@ -1987,6 +1987,8 @@ public class BpmnParse extends Parse {
    */
   protected ActivityImpl parseDecisionBusinessRuleTask(Element businessRuleTaskElement, ScopeImpl scope) {
     ActivityImpl activity = createActivityOnScope(businessRuleTaskElement, scope);
+ // the activity is a scope since the result variable is stored as local variable
+    activity.setScope(true);
 
     parseAsynchronousContinuationForActivity(businessRuleTaskElement, activity);
 

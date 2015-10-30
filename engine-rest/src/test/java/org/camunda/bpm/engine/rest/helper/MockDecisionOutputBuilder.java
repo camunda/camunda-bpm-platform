@@ -12,11 +12,13 @@
  */
 package org.camunda.bpm.engine.rest.helper;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * @author Philipp Ossler
@@ -69,6 +71,31 @@ public class MockDecisionOutputBuilder {
 
     @Override
     public <T> T getSingleValue() {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T extends TypedValue> T getValueTyped(String name) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T extends TypedValue> T getFirstValueTyped() {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T extends TypedValue> T getSingleValueTyped() {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean containsKey(String key) {
+      return super.containsKey(key);
+    }
+
+    @Override
+    public Collection<TypedValue> valuesTyped() {
       throw new UnsupportedOperationException();
     }
 

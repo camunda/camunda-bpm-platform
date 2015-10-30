@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.engine.test.dmn.businessruletask;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.engine.exception.dmn.DecisionDefinitionNotFoundException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -34,18 +33,10 @@ public class DmnBusinessRuleTaskTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = { DECISION_PROCESS, DECISION_PROCESS_EXPRESSION, DECISION_OKAY_DMN })
   public void testDecisionRef() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
-
-    DmnDecisionResult decisionResult = (DmnDecisionResult) runtimeService.getVariable(processInstance.getId(), "decisionResult");
-
-    assertNotNull(decisionResult);
-    assertEquals("okay", decisionResult.getFirstOutput().getFirstValue());
+    assertEquals("okay", getDecisionResult(processInstance));
 
     processInstance = startExpressionProcess("testDecision", 1);
-
-    decisionResult = (DmnDecisionResult) runtimeService.getVariable(processInstance.getId(), "decisionResult");
-
-    assertNotNull(decisionResult);
-    assertEquals("okay", decisionResult.getFirstOutput().getFirstValue());
+    assertEquals("okay", getDecisionResult(processInstance));
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_PROCESS_EXPRESSION })
@@ -72,11 +63,7 @@ public class DmnBusinessRuleTaskTest extends PluggableProcessEngineTestCase {
     String secondDeploymentId = repositoryService.createDeployment().addClasspathResource(DECISION_NOT_OKAY_DMN).deploy().getId();
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
-
-    DmnDecisionResult decisionResult = (DmnDecisionResult) runtimeService.getVariable(processInstance.getId(), "decisionResult");
-
-    assertNotNull(decisionResult);
-    assertEquals("not okay", decisionResult.getFirstOutput().getFirstValue());
+    assertEquals("not okay", getDecisionResult(processInstance));
 
     repositoryService.deleteDeployment(secondDeploymentId, true);
   }
@@ -86,11 +73,7 @@ public class DmnBusinessRuleTaskTest extends PluggableProcessEngineTestCase {
     String secondDeploymentId = repositoryService.createDeployment().addClasspathResource(DECISION_NOT_OKAY_DMN).deploy().getId();
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
-
-    DmnDecisionResult decisionResult = (DmnDecisionResult) runtimeService.getVariable(processInstance.getId(), "decisionResult");
-
-    assertNotNull(decisionResult);
-    assertEquals("okay", decisionResult.getFirstOutput().getFirstValue());
+    assertEquals("okay", getDecisionResult(processInstance));
 
     repositoryService.deleteDeployment(secondDeploymentId, true);
   }
@@ -101,18 +84,10 @@ public class DmnBusinessRuleTaskTest extends PluggableProcessEngineTestCase {
     String thirdDeploymentId = repositoryService.createDeployment().addClasspathResource(DECISION_OKAY_DMN).deploy().getId();
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess");
-
-    DmnDecisionResult decisionResult = (DmnDecisionResult) runtimeService.getVariable(processInstance.getId(), "decisionResult");
-
-    assertNotNull(decisionResult);
-    assertEquals("not okay", decisionResult.getFirstOutput().getFirstValue());
+    assertEquals("not okay", getDecisionResult(processInstance));
 
     processInstance = startExpressionProcess("testDecision", 2);
-
-    decisionResult = (DmnDecisionResult) runtimeService.getVariable(processInstance.getId(), "decisionResult");
-
-    assertNotNull(decisionResult);
-    assertEquals("not okay", decisionResult.getFirstOutput().getFirstValue());
+    assertEquals("not okay", getDecisionResult(processInstance));
 
     repositoryService.deleteDeployment(secondDeploymentId, true);
     repositoryService.deleteDeployment(thirdDeploymentId, true);
@@ -123,6 +98,11 @@ public class DmnBusinessRuleTaskTest extends PluggableProcessEngineTestCase {
         .putValue("decision", decisionKey)
         .putValue("version", version);
     return runtimeService.startProcessInstanceByKey("testProcessExpression", variables);
+  }
+
+  protected Object getDecisionResult(ProcessInstance processInstance) {
+    // the single value of the single output of the decision result is stored as process variable
+    return runtimeService.getVariable(processInstance.getId(), "decisionResult");
   }
 
 }

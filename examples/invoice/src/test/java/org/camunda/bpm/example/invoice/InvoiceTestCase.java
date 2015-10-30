@@ -70,10 +70,10 @@ public class InvoiceTestCase extends ProcessEngineTestCase {
     // create decision result
     DmnDecisionResultImpl decisionResult = new DmnDecisionResultImpl();
     DmnDecisionOutputImpl decisionOutput = new DmnDecisionOutputImpl();
-    decisionOutput.put("result", "sales");
+    decisionOutput.putValue("result", Variables.stringValue("sales"));
     decisionResult.add(decisionOutput);
     decisionOutput = new DmnDecisionOutputImpl();
-    decisionOutput.put("result", "accounting");
+    decisionOutput.putValue("result", Variables.stringValue("accounting"));
     decisionResult.add(decisionOutput);
 
     VariableMap variables = Variables.createVariables()

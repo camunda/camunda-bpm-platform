@@ -311,6 +311,18 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
 
   }
 
+  /**
+   * Sets a variable in the local scope. In contrast to
+   * {@link #setVariableLocal(String, Object)}, the variable is transient that
+   * means it will not be stored in the data base. For example, a transient
+   * variable can be used for a result variable that is only available for
+   * output mapping.
+   */
+  public void setVariableLocalTransient(String variableName, Object value) {
+    TypedValue typedValue = Variables.untypedValue(value);
+    getVariableStore().createTransientVariable(variableName, typedValue, getSourceActivityVariableScope());
+  }
+
   public void removeVariable(String variableName) {
     removeVariable(variableName, getSourceActivityVariableScope());
   }

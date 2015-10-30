@@ -7,18 +7,19 @@
 
     <startEvent id="start" />
 
-    <sequenceFlow sourceRef="start" targetRef="task" />
+    <sequenceFlow sourceRef="start" targetRef="ruleTask" />
 
-    <businessRuleTask id="task" camunda:decisionRef="testDecision"
-      camunda:resultVariable="decisionResult">
+    <businessRuleTask id="ruleTask"
+      camunda:decisionRef="testDecision" camunda:resultVariable="ruleResult">
       <extensionElements>
         <camunda:inputOutput>
-          <camunda:outputParameter name="decisionResult">${decisionResult.getSingleOutput().getSingleValue()}</camunda:outputParameter>
+          <camunda:outputParameter name="result">${ruleResult.getSingleOutput().getSingleValue()}</camunda:outputParameter>
         </camunda:inputOutput>
+        <camunda:executionListener class="org.camunda.bpm.engine.test.dmn.DecisionResultTestListener" event="end" />
       </extensionElements>
     </businessRuleTask>
 
-    <sequenceFlow sourceRef="task" targetRef="end" />
+    <sequenceFlow sourceRef="ruleTask" targetRef="end" />
 
     <endEvent id="end" camunda:asyncBefore="true" />
 
