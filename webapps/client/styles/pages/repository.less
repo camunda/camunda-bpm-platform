@@ -223,14 +223,20 @@ ul.deployments {
     }
   }
 
-  .deployment-action {
-    display: inline-block;
-    /*position: absolute;*/
-    padding: 0 4px;
+  .deployment-actions {
+    position: absolute;
+    bottom: 4px;
+    left: 8px;
+    right: 8px;
+    text-align: left;
     font-size: small;
+    z-index: 10;
     display: none;
-    left: 2px;
-    bottom: 2px;
+
+    > view {
+      display: inline-block;
+      margin-right: 8px;
+    }
   }
 
   > li {
@@ -242,14 +248,14 @@ ul.deployments {
     text-align: right;
     z-index: 1;
 
+    &:hover .deployment-actions {
+      display: block;
+    }
+
     &:first-of-type {
       margin-top: 0;
     }
 
-    &:hover .deployment-action {
-      z-index: 10;
-      display: inline-block;
-    }
 
     &.active {
       background-color: @body-bg;

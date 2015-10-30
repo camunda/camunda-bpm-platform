@@ -1,7 +1,8 @@
-<view class="deployment-action"
-      ng-repeat="deploymentPlugin in deploymentPlugins"
-      provider="deploymentPlugin"
-      vars="deploymentVars" />
+<div class="deployment-actions">
+  <view ng-repeat="deploymentPlugin in deploymentPlugins"
+        provider="deploymentPlugin"
+        vars="deploymentVars" />
+</div>
 
 <h4 class="name">{{ deployment.name || deployment.id }}</h4>
 
