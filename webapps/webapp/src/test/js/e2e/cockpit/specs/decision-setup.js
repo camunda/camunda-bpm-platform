@@ -41,10 +41,38 @@ var deploySecond = operation('deployment', 'create', [{
   }]
 }]);
 
+var deployThird = combine(
+
+operation('deployment', 'create', [{
+  deploymentName: 'assign-approver-without-clause-name',
+  files: [{
+    name: 'assign-approver-groups-clauses-without-name.dmn',
+    content: fs.readFileSync(__dirname + '/../../resources/assign-approver-groups-clauses-without-name.dmn').toString()
+  }]
+},{
+  deploymentName: 'invoice',
+  files: [{
+    name: 'invoice.bpmn',
+    content: fs.readFileSync(__dirname + '/../../resources/invoice.bpmn').toString()
+  }]
+}
+]),
+
+operation('process-definition', 'start', [{
+  key: 'invoice',
+  businessKey: 'invoice1',
+  variables: {
+    amount: { value: 100 },
+    invoiceCategory: { value: 'travelExpenses' }
+  }
+}])
+
+);
 
 module.exports = {
 
   setup1: deployFirst,
-  setup2: combine(deployFirst, deploySecond)
+  setup2: combine(deployFirst, deploySecond),
+  setup3: deployThird
 
 };

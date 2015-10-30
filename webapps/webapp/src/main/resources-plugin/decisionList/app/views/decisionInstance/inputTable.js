@@ -21,7 +21,7 @@ function(angular, template) {
             variable: {
               type: variable.type,
               value: variable.value,
-              name: variable.clauseName,
+              name: variable.clauseName || variable.clauseId,
               valueInfo: variable.valueInfo
             }
           };

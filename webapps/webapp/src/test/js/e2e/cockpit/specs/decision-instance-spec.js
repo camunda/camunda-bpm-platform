@@ -132,6 +132,47 @@ describe('Cockpit Decision Instance Spec', function() {
 
   });
 
+  describe('in-/outputs without clause name', function() {
+
+    before(function() {
+      return testHelper(setupFile.setup3, function() {
+
+        dashboardPage.navigateToWebapp('Cockpit');
+        dashboardPage.authentication.userLogin('admin', 'admin');
+      });
+    });
+
+    it('should go to decision instance view', function() {
+
+      // when
+      dashboardPage.deployedDecisionsList.selectDecision(0);
+      definitionPage.decisionInstancesTab.selectInstanceId(0);
+
+      // then
+      expect(instancePage.pageHeader().getText()).to.eventually.match(/DECISION INSTANCE/);
+    });
+
+
+    it('show inputs clause id', function() {
+
+      // when
+      instancePage.inputsTab.selectTab();
+
+      // then
+      expect(instancePage.inputsTab.variableName(0)).to.eventually.eql('clause1');
+    });
+
+
+    it('show outputs clause id', function() {
+
+      // when
+      instancePage.outputsTab.selectTab();
+
+      // then
+      expect(instancePage.outputsTab.variableName(0)).to.eventually.eql('clause3');
+    });
+
+  });
 
   describe('actions', function() {
 
