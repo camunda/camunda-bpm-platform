@@ -112,6 +112,13 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.apache.tomcat.embed</groupId>
+      <artifactId>tomcat-embed-logging-juli</artifactId>
+      <version>${version.tomcat}</version>
+      <scope>test</scope>
+    </dependency>
+
     <!-- has to be below resteasy otherwise a wrong class is loaded for reasteasy 3.0.8.Final -->
     <dependency>
       <groupId>org.jboss.spec</groupId>
