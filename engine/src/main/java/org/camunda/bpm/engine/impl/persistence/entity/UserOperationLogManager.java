@@ -12,9 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import org.camunda.bpm.engine.EntityTypes;
@@ -29,7 +27,6 @@ import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContext;
-import org.camunda.bpm.engine.impl.oplog.UserOperationLogContextEntry;
 import org.camunda.bpm.engine.impl.oplog.UserOperationLogContextEntryBuilder;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
 
@@ -39,18 +36,6 @@ import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
  * @author Danny Gräf
  */
 public class UserOperationLogManager extends AbstractHistoricManager {
-
-  // LEGACY: task events are always written to user operation log
-  protected static List<String> taskEvents = new ArrayList<String>();
-  static {
-    taskEvents.add(UserOperationLogEntry.OPERATION_TYPE_ADD_USER_LINK);
-    taskEvents.add(UserOperationLogEntry.OPERATION_TYPE_ADD_USER_LINK);
-    taskEvents.add(UserOperationLogEntry.OPERATION_TYPE_DELETE_USER_LINK);
-    taskEvents.add(UserOperationLogEntry.OPERATION_TYPE_ADD_GROUP_LINK);
-    taskEvents.add(UserOperationLogEntry.OPERATION_TYPE_DELETE_GROUP_LINK);
-    taskEvents.add(UserOperationLogEntry.OPERATION_TYPE_ADD_ATTACHMENT);
-    taskEvents.add(UserOperationLogEntry.OPERATION_TYPE_DELETE_ATTACHMENT);
-  }
 
   public UserOperationLogEntry findOperationLogById(String entryId) {
     return getDbEntityManager().selectById(UserOperationLogEntryEventEntity.class, entryId);
@@ -74,44 +59,25 @@ public class UserOperationLogManager extends AbstractHistoricManager {
   }
 
   protected void fireUserOperationLog(UserOperationLogContext context) {
-    if (isHistoryLevelFullEnabled()) {
+    context.setUserId(getAuthenticatedUserId());
 
-      context.setUserId(getAuthenticatedUserId());
+    ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
 
-      ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
+    HistoryEventProducer eventProducer = configuration.getHistoryEventProducer();
+    HistoryEventHandler eventHandler = configuration.getHistoryEventHandler();
 
-      HistoryEventProducer eventProducer = configuration.getHistoryEventProducer();
-      HistoryEventHandler eventHandler = configuration.getHistoryEventHandler();
-
-      List<HistoryEvent> historyEvents = eventProducer.createUserOperationLogEvents(context);
-      eventHandler.handleEvents(historyEvents);
-    }
+    List<HistoryEvent> historyEvents = eventProducer.createUserOperationLogEvents(context);
+    eventHandler.handleEvents(historyEvents);
   }
 
   public void logUserOperations(UserOperationLogContext context) {
-    if (isHistoryLevelFullEnabled()) {
-
-      if (!(isUserOperationLogEnabledOnCommandContext() && isUserAuthenticated()) && !isLegacyUserOperationLogEnabled()) {
-
-        List<UserOperationLogContextEntry> entries = context.getEntries();
-        Iterator<UserOperationLogContextEntry> iterator = entries.iterator();
-
-        while(iterator.hasNext()) {
-          UserOperationLogContextEntry entry = iterator.next();
-          // log only task events
-          if (!isTaskEvent(entry.getOperationType())) {
-            iterator.remove();
-          }
-        }
-      }
-
+    if (isUserOperationLogEnabled()) {
       fireUserOperationLog(context);
-
     }
   }
 
   public void logTaskOperations(String operation, TaskEntity task, List<PropertyChange> propertyChanges) {
-    if (isUserOperationLogEnabled(operation)) {
+    if (isUserOperationLogEnabled()) {
       UserOperationLogContext context = new UserOperationLogContext();
       UserOperationLogContextEntryBuilder entryBuilder =
           UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.TASK)
@@ -123,7 +89,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
   }
 
   public void logLinkOperation(String operation, TaskEntity task, PropertyChange propertyChange) {
-    if (isUserOperationLogEnabled(operation)) {
+    if (isUserOperationLogEnabled()) {
       UserOperationLogContext context = new UserOperationLogContext();
       UserOperationLogContextEntryBuilder entryBuilder =
           UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.IDENTITY_LINK)
@@ -135,7 +101,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
   }
 
   public void logProcessInstanceOperation(String operation, String processInstanceId, String processDefinitionId, String processDefinitionKey, PropertyChange propertyChange) {
-    if (isUserOperationLogEnabled(operation)) {
+    if (isUserOperationLogEnabled()) {
 
       UserOperationLogContext context = new UserOperationLogContext();
       UserOperationLogContextEntryBuilder entryBuilder =
@@ -166,7 +132,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
 
   public void logProcessDefinitionOperation(String operation, String processDefinitionId, String processDefinitionKey,
       PropertyChange propertyChange) {
-    if (isUserOperationLogEnabled(operation)) {
+    if (isUserOperationLogEnabled()) {
 
       UserOperationLogContext context = new UserOperationLogContext();
       UserOperationLogContextEntryBuilder entryBuilder =
@@ -188,7 +154,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
 
   public void logJobOperation(String operation, String jobId, String jobDefinitionId, String processInstanceId,
       String processDefinitionId, String processDefinitionKey, PropertyChange propertyChange) {
-    if (isUserOperationLogEnabled(operation)) {
+    if (isUserOperationLogEnabled()) {
 
       UserOperationLogContext context = new UserOperationLogContext();
       UserOperationLogContextEntryBuilder entryBuilder =
@@ -236,7 +202,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
 
   public void logJobDefinitionOperation(String operation, String jobDefinitionId, String processDefinitionId,
       String processDefinitionKey, PropertyChange propertyChange) {
-    if(isUserOperationLogEnabled(operation)) {
+    if(isUserOperationLogEnabled()) {
       UserOperationLogContext context = new UserOperationLogContext();
       UserOperationLogContextEntryBuilder entryBuilder =
           UserOperationLogContextEntryBuilder.entry(operation, EntityTypes.JOB_DEFINITION)
@@ -267,7 +233,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
   }
 
   public void logAttachmentOperation(String operation, TaskEntity task, PropertyChange propertyChange) {
-    if (isUserOperationLogEnabled(operation)) {
+    if (isUserOperationLogEnabled()) {
       UserOperationLogContext context = new UserOperationLogContext();
 
       UserOperationLogContextEntryBuilder entryBuilder =
@@ -280,7 +246,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
   }
 
   public void logVariableOperation(String operation, String executionId, String taskId, PropertyChange propertyChange) {
-    if(isUserOperationLogEnabled(operation)) {
+    if(isUserOperationLogEnabled()) {
 
       UserOperationLogContext context = new UserOperationLogContext();
 
@@ -303,7 +269,7 @@ public class UserOperationLogManager extends AbstractHistoricManager {
   }
 
   public void logDeploymentOperation(String operation, String deploymentId, List<PropertyChange> propertyChanges) {
-    if(isUserOperationLogEnabled(operation)) {
+    if(isUserOperationLogEnabled()) {
 
       UserOperationLogContext context = new UserOperationLogContext();
 
@@ -318,9 +284,9 @@ public class UserOperationLogManager extends AbstractHistoricManager {
 
   }
 
-  protected boolean isUserOperationLogEnabled(String operation) {
+  protected boolean isUserOperationLogEnabled() {
     return isHistoryLevelFullEnabled() &&
-        (isLegacyUserOperationLogEnabled() || (isUserOperationLogEnabledOnCommandContext() && isUserAuthenticated()) || isTaskEvent(operation));
+        (isLegacyUserOperationLogEnabled() || (isUserOperationLogEnabledOnCommandContext() && isUserAuthenticated()));
   }
 
   protected boolean isUserAuthenticated() {
@@ -340,10 +306,6 @@ public class UserOperationLogManager extends AbstractHistoricManager {
 
   protected boolean isUserOperationLogEnabledOnCommandContext() {
     return Context.getCommandContext().isUserOperationLogEnabled();
-  }
-
-  protected boolean isTaskEvent(String operation) {
-    return taskEvents.contains(operation);
   }
 
 }
