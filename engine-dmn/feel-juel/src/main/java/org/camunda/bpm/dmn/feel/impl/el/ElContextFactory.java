@@ -16,7 +16,7 @@ package org.camunda.bpm.dmn.feel.impl.el;
 import javax.el.ELContext;
 import javax.el.ExpressionFactory;
 
-import org.camunda.bpm.engine.variable.VariableContext;
+import org.camunda.bpm.engine.variable.context.VariableContext;
 
 public interface ElContextFactory {
 

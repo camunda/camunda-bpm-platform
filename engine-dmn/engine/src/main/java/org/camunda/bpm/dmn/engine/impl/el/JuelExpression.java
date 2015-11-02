@@ -16,7 +16,7 @@ import javax.el.ELContext;
 import javax.el.ValueExpression;
 
 import org.camunda.bpm.dmn.engine.el.ElExpression;
-import org.camunda.bpm.engine.variable.VariableContext;
+import org.camunda.bpm.engine.variable.context.VariableContext;
 
 /**
  * @author Daniel Meyer

@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.script.Bindings;
 
-import org.camunda.bpm.engine.variable.VariableContext;
+import org.camunda.bpm.engine.variable.context.VariableContext;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**

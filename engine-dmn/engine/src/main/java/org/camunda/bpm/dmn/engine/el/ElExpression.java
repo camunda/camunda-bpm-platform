@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.dmn.engine.el;
 
-import org.camunda.bpm.engine.variable.VariableContext;
+import org.camunda.bpm.engine.variable.context.VariableContext;
 
 /**
  * @author Daniel Meyer

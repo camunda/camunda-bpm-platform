@@ -13,8 +13,6 @@
 
 package org.camunda.bpm.dmn.feel.impl;
 
-import java.util.Map;
-
 import javax.el.ELContext;
 import javax.el.ELException;
 import javax.el.ExpressionFactory;
@@ -27,9 +25,7 @@ import org.camunda.bpm.dmn.feel.FeelMissingFunctionException;
 import org.camunda.bpm.dmn.feel.FeelMissingVariableException;
 import org.camunda.bpm.dmn.feel.impl.el.ElContextFactory;
 import org.camunda.bpm.dmn.feel.impl.transform.FeelToJuelTransform;
-import org.camunda.bpm.engine.variable.VariableContext;
-import org.camunda.bpm.engine.variable.VariableMap;
-import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.context.VariableContext;
 
 public class FeelEngineImpl implements FeelEngine {
 

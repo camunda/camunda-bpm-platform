@@ -15,7 +15,7 @@ package org.camunda.bpm.dmn.engine.context;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
-import org.camunda.bpm.engine.variable.VariableContext;
+import org.camunda.bpm.engine.variable.context.VariableContext;
 
 public interface DmnDecisionContext {
 

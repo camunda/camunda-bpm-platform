@@ -23,7 +23,7 @@ import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnDecisionModel;
 import org.camunda.bpm.dmn.engine.DmnExpressionException;
 import org.camunda.bpm.dmn.engine.test.DmnDecisionTest;
-import org.camunda.bpm.engine.variable.VariableContext;
+import org.camunda.bpm.engine.variable.context.VariableContext;
 import org.junit.Before;
 import org.junit.Test;
 

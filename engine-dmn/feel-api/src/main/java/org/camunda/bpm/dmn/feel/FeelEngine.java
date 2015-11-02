@@ -13,7 +13,7 @@
 
 package org.camunda.bpm.dmn.feel;
 
-import org.camunda.bpm.engine.variable.VariableContext;
+import org.camunda.bpm.engine.variable.context.VariableContext;
 
 public interface FeelEngine {
 
@@ -21,7 +21,7 @@ public interface FeelEngine {
    * Evaluate a FEEL simple expression
    *
    * @param simpleExpression the simple expression to evaluate
-   * @param variables the variables which are available
+   * @param variableContext the variable context which are available
    * @param <T> the expected return type
    * @return the result of the simple expression
    * @throws FeelException if the expression cannot be evaluated
@@ -33,7 +33,7 @@ public interface FeelEngine {
    *
    * @param simpleUnaryTests the simple unary tests expression to evaluate
    * @param inputName the name of the variable which is tested
-   * @param variables the variables which are available
+   * @param variableContext the variable context are available
    * @return the result of the simple unary tests expression
    * @throws FeelException if the expression cannot be evaluated
    */

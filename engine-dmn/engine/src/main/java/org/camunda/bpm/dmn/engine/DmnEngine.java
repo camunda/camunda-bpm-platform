@@ -16,7 +16,7 @@ package org.camunda.bpm.dmn.engine;
 import java.io.InputStream;
 import java.util.Map;
 
-import org.camunda.bpm.engine.variable.VariableContext;
+import org.camunda.bpm.engine.variable.context.VariableContext;
 import org.camunda.bpm.model.dmn.DmnModelInstance;
 
 public interface DmnEngine {

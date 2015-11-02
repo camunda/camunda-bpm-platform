@@ -36,9 +36,9 @@ import org.camunda.bpm.dmn.feel.FeelEngine;
 import org.camunda.bpm.dmn.feel.FeelEngineProvider;
 import org.camunda.bpm.dmn.feel.FeelException;
 import org.camunda.bpm.dmn.feel.impl.FeelEngineProviderImpl;
-import org.camunda.bpm.engine.variable.VariableContext;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.context.VariableContext;
 import org.camunda.bpm.engine.variable.value.DateValue;
 import org.junit.Test;
 

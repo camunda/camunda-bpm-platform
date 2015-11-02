@@ -19,7 +19,7 @@ import javax.el.VariableMapper;
 
 import org.camunda.bpm.dmn.feel.impl.FeelEngineLogger;
 import org.camunda.bpm.dmn.feel.impl.FeelLogger;
-import org.camunda.bpm.engine.variable.VariableContext;
+import org.camunda.bpm.engine.variable.context.VariableContext;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 public class FeelTypedVariableMapper extends VariableMapper {

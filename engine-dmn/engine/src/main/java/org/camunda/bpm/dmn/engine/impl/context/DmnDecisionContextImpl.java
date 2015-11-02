@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
@@ -49,8 +48,8 @@ import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableValueImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnEngineConfigurationImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnEngineLogger;
 import org.camunda.bpm.dmn.feel.FeelEngine;
-import org.camunda.bpm.engine.variable.VariableContext;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.context.VariableContext;
 import org.camunda.bpm.engine.variable.impl.context.CompositeVariableContext;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.bpm.model.dmn.HitPolicy;

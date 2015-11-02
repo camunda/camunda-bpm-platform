@@ -23,8 +23,7 @@ import javax.el.ListELResolver;
 import javax.el.MapELResolver;
 import javax.el.VariableMapper;
 
-import org.camunda.bpm.engine.variable.VariableContext;
-import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.context.VariableContext;
 
 public class FeelElContextFactory implements ElContextFactory {
 
