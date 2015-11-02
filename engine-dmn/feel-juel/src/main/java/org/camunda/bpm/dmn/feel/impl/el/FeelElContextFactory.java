@@ -13,17 +13,15 @@
 
 package org.camunda.bpm.dmn.feel.impl.el;
 
-import javax.el.ArrayELResolver;
-import javax.el.CompositeELResolver;
 import javax.el.ELContext;
 import javax.el.ELResolver;
 import javax.el.ExpressionFactory;
 import javax.el.FunctionMapper;
-import javax.el.ListELResolver;
-import javax.el.MapELResolver;
 import javax.el.VariableMapper;
 
 import org.camunda.bpm.engine.variable.context.VariableContext;
+
+import de.odysseus.el.util.SimpleResolver;
 
 public class FeelElContextFactory implements ElContextFactory {
 
@@ -35,12 +33,7 @@ public class FeelElContextFactory implements ElContextFactory {
   }
 
   public ELResolver createElResolver() {
-    CompositeELResolver elResolver = new CompositeELResolver();
-    elResolver.add(new ArrayELResolver(true));
-    elResolver.add(new ListELResolver(true));
-    elResolver.add(new MapELResolver(true));
-
-    return elResolver;
+    return new SimpleResolver(true);
   }
 
   public FunctionMapper createFunctionMapper() {

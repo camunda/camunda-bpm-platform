@@ -342,6 +342,15 @@ public class FeelEngineTest {
     assertEvaluatesToTrue(0, " not( 13 ,\t>0)\t");
   }
 
+  @Test
+  public void testPojo() {
+    variables.putValue("pojo", new TestPojo("foo", 13.37));
+    assertEvaluatesToTrue("foo", "pojo.foo");
+    assertEvaluatesToFalse("camunda", "pojo.foo");
+    assertEvaluatesToTrue(12, "<= pojo.bar");
+    assertEvaluatesToFalse(13.33, ">= pojo.bar");
+  }
+
   public void assertEvaluatesToTrue(Object input, String feelExpression) {
     boolean result = evaluateFeel(input, feelExpression);
     assertThat(result).isTrue();
@@ -360,6 +369,33 @@ public class FeelEngineTest {
   protected DateValue parseDateAndTime(String dateAndTimeString) {
     Date date = FeelFunctionMapper.parseDateAndTime(dateAndTimeString);
     return Variables.dateValue(date);
+  }
+
+  public class TestPojo {
+
+    protected String foo;
+    protected Double bar;
+
+    public TestPojo(String foo, Double bar) {
+      this.foo = foo;
+      this.bar = bar;
+    }
+
+    public String getFoo() {
+      return foo;
+    }
+
+    public Double getBar() {
+      return bar;
+    }
+
+    public String toString() {
+      return "TestPojo{" +
+        "foo='" + foo + '\'' +
+        ", bar=" + bar +
+        '}';
+    }
+
   }
 
 }
