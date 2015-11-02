@@ -58,8 +58,8 @@ define(['angular', 'text!./identity-links-modal.html', 'text!./user-tasks-table.
 
 
     ngModule.controller('UserTaskController', [
-            '$scope', 'search', 'TaskResource', 'Notifications', '$modal',
-    function($scope,   search,   TaskResource,   Notifications,   $modal) {
+            '$scope', 'search', 'camAPI', 'TaskResource', 'Notifications', '$modal',
+    function($scope,   search,   camAPI,   TaskResource,   Notifications,   $modal) {
 
       // input: processInstance, processData
 
@@ -73,6 +73,8 @@ define(['angular', 'text!./identity-links-modal.html', 'text!./user-tasks-table.
       var pages = $scope.pages = angular.copy(DEFAULT_PAGES);
 
       var filter = null;
+
+      var Task = camAPI.resource('task');
 
       $scope.$watch('pages.current', function(newValue, oldValue) {
         if (newValue == oldValue) {
@@ -207,86 +209,122 @@ define(['angular', 'text!./identity-links-modal.html', 'text!./user-tasks-table.
         );
       };
 
-      $scope.openDialog = function(userTask, groups) {
-        $modal.open({
-          resolve: {
-            userTask: function() { return userTask; },
-            groups: function() { return groups; }
-          },
-          controller: 'UserTaskGroupController',
-          // quick fix, should probably use the URI service...
-          template: identityLinksTemplate
-        });
-      };
-
-      $scope.changeGroups = function() {
-        var userTask = this.userTask;
+      $scope.openDialog = function(userTask, decorator) {
 
         // 1. load the identityLinks
-        TaskResource.getIdentityLinks({id: userTask.id}, {}).$promise.then(function(response) {
-          // 2. filter the response.data to exclude links who have no groupId or have type 'assignee' or 'owner'
-          // var groups = compact(map(response.data, function(item) {
-          var groups = compact(map(response, function(item) {
-            var ok = item.groupId && item.type !== 'assignee' && item.type !== 'owner';
+        Task.identityLinks(userTask.id, function (err, response) {
+
+          // 2. filter the response.data to exclude links
+          var identityLinks = compact(map(response, function(item) {
+            var ok = item[decorator.key] && item.type !== 'assignee' && item.type !== 'owner';
             return ok ? item : null;
           }));
 
           // 3. open a dialog
-          $scope.openDialog(userTask, groups);
+          $modal.open({
+            resolve: {
+              userTask: function() { return userTask; },
+              identityLinks: function() { return identityLinks; },
+              decorator: function() { return decorator }
+            },
+            controller: 'IdentityLinksController',
+            template: identityLinksTemplate,
+            windowClass:  'identity-link-modal'
+          });
+        });
+
+      };
+
+      $scope.changeGroupIdentityLinks = function() {
+        var userTask = this.userTask;
+
+        $scope.openDialog(userTask, {
+          title: 'Manage groups',
+          table: {
+            label: 'Current group(s)',
+            id: 'Group ID'
+          },
+          add: {
+            label: 'Add a group'
+          },
+          notifications: {
+            remove: 'Could not remove group',
+            add: 'Could not add group'
+          },
+          key: 'groupId'
         });
       };
 
+      $scope.changeUserIdentityLinks = function() {
+        var userTask = this.userTask;
+
+        $scope.openDialog(userTask, {
+          title: 'Manage users',
+          table: {
+            label: 'Current user(s)',
+            id: 'User ID'
+          },
+          add: {
+            label: 'Add a user'
+          },
+          notifications: {
+            remove: 'Could not remove user',
+            add: 'Could not add user'
+          },
+          key: 'userId'
+        });
+      };
 
       $scope.getExceptionForUserTask = function (userTask) {
         return taskIdIdToExceptionMessageMap[userTask.id];
       };
+
     }]);
 
-    ngModule.controller('UserTaskGroupController', [
-            '$modalInstance', 'TaskResource', '$scope', 'Notifications', 'userTask', 'groups',
-    function($modalInstance,   TaskResource,   $scope,   Notifications,   userTask,   groups) {
-      $scope.groups = groups;
+    ngModule.controller('IdentityLinksController', [
+            '$modalInstance', 'camAPI', '$scope', 'Notifications', 'userTask', 'identityLinks', 'decorator',
+    function($modalInstance,   camAPI,   $scope,   Notifications,   userTask,   identityLinks,   decorator) {
 
-      $scope.title = 'Manage groups';
+      var Task = camAPI.resource('task');
 
-      $scope.labelKey = 'groupId';
+      $scope.identityLinks = identityLinks;
+      $scope.decorator = decorator;
 
-      $scope.buttons = [
-        {
-          cssClass: 'btn',
-          label: 'Close'
-        }
-      ];
+      $scope.title = decorator.title;
+      var key = $scope.key = decorator.key;
 
       $scope.removeItem = function() {
         var delta = this.delta;
-        TaskResource.deleteIdentityLink({
-          id: userTask.id
-        }, angular.toJson(this.group)).$promise.then(function() {
-          // deleting an entry is not enough, we need to "rebuild" the groups array
-          // delete $scope.groups[delta];
-          $scope.groups = compact(map($scope.groups, function(g, d) {
+
+        Task.identityLinksDelete(userTask.id, this.identityLink, function (err) {
+
+          if (err) {
+            return Notifications.addError({
+              status: decorator.notifications.remove,
+              message: err.message,
+              exclusive: true
+            });
+          }
+
+          // deleting an entry is not enough, we need to "rebuild" the identiy links
+          identityLinks = $scope.identityLinks = compact(map(identityLinks, function(g, d) {
             return delta !== d ? g : false;
           }));
-        }, function(error) {
-          Notifications.addError({
-            status: 'Could not remove group',
-            message: error.data.message,
-            exclusive: true
-          });
+
         });
       };
 
       $scope.invalid = function() {
         var editForm = this.editForm;
+
         if (editForm.$invalid) {
           return true;
         }
 
         var exists;
         var newItem = editForm.newItem.$modelValue;
-        angular.forEach($scope.groups, function(group) {
-          exists = (exists || (group.groupId === newItem));
+        angular.forEach(identityLinks, function(identityLink) {
+          exists = (exists || (identityLink[key] === newItem));
         });
 
         return exists;
@@ -295,27 +333,28 @@ define(['angular', 'text!./identity-links-modal.html', 'text!./user-tasks-table.
       $scope.addItem = function() {
         var editForm = this;
 
-
-        var newGroup = {
-          type: 'candidate',
-          groupId: editForm.newItem
+        var newIdentityLink = {
+          type: 'candidate'
         };
 
-        TaskResource.addIdentityLink({
-          id: userTask.id
-        }, newGroup).$promise.then(function() {
-          $scope.groups.push(newGroup);
+        newIdentityLink[key] = editForm.newItem
+
+        Task.identityLinksAdd(userTask.id, newIdentityLink, function(err) {
+
+          if (err) {
+            return Notifications.addError({
+              status: decorator.notifications.add,
+              message: err.message,
+              exclusive: true
+            });
+          }
+
+          identityLinks.push(newIdentityLink);
           editForm.newItem = '';
-        }, function(error) {
-          Notifications.addError({
-            status: 'Could not add group',
-            message: error.data.message,
-            exclusive: true
-          });
+
         });
       };
 
-      $scope.close = $modalInstance.close;
     }]);
 
     var Configuration = function(ViewsProvider) {

@@ -56,11 +56,18 @@
         </td>
 
         <td class="action">
-          <a ng-click="changeGroups()"
+          <a ng-click="changeGroupIdentityLinks()"
              ng-model="userTask"
-             class="btn btn-default action-button"
+             class="btn btn-default action-button change-group-identity-links"
              tooltip-placement="left"
              tooltip="Manage group(s) for '{{ userTask.name || userTask.id }}'">
+            <span class="glyphicon glyphicon-th"></span>
+          </a>
+          <a ng-click="changeUserIdentityLinks()"
+             ng-model="userTask"
+             class="btn btn-default action-button change-user-identity-links"
+             tooltip-placement="left"
+             tooltip="Manage user(s) for '{{ userTask.name || userTask.id }}'">
             <span class="glyphicon glyphicon-user"></span>
           </a>
         </td>

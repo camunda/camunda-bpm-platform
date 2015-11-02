@@ -125,6 +125,118 @@ describe('Cockpit Process Instance Spec', function() {
 
   });
 
+  describe('edit User Task identity links', function() {
+
+    before(function() {
+      return testHelper(setupFile.setup1, function() {
+        dashboardPage.navigateToWebapp('Cockpit');
+        dashboardPage.authentication.userLogin('admin', 'admin');
+        dashboardPage.deployedProcessesList.selectProcess(0);
+        definitionPage.processInstancesTab.selectInstanceId(0);
+        instancePage.userTasksTab.selectTab();
+      });
+    });
+
+    describe('edit group identity links', function() {
+
+      before(function() {
+        instancePage.userTasksTab.clickChangeGroupIdentityLinksButton();
+      });
+
+      it('opens', function() {
+        expect(instancePage.userTasksTab.modal.dialog().isDisplayed()).to.eventually.eql(true);
+      });
+
+
+      it('has a title', function() {
+        expect(instancePage.userTasksTab.modal.title()).to.eventually.eql('Manage groups');
+      });
+
+
+      it('initially contains two groups', function () {
+        expect(instancePage.userTasksTab.modal.elements().count()).to.eventually.eql(2);
+      });
+
+
+      it('adds a new group identity link', function() {
+        // when
+        instancePage.userTasksTab.modal.nameInput().clear().sendKeys('my-super-group');
+        instancePage.userTasksTab.modal.clickAddNameButton();
+
+        // then
+        expect(instancePage.userTasksTab.modal.elements().count()).to.eventually.eql(3);
+      });
+
+      it('deletes a group identity link', function() {
+        // when
+        instancePage.userTasksTab.modal.clickDeleteNameButton('my-super-group');
+
+        // then
+        expect(instancePage.userTasksTab.modal.elements().count()).to.eventually.eql(2);
+      });
+
+
+      it('closes the dialog', function() {
+        // when
+        instancePage.userTasksTab.modal.clickCloseButton();
+
+        // then
+        expect(instancePage.userTasksTab.modal.dialog().isPresent()).to.eventually.eql(false);
+      });
+
+    });
+
+
+    describe('edit user identity links', function() {
+
+      before(function() {
+        instancePage.userTasksTab.clickChangeUserIdentityLinksButton();
+      });
+
+      it('opens', function() {
+        expect(instancePage.userTasksTab.modal.dialog().isDisplayed()).to.eventually.eql(true);
+      });
+
+
+      it('has a title', function() {
+        expect(instancePage.userTasksTab.modal.title()).to.eventually.eql('Manage users');
+      });
+
+
+      it('initially contains no users', function () {
+        expect(instancePage.userTasksTab.modal.elements().count()).to.eventually.eql(0);
+      });
+
+
+      it('adds a new user identity link', function() {
+        // when
+        instancePage.userTasksTab.modal.nameInput().clear().sendKeys('superman');
+        instancePage.userTasksTab.modal.clickAddNameButton();
+
+        // then
+        expect(instancePage.userTasksTab.modal.elements().count()).to.eventually.eql(1);
+      });
+
+      it('deletes a group identity link', function() {
+        // when
+        instancePage.userTasksTab.modal.clickDeleteNameButton('superman');
+
+        // then
+        expect(instancePage.userTasksTab.modal.elements().count()).to.eventually.eql(0);
+      });
+
+
+      it('closes the dialog', function() {
+        // when
+        instancePage.userTasksTab.modal.clickCloseButton();
+
+        // then
+        expect(instancePage.userTasksTab.modal.dialog().isPresent()).to.eventually.eql(false);
+      });
+
+    });
+
+  });
 
   describe('diagram interaction', function() {
 

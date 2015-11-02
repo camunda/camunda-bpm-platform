@@ -13,6 +13,7 @@ var CancelInstanceModalPage = require('./action-bar/cancel-instance-modal');
 var RetryFailedJobPage = require('./action-bar/retry-failed-job');
 var SuspensionModalPage = require('./action-bar/suspension-modal');
 var InstanceTreePage = require('./instance-tree');
+var IdentityLinksModalPage = require('./modals/identity-links-modal');
 
 module.exports = new ProcessInstancePage();
 module.exports.diagram = new DiagramPage();
@@ -20,6 +21,7 @@ module.exports.variablesTab = new TableVariablesPage();
 module.exports.incidentsTab = new TableIncidentsPage();
 module.exports.calledInstancesTab = new TableCalledInstancesPage();
 module.exports.userTasksTab = new TableUserTasksPage();
+module.exports.userTasksTab.modal = new IdentityLinksModalPage();
 module.exports.addVariable = new AddVariablePage();
 module.exports.suspension = new SuspensionPage();
 module.exports.suspension.modal = new SuspensionModalPage();
