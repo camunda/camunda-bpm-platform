@@ -13,12 +13,8 @@
 
 package org.camunda.bpm.dmn.engine;
 
-import java.util.List;
+public interface DmnOutputEntry extends DmnExpression {
 
-public interface DmnRule extends DmnElement {
-
-  List<DmnInputEntry> getInputEntries();
-
-  List<DmnOutputEntry> getOutputEntries();
+  DmnOutput getOutput();
 
 }

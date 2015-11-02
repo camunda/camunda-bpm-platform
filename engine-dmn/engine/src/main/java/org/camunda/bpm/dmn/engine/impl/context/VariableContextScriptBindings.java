@@ -26,7 +26,7 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
  * {@link VariableContext} and {@link Bindings} instance.
  *
  * Enhances the Bindings with the variables resolvable through the {@link VariableContext}.
- * The variables are reated as read only: all mutating operations write through to the
+ * The variables are treated as read only: all mutating operations write through to the
  * wrapped {@link Bindings}.
  *
  * @author Daniel Meyer

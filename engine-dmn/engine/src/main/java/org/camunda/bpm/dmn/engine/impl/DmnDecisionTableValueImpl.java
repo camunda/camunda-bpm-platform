@@ -13,8 +13,9 @@
 
 package org.camunda.bpm.dmn.engine.impl;
 
-import org.camunda.bpm.dmn.engine.DmnClause;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableValue;
+import org.camunda.bpm.dmn.engine.DmnInput;
+import org.camunda.bpm.dmn.engine.DmnOutput;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 public class DmnDecisionTableValueImpl implements DmnDecisionTableValue {
@@ -24,14 +25,16 @@ public class DmnDecisionTableValueImpl implements DmnDecisionTableValue {
   protected String outputName;
   protected TypedValue value;
 
-  public DmnDecisionTableValueImpl() {
-
+  public DmnDecisionTableValueImpl(DmnInput dmnInput) {
+    this.key = dmnInput.getKey();
+    this.name = dmnInput.getName();
+    this.outputName = dmnInput.getOutputName();
   }
 
-  public DmnDecisionTableValueImpl(DmnClause clause) {
-    this.key = clause.getKey();
-    this.name = clause.getName();
-    this.outputName = clause.getOutputName();
+  public DmnDecisionTableValueImpl(DmnOutput dmnOutput) {
+    this.key = dmnOutput.getKey();
+    this.name = dmnOutput.getName();
+    this.outputName = dmnOutput.getOutputName();
   }
 
   public String getKey() {

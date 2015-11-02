@@ -23,10 +23,6 @@ public interface DmnDecisionModel extends DmnElement {
 
   String getNamespace();
 
-  List<DmnItemDefinition> getItemDefinitions();
-
-  DmnItemDefinition getItemDefinition(String itemDefinitionKey);
-
   <T extends DmnDecision> List<T> getDecisions();
 
   <T  extends DmnDecision> T getDecision(String decisionKey);

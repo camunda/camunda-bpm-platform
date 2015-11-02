@@ -38,7 +38,7 @@ public abstract class AbstractDmnElementHandler<E extends DmnElement, I extends 
   }
 
   protected void initName(DmnElementHandlerContext context, DmnElement element, I dmnElement) {
-    dmnElement.setName(element.getName());
+    dmnElement.setName(element.getLabel());
   }
 
 }

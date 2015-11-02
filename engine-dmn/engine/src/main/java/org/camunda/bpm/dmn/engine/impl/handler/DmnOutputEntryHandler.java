@@ -13,8 +13,14 @@
 
 package org.camunda.bpm.dmn.engine.impl.handler;
 
+import org.camunda.bpm.dmn.engine.handler.DmnElementHandlerContext;
+import org.camunda.bpm.dmn.engine.impl.DmnOutputEntryImpl;
 import org.camunda.bpm.model.dmn.instance.OutputEntry;
 
-public class DmnOutputEntryHandler extends AbstractDmnClauseHandler<OutputEntry> {
+public class DmnOutputEntryHandler extends AbstractDmnLiteralExpressionHandler<OutputEntry, DmnOutputEntryImpl> {
+
+  protected DmnOutputEntryImpl createElement(DmnElementHandlerContext context, OutputEntry expression) {
+    return new DmnOutputEntryImpl();
+  }
 
 }

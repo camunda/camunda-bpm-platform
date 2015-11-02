@@ -21,7 +21,6 @@ import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnDecisionModel;
-import org.camunda.bpm.dmn.engine.DmnItemDefinition;
 
 public class DmnDecisionModelImpl extends DmnElementImpl implements DmnDecisionModel {
 
@@ -29,7 +28,6 @@ public class DmnDecisionModelImpl extends DmnElementImpl implements DmnDecisionM
   protected String typeLanguage;
   protected String namespace;
 
-  protected Map<String, DmnItemDefinition> itemDefinitions = new HashMap<String, DmnItemDefinition>();
   protected Map<String, DmnDecision> decisions = new HashMap<String, DmnDecision>();
 
   public String getExpressionLanguage() {
@@ -54,25 +52,6 @@ public class DmnDecisionModelImpl extends DmnElementImpl implements DmnDecisionM
 
   public void setNamespace(String namespace) {
     this.namespace = namespace;
-  }
-
-  public List<DmnItemDefinition> getItemDefinitions() {
-    return new ArrayList<DmnItemDefinition>(itemDefinitions.values());
-  }
-
-  public void setItemDefinitions(Collection<DmnItemDefinition> itemDefinitions) {
-    this.itemDefinitions.clear();
-    for (DmnItemDefinition itemDefinition : itemDefinitions) {
-      addItemDefinition(itemDefinition);
-    }
-  }
-
-  public void addItemDefinition(DmnItemDefinition itemDefinition) {
-    itemDefinitions.put(itemDefinition.getKey(), itemDefinition);
-  }
-
-  public DmnItemDefinition getItemDefinition(String itemDefinitionKey) {
-    return itemDefinitions.get(itemDefinitionKey);
   }
 
   @SuppressWarnings("unchecked")
@@ -103,7 +82,6 @@ public class DmnDecisionModelImpl extends DmnElementImpl implements DmnDecisionM
       ", expressionLanguage='" + expressionLanguage + '\'' +
       ", typeLanguage='" + typeLanguage + '\'' +
       ", namespace='" + namespace + '\'' +
-      ", itemDefinitions=" + itemDefinitions +
       ", decisions=" + decisions +
       '}';
   }

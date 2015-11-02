@@ -13,7 +13,6 @@
 
 package org.camunda.bpm.dmn.engine.hitpolicy;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.camunda.bpm.dmn.engine.test.asserts.DmnAssertions.assertThat;
 

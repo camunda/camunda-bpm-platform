@@ -55,17 +55,17 @@ public class FeelIntegrationTest extends DmnDecisionTest {
 
   @Test
   public void testDefaultEngineFeelInvocation() {
-    int numberOfInputEntries = 5;
+    int numberOfNotEmptyInputEntries = 6;
     int numberOfExampleInvocations = 4;
     assertExample(engine);
 
-    verify(feelEngine, times(numberOfInputEntries * numberOfExampleInvocations))
+    verify(feelEngine, times(numberOfNotEmptyInputEntries * numberOfExampleInvocations))
       .evaluateSimpleUnaryTests(anyString(), anyString(), any(VariableContext.class));
   }
 
   @Test
   public void testFeelAlternativeName() {
-    int numberOfInputEntries = 5;
+    int numberOfNotEmptyInputEntries = 6;
     int numberOfExampleInvocations = 4;
 
     DmnEngineConfigurationImpl dmnEngineConfiguration = (DmnEngineConfigurationImpl) createDmnEngineConfiguration();
@@ -74,7 +74,7 @@ public class FeelIntegrationTest extends DmnDecisionTest {
 
     assertExample(dmnEngine);
 
-    verify(feelEngine, times(numberOfInputEntries * numberOfExampleInvocations)).evaluateSimpleUnaryTests(anyString(), anyString(), any(VariableContext.class));
+    verify(feelEngine, times(numberOfNotEmptyInputEntries * numberOfExampleInvocations)).evaluateSimpleUnaryTests(anyString(), anyString(), any(VariableContext.class));
   }
 
   @Test

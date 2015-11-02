@@ -37,4 +37,8 @@ public abstract class AbstractDmnDecisionTableHandler<E extends DmnDecisionTable
     dmnElement.setAggregation(decisionTable.getAggregation());
   }
 
+  protected void initName(DmnElementHandlerContext context, Decision decision, E dmnElement) {
+    dmnElement.setName(decision.getName());
+  }
+
 }

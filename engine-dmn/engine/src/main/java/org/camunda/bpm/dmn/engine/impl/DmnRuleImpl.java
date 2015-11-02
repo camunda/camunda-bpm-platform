@@ -16,45 +16,45 @@ package org.camunda.bpm.dmn.engine.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.dmn.engine.DmnClauseEntry;
+import org.camunda.bpm.dmn.engine.DmnInputEntry;
+import org.camunda.bpm.dmn.engine.DmnOutputEntry;
 import org.camunda.bpm.dmn.engine.DmnRule;
 
 public class DmnRuleImpl extends DmnElementImpl implements DmnRule {
 
-  protected List<DmnClauseEntry> conditions = new ArrayList<DmnClauseEntry>();
-  protected List<DmnClauseEntry> conclusions = new ArrayList<DmnClauseEntry>();
+  protected List<DmnInputEntry> inputEntries = new ArrayList<DmnInputEntry>();
+  protected List<DmnOutputEntry> outputEntries = new ArrayList<DmnOutputEntry>();
 
-  public List<DmnClauseEntry> getConditions() {
-    return conditions;
+  public List<DmnInputEntry> getInputEntries() {
+    return inputEntries;
   }
 
-  public void setConditions(List<DmnClauseEntry> conditions) {
-    this.conditions = conditions;
+  public void setInputEntries(List<DmnInputEntry> inputEntries) {
+    this.inputEntries = inputEntries;
   }
 
-  public void addCondition(DmnClauseEntry condition) {
-    conditions.add(condition);
+  public void addInputEntry(DmnInputEntry inputEntry) {
+    inputEntries.add(inputEntry);
   }
 
-  public List<DmnClauseEntry> getConclusions() {
-    return conclusions;
+  public List<DmnOutputEntry> getOutputEntries() {
+    return outputEntries;
   }
 
-  public void setConclusions(List<DmnClauseEntry> conclusions) {
-    this.conclusions = conclusions;
+  public void setOutputEntries(List<DmnOutputEntry> outputEntries) {
+    this.outputEntries = outputEntries;
   }
 
-  public void addConclusion(DmnClauseEntry conclusion) {
-    conclusions.add(conclusion);
+  public void addOutputEntry(DmnOutputEntry outputEntry) {
+    outputEntries.add(outputEntry);
   }
 
   public String toString() {
     return "DmnRuleImpl{" +
       "key='" + key + '\'' +
       ", name='" + name + '\'' +
-      ", conditions=" + conditions +
-      ", conclusions=" + conclusions +
+      ", conditions=" + inputEntries +
+      ", conclusions=" + outputEntries +
       "} ";
   }
-
 }

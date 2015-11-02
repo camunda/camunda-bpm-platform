@@ -26,6 +26,6 @@ public interface ElExpression {
    * @param variableContext the context in which the expression should be executed
    * @return the value
    */
-  public Object getValue(VariableContext variableContext);
+  Object getValue(VariableContext variableContext);
 
 }

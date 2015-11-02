@@ -14,7 +14,6 @@ package org.camunda.bpm.dmn.engine.impl.el;
 
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;
-
 import javax.el.ELContext;
 import javax.el.ELResolver;
 

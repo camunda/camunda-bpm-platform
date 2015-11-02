@@ -12,10 +12,10 @@
  */
 package org.camunda.bpm.dmn.engine.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.camunda.bpm.engine.variable.Variables.createVariables;
 import static org.camunda.bpm.engine.variable.Variables.emptyVariableContext;
 import static org.junit.Assert.fail;
-import static org.assertj.core.api.Assertions.*;
 
 import java.util.Map;
 
@@ -87,7 +87,7 @@ public class EvaluationApiTest extends DmnDecisionTest {
     }
 
     try {
-      engine.evaluate((DmnDecisionModel) null, "decision", emptyVariableContext());
+      engine.evaluate(null, "decision", emptyVariableContext());
       fail("Exception expected");
     }
     catch(IllegalArgumentException e) {
@@ -95,7 +95,7 @@ public class EvaluationApiTest extends DmnDecisionTest {
     }
 
     try {
-      engine.evaluate((DmnDecisionModel) null, "decision", createVariables());
+      engine.evaluate(null, "decision", createVariables());
       fail("Exception expected");
     }
     catch(IllegalArgumentException e) {
@@ -131,7 +131,7 @@ public class EvaluationApiTest extends DmnDecisionTest {
   public void shouldFailIfVariablesIsNull() {
 
     try {
-      engine.evaluate(decision, (Map) null);
+      engine.evaluate(decision, (Map<String, Object>) null);
       fail("Exception expected");
     }
     catch(IllegalArgumentException e) {
@@ -147,7 +147,7 @@ public class EvaluationApiTest extends DmnDecisionTest {
     }
 
     try {
-      engine.evaluate(decisionModel, (Map) null);
+      engine.evaluate(decisionModel, (Map<String, Object>) null);
       fail("Exception expected");
     }
     catch(IllegalArgumentException e) {
@@ -163,7 +163,7 @@ public class EvaluationApiTest extends DmnDecisionTest {
     }
 
     try {
-      engine.evaluate(decisionModel, "decision", (Map) null);
+      engine.evaluate(decisionModel, "decision", (Map<String, Object>) null);
       fail("Exception expected");
     }
     catch(IllegalArgumentException e) {

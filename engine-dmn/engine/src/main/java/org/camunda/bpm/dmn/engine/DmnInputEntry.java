@@ -11,11 +11,10 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.dmn.engine.impl.handler;
+package org.camunda.bpm.dmn.engine;
 
-import org.camunda.bpm.dmn.engine.impl.DmnExpressionImpl;
-import org.camunda.bpm.model.dmn.instance.AllowedValue;
+public interface DmnInputEntry extends DmnExpression {
 
-public class DmnAllowValueHandler extends AbstractDmnLiteralExpressionHandler<AllowedValue, DmnExpressionImpl> {
+  DmnInput getInput();
 
 }

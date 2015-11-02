@@ -21,8 +21,8 @@ import javax.el.ListELResolver;
 import javax.el.MapELResolver;
 import javax.el.ResourceBundleELResolver;
 
-import org.camunda.bpm.dmn.engine.el.ElProvider;
 import org.camunda.bpm.dmn.engine.el.ElExpression;
+import org.camunda.bpm.dmn.engine.el.ElProvider;
 
 import de.odysseus.el.ExpressionFactoryImpl;
 import de.odysseus.el.TreeValueExpression;

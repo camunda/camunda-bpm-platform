@@ -1,55 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Definitions xmlns="http://www.omg.org/spec/DMN/20130901"
-             xmlns:camunda="http://camunda.org/schema/1.0/dmn"
+<definitions xmlns="http://www.omg.org/spec/DMN/20130901"
              id="definitions"
              name="camunda"
              expressionLanguage="juel"
-             namespace="http://camunda.org/dmn">
-             
-  <ItemDefinition id="stringItem">
-    <typeDefinition>string</typeDefinition>
-  </ItemDefinition>          
-             
-  <Decision id="decision">
-    <DecisionTable id="decisionTable" isComplete="true" isConsistent="true" hitPolicy="RULE ORDER">
-      <clause id="input">
+             namespace="http://camunda.org/schema/1.0/dmn">
+
+  <decision id="decision" name="decision">
+    <decisionTable id="decisionTable" hitPolicy="RULE ORDER">
+      <input id="input">
+        <inputExpression />
+      </input>
+      <output id="output1" name="firstOutput" typeRef="string"/>
+      <output id="output2" name="secondOutput" typeRef="string"/>
+      <rule id="noOutputValueRule">
         <inputEntry id="noOutputValueInput">
           <text>noOutputValue</text>
         </inputEntry>
+        <outputEntry />
+        <outputEntry />
+      </rule>
+      <rule id="singleOutputValueRule">
         <inputEntry id="singleOutputValueInput">
           <text>singleOutputValue</text>
         </inputEntry>
-        <inputEntry id="multipleOutputValuesInput">
-          <text>multipleOutputValues</text>
-        </inputEntry>
-      </clause>
-      <clause id="output1" camunda:output="firstOutput">
-        <outputDefinition href="#stringItem" />
         <outputEntry id="singleOutputValueOutput">
           <text>"singleValue"</text>
         </outputEntry>
+        <outputEntry />
+      </rule>
+      <rule id="multipleOutputValuesRule">
+        <inputEntry id="multipleOutputValuesInput">
+          <text>multipleOutputValues</text>
+        </inputEntry>
         <outputEntry id="multipleOutputValuesOutput1">
           <text>"multipleValues1"</text>
         </outputEntry>
-      </clause>
-      <clause id="output2" camunda:output="secondOutput">
-        <outputDefinition href="#stringItem" />
         <outputEntry id="multipleOutputValuesOutput2">
           <text>"multipleValues2"</text>
         </outputEntry>
-      </clause>
-      <rule id="noOutputValueRule">
-        <condition>noOutputValueInput</condition>
       </rule>
-      <rule id="singleOutputValueRule">
-        <condition>singleOutputValueInput</condition>
-        <conclusion>singleOutputValueOutput</conclusion>
-      </rule>
-      <rule id="multipleOutputValuesRule">
-        <condition>multipleOutputValuesInput</condition>
-        <conclusion>multipleOutputValuesOutput1</conclusion>
-        <conclusion>multipleOutputValuesOutput2</conclusion>
-      </rule>
-    </DecisionTable>
-  </Decision>
-</Definitions>
+    </decisionTable>
+  </decision>
+</definitions>

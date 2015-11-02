@@ -14,21 +14,22 @@
 package org.camunda.bpm.dmn.engine.el;
 
 import static org.assertj.core.api.Assertions.fail;
-import static org.mockito.Matchers.*;
 import static org.camunda.bpm.dmn.engine.test.asserts.DmnAssertions.assertThat;
 import static org.camunda.bpm.dmn.engine.util.DmnExampleVerifier.assertExample;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import org.camunda.bpm.dmn.engine.DmnClause;
-import org.camunda.bpm.dmn.engine.DmnClauseEntry;
 import org.camunda.bpm.dmn.engine.DmnDecisionModel;
 import org.camunda.bpm.dmn.engine.DmnDecisionTable;
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
-import org.camunda.bpm.dmn.engine.DmnExpression;
+import org.camunda.bpm.dmn.engine.DmnInput;
+import org.camunda.bpm.dmn.engine.DmnInputEntry;
+import org.camunda.bpm.dmn.engine.DmnOutputEntry;
+import org.camunda.bpm.dmn.engine.DmnRule;
 import org.camunda.bpm.dmn.engine.DmnScriptEngineResolver;
 import org.camunda.bpm.dmn.engine.impl.DefaultScriptEngineResolver;
 import org.camunda.bpm.dmn.engine.impl.DmnEngineConfigurationImpl;
@@ -46,11 +47,11 @@ public class ExpressionLanguageTest extends DmnDecisionTest {
   public static final String EMPTY_EXPRESSIONS_DMN = "org/camunda/bpm/dmn/engine/el/ExpressionLanguageTest.emptyExpressions.dmn";
 
   public static final int NUMBER_OF_INPUT_EXPRESSIONS = 2;
-  public static final int NUMBER_OF_INPUT_ENTRIES = 5;
+  public static final int NUMBER_OF_NON_EMPTY_INPUT_ENTRIES = 6;
   public static final int NUMBER_OF_MATCHING_OUTPUT_ENTRIES = 2;
   public static final int NUMBER_OF_EXAMPLE_EXECUTIONS = 4;
-  public static final int NUMBER_OF_EXPRESSIONS = (NUMBER_OF_INPUT_EXPRESSIONS + NUMBER_OF_INPUT_ENTRIES + NUMBER_OF_MATCHING_OUTPUT_ENTRIES) * NUMBER_OF_EXAMPLE_EXECUTIONS;
-  public static final int NUMBER_OF_FEEL_EXPRESSION = NUMBER_OF_INPUT_ENTRIES * NUMBER_OF_EXAMPLE_EXECUTIONS;
+  public static final int NUMBER_OF_EXPRESSIONS = (NUMBER_OF_INPUT_EXPRESSIONS + NUMBER_OF_NON_EMPTY_INPUT_ENTRIES + NUMBER_OF_MATCHING_OUTPUT_ENTRIES) * NUMBER_OF_EXAMPLE_EXECUTIONS;
+  public static final int NUMBER_OF_FEEL_EXPRESSION = NUMBER_OF_NON_EMPTY_INPUT_ENTRIES * NUMBER_OF_EXAMPLE_EXECUTIONS;
 
   protected DefaultScriptEngineResolver scriptEngineResolver;
   protected JuelElProvider elProvider;
@@ -80,17 +81,16 @@ public class ExpressionLanguageTest extends DmnDecisionTest {
     assertThat(decisionModel.getExpressionLanguage()).isEqualTo("groovy");
 
     DmnDecisionTable decision = decisionModel.getDecision("decision");
-    for (DmnClause dmnClause : decision.getClauses()) {
-      if (dmnClause.isInputClause()) {
-        assertThat(dmnClause.getInputExpression().getExpressionLanguage()).isEqualTo("groovy");
-        for (DmnClauseEntry dmnClauseEntry : dmnClause.getInputEntries()) {
-          assertThat(dmnClauseEntry.getExpressionLanguage()).isEqualTo("groovy");
-        }
+    for (DmnInput dmnInput : decision.getInputs()) {
+      assertThat(dmnInput.getInputExpression().getExpressionLanguage()).isEqualTo("groovy");
+    }
+
+    for (DmnRule dmnRule : decision.getRules()) {
+      for (DmnInputEntry dmnInputEntry : dmnRule.getInputEntries()) {
+        assertThat(dmnInputEntry.getExpressionLanguage()).isEqualTo("groovy");
       }
-      else {
-        for (DmnExpression dmnExpression : dmnClause.getOutputEntries()) {
-          assertThat(dmnExpression.getExpressionLanguage()).isEqualTo("groovy");
-        }
+      for (DmnOutputEntry dmnOutputEntry : dmnRule.getOutputEntries()) {
+        assertThat(dmnOutputEntry.getExpressionLanguage()).isEqualTo("groovy");
       }
     }
 

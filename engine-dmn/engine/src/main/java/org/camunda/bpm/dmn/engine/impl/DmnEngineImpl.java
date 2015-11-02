@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.dmn.engine.impl;
 
+import static org.camunda.commons.utils.EnsureUtil.ensureNotNull;
+
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
@@ -31,8 +33,6 @@ import org.camunda.bpm.model.dmn.DmnModelException;
 import org.camunda.bpm.model.dmn.DmnModelInstance;
 import org.camunda.commons.utils.IoUtil;
 import org.camunda.commons.utils.IoUtilException;
-
-import static org.camunda.commons.utils.EnsureUtil.*;
 
 public class DmnEngineImpl implements DmnEngine {
 

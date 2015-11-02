@@ -119,7 +119,7 @@ public class DmnDecisionOutputImpl implements DmnDecisionOutput {
       values.add(typedValue.getValue());
     }
 
-    return values();
+    return values;
   }
 
   @Override

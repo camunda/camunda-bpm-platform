@@ -16,8 +16,9 @@ package org.camunda.bpm.dmn.engine.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.dmn.engine.DmnClause;
 import org.camunda.bpm.dmn.engine.DmnDecisionTable;
+import org.camunda.bpm.dmn.engine.DmnInput;
+import org.camunda.bpm.dmn.engine.DmnOutput;
 import org.camunda.bpm.dmn.engine.DmnRule;
 import org.camunda.bpm.model.dmn.BuiltinAggregator;
 import org.camunda.bpm.model.dmn.HitPolicy;
@@ -29,7 +30,8 @@ public class DmnDecisionTableImpl extends DmnElementImpl implements DmnDecisionT
   protected HitPolicy hitPolicy = DEFAULT_HIT_POLICY;
   protected BuiltinAggregator aggregation;
 
-  protected List<DmnClause> clauses = new ArrayList<DmnClause>();
+  protected List<DmnInput> inputs = new ArrayList<DmnInput>();
+  protected List<DmnOutput> outputs = new ArrayList<DmnOutput>();
   protected List<DmnRule> rules = new ArrayList<DmnRule>();
 
   public HitPolicy getHitPolicy() {
@@ -48,16 +50,28 @@ public class DmnDecisionTableImpl extends DmnElementImpl implements DmnDecisionT
     this.aggregation = aggregation;
   }
 
-  public List<DmnClause> getClauses() {
-    return clauses;
+  public List<DmnInput> getInputs() {
+    return inputs;
   }
 
-  public void setClauses(List<DmnClause> clauses) {
-    this.clauses = clauses;
+  public void setInputs(List<DmnInput> inputs) {
+    this.inputs = inputs;
   }
 
-  public void addClause(DmnClause clause) {
-    clauses.add(clause);
+  public void addInput(DmnInput input) {
+    this.inputs.add(input);
+  }
+
+  public List<DmnOutput> getOutputs() {
+    return outputs;
+  }
+
+  public void setOutputs(List<DmnOutput> outputs) {
+    this.outputs = outputs;
+  }
+
+  public void addOutput(DmnOutput output) {
+    this.outputs.add(output);
   }
 
   public void setRules(List<DmnRule> rules) {
@@ -72,13 +86,17 @@ public class DmnDecisionTableImpl extends DmnElementImpl implements DmnDecisionT
     rules.add(rule);
   }
 
+  @Override
   public String toString() {
     return "DmnDecisionTableImpl{" +
       "key='" + key + '\'' +
       ", name='" + name + '\'' +
       ", hitPolicy=" + hitPolicy +
-      ", clauses=" + clauses +
+      ", aggregation=" + aggregation +
+      ", inputs=" + inputs +
+      ", outputs=" + outputs +
       ", rules=" + rules +
-      "} ";
+      '}';
   }
+
 }

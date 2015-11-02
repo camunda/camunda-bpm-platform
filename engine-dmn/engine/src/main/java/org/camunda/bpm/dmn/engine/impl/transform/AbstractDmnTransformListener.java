@@ -13,16 +13,18 @@
 
 package org.camunda.bpm.dmn.engine.impl.transform;
 
-import org.camunda.bpm.dmn.engine.DmnClause;
 import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnDecisionModel;
+import org.camunda.bpm.dmn.engine.DmnInput;
 import org.camunda.bpm.dmn.engine.DmnItemDefinition;
+import org.camunda.bpm.dmn.engine.DmnOutput;
 import org.camunda.bpm.dmn.engine.DmnRule;
 import org.camunda.bpm.dmn.engine.transform.DmnTransformListener;
-import org.camunda.bpm.model.dmn.instance.Clause;
 import org.camunda.bpm.model.dmn.instance.Decision;
 import org.camunda.bpm.model.dmn.instance.Definitions;
+import org.camunda.bpm.model.dmn.instance.Input;
 import org.camunda.bpm.model.dmn.instance.ItemDefinition;
+import org.camunda.bpm.model.dmn.instance.Output;
 import org.camunda.bpm.model.dmn.instance.Rule;
 
 /**
@@ -41,7 +43,10 @@ public abstract class AbstractDmnTransformListener implements DmnTransformListen
   public void transformItemDefinition(ItemDefinition itemDefinition, DmnItemDefinition dmnItemDefinition) {
   }
 
-  public void transformClause(Clause clause, DmnClause dmnClause) {
+  public void transformInput(Input input, DmnInput dmnInput) {
+  }
+
+  public void transformOutput(Output output, DmnOutput dmnOutput) {
   }
 
   public void transformRule(Rule rule, DmnRule dmnRule) {

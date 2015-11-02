@@ -14,41 +14,32 @@
 package org.camunda.bpm.dmn.engine.impl;
 
 import org.camunda.bpm.dmn.engine.DmnExpression;
+import org.camunda.bpm.dmn.engine.DmnInput;
 import org.camunda.bpm.dmn.engine.DmnTypeDefinition;
 
-public class DmnExpressionImpl extends DmnElementImpl implements DmnExpression {
+public class DmnInputImpl extends DmnElementImpl implements DmnInput {
 
-  protected String expressionLanguage;
-  protected String expression;
+  public static final String DEFAULT_INPUT_VARIABLE_NAME = "cellInput";
+
+  protected DmnExpression inputExpression;
+  protected String outputName;
+
   protected DmnTypeDefinition typeDefinition = new DefaultTypeDefinition();
 
-  public DmnExpressionImpl() {
+  public DmnExpression getInputExpression() {
+    return inputExpression;
   }
 
-  @Override
-  public void setKey(String id) {
-    this.key = id;
+  public void setInputExpression(DmnExpression inputExpression) {
+    this.inputExpression = inputExpression;
   }
 
-  @Override
-  public String getKey() {
-    return key;
+  public String getOutputName() {
+    return outputName;
   }
 
-  public void setExpression(String expression) {
-    this.expression = expression;
-  }
-
-  public String getExpression() {
-    return expression;
-  }
-
-  public void setExpressionLanguage(String expressionLanguage) {
-    this.expressionLanguage = expressionLanguage;
-  }
-
-  public String getExpressionLanguage() {
-    return expressionLanguage;
+  public void setOutputName(String outputName) {
+    this.outputName = outputName;
   }
 
   public DmnTypeDefinition getTypeDefinition() {
@@ -61,12 +52,12 @@ public class DmnExpressionImpl extends DmnElementImpl implements DmnExpression {
 
   @Override
   public String toString() {
-    return "DmnExpressionImpl{" +
+    return "DmnInputImpl{" +
       "key='" + key + '\'' +
       ", name='" + name + '\'' +
-      ", expressionLanguage='" + expressionLanguage + '\'' +
-      ", expression='" + expression + '\'' +
-      ", typeDefinition='" + typeDefinition + '\'' +
+      ", inputExpression=" + inputExpression +
+      ", outputName='" + outputName + '\'' +
+      ", typeDefinition=" + typeDefinition +
       '}';
   }
 

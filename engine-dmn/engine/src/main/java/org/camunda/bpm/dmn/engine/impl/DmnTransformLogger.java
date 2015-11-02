@@ -15,8 +15,8 @@ package org.camunda.bpm.dmn.engine.impl;
 
 import java.io.File;
 
+import org.camunda.bpm.dmn.engine.DmnRule;
 import org.camunda.bpm.dmn.engine.DmnTransformException;
-import org.camunda.bpm.model.dmn.instance.Clause;
 import org.camunda.bpm.model.dmn.instance.Decision;
 
 public class DmnTransformLogger extends DmnLogger {
@@ -55,10 +55,6 @@ public class DmnTransformLogger extends DmnLogger {
     }
   }
 
-  public void ignoringClause(Clause clause) {
-    logInfo("004", "Ignoring clause '{}' as neither an input expression nor output definition was found.", clause.getId());
-  }
-
   public DmnTransformException unableToTransformModelFromFile(File file, Throwable cause) {
     return new DmnTransformException(exceptionMessage("005", "Unable to transform decision model from file '{}'.", file.getAbsolutePath()), cause);
   }
@@ -81,6 +77,14 @@ public class DmnTransformLogger extends DmnLogger {
 
   public DmnTransformException unableToFindOutputEntry(String outputEntryKey) {
     return new DmnTransformException(exceptionMessage("009", "Unable to find output entry with id '{}'.", outputEntryKey));
+  }
+
+  public DmnTransformException differentNumberOfInputsAndInputEntries(int inputsSize, int inputEntriesSize, DmnRule rule) {
+    return new DmnTransformException(exceptionMessage("010", "The number of inputs '{}' and input entries differ '{}' for rule '{}'." , inputsSize, inputEntriesSize, rule));
+  }
+
+  public DmnTransformException differentNumberOfOutputsAndOutputEntries(int outputsSize, int outputEntriesSize, DmnRule rule) {
+    return new DmnTransformException(exceptionMessage("011", "The number of outputs '{}' and output entries differ '{}' for rule '{}'." , outputsSize, outputEntriesSize, rule));
   }
 
 }

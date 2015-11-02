@@ -11,16 +11,12 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.dmn.engine.impl.handler;
+package org.camunda.bpm.dmn.engine;
 
-import org.camunda.bpm.dmn.engine.handler.DmnElementHandlerContext;
-import org.camunda.bpm.dmn.engine.impl.DmnItemDefinitionImpl;
-import org.camunda.bpm.model.dmn.instance.ItemDefinition;
+public interface DmnOutput extends DmnElement {
 
-public class DmnItemDefinitionHandler extends AbstractDmnElementHandler<ItemDefinition, DmnItemDefinitionImpl> {
+  String getOutputName();
 
-  protected DmnItemDefinitionImpl createElement(DmnElementHandlerContext context, ItemDefinition element) {
-    return new DmnItemDefinitionImpl();
-  }
+  DmnTypeDefinition getTypeDefinition();
 
 }

@@ -24,7 +24,9 @@ public interface DmnDecisionTable extends DmnDecision {
 
   BuiltinAggregator getAggregation();
 
-  List<DmnClause> getClauses();
+  List<DmnInput> getInputs();
+
+  List<DmnOutput> getOutputs();
 
   List<DmnRule> getRules();
 

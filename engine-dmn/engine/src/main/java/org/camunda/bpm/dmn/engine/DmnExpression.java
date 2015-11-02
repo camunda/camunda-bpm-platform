@@ -19,6 +19,6 @@ public interface DmnExpression extends DmnElement {
 
   String getExpressionLanguage();
 
-  DmnItemDefinition getItemDefinition();
+  DmnTypeDefinition getTypeDefinition();
 
 }

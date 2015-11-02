@@ -13,42 +13,20 @@
 
 package org.camunda.bpm.dmn.engine.impl;
 
-import org.camunda.bpm.dmn.engine.DmnExpression;
+import org.camunda.bpm.dmn.engine.DmnOutput;
 import org.camunda.bpm.dmn.engine.DmnTypeDefinition;
 
-public class DmnExpressionImpl extends DmnElementImpl implements DmnExpression {
+public class DmnOutputImpl extends DmnElementImpl implements DmnOutput {
 
-  protected String expressionLanguage;
-  protected String expression;
+  protected String outputName;
   protected DmnTypeDefinition typeDefinition = new DefaultTypeDefinition();
 
-  public DmnExpressionImpl() {
+  public String getOutputName() {
+    return outputName;
   }
 
-  @Override
-  public void setKey(String id) {
-    this.key = id;
-  }
-
-  @Override
-  public String getKey() {
-    return key;
-  }
-
-  public void setExpression(String expression) {
-    this.expression = expression;
-  }
-
-  public String getExpression() {
-    return expression;
-  }
-
-  public void setExpressionLanguage(String expressionLanguage) {
-    this.expressionLanguage = expressionLanguage;
-  }
-
-  public String getExpressionLanguage() {
-    return expressionLanguage;
+  public void setOutputName(String outputName) {
+    this.outputName = outputName;
   }
 
   public DmnTypeDefinition getTypeDefinition() {
@@ -61,12 +39,11 @@ public class DmnExpressionImpl extends DmnElementImpl implements DmnExpression {
 
   @Override
   public String toString() {
-    return "DmnExpressionImpl{" +
+    return "DmnOutputImpl{" +
       "key='" + key + '\'' +
       ", name='" + name + '\'' +
-      ", expressionLanguage='" + expressionLanguage + '\'' +
-      ", expression='" + expression + '\'' +
-      ", typeDefinition='" + typeDefinition + '\'' +
+      ", outputName='" + outputName + '\'' +
+      ", typeDefinition=" + typeDefinition +
       '}';
   }
 

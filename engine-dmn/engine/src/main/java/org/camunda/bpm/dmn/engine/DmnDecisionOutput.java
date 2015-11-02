@@ -62,7 +62,7 @@ public interface DmnDecisionOutput extends Map<String, Object>, Serializable {
    * @return the typed value for the given name or null if no value exists for
    *         this name
    *
-   * @see #getValue(String)
+   * @see #get(Object)
    */
   <T extends TypedValue> T getValueTyped(String name);
 

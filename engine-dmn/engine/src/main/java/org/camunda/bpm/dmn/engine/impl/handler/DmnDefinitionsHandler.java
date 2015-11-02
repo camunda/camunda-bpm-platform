@@ -17,6 +17,7 @@ import org.camunda.bpm.dmn.engine.handler.DmnElementHandlerContext;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionModelImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnEngineConfigurationImpl;
 import org.camunda.bpm.model.dmn.instance.Definitions;
+import org.camunda.bpm.model.dmn.instance.DmnElement;
 
 public class DmnDefinitionsHandler extends AbstractDmnElementHandler<Definitions, DmnDecisionModelImpl> {
 
@@ -24,11 +25,17 @@ public class DmnDefinitionsHandler extends AbstractDmnElementHandler<Definitions
     return new DmnDecisionModelImpl();
   }
 
+  @Override
   protected void initElement(DmnElementHandlerContext context, Definitions definitions, DmnDecisionModelImpl dmnDecisionModel) {
     super.initElement(context, definitions, dmnDecisionModel);
     initExpressionLanguage(context, definitions, dmnDecisionModel);
     initTypeLanguage(context, definitions, dmnDecisionModel);
     initNamespace(context, definitions, dmnDecisionModel);
+  }
+
+  @Override
+  protected void initName(DmnElementHandlerContext context, DmnElement element, DmnDecisionModelImpl decisionModel) {
+    decisionModel.setName(((Definitions) element).getName());
   }
 
   protected void initNamespace(DmnElementHandlerContext context, Definitions definitions, DmnDecisionModelImpl dmnDecisionModel) {

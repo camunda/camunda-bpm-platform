@@ -13,8 +13,14 @@
 
 package org.camunda.bpm.dmn.engine.impl.handler;
 
+import org.camunda.bpm.dmn.engine.handler.DmnElementHandlerContext;
+import org.camunda.bpm.dmn.engine.impl.DmnInputEntryImpl;
 import org.camunda.bpm.model.dmn.instance.InputEntry;
 
-public class DmnInputEntryHandler extends AbstractDmnClauseHandler<InputEntry> {
+public class DmnInputEntryHandler extends AbstractDmnUnaryTestsHandler<InputEntry, DmnInputEntryImpl> {
+
+  protected DmnInputEntryImpl createElement(DmnElementHandlerContext context, InputEntry unaryTests) {
+    return new DmnInputEntryImpl();
+  }
 
 }

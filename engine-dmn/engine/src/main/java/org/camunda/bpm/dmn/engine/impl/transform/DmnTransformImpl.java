@@ -15,50 +15,52 @@ package org.camunda.bpm.dmn.engine.impl.transform;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.camunda.bpm.dmn.engine.DmnClause;
 import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnDecisionModel;
+import org.camunda.bpm.dmn.engine.DmnDecisionTable;
 import org.camunda.bpm.dmn.engine.DmnExpression;
+import org.camunda.bpm.dmn.engine.DmnInput;
 import org.camunda.bpm.dmn.engine.DmnItemDefinition;
+import org.camunda.bpm.dmn.engine.DmnOutput;
 import org.camunda.bpm.dmn.engine.DmnRule;
 import org.camunda.bpm.dmn.engine.handler.DmnElementHandler;
 import org.camunda.bpm.dmn.engine.handler.DmnElementHandlerContext;
 import org.camunda.bpm.dmn.engine.handler.DmnElementHandlerRegistry;
-import org.camunda.bpm.dmn.engine.impl.DmnClauseEntryImpl;
-import org.camunda.bpm.dmn.engine.impl.DmnClauseImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionModelImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnExpressionImpl;
-import org.camunda.bpm.dmn.engine.impl.DmnItemDefinitionImpl;
+import org.camunda.bpm.dmn.engine.impl.DmnInputEntryImpl;
+import org.camunda.bpm.dmn.engine.impl.DmnInputImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnLogger;
+import org.camunda.bpm.dmn.engine.impl.DmnOutputEntryImpl;
+import org.camunda.bpm.dmn.engine.impl.DmnOutputImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnRuleImpl;
 import org.camunda.bpm.dmn.engine.impl.DmnTransformLogger;
 import org.camunda.bpm.dmn.engine.impl.DmnTypeDefinitionImpl;
 import org.camunda.bpm.dmn.engine.transform.DmnTransform;
 import org.camunda.bpm.dmn.engine.transform.DmnTransformListener;
 import org.camunda.bpm.dmn.engine.transform.DmnTransformer;
+import org.camunda.bpm.dmn.engine.type.DataTypeTransformer;
 import org.camunda.bpm.dmn.engine.type.DataTypeTransformerFactory;
 import org.camunda.bpm.model.dmn.Dmn;
 import org.camunda.bpm.model.dmn.DmnModelException;
 import org.camunda.bpm.model.dmn.DmnModelInstance;
-import org.camunda.bpm.model.dmn.instance.AllowedValue;
-import org.camunda.bpm.model.dmn.instance.Clause;
 import org.camunda.bpm.model.dmn.instance.Decision;
 import org.camunda.bpm.model.dmn.instance.DecisionTable;
 import org.camunda.bpm.model.dmn.instance.Definitions;
 import org.camunda.bpm.model.dmn.instance.DmnModelElementInstance;
 import org.camunda.bpm.model.dmn.instance.Expression;
+import org.camunda.bpm.model.dmn.instance.Input;
 import org.camunda.bpm.model.dmn.instance.InputEntry;
 import org.camunda.bpm.model.dmn.instance.InputExpression;
 import org.camunda.bpm.model.dmn.instance.ItemDefinition;
+import org.camunda.bpm.model.dmn.instance.Output;
 import org.camunda.bpm.model.dmn.instance.OutputEntry;
 import org.camunda.bpm.model.dmn.instance.Rule;
-import org.camunda.bpm.model.dmn.instance.TypeDefinition;
 
 public class DmnTransformImpl implements DmnTransform, DmnElementHandlerContext {
 
@@ -77,14 +79,11 @@ public class DmnTransformImpl implements DmnTransform, DmnElementHandlerContext 
   protected DmnDecisionTableImpl decision;
   protected Object parent;
 
-  protected Map<String, DmnClauseEntryImpl> inputEntries = new HashMap<String, DmnClauseEntryImpl>();
-  protected Map<String, DmnClauseEntryImpl> outputEntries = new HashMap<String, DmnClauseEntryImpl>();
-
   public DmnTransformImpl(DmnTransformer transformer) {
     this.transformer = transformer;
-    this.elementHandlerRegistry = transformer.getElementHandlerRegistry();
-    this.transformListeners = transformer.getTransformListeners();
-    this.dataTypeTransformerFactory = transformer.getDataTypeTransformerFactory();
+    elementHandlerRegistry = transformer.getElementHandlerRegistry();
+    transformListeners = transformer.getTransformListeners();
+    dataTypeTransformerFactory = transformer.getDataTypeTransformerFactory();
   }
 
   public DmnTransform setModelInstance(File file) {
@@ -127,44 +126,11 @@ public class DmnTransformImpl implements DmnTransform, DmnElementHandlerContext 
     Definitions definitions = modelInstance.getDefinitions();
     decisionModel = definitionsHandler.handleElement(this, definitions);
 
-    transformItemDefinitions();
     transformDecisions();
 
     notifyTransformListeners(definitions, decisionModel);
 
     return decisionModel;
-  }
-
-  protected void transformItemDefinitions() {
-    Collection<ItemDefinition> itemDefinitions = modelInstance.getDefinitions().getItemDefinitions();
-    for (ItemDefinition itemDefinition : itemDefinitions) {
-      transformItemDefinition(itemDefinition);
-    }
-  }
-
-  protected void transformItemDefinition(ItemDefinition itemDefinition) {
-    DmnElementHandler<ItemDefinition, DmnItemDefinitionImpl> itemDefinitionHandler = getElementHandler(ItemDefinition.class);
-    DmnElementHandler<TypeDefinition, DmnTypeDefinitionImpl> typeDefinitionHandler = getElementHandler(TypeDefinition.class);
-    DmnElementHandler<AllowedValue, DmnExpressionImpl> allowedValueHandler = getElementHandler(AllowedValue.class);
-
-    DmnItemDefinitionImpl dmnItemDefinition = itemDefinitionHandler.handleElement(this, itemDefinition);
-
-    TypeDefinition typeDefinition = itemDefinition.getTypeDefinition();
-    if (typeDefinition != null) {
-      parent = dmnItemDefinition;
-      DmnTypeDefinitionImpl dmnTypeDefinition = typeDefinitionHandler.handleElement(this, typeDefinition);
-      dmnItemDefinition.setTypeDefinition(dmnTypeDefinition);
-    }
-
-    for (AllowedValue allowedValue : itemDefinition.getAllowedValues()) {
-      parent = itemDefinition;
-      DmnExpressionImpl dmnExpression = allowedValueHandler.handleElement(this, allowedValue);
-      dmnItemDefinition.addAllowedValue(dmnExpression);
-    }
-
-    notifyTransformListeners(itemDefinition, dmnItemDefinition);
-
-    decisionModel.addItemDefinition(dmnItemDefinition);
   }
 
   protected void transformDecisions() {
@@ -193,68 +159,44 @@ public class DmnTransformImpl implements DmnTransform, DmnElementHandlerContext 
 
   protected DmnDecision transformDecisionTable(DecisionTable decisionTable) {
     DmnElementHandler<DecisionTable, DmnDecisionTableImpl> decisionTableHandler =  getElementHandler(DecisionTable.class);
-    DmnDecisionTableImpl dmnDecision = decisionTableHandler.handleElement(this, decisionTable);
-    decision = dmnDecision;
+    DmnDecisionTableImpl dmnDecisionTable = decisionTableHandler.handleElement(this, decisionTable);
+    decision = dmnDecisionTable;
 
-    for (Clause clause : decisionTable.getClauses()) {
-      parent = dmnDecision;
-      transformClause(clause);
+    for (Input input : decisionTable.getInputs()) {
+      parent = dmnDecisionTable;
+      DmnInputImpl dmnInput = transformInput(input);
+      dmnDecisionTable.addInput(dmnInput);
+      notifyTransformListeners(input, dmnInput);
+    }
+
+    for (Output output : decisionTable.getOutputs()) {
+      parent = dmnDecisionTable;
+      DmnOutput dmnOutput = transformOutput(output);
+      dmnDecisionTable.addOutput(dmnOutput);
+      notifyTransformListeners(output, dmnOutput);
     }
 
     for (Rule rule : decisionTable.getRules()) {
-      parent = dmnDecision;
+      parent = dmnDecisionTable;
       transformRule(rule);
     }
 
-    return dmnDecision;
+    return dmnDecisionTable;
   }
 
-  protected void transformClause(Clause clause) {
-    DmnClause dmnClause = null;
+  protected DmnInputImpl transformInput(Input input) {
+    DmnElementHandler<Input, DmnInputImpl> inputHandler = getElementHandler(Input.class);
+    DmnInputImpl dmnInput = inputHandler.handleElement(this, input);
 
-    if (isInputClause(clause)) {
-      dmnClause = transformInputClause(clause);
-    }
-    else if (isOutputClause(clause)) {
-      dmnClause = transformOutputClause(clause);
-    }
-    else {
-      LOG.ignoringClause(clause);
-    }
 
-    if (dmnClause != null) {
-      notifyTransformListeners(clause, dmnClause);
-      decision.addClause(dmnClause);
-    }
-  }
-
-  protected DmnClause transformInputClause(Clause clause) {
-    DmnElementHandler<Clause, DmnClauseImpl> clauseHandler = getElementHandler(Clause.class);
-    DmnElementHandler<InputEntry, DmnClauseEntryImpl> inputEntryHandler = getElementHandler(InputEntry.class);
-
-    DmnClauseImpl dmnClause = clauseHandler.handleElement(this, clause);
-
-    // set default output name if not specified
-    if (dmnClause.getOutputName() == null) {
-      dmnClause.setOutputName(DmnClauseImpl.DEFAULT_INPUT_VARIABLE_NAME);
-    }
-
-    InputExpression inputExpression = clause.getInputExpression();
+    InputExpression inputExpression = input.getInputExpression();
     if (inputExpression != null) {
-      parent = dmnClause;
+      parent = dmnInput;
       DmnExpression dmnInputExpression = transformInputExpression(inputExpression);
-      dmnClause.setInputExpression(dmnInputExpression);
+      dmnInput.setInputExpression(dmnInputExpression);
     }
 
-    for (InputEntry inputEntry : clause.getInputEntries()) {
-      parent = dmnClause;
-      DmnClauseEntryImpl dmnInputEntry = inputEntryHandler.handleElement(this, inputEntry);
-      inputEntries.put(dmnInputEntry.getKey(), dmnInputEntry);
-      dmnInputEntry.setClause(dmnClause);
-      dmnClause.addInputEntry(dmnInputEntry);
-    }
-
-    return dmnClause;
+    return dmnInput;
   }
 
   protected DmnExpression transformInputExpression(InputExpression inputExpression) {
@@ -262,57 +204,70 @@ public class DmnTransformImpl implements DmnTransform, DmnElementHandlerContext 
 
     DmnExpressionImpl dmnInputExpression = inputExpressionHandler.handleElement(this, inputExpression);
 
-    if(inputExpression.getItemDefinition() != null) {
-      String itemDefinitionRef = inputExpression.getItemDefinition().getId();
-      DmnItemDefinition itemDefinition = decisionModel.getItemDefinition(itemDefinitionRef);
-      if(itemDefinition != null) {
-        dmnInputExpression.setItemDefinition(itemDefinition);
-      }
+    String typeRef = inputExpression.getTypeRef();
+    if (typeRef != null) {
+      DmnTypeDefinitionImpl dmnTypeDefinition = new DmnTypeDefinitionImpl();
+      dmnTypeDefinition.setTypeName(typeRef);
+      DataTypeTransformer dataTypeTransformer = getDataTypeTransformerFactory().getTransformerForType(typeRef);
+      dmnTypeDefinition.setTransformer(dataTypeTransformer);
+      dmnInputExpression.setTypeDefinition(dmnTypeDefinition);
     }
 
     return dmnInputExpression;
   }
 
-  protected DmnClause transformOutputClause(Clause clause) {
-    DmnElementHandler<Clause, DmnClauseImpl> clauseHandler = getElementHandler(Clause.class);
-    DmnElementHandler<OutputEntry, DmnClauseEntryImpl> outputEntryHandler = getElementHandler(OutputEntry.class);
+  protected DmnOutput transformOutput(Output output) {
+    DmnElementHandler<Output, DmnOutputImpl> outputHandler = getElementHandler(Output.class);
+    DmnOutputImpl dmnOutput = outputHandler.handleElement(this, output);
 
-    DmnClauseImpl dmnClause = clauseHandler.handleElement(this, clause);
-
-    if(clause.getOutputDefinition() != null) {
-      String itemDefinitionRef = clause.getOutputDefinition().getId();
-      DmnItemDefinition itemDefinition = decisionModel.getItemDefinition(itemDefinitionRef);
-      if(itemDefinition != null) {
-        dmnClause.setOutputDefinition(itemDefinition);
-      }
+    String typeRef = output.getTypeRef();
+    if (typeRef != null) {
+      DmnTypeDefinitionImpl dmnTypeDefinition = new DmnTypeDefinitionImpl();
+      dmnTypeDefinition.setTypeName(typeRef);
+      DataTypeTransformer dataTypeTransformer = getDataTypeTransformerFactory().getTransformerForType(typeRef);
+      dmnTypeDefinition.setTransformer(dataTypeTransformer);
+      dmnOutput.setTypeDefinition(dmnTypeDefinition);
     }
 
-    for (OutputEntry outputEntry : clause.getOutputEntries()) {
-      parent = dmnClause;
-      DmnClauseEntryImpl dmnOutputEntry = outputEntryHandler.handleElement(this, outputEntry);
-      outputEntries.put(dmnOutputEntry.getKey(), dmnOutputEntry);
-      dmnOutputEntry.setClause(dmnClause);
-      dmnClause.addOutputEntry(dmnOutputEntry);
-    }
-
-    return dmnClause;
+    return dmnOutput;
   }
 
   protected void transformRule(Rule rule) {
     DmnElementHandler<Rule, DmnRuleImpl> ruleHandler = getElementHandler(Rule.class);
 
+    DmnDecisionTable dmnDecisionTable = (DmnDecisionTable) parent;
     DmnRuleImpl dmnRule = ruleHandler.handleElement(this, rule);
 
-    for (Expression condition : rule.getConditions()) {
+    List<DmnInput> inputs = dmnDecisionTable.getInputs();
+    List<InputEntry> inputEntries = new ArrayList<InputEntry>(rule.getInputEntries());
+    if (inputs.size() != inputEntries.size()) {
+      throw LOG.differentNumberOfInputsAndInputEntries(inputs.size(), inputEntries.size(), dmnRule);
+    }
+    for (int i = 0; i < inputEntries.size(); i++) {
+      InputEntry inputEntry = inputEntries.get(i);
       parent = dmnRule;
-      DmnClauseEntryImpl dmnCondition = transformCondition(condition);
-      dmnRule.addCondition(dmnCondition);
+      DmnInputEntryImpl dmnInputEntry = transformInputEntry(inputEntry);
+
+      DmnInput dmnInput = inputs.get(i);
+      dmnInputEntry.setInput(dmnInput);
+
+      dmnRule.addInputEntry(dmnInputEntry);
     }
 
-    for (Expression conclusion : rule.getConclusions()) {
+    List<DmnOutput> outputs = dmnDecisionTable.getOutputs();
+    ArrayList<OutputEntry> outputEntries = new ArrayList<OutputEntry>(rule.getOutputEntries());
+    if (outputs.size() != outputEntries.size()) {
+      throw LOG.differentNumberOfOutputsAndOutputEntries(outputs.size(), outputEntries.size(), dmnRule);
+    }
+    for (int i = 0; i < outputEntries.size(); i++) {
+      OutputEntry outputEntry = outputEntries.get(i);
       parent = dmnRule;
-      DmnClauseEntryImpl dmnConclusion = transformConclusion(conclusion);
-      dmnRule.addConclusion(dmnConclusion);
+      DmnOutputEntryImpl dmnOutputEntry = transformOutputEntry(outputEntry);
+
+      DmnOutput dmnOutput = outputs.get(i);
+      dmnOutputEntry.setOutput(dmnOutput);
+
+      dmnRule.addOutputEntry(dmnOutputEntry);
     }
 
     notifyTransformListeners(rule, dmnRule);
@@ -320,35 +275,17 @@ public class DmnTransformImpl implements DmnTransform, DmnElementHandlerContext 
     decision.addRule(dmnRule);
   }
 
-  protected DmnClauseEntryImpl transformCondition(Expression condition) {
-    DmnClauseEntryImpl inputEntry = inputEntries.get(condition.getId());
-    if (inputEntry != null) {
-      return inputEntry;
-    }
-    else {
-      throw LOG.unableToFindInputEntry(condition.getId());
-    }
+  protected DmnInputEntryImpl transformInputEntry(InputEntry inputEntry) {
+    DmnElementHandler<InputEntry, DmnInputEntryImpl> inputEntryHandler = getElementHandler(InputEntry.class);
+    return inputEntryHandler.handleElement(this, inputEntry);
   }
 
-  protected DmnClauseEntryImpl transformConclusion(Expression conclusion) {
-    DmnClauseEntryImpl outputEntry = outputEntries.get(conclusion.getId());
-    if (outputEntry != null) {
-      return outputEntry;
-    }
-    else {
-      throw LOG.unableToFindOutputEntry(conclusion.getId());
-    }
+  protected DmnOutputEntryImpl transformOutputEntry(OutputEntry outputEntry) {
+    DmnElementHandler<OutputEntry, DmnOutputEntryImpl> outputEntryHandler = getElementHandler(OutputEntry.class);
+    return outputEntryHandler.handleElement(this, outputEntry);
   }
 
   // Helper /////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  protected boolean isInputClause(Clause clause) {
-    return clause.getInputExpression() != null || !clause.getInputEntries().isEmpty();
-  }
-
-  protected boolean isOutputClause(Clause clause) {
-    return clause.getOutputDefinition() != null || !clause.getOutputEntries().isEmpty();
-  }
 
   @SuppressWarnings("unchecked")
   protected <Source extends DmnModelElementInstance, Target>  DmnElementHandler<Source, Target> getElementHandler(Class<Source> elementClass) {
@@ -379,9 +316,15 @@ public class DmnTransformImpl implements DmnTransform, DmnElementHandlerContext 
     }
   }
 
-  protected void notifyTransformListeners(Clause clause, DmnClause dmnClause) {
+  protected void notifyTransformListeners(Input input, DmnInput dmnInput) {
     for (DmnTransformListener transformListener : transformListeners) {
-      transformListener.transformClause(clause, dmnClause);
+      transformListener.transformInput(input, dmnInput);
+    }
+  }
+
+  protected void notifyTransformListeners(Output output, DmnOutput dmnOutput) {
+    for (DmnTransformListener transformListener : transformListeners) {
+      transformListener.transformOutput(output, dmnOutput);
     }
   }
 
@@ -390,6 +333,9 @@ public class DmnTransformImpl implements DmnTransform, DmnElementHandlerContext 
       transformListener.transformRule(rule, dmnRule);
     }
   }
+
+  // Context methods //////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
   public DmnModelInstance getModelInstance() {
     return modelInstance;
@@ -412,3 +358,5 @@ public class DmnTransformImpl implements DmnTransform, DmnElementHandlerContext 
   }
 
 }
+
+
