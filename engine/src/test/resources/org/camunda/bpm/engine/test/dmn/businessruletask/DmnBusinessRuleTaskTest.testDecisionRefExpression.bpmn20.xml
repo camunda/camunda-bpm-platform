@@ -14,13 +14,8 @@
                       camunda:decisionRef="${decision}"
                       camunda:decisionRefBinding="version"
                       camunda:decisionRefVersion="${version}"
-                      camunda:resultVariable="decisionResult">
-                      <extensionElements>
-        <camunda:inputOutput>
-          <camunda:outputParameter name="decisionResult">${decisionResult.getSingleOutput().getSingleValue()}</camunda:outputParameter>
-        </camunda:inputOutput>
-      </extensionElements>
-    </businessRuleTask>
+                      camunda:mapDecisionResult="singleValue" 
+                      camunda:resultVariable="result" />
 
     <sequenceFlow sourceRef="task" targetRef="end" />
 

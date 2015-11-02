@@ -14,10 +14,7 @@ package org.camunda.bpm.engine.rest.helper;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
@@ -57,20 +54,26 @@ public class MockDecisionOutputBuilder {
     return endDecisionOutput().build();
   }
 
-  protected class SimpleDecisionOutput implements DmnDecisionOutput {
+  protected static class SimpleDecisionOutput extends HashMap<String, Object> implements DmnDecisionOutput {
 
     private static final long serialVersionUID = 1L;
 
-    protected final Map<String, TypedValue> outputValues;
+    protected final Map<String, TypedValue> typedOutputValues;
 
     public SimpleDecisionOutput(Map<String, TypedValue> outputValues) {
-      this.outputValues = outputValues;
+      super(asValueMap(outputValues));
+
+      this.typedOutputValues = outputValues;
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T> T getValue(String name) {
-      return (T) outputValues.get(name).getValue();
+    private static Map<? extends String, ? extends Object> asValueMap(Map<String, TypedValue> typedValueMap) {
+      Map<String, Object> valueMap = new HashMap<String, Object>();
+
+      for(Entry<String, TypedValue> entry : typedValueMap.entrySet()) {
+        valueMap.put(entry.getKey(), entry.getValue().getValue());
+      }
+
+      return valueMap;
     }
 
     @Override
@@ -86,7 +89,7 @@ public class MockDecisionOutputBuilder {
     @SuppressWarnings("unchecked")
     @Override
     public <T extends TypedValue> T getValueTyped(String name) {
-      return (T) outputValues.get(name);
+      return (T) typedOutputValues.get(name);
     }
 
     @Override
@@ -100,38 +103,13 @@ public class MockDecisionOutputBuilder {
     }
 
     @Override
-    public boolean containsKey(String key) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
     public Collection<TypedValue> valuesTyped() {
-      return outputValues.values();
+      return typedOutputValues.values();
     }
 
     @Override
-    public int size() {
-      return outputValues.size();
-    }
-
-    @Override
-    public boolean isEmpty() {
-      return outputValues.isEmpty();
-    }
-
-    @Override
-    public Set<String> keySet() {
-      return outputValues.keySet();
-    }
-
-    @Override
-    public Collection<Object> values() {
-      List<Object> values = new LinkedList<Object>();
-
-      for(TypedValue typedValue : outputValues.values()) {
-        values.add(typedValue.getValue());
-      }
-      return values();
+    public Map<String, Object> getValueMap() {
+      throw new UnsupportedOperationException();
     }
 
   }

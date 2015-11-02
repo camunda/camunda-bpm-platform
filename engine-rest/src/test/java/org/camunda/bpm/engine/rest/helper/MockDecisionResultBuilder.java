@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest.helper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
@@ -55,6 +56,11 @@ public class MockDecisionResultBuilder {
 
     @Override
     public <T> List<T> collectOutputValues(String outputName) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Map<String, Object>> getOutputList() {
       throw new UnsupportedOperationException();
     }
 

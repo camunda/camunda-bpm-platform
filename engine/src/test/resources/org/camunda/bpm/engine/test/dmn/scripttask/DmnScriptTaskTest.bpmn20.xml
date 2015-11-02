@@ -7,8 +7,8 @@
     <bpmn2:scriptTask id="scriptTask" camunda:resource="org/camunda/bpm/engine/test/dmn/scripttask/DmnScriptTaskTest.dmn10.xml" camunda:resultVariable="decisionResult" name="Check order" scriptFormat="dmn">
       <bpmn2:extensionElements>
         <camunda:inputOutput>
-          <camunda:outputParameter name="result">${decisionResult.getSingleOutput().getValue('result')}</camunda:outputParameter>
-          <camunda:outputParameter name="reason">${decisionResult.getSingleOutput().getValue('reason')}</camunda:outputParameter>
+          <camunda:outputParameter name="result">${decisionResult.getSingleOutput().result}</camunda:outputParameter>
+          <camunda:outputParameter name="reason">${decisionResult.getSingleOutput().reason}</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn2:extensionElements>
       <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>

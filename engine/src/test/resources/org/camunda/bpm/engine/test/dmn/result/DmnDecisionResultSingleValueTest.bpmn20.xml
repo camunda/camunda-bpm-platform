@@ -10,11 +10,7 @@
     <sequenceFlow sourceRef="start" targetRef="ruleTask" />
 
     <businessRuleTask id="ruleTask"
-      camunda:decisionRef="testDecision" camunda:resultVariable="ruleResult">
-      <extensionElements>
-        <camunda:executionListener class="org.camunda.bpm.engine.test.dmn.DecisionResultTestListener" event="end" />
-      </extensionElements>
-    </businessRuleTask>
+      camunda:decisionRef="testDecision" camunda:mapDecisionResult="singleValue" camunda:resultVariable="result" />
 
     <sequenceFlow sourceRef="ruleTask" targetRef="end" />
 

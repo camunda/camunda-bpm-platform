@@ -11,30 +11,27 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.engine.test.dmn;
+package org.camunda.bpm.engine.impl.dmn.result;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.ProcessEngineException;
 
 /**
+ * Mapping function for the decision result.
+ *
  * @author Philipp Ossler
  */
-public class DecisionResultTestListener implements ExecutionListener {
+public interface DecisionResultMapper {
 
-  protected static DmnDecisionResult decisionResult = null;
-
-  @Override
-  public void notify(DelegateExecution execution) throws Exception {
-    decisionResult = (DmnDecisionResult) execution.getVariable("ruleResult");
-  }
-
-  public static DmnDecisionResult getDecisionResult() {
-    return decisionResult;
-  }
-
-  public static void reset() {
-    decisionResult = null;
-  }
+  /**
+   * Maps the decision result into a value that can set as process variable.
+   *
+   * @param decisionResult
+   *          the result of the evaluated decision
+   * @return the value that should set as process variable
+   * @throws ProcessEngineException
+   *           if the decision result can not be mapped
+   */
+  Object mapDecisionResult(DmnDecisionResult decisionResult);
 
 }

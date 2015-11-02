@@ -98,6 +98,7 @@ public class DmnBusinessRuleTaskTest extends PluggableProcessEngineTestCase {
      VariableMap variables = Variables.createVariables()
        .putValue("pojo", new TestPojo("okay", 13.37));
      ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess", variables);
+
      assertEquals("okay", getDecisionResult(processInstance));
    }
 
@@ -110,7 +111,7 @@ public class DmnBusinessRuleTaskTest extends PluggableProcessEngineTestCase {
 
   protected Object getDecisionResult(ProcessInstance processInstance) {
     // the single value of the single output of the decision result is stored as process variable
-    return runtimeService.getVariable(processInstance.getId(), "decisionResult");
+    return runtimeService.getVariable(processInstance.getId(), "result");
   }
 
 }

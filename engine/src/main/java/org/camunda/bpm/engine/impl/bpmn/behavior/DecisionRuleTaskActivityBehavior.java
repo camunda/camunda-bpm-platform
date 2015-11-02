@@ -15,12 +15,13 @@ package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import java.util.concurrent.Callable;
 
+import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.model.BaseCallableElement;
-import org.camunda.bpm.engine.impl.delegate.DelegateInvocation;
 import org.camunda.bpm.engine.impl.dmn.invocation.DecisionInvocation;
 import org.camunda.bpm.engine.impl.dmn.invocation.VariableScopeContext;
+import org.camunda.bpm.engine.impl.dmn.result.DecisionResultMapper;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.util.CallableElementUtil;
@@ -38,20 +39,23 @@ import org.camunda.bpm.engine.repository.DecisionDefinition;
  */
 public class DecisionRuleTaskActivityBehavior extends AbstractBpmnActivityBehavior {
 
-  protected final String resultVariable;
+  public static final String DECISION_RESULT_VARIABLE = "decisionResult";
 
   protected final BaseCallableElement callableElement;
+  protected final String resultVariable;
+  protected final DecisionResultMapper decisionResultMapper;
 
-  public DecisionRuleTaskActivityBehavior(String resultVariableName, BaseCallableElement callableElement) {
-    this.resultVariable = resultVariableName;
+  public DecisionRuleTaskActivityBehavior(BaseCallableElement callableElement, String resultVariableName, DecisionResultMapper decisionResultMapper) {
     this.callableElement = callableElement;
+    this.resultVariable = resultVariableName;
+    this.decisionResultMapper = decisionResultMapper;
   }
 
   @Override
   public void execute(final ActivityExecution execution) throws Exception {
 
     final DecisionDefinition decisionDefinition = resolveDecisionDefinition(execution);
-    final DelegateInvocation invocation = createInvocation(execution, decisionDefinition);
+    final DecisionInvocation invocation = createInvocation(execution, decisionDefinition);
 
     executeWithErrorPropagation(execution, new Callable<Void>() {
 
@@ -61,9 +65,15 @@ public class DecisionRuleTaskActivityBehavior extends AbstractBpmnActivityBehavi
           .getDelegateInterceptor()
           .handleInvocation(invocation);
 
-        Object result = invocation.getInvocationResult();
-        if (result != null && resultVariable != null) {
-          ((ExecutionEntity) execution).setVariableLocalTransient(resultVariable, result);
+        DmnDecisionResult result = invocation.getInvocationResult();
+        if (result != null) {
+          // sets the decision result as variable for output mapping
+          ((ExecutionEntity) execution).setVariableLocalTransient(DECISION_RESULT_VARIABLE, result);
+
+          if (resultVariable != null && decisionResultMapper != null) {
+            Object mappedDecisionResult = decisionResultMapper.mapDecisionResult(result);
+            execution.setVariable(resultVariable, mappedDecisionResult);
+          }
         }
 
         leave(execution);
@@ -73,7 +83,7 @@ public class DecisionRuleTaskActivityBehavior extends AbstractBpmnActivityBehavi
     });
   }
 
-  protected DelegateInvocation createInvocation(ActivityExecution execution, DecisionDefinition decisionDefinitionToCall) {
+  protected DecisionInvocation createInvocation(ActivityExecution execution, DecisionDefinition decisionDefinitionToCall) {
     return new DecisionInvocation(decisionDefinitionToCall, VariableScopeContext.wrap(execution));
   }
 

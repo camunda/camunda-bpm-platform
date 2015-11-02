@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.engine.test.dmn;
+package org.camunda.bpm.engine.test.dmn.businessruletask;
 
 import java.util.Collections;
 
@@ -22,12 +22,17 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.Variables;
 
-public class DmnScriptOutputTest extends PluggableProcessEngineTestCase {
+/**
+ * Tests the decision result that is retrieved by an execution listener.
+ *
+ * @author Philipp Ossler
+ */
+public class DmnDecisionResultListenerTest extends PluggableProcessEngineTestCase {
 
-  protected static final String TEST_PROCESS = "org/camunda/bpm/engine/test/dmn/DmnScriptOutputTest.bpmn20.xml";
-  protected static final String TEST_DECISION = "org/camunda/bpm/engine/test/dmn/DmnScriptOutputTest.dmn10.xml";
-  protected static final String TEST_DECISION_COLLECT_SUM = "org/camunda/bpm/engine/test/dmn/DmnScriptOutputCollectSumHitPolicyTest.dmn10.xml";
-  protected static final String TEST_DECISION_COLLECT_COUNT = "org/camunda/bpm/engine/test/dmn/DmnScriptOutputCollectCountHitPolicyTest.dmn10.xml";
+  protected static final String TEST_PROCESS = "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultTest.bpmn20.xml";
+  protected static final String TEST_DECISION = "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultTest.dmn10.xml";
+  protected static final String TEST_DECISION_COLLECT_SUM = "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultCollectSumHitPolicyTest.dmn10.xml";
+  protected static final String TEST_DECISION_COLLECT_COUNT = "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultCollectCountHitPolicyTest.dmn10.xml";
 
   protected DmnDecisionResult ruleResult;
 
@@ -73,8 +78,8 @@ public class DmnScriptOutputTest extends PluggableProcessEngineTestCase {
     startTestProcess("multiple entries");
 
     DmnDecisionOutput firstOutput = ruleResult.get(0);
-    assertEquals("foo", firstOutput.getValue("result1"));
-    assertEquals("bar", firstOutput.getValue("result2"));
+    assertEquals("foo", firstOutput.get("result1"));
+    assertEquals("bar", firstOutput.get("result2"));
 
     assertEquals(Variables.stringValue("foo"), firstOutput.getValueTyped("result1"));
     assertEquals(Variables.stringValue("bar"), firstOutput.getValueTyped("result2"));
@@ -100,8 +105,8 @@ public class DmnScriptOutputTest extends PluggableProcessEngineTestCase {
 
     for (DmnDecisionOutput output : ruleResult) {
       assertEquals(2, output.size());
-      assertEquals("foo", output.getValue("result1"));
-      assertEquals("bar", output.getValue("result2"));
+      assertEquals("foo", output.get("result1"));
+      assertEquals("bar", output.get("result2"));
 
       assertEquals(Variables.stringValue("foo"), output.getValueTyped("result1"));
       assertEquals(Variables.stringValue("bar"), output.getValueTyped("result2"));
@@ -146,25 +151,6 @@ public class DmnScriptOutputTest extends PluggableProcessEngineTestCase {
 
     assertEquals(33, firstOutput.getFirstValue());
     assertEquals(Variables.integerValue(33), firstOutput.getFirstValueTyped());
-  }
-
-  @Deployment(resources = { TEST_PROCESS, TEST_DECISION })
-  public void testTransientDecisionResult() {
-    // when a decision is evaluated and the result is stored in a transient variable "ruleResult"
-    ProcessInstance processInstance = startTestProcess("single entry");
-
-    // then the variable should not be available outside the business rule task
-    assertNull(runtimeService.getVariable(processInstance.getId(), "ruleResult"));
-    // and should not create an entry in history since it is not persistent
-    assertNull(historyService.createHistoricVariableInstanceQuery().variableName("ruleResult").singleResult());
-  }
-
-  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/DmnScriptOutputMapping.bpmn20.xml", TEST_DECISION })
-  public void testDecisionResultOutputMapping() {
-    ProcessInstance processInstance = startTestProcess("single entry");
-
-    assertEquals("foo", runtimeService.getVariable(processInstance.getId(), "result"));
-    assertEquals(Variables.stringValue("foo"), runtimeService.getVariableTyped(processInstance.getId(), "result"));
   }
 
   protected ProcessInstance startTestProcess(String input) {
