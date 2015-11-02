@@ -18,6 +18,7 @@ import static org.assertj.core.api.Fail.fail;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.test.DecisionResource;
 import org.camunda.bpm.dmn.engine.test.DmnDecisionTest;
@@ -130,10 +131,42 @@ public class DmnResultTest extends DmnDecisionTest {
     assertThat(decisionResult).hasSize(3);
 
     List<String> outputValues = decisionResult.collectOutputValues("firstOutput");
-    assertThat(outputValues).containsExactly(null, "singleValue", "multipleValues1");
+    assertThat(outputValues).containsExactly("singleValue", "multipleValues1");
 
     outputValues = decisionResult.collectOutputValues("secondOutput");
-    assertThat(outputValues).containsExactly(null, null, "multipleValues2");
+    assertThat(outputValues).containsExactly("multipleValues2");
+  }
+
+  @Test
+  @DecisionResource(resource = RESULT_TEST_DMN)
+  public void testOutputList() {
+    DmnDecisionResult decisionResult = evaluateWithMatchingRules(SINGLE_OUTPUT_VALUE, MULTIPLE_OUTPUT_VALUES);
+
+    List<Map<String, Object>> outputList = decisionResult.getOutputList();
+    assertThat(outputList).hasSize(2);
+
+    Map<String, Object> firstOutput = outputList.get(0);
+    assertThat(firstOutput).hasSize(1);
+    assertThat(firstOutput).containsEntry("firstOutput", "singleValue");
+
+    Map<String, Object> secondOutput = outputList.get(1);
+    assertThat(secondOutput).hasSize(2);
+    assertThat(secondOutput).containsEntry("firstOutput", "multipleValues1");
+    assertThat(secondOutput).containsEntry("secondOutput", "multipleValues2");
+  }
+
+  @Test
+  @DecisionResource(resource = RESULT_TEST_DMN)
+  public void testValueMap() {
+    DmnDecisionResult decisionResult = evaluateWithMatchingRules(MULTIPLE_OUTPUT_VALUES);
+
+    DmnDecisionOutput decisionOutput = decisionResult.getSingleOutput();
+    assertThat(decisionOutput).hasSize(2);
+
+    Map<String, Object> valueMap = decisionOutput.getValueMap();
+    assertThat(valueMap).hasSize(2);
+    assertThat(valueMap).containsEntry("firstOutput", "multipleValues1");
+    assertThat(valueMap).containsEntry("secondOutput", "multipleValues2");
   }
 
   @Test
@@ -192,10 +225,10 @@ public class DmnResultTest extends DmnDecisionTest {
   protected void assertSingleOutputValue(DmnDecisionOutput decisionOutput) {
     assertThat(decisionOutput.size()).isEqualTo(1);
 
-    String value = decisionOutput.getValue("firstOutput");
+    String value = (String) decisionOutput.get("firstOutput");
     assertThat(value).isEqualTo("singleValue");
 
-    value = decisionOutput.getValue("secondOutput");
+    value = (String) decisionOutput.get("secondOutput");
     assertThat(value).isNull();
 
     value = decisionOutput.getFirstValue();
@@ -208,10 +241,10 @@ public class DmnResultTest extends DmnDecisionTest {
   protected void assertNoOutputValue(DmnDecisionOutput decisionOutput) {
     assertThat(decisionOutput.size()).isEqualTo(0);
 
-    String value = decisionOutput.getValue("firstOutput");
+    String value = (String) decisionOutput.get("firstOutput");
     assertThat(value).isNull();
 
-    value = decisionOutput.getValue("secondOutput");
+    value = (String) decisionOutput.get("secondOutput");
     assertThat(value).isNull();
 
     value = decisionOutput.getFirstValue();
@@ -224,10 +257,10 @@ public class DmnResultTest extends DmnDecisionTest {
   protected void assertMultipleOutputValues(DmnDecisionOutput decisionOutput) {
     assertThat(decisionOutput.size()).isEqualTo(2);
 
-    String value = decisionOutput.getValue("firstOutput");
+    String value = (String) decisionOutput.get("firstOutput");
     assertThat(value).isEqualTo("multipleValues1");
 
-    value = decisionOutput.getValue("secondOutput");
+    value = (String) decisionOutput.get("secondOutput");
     assertThat(value).isEqualTo("multipleValues2");
 
     value = decisionOutput.getFirstValue();

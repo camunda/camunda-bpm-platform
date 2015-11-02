@@ -213,14 +213,14 @@ public class DmnDecisionContextImpl implements DmnDecisionContext {
       DmnDecisionOutputImpl decisionOutput = new DmnDecisionOutputImpl();
       TypedValue resultValue = decisionTableResult.getCollectResultValue();
       decisionOutput.putValue(decisionTableResult.getCollectResultName(), resultValue);
-      decisionResult.add(decisionOutput);
+      decisionResult.addOutput(decisionOutput);
     } else {
       for (DmnDecisionTableRule matchingRule : decisionTableResult.getMatchingRules()) {
         DmnDecisionOutputImpl decisionOutput = new DmnDecisionOutputImpl();
         for (DmnDecisionTableValue outputValue : matchingRule.getOutputs().values()) {
           decisionOutput.putValue(outputValue.getOutputName(), outputValue.getValue());
         }
-        decisionResult.add(decisionOutput);
+        decisionResult.addOutput(decisionOutput);
       }
     }
     return decisionResult;

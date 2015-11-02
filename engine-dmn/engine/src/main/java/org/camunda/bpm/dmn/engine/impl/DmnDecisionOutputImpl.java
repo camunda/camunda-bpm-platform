@@ -15,6 +15,8 @@ package org.camunda.bpm.dmn.engine.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,15 +63,6 @@ public class DmnDecisionOutputImpl implements DmnDecisionOutput {
   }
 
   @SuppressWarnings("unchecked")
-  public <T> T getValue(String name) {
-    if (outputValues.containsKey(name)) {
-      return (T) getValueTyped(name).getValue();
-    } else {
-      return null;
-    }
-  }
-
-  @SuppressWarnings("unchecked")
   public <T> T getFirstValue() {
     if (!outputValues.isEmpty()) {
       return (T) getFirstValueTyped().getValue();
@@ -88,6 +81,17 @@ public class DmnDecisionOutputImpl implements DmnDecisionOutput {
   }
 
   @Override
+  public Map<String, Object> getValueMap() {
+    Map<String, Object> valueMap = new HashMap<String, Object>();
+
+    for (String key : outputValues.keySet()) {
+      valueMap.put(key, get(key));
+    }
+
+    return valueMap;
+  }
+
+  @Override
   public int size() {
     return outputValues.size();
   }
@@ -98,7 +102,7 @@ public class DmnDecisionOutputImpl implements DmnDecisionOutput {
   }
 
   @Override
-  public boolean containsKey(String key) {
+  public boolean containsKey(Object key) {
     return outputValues.containsKey(key);
   }
 
@@ -111,7 +115,7 @@ public class DmnDecisionOutputImpl implements DmnDecisionOutput {
   public Collection<Object> values() {
     List<Object> values = new ArrayList<Object>();
 
-    for(TypedValue typedValue : outputValues.values()) {
+    for (TypedValue typedValue : outputValues.values()) {
       values.add(typedValue.getValue());
     }
 
@@ -126,6 +130,84 @@ public class DmnDecisionOutputImpl implements DmnDecisionOutput {
   @Override
   public String toString() {
     return outputValues.toString();
+  }
+
+  @Override
+  public boolean containsValue(Object value) {
+    return values().contains(value);
+  }
+
+  @Override
+  public Object get(Object key) {
+    TypedValue typedValue = outputValues.get(key);
+    if (typedValue != null) {
+      return typedValue.getValue();
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  public Object put(String key, Object value) {
+    throw new UnsupportedOperationException("decision output is immutable");
+  }
+
+  @Override
+  public Object remove(Object key) {
+    throw new UnsupportedOperationException("decision output is immutable");
+  }
+
+  @Override
+  public void putAll(Map<? extends String, ? extends Object> m) {
+    throw new UnsupportedOperationException("decision output is immutable");
+  }
+
+  @Override
+  public void clear() {
+    throw new UnsupportedOperationException("decision output is immutable");
+  }
+
+  @Override
+  public Set<Entry<String, Object>> entrySet() {
+    Set<Entry<String, Object>> entrySet = new HashSet<Map.Entry<String, Object>>();
+
+    for (Entry<String, TypedValue> typedEntry : outputValues.entrySet()) {
+      DmnDecisionOutputValueEntry entry = new DmnDecisionOutputValueEntry(typedEntry.getKey(), typedEntry.getValue());
+      entrySet.add(entry);
+    }
+
+    return entrySet;
+  }
+
+  protected class DmnDecisionOutputValueEntry implements Entry<String, Object> {
+
+    protected final String key;
+    protected final TypedValue typedValue;
+
+    public DmnDecisionOutputValueEntry(String key, TypedValue typedValue) {
+      this.key = key;
+      this.typedValue = typedValue;
+    }
+
+    @Override
+    public String getKey() {
+      return key;
+    }
+
+    @Override
+    public Object getValue() {
+      if (typedValue != null) {
+        return typedValue.getValue();
+      } else {
+        return null;
+      }
+    }
+
+    @Override
+    public Object setValue(Object value) {
+      throw new UnsupportedOperationException("decision output entry is immutable");
+    }
+
   }
 
 }

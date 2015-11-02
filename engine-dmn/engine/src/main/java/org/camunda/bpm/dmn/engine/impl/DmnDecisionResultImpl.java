@@ -14,8 +14,12 @@
 package org.camunda.bpm.dmn.engine.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
@@ -28,11 +32,14 @@ public class DmnDecisionResultImpl implements DmnDecisionResult {
 
   protected final List<DmnDecisionOutput> decisionOutputs = new ArrayList<DmnDecisionOutput>();
 
+  public void addOutput(DmnDecisionOutput decisionOutput) {
+    decisionOutputs.add(decisionOutput);
+  }
+
   public DmnDecisionOutput getFirstOutput() {
     if (size() > 0) {
       return get(0);
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -40,11 +47,9 @@ public class DmnDecisionResultImpl implements DmnDecisionResult {
   public DmnDecisionOutput getSingleOutput() {
     if (size() == 1) {
       return get(0);
-    }
-    else if (isEmpty()) {
+    } else if (isEmpty()) {
       return null;
-    }
-    else {
+    } else {
       throw LOG.decisionResultHasMoreThanOneOutput(this);
     }
   }
@@ -52,20 +57,32 @@ public class DmnDecisionResultImpl implements DmnDecisionResult {
   @SuppressWarnings("unchecked")
   public <T> List<T> collectOutputValues(String outputName) {
     List<T> outputValues = new ArrayList<T>();
-    for (DmnDecisionOutput decisionOutput : this) {
-      Object value = decisionOutput.getValue(outputName);
-      outputValues.add((T) value);
+
+    for (DmnDecisionOutput decisionOutput : decisionOutputs) {
+      if (decisionOutput.containsKey(outputName)) {
+        Object value = decisionOutput.get(outputName);
+        outputValues.add((T) value);
+      }
     }
+
     return outputValues;
   }
 
-  public void add(DmnDecisionOutput decisionOutput) {
-    decisionOutputs.add(decisionOutput);
+  @Override
+  public List<Map<String, Object>> getOutputList() {
+    List<Map<String, Object>> outputList = new ArrayList<Map<String, Object>>();
+
+    for (DmnDecisionOutput decisionOutput : decisionOutputs) {
+      Map<String, Object> valueMap = decisionOutput.getValueMap();
+      outputList.add(valueMap);
+    }
+
+    return outputList;
   }
 
   @Override
   public Iterator<DmnDecisionOutput> iterator() {
-    return decisionOutputs.iterator();
+    return asUnmodifiableList().iterator();
   }
 
   @Override
@@ -84,8 +101,107 @@ public class DmnDecisionResultImpl implements DmnDecisionResult {
   }
 
   @Override
+  public boolean contains(Object o) {
+    return decisionOutputs.contains(o);
+  }
+
+  @Override
+  public Object[] toArray() {
+    return decisionOutputs.toArray();
+  }
+
+  @Override
+  public <T> T[] toArray(T[] a) {
+    return decisionOutputs.toArray(a);
+  }
+
+  @Override
+  public boolean add(DmnDecisionOutput e) {
+    throw new UnsupportedOperationException("decision result is immutable");
+  }
+
+  @Override
+  public boolean remove(Object o) {
+    throw new UnsupportedOperationException("decision result is immutable");
+  }
+
+  @Override
+  public boolean containsAll(Collection<?> c) {
+    return decisionOutputs.containsAll(c);
+  }
+
+  @Override
+  public boolean addAll(Collection<? extends DmnDecisionOutput> c) {
+    throw new UnsupportedOperationException("decision result is immutable");
+  }
+
+  @Override
+  public boolean addAll(int index, Collection<? extends DmnDecisionOutput> c) {
+    throw new UnsupportedOperationException("decision result is immutable");
+  }
+
+  @Override
+  public boolean removeAll(Collection<?> c) {
+    throw new UnsupportedOperationException("decision result is immutable");
+  }
+
+  @Override
+  public boolean retainAll(Collection<?> c) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void clear() {
+    throw new UnsupportedOperationException("decision result is immutable");
+  }
+
+  @Override
+  public DmnDecisionOutput set(int index, DmnDecisionOutput element) {
+    throw new UnsupportedOperationException("decision result is immutable");
+  }
+
+  @Override
+  public void add(int index, DmnDecisionOutput element) {
+    throw new UnsupportedOperationException("decision result is immutable");
+  }
+
+  @Override
+  public DmnDecisionOutput remove(int index) {
+    throw new UnsupportedOperationException("decision result is immutable");
+  }
+
+  @Override
+  public int indexOf(Object o) {
+    return decisionOutputs.indexOf(o);
+  }
+
+  @Override
+  public int lastIndexOf(Object o) {
+    return decisionOutputs.lastIndexOf(o);
+  }
+
+  @Override
+  public ListIterator<DmnDecisionOutput> listIterator() {
+    return asUnmodifiableList().listIterator();
+  }
+
+  @Override
+  public ListIterator<DmnDecisionOutput> listIterator(int index) {
+    return asUnmodifiableList().listIterator(index);
+  }
+
+  @Override
+  public List<DmnDecisionOutput> subList(int fromIndex, int toIndex) {
+    return asUnmodifiableList().subList(fromIndex, toIndex);
+  }
+
+  @Override
   public String toString() {
     return decisionOutputs.toString();
+  }
+
+  protected List<DmnDecisionOutput> asUnmodifiableList() {
+    return Collections.unmodifiableList(decisionOutputs);
   }
 
 }

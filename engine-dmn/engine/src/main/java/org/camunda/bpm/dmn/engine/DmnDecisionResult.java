@@ -15,13 +15,14 @@ package org.camunda.bpm.dmn.engine;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The result of one decision. Which is the list of its decision outputs (see
  * {@link DmnDecisionOutput}). In context of a decision table this represents
  * the output of all matching decision rules.
  */
-public interface DmnDecisionResult extends Iterable<DmnDecisionOutput>, Serializable {
+public interface DmnDecisionResult extends List<DmnDecisionOutput>, Serializable {
 
   /**
    * Returns the first {@link DmnDecisionOutput}.
@@ -42,9 +43,9 @@ public interface DmnDecisionResult extends Iterable<DmnDecisionOutput>, Serializ
 
   /**
    * Collects the values for a output name. The list will contain the value for
-   * the output name of every {@link DmnDecisionOutput}. If the
-   * {@link DmnDecisionOutput} doesn't contain a value for the output name the
-   * value will be null.
+   * the output name of every {@link DmnDecisionOutput}. Note that the list may
+   * contains less entries than decision outputs if an output doesn't contain a
+   * value for the name.
    *
    * @param outputName
    *          the name of the output to collect
@@ -55,24 +56,13 @@ public interface DmnDecisionResult extends Iterable<DmnDecisionOutput>, Serializ
   <T> List<T> collectOutputValues(String outputName);
 
   /**
-   * @return the number of the decision outputs
+   * Returns the valueMaps of all decision outputs. A valueMap contains all
+   * untyped values by output name.
+   *
+   * @return the list of all valueMaps
+   *
+   * @see DmnDecisionOutput#getValueMap()
    */
-  int size();
-
-  /**
-   * @return <code>true</code>, if the decision result has no decision output
-   */
-  boolean isEmpty();
-
-  /**
-   * @param index
-   *          index of the decision output to return
-   * @return the decision output at the specified position in this decision
-   *         result
-   * @throws IndexOutOfBoundsException
-   *           if the index is out of range (
-   *           <tt>index &lt; 0 || index &gt;= size()</tt>)
-   */
-  DmnDecisionOutput get(int index);
+  List<Map<String, Object>> getOutputList();
 
 }

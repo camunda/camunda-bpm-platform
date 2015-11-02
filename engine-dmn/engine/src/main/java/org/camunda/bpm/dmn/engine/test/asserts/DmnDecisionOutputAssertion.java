@@ -62,7 +62,7 @@ public class DmnDecisionOutputAssertion extends AbstractAssert<DmnDecisionOutput
   public DmnDecisionOutputAssertion hasEntryWithValue(String name, Object expectedValue) {
     isNotNull();
 
-    assertEquals(expectedValue, actual.getValue(name));
+    assertEquals(expectedValue, actual.get(name));
 
     return this;
   }
