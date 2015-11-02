@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.variable;
 
 import java.util.Map;
 
+import org.camunda.bpm.engine.variable.context.VariableContext;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**

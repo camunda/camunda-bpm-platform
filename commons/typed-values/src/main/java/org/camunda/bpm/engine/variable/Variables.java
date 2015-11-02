@@ -19,6 +19,7 @@ import java.util.Map;
 
 import javax.activation.MimetypesFileTypeMap;
 
+import org.camunda.bpm.engine.variable.context.VariableContext;
 import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
 import org.camunda.bpm.engine.variable.impl.context.EmptyVariableContext;
 import org.camunda.bpm.engine.variable.impl.value.NullValueImpl;
