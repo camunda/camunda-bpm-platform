@@ -221,7 +221,7 @@
         <database.password>sa</database.password>
         <database.port>18080</database.port>
         <!-- This url has to consistent for the subprojects: {server}-runtime and webapp-integration-tests -->
-        <database.url>jdbc:h2:${database.host}${database.name};MVCC=TRUE;AUTO_SERVER=TRUE;AUTO_SERVER_PORT=${database.port};LOCK_TIMEOUT=10000</database.url>
+        <database.url>jdbc:h2:${database.host}${database.name};MVCC=TRUE;AUTO_SERVER=TRUE;AUTO_SERVER_PORT=${database.port};LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE</database.url>
 
         <database.type>h2</database.type>
         <database.driver>org.h2.Driver</database.driver>
