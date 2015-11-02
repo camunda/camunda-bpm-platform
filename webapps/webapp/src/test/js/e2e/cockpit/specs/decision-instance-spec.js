@@ -176,29 +176,53 @@ describe('Cockpit Decision Instance Spec', function() {
 
   describe('actions', function() {
 
-    before(function() {
-      return testHelper(setupFile.setup1, function() {
+    describe('navigate to process instance', function () {
 
-        dashboardPage.navigateToWebapp('Cockpit');
-        dashboardPage.authentication.userLogin('admin', 'admin');
+      before(function() {
+        return testHelper(setupFile.setup1, function() {
+
+          dashboardPage.navigateToWebapp('Cockpit');
+          dashboardPage.authentication.userLogin('admin', 'admin');
+        });
       });
+
+      it('go to decision instance view', function() {
+
+        // when
+        dashboardPage.deployedDecisionsList.selectDecision(0);
+        definitionPage.decisionInstancesTab.selectInstanceId(0);
+      });
+
+
+      it('go to the process instance page', function() {
+
+        // when
+        instancePage.gotoProcessInstanceAction.gotoProcessInstance();
+
+        // then
+        expect(browser.getCurrentUrl()).to.eventually.contain('#/process-instance/');
+      });
+
     });
 
-    it('go to decision instance view', function() {
+    describe('navigation action', function () {
 
-      // when
-      dashboardPage.deployedDecisionsList.selectDecision(0);
-      definitionPage.decisionInstancesTab.selectInstanceId(0);
-    });
+      before(function() {
+        return testHelper(setupFile.setup4, function() {
 
+          dashboardPage.navigateToWebapp('Cockpit');
+          dashboardPage.authentication.userLogin('admin', 'admin');
+          dashboardPage.deployedDecisionsList.selectDecision(0);
+          definitionPage.decisionInstancesTab.selectInstanceId(0);
+        });
+      });
 
-    it('go to the process instance page', function() {
+      it('is not displayed', function() {
 
-      // when
-      instancePage.gotoProcessInstanceAction.gotoProcessInstance();
+        // then
+        expect(instancePage.gotoProcessInstanceAction.gotoProcessInstanceButton().isDisplayed()).to.eventually.eql(false);
+      });
 
-      // then
-      expect(browser.getCurrentUrl()).to.eventually.contain('#/process-instance/');
     });
 
   });

@@ -69,10 +69,31 @@ operation('process-definition', 'start', [{
 
 );
 
+var deploy4 = combine(
+
+operation('deployment', 'create', [{
+  deploymentName: 'assign-approver',
+  files: [{
+    name: 'assign-approver-groups.dmn',
+    content: fs.readFileSync(__dirname + '/../../resources/assign-approver-groups.dmn').toString()
+  }]
+}]),
+
+operation('decision-definition', 'evaluate', [{
+  key: 'invoice-assign-approver',
+  variables: {
+    amount: { value: 100 },
+    invoiceCategory: { value: 'travelExpenses' }
+  }
+}])
+
+);
+
 module.exports = {
 
   setup1: deployFirst,
   setup2: combine(deployFirst, deploySecond),
-  setup3: deployThird
+  setup3: deployThird,
+  setup4: deploy4
 
 };

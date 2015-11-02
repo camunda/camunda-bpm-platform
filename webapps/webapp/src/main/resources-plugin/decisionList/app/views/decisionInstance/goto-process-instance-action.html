@@ -1,6 +1,7 @@
 <!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/decisionList/app/views/decisionInstance/goto-process-instance-action.html -->
 <a class="btn btn-default btn-toolbar"
    ng-href="{{ processInstanceLink }}"
+   ng-show="decisionInstance.processInstanceId"
    tooltip="Goto process instance"
    tooltip-placement="left">
   <span class="glyphicon glyphicon-chevron-up"></span>
