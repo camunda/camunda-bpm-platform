@@ -24,9 +24,9 @@ public interface ElContextFactory {
    * Create a {@link ELContext} for the given {@link ExpressionFactory} and {@link VariableContext}.
    *
    * @param expressionFactory the {@link ExpressionFactory} to use
-   * @param varCtx the {@link VariableContext} to use
+   * @param variableContext the {@link VariableContext} to use
    * @return the {@link ELContext} instance
    */
-  ELContext createContext(ExpressionFactory expressionFactory, VariableContext varCtx);
+  ELContext createContext(ExpressionFactory expressionFactory, VariableContext variableContext);
 
 }

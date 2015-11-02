@@ -43,7 +43,7 @@ public interface DmnEngine {
 
   DmnDecisionResult evaluate(DmnDecision decision, Map<String, Object> variables);
 
-  DmnDecisionResult evaluate(DmnDecision decision, VariableContext ctx);
+  DmnDecisionResult evaluate(DmnDecision decision, VariableContext variableContext);
 
   DmnDecisionResult evaluate(DmnDecisionModel decisionModel, Map<String, Object> variables);
 

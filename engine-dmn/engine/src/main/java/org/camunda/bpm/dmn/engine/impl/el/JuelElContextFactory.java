@@ -32,9 +32,9 @@ public class JuelElContextFactory {
   }
 
   public ELContext createElContext(VariableContext variableContext) {
-    SimpleContext ctx = new SimpleContext(resolver);
-    ctx.putContext(VariableContext.class, variableContext);
-    return ctx;
+    SimpleContext elContext = new SimpleContext(resolver);
+    elContext.putContext(VariableContext.class, variableContext);
+    return elContext;
   }
 
 }

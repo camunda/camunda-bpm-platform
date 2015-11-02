@@ -27,15 +27,15 @@ public class FeelTypedVariableMapper extends VariableMapper {
   public static final FeelEngineLogger LOG = FeelLogger.ENGINE_LOGGER;
 
   protected ExpressionFactory expressionFactory;
-  protected VariableContext varCtx;
+  protected VariableContext variableContext;
 
-  public FeelTypedVariableMapper(ExpressionFactory expressionFactory, VariableContext varCtx) {
+  public FeelTypedVariableMapper(ExpressionFactory expressionFactory, VariableContext variableContext) {
     this.expressionFactory = expressionFactory;
-    this.varCtx = varCtx;
+    this.variableContext = variableContext;
   }
 
   public ValueExpression resolveVariable(String variable) {
-    if (varCtx.containsVariable(variable)) {
+    if (variableContext.containsVariable(variable)) {
       Object value = unpackVariable(variable);
       return expressionFactory.createValueExpression(value, Object.class);
     }
@@ -49,7 +49,7 @@ public class FeelTypedVariableMapper extends VariableMapper {
   }
 
   public Object unpackVariable(String variable) {
-    TypedValue valueTyped = varCtx.resolve(variable);
+    TypedValue valueTyped = variableContext.resolve(variable);
     if(valueTyped != null) {
       return valueTyped.getValue();
     }

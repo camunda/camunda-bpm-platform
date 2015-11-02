@@ -135,11 +135,11 @@ public class DmnEngineImpl implements DmnEngine {
     }
   }
 
-  public DmnDecisionResult evaluate(DmnDecision decision, VariableContext varCtx) {
+  public DmnDecisionResult evaluate(DmnDecision decision, VariableContext variableContext) {
     ensureNotNull("decision", decision);
-    ensureNotNull("variables", varCtx);
+    ensureNotNull("variables", variableContext);
     DmnDecisionContext decisionContext = contextFactory.createDecisionContext(configuration);
-    return decisionContext.evaluateDecision(decision, varCtx);
+    return decisionContext.evaluateDecision(decision, variableContext);
   }
 
   public DmnDecisionResult evaluate(DmnDecision decision, Map<String, Object> variables) {

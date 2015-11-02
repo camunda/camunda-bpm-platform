@@ -27,10 +27,10 @@ import org.camunda.bpm.engine.variable.context.VariableContext;
 
 public class FeelElContextFactory implements ElContextFactory {
 
-  public ELContext createContext(ExpressionFactory expressionFactory, VariableContext varCtx) {
+  public ELContext createContext(ExpressionFactory expressionFactory, VariableContext variableContext) {
     ELResolver elResolver = createElResolver();
     FunctionMapper functionMapper = createFunctionMapper();
-    VariableMapper variableMapper = createVariableMapper(expressionFactory, varCtx);
+    VariableMapper variableMapper = createVariableMapper(expressionFactory, variableContext);
     return new FeelElContext(elResolver, functionMapper, variableMapper);
   }
 
@@ -49,8 +49,8 @@ public class FeelElContextFactory implements ElContextFactory {
     return functionMapper;
   }
 
-  public VariableMapper createVariableMapper(ExpressionFactory expressionFactory, VariableContext varCtx) {
-    return new FeelTypedVariableMapper(expressionFactory, varCtx);
+  public VariableMapper createVariableMapper(ExpressionFactory expressionFactory, VariableContext variableContext) {
+    return new FeelTypedVariableMapper(expressionFactory, variableContext);
   }
 
 }

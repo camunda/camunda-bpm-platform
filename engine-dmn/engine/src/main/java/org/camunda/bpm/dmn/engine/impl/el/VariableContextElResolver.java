@@ -27,13 +27,13 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
  */
 public class VariableContextElResolver extends ELResolver {
 
-  public static final String VAR_CTX_KEY = "variableContext";
+  public static final String VARIABLE_CONTEXT_KEY = "variableContext";
 
   @Override
   public Object getValue(ELContext context, Object base, Object property) {
     VariableContext variableContext = (VariableContext) context.getContext(VariableContext.class);
     if(variableContext != null) {
-      if(VAR_CTX_KEY.equals(property)) {
+      if(VARIABLE_CONTEXT_KEY.equals(property)) {
         context.setPropertyResolved(true);
         return variableContext;
       }

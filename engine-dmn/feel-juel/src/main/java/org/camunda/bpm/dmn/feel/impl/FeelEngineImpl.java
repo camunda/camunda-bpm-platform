@@ -45,9 +45,9 @@ public class FeelEngineImpl implements FeelEngine {
     throw LOG.simpleExpressionNotSupported();
   }
 
-  public boolean evaluateSimpleUnaryTests(String simpleUnaryTests, String inputName, VariableContext varCtx) {
+  public boolean evaluateSimpleUnaryTests(String simpleUnaryTests, String inputName, VariableContext variableContext) {
     try {
-      ELContext elContext = createContext(varCtx);
+      ELContext elContext = createContext(variableContext);
       ValueExpression valueExpression = transformSimpleUnaryTests(simpleUnaryTests, inputName, elContext);
       return (Boolean) valueExpression.getValue(elContext);
     }
@@ -75,8 +75,8 @@ public class FeelEngineImpl implements FeelEngine {
     }
   }
 
-  protected ELContext createContext(VariableContext varCtx) {
-    return elContextFactory.createContext(expressionFactory, varCtx);
+  protected ELContext createContext(VariableContext variableContext) {
+    return elContextFactory.createContext(expressionFactory, variableContext);
   }
 
   protected ValueExpression transformSimpleUnaryTests(String simpleUnaryTests, String inputName, ELContext elContext) {

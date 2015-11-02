@@ -147,8 +147,8 @@ public class VariableContextScriptBindings implements Bindings {
     return null;
   }
 
-  public static VariableContextScriptBindings wrap(Bindings wrappedBindings, VariableContext varCtx) {
-    return new VariableContextScriptBindings(wrappedBindings, varCtx);
+  public static VariableContextScriptBindings wrap(Bindings wrappedBindings, VariableContext variableContext) {
+    return new VariableContextScriptBindings(wrappedBindings, variableContext);
   }
 
 }
