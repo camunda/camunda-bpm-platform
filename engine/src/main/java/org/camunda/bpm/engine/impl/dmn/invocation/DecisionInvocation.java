@@ -18,7 +18,7 @@ import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.delegate.DelegateInvocation;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
-import org.camunda.bpm.engine.variable.VariableContext;
+import org.camunda.bpm.engine.variable.context.VariableContext;
 
 /**
  * {@link DelegateInvocation} invoking a {@link DecisionDefinition}

@@ -15,7 +15,7 @@ package org.camunda.bpm.engine.impl.dmn.invocation;
 import java.util.Set;
 
 import org.camunda.bpm.engine.delegate.VariableScope;
-import org.camunda.bpm.engine.variable.VariableContext;
+import org.camunda.bpm.engine.variable.context.VariableContext;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
