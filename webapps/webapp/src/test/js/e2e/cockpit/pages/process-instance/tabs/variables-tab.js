@@ -32,19 +32,19 @@ module.exports = Table.extend({
 
 
   variableName: function(item) {
-    return this.tableItem(item, '.variable-name');
+    return this.tableItem(item, '.col-name');
   },
 
   variableValue: function(item) {
-    return this.tableItem(item, '.variable-value');
+    return this.tableItem(item, '.col-value');
   },
 
   variableType: function(item) {
-    return this.tableItem(item, '.variable-type');
+    return this.tableItem(item, '.col-type');
   },
 
   variableScope: function(item) {
-    return this.tableItem(item, by.css('.col-scope'));
+    return this.tableItem(item, '.col-scope');
   },
 
   variableScopeLink: function(item) {
