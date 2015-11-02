@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.EntityTypes;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
@@ -267,6 +268,41 @@ public class FilterAuthorizationsTest extends PluggableProcessEngineTestCase {
     assertFilterPermission(Permissions.DELETE, testUser, filter.getId(), false);
     assertFilterPermission(Permissions.DELETE, ownerUser, filter.getId(), true);
     assertFilterPermission(Permissions.DELETE, anotherUser, filter.getId(), false);
+  }
+
+  public void testCreateFilterGenericOwnerId() {
+    grantCreateFilter();
+
+    Filter filter = filterService.newTaskFilter("someName");
+    filter.setOwner("*");
+
+    try {
+      filterService.saveFilter(filter);
+      fail("exception expected");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Cannot create default authorization for filter owner *: "
+          + "id cannot be *. * is a reserved identifier.", e.getMessage());
+    }
+  }
+
+  /**
+   * CAM-4889
+   */
+  public void FAILING_testUpdateFilterGenericOwnerId() {
+    grantCreateFilter();
+
+    Filter filter = filterService.newTaskFilter("someName");
+    filterService.saveFilter(filter);
+
+    grantUpdateFilter(filter.getId());
+    filter.setOwner("*");
+
+    try {
+      filterService.saveFilter(filter);
+      fail("it should not be possible to save a filter with the generic owner id");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("foo", e.getMessage());
+    }
   }
 
   protected User createTestUser(String userId) {

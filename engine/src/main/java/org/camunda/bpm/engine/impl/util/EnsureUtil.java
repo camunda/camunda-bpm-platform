@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
 
@@ -289,6 +290,29 @@ public final class EnsureUtil {
     ensureNotNull(exceptionClass, message, variableName, collection);
     if (collection.size() != elements) {
       throw generateException(exceptionClass, message, variableName, "does not have " + elements + " elements");
+    }
+  }
+
+  public static void ensureValidIndividualResourceId(String message, String id) {
+    ensureValidIndividualResourceId(ProcessEngineException.class, message, id);
+  }
+
+  public static void ensureValidIndividualResourceId(Class<? extends ProcessEngineException> exceptionClass, String message, String id) {
+    ensureNotNull(exceptionClass, message, "id", id);
+    if (Authorization.ANY.equals(id)) {
+      throw generateException(exceptionClass, message, "id", "cannot be "
+          + Authorization.ANY + ". " + Authorization.ANY + " is a reserved identifier.");
+    }
+  }
+
+  public static void ensureValidIndividualResourceIds(String message, Collection<String> ids) {
+    ensureValidIndividualResourceIds(ProcessEngineException.class, message, ids);
+  }
+
+  public static void ensureValidIndividualResourceIds(Class<? extends ProcessEngineException> exceptionClass, String message, Collection<String> ids) {
+    ensureNotNull(exceptionClass, message, "id", ids);
+    for (String id : ids) {
+      ensureValidIndividualResourceId(exceptionClass, message, id);
     }
   }
 

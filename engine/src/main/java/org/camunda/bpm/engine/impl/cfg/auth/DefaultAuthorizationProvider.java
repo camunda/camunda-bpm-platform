@@ -22,6 +22,8 @@ import static org.camunda.bpm.engine.authorization.Resources.FILTER;
 import static org.camunda.bpm.engine.authorization.Resources.GROUP;
 import static org.camunda.bpm.engine.authorization.Resources.TASK;
 import static org.camunda.bpm.engine.authorization.Resources.USER;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.*;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +57,9 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
   public AuthorizationEntity[] newUser(User user) {
     // create an authorization which gives the user all permissions on himself:
     String userId = user.getId();
+
+    ensureValidIndividualResourceId("Cannot create default authorization for user " + userId,
+        userId);
     AuthorizationEntity resourceOwnerAuthorization = createGrantAuthorization(userId, null, USER, userId, ALL);
 
     return new AuthorizationEntity[]{ resourceOwnerAuthorization };
@@ -66,6 +71,10 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
     // whenever a new group is created, all users part of the
     // group are granted READ permissions on the group
     String groupId = group.getId();
+
+    ensureValidIndividualResourceId("Cannot create default authorization for group " + groupId,
+        groupId);
+
     AuthorizationEntity groupMemberAuthorization = createGrantAuthorization(null, groupId, GROUP, groupId, READ);
     authorizations.add(groupMemberAuthorization);
 
@@ -85,6 +94,10 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
     if(owner != null) {
       // create an authorization which gives the owner of the filter all permissions on the filter
       String filterId = filter.getId();
+
+      ensureValidIndividualResourceId("Cannot create default authorization for filter owner " + owner,
+          owner);
+
       AuthorizationEntity filterOwnerAuthorization = createGrantAuthorization(owner, null, FILTER, filterId, ALL);
 
       return new AuthorizationEntity[]{ filterOwnerAuthorization };
@@ -136,6 +149,9 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
   public AuthorizationEntity[] newTaskAssignee(Task task, String oldAssignee, String newAssignee) {
     if (newAssignee != null) {
 
+      ensureValidIndividualResourceId("Cannot create default authorization for assignee " + newAssignee,
+          newAssignee);
+
       // create (or update) an authorization for the new assignee.
 
       String taskId = task.getId();
@@ -157,6 +173,9 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
 
   public AuthorizationEntity[] newTaskOwner(Task task, String oldOwner, String newOwner) {
     if (newOwner != null) {
+
+      ensureValidIndividualResourceId("Cannot create default authorization for owner " + newOwner,
+          newOwner);
 
       // create (or update) an authorization for the new owner.
 
@@ -181,6 +200,9 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
     // create (or update) an authorization for the given user
     // whenever a new user identity link will be added
 
+    ensureValidIndividualResourceId("Cannot grant default authorization for identity link to user " + userId,
+        userId);
+
     String taskId = task.getId();
 
     // fetch existing authorization
@@ -196,6 +218,10 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
   }
 
   public AuthorizationEntity[] newTaskGroupIdentityLink(Task task, String groupId, String type) {
+
+    ensureValidIndividualResourceId("Cannot grant default authorization for identity link to group " + groupId,
+        groupId);
+
     // create (or update) an authorization for the given group
     // whenever a new user identity link will be added
     String taskId = task.getId();
@@ -259,6 +285,14 @@ public class DefaultAuthorizationProvider implements ResourceAuthorizationProvid
   }
 
   protected AuthorizationEntity createGrantAuthorization(String userId, String groupId, Resource resource, String resourceId, Permission... permissions) {
+    // assuming that there are no default authorizations for *
+    if (userId != null) {
+      ensureValidIndividualResourceId("Cannot create authorization for user " + userId, userId);
+    }
+    if (groupId != null) {
+      ensureValidIndividualResourceId("Cannot create authorization for group " + groupId, groupId);
+    }
+
     AuthorizationEntity authorization = new AuthorizationEntity(AUTH_TYPE_GRANT);
     authorization.setUserId(userId);
     authorization.setGroupId(groupId);

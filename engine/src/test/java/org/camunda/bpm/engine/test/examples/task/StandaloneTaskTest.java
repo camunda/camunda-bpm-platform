@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.examples.task;
 import java.util.List;
 
 import org.camunda.bpm.engine.OptimisticLockingException;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.task.Task;
@@ -72,16 +73,16 @@ public class StandaloneTaskTest extends PluggableProcessEngineTestCase {
     // TODO: check for historic data when implemented!
     assertNull(taskService.createTaskQuery().taskId(taskId).singleResult());
   }
-  
+
   public void testOptimisticLockingThrownOnMultipleUpdates() {
     Task task = taskService.newTask();
     taskService.saveTask(task);
     String taskId = task.getId();
-    
+
     // first modification
     Task task1 = taskService.createTaskQuery().taskId(taskId).singleResult();
     Task task2 = taskService.createTaskQuery().taskId(taskId).singleResult();
-    
+
     task1.setDescription("first modification");
     taskService.saveTask(task1);
 
@@ -93,11 +94,11 @@ public class StandaloneTaskTest extends PluggableProcessEngineTestCase {
     } catch (OptimisticLockingException expected) {
       //  exception was thrown as expected
     }
-    
+
     taskService.deleteTask(taskId, true);
   }
-  
-  // See http://jira.codehaus.org/browse/ACT-1290 
+
+  // See http://jira.codehaus.org/browse/ACT-1290
   public void testRevisionUpdatedOnSave() {
     Task task = taskService.newTask();
     taskService.saveTask(task);
@@ -110,8 +111,19 @@ public class StandaloneTaskTest extends PluggableProcessEngineTestCase {
     task.setDescription("second modification");
     taskService.saveTask(task);
     assertEquals(3, ((TaskEntity) task).getRevision());
-    
+
     taskService.deleteTask(task.getId(), true);
   }
+
+  public void testSaveTaskWithGenericResourceId() {
+    Task task = taskService.newTask("*");
+    try {
+      taskService.saveTask(task);
+      fail("it should not be possible to save a task with the generic resource id *");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Entity Task[*] has an invalid id: id cannot be *. * is a reserved identifier", e.getMessage());
+    }
+  }
+
 
 }

@@ -24,9 +24,14 @@ import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
 
 /**
+ * <p>Manages (create/update/delete) default authorization when an entity is
+ * changed</p>
+ *
+ * <p>Implementations should throw an exception when a specific resource's id is <code>*</code>, as
+ * <code>*</code> represents access to all resources/by all users.</p>
+ *
  *
  * @author Daniel Meyer
- *
  */
 public interface ResourceAuthorizationProvider {
 

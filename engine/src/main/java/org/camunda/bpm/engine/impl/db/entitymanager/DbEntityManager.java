@@ -29,6 +29,9 @@ import java.util.Collections;
 import java.util.List;
 
 
+
+
+
 import org.camunda.bpm.engine.impl.DeploymentQueryImpl;
 import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
 import org.camunda.bpm.engine.impl.GroupQueryImpl;
@@ -67,6 +70,7 @@ import org.camunda.bpm.engine.impl.identity.db.DbGroupQueryImpl;
 import org.camunda.bpm.engine.impl.identity.db.DbUserQueryImpl;
 import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorContext;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 /**
  *
@@ -233,9 +237,9 @@ public class DbEntityManager implements Session, EntityLoadListener {
     else {
       return persistentObject;
     }
-    
+
   }
-  
+
   public void onEntityLoaded(DbEntity entity) {
     // we get a callback when the persistence session loads an object from the database
     DbEntity cachedPersistentObject = dbEntityCache.get(entity.getClass(), entity.getId());
@@ -379,6 +383,8 @@ public class DbEntityManager implements Session, EntityLoadListener {
     // generate Id if not present
     ensureHasId(dbEntity);
 
+    validateId(dbEntity);
+
     // put into cache
     dbEntityCache.putTransient(dbEntity);
 
@@ -452,6 +458,10 @@ public class DbEntityManager implements Session, EntityLoadListener {
       String nextId = idGenerator.getNextId();
       dbEntity.setId(nextId);
     }
+  }
+
+  protected void validateId(DbEntity dbEntity) {
+    EnsureUtil.ensureValidIndividualResourceId("Entity " + dbEntity + " has an invalid id", dbEntity.getId());
   }
 
   public <T extends DbEntity> List<T> pruneDeletedEntities(List<T> listToPrune) {

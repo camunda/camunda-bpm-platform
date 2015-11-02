@@ -45,6 +45,7 @@ import org.camunda.bpm.engine.impl.identity.Account;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoEntity;
+import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 
 /**
@@ -116,19 +117,26 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
   }
 
   public void setAuthenticatedUserId(String authenticatedUserId) {
-    currentAuthentication.set(new Authentication(authenticatedUserId, null));
+    setAuthentication(new Authentication(authenticatedUserId, null));
   }
 
   public void setAuthentication(Authentication auth) {
     if(auth == null) {
       clearAuthentication();
     } else {
+      if (auth.getUserId() != null) {
+        EnsureUtil.ensureValidIndividualResourceId("Invalid user id provided", auth.getUserId());
+      }
+      if (auth.getGroupIds() != null) {
+        EnsureUtil.ensureValidIndividualResourceIds("At least one invalid group id provided", auth.getGroupIds());
+      }
+
       currentAuthentication.set(auth);
     }
   }
 
   public void setAuthentication(String userId, List<String> groups) {
-    currentAuthentication.set(new Authentication(userId, groups));
+    setAuthentication(new Authentication(userId, groups));
   }
 
   public void clearAuthentication() {
