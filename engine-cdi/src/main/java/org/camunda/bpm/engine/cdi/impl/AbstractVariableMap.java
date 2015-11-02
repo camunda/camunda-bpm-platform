@@ -7,8 +7,8 @@ import java.util.Set;
 import javax.inject.Inject;
 
 import org.camunda.bpm.engine.cdi.BusinessProcess;
-import org.camunda.bpm.engine.variable.VariableContext;
 import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.context.VariableContext;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 abstract class AbstractVariableMap implements VariableMap {
