@@ -15,16 +15,21 @@ package org.camunda.bpm.engine.impl.cmd;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeleteDeploymentFailListener;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
+import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
 
 /**
  * @author Joram Barrez
@@ -52,6 +57,10 @@ public class DeleteDeploymentCmd implements Command<Void>, Serializable {
 
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     authorizationManager.checkDeleteDeployment(deploymentId);
+
+    UserOperationLogManager logManager = commandContext.getOperationLogManager();
+    List<PropertyChange> propertyChanges = Arrays.asList(new PropertyChange("cascade", null, cascade));
+    logManager.logDeploymentOperation(UserOperationLogEntry.OPERATION_TYPE_DELETE, deploymentId, propertyChanges);
 
     commandContext
       .getDeploymentManager()

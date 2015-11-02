@@ -299,9 +299,10 @@ public class UserOperationLogTaskTest extends AbstractUserOperationLogTest {
 
     // then
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
-    assertEquals(2, query.count());
+    assertEquals(3, query.count());
     assertEquals(1, query.operationType(UserOperationLogEntry.OPERATION_TYPE_SUSPEND).count());
     assertEquals(1, query.operationType(UserOperationLogEntry.OPERATION_TYPE_RESOLVE).count());
+    assertEquals(1, query.operationType(UserOperationLogEntry.OPERATION_TYPE_DELETE).count());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/oneTaskProcess.bpmn20.xml"})

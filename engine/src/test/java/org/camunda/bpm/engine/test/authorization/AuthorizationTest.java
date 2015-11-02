@@ -32,6 +32,7 @@ import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.repository.Deployment;
@@ -522,13 +523,25 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
     });
   }
 
-  protected void deleteDeployment(final String deploymentId) {
-    runWithoutAuthorization(new Callable<Void>() {
-      public Void call() throws Exception {
-        repositoryService.deleteDeployment(deploymentId, true);
-        return null;
+  protected void deleteDeployment(String deploymentId) {
+    deleteDeployment(deploymentId, true);
+  }
+
+  protected void deleteDeployment(final String deploymentId, final boolean cascade) {
+    Authentication authentication = identityService.getCurrentAuthentication();
+    try  {
+      identityService.clearAuthentication();
+      runWithoutAuthorization(new Callable<Void>() {
+        public Void call() throws Exception {
+          repositoryService.deleteDeployment(deploymentId, cascade);
+          return null;
+        }
+      });
+    } finally {
+      if (authentication != null) {
+        identityService.setAuthentication(authentication);
       }
-    });
+    }
   }
 
   protected ProcessInstance startProcessAndExecuteJob(final String key) {

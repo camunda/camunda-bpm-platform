@@ -334,9 +334,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     taskService.complete(taskId);
     enableAuthorization();
 
-    disableAuthorization();
-    repositoryService.deleteDeployment(deploymentId);
-    enableAuthorization();
+    deleteDeployment(deploymentId, false);
 
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
@@ -446,9 +444,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     taskService.complete(taskId);
     enableAuthorization();
 
-    disableAuthorization();
-    repositoryService.deleteDeployment(deploymentId);
-    enableAuthorization();
+    deleteDeployment(deploymentId, false);
 
     String entryId = historyService.createUserOperationLogQuery().singleResult().getId();
 
