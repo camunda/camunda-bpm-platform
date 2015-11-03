@@ -189,8 +189,6 @@ public class Bpmn {
     definitions.getDomElement().registerNamespace("camunda", CAMUNDA_NS);
     modelInstance.setDefinitions(definitions);
     Process process = modelInstance.newInstance(Process.class);
-    String processId = ModelUtil.getUniqueIdentifier(process.getElementType());
-    process.setId(processId);
     definitions.addChildElement(process);
     return process.builder();
   }

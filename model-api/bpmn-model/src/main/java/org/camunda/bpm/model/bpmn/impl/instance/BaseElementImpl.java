@@ -67,9 +67,6 @@ public abstract class BaseElementImpl extends BpmnModelElementInstanceImpl imple
 
   public BaseElementImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
-    if (getId() == null) {
-      setId(ModelUtil.getUniqueIdentifier(getElementType()));
-    }
   }
 
   public String getId() {

@@ -35,6 +35,7 @@ import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_LIST_API;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN20_NS;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelException;
@@ -56,6 +57,7 @@ import org.camunda.bpm.model.bpmn.instance.SubProcess;
 import org.camunda.bpm.model.bpmn.instance.Task;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.camunda.bpm.model.xml.Model;
+import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.junit.After;
 import org.junit.BeforeClass;
@@ -90,8 +92,12 @@ public class ProcessBuilderTest {
     assertThat(definitions).isNotNull();
     assertThat(definitions.getTargetNamespace()).isEqualTo(BPMN20_NS);
 
-    assertThat(modelInstance.getModelElementsByType(processType))
+    Collection<ModelElementInstance> processes = modelInstance.getModelElementsByType(processType);
+    assertThat(processes)
       .hasSize(1);
+
+    Process process = (Process) processes.iterator().next();
+    assertThat(process.getId()).isNotNull();
   }
 
   @Test
