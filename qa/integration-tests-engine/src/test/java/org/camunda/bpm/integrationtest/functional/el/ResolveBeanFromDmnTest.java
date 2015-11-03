@@ -12,6 +12,10 @@
  */
 package org.camunda.bpm.integrationtest.functional.el;
 
+import static org.junit.Assert.assertNotNull;
+
+import org.camunda.bpm.engine.runtime.VariableInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.integrationtest.functional.el.beans.GreeterBean;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -38,5 +42,13 @@ public class ResolveBeanFromDmnTest extends AbstractFoxPlatformIntegrationTest {
   @Test
   public void testNullElResolverIsIgnored() {
     runtimeService.startProcessInstanceByKey("testProcess");
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+
+    VariableInstance decisionResult = runtimeService.createVariableInstanceQuery().variableName("result").singleResult();
+    assertNotNull("The variable 'result' should exist", decisionResult);
+    assertNotNull("The value of the variable 'result' should not be null", decisionResult.getValue());
   }
+
 }
