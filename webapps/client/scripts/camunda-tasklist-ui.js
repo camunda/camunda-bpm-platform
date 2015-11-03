@@ -75,7 +75,6 @@ define('camunda-tasklist-ui', [
 
   function loaded() {
     var angular = require('angular');
-    var $ = angular.element;
 
     function parseUriConfig() {
       var $baseTag = angular.element('base');

@@ -44,18 +44,29 @@
 
 </head>
 
-<body>
-  <div class="site-wrap"
-       ng-controller="camTasklistAppCtrl">
+<body ng-controller="camTasklistAppCtrl">
+  <div cam-widget-header
+       authentication="authentication"
+       user-name="userFullName"
+       current-app="tasklist"
+       toggle-navigation="{{ 'TOGGLE_NAVIGATION' | translate }}"
+       sign-out="{{ 'SIGN_OUT_ACTION' | translate }}"
+       my-profile="{{ 'MY_PROFILE' | translate }}"
+       brand-name="{{ 'APP_VENDOR' | translate }} {{ 'TASKLIST_APP' | translate }}">
+   <ul class="header-actions"
+       ng-controller="camHeaderViewsCtrl">
+      <li ng-repeat="actionProvider in navbarActions"
+          ng-class="actionProvider.id">
+        <view cam-if-logged-in
+              ng-cloak
+              provider="actionProvider"
+              vars="navbarVars">
+        </view>
+      </li>
+    </ul>
+  </div>
 
-    <!-- # page-navigation -->
-    <nav class="navbar navbar-default"
-         role="navigation"
-         cam-tasklist-navigation>
-    </nav>
-    <!-- / page-navigation -->
-
-
+  <div class="site-wrap">
 
     <!-- # page-content -->
     <div class="page-wrap" ng-view></div>
@@ -103,10 +114,5 @@
           src="$APP_ROOT/app/tasklist/scripts/placeholders.jquery.js"></script>
   <![endif]-->
 
-  <!-- #production-remove -->
-  <script type="text/javascript">
-  document.write('<s'+'cript src="//'+ location.hostname +':LIVERELOAD_PORT/livereload.js?snipver=1"><'+'/script>')
-  </script>
-  <!-- /production-remove -->
 </body>
 </html>

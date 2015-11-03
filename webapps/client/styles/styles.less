@@ -21,6 +21,11 @@
 @navbar-default-link-active-bg:     @brand-primary;
 @navbar-height:                     41px;
 
+@navbar-inverse-bg:                 @brand-primary;
+@navbar-inverse-color:              @body-bg;
+@navbar-inverse-link-color:         @body-bg;
+@navbar-inverse-link-hover-color:   @body-bg;
+
 @modal-header-bg:                   lighten(@gray-lighter, 3%);
 @modal-footer-bg:                   @modal-header-bg;
 
@@ -226,7 +231,32 @@ a:focus {
 
 @import "_notifications-panel";
 
+[cam-widget-header] {
+  [ng-transclude] {
+    > ul > li {
+      display: inline-block;
 
+       > view > a {
+        position: relative;
+        display: block;
+        padding: 10px @nav-link-padding;
+        line-height: @line-height-computed;
+        color: @navbar-default-link-color;
+
+        @media (min-width: @grid-float-breakpoint) {
+          padding-top: @navbar-padding-vertical;
+          padding-bottom: @navbar-padding-vertical;
+        }
+
+        // &:hover,
+        // &:focus {
+        //   color: @navbar-default-link-hover-color;
+        //   background-color: transparent;
+        // }
+      }
+    }
+  }
+}
 
 
 @import "../scripts/filter/directives/cam-tasklist-filters";
@@ -246,8 +276,6 @@ a:focus {
 @import "../scripts/tasklist/directives/cam-tasklist-sorting.less";
 @import "../scripts/tasklist/directives/cam-tasklist-tasks.less";
 
-
-@import "../scripts/navigation/directives/cam-tasklist-navigation";
 
 @import "../scripts/process/plugins/action/modals/cam-tasklist-process-start-modal";
 

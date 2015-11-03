@@ -1,8 +1,4 @@
-define([
-  'angular'
-], function(
-  angular
-) {
+define(function() {
   'use strict';
 
   var TasklistApp = (function() {
@@ -19,9 +15,11 @@ define([
 
   return [
     'camAPI',
+    '$window',
     '$scope',
   function(
     camAPI,
+    $window,
     $scope
   ) {
 
@@ -50,6 +48,9 @@ define([
 
     getUserProfile($scope.authentication);
 
+    $scope.$on('authentication.logout.success', function () {
+      $window.location.reload();
+    });
   }];
 
 });

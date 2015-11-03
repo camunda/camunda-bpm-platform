@@ -1,12 +1,12 @@
 define([
   'angular',
-  './directives/cam-tasklist-navigation',
   './controllers/cam-layout-ctrl',
+  './controllers/cam-header-views-ctrl',
   'camunda-commons-ui/util/index'
 ], function(
   angular,
-  camTasklistNavigation,
-  camLayoutCtrl
+  camLayoutCtrl,
+  camHeaderViewsCtrl
 ) {
   'use strict';
 
@@ -16,8 +16,8 @@ define([
     'cam.tasklist.user'
   ]);
 
+  navigationModule.controller('camHeaderViewsCtrl', camHeaderViewsCtrl);
   navigationModule.controller('camLayoutCtrl', camLayoutCtrl);
-  navigationModule.directive('camTasklistNavigation', camTasklistNavigation);
 
   return navigationModule;
 });
