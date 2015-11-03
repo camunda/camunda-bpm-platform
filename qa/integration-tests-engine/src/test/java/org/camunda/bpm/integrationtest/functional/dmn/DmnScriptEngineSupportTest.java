@@ -92,12 +92,12 @@ public class DmnScriptEngineSupportTest extends AbstractFoxPlatformIntegrationTe
 
   protected String getResultVariable(ProcessInstance processInstance) {
     DmnDecisionResult result = (DmnDecisionResult) runtimeService.getVariable(processInstance.getId(), RESULT_VARIABLE);
-    return result.getSingleOutput().getValue("result");
+    return (String) result.getSingleOutput().get("result");
   }
 
   protected String getReasonVariable(ProcessInstance processInstance) {
     DmnDecisionResult result = (DmnDecisionResult) runtimeService.getVariable(processInstance.getId(), RESULT_VARIABLE);
-    return result.getSingleOutput().getValue("reason");
+    return (String) result.getSingleOutput().get("reason");
   }
 
 }
