@@ -17,9 +17,11 @@ import org.camunda.bpm.model.xml.ModelException;
 import org.camunda.bpm.model.xml.impl.ModelInstanceImpl;
 import org.camunda.bpm.model.xml.impl.instance.ModelElementInstanceImpl;
 import org.camunda.bpm.model.xml.impl.type.ModelElementTypeImpl;
+import org.camunda.bpm.model.xml.impl.type.attribute.StringAttribute;
 import org.camunda.bpm.model.xml.instance.DomElement;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
+import org.camunda.bpm.model.xml.type.attribute.Attribute;
 
 import java.util.*;
 
@@ -187,6 +189,19 @@ public final class ModelUtil {
     ModelElementTypeImpl typeImpl = (ModelElementTypeImpl) type;
     typeImpl.resolveBaseTypes(baseTypes);
     return baseTypes;
+  }
+
+  /**
+   * Set unique identifier if the type has a String id attribute
+   *
+   * @param type the type of the model element
+   * @param modelElementInstance the model element instance to set the id
+   */
+  public static void setGeneratedUniqueIdentifier(ModelElementType type, ModelElementInstance modelElementInstance) {
+    Attribute<?> id = type.getAttribute("id");
+    if (id != null && id instanceof StringAttribute && id.isIdAttribute()) {
+      ((StringAttribute) id).setValue(modelElementInstance, ModelUtil.getUniqueIdentifier(type));
+    }
   }
 
   public static String getUniqueIdentifier(ModelElementType type) {

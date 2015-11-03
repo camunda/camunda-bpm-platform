@@ -76,7 +76,9 @@ public class ModelInstanceImpl implements ModelInstance {
 
   @SuppressWarnings("unchecked")
   public <T extends ModelElementInstance> T newInstance(ModelElementType type) {
-    return (T) type.newInstance(this);
+    ModelElementInstance modelElementInstance = type.newInstance(this);
+    ModelUtil.setGeneratedUniqueIdentifier(type, modelElementInstance);
+    return (T) modelElementInstance;
   }
 
   public Model getModel() {
