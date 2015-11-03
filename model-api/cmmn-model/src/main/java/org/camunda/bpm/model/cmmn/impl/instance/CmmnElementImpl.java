@@ -39,9 +39,6 @@ public abstract class CmmnElementImpl extends CmmnModelElementInstanceImpl imple
 
   public CmmnElementImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
-    if (getId() == null) {
-      setId(ModelUtil.getUniqueIdentifier(getElementType()));
-    }
   }
 
   public String getId() {
