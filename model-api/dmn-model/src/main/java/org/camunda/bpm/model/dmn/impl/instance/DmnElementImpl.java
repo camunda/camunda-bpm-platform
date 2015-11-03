@@ -39,9 +39,6 @@ public abstract class DmnElementImpl extends DmnModelElementInstanceImpl impleme
 
   public DmnElementImpl (ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
-    if (getId() == null) {
-      setId(ModelUtil.getUniqueIdentifier(getElementType()));
-    }
   }
 
   public String getId() {
