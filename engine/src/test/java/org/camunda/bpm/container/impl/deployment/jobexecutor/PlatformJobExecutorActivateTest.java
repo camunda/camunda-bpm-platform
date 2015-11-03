@@ -42,6 +42,8 @@ import static org.junit.Assert.*;
  */
 public class PlatformJobExecutorActivateTest {
 
+  private static final String ENGINE_NAME = "PlatformJobExecutorActivateTest-engine";
+
   @Test
   public void shouldAutoActivateIfNoPropertySet() {
 
@@ -54,7 +56,7 @@ public class PlatformJobExecutorActivateTest {
     deployPlatform(bpmPlatformXml);
 
     try {
-      ProcessEngine processEngine = ProcessEngines.getProcessEngine("default");
+      ProcessEngine processEngine = ProcessEngines.getProcessEngine(ENGINE_NAME);
       ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
       // then
       assertEquals(true, processEngineConfiguration.getJobExecutor().isActive());
@@ -81,7 +83,7 @@ public class PlatformJobExecutorActivateTest {
     deployPlatform(bpmPlatformXml);
 
     try {
-      ProcessEngine processEngine = ProcessEngines.getProcessEngine("default");
+      ProcessEngine processEngine = ProcessEngines.getProcessEngine(ENGINE_NAME);
       ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
       // then
       assertEquals(false, processEngineConfiguration.getJobExecutor().isActive());
@@ -94,9 +96,11 @@ public class PlatformJobExecutorActivateTest {
 
   private ProcessEngineXmlImpl defineProcessEngine() {
     ProcessEngineXmlImpl processEngineXml = new ProcessEngineXmlImpl();
-    processEngineXml.setProperties(new HashMap<String, String>());
+    HashMap<String, String> properties = new HashMap<String, String>();
+    properties.put("jdbcUrl", "jdbc:h2:mem:PlatformJobExecutorActivateTest-db");
+    processEngineXml.setProperties(properties);
     processEngineXml.setPlugins(new ArrayList<ProcessEnginePluginXml>());
-    processEngineXml.setName("default");
+    processEngineXml.setName(ENGINE_NAME);
     processEngineXml.setJobAcquisitionName("default");
     processEngineXml.setConfigurationClass(StandaloneInMemProcessEngineConfiguration.class.getName());
     processEngineXml.setDefault(true);
