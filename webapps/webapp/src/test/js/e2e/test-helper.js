@@ -8,8 +8,6 @@ var camClient = new CamSDK.Client({
   apiUri: 'http://localhost:8080/engine-rest'
 });
 
-var keys = Object.keys;
-
 module.exports = function (operations, noReset, done) {
   var deferred = protractor.promise.defer();
 
@@ -57,9 +55,9 @@ module.exports = function (operations, noReset, done) {
   operations.forEach(function(operation) {
     var resource = new camClient.resource(operation.module);
     callbacks.push(function (cb) {
-      console.info('doing '+operation.module+'.'+operation.operation);//, operation.params);
-      resource[operation.operation](operation.params, function(){
-        cb();
+      resource[operation.operation](operation.params, function(err){
+        console.info('doing '+ operation.module +'.'+ operation.operation +':', err ? '\n' + err.message : 'OK');
+        cb(err);
       });
     });
   });
