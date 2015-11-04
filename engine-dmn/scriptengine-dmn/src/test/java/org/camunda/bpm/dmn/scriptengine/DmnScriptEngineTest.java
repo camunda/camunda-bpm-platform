@@ -62,7 +62,7 @@ public class DmnScriptEngineTest {
     ScriptEngine scriptEngine = scriptEngineManager.getEngineByExtension("dmn");
     assertScriptEngine(scriptEngine);
 
-    scriptEngine = scriptEngineManager.getEngineByExtension("dmn10.xml");
+    scriptEngine = scriptEngineManager.getEngineByExtension("dmn11.xml");
     assertScriptEngine(scriptEngine);
   }
 

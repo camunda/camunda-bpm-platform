@@ -32,7 +32,7 @@ public class DmnScriptEngineFactory implements ScriptEngineFactory {
 
   static {
     names = Collections.unmodifiableList(Arrays.asList(NAME, "Dmn", "DMN"));
-    extensions = Collections.unmodifiableList(Arrays.asList(NAME, "dmn10.xml"));
+    extensions = Collections.unmodifiableList(Arrays.asList(NAME, "dmn11.xml"));
     mimeTypes = Collections.emptyList();
   }
 
