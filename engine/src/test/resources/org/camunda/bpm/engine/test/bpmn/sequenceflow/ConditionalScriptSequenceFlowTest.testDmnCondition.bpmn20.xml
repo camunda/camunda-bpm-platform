@@ -10,11 +10,11 @@
     <startEvent id="start" />
 
     <sequenceFlow id="flow1" sourceRef="start" targetRef="left">
-      <conditionExpression xsi:type="tFormalExpression" language="dmn" camunda:resource="org/camunda/bpm/engine/test/bpmn/sequenceflow/ConditionalScriptSequenceFlowTest.condition-left.dmn10.xml" />
+      <conditionExpression xsi:type="tFormalExpression" language="dmn" camunda:resource="org/camunda/bpm/engine/test/bpmn/sequenceflow/ConditionalScriptSequenceFlowTest.condition-left.dmn11.xml" />
     </sequenceFlow>
 
     <sequenceFlow id="flow2" sourceRef="start" targetRef="right">
-      <conditionExpression xsi:type="tFormalExpression" language="dmn" camunda:resource="org/camunda/bpm/engine/test/bpmn/sequenceflow/ConditionalScriptSequenceFlowTest.condition-right.dmn10.xml" />
+      <conditionExpression xsi:type="tFormalExpression" language="dmn" camunda:resource="org/camunda/bpm/engine/test/bpmn/sequenceflow/ConditionalScriptSequenceFlowTest.condition-right.dmn11.xml" />
     </sequenceFlow>
 
     <userTask id="left" name="task left" />

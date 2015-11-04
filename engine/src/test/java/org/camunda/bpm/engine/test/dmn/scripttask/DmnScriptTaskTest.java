@@ -36,7 +36,7 @@ public class DmnScriptTaskTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/dmn/scripttask/DmnScriptTaskTest.bpmn20.xml",
-    "org/camunda/bpm/engine/test/dmn/scripttask/DmnScriptTaskTest.dmn10.xml"
+    "org/camunda/bpm/engine/test/dmn/scripttask/DmnScriptTaskTest.dmn11.xml"
   })
   public void testDmnExampleWithScriptTask() {
     VariableMap variables = Variables.createVariables()

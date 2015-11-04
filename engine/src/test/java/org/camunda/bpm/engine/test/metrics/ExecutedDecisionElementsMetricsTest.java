@@ -21,7 +21,7 @@ import org.camunda.bpm.model.bpmn.instance.BusinessRuleTask;
 
 public class ExecutedDecisionElementsMetricsTest extends AbstractMetricsTest {
 
-  public static final String DMN_FILE = "org/camunda/bpm/engine/test/metrics/ExecutedDecisionElementsTest.dmn10.xml";
+  public static final String DMN_FILE = "org/camunda/bpm/engine/test/metrics/ExecutedDecisionElementsTest.dmn11.xml";
   public static VariableMap VARIABLES = Variables.createVariables().putValue("status", "").putValue("sum", 100);
 
   protected void clearMetrics() {

@@ -39,7 +39,7 @@ public class DmnHistoryTest extends AbstractFoxPlatformIntegrationTest {
 
     return initWebArchiveDeployment()
         .addAsResource("org/camunda/bpm/integrationtest/functional/dmn/BusinessRuleProcess.bpmn20.xml", "BusinessRuleProcess.bpmn20.xml")
-        .addAsResource("org/camunda/bpm/integrationtest/functional/dmn/Example.dmn10.xml", "Example.dmn10.xml");
+        .addAsResource("org/camunda/bpm/integrationtest/functional/dmn/Example.dmn11.xml", "Example.dmn11.xml");
 
   }
 

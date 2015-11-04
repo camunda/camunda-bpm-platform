@@ -4,7 +4,7 @@
     <bpmn2:startEvent id="startEvent" name="New order&#xA;placed">
       <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>
     </bpmn2:startEvent>
-    <bpmn2:scriptTask id="scriptTask" camunda:resource="org/camunda/bpm/engine/test/dmn/scripttask/DmnScriptTaskTest.dmn10.xml" camunda:resultVariable="decisionResult" name="Check order" scriptFormat="dmn">
+    <bpmn2:scriptTask id="scriptTask" camunda:resource="org/camunda/bpm/engine/test/dmn/scripttask/DmnScriptTaskTest.dmn11.xml" camunda:resultVariable="decisionResult" name="Check order" scriptFormat="dmn">
       <bpmn2:extensionElements>
         <camunda:inputOutput>
           <camunda:outputParameter name="result">${decisionResult.getSingleOutput().result}</camunda:outputParameter>

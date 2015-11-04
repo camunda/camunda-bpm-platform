@@ -30,7 +30,7 @@ import org.camunda.bpm.engine.variable.Variables;
  */
 public class DmnDecisionResultMappingTest extends PluggableProcessEngineTestCase {
 
-  protected static final String TEST_DECISION = "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultTest.dmn10.xml";
+  protected static final String TEST_DECISION = "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultTest.dmn11.xml";
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultCustomOutputMapping.bpmn20.xml", TEST_DECISION })
   public void testCustomOutputMapping() {

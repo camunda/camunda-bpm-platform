@@ -38,7 +38,7 @@ import org.camunda.bpm.dmn.engine.transform.DmnTransformer;
  */
 public class DmnDeployer extends AbstractDefinitionDeployer<DecisionDefinitionEntity> {
 
-  public static final String[] DMN_RESOURCE_SUFFIXES = new String[] { "dmn10.xml", "dmn" };
+  public static final String[] DMN_RESOURCE_SUFFIXES = new String[] { "dmn11.xml", "dmn" };
 
   protected DmnTransformer transformer;
 

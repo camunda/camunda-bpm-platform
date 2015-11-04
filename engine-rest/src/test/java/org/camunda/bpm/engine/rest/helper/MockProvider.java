@@ -291,7 +291,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_DEPLOYMENT_DMN_RESOURCE_NAME = "a-dmn-resource.dmn";
 
   public static final String EXAMPLE_DEPLOYMENT_DMN_XML_RESOURCE_ID = "aDeploymentDmnXmlResourceId";
-  public static final String EXAMPLE_DEPLOYMENT_DMN_XML_RESOURCE_NAME = "a-dmn-resource.dmn10.xml";
+  public static final String EXAMPLE_DEPLOYMENT_DMN_XML_RESOURCE_NAME = "a-dmn-resource.dmn11.xml";
 
   public static final String EXAMPLE_DEPLOYMENT_XML_RESOURCE_ID = "aDeploymentXmlResourceId";
   public static final String EXAMPLE_DEPLOYMENT_XML_RESOURCE_NAME = "a-xml-resource.xml";

@@ -40,7 +40,7 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
   public void setUp() throws Exception {
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.processWithBusinessRuleTask.bpmn20.xml",
-        "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.decisionSingleOutput.dmn10.xml")
+        "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.decisionSingleOutput.dmn11.xml")
         .getId();
     super.setUp();
   }

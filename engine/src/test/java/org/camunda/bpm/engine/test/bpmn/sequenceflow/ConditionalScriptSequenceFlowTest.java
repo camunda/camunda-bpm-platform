@@ -73,8 +73,8 @@ public class ConditionalScriptSequenceFlowTest extends PluggableProcessEngineTes
 
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/sequenceflow/ConditionalScriptSequenceFlowTest.testDmnCondition.bpmn20.xml",
-    "org/camunda/bpm/engine/test/bpmn/sequenceflow/ConditionalScriptSequenceFlowTest.condition-left.dmn10.xml",
-    "org/camunda/bpm/engine/test/bpmn/sequenceflow/ConditionalScriptSequenceFlowTest.condition-right.dmn10.xml"
+    "org/camunda/bpm/engine/test/bpmn/sequenceflow/ConditionalScriptSequenceFlowTest.condition-left.dmn11.xml",
+    "org/camunda/bpm/engine/test/bpmn/sequenceflow/ConditionalScriptSequenceFlowTest.condition-right.dmn11.xml"
   })
   public void testDmnCondition() {
     String[] directions = new String[] { "left", "right" };

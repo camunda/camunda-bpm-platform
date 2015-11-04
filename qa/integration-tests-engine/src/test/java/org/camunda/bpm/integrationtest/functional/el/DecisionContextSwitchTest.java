@@ -34,7 +34,7 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class DecisionContextSwitchTest extends AbstractFoxPlatformIntegrationTest {
 
-  protected static final String DMN_RESOURCE_NAME = "org/camunda/bpm/integrationtest/functional/el/BeanResolvingDecision.dmn10.xml";
+  protected static final String DMN_RESOURCE_NAME = "org/camunda/bpm/integrationtest/functional/el/BeanResolvingDecision.dmn11.xml";
 
   @Deployment(name="bpmnDeployment")
   public static WebArchive createBpmnDeplyoment() {

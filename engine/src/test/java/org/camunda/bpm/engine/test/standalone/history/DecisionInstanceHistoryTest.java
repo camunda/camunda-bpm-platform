@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.variable.Variables;
 
 public class DecisionInstanceHistoryTest extends ResourceProcessEngineTestCase {
 
-  public static final String DECISION_SINGLE_OUTPUT_DMN = "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.decisionSingleOutput.dmn10.xml";
+  public static final String DECISION_SINGLE_OUTPUT_DMN = "org/camunda/bpm/engine/test/history/HistoricDecisionInstanceTest.decisionSingleOutput.dmn11.xml";
 
   public DecisionInstanceHistoryTest() {
     super("org/camunda/bpm/engine/test/standalone/history/decisionInstanceHistory.camunda.cfg.xml");
