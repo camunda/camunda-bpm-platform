@@ -8616,9 +8616,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
           + "id cannot be *. * is a reserved identifier", e.getMessage());
     }
 
-    disableAuthorization();
-    taskService.deleteTask(task.getId(), true);
-    enableAuthorization();
+    deleteTask(task.getId(), true);
   }
 
   public void testStandaloneTaskSaveWithGenericResourceIdAssignee() {
@@ -8650,9 +8648,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
           + "id cannot be *. * is a reserved identifier", e.getMessage());
     }
 
-    disableAuthorization();
-    taskService.deleteTask(task.getId(), true);
-    enableAuthorization();
+    deleteTask(task.getId(), true);
   }
 
   public void testStandaloneTaskSaveIdentityLinkWithGenericUserId() {
@@ -8669,9 +8665,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
           + "id cannot be *. * is a reserved identifier.", e.getMessage());
     }
 
-    disableAuthorization();
-    taskService.deleteTask(task.getId(), true);
-    enableAuthorization();
+    deleteTask(task.getId(), true);
   }
 
   public void testStandaloneTaskSaveIdentityLinkWithGenericGroupId() {
@@ -8688,9 +8682,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
           + "id cannot be *. * is a reserved identifier.", e.getMessage());
     }
 
-    disableAuthorization();
-    taskService.deleteTask(task.getId(), true);
-    enableAuthorization();
+    deleteTask(task.getId(), true);
   }
 
   public void testStandaloneTaskSaveIdentityLinkWithGenericTaskId() {
@@ -8713,9 +8705,7 @@ public class TaskAuthorizationTest extends AuthorizationTest {
       assertTextPresent("Cannot find task with id *", e.getMessage());
     }
 
-    disableAuthorization();
-    taskService.deleteTask(task.getId(), true);
-    enableAuthorization();
+    deleteTask(task.getId(), true);
   }
 
   @Deployment
