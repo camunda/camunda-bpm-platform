@@ -138,4 +138,15 @@ public abstract class AbstractBusinessRuleTaskBuilder<B extends AbstractBusiness
     return myself;
   }
 
+  /**
+   * Set the camunda mapDecisionResult attribute.
+   *
+   * @param camundaMapDecisionResult the mapper for the decision result to set
+   * @return the builder object
+   */
+  public B camundaMapDecisionResult(String camundaMapDecisionResult) {
+    element.setCamundaMapDecisionResult(camundaMapDecisionResult);
+    return myself;
+  }
+
 }

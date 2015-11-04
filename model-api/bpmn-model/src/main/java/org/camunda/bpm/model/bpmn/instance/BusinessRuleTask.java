@@ -66,4 +66,8 @@ public interface BusinessRuleTask extends Task {
 
   void setCamundaDecisionRefVersion(String camundaDecisionRefVersion);
 
+  String getCamundaMapDecisionResult();
+
+  void setCamundaMapDecisionResult(String camundaMapDecisionResult);
+
 }
