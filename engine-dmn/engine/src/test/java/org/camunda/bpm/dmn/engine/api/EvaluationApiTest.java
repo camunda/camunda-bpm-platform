@@ -13,6 +13,7 @@
 package org.camunda.bpm.dmn.engine.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.camunda.bpm.dmn.engine.test.asserts.DmnAssertions.assertThat;
 import static org.camunda.bpm.engine.variable.Variables.createVariables;
 import static org.camunda.bpm.engine.variable.Variables.emptyVariableContext;
 import static org.junit.Assert.fail;
@@ -21,6 +22,7 @@ import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnDecisionModel;
+import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnExpressionException;
 import org.camunda.bpm.dmn.engine.test.DmnDecisionTest;
 import org.camunda.bpm.engine.variable.context.VariableContext;
@@ -36,6 +38,9 @@ import org.junit.Test;
 public class EvaluationApiTest extends DmnDecisionTest {
 
   public static final String ONE_RULE_DMN = "org/camunda/bpm/dmn/engine/OneRule.dmn";
+
+  public static final String INPUT_VALUE = "ok";
+  public static final String EXPECTED_OUTPUT_VALUE = "ok";
 
   protected DmnDecision decision;
   protected DmnDecisionModel decisionModel;
@@ -183,7 +188,8 @@ public class EvaluationApiTest extends DmnDecisionTest {
   @Test
   public void shouldEvaluateDecisionWithVariableMap() {
 
-    engine.evaluate(decision, createVariables().putValue("input", "someValue"));
+    DmnDecisionResult decisionResult = engine.evaluate(decision, createVariables().putValue("input", INPUT_VALUE));
+    assertThat(decisionResult).hasSingleOutput().hasSingleEntryValue(EXPECTED_OUTPUT_VALUE);
 
   }
 
@@ -204,7 +210,8 @@ public class EvaluationApiTest extends DmnDecisionTest {
   @Test
   public void shouldEvaluateDecisionWithVariableContext() {
 
-    engine.evaluate(decision, createVariables().putValue("input", "someValue").asVariableContext());
+    DmnDecisionResult decisionResult = engine.evaluate(decision, createVariables().putValue("input", INPUT_VALUE).asVariableContext());
+    assertThat(decisionResult).hasSingleOutput().hasSingleEntryValue(EXPECTED_OUTPUT_VALUE);
 
   }
 
@@ -223,7 +230,8 @@ public class EvaluationApiTest extends DmnDecisionTest {
   @Test
   public void shouldEvaluateDecisionModelWithVariableMap() {
 
-    engine.evaluate(decisionModel, createVariables().putValue("input", "someValue"));
+    DmnDecisionResult decisionResult = engine.evaluate(decisionModel, createVariables().putValue("input", INPUT_VALUE));
+    assertThat(decisionResult).hasSingleOutput().hasSingleEntryValue(EXPECTED_OUTPUT_VALUE);
 
   }
 
@@ -244,7 +252,8 @@ public class EvaluationApiTest extends DmnDecisionTest {
   @Test
   public void shouldEvaluateDecisionModelWithVariableContext() {
 
-    engine.evaluate(decisionModel, createVariables().putValue("input", "someValue").asVariableContext());
+    DmnDecisionResult decisionResult = engine.evaluate(decisionModel, createVariables().putValue("input", INPUT_VALUE).asVariableContext());
+    assertThat(decisionResult).hasSingleOutput().hasSingleEntryValue(EXPECTED_OUTPUT_VALUE);
 
   }
 
@@ -265,7 +274,8 @@ public class EvaluationApiTest extends DmnDecisionTest {
   @Test
   public void shouldEvaluateDecisionModelByKeyWithVariableMap() {
 
-    engine.evaluate(decisionModel, "decision", createVariables().putValue("input", "someValue"));
+    DmnDecisionResult decisionResult = engine.evaluate(decisionModel, "decision", createVariables().putValue("input", INPUT_VALUE));
+    assertThat(decisionResult).hasSingleOutput().hasSingleEntryValue(EXPECTED_OUTPUT_VALUE);
 
   }
 
@@ -286,7 +296,8 @@ public class EvaluationApiTest extends DmnDecisionTest {
   @Test
   public void shouldEvaluateDecisionModelByKeyWithVariableContext() {
 
-    engine.evaluate(decisionModel, "decision", createVariables().putValue("input", "someValue").asVariableContext());
+    DmnDecisionResult decisionResult = engine.evaluate(decisionModel, "decision", createVariables().putValue("input", INPUT_VALUE).asVariableContext());
+    assertThat(decisionResult).hasSingleOutput().hasSingleEntryValue(EXPECTED_OUTPUT_VALUE);
 
   }
 

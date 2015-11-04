@@ -137,7 +137,7 @@ public class DmnEngineImpl implements DmnEngine {
 
   public DmnDecisionResult evaluate(DmnDecision decision, VariableContext variableContext) {
     ensureNotNull("decision", decision);
-    ensureNotNull("variables", variableContext);
+    ensureNotNull("variableContext", variableContext);
     DmnDecisionContext decisionContext = contextFactory.createDecisionContext(configuration);
     return decisionContext.evaluateDecision(decision, variableContext);
   }
