@@ -16,6 +16,7 @@ package org.camunda.bpm.dmn.engine.impl.hitpolicy;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.dmn.engine.DmnDecisionTableOutput;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableRule;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableValue;
 import org.camunda.bpm.dmn.engine.impl.DmnLogger;
@@ -37,7 +38,7 @@ public class DmnHitPolicyLogger extends DmnLogger {
     return new DmnHitPolicyException(exceptionMessage("003", "Unable to find hit policy aggregator '{}'.", aggregation));
   }
 
-  public DmnHitPolicyException aggregationNotApplicableOnCompoundOutput(BuiltinAggregator aggregator, Map<String, DmnDecisionTableValue> outputs) {
+  public DmnHitPolicyException aggregationNotApplicableOnCompoundOutput(BuiltinAggregator aggregator, Map<String, DmnDecisionTableOutput> outputs) {
     return new DmnHitPolicyException(exceptionMessage("004", "Unable to execute aggregation '{}' on compound decision output '{}'. Only one output value allowed.", aggregator, outputs));
   }
 

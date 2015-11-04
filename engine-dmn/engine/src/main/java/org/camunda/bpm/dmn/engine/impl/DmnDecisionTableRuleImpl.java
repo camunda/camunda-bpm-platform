@@ -16,13 +16,13 @@ package org.camunda.bpm.dmn.engine.impl;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.camunda.bpm.dmn.engine.DmnDecisionTableOutput;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableRule;
-import org.camunda.bpm.dmn.engine.DmnDecisionTableValue;
 
 public class DmnDecisionTableRuleImpl implements DmnDecisionTableRule {
 
   protected String key;
-  protected Map<String, DmnDecisionTableValue> outputs = new LinkedHashMap<String, DmnDecisionTableValue>();
+  protected Map<String, DmnDecisionTableOutput> outputs = new LinkedHashMap<String, DmnDecisionTableOutput>();
 
   public String getKey() {
     return key;
@@ -32,11 +32,11 @@ public class DmnDecisionTableRuleImpl implements DmnDecisionTableRule {
     this.key = key;
   }
 
-  public Map<String, DmnDecisionTableValue> getOutputs() {
+  public Map<String, DmnDecisionTableOutput> getOutputs() {
     return outputs;
   }
 
-  public void addOutput(DmnDecisionTableValue output) {
+  public void addOutput(DmnDecisionTableOutput output) {
     outputs.put(output.getKey(), output);
   }
 

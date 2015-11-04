@@ -7,7 +7,7 @@
 
   <decision id="decision1" name="camunda">
     <decisionTable id="decisionTable1">
-      <input id="input" label="camunda" camunda:output="camunda">
+      <input id="input" label="camunda" camunda:inputVariable="camunda">
         <inputExpression id="inputExpression" typeRef="string" expressionLanguage="camunda">
           <text>camunda</text>
         </inputExpression>

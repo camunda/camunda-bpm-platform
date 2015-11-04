@@ -22,8 +22,8 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
 /**
  * The output of one decision. In context of a decision table this represents
  * the output of a matching decision rule. It is a mapping from the
- * <code>camunda:output</code> attribute to output value. If no
- * <code>camunda:output</code> was given the key is <code>null</code>.
+ * <code>name</code> attribute to output value. If no
+ * <code>name</code> was given the key is <code>null</code>.
  */
 public interface DmnDecisionOutput extends Map<String, Object>, Serializable {
 

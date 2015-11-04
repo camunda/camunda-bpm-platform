@@ -12,7 +12,7 @@
           <text>${input1}</text>
         </inputExpression>
       </input>
-      <input id="input2" camunda:output="x">
+      <input id="input2" camunda:inputVariable="x">
         <inputExpression id="inputExpression2">
           <text>${input2}</text>
         </inputExpression>

@@ -13,49 +13,24 @@
 
 package org.camunda.bpm.dmn.engine.impl;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionTableValue;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableInput;
 import org.camunda.bpm.dmn.engine.DmnInput;
-import org.camunda.bpm.dmn.engine.DmnOutput;
-import org.camunda.bpm.engine.variable.value.TypedValue;
 
-public class DmnDecisionTableValueImpl implements DmnDecisionTableValue {
+public class DmnDecisionTableInputImpl extends DmnDecisionTableValueImpl implements DmnDecisionTableInput {
 
-  protected String key;
-  protected String name;
-  protected TypedValue value;
+  protected String inputVariable;
 
-  public DmnDecisionTableValueImpl(DmnInput dmnInput) {
-    this.key = dmnInput.getKey();
-    this.name = dmnInput.getName();
+  public DmnDecisionTableInputImpl(DmnInput dmnInput) {
+    super(dmnInput);
+    this.inputVariable = dmnInput.getInputVariable();
   }
 
-  public DmnDecisionTableValueImpl(DmnOutput dmnOutput) {
-    this.key = dmnOutput.getKey();
-    this.name = dmnOutput.getName();
+  public String getInputVariable() {
+    return inputVariable;
   }
 
-  public String getKey() {
-    return key;
-  }
-
-  public void setKey(String key) {
-    this.key = key;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public TypedValue getValue() {
-    return value;
-  }
-
-  public void setValue(TypedValue value) {
-    this.value = value;
+  public void setInputVariable(String inputVariable) {
+    this.inputVariable = inputVariable;
   }
 
   @Override
@@ -63,6 +38,7 @@ public class DmnDecisionTableValueImpl implements DmnDecisionTableValue {
     return "DmnDecisionTableValueImpl{" +
       "key='" + key + '\'' +
       ", name='" + name + '\'' +
+      ", inputVariable='" + inputVariable + '\'' +
       ", value=" + value +
       '}';
   }
@@ -72,10 +48,11 @@ public class DmnDecisionTableValueImpl implements DmnDecisionTableValue {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
-    DmnDecisionTableValueImpl that = (DmnDecisionTableValueImpl) o;
+    DmnDecisionTableInputImpl that = (DmnDecisionTableInputImpl) o;
 
     if (key != null ? !key.equals(that.key) : that.key != null) return false;
     if (name != null ? !name.equals(that.name) : that.name != null) return false;
+    if (inputVariable != null ? !inputVariable.equals(that.inputVariable) : that.inputVariable != null) return false;
     return !(value != null ? !value.equals(that.value) : that.value != null);
 
   }
@@ -84,6 +61,7 @@ public class DmnDecisionTableValueImpl implements DmnDecisionTableValue {
   public int hashCode() {
     int result = key != null ? key.hashCode() : 0;
     result = 31 * result + (name != null ? name.hashCode() : 0);
+    result = 31 * result + (inputVariable != null ? inputVariable.hashCode() : 0);
     result = 31 * result + (value != null ? value.hashCode() : 0);
     return result;
   }

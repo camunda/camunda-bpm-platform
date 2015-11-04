@@ -27,15 +27,15 @@ public class DmnInputHandler extends AbstractDmnElementHandler<Input, DmnInputIm
   @Override
   protected void initElement(DmnElementHandlerContext context, Input input, DmnInputImpl dmnInput) {
     super.initElement(context, input, dmnInput);
-    initOutputName(context, input, dmnInput);
+    initInputVariable(context, input, dmnInput);
   }
 
-  protected void initOutputName(DmnElementHandlerContext context, Input input, DmnInputImpl dmnInput) {
-    String outputName = input.getCamundaOutput();
-    if (outputName == null) {
-      outputName = DmnInputImpl.DEFAULT_INPUT_VARIABLE_NAME;
+  protected void initInputVariable(DmnElementHandlerContext context, Input input, DmnInputImpl dmnInput) {
+    String inputVariable = input.getCamundaInputVariable();
+    if (inputVariable == null) {
+      inputVariable = DmnInputImpl.DEFAULT_INPUT_VARIABLE_NAME;
     }
-    dmnInput.setOutputName(outputName);
+    dmnInput.setInputVariable(inputVariable);
   }
 
 }

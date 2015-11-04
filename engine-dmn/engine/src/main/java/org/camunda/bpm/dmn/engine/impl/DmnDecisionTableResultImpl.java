@@ -18,24 +18,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.dmn.engine.DmnDecisionTableInput;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableRule;
-import org.camunda.bpm.dmn.engine.DmnDecisionTableValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 public class DmnDecisionTableResultImpl implements DmnDecisionTableResult {
 
-  protected Map<String, DmnDecisionTableValue> inputs = new HashMap<String, DmnDecisionTableValue>();
+  protected Map<String, DmnDecisionTableInput> inputs = new HashMap<String, DmnDecisionTableInput>();
   protected List<DmnDecisionTableRule> matchingRules = new ArrayList<DmnDecisionTableRule>();
   protected String collectResultName;
   protected TypedValue collectResultValue;
   protected long executedDecisionElements = 0;
 
-  public Map<String, DmnDecisionTableValue> getInputs() {
+  public Map<String, DmnDecisionTableInput> getInputs() {
     return inputs;
   }
 
-  public void setInputs(Map<String, DmnDecisionTableValue> inputs) {
+  public void setInputs(Map<String, DmnDecisionTableInput> inputs) {
     this.inputs = inputs;
   }
 

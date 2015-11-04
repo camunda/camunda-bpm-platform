@@ -99,7 +99,7 @@ public class DmnTransformTest {
     DmnInput input = inputs.get(0);
     assertThat(input.getKey()).isEqualTo("input");
     assertThat(input.getName()).isEqualTo("camunda");
-    assertThat(input.getOutputName()).isEqualTo("camunda");
+    assertThat(input.getInputVariable()).isEqualTo("camunda");
 
     DmnExpression inputExpression = input.getInputExpression();
     assertThat(inputExpression).isNotNull();
@@ -114,7 +114,7 @@ public class DmnTransformTest {
     input = inputs.get(1);
     assertThat(input.getKey()).isNull();
     assertThat(input.getName()).isNull();
-    assertThat(input.getOutputName()).isEqualTo(DmnInputImpl.DEFAULT_INPUT_VARIABLE_NAME);
+    assertThat(input.getInputVariable()).isEqualTo(DmnInputImpl.DEFAULT_INPUT_VARIABLE_NAME);
 
     inputExpression = input.getInputExpression();
     assertThat(inputExpression).isNotNull();

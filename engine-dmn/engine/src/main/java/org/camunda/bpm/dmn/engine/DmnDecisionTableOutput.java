@@ -16,23 +16,13 @@ package org.camunda.bpm.dmn.engine;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
- * The value of a clause of a decision table.
+ * The value of a output of a decision table.
  */
-public interface DmnDecisionTableValue {
+public interface DmnDecisionTableOutput extends DmnDecisionTableValue{
 
   /**
-   * @return the id of the clause from the DMN XML
+    * @return the name of this output
    */
-  String getKey();
-
-  /**
-   * @return the name of the clause from the DMN xml or null if non set
-   */
-  String getName();
-
-  /**
-   * @return the value of the evaluated clause expression or null if no expression given
-   */
-  TypedValue getValue();
+  String getOutputName();
 
 }

@@ -21,7 +21,9 @@ import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTable;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableInput;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableListener;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableOutput;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableRule;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableValue;
@@ -78,20 +80,20 @@ public class DmnDecisionTableListenerTest extends DmnDecisionTest {
   @DecisionResource(resource = DMN_FILE)
   public void testInputValues() {
     evaluateDecision(true, "foo", "test", "hello");
-    Map<String, DmnDecisionTableValue> inputs = listener.result.getInputs();
+    Map<String, DmnDecisionTableInput> inputs = listener.result.getInputs();
     assertThat(inputs).hasSize(2)
       .containsOnlyKeys("input1", "input2");
 
-    DmnDecisionTableValue input1 = inputs.get("input1");
+    DmnDecisionTableInput input1 = inputs.get("input1");
     assertThat(input1.getKey()).isEqualTo("input1");
     assertThat(input1.getName()).isEqualTo("Input");
-    assertThat(input1.getOutputName()).isEqualTo("cellInput");
+    assertThat(input1.getInputVariable()).isEqualTo("cellInput");
     assertThat(input1.getValue()).isEqualTo(Variables.untypedValue(true));
 
-    DmnDecisionTableValue input2 = inputs.get("input2");
+    DmnDecisionTableInput input2 = inputs.get("input2");
     assertThat(input2.getKey()).isEqualTo("input2");
     assertThat(input2.getName()).isNull();
-    assertThat(input2.getOutputName()).isEqualTo("x");
+    assertThat(input2.getInputVariable()).isEqualTo("x");
     assertThat(input2.getValue()).isEqualTo(Variables.untypedValue("foo"));
   }
 
@@ -144,17 +146,17 @@ public class DmnDecisionTableListenerTest extends DmnDecisionTest {
   public void testOutputs() {
     evaluateDecision(true, "foo", "test", "hello");
     List<DmnDecisionTableRule> matchingRules = listener.result.getMatchingRules();
-    Map<String, DmnDecisionTableValue> outputs = matchingRules.get(0).getOutputs();
+    Map<String, DmnDecisionTableOutput> outputs = matchingRules.get(0).getOutputs();
     assertThat(outputs).hasSize(2)
       .containsOnlyKeys("output1", "output2");
 
-    DmnDecisionTableValue output1 = outputs.get("output1");
+    DmnDecisionTableOutput output1 = outputs.get("output1");
     assertThat(output1.getKey()).isEqualTo("output1");
     assertThat(output1.getName()).isEqualTo("Output 1");
     assertThat(output1.getOutputName()).isEqualTo("out1");
     assertThat(output1.getValue()).isEqualTo(Variables.untypedValue("hello"));
 
-    DmnDecisionTableValue output2 = outputs.get("output2");
+    DmnDecisionTableOutput output2 = outputs.get("output2");
     assertThat(output2.getKey()).isEqualTo("output2");
     assertThat(output2.getName()).isNull();
     assertThat(output2.getOutputName()).isNull();

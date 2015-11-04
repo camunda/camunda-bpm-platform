@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionTable;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableOutput;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableRule;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableValue;
@@ -69,7 +70,7 @@ public class CollectHitPolicyHandler implements DmnHitPolicyHandler {
   protected List<TypedValue> collectSingleValues(BuiltinAggregator aggregator, List<DmnDecisionTableRule> matchingRules) {
     List<TypedValue> values = new ArrayList<TypedValue>();
     for (DmnDecisionTableRule matchingRule : matchingRules) {
-      Map<String, DmnDecisionTableValue> outputs = matchingRule.getOutputs();
+      Map<String, DmnDecisionTableOutput> outputs = matchingRule.getOutputs();
       if (outputs.isEmpty()) {
         continue; // skip empty output
       }
@@ -86,7 +87,7 @@ public class CollectHitPolicyHandler implements DmnHitPolicyHandler {
 
   protected String getDecisionOutputName(List<DmnDecisionTableRule> matchingRules) {
     for (DmnDecisionTableRule matchingRule : matchingRules) {
-      Map<String, DmnDecisionTableValue> outputs = matchingRule.getOutputs();
+      Map<String, DmnDecisionTableOutput> outputs = matchingRule.getOutputs();
       if (!outputs.isEmpty()) {
         return outputs.values().iterator().next().getOutputName();
       }

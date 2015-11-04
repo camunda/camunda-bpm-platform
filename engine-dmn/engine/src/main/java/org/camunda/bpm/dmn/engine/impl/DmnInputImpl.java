@@ -22,7 +22,7 @@ public class DmnInputImpl extends DmnElementImpl implements DmnInput {
   public static final String DEFAULT_INPUT_VARIABLE_NAME = "cellInput";
 
   protected DmnExpression inputExpression;
-  protected String outputName;
+  protected String inputVariable;
 
   protected DmnTypeDefinition typeDefinition = new DefaultTypeDefinition();
 
@@ -34,12 +34,12 @@ public class DmnInputImpl extends DmnElementImpl implements DmnInput {
     this.inputExpression = inputExpression;
   }
 
-  public String getOutputName() {
-    return outputName;
+  public String getInputVariable() {
+    return inputVariable;
   }
 
-  public void setOutputName(String outputName) {
-    this.outputName = outputName;
+  public void setInputVariable(String inputVariable) {
+    this.inputVariable = inputVariable;
   }
 
   public DmnTypeDefinition getTypeDefinition() {
@@ -56,7 +56,7 @@ public class DmnInputImpl extends DmnElementImpl implements DmnInput {
       "key='" + key + '\'' +
       ", name='" + name + '\'' +
       ", inputExpression=" + inputExpression +
-      ", outputName='" + outputName + '\'' +
+      ", inputVariable='" + inputVariable + '\'' +
       ", typeDefinition=" + typeDefinition +
       '}';
   }

@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionTable;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableOutput;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableRule;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableValue;
@@ -45,7 +46,7 @@ public class AnyHitPolicyHandler implements DmnHitPolicyHandler {
   }
 
   protected boolean allOutputsAreEqual(List<DmnDecisionTableRule> matchingRules) {
-    Map<String, DmnDecisionTableValue> firstOutputs = matchingRules.get(0).getOutputs();
+    Map<String, DmnDecisionTableOutput> firstOutputs = matchingRules.get(0).getOutputs();
     if (firstOutputs == null) {
       for (int i = 1; i < matchingRules.size(); i++) {
         if (matchingRules.get(i).getOutputs() != null) {

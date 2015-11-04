@@ -17,7 +17,7 @@ public interface DmnInput extends DmnElement {
 
   DmnExpression getInputExpression();
 
-  String getOutputName();
+  String getInputVariable();
 
   DmnTypeDefinition getTypeDefinition();
 

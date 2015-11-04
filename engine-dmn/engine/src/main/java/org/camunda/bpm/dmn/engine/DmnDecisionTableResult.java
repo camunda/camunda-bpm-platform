@@ -27,7 +27,7 @@ public interface DmnDecisionTableResult {
   /**
    * @return the inputs on which the decision table was evaluated
    */
-  Map<String, DmnDecisionTableValue> getInputs();
+  Map<String, DmnDecisionTableInput> getInputs();
 
   /**
    * @return the matching rules of the decision table evaluation

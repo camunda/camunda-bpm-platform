@@ -25,6 +25,6 @@ public interface DmnDecisionTableRule {
   /**
    * @return the output values of this rule
    */
-  Map<String, DmnDecisionTableValue> getOutputs();
+  Map<String, DmnDecisionTableOutput> getOutputs();
 
 }
