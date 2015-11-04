@@ -17,9 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionTable;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableInput;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableOutput;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableRule;
-import org.camunda.bpm.dmn.engine.DmnDecisionTableValue;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.history.HistoricDecisionInputInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionOutputInstance;
@@ -121,7 +122,7 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
   protected List<HistoricDecisionInputInstance> createHistoricDecisionInputInstances(DmnDecisionTableResult decisionTableResult) {
     List<HistoricDecisionInputInstance> inputInstances = new ArrayList<HistoricDecisionInputInstance>();
 
-    for(DmnDecisionTableValue inputClause : decisionTableResult.getInputs().values()) {
+    for(DmnDecisionTableInput inputClause : decisionTableResult.getInputs().values()) {
 
       HistoricDecisionInputInstanceEntity inputInstance = new HistoricDecisionInputInstanceEntity();
       inputInstance.setClauseId(inputClause.getKey());
@@ -146,7 +147,7 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
       String ruleId = rule.getKey();
       Integer ruleOrder = index + 1;
 
-      for(DmnDecisionTableValue outputClause : rule.getOutputs().values()) {
+      for(DmnDecisionTableOutput outputClause : rule.getOutputs().values()) {
 
         HistoricDecisionOutputInstanceEntity outputInstance = new HistoricDecisionOutputInstanceEntity();
         outputInstance.setClauseId(outputClause.getKey());
