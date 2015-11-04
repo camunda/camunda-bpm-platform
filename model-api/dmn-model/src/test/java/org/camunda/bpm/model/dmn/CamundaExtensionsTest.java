@@ -23,19 +23,19 @@ import org.junit.Test;
 public class CamundaExtensionsTest {
 
   private DmnModelInstance modelInstance;
-  private Input clause;
+  private Input input;
 
   @Before
   public void parseModel() {
     modelInstance = Dmn.readModelFromStream(getClass().getResourceAsStream(getClass().getSimpleName() + ".dmn"));
-    clause = modelInstance.getModelElementById("clause");
+    input = modelInstance.getModelElementById("input");
   }
 
   @Test
   public void testCamundaClauseOutput() {
-    assertThat(clause.getCamundaOutput()).isEqualTo("clauseOutput");
-    clause.setCamundaOutput("foo");
-    assertThat(clause.getCamundaOutput()).isEqualTo("foo");
+    assertThat(input.getCamundaInputVariable()).isEqualTo("myVariable");
+    input.setCamundaInputVariable("foo");
+    assertThat(input.getCamundaInputVariable()).isEqualTo("foo");
   }
 
   @After

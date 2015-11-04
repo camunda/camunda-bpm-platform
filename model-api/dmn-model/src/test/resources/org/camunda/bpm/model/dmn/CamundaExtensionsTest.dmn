@@ -6,7 +6,7 @@
              namespace="http://camunda.org/schema/1.0/dmn">
   <decision id="decision" name="Check Order">
     <decisionTable id="decisionTable">
-      <input id="clause" camunda:output="clauseOutput">
+      <input id="input" camunda:inputVariable="myVariable">
         <inputExpression/>
       </input>
       <output/>

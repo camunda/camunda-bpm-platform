@@ -13,7 +13,7 @@
 
 package org.camunda.bpm.model.dmn.impl.instance;
 
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.CAMUNDA_ATTRIBUTE_OUTPUT;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.CAMUNDA_ATTRIBUTE_INPUT_VARIABLE;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.CAMUNDA_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_INPUT_CLAUSE;
@@ -36,7 +36,7 @@ public class InputClauseImpl extends DmnElementImpl implements InputClause {
   protected static ChildElement<InputValues> inputValuesChild;
 
   // camunda extensions
-  protected static Attribute<String> camundaOutput;
+  protected static Attribute<String> camundaInputVariableAttribute;
 
   public InputClauseImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
@@ -60,12 +60,13 @@ public class InputClauseImpl extends DmnElementImpl implements InputClause {
 
   // camunda extensions
 
-  public void setCamundaOutput(String output) {
-    camundaOutput.setValue(this, output);
+  public String getCamundaInputVariable() {
+    return camundaInputVariableAttribute.getValue(this);
   }
 
-  public String getCamundaOutput() {
-    return camundaOutput.getValue(this);
+
+  public void setCamundaInputVariable(String inputVariable) {
+    camundaInputVariableAttribute.setValue(this, inputVariable);
   }
 
   public static void registerType(ModelBuilder modelBuilder) {
@@ -89,7 +90,7 @@ public class InputClauseImpl extends DmnElementImpl implements InputClause {
 
     // camunda extensions
 
-    camundaOutput = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_OUTPUT)
+    camundaInputVariableAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_INPUT_VARIABLE)
       .namespace(CAMUNDA_NS)
       .build();
 

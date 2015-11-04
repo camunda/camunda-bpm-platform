@@ -140,6 +140,6 @@ public final class DmnModelConstants {
 
   /** camunda extensions */
 
-  public static final String CAMUNDA_ATTRIBUTE_OUTPUT = "output";
+  public static final String CAMUNDA_ATTRIBUTE_INPUT_VARIABLE = "inputVariable";
 
 }

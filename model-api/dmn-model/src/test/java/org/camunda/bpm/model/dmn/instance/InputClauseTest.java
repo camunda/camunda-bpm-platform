@@ -34,7 +34,7 @@ public class InputClauseTest extends DmnModelElementInstanceTest {
   public Collection<AttributeAssumption> getAttributesAssumptions() {
     return Arrays.asList(
       // camunda extensions
-      new AttributeAssumption(CAMUNDA_NS, "output")
+      new AttributeAssumption(CAMUNDA_NS, "inputVariable")
     );
   }
 
