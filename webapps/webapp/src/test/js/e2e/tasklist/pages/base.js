@@ -2,7 +2,7 @@
 
 var Page = require('../../commons/pages/page');
 
-var navigationSection = element(by.css('[id="cam-tasklist-navigation"]'));
+var navigationSection = element(by.css('[cam-widget-header]'));
 
 module.exports = Page.extend({
 
@@ -28,7 +28,7 @@ module.exports = Page.extend({
         cssElement = '.engine-select';
         break;
       case 3:
-        cssElement = '.user-account';
+        cssElement = '.account';
         break;
       case 4:
         cssElement = '.app-switch';
@@ -45,7 +45,7 @@ module.exports = Page.extend({
 
   logout: function() {
     this.selectNavbarItem('Account');
-    element(by.css('.sign-out')).click();
+    element(by.css('[ng-click="logout()"]')).click();
   },
 
   navigateLogout: function() {

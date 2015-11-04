@@ -87,6 +87,7 @@ module.exports = function (appName) {
         browser.manage().window().getSize().then(function (size) {
           originalSize = size;
           browser.manage().window().setSize(760, 480);
+          browser.sleep(500);
         });
       });
 

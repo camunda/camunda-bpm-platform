@@ -7,11 +7,11 @@ module.exports = Base.extend({
   url: '/camunda/app/tasklist/default/#/',
 
   header: function () {
-    return element(by.css('[cam-tasklist-navigation]'));
+    return element(by.css('[cam-widget-header]'));
   },
 
   accountDropdown: function () {
-    return this.header().element(by.css('.user-account.dropdown'));
+    return this.header().element(by.css('.account.dropdown'));
   },
 
   accountDropdownButton: function () {
