@@ -17,7 +17,7 @@ import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ATTRIBUTE_AGGREGATION;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ATTRIBUTE_HIT_POLICY;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ATTRIBUTE_OUTPUT_LABEL;
-import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ATTRIBUTE_PREFERED_ORIENTATION;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ATTRIBUTE_PREFERRED_ORIENTATION;
 import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_DECISION_TABLE;
 
 import java.util.Collection;
@@ -42,7 +42,7 @@ public class DecisionTableImpl extends ExpressionImpl implements DecisionTable {
   
   protected static Attribute<HitPolicy> hitPolicyAttribute;
   protected static Attribute<BuiltinAggregator> aggregationAttribute;
-  protected static Attribute<DecisionTableOrientation> preferedOrientationAttribute;
+  protected static Attribute<DecisionTableOrientation> preferredOrientationAttribute;
   protected static Attribute<String> outputLabelAttribute;
 
   protected static ChildElementCollection<Input> inputCollection;
@@ -69,12 +69,12 @@ public class DecisionTableImpl extends ExpressionImpl implements DecisionTable {
     aggregationAttribute.setValue(this, aggregation);
   }
 
-  public DecisionTableOrientation getPreferedOrientation() {
-    return preferedOrientationAttribute.getValue(this);
+  public DecisionTableOrientation getPreferredOrientation() {
+    return preferredOrientationAttribute.getValue(this);
   }
 
-  public void setPreferedOrientation(DecisionTableOrientation preferedOrientation) {
-    preferedOrientationAttribute.setValue(this, preferedOrientation);
+  public void setPreferredOrientation(DecisionTableOrientation preferredOrientation) {
+    preferredOrientationAttribute.setValue(this, preferredOrientation);
   }
 
   public String getOutputLabel() {
@@ -114,7 +114,7 @@ public class DecisionTableImpl extends ExpressionImpl implements DecisionTable {
     aggregationAttribute = typeBuilder.enumAttribute(DMN_ATTRIBUTE_AGGREGATION, BuiltinAggregator.class)
       .build();
 
-    preferedOrientationAttribute = typeBuilder.namedEnumAttribute(DMN_ATTRIBUTE_PREFERED_ORIENTATION, DecisionTableOrientation.class)
+    preferredOrientationAttribute = typeBuilder.namedEnumAttribute(DMN_ATTRIBUTE_PREFERRED_ORIENTATION, DecisionTableOrientation.class)
       .defaultValue(DecisionTableOrientation.Rule_as_Row)
       .build();
 

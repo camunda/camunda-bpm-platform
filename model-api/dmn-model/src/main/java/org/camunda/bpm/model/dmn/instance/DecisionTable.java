@@ -29,9 +29,9 @@ public interface DecisionTable extends Expression {
   
   void setAggregation(BuiltinAggregator aggregation);
   
-  DecisionTableOrientation getPreferedOrientation();
+  DecisionTableOrientation getPreferredOrientation();
   
-  void setPreferedOrientation(DecisionTableOrientation preferedOrientation);
+  void setPreferredOrientation(DecisionTableOrientation preferredOrientation);
 
   String getOutputLabel();
 

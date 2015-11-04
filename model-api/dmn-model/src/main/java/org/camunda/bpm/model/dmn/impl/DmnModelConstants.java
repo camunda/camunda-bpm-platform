@@ -38,7 +38,6 @@ public final class DmnModelConstants {
   public static final String DMN_ELEMENT_BINDING = "binding";
   public static final String DMN_ELEMENT_BUSINESS_CONTEXT_ELEMENT = "businessContextElement";
   public static final String DMN_ELEMENT_BUSINESS_KNOWLEDGE_MODEL = "businessKnowledgeModel";
-  public static final String DMN_ELEMENT_CALLED_FUNCTION = "calledFunction";
   public static final String DMN_ELEMENT_COLUMN = "column";
   public static final String DMN_ELEMENT_CONTEXT = "context";
   public static final String DMN_ELEMENT_CONTEXT_ENTRY = "contextEntry";
@@ -133,7 +132,7 @@ public final class DmnModelConstants {
   public static final String DMN_ATTRIBUTE_NAME = "name";
   public static final String DMN_ATTRIBUTE_NAMESPACE = "namespace";
   public static final String DMN_ATTRIBUTE_OUTPUT_LABEL = "outputLabel";
-  public static final String DMN_ATTRIBUTE_PREFERED_ORIENTATION = "preferedOrientation";
+  public static final String DMN_ATTRIBUTE_PREFERRED_ORIENTATION = "preferredOrientation";
   public static final String DMN_ATTRIBUTE_TEXT_FORMAT = "textFormat";
   public static final String DMN_ATTRIBUTE_TYPE_LANGUAGE = "typeLanguage";
   public static final String DMN_ATTRIBUTE_TYPE_REF = "typeRef";

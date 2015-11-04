@@ -42,19 +42,19 @@ public class ReadWriteTest extends DmnModelTest {
   public void shouldReadDecisionTableOrientation() {
     // Default
     DecisionTable decisionTable = modelInstance.getModelElementById("decisionTable1");
-    assertThat(decisionTable.getPreferedOrientation()).isEqualTo(Rule_as_Row);
+    assertThat(decisionTable.getPreferredOrientation()).isEqualTo(Rule_as_Row);
 
     // Rule-as-Row
     decisionTable = modelInstance.getModelElementById("decisionTable2");
-    assertThat(decisionTable.getPreferedOrientation()).isEqualTo(Rule_as_Row);
+    assertThat(decisionTable.getPreferredOrientation()).isEqualTo(Rule_as_Row);
 
     // Rule-as-Column
     decisionTable = modelInstance.getModelElementById("decisionTable3");
-    assertThat(decisionTable.getPreferedOrientation()).isEqualTo(Rule_as_Column);
+    assertThat(decisionTable.getPreferredOrientation()).isEqualTo(Rule_as_Column);
 
     // CrossTable
     decisionTable = modelInstance.getModelElementById("decisionTable4");
-    assertThat(decisionTable.getPreferedOrientation()).isEqualTo(CrossTable);
+    assertThat(decisionTable.getPreferredOrientation()).isEqualTo(CrossTable);
   }
 
   @Test
@@ -75,7 +75,7 @@ public class ReadWriteTest extends DmnModelTest {
     // Rule-as-Row
     decision = generateNamedElement(Decision.class, "decision2", 2);
     decisionTable = generateElement(DecisionTable.class, 2);
-    decisionTable.setPreferedOrientation(Rule_as_Row);
+    decisionTable.setPreferredOrientation(Rule_as_Row);
     decision.setExpression(decisionTable);
     output = generateElement(Output.class, 2);
     decisionTable.getOutputs().add(output);
@@ -84,7 +84,7 @@ public class ReadWriteTest extends DmnModelTest {
     // Rule-as-Column
     decision = generateNamedElement(Decision.class, "decision3", 3);
     decisionTable = generateElement(DecisionTable.class, 3);
-    decisionTable.setPreferedOrientation(Rule_as_Column);
+    decisionTable.setPreferredOrientation(Rule_as_Column);
     decision.setExpression(decisionTable);
     output = generateElement(Output.class, 3);
     decisionTable.getOutputs().add(output);
@@ -93,7 +93,7 @@ public class ReadWriteTest extends DmnModelTest {
     // CrossTable
     decision = generateNamedElement(Decision.class, "decision4", 4);
     decisionTable = generateElement(DecisionTable.class, 4);
-    decisionTable.setPreferedOrientation(CrossTable);
+    decisionTable.setPreferredOrientation(CrossTable);
     decision.setExpression(decisionTable);
     output = generateElement(Output.class, 4);
     decisionTable.getOutputs().add(output);

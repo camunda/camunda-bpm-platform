@@ -29,7 +29,6 @@ import org.camunda.bpm.model.dmn.impl.instance.AuthorityRequirementImpl;
 import org.camunda.bpm.model.dmn.impl.instance.BindingImpl;
 import org.camunda.bpm.model.dmn.impl.instance.BusinessContextElementImpl;
 import org.camunda.bpm.model.dmn.impl.instance.BusinessKnowledgeModelImpl;
-import org.camunda.bpm.model.dmn.impl.instance.CalledFunctionImpl;
 import org.camunda.bpm.model.dmn.impl.instance.ColumnImpl;
 import org.camunda.bpm.model.dmn.impl.instance.ContextEntryImpl;
 import org.camunda.bpm.model.dmn.impl.instance.ContextImpl;
@@ -280,7 +279,6 @@ public class Dmn {
     BindingImpl.registerType(modelBuilder);
     BusinessContextElementImpl.registerType(modelBuilder);
     BusinessKnowledgeModelImpl.registerType(modelBuilder);
-    CalledFunctionImpl.registerType(modelBuilder);
     ColumnImpl.registerType(modelBuilder);
     ContextEntryImpl.registerType(modelBuilder);
     ContextImpl.registerType(modelBuilder);

@@ -37,7 +37,7 @@ public class DecisionTableTest extends DmnModelElementInstanceTest {
     return Arrays.asList(
       new AttributeAssumption("hitPolicy", false, false, HitPolicy.UNIQUE),
       new AttributeAssumption("aggregation"),
-      new AttributeAssumption("preferedOrientation", false, false, DecisionTableOrientation.Rule_as_Row),
+      new AttributeAssumption("preferredOrientation", false, false, DecisionTableOrientation.Rule_as_Row),
       new AttributeAssumption("outputLabel")
     );
   }

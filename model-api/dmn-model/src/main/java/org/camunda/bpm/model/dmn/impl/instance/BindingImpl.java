@@ -29,20 +29,12 @@ import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 import org.camunda.bpm.model.xml.type.reference.ElementReference;
 
 public class BindingImpl extends DmnModelElementInstanceImpl implements Binding {
-  
-  protected static ChildElement<Expression> expressionChild;
+
   protected static ElementReference<InformationItem, ParameterReference> parameterRef;
-  
+  protected static ChildElement<Expression> expressionChild;
+
   public BindingImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
-  }
-
-  public Expression getExpression() {
-    return expressionChild.getChild(this);
-  }
-
-  public void setExpression(Expression expression) {
-    expressionChild.setChild(this, expression);
   }
 
   public InformationItem getParameter() {
@@ -51,6 +43,14 @@ public class BindingImpl extends DmnModelElementInstanceImpl implements Binding 
 
   public void setParameter(InformationItem parameter) {
     parameterRef.setReferenceTargetElement(this, parameter);
+  }
+
+  public Expression getExpression() {
+    return expressionChild.getChild(this);
+  }
+
+  public void setExpression(Expression expression) {
+    expressionChild.setChild(this, expression);
   }
 
   public static void registerType(ModelBuilder modelBuilder) {
@@ -64,12 +64,12 @@ public class BindingImpl extends DmnModelElementInstanceImpl implements Binding 
 
     SequenceBuilder sequenceBuilder = typeBuilder.sequence();
 
-    expressionChild = sequenceBuilder.element(Expression.class)
-      .build();
-
     parameterRef = sequenceBuilder.element(ParameterReference.class)
       .required()
       .uriElementReference(InformationItem.class)
+      .build();
+
+    expressionChild = sequenceBuilder.element(Expression.class)
       .build();
 
     typeBuilder.build();

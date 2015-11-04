@@ -17,9 +17,9 @@ import java.util.Collection;
 
 public interface Invocation extends Expression {
 
-  CalledFunction getCalledFunction();
+  Expression getExpression();
 
-  void setCalledFunction(CalledFunction calledFunction);
+  void setExpression(Expression expression);
 
   Collection<Binding> getBindings();
 

@@ -19,7 +19,6 @@ import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_ELEMENT_INVOC
 import java.util.Collection;
 
 import org.camunda.bpm.model.dmn.instance.Binding;
-import org.camunda.bpm.model.dmn.instance.CalledFunction;
 import org.camunda.bpm.model.dmn.instance.Expression;
 import org.camunda.bpm.model.dmn.instance.Invocation;
 import org.camunda.bpm.model.xml.ModelBuilder;
@@ -32,19 +31,19 @@ import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 
 public class InvocationImpl extends ExpressionImpl implements Invocation {
 
-  protected static ChildElement<CalledFunction> calledFunctionChild;
+  protected static ChildElement<Expression> expressionChild;
   protected static ChildElementCollection<Binding> bindingCollection;
 
   public InvocationImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
   }
 
-  public CalledFunction getCalledFunction() {
-    return calledFunctionChild.getChild(this);
+  public Expression getExpression() {
+    return expressionChild.getChild(this);
   }
 
-  public void setCalledFunction(CalledFunction calledFunction) {
-    calledFunctionChild.setChild(this, calledFunction);
+  public void setExpression(Expression expression) {
+    expressionChild.setChild(this, expression);
   }
 
   public Collection<Binding> getBindings() {
@@ -63,7 +62,7 @@ public class InvocationImpl extends ExpressionImpl implements Invocation {
 
     SequenceBuilder sequenceBuilder = typeBuilder.sequence();
 
-    calledFunctionChild = sequenceBuilder.element(CalledFunction.class)
+    expressionChild = sequenceBuilder.element(Expression.class)
       .build();
 
     bindingCollection = sequenceBuilder.elementCollection(Binding.class)

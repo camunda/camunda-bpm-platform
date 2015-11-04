@@ -9,17 +9,17 @@
     </decisionTable>
   </decision>
   <decision id="decision2" name="decision2">
-    <decisionTable id="decisionTable2" preferedOrientation="Rule-as-Row">
+    <decisionTable id="decisionTable2" preferredOrientation="Rule-as-Row">
       <output id="output2" />
     </decisionTable>
   </decision>
   <decision id="decision3" name="decision3">
-    <decisionTable id="decisionTable3" preferedOrientation="Rule-as-Column">
+    <decisionTable id="decisionTable3" preferredOrientation="Rule-as-Column">
       <output id="output3" />
     </decisionTable>
   </decision>
   <decision id="decision4" name="decision4">
-    <decisionTable id="decisionTable4" preferedOrientation="CrossTable">
+    <decisionTable id="decisionTable4" preferredOrientation="CrossTable">
       <output id="output4" />
     </decisionTable>
   </decision>

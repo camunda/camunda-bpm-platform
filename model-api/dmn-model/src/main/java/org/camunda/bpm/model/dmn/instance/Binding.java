@@ -15,12 +15,12 @@ package org.camunda.bpm.model.dmn.instance;
 
 public interface Binding extends DmnModelElementInstance {
 
-  Expression getExpression();
-
-  void setExpression(Expression expression);
-
   InformationItem getParameter();
 
   void setParameter(InformationItem parameter);
+
+  Expression getExpression();
+
+  void setExpression(Expression expression);
 
 }
