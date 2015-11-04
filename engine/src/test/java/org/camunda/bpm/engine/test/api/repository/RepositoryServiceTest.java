@@ -467,7 +467,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     byte[] readInputStream = IoUtil.readInputStream(decisionModel, "decisionModel");
     String model = new String(readInputStream, "UTF-8");
 
-    assertTrue(model.contains("<Decision id=\"one\" name=\"One\">"));
+    assertTrue(model.contains("<decision id=\"one\" name=\"One\">"));
 
     IoUtil.closeSilently(decisionModel);
   }

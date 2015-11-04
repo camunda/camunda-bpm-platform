@@ -52,7 +52,7 @@ public class DmnHistoryTest extends AbstractFoxPlatformIntegrationTest {
     HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery().includeInputs().includeOutputs().singleResult();
     assertThat(historicDecisionInstance, is(notNullValue()));
     assertThat(historicDecisionInstance.getDecisionDefinitionKey(), is("decision"));
-    assertThat(historicDecisionInstance.getDecisionDefinitionName(), is("CheckOrder"));
+    assertThat(historicDecisionInstance.getDecisionDefinitionName(), is("Check Order"));
 
     assertThat(historicDecisionInstance.getInputs().size(), is(2));
     assertThat(historicDecisionInstance.getOutputs().size(), is(2));

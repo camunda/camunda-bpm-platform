@@ -1,55 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Definitions xmlns="http://www.omg.org/spec/DMN/20130901"
-             xmlns:camunda="http://camunda.org/schema/1.0/dmn"
+<definitions xmlns="http://www.omg.org/spec/DMN/20130901"
              id="definitions"
              name="camunda"
              namespace="http://camunda.org/dmn">
-             
-  <ItemDefinition id="integerItem">
-    <typeDefinition>integer</typeDefinition>
-  </ItemDefinition>
-             
-  <Decision id="testDecision">
-    <DecisionTable id="table" hitPolicy="COLLECT" aggregation="SUM">
-      <clause id="input">
+
+  <decision id="testDecision" name="decision">
+    <decisionTable id="table" hitPolicy="COLLECT" aggregation="SUM">
+      <input id="input">
         <inputExpression id="inputExpression">
           <text>input</text>
         </inputExpression>
+      </input>
+      <output id="result1" name="result1" typeRef="integer" />
+      <output id="result2" name="result2" typeRef="integer" />
+      <rule id="ruleSingleEntry">
         <inputEntry id="input1">
-          <text>"no output"</text>
-        </inputEntry>
-       <inputEntry id="input4">
           <text>"single entry"</text>
         </inputEntry>
-       <inputEntry id="input6">
-          <text>"single entry list"</text>
-        </inputEntry>
-      </clause>
-      <clause id="result1" camunda:output="result1" >
-        <outputDefinition href="#integerItem" />
         <outputEntry id="output1">
           <text>12</text>
         </outputEntry>
-      </clause>
-      <clause id="result2" camunda:output="result2" >
-        <outputDefinition href="#integerItem" />
-        <outputEntry id="output2">
-          <text>21</text>
-        </outputEntry>
-      </clause>
-      <rule id="ruleSingleEntry">
-        <condition>input4</condition>
-        <conclusion>output1</conclusion>
+        <outputEntry/>
       </rule>
       <rule id="ruleSingleEntryList1">
-        <condition>input6</condition>
-        <conclusion>output1</conclusion>
+        <inputEntry id="input2">
+          <text>"single entry list"</text>
+        </inputEntry>
+        <outputEntry id="output2">
+          <text>12</text>
+        </outputEntry>
+        <outputEntry/>
       </rule>
       <rule id="ruleSingleEntryList2">
-        <condition>input6</condition>
-        <conclusion>output2</conclusion>
+        <inputEntry id="input3">
+          <text>"single entry list"</text>
+        </inputEntry>
+        <outputEntry/>
+        <outputEntry id="output3">
+          <text>21</text>
+        </outputEntry>
       </rule>
-    </DecisionTable>
-  </Decision>
-</Definitions>
+    </decisionTable>
+  </decision>
+</definitions>
 

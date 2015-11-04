@@ -13,7 +13,6 @@
 
 package org.camunda.bpm.engine.test.standalone.history;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
