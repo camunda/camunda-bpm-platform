@@ -7,7 +7,7 @@
 
   <case id="testCase" name="Test Case">
 
-    <casePlanModel>
+    <casePlanModel id="CasePlanModel_1">
 
       <planItem id="PI_HumanTask_1" definitionRef="HumanTask_1" />
       <planItem id="PI_HumanTask_2" definitionRef="HumanTask_2" />
