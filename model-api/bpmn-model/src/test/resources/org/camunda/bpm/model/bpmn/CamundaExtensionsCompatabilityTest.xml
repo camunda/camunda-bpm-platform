@@ -168,7 +168,8 @@
     <businessRuleTask id="businessRuleTask"
                       camunda:decisionRef="test"
                       camunda:decisionRefBinding="test"
-                      camunda:decisionRefVersion="test" />
+                      camunda:decisionRefVersion="test"
+                      camunda:mapDecisionResult="test" />
 
     <endEvent id="endEvent"
               camunda:asyncAfter="true"

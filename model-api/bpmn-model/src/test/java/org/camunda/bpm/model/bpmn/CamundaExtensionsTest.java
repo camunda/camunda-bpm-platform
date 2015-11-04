@@ -270,6 +270,13 @@ public class CamundaExtensionsTest {
   }
 
   @Test
+  public void testMapDecisionResult() {
+    assertThat(businessRuleTask.getCamundaMapDecisionResult()).isEqualTo(TEST_STRING_XML);
+    businessRuleTask.setCamundaMapDecisionResult(TEST_STRING_API);
+    assertThat(businessRuleTask.getCamundaMapDecisionResult()).isEqualTo(TEST_STRING_API);
+  }
+
+  @Test
   public void testCandidateGroups() {
     assertThat(userTask.getCamundaCandidateGroups()).isEqualTo(TEST_GROUPS_XML);
     assertThat(userTask.getCamundaCandidateGroupsList()).containsAll(TEST_GROUPS_LIST_XML);
