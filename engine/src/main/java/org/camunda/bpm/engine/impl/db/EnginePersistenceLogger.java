@@ -516,4 +516,12 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         collectResultValue
         ));
   }
+
+  public ProcessEngineException updateTransientVariableException(String variableName) {
+    return new ProcessEngineException(exceptionMessage(
+        "064",
+        "The variable with name '{}' can not be updated because it is transient and read-only.",
+        variableName
+        ));
+  }
 }

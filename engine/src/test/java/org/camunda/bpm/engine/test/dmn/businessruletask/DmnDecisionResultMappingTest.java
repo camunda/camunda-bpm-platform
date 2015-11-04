@@ -32,17 +32,6 @@ public class DmnDecisionResultMappingTest extends PluggableProcessEngineTestCase
 
   protected static final String TEST_DECISION = "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultTest.dmn10.xml";
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultTest.bpmn20.xml", TEST_DECISION })
-  public void testTransientDecisionResult() {
-    // when a decision is evaluated and the result is stored in a transient variable "ruleResult"
-    ProcessInstance processInstance = startTestProcess("single entry");
-
-    // then the variable should not be available outside the business rule task
-    assertNull(runtimeService.getVariable(processInstance.getId(), "decisionResult"));
-    // and should not create an entry in history since it is not persistent
-    assertNull(historyService.createHistoricVariableInstanceQuery().variableName("decisionResult").singleResult());
-  }
-
   @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultCustomOutputMapping.bpmn20.xml", TEST_DECISION })
   public void testCustomOutputMapping() {
     ProcessInstance processInstance = startTestProcess("multiple entries");
@@ -172,6 +161,29 @@ public class DmnDecisionResultMappingTest extends PluggableProcessEngineTestCase
       fail("expect parse exception");
     } catch (ProcessEngineException e) {
       assertTextPresent("No decision result mapper found for name 'invalid'", e.getMessage());
+    }
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultTest.bpmn20.xml", TEST_DECISION })
+  public void testTransientDecisionResult() {
+    // when a decision is evaluated and the result is stored in a transient variable "decisionResult"
+    ProcessInstance processInstance = startTestProcess("single entry");
+
+    // then the variable should not be available outside the business rule task
+    assertNull(runtimeService.getVariable(processInstance.getId(), "decisionResult"));
+    // and should not create an entry in history since it is not persistent
+    assertNull(historyService.createHistoricVariableInstanceQuery().variableName("decisionResult").singleResult());
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultOverrideVariableTest.bpmn20.xml", TEST_DECISION })
+  public void testFailedToOverrideDecisionResultVariable() {
+    try {
+      // the transient variable "decisionResult" should not be overridden by the task result variable
+      startTestProcess("single entry");
+      fail("expect exception");
+
+    } catch (ProcessEngineException e) {
+      assertTextPresent("variable with name 'decisionResult' can not be updated", e.getMessage());
     }
   }
 

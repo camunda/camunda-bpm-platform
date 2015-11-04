@@ -22,12 +22,14 @@ import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.engine.delegate.VariableListener;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
 import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableStore;
+import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
@@ -41,6 +43,8 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
  * @author Sebastian Menski
  */
 public abstract class AbstractPersistentVariableStore extends AbstractVariableStore {
+
+  protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
   protected Map<String, VariableInstanceEntity> variableInstances = null;
 
@@ -120,6 +124,11 @@ public abstract class AbstractPersistentVariableStore extends AbstractVariableSt
   @Override
   public void setVariableValue(CoreVariableInstance variableInstance, TypedValue value, AbstractVariableScope sourceActivityExecution) {
     VariableInstanceEntity variableInstanceEntity = (VariableInstanceEntity) variableInstance;
+
+    if(variableInstanceEntity.isTransient()) {
+      throw LOG.updateTransientVariableException(variableInstanceEntity.getName());
+    }
+
     variableInstanceEntity.setValue(value);
     variableInstanceEntity.incrementSequenceCounter();
 
