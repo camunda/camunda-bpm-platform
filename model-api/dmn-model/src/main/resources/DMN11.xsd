@@ -79,8 +79,8 @@
 					<xsd:element name="decisionOwner" type="tDMNElementReference" minOccurs="0" maxOccurs="unbounded"/>
 					<xsd:element name="usingProcess" type="tDMNElementReference" minOccurs="0" maxOccurs="unbounded"/>
 					<xsd:element name="usingTask" type="tDMNElementReference" minOccurs="0" maxOccurs="unbounded"/>
+					<!-- decisionLogic -->
 					<xsd:element ref="expression" minOccurs="0" maxOccurs="1"/>
-					<!-- the decision logic -->
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
@@ -119,9 +119,7 @@
 		<xsd:complexContent>
 			<xsd:extension base="tDRGElement">
 				<xsd:sequence>
-					<!-- the parameters -->
 					<xsd:element name="encapsulatedLogic" type="tFunctionDefinition" minOccurs="0" maxOccurs="1"/>
-					<!-- the body -->
 					<xsd:element name="variable" type="tInformationItem" minOccurs="0"/>
 					<xsd:element name="knowledgeRequirement" type="tKnowledgeRequirement" minOccurs="0" maxOccurs="unbounded"/>
 					<xsd:element name="authorityRequirement" type="tAuthorityRequirement" minOccurs="0" maxOccurs="unbounded"/>
@@ -154,7 +152,6 @@
 	</xsd:complexType>
 	<xsd:complexType name="tInformationRequirement">
 		<xsd:sequence>
-			<!-- the variable -->
 			<xsd:choice minOccurs="1" maxOccurs="1">
 				<xsd:element name="requiredDecision" type="tDMNElementReference"/>
 				<xsd:element name="requiredInput" type="tDMNElementReference"/>
@@ -214,7 +211,8 @@
 		<xsd:complexContent>
 			<xsd:extension base="tExpression">
 				<xsd:sequence>
-					<xsd:element name="calledFunction" type="xsd:string" minOccurs="0"/>
+					<!-- calledFunction -->
+					<xsd:element ref="expression" minOccurs="0"/>
 					<xsd:element name="binding" type="tBinding" minOccurs="0" maxOccurs="unbounded"/>
 				</xsd:sequence>
 			</xsd:extension>
@@ -222,8 +220,9 @@
 	</xsd:complexType>
 	<xsd:complexType name="tBinding">
 		<xsd:sequence>
+			<xsd:element name="parameter" type="tInformationItem" minOccurs="1" maxOccurs="1"/>
+			<!-- bindingFormula -->
 			<xsd:element ref="expression" minOccurs="0" maxOccurs="1"/>
-			<xsd:element name="parameter" type="tDMNElementReference" minOccurs="1" maxOccurs="1"/>
 		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:element name="informationItem" type="tInformationItem" substitutionGroup="namedElement"/>
@@ -232,7 +231,6 @@
 			<xsd:extension base="tNamedElement">
 				<xsd:attribute name="typeRef" type="xsd:QName"/>
 			</xsd:extension>
-			<!-- NB: the name attribute is "required" for information items -->
 		</xsd:complexContent>
 	</xsd:complexType>
 	<xsd:element name="decisionTable" type="tDecisionTable" substitutionGroup="expression"/>
@@ -241,13 +239,13 @@
 			<xsd:extension base="tExpression">
 				<xsd:sequence>
 					<xsd:element name="input" type="tInputClause" minOccurs="0" maxOccurs="unbounded"/>
-					<!-- NB: when the hit policy is FIRST or RULE ORDER, the ordering of the rules is significant and MUST be preserved -->
 					<xsd:element name="output" type="tOutputClause" maxOccurs="unbounded"/>
+					<!-- NB: when the hit policy is FIRST or RULE ORDER, the ordering of the rules is significant and MUST be preserved -->
 					<xsd:element name="rule" type="tDecisionRule" minOccurs="0" maxOccurs="unbounded"/>
 				</xsd:sequence>
 				<xsd:attribute name="hitPolicy" type="tHitPolicy" use="optional" default="UNIQUE"/>
 				<xsd:attribute name="aggregation" type="tBuiltinAggregator" use="optional"/>
-				<xsd:attribute name="preferedOrientation" type="tDecisionTableOrientation" use="optional" default="Rule-as-Row"/>
+				<xsd:attribute name="preferredOrientation" type="tDecisionTableOrientation" use="optional" default="Rule-as-Row"/>
 				<xsd:attribute name="outputLabel" type="xsd:string" use="optional"/>
 			</xsd:extension>
 		</xsd:complexContent>
@@ -338,7 +336,6 @@
 		<xsd:complexContent>
 			<xsd:extension base="tDMNElement">
 				<xsd:sequence>
-					<!-- NB: When the isOrdered attribute is "true", the ordering of the output entries is significant and MUST be preserved -->
 					<xsd:element name="outputValues" type="tUnaryTests" minOccurs="0"/>
 					<xsd:element name="defaultOutputEntry" type="tLiteralExpression" minOccurs="0"/>
 				</xsd:sequence>
@@ -370,9 +367,8 @@
 	<xsd:complexType name="tContextEntry">
 		<xsd:sequence>
 			<xsd:element name="variable" type="tInformationItem" minOccurs="0" maxOccurs="1"/>
-			<!-- the variable -->
+			<!-- value -->
 			<xsd:element ref="expression" minOccurs="1" maxOccurs="1"/>
-			<!-- the value -->
 		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:element name="functionDefinition" type="tFunctionDefinition" substitutionGroup="expression"/>
@@ -381,9 +377,8 @@
 			<xsd:extension base="tExpression">
 				<xsd:sequence>
 					<xsd:element name="formalParameter" type="tInformationItem" minOccurs="0" maxOccurs="unbounded"/>
-					<!-- the formal parameters -->
+					<!-- body -->
 					<xsd:element ref="expression" minOccurs="0" maxOccurs="1"/>
-					<!-- the body -->
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
@@ -404,6 +399,7 @@
 		<xsd:complexContent>
 			<xsd:extension base="tExpression">
 				<xsd:sequence>
+					<!-- element -->
 					<xsd:element ref="expression" minOccurs="0" maxOccurs="unbounded"/>
 				</xsd:sequence>
 			</xsd:extension>
