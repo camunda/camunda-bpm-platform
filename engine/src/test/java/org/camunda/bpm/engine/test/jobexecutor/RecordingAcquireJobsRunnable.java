@@ -37,8 +37,7 @@ public class RecordingAcquireJobsRunnable extends SequentialJobAcquisitionRunnab
 
   @Override
   protected void suspendAcquisition(long millis) {
-    // just record, don't actually wait
-    waitEvents.add(new RecordedWaitEvent(System.currentTimeMillis(), millis));
+    // don't actually wait
   }
 
   @Override
@@ -55,21 +54,28 @@ public class RecordingAcquireJobsRunnable extends SequentialJobAcquisitionRunnab
     return acquisitionEvents;
   }
 
+  protected void configureNextAcquisitionCycle(JobAcquisitionContext acquisitionContext, JobAcquisitionStrategy acquisitionStrategy) {
+    super.configureNextAcquisitionCycle(acquisitionContext, acquisitionStrategy);
+
+    long timeBetweenCurrentAndNextAcquisition = acquisitionStrategy.getWaitTime();
+    waitEvents.add(new RecordedWaitEvent(System.currentTimeMillis(), timeBetweenCurrentAndNextAcquisition));
+  }
+
   public static class RecordedWaitEvent {
 
     protected long timestamp;
-    protected long waitTime;
+    protected long timeBetweenAcquisitions;
 
-    public RecordedWaitEvent(long timestamp, long waitTime) {
+    public RecordedWaitEvent(long timestamp, long timeBetweenAcquisitions) {
       this.timestamp = timestamp;
-      this.waitTime = waitTime;
+      this.timeBetweenAcquisitions = timeBetweenAcquisitions;
     }
 
     public long getTimestamp() {
       return timestamp;
     }
-    public long getWaitTime() {
-      return waitTime;
+    public long getTimeBetweenAcquisitions() {
+      return timeBetweenAcquisitions;
     }
   }
 

@@ -79,7 +79,7 @@ public class JobAcquisitionTest extends PluggableProcessEngineTestCase {
     assertEquals(0, managementService.createJobQuery().active().count());
     List<RecordedWaitEvent> jobExecutor1WaitEvents = jobExecutor1.getAcquireJobsRunnable().getWaitEvents();
     assertEquals(1, jobExecutor1WaitEvents.size());
-    assertEquals(0, jobExecutor1WaitEvents.get(0).getWaitTime());
+    assertEquals(0, jobExecutor1WaitEvents.get(0).getTimeBetweenAcquisitions());
 
     // when continuing acquisition thread 2
     acquisitionThread2.makeContinueAndWaitForSync();
@@ -88,7 +88,7 @@ public class JobAcquisitionTest extends PluggableProcessEngineTestCase {
     // but the acquisition thread immediately tries again
     List<RecordedWaitEvent> jobExecutor2WaitEvents = jobExecutor2.getAcquireJobsRunnable().getWaitEvents();
     assertEquals(1, jobExecutor2WaitEvents.size());
-    assertEquals(0, jobExecutor2WaitEvents.get(0).getWaitTime());
+    assertEquals(0, jobExecutor2WaitEvents.get(0).getTimeBetweenAcquisitions());
 
   }
 }
