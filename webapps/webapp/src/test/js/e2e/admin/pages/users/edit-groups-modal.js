@@ -17,7 +17,7 @@ module.exports = Page.extend({
   },
 
   groupId: function(idx) {
-    return this.groupList().get(idx).element(by.css('.group-id'));
+    return this.groupList().get(idx).element(by.css('.group-id a'));
   },
 
   groupName: function(idx) {

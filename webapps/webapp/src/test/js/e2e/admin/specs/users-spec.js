@@ -331,7 +331,7 @@ describe('Admin Users Spec', function() {
     it('should navigate to groups edit menu', function() {
 
       // given
-      usersPage.editUserGroups.navigateTo({ user: users[2].id });
+      usersPage.editUserGroups.navigateTo({ user: users[2].params.id });
       usersPage.editUserGroups.openAddGroupModal();
 
 
