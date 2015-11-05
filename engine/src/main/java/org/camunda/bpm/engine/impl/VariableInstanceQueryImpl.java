@@ -15,7 +15,9 @@ package org.camunda.bpm.engine.impl;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,6 +39,12 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
   private final static Logger LOGGER = Logger.getLogger(VariableInstanceQuery.class.getName());
 
   private static final long serialVersionUID = 1L;
+
+  public static final Set<ValueType> BINARY_VALUE_TYPES = new HashSet<ValueType>();
+  static {
+    BINARY_VALUE_TYPES.add(ValueType.BYTES);
+    BINARY_VALUE_TYPES.add(ValueType.FILE);
+  }
 
   protected String variableId;
   protected String variableName;
@@ -192,7 +200,7 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
 
   protected boolean shouldFetchValue(VariableInstanceEntity entity) {
     // do not fetch values for byte arrays eagerly (unless requested by the user)
-    return isByteArrayFetchingEnabled || !ValueType.BYTES.equals(entity.getSerializer().getType());
+    return isByteArrayFetchingEnabled || !BINARY_VALUE_TYPES.contains(entity.getSerializer().getType());
   }
 
   // getters ////////////////////////////////////////////////////
