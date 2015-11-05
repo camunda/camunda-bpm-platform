@@ -286,7 +286,8 @@ public class UserOperationLogManager extends AbstractHistoricManager {
 
   protected boolean isUserOperationLogEnabled() {
     return isHistoryLevelFullEnabled() &&
-        (isLegacyUserOperationLogEnabled() || (isUserOperationLogEnabledOnCommandContext() && isUserAuthenticated()));
+        ((isUserOperationLogEnabledOnCommandContext() && isUserAuthenticated()) ||
+            !writeUserOperationLogOnlyWithLoggedInUser());
   }
 
   protected boolean isUserAuthenticated() {
@@ -299,9 +300,9 @@ public class UserOperationLogManager extends AbstractHistoricManager {
     return commandContext.getAuthenticatedUserId();
   }
 
-  protected boolean isLegacyUserOperationLogEnabled() {
+  protected boolean writeUserOperationLogOnlyWithLoggedInUser() {
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
-    return configuration.isLegacyUserOperationLogEnabled();
+    return configuration.isRestrictUserOperationLogToAuthenticatedUsers();
   }
 
   protected boolean isUserOperationLogEnabledOnCommandContext() {

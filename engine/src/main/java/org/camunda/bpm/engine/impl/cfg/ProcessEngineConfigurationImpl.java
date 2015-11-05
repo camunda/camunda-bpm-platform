@@ -503,7 +503,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean enableExpressionsInAdhocQueries = false;
   protected boolean enableExpressionsInStoredQueries = true;
 
-  protected boolean legacyUserOperationLogEnabled = false;
+  /**
+   * If true, user operation log entries are only written if there is an
+   * authenticated user present in the context. If false, user operation log
+   * entries are written regardless of authentication state.
+   */
+  protected boolean restrictUserOperationLogToAuthenticatedUsers = true;
 
   protected boolean isBpmnStacktraceVerbose = false;
 
@@ -2850,12 +2855,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
-  public boolean isLegacyUserOperationLogEnabled() {
-    return legacyUserOperationLogEnabled;
+  public boolean isRestrictUserOperationLogToAuthenticatedUsers() {
+    return restrictUserOperationLogToAuthenticatedUsers;
   }
 
-  public ProcessEngineConfigurationImpl setLegacyUserOperationLogEnabled(boolean legacyUserOperationLogEnabled) {
-    this.legacyUserOperationLogEnabled = legacyUserOperationLogEnabled;
+  public ProcessEngineConfigurationImpl setRestrictUserOperationLogToAuthenticatedUsers(boolean restrictUserOperationLogToAuthenticatedUsers) {
+    this.restrictUserOperationLogToAuthenticatedUsers = restrictUserOperationLogToAuthenticatedUsers;
     return this;
   }
 

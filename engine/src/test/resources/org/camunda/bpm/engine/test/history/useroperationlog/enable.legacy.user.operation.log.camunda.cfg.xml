@@ -21,7 +21,7 @@
     <property name="jobExecutorActivate" value="false" />
     
     <!-- enable user operation log legacy behavior -->
-    <property name="legacyUserOperationLogEnabled" value="true" />
+    <property name="restrictUserOperationLogToAuthenticatedUsers" value="false" />
     
     <!-- turn off metrics reporter -->
     <property name="dbMetricsReporterActivate" value="false" />

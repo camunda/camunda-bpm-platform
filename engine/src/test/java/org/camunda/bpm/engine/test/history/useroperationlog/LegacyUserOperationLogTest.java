@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.test.history.useroperationlog;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
-import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.test.Deployment;
 
 /**
