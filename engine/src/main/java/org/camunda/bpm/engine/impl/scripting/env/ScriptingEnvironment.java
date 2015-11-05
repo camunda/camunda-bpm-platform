@@ -24,7 +24,6 @@ import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
-import org.camunda.bpm.dmn.scriptengine.DmnScriptEngineFactory;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -104,7 +103,7 @@ public class ScriptingEnvironment {
 
     Map<String, List<ExecutableScript>> result = null;
     if (config.isEnableFetchScriptEngineFromProcessApplication()) {
-      if(processApplication != null && !DmnScriptEngineFactory.names.contains(language)) {
+      if(processApplication != null) {
         result = getPaEnvScripts(processApplication);
       }
     }

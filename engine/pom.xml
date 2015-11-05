@@ -28,7 +28,7 @@
 
     <dependency>
       <groupId>org.camunda.bpm.dmn</groupId>
-      <artifactId>camunda-scriptengine-dmn</artifactId>
+      <artifactId>camunda-engine-dmn</artifactId>
       <exclusions>
         <exclusion>
           <groupId>de.odysseus.juel</groupId>

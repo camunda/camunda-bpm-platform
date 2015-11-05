@@ -48,7 +48,6 @@ import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
-import org.camunda.bpm.dmn.scriptengine.DmnScriptEngineFactory;
 import org.camunda.bpm.engine.ArtifactFactory;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.CaseService;
@@ -1448,8 +1447,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     else if (dmnEngineConfiguration == null) {
       dmnEngineConfiguration = dmnEngine.getConfiguration();
     }
-
-    scriptingEngines.addScriptEngineFactory(new DmnScriptEngineFactory(dmnEngine));
 
   }
 
