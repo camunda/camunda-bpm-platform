@@ -35,7 +35,7 @@ public class SingleVariableContext implements VariableContext {
   }
 
   public TypedValue resolve(String variableName) {
-    if(name.equals(variableName)) {
+    if(containsVariable(variableName)) {
       return typedValue;
     }
     else {
