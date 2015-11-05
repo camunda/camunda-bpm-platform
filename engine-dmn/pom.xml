@@ -17,7 +17,6 @@
     <module>engine</module>
     <module>feel-api</module>
     <module>feel-juel</module>
-    <module>scriptengine-dmn</module>
   </modules>
 
   <properties>
