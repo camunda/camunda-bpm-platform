@@ -26,7 +26,7 @@
         <flowNodeRef>ServiceTask_1</flowNodeRef>
       </lane>
     </laneSet>
-    <userTask id="approveInvoice" camunda:formKey="embedded:app:forms/approve-invoice.html" camunda:dueDate="${dateTime().plusWeeks(1).toDate()}" camunda:candidateGroups="${approverGroups}" name="Approve Invoice">
+    <userTask id="approveInvoice" camunda:formKey="embedded:app:develop/invoice-forms/approve-invoice.html" camunda:dueDate="${dateTime().plusWeeks(1).toDate()}" camunda:candidateGroups="${approverGroups}" name="Approve Invoice">
       <documentation>Approve the invoice (or not).</documentation>
       <extensionElements>
         <camunda:taskListener event="create">
@@ -47,7 +47,7 @@
       <outgoing>invoiceNotApproved</outgoing>
       <outgoing>invoiceApproved</outgoing>
     </exclusiveGateway>
-    <userTask id="reviewInvoice" camunda:assignee="demo" camunda:formKey="embedded:app:forms/review-invoice.html" camunda:dueDate="${dateTime().plusDays(2).toDate()}" name="Review Invoice">
+    <userTask id="reviewInvoice" camunda:assignee="demo" camunda:formKey="embedded:app:develop/invoice-forms/review-invoice.html" camunda:dueDate="${dateTime().plusDays(2).toDate()}" name="Review Invoice">
       <documentation><![CDATA[Review the invoice.
 
 
@@ -60,7 +60,7 @@ If data is missing, provide it.]]></documentation>
       <outgoing>reviewNotSuccessful</outgoing>
       <outgoing>reviewSuccessful</outgoing>
     </exclusiveGateway>
-    <userTask id="prepareBankTransfer" camunda:formKey="embedded:app:forms/prepare-bank-transfer.html" camunda:candidateGroups="accounting" camunda:dueDate="${dateTime().plusWeeks(1).toDate()}" name="Prepare&#xD;&#xA;Bank&#xD;&#xA;Transfer">
+    <userTask id="prepareBankTransfer" camunda:formKey="embedded:app:develop/invoice-forms/prepare-bank-transfer.html" camunda:candidateGroups="accounting" camunda:dueDate="${dateTime().plusWeeks(1).toDate()}" name="Prepare&#xD;&#xA;Bank&#xD;&#xA;Transfer">
       <documentation>Prepare the bank transfer.</documentation>
       <incoming>invoiceApproved</incoming>
       <outgoing>SequenceFlow_2</outgoing>
