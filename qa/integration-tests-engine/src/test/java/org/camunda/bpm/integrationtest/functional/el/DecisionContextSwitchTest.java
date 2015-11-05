@@ -12,8 +12,14 @@
  */
 package org.camunda.bpm.integrationtest.functional.el;
 
-import java.util.List;
+import static org.junit.Assert.assertEquals;
 
+import java.util.List;
+import java.util.Map;
+
+import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.integrationtest.functional.el.beans.GreeterBean;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
@@ -37,13 +43,13 @@ public class DecisionContextSwitchTest extends AbstractFoxPlatformIntegrationTes
   protected static final String DMN_RESOURCE_NAME = "org/camunda/bpm/integrationtest/functional/el/BeanResolvingDecision.dmn11.xml";
 
   @Deployment(name="bpmnDeployment")
-  public static WebArchive createBpmnDeplyoment() {
+  public static WebArchive createBpmnDeployment() {
     return initWebArchiveDeployment("bpmn-deployment.war")
       .addAsResource("org/camunda/bpm/integrationtest/functional/el/BusinessRuleProcess.bpmn20.xml");
   }
 
   @Deployment(name="dmnDeployment")
-  public static WebArchive createDmnDeplyoment() {
+  public static WebArchive createDmnDeployment() {
     return initWebArchiveDeployment("dmn-deployment.war")
       .addClass(GreeterBean.class)
       .addAsResource(DMN_RESOURCE_NAME);
@@ -63,13 +69,21 @@ public class DecisionContextSwitchTest extends AbstractFoxPlatformIntegrationTes
   @Test
   @OperateOnDeployment("clientDeployment")
   public void shouldSwitchContextWhenUsingDecisionService() {
-    decisionService.evaluateDecisionByKey("decision", Variables.createVariables());
+    DmnDecisionResult decisionResult = decisionService.evaluateDecisionByKey("decision", Variables.createVariables());
+    assertEquals("ok", decisionResult.getFirstOutput().getFirstValue());
   }
 
   @Test
+  @SuppressWarnings("unchecked")
   @OperateOnDeployment("clientDeployment")
   public void shouldSwitchContextWhenCallingFromBpmn() {
-    runtimeService.startProcessInstanceByKey("testProcess");
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+
+    VariableInstance decisionResult = runtimeService.createVariableInstanceQuery()
+      .processInstanceIdIn(pi.getId())
+      .variableName("result").singleResult();
+    List<Map<String, Object>> result = (List<Map<String, Object>>) decisionResult.getValue();
+    assertEquals("ok", result.get(0).get("result"));
   }
 
   @Test
@@ -101,7 +115,8 @@ public class DecisionContextSwitchTest extends AbstractFoxPlatformIntegrationTes
 
     try {
       // when then
-      decisionService.evaluateDecisionByKey("decision", Variables.createVariables());
+      DmnDecisionResult decisionResult = decisionService.evaluateDecisionByKey("decision", Variables.createVariables());
+      assertEquals("ok", decisionResult.getFirstOutput().getFirstValue());
     }
     finally {
       repositoryService.deleteDeployment(deployment2.getId(), true);
@@ -110,6 +125,7 @@ public class DecisionContextSwitchTest extends AbstractFoxPlatformIntegrationTes
   }
 
   @Test
+  @SuppressWarnings("unchecked")
   @OperateOnDeployment("clientDeployment")
   public void shouldSwitchContextWhenCallingFromBpmnAfterRedeployment() {
     // given
@@ -137,7 +153,14 @@ public class DecisionContextSwitchTest extends AbstractFoxPlatformIntegrationTes
 
     try {
       // when then
-      runtimeService.startProcessInstanceByKey("testProcess");
+      ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+
+      VariableInstance decisionResult = runtimeService.createVariableInstanceQuery()
+        .processInstanceIdIn(pi.getId())
+        .variableName("result")
+        .singleResult();
+      List<Map<String, Object>> result = (List<Map<String, Object>>) decisionResult.getValue();
+      assertEquals("ok", result.get(0).get("result"));
     }
     finally {
       repositoryService.deleteDeployment(deployment2.getId(), true);
