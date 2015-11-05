@@ -76,9 +76,9 @@ Next, reference a DMN decision from a BPMN Business Rule Task:
 The `camunda:decisionRef` attribute references the id of the decision in the DMN file:
 
 ```xml
-<dmn:Decision id="invoice-assign-approver">
+<dmn:decision id="invoice-assign-approver" name="Assign Approver">
   ...
-</dmn:Decision>
+</dmn:decision>
 ```
 
 Now you can start the BPMN process inside your application:
