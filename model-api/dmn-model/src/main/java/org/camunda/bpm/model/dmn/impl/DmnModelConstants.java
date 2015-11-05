@@ -15,7 +15,7 @@ package org.camunda.bpm.model.dmn.impl;
 
 public final class DmnModelConstants {
 
-  /** The DMN 1.0 namespace */
+  /** The DMN 1.1 namespace */
   public static final String DMN11_NS = "http://www.omg.org/spec/DMN/20130901";
 
   /** The location of the DMN 1.1 XML schema. */
