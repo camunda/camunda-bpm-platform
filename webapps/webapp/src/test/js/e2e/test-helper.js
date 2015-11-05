@@ -10,32 +10,36 @@ var camClient = new CamSDK.Client({
 
 module.exports = function (operations, noReset, done) {
   var deferred = protractor.promise.defer();
+  var arity = arguments.length;
 
-  if (arguments.length === 1 && typeof operations === 'function') {
+  if (arity === 1 && typeof operations === 'function') {
     // testHelper(function(){ console.log('setup complete'); });
     done = operations;
     noReset = false;
     operations = [];
-  } else if (arguments.length === 1 && typeof operations === 'object') {
+  }
+  else if (arity === 1 && typeof operations === 'object') {
     // testHelper(setupObject);
     noReset = false;
     done = function(){};
-  } else if (arguments.length === 2 && typeof noReset === 'function') {
+  }
+  else if (arity === 2 && typeof noReset === 'function') {
     // testHelper(setupObject, function(err, result){ console.log('setup complete', result); });
     done = noReset;
     noReset = false;
-  } else if (arguments.length === 2 && typeof noReset === 'boolean') {
+  }
+  else if (arity === 2 && typeof noReset === 'boolean') {
     done = function(){};
   }
 
-  var callbacks = [
-    function (cb) {
-      if (noReset) {
-        return cb();
-      }
+  var callbacks = [];
 
-      browser.manage().deleteAllCookies();
+  if (!noReset) {
+    callbacks.push(function (cb) {
+      browser.manage().deleteAllCookies().then(function () {cb();}, cb);
+    });
 
+    callbacks.push(function (cb) {
       request(resetUrl, function(err, res, body) {
         if (err) {
           return cb(err);
@@ -49,8 +53,8 @@ module.exports = function (operations, noReset, done) {
           cb(err);
         }
       });
-    }
-  ];
+    });
+  }
 
   operations.forEach(function(operation) {
     var resource = new camClient.resource(operation.module);
@@ -66,27 +70,40 @@ module.exports = function (operations, noReset, done) {
     // now all process instances are started, we can start the jobs to create incidents
     // This method sets retries to 0 for all jobs that were created in the test setup
     if(err) {
-      done(err, result);
       deferred.reject();
+      return done(err, result);
     }
 
     var resource = new camClient.resource('job');
 
-    resource.list({}, function(err, result) {
-      var jobTasks = [];
-      for(var i = 0; i < result.length; i++) {
-        jobTasks.push((function(i) {
-          return function(cb) {
-            resource.setRetries({
-              id: result[i].id,
-              retries: 0
-            }, cb);
-          };
-        })(i));
+    resource.list({}, function(err, listResult) {
+      if(err) {
+        deferred.reject();
+        return done(err, result);
       }
-      CamSDK.utils.series(jobTasks, function(err, result) {
-        done(err, result);
-        deferred.fulfill();
+
+      if (!listResult) {
+        deferred.reject();
+        return done(new Error('job resource list no results'));
+      }
+
+      var jobTasks = listResult.map(function (job) {
+        return function(cb) {
+          resource.setRetries({
+            id: job.id,
+            retries: 0
+          }, cb);
+        };
+      });
+
+      CamSDK.utils.series(jobTasks, function(err, finalResult) {
+        if (err) {
+          deferred.reject();
+        }
+        else {
+          deferred.fulfill();
+        }
+        done(err, finalResult);
       });
     });
   });
