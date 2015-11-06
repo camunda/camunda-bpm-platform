@@ -293,6 +293,10 @@ define(['angular', 'text!./identity-links-modal.html', 'text!./user-tasks-table.
       $scope.title = decorator.title;
       var key = $scope.key = decorator.key;
 
+      $scope.$on('$routeChangeStart', function () {
+        $modalInstance.close();
+      });
+
       $scope.removeItem = function() {
         var delta = this.delta;
 

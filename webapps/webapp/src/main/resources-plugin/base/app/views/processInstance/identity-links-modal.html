@@ -7,7 +7,7 @@
   <div notifications-panel></div>
 
   <form name="editForm"
-        ng-submit="addFormItem()">
+        ng-submit="!invalid() && addItem()">
     <fieldset ng-show="identityLinks.length">
       <legend>{{ decorator.table.label }}</legend>
 
