@@ -11,18 +11,13 @@
   <packaging>jar</packaging>
   <name>camunda BPM - QA - upgrade - instance migration - test</name>
 
-  <properties>
-    <camunda.version.current>${project.version}</camunda.version.current>
-    <camunda.version.previous>7.3.0</camunda.version.previous>
-  </properties>
-
   <dependencies>
 
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.camunda.bpm.qa.upgrade</groupId>
       <artifactId>camunda-qa-upgrade-scenario-util</artifactId>
@@ -113,126 +108,10 @@
             </configuration>
           </plugin>
 
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>compile</id>
-                <phase>generate-test-resources</phase>
-                <configuration>
-                  <target>
-
-                    <!-- create the SQL scripts so that the files exist even if they do not exist in the distribution. (this can be the case if there are no db
-                      upgrades (yet) for a particular release ) -->
-
-                    <mkdir dir="${project.build.directory}/scripts-current/sql/upgrade/" />
-
-                    <!-- patch upgrade for previous version -->
-                    <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.0_to_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.1.sql" />
-                    <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.2_to_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.3_1.sql" />
-                    <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.2_to_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.3_2.sql" />
-                    
-                    <!-- minor version upgrade from previous to current version -->
-                    <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql" />
-                    <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql" />
-
-                    <!-- patch upgrade for current version -->
-                    <!-- for example:
-                    <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch_{camunda.current.majorVersion}.${camunda.current.minorVersion}.0_to_{camunda.current.majorVersion}.${camunda.current.minorVersion}.1.sql" />
-                    -->
-                  </target>
-                </configuration>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-
           <!-- provide sql scripts -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-dependency-plugin</artifactId>
-          </plugin>
-
-          <!-- parse version properties from qa/pom.xml -->
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>build-helper-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>parse-current-version</id>
-                <goals>
-                  <goal>parse-version</goal>
-                </goals>
-                <configuration>
-                  <propertyPrefix>camunda.current</propertyPrefix>
-                  <versionString>${camunda.version.current}</versionString>
-                </configuration>
-              </execution>
-              <execution>
-                <id>parse-old-version</id>
-                <goals>
-                  <goal>parse-version</goal>
-                </goals>
-                <configuration>
-                  <propertyPrefix>camunda.previous</propertyPrefix>
-                  <versionString>${camunda.version.old}</versionString>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>sql-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>patch-previous-schema</id>
-                <phase>process-test-classes</phase>
-                <goals>
-                  <goal>execute</goal>
-                </goals>
-                <configuration>
-                  <srcFiles>
-                    <!-- now patch old version of the schema -->
-                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.0_to_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.1.sql</srcFile>
-                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.2_to_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.3_1.sql</srcFile>
-                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.2_to_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.3_2.sql</srcFile>
-                  </srcFiles>
-                </configuration>
-              </execution>
-              <execution>
-                <id>upgrade-db</id>
-                <phase>process-test-classes</phase>
-                <goals>
-                  <goal>execute</goal>
-                </goals>
-                <configuration>
-                  <srcFiles>
-                    <!-- now perform the schema migrations -->
-                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql</srcFile>
-                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql</srcFile>
-                  </srcFiles>
-                </configuration>
-              </execution>
-              <execution>
-                <id>patch-current-schema</id>
-                <phase>process-test-classes</phase>
-                <goals>
-                  <goal>execute</goal>
-                </goals>
-                <configuration>
-                  <srcFiles>
-                    <!-- now patch new version of the schema, apply any patches explicitly -->
-                    <!-- example:
-                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch_{camunda.current.majorVersion}.${camunda.current.minorVersion}.0_to_{camunda.current.majorVersion}.${camunda.current.minorVersion}.1.sql</srcFile>
-                    -->
-                  </srcFiles>
-                </configuration>
-              </execution>
-            </executions>
           </plugin>
 
           <plugin>
@@ -256,13 +135,6 @@
                 </configuration>
               </execution>
             </executions>
-            <dependencies>
-              <dependency>
-                <groupId>org.camunda.bpm</groupId>
-                <artifactId>camunda-engine</artifactId>
-                <version>${camunda.version.previous}</version>
-              </dependency>
-            </dependencies>
           </plugin>
         </plugins>
       </build>
