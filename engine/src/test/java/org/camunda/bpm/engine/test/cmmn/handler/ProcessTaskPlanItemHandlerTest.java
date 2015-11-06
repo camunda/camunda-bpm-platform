@@ -43,12 +43,12 @@ import org.camunda.bpm.engine.impl.core.variable.mapping.value.ConstantValueProv
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.el.ElValueProvider;
 import org.camunda.bpm.model.cmmn.Cmmn;
-import org.camunda.bpm.model.cmmn.impl.instance.Body;
-import org.camunda.bpm.model.cmmn.impl.instance.ConditionExpression;
-import org.camunda.bpm.model.cmmn.impl.instance.DefaultControl;
-import org.camunda.bpm.model.cmmn.impl.instance.ItemControl;
+import org.camunda.bpm.model.cmmn.instance.Body;
+import org.camunda.bpm.model.cmmn.instance.ConditionExpression;
+import org.camunda.bpm.model.cmmn.instance.DefaultControl;
 import org.camunda.bpm.model.cmmn.instance.ExtensionElements;
 import org.camunda.bpm.model.cmmn.instance.IfPart;
+import org.camunda.bpm.model.cmmn.instance.ItemControl;
 import org.camunda.bpm.model.cmmn.instance.ManualActivationRule;
 import org.camunda.bpm.model.cmmn.instance.PlanItem;
 import org.camunda.bpm.model.cmmn.instance.PlanItemControl;

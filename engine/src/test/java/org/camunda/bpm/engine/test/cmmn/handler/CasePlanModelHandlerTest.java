@@ -28,8 +28,8 @@ import org.camunda.bpm.engine.impl.cmmn.handler.SentryHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
-import org.camunda.bpm.model.cmmn.impl.instance.Body;
-import org.camunda.bpm.model.cmmn.impl.instance.ConditionExpression;
+import org.camunda.bpm.model.cmmn.instance.Body;
+import org.camunda.bpm.model.cmmn.instance.ConditionExpression;
 import org.camunda.bpm.model.cmmn.instance.IfPart;
 import org.camunda.bpm.model.cmmn.instance.Sentry;
 import org.junit.Test;
@@ -78,7 +78,7 @@ public class CasePlanModelHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity activity = handler.handleElement(casePlanModel, context);
 
     // then
-    assertEquals(description, (String) activity.getProperty(PROPERTY_ACTIVITY_DESCRIPTION));
+    assertEquals(description, activity.getProperty(PROPERTY_ACTIVITY_DESCRIPTION));
   }
 
   @Test

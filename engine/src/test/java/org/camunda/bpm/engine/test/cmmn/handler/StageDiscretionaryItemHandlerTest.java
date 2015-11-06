@@ -29,11 +29,11 @@ import org.camunda.bpm.engine.impl.cmmn.handler.StageItemHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.model.cmmn.Cmmn;
-import org.camunda.bpm.model.cmmn.impl.instance.Body;
-import org.camunda.bpm.model.cmmn.impl.instance.ConditionExpression;
-import org.camunda.bpm.model.cmmn.impl.instance.DefaultControl;
-import org.camunda.bpm.model.cmmn.impl.instance.ItemControl;
+import org.camunda.bpm.model.cmmn.instance.Body;
+import org.camunda.bpm.model.cmmn.instance.ConditionExpression;
+import org.camunda.bpm.model.cmmn.instance.DefaultControl;
 import org.camunda.bpm.model.cmmn.instance.DiscretionaryItem;
+import org.camunda.bpm.model.cmmn.instance.ItemControl;
 import org.camunda.bpm.model.cmmn.instance.ManualActivationRule;
 import org.camunda.bpm.model.cmmn.instance.PlanItemControl;
 import org.camunda.bpm.model.cmmn.instance.PlanningTable;
@@ -100,7 +100,7 @@ public class StageDiscretionaryItemHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity activity = handler.handleElement(discretionaryItem, context);
 
     // then
-    assertEquals(description, (String) activity.getProperty(PROPERTY_ACTIVITY_DESCRIPTION));
+    assertEquals(description, activity.getProperty(PROPERTY_ACTIVITY_DESCRIPTION));
   }
 
   @Test
@@ -113,7 +113,7 @@ public class StageDiscretionaryItemHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity activity = handler.handleElement(discretionaryItem, context);
 
     // then
-    assertEquals(description, (String) activity.getProperty(PROPERTY_ACTIVITY_DESCRIPTION));
+    assertEquals(description, activity.getProperty(PROPERTY_ACTIVITY_DESCRIPTION));
   }
 
   @Test

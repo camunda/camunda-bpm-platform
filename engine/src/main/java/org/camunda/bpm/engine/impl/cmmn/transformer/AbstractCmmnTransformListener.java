@@ -18,8 +18,8 @@ import java.util.List;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
-import org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.Case;
+import org.camunda.bpm.model.cmmn.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.CaseTask;
 import org.camunda.bpm.model.cmmn.instance.Definitions;
 import org.camunda.bpm.model.cmmn.instance.EventListener;
@@ -43,6 +43,10 @@ public class AbstractCmmnTransformListener implements CmmnTransformListener {
   }
 
   public void transformCase(Case element, CmmnCaseDefinition caseDefinition) {
+  }
+
+  public void transformCasePlanModel(org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel casePlanModel, CmmnActivity activity) {
+    transformCasePlanModel((org.camunda.bpm.model.cmmn.instance.CasePlanModel) casePlanModel, activity);
   }
 
   public void transformCasePlanModel(CasePlanModel casePlanModel, CmmnActivity activity) {

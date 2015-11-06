@@ -43,8 +43,8 @@ import org.camunda.bpm.engine.impl.variable.listener.DelegateExpressionCaseVaria
 import org.camunda.bpm.engine.impl.variable.listener.ExpressionCaseVariableListener;
 import org.camunda.bpm.engine.impl.variable.listener.ScriptCaseVariableListener;
 import org.camunda.bpm.model.cmmn.Query;
-import org.camunda.bpm.model.cmmn.impl.instance.ConditionExpression;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
+import org.camunda.bpm.model.cmmn.instance.ConditionExpression;
 import org.camunda.bpm.model.cmmn.instance.DiscretionaryItem;
 import org.camunda.bpm.model.cmmn.instance.ExtensionElements;
 import org.camunda.bpm.model.cmmn.instance.ManualActivationRule;

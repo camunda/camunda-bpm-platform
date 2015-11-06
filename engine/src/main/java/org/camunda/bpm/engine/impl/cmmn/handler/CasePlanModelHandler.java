@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
-import org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel;
+import org.camunda.bpm.model.cmmn.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 import org.camunda.bpm.model.cmmn.instance.PlanItemDefinition;
 import org.camunda.bpm.model.cmmn.instance.Sentry;

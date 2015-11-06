@@ -35,8 +35,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 import org.camunda.bpm.model.cmmn.Cmmn;
 import org.camunda.bpm.model.cmmn.CmmnModelException;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
-import org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.Case;
+import org.camunda.bpm.model.cmmn.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.CaseTask;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 import org.camunda.bpm.model.cmmn.instance.Definitions;
@@ -184,7 +184,7 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
     transformer.initializeExitCriterias(casePlanModel, newActivity, context);
 
     for (CmmnTransformListener transformListener : transformListeners) {
-      transformListener.transformCasePlanModel(casePlanModel, newActivity);
+      transformListener.transformCasePlanModel((org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel) casePlanModel, newActivity);
     }
   }
 
