@@ -171,7 +171,7 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
       historicDecisionInstance.addOutput(decisionOutputInstance);
 
       // do not fetch values for byte arrays eagerly (unless requested by the user)
-      if(!isByteArrayValue(decisionOutputInstance) || query.isByteArrayFetchingEnabled()) {
+      if(!isBinaryValue(decisionOutputInstance) || query.isByteArrayFetchingEnabled()) {
         fetchVariableValue(decisionOutputInstance, query.isCustomObjectDeserializationEnabled());
       }
     }
@@ -182,8 +182,8 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
     return getDbEntityManager().selectList("selectHistoricDecisionOutputInstancesByDecisionInstanceIds", decisionInstanceKeys);
   }
 
-  protected boolean isByteArrayValue(HistoricDecisionOutputInstance decisionOutputInstance) {
-    return ValueType.BYTES.getName().equals(decisionOutputInstance.getTypeName());
+  protected boolean isBinaryValue(HistoricDecisionOutputInstance decisionOutputInstance) {
+    return AbstractTypedValueSerializer.BINARY_VALUE_TYPES.contains(decisionOutputInstance.getTypeName());
   }
 
   protected void fetchVariableValue(HistoricDecisionOutputInstanceEntity decisionOutputInstance, boolean isCustomObjectDeserializationEnabled) {
