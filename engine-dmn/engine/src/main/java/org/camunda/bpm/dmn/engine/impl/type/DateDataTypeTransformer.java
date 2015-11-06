@@ -16,7 +16,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.camunda.bpm.dmn.engine.type.DataTypeTransformer;
+import org.camunda.bpm.dmn.engine.impl.spi.type.DmnDataTypeTransformer;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.DateValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -28,7 +28,7 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
  *
  * @author Philipp Ossler
  */
-public class DateDataTypeTransformer implements DataTypeTransformer {
+public class DateDataTypeTransformer implements DmnDataTypeTransformer {
 
   protected SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 

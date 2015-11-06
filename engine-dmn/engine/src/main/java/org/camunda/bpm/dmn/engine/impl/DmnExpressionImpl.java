@@ -13,42 +13,31 @@
 
 package org.camunda.bpm.dmn.engine.impl;
 
-import org.camunda.bpm.dmn.engine.DmnExpression;
-import org.camunda.bpm.dmn.engine.DmnTypeDefinition;
+import org.camunda.bpm.dmn.engine.impl.spi.type.DmnTypeDefinition;
 
-public class DmnExpressionImpl extends DmnElementImpl implements DmnExpression {
+public class DmnExpressionImpl {
 
+  protected String id;
+  protected String name;
+
+  protected DmnTypeDefinition typeDefinition;
   protected String expressionLanguage;
   protected String expression;
-  protected DmnTypeDefinition typeDefinition = new DefaultTypeDefinition();
 
-  public DmnExpressionImpl() {
+  public String getId() {
+    return id;
   }
 
-  @Override
-  public void setKey(String id) {
-    this.key = id;
+  public void setId(String id) {
+    this.id = id;
   }
 
-  @Override
-  public String getKey() {
-    return key;
+  public String getName() {
+    return name;
   }
 
-  public void setExpression(String expression) {
-    this.expression = expression;
-  }
-
-  public String getExpression() {
-    return expression;
-  }
-
-  public void setExpressionLanguage(String expressionLanguage) {
-    this.expressionLanguage = expressionLanguage;
-  }
-
-  public String getExpressionLanguage() {
-    return expressionLanguage;
+  public void setName(String name) {
+    this.name = name;
   }
 
   public DmnTypeDefinition getTypeDefinition() {
@@ -59,14 +48,29 @@ public class DmnExpressionImpl extends DmnElementImpl implements DmnExpression {
     this.typeDefinition = typeDefinition;
   }
 
-  @Override
+  public String getExpressionLanguage() {
+    return expressionLanguage;
+  }
+
+  public void setExpressionLanguage(String expressionLanguage) {
+    this.expressionLanguage = expressionLanguage;
+  }
+
+  public String getExpression() {
+    return expression;
+  }
+
+  public void setExpression(String expression) {
+    this.expression = expression;
+  }
+
   public String toString() {
     return "DmnExpressionImpl{" +
-      "key='" + key + '\'' +
+      "id='" + id + '\'' +
       ", name='" + name + '\'' +
+      ", typeDefinition=" + typeDefinition +
       ", expressionLanguage='" + expressionLanguage + '\'' +
       ", expression='" + expression + '\'' +
-      ", typeDefinition='" + typeDefinition + '\'' +
       '}';
   }
 

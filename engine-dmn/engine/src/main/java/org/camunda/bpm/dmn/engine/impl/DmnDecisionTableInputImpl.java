@@ -13,20 +13,47 @@
 
 package org.camunda.bpm.dmn.engine.impl;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionTableInput;
-import org.camunda.bpm.dmn.engine.DmnInput;
+public class DmnDecisionTableInputImpl {
 
-public class DmnDecisionTableInputImpl extends DmnDecisionTableValueImpl implements DmnDecisionTableInput {
+  public static final String DEFAULT_INPUT_VARIABLE_NAME = "cellInput";
 
+  public String id;
+  public String name;
+
+  protected DmnExpressionImpl expression;
   protected String inputVariable;
 
-  public DmnDecisionTableInputImpl(DmnInput dmnInput) {
-    super(dmnInput);
-    this.inputVariable = dmnInput.getInputVariable();
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public void setExpression(DmnExpressionImpl expression) {
+    this.expression = expression;
+  }
+
+  public DmnExpressionImpl getExpression() {
+    return expression;
   }
 
   public String getInputVariable() {
-    return inputVariable;
+    if (inputVariable != null) {
+      return inputVariable;
+    }
+    else {
+      return DEFAULT_INPUT_VARIABLE_NAME;
+    }
   }
 
   public void setInputVariable(String inputVariable) {
@@ -35,35 +62,12 @@ public class DmnDecisionTableInputImpl extends DmnDecisionTableValueImpl impleme
 
   @Override
   public String toString() {
-    return "DmnDecisionTableValueImpl{" +
-      "key='" + key + '\'' +
+    return "DmnDecisionTableInputImpl{" +
+      "id='" + id + '\'' +
       ", name='" + name + '\'' +
+      ", expression=" + expression +
       ", inputVariable='" + inputVariable + '\'' +
-      ", value=" + value +
       '}';
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-
-    DmnDecisionTableInputImpl that = (DmnDecisionTableInputImpl) o;
-
-    if (key != null ? !key.equals(that.key) : that.key != null) return false;
-    if (name != null ? !name.equals(that.name) : that.name != null) return false;
-    if (inputVariable != null ? !inputVariable.equals(that.inputVariable) : that.inputVariable != null) return false;
-    return !(value != null ? !value.equals(that.value) : that.value != null);
-
-  }
-
-  @Override
-  public int hashCode() {
-    int result = key != null ? key.hashCode() : 0;
-    result = 31 * result + (name != null ? name.hashCode() : 0);
-    result = 31 * result + (inputVariable != null ? inputVariable.hashCode() : 0);
-    result = 31 * result + (value != null ? value.hashCode() : 0);
-    return result;
   }
 
 }

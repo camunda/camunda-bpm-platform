@@ -13,37 +13,56 @@
 
 package org.camunda.bpm.dmn.engine.impl;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionTableOutput;
-import org.camunda.bpm.dmn.engine.DmnDecisionTableRule;
+public class DmnDecisionTableRuleImpl {
 
-public class DmnDecisionTableRuleImpl implements DmnDecisionTableRule {
+  public String id;
+  public String name;
 
-  protected String key;
-  protected Map<String, DmnDecisionTableOutput> outputs = new LinkedHashMap<String, DmnDecisionTableOutput>();
+  protected List<DmnExpressionImpl> conditions = new ArrayList<DmnExpressionImpl>();
+  protected List<DmnExpressionImpl> conclusions = new ArrayList<DmnExpressionImpl>();
 
-  public String getKey() {
-    return key;
+  public String getId() {
+    return id;
   }
 
-  public void setKey(String key) {
-    this.key = key;
+  public void setId(String id) {
+    this.id = id;
   }
 
-  public Map<String, DmnDecisionTableOutput> getOutputs() {
-    return outputs;
+  public String getName() {
+    return name;
   }
 
-  public void addOutput(DmnDecisionTableOutput output) {
-    outputs.put(output.getKey(), output);
+  public void setName(String name) {
+    this.name = name;
   }
 
+  public List<DmnExpressionImpl> getConditions() {
+    return conditions;
+  }
+
+  public void setConditions(List<DmnExpressionImpl> conditions) {
+    this.conditions = conditions;
+  }
+
+  public List<DmnExpressionImpl> getConclusions() {
+    return conclusions;
+  }
+
+  public void setConclusions(List<DmnExpressionImpl> conclusions) {
+    this.conclusions = conclusions;
+  }
+
+  @Override
   public String toString() {
     return "DmnDecisionTableRuleImpl{" +
-      "key='" + key + '\'' +
-      ", outputs=" + outputs +
+      "id='" + id + '\'' +
+      ", name='" + name + '\'' +
+      ", conditions=" + conditions +
+      ", conclusions=" + conclusions +
       '}';
   }
 

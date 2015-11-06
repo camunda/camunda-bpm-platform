@@ -14,43 +14,361 @@
 package org.camunda.bpm.dmn.engine;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.variable.context.VariableContext;
 import org.camunda.bpm.model.dmn.DmnModelInstance;
 
+/**
+ * A DMN engine which can parse DMN decision models
+ * and evaluate decisions.
+ *
+ * <p>
+ * A new DMN engine can be build with a DMN engine configuration
+ * (see {@link DmnEngineConfiguration#buildEngine()}).
+ * </p>
+ */
 public interface DmnEngine {
 
+  /**
+   * The configuration of this engine.
+   *
+   * @return the DMN engine configuration
+   */
   DmnEngineConfiguration getConfiguration();
 
-  DmnDecisionModel parseDecisionModel(String filename);
+  /**
+   * Parse all decisions in a DMN decision model.
+   *
+   * @param filename the filename of the DMN file
+   * @return a list of the {@link DmnDecision}s of the DMN file
+   *
+   * @throws DmnEngineException
+   *           if an error occurs during the parsing of the decision model
+   */
+  List<DmnDecision> parseDecisions(String filename);
 
-  DmnDecisionModel parseDecisionModel(InputStream inputStream);
+  /**
+   * Parse all decisions in a DMN decision model.
+   *
+   * @param inputStream the {@link InputStream} of the DMN file
+   * @return a list of the {@link DmnDecision}s of the DMN file
+   *
+   * @throws DmnEngineException
+   *           if an error occurs during the parsing of the decision model
+   */
+  List<DmnDecision> parseDecisions(InputStream inputStream);
 
-  DmnDecisionModel parseDecisionModel(DmnModelInstance modelInstance);
+  /**
+   * Parse all decisions in a DMN decision model.
+   *
+   * @param dmnModelInstance the {@link DmnModelInstance} of the DMN decision model
+   * @return a list of the {@link DmnDecision}s of the DMN file
+   *
+   * @throws DmnEngineException
+   *           if an error occurs during the parsing of the decision model
+   */
+  List<DmnDecision> parseDecisions(DmnModelInstance dmnModelInstance);
 
-  DmnDecision parseDecision(String filename);
+  /**
+   * Parse the first decision in a DMN decision model.
+   *
+   * @param filename the filename of the DMN file
+   * @return the first {@link DmnDecision} of the DMN file
+   *
+   * @throws DmnEngineException
+   *           if an error occurs during the parsing of the decision model
+   */
+  DmnDecision parseFirstDecision(String filename);
 
-  DmnDecision parseDecision(InputStream inputStream);
+  /**
+   * Parse the first decision in a DMN decision model.
+   *
+   * @param inputStream the {@link InputStream} of the DMN file
+   * @return the first {@link DmnDecision} of the DMN file
+   *
+   * @throws DmnEngineException
+   *           if an error occurs during the parsing of the decision model
+   */
+  DmnDecision parseFirstDecision(InputStream inputStream);
 
-  DmnDecision parseDecision(DmnModelInstance modelInstance);
+  /**
+   * Parse the first decision in a DMN decision model.
+   *
+   * @param dmnModelInstance the {@link DmnModelInstance} of the DMN decision model
+   * @return the first {@link DmnDecision} of the DMN file
+   *
+   * @throws DmnEngineException
+   *           if an error occurs during the parsing of the decision model
+   */
+  DmnDecision parseFirstDecision(DmnModelInstance dmnModelInstance);
 
-  DmnDecision parseDecision(String filename, String decisionKey);
+  /**
+   * Parse the decision with the given key in a DMN decision model.
+   * The key is the {@code id} attribute of the decision
+   * in the DMN XML file.
+   *
+   * @param decisionKey the key of the decision to parse
+   * @param filename the filename of the DMN file
+   * @return the first {@link DmnDecision} of the DMN file
+   *
+   * @throws DmnEngineException
+   *           if an error occurs during the parsing of the decision model
+   */
+  DmnDecision parseDecision(String decisionKey, String filename);
 
-  DmnDecision parseDecision(InputStream inputStream, String decisionKey);
+  /**
+   * Parse the decision with the given key in a DMN decision model.
+   * The key is the {@code id} attribute of the decision
+   * in the DMN XML file.
+   *
+   * @param decisionKey the key of the decision to parse
+   * @param inputStream the {@link InputStream} of the DMN file
+   * @return the first {@link DmnDecision} of the DMN file
+   *
+   * @throws DmnEngineException
+   *           if an error occurs during the parsing of the decision model
+   */
+  DmnDecision parseDecision(String decisionKey, InputStream inputStream);
 
-  DmnDecision parseDecision(DmnModelInstance modelInstance, String decisionKey);
+  /**
+   * Parse the decision with the given key in a DMN decision model.
+   * The key is the {@code id} attribute of the decision
+   * in the DMN XML file.
+   *
+   * @param decisionKey the key of the decision to parse
+   * @param dmnModelInstance the {@link DmnModelInstance} of the DMN decision model
+   * @return the first {@link DmnDecision} of the DMN file
+   *
+   * @throws DmnEngineException
+   *           if an error occurs during the parsing of the decision model
+   */
+  DmnDecision parseDecision(String decisionKey, DmnModelInstance dmnModelInstance);
 
-  DmnDecisionResult evaluate(DmnDecision decision, Map<String, Object> variables);
+  /**
+   * Evaluates a decision which is implemented as decision table.
+   * @param decision the {@link DmnDecision} to evaluate
+   * @param variables the variables which are available
+   * @return the {@link DmnDecisionTableResult} of this evaluation
+   *
+   * @throws DmnEngineException
+   *           if the decision is not implemented as decision table (see {@link DmnDecision#isDecisionTable()}
+   * @throws DmnEngineException
+   *           if an error occurs during the evaluation
+   */
+  DmnDecisionTableResult evaluateDecisionTable(DmnDecision decision, Map<String, Object> variables);
 
-  DmnDecisionResult evaluate(DmnDecision decision, VariableContext variableContext);
+  /**
+   * Evaluates a decision which is implemented as decision table.
+   *
+   * @param decision the {@link DmnDecision} to evaluate
+   * @param variableContext the variables context which is available
+   * @return the {@link DmnDecisionTableResult} of this evaluation
+   *
+   * @throws DmnEngineException
+   *           if the decision is not implemented as decision table (see {@link DmnDecision#isDecisionTable()}
+   * @throws DmnEngineException
+   *           if an error occurs during the evaluation
+   */
+  DmnDecisionTableResult evaluateDecisionTable(DmnDecision decision, VariableContext variableContext);
 
-  DmnDecisionResult evaluate(DmnDecisionModel decisionModel, Map<String, Object> variables);
+  /**
+   * Evaluates the first decision which is implemented as decision table of the DMN file.
+   *
+   * @param filename the filename of the DMN file
+   * @param variables the variables which are available
+   * @return the {@link DmnDecisionTableResult} of this evaluation
+   *
+   * @throws DmnEngineException
+   *           if an error occurs during the parsing of the decision model
+   * @throws DmnEngineException
+   *           if no decision is found which is implemented as decision table
+   * @throws DmnEngineException
+   *           if an error occurs during the evaluation
+   */
+  DmnDecisionTableResult evaluateFirstDecisionTable(String filename, Map<String, Object> variables);
 
-  DmnDecisionResult evaluate(DmnDecisionModel decisionModel, VariableContext variableContext);
+  /**
+   * Evaluates the first decision which is implemented as decision table of the DMN file.
+   *
+   * @param filename the filename of the DMN file
+   * @param variableContext the variables context which is available
+   * @return the {@link DmnDecisionTableResult} of this evaluation
+   *
+   * @throws DmnEngineException
+   *           if an error occurs during the parsing of the decision model
+   * @throws DmnEngineException
+   *           if no decision is found which is implemented as decision table
+   * @throws DmnEngineException
+   *           if an error occurs during the evaluation
+   */
+  DmnDecisionTableResult evaluateFirstDecisionTable(String filename, VariableContext variableContext);
 
-  DmnDecisionResult evaluate(DmnDecisionModel decisionModel, String decisionKey, Map<String, Object> variables);
+  /**
+   * Evaluates the first decision which is implemented as decision table of the DMN file.
+   *
+   * @param inputStream the {@link InputStream} of the DMN file
+   * @param variables the variables which are available
+   * @return the {@link DmnDecisionTableResult} of this evaluation
+   *
+   * @throws DmnEngineException
+   *           if no decision is found which is implemented as decision table
+   * @throws DmnEngineException
+   *           if an error occurs during the evaluation
+   */
+  DmnDecisionTableResult evaluateFirstDecisionTable(InputStream inputStream, Map<String, Object> variables);
 
-  DmnDecisionResult evaluate(DmnDecisionModel decisionModel, String decisionKey, VariableContext variableContext);
+  /**
+   * Evaluates the first decision which is implemented as decision table of the DMN file.
+   *
+   * @param inputStream the {@link InputStream} of the DMN file
+   * @param variableContext the variables context which is available
+   * @return the {@link DmnDecisionTableResult} of this evaluation
+   *
+   * @throws DmnEngineException
+   *           if no decision is found which is implemented as decision table
+   * @throws DmnEngineException
+   *           if an error occurs during the evaluation
+   */
+  DmnDecisionTableResult evaluateFirstDecisionTable(InputStream inputStream, VariableContext variableContext);
+
+  /**
+   * Evaluates the first decision which is implemented as decision table of the DMN model instance.
+   *
+   * @param dmnModelInstance the {@link DmnModelInstance} of the DMN decision model
+   * @param variables the variables which are available
+   * @return the {@link DmnDecisionTableResult} of this evaluation
+   *
+   * @throws DmnEngineException
+   *           if no decision is found which is implemented as decision table
+   * @throws DmnEngineException
+   *           if an error occurs during the evaluation
+   */
+  DmnDecisionTableResult evaluateFirstDecisionTable(DmnModelInstance dmnModelInstance, Map<String, Object> variables);
+
+  /**
+   * Evaluates the first decision which is implemented as decision table of the DMN model instance.
+   *
+   * @param dmnModelInstance the {@link DmnModelInstance} of the DMN decision model
+   * @param variableContext the variables context which is available
+   * @return the {@link DmnDecisionTableResult} of this evaluation
+   *
+   * @throws DmnEngineException
+   *           if no decision is found which is implemented as decision table
+   * @throws DmnEngineException
+   *           if an error occurs during the evaluation
+   */
+  DmnDecisionTableResult evaluateFirstDecisionTable(DmnModelInstance dmnModelInstance, VariableContext variableContext);
+
+  /**
+   * Evaluates the decision with the given key in a DMN decision model.
+   * The key is the {@code id} attribute of the decision in the DMN XML file.
+   *
+   * @param decisionKey the key of the decision to evaluated
+   * @param filename the filename of the DMN file
+   * @param variables the variables which are available
+   * @return the {@link DmnDecisionTableResult} of this evaluation
+   *
+   * @throws DmnEngineException
+   *           if no decision is found with the given key
+   * @throws DmnEngineException
+   *           if the decision is not implemented as decision table
+   * @throws DmnEngineException
+   *           if an error occurs during the evaluation
+   */
+  DmnDecisionTableResult evaluateDecisionTable(String decisionKey, String filename, Map<String, Object> variables);
+
+  /**
+   * Evaluates the decision with the given key in a DMN decision model.
+   * The key is the {@code id} attribute of the decision in the DMN XML file.
+   *
+   * @param decisionKey the key of the decision to evaluated
+   * @param filename the filename of the DMN file
+   * @param variableContext the variables context which is available
+   * @return the {@link DmnDecisionTableResult} of this evaluation
+   *
+   * @throws DmnEngineException
+   *           if no decision is found with the given key
+   * @throws DmnEngineException
+   *           if the decision is not implemented as decision table
+   * @throws DmnEngineException
+   *           if an error occurs during the evaluation
+   */
+  DmnDecisionTableResult evaluateDecisionTable(String decisionKey, String filename, VariableContext variableContext);
+
+  /**
+   * Evaluates the decision with the given key in a DMN decision model.
+   * The key is the {@code id} attribute of the decision in the DMN XML file.
+   *
+   * @param decisionKey the key of the decision to evaluated
+   * @param inputStream the {@link InputStream} of the DMN file
+   * @param variables the variables which are available
+   * @return the {@link DmnDecisionTableResult} of this evaluation
+   *
+   * @throws DmnEngineException
+   *           if no decision is found with the given key
+   * @throws DmnEngineException
+   *           if the decision is not implemented as decision table
+   * @throws DmnEngineException
+   *           if an error occurs during the evaluation
+   */
+  DmnDecisionTableResult evaluateDecisionTable(String decisionKey, InputStream inputStream, Map<String, Object> variables);
+
+  /**
+   * Evaluates the decision with the given key in a DMN decision model.
+   * The key is the {@code id} attribute of the decision in the DMN XML file.
+   *
+   * @param decisionKey the key of the decision to evaluated
+   * @param inputStream the {@link InputStream} of the DMN file
+   * @param variableContext the variables context which is available
+   * @return the {@link DmnDecisionTableResult} of this evaluation
+   *
+   * @throws DmnEngineException
+   *           if no decision is found with the given key
+   * @throws DmnEngineException
+   *           if the decision is not implemented as decision table
+   * @throws DmnEngineException
+   *           if an error occurs during the evaluation
+   */
+  DmnDecisionTableResult evaluateDecisionTable(String decisionKey, InputStream inputStream, VariableContext variableContext);
+
+  /**
+   * Evaluates the decision with the given key in a DMN decision model.
+   * The key is the {@code id} attribute of the decision in the DMN XML file.
+   *
+   * @param decisionKey the key of the decision to evaluated
+   * @param dmnModelInstance the {@link DmnModelInstance} of the DMN decision model
+   * @param variables the variables which are available
+   * @return the {@link DmnDecisionTableResult} of this evaluation
+   *
+   * @throws DmnEngineException
+   *           if no decision is found with the given key
+   * @throws DmnEngineException
+   *           if the decision is not implemented as decision table
+   * @throws DmnEngineException
+   *           if an error occurs during the evaluation
+   */
+  DmnDecisionTableResult evaluateDecisionTable(String decisionKey, DmnModelInstance dmnModelInstance, Map<String, Object> variables);
+
+  /**
+   * Evaluates the decision with the given key in a DMN decision model.
+   * The key is the {@code id} attribute of the decision in the DMN XML file.
+   *
+   * @param decisionKey the key of the decision to evaluated
+   * @param dmnModelInstance the {@link DmnModelInstance} of the DMN decision model
+   * @param variableContext the variables context which is available
+   * @return the {@link DmnDecisionTableResult} of this evaluation
+   *
+   * @throws DmnEngineException
+   *           if an error occurs during the parsing of the decision model
+   * @throws DmnEngineException
+   *           if no decision is found with the given key
+   * @throws DmnEngineException
+   *           if the decision is not implemented as decision table
+   * @throws DmnEngineException
+   *           if an error occurs during the evaluation
+   */
+  DmnDecisionTableResult evaluateDecisionTable(String decisionKey, DmnModelInstance dmnModelInstance, VariableContext variableContext);
 
 }

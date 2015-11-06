@@ -13,40 +13,57 @@
 
 package org.camunda.bpm.dmn.engine;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.variable.value.TypedValue;
-import org.camunda.bpm.model.dmn.HitPolicy;
-
 /**
- * The result of a decision table with its inputs and outputs.
+ * The result of one decision table. Which is the list of its decision rule results (see
+ * {@link DmnDecisionRuleResult}). This represents the output entries of all matching
+ * decision rules.
  */
-public interface DmnDecisionTableResult {
+public interface DmnDecisionTableResult extends List<DmnDecisionRuleResult>, Serializable {
 
   /**
-   * @return the inputs on which the decision table was evaluated
+   * Returns the first {@link DmnDecisionRuleResult}.
+   *
+   * @return the first decision rule result or null if none exits
    */
-  Map<String, DmnDecisionTableInput> getInputs();
+  DmnDecisionRuleResult getFirstResult();
 
   /**
-   * @return the matching rules of the decision table evaluation
+   * Returns the single {@link DmnDecisionRuleResult} of the result. Which asserts
+   * that only one decision rule result exist.
+   *
+   * @return the single decision rule result or null if none exists
+   *
+   * @throws DmnEngineException
+   *           if more than one decision rule result exists
    */
-  List<DmnDecisionTableRule> getMatchingRules();
+  DmnDecisionRuleResult getSingleResult();
 
   /**
-   * @return the result name of the collect operation if the {@link HitPolicy#COLLECT} was used with an aggregator otherwise null
+   * Collects the entries for a output name. The list will contain entries for
+   * the output name of every {@link DmnDecisionRuleResult}. Note that the list
+   * may contains less entries than decision rule results if an output does not
+   * contain a value for the output name.
+   *
+   * @param outputName
+   *          the name of the output to collect
+   * @param <T>
+   *          the type of the rule result entry
+   * @return the list of collected output values
    */
-  String getCollectResultName();
+  <T> List<T> collectEntries(String outputName);
 
   /**
-   * @return the result value of the collect operation if the {@link HitPolicy#COLLECT} was used with an aggregator otherwise null
+   * Returns the entries of all decision rule results. For every decision rule
+   * result a map of the output names and corresponding entries is returned.
+   *
+   * @return the list of all entry maps
+   *
+   * @see DmnDecisionRuleResult#getEntryMap()
    */
-  TypedValue getCollectResultValue();
-
-  /**
-   * @return the number of executed decision elements during the evaluation
-   */
-  long getExecutedDecisionElements();
+  List<Map<String, Object>> getResultList();
 
 }

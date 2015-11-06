@@ -13,6 +13,35 @@
 
 package org.camunda.bpm.dmn.engine;
 
-public interface DmnDecision extends DmnElement {
+/**
+ * A decision of the DMN Engine.
+ *
+ * <p>
+ * Decisions can be implement in different ways. To check if the decision is implemented
+ * as a Decision Table see {@link #isDecisionTable()}.
+ * </p>
+ */
+public interface DmnDecision {
+
+  /**
+   * The unique identifier of the element if exists.
+   *
+   * @return the identifier or null if not set
+   */
+  String getKey();
+
+  /**
+   * The human readable name of the element if exists.
+   *
+   * @return the name or null if not set
+   */
+  String getName();
+
+  /**
+   * Check if the decision is implemented as Decision Table.
+   *
+   * @return true if the decision is implement as Decision Table, false otherwise
+   */
+  boolean isDecisionTable();
 
 }

@@ -14,98 +14,111 @@
 package org.camunda.bpm.dmn.engine.impl;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
-import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionRuleResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnEngineException;
-import org.camunda.bpm.dmn.engine.DmnExpressionException;
-import org.camunda.bpm.dmn.engine.DmnResultException;
-import org.camunda.bpm.dmn.engine.DmnTransformException;
-import org.camunda.bpm.model.dmn.HitPolicy;
+import org.camunda.bpm.dmn.engine.impl.transform.DmnTransformException;
 
 public class DmnEngineLogger extends DmnLogger {
 
-  public DmnEngineException outputDoesNotContainAnyComponent() {
-    return new DmnEngineException(exceptionMessage("001", "The DMN output doesn't contain any component."));
-  }
-
-  public DmnEngineException unableToFindOutputComponentWithName(String name) {
-    return new DmnEngineException(exceptionMessage("002", "Unable to find output component with name '{}'.", name));
-  }
-
-  public DmnEngineException notConfigurationSetInContext() {
-    return new DmnEngineException(exceptionMessage("003", "No engine configuration set in decision context"));
-  }
-
-  public DmnEngineException noScriptContextSetInDecisionContext() {
-    return new DmnEngineException(exceptionMessage("004", "No script context set in decision context"));
-  }
-
-  public DmnEngineException unableToFindScriptEngineForName(String name) {
-    return new DmnEngineException(exceptionMessage("005", "Unable to find script engine for name '{}'.", name));
-  }
-
   public DmnTransformException unableToReadFile(String filename, Throwable cause) {
-    return new DmnTransformException(exceptionMessage("006", "Unable to read model from file '{}'.", filename), cause);
+    return new DmnTransformException(exceptionMessage(
+      "001",
+      "Unable to read model from file '{}'.", filename),
+      cause
+    );
   }
 
-  public DmnTransformException unableToReadInputStream(Throwable cause) {
-    return new DmnTransformException(exceptionMessage("007", "Unable to read model from input stream."), cause);
-  }
-
-  public DmnTransformException unableToFinDecisionWithKeyInFile(String filename, String decisionKey) {
-    return new DmnTransformException(exceptionMessage("008", "Unable to find decision with id '{}' in file '{}'.", decisionKey, filename));
+  public DmnTransformException unableToFindDecisionWithKeyInFile(String decisionKey, String filename) {
+    return new DmnTransformException(exceptionMessage(
+      "002",
+      "Unable to find decision with id '{}' in file '{}'.", decisionKey, filename)
+    );
   }
 
   public DmnTransformException unableToFindDecisionWithKey(String decisionKey) {
-    return new DmnTransformException(exceptionMessage("009", "Unable to find decision with id '{}' in model.", decisionKey));
+    return new DmnTransformException(exceptionMessage(
+      "003",
+      "Unable to find decision with id '{}' in model.", decisionKey)
+    );
   }
 
   public DmnTransformException unableToFindAnyDecisionInFile(String filename) {
-    return new DmnTransformException(exceptionMessage("010", "Unable to find any decision in file '{}'.", filename));
+    return new DmnTransformException(exceptionMessage(
+      "004",
+      "Unable to find any decision in file '{}'.", filename)
+    );
   }
 
   public DmnTransformException unableToFindAnyDecision() {
-    return new DmnTransformException(exceptionMessage("011", "Unable to find any decision in model."));
+    return new DmnTransformException(exceptionMessage(
+      "005",
+      "Unable to find any decision in model.")
+    );
   }
 
-  public DmnEngineException noVariableContextSetInDecisionContext() {
-    return new DmnEngineException(exceptionMessage("012", "No variable context set in decision context"));
+  public DmnEvaluationException unableToEvaluateExpression(String expression, String expressionLanguage, Throwable cause) {
+    return new DmnEvaluationException(exceptionMessage(
+      "006",
+      "Unable to evaluate expression for language '{}': '{}'", expressionLanguage, expression),
+      cause
+    );
   }
 
-  public DmnExpressionException unableToEvaluateExpression(String expression, String expressionLanguage, Throwable cause) {
-    return new DmnExpressionException(exceptionMessage("013", "Unable to evaluate expression for language '{}': '{}'", expressionLanguage, expression), cause);
-  }
-
-  public DmnExpressionException unableToCastExpressionResult(Object result, Throwable cause) {
-    return new DmnExpressionException(exceptionMessage("014", "Unable to cast result '{}' to expected type", result), cause);
-  }
-
-  public DmnExpressionException noScriptEngineFoundForLanguage(String expressionLanguage) {
-    return new DmnExpressionException(exceptionMessage("015", "Unable to find script engine for expression language '{}'.", expressionLanguage));
+  public DmnEvaluationException noScriptEngineFoundForLanguage(String expressionLanguage) {
+    return new DmnEvaluationException(exceptionMessage(
+      "007",
+      "Unable to find script engine for expression language '{}'.", expressionLanguage)
+    );
   }
 
   public DmnEngineException decisionTypeNotSupported(DmnDecision decision) {
-    return new DmnEngineException(exceptionMessage("016", "Decision type '{}' not supported by DMN engine.", decision.getClass()));
-  }
-
-  public DmnEngineException unableToFindHitPolicyHandlerFor(HitPolicy hitPolicy) {
-    return new DmnEngineException(exceptionMessage("017", "Unable to find handler for hit policy '{}'.", hitPolicy));
+    return new DmnEngineException(exceptionMessage(
+      "008",
+      "Decision type '{}' not supported by DMN engine.", decision.getClass())
+    );
   }
 
   public DmnEngineException invalidValueForTypeDefinition(String typeName, Object value) {
-    return new DmnEngineException(exceptionMessage("018", "Invalid value '{}' for clause with type '{}'.", value, typeName));
+    return new DmnEngineException(exceptionMessage(
+      "009",
+      "Invalid value '{}' for clause with type '{}'.", value, typeName)
+    );
   }
 
   public void unsupportedTypeDefinitionForClause(String typeName) {
-    logWarn("019", "Unsupported type '{}' for clause. Values of this clause will not transform into another type.", typeName);
+    logWarn(
+      "010",
+      "Unsupported type '{}' for clause. Values of this clause will not transform into another type.", typeName
+    );
   }
 
-  public DmnResultException decisionOutputHasMoreThanOneValue(DmnDecisionOutput dmnDecisionOutput) {
-    return new DmnResultException(exceptionMessage("020", "Unable to get single decision output value as it has more than one value '{}'", dmnDecisionOutput));
+  public DmnDecisionResultException decisionOutputHasMoreThanOneValue(DmnDecisionRuleResult ruleResult) {
+    return new DmnDecisionResultException(exceptionMessage(
+      "011",
+      "Unable to get single decision rule result entry as it has more than one entry '{}'", ruleResult)
+    );
   }
 
-  public DmnResultException decisionResultHasMoreThanOneOutput(DmnDecisionResult dmnDecisionResult) {
-    return new DmnResultException(exceptionMessage("021", "Unable to get single decision output as it has more than one output '{}'", dmnDecisionResult));
+  public DmnDecisionResultException decisionResultHasMoreThanOneOutput(DmnDecisionTableResult decisionResult) {
+    return new DmnDecisionResultException(exceptionMessage(
+      "012",
+      "Unable to get single decision rule result as it has more than one rule result '{}'", decisionResult)
+    );
+  }
+
+  public DmnTransformException unableToFindAnyDecisionTableInFile(String filename) {
+    return new DmnTransformException(exceptionMessage(
+      "013",
+      "Unable to find any decision table in file '{}'.", filename)
+    );
+  }
+
+  public DmnTransformException unableToFindAnyDecisionTable() {
+    return new DmnTransformException(exceptionMessage(
+      "014",
+      "Unable to find any decision table in model.")
+    );
   }
 
 }

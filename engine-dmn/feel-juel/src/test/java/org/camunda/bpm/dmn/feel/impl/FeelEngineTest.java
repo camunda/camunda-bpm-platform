@@ -37,7 +37,7 @@ public class FeelEngineTest {
 
   @BeforeClass
   public static void initFeelEngine() {
-    feelEngine = new FeelEngineProviderImpl().createInstance();
+    feelEngine = new FeelEngineFactoryImpl().createInstance();
   }
 
   @Before

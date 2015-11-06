@@ -13,16 +13,29 @@
 
 package org.camunda.bpm.dmn.engine.impl;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionTableOutput;
-import org.camunda.bpm.dmn.engine.DmnOutput;
+import org.camunda.bpm.dmn.engine.impl.spi.type.DmnTypeDefinition;
 
-public class DmnDecisionTableOutputImpl extends DmnDecisionTableValueImpl implements DmnDecisionTableOutput {
+public class DmnDecisionTableOutputImpl {
 
+  protected String id;
+  protected String name;
   protected String outputName;
+  protected DmnTypeDefinition typeDefinition;
 
-  public DmnDecisionTableOutputImpl(DmnOutput dmnOutput) {
-    super(dmnOutput);
-    this.outputName = dmnOutput.getOutputName();
+  public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 
   public String getOutputName() {
@@ -33,37 +46,22 @@ public class DmnDecisionTableOutputImpl extends DmnDecisionTableValueImpl implem
     this.outputName = outputName;
   }
 
+  public DmnTypeDefinition getTypeDefinition() {
+    return typeDefinition;
+  }
+
+  public void setTypeDefinition(DmnTypeDefinition typeDefinition) {
+    this.typeDefinition = typeDefinition;
+  }
+
   @Override
   public String toString() {
-    return "DmnDecisionTableValueImpl{" +
-      "key='" + key + '\'' +
+    return "DmnDecisionTableOutputImpl{" +
+      "id='" + id + '\'' +
       ", name='" + name + '\'' +
-      ", camundaOutput='" + outputName + '\'' +
-      ", value=" + value +
+      ", outputName='" + outputName + '\'' +
+      ", typeDefinition=" + typeDefinition +
       '}';
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-
-    DmnDecisionTableOutputImpl that = (DmnDecisionTableOutputImpl) o;
-
-    if (key != null ? !key.equals(that.key) : that.key != null) return false;
-    if (name != null ? !name.equals(that.name) : that.name != null) return false;
-    if (outputName != null ? !outputName.equals(that.outputName) : that.outputName != null) return false;
-    return !(value != null ? !value.equals(that.value) : that.value != null);
-
-  }
-
-  @Override
-  public int hashCode() {
-    int result = key != null ? key.hashCode() : 0;
-    result = 31 * result + (name != null ? name.hashCode() : 0);
-    result = 31 * result + (outputName != null ? outputName.hashCode() : 0);
-    result = 31 * result + (value != null ? value.hashCode() : 0);
-    return result;
   }
 
 }

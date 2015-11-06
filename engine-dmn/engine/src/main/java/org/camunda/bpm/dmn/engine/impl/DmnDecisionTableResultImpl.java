@@ -14,72 +14,194 @@
 package org.camunda.bpm.dmn.engine.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionTableInput;
+import org.camunda.bpm.dmn.engine.DmnDecisionRuleResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
-import org.camunda.bpm.dmn.engine.DmnDecisionTableRule;
-import org.camunda.bpm.engine.variable.value.TypedValue;
 
 public class DmnDecisionTableResultImpl implements DmnDecisionTableResult {
 
-  protected Map<String, DmnDecisionTableInput> inputs = new HashMap<String, DmnDecisionTableInput>();
-  protected List<DmnDecisionTableRule> matchingRules = new ArrayList<DmnDecisionTableRule>();
-  protected String collectResultName;
-  protected TypedValue collectResultValue;
-  protected long executedDecisionElements = 0;
+  private static final long serialVersionUID = 1L;
 
-  public Map<String, DmnDecisionTableInput> getInputs() {
-    return inputs;
+  public static final DmnEngineLogger LOG = DmnLogger.ENGINE_LOGGER;
+
+  protected final List<DmnDecisionRuleResult> ruleResults;
+
+  public DmnDecisionTableResultImpl(List<DmnDecisionRuleResult> ruleResults) {
+    this.ruleResults = ruleResults;
   }
 
-  public void setInputs(Map<String, DmnDecisionTableInput> inputs) {
-    this.inputs = inputs;
+  public DmnDecisionRuleResult getFirstResult() {
+    if (size() > 0) {
+      return get(0);
+    } else {
+      return null;
+    }
   }
 
-  public List<DmnDecisionTableRule> getMatchingRules() {
-    return matchingRules;
+  public DmnDecisionRuleResult getSingleResult() {
+    if (size() == 1) {
+      return get(0);
+    } else if (isEmpty()) {
+      return null;
+    } else {
+      throw LOG.decisionResultHasMoreThanOneOutput(this);
+    }
   }
 
-  public void setMatchingRules(List<DmnDecisionTableRule> matchingRules) {
-    this.matchingRules = matchingRules;
+  @SuppressWarnings("unchecked")
+  public <T> List<T> collectEntries(String outputName) {
+    List<T> outputValues = new ArrayList<T>();
+
+    for (DmnDecisionRuleResult ruleResult : ruleResults) {
+      if (ruleResult.containsKey(outputName)) {
+        Object value = ruleResult.get(outputName);
+        outputValues.add((T) value);
+      }
+    }
+
+    return outputValues;
   }
 
-  public String getCollectResultName() {
-    return collectResultName;
+  @Override
+  public List<Map<String, Object>> getResultList() {
+    List<Map<String, Object>> entryMapList = new ArrayList<Map<String, Object>>();
+
+    for (DmnDecisionRuleResult ruleResult : ruleResults) {
+      Map<String, Object> entryMap = ruleResult.getEntryMap();
+      entryMapList.add(entryMap);
+    }
+
+    return entryMapList;
   }
 
-  public void setCollectResultName(String collectResultName) {
-    this.collectResultName = collectResultName;
+  @Override
+  public Iterator<DmnDecisionRuleResult> iterator() {
+    return asUnmodifiableList().iterator();
   }
 
-  public TypedValue getCollectResultValue() {
-    return collectResultValue;
+  @Override
+  public int size() {
+    return ruleResults.size();
   }
 
-  public void setCollectResultValue(TypedValue outputValue) {
-    this.collectResultValue = outputValue;
+  @Override
+  public boolean isEmpty() {
+    return ruleResults.isEmpty();
   }
 
-  public long getExecutedDecisionElements() {
-    return executedDecisionElements;
+  @Override
+  public DmnDecisionRuleResult get(int index) {
+    return ruleResults.get(index);
   }
 
-  public void setExecutedDecisionElements(long executedDecisionElements) {
-    this.executedDecisionElements = executedDecisionElements;
+  @Override
+  public boolean contains(Object o) {
+    return ruleResults.contains(o);
+  }
+
+  @Override
+  public Object[] toArray() {
+    return ruleResults.toArray();
+  }
+
+  @Override
+  public <T> T[] toArray(T[] a) {
+    return ruleResults.toArray(a);
+  }
+
+  @Override
+  public boolean add(DmnDecisionRuleResult e) {
+    throw new UnsupportedOperationException("decision result is immutable");
+  }
+
+  @Override
+  public boolean remove(Object o) {
+    throw new UnsupportedOperationException("decision result is immutable");
+  }
+
+  @Override
+  public boolean containsAll(Collection<?> c) {
+    return ruleResults.containsAll(c);
+  }
+
+  @Override
+  public boolean addAll(Collection<? extends DmnDecisionRuleResult> c) {
+    throw new UnsupportedOperationException("decision result is immutable");
+  }
+
+  @Override
+  public boolean addAll(int index, Collection<? extends DmnDecisionRuleResult> c) {
+    throw new UnsupportedOperationException("decision result is immutable");
+  }
+
+  @Override
+  public boolean removeAll(Collection<?> c) {
+    throw new UnsupportedOperationException("decision result is immutable");
+  }
+
+  @Override
+  public boolean retainAll(Collection<?> c) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void clear() {
+    throw new UnsupportedOperationException("decision result is immutable");
+  }
+
+  @Override
+  public DmnDecisionRuleResult set(int index, DmnDecisionRuleResult element) {
+    throw new UnsupportedOperationException("decision result is immutable");
+  }
+
+  @Override
+  public void add(int index, DmnDecisionRuleResult element) {
+    throw new UnsupportedOperationException("decision result is immutable");
+  }
+
+  @Override
+  public DmnDecisionRuleResult remove(int index) {
+    throw new UnsupportedOperationException("decision result is immutable");
+  }
+
+  @Override
+  public int indexOf(Object o) {
+    return ruleResults.indexOf(o);
+  }
+
+  @Override
+  public int lastIndexOf(Object o) {
+    return ruleResults.lastIndexOf(o);
+  }
+
+  @Override
+  public ListIterator<DmnDecisionRuleResult> listIterator() {
+    return asUnmodifiableList().listIterator();
+  }
+
+  @Override
+  public ListIterator<DmnDecisionRuleResult> listIterator(int index) {
+    return asUnmodifiableList().listIterator(index);
+  }
+
+  @Override
+  public List<DmnDecisionRuleResult> subList(int fromIndex, int toIndex) {
+    return asUnmodifiableList().subList(fromIndex, toIndex);
   }
 
   @Override
   public String toString() {
-    return "DmnDecisionTableResultImpl{" +
-      "inputs=" + inputs +
-      ", matchingRules=" + matchingRules +
-      ", collectResultName='" + collectResultName + '\'' +
-      ", collectResultValue=" + collectResultValue +
-      ", executedDecisionElements=" + executedDecisionElements +
-      '}';
+    return ruleResults.toString();
+  }
+
+  protected List<DmnDecisionRuleResult> asUnmodifiableList() {
+    return Collections.unmodifiableList(ruleResults);
   }
 
 }

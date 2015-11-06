@@ -16,74 +16,70 @@ package org.camunda.bpm.dmn.engine.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionTable;
-import org.camunda.bpm.dmn.engine.DmnInput;
-import org.camunda.bpm.dmn.engine.DmnOutput;
-import org.camunda.bpm.dmn.engine.DmnRule;
-import org.camunda.bpm.model.dmn.BuiltinAggregator;
-import org.camunda.bpm.model.dmn.HitPolicy;
+import org.camunda.bpm.dmn.engine.DmnDecision;
+import org.camunda.bpm.dmn.engine.impl.spi.hitpolicy.DmnHitPolicyHandler;
 
-public class DmnDecisionTableImpl extends DmnElementImpl implements DmnDecisionTable {
+public class DmnDecisionTableImpl implements DmnDecision {
 
-  public static final HitPolicy DEFAULT_HIT_POLICY = HitPolicy.UNIQUE;
+  protected String key;
+  protected String name;
 
-  protected HitPolicy hitPolicy = DEFAULT_HIT_POLICY;
-  protected BuiltinAggregator aggregation;
+  protected DmnHitPolicyHandler hitPolicyHandler;
 
-  protected List<DmnInput> inputs = new ArrayList<DmnInput>();
-  protected List<DmnOutput> outputs = new ArrayList<DmnOutput>();
-  protected List<DmnRule> rules = new ArrayList<DmnRule>();
+  protected List<DmnDecisionTableInputImpl> inputs = new ArrayList<DmnDecisionTableInputImpl>();
+  protected List<DmnDecisionTableOutputImpl> outputs = new ArrayList<DmnDecisionTableOutputImpl>();
+  protected List<DmnDecisionTableRuleImpl> rules = new ArrayList<DmnDecisionTableRuleImpl>();
 
-  public HitPolicy getHitPolicy() {
-    return hitPolicy;
+  public String getKey() {
+    return key;
   }
 
-  public void setHitPolicy(HitPolicy hitPolicy) {
-    this.hitPolicy = hitPolicy;
+  public void setKey(String key) {
+    this.key = key;
   }
 
-  public BuiltinAggregator getAggregation() {
-    return aggregation;
+  public String getName() {
+    return name;
   }
 
-  public void setAggregation(BuiltinAggregator aggregation) {
-    this.aggregation = aggregation;
+  public void setName(String name) {
+    this.name = name;
   }
 
-  public List<DmnInput> getInputs() {
+  public boolean isDecisionTable() {
+    return true;
+  }
+
+  public DmnHitPolicyHandler getHitPolicyHandler() {
+    return hitPolicyHandler;
+  }
+
+  public void setHitPolicyHandler(DmnHitPolicyHandler hitPolicyHandler) {
+    this.hitPolicyHandler = hitPolicyHandler;
+  }
+
+  public List<DmnDecisionTableInputImpl> getInputs() {
     return inputs;
   }
 
-  public void setInputs(List<DmnInput> inputs) {
+  public void setInputs(List<DmnDecisionTableInputImpl> inputs) {
     this.inputs = inputs;
   }
 
-  public void addInput(DmnInput input) {
-    this.inputs.add(input);
-  }
-
-  public List<DmnOutput> getOutputs() {
+  public List<DmnDecisionTableOutputImpl> getOutputs() {
     return outputs;
   }
 
-  public void setOutputs(List<DmnOutput> outputs) {
+  public void setOutputs(List<DmnDecisionTableOutputImpl> outputs) {
     this.outputs = outputs;
   }
 
-  public void addOutput(DmnOutput output) {
-    this.outputs.add(output);
-  }
-
-  public void setRules(List<DmnRule> rules) {
-    this.rules = rules;
-  }
-
-  public List<DmnRule> getRules() {
+  public List<DmnDecisionTableRuleImpl> getRules() {
     return rules;
   }
 
-  public void addRule(DmnRule rule) {
-    rules.add(rule);
+  public void setRules(List<DmnDecisionTableRuleImpl> rules) {
+    this.rules = rules;
   }
 
   @Override
@@ -91,8 +87,7 @@ public class DmnDecisionTableImpl extends DmnElementImpl implements DmnDecisionT
     return "DmnDecisionTableImpl{" +
       "key='" + key + '\'' +
       ", name='" + name + '\'' +
-      ", hitPolicy=" + hitPolicy +
-      ", aggregation=" + aggregation +
+      ", hitPolicyHandler=" + hitPolicyHandler +
       ", inputs=" + inputs +
       ", outputs=" + outputs +
       ", rules=" + rules +

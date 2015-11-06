@@ -13,12 +13,7 @@
 
 package org.camunda.bpm.dmn.feel.impl;
 
-import org.camunda.bpm.dmn.feel.FeelConvertException;
 import org.camunda.bpm.dmn.feel.FeelException;
-import org.camunda.bpm.dmn.feel.FeelMethodInvocationException;
-import org.camunda.bpm.dmn.feel.FeelMissingFunctionException;
-import org.camunda.bpm.dmn.feel.FeelMissingVariableException;
-import org.camunda.bpm.dmn.feel.FeelSyntaxException;
 
 public class FeelEngineLogger extends FeelLogger {
 
@@ -32,10 +27,15 @@ public class FeelEngineLogger extends FeelLogger {
 
   protected String syntaxExceptionMessage(String id, String feelExpression, String description) {
     if (description != null) {
-      return exceptionMessage(id, "Syntax error in expression '{}': {}", feelExpression, description);
+      return exceptionMessage(
+        id,
+        "Syntax error in expression '{}': {}", feelExpression, description
+      );
     }
     else {
-      return exceptionMessage(id, "Syntax error in expression '{}'", feelExpression);
+      return exceptionMessage(
+        id, "Syntax error in expression '{}'", feelExpression
+      );
     }
   }
 
@@ -55,11 +55,18 @@ public class FeelEngineLogger extends FeelLogger {
   }
 
   public FeelException variableMapperIsReadOnly() {
-    return new FeelException(exceptionMessage("004", "The variable mapper is read only."));
+    return new FeelException(exceptionMessage(
+      "004",
+      "The variable mapper is read only.")
+    );
   }
 
-  public FeelException unableToFindMethod(NoSuchMethodException e, String name, Class<?>... parameterTypes) {
-    return new FeelException(exceptionMessage("005", "Unable to find method '{}' with parameter types '{}'", name, parameterTypes), e);
+  public FeelException unableToFindMethod(NoSuchMethodException cause, String name, Class<?>... parameterTypes) {
+    return new FeelException(exceptionMessage(
+      "005",
+      "Unable to find method '{}' with parameter types '{}'", name, parameterTypes),
+      cause
+    );
   }
 
   public FeelMissingFunctionException unknownFunction(String prefix, String localName) {
@@ -67,21 +74,37 @@ public class FeelEngineLogger extends FeelLogger {
     if (prefix != null && !prefix.isEmpty()) {
       function = prefix + ":" + localName;
     }
-    return new FeelMissingFunctionException(exceptionMessage("006", "Unable to resolve function '{}'", function), function);
+    return new FeelMissingFunctionException(exceptionMessage(
+      "006",
+      "Unable to resolve function '{}'", function),
+      function
+    );
   }
 
   public FeelMissingFunctionException unknownFunction(String feelExpression, FeelMissingFunctionException cause) {
     String function = cause.getFunction();
-    return new FeelMissingFunctionException(exceptionMessage("007", "Unable to resolve function '{}' in expression '{}'" , function, feelExpression), function);
+    return new FeelMissingFunctionException(exceptionMessage(
+      "007",
+      "Unable to resolve function '{}' in expression '{}'" , function, feelExpression),
+      function
+    );
   }
 
   public FeelMissingVariableException unknownVariable(String variable) {
-    return new FeelMissingVariableException(exceptionMessage("008", "Unable to resolve variable '{}'", variable), variable);
+    return new FeelMissingVariableException(exceptionMessage(
+      "008",
+      "Unable to resolve variable '{}'", variable),
+      variable
+    );
   }
 
   public FeelMissingVariableException unknownVariable(String feelExpression, FeelMissingVariableException cause) {
     String variable = cause.getVariable();
-    return new FeelMissingVariableException(exceptionMessage("009", "Unable to resolve variable '{}' in expression '{}'", variable, feelExpression), variable);
+    return new FeelMissingVariableException(exceptionMessage(
+      "009",
+      "Unable to resolve variable '{}' in expression '{}'", variable, feelExpression),
+      variable
+    );
   }
 
   public FeelSyntaxException invalidExpression(String feelExpression, Throwable cause) {
@@ -89,44 +112,78 @@ public class FeelEngineLogger extends FeelLogger {
   }
 
   public FeelException unableToInitializeFeelEngine(Throwable cause) {
-    return new FeelException(exceptionMessage("011", "Unable to initialize FEEL engine"), cause);
+    return new FeelException(exceptionMessage(
+      "011",
+      "Unable to initialize FEEL engine"),
+      cause
+    );
   }
 
   public FeelException unableToEvaluateExpression(String simpleUnaryTests, Throwable cause) {
-    return new FeelException(exceptionMessage("012", "Unable to evaluate expression '{}'", simpleUnaryTests), cause);
+    return new FeelException(exceptionMessage(
+      "012",
+      "Unable to evaluate expression '{}'", simpleUnaryTests),
+      cause
+    );
   }
 
   public FeelConvertException unableToConvertValue(Object value, Class<?> type) {
-    return new FeelConvertException(exceptionMessage("013", "Unable to convert value '{}' of type '{}' to type '{}'", value, value.getClass(), type), value, type);
+    return new FeelConvertException(exceptionMessage(
+      "013",
+      "Unable to convert value '{}' of type '{}' to type '{}'", value, value.getClass(), type),
+      value, type
+    );
   }
 
   public FeelConvertException unableToConvertValue(Object value, Class<?> type, Throwable cause) {
-    return new FeelConvertException(exceptionMessage("014", "Unable to convert value '{}' of type '{}' to type '{}'", value, value.getClass(), type), value, type, cause);
+    return new FeelConvertException(exceptionMessage(
+      "014",
+      "Unable to convert value '{}' of type '{}' to type '{}'", value, value.getClass(), type),
+      value, type, cause
+    );
   }
 
   public FeelConvertException unableToConvertValue(String feelExpression, FeelConvertException cause) {
     Object value = cause.getValue();
     Class<?> type = cause.getType();
-    String message = exceptionMessage("015", "Unable to convert value '{}' of type '{}' to type '{}' in expression '{}'", value, value.getClass(), type, feelExpression);
-    return new FeelConvertException(message, cause);
+    return new FeelConvertException(exceptionMessage(
+      "015",
+      "Unable to convert value '{}' of type '{}' to type '{}' in expression '{}'", value, value.getClass(), type, feelExpression),
+      cause
+    );
   }
 
   public UnsupportedOperationException simpleExpressionNotSupported() {
-    return new UnsupportedOperationException(exceptionMessage("016", "Simple Expression not supported by FEEL engine"));
+    return new UnsupportedOperationException(exceptionMessage(
+      "016",
+      "Simple Expression not supported by FEEL engine")
+    );
   }
 
   public FeelException unableToEvaluateExpressionAsNotInputIsSet(String simpleUnaryTests, FeelMissingVariableException e) {
-    return new FeelException(exceptionMessage("017", "Unable to evaluate expression '{}' as no input is set. Maybe the inputExpression is missing or empty.", simpleUnaryTests), e);
+    return new FeelException(exceptionMessage(
+      "017",
+      "Unable to evaluate expression '{}' as no input is set. Maybe the inputExpression is missing or empty.", simpleUnaryTests),
+      e
+    );
   }
 
   public FeelMethodInvocationException invalidDateAndTimeFormat(String dateTimeString, Throwable cause) {
-    return new FeelMethodInvocationException(exceptionMessage("018", "Invalid date and time format in '{}'", dateTimeString), cause, "date and time", dateTimeString);
+    return new FeelMethodInvocationException(exceptionMessage(
+      "018",
+      "Invalid date and time format in '{}'", dateTimeString),
+      cause, "date and time", dateTimeString
+    );
   }
 
   public FeelMethodInvocationException unableToInvokeMethod(String simpleUnaryTests, FeelMethodInvocationException cause) {
     String method = cause.getMethod();
     String[] parameters = cause.getParameters();
-    return new FeelMethodInvocationException(exceptionMessage("019", "Unable to invoke method '{}' with parameters '{}' in expression '{}'", method, parameters, simpleUnaryTests), cause.getCause(), method, parameters);
+    return new FeelMethodInvocationException(exceptionMessage(
+      "019",
+      "Unable to invoke method '{}' with parameters '{}' in expression '{}'", method, parameters, simpleUnaryTests),
+      cause.getCause(), method, parameters
+    );
   }
 
 }

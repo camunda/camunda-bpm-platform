@@ -15,6 +15,9 @@ package org.camunda.bpm.dmn.feel;
 
 import org.camunda.bpm.engine.variable.context.VariableContext;
 
+/**
+ * Engine to evaluate FEEL expressions.
+ */
 public interface FeelEngine {
 
   /**
@@ -24,7 +27,9 @@ public interface FeelEngine {
    * @param variableContext the variable context which are available
    * @param <T> the expected return type
    * @return the result of the simple expression
-   * @throws FeelException if the expression cannot be evaluated
+   *
+   * @throws FeelException
+   *           if the expression cannot be evaluated
    */
   <T> T evaluateSimpleExpression(String simpleExpression, VariableContext variableContext);
 
@@ -35,7 +40,9 @@ public interface FeelEngine {
    * @param inputName the name of the variable which is tested
    * @param variableContext the variable context are available
    * @return the result of the simple unary tests expression
-   * @throws FeelException if the expression cannot be evaluated
+   *
+   * @throws FeelException
+   *           if the expression cannot be evaluated
    */
   boolean evaluateSimpleUnaryTests(String simpleUnaryTests, String inputName, VariableContext variableContext);
 

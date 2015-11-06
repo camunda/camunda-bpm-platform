@@ -14,59 +14,180 @@
 package org.camunda.bpm.dmn.engine;
 
 import java.util.List;
-import java.util.Map;
 
-import org.camunda.bpm.dmn.engine.context.DmnContextFactory;
-import org.camunda.bpm.dmn.engine.el.ElProvider;
-import org.camunda.bpm.dmn.engine.handler.DmnElementHandlerRegistry;
-import org.camunda.bpm.dmn.engine.hitpolicy.DmnHitPolicyHandler;
-import org.camunda.bpm.dmn.engine.transform.DmnTransformFactory;
-import org.camunda.bpm.dmn.engine.transform.DmnTransformListener;
-import org.camunda.bpm.dmn.engine.transform.DmnTransformer;
-import org.camunda.bpm.dmn.engine.type.DataTypeTransformerFactory;
-import org.camunda.bpm.dmn.feel.FeelEngineProvider;
-import org.camunda.bpm.model.dmn.HitPolicy;
+import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationListener;
+import org.camunda.bpm.dmn.engine.spi.DmnEngineMetricCollector;
+import org.camunda.bpm.dmn.feel.FeelEngine;
+import org.camunda.bpm.dmn.feel.FeelEngineFactory;
 
+/**
+ * The configuration of a {@link DmnEngine}. It can be used
+ * to build a new engine using {@link #buildEngine()}.
+ */
 public interface DmnEngineConfiguration {
 
-  DmnContextFactory getDmnContextFactory();
-
-  DmnTransformer getTransformer();
-
-  DmnTransformFactory getTransformFactory();
-
-  DmnElementHandlerRegistry getElementHandlerRegistry();
-
+  /**
+   * @return the configured engine metric collector
+   */
   DmnEngineMetricCollector getEngineMetricCollector();
 
-  List<DmnTransformListener> getCustomPreDmnTransformListeners();
+  /**
+   * Set the engine metric collector
+   *
+   * @param engineMetricCollector the engine metric collector to use
+   */
+  void setEngineMetricCollector(DmnEngineMetricCollector engineMetricCollector);
 
-  List<DmnTransformListener> getCustomPostDmnTransformListeners();
+  /**
+   * Set the engine metric collector
+   *
+   * @param engineMetricCollector the engine metric collector to use
+   * @return this configuration
+   */
+  DmnEngineConfiguration engineMetricCollector(DmnEngineMetricCollector engineMetricCollector);
 
-  List<DmnDecisionTableListener> getCustomPreDmnDecisionTableListeners();
+  /**
+   * @return the list of custom pre decision table evaluation listeners
+   */
+  List<DmnDecisionTableEvaluationListener> getCustomPreDecisionTableEvaluationListeners();
 
-  List<DmnDecisionTableListener> getCustomDmnDecisionTableListeners();
+  /**
+   * Set the list of pre decision table evaluation listeners. They will be notified before
+   * the default decision table evaluation listeners.
+   *
+   * @param decisionTableEvaluationListeners the list of pre decision table evaluation listeners
+   */
+  void setCustomPreDecisionTableEvaluationListeners(List<DmnDecisionTableEvaluationListener> decisionTableEvaluationListeners);
 
-  List<DmnDecisionTableListener> getCustomPostDmnDecisionTableListeners();
 
-  Map<HitPolicy, DmnHitPolicyHandler> getHitPolicyHandlers();
+  /**
+   * Set the list of pre decision table evaluation listeners. They will be notified before
+   * the default decision table evaluation listeners.
+   *
+   * @param decisionTableEvaluationListeners the list of pre decision table evaluation listeners
+   * @return this configuration
+   */
+  DmnEngineConfiguration customPreDecisionTableEvaluationListeners(List<DmnDecisionTableEvaluationListener> decisionTableEvaluationListeners);
 
-  DmnScriptEngineResolver getScriptEngineResolver();
+  /**
+   * @return the list of custom post decision table evaluation listeners
+   */
+  List<DmnDecisionTableEvaluationListener> getCustomPostDecisionTableEvaluationListeners();
 
-  FeelEngineProvider getFeelEngineProvider();
+  /**
+   * Set the list of post decision table evaluation listeners. They will be notified after
+   * the default decision table evaluation listeners.
+   *
+   * @param decisionTableEvaluationListeners the list of post decision table evaluation listeners
+   */
+  void setCustomPostDecisionTableEvaluationListeners(List<DmnDecisionTableEvaluationListener> decisionTableEvaluationListeners);
 
-  ElProvider getElProvider();
+  /**
+   * Set the list of post decision table evaluation listeners. They will be notified after
+   * the default decision table evaluation listeners.
+   *
+   * @param decisionTableEvaluationListeners the list of post decision table evaluation listeners
+   * @return this configuration
+   */
+  DmnEngineConfiguration customPostDecisionTableEvaluationListeners(List<DmnDecisionTableEvaluationListener> decisionTableEvaluationListeners);
 
-  DataTypeTransformerFactory getDataTypeTransformerFactory();
+  /**
+   * @return the factory is used to create a {@link FeelEngine}
+   */
+  FeelEngineFactory getFeelEngineFactory();
 
-  String getDefaultAllowedValueExpressionLanguage();
+  /**
+   * Set the factory to create a {@link FeelEngine}
+   *
+   * @param feelEngineFactory the feel engine factory
+   */
+  void setFeelEngineFactory(FeelEngineFactory feelEngineFactory);
 
+  /**
+   * Set the factory to create a {@link FeelEngine}
+   *
+   * @param feelEngineFactory the feel engine factory
+   * @return this
+   */
+  DmnEngineConfiguration feelEngineFactory(FeelEngineFactory feelEngineFactory);
+
+  /**
+   * @return the default expression language for input entries
+   */
   String getDefaultInputEntryExpressionLanguage();
 
+  /**
+   * Set the default expression language which is used to evaluate input entries.
+   * It is used for all input entries which do not have a expression
+   * language set.
+   *
+   * @param expressionLanguage the default expression language for input entries
+   */
+  void setDefaultInputEntryExpressionLanguage(String expressionLanguage);
+
+  /**
+   * Set the default expression language which is used to evaluate input entries.
+   * It is used for all input entries which do not have a expression
+   * language set.
+   *
+   * @param expressionLanguage the default expression language for input entries
+   * @return this configuration
+   */
+  DmnEngineConfiguration defaultInputEntryExpressionLanguage(String expressionLanguage);
+
+  /**
+   * @return the default expression language for input expressions
+   */
   String getDefaultInputExpressionExpressionLanguage();
 
+  /**
+   * Set the default expression language which is used to evaluate input expressions.
+   * It is used for all input expressions which do not have a expression
+   * language set.
+   *
+   * @param expressionLanguage the default expression language for input expressions
+   */
+  void setDefaultInputExpressionExpressionLanguage(String expressionLanguage);
+
+  /**
+   * Set the default expression language which is used to evaluate input expressions.
+   * It is used for all input expressions which do not have a expression
+   * language set.
+   *
+   * @param expressionLanguage the default expression language for input expressions
+   * @return this configuration
+   */
+  DmnEngineConfiguration defaultInputExpressionExpressionLanguage(String expressionLanguage);
+
+  /**
+   * @return the default expression language for output entries
+   */
   String getDefaultOutputEntryExpressionLanguage();
 
+  /**
+   * Set the default expression language which is used to evaluate output entries.
+   * It is used for all output entries which do not have a expression
+   * language set.
+   *
+   * @param expressionLanguage the default expression language for output entries
+   */
+  void setDefaultOutputEntryExpressionLanguage(String expressionLanguage);
+
+  /**
+   * Set the default expression language which is used to evaluate output entries.
+   * It is used for all output entries which do not have a expression
+   * language set.
+   *
+   * @param expressionLanguage the default expression language for output entries
+   * @return this configuration
+   */
+  DmnEngineConfiguration defaultOutputEntryExpressionLanguage(String expressionLanguage);
+
+  /**
+   * Create a {@link DmnEngine} with this configuration
+   *
+   * @return the created {@link DmnEngine}
+   */
   DmnEngine buildEngine();
 
 }

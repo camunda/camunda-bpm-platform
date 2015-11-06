@@ -13,14 +13,18 @@
 
 package org.camunda.bpm.dmn.engine.impl.hitpolicy;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionTable;
-import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
-import org.camunda.bpm.dmn.engine.hitpolicy.DmnHitPolicyHandler;
+import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationEvent;
+import org.camunda.bpm.dmn.engine.impl.spi.hitpolicy.DmnHitPolicyHandler;
 
 public class RuleOrderHitPolicyHandler implements DmnHitPolicyHandler {
 
-  public DmnDecisionTableResult apply(DmnDecisionTable decisionTable, DmnDecisionTableResult decisionTableResult) {
-    return decisionTableResult;
+  public DmnDecisionTableEvaluationEvent apply(DmnDecisionTableEvaluationEvent decisionTableEvaluationEvent) {
+    return decisionTableEvaluationEvent;
+  }
+
+  @Override
+  public String toString() {
+    return "RuleOrderHitPolicyHandler{}";
   }
 
 }

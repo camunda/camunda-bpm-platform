@@ -15,10 +15,8 @@
           <text>sum</text>
         </inputExpression>
       </input>
-      <output id="clause3" label="Check Result" name="result" typeRef="string">
-      </output>
-      <output id="clause4" label="Reason" name="reason">
-      </output>
+      <output id="clause3" label="Check Result" name="result" typeRef="string" />
+      <output id="clause4" label="Reason" name="reason" />
       <rule id="rule1">
         <inputEntry>
           <text>cellInput == "bronze"</text>

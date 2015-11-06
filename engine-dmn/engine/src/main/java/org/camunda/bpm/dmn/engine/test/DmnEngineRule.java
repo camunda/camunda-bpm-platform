@@ -13,89 +13,67 @@
 
 package org.camunda.bpm.dmn.engine.test;
 
-import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
-import org.camunda.bpm.dmn.engine.impl.DmnEngineConfigurationImpl;
+import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 
+/**
+ * JUnit rule for {@link DmnEngine} initialization.
+ * <p>
+ * Usage:
+ * </p>
+ *
+ * <pre>
+ * public class YourDmnTest {
+ *
+ *   &#64;Rule
+ *   public DmnEngineRule dmnEngineRule = new DmnEngineRule();
+ *
+ *   ...
+ * }
+ * </pre>
+ *
+ * <p>
+ * The DMN engine will be made available to the test class
+ * through the getters of the {@code dmnEngineRule} (see {@link #getDmnEngine()}).
+ * The DMN engine will be initialized with the default DMN engine configuration.
+ * To specify a different configuration, pass the configuration to the
+ * {@link #DmnEngineRule(DmnEngineConfiguration)} constructor.
+ * </p>
+ */
 public class DmnEngineRule extends TestWatcher {
 
-  public static final String DMN_SUFFIX = "dmn";
+  protected DmnEngine dmnEngine;
+  protected DmnEngineConfiguration dmnEngineConfiguration;
 
-  protected DmnEngine engine;
-  protected DmnEngineConfiguration configuration;
-  protected DmnDecision decision;
-
+  /**
+   * Creates a {@link DmnEngine} with the default {@link DmnEngineConfiguration}
+   */
   public DmnEngineRule() {
-    this(new DmnEngineConfigurationImpl());
+    this(new DefaultDmnEngineConfiguration());
   }
 
-  public DmnEngineRule(DmnEngineConfiguration configuration) {
-    this.configuration = configuration;
+  /**
+   * Creates a {@link DmnEngine} with the given {@link DmnEngineConfiguration}
+   */
+  public DmnEngineRule(DmnEngineConfiguration dmnEngineConfiguration) {
+    this.dmnEngineConfiguration = dmnEngineConfiguration;
+  }
+
+  /**
+   * @return the {@link DmnEngine}
+   */
+  public DmnEngine getDmnEngine() {
+    return dmnEngine;
   }
 
   @Override
   protected void starting(Description description) {
-    if (engine == null) {
-      initializeDmnEngine();
+    if (dmnEngine == null) {
+      dmnEngine = dmnEngineConfiguration.buildEngine();
     }
-
-    decision = loadDecision(description);
-  }
-
-  protected void initializeDmnEngine() {
-    engine = configuration.buildEngine();
-  }
-
-  protected DmnDecision loadDecision(Description description) {
-    DecisionResource decisionResource = description.getAnnotation(DecisionResource.class);
-
-    if(decisionResource != null) {
-
-      String resourcePath = decisionResource.resource();
-
-      resourcePath = expandResourcePath(description, resourcePath);
-
-      String decisionKey = decisionResource.decisionKey();
-
-      if (decisionKey == null || decisionKey.isEmpty()) {
-        return engine.parseDecision(resourcePath);
-      }
-      else {
-        return engine.parseDecision(resourcePath, decisionKey);
-      }
-    }
-    else {
-      return null;
-    }
-  }
-
-  protected String expandResourcePath(Description description, String resourcePath) {
-    if (resourcePath.contains("/")) {
-      // already expanded path
-      return resourcePath;
-    }
-    else {
-      Class<?> testClass = description.getTestClass();
-      if (resourcePath.isEmpty()) {
-        // use test class and method name as resource file name
-        return testClass.getName().replace(".", "/") + "." + description.getMethodName() + "." + DMN_SUFFIX;
-      }
-      else {
-        // use test class location as resource location
-        return testClass.getPackage().getName().replace(".", "/") + "/" + resourcePath;
-      }
-    }
-  }
-
-  public DmnEngine getEngine() {
-    return engine;
-  }
-
-  public DmnDecision getDecision() {
-    return decision;
   }
 
 }

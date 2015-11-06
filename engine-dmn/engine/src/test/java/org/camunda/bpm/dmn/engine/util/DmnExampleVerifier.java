@@ -13,19 +13,20 @@
 
 package org.camunda.bpm.dmn.engine.util;
 
-import static org.camunda.bpm.dmn.engine.test.asserts.DmnAssertions.assertThat;
+import static org.camunda.bpm.dmn.engine.test.asserts.DmnEngineTestAssertions.assertThat;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 
 public final class DmnExampleVerifier {
 
-  public static final String EXAMPLE_DMN = "org/camunda/bpm/dmn/engine/Example.dmn";
+  public static final String EXAMPLE_DMN = "org/camunda/bpm/dmn/engine/api/Example.dmn";
 
   public static void assertExample(DmnEngine engine) {
-    DmnDecision decision = engine.parseDecision(EXAMPLE_DMN);
+    DmnDecision decision = engine.parseFirstDecision(EXAMPLE_DMN);
     assertExample(engine, decision);
   }
 
@@ -34,40 +35,40 @@ public final class DmnExampleVerifier {
     variables.put("status", "bronze");
     variables.put("sum", 200);
 
-    assertThat(engine)
-      .evaluates(decision, variables)
-      .hasResult()
-      .hasSingleOutput()
-      .hasEntryWithValue("result", "notok")
-      .hasEntryWithValue("reason", "work on your status first, as bronze you're not going to get anything");
+    DmnDecisionTableResult results = engine.evaluateDecisionTable(decision, variables);
+    assertThat(results)
+      .hasSingleResult()
+      .containsOnlyKeys("result", "reason")
+      .containsEntry("result", "notok")
+      .containsEntry("reason", "work on your status first, as bronze you're not going to get anything");
 
     variables.put("status", "silver");
 
-    assertThat(engine)
-      .evaluates(decision, variables)
-      .hasResult()
-      .hasSingleOutput()
-      .hasEntryWithValue("result", "ok")
-      .hasEntryWithValue("reason", "you little fish will get what you want");
+    results = engine.evaluateDecisionTable(decision, variables);
+    assertThat(results)
+      .hasSingleResult()
+      .containsOnlyKeys("result", "reason")
+      .containsEntry("result", "ok")
+      .containsEntry("reason", "you little fish will get what you want");
 
     variables.put("sum", 1200);
 
-    assertThat(engine)
-      .evaluates(decision, variables)
-      .hasResult()
-      .hasSingleOutput()
-      .hasEntryWithValue("result", "notok")
-      .hasEntryWithValue("reason", "you took too much man, you took too much!");
+    results = engine.evaluateDecisionTable(decision, variables);
+    assertThat(results)
+      .hasSingleResult()
+      .containsOnlyKeys("result", "reason")
+      .containsEntry("result", "notok")
+      .containsEntry("reason", "you took too much man, you took too much!");
 
     variables.put("status", "gold");
     variables.put("sum", 200);
 
-    assertThat(engine)
-      .evaluates(decision, variables)
-      .hasResult()
-      .hasSingleOutput()
-      .hasEntryWithValue("result", "ok")
-      .hasEntryWithValue("reason", "you get anything you want");
+    results = engine.evaluateDecisionTable(decision, variables);
+    assertThat(results)
+      .hasSingleResult()
+      .containsOnlyKeys("result", "reason")
+      .containsEntry("result", "ok")
+      .containsEntry("reason", "you get anything you want");
   }
 
 }

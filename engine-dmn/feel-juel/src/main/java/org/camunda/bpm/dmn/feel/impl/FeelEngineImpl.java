@@ -18,11 +18,7 @@ import javax.el.ELException;
 import javax.el.ExpressionFactory;
 import javax.el.ValueExpression;
 
-import org.camunda.bpm.dmn.feel.FeelConvertException;
 import org.camunda.bpm.dmn.feel.FeelEngine;
-import org.camunda.bpm.dmn.feel.FeelMethodInvocationException;
-import org.camunda.bpm.dmn.feel.FeelMissingFunctionException;
-import org.camunda.bpm.dmn.feel.FeelMissingVariableException;
 import org.camunda.bpm.dmn.feel.impl.el.ElContextFactory;
 import org.camunda.bpm.dmn.feel.impl.transform.FeelToJuelTransform;
 import org.camunda.bpm.engine.variable.context.VariableContext;

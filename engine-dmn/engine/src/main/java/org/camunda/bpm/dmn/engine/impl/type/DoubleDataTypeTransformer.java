@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.dmn.engine.impl.type;
 
-import org.camunda.bpm.dmn.engine.type.DataTypeTransformer;
+import org.camunda.bpm.dmn.engine.impl.spi.type.DmnDataTypeTransformer;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.DoubleValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -22,7 +22,7 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
  *
  * @author Philipp Ossler
  */
-public class DoubleDataTypeTransformer implements DataTypeTransformer {
+public class DoubleDataTypeTransformer implements DmnDataTypeTransformer {
 
   @Override
   public TypedValue transform(Object value) throws IllegalArgumentException {

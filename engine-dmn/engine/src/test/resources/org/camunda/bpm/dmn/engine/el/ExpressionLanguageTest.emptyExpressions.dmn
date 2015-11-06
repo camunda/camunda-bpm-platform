@@ -15,9 +15,9 @@
           <text>    </text>
         </inputExpression>
       </input>
-      <output id="clause3" />
-      <output id="clause4" />
-      <output id="clause5" />
+      <output id="clause3" name="out1"/>
+      <output id="clause4" name="out2"/>
+      <output id="clause5" name="out3"/>
       <rule id="rule1">
         <inputEntry id="inputEntry1">
           <text/>

@@ -17,50 +17,53 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionTable;
-import org.camunda.bpm.dmn.engine.DmnDecisionTableOutput;
-import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
-import org.camunda.bpm.dmn.engine.DmnDecisionTableRule;
-import org.camunda.bpm.dmn.engine.DmnDecisionTableValue;
-import org.camunda.bpm.dmn.engine.hitpolicy.DmnHitPolicyHandler;
-import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableResultImpl;
+import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationEvent;
+import org.camunda.bpm.dmn.engine.delegate.DmnEvaluatedDecisionRule;
+import org.camunda.bpm.dmn.engine.delegate.DmnEvaluatedOutput;
 import org.camunda.bpm.dmn.engine.impl.DmnLogger;
+import org.camunda.bpm.dmn.engine.impl.delegate.DmnDecisionTableEvaluationEventImpl;
+import org.camunda.bpm.dmn.engine.impl.spi.hitpolicy.DmnHitPolicyHandler;
 
 public class AnyHitPolicyHandler implements DmnHitPolicyHandler {
 
   public static final DmnHitPolicyLogger LOG = DmnLogger.HIT_POLICY_LOGGER;
 
-  public DmnDecisionTableResult apply(DmnDecisionTable decisionTable, DmnDecisionTableResult decisionTableResult) {
-    List<DmnDecisionTableRule> matchingRules = decisionTableResult.getMatchingRules();
+  public DmnDecisionTableEvaluationEvent apply(DmnDecisionTableEvaluationEvent decisionTableEvaluationEvent) {
+    List<DmnEvaluatedDecisionRule> matchingRules = decisionTableEvaluationEvent.getMatchingRules();
 
     if (!matchingRules.isEmpty()) {
       if (allOutputsAreEqual(matchingRules)) {
-        DmnDecisionTableRule firstMatchingRule = matchingRules.get(0);
-        ((DmnDecisionTableResultImpl) decisionTableResult).setMatchingRules(Collections.singletonList(firstMatchingRule));
+        DmnEvaluatedDecisionRule firstMatchingRule = matchingRules.get(0);
+        ((DmnDecisionTableEvaluationEventImpl) decisionTableEvaluationEvent).setMatchingRules(Collections.singletonList(firstMatchingRule));
       } else {
         throw LOG.anyHitPolicyRequiresThatAllOutputsAreEqual(matchingRules);
       }
     }
 
-    return decisionTableResult;
+    return decisionTableEvaluationEvent;
   }
 
-  protected boolean allOutputsAreEqual(List<DmnDecisionTableRule> matchingRules) {
-    Map<String, DmnDecisionTableOutput> firstOutputs = matchingRules.get(0).getOutputs();
-    if (firstOutputs == null) {
+  protected boolean allOutputsAreEqual(List<DmnEvaluatedDecisionRule> matchingRules) {
+    Map<String, DmnEvaluatedOutput> firstOutputEntries = matchingRules.get(0).getOutputEntries();
+    if (firstOutputEntries == null) {
       for (int i = 1; i < matchingRules.size(); i++) {
-        if (matchingRules.get(i).getOutputs() != null) {
+        if (matchingRules.get(i).getOutputEntries() != null) {
           return false;
         }
       }
     } else {
       for (int i = 1; i < matchingRules.size(); i++) {
-        if (!firstOutputs.equals(matchingRules.get(i).getOutputs())) {
+        if (!firstOutputEntries.equals(matchingRules.get(i).getOutputEntries())) {
           return false;
         }
       }
     }
     return true;
+  }
+
+  @Override
+  public String toString() {
+    return "AnyHitPolicyHandler{}";
   }
 
 }

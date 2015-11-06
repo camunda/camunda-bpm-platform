@@ -15,25 +15,29 @@ package org.camunda.bpm.dmn.engine.impl.hitpolicy;
 
 import java.util.List;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionTable;
-import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
-import org.camunda.bpm.dmn.engine.DmnDecisionTableRule;
-import org.camunda.bpm.dmn.engine.hitpolicy.DmnHitPolicyHandler;
+import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationEvent;
+import org.camunda.bpm.dmn.engine.delegate.DmnEvaluatedDecisionRule;
 import org.camunda.bpm.dmn.engine.impl.DmnLogger;
+import org.camunda.bpm.dmn.engine.impl.spi.hitpolicy.DmnHitPolicyHandler;
 
 public class UniqueHitPolicyHandler implements DmnHitPolicyHandler {
 
   public static final DmnHitPolicyLogger LOG = DmnLogger.HIT_POLICY_LOGGER;
 
-  public DmnDecisionTableResult apply(DmnDecisionTable decisionTable, DmnDecisionTableResult decisionTableResult) {
-    List<DmnDecisionTableRule> matchingRules = decisionTableResult.getMatchingRules();
+  public DmnDecisionTableEvaluationEvent apply(DmnDecisionTableEvaluationEvent decisionTableEvaluationEvent) {
+    List<DmnEvaluatedDecisionRule> matchingRules = decisionTableEvaluationEvent.getMatchingRules();
 
     if (matchingRules.size() < 2) {
-      return decisionTableResult;
+      return decisionTableEvaluationEvent;
     }
     else {
       throw LOG.uniqueHitPolicyOnlyAllowsSingleMatchingRule(matchingRules);
     }
+  }
+
+  @Override
+  public String toString() {
+    return "UniqueHitPolicyHandler{}";
   }
 
 }

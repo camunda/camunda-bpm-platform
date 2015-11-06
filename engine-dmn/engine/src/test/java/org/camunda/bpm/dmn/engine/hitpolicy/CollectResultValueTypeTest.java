@@ -12,14 +12,9 @@
  */
 package org.camunda.bpm.dmn.engine.hitpolicy;
 
-import static org.camunda.bpm.dmn.engine.test.asserts.DmnAssertions.assertThat;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.test.DecisionResource;
-import org.camunda.bpm.dmn.engine.test.DmnDecisionTest;
+import org.camunda.bpm.dmn.engine.test.DmnEngineTest;
+import org.camunda.bpm.dmn.engine.test.asserts.DmnDecisionTableResultAssert;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Test;
 
@@ -29,7 +24,7 @@ import org.junit.Test;
  *
  * @author Philipp Ossler
  */
-public class CollectResultValueTypeTest extends DmnDecisionTest {
+public class CollectResultValueTypeTest extends DmnEngineTest {
 
   public static final String COLLECT_SUM = "HitPolicyTest.collect.sum.single.dmn";
   public static final String COLLECT_MIN = "HitPolicyTest.collect.min.single.dmn";
@@ -39,57 +34,68 @@ public class CollectResultValueTypeTest extends DmnDecisionTest {
   @Test
   @DecisionResource(resource = COLLECT_SUM)
   public void collectSumHitPolicy() {
-    DmnDecisionResult result = startDecision(10, 20, 50);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Variables.integerValue(80));
+    assertThatDecisionTableResult(10, 20, 50)
+      .hasSingleResult()
+      .hasSingleEntryTyped(Variables.integerValue(80));
 
-    result = startDecision(10L, 20L, 50L);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Variables.longValue(80L));
+    assertThatDecisionTableResult(10L, 20L, 50L)
+      .hasSingleResult()
+      .hasSingleEntryTyped(Variables.longValue(80L));
 
-    result = startDecision(10.3, 20.5, 50.7);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Variables.doubleValue(81.5));
+    assertThatDecisionTableResult(10.3, 20.5, 50.7)
+      .hasSingleResult()
+      .hasSingleEntryTyped(Variables.doubleValue(81.5));
   }
 
   @Test
   @DecisionResource(resource = COLLECT_MIN)
   public void collectMinHitPolicy() {
-    DmnDecisionResult result = startDecision(10, 20, 50);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Variables.integerValue(10));
+    assertThatDecisionTableResult(10, 20, 50)
+      .hasSingleResult()
+      .hasSingleEntryTyped(Variables.integerValue(10));
 
-    result = startDecision(10L, 20L, 50L);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Variables.longValue(10L));
+    assertThatDecisionTableResult(10L, 20L, 50L)
+      .hasSingleResult()
+      .hasSingleEntryTyped(Variables.longValue(10L));
 
-    result = startDecision(10.3, 20.5, 50.7);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Variables.doubleValue(10.3));
+    assertThatDecisionTableResult(10.3, 20.5, 50.7)
+      .hasSingleResult()
+      .hasSingleEntryTyped(Variables.doubleValue(10.3));
   }
 
   @Test
   @DecisionResource(resource = COLLECT_MAX)
   public void collectMaxHitPolicy() {
-    DmnDecisionResult result = startDecision(10, 20, 50);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Variables.integerValue(50));
+    assertThatDecisionTableResult(10, 20, 50)
+      .hasSingleResult()
+      .hasSingleEntryTyped(Variables.integerValue(50));
 
-    result = startDecision(10L, 20L, 50L);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Variables.longValue(50L));
+    assertThatDecisionTableResult(10L, 20L, 50L)
+      .hasSingleResult()
+      .hasSingleEntryTyped(Variables.longValue(50L));
 
-    result = startDecision(10.3, 20.5, 50.7);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Variables.doubleValue(50.7));
+    assertThatDecisionTableResult(10.3, 20.5, 50.7)
+      .hasSingleResult()
+      .hasSingleEntryTyped(Variables.doubleValue(50.7));
   }
 
   @Test
   @DecisionResource(resource = COLLECT_COUNT)
   public void collectCountHitPolicy() {
-    DmnDecisionResult result = startDecision(10, 20, 50);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Variables.integerValue(3));
+    assertThatDecisionTableResult(10, 20, 50)
+      .hasSingleResult()
+      .hasSingleEntryTyped(Variables.integerValue(3));
 
-    result = startDecision(10L, 20L, 50L);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Variables.integerValue(3));
+    assertThatDecisionTableResult(10L, 20L, 50L)
+      .hasSingleResult()
+      .hasSingleEntryTyped(Variables.integerValue(3));
 
-    result = startDecision(10.3, 20.5, 50.7);
-    assertThat(result).hasSingleOutput().hasSingleEntry(Variables.integerValue(3));
+    assertThatDecisionTableResult(10.3, 20.5, 50.7)
+      .hasSingleResult()
+      .hasSingleEntryTyped(Variables.integerValue(3));
   }
 
-  protected DmnDecisionResult startDecision(Object output1, Object output2, Object output3) {
-    Map<String, Object> variables = new HashMap<String, Object>();
+  public DmnDecisionTableResultAssert assertThatDecisionTableResult(Object output1, Object output2, Object output3) {
     variables.put("input1", true);
     variables.put("input2", true);
     variables.put("input3", true);
@@ -97,7 +103,7 @@ public class CollectResultValueTypeTest extends DmnDecisionTest {
     variables.put("output2", output2);
     variables.put("output3", output3);
 
-    return engine.evaluate(decision, variables);
+    return assertThatDecisionTableResult();
   }
 
 }

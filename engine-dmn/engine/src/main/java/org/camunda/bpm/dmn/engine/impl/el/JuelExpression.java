@@ -15,7 +15,7 @@ package org.camunda.bpm.dmn.engine.impl.el;
 import javax.el.ELContext;
 import javax.el.ValueExpression;
 
-import org.camunda.bpm.dmn.engine.el.ElExpression;
+import org.camunda.bpm.dmn.engine.impl.spi.el.ElExpression;
 import org.camunda.bpm.engine.variable.context.VariableContext;
 
 /**
@@ -35,6 +35,14 @@ public class JuelExpression implements ElExpression {
   public Object getValue(VariableContext variableContext) {
     ELContext elContext = elContextFactory.createElContext(variableContext);
     return expression.getValue(elContext);
+  }
+
+  @Override
+  public String toString() {
+    return "JuelExpression{" +
+      "expression=" + expression +
+      ", elContextFactory=" + elContextFactory +
+      '}';
   }
 
 }

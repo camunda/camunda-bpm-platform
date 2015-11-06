@@ -15,95 +15,74 @@ package org.camunda.bpm.dmn.engine.transform;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.InputStream;
 import java.util.List;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
-import org.camunda.bpm.dmn.engine.DmnDecisionModel;
-import org.camunda.bpm.dmn.engine.DmnDecisionTable;
-import org.camunda.bpm.dmn.engine.DmnEngine;
-import org.camunda.bpm.dmn.engine.DmnExpression;
-import org.camunda.bpm.dmn.engine.DmnInput;
-import org.camunda.bpm.dmn.engine.DmnInputEntry;
-import org.camunda.bpm.dmn.engine.DmnOutput;
-import org.camunda.bpm.dmn.engine.DmnOutputEntry;
-import org.camunda.bpm.dmn.engine.DmnRule;
-import org.camunda.bpm.dmn.engine.impl.DefaultTypeDefinition;
 import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableImpl;
-import org.camunda.bpm.dmn.engine.impl.DmnEngineConfigurationImpl;
-import org.camunda.bpm.dmn.engine.impl.DmnInputImpl;
-import org.camunda.bpm.model.dmn.HitPolicy;
-import org.camunda.commons.utils.IoUtil;
-import org.junit.BeforeClass;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableInputImpl;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableOutputImpl;
+import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableRuleImpl;
+import org.camunda.bpm.dmn.engine.impl.DmnExpressionImpl;
+import org.camunda.bpm.dmn.engine.impl.hitpolicy.FirstHitPolicyHandler;
+import org.camunda.bpm.dmn.engine.impl.hitpolicy.UniqueHitPolicyHandler;
+import org.camunda.bpm.dmn.engine.impl.type.DefaultTypeDefinition;
+import org.camunda.bpm.dmn.engine.test.DmnEngineTest;
 import org.junit.Test;
 
-public class DmnTransformTest {
+public class DmnTransformTest extends DmnEngineTest {
 
-  protected static DmnEngine engine;
-  protected static DmnDecisionModel decisionModel;
-
-  @BeforeClass
-  public static void readModelFromFile() {
-    InputStream inputStream = IoUtil.fileAsStream("org/camunda/bpm/dmn/engine/transform/DmnTransformTest.dmn");
-    DmnEngineConfigurationImpl engineConfiguration = new DmnEngineConfigurationImpl();
-    engine = engineConfiguration.buildEngine();
-    decisionModel = engine.parseDecisionModel(inputStream);
-  }
-
-  @Test
-  public void shouldTransformDefinitions() {
-    assertThat(decisionModel.getKey()).isEqualTo("definitions");
-    assertThat(decisionModel.getName()).isEqualTo("camunda");
-    assertThat(decisionModel.getNamespace()).isEqualTo("http://camunda.org/schema/1.0/dmn");
-    assertThat(decisionModel.getExpressionLanguage()).isEqualTo(null);
-  }
-
+  public static final String TRANSFORM_DMN = "org/camunda/bpm/dmn/engine/transform/DmnTransformTest.dmn";
 
   @Test
   public void shouldTransformDecisions() {
-    assertThat(decisionModel.getDecisions()).hasSize(2);
+    List<DmnDecision> decisions = dmnEngine.parseDecisions(TRANSFORM_DMN);
+    assertThat(decisions).hasSize(2);
 
-    DmnDecision decision = decisionModel.getDecision("decision1");
+    DmnDecision decision = decisions.get(0);
     assertThat(decision).isNotNull();
+    assertThat(decision.getKey()).isEqualTo("decision1");
     assertThat(decision.getName()).isEqualTo("camunda");
 
     // decision2 should be ignored as it isn't supported by the DMN engine
-    decision = decisionModel.getDecision("decision2");
-    assertThat(decision).isNull();
 
-    decision = decisionModel.getDecision("decision3");
+    decision = decisions.get(1);
     assertThat(decision).isNotNull();
+    assertThat(decision.getKey()).isEqualTo("decision3");
     assertThat(decision.getName()).isEqualTo("camunda");
   }
 
   @Test
   public void shouldTransformDecisionTables() {
-    DmnDecision decision = decisionModel.getDecision("decision1");
-    assertThat(decision).isInstanceOf(DmnDecisionTable.class);
+    List<DmnDecision> decisions = dmnEngine.parseDecisions(TRANSFORM_DMN);
+    DmnDecision decision = decisions.get(0);
+    assertThat(decision.isDecisionTable()).isTrue();
+    assertThat(decision).isInstanceOf(DmnDecisionTableImpl.class);
 
-    DmnDecisionTable decisionTable = (DmnDecisionTable) decision;
-    assertThat(decisionTable.getHitPolicy()).isEqualTo(DmnDecisionTableImpl.DEFAULT_HIT_POLICY);
+    DmnDecisionTableImpl decisionTable = (DmnDecisionTableImpl) decision;
+    assertThat(decisionTable.getHitPolicyHandler()).isInstanceOf(UniqueHitPolicyHandler.class);
 
-    decision = decisionModel.getDecision("decision3");
-    assertThat(decision).isInstanceOf(DmnDecisionTable.class);
+    decision = decisions.get(1);
+    assertThat(decision.isDecisionTable()).isTrue();
+    assertThat(decision).isInstanceOf(DmnDecisionTableImpl.class);
 
-    decisionTable = (DmnDecisionTable) decision;
-    assertThat(decisionTable.getHitPolicy()).isEqualTo(HitPolicy.FIRST);
+    decisionTable = (DmnDecisionTableImpl) decision;
+    assertThat(decisionTable.getHitPolicyHandler()).isInstanceOf(FirstHitPolicyHandler.class);
   }
 
   @Test
   public void shouldTransformInputs() {
-    List<DmnInput> inputs = getInputsForDecision("decision1");
+    DmnDecisionTableImpl decision = (DmnDecisionTableImpl) dmnEngine.parseDecision("decision1", TRANSFORM_DMN);
+    List<DmnDecisionTableInputImpl> inputs = decision.getInputs();
     assertThat(inputs).hasSize(2);
 
-    DmnInput input = inputs.get(0);
-    assertThat(input.getKey()).isEqualTo("input");
+    DmnDecisionTableInputImpl input = inputs.get(0);
+    assertThat(input.getId()).isEqualTo("input1");
     assertThat(input.getName()).isEqualTo("camunda");
     assertThat(input.getInputVariable()).isEqualTo("camunda");
 
-    DmnExpression inputExpression = input.getInputExpression();
+    DmnExpressionImpl inputExpression = input.getExpression();
     assertThat(inputExpression).isNotNull();
-    assertThat(inputExpression.getKey()).isEqualTo("inputExpression");
+    assertThat(inputExpression.getId()).isEqualTo("inputExpression");
     assertThat(inputExpression.getName()).isNull();
     assertThat(inputExpression.getExpressionLanguage()).isEqualTo("camunda");
     assertThat(inputExpression.getExpression()).isEqualTo("camunda");
@@ -112,13 +91,13 @@ public class DmnTransformTest {
     assertThat(inputExpression.getTypeDefinition().getTypeName()).isEqualTo("string");
 
     input = inputs.get(1);
-    assertThat(input.getKey()).isNull();
+    assertThat(input.getId()).isEqualTo("input2");
     assertThat(input.getName()).isNull();
-    assertThat(input.getInputVariable()).isEqualTo(DmnInputImpl.DEFAULT_INPUT_VARIABLE_NAME);
+    assertThat(input.getInputVariable()).isEqualTo(DmnDecisionTableInputImpl.DEFAULT_INPUT_VARIABLE_NAME);
 
-    inputExpression = input.getInputExpression();
+    inputExpression = input.getExpression();
     assertThat(inputExpression).isNotNull();
-    assertThat(inputExpression.getKey()).isNull();
+    assertThat(inputExpression.getId()).isNull();
     assertThat(inputExpression.getName()).isNull();
     assertThat(inputExpression.getExpressionLanguage()).isNull();
     assertThat(inputExpression.getExpression()).isNull();
@@ -129,77 +108,62 @@ public class DmnTransformTest {
 
   @Test
   public void shouldTransformOutputs() {
-    List<DmnOutput> outputs = getOutputsForDecision("decision1");
+    DmnDecisionTableImpl decision = (DmnDecisionTableImpl) dmnEngine.parseDecision("decision1", TRANSFORM_DMN);
+    List<DmnDecisionTableOutputImpl> outputs = decision.getOutputs();
     assertThat(outputs).hasSize(2);
 
-    DmnOutput output = outputs.get(0);
-    assertThat(output.getKey()).isEqualTo("output");
+    DmnDecisionTableOutputImpl output = outputs.get(0);
+    assertThat(output.getId()).isEqualTo("output1");
     assertThat(output.getName()).isEqualTo("camunda");
     assertThat(output.getOutputName()).isEqualTo("camunda");
     assertThat(output.getTypeDefinition()).isNotNull();
     assertThat(output.getTypeDefinition().getTypeName()).isEqualTo("string");
 
     output = outputs.get(1);
-    assertThat(output.getKey()).isNull();
+    assertThat(output.getId()).isEqualTo("output2");
     assertThat(output.getName()).isNull();
-    assertThat(output.getOutputName()).isNull();
+    assertThat(output.getOutputName()).isEqualTo("out2");
     assertThat(output.getTypeDefinition()).isNotNull();
     assertThat(output.getTypeDefinition()).isEqualTo(new DefaultTypeDefinition());
   }
 
   @Test
   public void shouldTransformRules() {
-    List<DmnRule> rules = getRulesForDecision("decision1");
+    DmnDecisionTableImpl decision = (DmnDecisionTableImpl) dmnEngine.parseDecision("decision1", TRANSFORM_DMN);
+    List<DmnDecisionTableRuleImpl> rules = decision.getRules();
     assertThat(rules).hasSize(1);
 
-    DmnRule rule = rules.get(0);
+    DmnDecisionTableRuleImpl rule = rules.get(0);
 
-    List<DmnInputEntry> inputEntries = rule.getInputEntries();
-    assertThat(inputEntries).hasSize(2);
+    List<DmnExpressionImpl> conditions = rule.getConditions();
+    assertThat(conditions).hasSize(2);
 
-    DmnInputEntry inputEntry = inputEntries.get(0);
-    assertThat(inputEntry.getKey()).isEqualTo("inputEntry");
-    assertThat(inputEntry.getName()).isEqualTo("camunda");
-    assertThat(inputEntry.getExpressionLanguage()).isEqualTo("camunda");
-    assertThat(inputEntry.getExpression()).isEqualTo("camunda");
+    DmnExpressionImpl condition = conditions.get(0);
+    assertThat(condition.getId()).isEqualTo("inputEntry");
+    assertThat(condition.getName()).isEqualTo("camunda");
+    assertThat(condition.getExpressionLanguage()).isEqualTo("camunda");
+    assertThat(condition.getExpression()).isEqualTo("camunda");
 
-    inputEntry = inputEntries.get(1);
-    assertThat(inputEntry.getKey()).isNull();
-    assertThat(inputEntry.getName()).isNull();
-    assertThat(inputEntry.getExpressionLanguage()).isNull();
-    assertThat(inputEntry.getExpression()).isNull();
+    condition = conditions.get(1);
+    assertThat(condition.getId()).isNull();
+    assertThat(condition.getName()).isNull();
+    assertThat(condition.getExpressionLanguage()).isNull();
+    assertThat(condition.getExpression()).isNull();
 
-    List<DmnOutputEntry> outputEntries = rule.getOutputEntries();
-    assertThat(outputEntries).hasSize(2);
+    List<DmnExpressionImpl> conclusions = rule.getConclusions();
+    assertThat(conclusions).hasSize(2);
 
-    DmnOutputEntry outputEntry = outputEntries.get(0);
-    assertThat(outputEntry.getKey()).isEqualTo("outputEntry");
-    assertThat(outputEntry.getName()).isEqualTo("camunda");
-    assertThat(outputEntry.getExpressionLanguage()).isEqualTo("camunda");
-    assertThat(outputEntry.getExpression()).isEqualTo("camunda");
+    DmnExpressionImpl dmnOutputEntry = conclusions.get(0);
+    assertThat(dmnOutputEntry.getId()).isEqualTo("outputEntry");
+    assertThat(dmnOutputEntry.getName()).isEqualTo("camunda");
+    assertThat(dmnOutputEntry.getExpressionLanguage()).isEqualTo("camunda");
+    assertThat(dmnOutputEntry.getExpression()).isEqualTo("camunda");
 
-    outputEntry = outputEntries.get(1);
-    assertThat(outputEntry.getKey()).isNull();
-    assertThat(outputEntry.getName()).isNull();
-    assertThat(outputEntry.getExpressionLanguage()).isNull();
-    assertThat(outputEntry.getExpression()).isNull();
-  }
-
-  // helper ///////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  public List<DmnInput> getInputsForDecision(String decisionKey) {
-    DmnDecisionTable decisionTable = decisionModel.getDecision(decisionKey);
-    return decisionTable.getInputs();
-  }
-
-  public List<DmnOutput> getOutputsForDecision(String decisionKey) {
-    DmnDecisionTable decisionTable = decisionModel.getDecision(decisionKey);
-    return decisionTable.getOutputs();
-  }
-
-  public List<DmnRule> getRulesForDecision(String decisionKey) {
-    DmnDecisionTable decisionTable = decisionModel.getDecision(decisionKey);
-    return decisionTable.getRules();
+    dmnOutputEntry = conclusions.get(1);
+    assertThat(dmnOutputEntry.getId()).isNull();
+    assertThat(dmnOutputEntry.getName()).isNull();
+    assertThat(dmnOutputEntry.getExpressionLanguage()).isNull();
+    assertThat(dmnOutputEntry.getExpression()).isNull();
   }
 
 }

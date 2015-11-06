@@ -15,20 +15,25 @@ package org.camunda.bpm.dmn.engine.impl.hitpolicy;
 
 import java.util.Collections;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionTable;
-import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
-import org.camunda.bpm.dmn.engine.DmnDecisionTableRule;
-import org.camunda.bpm.dmn.engine.hitpolicy.DmnHitPolicyHandler;
-import org.camunda.bpm.dmn.engine.impl.DmnDecisionTableResultImpl;
+import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationEvent;
+import org.camunda.bpm.dmn.engine.delegate.DmnEvaluatedDecisionRule;
+import org.camunda.bpm.dmn.engine.impl.delegate.DmnDecisionTableEvaluationEventImpl;
+import org.camunda.bpm.dmn.engine.impl.spi.hitpolicy.DmnHitPolicyHandler;
+
 
 public class FirstHitPolicyHandler implements DmnHitPolicyHandler {
 
-  public DmnDecisionTableResult apply(DmnDecisionTable decisionTable, DmnDecisionTableResult decisionTableResult) {
-    if (!decisionTableResult.getMatchingRules().isEmpty()) {
-      DmnDecisionTableRule firstMatchedRule = decisionTableResult.getMatchingRules().get(0);
-      ((DmnDecisionTableResultImpl) decisionTableResult).setMatchingRules(Collections.singletonList(firstMatchedRule));
+  public DmnDecisionTableEvaluationEvent apply(DmnDecisionTableEvaluationEvent decisionTableEvaluationEvent) {
+    if (!decisionTableEvaluationEvent.getMatchingRules().isEmpty()) {
+      DmnEvaluatedDecisionRule firstMatchedRule = decisionTableEvaluationEvent.getMatchingRules().get(0);
+      ((DmnDecisionTableEvaluationEventImpl) decisionTableEvaluationEvent).setMatchingRules(Collections.singletonList(firstMatchedRule));
     }
-    return decisionTableResult;
+    return decisionTableEvaluationEvent;
+  }
+
+  @Override
+  public String toString() {
+    return "FirstHitPolicyHandler{}";
   }
 
 }

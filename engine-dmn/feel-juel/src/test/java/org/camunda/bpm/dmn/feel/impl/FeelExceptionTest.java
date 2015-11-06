@@ -14,7 +14,7 @@
 package org.camunda.bpm.dmn.feel.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -37,14 +37,14 @@ public class FeelExceptionTest {
 
   @BeforeClass
   public static void initFeelEngine() {
-    feelEngine = new FeelEngineProviderImpl().createInstance();
+    feelEngine = new FeelEngineFactoryImpl().createInstance();
   }
 
   @Test
   public void testSimpleExpressionNotSupported() {
     try {
       feelEngine.evaluateSimpleExpression("12 == 12", Variables.emptyVariableContext());
-      fail("Exception expected as FEEL simple expressions are not supported");
+      failBecauseExceptionWasNotThrown(UnsupportedOperationException.class);
     }
     catch (UnsupportedOperationException e) {
       assertThat(e).hasMessageStartingWith("FEEL-01016");
@@ -277,7 +277,7 @@ public class FeelExceptionTest {
     for (String feelExpression : feelExpressions) {
       try {
         evaluateFeel(feelExpression);
-        fail("Expected exception with code '" + exceptionCode + "' for FEEL expression '" + feelExpression + "'");
+        failBecauseExceptionWasNotThrown(FeelException.class);
       }
       catch (FeelException e) {
         assertThat(e).hasMessageStartingWith(exceptionCode);

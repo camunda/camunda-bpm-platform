@@ -14,6 +14,7 @@
 package org.camunda.bpm.dmn.engine.impl;
 
 import org.camunda.bpm.dmn.engine.impl.hitpolicy.DmnHitPolicyLogger;
+import org.camunda.bpm.dmn.engine.impl.transform.DmnTransformLogger;
 import org.camunda.commons.logging.BaseLogger;
 
 public class DmnLogger extends BaseLogger {
