@@ -36,6 +36,8 @@ import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 import org.joda.time.DateTime;
 
 /**
@@ -729,7 +731,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
 
 
   protected ProcessInstance startProcessInstanceAndEvaluateDecision(Object input) {
-    Map<String, Object> variables = new HashMap<String, Object>();
+    VariableMap variables = Variables.createVariables();
     variables.put("input1", input);
     return runtimeService.startProcessInstanceByKey("testProcess", variables);
   }

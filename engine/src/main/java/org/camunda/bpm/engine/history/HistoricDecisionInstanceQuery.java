@@ -14,7 +14,6 @@
 package org.camunda.bpm.engine.history;
 
 import java.util.Date;
-import java.util.Set;
 
 import org.camunda.bpm.engine.query.Query;
 

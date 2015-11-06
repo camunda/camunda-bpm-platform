@@ -48,8 +48,10 @@ import org.camunda.bpm.engine.test.api.runtime.util.FailingSerializable;
 import org.camunda.bpm.engine.test.history.SerializableVariable;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.junit.Assert;
+import org.junit.Test;
 
 
 /**
@@ -1428,6 +1430,51 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
     assertNull(((HistoricVariableUpdate)result).getValue());
 
     taskService.deleteTask(newTask.getId(), true);
+  }
+
+  @Deployment(resources= "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
+  public void testDisableBinaryFetchingForFileValues() {
+    // given
+    String fileName = "text.txt";
+    String encoding = "crazy-encoding";
+    String mimeType = "martini/dry";
+
+    FileValue fileValue = Variables
+        .fileValue(fileName)
+        .file("ABC".getBytes())
+        .encoding(encoding)
+        .mimeType(mimeType)
+        .create();
+
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables().putValueTyped("fileVar", fileValue));
+
+    // when enabling binary fetching
+    HistoricVariableUpdate fileVariableInstance =
+        (HistoricVariableUpdate) historyService.createHistoricDetailQuery().singleResult();
+
+    // then the binary value is accessible
+    assertNotNull(fileVariableInstance.getValue());
+
+    // when disabling binary fetching
+    fileVariableInstance =
+        (HistoricVariableUpdate) historyService.createHistoricDetailQuery().disableBinaryFetching().singleResult();
+
+    // then the byte value is not fetched
+    assertNotNull(fileVariableInstance);
+    assertEquals("fileVar", fileVariableInstance.getVariableName());
+
+    assertNull(fileVariableInstance.getValue());
+
+    FileValue typedValue = (FileValue) fileVariableInstance.getTypedValue();
+    assertNull(typedValue.getValue());
+
+    // but typed value metadata is accessible
+    assertEquals(ValueType.FILE, typedValue.getType());
+    assertEquals(fileName, typedValue.getFilename());
+    assertEquals(encoding, typedValue.getEncoding());
+    assertEquals(mimeType, typedValue.getMimeType());
+
   }
 
   public void testDisableCustomObjectDeserialization() {

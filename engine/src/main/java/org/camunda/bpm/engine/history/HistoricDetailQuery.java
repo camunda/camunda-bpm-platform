@@ -78,8 +78,9 @@ public interface HistoricDetailQuery extends Query<HistoricDetailQuery, Historic
   HistoricDetailQuery variableUpdates();
 
   /**
-   * Disable fetching of byte array values. By default, the query will fetch the value of a byte array.
+   * Disable fetching of byte array and file values. By default, the query will fetch such values.
    * By calling this method you can prevent the values of (potentially large) blob data chunks to be fetched.
+   *  The variables themselves are nonetheless included in the query result.
    *
    * @return the query builder
    */

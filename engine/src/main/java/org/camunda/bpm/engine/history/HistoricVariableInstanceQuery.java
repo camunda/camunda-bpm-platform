@@ -62,7 +62,7 @@ public interface HistoricVariableInstanceQuery extends Query<HistoricVariableIns
   HistoricVariableInstanceQuery activityInstanceIdIn(String... activityInstanceIds);
 
   /**
-   * Disable fetching of byte array and file values. By default, the query will fetch such values
+   * Disable fetching of byte array and file values. By default, the query will fetch such values.
    * By calling this method you can prevent the values of (potentially large) blob data chunks
    * to be fetched. The variables themselves are nonetheless included in the query result.
    *

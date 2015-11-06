@@ -514,7 +514,6 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     taskService.deleteTask(newTask.getId(), true);
   }
 
-  @Test
   @Deployment(resources= "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
   public void testDisableBinaryFetchingForFileValues() {
     // given
