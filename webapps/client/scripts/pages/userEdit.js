@@ -1,12 +1,22 @@
 /* global define: false */
-define([ 'angular', 'text!./userEdit.html', 'text!./create-group-membership.html' ], function(angular, template, groupTemplate) {
+define([
+  'angular',
+  'text!./userEdit.html',
+  'text!./create-group-membership.html',
+  'text!./generic-confirmation.html'
+], function(
+  angular,
+  template,
+  groupTemplate,
+  confirmationTemplate
+) {
   'use strict';
   return [ '$routeProvider', function($routeProvider) {
     $routeProvider.when('/users/:userId', {
       template: template,
       controller: [
-              '$scope', '$window', '$routeParams', 'UserResource', 'GroupResource', 'GroupMembershipResource', 'Notifications', '$location', '$modal', 'AuthorizationResource', 'authentication',
-      function($scope,   $window,   $routeParams,   UserResource,   GroupResource,   GroupMembershipResource,   Notifications,   $location,   $modal,   AuthorizationResource,   authentication) {
+              '$scope', '$routeParams', 'UserResource', 'GroupResource', 'GroupMembershipResource', 'Notifications', '$location', '$modal', 'AuthorizationResource', 'authentication',
+      function($scope,   $routeParams,   UserResource,   GroupResource,   GroupMembershipResource,   Notifications,   $location,   $modal,   AuthorizationResource,   authentication) {
 
         $scope.encodedUserId = $routeParams.userId
                                                 .replace(/\//g, '%2F')
@@ -118,21 +128,19 @@ define([ 'angular', 'text!./userEdit.html', 'text!./create-group-membership.html
         // delete user form /////////////////////////////
 
         $scope.deleteUser = function() {
-
-          function confirmDelete() {
-            return $window.confirm('Really delete user ' + $scope.user.id + '?');
-          }
-
-          if (!confirmDelete()) {
-            return;
-          }
-
-          UserResource.delete({'userId':$scope.encodedUserId}).$promise.then(
-            function(){
-              Notifications.addMessage({type:'success', status:'Success', message:'User '+$scope.user.id+' successfully deleted.'});
-              $location.path('/users');
-            }
-          );
+          $modal.open({
+            template: confirmationTemplate,
+            controller: ['$scope', function ($dialogScope) {
+              $dialogScope.question = 'Really delete user ' + $scope.user.id + '?';
+            }]
+          }).result.then(function () {
+            UserResource.delete({'userId':$scope.encodedUserId}).$promise.then(
+              function(){
+                Notifications.addMessage({type:'success', status:'Success', message:'User '+$scope.user.id+' successfully deleted.'});
+                $location.path('/users');
+              }
+            );
+          });
         };
 
         // group form /////////////////////////////

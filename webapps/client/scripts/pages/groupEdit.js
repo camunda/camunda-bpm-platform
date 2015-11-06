@@ -1,4 +1,12 @@
-define(['angular', 'text!./groupEdit.html'], function(angular, template) {
+define([
+  'angular',
+  'text!./groupEdit.html',
+  'text!./generic-confirmation.html'
+], function(
+  angular,
+  template,
+  confirmationTemplate
+) {
   'use strict';
 
   var Controller = [
@@ -9,7 +17,7 @@ define(['angular', 'text!./groupEdit.html'], function(angular, template) {
     'AuthorizationResource',
     'Notifications',
     '$location',
-    '$window',
+    '$modal',
   function (
     $scope,
     $routeParams,
@@ -18,7 +26,7 @@ define(['angular', 'text!./groupEdit.html'], function(angular, template) {
     AuthorizationResource,
     Notifications,
     $location,
-    $window
+    $modal
   ) {
 
     $scope.group = null;
@@ -92,25 +100,25 @@ define(['angular', 'text!./groupEdit.html'], function(angular, template) {
     // delete group form /////////////////////////////
 
     $scope.deleteGroup = function() {
-
-      function confirmDelete() {
-        return $window.confirm('Really delete group ' + $scope.group.id + '?');
-      }
-
-      if (!confirmDelete()) {
-        return;
-      }
-
-      GroupResource.delete({'groupId':$scope.encodedGroupId}).$promise.then(
-        function(){
-          Notifications.addMessage({
-            type: 'success',
-            status: 'Success',
-            message: 'Group ' + $scope.group.id + ' successfully deleted.'
-          });
-          $location.path('/groups');
-        }
-      );
+      $modal.open({
+        template: confirmationTemplate,
+        controller: ['$scope', function ($dialogScope) {
+          $dialogScope.question = 'Really delete group ' + $scope.group.id + '?';
+        }]
+      }).result.then(function () {
+        GroupResource.delete({
+          'groupId':$scope.encodedGroupId
+        }).$promise.then(
+          function(){
+            Notifications.addMessage({
+              type: 'success',
+              status: 'Success',
+              message: 'Group ' + $scope.group.id + ' successfully deleted.'
+            });
+            $location.path('/groups');
+          }
+        );
+      });
     };
 
     // page controls ////////////////////////////////////
