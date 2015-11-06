@@ -19,6 +19,7 @@ import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_RE
 
 import org.camunda.bpm.model.cmmn.instance.CaseFileItem;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
+import org.camunda.bpm.model.cmmn.instance.ConditionExpression;
 import org.camunda.bpm.model.cmmn.instance.RepetitionRule;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;

@@ -14,12 +14,6 @@ package org.camunda.bpm.model.cmmn.instance;
 
 import java.util.Collection;
 
-import org.camunda.bpm.model.cmmn.impl.instance.CaseFileModel;
-import org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel;
-import org.camunda.bpm.model.cmmn.impl.instance.CaseRoles;
-import org.camunda.bpm.model.cmmn.impl.instance.InputCaseParameter;
-import org.camunda.bpm.model.cmmn.impl.instance.OutputCaseParameter;
-
 
 /**
  * @author Roman Smirnov

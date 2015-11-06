@@ -18,6 +18,8 @@ import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_TA
 
 import java.util.Collection;
 
+import org.camunda.bpm.model.cmmn.instance.InputsCaseParameter;
+import org.camunda.bpm.model.cmmn.instance.OutputsCaseParameter;
 import org.camunda.bpm.model.cmmn.instance.PlanItemDefinition;
 import org.camunda.bpm.model.cmmn.instance.Task;
 import org.camunda.bpm.model.xml.ModelBuilder;

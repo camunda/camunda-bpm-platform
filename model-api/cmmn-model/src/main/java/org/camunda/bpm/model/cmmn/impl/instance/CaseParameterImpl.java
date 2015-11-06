@@ -16,6 +16,7 @@ import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_BINDING_REF;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_CASE_PARAMETER;
 
+import org.camunda.bpm.model.cmmn.instance.BindingRefinementExpression;
 import org.camunda.bpm.model.cmmn.instance.CaseFileItem;
 import org.camunda.bpm.model.cmmn.instance.CaseParameter;
 import org.camunda.bpm.model.cmmn.instance.Parameter;

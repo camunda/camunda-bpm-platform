@@ -17,6 +17,7 @@ import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_DISCRETIONARY_ITEM;
 
 import org.camunda.bpm.model.cmmn.instance.DiscretionaryItem;
+import org.camunda.bpm.model.cmmn.instance.ItemControl;
 import org.camunda.bpm.model.cmmn.instance.PlanItemDefinition;
 import org.camunda.bpm.model.cmmn.instance.TableItem;
 import org.camunda.bpm.model.xml.ModelBuilder;

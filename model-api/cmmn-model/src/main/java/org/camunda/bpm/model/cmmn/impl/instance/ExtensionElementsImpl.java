@@ -26,7 +26,6 @@ import org.camunda.bpm.model.xml.impl.util.ModelUtil;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
-import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 
 /**
  * @author Roman Smirnov
@@ -43,8 +42,6 @@ public class ExtensionElementsImpl extends CmmnModelElementInstanceImpl implemen
           return new ExtensionElementsImpl(instanceContext);
         }
       });
-
-    SequenceBuilder sequence = typeBuilder.sequence();
 
     typeBuilder.build();
   }

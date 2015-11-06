@@ -20,6 +20,7 @@ import java.util.Collection;
 
 import org.camunda.bpm.model.cmmn.instance.CaseFileItem;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
+import org.camunda.bpm.model.cmmn.instance.ConditionExpression;
 import org.camunda.bpm.model.cmmn.instance.IfPart;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;

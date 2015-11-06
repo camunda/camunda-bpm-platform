@@ -15,8 +15,8 @@ package org.camunda.bpm.model.cmmn;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.Case;
+import org.camunda.bpm.model.cmmn.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.Definitions;
 import org.camunda.bpm.model.cmmn.instance.HumanTask;
 import org.junit.Test;

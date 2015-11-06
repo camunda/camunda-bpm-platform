@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.model.cmmn.instance;
 
-import org.camunda.bpm.model.cmmn.impl.instance.ConditionExpression;
 
 /**
  * @author Roman Smirnov

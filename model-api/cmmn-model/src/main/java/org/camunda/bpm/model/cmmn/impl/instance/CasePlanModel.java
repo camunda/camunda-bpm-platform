@@ -24,14 +24,14 @@ import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
  * @author Roman Smirnov
  *
  */
-public class CasePlanModel extends StageImpl {
+public class CasePlanModel extends StageImpl implements org.camunda.bpm.model.cmmn.instance.CasePlanModel {
 
   public CasePlanModel(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
   }
 
   public static void registerType(ModelBuilder modelBuilder) {
-    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(CasePlanModel.class, CMMN_ELEMENT_CASE_PLAN_MODEL)
+    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(org.camunda.bpm.model.cmmn.instance.CasePlanModel.class, CMMN_ELEMENT_CASE_PLAN_MODEL)
       .namespaceUri(CMMN10_NS)
       .extendsType(Stage.class)
       .instanceProvider(new ModelElementTypeBuilder.ModelTypeInstanceProvider<CasePlanModel>() {

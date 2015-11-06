@@ -20,6 +20,7 @@ import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_PA
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 import org.camunda.bpm.model.cmmn.instance.Parameter;
 import org.camunda.bpm.model.cmmn.instance.ParameterMapping;
+import org.camunda.bpm.model.cmmn.instance.TransformationExpression;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;

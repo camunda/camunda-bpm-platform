@@ -22,6 +22,7 @@ import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_PL
 import java.util.Collection;
 
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
+import org.camunda.bpm.model.cmmn.instance.ItemControl;
 import org.camunda.bpm.model.cmmn.instance.PlanItem;
 import org.camunda.bpm.model.cmmn.instance.PlanItemDefinition;
 import org.camunda.bpm.model.cmmn.instance.Sentry;

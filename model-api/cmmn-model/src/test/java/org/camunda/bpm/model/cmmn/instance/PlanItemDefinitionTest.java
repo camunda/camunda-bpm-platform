@@ -15,7 +15,7 @@ package org.camunda.bpm.model.cmmn.instance;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.camunda.bpm.model.cmmn.impl.instance.DefaultControl;
+import org.camunda.bpm.model.cmmn.impl.instance.DefaultControlImpl;
 
 /**
  * @author Roman Smirnov

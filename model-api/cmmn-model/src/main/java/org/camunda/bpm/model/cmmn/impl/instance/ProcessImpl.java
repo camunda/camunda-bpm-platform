@@ -20,6 +20,8 @@ import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_PR
 import java.util.Collection;
 
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
+import org.camunda.bpm.model.cmmn.instance.InputProcessParameter;
+import org.camunda.bpm.model.cmmn.instance.OutputProcessParameter;
 import org.camunda.bpm.model.cmmn.instance.Process;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;

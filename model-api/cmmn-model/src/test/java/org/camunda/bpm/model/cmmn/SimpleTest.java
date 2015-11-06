@@ -16,8 +16,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collection;
 
-import org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.Case;
+import org.camunda.bpm.model.cmmn.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.HumanTask;
 import org.camunda.bpm.model.cmmn.instance.PlanItem;
 import org.camunda.bpm.model.cmmn.instance.PlanItemDefinition;
@@ -40,7 +40,7 @@ public class SimpleTest extends CmmnModelTest {
 
     Collection<Case> caseElements = cmmnModelInstance.getDefinitions().getCases();
     assertThat(caseElements).hasSize(1);
-    Case caseElement = (Case) caseElements.iterator().next();
+    Case caseElement = caseElements.iterator().next();
 
     assertThat(caseElement.getId()).isEqualTo("Case_1");
     assertThat(caseElement.getName()).isNull();

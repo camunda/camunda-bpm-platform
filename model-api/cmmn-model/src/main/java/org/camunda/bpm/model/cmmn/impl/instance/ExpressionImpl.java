@@ -16,6 +16,7 @@ import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_LANGUAGE;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_EXPRESSION;
 
+import org.camunda.bpm.model.cmmn.instance.Body;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 import org.camunda.bpm.model.cmmn.instance.Expression;
 import org.camunda.bpm.model.xml.ModelBuilder;

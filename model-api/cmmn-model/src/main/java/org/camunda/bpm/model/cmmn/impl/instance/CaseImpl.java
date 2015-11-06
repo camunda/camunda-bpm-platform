@@ -19,7 +19,12 @@ import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_CA
 import java.util.Collection;
 
 import org.camunda.bpm.model.cmmn.instance.Case;
+import org.camunda.bpm.model.cmmn.instance.CaseFileModel;
+import org.camunda.bpm.model.cmmn.instance.CasePlanModel;
+import org.camunda.bpm.model.cmmn.instance.CaseRoles;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
+import org.camunda.bpm.model.cmmn.instance.InputCaseParameter;
+import org.camunda.bpm.model.cmmn.instance.OutputCaseParameter;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
@@ -80,7 +85,7 @@ public class CaseImpl extends CmmnElementImpl implements Case {
   }
 
   public void setCaseFileModel(CaseFileModel caseFileModel) {
-    caseFileModelChild.setChild(this, (CaseFileModel) caseFileModel);
+    caseFileModelChild.setChild(this, caseFileModel);
   }
 
   public static void registerType(ModelBuilder modelBuilder) {
