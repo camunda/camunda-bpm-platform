@@ -65,7 +65,7 @@ module.exports = Page.extend({
 
   deleteUser: function() {
     this.deleteUserButton().click();
-    this.deleteUserAlert().accept();
+    element(by.css('.modal-footer [ng-click="$close()"]')).click();
     browser.sleep(100);
   }
 

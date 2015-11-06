@@ -38,7 +38,7 @@ module.exports = Page.extend({
 
   deleteGroup: function() {
     this.deleteGroupButton().click();
-    this.deleteGroupAlert().accept();
+    element(by.css('.modal-footer [ng-click="$close()"]')).click();
   }
 
 });

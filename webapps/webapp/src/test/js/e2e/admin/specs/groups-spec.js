@@ -144,8 +144,7 @@ describe('Admin Groups Spec', function() {
     it('should delete group', function() {
 
       // when
-      groupsPage.editGroup.deleteGroupButton().click();
-      groupsPage.editGroup.deleteGroupAlert().accept();
+      groupsPage.editGroup.deleteGroup();
 
       // then
       expect(groupsPage.groupList().count()).to.eventually.eql(3);
