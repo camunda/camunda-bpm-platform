@@ -16,12 +16,16 @@ import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
@@ -107,6 +111,42 @@ public abstract class AbstractHistoricProcessInstanceRestServiceInteractionTest 
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
       .body("message", equalTo("Historic process instance with id aNonExistingInstanceId does not exist"))
       .when().get(HISTORIC_SINGLE_PROCESS_INSTANCE_URL);
+  }
+  
+  @Test
+  public void testDeleteProcessInstance() {
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().delete(HISTORIC_SINGLE_PROCESS_INSTANCE_URL);
+
+    verify(historyServiceMock).deleteHistoricProcessInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+  }
+
+  @Test
+  public void testDeleteNonExistingProcessInstance() {
+    doThrow(new ProcessEngineException("expected exception")).when(historyServiceMock).deleteHistoricProcessInstance(anyString());
+
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
+      .then().expect().statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Historic process instance with id " + MockProvider.EXAMPLE_PROCESS_INSTANCE_ID + " does not exist"))
+      .when().delete(HISTORIC_SINGLE_PROCESS_INSTANCE_URL);
+  }
+
+  @Test
+  public void testDeleteProcessInstanceThrowsAuthorizationException() {
+    String message = "expected exception";
+    doThrow(new AuthorizationException(message)).when(historyServiceMock).deleteHistoricProcessInstance(anyString());
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
+    .then().expect()
+      .statusCode(Status.FORBIDDEN.getStatusCode())
+      .contentType(ContentType.JSON)
+      .body("type", equalTo(AuthorizationException.class.getSimpleName()))
+      .body("message", equalTo(message))
+    .when()
+      .delete(HISTORIC_SINGLE_PROCESS_INSTANCE_URL);
   }
 
 }

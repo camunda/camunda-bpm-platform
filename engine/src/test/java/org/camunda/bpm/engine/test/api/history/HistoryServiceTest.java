@@ -24,9 +24,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -475,5 +479,50 @@ public class HistoryServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(4, historyService.createHistoricProcessInstanceQuery().variableValueEquals("var", Variables.numberValue((short) 123)).count());
 
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().variableValueEquals("var", Variables.numberValue(null)).count());
+  }
+  
+  @Deployment(resources={
+  "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testDeleteProcessInstance() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
+    
+    runtimeService.deleteProcessInstance(processInstance.getId(), null);
+    assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
+
+    historyService.deleteHistoricProcessInstance(processInstance.getId());
+    assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
+  }
+  
+  @Deployment(resources={
+  "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testDeleteRunningProcessInstance() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
+    try {
+      historyService.deleteHistoricProcessInstance(processInstance.getId());
+      fail("ProcessEngineException expected");
+    } catch (ProcessEngineException ae) {
+      assertTextPresent("Process instance is still running, cannot delete historic process instance", ae.getMessage());
+    }
+  }
+  
+  public void testDeleteProcessInstanceUnexistingId() {
+    try {
+      historyService.deleteHistoricProcessInstance("enexistingInstanceId");
+      fail("ProcessEngineException expected");
+    } catch (ProcessEngineException ae) {
+      assertTextPresent("No historic process instance found with id", ae.getMessage());
+    }
+  }
+
+  public void testDeleteProcessInstanceNullId() {
+    try {
+      historyService.deleteHistoricProcessInstance(null);
+      fail("ProcessEngineException expected");
+    } catch (ProcessEngineException ae) {
+      assertTextPresent("processInstanceId is null", ae.getMessage());
+    }
   }
 }
