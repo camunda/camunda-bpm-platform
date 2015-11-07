@@ -12,8 +12,11 @@
  */
 package org.camunda.bpm.engine.rest.sub.history.impl;
 
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -41,6 +44,18 @@ public class HistoricProcessInstanceResourceImpl implements HistoricProcessInsta
     }
 
     return HistoricProcessInstanceDto.fromHistoricProcessInstance(instance);
+  }
+
+  @Override
+  public void deleteHistoricProcessInstance() {
+    HistoryService historyService = engine.getHistoryService();
+    try {
+      historyService.deleteHistoricProcessInstance(processInstanceId);
+    } catch (AuthorizationException e) {
+      throw e;
+    } catch (ProcessEngineException e) {
+      throw new InvalidRequestException(Status.NOT_FOUND, e, "Historic process instance with id " + processInstanceId + " does not exist");
+    }
   }
 
 }

@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest.sub.history;
 
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -23,5 +24,8 @@ public interface HistoricProcessInstanceResource {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   HistoricProcessInstanceDto getHistoricProcessInstance();
+  
+  @DELETE
+  void deleteHistoricProcessInstance();
 
 }
