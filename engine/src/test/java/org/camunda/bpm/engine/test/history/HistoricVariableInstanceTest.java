@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.history;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -38,7 +39,10 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.api.runtime.util.CustomSerializable;
 import org.camunda.bpm.engine.test.api.runtime.util.FailingSerializable;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
+import org.junit.Test;
 
 
 /**
@@ -510,6 +514,51 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     taskService.deleteTask(newTask.getId(), true);
   }
 
+  @Deployment(resources= "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
+  public void testDisableBinaryFetchingForFileValues() {
+    // given
+    String fileName = "text.txt";
+    String encoding = "crazy-encoding";
+    String mimeType = "martini/dry";
+
+    FileValue fileValue = Variables
+        .fileValue(fileName)
+        .file("ABC".getBytes())
+        .encoding(encoding)
+        .mimeType(mimeType)
+        .create();
+
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables().putValueTyped("fileVar", fileValue));
+
+    // when enabling binary fetching
+    HistoricVariableInstance fileVariableInstance =
+        historyService.createHistoricVariableInstanceQuery().singleResult();
+
+    // then the binary value is accessible
+    assertNotNull(fileVariableInstance.getValue());
+
+    // when disabling binary fetching
+    fileVariableInstance =
+        historyService.createHistoricVariableInstanceQuery().disableBinaryFetching().singleResult();
+
+    // then the byte value is not fetched
+    assertNotNull(fileVariableInstance);
+    assertEquals("fileVar", fileVariableInstance.getName());
+
+    assertNull(fileVariableInstance.getValue());
+
+    FileValue typedValue = (FileValue) fileVariableInstance.getTypedValue();
+    assertNull(typedValue.getValue());
+
+    // but typed value metadata is accessible
+    assertEquals(ValueType.FILE, typedValue.getType());
+    assertEquals(fileName, typedValue.getFilename());
+    assertEquals(encoding, typedValue.getEncoding());
+    assertEquals(mimeType, typedValue.getMimeType());
+
+  }
+
   public void testDisableCustomObjectDeserialization() {
     // given
     Task newTask = taskService.newTask();
@@ -646,7 +695,7 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
    */
   @Deployment
   @SuppressWarnings("unchecked")
-  public void FAILING_testImplicitVariableObjectValueUpdate() {
+  public void testImplicitVariableUpdate() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("serviceTaskProcess",
         Variables.createVariables()
           .putValue("listVar", new ArrayList<String>())
@@ -665,6 +714,226 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     assertNotNull(historicList);
     assertEquals(1, historicList.size());
     assertEquals(UpdateValueDelegate.NEW_ELEMENT, historicList.get(0));
+
+    if (isFullHistoryEnabled()) {
+      List<HistoricDetail> historicDetails = historyService
+          .createHistoricDetailQuery()
+          .variableUpdates()
+          .variableInstanceId(historicVariableInstance.getId())
+          .orderPartiallyByOccurrence().asc()
+          .list();
+
+      assertEquals(2, historicDetails.size());
+
+      HistoricVariableUpdate update1 = (HistoricVariableUpdate) historicDetails.get(0);
+      HistoricVariableUpdate update2 = (HistoricVariableUpdate) historicDetails.get(1);
+
+      List<String> value1 = (List<String>) update1.getValue();
+
+      assertNotNull(value1);
+      assertTrue(value1.isEmpty());
+
+      List<String> value2 = (List<String>) update2.getValue();
+
+      assertNotNull(value2);
+      assertEquals(1, value2.size());
+      assertEquals(UpdateValueDelegate.NEW_ELEMENT, value2.get(0));
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricVariableInstanceTest.testImplicitVariableUpdate.bpmn20.xml")
+  public void FAILING_testImplicitVariableUpdateActivityInstanceId() {
+    // given
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("serviceTaskProcess",
+        Variables.createVariables()
+          .putValue("listVar", new ArrayList<String>())
+          .putValue("delegate", new UpdateValueDelegate()));
+
+    HistoricActivityInstance historicServiceTask = historyService
+        .createHistoricActivityInstanceQuery()
+        .activityId("task")
+        .singleResult();
+
+    List<String> list = (List<String>) runtimeService.getVariable(instance.getId(), "listVar");
+    assertNotNull(list);
+    assertEquals(1, list.size());
+    assertEquals(UpdateValueDelegate.NEW_ELEMENT, list.get(0));
+
+    // when
+    HistoricVariableInstance historicVariableInstance = historyService
+        .createHistoricVariableInstanceQuery()
+        .variableName("listVar").singleResult();
+
+    // then
+    assertEquals(historicServiceTask.getId(), historicVariableInstance.getActivityInstanceId());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricVariableInstanceTest.testImplicitVariableUpdate.bpmn20.xml")
+  public void FAILING_testImplicitVariableUpdateAndReplacementInOneTransaction() {
+    // given
+    runtimeService.startProcessInstanceByKey("serviceTaskProcess",
+        Variables.createVariables()
+          .putValue("listVar", new ArrayList<String>())
+          .putValue("delegate", new UpdateAndReplaceValueDelegate()));
+
+    HistoricVariableInstance historicVariableInstance = historyService
+        .createHistoricVariableInstanceQuery()
+        .variableName("listVar").singleResult();
+
+    List<String> historicList = (List<String>) historicVariableInstance.getValue();
+    assertNotNull(historicList);
+    assertEquals(0, historicList.size());
+
+    if (isFullHistoryEnabled()) {
+      List<HistoricDetail> historicDetails = historyService
+          .createHistoricDetailQuery()
+          .variableUpdates()
+          .variableInstanceId(historicVariableInstance.getId())
+          .orderPartiallyByOccurrence().asc()
+          .list();
+
+      assertEquals(3, historicDetails.size());
+
+      HistoricVariableUpdate update1 = (HistoricVariableUpdate) historicDetails.get(0);
+      HistoricVariableUpdate update2 = (HistoricVariableUpdate) historicDetails.get(1);
+      HistoricVariableUpdate update3 = (HistoricVariableUpdate) historicDetails.get(2);
+
+      List<String> value1 = (List<String>) update1.getValue();
+
+      assertNotNull(value1);
+      assertTrue(value1.isEmpty());
+
+      List<String> value2 = (List<String>) update2.getValue();
+
+      assertNotNull(value2);
+      assertEquals(1, value2.size());
+      assertEquals(UpdateValueDelegate.NEW_ELEMENT, value2.get(0));
+
+      List<String> value3 = (List<String>) update3.getValue();
+
+      assertNotNull(value3);
+      assertTrue(value3.isEmpty());
+    }
+  }
+
+  @Deployment
+  public void testNoImplicitUpdateOnHistoricValues() {
+    //given
+    runtimeService.startProcessInstanceByKey("serviceTaskProcess",
+        Variables.createVariables()
+          .putValue("listVar", new ArrayList<String>())
+          .putValue("delegate", new UpdateHistoricValueDelegate()));
+
+    // a task before the delegate ensures that the variables have actually been persisted
+    // and can be fetched by querying
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId());
+
+    // then
+    HistoricVariableInstance historicVariableInstance = historyService
+        .createHistoricVariableInstanceQuery()
+        .variableName("listVar").singleResult();
+
+    List<String> historicList = (List<String>) historicVariableInstance.getValue();
+    assertNotNull(historicList);
+    assertEquals(0, historicList.size());
+
+    if (isFullHistoryEnabled()) {
+      assertEquals(2, historyService.createHistoricDetailQuery().count());
+
+      List<HistoricDetail> historicDetails = historyService
+          .createHistoricDetailQuery()
+          .variableUpdates()
+          .variableInstanceId(historicVariableInstance.getId())
+          .list();
+
+      assertEquals(1, historicDetails.size());
+
+      HistoricVariableUpdate update1 = (HistoricVariableUpdate) historicDetails.get(0);
+
+      List<String> value1 = (List<String>) update1.getValue();
+
+      assertNotNull(value1);
+      assertTrue(value1.isEmpty());
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricVariableInstanceTest.testImplicitVariableUpdate.bpmn20.xml")
+  public void testImplicitVariableRemoveAndUpdateInOneTransaction() {
+    // given
+    runtimeService.startProcessInstanceByKey("serviceTaskProcess",
+        Variables.createVariables()
+          .putValue("listVar", new ArrayList<String>())
+          .putValue("delegate", new RemoveAndUpdateValueDelegate()));
+
+    if (isFullHistoryEnabled()) {
+      List<HistoricDetail> historicDetails = historyService
+          .createHistoricDetailQuery()
+          .variableUpdates()
+          .orderPartiallyByOccurrence().asc()
+          .list();
+
+      Iterator<HistoricDetail> detailsIt = historicDetails.iterator();
+      while(detailsIt.hasNext()) {
+        if (!"listVar".equals(((HistoricVariableUpdate) detailsIt.next()).getVariableName())) {
+          detailsIt.remove();
+        }
+      }
+
+      // one for creation, one for deletion, none for update
+      assertEquals(2, historicDetails.size());
+
+      HistoricVariableUpdate update1 = (HistoricVariableUpdate) historicDetails.get(0);
+
+      List<String> value1 = (List<String>) update1.getValue();
+
+      assertNotNull(value1);
+      assertTrue(value1.isEmpty());
+
+      HistoricVariableUpdate update2 = (HistoricVariableUpdate) historicDetails.get(1);
+      assertNull(update2.getValue());
+    }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/history/HistoricVariableInstanceTest.testNoImplicitUpdateOnHistoricValues.bpmn20.xml")
+  public void testNoImplicitUpdateOnHistoricDetailValues() {
+    if (!isFullHistoryEnabled()) {
+      return;
+    }
+
+    // given
+    runtimeService.startProcessInstanceByKey("serviceTaskProcess",
+        Variables.createVariables()
+          .putValue("listVar", new ArrayList<String>())
+          .putValue("delegate", new UpdateHistoricDetailValueDelegate()));
+
+    // a task before the delegate ensures that the variables have actually been persisted
+    // and can be fetched by querying
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId());
+
+    // then
+    HistoricVariableInstance historicVariableInstance = historyService
+        .createHistoricVariableInstanceQuery()
+        .variableName("listVar").singleResult();
+
+    // One for "listvar", one for "delegate"
+    assertEquals(2, historyService.createHistoricDetailQuery().count());
+
+    List<HistoricDetail> historicDetails = historyService
+        .createHistoricDetailQuery()
+        .variableUpdates()
+        .variableInstanceId(historicVariableInstance.getId())
+        .list();
+
+    assertEquals(1, historicDetails.size());
+
+    HistoricVariableUpdate update1 = (HistoricVariableUpdate) historicDetails.get(0);
+
+    List<String> value1 = (List<String>) update1.getValue();
+
+    assertNotNull(value1);
+    assertTrue(value1.isEmpty());
   }
 
   protected boolean isFullHistoryEnabled() {

@@ -55,10 +55,6 @@
           DEPLOYMENT_ID_ = #{parameter.deploymentId}
     <if test="parameter.resourceNames != null">
     and
-          <if test="parameter.resourceNames.length == 1">
-          NAME_ = #{parameter.resourceNames[0]}
-          </if>
-          <if test="parameter.resourceNames.length > 1">
           NAME_ in
             <foreach item="resourceName"
                       collection="parameter.resourceNames"
@@ -67,7 +63,6 @@
                       close=")">
               #{resourceName}
             </foreach>
-          </if>
     </if>
   </select>
 
@@ -91,10 +86,6 @@
           DEPLOYMENT_ID_ = #{parameter.deploymentId}
     <if test="parameter.resourceIds != null">
     and
-          <if test="parameter.resourceIds.length == 1">
-          ID_ = #{parameter.resourceIds[0]}
-          </if>
-          <if test="parameter.resourceIds.length > 1">
           ID_ in
             <foreach item="resourceId"
                       collection="parameter.resourceIds"
@@ -103,7 +94,6 @@
                       close=")">
               #{resourceId}
             </foreach>
-          </if>
     </if>
   </select>
 
@@ -116,6 +106,8 @@
   </select>
   
   <sql id="resourcesFromLastDeploymentWithName">
+    <bind name="processApplicationSource" value="'process application'"/>
+
     select B.*
     from ${prefix}ACT_GE_BYTEARRAY B
     inner join
@@ -125,11 +117,11 @@
         on B.DEPLOYMENT_ID_ = D.ID_
       where D.NAME_ = #{parameter.deploymentName}
         and
-        <if test="parameter.source != null">
-          (D.SOURCE_ = #{parameter.source} or
+        <if test="processApplicationSource.equals(parameter.source)">
+          (D.SOURCE_ is null or
         </if>
-          D.SOURCE_ is null
-        <if test="parameter.source != null">
+          D.SOURCE_ = #{parameter.source}
+        <if test="processApplicationSource.equals(parameter.source)">
           )
         </if>
       <if test="parameter.resourcesToFind != null &amp;&amp; parameter.resourcesToFind.size > 0">
@@ -147,11 +139,11 @@
     and D.DEPLOY_TIME_ = LAST_RESOURCE.DEPLOY_TIME_ 
     and D.NAME_ = #{parameter.deploymentName}
     and
-    <if test="parameter.source != null">
-      (D.SOURCE_ = #{parameter.source} or
+    <if test="processApplicationSource.equals(parameter.source)">
+      (D.SOURCE_ is null or
     </if>
-      D.SOURCE_ is null
-    <if test="parameter.source != null">
+      D.SOURCE_ = #{parameter.source}
+    <if test="processApplicationSource.equals(parameter.source)">
       )
     </if>
   </sql>

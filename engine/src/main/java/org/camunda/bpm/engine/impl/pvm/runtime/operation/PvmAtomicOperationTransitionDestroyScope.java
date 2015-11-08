@@ -45,28 +45,29 @@ public class PvmAtomicOperationTransitionDestroyScope implements PvmAtomicOperat
   public void execute(PvmExecutionImpl execution) {
 
     // calculate the propagating execution
-    PvmExecutionImpl propagatingExecution = null;
+    PvmExecutionImpl propagatingExecution = execution;
 
     PvmActivity activity = execution.getActivity();
     List<PvmTransition> transitionsToTake = execution.getTransitionsToTake();
     execution.setTransitionsToTake(null);
 
     // check whether the current scope needs to be destroyed
-    if (activity.isScope()) {
+    if (execution.isScope() && activity.isScope()) {
 
-      if (execution.isConcurrent()) {
-        // legacy behavior
-        LegacyBehavior.destroyConcurrentScope(execution);
-        propagatingExecution = execution;
-      }
-      else {
-        propagatingExecution = execution.getParent();
-        propagatingExecution.setActivity(execution.getActivity());
-        propagatingExecution.setTransition(execution.getTransition());
-        propagatingExecution.setActive(true);
-        log.fine("destroy scope: scoped "+execution+" continues as parent scope "+propagatingExecution);
-        execution.destroy();
-        execution.remove();
+      if (!LegacyBehavior.destroySecondNonScope(execution)) {
+        if (execution.isConcurrent()) {
+          // legacy behavior
+          LegacyBehavior.destroyConcurrentScope(execution);
+        }
+        else {
+          propagatingExecution = execution.getParent();
+          propagatingExecution.setActivity(execution.getActivity());
+          propagatingExecution.setTransition(execution.getTransition());
+          propagatingExecution.setActive(true);
+          log.fine("destroy scope: scoped "+execution+" continues as parent scope "+propagatingExecution);
+          execution.destroy();
+          execution.remove();
+        }
       }
 
     } else {

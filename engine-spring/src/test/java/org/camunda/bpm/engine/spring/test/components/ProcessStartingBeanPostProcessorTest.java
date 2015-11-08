@@ -26,15 +26,15 @@ public class ProcessStartingBeanPostProcessorTest {
 
 	private Logger log = Logger.getLogger(getClass().getName());
 
-	@Autowired 
+	@Autowired
 	private ProcessEngine processEngine;
-	
-	@Autowired 
+
+	@Autowired
 	private ProcessInitiatingPojo processInitiatingPojo;
-	
+
 	@Autowired
 	private RepositoryService repositoryService;
-	
+
 	@Before
 	public void before() {
 	  repositoryService.createDeployment()
@@ -42,13 +42,16 @@ public class ProcessStartingBeanPostProcessorTest {
 	    .addClasspathResource("org/camunda/bpm/engine/spring/test/components/waiter.bpmn20.xml")
 	    .deploy();
 	}
-	
+
 	@After
   public void after() {
     for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
     processEngine.close();
+    processEngine = null;
+    processInitiatingPojo = null;
+    repositoryService = null;
   }
 
 	@Test

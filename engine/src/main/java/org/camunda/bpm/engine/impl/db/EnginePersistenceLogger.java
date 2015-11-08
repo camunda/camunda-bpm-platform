@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.impl.db.entitymanager.cache.DbEntityState;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.util.ClassNameUtil;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 
 /**
@@ -506,5 +507,21 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
           "Executing Schmema DDL {}",
           buildStringFromList(logLines));
     }
+  }
+
+  public ProcessEngineException collectResultValueOfUnsupportedTypeException(TypedValue collectResultValue) {
+    return new ProcessEngineException(exceptionMessage(
+        "063",
+        "The collect result value '{}' of the decision table result is not of type integer, long or double.",
+        collectResultValue
+        ));
+  }
+
+  public ProcessEngineException updateTransientVariableException(String variableName) {
+    return new ProcessEngineException(exceptionMessage(
+        "064",
+        "The variable with name '{}' can not be updated because it is transient and read-only.",
+        variableName
+        ));
   }
 }

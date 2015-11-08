@@ -33,18 +33,18 @@ public class ExternalTaskQueryAuthorizationTest extends AuthorizationTest {
   protected String instance2Id;
 
   protected void setUp() throws Exception {
-    super.setUp();
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml").getId();
 
     instance1Id = startProcessInstanceByKey("oneExternalTaskProcess").getId();
     instance2Id = startProcessInstanceByKey("twoExternalTaskProcess").getId();
+    super.setUp();
   }
 
   public void tearDown() {
-    deleteDeployment(deploymentId);
     super.tearDown();
+    deleteDeployment(deploymentId);
   }
 
   public void testQueryWithoutAuthorization() {

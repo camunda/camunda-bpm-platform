@@ -18,6 +18,7 @@ import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.history.UserOperationLogQuery;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.util.CompareUtil;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
@@ -28,6 +29,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQuery, UserOperationLogEntry> implements UserOperationLogQuery {
 
   private static final long serialVersionUID = 1L;
+  protected String deploymentId;
   protected String processDefinitionId;
   protected String processDefinitionKey;
   protected String processInstanceId;
@@ -51,6 +53,12 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
 
   public UserOperationLogQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
+  }
+
+  public UserOperationLogQuery deploymentId(String deploymentId) {
+    ensureNotNull("deploymentId", deploymentId);
+    this.deploymentId = deploymentId;
+    return this;
   }
 
   public UserOperationLogQuery processDefinitionId(String processDefinitionId) {
@@ -170,5 +178,10 @@ public class UserOperationLogQueryImpl extends AbstractQuery<UserOperationLogQue
     return commandContext
         .getOperationLogManager()
         .findOperationLogEntriesByQueryCriteria(this, page);
+  }
+
+  @Override
+  protected boolean hasExcludingConditions() {
+    return super.hasExcludingConditions() || CompareUtil.areNotInAscendingOrder(timestampAfter, timestampBefore);
   }
 }

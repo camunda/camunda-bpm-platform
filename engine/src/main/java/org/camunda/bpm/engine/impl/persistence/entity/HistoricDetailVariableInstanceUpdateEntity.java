@@ -37,7 +37,7 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariable
   private static final long serialVersionUID = 1L;
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
-  protected TypedValueField typedValueField = new TypedValueField(this);
+  protected TypedValueField typedValueField = new TypedValueField(this, false);
 
   protected ByteArrayField byteArrayField = new ByteArrayField(this);
 
@@ -78,10 +78,6 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariable
     byteArrayField.setByteArrayId(id);
   }
 
-  public String getByteArrayValueId() {
-    return byteArrayField.getByteArrayId();
-  }
-
   @Override
   public String getSerializerName() {
     return typedValueField.getSerializerName();
@@ -91,7 +87,11 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariable
     typedValueField.setSerializerName(serializerName);
   }
 
-  public ByteArrayEntity getByteArrayValue() {
+  public String getByteArrayValueId() {
+    return byteArrayField.getByteArrayId();
+  }
+
+  public byte[] getByteArrayValue() {
     return byteArrayField.getByteArrayValue();
   }
 

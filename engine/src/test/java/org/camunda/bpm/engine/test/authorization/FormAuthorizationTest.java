@@ -44,16 +44,16 @@ public class FormAuthorizationTest extends AuthorizationTest {
   protected String deploymentId;
 
   public void setUp() throws Exception {
-    super.setUp();
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/authorization/formKeyProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/authorization/renderedFormProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/authorization/oneTaskCase.cmmn").getId();
+    super.setUp();
   }
 
   public void tearDown() {
-    deleteDeployment(deploymentId);
     super.tearDown();
+    deleteDeployment(deploymentId);
   }
 
   // get start form data ///////////////////////////////////////////

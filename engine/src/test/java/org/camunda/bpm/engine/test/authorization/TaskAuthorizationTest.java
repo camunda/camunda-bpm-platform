@@ -29,7 +29,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.TaskServiceImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
@@ -38,6 +40,7 @@ import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
+import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
@@ -56,18 +59,18 @@ public class TaskAuthorizationTest extends AuthorizationTest {
   protected String deploymentId;
 
   public void setUp() throws Exception {
-    super.setUp();
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/authorization/oneTaskCase.cmmn",
         "org/camunda/bpm/engine/test/authorization/oneTaskProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/authorization/candidateUsersProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/authorization/candidateGroupsProcess.bpmn20.xml").getId();
+    super.setUp();
   }
 
   public void tearDown() {
-    deleteDeployment(deploymentId);
     super.tearDown();
+    deleteDeployment(deploymentId);
   }
 
   // task query ///////////////////////////////////////////////////////
@@ -8582,6 +8585,141 @@ public class TaskAuthorizationTest extends AuthorizationTest {
     disableAuthorization();
     verifyQueryResults(query, 0);
     enableAuthorization();
+  }
+
+  public void testStandaloneTaskSaveWithGenericResourceIdOwner() {
+    createGrantAuthorization(TASK, ANY, userId, CREATE);
+
+    Task task = taskService.newTask();
+    task.setOwner("*");
+
+    try {
+      taskService.saveTask(task);
+      fail("it should not be possible to save a task with the generic resource id *");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Cannot create default authorization for owner *: "
+          + "id cannot be *. * is a reserved identifier", e.getMessage());
+    }
+  }
+
+  public void testStandaloneTaskSaveWithGenericResourceIdOwnerTaskServiceApi() {
+    createGrantAuthorization(TASK, ANY, userId, CREATE, UPDATE);
+
+    Task task = taskService.newTask();
+    taskService.saveTask(task);
+
+    try {
+      taskService.setOwner(task.getId(), "*");
+      fail("exception expected");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Cannot create default authorization for owner *: "
+          + "id cannot be *. * is a reserved identifier", e.getMessage());
+    }
+
+    deleteTask(task.getId(), true);
+  }
+
+  public void testStandaloneTaskSaveWithGenericResourceIdAssignee() {
+    createGrantAuthorization(TASK, ANY, userId, CREATE);
+
+    Task task = taskService.newTask();
+    task.setAssignee("*");
+
+    try {
+      taskService.saveTask(task);
+      fail("it should not be possible to save a task with the generic resource id *");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Cannot create default authorization for assignee *: "
+          + "id cannot be *. * is a reserved identifier", e.getMessage());
+    }
+  }
+
+  public void testStandaloneTaskSaveWithGenericResourceIdAssigneeTaskServiceApi() {
+    createGrantAuthorization(TASK, ANY, userId, CREATE, UPDATE);
+
+    Task task = taskService.newTask();
+    taskService.saveTask(task);
+
+    try {
+      taskService.setAssignee(task.getId(), "*");
+      fail("exception expected");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Cannot create default authorization for assignee *: "
+          + "id cannot be *. * is a reserved identifier", e.getMessage());
+    }
+
+    deleteTask(task.getId(), true);
+  }
+
+  public void testStandaloneTaskSaveIdentityLinkWithGenericUserId() {
+    createGrantAuthorization(TASK, ANY, userId, CREATE, UPDATE);
+
+    Task task = taskService.newTask();
+    taskService.saveTask(task);
+
+    try {
+      taskService.addUserIdentityLink(task.getId(), "*", "someLink");
+      fail("exception expected");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Cannot grant default authorization for identity link to user *: "
+          + "id cannot be *. * is a reserved identifier.", e.getMessage());
+    }
+
+    deleteTask(task.getId(), true);
+  }
+
+  public void testStandaloneTaskSaveIdentityLinkWithGenericGroupId() {
+    createGrantAuthorization(TASK, ANY, userId, CREATE, UPDATE);
+
+    Task task = taskService.newTask();
+    taskService.saveTask(task);
+
+    try {
+      taskService.addGroupIdentityLink(task.getId(), "*", "someLink");
+      fail("exception expected");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Cannot grant default authorization for identity link to group *: "
+          + "id cannot be *. * is a reserved identifier.", e.getMessage());
+    }
+
+    deleteTask(task.getId(), true);
+  }
+
+  public void testStandaloneTaskSaveIdentityLinkWithGenericTaskId() {
+    createGrantAuthorization(TASK, ANY, userId, CREATE, UPDATE);
+
+    Task task = taskService.newTask();
+    taskService.saveTask(task);
+
+    try {
+      taskService.addUserIdentityLink("*", "aUserId", "someLink");
+      fail("exception expected");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Cannot find task with id *", e.getMessage());
+    }
+
+    try {
+      taskService.addGroupIdentityLink("*", "aGroupId", "someLink");
+      fail("exception expected");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Cannot find task with id *", e.getMessage());
+    }
+
+    deleteTask(task.getId(), true);
+  }
+
+  @Deployment
+  public void testSetGenericResourceIdAssignee() {
+    createGrantAuthorization(Resources.PROCESS_DEFINITION, Authorization.ANY, userId, CREATE_INSTANCE);
+    createGrantAuthorization(Resources.PROCESS_INSTANCE, Authorization.ANY, userId, CREATE);
+
+    try {
+      runtimeService.startProcessInstanceByKey("genericResourceIdAssignmentProcess");
+      fail("exception expected");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Cannot create default authorization for assignee *: "
+          + "id cannot be *. * is a reserved identifier.", e.getMessage());
+    }
   }
 
   // helper ////////////////////////////////////////////////////////////////////////////////

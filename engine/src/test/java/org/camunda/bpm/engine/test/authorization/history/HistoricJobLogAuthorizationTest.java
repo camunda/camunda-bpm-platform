@@ -44,14 +44,15 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
   protected String deploymentId;
 
   public void setUp() throws Exception {
-    super.setUp();
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/authorization/timerStartEventProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/authorization/timerBoundaryEventProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/authorization/oneIncidentProcess.bpmn20.xml").getId();
+    super.setUp();
   }
 
   public void tearDown() {
+    super.tearDown();
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Object>() {
       public Object execute(CommandContext commandContext) {
@@ -60,7 +61,6 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
       }
     });
     deleteDeployment(deploymentId);
-    super.tearDown();
   }
 
   // historic job log query (start timer job) ////////////////////////////////
@@ -224,9 +224,6 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
     String jobId = managementService.createJobQuery().singleResult().getId();
     managementService.deleteJob(jobId);
     enableAuthorization();
-
-    // clean operation log
-    clearOpLog();
   }
 
   // delete deployment (cascade = false)
@@ -284,9 +281,6 @@ public class HistoricJobLogAuthorizationTest extends AuthorizationTest {
     String jobId = managementService.createJobQuery().singleResult().getId();
     managementService.deleteJob(jobId);
     enableAuthorization();
-
-    // clean operation log
-    clearOpLog();
   }
 
   // get historic job log exception stacktrace /////////////////////

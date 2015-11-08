@@ -73,9 +73,6 @@ public class HistoricProcessInstanceManager extends AbstractHistoricManager {
       getHistoricTaskInstanceManager()
         .deleteHistoricTaskInstancesByProcessInstanceId(historicProcessInstanceId);
 
-      getUserOperationLogManager()
-        .deleteOperationLogEntriesByProcessInstanceId(historicProcessInstanceId);
-
       getHistoricIncidentManager()
         .deleteHistoricIncidentsByProcessInstanceId(historicProcessInstanceId);
 

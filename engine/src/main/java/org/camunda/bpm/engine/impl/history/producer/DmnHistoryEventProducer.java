@@ -19,9 +19,9 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 
 /**
- * <p>The producer for DMN history events. The history event producer is
- * responsible for extracting data from the dmn engine
- * and adding the data to a {@link HistoryEvent}.
+ * The producer for DMN history events. The history event producer is
+ * responsible for extracting data from the dmn engine and adding the data to a
+ * {@link HistoryEvent}.
  *
  * @author Philipp Ossler
  *
@@ -29,13 +29,32 @@ import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 public interface DmnHistoryEventProducer {
 
   /**
-   * Creates the history event fired when a decision is evaluated.
+   * Creates the history event fired when a decision is evaluated while execute
+   * a process instance.
    *
-   * @param execution the current execution
-   * @param decisionTable the evaluated decision table
-   * @param decisionTableResult the decision table evaluation result
+   * @param execution
+   *          the current execution
+   * @param decisionTable
+   *          the evaluated decision table
+   * @param decisionTableResult
+   *          the decision table evaluation result
    * @return the history event
+   *
+   * @see #createDecisionEvaluatedEvt(DmnDecisionTable, DmnDecisionTableResult)
    */
   HistoryEvent createDecisionEvaluatedEvt(DelegateExecution execution, DmnDecisionTable decisionTable, DmnDecisionTableResult decisionTableResult);
+
+  /**
+   * Creates the history event fired when a decision is evaluated. If the
+   * decision is evaluated while execute a process instance then you should use
+   * {@link #createDecisionEvaluatedEvt(DelegateExecution, DmnDecisionTable, DmnDecisionTableResult)} instead.
+   *
+   * @param decisionTable
+   *          the evaluated decision table
+   * @param decisionTableResult
+   *          the decision table evaluation result
+   * @return the history event
+   */
+  HistoryEvent createDecisionEvaluatedEvt(DmnDecisionTable decisionTable, DmnDecisionTableResult decisionTableResult);
 
 }

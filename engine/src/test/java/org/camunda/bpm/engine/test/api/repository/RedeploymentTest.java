@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.test.api.repository;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -39,6 +40,7 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
  */
 public class RedeploymentTest extends PluggableProcessEngineTestCase {
 
+  public static final String DEPLOYMENT_NAME = "my-deployment";
   public static final String PROCESS_KEY = "process";
   public static final String PROCESS_1_KEY = "process-1";
   public static final String PROCESS_2_KEY = "process-2";
@@ -52,8 +54,10 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
 
     try {
       repositoryService
-        .createRedeployment("not-existing")
-        .redeploy();
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResources("not-existing")
+        .deploy();
       fail("It should not be able to re-deploy an unexisting deployment");
     } catch (NotFoundException e) {
       // expected
@@ -61,9 +65,96 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
 
     try {
       repositoryService
-        .createRedeployment(null)
-        .redeploy();
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourceById("not-existing", "an-id")
+        .deploy();
       fail("It should not be able to re-deploy an unexisting deployment");
+    } catch (NotFoundException e) {
+      // expected
+    }
+
+    try {
+      repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourcesById("not-existing", Arrays.asList("an-id"))
+        .deploy();
+      fail("It should not be able to re-deploy an unexisting deployment");
+    } catch (NotFoundException e) {
+      // expected
+    }
+
+    try {
+      repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourceByName("not-existing", "a-name")
+        .deploy();
+      fail("It should not be able to re-deploy an unexisting deployment");
+    } catch (NotFoundException e) {
+      // expected
+    }
+
+    try {
+      repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourcesByName("not-existing", Arrays.asList("a-name"))
+        .deploy();
+      fail("It should not be able to re-deploy an unexisting deployment");
+    } catch (NotFoundException e) {
+      // expected
+    }
+  }
+
+  public void testNotValidDeploymentId() {
+    try {
+      repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResources(null);
+      fail("It should not be possible to pass a null deployment id");
+    } catch (NotValidException e) {
+      // expected
+    }
+
+    try {
+      repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourceById(null, "an-id");
+      fail("It should not be possible to pass a null deployment id");
+    } catch (NotValidException e) {
+      // expected
+    }
+
+    try {
+      repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourcesById(null, Arrays.asList("an-id"));
+      fail("It should not be possible to pass a null deployment id");
+    } catch (NotValidException e) {
+      // expected
+    }
+
+    try {
+      repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourceByName(null, "a-name");
+      fail("It should not be possible to pass a null deployment id");
+    } catch (NotValidException e) {
+      // expected
+    }
+
+    try {
+      repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourcesByName(null, Arrays.asList("a-name"));
+      fail("It should not be possible to pass a null deployment id");
     } catch (NotValidException e) {
       // expected
     }
@@ -75,15 +166,17 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
 
     Deployment deployment = repositoryService
         .createDeployment()
+        .name(DEPLOYMENT_NAME)
         .addModelInstance(RESOURCE_NAME, model)
         .deploy();
 
     try {
       // when
       repositoryService
-        .createRedeployment(deployment.getId())
-        .addResourceName("not-existing-resource.bpmn")
-        .redeploy();
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourceByName(deployment.getId(), "not-existing-resource.bpmn")
+        .deploy();
       fail("It should not be possible to re-deploy a not existing deployment resource");
     } catch (NotFoundException e) {
       // then
@@ -93,9 +186,10 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
     try {
       // when
       repositoryService
-        .createRedeployment(deployment.getId())
-        .addResourceNames(Arrays.asList("not-existing-resource.bpmn"))
-        .redeploy();
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourcesByName(deployment.getId(), Arrays.asList("not-existing-resource.bpmn"))
+        .deploy();
       fail("It should not be possible to re-deploy a not existing deployment resource");
     } catch (NotFoundException e) {
       // then
@@ -105,9 +199,10 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
     try {
       // when
       repositoryService
-        .createRedeployment(deployment.getId())
-        .addResourceId("not-existing-resource-id")
-        .redeploy();
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourceById(deployment.getId(), "not-existing-resource-id")
+        .deploy();
       fail("It should not be possible to re-deploy a not existing deployment resource");
     } catch (NotFoundException e) {
       // then
@@ -117,9 +212,10 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
     try {
       // when
       repositoryService
-        .createRedeployment(deployment.getId())
-        .addResourceIds(Arrays.asList("not-existing-resource-id"))
-        .redeploy();
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourcesById(deployment.getId(), Arrays.asList("not-existing-resource-id"))
+        .deploy();
       fail("It should not be possible to re-deploy a not existing deployment resource");
     } catch (NotFoundException e) {
       // then
@@ -129,24 +225,109 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
     deleteDeployments(deployment);
   }
 
+  public void testNotValidResource() {
+    try {
+      repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourceById("an-id", null);
+      fail("It should not be possible to pass a null resource id");
+    } catch (NotValidException e) {
+      // expected
+    }
+
+    try {
+      repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourcesById("an-id", null);
+      fail("It should not be possible to pass a null resource id");
+    } catch (NotValidException e) {
+      // expected
+    }
+
+    try {
+      repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourcesById("an-id", Arrays.asList((String)null));
+      fail("It should not be possible to pass a null resource id");
+    } catch (NotValidException e) {
+      // expected
+    }
+
+    try {
+      repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourcesById("an-id", new ArrayList<String>());
+      fail("It should not be possible to pass a null resource id");
+    } catch (NotValidException e) {
+      // expected
+    }
+
+    try {
+      repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourceByName("an-id", null);
+      fail("It should not be possible to pass a null resource name");
+    } catch (NotValidException e) {
+      // expected
+    }
+
+    try {
+      repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourcesByName("an-id", null);
+      fail("It should not be possible to pass a null resource name");
+    } catch (NotValidException e) {
+      // expected
+    }
+
+    try {
+      repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourcesByName("an-id", Arrays.asList((String)null));
+      fail("It should not be possible to pass a null resource name");
+    } catch (NotValidException e) {
+      // expected
+    }
+
+    try {
+      repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourcesByName("an-id", new ArrayList<String>());
+      fail("It should not be possible to pass a null resource name");
+    } catch (NotValidException e) {
+      // expected
+    }
+  }
+
   public void testRedeployNewDeployment() {
     // given
     BpmnModelInstance model = createProcessWithServiceTask(PROCESS_KEY);
 
     Deployment deployment1 = repositoryService
         .createDeployment()
+        .name(DEPLOYMENT_NAME)
         .addModelInstance(RESOURCE_NAME, model)
         .deploy();
 
-    DeploymentQuery query = repositoryService.createDeploymentQuery();
+    DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentName(DEPLOYMENT_NAME);
 
     assertNotNull(deployment1.getId());
     verifyQueryResults(query, 1);
 
     // when
     Deployment deployment2 = repositoryService
-        .createRedeployment(deployment1.getId())
-        .redeploy();
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResources(deployment1.getId())
+        .deploy();
 
     // then
     assertNotNull(deployment2);
@@ -158,26 +339,76 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
     deleteDeployments(deployment1, deployment2);
   }
 
-  public void testRedeployDeploymentNameProperty() {
+  public void testFailingDeploymentName() {
+    try {
+      repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .nameFromDeployment("a-deployment-id");
+      fail("Cannot set name() and nameFromDeployment().");
+    } catch (NotValidException e) {
+      // expected
+    }
+
+    try {
+      repositoryService
+        .createDeployment()
+        .nameFromDeployment("a-deployment-id")
+        .name(DEPLOYMENT_NAME);
+      fail("Cannot set name() and nameFromDeployment().");
+    } catch (NotValidException e) {
+      // expected
+    }
+  }
+
+  public void testRedeployDeploymentName() {
     // given
     BpmnModelInstance model = createProcessWithServiceTask(PROCESS_KEY);
 
     Deployment deployment1 = repositoryService
         .createDeployment()
-        .name("my-deployment")
+        .name(DEPLOYMENT_NAME)
         .addModelInstance(RESOURCE_NAME, model)
         .deploy();
 
-    assertEquals("my-deployment", deployment1.getName());
+    assertEquals(DEPLOYMENT_NAME, deployment1.getName());
 
     // when
     Deployment deployment2 = repositoryService
-        .createRedeployment(deployment1.getId())
-        .redeploy();
+        .createDeployment()
+        .nameFromDeployment(deployment1.getId())
+        .addDeploymentResources(deployment1.getId())
+        .deploy();
 
     // then
     assertNotNull(deployment2);
     assertEquals(deployment1.getName(), deployment2.getName());
+
+    deleteDeployments(deployment1, deployment2);
+  }
+
+  public void testRedeployDeploymentDifferentName() {
+    // given
+    BpmnModelInstance model = createProcessWithServiceTask(PROCESS_KEY);
+
+    Deployment deployment1 = repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addModelInstance(RESOURCE_NAME, model)
+        .deploy();
+
+    assertEquals(DEPLOYMENT_NAME, deployment1.getName());
+
+    // when
+    Deployment deployment2 = repositoryService
+        .createDeployment()
+        .name("my-another-deployment")
+        .addDeploymentResources(deployment1.getId())
+        .deploy();
+
+    // then
+    assertNotNull(deployment2);
+    assertFalse(deployment1.getName().equals(deployment2.getName()));
 
     deleteDeployments(deployment1, deployment2);
   }
@@ -188,6 +419,7 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
 
     Deployment deployment1 = repositoryService
         .createDeployment()
+        .name(DEPLOYMENT_NAME)
         .source("my-deployment-source")
         .addModelInstance(RESOURCE_NAME, model)
         .deploy();
@@ -196,8 +428,10 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
 
     // when
     Deployment deployment2 = repositoryService
-        .createRedeployment(deployment1.getId())
-        .redeploy();
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResources(deployment1.getId())
+        .deploy();
 
     // then
     assertNotNull(deployment2);
@@ -212,6 +446,7 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
 
     Deployment deployment1 = repositoryService
         .createDeployment()
+        .name(DEPLOYMENT_NAME)
         .source("my-deployment-source")
         .addModelInstance(RESOURCE_NAME, model)
         .deploy();
@@ -220,9 +455,11 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
 
     // when
     Deployment deployment2 = repositoryService
-        .createRedeployment(deployment1.getId())
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResources(deployment1.getId())
         .source("my-another-deployment-source")
-        .redeploy();
+        .deploy();
 
     // then
     assertNotNull(deployment2);
@@ -238,6 +475,7 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
     BpmnModelInstance model = createProcessWithServiceTask(PROCESS_KEY);
     Deployment deployment1 = repositoryService
         .createDeployment()
+        .name(DEPLOYMENT_NAME)
         .addModelInstance(RESOURCE_NAME, model)
         .deploy();
 
@@ -247,6 +485,7 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
     model = createProcessWithUserTask(PROCESS_KEY);
     Deployment deployment2 = repositoryService
         .createDeployment()
+        .name(DEPLOYMENT_NAME)
         .addModelInstance(RESOURCE_NAME, model)
         .deploy();
 
@@ -254,8 +493,10 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
 
     // when
     Deployment deployment3 = repositoryService
-        .createRedeployment(deployment1.getId())
-        .redeploy();
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResources(deployment1.getId())
+        .deploy();
 
     // then
     Resource resource3 = getResourceByName(deployment3.getId(), RESOURCE_NAME);
@@ -291,6 +532,7 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
     // first deployment
     Deployment deployment1 = repositoryService
         .createDeployment()
+        .name(DEPLOYMENT_NAME)
         .addModelInstance(RESOURCE_1_NAME, model1)
         .addModelInstance(RESOURCE_2_NAME, model2)
         .deploy();
@@ -301,6 +543,7 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
     // second deployment
     Deployment deployment2 = repositoryService
         .createDeployment()
+        .name(DEPLOYMENT_NAME)
         .addModelInstance(RESOURCE_1_NAME, model2)
         .addModelInstance(RESOURCE_2_NAME, model1)
         .deploy();
@@ -310,8 +553,10 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
 
     // when
     Deployment deployment3 = repositoryService
-        .createRedeployment(deployment1.getId())
-        .redeploy();
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResources(deployment1.getId())
+        .deploy();
 
     // then
     verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 3);
@@ -330,6 +575,7 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
     // first deployment
     Deployment deployment1 = repositoryService
         .createDeployment()
+        .name(DEPLOYMENT_NAME)
         .addModelInstance(RESOURCE_1_NAME, model1)
         .addModelInstance(RESOURCE_2_NAME, model2)
         .deploy();
@@ -343,6 +589,7 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
 
     Deployment deployment2 = repositoryService
         .createDeployment()
+        .name(DEPLOYMENT_NAME)
         .addModelInstance(RESOURCE_1_NAME, model1)
         .addModelInstance(RESOURCE_2_NAME, model2)
         .deploy();
@@ -352,9 +599,10 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
 
     // when
     Deployment deployment3 = repositoryService
-        .createRedeployment(deployment1.getId())
-        .addResourceName(RESOURCE_1_NAME)
-        .redeploy();
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourceByName(deployment1.getId(), RESOURCE_1_NAME)
+        .deploy();
 
     // then
     verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 3);
@@ -374,6 +622,7 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
     // first deployment
     Deployment deployment1 = repositoryService
         .createDeployment()
+        .name(DEPLOYMENT_NAME)
         .addModelInstance(RESOURCE_1_NAME, model1)
         .addModelInstance(RESOURCE_2_NAME, model2)
         .addModelInstance(RESOURCE_3_NAME, model3)
@@ -390,6 +639,7 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
 
     Deployment deployment2 = repositoryService
         .createDeployment()
+        .name(DEPLOYMENT_NAME)
         .addModelInstance(RESOURCE_1_NAME, model1)
         .addModelInstance(RESOURCE_2_NAME, model2)
         .addModelInstance(RESOURCE_3_NAME, model3)
@@ -401,10 +651,11 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
 
     // when (1)
     Deployment deployment3 = repositoryService
-        .createRedeployment(deployment1.getId())
-        .addResourceName(RESOURCE_1_NAME)
-        .addResourceName(RESOURCE_3_NAME)
-        .redeploy();
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourceByName(deployment1.getId(), RESOURCE_1_NAME)
+        .addDeploymentResourceByName(deployment1.getId(), RESOURCE_3_NAME)
+        .deploy();
 
     // then (1)
     verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 3);
@@ -413,9 +664,10 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
 
     // when (2)
     Deployment deployment4 = repositoryService
-        .createRedeployment(deployment2.getId())
-        .addResourceNames(Arrays.asList(RESOURCE_1_NAME, RESOURCE_3_NAME))
-        .redeploy();
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourcesByName(deployment2.getId(), Arrays.asList(RESOURCE_1_NAME, RESOURCE_3_NAME))
+        .deploy();
 
     // then (2)
     verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 4);
@@ -436,6 +688,7 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
     // first deployment
     Deployment deployment1 = repositoryService
         .createDeployment()
+        .name(DEPLOYMENT_NAME)
         .addModelInstance(RESOURCE_1_NAME, model1)
         .addModelInstance(RESOURCE_2_NAME, model2)
         .addModelInstance(RESOURCE_3_NAME, model3)
@@ -452,6 +705,7 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
 
     Deployment deployment2 = repositoryService
         .createDeployment()
+        .name(DEPLOYMENT_NAME)
         .addModelInstance(RESOURCE_1_NAME, model1)
         .addModelInstance(RESOURCE_2_NAME, model2)
         .addModelInstance(RESOURCE_3_NAME, model3)
@@ -463,10 +717,11 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
 
     // when
     Deployment deployment3 = repositoryService
-        .createRedeployment(deployment1.getId())
-        .addResourceName(RESOURCE_1_NAME)
-        .addResourceNames(Arrays.asList(RESOURCE_2_NAME, RESOURCE_3_NAME))
-        .redeploy();
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourceByName(deployment1.getId(), RESOURCE_1_NAME)
+        .addDeploymentResourcesByName(deployment1.getId(), Arrays.asList(RESOURCE_2_NAME, RESOURCE_3_NAME))
+        .deploy();
 
     // then
     verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 3);
@@ -486,6 +741,7 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
     // first deployment
     Deployment deployment1 = repositoryService
         .createDeployment()
+        .name(DEPLOYMENT_NAME)
         .addModelInstance(RESOURCE_1_NAME, model1)
         .addModelInstance(RESOURCE_2_NAME, model2)
         .deploy();
@@ -499,6 +755,7 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
 
     Deployment deployment2 = repositoryService
         .createDeployment()
+        .name(DEPLOYMENT_NAME)
         .addModelInstance(RESOURCE_1_NAME, model1)
         .addModelInstance(RESOURCE_2_NAME, model2)
         .deploy();
@@ -508,10 +765,11 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
 
     // when
     Deployment deployment3 = repositoryService
-        .createRedeployment(deployment1.getId())
-        .addResourceName(RESOURCE_1_NAME)
-        .addResourceNames(Arrays.asList(RESOURCE_1_NAME))
-        .redeploy();
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourceByName(deployment1.getId(), RESOURCE_1_NAME)
+        .addDeploymentResourcesByName(deployment1.getId(), Arrays.asList(RESOURCE_1_NAME))
+        .deploy();
 
     // then
     verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 3);
@@ -530,6 +788,7 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
     // first deployment
     Deployment deployment1 = repositoryService
         .createDeployment()
+        .name(DEPLOYMENT_NAME)
         .addModelInstance(RESOURCE_1_NAME, model1)
         .addModelInstance(RESOURCE_2_NAME, model2)
         .deploy();
@@ -545,6 +804,7 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
 
     Deployment deployment2 = repositoryService
         .createDeployment()
+        .name(DEPLOYMENT_NAME)
         .addModelInstance(RESOURCE_1_NAME, model1)
         .addModelInstance(RESOURCE_2_NAME, model2)
         .deploy();
@@ -554,9 +814,10 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
 
     // when
     Deployment deployment3 = repositoryService
-        .createRedeployment(deployment1.getId())
-        .addResourceId(resource.getId())
-        .redeploy();
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourceById(deployment1.getId(), resource.getId())
+        .deploy();
 
     // then
     verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 3);
@@ -576,6 +837,7 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
     // first deployment
     Deployment deployment1 = repositoryService
         .createDeployment()
+        .name(DEPLOYMENT_NAME)
         .addModelInstance(RESOURCE_1_NAME, model1)
         .addModelInstance(RESOURCE_2_NAME, model2)
         .addModelInstance(RESOURCE_3_NAME, model3)
@@ -595,6 +857,7 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
 
     Deployment deployment2 = repositoryService
         .createDeployment()
+        .name(DEPLOYMENT_NAME)
         .addModelInstance(RESOURCE_1_NAME, model1)
         .addModelInstance(RESOURCE_2_NAME, model2)
         .addModelInstance(RESOURCE_3_NAME, model3)
@@ -609,10 +872,11 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
 
     // when (1)
     Deployment deployment3 = repositoryService
-        .createRedeployment(deployment1.getId())
-        .addResourceId(resource11.getId())
-        .addResourceId(resource13.getId())
-        .redeploy();
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourceById(deployment1.getId(), resource11.getId())
+        .addDeploymentResourceById(deployment1.getId(), resource13.getId())
+        .deploy();
 
     // then (1)
     verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 3);
@@ -621,9 +885,10 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
 
     // when (2)
     Deployment deployment4 = repositoryService
-        .createRedeployment(deployment2.getId())
-        .addResourceIds(Arrays.asList(resource21.getId(), resource23.getId()))
-        .redeploy();
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourcesById(deployment2.getId(), Arrays.asList(resource21.getId(), resource23.getId()))
+        .deploy();
 
     // then (2)
     verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 4);
@@ -644,6 +909,7 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
     // first deployment
     Deployment deployment1 = repositoryService
         .createDeployment()
+        .name(DEPLOYMENT_NAME)
         .addModelInstance(RESOURCE_1_NAME, model1)
         .addModelInstance(RESOURCE_2_NAME, model2)
         .addModelInstance(RESOURCE_3_NAME, model3)
@@ -664,6 +930,7 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
 
     Deployment deployment2 = repositoryService
         .createDeployment()
+        .name(DEPLOYMENT_NAME)
         .addModelInstance(RESOURCE_1_NAME, model1)
         .addModelInstance(RESOURCE_2_NAME, model2)
         .addModelInstance(RESOURCE_3_NAME, model3)
@@ -675,10 +942,11 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
 
     // when
     Deployment deployment3 = repositoryService
-        .createRedeployment(deployment1.getId())
-        .addResourceId(resource1.getId())
-        .addResourceIds(Arrays.asList(resource2.getId(), resource3.getId()))
-        .redeploy();
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourceById(deployment1.getId(), resource1.getId())
+        .addDeploymentResourcesById(deployment1.getId(), Arrays.asList(resource2.getId(), resource3.getId()))
+        .deploy();
 
     // then
     verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 3);
@@ -698,6 +966,7 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
     // first deployment
     Deployment deployment1 = repositoryService
         .createDeployment()
+        .name(DEPLOYMENT_NAME)
         .addModelInstance(RESOURCE_1_NAME, model1)
         .addModelInstance(RESOURCE_2_NAME, model2)
         .deploy();
@@ -713,6 +982,7 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
 
     Deployment deployment2 = repositoryService
         .createDeployment()
+        .name(DEPLOYMENT_NAME)
         .addModelInstance(RESOURCE_1_NAME, model1)
         .addModelInstance(RESOURCE_2_NAME, model2)
         .deploy();
@@ -722,10 +992,11 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
 
     // when
     Deployment deployment3 = repositoryService
-        .createRedeployment(deployment1.getId())
-        .addResourceId(resource1.getId())
-        .addResourceIds(Arrays.asList(resource1.getId()))
-        .redeploy();
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourceById(deployment1.getId(), resource1.getId())
+        .addDeploymentResourcesById(deployment1.getId(), Arrays.asList(resource1.getId()))
+        .deploy();
 
     // then
     verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 3);
@@ -744,6 +1015,7 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
     // first deployment
     Deployment deployment1 = repositoryService
         .createDeployment()
+        .name(DEPLOYMENT_NAME)
         .addModelInstance(RESOURCE_1_NAME, model1)
         .addModelInstance(RESOURCE_2_NAME, model2)
         .deploy();
@@ -760,6 +1032,7 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
 
     Deployment deployment2 = repositoryService
         .createDeployment()
+        .name(DEPLOYMENT_NAME)
         .addModelInstance(RESOURCE_1_NAME, model1)
         .addModelInstance(RESOURCE_2_NAME, model2)
         .deploy();
@@ -769,10 +1042,11 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
 
     // when
     Deployment deployment3 = repositoryService
-        .createRedeployment(deployment1.getId())
-        .addResourceId(resource1.getId())
-        .addResourceName(resource2.getName())
-        .redeploy();
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourceById(deployment1.getId(), resource1.getId())
+        .addDeploymentResourceByName(deployment1.getId(), resource2.getName())
+        .deploy();
 
     // then
     verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 3);
@@ -791,6 +1065,7 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
     // first deployment
     Deployment deployment1 = repositoryService
         .createDeployment()
+        .name(DEPLOYMENT_NAME)
         .addModelInstance(RESOURCE_1_NAME, model1)
         .addModelInstance(RESOURCE_2_NAME, model2)
         .deploy();
@@ -807,6 +1082,7 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
 
     Deployment deployment2 = repositoryService
         .createDeployment()
+        .name(DEPLOYMENT_NAME)
         .addModelInstance(RESOURCE_1_NAME, model1)
         .addModelInstance(RESOURCE_2_NAME, model2)
         .deploy();
@@ -816,10 +1092,10 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
 
     // when
     Deployment deployment3 = repositoryService
-        .createRedeployment(deployment1.getId())
-        .addResourceIds(Arrays.asList(resource1.getId()))
-        .addResourceNames(Arrays.asList(resource2.getName()))
-        .redeploy();
+        .createDeployment()
+        .addDeploymentResourcesById(deployment1.getId(), Arrays.asList(resource1.getId()))
+        .addDeploymentResourcesByName(deployment1.getId(), Arrays.asList(resource2.getName()))
+        .deploy();
 
     // then
     verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 3);
@@ -828,23 +1104,358 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
     deleteDeployments(deployment1, deployment2, deployment3);
   }
 
+  public void testRedeployFormDifferentDeployments() {
+    // given
+    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
+
+    BpmnModelInstance model1 = createProcessWithServiceTask(PROCESS_1_KEY);
+
+    // first deployment
+    Deployment deployment1 = repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME + "-1")
+        .addModelInstance(RESOURCE_1_NAME, model1)
+        .deploy();
+
+    assertEquals(1, repositoryService.getDeploymentResources(deployment1.getId()).size());
+
+    verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 1);
+
+    // second deployment
+    BpmnModelInstance model2 = createProcessWithReceiveTask(PROCESS_2_KEY);
+
+    Deployment deployment2 = repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME + "-2")
+        .addModelInstance(RESOURCE_2_NAME, model2)
+        .deploy();
+
+    assertEquals(1, repositoryService.getDeploymentResources(deployment2.getId()).size());
+
+    verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 1);
+    verifyQueryResults(query.processDefinitionKey(PROCESS_2_KEY), 1);
+
+    // when
+    Deployment deployment3 = repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME + "-3")
+        .addDeploymentResources(deployment1.getId())
+        .addDeploymentResources(deployment2.getId())
+        .deploy();
+
+    assertEquals(2, repositoryService.getDeploymentResources(deployment3.getId()).size());
+
+    verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 2);
+    verifyQueryResults(query.processDefinitionKey(PROCESS_2_KEY), 2);
+
+    deleteDeployments(deployment1, deployment2, deployment3);
+  }
+
+  public void testRedeployFormDifferentDeploymentsById() {
+    // given
+    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
+
+    BpmnModelInstance model1 = createProcessWithServiceTask(PROCESS_1_KEY);
+
+    // first deployment
+    Deployment deployment1 = repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME + "-1")
+        .addModelInstance(RESOURCE_1_NAME, model1)
+        .deploy();
+
+    assertEquals(1, repositoryService.getDeploymentResources(deployment1.getId()).size());
+    Resource resource1 = getResourceByName(deployment1.getId(), RESOURCE_1_NAME);
+
+    verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 1);
+
+    // second deployment
+    BpmnModelInstance model2 = createProcessWithReceiveTask(PROCESS_2_KEY);
+
+    Deployment deployment2 = repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME + "-2")
+        .addModelInstance(RESOURCE_2_NAME, model2)
+        .deploy();
+
+    assertEquals(1, repositoryService.getDeploymentResources(deployment2.getId()).size());
+    Resource resource2 = getResourceByName(deployment2.getId(), RESOURCE_2_NAME);
+
+    verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 1);
+    verifyQueryResults(query.processDefinitionKey(PROCESS_2_KEY), 1);
+
+    // when
+    Deployment deployment3 = repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME + "-3")
+        .addDeploymentResourceById(deployment1.getId(), resource1.getId())
+        .addDeploymentResourceById(deployment2.getId(), resource2.getId())
+        .deploy();
+
+    assertEquals(2, repositoryService.getDeploymentResources(deployment3.getId()).size());
+
+    verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 2);
+    verifyQueryResults(query.processDefinitionKey(PROCESS_2_KEY), 2);
+
+    deleteDeployments(deployment1, deployment2, deployment3);
+  }
+
+  public void testRedeployFormDifferentDeploymentsByName() {
+    // given
+    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
+
+    BpmnModelInstance model1 = createProcessWithServiceTask(PROCESS_1_KEY);
+
+    // first deployment
+    Deployment deployment1 = repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME + "-1")
+        .addModelInstance(RESOURCE_1_NAME, model1)
+        .deploy();
+
+    assertEquals(1, repositoryService.getDeploymentResources(deployment1.getId()).size());
+
+    verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 1);
+
+    // second deployment
+    BpmnModelInstance model2 = createProcessWithReceiveTask(PROCESS_2_KEY);
+
+    Deployment deployment2 = repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME + "-2")
+        .addModelInstance(RESOURCE_2_NAME, model2)
+        .deploy();
+
+    assertEquals(1, repositoryService.getDeploymentResources(deployment2.getId()).size());
+
+    verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 1);
+    verifyQueryResults(query.processDefinitionKey(PROCESS_2_KEY), 1);
+
+    // when
+    Deployment deployment3 = repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME + "-3")
+        .addDeploymentResourceByName(deployment1.getId(), RESOURCE_1_NAME)
+        .addDeploymentResourceByName(deployment2.getId(), RESOURCE_2_NAME)
+        .deploy();
+
+    assertEquals(2, repositoryService.getDeploymentResources(deployment3.getId()).size());
+
+    verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 2);
+    verifyQueryResults(query.processDefinitionKey(PROCESS_2_KEY), 2);
+
+    deleteDeployments(deployment1, deployment2, deployment3);
+  }
+
+  public void testRedeployFormDifferentDeploymentsByNameAndId() {
+    // given
+    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
+
+    BpmnModelInstance model1 = createProcessWithServiceTask(PROCESS_1_KEY);
+
+    // first deployment
+    Deployment deployment1 = repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME + "-1")
+        .addModelInstance(RESOURCE_1_NAME, model1)
+        .deploy();
+
+    assertEquals(1, repositoryService.getDeploymentResources(deployment1.getId()).size());
+    Resource resource1 = getResourceByName(deployment1.getId(), RESOURCE_1_NAME);
+
+    verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 1);
+
+    // second deployment
+    BpmnModelInstance model2 = createProcessWithReceiveTask(PROCESS_2_KEY);
+
+    Deployment deployment2 = repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME + "-2")
+        .addModelInstance(RESOURCE_2_NAME, model2)
+        .deploy();
+
+    assertEquals(1, repositoryService.getDeploymentResources(deployment2.getId()).size());
+
+    verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 1);
+    verifyQueryResults(query.processDefinitionKey(PROCESS_2_KEY), 1);
+
+    // when
+    Deployment deployment3 = repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME + "-3")
+        .addDeploymentResourceById(deployment1.getId(), resource1.getId())
+        .addDeploymentResourceByName(deployment2.getId(), RESOURCE_2_NAME)
+        .deploy();
+
+    assertEquals(2, repositoryService.getDeploymentResources(deployment3.getId()).size());
+
+    verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 2);
+    verifyQueryResults(query.processDefinitionKey(PROCESS_2_KEY), 2);
+
+    deleteDeployments(deployment1, deployment2, deployment3);
+  }
+
+  public void testRedeployFormDifferentDeploymentsAddsNewSource() {
+    // given
+    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
+
+    BpmnModelInstance model1 = createProcessWithServiceTask(PROCESS_1_KEY);
+
+    // first deployment
+    Deployment deployment1 = repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME + "-1")
+        .addModelInstance(RESOURCE_1_NAME, model1)
+        .deploy();
+
+    assertEquals(1, repositoryService.getDeploymentResources(deployment1.getId()).size());
+
+    verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 1);
+
+    // second deployment
+    BpmnModelInstance model2 = createProcessWithReceiveTask(PROCESS_2_KEY);
+
+    Deployment deployment2 = repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME + "-2")
+        .addModelInstance(RESOURCE_2_NAME, model2)
+        .deploy();
+
+    assertEquals(1, repositoryService.getDeploymentResources(deployment2.getId()).size());
+
+    verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 1);
+    verifyQueryResults(query.processDefinitionKey(PROCESS_2_KEY), 1);
+
+    // when
+    BpmnModelInstance model3 = createProcessWithUserTask(PROCESS_3_KEY);
+    Deployment deployment3 = repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME + "-3")
+        .addDeploymentResources(deployment1.getId())
+        .addDeploymentResources(deployment2.getId())
+        .addModelInstance(RESOURCE_3_NAME, model3)
+        .deploy();
+
+    assertEquals(3, repositoryService.getDeploymentResources(deployment3.getId()).size());
+
+    verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 2);
+    verifyQueryResults(query.processDefinitionKey(PROCESS_2_KEY), 2);
+    verifyQueryResults(query.processDefinitionKey(PROCESS_3_KEY), 1);
+
+    deleteDeployments(deployment1, deployment2, deployment3);
+  }
+
+  public void testRedeployFormDifferentDeploymentsSameResourceName() {
+    // given
+    BpmnModelInstance model1 = createProcessWithServiceTask(PROCESS_1_KEY);
+
+    // first deployment
+    Deployment deployment1 = repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME + "-1")
+        .addModelInstance(RESOURCE_1_NAME, model1)
+        .deploy();
+
+    // second deployment
+    BpmnModelInstance model2 = createProcessWithReceiveTask(PROCESS_2_KEY);
+
+    Deployment deployment2 = repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME + "-2")
+        .addModelInstance(RESOURCE_1_NAME, model2)
+        .deploy();
+
+    // when
+    try {
+      repositoryService
+          .createDeployment()
+          .name(DEPLOYMENT_NAME + "-3")
+          .addDeploymentResources(deployment1.getId())
+          .addDeploymentResources(deployment2.getId())
+          .deploy();
+      fail("It should not be possible to deploy different resources with same name.");
+    } catch (NotValidException e) {
+      // expected
+    }
+
+    deleteDeployments(deployment1, deployment2);
+  }
+
+  public void testRedeployAndAddNewResourceWithSameName() {
+    // given
+    BpmnModelInstance model1 = createProcessWithServiceTask(PROCESS_1_KEY);
+
+    Deployment deployment1 = repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME + "-1")
+        .addModelInstance(RESOURCE_1_NAME, model1)
+        .deploy();
+
+    // when
+    BpmnModelInstance model2 = createProcessWithReceiveTask(PROCESS_2_KEY);
+
+    try {
+      repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME + "-2")
+        .addModelInstance(RESOURCE_1_NAME, model2)
+        .addDeploymentResourceByName(deployment1.getId(), RESOURCE_1_NAME)
+        .deploy();
+      fail("It should not be possible to deploy different resources with same name.");
+    } catch (NotValidException e) {
+      // expected
+    }
+
+    deleteDeployments(deployment1);
+  }
+
+  public void testRedeployEnableDuplcateChecking() {
+    // given
+    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
+
+    BpmnModelInstance model1 = createProcessWithServiceTask(PROCESS_1_KEY);
+    Deployment deployment1 = repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addModelInstance(RESOURCE_1_NAME, model1)
+        .deploy();
+
+    verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 1);
+
+    // when
+    Deployment deployment2 = repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResources(deployment1.getId())
+        .enableDuplicateFiltering(true)
+        .deploy();
+
+    assertEquals(deployment1.getId(), deployment2.getId());
+
+    verifyQueryResults(query.processDefinitionKey(PROCESS_1_KEY), 1);
+
+    deleteDeployments(deployment1);
+  }
+
   public void testSimpleProcessApplicationDeployment() {
     // given
     EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication();
 
     BpmnModelInstance model = createProcessWithServiceTask(PROCESS_KEY);
     ProcessApplicationDeployment deployment1 = repositoryService.createDeployment(processApplication.getReference())
-      .name("deployment")
-      .addModelInstance(RESOURCE_NAME, model)
-      .enableDuplicateFiltering(true)
-      .deploy();
+        .name(DEPLOYMENT_NAME)
+        .addModelInstance(RESOURCE_NAME, model)
+        .enableDuplicateFiltering(true)
+        .deploy();
 
     Resource resource1 = getResourceByName(deployment1.getId(), RESOURCE_NAME);
 
     // when
-    ProcessApplicationDeployment deployment2 = repositoryService.createRedeployment(deployment1.getId(), processApplication.getReference())
-        .addResourceId(resource1.getId())
-        .redeploy();
+    ProcessApplicationDeployment deployment2 = repositoryService
+        .createDeployment(processApplication.getReference())
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResourceById(deployment1.getId(), resource1.getId())
+        .deploy();
 
     // then
     // registration was performed:
@@ -863,26 +1474,28 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
     // first deployment
     BpmnModelInstance model = createProcessWithServiceTask(PROCESS_KEY);
     ProcessApplicationDeployment deployment1 = repositoryService.createDeployment(processApplication.getReference())
-      .name("deployment")
-      .addModelInstance(RESOURCE_NAME, model)
-      .enableDuplicateFiltering(true)
-      .deploy();
+        .name(DEPLOYMENT_NAME)
+        .addModelInstance(RESOURCE_NAME, model)
+        .enableDuplicateFiltering(true)
+        .deploy();
 
     Resource resource1 = getResourceByName(deployment1.getId(), RESOURCE_NAME);
 
     // second deployment
     model = createProcessWithUserTask(PROCESS_KEY);
     ProcessApplicationDeployment deployment2 = repositoryService.createDeployment(processApplication.getReference())
-      .name("deployment")
-      .addModelInstance(RESOURCE_NAME, model)
-      .enableDuplicateFiltering(true)
-      .deploy();
+        .name(DEPLOYMENT_NAME)
+        .addModelInstance(RESOURCE_NAME, model)
+        .enableDuplicateFiltering(true)
+        .deploy();
 
     // when
-    ProcessApplicationDeployment deployment3 = repositoryService.createRedeployment(deployment1.getId(), processApplication.getReference())
+    ProcessApplicationDeployment deployment3 = repositoryService
+        .createDeployment(processApplication.getReference())
+        .name(DEPLOYMENT_NAME)
         .resumePreviousVersions()
-        .addResourceId(resource1.getId())
-        .redeploy();
+        .addDeploymentResourceById(deployment1.getId(), resource1.getId())
+        .deploy();
 
     // then
     // old deployments was resumed
@@ -900,28 +1513,29 @@ public class RedeploymentTest extends PluggableProcessEngineTestCase {
     // first deployment
     BpmnModelInstance model = createProcessWithServiceTask(PROCESS_KEY);
     ProcessApplicationDeployment deployment1 = repositoryService.createDeployment(processApplication.getReference())
-      .name("deployment")
-      .addModelInstance(RESOURCE_NAME, model)
-      .enableDuplicateFiltering(true)
-      .deploy();
+        .name(DEPLOYMENT_NAME)
+        .addModelInstance(RESOURCE_NAME, model)
+        .enableDuplicateFiltering(true)
+        .deploy();
 
     Resource resource1 = getResourceByName(deployment1.getId(), RESOURCE_NAME);
 
     // second deployment
     model = createProcessWithUserTask(PROCESS_KEY);
     ProcessApplicationDeployment deployment2 = repositoryService.createDeployment(processApplication.getReference())
-      .name("deployment")
-      .addModelInstance(RESOURCE_NAME, model)
-      .enableDuplicateFiltering(true)
-      .deploy();
+        .name(DEPLOYMENT_NAME)
+        .addModelInstance(RESOURCE_NAME, model)
+        .enableDuplicateFiltering(true)
+        .deploy();
 
     // when
-    ProcessApplicationDeployment deployment3 = repositoryService.createRedeployment(deployment1.getId(), processApplication.getReference())
+    ProcessApplicationDeployment deployment3 = repositoryService
+        .createDeployment(processApplication.getReference())
+        .name(DEPLOYMENT_NAME)
         .resumePreviousVersions()
         .resumePreviousVersionsBy(ResumePreviousBy.RESUME_BY_DEPLOYMENT_NAME)
-        .addResourceId(resource1.getId())
-        .redeploy();
-
+        .addDeploymentResourceById(deployment1.getId(), resource1.getId())
+        .deploy();
 
     // then
     // old deployment was resumed

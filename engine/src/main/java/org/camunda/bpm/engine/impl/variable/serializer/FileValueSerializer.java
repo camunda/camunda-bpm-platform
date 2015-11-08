@@ -14,9 +14,9 @@ package org.camunda.bpm.engine.impl.variable.serializer;
 
 import java.util.Arrays;
 
-import org.camunda.bpm.engine.impl.core.variable.value.FileValueImpl;
-import org.camunda.bpm.engine.impl.core.variable.value.UntypedValueImpl;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.impl.value.FileValueImpl;
+import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -67,7 +67,7 @@ public class FileValueSerializer extends AbstractTypedValueSerializer<FileValue>
   public FileValue readValue(ValueFields valueFields, boolean deserializeValue) {
     FileValueBuilder builder = Variables.fileValue(valueFields.getTextValue());
     if (valueFields.getByteArrayValue() != null) {
-      builder.file(valueFields.getByteArrayValue().getBytes());
+      builder.file(valueFields.getByteArrayValue());
     }
     // to ensure the same array size all the time
     if (valueFields.getTextValue2() != null) {

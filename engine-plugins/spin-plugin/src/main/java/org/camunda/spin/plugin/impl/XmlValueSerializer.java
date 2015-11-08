@@ -12,8 +12,8 @@
  */
 package org.camunda.spin.plugin.impl;
 
-import org.camunda.bpm.engine.impl.core.variable.value.UntypedValueImpl;
 import org.camunda.bpm.engine.impl.variable.serializer.ValueFields;
+import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
 import org.camunda.spin.DataFormats;
 import org.camunda.spin.plugin.variable.SpinValues;
 import org.camunda.spin.plugin.variable.type.SpinValueType;

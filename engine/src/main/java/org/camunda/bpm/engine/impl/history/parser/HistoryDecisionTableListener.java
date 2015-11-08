@@ -16,7 +16,6 @@ package org.camunda.bpm.engine.impl.history.parser;
 import org.camunda.bpm.dmn.engine.DmnDecisionTable;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableListener;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
@@ -36,21 +35,25 @@ public class HistoryDecisionTableListener implements DmnDecisionTableListener {
   }
 
   public void notify(DmnDecisionTable decisionTable, DmnDecisionTableResult decisionTableResult) {
-    ExecutionEntity execution = Context.getBpmnExecutionContext().getExecution();
-
-    HistoryEvent historyEvent = createHistoryEvent(execution, decisionTable, decisionTableResult);
+   HistoryEvent historyEvent = createHistoryEvent(decisionTable, decisionTableResult);
 
     if(historyEvent != null) {
       Context.getProcessEngineConfiguration()
         .getHistoryEventHandler()
         .handleEvent(historyEvent);
     }
-
   }
 
-  public HistoryEvent createHistoryEvent(DelegateExecution execution, DmnDecisionTable decisionTable, DmnDecisionTableResult decisionTableResult) {
-    if(historyLevel.isHistoryEventProduced(HistoryEventTypes.DMN_DECISION_EVALUATE, null) && isDeployedDecisionTable(decisionTable)) {
-      return eventProducer.createDecisionEvaluatedEvt(execution, decisionTable, decisionTableResult);
+  protected HistoryEvent createHistoryEvent(DmnDecisionTable decisionTable, DmnDecisionTableResult decisionTableResult) {
+    if(isDeployedDecisionTable(decisionTable) && historyLevel.isHistoryEventProduced(HistoryEventTypes.DMN_DECISION_EVALUATE, decisionTable)) {
+
+      if(Context.getBpmnExecutionContext() != null) {
+        ExecutionEntity execution = Context.getBpmnExecutionContext().getExecution();
+        return eventProducer.createDecisionEvaluatedEvt(execution, decisionTable, decisionTableResult);
+      } else {
+        return eventProducer.createDecisionEvaluatedEvt(decisionTable, decisionTableResult);
+      }
+
     } else {
       return null;
     }

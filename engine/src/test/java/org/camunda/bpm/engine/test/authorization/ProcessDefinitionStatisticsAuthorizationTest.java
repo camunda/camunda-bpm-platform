@@ -37,15 +37,15 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
   protected String deploymentId;
 
   public void setUp() throws Exception {
-    super.setUp();
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/authorization/oneIncidentProcess.bpmn20.xml").getId();
+    super.setUp();
   }
 
   public void tearDown() {
-    deleteDeployment(deploymentId);
     super.tearDown();
+    deleteDeployment(deploymentId);
   }
 
   // without running instances //////////////////////////////////////////////////////////

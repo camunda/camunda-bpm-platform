@@ -64,7 +64,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
 
   protected ByteArrayField byteArrayField = new ByteArrayField(this);
 
-  protected TypedValueField typedValueField = new TypedValueField(this);
+  protected TypedValueField typedValueField = new TypedValueField(this, false);
 
   public HistoricVariableInstanceEntity() {
   }
@@ -153,7 +153,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     byteArrayField.setByteArrayId(byteArrayId);
   }
 
-  public ByteArrayEntity getByteArrayValue() {
+  public byte[] getByteArrayValue() {
     return byteArrayField.getByteArrayValue();
   }
 

@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.test.Deployment;
 public class DmnDeployerTest extends PluggableProcessEngineTestCase {
 
   public void testDmnDeployment() {
-    String resourceName = "org/camunda/bpm/engine/test/dmn/deployment/DmnDeployerTest.testDmnDeployment.dmn10.xml";
+    String resourceName = "org/camunda/bpm/engine/test/dmn/deployment/DmnDeployerTest.testDmnDeployment.dmn11.xml";
     String deploymentId = repositoryService
         .createDeployment()
         .addClasspathResource(resourceName)
@@ -96,8 +96,8 @@ public class DmnDeployerTest extends PluggableProcessEngineTestCase {
 
   public void testDuplicateIdInDeployment() {
     try {
-      String resourceName1 = "org/camunda/bpm/engine/test/dmn/deployment/DmnDeployerTest.testDuplicateIdInDeployment.dmn10.xml";
-      String resourceName2 = "org/camunda/bpm/engine/test/dmn/deployment/DmnDeployerTest.testDuplicateIdInDeployment2.dmn10.xml";
+      String resourceName1 = "org/camunda/bpm/engine/test/dmn/deployment/DmnDeployerTest.testDuplicateIdInDeployment.dmn11.xml";
+      String resourceName2 = "org/camunda/bpm/engine/test/dmn/deployment/DmnDeployerTest.testDuplicateIdInDeployment2.dmn11.xml";
       repositoryService.createDeployment()
               .addClasspathResource(resourceName1)
               .addClasspathResource(resourceName2)
@@ -112,7 +112,7 @@ public class DmnDeployerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/DmnDeployerTest.testDecisionDiagramResource.dmn10.xml",
+    "org/camunda/bpm/engine/test/dmn/deployment/DmnDeployerTest.testDecisionDiagramResource.dmn11.xml",
     "org/camunda/bpm/engine/test/dmn/deployment/DmnDeployerTest.testDecisionDiagramResource.png"
   })
   public void testDecisionDiagramResource() {
@@ -120,7 +120,7 @@ public class DmnDeployerTest extends PluggableProcessEngineTestCase {
 
     DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
 
-    assertEquals(resourcePrefix + ".dmn10.xml", decisionDefinition.getResourceName());
+    assertEquals(resourcePrefix + ".dmn11.xml", decisionDefinition.getResourceName());
     assertEquals("decision", decisionDefinition.getKey());
 
     String diagramResourceName = decisionDefinition.getDiagramResourceName();
@@ -132,7 +132,7 @@ public class DmnDeployerTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = {
-    "org/camunda/bpm/engine/test/dmn/deployment/DmnDeployerTest.testMultipleDecisionDiagramResource.dmn10.xml",
+    "org/camunda/bpm/engine/test/dmn/deployment/DmnDeployerTest.testMultipleDecisionDiagramResource.dmn11.xml",
     "org/camunda/bpm/engine/test/dmn/deployment/DmnDeployerTest.testMultipleDecisionDiagramResource.decision1.png",
     "org/camunda/bpm/engine/test/dmn/deployment/DmnDeployerTest.testMultipleDecisionDiagramResource.decision2.png",
     "org/camunda/bpm/engine/test/dmn/deployment/DmnDeployerTest.testMultipleDecisionDiagramResource.decision3.png"

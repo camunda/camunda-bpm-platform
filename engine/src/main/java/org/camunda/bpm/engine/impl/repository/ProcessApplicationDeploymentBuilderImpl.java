@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.repository;
 
 import java.io.InputStream;
 import java.util.Date;
+import java.util.List;
 import java.util.zip.ZipInputStream;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
@@ -38,6 +39,7 @@ public class ProcessApplicationDeploymentBuilderImpl extends DeploymentBuilderIm
   public ProcessApplicationDeploymentBuilderImpl(RepositoryServiceImpl repositoryService, ProcessApplicationReference reference) {
     super(repositoryService);
     this.processApplicationReference = reference;
+    source(ProcessApplicationDeployment.PROCESS_APPLICATION_DEPLOYMENT_SOURCE);
   }
 
   public ProcessApplicationDeploymentBuilder resumePreviousVersions() {
@@ -93,6 +95,11 @@ public class ProcessApplicationDeploymentBuilderImpl extends DeploymentBuilderIm
   }
 
   @Override
+  public ProcessApplicationDeploymentBuilderImpl nameFromDeployment(String deploymentId) {
+    return (ProcessApplicationDeploymentBuilderImpl) super.nameFromDeployment(deploymentId);
+  }
+
+  @Override
   public ProcessApplicationDeploymentBuilderImpl source(String source) {
     return (ProcessApplicationDeploymentBuilderImpl) super.source(source);
   }
@@ -105,6 +112,30 @@ public class ProcessApplicationDeploymentBuilderImpl extends DeploymentBuilderIm
   @Override
   public ProcessApplicationDeploymentBuilderImpl enableDuplicateFiltering(boolean deployChangedOnly) {
     return (ProcessApplicationDeploymentBuilderImpl) super.enableDuplicateFiltering(deployChangedOnly);
+  }
+
+  public ProcessApplicationDeploymentBuilderImpl addDeploymentResources(String deploymentId) {
+    return (ProcessApplicationDeploymentBuilderImpl) super.addDeploymentResources(deploymentId);
+  }
+
+  @Override
+  public ProcessApplicationDeploymentBuilderImpl addDeploymentResourceById(String deploymentId, String resourceId) {
+    return (ProcessApplicationDeploymentBuilderImpl) super.addDeploymentResourceById(deploymentId, resourceId);
+  }
+
+  @Override
+  public ProcessApplicationDeploymentBuilderImpl addDeploymentResourcesById(String deploymentId, List<String> resourceIds) {
+    return (ProcessApplicationDeploymentBuilderImpl) super.addDeploymentResourcesById(deploymentId, resourceIds);
+  }
+
+  @Override
+  public ProcessApplicationDeploymentBuilderImpl addDeploymentResourceByName(String deploymentId, String resourceName) {
+    return (ProcessApplicationDeploymentBuilderImpl) super.addDeploymentResourceByName(deploymentId, resourceName);
+  }
+
+  @Override
+  public ProcessApplicationDeploymentBuilderImpl addDeploymentResourcesByName(String deploymentId, List<String> resourceNames) {
+    return (ProcessApplicationDeploymentBuilderImpl) super.addDeploymentResourcesByName(deploymentId, resourceNames);
   }
 
   // getters / setters ///////////////////////////////////////////////

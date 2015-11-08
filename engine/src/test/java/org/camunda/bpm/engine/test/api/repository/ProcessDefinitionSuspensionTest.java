@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.impl.test.TestHelper;
+//import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
@@ -95,8 +95,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     repositoryService.activateProcessDefinitionByKey(processDefinition.getKey());
     processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
     assertFalse(processDefinition.isSuspended());
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/db/processOne.bpmn20.xml"})
@@ -478,8 +476,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   public void testDelayedSuspendMultipleProcessDefinitionsByKey () {
@@ -537,8 +533,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn"})
@@ -623,8 +617,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
     assertEquals(jobDefinition.getId(), job.getJobDefinitionId());
     assertFalse(job.isSuspended());
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn"})
@@ -705,8 +697,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
     assertEquals(jobDefinition.getId(), job.getJobDefinitionId());
     assertFalse(job.isSuspended());
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn"})
@@ -787,9 +777,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
     assertEquals(jobDefinition.getId(), job.getJobDefinitionId());
     assertTrue(job.isSuspended());
-
-    // db cleanup
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn"})
@@ -923,8 +910,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
     assertEquals(jobDefinition.getId(), job.getJobDefinitionId());
     assertFalse(job.isSuspended());
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn"})
@@ -1059,9 +1044,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
     assertEquals(jobDefinition.getId(), job.getJobDefinitionId());
     assertTrue(job.isSuspended());
-
-    // db cleanup
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   public void testMultipleSuspendByKey_shouldSuspendJobDefinitionAndRetainJob() {
@@ -1101,8 +1083,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   public void testMultipleSuspendByKeyAndIncludeInstances_shouldSuspendJobDefinitionAndRetainJob() {
@@ -1142,8 +1122,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   public void testMultipleSuspendByKeyAndIncludeInstances_shouldSuspendJobDefinitionAndJob() {
@@ -1183,8 +1161,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   public void testDelayedMultipleSuspendByKeyAndIncludeInstances_shouldSuspendJobDefinitionAndRetainJob() {
@@ -1245,8 +1221,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   public void testDelayedMultipleSuspendByKeyAndIncludeInstances_shouldSuspendJobDefinitionAndJob() {
@@ -1307,8 +1281,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn"})
@@ -1407,8 +1379,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
     assertEquals(jobDefinition.getId(), job.getJobDefinitionId());
     assertTrue(job.isSuspended());
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn"})
@@ -1507,8 +1477,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
     assertEquals(jobDefinition.getId(), job.getJobDefinitionId());
     assertTrue(job.isSuspended());
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn"})
@@ -1607,9 +1575,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
     assertEquals(jobDefinition.getId(), job.getJobDefinitionId());
     assertFalse(job.isSuspended());
-
-    // db cleanup
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn"})
@@ -1761,8 +1726,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
     assertEquals(jobDefinition.getId(), job.getJobDefinitionId());
     assertTrue(job.isSuspended());
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testWithOneAsyncServiceTask.bpmn"})
@@ -1915,9 +1878,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
     assertEquals(jobDefinition.getId(), job.getJobDefinitionId());
     assertFalse(job.isSuspended());
-
-    // db cleanup
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   public void testMultipleActivationByKey_shouldActivateJobDefinitionAndRetainJob() {
@@ -1966,8 +1926,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   public void testMultipleActivationByKeyAndIncludeInstances_shouldActivateJobDefinitionAndRetainJob() {
@@ -2016,8 +1974,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   public void testMultipleActivationByKeyAndIncludeInstances_shouldActivateJobDefinitionAndJob() {
@@ -2067,8 +2023,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   public void testDelayedMultipleActivationByKeyAndIncludeInstances_shouldActivateJobDefinitionAndRetainJob() {
@@ -2138,8 +2092,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   public void testDelayedMultipleActivationByKeyAndIncludeInstances_shouldActivateJobDefinitionAndJob() {
@@ -2209,8 +2161,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     for (org.camunda.bpm.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
 
@@ -2228,8 +2178,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     // refresh job
     startTimer = managementService.createJobQuery().timers().singleResult();
     assertTrue(startTimer.isSuspended());
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testSuspendStartTimerOnProcessDefinitionSuspension.bpmn20.xml"})
@@ -2264,8 +2212,6 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     // refresh job
     startTimer = managementService.createJobQuery().timers().singleResult();
     assertFalse(startTimer.isSuspended());
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/repository/ProcessDefinitionSuspensionTest.testSuspendStartTimerOnProcessDefinitionSuspension.bpmn20.xml"})

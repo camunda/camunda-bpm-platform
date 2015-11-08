@@ -24,7 +24,6 @@ import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
 import org.camunda.bpm.dmn.engine.DmnScriptEngineResolver;
-import org.camunda.bpm.dmn.scriptengine.DmnScriptEngineFactory;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -100,7 +99,7 @@ public class ScriptingEngines implements DmnScriptEngineResolver {
 
     ScriptEngine engine = null;
     if (config.isEnableFetchScriptEngineFromProcessApplication()) {
-      if(pa != null && !DmnScriptEngineFactory.names.contains(language)) {
+      if(pa != null) {
         engine = getPaScriptEngine(language, pa);
       }
     }

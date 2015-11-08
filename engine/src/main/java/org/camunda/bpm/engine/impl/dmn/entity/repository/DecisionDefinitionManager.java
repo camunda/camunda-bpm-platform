@@ -64,6 +64,13 @@ public class DecisionDefinitionManager extends AbstractManager {
     return (Long) getDbEntityManager().selectOne("selectDecisionDefinitionCountByQueryCriteria", decisionDefinitionQuery);
   }
 
+  public String findPreviousDecisionDefinitionIdByKeyAndVersion(String decisionDefinitionKey, Integer version) {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("key", decisionDefinitionKey);
+    params.put("version", version);
+    return (String) getDbEntityManager().selectOne("selectPreviousDecisionDefinitionIdByKeyAndVersion", params);
+  }
+
   @SuppressWarnings("unchecked")
   public List<DecisionDefinition> findDecisionDefinitionByDeploymentId(String deploymentId) {
     return getDbEntityManager().selectList("selectDecisionDefinitionByDeploymentId", deploymentId);

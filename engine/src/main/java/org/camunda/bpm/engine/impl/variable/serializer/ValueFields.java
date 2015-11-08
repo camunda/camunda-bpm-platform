@@ -13,9 +13,6 @@
 
 package org.camunda.bpm.engine.impl.variable.serializer;
 
-import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
-
-
 /**
  * @author Tom Baeyens
  * @author Daniel Meyer
@@ -36,8 +33,7 @@ public interface ValueFields {
   Double getDoubleValue();
   void setDoubleValue(Double doubleValue);
 
-  String getByteArrayValueId();
-  ByteArrayEntity getByteArrayValue();
+  byte[] getByteArrayValue();
   void setByteArrayValue(byte[] bytes);
 
 }

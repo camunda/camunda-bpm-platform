@@ -8,6 +8,7 @@ import javax.inject.Inject;
 
 import org.camunda.bpm.engine.cdi.BusinessProcess;
 import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.context.VariableContext;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 abstract class AbstractVariableMap implements VariableMap {
@@ -124,6 +125,10 @@ abstract class AbstractVariableMap implements VariableMap {
   @Override
   public Set<java.util.Map.Entry<String, Object>> entrySet() {
     throw new UnsupportedOperationException(getClass().getName()+".entrySet() is not supported.");
+  }
+
+  public VariableContext asVariableContext() {
+    throw new UnsupportedOperationException(getClass().getName()+".asVariableContext() is not supported.");
   }
 
 }

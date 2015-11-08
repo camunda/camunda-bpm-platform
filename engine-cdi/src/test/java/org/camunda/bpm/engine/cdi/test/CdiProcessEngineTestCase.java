@@ -21,6 +21,11 @@ import javax.enterprise.inject.spi.BeanManager;
 
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
+import org.camunda.bpm.engine.AuthorizationService;
+import org.camunda.bpm.engine.CaseService;
+import org.camunda.bpm.engine.DecisionService;
+import org.camunda.bpm.engine.ExternalTaskService;
+import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
@@ -35,6 +40,7 @@ import org.camunda.bpm.engine.cdi.impl.util.ProgrammaticBeanLookup;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.util.LogUtil;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -50,6 +56,10 @@ import org.junit.runner.RunWith;
  */
 @RunWith(Arquillian.class)
 public abstract class CdiProcessEngineTestCase {
+
+  static {
+    LogUtil.readJavaUtilLoggingConfigFromClasspath();
+  }
 
   protected Logger logger = Logger.getLogger(getClass().getName());
 
@@ -74,6 +84,12 @@ public abstract class CdiProcessEngineTestCase {
   protected RepositoryService repositoryService;
   protected RuntimeService runtimeService;
   protected TaskService taskService;
+  protected AuthorizationService authorizationService;
+  protected FilterService filterService;
+  protected ExternalTaskService externalTaskService;
+  protected CaseService caseService;
+  protected DecisionService decisionService;
+
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
   @Before
@@ -93,6 +109,11 @@ public abstract class CdiProcessEngineTestCase {
     repositoryService = processEngine.getRepositoryService();
     runtimeService = processEngine.getRuntimeService();
     taskService = processEngine.getTaskService();
+    authorizationService = processEngine.getAuthorizationService();
+    filterService = processEngine.getFilterService();
+    externalTaskService = processEngine.getExternalTaskService();
+    caseService = processEngine.getCaseService();
+    decisionService = processEngine.getDecisionService();
   }
 
   @After
@@ -108,6 +129,11 @@ public abstract class CdiProcessEngineTestCase {
     repositoryService = null;
     runtimeService = null;
     taskService = null;
+    authorizationService = null;
+    filterService = null;
+    externalTaskService = null;
+    caseService = null;
+    decisionService = null;
     processEngineRule = null;
   }
 
@@ -198,6 +224,7 @@ public abstract class CdiProcessEngineTestCase {
     public boolean isTimeLimitExceeded() {
       return timeLimitExceeded;
     }
+    @Override
     public void run() {
       timeLimitExceeded = true;
       thread.interrupt();

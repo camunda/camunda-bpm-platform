@@ -15,14 +15,22 @@ package org.camunda.bpm.engine.impl.dmn.configuration;
 
 import org.camunda.bpm.dmn.engine.DmnScriptEngineResolver;
 import org.camunda.bpm.dmn.engine.impl.DmnEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.dmn.el.ProcessEngineElProvider;
 import org.camunda.bpm.engine.impl.dmn.handler.ProcessEngineDmnElementHandlerRegistry;
+import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.history.parser.HistoryDecisionTableListener;
 import org.camunda.bpm.engine.impl.metrics.dmn.MetricsDecisionTableListener;
 
 public class ProcessEngineDmnEngineConfiguration extends DmnEngineConfigurationImpl {
 
-  public ProcessEngineDmnEngineConfiguration(DmnScriptEngineResolver scriptEngineResolver, HistoryDecisionTableListener historyDecisionTableListener) {
+  protected ExpressionManager expressionManager;
+
+  public ProcessEngineDmnEngineConfiguration(
+      DmnScriptEngineResolver scriptEngineResolver,
+      HistoryDecisionTableListener historyDecisionTableListener,
+      ExpressionManager expressionManager) {
     this.scriptEngineResolver = scriptEngineResolver;
+    this.expressionManager = expressionManager;
     this.customPostDmnDecisionTableListeners.add(new MetricsDecisionTableListener());
   	this.customPostDmnDecisionTableListeners.add(historyDecisionTableListener);
   }
@@ -30,6 +38,12 @@ public class ProcessEngineDmnEngineConfiguration extends DmnEngineConfigurationI
   protected void initElementHandlerRegistry() {
     if (elementHandlerRegistry == null) {
       elementHandlerRegistry = new ProcessEngineDmnElementHandlerRegistry();
+    }
+  }
+
+  protected void initElProvider() {
+    if(elProvider == null) {
+      elProvider = new ProcessEngineElProvider(expressionManager);
     }
   }
 

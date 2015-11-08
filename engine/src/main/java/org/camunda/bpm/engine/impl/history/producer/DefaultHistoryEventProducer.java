@@ -229,14 +229,14 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setDoubleValue(variableInstance.getDoubleValue());
     evt.setLongValue(variableInstance.getLongValue());
     if (variableInstance.getByteArrayValueId() != null) {
-      ByteArrayEntity byteArrayValue = variableInstance.getByteArrayValue();
-      evt.setByteValue(byteArrayValue.getBytes());
+      evt.setByteValue(variableInstance.getByteArrayValue());
     }
   }
 
   protected void initUserOperationLogEvent(UserOperationLogEntryEventEntity evt, UserOperationLogContext context,
       UserOperationLogContextEntry contextEntry, PropertyChange propertyChange) {
     // init properties
+    evt.setDeploymentId(contextEntry.getDeploymentId());
     evt.setEntityType(contextEntry.getEntityType());
     evt.setOperationType(contextEntry.getOperationType());
     evt.setOperationId(context.getOperationId());
@@ -560,13 +560,6 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
   public List<HistoryEvent> createUserOperationLogEvents(UserOperationLogContext context) {
     List<HistoryEvent> historyEvents = new ArrayList<HistoryEvent>();
-
-    String userId = null;
-    CommandContext commandContext = Context.getCommandContext();
-    if (commandContext != null) {
-      userId = commandContext.getAuthenticatedUserId();
-    }
-    context.setUserId(userId);
 
     String operationId = Context.getProcessEngineConfiguration().getIdGenerator().getNextId();
     context.setOperationId(operationId);

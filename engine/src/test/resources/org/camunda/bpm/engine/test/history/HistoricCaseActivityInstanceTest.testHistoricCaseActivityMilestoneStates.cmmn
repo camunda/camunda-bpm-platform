@@ -7,7 +7,7 @@
 
   <case id="testCase" name="Test Case">
 
-    <casePlanModel>
+    <casePlanModel id="CasePlanModel_1">
 
       <planItem id="PI_Milestone_1" definitionRef="Milestone" entryCriteriaRefs="Sentry_1" />
       <planItem id="PI_Milestone_2" definitionRef="Milestone" entryCriteriaRefs="Sentry_2" />

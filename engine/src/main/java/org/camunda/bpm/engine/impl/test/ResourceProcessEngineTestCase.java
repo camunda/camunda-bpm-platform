@@ -14,14 +14,13 @@
 package org.camunda.bpm.engine.impl.test;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.ProcessEngines;
 
 
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class ResourceProcessEngineTestCase extends AbstractProcessEngineTestCase {
+public abstract class ResourceProcessEngineTestCase extends AbstractProcessEngineTestCase {
 
   protected String engineConfigurationResource;
 

@@ -33,7 +33,6 @@
     <module name="org.camunda.template-engines.camunda-template-engines-freemarker" services="import" />
 
     <module name="org.camunda.bpm.dmn.camunda-engine-dmn" />
-    <module name="org.camunda.bpm.dmn.camunda-scriptengine-dmn" services="import" />
 
   </dependencies>
 </module>

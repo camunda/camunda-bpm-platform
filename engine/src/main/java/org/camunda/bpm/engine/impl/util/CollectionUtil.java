@@ -13,10 +13,13 @@
 package org.camunda.bpm.engine.impl.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * helper/convience methods for working with collections.
@@ -58,5 +61,23 @@ public class CollectionUtil {
       map.put(key, list);
     }
     list.add(value);
+  }
+
+  public static <S, T> void addToMapOfSets(Map<S, Set<T>> map, S key, T value) {
+    Set<T> set = map.get(key);
+    if (set == null) {
+      set = new HashSet<T>();
+      map.put(key, set);
+    }
+    set.add(value);
+  }
+
+  public static <S, T> void addCollectionToMapOfSets(Map<S, Set<T>> map, S key, Collection<T> values) {
+    Set<T> set = map.get(key);
+    if (set == null) {
+      set = new HashSet<T>();
+      map.put(key, set);
+    }
+    set.addAll(values);
   }
 }

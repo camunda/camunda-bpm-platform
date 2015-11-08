@@ -27,7 +27,6 @@ import java.util.Set;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -1115,9 +1114,6 @@ public class ProcessInstanceQueryTest extends PluggableProcessEngineTestCase {
     repositoryService.suspendProcessDefinitionByKey("oneTaskProcess", true, null);
 
     assertEquals(1, processInstanceQuery.active().count());
-
-    // db cleanup
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   public void testQueryBySuspeded() throws Exception {
@@ -1132,10 +1128,7 @@ public class ProcessInstanceQueryTest extends PluggableProcessEngineTestCase {
     repositoryService.suspendProcessDefinitionByKey("oneTaskProcess", true, null);
 
     assertEquals(4, processInstanceQuery.suspended().count());
-
-    // db cleanup
-    TestHelper.clearOpLog(processEngineConfiguration);
-}
+  }
 
   public void testNativeQuery() {
     // just test that the query will be constructed and executed, details are tested in the TaskQueryTest

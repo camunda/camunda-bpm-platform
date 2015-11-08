@@ -29,6 +29,7 @@ import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySor
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -264,6 +265,18 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
     query = taskService.createTaskQuery().taskMaxPriority(3);
     assertEquals(6, query.list().size());
+
+    query = taskService.createTaskQuery().taskMinPriority(50).taskMaxPriority(10);
+    assertEquals(0, query.list().size());
+
+    query = taskService.createTaskQuery().taskPriority(30).taskMaxPriority(10);
+    assertEquals(0, query.list().size());
+
+    query = taskService.createTaskQuery().taskMinPriority(30).taskPriority(10);
+    assertEquals(0, query.list().size());
+
+    query = taskService.createTaskQuery().taskMinPriority(30).taskPriority(20).taskMaxPriority(10);
+    assertEquals(0, query.list().size());
   }
 
   public void testQueryByInvalidPriority() {
@@ -546,6 +559,25 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(0, query.list().size());
   }
 
+  public void testCreateTimeCombinations() throws ParseException {
+    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
+
+    // Exact matching of createTime, should result in 6 tasks
+    Date createTime = sdf.parse("01/01/2001 01:01:01.000");
+
+    Date oneHourAgo = new Date(createTime.getTime() - 60 * 60 * 1000);
+    Date oneHourLater = new Date(createTime.getTime() + 60 * 60 * 1000);
+
+    assertEquals(6, taskService.createTaskQuery()
+        .taskCreatedAfter(oneHourAgo).taskCreatedOn(createTime).taskCreatedBefore(oneHourLater).count());
+    assertEquals(0, taskService.createTaskQuery()
+        .taskCreatedAfter(oneHourLater).taskCreatedOn(createTime).taskCreatedBefore(oneHourAgo).count());
+    assertEquals(0, taskService.createTaskQuery()
+        .taskCreatedAfter(oneHourLater).taskCreatedOn(createTime).count());
+    assertEquals(0, taskService.createTaskQuery()
+        .taskCreatedOn(createTime).taskCreatedBefore(oneHourAgo).count());
+  }
+
   @Deployment(resources="org/camunda/bpm/engine/test/api/task/taskDefinitionProcess.bpmn20.xml")
   public void testTaskDefinitionKey() throws Exception {
 
@@ -630,6 +662,9 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     // No task should be found with UnexistingKey
     Long count = taskService.createTaskQuery().taskDefinitionKeyIn("unexistingKey").count();
     assertEquals(0L, count.longValue());
+
+    count = taskService.createTaskQuery().taskDefinitionKey("unexistingKey").taskDefinitionKeyIn("taskKey1").count();
+    assertEquals(0l, count.longValue());
   }
 
   @Deployment
@@ -1236,6 +1271,10 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     // No task should be found with NonExistingKey
     Long count = taskService.createTaskQuery().processDefinitionKeyIn("NonExistingKey").count();
     assertEquals(0L, count.longValue());
+
+    count = taskService.createTaskQuery()
+        .processDefinitionKeyIn("oneTaskProcess").processDefinitionKey("NonExistingKey").count();
+    assertEquals(0L, count.longValue());
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
@@ -1300,6 +1339,10 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
 
     assertNotNull(tasks);
     assertEquals("theTask", task.getTaskDefinitionKey());
+
+    long count = taskService.createTaskQuery().processInstanceBusinessKeyIn("BUSINESS-KEY-1").processInstanceBusinessKey("NON-EXISTING-KEY")
+        .count();
+    assertEquals(0l, count);
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
@@ -1399,6 +1442,29 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
+  public void testTaskDueDateCombinations() throws ParseException {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+    // Set due-date on task
+    Date dueDate = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse("01/02/2003 01:12:13");
+    task.setDueDate(dueDate);
+    taskService.saveTask(task);
+
+    Date oneHourAgo = new Date(dueDate.getTime() - 60 * 60 * 1000);
+    Date oneHourLater = new Date(dueDate.getTime() + 60 * 60 * 1000);
+
+    assertEquals(1, taskService.createTaskQuery()
+        .dueAfter(oneHourAgo).dueDate(dueDate).dueBefore(oneHourLater).count());
+    assertEquals(0, taskService.createTaskQuery()
+        .dueAfter(oneHourLater).dueDate(dueDate).dueBefore(oneHourAgo).count());
+    assertEquals(0, taskService.createTaskQuery()
+        .dueAfter(oneHourLater).dueDate(dueDate).count());
+    assertEquals(0, taskService.createTaskQuery()
+        .dueDate(dueDate).dueBefore(oneHourAgo).count());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
   public void testFollowUpDate() throws Exception {
     Calendar otherDate = Calendar.getInstance();
 
@@ -1436,6 +1502,29 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
         .followUpBeforeOrNotExistent(otherDate.getTime()).count());
 
     taskService.complete(task.getId());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})
+  public void testFollowUpDateCombinations() throws ParseException {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+    // Set follow-up date on task
+    Date dueDate = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse("01/02/2003 01:12:13");
+    task.setFollowUpDate(dueDate);
+    taskService.saveTask(task);
+
+    Date oneHourAgo = new Date(dueDate.getTime() - 60 * 60 * 1000);
+    Date oneHourLater = new Date(dueDate.getTime() + 60 * 60 * 1000);
+
+    assertEquals(1, taskService.createTaskQuery()
+        .followUpAfter(oneHourAgo).followUpDate(dueDate).followUpBefore(oneHourLater).count());
+    assertEquals(0, taskService.createTaskQuery()
+        .followUpAfter(oneHourLater).followUpDate(dueDate).followUpBefore(oneHourAgo).count());
+    assertEquals(0, taskService.createTaskQuery()
+        .followUpAfter(oneHourLater).followUpDate(dueDate).count());
+    assertEquals(0, taskService.createTaskQuery()
+        .followUpDate(dueDate).followUpBefore(oneHourAgo).count());
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/task/TaskQueryTest.testProcessDefinition.bpmn20.xml"})

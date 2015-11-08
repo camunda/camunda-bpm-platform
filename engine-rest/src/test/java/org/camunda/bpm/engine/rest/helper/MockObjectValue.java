@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.engine.rest.helper;
 
-import org.camunda.bpm.engine.impl.core.variable.value.ObjectValueImpl;
+import org.camunda.bpm.engine.variable.impl.value.ObjectValueImpl;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 
 /**

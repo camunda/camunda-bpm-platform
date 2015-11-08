@@ -69,7 +69,7 @@
   </resultMap>
 
   <!-- PROCESSDEFINITION SELECT -->
-  
+
   <select id="selectProcessDefinition" parameterType="string" resultMap="processDefinitionResultMap">
     select * from ${prefix}ACT_RE_PROCDEF where ID_ = #{processDefinitionId}
   </select>
@@ -91,6 +91,13 @@
        #{key}
      </foreach>
     </if>
+  </select>
+
+  <select id="selectPreviousProcessDefinitionIdByKeyAndVersion" parameterType="map" resultType="string">
+    select RES.ID_
+      from ${prefix}ACT_RE_PROCDEF RES
+     where RES.KEY_ = #{key}
+       and RES.VERSION_ = (select MAX(VERSION_) from ${prefix}ACT_RE_PROCDEF where KEY_ = #{key} AND VERSION_ &lt; #{version})
   </select>
 
   <select id="selectProcessDefinitionsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl" resultMap="processDefinitionResultMap">

@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -26,6 +27,7 @@ import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.persistence.entity.util.ByteArrayField;
 import org.camunda.bpm.engine.impl.persistence.entity.util.TypedValueField;
+import org.camunda.bpm.engine.impl.persistence.entity.util.TypedValueUpdateListener;
 import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.ValueFields;
 import org.camunda.bpm.engine.runtime.VariableInstance;
@@ -34,7 +36,7 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
 /**
  * @author Tom Baeyens
  */
-public class VariableInstanceEntity implements VariableInstance, CoreVariableInstance, ValueFields, DbEntity, DbEntityLifecycleAware, HasDbRevision, Serializable {
+public class VariableInstanceEntity implements VariableInstance, CoreVariableInstance, ValueFields, DbEntity, DbEntityLifecycleAware, TypedValueUpdateListener, HasDbRevision, Serializable {
 
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
@@ -59,7 +61,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
 
   protected ByteArrayField byteArrayField = new ByteArrayField(this);
 
-  protected TypedValueField typedValueField = new TypedValueField(this);
+  protected TypedValueField typedValueField = new TypedValueField(this, true);
 
   boolean forcedUpdate;
 
@@ -91,8 +93,14 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
    */
   protected boolean isConcurrentLocal = false;
 
+  /**
+   * Determines whether this variable is stored in the data base.
+   */
+  protected boolean isTransient = false;
+
   // Default constructor for SQL mapping
   public VariableInstanceEntity() {
+    typedValueField.addImplicitUpdateListener(this);
   }
 
   public static VariableInstanceEntity createAndInsert(String name, TypedValue value) {
@@ -118,15 +126,13 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   }
 
   public void delete() {
-
     // clear value
     clearValueFields();
 
-    // delete variable
-    Context
-      .getCommandContext()
-      .getDbEntityManager()
-      .delete(this);
+    if (!isTransient) {
+      // delete variable
+      Context.getCommandContext().getDbEntityManager().delete(this);
+    }
   }
 
   public Object getPersistentState() {
@@ -195,12 +201,16 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     this.byteArrayField.setByteArrayId(byteArrayValueId);
   }
 
-  public ByteArrayEntity getByteArrayValue() {
+  public byte[] getByteArrayValue() {
     return byteArrayField.getByteArrayValue();
   }
 
   public void setByteArrayValue(byte[] bytes) {
-    byteArrayField.setByteArrayValue(bytes);
+    // avoid setting a byte array value for a transient variable because this
+    // would create and insert an entity in the data base
+    if (!isTransient) {
+      byteArrayField.setByteArrayValue(bytes);
+    }
   }
 
   protected void deleteByteArrayValue() {
@@ -392,7 +402,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     return typedValueField.getErrorMessage();
   }
 
-  public String getVariableScope() {
+  public String getVariableScopeId() {
     if (taskId != null) {
       return taskId;
     }
@@ -402,6 +412,23 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     }
 
     return caseExecutionId;
+  }
+
+  protected VariableScope getVariableScope() {
+
+    if (taskId != null) {
+      return Context.getCommandContext().getTaskManager().findTaskById(taskId);
+    }
+    else if (executionId != null) {
+      return Context.getCommandContext().getExecutionManager().findExecutionById(executionId);
+    }
+    else if (caseExecutionId != null) {
+      return Context.getCommandContext().getCaseExecutionManager().findCaseExecutionById(caseExecutionId);
+    }
+    else {
+      return null;
+    }
+
   }
 
   //sequence counter ///////////////////////////////////////////////////////////
@@ -425,6 +452,14 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
 
   public void setConcurrentLocal(boolean isConcurrentLocal) {
     this.isConcurrentLocal = isConcurrentLocal;
+  }
+
+  @Override
+  public void onImplicitValueUpdate(TypedValue updatedValue) {
+    // note: this implementation relies on the
+    //   behavior that the variable scope
+    //   of variable value can never become null
+    getVariableScope().setVariableLocal(name, updatedValue);
   }
 
   @Override
@@ -473,6 +508,23 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
     } else if (!id.equals(other.id))
       return false;
     return true;
+  }
+
+  /**
+   * @param isTransient
+   *          <code>true</code>, if the variable is not stored in the data base.
+   *          Default is <code>false</code>.
+   */
+  public void setTransient(boolean isTransient) {
+    this.isTransient = isTransient;
+  }
+
+  /**
+   * @return <code>true</code>, if the variable is transient. A transient
+   *         variable is not stored in the data base.
+   */
+  public boolean isTransient() {
+    return isTransient;
   }
 
 }

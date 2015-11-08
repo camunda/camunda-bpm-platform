@@ -39,7 +39,7 @@ public class DmnHistoryTest extends AbstractFoxPlatformIntegrationTest {
 
     return initWebArchiveDeployment()
         .addAsResource("org/camunda/bpm/integrationtest/functional/dmn/BusinessRuleProcess.bpmn20.xml", "BusinessRuleProcess.bpmn20.xml")
-        .addAsResource("org/camunda/bpm/integrationtest/functional/dmn/Example.dmn10.xml", "Example.dmn10.xml");
+        .addAsResource("org/camunda/bpm/integrationtest/functional/dmn/Example.dmn11.xml", "Example.dmn11.xml");
 
   }
 
@@ -52,7 +52,7 @@ public class DmnHistoryTest extends AbstractFoxPlatformIntegrationTest {
     HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery().includeInputs().includeOutputs().singleResult();
     assertThat(historicDecisionInstance, is(notNullValue()));
     assertThat(historicDecisionInstance.getDecisionDefinitionKey(), is("decision"));
-    assertThat(historicDecisionInstance.getDecisionDefinitionName(), is("CheckOrder"));
+    assertThat(historicDecisionInstance.getDecisionDefinitionName(), is("Check Order"));
 
     assertThat(historicDecisionInstance.getInputs().size(), is(2));
     assertThat(historicDecisionInstance.getOutputs().size(), is(2));

@@ -134,14 +134,10 @@ public class SignalEventReceivedCmd implements Command<Void> {
   }
 
   private void notifyExecutions(List<SignalEventSubscriptionEntity> catchSignalEventSubscription) {
-    HashMap<String, Object> payload = null;
-    if (variables != null) {
-      payload = new HashMap<String, Object>(variables);
-    }
 
     for (SignalEventSubscriptionEntity signalEventSubscriptionEntity : catchSignalEventSubscription) {
       if (isActiveEventSubscription(signalEventSubscriptionEntity)) {
-        signalEventSubscriptionEntity.eventReceived(payload, false);
+        signalEventSubscriptionEntity.eventReceived(variables, false);
       }
     }
   }

@@ -35,7 +35,6 @@ import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
-import org.camunda.bpm.engine.impl.core.variable.type.ObjectTypeImpl;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
@@ -54,6 +53,7 @@ import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.type.SerializableValueType;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.BooleanValue;
 import org.camunda.bpm.engine.variable.value.FileValue;
@@ -337,8 +337,8 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .then().expect().statusCode(Status.OK.getStatusCode())
       .body(variableKey + ".value", equalTo(payload))
       .body(variableKey + ".type", equalTo("Object"))
-      .body(variableKey + ".valueInfo." + ObjectTypeImpl.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
-      .body(variableKey + ".valueInfo." + ObjectTypeImpl.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ArrayList.class.getName()))
+      .body(variableKey + ".valueInfo." + SerializableValueType.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
+      .body(variableKey + ".valueInfo." + SerializableValueType.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ArrayList.class.getName()))
       .when().get(EXECUTION_LOCAL_VARIABLES_URL);
 
     // then
@@ -367,8 +367,8 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     .then().expect().statusCode(Status.OK.getStatusCode())
       .body(variableKey + ".value", equalTo("a serialized value"))
       .body(variableKey + ".type", equalTo("Object"))
-      .body(variableKey + ".valueInfo." + ObjectTypeImpl.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
-      .body(variableKey + ".valueInfo." + ObjectTypeImpl.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ArrayList.class.getName()))
+      .body(variableKey + ".valueInfo." + SerializableValueType.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
+      .body(variableKey + ".valueInfo." + SerializableValueType.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ArrayList.class.getName()))
       .when().get(EXECUTION_LOCAL_VARIABLES_URL);
 
     // then
@@ -556,8 +556,8 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .then().expect().statusCode(Status.OK.getStatusCode())
       .body("value", equalTo(payload))
       .body("type", equalTo("Object"))
-      .body("valueInfo." + ObjectTypeImpl.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
-      .body("valueInfo." + ObjectTypeImpl.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ArrayList.class.getName()))
+      .body("valueInfo." + SerializableValueType.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
+      .body("valueInfo." + SerializableValueType.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ArrayList.class.getName()))
       .when().get(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
 
     // then
@@ -586,8 +586,8 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     .then().expect().statusCode(Status.OK.getStatusCode())
       .body("value", equalTo("a serialized value"))
       .body("type", equalTo("Object"))
-      .body("valueInfo." + ObjectTypeImpl.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
-      .body("valueInfo." + ObjectTypeImpl.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ArrayList.class.getName()))
+      .body("valueInfo." + SerializableValueType.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
+      .body("valueInfo." + SerializableValueType.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ArrayList.class.getName()))
       .when().get(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
 
     // then
@@ -714,15 +714,16 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
 
     when(runtimeServiceMock.getVariableLocalTyped(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey), anyBoolean())).thenReturn(variableValue);
 
-    given()
+    Response response = given()
       .pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID)
       .pathParam("varId", variableKey)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
-      .contentType(either(CoreMatchers.<Object>equalTo(ContentType.TEXT.toString() + "; charset=UTF-8")).or(CoreMatchers.<Object>equalTo(ContentType.TEXT.toString() + ";charset=UTF-8")))
-    .and()
       .body(is(equalTo(new String(byteContent))))
     .when().get(SINGLE_EXECUTION_LOCAL_BINARY_VARIABLE_URL);
+
+    String contentType = response.contentType().replaceAll(" ", "");
+    assertThat(contentType, is(ContentType.TEXT + ";charset=" + encoding));
   }
 
   @Test
@@ -1010,7 +1011,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
   }
 
   @Test
-  public void testPutSingleLocalBinaryVariable() throws Exception {
+  public void testPutSingleLocalBinaryVariable() {
     byte[] bytes = "someContent".getBytes();
 
     String variableKey = "aVariableKey";
@@ -1029,7 +1030,67 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
   }
 
   @Test
-  public void testPutSingleLocalBinaryVariableWithNoValue() throws Exception {
+  public void testPutSingleLocalBinaryVariableWithValueType() {
+    byte[] bytes = "someContent".getBytes();
+
+    String variableKey = "aVariableKey";
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
+      .multiPart("data", null, bytes)
+      .multiPart("valueType", "Bytes", "text/plain")
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(SINGLE_EXECUTION_LOCAL_BINARY_VARIABLE_URL);
+
+    verify(runtimeServiceMock).setVariableLocal(
+        eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey),
+        argThat(EqualsPrimitiveValue.bytesValue(bytes)));
+  }
+
+  @Test
+  public void testPutSingleLocalBinaryVariableWithUnknownValueType() {
+    byte[] bytes = "someContent".getBytes();
+
+    String variableKey = "aVariableKey";
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
+      .multiPart("data", null, bytes)
+      .multiPart("valueType", "SomeUnknownType", "text/plain")
+    .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Unsupported value type 'SomeUnknownType'"))
+    .when()
+      .post(SINGLE_EXECUTION_LOCAL_BINARY_VARIABLE_URL);
+
+    verify(runtimeServiceMock, never()).setVariableLocal(anyString(), anyString(), any(Object.class));
+  }
+
+  @Test
+  public void testPutSingleLocalBinaryVariableWithValueTypeOfWrongMimeType() {
+    byte[] bytes = "someContent".getBytes();
+
+    String variableKey = "aVariableKey";
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
+      .multiPart("data", null, bytes)
+      .multiPart("valueType", "{ \"type\": \"Bytes\"", "application/json")
+    .expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Form part with name 'valueType' must have a text/plain value"))
+    .when()
+      .post(SINGLE_EXECUTION_LOCAL_BINARY_VARIABLE_URL);
+
+    verify(runtimeServiceMock, never()).setVariableLocal(anyString(), anyString(), any(Object.class));
+  }
+
+  @Test
+  public void testPutSingleLocalBinaryVariableWithNoValue() {
     byte[] bytes = new byte[0];
 
     String variableKey = "aVariableKey";
@@ -1119,7 +1180,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
   }
 
   @Test
-  public void testPutSingleLocalVariableFromSerialized() throws Exception {
+  public void testPutSingleLocalVariableFromSerialized() {
     String serializedValue = "{\"prop\" : \"value\"}";
     Map<String, Object> requestJson = VariablesBuilder
         .getObjectValueMap(serializedValue, ValueType.OBJECT.getName(), "aDataFormat", "aRootType");
@@ -1144,7 +1205,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
   }
 
   @Test
-  public void testPutSingleLocalVariableFromInvalidSerialized() throws Exception {
+  public void testPutSingleLocalVariableFromInvalidSerialized() {
     String serializedValue = "{\"prop\" : \"value\"}";
 
     Map<String, Object> requestJson = VariablesBuilder
@@ -1228,7 +1289,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
   }
 
   @Test
-  public void testPostSingleLocalFileVariableWithEncodingAndMimeType() throws Exception {
+  public void testPostSingleLocalFileVariableWithEncodingAndMimeType() {
 
     byte[] value = "some text".getBytes();
     String variableKey = "aVariableKey";
@@ -1239,6 +1300,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     given()
       .pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
       .multiPart("data", filename, value, mimetype + "; encoding="+encoding)
+      .multiPart("valueType", "File", "text/plain")
       .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
@@ -1256,7 +1318,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
   }
 
   @Test
-  public void testPostSingleLocalFileVariableWithMimeType() throws Exception {
+  public void testPostSingleLocalFileVariableWithMimeType() {
 
     byte[] value = "some text".getBytes();
     String variableKey = "aVariableKey";
@@ -1266,6 +1328,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     given()
       .pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
       .multiPart("data", filename, value, mimetype)
+      .multiPart("valueType", "File", "text/plain")
       .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
@@ -1283,7 +1346,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
   }
 
   @Test
-  public void testPostSingleLocalFileVariableWithEncoding() throws Exception {
+  public void testPostSingleLocalFileVariableWithEncoding() {
 
     byte[] value = "some text".getBytes();
     String variableKey = "aVariableKey";
@@ -1293,6 +1356,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     given()
       .pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
       .multiPart("data", filename, value, "encoding="+encoding)
+      .multiPart("valueType", "File", "text/plain")
       .header("accept", MediaType.APPLICATION_JSON)
     .expect()
     //when the user passes an encoding, he has to provide the type, too
@@ -1310,6 +1374,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     given()
       .pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
       .multiPart("data", filename, new byte[0])
+      .multiPart("valueType", "File", "text/plain")
       .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())

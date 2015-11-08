@@ -13,19 +13,21 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity.util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.core.variable.value.UntypedValueImpl;
 import org.camunda.bpm.engine.impl.db.DbEntityLifecycleAware;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextListener;
-import org.camunda.bpm.engine.impl.variable.serializer.ByteArrayValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.ValueFields;
+import org.camunda.bpm.engine.impl.variable.serializer.ValueFieldsImpl;
 import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
+import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.SerializableValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -49,8 +51,13 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
 
   protected final ValueFields valueFields;
 
-  public TypedValueField(ValueFields valueFields) {
+  protected boolean notifyOnImplicitUpdates = false;
+  protected List<TypedValueUpdateListener> updateListeners;
+
+  public TypedValueField(ValueFields valueFields, boolean notifyOnImplicitUpdates) {
     this.valueFields = valueFields;
+    this.notifyOnImplicitUpdates = notifyOnImplicitUpdates;
+    this.updateListeners = new ArrayList<TypedValueUpdateListener>();
   }
 
   public Object getValue() {
@@ -79,7 +86,7 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
       try {
         cachedValue = getSerializer().readValue(valueFields, deserializeValue);
 
-        if (isMutableValue(cachedValue)) {
+        if (notifyOnImplicitUpdates && isMutableValue(cachedValue)) {
           Context.getCommandContext().registerCommandContextListener(this);
         }
 
@@ -103,18 +110,22 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
     }
 
     // set new value
-    writeValue(value);
+    writeValue(value, valueFields);
 
     // cache the value
     cachedValue = value;
 
     // ensure that we serialize the object on command context flush
     // if it can be implicitly changed
-    if (isMutableValue(cachedValue)) {
+    if (notifyOnImplicitUpdates && isMutableValue(cachedValue)) {
       Context.getCommandContext().registerCommandContextListener(this);
     }
 
     return value;
+  }
+
+  public boolean isMutable() {
+    return isMutableValue(cachedValue);
   }
 
   @SuppressWarnings("unchecked")
@@ -122,32 +133,36 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
     return((TypedValueSerializer<TypedValue>) serializer).isMutableValue(value);
   }
 
+  protected boolean isValuedImplicitlyUpdated() {
+    if (cachedValue != null && isMutableValue(cachedValue)) {
+      byte[] byteArray = valueFields.getByteArrayValue();
+
+      ValueFieldsImpl tempValueFields = new ValueFieldsImpl();
+      writeValue(cachedValue, tempValueFields);
+
+      byte[] byteArrayAfter = tempValueFields.getByteArrayValue();
+
+      return !Arrays.equals(byteArray, byteArrayAfter);
+    }
+
+    return false;
+  }
+
   @SuppressWarnings("unchecked")
-  protected void writeValue(TypedValue value) {
+  protected void writeValue(TypedValue value, ValueFields valueFields) {
     ((TypedValueSerializer<TypedValue>) serializer).writeValue(value, valueFields);
   }
 
   public void onCommandContextClose(CommandContext commandContext) {
-    updateFields();
+    if (isValuedImplicitlyUpdated()) {
+      for (TypedValueUpdateListener typedValueImplicitUpdateListener : updateListeners) {
+        typedValueImplicitUpdateListener.onImplicitValueUpdate(cachedValue);
+      }
+    }
   }
 
   public void onCommandFailed(CommandContext commandContext, Throwable t) {
     // ignore
-  }
-
-  protected void updateFields() {
-    if (cachedValue != null &&isMutableValue(cachedValue)) {
-      byte[] byteArray = ByteArrayValueSerializer.getBytes(valueFields);
-
-      writeValue(cachedValue);
-
-      byte[] byteArrayAfter = ByteArrayValueSerializer.getBytes(valueFields);
-
-      if (Arrays.equals(byteArray, byteArrayAfter)) {
-        // avoids an UPDATE statement when the byte array has not changed, cf ByteArrayEntity#getPersistentState
-        ByteArrayValueSerializer.setBytes(valueFields, byteArray);
-      }
-    }
   }
 
   public TypedValueSerializer<?> getSerializer() {
@@ -178,6 +193,10 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
 
   public void setSerializerName(String serializerName) {
     this.serializerName = serializerName;
+  }
+
+  public void addImplicitUpdateListener(TypedValueUpdateListener listener) {
+    updateListeners.add(listener);
   }
 
   /**

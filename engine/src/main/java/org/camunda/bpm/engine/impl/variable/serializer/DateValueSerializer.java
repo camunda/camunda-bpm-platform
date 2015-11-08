@@ -14,8 +14,8 @@ package org.camunda.bpm.engine.impl.variable.serializer;
 
 import java.util.Date;
 
-import org.camunda.bpm.engine.impl.core.variable.value.UntypedValueImpl;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.DateValue;
 

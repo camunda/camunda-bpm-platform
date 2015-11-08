@@ -14,10 +14,9 @@ package org.camunda.bpm.engine.impl.variable.serializer;
 
 import java.io.InputStream;
 
-import org.camunda.bpm.engine.impl.core.variable.value.UntypedValueImpl;
-import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.BytesValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -43,34 +42,16 @@ public class ByteArrayValueSerializer extends PrimitiveValueSerializer<BytesValu
   }
 
   public BytesValue readValue(ValueFields valueFields) {
-    return Variables.byteArrayValue(getBytes(valueFields));
+    return Variables.byteArrayValue(valueFields.getByteArrayValue());
   }
 
   public void writeValue(BytesValue variableValue, ValueFields valueFields) {
-    setBytes(valueFields, variableValue.getValue());
+    valueFields.setByteArrayValue(variableValue.getValue());
   }
 
   @Override
   protected boolean canWriteValue(TypedValue typedValue) {
     return super.canWriteValue(typedValue) || typedValue.getValue() instanceof InputStream;
-  }
-
-  public static byte[] getBytes(ValueFields valueFields) {
-    byte[] byteArray = null;
-    if (valueFields.getByteArrayValue() != null) {
-      byteArray = valueFields.getByteArrayValue().getBytes();
-    }
-    return byteArray;
-  }
-
-  public static void setBytes(ValueFields valueFields, byte[] bytes) {
-    ByteArrayEntity byteArray = valueFields.getByteArrayValue();
-
-    if (byteArray == null) {
-      valueFields.setByteArrayValue(bytes);
-    } else {
-      byteArray.setBytes(bytes);
-    }
   }
 
 }

@@ -34,6 +34,7 @@ public class UserOperationLogEntryEventEntity extends HistoryEvent implements Us
   protected String orgValue;
   protected String newValue;
   protected String entityType;
+  protected String deploymentId;
 
   public String getOperationId() {
     return operationId;
@@ -123,10 +124,19 @@ public class UserOperationLogEntryEventEntity extends HistoryEvent implements Us
     this.jobDefinitionId = jobDefinitionId;
   }
 
+  public String getDeploymentId() {
+    return deploymentId;
+  }
+
+  public void setDeploymentId(String deploymentId) {
+    this.deploymentId = deploymentId;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
         + "[taskId" + taskId
+        + ", deploymentId" + deploymentId
         + ", processDefinitionKey =" + processDefinitionKey
         + ", jobId = " + jobId
         + ", jobDefinitionId = " + jobDefinitionId

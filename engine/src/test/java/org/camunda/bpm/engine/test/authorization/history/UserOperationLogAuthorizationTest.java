@@ -47,16 +47,16 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
   protected String deploymentId;
 
   public void setUp() throws Exception {
-    super.setUp();
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/authorization/oneTaskCase.cmmn",
         "org/camunda/bpm/engine/test/authorization/timerBoundaryEventProcess.bpmn20.xml").getId();
+    super.setUp();
   }
 
   public void tearDown() {
-    deleteDeployment(deploymentId);
     super.tearDown();
+    deleteDeployment(deploymentId);
   }
 
   // standalone task ///////////////////////////////
@@ -334,9 +334,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     taskService.complete(taskId);
     enableAuthorization();
 
-    disableAuthorization();
-    repositoryService.deleteDeployment(deploymentId);
-    enableAuthorization();
+    deleteDeployment(deploymentId, false);
 
     // when
     UserOperationLogQuery query = historyService.createUserOperationLogQuery();
@@ -446,9 +444,7 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
     taskService.complete(taskId);
     enableAuthorization();
 
-    disableAuthorization();
-    repositoryService.deleteDeployment(deploymentId);
-    enableAuthorization();
+    deleteDeployment(deploymentId, false);
 
     String entryId = historyService.createUserOperationLogQuery().singleResult().getId();
 
@@ -496,7 +492,6 @@ public class UserOperationLogAuthorizationTest extends AuthorizationTest {
   }
 
   protected void clearDatabase() {
-    clearOpLog();
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Object>() {
       public Object execute(CommandContext commandContext) {

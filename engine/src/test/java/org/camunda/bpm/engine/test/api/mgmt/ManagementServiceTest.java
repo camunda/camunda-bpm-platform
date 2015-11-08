@@ -22,10 +22,8 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricIncident;
-import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cmd.AcquireJobsCmd;
-import org.camunda.bpm.engine.impl.incident.DefaultIncidentHandler;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -36,10 +34,10 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.TableMetaData;
+import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -326,8 +324,6 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(3, job.getRetries());
 
     deleteJobAndIncidents(job);
-
-    TestHelper.clearOpLog(processEngineConfiguration);
   }
 
   protected void createJob(final int retries, final String owner, final Date lockExpirationTime) {
@@ -385,7 +381,7 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
   protected void deleteJobAndIncidents(final Job job) {
     final List<HistoricIncident> incidents =
         historyService.createHistoricIncidentQuery()
-        .incidentType(DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE).list();
+        .incidentType(Incident.FAILED_JOB_HANDLER_TYPE).list();
 
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Void>() {
@@ -644,8 +640,4 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(Long.MIN_VALUE + 1, job.getPriority());
   }
 
-  protected void cleanOpLog(String jobId) {
-    UserOperationLogEntry entry = historyService.createUserOperationLogQuery().jobId(jobId).singleResult();
-    historyService.deleteUserOperationLogEntry(entry.getId());
-  }
 }

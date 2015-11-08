@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Job;
@@ -29,10 +28,6 @@ import org.camunda.bpm.engine.test.Deployment;
  * @author roman.smirnov
  */
 public class ActivateJobTest extends PluggableProcessEngineTestCase {
-
-  public void tearDown() throws Exception {
-    TestHelper.clearOpLog(processEngineConfiguration);
-  }
 
   public void testActivationById_shouldThrowProcessEngineException() {
     try {

@@ -14,7 +14,9 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.ByteArrayInputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,6 +30,9 @@ import java.util.logging.Logger;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.DeploymentQueryImpl;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
@@ -38,15 +43,20 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentFailListener;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.DeploymentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessApplicationDeploymentImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ResourceManager;
+import org.camunda.bpm.engine.impl.persistence.entity.UserOperationLogManager;
 import org.camunda.bpm.engine.impl.repository.DeploymentBuilderImpl;
 import org.camunda.bpm.engine.impl.repository.ProcessApplicationDeploymentBuilderImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ResumePreviousBy;
@@ -85,10 +95,35 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
   }
 
   protected Deployment doExecute(final CommandContext commandContext) {
+    DeploymentManager deploymentManager = commandContext.getDeploymentManager();
+
+    Set<String> deploymentIds = getAllDeploymentIds(deploymentBuilder);
+    if (!deploymentIds.isEmpty()) {
+      String[] deploymentIdArray = deploymentIds.toArray(new String[deploymentIds.size()]);
+      List<DeploymentEntity> deployments = deploymentManager.findDeploymentsByIds(deploymentIdArray);
+      ensureDeploymentsWithIdsExists(deploymentIds, deployments);
+    }
+
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     authorizationManager.checkCreateDeployment();
+    checkReadDeployments(authorizationManager, deploymentIds);
 
-    return commandContext.runWithoutAuthorization(new Callable<Deployment>() {
+    // set deployment name if it should retrieved from an existing deployment
+    String nameFromDeployment = deploymentBuilder.getNameFromDeployment();
+    setDeploymentName(nameFromDeployment, deploymentBuilder, commandContext);
+
+    // get resources to re-deploy
+    List<ResourceEntity> resources = getResources(deploymentBuilder, commandContext);
+    // .. and add them the builder
+    addResources(resources, deploymentBuilder);
+
+    Collection<String> resourceNames = deploymentBuilder.getResourceNames();
+    if (resourceNames == null || resourceNames.isEmpty()) {
+      throw new NotValidException("No deployment resources contained to deploy.");
+    }
+
+    // perform deployment
+    Deployment deployment = commandContext.runWithoutAuthorization(new Callable<Deployment>() {
       public Deployment call() throws Exception {
         acquireExclusiveLock(commandContext);
         DeploymentEntity deployment = initDeployment();
@@ -120,6 +155,250 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
         return deployment;
       }
     });
+
+    createUserOperationLog(deploymentBuilder, deployment, commandContext);
+
+    return deployment;
+  }
+
+  protected void createUserOperationLog(DeploymentBuilderImpl deploymentBuilder, Deployment deployment, CommandContext commandContext) {
+    UserOperationLogManager logManager = commandContext.getOperationLogManager();
+
+    List<PropertyChange> properties = new ArrayList<PropertyChange>();
+
+    PropertyChange filterDuplicate = new PropertyChange("duplicateFilterEnabled", null, deploymentBuilder.isDuplicateFilterEnabled());
+    properties.add(filterDuplicate);
+
+    if (deploymentBuilder.isDuplicateFilterEnabled()) {
+      PropertyChange deployChangedOnly = new PropertyChange("deployChangedOnly", null, deploymentBuilder.isDeployChangedOnly());
+      properties.add(deployChangedOnly);
+    }
+
+    logManager.logDeploymentOperation(UserOperationLogEntry.OPERATION_TYPE_CREATE, deployment.getId(), properties);
+  }
+
+  protected void setDeploymentName(String deploymentId, DeploymentBuilderImpl deploymentBuilder, CommandContext commandContext) {
+    if (deploymentId != null && !deploymentId.isEmpty()) {
+      DeploymentManager deploymentManager = commandContext.getDeploymentManager();
+      DeploymentEntity deployment = deploymentManager.findDeploymentById(deploymentId);
+      deploymentBuilder.getDeployment().setName(deployment.getName());
+    }
+  }
+
+  protected List<ResourceEntity> getResources(final DeploymentBuilderImpl deploymentBuilder, final CommandContext commandContext) {
+    List<ResourceEntity> resources = new ArrayList<ResourceEntity>();
+
+    Set<String> deploymentIds = deploymentBuilder.getDeployments();
+    resources.addAll(getResourcesByDeploymentId(deploymentIds, commandContext));
+
+    Map<String, Set<String>> deploymentResourcesById = deploymentBuilder.getDeploymentResourcesById();
+    resources.addAll(getResourcesById(deploymentResourcesById, commandContext));
+
+    Map<String, Set<String>> deploymentResourcesByName = deploymentBuilder.getDeploymentResourcesByName();
+    resources.addAll(getResourcesByName(deploymentResourcesByName, commandContext));
+
+    checkDuplicateResourceName(resources);
+
+    return resources;
+  }
+
+  protected List<ResourceEntity> getResourcesByDeploymentId(Set<String> deploymentIds, CommandContext commandContext) {
+    List<ResourceEntity> result = new ArrayList<ResourceEntity>();
+
+    if (!deploymentIds.isEmpty()) {
+
+      DeploymentManager deploymentManager = commandContext.getDeploymentManager();
+
+      for (String deploymentId : deploymentIds) {
+        DeploymentEntity deployment = deploymentManager.findDeploymentById(deploymentId);
+        Map<String, ResourceEntity> resources = deployment.getResources();
+        Collection<ResourceEntity> values = resources.values();
+        result.addAll(values);
+      }
+    }
+
+    return result;
+  }
+
+  protected List<ResourceEntity> getResourcesById(Map<String, Set<String>> resourcesById, CommandContext commandContext) {
+    List<ResourceEntity> result = new ArrayList<ResourceEntity>();
+
+    ResourceManager resourceManager = commandContext.getResourceManager();
+
+    for (String deploymentId : resourcesById.keySet()) {
+      Set<String> resourceIds = resourcesById.get(deploymentId);
+
+      String[] resourceIdArray = resourceIds.toArray(new String[resourceIds.size()]);
+      List<ResourceEntity> resources = resourceManager.findResourceByDeploymentIdAndResourceIds(deploymentId, resourceIdArray);
+
+      ensureResourcesWithIdsExist(deploymentId, resourceIds, resources);
+
+      result.addAll(resources);
+    }
+
+    return result;
+  }
+
+  protected List<ResourceEntity> getResourcesByName(Map<String, Set<String>> resourcesByName, CommandContext commandContext) {
+    List<ResourceEntity> result = new ArrayList<ResourceEntity>();
+
+    ResourceManager resourceManager = commandContext.getResourceManager();
+
+    for (String deploymentId : resourcesByName.keySet()) {
+      Set<String> resourceNames = resourcesByName.get(deploymentId);
+
+      String[] resourceNameArray = resourceNames.toArray(new String[resourceNames.size()]);
+      List<ResourceEntity> resources = resourceManager.findResourceByDeploymentIdAndResourceNames(deploymentId, resourceNameArray);
+
+      ensureResourcesWithNamesExist(deploymentId, resourceNames, resources);
+
+      result.addAll(resources);
+    }
+
+    return result;
+  }
+
+  protected void addResources(List<ResourceEntity> resources, DeploymentBuilderImpl deploymentBuilder) {
+    DeploymentEntity deployment = deploymentBuilder.getDeployment();
+    Map<String, ResourceEntity> existingResources = deployment.getResources();
+
+    for (ResourceEntity resource : resources) {
+      String resourceName = resource.getName();
+
+      if (existingResources != null && existingResources.containsKey(resourceName)) {
+        String message = String.format("Cannot add resource with id '%s' and name '%s' from "
+            + "deployment with id '%s' to new deployment because the new deployment contains "
+            + "already a resource with same name.", resource.getId(), resourceName, resource.getDeploymentId());
+
+        throw new NotValidException(message);
+      }
+
+      ByteArrayInputStream inputStream = new ByteArrayInputStream(resource.getBytes());
+      deploymentBuilder.addInputStream(resourceName, inputStream);
+    }
+  }
+
+  protected void checkDuplicateResourceName(List<ResourceEntity> resources) {
+    Map<String, ResourceEntity> resourceMap = new HashMap<String, ResourceEntity>();
+
+    for (ResourceEntity resource : resources) {
+      String name = resource.getName();
+
+      ResourceEntity duplicate = resourceMap.get(name);
+      if (duplicate != null) {
+        String deploymentId = resource.getDeploymentId();
+        if (!deploymentId.equals(duplicate.getDeploymentId())) {
+          String message = String.format("The deployments with id '%s' and '%s' contain a resource with same name '%s'.", deploymentId, duplicate.getDeploymentId(), name);
+          throw new NotValidException(message);
+        }
+      }
+      resourceMap.put(name, resource);
+    }
+  }
+
+  protected void ensureDeploymentsWithIdsExists(Set<String> expected, List<DeploymentEntity> actual) {
+    Map<String, DeploymentEntity> deploymentMap = new HashMap<String, DeploymentEntity>();
+    for (DeploymentEntity deployment : actual) {
+      deploymentMap.put(deployment.getId(), deployment);
+    }
+
+    List<String> missingDeployments = getMissingElements(expected, deploymentMap);
+
+    if (!missingDeployments.isEmpty()) {
+      StringBuilder builder = new StringBuilder();
+
+      builder.append("The following deployments are not found by id: ");
+
+      boolean first = true;
+      for(String missingDeployment: missingDeployments) {
+        if (!first) {
+          builder.append(", ");
+        } else {
+          first = false;
+        }
+        builder.append(missingDeployment);
+      }
+
+      throw new NotFoundException(builder.toString());
+    }
+  }
+
+  protected void ensureResourcesWithIdsExist(String deploymentId, Set<String> expectedIds, List<ResourceEntity> actual) {
+    Map<String, ResourceEntity> resources = new HashMap<String, ResourceEntity>();
+    for (ResourceEntity resource : actual) {
+      resources.put(resource.getId(), resource);
+    }
+    ensureResourcesWithKeysExist(deploymentId, expectedIds, resources, "id");
+  }
+
+  protected void ensureResourcesWithNamesExist(String deploymentId, Set<String> expectedNames, List<ResourceEntity> actual) {
+    Map<String, ResourceEntity> resources = new HashMap<String, ResourceEntity>();
+    for (ResourceEntity resource : actual) {
+      resources.put(resource.getName(), resource);
+    }
+    ensureResourcesWithKeysExist(deploymentId, expectedNames, resources, "name");
+  }
+
+  protected void ensureResourcesWithKeysExist(String deploymentId, Set<String> expectedKeys, Map<String, ResourceEntity> actual, String valueProperty) {
+    List<String> missingResources = getMissingElements(expectedKeys, actual);
+
+    if (!missingResources.isEmpty()) {
+      StringBuilder builder = new StringBuilder();
+
+      builder.append("The deployment with id '");
+      builder.append(deploymentId);
+      builder.append("' does not contain the following resources with ");
+      builder.append(valueProperty);
+      builder.append(": ");
+
+      boolean first = true;
+      for(String missingResource: missingResources) {
+        if (!first) {
+          builder.append(", ");
+        } else {
+          first = false;
+        }
+        builder.append(missingResource);
+      }
+
+      throw new NotFoundException(builder.toString());
+    }
+  }
+
+  protected List<String> getMissingElements(Set<String> expected, Map<String, ?> actual) {
+    List<String> missingElements = new ArrayList<String>();
+    for (String value : expected) {
+      if (!actual.containsKey(value)) {
+        missingElements.add(value);
+      }
+    }
+    return missingElements;
+  }
+
+  protected Set<String> getAllDeploymentIds(DeploymentBuilderImpl deploymentBuilder) {
+    Set<String> result = new HashSet<String>();
+
+    String nameFromDeployment = deploymentBuilder.getNameFromDeployment();
+    if (nameFromDeployment != null && !nameFromDeployment.isEmpty()) {
+      result.add(nameFromDeployment);
+    }
+
+    Set<String> deployments = deploymentBuilder.getDeployments();
+    result.addAll(deployments);
+
+    deployments = deploymentBuilder.getDeploymentResourcesById().keySet();
+    result.addAll(deployments);
+
+    deployments = deploymentBuilder.getDeploymentResourcesByName().keySet();
+    result.addAll(deployments);
+
+    return result;
+  }
+
+  protected void checkReadDeployments(AuthorizationManager authorizationManager, Set<String> deploymentIds) {
+    for (String deploymentId : deploymentIds) {
+      authorizationManager.checkReadDeployment(deploymentId);
+    }
   }
 
   protected void acquireExclusiveLock(CommandContext commandContext) {
@@ -145,9 +424,14 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
 
     if (deploymentBuilder.isDuplicateFilterEnabled()) {
 
+      String source = deployment.getSource();
+      if (source == null || source.isEmpty()) {
+        source = ProcessApplicationDeployment.PROCESS_APPLICATION_DEPLOYMENT_SOURCE;
+      }
+
       Map<String, ResourceEntity> existingResources = commandContext
           .getResourceManager()
-          .findLatestResourcesByDeploymentName(deployment.getName(), containedResources.keySet(), deployment.getSource());
+          .findLatestResourcesByDeploymentName(deployment.getName(), containedResources.keySet(), source);
 
       for (ResourceEntity deployedResource : containedResources.values()) {
         String resourceName = deployedResource.getName();

@@ -28,7 +28,7 @@ import org.camunda.bpm.engine.history.HistoricCaseInstanceQuery;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-
+import org.camunda.bpm.engine.impl.util.CompareUtil;
 
 /**
  * @author Sebastian Menski
@@ -246,6 +246,15 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     return commandContext
       .getHistoricCaseInstanceManager()
       .findHistoricCaseInstancesByQueryCriteria(this, page);
+  }
+
+  @Override
+  protected boolean hasExcludingConditions() {
+    return super.hasExcludingConditions()
+      || CompareUtil.areNotInAscendingOrder(createdAfter, createdBefore)
+      || CompareUtil.areNotInAscendingOrder(closedAfter, closedBefore)
+      || CompareUtil.elementIsNotContainedInList(caseInstanceId, caseInstanceIds)
+      || CompareUtil.elementIsContainedInList(caseDefinitionKey, caseKeyNotIn);
   }
 
   public String getBusinessKey() {

@@ -96,6 +96,7 @@ public class StartProcessEngineStep extends DeploymentOperationStep {
 
     // apply properties
     Map<String, String> properties = processEngineXml.getProperties();
+    setJobExecutorActivate(configuration, properties);
     PropertyHelper.applyProperties(configuration, properties);
 
     // instantiate plugins:
@@ -113,6 +114,12 @@ public class StartProcessEngineStep extends DeploymentOperationStep {
     JmxManagedProcessEngine managedProcessEngineService = createProcessEngineControllerInstance(configuration);
     serviceContainer.startService(ServiceTypes.PROCESS_ENGINE, configuration.getProcessEngineName(), managedProcessEngineService);
 
+  }
+
+  protected void setJobExecutorActivate(ProcessEngineConfigurationImpl configuration, Map<String, String> properties) {
+    // override job executor auto activate: set to true in shared engine scenario
+    // if it is not specified (see #CAM-4817)
+    configuration.setJobExecutorActivate(true);
   }
 
   protected JmxManagedProcessEngineController createProcessEngineControllerInstance(ProcessEngineConfigurationImpl configuration) {

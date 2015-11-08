@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.history.HistoricDecisionOutputInstance;
 import org.camunda.bpm.engine.impl.HistoricDecisionInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.persistence.AbstractHistoricManager;
+import org.camunda.bpm.engine.impl.variable.serializer.AbstractTypedValueSerializer;
 import org.camunda.bpm.engine.variable.type.ValueType;
 
 /**
@@ -137,7 +138,7 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
       historicDecisionInstance.addInput(decisionInputInstance);
 
       // do not fetch values for byte arrays eagerly (unless requested by the user)
-      if (!isByteArrayValue(decisionInputInstance) || query.isByteArrayFetchingEnabled()) {
+      if (!isBinaryValue(decisionInputInstance) || query.isByteArrayFetchingEnabled()) {
         fetchVariableValue(decisionInputInstance, query.isCustomObjectDeserializationEnabled());
       }
     }
@@ -148,8 +149,8 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
     return getDbEntityManager().selectList("selectHistoricDecisionInputInstancesByDecisionInstanceIds", historicDecisionInstanceKeys);
   }
 
-  protected boolean isByteArrayValue(HistoricDecisionInputInstance decisionInputInstance) {
-    return ValueType.BYTES.getName().equals(decisionInputInstance.getTypeName());
+  protected boolean isBinaryValue(HistoricDecisionInputInstance decisionInputInstance) {
+    return AbstractTypedValueSerializer.BINARY_VALUE_TYPES.contains(decisionInputInstance.getTypeName());
   }
 
   protected void fetchVariableValue(HistoricDecisionInputInstanceEntity decisionInputInstance, boolean isCustomObjectDeserializationEnabled) {
@@ -170,7 +171,7 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
       historicDecisionInstance.addOutput(decisionOutputInstance);
 
       // do not fetch values for byte arrays eagerly (unless requested by the user)
-      if(!isByteArrayValue(decisionOutputInstance) || query.isByteArrayFetchingEnabled()) {
+      if(!isBinaryValue(decisionOutputInstance) || query.isByteArrayFetchingEnabled()) {
         fetchVariableValue(decisionOutputInstance, query.isCustomObjectDeserializationEnabled());
       }
     }
@@ -181,8 +182,8 @@ public class HistoricDecisionInstanceManager extends AbstractHistoricManager {
     return getDbEntityManager().selectList("selectHistoricDecisionOutputInstancesByDecisionInstanceIds", decisionInstanceKeys);
   }
 
-  protected boolean isByteArrayValue(HistoricDecisionOutputInstance decisionOutputInstance) {
-    return ValueType.BYTES.getName().equals(decisionOutputInstance.getTypeName());
+  protected boolean isBinaryValue(HistoricDecisionOutputInstance decisionOutputInstance) {
+    return AbstractTypedValueSerializer.BINARY_VALUE_TYPES.contains(decisionOutputInstance.getTypeName());
   }
 
   protected void fetchVariableValue(HistoricDecisionOutputInstanceEntity decisionOutputInstance, boolean isCustomObjectDeserializationEnabled) {

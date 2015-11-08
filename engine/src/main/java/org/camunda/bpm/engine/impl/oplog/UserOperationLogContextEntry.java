@@ -23,6 +23,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
  * @author Thorben Lindhauer
  */
 public class UserOperationLogContextEntry {
+
+  protected String deploymentId;
   protected String processDefinitionId;
   protected String processDefinitionKey;
   protected String processInstanceId;
@@ -40,6 +42,14 @@ public class UserOperationLogContextEntry {
   public UserOperationLogContextEntry(String operationType, String entityType) {
     this.operationType = operationType;
     this.entityType = entityType;
+  }
+
+  public String getDeploymentId() {
+    return deploymentId;
+  }
+
+  public void setDeploymentId(String deploymentId) {
+    this.deploymentId = deploymentId;
   }
 
   public String getProcessDefinitionId() {

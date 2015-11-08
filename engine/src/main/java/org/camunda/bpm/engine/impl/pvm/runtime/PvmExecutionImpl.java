@@ -36,6 +36,7 @@ import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
+import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ModificationObserverBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -45,10 +46,13 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.FoxAtomicOperationDeleteCascadeFireActivityEnd;
 import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
-import org.camunda.bpm.engine.impl.tree.ActivityAwareScopeExecutionCollector;
 import org.camunda.bpm.engine.impl.tree.ExecutionWalker;
 import org.camunda.bpm.engine.impl.tree.FlowScopeWalker;
+import org.camunda.bpm.engine.impl.tree.LeafActivityInstanceExecutionCollector;
 import org.camunda.bpm.engine.impl.tree.ScopeCollector;
+import org.camunda.bpm.engine.impl.tree.ScopeExecutionCollector;
+import org.camunda.bpm.engine.impl.tree.TreeVisitor;
+import org.camunda.bpm.engine.impl.tree.TreeWalker.WalkCondition;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 
 /**
@@ -1086,34 +1090,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     }
   }
 
-  /**
-   * Returns the activity instance id of the of the scope the current execution belongs to
-   *
-   * Limitation: this does not return the correct activity instance id in case of a
-   *   compensation handler execution that is the direct child of a compensation throwing execution
-   *   (background: in this case, multiple parent executions have to be skipped to
-   *   find the correct scope execution)
-   */
-  public String getScopeActivityInstanceId() {
-    PvmExecutionImpl scopeExecution = isScope ? this : getParent();
-
-    PvmActivity scopeActivity = scopeExecution.getActivity();
-    if (scopeActivity != null && scopeActivity.isScope()
-        && scopeExecution.getActivityInstanceId() != null
-        && !CompensationBehavior.isCompensationThrowing(scopeExecution)
-        && !CompensationBehavior.executesDefaultCompensationHandler(scopeExecution)) {
-      // take the execution's activity instance id if
-      //   * it is a leaf (scopeActivity != null)
-      //   * it executes a scope activity (scopeActivity != null)
-      //   * it actually executes the activity (activityInstanceId != null)
-      //   * it cannot have child executions (i.e. no compensation throwing event)
-      return scopeExecution.getActivityInstanceId();
-    }
-    else {
-      return scopeExecution.getParentActivityInstanceId();
-    }
-  }
-
   public void forceUpdateActivityInstance() {
     activityInstanceId = generateActivityInstanceId(getActivity().getId());
   }
@@ -1261,36 +1237,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     return scopeExecution;
   }
 
-  @Override
-  public Map<ScopeImpl, PvmExecutionImpl> createActivityExecutionMapping() {
-    ScopeImpl currentActivity = getActivity();
-    EnsureUtil.ensureNotNull("activity of current execution", currentActivity);
-
-    if (!currentActivity.isScope() || activityInstanceId == null || (currentActivity.isScope() && !isScope())) {
-      // if
-      // - this is a scope execution currently executing a non scope activity
-      // - or it is not scope but the current activity is (e.g. can happen during activity end, when the actual
-      //   scope execution has been removed and the concurrent parent has been set to the scope activity)
-      // - or it is asyncBefore/asyncAfter
-
-      currentActivity = currentActivity.getFlowScope();
-    }
-
-    PvmExecutionImpl scopeExecution = getFlowScopeExecution();
-    return scopeExecution.createActivityExecutionMapping(currentActivity);
-  }
-
-  protected PvmExecutionImpl getFlowScopeExecution() {
-    if (!isScope || CompensationBehavior.executesNonScopeCompensationHandler(this)) {
-      // recursion is necessary since there may be more than one concurrent execution in the presence of compensating executions
-      // that compensate non-scope activities contained in the same flow scope as the throwing compensation event
-      return getParent().getFlowScopeExecution();
-    }
-    else {
-      return this;
-    }
-  }
-
   public Map<ScopeImpl, PvmExecutionImpl> createActivityExecutionMapping(ScopeImpl currentScope) {
     if(!isScope()) {
       throw new ProcessEngineException("Execution must be a scope execution");
@@ -1299,25 +1245,155 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       throw new ProcessEngineException("Current scope must be a scope.");
     }
 
-    ActivityAwareScopeExecutionCollector scopeExecutionCollector = new ActivityAwareScopeExecutionCollector(currentScope);
+    // A single path in the execution tree from a leaf (no child executions) to the root
+    // may in fact contain multiple executions that correspond to leaves in the activity instance hierarchy.
+    //
+    // This is because compensation throwing executions have child executions. In that case, the
+    // flow scope hierarchy is not aligned with the scope execution hierarchy: There is a scope
+    // execution for a compensation-throwing event that is an ancestor of this execution,
+    // while these events are not ancestor scopes of currentScope.
+    //
+    // The strategy to deal with this situation is as follows:
+    // 1. Determine all executions that correspond to leaf activity instances
+    // 2. Order the leaf executions in top-to-bottom fashion
+    // 3. Iteratively build the activity execution mapping based on the leaves in top-to-bottom order
+    //    3.1. For the first leaf, create the activity execution mapping regularly
+    //    3.2. For every following leaf, rebuild the mapping but reuse any scopes and scope executions
+    //         that are part of the mapping created in the previous iteration
+    //
+    // This process ensures that the resulting mapping does not contain scopes that are not ancestors
+    // of currentScope and that it does not contain scope executions for such scopes.
+    // For any execution hierarchy that does not involve compensation, the number of iterations in step 3
+    // should be 1, i.e. there are no other leaf activity instance executions in the hierarchy.
+
+    // 1. Find leaf activity instance executions
+    LeafActivityInstanceExecutionCollector leafCollector = new LeafActivityInstanceExecutionCollector();
+    new ExecutionWalker(this).addPreVisitor(leafCollector).walkUntil();
+
+    List<PvmExecutionImpl> leaves = leafCollector.getLeaves();
+    leaves.remove(this);
+
+    // 2. Order them from top to bottom
+    Collections.reverse(leaves);
+
+    // 3. Iteratively extend the mapping for every additional leaf
+    Map<ScopeImpl, PvmExecutionImpl> mapping = new HashMap<ScopeImpl, PvmExecutionImpl>();
+    for (PvmExecutionImpl leaf : leaves) {
+      ScopeImpl leafFlowScope = leaf.getFlowScope();
+      PvmExecutionImpl leafFlowScopeExecution = leaf.getFlowScopeExecution();
+
+      mapping = leafFlowScopeExecution.createActivityExecutionMapping(leafFlowScope, mapping);
+    }
+
+    // finally extend the mapping for the current execution
+    // (note that the current execution need not be a leaf itself)
+    mapping = this.createActivityExecutionMapping(currentScope, mapping);
+
+    return mapping;
+  }
+
+  @Override
+  public Map<ScopeImpl, PvmExecutionImpl> createActivityExecutionMapping() {
+    ScopeImpl currentActivity = getActivity();
+    EnsureUtil.ensureNotNull("activity of current execution", currentActivity);
+
+    ScopeImpl flowScope = getFlowScope();
+    PvmExecutionImpl flowScopeExecution = getFlowScopeExecution();
+
+    return flowScopeExecution.createActivityExecutionMapping(flowScope);
+  }
+
+  protected PvmExecutionImpl getFlowScopeExecution() {
+    if (!isScope || CompensationBehavior.executesNonScopeCompensationHandler(this)) {
+      // LEGACY: a correct implementation should also skip a compensation-throwing parent scope execution
+      // (since compensation throwing activities are scopes), but this cannot be done for backwards compatibility
+      // where a compensation throwing activity was no scope (and we would wrongly skip an execution in that case)
+      return getParent().getFlowScopeExecution();
+
+    }
+    else {
+      return this;
+    }
+  }
+
+  protected ScopeImpl getFlowScope() {
+    ActivityImpl activity = getActivity();
+
+    if (!activity.isScope() || activityInstanceId == null
+        || (activity.isScope() && !isScope() && activity.getActivityBehavior() instanceof CompositeActivityBehavior)) {
+      // if
+      // - this is a scope execution currently executing a non scope activity
+      // - or it is not scope but the current activity is (e.g. can happen during activity end, when the actual
+      //   scope execution has been removed and the concurrent parent has been set to the scope activity)
+      // - or it is asyncBefore/asyncAfter
+
+      return activity.getFlowScope();
+    }
+    else {
+      return activity;
+    }
+  }
+
+  /**
+   * Creates an extended mapping based on this execution and the given existing mapping.
+   * Any entry <code>mapping</code> in mapping that corresponds to an ancestor scope of
+   * <code>currentScope</code> is reused.
+   */
+  protected Map<ScopeImpl, PvmExecutionImpl> createActivityExecutionMapping(ScopeImpl currentScope,
+      final Map<ScopeImpl, PvmExecutionImpl> mapping) {
+    if(!isScope()) {
+      throw new ProcessEngineException("Execution must be a scope execution");
+    }
+    if(!currentScope.isScope()) {
+      throw new ProcessEngineException("Current scope must be a scope.");
+    }
+
+    // collect all ancestor scope executions unless one is encountered that is already in "mapping"
+    ScopeExecutionCollector scopeExecutionCollector = new ScopeExecutionCollector();
     new ExecutionWalker(this)
       .addPreVisitor(scopeExecutionCollector)
-      .walkUntil();
-    List<PvmExecutionImpl> scopeExecutions = scopeExecutionCollector.getExecutions();
+      .walkWhile(new WalkCondition<PvmExecutionImpl>() {
+        public boolean isFulfilled(PvmExecutionImpl element) {
+          return element == null || mapping.containsValue(element);
+        }
+      });
+    final List<PvmExecutionImpl> scopeExecutions = scopeExecutionCollector.getScopeExecutions();
 
+    // collect all ancestor scopes unless one is encountered that is already in "mapping"
     ScopeCollector scopeCollector = new ScopeCollector();
     new FlowScopeWalker(currentScope)
       .addPreVisitor(scopeCollector)
-      .walkUntil();
+      .walkWhile(new WalkCondition<ScopeImpl>() {
+        public boolean isFulfilled(ScopeImpl element) {
+          return element == null || mapping.containsKey(element);
+        }
+      });
 
-    List<ScopeImpl> scopes = scopeCollector.getScopes();
+    final List<ScopeImpl> scopes = scopeCollector.getScopes();
+
+    // add all ancestor scopes and scopeExecutions that are already in "mapping"
+    // and correspond to ancestors of the topmost previously collected scope
+    ScopeImpl topMostScope = scopes.get(scopes.size() - 1);
+    new FlowScopeWalker(topMostScope.getFlowScope())
+      .addPreVisitor(new TreeVisitor<ScopeImpl>() {
+          public void visit(ScopeImpl obj) {
+            scopes.add(obj);
+            PvmExecutionImpl priorMappingExecution = mapping.get(obj);
+
+            if (priorMappingExecution != null && !scopeExecutions.contains(priorMappingExecution)) {
+              scopeExecutions.add(priorMappingExecution);
+            }
+          }
+        })
+      .walkWhile();
+
     if(scopes.size() == scopeExecutions.size()) {
       // the trees are in sync
-      Map<ScopeImpl, PvmExecutionImpl> activityExecutionMapping = new HashMap<ScopeImpl, PvmExecutionImpl>();
+      Map<ScopeImpl, PvmExecutionImpl> result = new HashMap<ScopeImpl, PvmExecutionImpl>();
       for(int i = 0; i<scopes.size(); i++) {
-        activityExecutionMapping.put(scopes.get(i), scopeExecutions.get(i));
+        result.put(scopes.get(i), scopeExecutions.get(i));
       }
-      return activityExecutionMapping;
+      return result;
     }
     else {
       // Wounderful! The trees are out of sync. This is due to legacy behavior

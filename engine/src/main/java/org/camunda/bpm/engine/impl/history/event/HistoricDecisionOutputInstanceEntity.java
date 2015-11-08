@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.impl.history.event;
 
 import org.camunda.bpm.engine.history.HistoricDecisionOutputInstance;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.util.ByteArrayField;
 import org.camunda.bpm.engine.impl.persistence.entity.util.TypedValueField;
 import org.camunda.bpm.engine.impl.variable.serializer.ValueFields;
@@ -44,7 +43,7 @@ public class HistoricDecisionOutputInstanceEntity extends HistoryEvent implement
   protected String textValue2;
 
   protected ByteArrayField byteArrayField = new ByteArrayField(this);
-  protected TypedValueField typedValueField = new TypedValueField(this);
+  protected TypedValueField typedValueField = new TypedValueField(this, false);
 
   @Override
   public String getDecisionInstanceId() {
@@ -173,7 +172,6 @@ public class HistoricDecisionOutputInstanceEntity extends HistoryEvent implement
     this.doubleValue = doubleValue;
   }
 
-  @Override
   public String getByteArrayValueId() {
     return byteArrayField.getByteArrayId();
   }
@@ -183,7 +181,7 @@ public class HistoricDecisionOutputInstanceEntity extends HistoryEvent implement
   }
 
   @Override
-  public ByteArrayEntity getByteArrayValue() {
+  public byte[] getByteArrayValue() {
     return byteArrayField.getByteArrayValue();
   }
 

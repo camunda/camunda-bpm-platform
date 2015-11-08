@@ -14,11 +14,13 @@ package org.camunda.bpm.engine.impl;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.camunda.bpm.engine.impl.cmd.CorrelateAllMessageCmd;
 import org.camunda.bpm.engine.impl.cmd.CorrelateMessageCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
+import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
@@ -75,21 +77,23 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
 
   public MessageCorrelationBuilder setVariable(String variableName, Object variableValue) {
     ensureNotNull("variableName", variableName);
-    if(payloadProcessInstanceVariables == null) {
-      payloadProcessInstanceVariables = new HashMap<String, Object>();
-    }
+    ensurePayloadProcessInstanceVariablesInitialized();
     payloadProcessInstanceVariables.put(variableName, variableValue);
     return this;
   }
 
   public MessageCorrelationBuilder setVariables(Map<String, Object> variables) {
     if (variables != null) {
-      if (payloadProcessInstanceVariables == null) {
-        payloadProcessInstanceVariables = new HashMap<String, Object>();
-      }
+      ensurePayloadProcessInstanceVariablesInitialized();
       payloadProcessInstanceVariables.putAll(variables);
     }
     return this;
+  }
+
+  protected void ensurePayloadProcessInstanceVariablesInitialized() {
+    if (payloadProcessInstanceVariables == null) {
+      payloadProcessInstanceVariables = new VariableMapImpl();
+    }
   }
 
   public void correlate() {

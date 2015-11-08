@@ -43,45 +43,64 @@ public class ByteArrayField {
     this.byteArrayValue = null;
   }
 
-  public ByteArrayEntity getByteArrayValue() {
-    if ((byteArrayValue == null) && (byteArrayId != null)) {
-      // no lazy fetching outside of command context
-      if (Context.getCommandContext() != null) {
-        byteArrayValue = Context
-            .getCommandContext()
-            .getDbEntityManager()
-            .selectById(ByteArrayEntity.class, byteArrayId);
+  public byte[] getByteArrayValue() {
+    getByteArrayEntity();
+
+    if (byteArrayValue != null) {
+      return byteArrayValue.getBytes();
+    }
+    else {
+      return null;
+    }
+  }
+
+  protected ByteArrayEntity getByteArrayEntity() {
+    if (byteArrayValue == null) {
+      if (byteArrayId != null) {
+        // no lazy fetching outside of command context
+        if (Context.getCommandContext() != null) {
+          return byteArrayValue = Context
+              .getCommandContext()
+              .getDbEntityManager()
+              .selectById(ByteArrayEntity.class, byteArrayId);
+        }
       }
     }
+
     return byteArrayValue;
   }
 
   public void setByteArrayValue(byte[] bytes) {
-    deleteByteArrayValue();
-
-    ByteArrayEntity byteArrayValue = null;
     if (bytes != null) {
-      byteArrayValue = new ByteArrayEntity(valueFields.getName(), bytes);
-      Context.
-        getCommandContext()
-        .getDbEntityManager()
-        .insert(byteArrayValue);
+      // note: there can be cases where byteArrayId is not null
+      //   but the corresponding byte array entity has been removed in parallel;
+      //   thus we also need to check if the actual byte array entity still exists
+      if (this.byteArrayId != null && getByteArrayEntity() != null) {
+        byteArrayValue.setBytes(bytes);
+      }
+      else {
+        deleteByteArrayValue();
+
+        byteArrayValue = new ByteArrayEntity(valueFields.getName(), bytes);
+        Context.
+          getCommandContext()
+          .getDbEntityManager()
+          .insert(byteArrayValue);
+
+        byteArrayId = byteArrayValue.getId();
+      }
+    }
+    else {
+      deleteByteArrayValue();
     }
 
-    this.byteArrayValue = byteArrayValue;
-
-    if (byteArrayValue != null) {
-      this.byteArrayId = byteArrayValue.getId();
-    } else {
-      this.byteArrayId = null;
-    }
   }
 
   public void deleteByteArrayValue() {
     if (byteArrayId != null) {
       // the next apparently useless line is probably to ensure consistency in the DbSqlSession cache,
       // but should be checked and docked here (or removed if it turns out to be unnecessary)
-      getByteArrayValue();
+      getByteArrayEntity();
 
       Context
         .getCommandContext()

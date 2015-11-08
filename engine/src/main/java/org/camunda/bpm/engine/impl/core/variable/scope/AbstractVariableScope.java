@@ -23,12 +23,12 @@ import java.util.Set;
 
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
-import org.camunda.bpm.engine.impl.core.variable.VariableMapImpl;
 import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
 import org.camunda.bpm.engine.impl.core.variable.event.VariableEventDispatcher;
 import org.camunda.bpm.engine.impl.javax.el.ELContext;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
@@ -309,6 +309,18 @@ public abstract class AbstractVariableScope implements Serializable, VariableSco
     TypedValue typedValue = Variables.untypedValue(value);
     getVariableStore().createOrUpdateVariable(variableName, typedValue, getSourceActivityVariableScope());
 
+  }
+
+  /**
+   * Sets a variable in the local scope. In contrast to
+   * {@link #setVariableLocal(String, Object)}, the variable is transient that
+   * means it will not be stored in the data base. For example, a transient
+   * variable can be used for a result variable that is only available for
+   * output mapping.
+   */
+  public void setVariableLocalTransient(String variableName, Object value) {
+    TypedValue typedValue = Variables.untypedValue(value);
+    getVariableStore().createTransientVariable(variableName, typedValue, getSourceActivityVariableScope());
   }
 
   public void removeVariable(String variableName) {

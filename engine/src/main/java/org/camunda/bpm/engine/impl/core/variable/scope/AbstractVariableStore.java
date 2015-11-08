@@ -35,4 +35,5 @@ public abstract class AbstractVariableStore implements CoreVariableStore {
   protected abstract CoreVariableInstance createVariableInstance(String variableName, TypedValue value, AbstractVariableScope sourceActivityExecution);
 
   protected abstract void setVariableValue(CoreVariableInstance variableInstance, TypedValue value, AbstractVariableScope sourceActivityExecution);
+
 }

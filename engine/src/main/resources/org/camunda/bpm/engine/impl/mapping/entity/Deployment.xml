@@ -34,6 +34,25 @@
     select * from ${prefix}ACT_RE_DEPLOYMENT where ID_ = #{id}
   </select>
 
+  <select id="selectDeploymentsByIds" resultMap="deploymentResultMap">
+    select
+          *
+    from
+          ${prefix}ACT_RE_DEPLOYMENT
+    <if test="parameter != null">
+    where
+          ID_ in
+            <foreach item="id"
+                     collection="parameter"
+                     open="("
+                     separator=","
+                     close=")">
+              #{id}
+            </foreach>
+    </if>
+
+  </select>
+
   <select id="selectDeploymentsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.DeploymentQueryImpl" resultMap="deploymentResultMap">
   	<include refid="org.camunda.bpm.engine.impl.persistence.entity.Commons.bindOrderBy"/>
     ${limitBefore}

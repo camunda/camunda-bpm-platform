@@ -14,9 +14,18 @@ package org.camunda.bpm.engine.rest.sub.repository.impl;
 
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
+import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
+import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnEngineException;
+import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
@@ -24,11 +33,16 @@ import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
+import org.camunda.bpm.engine.rest.dto.VariableValueDto;
+import org.camunda.bpm.engine.rest.dto.dmn.EvaluateDecisionDto;
 import org.camunda.bpm.engine.rest.dto.repository.DecisionDefinitionDiagramDto;
 import org.camunda.bpm.engine.rest.dto.repository.DecisionDefinitionDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.repository.DecisionDefinitionResource;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -106,6 +120,47 @@ public class DecisionDefinitionResourceImpl implements DecisionDefinitionResourc
       return Response.ok(decisionDiagram).header("Content-Disposition", "attachment; filename=" + fileName)
           .type(ProcessDefinitionResourceImpl.getMediaTypeForFileSuffix(fileName)).build();
     }
+  }
+
+  @Override
+  public List<Map<String, VariableValueDto>> evaluateDecision(UriInfo context, EvaluateDecisionDto parameters) {
+    DecisionService decisionService = engine.getDecisionService();
+
+    Map<String, Object> variables = VariableValueDto.toMap(parameters.getVariables(), engine, objectMapper);
+
+    try {
+      DmnDecisionResult decisionResult = decisionService.evaluateDecisionById(decisionDefinitionId, variables);
+      return createDecisionResultDto(decisionResult);
+
+    } catch (ProcessEngineException e) {
+      String errorMessage = String.format("Cannot evaluate decision %s: %s", decisionDefinitionId, e.getMessage());
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
+    } catch (DmnEngineException e) {
+      String errorMessage = String.format("Cannot evaluate decision %s: %s", decisionDefinitionId, e.getMessage());
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
+    }
+  }
+
+  protected List<Map<String, VariableValueDto>> createDecisionResultDto(DmnDecisionResult decisionResult) {
+    List<Map<String, VariableValueDto>> dto = new ArrayList<Map<String, VariableValueDto>>();
+
+    for (DmnDecisionOutput decisionOutput : decisionResult) {
+      Map<String, VariableValueDto> decisionOutputDto = createDecisionOutputDto(decisionOutput);
+      dto.add(decisionOutputDto);
+    }
+
+    return dto;
+  }
+
+  protected Map<String, VariableValueDto> createDecisionOutputDto(DmnDecisionOutput decisionOutput) {
+    VariableMap variableMap = Variables.createVariables();
+
+    for(String key : decisionOutput.keySet()) {
+      TypedValue typedValue = decisionOutput.getValueTyped(key);
+      variableMap.putValueTyped(key, typedValue);
+    }
+
+    return VariableValueDto.fromVariableMap(variableMap);
   }
 
 }

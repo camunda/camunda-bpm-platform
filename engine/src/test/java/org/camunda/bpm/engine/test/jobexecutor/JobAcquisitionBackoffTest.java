@@ -88,7 +88,7 @@ public class JobAcquisitionBackoffTest extends PluggableProcessEngineTestCase {
     // then it has not performed waiting since it was able to acquire and execute all jobs
     List<RecordedWaitEvent> jobExecutor1WaitEvents = jobExecutor1.getAcquireJobsRunnable().getWaitEvents();
     assertEquals(1, jobExecutor1WaitEvents.size());
-    assertEquals(0, jobExecutor1WaitEvents.get(0).getWaitTime());
+    assertEquals(0, jobExecutor1WaitEvents.get(0).getTimeBetweenAcquisitions());
 
     // when continuing acquisition thread 2, acquisition fails with an OLE
     acquisitionThread2.makeContinueAndWaitForSync();
@@ -98,9 +98,8 @@ public class JobAcquisitionBackoffTest extends PluggableProcessEngineTestCase {
     assertEquals(1, jobExecutor2WaitEvents.size());
     RecordedWaitEvent waitEvent = jobExecutor2WaitEvents.get(0);
     // we don't know the exact wait time,
-    // since the actual time taken for acquisition is deducted by the acquisition runnable
-    // and there is random jitter applied
-    JobAcquisitionTestHelper.assertInBetween(0, BASE_BACKOFF_TIME + BASE_BACKOFF_TIME / 2, waitEvent.getWaitTime());
+    // since there is random jitter applied
+    JobAcquisitionTestHelper.assertInBetween(BASE_BACKOFF_TIME, BASE_BACKOFF_TIME + BASE_BACKOFF_TIME / 2, waitEvent.getTimeBetweenAcquisitions());
 
     // when performing another cycle of acquisition
     JobAcquisitionTestHelper.activateInstances(processEngine, 6);
@@ -121,7 +120,7 @@ public class JobAcquisitionBackoffTest extends PluggableProcessEngineTestCase {
     // and not waited
     jobExecutor1WaitEvents = jobExecutor1.getAcquireJobsRunnable().getWaitEvents();
     assertEquals(2, jobExecutor1WaitEvents.size());
-    assertEquals(0, jobExecutor1WaitEvents.get(1).getWaitTime());
+    assertEquals(0, jobExecutor1WaitEvents.get(1).getTimeBetweenAcquisitions());
 
     // then thread 2 has tried to acquire 6 jobs this time
     List<RecordedAcquisitionEvent> jobExecutor2AcquisitionEvents = jobExecutor2.getAcquireJobsRunnable().getAcquisitionEvents();
@@ -133,7 +132,7 @@ public class JobAcquisitionBackoffTest extends PluggableProcessEngineTestCase {
     assertEquals(2, jobExecutor2WaitEvents.size());
     RecordedWaitEvent secondWaitEvent = jobExecutor2WaitEvents.get(1);
     long expectedBackoffTime = BASE_BACKOFF_TIME * BACKOFF_FACTOR; // 1000 * 2^1
-    JobAcquisitionTestHelper.assertInBetween(BASE_BACKOFF_TIME, expectedBackoffTime + expectedBackoffTime / 2, secondWaitEvent.getWaitTime());
+    JobAcquisitionTestHelper.assertInBetween(expectedBackoffTime, expectedBackoffTime + expectedBackoffTime / 2, secondWaitEvent.getTimeBetweenAcquisitions());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml")
@@ -173,14 +172,14 @@ public class JobAcquisitionBackoffTest extends PluggableProcessEngineTestCase {
 
     for (int i = 0; i < BACKOFF_DECREASE_THRESHOLD; i++) {
       // backoff has not decreased yet
-      assertTrue(jobExecutor2WaitEvents.get(i).getWaitTime() > 0);
+      assertTrue(jobExecutor2WaitEvents.get(i).getTimeBetweenAcquisitions() > 0);
 
       acquisitionThread2.makeContinueAndWaitForSync(); // acquire
       acquisitionThread2.makeContinueAndWaitForSync(); // continue after acquisition with next cycle
     }
 
     // it decreases its backoff again
-    long lastBackoff = jobExecutor2WaitEvents.get(BACKOFF_DECREASE_THRESHOLD).getWaitTime();
+    long lastBackoff = jobExecutor2WaitEvents.get(BACKOFF_DECREASE_THRESHOLD).getTimeBetweenAcquisitions();
     assertEquals(0, lastBackoff);
   }
 

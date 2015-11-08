@@ -13,6 +13,10 @@
 
 package org.camunda.bpm.engine.impl;
 
+import java.io.InputStream;
+import java.util.Date;
+import java.util.List;
+
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.exception.DeploymentResourceNotFoundException;
@@ -38,7 +42,6 @@ import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceForIdCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourceNamesCmd;
 import org.camunda.bpm.engine.impl.cmd.GetDeploymentResourcesCmd;
 import org.camunda.bpm.engine.impl.cmd.GetIdentityLinksForProcessDefinitionCmd;
-import org.camunda.bpm.engine.impl.cmd.RedeployCmd;
 import org.camunda.bpm.engine.impl.cmd.SuspendProcessDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.GetDeploymentCaseDefinitionCmd;
 import org.camunda.bpm.engine.impl.cmmn.cmd.GetDeploymentCaseDiagramCmd;
@@ -53,8 +56,6 @@ import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionQuery
 import org.camunda.bpm.engine.impl.pvm.ReadOnlyProcessDefinition;
 import org.camunda.bpm.engine.impl.repository.DeploymentBuilderImpl;
 import org.camunda.bpm.engine.impl.repository.ProcessApplicationDeploymentBuilderImpl;
-import org.camunda.bpm.engine.impl.repository.ProcessApplicationRedeploymentBuilderImpl;
-import org.camunda.bpm.engine.impl.repository.RedeploymentBuilderImpl;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.CaseDefinitionQuery;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
@@ -64,19 +65,13 @@ import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
 import org.camunda.bpm.engine.repository.DiagramLayout;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeploymentBuilder;
-import org.camunda.bpm.engine.repository.ProcessApplicationRedeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
-import org.camunda.bpm.engine.repository.RedeploymentBuilder;
 import org.camunda.bpm.engine.repository.Resource;
 import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
 import org.camunda.bpm.model.dmn.DmnModelInstance;
-
-import java.io.InputStream;
-import java.util.Date;
-import java.util.List;
 
 /**
  * @author Tom Baeyens
@@ -93,20 +88,8 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
     return new ProcessApplicationDeploymentBuilderImpl(this, processApplication);
   }
 
-  public RedeploymentBuilder createRedeployment(String deploymentId) {
-    return new RedeploymentBuilderImpl(this, deploymentId);
-  }
-
-  public ProcessApplicationRedeploymentBuilder createRedeployment(String deploymentId, ProcessApplicationReference processApplicationReference) {
-    return new ProcessApplicationRedeploymentBuilderImpl(this, deploymentId, processApplicationReference);
-  }
-
   public Deployment deploy(DeploymentBuilderImpl deploymentBuilder) {
     return commandExecutor.execute(new DeployCmd<Deployment>(deploymentBuilder));
-  }
-
-  public Deployment redeploy(RedeploymentBuilderImpl redeploymentBuilder) {
-    return commandExecutor.execute(new RedeployCmd(redeploymentBuilder));
   }
 
   public void deleteDeployment(String deploymentId) {

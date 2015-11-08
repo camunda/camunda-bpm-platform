@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:camunda="http://activiti.org/bpmn" targetNamespace="Examples"
+  xmlns:tns="Examples">
+  <message id="messageId" name="Message" />
+
+  <process id="InterruptingEventSubprocessScenario" isExecutable="true">
+    <startEvent id="theStart" />
+    <sequenceFlow sourceRef="theStart" targetRef="innerTask" />
+    <userTask id="innerTask" />
+    <sequenceFlow sourceRef="innerTask" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+
+    <subProcess id="eventSubProcess" triggeredByEvent="true">
+      <startEvent id="eventProcessStart" isInterrupting="true">
+        <messageEventDefinition messageRef="messageId" />
+      </startEvent>
+      <sequenceFlow sourceRef="eventProcessStart" targetRef="eventSubProcessTask" />
+      <userTask id="eventSubProcessTask" name="Task" />
+      <sequenceFlow sourceRef="eventSubProcessTask" targetRef="eventSubProcessEnd" />
+      <endEvent id="eventSubProcessEnd" />
+    </subProcess>
+  </process>
+</definitions>

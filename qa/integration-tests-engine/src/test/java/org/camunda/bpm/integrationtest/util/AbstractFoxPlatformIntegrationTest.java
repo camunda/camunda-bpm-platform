@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.ProcessEngineService;
 import org.camunda.bpm.engine.CaseService;
+import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
@@ -59,6 +60,7 @@ public abstract class AbstractFoxPlatformIntegrationTest {
   protected RuntimeService runtimeService;
   protected TaskService taskService;
   protected CaseService caseService;
+  protected DecisionService decisionService;
 
   public static WebArchive initWebArchiveDeployment(String name, String processesXmlPath) {
     WebArchive archive = ShrinkWrap.create(WebArchive.class, name)
@@ -96,6 +98,7 @@ public abstract class AbstractFoxPlatformIntegrationTest {
     runtimeService = processEngine.getRuntimeService();
     taskService = processEngine.getTaskService();
     caseService = processEngine.getCaseService();
+    decisionService = processEngine.getDecisionService();
   }
 
   public void waitForJobExecutorToProcessAllJobs() {

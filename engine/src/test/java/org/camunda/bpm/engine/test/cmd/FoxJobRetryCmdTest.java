@@ -1,7 +1,19 @@
 package org.camunda.bpm.engine.test.cmd;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
+import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -813,4 +825,76 @@ public class FoxJobRetryCmdTest extends PluggableProcessEngineTestCase {
 
     assertEquals(4, job.getRetries());
   }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/cmd/FoxJobRetryCmdTest.testFailedServiceTask.bpmn20.xml" })
+  public void FAILING_testFailedRetryWithTimeShift() throws ParseException {
+    // set date to hour before time shift (2015-10-25T03:00:00 CEST => 2015-10-25T02:00:00 CET)
+    Date tenMinutesBeforeTimeShift = createDateFromLocalString("2015-10-25T02:50:00 CEST");
+    Date fiveMinutesBeforeTimeShift = createDateFromLocalString("2015-10-25T02:55:00 CEST");
+    Date twoMinutesBeforeTimeShift = createDateFromLocalString("2015-10-25T02:58:00 CEST");
+    ClockUtil.setCurrentTime(tenMinutesBeforeTimeShift);
+
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("failedServiceTask");
+    assertNotNull(pi);
+
+    // a job is acquirable
+    List<JobEntity> acquirableJobs = findAndLockAcquirableJobs();
+    assertEquals(1, acquirableJobs.size());
+
+    // execute job
+    waitForExecutedJobWithRetriesLeft(4);
+
+    // the job lock time is after the current time but before the time shift
+    JobEntity job = (JobEntity) fetchJob(pi.getProcessInstanceId());
+    assertTrue(tenMinutesBeforeTimeShift.before(job.getLockExpirationTime()));
+    assertEquals(fiveMinutesBeforeTimeShift, job.getLockExpirationTime());
+    assertTrue(twoMinutesBeforeTimeShift.after(job.getLockExpirationTime()));
+
+    // the job is not acquirable
+    acquirableJobs = findAndLockAcquirableJobs();
+    assertEquals(0, acquirableJobs.size());
+
+    // set clock to two minutes before time shift
+    ClockUtil.setCurrentTime(twoMinutesBeforeTimeShift);
+
+    // the job is now acquirable
+    acquirableJobs = findAndLockAcquirableJobs();
+    assertEquals(1, acquirableJobs.size());
+
+    // execute job
+    waitForExecutedJobWithRetriesLeft(3);
+
+    // the job lock time is after the current time
+    job = (JobEntity) refreshJob(job.getId());
+    assertTrue(twoMinutesBeforeTimeShift.before(job.getLockExpirationTime()));
+
+    // the job is not acquirable
+    acquirableJobs = findAndLockAcquirableJobs();
+    assertEquals("Job shouldn't be acquirable", 0, acquirableJobs.size());
+
+    ClockUtil.reset();
+  }
+
+  protected Date createDateFromLocalString(String dateString) throws ParseException {
+    // Format: 2015-10-25T02:50:00 CEST
+    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss z", Locale.US);
+    return dateFormat.parse(dateString);
+  }
+
+  protected List<JobEntity> findAndLockAcquirableJobs() {
+    return processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<List<JobEntity>>() {
+
+      @Override
+      public List<JobEntity> execute(CommandContext commandContext) {
+        List<JobEntity> jobs = commandContext
+          .getJobManager()
+          .findNextJobsToExecute(new Page(0, 100));
+        for (JobEntity job : jobs) {
+          job.setLockOwner("test");
+        }
+        return jobs;
+      }
+    });
+  }
+
 }

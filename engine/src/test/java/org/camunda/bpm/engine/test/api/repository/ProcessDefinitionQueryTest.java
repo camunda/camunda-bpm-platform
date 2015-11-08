@@ -464,6 +464,8 @@ public class ProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
         fail("Expected to find process definition "+processDefinition);
       }
     }
+
+    assertEquals(0, repositoryService.createProcessDefinitionQuery().processDefinitionId("dummyId").processDefinitionIdIn(ids).count());
   }
 
   public void testQueryByLatestAndName() {

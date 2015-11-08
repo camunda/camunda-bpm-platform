@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.application.impl.EmbeddedProcessApplication;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
@@ -41,6 +42,26 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
 
   protected void setUp() throws Exception {
     processApplication = new EmbeddedProcessApplication();
+  }
+
+  public void testEmptyDeployment() {
+    try {
+      repositoryService
+        .createDeployment(processApplication.getReference())
+        .deploy();
+      fail("it should not be possible to deploy without deployment resources");
+    } catch (NotValidException e) {
+      // expected
+    }
+
+    try {
+      repositoryService
+        .createDeployment()
+        .deploy();
+      fail("it should not be possible to deploy without deployment resources");
+    } catch (NotValidException e) {
+      // expected
+    }
   }
 
   public void testSimpleProcessApplicationDeployment() {
@@ -475,6 +496,7 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
     Deployment deployment2 = repositoryService
         .createDeployment(processApplication.getReference())
         .name("second-deployment-with-a-source")
+        .source(null)
         .addModelInstance("process.bpmn", model)
         .deploy();
 
@@ -511,8 +533,178 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
     deleteDeployments(deployment1, deployment2);
   }
 
+  public void testDefaultDeploymentSource() {
+    String key = "process";
+
+    BpmnModelInstance model = Bpmn.createExecutableProcess(key).done();
+
+    DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
+
+    Deployment deployment = repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("first-deployment-with-a-source")
+        .addModelInstance("process.bpmn", model)
+        .deploy();
+
+    assertEquals(ProcessApplicationDeployment.PROCESS_APPLICATION_DEPLOYMENT_SOURCE, deploymentQuery.deploymentName("first-deployment-with-a-source").singleResult().getSource());
+
+    deleteDeployments(deployment);
+  }
+
+  public void testOverwriteDeploymentSource() {
+    String key = "process";
+
+    BpmnModelInstance model = Bpmn.createExecutableProcess(key).done();
+
+    DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
+
+    Deployment deployment = repositoryService
+        .createDeployment(processApplication.getReference())
+        .name("first-deployment-with-a-source")
+        .source("my-source")
+        .addModelInstance("process.bpmn", model)
+        .deploy();
+
+    assertEquals("my-source", deploymentQuery.deploymentName("first-deployment-with-a-source").singleResult().getSource());
+
+    deleteDeployments(deployment);
+  }
+
   public void testNullDeploymentSourceAwareDuplicateFilter() {
     // given
+    String key = "process";
+    String name = "my-deployment";
+
+    BpmnModelInstance model = Bpmn.createExecutableProcess(key).done();
+
+    ProcessDefinitionQuery processDefinitionQuery = repositoryService
+        .createProcessDefinitionQuery()
+        .processDefinitionKey(key);
+
+    DeploymentQuery deploymentQuery = repositoryService
+        .createDeploymentQuery()
+        .deploymentName(name);
+
+    // when
+
+    ProcessApplicationDeployment deployment1 = repositoryService
+        .createDeployment(processApplication.getReference())
+        .name(name)
+        .source(null)
+        .addModelInstance("process.bpmn", model)
+        .enableDuplicateFiltering(true)
+        .deploy();
+
+    assertEquals(1, processDefinitionQuery.count());
+    assertEquals(1, deploymentQuery.count());
+
+    ProcessApplicationDeployment deployment2 = repositoryService
+        .createDeployment(processApplication.getReference())
+        .name(name)
+        .source(null)
+        .addModelInstance("process.bpmn", model)
+        .enableDuplicateFiltering(true)
+        .deploy();
+
+    // then
+
+    assertEquals(1, processDefinitionQuery.count());
+    assertEquals(1, deploymentQuery.count());
+
+    deleteDeployments(deployment1, deployment2);
+  }
+
+  public void testNullAndProcessApplicationDeploymentSourceAwareDuplicateFilter() {
+    // given
+
+    String key = "process";
+    String name = "my-deployment";
+
+    BpmnModelInstance model = Bpmn.createExecutableProcess(key).done();
+
+    ProcessDefinitionQuery processDefinitionQuery = repositoryService
+        .createProcessDefinitionQuery()
+        .processDefinitionKey(key);
+
+    DeploymentQuery deploymentQuery = repositoryService
+        .createDeploymentQuery()
+        .deploymentName(name);
+
+    // when
+
+    ProcessApplicationDeployment deployment1 = repositoryService
+        .createDeployment(processApplication.getReference())
+        .name(name)
+        .source(null)
+        .addModelInstance("process.bpmn", model)
+        .enableDuplicateFiltering(true)
+        .deploy();
+
+    assertEquals(1, processDefinitionQuery.count());
+    assertEquals(1, deploymentQuery.count());
+
+    ProcessApplicationDeployment deployment2 = repositoryService
+        .createDeployment(processApplication.getReference())
+        .name(name)
+        .addModelInstance("process.bpmn", model)
+        .enableDuplicateFiltering(true)
+        .deploy();
+
+    // then
+
+    assertEquals(1, processDefinitionQuery.count());
+    assertEquals(1, deploymentQuery.count());
+
+    deleteDeployments(deployment1, deployment2);
+  }
+
+  public void testProcessApplicationAndNullDeploymentSourceAwareDuplicateFilter() {
+    // given
+
+    String key = "process";
+    String name = "my-deployment";
+
+    BpmnModelInstance model = Bpmn.createExecutableProcess(key).done();
+
+    ProcessDefinitionQuery processDefinitionQuery = repositoryService
+        .createProcessDefinitionQuery()
+        .processDefinitionKey(key);
+
+    DeploymentQuery deploymentQuery = repositoryService
+        .createDeploymentQuery()
+        .deploymentName(name);
+
+    // when
+
+    ProcessApplicationDeployment deployment1 = repositoryService
+        .createDeployment(processApplication.getReference())
+        .name(name)
+        .addModelInstance("process.bpmn", model)
+        .enableDuplicateFiltering(true)
+        .deploy();
+
+    assertEquals(1, processDefinitionQuery.count());
+    assertEquals(1, deploymentQuery.count());
+
+    ProcessApplicationDeployment deployment2 = repositoryService
+        .createDeployment(processApplication.getReference())
+        .name(name)
+        .source(null)
+        .addModelInstance("process.bpmn", model)
+        .enableDuplicateFiltering(true)
+        .deploy();
+
+    // then
+
+    assertEquals(1, processDefinitionQuery.count());
+    assertEquals(1, deploymentQuery.count());
+
+    deleteDeployments(deployment1, deployment2);
+  }
+
+  public void testProcessApplicationDeploymentSourceAwareDuplicateFilter() {
+    // given
+
     String key = "process";
     String name = "my-deployment";
 
@@ -574,7 +766,7 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
     ProcessApplicationDeployment deployment1 = repositoryService
         .createDeployment(processApplication.getReference())
         .name(name)
-        .source(ProcessApplicationDeployment.PROCESS_APPLICATION_DEPLOYMENT_SOURCE)
+        .source("cockpit")
         .addModelInstance("process.bpmn", model)
         .enableDuplicateFiltering(true)
         .deploy();
@@ -585,51 +777,7 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
     ProcessApplicationDeployment deployment2 = repositoryService
         .createDeployment(processApplication.getReference())
         .name("my-deployment")
-        .source(ProcessApplicationDeployment.PROCESS_APPLICATION_DEPLOYMENT_SOURCE)
-        .addModelInstance("process.bpmn", model)
-        .enableDuplicateFiltering(true)
-        .deploy();
-
-    // then
-
-    assertEquals(1, processDefinitionQuery.count());
-    assertEquals(1, deploymentQuery.count());
-
-    deleteDeployments(deployment1, deployment2);
-  }
-
-  public void testNullAndNotNullDeploymentSourceAwareDuplicateFilter() {
-    // given
-
-    String key = "process";
-    String name = "my-deployment";
-
-    BpmnModelInstance model = Bpmn.createExecutableProcess(key).done();
-
-    ProcessDefinitionQuery processDefinitionQuery = repositoryService
-        .createProcessDefinitionQuery()
-        .processDefinitionKey(key);
-
-    DeploymentQuery deploymentQuery = repositoryService
-        .createDeploymentQuery()
-        .deploymentName(name);
-
-    // when
-
-    ProcessApplicationDeployment deployment1 = repositoryService
-        .createDeployment(processApplication.getReference())
-        .name(name)
-        .addModelInstance("process.bpmn", model)
-        .enableDuplicateFiltering(true)
-        .deploy();
-
-    assertEquals(1, processDefinitionQuery.count());
-    assertEquals(1, deploymentQuery.count());
-
-    ProcessApplicationDeployment deployment2 = repositoryService
-        .createDeployment(processApplication.getReference())
-        .name(name)
-        .source(ProcessApplicationDeployment.PROCESS_APPLICATION_DEPLOYMENT_SOURCE)
+        .source("cockpit")
         .addModelInstance("process.bpmn", model)
         .enableDuplicateFiltering(true)
         .deploy();
@@ -687,7 +835,7 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
     deleteDeployments(deployment1, deployment2);
   }
 
-  public void testNotNullAndNullDeploymentSourceAwareDuplicateFilter() {
+  public void testNullAndNotNullDeploymentSourceShouldDeployNewVersion() {
     // given
 
     String key = "process";
@@ -708,7 +856,7 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
     ProcessApplicationDeployment deployment1 = repositoryService
         .createDeployment(processApplication.getReference())
         .name(name)
-         .source(ProcessApplicationDeployment.PROCESS_APPLICATION_DEPLOYMENT_SOURCE)
+        .source(null)
         .addModelInstance("process.bpmn", model)
         .enableDuplicateFiltering(true)
         .deploy();
@@ -719,6 +867,52 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
     ProcessApplicationDeployment deployment2 = repositoryService
         .createDeployment(processApplication.getReference())
         .name(name)
+        .source("my-source2")
+        .addModelInstance("process.bpmn", model)
+        .enableDuplicateFiltering(true)
+        .deploy();
+
+    // then
+
+    assertEquals(2, processDefinitionQuery.count());
+    assertEquals(2, deploymentQuery.count());
+
+    deleteDeployments(deployment1, deployment2);
+  }
+
+  public void testNotNullAndNullDeploymentSourceShouldDeployNewVersion() {
+    // given
+
+    String key = "process";
+    String name = "my-deployment";
+
+    BpmnModelInstance model = Bpmn.createExecutableProcess(key).done();
+
+    ProcessDefinitionQuery processDefinitionQuery = repositoryService
+        .createProcessDefinitionQuery()
+        .processDefinitionKey(key);
+
+    DeploymentQuery deploymentQuery = repositoryService
+        .createDeploymentQuery()
+        .deploymentName(name);
+
+    // when
+
+    ProcessApplicationDeployment deployment1 = repositoryService
+        .createDeployment(processApplication.getReference())
+        .name(name)
+        .source("my-source1")
+        .addModelInstance("process.bpmn", model)
+        .enableDuplicateFiltering(true)
+        .deploy();
+
+    assertEquals(1, processDefinitionQuery.count());
+    assertEquals(1, deploymentQuery.count());
+
+    ProcessApplicationDeployment deployment2 = repositoryService
+        .createDeployment(processApplication.getReference())
+        .name(name)
+        .source(null)
         .addModelInstance("process.bpmn", model)
         .enableDuplicateFiltering(true)
         .deploy();

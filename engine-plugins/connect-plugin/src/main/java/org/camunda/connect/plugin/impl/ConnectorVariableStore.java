@@ -42,14 +42,22 @@ public class ConnectorVariableStore extends MapBasedVariableStore {
     }
   }
 
+  @Override
   public void setVariableValue(CoreVariableInstance variableInstance, TypedValue value, AbstractVariableScope sourceActivityExecution) {
     ((ConnectorParamVariable)variableInstance).value = value;
   }
 
+  @Override
   public ConnectorParamVariable createVariableInstance(String variableName, TypedValue value, AbstractVariableScope sourceActivityExecution) {
     ConnectorParamVariable variableInstance = new ConnectorParamVariable(variableName, value);
     variables.put(variableName, variableInstance);
     return variableInstance;
+  }
+
+  @Override
+  public void createTransientVariable(String variableName, TypedValue value, AbstractVariableScope sourceActivityExecution) {
+    // all variables are transient in this store
+    createVariableInstance(variableName, value, sourceActivityExecution);
   }
 
 }

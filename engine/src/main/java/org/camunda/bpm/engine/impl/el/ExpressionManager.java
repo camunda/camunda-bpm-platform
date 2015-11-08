@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.impl.javax.el.ListELResolver;
 import org.camunda.bpm.engine.impl.javax.el.MapELResolver;
 import org.camunda.bpm.engine.impl.javax.el.ValueExpression;
 import org.camunda.bpm.engine.impl.juel.ExpressionFactoryImpl;
+import org.camunda.bpm.engine.variable.context.VariableContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,8 +70,12 @@ public class ExpressionManager {
   }
 
   public Expression createExpression(String expression) {
-    ValueExpression valueExpression = expressionFactory.createValueExpression(parsingElContext, expression, Object.class);
+    ValueExpression valueExpression = createValueExpression(expression);
     return new JuelExpression(valueExpression, this, expression);
+  }
+
+  public ValueExpression createValueExpression(String expression) {
+    return expressionFactory.createValueExpression(parsingElContext, expression, Object.class);
   }
 
   public void setExpressionFactory(ExpressionFactory expressionFactory) {
@@ -91,6 +96,14 @@ public class ExpressionManager {
       }
     }
 
+    return elContext;
+  }
+
+  public ELContext createElContext(VariableContext variableContext) {
+    ELResolver elResolver = getCachedElResolver();
+    ProcessEngineElContext elContext = new ProcessEngineElContext(functionMappers, elResolver);
+    elContext.putContext(ExpressionFactory.class, expressionFactory);
+    elContext.putContext(VariableContext.class, variableContext);
     return elContext;
   }
 
@@ -117,6 +130,7 @@ public class ExpressionManager {
   protected ELResolver createElResolver() {
     CompositeELResolver elResolver = new CompositeELResolver();
     elResolver.add(new VariableScopeElResolver());
+    elResolver.add(new VariableContextElResolver());
 
     if(beans != null) {
       // ACT-1102: Also expose all beans in configuration when using standalone engine, not

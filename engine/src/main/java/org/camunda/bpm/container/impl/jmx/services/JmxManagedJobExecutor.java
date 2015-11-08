@@ -29,7 +29,9 @@ public class JmxManagedJobExecutor implements PlatformService<JobExecutor>, JmxM
   }
 
   public void start(PlatformServiceContainer mBeanServiceContainer) {
-    start();
+    // no-op:
+    // job executor is lazy-started when first process engine is registered and jobExecutorActivate = true
+    // See: #CAM-4817
   }
 
   public void stop(PlatformServiceContainer mBeanServiceContainer) {
@@ -82,5 +84,9 @@ public class JmxManagedJobExecutor implements PlatformService<JobExecutor>, JmxM
 
   public JobExecutor getValue() {
     return jobExecutor;
+  }
+
+  public boolean isActive() {
+    return jobExecutor.isActive();
   }
 }

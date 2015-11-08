@@ -16,12 +16,11 @@ import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.core.variable.value.UntypedValueImpl;
-import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.ValueFields;
 import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.JPAVariableSerializer;
+import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
@@ -115,11 +114,8 @@ public class SingleQueryVariableValueCondition extends AbstractQueryVariableValu
   public void setDoubleValue(Double doubleValue) {
     this.doubleValue = doubleValue;
   }
-  public String getByteArrayValueId() {
-    return null;
-  }
 
-  public ByteArrayEntity getByteArrayValue() {
+  public byte[] getByteArrayValue() {
     return null;
   }
 

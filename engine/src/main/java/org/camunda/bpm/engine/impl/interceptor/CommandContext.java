@@ -93,6 +93,7 @@ public class CommandContext {
   private static Logger log = Logger.getLogger(CommandContext.class.getName());
 
   protected boolean authorizationCheckEnabled = true;
+  protected boolean userOperationLogEnabled = true;
 
   protected TransactionContext transactionContext;
   protected Map<Class< ? >, SessionFactory> sessionFactories;
@@ -141,7 +142,7 @@ public class CommandContext {
       return;
     }
 
-    ProcessApplicationReference targetProcessApplication = getTargetProcessApplication((ExecutionEntity) nextInvocation.execution);
+    ProcessApplicationReference targetProcessApplication = getTargetProcessApplication(nextInvocation.execution);
     if(requiresContextSwitch(targetProcessApplication)) {
 
       Context.executeWithinProcessApplication(new Callable<Void>() {
@@ -595,5 +596,21 @@ public class CommandContext {
 
   public void setAuthorizationCheckEnabled(boolean authorizationCheckEnabled) {
     this.authorizationCheckEnabled = authorizationCheckEnabled;
+  }
+
+  public void enableUserOperationLog() {
+    userOperationLogEnabled = true;
+  }
+
+  public void disableUserOperationLog() {
+    userOperationLogEnabled = false;
+  }
+
+  public boolean isUserOperationLogEnabled() {
+    return userOperationLogEnabled;
+  }
+
+  public void setLogUserOperationEnabled(boolean userOperationLogEnabled) {
+    this.userOperationLogEnabled = userOperationLogEnabled;
   }
 }

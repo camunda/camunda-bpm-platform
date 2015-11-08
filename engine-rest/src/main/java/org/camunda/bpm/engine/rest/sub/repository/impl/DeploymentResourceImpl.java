@@ -13,13 +13,14 @@
 package org.camunda.bpm.engine.rest.sub.repository.impl;
 
 import java.net.URI;
+import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.repository.Deployment;
-import org.camunda.bpm.engine.repository.RedeploymentBuilder;
+import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.rest.DeploymentRestService;
 import org.camunda.bpm.engine.rest.dto.repository.DeploymentDto;
 import org.camunda.bpm.engine.rest.dto.repository.RedeploymentDto;
@@ -66,15 +67,38 @@ public class DeploymentResourceImpl extends AbstractRestProcessEngineAware imple
     Deployment deployment = null;
     try {
 
-      RedeploymentBuilder builder = repositoryService.createRedeployment(deploymentId);
+      DeploymentBuilder builder = repositoryService.createDeployment();
+      builder.nameFromDeployment(deploymentId);
 
       if (redeployment != null) {
         builder.source(redeployment.getSource());
-        builder.addResourceIds(redeployment.getResourceIds());
-        builder.addResourceNames(redeployment.getResourceNames());
+
+        List<String> resourceIds = redeployment.getResourceIds();
+        List<String> resourceNames = redeployment.getResourceNames();
+
+        boolean isResourceIdListEmpty = resourceIds == null || resourceIds.isEmpty();
+        boolean isResourceNameListEmpty = resourceNames == null || resourceNames.isEmpty();
+
+        if (isResourceIdListEmpty && isResourceNameListEmpty) {
+          builder.addDeploymentResources(deploymentId);
+        }
+        else {
+
+          if (!isResourceIdListEmpty) {
+            builder.addDeploymentResourcesById(deploymentId, resourceIds);
+          }
+
+          if (!isResourceNameListEmpty) {
+            builder.addDeploymentResourcesByName(deploymentId, resourceNames);
+          }
+
+        }
+      }
+      else {
+        builder.addDeploymentResources(deploymentId);
       }
 
-      deployment = builder.redeploy();
+      deployment = builder.deploy();
 
     } catch (NotFoundException e) {
       throw createInvalidRequestException("redeploy", Status.NOT_FOUND, e);

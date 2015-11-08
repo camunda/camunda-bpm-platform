@@ -47,14 +47,22 @@ public class SimpleVariableStore extends MapBasedVariableStore {
     }
   }
 
+  @Override
   public CoreVariableInstance createVariableInstance(String variableName, TypedValue value, AbstractVariableScope sourceActivityExecution) {
     SimpleVariableInstance instance = new SimpleVariableInstance(variableName, value);
     variables.put(variableName, instance);
     return instance;
   }
 
+  @Override
   public void setVariableValue(CoreVariableInstance variableInstance, TypedValue value, AbstractVariableScope sourceActivityExecution) {
     ((SimpleVariableInstance) variableInstance).value = value;
+  }
+
+  @Override
+  public void createTransientVariable(String variableName, TypedValue value, AbstractVariableScope sourceActivityExecution) {
+    // all variables are transient in this store
+    createVariableInstance(variableName, value, sourceActivityExecution);
   }
 
 

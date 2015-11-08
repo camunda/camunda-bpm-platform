@@ -26,6 +26,5 @@ public class SpringProcessEngineTestCaseTest extends SpringProcessEngineTestCase
   public void testProgrammaticContextConfiguration() {
     assertNotNull(processEngine);
     assertTrue(((ProcessEngineImpl) processEngine).getProcessEngineConfiguration().isJobExecutorDeploymentAware());
-    assertNotNull(cachedProcessEngines.get(ExampleConfiguration.class.getName()));
   }
 }

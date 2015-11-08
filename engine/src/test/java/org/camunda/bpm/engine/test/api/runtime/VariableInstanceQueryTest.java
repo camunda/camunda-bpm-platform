@@ -33,6 +33,9 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.api.runtime.util.CustomSerializable;
 import org.camunda.bpm.engine.test.api.runtime.util.FailingSerializable;
+import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.type.ValueType;
+import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.junit.Test;
 
@@ -155,6 +158,9 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
       assertEquals(variableValue, variableInstance.getValue());
       assertEquals("string", variableInstance.getTypeName());
     }
+
+    assertEquals(1, runtimeService.createVariableInstanceQuery().variableName("task").variableNameIn("task", "execution").count());
+    assertEquals(0, runtimeService.createVariableInstanceQuery().variableName("task").variableNameIn("process", "execution").count());
   }
 
   @Test
@@ -2299,6 +2305,52 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
 
     // delete task
     taskService.deleteTask(task.getId(), true);
+  }
+
+  @Test
+  @Deployment(resources= "org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
+  public void testDisableBinaryFetchingForFileValues() {
+    // given
+    String fileName = "text.txt";
+    String encoding = "crazy-encoding";
+    String mimeType = "martini/dry";
+
+    FileValue fileValue = Variables
+        .fileValue(fileName)
+        .file("ABC".getBytes())
+        .encoding(encoding)
+        .mimeType(mimeType)
+        .create();
+
+    runtimeService.startProcessInstanceByKey("oneTaskProcess",
+        Variables.createVariables().putValueTyped("fileVar", fileValue));
+
+    // when enabling binary fetching
+    VariableInstance fileVariableInstance =
+        runtimeService.createVariableInstanceQuery().singleResult();
+
+    // then the binary value is accessible
+    assertNotNull(fileVariableInstance.getValue());
+
+    // when disabling binary fetching
+    fileVariableInstance =
+        runtimeService.createVariableInstanceQuery().disableBinaryFetching().singleResult();
+
+    // then the byte value is not fetched
+    assertNotNull(fileVariableInstance);
+    assertEquals("fileVar", fileVariableInstance.getName());
+
+    assertNull(fileVariableInstance.getValue());
+
+    FileValue typedValue = (FileValue) fileVariableInstance.getTypedValue();
+    assertNull(typedValue.getValue());
+
+    // but typed value metadata is accessible
+    assertEquals(ValueType.FILE, typedValue.getType());
+    assertEquals(fileName, typedValue.getFilename());
+    assertEquals(encoding, typedValue.getEncoding());
+    assertEquals(mimeType, typedValue.getMimeType());
+
   }
 
   @Test

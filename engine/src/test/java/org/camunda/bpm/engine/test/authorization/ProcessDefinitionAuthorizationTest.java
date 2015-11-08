@@ -45,15 +45,15 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
   protected String deploymentId;
 
   public void setUp() throws Exception {
-    super.setUp();
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/api/twoTasksProcess.bpmn20.xml").getId();
+    super.setUp();
   }
 
   public void tearDown() {
-    deleteDeployment(deploymentId);
     super.tearDown();
+    deleteDeployment(deploymentId);
   }
 
   public void testQueryWithoutAuthorization() {
@@ -365,9 +365,6 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     // then
     ProcessDefinition definition = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY);
     assertTrue(definition.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   // activate process definition by id ///////////////////////////////////////////
@@ -389,9 +386,6 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
       assertTextPresent(ONE_TASK_PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
-
-    // clean operation log
-    clearOpLog();
   }
 
   public void testActivateProcessDefinitionById() {
@@ -406,9 +400,6 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     // then
     ProcessDefinition definition = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY);
     assertFalse(definition.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   // suspend process definition by id including instances ///////////////////////////////////////////
@@ -475,9 +466,6 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
 
     ProcessInstance instance = selectSingleProcessInstance();
     assertTrue(instance.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   public void testSuspendProcessDefinitionByIdIncludingInstancesWithUpdateInstancePermissionOnProcessDefinition() {
@@ -496,9 +484,6 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
 
     ProcessInstance instance = selectSingleProcessInstance();
     assertTrue(instance.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   // activate process definition by id including instances ///////////////////////////////////////////
@@ -525,9 +510,6 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
       assertTextPresent(ONE_TASK_PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
-
-    // clean operation log
-    clearOpLog();
   }
 
   public void testActivateProcessDefinitionByIdIncludingInstancesWithUpdatePermissionOnProcessInstance() {
@@ -553,9 +535,6 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
       assertTextPresent(ONE_TASK_PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
-
-    // clean operation log
-    clearOpLog();
   }
 
   public void testActivateProcessDefinitionByIdIncludingInstancesWithUpdatePermissionOnAnyProcessInstance() {
@@ -576,9 +555,6 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
 
     ProcessInstance instance = selectSingleProcessInstance();
     assertFalse(instance.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   public void testActivateProcessDefinitionByIdIncludingInstancesWithUpdateInstancePermissionOnProcessDefinition() {
@@ -598,9 +574,6 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
 
     ProcessInstance instance = selectSingleProcessInstance();
     assertFalse(instance.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   // suspend process definition by key ///////////////////////////////////////////
@@ -632,9 +605,6 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     // then
     ProcessDefinition definition = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY);
     assertTrue(definition.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   // activate process definition by id ///////////////////////////////////////////
@@ -655,9 +625,6 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
       assertTextPresent(ONE_TASK_PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
-
-    // clean operation log
-    clearOpLog();
   }
 
   public void testActivateProcessDefinitionByKey() {
@@ -671,9 +638,6 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
     // then
     ProcessDefinition definition = selectProcessDefinitionByKey(ONE_TASK_PROCESS_KEY);
     assertFalse(definition.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   // suspend process definition by key including instances ///////////////////////////////////////////
@@ -737,9 +701,6 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
 
     ProcessInstance instance = selectSingleProcessInstance();
     assertTrue(instance.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   public void testSuspendProcessDefinitionByKeyIncludingInstancesWithUpdateInstancePermissionOnProcessDefinition() {
@@ -757,9 +718,6 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
 
     ProcessInstance instance = selectSingleProcessInstance();
     assertTrue(instance.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   // activate process definition by key including instances ///////////////////////////////////////////
@@ -785,9 +743,6 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
       assertTextPresent(ONE_TASK_PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
-
-    // clean operation log
-    clearOpLog();
   }
 
   public void testActivateProcessDefinitionByKeyIncludingInstancesWithUpdatePermissionOnProcessInstance() {
@@ -812,9 +767,6 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
       assertTextPresent(ONE_TASK_PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
-
-    // clean operation log
-    clearOpLog();
   }
 
   public void testActivateProcessDefinitionByKeyIncludingInstancesWithUpdatePermissionOnAnyProcessInstance() {
@@ -834,9 +786,6 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
 
     ProcessInstance instance = selectSingleProcessInstance();
     assertFalse(instance.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   public void testActivateProcessDefinitionByKeyIncludingInstancesWithUpdateInstancePermissionOnProcessDefinition() {
@@ -855,9 +804,6 @@ public class ProcessDefinitionAuthorizationTest extends AuthorizationTest {
 
     ProcessInstance instance = selectSingleProcessInstance();
     assertFalse(instance.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   // helper /////////////////////////////////////////////////////////////////////

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:camunda="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+  <message id="receiveTaskMessageId" name="ReceiveTaskMessage" />
+  <message id="boundaryMessageId" name="BoundaryEventMessage" />
+  <error id="errorId" errorCode="ThrowBpmnErrorDelegate"/>
+
+  <process id="NestedNonInterruptingMessageBoundaryEventOnInnerSubprocessScenario" isExecutable="true">
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="outerSubProcess" />
+
+    <subProcess id="outerSubProcess">
+      <startEvent id="outerSubProcessStart" />
+      <sequenceFlow id="flow2" sourceRef="outerSubProcessStart" targetRef="innerSubProcess" />
+
+      <subProcess id="innerSubProcess">
+        <startEvent id="innerSubProcessStart" />
+        <sequenceFlow id="flow3" sourceRef="innerSubProcessStart" targetRef="innerSubProcessTask" />
+
+        <!-- wait state -->
+        <receiveTask id="innerSubProcessTask" messageRef="receiveTaskMessageId" />
+        <sequenceFlow sourceRef="innerSubProcessTask" targetRef="throwErrorServiceTask" />
+
+        <!-- throws an BpmnError if requested via process variable -->
+        <serviceTask id="throwErrorServiceTask" camunda:class="org.camunda.bpm.qa.upgrade.util.ThrowBpmnErrorDelegate" />
+        <sequenceFlow id="flow4" sourceRef="throwErrorServiceTask" targetRef="innerSubProcessEnd" />
+        <endEvent id="innerSubProcessEnd" />
+      </subProcess>
+
+      <sequenceFlow id="flow5" sourceRef="innerSubProcess" targetRef="outerSubProcessEnd" />
+      <endEvent id="outerSubProcessEnd" />
+
+      <!-- Non-interrupting message boundary event -->
+      <boundaryEvent id="messageBoundaryEvent" attachedToRef="innerSubProcess" cancelActivity="false">
+        <messageEventDefinition messageRef="boundaryMessageId" />
+      </boundaryEvent>
+      <sequenceFlow id="flow6" sourceRef="messageBoundaryEvent" targetRef="afterBoundaryTask" />
+      <userTask id="afterBoundaryTask" />
+      <sequenceFlow id="flow7" sourceRef="afterBoundaryTask" targetRef="afterBoundaryEnd" />
+      <endEvent id="afterBoundaryEnd" />
+    </subProcess>
+
+    <sequenceFlow id="flow8" sourceRef="outerSubProcess" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+
+    <!-- Boundary event catching the error -->
+    <boundaryEvent id="catchError" attachedToRef="outerSubProcess">
+      <errorEventDefinition errorRef="errorId"/>
+    </boundaryEvent>
+    <sequenceFlow id="flow9" sourceRef="catchError" targetRef="escalatedTask" />
+    <userTask id="escalatedTask" />
+    <sequenceFlow id="flow10" sourceRef="escalatedTask" targetRef="escalatedEnd" />
+    <endEvent id="escalatedEnd" />
+  </process>
+</definitions>

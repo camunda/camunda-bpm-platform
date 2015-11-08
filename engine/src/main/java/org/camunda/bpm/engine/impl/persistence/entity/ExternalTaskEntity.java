@@ -24,9 +24,9 @@ import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
-import org.camunda.bpm.engine.impl.incident.DefaultIncidentHandler;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
+import org.camunda.bpm.engine.runtime.Incident;
 
 /**
  * @author Thorben Lindhauer
@@ -221,7 +221,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   protected void createIncident() {
     IncidentHandler incidentHandler = Context
         .getProcessEngineConfiguration()
-        .getIncidentHandler(DefaultIncidentHandler.EXTERNAL_TASK_HANDLER_TYPE);
+        .getIncidentHandler(Incident.EXTERNAL_TASK_HANDLER_TYPE);
 
     incidentHandler.handleIncident(processDefinitionId, activityId, executionId, id, errorMessage);
   }
@@ -229,7 +229,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   protected void removeIncident() {
     IncidentHandler handler = Context
         .getProcessEngineConfiguration()
-        .getIncidentHandler(DefaultIncidentHandler.EXTERNAL_TASK_HANDLER_TYPE);
+        .getIncidentHandler(Incident.EXTERNAL_TASK_HANDLER_TYPE);
 
     handler.resolveIncident(getProcessDefinitionId(), null, executionId, id);
   }

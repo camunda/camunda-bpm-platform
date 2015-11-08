@@ -42,7 +42,7 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.CancelBoundaryEventActivityBeha
 import org.camunda.bpm.engine.impl.bpmn.behavior.CancelEndEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.CaseCallActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ClassDelegateActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.CompensationEndEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.CompensationEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.DecisionRuleTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ErrorEndEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.EventBasedGatewayActivityBehavior;
@@ -53,7 +53,6 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.ExternalTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.InclusiveGatewayActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateCatchEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateCatchLinkEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateThrowCompensationEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateThrowNoneEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateThrowSignalEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.MailActivityBehavior;
@@ -89,6 +88,11 @@ import org.camunda.bpm.engine.impl.core.variable.mapping.IoMapping;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ConstantValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.NullValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
+import org.camunda.bpm.engine.impl.dmn.result.CollectValuesDecisionResultMapper;
+import org.camunda.bpm.engine.impl.dmn.result.DecisionResultMapper;
+import org.camunda.bpm.engine.impl.dmn.result.OutputListDecisionResultMapper;
+import org.camunda.bpm.engine.impl.dmn.result.SingleOutputDecisionResultMapper;
+import org.camunda.bpm.engine.impl.dmn.result.SingleValueDecisionResultMapper;
 import org.camunda.bpm.engine.impl.el.ElValueProvider;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.el.FixedValue;
@@ -1453,7 +1457,7 @@ public class BpmnParse extends Parse {
     } else if (compensateEventDefinitionElement != null) {
       nestedActivityImpl.setProperty("type", "intermediateCompensationThrowEvent");
       CompensateEventDefinition compensateEventDefinition = parseThrowCompensateEventDefinition(compensateEventDefinitionElement, scopeElement);
-      activityBehavior = new IntermediateThrowCompensationEventActivityBehavior(compensateEventDefinition);
+      activityBehavior = new CompensationEventActivityBehavior(compensateEventDefinition);
       nestedActivityImpl.setProperty(PROPERTYNAME_THROWS_COMPENSATION, true);
       nestedActivityImpl.setScope(true);
     } else if (messageEventDefinitionElement != null) {
@@ -1987,6 +1991,8 @@ public class BpmnParse extends Parse {
    */
   protected ActivityImpl parseDecisionBusinessRuleTask(Element businessRuleTaskElement, ScopeImpl scope) {
     ActivityImpl activity = createActivityOnScope(businessRuleTaskElement, scope);
+    // the activity is a scope since the result variable is stored as local variable
+    activity.setScope(true);
 
     parseAsynchronousContinuationForActivity(businessRuleTaskElement, activity);
 
@@ -2002,10 +2008,9 @@ public class BpmnParse extends Parse {
     parseVersion(businessRuleTaskElement, activity, callableElement, "decisionRefBinding", "decisionRefVersion");
 
     String resultVariable = parseResultVariable(businessRuleTaskElement);
+    DecisionResultMapper decisionResultMapper = parseDecisionResultMapper(businessRuleTaskElement);
 
-    DecisionRuleTaskActivityBehavior behavior = new DecisionRuleTaskActivityBehavior(resultVariable);
-    behavior.setCallableElement(callableElement);
-
+    DecisionRuleTaskActivityBehavior behavior = new DecisionRuleTaskActivityBehavior(callableElement, resultVariable, decisionResultMapper);
     activity.setActivityBehavior(behavior);
 
     parseExecutionListenersOnScope(businessRuleTaskElement, activity);
@@ -2017,6 +2022,28 @@ public class BpmnParse extends Parse {
     return activity;
   }
 
+  protected DecisionResultMapper parseDecisionResultMapper(Element businessRuleTaskElement) {
+    // default mapper is 'outputList'
+    String decisionResultMapper = businessRuleTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "mapDecisionResult", "outputList");
+
+    if ("singleValue".equals(decisionResultMapper)) {
+      return new SingleValueDecisionResultMapper();
+
+    } else if ("singleOutput".equals(decisionResultMapper)) {
+      return new SingleOutputDecisionResultMapper();
+
+    } else if ("collectValues".equals(decisionResultMapper)) {
+      return new CollectValuesDecisionResultMapper();
+
+    } else if ("outputList".equals(decisionResultMapper)) {
+      return new OutputListDecisionResultMapper();
+
+    } else {
+      addError("No decision result mapper found for name '" + decisionResultMapper
+          + "'. Supported mappers are 'singleValue', 'singleOutput', 'collectValues' and 'outputList'.", businessRuleTaskElement);
+      return null;
+    }
+  }
 
   /**
    * Parse async continuation of an activity and create async jobs for the activity.
@@ -2736,7 +2763,7 @@ public class BpmnParse extends Parse {
       } else if (compensateEventDefinitionElement != null) {
         activity.setProperty("type", "compensationEndEvent");
         CompensateEventDefinition compensateEventDefinition = parseThrowCompensateEventDefinition(compensateEventDefinitionElement, scope);
-        activity.setActivityBehavior(new CompensationEndEventActivityBehavior(compensateEventDefinition));
+        activity.setActivityBehavior(new CompensationEventActivityBehavior(compensateEventDefinition));
         activity.setProperty(PROPERTYNAME_THROWS_COMPENSATION, true);
         activity.setScope(true);
 

@@ -25,8 +25,8 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.camunda.bpm.engine.impl.variable.serializer.AbstractTypedValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
-import org.camunda.bpm.engine.variable.type.ValueType;
 
 /**
  * @author Christian Lipphardt (camunda)
@@ -37,6 +37,7 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
   private final static Logger LOGGER = Logger.getLogger(HistoricVariableInstanceQueryImpl.class.getName());
 
   private static final long serialVersionUID = 1L;
+
   protected String variableId;
   protected String processInstanceId;
   protected String caseInstanceId;
@@ -171,7 +172,8 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
   protected boolean shouldFetchValue(HistoricVariableInstanceEntity entity) {
     // do not fetch values for byte arrays eagerly (unless requested by the user)
-    return isByteArrayFetchingEnabled || !ValueType.BYTES.equals(entity.getSerializer().getType());
+    return isByteArrayFetchingEnabled
+        || !AbstractTypedValueSerializer.BINARY_VALUE_TYPES.contains(entity.getSerializer().getType().getName());
   }
 
   // order by /////////////////////////////////////////////////////////////////

@@ -28,11 +28,11 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.cdi.annotation.BusinessProcessScoped;
 import org.camunda.bpm.engine.cdi.impl.context.ContextAssociationManager;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.core.variable.VariableMapImpl;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**

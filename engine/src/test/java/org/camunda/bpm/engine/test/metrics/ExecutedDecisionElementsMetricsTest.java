@@ -21,40 +21,15 @@ import org.camunda.bpm.model.bpmn.instance.BusinessRuleTask;
 
 public class ExecutedDecisionElementsMetricsTest extends AbstractMetricsTest {
 
-  public static final String DMN_FILE = "org/camunda/bpm/engine/test/metrics/ExecutedDecisionElementsTest.dmn10.xml";
+  public static final String DMN_FILE = "org/camunda/bpm/engine/test/metrics/ExecutedDecisionElementsTest.dmn11.xml";
   public static VariableMap VARIABLES = Variables.createVariables().putValue("status", "").putValue("sum", 100);
 
+  @Override
   protected void clearMetrics() {
     super.clearMetrics();
     processEngineConfiguration.getDmnEngineConfiguration()
       .getEngineMetricCollector()
       .clearExecutedDecisionElements();
-  }
-
-  public void testDmnScriptTask() {
-    BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("testProcess")
-        .startEvent()
-        .scriptTask().scriptFormat("dmn").camundaResource(DMN_FILE)
-        .endEvent()
-        .done();
-
-    deploymentId = repositoryService.createDeployment()
-        .addModelInstance("process.bpmn", modelInstance)
-        .addClasspathResource(DMN_FILE)
-        .deploy().getId();
-
-    assertEquals(0l, getExecutedDecisionElements());
-    assertEquals(0l, getExecutedDecisionElementsFromDmnEngine());
-
-    runtimeService.startProcessInstanceByKey("testProcess", VARIABLES);
-
-    assertEquals(16l, getExecutedDecisionElements());
-    assertEquals(16l, getExecutedDecisionElementsFromDmnEngine());
-
-    processEngineConfiguration.getDbMetricsReporter().reportNow();
-
-    assertEquals(16l, getExecutedDecisionElements());
-    assertEquals(16l, getExecutedDecisionElementsFromDmnEngine());
   }
 
   public void testBusinessRuleTask() {

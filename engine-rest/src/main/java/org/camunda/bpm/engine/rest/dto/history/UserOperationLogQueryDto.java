@@ -32,6 +32,7 @@ public class UserOperationLogQueryDto extends AbstractQueryDto<UserOperationLogQ
 
   public static final String TIMESTAMP = "timestamp";
 
+  protected String deploymentId;
   protected String processDefinitionId;
   protected String processDefinitionKey;
   protected String processInstanceId;
@@ -66,6 +67,9 @@ public class UserOperationLogQueryDto extends AbstractQueryDto<UserOperationLogQ
 
   @Override
   protected void applyFilters(UserOperationLogQuery query) {
+    if (deploymentId != null) {
+      query.deploymentId(deploymentId);
+    }
     if (processDefinitionId != null) {
       query.processDefinitionId(processDefinitionId);
     }
@@ -124,6 +128,11 @@ public class UserOperationLogQueryDto extends AbstractQueryDto<UserOperationLogQ
     if (TIMESTAMP.equals(sortBy)) {
       query.orderByTimestamp();
     }
+  }
+
+  @CamundaQueryParam("deploymentId")
+  public void setDeploymentId(String deploymentId) {
+    this.deploymentId = deploymentId;
   }
 
   @CamundaQueryParam("processDefinitionId")

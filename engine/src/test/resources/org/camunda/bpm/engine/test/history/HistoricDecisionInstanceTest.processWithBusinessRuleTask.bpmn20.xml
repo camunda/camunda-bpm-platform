@@ -12,7 +12,7 @@
 
     <businessRuleTask id="task"
                       camunda:decisionRef="testDecision"
-                      camunda:resultVariable="decisionResult" />
+                      camunda:resultVariable="result" />
 
     <sequenceFlow sourceRef="task" targetRef="end" />
     

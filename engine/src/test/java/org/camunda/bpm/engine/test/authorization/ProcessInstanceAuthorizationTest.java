@@ -60,7 +60,6 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
 
   @Override
   public void setUp() throws Exception {
-    super.setUp();
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/authorization/messageStartEventProcess.bpmn20.xml",
@@ -70,12 +69,13 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
         "org/camunda/bpm/engine/test/authorization/throwWarningSignalEventProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/authorization/throwAlertSignalEventProcess.bpmn20.xml"
         ).getId();
+    super.setUp();
   }
 
   @Override
   public void tearDown() {
-    deleteDeployment(deploymentId);
     super.tearDown();
+    deleteDeployment(deploymentId);
   }
 
   // process instance query //////////////////////////////////////////////////////////
@@ -958,7 +958,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
   public void testSignalEventReceivedWithoutAuthorization() {
     // given
     String processInstanceId = startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY).getId();
-    
+
     try {
       // when
       runtimeService.signalEventReceived("alert");
@@ -1166,11 +1166,11 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     assertNotNull(task);
     assertEquals("taskAfterBoundaryEvent", task.getTaskDefinitionKey());
   }
-  
+
   public void testStartProcessInstanceBySignalEventReceivedWithoutAuthorization() {
     // given
     // no authorization to start a process instance
-    
+
     try {
       // when
       runtimeService.signalEventReceived("warning");
@@ -1180,7 +1180,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       assertTextPresent("The user with id 'test' does not have 'CREATE' permission on resource 'ProcessInstance'", e.getMessage());
     }
   }
-  
+
   public void testStartProcessInstanceBySignalEventReceivedWithCreatePermissionOnProcessInstance() {
     // given
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
@@ -1194,7 +1194,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       assertTextPresent("The user with id 'test' does not have 'CREATE_INSTANCE' permission on resource 'signalStartProcess' of type 'ProcessDefinition'", e.getMessage());
     }
   }
-  
+
   public void testStartProcessInstanceBySignalEventReceived() {
     // given
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
@@ -1208,7 +1208,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     assertNotNull(task);
     assertEquals("task", task.getTaskDefinitionKey());
   }
-  
+
   /**
    * currently the IntermediateThrowSignalEventActivityBehavior does not check authorization
    */
@@ -1226,7 +1226,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       assertTextPresent("The user with id 'test' does not have 'CREATE_INSTANCE' permission on resource 'signalStartProcess' of type 'ProcessDefinition'", e.getMessage());
     }
   }
-  
+
   public void testStartProcessInstanceByThrowSignalEvent() {
     // given
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
@@ -1241,7 +1241,7 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     assertNotNull(task);
     assertEquals("task", task.getTaskDefinitionKey());
   }
-  
+
   /**
    * currently the IntermediateThrowSignalEventActivityBehavior does not check authorization
    */
@@ -1249,13 +1249,13 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     // given
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
     createGrantAuthorization(PROCESS_DEFINITION, THROW_ALERT_SIGNAL_PROCESS_KEY, userId, CREATE_INSTANCE);
-    
-    String processInstanceId = startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY).getId(); 
-    
+
+    String processInstanceId = startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY).getId();
+
     try {
       // when
       runtimeService.startProcessInstanceByKey(THROW_ALERT_SIGNAL_PROCESS_KEY);
-      
+
       fail("Exception expected");
     } catch (AuthorizationException e) {
       // then
@@ -1269,24 +1269,24 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
   }
-  
+
   public void testThrowSignalEvent() {
     // given
     createGrantAuthorization(PROCESS_INSTANCE, ANY, userId, CREATE);
     createGrantAuthorization(PROCESS_DEFINITION, THROW_ALERT_SIGNAL_PROCESS_KEY, userId, CREATE_INSTANCE);
-    
-    String processInstanceId = startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY).getId(); 
-    
+
+    String processInstanceId = startProcessInstanceByKey(SIGNAL_BOUNDARY_PROCESS_KEY).getId();
+
     createGrantAuthorization(PROCESS_INSTANCE, processInstanceId, userId, UPDATE);
     createGrantAuthorization(PROCESS_DEFINITION, SIGNAL_BOUNDARY_PROCESS_KEY, userId, UPDATE_INSTANCE);
-    
+
     // when
     runtimeService.startProcessInstanceByKey(THROW_ALERT_SIGNAL_PROCESS_KEY);
 
     // then
     Task task = selectSingleTask();
     assertNotNull(task);
-    assertEquals("taskAfterBoundaryEvent", task.getTaskDefinitionKey());    
+    assertEquals("taskAfterBoundaryEvent", task.getTaskDefinitionKey());
   }
 
   // message event received /////////////////////////////////////
@@ -2123,9 +2123,6 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     // then
     ProcessInstance instance = selectSingleProcessInstance();
     assertTrue(instance.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   public void testSuspendProcessInstanceByProcessDefinitionKeyWithUpdateInstancesPermissionOnProcessDefinition() {
@@ -2139,9 +2136,6 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     // then
     ProcessInstance instance = selectSingleProcessInstance();
     assertTrue(instance.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   public void testSuspendProcessInstanceByProcessDefinitionKey() {
@@ -2158,9 +2152,6 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     // then
     instance = selectSingleProcessInstance();
     assertTrue(instance.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   // activate process instance by process definition key /////////////////////////////
@@ -2223,9 +2214,6 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     // then
     instance = selectSingleProcessInstance();
     assertFalse(instance.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   public void testActivateProcessInstanceByProcessDefinitionKeyWithUpdateInstancesPermissionOnProcessDefinition() {
@@ -2242,9 +2230,6 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     // then
     instance = selectSingleProcessInstance();
     assertFalse(instance.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   public void testActivateProcessInstanceByProcessDefinitionKey() {
@@ -2262,9 +2247,6 @@ public class ProcessInstanceAuthorizationTest extends AuthorizationTest {
     // then
     instance = selectSingleProcessInstance();
     assertFalse(instance.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   // modify process instance /////////////////////////////////////

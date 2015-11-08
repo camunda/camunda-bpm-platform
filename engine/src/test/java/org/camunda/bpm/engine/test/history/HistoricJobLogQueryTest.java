@@ -407,6 +407,15 @@ public class HistoricJobLogQueryTest extends PluggableProcessEngineTestCase {
     for (HistoricJobLog log : jobLogs) {
       assertTrue(log.getJobPriority() >= 1 && log.getJobPriority() <= 3);
     }
+
+    // (4) lower and higher than or equal are disjunctive
+    jobLogs = historyService.createHistoricJobLogQuery()
+        .jobPriorityHigherThanOrEquals(3)
+        .jobPriorityLowerThanOrEquals(1)
+        .orderByJobPriority()
+        .asc()
+        .list();
+    assertEquals(0, jobLogs.size());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricJobLogTest.testAsyncContinuation.bpmn20.xml"})

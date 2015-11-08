@@ -48,10 +48,10 @@ import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
-import org.camunda.bpm.dmn.scriptengine.DmnScriptEngineFactory;
 import org.camunda.bpm.engine.ArtifactFactory;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.CaseService;
+import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.ExternalTaskService;
 import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.FormService;
@@ -65,6 +65,7 @@ import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.AuthorizationServiceImpl;
+import org.camunda.bpm.engine.impl.DecisionServiceImpl;
 import org.camunda.bpm.engine.impl.DefaultArtifactFactory;
 import org.camunda.bpm.engine.impl.ExternalTaskServiceImpl;
 import org.camunda.bpm.engine.impl.FilterServiceImpl;
@@ -150,8 +151,8 @@ import org.camunda.bpm.engine.impl.history.transformer.CmmnHistoryTransformListe
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.identity.WritableIdentityProvider;
 import org.camunda.bpm.engine.impl.identity.db.DbIdentityServiceProvider;
-import org.camunda.bpm.engine.impl.incident.IncidentHandler;
 import org.camunda.bpm.engine.impl.incident.DefaultIncidentHandler;
+import org.camunda.bpm.engine.impl.incident.IncidentHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutorImpl;
@@ -240,11 +241,8 @@ import org.camunda.bpm.engine.impl.variable.serializer.DoubleValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.FileValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.IntegerValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.JavaObjectSerializer;
-import org.camunda.bpm.engine.impl.variable.serializer.LocalDateSerializer;
-import org.camunda.bpm.engine.impl.variable.serializer.LocalTimeSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.LongValueSerlializer;
 import org.camunda.bpm.engine.impl.variable.serializer.NullValueSerializer;
-import org.camunda.bpm.engine.impl.variable.serializer.PeriodSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.ShortValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.StringValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
@@ -254,6 +252,7 @@ import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSessionF
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.JPAVariableSerializer;
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
+import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 
@@ -290,6 +289,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected CaseService caseService = new CaseServiceImpl();
   protected FilterService filterService = new FilterServiceImpl();
   protected ExternalTaskService externalTaskService = new ExternalTaskServiceImpl();
+  protected DecisionService decisionService = new DecisionServiceImpl();
 
   // COMMAND EXECUTORS ////////////////////////////////////////////////////////
 
@@ -503,6 +503,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected boolean enableExpressionsInAdhocQueries = false;
   protected boolean enableExpressionsInStoredQueries = true;
 
+  /**
+   * If true, user operation log entries are only written if there is an
+   * authenticated user present in the context. If false, user operation log
+   * entries are written regardless of authentication state.
+   */
+  protected boolean restrictUserOperationLogToAuthenticatedUsers = true;
+
   protected boolean isBpmnStacktraceVerbose = false;
 
   protected boolean forceCloseMybatisConnectionPool = true;
@@ -604,10 +611,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     if (incidentHandlers == null) {
       incidentHandlers = new HashMap<String, IncidentHandler>();
 
-      DefaultIncidentHandler failedJobIncidentHandler = new DefaultIncidentHandler(DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE);
+      DefaultIncidentHandler failedJobIncidentHandler = new DefaultIncidentHandler(Incident.FAILED_JOB_HANDLER_TYPE);
       incidentHandlers.put(failedJobIncidentHandler.getIncidentHandlerType(), failedJobIncidentHandler);
 
-      DefaultIncidentHandler failedExternalTaskIncidentHandler = new DefaultIncidentHandler(DefaultIncidentHandler.EXTERNAL_TASK_HANDLER_TYPE);
+      DefaultIncidentHandler failedExternalTaskIncidentHandler = new DefaultIncidentHandler(Incident.EXTERNAL_TASK_HANDLER_TYPE);
       incidentHandlers.put(failedExternalTaskIncidentHandler.getIncidentHandlerType(), failedExternalTaskIncidentHandler);
     }
     if(customIncidentHandlers != null) {
@@ -710,6 +717,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initService(caseService);
     initService(filterService);
     initService(externalTaskService);
+    initService(decisionService);
   }
 
   protected void initService(Object service) {
@@ -1345,9 +1353,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       variableSerializers.addSerializer(new IntegerValueSerializer());
       variableSerializers.addSerializer(new LongValueSerlializer());
       variableSerializers.addSerializer(new DateValueSerializer());
-      variableSerializers.addSerializer(new LocalDateSerializer());
-      variableSerializers.addSerializer(new LocalTimeSerializer());
-      variableSerializers.addSerializer(new PeriodSerializer());
       variableSerializers.addSerializer(new DoubleValueSerializer());
       variableSerializers.addSerializer(new ByteArrayValueSerializer());
       variableSerializers.addSerializer(new JavaObjectSerializer());
@@ -1437,7 +1442,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected void initDmnEngine() {
     if (dmnEngine == null) {
       if (dmnEngineConfiguration == null) {
-        dmnEngineConfiguration = new ProcessEngineDmnEngineConfiguration(scriptingEngines, new HistoryDecisionTableListener(dmnHistoryEventProducer, historyLevel));
+        dmnEngineConfiguration = new ProcessEngineDmnEngineConfiguration(
+            scriptingEngines,
+            new HistoryDecisionTableListener(dmnHistoryEventProducer, historyLevel),
+            expressionManager);
       }
       dmnEngine = dmnEngineConfiguration.buildEngine();
     }
@@ -1445,7 +1453,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       dmnEngineConfiguration = dmnEngine.getConfiguration();
     }
 
-    scriptingEngines.addScriptEngineFactory(new DmnScriptEngineFactory(dmnEngine));
   }
 
   protected void initExpressionManager() {
@@ -1788,6 +1795,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setExternalTaskService(ExternalTaskService externalTaskService) {
     this.externalTaskService = externalTaskService;
+  }
+
+  public DecisionService getDecisionService() {
+    return decisionService;
+  }
+
+  public void setDecisionService(DecisionService decisionService) {
+    this.decisionService = decisionService;
   }
 
   public Map<Class< ? >, SessionFactory> getSessionFactories() {
@@ -2840,5 +2855,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
+  public boolean isRestrictUserOperationLogToAuthenticatedUsers() {
+    return restrictUserOperationLogToAuthenticatedUsers;
+  }
+
+  public ProcessEngineConfigurationImpl setRestrictUserOperationLogToAuthenticatedUsers(boolean restrictUserOperationLogToAuthenticatedUsers) {
+    this.restrictUserOperationLogToAuthenticatedUsers = restrictUserOperationLogToAuthenticatedUsers;
+    return this;
+  }
 
 }

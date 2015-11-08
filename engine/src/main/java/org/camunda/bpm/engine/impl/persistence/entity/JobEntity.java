@@ -30,7 +30,6 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
-import org.camunda.bpm.engine.impl.incident.DefaultIncidentHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobPriorityProvider;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
@@ -284,7 +283,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     if (processEngineConfiguration
         .isCreateIncidentOnFailedJobEnabled()) {
 
-      String incidentHandlerType = DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE;
+      String incidentHandlerType = Incident.FAILED_JOB_HANDLER_TYPE;
 
       // make sure job has an ID set:
       if(id == null) {
@@ -316,7 +315,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
   protected void removeFailedJobIncident(boolean incidentResolved) {
     IncidentHandler handler = Context
         .getProcessEngineConfiguration()
-        .getIncidentHandler(DefaultIncidentHandler.FAILED_JOB_HANDLER_TYPE);
+        .getIncidentHandler(Incident.FAILED_JOB_HANDLER_TYPE);
 
     if (incidentResolved) {
       handler.resolveIncident(getProcessDefinitionId(), null, executionId, id);

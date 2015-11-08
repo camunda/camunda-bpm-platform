@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.api.identity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,7 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.Picture;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.identity.Account;
+import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 
 /**
@@ -493,6 +495,72 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     }
 
     identityService.deleteGroup(group.getId());
+  }
+
+  public void testSaveUserWithGenericResourceId() {
+    User user = identityService.newUser("*");
+
+    try {
+      identityService.saveUser(user);
+      fail("it should not be possible to save a user with the generic resource id *");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("has an invalid id: id cannot be *. * is a reserved identifier.", e.getMessage());
+    }
+  }
+
+  public void testSaveGroupWithGenericResourceId() {
+    Group group = identityService.newGroup("*");
+
+    try {
+      identityService.saveGroup(group);
+      fail("it should not be possible to save a group with the generic resource id *");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("has an invalid id: id cannot be *. * is a reserved identifier.", e.getMessage());
+    }
+  }
+
+  public void testSetAuthenticatedIdToGenericId() {
+    try {
+      identityService.setAuthenticatedUserId("*");
+      fail("exception expected");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Invalid user id provided: id cannot be *. * is a reserved identifier.", e.getMessage());
+      assertNull(identityService.getCurrentAuthentication());
+    }
+  }
+
+  public void testSetAuthenticationUserIdToGenericId() {
+    try {
+      identityService.setAuthentication("*", Collections.<String>emptyList());
+      fail("exception expected");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Invalid user id provided: id cannot be *. * is a reserved identifier.", e.getMessage());
+      assertNull(identityService.getCurrentAuthentication());
+    }
+
+    try {
+      identityService.setAuthentication("aUserId", Arrays.asList("*"));
+      fail("exception expected");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("At least one invalid group id provided: id cannot be *. * is a reserved identifier.", e.getMessage());
+      assertNull(identityService.getCurrentAuthentication());
+    }
+
+    try {
+      identityService.setAuthentication(new Authentication("*", Collections.<String>emptyList()));
+      fail("exception expected");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("Invalid user id provided: id cannot be *. * is a reserved identifier.", e.getMessage());
+      assertNull(identityService.getCurrentAuthentication());
+    }
+
+    try {
+      identityService.setAuthentication(new Authentication("aUserId", Arrays.asList("*")));
+      fail("exception expected");
+    } catch (ProcessEngineException e) {
+      assertTextPresent("At least one invalid group id provided: id cannot be *. * is a reserved identifier.", e.getMessage());
+      assertNull(identityService.getCurrentAuthentication());
+    }
   }
 
 }

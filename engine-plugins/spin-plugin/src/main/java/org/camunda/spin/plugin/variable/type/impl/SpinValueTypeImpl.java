@@ -15,7 +15,7 @@ package org.camunda.spin.plugin.variable.type.impl;
 import java.util.Collections;
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.core.variable.type.AbstractValueTypeImpl;
+import org.camunda.bpm.engine.variable.impl.type.AbstractValueTypeImpl;
 import org.camunda.bpm.engine.variable.value.SerializableValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.spin.plugin.variable.type.SpinValueType;
@@ -29,8 +29,6 @@ import org.camunda.spin.plugin.variable.value.builder.SpinValueBuilder;
 public abstract class SpinValueTypeImpl extends AbstractValueTypeImpl implements SpinValueType {
 
   private static final long serialVersionUID = 1L;
-
-  public final static String VALUE_INFO_SERIALIZATION_DATA_FORMAT = "serializationDataFormat";
 
   public SpinValueTypeImpl(String name) {
     super(name);

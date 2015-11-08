@@ -37,15 +37,15 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
   protected String deploymentId;
 
   public void setUp() throws Exception {
-    super.setUp();
     deploymentId = createDeployment(null,
         "org/camunda/bpm/engine/test/authorization/timerStartEventProcess.bpmn20.xml",
         "org/camunda/bpm/engine/test/authorization/timerBoundaryEventProcess.bpmn20.xml").getId();
+    super.setUp();
   }
 
   public void tearDown() {
-    deleteDeployment(deploymentId);
     super.tearDown();
+    deleteDeployment(deploymentId);
   }
 
   // job definition query ///////////////////////////////////////
@@ -750,9 +750,6 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
       assertTextPresent(TIMER_BOUNDARY_PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
-
-    // clean operation log
-    clearOpLog();
   }
 
   public void testSuspendByProcessDefinitionKeyWithUpdatePermissionOnProcessDefinition() {
@@ -766,9 +763,6 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
     JobDefinition jobDefinition = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY);
     assertNotNull(jobDefinition);
     assertTrue(jobDefinition.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   public void testSuspendByProcessDefinitionKeyWithUpdatePermissionOnAnyProcessDefinition() {
@@ -782,9 +776,6 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
     JobDefinition jobDefinition = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY);
     assertNotNull(jobDefinition);
     assertTrue(jobDefinition.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   // activate job definition by process definition key ///////////////////////////////
@@ -805,9 +796,6 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
       assertTextPresent(TIMER_BOUNDARY_PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
-
-    // clean operation log
-    clearOpLog();
   }
 
   public void testActivateByProcessDefinitionKeyWithUpdatePermissionOnProcessDefinition() {
@@ -822,9 +810,6 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
     JobDefinition jobDefinition = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY);
     assertNotNull(jobDefinition);
     assertFalse(jobDefinition.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   public void testActivateByProcessDefinitionKeyWithUpdatePermissionOnAnyProcessDefinition() {
@@ -839,9 +824,6 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
     JobDefinition jobDefinition = selectJobDefinitionByProcessDefinitionKey(TIMER_BOUNDARY_PROCESS_KEY);
     assertNotNull(jobDefinition);
     assertFalse(jobDefinition.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   // suspend job definition by process definition key (including jobs) ///////////////////////////////
@@ -866,9 +848,6 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
       assertTextPresent(TIMER_BOUNDARY_PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
-
-    // clean operation log
-    clearOpLog();
   }
 
   public void testSuspendIncludingJobsByProcessDefinitionKeyWithUpdatePermissionOnProcessInstance() {
@@ -892,9 +871,6 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
       assertTextPresent(TIMER_BOUNDARY_PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
-
-    // clean operation log
-    clearOpLog();
   }
 
   public void testSuspendIncludingJobsByProcessDefinitionKeyWithUpdatePermissionOnAnyProcessInstance() {
@@ -915,9 +891,6 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
     Job job = selectJobByProcessInstanceId(processInstanceId);
     assertNotNull(job);
     assertTrue(job.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   public void testSuspendIncludingJobsByProcessDefinitionKeyWithUpdateInstancePermissionOnProcessDefinition() {
@@ -937,9 +910,6 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
     Job job = selectJobByProcessInstanceId(processInstanceId);
     assertNotNull(job);
     assertTrue(job.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   public void testSuspendIncludingJobsByProcessDefinitionKeyWithUpdateInstancePermissionOnAnyProcessDefinition() {
@@ -960,9 +930,6 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
     Job job = selectJobByProcessInstanceId(processInstanceId);
     assertNotNull(job);
     assertTrue(job.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   // activate job definition by id (including jobs) ///////////////////////////////
@@ -988,9 +955,6 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
       assertTextPresent(TIMER_BOUNDARY_PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
-
-    // clean operation log
-    clearOpLog();
   }
 
   public void testActivateIncludingJobsByProcessDefinitionKeyWithUpdatePermissionOnProcessInstance() {
@@ -1015,9 +979,6 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
       assertTextPresent(TIMER_BOUNDARY_PROCESS_KEY, message);
       assertTextPresent(PROCESS_DEFINITION.resourceName(), message);
     }
-
-    // clean operation log
-    clearOpLog();
   }
 
   public void testActivateIncludingJobsByProcessDefinitionKeyWithUpdatePermissionOnAnyProcessInstance() {
@@ -1039,9 +1000,6 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
     Job job = selectJobByProcessInstanceId(processInstanceId);
     assertNotNull(job);
     assertFalse(job.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   public void testActivateIncludingJobsByProcessDefinitionKeyWithUpdateInstancePermissionOnProcessDefinition() {
@@ -1062,9 +1020,6 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
     Job job = selectJobByProcessInstanceId(processInstanceId);
     assertNotNull(job);
     assertFalse(job.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   public void testActivateIncludingJobsByProcessDefinitionKeyWithUpdateInstancePermissionOnAnyProcessDefinition() {
@@ -1086,9 +1041,6 @@ public class JobDefinitionAuthorizationTest extends AuthorizationTest {
     Job job = selectJobByProcessInstanceId(processInstanceId);
     assertNotNull(job);
     assertFalse(job.isSuspended());
-
-    // clean operation log
-    clearOpLog();
   }
 
   // helper /////////////////////////////////////////////////////

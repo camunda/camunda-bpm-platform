@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.util.CompareUtil;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
 
@@ -82,6 +83,11 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
     ensureNotNull("deploymentAfter", after);
     this.deploymentAfter = after;
     return this;
+  }
+
+  @Override
+  protected boolean hasExcludingConditions() {
+    return super.hasExcludingConditions() || CompareUtil.areNotInAscendingOrder(deploymentAfter, deploymentBefore);
   }
 
   //sorting ////////////////////////////////////////////////////////

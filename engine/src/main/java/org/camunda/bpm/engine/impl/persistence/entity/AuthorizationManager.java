@@ -74,11 +74,11 @@ import org.camunda.bpm.engine.impl.UserOperationLogQueryImpl;
 import org.camunda.bpm.engine.impl.VariableInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.AuthorizationCheck;
+import org.camunda.bpm.engine.impl.db.CompositePermissionCheck;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.db.PermissionCheck;
-import org.camunda.bpm.engine.impl.db.CompositePermissionCheck;
 import org.camunda.bpm.engine.impl.db.PermissionCheckBuilder;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -733,6 +733,10 @@ public class AuthorizationManager extends AbstractManager {
 
   public void checkDeleteHistoricDecisionInstance(String decisionDefinitionKey) {
     checkAuthorization(DELETE_HISTORY, DECISION_DEFINITION, decisionDefinitionKey);
+  }
+
+  public void checkEvaluateDecision(String decisionDefinitionKey) {
+    checkAuthorization(CREATE_INSTANCE, DECISION_DEFINITION, decisionDefinitionKey);
   }
 
   /* QUERIES */

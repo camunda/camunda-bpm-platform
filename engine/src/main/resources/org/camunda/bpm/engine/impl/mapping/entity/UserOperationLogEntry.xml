@@ -23,6 +23,7 @@
   <insert id="insertUserOperationLogEntryEvent" parameterType="org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity">
       insert into ${prefix}ACT_HI_OP_LOG (
         ID_,
+        DEPLOYMENT_ID_,
         PROC_DEF_ID_,
         PROC_DEF_KEY_,
         PROC_INST_ID_,
@@ -43,6 +44,7 @@
         NEW_VALUE_
       ) values (
         #{id ,jdbcType=VARCHAR},
+        #{deploymentId, jdbcType=VARCHAR},
         #{processDefinitionId, jdbcType=VARCHAR},
         #{processDefinitionKey, jdbcType=VARCHAR},
         #{processInstanceId, jdbcType=VARCHAR},
@@ -70,42 +72,11 @@
     delete from ${prefix}ACT_HI_OP_LOG where ID_ = #{id}
   </delete>
 
-  <delete id="deleteUserOperationLogEntriesByProcessInstanceId">
-    delete from ${prefix}ACT_HI_OP_LOG where PROC_INST_ID_ = #{id}
-  </delete>
-
-  <delete id="deleteUserOperationLogEntriesByCaseInstanceId">
-    delete from ${prefix}ACT_HI_OP_LOG where CASE_INST_ID_ = #{id}
-  </delete>
-
-  <delete id="deleteUserOperationLogEntriesByCaseDefinitionId">
-    delete from ${prefix}ACT_HI_OP_LOG where CASE_DEF_ID_ = #{id}
-  </delete>
-
-  <delete id="deleteUserOperationLogEntriesByTaskId">
-    delete from ${prefix}ACT_HI_OP_LOG where TASK_ID_ = #{id}
-  </delete>
-  
-  <delete id="deleteUserOperationLogEntriesByProcessDefinitionId">
-    delete from ${prefix}ACT_HI_OP_LOG where PROC_DEF_ID_ = #{id}
-  </delete>
-
-  <delete id="deleteUserOperationLogEntriesByProcessDefinitionKey">
-    delete from ${prefix}ACT_HI_OP_LOG where PROC_DEF_KEY_ = #{id}
-  </delete>
-
-  <delete id="deleteUserOperationLogEntriesByJobId">
-    delete from ${prefix}ACT_HI_OP_LOG where JOB_ID_ = #{id}
-  </delete>
-
-  <delete id="deleteUserOperationLogEntriesByJobDefinitionId">
-    delete from ${prefix}ACT_HI_OP_LOG where JOB_DEF_ID_ = #{id}
-  </delete>
-
   <!--OPERATION LOG ENTRY RESULT MAP -->
 
   <resultMap id="UserOperationLogResultMap" type="org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
@@ -150,6 +121,9 @@
   <sql id="selectUserOperationLogEntriesByQueryCriteriaSql">
     from ${prefix}ACT_HI_OP_LOG RES
     <where>
+      <if test="deploymentId != null">
+        RES.DEPLOYMENT_ID_ = #{deploymentId}
+      </if>
       <if test="processDefinitionId != null">
         RES.PROC_DEF_ID_ = #{processDefinitionId}
       </if>

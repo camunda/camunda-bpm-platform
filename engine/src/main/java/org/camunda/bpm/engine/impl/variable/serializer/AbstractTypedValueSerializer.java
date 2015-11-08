@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.variable.serializer;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 
@@ -20,6 +23,12 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
  * @author Daniel Meyer
  */
 public abstract class AbstractTypedValueSerializer<T extends TypedValue> implements TypedValueSerializer<T> {
+
+  public static final Set<String> BINARY_VALUE_TYPES = new HashSet<String>();
+  static {
+    BINARY_VALUE_TYPES.add(ValueType.BYTES.getName());
+    BINARY_VALUE_TYPES.add(ValueType.FILE.getName());
+  }
 
   protected ValueType valueType;
 

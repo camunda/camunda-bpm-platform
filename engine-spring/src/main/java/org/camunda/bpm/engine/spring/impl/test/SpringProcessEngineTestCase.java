@@ -12,15 +12,16 @@
  */
 package org.camunda.bpm.engine.spring.impl.test;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.test.AbstractProcessEngineTestCase;
+import org.springframework.beans.CachedIntrospectionResults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestContextManager;
 import org.springframework.test.context.TestExecutionListeners;
@@ -33,12 +34,10 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 @TestExecutionListeners(DependencyInjectionTestExecutionListener.class)
 public class SpringProcessEngineTestCase extends AbstractProcessEngineTestCase implements ApplicationContextAware {
 
-  protected static Map<String, ProcessEngine> cachedProcessEngines = new HashMap<String, ProcessEngine>();
-
   protected TestContextManager testContextManager;
 
   @Autowired
-  protected ApplicationContext applicationContext;
+  protected ConfigurableApplicationContext applicationContext;
 
   public SpringProcessEngineTestCase() {
     super();
@@ -48,44 +47,38 @@ public class SpringProcessEngineTestCase extends AbstractProcessEngineTestCase i
   @Override
   public void runBare() throws Throwable {
     testContextManager.prepareTestInstance(this); // this will initialize all dependencies
-    super.runBare();
+    try {
+      super.runBare();
+    }
+    finally {
+      testContextManager.afterTestClass();
+      applicationContext.close();
+      clearTestContextCache(testContextManager);
+      applicationContext = null;
+      processEngine = null;
+      testContextManager = null;
+      CachedIntrospectionResults.clearClassLoader(getClass().getClassLoader());
+    }
+  }
+
+  private final void clearTestContextCache(TestContextManager testContextManager) throws Exception {
+    // well this is fun...
+    Field contextCacheField = TestContextManager.class.getDeclaredField("contextCache");
+    contextCacheField.setAccessible(true);
+    Object cache = contextCacheField.get(null);
+    Method method = cache.getClass().getDeclaredMethod("clear");
+    method.setAccessible(true);
+    method.invoke(cache);
   }
 
   @Override
   protected void initializeProcessEngine() {
     ContextConfiguration contextConfiguration = getClass().getAnnotation(ContextConfiguration.class);
-    String processEngineKey = createProcessEngineKey(contextConfiguration);
-
-    processEngine = cachedProcessEngines.get(processEngineKey);
-    if (processEngine==null) {
-      processEngine = applicationContext.getBean(ProcessEngine.class);
-      cachedProcessEngines.put(processEngineKey, processEngine);
-    }
-  }
-
-  protected String createProcessEngineKey(ContextConfiguration contextConfiguration) {
-    String processEngineKey = null;
-    String[] value = contextConfiguration.value();
-    Class<?>[] classes = contextConfiguration.classes();
-
-    if (value.length > 1 || classes.length > 1) {
-      throw new ProcessEngineException("SpringProcessEngineTestCase requires exactly one value in annotation ContextConfiguration");
-    }
-
-    if (value != null && value.length == 1) {
-      processEngineKey = value[0];
-
-    } else if (classes != null && classes.length == 1) {
-      processEngineKey = classes[0].getName();
-    }
-
-    if (processEngineKey == null) {
-      throw new ProcessEngineException("value or classes is mandatory in ContextConfiguration");
-    }
-    return processEngineKey;
+    processEngine = applicationContext.getBean(ProcessEngine.class);
   }
 
   public void setApplicationContext(ApplicationContext applicationContext) {
-    this.applicationContext = applicationContext;
+    this.applicationContext = (ConfigurableApplicationContext) applicationContext;
   }
+
 }

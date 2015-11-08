@@ -18,7 +18,6 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNumberOfElements;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -79,12 +78,7 @@ public class MessageEventReceivedCmd implements Command<Void>, Serializable {
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     authorizationManager.checkUpdateProcessInstanceById(processInstanceId);
 
-    HashMap<String, Object> payload = null;
-    if (processVariables != null) {
-      payload = new HashMap<String, Object>(processVariables);
-    }
-
-    eventSubscriptionEntity.eventReceived(payload, false);
+    eventSubscriptionEntity.eventReceived(processVariables, false);
 
     return null;
   }

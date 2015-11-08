@@ -28,11 +28,19 @@
 
     <dependency>
       <groupId>org.camunda.bpm.dmn</groupId>
-      <artifactId>camunda-scriptengine-dmn</artifactId>
+      <artifactId>camunda-engine-dmn</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>org.camunda.bpm.dmn</groupId>
-          <artifactId>camunda-scriptengine-juel</artifactId>
+          <groupId>de.odysseus.juel</groupId>
+          <artifactId>juel-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>de.odysseus.juel</groupId>
+          <artifactId>juel-spi</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>de.odysseus.juel</groupId>
+          <artifactId>juel-impl</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -172,7 +180,25 @@
       <artifactId>hamcrest-library</artifactId>
       <scope>test</scope>
     </dependency>
-
+    
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+   <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <scope>test</scope>
+   </dependency>
+   
+   <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jul-to-slf4j</artifactId>
+      <scope>test</scope>
+   </dependency>
+    
   </dependencies>
 
 
@@ -384,7 +410,7 @@
                 <exclude>**/*TestCase.java</exclude>
                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
                 <exclude>**/TaskEventsTest.java</exclude>
-                <exclude>**/OperationLog*.java</exclude>
+                <exclude>**/UserOperationLog*.java</exclude>
                 <exclude>**/HistoricIncident*Test.java</exclude>
                 <exclude>**/HistoricJobLog*Test.java</exclude>
                 <exclude>**/ProcessInstanceModificationHistoryTest.java</exclude>
@@ -422,7 +448,7 @@
                 <exclude>**/HistoryServiceTest.java</exclude>
                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
                 <exclude>**/TaskEventsTest.java</exclude>
-                <exclude>**/OperationLog*.java</exclude>
+                <exclude>**/UserOperationLog*.java</exclude>
                 <exclude>**/HistoricIncident*Test.java</exclude>
                 <exclude>**/HistoricVariableDataFormatTest.java</exclude>
                 <exclude>**/HistoricVariableInstanceScopeTest.java</exclude>
@@ -464,7 +490,7 @@
                 <exclude>**/HistoryServiceTest.java</exclude>
                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
                 <exclude>**/TaskEventsTest.java</exclude>
-                <exclude>**/OperationLog*.java</exclude>
+                <exclude>**/UserOperationLog*.java</exclude>
                 <exclude>**/HistoricVariableInstanceScopeTest.java</exclude>
                 <exclude>**/HistoricIncident*Test.java</exclude>
                 <exclude>**/HistoricVariableDataFormatTest.java</exclude>

@@ -60,9 +60,6 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
 
   protected String processInstanceId;
 
-  /**
-   * @param processInstanceId
-   */
   public GetActivityInstanceCmd(String processInstanceId) {
     this.processInstanceId = processInstanceId;
   }
@@ -108,20 +105,12 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
       // and does not throw compensation
       if (leaf.getActivityInstanceId() != null) {
 
-        if (!CompensationBehavior.isCompensationThrowing(leaf)) {
+        if (!CompensationBehavior.isCompensationThrowing(leaf) || LegacyBehavior.isCompensationThrowing(leaf, activityExecutionMapping)) {
           String parentActivityInstanceId = null;
 
-          ActivityImpl leafActivity = leaf.getActivity();
-          if (leafActivity.isScope()) {
-            parentActivityInstanceId = activityExecutionMapping
-              .get(leaf.getActivity().getFlowScope())
-              .getActivityInstanceId();
-          }
-          else {
-            parentActivityInstanceId = activityExecutionMapping
+          parentActivityInstanceId = activityExecutionMapping
               .get(leaf.getActivity().getFlowScope())
               .getParentActivityInstanceId();
-          }
 
           ActivityInstanceImpl leafInstance = createActivityInstance(leaf,
               leaf.getActivity(),
@@ -139,22 +128,26 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
         scopeInstancesToCreate.remove(leaf.getActivity());
       }
 
-      scopeInstancesToCreate.remove(leaf.getProcessDefinition());
       LegacyBehavior.removeLegacyNonScopesFromMapping(scopeInstancesToCreate);
+      scopeInstancesToCreate.remove(leaf.getProcessDefinition());
 
       // create an activity instance for each scope (including compensation throwing executions)
       for (Map.Entry<ScopeImpl, PvmExecutionImpl> scopeExecutionEntry : scopeInstancesToCreate.entrySet()) {
         ScopeImpl scope = scopeExecutionEntry.getKey();
         PvmExecutionImpl scopeExecution = scopeExecutionEntry.getValue();
 
-        String activityInstanceId = scopeExecution.getScopeActivityInstanceId();
+        String activityInstanceId = null;
+        String parentActivityInstanceId = null;
+
+        activityInstanceId = scopeExecution.getParentActivityInstanceId();
+        parentActivityInstanceId = activityExecutionMapping
+            .get(scope.getFlowScope())
+            .getParentActivityInstanceId();
+
         if (activityInstances.containsKey(activityInstanceId)) {
           continue;
         }
         else {
-          ScopeImpl parentFlowScope = scope.getFlowScope();
-          String parentActivityInstanceId = activityExecutionMapping.get(parentFlowScope).getScopeActivityInstanceId();
-
           // regardless of the tree structure (compacted or not), the scope's activity instance id
           // is the activity instance id of the parent execution and the parent activity instance id
           // of that is the actual parent activity instance id

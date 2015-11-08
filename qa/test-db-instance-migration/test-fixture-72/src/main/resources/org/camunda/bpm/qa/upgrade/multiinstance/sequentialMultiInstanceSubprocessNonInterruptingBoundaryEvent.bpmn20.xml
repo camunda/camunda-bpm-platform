@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:camunda="http://activiti.org/bpmn" targetNamespace="Examples"
+  xmlns:tns="Examples">
+  <message id="boundaryMessageId" name="BoundaryEventMessage" />
+  <error id="errorId" errorCode="ThrowBpmnErrorDelegate"/>
+
+  <process id="SequentialMultiInstanceSubprocessNonInterruptingBoundaryEvent" isExecutable="true">
+    <startEvent id="theStart" />
+    <sequenceFlow sourceRef="theStart" targetRef="miSubProcess" />
+
+    <subProcess id="miSubProcess">
+      <multiInstanceLoopCharacteristics isSequential="true">
+        <loopCardinality>3</loopCardinality>
+      </multiInstanceLoopCharacteristics>
+      <startEvent id="subProcessStart" />
+      <sequenceFlow sourceRef="subProcessStart" targetRef="subProcessTask" />
+      <userTask id="subProcessTask" />
+      <sequenceFlow sourceRef="subProcessTask" targetRef="throwErrorServiceTask" />
+      <serviceTask id="throwErrorServiceTask" camunda:class="org.camunda.bpm.qa.upgrade.util.ThrowBpmnErrorDelegate" />
+      <sequenceFlow sourceRef="throwErrorServiceTask" targetRef="subProcessEnd" />
+      <endEvent id="subProcessEnd" />
+    </subProcess>
+
+    <sequenceFlow sourceRef="miSubProcess" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+
+    <!-- Non-interrupting message boundary event -->
+    <boundaryEvent id="messageBoundaryEvent" attachedToRef="miSubProcess" cancelActivity="false">
+      <messageEventDefinition messageRef="boundaryMessageId" />
+    </boundaryEvent>
+    <sequenceFlow id="flow6" sourceRef="messageBoundaryEvent" targetRef="afterBoundaryTask" />
+    <userTask id="afterBoundaryTask" />
+    <sequenceFlow id="flow7" sourceRef="afterBoundaryTask" targetRef="afterBoundaryEnd" />
+    <endEvent id="afterBoundaryEnd" />
+
+    <!-- Boundary event catching the error -->
+    <boundaryEvent id="catchError" attachedToRef="miSubProcess">
+      <errorEventDefinition errorRef="errorId"/>
+    </boundaryEvent>
+    <sequenceFlow id="flow3" sourceRef="catchError" targetRef="escalatedTask" />
+    <userTask id="escalatedTask" />
+    <sequenceFlow id="flow5" sourceRef="escalatedTask" targetRef="escalatedEnd" />
+    <endEvent id="escalatedEnd" />
+  </process>
+</definitions>

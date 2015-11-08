@@ -43,4 +43,11 @@ public interface CoreVariableStore {
   void createOrUpdateVariable(String variableName, TypedValue value, AbstractVariableScope sourceActivityExecution);
 
   Collection<CoreVariableInstance> getVariableInstancesValues();
+
+  /**
+   * Creates a transient variable in the given scope. In contrast to other
+   * variables, this variable will not be stored in the data base.
+   */
+  void createTransientVariable(String variableName, TypedValue value, AbstractVariableScope sourceActivityExecution);
+
 }

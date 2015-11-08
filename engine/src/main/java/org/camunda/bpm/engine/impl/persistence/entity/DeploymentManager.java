@@ -94,9 +94,6 @@ public class DeploymentManager extends AbstractManager {
         // remove historic incidents which are not referenced to a process instance
         getHistoricIncidentManager().deleteHistoricIncidentsByProcessDefinitionId(processDefinitionId);
 
-        // remove historic op log entries which are not related to a process instance
-        getUserOperationLogManager().deleteOperationLogEntriesByProcessDefinitionId(processDefinitionId);
-
         // remove historic job log entries not related to a process instance
         getHistoricJobLogManager().deleteHistoricJobLogsByProcessDefinitionId(processDefinitionId);
       }
@@ -221,6 +218,11 @@ public class DeploymentManager extends AbstractManager {
 
   public DeploymentEntity findDeploymentById(String deploymentId) {
     return getDbEntityManager().selectById(DeploymentEntity.class, deploymentId);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<DeploymentEntity> findDeploymentsByIds(String... deploymentsIds) {
+    return getDbEntityManager().selectList("selectDeploymentsByIds", deploymentsIds);
   }
 
   public long findDeploymentCountByQueryCriteria(DeploymentQueryImpl deploymentQuery) {

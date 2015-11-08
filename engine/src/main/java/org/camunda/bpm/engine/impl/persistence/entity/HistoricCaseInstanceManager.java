@@ -77,10 +77,6 @@ public class HistoricCaseInstanceManager extends AbstractHistoricManager {
         .getHistoricTaskInstanceManager()
         .deleteHistoricTaskInstancesByCaseInstanceId(historicCaseInstanceId);
 
-      commandContext
-          .getOperationLogManager()
-          .deleteOperationLogEntriesByCaseInstanceId(historicCaseInstanceId);
-
       commandContext.getDbEntityManager().delete(HistoricCaseInstanceEntity.class, "deleteHistoricCaseInstance", historicCaseInstanceId);
 
     }

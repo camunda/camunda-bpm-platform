@@ -3,6 +3,7 @@ package org.camunda.bpm.engine.rest;
 import static com.jayway.restassured.RestAssured.given;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TASK_ID;
 import static org.hamcrest.CoreMatchers.either;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
@@ -39,7 +40,6 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
-import org.camunda.bpm.engine.impl.core.variable.type.ObjectTypeImpl;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceSuspensionStateDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -62,6 +62,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceModificationInstantiationBu
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.type.SerializableValueType;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.engine.variable.value.LongValue;
@@ -301,15 +302,16 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     when(runtimeServiceMock.getVariableTyped(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey), anyBoolean()))
     .thenReturn(variableValue);
 
-    given()
+    Response response = given()
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
       .pathParam("varId", variableKey)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
-      .contentType(either(CoreMatchers.<Object>equalTo(ContentType.TEXT.toString() + "; charset=UTF-8")).or(CoreMatchers.<Object>equalTo(ContentType.TEXT.toString() + ";charset=UTF-8")))
-    .and()
       .body(is(equalTo(new String(byteContent))))
     .when().get(SINGLE_PROCESS_INSTANCE_BINARY_VARIABLE_URL);
+
+    String contentType = response.contentType().replaceAll(" ", "");
+    assertThat(contentType, is(ContentType.TEXT + ";charset=" + encoding));
   }
 
   @Test
@@ -360,8 +362,8 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
       .body(EXAMPLE_VARIABLE_KEY + ".value.property1", equalTo("aPropertyValue"))
       .body(EXAMPLE_VARIABLE_KEY + ".value.property2", equalTo(true))
       .body(EXAMPLE_VARIABLE_KEY + ".type", equalTo(VariableTypeHelper.toExpectedValueTypeName(ValueType.OBJECT)))
-      .body(EXAMPLE_VARIABLE_KEY + ".valueInfo." + ObjectTypeImpl.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ExampleVariableObject.class.getName()))
-      .body(EXAMPLE_VARIABLE_KEY + ".valueInfo." + ObjectTypeImpl.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
+      .body(EXAMPLE_VARIABLE_KEY + ".valueInfo." + SerializableValueType.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ExampleVariableObject.class.getName()))
+      .body(EXAMPLE_VARIABLE_KEY + ".valueInfo." + SerializableValueType.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
       .when().get(PROCESS_INSTANCE_VARIABLES_URL);
 
     Assert.assertEquals("Should return exactly one variable", 1, response.jsonPath().getMap("").size());
@@ -390,8 +392,8 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
       .then().expect().statusCode(Status.OK.getStatusCode())
       .body(variableKey + ".value", equalTo(payload))
       .body(variableKey + ".type", equalTo("Object"))
-      .body(variableKey + ".valueInfo." + ObjectTypeImpl.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
-      .body(variableKey + ".valueInfo." + ObjectTypeImpl.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ArrayList.class.getName()))
+      .body(variableKey + ".valueInfo." + SerializableValueType.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
+      .body(variableKey + ".valueInfo." + SerializableValueType.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ArrayList.class.getName()))
       .when().get(PROCESS_INSTANCE_VARIABLES_URL);
 
     // then
@@ -420,8 +422,8 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     .then().expect().statusCode(Status.OK.getStatusCode())
       .body(variableKey + ".value", equalTo("a serialized value"))
       .body(variableKey + ".type", equalTo("Object"))
-      .body(variableKey + ".valueInfo." + ObjectTypeImpl.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
-      .body(variableKey + ".valueInfo." + ObjectTypeImpl.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ArrayList.class.getName()))
+      .body(variableKey + ".valueInfo." + SerializableValueType.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
+      .body(variableKey + ".valueInfo." + SerializableValueType.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ArrayList.class.getName()))
       .when().get(PROCESS_INSTANCE_VARIABLES_URL);
 
     // then
@@ -841,8 +843,8 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
       .then().expect().statusCode(Status.OK.getStatusCode())
       .body("value", equalTo(payload))
       .body("type", equalTo("Object"))
-      .body("valueInfo." + ObjectTypeImpl.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
-      .body("valueInfo." + ObjectTypeImpl.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ArrayList.class.getName()))
+      .body("valueInfo." + SerializableValueType.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
+      .body("valueInfo." + SerializableValueType.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ArrayList.class.getName()))
       .when().get(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
 
     // then
@@ -871,8 +873,8 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     .then().expect().statusCode(Status.OK.getStatusCode())
       .body("value", equalTo("a serialized value"))
       .body("type", equalTo("Object"))
-      .body("valueInfo." + ObjectTypeImpl.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
-      .body("valueInfo." + ObjectTypeImpl.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ArrayList.class.getName()))
+      .body("valueInfo." + SerializableValueType.VALUE_INFO_SERIALIZATION_DATA_FORMAT, equalTo("application/json"))
+      .body("valueInfo." + SerializableValueType.VALUE_INFO_OBJECT_TYPE_NAME, equalTo(ArrayList.class.getName()))
       .when().get(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
 
     // then
@@ -1176,6 +1178,25 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   }
 
   @Test
+  public void testPutSingleBinaryVariableWithValueType() throws Exception {
+    byte[] bytes = "someContent".getBytes();
+
+    String variableKey = "aVariableKey";
+
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .multiPart("data", null, bytes)
+      .multiPart("valueType", "Bytes", "text/plain")
+    .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .post(SINGLE_PROCESS_INSTANCE_BINARY_VARIABLE_URL);
+
+    verify(runtimeServiceMock).setVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey),
+        argThat(EqualsPrimitiveValue.bytesValue(bytes)));
+  }
+
+  @Test
   public void testPutSingleBinaryVariableWithNoValue() throws Exception {
     byte[] bytes = new byte[0];
 
@@ -1371,6 +1392,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     given()
       .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
       .multiPart("data", filename, value, mimetype + "; encoding="+encoding)
+      .multiPart("valueType", "File", "text/plain")
       .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
@@ -1398,6 +1420,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     given()
       .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
       .multiPart("data", filename, value, mimetype)
+      .multiPart("valueType", "File", "text/plain")
       .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
@@ -1425,6 +1448,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     given()
       .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
       .multiPart("data", filename, value, "encoding="+encoding)
+      .multiPart("valueType", "File", "text/plain")
       .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       //when the user passes an encoding, he has to provide the type, too
@@ -1442,6 +1466,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     given()
       .pathParam("id", EXAMPLE_TASK_ID).pathParam("varId", variableKey)
       .multiPart("data", filename, new byte[0])
+      .multiPart("valueType", "File", "text/plain")
       .header("accept", MediaType.APPLICATION_JSON)
     .expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())

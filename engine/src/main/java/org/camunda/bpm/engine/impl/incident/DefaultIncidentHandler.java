@@ -40,9 +40,6 @@ import org.camunda.bpm.engine.runtime.Incident;
  */
 public class DefaultIncidentHandler implements IncidentHandler {
 
-  public static final String FAILED_JOB_HANDLER_TYPE = "failedJob";
-  public static final String EXTERNAL_TASK_HANDLER_TYPE = "failedExternalTask";
-
   protected String type;
 
   public DefaultIncidentHandler(String type) {

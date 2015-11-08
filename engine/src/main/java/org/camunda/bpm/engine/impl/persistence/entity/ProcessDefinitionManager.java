@@ -92,15 +92,14 @@ public class ProcessDefinitionManager extends AbstractManager {
   }
 
   public List<ProcessDefinition> findProcessDefinitionsStartableByUser(String user) {
-    return   new ProcessDefinitionQueryImpl().startableByUser(user).list();
+    return new ProcessDefinitionQueryImpl().startableByUser(user).list();
   }
 
-  public List<User> findProcessDefinitionPotentialStarterUsers() {
-    return null;
-  }
-
-  public List<Group> findProcessDefinitionPotentialStarterGroups() {
-    return null;
+  public String findPreviousProcessDefinitionIdByKeyAndVersion(String processDefinitionKey, Integer version) {
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("key", processDefinitionKey);
+    params.put("version", version);
+    return (String) getDbEntityManager().selectOne("selectPreviousProcessDefinitionIdByKeyAndVersion", params);
   }
 
   @SuppressWarnings("unchecked")

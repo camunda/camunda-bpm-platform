@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.util.CompareUtil;
 import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
 
 
@@ -287,6 +288,15 @@ public class HistoricTaskInstanceQueryImpl extends AbstractQuery<HistoricTaskIns
   public HistoricTaskInstanceQuery taskFollowUpAfter(Date followUpAfter) {
     this.followUpAfter = followUpAfter;
     return this;
+  }
+
+  @Override
+  protected boolean hasExcludingConditions() {
+    return super.hasExcludingConditions()
+      || (finished && unfinished)
+      ||(processFinished && processUnfinished)
+      || CompareUtil.areNotInAscendingOrder(dueAfter, dueDate, dueBefore)
+      || CompareUtil.areNotInAscendingOrder(followUpAfter, followUpDate, followUpBefore);
   }
 
   // ordering /////////////////////////////////////////////////////////////////
