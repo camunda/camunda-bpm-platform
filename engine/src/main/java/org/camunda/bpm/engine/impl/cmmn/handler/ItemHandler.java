@@ -46,6 +46,7 @@ import org.camunda.bpm.model.cmmn.Query;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 import org.camunda.bpm.model.cmmn.instance.ConditionExpression;
 import org.camunda.bpm.model.cmmn.instance.DiscretionaryItem;
+import org.camunda.bpm.model.cmmn.instance.Documentation;
 import org.camunda.bpm.model.cmmn.instance.ExtensionElements;
 import org.camunda.bpm.model.cmmn.instance.ManualActivationRule;
 import org.camunda.bpm.model.cmmn.instance.PlanItem;
@@ -256,15 +257,10 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
   }
 
   protected void initializeDescription(CmmnElement element, CmmnActivity activity, CmmnHandlerContext context) {
-    String description = element.getDescription();
-
+    String description = getDesciption(element);
     if (description == null) {
-      PlanItemDefinition definition = getDefinition(element);
-      if (definition != null) {
-        description = definition.getDescription();
-      }
+      description = getDocumentation(element);
     }
-
     activity.setProperty(PROPERTY_ACTIVITY_DESCRIPTION, description);
   }
 
@@ -289,7 +285,7 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
     if (requiredRule != null) {
       ConditionExpression condition = requiredRule.getCondition();
       if (condition != null) {
-        String rule = condition.getBody();
+        String rule = condition.getText();
         if (rule != null) {
           Expression requiredRuleExpression = expressionManager.createExpression(rule);
           CaseControlRule caseRule = new CaseControlRuleImpl(requiredRuleExpression);
@@ -317,7 +313,7 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
     if (manualActivationRule != null) {
       ConditionExpression condition = manualActivationRule.getCondition();
       if (condition != null) {
-        String rule = condition.getBody();
+        String rule = condition.getText();
         if (rule != null) {
           Expression manualActivationExpression = expressionManager.createExpression(rule);
           CaseControlRule caseRule = new CaseControlRuleImpl(manualActivationExpression);
@@ -358,7 +354,7 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
 
       ConditionExpression condition = repetitionRule.getCondition();
       if (condition != null) {
-        String rule = condition.getBody();
+        String rule = condition.getText();
         if (rule != null) {
           Expression repetitionRuleExpression = expressionManager.createExpression(rule);
           CaseControlRule caseRule = new CaseControlRuleImpl(repetitionRuleExpression);
@@ -659,7 +655,7 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
   protected Collection<Sentry> getEntryCriterias(CmmnElement element) {
     if (isPlanItem(element)) {
       PlanItem planItem = (PlanItem) element;
-      return planItem.getEntryCriterias();
+      return planItem.getEntryCriteria();
     }
 
     return new ArrayList<Sentry>();
@@ -668,7 +664,7 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
   protected Collection<Sentry> getExitCriterias(CmmnElement element) {
     if (isPlanItem(element)) {
       PlanItem planItem = (PlanItem) element;
-      return planItem.getExitCriterias();
+      return planItem.getExitCriteria();
     }
 
     return new ArrayList<Sentry>();
@@ -683,6 +679,38 @@ public abstract class ItemHandler extends CmmnElementHandler<CmmnElement, CmmnAc
     }
 
     return description;
+  }
+
+  protected String getDocumentation(CmmnElement element) {
+    Collection<Documentation> documentations = element.getDocumentations();
+
+    if (documentations.isEmpty()) {
+      PlanItemDefinition definition = getDefinition(element);
+      documentations = definition.getDocumentations();
+    }
+
+    if (documentations.isEmpty()) {
+      return null;
+    }
+
+    StringBuilder builder = new StringBuilder();
+    for (Documentation doc : documentations) {
+
+      String content = doc.getTextContent();
+      if (content == null || content.isEmpty()) {
+        continue;
+      }
+
+      if (builder.length() != 0) {
+        builder.append("\n\n");
+      }
+
+      builder.append(content.trim());
+    }
+
+    return builder.toString();
+
+
   }
 
   protected boolean isPlanItem(CmmnElement element) {

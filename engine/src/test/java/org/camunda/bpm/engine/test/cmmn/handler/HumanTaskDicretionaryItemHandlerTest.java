@@ -30,7 +30,6 @@ import org.camunda.bpm.engine.impl.cmmn.handler.HumanTaskItemHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.model.cmmn.Cmmn;
-import org.camunda.bpm.model.cmmn.instance.Body;
 import org.camunda.bpm.model.cmmn.instance.ConditionExpression;
 import org.camunda.bpm.model.cmmn.instance.DefaultControl;
 import org.camunda.bpm.model.cmmn.instance.DiscretionaryItem;
@@ -205,8 +204,7 @@ public class HumanTaskDicretionaryItemHandlerTest extends CmmnElementHandlerTest
     ItemControl itemControl = createElement(discretionaryItem, "ItemControl_1", ItemControl.class);
     ManualActivationRule manualActivationRule = createElement(itemControl, "ManualActivationRule_1", ManualActivationRule.class);
     ConditionExpression expression = createElement(manualActivationRule, "Expression_1", ConditionExpression.class);
-    Body body = createElement(expression, Body.class);
-    body.setTextContent("${true}");
+    expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
 
@@ -225,8 +223,7 @@ public class HumanTaskDicretionaryItemHandlerTest extends CmmnElementHandlerTest
     PlanItemControl defaultControl = createElement(humanTask, "ItemControl_1", DefaultControl.class);
     ManualActivationRule manualActivationRule = createElement(defaultControl, "ManualActivationRule_1", ManualActivationRule.class);
     ConditionExpression expression = createElement(manualActivationRule, "Expression_1", ConditionExpression.class);
-    Body body = createElement(expression, Body.class);
-    body.setTextContent("${true}");
+    expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
 
@@ -245,8 +242,7 @@ public class HumanTaskDicretionaryItemHandlerTest extends CmmnElementHandlerTest
     ItemControl itemControl = createElement(discretionaryItem, "ItemControl_1", ItemControl.class);
     RequiredRule requiredRule = createElement(itemControl, "RequiredRule_1", RequiredRule.class);
     ConditionExpression expression = createElement(requiredRule, "Expression_1", ConditionExpression.class);
-    Body body = createElement(expression, Body.class);
-    body.setTextContent("${true}");
+    expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
 
@@ -265,8 +261,7 @@ public class HumanTaskDicretionaryItemHandlerTest extends CmmnElementHandlerTest
     PlanItemControl defaultControl = createElement(humanTask, "ItemControl_1", DefaultControl.class);
     RequiredRule requiredRule = createElement(defaultControl, "RequiredRule_1", RequiredRule.class);
     ConditionExpression expression = createElement(requiredRule, "Expression_1", ConditionExpression.class);
-    Body body = createElement(expression, Body.class);
-    body.setTextContent("${true}");
+    expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
 

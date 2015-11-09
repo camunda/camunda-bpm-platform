@@ -1,17 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <definitions name="Test Case"
-                xmlns="http://www.omg.org/spec/CMMN/20131201/MODEL"
+                xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
                 xmlns:camunda="http://camunda.org/schema/1.0/cmmn"
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 targetNamespace="Examples">
 
   <case id="testCase" name="Test Case">
 
-    <casePlanModel exitCriteriaRefs="Sentry_3">
+    <casePlanModel>
 
       <planItem definitionRef="collectDataStage" id="PI_collectDataStage" />
-      <planItem definitionRef="dataCollectedMilestone" entryCriteriaRefs="Sentry_1" id="PI_dataCollectedMilestone" />
-      <planItem definitionRef="decideHumanTask" entryCriteriaRefs="Sentry_2" id="PI_decideHumanTask" />
+      <planItem definitionRef="dataCollectedMilestone"  id="PI_dataCollectedMilestone">
+        <entryCriterion sentryRef="Sentry_1" />
+      </planItem>
+      <planItem definitionRef="decideHumanTask" id="PI_decideHumanTask">
+        <entryCriterion sentryRef="Sentry_2" />
+      </planItem>
       <planItem definitionRef="customerRetiredUserEvent" id="PI_customerRetiredUserEvent" />
 
       <sentry id="Sentry_1">
@@ -50,7 +54,9 @@
 
       <milestone name="Data collected" id="dataCollectedMilestone" />
 
-      <userEvent name="Customer retired" id="customerRetiredUserEvent" />
+      <userEventListener name="Customer retired" id="customerRetiredUserEvent" />
+      
+      <exitCriterion sentryRef="Sentry_3" />
 
     </casePlanModel>
 

@@ -159,7 +159,7 @@ public class SentryHandler extends CmmnElementHandler<Sentry, CmmnSentryDeclarat
 
     ExpressionManager expressionManager = context.getExpressionManager();
     ConditionExpression condition = conditions.iterator().next();
-    Expression conditionExpression = expressionManager.createExpression(condition.getBody());
+    Expression conditionExpression = expressionManager.createExpression(condition.getText());
 
     CmmnIfPartDeclaration ifPartDeclaration = new CmmnIfPartDeclaration();
     ifPartDeclaration.setCondition(conditionExpression);

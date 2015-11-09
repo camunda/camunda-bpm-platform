@@ -2,7 +2,7 @@
 
 <definitions id="_81291489-586f-4b00-b7c4-1ef8f7523c29"
                   targetNamespace="Examples"
-                  xmlns="http://www.omg.org/spec/CMMN/20131201/MODEL"
+                  xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
   <case id="loanApplication" name="Loan Application Case">
