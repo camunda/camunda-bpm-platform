@@ -14,7 +14,7 @@ define(['angular',
   './setup',
   './system',
   './systemSettingsGeneral',
-  './systemSettingsFlowNodeCount'
+  './execution-metrics'
 ], function(angular,
   angularRoute,
   camundaCommonsUi,
@@ -31,7 +31,7 @@ define(['angular',
   setup,
   system,
   systemSettingsGeneral,
-  systemSettingsFlowNodeCount) {
+  executionMetrics) {
   'use strict';
 
   var ngModule = angular.module('admin.pages', ['ngRoute', 'cam.commons']);
@@ -49,7 +49,7 @@ define(['angular',
   ngModule.config(setup);
   ngModule.config(system);
   ngModule.config(systemSettingsGeneral);
-  ngModule.config(systemSettingsFlowNodeCount);
+  ngModule.config(executionMetrics);
 
   return ngModule;
 });
