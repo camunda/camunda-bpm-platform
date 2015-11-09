@@ -43,20 +43,31 @@ public final class ModelUtil {
   public static ModelElementInstance getModelElement(DomElement domElement, ModelInstanceImpl modelInstance) {
     ModelElementInstance modelElement = domElement.getModelElementInstance();
     if(modelElement == null) {
-
-      Model model = modelInstance.getModel();
-      String namespaceUri = model.getActualNamespace(domElement.getNamespaceURI());
-
-      String localName = domElement.getLocalName();
-
-      ModelElementTypeImpl modelType = (ModelElementTypeImpl) modelInstance.getModel().getTypeForName(namespaceUri, localName);
-      if(modelType == null) {
-        modelType = (ModelElementTypeImpl) modelInstance.registerGenericType(namespaceUri, localName);
-      }
+      ModelElementTypeImpl modelType = getModelElement(domElement, modelInstance, domElement.getNamespaceURI());
       modelElement = modelType.newInstance(modelInstance, domElement);
       domElement.setModelElementInstance(modelElement);
     }
     return modelElement;
+  }
+
+  protected static ModelElementTypeImpl getModelElement(DomElement domElement, ModelInstanceImpl modelInstance, String namespaceUri) {
+    String localName = domElement.getLocalName();
+    ModelElementTypeImpl modelType = (ModelElementTypeImpl) modelInstance.getModel().getTypeForName(namespaceUri, localName);
+
+    if (modelType == null) {
+
+      Model model = modelInstance.getModel();
+      String actualNamespaceUri = model.getActualNamespace(namespaceUri);
+
+      if (!namespaceUri.equals(actualNamespaceUri)) {
+        modelType = getModelElement(domElement, modelInstance, actualNamespaceUri);
+      }
+      else {
+        modelType = (ModelElementTypeImpl) modelInstance.registerGenericType(actualNamespaceUri, localName);
+      }
+
+    }
+    return modelType;
   }
 
   public static QName getQName(String namespaceUri, String localName) {

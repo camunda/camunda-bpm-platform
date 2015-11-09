@@ -12,6 +12,13 @@
  */
 package org.camunda.bpm.model.xml.impl.type;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.ModelException;
 import org.camunda.bpm.model.xml.ModelInstance;
@@ -24,12 +31,9 @@ import org.camunda.bpm.model.xml.instance.DomDocument;
 import org.camunda.bpm.model.xml.instance.DomElement;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
+import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
 import org.camunda.bpm.model.xml.type.attribute.Attribute;
 import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
-
-import java.util.*;
-
-import static org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
 
 /**
  * @author Daniel Meyer
@@ -227,12 +231,27 @@ public class ModelElementTypeImpl implements ModelElementType {
   public Collection<ModelElementInstance> getInstances(ModelInstance modelInstance) {
     ModelInstanceImpl modelInstanceImpl = (ModelInstanceImpl) modelInstance;
     DomDocument document = modelInstanceImpl.getDocument();
-    List<DomElement> elements = document.getElementsByNameNs(typeNamespace, typeName);
+
+    List<DomElement> elements = getElementsByNameNs(document, typeNamespace);
+
     List<ModelElementInstance> resultList = new ArrayList<ModelElementInstance>();
     for (DomElement element : elements) {
       resultList.add(ModelUtil.getModelElement(element, modelInstanceImpl));
     }
     return resultList;
+  }
+
+  protected List<DomElement> getElementsByNameNs(DomDocument document, String namespaceURI) {
+    List<DomElement> elements = document.getElementsByNameNs(namespaceURI, typeName);
+
+    if (elements.isEmpty()) {
+      String alternativeNamespaceURI = getModel().getAlternativeNamespace(namespaceURI);
+      if (!namespaceURI.equals(alternativeNamespaceURI)) {
+        elements = getElementsByNameNs(document, alternativeNamespaceURI);
+      }
+    }
+
+    return elements;
   }
 
   /**

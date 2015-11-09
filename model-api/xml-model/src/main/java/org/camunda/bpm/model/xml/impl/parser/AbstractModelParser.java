@@ -12,18 +12,24 @@
  */
 package org.camunda.bpm.model.xml.impl.parser;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.camunda.bpm.model.xml.ModelInstance;
 import org.camunda.bpm.model.xml.ModelValidationException;
 import org.camunda.bpm.model.xml.impl.util.DomUtil;
+import org.camunda.bpm.model.xml.impl.util.ReflectUtil;
 import org.camunda.bpm.model.xml.instance.DomDocument;
+import org.camunda.bpm.model.xml.instance.DomElement;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
-import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * @author Daniel Meyer
@@ -33,7 +39,7 @@ public abstract class AbstractModelParser {
 
   private final DocumentBuilderFactory documentBuilderFactory;
   protected SchemaFactory schemaFactory;
-  protected Schema schema;
+  protected Map<String, Schema> schemas = new HashMap<String, Schema>();
 
   protected AbstractModelParser() {
     DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -80,6 +86,9 @@ public abstract class AbstractModelParser {
    * @param document the DOM document to validate
    */
   public void validateModel(DomDocument document) {
+
+    Schema schema = getSchema(document);
+
     if (schema == null) {
       return;
     }
@@ -93,6 +102,25 @@ public abstract class AbstractModelParser {
       throw new ModelValidationException("Error during DOM document validation", e);
     } catch (SAXException e) {
       throw new ModelValidationException("DOM document is not valid", e);
+    }
+  }
+
+  protected Schema getSchema(DomDocument document) {
+    DomElement rootElement = document.getRootElement();
+    String namespaceURI = rootElement.getNamespaceURI();
+    return schemas.get(namespaceURI);
+  }
+
+  protected void addSchema(String namespaceURI, Schema schema) {
+    schemas.put(namespaceURI, schema);
+  }
+
+  protected Schema createSchema(String location, ClassLoader classLoader) {
+    URL cmmnSchema = ReflectUtil.getResource(location, classLoader);
+    try {
+      return schemaFactory.newSchema(cmmnSchema);
+    } catch (SAXException e) {
+      throw new ModelValidationException("Unable to parse schema:" + cmmnSchema);
     }
   }
 
