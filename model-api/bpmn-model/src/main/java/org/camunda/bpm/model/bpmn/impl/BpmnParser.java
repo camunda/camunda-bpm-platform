@@ -12,18 +12,19 @@
  */
 package org.camunda.bpm.model.bpmn.impl;
 
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN20_NS;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_20_SCHEMA_LOCATION;
+
+import java.io.InputStream;
+
 import org.camunda.bpm.model.bpmn.Bpmn;
-import org.camunda.bpm.model.xml.ModelValidationException;
 import org.camunda.bpm.model.xml.impl.ModelImpl;
 import org.camunda.bpm.model.xml.impl.parser.AbstractModelParser;
 import org.camunda.bpm.model.xml.impl.util.ReflectUtil;
 import org.camunda.bpm.model.xml.instance.DomDocument;
-import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.validation.SchemaFactory;
-import java.io.InputStream;
-import java.net.URL;
 
 /**
  * <p>The parser used when parsing BPMN Files</p>
@@ -40,18 +41,13 @@ public class BpmnParser extends AbstractModelParser {
 
   public BpmnParser() {
     this.schemaFactory = SchemaFactory.newInstance(W3C_XML_SCHEMA);
-    URL bpmnSchema = ReflectUtil.getResource(BpmnModelConstants.BPMN_20_SCHEMA_LOCATION, BpmnParser.class.getClassLoader());
-    try {
-      this.schema = schemaFactory.newSchema(bpmnSchema);
-    } catch (SAXException e) {
-      throw new ModelValidationException("Unable to parse schema:" + bpmnSchema);
-    }
+    addSchema(BPMN20_NS, createSchema(BPMN_20_SCHEMA_LOCATION, BpmnParser.class.getClassLoader()));
   }
 
   @Override
   protected void configureFactory(DocumentBuilderFactory dbf) {
     dbf.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
-    dbf.setAttribute(JAXP_SCHEMA_SOURCE, ReflectUtil.getResource(BpmnModelConstants.BPMN_20_SCHEMA_LOCATION, BpmnParser.class.getClassLoader()).toString());
+    dbf.setAttribute(JAXP_SCHEMA_SOURCE, ReflectUtil.getResource(BPMN_20_SCHEMA_LOCATION, BpmnParser.class.getClassLoader()).toString());
     super.configureFactory(dbf);
   }
 
