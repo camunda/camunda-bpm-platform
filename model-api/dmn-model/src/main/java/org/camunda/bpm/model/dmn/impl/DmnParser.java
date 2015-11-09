@@ -13,20 +13,21 @@
 
 package org.camunda.bpm.model.dmn.impl;
 
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN11_NS;
+import static org.camunda.bpm.model.dmn.impl.DmnModelConstants.DMN_11_SCHEMA_LOCATION;
+
 import java.io.InputStream;
-import java.net.URL;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.validation.SchemaFactory;
 
 import org.camunda.bpm.model.dmn.Dmn;
 import org.camunda.bpm.model.dmn.DmnModelException;
 import org.camunda.bpm.model.xml.ModelParseException;
-import org.camunda.bpm.model.xml.ModelValidationException;
 import org.camunda.bpm.model.xml.impl.ModelImpl;
 import org.camunda.bpm.model.xml.impl.parser.AbstractModelParser;
 import org.camunda.bpm.model.xml.impl.util.ReflectUtil;
 import org.camunda.bpm.model.xml.instance.DomDocument;
-import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.validation.SchemaFactory;
 
 public class DmnParser extends AbstractModelParser {
 
@@ -37,18 +38,13 @@ public class DmnParser extends AbstractModelParser {
 
   public DmnParser() {
     this.schemaFactory = SchemaFactory.newInstance(W3C_XML_SCHEMA);
-    URL cmmnSchema = ReflectUtil.getResource(DmnModelConstants.DMN_11_SCHEMA_LOCATION, DmnParser.class.getClassLoader());
-    try {
-      this.schema = schemaFactory.newSchema(cmmnSchema);
-    } catch (SAXException e) {
-      throw new ModelValidationException("Unable to parse schema:" + cmmnSchema);
-    }
+    addSchema(DMN11_NS, createSchema(DMN_11_SCHEMA_LOCATION, DmnParser.class.getClassLoader()));
   }
 
   @Override
   protected void configureFactory(DocumentBuilderFactory dbf) {
     dbf.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
-    dbf.setAttribute(JAXP_SCHEMA_SOURCE, ReflectUtil.getResource(DmnModelConstants.DMN_11_SCHEMA_LOCATION, DmnParser.class.getClassLoader()).toString());
+    dbf.setAttribute(JAXP_SCHEMA_SOURCE, ReflectUtil.getResource(DMN_11_SCHEMA_LOCATION, DmnParser.class.getClassLoader()).toString());
     super.configureFactory(dbf);
   }
 
