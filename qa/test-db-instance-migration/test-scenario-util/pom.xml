@@ -11,16 +11,12 @@
   <packaging>jar</packaging>
   <name>camunda BPM - QA - upgrade - instance migration - scenario util</name>
 
-  <properties>
-    <camunda.version>7.2.0</camunda.version>
-  </properties>
-
   <dependencies>
 
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
-      <version>${camunda.version}</version>
+      <version>7.2.0</version>
       <scope>provided</scope>
     </dependency>
 
