@@ -163,7 +163,7 @@ ALTER TABLE ACT_HI_OP_LOG
 -- job suspension state
 
 ALTER TABLE ACT_RU_JOB
-  ADD CONSTRAINT DEFAULT 1
+  ADD DEFAULT 1
   FOR SUSPENSION_STATE_;
 
   -- relevant for jobs created in Camunda 7.0
