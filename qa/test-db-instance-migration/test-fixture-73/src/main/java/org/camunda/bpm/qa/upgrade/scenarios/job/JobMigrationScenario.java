@@ -20,6 +20,7 @@ import java.sql.Statement;
 import org.apache.ibatis.session.SqlSession;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -40,7 +41,7 @@ public class JobMigrationScenario {
     return new ScenarioSetup() {
       public void execute(ProcessEngine engine, final String scenarioName) {
 
-        ProcessEngineConfigurationImpl engineConfiguration = (ProcessEngineConfigurationImpl) engine.getProcessEngineConfiguration();
+        final ProcessEngineConfigurationImpl engineConfiguration = (ProcessEngineConfigurationImpl) engine.getProcessEngineConfiguration();
         CommandExecutor commandExecutor = engineConfiguration.getCommandExecutorTxRequired();
 
         // create a job with the scenario name as id and a null suspension state
@@ -61,9 +62,9 @@ public class JobMigrationScenario {
                   "1," +
                   "3," +
                   "'timer'," +
-                  "true," +
-                  "'" + TimerStartEventJobHandler.TYPE + "'," +
-                  ");");
+                  DbSqlSessionFactory.databaseSpecificTrueConstant.get(engineConfiguration.getDatabaseType()) + "," +
+                  "'" + TimerStartEventJobHandler.TYPE + "'" +
+                  ")");
               connection.commit();
               statement.close();
             } catch (SQLException e) {

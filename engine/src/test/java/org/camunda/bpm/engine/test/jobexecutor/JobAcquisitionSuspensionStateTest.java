@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.apache.ibatis.session.SqlSession;
 import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -62,17 +63,19 @@ public class JobAcquisitionSuspensionStateTest extends PluggableProcessEngineTes
           connection = sqlSession.getConnection();
           statement = connection
               .createStatement();
-          int updateResult = statement.executeUpdate("INSERT INTO ACT_RU_JOB(ID_, REV_, RETRIES_, PROCESS_INSTANCE_ID_, TYPE_, EXCLUSIVE_, HANDLER_TYPE_, HANDLER_CFG_) " +
+          String insertStatementString = "INSERT INTO ACT_RU_JOB(ID_, REV_, RETRIES_, PROCESS_INSTANCE_ID_, TYPE_, EXCLUSIVE_, HANDLER_TYPE_, HANDLER_CFG_) " +
               "VALUES (" +
               "'" + jobId + "'," +
               "1," +
               "3," +
               "'" + processInstanceId + "'," +
               "'timer'," +
-              "true," +
+              DbSqlSessionFactory.databaseSpecificTrueConstant.get(processEngineConfiguration.getDatabaseType()) + "," +
               "'" + TimerStartEventJobHandler.TYPE + "'," +
               "'" + myCustomTimerEntity + "'" +
-              ");");
+              ")";
+
+          int updateResult = statement.executeUpdate(insertStatementString);
           assertEquals(1, updateResult);
           connection.commit();
 
