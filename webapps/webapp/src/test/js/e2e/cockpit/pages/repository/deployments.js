@@ -147,14 +147,26 @@ module.exports = Page.extend({
     this.searchList().get(index).element(by.css('.remove-search')).click();
   },
 
+  getType: function(index) {
+    return this.searchList().get(index).element(by.css('[cam-widget-inline-field][value="type.value"]')).getText();
+  },
+
   changeType: function(index, type) {
     this.searchList().get(index).element(by.css('[cam-widget-inline-field][value="type.value"]')).click();
     this.searchList().get(index).element(by.cssContainingText('ul > li', type)).click();
   },
 
+  getOperator: function(index) {
+    return this.searchList().get(index).element(by.css('[cam-widget-inline-field][value="operator.value"]')).getText();
+  },
+
   changeOperator: function(index, operator) {
     this.searchList().get(index).element(by.css('[cam-widget-inline-field][value="operator.value"]')).click();
     this.searchList().get(index).element(by.cssContainingText('ul > li', operator)).click();
+  },
+
+  getValue: function(index) {
+    return this.searchList().get(index).element(by.css('[cam-widget-inline-field][value="value.value"]')).getText();
   },
 
   changeValue: function(index, value, isDateValue) {
