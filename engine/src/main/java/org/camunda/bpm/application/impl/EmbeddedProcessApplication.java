@@ -17,6 +17,7 @@ import java.util.concurrent.Callable;
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationExecutionException;
 import org.camunda.bpm.application.ProcessApplicationReference;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 /**
  * <p>An embedded process application is a ProcessApplication that uses an embedded
@@ -29,6 +30,8 @@ import org.camunda.bpm.application.ProcessApplicationReference;
  *
  */
 public class EmbeddedProcessApplication extends AbstractProcessApplication {
+
+  private static ProcessApplicationLogger LOG = ProcessEngineLogger.PROCESS_APPLICATION_LOGGER;
 
   protected String autodetectProcessApplicationName() {
     return "Process Application";
@@ -45,8 +48,9 @@ public class EmbeddedProcessApplication extends AbstractProcessApplication {
   public <T> T execute(Callable<T> callable) throws ProcessApplicationExecutionException {
     try {
       return callable.call();
-    } catch (Exception e) {
-      throw new ProcessApplicationExecutionException(e);
+    }
+    catch (Exception e) {
+      throw LOG.processApplicationExecutionException(e);
     }
   }
 

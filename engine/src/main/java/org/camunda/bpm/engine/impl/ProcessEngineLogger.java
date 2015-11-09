@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.impl;
 
+import org.camunda.bpm.application.impl.ProcessApplicationLogger;
 import org.camunda.bpm.engine.impl.bpmn.behavior.BpmnBehaviorLogger;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseLogger;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnBehaviorLogger;
@@ -34,4 +35,6 @@ public class ProcessEngineLogger extends BaseLogger {
   public static final CmmnTransformerLogger CMMN_TRANSFORMER_LOGGER = BaseLogger.createLogger(CmmnTransformerLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.cmmn.transformer", "04");
   public static final CmmnBehaviorLogger CMNN_BEHAVIOR_LOGGER = BaseLogger.createLogger(CmmnBehaviorLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.cmmn.behavior", "05");
   public static final CmmnOperationLogger CMMN_OPERATION_LOGGER = BaseLogger.createLogger(CmmnOperationLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.cmmn.operation", "06");
+
+  public static final ProcessApplicationLogger PROCESS_APPLICATION_LOGGER = BaseLogger.createLogger(ProcessApplicationLogger.class, PROJECT_CODE, "org.camunda.bpm.application", "07");
 }

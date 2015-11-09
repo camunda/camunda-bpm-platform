@@ -14,9 +14,6 @@ package org.camunda.bpm.application.impl;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextListener;
@@ -25,6 +22,7 @@ import javax.servlet.annotation.HandlesTypes;
 
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplication;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 /**
  * <p>This class is an implementation of {@link ServletContainerInitializer} and
@@ -41,7 +39,7 @@ import org.camunda.bpm.application.ProcessApplication;
 @HandlesTypes(ProcessApplication.class)
 public class ServletProcessApplicationDeployer implements ServletContainerInitializer {
 
-  private final static Logger LOGGER = Logger.getLogger(ServletProcessApplicationDeployer.class.getName());
+  private static ProcessApplicationLogger LOG = ProcessEngineLogger.PROCESS_APPLICATION_LOGGER;
 
   public void onStartup(Set<Class<?>> c, ServletContext ctx) throws ServletException {
     if(c == null || c.isEmpty()) {
@@ -62,52 +60,29 @@ public class ServletProcessApplicationDeployer implements ServletContainerInitia
     }
 
 
+    String contextPath = ctx.getContextPath();
     if(c.size() > 1) {
       // a deployment must only contain a single PA
-      String msg = getLogMultiplePas(c, ctx);
-      LOGGER.log(Level.SEVERE, msg);
-      throw new ServletException(msg);
+      throw LOG.multiplePasException(c, contextPath);
 
     } else if(c.size() == 1) {
       Class<?> paClass = c.iterator().next();
 
       // validate whether it is a legal Process Application
       if(!AbstractProcessApplication.class.isAssignableFrom(paClass)) {
-        String msg = getLogWrongType(paClass);
-        LOGGER.log(Level.SEVERE, msg);
-        throw new ServletException(msg);
+        throw LOG.paWrongTypeException(paClass);
       }
 
       // add it as listener if it's a ServletProcessApplication
       if(ServletProcessApplication.class.isAssignableFrom(paClass)) {
-        LOGGER.info("Detected @ProcessApplication class "+paClass.getName());
+        LOG.detectedPa(paClass);
         ctx.addListener(paClass.getName());
       }
     }
     else {
-      LOGGER.fine("Listener invoked but no process application annotation detected.");
+      LOG.servletDeployerNoPaFound(contextPath);
     }
 
-  }
-
-  protected String getLogWrongType(Class<?> paClass) {
-    String msg = "Class '"+paClass+"' is annotated with @"+ProcessApplication.class.getName()+" " +
-    		"but is not a subclass of "+AbstractProcessApplication.class.getName();
-    return msg;
-  }
-
-  protected String getLogMultiplePas(Set<Class<?>> c, ServletContext ctx) {
-    StringBuilder builder = new StringBuilder();
-    builder.append("An application must not contain more than one class annotated with @ProcessApplication.\n Application '");
-    builder.append(ctx.getContextPath());
-    builder.append("' contains the following @ProcessApplication classes:\n");
-    for (Class<?> clazz : c) {
-      builder.append("  ");
-      builder.append(clazz.getName());
-      builder.append("\n");
-    }
-    String msg = builder.toString();
-    return msg;
   }
 
 }

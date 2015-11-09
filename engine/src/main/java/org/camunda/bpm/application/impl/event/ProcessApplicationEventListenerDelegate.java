@@ -13,13 +13,10 @@
 package org.camunda.bpm.application.impl.event;
 
 import java.util.concurrent.Callable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.application.impl.ProcessApplicationLogger;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
@@ -49,7 +46,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
  */
 public class ProcessApplicationEventListenerDelegate implements ExecutionListener, TaskListener {
 
-  private Logger LOG = Logger.getLogger(ProcessApplicationEventListenerDelegate.class.getName());
+  private static ProcessApplicationLogger LOG = ProcessApplicationLogger.PROCESS_APPLICATION_LOGGER;
 
   public void notify(final DelegateExecution execution) throws Exception {
     Callable<Void> notification = new Callable<Void>() {
@@ -63,7 +60,7 @@ public class ProcessApplicationEventListenerDelegate implements ExecutionListene
 
   public void notify(final DelegateTask delegateTask){
     if(delegateTask.getExecution() == null) {
-      LOG.log(Level.FINE, "Task {0} not related to an execution, target process application cannot be determined.", new Object[] { delegateTask });
+      LOG.taskNotRelatedToExecution(delegateTask);
     } else {
       final DelegateExecution execution = delegateTask.getExecution();
       Callable<Void> notification = new Callable<Void>() {
@@ -75,7 +72,7 @@ public class ProcessApplicationEventListenerDelegate implements ExecutionListene
       try {
         performNotification(execution, notification);
       } catch(Exception e) {
-        throw new ProcessEngineException("Exception while notifying process application task listener.", e);
+        throw LOG.exceptionWhileNotifyingPaTaskListener(e);
       }
     }
   }
@@ -84,7 +81,7 @@ public class ProcessApplicationEventListenerDelegate implements ExecutionListene
     final ProcessApplicationReference processApp = ProcessApplicationContextUtil.getTargetProcessApplication((ExecutionEntity) execution);
     if (processApp == null) {
       // ignore silently
-      LOG.log(Level.FINE, "No target process application found for execution {0}", new Object[] { execution });
+      LOG.noTargetProcessApplicationForExecution(execution);
 
     } else {
       if (ProcessApplicationContextUtil.requiresContextSwitch(processApp)) {
@@ -108,12 +105,12 @@ public class ProcessApplicationEventListenerDelegate implements ExecutionListene
         executionListener.notify(execution);
 
       } else {
-        LOG.log(Level.FINE, "Target process application '"+processApp.getName()+"' does not provide an ExecutionListener.");
+        LOG.paDoesNotProvideExecutionListener(processApp.getName());
 
       }
     } catch (ProcessApplicationUnavailableException e) {
       // Process Application unavailable => ignore silently
-      LOG.log(Level.FINE, "Target process application '"+processApp.getName()+"' unavailable", e);
+      LOG.cannotInvokeListenerPaUnavailable(processApp.getName(), e);
     }
   }
 
@@ -126,12 +123,12 @@ public class ProcessApplicationEventListenerDelegate implements ExecutionListene
         taskListener.notify(task);
 
       } else {
-        LOG.log(Level.FINE, "Target process application '"+processApp.getName()+"' does not provide a TaskListener.");
+        LOG.paDoesNotProvideTaskListener(processApp.getName());
 
       }
     } catch (ProcessApplicationUnavailableException e) {
       // Process Application unavailable => ignore silently
-      LOG.log(Level.FINE, "Target process application '"+processApp.getName()+"' unavailable", e);
+      LOG.cannotInvokeListenerPaUnavailable(processApp.getName(), e);
     }
   }
 
