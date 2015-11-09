@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_DIRECTION;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_TYPE;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_RELATIONSHIP;
@@ -45,7 +45,7 @@ public class RelationshipImpl extends CmmnElementImpl implements Relationship {
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Relationship.class, CMMN_ELEMENT_RELATIONSHIP)
-      .namespaceUri(CMMN10_NS)
+      .namespaceUri(CMMN11_NS)
       .extendsType(CmmnElement.class)
       .instanceProvider(new ModelTypeInstanceProvider<Relationship>() {
         public Relationship newInstance(ModelTypeInstanceContext instanceContext) {

@@ -14,7 +14,6 @@ package org.camunda.bpm.model.cmmn.instance;
 
 import java.util.Collection;
 
-
 /**
  * @author Roman Smirnov
  *
@@ -29,9 +28,25 @@ public interface PlanItem extends CmmnElement {
 
   void setDefinition(PlanItemDefinition definition);
 
+  @Deprecated
   Collection<Sentry> getEntryCriterias();
 
+  @Deprecated
   Collection<Sentry> getExitCriterias();
+
+  /**
+   * @return an immutable collection
+   */
+  Collection<Sentry> getEntryCriteria();
+
+  /**
+   * @return an immutable collection
+   */
+  Collection<Sentry> getExitCriteria();
+
+  Collection<EntryCriterion> getEntryCriterions();
+
+  Collection<ExitCriterion> getExitCriterions();
 
   ItemControl getItemControl();
 

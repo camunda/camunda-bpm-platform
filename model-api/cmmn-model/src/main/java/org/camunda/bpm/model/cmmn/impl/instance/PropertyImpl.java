@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_NAME;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_TYPE;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_PROPERTY;
@@ -56,7 +56,7 @@ public class PropertyImpl extends CmmnElementImpl implements Property {
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Property.class, CMMN_ELEMENT_PROPERTY)
-        .namespaceUri(CMMN10_NS)
+        .namespaceUri(CMMN11_NS)
         .extendsType(CmmnElement.class)
         .instanceProvider(new ModelTypeInstanceProvider<Property>() {
           public Property newInstance(ModelTypeInstanceContext instanceContext) {

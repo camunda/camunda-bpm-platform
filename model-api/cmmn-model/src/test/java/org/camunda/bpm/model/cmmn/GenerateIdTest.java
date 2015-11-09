@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.camunda.bpm.model.cmmn.instance.Case;
 import org.camunda.bpm.model.cmmn.instance.CasePlanModel;
+import org.camunda.bpm.model.cmmn.instance.DefaultControl;
 import org.camunda.bpm.model.cmmn.instance.Definitions;
 import org.camunda.bpm.model.cmmn.instance.HumanTask;
 import org.junit.Test;
@@ -37,6 +38,10 @@ public class GenerateIdTest {
 
     HumanTask humanTask = modelInstance.getModelElementsByType(HumanTask.class).iterator().next();
     assertThat(humanTask.getId()).isNull();
+
+
+    DefaultControl element = modelInstance.newInstance(DefaultControl.class);
+    humanTask.setDefaultControl(element);
   }
 
   @Test

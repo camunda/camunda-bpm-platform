@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_PROCESS_PARAMETER;
 
 import org.camunda.bpm.model.cmmn.instance.Parameter;
@@ -34,7 +34,7 @@ public class ProcessParameterImpl extends ParameterImpl implements ProcessParame
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(ProcessParameter.class, CMMN_ELEMENT_PROCESS_PARAMETER)
-        .namespaceUri(CMMN10_NS)
+        .namespaceUri(CMMN11_NS)
         .extendsType(Parameter.class)
         .instanceProvider(new ModelTypeInstanceProvider<ProcessParameter>() {
           public ProcessParameter newInstance(ModelTypeInstanceContext instanceContext) {

@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_INPUT;
 
 import org.camunda.bpm.model.cmmn.instance.InputProcessParameter;
@@ -33,7 +33,7 @@ public class InputProcessParameterImpl extends ProcessParameterImpl implements I
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(InputProcessParameter.class, CMMN_ELEMENT_INPUT)
-      .namespaceUri(CMMN10_NS)
+      .namespaceUri(CMMN11_NS)
       .extendsType(ProcessParameter.class)
       .instanceProvider(new ModelElementTypeBuilder.ModelTypeInstanceProvider<InputProcessParameter>() {
         public InputProcessParameter newInstance(ModelTypeInstanceContext instanceContext) {

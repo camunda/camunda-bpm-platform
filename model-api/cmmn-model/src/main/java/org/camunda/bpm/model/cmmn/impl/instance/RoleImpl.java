@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_NAME;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_ROLE;
 
@@ -47,7 +47,7 @@ public class RoleImpl extends CmmnElementImpl implements Role {
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Role.class, CMMN_ELEMENT_ROLE)
         .extendsType(CmmnElement.class)
-        .namespaceUri(CMMN10_NS)
+        .namespaceUri(CMMN11_NS)
         .instanceProvider(new ModelTypeInstanceProvider<Role>() {
           public Role newInstance(ModelTypeInstanceContext instanceContext) {
             return new RoleImpl(instanceContext);

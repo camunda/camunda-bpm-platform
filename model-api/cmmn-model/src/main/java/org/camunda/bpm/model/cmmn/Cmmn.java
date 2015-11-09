@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.model.cmmn;
 
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -21,6 +24,8 @@ import java.io.OutputStream;
 
 import org.camunda.bpm.model.cmmn.impl.CmmnParser;
 import org.camunda.bpm.model.cmmn.impl.instance.ApplicabilityRuleImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.ArtifactImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.AssociationImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.BindingRefinementExpressionImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.BodyImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.CaseFileImpl;
@@ -33,21 +38,33 @@ import org.camunda.bpm.model.cmmn.impl.instance.CaseFileModelImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.CaseImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.CaseParameterImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel;
+import org.camunda.bpm.model.cmmn.impl.instance.CaseRefExpressionImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.CaseRolesImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.CaseRoleImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.CaseTaskImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.ChildrenImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.CmmnElementImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.ConditionExpressionImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.CriterionImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.DecisionImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.DecisionParameterImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.DecisionRefExpressionImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.DecisionTaskImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.DefaultControlImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.DefinitionsImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.DiscretionaryItemImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.DocumentationImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.EntryCriterionImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.EventImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.EventListenerImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.ExitCriterionImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.ExpressionImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.ExtensionElementsImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.HumanTaskImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.IfPartImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.ImportImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.InputCaseParameterImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.InputDecisionParameterImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.InputProcessParameterImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.InputsCaseParameterImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.ItemControlImpl;
@@ -55,6 +72,7 @@ import org.camunda.bpm.model.cmmn.impl.instance.ManualActivationRuleImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.MilestoneImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.OnPartImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.OutputCaseParameterImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.OutputDecisionParameterImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.OutputProcessParameterImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.OutputsCaseParameterImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.ParameterImpl;
@@ -69,6 +87,7 @@ import org.camunda.bpm.model.cmmn.impl.instance.PlanItemTransitionStandardEvent;
 import org.camunda.bpm.model.cmmn.impl.instance.PlanningTableImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.ProcessImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.ProcessParameterImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.ProcessRefExpressionImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.ProcessTaskImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.PropertyImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.RelationshipImpl;
@@ -82,9 +101,13 @@ import org.camunda.bpm.model.cmmn.impl.instance.StartTriggerImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.TableItemImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.TargetImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.TaskImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.TextAnnotationImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.TextImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.TimerEventImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.TimerEventListenerImpl;
-import org.camunda.bpm.model.cmmn.impl.instance.TimerExpression;
+import org.camunda.bpm.model.cmmn.impl.instance.TimerExpressionImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.TransformationExpressionImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.UserEventImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.UserEventListenerImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaCaseExecutionListenerImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaExpressionImpl;
@@ -205,6 +228,7 @@ public class Cmmn {
    */
   protected Cmmn() {
     cmmnModelBuilder = ModelBuilder.createInstance("CMMN Model");
+    cmmnModelBuilder.alternativeNamespace(CMMN10_NS, CMMN11_NS);
     doRegisterTypes(cmmnModelBuilder);
     cmmnModel = cmmnModelBuilder.build();
   }
@@ -264,7 +288,9 @@ public class Cmmn {
   }
 
   protected void doRegisterTypes(ModelBuilder modelBuilder) {
+    ArtifactImpl.registerType(modelBuilder);
     ApplicabilityRuleImpl.registerType(modelBuilder);
+    AssociationImpl.registerType(modelBuilder);
     BindingRefinementExpressionImpl.registerType(modelBuilder);
     BodyImpl.registerType(modelBuilder);
     CaseFileImpl.registerType(modelBuilder);
@@ -277,15 +303,26 @@ public class Cmmn {
     CaseImpl.registerType(modelBuilder);
     CaseParameterImpl.registerType(modelBuilder);
     CasePlanModel.registerType(modelBuilder);
+    CaseRoleImpl.registerType(modelBuilder);
     CaseRolesImpl.registerType(modelBuilder);
+    CaseRefExpressionImpl.registerType(modelBuilder);
     CaseTaskImpl.registerType(modelBuilder);
     ChildrenImpl.registerType(modelBuilder);
     CmmnElementImpl.registerType(modelBuilder);
     ConditionExpressionImpl.registerType(modelBuilder);
+    CriterionImpl.registerType(modelBuilder);
+    DecisionImpl.registerType(modelBuilder);
+    DecisionParameterImpl.registerType(modelBuilder);
+    DecisionRefExpressionImpl.registerType(modelBuilder);
+    DecisionTaskImpl.registerType(modelBuilder);
     DefaultControlImpl.registerType(modelBuilder);
     DefinitionsImpl.registerType(modelBuilder);
     DiscretionaryItemImpl.registerType(modelBuilder);
+    DocumentationImpl.registerType(modelBuilder);
+    EntryCriterionImpl.registerType(modelBuilder);
+    EventImpl.registerType(modelBuilder);
     EventListenerImpl.registerType(modelBuilder);
+    ExitCriterionImpl.registerType(modelBuilder);
     ExpressionImpl.registerType(modelBuilder);
     ExtensionElementsImpl.registerType(modelBuilder);
     HumanTaskImpl.registerType(modelBuilder);
@@ -294,6 +331,8 @@ public class Cmmn {
     InputCaseParameterImpl.registerType(modelBuilder);
     InputProcessParameterImpl.registerType(modelBuilder);
     InputsCaseParameterImpl.registerType(modelBuilder);
+    InputDecisionParameterImpl.registerType(modelBuilder);
+    InputProcessParameterImpl.registerType(modelBuilder);
     ItemControlImpl.registerType(modelBuilder);
     ManualActivationRuleImpl.registerType(modelBuilder);
     MilestoneImpl.registerType(modelBuilder);
@@ -302,6 +341,8 @@ public class Cmmn {
     OutputCaseParameterImpl.registerType(modelBuilder);
     OutputProcessParameterImpl.registerType(modelBuilder);
     OutputsCaseParameterImpl.registerType(modelBuilder);
+    OutputDecisionParameterImpl.registerType(modelBuilder);
+    OutputProcessParameterImpl.registerType(modelBuilder);
     ParameterImpl.registerType(modelBuilder);
     ParameterMappingImpl.registerType(modelBuilder);
     PlanFragmentImpl.registerType(modelBuilder);
@@ -314,6 +355,7 @@ public class Cmmn {
     PlanningTableImpl.registerType(modelBuilder);
     ProcessImpl.registerType(modelBuilder);
     ProcessParameterImpl.registerType(modelBuilder);
+    ProcessRefExpressionImpl.registerType(modelBuilder);
     ProcessTaskImpl.registerType(modelBuilder);
     PropertyImpl.registerType(modelBuilder);
     RelationshipImpl.registerType(modelBuilder);
@@ -327,9 +369,14 @@ public class Cmmn {
     TableItemImpl.registerType(modelBuilder);
     TargetImpl.registerType(modelBuilder);
     TaskImpl.registerType(modelBuilder);
+    TextAnnotationImpl.registerType(modelBuilder);
+    TextImpl.registerType(modelBuilder);
+    TimerEventImpl.registerType(modelBuilder);
     TimerEventListenerImpl.registerType(modelBuilder);
-    TimerExpression.registerType(modelBuilder);
     TransformationExpressionImpl.registerType(modelBuilder);
+    TimerExpressionImpl.registerType(modelBuilder);
+    TransformationExpressionImpl.registerType(modelBuilder);
+    UserEventImpl.registerType(modelBuilder);
     UserEventListenerImpl.registerType(modelBuilder);
 
     /** camunda extensions */

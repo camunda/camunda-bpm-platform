@@ -14,11 +14,17 @@ package org.camunda.bpm.model.cmmn.instance;
 
 import java.util.Collection;
 
+import org.camunda.bpm.model.cmmn.impl.CmmnModelConstants;
+
 /**
  * @author Roman Smirnov
  *
  */
 public class BodyTest extends CmmnModelElementInstanceTest {
+
+  public String getDefaultNamespace() {
+    return CmmnModelConstants.CMMN10_NS;
+  }
 
   public TypeAssumption getTypeAssumption() {
     return new TypeAssumption(false);

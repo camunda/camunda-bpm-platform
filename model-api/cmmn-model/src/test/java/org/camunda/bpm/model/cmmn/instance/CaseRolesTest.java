@@ -12,9 +12,8 @@
  */
 package org.camunda.bpm.model.cmmn.instance;
 
+import java.util.Arrays;
 import java.util.Collection;
-
-import org.camunda.bpm.model.cmmn.instance.Role;
 
 /**
  * @author Roman Smirnov
@@ -23,11 +22,13 @@ import org.camunda.bpm.model.cmmn.instance.Role;
 public class CaseRolesTest extends CmmnModelElementInstanceTest {
 
   public TypeAssumption getTypeAssumption() {
-    return new TypeAssumption(Role.class, false);
+    return new TypeAssumption(false);
   }
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
-    return null;
+    return Arrays.asList(
+        new ChildElementAssumption(Role.class)
+      );
   }
 
   public Collection<AttributeAssumption> getAttributesAssumptions() {

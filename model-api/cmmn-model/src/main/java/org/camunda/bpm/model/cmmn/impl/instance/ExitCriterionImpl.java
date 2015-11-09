@@ -12,33 +12,35 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_TIMER_EXPRESSION;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_EXIT_CRITERION;
 
-import org.camunda.bpm.model.cmmn.instance.Expression;
+import org.camunda.bpm.model.cmmn.instance.Criterion;
+import org.camunda.bpm.model.cmmn.instance.ExitCriterion;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
+import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class TimerExpression extends ExpressionImpl {
+public class ExitCriterionImpl extends CriterionImpl implements ExitCriterion {
 
-  public TimerExpression(ModelTypeInstanceContext instanceContext) {
+  public ExitCriterionImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
   }
 
   public static void registerType(ModelBuilder modelBuilder) {
-    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(TimerExpression.class, CMMN_ELEMENT_TIMER_EXPRESSION)
-      .namespaceUri(CMMN10_NS)
-      .extendsType(Expression.class)
-      .instanceProvider(new ModelElementTypeBuilder.ModelTypeInstanceProvider<TimerExpression>() {
-        public TimerExpression newInstance(ModelTypeInstanceContext instanceContext) {
-          return new TimerExpression(instanceContext);
-        }
-      });
+    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(ExitCriterion.class, CMMN_ELEMENT_EXIT_CRITERION)
+        .extendsType(Criterion.class)
+        .namespaceUri(CMMN11_NS)
+        .instanceProvider(new ModelTypeInstanceProvider<ExitCriterion>() {
+          public ExitCriterion newInstance(ModelTypeInstanceContext instanceContext) {
+            return new ExitCriterionImpl(instanceContext);
+          }
+        });
 
     typeBuilder.build();
   }

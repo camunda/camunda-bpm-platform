@@ -29,7 +29,8 @@ public class CaseTaskTest extends CmmnModelElementInstanceTest {
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
     return Arrays.asList(
-          new ChildElementAssumption(ParameterMapping.class)
+          new ChildElementAssumption(ParameterMapping.class),
+          new ChildElementAssumption(CaseRefExpression.class, 0, 1)
         );
   }
 

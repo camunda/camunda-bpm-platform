@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_NAME;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_CASE;
 
@@ -22,6 +22,7 @@ import org.camunda.bpm.model.cmmn.instance.Case;
 import org.camunda.bpm.model.cmmn.instance.CaseFileModel;
 import org.camunda.bpm.model.cmmn.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.CaseRoles;
+import org.camunda.bpm.model.cmmn.instance.CaseRole;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 import org.camunda.bpm.model.cmmn.instance.InputCaseParameter;
 import org.camunda.bpm.model.cmmn.instance.OutputCaseParameter;
@@ -44,9 +45,15 @@ public class CaseImpl extends CmmnElementImpl implements Case {
 
   protected static ChildElement<CaseFileModel> caseFileModelChild;
   protected static ChildElement<CasePlanModel> casePlanModelChild;
-  protected static ChildElementCollection<CaseRoles> caseRolesCollection;
   protected static ChildElementCollection<InputCaseParameter> inputCollection;
   protected static ChildElementCollection<OutputCaseParameter> outputCollection;
+
+  // cmmn 1.0
+  @Deprecated
+  protected static ChildElementCollection<CaseRole> caseRolesCollection;
+
+  // cmmn 1.1
+  protected static ChildElement<CaseRoles> caseRolesChild;
 
   public CaseImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
@@ -60,8 +67,16 @@ public class CaseImpl extends CmmnElementImpl implements Case {
     nameAttribute.setValue(this, name);
   }
 
-  public Collection<CaseRoles> getCaseRoles() {
+  public Collection<CaseRole> getCaseRoles() {
     return caseRolesCollection.get(this);
+  }
+
+  public CaseRoles getRoles() {
+    return caseRolesChild.getChild(this);
+  }
+
+  public void setRoles(CaseRoles caseRole) {
+    caseRolesChild.setChild(this, caseRole);
   }
 
   public Collection<InputCaseParameter> getInputs() {
@@ -91,7 +106,7 @@ public class CaseImpl extends CmmnElementImpl implements Case {
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Case.class, CMMN_ELEMENT_CASE)
         .extendsType(CmmnElement.class)
-        .namespaceUri(CMMN10_NS)
+        .namespaceUri(CMMN11_NS)
         .instanceProvider(new ModelTypeInstanceProvider<Case>() {
           public Case newInstance(ModelTypeInstanceContext instanceContext) {
             return new CaseImpl(instanceContext);
@@ -109,7 +124,10 @@ public class CaseImpl extends CmmnElementImpl implements Case {
     casePlanModelChild = sequenceBuilder.element(CasePlanModel.class)
         .build();
 
-    caseRolesCollection = sequenceBuilder.elementCollection(CaseRoles.class)
+    caseRolesCollection = sequenceBuilder.elementCollection(CaseRole.class)
+        .build();
+
+    caseRolesChild = sequenceBuilder.element(CaseRoles.class)
         .build();
 
     inputCollection = sequenceBuilder.elementCollection(InputCaseParameter.class)

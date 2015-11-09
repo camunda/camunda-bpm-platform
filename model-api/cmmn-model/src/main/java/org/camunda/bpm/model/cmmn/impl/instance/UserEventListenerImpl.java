@@ -12,15 +12,20 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_USER_EVENT;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_AUTHORIZED_ROLE_REFS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_USER_EVENT_LISTENER;
+
+import java.util.Collection;
 
 import org.camunda.bpm.model.cmmn.instance.EventListener;
+import org.camunda.bpm.model.cmmn.instance.Role;
 import org.camunda.bpm.model.cmmn.instance.UserEventListener;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
+import org.camunda.bpm.model.xml.type.reference.AttributeReferenceCollection;
 
 /**
  * @author Roman Smirnov
@@ -28,19 +33,30 @@ import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceP
  */
 public class UserEventListenerImpl extends EventListenerImpl implements UserEventListener {
 
+  protected static AttributeReferenceCollection<Role> authorizedRoleRefCollection;
+
   public UserEventListenerImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
   }
 
+  public Collection<Role> getAuthorizedRoles() {
+    return authorizedRoleRefCollection.getReferenceTargetElements(this);
+  }
+
+
   public static void registerType(ModelBuilder modelBuilder) {
-    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(UserEventListener.class, CMMN_ELEMENT_USER_EVENT)
-        .namespaceUri(CMMN10_NS)
+    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(UserEventListener.class, CMMN_ELEMENT_USER_EVENT_LISTENER)
+        .namespaceUri(CMMN11_NS)
         .extendsType(EventListener.class)
         .instanceProvider(new ModelTypeInstanceProvider<UserEventListener>() {
           public UserEventListener newInstance(ModelTypeInstanceContext instanceContext) {
             return new UserEventListenerImpl(instanceContext);
           }
         });
+
+    authorizedRoleRefCollection = typeBuilder.stringAttribute(CMMN_ATTRIBUTE_AUTHORIZED_ROLE_REFS)
+        .idAttributeReferenceCollection(Role.class, CmmnAttributeElementReferenceCollection.class)
+        .build();
 
     typeBuilder.build();
   }

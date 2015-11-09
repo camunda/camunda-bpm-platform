@@ -33,7 +33,8 @@ public class ApplicabilityRuleTest extends CmmnModelElementInstanceTest {
 
   public Collection<AttributeAssumption> getAttributesAssumptions() {
     return Arrays.asList(
-          new AttributeAssumption("contextRef")
+          new AttributeAssumption("contextRef"),
+          new AttributeAssumption("name")
         );
   }
 

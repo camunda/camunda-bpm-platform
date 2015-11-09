@@ -12,11 +12,16 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_DEFINITION_REF;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_NAME;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_DISCRETIONARY_ITEM;
 
+import java.util.Collection;
+
 import org.camunda.bpm.model.cmmn.instance.DiscretionaryItem;
+import org.camunda.bpm.model.cmmn.instance.EntryCriterion;
+import org.camunda.bpm.model.cmmn.instance.ExitCriterion;
 import org.camunda.bpm.model.cmmn.instance.ItemControl;
 import org.camunda.bpm.model.cmmn.instance.PlanItemDefinition;
 import org.camunda.bpm.model.cmmn.instance.TableItem;
@@ -24,7 +29,9 @@ import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
+import org.camunda.bpm.model.xml.type.attribute.Attribute;
 import org.camunda.bpm.model.xml.type.child.ChildElement;
+import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 import org.camunda.bpm.model.xml.type.reference.AttributeReference;
 
@@ -37,8 +44,21 @@ public class DiscretionaryItemImpl extends TableItemImpl implements Discretionar
   protected static AttributeReference<PlanItemDefinition> definitionRefAttribute;
   protected static ChildElement<ItemControl> itemControlChild;
 
+  // cmmn 1.1
+  protected static Attribute<String> nameAttribute;
+  protected static ChildElementCollection<EntryCriterion> entryCriterionCollection;
+  protected static ChildElementCollection<ExitCriterion> exitCriterionCollection;
+
   public DiscretionaryItemImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
+  }
+
+  public String getName() {
+    return nameAttribute.getValue(this);
+  }
+
+  public void setName(String name) {
+    nameAttribute.setValue(this, name);
   }
 
   public PlanItemDefinition getDefinition() {
@@ -57,15 +77,26 @@ public class DiscretionaryItemImpl extends TableItemImpl implements Discretionar
     itemControlChild.setChild(this, itemControl);
   }
 
+  public Collection<EntryCriterion> getEntryCriterions() {
+    return entryCriterionCollection.get(this);
+  }
+
+  public Collection<ExitCriterion> getExitCriterions() {
+    return exitCriterionCollection.get(this);
+  }
+
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(DiscretionaryItem.class, CMMN_ELEMENT_DISCRETIONARY_ITEM)
-        .namespaceUri(CMMN10_NS)
+        .namespaceUri(CMMN11_NS)
         .extendsType(TableItem.class)
         .instanceProvider(new ModelTypeInstanceProvider<DiscretionaryItem>() {
           public DiscretionaryItem newInstance(ModelTypeInstanceContext instanceContext) {
             return new DiscretionaryItemImpl(instanceContext);
           }
         });
+
+    nameAttribute = typeBuilder.stringAttribute(CMMN_ATTRIBUTE_NAME)
+        .build();
 
     definitionRefAttribute = typeBuilder.stringAttribute(CMMN_ATTRIBUTE_DEFINITION_REF)
         .idAttributeReference(PlanItemDefinition.class)
@@ -74,6 +105,12 @@ public class DiscretionaryItemImpl extends TableItemImpl implements Discretionar
     SequenceBuilder sequenceBuilder = typeBuilder.sequence();
 
     itemControlChild = sequenceBuilder.element(ItemControl.class)
+        .build();
+
+    entryCriterionCollection = sequenceBuilder.elementCollection(EntryCriterion.class)
+        .build();
+
+    exitCriterionCollection = sequenceBuilder.elementCollection(ExitCriterion.class)
         .build();
 
     typeBuilder.build();

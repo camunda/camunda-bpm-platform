@@ -15,6 +15,8 @@ package org.camunda.bpm.model.cmmn.instance;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.camunda.bpm.model.cmmn.impl.CmmnModelConstants;
+
 /**
  * @author Roman Smirnov
  *
@@ -27,8 +29,10 @@ public class TaskTest extends CmmnModelElementInstanceTest {
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
     return Arrays.asList(
-          new ChildElementAssumption(InputsCaseParameter.class),
-          new ChildElementAssumption(OutputsCaseParameter.class)
+          new ChildElementAssumption(CmmnModelConstants.CMMN10_NS, InputsCaseParameter.class),
+          new ChildElementAssumption(CmmnModelConstants.CMMN10_NS, OutputsCaseParameter.class),
+          new ChildElementAssumption(InputCaseParameter.class),
+          new ChildElementAssumption(OutputCaseParameter.class)
         );
   }
 

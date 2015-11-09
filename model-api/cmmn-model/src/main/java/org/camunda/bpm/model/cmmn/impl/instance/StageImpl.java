@@ -13,12 +13,17 @@
 package org.camunda.bpm.model.cmmn.impl.instance;
 
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_AUTO_COMPLETE;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_EXIT_CRITERIA_REFS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_STAGE;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
+import org.camunda.bpm.model.cmmn.instance.ExitCriterion;
 import org.camunda.bpm.model.cmmn.instance.PlanFragment;
 import org.camunda.bpm.model.cmmn.instance.PlanItemDefinition;
 import org.camunda.bpm.model.cmmn.instance.PlanningTable;
@@ -41,9 +46,15 @@ import org.camunda.bpm.model.xml.type.reference.AttributeReferenceCollection;
 public class StageImpl extends PlanFragmentImpl implements Stage {
 
   protected static Attribute<Boolean> autoCompleteAttribute;
-  protected static AttributeReferenceCollection<Sentry> exitCriteriaRefCollection;
   protected static ChildElement<PlanningTable> planningTableChild;
   protected static ChildElementCollection<PlanItemDefinition> planItemDefinitionCollection;
+
+  // cmmn 1.0
+  @Deprecated
+  protected static AttributeReferenceCollection<Sentry> exitCriteriaRefCollection;
+
+  // cmmn 1.1
+  protected static ChildElementCollection<ExitCriterion> exitCriterionCollection;
 
   public StageImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
@@ -61,6 +72,27 @@ public class StageImpl extends PlanFragmentImpl implements Stage {
     return exitCriteriaRefCollection.getReferenceTargetElements(this);
   }
 
+  public Collection<Sentry> getExitCriteria() {
+    if (!isCmmn11()) {
+      return Collections.unmodifiableCollection(getExitCriterias());
+    }
+    else {
+      List<Sentry> sentries = new ArrayList<Sentry>();
+      Collection<ExitCriterion> exitCriterions = getExitCriterions();
+      for (ExitCriterion exitCriterion : exitCriterions) {
+        Sentry sentry = exitCriterion.getSentry();
+        if (sentry != null) {
+          sentries.add(sentry);
+        }
+      }
+      return Collections.unmodifiableCollection(sentries);
+    }
+  }
+
+  public Collection<ExitCriterion> getExitCriterions() {
+    return exitCriterionCollection.get(this);
+  }
+
   public PlanningTable getPlanningTable() {
     return planningTableChild.getChild(this);
   }
@@ -75,7 +107,7 @@ public class StageImpl extends PlanFragmentImpl implements Stage {
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Stage.class, CMMN_ELEMENT_STAGE)
-        .namespaceUri(CMMN10_NS)
+        .namespaceUri(CMMN11_NS)
         .extendsType(PlanFragment.class)
         .instanceProvider(new ModelTypeInstanceProvider<Stage>() {
           public Stage newInstance(ModelTypeInstanceContext instanceContext) {
@@ -88,6 +120,7 @@ public class StageImpl extends PlanFragmentImpl implements Stage {
         .build();
 
     exitCriteriaRefCollection = typeBuilder.stringAttribute(CMMN_ATTRIBUTE_EXIT_CRITERIA_REFS)
+        .namespace(CMMN10_NS)
         .idAttributeReferenceCollection(Sentry.class, CmmnAttributeElementReferenceCollection.class)
         .build();
 
@@ -97,6 +130,9 @@ public class StageImpl extends PlanFragmentImpl implements Stage {
         .build();
 
     planItemDefinitionCollection = sequenceBuilder.elementCollection(PlanItemDefinition.class)
+        .build();
+
+    exitCriterionCollection = sequenceBuilder.elementCollection(ExitCriterion.class)
         .build();
 
     typeBuilder.build();

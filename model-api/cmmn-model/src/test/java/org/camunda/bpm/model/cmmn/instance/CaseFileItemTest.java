@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.camunda.bpm.model.cmmn.MultiplicityEnum;
+import org.camunda.bpm.model.cmmn.impl.CmmnModelConstants;
 
 /**
  * @author Roman Smirnov
@@ -38,7 +39,8 @@ public class CaseFileItemTest extends CmmnModelElementInstanceTest {
           new AttributeAssumption("name"),
           new AttributeAssumption("multiplicity", false, false, MultiplicityEnum.Unspecified),
           new AttributeAssumption("definitionRef"),
-          new AttributeAssumption("sourceRef"),
+          new AttributeAssumption(CmmnModelConstants.CMMN10_NS, "sourceRef"),
+          new AttributeAssumption("sourceRefs"),
           new AttributeAssumption("targetRefs")
         );
   }

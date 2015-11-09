@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_AUTHOR;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_EXPORTER;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_EXPORTER_VERSION;
@@ -25,15 +25,20 @@ import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.XPATH_NS;
 
 import java.util.Collection;
 
+import org.camunda.bpm.model.cmmn.instance.Artifact;
 import org.camunda.bpm.model.cmmn.instance.Case;
 import org.camunda.bpm.model.cmmn.instance.CaseFileItemDefinition;
+import org.camunda.bpm.model.cmmn.instance.Decision;
 import org.camunda.bpm.model.cmmn.instance.Definitions;
+import org.camunda.bpm.model.cmmn.instance.ExtensionElements;
 import org.camunda.bpm.model.cmmn.instance.Import;
 import org.camunda.bpm.model.cmmn.instance.Process;
+import org.camunda.bpm.model.cmmn.instance.Relationship;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 import org.camunda.bpm.model.xml.type.attribute.Attribute;
+import org.camunda.bpm.model.xml.type.child.ChildElement;
 import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 
@@ -55,6 +60,12 @@ public class DefinitionsImpl extends CmmnModelElementInstanceImpl implements Def
   protected static ChildElementCollection<CaseFileItemDefinition> caseFileItemDefinitionCollection;
   protected static ChildElementCollection<Case> caseCollection;
   protected static ChildElementCollection<Process> processCollection;
+  protected static ChildElementCollection<Relationship> relationshipCollection;
+
+  // cmmn 1.1
+  protected static ChildElement<ExtensionElements> extensionElementsChild;
+  protected static ChildElementCollection<Decision> decisionCollection;
+  protected static ChildElementCollection<Artifact> artifactCollection;
 
   public DefinitionsImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
@@ -132,10 +143,30 @@ public class DefinitionsImpl extends CmmnModelElementInstanceImpl implements Def
     return processCollection.get(this);
   }
 
+  public Collection<Decision> getDecisions() {
+    return decisionCollection.get(this);
+  }
+
+  public ExtensionElements getExtensionElements() {
+    return extensionElementsChild.getChild(this);
+  }
+
+  public void setExtensionElements(ExtensionElements extensionElements) {
+    extensionElementsChild.setChild(this, extensionElements);
+  }
+
+  public Collection<Relationship> getRelationships() {
+    return relationshipCollection.get(this);
+  }
+
+  public Collection<Artifact> getArtifacts() {
+    return artifactCollection.get(this);
+  }
+
   public static void registerType(ModelBuilder modelBuilder) {
 
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Definitions.class, CMMN_ELEMENT_DEFINITIONS)
-      .namespaceUri(CMMN10_NS)
+      .namespaceUri(CMMN11_NS)
       .instanceProvider(new ModelElementTypeBuilder.ModelTypeInstanceProvider<Definitions>() {
         public Definitions newInstance(ModelTypeInstanceContext instanceContext) {
           return new DefinitionsImpl(instanceContext);
@@ -178,6 +209,20 @@ public class DefinitionsImpl extends CmmnModelElementInstanceImpl implements Def
         .build();
 
     processCollection = sequenceBuilder.elementCollection(Process.class)
+        .build();
+
+    decisionCollection = sequenceBuilder.elementCollection(Decision.class)
+        .build();
+
+    extensionElementsChild = sequenceBuilder.element(ExtensionElements.class)
+        .minOccurs(0)
+        .maxOccurs(1)
+        .build();
+
+    relationshipCollection = sequenceBuilder.elementCollection(Relationship.class)
+        .build();
+
+    artifactCollection = sequenceBuilder.elementCollection(Artifact.class)
         .build();
 
     typeBuilder.build();

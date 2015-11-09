@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_BINDING_REF;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_CASE_PARAMETER;
 
@@ -59,7 +59,7 @@ public class CaseParameterImpl extends ParameterImpl implements CaseParameter {
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(CaseParameter.class, CMMN_ELEMENT_CASE_PARAMETER)
-        .namespaceUri(CMMN10_NS)
+        .namespaceUri(CMMN11_NS)
         .extendsType(Parameter.class)
         .instanceProvider(new ModelTypeInstanceProvider<CaseParameter>() {
           public CaseParameter newInstance(ModelTypeInstanceContext instanceContext) {
@@ -67,7 +67,7 @@ public class CaseParameterImpl extends ParameterImpl implements CaseParameter {
           }
         });
 
-     bindingRefAttribute = typeBuilder.stringAttribute(CMMN_ATTRIBUTE_BINDING_REF)
+    bindingRefAttribute = typeBuilder.stringAttribute(CMMN_ATTRIBUTE_BINDING_REF)
          .idAttributeReference(CaseFileItem.class)
          .build();
 

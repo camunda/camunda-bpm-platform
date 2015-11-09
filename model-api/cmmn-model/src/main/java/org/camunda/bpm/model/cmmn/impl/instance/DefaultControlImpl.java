@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_DEFAULT_CONTROL;
 
 import org.camunda.bpm.model.cmmn.instance.DefaultControl;
@@ -34,7 +34,7 @@ public class DefaultControlImpl extends PlanItemControlImpl implements DefaultCo
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(DefaultControl.class, CMMN_ELEMENT_DEFAULT_CONTROL)
-      .namespaceUri(CMMN10_NS)
+      .namespaceUri(CMMN11_NS)
       .extendsType(PlanItemControl.class)
       .instanceProvider(new ModelTypeInstanceProvider<DefaultControl>() {
         public DefaultControl newInstance(ModelTypeInstanceContext instanceContext) {

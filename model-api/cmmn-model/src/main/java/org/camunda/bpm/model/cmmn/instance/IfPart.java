@@ -24,6 +24,11 @@ public interface IfPart extends CmmnElement {
 
   void setContext(CaseFileItem caseFileItem);
 
+  @Deprecated
   public Collection<ConditionExpression> getConditions();
+
+  ConditionExpression getCondition();
+
+  void setCondition(ConditionExpression condition);
 
 }

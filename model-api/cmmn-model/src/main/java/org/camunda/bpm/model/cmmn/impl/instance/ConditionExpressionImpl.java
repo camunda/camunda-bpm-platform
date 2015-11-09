@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_CONDITION;
 
 import org.camunda.bpm.model.cmmn.instance.ConditionExpression;
@@ -33,7 +33,7 @@ public class ConditionExpressionImpl extends ExpressionImpl implements Condition
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(ConditionExpression.class, CMMN_ELEMENT_CONDITION)
-      .namespaceUri(CMMN10_NS)
+      .namespaceUri(CMMN11_NS)
       .extendsType(Expression.class)
       .instanceProvider(new ModelElementTypeBuilder.ModelTypeInstanceProvider<ConditionExpression>() {
         public ConditionExpression newInstance(ModelTypeInstanceContext instanceContext) {

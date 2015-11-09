@@ -27,12 +27,15 @@ public class DiscretionaryItemTest extends CmmnModelElementInstanceTest {
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
     return Arrays.asList(
-          new ChildElementAssumption(ItemControl.class, 0, 1)
+          new ChildElementAssumption(ItemControl.class, 0, 1),
+          new ChildElementAssumption(EntryCriterion.class),
+          new ChildElementAssumption(ExitCriterion.class)
         );
   }
 
   public Collection<AttributeAssumption> getAttributesAssumptions() {
     return Arrays.asList(
+          new AttributeAssumption("name"),
           new AttributeAssumption("definitionRef")
         );
   }

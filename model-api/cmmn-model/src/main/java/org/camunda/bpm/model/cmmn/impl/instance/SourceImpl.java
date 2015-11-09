@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_SOURCE;
 
 import org.camunda.bpm.model.cmmn.instance.Source;
@@ -29,7 +29,7 @@ public class SourceImpl extends CmmnModelElementInstanceImpl implements Source {
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Source.class, CMMN_ELEMENT_SOURCE)
-      .namespaceUri(CMMN10_NS)
+      .namespaceUri(CMMN11_NS)
       .instanceProvider(new ModelTypeInstanceProvider<Source>() {
         public Source newInstance(ModelTypeInstanceContext instanceContext) {
           return new SourceImpl(instanceContext);

@@ -19,6 +19,10 @@ package org.camunda.bpm.model.cmmn.instance;
  */
 public interface ApplicabilityRule extends CmmnElement {
 
+  String getName();
+
+  void setName(String name);
+
   CaseFileItem getContext();
 
   void setContext(CaseFileItem context);

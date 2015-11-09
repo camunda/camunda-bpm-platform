@@ -12,12 +12,18 @@
  */
 package org.camunda.bpm.model.cmmn.instance;
 
+import java.util.Collection;
+
 
 /**
  * @author Roman Smirnov
  *
  */
 public interface DiscretionaryItem extends TableItem {
+
+  String getName();
+
+  void setName(String name);
 
   PlanItemDefinition getDefinition();
 
@@ -26,5 +32,9 @@ public interface DiscretionaryItem extends TableItem {
   ItemControl getItemControl();
 
   void setItemControl(ItemControl itemControl);
+
+  Collection<EntryCriterion> getEntryCriterions();
+
+  Collection<ExitCriterion> getExitCriterions();
 
 }

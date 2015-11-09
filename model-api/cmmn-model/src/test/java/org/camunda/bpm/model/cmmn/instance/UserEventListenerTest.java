@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.model.cmmn.instance;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -29,7 +30,9 @@ public class UserEventListenerTest extends CmmnModelElementInstanceTest {
   }
 
   public Collection<AttributeAssumption> getAttributesAssumptions() {
-    return null;
+    return Arrays.asList(
+        new AttributeAssumption("authorizedRoleRefs")
+      );
   }
 
 }

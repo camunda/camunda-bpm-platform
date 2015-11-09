@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_LANGUAGE;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_EXPRESSION;
 
@@ -34,14 +34,39 @@ import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 public class ExpressionImpl extends CmmnElementImpl implements Expression {
 
   protected static Attribute<String> languageAttribute;
+
+  // cmmn 1.0
+  @Deprecated
   protected static ChildElement<Body> bodyChild;
 
   public ExpressionImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
   }
 
+  public String getText() {
+    if (isCmmn11()) {
+      return getTextContent();
+    }
+    else {
+      return getBody();
+    }
+  }
+
+  public void setText(String text) {
+    if (isCmmn11()) {
+      setTextContent(text);
+    }
+    else {
+      setBody(text);
+    }
+  }
+
   public String getBody() {
-    return bodyChild.getChild(this).getTextContent();
+    Body body = bodyChild.getChild(this);
+    if (body != null) {
+      return body.getTextContent();
+    }
+    return null;
   }
 
   public void setBody(String body) {
@@ -58,7 +83,7 @@ public class ExpressionImpl extends CmmnElementImpl implements Expression {
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Expression.class, CMMN_ELEMENT_EXPRESSION)
-        .namespaceUri(CMMN10_NS)
+        .namespaceUri(CMMN11_NS)
         .extendsType(CmmnElement.class)
         .instanceProvider(new ModelTypeInstanceProvider<Expression>() {
           public Expression newInstance(ModelTypeInstanceContext instanceContext) {

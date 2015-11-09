@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_ON_PART;
 
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
@@ -34,7 +34,7 @@ public abstract class OnPartImpl extends CmmnElementImpl implements OnPart {
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(OnPart.class, CMMN_ELEMENT_ON_PART)
         .extendsType(CmmnElement.class)
-        .namespaceUri(CMMN10_NS)
+        .namespaceUri(CMMN11_NS)
         .abstractType();
 
     typeBuilder.build();

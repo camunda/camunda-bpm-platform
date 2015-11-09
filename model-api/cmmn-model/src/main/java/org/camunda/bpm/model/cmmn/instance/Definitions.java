@@ -56,4 +56,14 @@ public interface Definitions extends CmmnModelElementInstance {
 
   Collection<Process> getProcesses();
 
+  Collection<Decision> getDecisions();
+
+  ExtensionElements getExtensionElements();
+
+  void setExtensionElements(ExtensionElements extensionElements);
+
+  Collection<Relationship> getRelationships();
+
+  Collection<Artifact> getArtifacts();
+
 }

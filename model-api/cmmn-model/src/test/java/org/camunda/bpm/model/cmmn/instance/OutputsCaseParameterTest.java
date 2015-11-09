@@ -14,6 +14,7 @@ package org.camunda.bpm.model.cmmn.instance;
 
 import java.util.Collection;
 
+import org.camunda.bpm.model.cmmn.impl.CmmnModelConstants;
 import org.camunda.bpm.model.cmmn.instance.CaseParameter;
 
 /**
@@ -21,6 +22,10 @@ import org.camunda.bpm.model.cmmn.instance.CaseParameter;
  *
  */
 public class OutputsCaseParameterTest extends CmmnModelElementInstanceTest {
+
+  public String getDefaultNamespace() {
+    return CmmnModelConstants.CMMN10_NS;
+  }
 
   public TypeAssumption getTypeAssumption() {
     return new TypeAssumption(CaseParameter.class, false);

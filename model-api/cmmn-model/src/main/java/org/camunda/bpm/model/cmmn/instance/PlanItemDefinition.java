@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.model.cmmn.instance;
 
-
 /**
  * @author Roman Smirnov
  *

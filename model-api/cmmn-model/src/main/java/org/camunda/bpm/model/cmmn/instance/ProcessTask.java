@@ -24,6 +24,10 @@ public interface ProcessTask extends Task {
 
   void setProcess(String process);
 
+  ProcessRefExpression getProcessExpression();
+
+  void setProcessExpression(ProcessRefExpression processExpression);
+
   Collection<ParameterMapping> getParameterMappings();
 
   /** camunda extensions */

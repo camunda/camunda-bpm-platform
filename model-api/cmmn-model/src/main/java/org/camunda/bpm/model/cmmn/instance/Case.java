@@ -14,7 +14,6 @@ package org.camunda.bpm.model.cmmn.instance;
 
 import java.util.Collection;
 
-
 /**
  * @author Roman Smirnov
  *
@@ -25,7 +24,12 @@ public interface Case extends CmmnElement {
 
   void setName(String name);
 
-  Collection<CaseRoles> getCaseRoles();
+  @Deprecated
+  Collection<CaseRole> getCaseRoles();
+
+  CaseRoles getRoles();
+
+  void setRoles(CaseRoles roles);
 
   Collection<InputCaseParameter> getInputs();
 

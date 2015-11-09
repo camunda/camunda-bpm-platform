@@ -20,9 +20,15 @@ import org.camunda.bpm.model.cmmn.PlanItemTransition;
  */
 public interface PlanItemOnPart extends OnPart {
 
+  @Deprecated
   Sentry getSentry();
 
+  @Deprecated
   void setSentry(Sentry sentry);
+
+  ExitCriterion getExitCriterion();
+
+  void setExitCriterion(ExitCriterion exitCriterion);
 
   PlanItem getSource();
 

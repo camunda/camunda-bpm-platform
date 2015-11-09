@@ -12,15 +12,20 @@
  */
 package org.camunda.bpm.model.cmmn.instance;
 
-
 /**
  * @author Roman Smirnov
  *
  */
 public interface Expression extends CmmnElement {
 
+  String getText();
+
+  void setText(String text);
+
+  @Deprecated
   String getBody();
 
+  @Deprecated
   void setBody(String body);
 
   String getLanguage();

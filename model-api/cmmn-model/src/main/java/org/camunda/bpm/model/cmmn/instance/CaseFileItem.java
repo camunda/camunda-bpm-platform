@@ -38,9 +38,13 @@ public interface CaseFileItem extends CmmnElement {
 
   void setDefinitionRef(CaseFileItemDefinition caseFileItemDefinition);
 
+  @Deprecated
   CaseFileItem getSourceRef();
 
+  @Deprecated
   void setSourceRef(CaseFileItem sourceRef);
+
+  Collection<CaseFileItem> getSourceRefs();
 
   Collection<CaseFileItem> getTargetRefs();
 

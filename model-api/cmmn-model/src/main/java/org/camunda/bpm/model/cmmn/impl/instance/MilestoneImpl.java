@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_MILESTONE;
 
 import org.camunda.bpm.model.cmmn.instance.Milestone;
@@ -34,7 +34,7 @@ public class MilestoneImpl extends PlanItemDefinitionImpl implements Milestone {
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Milestone.class, CMMN_ELEMENT_MILESTONE)
-        .namespaceUri(CMMN10_NS)
+        .namespaceUri(CMMN11_NS)
         .extendsType(PlanItemDefinition.class)
         .instanceProvider(new ModelTypeInstanceProvider<Milestone>() {
           public Milestone newInstance(ModelTypeInstanceContext instanceContext) {

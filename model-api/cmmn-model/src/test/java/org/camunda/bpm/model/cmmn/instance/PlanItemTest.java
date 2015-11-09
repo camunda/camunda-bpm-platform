@@ -15,6 +15,8 @@ package org.camunda.bpm.model.cmmn.instance;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.camunda.bpm.model.cmmn.impl.CmmnModelConstants;
+
 /**
  * @author Roman Smirnov
  *
@@ -27,7 +29,9 @@ public class PlanItemTest extends CmmnModelElementInstanceTest {
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
     return Arrays.asList(
-          new ChildElementAssumption(ItemControl.class, 0, 1)
+          new ChildElementAssumption(ItemControl.class, 0, 1),
+          new ChildElementAssumption(EntryCriterion.class),
+          new ChildElementAssumption(ExitCriterion.class)
         );
   }
 
@@ -35,8 +39,8 @@ public class PlanItemTest extends CmmnModelElementInstanceTest {
     return Arrays.asList(
           new AttributeAssumption("name"),
           new AttributeAssumption("definitionRef"),
-          new AttributeAssumption("entryCriteriaRefs"),
-          new AttributeAssumption("exitCriteriaRefs")
+          new AttributeAssumption(CmmnModelConstants.CMMN10_NS, "entryCriteriaRefs"),
+          new AttributeAssumption(CmmnModelConstants.CMMN10_NS, "exitCriteriaRefs")
         );
   }
 

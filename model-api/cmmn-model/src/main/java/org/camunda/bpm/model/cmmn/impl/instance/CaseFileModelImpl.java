@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_CASE_FILE_MODEL;
 
 import org.camunda.bpm.model.cmmn.instance.CaseFile;
@@ -33,7 +33,7 @@ public class CaseFileModelImpl extends CaseFileImpl implements CaseFileModel {
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(CaseFileModel.class, CMMN_ELEMENT_CASE_FILE_MODEL)
-      .namespaceUri(CMMN10_NS)
+      .namespaceUri(CMMN11_NS)
       .extendsType(CaseFile.class)
       .instanceProvider(new ModelElementTypeBuilder.ModelTypeInstanceProvider<CaseFileModel>() {
         public CaseFileModel newInstance(ModelTypeInstanceContext instanceContext) {

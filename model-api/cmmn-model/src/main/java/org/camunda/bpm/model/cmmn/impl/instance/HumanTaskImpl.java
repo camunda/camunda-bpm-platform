@@ -20,7 +20,7 @@ import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBU
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_FORM_KEY;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_PRIORITY;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_NS;
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_PERFORMER_REF;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_HUMAN_TASK;
 
@@ -37,6 +37,7 @@ import org.camunda.bpm.model.xml.impl.util.StringUtil;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
 import org.camunda.bpm.model.xml.type.attribute.Attribute;
+import org.camunda.bpm.model.xml.type.child.ChildElement;
 import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 import org.camunda.bpm.model.xml.type.reference.AttributeReference;
@@ -48,7 +49,13 @@ import org.camunda.bpm.model.xml.type.reference.AttributeReference;
 public class HumanTaskImpl extends TaskImpl implements HumanTask {
 
   protected static AttributeReference<Role> performerRefAttribute;
-  protected static ChildElementCollection<PlanningTable> planningTableChild;
+
+  // cmmn 1.0
+  @Deprecated
+  protected static ChildElementCollection<PlanningTable> planningTableCollection;
+
+  // cmmn 1.1
+  protected static ChildElement<PlanningTable> planningTableChild;
 
   /** camunda extensions */
   protected static Attribute<String> camundaAssigneeAttribute;
@@ -72,7 +79,15 @@ public class HumanTaskImpl extends TaskImpl implements HumanTask {
   }
 
   public Collection<PlanningTable> getPlanningTables() {
-    return planningTableChild.get(this);
+    return planningTableCollection.get(this);
+  }
+
+  public PlanningTable getPlanningTable() {
+    return planningTableChild.getChild(this);
+  }
+
+  public void setPlanningTable(PlanningTable planningTable) {
+    planningTableChild.setChild(this, planningTable);
   }
 
   /** camunda extensions */
@@ -155,7 +170,7 @@ public class HumanTaskImpl extends TaskImpl implements HumanTask {
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(HumanTask.class, CMMN_ELEMENT_HUMAN_TASK)
-        .namespaceUri(CMMN10_NS)
+        .namespaceUri(CMMN11_NS)
         .extendsType(Task.class)
         .instanceProvider(new ModelTypeInstanceProvider<HumanTask>() {
           public HumanTask newInstance(ModelTypeInstanceContext instanceContext) {
@@ -199,7 +214,12 @@ public class HumanTaskImpl extends TaskImpl implements HumanTask {
 
     SequenceBuilder sequenceBuilder = typeBuilder.sequence();
 
-    planningTableChild = sequenceBuilder.elementCollection(PlanningTable.class)
+    planningTableCollection = sequenceBuilder.elementCollection(PlanningTable.class)
+        .build();
+
+    planningTableChild = sequenceBuilder.element(PlanningTable.class)
+        .minOccurs(0)
+        .maxOccurs(1)
         .build();
 
     typeBuilder.build();

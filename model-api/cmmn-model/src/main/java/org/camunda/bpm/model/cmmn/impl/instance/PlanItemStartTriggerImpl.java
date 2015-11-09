@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_SOURCE_REF;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_PLAN_ITEM_START_TRIGGER;
 
@@ -62,7 +62,7 @@ public class PlanItemStartTriggerImpl extends StartTriggerImpl implements PlanIt
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(PlanItemStartTrigger.class, CMMN_ELEMENT_PLAN_ITEM_START_TRIGGER)
         .extendsType(StartTrigger.class)
-        .namespaceUri(CMMN10_NS)
+        .namespaceUri(CMMN11_NS)
         .instanceProvider(new ModelTypeInstanceProvider<PlanItemStartTrigger>() {
           public PlanItemStartTrigger newInstance(ModelTypeInstanceContext instanceContext) {
             return new PlanItemStartTriggerImpl(instanceContext);

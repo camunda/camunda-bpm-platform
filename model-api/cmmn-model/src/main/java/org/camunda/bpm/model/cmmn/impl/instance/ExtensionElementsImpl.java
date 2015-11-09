@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_EXTENSION_ELEMENTS;
 
 import java.util.Collection;
@@ -36,7 +36,7 @@ public class ExtensionElementsImpl extends CmmnModelElementInstanceImpl implemen
   public static void registerType(ModelBuilder modelBuilder) {
 
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(ExtensionElements.class, CMMN_ELEMENT_EXTENSION_ELEMENTS)
-      .namespaceUri(CMMN10_NS)
+      .namespaceUri(CMMN11_NS)
       .instanceProvider(new ModelElementTypeBuilder.ModelTypeInstanceProvider<ExtensionElements>() {
         public ExtensionElements newInstance(ModelTypeInstanceContext instanceContext) {
           return new ExtensionElementsImpl(instanceContext);

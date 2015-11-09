@@ -24,7 +24,12 @@ public interface Stage extends PlanFragment {
 
   void setAutoComplete(boolean autoComplete);
 
+  @Deprecated
   Collection<Sentry> getExitCriterias();
+
+  Collection<Sentry> getExitCriteria();
+
+  Collection<ExitCriterion> getExitCriterions();
 
   PlanningTable getPlanningTable();
 

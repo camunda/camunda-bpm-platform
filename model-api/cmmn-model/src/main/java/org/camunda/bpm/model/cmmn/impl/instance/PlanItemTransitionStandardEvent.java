@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_STANDARD_EVENT;
 
 import org.camunda.bpm.model.cmmn.PlanItemTransition;
@@ -32,7 +32,7 @@ public class PlanItemTransitionStandardEvent extends CmmnModelElementInstanceImp
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(PlanItemTransitionStandardEvent.class, CMMN_ELEMENT_STANDARD_EVENT)
-      .namespaceUri(CMMN10_NS)
+      .namespaceUri(CMMN11_NS)
       .instanceProvider(new ModelElementTypeBuilder.ModelTypeInstanceProvider<PlanItemTransitionStandardEvent>() {
         public PlanItemTransitionStandardEvent newInstance(ModelTypeInstanceContext instanceContext) {
           return new PlanItemTransitionStandardEvent(instanceContext);

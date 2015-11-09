@@ -25,7 +25,12 @@ public interface HumanTask extends Task {
 
   void setPerformer(Role performerRef);
 
+  @Deprecated
   Collection<PlanningTable> getPlanningTables();
+
+  PlanningTable getPlanningTable();
+
+  void setPlanningTable(PlanningTable planningTable);
 
   /** camunda extensions */
 

@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.model.cmmn.instance;
 
-import org.camunda.bpm.model.cmmn.impl.instance.TimerExpression;
-
 /**
  * @author Roman Smirnov
  *

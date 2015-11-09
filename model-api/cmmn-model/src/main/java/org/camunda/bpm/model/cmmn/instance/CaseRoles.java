@@ -12,10 +12,14 @@
  */
 package org.camunda.bpm.model.cmmn.instance;
 
+import java.util.Collection;
+
 /**
  * @author Roman Smirnov
  *
  */
-public interface CaseRoles extends Role {
+public interface CaseRoles extends CmmnElement {
+
+  Collection<Role> getRoles();
 
 }

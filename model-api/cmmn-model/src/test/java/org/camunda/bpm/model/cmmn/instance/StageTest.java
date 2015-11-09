@@ -15,6 +15,8 @@ package org.camunda.bpm.model.cmmn.instance;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.camunda.bpm.model.cmmn.impl.CmmnModelConstants;
+
 /**
  * @author Roman Smirnov
  *
@@ -28,14 +30,15 @@ public class StageTest extends CmmnModelElementInstanceTest {
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
     return Arrays.asList(
           new ChildElementAssumption(PlanningTable.class, 0 , 1),
-          new ChildElementAssumption(PlanItemDefinition.class)
+          new ChildElementAssumption(PlanItemDefinition.class),
+          new ChildElementAssumption(ExitCriterion.class)
         );
   }
 
   public Collection<AttributeAssumption> getAttributesAssumptions() {
     return Arrays.asList(
           new AttributeAssumption("autoComplete", false, false, Boolean.FALSE),
-          new AttributeAssumption("exitCriteriaRefs")
+          new AttributeAssumption(CmmnModelConstants.CMMN10_NS, "exitCriteriaRefs")
         );
   }
 

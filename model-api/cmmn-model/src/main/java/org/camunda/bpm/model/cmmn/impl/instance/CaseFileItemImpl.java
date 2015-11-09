@@ -13,10 +13,12 @@
 package org.camunda.bpm.model.cmmn.impl.instance;
 
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_DEFINITION_REF;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_MULTIPLICITY;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_NAME;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_SOURCE_REF;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_SOURCE_REFS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_TARGET_REFS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_CASE_FILE_ITEM;
 
@@ -46,9 +48,17 @@ public class CaseFileItemImpl extends CmmnElementImpl implements CaseFileItem {
   protected static Attribute<String> nameAttribute;
   protected static Attribute<MultiplicityEnum> multiplicityAttribute;
   protected static AttributeReference<CaseFileItemDefinition> definitionRefAttribute;
-  protected static AttributeReference<CaseFileItem> sourceRefAttribute;
   protected static AttributeReferenceCollection<CaseFileItem> targetRefCollection;
   protected static ChildElement<Children> childrenChild;
+
+  // cmmn 1.0
+  @Deprecated
+  protected static AttributeReference<CaseFileItem> sourceRefAttribute;
+
+//  cmmn 1.1
+  protected static AttributeReferenceCollection<CaseFileItem> sourceRefCollection;
+
+
 
   public CaseFileItemImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
@@ -86,6 +96,10 @@ public class CaseFileItemImpl extends CmmnElementImpl implements CaseFileItem {
     sourceRefAttribute.setReferenceTargetElement(this, sourceRef);
   }
 
+  public Collection<CaseFileItem> getSourceRefs() {
+    return sourceRefCollection.getReferenceTargetElements(this);
+  }
+
   public Collection<CaseFileItem> getTargetRefs() {
     return targetRefCollection.getReferenceTargetElements(this);
   }
@@ -101,7 +115,7 @@ public class CaseFileItemImpl extends CmmnElementImpl implements CaseFileItem {
   public static void registerType(ModelBuilder modelBuilder) {
 
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(CaseFileItem.class, CMMN_ELEMENT_CASE_FILE_ITEM)
-        .namespaceUri(CMMN10_NS)
+        .namespaceUri(CMMN11_NS)
         .extendsType(CmmnElement.class)
         .instanceProvider(new ModelTypeInstanceProvider<CaseFileItem>() {
           public CaseFileItem newInstance(ModelTypeInstanceContext instanceContext) {
@@ -121,7 +135,12 @@ public class CaseFileItemImpl extends CmmnElementImpl implements CaseFileItem {
         .build();
 
     sourceRefAttribute = typeBuilder.stringAttribute(CMMN_ATTRIBUTE_SOURCE_REF)
+        .namespace(CMMN10_NS)
         .idAttributeReference(CaseFileItem.class)
+        .build();
+
+    sourceRefCollection = typeBuilder.stringAttribute(CMMN_ATTRIBUTE_SOURCE_REFS)
+        .idAttributeReferenceCollection(CaseFileItem.class, CmmnAttributeElementReferenceCollection.class)
         .build();
 
     targetRefCollection = typeBuilder.stringAttribute(CMMN_ATTRIBUTE_TARGET_REFS)

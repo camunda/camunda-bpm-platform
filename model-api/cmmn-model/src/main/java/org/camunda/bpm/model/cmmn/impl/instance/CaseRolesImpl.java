@@ -12,36 +12,49 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_CASE_ROLES;
+
+import java.util.Collection;
 
 import org.camunda.bpm.model.cmmn.instance.CaseRoles;
 import org.camunda.bpm.model.cmmn.instance.Role;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
+import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
+import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class CaseRolesImpl extends RoleImpl implements CaseRoles {
+public class CaseRolesImpl extends CmmnElementImpl implements CaseRoles {
+
+  protected static ChildElementCollection<Role> roleCollection;
 
   public CaseRolesImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
   }
 
+  public Collection<Role> getRoles() {
+    return roleCollection.get(this);
+  }
+
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(CaseRoles.class, CMMN_ELEMENT_CASE_ROLES)
-      .namespaceUri(CMMN10_NS)
-      .extendsType(Role.class)
+      .namespaceUri(CMMN11_NS)
       .instanceProvider(new ModelElementTypeBuilder.ModelTypeInstanceProvider<CaseRoles>() {
         public CaseRoles newInstance(ModelTypeInstanceContext instanceContext) {
           return new CaseRolesImpl(instanceContext);
         }
       });
 
+    SequenceBuilder sequenceBuilder = typeBuilder.sequence();
+
+    roleCollection = sequenceBuilder.elementCollection(Role.class)
+        .build();
+
     typeBuilder.build();
   }
-
 }

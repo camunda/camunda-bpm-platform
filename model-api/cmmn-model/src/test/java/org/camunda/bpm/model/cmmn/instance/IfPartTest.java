@@ -27,7 +27,7 @@ public class IfPartTest extends CmmnModelElementInstanceTest {
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
     return Arrays.asList(
-          new ChildElementAssumption(ConditionExpression.class)
+          new ChildElementAssumption(ConditionExpression.class, 0, 1)
         );
   }
 

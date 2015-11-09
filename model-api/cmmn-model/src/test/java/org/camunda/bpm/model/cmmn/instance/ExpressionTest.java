@@ -29,7 +29,7 @@ public class ExpressionTest extends CmmnModelElementInstanceTest {
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
     return Arrays.asList(
-          new ChildElementAssumption(Body.class, 0, 1)
+          new ChildElementAssumption(CmmnModelConstants.CMMN10_NS, Body.class, 0, 1)
         );
   }
 

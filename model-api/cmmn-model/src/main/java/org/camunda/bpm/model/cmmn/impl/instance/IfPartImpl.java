@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_CONTEXT_REF;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_IF_PART;
 
@@ -26,7 +26,7 @@ import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
-import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
+import org.camunda.bpm.model.xml.type.child.ChildElement;
 import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 import org.camunda.bpm.model.xml.type.reference.AttributeReference;
 
@@ -37,7 +37,9 @@ import org.camunda.bpm.model.xml.type.reference.AttributeReference;
 public class IfPartImpl extends CmmnElementImpl implements IfPart {
 
   protected static AttributeReference<CaseFileItem> contextRefAttribute;
-  protected static ChildElementCollection<ConditionExpression> conditionCollection;
+
+  // cmmn 1.1
+  protected static ChildElement<ConditionExpression> conditionChild;
 
   public IfPartImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
@@ -52,12 +54,20 @@ public class IfPartImpl extends CmmnElementImpl implements IfPart {
   }
 
   public Collection<ConditionExpression> getConditions() {
-    return conditionCollection.get(this);
+    return conditionChild.get(this);
+  }
+
+  public ConditionExpression getCondition() {
+    return conditionChild.getChild(this);
+  }
+
+  public void setCondition(ConditionExpression condition) {
+    conditionChild.setChild(this, condition);
   }
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(IfPart.class, CMMN_ELEMENT_IF_PART)
-        .namespaceUri(CMMN10_NS)
+        .namespaceUri(CMMN11_NS)
         .extendsType(CmmnElement.class)
         .instanceProvider(new ModelTypeInstanceProvider<IfPart>() {
           public IfPart newInstance(ModelTypeInstanceContext instanceContext) {
@@ -71,7 +81,7 @@ public class IfPartImpl extends CmmnElementImpl implements IfPart {
 
     SequenceBuilder sequenceBuilder = typeBuilder.sequence();
 
-    conditionCollection = sequenceBuilder.elementCollection(ConditionExpression.class)
+    conditionChild = sequenceBuilder.element(ConditionExpression.class)
         .build();
 
     typeBuilder.build();

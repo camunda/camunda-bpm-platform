@@ -21,15 +21,21 @@ public class CmmnModelConstants {
   /** The CMMN 1.0 namespace */
   public static final String CMMN10_NS = "http://www.omg.org/spec/CMMN/20131201/MODEL";
 
+  /** The CMMN 1.1 namespace */
+  public static final String CMMN11_NS = "http://www.omg.org/spec/CMMN/20151109/MODEL";
+
   /** The location of the CMMN 1.0 XML schema. */
-  public static final String CMMN_10_SCHEMA_LOCATION = "CMMN10.xsd";
+  public static final String CMMN_10_SCHEMA_LOCATION = "cmmn10/CMMN10.xsd";
+
+  /** The location of the CMMN 1.1 XML schema. */
+  public static final String CMMN_11_SCHEMA_LOCATION = "cmmn11/CMMN11.xsd";
 
   /** Xml Schema is the default type language */
   public static final String XML_SCHEMA_NS = "http://www.w3.org/2001/XMLSchema";
 
   public static final String XPATH_NS = "http://www.w3.org/1999/XPath";
 
-  /** CAMUNDA_NS namespace */
+  /** Camunda namespace */
   public static final String CAMUNDA_NS = "http://camunda.org/schema/1.0/cmmn";
 
   // elements ///////////////////////////////////////////////////////////////////////////
@@ -38,6 +44,13 @@ public class CmmnModelConstants {
   public static final String CMMN_ELEMENT_DEFINITIONS = "definitions";
   public static final String CMMN_ELEMENT_IMPORT = "import";
   public static final String CMMN_ELEMENT_EXTENSION_ELEMENTS= "extensionElements";
+  public static final String CMMN_ELEMENT_DOCUMENTATION = "documentation";
+
+  // artifact
+  public static final String CMMN_ELEMENT_ARTIFACT = "artifact";
+  public static final String CMMN_ELEMENT_ASSOCIATION = "association";
+  public static final String CMMN_ELEMENT_TEXT_ANNOTATION = "textAnnotation";
+  public static final String CMMN_ELEMENT_TEXT = "text";
 
   // relationship
   public static final String CMMN_ELEMENT_RELATIONSHIP = "relationship";
@@ -67,6 +80,9 @@ public class CmmnModelConstants {
   public static final String CMMN_ELEMENT_BINDING_REFINEMENT = "bindingRefinement";
   public static final String CMMN_ELEMENT_TRANSFORMATION = "transformation";
   public static final String CMMN_ELEMENT_TIMER_EXPRESSION = "timerExpression";
+  public static final String CMMN_ELEMENT_CASE_REF_EXPRESSION = "caseRefExpression";
+  public static final String CMMN_ELEMENT_DECISION_REF_EXPRESSION = "decisionRefExpression";
+  public static final String CMMN_ELEMENT_PROCESS_REF_EXPRESSION = "processRefExpression";
 
   // case file
   public static final String CMMN_ELEMENT_CASE_FILE = "caseFile";
@@ -86,10 +102,15 @@ public class CmmnModelConstants {
   public static final String CMMN_ELEMENT_HUMAN_TASK = "humanTask";
   public static final String CMMN_ELEMENT_PROCESS_TASK = "processTask";
   public static final String CMMN_ELEMENT_CASE_TASK = "caseTask";
+  public static final String CMMN_ELEMENT_DECISION_TASK = "decisionTask";
   // events
   public static final String CMMN_ELEMENT_EVENT = "event";
   public static final String CMMN_ELEMENT_USER_EVENT = "userEvent";
   public static final String CMMN_ELEMENT_TIMER_EVENT = "timerEvent";
+  // event listeners
+  public static final String CMMN_ELEMENT_EVENT_LISTENER = "eventListener";
+  public static final String CMMN_ELEMENT_USER_EVENT_LISTENER = "userEventListener";
+  public static final String CMMN_ELEMENT_TIMER_EVENT_LISTENER = "timerEventListener";
   // milestones
   public static final String CMMN_ELEMENT_MILESTONE = "milestone";
   // plan fragment
@@ -118,10 +139,16 @@ public class CmmnModelConstants {
   public static final String CMMN_ELEMENT_PLAN_ITEM_ON_PART = "planItemOnPart";
   public static final String CMMN_ELEMENT_IF_PART = "ifPart";
 
+  // criterion
+  public static final String CMMN_ELEMENT_CRITERION = "criterion";
+  public static final String CMMN_ELEMENT_ENTRY_CRITERION = "entryCriterion";
+  public static final String CMMN_ELEMENT_EXIT_CRITERION = "exitCriterion";
+
   // parameter
   public static final String CMMN_ELEMENT_PARAMETER = "parameter";
   public static final String CMMN_ELEMENT_CASE_PARAMETER = "caseParameter";
   public static final String CMMN_ELEMENT_PROCESS_PARAMETER = "processParameter";
+  public static final String CMMN_ELEMENT_DECISION_PARAMETER = "decisionParameter";
   public static final String CMMN_ELEMENT_INPUT = "input";
   public static final String CMMN_ELEMENT_INPUTS = "inputs";
   public static final String CMMN_ELEMENT_OUTPUT = "output";
@@ -133,6 +160,9 @@ public class CmmnModelConstants {
 
   // process
   public static final String CMMN_ELEMENT_PROCESS = "process";
+
+  // decision
+  public static final String CMMN_ELEMENT_DECISION = "decision";
 
   // camunda elements
   public static final String CAMUNDA_ELEMENT_IN = "in";
@@ -164,6 +194,7 @@ public class CmmnModelConstants {
   public static final String CMMN_ATTRIBUTE_MULTIPLICITY = "multiplicity";
   public static final String CMMN_ATTRIBUTE_DEFINITION_REF = "definitionRef";
   public static final String CMMN_ATTRIBUTE_SOURCE_REF = "sourceRef";
+  public static final String CMMN_ATTRIBUTE_SOURCE_REFS = "sourceRefs";
   public static final String CMMN_ATTRIBUTE_TARGET_REFS = "targetRefs";
   public static final String CMMN_ATTRIBUTE_DEFINITION_TYPE = "definitionType";
   public static final String CMMN_ATTRIBUTE_STRUCTURE_REF = "structureRef";
@@ -184,6 +215,10 @@ public class CmmnModelConstants {
   public static final String CMMN_ATTRIBUTE_APPLICABILITY_RULE_REFS = "applicabilityRuleRefs";
   public static final String CMMN_ATTRIBUTE_AUTHORIZED_ROLE_REFS = "authorizedRoleRefs";
   public static final String CMMN_ATTRIBUTE_DIRECTION = "direction";
+  public static final String CMMN_ATTRIBUTE_TEXT_FORMAT = "textFormat";
+  public static final String CMMN_ATTRIBUTE_DECISION_REF = "decisionRef";
+  public static final String CMMN_ATTRIBUTE_ASSOCIATION_DIRECTION = "associationDirection";
+  public static final String CMMN_ATTRIBUTE_EXIT_CRITERION_REF = "exitCriterionRef";
 
   // camunda attribute extensions ////////////////////////////////////////////////////
 

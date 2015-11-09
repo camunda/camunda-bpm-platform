@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_NAME;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_PLAN_ITEM_DEFINITION;
 
@@ -57,7 +57,7 @@ public abstract class PlanItemDefinitionImpl extends CmmnElementImpl implements 
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(PlanItemDefinition.class, CMMN_ELEMENT_PLAN_ITEM_DEFINITION)
-        .namespaceUri(CMMN10_NS)
+        .namespaceUri(CMMN11_NS)
         .abstractType()
         .extendsType(CmmnElement.class);
 

@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_ITEM_CONTROL;
 
 import org.camunda.bpm.model.cmmn.instance.ItemControl;
@@ -34,7 +34,7 @@ public class ItemControlImpl extends PlanItemControlImpl implements ItemControl 
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(ItemControl.class, CMMN_ELEMENT_ITEM_CONTROL)
-      .namespaceUri(CMMN10_NS)
+      .namespaceUri(CMMN11_NS)
       .extendsType(PlanItemControl.class)
       .instanceProvider(new ModelTypeInstanceProvider<ItemControl>() {
         public ItemControl newInstance(ModelTypeInstanceContext instanceContext) {

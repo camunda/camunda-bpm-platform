@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_SOURCE_REF;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_TARGET_REF;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_PARAMETER_MAPPING;
@@ -71,7 +71,7 @@ public class ParameterMappingImpl extends CmmnElementImpl implements ParameterMa
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(ParameterMapping.class, CMMN_ELEMENT_PARAMETER_MAPPING)
         .extendsType(CmmnElement.class)
-        .namespaceUri(CMMN10_NS)
+        .namespaceUri(CMMN11_NS)
         .instanceProvider(new ModelTypeInstanceProvider<ParameterMapping>() {
           public ParameterMapping newInstance(ModelTypeInstanceContext instanceContext) {
             return new ParameterMappingImpl(instanceContext);

@@ -32,7 +32,11 @@ public class DefinitionsTest extends CmmnModelElementInstanceTest {
           new ChildElementAssumption(Import.class),
           new ChildElementAssumption(CaseFileItemDefinition.class),
           new ChildElementAssumption(Case.class),
-          new ChildElementAssumption(Process.class)
+          new ChildElementAssumption(Process.class),
+          new ChildElementAssumption(Decision.class),
+          new ChildElementAssumption(ExtensionElements.class, 0, 1),
+          new ChildElementAssumption(Relationship.class),
+          new ChildElementAssumption(Artifact.class)
         );
   }
 

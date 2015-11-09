@@ -12,12 +12,13 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_TIMER_EVENT;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_TIMER_EVENT_LISTENER;
 
 import org.camunda.bpm.model.cmmn.instance.EventListener;
 import org.camunda.bpm.model.cmmn.instance.StartTrigger;
 import org.camunda.bpm.model.cmmn.instance.TimerEventListener;
+import org.camunda.bpm.model.cmmn.instance.TimerExpression;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
@@ -55,8 +56,8 @@ public class TimerEventListenerImpl extends EventListenerImpl implements TimerEv
   }
 
   public static void registerType(ModelBuilder modelBuilder) {
-    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(TimerEventListener.class, CMMN_ELEMENT_TIMER_EVENT)
-        .namespaceUri(CMMN10_NS)
+    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(TimerEventListener.class, CMMN_ELEMENT_TIMER_EVENT_LISTENER)
+        .namespaceUri(CMMN11_NS)
         .extendsType(EventListener.class)
         .instanceProvider(new ModelTypeInstanceProvider<TimerEventListener>() {
           public TimerEventListener newInstance(ModelTypeInstanceContext instanceContext) {

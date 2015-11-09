@@ -15,6 +15,8 @@ package org.camunda.bpm.model.cmmn.instance;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.camunda.bpm.model.cmmn.impl.CmmnModelConstants;
+
 /**
  * @author Roman Smirnov
  *
@@ -27,6 +29,7 @@ public class CmmnElementTest extends CmmnModelElementInstanceTest {
 
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
     return Arrays.asList(
+        new ChildElementAssumption(Documentation.class),
         new ChildElementAssumption(ExtensionElements.class, 0, 1)
       );
   }
@@ -34,7 +37,7 @@ public class CmmnElementTest extends CmmnModelElementInstanceTest {
   public Collection<AttributeAssumption> getAttributesAssumptions() {
     return Arrays.asList(
         new AttributeAssumption("id", true),
-        new AttributeAssumption("description")
+        new AttributeAssumption(CmmnModelConstants.CMMN10_NS, "description")
       );
   }
 

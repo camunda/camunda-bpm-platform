@@ -15,6 +15,8 @@ package org.camunda.bpm.model.cmmn.instance;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.camunda.bpm.model.cmmn.impl.CmmnModelConstants;
+
 /**
  * @author Roman Smirnov
  *
@@ -29,7 +31,8 @@ public class CaseTest extends CmmnModelElementInstanceTest {
     return Arrays.asList(
           new ChildElementAssumption(CaseFileModel.class, 0, 1),
           new ChildElementAssumption(CasePlanModel.class, 0, 1),
-          new ChildElementAssumption(CaseRoles.class),
+          new ChildElementAssumption(CmmnModelConstants.CMMN10_NS, CaseRole.class),
+          new ChildElementAssumption(CaseRoles.class, 0, 1),
           new ChildElementAssumption(InputCaseParameter.class),
           new ChildElementAssumption(OutputCaseParameter.class)
         );

@@ -15,13 +15,14 @@ package org.camunda.bpm.model.cmmn.impl.instance;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_PROCESS_BINDING;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_PROCESS_VERSION;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_NS;
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_PROCESS_REF;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_PROCESS_TASK;
 
 import java.util.Collection;
 
 import org.camunda.bpm.model.cmmn.instance.ParameterMapping;
+import org.camunda.bpm.model.cmmn.instance.ProcessRefExpression;
 import org.camunda.bpm.model.cmmn.instance.ProcessTask;
 import org.camunda.bpm.model.cmmn.instance.Task;
 import org.camunda.bpm.model.xml.ModelBuilder;
@@ -29,6 +30,7 @@ import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
 import org.camunda.bpm.model.xml.type.attribute.Attribute;
+import org.camunda.bpm.model.xml.type.child.ChildElement;
 import org.camunda.bpm.model.xml.type.child.ChildElementCollection;
 import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 
@@ -40,6 +42,7 @@ public class ProcessTaskImpl extends TaskImpl implements ProcessTask {
 
   protected static Attribute<String> processRefAttribute;
   protected static ChildElementCollection<ParameterMapping> parameterMappingCollection;
+  protected static ChildElement<ProcessRefExpression> processRefExpressionChild;
 
   protected static Attribute<String> camundaProcessBindingAttribute;
   protected static Attribute<String> camundaProcessVersionAttribute;
@@ -54,6 +57,14 @@ public class ProcessTaskImpl extends TaskImpl implements ProcessTask {
 
   public void setProcess(String process) {
     processRefAttribute.setValue(this, process);
+  }
+
+  public ProcessRefExpression getProcessExpression() {
+    return processRefExpressionChild.getChild(this);
+  }
+
+  public void setProcessExpression(ProcessRefExpression processExpression) {
+    processRefExpressionChild.setChild(this, processExpression);
   }
 
   public Collection<ParameterMapping> getParameterMappings() {
@@ -78,7 +89,7 @@ public class ProcessTaskImpl extends TaskImpl implements ProcessTask {
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(ProcessTask.class, CMMN_ELEMENT_PROCESS_TASK)
-        .namespaceUri(CMMN10_NS)
+        .namespaceUri(CMMN11_NS)
         .extendsType(Task.class)
         .instanceProvider(new ModelTypeInstanceProvider<ProcessTask>() {
           public ProcessTask newInstance(ModelTypeInstanceContext instanceContext) {
@@ -102,6 +113,11 @@ public class ProcessTaskImpl extends TaskImpl implements ProcessTask {
     SequenceBuilder sequenceBuilder = typeBuilder.sequence();
 
     parameterMappingCollection = sequenceBuilder.elementCollection(ParameterMapping.class)
+        .build();
+
+    processRefExpressionChild = sequenceBuilder.element(ProcessRefExpression.class)
+        .minOccurs(0)
+        .maxOccurs(1)
         .build();
 
     typeBuilder.build();

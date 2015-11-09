@@ -12,8 +12,9 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_CONTEXT_REF;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_NAME;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_APPLICABILITY_RULE;
 
 import org.camunda.bpm.model.cmmn.instance.ApplicabilityRule;
@@ -24,6 +25,7 @@ import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder.ModelTypeInstanceProvider;
+import org.camunda.bpm.model.xml.type.attribute.Attribute;
 import org.camunda.bpm.model.xml.type.child.ChildElement;
 import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 import org.camunda.bpm.model.xml.type.reference.AttributeReference;
@@ -37,8 +39,19 @@ public class ApplicabilityRuleImpl extends CmmnElementImpl implements Applicabil
   protected static AttributeReference<CaseFileItem> contextRefAttribute;
   protected static ChildElement<ConditionExpression> conditionChild;
 
+  // cmmn 1.1
+  protected static Attribute<String> nameAttribute;
+
   public ApplicabilityRuleImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
+  }
+
+  public String getName() {
+    return nameAttribute.getValue(this);
+  }
+
+  public void setName(String name) {
+    nameAttribute.setValue(this, name);
   }
 
   public CaseFileItem getContext() {
@@ -59,13 +72,16 @@ public class ApplicabilityRuleImpl extends CmmnElementImpl implements Applicabil
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(ApplicabilityRule.class, CMMN_ELEMENT_APPLICABILITY_RULE)
-        .namespaceUri(CMMN10_NS)
+        .namespaceUri(CMMN11_NS)
         .extendsType(CmmnElement.class)
         .instanceProvider(new ModelTypeInstanceProvider<ApplicabilityRule>() {
           public ApplicabilityRule newInstance(ModelTypeInstanceContext instanceContext) {
             return new ApplicabilityRuleImpl(instanceContext);
           }
         });
+
+    nameAttribute = typeBuilder.stringAttribute(CMMN_ATTRIBUTE_NAME)
+        .build();
 
     contextRefAttribute = typeBuilder.stringAttribute(CMMN_ATTRIBUTE_CONTEXT_REF)
         .idAttributeReference(CaseFileItem.class)

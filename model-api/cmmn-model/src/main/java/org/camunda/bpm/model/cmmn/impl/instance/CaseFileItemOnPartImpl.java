@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_SOURCE_REF;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_CASE_FILE_ITEM_ON_PART;
 
@@ -62,7 +62,7 @@ public class CaseFileItemOnPartImpl extends OnPartImpl implements CaseFileItemOn
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(CaseFileItemOnPart.class, CMMN_ELEMENT_CASE_FILE_ITEM_ON_PART)
         .extendsType(OnPart.class)
-        .namespaceUri(CMMN10_NS)
+        .namespaceUri(CMMN11_NS)
         .instanceProvider(new ModelTypeInstanceProvider<CaseFileItemOnPart>() {
           public CaseFileItemOnPart newInstance(ModelTypeInstanceContext instanceContext) {
             return new CaseFileItemOnPartImpl(instanceContext);

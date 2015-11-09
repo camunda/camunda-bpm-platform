@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_TRANSFORMATION;
 
 import org.camunda.bpm.model.cmmn.instance.Expression;
@@ -33,7 +33,7 @@ public class TransformationExpressionImpl extends ExpressionImpl implements Tran
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(TransformationExpression.class, CMMN_ELEMENT_TRANSFORMATION)
-      .namespaceUri(CMMN10_NS)
+      .namespaceUri(CMMN11_NS)
       .extendsType(Expression.class)
       .instanceProvider(new ModelElementTypeBuilder.ModelTypeInstanceProvider<TransformationExpression>() {
         public TransformationExpression newInstance(ModelTypeInstanceContext instanceContext) {

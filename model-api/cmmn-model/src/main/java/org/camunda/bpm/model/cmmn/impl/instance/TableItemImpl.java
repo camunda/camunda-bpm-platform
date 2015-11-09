@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_APPLICABILITY_RULE_REFS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_AUTHORIZED_ROLE_REFS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_TABLE_ITEM;
@@ -51,7 +51,7 @@ public abstract class TableItemImpl extends CmmnElementImpl implements TableItem
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(TableItem.class, CMMN_ELEMENT_TABLE_ITEM)
-        .namespaceUri(CMMN10_NS)
+        .namespaceUri(CMMN11_NS)
         .abstractType()
         .extendsType(CmmnElement.class);
 

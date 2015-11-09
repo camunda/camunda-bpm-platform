@@ -12,8 +12,8 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_EVENT;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_EVENT_LISTENER;
 
 import org.camunda.bpm.model.cmmn.instance.EventListener;
 import org.camunda.bpm.model.cmmn.instance.PlanItemDefinition;
@@ -33,8 +33,8 @@ public class EventListenerImpl extends PlanItemDefinitionImpl implements EventLi
   }
 
   public static void registerType(ModelBuilder modelBuilder) {
-    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(EventListener.class, CMMN_ELEMENT_EVENT)
-        .namespaceUri(CMMN10_NS)
+    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(EventListener.class, CMMN_ELEMENT_EVENT_LISTENER)
+        .namespaceUri(CMMN11_NS)
         .extendsType(PlanItemDefinition.class)
         .instanceProvider(new ModelTypeInstanceProvider<EventListener>() {
           public EventListener newInstance(ModelTypeInstanceContext instanceContext) {

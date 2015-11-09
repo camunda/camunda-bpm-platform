@@ -13,11 +13,14 @@
 package org.camunda.bpm.model.cmmn.impl.instance;
 
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_EXIT_CRITERION_REF;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_SENTRY_REF;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_SOURCE_REF;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_PLAN_ITEM_ON_PART;
 
 import org.camunda.bpm.model.cmmn.PlanItemTransition;
+import org.camunda.bpm.model.cmmn.instance.ExitCriterion;
 import org.camunda.bpm.model.cmmn.instance.OnPart;
 import org.camunda.bpm.model.cmmn.instance.PlanItem;
 import org.camunda.bpm.model.cmmn.instance.PlanItemOnPart;
@@ -37,8 +40,14 @@ import org.camunda.bpm.model.xml.type.reference.AttributeReference;
 public class PlanItemOnPartImpl extends OnPartImpl implements PlanItemOnPart {
 
   protected static AttributeReference<PlanItem> sourceRefAttribute;
-  protected static AttributeReference<Sentry> sentryRefAttribute;
   protected static ChildElement<PlanItemTransitionStandardEvent> standardEventChild;
+
+  // cmmn 1.0
+  @Deprecated
+  protected static AttributeReference<Sentry> sentryRefAttribute;
+
+  // cmmn 1.1
+  protected static AttributeReference<ExitCriterion> exitCriterionRefAttribute;
 
   public PlanItemOnPartImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
@@ -50,6 +59,14 @@ public class PlanItemOnPartImpl extends OnPartImpl implements PlanItemOnPart {
 
   public void setSentry(Sentry sentry) {
     sentryRefAttribute.setReferenceTargetElement(this, sentry);
+  }
+
+  public ExitCriterion getExitCriterion() {
+    return exitCriterionRefAttribute.getReferenceTargetElement(this);
+  }
+
+  public void setExitCriterion(ExitCriterion exitCriterion) {
+    exitCriterionRefAttribute.setReferenceTargetElement(this, exitCriterion);
   }
 
   public PlanItem getSource() {
@@ -73,7 +90,7 @@ public class PlanItemOnPartImpl extends OnPartImpl implements PlanItemOnPart {
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(PlanItemOnPart.class, CMMN_ELEMENT_PLAN_ITEM_ON_PART)
         .extendsType(OnPart.class)
-        .namespaceUri(CMMN10_NS)
+        .namespaceUri(CMMN11_NS)
         .instanceProvider(new ModelTypeInstanceProvider<PlanItemOnPart>() {
           public PlanItemOnPart newInstance(ModelTypeInstanceContext instanceContext) {
             return new PlanItemOnPartImpl(instanceContext);
@@ -84,7 +101,12 @@ public class PlanItemOnPartImpl extends OnPartImpl implements PlanItemOnPart {
         .idAttributeReference(PlanItem.class)
         .build();
 
+    exitCriterionRefAttribute = typeBuilder.stringAttribute(CMMN_ATTRIBUTE_EXIT_CRITERION_REF)
+        .idAttributeReference(ExitCriterion.class)
+        .build();
+
     sentryRefAttribute = typeBuilder.stringAttribute(CMMN_ATTRIBUTE_SENTRY_REF)
+        .namespace(CMMN10_NS)
         .idAttributeReference(Sentry.class)
         .build();
 

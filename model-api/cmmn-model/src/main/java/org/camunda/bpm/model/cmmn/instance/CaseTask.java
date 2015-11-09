@@ -24,6 +24,10 @@ public interface CaseTask extends Task {
 
   void setCase(String caseInstance);
 
+  CaseRefExpression getCaseExpression();
+
+  void setCaseExpression(CaseRefExpression caseExpression);
+
   Collection<ParameterMapping> getParameterMappings();
 
   /** camunda extensions */

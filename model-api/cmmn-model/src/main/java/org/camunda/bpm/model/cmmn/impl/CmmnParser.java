@@ -12,20 +12,23 @@
  */
 package org.camunda.bpm.model.cmmn.impl;
 
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_10_SCHEMA_LOCATION;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_11_SCHEMA_LOCATION;
+
+import java.io.InputStream;
+
 import org.camunda.bpm.model.cmmn.Cmmn;
 import org.camunda.bpm.model.cmmn.CmmnModelException;
 import org.camunda.bpm.model.xml.ModelParseException;
-import org.camunda.bpm.model.xml.ModelValidationException;
 import org.camunda.bpm.model.xml.impl.ModelImpl;
 import org.camunda.bpm.model.xml.impl.parser.AbstractModelParser;
 import org.camunda.bpm.model.xml.impl.util.ReflectUtil;
 import org.camunda.bpm.model.xml.instance.DomDocument;
-import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.validation.SchemaFactory;
-import java.io.InputStream;
-import java.net.URL;
 
 /**
  * @author Roman Smirnov
@@ -33,46 +36,48 @@ import java.net.URL;
  */
 public class CmmnParser extends AbstractModelParser {
 
-    private static final String JAXP_SCHEMA_SOURCE = "http://java.sun.com/xml/jaxp/properties/schemaSource";
-    private static final String JAXP_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
+  private static final String JAXP_SCHEMA_SOURCE = "http://java.sun.com/xml/jaxp/properties/schemaSource";
+  private static final String JAXP_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
 
-   private static final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
+  private static final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
 
-   public CmmnParser() {
-     this.schemaFactory = SchemaFactory.newInstance(W3C_XML_SCHEMA);
-     URL cmmnSchema = ReflectUtil.getResource(CmmnModelConstants.CMMN_10_SCHEMA_LOCATION, CmmnParser.class.getClassLoader());
-     try {
-       this.schema = schemaFactory.newSchema(cmmnSchema);
-     } catch (SAXException e) {
-       throw new ModelValidationException("Unable to parse schema:" + cmmnSchema);
-     }
-   }
+  public CmmnParser() {
+    this.schemaFactory = SchemaFactory.newInstance(W3C_XML_SCHEMA);
+    addSchema(CMMN10_NS, createSchema(CMMN_10_SCHEMA_LOCATION, CmmnParser.class.getClassLoader()));
+    addSchema(CMMN11_NS, createSchema(CMMN_11_SCHEMA_LOCATION, CmmnParser.class.getClassLoader()));
+  }
 
-   @Override
-   protected void configureFactory(DocumentBuilderFactory dbf) {
-     dbf.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
-     dbf.setAttribute(JAXP_SCHEMA_SOURCE, ReflectUtil.getResource(CmmnModelConstants.CMMN_10_SCHEMA_LOCATION, CmmnParser.class.getClassLoader()).toString());
-     super.configureFactory(dbf);
-   }
+  @Override
+  protected void configureFactory(DocumentBuilderFactory dbf) {
+    dbf.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
 
-   @Override
-   protected CmmnModelInstanceImpl createModelInstance(DomDocument document) {
-     return new CmmnModelInstanceImpl((ModelImpl) Cmmn.INSTANCE.getCmmnModel(), Cmmn.INSTANCE.getCmmnModelBuilder(), document);
-   }
+    ClassLoader classLoader = CmmnParser.class.getClassLoader();
+    dbf.setAttribute(JAXP_SCHEMA_SOURCE, new String[] {
+        ReflectUtil.getResource(CMMN_10_SCHEMA_LOCATION, classLoader).toString(),
+        ReflectUtil.getResource(CMMN_11_SCHEMA_LOCATION, classLoader).toString() }
+    );
 
-   @Override
-   public CmmnModelInstanceImpl parseModelFromStream(InputStream inputStream) {
-     try {
-       return (CmmnModelInstanceImpl) super.parseModelFromStream(inputStream);
-     }
-     catch (ModelParseException e) {
-      throw new CmmnModelException("Unable to parse model", e);
-     }
-   }
+    super.configureFactory(dbf);
+  }
 
-   @Override
-   public CmmnModelInstanceImpl getEmptyModel() {
-     return (CmmnModelInstanceImpl) super.getEmptyModel();
-   }
+  @Override
+  protected CmmnModelInstanceImpl createModelInstance(DomDocument document) {
+    return new CmmnModelInstanceImpl((ModelImpl) Cmmn.INSTANCE.getCmmnModel(), Cmmn.INSTANCE.getCmmnModelBuilder(), document);
+  }
+
+  @Override
+  public CmmnModelInstanceImpl parseModelFromStream(InputStream inputStream) {
+    try {
+      return (CmmnModelInstanceImpl) super.parseModelFromStream(inputStream);
+    }
+    catch (ModelParseException e) {
+     throw new CmmnModelException("Unable to parse model", e);
+    }
+  }
+
+  @Override
+  public CmmnModelInstanceImpl getEmptyModel() {
+    return (CmmnModelInstanceImpl) super.getEmptyModel();
+  }
 
 }

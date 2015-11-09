@@ -12,13 +12,15 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_IS_BLOCKING;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_TASK;
 
 import java.util.Collection;
 
+import org.camunda.bpm.model.cmmn.instance.InputCaseParameter;
 import org.camunda.bpm.model.cmmn.instance.InputsCaseParameter;
+import org.camunda.bpm.model.cmmn.instance.OutputCaseParameter;
 import org.camunda.bpm.model.cmmn.instance.OutputsCaseParameter;
 import org.camunda.bpm.model.cmmn.instance.PlanItemDefinition;
 import org.camunda.bpm.model.cmmn.instance.Task;
@@ -37,8 +39,16 @@ import org.camunda.bpm.model.xml.type.child.SequenceBuilder;
 public class TaskImpl extends PlanItemDefinitionImpl implements Task {
 
   protected static Attribute<Boolean> isBlockingAttribute;
+
+  // cmmn 1.0
+  @Deprecated
   protected static ChildElementCollection<InputsCaseParameter> inputsCollection;
+  @Deprecated
   protected static ChildElementCollection<OutputsCaseParameter> outputsCollection;
+
+  // cmmn 1.1
+  protected static ChildElementCollection<InputCaseParameter> inputParameterCollection;
+  protected static ChildElementCollection<OutputCaseParameter> outputParameterCollection;
 
   public TaskImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
@@ -60,9 +70,17 @@ public class TaskImpl extends PlanItemDefinitionImpl implements Task {
     return outputsCollection.get(this);
   }
 
+  public Collection<InputCaseParameter> getInputParameters() {
+    return inputParameterCollection.get(this);
+  }
+
+  public Collection<OutputCaseParameter> getOutputParameters() {
+    return outputParameterCollection.get(this);
+  }
+
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(Task.class, CMMN_ELEMENT_TASK)
-        .namespaceUri(CMMN10_NS)
+        .namespaceUri(CMMN11_NS)
         .extendsType(PlanItemDefinition.class)
         .instanceProvider(new ModelTypeInstanceProvider<Task>() {
           public Task newInstance(ModelTypeInstanceContext instanceContext) {
@@ -80,6 +98,12 @@ public class TaskImpl extends PlanItemDefinitionImpl implements Task {
         .build();
 
     outputsCollection = sequenceBuilder.elementCollection(OutputsCaseParameter.class)
+        .build();
+
+    inputParameterCollection = sequenceBuilder.elementCollection(InputCaseParameter.class)
+        .build();
+
+    outputParameterCollection = sequenceBuilder.elementCollection(OutputCaseParameter.class)
         .build();
 
     typeBuilder.build();

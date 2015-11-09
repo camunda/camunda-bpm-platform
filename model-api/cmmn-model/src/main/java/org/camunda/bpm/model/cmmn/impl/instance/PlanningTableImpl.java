@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_PLANNING_TABLE;
 
 import java.util.Collection;
@@ -50,7 +50,7 @@ public class PlanningTableImpl extends TableItemImpl implements PlanningTable {
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(PlanningTable.class, CMMN_ELEMENT_PLANNING_TABLE)
-        .namespaceUri(CMMN10_NS)
+        .namespaceUri(CMMN11_NS)
         .extendsType(TableItem.class)
         .instanceProvider(new ModelTypeInstanceProvider<PlanningTable>() {
           public PlanningTable newInstance(ModelTypeInstanceContext instanceContext) {

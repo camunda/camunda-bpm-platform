@@ -33,7 +33,7 @@ public abstract class CmmnModelElementInstanceTest extends AbstractModelElementI
   }
 
   public String getDefaultNamespace() {
-    return CmmnModelConstants.CMMN10_NS;
+    return CmmnModelConstants.CMMN11_NS;
   }
 
 }

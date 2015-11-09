@@ -15,6 +15,7 @@ package org.camunda.bpm.model.cmmn.instance;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.camunda.bpm.model.cmmn.impl.CmmnModelConstants;
 import org.camunda.bpm.model.cmmn.impl.instance.PlanItemTransitionStandardEvent;
 
 /**
@@ -36,7 +37,8 @@ public class PlanItemOnPartTest extends CmmnModelElementInstanceTest {
   public Collection<AttributeAssumption> getAttributesAssumptions() {
     return Arrays.asList(
           new AttributeAssumption("sourceRef"),
-          new AttributeAssumption("sentryRef")
+          new AttributeAssumption(CmmnModelConstants.CMMN10_NS, "sentryRef"),
+          new AttributeAssumption("exitCriterionRef")
         );
   }
 

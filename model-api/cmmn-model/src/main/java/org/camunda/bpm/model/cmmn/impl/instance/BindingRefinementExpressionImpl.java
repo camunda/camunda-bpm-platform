@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_BINDING_REFINEMENT;
 
 import org.camunda.bpm.model.cmmn.instance.BindingRefinementExpression;
@@ -33,7 +33,7 @@ public class BindingRefinementExpressionImpl extends ExpressionImpl implements B
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(BindingRefinementExpression.class, CMMN_ELEMENT_BINDING_REFINEMENT)
-      .namespaceUri(CMMN10_NS)
+      .namespaceUri(CMMN11_NS)
       .extendsType(Expression.class)
       .instanceProvider(new ModelElementTypeBuilder.ModelTypeInstanceProvider<BindingRefinementExpression>() {
         public BindingRefinementExpression newInstance(ModelTypeInstanceContext instanceContext) {

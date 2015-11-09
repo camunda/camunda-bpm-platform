@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
-import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN10_NS;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_INPUT;
 
 import org.camunda.bpm.model.cmmn.instance.CaseParameter;
@@ -33,7 +33,7 @@ public class InputCaseParameterImpl extends CaseParameterImpl implements InputCa
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(InputCaseParameter.class, CMMN_ELEMENT_INPUT)
-      .namespaceUri(CMMN10_NS)
+      .namespaceUri(CMMN11_NS)
       .extendsType(CaseParameter.class)
       .instanceProvider(new ModelElementTypeBuilder.ModelTypeInstanceProvider<InputCaseParameter>() {
         public InputCaseParameter newInstance(ModelTypeInstanceContext instanceContext) {

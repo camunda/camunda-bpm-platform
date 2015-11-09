@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.model.cmmn.instance;
 
-
+import java.util.Collection;
 
 /**
  * @author Roman Smirnov
@@ -24,9 +24,13 @@ public interface CmmnElement extends CmmnModelElementInstance {
 
   void setId(String id);
 
+  @Deprecated
   String getDescription();
 
+  @Deprecated
   void setDescription(String description);
+
+  Collection<Documentation> getDocumentations();
 
   ExtensionElements getExtensionElements();
 
