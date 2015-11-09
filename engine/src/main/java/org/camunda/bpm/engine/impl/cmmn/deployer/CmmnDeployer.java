@@ -34,7 +34,7 @@ import java.util.List;
  */
 public class CmmnDeployer extends AbstractDefinitionDeployer<CaseDefinitionEntity> {
 
-  public static final String[] CMMN_RESOURCE_SUFFIXES = new String[] { "cmmn10.xml", "cmmn" };
+  public static final String[] CMMN_RESOURCE_SUFFIXES = new String[] { "cmmn11.xml", "cmmn10.xml", "cmmn" };
 
   protected ExpressionManager expressionManager;
   protected CmmnTransformer transformer;

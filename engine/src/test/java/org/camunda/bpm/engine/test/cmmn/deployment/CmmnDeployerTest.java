@@ -99,4 +99,38 @@ public class CmmnDeployerTest extends PluggableProcessEngineTestCase {
     assertEquals("org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testMultipleDiagramResourcesProvided.c.png", caseC.getDiagramResourceName());
   }
 
+  public void testDeployCmmn10XmlFile() {
+    verifyCmmnResourceDeployed("org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testDeployCmmn10XmlFile.cmmn10.xml");
+
+  }
+
+  public void testDeployCmmn11XmlFile() {
+    verifyCmmnResourceDeployed("org/camunda/bpm/engine/test/cmmn/deployment/CmmnDeploymentTest.testDeployCmmn11XmlFile.cmmn11.xml");
+  }
+
+  protected void verifyCmmnResourceDeployed(String resourcePath) {
+    String deploymentId = processEngine
+        .getRepositoryService()
+        .createDeployment()
+        .addClasspathResource(resourcePath)
+        .deploy()
+        .getId();
+
+    // there should be one deployment
+    RepositoryService repositoryService = processEngine.getRepositoryService();
+    DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
+
+    assertEquals(1, deploymentQuery.count());
+
+    // there should be one case definition
+    CaseDefinitionQuery query = processEngine.getRepositoryService().createCaseDefinitionQuery();
+    assertEquals(1, query.count());
+
+    CaseDefinition caseDefinition = query.singleResult();
+    assertEquals("Case_1", caseDefinition.getKey());
+
+    processEngine.getRepositoryService().deleteDeployment(deploymentId);
+
+  }
+
 }
