@@ -27,6 +27,17 @@
     </dependency>
     
     <dependency>
+      <groupId>org.camunda.bpm.model</groupId>
+      <artifactId>camunda-cmmn-model</artifactId>
+      <version>7.2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.camunda.bpm.model</groupId>
+      <artifactId>camunda-xml-model</artifactId>
+      <version>7.2.0</version>
+    </dependency>
+    
+    <dependency>
       <groupId>org.camunda.bpm.qa.upgrade</groupId>
       <artifactId>camunda-qa-upgrade-scenario-util</artifactId>
       <version>${project.version}</version>
