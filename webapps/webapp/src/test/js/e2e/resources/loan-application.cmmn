@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
 <definitions name="Loan Application" 
-                  xmlns="http://www.omg.org/spec/CMMN/20131201/MODEL"
+                  xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
                   xmlns:camunda="http://camunda.org/schema/1.0/cmmn"
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   targetNamespace="Examples">
 
   <case id="loanApplicationCase" name="Loan Application">
 
-    <casePlanModel exitCriteriaRefs="Sentry_3">
+    <casePlanModel id="CasePlanModel_1" >
 
       <planItem definitionRef="collectDataStage" id="PI_collectDataStage" />
-      <planItem definitionRef="dataCollectedMilestone" entryCriteriaRefs="Sentry_1" id="PI_dataCollectedMilestone" />
-      <planItem definitionRef="decideHumanTask" entryCriteriaRefs="Sentry_2" id="PI_decideHumanTask" />
+      <planItem definitionRef="dataCollectedMilestone" id="PI_dataCollectedMilestone">
+        <entryCriterion sentryRef="Sentry_1" />
+      </planItem>
+      <planItem definitionRef="decideHumanTask" id="PI_decideHumanTask">
+        <entryCriterion sentryRef="Sentry_2" />
+      </planItem>
       <planItem definitionRef="customerRetiredUserEvent" id="PI_customerRetiredUserEvent" />
       
       <sentry id="Sentry_1">
@@ -45,9 +49,7 @@
       <humanTask name="Decide About Loan Application" id="decideHumanTask" camunda:assignee="jonny1">
         <defaultControl>
           <manualActivationRule>
-            <condition>
-              <body>${false}</body>
-            </condition>
+            <condition>${false}</condition>
           </manualActivationRule>
         </defaultControl>
       </humanTask>
@@ -62,7 +64,9 @@
 
       <milestone name="Data collected" id="dataCollectedMilestone" />
 
-      <userEvent name="Customer retired" id="customerRetiredUserEvent" />
+      <userEventListener name="Customer retired" id="customerRetiredUserEvent" />
+
+      <exitCriterion sentryRef="Sentry_3" />
 
     </casePlanModel>
 
