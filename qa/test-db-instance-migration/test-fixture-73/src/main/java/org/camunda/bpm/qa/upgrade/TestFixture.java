@@ -29,6 +29,7 @@ import org.camunda.bpm.qa.upgrade.scenarios.compensation.ParallelMultiInstanceCo
 import org.camunda.bpm.qa.upgrade.scenarios.compensation.SequentialMultiInstanceCompensationScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.compensation.SingleActivityCompensationScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.compensation.SingleActivityConcurrentCompensationScenario;
+import org.camunda.bpm.qa.upgrade.scenarios.job.JobMigrationScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.sentry.SentryScenario;
 
 /**
@@ -75,6 +76,9 @@ public class TestFixture {
     runner.setupScenarios(InterruptingEventSubProcessCompensationScenario.class);
     runner.setupScenarios(NonInterruptingEventSubProcessCompensationScenario.class);
     runner.setupScenarios(InterruptingEventSubProcessNestedCompensationScenario.class);
+
+    // job
+    runner.setupScenarios(JobMigrationScenario.class);
 
     processEngine.close();
   }
