@@ -15,22 +15,6 @@
     <camunda.version.current>7.2.0</camunda.version.current>
   </properties>
 
-  <dependencies>
-    <!-- NOTE: this pulls transitive dependencies of version ${project.version} in unless
-      you declare them to be ${camunda.version.current} here -->
-    <dependency>
-      <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine</artifactId>
-      <version>${camunda.version.current}</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.camunda.bpm.qa.upgrade</groupId>
-      <artifactId>camunda-qa-upgrade-scenario-util</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-  </dependencies>
-
   <build>
     <resources>
       <resource>
@@ -49,6 +33,21 @@
   <profiles>
     <profile>
       <id>instance-migration</id>
+      <dependencies>
+        <!-- NOTE: this pulls transitive dependencies of version ${project.version} in unless
+          you declare them to be ${camunda.version.current} here -->
+        <dependency>
+          <groupId>org.camunda.bpm</groupId>
+          <artifactId>camunda-engine</artifactId>
+          <version>${camunda.version.current}</version>
+        </dependency>
+        
+        <dependency>
+          <groupId>org.camunda.bpm.qa.upgrade</groupId>
+          <artifactId>camunda-qa-upgrade-scenario-util</artifactId>
+          <version>${project.version}</version>
+        </dependency>
+      </dependencies>
       <build>
         <plugins>
           <plugin>

@@ -16,21 +16,7 @@
     <camunda.version.previous>7.2.0</camunda.version.previous>
   </properties>
   
-  <dependencies>
-    <!-- NOTE: this pulls transitive dependencies of version ${project.version} in unless
-      you declare them to be ${camunda.version.current} here -->
-    <dependency>
-      <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine</artifactId>
-      <version>${camunda.version.current}</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.camunda.bpm.qa.upgrade</groupId>
-      <artifactId>camunda-qa-upgrade-scenario-util</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-  </dependencies>
+  
 
   <build>
     <resources>
@@ -45,41 +31,26 @@
         <filtering>true</filtering>
       </testResource>
     </testResources>
-
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <executions>
-            <execution>
-              <id>unpack-current-sql-scripts</id>
-              <phase>generate-test-resources</phase>
-              <goals>
-                <goal>unpack</goal>
-              </goals>
-              <configuration>
-                <artifactItems>
-                  <artifactItem>
-                    <groupId>org.camunda.bpm.distro</groupId>
-                    <artifactId>camunda-sql-scripts</artifactId>
-                    <version>${camunda.version.current}</version>
-                    <type>test-jar</type>
-                    <outputDirectory>${project.build.directory}/scripts-current</outputDirectory>
-                    <overWrite>true</overWrite>
-                  </artifactItem>
-                </artifactItems>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-      </plugins>
-    </pluginManagement>
   </build>
 
   <profiles>
     <profile>
       <id>instance-migration</id>
+      <dependencies>
+        <!-- NOTE: this pulls transitive dependencies of version ${project.version} in unless
+          you declare them to be ${camunda.version.current} here -->
+        <dependency>
+          <groupId>org.camunda.bpm</groupId>
+          <artifactId>camunda-engine</artifactId>
+          <version>${camunda.version.current}</version>
+        </dependency>
+        
+        <dependency>
+          <groupId>org.camunda.bpm.qa.upgrade</groupId>
+          <artifactId>camunda-qa-upgrade-scenario-util</artifactId>
+          <version>${project.version}</version>
+        </dependency>
+      </dependencies>
       <build>
         <plugins>
           <plugin>
@@ -112,10 +83,31 @@
             </executions>
           </plugin>
 
-          <!-- provide sql scripts -->
+          <!-- unpack SQL scripts -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>unpack-current-sql-scripts</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.camunda.bpm.distro</groupId>
+                      <artifactId>camunda-sql-scripts</artifactId>
+                      <version>${camunda.version.current}</version>
+                      <type>test-jar</type>
+                      <outputDirectory>${project.build.directory}/scripts-current</outputDirectory>
+                      <overWrite>true</overWrite>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
 
           <!-- parse version properties from qa/pom.xml -->
