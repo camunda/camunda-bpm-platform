@@ -29,7 +29,6 @@ import org.camunda.bpm.container.impl.metadata.spi.JobAcquisitionXml;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEnginePluginXml;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.junit.Test;
@@ -43,6 +42,7 @@ import static org.junit.Assert.*;
 public class PlatformJobExecutorActivateTest {
 
   private static final String ENGINE_NAME = "PlatformJobExecutorActivateTest-engine";
+  private static final String ACQUISITION_NAME = "PlatformJobExecutorActivateTest-acquisition";
 
   @Test
   public void shouldAutoActivateIfNoPropertySet() {
@@ -56,7 +56,7 @@ public class PlatformJobExecutorActivateTest {
     deployPlatform(bpmPlatformXml);
 
     try {
-      ProcessEngine processEngine = ProcessEngines.getProcessEngine(ENGINE_NAME);
+      ProcessEngine processEngine = getProcessEngine(ENGINE_NAME);
       ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
       // then
       assertEquals(true, processEngineConfiguration.getJobExecutor().isActive());
@@ -83,7 +83,7 @@ public class PlatformJobExecutorActivateTest {
     deployPlatform(bpmPlatformXml);
 
     try {
-      ProcessEngine processEngine = ProcessEngines.getProcessEngine(ENGINE_NAME);
+      ProcessEngine processEngine = getProcessEngine(ENGINE_NAME);
       ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
       // then
       assertEquals(false, processEngineConfiguration.getJobExecutor().isActive());
@@ -94,6 +94,11 @@ public class PlatformJobExecutorActivateTest {
   }
 
 
+  protected ProcessEngine getProcessEngine(String engineName) {
+    RuntimeContainerDelegateImpl containerDelegate = (RuntimeContainerDelegateImpl) RuntimeContainerDelegate.INSTANCE.get();
+    return containerDelegate.getProcessEngine(engineName);
+  }
+
   private ProcessEngineXmlImpl defineProcessEngine() {
     ProcessEngineXmlImpl processEngineXml = new ProcessEngineXmlImpl();
     HashMap<String, String> properties = new HashMap<String, String>();
@@ -101,7 +106,7 @@ public class PlatformJobExecutorActivateTest {
     processEngineXml.setProperties(properties);
     processEngineXml.setPlugins(new ArrayList<ProcessEnginePluginXml>());
     processEngineXml.setName(ENGINE_NAME);
-    processEngineXml.setJobAcquisitionName("default");
+    processEngineXml.setJobAcquisitionName(ACQUISITION_NAME);
     processEngineXml.setConfigurationClass(StandaloneInMemProcessEngineConfiguration.class.getName());
     processEngineXml.setDefault(true);
     return processEngineXml;
@@ -111,7 +116,7 @@ public class PlatformJobExecutorActivateTest {
   private JobExecutorXmlImpl defineJobExecutor() {
     JobAcquisitionXmlImpl jobAcquisition = new JobAcquisitionXmlImpl();
     jobAcquisition.setProperties(new HashMap<String, String>());
-    jobAcquisition.setName("default");
+    jobAcquisition.setName(ACQUISITION_NAME);
     JobExecutorXmlImpl jobExecutorXml = new JobExecutorXmlImpl();
     jobExecutorXml.setProperties(new HashMap<String, String>());
     jobExecutorXml.setJobAcquisitions(Collections.<JobAcquisitionXml>singletonList(jobAcquisition));
