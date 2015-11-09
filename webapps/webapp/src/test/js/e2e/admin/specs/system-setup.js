@@ -34,6 +34,29 @@ module.exports = {
         varId: 'testVar',
         value: 42,
         type: 'Integer'
+      }]),
+
+      operation('deployment', 'create', [{
+        deploymentName: 'assign-approver',
+        files: [{
+          name: 'assign-approver-groups.dmn',
+          content: fs.readFileSync(__dirname + '/../../resources/assign-approver-groups.dmn').toString()
+        }]
+      },{
+        deploymentName: 'invoice',
+        files: [{
+          name: 'invoice.bpmn',
+          content: fs.readFileSync(__dirname + '/../../resources/invoice.bpmn').toString()
+        }]
+      }]),
+
+      operation('process-definition', 'start', [{
+        key: 'invoice',
+        businessKey: 'invoice1',
+        variables: {
+          amount: { value: 100 },
+          invoiceCategory: { value: 'travelExpenses' }
+        }
       }])
 
 )};

@@ -9,7 +9,7 @@ module.exports = Page.extend({
   selectSystemNavbarItem: function(navbarItem) {
     var index = [
       'General',
-      'Flow Node Count',
+      'Execution Metrics',
       'License Key'
     ];
     var item;

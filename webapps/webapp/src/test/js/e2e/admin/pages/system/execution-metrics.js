@@ -4,10 +4,14 @@ var Page = require('./system-base');
 
 module.exports = Page.extend({
 
-  url: '/camunda/app/admin/default/#/system?section=system-settings-flow-node-count',
+  url: '/camunda/app/admin/default/#/system?section=system-settings-metrics',
 
-  resultField: function() {
-    return element(by.binding('activityInstances')).getText();
+  flowNodesResult: function() {
+    return element(by.binding('metrics.flowNodes')).getText();
+  },
+
+  decisionElementsResult: function() {
+    return element(by.binding('metrics.decisionElements')).getText();
   },
 
   startDateField: function(inputValue) {

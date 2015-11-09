@@ -43,15 +43,16 @@ describe('Admin system Spec', function() {
     });
 
 
-    it('should validate flow node count page', function() {
+    it('should validate metrics page', function() {
 
       // when
-      systemPage.selectSystemNavbarItem('Flow Node Count');
+      systemPage.selectSystemNavbarItem('Execution Metrics');
 
       // then
-      systemPage.flowNodeCount.isActive();
-      expect(systemPage.flowNodeCount.boxHeader()).to.eventually.eql('Flow Node Count');
-      expect(systemPage.flowNodeCount.resultField()).to.eventually.eql('3');
+      systemPage.executionMetrics.isActive();
+      expect(systemPage.executionMetrics.boxHeader()).to.eventually.eql('Execution Metrics');
+      expect(systemPage.executionMetrics.flowNodesResult()).to.eventually.eql('6');
+      expect(systemPage.executionMetrics.decisionElementsResult()).to.eventually.eql('9');
     });
 
 
@@ -61,15 +62,17 @@ describe('Admin system Spec', function() {
       // we are on the flow node count page
 
       // when
-      systemPage.flowNodeCount.startDateField().clear();
-      systemPage.flowNodeCount.endDateField().clear();
+      systemPage.executionMetrics.startDateField().clear();
+      systemPage.executionMetrics.endDateField().clear();
 
-      systemPage.flowNodeCount.startDateField('2014-01-01T00:00:00');
-      systemPage.flowNodeCount.endDateField('2014-12-31T23:59:59');
-      systemPage.flowNodeCount.refreshButton().click();
+      systemPage.executionMetrics.startDateField('2014-01-01T00:00:00');
+      systemPage.executionMetrics.endDateField('2014-12-31T23:59:59');
+      systemPage.executionMetrics.refreshButton().click();
 
       // then
-      expect(systemPage.flowNodeCount.resultField()).to.eventually.eql('0');
+      // expect(systemPage.executionMetrics.resultField()).to.eventually.eql('0');
+      expect(systemPage.executionMetrics.flowNodesResult()).to.eventually.eql('0');
+      expect(systemPage.executionMetrics.decisionElementsResult()).to.eventually.eql('0');
     });
 
 
