@@ -266,17 +266,17 @@ define([
       resourceId = getPropertyFromLocation('resource');
       resourceName = getPropertyFromLocation('resourceName');
 
-      if (oldDeploymentsSortBy !== deploymentsSortBy || oldDeploymentsSortOrder !== deploymentsSortOrder) {
+      if (deploymentsSortBy && oldDeploymentsSortBy !== deploymentsSortBy || deploymentsSortOrder && oldDeploymentsSortOrder !== deploymentsSortOrder) {
         repositoryData.changed('deploymentsSorting');
       }
 
-      if (oldDeploymentsPage !== deploymentsPage) {
+      if (deploymentsPage && oldDeploymentsPage !== deploymentsPage) {
         repositoryData.changed('deploymentsPagination');
       }
-      else if (oldDeploymentId !== deploymentId) {
+      else if (deploymentId && oldDeploymentId !== deploymentId) {
         repositoryData.changed('currentDeployment');
       }
-      else if (oldResourceId !== resourceId || oldResourceName !== resourceName) {
+      else if (resourceId && oldResourceId !== resourceId || resourceName && oldResourceName !== resourceName) {
         repositoryData.changed('resourceId');
       }
     });
