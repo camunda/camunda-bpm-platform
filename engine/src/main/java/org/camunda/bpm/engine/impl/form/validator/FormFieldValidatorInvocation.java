@@ -25,6 +25,7 @@ public class FormFieldValidatorInvocation extends DelegateInvocation {
   protected FormFieldValidatorContext validatorContext;
 
   public FormFieldValidatorInvocation(FormFieldValidator formFieldValidator, Object submittedValue, FormFieldValidatorContext validatorContext) {
+    super(null, null);
     this.formFieldValidator = formFieldValidator;
     this.submittedValue = submittedValue;
     this.validatorContext = validatorContext;
@@ -36,10 +37,6 @@ public class FormFieldValidatorInvocation extends DelegateInvocation {
 
   public Boolean getInvocationResult() {
     return (Boolean) super.getInvocationResult();
-  }
-
-  public Object getTarget() {
-    return formFieldValidator;
   }
 
 }

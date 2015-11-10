@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.delegate;
 
+import org.camunda.bpm.engine.delegate.BaseDelegateExecution;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
@@ -26,6 +27,11 @@ public class ScriptInvocation extends DelegateInvocation {
   protected VariableScope scope;
 
   public ScriptInvocation(ExecutableScript script, VariableScope scope) {
+    this(script, scope, null);
+  }
+
+  public ScriptInvocation(ExecutableScript script, VariableScope scope, BaseDelegateExecution contextExecution) {
+    super(contextExecution, null);
     this.script = script;
     this.scope = scope;
   }
@@ -35,10 +41,6 @@ public class ScriptInvocation extends DelegateInvocation {
       .getProcessEngineConfiguration()
       .getScriptingEnvironment()
       .execute(script, scope);
-  }
-
-  public Object getTarget() {
-    return script;
   }
 
 }

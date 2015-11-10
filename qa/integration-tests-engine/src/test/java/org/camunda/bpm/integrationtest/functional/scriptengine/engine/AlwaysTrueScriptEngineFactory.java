@@ -12,35 +12,22 @@
  */
 package org.camunda.bpm.integrationtest.functional.scriptengine.engine;
 
-import java.io.Reader;
-
-import javax.script.AbstractScriptEngine;
-import javax.script.Bindings;
 import javax.script.ScriptContext;
-import javax.script.ScriptEngineFactory;
-import javax.script.ScriptException;
-import javax.script.SimpleBindings;
 
 /**
- * @author Roman Smirnov
+ * @author Thorben Lindhauer
  *
  */
-public class DummyScriptEngine extends AbstractScriptEngine {
+public class AlwaysTrueScriptEngineFactory extends AbstractScriptEngineFactory {
 
-  public Object eval(String script, ScriptContext context) throws ScriptException {
-    return script;
-  }
+  public AlwaysTrueScriptEngineFactory() {
+    super("always-true", "0.1.0", new ScriptEngineBehavior() {
 
-  public Object eval(Reader reader, ScriptContext context) throws ScriptException {
-    return null;
-  }
-
-  public Bindings createBindings() {
-    return new SimpleBindings();
-  }
-
-  public ScriptEngineFactory getFactory() {
-    return new DummyScriptEngineFactory();
+      @Override
+      public Object eval(String script, ScriptContext context) {
+        return true;
+      }
+    });
   }
 
 }

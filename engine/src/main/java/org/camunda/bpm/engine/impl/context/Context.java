@@ -121,7 +121,6 @@ public class Context {
     }
   }
 
-
   public static void setExecutionContext(ExecutionEntity execution) {
     getStack(executionContextStackThreadLocal).push(new BpmnExecutionContext(execution));
   }

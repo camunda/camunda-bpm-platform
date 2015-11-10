@@ -28,6 +28,7 @@ public class SubmitFormVariablesInvocation extends DelegateInvocation {
 
 
   public SubmitFormVariablesInvocation(FormHandler formHandler, VariableMap properties, VariableScope variableScope) {
+    super(null, null);
     this.formHandler = formHandler;
     this.properties = properties;
     this.variableScope = variableScope;
@@ -35,10 +36,6 @@ public class SubmitFormVariablesInvocation extends DelegateInvocation {
 
   protected void invoke() throws Exception {
     formHandler.submitFormVariables(properties, variableScope);
-  }
-
-  public Object getTarget() {
-    return formHandler;
   }
 
 }

@@ -14,6 +14,8 @@
 package org.camunda.bpm.engine.impl.el;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.BaseDelegateExecution;
+import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.VariableScope;
 
 /**
@@ -32,6 +34,10 @@ public class FixedValue implements Expression {
 
   public Object getValue(VariableScope variableScope) {
     return value;
+  }
+
+  public Object getValue(VariableScope variableScope, BaseDelegateExecution contextExecution) {
+    return getValue(variableScope);
   }
 
   public void setValue(Object value, VariableScope variableScope) {

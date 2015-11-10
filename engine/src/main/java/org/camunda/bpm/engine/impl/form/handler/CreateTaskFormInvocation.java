@@ -25,16 +25,13 @@ public class CreateTaskFormInvocation extends DelegateInvocation {
   protected TaskEntity task;
 
   public CreateTaskFormInvocation(TaskFormHandler taskFormHandler, TaskEntity task) {
+    super(null, null);
     this.taskFormHandler = taskFormHandler;
     this.task = task;
   }
 
   protected void invoke() throws Exception {
     invocationResult = taskFormHandler.createTaskForm(task);
-  }
-
-  public Object getTarget() {
-    return taskFormHandler;
   }
 
 }

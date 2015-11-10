@@ -17,6 +17,7 @@ import org.camunda.bpm.dmn.engine.DmnDecisionResult;
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.delegate.DelegateInvocation;
+import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.variable.context.VariableContext;
 
@@ -39,6 +40,7 @@ public class DecisionInvocation extends DelegateInvocation {
   protected VariableContext variableContext;
 
   public DecisionInvocation(DecisionDefinition decisionDefinition, VariableContext variableContext) {
+    super(null, (DecisionDefinitionEntity) decisionDefinition);
     this.decisionDefinition = decisionDefinition;
     this.variableContext = variableContext;
   }
@@ -48,10 +50,6 @@ public class DecisionInvocation extends DelegateInvocation {
       .getDmnEngine();
 
     invocationResult = dmnEngine.evaluate((DmnDecision) decisionDefinition, variableContext);
-  }
-
-  public Object getTarget() {
-    return decisionDefinition;
   }
 
   public DmnDecisionResult getInvocationResult() {

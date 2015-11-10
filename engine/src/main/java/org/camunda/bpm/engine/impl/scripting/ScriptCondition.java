@@ -38,7 +38,7 @@ public class ScriptCondition implements Condition {
   }
 
   public boolean evaluate(DelegateExecution execution) {
-    ScriptInvocation invocation = new ScriptInvocation(script, execution);
+    ScriptInvocation invocation = new ScriptInvocation(script, execution, execution);
     try {
       Context
         .getProcessEngineConfiguration()

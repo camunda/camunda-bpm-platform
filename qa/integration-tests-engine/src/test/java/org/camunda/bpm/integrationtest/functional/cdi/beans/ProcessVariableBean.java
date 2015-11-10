@@ -10,17 +10,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.cmmn.behavior;
+package org.camunda.bpm.integrationtest.functional.cdi.beans;
 
-import org.camunda.bpm.engine.delegate.VariableScope;
-import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.camunda.bpm.engine.cdi.annotation.ProcessVariable;
 
 /**
- * @author Roman Smirnov
+ * @author Thorben Lindhauer
  *
  */
-public interface TransferVariablesActivityBehavior extends CmmnActivityBehavior {
+@Named
+public class ProcessVariableBean {
 
-  public void transferVariables(VariableScope sourceScope, CmmnActivityExecution caseExecution);
+  @Inject
+  @ProcessVariable
+  protected Object var;
 
+  public String getNewValue() {
+    return var.toString() + var.toString();
+  }
 }

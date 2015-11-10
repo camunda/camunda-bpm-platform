@@ -15,12 +15,7 @@ package org.camunda.bpm.engine.impl.task.delegate;
 import org.camunda.bpm.engine.delegate.BaseDelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
-import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
-import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.context.CoreExecutionContext;
-import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.delegate.DelegateInvocation;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
 /**
  * Class handling invocations of {@link TaskListener TaskListeners}
@@ -37,32 +32,13 @@ public class TaskListenerInvocation extends DelegateInvocation {
   }
 
   public TaskListenerInvocation(TaskListener taskListenerInstance, DelegateTask delegateTask, BaseDelegateExecution contextExecution) {
+    super(contextExecution, null);
     this.taskListenerInstance = taskListenerInstance;
     this.delegateTask = delegateTask;
-    this.contextExecution = contextExecution;
   }
 
   protected void invoke() throws Exception {
-    CoreExecutionContext<? extends CoreExecution> executionContext = Context.getCoreExecutionContext();
-    try {
-      if (executionContext == null) {
-        if (contextExecution instanceof ExecutionEntity) {
-          Context.setExecutionContext((ExecutionEntity) contextExecution);
-        } else {
-          Context.setExecutionContext((CaseExecutionEntity) contextExecution);
-        }
-      }
-      taskListenerInstance.notify(delegateTask);
-    }
-    finally {
-      if (executionContext == null) {
-        Context.removeExecutionContext();
-      }
-    }
-  }
-
-  public Object getTarget() {
-    return taskListenerInstance;
+    taskListenerInstance.notify(delegateTask);
   }
 
 }

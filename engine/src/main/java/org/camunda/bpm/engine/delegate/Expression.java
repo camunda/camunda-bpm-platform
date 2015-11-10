@@ -13,17 +13,17 @@
 
 package org.camunda.bpm.engine.delegate;
 
-
-
 /**
  * @author Frederik Heremans
  */
 public interface Expression {
 
-   Object getValue(VariableScope variableScope);
+  // public API for field injection
 
-   void setValue(Object value, VariableScope variableScope);
+  Object getValue(VariableScope variableScope);
 
-   String getExpressionText();
+  void setValue(Object value, VariableScope variableScope);
+
+  String getExpressionText();
 
 }

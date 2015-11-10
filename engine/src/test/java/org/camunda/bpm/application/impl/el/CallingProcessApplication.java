@@ -30,11 +30,9 @@ import org.camunda.bpm.engine.impl.javax.el.ELResolver;
 )
 public class CallingProcessApplication extends EmbeddedProcessApplication {
 
-  public static final String STRING_VARIABLE_VALUE = "aVariableValue";
-
   protected ELResolver initProcessApplicationElResolver() {
     Map<Object, Object> resolvableValues = new HashMap<Object, Object>();
-    resolvableValues.put("aStringValue", STRING_VARIABLE_VALUE);
+    resolvableValues.put("shouldTakeFlow", true);
 
     return new ReadOnlyMapELResolver(resolvableValues);
   }

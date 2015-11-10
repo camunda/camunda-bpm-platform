@@ -1,34 +1,36 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.delegate;
+package org.camunda.bpm.integrationtest.functional.cdi.beans;
 
-import org.camunda.bpm.engine.impl.javax.el.ValueExpression;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.camunda.bpm.engine.CaseService;
+import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
 
 /**
- * Baseclass responsible for handling invocations of Expressions
- * 
- * @author Daniel Meyer
+ * @author Thorben Lindhauer
+ *
  */
-public abstract class ExpressionInvocation extends DelegateInvocation {
+@Named
+public class CaseVariableBean {
 
-  protected final ValueExpression valueExpression;
-  
-  public ExpressionInvocation(ValueExpression valueExpression) {
-    this.valueExpression = valueExpression;
-  }
+  @Inject
+  protected CaseService caseService;
 
-  public Object getTarget() {
-    return valueExpression; 
+  public String getNewValue(DelegateCaseExecution caseExecution) {
+    Object variableValue = caseService.getVariable(caseExecution.getId(), "var");
+
+    return variableValue.toString() + variableValue.toString();
   }
-  
 }

@@ -36,7 +36,7 @@ public class OutputVariablesPropagator implements TreeVisitor<ActivityExecution>
       ActivityImpl activity = superExecution.getActivity();
       SubProcessActivityBehavior subProcessActivityBehavior = (SubProcessActivityBehavior) activity.getActivityBehavior();
 
-      subProcessActivityBehavior.passOutputVariablesFromSubprocess(superExecution, execution);
+      subProcessActivityBehavior.passOutputVariables(superExecution, execution);
     }
   }
 
