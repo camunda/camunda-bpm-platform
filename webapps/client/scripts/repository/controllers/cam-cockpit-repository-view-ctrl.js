@@ -157,7 +157,6 @@ define([
           updateSilently({
             deployment: focused.id,
             resource: null,
-            resourceName: null,
             viewbox: null,
             editMode: null
           });
@@ -169,7 +168,6 @@ define([
         updateSilently({
           deployment: null,
           resource: null,
-          resourceName: null,
           viewbox: null,
           editMode: null
         });
@@ -208,7 +206,7 @@ define([
         };
       }
       else if (resourceName) {
-
+        resources = resources || [];
         for(var i=0, resource; !!(resource = resources[i]); i++) {
           if (resource.name === resourceName) {
             return {
