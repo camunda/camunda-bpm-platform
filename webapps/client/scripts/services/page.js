@@ -15,9 +15,11 @@ define(['angular'], function(angular) {
 
   return [
     '$rootScope',
+    '$location',
     'camAPI',
   function(
     $rootScope,
+    $location,
     camAPI
   ) {
 
@@ -34,6 +36,13 @@ define(['angular'], function(angular) {
     $rootScope.$on('page.title.changed', function() {
       headTitle.text(page.title);
     });
+
+
+
+    $rootScope.isActivePage = function (pageName) {
+      return $location.path().indexOf('/' + pageName) === 0 ? 'active' : '';
+    };
+
 
     function getUserProfile(auth) {
       if (!auth || !auth.name) {

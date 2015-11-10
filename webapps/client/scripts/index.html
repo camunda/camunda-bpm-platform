@@ -58,6 +58,12 @@
          user-name="userFullName"
          current-app="cockpit"
          brand-name="Camunda Cockpit">
+      <ul ng-cloak
+          cam-if-logged-in
+          class="navbar-nav">
+        <li ng-class="isActivePage('dashboard')"><a href="#/dashboard">Dashboard</a></li>
+        <li ng-class="isActivePage('repository')"><a href="#/repository">Deployments</a></li>
+      </ul>
     </div>
 
     <!-- content -->

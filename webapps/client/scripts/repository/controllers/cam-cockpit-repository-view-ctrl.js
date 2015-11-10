@@ -13,6 +13,7 @@ define([
     '$timeout',
     'search',
     'dataDepend',
+    'page',
     'camAPI',
   function(
     $scope,
@@ -21,8 +22,13 @@ define([
     $timeout,
     search,
     dataDepend,
+    page,
     camAPI
   ) {
+    page.titleSet([
+      'Camunda Cockpit',
+      'Deployments'
+    ].join(' | '));
 
     // utilities /////////////////////////////////////////////////////////////////
 
