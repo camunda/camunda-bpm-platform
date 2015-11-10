@@ -54,6 +54,28 @@ describe('Repository Spec', function() {
       expect(deploymentsPage.deploymentName(0)).to.eventually.eql('first-deployment');
     });
 
+    it('should change sorting order on URL change', function() {
+      browser.getLocationAbsUrl().then(function(url) {
+
+        expect(url).to.contain('deploymentsSortBy=name');
+
+        var location = url.substr(url.indexOf('#') + 2);
+
+        location = location.replace('deploymentsSortBy=name', 'deploymentsSortBy=id');
+
+        browser.setLocation(location).then(function() {
+          expect(deploymentsPage.sortingBy()).to.eventually.eql('Id');
+        });
+
+      });
+    });
+
+    it('should preserve sorting order on unrelated URL change', function() {
+      browser.setLocation('repository').then(function() {
+        expect(deploymentsPage.sortingBy()).to.eventually.eql('Id');
+      });
+    });
+
   });
 
   describe('deployments search', function() {
