@@ -13,13 +13,12 @@
 package org.camunda.bpm.container.impl.deployment.jobexecutor;
 
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import org.camunda.bpm.container.impl.ContainerIntegrationLogger;
 import org.camunda.bpm.container.impl.spi.PlatformServiceContainer;
 import org.camunda.bpm.container.impl.spi.DeploymentOperation;
 import org.camunda.bpm.container.impl.spi.DeploymentOperationStep;
 import org.camunda.bpm.container.impl.spi.ServiceTypes;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 /**
  * <p>Deployment operation step responsible for stopping all job acquisitions</p>
@@ -29,7 +28,7 @@ import org.camunda.bpm.container.impl.spi.ServiceTypes;
  */
 public class StopJobExecutorStep extends DeploymentOperationStep {
 
-  private final static Logger LOGGER = Logger.getLogger(StopJobExecutorStep.class.getName());
+  protected final static ContainerIntegrationLogger LOG = ProcessEngineLogger.CONTAINER_INTEGRATION_LOGGER;
 
   public String getName() {
     return "Stop managed job acquisitions";
@@ -44,8 +43,9 @@ public class StopJobExecutorStep extends DeploymentOperationStep {
     for (String serviceName : jobExecutorServiceNames) {
       try {
         serviceContainer.stopService(serviceName);
-      } catch(Exception e) {
-        LOGGER.log(Level.WARNING, "Exception while stopping job executor service: "+e.getMessage(), e);
+      }
+      catch(Exception e) {
+        LOG.exceptionWhileStopping("Job Executor Service", serviceName, e);
       }
     }
 

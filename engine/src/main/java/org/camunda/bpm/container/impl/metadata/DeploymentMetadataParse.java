@@ -12,25 +12,16 @@
  */
 package org.camunda.bpm.container.impl.metadata;
 
-import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.CONFIGURATION;
-import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.DATASOURCE;
-import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.DEFAULT;
 import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.*;
-import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.JOB_ACQUISITION;
-import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.NAME;
-import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.PROPERTIES;
-import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.PROPERTY;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import org.camunda.bpm.container.impl.ContainerIntegrationLogger;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEnginePluginXml;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 import org.camunda.bpm.engine.impl.util.xml.Parse;
 import org.camunda.bpm.engine.impl.util.xml.Parser;
@@ -45,7 +36,7 @@ import org.camunda.bpm.engine.impl.util.xml.Parser;
  */
 public abstract class DeploymentMetadataParse extends Parse {
 
-  private final static Logger LOGGER = Logger.getLogger(DeploymentMetadataParse.class.getName());
+  private final static ContainerIntegrationLogger LOG = ProcessEngineLogger.CONTAINER_INTEGRATION_LOGGER;
 
   public DeploymentMetadataParse(Parser parser) {
     super(parser);
@@ -56,13 +47,11 @@ public abstract class DeploymentMetadataParse extends Parse {
 
     try {
       parseRootElement();
-
-    } catch (Exception e) {
-      LOGGER.log(Level.SEVERE, "Unknown exception", e);
-
-      throw new ProcessEngineException("Error while parsing deployment descriptor: " + e.getMessage(), e);
-
-    } finally {
+    }
+    catch (Exception e) {
+      throw LOG.unknownExceptionWhileParsingDeploymentDescriptor(e);
+    }
+    finally {
       if (hasWarnings()) {
         logWarnings();
       }
@@ -171,8 +160,8 @@ public abstract class DeploymentMetadataParse extends Parse {
    * &lt;/properties&gt;
    * </pre>
    * structure into a properties {@link Map}
-   * 
-   * Supports resolution of Ant-style placeholders against system properties. 
+   *
+   * Supports resolution of Ant-style placeholders against system properties.
    *
    */
   protected void parseProperties(Element element, Map<String, String> properties) {

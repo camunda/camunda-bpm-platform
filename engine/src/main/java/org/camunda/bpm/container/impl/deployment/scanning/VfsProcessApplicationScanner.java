@@ -23,11 +23,10 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.camunda.bpm.container.impl.ContainerIntegrationLogger;
 import org.camunda.bpm.container.impl.deployment.scanning.spi.ProcessApplicationScanner;
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.jboss.vfs.VFS;
 import org.jboss.vfs.VirtualFile;
@@ -36,15 +35,15 @@ import org.jboss.vfs.VirtualFileFilter;
 /**
  * <p>A {@link ProcessArchiveScanner} which uses Jboss VFS for
  * scanning the process archive for processes.</p>
- * 
+ *
  * <p>This implementation should be used on Jboss AS 7</p>
- * 
+ *
  * @author Daniel Meyer
  * @author Falko Menge
  */
 public class VfsProcessApplicationScanner implements ProcessApplicationScanner {
 
-  private static Logger log = Logger.getLogger(VfsProcessApplicationScanner.class.getName());
+  private final static ContainerIntegrationLogger LOG = ProcessEngineLogger.CONTAINER_INTEGRATION_LOGGER;
 
   public Map<String, byte[]> findResources(ClassLoader classLoader, String resourceRootPath, URL processesXml) {
     return findResources(classLoader, resourceRootPath, processesXml, null);
@@ -54,26 +53,26 @@ public class VfsProcessApplicationScanner implements ProcessApplicationScanner {
 
     // the map in which we collect the resources
     final Map<String, byte[]> resources = new HashMap<String, byte[]>();
-    
+
     if(resourceRootPath != null && !resourceRootPath.startsWith("pa:")) {
-      
+
         //  1. CASE: paResourceRootPath specified AND it is a "classpath:" resource root
-      
+
         String strippedPath = resourceRootPath.replace("classpath:", "");
         Enumeration<URL> resourceRoots = loadClasspathResourceRoots(classLoader, strippedPath);
-        
+
         if(!resourceRoots.hasMoreElements()) {
-          log.warning("Could not find any resources for process archive resource root path '"+resourceRootPath+"' using classloader '"+classLoader+"'");
+          LOG.cannotFindResourcesForPath(resourceRootPath, classLoader);
         }
-        
+
         while (resourceRoots.hasMoreElements()) {
           URL resourceRoot = resourceRoots.nextElement();
           VirtualFile virtualRoot = getVirtualFileForUrl(resourceRoot);
           scanRoot(virtualRoot, additionalResourceSuffixes, resources);
         }
-          
+
     } else {
-      
+
       // 2nd. CASE: no paResourceRootPath specified OR paResourceRootPath is PA-local
       if (processesXml != null) {
 
@@ -85,11 +84,11 @@ public class VfsProcessApplicationScanner implements ProcessApplicationScanner {
           String strippedPath = resourceRootPath.replace("pa:", "");
           resourceRoot = resourceRoot.getChild(strippedPath);
         }
-        
+
         // perform the scanning
         scanRoot(resourceRoot, additionalResourceSuffixes, resources);
-        
-      } 
+
+      }
     }
 
     return resources;
@@ -99,8 +98,9 @@ public class VfsProcessApplicationScanner implements ProcessApplicationScanner {
   protected VirtualFile getVirtualFileForUrl(final URL url) {
     try {
       return  VFS.getChild(url.toURI());
-    } catch (URISyntaxException e) {
-      throw new ProcessEngineException("Could not load virtual filefor url "+url, e);
+    }
+    catch (URISyntaxException e) {
+      throw LOG.exceptionWhileGettingVirtualFolder(url, e);
     }
   }
 
@@ -123,8 +123,9 @@ public class VfsProcessApplicationScanner implements ProcessApplicationScanner {
           addResource(diagram, processArchiveRoot, resources);
         }
       }
-    } catch (IOException e) {
-      log.log(Level.WARNING, "Could not scan VFS root: "+processArchiveRoot, e);
+    }
+    catch (IOException e) {
+      LOG.cannotScanVfsRoot(processArchiveRoot, e);
     }
   }
 
@@ -135,19 +136,19 @@ public class VfsProcessApplicationScanner implements ProcessApplicationScanner {
       byte[] bytes = IoUtil.readInputStream(inputStream, resourceName);
       IoUtil.closeSilently(inputStream);
       resources.put(resourceName, bytes);
-    } catch (IOException e) {
-      log.log(Level.WARNING, "Could not read input stream of file '" + resourceName + "' from process archive '" + processArchiveRoot + "'.", e);
+    }
+    catch (IOException e) {
+      LOG.cannotReadInputStreamForFile(resourceName, processArchiveRoot, e);
     }
   }
-  
+
   protected Enumeration<URL> loadClasspathResourceRoots(final ClassLoader classLoader, String strippedPaResourceRootPath) {
-    Enumeration<URL> resourceRoots;
     try {
-      resourceRoots = classLoader.getResources(strippedPaResourceRootPath);
-    } catch (IOException e) {
-      throw new ProcessEngineException("Could not load resources at '"+strippedPaResourceRootPath+"' using classloaded '"+classLoader+"'", e);
+      return classLoader.getResources(strippedPaResourceRootPath);
     }
-    return resourceRoots;
+    catch (IOException e) {
+      throw LOG.exceptionWhileLoadingCpRoots(strippedPaResourceRootPath, classLoader, e);
+    }
   }
-  
+
 }

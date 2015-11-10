@@ -13,12 +13,14 @@
 package org.camunda.bpm.engine.impl;
 
 import org.camunda.bpm.application.impl.ProcessApplicationLogger;
+import org.camunda.bpm.container.impl.ContainerIntegrationLogger;
 import org.camunda.bpm.engine.impl.bpmn.behavior.BpmnBehaviorLogger;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseLogger;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnBehaviorLogger;
 import org.camunda.bpm.engine.impl.cmmn.operation.CmmnOperationLogger;
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformerLogger;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
+import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
 import org.camunda.commons.logging.BaseLogger;
 
 /**
@@ -37,4 +39,7 @@ public class ProcessEngineLogger extends BaseLogger {
   public static final CmmnOperationLogger CMMN_OPERATION_LOGGER = BaseLogger.createLogger(CmmnOperationLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.cmmn.operation", "06");
 
   public static final ProcessApplicationLogger PROCESS_APPLICATION_LOGGER = BaseLogger.createLogger(ProcessApplicationLogger.class, PROJECT_CODE, "org.camunda.bpm.application", "07");
+  public static final ContainerIntegrationLogger CONTAINER_INTEGRATION_LOGGER = BaseLogger.createLogger(ContainerIntegrationLogger.class, PROJECT_CODE, "org.camunda.bpm.container", "08");
+
+  public static final EngineUtilLogger UTIL_LOGGER = BaseLogger.createLogger(EngineUtilLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.util", "09");
 }
