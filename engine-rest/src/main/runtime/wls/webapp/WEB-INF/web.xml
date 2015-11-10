@@ -13,6 +13,15 @@
     <filter-name>CacheControlFilter</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
+
+  <filter>
+    <filter-name>CorsFilter</filter-name>
+    <filter-class>org.camunda.bpm.engine.rest.filter.CorsFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>CorsFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
   
   <!-- Http Basic Authentication Filter -->
   <!-- <filter>
