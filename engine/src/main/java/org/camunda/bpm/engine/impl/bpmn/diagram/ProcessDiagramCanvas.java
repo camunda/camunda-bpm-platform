@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,26 +33,25 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.logging.Logger;
-
 import javax.imageio.ImageIO;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 
 /**
  * Represents a canvas on which BPMN 2.0 constructs can be drawn.
- * 
+ *
  * Some of the icons used are licenced under a Creative Commons Attribution 2.5
  * License, see http://www.famfamfam.com/lab/icons/silk/
- * 
+ *
  * @see ProcessDiagramGenerator
  * @author Joram Barrez
  */
 public class ProcessDiagramCanvas {
 
-  protected static final Logger LOGGER = Logger.getLogger(ProcessDiagramCanvas.class.getName());
+  protected static final DiagramCanvasLogger LOG = ProcessEngineLogger.DIAGRAM_CANVAS_LOGGER;
 
   // Predefined sized
   protected static final int ARROW_WIDTH = 5;
@@ -102,8 +101,9 @@ public class ProcessDiagramCanvas {
       ERROR_CATCH_IMAGE = ImageIO.read(ReflectUtil.getResourceAsStream("org/camunda/bpm/engine/impl/bpmn/deployer/error_catch.png"));
       SIGNAL_CATCH_IMAGE = ImageIO.read(ReflectUtil.getResourceAsStream("org/camunda/bpm/engine/impl/bpmn/deployer/signal_catch.png"));
       SIGNAL_THROW_IMAGE = ImageIO.read(ReflectUtil.getResourceAsStream("org/camunda/bpm/engine/impl/bpmn/deployer/signal_throw.png"));
-    } catch (IOException e) {
-      LOGGER.warning("Could not load image for process diagram creation: " + e.getMessage());
+    }
+    catch (IOException e) {
+      LOG.couldNotLoadImage(e);
     }
   }
 
@@ -134,11 +134,11 @@ public class ProcessDiagramCanvas {
 
   /**
    * Creates an empty canvas with given width and height.
-   * 
+   *
    * Allows to specify minimal boundaries on the left and upper side of the
    * canvas. This is useful for diagrams that have white space there (eg
    * Signavio). Everything beneath these minimum values will be cropped.
-   * 
+   *
    * @param minX
    *          Hint that will be used when generating the image. Parts that fall
    *          below minX on the horizontal scale will be cropped.
@@ -154,7 +154,7 @@ public class ProcessDiagramCanvas {
 
   /**
    * Generates an image of what currently is drawn on the canvas.
-   * 
+   *
    * Throws an {@link ProcessEngineException} when {@link #close()} is already
    * called.
    */
@@ -217,7 +217,7 @@ public class ProcessDiagramCanvas {
     drawNoneEndEvent(x, y, width, height);
     g.drawImage(ERROR_THROW_IMAGE, x + 3, y + 3, width - 6, height - 6, null);
   }
-  
+
   public void drawErrorStartEvent(int x, int y, int width, int height) {
     drawNoneStartEvent(x, y, width, height);
     g.drawImage(ERROR_CATCH_IMAGE, x + 3, y + 3, width - 6, height - 6, null);
@@ -250,11 +250,11 @@ public class ProcessDiagramCanvas {
   public void drawCatchingErroEvent(int x, int y, int width, int height) {
     drawCatchingEvent(x, y, width, height, ERROR_CATCH_IMAGE);
   }
-  
+
   public void drawCatchingSignalEvent(int x, int y, int width, int height) {
     drawCatchingEvent(x, y, width, height, SIGNAL_CATCH_IMAGE);
   }
-  
+
   public void drawThrowingSignalEvent(int x, int y, int width, int height) {
     drawCatchingEvent(x, y, width, height, SIGNAL_THROW_IMAGE);
   }
@@ -329,10 +329,10 @@ public class ProcessDiagramCanvas {
   public void drawTask(String name, int x, int y, int width, int height) {
     drawTask(name, x, y, width, height, false);
   }
-  
+
   public void drawPoolOrLane(String name, int x, int y, int width, int height) {
     g.drawRect(x, y, width, height);
-    
+
     // Add the name as text, vertical
     if(name != null && name.length() > 0) {
       // Include some padding
@@ -346,10 +346,10 @@ public class ProcessDiagramCanvas {
       Font currentFont = g.getFont();
       Font theDerivedFont = currentFont.deriveFont(transformation);
       g.setFont(theDerivedFont);
-      
+
       String truncated = fitTextToWidth(name, availableTextSpace);
       int realWidth = fontMetrics.stringWidth(truncated);
-      
+
       g.drawString(truncated, x + 2 + fontMetrics.getHeight(), 3 + y + availableTextSpace - (availableTextSpace - realWidth) / 2);
       g.setFont(currentFont);
     }
@@ -428,7 +428,7 @@ public class ProcessDiagramCanvas {
     drawTask(name, x, y, width, height);
     g.drawImage(MANUALTASK_IMAGE, x + 7, y + 7, ICON_SIZE, ICON_SIZE, null);
   }
-  
+
   public void drawBusinessRuleTask(String name, int x, int y, int width, int height) {
     drawTask(name, x, y, width, height);
     g.drawImage(BUSINESS_RULE_TASK_IMAGE, x + 7, y + 7, ICON_SIZE, ICON_SIZE, null);
@@ -436,7 +436,7 @@ public class ProcessDiagramCanvas {
 
   public void drawExpandedSubProcess(String name, int x, int y, int width, int height, Boolean isTriggeredByEvent) {
     RoundRectangle2D rect = new RoundRectangle2D.Double(x, y, width, height, 20, 20);
-    
+
     // Use different stroke (dashed)
     if(isTriggeredByEvent) {
       Stroke originalStroke = g.getStroke();

@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl;
 import org.camunda.bpm.application.impl.ProcessApplicationLogger;
 import org.camunda.bpm.container.impl.ContainerIntegrationLogger;
 import org.camunda.bpm.engine.impl.bpmn.behavior.BpmnBehaviorLogger;
+import org.camunda.bpm.engine.impl.bpmn.diagram.DiagramCanvasLogger;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseLogger;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnBehaviorLogger;
 import org.camunda.bpm.engine.impl.cmmn.operation.CmmnOperationLogger;
@@ -30,7 +31,7 @@ public class ProcessEngineLogger extends BaseLogger {
 
   public static final String PROJECT_CODE = "ENGINE";
 
-  public static final BpmnParseLogger PARSE_LOGGER = BaseLogger.createLogger(BpmnParseLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.bpmn.parser", "01");
+  public static final BpmnParseLogger BPMN_PARSE_LOGGER = BaseLogger.createLogger(BpmnParseLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.bpmn.parser", "01");
   public static final BpmnBehaviorLogger BPMN_BEHAVIOR_LOGGER = BaseLogger.createLogger(BpmnBehaviorLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.bpmn.behavior", "02");
   public static final EnginePersistenceLogger PERSISTENCE_LOGGER = BaseLogger.createLogger(EnginePersistenceLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.persistence", "03");
 
@@ -42,4 +43,5 @@ public class ProcessEngineLogger extends BaseLogger {
   public static final ContainerIntegrationLogger CONTAINER_INTEGRATION_LOGGER = BaseLogger.createLogger(ContainerIntegrationLogger.class, PROJECT_CODE, "org.camunda.bpm.container", "08");
 
   public static final EngineUtilLogger UTIL_LOGGER = BaseLogger.createLogger(EngineUtilLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.util", "09");
+  public static final DiagramCanvasLogger DIAGRAM_CANVAS_LOGGER = BaseLogger.createLogger(DiagramCanvasLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.diagram", "10");
 }

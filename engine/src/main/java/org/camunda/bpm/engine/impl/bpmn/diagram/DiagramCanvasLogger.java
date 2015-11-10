@@ -10,31 +10,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.util;
+package org.camunda.bpm.engine.impl.bpmn.diagram;
 
-import java.util.Date;
+import java.io.IOException;
 
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 /**
- * @author Joram Barrez
+ * @author Daniel Meyer
+ *
  */
-public class ClockUtil {
+public class DiagramCanvasLogger extends ProcessEngineLogger {
 
-  private volatile static Date CURRENT_TIME = null;
-
-  public static void setCurrentTime(Date currentTime) {
-    ClockUtil.CURRENT_TIME = currentTime;
-  }
-
-  public static void reset() {
-    ClockUtil.CURRENT_TIME = null;
-  }
-
-  public static Date getCurrentTime() {
-    if (CURRENT_TIME != null) {
-      return CURRENT_TIME;
-    }
-    return new Date();
+  public void couldNotLoadImage(IOException e) {
+    logError(
+        "001", "Could not load image for process diagram creation: " + e.getMessage());
   }
 
 }

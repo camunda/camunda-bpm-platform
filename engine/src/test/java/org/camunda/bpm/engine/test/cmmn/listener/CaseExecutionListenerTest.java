@@ -2581,7 +2581,7 @@ public class CaseExecutionListenerTest extends CmmnProcessEngineTestCase {
     } catch (Exception e) {
       // then
       String message = e.getMessage();
-      assertTextPresent("couldn't instantiate class org.camunda.bpm.engine.test.cmmn.listener.NotExistingCaseExecutionListener", message);
+      assertTextPresent("Exception while instantiating class 'org.camunda.bpm.engine.test.cmmn.listener.NotExistingCaseExecutionListener'", message);
     }
 
   }

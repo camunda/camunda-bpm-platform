@@ -71,10 +71,8 @@ public final class StringUtil {
    * @return a string representing the bytes
    */
   public static String fromBytes(byte[] bytes) {
+    EnsureUtil.ensureActiveCommandContext("StringUtil.fromBytes");
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
-    if(processEngineConfiguration == null) {
-      throw new IllegalStateException("Can only be called from active command context");
-    }
     return fromBytes(bytes, processEngineConfiguration.getProcessEngine());
   }
 
@@ -99,10 +97,8 @@ public final class StringUtil {
    * @return the byte array
    */
   public static byte[] toByteArray(String string) {
+    EnsureUtil.ensureActiveCommandContext("StringUtil.fromBytes");
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
-    if(processEngineConfiguration == null) {
-      throw new IllegalStateException("Can only be called from active command context");
-    }
     return toByteArray(string, processEngineConfiguration.getProcessEngine());
   }
 

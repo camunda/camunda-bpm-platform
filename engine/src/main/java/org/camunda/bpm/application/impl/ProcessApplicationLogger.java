@@ -157,4 +157,36 @@ public class ProcessApplicationLogger extends ProcessEngineLogger {
         "017",
         "Calling undeploy() on process application that is not deployed.");
   }
+
+  public void couldNotRemoveDefinitionsFromCache(Throwable t) {
+    logError(
+        "018",
+        "Unregistering process application for deployment but could not remove process definitions from deployment cache.", t);
+  }
+
+  public ProcessEngineException exceptionWhileRegisteringDeploymentsWithJobExecutor(Exception e) {
+    return new ProcessEngineException(exceptionMessage(
+        "019",
+        "Exception while registering deployment with job executor"), e);
+  }
+
+  public void exceptionWhileUnregisteringDeploymentsWithJobExecutor(Exception e) {
+    logError(
+        "020",
+        "Exceptions while unregistering deployments with job executor", e);
+
+  }
+
+  public void registrationSummary(String string) {
+    logInfo(
+        "021",
+        string);
+  }
+
+  public void exceptionWhileLoggingRegistrationSummary(Throwable e) {
+    logError(
+        "022",
+        "Exception while logging registration summary",
+        e);
+  }
 }

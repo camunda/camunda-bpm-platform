@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 
 import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 
@@ -24,6 +25,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
  * @author Sebastian Menski
  */
 public final class ResourceUtil {
+
+  private static final EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
 
   /**
    * Parse a camunda:resource attribute and loads the resource depending on the url scheme.
@@ -70,7 +73,7 @@ public final class ResourceUtil {
       return new String(resourceBytes, Charset.forName("UTF-8"));
     }
     else {
-      throw new NotFoundException("Unable to find resource with name " + resourcePath);
+      throw LOG.cannotFindResource(resourcePath);
     }
   }
 

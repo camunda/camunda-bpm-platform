@@ -12,9 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.parser;
 
-import static org.camunda.bpm.engine.impl.util.BpmnParseUtil.findCamundaExtensionElement;
-import static org.camunda.bpm.engine.impl.util.BpmnParseUtil.parseCamundaScript;
-import static org.camunda.bpm.engine.impl.util.BpmnParseUtil.parseInputOutput;
+import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.findCamundaExtensionElement;
+import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.parseCamundaScript;
+import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.parseInputOutput;
 import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.instantiateDelegate;
 
 import java.io.InputStream;
@@ -169,7 +169,7 @@ public class BpmnParse extends Parse {
 
   public static final String MULTI_INSTANCE_BODY_ID_SUFFIX = "#multiInstanceBody";
 
-  protected static final BpmnParseLogger LOG = ProcessEngineLogger.PARSE_LOGGER;
+  protected static final BpmnParseLogger LOG = ProcessEngineLogger.BPMN_PARSE_LOGGER;
 
   public static final String PROPERTYNAME_DOCUMENTATION = "documentation";
   public static final String PROPERTYNAME_INITIAL = "initial";
