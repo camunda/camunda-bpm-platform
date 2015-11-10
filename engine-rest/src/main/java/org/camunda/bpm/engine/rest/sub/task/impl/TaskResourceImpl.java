@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.form.FormData;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
@@ -333,4 +334,14 @@ public class TaskResourceImpl implements TaskResource {
     taskService.saveTask(task);
   }
 
+  @Override
+  public void deleteTask(String id) {
+	TaskService taskService = engine.getTaskService();
+	
+	try {
+		taskService.deleteTask(id);
+	} catch (NotValidException e) {
+		throw new InvalidRequestException(Status.BAD_REQUEST, e, "Could not delete task: " + e.getMessage());
+	}
+  }
 }
