@@ -13,15 +13,16 @@
 
 package org.camunda.bpm.engine.impl.dmn.configuration;
 
-import org.camunda.bpm.dmn.engine.DmnScriptEngineResolver;
-import org.camunda.bpm.dmn.engine.impl.DmnEngineConfigurationImpl;
+import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
+import org.camunda.bpm.dmn.engine.impl.spi.el.DmnScriptEngineResolver;
 import org.camunda.bpm.engine.impl.dmn.el.ProcessEngineElProvider;
-import org.camunda.bpm.engine.impl.dmn.handler.ProcessEngineDmnElementHandlerRegistry;
+import org.camunda.bpm.engine.impl.dmn.transformer.DecisionDefinitionHandler;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.history.parser.HistoryDecisionTableListener;
 import org.camunda.bpm.engine.impl.metrics.dmn.MetricsDecisionTableListener;
+import org.camunda.bpm.model.dmn.instance.DecisionTable;
 
-public class ProcessEngineDmnEngineConfiguration extends DmnEngineConfigurationImpl {
+public class ProcessEngineDmnEngineConfiguration extends DefaultDmnEngineConfiguration {
 
   protected ExpressionManager expressionManager;
 
@@ -29,16 +30,13 @@ public class ProcessEngineDmnEngineConfiguration extends DmnEngineConfigurationI
       DmnScriptEngineResolver scriptEngineResolver,
       HistoryDecisionTableListener historyDecisionTableListener,
       ExpressionManager expressionManager) {
+
+    this.customPostDecisionTableEvaluationListeners.add(new MetricsDecisionTableListener());
+    this.customPostDecisionTableEvaluationListeners.add(historyDecisionTableListener);
     this.scriptEngineResolver = scriptEngineResolver;
     this.expressionManager = expressionManager;
-    this.customPostDmnDecisionTableListeners.add(new MetricsDecisionTableListener());
-  	this.customPostDmnDecisionTableListeners.add(historyDecisionTableListener);
-  }
-
-  protected void initElementHandlerRegistry() {
-    if (elementHandlerRegistry == null) {
-      elementHandlerRegistry = new ProcessEngineDmnElementHandlerRegistry();
-    }
+    // override decision table handler
+    this.transformer.getElementTransformHandlerRegistry().addHandler(DecisionTable.class, new DecisionDefinitionHandler());
   }
 
   protected void initElProvider() {

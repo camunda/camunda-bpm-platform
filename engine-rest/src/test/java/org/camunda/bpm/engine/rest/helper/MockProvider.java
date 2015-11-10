@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.application.ProcessApplicationInfo;
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.EntityTypes;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Authorization;
@@ -2369,14 +2369,14 @@ public abstract class MockProvider {
     return mocks;
   }
 
-  public static MockDecisionResultBuilder mockDecisionResult() {
-    return new MockDecisionResultBuilder()
-        .decisionOutput()
-          .output(EXAMPLE_DECISION_OUTPUT_KEY, EXAMPLE_DECISION_OUTPUT_VALUE)
-          .endDecisionOutput();
+  public static MockDecisionTableResultBuilder mockDecisionResult() {
+    return new MockDecisionTableResultBuilder()
+        .ruleResult()
+          .entry(EXAMPLE_DECISION_OUTPUT_KEY, EXAMPLE_DECISION_OUTPUT_VALUE)
+          .endRuleResult();
   }
 
-  public static DmnDecisionResult createMockDecisionResult() {
+  public static DmnDecisionTableResult createMockDecisionResult() {
     return mockDecisionResult().build();
   }
 

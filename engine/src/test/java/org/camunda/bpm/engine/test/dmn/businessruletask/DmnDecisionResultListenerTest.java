@@ -15,8 +15,8 @@ package org.camunda.bpm.engine.test.dmn.businessruletask;
 
 import java.util.Collections;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionRuleResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
@@ -34,32 +34,32 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTestCas
   protected static final String TEST_DECISION_COLLECT_SUM = "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultCollectSumHitPolicyTest.dmn11.xml";
   protected static final String TEST_DECISION_COLLECT_COUNT = "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultCollectCountHitPolicyTest.dmn11.xml";
 
-  protected DmnDecisionResult ruleResult;
+  protected DmnDecisionTableResult results;
 
   @Deployment(resources = { TEST_PROCESS, TEST_DECISION})
   public void testNoOutput() {
     startTestProcess("no output");
 
-    assertTrue("The decision result 'ruleResult' should be empty", ruleResult.isEmpty());
+    assertTrue("The decision result 'ruleResult' should be empty", results.isEmpty());
   }
 
   @Deployment(resources = { TEST_PROCESS, TEST_DECISION})
   public void testEmptyOutput() {
     startTestProcess("empty output");
 
-    assertFalse("The decision result 'ruleResult' should not be empty", ruleResult.isEmpty());
+    assertFalse("The decision result 'ruleResult' should not be empty", results.isEmpty());
 
-    DmnDecisionOutput decisionOutput = ruleResult.get(0);
-    assertNull(decisionOutput.getFirstValue());
+    DmnDecisionRuleResult decisionOutput = results.get(0);
+    assertNull(decisionOutput.getFirstEntry());
   }
 
   @Deployment(resources = { TEST_PROCESS, TEST_DECISION})
   public void testEmptyMap() {
     startTestProcess("empty map");
 
-    assertEquals(2, ruleResult.size());
+    assertEquals(2, results.size());
 
-    for (DmnDecisionOutput output : ruleResult) {
+    for (DmnDecisionRuleResult output : results) {
       assertTrue("The decision output should be empty", output.isEmpty());
     }
   }
@@ -68,32 +68,32 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTestCas
   public void testSingleEntry() {
     startTestProcess("single entry");
 
-    DmnDecisionOutput firstOutput = ruleResult.get(0);
-    assertEquals("foo", firstOutput.getFirstValue());
-    assertEquals(Variables.stringValue("foo"), firstOutput.getFirstValueTyped());
+    DmnDecisionRuleResult firstOutput = results.get(0);
+    assertEquals("foo", firstOutput.getFirstEntry());
+    assertEquals(Variables.stringValue("foo"), firstOutput.getFirstEntryTyped());
   }
 
   @Deployment(resources = { TEST_PROCESS, TEST_DECISION})
   public void testMultipleEntries() {
     startTestProcess("multiple entries");
 
-    DmnDecisionOutput firstOutput = ruleResult.get(0);
+    DmnDecisionRuleResult firstOutput = results.get(0);
     assertEquals("foo", firstOutput.get("result1"));
     assertEquals("bar", firstOutput.get("result2"));
 
-    assertEquals(Variables.stringValue("foo"), firstOutput.getValueTyped("result1"));
-    assertEquals(Variables.stringValue("bar"), firstOutput.getValueTyped("result2"));
+    assertEquals(Variables.stringValue("foo"), firstOutput.getEntryTyped("result1"));
+    assertEquals(Variables.stringValue("bar"), firstOutput.getEntryTyped("result2"));
   }
 
   @Deployment(resources = { TEST_PROCESS, TEST_DECISION})
   public void testSingleEntryList() {
     startTestProcess("single entry list");
 
-    assertEquals(2, ruleResult.size());
+    assertEquals(2, results.size());
 
-    for (DmnDecisionOutput output : ruleResult) {
-      assertEquals("foo", output.getFirstValue());
-      assertEquals(Variables.stringValue("foo"), output.getFirstValueTyped());
+    for (DmnDecisionRuleResult output : results) {
+      assertEquals("foo", output.getFirstEntry());
+      assertEquals(Variables.stringValue("foo"), output.getFirstEntryTyped());
     }
   }
 
@@ -101,15 +101,15 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTestCas
   public void testMultipleEntriesList() {
     startTestProcess("multiple entries list");
 
-    assertEquals(2, ruleResult.size());
+    assertEquals(2, results.size());
 
-    for (DmnDecisionOutput output : ruleResult) {
+    for (DmnDecisionRuleResult output : results) {
       assertEquals(2, output.size());
       assertEquals("foo", output.get("result1"));
       assertEquals("bar", output.get("result2"));
 
-      assertEquals(Variables.stringValue("foo"), output.getValueTyped("result1"));
-      assertEquals(Variables.stringValue("bar"), output.getValueTyped("result2"));
+      assertEquals(Variables.stringValue("foo"), output.getEntryTyped("result1"));
+      assertEquals(Variables.stringValue("bar"), output.getEntryTyped("result2"));
     }
   }
 
@@ -117,48 +117,48 @@ public class DmnDecisionResultListenerTest extends PluggableProcessEngineTestCas
   public void testCollectCountHitPolicyNoOutput() {
     startTestProcess("no output");
 
-    assertEquals(1, ruleResult.size());
-    DmnDecisionOutput firstOutput = ruleResult.get(0);
+    assertEquals(1, results.size());
+    DmnDecisionRuleResult firstOutput = results.get(0);
 
-    assertEquals(0, firstOutput.getFirstValue());
-    assertEquals(Variables.integerValue(0), firstOutput.getFirstValueTyped());
+    assertEquals(0, firstOutput.getFirstEntry());
+    assertEquals(Variables.integerValue(0), firstOutput.getFirstEntryTyped());
   }
 
   @Deployment(resources = { TEST_PROCESS, TEST_DECISION_COLLECT_SUM })
   public void testCollectSumHitPolicyNoOutput() {
     startTestProcess("no output");
 
-    assertTrue("The decision result 'ruleResult' should be empty", ruleResult.isEmpty());
+    assertTrue("The decision result 'ruleResult' should be empty", results.isEmpty());
   }
 
   @Deployment(resources = { TEST_PROCESS, TEST_DECISION_COLLECT_SUM })
   public void testCollectSumHitPolicySingleEntry() {
     startTestProcess("single entry");
 
-    assertEquals(1, ruleResult.size());
-    DmnDecisionOutput firstOutput = ruleResult.get(0);
+    assertEquals(1, results.size());
+    DmnDecisionRuleResult firstOutput = results.get(0);
 
-    assertEquals(12, firstOutput.getFirstValue());
-    assertEquals(Variables.integerValue(12), firstOutput.getFirstValueTyped());
+    assertEquals(12, firstOutput.getFirstEntry());
+    assertEquals(Variables.integerValue(12), firstOutput.getFirstEntryTyped());
   }
 
   @Deployment(resources = { TEST_PROCESS, TEST_DECISION_COLLECT_SUM })
   public void testCollectSumHitPolicySingleEntryList() {
     startTestProcess("single entry list");
 
-    assertEquals(1, ruleResult.size());
-    DmnDecisionOutput firstOutput = ruleResult.get(0);
+    assertEquals(1, results.size());
+    DmnDecisionRuleResult firstOutput = results.get(0);
 
-    assertEquals(33, firstOutput.getFirstValue());
-    assertEquals(Variables.integerValue(33), firstOutput.getFirstValueTyped());
+    assertEquals(33, firstOutput.getFirstEntry());
+    assertEquals(Variables.integerValue(33), firstOutput.getFirstEntryTyped());
   }
 
   protected ProcessInstance startTestProcess(String input) {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testProcess", Collections.<String, Object>singletonMap("input", input));
 
     // get the result from an execution listener that is invoked at the end of the business rule activity
-    ruleResult = DecisionResultTestListener.getDecisionResult();
-    assertNotNull(ruleResult);
+    results = DecisionResultTestListener.getDecisionResult();
+    assertNotNull(results);
 
     return processInstance;
   }

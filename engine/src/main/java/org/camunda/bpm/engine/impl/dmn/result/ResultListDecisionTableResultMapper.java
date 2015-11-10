@@ -13,19 +13,19 @@
 
 package org.camunda.bpm.engine.impl.dmn.result;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 
 /**
  * Maps the decision result to a list of pairs that contains output name and
- * untyped value.
+ * untyped entry.
  *
  * @author Philipp Ossler
  */
-public class OutputListDecisionResultMapper implements DecisionResultMapper {
+public class ResultListDecisionTableResultMapper implements DecisionTableResultMapper {
 
   @Override
-  public Object mapDecisionResult(DmnDecisionResult decisionResult) {
-    return decisionResult.getOutputList();
+  public Object mapDecisionTableResult(DmnDecisionTableResult decisionTableResult) {
+    return decisionTableResult.getResultList();
   }
 
 }

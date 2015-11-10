@@ -13,8 +13,7 @@
 
 package org.camunda.bpm.engine.impl.history.producer;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionTable;
-import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
+import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationEvent;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 
@@ -34,27 +33,23 @@ public interface DmnHistoryEventProducer {
    *
    * @param execution
    *          the current execution
-   * @param decisionTable
-   *          the evaluated decision table
-   * @param decisionTableResult
-   *          the decision table evaluation result
+   * @param decisionTableEvaluationEvent
+   *          the evaluation event
    * @return the history event
    *
-   * @see #createDecisionEvaluatedEvt(DmnDecisionTable, DmnDecisionTableResult)
+   * @see #createDecisionEvaluatedEvt(DmnDecisionTableEvaluationEvent)
    */
-  HistoryEvent createDecisionEvaluatedEvt(DelegateExecution execution, DmnDecisionTable decisionTable, DmnDecisionTableResult decisionTableResult);
+  HistoryEvent createDecisionEvaluatedEvt(DelegateExecution execution, DmnDecisionTableEvaluationEvent decisionTableEvaluationEvent);
 
   /**
    * Creates the history event fired when a decision is evaluated. If the
    * decision is evaluated while execute a process instance then you should use
-   * {@link #createDecisionEvaluatedEvt(DelegateExecution, DmnDecisionTable, DmnDecisionTableResult)} instead.
+   * {@link #createDecisionEvaluatedEvt(DelegateExecution, DmnDecisionTableEvaluationEvent)} instead.
    *
-   * @param decisionTable
-   *          the evaluated decision table
-   * @param decisionTableResult
-   *          the decision table evaluation result
+   * @param decisionTableEvaluationEvent
+   *          the evaluation event
    * @return the history event
    */
-  HistoryEvent createDecisionEvaluatedEvt(DmnDecisionTable decisionTable, DmnDecisionTableResult decisionTableResult);
+  HistoryEvent createDecisionEvaluatedEvt(DmnDecisionTableEvaluationEvent decisionTableEvaluationEvent);
 
 }

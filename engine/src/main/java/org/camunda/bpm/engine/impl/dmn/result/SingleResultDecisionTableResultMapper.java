@@ -13,27 +13,27 @@
 
 package org.camunda.bpm.engine.impl.dmn.result;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.behavior.BpmnBehaviorLogger;
 
 /**
- * Maps the decision result to pairs of output name and untyped value.
+ * Maps the decision result to pairs of output name and untyped entries.
  *
  * @author Philipp Ossler
  */
-public class SingleOutputDecisionResultMapper implements DecisionResultMapper {
+public class SingleResultDecisionTableResultMapper implements DecisionTableResultMapper {
 
   protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BPMN_BEHAVIOR_LOGGER;
 
   @Override
-  public Object mapDecisionResult(DmnDecisionResult decisionResult) {
+  public Object mapDecisionTableResult(DmnDecisionTableResult decisionTableResult) {
     try {
-      return decisionResult.getSingleOutput().getValueMap();
+      return decisionTableResult.getSingleResult().getEntryMap();
 
     } catch (DmnEngineException e) {
-      throw LOG.decisionResultMappingException(decisionResult, e);
+      throw LOG.decisionResultMappingException(decisionTableResult, e);
     }
   }
 

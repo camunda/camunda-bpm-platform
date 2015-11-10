@@ -13,7 +13,7 @@
 package org.camunda.bpm.engine.impl.dmn.invocation;
 
 import org.camunda.bpm.dmn.engine.DmnDecision;
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.delegate.DelegateInvocation;
@@ -27,19 +27,19 @@ import org.camunda.bpm.engine.variable.context.VariableContext;
  *
  * The DmnEngine instance is resolved from the Context.
  *
- * The invocation result is a {@link DmnDecisionResult}.
+ * The invocation result is a {@link DmnDecisionTableResult}.
  *
  * The target of the invocation is the {@link DecisionDefinition}.
  *
  * @author Daniel Meyer
  *
  */
-public class DecisionInvocation extends DelegateInvocation {
+public class DecisionTableInvocation extends DelegateInvocation {
 
   protected DecisionDefinition decisionDefinition;
   protected VariableContext variableContext;
 
-  public DecisionInvocation(DecisionDefinition decisionDefinition, VariableContext variableContext) {
+  public DecisionTableInvocation(DecisionDefinition decisionDefinition, VariableContext variableContext) {
     super(null, (DecisionDefinitionEntity) decisionDefinition);
     this.decisionDefinition = decisionDefinition;
     this.variableContext = variableContext;
@@ -49,11 +49,12 @@ public class DecisionInvocation extends DelegateInvocation {
     final DmnEngine dmnEngine = Context.getProcessEngineConfiguration()
       .getDmnEngine();
 
-    invocationResult = dmnEngine.evaluate((DmnDecision) decisionDefinition, variableContext);
+    invocationResult = dmnEngine.evaluateDecisionTable((DmnDecision) decisionDefinition, variableContext);
   }
 
-  public DmnDecisionResult getInvocationResult() {
-    return (DmnDecisionResult) super.getInvocationResult();
+  @Override
+  public DmnDecisionTableResult getInvocationResult() {
+    return (DmnDecisionTableResult) super.getInvocationResult();
   }
 
   public DecisionDefinition getDecisionDefinition() {

@@ -203,7 +203,14 @@ public class DecisionDefinitionEntity extends DmnDecisionTableImpl implements De
 
   @Override
   public String toString() {
-    return "DecisionDefinitionEntity["+id+"]";
+    return "DecisionDefinitionEntity{" +
+      "id='" + id + '\'' +
+      ", name='" + name + '\'' +
+      ", category='" + category + '\'' +
+      ", key='" + key + '\'' +
+      ", version=" + version +
+      ", deploymentId='" + deploymentId + '\'' +
+      '}';
   }
 
 }

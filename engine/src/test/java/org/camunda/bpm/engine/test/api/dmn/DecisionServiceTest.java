@@ -13,17 +13,17 @@
 
 package org.camunda.bpm.engine.test.api.dmn;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
-
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author Philipp Ossler
@@ -42,14 +42,14 @@ public class DecisionServiceTest extends PluggableProcessEngineTestCase {
   public void testEvaluateDecisionById() {
     DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
 
-    DmnDecisionResult decisionResult = decisionService.evaluateDecisionById(decisionDefinition.getId(), createVariables());
+    DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableById(decisionDefinition.getId(), createVariables());
 
     assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
   }
 
   @Deployment(resources = DMN_FILE)
   public void testEvaluateDecisionByKey() {
-    DmnDecisionResult decisionResult = decisionService.evaluateDecisionByKey(DECISION_DEFINITION_KEY, createVariables());
+    DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY, createVariables());
 
     assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
   }
@@ -59,7 +59,7 @@ public class DecisionServiceTest extends PluggableProcessEngineTestCase {
     String secondDeploymentId = repositoryService.createDeployment().addClasspathResource(DMN_FILE_SECOND_VERSION).deploy().getId();
     try {
 
-      DmnDecisionResult decisionResult = decisionService.evaluateDecisionByKey(DECISION_DEFINITION_KEY, createVariables());
+      DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY, createVariables());
 
       assertThatDecisionHasResult(decisionResult, RESULT_OF_SECOND_VERSION);
 
@@ -73,7 +73,7 @@ public class DecisionServiceTest extends PluggableProcessEngineTestCase {
     String secondDeploymentId = repositoryService.createDeployment().addClasspathResource(DMN_FILE_SECOND_VERSION).deploy().getId();
     try {
 
-      DmnDecisionResult decisionResult = decisionService.evaluateDecisionByKeyAndVersion(DECISION_DEFINITION_KEY, 1, createVariables());
+      DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableByKeyAndVersion(DECISION_DEFINITION_KEY, 1, createVariables());
 
       assertThatDecisionHasResult(decisionResult, RESULT_OF_FIRST_VERSION);
 
@@ -87,7 +87,7 @@ public class DecisionServiceTest extends PluggableProcessEngineTestCase {
     String secondDeploymentId = repositoryService.createDeployment().addClasspathResource(DMN_FILE_SECOND_VERSION).deploy().getId();
     try {
 
-      DmnDecisionResult decisionResult = decisionService.evaluateDecisionByKeyAndVersion(DECISION_DEFINITION_KEY, null, createVariables());
+      DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableByKeyAndVersion(DECISION_DEFINITION_KEY, null, createVariables());
 
       assertThatDecisionHasResult(decisionResult, RESULT_OF_SECOND_VERSION);
 
@@ -98,7 +98,7 @@ public class DecisionServiceTest extends PluggableProcessEngineTestCase {
 
   public void testEvaluateDecisionByNullId() {
     try {
-      decisionService.evaluateDecisionById(null, null);
+      decisionService.evaluateDecisionTableById(null, null);
       fail("expect exception");
     } catch (ProcessEngineException e) {
       assertTextPresent("decision definition id is null", e.getMessage());
@@ -107,7 +107,7 @@ public class DecisionServiceTest extends PluggableProcessEngineTestCase {
 
   public void testEvaluateDecisionByNonExistingId() {
     try {
-      decisionService.evaluateDecisionById("unknown", null);
+      decisionService.evaluateDecisionTableById("unknown", null);
       fail("expect exception");
     } catch (ProcessEngineException e) {
       assertTextPresent("no deployed decision definition found with id 'unknown'", e.getMessage());
@@ -116,7 +116,7 @@ public class DecisionServiceTest extends PluggableProcessEngineTestCase {
 
   public void testEvaluateDecisionByNullKey() {
     try {
-      decisionService.evaluateDecisionByKey(null, null);
+      decisionService.evaluateDecisionTableByKey(null, null);
       fail("expect exception");
     } catch (ProcessEngineException e) {
       assertTextPresent("decision definition key is null", e.getMessage());
@@ -125,7 +125,7 @@ public class DecisionServiceTest extends PluggableProcessEngineTestCase {
 
   public void testEvaluateDecisionByNonExistingKey() {
     try {
-      decisionService.evaluateDecisionByKey("unknown", null);
+      decisionService.evaluateDecisionTableByKey("unknown", null);
       fail("expect exception");
     } catch (ProcessEngineException e) {
       assertTextPresent("no decision definition deployed with key 'unknown'", e.getMessage());
@@ -137,7 +137,7 @@ public class DecisionServiceTest extends PluggableProcessEngineTestCase {
     DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().singleResult();
 
     try {
-      decisionService.evaluateDecisionByKeyAndVersion(decisionDefinition.getKey(), 42, null);
+      decisionService.evaluateDecisionTableByKeyAndVersion(decisionDefinition.getKey(), 42, null);
       fail("expect exception");
     } catch (ProcessEngineException e) {
       assertTextPresent("no decision definition deployed with key = 'decision' and version = '42'", e.getMessage());
@@ -148,10 +148,10 @@ public class DecisionServiceTest extends PluggableProcessEngineTestCase {
     return Variables.createVariables().putValue("status", "silver").putValue("sum", 723);
   }
 
-  protected void assertThatDecisionHasResult(DmnDecisionResult decisionResult, Object expectedValue) {
+  protected void assertThatDecisionHasResult(DmnDecisionTableResult decisionResult, Object expectedValue) {
     assertThat(decisionResult, is(notNullValue()));
     assertThat(decisionResult.size(), is(1));
-    String value = decisionResult.getSingleOutput().getFirstValue();
+    String value = decisionResult.getSingleResult().getFirstEntry();
     assertThat(value, is(expectedValue));
   }
 

@@ -15,7 +15,7 @@ package org.camunda.bpm.engine.impl;
 
 import java.util.Map;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.impl.dmn.cmd.EvaluateDecisionByIdCmd;
 import org.camunda.bpm.engine.impl.dmn.cmd.EvaluateDecisionByKeyCmd;
@@ -26,17 +26,17 @@ import org.camunda.bpm.engine.impl.dmn.cmd.EvaluateDecisionByKeyCmd;
 public class DecisionServiceImpl extends ServiceImpl implements DecisionService {
 
   @Override
-  public DmnDecisionResult evaluateDecisionById(String decisionDefinitionId, Map<String, Object> variables) {
+  public DmnDecisionTableResult evaluateDecisionTableById(String decisionDefinitionId, Map<String, Object> variables) {
     return commandExecutor.execute(new EvaluateDecisionByIdCmd(decisionDefinitionId, variables));
   }
 
   @Override
-  public DmnDecisionResult evaluateDecisionByKey(String decisionDefinitionKey, Map<String, Object> variables) {
+  public DmnDecisionTableResult evaluateDecisionTableByKey(String decisionDefinitionKey, Map<String, Object> variables) {
     return commandExecutor.execute(new EvaluateDecisionByKeyCmd(decisionDefinitionKey, variables));
   }
 
   @Override
-  public DmnDecisionResult evaluateDecisionByKeyAndVersion(String decisionDefinitionKey, Integer version, Map<String, Object> variables) {
+  public DmnDecisionTableResult evaluateDecisionTableByKeyAndVersion(String decisionDefinitionKey, Integer version, Map<String, Object> variables) {
     return commandExecutor.execute(new EvaluateDecisionByKeyCmd(decisionDefinitionKey, version, variables));
   }
 

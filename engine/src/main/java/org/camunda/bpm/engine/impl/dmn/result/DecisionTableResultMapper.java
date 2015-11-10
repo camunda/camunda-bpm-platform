@@ -13,25 +13,25 @@
 
 package org.camunda.bpm.engine.impl.dmn.result;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.ProcessEngineException;
 
 /**
- * Mapping function for the decision result.
+ * Mapping function for the decision table result.
  *
  * @author Philipp Ossler
  */
-public interface DecisionResultMapper {
+public interface DecisionTableResultMapper {
 
   /**
    * Maps the decision result into a value that can set as process variable.
    *
-   * @param decisionResult
+   * @param decisionTableResult
    *          the result of the evaluated decision
    * @return the value that should set as process variable
    * @throws ProcessEngineException
    *           if the decision result can not be mapped
    */
-  Object mapDecisionResult(DmnDecisionResult decisionResult);
+  Object mapDecisionTableResult(DmnDecisionTableResult decisionTableResult);
 
 }

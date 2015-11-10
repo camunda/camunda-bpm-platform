@@ -36,7 +36,7 @@ public class DecisionInstanceHistoryTest extends ResourceProcessEngineTestCase {
     DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().decisionDefinitionKey("testDecision").singleResult();
 
     VariableMap variables = Variables.createVariables().putValue("input1", true);
-    decisionService.evaluateDecisionByKey("testDecision", variables);
+    decisionService.evaluateDecisionTableByKey("testDecision", variables);
 
     List<RecordHistoryLevel.ProducedHistoryEvent> producedHistoryEvents = historyLevel.getProducedHistoryEvents();
     assertEquals(1, producedHistoryEvents.size());

@@ -17,9 +17,9 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.Map;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.dmn.invocation.DecisionInvocation;
+import org.camunda.bpm.engine.impl.dmn.invocation.DecisionTableInvocation;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
@@ -34,7 +34,7 @@ import org.camunda.bpm.engine.variable.Variables;
  *
  * @author Philipp Ossler
  */
-public class EvaluateDecisionByKeyCmd implements Command<DmnDecisionResult> {
+public class EvaluateDecisionByKeyCmd implements Command<DmnDecisionTableResult> {
 
   protected String decisionDefinitionKey;
   protected Integer version;
@@ -51,7 +51,7 @@ public class EvaluateDecisionByKeyCmd implements Command<DmnDecisionResult> {
   }
 
   @Override
-  public DmnDecisionResult execute(CommandContext commandContext) {
+  public DmnDecisionTableResult execute(CommandContext commandContext) {
     ensureNotNull("decision definition key is null", "processDefinitionKey", decisionDefinitionKey);
 
     DecisionDefinition decisionDefinition = getDecisionDefinition(commandContext);
@@ -66,9 +66,9 @@ public class EvaluateDecisionByKeyCmd implements Command<DmnDecisionResult> {
 
   }
 
-  protected DmnDecisionResult doEvaluateDecision(CommandContext commandContext, DecisionDefinition decisionDefinition, VariableMap variables) {
+  protected DmnDecisionTableResult doEvaluateDecision(CommandContext commandContext, DecisionDefinition decisionDefinition, VariableMap variables) {
 
-    final DecisionInvocation invocation = new DecisionInvocation(decisionDefinition, variables.asVariableContext());
+    final DecisionTableInvocation invocation = new DecisionTableInvocation(decisionDefinition, variables.asVariableContext());
 
     try {
       commandContext.getProcessEngineConfiguration()

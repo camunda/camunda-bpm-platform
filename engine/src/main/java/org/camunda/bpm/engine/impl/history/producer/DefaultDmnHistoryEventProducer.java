@@ -16,11 +16,11 @@ package org.camunda.bpm.engine.impl.history.producer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionTable;
-import org.camunda.bpm.dmn.engine.DmnDecisionTableInput;
-import org.camunda.bpm.dmn.engine.DmnDecisionTableOutput;
-import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
-import org.camunda.bpm.dmn.engine.DmnDecisionTableRule;
+import org.camunda.bpm.dmn.engine.DmnDecision;
+import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationEvent;
+import org.camunda.bpm.dmn.engine.delegate.DmnEvaluatedDecisionRule;
+import org.camunda.bpm.dmn.engine.delegate.DmnEvaluatedInput;
+import org.camunda.bpm.dmn.engine.delegate.DmnEvaluatedOutput;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.history.HistoricDecisionInputInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionOutputInstance;
@@ -49,13 +49,13 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
   @Override
-  public HistoryEvent createDecisionEvaluatedEvt(DelegateExecution execution, DmnDecisionTable decisionTable, DmnDecisionTableResult decisionTableResult) {
+  public HistoryEvent createDecisionEvaluatedEvt(DelegateExecution execution, DmnDecisionTableEvaluationEvent evaluationEvent) {
     final ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
     // create event instance
-    HistoricDecisionInstanceEntity event = newDecisionInstanceEventEntity(executionEntity, decisionTable, decisionTableResult);
+    HistoricDecisionInstanceEntity event = newDecisionInstanceEventEntity(executionEntity, evaluationEvent);
     // initialize event
-    initDecisionInstanceEvent(event, decisionTable, decisionTableResult, HistoryEventTypes.DMN_DECISION_EVALUATE);
+    initDecisionInstanceEvent(event, evaluationEvent, HistoryEventTypes.DMN_DECISION_EVALUATE);
     setReferenceToProcessInstance(event, executionEntity);
     // set current time as evaluation time
     event.setEvaluationTime(ClockUtil.getCurrentTime());
@@ -64,41 +64,42 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
   }
 
   @Override
-  public HistoryEvent createDecisionEvaluatedEvt(DmnDecisionTable decisionTable, DmnDecisionTableResult decisionTableResult) {
+  public HistoryEvent createDecisionEvaluatedEvt(DmnDecisionTableEvaluationEvent evaluationEvent) {
     // create event instance
-    HistoricDecisionInstanceEntity event = newDecisionInstanceEventEntity(decisionTable, decisionTableResult);
+    HistoricDecisionInstanceEntity event = newDecisionInstanceEventEntity(evaluationEvent);
     // initialize event
-    initDecisionInstanceEvent(event, decisionTable, decisionTableResult, HistoryEventTypes.DMN_DECISION_EVALUATE);
+    initDecisionInstanceEvent(event, evaluationEvent, HistoryEventTypes.DMN_DECISION_EVALUATE);
     // set current time as evaluation time
     event.setEvaluationTime(ClockUtil.getCurrentTime());
 
     return event;
   }
 
-  protected HistoricDecisionInstanceEntity newDecisionInstanceEventEntity(ExecutionEntity executionEntity, DmnDecisionTable decisionTable, DmnDecisionTableResult decisionTableResult) {
+  protected HistoricDecisionInstanceEntity newDecisionInstanceEventEntity(ExecutionEntity executionEntity, DmnDecisionTableEvaluationEvent evaluationEvent) {
     return new HistoricDecisionInstanceEntity();
   }
 
-  protected HistoricDecisionInstanceEntity newDecisionInstanceEventEntity(DmnDecisionTable decisionTable, DmnDecisionTableResult decisionTableResult) {
+  protected HistoricDecisionInstanceEntity newDecisionInstanceEventEntity(DmnDecisionTableEvaluationEvent evaluationEvent) {
     return new HistoricDecisionInstanceEntity();
   }
 
-  protected void initDecisionInstanceEvent(HistoricDecisionInstanceEntity event, DmnDecisionTable decisionTable, DmnDecisionTableResult decisionTableResult, HistoryEventTypes eventType) {
+  protected void initDecisionInstanceEvent(HistoricDecisionInstanceEntity event, DmnDecisionTableEvaluationEvent evaluationEvent, HistoryEventTypes eventType) {
     event.setEventType(eventType.getEventName());
 
+    DmnDecision decisionTable = evaluationEvent.getDecisionTable();
     event.setDecisionDefinitionId(((DecisionDefinition) decisionTable).getId());
     event.setDecisionDefinitionKey(decisionTable.getKey());
     event.setDecisionDefinitionName(decisionTable.getName());
 
-    if(decisionTableResult.getCollectResultValue() != null) {
-      Double collectResultValue = getCollectResultValue(decisionTableResult.getCollectResultValue());
+    if(evaluationEvent.getCollectResultValue() != null) {
+      Double collectResultValue = getCollectResultValue(evaluationEvent.getCollectResultValue());
       event.setCollectResultValue(collectResultValue);
     }
 
-    List<HistoricDecisionInputInstance> historicDecisionInputInstances = createHistoricDecisionInputInstances(decisionTableResult);
+    List<HistoricDecisionInputInstance> historicDecisionInputInstances = createHistoricDecisionInputInstances(evaluationEvent);
     event.setInputs(historicDecisionInputInstances);
 
-    List<HistoricDecisionOutputInstance> historicDecisionOutputInstances = createHistoricDecisionOutputInstances(decisionTableResult);
+    List<HistoricDecisionOutputInstance> historicDecisionOutputInstances = createHistoricDecisionOutputInstances(evaluationEvent);
     event.setOutputs(historicDecisionOutputInstances);
   }
 
@@ -119,13 +120,13 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     }
   }
 
-  protected List<HistoricDecisionInputInstance> createHistoricDecisionInputInstances(DmnDecisionTableResult decisionTableResult) {
+  protected List<HistoricDecisionInputInstance> createHistoricDecisionInputInstances(DmnDecisionTableEvaluationEvent evaluationEvent) {
     List<HistoricDecisionInputInstance> inputInstances = new ArrayList<HistoricDecisionInputInstance>();
 
-    for(DmnDecisionTableInput inputClause : decisionTableResult.getInputs().values()) {
+    for(DmnEvaluatedInput inputClause : evaluationEvent.getInputs()) {
 
       HistoricDecisionInputInstanceEntity inputInstance = new HistoricDecisionInputInstanceEntity();
-      inputInstance.setClauseId(inputClause.getKey());
+      inputInstance.setClauseId(inputClause.getId());
       inputInstance.setClauseName(inputClause.getName());
 
       TypedValue typedValue = Variables.untypedValue(inputClause.getValue());
@@ -137,20 +138,20 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     return inputInstances;
   }
 
-  protected List<HistoricDecisionOutputInstance> createHistoricDecisionOutputInstances(DmnDecisionTableResult decisionTableResult) {
+  protected List<HistoricDecisionOutputInstance> createHistoricDecisionOutputInstances(DmnDecisionTableEvaluationEvent evaluationEvent) {
     List<HistoricDecisionOutputInstance> outputInstances = new ArrayList<HistoricDecisionOutputInstance>();
 
-    List<DmnDecisionTableRule> matchingRules = decisionTableResult.getMatchingRules();
+    List<DmnEvaluatedDecisionRule> matchingRules = evaluationEvent.getMatchingRules();
     for(int index = 0; index < matchingRules.size(); index++) {
-      DmnDecisionTableRule rule = matchingRules.get(index);
+      DmnEvaluatedDecisionRule rule = matchingRules.get(index);
 
-      String ruleId = rule.getKey();
+      String ruleId = rule.getId();
       Integer ruleOrder = index + 1;
 
-      for(DmnDecisionTableOutput outputClause : rule.getOutputs().values()) {
+      for(DmnEvaluatedOutput outputClause : rule.getOutputEntries().values()) {
 
         HistoricDecisionOutputInstanceEntity outputInstance = new HistoricDecisionOutputInstanceEntity();
-        outputInstance.setClauseId(outputClause.getKey());
+        outputInstance.setClauseId(outputClause.getId());
         outputInstance.setClauseName(outputClause.getName());
 
         outputInstance.setRuleId(ruleId);

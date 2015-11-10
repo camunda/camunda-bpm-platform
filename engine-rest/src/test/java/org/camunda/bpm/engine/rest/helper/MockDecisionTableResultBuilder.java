@@ -16,51 +16,51 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionOutput;
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionRuleResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 
 /**
  * @author Philipp Ossler
  */
-public class MockDecisionResultBuilder {
+public class MockDecisionTableResultBuilder {
 
-  protected List<DmnDecisionOutput> decisionOutputs = new ArrayList<DmnDecisionOutput>();
+  protected List<DmnDecisionRuleResult> ruleResults = new ArrayList<DmnDecisionRuleResult>();
 
-  public MockDecisionOutputBuilder decisionOutput() {
-    return new MockDecisionOutputBuilder(this);
+  public MockDecisionRuleResultBuilder ruleResult() {
+    return new MockDecisionRuleResultBuilder(this);
   }
 
-  public void addDecisionOutput(DmnDecisionOutput decisionOutput) {
-    decisionOutputs.add(decisionOutput);
+  public void addRuleResult(DmnDecisionRuleResult ruleResult) {
+    ruleResults.add(ruleResult);
   }
 
-  public DmnDecisionResult build() {
-    SimpleDecisionResult decisionResult = new SimpleDecisionResult();
-    decisionResult.addAll(decisionOutputs);
-    return decisionResult;
+  public DmnDecisionTableResult build() {
+    SimpleDecisionTableResult decisionTableResult = new SimpleDecisionTableResult();
+    decisionTableResult.addAll(ruleResults);
+    return decisionTableResult;
   }
 
-  protected class SimpleDecisionResult extends ArrayList<DmnDecisionOutput>implements DmnDecisionResult {
+  protected class SimpleDecisionTableResult extends ArrayList<DmnDecisionRuleResult> implements DmnDecisionTableResult {
 
     private static final long serialVersionUID = 1L;
 
     @Override
-    public DmnDecisionOutput getFirstOutput() {
+    public DmnDecisionRuleResult getFirstResult() {
       throw new UnsupportedOperationException();
     }
 
     @Override
-    public DmnDecisionOutput getSingleOutput() {
+    public DmnDecisionRuleResult getSingleResult() {
       throw new UnsupportedOperationException();
     }
 
     @Override
-    public <T> List<T> collectOutputValues(String outputName) {
+    public <T> List<T> collectEntries(String outputName) {
       throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<Map<String, Object>> getOutputList() {
+    public List<Map<String, Object>> getResultList() {
       throw new UnsupportedOperationException();
     }
 

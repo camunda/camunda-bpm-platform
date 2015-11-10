@@ -14,7 +14,7 @@ package org.camunda.bpm.engine.impl.bpmn.behavior;
 
 import java.util.Collection;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnEngineException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.Expression;
@@ -236,7 +236,7 @@ public class BpmnBehaviorLogger extends ProcessEngineLogger {
     logError("035", "caught an exception while propagate error in activity with id '{}'", activityId, cause);
   }
 
-  public ProcessEngineException decisionResultMappingException(DmnDecisionResult decisionResult, DmnEngineException cause) {
+  public ProcessEngineException decisionResultMappingException(DmnDecisionTableResult decisionResult, DmnEngineException cause) {
     return new ProcessEngineException(exceptionMessage(
         "036",
         "The decision result mapper failed to process '{}'",
@@ -244,7 +244,7 @@ public class BpmnBehaviorLogger extends ProcessEngineLogger {
       ), cause);
   }
 
-  public ProcessEngineException decisionResultCollectMappingException(Collection<String> outputNames, DmnDecisionResult decisionResult) {
+  public ProcessEngineException decisionResultCollectMappingException(Collection<String> outputNames, DmnDecisionTableResult decisionResult) {
     return new ProcessEngineException(exceptionMessage(
         "037",
         "The decision result mapper failed to process '{}'. The decision outputs should only contains values for one output name but found '{}'.",

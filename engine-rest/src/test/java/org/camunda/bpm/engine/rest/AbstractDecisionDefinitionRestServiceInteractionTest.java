@@ -32,10 +32,9 @@ import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.ws.rs.core.Response.Status;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.util.IoUtil;
@@ -43,7 +42,7 @@ import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
 import org.camunda.bpm.engine.rest.exception.RestException;
-import org.camunda.bpm.engine.rest.helper.MockDecisionResultBuilder;
+import org.camunda.bpm.engine.rest.helper.MockDecisionTableResultBuilder;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.sub.repository.impl.ProcessDefinitionResourceImpl;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
@@ -268,9 +267,9 @@ public abstract class AbstractDecisionDefinitionRestServiceInteractionTest exten
 
   @Test
   public void testEvaluateDecisionByKey() {
-    DmnDecisionResult decisionResult = MockProvider.createMockDecisionResult();
+    DmnDecisionTableResult decisionResult = MockProvider.createMockDecisionResult();
 
-    when(decisionServiceMock.evaluateDecisionById(eq(MockProvider.EXAMPLE_DECISION_DEFINITION_ID), anyMapOf(String.class, Object.class)))
+    when(decisionServiceMock.evaluateDecisionTableById(eq(MockProvider.EXAMPLE_DECISION_DEFINITION_ID), anyMapOf(String.class, Object.class)))
         .thenReturn(decisionResult);
 
     Map<String, Object> json = new HashMap<String, Object>();
@@ -291,14 +290,14 @@ public abstract class AbstractDecisionDefinitionRestServiceInteractionTest exten
     expectedVariables.put("amount", 420);
     expectedVariables.put("invoiceCategory", "MISC");
 
-    verify(decisionServiceMock).evaluateDecisionById(MockProvider.EXAMPLE_DECISION_DEFINITION_ID, expectedVariables);
+    verify(decisionServiceMock).evaluateDecisionTableById(MockProvider.EXAMPLE_DECISION_DEFINITION_ID, expectedVariables);
   }
 
   @Test
   public void testEvaluateDecisionById() {
-    DmnDecisionResult decisionResult = MockProvider.createMockDecisionResult();
+    DmnDecisionTableResult decisionResult = MockProvider.createMockDecisionResult();
 
-    when(decisionServiceMock.evaluateDecisionById(eq(MockProvider.EXAMPLE_DECISION_DEFINITION_ID), anyMapOf(String.class, Object.class)))
+    when(decisionServiceMock.evaluateDecisionTableById(eq(MockProvider.EXAMPLE_DECISION_DEFINITION_ID), anyMapOf(String.class, Object.class)))
         .thenReturn(decisionResult);
 
     Map<String, Object> json = new HashMap<String, Object>();
@@ -319,17 +318,17 @@ public abstract class AbstractDecisionDefinitionRestServiceInteractionTest exten
     expectedVariables.put("amount", 420);
     expectedVariables.put("invoiceCategory", "MISC");
 
-    verify(decisionServiceMock).evaluateDecisionById(MockProvider.EXAMPLE_DECISION_DEFINITION_ID, expectedVariables);
+    verify(decisionServiceMock).evaluateDecisionTableById(MockProvider.EXAMPLE_DECISION_DEFINITION_ID, expectedVariables);
   }
 
   @Test
   public void testEvaluateDecisionSingleDecisionOutput() {
-    DmnDecisionResult decisionResult = new MockDecisionResultBuilder()
-        .decisionOutput()
-          .output("status", Variables.stringValue("gold"))
+    DmnDecisionTableResult decisionResult = new MockDecisionTableResultBuilder()
+        .ruleResult()
+          .entry("status", Variables.stringValue("gold"))
         .build();
 
-    when(decisionServiceMock.evaluateDecisionById(eq(MockProvider.EXAMPLE_DECISION_DEFINITION_ID), anyMapOf(String.class, Object.class)))
+    when(decisionServiceMock.evaluateDecisionTableById(eq(MockProvider.EXAMPLE_DECISION_DEFINITION_ID), anyMapOf(String.class, Object.class)))
         .thenReturn(decisionResult);
 
     Map<String, Object> json = new HashMap<String, Object>();
@@ -348,14 +347,14 @@ public abstract class AbstractDecisionDefinitionRestServiceInteractionTest exten
 
   @Test
   public void testEvaluateDecisionMultipleDecisionOutputs() {
-    DmnDecisionResult decisionResult = new MockDecisionResultBuilder()
-        .decisionOutput()
-          .output("status", Variables.stringValue("gold"))
-        .decisionOutput()
-          .output("assignee", Variables.stringValue("manager"))
+    DmnDecisionTableResult decisionResult = new MockDecisionTableResultBuilder()
+        .ruleResult()
+          .entry("status", Variables.stringValue("gold"))
+        .ruleResult()
+          .entry("assignee", Variables.stringValue("manager"))
         .build();
 
-    when(decisionServiceMock.evaluateDecisionById(eq(MockProvider.EXAMPLE_DECISION_DEFINITION_ID), anyMapOf(String.class, Object.class)))
+    when(decisionServiceMock.evaluateDecisionTableById(eq(MockProvider.EXAMPLE_DECISION_DEFINITION_ID), anyMapOf(String.class, Object.class)))
         .thenReturn(decisionResult);
 
     Map<String, Object> json = new HashMap<String, Object>();
@@ -376,13 +375,13 @@ public abstract class AbstractDecisionDefinitionRestServiceInteractionTest exten
 
   @Test
   public void testEvaluateDecisionMultipleDecisionValues() {
-    DmnDecisionResult decisionResult = new MockDecisionResultBuilder()
-        .decisionOutput()
-          .output("status", Variables.stringValue("gold"))
-          .output("assignee", Variables.stringValue("manager"))
+    DmnDecisionTableResult decisionResult = new MockDecisionTableResultBuilder()
+        .ruleResult()
+          .entry("status", Variables.stringValue("gold"))
+          .entry("assignee", Variables.stringValue("manager"))
         .build();
 
-    when(decisionServiceMock.evaluateDecisionById(eq(MockProvider.EXAMPLE_DECISION_DEFINITION_ID), anyMapOf(String.class, Object.class)))
+    when(decisionServiceMock.evaluateDecisionTableById(eq(MockProvider.EXAMPLE_DECISION_DEFINITION_ID), anyMapOf(String.class, Object.class)))
         .thenReturn(decisionResult);
 
     Map<String, Object> json = new HashMap<String, Object>();

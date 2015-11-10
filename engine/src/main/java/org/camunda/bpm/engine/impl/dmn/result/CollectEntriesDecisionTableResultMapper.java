@@ -18,21 +18,21 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.behavior.BpmnBehaviorLogger;
 
 /**
- * Maps the decision result to a list of untyped values.
+ * Maps the decision result to a list of untyped entries.
  *
  * @author Philipp Ossler
  */
-public class CollectValuesDecisionResultMapper implements DecisionResultMapper {
+public class CollectEntriesDecisionTableResultMapper implements DecisionTableResultMapper {
 
   protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BPMN_BEHAVIOR_LOGGER;
 
   @Override
-  public Object mapDecisionResult(DmnDecisionResult decisionResult) {
+  public Object mapDecisionTableResult(DmnDecisionTableResult decisionResult) {
     if (decisionResult.isEmpty()) {
       return Collections.emptyList();
 
@@ -44,16 +44,16 @@ public class CollectValuesDecisionResultMapper implements DecisionResultMapper {
 
       } else {
         String outputName = outputNames.iterator().next();
-        return decisionResult.collectOutputValues(outputName);
+        return decisionResult.collectEntries(outputName);
       }
     }
   }
 
-  protected Set<String> collectOutputNames(DmnDecisionResult decisionResult) {
+  protected Set<String> collectOutputNames(DmnDecisionTableResult decisionResult) {
     Set<String> outputNames = new HashSet<String>();
 
-    for (Map<String, Object> valueMap : decisionResult.getOutputList()) {
-      outputNames.addAll(valueMap.keySet());
+    for (Map<String, Object> entryMap : decisionResult.getResultList()) {
+      outputNames.addAll(entryMap.keySet());
     }
 
     return outputNames;

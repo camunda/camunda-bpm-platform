@@ -87,11 +87,11 @@ import org.camunda.bpm.engine.impl.core.variable.mapping.IoMapping;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ConstantValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.NullValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
-import org.camunda.bpm.engine.impl.dmn.result.CollectValuesDecisionResultMapper;
-import org.camunda.bpm.engine.impl.dmn.result.DecisionResultMapper;
-import org.camunda.bpm.engine.impl.dmn.result.OutputListDecisionResultMapper;
-import org.camunda.bpm.engine.impl.dmn.result.SingleOutputDecisionResultMapper;
-import org.camunda.bpm.engine.impl.dmn.result.SingleValueDecisionResultMapper;
+import org.camunda.bpm.engine.impl.dmn.result.CollectEntriesDecisionTableResultMapper;
+import org.camunda.bpm.engine.impl.dmn.result.DecisionTableResultMapper;
+import org.camunda.bpm.engine.impl.dmn.result.ResultListDecisionTableResultMapper;
+import org.camunda.bpm.engine.impl.dmn.result.SingleResultDecisionTableResultMapper;
+import org.camunda.bpm.engine.impl.dmn.result.SingleEntryDecisionTableResultMapper;
 import org.camunda.bpm.engine.impl.el.ElValueProvider;
 import org.camunda.bpm.engine.impl.el.Expression;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
@@ -2008,9 +2008,9 @@ public class BpmnParse extends Parse {
     parseVersion(businessRuleTaskElement, activity, callableElement, "decisionRefBinding", "decisionRefVersion");
 
     String resultVariable = parseResultVariable(businessRuleTaskElement);
-    DecisionResultMapper decisionResultMapper = parseDecisionResultMapper(businessRuleTaskElement);
+    DecisionTableResultMapper decisionTableResultMapper = parseDecisionResultMapper(businessRuleTaskElement);
 
-    DecisionRuleTaskActivityBehavior behavior = new DecisionRuleTaskActivityBehavior(callableElement, resultVariable, decisionResultMapper);
+    DecisionRuleTaskActivityBehavior behavior = new DecisionRuleTaskActivityBehavior(callableElement, resultVariable, decisionTableResultMapper);
     activity.setActivityBehavior(behavior);
 
     parseExecutionListenersOnScope(businessRuleTaskElement, activity);
@@ -2022,25 +2022,25 @@ public class BpmnParse extends Parse {
     return activity;
   }
 
-  protected DecisionResultMapper parseDecisionResultMapper(Element businessRuleTaskElement) {
-    // default mapper is 'outputList'
-    String decisionResultMapper = businessRuleTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "mapDecisionResult", "outputList");
+  protected DecisionTableResultMapper parseDecisionResultMapper(Element businessRuleTaskElement) {
+    // default mapper is 'resultList'
+    String decisionResultMapper = businessRuleTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "mapDecisionResult", "resultList");
 
-    if ("singleValue".equals(decisionResultMapper)) {
-      return new SingleValueDecisionResultMapper();
+    if ("singleEntry".equals(decisionResultMapper)) {
+      return new SingleEntryDecisionTableResultMapper();
 
-    } else if ("singleOutput".equals(decisionResultMapper)) {
-      return new SingleOutputDecisionResultMapper();
+    } else if ("singleResult".equals(decisionResultMapper)) {
+      return new SingleResultDecisionTableResultMapper();
 
-    } else if ("collectValues".equals(decisionResultMapper)) {
-      return new CollectValuesDecisionResultMapper();
+    } else if ("collectEntries".equals(decisionResultMapper)) {
+      return new CollectEntriesDecisionTableResultMapper();
 
-    } else if ("outputList".equals(decisionResultMapper)) {
-      return new OutputListDecisionResultMapper();
+    } else if ("resultList".equals(decisionResultMapper)) {
+      return new ResultListDecisionTableResultMapper();
 
     } else {
       addError("No decision result mapper found for name '" + decisionResultMapper
-          + "'. Supported mappers are 'singleValue', 'singleOutput', 'collectValues' and 'outputList'.", businessRuleTaskElement);
+          + "'. Supported mappers are 'singleEntry', 'singleResult', 'collectEntries' and 'resultList'.", businessRuleTaskElement);
       return null;
     }
   }

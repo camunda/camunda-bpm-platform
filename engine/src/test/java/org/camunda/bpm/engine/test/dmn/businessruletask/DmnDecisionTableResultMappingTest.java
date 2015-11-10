@@ -28,7 +28,7 @@ import org.camunda.bpm.engine.variable.Variables;
  *
  * @author Philipp Ossler
  */
-public class DmnDecisionResultMappingTest extends PluggableProcessEngineTestCase {
+public class DmnDecisionTableResultMappingTest extends PluggableProcessEngineTestCase {
 
   protected static final String TEST_DECISION = "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultTest.dmn11.xml";
 
@@ -80,10 +80,10 @@ public class DmnDecisionResultMappingTest extends PluggableProcessEngineTestCase
     ProcessInstance processInstance = startTestProcess("multiple entries list");
 
     @SuppressWarnings("unchecked")
-    List<Map<String, Object>> outputList = (List<Map<String, Object>>) runtimeService.getVariable(processInstance.getId(), "result");
-    assertEquals(2, outputList.size());
+    List<Map<String, Object>> resultList = (List<Map<String, Object>>) runtimeService.getVariable(processInstance.getId(), "result");
+    assertEquals(2, resultList.size());
 
-    for (Map<String, Object> valueMap : outputList) {
+    for (Map<String, Object> valueMap : resultList) {
       assertEquals(2, valueMap.size());
       assertEquals("foo", valueMap.get("result1"));
       assertEquals("bar", valueMap.get("result2"));
@@ -94,12 +94,12 @@ public class DmnDecisionResultMappingTest extends PluggableProcessEngineTestCase
   public void testDefaultResultMapping() {
     ProcessInstance processInstance = startTestProcess("multiple entries list");
 
-    // default mapping is 'outputList'
+    // default mapping is 'resultList'
     @SuppressWarnings("unchecked")
-    List<Map<String, Object>> outputList = (List<Map<String, Object>>) runtimeService.getVariable(processInstance.getId(), "result");
-    assertEquals(2, outputList.size());
+    List<Map<String, Object>> resultList = (List<Map<String, Object>>) runtimeService.getVariable(processInstance.getId(), "result");
+    assertEquals(2, resultList.size());
 
-    for (Map<String, Object> valueMap : outputList) {
+    for (Map<String, Object> valueMap : resultList) {
       assertEquals(2, valueMap.size());
       assertEquals("foo", valueMap.get("result1"));
       assertEquals("bar", valueMap.get("result2"));
