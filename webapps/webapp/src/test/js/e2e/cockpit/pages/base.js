@@ -22,6 +22,14 @@ module.exports = Page.extend({
 
   selectBreadCrumb: function(item) {
     this.breadCrumb(item).click();
+  },
+
+  navbarItem: function (idx) {
+    return element(by.css('[cam-widget-header] [ng-transclude] > ul > li:nth-child(' + (idx + 1) + ')'));
+  },
+
+  navbarItemClick: function () {
+    return this.navbarItem().element(by.css('a')).click();
   }
 
 });

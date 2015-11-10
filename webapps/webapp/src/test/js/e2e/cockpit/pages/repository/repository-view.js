@@ -1,6 +1,6 @@
 'use strict';
 
-var Page = require('../../../commons/pages/page');
+var Page = require('../base');
 
 module.exports = Page.extend({
 

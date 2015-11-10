@@ -20,6 +20,13 @@ describe('Repository Spec', function() {
       });
     });
 
+    it('shows an active link in the header', function () {
+      expect(repositoryPage.navbarItem(1).getText()).to.eventually.eql('Deployments');
+      browser.sleep(2000).then(function () {
+        expect(repositoryPage.navbarItem(1).getAttribute('class')).to.eventually.contain('active');
+      });
+    });
+
 
     it('should change sorting by', function() {
       // given

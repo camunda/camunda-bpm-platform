@@ -25,6 +25,9 @@ describe('Cockpit Dashboard Spec', function() {
       expect(dashboardPage.deployedProcessesList.processCountHeader()).to.eventually.eql('1 process definition deployed');
     });
 
+    it('shows an active link in the header', function () {
+      expect(dashboardPage.navbarItem(0).getAttribute('class')).to.eventually.contain('active');
+    });
 
     it('should validate process previews tab', function() {
 
