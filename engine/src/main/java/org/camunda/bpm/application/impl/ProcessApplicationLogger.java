@@ -75,11 +75,11 @@ public class ProcessApplicationLogger extends ProcessEngineLogger {
     logDebug("007", summary);
   }
 
-  public void noElResolverProvided(String paName, org.camunda.bpm.engine.impl.javax.el.ELResolver elResolver) {
+  public void noElResolverProvided(String paName, String string) {
     logWarn("008",
         "Process Application '{}': No ELResolver provided by ProcessApplicationElResolver {}",
         paName,
-        elResolver.getClass().getName());
+        string);
 
   }
 

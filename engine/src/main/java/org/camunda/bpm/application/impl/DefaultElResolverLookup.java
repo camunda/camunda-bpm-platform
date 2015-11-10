@@ -57,8 +57,9 @@ public class DefaultElResolverLookup {
         if (elResolver != null) {
           compositeResolver.add(elResolver);
           summary.append(String.format("Class %s", processApplicationElResolver.getClass().getName()));
-        } else {
-          LOG.noElResolverProvided(processApplication.getName(), elResolver);
+        }
+        else {
+          LOG.noElResolverProvided(processApplication.getName(), processApplicationElResolver.getClass().getName());
         }
       }
 
