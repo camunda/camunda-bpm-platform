@@ -8,24 +8,20 @@
 
     <casePlanModel id="CasePlanModel_1">
 
-      <planItem id="PI_Stage_1" definitionRef="Stage_1" />
-
+      <planItem id="PI_Stage_1" definitionRef="Stage_1"/>
+      
       <humanTask id="HumanTask_1" />
-
-      <stage id="Stage_1" autoComplete="true">
-        <planItem id="PI_HumanTask_1" definitionRef="HumanTask_1">
-          <itemControl>
-            <repetitionRule>
-              <condition>${true}</condition>
-            </repetitionRule>
-            <manualActivationRule>
-              <condition>${false}</condition>
-            </manualActivationRule>
-          </itemControl>
-        </planItem>
+      <stage id="Stage_1">
+        <defaultControl>
+          <repetitionRule>
+            <condition>${true}</condition>
+          </repetitionRule>
+        </defaultControl>
+        <planItem id="PI_HumanTask_1" definitionRef="HumanTask_1" />
       </stage>
 
     </casePlanModel>
   </case>
 
 </definitions>
+

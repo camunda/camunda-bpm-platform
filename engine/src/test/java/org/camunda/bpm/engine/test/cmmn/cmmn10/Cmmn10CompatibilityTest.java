@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.cmmn.cmmn10;
 import org.camunda.bpm.engine.exception.NotAllowedException;
 import org.camunda.bpm.engine.impl.test.CmmnProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.CaseExecution;
+import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -56,12 +57,60 @@ public class Cmmn10CompatibilityTest extends CmmnProcessEngineTestCase {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/cmm10/Cmmn10CompatibilityTest.testRepetitionRule.cmmn")
   public void testRepetitionRule() {
+    // given
     createCaseInstanceByKey("case", Variables.createVariables().putValue("repetition", true));
 
-    CaseExecution taskExecution = queryCaseExecutionByActivityId("PI_HumanTask_1");
+    String secondHumanTaskId = queryCaseExecutionByActivityId("PI_HumanTask_2").getId();
 
-    assertNotNull(taskExecution);
-    assertTrue(taskExecution.isRepeatable());
+    // when
+    manualStart(secondHumanTaskId);
+    complete(secondHumanTaskId);
+
+    // then
+    CaseExecutionQuery query = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1");
+    assertEquals(2, query.count());
+    assertEquals(1, query.available().count());
+    assertEquals(1, query.enabled().count());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/cmm10/Cmmn10CompatibilityTest.testRepetitionRuleWithoutEntryCriteria.cmmn")
+  public void testRepetitionRuleWithoutEntryCriteria() {
+    // given
+    createCaseInstanceByKey("case", Variables.createVariables().putValue("repetition", true));
+
+    String firstHumanTaskId = queryCaseExecutionByActivityId("PI_HumanTask_1").getId();
+
+    // when
+    manualStart(firstHumanTaskId);
+    complete(firstHumanTaskId);
+
+    // then
+    CaseExecutionQuery query = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1");
+    assertEquals(1, query.count());
+    assertEquals(1, query.enabled().count());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/cmm10/Cmmn10CompatibilityTest.testRepetitionRuleCustomStandardEvent.cmmn")
+  public void testRepetitionRuleWithoutEntryCriteriaAndCustomStandardEvent() {
+    // given
+    createCaseInstanceByKey("case", Variables.createVariables().putValue("repetition", true));
+
+    String firstHumanTaskId = queryCaseExecutionByActivityId("PI_HumanTask_1").getId();
+
+    // when
+    disable(firstHumanTaskId);
+
+    // then
+    CaseExecutionQuery query = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_1");
+    assertEquals(2, query.count());
+    assertEquals(1, query.enabled().count());
+    assertEquals(1, query.disabled().count());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/cmmn/cmm10/Cmmn10CompatibilityTest.testPlanItemEntryCriterion.cmmn")

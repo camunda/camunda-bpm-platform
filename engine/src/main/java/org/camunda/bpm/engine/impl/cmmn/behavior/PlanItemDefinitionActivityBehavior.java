@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.behavior;
 
+import static org.camunda.bpm.engine.delegate.CaseExecutionListener.ENABLE;
+import static org.camunda.bpm.engine.delegate.CaseExecutionListener.OCCUR;
+import static org.camunda.bpm.engine.delegate.CaseExecutionListener.START;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.AVAILABLE;
 import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.NEW;
 import static org.camunda.bpm.engine.impl.cmmn.handler.ItemHandler.PROPERTY_REPETITION_RULE;
@@ -21,8 +24,8 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 import java.util.Arrays;
 import java.util.List;
 
-import org.camunda.bpm.engine.exception.cmmn.CaseIllegalStateTransitionException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.bpmn.helper.CmmnProperties;
 import org.camunda.bpm.engine.impl.cmmn.CaseControlRule;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
@@ -52,15 +55,7 @@ public abstract class PlanItemDefinitionActivityBehavior implements CmmnActivity
     }
 
     CmmnActivity activity = getActivity(execution);
-
     List<CmmnSentryDeclaration> criteria = activity.getEntryCriteria();
-    if (execution.isRepetition()) {
-      List<CmmnSentryDeclaration> repetitionCriteria = activity.getRepetitionCriteria();
-      if (repetitionCriteria != null && !repetitionCriteria.isEmpty()) {
-        criteria = repetitionCriteria;
-      }
-    }
-
     return !(criteria != null && !criteria.isEmpty());
   }
 
@@ -81,15 +76,16 @@ public abstract class PlanItemDefinitionActivityBehavior implements CmmnActivity
     }
   }
 
-  protected void evaluateRepetitionRule(CmmnActivityExecution execution) {
+  protected boolean evaluateRepetitionRule(CmmnActivityExecution execution) {
     CmmnActivity activity = execution.getActivity();
 
     Object repetitionRule = activity.getProperty(PROPERTY_REPETITION_RULE);
     if (repetitionRule != null) {
       CaseControlRule rule = (CaseControlRule) repetitionRule;
-      boolean repeatable = rule.evaluate(execution);
-      execution.setRepeatable(repeatable);
+      return rule.evaluate(execution);
     }
+
+    return false;
   }
 
   // creation ///////////////////////////////////////////////////////////////
@@ -185,24 +181,33 @@ public abstract class PlanItemDefinitionActivityBehavior implements CmmnActivity
 
   // repetition ///////////////////////////////////////////////////////////////
 
-  public void repeat(CmmnActivityExecution execution) {
-    // a case execution can only repeated,
-    // iff execution.isRepeatable() == true
-    if (execution.isRepeatable()) {
-      CmmnActivity activity = execution.getActivity();
+  public void repeat(CmmnActivityExecution execution, String standardEvent) {
+    CmmnActivity activity = execution.getActivity();
+    boolean repeat = false;
+
+    if (activity.getEntryCriteria().isEmpty()) {
+      List<String> events = activity.getProperties().get(CmmnProperties.REPEAT_ON_STANDARD_EVENTS);
+      if (events != null && events.contains(standardEvent)) {
+        repeat = evaluateRepetitionRule(execution);
+      }
+    }
+    else {
+
+      if (ENABLE.equals(standardEvent) || START.equals(standardEvent) || OCCUR.equals(standardEvent)) {
+        repeat = evaluateRepetitionRule(execution);
+      }
+    }
+
+    if (repeat) {
+
       CmmnActivityExecution parent = execution.getParent();
 
       // instantiate a new instance of given activity
       List<CmmnExecution> children = parent.createChildExecutions(Arrays.asList(activity));
-      CmmnExecution newInstance = children.get(0);
-
-      // set flag to note that the new instance is a repetition
-      // -> the activity has been executed at least one times.
-      newInstance.setRepetition(true);
-
       // start the lifecycle of the new instance
       parent.triggerChildExecutionsLifecycle(children);
     }
+
   }
 
   // helper //////////////////////////////////////////////////////////////////////

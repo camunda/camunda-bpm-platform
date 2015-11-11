@@ -52,7 +52,7 @@
         </extensionElements>
         <defaultControl>
           <repetitionRule>
-            <condition><![CDATA[${repetition < 2}]]></condition>
+            <condition><![CDATA[${repetition < 3}]]></condition>
           </repetitionRule>
         </defaultControl>
       </humanTask>

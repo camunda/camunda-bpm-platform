@@ -30,8 +30,6 @@ public class CaseExecutionDto {
   protected String activityDescription;
   protected String parentId;
   protected boolean required;
-  protected boolean repeatable;
-  protected boolean repetition;
   protected boolean enabled;
   protected boolean active;
   protected boolean disabled;
@@ -72,14 +70,6 @@ public class CaseExecutionDto {
     return required;
   }
 
-  public boolean isRepeatable() {
-    return repeatable;
-  }
-  
-  public boolean isRepetition() {
-    return repetition;
-  }
-  
   public boolean isEnabled() {
     return enabled;
   }
@@ -104,8 +94,6 @@ public class CaseExecutionDto {
     dto.activityDescription = caseExecution.getActivityDescription();
     dto.parentId = caseExecution.getParentId();
     dto.required = caseExecution.isRequired();
-    dto.repeatable = caseExecution.isRepeatable();
-    dto.repetition = caseExecution.isRepetition();
     dto.active = caseExecution.isActive();
     dto.enabled = caseExecution.isEnabled();
     dto.disabled = caseExecution.isDisabled();

@@ -31,8 +31,6 @@ create table ACT_HI_CASEACTINST (
     DURATION_ bigint,
     STATE_ integer,
     REQUIRED_ smallint check(REQUIRED_ in (1,0)),
-    REPEATABLE_ smallint check(REPEATABLE_ in (1,0)),
-    REPETITION_ smallint check(REPETITION_ in (1,0)),
     primary key (ID_)
 );
 

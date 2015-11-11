@@ -22,7 +22,6 @@ public class MilestoneActivityBehavior extends EventListenerOrMilestoneActivityB
 
   protected void creating(CmmnActivityExecution execution) {
     evaluateRequiredRule(execution);
-    evaluateRepetitionRule(execution);
   }
 
   public void created(CmmnActivityExecution execution) {

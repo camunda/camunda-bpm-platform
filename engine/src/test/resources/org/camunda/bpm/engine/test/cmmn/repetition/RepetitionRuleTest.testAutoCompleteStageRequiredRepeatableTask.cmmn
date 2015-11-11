@@ -14,12 +14,8 @@
 
       <stage id="Stage_1" autoComplete="true">
         <planItem id="PI_HumanTask_1" definitionRef="HumanTask_1">
-
           <itemControl>
             <repetitionRule>
-              <extensionElements>
-                <camunda:repetitionCriterion>Sentry_1</camunda:repetitionCriterion>
-              </extensionElements>
               <condition>${true}</condition>
             </repetitionRule>
             <requiredRule>
@@ -27,13 +23,6 @@
             </requiredRule>
           </itemControl>
         </planItem>
-        
-        <sentry id="Sentry_1">
-          <planItemOnPart sourceRef="PI_HumanTask_1">
-            <standardEvent>complete</standardEvent>
-          </planItemOnPart>
-        </sentry>
-
       </stage>
 
     </casePlanModel>

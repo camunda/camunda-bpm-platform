@@ -35,22 +35,6 @@ alter table ACT_RE_DECISION_DEF
     add constraint ACT_UNIQ_DECISION_DEF
     unique (KEY_,VERSION_);
 
--- case execution repetition rule --
-
-ALTER TABLE ACT_RU_CASE_EXECUTION
-  ADD REPEATABLE_ tinyint;
-
-ALTER TABLE ACT_RU_CASE_EXECUTION
-  ADD REPETITION_ tinyint;
-
--- historic case activity instance repetition rule --
-
-ALTER TABLE ACT_HI_CASEACTINST
-  ADD REPEATABLE_ tinyint;
-
-ALTER TABLE ACT_HI_CASEACTINST
-  ADD REPETITION_ tinyint;
-
 -- case sentry part source --
 
 ALTER TABLE ACT_RU_CASE_SENTRY_PART

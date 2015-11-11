@@ -68,8 +68,6 @@ public class HistoricCaseActivityInstanceQueryDto extends AbstractQueryDto<Histo
   protected Date endedBefore;
   protected Date endedAfter;
   protected Boolean required;
-  protected Boolean repeatable;
-  protected Boolean repetition;
   protected Boolean finished;
   protected Boolean unfinished;
   protected Boolean available;
@@ -146,16 +144,6 @@ public class HistoricCaseActivityInstanceQueryDto extends AbstractQueryDto<Histo
     this.required = required;
   }
 
-  @CamundaQueryParam(value = "repeatable", converter = BooleanConverter.class)
-  public void setRepeatable(Boolean repeatable) {
-    this.repeatable = repeatable;
-  }
-  
-  @CamundaQueryParam(value = "repetition", converter = BooleanConverter.class)
-  public void setRepetition(Boolean repetition) {
-    this.repetition = repetition;
-  }
-  
   @CamundaQueryParam(value = "finished", converter = BooleanConverter.class)
   public void setFinished(Boolean finished) {
     this.finished = finished;
@@ -243,12 +231,6 @@ public class HistoricCaseActivityInstanceQueryDto extends AbstractQueryDto<Histo
     }
     if (required != null && required) {
       query.required();
-    }
-    if (repeatable != null && repeatable) {
-      query.repeatable();
-    }
-    if (repetition != null && repetition) {
-      query.repetition();
     }
     if (finished != null && finished) {
       query.ended();

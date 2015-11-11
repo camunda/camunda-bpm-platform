@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.operation;
 
+import static org.camunda.bpm.engine.impl.util.ActivityBehaviorUtil.getActivityBehavior;
+
+import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.core.operation.AbstractEventAtomicOperation;
@@ -31,9 +34,15 @@ public abstract class AbstractCmmnEventAtomicOperation extends AbstractEventAtom
   }
 
   protected final void eventNotificationsCompleted(CmmnExecution execution) {
+    repetition(execution);
     preTransitionNotification(execution);
     performTransitionNotification(execution);
     postTransitionNotification(execution);
+  }
+
+  protected void repetition(CmmnExecution execution) {
+    CmmnActivityBehavior behavior = getActivityBehavior(execution);
+    behavior.repeat(execution, getEventName());
   }
 
   protected void preTransitionNotification(CmmnExecution execution) {

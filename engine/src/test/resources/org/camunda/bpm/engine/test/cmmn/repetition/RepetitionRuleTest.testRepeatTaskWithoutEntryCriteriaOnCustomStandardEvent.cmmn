@@ -9,32 +9,14 @@
     <casePlanModel id="CasePlanModel_1">
 
       <planItem id="PI_HumanTask_1" definitionRef="HumanTask_1"/>
-      <planItem id="PI_HumanTask_2" definitionRef="HumanTask_2"/>
       
-      <sentry id="Sentry_1">
-        <planItemOnPart sourceRef="PI_HumanTask_1">
-          <standardEvent>complete</standardEvent>
-        </planItemOnPart>
-      </sentry>
-
-      <sentry id="Sentry_2">
-        <planItemOnPart sourceRef="PI_HumanTask_2">
-          <standardEvent>complete</standardEvent>
-        </planItemOnPart>
-      </sentry>
-
       <humanTask id="HumanTask_1">
         <defaultControl>
-          <repetitionRule>
-            <extensionElements>
-              <camunda:repetitionCriterion>Sentry_1</camunda:repetitionCriterion>
-              <camunda:repetitionCriterion>Sentry_2</camunda:repetitionCriterion>
-            </extensionElements>
+          <repetitionRule camunda:repeatOnStandardEvent="disable">
             <condition>${true}</condition>
           </repetitionRule>
         </defaultControl>
       </humanTask>
-      <humanTask id="HumanTask_2" />
 
     </casePlanModel>
   </case>

@@ -8,26 +8,32 @@
 
     <casePlanModel id="CasePlanModel_1">
 
-      <planItem id="PI_HumanTask_1" definitionRef="HumanTask_1" />
-      
+      <planItem id="PI_Stage_1" definitionRef="Stage_1" />
+
       <humanTask id="HumanTask_1">
         <extensionElements>
-          <camunda:caseExecutionListener event="create">
+          <camunda:caseExecutionListener event="start">
             <camunda:script scriptFormat="groovy">
-              def repetition = caseExecution.getVariable("repetition")
-              if (repetition == null) {
-                repetition = 0
-              }
-              caseExecution.setVariable("repetition", repetition + 1)
+              caseExecution.setVariable("manualActivation", true)
             </camunda:script>
-          </camunda:caseExecutionListener>
+          </camunda:caseExecutionListener>    
         </extensionElements>
-        <defaultControl>
-          <repetitionRule camunda:repeatOnStandardEvent="create">
-            <condition><![CDATA[${repetition < 3}]]></condition>
-          </repetitionRule>
-        </defaultControl>
       </humanTask>
+
+      <stage id="Stage_1" autoComplete="true">
+        <planItem id="PI_HumanTask_1" definitionRef="HumanTask_1">
+
+          <itemControl>
+            <repetitionRule>
+              <condition>${true}</condition>
+            </repetitionRule>
+            <manualActivationRule>
+              <condition>${manualActivation}</condition>
+            </manualActivationRule>
+          </itemControl>
+        </planItem>
+
+      </stage>
 
     </casePlanModel>
   </case>

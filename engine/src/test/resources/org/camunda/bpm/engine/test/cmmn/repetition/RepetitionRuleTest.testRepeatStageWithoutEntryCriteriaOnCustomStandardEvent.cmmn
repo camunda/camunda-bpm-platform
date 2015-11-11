@@ -10,19 +10,10 @@
 
       <planItem id="PI_Stage_1" definitionRef="Stage_1"/>
       
-      <sentry id="Sentry_1">
-        <planItemOnPart sourceRef="PI_Stage_1">
-          <standardEvent>complete</standardEvent>
-        </planItemOnPart>
-      </sentry>
-
       <humanTask id="HumanTask_1" />
       <stage id="Stage_1">
         <defaultControl>
-          <repetitionRule>
-            <extensionElements>
-              <camunda:repetitionCriterion>Sentry_1</camunda:repetitionCriterion>
-            </extensionElements>
+          <repetitionRule camunda:repeatOnStandardEvent="disable">
             <condition>${true}</condition>
           </repetitionRule>
         </defaultControl>

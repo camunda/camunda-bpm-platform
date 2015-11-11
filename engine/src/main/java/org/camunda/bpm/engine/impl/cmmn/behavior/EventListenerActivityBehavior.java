@@ -49,8 +49,9 @@ public class EventListenerActivityBehavior extends EventListenerOrMilestoneActiv
     // It is not possible to repeat a event listener
   }
 
-  protected void evaluateRepetitionRule(CmmnActivityExecution execution) {
+  protected boolean evaluateRepetitionRule(CmmnActivityExecution execution) {
     // It is not possible to define a repetition rule on an event listener
+    return false;
   }
 
 }

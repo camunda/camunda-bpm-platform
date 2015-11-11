@@ -29,8 +29,10 @@ import static org.junit.Assert.fail;
 import java.util.List;
 import java.util.Set;
 
+import org.camunda.bpm.engine.delegate.CaseExecutionListener;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.impl.bpmn.helper.CmmnProperties;
 import org.camunda.bpm.engine.impl.cmmn.CaseControlRule;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.HumanTaskActivityBehavior;
@@ -1263,6 +1265,92 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     Object rule = newActivity.getProperty(PROPERTY_REPETITION_RULE);
     assertNotNull(rule);
     assertTrue(rule instanceof CaseControlRule);
+  }
+
+  @Test
+  public void testRepetitionRuleStandardEvents() {
+    // given
+    ItemControl itemControl = createElement(planItem, "ItemControl_1", ItemControl.class);
+    RepetitionRule repetitionRule = createElement(itemControl, "RepititionRule_1", RepetitionRule.class);
+    ConditionExpression expression = createElement(repetitionRule, "Expression_1", ConditionExpression.class);
+    expression.setText("${true}");
+
+    Cmmn.validateModel(modelInstance);
+
+    // when
+    CmmnActivity newActivity = handler.handleElement(planItem, context);
+
+    // then
+    List<String> events = newActivity.getProperties().get(CmmnProperties.REPEAT_ON_STANDARD_EVENTS);
+    assertNotNull(events);
+    assertEquals(2, events.size());
+    assertTrue(events.contains(CaseExecutionListener.COMPLETE));
+    assertTrue(events.contains(CaseExecutionListener.TERMINATE));
+  }
+
+  @Test
+  public void testRepetitionRuleStandardEventsByDefaultPlanItemControl() {
+    // given
+    PlanItemControl defaultControl = createElement(humanTask, "DefaultControl_1", DefaultControl.class);
+    RepetitionRule repetitionRule = createElement(defaultControl, "RepititionRule_1", RepetitionRule.class);
+    ConditionExpression expression = createElement(repetitionRule, "Expression_1", ConditionExpression.class);
+    expression.setText("${true}");
+
+    Cmmn.validateModel(modelInstance);
+
+    // when
+    CmmnActivity newActivity = handler.handleElement(planItem, context);
+
+    // then
+    List<String> events = newActivity.getProperties().get(CmmnProperties.REPEAT_ON_STANDARD_EVENTS);
+    assertNotNull(events);
+    assertEquals(2, events.size());
+    assertTrue(events.contains(CaseExecutionListener.COMPLETE));
+    assertTrue(events.contains(CaseExecutionListener.TERMINATE));
+  }
+
+  @Test
+  public void testRepetitionRuleCustomStandardEvents() {
+    // given
+    ItemControl itemControl = createElement(planItem, "ItemControl_1", ItemControl.class);
+    RepetitionRule repetitionRule = createElement(itemControl, "RepititionRule_1", RepetitionRule.class);
+    ConditionExpression expression = createElement(repetitionRule, "Expression_1", ConditionExpression.class);
+    expression.setText("${true}");
+
+    repetitionRule.setCamundaRepeatOnStandardEvent(CaseExecutionListener.DISABLE);
+
+    Cmmn.validateModel(modelInstance);
+
+    // when
+    CmmnActivity newActivity = handler.handleElement(planItem, context);
+
+    // then
+    List<String> events = newActivity.getProperties().get(CmmnProperties.REPEAT_ON_STANDARD_EVENTS);
+    assertNotNull(events);
+    assertEquals(1, events.size());
+    assertTrue(events.contains(CaseExecutionListener.DISABLE));
+  }
+
+  @Test
+  public void testRepetitionRuleCustomStandardEventsByDefaultPlanItemControl() {
+    // given
+    PlanItemControl defaultControl = createElement(humanTask, "DefaultControl_1", DefaultControl.class);
+    RepetitionRule repetitionRule = createElement(defaultControl, "RepititionRule_1", RepetitionRule.class);
+    ConditionExpression expression = createElement(repetitionRule, "Expression_1", ConditionExpression.class);
+    expression.setText("${true}");
+
+    repetitionRule.setCamundaRepeatOnStandardEvent(CaseExecutionListener.DISABLE);
+
+    Cmmn.validateModel(modelInstance);
+
+    // when
+    CmmnActivity newActivity = handler.handleElement(planItem, context);
+
+    // then
+    List<String> events = newActivity.getProperties().get(CmmnProperties.REPEAT_ON_STANDARD_EVENTS);
+    assertNotNull(events);
+    assertEquals(1, events.size());
+    assertTrue(events.contains(CaseExecutionListener.DISABLE));
   }
 
 }

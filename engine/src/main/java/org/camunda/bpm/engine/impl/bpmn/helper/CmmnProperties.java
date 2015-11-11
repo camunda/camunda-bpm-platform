@@ -10,27 +10,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.cmmn.operation;
+package org.camunda.bpm.engine.impl.bpmn.helper;
 
-import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
-import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
+import org.camunda.bpm.engine.impl.core.model.PropertyListKey;
 
 /**
  * @author Roman Smirnov
  *
  */
-public class AtomicOperationCaseExecutionOccur extends AbstractAtomicOperationCaseExecutionComplete {
+public class CmmnProperties {
 
-  protected String getEventName() {
-    return "occur";
-  }
-
-  public String getCanonicalName() {
-    return "case-execution-occur";
-  }
-
-  protected void triggerBehavior(CmmnActivityBehavior behavior, CmmnExecution execution) {
-    behavior.onOccur(execution);
-  }
+  public static final PropertyListKey<String> REPEAT_ON_STANDARD_EVENTS = new PropertyListKey<String>("repeatOnStandardEvents");
 
 }

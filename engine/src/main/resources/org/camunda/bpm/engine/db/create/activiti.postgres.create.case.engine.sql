@@ -28,8 +28,6 @@ create table ACT_RU_CASE_EXECUTION (
     PREV_STATE_ integer,
     CURRENT_STATE_ integer,
     REQUIRED_ boolean,
-    REPEATABLE_ boolean,
-    REPETITION_ boolean,
     primary key (ID_)
 );
 

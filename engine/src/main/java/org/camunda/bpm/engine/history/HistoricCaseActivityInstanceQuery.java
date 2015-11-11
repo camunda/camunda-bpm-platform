@@ -61,12 +61,6 @@ public interface HistoricCaseActivityInstanceQuery extends Query<HistoricCaseAct
   /** Only select historic case activity instances which are required. */
   HistoricCaseActivityInstanceQuery required();
 
-  /** Only select historic case activity instances which are repeatable. */
-  HistoricCaseActivityInstanceQuery repeatable();
-
-  /** Only select historic case activity instances which are repetitions. */
-  HistoricCaseActivityInstanceQuery repetition();
-
   /** Only select historic case activity instances which are already ended (ie. completed or terminated). */
   HistoricCaseActivityInstanceQuery ended();
 

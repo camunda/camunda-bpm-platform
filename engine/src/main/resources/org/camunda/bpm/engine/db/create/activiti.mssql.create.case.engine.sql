@@ -26,8 +26,6 @@ create table ACT_RU_CASE_EXECUTION (
     PREV_STATE_ int,
     CURRENT_STATE_ int,
     REQUIRED_ tinyint,
-    REPEATABLE_ tinyint,
-    REPETITION_ tinyint,
     primary key (ID_)
 );
 
