@@ -25,8 +25,12 @@ public class ClassLoadingException extends ProcessEngineException {
 
   protected String className;
 
-  public ClassLoadingException(String message, String className, Throwable cause) {
+  public ClassLoadingException(String message, Throwable cause) {
     super(message, cause);
+  }
+
+  public ClassLoadingException(String message, String className, Throwable cause) {
+    this(message, cause);
     this.className = className;
   }
 
