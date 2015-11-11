@@ -20,7 +20,8 @@ define(['text!./authorizations.html', 'text!./confirm-delete-authorization.html'
           6: 'Process Definition',
           7: 'Task',
           8: 'Process Instance',
-          9: 'Deployment'
+          9: 'Deployment',
+         10: 'Decision Definition'
         };
 
         $scope.permissionMap = {
@@ -33,7 +34,8 @@ define(['text!./authorizations.html', 'text!./confirm-delete-authorization.html'
           6: [ 'READ', 'CREATE_INSTANCE', 'READ_INSTANCE', 'UPDATE_INSTANCE', 'DELETE_INSTANCE', 'READ_TASK', 'UPDATE_TASK', 'READ_HISTORY', 'DELETE_HISTORY' ],
           7: [ 'CREATE', 'READ', 'UPDATE', 'DELETE' ],
           8: [ 'CREATE', 'READ', 'UPDATE', 'DELETE' ],
-          9: [ 'CREATE', 'READ', 'DELETE' ]
+          9: [ 'CREATE', 'READ', 'DELETE' ],
+         10: [ 'READ', 'CREATE_INSTANCE', 'READ_HISTORY', 'DELETE_HISTORY' ]
         };
 
         $scope.typeMap = {
