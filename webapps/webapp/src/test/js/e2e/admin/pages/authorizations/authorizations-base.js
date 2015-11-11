@@ -10,6 +10,7 @@ module.exports = Page.extend({
     var index = [
       'Application',
       'Authorization',
+      'Decision Definition',
       'Deployment',
       'Filter',
       'Group',

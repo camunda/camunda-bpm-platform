@@ -408,6 +408,54 @@ describe('Admin Authorizations Spec', function() {
   });
 
 
+  describe('Decision Definition Authorizations', function() {
+
+    before(function() {
+      return testHelper(setupFile.setup1, function() {
+
+        authorizationsPage.navigateToWebapp('Admin');
+        authorizationsPage.authentication.userLogin('admin', 'admin');
+
+        authorizationsPage.selectNavbarItem('Authorizations');
+      });
+    });
+
+    it('should navigate to decision definition page', function() {
+
+      // when
+      authorizationsPage.selectAuthorizationNavbarItem('Decision Definition');
+
+      // then
+      authorizationsPage.decisionDefinition.isActive();
+      expect(authorizationsPage.decisionDefinition.createNewButton().isEnabled()).to.eventually.eql(true);
+      expect(authorizationsPage.decisionDefinition.boxHeader()).to.eventually.eql('Decision Definition Authorizations');
+    });
+
+
+    it('should validate authorization attributes', function() {
+
+      authorizationsPage.createNewButton().click().then(function() {
+
+        checkCreateNewState();
+
+        checkAuthorizationTypes();
+
+        var permissionsList = [
+          'READ',
+          'CREATE_INSTANCE',
+          'READ_HISTORY',
+          'DELETE_HISTORY'
+        ];
+        checkPermissionTypes(permissionsList);
+
+        abortCreatingNewAuthorization();
+      });
+
+    });
+
+  });
+
+
   describe('Process Instance Authorizations', function() {
 
     before(function() {
