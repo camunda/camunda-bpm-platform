@@ -14,10 +14,13 @@ package org.camunda.bpm.engine.impl.calendar;
 
 import java.util.Date;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
 
 public class CycleBusinessCalendar implements BusinessCalendar {
+
+  private final static EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
 
   public static String NAME = "cycle";
 
@@ -31,8 +34,9 @@ public class CycleBusinessCalendar implements BusinessCalendar {
         return ce.getTimeAfter(ClockUtil.getCurrentTime());
       }
 
-    } catch (Exception e) {
-      throw new ProcessEngineException("Failed to parse cron expression: "+duedateDescription, e);
+    }
+    catch (Exception e) {
+      throw LOG.exceptionWhileParsingCronExpresison(duedateDescription, e);
     }
 
   }

@@ -22,6 +22,7 @@ import javax.naming.NamingException;
 import javax.transaction.TransactionManager;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.jta.JtaTransactionContextFactory;
 import org.camunda.bpm.engine.impl.cfg.standalone.StandaloneTransactionContextFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextFactory;
@@ -36,6 +37,8 @@ import org.camunda.bpm.engine.impl.interceptor.TxContextCommandContextFactory;
  * @author Tom Baeyens
  */
 public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImpl {
+
+  private final static ConfigurationLogger LOG = ProcessEngineLogger.CONFIG_LOGGER;
 
   protected TransactionManager transactionManager;
 
@@ -99,15 +102,14 @@ public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImp
     if(transactionManager == null){
 
       if(transactionManagerJndiName == null || transactionManagerJndiName.length() == 0) {
-        throw new ProcessEngineException("Property 'transactionManager' is null and 'transactionManagerJndiName' is not set. \n " +
-        		"Please set either the 'transactionManager' property or the 'transactionManagerJndiName' property.");
+        throw LOG.invalidConfigTransactionManagerIsNull();
       }
 
       try {
         transactionManager = (TransactionManager) new InitialContext().lookup(transactionManagerJndiName);
 
       } catch(NamingException e) {
-        throw new ProcessEngineException("Cannot lookup Jta TransactionManager in JNDI using name '"+transactionManagerJndiName+"'.", e);
+        throw LOG.invalidConfigCannotFindTransactionManger(transactionManagerJndiName+"'.", e);
       }
     }
   }

@@ -3,9 +3,6 @@ package org.camunda.bpm.engine.impl.cmd;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -20,7 +17,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 public class DeleteJobCmd implements Command<Object>, Serializable {
 
   private static final long serialVersionUID = 1L;
-  private static Logger log = Logger.getLogger(DeleteJobCmd.class.getName());
 
   protected String jobId;
 
@@ -30,9 +26,6 @@ public class DeleteJobCmd implements Command<Object>, Serializable {
 
   public Object execute(CommandContext commandContext) {
     ensureNotNull("jobId", jobId);
-    if (log.isLoggable(Level.FINE)) {
-      log.fine("Deleting job " + jobId);
-    }
 
     JobEntity job = commandContext.getJobManager().findJobById(jobId);
     ensureNotNull("No job found with id '" + jobId + "'", "job", job);

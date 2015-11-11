@@ -12,13 +12,16 @@
  */
 package org.camunda.bpm.engine.impl.calendar;
 
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.joda.time.format.ISOPeriodFormat;
-
 import java.util.Date;
+
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
+import org.joda.time.format.ISOPeriodFormat;
 
 
 public class DueDateBusinessCalendar implements BusinessCalendar {
+
+  private final static EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
 
   public static final String NAME = "dueDate";
 
@@ -30,8 +33,9 @@ public class DueDateBusinessCalendar implements BusinessCalendar {
 
       return DateTimeUtil.parseDateTime(duedate).toDate();
 
-    } catch (Exception e) {
-      throw new ProcessEngineException("couldn't resolve duedate: " + e.getMessage(), e);
+    }
+    catch (Exception e) {
+      throw LOG.exceptionWhileResolvingDuedate(duedate, e);
     }
   }
 }

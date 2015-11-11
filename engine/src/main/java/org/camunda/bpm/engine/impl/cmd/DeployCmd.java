@@ -24,9 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -34,7 +31,9 @@ import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.DeploymentQueryImpl;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
+import org.camunda.bpm.engine.impl.cfg.TransactionLogger;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.cmmn.deployer.CmmnDeployer;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -75,9 +74,10 @@ import org.camunda.bpm.model.cmmn.instance.Case;
  */
 public class DeployCmd<T> implements Command<Deployment>, Serializable {
 
-  private static final long serialVersionUID = 1L;
+  private final static CmdLogger LOG = ProcessEngineLogger.CMD_LOGGER;
+  private final static TransactionLogger TX_LOG = ProcessEngineLogger.TX_LOGGER;
 
-  private static Logger log = Logger.getLogger(DeployCmd.class.getName());
+  private static final long serialVersionUID = 1L;
 
   protected DeploymentBuilderImpl deploymentBuilder;
 
@@ -132,11 +132,11 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
         resourcesToIgnore.keySet().removeAll(resourcesToDeploy.keySet());
 
         if (!resourcesToDeploy.isEmpty()) {
-          log.fine("Creating new deployment.");
+          LOG.debugCreatingNewDeployment();
           deployment.setResources(resourcesToDeploy);
           deploy(deployment);
         } else {
-          log.fine("Using existing deployment.");
+          LOG.usingExistingDeployment();
           deployment = getExistingDeployment(commandContext, deployment.getName());
         }
 
@@ -629,7 +629,7 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
       try {
         commandContext.getTransactionContext().addTransactionListener(TransactionState.ROLLED_BACK, listener);
       } catch (Exception e) {
-        log.log(Level.FINE, "Could not register transaction synchronization. Probably the TX has already been rolled back by application code.", e);
+        TX_LOG.debugTransactionOperation("Could not register transaction synchronization. Probably the TX has already been rolled back by application code.");
         listener.execute(commandContext);
       }
     }

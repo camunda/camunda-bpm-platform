@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URISyntaxException;
 import java.net.URL;
-
 import org.camunda.bpm.engine.ClassLoadingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotFoundException;
@@ -185,6 +184,24 @@ public class EngineUtilLogger extends ProcessEngineLogger {
     return new IllegalStateException(exceptionMessage(
         "025",
         "Operation {} requires active command context. No command context active on thread {}.", operation, Thread.currentThread()));
+  }
+
+  public ProcessEngineException exceptionWhileParsingCronExpresison(String duedateDescription, Exception e) {
+    return new ProcessEngineException(exceptionMessage(
+        "026",
+        "Exception while parsing cron expression '{}': {}", duedateDescription, e.getMessage()), e);
+  }
+
+  public ProcessEngineException exceptionWhileResolvingDuedate(String duedate, Exception e) {
+    return new ProcessEngineException(exceptionMessage(
+        "027",
+        "Exception while resolving duedate '{}': {}", duedate, e.getMessage()), e);
+  }
+
+  public Exception cannotParseDuration(String expressions) {
+    return new ProcessEngineException(exceptionMessage(
+        "028",
+        "Cannot parse duration '{}'.", expressions));
   }
 
 }

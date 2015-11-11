@@ -20,9 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -42,8 +39,6 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
  * @author Joram Barrez
  */
 public class SignalEventReceivedCmd implements Command<Void> {
-
-  private final static Logger LOGGER = Logger.getLogger(SignalEventReceivedCmd.class.getName());
 
   protected final String eventName;
   protected final String executionId;
@@ -102,11 +97,7 @@ public class SignalEventReceivedCmd implements Command<Void> {
           processDefinitionId);
 
       ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
-      if (processDefinition == null || processDefinition.isSuspended()) {
-        // ignore event subscription
-        LOGGER.log(Level.FINE, "Found event subscription with {0} but process definition {1} could not be found.",
-            new Object[] { eventSubscription, processDefinitionId });
-      } else {
+      if (processDefinition != null && !processDefinition.isSuspended()) {
         processDefinitions.put(eventSubscription.getId(), processDefinition);
       }
     }

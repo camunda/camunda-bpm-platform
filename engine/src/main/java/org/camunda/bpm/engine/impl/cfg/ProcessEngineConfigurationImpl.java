@@ -31,9 +31,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
@@ -262,7 +259,7 @@ import org.camunda.bpm.engine.variable.type.ValueType;
  */
 public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfiguration {
 
-  private static Logger log = Logger.getLogger(ProcessEngineConfigurationImpl.class.getName());
+  private final static ConfigurationLogger LOG = ConfigurationLogger.CONFIG_LOGGER;
 
   public static final String DB_SCHEMA_UPDATE_CREATE = "create";
   public static final String DB_SCHEMA_UPDATE_DROP_CREATE = "drop-create";
@@ -575,11 +572,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void invokePreInit() {
     for (ProcessEnginePlugin plugin : processEnginePlugins) {
-
-      log.log(Level.INFO, "PLUGIN {0} activated on process engine {1}",
-          new String[]{plugin.getClass().getSimpleName(),
-          getProcessEngineName()});
-
+      LOG.pluginActivated(plugin.getClass().getSimpleName(), getProcessEngineName());
       plugin.preInit(this);
     }
   }
@@ -742,8 +735,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
           throw new ProcessEngineException("DataSource or JDBC properties have to be specified in a process engine configuration");
         }
 
-        log.fine("initializing datasource to db: "+jdbcUrl);
-
         PooledDataSource pooledDataSource =
           new PooledDataSource(ReflectUtil.getClassLoader(), jdbcDriver, jdbcUrl, jdbcUsername, jdbcPassword );
 
@@ -817,10 +808,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       connection = dataSource.getConnection();
       DatabaseMetaData databaseMetaData = connection.getMetaData();
       String databaseProductName = databaseMetaData.getDatabaseProductName();
-      log.fine("database product name: '" + databaseProductName + "'");
+      LOG.debugDatabaseproductName(databaseProductName);
       databaseType = databaseTypeMappings.getProperty(databaseProductName);
       ensureNotNull("couldn't deduct database type from database product name '" + databaseProductName + "'", "databaseType", databaseType);
-      log.fine("using database type: " + databaseType);
+      LOG.debugDatabaseType(databaseType);
 
     } catch (SQLException e) {
       e.printStackTrace();
@@ -1224,9 +1215,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
       if(HISTORY_VARIABLE.equalsIgnoreCase(history)) {
         historyLevel = HistoryLevel.HISTORY_LEVEL_ACTIVITY;
-        log.warning("Using deprecated history level 'variable'. " +
-            "This history level is deprecated and replaced by 'activity'. " +
-            "Consider using 'ACTIVITY' instead.");
+        LOG.usingDeprecatedHistoryLevelVariable();
 
       } else {
         for (HistoryLevel historyLevel : historyLevels) {

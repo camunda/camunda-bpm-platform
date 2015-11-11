@@ -12,14 +12,13 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.parser.FoxFailedJobParseListener;
 import org.camunda.bpm.engine.impl.calendar.DurationHelper;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorLogger;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerCatchIntermediateEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
@@ -35,7 +34,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
  */
 public class FoxJobRetryCmd extends JobRetryCmd {
 
-  protected static final Logger log = Logger.getLogger(FoxJobRetryCmd.class.getName());
+  private final static JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
 
   public FoxJobRetryCmd(String jobId, Throwable exception) {
     super(jobId, exception);
@@ -47,7 +46,7 @@ public class FoxJobRetryCmd extends JobRetryCmd {
     ActivityImpl activity = getCurrentActivity(commandContext, job);
 
     if (activity == null) {
-      log.log(Level.SEVERE, "Failure while executing " + FoxJobRetryCmd.class.getName() + " for job id '" + jobId + "'. Falling back to standard job retry strategy.");
+      LOG.debugFallbackToDefaultRetryStrategy();
       executeStandardStrategy(commandContext);
 
     } else {
@@ -55,7 +54,7 @@ public class FoxJobRetryCmd extends JobRetryCmd {
         executeCustomStrategy(commandContext, job, activity);
 
       } catch (Exception e) {
-        log.log(Level.SEVERE, "Failure while executing " + FoxJobRetryCmd.class.getName() + " for job id '" + jobId + "'. Falling back to standard job retry strategy.", e);
+        LOG.debugFallbackToDefaultRetryStrategy();
         executeStandardStrategy(commandContext);
       }
     }
@@ -84,7 +83,7 @@ public class FoxJobRetryCmd extends JobRetryCmd {
         initializeRetries(job, failedJobRetryTimeCycle, durationHelper);
 
       } else {
-        log.fine("Decrementing retries of JobRetryStrategy '" + failedJobRetryTimeCycle + "' for job " + job.getId());
+        LOG.debugDecrementingRetriesForJob(job.getId());
       }
 
       logException(job);
@@ -156,7 +155,7 @@ public class FoxJobRetryCmd extends JobRetryCmd {
   }
 
   protected void initializeRetries(JobEntity job, String failedJobRetryTimeCycle, DurationHelper durationHelper) {
-    log.fine("Applying JobRetryStrategy '" + failedJobRetryTimeCycle + "' the first time for job " + job.getId() + " with " + durationHelper.getTimes() + " retries");
+    LOG.debugInitiallyAppyingRetryCycleForJob(job.getId(),  durationHelper.getTimes());
     job.setRetries(durationHelper.getTimes());
   }
 
