@@ -24,7 +24,7 @@ describe('Tasklist Sorting Spec', function() {
       expect(dashboardPage.taskList.taskSorting.addSortingButton().isPresent()).to.eventually.be.true;
       expect(dashboardPage.taskList.taskSorting.removeSortingButton(0).isPresent()).to.eventually.be.false;
       expect(dashboardPage.taskList.taskSorting.sortingList().count()).to.eventually.eql(1);
-      expect(dashboardPage.taskList.taskSorting.sortingName(0).getText()).to.eventually.eql('created');
+      expect(dashboardPage.taskList.taskSorting.sortingName(0).getText()).to.eventually.eql('Created');
       expect(dashboardPage.taskList.taskSorting.isSortingDescending(0)).to.eventually.be.true;
     });
 
@@ -47,7 +47,7 @@ describe('Tasklist Sorting Spec', function() {
         dashboardPage.taskList.taskSorting.addNewSorting('Task name');
 
         // then
-        expect(dashboardPage.taskList.taskSorting.sortingName(1).getText()).to.eventually.eql('task name');
+        expect(dashboardPage.taskList.taskSorting.sortingName(1).getText()).to.eventually.eql('Task name');
         expect(dashboardPage.taskList.taskSorting.isSortingDescending(1)).to.eventually.be.true;
         expect(dashboardPage.taskList.taskSorting.sortingList().count()).to.eventually.eql(2);
       });
@@ -59,7 +59,7 @@ describe('Tasklist Sorting Spec', function() {
         dashboardPage.taskList.taskSorting.addNewSorting('Priority');
 
         // then
-        expect(dashboardPage.taskList.taskSorting.sortingName(2).getText()).to.eventually.eql('priority');
+        expect(dashboardPage.taskList.taskSorting.sortingName(2).getText()).to.eventually.eql('Priority');
         expect(dashboardPage.taskList.taskSorting.isSortingDescending(2)).to.eventually.be.true;
         expect(dashboardPage.taskList.taskSorting.sortingList().count()).to.eventually.eql(3);
       });
@@ -71,7 +71,7 @@ describe('Tasklist Sorting Spec', function() {
         dashboardPage.taskList.taskSorting.addNewSorting('Follow-up date');
 
         // then
-        expect(dashboardPage.taskList.taskSorting.sortingName(3).getText()).to.eventually.eql('follow-up date');
+        expect(dashboardPage.taskList.taskSorting.sortingName(3).getText()).to.eventually.eql('Follow-up date');
         expect(dashboardPage.taskList.taskSorting.isSortingDescending(3)).to.eventually.be.true;
         expect(dashboardPage.taskList.taskSorting.sortingList().count()).to.eventually.eql(4);
       });
@@ -122,7 +122,7 @@ describe('Tasklist Sorting Spec', function() {
       dashboardPage.taskList.taskSorting.changeSorting(0, 'Assignee');
 
       // then
-      expect(dashboardPage.taskList.taskSorting.sortingName(0).getText()).to.eventually.eql('assignee');
+      expect(dashboardPage.taskList.taskSorting.sortingName(0).getText()).to.eventually.eql('Assignee');
       expect(dashboardPage.taskList.taskSorting.isSortingDescending(0)).to.eventually.be.true;
       expect(dashboardPage.taskList.taskSorting.sortingList().count()).to.eventually.eql(1);
     });
@@ -197,9 +197,9 @@ describe('Tasklist Sorting Spec', function() {
       dashboardPage.taskList.taskSorting.addNewSorting('Priority');
 
       // then
-      expect(dashboardPage.taskList.taskSorting.sortingName(0).getText()).to.eventually.eql('created');
-      expect(dashboardPage.taskList.taskSorting.sortingName(1).getText()).to.eventually.eql('follow-up date');
-      expect(dashboardPage.taskList.taskSorting.sortingName(2).getText()).to.eventually.eql('priority');
+      expect(dashboardPage.taskList.taskSorting.sortingName(0).getText()).to.eventually.eql('Created');
+      expect(dashboardPage.taskList.taskSorting.sortingName(1).getText()).to.eventually.eql('Follow-up date');
+      expect(dashboardPage.taskList.taskSorting.sortingName(2).getText()).to.eventually.eql('Priority');
       expect(dashboardPage.taskList.taskSorting.sortingList().count()).to.eventually.eql(3);
     });
 
@@ -210,8 +210,8 @@ describe('Tasklist Sorting Spec', function() {
       dashboardPage.taskList.taskSorting.removeSortingButton(1).click();
 
       // then
-      expect(dashboardPage.taskList.taskSorting.sortingName(0).getText()).to.eventually.eql('created');
-      expect(dashboardPage.taskList.taskSorting.sortingName(1).getText()).to.eventually.eql('priority');
+      expect(dashboardPage.taskList.taskSorting.sortingName(0).getText()).to.eventually.eql('Created');
+      expect(dashboardPage.taskList.taskSorting.sortingName(1).getText()).to.eventually.eql('Priority');
       expect(dashboardPage.taskList.taskSorting.sortingList().count()).to.eventually.eql(2);
     });
 
@@ -222,7 +222,7 @@ describe('Tasklist Sorting Spec', function() {
       dashboardPage.taskList.taskSorting.removeSortingButton(0).click();
 
       // then
-      expect(dashboardPage.taskList.taskSorting.sortingName(0).getText()).to.eventually.eql('priority');
+      expect(dashboardPage.taskList.taskSorting.sortingName(0).getText()).to.eventually.eql('Priority');
       expect(dashboardPage.taskList.taskSorting.sortingList().count()).to.eventually.eql(1);
     });
 
