@@ -68,6 +68,15 @@ public class VariableApiTest {
   }
 
   @Test
+  public void testVariableMapWithoutCreateVariables() {
+    VariableMap map1 = putValue("foo", true).putValue("bar", 20);
+    VariableMap map2 = putValueTyped("foo", booleanValue(true)).putValue("bar", integerValue(20));
+
+    assertEquals(map1, map2);
+    assertTrue(map1.values().containsAll(map2.values()));
+  }
+
+  @Test
   public void testVariableMapCompatibility() {
 
     // test compatibility with Map<String, Object>
