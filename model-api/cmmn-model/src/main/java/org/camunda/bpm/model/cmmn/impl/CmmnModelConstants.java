@@ -174,7 +174,6 @@ public class CmmnModelConstants {
   public static final String CAMUNDA_ELEMENT_EXPRESSION = "expression";
   public static final String CAMUNDA_ELEMENT_STRING = "string";
   public static final String CAMUNDA_ELEMENT_SCRIPT = "script";
-  public static final String CAMUNDA_ELEMENT_REPETITION_CRITERION = "repetitionCriterion";
 
   // attributes /////////////////////////////////////////////////////////////////////////
 
@@ -247,5 +246,6 @@ public class CmmnModelConstants {
   public static final String CAMUNDA_ATTRIBUTE_NAME = "name";
   public static final String CAMUNDA_ATTRIBUTE_SCRIPT_FORMAT = "scriptFormat";
   public static final String CAMUNDA_ATTRIBUTE_RESOURCE = "resource";
+  public static final String CAMUNDA_ATTRIBUTE_REPEAT_ON_STANDARD_EVENT = "repeatOnStandardEvent";
 
 }

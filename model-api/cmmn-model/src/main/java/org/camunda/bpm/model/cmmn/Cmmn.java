@@ -39,8 +39,8 @@ import org.camunda.bpm.model.cmmn.impl.instance.CaseImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.CaseParameterImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.impl.instance.CaseRefExpressionImpl;
-import org.camunda.bpm.model.cmmn.impl.instance.CaseRolesImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.CaseRoleImpl;
+import org.camunda.bpm.model.cmmn.impl.instance.CaseRolesImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.CaseTaskImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.ChildrenImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.CmmnElementImpl;
@@ -114,7 +114,6 @@ import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaExpressionImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaFieldImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaInImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaOutImpl;
-import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaRepititionCriterionImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaScriptImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaStringImpl;
 import org.camunda.bpm.model.cmmn.impl.instance.camunda.CamundaTaskListenerImpl;
@@ -389,7 +388,6 @@ public class Cmmn {
     CamundaStringImpl.registerType(modelBuilder);
     CamundaTaskListenerImpl.registerType(modelBuilder);
     CamundaVariableListenerImpl.registerType(modelBuilder);
-    CamundaRepititionCriterionImpl.registerType(modelBuilder);
   }
 
   /**

@@ -15,6 +15,8 @@ package org.camunda.bpm.model.cmmn.instance;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.camunda.bpm.model.cmmn.impl.CmmnModelConstants;
+
 /**
  * @author Roman Smirnov
  *
@@ -34,7 +36,8 @@ public class RepetitionRuleTest extends CmmnModelElementInstanceTest {
   public Collection<AttributeAssumption> getAttributesAssumptions() {
     return Arrays.asList(
           new AttributeAssumption("name"),
-          new AttributeAssumption("contextRef")
+          new AttributeAssumption("contextRef"),
+          new AttributeAssumption(CmmnModelConstants.CAMUNDA_NS, "repeatOnStandardEvent")
         );
   }
 

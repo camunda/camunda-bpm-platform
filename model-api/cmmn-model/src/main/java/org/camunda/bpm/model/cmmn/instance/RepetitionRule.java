@@ -30,4 +30,10 @@ public interface RepetitionRule extends CmmnElement {
 
   void setCondition(ConditionExpression condition);
 
+  /** Camunda extensions */
+
+  String getCamundaRepeatOnStandardEvent();
+
+  void setCamundaRepeatOnStandardEvent(String standardEvent);
+
 }

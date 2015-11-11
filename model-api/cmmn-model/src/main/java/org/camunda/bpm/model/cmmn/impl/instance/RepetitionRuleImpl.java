@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_REPEAT_ON_STANDARD_EVENT;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_CONTEXT_REF;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_NAME;
@@ -39,6 +41,9 @@ public class RepetitionRuleImpl extends CmmnElementImpl implements RepetitionRul
   protected static Attribute<String> nameAttribute;
   protected static AttributeReference<CaseFileItem> contextRefAttribute;
   protected static ChildElement<ConditionExpression> conditionChild;
+
+  /* Camunda extensions */
+  protected static Attribute<String> camundaRepeatOnStandardEventAttribute;
 
   public RepetitionRuleImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
@@ -68,6 +73,14 @@ public class RepetitionRuleImpl extends CmmnElementImpl implements RepetitionRul
     conditionChild.setChild(this, condition);
   }
 
+  public String getCamundaRepeatOnStandardEvent() {
+    return camundaRepeatOnStandardEventAttribute.getValue(this);
+  }
+
+  public void setCamundaRepeatOnStandardEvent(String standardEvent) {
+    camundaRepeatOnStandardEventAttribute.setValue(this, standardEvent);
+  }
+
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(RepetitionRule.class, CMMN_ELEMENT_REPETITION_RULE)
         .namespaceUri(CMMN11_NS)
@@ -84,6 +97,12 @@ public class RepetitionRuleImpl extends CmmnElementImpl implements RepetitionRul
     contextRefAttribute = typeBuilder.stringAttribute(CMMN_ATTRIBUTE_CONTEXT_REF)
         .idAttributeReference(CaseFileItem.class)
         .build();
+
+    /** Camunda extensions */
+
+    camundaRepeatOnStandardEventAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_REPEAT_ON_STANDARD_EVENT)
+      .namespace(CAMUNDA_NS)
+      .build();
 
     SequenceBuilder sequenceBuilder = typeBuilder.sequence();
 
