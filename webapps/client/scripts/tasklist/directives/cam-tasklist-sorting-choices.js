@@ -113,7 +113,7 @@ define([
           var by = scope.sortings[index].by;
 
           if (scope.uniqueProps[by]) {
-            return scope.uniqueProps[by].toLowerCase();
+            return scope.uniqueProps[by];
           }
 
           if (!scope.sortings[index] || !scope.sortings[index].parameters) {
