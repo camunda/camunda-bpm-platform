@@ -19,8 +19,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.rest.cache.Cache;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -120,9 +118,10 @@ public class HalRelationCacheConfiguration {
 
   protected Class<?> loadClass(String className) {
     try {
-      return ReflectUtil.loadClass(className);
+      // use classloader which loaded the REST api classes
+      return Class.forName(className, true, HalRelationCacheConfiguration.class.getClassLoader());
     }
-    catch (ProcessEngineException e) {
+    catch (ClassNotFoundException e) {
       throw new HalRelationCacheConfigurationException("Unable to load class of cache configuration " + className, e);
     }
   }

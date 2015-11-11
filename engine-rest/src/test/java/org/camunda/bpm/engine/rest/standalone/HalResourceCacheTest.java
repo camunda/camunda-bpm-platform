@@ -33,7 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.ClassLoadingException;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -134,7 +133,7 @@ public class HalResourceCacheTest extends AbstractRestServiceTest {
       fail("Exception expected");
     }
     catch (HalRelationCacheConfigurationException e) {
-      assertTrue(e.getCause() instanceof ClassLoadingException);
+      assertTrue(e.getCause() instanceof ClassNotFoundException);
     }
   }
 
