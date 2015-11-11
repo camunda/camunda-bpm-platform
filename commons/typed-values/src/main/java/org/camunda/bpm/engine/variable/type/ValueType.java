@@ -77,7 +77,9 @@ public interface ValueType extends Serializable {
   boolean isPrimitiveValueType();
 
   /**
-   * Get the value info for a {@link TypedValue}.
+   * Get the value info (meta data) for a {@link TypedValue}.
+   * The keys of the returned map for a {@link TypedValue} are available
+   * as constants in the value's {@link ValueType} interface.
    *
    * @param typedValue
    * @return
