@@ -101,6 +101,9 @@ public abstract class TestHelper {
     if (deploymentAnnotation == null) {
       deploymentAnnotation = method.getAnnotation(Deployment.class);
     }
+    if (deploymentAnnotation == null) {
+      deploymentAnnotation = testClass.getAnnotation(Deployment.class);
+    }
 
     if (deploymentAnnotation != null) {
       LOG.debug("annotation @Deployment creates deployment for {}.{}", ClassNameUtil.getClassNameWithoutPackage(testClass), methodName);
