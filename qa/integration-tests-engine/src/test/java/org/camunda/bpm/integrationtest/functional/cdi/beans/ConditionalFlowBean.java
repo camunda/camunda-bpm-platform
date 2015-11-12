@@ -15,7 +15,8 @@ package org.camunda.bpm.integrationtest.functional.cdi.beans;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.camunda.bpm.engine.cdi.annotation.ProcessVariable;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 /**
  * @author Thorben Lindhauer
@@ -24,11 +25,15 @@ import org.camunda.bpm.engine.cdi.annotation.ProcessVariable;
 @Named
 public class ConditionalFlowBean {
 
-    @Inject
-    @ProcessVariable
-    protected Object takeFlow;
+  @Inject
+  protected ProcessInstance processInstance;
+
+  @Inject
+  protected RuntimeService runtimeService;
 
     public boolean shouldTakeFlow() {
+      Object takeFlow = runtimeService.getVariable(processInstance.getId(), "takeFlow");
+
       return Boolean.TRUE.equals(takeFlow);
     }
   }
