@@ -21,6 +21,10 @@ module.exports = Page.extend({
     return this.formElement().element(by.binding('resource.name')).getText();
   },
 
+  resourceVersion: function() {
+    return this.formElement().element(by.css('header .version')).getText();
+  },
+
   downloadButton: function() {
     return element(by.css('.download-resource'));
   },

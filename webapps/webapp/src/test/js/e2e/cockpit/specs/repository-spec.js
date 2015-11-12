@@ -385,6 +385,11 @@ describe('Repository Spec', function() {
       });
 
     });
+
+
+    it('should display version of the resource', function() {
+      expect(resourcePage.resourceVersion()).to.eventually.eql('Version: 1');
+    });
   });
 
   describe('diagram', function() {
