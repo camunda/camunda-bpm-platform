@@ -24,13 +24,14 @@ import org.camunda.bpm.dmn.engine.impl.DmnLogger;
 import org.camunda.bpm.model.dmn.BuiltinAggregator;
 import org.camunda.bpm.model.dmn.HitPolicy;
 import org.camunda.bpm.model.dmn.instance.Decision;
+import org.camunda.bpm.model.dmn.instance.Expression;
 
 public class DmnTransformLogger extends DmnLogger {
 
-  public void decisionTypeNotSupported(Decision decision) {
+  public void decisionTypeNotSupported(Expression expression, Decision decision) {
     logInfo(
       "001",
-      "The expression type '{}' of the decision '{}' is not supported.", decision.getClass().getSimpleName(), decision.getName()
+      "The expression type '{}' of the decision '{}' is not supported. The decision will be ignored.", expression.getClass().getSimpleName(), decision.getName()
     );
   }
 
@@ -126,6 +127,13 @@ public class DmnTransformLogger extends DmnLogger {
     return new DmnTransformException(exceptionMessage(
       "013",
       "The decision table rule '{}' of decision '{}' must have a 'id' attribute set.", dmnDecisionTableRule, dmnDecision)
+    );
+  }
+
+  public void decisionWithoutExpression(Decision decision) {
+    logInfo(
+      "014",
+      "The decision '{}' has no expression and will be ignored.", decision.getName()
     );
   }
 

@@ -140,11 +140,16 @@ public class DefaultDmnTransform implements DmnTransform, DmnElementTransformCon
 
   protected DmnDecision transformDecision(Decision decision) {
     Expression expression = decision.getExpression();
+    if (expression == null) {
+      LOG.decisionWithoutExpression(decision);
+      return null;
+    }
+
     if (expression instanceof DecisionTable) {
       return transformDecisionTable((DecisionTable) expression);
     }
     else {
-      LOG.decisionTypeNotSupported(decision);
+      LOG.decisionTypeNotSupported(expression, decision);
       return null;
     }
   }
