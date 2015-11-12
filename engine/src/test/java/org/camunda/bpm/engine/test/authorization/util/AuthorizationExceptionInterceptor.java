@@ -12,12 +12,11 @@
  */
 package org.camunda.bpm.engine.test.authorization.util;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
+import org.slf4j.Logger;
 
 /**
  * @author Thorben Lindhauer
@@ -25,7 +24,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
  */
 public class AuthorizationExceptionInterceptor extends CommandInterceptor {
 
-  private static Logger log = Logger.getLogger(AuthorizationExceptionInterceptor.class.getName());
+private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
   protected boolean isActive;
   protected AuthorizationException lastException;
@@ -36,8 +35,9 @@ public class AuthorizationExceptionInterceptor extends CommandInterceptor {
     } catch (AuthorizationException e) {
       if (isActive) {
         lastException = e;
-        log.log(Level.INFO, "Caught authorization exception; storing for assertion in test", e);
-      } else {
+        LOG.info("Caught authorization exception; storing for assertion in test", e);
+      }
+      else {
         throw e;
       }
     }

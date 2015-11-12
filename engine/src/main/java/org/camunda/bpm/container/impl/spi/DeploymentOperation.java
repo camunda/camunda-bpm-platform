@@ -16,8 +16,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.container.impl.ContainerIntegrationLogger;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
@@ -42,8 +40,6 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 public class DeploymentOperation {
 
   private final static ContainerIntegrationLogger LOG = ProcessEngineLogger.CONTAINER_INTEGRATION_LOGGER;
-
-  protected Logger log = Logger.getLogger(DeploymentOperation.class.getName());
 
   /** the name of this composite operation */
   protected final String name;

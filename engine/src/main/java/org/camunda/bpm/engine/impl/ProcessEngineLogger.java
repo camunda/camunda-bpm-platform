@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.impl.cmmn.operation.CmmnOperationLogger;
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformerLogger;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorLogger;
+import org.camunda.bpm.engine.impl.test.TestLogger;
 import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
 import org.camunda.commons.logging.BaseLogger;
 
@@ -76,5 +77,10 @@ public class ProcessEngineLogger extends BaseLogger {
 
   public static final JobExecutorLogger JOB_EXECUTOR_LOGGER = BaseLogger.createLogger(
       JobExecutorLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.jobexecutor", "14");
+
+
+  public static final TestLogger TEST_LOGGER = BaseLogger.createLogger(
+      TestLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.test", "15");
+
 }
 

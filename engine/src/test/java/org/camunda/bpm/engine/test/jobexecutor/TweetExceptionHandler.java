@@ -13,11 +13,12 @@
 package org.camunda.bpm.engine.test.jobexecutor;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Logger;
 
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.slf4j.Logger;
 
 
 /**
@@ -25,7 +26,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
  */
 public class TweetExceptionHandler implements JobHandler {
 
-  private static Logger log = Logger.getLogger(TweetExceptionHandler.class.getName());
+private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
   public static final String TYPE = "tweet-exception";
 
@@ -39,7 +40,7 @@ public class TweetExceptionHandler implements JobHandler {
     if (exceptionsRemaining.decrementAndGet() >= 0) {
       throw new RuntimeException("exception remaining: "+exceptionsRemaining);
     }
-    log.info("no more exceptions to throw.");
+    LOG.info("no more exceptions to throw.");
   }
 
 

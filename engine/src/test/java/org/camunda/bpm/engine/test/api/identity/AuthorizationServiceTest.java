@@ -32,22 +32,24 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.slf4j.Logger;
 
 /**
  * @author Daniel Meyer
  *
  */
 public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
+
+private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
   @Override
   protected void tearDown() throws Exception {
@@ -774,12 +776,6 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
     int invocationCount = 500;
     ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
 
-    Logger logger = Logger.getLogger("org.camunda");
-    Level originalLevel = logger.getLevel();
-
-    // reduce logging level
-    logger.setLevel(Level.WARNING);
-
     try {
       ArrayList<Callable<Exception>> callables = new ArrayList<Callable<Exception>>();
 
@@ -809,8 +805,6 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
     }
     finally {
       // reset original logging level
-      logger.setLevel(originalLevel);
-
       executorService.shutdownNow();
       executorService.awaitTermination(10, TimeUnit.SECONDS);
     }

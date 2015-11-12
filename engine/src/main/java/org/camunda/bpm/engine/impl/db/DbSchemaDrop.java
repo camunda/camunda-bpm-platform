@@ -18,17 +18,12 @@ import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.impl.util.LogUtil;
 
 
 /**
  * @author Tom Baeyens
  */
 public class DbSchemaDrop {
-
-  static {
-    LogUtil.readJavaUtilLoggingConfigFromClasspath();
-  }
 
   public static void main(String[] args) {
     ProcessEngineImpl processEngine = (ProcessEngineImpl) ProcessEngines.getDefaultProcessEngine();

@@ -14,6 +14,8 @@
 package org.camunda.bpm.engine.test.bpmn.mail;
 
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.test.TestLogger;
+import org.slf4j.Logger;
 import org.subethamail.wiser.Wiser;
 
 
@@ -21,6 +23,8 @@ import org.subethamail.wiser.Wiser;
  * @author Joram Barrez
  */
 public abstract class EmailTestCase extends PluggableProcessEngineTestCase {
+
+  private final static Logger LOG = TestLogger.TEST_LOGGER.getLogger();
 
   protected Wiser wiser;
 
@@ -36,10 +40,10 @@ public abstract class EmailTestCase extends PluggableProcessEngineTestCase {
       wiser.setPort(port);
 
       try {
-        log.info("Starting Wiser mail server on port: " + port);
+        LOG.info("Starting Wiser mail server on port: " + port);
         wiser.start();
         serverUpAndRunning = true;
-        log.info("Wiser mail server listening on port: " + port);
+        LOG.info("Wiser mail server listening on port: " + port);
       } catch (RuntimeException e) { // Fix for slow port-closing Jenkins
         if (e.getMessage().toLowerCase().contains("BindException")) {
           Thread.sleep(250L);

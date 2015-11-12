@@ -15,18 +15,12 @@ package org.camunda.bpm.engine.test.concurrency;
 import static org.camunda.bpm.engine.variable.Variables.createVariables;
 import static org.camunda.bpm.model.bpmn.Bpmn.createExecutableProcess;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.impl.db.entitymanager.cache.CachedDbEntity;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
-import org.camunda.bpm.engine.test.concurrency.CompetingVariableFetchingAndDeletion.FetchVariableCmd;
-import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestCase.ControllableCommand;
-import org.camunda.bpm.engine.test.concurrency.ConcurrencyTestCase.ThreadControl;
 
 /**
  * thread1:

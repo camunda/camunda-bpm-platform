@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
+import java.io.ByteArrayOutputStream;
+
 import org.camunda.bpm.engine.impl.cmd.DeployCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.repository.DeploymentBuilderImpl;
@@ -20,8 +22,6 @@ import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-
-import java.io.ByteArrayOutputStream;
 
 /**
  *

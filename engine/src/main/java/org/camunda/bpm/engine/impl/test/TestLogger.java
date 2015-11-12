@@ -10,23 +10,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.camunda.bpm.engine.impl.test;
 
-package org.camunda.bpm.engine.impl.db;
-
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.slf4j.Logger;
 
 /**
- * @author Tom Baeyens
+ * @author Daniel Meyer
+ *
  */
-public class DbSchemaCreate {
+public class TestLogger extends ProcessEngineLogger {
 
-  public static void main(String[] args) {
-    ProcessEngineConfiguration
-      .createProcessEngineConfigurationFromResourceDefault()
-      .setDatabaseSchemaUpdate(ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_CREATE)
-      .buildProcessEngine();
+  public Logger getLogger() {
+    return delegateLogger;
   }
-
 }
