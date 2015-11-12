@@ -10,28 +10,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.camunda.bpm.engine.impl.interceptor;
+package org.camunda.bpm.engine.impl.plugin;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.cmd.CommandLogger;
-
 
 /**
- * @author Tom Baeyens
+ * @author Daniel Meyer
+ *
  */
-public class LogInterceptor extends CommandInterceptor {
+public class AdministratorAuthorizationPluginLogger extends ProcessEngineLogger {
 
-  private static final CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
+  public void grantGroupPermissions(String administratorGroupName, String resourceName) {
+    logInfo(
+        "001", "GRANT group {} ALL permissions on resource {}.", administratorGroupName , resourceName);
+  }
 
-  public <T> T execute(Command<T> command) {
-    LOG.debugStartingCommand(command);
-    try {
-      return next.execute(command);
-    }
-    finally {
-      LOG.debugFinishingCommand(command);
-    }
+  public void grantUserPermissions(String administratorUserName, String resourceName) {
+    logInfo(
+        "002", "GRANT user {} ALL permissions on resource {}.", administratorUserName , resourceName);
   }
 
 }

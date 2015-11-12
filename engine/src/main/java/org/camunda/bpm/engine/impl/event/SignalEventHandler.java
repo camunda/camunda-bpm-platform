@@ -15,9 +15,8 @@ package org.camunda.bpm.engine.impl.event;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
@@ -33,7 +32,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
  */
 public class SignalEventHandler extends AbstractEventHandler {
 
-  private final static Logger LOGGER = Logger.getLogger(SignalEventHandler.class.getName());
+  private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
   public static final String EVENT_HANDLER_TYPE = "signal";
 
@@ -50,8 +49,7 @@ public class SignalEventHandler extends AbstractEventHandler {
     ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
     if (processDefinition == null || processDefinition.isSuspended()) {
       // ignore event subscription
-      LOGGER.log(Level.FINE, "Found event subscription with {0} but process definition {1} could not be found.",
-          new Object[] { eventSubscription, processDefinitionId });
+      LOG.debugIgnoringEventSubscription(eventSubscription, processDefinitionId);
     } else {
 
       ActivityImpl signalStartEvent = processDefinition.findActivity(eventSubscription.getActivityId());

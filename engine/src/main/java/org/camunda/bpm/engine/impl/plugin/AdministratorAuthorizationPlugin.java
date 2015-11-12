@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.AbstractProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
@@ -33,7 +34,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
  */
 public class AdministratorAuthorizationPlugin extends AbstractProcessEnginePlugin {
 
-  protected Logger LOG = Logger.getLogger(AdministratorAuthorizationPlugin.class.getName());
+  private final static AdministratorAuthorizationPluginLogger LOG = ProcessEngineLogger.ADMIN_PLUGIN_LOGGER;
 
   /** The name of the administrator group.
    *
@@ -72,7 +73,7 @@ public class AdministratorAuthorizationPlugin extends AbstractProcessEnginePlugi
           adminGroupAuth.setResourceId(ANY);
           adminGroupAuth.addPermission(ALL);
           authorizationService.saveAuthorization(adminGroupAuth);
-          LOG.log(Level.INFO, "GRANT group {0} ALL permissions on resource {1}.", new String[]{administratorGroupName, resource.resourceName()});
+          LOG.grantGroupPermissions(administratorGroupName, resource.resourceName());
 
         }
       }
@@ -88,7 +89,7 @@ public class AdministratorAuthorizationPlugin extends AbstractProcessEnginePlugi
           adminUserAuth.setResourceId(ANY);
           adminUserAuth.addPermission(ALL);
           authorizationService.saveAuthorization(adminUserAuth);
-          LOG.log(Level.INFO, "GRANT user {0} ALL permissions on resource {1}.", new String[]{administratorUserName, resource.resourceName()});
+          LOG.grantUserPermissions(administratorUserName, resource.resourceName());
         }
       }
     }

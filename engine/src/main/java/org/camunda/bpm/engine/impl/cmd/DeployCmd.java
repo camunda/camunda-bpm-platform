@@ -74,7 +74,7 @@ import org.camunda.bpm.model.cmmn.instance.Case;
  */
 public class DeployCmd<T> implements Command<Deployment>, Serializable {
 
-  private final static CmdLogger LOG = ProcessEngineLogger.CMD_LOGGER;
+  private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
   private final static TransactionLogger TX_LOG = ProcessEngineLogger.TX_LOGGER;
 
   private static final long serialVersionUID = 1L;

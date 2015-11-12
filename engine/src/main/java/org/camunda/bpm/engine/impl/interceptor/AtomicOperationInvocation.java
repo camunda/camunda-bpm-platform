@@ -12,10 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.interceptor;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.application.ProcessApplicationReference;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
@@ -29,7 +27,7 @@ import org.camunda.bpm.engine.impl.pvm.runtime.operation.PvmAtomicOperation;
  */
 public class AtomicOperationInvocation {
 
-  private static Logger log = Logger.getLogger(CommandContext.class.getName());
+  private final static ContextLogger LOG = ProcessEngineLogger.CONTEXT_LOGGER;
 
   protected AtomicOperation operation;
 
@@ -79,9 +77,7 @@ public class AtomicOperationInvocation {
     try {
       Context.setExecutionContext(execution);
       if(!performAsync) {
-        if (log.isLoggable(Level.FINEST)) {
-          log.finest("AtomicOperation: " + operation + " on " + execution);
-        }
+        LOG.debugExecutingAtomicOperation(operation, execution);
         operation.execute(execution);
       }
       else {

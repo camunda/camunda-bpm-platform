@@ -27,10 +27,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.impl.ProcessEngineInfoImpl;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 
@@ -60,7 +58,7 @@ import org.camunda.bpm.engine.impl.util.ReflectUtil;
  */
 public abstract class ProcessEngines {
 
-  private static Logger log = Logger.getLogger(ProcessEngines.class.getName());
+  private final static ProcessEngineLogger LOG = ProcessEngineLogger.INSTANCE;
 
   public static final String NAME_DEFAULT = "default";
 
@@ -125,7 +123,7 @@ public abstract class ProcessEngines {
 
       isInitialized = true;
     } else {
-      log.info("Process engines already initialized");
+      LOG.processEngineAlreadyInitialized();
     }
   }
 
@@ -177,15 +175,15 @@ public abstract class ProcessEngines {
 
     String resourceUrlString = resourceUrl.toString();
     try {
-      log.info("initializing process engine for resource " + resourceUrl);
+      LOG.initializingProcessEngineForResource(resourceUrl);
       ProcessEngine processEngine = buildProcessEngine(resourceUrl);
       String processEngineName = processEngine.getName();
-      log.info("initialised process engine " + processEngineName);
+      LOG.initializingProcessEngine(processEngine.getName());
       processEngineInfo = new ProcessEngineInfoImpl(processEngineName, resourceUrlString, null);
       processEngines.put(processEngineName, processEngine);
       processEngineInfosByName.put(processEngineName, processEngineInfo);
     } catch (Throwable e) {
-      log.log(Level.SEVERE, "Exception while initializing process engine :" + e.getMessage(), e);
+      LOG.exceptionWhileInitializingProcessengine(e);
       processEngineInfo = new ProcessEngineInfoImpl(null, resourceUrlString, getExceptionString(e));
     }
     processEngineInfosByResourceUrl.put(resourceUrlString, processEngineInfo);
@@ -251,7 +249,6 @@ public abstract class ProcessEngines {
   /** retries to initialize a process engine that previously failed.
    */
   public static ProcessEngineInfo retry(String resourceUrl) {
-    log.fine("retying initializing of resource " + resourceUrl);
     try {
       return initProcessEngineFromResource(new URL(resourceUrl));
     } catch (MalformedURLException e) {
@@ -276,8 +273,9 @@ public abstract class ProcessEngines {
         ProcessEngine processEngine = engines.get(processEngineName);
         try {
           processEngine.close();
-        } catch (Exception e) {
-          log.log(Level.SEVERE, "exception while closing "+(processEngineName==null ? "the default process engine" : "process engine "+processEngineName), e);
+        }
+        catch (Exception e) {
+          LOG.exceptionWhileClosingProcessEngine(processEngineName==null ? "the default process engine" : "process engine "+processEngineName, e);
         }
       }
 

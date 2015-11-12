@@ -30,7 +30,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
  */
 public class ModifyProcessInstanceCmd implements Command<Void> {
 
-  private final static CmdLogger LOG = ProcessEngineLogger.CMD_LOGGER;
+  private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
   protected ProcessInstanceModificationBuilderImpl builder;
 

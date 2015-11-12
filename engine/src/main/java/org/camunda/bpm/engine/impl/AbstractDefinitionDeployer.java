@@ -19,11 +19,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
@@ -38,9 +37,9 @@ import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
  */
 public abstract class AbstractDefinitionDeployer<DefinitionEntity extends ResourceDefinitionEntity> implements Deployer {
 
-  private static final Logger LOG = Logger.getLogger(AbstractDefinitionDeployer.class.getName());
-
   public static final String[] DIAGRAM_SUFFIXES = new String[] { "png", "jpg", "gif", "svg" };
+
+  private final CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
   protected IdGenerator idGenerator;
 
@@ -53,7 +52,7 @@ public abstract class AbstractDefinitionDeployer<DefinitionEntity extends Resour
   }
 
   public void deploy(DeploymentEntity deployment) {
-    LOG.fine("Processing deployment " + deployment.getName());
+    LOG.debugProcessingDeployment(deployment.getName());
     List<DefinitionEntity> definitions = parseDefinitionResources(deployment);
     ensureNoDuplicateDefinitionKeys(definitions);
     postProcessDefinitions(deployment, definitions);
@@ -62,7 +61,7 @@ public abstract class AbstractDefinitionDeployer<DefinitionEntity extends Resour
   protected List<DefinitionEntity> parseDefinitionResources(DeploymentEntity deployment) {
     List<DefinitionEntity> definitions = new ArrayList<DefinitionEntity>();
     for (ResourceEntity resource : deployment.getResources().values()) {
-      LOG.fine("Processing resource " + resource.getName());
+      LOG.debugProcessingResource(resource.getName());
       if (isResourceHandled(resource)) {
         definitions.addAll(transformResource(deployment, resource));
       }
@@ -96,7 +95,6 @@ public abstract class AbstractDefinitionDeployer<DefinitionEntity extends Resour
 
       String diagramResourceName = getDiagramResourceForDefinition(deployment, resourceName, definition, deployment.getResources());
       if (diagramResourceName != null) {
-        LOG.fine("Setting diagram for definition " + definition.getKey() + " to " + diagramResourceName);
         definition.setDiagramResourceName(diagramResourceName);
       }
     }

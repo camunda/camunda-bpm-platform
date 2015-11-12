@@ -12,10 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.StartProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -26,7 +24,7 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 
 public class TimerStartEventJobHandler extends TimerEventJobHandler {
 
-  private static Logger log = Logger.getLogger(TimerStartEventJobHandler.class.getName());
+  private final static JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
 
   public static final String TYPE = "timer-start-event";
 
@@ -44,14 +42,15 @@ public class TimerStartEventJobHandler extends TimerEventJobHandler {
     try {
       if(!processDefinition.isSuspended()) {
         new StartProcessInstanceCmd(definitionKey, null, null, null, null).execute(commandContext);
-      } else {
-        log.log(Level.FINE, "ignoring timer of suspended process definition " + processDefinition.getName());
       }
-    } catch (RuntimeException e) {
-      log.log(Level.SEVERE, "exception during timer execution", e);
+      else {
+        LOG.ignoringSuspendedJob(processDefinition);
+      }
+    }
+    catch (RuntimeException e) {
       throw e;
-    } catch (Exception e) {
-      log.log(Level.SEVERE, "exception during timer execution", e);
+    }
+    catch (Exception e) {
       throw new ProcessEngineException("exception during timer execution: " + e.getMessage(), e);
     }
   }

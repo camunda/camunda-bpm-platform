@@ -15,10 +15,10 @@ package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
+import org.camunda.bpm.engine.impl.pvm.PvmLogger;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.runtime.LegacyBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.OutgoingExecution;
@@ -32,7 +32,7 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
  */
 public class PvmAtomicOperationTransitionDestroyScope implements PvmAtomicOperation {
 
-  private static Logger log = Logger.getLogger(PvmAtomicOperationTransitionDestroyScope.class.getName());
+  private final static PvmLogger LOG = ProcessEngineLogger.PVM_LOGGER;
 
   public boolean isAsync(PvmExecutionImpl instance) {
     return false;
@@ -64,7 +64,7 @@ public class PvmAtomicOperationTransitionDestroyScope implements PvmAtomicOperat
           propagatingExecution.setActivity(execution.getActivity());
           propagatingExecution.setTransition(execution.getTransition());
           propagatingExecution.setActive(true);
-          log.fine("destroy scope: scoped "+execution+" continues as parent scope "+propagatingExecution);
+          LOG.debugDestroyScope(execution, propagatingExecution);
           execution.destroy();
           execution.remove();
         }

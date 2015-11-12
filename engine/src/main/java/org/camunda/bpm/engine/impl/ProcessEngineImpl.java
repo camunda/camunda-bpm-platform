@@ -13,7 +13,6 @@
 package org.camunda.bpm.engine.impl;
 
 import java.util.Map;
-import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.CaseService;
@@ -43,7 +42,7 @@ import org.camunda.bpm.engine.impl.metrics.reporter.DbMetricsReporter;
  */
 public class ProcessEngineImpl implements ProcessEngine {
 
-  private static Logger log = Logger.getLogger(ProcessEngineImpl.class.getName());
+  private final static ProcessEngineLogger LOG = ProcessEngineLogger.INSTANCE;
 
   protected String name;
 
@@ -99,9 +98,9 @@ public class ProcessEngineImpl implements ProcessEngine {
     executeSchemaOperations();
 
     if (name == null) {
-      log.info("default activiti ProcessEngine created");
+      LOG.processEngineCreated("default");
     } else {
-      log.info("ProcessEngine " + name + " created");
+      LOG.processEngineCreated(name);
     }
 
     ProcessEngines.registerProcessEngine(this);

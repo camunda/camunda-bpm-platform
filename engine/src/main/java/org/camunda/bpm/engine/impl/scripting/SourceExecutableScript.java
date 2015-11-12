@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.scripting;
 
-import java.util.logging.Logger;
-
 import javax.script.Bindings;
 import javax.script.Compilable;
 import javax.script.CompiledScript;
@@ -24,6 +22,7 @@ import org.camunda.bpm.engine.ScriptCompilationException;
 import org.camunda.bpm.engine.ScriptEvaluationException;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 
@@ -35,7 +34,7 @@ import org.camunda.bpm.engine.impl.context.Context;
  */
 public class SourceExecutableScript extends CompiledExecutableScript {
 
-  private static final Logger LOG = Logger.getLogger(SourceExecutableScript.class.getName());
+  private final static ScriptLogger LOG = ProcessEngineLogger.SCRIPT_LOGGER;
 
   /** The source of the script. */
   protected String scriptSource;
@@ -93,7 +92,7 @@ public class SourceExecutableScript extends CompiledExecutableScript {
       try {
         CompiledScript compiledScript = compilingEngine.compile(src);
 
-        LOG.fine("Compiled script using " + language + " script engine");
+        LOG.debugCompiledScriptUsing(language);
 
         return compiledScript;
 
@@ -111,7 +110,7 @@ public class SourceExecutableScript extends CompiledExecutableScript {
 
   protected Object evaluateScript(ScriptEngine engine, Bindings bindings) {
     try {
-      LOG.fine("Evaluating un-compiled script using " + language + " script engine ");
+      LOG.debugEvaluatingNonCompiledScript(scriptSource);
       return engine.eval(scriptSource, bindings);
     } catch (ScriptException e) {
       if (e.getCause() instanceof BpmnError) {

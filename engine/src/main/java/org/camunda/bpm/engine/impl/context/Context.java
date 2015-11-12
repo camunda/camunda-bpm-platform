@@ -15,9 +15,6 @@ package org.camunda.bpm.engine.impl.context;
 
 import java.util.Stack;
 import java.util.concurrent.Callable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
@@ -37,8 +34,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
  * @author Thorben Lindhauer
  */
 public class Context {
-
-  private final static Logger LOGGER = Logger.getLogger(Context.class.getName());
 
   protected static ThreadLocal<Stack<CommandContext>> commandContextThreadLocal = new ThreadLocal<Stack<CommandContext>>();
   protected static ThreadLocal<Stack<CommandInvocationContext>> commandInvocationContextThreadLocal = new ThreadLocal<Stack<CommandInvocationContext>>();
@@ -185,7 +180,6 @@ public class Context {
       setCurrentProcessApplication(processApplicationReference);
 
       try {
-        LOGGER.log(Level.FINE, "[PA-CONTEXT] Switch to {0}", paName);
         // wrap callback
         ProcessApplicationClassloaderInterceptor<T> wrappedCallback = new ProcessApplicationClassloaderInterceptor<T>(callback);
         // execute wrapped callback
@@ -201,7 +195,6 @@ public class Context {
         }
 
       } finally {
-        LOGGER.log(Level.FINE, "[PA-CONTEXT] Return from {0}", paName);
         removeCurrentProcessApplication();
       }
 

@@ -12,13 +12,12 @@
  */
 package org.camunda.bpm.engine.impl;
 
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.DetermineHistoryLevelCmd;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.PersistenceSession;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
@@ -34,7 +33,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
  */
 public final class SchemaOperationsProcessEngineBuild implements Command<Void> {
 
-  private final static Logger log = Logger.getLogger(SchemaOperationsProcessEngineBuild.class.getName());
+  private final static EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
 
   public Void execute(CommandContext commandContext) {
     String databaseSchemaUpdate = Context.getProcessEngineConfiguration().getDatabaseSchemaUpdate();
@@ -70,7 +69,7 @@ public final class SchemaOperationsProcessEngineBuild implements Command<Void> {
     HistoryLevel configuredHistoryLevel = processEngineConfiguration.getHistoryLevel();
     PropertyEntity property = new PropertyEntity("historyLevel", Integer.toString(configuredHistoryLevel.getId()));
     entityManager.insert(property);
-    log.info("Creating historyLevel property in database with value: " + configuredHistoryLevel.getId());
+    LOG.creatingHistoryLevelPropertyInDatabase(configuredHistoryLevel.getId());
   }
 
   /**
@@ -83,8 +82,9 @@ public final class SchemaOperationsProcessEngineBuild implements Command<Void> {
     try {
       PropertyEntity historyLevelProperty = entityManager.selectById(PropertyEntity.class, "historyLevel");
       return historyLevelProperty != null ? new Integer(historyLevelProperty.getValue()) : null;
-    } catch (Exception e) {
-      log.warning("could not select property historyLevel: " + e.getMessage());
+    }
+    catch (Exception e) {
+      LOG.couldNotSelectHistoryLevel(e.getMessage());
       return null;
     }
 
@@ -101,7 +101,7 @@ public final class SchemaOperationsProcessEngineBuild implements Command<Void> {
     HistoryLevel configuredHistoryLevel = processEngineConfiguration.getHistoryLevel();
 
     if (databaseHistoryLevel == null) {
-      log.info("No historyLevel property found in database.");
+      LOG.noHistoryLevelPropertyFound();
       dbCreateHistoryLevel(entityManager);
     } else {
       if (!((Integer) configuredHistoryLevel.getId()).equals(databaseHistoryLevel.getId())) {
@@ -130,7 +130,7 @@ public final class SchemaOperationsProcessEngineBuild implements Command<Void> {
   public void checkDeploymentLockExists(DbEntityManager entityManager) {
     PropertyEntity deploymentLockProperty = entityManager.selectById(PropertyEntity.class, "deployment.lock");
     if (deploymentLockProperty == null) {
-      log.warning("No deployment lock property found in database.");
+      LOG.noDeploymentLockPropertyFound();
     }
   }
 }

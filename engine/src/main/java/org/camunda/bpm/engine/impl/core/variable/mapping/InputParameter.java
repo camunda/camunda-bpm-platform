@@ -12,9 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.core.variable.mapping;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import org.camunda.bpm.engine.impl.core.CoreLogger;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 
@@ -32,7 +30,7 @@ import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
  */
 public class InputParameter extends IoParameter {
 
-  private final static Logger LOG = Logger.getLogger(InputParameter.class.getName());
+  private final static CoreLogger LOG = CoreLogger.CORE_LOGGER;
 
   public InputParameter(String name, ParameterValueProvider valueProvider) {
     super(name, valueProvider);
@@ -43,10 +41,7 @@ public class InputParameter extends IoParameter {
     // get value from outer scope
     Object value = valueProvider.getValue(outerScope);
 
-    if(LOG.isLoggable(Level.FINE)) {
-      LOG.log(Level.FINE, "Mapping value '"+value+"' from outer scope '"+outerScope
-          +"' to variable '"+name+ "' in inner scope '"+innerScope+"'.");
-    }
+    LOG.debugMappingValueFromOuterScopeToInnerScope(value,outerScope, name, innerScope);
 
     // set variable in inner scope
     innerScope.setVariableLocal(name, value);

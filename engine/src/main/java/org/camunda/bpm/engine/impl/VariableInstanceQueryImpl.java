@@ -16,9 +16,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.db.CompositePermissionCheck;
 import org.camunda.bpm.engine.impl.db.PermissionCheck;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -34,7 +32,7 @@ import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
  */
 public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<VariableInstanceQuery, VariableInstance> implements VariableInstanceQuery, Serializable {
 
-  private final static Logger LOGGER = Logger.getLogger(VariableInstanceQuery.class.getName());
+  private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
   private static final long serialVersionUID = 1L;
 
@@ -181,7 +179,7 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
 
         } catch(Exception t) {
           // do not fail if one of the variables fails to load
-          LOGGER.log(Level.FINE, "Exception while getting value for variable", t);
+          LOG.exceptionWhileGettingValueForVariable(t);
         }
       }
 

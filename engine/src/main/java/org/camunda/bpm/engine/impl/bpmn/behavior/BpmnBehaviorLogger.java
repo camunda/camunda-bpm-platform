@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
+import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
  * @author Stefan Hentschel.
@@ -251,6 +252,31 @@ public class BpmnBehaviorLogger extends ProcessEngineLogger {
         decisionResult,
         outputNames
       ));
+  }
+
+  public void debugConcurrentScopeIsPruned(PvmExecutionImpl execution) {
+    logDebug(
+        "038", "Concurrent scope is pruned {}", execution);
+  }
+
+  public void debugCancelConcurrentScopeExecution(PvmExecutionImpl execution) {
+    logDebug(
+        "039", "Cancel concurrent scope execution {}", execution);
+  }
+
+  public void destroyConcurrentScopeExecution(PvmExecutionImpl execution) {
+    logDebug(
+        "040", "Destroy concurrent scope execution", execution);
+  }
+
+  public void completeNonScopeEventSubprocess() {
+    logDebug(
+        "041", "Destroy non-socpe event subprocess");
+  }
+
+  public void endConcurrentExecutionInEventSubprocess() {
+    logDebug(
+        "042", "End concurrent execution in event subprocess");
   }
 
 }

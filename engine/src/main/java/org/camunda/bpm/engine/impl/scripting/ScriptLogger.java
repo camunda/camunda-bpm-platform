@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.cmd;
+package org.camunda.bpm.engine.impl.scripting;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
@@ -18,29 +18,21 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
  * @author Daniel Meyer
  *
  */
-public class CmdLogger extends ProcessEngineLogger {
+public class ScriptLogger extends ProcessEngineLogger {
 
-
-  public void debugCreatingNewDeployment() {
+  public void debugEvaluatingCompiledScript(String language) {
     logDebug(
-        "001", "Creating new deployment");
+        "001", "Evaluating compiled script {} in language", language);
   }
 
-  public void usingExistingDeployment() {
+  public void debugCompiledScriptUsing(String language) {
     logDebug(
-        "002", "Using existing deployment");
+        "002", "Compiled script using {} script language", language);
   }
 
-  public void debugModificationInstruction(String processInstanceId, int i, String describe) {
+  public void debugEvaluatingNonCompiledScript(String scriptSource) {
     logDebug(
-        "003", "Modifying process instance '{}': Instruction {}: {}",
-        processInstanceId, i, describe);
-  }
-
-  public void debugStartingInstruction(String processInstanceId, int i, String describe) {
-    logDebug(
-        "004", "Starting process instance '{}': Instruction {}: {}",
-        processInstanceId, i, describe);
+        "001", "Evaluating non-compiled script {}", scriptSource);
   }
 
 }

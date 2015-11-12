@@ -19,6 +19,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+
 /**
  * <p>This is a simple implementation of the {@link JobExecutor} using self-managed
  * threads for performing background work.</p>
@@ -34,7 +36,7 @@ import java.util.logging.Logger;
  */
 public class DefaultJobExecutor extends ThreadPoolJobExecutor {
 
-  private static Logger log = Logger.getLogger(DefaultJobExecutor.class.getName());
+  private final static JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
 
   protected int queueSize = 3;
   protected int corePoolSize = 3;
@@ -61,11 +63,10 @@ public class DefaultJobExecutor extends ThreadPoolJobExecutor {
     // Waits for 1 minute to finish all currently executing jobs
     try {
       if(!threadPoolExecutor.awaitTermination(60L, TimeUnit.SECONDS)) {
-        log.log(Level.WARNING, "Timeout during shutdown of job executor. "
-                + "The current running jobs could not end within 60 seconds after shutdown operation.");
+        LOG.timeoutDuringShutdown();
       }
     } catch (InterruptedException e) {
-      log.log(Level.WARNING, "Interrupted while shutting down the job executor. ", e);
+      LOG.interruptedWhileShuttingDownjobExecutor(e);
     }
   }
 
