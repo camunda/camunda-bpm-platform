@@ -1,6 +1,6 @@
 <module xmlns="urn:jboss:module:1.0" name="org.codehaus.groovy.groovy-all">
   <resources>
-    <resource-root path="groovy-all-2.3.0.jar" />
+    <resource-root path="groovy-all-2.4.5.jar" />
   </resources>
 
   <dependencies>

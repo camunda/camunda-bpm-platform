@@ -22,10 +22,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Level;
-
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
+import org.camunda.bpm.container.impl.ContainerIntegrationLogger;
 import org.camunda.bpm.container.impl.deployment.scanning.ProcessApplicationScanningUtil;
 import org.camunda.bpm.container.impl.deployment.util.DeployedProcessArchive;
 import org.camunda.bpm.container.impl.metadata.PropertyHelper;
@@ -35,6 +34,7 @@ import org.camunda.bpm.container.impl.spi.PlatformServiceContainer;
 import org.camunda.bpm.container.impl.spi.ServiceTypes;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
@@ -50,6 +50,8 @@ import org.camunda.bpm.engine.repository.ResumePreviousBy;
  *
  */
 public class DeployProcessArchiveStep extends DeploymentOperationStep {
+
+  private final static ContainerIntegrationLogger LOG = ProcessEngineLogger.CONTAINER_INTEGRATION_LOGGER;
 
   protected final ProcessArchiveXml processArchive;
   protected URL metaFileUrl;
@@ -123,7 +125,8 @@ public class DeployProcessArchiveStep extends DeploymentOperationStep {
 
     Collection<String> deploymentResourceNames = deploymentBuilder.getResourceNames();
     if(!deploymentResourceNames.isEmpty()) {
-      logDeploymentSummary(deploymentResourceNames, deploymentName);
+
+      LOG.deploymentSummary(deploymentResourceNames, deploymentName);
 
       // perform the process engine deployment
       deployment = deploymentBuilder.deploy();
@@ -136,9 +139,9 @@ public class DeployProcessArchiveStep extends DeploymentOperationStep {
       }
       processArchiveDeploymentMap.put(processArchive.getName(), new DeployedProcessArchive(deployment));
 
-    } else {
-      LOGGER.info("Not creating a deployment for process archive '" + processArchive.getName() + "': no resources provided.");
-
+    }
+    else {
+      LOG.notCreatingPaDeployment(processApplication.getName());
     }
   }
 
@@ -155,7 +158,7 @@ public class DeployProcessArchiveStep extends DeploymentOperationStep {
       b.append(". Value was ").append(resumePreviousBy);
       b.append(" expected ").append(ResumePreviousBy.RESUME_BY_DEPLOYMENT_NAME);
       b.append(" or ").append(ResumePreviousBy.RESUME_BY_PROCESS_DEFINITION_KEY).append(".");
-      throw new IllegalArgumentException(b.toString());
+      throw LOG.illegalValueForResumePreviousByProperty(b.toString());
     }
   }
 
@@ -165,17 +168,6 @@ public class DeployProcessArchiveStep extends DeploymentOperationStep {
 
   protected Map<String, byte[]> findResources(final ClassLoader processApplicationClassloader, String paResourceRoot, String[] additionalResourceSuffixes) {
     return ProcessApplicationScanningUtil.findResources(processApplicationClassloader, paResourceRoot, metaFileUrl, additionalResourceSuffixes);
-  }
-
-  protected void logDeploymentSummary(Collection<String> deploymentResourceNames, String deploymentName) {
-    StringBuilder builder = new StringBuilder();
-    builder.append("Deployment summary for process archive '" + deploymentName + "': \n");
-    builder.append("\n");
-    for (String resourceName : deploymentResourceNames) {
-      builder.append("        " + resourceName);
-      builder.append("\n");
-    }
-    LOGGER.log(Level.INFO, builder.toString());
   }
 
   public void cancelOperationStep(DeploymentOperation operationContext) {

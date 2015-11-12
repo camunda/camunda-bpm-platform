@@ -216,7 +216,7 @@ public class MBeanServiceContainerTest extends TestCase {
       fail("Exception expected");
 
     } catch(Exception e) {
-      assertTrue(e.getMessage().contains("Exception while performing 'test failing op => failing step'"));
+      assertTrue(e.getMessage().contains("Exception while performing 'test failing op' => 'failing step'"));
 
     }
 
@@ -236,7 +236,7 @@ public class MBeanServiceContainerTest extends TestCase {
       fail("Exception expected");
 
     } catch(Exception e) {
-      assertTrue(e.getMessage().contains("Exception while performing 'test failing op => failing step'"));
+      assertTrue(e.getMessage().contains("Exception while performing 'test failing op' => 'failing step'"));
 
     }
 

@@ -27,6 +27,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -36,12 +37,15 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.api.runtime.ProcessInstanceQueryTest;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Assert;
+import org.slf4j.Logger;
 
 /**
  * @author Frederik Heremans
  * @author Falko Menge
  */
 public class HistoryServiceTest extends PluggableProcessEngineTestCase {
+
+private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testHistoricProcessInstanceQuery() {
@@ -203,7 +207,7 @@ public class HistoryServiceTest extends PluggableProcessEngineTestCase {
     for (Task task : tasks) {
       Map<String, Object> variables = new HashMap<String, Object>();
       // set token local variable
-      log.fine("setting variables on task "+task.getId()+", execution "+task.getExecutionId());
+      LOG.debug("setting variables on task "+task.getId()+", execution "+task.getExecutionId());
       runtimeService.setVariableLocal(task.getExecutionId(), "parallelValue1", task.getName());
       runtimeService.setVariableLocal(task.getExecutionId(), "parallelValue2", "test");
       taskService.complete(task.getId(), variables);
@@ -475,5 +479,50 @@ public class HistoryServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(4, historyService.createHistoricProcessInstanceQuery().variableValueEquals("var", Variables.numberValue((short) 123)).count());
 
     assertEquals(1, historyService.createHistoricProcessInstanceQuery().variableValueEquals("var", Variables.numberValue(null)).count());
+  }
+
+  @Deployment(resources={
+  "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testDeleteProcessInstance() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
+
+    runtimeService.deleteProcessInstance(processInstance.getId(), null);
+    assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
+    assertEquals(1, historyService.createHistoricProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
+
+    historyService.deleteHistoricProcessInstance(processInstance.getId());
+    assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
+  }
+
+  @Deployment(resources={
+  "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testDeleteRunningProcessInstance() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
+    try {
+      historyService.deleteHistoricProcessInstance(processInstance.getId());
+      fail("ProcessEngineException expected");
+    } catch (ProcessEngineException ae) {
+      assertTextPresent("Process instance is still running, cannot delete historic process instance", ae.getMessage());
+    }
+  }
+
+  public void testDeleteProcessInstanceUnexistingId() {
+    try {
+      historyService.deleteHistoricProcessInstance("enexistingInstanceId");
+      fail("ProcessEngineException expected");
+    } catch (ProcessEngineException ae) {
+      assertTextPresent("No historic process instance found with id", ae.getMessage());
+    }
+  }
+
+  public void testDeleteProcessInstanceNullId() {
+    try {
+      historyService.deleteHistoricProcessInstance(null);
+      fail("ProcessEngineException expected");
+    } catch (ProcessEngineException ae) {
+      assertTextPresent("processInstanceId is null", ae.getMessage());
+    }
   }
 }

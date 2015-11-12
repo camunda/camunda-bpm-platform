@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.delegate;
 
 import org.camunda.bpm.engine.delegate.BaseDelegateExecution;
 import org.camunda.bpm.engine.impl.interceptor.DelegateInterceptor;
+import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
 
 /**
  * Provides context about the invocation of usercode and handles the actual
@@ -25,8 +26,22 @@ import org.camunda.bpm.engine.impl.interceptor.DelegateInterceptor;
 public abstract class DelegateInvocation {
 
   protected Object invocationResult;
-  protected Object[] invocationParameters;
   protected BaseDelegateExecution contextExecution;
+  protected ResourceDefinitionEntity contextResource;
+
+  /**
+   * Provide a context execution or resource definition in which context the invocation
+   *   should be performed. If both parameters are null, the invocation is performed in the
+   *   current context.
+   *
+   * @param contextExecution set to an execution
+   */
+  public DelegateInvocation(BaseDelegateExecution contextExecution, ResourceDefinitionEntity contextResource) {
+    // This constructor forces sub classes to call it, thereby making it more visible
+    // whether a context switch is going to be performed for them.
+    this.contextExecution = contextExecution;
+    this.contextResource = contextResource;
+  }
 
   /**
    * make the invocation proceed, performing the actual invocation of the user
@@ -50,22 +65,13 @@ public abstract class DelegateInvocation {
   }
 
   /**
-   * @return an array of invocation parameters (null if the invocation takes no
-   *         parameters)
-   */
-  public Object[] getInvocationParameters() {
-    return invocationParameters;
-  }
-
-  /**
-   * returns the target of the current invocation, ie. JavaDelegate, ValueExpression ...
-   */
-  public abstract Object getTarget();
-
-  /**
    * returns the execution in which context this delegate is invoked. may be null
    */
   public BaseDelegateExecution getContextExecution() {
     return contextExecution;
+  }
+
+  public ResourceDefinitionEntity getContextResource() {
+    return contextResource;
   }
 }

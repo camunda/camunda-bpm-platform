@@ -162,4 +162,8 @@ public class UpgradeTestRule extends ProcessEngineRule {
     return instance;
   }
 
+  public String getScenarioName() {
+    return scenarioName;
+  }
+
 }

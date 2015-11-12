@@ -15,15 +15,19 @@ package org.camunda.bpm.engine.test.concurrency;
 import java.util.Collections;
 
 import org.camunda.bpm.engine.OptimisticLockingException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.SetTaskVariablesCmd;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
+import org.slf4j.Logger;
 
 /**
  * @author Daniel Meyer
  *
  */
 public class ConcurrentVariableUpdateTest extends PluggableProcessEngineTestCase {
+
+private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
   static ControllableThread activeThread;
 
@@ -58,7 +62,7 @@ public class ConcurrentVariableUpdateTest extends PluggableProcessEngineTestCase
       } catch (Exception e) {
         this.exception = e;
       }
-      log.fine(getName()+" ends");
+      LOG.debug(getName()+" ends");
     }
   }
 

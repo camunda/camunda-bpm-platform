@@ -14,17 +14,14 @@
 package org.camunda.bpm.engine.test.concurrency;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.OptimisticLockingException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.CompleteTaskCmd;
-import org.camunda.bpm.engine.impl.cmd.SignalCmd;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.runtime.Execution;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.concurrency.CompetingSubprocessCompletionTest.CompleteTaskThread;
+import org.slf4j.Logger;
 
 
 /**
@@ -32,7 +29,7 @@ import org.camunda.bpm.engine.test.concurrency.CompetingSubprocessCompletionTest
  */
 public class CompetingProcessCompletionTest extends PluggableProcessEngineTestCase {
 
-  private static Logger log = Logger.getLogger(CompetingSignalsTest.class.getName());
+private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
   static ControllableThread activeThread;
 
@@ -55,7 +52,7 @@ public class CompetingProcessCompletionTest extends PluggableProcessEngineTestCa
       } catch (OptimisticLockingException e) {
         this.exception = e;
       }
-      log.fine(getName()+" ends");
+      LOG.debug(getName()+" ends");
     }
   }
 
@@ -70,19 +67,19 @@ public class CompetingProcessCompletionTest extends PluggableProcessEngineTestCa
     List<Task> tasks = taskService.createTaskQuery().list();
     assertEquals(3, tasks.size());
 
-    log.fine("test thread starts thread one");
+    LOG.debug("test thread starts thread one");
     CompleteTaskThread threadOne = new CompleteTaskThread(tasks.get(0).getId());
     threadOne.startAndWaitUntilControlIsReturned();
 
-    log.fine("test thread continues to start thread two");
+    LOG.debug("test thread continues to start thread two");
     CompleteTaskThread threadTwo = new CompleteTaskThread(tasks.get(1).getId());
     threadTwo.startAndWaitUntilControlIsReturned();
 
-    log.fine("test thread notifies thread 1");
+    LOG.debug("test thread notifies thread 1");
     threadOne.proceedAndWaitTillDone();
     assertNull(threadOne.exception);
 
-    log.fine("test thread notifies thread 2");
+    LOG.debug("test thread notifies thread 2");
     threadTwo.proceedAndWaitTillDone();
     assertNotNull(threadTwo.exception);
     assertTextPresent("was updated by another transaction concurrently", threadTwo.exception.getMessage());

@@ -18,8 +18,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.TransactionContext;
 import org.camunda.bpm.engine.impl.cfg.TransactionListener;
+import org.camunda.bpm.engine.impl.cfg.TransactionLogger;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.PersistenceSession;
@@ -29,6 +32,8 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
  * @author Sebastian Menski
  */
 public class StandaloneTransactionContext implements TransactionContext {
+
+  public final static TransactionLogger LOG = ProcessEngineLogger.TX_LOGGER;
 
   private static Logger log = Logger.getLogger(StandaloneTransactionContext.class.getName());
   protected CommandContext commandContext;
@@ -52,11 +57,16 @@ public class StandaloneTransactionContext implements TransactionContext {
   }
 
   public void commit() {
-    log.fine("firing event committing...");
+    LOG.debugTransactionOperation("firing event committing...");
+
     fireTransactionEvent(TransactionState.COMMITTING);
-    log.fine("committing the persistence session...");
+
+    LOG.debugTransactionOperation("committing the persistence session...");
+
     getPersistenceProvider().commit();
-    log.fine("firing event committed...");
+
+    LOG.debugTransactionOperation("firing event committed...");
+
     fireTransactionEvent(TransactionState.COMMITTED);
   }
 
@@ -85,23 +95,25 @@ public class StandaloneTransactionContext implements TransactionContext {
   public void rollback() {
     try {
       try {
-        log.fine("firing event rolling back...");
+        LOG.debugTransactionOperation("firing event rollback...");
         fireTransactionEvent(TransactionState.ROLLINGBACK);
 
-      } catch (Throwable exception) {
-        log.info("Exception during transaction: " + exception.getMessage());
+      }
+      catch (Throwable exception) {
+        LOG.exceptionWhileFiringEvent(TransactionState.ROLLINGBACK, exception);
         Context.getCommandInvocationContext().trySetThrowable(exception);
-      } finally {
-        log.fine("rolling back persistence session...");
+      }
+      finally {
+        LOG.debugTransactionOperation("rolling back the persistence session...");
         getPersistenceProvider().rollback();
       }
 
-    } catch (Throwable exception) {
-
-      log.info("Exception during transaction: " + exception.getMessage());
+    }
+    catch (Throwable exception) {
+      LOG.exceptionWhileFiringEvent(TransactionState.ROLLINGBACK, exception);
       Context.getCommandInvocationContext().trySetThrowable(exception);
-
-    } finally {
+    }
+    finally {
       log.fine("firing event rolled back...");
       fireTransactionEvent(TransactionState.ROLLED_BACK);
     }

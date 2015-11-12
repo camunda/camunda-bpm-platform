@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.operation;
 
-import static org.camunda.bpm.engine.impl.util.ActivityBehaviorUtil.getActivityBehavior;
-
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 
@@ -33,11 +31,6 @@ public class AtomicOperationCaseExecutionOccur extends AbstractAtomicOperationCa
 
   protected void triggerBehavior(CmmnActivityBehavior behavior, CmmnExecution execution) {
     behavior.onOccur(execution);
-  }
-
-  protected void preTransitionNotification(CmmnExecution execution) {
-    CmmnActivityBehavior behavior = getActivityBehavior(execution);
-    behavior.repeat(execution);
   }
 
 }

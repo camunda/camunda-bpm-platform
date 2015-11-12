@@ -24,7 +24,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 
 /**
@@ -33,6 +33,8 @@ import org.camunda.bpm.engine.ProcessEngineException;
  * @author Joram Barrez
  */
 public class IoUtil {
+
+  private static final EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
 
   public static byte[] readInputStream(InputStream inputStream, String inputStreamName) {
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -43,8 +45,9 @@ public class IoUtil {
         outputStream.write(buffer, 0, bytesRead);
         bytesRead = inputStream.read(buffer);
       }
-    } catch (Exception e) {
-      throw new ProcessEngineException("couldn't read input stream "+inputStreamName, e);
+    }
+    catch (Exception e) {
+      throw LOG.exceptionWhileReadingStream(inputStreamName, e);
     }
     return outputStream.toByteArray();
   }
@@ -55,9 +58,11 @@ public class IoUtil {
     try {
       inputStream = new BufferedInputStream(new FileInputStream(getFile(filePath)));
       inputStream.read(buffer);
-    } catch(Exception e) {
-      throw new ProcessEngineException("Couldn't read file " + filePath + ": " + e.getMessage());
-    } finally {
+    }
+    catch(Exception e) {
+      throw LOG.exceptionWhileReadingFile(filePath, e);
+    }
+    finally {
       IoUtil.closeSilently(inputStream);
     }
     return new String(buffer, Charset.forName("UTF-8"));
@@ -67,8 +72,9 @@ public class IoUtil {
     URL url = IoUtil.class.getClassLoader().getResource(filePath);
     try {
       return new File(url.toURI());
-    } catch (Exception e) {
-      throw new ProcessEngineException("Couldn't get file " + filePath + ": " + e.getMessage());
+    }
+    catch (Exception e) {
+      throw LOG.exceptionWhileGettingFile(filePath, e);
     }
   }
 
@@ -78,9 +84,11 @@ public class IoUtil {
       outputStream = new BufferedOutputStream(new FileOutputStream(getFile(filePath)));
       outputStream.write(content.getBytes());
       outputStream.flush();
-    } catch(Exception e) {
-      throw new ProcessEngineException("Couldn't write file " + filePath, e);
-    } finally {
+    }
+    catch(Exception e) {
+      throw LOG.exceptionWhileWritingToFile(filePath, e);
+    }
+    finally {
       IoUtil.closeSilently(outputStream);
     }
   }
@@ -94,8 +102,9 @@ public class IoUtil {
       if(closeable != null) {
         closeable.close();
       }
-    } catch(IOException ignore) {
-      // Exception is silently ignored
+    }
+    catch(IOException ignore) {
+      LOG.debugCloseException(ignore);
     }
   }
 }

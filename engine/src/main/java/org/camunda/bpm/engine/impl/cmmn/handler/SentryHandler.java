@@ -13,7 +13,6 @@
 package org.camunda.bpm.engine.impl.cmmn.handler;
 
 import java.util.Collection;
-import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -24,8 +23,8 @@ import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformerLogger;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.model.cmmn.PlanItemTransition;
-import org.camunda.bpm.model.cmmn.impl.instance.ConditionExpression;
 import org.camunda.bpm.model.cmmn.instance.CaseFileItemOnPart;
+import org.camunda.bpm.model.cmmn.instance.ConditionExpression;
 import org.camunda.bpm.model.cmmn.instance.IfPart;
 import org.camunda.bpm.model.cmmn.instance.OnPart;
 import org.camunda.bpm.model.cmmn.instance.PlanItem;
@@ -160,7 +159,7 @@ public class SentryHandler extends CmmnElementHandler<Sentry, CmmnSentryDeclarat
 
     ExpressionManager expressionManager = context.getExpressionManager();
     ConditionExpression condition = conditions.iterator().next();
-    Expression conditionExpression = expressionManager.createExpression(condition.getBody());
+    Expression conditionExpression = expressionManager.createExpression(condition.getText());
 
     CmmnIfPartDeclaration ifPartDeclaration = new CmmnIfPartDeclaration();
     ifPartDeclaration.setCondition(conditionExpression);

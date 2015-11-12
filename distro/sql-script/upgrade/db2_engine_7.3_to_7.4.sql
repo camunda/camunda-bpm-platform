@@ -34,22 +34,6 @@ create table ACT_RE_DECISION_DEF (
 alter table ACT_RE_DECISION_DEF
     add constraint ACT_UNIQ_DECISION_DEF
     unique (KEY_,VERSION_);
-    
--- case execution repetition rule --
-
-ALTER TABLE ACT_RU_CASE_EXECUTION
-  ADD REPEATABLE_ smallint check(REPEATABLE_ in (1,0));
-
-ALTER TABLE ACT_RU_CASE_EXECUTION
-  ADD REPETITION_ smallint check(REPETITION_ in (1,0));
-
--- historic case activity instance repetition rule --
-
-ALTER TABLE ACT_HI_CASEACTINST
-  ADD REPEATABLE_ smallint check(REPEATABLE_ in (1,0));
-
-ALTER TABLE ACT_HI_CASEACTINST
-  ADD REPETITION_ smallint check(REPETITION_ in (1,0));
 
 -- case sentry part source --
 
@@ -159,3 +143,20 @@ ALTER TABLE ACT_RE_DEPLOYMENT
 
 ALTER TABLE ACT_HI_OP_LOG
   ADD DEPLOYMENT_ID_ varchar(64);
+  
+-- job suspension state
+
+ALTER TABLE ACT_RU_JOB
+  ALTER COLUMN SUSPENSION_STATE_
+  SET DEFAULT 1;
+
+  -- relevant for jobs created in Camunda 7.0
+UPDATE ACT_RU_JOB
+  SET SUSPENSION_STATE_ = 1
+  WHERE SUSPENSION_STATE_ IS NULL;
+  
+ALTER TABLE ACT_RU_JOB
+  ALTER COLUMN SUSPENSION_STATE_
+  SET NOT NULL;
+  
+CALL SYSPROC.ADMIN_CMD('REORG TABLE ACT_RU_JOB');

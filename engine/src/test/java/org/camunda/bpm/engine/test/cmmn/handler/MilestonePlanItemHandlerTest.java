@@ -33,11 +33,12 @@ import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
 import org.camunda.bpm.model.cmmn.Cmmn;
-import org.camunda.bpm.model.cmmn.impl.instance.Body;
-import org.camunda.bpm.model.cmmn.impl.instance.ConditionExpression;
-import org.camunda.bpm.model.cmmn.impl.instance.DefaultControl;
-import org.camunda.bpm.model.cmmn.impl.instance.ItemControl;
+import org.camunda.bpm.model.cmmn.instance.ConditionExpression;
+import org.camunda.bpm.model.cmmn.instance.DefaultControl;
+import org.camunda.bpm.model.cmmn.instance.EntryCriterion;
+import org.camunda.bpm.model.cmmn.instance.ExitCriterion;
 import org.camunda.bpm.model.cmmn.instance.IfPart;
+import org.camunda.bpm.model.cmmn.instance.ItemControl;
 import org.camunda.bpm.model.cmmn.instance.Milestone;
 import org.camunda.bpm.model.cmmn.instance.PlanItem;
 import org.camunda.bpm.model.cmmn.instance.PlanItemControl;
@@ -183,11 +184,11 @@ public class MilestonePlanItemHandlerTest extends CmmnElementHandlerTest {
     Sentry sentry = createElement(casePlanModel, "Sentry_1", Sentry.class);
     IfPart ifPart = createElement(sentry, "abc", IfPart.class);
     ConditionExpression conditionExpression = createElement(ifPart, "def", ConditionExpression.class);
-    Body body = createElement(conditionExpression, null, Body.class);
-    body.setTextContent("${test}");
+    conditionExpression.setText("${test}");
 
-    // set exitCriteria
-    planItem.getEntryCriterias().add(sentry);
+    // set entryCriteria
+    EntryCriterion criterion = createElement(planItem, EntryCriterion.class);
+    criterion.setSentry(sentry);
 
     // transform casePlanModel as parent
     CmmnActivity parent = new CasePlanModelHandler().handleElement(casePlanModel, context);
@@ -217,21 +218,21 @@ public class MilestonePlanItemHandlerTest extends CmmnElementHandlerTest {
     Sentry sentry1 = createElement(casePlanModel, "Sentry_1", Sentry.class);
     IfPart ifPart1 = createElement(sentry1, "abc", IfPart.class);
     ConditionExpression conditionExpression1 = createElement(ifPart1, "def", ConditionExpression.class);
-    Body body1 = createElement(conditionExpression1, null, Body.class);
-    body1.setTextContent("${test}");
+    conditionExpression1.setText("${test}");
 
     // set first entryCriteria
-    planItem.getEntryCriterias().add(sentry1);
+    EntryCriterion criterion1 = createElement(planItem, EntryCriterion.class);
+    criterion1.setSentry(sentry1);
 
     // create first sentry containing ifPart
     Sentry sentry2 = createElement(casePlanModel, "Sentry_2", Sentry.class);
     IfPart ifPart2 = createElement(sentry2, "ghi", IfPart.class);
     ConditionExpression conditionExpression2 = createElement(ifPart2, "jkl", ConditionExpression.class);
-    Body body2 = createElement(conditionExpression2, null, Body.class);
-    body2.setTextContent("${test}");
+    conditionExpression2.setText("${test}");
 
     // set second entryCriteria
-    planItem.getEntryCriterias().add(sentry2);
+    EntryCriterion criterion2 = createElement(planItem, EntryCriterion.class);
+    criterion2.setSentry(sentry2);
 
     // transform casePlanModel as parent
     CmmnActivity parent = new CasePlanModelHandler().handleElement(casePlanModel, context);
@@ -263,11 +264,13 @@ public class MilestonePlanItemHandlerTest extends CmmnElementHandlerTest {
     Sentry sentry = createElement(casePlanModel, "Sentry_1", Sentry.class);
     IfPart ifPart = createElement(sentry, "abc", IfPart.class);
     ConditionExpression conditionExpression = createElement(ifPart, "def", ConditionExpression.class);
-    Body body = createElement(conditionExpression, null, Body.class);
-    body.setTextContent("${test}");
+    conditionExpression.setText("${test}");
 
     // set entry-/exitCriteria
-    planItem.getEntryCriterias().add(sentry);
+    EntryCriterion criterion1 = createElement(planItem, EntryCriterion.class);
+    criterion1.setSentry(sentry);
+    ExitCriterion criterion2 = createElement(planItem, ExitCriterion.class);
+    criterion2.setSentry(sentry);
 
     // transform casePlanModel as parent
     CmmnActivity parent = new CasePlanModelHandler().handleElement(casePlanModel, context);
@@ -294,8 +297,7 @@ public class MilestonePlanItemHandlerTest extends CmmnElementHandlerTest {
     ItemControl itemControl = createElement(planItem, "ItemControl_1", ItemControl.class);
     RequiredRule requiredRule = createElement(itemControl, "RequiredRule_1", RequiredRule.class);
     ConditionExpression expression = createElement(requiredRule, "Expression_1", ConditionExpression.class);
-    Body body = createElement(expression, Body.class);
-    body.setTextContent("${true}");
+    expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
 
@@ -314,8 +316,7 @@ public class MilestonePlanItemHandlerTest extends CmmnElementHandlerTest {
     PlanItemControl defaultControl = createElement(milestone, "ItemControl_1", DefaultControl.class);
     RequiredRule requiredRule = createElement(defaultControl, "RequiredRule_1", RequiredRule.class);
     ConditionExpression expression = createElement(requiredRule, "Expression_1", ConditionExpression.class);
-    Body body = createElement(expression, Body.class);
-    body.setTextContent("${true}");
+    expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
 
@@ -334,8 +335,7 @@ public class MilestonePlanItemHandlerTest extends CmmnElementHandlerTest {
     ItemControl itemControl = createElement(planItem, "ItemControl_1", ItemControl.class);
     RepetitionRule repetitionRule = createElement(itemControl, "RepititionRule_1", RepetitionRule.class);
     ConditionExpression expression = createElement(repetitionRule, "Expression_1", ConditionExpression.class);
-    Body body = createElement(expression, Body.class);
-    body.setTextContent("${true}");
+    expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
 
@@ -354,8 +354,7 @@ public class MilestonePlanItemHandlerTest extends CmmnElementHandlerTest {
     PlanItemControl defaultControl = createElement(milestone, "DefaultControl_1", DefaultControl.class);
     RepetitionRule repetitionRule = createElement(defaultControl, "RepititionRule_1", RepetitionRule.class);
     ConditionExpression expression = createElement(repetitionRule, "Expression_1", ConditionExpression.class);
-    Body body = createElement(expression, Body.class);
-    body.setTextContent("${true}");
+    expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
 

@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
+import static org.camunda.bpm.engine.variable.Variables.createVariables;
+import static org.camunda.bpm.model.bpmn.Bpmn.createExecutableProcess;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,9 +23,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
-
-import static org.camunda.bpm.model.bpmn.Bpmn.*;
-import static org.camunda.bpm.engine.variable.Variables.*;
 
 /**
  * This test makes sure that if one thread loads a variable

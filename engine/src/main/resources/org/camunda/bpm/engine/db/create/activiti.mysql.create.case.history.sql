@@ -30,8 +30,6 @@ create table ACT_HI_CASEACTINST (
     DURATION_ bigint,
     STATE_ integer,
     REQUIRED_ boolean,
-    REPEATABLE_ boolean,
-    REPETITION_ boolean,
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 

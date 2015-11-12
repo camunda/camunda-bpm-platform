@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,7 +33,7 @@ import org.camunda.bpm.engine.impl.util.xml.Parser;
 
 /**
  * <p>Parse implementation for parsing the {@link BpmPlatformXml}</p>
- * 
+ *
  * @author Daniel Meyer
  *
  */
@@ -41,61 +41,61 @@ public class BpmPlatformXmlParse extends DeploymentMetadataParse {
 
   /** the parsed {@link BpmPlatformXml} */
   protected BpmPlatformXml bpmPlatformXml;
-  
+
   public BpmPlatformXmlParse(Parser parser) {
     super(parser);
   }
-  
+
   public BpmPlatformXmlParse execute() {
     super.execute();
     return this;
   }
-  
+
   /** We know this is a <code>&lt;bpm-platform ../&gt;</code> element */
   protected void parseRootElement() {
-    
-    JobExecutorXmlImpl jobExecutor = new JobExecutorXmlImpl();    
+
+    JobExecutorXmlImpl jobExecutor = new JobExecutorXmlImpl();
     List<ProcessEngineXml> processEngines = new ArrayList<ProcessEngineXml>();
-    
+
     for (Element element : rootElement.elements()) {
-      
+
       if(JOB_EXECUTOR.equals(element.getTagName())) {
         parseJobExecutor(element, jobExecutor);
-        
+
       } else if(PROCESS_ENGINE.equals(element.getTagName())) {
         parseProcessEngine(element, processEngines);
-        
+
       }
-      
+
     }
-    
+
     bpmPlatformXml = new BpmPlatformXmlImpl(jobExecutor, processEngines);
   }
-  
+
   /**
    * parse a <code>&lt;job-executor .../&gt;</code> element and add it to the list of parsed elements
    */
   protected void parseJobExecutor(Element element, JobExecutorXmlImpl jobExecutorXml) {
-    
+
     List<JobAcquisitionXml> jobAcquisitions = new ArrayList<JobAcquisitionXml>();
     Map<String, String> properties = new HashMap<String, String>();
-    
+
     for (Element childElement : element.elements()) {
-      
+
       if(JOB_ACQUISITION.equals(childElement.getTagName())) {
         parseJobAcquisition(childElement, jobAcquisitions);
-        
+
       }else if(PROPERTIES.equals(childElement.getTagName())){
         parseProperties(childElement, properties);
       }
-      
+
     }
-    
+
     jobExecutorXml.setJobAcquisitions(jobAcquisitions);
     jobExecutorXml.setProperties(properties);
-    
+
   }
-    
+
   /**
    * parse a <code>&lt;job-acquisition .../&gt;</code> element and add it to the
    * list of parsed elements
@@ -130,7 +130,7 @@ public class BpmPlatformXmlParse extends DeploymentMetadataParse {
   public BpmPlatformXml getBpmPlatformXml() {
     return bpmPlatformXml;
   }
-  
+
   public BpmPlatformXmlParse sourceUrl(URL url) {
     super.sourceUrl(url);
     return this;

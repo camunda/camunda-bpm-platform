@@ -15,11 +15,12 @@ package org.camunda.bpm.engine.test.pvm;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
+import org.slf4j.Logger;
 
 
 /**
@@ -27,13 +28,13 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
  */
 public class EventCollector implements ExecutionListener {
 
-  private static Logger log = Logger.getLogger(EventCollector.class.getName());
+private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
   public List<String> events = new ArrayList<String>();
 
   public void notify(DelegateExecution execution) throws Exception {
     PvmExecutionImpl executionImpl = (PvmExecutionImpl) execution;
-    log.fine("collecting event: "+execution.getEventName()+" on "+executionImpl.getEventSource());
+    LOG.debug("collecting event: "+execution.getEventName()+" on "+executionImpl.getEventSource());
     events.add(execution.getEventName()+" on "+executionImpl.getEventSource());
   }
 

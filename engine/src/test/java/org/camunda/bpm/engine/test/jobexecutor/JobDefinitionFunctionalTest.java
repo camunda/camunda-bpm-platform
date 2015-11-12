@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.jobexecutor;
 import java.util.List;
 
 import org.camunda.bpm.engine.OptimisticLockingException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.AcquireJobsCmd;
 import org.camunda.bpm.engine.impl.cmd.ExecuteJobsCmd;
 import org.camunda.bpm.engine.impl.cmd.SetJobDefinitionPriorityCmd;
@@ -30,12 +31,15 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.concurrency.ControllableThread;
 import org.camunda.bpm.engine.test.concurrency.ControlledCommand;
+import org.slf4j.Logger;
 
 /**
  * @author Daniel Meyer
  *
  */
 public class JobDefinitionFunctionalTest extends PluggableProcessEngineTestCase {
+
+private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
   @Deployment(resources={"org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml"})
   public void testCreateJobInstanceSuspended() {
@@ -326,7 +330,7 @@ public class JobDefinitionFunctionalTest extends PluggableProcessEngineTestCase 
       } catch (OptimisticLockingException e) {
         this.exception = e;
       }
-      log.fine(getName()+" ends");
+      LOG.debug(getName()+" ends");
     }
   }
 
@@ -351,7 +355,7 @@ public class JobDefinitionFunctionalTest extends PluggableProcessEngineTestCase 
       } catch (OptimisticLockingException e) {
         this.exception = e;
       }
-      log.fine(getName()+" ends");
+      LOG.debug(getName()+" ends");
     }
   }
 
@@ -376,7 +380,7 @@ public class JobDefinitionFunctionalTest extends PluggableProcessEngineTestCase 
       } catch (OptimisticLockingException e) {
         this.exception = e;
       }
-      log.fine(getName()+" ends");
+      LOG.debug(getName()+" ends");
     }
   }
 
@@ -401,7 +405,7 @@ public class JobDefinitionFunctionalTest extends PluggableProcessEngineTestCase 
       } catch (OptimisticLockingException e) {
         this.exception = e;
       }
-      log.fine(getName()+" ends");
+      LOG.debug(getName()+" ends");
     }
   }
 

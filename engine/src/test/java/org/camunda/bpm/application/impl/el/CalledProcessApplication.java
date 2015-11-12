@@ -12,8 +12,13 @@
  */
 package org.camunda.bpm.application.impl.el;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.impl.EmbeddedProcessApplication;
+import org.camunda.bpm.engine.impl.el.ReadOnlyMapELResolver;
+import org.camunda.bpm.engine.impl.javax.el.ELResolver;
 
 /**
  * @author Thorben Lindhauer
@@ -25,4 +30,12 @@ import org.camunda.bpm.application.impl.EmbeddedProcessApplication;
 )
 public class CalledProcessApplication extends EmbeddedProcessApplication {
 
+  public static final String STRING_VARIABLE_VALUE = "aVariableValue";
+
+  protected ELResolver initProcessApplicationElResolver() {
+    Map<Object, Object> resolvableValues = new HashMap<Object, Object>();
+    resolvableValues.put("aStringValue", STRING_VARIABLE_VALUE);
+
+    return new ReadOnlyMapELResolver(resolvableValues);
+  }
 }

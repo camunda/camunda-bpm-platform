@@ -18,12 +18,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.application.impl.ProcessApplicationLogger;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
@@ -43,7 +41,7 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
  */
 public class ProcessApplicationManager {
 
-  private Logger LOGGER = Logger.getLogger(ProcessApplicationManager.class.getName());
+  public final static ProcessApplicationLogger LOG = ProcessEngineLogger.PROCESS_APPLICATION_LOGGER;
 
   protected Map<String, DefaultProcessApplicationRegistration> registrationsByDeploymentId = new HashMap<String, DefaultProcessApplicationRegistration>();
 
@@ -89,10 +87,11 @@ public class ProcessApplicationManager {
             .getDeploymentCache()
             .removeDeployment(deploymentId);
         }
-      } catch (Throwable t) {
-        LOGGER.log(Level.WARNING, "unregistering process application for deployment but could not remove process definitions from deployment cache. ", t);
-
-      } finally {
+      }
+      catch (Throwable t) {
+        LOG.couldNotRemoveDefinitionsFromCache(t);
+      }
+      finally {
         if(deploymentId != null) {
           registrationsByDeploymentId.remove(deploymentId);
         }
@@ -109,9 +108,9 @@ public class ProcessApplicationManager {
       Set<String> registeredDeployments = Context.getProcessEngineConfiguration().getRegisteredDeployments();
       registeredDeployments.addAll(deploymentIds);
 
-    } catch (Exception e) {
-      throw new ProcessEngineException("Could not register deployments with Job Executor.", e);
-
+    }
+    catch (Exception e) {
+      throw LOG.exceptionWhileRegisteringDeploymentsWithJobExecutor(e);
     }
   }
 
@@ -120,18 +119,17 @@ public class ProcessApplicationManager {
       Set<String> registeredDeployments = Context.getProcessEngineConfiguration().getRegisteredDeployments();
       registeredDeployments.removeAll(deploymentIds);
 
-    } catch (Exception e) {
-      LOGGER.log(Level.WARNING, "Could not unregister deployments with Job Executor.", e);
-
+    }
+    catch (Exception e) {
+      LOG.exceptionWhileUnregisteringDeploymentsWithJobExecutor(e);
     }
   }
 
   // logger ////////////////////////////////////////////////////////////////////////////
 
   protected void logRegistration(Set<String> deploymentIds, ProcessApplicationReference reference) {
-    Level logLevel = Level.INFO;
 
-    if (!LOGGER.isLoggable(logLevel)) {
+    if (LOG.isInfoEnabled()) {
       // building the log message is expensive (db queries) so we avoid it if we can
       return;
     }
@@ -174,11 +172,11 @@ public class ProcessApplicationManager {
         logCaseDefinitionRegistrations(builder, caseDefinitions);
       }
 
-      LOGGER.log(logLevel, builder.toString());
+      LOG.registrationSummary(builder.toString());
 
-    } catch(Throwable e) {
-      // ignore
-      LOGGER.log(Level.WARNING, "Exception while logging registration summary", e);
+    }
+    catch(Throwable e) {
+      LOG.exceptionWhileLoggingRegistrationSummary(e);
     }
   }
 

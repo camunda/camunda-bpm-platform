@@ -16,10 +16,9 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.List;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.ProcessInstanceModificationBuilderImpl;
 import org.camunda.bpm.engine.impl.ProcessInstantiationBuilderImpl;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -41,8 +40,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
  */
 public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInstance> {
 
-  private static final Logger LOG = Logger.getLogger(StartProcessInstanceAtActivitiesCmd.class.getName());
-  protected static final String INSTRUCTION_LOG_FORMAT = "Starting process instance '%s': Instruction %s: %s";
+  private final static CmdLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
   protected ProcessInstantiationBuilderImpl instantiationBuilder;
 
@@ -99,7 +97,7 @@ public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInsta
 
     for (int i = 0; i < instructions.size(); i++) {
       AbstractProcessInstanceModificationCommand instruction = instructions.get(i);
-      logInstruction(processInstance.getId(), i, instruction);
+      LOG.debugStartingInstruction(processInstance.getId(), i, instruction.describe());
 
       instruction.setProcessInstanceId(processInstance.getId());
       instruction.setSkipCustomListeners(modificationBuilder.isSkipCustomListeners());
@@ -143,10 +141,6 @@ public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInsta
     }
 
     return null;
-  }
-
-  protected void logInstruction(String processInstanceId, int index, AbstractProcessInstanceModificationCommand instruction) {
-    LOG.info(String.format(INSTRUCTION_LOG_FORMAT, processInstanceId, index + 1, instruction.describe()));
   }
 
 }

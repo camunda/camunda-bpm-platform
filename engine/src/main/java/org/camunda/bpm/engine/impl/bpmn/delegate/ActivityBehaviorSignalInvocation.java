@@ -28,6 +28,7 @@ public class ActivityBehaviorSignalInvocation extends DelegateInvocation {
   protected Object signalData;
 
   public ActivityBehaviorSignalInvocation(SignallableActivityBehavior behaviorInstance, ActivityExecution execution, String signalName, Object signalData) {
+    super(execution, null);
     this.behaviorInstance = behaviorInstance;
     this.execution = execution;
     this.signalName = signalName;
@@ -36,10 +37,6 @@ public class ActivityBehaviorSignalInvocation extends DelegateInvocation {
 
   protected void invoke() throws Exception {
     behaviorInstance.signal(execution, signalName, signalData);
-  }
-
-  public Object getTarget() {
-    return behaviorInstance;
   }
 
 }

@@ -16,13 +16,11 @@ import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
-import org.junit.Ignore;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-@Ignore
 public class ProcessApplicationElResolverTest extends PluggableProcessEngineTestCase {
 
   RuntimeContainerDelegate runtimeContainerDelegate = null;
@@ -52,9 +50,10 @@ public class ProcessApplicationElResolverTest extends PluggableProcessEngineTest
   }
 
   /**
-   * Note: please remove the @Ignore annotation of the class if at least one test is inside this class
+   * Tests that an expression for a call activity output parameter is resolved
+   * in the context of the called process definition's application.
    */
-  public void FAILING_testCallActivityOutputExpression() {
+  public void testCallActivityOutputExpression() {
     // given an instance of the calling process that calls the called process
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("callingProcess");
 
@@ -64,6 +63,26 @@ public class ProcessApplicationElResolverTest extends PluggableProcessEngineTest
 
     // then the output mapping should have successfully resolved the expression
     String outVariable = (String) runtimeService.getVariable(instance.getId(), "outVar");
-    assertEquals(CallingProcessApplication.STRING_VARIABLE_VALUE, outVariable);
+    assertEquals(CalledProcessApplication.STRING_VARIABLE_VALUE, outVariable);
+  }
+
+  /**
+   * Tests that an expression on an outgoing flow leaving a call activity
+   * is resolved in the context of the calling process definition's application.
+   */
+  public void testCallActivityConditionalOutgoingFlow() {
+    // given an instance of the calling process that calls the called process
+    runtimeService.startProcessInstanceByKey("callingProcessConditionalFlow");
+
+    // when the called process is completed
+    Task calledProcessTask = taskService.createTaskQuery().singleResult();
+    taskService.complete(calledProcessTask.getId());
+
+    // then the conditional flow expression was resolved in the context of the calling process application, so
+    // the following task has been reached successfully
+    Task afterCallActivityTask = taskService.createTaskQuery().singleResult();
+    assertNotNull(afterCallActivityTask);
+    assertEquals("afterCallActivityTask", afterCallActivityTask.getTaskDefinitionKey());
+
   }
 }

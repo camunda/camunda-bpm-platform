@@ -309,8 +309,6 @@ public abstract class AbstractCaseExecutionRestServiceQueryTest extends Abstract
     String returnedActivityType = from(content).getString("[0].activityType");
     String returnedActivityDescription = from(content).getString("[0].activityDescription");
     boolean returnedRequired = from(content).getBoolean("[0].required");
-    boolean returnedRepeatable = from(content).getBoolean("[0].repeatable");
-    boolean returnedRepetition = from(content).getBoolean("[0].repetition");
     boolean returnedActiveState = from(content).getBoolean("[0].active");
     boolean returnedEnabledState = from(content).getBoolean("[0].enabled");
     boolean returnedDisabledState = from(content).getBoolean("[0].disabled");
@@ -324,8 +322,6 @@ public abstract class AbstractCaseExecutionRestServiceQueryTest extends Abstract
     assertThat(returnedActivityType).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_TYPE);
     assertThat(returnedActivityDescription).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_DESCRIPTION);
     assertThat(returnedRequired).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_REQUIRED);
-    assertThat(returnedRepeatable).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_REPEATABLE);
-    assertThat(returnedRepetition).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_REPETITION);
     assertThat(returnedEnabledState).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_ENABLED);
     assertThat(returnedActiveState).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_ACTIVE);
     assertThat(returnedDisabledState).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_DISABLED);
@@ -367,8 +363,6 @@ public abstract class AbstractCaseExecutionRestServiceQueryTest extends Abstract
     String returnedActivityType = from(content).getString("[0].activityType");
     String returnedActivityDescription = from(content).getString("[0].activityDescription");
     boolean returnedRequired = from(content).getBoolean("[0].required");
-    boolean returnedRepeatable = from(content).getBoolean("[0].repeatable");
-    boolean returnedRepetition = from(content).getBoolean("[0].repetition");
     boolean returnedActiveState = from(content).getBoolean("[0].active");
     boolean returnedEnabledState = from(content).getBoolean("[0].enabled");
     boolean returnedDisabledState = from(content).getBoolean("[0].disabled");
@@ -382,8 +376,6 @@ public abstract class AbstractCaseExecutionRestServiceQueryTest extends Abstract
     assertThat(returnedActivityType).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_TYPE);
     assertThat(returnedActivityDescription).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_ACTIVITY_DESCRIPTION);
     assertThat(returnedRequired).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_REQUIRED);
-    assertThat(returnedRepeatable).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_REPEATABLE);
-    assertThat(returnedRepetition).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_REPETITION);
     assertThat(returnedEnabledState).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_ENABLED);
     assertThat(returnedActiveState).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_ACTIVE);
     assertThat(returnedDisabledState).isEqualTo(MockProvider.EXAMPLE_CASE_EXECUTION_IS_DISABLED);
@@ -400,8 +392,6 @@ public abstract class AbstractCaseExecutionRestServiceQueryTest extends Abstract
     queryParameters.put("businessKey", "aBusinessKey");
     queryParameters.put("activityId", "anActivityId");
     queryParameters.put("required", "true");
-    queryParameters.put("repeatable", "true");
-    queryParameters.put("repetition", "true");
     queryParameters.put("active", "true");
     queryParameters.put("enabled", "true");
     queryParameters.put("disabled", "true");
@@ -421,8 +411,6 @@ public abstract class AbstractCaseExecutionRestServiceQueryTest extends Abstract
     verify(mockedQuery).caseInstanceBusinessKey(queryParameters.get("businessKey"));
     verify(mockedQuery).activityId(queryParameters.get("activityId"));
     verify(mockedQuery).required();
-    verify(mockedQuery).repeatable();
-    verify(mockedQuery).repetition();
     verify(mockedQuery).active();
     verify(mockedQuery).enabled();
     verify(mockedQuery).disabled();
@@ -469,8 +457,6 @@ public abstract class AbstractCaseExecutionRestServiceQueryTest extends Abstract
     verify(mockedQuery).caseInstanceBusinessKey(aBusinessKey);
     verify(mockedQuery).activityId(anActivityId);
     verify(mockedQuery).required();
-    verify(mockedQuery).repeatable();
-    verify(mockedQuery).repetition();
     verify(mockedQuery).active();
     verify(mockedQuery).enabled();
     verify(mockedQuery).disabled();

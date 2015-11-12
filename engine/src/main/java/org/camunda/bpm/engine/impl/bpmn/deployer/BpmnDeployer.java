@@ -18,14 +18,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.AbstractDefinitionDeployer;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.diagram.ProcessDiagramGenerator;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseLogger;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParser;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.cmd.DeleteJobsCmd;
@@ -69,7 +68,7 @@ import org.camunda.bpm.engine.task.IdentityLinkType;
  */
 public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEntity> {
 
-  private static final Logger LOG = Logger.getLogger(BpmnDeployer.class.getName());
+  public static BpmnParseLogger LOG = ProcessEngineLogger.BPMN_PARSE_LOGGER;
 
   public static final String[] BPMN_RESOURCE_SUFFIXES = new String[] { "bpmn20.xml", "bpmn" };
 
@@ -138,8 +137,9 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
         byte[] diagramBytes = IoUtil.readInputStream(ProcessDiagramGenerator.generatePngDiagram(definition), null);
         diagramResourceName = getDefinitionDiagramResourceName(resourceName, definition, "png");
         createResource(diagramResourceName, diagramBytes, deployment);
-      } catch (Throwable t) { // if anything goes wrong, we don't store the image (the process will still be executable).
-        LOG.log(Level.WARNING, "Error while generating process diagram, image will not be stored in repository", t);
+      }
+      catch (Throwable t) { // if anything goes wrong, we don't store the image (the process will still be executable).
+        LOG.exceptionWhileGeneratingProcessDiagram(t);
       }
     }
 
@@ -299,8 +299,7 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
   protected void addMessageEventSubscription(EventSubscriptionDeclaration messageEventDefinition, ProcessDefinitionEntity processDefinition) {
 
     if(isSameMessageEventSubscriptionAlreadyPresent(messageEventDefinition)) {
-      throw new ProcessEngineException("Cannot deploy process definition '" + processDefinition.getResourceName()
-              + "': there already is a message event subscription for the message with name '" + messageEventDefinition.getEventName() + "'.");
+      throw LOG.messageEventSubscriptionWithSameNameExists(processDefinition.getResourceName(), messageEventDefinition.getEventName());
     }
 
     MessageEventSubscriptionEntity newSubscription = new MessageEventSubscriptionEntity();

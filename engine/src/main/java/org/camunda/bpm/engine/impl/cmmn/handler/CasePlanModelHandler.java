@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
-import org.camunda.bpm.model.cmmn.impl.instance.CasePlanModel;
+import org.camunda.bpm.model.cmmn.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
 import org.camunda.bpm.model.cmmn.instance.PlanItemDefinition;
 import org.camunda.bpm.model.cmmn.instance.Sentry;
@@ -37,7 +37,7 @@ public class CasePlanModelHandler extends StageItemHandler {
   }
 
   public void initializeExitCriterias(CasePlanModel casePlanModel, CmmnActivity activity, CmmnHandlerContext context) {
-    Collection<Sentry> exitCriterias = casePlanModel.getExitCriterias();
+    Collection<Sentry> exitCriterias = casePlanModel.getExitCriteria();
     for (Sentry sentry : exitCriterias) {
       String sentryId = sentry.getId();
       CmmnSentryDeclaration sentryDeclaration = activity.getSentry(sentryId);

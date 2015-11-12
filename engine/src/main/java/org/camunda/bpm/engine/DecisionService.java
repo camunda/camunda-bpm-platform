@@ -15,7 +15,7 @@ package org.camunda.bpm.engine;
 
 import java.util.Map;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 
@@ -42,7 +42,7 @@ public interface DecisionService {
    *           if the user has no {@link Permissions#CREATE_INSTANCE} permission
    *           on {@link Resources#DECISION_DEFINITION}.
    */
-  DmnDecisionResult evaluateDecisionById(String decisionDefinitionId, Map<String, Object> variables);
+  DmnDecisionTableResult evaluateDecisionTableById(String decisionDefinitionId, Map<String, Object> variables);
 
   /**
    * Evaluates the decision with the given key in the latest version.
@@ -60,7 +60,7 @@ public interface DecisionService {
    *           if the user has no {@link Permissions#CREATE_INSTANCE} permission
    *           on {@link Resources#DECISION_DEFINITION}.
    */
-  DmnDecisionResult evaluateDecisionByKey(String decisionDefinitionKey, Map<String, Object> variables);
+  DmnDecisionTableResult evaluateDecisionTableByKey(String decisionDefinitionKey, Map<String, Object> variables);
 
   /**
    * Evaluates the decision with the given key in the specified version. If no
@@ -84,6 +84,6 @@ public interface DecisionService {
    *           if the user has no {@link Permissions#CREATE_INSTANCE} permission
    *           on {@link Resources#DECISION_DEFINITION}.
    */
-  DmnDecisionResult evaluateDecisionByKeyAndVersion(String decisionDefinitionKey, Integer version, Map<String, Object> variables);
+  DmnDecisionTableResult evaluateDecisionTableByKeyAndVersion(String decisionDefinitionKey, Integer version, Map<String, Object> variables);
 
 }

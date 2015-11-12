@@ -16,10 +16,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.ServiceLoader;
-import java.util.logging.Logger;
 
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationElResolver;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.javax.el.CompositeELResolver;
 import org.camunda.bpm.engine.impl.javax.el.ELResolver;
 
@@ -29,7 +29,7 @@ import org.camunda.bpm.engine.impl.javax.el.ELResolver;
  */
 public class DefaultElResolverLookup {
 
-  private final static Logger LOGGER = Logger.getLogger(DefaultElResolverLookup.class.getName());
+  private final static ProcessApplicationLogger LOG = ProcessEngineLogger.PROCESS_APPLICATION_LOGGER;
 
   public final static ELResolver lookupResolver(AbstractProcessApplication processApplication) {
 
@@ -57,14 +57,13 @@ public class DefaultElResolverLookup {
         if (elResolver != null) {
           compositeResolver.add(elResolver);
           summary.append(String.format("Class %s", processApplicationElResolver.getClass().getName()));
-        } else {
-          LOGGER.warning(String.format("Process Application '%s': No ELResolver provided by ProcessApplicationElResolver %s",
-            processApplication.getName(),
-            processApplicationElResolver.getClass().getName()));
+        }
+        else {
+          LOG.noElResolverProvided(processApplication.getName(), processApplicationElResolver.getClass().getName());
         }
       }
 
-      LOGGER.info(summary.toString());
+      LOG.paElResolversDiscovered(summary.toString());
 
       return compositeResolver;
     }

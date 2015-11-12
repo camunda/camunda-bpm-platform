@@ -29,8 +29,10 @@ import static org.junit.Assert.fail;
 import java.util.List;
 import java.util.Set;
 
+import org.camunda.bpm.engine.delegate.CaseExecutionListener;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.impl.bpmn.helper.CmmnProperties;
 import org.camunda.bpm.engine.impl.cmmn.CaseControlRule;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.HumanTaskActivityBehavior;
@@ -46,14 +48,16 @@ import org.camunda.bpm.engine.impl.task.listener.ClassDelegateTaskListener;
 import org.camunda.bpm.engine.impl.task.listener.DelegateExpressionTaskListener;
 import org.camunda.bpm.engine.impl.task.listener.ExpressionTaskListener;
 import org.camunda.bpm.model.cmmn.Cmmn;
-import org.camunda.bpm.model.cmmn.impl.instance.Body;
-import org.camunda.bpm.model.cmmn.impl.instance.CaseRoles;
-import org.camunda.bpm.model.cmmn.impl.instance.ConditionExpression;
-import org.camunda.bpm.model.cmmn.impl.instance.DefaultControl;
-import org.camunda.bpm.model.cmmn.impl.instance.ItemControl;
+import org.camunda.bpm.model.cmmn.instance.Body;
+import org.camunda.bpm.model.cmmn.instance.CaseRole;
+import org.camunda.bpm.model.cmmn.instance.ConditionExpression;
+import org.camunda.bpm.model.cmmn.instance.DefaultControl;
+import org.camunda.bpm.model.cmmn.instance.EntryCriterion;
+import org.camunda.bpm.model.cmmn.instance.ExitCriterion;
 import org.camunda.bpm.model.cmmn.instance.ExtensionElements;
 import org.camunda.bpm.model.cmmn.instance.HumanTask;
 import org.camunda.bpm.model.cmmn.instance.IfPart;
+import org.camunda.bpm.model.cmmn.instance.ItemControl;
 import org.camunda.bpm.model.cmmn.instance.ManualActivationRule;
 import org.camunda.bpm.model.cmmn.instance.PlanItem;
 import org.camunda.bpm.model.cmmn.instance.PlanItemControl;
@@ -362,7 +366,7 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
   @Test
   public void testTaskDefinitionPeformerExpression() {
     // given
-    CaseRoles role = createElement(caseDefinition, "aRole", CaseRoles.class);
+    CaseRole role = createElement(caseDefinition, "aRole", CaseRole.class);
     role.setName("aPerformerRole");
 
     humanTask.setPerformer(role);
@@ -955,7 +959,8 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     body.setTextContent("${test}");
 
     // set exitCriteria
-    planItem.getExitCriterias().add(sentry);
+    ExitCriterion criterion = createElement(planItem, ExitCriterion.class);
+    criterion.setSentry(sentry);
 
     // transform casePlanModel as parent
     CmmnActivity parent = new CasePlanModelHandler().handleElement(casePlanModel, context);
@@ -989,7 +994,8 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     body1.setTextContent("${test}");
 
     // set first exitCriteria
-    planItem.getExitCriterias().add(sentry1);
+    ExitCriterion criterion1 = createElement(planItem, ExitCriterion.class);
+    criterion1.setSentry(sentry1);
 
     // create first sentry containing ifPart
     Sentry sentry2 = createElement(casePlanModel, "Sentry_2", Sentry.class);
@@ -999,7 +1005,8 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     body2.setTextContent("${test}");
 
     // set second exitCriteria
-    planItem.getExitCriterias().add(sentry2);
+    ExitCriterion criterion2 = createElement(planItem, ExitCriterion.class);
+    criterion2.setSentry(sentry2);
 
     // transform casePlanModel as parent
     CmmnActivity parent = new CasePlanModelHandler().handleElement(casePlanModel, context);
@@ -1034,8 +1041,9 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     Body body = createElement(conditionExpression, null, Body.class);
     body.setTextContent("${test}");
 
-    // set exitCriteria
-    planItem.getEntryCriterias().add(sentry);
+    // set entryCriterion
+    EntryCriterion criterion = createElement(planItem, EntryCriterion.class);
+    criterion.setSentry(sentry);
 
     // transform casePlanModel as parent
     CmmnActivity parent = new CasePlanModelHandler().handleElement(casePlanModel, context);
@@ -1069,7 +1077,8 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     body1.setTextContent("${test}");
 
     // set first entryCriteria
-    planItem.getEntryCriterias().add(sentry1);
+    EntryCriterion criterion1 = createElement(planItem, EntryCriterion.class);
+    criterion1.setSentry(sentry1);
 
     // create first sentry containing ifPart
     Sentry sentry2 = createElement(casePlanModel, "Sentry_2", Sentry.class);
@@ -1079,7 +1088,8 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     body2.setTextContent("${test}");
 
     // set second entryCriteria
-    planItem.getEntryCriterias().add(sentry2);
+    EntryCriterion criterion2 = createElement(planItem, EntryCriterion.class);
+    criterion2.setSentry(sentry2);
 
     // transform casePlanModel as parent
     CmmnActivity parent = new CasePlanModelHandler().handleElement(casePlanModel, context);
@@ -1114,9 +1124,13 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     Body body = createElement(conditionExpression, null, Body.class);
     body.setTextContent("${test}");
 
-    // set entry-/exitCriteria
-    planItem.getEntryCriterias().add(sentry);
-    planItem.getExitCriterias().add(sentry);
+    // set entryCriteria
+    EntryCriterion criterion1 = createElement(planItem, EntryCriterion.class);
+    criterion1.setSentry(sentry);
+
+    // set exitCriterion
+    ExitCriterion criterion2 = createElement(planItem, ExitCriterion.class);
+    criterion2.setSentry(sentry);
 
     // transform casePlanModel as parent
     CmmnActivity parent = new CasePlanModelHandler().handleElement(casePlanModel, context);
@@ -1145,8 +1159,7 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     ItemControl itemControl = createElement(planItem, "ItemControl_1", ItemControl.class);
     ManualActivationRule manualActivationRule = createElement(itemControl, "ManualActivationRule_1", ManualActivationRule.class);
     ConditionExpression expression = createElement(manualActivationRule, "Expression_1", ConditionExpression.class);
-    Body body = createElement(expression, Body.class);
-    body.setTextContent("${true}");
+    expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
 
@@ -1165,8 +1178,7 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     PlanItemControl defaultControl = createElement(humanTask, "ItemControl_1", DefaultControl.class);
     ManualActivationRule manualActivationRule = createElement(defaultControl, "ManualActivationRule_1", ManualActivationRule.class);
     ConditionExpression expression = createElement(manualActivationRule, "Expression_1", ConditionExpression.class);
-    Body body = createElement(expression, Body.class);
-    body.setTextContent("${true}");
+    expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
 
@@ -1185,8 +1197,7 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     ItemControl itemControl = createElement(planItem, "ItemControl_1", ItemControl.class);
     RequiredRule requiredRule = createElement(itemControl, "RequiredRule_1", RequiredRule.class);
     ConditionExpression expression = createElement(requiredRule, "Expression_1", ConditionExpression.class);
-    Body body = createElement(expression, Body.class);
-    body.setTextContent("${true}");
+    expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
 
@@ -1205,8 +1216,7 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     PlanItemControl defaultControl = createElement(humanTask, "ItemControl_1", DefaultControl.class);
     RequiredRule requiredRule = createElement(defaultControl, "RequiredRule_1", RequiredRule.class);
     ConditionExpression expression = createElement(requiredRule, "Expression_1", ConditionExpression.class);
-    Body body = createElement(expression, Body.class);
-    body.setTextContent("${true}");
+    expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
 
@@ -1225,8 +1235,7 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     ItemControl itemControl = createElement(planItem, "ItemControl_1", ItemControl.class);
     RepetitionRule repetitionRule = createElement(itemControl, "RepititionRule_1", RepetitionRule.class);
     ConditionExpression expression = createElement(repetitionRule, "Expression_1", ConditionExpression.class);
-    Body body = createElement(expression, Body.class);
-    body.setTextContent("${true}");
+    expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
 
@@ -1245,8 +1254,7 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     PlanItemControl defaultControl = createElement(humanTask, "DefaultControl_1", DefaultControl.class);
     RepetitionRule repetitionRule = createElement(defaultControl, "RepititionRule_1", RepetitionRule.class);
     ConditionExpression expression = createElement(repetitionRule, "Expression_1", ConditionExpression.class);
-    Body body = createElement(expression, Body.class);
-    body.setTextContent("${true}");
+    expression.setText("${true}");
 
     Cmmn.validateModel(modelInstance);
 
@@ -1257,6 +1265,92 @@ public class HumanTaskPlanItemHandlerTest extends CmmnElementHandlerTest {
     Object rule = newActivity.getProperty(PROPERTY_REPETITION_RULE);
     assertNotNull(rule);
     assertTrue(rule instanceof CaseControlRule);
+  }
+
+  @Test
+  public void testRepetitionRuleStandardEvents() {
+    // given
+    ItemControl itemControl = createElement(planItem, "ItemControl_1", ItemControl.class);
+    RepetitionRule repetitionRule = createElement(itemControl, "RepititionRule_1", RepetitionRule.class);
+    ConditionExpression expression = createElement(repetitionRule, "Expression_1", ConditionExpression.class);
+    expression.setText("${true}");
+
+    Cmmn.validateModel(modelInstance);
+
+    // when
+    CmmnActivity newActivity = handler.handleElement(planItem, context);
+
+    // then
+    List<String> events = newActivity.getProperties().get(CmmnProperties.REPEAT_ON_STANDARD_EVENTS);
+    assertNotNull(events);
+    assertEquals(2, events.size());
+    assertTrue(events.contains(CaseExecutionListener.COMPLETE));
+    assertTrue(events.contains(CaseExecutionListener.TERMINATE));
+  }
+
+  @Test
+  public void testRepetitionRuleStandardEventsByDefaultPlanItemControl() {
+    // given
+    PlanItemControl defaultControl = createElement(humanTask, "DefaultControl_1", DefaultControl.class);
+    RepetitionRule repetitionRule = createElement(defaultControl, "RepititionRule_1", RepetitionRule.class);
+    ConditionExpression expression = createElement(repetitionRule, "Expression_1", ConditionExpression.class);
+    expression.setText("${true}");
+
+    Cmmn.validateModel(modelInstance);
+
+    // when
+    CmmnActivity newActivity = handler.handleElement(planItem, context);
+
+    // then
+    List<String> events = newActivity.getProperties().get(CmmnProperties.REPEAT_ON_STANDARD_EVENTS);
+    assertNotNull(events);
+    assertEquals(2, events.size());
+    assertTrue(events.contains(CaseExecutionListener.COMPLETE));
+    assertTrue(events.contains(CaseExecutionListener.TERMINATE));
+  }
+
+  @Test
+  public void testRepetitionRuleCustomStandardEvents() {
+    // given
+    ItemControl itemControl = createElement(planItem, "ItemControl_1", ItemControl.class);
+    RepetitionRule repetitionRule = createElement(itemControl, "RepititionRule_1", RepetitionRule.class);
+    ConditionExpression expression = createElement(repetitionRule, "Expression_1", ConditionExpression.class);
+    expression.setText("${true}");
+
+    repetitionRule.setCamundaRepeatOnStandardEvent(CaseExecutionListener.DISABLE);
+
+    Cmmn.validateModel(modelInstance);
+
+    // when
+    CmmnActivity newActivity = handler.handleElement(planItem, context);
+
+    // then
+    List<String> events = newActivity.getProperties().get(CmmnProperties.REPEAT_ON_STANDARD_EVENTS);
+    assertNotNull(events);
+    assertEquals(1, events.size());
+    assertTrue(events.contains(CaseExecutionListener.DISABLE));
+  }
+
+  @Test
+  public void testRepetitionRuleCustomStandardEventsByDefaultPlanItemControl() {
+    // given
+    PlanItemControl defaultControl = createElement(humanTask, "DefaultControl_1", DefaultControl.class);
+    RepetitionRule repetitionRule = createElement(defaultControl, "RepititionRule_1", RepetitionRule.class);
+    ConditionExpression expression = createElement(repetitionRule, "Expression_1", ConditionExpression.class);
+    expression.setText("${true}");
+
+    repetitionRule.setCamundaRepeatOnStandardEvent(CaseExecutionListener.DISABLE);
+
+    Cmmn.validateModel(modelInstance);
+
+    // when
+    CmmnActivity newActivity = handler.handleElement(planItem, context);
+
+    // then
+    List<String> events = newActivity.getProperties().get(CmmnProperties.REPEAT_ON_STANDARD_EVENTS);
+    assertNotNull(events);
+    assertEquals(1, events.size());
+    assertTrue(events.contains(CaseExecutionListener.DISABLE));
   }
 
 }

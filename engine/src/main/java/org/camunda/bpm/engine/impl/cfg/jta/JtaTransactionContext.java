@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,16 +13,16 @@
 
 package org.camunda.bpm.engine.impl.cfg.jta;
 
-import javax.transaction.RollbackException;
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.TransactionContext;
 import org.camunda.bpm.engine.impl.cfg.TransactionListener;
+import org.camunda.bpm.engine.impl.cfg.TransactionLogger;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -31,6 +31,8 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
  * @author Daniel Meyer
  */
 public class JtaTransactionContext implements TransactionContext {
+
+  public final static TransactionLogger LOG = ProcessEngineLogger.TX_LOGGER;
 
   protected final TransactionManager transactionManager;
 
@@ -50,40 +52,37 @@ public class JtaTransactionContext implements TransactionContext {
       if (status != Status.STATUS_NO_TRANSACTION && status != Status.STATUS_ROLLEDBACK) {
         transaction.setRollbackOnly();
       }
-    } catch (IllegalStateException e) {
-      throw new ProcessEngineException("Unexpected IllegalStateException while marking transaction rollback only");
-    } catch (SystemException e) {
-      throw new ProcessEngineException("SystemException while marking transaction rollback only");
+    }
+    catch (Exception e) {
+      throw LOG.exceptionWhileInteractingWithTransaction("setting transaction rollback only", e);
     }
   }
 
   protected Transaction getTransaction() {
     try {
       return transactionManager.getTransaction();
-    } catch (SystemException e) {
-      throw new ProcessEngineException("SystemException while getting transaction ", e);
+    }
+    catch (Exception e) {
+      throw LOG.exceptionWhileInteractingWithTransaction("getting transaction", e);
     }
   }
 
   public void addTransactionListener(TransactionState transactionState, final TransactionListener transactionListener) {
     Transaction transaction = getTransaction();
-    CommandContext commandContext = Context.getCommandContext();    
+    CommandContext commandContext = Context.getCommandContext();
     try {
       transaction.registerSynchronization(new TransactionStateSynchronization(transactionState, transactionListener, commandContext));
-    } catch (IllegalStateException e) {
-      throw new ProcessEngineException("IllegalStateException while registering synchronization ", e);
-    } catch (RollbackException e) {
-      throw new ProcessEngineException("RollbackException while registering synchronization ", e);
-    } catch (SystemException e) {
-      throw new ProcessEngineException("SystemException while registering synchronization ", e);
-    }   
+    }
+    catch (Exception e) {
+      throw LOG.exceptionWhileInteractingWithTransaction("registering synchronization", e);
+    }
   }
-  
+
   public static class TransactionStateSynchronization implements Synchronization {
-        
+
     protected final TransactionListener transactionListener;
     protected final TransactionState transactionState;
-    private final CommandContext commandContext;    
+    private final CommandContext commandContext;
 
     public TransactionStateSynchronization(TransactionState transactionState, TransactionListener transactionListener, CommandContext commandContext) {
       this.transactionState = transactionState;
@@ -92,7 +91,7 @@ public class JtaTransactionContext implements TransactionContext {
     }
 
     public void beforeCompletion() {
-      if(TransactionState.COMMITTING.equals(transactionState) 
+      if(TransactionState.COMMITTING.equals(transactionState)
          || TransactionState.ROLLINGBACK.equals(transactionState)) {
         transactionListener.execute(commandContext);
       }
@@ -105,16 +104,15 @@ public class JtaTransactionContext implements TransactionContext {
         transactionListener.execute(commandContext);
       }
     }
-    
+
   }
 
   public boolean isTransactionActive() {
     try {
       return transactionManager.getStatus() != Status.STATUS_MARKED_ROLLBACK && transactionManager.getStatus() != Status.STATUS_NO_TRANSACTION;
     } catch (SystemException e) {
-      throw new ProcessEngineException(e);
+      throw LOG.exceptionWhileInteractingWithTransaction("getting transaction state", e);
     }
   }
-  
 
 }

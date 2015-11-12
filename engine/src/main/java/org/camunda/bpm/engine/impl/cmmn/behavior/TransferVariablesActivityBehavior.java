@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.cmmn.behavior;
 
 import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 
 /**
  * @author Roman Smirnov
@@ -20,6 +21,6 @@ import org.camunda.bpm.engine.delegate.VariableScope;
  */
 public interface TransferVariablesActivityBehavior extends CmmnActivityBehavior {
 
-  public void transferVariables(VariableScope from, VariableScope to);
+  public void transferVariables(VariableScope sourceScope, CmmnActivityExecution caseExecution);
 
 }

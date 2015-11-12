@@ -15,7 +15,7 @@ package org.camunda.bpm.integrationtest.functional.scriptengine;
 import static org.junit.Assert.assertNotEquals;
 
 import org.camunda.bpm.application.AbstractProcessApplication;
-import org.camunda.bpm.integrationtest.functional.scriptengine.engine.DummyScriptEngine;
+import org.camunda.bpm.integrationtest.functional.scriptengine.engine.AbstractScriptEngineFactory;
 import org.camunda.bpm.integrationtest.functional.scriptengine.engine.DummyScriptEngineFactory;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
@@ -32,9 +32,9 @@ public class PaLocalScriptEngineDisabledCacheTest extends AbstractPaLocalScriptE
   public static WebArchive createProcessApplication() {
     return initWebArchiveDeployment()
       .addClass(AbstractPaLocalScriptEngineTest.class)
-      .addClass(DummyScriptEngine.class)
+      .addClass(AbstractScriptEngineFactory.class)
       .addClass(DummyScriptEngineFactory.class)
-      .addAsResource(new StringAsset(SCRIPT_ENGINE_FACTORY_SPI), SCRIPT_ENGINE_FACTORY_PATH)
+      .addAsResource(new StringAsset(DUMMY_SCRIPT_ENGINE_FACTORY_SPI), SCRIPT_ENGINE_FACTORY_PATH)
       .addAsResource(createScriptTaskProcess(SCRIPT_FORMAT, SCRIPT_TEXT), "process.bpmn20.xml");
   }
 

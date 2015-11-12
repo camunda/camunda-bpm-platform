@@ -25,16 +25,13 @@ public class CreateStartFormInvocation extends DelegateInvocation {
   protected ProcessDefinitionEntity definition;
 
   public CreateStartFormInvocation(StartFormHandler startFormHandler, ProcessDefinitionEntity definition) {
+    super(null, definition);
     this.startFormHandler = startFormHandler;
     this.definition = definition;
   }
 
   protected void invoke() throws Exception {
     invocationResult = startFormHandler.createStartFormData(definition);
-  }
-
-  public Object getTarget() {
-    return startFormHandler;
   }
 
 }

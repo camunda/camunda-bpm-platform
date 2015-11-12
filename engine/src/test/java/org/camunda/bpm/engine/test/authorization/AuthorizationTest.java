@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.query.Query;
+import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -572,6 +573,17 @@ public abstract class AuthorizationTest extends PluggableProcessEngineTestCase {
 
         executeAvailableJobs(key);
         return null;
+      }
+    });
+  }
+
+  protected DecisionDefinition selectDecisionDefinitionByKey(final String decisionDefinitionKey) {
+    return runWithoutAuthorization(new Callable<DecisionDefinition>() {
+      public DecisionDefinition call() throws Exception {
+        return repositoryService
+            .createDecisionDefinitionQuery()
+            .decisionDefinitionKey(decisionDefinitionKey)
+            .singleResult();
       }
     });
   }

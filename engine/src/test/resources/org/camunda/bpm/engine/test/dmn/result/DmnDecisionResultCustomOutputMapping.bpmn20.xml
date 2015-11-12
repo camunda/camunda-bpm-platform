@@ -13,8 +13,8 @@
       camunda:decisionRef="testDecision">
       <extensionElements>
         <camunda:inputOutput>
-          <camunda:outputParameter name="result1">${decisionResult.getSingleOutput().result1}</camunda:outputParameter>
-          <camunda:outputParameter name="result2">${decisionResult.getSingleOutput().result2}</camunda:outputParameter>
+          <camunda:outputParameter name="result1">${decisionResult.getSingleResult().result1}</camunda:outputParameter>
+          <camunda:outputParameter name="result2">${decisionResult.getSingleResult().result2}</camunda:outputParameter>
         </camunda:inputOutput>
       </extensionElements>
     </businessRuleTask>

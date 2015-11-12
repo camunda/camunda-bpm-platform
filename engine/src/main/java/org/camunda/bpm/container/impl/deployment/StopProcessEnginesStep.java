@@ -13,12 +13,12 @@
 package org.camunda.bpm.container.impl.deployment;
 
 import java.util.Set;
-import java.util.logging.Level;
-
+import org.camunda.bpm.container.impl.ContainerIntegrationLogger;
 import org.camunda.bpm.container.impl.spi.PlatformServiceContainer;
 import org.camunda.bpm.container.impl.spi.DeploymentOperation;
 import org.camunda.bpm.container.impl.spi.DeploymentOperationStep;
 import org.camunda.bpm.container.impl.spi.ServiceTypes;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 /**
  * <p>Deployment operation step that stops ALL process engines registered inside the container.</p>
@@ -27,6 +27,8 @@ import org.camunda.bpm.container.impl.spi.ServiceTypes;
  *
  */
 public class StopProcessEnginesStep extends DeploymentOperationStep {
+
+  private final static ContainerIntegrationLogger LOG = ProcessEngineLogger.CONTAINER_INTEGRATION_LOGGER;
 
   public String getName() {
     return "Stopping process engines";
@@ -51,9 +53,9 @@ public class StopProcessEnginesStep extends DeploymentOperationStep {
 
     try {
       serviceContainer.stopService(serviceName);
-
-    }catch(Exception e) {
-      LOGGER.log(Level.FINE, "Could not stop managed process engine "+serviceName.toString(), e);
+    }
+    catch(Exception e) {
+      LOG.exceptionWhileStopping("Process Engine", serviceName, e);
     }
 
   }

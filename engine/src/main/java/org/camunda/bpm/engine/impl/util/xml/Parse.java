@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,15 +17,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
-
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.camunda.bpm.engine.BpmnParseException;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseLogger;
+import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
 import org.camunda.bpm.engine.impl.util.io.InputStreamSource;
 import org.camunda.bpm.engine.impl.util.io.ResourceStreamSource;
 import org.camunda.bpm.engine.impl.util.io.StreamSource;
@@ -40,15 +37,14 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class Parse extends DefaultHandler {
 
-  private static final BpmnParseLogger LOG = ProcessEngineLogger.PARSE_LOGGER;
-  private static final Logger LOGGER = Logger.getLogger(Parse.class.getName());
+  private static final EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
 
   private static final String JAXP_SCHEMA_SOURCE = "http://java.sun.com/xml/jaxp/properties/schemaSource";
   private static final String JAXP_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
   private static final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
-  
+
   private static final String NEW_LINE = System.getProperty("line.separator");
-  
+
   protected Parser parser;
   protected String name;
   protected StreamSource streamSource;
@@ -60,17 +56,17 @@ public class Parse extends DefaultHandler {
   public Parse(Parser parser) {
     this.parser = parser;
   }
-  
+
   public Parse name(String name) {
     this.name = name;
     return this;
   }
-  
+
   public Parse sourceInputStream(InputStream inputStream) {
     if (name==null) {
       name("inputStream");
     }
-    setStreamSource(new InputStreamSource(inputStream)); 
+    setStreamSource(new InputStreamSource(inputStream));
     return this;
   }
 
@@ -85,7 +81,7 @@ public class Parse extends DefaultHandler {
     setStreamSource(new UrlStreamSource(url));
     return this;
   }
-  
+
   public Parse sourceUrl(String url) {
     try {
       return sourceUrl(new URL(url));
@@ -93,12 +89,12 @@ public class Parse extends DefaultHandler {
       throw LOG.malformedUrlException(url, e);
     }
   }
-  
+
   public Parse sourceResource(String resource, ClassLoader classLoader) {
     if (name==null) {
       name(resource);
     }
-    setStreamSource(new ResourceStreamSource(resource, classLoader)); 
+    setStreamSource(new ResourceStreamSource(resource, classLoader));
     return this;
   }
 
@@ -106,7 +102,7 @@ public class Parse extends DefaultHandler {
     if (name==null) {
       name("string");
     }
-    setStreamSource(new StringStreamSource(string)); 
+    setStreamSource(new StringStreamSource(string));
     return this;
   }
 
@@ -116,7 +112,7 @@ public class Parse extends DefaultHandler {
     }
     this.streamSource = streamSource;
   }
-  
+
   public Parse execute() {
     try {
       InputStream inputStream = streamSource.getInputStream();
@@ -126,17 +122,18 @@ public class Parse extends DefaultHandler {
         parser.getSaxParserFactory().setValidating(false);
       }
 
-      SAXParser saxParser = parser.getSaxParser(); 
-      if (schemaResource != null) { 
+      SAXParser saxParser = parser.getSaxParser();
+      if (schemaResource != null) {
         saxParser.setProperty(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
         saxParser.setProperty(JAXP_SCHEMA_SOURCE, schemaResource);
       }
       saxParser.parse(inputStream, new ParseHandler(this));
-      
-    } catch (Exception e) { // any exception can happen (Activiti, Io, etc.)
+
+    }
+    catch (Exception e) {
       throw LOG.parsingFailureException(name, e);
     }
-    
+
     return this;
   }
 
@@ -151,7 +148,7 @@ public class Parse extends DefaultHandler {
   public void addError(SAXParseException e) {
     errors.add(new Problem(e, name));
   }
-  
+
   public void addError(String errorMessage, Element element) {
     errors.add(new Problem(errorMessage, name, element));
   }
@@ -159,45 +156,49 @@ public class Parse extends DefaultHandler {
   public void addError(BpmnParseException e) {
     errors.add(new Problem(e, name));
   }
-  
+
   public boolean hasErrors() {
     return errors != null && !errors.isEmpty();
   }
-  
+
   public void addWarning(SAXParseException e) {
     warnings.add(new Problem(e, name));
   }
-  
+
   public void addWarning(String errorMessage, Element element) {
     warnings.add(new Problem(errorMessage, name, element));
   }
-  
+
   public boolean hasWarnings() {
     return warnings != null && !warnings.isEmpty();
   }
-  
+
   public void logWarnings() {
+    StringBuilder builder = new StringBuilder();
     for (Problem warning : warnings) {
-      LOGGER.warning(warning.toString());
+      builder.append("\n* ");
+      builder.append(warning.toString());
     }
+    LOG.logParseWarnings(builder.toString());
   }
-  
+
   public void throwExceptionForErrors() {
     StringBuilder strb = new StringBuilder();
     for (Problem error : errors) {
+      strb.append("\n* ");
       strb.append(error.toString());
-      strb.append(NEW_LINE);
     }
-    throw new ProcessEngineException(strb.toString());
+    throw LOG.exceptionDuringParsing(strb.toString());
   }
-  
+
   public void setSchemaResource(String schemaResource) {
     SAXParserFactory saxParserFactory = parser.getSaxParserFactory();
     saxParserFactory.setNamespaceAware(true);
     saxParserFactory.setValidating(true);
     try {
       saxParserFactory.setFeature("http://xml.org/sax/features/namespace-prefixes", true);
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       LOG.unableToSetSchemaResource(e);
     }
     this.schemaResource = schemaResource;

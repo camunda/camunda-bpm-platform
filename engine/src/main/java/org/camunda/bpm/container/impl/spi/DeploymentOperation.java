@@ -16,10 +16,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.container.impl.ContainerIntegrationLogger;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 /**
  * <p>A DeploymentOperation allows bundling multiple deployment steps into a
@@ -41,7 +39,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
  */
 public class DeploymentOperation {
 
-  protected Logger log = Logger.getLogger(DeploymentOperation.class.getName());
+  private final static ContainerIntegrationLogger LOG = ProcessEngineLogger.CONTAINER_INTEGRATION_LOGGER;
 
   /** the name of this composite operation */
   protected final String name;
@@ -111,31 +109,29 @@ public class DeploymentOperation {
       currentStep = steps.remove(0);
 
       try {
-        if (log.isLoggable(Level.FINE)) {
-          log.fine("Performing operation step: '" + currentStep.getName() + "'");
-        }
+        LOG.debugPerformOperationStep(currentStep.getName());
+
         currentStep.performOperationStep(this);
         successfulSteps.add(currentStep);
-        if (log.isLoggable(Level.FINE)) {
-          log.fine("Successfully performed operation step: '" + currentStep.getName() + "'");
-        }
-      } catch (Exception e) {
+
+        LOG.debugSuccessfullyPerformedOperationStep(currentStep.getName());
+      }
+      catch (Exception e) {
 
         if(isRollbackOnFailure) {
 
           try {
             rollbackOperation();
-
-          } catch(Exception e2) {
-            log.log(Level.SEVERE, "Exception while rolling back operation " + e2.getMessage(), e2);
           }
-
+          catch(Exception e2) {
+            LOG.exceptionWhileRollingBackOperation(e2);
+          }
           // re-throw the original exception
-          throw new ProcessEngineException("Exception while performing '" + name+" => "+currentStep.getName()+"': " + e.getMessage(), e);
+          throw LOG.exceptionWhilePerformingOperationStep(name, currentStep.getName(), e);
+        }
 
-        } else {
-          log.log(Level.SEVERE, "Exception while performing operation step '" + currentStep.getName() + "': " + e.getMessage(), e);
-
+        else {
+          LOG.exceptionWhilePerformingOperationStep(currentStep.getName(), e);
         }
 
       }
@@ -149,10 +145,9 @@ public class DeploymentOperation {
     for (DeploymentOperationStep step : successfulSteps) {
       try {
         step.cancelOperationStep(this);
-
-      } catch(Exception e) {
-        log.log(Level.SEVERE, "Exception while cancelling '"+step.getName()+"'", e);
-
+      }
+      catch(Exception e) {
+        LOG.exceptionWhileRollingBackOperation(e);
       }
     }
 
@@ -160,10 +155,9 @@ public class DeploymentOperation {
     for (String serviceName : installedServices) {
       try {
         serviceContainer.stopService(serviceName);
-
-      } catch(Exception e) {
-        log.log(Level.SEVERE, "Exception while stopping service", e);
-
+      }
+      catch(Exception e) {
+        LOG.exceptionWhileStopping("service", serviceName, e);
       }
     }
   }

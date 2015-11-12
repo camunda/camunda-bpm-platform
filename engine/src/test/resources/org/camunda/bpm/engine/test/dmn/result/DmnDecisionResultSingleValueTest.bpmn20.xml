@@ -10,7 +10,7 @@
     <sequenceFlow sourceRef="start" targetRef="ruleTask" />
 
     <businessRuleTask id="ruleTask"
-      camunda:decisionRef="testDecision" camunda:mapDecisionResult="singleValue" camunda:resultVariable="result" />
+      camunda:decisionRef="testDecision" camunda:mapDecisionResult="singleEntry" camunda:resultVariable="result" />
 
     <sequenceFlow sourceRef="ruleTask" targetRef="end" />
 

@@ -29,9 +29,9 @@ public interface SubProcessActivityBehavior extends ActivityBehavior {
    * This should be called before the process instance is destroyed.
    *
    * @param targetExecution execution of the calling process instance to pass the variables to
-   * @param subProcessInstance process instance of the subprocess where the variables extract from
+   * @param subProcessInstance instance of the called element that serves as the variable source
    */
-  void passOutputVariablesFromSubprocess(VariableScope targetExecution, VariableScope subProcessInstance);
+  void passOutputVariables(ActivityExecution targetExecution, VariableScope calledElementInstance);
 
   /** called after the process instance is destroyed for
    * this activity to perform its outgoing control flow logic. */

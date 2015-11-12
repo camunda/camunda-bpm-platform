@@ -14,7 +14,6 @@ package org.camunda.bpm.engine.impl.cmmn.handler;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.cmmn.behavior.ProcessOrCaseTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.core.model.BaseCallableElement.CallableElementBinding;
@@ -24,6 +23,7 @@ import org.camunda.bpm.engine.impl.core.variable.mapping.value.ConstantValueProv
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.NullValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
 import org.camunda.bpm.engine.impl.el.ElValueProvider;
+import org.camunda.bpm.engine.impl.el.Expression;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.util.StringUtil;
 import org.camunda.bpm.engine.repository.Deployment;

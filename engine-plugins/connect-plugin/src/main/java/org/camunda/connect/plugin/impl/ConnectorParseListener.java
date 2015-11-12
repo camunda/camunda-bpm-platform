@@ -13,8 +13,8 @@
 
 package org.camunda.connect.plugin.impl;
 
-import static org.camunda.bpm.engine.impl.util.BpmnParseUtil.findCamundaExtensionElement;
-import static org.camunda.bpm.engine.impl.util.BpmnParseUtil.parseInputOutput;
+import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.findCamundaExtensionElement;
+import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.parseInputOutput;
 
 import org.camunda.bpm.engine.BpmnParseException;
 import org.camunda.bpm.engine.impl.bpmn.parser.AbstractBpmnParseListener;

@@ -17,14 +17,15 @@ import java.util.concurrent.Callable;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.delegate.BaseDelegateExecution;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.context.CoreExecutionContext;
 import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
-import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
-import org.camunda.bpm.engine.impl.dmn.invocation.DecisionInvocation;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.DelegateInterceptor;
-import org.camunda.bpm.engine.repository.DecisionDefinition;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
 
 /**
  * The default implementation of the DelegateInterceptor.
@@ -62,39 +63,79 @@ public class DefaultDelegateInterceptor implements DelegateInterceptor {
   protected void handleInvocationInContext(final DelegateInvocation invocation) throws Exception {
     CommandContext commandContext = Context.getCommandContext();
     boolean oldValue = commandContext.isAuthorizationCheckEnabled();
+    BaseDelegateExecution contextExecution = invocation.getContextExecution();
 
     ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
-    if (!configuration.isAuthorizationEnabledForCustomCode()) {
-      // the custom code should be executed without authorization
-      commandContext.disableAuthorizationCheck();
-    }
 
-    commandContext.disableUserOperationLog();
+    boolean popExecutionContext = false;
 
     try {
-      invocation.proceed();
+      if (!configuration.isAuthorizationEnabledForCustomCode()) {
+        // the custom code should be executed without authorization
+        commandContext.disableAuthorizationCheck();
+      }
+
+      try {
+        commandContext.disableUserOperationLog();
+
+        try {
+          if (contextExecution != null && !isCurrentContextExecution(contextExecution)) {
+            popExecutionContext = setExecutionContext(contextExecution);
+          }
+
+          invocation.proceed();
+        }
+        finally {
+          if (popExecutionContext) {
+            Context.removeExecutionContext();
+          }
+        }
+      }
+      finally {
+        commandContext.enableUserOperationLog();
+      }
     }
     finally {
-
-      commandContext.enableUserOperationLog();
-
       if (oldValue) {
-        // the last "one" set the flag back to true
         commandContext.enableAuthorizationCheck();
       }
     }
+
+  }
+
+  /**
+   * @return true if the execution context is modified by this invocation
+   */
+  protected boolean setExecutionContext(BaseDelegateExecution execution) {
+    if (execution instanceof ExecutionEntity) {
+      Context.setExecutionContext((ExecutionEntity) execution);
+      return true;
+    }
+    else if (execution instanceof CaseExecutionEntity) {
+      Context.setExecutionContext((CaseExecutionEntity) execution);
+      return true;
+    }
+    return false;
+  }
+
+  protected boolean isCurrentContextExecution(BaseDelegateExecution execution) {
+    CoreExecutionContext<?> coreExecutionContext = Context.getCoreExecutionContext();
+    return coreExecutionContext != null && coreExecutionContext.getExecution() == execution;
   }
 
   protected ProcessApplicationReference getProcessApplicationForInvocation(final DelegateInvocation invocation) {
-    if (invocation instanceof DecisionInvocation) {
-      DecisionInvocation decisionInvocation = (DecisionInvocation) invocation;
-      DecisionDefinition decisionDefinition = decisionInvocation.getDecisionDefinition();
-      return ProcessApplicationContextUtil.getTargetProcessApplication((DecisionDefinitionEntity) decisionDefinition);
 
+    BaseDelegateExecution contextExecution = invocation.getContextExecution();
+    ResourceDefinitionEntity contextResource = invocation.getContextResource();
+
+    if (contextExecution != null) {
+      return ProcessApplicationContextUtil.getTargetProcessApplication((CoreExecution) contextExecution);
+    }
+    else if (contextResource != null) {
+      return ProcessApplicationContextUtil.getTargetProcessApplication(contextResource);
     }
     else {
-      BaseDelegateExecution contextExecution = invocation.getContextExecution();
-      return ProcessApplicationContextUtil.getTargetProcessApplication((CoreExecution) contextExecution);
+      return null;
     }
   }
 

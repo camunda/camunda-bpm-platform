@@ -2628,7 +2628,19 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     .when()
       .delete(SINGLE_TASK_DELETE_SINGLE_ATTACHMENT_URL);
   }
+  
+  @Test
+  public void testDeleteDeleteTask() {
 
+    given()
+      .pathParam("id", EXAMPLE_TASK_ID)
+      .expect()
+      .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+      .delete(SINGLE_TASK_URL);
+
+    verify(taskServiceMock).deleteTask(EXAMPLE_TASK_ID);
+  }
 
   @Test
   public void testPostCreateTask() {

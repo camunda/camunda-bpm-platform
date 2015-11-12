@@ -36,6 +36,6 @@ import org.camunda.bpm.engine.impl.delegate.DelegateInvocation;
  */
 public interface DelegateInterceptor {
 
-  public void handleInvocation(DelegateInvocation invocation) throws Exception;
+  void handleInvocation(DelegateInvocation invocation) throws Exception;
 
 }

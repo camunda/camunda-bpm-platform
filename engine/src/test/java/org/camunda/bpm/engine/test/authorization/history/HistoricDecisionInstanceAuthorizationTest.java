@@ -25,7 +25,6 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
-import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.test.authorization.AuthorizationTest;
 
 /**
@@ -89,10 +88,11 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
   public void testDeleteHistoricDecisionInstanceWithoutAuthorization(){
     // given
     startProcessInstanceAndEvaluateDecision();
+    String decisionDefinitionId = selectDecisionDefinitionByKey(DECISION_DEFINITION_KEY).getId();
 
     try {
       // when
-      historyService.deleteHistoricDecisionInstance(getDecisionDefinitionId(DECISION_DEFINITION_KEY));
+      historyService.deleteHistoricDecisionInstance(decisionDefinitionId);
       fail("expect authorization exception");
     } catch (AuthorizationException e) {
       // then
@@ -105,9 +105,11 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
     // given
     startProcessInstanceAndEvaluateDecision();
     createGrantAuthorization(DECISION_DEFINITION, ANY, userId, DELETE_HISTORY);
+    String decisionDefinitionId = selectDecisionDefinitionByKey(DECISION_DEFINITION_KEY).getId();
+
 
     // when
-    historyService.deleteHistoricDecisionInstance(getDecisionDefinitionId(DECISION_DEFINITION_KEY));
+    historyService.deleteHistoricDecisionInstance(decisionDefinitionId);
 
     // then
     disableAuthorization();
@@ -119,9 +121,10 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
     // given
     startProcessInstanceAndEvaluateDecision();
     createGrantAuthorization(DECISION_DEFINITION, DECISION_DEFINITION_KEY, userId, DELETE_HISTORY);
+    String decisionDefinitionId = selectDecisionDefinitionByKey(DECISION_DEFINITION_KEY).getId();
 
     // when
-    historyService.deleteHistoricDecisionInstance(getDecisionDefinitionId(DECISION_DEFINITION_KEY));
+    historyService.deleteHistoricDecisionInstance(decisionDefinitionId);
 
     // then
     disableAuthorization();
@@ -133,12 +136,6 @@ public class HistoricDecisionInstanceAuthorizationTest extends AuthorizationTest
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("input1", null);
     startProcessInstanceByKey(PROCESS_KEY, variables);
-  }
-
-  protected String getDecisionDefinitionId(String decisionDefinitionKey) {
-    DecisionDefinition decisionDefinition = repositoryService.createDecisionDefinitionQuery().decisionDefinitionKey(decisionDefinitionKey).singleResult();
-    assertNotNull(decisionDefinition);
-    return decisionDefinition.getId();
   }
 
 }

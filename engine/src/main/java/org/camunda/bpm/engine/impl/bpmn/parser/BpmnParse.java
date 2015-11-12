@@ -12,9 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.parser;
 
-import static org.camunda.bpm.engine.impl.util.BpmnParseUtil.findCamundaExtensionElement;
-import static org.camunda.bpm.engine.impl.util.BpmnParseUtil.parseCamundaScript;
-import static org.camunda.bpm.engine.impl.util.BpmnParseUtil.parseInputOutput;
+import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.findCamundaExtensionElement;
+import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.parseCamundaScript;
+import static org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseUtil.parseInputOutput;
 import static org.camunda.bpm.engine.impl.util.ClassDelegateUtil.instantiateDelegate;
 
 import java.io.InputStream;
@@ -31,7 +31,6 @@ import java.util.Map;
 import org.camunda.bpm.engine.BpmnParseException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.Condition;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -88,12 +87,13 @@ import org.camunda.bpm.engine.impl.core.variable.mapping.IoMapping;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ConstantValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.NullValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
-import org.camunda.bpm.engine.impl.dmn.result.CollectValuesDecisionResultMapper;
-import org.camunda.bpm.engine.impl.dmn.result.DecisionResultMapper;
-import org.camunda.bpm.engine.impl.dmn.result.OutputListDecisionResultMapper;
-import org.camunda.bpm.engine.impl.dmn.result.SingleOutputDecisionResultMapper;
-import org.camunda.bpm.engine.impl.dmn.result.SingleValueDecisionResultMapper;
+import org.camunda.bpm.engine.impl.dmn.result.CollectEntriesDecisionTableResultMapper;
+import org.camunda.bpm.engine.impl.dmn.result.DecisionTableResultMapper;
+import org.camunda.bpm.engine.impl.dmn.result.ResultListDecisionTableResultMapper;
+import org.camunda.bpm.engine.impl.dmn.result.SingleResultDecisionTableResultMapper;
+import org.camunda.bpm.engine.impl.dmn.result.SingleEntryDecisionTableResultMapper;
 import org.camunda.bpm.engine.impl.el.ElValueProvider;
+import org.camunda.bpm.engine.impl.el.Expression;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.el.FixedValue;
 import org.camunda.bpm.engine.impl.el.UelExpressionCondition;
@@ -169,7 +169,7 @@ public class BpmnParse extends Parse {
 
   public static final String MULTI_INSTANCE_BODY_ID_SUFFIX = "#multiInstanceBody";
 
-  protected static final BpmnParseLogger LOG = ProcessEngineLogger.PARSE_LOGGER;
+  protected static final BpmnParseLogger LOG = ProcessEngineLogger.BPMN_PARSE_LOGGER;
 
   public static final String PROPERTYNAME_DOCUMENTATION = "documentation";
   public static final String PROPERTYNAME_INITIAL = "initial";
@@ -2008,9 +2008,9 @@ public class BpmnParse extends Parse {
     parseVersion(businessRuleTaskElement, activity, callableElement, "decisionRefBinding", "decisionRefVersion");
 
     String resultVariable = parseResultVariable(businessRuleTaskElement);
-    DecisionResultMapper decisionResultMapper = parseDecisionResultMapper(businessRuleTaskElement);
+    DecisionTableResultMapper decisionTableResultMapper = parseDecisionResultMapper(businessRuleTaskElement);
 
-    DecisionRuleTaskActivityBehavior behavior = new DecisionRuleTaskActivityBehavior(callableElement, resultVariable, decisionResultMapper);
+    DecisionRuleTaskActivityBehavior behavior = new DecisionRuleTaskActivityBehavior(callableElement, resultVariable, decisionTableResultMapper);
     activity.setActivityBehavior(behavior);
 
     parseExecutionListenersOnScope(businessRuleTaskElement, activity);
@@ -2022,25 +2022,25 @@ public class BpmnParse extends Parse {
     return activity;
   }
 
-  protected DecisionResultMapper parseDecisionResultMapper(Element businessRuleTaskElement) {
-    // default mapper is 'outputList'
-    String decisionResultMapper = businessRuleTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "mapDecisionResult", "outputList");
+  protected DecisionTableResultMapper parseDecisionResultMapper(Element businessRuleTaskElement) {
+    // default mapper is 'resultList'
+    String decisionResultMapper = businessRuleTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "mapDecisionResult", "resultList");
 
-    if ("singleValue".equals(decisionResultMapper)) {
-      return new SingleValueDecisionResultMapper();
+    if ("singleEntry".equals(decisionResultMapper)) {
+      return new SingleEntryDecisionTableResultMapper();
 
-    } else if ("singleOutput".equals(decisionResultMapper)) {
-      return new SingleOutputDecisionResultMapper();
+    } else if ("singleResult".equals(decisionResultMapper)) {
+      return new SingleResultDecisionTableResultMapper();
 
-    } else if ("collectValues".equals(decisionResultMapper)) {
-      return new CollectValuesDecisionResultMapper();
+    } else if ("collectEntries".equals(decisionResultMapper)) {
+      return new CollectEntriesDecisionTableResultMapper();
 
-    } else if ("outputList".equals(decisionResultMapper)) {
-      return new OutputListDecisionResultMapper();
+    } else if ("resultList".equals(decisionResultMapper)) {
+      return new ResultListDecisionTableResultMapper();
 
     } else {
       addError("No decision result mapper found for name '" + decisionResultMapper
-          + "'. Supported mappers are 'singleValue', 'singleOutput', 'collectValues' and 'outputList'.", businessRuleTaskElement);
+          + "'. Supported mappers are 'singleEntry', 'singleResult', 'collectEntries' and 'resultList'.", businessRuleTaskElement);
       return null;
     }
   }

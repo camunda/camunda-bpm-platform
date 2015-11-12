@@ -165,6 +165,9 @@
       <if test="latest">
         and RES.VERSION_ = (select max(VERSION_) from ${prefix}ACT_RE_DECISION_DEF where KEY_ = RES.KEY_)
       </if>
+      
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+      
     </where>
   </sql>
 

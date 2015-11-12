@@ -83,7 +83,8 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
   protected void propagateExceptionAsError(Exception exception, ActivityExecution execution) throws Exception {
     if (isProcessEngineExceptionWithoutCause(exception) || isTransactionNotActive()) {
       throw exception;
-    } else {
+    }
+    else {
       propagateError(null, exception, execution);
     }
   }
@@ -107,14 +108,16 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
 
         try {
           propagateException(execution, ex);
-        } catch (ErrorPropagationException e) {
+        }
+        catch (ErrorPropagationException e) {
           LOG.errorPropagationException(activityInstanceId, e.getCause());
           // re-throw the original exception so that it is logged
           // and set as cause of the failure
           throw ex;
         }
 
-      } else {
+      }
+      else {
         throw ex;
       }
     }

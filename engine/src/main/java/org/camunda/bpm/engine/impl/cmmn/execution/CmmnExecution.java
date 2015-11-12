@@ -65,7 +65,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.CaseVariableListener;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.TaskListener;
@@ -109,10 +108,6 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
   protected transient CmmnActivity activity;
 
   protected boolean required = false;
-
-  protected boolean repeatable = false;
-
-  protected boolean repetition = false;
 
   protected int previousState;
 
@@ -478,13 +473,6 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
       ensureNotNull(PvmException.class, "Case execution '"+getId()+"': has no current activity.", "activity", activity);
 
       List<CmmnSentryDeclaration> criteria = activity.getEntryCriteria();
-      if (isRepetition()) {
-        List<CmmnSentryDeclaration> repetitionCriteria = activity.getRepetitionCriteria();
-        if (repetitionCriteria != null && !repetitionCriteria.isEmpty()){
-          criteria = repetitionCriteria;
-        }
-      }
-
       for (CmmnSentryDeclaration sentryDeclaration : criteria) {
         if (sentryDeclaration != null && satisfiedSentries.contains(sentryDeclaration.getId())) {
           if (isAvailable()) {
@@ -677,26 +665,6 @@ public abstract class CmmnExecution extends CoreExecution implements CmmnCaseIns
 
   public void setRequired(boolean required) {
     this.required = required;
-  }
-
-  // repeatable ////////////////////////////////////////////////
-
-  public boolean isRepeatable() {
-    return repeatable;
-  }
-
-  public void setRepeatable(boolean repeatable) {
-    this.repeatable = repeatable;
-  }
-
-  // repetition ////////////////////////////////////////////////
-
-  public boolean isRepetition() {
-    return repetition;
-  }
-
-  public void setRepetition(boolean repetition) {
-    this.repetition = repetition;
   }
 
   // state /////////////////////////////////////////////////////

@@ -15,17 +15,21 @@ package org.camunda.bpm.engine.test.concurrency;
 import java.util.List;
 
 import org.camunda.bpm.engine.OptimisticLockingException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.ExecuteJobsCmd;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.Deployment;
+import org.slf4j.Logger;
 
 /**
  * @author Thorben Lindhauer
  *
  */
 public class CompetingJobExecutionTest extends PluggableProcessEngineTestCase {
+
+private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
   protected static ControllableThread activeThread;
 
@@ -45,13 +49,13 @@ public class CompetingJobExecutionTest extends PluggableProcessEngineTestCase {
     threadTwo.startAndWaitUntilControlIsReturned();
 
     // then the first committing thread succeeds
-    log.fine("test thread notifies thread 1");
+    LOG.debug("test thread notifies thread 1");
     threadOne.proceedAndWaitTillDone();
     assertNull(threadOne.exception);
 
     // then the second committing thread fails with an OptimisticLockingException
     // and the job retries have not been decremented
-    log.fine("test thread notifies thread 2");
+    LOG.debug("test thread notifies thread 2");
     threadTwo.proceedAndWaitTillDone();
     assertNotNull(threadTwo.exception);
 
@@ -83,13 +87,13 @@ public class CompetingJobExecutionTest extends PluggableProcessEngineTestCase {
     threadTwo.startAndWaitUntilControlIsReturned();
 
     // then the first committing thread succeeds
-    log.fine("test thread notifies thread 1");
+    LOG.debug("test thread notifies thread 1");
     threadOne.proceedAndWaitTillDone();
     assertNull(threadOne.exception);
 
     // then the second committing thread fails with an OptimisticLockingException
     // and the job retries have not been decremented
-    log.fine("test thread notifies thread 2");
+    LOG.debug("test thread notifies thread 2");
     threadTwo.proceedAndWaitTillDone();
     assertNotNull(threadTwo.exception);
 
@@ -128,7 +132,7 @@ public class CompetingJobExecutionTest extends PluggableProcessEngineTestCase {
       } catch (OptimisticLockingException e) {
         this.exception = e;
       }
-      log.fine(getName()+" ends");
+      LOG.debug(getName()+" ends");
     }
   }
 }

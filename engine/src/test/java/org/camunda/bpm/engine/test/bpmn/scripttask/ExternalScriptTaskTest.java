@@ -108,7 +108,7 @@ public class ExternalScriptTaskTest extends PluggableProcessEngineTestCase {
       fail("Resource does not exist in classpath");
     }
     catch (NotFoundException e) {
-      assertTextPresentIgnoreCase("Unable to find resource with name classpath://org/camunda/bpm/engine/test/bpmn/scripttask/notexisting.py", e.getMessage());
+      assertTextPresentIgnoreCase("unable to find resource at path classpath://org/camunda/bpm/engine/test/bpmn/scripttask/notexisting.py", e.getMessage());
     }
   }
 
@@ -159,7 +159,7 @@ public class ExternalScriptTaskTest extends PluggableProcessEngineTestCase {
       fail("Resource does not exist in classpath");
     }
     catch (NotFoundException e) {
-      assertTextPresentIgnoreCase("Unable to find resource with name deployment://org/camunda/bpm/engine/test/bpmn/scripttask/notexisting.py", e.getMessage());
+      assertTextPresentIgnoreCase("unable to find resource at path deployment://org/camunda/bpm/engine/test/bpmn/scripttask/notexisting.py", e.getMessage());
     }
   }
 

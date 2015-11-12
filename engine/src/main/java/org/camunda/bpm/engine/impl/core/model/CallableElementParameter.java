@@ -34,13 +34,13 @@ public class CallableElementParameter {
   // source ////////////////////////////////////////////////////////
 
   public Object getSource(VariableScope variableScope) {
+
     if (sourceValueProvider instanceof ConstantValueProvider) {
       String variableName = (String) sourceValueProvider.getValue(variableScope);
 
       return variableScope.getVariableTyped(variableName);
-
-    } else {
-
+    }
+    else {
       return sourceValueProvider.getValue(variableScope);
     }
 

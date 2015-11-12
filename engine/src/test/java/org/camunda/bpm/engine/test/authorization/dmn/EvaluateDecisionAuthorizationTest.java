@@ -12,16 +12,7 @@
  */
 package org.camunda.bpm.engine.test.authorization.dmn;
 
-import static org.camunda.bpm.engine.test.authorization.util.AuthorizationScenario.scenario;
-import static org.camunda.bpm.engine.test.authorization.util.AuthorizationSpec.grant;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Collection;
-
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -41,6 +32,14 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
+
+import java.util.Collection;
+
+import static org.camunda.bpm.engine.test.authorization.util.AuthorizationScenario.scenario;
+import static org.camunda.bpm.engine.test.authorization.util.AuthorizationSpec.grant;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author Philipp Ossler
@@ -98,7 +97,7 @@ public class EvaluateDecisionAuthorizationTest {
     // when
     authRule.init(scenario).withUser("userId").bindResource("decisionDefinitionKey", DECISION_DEFINITION_KEY).start();
 
-    DmnDecisionResult decisionResult = engineRule.getDecisionService().evaluateDecisionById(decisionDefinition.getId(), createVariables());
+    DmnDecisionTableResult decisionResult = engineRule.getDecisionService().evaluateDecisionTableById(decisionDefinition.getId(), createVariables());
 
     // then
     if (authRule.assertScenario(scenario)) {
@@ -116,7 +115,7 @@ public class EvaluateDecisionAuthorizationTest {
     // when
     authRule.init(scenario).withUser("userId").bindResource("decisionDefinitionKey", DECISION_DEFINITION_KEY).start();
 
-    DmnDecisionResult decisionResult = engineRule.getDecisionService().evaluateDecisionByKey(decisionDefinition.getKey(), createVariables());
+    DmnDecisionTableResult decisionResult = engineRule.getDecisionService().evaluateDecisionTableByKey(decisionDefinition.getKey(), createVariables());
 
     // then
     if (authRule.assertScenario(scenario)) {
@@ -134,7 +133,7 @@ public class EvaluateDecisionAuthorizationTest {
     // when
     authRule.init(scenario).withUser("userId").bindResource("decisionDefinitionKey", DECISION_DEFINITION_KEY).start();
 
-    DmnDecisionResult decisionResult = engineRule.getDecisionService().evaluateDecisionByKeyAndVersion(decisionDefinition.getKey(),
+    DmnDecisionTableResult decisionResult = engineRule.getDecisionService().evaluateDecisionTableByKeyAndVersion(decisionDefinition.getKey(),
         decisionDefinition.getVersion(), createVariables());
 
     // then
@@ -147,10 +146,10 @@ public class EvaluateDecisionAuthorizationTest {
     return Variables.createVariables().putValue("status", "silver").putValue("sum", 723);
   }
 
-  protected void assertThatDecisionHasExpectedResult(DmnDecisionResult decisionResult) {
+  protected void assertThatDecisionHasExpectedResult(DmnDecisionTableResult decisionResult) {
     assertThat(decisionResult, is(notNullValue()));
     assertThat(decisionResult.size(), is(1));
-    String value = decisionResult.getSingleOutput().getFirstValue();
+    String value = decisionResult.getSingleResult().getFirstEntry();
     assertThat(value, is("ok"));
   }
 

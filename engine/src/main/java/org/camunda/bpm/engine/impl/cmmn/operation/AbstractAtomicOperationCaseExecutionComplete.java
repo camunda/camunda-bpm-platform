@@ -17,10 +17,7 @@ import static org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState.COMP
 import static org.camunda.bpm.engine.impl.util.ActivityBehaviorUtil.getActivityBehavior;
 
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnCompositeActivityBehavior;
@@ -74,7 +71,7 @@ public abstract class AbstractAtomicOperationCaseExecutionComplete extends Abstr
         SubProcessActivityBehavior behavior = (SubProcessActivityBehavior) getActivityBehavior(superExecution);
 
         try {
-          behavior.passOutputVariablesFromSubprocess(superExecution, execution);
+          behavior.passOutputVariables(superExecution, execution);
         } catch (RuntimeException e) {
           LOG.completingSubCaseError(execution, e);
           throw e;

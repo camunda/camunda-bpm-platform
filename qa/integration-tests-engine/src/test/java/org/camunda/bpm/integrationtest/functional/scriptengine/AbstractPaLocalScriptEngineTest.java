@@ -39,7 +39,7 @@ public abstract class AbstractPaLocalScriptEngineTest extends AbstractFoxPlatfor
   public static final String PROCESS_ID = "testProcess";
   public static final String SCRIPT_TEXT = "my-script";
   public static final String SCRIPT_FORMAT = "dummy";
-  public static final String SCRIPT_ENGINE_FACTORY_SPI = "org.camunda.bpm.integrationtest.functional.scriptengine.engine.DummyScriptEngineFactory";
+  public static final String DUMMY_SCRIPT_ENGINE_FACTORY_SPI = "org.camunda.bpm.integrationtest.functional.scriptengine.engine.DummyScriptEngineFactory";
   public static final String SCRIPT_ENGINE_FACTORY_PATH = "META-INF/services/javax.script.ScriptEngineFactory";
 
   protected static StringAsset createScriptTaskProcess(String scriptFormat, String scriptText) {

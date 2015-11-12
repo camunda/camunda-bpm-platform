@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.impl.util;
 
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+
 
 /**
  * Util class for manipulating bit-flag in ints.
@@ -23,6 +25,8 @@ package org.camunda.bpm.engine.impl.util;
  * @author Frederik Heremans
  */
 public class BitMaskUtil {
+
+  private static final EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
 
   // First 8 masks as constant to prevent having to math.pow() every time a bit needs flippin'.
   private static final int FLAG_BIT_1 = 1;    // 000...00000001
@@ -41,11 +45,8 @@ public class BitMaskUtil {
    * @param current integer value
    * @param bitNumber number of the bit to set to '1' (right first bit starting at 1).
    */
-  public static int setBitOn(int value, int bitNumber) {
-    if(bitNumber <= 0 && bitNumber > 8) {
-      throw new IllegalArgumentException("Only bits 1 htrough 8 are supported");
-    }
-
+  public static int setBitOn(final int value, final int bitNumber) {
+    ensureBitRange(bitNumber);
     // To turn on, OR with the correct mask
     return value | MASKS[bitNumber - 1];
   }
@@ -56,10 +57,7 @@ public class BitMaskUtil {
    * @param bitNumber number of the bit to set to '0' (right first bit starting at 1).
    */
   public static int setBitOff(int value, int bitNumber) {
-    if(bitNumber <= 0 && bitNumber > 8) {
-      throw new IllegalArgumentException("Only bits 1 htrough 8 are supported");
-    }
-
+    ensureBitRange(bitNumber);
     // To turn on, OR with the correct mask
     return value &~MASKS[bitNumber - 1];
   }
@@ -70,10 +68,7 @@ public class BitMaskUtil {
    * @param number of bit to check (right first bit starting at 1)
    */
   public static boolean isBitOn(int value, int bitNumber) {
-    if(bitNumber <= 0 && bitNumber > 8) {
-      throw new IllegalArgumentException("Only bits 1 htrough 8 are supported");
-    }
-
+    ensureBitRange(bitNumber);
     return ((value & MASKS[bitNumber - 1]) == MASKS[bitNumber - 1]);
   }
 
@@ -87,12 +82,19 @@ public class BitMaskUtil {
   {
     if(bitValue) {
       return setBitOn(value, bitNumber);
-    } else {
+    }
+    else {
       return setBitOff(value, bitNumber);
     }
   }
 
   public static int getMaskForBit(int bitNumber) {
     return MASKS[bitNumber - 1];
+  }
+
+  private static void ensureBitRange(final int bitNumber) {
+    if(bitNumber <= 0 && bitNumber > 8) {
+      throw LOG.invalidBitNumber(bitNumber);
+    }
   }
 }

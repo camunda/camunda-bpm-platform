@@ -14,9 +14,8 @@ package org.camunda.bpm.engine.impl.cmd;
 
 
 import java.util.List;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.ProcessInstanceModificationBuilderImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -31,8 +30,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.PropertyChange;
  */
 public class ModifyProcessInstanceCmd implements Command<Void> {
 
-  private static final Logger LOG = Logger.getLogger(ModifyProcessInstanceCmd.class.getName());
-  protected static final String INSTRUCTION_LOG_FORMAT = "Modifying process instance '%s': Instruction %s: %s";
+  private final static CmdLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
   protected ProcessInstanceModificationBuilderImpl builder;
 
@@ -55,7 +53,7 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
 
     for (int i = 0; i < instructions.size(); i++) {
       AbstractProcessInstanceModificationCommand instruction = instructions.get(i);
-      logInstruction(processInstanceId, i, instruction);
+      LOG.debugModificationInstruction(processInstanceId, i + 1, instruction.describe());
 
       instruction.setSkipCustomListeners(builder.isSkipCustomListeners());
       instruction.setSkipIoMappings(builder.isSkipIoMappings());
@@ -79,10 +77,6 @@ public class ModifyProcessInstanceCmd implements Command<Void> {
     commandContext.getOperationLogManager().logProcessInstanceOperation(getLogEntryOperation(), processInstanceId, null, null, PropertyChange.EMPTY_CHANGE);
 
     return null;
-  }
-
-  protected void logInstruction(String processInstanceId, int index, AbstractProcessInstanceModificationCommand instruction) {
-    LOG.info(String.format(INSTRUCTION_LOG_FORMAT, processInstanceId, index + 1, instruction.describe()));
   }
 
   protected String getLogEntryOperation() {

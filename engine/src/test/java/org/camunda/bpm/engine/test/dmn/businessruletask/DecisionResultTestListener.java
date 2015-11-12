@@ -13,7 +13,7 @@
 
 package org.camunda.bpm.engine.test.dmn.businessruletask;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.bpmn.behavior.DecisionRuleTaskActivityBehavior;
@@ -23,14 +23,14 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.DecisionRuleTaskActivityBehavio
  */
 public class DecisionResultTestListener implements ExecutionListener {
 
-  public static DmnDecisionResult decisionResult = null;
+  public static DmnDecisionTableResult decisionResult = null;
 
   @Override
   public void notify(DelegateExecution execution) throws Exception {
-    decisionResult = (DmnDecisionResult) execution.getVariable(DecisionRuleTaskActivityBehavior.DECISION_RESULT_VARIABLE);
+    decisionResult = (DmnDecisionTableResult) execution.getVariable(DecisionRuleTaskActivityBehavior.DECISION_RESULT_VARIABLE);
   }
 
-  public static DmnDecisionResult getDecisionResult() {
+  public static DmnDecisionTableResult getDecisionResult() {
     return decisionResult;
   }
 

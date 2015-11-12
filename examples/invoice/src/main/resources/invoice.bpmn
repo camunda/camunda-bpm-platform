@@ -81,7 +81,7 @@ If data is missing, provide it.]]></documentation>
     </sequenceFlow>
     <dataStoreReference id="DataStoreReference_1" name="Financial Accounting System" dataStoreRef="FinancialAccountingSystem"/>
     <businessRuleTask id="assignApprover" camunda:decisionRef="invoice-assign-approver" name="Assign Approver Group"
-      camunda:mapDecisionResult="collectValues" camunda:resultVariable="approverGroups">
+      camunda:mapDecisionResult="collectEntries" camunda:resultVariable="approverGroups">
       <incoming>SequenceFlow_1</incoming>
       <outgoing>sequenceFlow_178</outgoing>
     </businessRuleTask>

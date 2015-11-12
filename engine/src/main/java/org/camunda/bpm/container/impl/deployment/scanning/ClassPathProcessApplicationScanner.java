@@ -22,13 +22,12 @@ import java.net.URLDecoder;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.camunda.bpm.container.impl.ContainerIntegrationLogger;
 import org.camunda.bpm.container.impl.deployment.scanning.spi.ProcessApplicationScanner;
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 
 /**
@@ -42,7 +41,7 @@ import org.camunda.bpm.engine.impl.util.IoUtil;
  */
 public class ClassPathProcessApplicationScanner implements ProcessApplicationScanner  {
 
-  private static Logger log = Logger.getLogger(ClassPathProcessApplicationScanner.class.getName());
+  private final static ContainerIntegrationLogger LOG = ProcessEngineLogger.CONTAINER_INTEGRATION_LOGGER;
 
   public Map<String, byte[]> findResources(ClassLoader classLoader, String paResourceRootPath, URL metaFileUrl) {
     return findResources(classLoader, paResourceRootPath, metaFileUrl, null);
@@ -127,11 +126,12 @@ public class ClassPathProcessApplicationScanner implements ProcessApplicationSca
 
     try {
       urlPath = URLDecoder.decode(urlPath, "UTF-8");
-    } catch (UnsupportedEncodingException e) {
-      throw new ProcessEngineException("Could not decode pathname using utf-8 decoder.", e);
+    }
+    catch (UnsupportedEncodingException e) {
+      throw LOG.cannotDecodePathName(e);
     }
 
-    log.log(Level.FINEST, "Rootpath is {0}", urlPath);
+    LOG.debugRootPath(urlPath);
 
     scanPath(urlPath, paResourceRootPath, isPaLocal, additionalResourceSuffixes, resourceMap);
 
@@ -150,7 +150,8 @@ public class ClassPathProcessApplicationScanner implements ProcessApplicationSca
       String path = file.getPath();
       String rootPath = path.endsWith(File.separator) ? path : path+File.separator;
       handleDirectory(file, rootPath,  paResourceRootPath, paResourceRootPath, isPaLocal, additionalResourceSuffixes, resourceMap);
-    } else {
+    }
+    else {
       handleArchive(file, paResourceRootPath, additionalResourceSuffixes, resourceMap);
     }
   }
@@ -185,8 +186,9 @@ public class ClassPathProcessApplicationScanner implements ProcessApplicationSca
         }
       }
       zipFile.close();
-    } catch (IOException e) {
-      throw new ProcessEngineException("IOException while scanning archive '"+file+"'.", e);
+    }
+    catch (IOException e) {
+      throw LOG.exceptionWhileScanning(file.getAbsolutePath(), e);
     }
   }
 
@@ -232,7 +234,8 @@ public class ClassPathProcessApplicationScanner implements ProcessApplicationSca
               addResource(file, resourceMap, paResourceRootPath, diagramFileName.replace(rootPath, "").replace("\\", "/"));
             }
           }
-        } else if (path.isDirectory()) {
+        }
+        else if (path.isDirectory()) {
           handleDirectory(path, rootPath, localPath, paResourceRootPath, isPaLocal, additionalResourceSuffixes, resourceMap);
         }
       }
@@ -243,7 +246,7 @@ public class ClassPathProcessApplicationScanner implements ProcessApplicationSca
 
     String resourcePath = (resourceRootPath == null ? "" : resourceRootPath).concat(resourceName);
 
-    log.log(Level.FINEST, "discovered process resource {0}", resourcePath);
+    LOG.debugDiscoveredResource(resourcePath);
 
     InputStream inputStream = null;
 
@@ -251,17 +254,20 @@ public class ClassPathProcessApplicationScanner implements ProcessApplicationSca
       if(source instanceof File) {
         try {
           inputStream = new FileInputStream((File) source);
-        } catch (IOException e) {
-          throw new ProcessEngineException("Could not open file for reading "+source + ". "+e.getMessage(), e);
         }
-      } else {
+        catch (IOException e) {
+          throw LOG.cannotOpenFileInputStream(((File) source).getAbsolutePath(), e);
+        }
+      }
+      else {
         inputStream = (InputStream) source;
       }
       byte[] bytes = IoUtil.readInputStream(inputStream, resourcePath);
 
       resourceMap.put(resourceName, bytes);
 
-    } finally {
+    }
+    finally {
       if(inputStream != null) {
         IoUtil.closeSilently(inputStream);
       }
@@ -272,8 +278,9 @@ public class ClassPathProcessApplicationScanner implements ProcessApplicationSca
     Enumeration<URL> resourceRoots;
     try {
       resourceRoots = classLoader.getResources(strippedPaResourceRootPath);
-    } catch (IOException e) {
-      throw new ProcessEngineException("Could not load resources at '"+strippedPaResourceRootPath+"' using classloaded '"+classLoader+"'", e);
+    }
+    catch (IOException e) {
+      throw LOG.couldNotGetResource(strippedPaResourceRootPath, classLoader, e);
     }
     return resourceRoots;
   }
@@ -281,7 +288,8 @@ public class ClassPathProcessApplicationScanner implements ProcessApplicationSca
   protected boolean isBelowPath(String processFileName, String paResourceRootPath) {
     if(paResourceRootPath == null || paResourceRootPath.length() ==0 ) {
       return true;
-    } else {
+    }
+    else {
       return processFileName.startsWith(paResourceRootPath);
     }
   }

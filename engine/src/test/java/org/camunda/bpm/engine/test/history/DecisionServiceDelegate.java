@@ -24,7 +24,7 @@ public class DecisionServiceDelegate implements JavaDelegate {
 
     DecisionService decisionService = execution.getProcessEngineServices().getDecisionService();
 
-    decisionService.evaluateDecisionByKey("testDecision", execution.getVariables());
+    decisionService.evaluateDecisionTableByKey("testDecision", execution.getVariables());
   }
 
 }

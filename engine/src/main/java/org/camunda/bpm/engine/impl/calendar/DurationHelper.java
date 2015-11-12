@@ -25,12 +25,16 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
 
 /**
  * helper class for parsing ISO8601 duration format (also recurring) and computing next timer date
  */
 public class DurationHelper {
+
+  private final static EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
 
   Date start;
 
@@ -52,7 +56,7 @@ public class DurationHelper {
     datatypeFactory = DatatypeFactory.newInstance();
 
     if (expression.size() > 3 || expression.isEmpty()) {
-      throw new ProcessEngineException("Cannot parse duration");
+      throw LOG.cannotParseDuration(expressions);
     }
     if (expression.get(0).startsWith("R")) {
       isRepeat = true;

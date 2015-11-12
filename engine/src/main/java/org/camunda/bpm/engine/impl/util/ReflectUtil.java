@@ -26,9 +26,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
-import org.camunda.bpm.engine.ClassLoadingException;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 
@@ -40,7 +39,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
  */
 public abstract class ReflectUtil {
 
-  private static final Logger LOG = Logger.getLogger(ReflectUtil.class.getName());
+  private static final EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
 
   private static final Map<String, String> charEncodings = new HashMap<String, String>();
 
@@ -70,9 +69,10 @@ public abstract class ReflectUtil {
 
    if(classLoader != null) {
      try {
-       LOG.finest("Trying to load class with custom classloader: " + className);
+       LOG.debugClassLoading(className, "custom classloader", classLoader);
        clazz = Class.forName(className, true, classLoader);
-     } catch(Throwable t) {
+     }
+     catch(Throwable t) {
        throwable = t;
      }
    }
@@ -80,19 +80,22 @@ public abstract class ReflectUtil {
      try {
        ClassLoader contextClassloader = ClassLoaderUtil.getContextClassloader();
        if(contextClassloader != null) {
-         LOG.finest("Trying to load class with current thread context classloader: " + className);
+         LOG.debugClassLoading(className, "current thread context classloader", contextClassloader);
          clazz = Class.forName(className, true, contextClassloader);
        }
-     } catch(Throwable t) {
+     }
+     catch(Throwable t) {
        if(throwable == null) {
          throwable = t;
        }
      }
      if(clazz == null) {
        try {
-         LOG.finest("Trying to load class with local classloader: " + className);
-         clazz = Class.forName(className, true, ClassLoaderUtil.getClassloader(ReflectUtil.class));
-       } catch(Throwable t) {
+         ClassLoader localClassloader = ClassLoaderUtil.getClassloader(ReflectUtil.class);
+         LOG.debugClassLoading(className, "local classloader", localClassloader);
+         clazz = Class.forName(className, true, localClassloader);
+       }
+       catch(Throwable t) {
          if(throwable == null) {
            throwable = t;
          }
@@ -101,7 +104,7 @@ public abstract class ReflectUtil {
    }
 
    if(clazz == null) {
-     throw new ClassLoadingException(className, throwable);
+     throw LOG.classLoadingException(className, throwable);
    }
    return clazz;
   }
@@ -164,8 +167,9 @@ public abstract class ReflectUtil {
   public static URI urlToURI(URL url) {
     try {
       return url.toURI();
-    } catch (URISyntaxException e) {
-      throw new ProcessEngineException("couldn't convert URL to URI " + url, e);
+    }
+    catch (URISyntaxException e) {
+      throw LOG.cannotConvertUrlToUri(url, e);
     }
   }
 
@@ -174,16 +178,18 @@ public abstract class ReflectUtil {
     try {
       Class< ? > clazz = loadClass(className);
       return clazz.newInstance();
-    } catch (Exception e) {
-      throw new ProcessEngineException("couldn't instantiate class "+className, e);
+    }
+    catch (Exception e) {
+      throw LOG.exceptionWhileInstantiatingClass(className, e);
     }
   }
 
   public static <T> T instantiate(Class<T> type) {
     try {
       return type.newInstance();
-    } catch (Exception e) {
-      throw new ProcessEngineException("couldn't instantiate class "+type, e);
+    }
+    catch (Exception e) {
+      throw LOG.exceptionWhileInstantiatingClass(type.getName(), e);
     }
   }
 
@@ -193,8 +199,9 @@ public abstract class ReflectUtil {
       Method method = findMethod(clazz, methodName, args);
       method.setAccessible(true);
       return method.invoke(target, args);
-    } catch (Exception e) {
-      throw new ProcessEngineException("couldn't invoke "+methodName+" on "+target, e);
+    }
+    catch (Exception e) {
+      throw LOG.exceptionWhileInvokingMethod(methodName, target, e);
     }
   }
 
@@ -212,9 +219,11 @@ public abstract class ReflectUtil {
     Field field = null;
     try {
       field = clazz.getDeclaredField(fieldName);
-    } catch (SecurityException e) {
-      throw new ProcessEngineException("not allowed to access field " + field + " on class " + clazz.getCanonicalName());
-    } catch (NoSuchFieldException e) {
+    }
+    catch (SecurityException e) {
+      throw LOG.unableToAccessField(field, clazz.getName());
+    }
+    catch (NoSuchFieldException e) {
       // for some reason getDeclaredFields doesnt search superclasses
       // (which getFields() does ... but that gives only public fields)
       Class<?> superClass = clazz.getSuperclass();
@@ -229,10 +238,9 @@ public abstract class ReflectUtil {
     try {
       field.setAccessible(true);
       field.set(object, value);
-    } catch (IllegalArgumentException e) {
-      throw new ProcessEngineException("Could not set field " + field.toString(), e);
-    } catch (IllegalAccessException e) {
-      throw new ProcessEngineException("Could not set field " + field.toString(), e);
+    }
+    catch (Exception e) {
+      throw LOG.exceptionWhileSettingField(field, object, value, e);
     }
   }
 
@@ -254,8 +262,9 @@ public abstract class ReflectUtil {
         }
       }
       return null;
-    } catch (SecurityException e) {
-      throw new ProcessEngineException("Not allowed to access method " + setterName + " on class " + clazz.getCanonicalName());
+    }
+    catch (SecurityException e) {
+      throw LOG.unableToAccessMethod(setterName, clazz.getName());
     }
   }
 
@@ -284,15 +293,16 @@ public abstract class ReflectUtil {
       }
 
       if (parameterTypes.size() > 1) {
-        throw new ProcessEngineException("There exists more than one setter method with different argument types named " + setterName + " on class " + clazz.getCanonicalName());
+        throw LOG.ambiguousSetterMethod(setterName, clazz.getName());
       }
       if (candidates.size() >= 1) {
         return candidates.get(0);
       }
 
       return null;
-    } catch (SecurityException e) {
-      throw new ProcessEngineException("Not allowed to access method " + setterName + " on class " + clazz.getCanonicalName());
+    }
+    catch (SecurityException e) {
+      throw LOG.unableToAccessMethod(setterName, clazz.getName());
     }
   }
 
@@ -323,8 +333,9 @@ public abstract class ReflectUtil {
     ensureNotNull("couldn't find constructor for " + className + " with args " + Arrays.asList(args), "constructor", constructor);
     try {
       return constructor.newInstance(args);
-    } catch (Exception e) {
-      throw new ProcessEngineException("couldn't find constructor for " + className + " with args " + Arrays.asList(args), e);
+    }
+    catch (Exception e) {
+      throw LOG.exceptionWhileInstantiatingClass(className, e);
     }
   }
 
@@ -379,7 +390,7 @@ public abstract class ReflectUtil {
    * @param methodName the name of the method to look for
    * @param parameterTypes the types of the parameters
    */
-  public static Method getMethod(Class declaringType, String methodName, Class<?>... parameterTypes) {
+  public static Method getMethod(Class<?> declaringType, String methodName, Class<?>... parameterTypes) {
     return findMethod(declaringType, methodName, parameterTypes);
   }
 }

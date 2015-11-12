@@ -28,8 +28,9 @@ import org.camunda.bpm.engine.impl.cmmn.handler.SentryHandler;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
-import org.camunda.bpm.model.cmmn.impl.instance.Body;
-import org.camunda.bpm.model.cmmn.impl.instance.ConditionExpression;
+import org.camunda.bpm.model.cmmn.instance.Body;
+import org.camunda.bpm.model.cmmn.instance.ConditionExpression;
+import org.camunda.bpm.model.cmmn.instance.ExitCriterion;
 import org.camunda.bpm.model.cmmn.instance.IfPart;
 import org.camunda.bpm.model.cmmn.instance.Sentry;
 import org.junit.Test;
@@ -78,7 +79,7 @@ public class CasePlanModelHandlerTest extends CmmnElementHandlerTest {
     CmmnActivity activity = handler.handleElement(casePlanModel, context);
 
     // then
-    assertEquals(description, (String) activity.getProperty(PROPERTY_ACTIVITY_DESCRIPTION));
+    assertEquals(description, activity.getProperty(PROPERTY_ACTIVITY_DESCRIPTION));
   }
 
   @Test
@@ -131,7 +132,8 @@ public class CasePlanModelHandlerTest extends CmmnElementHandlerTest {
     body.setTextContent("${test}");
 
     // set exitCriteria
-    casePlanModel.getExitCriterias().add(sentry);
+    ExitCriterion criterion = createElement(casePlanModel, ExitCriterion.class);
+    criterion.setSentry(sentry);
 
     // transform casePlanModel
     CmmnActivity newActivity = handler.handleElement(casePlanModel, context);
@@ -162,21 +164,21 @@ public class CasePlanModelHandlerTest extends CmmnElementHandlerTest {
     Sentry sentry1 = createElement(casePlanModel, "Sentry_1", Sentry.class);
     IfPart ifPart1 = createElement(sentry1, "abc", IfPart.class);
     ConditionExpression conditionExpression1 = createElement(ifPart1, "def", ConditionExpression.class);
-    Body body1 = createElement(conditionExpression1, null, Body.class);
-    body1.setTextContent("${test}");
+    conditionExpression1.setText("${test}");
 
     // set first exitCriteria
-    casePlanModel.getExitCriterias().add(sentry1);
+    ExitCriterion criterion1 = createElement(casePlanModel, ExitCriterion.class);
+    criterion1.setSentry(sentry1);
 
     // create first sentry containing ifPart
     Sentry sentry2 = createElement(casePlanModel, "Sentry_2", Sentry.class);
     IfPart ifPart2 = createElement(sentry2, "ghi", IfPart.class);
     ConditionExpression conditionExpression2 = createElement(ifPart2, "jkl", ConditionExpression.class);
-    Body body2 = createElement(conditionExpression2, null, Body.class);
-    body2.setTextContent("${test}");
+    conditionExpression2.setText("${test}");
 
     // set second exitCriteria
-    casePlanModel.getExitCriterias().add(sentry2);
+    ExitCriterion criterion2 = createElement(casePlanModel, ExitCriterion.class);
+    criterion2.setSentry(sentry2);
 
     // transform casePlanModel
     CmmnActivity newActivity = handler.handleElement(casePlanModel, context);

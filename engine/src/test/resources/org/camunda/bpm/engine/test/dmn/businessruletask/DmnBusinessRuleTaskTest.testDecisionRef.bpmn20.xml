@@ -9,9 +9,9 @@
 
     <sequenceFlow sourceRef="start" targetRef="task" />
 
-    <businessRuleTask id="task" 
-      camunda:decisionRef="testDecision" 
-      camunda:mapDecisionResult="singleValue" 
+    <businessRuleTask id="task"
+      camunda:decisionRef="testDecision"
+      camunda:mapDecisionResult="singleEntry"
       camunda:resultVariable="result" />
 
     <sequenceFlow sourceRef="task" targetRef="end" />

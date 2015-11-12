@@ -679,7 +679,7 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
 
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("input1", "test");
-    decisionService.evaluateDecisionByKey(DECISION_DEFINITION_KEY, variables);
+    decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY, variables);
 
     String decisionDefinitionId = repositoryService.createDecisionDefinitionQuery().decisionDefinitionKey(DECISION_DEFINITION_KEY).singleResult().getId();
 

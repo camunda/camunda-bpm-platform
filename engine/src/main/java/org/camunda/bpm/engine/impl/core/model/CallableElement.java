@@ -108,14 +108,14 @@ public class CallableElement extends BaseCallableElement {
     this.outputs.addAll(outputs);
   }
 
-  public VariableMap getOutputVariables(VariableScope variableScope) {
+  public VariableMap getOutputVariables(VariableScope calledElementScope) {
     List<CallableElementParameter> outputs = getOutputs();
-    return getVariables(outputs, variableScope);
+    return getVariables(outputs, calledElementScope);
   }
 
-  public VariableMap getOutputVariablesLocal(VariableScope variableScope) {
+  public VariableMap getOutputVariablesLocal(VariableScope calledElementScope) {
     List<CallableElementParameter> outputs = getOutputsLocal();
-    return getVariables(outputs, variableScope);
+    return getVariables(outputs, calledElementScope);
   }
 
   // variables //////////////////////////////////////////////////////////////////

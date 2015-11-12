@@ -12,11 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.dmn.deployer;
 
-import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
+import org.camunda.bpm.dmn.engine.impl.spi.transform.DmnTransformer;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.AbstractDefinitionDeployer;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
@@ -25,12 +21,9 @@ import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
-import org.camunda.bpm.model.dmn.Dmn;
-import org.camunda.bpm.model.dmn.DmnModelInstance;
-import org.camunda.bpm.model.dmn.instance.Decision;
-import org.camunda.bpm.dmn.engine.DmnDecision;
-import org.camunda.bpm.dmn.engine.DmnDecisionModel;
-import org.camunda.bpm.dmn.engine.transform.DmnTransformer;
+
+import java.io.ByteArrayInputStream;
+import java.util.List;
 
 /**
  * {@link Deployer} responsible to parse DMN 1.0 XML files and create the
@@ -51,8 +44,7 @@ public class DmnDeployer extends AbstractDefinitionDeployer<DecisionDefinitionEn
     ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
 
     try {
-      DmnDecisionModel decisionModel = transformer.createTransform().setModelInstance(inputStream).transform();
-      return decisionModel.getDecisions();
+      return transformer.createTransform().modelInstance(inputStream).transformDecisions();
     }
     catch (Exception e) {
       throw new ProcessEngineException("Unable to transform DMN resource '" + resource.getName() + "'", e);

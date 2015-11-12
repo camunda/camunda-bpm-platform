@@ -17,7 +17,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.variable.Variables;
@@ -69,8 +69,8 @@ public class DecisionContextSwitchTest extends AbstractFoxPlatformIntegrationTes
   @Test
   @OperateOnDeployment("clientDeployment")
   public void shouldSwitchContextWhenUsingDecisionService() {
-    DmnDecisionResult decisionResult = decisionService.evaluateDecisionByKey("decision", Variables.createVariables());
-    assertEquals("ok", decisionResult.getFirstOutput().getFirstValue());
+    DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableByKey("decision", Variables.createVariables());
+    assertEquals("ok", decisionResult.getFirstResult().getFirstEntry());
   }
 
   @Test
@@ -115,8 +115,8 @@ public class DecisionContextSwitchTest extends AbstractFoxPlatformIntegrationTes
 
     try {
       // when then
-      DmnDecisionResult decisionResult = decisionService.evaluateDecisionByKey("decision", Variables.createVariables());
-      assertEquals("ok", decisionResult.getFirstOutput().getFirstValue());
+      DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableByKey("decision", Variables.createVariables());
+      assertEquals("ok", decisionResult.getFirstResult().getFirstEntry());
     }
     finally {
       repositoryService.deleteDeployment(deployment2.getId(), true);

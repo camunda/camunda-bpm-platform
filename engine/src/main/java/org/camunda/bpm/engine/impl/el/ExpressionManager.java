@@ -12,7 +12,10 @@
  */
 package org.camunda.bpm.engine.impl.el;
 
-import org.camunda.bpm.engine.delegate.Expression;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.javax.el.ArrayELResolver;
@@ -26,10 +29,6 @@ import org.camunda.bpm.engine.impl.javax.el.MapELResolver;
 import org.camunda.bpm.engine.impl.javax.el.ValueExpression;
 import org.camunda.bpm.engine.impl.juel.ExpressionFactoryImpl;
 import org.camunda.bpm.engine.variable.context.VariableContext;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 
 /**

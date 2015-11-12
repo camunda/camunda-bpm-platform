@@ -15,12 +15,11 @@ package org.camunda.bpm.engine.impl.util;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
 import org.camunda.bpm.engine.ArtifactFactory;
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.parser.FieldDeclaration;
 import org.camunda.bpm.engine.impl.context.Context;
 
@@ -29,6 +28,8 @@ import org.camunda.bpm.engine.impl.context.Context;
  *
  */
 public class ClassDelegateUtil {
+
+  private static final EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
 
   public static Object instantiateDelegate(Class<?> clazz, List<FieldDeclaration> fieldDeclarations) {
     return instantiateDelegate(clazz.getName(), fieldDeclarations);
@@ -44,8 +45,9 @@ public class ClassDelegateUtil {
 
       applyFieldDeclaration(fieldDeclarations, object);
       return object;
-    } catch (Exception e) {
-      throw new ProcessEngineException("couldn't instantiate class " + className, e);
+    }
+    catch (Exception e) {
+      throw LOG.exceptionWhileInstantiatingClass(className, e);
     }
 
   }
@@ -65,22 +67,17 @@ public class ClassDelegateUtil {
     if(setterMethod != null) {
       try {
         setterMethod.invoke(target, declaration.getValue());
-      } catch (IllegalArgumentException e) {
-        throw new ProcessEngineException("Error while invoking '" + declaration.getName() + "' on class " + target.getClass().getName(), e);
-      } catch (IllegalAccessException e) {
-        throw new ProcessEngineException("Illegal acces when calling '" + declaration.getName() + "' on class " + target.getClass().getName(), e);
-      } catch (InvocationTargetException e) {
-        throw new ProcessEngineException("Exception while invoking '" + declaration.getName() + "' on class " + target.getClass().getName(), e);
       }
-    } else {
+      catch (Exception e) {
+        throw LOG.exceptionWhileApplyingFieldDeclatation(declaration.getName(), target.getClass().getName(), e);
+      }
+    }
+    else {
       Field field = ReflectUtil.getField(declaration.getName(), target);
       ensureNotNull("Field definition uses unexisting field '" + declaration.getName() + "' on class " + target.getClass().getName(), "field", field);
       // Check if the delegate field's type is correct
       if (!fieldTypeCompatible(declaration, field)) {
-        throw new ProcessEngineException("Incompatible type set on field declaration '" + declaration.getName()
-          + "' for class " + target.getClass().getName()
-          + ". Declared value has type " + declaration.getValue().getClass().getName()
-          + ", while expecting " + field.getType().getName());
+        throw LOG.incompatibleTypeForFieldDeclaration(declaration, target, field);
       }
       ReflectUtil.setField(field, target, declaration.getValue());
     }

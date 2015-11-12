@@ -670,51 +670,6 @@ public interface CmmnActivityExecution extends DelegateCaseExecution {
   void setRequired(boolean required);
 
   /**
-   * <p>Returns true, if <code>this</code> case execution is repeatable.</p>
-   *
-   * <p>A case execution is repeatable, if the associated repetition rule
-   * evaluates to true. The repetition rule will be evaluated when <code>this</code>
-   * case execution performs the transition <code>create</code> (and cannot be re-evaluated
-   * during the lifecycle of <code>this</code> case execution.</p>
-   *
-   * @return true if <code>this</code> case execution is repeatable.
-   */
-  boolean isRepeatable();
-
-  /**
-   * <p>Sets <code>this</code> case execution as repeatable or not repeatable.</p>
-   *
-   * @param repeatable a boolean value whether <code>this</code> case execution
-   * is repeatable or not repeatable.
-   */
-  void setRepeatable(boolean repeatable);
-
-  /**
-   * <p>Returns true, if <code>this</code> case execution is a repetition.</p>
-   *
-   * <p>For example:</p>
-   * <p>There exists a task containing a repetition rule which evaluates to
-   * true when creating the corresponding case execution <code>x</code>. This
-   * case execution instance <code>x</code> is repeatable (<code>x.isRepeatable() == true</code>),
-   * but <code>x</code> is not a repetition (<code>x.isRepetition() == false</code>). If
-   * a new case execution <code>x'</code> of the same task will be created, because the
-   * criterion for the repetition is satisfied (e.g. entryCriterion is satisfied),
-   * then the case execution <code>x'</code> is a repetition of <code>x</code> and
-   * <code>x'.isRepetition()</code> returns true.</p>
-   *
-   * @return true if <code>this</code> case execution is a repetition.
-   */
-  boolean isRepetition();
-
-  /**
-   * <p>Sets <code>this</code> case execution as a repetition or not as repetition.</p>
-   *
-   * @param repetition a boolean value whether <code>this</code> case execution
-   * is a repetition or not a repetition.
-   */
-  void setRepetition(boolean repetition);
-
-  /**
    * <p>Removes <code>this</code> case execution from the parent case execution.</p>
    */
   void remove();

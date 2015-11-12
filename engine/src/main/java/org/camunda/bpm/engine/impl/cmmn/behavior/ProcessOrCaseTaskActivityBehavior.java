@@ -17,7 +17,6 @@ import java.util.Map;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
-import org.camunda.bpm.engine.impl.core.model.BaseCallableElement;
 import org.camunda.bpm.engine.impl.core.model.BaseCallableElement.CallableElementBinding;
 import org.camunda.bpm.engine.impl.core.model.CallableElement;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -40,9 +39,9 @@ public abstract class ProcessOrCaseTaskActivityBehavior extends TaskActivityBeha
     }
   }
 
-  public void transferVariables(VariableScope from, VariableScope to) {
-    VariableMap variables = getOutputVariables(from);
-    to.setVariables(variables);
+  public void transferVariables(VariableScope sourceScope, CmmnActivityExecution caseExecution) {
+    VariableMap variables = getOutputVariables(sourceScope);
+    caseExecution.setVariables(variables);
   }
 
   public CallableElement getCallableElement() {

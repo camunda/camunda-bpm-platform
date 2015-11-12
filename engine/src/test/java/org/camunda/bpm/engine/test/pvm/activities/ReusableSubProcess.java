@@ -37,13 +37,10 @@ public class ReusableSubProcess implements SubProcessActivityBehavior {
   public void execute(ActivityExecution execution) throws Exception {
     PvmProcessInstance subProcessInstance = execution.createSubProcessInstance(processDefinition);
 
-    // TODO set variables
-
     subProcessInstance.start();
   }
 
-  public void passOutputVariablesFromSubprocess(VariableScope execution, VariableScope subProcessInstance) {
-    // TODO extract information from the subprocess and inject it into the superprocess
+  public void passOutputVariables(ActivityExecution targetExecution, VariableScope calledElementInstance) {
   }
 
   public void completed(ActivityExecution execution) throws Exception {

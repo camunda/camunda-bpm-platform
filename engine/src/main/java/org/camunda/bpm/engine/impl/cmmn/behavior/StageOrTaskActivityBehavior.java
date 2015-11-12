@@ -38,7 +38,6 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
 
   protected void creating(CmmnActivityExecution execution) {
     evaluateRequiredRule(execution);
-    evaluateRepetitionRule(execution);
   }
 
   public void created(CmmnActivityExecution execution) {
@@ -124,7 +123,6 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
     String id = execution.getId();
 
     if (execution.isTerminated()) {
-      String message = "Case execution '"+id+"' is already terminated.";
       throw LOG.alreadyTerminatedException("exit", id);
     }
 
@@ -207,7 +205,6 @@ public abstract class StageOrTaskActivityBehavior extends PlanItemDefinitionActi
 
   public void fireEntryCriteria(CmmnActivityExecution execution) {
     boolean manualActivation = evaluateManualActivationRule(execution);
-
     if (manualActivation) {
       execution.enable();
 

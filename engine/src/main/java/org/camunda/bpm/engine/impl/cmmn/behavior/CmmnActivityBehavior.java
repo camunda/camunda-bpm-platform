@@ -69,6 +69,6 @@ public interface CmmnActivityBehavior extends CoreActivityBehavior<CmmnActivityE
 
   public void fireExitCriteria(CmmnActivityExecution execution);
 
-  public void repeat(CmmnActivityExecution execution);
+  public void repeat(CmmnActivityExecution execution, String standardEvent);
 
 }

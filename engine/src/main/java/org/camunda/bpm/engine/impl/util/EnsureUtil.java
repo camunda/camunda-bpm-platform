@@ -21,12 +21,16 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.context.Context;
 
 /**
  * @author Sebastian Menski
  * @author Roman Smirnov
  */
 public final class EnsureUtil {
+
+  private static final EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
 
   public static void ensureNotNull(String variableName, Object value) {
     ensureNotNull("", variableName, value);
@@ -324,8 +328,9 @@ public final class EnsureUtil {
 
       return constructor.newInstance(formattedMessage);
 
-    } catch (Exception e) {
-      throw new ProcessEngineException("Couldn't instantiate class " + exceptionClass.getName(), e);
+    }
+    catch (Exception e) {
+      throw LOG.exceptionWhileInstantiatingClass(exceptionClass.getName(), e);
     }
 
   }
@@ -340,6 +345,12 @@ public final class EnsureUtil {
     }
     else {
       return "";
+    }
+  }
+
+  public static void ensureActiveCommandContext(String operation) {
+    if(Context.getCommandContext() == null) {
+      throw LOG.notInsideCommandContext(operation);
     }
   }
 

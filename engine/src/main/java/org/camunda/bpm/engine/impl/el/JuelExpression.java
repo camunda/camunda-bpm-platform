@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.impl.el;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.BaseDelegateExecution;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.delegate.ExpressionGetInvocation;
@@ -44,9 +45,13 @@ public class JuelExpression implements Expression {
   }
 
   public Object getValue(VariableScope variableScope) {
+    return getValue(variableScope, null);
+  }
+
+  public Object getValue(VariableScope variableScope, BaseDelegateExecution contextExecution) {
     ELContext elContext = expressionManager.getElContext(variableScope);
     try {
-      ExpressionGetInvocation invocation = new ExpressionGetInvocation(valueExpression, elContext);
+      ExpressionGetInvocation invocation = new ExpressionGetInvocation(valueExpression, elContext, contextExecution);
       Context.getProcessEngineConfiguration()
         .getDelegateInterceptor()
         .handleInvocation(invocation);
@@ -63,9 +68,13 @@ public class JuelExpression implements Expression {
   }
 
   public void setValue(Object value, VariableScope variableScope) {
+    setValue(value, variableScope, null);
+  }
+
+  public void setValue(Object value, VariableScope variableScope, BaseDelegateExecution contextExecution) {
     ELContext elContext = expressionManager.getElContext(variableScope);
     try {
-      ExpressionSetInvocation invocation = new ExpressionSetInvocation(valueExpression, elContext, value);
+      ExpressionSetInvocation invocation = new ExpressionSetInvocation(valueExpression, elContext, value, contextExecution);
       Context.getProcessEngineConfiguration()
         .getDelegateInterceptor()
         .handleInvocation(invocation);

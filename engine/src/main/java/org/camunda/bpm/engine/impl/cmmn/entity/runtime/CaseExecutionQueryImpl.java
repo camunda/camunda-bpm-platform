@@ -43,8 +43,6 @@ public class CaseExecutionQueryImpl extends AbstractVariableQueryImpl<CaseExecut
   protected String businessKey;
   protected CaseExecutionState state;
   protected Boolean required = false;
-  protected Boolean repeatable = false;
-  protected Boolean repetition = false;
 
   // Not used by end-users, but needed for dynamic ibatis query
   protected String superProcessInstanceId;
@@ -98,16 +96,6 @@ public class CaseExecutionQueryImpl extends AbstractVariableQueryImpl<CaseExecut
 
   public CaseExecutionQuery required() {
     this.required = true;
-    return this;
-  }
-
-  public CaseExecutionQuery repeatable() {
-    this.repeatable = true;
-    return this;
-  }
-
-  public CaseExecutionQuery repetition() {
-    this.repetition = true;
     return this;
   }
 
@@ -267,14 +255,6 @@ public class CaseExecutionQueryImpl extends AbstractVariableQueryImpl<CaseExecut
 
   public Boolean isRequired() {
     return required;
-  }
-
-  public Boolean isRepeatable() {
-    return repeatable;
-  }
-
-  public Boolean isRepetition() {
-    return repetition;
   }
 
 }

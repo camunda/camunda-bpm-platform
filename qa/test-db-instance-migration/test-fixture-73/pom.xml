@@ -11,8 +11,10 @@
   <packaging>jar</packaging>
   <name>camunda BPM - QA - upgrade - instance migration - test fixture - 7.3.0</name>
 
+  <!-- Due to https://issues.apache.org/jira/browse/MRELEASE-799 the release test fails when
+     the version is managed in a property. Thus we use explicit versions everywhere. -->
   <properties>
-    <camunda.version.current>7.3.0</camunda.version.current>
+<!--     <camunda.version.current>7.3.0</camunda.version.current> -->
     <camunda.version.previous>7.2.0</camunda.version.previous>
   </properties>
   
@@ -22,7 +24,18 @@
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
-      <version>${camunda.version.current}</version>
+      <version>7.3.0</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.camunda.bpm.model</groupId>
+      <artifactId>camunda-cmmn-model</artifactId>
+      <version>7.3.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.camunda.bpm.model</groupId>
+      <artifactId>camunda-xml-model</artifactId>
+      <version>7.3.0</version>
     </dependency>
     
     <dependency>
@@ -63,7 +76,7 @@
                   <artifactItem>
                     <groupId>org.camunda.bpm.distro</groupId>
                     <artifactId>camunda-sql-scripts</artifactId>
-                    <version>${camunda.version.current}</version>
+                    <version>7.3.0</version>
                     <type>test-jar</type>
                     <outputDirectory>${project.build.directory}/scripts-current</outputDirectory>
                     <overWrite>true</overWrite>
@@ -130,7 +143,7 @@
                 </goals>
                 <configuration>
                   <propertyPrefix>camunda.current</propertyPrefix>
-                  <versionString>${camunda.version.current}</versionString>
+                  <versionString>7.3.0</versionString>
                 </configuration>
               </execution>
               <execution>

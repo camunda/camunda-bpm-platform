@@ -76,7 +76,7 @@ create table ACT_RU_JOB (
     HANDLER_TYPE_ varchar(255),
     HANDLER_CFG_ varchar(4000),
     DEPLOYMENT_ID_ varchar(64),
-    SUSPENSION_STATE_ integer,
+    SUSPENSION_STATE_ integer NOT NULL DEFAULT 1,
     JOB_DEF_ID_ varchar(64),
     PRIORITY_ bigint NOT NULL DEFAULT 0,
     SEQUENCE_COUNTER_ integer,

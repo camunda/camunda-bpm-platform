@@ -27,16 +27,13 @@ public class CaseExecutionListenerInvocation extends DelegateInvocation {
   protected final DelegateCaseExecution caseExecution;
 
   public CaseExecutionListenerInvocation(CaseExecutionListener listenerInstance, DelegateCaseExecution caseExecution) {
+    super(caseExecution, null);
     this.listenerInstance = listenerInstance;
     this.caseExecution = caseExecution;
   }
 
   protected void invoke() throws Exception {
     listenerInstance.notify(caseExecution);
-  }
-
-  public Object getTarget() {
-    return listenerInstance;
   }
 
 }

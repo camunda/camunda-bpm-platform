@@ -44,7 +44,7 @@ public class DmnDeployerTest extends PluggableProcessEngineTestCase {
     DecisionDefinition decisionDefinition = query.singleResult();
 
     assertTrue(decisionDefinition.getId().startsWith("decision:1:"));
-    assertEquals("http://camunda.org/dmn", decisionDefinition.getCategory());
+    assertEquals("http://camunda.org/schema/1.0/dmn", decisionDefinition.getCategory());
     assertEquals("CheckOrder", decisionDefinition.getName());
     assertEquals("decision", decisionDefinition.getKey());
     assertEquals(1, decisionDefinition.getVersion());
@@ -75,7 +75,7 @@ public class DmnDeployerTest extends PluggableProcessEngineTestCase {
     DecisionDefinition decisionDefinition = query.singleResult();
 
     assertTrue(decisionDefinition.getId().startsWith("decision:1:"));
-    assertEquals("http://camunda.org/dmn", decisionDefinition.getCategory());
+    assertEquals("http://camunda.org/schema/1.0/dmn", decisionDefinition.getCategory());
     assertEquals("CheckOrder", decisionDefinition.getName());
     assertEquals("decision", decisionDefinition.getKey());
     assertEquals(1, decisionDefinition.getVersion());

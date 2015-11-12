@@ -14,7 +14,8 @@ package org.camunda.bpm.engine.impl.calendar;
 
 import java.util.Date;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
 
 
 /**
@@ -22,14 +23,17 @@ import org.camunda.bpm.engine.ProcessEngineException;
  */
 public class DurationBusinessCalendar implements BusinessCalendar {
 
+  private final static EngineUtilLogger LOG = ProcessEngineLogger.UTIL_LOGGER;
+
   public static String NAME = "duration";
 
   public Date resolveDuedate(String duedate) {
     try {
       DurationHelper dh = new DurationHelper(duedate);
       return dh.getDateAfter();
-    } catch (Exception e) {
-      throw new ProcessEngineException("couldn't resolve duedate: "+e.getMessage(), e);
+    }
+    catch (Exception e) {
+      throw LOG.exceptionWhileResolvingDuedate(duedate, e);
     }
   }
 }

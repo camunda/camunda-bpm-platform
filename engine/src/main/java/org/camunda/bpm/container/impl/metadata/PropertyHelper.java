@@ -18,7 +18,9 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.camunda.bpm.container.impl.ContainerIntegrationLogger;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 
 /**
@@ -28,6 +30,7 @@ import org.camunda.bpm.engine.impl.util.ReflectUtil;
  */
 public class PropertyHelper {
 
+  private final static ContainerIntegrationLogger LOG = ProcessEngineLogger.CONTAINER_INTEGRATION_LOGGER;
 
   /**
    * Regex for Ant-style property placeholders
@@ -79,11 +82,13 @@ public class PropertyHelper {
         Object value = PropertyHelper.convertToClass(stringValue, parameterClass);
 
         setter.invoke(configuration, value);
-      } catch (Exception e) {
-        throw new ProcessEngineException("Could not set value for property '"+key + "' on class " + configurationClass.getCanonicalName(), e);
       }
-    } else {
-      throw new ProcessEngineException("Could not find setter for property '"+ key + "' on class " + configurationClass.getCanonicalName());
+      catch (Exception e) {
+        throw LOG.cannotSetValueForProperty(key, configurationClass.getCanonicalName(), e);
+      }
+    }
+    else {
+      throw LOG.cannotFindSetterForProperty(key, configurationClass.getCanonicalName());
     }
   }
 

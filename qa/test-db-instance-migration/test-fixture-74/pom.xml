@@ -22,7 +22,6 @@
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
-      <version>${camunda.version.current}</version>
     </dependency>
 
     <dependency>
