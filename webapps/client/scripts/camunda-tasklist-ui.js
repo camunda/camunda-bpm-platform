@@ -79,7 +79,7 @@ define('camunda-tasklist-ui', [
     function parseUriConfig() {
       var $baseTag = angular.element('base');
       var config = {};
-      var names = ['href', 'app-root', 'admin-api', 'engine-api'];
+      var names = ['href', 'app-root', 'admin-api', 'tasklist-api', 'engine-api'];
       for(var i = 0; i < names.length; i++) {
         config[names[i]] = $baseTag.attr(names[i]);
       }
