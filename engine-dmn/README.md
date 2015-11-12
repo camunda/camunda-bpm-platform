@@ -32,16 +32,18 @@ public class DmnApp {
   public static void main(String[] args) {
 
     // configure the engine
-    DmnEngine dmnEngine = new DmnEngineConfigurationImpl().buildEngine();
+    DmnEngine dmnEngine = new DefaultDmnEngineConfiguration().buildEngine();
+
     // parse a decision
-    DmnDecision decision = dmnEngine.parseDecision("checkOrder.dmn");
+    DmnDecision decision = dmnEngine.parseDecision("orderDecision", "CheckOrder.dmn");
 
     Map<String, Object> data = new HashMap<String, Object>();
     data.put("status", "gold");
     data.put("sum", 354.12d);
 
     // evaluate a decision
-    DmnDecisionResult result = dmnEngine.evaluate(decision, data);
+    DmnDecisionTableResult result = dmnEngine.evaluateDecisionTable(decision, data);
+
   }
 
 }
