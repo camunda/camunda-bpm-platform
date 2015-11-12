@@ -336,12 +336,13 @@ public class TaskResourceImpl implements TaskResource {
 
   @Override
   public void deleteTask(String id) {
-	TaskService taskService = engine.getTaskService();
-	
-	try {
-		taskService.deleteTask(id);
-	} catch (NotValidException e) {
-		throw new InvalidRequestException(Status.BAD_REQUEST, e, "Could not delete task: " + e.getMessage());
-	}
+    TaskService taskService = engine.getTaskService();
+
+    try {
+      taskService.deleteTask(id);
+    }
+    catch (NotValidException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e, "Could not delete task: " + e.getMessage());
+    }
   }
 }
