@@ -73,6 +73,10 @@ define([], function() {
       return !isBpmnResource(resource) && !isCmmnResource(resource) && !isDmnResource(resource) && !isImageResource(resource);
     };
 
+    var ProcessDefinition = camAPI.resource('process-definition');
+    var CaseDefinition = camAPI.resource('case-definition');
+    var DecisionDefinition = camAPI.resource('decision-definition');
+
 
     // download link ////////////////////////////////////////////////
 
@@ -84,7 +88,7 @@ define([], function() {
 
     resourceDetailsData.provide('binary', [ 'resource', 'currentDeployment', function(resource, deployment) {
       var deferred = $q.defer();
-      
+
       if (!resource) {
         deferred.resolve(null);
       }
@@ -109,6 +113,57 @@ define([], function() {
 
       return deferred.promise;
     }]);
+
+
+    resourceDetailsData.provide('definitions', [ 'currentDeployment', 'resource', function(deployment, resource) {
+      var deferred = $q.defer();
+
+      $scope.loadingState = 'LOADING';
+
+      var Service = null;
+      var bpmnResource = false;
+
+      if (!deployment || !resource) {
+        deferred.resolve([]);
+      }
+      else {
+        if (isBpmnResource(resource)) {
+          bpmnResource = true;
+          Service = ProcessDefinition;
+        }
+        else if (isCmmnResource(resource)) {
+          Service = CaseDefinition;
+        }
+        else if (isDmnResource(resource)) {
+          Service = DecisionDefinition;
+        }
+
+        if (!Service) {
+          deferred.resolve([]);
+        }
+        else {
+
+          Service.list({
+            deploymentId: deployment.id,
+            resourceName: resource.name
+          }, function(err, res) {
+
+            if (err) {
+              $scope.loadingState = 'ERROR';
+              $scope.textError = err.message || 'Failed to load definitions.';
+              return deferred.reject(err);
+            }
+
+            deferred.resolve(bpmnResource ? res.items : res);
+          });
+        }
+      }
+
+      return deferred.promise;
+    }]);
+
+
+
 
 
     // observe /////////////////////////////////////////////////

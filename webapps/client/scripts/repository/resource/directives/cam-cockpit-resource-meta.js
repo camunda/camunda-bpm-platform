@@ -35,6 +35,10 @@ define([
           $scope.resource = resource;
         });
 
+        resourceMetaData.observe('definitions', function(definitions) {
+          $scope.definitions = definitions;
+        });
+
       }
     ]};
   }];

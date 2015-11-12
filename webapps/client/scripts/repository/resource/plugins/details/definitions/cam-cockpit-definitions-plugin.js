@@ -25,66 +25,10 @@ define([
     var isCmmnResource = $scope.isCmmnResource = $scope.control.isCmmnResource;
     var isDmnResource = $scope.isDmnResource = $scope.control.isDmnResource;
 
-    var ProcessDefinition = camAPI.resource('process-definition');
     var ProcessInstance = camAPI.resource('process-instance');
-
-    var CaseDefinition = camAPI.resource('case-definition');
     var CaseInstance = camAPI.resource('case-instance');
 
-    var DecisionDefinition = camAPI.resource('decision-definition');
-
     var resource;
-
-
-    // provide /////////////////////////////////////////////////////
-
-    definitionsData.provide('definitions', [ 'currentDeployment', 'resource', function(deployment, resource) {
-      var deferred = $q.defer();
-
-      $scope.loadingState = 'LOADING';
-
-      var Service = null;
-      var bpmnResource = false;
-
-      if (!deployment || !resource) {
-        deferred.resolve([]);
-      }
-      else {
-        if (isBpmnResource(resource)) {
-          bpmnResource = true;
-          Service = ProcessDefinition;
-        }
-        else if (isCmmnResource(resource)) {
-          Service = CaseDefinition;
-        }
-        else if (isDmnResource(resource)) {
-          Service = DecisionDefinition;
-        }
-
-        if (!Service) {
-          deferred.resolve([]);
-        }
-        else {
-
-          Service.list({
-            deploymentId: deployment.id,
-            resourceName: resource.name
-          }, function(err, res) {
-
-            if (err) {
-              $scope.loadingState = 'ERROR';
-              $scope.textError = err.message || 'Failed to load definitions.';
-              return deferred.reject(err);
-            }
-
-            deferred.resolve(bpmnResource ? res.items : res);
-          });
-        }
-      }
-
-      return deferred.promise;
-    }]);
-
 
     // observe //////////////////////////////////////////////////////
 
@@ -145,7 +89,7 @@ define([
           instancesCount(definition, query, Service);
         }
       }
-    }
+    };
 
 
     // link ////////////////////////////////////////////////////////
