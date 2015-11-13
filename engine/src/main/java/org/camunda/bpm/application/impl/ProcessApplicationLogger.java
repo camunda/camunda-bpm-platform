@@ -64,8 +64,8 @@ public class ProcessApplicationLogger extends ProcessEngineLogger {
   }
 
   public void cannotInvokeListenerPaUnavailable(String paName, ProcessApplicationUnavailableException e) {
-    delegateLogger.debug(exceptionMessage("005",
-        "Exception while invoking listener: target process application '{}' unavailable", paName), e);
+    logDebug("005",
+        "Exception while invoking listener: target process application '{}' unavailable", paName, e);
   }
 
   public void paDoesNotProvideTaskListener(String paName) {
@@ -195,7 +195,7 @@ public class ProcessApplicationLogger extends ProcessEngineLogger {
   }
 
   public boolean isContextSwitchLoggable() {
-    return delegateLogger.isDebugEnabled();
+    return isDebugEnabled();
   }
 
   public void debugNoTargetProcessApplicationFound(ExecutionEntity execution, ProcessApplicationManager processApplicationManager) {
