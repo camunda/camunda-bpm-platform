@@ -108,6 +108,9 @@ public class DefaultDmnEngineConfiguration implements DmnEngineConfiguration {
   protected void initFeelEngine() {
     if (feelEngineFactory == null) {
       feelEngineFactory = new FeelEngineFactoryImpl();
+    }
+
+    if (feelEngine == null) {
       feelEngine = feelEngineFactory.createInstance();
     }
   }
@@ -188,7 +191,7 @@ public class DefaultDmnEngineConfiguration implements DmnEngineConfiguration {
 
   public void setFeelEngineFactory(FeelEngineFactory feelEngineFactory) {
     this.feelEngineFactory = feelEngineFactory;
-    this.feelEngine = feelEngineFactory.createInstance();
+    this.feelEngine = null; // clear cached FEEL engine
   }
 
   public DmnEngineConfiguration feelEngineFactory(FeelEngineFactory feelEngineFactory) {
