@@ -14,8 +14,6 @@ package org.camunda.bpm.model.cmmn.instance;
 
 import java.util.Collection;
 
-import org.camunda.bpm.model.cmmn.instance.CaseParameter;
-
 /**
  * @author Roman Smirnov
  *

@@ -15,7 +15,6 @@ package org.camunda.bpm.model.cmmn.instance;
 import java.util.Collection;
 
 import org.camunda.bpm.model.cmmn.impl.CmmnModelConstants;
-import org.camunda.bpm.model.cmmn.instance.Role;
 
 /**
  * @author Roman Smirnov
