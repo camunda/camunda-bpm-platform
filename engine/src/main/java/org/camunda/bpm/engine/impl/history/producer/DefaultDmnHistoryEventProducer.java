@@ -113,7 +113,7 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
       return ((LongValue) collectResultValue).getValue().doubleValue();
 
     } else if(collectResultValue instanceof DoubleValue) {
-      return ((DoubleValue) collectResultValue).getValue().doubleValue();
+      return ((DoubleValue) collectResultValue).getValue();
 
     } else {
       throw LOG.collectResultValueOfUnsupportedTypeException(collectResultValue);
