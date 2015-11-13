@@ -87,7 +87,7 @@ If data is missing, provide it.]]></documentation>
     </businessRuleTask>
     <sequenceFlow id="sequenceFlow_178" isImmediate="true" sourceRef="assignApprover" targetRef="approveInvoice"/>
     <sequenceFlow id="SequenceFlow_2" name="" sourceRef="prepareBankTransfer" targetRef="ServiceTask_1"/>
-    <startEvent id="StartEvent_1" camunda:formKey="embedded:app:forms/start-form.html" name="Invoice&#xA;received">
+    <startEvent id="StartEvent_1" camunda:formKey="embedded:app:develop/invoice-forms/start-form.html" name="Invoice&#xA;received">
       <outgoing>SequenceFlow_1</outgoing>
     </startEvent>
     <sequenceFlow id="SequenceFlow_1" name="" sourceRef="StartEvent_1" targetRef="assignApprover"/>
