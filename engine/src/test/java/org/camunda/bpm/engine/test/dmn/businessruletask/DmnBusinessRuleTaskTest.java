@@ -110,7 +110,7 @@ public class DmnBusinessRuleTaskTest extends PluggableProcessEngineTestCase {
   }
 
   protected Object getDecisionResult(ProcessInstance processInstance) {
-    // the single value of the single output of the decision result is stored as process variable
+    // the single entry of the single result of the decision result is stored as process variable
     return runtimeService.getVariable(processInstance.getId(), "result");
   }
 
