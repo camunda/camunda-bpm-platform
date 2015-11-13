@@ -1130,6 +1130,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return dmnEngine;
   }
 
+  public void setDmnEngine(DmnEngine dmnEngine) {
+    this.dmnEngine = dmnEngine;
+  }
+
   public DmnEngineConfiguration getDmnEngineConfiguration() {
     return dmnEngineConfiguration;
   }
