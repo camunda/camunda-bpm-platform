@@ -160,7 +160,7 @@ public abstract class TestHelper {
         return resource;
       }
     }
-    return findDefinitionResource(type, name, BpmnDeployer.BPMN_RESOURCE_SUFFIXES[1]);
+    return findDefinitionResource(type, name, BpmnDeployer.BPMN_RESOURCE_SUFFIXES[0]);
   }
 
   private static String findDefinitionResource(Class< ? > type, String name, String suffix) {
