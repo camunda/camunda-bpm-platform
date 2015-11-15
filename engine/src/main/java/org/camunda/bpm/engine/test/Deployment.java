@@ -17,9 +17,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Annotation for a test method to create and delete a deployment around a test method.
+ * Annotation for a test method or class to create and delete a deployment around a test method.
  *
- * <p>Usage:</p>
+ * <p>Usage - Example 1 (method-level annotation):</p>
  * <pre>
  * package org.example;
  *
@@ -40,6 +40,26 @@ import java.lang.annotation.RetentionPolicy;
  *   public void testForADeploymentWithASingleResource() {
  *     // a deployment will be available in the engine repository
  *     // containing the three resources
+ *   }
+ * </pre>
+ *
+ * <p>Usage - Example 2 (class-level annotation):</p>
+ * <pre>
+ * package org.example;
+ *
+ * ...
+ *
+ * &#64;Deployment
+ * public class ExampleTest2 {
+ *
+ *   public void testForADeploymentWithASingleResource() {
+ *     // a deployment will be available in the engine repository
+ *     // containing the single resource <b>org/example/ExampleTest2.bpmn20.xml</b>
+ *   }
+ *
+ *   &#64;Deployment(resources = "org/example/process.bpmn20.xml")
+ *   public void testForADeploymentWithASingleResource() {
+ *     // the method-level annotation overrides the class-level annotation
  *   }
  * </pre>
  *
