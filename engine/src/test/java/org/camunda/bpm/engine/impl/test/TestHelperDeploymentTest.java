@@ -9,7 +9,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertNotNull;
 
 
-@Deployment(resources = "org/camunda/bpm/engine/test/api/oneAsyncTask.bpmn")
+@Deployment //(resources = "org/camunda/bpm/engine/test/api/oneAsyncTask.bpmn")
 public class TestHelperDeploymentTest {
 
   @Rule
@@ -17,7 +17,13 @@ public class TestHelperDeploymentTest {
 
   @Test
   public void isDeployed() {
-    assertNotNull(processEngineRule.getRepositoryService().createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess").singleResult());
+    assertNotNull("process is not deployed",processEngineRule.getRepositoryService().createProcessDefinitionQuery().processDefinitionKey("testHelperDeploymentTest").singleResult());
+  }
+
+  @Test
+  @Deployment
+  public void overridesDefault() {
+    assertNotNull("process is not deployed",processEngineRule.getRepositoryService().createProcessDefinitionQuery().processDefinitionKey("testHelperDeploymentTestOverride").singleResult());
   }
 
 }

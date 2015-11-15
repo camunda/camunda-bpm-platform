@@ -89,6 +89,8 @@ public abstract class TestHelper {
   public static String annotationDeploymentSetUp(ProcessEngine processEngine, Class<?> testClass, String methodName, Deployment deploymentAnnotation) {
     String deploymentId = null;
     Method method = null;
+    boolean onMethod = true;
+
     try {
       method = testClass.getDeclaredMethod(methodName, (Class<?>[])null);
     } catch (Exception e) {
@@ -102,14 +104,16 @@ public abstract class TestHelper {
       deploymentAnnotation = method.getAnnotation(Deployment.class);
     }
     if (deploymentAnnotation == null) {
+      onMethod = false;
       deploymentAnnotation = testClass.getAnnotation(Deployment.class);
     }
+
 
     if (deploymentAnnotation != null) {
       LOG.debug("annotation @Deployment creates deployment for {}.{}", ClassNameUtil.getClassNameWithoutPackage(testClass), methodName);
       String[] resources = deploymentAnnotation.resources();
       if (resources.length == 0 && method != null) {
-        String name = method.getName();
+        String name = onMethod ? method.getName() : null;
         String resource = getBpmnProcessDefinitionResource(testClass, name);
         resources = new String[]{resource};
       }
@@ -148,7 +152,7 @@ public abstract class TestHelper {
    */
   public static String getBpmnProcessDefinitionResource(Class< ? > type, String name) {
     for (String suffix : RESOURCE_SUFFIXES) {
-      String resource = type.getName().replace('.', '/') + "." + name + "." + suffix;
+      String resource = findDefinitionResource(type, name, suffix);
       InputStream inputStream = ReflectUtil.getResourceAsStream(resource);
       if (inputStream == null) {
         continue;
@@ -156,7 +160,15 @@ public abstract class TestHelper {
         return resource;
       }
     }
-    return type.getName().replace('.', '/') + "." + name + "." + BpmnDeployer.BPMN_RESOURCE_SUFFIXES[0];
+    return findDefinitionResource(type, name, BpmnDeployer.BPMN_RESOURCE_SUFFIXES[1]);
+  }
+
+  private static String findDefinitionResource(Class< ? > type, String name, String suffix) {
+    StringBuffer r = new StringBuffer(type.getName().replace('.', '/'));
+    if (name != null) {
+      r.append("." + name);
+    }
+    return r.append("." + suffix).toString();
   }
 
   public static void assertAndEnsureCleanDbAndCache(ProcessEngine processEngine) {
