@@ -38,4 +38,8 @@ public class TransactionLogger extends ProcessEngineLogger {
         "Exception while firing event {}: {}", state, exception.getMessage(), exception);
   }
 
+  public void debugFiringEventRolledBack() {
+    logDebug("004", "Firing event rolled back");
+  }
+
 }

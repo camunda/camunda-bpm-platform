@@ -17,8 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.BpmnModelExecutionContext;
 import org.camunda.bpm.engine.delegate.ProcessEngineServicesAware;
@@ -45,8 +43,6 @@ public class ExecutionImpl extends PvmExecutionImpl implements
         PvmProcessInstance {
 
   private static final long serialVersionUID = 1L;
-
-  private static Logger log = Logger.getLogger(ExecutionImpl.class.getName());
 
   private static AtomicInteger idGenerator = new AtomicInteger();
 

@@ -99,13 +99,26 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
       super.runBare();
 
     }
+    catch (AssertionFailedError e) {
+      LOG.error("ASSERTION FAILED: " + e, e);
+      exception = e;
+      throw e;
+
+    }
+    catch (Throwable e) {
+      LOG.error("EXCEPTION: " + e, e);
+      exception = e;
+      throw e;
+
+    }
     finally {
       TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, getClass(), getName());
       identityService.clearAuthentication();
       TestHelper.assertAndEnsureCleanDbAndCache(processEngine);
       ClockUtil.reset();
 
-      // Can't do this in the teardown, as the teardown will be called as part of the super.runBare
+      // Can't do this in the teardown, as the teardown will be called as part
+      // of the super.runBare
       closeDownProcessEngine();
       clearServiceReferences();
     }

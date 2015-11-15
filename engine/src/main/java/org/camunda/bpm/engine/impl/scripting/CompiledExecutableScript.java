@@ -12,19 +12,19 @@
  */
 package org.camunda.bpm.engine.impl.scripting;
 
-import org.camunda.bpm.engine.ScriptEvaluationException;
-import org.camunda.bpm.engine.delegate.BpmnError;
-import org.camunda.bpm.engine.delegate.VariableScope;
-
 import javax.script.Bindings;
 import javax.script.CompiledScript;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
-import java.util.logging.Logger;
+
+import org.camunda.bpm.engine.ScriptEvaluationException;
+import org.camunda.bpm.engine.delegate.BpmnError;
+import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 public class CompiledExecutableScript extends ExecutableScript {
 
-  private static final Logger LOG = Logger.getLogger(CompiledExecutableScript.class.getName());
+  private final static ScriptLogger LOG = ProcessEngineLogger.SCRIPT_LOGGER;
 
   protected CompiledScript compiledScript;
 
@@ -47,7 +47,7 @@ public class CompiledExecutableScript extends ExecutableScript {
 
   public Object evaluate(ScriptEngine scriptEngine, VariableScope variableScope, Bindings bindings) {
     try {
-      LOG.fine("Evaluating compiled script using " + language + " script engine ");
+      LOG.debugEvaluatingCompiledScript(language);
       return getCompiledScript().eval(bindings);
     } catch (ScriptException e) {
       if (e.getCause() instanceof BpmnError) {

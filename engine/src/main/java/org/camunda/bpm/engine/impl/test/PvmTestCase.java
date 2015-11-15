@@ -22,9 +22,6 @@ import junit.framework.TestCase;
  */
 public class PvmTestCase extends TestCase {
 
-  public PvmTestCase() {
-  }
-
   /**
    * Asserts if the provided text is part of some text.
    */

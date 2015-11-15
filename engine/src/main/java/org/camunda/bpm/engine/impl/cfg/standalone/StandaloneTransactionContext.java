@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.TransactionContext;
@@ -33,9 +32,8 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
  */
 public class StandaloneTransactionContext implements TransactionContext {
 
-  public final static TransactionLogger LOG = ProcessEngineLogger.TX_LOGGER;
+  private final static TransactionLogger LOG = ProcessEngineLogger.TX_LOGGER;
 
-  private static Logger log = Logger.getLogger(StandaloneTransactionContext.class.getName());
   protected CommandContext commandContext;
   protected Map<TransactionState, List<TransactionListener>> stateTransactionListeners = null;
   private TransactionState lastTransactionState;
@@ -114,7 +112,7 @@ public class StandaloneTransactionContext implements TransactionContext {
       Context.getCommandInvocationContext().trySetThrowable(exception);
     }
     finally {
-      log.fine("firing event rolled back...");
+      LOG.debugFiringEventRolledBack();
       fireTransactionEvent(TransactionState.ROLLED_BACK);
     }
   }

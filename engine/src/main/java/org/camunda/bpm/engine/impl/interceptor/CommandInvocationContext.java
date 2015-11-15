@@ -12,11 +12,10 @@
  */
 package org.camunda.bpm.engine.impl.interceptor;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 
 /**
  * In contrast to {@link CommandContext}, this context holds resources that are only valid
@@ -27,7 +26,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
  */
 public class CommandInvocationContext {
 
-  private static Logger log = Logger.getLogger(CommandInvocationContext.class.getName());
+  private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
   protected Throwable throwable;
   protected Command< ? > command;
@@ -47,8 +46,9 @@ public class CommandInvocationContext {
   public void trySetThrowable(Throwable t) {
     if (this.throwable == null) {
       this.throwable = t;
-    } else {
-      log.log(Level.SEVERE, "masked exception in command context. for root cause, see below as it will be rethrown later.", throwable);
+    }
+    else {
+      LOG.maskedExceptionInCommandContext(throwable);
     }
   }
 

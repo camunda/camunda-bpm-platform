@@ -16,11 +16,9 @@ package org.camunda.bpm.engine.impl;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstanceQuery;
+import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -34,7 +32,7 @@ import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
 public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVariableInstanceQuery, HistoricVariableInstance> implements
         HistoricVariableInstanceQuery {
 
-  private final static Logger LOGGER = Logger.getLogger(HistoricVariableInstanceQueryImpl.class.getName());
+  private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
   private static final long serialVersionUID = 1L;
 
@@ -161,7 +159,7 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
           } catch(Exception t) {
             // do not fail if one of the variables fails to load
-            LOGGER.log(Level.FINE, "Exception while getting value for variable", t);
+            LOG.exceptionWhileGettingValueForVariable(t);
           }
         }
 

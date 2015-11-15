@@ -20,9 +20,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.bpmn.behavior.BpmnBehaviorLogger;
 import org.camunda.bpm.engine.impl.bpmn.behavior.CancelBoundaryEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.CancelEndEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.CompensationEventActivityBehavior;
@@ -76,7 +77,7 @@ import org.camunda.bpm.engine.impl.tree.TreeWalker.WalkCondition;
  */
 public class LegacyBehavior {
 
-  private final static Logger log = Logger.getLogger(LegacyBehavior.class.getName());
+  private final static BpmnBehaviorLogger LOG = ProcessEngineLogger.BPMN_BEHAVIOR_LOGGER;
 
   // concurrent scopes ///////////////////////////////////////////
 
@@ -92,7 +93,7 @@ public class LegacyBehavior {
    */
   public static void pruneConcurrentScope(PvmExecutionImpl execution) {
     ensureConcurrentScope(execution);
-    log.fine("[LEGACY BEHAVIOR]: concurrent scope execution is pruned "+execution);
+    LOG.debugConcurrentScopeIsPruned(execution);
     execution.setConcurrent(false);
   }
 
@@ -108,7 +109,7 @@ public class LegacyBehavior {
    */
   public static void cancelConcurrentScope(PvmExecutionImpl execution, PvmActivity cancelledScopeActivity) {
     ensureConcurrentScope(execution);
-    log.fine("[LEGACY BEHAVIOR]: cancel concurrent scope execution "+execution);
+    LOG.debugCancelConcurrentScopeExecution(execution);
 
     execution.interrupt("Scope "+cancelledScopeActivity+" cancelled.");
     // <!> HACK set to event scope activity and leave activity instance
@@ -128,8 +129,7 @@ public class LegacyBehavior {
    */
   public static void destroyConcurrentScope(PvmExecutionImpl execution) {
     ensureConcurrentScope(execution);
-    log.fine("[LEGACY BEHAVIOR]: destroy concurrent scope execution "+execution);
-
+    LOG.destroyConcurrentScopeExecution(execution);
     execution.destroy();
   }
 
@@ -139,7 +139,7 @@ public class LegacyBehavior {
     boolean performLegacyBehavior = isLegacyBehaviorRequired(scopeExecution);
 
     if(performLegacyBehavior) {
-      log.fine("[LEGACY BEHAVIOR]: complete non-scope event subprocess.");
+      LOG.completeNonScopeEventSubprocess();
       scopeExecution.end(false);
     }
 
@@ -150,7 +150,7 @@ public class LegacyBehavior {
     boolean performLegacyBehavior = isLegacyBehaviorRequired(endedExecution);
 
     if(performLegacyBehavior) {
-      log.fine("[LEGACY BEHAVIOR]: end concurrent execution in event subprocess.");
+      LOG.endConcurrentExecutionInEventSubprocess();
       // notify the grandparent flow scope in a similar way PvmAtomicOperationAcitivtyEnd does
       ScopeImpl flowScope = endedExecution.getActivity().getFlowScope();
       if (flowScope != null) {
@@ -186,7 +186,6 @@ public class LegacyBehavior {
     boolean performLegacyBehavior = isLegacyBehaviorRequired(execution);
 
     if(performLegacyBehavior) {
-      log.fine("[LEGACY BEHAVIOR]: end scope execution in previously non-scope activity");
       // legacy behavior is to do nothing
     }
 

@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.jobexecutor.ProcessEventJobHandler;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.runtime.EventSubscription;
+import org.camunda.commons.utils.EnsureUtil;
 
 
 /**
@@ -170,7 +171,7 @@ public class EventSubscriptionManager extends AbstractManager {
       List<EventSubscriptionEntity> eventSubscriptions = cachedExecution.getEventSubscriptions();
       List<EventSubscriptionEntity> result = new ArrayList<EventSubscriptionEntity>();
       for (EventSubscriptionEntity subscription : eventSubscriptions) {
-        if(subscription.getEventName().equals(eventName) && subscription.getEventType().equals(type)) {
+        if(matchesSubscription(subscription, type, eventName)) {
           result.add(subscription);
         }
       }
@@ -194,6 +195,14 @@ public class EventSubscriptionManager extends AbstractManager {
 
   protected void configureAuthorizationCheck(EventSubscriptionQueryImpl query) {
     getAuthorizationManager().configureEventSubscriptionQuery(query);
+  }
+
+  protected boolean matchesSubscription(EventSubscriptionEntity subscription, String type, String eventName) {
+    EnsureUtil.ensureNotNull("event type", type);
+    String subscriptionEventName = subscription.getEventName();
+
+    return type.equals(subscription.getEventType()) &&
+          ((eventName == null && subscriptionEventName == null) || (eventName != null && eventName.equals(subscriptionEventName)));
   }
 
 }

@@ -13,10 +13,8 @@
 
 package org.camunda.bpm.engine.impl.pvm.runtime;
 
-import java.util.logging.Logger;
-
+import org.camunda.bpm.engine.impl.pvm.PvmLogger;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
-import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 
 /**
  *
@@ -25,7 +23,7 @@ import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
  */
 public class OutgoingExecution {
 
-  private static Logger log = Logger.getLogger(OutgoingExecution.class.getName());
+  private final static PvmLogger LOG = PvmLogger.PVM_LOGGER;
 
   protected PvmExecutionImpl outgoingExecution;
   protected PvmTransition outgoingTransition;
@@ -43,7 +41,7 @@ public class OutgoingExecution {
     if(!outgoingExecution.isEnded()) {
       outgoingExecution.take();
     } else {
-      log.fine("Not taking transition '"+outgoingTransition+"', outgoing execution has ended.");
+      LOG.notTakingTranistion(outgoingTransition);
     }
   }
 }

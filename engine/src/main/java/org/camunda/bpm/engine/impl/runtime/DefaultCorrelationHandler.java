@@ -16,11 +16,10 @@ package org.camunda.bpm.engine.impl.runtime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
@@ -36,7 +35,7 @@ import org.camunda.bpm.engine.runtime.Execution;
  */
 public class DefaultCorrelationHandler implements CorrelationHandler {
 
-  private final static Logger LOGGER = Logger.getLogger(DefaultCorrelationHandler.class.getName());
+  private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
   public MessageCorrelationResult correlateMessage(CommandContext commandContext, String messageName, CorrelationSet correlationSet) {
 
@@ -132,8 +131,7 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
       ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
       // only an active process definition will be returned
       if (processDefinition == null || processDefinition.isSuspended()) {
-        LOGGER.log(Level.FINE, "Found event subscription with {0} but process definition {1} could not be found.",
-            new Object[]{messageEventSubscription, processDefinitionId});
+        LOG.couldNotFindProcessDefinitionForEventSubscription(messageEventSubscription, processDefinitionId);
         return null;
 
       } else {

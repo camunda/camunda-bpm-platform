@@ -10,28 +10,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.camunda.bpm.engine.impl.interceptor;
+package org.camunda.bpm.engine.impl.metrics;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.cmd.CommandLogger;
-
 
 /**
- * @author Tom Baeyens
+ * @author Daniel Meyer
+ *
  */
-public class LogInterceptor extends CommandInterceptor {
+public class MetricsLogger extends ProcessEngineLogger {
 
-  private static final CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
+  public void couldNotDetermineIp(Exception e) {
+    logWarn(
+        "001", "Could not determine local IP address for generating an engine id", e);
+  }
 
-  public <T> T execute(Command<T> command) {
-    LOG.debugStartingCommand(command);
-    try {
-      return next.execute(command);
-    }
-    finally {
-      LOG.debugFinishingCommand(command);
-    }
+  /**
+   * @param e
+   */
+  public void couldNotCollectAndLogMetrics(Exception e) {
+    logWarn(
+        "002", "Could not collect and log metrics", e);
   }
 
 }

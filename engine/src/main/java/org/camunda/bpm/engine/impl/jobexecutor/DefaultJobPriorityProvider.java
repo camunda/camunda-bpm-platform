@@ -12,10 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
@@ -31,7 +29,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
  */
 public class DefaultJobPriorityProvider implements JobPriorityProvider {
 
-  private static final Logger LOG = Logger.getLogger(DefaultJobPriorityProvider.class.getName());
+  private final static JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
 
   public static long DEFAULT_PRIORITY = 0;
 
@@ -124,8 +122,8 @@ public class DefaultJobPriorityProvider implements JobPriorityProvider {
 
         value = getDefaultPriorityOnResolutionFailure();
 
-        LOG.log(Level.WARNING, "Could not determine priority for job created in context of execution " + execution
-            + ". Using default priority " + value, e);
+        LOG.couldNotDeterminePriority(execution, value, e);
+
       }
       else {
         throw e;

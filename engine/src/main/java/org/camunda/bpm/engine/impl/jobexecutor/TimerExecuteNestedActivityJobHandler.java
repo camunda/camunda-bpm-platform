@@ -14,9 +14,6 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -28,8 +25,6 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
  * @author Joram Barrez
  */
 public class TimerExecuteNestedActivityJobHandler extends TimerEventJobHandler {
-
-  private static Logger log = Logger.getLogger(TimerExecuteNestedActivityJobHandler.class.getName());
 
   public static final String TYPE = "timer-transition";
 
@@ -48,11 +43,9 @@ public class TimerExecuteNestedActivityJobHandler extends TimerEventJobHandler {
       execution.executeEventHandlerActivity(activity);
 
     } catch (RuntimeException e) {
-      log.log(Level.SEVERE, "exception during timer execution", e);
       throw e;
 
     } catch (Exception e) {
-      log.log(Level.SEVERE, "exception during timer execution", e);
       throw new ProcessEngineException("exception during timer execution: " + e.getMessage(), e);
     }
   }

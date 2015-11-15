@@ -2,10 +2,8 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
 
@@ -29,7 +27,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
  */
 public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
 
-  private static Logger log = Logger.getLogger(SequentialJobAcquisitionRunnable.class.getName());
+  private final JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
 
   protected JobAcquisitionContext acquisitionContext;
 
@@ -39,7 +37,7 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
   }
 
   public synchronized void run() {
-    log.info(jobExecutor.getName() + " starting to acquire jobs");
+    LOG.startingToAacquireJobs(jobExecutor.getName());
 
     JobAcquisitionStrategy acquisitionStrategy = initializeAcquisitionStrategy();
 
@@ -61,7 +59,7 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
           executeJobs(acquisitionContext, currentProcessEngine, acquiredJobs);
         }
       } catch (Exception e) {
-        log.log(Level.SEVERE, "exception during job acquisition: " + e.getMessage(), e);
+        LOG.exceptionDuringJobAcquisition(e);
 
         acquisitionContext.setAcquisitionException(e);
       }
@@ -77,7 +75,7 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
       suspendAcquisition(waitTime);
     }
 
-    log.info(jobExecutor.getName() + " stopped job acquisition");
+    LOG.stoppedJobAcquisition(jobExecutor.getName());
   }
 
   protected JobAcquisitionContext initializeAcquisitionContext() {

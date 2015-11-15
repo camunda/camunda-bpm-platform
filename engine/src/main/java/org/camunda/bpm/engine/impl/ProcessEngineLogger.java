@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl;
 
+import java.net.URL;
+
 import org.camunda.bpm.application.impl.ProcessApplicationLogger;
 import org.camunda.bpm.container.impl.ContainerIntegrationLogger;
 import org.camunda.bpm.engine.impl.bpmn.behavior.BpmnBehaviorLogger;
@@ -19,12 +21,18 @@ import org.camunda.bpm.engine.impl.bpmn.diagram.DiagramCanvasLogger;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseLogger;
 import org.camunda.bpm.engine.impl.cfg.ConfigurationLogger;
 import org.camunda.bpm.engine.impl.cfg.TransactionLogger;
-import org.camunda.bpm.engine.impl.cmd.CmdLogger;
+import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnBehaviorLogger;
 import org.camunda.bpm.engine.impl.cmmn.operation.CmmnOperationLogger;
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformerLogger;
+import org.camunda.bpm.engine.impl.core.CoreLogger;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
+import org.camunda.bpm.engine.impl.interceptor.ContextLogger;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorLogger;
+import org.camunda.bpm.engine.impl.metrics.MetricsLogger;
+import org.camunda.bpm.engine.impl.plugin.AdministratorAuthorizationPluginLogger;
+import org.camunda.bpm.engine.impl.pvm.PvmLogger;
+import org.camunda.bpm.engine.impl.scripting.ScriptLogger;
 import org.camunda.bpm.engine.impl.test.TestLogger;
 import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
 import org.camunda.commons.logging.BaseLogger;
@@ -35,6 +43,9 @@ import org.camunda.commons.logging.BaseLogger;
 public class ProcessEngineLogger extends BaseLogger {
 
   public static final String PROJECT_CODE = "ENGINE";
+
+  public static final ProcessEngineLogger INSTANCE = BaseLogger.createLogger(
+      ProcessEngineLogger.class, PROJECT_CODE, "org.camunda.bpm.engine", "00");
 
   public static final BpmnParseLogger BPMN_PARSE_LOGGER = BaseLogger.createLogger(
       BpmnParseLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.bpmn.parser", "01");
@@ -72,15 +83,58 @@ public class ProcessEngineLogger extends BaseLogger {
   public static final ConfigurationLogger CONFIG_LOGGER = BaseLogger.createLogger(
       ConfigurationLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.cfg", "12");
 
-  public static final CmdLogger CMD_LOGGER = BaseLogger.createLogger(
-      CmdLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.cmd", "13");
+  public static final CommandLogger CMD_LOGGER = BaseLogger.createLogger(
+      CommandLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.cmd", "13");
 
   public static final JobExecutorLogger JOB_EXECUTOR_LOGGER = BaseLogger.createLogger(
       JobExecutorLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.jobexecutor", "14");
 
-
   public static final TestLogger TEST_LOGGER = BaseLogger.createLogger(
       TestLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.test", "15");
+
+  public static final ContextLogger CONTEXT_LOGGER = BaseLogger.createLogger(
+      ContextLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.context", "16");
+
+  public static final CoreLogger CORE_LOGGER = BaseLogger.createLogger(
+      CoreLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.core", "17");
+
+  public static final MetricsLogger METRICS_LOGGER = BaseLogger.createLogger(
+      MetricsLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.metrics", "18");
+
+  public static final AdministratorAuthorizationPluginLogger ADMIN_PLUGIN_LOGGER = BaseLogger.createLogger(
+      AdministratorAuthorizationPluginLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.plugin.admin", "19");
+
+  public static final PvmLogger PVM_LOGGER = BaseLogger.createLogger(
+      PvmLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.pvm", "20");
+
+  public static final ScriptLogger SCRIPT_LOGGER = BaseLogger.createLogger(
+      ScriptLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.script", "21");
+
+  public void processEngineCreated(String name) {
+    logInfo("001", "Process Engine {} created.", name);
+  }
+
+  public void processEngineAlreadyInitialized() {
+    logInfo("002", "Process engine already initialized");
+  }
+
+  public void initializingProcessEngineForResource(URL resourceUrl) {
+    logInfo(
+        "003", "Initializing process engine for resource {}", resourceUrl);
+  }
+
+  public void initializingProcessEngine(String name) {
+    logInfo(
+        "004", "Initializing process engine {}", name);
+  }
+
+  public void exceptionWhileInitializingProcessengine(Throwable e) {
+    logError("005", "Exception while initializing process engine {}", e.getMessage(), e);
+  }
+
+  public void exceptionWhileClosingProcessEngine(String string, Exception e) {
+    logError("006", "Exception while closing process engine {}", string, e);
+  }
 
 }
 

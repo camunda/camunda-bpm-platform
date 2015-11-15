@@ -14,9 +14,6 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -24,8 +21,6 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
 
 public class TimerCatchIntermediateEventJobHandler extends TimerEventJobHandler {
-
-  private static Logger log = Logger.getLogger(TimerCatchIntermediateEventJobHandler.class.getName());
 
   public static final String TYPE = "timer-intermediate-transition";
 
@@ -49,11 +44,11 @@ public class TimerCatchIntermediateEventJobHandler extends TimerEventJobHandler 
         execution.executeEventHandlerActivity(intermediateEventActivity);
       }
 
-    } catch (RuntimeException e) {
-      log.log(Level.SEVERE, "exception during timer execution", e);
+    }
+    catch (RuntimeException e) {
       throw e;
-    } catch (Exception e) {
-      log.log(Level.SEVERE, "exception during timer execution", e);
+    }
+    catch (Exception e) {
       throw new ProcessEngineException("exception during timer execution: " + e.getMessage(), e);
     }
   }

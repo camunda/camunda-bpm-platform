@@ -16,7 +16,8 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Logger;
+
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 /**
  *
@@ -25,7 +26,7 @@ import java.util.logging.Logger;
  */
 public class BpmnStackTrace {
 
-  public final static Logger log = Logger.getLogger(BpmnStackTrace.class.getName());
+  private final static ContextLogger LOG = ProcessEngineLogger.CONTEXT_LOGGER;
 
   protected List<AtomicOperationInvocation> perfromedInvocations = new ArrayList<AtomicOperationInvocation>();
 
@@ -44,7 +45,7 @@ public class BpmnStackTrace {
       logVerbose(writer);
     }
 
-    log.severe(writer.toString());
+    LOG.bpmnStackTrace(writer.toString());
 
     perfromedInvocations.clear();
   }

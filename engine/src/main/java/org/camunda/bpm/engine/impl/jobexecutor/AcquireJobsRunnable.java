@@ -13,7 +13,7 @@
 package org.camunda.bpm.engine.impl.jobexecutor;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Logger;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 
 /**
  * @author Thorben Lindhauer
@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  */
 public abstract class AcquireJobsRunnable implements Runnable {
 
-  private static Logger log = Logger.getLogger(AcquireJobsRunnable.class.getName());
+  private final static JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
 
   protected final JobExecutor jobExecutor;
 
@@ -40,18 +40,20 @@ public abstract class AcquireJobsRunnable implements Runnable {
     }
 
     try {
-      log.fine("job acquisition thread sleeping for " + millis + " millis");
+      LOG.debugJobAcquisitionThreadSleeping(millis);
       synchronized (MONITOR) {
         if(!isInterrupted) {
           isWaiting.set(true);
           MONITOR.wait(millis);
         }
       }
-      log.fine("job acquisition thread woke up");
+      LOG.jobExecutorThreadWokeUp();
       isJobAdded = false;
-    } catch (InterruptedException e) {
-      log.fine("job acquisition wait interrupted");
-    } finally {
+    }
+    catch (InterruptedException e) {
+      LOG.jobExecutionWaitInterrupted();
+    }
+    finally {
       isWaiting.set(false);
     }
   }

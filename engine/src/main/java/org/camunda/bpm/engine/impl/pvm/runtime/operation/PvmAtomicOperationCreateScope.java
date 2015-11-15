@@ -12,9 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.pvm.runtime.operation;
 
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
+import org.camunda.bpm.engine.impl.pvm.PvmLogger;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
@@ -23,7 +22,7 @@ import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
  */
 public abstract class PvmAtomicOperationCreateScope implements PvmAtomicOperation {
 
-  private static Logger log = Logger.getLogger(PvmAtomicOperationCreateScope.class.getName());
+  private final static PvmLogger LOG = PvmLogger.PVM_LOGGER;
 
   public void execute(PvmExecutionImpl execution) {
 
@@ -39,7 +38,7 @@ public abstract class PvmAtomicOperationCreateScope implements PvmAtomicOperatio
       execution.setTransition(null);
       execution.setActive(false);
       execution.setActivity(null);
-      log.fine("create scope: parent "+execution+" continues as execution "+propagatingExecution);
+      LOG.createScope(execution, propagatingExecution);
       propagatingExecution.initialize();
 
     } else {

@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.impl.db.entitymanager.cache.CachedDbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.cache.DbEntityState;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClassNameUtil;
 import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
@@ -523,5 +524,31 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         "The variable with name '{}' can not be updated because it is transient and read-only.",
         variableName
         ));
+  }
+
+  public void creatingHistoryLevelPropertyInDatabase(int id) {
+    logInfo(
+        "065",
+        "Creating historyLevel property in database with value: {}", id);
+  }
+
+  public void couldNotSelectHistoryLevel(String message) {
+    logWarn(
+        "066", "Could not select history level property: {}", message);
+  }
+
+  public void noHistoryLevelPropertyFound() {
+    logInfo(
+        "067", "No history level property found in database");
+  }
+
+  public void noDeploymentLockPropertyFound() {
+    logError(
+        "068", "No deployment lock property found in databse");
+  }
+
+  public void debugJobExecuted(JobEntity jobEntity) {
+    logDebug(
+        "067", "Job executed, deleting it", jobEntity);
   }
 }

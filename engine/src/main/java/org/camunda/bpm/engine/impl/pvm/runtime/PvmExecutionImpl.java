@@ -20,10 +20,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
@@ -31,6 +30,7 @@ import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
 import org.camunda.bpm.engine.impl.pvm.PvmExecution;
+import org.camunda.bpm.engine.impl.pvm.PvmLogger;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
@@ -65,7 +65,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   private static final long serialVersionUID = 1L;
 
-  private static Logger log = Logger.getLogger(PvmExecutionImpl.class.getName());
+  private static final PvmLogger LOG = ProcessEngineLogger.PVM_LOGGER;
 
   protected transient ProcessDefinitionImpl processDefinition;
 
@@ -243,7 +243,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   @Override
   public void destroy() {
-    log.fine("destroying "+this);
+    LOG.destroying(this);
 
     setScope(false);
   }
@@ -251,7 +251,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   protected void removeEventScopes() {
     List<PvmExecutionImpl> childExecutions = new ArrayList<PvmExecutionImpl>(getEventScopeExecutions());
     for (PvmExecutionImpl childExecution : childExecutions) {
-      log.fine("removing eventScope "+childExecution);
+      LOG.removingEventScope(childExecution);
       childExecution.destroy();
       childExecution.remove();
     }
@@ -296,9 +296,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   }
 
   public void interrupt(String reason, boolean skipCustomListeners, boolean skipIoMappings) {
-    if(log.isLoggable(Level.FINE)) {
-      log.fine("Interrupting execution "+this);
-    }
+    LOG.interruptingExecution(reason, skipCustomListeners);
     clearScope(reason, skipCustomListeners, skipIoMappings);
   }
 
@@ -824,10 +822,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
         otherConcurrentExecutions.add(this);
       }
     }
-    if (log.isLoggable(Level.FINE)) {
-      log.fine("inactive concurrent executions in '"+activity+"': "+inactiveConcurrentExecutionsInActivity);
-      log.fine("other concurrent executions: "+otherConcurrentExecutions);
-    }
     return (List) inactiveConcurrentExecutionsInActivity;
   }
 
@@ -1048,9 +1042,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
     activityInstanceId = generateActivityInstanceId(activity.getId());
 
-    if(log.isLoggable(Level.FINE)) {
-      log.fine("[ENTER] "+this + ": "+activityInstanceId+", parent: "+getParentActivityInstanceId());
-    }
+    LOG.debugEnterActivityInstance(this, getParentActivityInstanceId());
 
     // <LEGACY>: in general, io mappings may only exist when the activity is scope
     // however, for multi instance activities, the inner activity does not become a scope
@@ -1069,11 +1061,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   @Override
   public void leaveActivityInstance() {
     if(activityInstanceId != null) {
-
-      if(log.isLoggable(Level.FINE)) {
-        log.fine("[LEAVE] "+ this + ": "+activityInstanceId );
-      }
-
+      LOG.debugLeavesActivityInstance(this, activityInstanceId);
     }
     activityInstanceId = getParentActivityInstanceId();
 

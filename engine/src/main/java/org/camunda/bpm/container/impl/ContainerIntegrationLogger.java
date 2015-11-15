@@ -48,9 +48,9 @@ public class ContainerIntegrationLogger extends ProcessEngineLogger {
   }
 
   public void exceptionWhileStopping(String serviceType, String serviceName, Throwable t) {
-    delegateLogger.warn(exceptionMessage(
+    logWarn(
         "003",
-        "Exception while stopping {} '{}': {}", serviceType, serviceName, t.getMessage()), t);
+        "Exception while stopping {} '{}': {}", serviceType, serviceName, t.getMessage(), t);
   }
 
   public void debugRootPath(String urlPath) {

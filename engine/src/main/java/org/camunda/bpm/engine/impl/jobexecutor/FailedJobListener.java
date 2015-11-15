@@ -13,8 +13,6 @@
 
 package org.camunda.bpm.engine.impl.jobexecutor;
 
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.impl.cfg.TransactionListener;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -30,8 +28,6 @@ import org.camunda.bpm.engine.management.Metrics;
  * @author Bernd Ruecker
  */
 public class FailedJobListener implements TransactionListener, CommandContextListener {
-
-  private static Logger log = Logger.getLogger(FailedJobListener.class.getName());
 
   protected CommandExecutor commandExecutor;
   protected String jobId;
@@ -53,7 +49,6 @@ public class FailedJobListener implements TransactionListener, CommandContextLis
     FailedJobCommandFactory failedJobCommandFactory = commandContext.getFailedJobCommandFactory();
     final Command<Object> cmd = failedJobCommandFactory.getCommand(jobId, exception);
 
-    log.fine("Using FailedJobCommandFactory '" + failedJobCommandFactory.getClass() + "' and command of type '" + cmd.getClass() + "'");
     commandExecutor.execute(new Command<Void>() {
 
       public Void execute(CommandContext commandContext) {

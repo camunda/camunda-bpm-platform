@@ -17,10 +17,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.management.Metrics;
@@ -41,7 +39,7 @@ import org.camunda.bpm.engine.runtime.Job;
  */
 public abstract class JobExecutor {
 
-  private static Logger log = Logger.getLogger(JobExecutor.class.getName());
+  private final static JobExecutorLogger LOG = ProcessEngineLogger.JOB_EXECUTOR_LOGGER;
 
   protected String name = "JobExecutor["+getClass().getName()+"]";
   protected List<ProcessEngineImpl> processEngines = new CopyOnWriteArrayList<ProcessEngineImpl>();
@@ -77,7 +75,7 @@ public abstract class JobExecutor {
     if (isActive) {
       return;
     }
-    log.info("Starting up the JobExecutor["+getClass().getName()+"].");
+    LOG.startingUpJobExecutor(getClass().getName());
     ensureInitialization();
     startExecutingJobs();
     isActive = true;
@@ -87,7 +85,7 @@ public abstract class JobExecutor {
     if (!isActive) {
       return;
     }
-    log.info("Shutting down the JobExecutor["+getClass().getName()+"].");
+    LOG.shuttingDownTheJobExecutor(getClass().getName());
     acquireJobsRunnable.stop();
     stopExecutingJobs();
     ensureCleanup();
@@ -339,11 +337,9 @@ public abstract class JobExecutor {
 	protected void stopJobAcquisitionThread() {
 		try {
 			jobAcquisitionThread.join();
-		} catch (InterruptedException e) {
-			log.log(
-					Level.WARNING,
-					"Interrupted while waiting for the job Acquisition thread to terminate",
-					e);
+		}
+		catch (InterruptedException e) {
+		  LOG.interruptedWhileShuttingDownjobExecutor(e);
 		}
 		jobAcquisitionThread = null;
 	}

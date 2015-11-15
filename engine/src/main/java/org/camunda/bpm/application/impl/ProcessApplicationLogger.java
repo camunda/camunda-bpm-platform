@@ -25,6 +25,10 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
 /**
  * @author Daniel Meyer
@@ -60,8 +64,8 @@ public class ProcessApplicationLogger extends ProcessEngineLogger {
   }
 
   public void cannotInvokeListenerPaUnavailable(String paName, ProcessApplicationUnavailableException e) {
-    delegateLogger.debug(exceptionMessage("005",
-        "Exception while invoking listener: target process application '{}' unavailable", paName), e);
+    logDebug("005",
+        "Exception while invoking listener: target process application '{}' unavailable", paName, e);
   }
 
   public void paDoesNotProvideTaskListener(String paName) {
@@ -188,5 +192,27 @@ public class ProcessApplicationLogger extends ProcessEngineLogger {
         "022",
         "Exception while logging registration summary",
         e);
+  }
+
+  public boolean isContextSwitchLoggable() {
+    return isDebugEnabled();
+  }
+
+  public void debugNoTargetProcessApplicationFound(ExecutionEntity execution, ProcessApplicationManager processApplicationManager) {
+    logDebug("023",
+        "no target process application found for Execution[{}], ProcessDefinition[{}], Deployment[{}] Registrations[{}]",
+            execution.getId(),
+            execution.getProcessDefinitionId(),
+            execution.getProcessDefinition().getDeploymentId(),
+            processApplicationManager.getRegistrationSummary());
+  }
+
+  public void debugNoTargetProcessApplicationFoundForCaseExecution(CaseExecutionEntity execution, ProcessApplicationManager processApplicationManager) {
+    logDebug("024",
+        "no target process application found for CaseExecution[{}], CaseDefinition[{}], Deployment[{}] Registrations[{}]",
+            execution.getId(),
+            execution.getCaseDefinitionId(),
+            ((CaseDefinitionEntity)execution.getCaseDefinition()).getDeploymentId(),
+            processApplicationManager.getRegistrationSummary());
   }
 }

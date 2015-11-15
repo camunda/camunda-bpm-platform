@@ -40,7 +40,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
  */
 public class StartProcessInstanceAtActivitiesCmd implements Command<ProcessInstance> {
 
-  private final static CmdLogger LOG = ProcessEngineLogger.CMD_LOGGER;
+  private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
   protected ProcessInstantiationBuilderImpl instantiationBuilder;
 
