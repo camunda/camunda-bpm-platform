@@ -24,6 +24,7 @@ import javax.sql.DataSource;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.impl.DefaultArtifactFactory;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextInterceptor;
@@ -31,6 +32,9 @@ import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.LogInterceptor;
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSession;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ContextResource;
 import org.springframework.core.io.Resource;
@@ -45,12 +49,12 @@ import org.springframework.transaction.support.TransactionTemplate;
  * @author Joram Barrez
  * @author Daniel Meyer
  */
-public class SpringProcessEngineConfiguration extends ProcessEngineConfigurationImpl {
+public class SpringProcessEngineConfiguration extends ProcessEngineConfigurationImpl implements ApplicationContextAware {
 
   protected PlatformTransactionManager transactionManager;
   protected String deploymentName = "SpringAutoDeployment";
   protected Resource[] deploymentResources = new Resource[0];
-
+  protected ApplicationContext applicationContext;
 
   public SpringProcessEngineConfiguration() {
     transactionsExternallyManaged = true;
@@ -89,6 +93,13 @@ public class SpringProcessEngineConfiguration extends ProcessEngineConfiguration
   protected void initTransactionContextFactory() {
     if(transactionContextFactory == null && transactionManager != null) {
       transactionContextFactory = new SpringTransactionContextFactory(transactionManager);
+    }
+  }
+
+  @Override
+  protected void initArtifactFactory() {
+    if (artifactFactory == null) {
+      artifactFactory = applicationContext != null ? new SpringArtifactFactory(applicationContext) : new DefaultArtifactFactory();
     }
   }
 
@@ -177,5 +188,10 @@ public class SpringProcessEngineConfiguration extends ProcessEngineConfiguration
 
   public void setDeploymentResources(Resource[] deploymentResources) {
     this.deploymentResources = deploymentResources;
+  }
+
+  @Override
+  public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    this.applicationContext = applicationContext;
   }
 }
