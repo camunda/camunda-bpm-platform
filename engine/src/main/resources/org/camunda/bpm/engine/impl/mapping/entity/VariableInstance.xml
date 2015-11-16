@@ -116,10 +116,6 @@
     ON
         EXECUTION.PARENT_ID_ = PARENT_EXECUTION.ID_
 
-    LEFT JOIN
-        ${prefix}ACT_RU_CASE_EXECUTION CASE_EXECUTION
-    ON
-        RES.CASE_EXECUTION_ID_ = CASE_EXECUTION.ID_
     WHERE
         ID_ = #{id, jdbcType=VARCHAR}
   </select>
@@ -140,11 +136,6 @@
         ${prefix}ACT_RU_EXECUTION PARENT_EXECUTION
     ON
         EXECUTION.PARENT_ID_ = PARENT_EXECUTION.ID_
-
-    LEFT JOIN
-        ${prefix}ACT_RU_CASE_EXECUTION CASE_EXECUTION
-    ON
-        RES.CASE_EXECUTION_ID_ = CASE_EXECUTION.ID_
 
 		WHERE
         EXECUTION_ID_ = #{parameter, jdbcType=VARCHAR}
@@ -169,11 +160,6 @@
     ON
         EXECUTION.PARENT_ID_ = PARENT_EXECUTION.ID_
 
-    LEFT JOIN
-        ${prefix}ACT_RU_CASE_EXECUTION CASE_EXECUTION
-    ON
-        RES.CASE_EXECUTION_ID_ = CASE_EXECUTION.ID_
-
     WHERE
         CASE_EXECUTION_ID_ = #{parameter, jdbcType=VARCHAR}
     AND
@@ -196,11 +182,6 @@
         ${prefix}ACT_RU_EXECUTION PARENT_EXECUTION
     ON
         EXECUTION.PARENT_ID_ = PARENT_EXECUTION.ID_
-
-    LEFT JOIN
-        ${prefix}ACT_RU_CASE_EXECUTION CASE_EXECUTION
-    ON
-        RES.CASE_EXECUTION_ID_ = CASE_EXECUTION.ID_
 
     WHERE
         TASK_ID_ = #{parameter, jdbcType=VARCHAR}
@@ -230,7 +211,7 @@
 
     when
       RES.CASE_EXECUTION_ID_ is not null
-    then CASE_EXECUTION.ID_
+    then RES.CASE_EXECUTION_ID_
 
     <!-- if execution is process instance -->
 	  when
@@ -262,9 +243,6 @@
 
           left join ${prefix}ACT_RU_EXECUTION PARENT_EXECUTION
           on EXECUTION.PARENT_ID_ = PARENT_EXECUTION.ID_
-
-          left join ${prefix}ACT_RU_CASE_EXECUTION CASE_EXECUTION
-          on RES.CASE_EXECUTION_ID_ = CASE_EXECUTION.ID_
 
           <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
             left join ${prefix}ACT_RE_PROCDEF PROCDEF
