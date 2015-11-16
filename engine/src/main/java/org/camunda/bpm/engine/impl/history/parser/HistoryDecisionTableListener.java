@@ -16,7 +16,10 @@ package org.camunda.bpm.engine.impl.history.parser;
 import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationEvent;
 import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationListener;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.context.CoreExecutionContext;
+import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
@@ -48,12 +51,22 @@ public class HistoryDecisionTableListener implements DmnDecisionTableEvaluationL
     DmnDecision decisionTable = evaluationEvent.getDecisionTable();
     if(isDeployedDecisionTable(decisionTable) && historyLevel.isHistoryEventProduced(HistoryEventTypes.DMN_DECISION_EVALUATE, decisionTable)) {
 
-      if(Context.getBpmnExecutionContext() != null) {
-        ExecutionEntity execution = Context.getBpmnExecutionContext().getExecution();
-        return eventProducer.createDecisionEvaluatedEvt(execution, evaluationEvent);
-      } else {
-        return eventProducer.createDecisionEvaluatedEvt(evaluationEvent);
+      CoreExecutionContext<? extends CoreExecution> executionContext = Context.getCoreExecutionContext();
+      if (executionContext != null) {
+        CoreExecution coreExecution = executionContext.getExecution();
+
+        if (coreExecution instanceof ExecutionEntity) {
+          ExecutionEntity execution = (ExecutionEntity) coreExecution;
+          return eventProducer.createDecisionEvaluatedEvt(execution, evaluationEvent);
+        }
+        else if (coreExecution instanceof CaseExecutionEntity) {
+          CaseExecutionEntity caseExecution = (CaseExecutionEntity) coreExecution;
+          return eventProducer.createDecisionEvaluatedEvt(caseExecution, evaluationEvent);
+        }
+
       }
+
+      return eventProducer.createDecisionEvaluatedEvt(evaluationEvent);
 
     } else {
       return null;

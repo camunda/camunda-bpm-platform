@@ -17,7 +17,7 @@ import org.camunda.bpm.dmn.engine.DmnDecisionRuleResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.bpmn.behavior.BpmnBehaviorLogger;
+import org.camunda.bpm.engine.impl.dmn.DecisionLogger;
 
 /**
  * Maps the decision result to pairs of output name and untyped entries.
@@ -26,7 +26,7 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.BpmnBehaviorLogger;
  */
 public class SingleResultDecisionTableResultMapper implements DecisionTableResultMapper {
 
-  protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BPMN_BEHAVIOR_LOGGER;
+  protected static final DecisionLogger LOG = ProcessEngineLogger.DECISION_LOGGER;
 
   @Override
   public Object mapDecisionTableResult(DmnDecisionTableResult decisionTableResult) {

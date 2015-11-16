@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.impl.history.producer.CmmnHistoryEventProducer;
 import org.camunda.bpm.model.cmmn.instance.Case;
 import org.camunda.bpm.model.cmmn.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.CaseTask;
+import org.camunda.bpm.model.cmmn.instance.DecisionTask;
 import org.camunda.bpm.model.cmmn.instance.Definitions;
 import org.camunda.bpm.model.cmmn.instance.EventListener;
 import org.camunda.bpm.model.cmmn.instance.HumanTask;
@@ -95,6 +96,10 @@ public class CmmnHistoryTransformListener implements CmmnTransformListener {
   }
 
   public void transformCaseTask(PlanItem planItem, CaseTask caseTask, CmmnActivity caseActivity) {
+    addTaskOrStageHandlers(caseActivity);
+  }
+
+  public void transformDecisionTask(PlanItem planItem, DecisionTask decisionTask, CmmnActivity caseActivity) {
     addTaskOrStageHandlers(caseActivity);
   }
 

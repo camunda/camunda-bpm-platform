@@ -7,7 +7,21 @@
  <!-- insert -->
 
  <insert id="insertHistoricDecisionInstance" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceEntity">
-    insert into ${prefix}ACT_HI_DECINST(ID_, DEC_DEF_ID_, DEC_DEF_KEY_, DEC_DEF_NAME_, PROC_DEF_KEY_, PROC_DEF_ID_, PROC_INST_ID_, ACT_INST_ID_, ACT_ID_, EVAL_TIME_, COLLECT_VALUE_)
+    insert into ${prefix}ACT_HI_DECINST(
+      ID_,
+      DEC_DEF_ID_,
+      DEC_DEF_KEY_,
+      DEC_DEF_NAME_,
+      PROC_DEF_KEY_,
+      PROC_DEF_ID_,
+      PROC_INST_ID_,
+      CASE_DEF_KEY_,
+      CASE_DEF_ID_,
+      CASE_INST_ID_,
+      ACT_INST_ID_,
+      ACT_ID_,
+      EVAL_TIME_,
+      COLLECT_VALUE_)
     values (#{id, jdbcType=VARCHAR},
             #{decisionDefinitionId, jdbcType=VARCHAR},
             #{decisionDefinitionKey, jdbcType=VARCHAR},
@@ -15,6 +29,9 @@
             #{processDefinitionKey, jdbcType=VARCHAR},
             #{processDefinitionId, jdbcType=VARCHAR},
             #{processInstanceId, jdbcType=VARCHAR},
+            #{caseDefinitionKey, jdbcType=VARCHAR},
+            #{caseDefinitionId, jdbcType=VARCHAR},
+            #{caseInstanceId, jdbcType=VARCHAR},
             #{activityInstanceId, jdbcType=VARCHAR},
             #{activityId, jdbcType=VARCHAR},
             #{evaluationTime, jdbcType=TIMESTAMP},
@@ -38,6 +55,9 @@
     <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR"/>
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR"/>
+    <result property="caseDefinitionKey" column="CASE_DEF_KEY_" jdbcType="VARCHAR" />
+    <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR"/>
+    <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR"/>
     <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR"/>
     <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR"/>
     <result property="evaluationTime" column="EVAL_TIME_" jdbcType="TIMESTAMP"/>
@@ -126,7 +146,16 @@
       <if test="processInstanceId != null">
         and RES.PROC_INST_ID_ = #{processInstanceId}
       </if>
-      
+      <if test="caseDefinitionKey != null">
+        and RES.CASE_DEF_KEY_ = #{caseDefinitionKey}
+      </if>
+      <if test="caseDefinitionId != null">
+        and RES.CASE_DEF_ID_ = #{caseDefinitionId}
+      </if>
+      <if test="caseInstanceId != null">
+        and RES.CASE_INST_ID_ = #{caseInstanceId}
+      </if>
+
       <if test="activityInstanceIds != null &amp;&amp; activityInstanceIds.length > 0">
         and RES.ACT_INST_ID_ in
         <foreach item="activityInstanceId" index="index" collection="activityInstanceIds" open="(" separator="," close=")">

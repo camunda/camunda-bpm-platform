@@ -21,10 +21,13 @@ import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationEvent;
 import org.camunda.bpm.dmn.engine.delegate.DmnEvaluatedDecisionRule;
 import org.camunda.bpm.dmn.engine.delegate.DmnEvaluatedInput;
 import org.camunda.bpm.dmn.engine.delegate.DmnEvaluatedOutput;
+import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.history.HistoricDecisionInputInstance;
 import org.camunda.bpm.engine.history.HistoricDecisionOutputInstance;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
+import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInputInstanceEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceEntity;
@@ -63,6 +66,20 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     return event;
   }
 
+  public HistoryEvent createDecisionEvaluatedEvt(DelegateCaseExecution execution, DmnDecisionTableEvaluationEvent evaluationEvent) {
+    final CaseExecutionEntity executionEntity = (CaseExecutionEntity) execution;
+
+    // create event instance
+    HistoricDecisionInstanceEntity event = newDecisionInstanceEventEntity(executionEntity, evaluationEvent);
+    // initialize event
+    initDecisionInstanceEvent(event, evaluationEvent, HistoryEventTypes.DMN_DECISION_EVALUATE);
+    setReferenceToCaseInstance(event, executionEntity);
+    // set current time as evaluation time
+    event.setEvaluationTime(ClockUtil.getCurrentTime());
+
+    return event;
+  }
+
   @Override
   public HistoryEvent createDecisionEvaluatedEvt(DmnDecisionTableEvaluationEvent evaluationEvent) {
     // create event instance
@@ -76,6 +93,10 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
   }
 
   protected HistoricDecisionInstanceEntity newDecisionInstanceEventEntity(ExecutionEntity executionEntity, DmnDecisionTableEvaluationEvent evaluationEvent) {
+    return new HistoricDecisionInstanceEntity();
+  }
+
+  protected HistoricDecisionInstanceEntity newDecisionInstanceEventEntity(CaseExecutionEntity executionEntity, DmnDecisionTableEvaluationEvent evaluationEvent) {
     return new HistoricDecisionInstanceEntity();
   }
 
@@ -188,4 +209,24 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     }
   }
 
+  protected void setReferenceToCaseInstance(HistoricDecisionInstanceEntity event, CaseExecutionEntity execution) {
+    event.setCaseDefinitionKey(getCaseDefinitionKey(execution));
+    event.setCaseDefinitionId(execution.getCaseDefinitionId());
+
+    event.setCaseInstanceId(execution.getCaseInstanceId());
+
+    event.setActivityId(execution.getActivityId());
+    event.setActivityInstanceId(execution.getId());
+  }
+
+  protected String getCaseDefinitionKey(CaseExecutionEntity execution) {
+    CaseDefinitionEntity definition = (CaseDefinitionEntity) execution.getCaseDefinition();
+    if (definition != null) {
+      return definition.getKey();
+    } else {
+      return null;
+    }
+  }
+
 }
+

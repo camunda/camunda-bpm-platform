@@ -20,6 +20,7 @@ import org.camunda.bpm.model.cmmn.instance.Case;
 import org.camunda.bpm.model.cmmn.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.CaseTask;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
+import org.camunda.bpm.model.cmmn.instance.DecisionTask;
 import org.camunda.bpm.model.cmmn.instance.HumanTask;
 import org.camunda.bpm.model.cmmn.instance.Milestone;
 import org.camunda.bpm.model.cmmn.instance.PlanItemDefinition;
@@ -45,6 +46,7 @@ public class DefaultCmmnElementHandlerRegistry {
   protected HumanTaskItemHandler humanTaskPlanItemHandler = new HumanTaskItemHandler();
   protected ProcessTaskItemHandler processTaskPlanItemHandler = new ProcessTaskItemHandler();
   protected CaseTaskItemHandler caseTaskPlanItemHandler = new CaseTaskItemHandler();
+  protected DecisionTaskItemHandler decisionTaskPlanItemHandler = new DecisionTaskItemHandler();
   protected MilestoneItemHandler milestonePlanItemHandler = new MilestoneItemHandler();
   protected EventListenerItemHandler eventListenerPlanItemHandler = new EventListenerItemHandler();
 
@@ -68,6 +70,7 @@ public class DefaultCmmnElementHandlerRegistry {
     planItemElementHandlers.put(Task.class, taskPlanItemHandler);
     planItemElementHandlers.put(HumanTask.class, humanTaskPlanItemHandler);
     planItemElementHandlers.put(ProcessTask.class, processTaskPlanItemHandler);
+    planItemElementHandlers.put(DecisionTask.class, decisionTaskPlanItemHandler);
     planItemElementHandlers.put(CaseTask.class, caseTaskPlanItemHandler);
     planItemElementHandlers.put(Milestone.class, milestonePlanItemHandler);
 

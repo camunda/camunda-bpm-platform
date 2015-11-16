@@ -20,7 +20,7 @@ import java.util.Set;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.bpmn.behavior.BpmnBehaviorLogger;
+import org.camunda.bpm.engine.impl.dmn.DecisionLogger;
 
 /**
  * Maps the decision result to a list of untyped entries.
@@ -29,7 +29,7 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.BpmnBehaviorLogger;
  */
 public class CollectEntriesDecisionTableResultMapper implements DecisionTableResultMapper {
 
-  protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BPMN_BEHAVIOR_LOGGER;
+  protected static final DecisionLogger LOG = ProcessEngineLogger.DECISION_LOGGER;
 
   @Override
   public Object mapDecisionTableResult(DmnDecisionTableResult decisionResult) {

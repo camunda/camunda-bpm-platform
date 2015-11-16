@@ -805,6 +805,19 @@ public class HistoricCaseActivityInstanceTest extends CmmnProcessEngineTestCase 
 
   }
 
+  @Deployment
+  public void testDecisionTask() {
+    createCaseInstance();
+
+    HistoricCaseActivityInstance decisionTask = historyService
+        .createHistoricCaseActivityInstanceQuery()
+        .caseActivityId("PI_DecisionTask_1")
+        .singleResult();
+
+    assertNotNull(decisionTask);
+    assertEquals("decisionTask", decisionTask.getCaseActivityType());
+  }
+
   protected HistoricCaseActivityInstanceQuery historicQuery() {
     return historyService.createHistoricCaseActivityInstanceQuery();
   }

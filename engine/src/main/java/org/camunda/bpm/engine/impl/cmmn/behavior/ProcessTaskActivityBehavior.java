@@ -35,16 +35,6 @@ public class ProcessTaskActivityBehavior extends ProcessOrCaseTaskActivityBehavi
     processInstance.start(variables);
   }
 
-  public void onManualCompletion(CmmnActivityExecution execution) {
-    // Throw always an exception!
-    // It should not be possible to complete a process
-    // task manually. If the called process instance has
-    // been completed, the associated process task will
-    // be notified to complete automatically.
-    String id = execution.getId();
-    throw LOG.forbiddenManualCompletitionException("complete", id, "process task");
-  }
-
   protected String getTypeName() {
     return "process task";
   }

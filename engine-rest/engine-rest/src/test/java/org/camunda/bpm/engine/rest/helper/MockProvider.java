@@ -2250,6 +2250,9 @@ public abstract class MockProvider {
     when(mock.getProcessDefinitionId()).thenReturn(EXAMPLE_PROCESS_DEFINITION_ID);
     when(mock.getProcessDefinitionKey()).thenReturn(EXAMPLE_PROCESS_DEFINITION_KEY);
     when(mock.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
+    when(mock.getCaseDefinitionId()).thenReturn(EXAMPLE_CASE_DEFINITION_ID);
+    when(mock.getCaseDefinitionKey()).thenReturn(EXAMPLE_CASE_DEFINITION_KEY);
+    when(mock.getCaseInstanceId()).thenReturn(EXAMPLE_CASE_INSTANCE_ID);
     when(mock.getActivityId()).thenReturn(EXAMPLE_HISTORIC_DECISION_INSTANCE_ACTIVITY_ID);
     when(mock.getActivityInstanceId()).thenReturn(EXAMPLE_HISTORIC_DECISION_INSTANCE_ACTIVITY_INSTANCE_ID);
     when(mock.getEvaluationTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_DECISION_INSTANCE_EVALUATION_TIME));

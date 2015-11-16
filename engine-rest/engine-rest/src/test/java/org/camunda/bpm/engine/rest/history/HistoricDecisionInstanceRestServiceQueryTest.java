@@ -226,6 +226,9 @@ public class HistoricDecisionInstanceRestServiceQueryTest extends AbstractRestSe
     String returnedProcessDefinitionId = from(content).getString("[0].processDefinitionId");
     String returnedProcessDefinitionKey = from(content).getString("[0].processDefinitionKey");
     String returnedProcessInstanceId = from(content).getString("[0].processInstanceId");
+    String returnedCaseDefinitionId = from(content).getString("[0].caseDefinitionId");
+    String returnedCaseDefinitionKey = from(content).getString("[0].caseDefinitionKey");
+    String returnedCaseInstanceId = from(content).getString("[0].caseInstanceId");
     String returnedActivityId = from(content).getString("[0].activityId");
     String returnedActivityInstanceId = from(content).getString("[0].activityInstanceId");
     List<HistoricDecisionInputInstanceDto> returnedInputs = from(content).getList("[0].inputs");
@@ -240,6 +243,9 @@ public class HistoricDecisionInstanceRestServiceQueryTest extends AbstractRestSe
     assertThat(returnedProcessDefinitionId, is(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID));
     assertThat(returnedProcessDefinitionKey, is(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY));
     assertThat(returnedProcessInstanceId, is(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
+    assertThat(returnedCaseDefinitionId, is(MockProvider.EXAMPLE_CASE_DEFINITION_ID));
+    assertThat(returnedCaseDefinitionKey, is(MockProvider.EXAMPLE_CASE_DEFINITION_KEY));
+    assertThat(returnedCaseInstanceId, is(MockProvider.EXAMPLE_CASE_INSTANCE_ID));
     assertThat(returnedActivityId, is(MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_ACTIVITY_ID));
     assertThat(returnedActivityInstanceId, is(MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_ACTIVITY_INSTANCE_ID));
     assertThat(returnedInputs, is(nullValue()));
@@ -446,6 +452,9 @@ public class HistoricDecisionInstanceRestServiceQueryTest extends AbstractRestSe
     parameters.put("processDefinitionId", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
     parameters.put("processDefinitionKey", MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY);
     parameters.put("processInstanceId", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+    parameters.put("caseDefinitionId", MockProvider.EXAMPLE_CASE_DEFINITION_ID);
+    parameters.put("caseDefinitionKey", MockProvider.EXAMPLE_CASE_DEFINITION_KEY);
+    parameters.put("caseInstanceId", MockProvider.EXAMPLE_CASE_INSTANCE_ID);
     parameters.put("activityIdIn", MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_ACTIVITY_ID_IN);
     parameters.put("activityInstanceIdIn", MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_ACTIVITY_INSTANCE_ID_IN);
     parameters.put("evaluatedBefore", MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_EVALUATED_BEFORE);
@@ -466,6 +475,9 @@ public class HistoricDecisionInstanceRestServiceQueryTest extends AbstractRestSe
     verify(mockedQuery).processDefinitionId(stringQueryParameters.get("processDefinitionId"));
     verify(mockedQuery).processDefinitionKey(stringQueryParameters.get("processDefinitionKey"));
     verify(mockedQuery).processInstanceId(stringQueryParameters.get("processInstanceId"));
+    verify(mockedQuery).caseDefinitionId(stringQueryParameters.get("caseDefinitionId"));
+    verify(mockedQuery).caseDefinitionKey(stringQueryParameters.get("caseDefinitionKey"));
+    verify(mockedQuery).caseInstanceId(stringQueryParameters.get("caseInstanceId"));
     verify(mockedQuery).activityIdIn(stringArrayConverter.convertQueryParameterToType(stringQueryParameters.get("activityIdIn")));
     verify(mockedQuery).activityInstanceIdIn(stringArrayConverter.convertQueryParameterToType(stringQueryParameters.get("activityInstanceIdIn")));
     verify(mockedQuery).evaluatedBefore(DateTimeUtil.parseDate(stringQueryParameters.get("evaluatedBefore")));

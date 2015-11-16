@@ -16,7 +16,7 @@ package org.camunda.bpm.engine.test.dmn.businessruletask;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.impl.bpmn.behavior.DecisionRuleTaskActivityBehavior;
+import org.camunda.bpm.engine.impl.util.DecisionTableUtil;
 
 /**
  * @author Philipp Ossler
@@ -27,7 +27,7 @@ public class DecisionResultTestListener implements ExecutionListener {
 
   @Override
   public void notify(DelegateExecution execution) throws Exception {
-    decisionResult = (DmnDecisionTableResult) execution.getVariable(DecisionRuleTaskActivityBehavior.DECISION_RESULT_VARIABLE);
+    decisionResult = (DmnDecisionTableResult) execution.getVariable(DecisionTableUtil.DECISION_RESULT_VARIABLE);
   }
 
   public static DmnDecisionTableResult getDecisionResult() {

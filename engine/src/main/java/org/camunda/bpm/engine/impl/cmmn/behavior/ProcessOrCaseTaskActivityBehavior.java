@@ -16,8 +16,6 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
-import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
-import org.camunda.bpm.engine.impl.core.model.BaseCallableElement.CallableElementBinding;
 import org.camunda.bpm.engine.impl.core.model.CallableElement;
 import org.camunda.bpm.engine.variable.VariableMap;
 
@@ -25,9 +23,7 @@ import org.camunda.bpm.engine.variable.VariableMap;
  * @author Roman Smirnov
  *
  */
-public abstract class ProcessOrCaseTaskActivityBehavior extends TaskActivityBehavior implements TransferVariablesActivityBehavior {
-
-  protected CallableElement callableElement;
+public abstract class ProcessOrCaseTaskActivityBehavior extends CallingTaskActivityBehavior implements TransferVariablesActivityBehavior {
 
   protected void performStart(CmmnActivityExecution execution) {
     VariableMap variables = getInputVariables(execution);
@@ -45,11 +41,7 @@ public abstract class ProcessOrCaseTaskActivityBehavior extends TaskActivityBeha
   }
 
   public CallableElement getCallableElement() {
-    return callableElement;
-  }
-
-  public void setCallableElement(CallableElement callableElement) {
-    this.callableElement = callableElement;
+    return (CallableElement) callableElement;
   }
 
   protected String getBusinessKey(CmmnActivityExecution execution) {
@@ -62,36 +54,6 @@ public abstract class ProcessOrCaseTaskActivityBehavior extends TaskActivityBeha
 
   protected VariableMap getOutputVariables(VariableScope variableScope) {
     return getCallableElement().getOutputVariables(variableScope);
-  }
-
-  protected String getDefinitionKey(CmmnActivityExecution execution) {
-    CmmnExecution caseExecution = (CmmnExecution) execution;
-    return getCallableElement().getDefinitionKey(caseExecution);
-  }
-
-  protected Integer getVersion(CmmnActivityExecution execution) {
-    CmmnExecution caseExecution = (CmmnExecution) execution;
-    return getCallableElement().getVersion(caseExecution);
-  }
-
-  protected String getDeploymentId(CmmnActivityExecution execution) {
-    return getCallableElement().getDeploymentId();
-  }
-
-  protected CallableElementBinding getBinding() {
-    return getCallableElement().getBinding();
-  }
-
-  protected boolean isLatestBinding() {
-    return getCallableElement().isLatestBinding();
-  }
-
-  protected boolean isDeploymentBinding() {
-    return getCallableElement().isDeploymentBinding();
-  }
-
-  protected boolean isVersionBinding() {
-    return getCallableElement().isVersionBinding();
   }
 
   protected abstract void triggerCallableElement(CmmnActivityExecution execution, Map<String, Object> variables, String businessKey);

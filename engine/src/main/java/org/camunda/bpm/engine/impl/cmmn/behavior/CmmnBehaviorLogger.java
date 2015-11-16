@@ -16,6 +16,8 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.cmmn.CaseIllegalStateTransitionException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmmn.execution.CaseExecutionState;
+import org.camunda.bpm.engine.impl.cmmn.execution.CmmnActivityExecution;
+import org.camunda.bpm.engine.impl.core.model.BaseCallableElement;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
 
 /**
@@ -255,6 +257,15 @@ public class CmmnBehaviorLogger extends ProcessEngineLogger {
     return new ProcessEngineException(exceptionMessage(
       "018",
       "Variable listener invocation failed. Reason: {}",
+      cause.getMessage()),
+      cause
+    );
+  }
+
+  public ProcessEngineException decisionDefinitionEvaluationFailed(CmmnActivityExecution execution, Exception cause) {
+    return new ProcessEngineException(exceptionMessage(
+      "019",
+      "Could not evaluate decision in case execution '"+execution.getId()+"'. Reason: {}",
       cause.getMessage()),
       cause
     );

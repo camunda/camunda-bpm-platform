@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.impl.cmmn.operation.CmmnOperationLogger;
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformerLogger;
 import org.camunda.bpm.engine.impl.core.CoreLogger;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
+import org.camunda.bpm.engine.impl.dmn.DecisionLogger;
 import org.camunda.bpm.engine.impl.interceptor.ContextLogger;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutorLogger;
 import org.camunda.bpm.engine.impl.metrics.MetricsLogger;
@@ -109,6 +110,9 @@ public class ProcessEngineLogger extends BaseLogger {
 
   public static final ScriptLogger SCRIPT_LOGGER = BaseLogger.createLogger(
       ScriptLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.script", "21");
+
+  public static final DecisionLogger DECISION_LOGGER = BaseLogger.createLogger(
+      DecisionLogger.class, PROJECT_CODE, "org.camunda.bpm.engine.dmn", "22");
 
   public void processEngineCreated(String name) {
     logInfo("001", "Process Engine {} created.", name);

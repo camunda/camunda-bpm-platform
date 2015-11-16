@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.impl.dmn.cmd;
 
+import static org.camunda.bpm.engine.impl.util.DecisionTableUtil.evaluateDecisionTable;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.Map;
@@ -21,7 +22,6 @@ import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
-import org.camunda.bpm.engine.impl.dmn.invocation.DecisionTableInvocation;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
@@ -59,21 +59,13 @@ public class EvaluateDecisionByIdCmd implements Command<DmnDecisionTableResult> 
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     authorizationManager.checkEvaluateDecision(decisionDefinition.getKey());
 
-    return doEvaluateDecision(commandContext, decisionDefinition);
+    return doEvaluateDecision(decisionDefinition, variables);
   }
 
 
-  protected DmnDecisionTableResult doEvaluateDecision(CommandContext commandContext, DecisionDefinition decisionDefinition) {
-
-    final DecisionTableInvocation invocation = new DecisionTableInvocation(decisionDefinition, variables.asVariableContext());
-
+  protected DmnDecisionTableResult doEvaluateDecision(DecisionDefinition decisionDefinition, VariableMap variables) {
     try {
-      commandContext.getProcessEngineConfiguration()
-        .getDelegateInterceptor()
-        .handleInvocation(invocation);
-
-      return invocation.getInvocationResult();
-
+      return evaluateDecisionTable(decisionDefinition, variables);
     }
     catch (Exception e) {
       throw new ProcessEngineException("Exception while evaluating decision with id '"+decisionDefinitionId+"'", e);

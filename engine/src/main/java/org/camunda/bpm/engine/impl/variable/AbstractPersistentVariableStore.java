@@ -224,6 +224,8 @@ public abstract class AbstractPersistentVariableStore extends AbstractVariableSt
     VariableInstanceEntity variableInstance = VariableInstanceEntity.create(variableName, value);
     variableInstance.setTransient(true);
     initializeVariableInstanceBackPointer(variableInstance);
+
+    ensureVariableInstancesInitialized();
     variableInstances.put(variableName, variableInstance);
   }
 

@@ -96,6 +96,9 @@ public class HistoricDecisionInstanceRestServiceInteractionTest extends Abstract
     String returnedProcessDefinitionId = from(content).getString("processDefinitionId");
     String returnedProcessDefinitionKey = from(content).getString("processDefinitionKey");
     String returnedProcessInstanceId = from(content).getString("processInstanceId");
+    String returnedCaseDefinitionId = from(content).getString("caseDefinitionId");
+    String returnedCaseDefinitionKey = from(content).getString("caseDefinitionKey");
+    String returnedCaseInstanceId = from(content).getString("caseInstanceId");
     String returnedActivityId = from(content).getString("activityId");
     String returnedActivityInstanceId = from(content).getString("activityInstanceId");
     List<Map<String, Object>> returnedInputs = from(content).getList("inputs");
@@ -110,6 +113,9 @@ public class HistoricDecisionInstanceRestServiceInteractionTest extends Abstract
     assertThat(returnedProcessDefinitionId, is(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID));
     assertThat(returnedProcessDefinitionKey, is(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY));
     assertThat(returnedProcessInstanceId, is(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID));
+    assertThat(returnedCaseDefinitionId, is(MockProvider.EXAMPLE_CASE_DEFINITION_ID));
+    assertThat(returnedCaseDefinitionKey, is(MockProvider.EXAMPLE_CASE_DEFINITION_KEY));
+    assertThat(returnedCaseInstanceId, is(MockProvider.EXAMPLE_CASE_INSTANCE_ID));
     assertThat(returnedActivityId, is(MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_ACTIVITY_ID));
     assertThat(returnedActivityInstanceId, is(MockProvider.EXAMPLE_HISTORIC_DECISION_INSTANCE_ACTIVITY_INSTANCE_ID));
     assertThat(returnedInputs, is(nullValue()));

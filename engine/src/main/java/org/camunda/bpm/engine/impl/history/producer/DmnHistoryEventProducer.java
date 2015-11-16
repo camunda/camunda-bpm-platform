@@ -13,7 +13,9 @@
 
 package org.camunda.bpm.engine.impl.history.producer;
 
+import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationEvent;
+import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 
@@ -40,6 +42,22 @@ public interface DmnHistoryEventProducer {
    * @see #createDecisionEvaluatedEvt(DmnDecisionTableEvaluationEvent)
    */
   HistoryEvent createDecisionEvaluatedEvt(DelegateExecution execution, DmnDecisionTableEvaluationEvent decisionTableEvaluationEvent);
+
+  /**
+   * Creates the history event fired when a decision is evaluated while execute
+   * a case instance.
+   *
+   * @param execution
+   *          the current case execution
+   * @param decisionTable
+   *          the evaluated decision table
+   * @param decisionTableResult
+   *          the decision table evaluation result
+   * @return the history event
+   *
+   * @see #createDecisionEvaluatedEvt(DmnDecisionTable, DmnDecisionTableResult)
+   */
+  HistoryEvent createDecisionEvaluatedEvt(DelegateCaseExecution execution, DmnDecisionTableEvaluationEvent decisionTableEvaluationEvent);
 
   /**
    * Creates the history event fired when a decision is evaluated. If the

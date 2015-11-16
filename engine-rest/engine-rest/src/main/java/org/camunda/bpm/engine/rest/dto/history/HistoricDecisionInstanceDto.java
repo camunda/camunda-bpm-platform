@@ -35,6 +35,9 @@ public class HistoricDecisionInstanceDto {
   protected String processDefinitionId;
   protected String processDefinitionKey;
   protected String processInstanceId;
+  protected String caseDefinitionId;
+  protected String caseDefinitionKey;
+  protected String caseInstanceId;
   protected String activityId;
   protected String activityInstanceId;
   protected List<HistoricDecisionInputInstanceDto> inputs;
@@ -73,6 +76,18 @@ public class HistoricDecisionInstanceDto {
     return processInstanceId;
   }
 
+  public String getCaseDefinitionId() {
+    return caseDefinitionId;
+  }
+
+  public String getCaseDefinitionKey() {
+    return caseDefinitionKey;
+  }
+
+  public String getCaseInstanceId() {
+    return caseInstanceId;
+  }
+
   public String getActivityId() {
     return activityId;
   }
@@ -106,6 +121,9 @@ public class HistoricDecisionInstanceDto {
     dto.processDefinitionId = historicDecisionInstance.getProcessDefinitionId();
     dto.processDefinitionKey = historicDecisionInstance.getProcessDefinitionKey();
     dto.processInstanceId = historicDecisionInstance.getProcessInstanceId();
+    dto.caseDefinitionId = historicDecisionInstance.getCaseDefinitionId();
+    dto.caseDefinitionKey = historicDecisionInstance.getCaseDefinitionKey();
+    dto.caseInstanceId = historicDecisionInstance.getCaseInstanceId();
     dto.activityId = historicDecisionInstance.getActivityId();
     dto.activityInstanceId = historicDecisionInstance.getActivityInstanceId();
     dto.collectResultValue = historicDecisionInstance.getCollectResultValue();

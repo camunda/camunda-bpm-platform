@@ -13,19 +13,15 @@
 
 package org.camunda.bpm.engine.impl.bpmn.behavior;
 
+import static org.camunda.bpm.engine.impl.util.DecisionTableUtil.evaluateDecisionTable;
+
 import java.util.concurrent.Callable;
 
-import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.delegate.VariableScope;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.core.model.BaseCallableElement;
-import org.camunda.bpm.engine.impl.dmn.invocation.DecisionTableInvocation;
-import org.camunda.bpm.engine.impl.dmn.invocation.VariableScopeContext;
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.dmn.result.DecisionTableResultMapper;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
-import org.camunda.bpm.engine.impl.util.CallableElementUtil;
-import org.camunda.bpm.engine.repository.DecisionDefinition;
 
 /**
  * Implementation of a Bpmn BusinessRuleTask executing a DMN Decision.
@@ -39,8 +35,6 @@ import org.camunda.bpm.engine.repository.DecisionDefinition;
  */
 public class DecisionRuleTaskActivityBehavior extends AbstractBpmnActivityBehavior {
 
-  public static final String DECISION_RESULT_VARIABLE = "decisionResult";
-
   protected final BaseCallableElement callableElement;
   protected final String resultVariable;
   protected final DecisionTableResultMapper decisionTableResultMapper;
@@ -53,42 +47,15 @@ public class DecisionRuleTaskActivityBehavior extends AbstractBpmnActivityBehavi
 
   @Override
   public void execute(final ActivityExecution execution) throws Exception {
-
-    final DecisionDefinition decisionDefinition = resolveDecisionDefinition(execution);
-    final DecisionTableInvocation invocation = createInvocation(execution, decisionDefinition);
-
     executeWithErrorPropagation(execution, new Callable<Void>() {
 
       public Void call() throws Exception {
-
-        Context.getProcessEngineConfiguration()
-          .getDelegateInterceptor()
-          .handleInvocation(invocation);
-
-        DmnDecisionTableResult result = invocation.getInvocationResult();
-        if (result != null) {
-          // sets the decision result as variable for output mapping
-          ((ExecutionEntity) execution).setVariableLocalTransient(DECISION_RESULT_VARIABLE, result);
-
-          if (resultVariable != null && decisionTableResultMapper != null) {
-            Object mappedDecisionResult = decisionTableResultMapper.mapDecisionTableResult(result);
-            execution.setVariable(resultVariable, mappedDecisionResult);
-          }
-        }
-
+        evaluateDecisionTable((AbstractVariableScope) execution, callableElement, resultVariable, decisionTableResultMapper);
         leave(execution);
         return null;
       }
 
     });
-  }
-
-  protected DecisionTableInvocation createInvocation(ActivityExecution execution, DecisionDefinition decisionDefinitionToCall) {
-    return new DecisionTableInvocation(decisionDefinitionToCall, VariableScopeContext.wrap(execution));
-  }
-
-  protected DecisionDefinition resolveDecisionDefinition(ActivityExecution execution) {
-    return CallableElementUtil.getDecisionDefinitionToCall(execution, callableElement);
   }
 
 }

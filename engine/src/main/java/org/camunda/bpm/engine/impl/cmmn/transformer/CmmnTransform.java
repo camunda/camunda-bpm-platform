@@ -39,6 +39,7 @@ import org.camunda.bpm.model.cmmn.instance.Case;
 import org.camunda.bpm.model.cmmn.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.CaseTask;
 import org.camunda.bpm.model.cmmn.instance.CmmnElement;
+import org.camunda.bpm.model.cmmn.instance.DecisionTask;
 import org.camunda.bpm.model.cmmn.instance.Definitions;
 import org.camunda.bpm.model.cmmn.instance.EventListener;
 import org.camunda.bpm.model.cmmn.instance.HumanTask;
@@ -262,6 +263,8 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
       planItemTransformer = getPlanItemHandler(ProcessTask.class);
     } else if (definition instanceof CaseTask) {
       planItemTransformer = getPlanItemHandler(CaseTask.class);
+    } else if (definition instanceof DecisionTask) {
+      planItemTransformer = getPlanItemHandler(DecisionTask.class);
     } else if (definition instanceof Task) {
       planItemTransformer = getPlanItemHandler(Task.class);
     } else if (definition instanceof Stage) {
@@ -299,6 +302,8 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
           transformListener.transformProcessTask(planItem, (ProcessTask) definition, newActivity);
         } else if (definition instanceof CaseTask) {
           transformListener.transformCaseTask(planItem, (CaseTask) definition, newActivity);
+        } else if (definition instanceof DecisionTask) {
+          transformListener.transformDecisionTask(planItem, (DecisionTask) definition, newActivity);
         } else if (definition instanceof Task) {
           transformListener.transformTask(planItem, (Task) definition, newActivity);
         } else if (definition instanceof Stage) {

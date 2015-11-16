@@ -9,6 +9,7 @@
 
     <casePlanModel>
 
+      <planItem definitionRef="decisionTask" id="PI_decisionTask" />
       <planItem definitionRef="collectDataStage" id="PI_collectDataStage" />
       <planItem definitionRef="dataCollectedMilestone"  id="PI_dataCollectedMilestone">
         <entryCriterion sentryRef="Sentry_1" />
@@ -51,6 +52,7 @@
       <caseTask name="Obtain Credit-worthiness" id="obtainCreditWorthinessCaseTask" camunda:assignee="jonny1" />
       <task name="Request Missing Documents" id="requestMissingDocumentsTask"/>
       <humanTask name="Review Documents" id="reviewDocumentsHumanTask"/>
+      <decisionTask name="Decide something" id="decisionTask"/>
 
       <milestone name="Data collected" id="dataCollectedMilestone" />
 

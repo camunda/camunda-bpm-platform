@@ -13,18 +13,41 @@
 
 package org.camunda.bpm.engine.test.history;
 
+import java.io.Serializable;
+
+import org.camunda.bpm.dmn.engine.DmnDecisionRuleResult;
+import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.DecisionService;
+import org.camunda.bpm.engine.delegate.CaseExecutionListener;
+import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.delegate.VariableScope;
 
-public class DecisionServiceDelegate implements JavaDelegate {
+public class DecisionServiceDelegate implements JavaDelegate, CaseExecutionListener, Serializable {
+
+  private static final long serialVersionUID = 1L;
 
   @Override
   public void execute(DelegateExecution execution) throws Exception {
-
     DecisionService decisionService = execution.getProcessEngineServices().getDecisionService();
+    evaluateDecision(decisionService, execution);
+  }
 
-    decisionService.evaluateDecisionTableByKey("testDecision", execution.getVariables());
+  public void notify(DelegateCaseExecution caseExecution) throws Exception {
+    DecisionService decisionService = caseExecution.getProcessEngineServices().getDecisionService();
+    evaluateDecision(decisionService, caseExecution);
+  }
+
+  public boolean evaluate(DelegateCaseExecution caseExecution) {
+    DecisionService decisionService = caseExecution.getProcessEngineServices().getDecisionService();
+    DmnDecisionTableResult result = evaluateDecision(decisionService, caseExecution);
+    DmnDecisionRuleResult singleResult = result.getSingleResult();
+    return (Boolean) singleResult.getSingleEntry();
+  }
+
+  protected DmnDecisionTableResult evaluateDecision(DecisionService decisionService, VariableScope variableScope) {
+    return decisionService.evaluateDecisionTableByKey("testDecision", variableScope.getVariables());
   }
 
 }

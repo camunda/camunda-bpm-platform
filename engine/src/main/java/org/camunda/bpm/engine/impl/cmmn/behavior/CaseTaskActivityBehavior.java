@@ -35,16 +35,6 @@ public class CaseTaskActivityBehavior extends ProcessOrCaseTaskActivityBehavior 
     caseInstance.create(variables);
   }
 
-  public void onManualCompletion(CmmnActivityExecution execution) {
-    // Throw always an exception!
-    // It should not be possible to complete a case task
-    // manually. If the called case instance has been
-    // completed, the associated case task will be
-    // notified to complete automatically.
-    String id = execution.getId();
-    throw LOG.forbiddenManualCompletitionException("complete", id, "case task");
-  }
-
   protected String getTypeName() {
     return "case task";
   }

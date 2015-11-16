@@ -87,11 +87,7 @@ import org.camunda.bpm.engine.impl.core.variable.mapping.IoMapping;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ConstantValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.NullValueProvider;
 import org.camunda.bpm.engine.impl.core.variable.mapping.value.ParameterValueProvider;
-import org.camunda.bpm.engine.impl.dmn.result.CollectEntriesDecisionTableResultMapper;
 import org.camunda.bpm.engine.impl.dmn.result.DecisionTableResultMapper;
-import org.camunda.bpm.engine.impl.dmn.result.ResultListDecisionTableResultMapper;
-import org.camunda.bpm.engine.impl.dmn.result.SingleResultDecisionTableResultMapper;
-import org.camunda.bpm.engine.impl.dmn.result.SingleEntryDecisionTableResultMapper;
 import org.camunda.bpm.engine.impl.el.ElValueProvider;
 import org.camunda.bpm.engine.impl.el.Expression;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
@@ -139,6 +135,7 @@ import org.camunda.bpm.engine.impl.task.listener.ClassDelegateTaskListener;
 import org.camunda.bpm.engine.impl.task.listener.DelegateExpressionTaskListener;
 import org.camunda.bpm.engine.impl.task.listener.ExpressionTaskListener;
 import org.camunda.bpm.engine.impl.task.listener.ScriptTaskListener;
+import org.camunda.bpm.engine.impl.util.DecisionTableUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.impl.util.ScriptUtil;
 import org.camunda.bpm.engine.impl.util.StringUtil;
@@ -2024,25 +2021,15 @@ public class BpmnParse extends Parse {
 
   protected DecisionTableResultMapper parseDecisionResultMapper(Element businessRuleTaskElement) {
     // default mapper is 'resultList'
-    String decisionResultMapper = businessRuleTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "mapDecisionResult", "resultList");
+    String decisionResultMapper = businessRuleTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "mapDecisionResult");
+    DecisionTableResultMapper mapper = DecisionTableUtil.getDecisionTableResultMapper(decisionResultMapper);
 
-    if ("singleEntry".equals(decisionResultMapper)) {
-      return new SingleEntryDecisionTableResultMapper();
-
-    } else if ("singleResult".equals(decisionResultMapper)) {
-      return new SingleResultDecisionTableResultMapper();
-
-    } else if ("collectEntries".equals(decisionResultMapper)) {
-      return new CollectEntriesDecisionTableResultMapper();
-
-    } else if ("resultList".equals(decisionResultMapper)) {
-      return new ResultListDecisionTableResultMapper();
-
-    } else {
+    if (mapper == null) {
       addError("No decision result mapper found for name '" + decisionResultMapper
           + "'. Supported mappers are 'singleEntry', 'singleResult', 'collectEntries' and 'resultList'.", businessRuleTaskElement);
-      return null;
     }
+
+    return mapper;
   }
 
   /**

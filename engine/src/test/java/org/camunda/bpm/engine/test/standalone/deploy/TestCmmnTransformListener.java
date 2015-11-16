@@ -26,6 +26,7 @@ import org.camunda.bpm.model.cmmn.instance.Case;
 import org.camunda.bpm.model.cmmn.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.CaseTask;
 import org.camunda.bpm.model.cmmn.instance.CmmnModelElementInstance;
+import org.camunda.bpm.model.cmmn.instance.DecisionTask;
 import org.camunda.bpm.model.cmmn.instance.Definitions;
 import org.camunda.bpm.model.cmmn.instance.EventListener;
 import org.camunda.bpm.model.cmmn.instance.HumanTask;
@@ -82,6 +83,12 @@ public class TestCmmnTransformListener implements CmmnTransformListener {
   public void transformCaseTask(PlanItem planItem, CaseTask caseTask, CmmnActivity activity) {
     modelElementInstances.add(planItem);
     modelElementInstances.add(caseTask);
+    cmmnActivities.add(activity);
+  }
+
+  public void transformDecisionTask(PlanItem planItem, DecisionTask decisionTask, CmmnActivity activity) {
+    modelElementInstances.add(planItem);
+    modelElementInstances.add(decisionTask);
     cmmnActivities.add(activity);
   }
 

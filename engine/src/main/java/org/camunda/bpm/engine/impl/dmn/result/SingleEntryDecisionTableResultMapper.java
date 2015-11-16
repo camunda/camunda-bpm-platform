@@ -17,7 +17,7 @@ import org.camunda.bpm.dmn.engine.DmnDecisionRuleResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.bpmn.behavior.BpmnBehaviorLogger;
+import org.camunda.bpm.engine.impl.dmn.DecisionLogger;
 import org.camunda.bpm.engine.variable.Variables;
 
 /**
@@ -27,7 +27,7 @@ import org.camunda.bpm.engine.variable.Variables;
  */
 public class SingleEntryDecisionTableResultMapper implements DecisionTableResultMapper {
 
-  protected static final BpmnBehaviorLogger LOG = ProcessEngineLogger.BPMN_BEHAVIOR_LOGGER;
+  protected static final DecisionLogger LOG = ProcessEngineLogger.DECISION_LOGGER;
 
   @Override
   public Object mapDecisionTableResult(DmnDecisionTableResult decisionTableResult) {

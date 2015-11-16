@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
 import org.camunda.bpm.model.cmmn.instance.Case;
 import org.camunda.bpm.model.cmmn.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.CaseTask;
+import org.camunda.bpm.model.cmmn.instance.DecisionTask;
 import org.camunda.bpm.model.cmmn.instance.Definitions;
 import org.camunda.bpm.model.cmmn.instance.EventListener;
 import org.camunda.bpm.model.cmmn.instance.HumanTask;
@@ -58,6 +59,8 @@ public interface CmmnTransformListener {
   void transformProcessTask(PlanItem planItem, ProcessTask processTask, CmmnActivity caseActivity);
 
   void transformCaseTask(PlanItem planItem, CaseTask caseTask, CmmnActivity caseActivity);
+
+  void transformDecisionTask(PlanItem planItem, DecisionTask decisionTask, CmmnActivity caseActivity);
 
   void transformTask(PlanItem planItem, Task task, CmmnActivity caseActivity);
 
