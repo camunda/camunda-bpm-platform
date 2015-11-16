@@ -41,10 +41,6 @@ public class GenerateIdTest {
 
     HumanTask humanTask = modelInstance.getModelElementsByType(HumanTask.class).iterator().next();
     assertThat(humanTask.getId()).isNull();
-
-
-    DefaultControl element = modelInstance.newInstance(DefaultControl.class);
-    humanTask.setDefaultControl(element);
   }
 
   @Test
