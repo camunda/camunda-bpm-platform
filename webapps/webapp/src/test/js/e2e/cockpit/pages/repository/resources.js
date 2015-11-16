@@ -19,9 +19,10 @@ module.exports = Page.extend({
   },
 
   selectResource: function(idxOrName) {
+    var self = this;
     function callPageObject(idx) {
-      this.resourceList().get(idx).element(by.binding('resource.name')).click();
-      this.waitForElementToBeVisible(element(by.css('[cam-resource-meta] .name')));
+      self.resourceList().get(idx).element(by.css('a')).click();
+      self.waitForElementToBeVisible(element(by.css('[cam-resource-meta] .name')));
     }
 
     if (typeof idxOrName === 'number') {
@@ -32,7 +33,7 @@ module.exports = Page.extend({
   },
 
   resourceName: function(idx) {
-    return this.resourceList().get(idx).element(by.binding('resource.name')).getText();
+    return this.resourceList().get(idx).element(by.css('a')).getText();
   }
 
 });

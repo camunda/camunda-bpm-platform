@@ -18,7 +18,7 @@ module.exports = Page.extend({
   },
 
   resourceName: function() {
-    return this.formElement().element(by.binding('resource.name')).getText();
+    return this.formElement().element(by.css('h2.name')).getText();
   },
 
   resourceVersion: function() {
