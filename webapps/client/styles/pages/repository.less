@@ -58,6 +58,12 @@
     .layout(250px, 250px * 1.618);
   }
 
+  small.filepath {
+    font-style: italic;
+    display: block;
+    color: @gray;
+  }
+
   .ctn-content-container {
     overflow: auto;
     overflow-x: visible;
@@ -124,6 +130,9 @@
       .cell.top {
         background-color: mix(@brand-primary, @column-right-bg, 8%);
         text-align: right;
+      }
+      .cell.content {
+        overflow: auto;
       }
 
       .resource-actions {
@@ -405,7 +414,6 @@ section.deployments.ctn-column > .cell.content {
           font-style: italic;
         }
       }
-
       > a {
         .font-light;
         font-size: 18px;
@@ -423,8 +431,9 @@ section.deployments.ctn-column > .cell.content {
   &:focus {
     outline: none;
   }
-
 }
+
+
 
 [cam-resource-wrapper] {
   max-height: 100%;
@@ -434,12 +443,24 @@ section.deployments.ctn-column > .cell.content {
     z-index: 15;
   }
 
-  h2.name, h3.version {
+  .table-row {
+    display: table;
+    margin-bottom: @grid-gutter-width / 2;
+  }
+
+  h2.name,
+  h3.version {
     margin-top: 0;
+    display: table-cell;
+  }
+  h3.version {
+    width: 1%;
+    text-align: right;
+    white-space: nowrap;
   }
 
   h2.name {
-    margin-right: @grid-gutter-width / 2;
+    padding-right: @grid-gutter-width / 2;
   }
 
   .cmmn-resource,
@@ -455,8 +476,14 @@ section.deployments.ctn-column > .cell.content {
     overflow: auto;
   }
 
-  .cmmn-resource pre {
-    max-height: 400px;
+  .cmmn-resource {
+    > [cam-source] {
+      overflow: auto;
+    }
+    pre {
+      max-height: 400px;
+      margin: 0;
+    }
   }
 
   .image-resource {
