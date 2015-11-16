@@ -12,6 +12,11 @@
  */
 package org.camunda.bpm.model.cmmn.impl.instance;
 
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_DECISION_BINDING;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_DECISION_VERSION;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_MAP_DECISION_RESULT;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_ATTRIBUTE_RESULT_VARIABLE;
+import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CAMUNDA_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ATTRIBUTE_DECISION_REF;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_DECISION_TASK;
@@ -42,6 +47,12 @@ public class DecisionTaskImpl extends TaskImpl implements DecisionTask {
   protected static ChildElementCollection<ParameterMapping> parameterMappingCollection;
   protected static ChildElement<DecisionRefExpression> decisionRefExpressionChild;
 
+  /** Camunda extensions */
+  protected static Attribute<String> camundaResultVariableAttribute;
+  protected static Attribute<String> camundaDecisionBindingAttribute;
+  protected static Attribute<String> camundaDecisionVersionAttribute;
+  protected static Attribute<String> camundaMapDecisionResultAttribute;
+
   public DecisionTaskImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
   }
@@ -66,6 +77,40 @@ public class DecisionTaskImpl extends TaskImpl implements DecisionTask {
     decisionRefExpressionChild.setChild(this, decisionExpression);
   }
 
+  public String getCamundaResultVariable() {
+    return camundaResultVariableAttribute.getValue(this);
+  }
+
+  public void setCamundaResultVariable(String camundaResultVariable) {
+    camundaResultVariableAttribute.setValue(this, camundaResultVariable);
+  }
+
+  public String getCamundaDecisionBinding() {
+    return camundaDecisionBindingAttribute.getValue(this);
+  }
+
+  public void setCamundaDecisionBinding(String camundaDecisionBinding) {
+    camundaDecisionBindingAttribute.setValue(this, camundaDecisionBinding);
+  }
+
+  public String getCamundaDecisionVersion() {
+    return camundaDecisionVersionAttribute.getValue(this);
+  }
+
+  public void setCamundaDecisionVersion(String camundaDecisionVersion) {
+    camundaDecisionVersionAttribute.setValue(this, camundaDecisionVersion);
+  }
+
+  @Override
+  public String getCamundaMapDecisionResult() {
+    return camundaMapDecisionResultAttribute.getValue(this);
+  }
+
+  @Override
+  public void setCamundaMapDecisionResult(String camundaMapDecisionResult) {
+    camundaMapDecisionResultAttribute.setValue(this, camundaMapDecisionResult);
+  }
+
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(DecisionTask.class, CMMN_ELEMENT_DECISION_TASK)
         .namespaceUri(CMMN11_NS)
@@ -78,6 +123,24 @@ public class DecisionTaskImpl extends TaskImpl implements DecisionTask {
 
     decisionRefAttribute = typeBuilder.stringAttribute(CMMN_ATTRIBUTE_DECISION_REF)
         .build();
+
+    /** Camunda extensions */
+
+    camundaResultVariableAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_RESULT_VARIABLE)
+      .namespace(CAMUNDA_NS)
+      .build();
+
+    camundaDecisionBindingAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_DECISION_BINDING)
+      .namespace(CAMUNDA_NS)
+      .build();
+
+    camundaDecisionVersionAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_DECISION_VERSION)
+      .namespace(CAMUNDA_NS)
+      .build();
+
+    camundaMapDecisionResultAttribute = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_MAP_DECISION_RESULT)
+      .namespace(CAMUNDA_NS)
+      .build();
 
     SequenceBuilder sequenceBuilder = typeBuilder.sequence();
 

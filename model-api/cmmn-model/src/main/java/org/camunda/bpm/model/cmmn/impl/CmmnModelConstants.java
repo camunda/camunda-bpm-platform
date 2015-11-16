@@ -247,5 +247,9 @@ public class CmmnModelConstants {
   public static final String CAMUNDA_ATTRIBUTE_SCRIPT_FORMAT = "scriptFormat";
   public static final String CAMUNDA_ATTRIBUTE_RESOURCE = "resource";
   public static final String CAMUNDA_ATTRIBUTE_REPEAT_ON_STANDARD_EVENT = "repeatOnStandardEvent";
+  public static final String CAMUNDA_ATTRIBUTE_RESULT_VARIABLE = "resultVariable";
+  public static final String CAMUNDA_ATTRIBUTE_DECISION_BINDING = "decisionBinding";
+  public static final String CAMUNDA_ATTRIBUTE_DECISION_VERSION = "decisionVersion";
+  public static final String CAMUNDA_ATTRIBUTE_MAP_DECISION_RESULT = "mapDecisionResult";
 
 }

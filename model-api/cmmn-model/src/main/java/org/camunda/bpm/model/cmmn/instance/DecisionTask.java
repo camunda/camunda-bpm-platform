@@ -30,4 +30,22 @@ public interface DecisionTask extends Task {
 
   Collection<ParameterMapping> getParameterMappings();
 
+  /** Camunda extensions */
+
+  String getCamundaResultVariable();
+
+  void setCamundaResultVariable(String camundaResultVariable);
+
+  String getCamundaDecisionBinding();
+
+  void setCamundaDecisionBinding(String camundaDecisionBinding);
+
+  String getCamundaDecisionVersion();
+
+  void setCamundaDecisionVersion(String camundaDecisionVersion);
+
+  String getCamundaMapDecisionResult();
+
+  void setCamundaMapDecisionResult(String camundaMapDecisionResult);
+
 }
