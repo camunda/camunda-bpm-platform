@@ -43,8 +43,7 @@
         </thead>
 
         <tbody>
-          <tr ng-if="loadingState === 'LOADED'"
-              ng-repeat="authorization in authorizations | orderBy:getIdentityId:false">
+          <tr ng-repeat="authorization in authorizations | orderBy:getIdentityId:false">
             <td class="authorization-type" ng-if="!authorization.inUpdate || !!authorization.id">
               {{getType(authorization)}}
             </td>

@@ -8,6 +8,7 @@ define(['camunda-bpm-sdk-js', 'angular'], function(CamSDK, angular) {
     }).resource('authorization');
 
     $scope.addNewAuthorization = function() {
+      $scope.authorizations = $scope.authorizations || [];
       $scope.authorizations.push({
         inUpdate: true,
         type: 1,
