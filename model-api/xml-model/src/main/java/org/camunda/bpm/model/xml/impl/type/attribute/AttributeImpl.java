@@ -88,7 +88,9 @@ public abstract class AttributeImpl<T> implements Attribute<T> {
       value = modelElement.getAttributeValueNs(namespaceUri, attributeName);
       if(value == null) {
         String alternativeNamespace = owningElementType.getModel().getAlternativeNamespace(namespaceUri);
-        value = modelElement.getAttributeValueNs(alternativeNamespace, attributeName);
+        if (alternativeNamespace != null) {
+          value = modelElement.getAttributeValueNs(alternativeNamespace, attributeName);
+        }
       }
     }
 

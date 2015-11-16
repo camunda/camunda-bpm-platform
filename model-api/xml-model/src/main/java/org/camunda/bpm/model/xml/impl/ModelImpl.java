@@ -70,17 +70,11 @@ public class ModelImpl implements Model {
   }
 
   public String getAlternativeNamespace(String actualNs) {
-    if (actualNsToAlternative.containsKey(actualNs)) {
-      return actualNsToAlternative.get(actualNs);
-    }
-    return actualNs;
+    return actualNsToAlternative.get(actualNs);
   }
 
   public String getActualNamespace(String alternativeNs) {
-    if(alternativeNsToActual.containsKey(alternativeNs)){
-      return alternativeNsToActual.get(alternativeNs);
-    }
-    return alternativeNs;
+    return alternativeNsToActual.get(alternativeNs);
   }
 
   public Collection<ModelElementType> getTypes() {

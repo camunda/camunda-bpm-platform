@@ -59,11 +59,11 @@ public final class ModelUtil {
       Model model = modelInstance.getModel();
       String actualNamespaceUri = model.getActualNamespace(namespaceUri);
 
-      if (!namespaceUri.equals(actualNamespaceUri)) {
+      if (actualNamespaceUri != null) {
         modelType = getModelElement(domElement, modelInstance, actualNamespaceUri);
       }
       else {
-        modelType = (ModelElementTypeImpl) modelInstance.registerGenericType(actualNamespaceUri, localName);
+        modelType = (ModelElementTypeImpl) modelInstance.registerGenericType(namespaceUri, localName);
       }
 
     }

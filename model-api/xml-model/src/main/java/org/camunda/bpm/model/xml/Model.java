@@ -66,8 +66,18 @@ public interface Model {
    */
   String getModelName();
 
+  /**
+   * Returns the actual namespace URI for an alternative namespace URI
+   * @param alternativeNs the alternative namespace URI
+   * @return the actual namespace URI or null if none is set
+   */
   String getActualNamespace(String alternativeNs);
 
+  /**
+   * Returns the alternative namespace URI for a namespace URI
+   * @param actualNs the actual namespace URI
+   * @return the alternative namespace URI or null if none is set
+   */
   String getAlternativeNamespace(String actualNs);
 
 }

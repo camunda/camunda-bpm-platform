@@ -246,7 +246,7 @@ public class ModelElementTypeImpl implements ModelElementType {
 
     if (elements.isEmpty()) {
       String alternativeNamespaceURI = getModel().getAlternativeNamespace(namespaceURI);
-      if (!namespaceURI.equals(alternativeNamespaceURI)) {
+      if (alternativeNamespaceURI != null) {
         elements = getElementsByNameNs(document, alternativeNamespaceURI);
       }
     }
