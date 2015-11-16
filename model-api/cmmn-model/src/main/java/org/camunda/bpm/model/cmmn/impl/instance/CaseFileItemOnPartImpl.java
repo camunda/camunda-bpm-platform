@@ -19,6 +19,7 @@ import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_CA
 import org.camunda.bpm.model.cmmn.CaseFileItemTransition;
 import org.camunda.bpm.model.cmmn.instance.CaseFileItem;
 import org.camunda.bpm.model.cmmn.instance.CaseFileItemOnPart;
+import org.camunda.bpm.model.cmmn.instance.CaseFileItemTransitionStandardEvent;
 import org.camunda.bpm.model.cmmn.instance.OnPart;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;

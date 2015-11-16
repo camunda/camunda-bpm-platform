@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.camunda.bpm.model.cmmn.impl.CmmnModelConstants;
-import org.camunda.bpm.model.cmmn.impl.instance.PlanItemTransitionStandardEvent;
 
 /**
  * @author Roman Smirnov

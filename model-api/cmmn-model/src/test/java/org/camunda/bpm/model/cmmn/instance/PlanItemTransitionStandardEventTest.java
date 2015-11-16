@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.model.cmmn.impl.instance;
+package org.camunda.bpm.model.cmmn.instance;
 
 import java.util.Collection;
 
@@ -20,16 +20,18 @@ import org.camunda.bpm.model.cmmn.instance.CmmnModelElementInstanceTest;
  * @author Roman Smirnov
  *
  */
-public class CaseFileItemTransitionStandardEventTest extends CmmnModelElementInstanceTest {
+public class PlanItemTransitionStandardEventTest extends CmmnModelElementInstanceTest {
 
   public TypeAssumption getTypeAssumption() {
     return new TypeAssumption(false);
   }
 
+  @Override
   public Collection<ChildElementAssumption> getChildElementAssumptions() {
     return null;
   }
 
+  @Override
   public Collection<AttributeAssumption> getAttributesAssumptions() {
     return null;
   }

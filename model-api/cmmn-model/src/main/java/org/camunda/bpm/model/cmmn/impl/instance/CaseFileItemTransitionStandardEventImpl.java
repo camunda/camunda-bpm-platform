@@ -15,7 +15,8 @@ package org.camunda.bpm.model.cmmn.impl.instance;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN11_NS;
 import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_STANDARD_EVENT;
 
-import org.camunda.bpm.model.cmmn.PlanItemTransition;
+import org.camunda.bpm.model.cmmn.CaseFileItemTransition;
+import org.camunda.bpm.model.cmmn.instance.CaseFileItemTransitionStandardEvent;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
 import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
@@ -24,30 +25,30 @@ import org.camunda.bpm.model.xml.type.ModelElementTypeBuilder;
  * @author Roman Smirnov
  *
  */
-public class PlanItemTransitionStandardEvent extends CmmnModelElementInstanceImpl {
+public class CaseFileItemTransitionStandardEventImpl extends CmmnModelElementInstanceImpl implements CaseFileItemTransitionStandardEvent {
 
-  public PlanItemTransitionStandardEvent(ModelTypeInstanceContext instanceContext) {
+  public CaseFileItemTransitionStandardEventImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
   }
 
   public static void registerType(ModelBuilder modelBuilder) {
-    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(PlanItemTransitionStandardEvent.class, CMMN_ELEMENT_STANDARD_EVENT)
+    ModelElementTypeBuilder typeBuilder = modelBuilder.defineType(CaseFileItemTransitionStandardEvent.class, CMMN_ELEMENT_STANDARD_EVENT)
       .namespaceUri(CMMN11_NS)
-      .instanceProvider(new ModelElementTypeBuilder.ModelTypeInstanceProvider<PlanItemTransitionStandardEvent>() {
-        public PlanItemTransitionStandardEvent newInstance(ModelTypeInstanceContext instanceContext) {
-          return new PlanItemTransitionStandardEvent(instanceContext);
+      .instanceProvider(new ModelElementTypeBuilder.ModelTypeInstanceProvider<CaseFileItemTransitionStandardEvent>() {
+        public CaseFileItemTransitionStandardEvent newInstance(ModelTypeInstanceContext instanceContext) {
+          return new CaseFileItemTransitionStandardEventImpl(instanceContext);
         }
       });
 
     typeBuilder.build();
   }
 
-  public PlanItemTransition getValue() {
+  public CaseFileItemTransition getValue() {
     String standardEvent = getTextContent().trim();
-    return Enum.valueOf(PlanItemTransition.class, standardEvent);
+    return Enum.valueOf(CaseFileItemTransition.class, standardEvent);
   }
 
-  public void setValue(PlanItemTransition value) {
+  public void setValue(CaseFileItemTransition value) {
     setTextContent(value.toString());
   }
 

@@ -24,6 +24,7 @@ import org.camunda.bpm.model.cmmn.instance.ExitCriterion;
 import org.camunda.bpm.model.cmmn.instance.OnPart;
 import org.camunda.bpm.model.cmmn.instance.PlanItem;
 import org.camunda.bpm.model.cmmn.instance.PlanItemOnPart;
+import org.camunda.bpm.model.cmmn.instance.PlanItemTransitionStandardEvent;
 import org.camunda.bpm.model.cmmn.instance.Sentry;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;

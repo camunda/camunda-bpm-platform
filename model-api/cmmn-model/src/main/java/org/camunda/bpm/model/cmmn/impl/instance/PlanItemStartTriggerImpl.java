@@ -19,6 +19,7 @@ import static org.camunda.bpm.model.cmmn.impl.CmmnModelConstants.CMMN_ELEMENT_PL
 import org.camunda.bpm.model.cmmn.PlanItemTransition;
 import org.camunda.bpm.model.cmmn.instance.PlanItem;
 import org.camunda.bpm.model.cmmn.instance.PlanItemStartTrigger;
+import org.camunda.bpm.model.cmmn.instance.PlanItemTransitionStandardEvent;
 import org.camunda.bpm.model.cmmn.instance.StartTrigger;
 import org.camunda.bpm.model.xml.ModelBuilder;
 import org.camunda.bpm.model.xml.impl.instance.ModelTypeInstanceContext;
