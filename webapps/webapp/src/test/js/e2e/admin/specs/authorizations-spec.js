@@ -599,6 +599,26 @@ describe('Admin Authorizations Spec', function() {
 
   });
 
+  describe.only('New authorization on empty lists', function () {
+    before(function () {
+      return testHelper(setupFile.setup4, function () {
+        authorizationsPage.navigateToWebapp('Admin');
+        authorizationsPage.authentication.userLogin('admin', 'admin');
+
+        authorizationsPage.selectNavbarItem('Authorizations');
+
+        authorizationsPage.selectAuthorizationNavbarItem('Task');
+      });
+    });
+
+    it('can be created', function () {
+      authorizationsPage.createNewButton().click().then(function() {
+        checkCreateNewState();
+
+        abortCreatingNewAuthorization();
+      });
+    });
+  });
 
   describe('Update', function() {
 
