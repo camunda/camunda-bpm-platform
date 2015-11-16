@@ -27,7 +27,6 @@
           ng-repeat="(delta, resource) in resources"
           ng-class="{active: currentResourceId === resource.id, clickable: true}"
           ng-click="focus($event, resource)">
-        <small class="filepath" ng-if="resource._filepath">{{ resource._filepath }}/</small>
         <a href>
           {{ resource._filename }}
         </a>

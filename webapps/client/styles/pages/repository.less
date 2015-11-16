@@ -58,10 +58,12 @@
     .layout(250px, 250px * 1.618);
   }
 
-  small.filepath {
+  .filepath {
     font-style: italic;
     display: block;
-    color: @gray;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: @gray-light;
   }
 
   .ctn-content-container {
