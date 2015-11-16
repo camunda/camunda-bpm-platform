@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * Tests the mapping of the decision result.
@@ -31,8 +32,17 @@ import org.camunda.bpm.engine.variable.Variables;
 public class DmnDecisionTableResultMappingTest extends PluggableProcessEngineTestCase {
 
   protected static final String TEST_DECISION = "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultTest.dmn11.xml";
+  protected static final String CUSTOM_MAPPING_BPMN = "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultCustomOutputMapping.bpmn20.xml";
+  protected static final String SINGLE_ENTRY_BPMN = "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultSingleEntryTest.bpmn20.xml";
+  protected static final String SINGLE_RESULT_BPMN = "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultSingleResultTest.bpmn20.xml";
+  protected static final String COLLECT_ENTRIES_BPMN = "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultCollectEntriesTest.bpmn20.xml";
+  protected static final String RESULT_LIST_BPMN = "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultResultListTest.bpmn20.xml";
+  protected static final String DEFAULT_MAPPING_BPMN = "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultDefaultMappingTest.bpmn20.xml";
+  protected static final String INVALID_MAPPING_BPMN = "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultInvalidMappingTest.bpmn20.xml";
+  protected static final String OVERRIDE_DECISION_RESULT_BPMN = "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultOverrideVariableTest.bpmn20.xml";
+  protected static final String DECISION_RESULT_BPMN = "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultTest.bpmn20.xml";
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultCustomOutputMapping.bpmn20.xml", TEST_DECISION })
+  @Deployment(resources = {CUSTOM_MAPPING_BPMN, TEST_DECISION })
   public void testCustomOutputMapping() {
     ProcessInstance processInstance = startTestProcess("multiple entries");
 
@@ -43,7 +53,7 @@ public class DmnDecisionTableResultMappingTest extends PluggableProcessEngineTes
     assertEquals(Variables.stringValue("bar"), runtimeService.getVariableTyped(processInstance.getId(), "result2"));
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultSingleValueTest.bpmn20.xml", TEST_DECISION})
+  @Deployment(resources = { SINGLE_ENTRY_BPMN, TEST_DECISION})
   public void testSingleValueMapping() {
     ProcessInstance processInstance = startTestProcess("single entry");
 
@@ -51,7 +61,7 @@ public class DmnDecisionTableResultMappingTest extends PluggableProcessEngineTes
     assertEquals(Variables.stringValue("foo"), runtimeService.getVariableTyped(processInstance.getId(), "result"));
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultSingleOutputTest.bpmn20.xml", TEST_DECISION })
+  @Deployment(resources = { SINGLE_RESULT_BPMN, TEST_DECISION })
   public void testSingleOutputMapping() {
     ProcessInstance processInstance = startTestProcess("multiple entries");
 
@@ -63,7 +73,7 @@ public class DmnDecisionTableResultMappingTest extends PluggableProcessEngineTes
     assertEquals("bar", output.get("result2"));
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultCollectValuesTest.bpmn20.xml", TEST_DECISION })
+  @Deployment(resources = { COLLECT_ENTRIES_BPMN, TEST_DECISION })
   public void testCollectValuesMapping() {
     ProcessInstance processInstance = startTestProcess("single entry list");
 
@@ -75,7 +85,7 @@ public class DmnDecisionTableResultMappingTest extends PluggableProcessEngineTes
     assertEquals("foo", output.get(1));
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultOutputListTest.bpmn20.xml", TEST_DECISION })
+  @Deployment(resources = { RESULT_LIST_BPMN, TEST_DECISION })
   public void testOutputListMapping() {
     ProcessInstance processInstance = startTestProcess("multiple entries list");
 
@@ -90,7 +100,7 @@ public class DmnDecisionTableResultMappingTest extends PluggableProcessEngineTes
     }
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultDefaultMappingTest.bpmn20.xml", TEST_DECISION })
+  @Deployment(resources = { DEFAULT_MAPPING_BPMN, TEST_DECISION })
   public void testDefaultResultMapping() {
     ProcessInstance processInstance = startTestProcess("multiple entries list");
 
@@ -106,7 +116,7 @@ public class DmnDecisionTableResultMappingTest extends PluggableProcessEngineTes
     }
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultSingleValueTest.bpmn20.xml", TEST_DECISION })
+  @Deployment(resources = { SINGLE_ENTRY_BPMN, TEST_DECISION })
   public void testSingleValueMappingFailureMultipleOutputs() {
     try {
       startTestProcess("single entry list");
@@ -117,7 +127,7 @@ public class DmnDecisionTableResultMappingTest extends PluggableProcessEngineTes
     }
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultSingleValueTest.bpmn20.xml", TEST_DECISION })
+  @Deployment(resources = { SINGLE_ENTRY_BPMN, TEST_DECISION })
   public void testSingleValueMappingFailureMultipleValues() {
     try {
       startTestProcess("multiple entries");
@@ -128,7 +138,7 @@ public class DmnDecisionTableResultMappingTest extends PluggableProcessEngineTes
     }
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultSingleOutputTest.bpmn20.xml", TEST_DECISION })
+  @Deployment(resources = { SINGLE_RESULT_BPMN, TEST_DECISION })
   public void testSingleOutputMappingFailure() {
     try {
       startTestProcess("single entry list");
@@ -139,7 +149,7 @@ public class DmnDecisionTableResultMappingTest extends PluggableProcessEngineTes
     }
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultCollectValuesTest.bpmn20.xml", TEST_DECISION })
+  @Deployment(resources = { COLLECT_ENTRIES_BPMN, TEST_DECISION })
   public void testCollectValuesMappingFailure() {
     try {
       startTestProcess("multiple entries");
@@ -154,7 +164,7 @@ public class DmnDecisionTableResultMappingTest extends PluggableProcessEngineTes
     try {
       deploymentId = repositoryService
           .createDeployment()
-          .addClasspathResource("org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultInvalidMappingTest.bpmn20.xml")
+          .addClasspathResource(INVALID_MAPPING_BPMN)
           .deploy()
           .getId();
 
@@ -164,7 +174,7 @@ public class DmnDecisionTableResultMappingTest extends PluggableProcessEngineTes
     }
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultTest.bpmn20.xml", TEST_DECISION })
+  @Deployment(resources = { DECISION_RESULT_BPMN, TEST_DECISION })
   public void testTransientDecisionResult() {
     // when a decision is evaluated and the result is stored in a transient variable "decisionResult"
     ProcessInstance processInstance = startTestProcess("single entry");
@@ -175,7 +185,7 @@ public class DmnDecisionTableResultMappingTest extends PluggableProcessEngineTes
     assertNull(historyService.createHistoricVariableInstanceQuery().variableName("decisionResult").singleResult());
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultOverrideVariableTest.bpmn20.xml", TEST_DECISION })
+  @Deployment(resources = { OVERRIDE_DECISION_RESULT_BPMN, TEST_DECISION })
   public void testFailedToOverrideDecisionResultVariable() {
     try {
       // the transient variable "decisionResult" should not be overridden by the task result variable
@@ -185,6 +195,53 @@ public class DmnDecisionTableResultMappingTest extends PluggableProcessEngineTes
     } catch (ProcessEngineException e) {
       assertTextPresent("variable with name 'decisionResult' can not be updated", e.getMessage());
     }
+  }
+
+  @Deployment(resources = { SINGLE_ENTRY_BPMN, TEST_DECISION })
+  public void testSingleEntryEmptyResult() {
+    ProcessInstance processInstance = startTestProcess("empty result");
+
+    Object result = runtimeService.getVariable(processInstance.getId(), "result");
+    assertNull(result);
+    TypedValue resultTyped = runtimeService.getVariableTyped(processInstance.getId(), "result");
+    assertEquals(Variables.untypedNullValue(), resultTyped);
+  }
+
+  @Deployment(resources = { SINGLE_RESULT_BPMN, TEST_DECISION })
+  public void testSingleResultEmptyResult() {
+    ProcessInstance processInstance = startTestProcess("empty result");
+
+    Object result = runtimeService.getVariable(processInstance.getId(), "result");
+    assertNull(result);
+    TypedValue resultTyped = runtimeService.getVariableTyped(processInstance.getId(), "result");
+    assertEquals(Variables.untypedNullValue(), resultTyped);
+  }
+
+  @Deployment(resources = { COLLECT_ENTRIES_BPMN, TEST_DECISION })
+  @SuppressWarnings("unchecked")
+  public void testCollectEntriesEmptyResult() {
+    ProcessInstance processInstance = startTestProcess("empty result");
+
+    List<Object> result = (List<Object>) runtimeService.getVariable(processInstance.getId(), "result");
+    assertTrue(result.isEmpty());
+  }
+
+  @Deployment(resources = { RESULT_LIST_BPMN, TEST_DECISION })
+  @SuppressWarnings("unchecked")
+  public void testResultListEmptyResult() {
+    ProcessInstance processInstance = startTestProcess("empty result");
+
+    List<Object> result = (List<Object>) runtimeService.getVariable(processInstance.getId(), "result");
+    assertTrue(result.isEmpty());
+  }
+
+  @Deployment(resources = { DEFAULT_MAPPING_BPMN, TEST_DECISION })
+  @SuppressWarnings("unchecked")
+  public void testDefaultMappingEmptyResult() {
+    ProcessInstance processInstance = startTestProcess("empty result");
+
+    List<Object> result = (List<Object>) runtimeService.getVariable(processInstance.getId(), "result");
+    assertTrue(result.isEmpty());
   }
 
   protected ProcessInstance startTestProcess(String input) {

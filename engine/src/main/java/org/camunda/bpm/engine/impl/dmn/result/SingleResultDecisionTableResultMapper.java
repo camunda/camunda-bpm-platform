@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.impl.dmn.result;
 
+import org.camunda.bpm.dmn.engine.DmnDecisionRuleResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -30,8 +31,13 @@ public class SingleResultDecisionTableResultMapper implements DecisionTableResul
   @Override
   public Object mapDecisionTableResult(DmnDecisionTableResult decisionTableResult) {
     try {
-      return decisionTableResult.getSingleResult().getEntryMap();
-
+      DmnDecisionRuleResult singleResult = decisionTableResult.getSingleResult();
+      if (singleResult != null) {
+        return singleResult.getEntryMap();
+      }
+      else {
+        return null;
+      }
     } catch (DmnEngineException e) {
       throw LOG.decisionResultMappingException(decisionTableResult, e);
     }
