@@ -30,9 +30,9 @@ public abstract class CallingTaskActivityBehavior extends TaskActivityBehavior {
 
   public void onManualCompletion(CmmnActivityExecution execution) {
     // Throw always an exception!
-    // It should not be possible to complete a process
-    // task manually. If the called process instance has
-    // been completed, the associated process task will
+    // It should not be possible to complete a calling
+    // task manually. If the called instance has
+    // been completed, the associated task will
     // be notified to complete automatically.
     String id = execution.getId();
     throw LOG.forbiddenManualCompletitionException("complete", id, getTypeName());
