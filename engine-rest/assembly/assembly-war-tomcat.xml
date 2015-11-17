@@ -15,7 +15,7 @@
       <outputDirectory>WEB-INF/lib</outputDirectory>
       <useTransitiveDependencies>true</useTransitiveDependencies>     
       <useTransitiveFiltering>true</useTransitiveFiltering>
-      <scope>test</scope>
+      <scope>provided</scope>
       <includes>
         <include>org.jboss.resteasy:resteasy-jaxrs:jar:*</include>
       </includes>

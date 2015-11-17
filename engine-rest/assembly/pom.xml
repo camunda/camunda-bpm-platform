@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>camunda-engine-rest-assembly</artifactId>
+  <artifactId>camunda-engine-rest</artifactId>
   <name>camunda BPM - engine - REST - Assembly</name>
-  <packaging>pom</packaging>
+  <packaging>war</packaging>
 
   <parent>
     <groupId>org.camunda.bpm</groupId>
@@ -14,19 +14,50 @@
   <dependencies>
     <dependency>
       <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine-rest</artifactId>
+      <artifactId>camunda-engine-rest-core</artifactId>
       <version>${project.version}</version>
-      <type>war</type>
+    </dependency>
+
+    <!-- dependencies only used for assemblies should be scope provided -->
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine-rest-core</artifactId>
+      <version>${project.version}</version>
+      <classifier>sources</classifier>
+      <scope>provided</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine-rest-core</artifactId>
+      <version>${project.version}</version>
+      <classifier>classes</classifier>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jaxrs</artifactId>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <failOnMissingWebXml>false</failOnMissingWebXml>
+          <archive>
+            <manifestEntries>
+              <!-- module dependencies for deployment on AS 7  -->
+              <Dependencies>org.camunda.bpm.camunda-engine,org.camunda.bpm.dmn.camunda-engine-dmn</Dependencies>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
@@ -39,7 +70,7 @@
             </goals>
             <configuration>
               <descriptors>
-                <descriptor>assembly-tomcat.xml</descriptor>
+                <descriptor>assembly-war-tomcat.xml</descriptor>
               </descriptors>
               <finalName>camunda-engine-rest-${project.version}</finalName>
               <attach>true</attach>
@@ -57,7 +88,7 @@
             </goals>
             <configuration>
               <descriptors>
-                <descriptor>assembly-was.xml</descriptor>
+                <descriptor>assembly-war-was.xml</descriptor>
               </descriptors>
               <finalName>camunda-engine-rest-${project.version}</finalName>
               <attach>true</attach>
@@ -75,7 +106,7 @@
             </goals>
             <configuration>
               <descriptors>
-                <descriptor>assembly-wls.xml</descriptor>
+                <descriptor>assembly-war-wls.xml</descriptor>
               </descriptors>
               <finalName>camunda-engine-rest-${project.version}</finalName>
               <attach>true</attach>
@@ -84,8 +115,43 @@
               <workDirectory>target/assembly/work</workDirectory>
             </configuration>
           </execution>
+
+          <execution>
+            <id>classes</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>assembly-classes.xml</descriptor>
+              </descriptors>
+              <finalName>camunda-engine-rest-${project.version}</finalName>
+              <attach>true</attach>
+              <outputDirectory>target/</outputDirectory>
+              <workDirectory>target/assembly/work</workDirectory>
+            </configuration>
+        </execution>
+        <execution>
+            <id>sources</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>assembly-sources.xml</descriptor>
+              </descriptors>
+              <finalName>camunda-engine-rest-${project.version}</finalName>
+              <attach>true</attach>
+              <outputDirectory>target/</outputDirectory>
+              <workDirectory>target/assembly/work</workDirectory>
+            </configuration>
+          </execution>
+
         </executions>
       </plugin>
+
     </plugins>
   </build>
 </project>

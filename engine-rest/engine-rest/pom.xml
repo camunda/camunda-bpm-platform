@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>camunda-engine-rest</artifactId>
+  <artifactId>camunda-engine-rest-core</artifactId>
   <name>camunda BPM - engine - REST</name>
-  <packaging>war</packaging>
+  <packaging>jar</packaging>
 
   <parent>
     <groupId>org.camunda.bpm</groupId>
@@ -27,21 +27,27 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.jboss.spec.javax.ws.rs</groupId>
-      <artifactId>jboss-jaxrs-api_1.1_spec</artifactId>
-      <scope>provided</scope>
+      <groupId>commons-fileupload</groupId>
+      <artifactId>commons-fileupload</artifactId>
     </dependency>
-    
-    <dependency>
-      <groupId>org.jboss.spec.javax.servlet</groupId>
-      <artifactId>jboss-servlet-api_3.0_spec</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    
+
     <dependency>
       <groupId>com.fasterxml.jackson.jaxrs</groupId>
       <artifactId>jackson-jaxrs-json-provider</artifactId>
       <version>${jackson.version}</version>
+    </dependency>
+
+    <!-- provided deps -->
+    <dependency>
+      <groupId>org.jboss.spec.javax.ws.rs</groupId>
+      <artifactId>jboss-jaxrs-api_1.1_spec</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.spec.javax.servlet</groupId>
+      <artifactId>jboss-servlet-api_3.0_spec</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -50,10 +56,6 @@
       <scope>provided</scope>
     </dependency>
 
-    <dependency>
-      <groupId>commons-fileupload</groupId>
-      <artifactId>commons-fileupload</artifactId>
-    </dependency>
 
     <!-- test -->
     <dependency>
@@ -145,7 +147,7 @@
       <version>2.0.8</version>
       <scope>test</scope>
     </dependency>
-    
+
     <!-- Tomcat for resteasy and wink -->
     <dependency>
       <groupId>ch.qos.logback</groupId>
@@ -221,18 +223,25 @@
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <!-- This id must match the -Prelease-profile id value or else sources will be "uploaded" twice, which causes Nexus to fail -->
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
         <configuration>
           <failOnMissingWebXml>false</failOnMissingWebXml>
-          <archive>
-            <manifestEntries>
-              <!-- module dependencies for deployment on AS 7  -->
-              <Dependencies>org.camunda.bpm.camunda-engine,org.camunda.bpm.dmn.camunda-engine-dmn</Dependencies>
-            </manifestEntries>
-          </archive>
         </configuration>
       </plugin>
-      
+
       <!-- the test runtimes each bring the JAX-RS classes themselves -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -394,7 +403,7 @@
         </plugins>
       </build>
     </profile>
-    
+
     <profile>
       <id>wink</id>
       <dependencies>
