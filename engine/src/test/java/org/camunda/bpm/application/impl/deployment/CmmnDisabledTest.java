@@ -40,24 +40,24 @@ public class CmmnDisabledTest extends ResourceProcessEngineTestCase {
     super.setUp();
   }
 
-  public void testListenerInvocation() {
+  public void testCmmnDisabled() {
     ProcessApplicationDeployment deployment = repositoryService.createDeployment(processApplication.getReference())
         .addClasspathResource("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
         .deploy();
 
-      // process is deployed:
-      ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
-      assertNotNull(processDefinition);
-      assertEquals(1, processDefinition.getVersion());
+    // process is deployed:
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    assertNotNull(processDefinition);
+    assertEquals(1, processDefinition.getVersion());
 
-      try {
-        repositoryService.createCaseDefinitionQuery().singleResult();
-        fail("Cmmn Disabled: It should not be possible to query for a case definition.");
-      } catch (Exception e) {
-        // expected
-      }
+    try {
+      repositoryService.createCaseDefinitionQuery().singleResult();
+      fail("Cmmn Disabled: It should not be possible to query for a case definition.");
+    } catch (Exception e) {
+      // expected
+    }
 
-      repositoryService.deleteDeployment(deployment.getId(), true);
+    repositoryService.deleteDeployment(deployment.getId(), true);
   }
 
   public void testVariableInstanceQuery() {
