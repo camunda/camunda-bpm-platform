@@ -18,6 +18,7 @@ import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnEngineException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.dmn.result.DecisionTableResultMapper;
 
 /**
  * @author Roman Smirnov
@@ -25,18 +26,20 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
  */
 public class DecisionLogger extends ProcessEngineLogger {
 
-  public ProcessEngineException decisionResultMappingException(DmnDecisionTableResult decisionResult, DmnEngineException cause) {
+  public ProcessEngineException decisionResultMappingException(DmnDecisionTableResult decisionResult, DecisionTableResultMapper resultMapper, DmnEngineException cause) {
     return new ProcessEngineException(exceptionMessage(
         "001",
-        "The decision result mapper failed to process '{}'",
+        "The decision result mapper '{}' failed to process '{}'",
+        resultMapper,
         decisionResult
       ), cause);
   }
 
-  public ProcessEngineException decisionResultCollectMappingException(Collection<String> outputNames, DmnDecisionTableResult decisionResult) {
+  public ProcessEngineException decisionResultCollectMappingException(Collection<String> outputNames, DmnDecisionTableResult decisionResult, DecisionTableResultMapper resultMapper) {
     return new ProcessEngineException(exceptionMessage(
         "002",
-        "The decision result mapper failed to process '{}'. The decision outputs should only contains values for one output name but found '{}'.",
+        "The decision result mapper '{}' failed to process '{}'. The decision outputs should only contains values for one output name but found '{}'.",
+        resultMapper,
         decisionResult,
         outputNames
       ));

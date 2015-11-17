@@ -40,8 +40,13 @@ public class SingleResultDecisionTableResultMapper implements DecisionTableResul
         return Variables.untypedNullValue();
       }
     } catch (DmnEngineException e) {
-      throw LOG.decisionResultMappingException(decisionTableResult, e);
+      throw LOG.decisionResultMappingException(decisionTableResult, this, e);
     }
+  }
+
+  @Override
+  public String toString() {
+    return "SingleResultDecisionTableResultMapper{}";
   }
 
 }

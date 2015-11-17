@@ -40,7 +40,7 @@ public class CollectEntriesDecisionTableResultMapper implements DecisionTableRes
 
       Set<String> outputNames = collectOutputNames(decisionResult);
       if (outputNames.size() > 1) {
-        throw LOG.decisionResultCollectMappingException(outputNames, decisionResult);
+        throw LOG.decisionResultCollectMappingException(outputNames, decisionResult, this);
 
       } else {
         String outputName = outputNames.iterator().next();
@@ -57,6 +57,11 @@ public class CollectEntriesDecisionTableResultMapper implements DecisionTableRes
     }
 
     return outputNames;
+  }
+
+  @Override
+  public String toString() {
+    return "CollectEntriesDecisionTableResultMapper{}";
   }
 
 }

@@ -123,7 +123,7 @@ public class DmnDecisionTableResultMappingTest extends PluggableProcessEngineTes
 
       fail("expect exception");
     } catch (ProcessEngineException e) {
-      assertTextPresent("The decision result mapper failed to process", e.getMessage());
+      assertTextPresent("ENGINE-22001", e.getMessage());
     }
   }
 
@@ -134,7 +134,7 @@ public class DmnDecisionTableResultMappingTest extends PluggableProcessEngineTes
 
       fail("expect exception");
     } catch (ProcessEngineException e) {
-      assertTextPresent("The decision result mapper failed to process", e.getMessage());
+      assertTextPresent("ENGINE-22001", e.getMessage());
     }
   }
 
@@ -145,7 +145,7 @@ public class DmnDecisionTableResultMappingTest extends PluggableProcessEngineTes
 
       fail("expect exception");
     } catch (ProcessEngineException e) {
-      assertTextPresent("The decision result mapper failed to process", e.getMessage());
+      assertTextPresent("ENGINE-22001", e.getMessage());
     }
   }
 
@@ -156,7 +156,7 @@ public class DmnDecisionTableResultMappingTest extends PluggableProcessEngineTes
 
       fail("expect exception");
     } catch (ProcessEngineException e) {
-      assertTextPresent("The decision result mapper failed to process", e.getMessage());
+      assertTextPresent("ENGINE-22002", e.getMessage());
     }
   }
 
