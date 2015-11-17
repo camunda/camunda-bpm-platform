@@ -25,14 +25,17 @@ import org.camunda.bpm.engine.variable.Variables;
  * @author Roman Smirnov
  *
  */
-public class DmnDecisionTableResultMappingTest extends CmmnProcessEngineTestCase {
+public class CmmnDecisionTaskResultMappingTest extends CmmnProcessEngineTestCase {
 
   protected static final String TEST_DECISION = "org/camunda/bpm/engine/test/dmn/result/DmnDecisionResultTest.dmn11.xml";
+  protected static final String SINGLE_ENTRY_MAPPING_CMMN = "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTableResultMappingTest.testSingleEntryMapping.cmmn";
+  protected static final String SINGLE_RESULT_MAPPING_CMMN = "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTableResultMappingTest.testSingleResultMapping.cmmn";
+  protected static final String COLLECT_ENTRIES_MAPPING_CMMN = "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTableResultMappingTest.testCollectEntriesMapping.cmmn";
+  protected static final String RESULT_LIST_MAPPING_CMMN = "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTableResultMappingTest.testResultListMapping.cmmn";
+  protected static final String DEFAULT_MAPPING_CMMN = "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTableResultMappingTest.testDefaultResultMapping.cmmn";
+  protected static final String OVERRIDE_DECISION_RESULT_CMMN = "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTableResultMappingTest.testFailedToOverrideDecisionResultVariable.cmmn";
 
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTableResultMappingTest.testSingleEntryMapping.cmmn",
-      TEST_DECISION
-    })
+  @Deployment(resources = { SINGLE_ENTRY_MAPPING_CMMN, TEST_DECISION })
   public void testSingleEntryMapping() {
     CaseInstance caseInstance = createTestCase("single entry");
 
@@ -41,10 +44,7 @@ public class DmnDecisionTableResultMappingTest extends CmmnProcessEngineTestCase
   }
 
   @SuppressWarnings("unchecked")
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTableResultMappingTest.testSingleResultMapping.cmmn",
-      TEST_DECISION
-    })
+  @Deployment(resources = { SINGLE_RESULT_MAPPING_CMMN, TEST_DECISION })
   public void testSingleResultMapping() {
     CaseInstance caseInstance = createTestCase("multiple entries");
 
@@ -56,10 +56,7 @@ public class DmnDecisionTableResultMappingTest extends CmmnProcessEngineTestCase
   }
 
   @SuppressWarnings("unchecked")
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTableResultMappingTest.testCollectEntriesMapping.cmmn",
-      TEST_DECISION
-    })
+  @Deployment(resources = { COLLECT_ENTRIES_MAPPING_CMMN, TEST_DECISION })
   public void testCollectEntriesMapping() {
     CaseInstance caseInstance = createTestCase("single entry list");
 
@@ -71,10 +68,7 @@ public class DmnDecisionTableResultMappingTest extends CmmnProcessEngineTestCase
   }
 
   @SuppressWarnings("unchecked")
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTableResultMappingTest.testResultListMapping.cmmn",
-      TEST_DECISION
-    })
+  @Deployment(resources = { RESULT_LIST_MAPPING_CMMN, TEST_DECISION })
   public void testResultListMapping() {
     CaseInstance caseInstance = createTestCase("multiple entries list");
 
@@ -89,10 +83,7 @@ public class DmnDecisionTableResultMappingTest extends CmmnProcessEngineTestCase
   }
 
   @SuppressWarnings("unchecked")
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTableResultMappingTest.testDefaultResultMapping.cmmn",
-      TEST_DECISION
-    })
+  @Deployment(resources = { DEFAULT_MAPPING_CMMN, TEST_DECISION })
   public void testDefaultResultMapping() {
     CaseInstance caseInstance = createTestCase("multiple entries list");
 
@@ -107,11 +98,8 @@ public class DmnDecisionTableResultMappingTest extends CmmnProcessEngineTestCase
     }
   }
 
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTableResultMappingTest.testSingleEntryMapping.cmmn",
-      TEST_DECISION
-    })
-  public void testSingleValueMappingFailureMultipleOutputs() {
+  @Deployment(resources = { SINGLE_ENTRY_MAPPING_CMMN, TEST_DECISION })
+  public void testSingleEntryMappingFailureMultipleOutputs() {
     try {
       createTestCase("single entry list");
 
@@ -121,11 +109,8 @@ public class DmnDecisionTableResultMappingTest extends CmmnProcessEngineTestCase
     }
   }
 
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTableResultMappingTest.testSingleEntryMapping.cmmn",
-      TEST_DECISION
-    })
-  public void testSingleValueMappingFailureMultipleValues() {
+  @Deployment(resources = { SINGLE_ENTRY_MAPPING_CMMN, TEST_DECISION })
+  public void testSingleEntryMappingFailureMultipleValues() {
     try {
       createTestCase("multiple entries");
 
@@ -135,11 +120,8 @@ public class DmnDecisionTableResultMappingTest extends CmmnProcessEngineTestCase
     }
   }
 
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTableResultMappingTest.testSingleResultMapping.cmmn",
-      TEST_DECISION
-    })
-  public void testSingleOutputMappingFailure() {
+  @Deployment(resources = { SINGLE_RESULT_MAPPING_CMMN, TEST_DECISION })
+  public void testSingleResultMappingFailure() {
     try {
       createTestCase("single entry list");
 
@@ -149,11 +131,8 @@ public class DmnDecisionTableResultMappingTest extends CmmnProcessEngineTestCase
     }
   }
 
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTableResultMappingTest.testCollectEntriesMapping.cmmn",
-      TEST_DECISION
-    })
-  public void testCollectValuesMappingFailure() {
+  @Deployment(resources = { COLLECT_ENTRIES_MAPPING_CMMN, TEST_DECISION })
+  public void testCollectEntriesMappingFailure() {
     try {
       createTestCase("multiple entries");
 
@@ -163,10 +142,7 @@ public class DmnDecisionTableResultMappingTest extends CmmnProcessEngineTestCase
     }
   }
 
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTableResultMappingTest.testTransientDecisionResult.cmmn",
-      TEST_DECISION
-    })
+  @Deployment(resources = { DEFAULT_MAPPING_CMMN, TEST_DECISION })
   public void testTransientDecisionResult() {
     // when a decision is evaluated and the result is stored in a transient variable "decisionResult"
     CaseInstance caseInstance = createTestCase("single entry");
@@ -175,10 +151,7 @@ public class DmnDecisionTableResultMappingTest extends CmmnProcessEngineTestCase
     assertNull(caseService.getVariable(caseInstance.getId(), "decisionResult"));
   }
 
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/cmmn/decisiontask/DmnDecisionTableResultMappingTest.testFailedToOverrideDecisionResultVariable.cmmn",
-      TEST_DECISION
-    })
+  @Deployment(resources = { OVERRIDE_DECISION_RESULT_CMMN, TEST_DECISION })
   public void testFailedToOverrideDecisionResultVariable() {
     try {
       // the transient variable "decisionResult" should not be overridden by the task result variable
