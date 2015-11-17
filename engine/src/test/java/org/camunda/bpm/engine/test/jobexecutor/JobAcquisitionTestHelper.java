@@ -57,6 +57,8 @@ public class JobAcquisitionTestHelper {
   }
 
   public static void assertInBetween(long minimum, long maximum, long actualValue) {
-    Assert.assertTrue(actualValue > minimum && actualValue < maximum);
+    Assert.assertTrue("Expected '" + actualValue + "' to be between '" + minimum + "' and '" + maximum + "'",
+      actualValue >= minimum && actualValue <= maximum);
   }
+
 }
