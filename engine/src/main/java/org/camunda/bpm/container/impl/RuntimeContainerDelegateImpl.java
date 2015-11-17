@@ -12,11 +12,11 @@
  */
 package org.camunda.bpm.container.impl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
-
 import javax.management.MBeanServer;
 
 import org.camunda.bpm.ProcessApplicationService;
@@ -42,8 +42,6 @@ import org.camunda.bpm.container.impl.spi.PlatformServiceContainer;
 import org.camunda.bpm.container.impl.spi.ServiceTypes;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * <p>This is the default {@link RuntimeContainerDelegate} implementation that delegates
