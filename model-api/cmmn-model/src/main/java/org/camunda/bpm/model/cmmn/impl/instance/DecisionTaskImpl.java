@@ -61,8 +61,8 @@ public class DecisionTaskImpl extends TaskImpl implements DecisionTask {
     return decisionRefAttribute.getValue(this);
   }
 
-  public void setDecision(String process) {
-    decisionRefAttribute.setValue(this, process);
+  public void setDecision(String decision) {
+    decisionRefAttribute.setValue(this, decision);
   }
 
   public Collection<ParameterMapping> getParameterMappings() {
