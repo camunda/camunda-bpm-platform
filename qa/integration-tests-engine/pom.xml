@@ -244,16 +244,16 @@
               <excludes>
                 <!-- HEMERA-2453 -->
                 <exclude>**/JobExecutorRequestContextLocalInvocationTest.java</exclude>
-                <exclude>**_OTHERS.java</exclude>
+                <exclude>**/*_OTHERS.java</exclude>
                 <exclude>**/SpringPAExpressionResolvingTest.java</exclude>
                 <exclude>**/SpringServletPALifecycleTest.java</exclude>
-                <exclude>**/ManagedDomainTestCase_JBOSS.java</exclude>
+                <exclude>**/TestManagedDomain_JBOSS.java</exclude>
                 <!-- CAM-1778 -->
                 <exclude>**/TestWarDeploymentWithProcessEnginePlugin.java</exclude>
                 <exclude>**/TestWarDeploymentWithProcessEnginePlugin.exclude</exclude>
                 <exclude>**/JavascriptScriptEngineSupportTest.java</exclude>
               </excludes>
-             <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
           </plugin>
         </plugins>
@@ -325,7 +325,7 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <includes>
-                <include>**/ManagedDomainTestCase_JBOSS.java</include>
+                <include>**/TestManagedDomain_JBOSS.java</include>
               </includes>
              <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
@@ -467,10 +467,10 @@
               <excludes>
                 <!-- HEMERA-2453 -->
                 <exclude>**/JobExecutorRequestContextLocalInvocationTest.java</exclude>
-                <exclude>**_OTHERS.java</exclude>
+                <exclude>**/*_OTHERS.java</exclude>
                 <exclude>**/SpringPAExpressionResolvingTest.java</exclude>
                 <exclude>**/SpringServletPALifecycleTest.java</exclude>
-                <exclude>**/ManagedDomainTestCase_JBOSS.java</exclude>
+                <exclude>**/TestManagedDomain_JBOSS.java</exclude>
                 <!-- CAM-1778 -->
                 <exclude>**/TestWarDeploymentWithProcessEnginePlugin.java</exclude>
                 <exclude>**/TestWarDeploymentWithProcessEnginePlugin.exclude</exclude>
@@ -566,7 +566,7 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <includes>
-                <include>**/ManagedDomainTestCase_JBOSS.java</include>
+                <include>**/TestManagedDomain_JBOSS.java</include>
               </includes>
               <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>

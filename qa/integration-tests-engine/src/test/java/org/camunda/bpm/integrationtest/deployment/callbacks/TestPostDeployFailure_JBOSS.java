@@ -29,7 +29,7 @@ import org.junit.runner.RunWith;
  *
  */
 @RunWith(Arquillian.class)
-public class PostDeployFailureTest_JBOSS {
+public class TestPostDeployFailure_JBOSS {
   
   private static final String DEPLOYMENT = "DEPLOYMENT";
 

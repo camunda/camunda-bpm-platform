@@ -32,7 +32,7 @@ import org.junit.runner.RunWith;
  *
  */
 @RunWith(Arquillian.class)
-public class ManagedDomainTestCase_JBOSS {
+public class TestManagedDomain_JBOSS {
 
   @Deployment @TargetsContainer("test-domain")
   public static WebArchive create1() {

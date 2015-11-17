@@ -41,7 +41,7 @@ import org.junit.runner.RunWith;
  * @author Daniel Meyer
  */
 @RunWith(Arquillian.class)
-public class JavaDelegateResolution_ClientAsLibInWebModule extends AbstractFoxPlatformIntegrationTest {
+public class TestJavaDelegateResolution_ClientAsLibInWebModule extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
   public static EnterpriseArchive createProcessArchiveDeplyoment() {

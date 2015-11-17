@@ -10,47 +10,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.integrationtest.service;
+package org.camunda.bpm.integrationtest.deployment.callbacks;
 
-import javax.naming.InitialContext;
+import org.junit.Assert;
 
-import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * <p>Makes sure that the process engine JNDI bindings are created</p>
- * 
  * @author Daniel Meyer
  *
  */
 @RunWith(Arquillian.class)
-public class ProcessEngineJndiBindingTest_JBOSS extends AbstractFoxPlatformIntegrationTest {
-
-  @Deployment
-  public static WebArchive app1() {    
-    return initWebArchiveDeployment();
+public class TestPostDeployFailure_OTHERS extends AbstractFoxPlatformIntegrationTest {
+  
+  @Deployment(name="fail")
+  public static WebArchive createDeployment1() {    
+   return TestPostDeployFailure_JBOSS.createDeployment1();    
+  }
+  
+  @Deployment(name="checker")
+  public static WebArchive createDeployment2() {    
+    return initWebArchiveDeployment("checker.war");
   }
   
   @Test
-  public void testDefaultProcessEngineBindingCreated() {
+  @OperateOnDeployment("checker")
+  public void test() {
     
-    try {
-      ProcessEngine processEngine = InitialContext.doLookup("java:global/camunda-bpm-platform/process-engine/default");
-      Assert.assertNotNull("Process engine must not be null", processEngine);
-      
-    } catch(Exception e) {
-      Assert.fail("Process Engine not bound in JNDI.");
-      
-    }
-        
+    // make sure the deployment of the first app was rolled back
+    
+    long count = processEngine.getRepositoryService()
+      .createDeploymentQuery()
+      .count();
+    
+    Assert.assertEquals(1, count);
+       
   }
   
-  
-
 }

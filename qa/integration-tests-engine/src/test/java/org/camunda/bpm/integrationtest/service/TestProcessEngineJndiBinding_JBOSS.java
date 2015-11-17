@@ -10,47 +10,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.integrationtest.deployment.callbacks;
+package org.camunda.bpm.integrationtest.service;
 
-import org.junit.Assert;
+import javax.naming.InitialContext;
 
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
+ * <p>Makes sure that the process engine JNDI bindings are created</p>
+ * 
  * @author Daniel Meyer
  *
  */
 @RunWith(Arquillian.class)
-public class PostDeployFailureTest_OTHERS extends AbstractFoxPlatformIntegrationTest {
-  
-  @Deployment(name="fail")
-  public static WebArchive createDeployment1() {    
-   return PostDeployFailureTest_JBOSS.createDeployment1();    
-  }
-  
-  @Deployment(name="checker")
-  public static WebArchive createDeployment2() {    
-    return initWebArchiveDeployment("checker.war");
+public class TestProcessEngineJndiBinding_JBOSS extends AbstractFoxPlatformIntegrationTest {
+
+  @Deployment
+  public static WebArchive app1() {    
+    return initWebArchiveDeployment();
   }
   
   @Test
-  @OperateOnDeployment("checker")
-  public void test() {
+  public void testDefaultProcessEngineBindingCreated() {
     
-    // make sure the deployment of the first app was rolled back
-    
-    long count = processEngine.getRepositoryService()
-      .createDeploymentQuery()
-      .count();
-    
-    Assert.assertEquals(1, count);
-       
+    try {
+      ProcessEngine processEngine = InitialContext.doLookup("java:global/camunda-bpm-platform/process-engine/default");
+      Assert.assertNotNull("Process engine must not be null", processEngine);
+      
+    } catch(Exception e) {
+      Assert.fail("Process Engine not bound in JNDI.");
+      
+    }
+        
   }
   
+  
+
 }

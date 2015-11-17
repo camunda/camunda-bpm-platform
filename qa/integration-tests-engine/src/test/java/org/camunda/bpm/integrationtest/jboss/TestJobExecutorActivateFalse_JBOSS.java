@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
  *
  */
 @RunWith(Arquillian.class)
-public class JobExecutorActivateFalseTest_JBOSS extends AbstractFoxPlatformIntegrationTest {
+public class TestJobExecutorActivateFalse_JBOSS extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment(name="deployment1")
   public static WebArchive processArchive() {
