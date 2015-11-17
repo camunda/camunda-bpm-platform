@@ -18,6 +18,7 @@ import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.dmn.DecisionLogger;
+import org.camunda.bpm.engine.variable.Variables;
 
 /**
  * Maps the decision result to pairs of output name and untyped entries.
@@ -36,7 +37,7 @@ public class SingleResultDecisionTableResultMapper implements DecisionTableResul
         return singleResult.getEntryMap();
       }
       else {
-        return null;
+        return Variables.untypedNullValue();
       }
     } catch (DmnEngineException e) {
       throw LOG.decisionResultMappingException(decisionTableResult, e);
