@@ -18,6 +18,8 @@ import java.util.Map;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NotValidException;
 
 /**
  * Service to evaluate decisions inside the DMN engine.
@@ -35,8 +37,11 @@ public interface DecisionService {
    *          the input values of the decision.
    * @return the result of the evaluation.
    *
-   * @throws ProcessEngineException
+   * @throws NotFoundException
    *           when no decision definition is deployed with the given id.
+   *
+   * @throws NotValidException
+   *           when the given case definition id is null.
    *
    * @throws AuthorizationException
    *           if the user has no {@link Permissions#CREATE_INSTANCE} permission
@@ -53,8 +58,11 @@ public interface DecisionService {
    *          the input values of the decision.
    * @return the result of the evaluation.
    *
-   * @throws ProcessEngineException
+   * @throws NotFoundException
    *           when no decision definition is deployed with the given key.
+   *
+   * @throws NotValidException
+   *           when the given case definition key is null.
    *
    * @throws AuthorizationException
    *           if the user has no {@link Permissions#CREATE_INSTANCE} permission
@@ -76,9 +84,12 @@ public interface DecisionService {
    *          the input values of the decision.
    * @return the result of the evaluation.
    *
-   * @throws ProcessEngineException
+   * @throws NotFoundException
    *           when no decision definition is deployed with the given key and
    *           version.
+   *
+   * @throws NotValidException
+   *           when the given case definition key is null.
    *
    * @throws AuthorizationException
    *           if the user has no {@link Permissions#CREATE_INSTANCE} permission

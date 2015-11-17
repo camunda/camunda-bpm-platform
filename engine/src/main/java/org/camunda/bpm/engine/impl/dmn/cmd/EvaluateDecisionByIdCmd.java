@@ -53,7 +53,6 @@ public class EvaluateDecisionByIdCmd implements Command<DmnDecisionTableResult> 
     DeploymentCache deploymentCache = processEngineConfiguration.getDeploymentCache();
 
     DecisionDefinitionEntity decisionDefinition = deploymentCache.findDeployedDecisionDefinitionById(decisionDefinitionId);
-    ensureNotNull("No decision definition found for id '" + decisionDefinitionId + "'", "decisionDefinition", decisionDefinition);
 
     // check authorization
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();

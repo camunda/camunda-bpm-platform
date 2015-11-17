@@ -18,13 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
-
 import org.camunda.bpm.dmn.engine.DmnDecisionRuleResult;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnEngineException;
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.DecisionService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -43,6 +40,10 @@ import org.camunda.bpm.engine.rest.sub.repository.DecisionDefinitionResource;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.TypedValue;
+
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -132,10 +133,23 @@ public class DecisionDefinitionResourceImpl implements DecisionDefinitionResourc
       DmnDecisionTableResult decisionResult = decisionService.evaluateDecisionTableById(decisionDefinitionId, variables);
       return createDecisionTableResultDto(decisionResult);
 
-    } catch (ProcessEngineException e) {
+    }
+    catch (AuthorizationException e) {
+      throw e;
+    }
+    catch (NotFoundException e) {
+      String errorMessage = String.format("Cannot evaluate decision %s: %s", decisionDefinitionId, e.getMessage());
+      throw new InvalidRequestException(Status.NOT_FOUND, e, errorMessage);
+    }
+    catch (NotValidException e) {
+      String errorMessage = String.format("Cannot evaluate decision %s: %s", decisionDefinitionId, e.getMessage());
+      throw new InvalidRequestException(Status.BAD_REQUEST, e, errorMessage);
+    }
+    catch (ProcessEngineException e) {
       String errorMessage = String.format("Cannot evaluate decision %s: %s", decisionDefinitionId, e.getMessage());
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
-    } catch (DmnEngineException e) {
+    }
+    catch (DmnEngineException e) {
       String errorMessage = String.format("Cannot evaluate decision %s: %s", decisionDefinitionId, e.getMessage());
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
     }

@@ -55,8 +55,6 @@ public class EvaluateDecisionByKeyCmd implements Command<DmnDecisionTableResult>
     ensureNotNull("decision definition key is null", "processDefinitionKey", decisionDefinitionKey);
 
     DecisionDefinition decisionDefinition = getDecisionDefinition(commandContext);
-    ensureNotNull("No decision definition found for key '" + decisionDefinitionKey + "' and version '" + version + "'", "decisionDefinition",
-        decisionDefinition);
 
     // check authorization
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();

@@ -13,17 +13,18 @@
 
 package org.camunda.bpm.engine.test.api.dmn;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
+
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
 
 /**
  * @author Philipp Ossler
@@ -100,7 +101,7 @@ public class DecisionServiceTest extends PluggableProcessEngineTestCase {
     try {
       decisionService.evaluateDecisionTableById(null, null);
       fail("expect exception");
-    } catch (ProcessEngineException e) {
+    } catch (NotValidException e) {
       assertTextPresent("decision definition id is null", e.getMessage());
     }
   }
@@ -109,7 +110,7 @@ public class DecisionServiceTest extends PluggableProcessEngineTestCase {
     try {
       decisionService.evaluateDecisionTableById("unknown", null);
       fail("expect exception");
-    } catch (ProcessEngineException e) {
+    } catch (NotFoundException e) {
       assertTextPresent("no deployed decision definition found with id 'unknown'", e.getMessage());
     }
   }
@@ -118,7 +119,7 @@ public class DecisionServiceTest extends PluggableProcessEngineTestCase {
     try {
       decisionService.evaluateDecisionTableByKey(null, null);
       fail("expect exception");
-    } catch (ProcessEngineException e) {
+    } catch (NotValidException e) {
       assertTextPresent("decision definition key is null", e.getMessage());
     }
   }
@@ -127,7 +128,7 @@ public class DecisionServiceTest extends PluggableProcessEngineTestCase {
     try {
       decisionService.evaluateDecisionTableByKey("unknown", null);
       fail("expect exception");
-    } catch (ProcessEngineException e) {
+    } catch (NotFoundException e) {
       assertTextPresent("no decision definition deployed with key 'unknown'", e.getMessage());
     }
   }
@@ -139,7 +140,7 @@ public class DecisionServiceTest extends PluggableProcessEngineTestCase {
     try {
       decisionService.evaluateDecisionTableByKeyAndVersion(decisionDefinition.getKey(), 42, null);
       fail("expect exception");
-    } catch (ProcessEngineException e) {
+    } catch (NotFoundException e) {
       assertTextPresent("no decision definition deployed with key = 'decision' and version = '42'", e.getMessage());
     }
   }

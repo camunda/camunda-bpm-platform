@@ -19,6 +19,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Matchers.anyMapOf;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -33,15 +34,19 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
+import org.camunda.bpm.dmn.engine.DmnEngineException;
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.DecisionService;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.MockDecisionTableResultBuilder;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
@@ -53,6 +58,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+
+import javax.ws.rs.core.Response.Status;
 
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
@@ -403,6 +410,176 @@ public class DecisionDefinitionRestServiceInteractionTest extends AbstractRestSe
         .body("[0].assignee.value", is("manager"))
 
       .when().post(EVALUATE_DECISION_URL);
+  }
+
+  @Test
+  public void testEvaluateDecision_NotFound() {
+    String message = "expected message";
+    when(decisionServiceMock.evaluateDecisionTableById(anyString(), anyMapOf(String.class, Object.class))).thenThrow(new NotFoundException(message));
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", Collections.emptyMap());
+
+    given().pathParam("id", MockProvider.EXAMPLE_DECISION_DEFINITION_ID)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", is(InvalidRequestException.class.getSimpleName()))
+        .body("message", containsString(message))
+    .when().post(EVALUATE_DECISION_URL);
+  }
+
+  @Test
+  public void testEvaluateDecisionByKey_NotFound() {
+    String message = "expected message";
+    when(decisionServiceMock.evaluateDecisionTableById(anyString(), anyMapOf(String.class, Object.class))).thenThrow(new NotFoundException(message));
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", Collections.emptyMap());
+
+    given().pathParam("key", MockProvider.EXAMPLE_DECISION_DEFINITION_KEY)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", is(InvalidRequestException.class.getSimpleName()))
+        .body("message", containsString(message))
+    .when().post(EVALUATE_DECISION_BY_KEY_URL);
+  }
+
+  @Test
+  public void testEvaluateDecision_NotValid() {
+    String message = "expected message";
+    when(decisionServiceMock.evaluateDecisionTableById(anyString(), anyMapOf(String.class, Object.class))).thenThrow(new NotValidException(message));
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", Collections.emptyMap());
+
+    given().pathParam("id", MockProvider.EXAMPLE_DECISION_DEFINITION_ID)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", is(InvalidRequestException.class.getSimpleName()))
+        .body("message", containsString(message))
+    .when().post(EVALUATE_DECISION_URL);
+  }
+
+  @Test
+  public void testEvaluateDecisionByKey_NotValid() {
+    String message = "expected message";
+    when(decisionServiceMock.evaluateDecisionTableById(anyString(), anyMapOf(String.class, Object.class))).thenThrow(new NotValidException(message));
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", Collections.emptyMap());
+
+    given().pathParam("key", MockProvider.EXAMPLE_DECISION_DEFINITION_KEY)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", is(InvalidRequestException.class.getSimpleName()))
+        .body("message", containsString(message))
+    .when().post(EVALUATE_DECISION_BY_KEY_URL);
+  }
+
+  @Test
+  public void testEvaluateDecision_NotAuthorized() {
+    String message = "expected message";
+    when(decisionServiceMock.evaluateDecisionTableById(anyString(), anyMapOf(String.class, Object.class))).thenThrow(new AuthorizationException(message));
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", Collections.emptyMap());
+
+    given().pathParam("id", MockProvider.EXAMPLE_DECISION_DEFINITION_ID)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", is(AuthorizationException.class.getSimpleName()))
+        .body("message", containsString(message))
+    .when().post(EVALUATE_DECISION_URL);
+  }
+
+  @Test
+  public void testEvaluateDecisionByKey_NotAuthorized() {
+    String message = "expected message";
+    when(decisionServiceMock.evaluateDecisionTableById(anyString(), anyMapOf(String.class, Object.class))).thenThrow(new AuthorizationException(message));
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", Collections.emptyMap());
+
+    given().pathParam("key", MockProvider.EXAMPLE_DECISION_DEFINITION_KEY)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", is(AuthorizationException.class.getSimpleName()))
+        .body("message", containsString(message))
+    .when().post(EVALUATE_DECISION_BY_KEY_URL);
+  }
+
+  @Test
+  public void testEvaluateDecision_ProcessEngineException() {
+    String message = "expected message";
+    when(decisionServiceMock.evaluateDecisionTableById(anyString(), anyMapOf(String.class, Object.class))).thenThrow(new ProcessEngineException(message));
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", Collections.emptyMap());
+
+    given().pathParam("id", MockProvider.EXAMPLE_DECISION_DEFINITION_ID)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", is(RestException.class.getSimpleName()))
+        .body("message", containsString(message))
+    .when().post(EVALUATE_DECISION_URL);
+  }
+
+  @Test
+  public void testEvaluateDecisionByKey_ProcessEngineException() {
+    String message = "expected message";
+    when(decisionServiceMock.evaluateDecisionTableById(anyString(), anyMapOf(String.class, Object.class))).thenThrow(new ProcessEngineException(message));
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", Collections.emptyMap());
+
+    given().pathParam("key", MockProvider.EXAMPLE_DECISION_DEFINITION_KEY)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", is(RestException.class.getSimpleName()))
+        .body("message", containsString(message))
+    .when().post(EVALUATE_DECISION_BY_KEY_URL);
+  }
+
+  @Test
+  public void testEvaluateDecision_DmnEngineException() {
+    String message = "expected message";
+    when(decisionServiceMock.evaluateDecisionTableById(anyString(), anyMapOf(String.class, Object.class))).thenThrow(new DmnEngineException(message));
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", Collections.emptyMap());
+
+    given().pathParam("id", MockProvider.EXAMPLE_DECISION_DEFINITION_ID)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", is(RestException.class.getSimpleName()))
+        .body("message", containsString(message))
+    .when().post(EVALUATE_DECISION_URL);
+  }
+
+  @Test
+  public void testEvaluateDecisionByKey_DmnEngineException() {
+    String message = "expected message";
+    when(decisionServiceMock.evaluateDecisionTableById(anyString(), anyMapOf(String.class, Object.class))).thenThrow(new DmnEngineException(message));
+
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", Collections.emptyMap());
+
+    given().pathParam("key", MockProvider.EXAMPLE_DECISION_DEFINITION_KEY)
+      .contentType(POST_JSON_CONTENT_TYPE).body(json)
+      .then().expect()
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", is(RestException.class.getSimpleName()))
+        .body("message", containsString(message))
+    .when().post(EVALUATE_DECISION_BY_KEY_URL);
   }
 
 }

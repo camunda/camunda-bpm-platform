@@ -17,27 +17,41 @@ import java.util.Map;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.engine.DecisionService;
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.exception.dmn.DecisionDefinitionNotFoundException;
 import org.camunda.bpm.engine.impl.dmn.cmd.EvaluateDecisionByIdCmd;
 import org.camunda.bpm.engine.impl.dmn.cmd.EvaluateDecisionByKeyCmd;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 
 /**
  * @author Philipp Ossler
  */
 public class DecisionServiceImpl extends ServiceImpl implements DecisionService {
 
-  @Override
   public DmnDecisionTableResult evaluateDecisionTableById(String decisionDefinitionId, Map<String, Object> variables) {
-    return commandExecutor.execute(new EvaluateDecisionByIdCmd(decisionDefinitionId, variables));
+    return evaluateDecisionTable(new EvaluateDecisionByIdCmd(decisionDefinitionId, variables));
   }
 
-  @Override
   public DmnDecisionTableResult evaluateDecisionTableByKey(String decisionDefinitionKey, Map<String, Object> variables) {
-    return commandExecutor.execute(new EvaluateDecisionByKeyCmd(decisionDefinitionKey, variables));
+    return evaluateDecisionTable(new EvaluateDecisionByKeyCmd(decisionDefinitionKey, variables));
   }
 
-  @Override
   public DmnDecisionTableResult evaluateDecisionTableByKeyAndVersion(String decisionDefinitionKey, Integer version, Map<String, Object> variables) {
-    return commandExecutor.execute(new EvaluateDecisionByKeyCmd(decisionDefinitionKey, version, variables));
+    return evaluateDecisionTable(new EvaluateDecisionByKeyCmd(decisionDefinitionKey, version, variables));
+  }
+
+  protected DmnDecisionTableResult evaluateDecisionTable(Command<DmnDecisionTableResult> cmd) {
+    try {
+      return commandExecutor.execute(cmd);
+    }
+    catch (NullValueException e) {
+      throw new NotValidException(e.getMessage(), e);
+    }
+    catch (DecisionDefinitionNotFoundException e) {
+      throw new NotFoundException(e.getMessage(), e);
+    }
   }
 
 }
