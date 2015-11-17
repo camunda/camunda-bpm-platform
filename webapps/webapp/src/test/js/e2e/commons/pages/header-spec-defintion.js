@@ -21,7 +21,7 @@ module.exports = function (appName) {
     });
 
 
-    describe('on large screens', function () {
+    describe.skip('on large screens', function () {
       describe('for anonymous user', function () {
         it('does not show the account', function () {
           expect(frontPage.accountDropdown().isPresent()).to.eventually.eql(false);
@@ -86,7 +86,7 @@ module.exports = function (appName) {
       before(function () {
         browser.manage().window().getSize().then(function (size) {
           originalSize = size;
-          browser.manage().window().setSize(760, 480);
+          browser.manage().window().setSize(760, 560);
           browser.sleep(500);
         });
       });
