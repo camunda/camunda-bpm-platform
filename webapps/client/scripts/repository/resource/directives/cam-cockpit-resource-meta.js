@@ -32,9 +32,12 @@ define([
         // observe //////////////////////////////////////////////////
 
         resourceMetaData.observe('resource', function(resource) {
-          var parts = (resource.name || resource.id).split('/');
-          resource._filename = parts.pop();
-          resource._filepath = parts.join('/');
+          if (resource) {
+            var parts = (resource.name || resource.id).split('/');
+            resource._filename = parts.pop();
+            resource._filepath = parts.join('/');
+          }
+
           $scope.resource = resource;
         });
 

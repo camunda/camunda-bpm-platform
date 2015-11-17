@@ -53,7 +53,7 @@ define([
         });
 
         $scope.state = resourcesData.observe('resources', function (resources) {
-          $scope.resources = resources.map(function (resource) {
+          $scope.resources = (resources || []).map(function (resource) {
             var parts = (resource.name || resource.id).split('/');
             resource._filename = parts.pop();
             resource._filepath = parts.join('/');
