@@ -97,7 +97,7 @@ public final class StringUtil {
    * @return the byte array
    */
   public static byte[] toByteArray(String string) {
-    EnsureUtil.ensureActiveCommandContext("StringUtil.fromBytes");
+    EnsureUtil.ensureActiveCommandContext("StringUtil.toByteArray");
     ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
     return toByteArray(string, processEngineConfiguration.getProcessEngine());
   }
