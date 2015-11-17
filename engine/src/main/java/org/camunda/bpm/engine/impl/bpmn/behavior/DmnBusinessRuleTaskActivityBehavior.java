@@ -33,13 +33,13 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
  * @author Daniel Meyer
  *
  */
-public class DecisionRuleTaskActivityBehavior extends AbstractBpmnActivityBehavior {
+public class DmnBusinessRuleTaskActivityBehavior extends AbstractBpmnActivityBehavior {
 
   protected final BaseCallableElement callableElement;
   protected final String resultVariable;
   protected final DecisionTableResultMapper decisionTableResultMapper;
 
-  public DecisionRuleTaskActivityBehavior(BaseCallableElement callableElement, String resultVariableName, DecisionTableResultMapper decisionTableResultMapper) {
+  public DmnBusinessRuleTaskActivityBehavior(BaseCallableElement callableElement, String resultVariableName, DecisionTableResultMapper decisionTableResultMapper) {
     this.callableElement = callableElement;
     this.resultVariable = resultVariableName;
     this.decisionTableResultMapper = decisionTableResultMapper;

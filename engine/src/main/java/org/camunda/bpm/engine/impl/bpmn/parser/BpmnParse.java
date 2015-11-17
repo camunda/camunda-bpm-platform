@@ -42,7 +42,7 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.CancelEndEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.CaseCallActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ClassDelegateActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.CompensationEventActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.DecisionRuleTaskActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.DmnBusinessRuleTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ErrorEndEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.EventBasedGatewayActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessActivityBehavior;
@@ -1976,7 +1976,7 @@ public class BpmnParse extends Parse {
   public ActivityImpl parseBusinessRuleTask(Element businessRuleTaskElement, ScopeImpl scope) {
     String decisionRef = businessRuleTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "decisionRef");
     if (decisionRef != null) {
-      return parseDecisionBusinessRuleTask(businessRuleTaskElement, scope);
+      return parseDmnBusinessRuleTask(businessRuleTaskElement, scope);
     }
     else {
       return parseServiceTaskLike("businessRuleTask", businessRuleTaskElement, scope);
@@ -1986,7 +1986,7 @@ public class BpmnParse extends Parse {
   /**
    * Parse a Business Rule Task which references a decision.
    */
-  protected ActivityImpl parseDecisionBusinessRuleTask(Element businessRuleTaskElement, ScopeImpl scope) {
+  protected ActivityImpl parseDmnBusinessRuleTask(Element businessRuleTaskElement, ScopeImpl scope) {
     ActivityImpl activity = createActivityOnScope(businessRuleTaskElement, scope);
     // the activity is a scope since the result variable is stored as local variable
     activity.setScope(true);
@@ -2007,7 +2007,7 @@ public class BpmnParse extends Parse {
     String resultVariable = parseResultVariable(businessRuleTaskElement);
     DecisionTableResultMapper decisionTableResultMapper = parseDecisionResultMapper(businessRuleTaskElement);
 
-    DecisionRuleTaskActivityBehavior behavior = new DecisionRuleTaskActivityBehavior(callableElement, resultVariable, decisionTableResultMapper);
+    DmnBusinessRuleTaskActivityBehavior behavior = new DmnBusinessRuleTaskActivityBehavior(callableElement, resultVariable, decisionTableResultMapper);
     activity.setActivityBehavior(behavior);
 
     parseExecutionListenersOnScope(businessRuleTaskElement, activity);
