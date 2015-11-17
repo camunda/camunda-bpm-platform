@@ -2022,7 +2022,7 @@ public class BpmnParse extends Parse {
   protected DecisionTableResultMapper parseDecisionResultMapper(Element businessRuleTaskElement) {
     // default mapper is 'resultList'
     String decisionResultMapper = businessRuleTaskElement.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "mapDecisionResult");
-    DecisionTableResultMapper mapper = DecisionTableUtil.getDecisionTableResultMapper(decisionResultMapper);
+    DecisionTableResultMapper mapper = DecisionTableUtil.getDecisionTableResultMapperForName(decisionResultMapper);
 
     if (mapper == null) {
       addError("No decision result mapper found for name '" + decisionResultMapper

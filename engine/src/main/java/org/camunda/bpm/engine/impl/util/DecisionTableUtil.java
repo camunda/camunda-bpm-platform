@@ -35,7 +35,7 @@ public class DecisionTableUtil {
 
   public static final String DECISION_RESULT_VARIABLE = "decisionResult";
 
-  public static DecisionTableResultMapper getDecisionTableResultMapper(String mapDecisionResult) {
+  public static DecisionTableResultMapper getDecisionTableResultMapperForName(String mapDecisionResult) {
     if ("singleEntry".equals(mapDecisionResult)) {
       return new SingleEntryDecisionTableResultMapper();
 

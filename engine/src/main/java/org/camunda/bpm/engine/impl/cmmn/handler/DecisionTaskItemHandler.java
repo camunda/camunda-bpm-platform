@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.handler;
 
-import static org.camunda.bpm.engine.impl.util.DecisionTableUtil.getDecisionTableResultMapper;
+import static org.camunda.bpm.engine.impl.util.DecisionTableUtil.getDecisionTableResultMapperForName;
 
 import org.camunda.bpm.engine.impl.cmmn.behavior.CmmnActivityBehavior;
 import org.camunda.bpm.engine.impl.cmmn.behavior.DmnDecisionTaskActivityBehavior;
@@ -49,7 +49,7 @@ public class DecisionTaskItemHandler extends CallingTaskItemHandler {
     DecisionTask decisionTask = getDefinition(element);
     DmnDecisionTaskActivityBehavior behavior = getActivityBehavior(activity);
     String mapper = decisionTask.getCamundaMapDecisionResult();
-    DecisionTableResultMapper decisionTableResultMapper = getDecisionTableResultMapper(mapper);
+    DecisionTableResultMapper decisionTableResultMapper = getDecisionTableResultMapperForName(mapper);
     behavior.setDecisionTableResultMapper(decisionTableResultMapper);
   }
 
