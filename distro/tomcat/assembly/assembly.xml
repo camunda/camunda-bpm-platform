@@ -37,7 +37,8 @@
         <include>com.fasterxml.uuid:java-uuid-generator:jar:*</include>
         <include>joda-time:joda-time:jar:*</include>
         <include>org.codehaus.groovy:groovy-all:jar:*</include>
-        <include>org.slf4j:*:jar</include>
+        <include>org.slf4j:slf4j-api:jar:*</include>
+        <include>org.slf4j:slf4j-jdk14:jar:*</include>
 
         <include>org.camunda.bpm:camunda-engine-plugin-*:jar</include>
         <include>org.camunda.spin:*:jar</include>
@@ -66,7 +67,8 @@
         <include>com.fasterxml.uuid:java-uuid-generator:jar:*</include>
         <include>joda-time:joda-time:jar:*</include>
         <include>org.codehaus.groovy:groovy-all:jar:*</include>
-        <include>org.slf4j:*:jar</include>
+        <include>org.slf4j:slf4j-api:jar:*</include>
+        <include>org.slf4j:slf4j-jdk14:jar:*</include>
 
         <include>org.camunda.bpm:camunda-engine-plugin-*:jar</include>
         <include>org.camunda.spin:*:jar</include>
