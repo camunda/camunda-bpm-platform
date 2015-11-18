@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+  <!-- for accessing the process engine datasource -->
+  <resource-ref>
+    <description>Process Engine DS</description>
+    <res-ref-name>ProcessEngineDataSource</res-ref-name>
+    <res-type>javax.sql.DataSource</res-type>    
+    <res-auth>Container</res-auth>
+  </resource-ref>
+      
+  <resource-ref>
+    <description>Process Engine Service</description>
+    <res-ref-name>ProcessEngineService</res-ref-name>
+    <res-type>org.camunda.bpm.ProcessEngineService</res-type> 
+    <res-auth>Container</res-auth>
+  </resource-ref>
+
+  <resource-ref>
+    <description>Process Application Service</description>
+    <res-ref-name>ProcessApplicationService</res-ref-name>
+    <res-type>org.camunda.bpm.ProcessApplicationService</res-type> 
+    <res-auth>Container</res-auth>
+  </resource-ref>
+
+</web-app>

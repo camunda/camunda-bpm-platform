@@ -15,18 +15,25 @@ public class TestContainer {
   
   public final static String PROCESS_ENGINE_SERVICE_JNDI_NAME = BpmPlatform.PROCESS_ENGINE_SERVICE_JNDI_NAME;
   public final static String PROCESS_APPLICATION_SERVICE_JNDI_NAME = BpmPlatform.PROCESS_APPLICATION_SERVICE_JNDI_NAME;
-  
-  public static void addContainerSpecificResources(WebArchive archive) {
-    archive.addAsLibraries(DeploymentHelper.getEjbClient());
-  }
 
   public static String getAppName() {
     return APP_NAME;
   }
 
+  public static void addContainerSpecificResources(WebArchive webArchive) {
+    addContainerSpecificResourcesWithoutWeld(webArchive);
+  }
+
+  public static void addContainerSpecificResourcesWithoutWeld(WebArchive webArchive) {
+    webArchive.addAsLibraries(DeploymentHelper.getEjbClient());
+  }
+
   public static void addContainerSpecificResourcesForNonPa(WebArchive webArchive) {
+    addContainerSpecificResourcesForNonPaWithoutWeld(webArchive);
+  }
+
+  public static void addContainerSpecificResourcesForNonPaWithoutWeld(WebArchive webArchive) {
     webArchive.addAsManifestResource("jboss-deployment-structure.xml");
-    
   }
 
   public static void addContainerSpecificProcessEngineConfigurationClass(WebArchive deployment) {
