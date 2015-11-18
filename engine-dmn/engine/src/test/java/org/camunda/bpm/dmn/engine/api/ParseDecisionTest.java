@@ -36,6 +36,8 @@ public class ParseDecisionTest extends DmnEngineTest {
   public static final String MISSING_INPUT_ID_DMN = "org/camunda/bpm/dmn/engine/api/MissingIds.missingInputId.dmn";
   public static final String MISSING_OUTPUT_ID_DMN = "org/camunda/bpm/dmn/engine/api/MissingIds.missingOutputId.dmn";
   public static final String MISSING_RULE_ID_DMN = "org/camunda/bpm/dmn/engine/api/MissingIds.missingRuleId.dmn";
+  public static final String MISSING_COMPOUND_OUTPUT_NAME_DMN = "org/camunda/bpm/dmn/engine/api/CompoundOutputs.noName.dmn";
+  public static final String DUPLICATE_COMPOUND_OUTPUT_NAME_DMN = "org/camunda/bpm/dmn/engine/api/CompoundOutputs.duplicateName.dmn";
 
   @Test
   public void shouldParseDecisionFromFile() {
@@ -169,6 +171,37 @@ public class ParseDecisionTest extends DmnEngineTest {
         .hasMessageStartingWith("DMN-02004")
         .hasMessageContaining("DMN-02013")
         .hasMessageContaining("Decision With Missing Rule Id");
+    }
+  }
+
+  @Test
+  public void shouldFailIfCompoundOutputsNameIsMissing() {
+    try {
+      dmnEngine.parseFirstDecision(MISSING_COMPOUND_OUTPUT_NAME_DMN);
+      failBecauseExceptionWasNotThrown(DmnTransformException.class);
+    }
+    catch (DmnTransformException e) {
+      assertThat(e)
+        .hasCauseExactlyInstanceOf(DmnTransformException.class)
+        .hasMessageStartingWith("DMN-02004")
+        .hasMessageContaining("DMN-02008")
+        .hasMessageContaining("does not have an output name");
+    }
+  }
+
+  @Test
+  public void shouldFailIfCompoundOutputsHaveDuplicateName() {
+    try {
+      dmnEngine.parseFirstDecision(DUPLICATE_COMPOUND_OUTPUT_NAME_DMN);
+      failBecauseExceptionWasNotThrown(DmnTransformException.class);
+    }
+    catch (DmnTransformException e) {
+      assertThat(e)
+        .hasCauseExactlyInstanceOf(DmnTransformException.class)
+        .hasMessageStartingWith("DMN-02004")
+        .hasMessageContaining("DMN-02009")
+        .hasMessageContaining("has a compound output but name of output")
+        .hasMessageContaining("is duplicate");
     }
   }
 

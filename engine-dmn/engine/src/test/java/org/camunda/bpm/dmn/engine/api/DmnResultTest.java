@@ -108,6 +108,17 @@ public class DmnResultTest extends DmnEngineTest {
   }
 
   @Test
+  @DecisionResource
+  public void testSingleOutputNoName() {
+    DmnDecisionTableResult decisionResult = evaluateDecisionTable();
+    assertThat(decisionResult).hasSize(1);
+
+    assertThat(decisionResult.getFirstResult()).hasSize(1);
+    assertThat(decisionResult.getFirstResult().getSingleEntry()).isEqualTo("outputValue");
+    assertThat(decisionResult.getFirstResult().get(null)).isEqualTo("outputValue");
+  }
+
+  @Test
   @DecisionResource(resource = RESULT_TEST_DMN)
   public void testMultipleOutputValues() {
     DmnDecisionTableResult decisionResult = evaluateWithMatchingRules(MULTIPLE_OUTPUT_VALUES);
