@@ -13,6 +13,9 @@
 
 package org.camunda.bpm.engine.test;
 
+import org.camunda.bpm.engine.impl.test.TestHelper;
+import org.camunda.bpm.model.xml.ModelInstance;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -52,4 +55,5 @@ public @interface Deployment {
   /** Specify resources that make up the process definition. */
   public String[] resources() default {};
 
+  public Class<? extends TestHelper.ModelInstanceSupplier>[] modelInstances() default {};
 }

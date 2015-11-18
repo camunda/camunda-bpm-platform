@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -51,6 +52,7 @@ import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
+import org.camunda.bpm.model.xml.ModelInstance;
 import org.junit.Assert;
 import org.slf4j.Logger;
 
@@ -59,6 +61,10 @@ import org.slf4j.Logger;
  * @author Tom Baeyens
  */
 public abstract class TestHelper {
+
+  public static interface ModelInstanceSupplier {
+    BpmnModelInstance get();
+  }
 
   private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
@@ -104,12 +110,18 @@ public abstract class TestHelper {
 
     if (deploymentAnnotation != null) {
       LOG.debug("annotation @Deployment creates deployment for {}.{}", ClassNameUtil.getClassNameWithoutPackage(testClass), methodName);
+
+      List<String> deploymentResources = new ArrayList<String>();
+
       String[] resources = deploymentAnnotation.resources();
-      if (resources.length == 0 && method != null) {
+      Class<? extends ModelInstanceSupplier>[] suppliers = deploymentAnnotation.modelInstances();
+      if (resources.length == 0 && method != null && suppliers.length == 0) {
         String name = method.getName();
         String resource = getBpmnProcessDefinitionResource(testClass, name);
         resources = new String[]{resource};
       }
+      deploymentResources.addAll(Arrays.asList(resources));
+
 
       DeploymentBuilder deploymentBuilder = processEngine.getRepositoryService()
         .createDeployment()
@@ -118,6 +130,20 @@ public abstract class TestHelper {
       for (String resource: resources) {
         deploymentBuilder.addClasspathResource(resource);
       }
+      if (suppliers.length != 0) {
+        for (Class<? extends ModelInstanceSupplier> supplier : suppliers) {
+          try {
+            final BpmnModelInstance modelInstance = supplier.newInstance().get();
+
+            deploymentBuilder.addModelInstance(UUID.randomUUID().toString()+".bpmn", modelInstance);
+
+          } catch (Exception e) {
+            throw new IllegalStateException(e);
+          }
+        }
+
+      }
+
 
       deploymentId = deploymentBuilder.deploy().getId();
     }
