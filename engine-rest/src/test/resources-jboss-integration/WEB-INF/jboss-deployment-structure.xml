@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jboss-deployment-structure>
+    <deployment>
+        <dependencies>
+            <module name="org.codehaus.jackson.jackson-jaxrs"/>
+            <module name="org.codehaus.jackson.jackson-mapper-asl"/>
+            <module name="org.camunda.bpm.camunda-engine"/>
+<!--             <module name="joda-time.joda-time-2.1"/> -->
+        </dependencies>
+    </deployment>
+</jboss-deployment-structure>
