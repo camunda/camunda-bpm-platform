@@ -37,10 +37,6 @@
           <groupId>joda-time</groupId>
           <artifactId>joda-time</artifactId>
         </exclusion>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
-        </exclusion>
       </exclusions>
     </dependency>
 
@@ -95,7 +91,8 @@
       <groupId>org.camunda.template-engines</groupId>
       <artifactId>camunda-template-engines-freemarker</artifactId>
     </dependency>
-    
+
+    <!-- exclude slf4j as it is part of jboss distro -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>

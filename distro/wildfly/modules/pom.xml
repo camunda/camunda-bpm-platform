@@ -39,10 +39,6 @@
           <groupId>joda-time</groupId>
           <artifactId>joda-time</artifactId>
         </exclusion>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
-        </exclusion>
       </exclusions>
     </dependency>
 
@@ -98,6 +94,7 @@
       <artifactId>camunda-template-engines-freemarker</artifactId>
     </dependency>
 
+    <!-- exclude slf4j as it is part of wildfly distro -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
