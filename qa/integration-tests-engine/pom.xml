@@ -10,6 +10,10 @@
     <version>7.4.0-SNAPSHOT</version>
   </parent>
 
+  <properties>
+    <redirect.test.output>true</redirect.test.output>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.jboss.shrinkwrap.resolver</groupId>
@@ -253,7 +257,7 @@
                 <exclude>**/TestWarDeploymentWithProcessEnginePlugin.exclude</exclude>
                 <exclude>**/JavascriptScriptEngineSupportTest.java</exclude>
               </excludes>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
             </configuration>
           </plugin>
         </plugins>
@@ -327,7 +331,7 @@
               <includes>
                 <include>**/TestManagedDomain_JBOSS.java</include>
               </includes>
-             <redirectTestOutputToFile>true</redirectTestOutputToFile>
+             <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
             </configuration>
           </plugin>
         </plugins>
@@ -373,7 +377,7 @@
                 <exludes>**/TestWarDeploymentWithProcessEnginePlugin.java</exludes>
                 <exclude>**/JavascriptScriptEngineSupportTest.java</exclude>
               </excludes>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
             </configuration>
           </plugin>
         </plugins>
@@ -476,7 +480,7 @@
                 <exclude>**/TestWarDeploymentWithProcessEnginePlugin.exclude</exclude>
                 <exclude>**/JavascriptScriptEngineSupportTest.java</exclude>
               </excludes>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
             </configuration>
           </plugin>
         </plugins>
@@ -568,7 +572,7 @@
               <includes>
                 <include>**/TestManagedDomain_JBOSS.java</include>
               </includes>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
             </configuration>
           </plugin>
         </plugins>
@@ -614,7 +618,7 @@
                 <exludes>**/TestWarDeploymentWithProcessEnginePlugin.java</exludes>
                 <exclude>**/JavascriptScriptEngineSupportTest.java</exclude>
               </excludes>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
             </configuration>
           </plugin>
         </plugins>
@@ -687,7 +691,7 @@
 
                 <exclude>**/PythonPaClassImportTest.java</exclude>
               </excludes>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
             </configuration>
           </plugin>
 
@@ -790,7 +794,7 @@
 
                 <exclude>**/PythonPaClassImportTest.java</exclude>
               </excludes>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
             </configuration>
           </plugin>
 
@@ -950,7 +954,7 @@
 
                 <exclude>**/PythonPaClassImportTest.java</exclude>
               </excludes>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
             </configuration>
           </plugin>
         </plugins>
@@ -983,7 +987,7 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <skipTests>true</skipTests>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
             </configuration>
           </plugin>
           <plugin>
@@ -1035,7 +1039,7 @@
               <systemPropertyVariables>
                 <org.apache.maven.user-settings>../../settings.xml</org.apache.maven.user-settings>
               </systemPropertyVariables>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+              <redirectTestOutputToFile>${redirect.test.output}</redirectTestOutputToFile>
             </configuration>
           </plugin>
         </plugins>
