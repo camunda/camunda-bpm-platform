@@ -142,7 +142,7 @@ public class ContainerIntegrationLogger extends ProcessEngineLogger {
   public void foundConfigJndi(String jndi, String string) {
     logInfo(
         "018",
-        "Found camunda bpm platform configuration in JNDI [{}] at ", jndi, string);
+        "Found camunda bpm platform configuration in JNDI [{}] at {}", jndi, string);
   }
 
   public void debugExceptionWhileGettingConfigFromJndi(String jndi, NamingException e) {
