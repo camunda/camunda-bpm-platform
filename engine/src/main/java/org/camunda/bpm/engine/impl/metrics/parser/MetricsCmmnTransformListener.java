@@ -16,6 +16,7 @@ import org.camunda.bpm.engine.delegate.CaseExecutionListener;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnActivity;
 import org.camunda.bpm.engine.impl.cmmn.transformer.AbstractCmmnTransformListener;
 import org.camunda.bpm.model.cmmn.instance.CaseTask;
+import org.camunda.bpm.model.cmmn.instance.DecisionTask;
 import org.camunda.bpm.model.cmmn.instance.HumanTask;
 import org.camunda.bpm.model.cmmn.instance.Milestone;
 import org.camunda.bpm.model.cmmn.instance.PlanItem;
@@ -48,6 +49,10 @@ public class MetricsCmmnTransformListener extends AbstractCmmnTransformListener 
   }
 
   public void transformCaseTask(PlanItem planItem, CaseTask caseTask, CmmnActivity activity) {
+    addListeners(activity);
+  }
+
+  public void transformDecisionTask(PlanItem planItem, DecisionTask decisionTask, CmmnActivity activity) {
     addListeners(activity);
   }
 
