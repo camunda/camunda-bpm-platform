@@ -23,6 +23,12 @@ import org.camunda.bpm.dmn.feel.FeelEngineFactory;
 /**
  * The configuration of a {@link DmnEngine}. It can be used
  * to build a new engine using {@link #buildEngine()}.
+ *
+ * <p>
+ *   Please be aware that changes to the configuration can also
+ *   influence the behavior of engines which were already created
+ *   by this configuration instance.
+ * </p>
  */
 public interface DmnEngineConfiguration {
 
