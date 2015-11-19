@@ -123,7 +123,7 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
     this.engineMetricCollector = engineMetricCollector;
   }
 
-  public DmnEngineConfiguration engineMetricCollector(DmnEngineMetricCollector engineMetricCollector) {
+  public DefaultDmnEngineConfiguration engineMetricCollector(DmnEngineMetricCollector engineMetricCollector) {
     setEngineMetricCollector(engineMetricCollector);
     return this;
   }
@@ -136,7 +136,7 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
     this.customPreDecisionTableEvaluationListeners = decisionTableEvaluationListeners;
   }
 
-  public DmnEngineConfiguration customPreDecisionTableEvaluationListeners(List<DmnDecisionTableEvaluationListener> decisionTableEvaluationListeners) {
+  public DefaultDmnEngineConfiguration customPreDecisionTableEvaluationListeners(List<DmnDecisionTableEvaluationListener> decisionTableEvaluationListeners) {
     setCustomPreDecisionTableEvaluationListeners(decisionTableEvaluationListeners);
     return this;
   }
@@ -149,37 +149,76 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
     this.customPostDecisionTableEvaluationListeners = decisionTableEvaluationListeners;
   }
 
-  public DmnEngineConfiguration customPostDecisionTableEvaluationListeners(List<DmnDecisionTableEvaluationListener> decisionTableEvaluationListeners) {
+  public DefaultDmnEngineConfiguration customPostDecisionTableEvaluationListeners(List<DmnDecisionTableEvaluationListener> decisionTableEvaluationListeners) {
     setCustomPostDecisionTableEvaluationListeners(decisionTableEvaluationListeners);
     return this;
   }
 
+  /**
+   * The list of decision table evaluation listeners of the configuration. Contains
+   * the pre, default and post decision table evaluation listeners. Is set during
+   * the build of an engine.
+   *
+   * @return the list of decision table evaluation listeners
+   */
   public List<DmnDecisionTableEvaluationListener> getDecisionTableEvaluationListeners() {
     return decisionTableEvaluationListeners;
   }
 
+  /**
+   * @return the script engine resolver
+   */
   public DmnScriptEngineResolver getScriptEngineResolver() {
     return scriptEngineResolver;
   }
 
+  /**
+   * Set the script engine resolver which is used by the engine to get
+   * an instance of a script engine to evaluated expressions.
+   *
+   * @param scriptEngineResolver the script engine resolver
+   */
   public void setScriptEngineResolver(DmnScriptEngineResolver scriptEngineResolver) {
     this.scriptEngineResolver = scriptEngineResolver;
   }
 
-  public DmnEngineConfiguration scriptEngineResolver(DmnScriptEngineResolver scriptEngineResolver) {
+  /**
+   * Set the script engine resolver which is used by the engine to get
+   * an instance of a script engine to evaluated expressions.
+   *
+   * @param scriptEngineResolver the script engine resolver
+   * @return this
+   */
+  public DefaultDmnEngineConfiguration scriptEngineResolver(DmnScriptEngineResolver scriptEngineResolver) {
     setScriptEngineResolver(scriptEngineResolver);
     return this;
   }
 
+  /**
+   * @return the el provider
+   */
   public ElProvider getElProvider() {
     return elProvider;
   }
 
+  /**
+   * Set the el provider which is used by the engine to
+   * evaluate an el expression.
+   *
+   * @param elProvider the el provider
+   */
   public void setElProvider(ElProvider elProvider) {
     this.elProvider = elProvider;
   }
 
-  public DmnEngineConfiguration elProvider(ElProvider elProvider) {
+  /**
+   * Set the el provider which is used by the engine to
+   * evaluate an el expression.
+   *
+   * @param elProvider the el provider
+   * @return this
+   */
+  public DefaultDmnEngineConfiguration elProvider(ElProvider elProvider) {
     setElProvider(elProvider);
     return this;
   }
@@ -207,13 +246,50 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
    * @param feelEngineFactory the feel engine factory
    * @return this
    */
-  public DmnEngineConfiguration feelEngineFactory(FeelEngineFactory feelEngineFactory) {
+  public DefaultDmnEngineConfiguration feelEngineFactory(FeelEngineFactory feelEngineFactory) {
     setFeelEngineFactory(feelEngineFactory);
     return this;
   }
 
+  /**
+   * The feel engine used by the engine. Is initialized during the build of
+   * the engine.
+   *
+   * @return the feel engine
+   */
   public FeelEngine getFeelEngine() {
     return feelEngine;
+  }
+
+  /**
+   * @return the default expression language for input expressions
+   */
+  public String getDefaultInputExpressionExpressionLanguage() {
+    return defaultInputExpressionExpressionLanguage;
+  }
+
+  /**
+   * Set the default expression language which is used to evaluate input expressions.
+   * It is used for all input expressions which do not have a expression
+   * language set.
+   *
+   * @param expressionLanguage the default expression language for input expressions
+   */
+  public void setDefaultInputExpressionExpressionLanguage(String expressionLanguage) {
+    this.defaultInputExpressionExpressionLanguage = expressionLanguage;
+  }
+
+  /**
+   * Set the default expression language which is used to evaluate input expressions.
+   * It is used for all input expressions which do not have a expression
+   * language set.
+   *
+   * @param expressionLanguage the default expression language for input expressions
+   * @return this configuration
+   */
+  public DefaultDmnEngineConfiguration defaultInputExpressionExpressionLanguage(String expressionLanguage) {
+    setDefaultInputExpressionExpressionLanguage(expressionLanguage);
+    return this;
   }
 
   /**
@@ -242,7 +318,7 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
    * @param expressionLanguage the default expression language for input entries
    * @return this configuration
    */
-  public DmnEngineConfiguration defaultInputEntryExpressionLanguage(String expressionLanguage) {
+  public DefaultDmnEngineConfiguration defaultInputEntryExpressionLanguage(String expressionLanguage) {
     setDefaultInputEntryExpressionLanguage(expressionLanguage);
     return this;
   }
@@ -273,51 +349,34 @@ public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
    * @param expressionLanguage the default expression language for output entries
    * @return this configuration
    */
-  public DmnEngineConfiguration defaultOutputEntryExpressionLanguage(String expressionLanguage) {
+  public DefaultDmnEngineConfiguration defaultOutputEntryExpressionLanguage(String expressionLanguage) {
     setDefaultOutputEntryExpressionLanguage(expressionLanguage);
     return this;
   }
 
   /**
-   * @return the default expression language for input expressions
+   * @return the DMN transformer
    */
-  public String getDefaultInputExpressionExpressionLanguage() {
-    return defaultInputExpressionExpressionLanguage;
-  }
-
-  /**
-   * Set the default expression language which is used to evaluate input expressions.
-   * It is used for all input expressions which do not have a expression
-   * language set.
-   *
-   * @param expressionLanguage the default expression language for input expressions
-   */
-  public void setDefaultInputExpressionExpressionLanguage(String expressionLanguage) {
-    this.defaultInputExpressionExpressionLanguage = expressionLanguage;
-  }
-
-  /**
-   * Set the default expression language which is used to evaluate input expressions.
-   * It is used for all input expressions which do not have a expression
-   * language set.
-   *
-   * @param expressionLanguage the default expression language for input expressions
-   * @return this configuration
-   */
-  public DmnEngineConfiguration defaultInputExpressionExpressionLanguage(String expressionLanguage) {
-    setDefaultInputExpressionExpressionLanguage(expressionLanguage);
-    return this;
-  }
-
   public DmnTransformer getTransformer() {
     return transformer;
   }
 
+  /**
+   * Set the DMN transformer used to transform the DMN model.
+   *
+   * @param transformer the DMN transformer
+   */
   public void setTransformer(DmnTransformer transformer) {
     this.transformer = transformer;
   }
 
-  public DmnEngineConfiguration transformer(DmnTransformer transformer) {
+  /**
+   * Set the DMN transformer used to transform the DMN model.
+   *
+   * @param transformer the DMN transformer
+   * @return this
+   */
+  public DefaultDmnEngineConfiguration transformer(DmnTransformer transformer) {
     setTransformer(transformer);
     return this;
   }
