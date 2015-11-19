@@ -28,9 +28,9 @@ import org.camunda.bpm.dmn.engine.impl.spi.el.ElProvider;
 import org.camunda.bpm.dmn.engine.impl.spi.transform.DmnTransformer;
 import org.camunda.bpm.dmn.engine.impl.transform.DefaultDmnTransformer;
 import org.camunda.bpm.dmn.engine.spi.DmnEngineMetricCollector;
-import org.camunda.bpm.dmn.feel.FeelEngine;
-import org.camunda.bpm.dmn.feel.FeelEngineFactory;
-import org.camunda.bpm.dmn.feel.impl.FeelEngineFactoryImpl;
+import org.camunda.bpm.dmn.feel.impl.FeelEngine;
+import org.camunda.bpm.dmn.feel.impl.FeelEngineFactory;
+import org.camunda.bpm.dmn.feel.impl.juel.FeelEngineFactoryImpl;
 import org.camunda.bpm.model.dmn.impl.DmnModelConstants;
 
 public class DefaultDmnEngineConfiguration implements DmnEngineConfiguration {

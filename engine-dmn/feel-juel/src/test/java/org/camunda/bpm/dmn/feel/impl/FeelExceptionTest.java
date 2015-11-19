@@ -19,8 +19,7 @@ import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import org.camunda.bpm.dmn.feel.FeelEngine;
-import org.camunda.bpm.dmn.feel.FeelException;
+import org.camunda.bpm.dmn.feel.impl.juel.FeelEngineFactoryImpl;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Before;

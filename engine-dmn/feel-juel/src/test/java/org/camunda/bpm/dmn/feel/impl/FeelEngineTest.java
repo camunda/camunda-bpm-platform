@@ -18,8 +18,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Collections;
 import java.util.Date;
 
-import org.camunda.bpm.dmn.feel.FeelEngine;
-import org.camunda.bpm.dmn.feel.impl.el.FeelFunctionMapper;
+import org.camunda.bpm.dmn.feel.impl.juel.FeelEngineFactoryImpl;
+import org.camunda.bpm.dmn.feel.impl.juel.el.FeelFunctionMapper;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.DateValue;

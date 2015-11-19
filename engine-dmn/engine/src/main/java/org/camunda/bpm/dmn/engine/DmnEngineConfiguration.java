@@ -17,8 +17,6 @@ import java.util.List;
 
 import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationListener;
 import org.camunda.bpm.dmn.engine.spi.DmnEngineMetricCollector;
-import org.camunda.bpm.dmn.feel.FeelEngine;
-import org.camunda.bpm.dmn.feel.FeelEngineFactory;
 
 /**
  * The configuration of a {@link DmnEngine}. It can be used

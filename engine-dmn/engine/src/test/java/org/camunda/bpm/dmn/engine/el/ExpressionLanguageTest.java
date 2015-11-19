@@ -35,7 +35,7 @@ import org.camunda.bpm.dmn.engine.impl.spi.el.DmnScriptEngineResolver;
 import org.camunda.bpm.dmn.engine.impl.spi.el.ElProvider;
 import org.camunda.bpm.dmn.engine.test.DecisionResource;
 import org.camunda.bpm.dmn.engine.test.DmnEngineTest;
-import org.camunda.bpm.dmn.feel.FeelException;
+import org.camunda.bpm.dmn.feel.impl.FeelException;
 import org.junit.Test;
 
 public class ExpressionLanguageTest extends DmnEngineTest {

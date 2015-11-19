@@ -15,8 +15,8 @@ package org.camunda.bpm.dmn.feel.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.camunda.bpm.dmn.feel.impl.transform.FeelToJuelTransform;
-import org.camunda.bpm.dmn.feel.impl.transform.FeelToJuelTransformImpl;
+import org.camunda.bpm.dmn.feel.impl.juel.transform.FeelToJuelTransform;
+import org.camunda.bpm.dmn.feel.impl.juel.transform.FeelToJuelTransformImpl;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
