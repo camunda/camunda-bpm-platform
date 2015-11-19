@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.db.entitymanager.cache.CachedDbEntity;
 import org.camunda.bpm.engine.impl.db.entitymanager.cache.DbEntityState;
 import org.camunda.bpm.engine.impl.db.entitymanager.operation.DbOperation;
+import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClassNameUtil;
@@ -526,10 +527,10 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         ));
   }
 
-  public void creatingHistoryLevelPropertyInDatabase(int id) {
+  public void creatingHistoryLevelPropertyInDatabase(HistoryLevel historyLevel) {
     logInfo(
         "065",
-        "Creating historyLevel property in database with value: {}", id);
+        "Creating historyLevel property in database for level: {}", historyLevel);
   }
 
   public void couldNotSelectHistoryLevel(String message) {

@@ -69,7 +69,7 @@ public final class SchemaOperationsProcessEngineBuild implements Command<Void> {
     HistoryLevel configuredHistoryLevel = processEngineConfiguration.getHistoryLevel();
     PropertyEntity property = new PropertyEntity("historyLevel", Integer.toString(configuredHistoryLevel.getId()));
     entityManager.insert(property);
-    LOG.creatingHistoryLevelPropertyInDatabase(configuredHistoryLevel.getId());
+    LOG.creatingHistoryLevelPropertyInDatabase(configuredHistoryLevel);
   }
 
   /**
@@ -106,7 +106,7 @@ public final class SchemaOperationsProcessEngineBuild implements Command<Void> {
     } else {
       if (!((Integer) configuredHistoryLevel.getId()).equals(databaseHistoryLevel.getId())) {
         throw new ProcessEngineException("historyLevel mismatch: configuration says " + configuredHistoryLevel
-            + " and database says " + databaseHistoryLevel.getId());
+            + " and database says " + databaseHistoryLevel);
       }
     }
   }
