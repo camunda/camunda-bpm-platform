@@ -52,14 +52,31 @@ define([
           $scope.currentResourceId = resourceId.resourceId;
         });
 
+        // taken from
+        // http://stackoverflow.com/questions/1916218/find-the-longest-common-starting-substring-in-a-set-of-strings#answer-1917041
+        function sharedStart(array){
+          var A = array.concat().sort(),
+          a1= A[0], a2= A[A.length-1], L= a1.length, i= 0;
+          while(i<L && a1.charAt(i)=== a2.charAt(i)) i++;
+          return a1.substring(0, i);
+        }
+
+        $scope.sharedStart = '';
         $scope.state = resourcesData.observe('resources', function (resources) {
+          var paths = [];
           $scope.resources = (resources || []).map(function (resource) {
             var parts = (resource.name || resource.id).split('/');
             resource._filename = parts.pop();
             resource._filepath = parts.join('/');
+            paths.push(resource._filepath);
             return resource;
           });
+          $scope.sharedStart = sharedStart(paths);
         });
+
+        $scope.truncateFilepath = function (filepath) {
+          return filepath.slice($scope.sharedStart.length);
+        };
 
 
         // selection //////////////////////////////////////////////////////////////////

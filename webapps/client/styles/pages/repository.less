@@ -59,11 +59,19 @@
   }
 
   .filepath {
+    max-width: 100%;
     font-style: italic;
     display: block;
     overflow: hidden;
     text-overflow: ellipsis;
     color: @gray-light;
+    &:after {
+      content: '/';
+      display: inline-block;
+    }
+    &:empty {
+      display: none;
+    }
   }
 
   .ctn-content-container {
