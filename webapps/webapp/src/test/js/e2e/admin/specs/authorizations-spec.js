@@ -599,7 +599,7 @@ describe('Admin Authorizations Spec', function() {
 
   });
 
-  describe.only('New authorization on empty lists', function () {
+  describe('New authorization on empty lists', function () {
     before(function () {
       return testHelper(setupFile.setup4, function () {
         authorizationsPage.navigateToWebapp('Admin');
