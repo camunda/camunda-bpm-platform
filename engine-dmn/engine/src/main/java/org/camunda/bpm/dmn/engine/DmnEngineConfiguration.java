@@ -16,6 +16,7 @@ package org.camunda.bpm.dmn.engine;
 import java.util.List;
 
 import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationListener;
+import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.spi.DmnEngineMetricCollector;
 
 /**
@@ -23,24 +24,37 @@ import org.camunda.bpm.dmn.engine.spi.DmnEngineMetricCollector;
  * to build a new engine using {@link #buildEngine()}.
  *
  * <p>
+ *   To create a new default DMN engine configuration the
+ *   method {@link #createDefaultDmnEngineConfiguration()}
+ *   can be used.
+ * </p>
+ *
+ * <p>
  *   Please be aware that changes to the configuration can also
  *   influence the behavior of engines which were already created
  *   by this configuration instance.
  * </p>
  */
-public interface DmnEngineConfiguration {
+public abstract class DmnEngineConfiguration {
+
+  /**
+   * @return a new default dmn engine configuration
+   */
+  public static DmnEngineConfiguration createDefaultDmnEngineConfiguration() {
+    return new DefaultDmnEngineConfiguration();
+  }
 
   /**
    * @return the configured engine metric collector
    */
-  DmnEngineMetricCollector getEngineMetricCollector();
+  public abstract DmnEngineMetricCollector getEngineMetricCollector();
 
   /**
    * Set the engine metric collector
    *
    * @param engineMetricCollector the engine metric collector to use
    */
-  void setEngineMetricCollector(DmnEngineMetricCollector engineMetricCollector);
+  public abstract void setEngineMetricCollector(DmnEngineMetricCollector engineMetricCollector);
 
   /**
    * Set the engine metric collector
@@ -48,12 +62,12 @@ public interface DmnEngineConfiguration {
    * @param engineMetricCollector the engine metric collector to use
    * @return this configuration
    */
-  DmnEngineConfiguration engineMetricCollector(DmnEngineMetricCollector engineMetricCollector);
+  public abstract DmnEngineConfiguration engineMetricCollector(DmnEngineMetricCollector engineMetricCollector);
 
   /**
    * @return the list of custom pre decision table evaluation listeners
    */
-  List<DmnDecisionTableEvaluationListener> getCustomPreDecisionTableEvaluationListeners();
+  public abstract List<DmnDecisionTableEvaluationListener> getCustomPreDecisionTableEvaluationListeners();
 
   /**
    * Set the list of pre decision table evaluation listeners. They will be notified before
@@ -61,7 +75,7 @@ public interface DmnEngineConfiguration {
    *
    * @param decisionTableEvaluationListeners the list of pre decision table evaluation listeners
    */
-  void setCustomPreDecisionTableEvaluationListeners(List<DmnDecisionTableEvaluationListener> decisionTableEvaluationListeners);
+  public abstract void setCustomPreDecisionTableEvaluationListeners(List<DmnDecisionTableEvaluationListener> decisionTableEvaluationListeners);
 
   /**
    * Set the list of pre decision table evaluation listeners. They will be notified before
@@ -70,12 +84,12 @@ public interface DmnEngineConfiguration {
    * @param decisionTableEvaluationListeners the list of pre decision table evaluation listeners
    * @return this configuration
    */
-  DmnEngineConfiguration customPreDecisionTableEvaluationListeners(List<DmnDecisionTableEvaluationListener> decisionTableEvaluationListeners);
+  public abstract DmnEngineConfiguration customPreDecisionTableEvaluationListeners(List<DmnDecisionTableEvaluationListener> decisionTableEvaluationListeners);
 
   /**
    * @return the list of custom post decision table evaluation listeners
    */
-  List<DmnDecisionTableEvaluationListener> getCustomPostDecisionTableEvaluationListeners();
+  public abstract List<DmnDecisionTableEvaluationListener> getCustomPostDecisionTableEvaluationListeners();
 
   /**
    * Set the list of post decision table evaluation listeners. They will be notified after
@@ -83,7 +97,7 @@ public interface DmnEngineConfiguration {
    *
    * @param decisionTableEvaluationListeners the list of post decision table evaluation listeners
    */
-  void setCustomPostDecisionTableEvaluationListeners(List<DmnDecisionTableEvaluationListener> decisionTableEvaluationListeners);
+  public abstract void setCustomPostDecisionTableEvaluationListeners(List<DmnDecisionTableEvaluationListener> decisionTableEvaluationListeners);
 
   /**
    * Set the list of post decision table evaluation listeners. They will be notified after
@@ -92,13 +106,13 @@ public interface DmnEngineConfiguration {
    * @param decisionTableEvaluationListeners the list of post decision table evaluation listeners
    * @return this configuration
    */
-  DmnEngineConfiguration customPostDecisionTableEvaluationListeners(List<DmnDecisionTableEvaluationListener> decisionTableEvaluationListeners);
+  public abstract DmnEngineConfiguration customPostDecisionTableEvaluationListeners(List<DmnDecisionTableEvaluationListener> decisionTableEvaluationListeners);
 
   /**
    * Create a {@link DmnEngine} with this configuration
    *
    * @return the created {@link DmnEngine}
    */
-  DmnEngine buildEngine();
+  public abstract DmnEngine buildEngine();
 
 }

@@ -33,7 +33,7 @@ import org.camunda.bpm.dmn.feel.impl.FeelEngineFactory;
 import org.camunda.bpm.dmn.feel.impl.juel.FeelEngineFactoryImpl;
 import org.camunda.bpm.model.dmn.impl.DmnModelConstants;
 
-public class DefaultDmnEngineConfiguration implements DmnEngineConfiguration {
+public class DefaultDmnEngineConfiguration extends DmnEngineConfiguration {
 
   public static final String FEEL_EXPRESSION_LANGUAGE = DmnModelConstants.FEEL_NS;
   public static final String FEEL_EXPRESSION_LANGUAGE_ALTERNATIVE = "feel";

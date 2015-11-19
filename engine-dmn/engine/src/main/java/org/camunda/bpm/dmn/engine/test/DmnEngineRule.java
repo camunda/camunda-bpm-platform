@@ -52,14 +52,19 @@ public class DmnEngineRule extends TestWatcher {
    * Creates a {@link DmnEngine} with the default {@link DmnEngineConfiguration}
    */
   public DmnEngineRule() {
-    this(new DefaultDmnEngineConfiguration());
+    this(null);
   }
 
   /**
    * Creates a {@link DmnEngine} with the given {@link DmnEngineConfiguration}
    */
   public DmnEngineRule(DmnEngineConfiguration dmnEngineConfiguration) {
-    this.dmnEngineConfiguration = dmnEngineConfiguration;
+    if (dmnEngineConfiguration != null) {
+      this.dmnEngineConfiguration = dmnEngineConfiguration;
+    }
+    else {
+      this.dmnEngineConfiguration = DmnEngineConfiguration.createDefaultDmnEngineConfiguration();
+    }
   }
 
   /**

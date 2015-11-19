@@ -40,7 +40,7 @@ public abstract class DmnEngineTest {
   public VariableMap variables;
 
   public DmnEngineConfiguration getDmnEngineConfiguration() {
-    return new DefaultDmnEngineConfiguration();
+    return null;
   }
 
   @Before

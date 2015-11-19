@@ -1,4 +1,4 @@
-Camunda DMN Engine
+
 ==================
 
 Lightweight Execution Engine for DMN (Decision Model and Notation) written in Java.
@@ -31,8 +31,8 @@ public class DmnApp {
 
   public static void main(String[] args) {
 
-    // configure the engine
-    DmnEngine dmnEngine = new DefaultDmnEngineConfiguration().buildEngine();
+    // configure and build the DMN engine
+    DmnEngine dmnEngine = DmnEngineConfiguration.createDefaultDmnEngineConfiguration().buildEngine();
 
     // parse a decision
     DmnDecision decision = dmnEngine.parseDecision("orderDecision", "CheckOrder.dmn");
