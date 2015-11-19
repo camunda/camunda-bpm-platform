@@ -25,12 +25,14 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.spin.DataFormats;
 
-public class JsonDecisionInputTest extends PluggableProcessEngineTestCase {
+public class HistoricDecisionInstanceSerializationTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/spin/plugin/DecisionSingleOutput.dmn11.xml"})
-  public void test() {
-    JsonSerializable bean = new JsonSerializable("a String", 42, true);
-    ObjectValue objectValue = Variables.objectValue(bean).serializationDataFormat(DataFormats.JSON_DATAFORMAT_NAME).create();
+  public void testListJsonProperty() {
+    JsonListSerializable<String> list = new JsonListSerializable<String>();
+    list.addElement("foo");
+
+    ObjectValue objectValue = Variables.objectValue(list).serializationDataFormat(DataFormats.JSON_DATAFORMAT_NAME).create();
 
     VariableMap variables = Variables.createVariables()
       .putValueTyped("input1", objectValue);
@@ -44,13 +46,14 @@ public class JsonDecisionInputTest extends PluggableProcessEngineTestCase {
     assertEquals(1, inputs.size());
 
     HistoricDecisionInputInstance inputInstance = inputs.get(0);
-    assertEquals(bean, inputInstance.getValue());
+    assertEquals(list.getListProperty(), inputInstance.getValue());
 
     List<HistoricDecisionOutputInstance> outputs = testDecision.getOutputs();
     assertEquals(1, outputs.size());
 
     HistoricDecisionOutputInstance outputInstance = outputs.get(0);
-    assertEquals(bean, outputInstance.getValue());
+    assertEquals(list.getListProperty(), outputInstance.getValue());
+
   }
 
 }

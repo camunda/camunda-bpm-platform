@@ -18,6 +18,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +39,7 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.variables.JavaSerializable;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.joda.time.DateTime;
@@ -312,6 +314,21 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
+  public void testDecisionInputInstanceObjectValue() {
+
+    JavaSerializable object = new JavaSerializable("foo");
+    startProcessInstanceAndEvaluateDecision(object);
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery().includeInputs().singleResult();
+    List<HistoricDecisionInputInstance> inputs = historicDecisionInstance.getInputs();
+    assertThat(inputs.size(), is(1));
+
+    HistoricDecisionInputInstance input = inputs.get(0);
+    assertThat(input.getTypeName(), is("object"));
+    assertThat(input.getValue(), is((Object) object));
+  }
+
+  @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
   public void testDisableDecisionInputInstanceByteValue() {
 
     byte[] bytes = "object".getBytes();
@@ -450,6 +467,37 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     HistoricDecisionOutputInstance output = outputs.get(0);
     assertThat(output.getTypeName(), is("bytes"));
     assertThat(output.getValue(), is((Object) bytes));
+  }
+
+  @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
+  public void testDecisionOutputInstanceObjectValue() {
+
+    JavaSerializable object = new JavaSerializable("foo");
+    startProcessInstanceAndEvaluateDecision(object);
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery().includeOutputs().singleResult();
+    List<HistoricDecisionOutputInstance> outputs = historicDecisionInstance.getOutputs();
+    assertThat(outputs.size(), is(1));
+
+    HistoricDecisionOutputInstance output = outputs.get(0);
+    assertThat(output.getTypeName(), is("object"));
+    assertThat(output.getValue(), is((Object) object));
+  }
+
+  @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
+  public void testDecisionOutputInstanceObjectListValue() {
+
+    List<JavaSerializable> object = new ArrayList<JavaSerializable>();
+    object.add(new JavaSerializable("foo"));
+    startProcessInstanceAndEvaluateDecision(object);
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery().includeOutputs().singleResult();
+    List<HistoricDecisionOutputInstance> outputs = historicDecisionInstance.getOutputs();
+    assertThat(outputs.size(), is(1));
+
+    HistoricDecisionOutputInstance output = outputs.get(0);
+    assertThat(output.getTypeName(), is("object"));
+    assertThat(output.getValue(), is((Object) object));
   }
 
   @Deployment(resources = { DECISION_PROCESS, DECISION_COLLECT_SUM_DMN })

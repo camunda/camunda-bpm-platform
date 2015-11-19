@@ -163,6 +163,14 @@ public class HistoricDecisionInputInstanceEntity extends HistoryEvent implements
     typedValueField.setValue(typedValue);
   }
 
+  public String getSerializerName() {
+    return typedValueField.getSerializerName();
+  }
+
+  public void setSerializerName(String serializerName) {
+    typedValueField.setSerializerName(serializerName);
+  }
+
   public void delete() {
     byteArrayField.deleteByteArrayValue();
 

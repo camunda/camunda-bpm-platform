@@ -29,7 +29,7 @@
           #{ruleId, jdbcType=VARCHAR},
           #{ruleOrder, jdbcType=VARCHAR},
           #{variableName, jdbcType=VARCHAR},
-          #{typeName, jdbcType=VARCHAR},
+          #{serializerName, jdbcType=VARCHAR},
           #{byteArrayValueId, jdbcType=VARCHAR},
           #{doubleValue, jdbcType=DOUBLE},
           #{longValue, jdbcType=BIGINT},
@@ -54,7 +54,7 @@
     <result property="ruleId" column="RULE_ID_" jdbcType="VARCHAR" />
     <result property="ruleOrder" column="RULE_ORDER_" jdbcType="INTEGER" />
     <result property="variableName" column="VAR_NAME_" jdbcType="VARCHAR"/>
-    <result property="typeName" column="VAR_TYPE_" jdbcType="VARCHAR"/>
+    <result property="serializerName" column="VAR_TYPE_" jdbcType="VARCHAR"/>
     <result property="byteArrayValueId" column="BYTEARRAY_ID_" jdbcType="VARCHAR" />
     <result property="doubleValue" column="DOUBLE_" jdbcType="DOUBLE" />
     <result property="textValue" column="TEXT_" jdbcType="VARCHAR" />
