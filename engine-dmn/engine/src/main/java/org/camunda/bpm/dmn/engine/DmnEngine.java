@@ -91,7 +91,8 @@ public interface DmnEngine {
   /**
    * Evaluates a decision which is implemented as decision table.
    * @param decision the {@link DmnDecision} to evaluate
-   * @param variables the variables which are available
+   * @param variables the variables which are available during the evaluation
+   *                  of expressions in the decision table
    * @return the {@link DmnDecisionTableResult} of this evaluation
    *
    * @throws DmnEngineException
@@ -105,7 +106,8 @@ public interface DmnEngine {
    * Evaluates a decision which is implemented as decision table.
    *
    * @param decision the {@link DmnDecision} to evaluate
-   * @param variableContext the variables context which is available
+   * @param variableContext the variables context which is available during the evaluation
+   *                        of expressions in the decision table
    * @return the {@link DmnDecisionTableResult} of this evaluation
    *
    * @throws DmnEngineException
@@ -121,7 +123,8 @@ public interface DmnEngine {
    *
    * @param decisionKey the key of the decision to evaluated
    * @param inputStream the {@link InputStream} of the DMN file
-   * @param variables the variables which are available
+   * @param variables the variables which are available during the evaluation
+   *                  of expressions in the decision table
    * @return the {@link DmnDecisionTableResult} of this evaluation
    *
    * @throws DmnEngineException
@@ -139,7 +142,8 @@ public interface DmnEngine {
    *
    * @param decisionKey the key of the decision to evaluated
    * @param inputStream the {@link InputStream} of the DMN file
-   * @param variableContext the variables context which is available
+   * @param variableContext the variables context which is available during the evaluation
+   *                        of expressions in the decision table
    * @return the {@link DmnDecisionTableResult} of this evaluation
    *
    * @throws DmnEngineException
@@ -157,7 +161,8 @@ public interface DmnEngine {
    *
    * @param decisionKey the key of the decision to evaluated
    * @param dmnModelInstance the {@link DmnModelInstance} of the DMN decision model
-   * @param variables the variables which are available
+   * @param variables the variables which are available during the evaluation
+   *                  of expressions in the decision table
    * @return the {@link DmnDecisionTableResult} of this evaluation
    *
    * @throws DmnEngineException
@@ -175,7 +180,8 @@ public interface DmnEngine {
    *
    * @param decisionKey the key of the decision to evaluated
    * @param dmnModelInstance the {@link DmnModelInstance} of the DMN decision model
-   * @param variableContext the variables context which is available
+   * @param variableContext the variables context which is available during the evaluation
+   *                        of expressions in the decision table
    * @return the {@link DmnDecisionTableResult} of this evaluation
    *
    * @throws DmnEngineException
