@@ -184,16 +184,29 @@ public class DefaultDmnEngineConfiguration implements DmnEngineConfiguration {
     return this;
   }
 
-
+  /**
+   * @return the factory is used to create a {@link FeelEngine}
+   */
   public FeelEngineFactory getFeelEngineFactory() {
     return feelEngineFactory;
   }
 
+  /**
+   * Set the factory to create a {@link FeelEngine}
+   *
+   * @param feelEngineFactory the feel engine factory
+   */
   public void setFeelEngineFactory(FeelEngineFactory feelEngineFactory) {
     this.feelEngineFactory = feelEngineFactory;
     this.feelEngine = null; // clear cached FEEL engine
   }
 
+  /**
+   * Set the factory to create a {@link FeelEngine}
+   *
+   * @param feelEngineFactory the feel engine factory
+   * @return this
+   */
   public DmnEngineConfiguration feelEngineFactory(FeelEngineFactory feelEngineFactory) {
     setFeelEngineFactory(feelEngineFactory);
     return this;
@@ -203,40 +216,94 @@ public class DefaultDmnEngineConfiguration implements DmnEngineConfiguration {
     return feelEngine;
   }
 
+  /**
+   * @return the default expression language for input entries
+   */
   public String getDefaultInputEntryExpressionLanguage() {
     return defaultInputEntryExpressionLanguage;
   }
 
-  public void setDefaultInputEntryExpressionLanguage(String defaultInputEntryExpressionLanguage) {
-    this.defaultInputEntryExpressionLanguage = defaultInputEntryExpressionLanguage;
+  /**
+   * Set the default expression language which is used to evaluate input entries.
+   * It is used for all input entries which do not have a expression
+   * language set.
+   *
+   * @param expressionLanguage the default expression language for input entries
+   */
+  public void setDefaultInputEntryExpressionLanguage(String expressionLanguage) {
+    this.defaultInputEntryExpressionLanguage = expressionLanguage;
   }
 
+  /**
+   * Set the default expression language which is used to evaluate input entries.
+   * It is used for all input entries which do not have a expression
+   * language set.
+   *
+   * @param expressionLanguage the default expression language for input entries
+   * @return this configuration
+   */
   public DmnEngineConfiguration defaultInputEntryExpressionLanguage(String expressionLanguage) {
     setDefaultInputEntryExpressionLanguage(expressionLanguage);
     return this;
   }
 
+  /**
+   * @return the default expression language for output entries
+   */
   public String getDefaultOutputEntryExpressionLanguage() {
     return defaultOutputEntryExpressionLanguage;
   }
 
-  public void setDefaultOutputEntryExpressionLanguage(String defaultOutputEntryExpressionLanguage) {
-    this.defaultOutputEntryExpressionLanguage = defaultOutputEntryExpressionLanguage;
+  /**
+   * Set the default expression language which is used to evaluate output entries.
+   * It is used for all output entries which do not have a expression
+   * language set.
+   *
+   * @param expressionLanguage the default expression language for output entries
+   */
+  public void setDefaultOutputEntryExpressionLanguage(String expressionLanguage) {
+    this.defaultOutputEntryExpressionLanguage = expressionLanguage;
   }
 
+  /**
+   * Set the default expression language which is used to evaluate output entries.
+   * It is used for all output entries which do not have a expression
+   * language set.
+   *
+   * @param expressionLanguage the default expression language for output entries
+   * @return this configuration
+   */
   public DmnEngineConfiguration defaultOutputEntryExpressionLanguage(String expressionLanguage) {
     setDefaultOutputEntryExpressionLanguage(expressionLanguage);
     return this;
   }
 
+  /**
+   * @return the default expression language for input expressions
+   */
   public String getDefaultInputExpressionExpressionLanguage() {
     return defaultInputExpressionExpressionLanguage;
   }
 
-  public void setDefaultInputExpressionExpressionLanguage(String defaultInputExpressionExpressionLanguage) {
-    this.defaultInputExpressionExpressionLanguage = defaultInputExpressionExpressionLanguage;
+  /**
+   * Set the default expression language which is used to evaluate input expressions.
+   * It is used for all input expressions which do not have a expression
+   * language set.
+   *
+   * @param expressionLanguage the default expression language for input expressions
+   */
+  public void setDefaultInputExpressionExpressionLanguage(String expressionLanguage) {
+    this.defaultInputExpressionExpressionLanguage = expressionLanguage;
   }
 
+  /**
+   * Set the default expression language which is used to evaluate input expressions.
+   * It is used for all input expressions which do not have a expression
+   * language set.
+   *
+   * @param expressionLanguage the default expression language for input expressions
+   * @return this configuration
+   */
   public DmnEngineConfiguration defaultInputExpressionExpressionLanguage(String expressionLanguage) {
     setDefaultInputExpressionExpressionLanguage(expressionLanguage);
     return this;

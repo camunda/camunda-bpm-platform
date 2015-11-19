@@ -59,7 +59,7 @@ public class FeelIntegrationTest extends DmnEngineTest {
 
   @Test
   public void testFeelAlternativeName() {
-    DmnEngineConfiguration configuration = getDmnEngineConfiguration();
+    DefaultDmnEngineConfiguration configuration = (DefaultDmnEngineConfiguration) getDmnEngineConfiguration();
     configuration.setDefaultInputEntryExpressionLanguage("feel");
     DmnEngine dmnEngine = configuration.buildEngine();
 
@@ -70,7 +70,7 @@ public class FeelIntegrationTest extends DmnEngineTest {
 
   @Test
   public void testFeelInputExpressions() {
-    DmnEngineConfiguration configuration = getDmnEngineConfiguration();
+    DefaultDmnEngineConfiguration configuration = (DefaultDmnEngineConfiguration) getDmnEngineConfiguration();
     configuration.setDefaultInputExpressionExpressionLanguage(DefaultDmnEngineConfiguration.FEEL_EXPRESSION_LANGUAGE);
     DmnEngine engine = configuration.buildEngine();
 
@@ -86,7 +86,7 @@ public class FeelIntegrationTest extends DmnEngineTest {
 
   @Test
   public void testFeelOutputEntry() {
-    DmnEngineConfiguration configuration = getDmnEngineConfiguration();
+    DefaultDmnEngineConfiguration configuration = (DefaultDmnEngineConfiguration) getDmnEngineConfiguration();
     configuration.setDefaultOutputEntryExpressionLanguage(DefaultDmnEngineConfiguration.FEEL_EXPRESSION_LANGUAGE);
     DmnEngine engine = configuration.buildEngine();
 

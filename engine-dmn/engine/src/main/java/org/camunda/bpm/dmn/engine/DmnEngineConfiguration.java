@@ -65,7 +65,6 @@ public interface DmnEngineConfiguration {
    */
   void setCustomPreDecisionTableEvaluationListeners(List<DmnDecisionTableEvaluationListener> decisionTableEvaluationListeners);
 
-
   /**
    * Set the list of pre decision table evaluation listeners. They will be notified before
    * the default decision table evaluation listeners.
@@ -96,98 +95,6 @@ public interface DmnEngineConfiguration {
    * @return this configuration
    */
   DmnEngineConfiguration customPostDecisionTableEvaluationListeners(List<DmnDecisionTableEvaluationListener> decisionTableEvaluationListeners);
-
-  /**
-   * @return the factory is used to create a {@link FeelEngine}
-   */
-  FeelEngineFactory getFeelEngineFactory();
-
-  /**
-   * Set the factory to create a {@link FeelEngine}
-   *
-   * @param feelEngineFactory the feel engine factory
-   */
-  void setFeelEngineFactory(FeelEngineFactory feelEngineFactory);
-
-  /**
-   * Set the factory to create a {@link FeelEngine}
-   *
-   * @param feelEngineFactory the feel engine factory
-   * @return this
-   */
-  DmnEngineConfiguration feelEngineFactory(FeelEngineFactory feelEngineFactory);
-
-  /**
-   * @return the default expression language for input entries
-   */
-  String getDefaultInputEntryExpressionLanguage();
-
-  /**
-   * Set the default expression language which is used to evaluate input entries.
-   * It is used for all input entries which do not have a expression
-   * language set.
-   *
-   * @param expressionLanguage the default expression language for input entries
-   */
-  void setDefaultInputEntryExpressionLanguage(String expressionLanguage);
-
-  /**
-   * Set the default expression language which is used to evaluate input entries.
-   * It is used for all input entries which do not have a expression
-   * language set.
-   *
-   * @param expressionLanguage the default expression language for input entries
-   * @return this configuration
-   */
-  DmnEngineConfiguration defaultInputEntryExpressionLanguage(String expressionLanguage);
-
-  /**
-   * @return the default expression language for input expressions
-   */
-  String getDefaultInputExpressionExpressionLanguage();
-
-  /**
-   * Set the default expression language which is used to evaluate input expressions.
-   * It is used for all input expressions which do not have a expression
-   * language set.
-   *
-   * @param expressionLanguage the default expression language for input expressions
-   */
-  void setDefaultInputExpressionExpressionLanguage(String expressionLanguage);
-
-  /**
-   * Set the default expression language which is used to evaluate input expressions.
-   * It is used for all input expressions which do not have a expression
-   * language set.
-   *
-   * @param expressionLanguage the default expression language for input expressions
-   * @return this configuration
-   */
-  DmnEngineConfiguration defaultInputExpressionExpressionLanguage(String expressionLanguage);
-
-  /**
-   * @return the default expression language for output entries
-   */
-  String getDefaultOutputEntryExpressionLanguage();
-
-  /**
-   * Set the default expression language which is used to evaluate output entries.
-   * It is used for all output entries which do not have a expression
-   * language set.
-   *
-   * @param expressionLanguage the default expression language for output entries
-   */
-  void setDefaultOutputEntryExpressionLanguage(String expressionLanguage);
-
-  /**
-   * Set the default expression language which is used to evaluate output entries.
-   * It is used for all output entries which do not have a expression
-   * language set.
-   *
-   * @param expressionLanguage the default expression language for output entries
-   * @return this configuration
-   */
-  DmnEngineConfiguration defaultOutputEntryExpressionLanguage(String expressionLanguage);
 
   /**
    * Create a {@link DmnEngine} with this configuration

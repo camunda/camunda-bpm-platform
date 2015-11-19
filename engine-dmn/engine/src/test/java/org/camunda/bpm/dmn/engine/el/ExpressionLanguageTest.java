@@ -184,7 +184,7 @@ public class ExpressionLanguageTest extends DmnEngineTest {
   }
 
   protected DmnEngine createEngineWithDefaultExpressionLanguage(String expressionLanguage) {
-    DmnEngineConfiguration configuration = getDmnEngineConfiguration();
+    DefaultDmnEngineConfiguration configuration = (DefaultDmnEngineConfiguration) getDmnEngineConfiguration();
 
     configuration.setDefaultInputExpressionExpressionLanguage(expressionLanguage);
     configuration.setDefaultInputEntryExpressionLanguage(expressionLanguage);
