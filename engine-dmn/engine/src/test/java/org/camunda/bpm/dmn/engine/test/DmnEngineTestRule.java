@@ -13,8 +13,12 @@
 
 package org.camunda.bpm.dmn.engine.test;
 
+import java.io.InputStream;
+import java.util.List;
+
 import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
+import org.camunda.commons.utils.IoUtil;
 import org.junit.runner.Description;
 
 /**
@@ -56,12 +60,20 @@ public class DmnEngineTestRule extends DmnEngineRule {
 
       resourcePath = expandResourcePath(description, resourcePath);
 
+      InputStream inputStream = IoUtil.fileAsStream(resourcePath);
+
       String decisionKey = decisionResource.decisionKey();
 
       if (decisionKey == null || decisionKey.isEmpty()) {
-        return dmnEngine.parseFirstDecision(resourcePath);
+        List<DmnDecision> decisions = dmnEngine.parseDecisions(inputStream);
+        if (!decisions.isEmpty()) {
+          return decisions.get(0);
+        }
+        else {
+          return null;
+        }
       } else {
-        return dmnEngine.parseDecision(decisionKey, resourcePath);
+        return dmnEngine.parseDecision(decisionKey, inputStream);
       }
     }
     else {

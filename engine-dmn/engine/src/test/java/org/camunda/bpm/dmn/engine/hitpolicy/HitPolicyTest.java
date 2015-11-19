@@ -444,7 +444,7 @@ public class HitPolicyTest extends DmnEngineTest {
   @Test
   public void testPriorityHitPolicySingleOutputNoMatchingRule() {
     try {
-      dmnEngine.parseFirstDecision(PRIORITY_SINGLE);
+      parseDecisionsFromFile(PRIORITY_SINGLE);
       failBecauseExceptionWasNotThrown(DmnTransformException.class);
     }
     catch (DmnTransformException e) {
@@ -573,7 +573,7 @@ public class HitPolicyTest extends DmnEngineTest {
   @Test
   public void testOutputOrderHitPolicyNotSupported() {
     try {
-      dmnEngine.parseFirstDecision(OUTPUT_ORDER_SINGLE);
+      parseDecisionsFromFile(OUTPUT_ORDER_SINGLE);
       failBecauseExceptionWasNotThrown(DmnTransformException.class);
     }
     catch (DmnTransformException e) {

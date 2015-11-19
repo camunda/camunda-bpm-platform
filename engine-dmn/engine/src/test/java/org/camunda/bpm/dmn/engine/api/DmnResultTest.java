@@ -82,7 +82,7 @@ public class DmnResultTest extends DmnEngineTest {
     }
     catch (DmnDecisionResultException e){
       assertThat(e)
-        .hasMessageStartingWith("DMN-01012")
+        .hasMessageStartingWith("DMN-01008")
         .hasMessageContaining("singleValue")
         .hasMessageContaining("multipleValues1")
         .hasMessageContaining("multipleValues2");
@@ -274,7 +274,7 @@ public class DmnResultTest extends DmnEngineTest {
     }
     catch (DmnDecisionResultException e) {
       assertThat(e)
-        .hasMessageStartingWith("DMN-01011")
+        .hasMessageStartingWith("DMN-01007")
         .hasMessageContaining("multipleValues1")
         .hasMessageContaining("multipleValues2");
     }

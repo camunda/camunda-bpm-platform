@@ -27,8 +27,6 @@ import org.camunda.bpm.dmn.engine.impl.spi.transform.DmnTransformer;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.context.VariableContext;
 import org.camunda.bpm.model.dmn.DmnModelInstance;
-import org.camunda.commons.utils.IoUtil;
-import org.camunda.commons.utils.IoUtilException;
 
 public class DefaultDmnEngine implements DmnEngine {
 
@@ -46,17 +44,6 @@ public class DefaultDmnEngine implements DmnEngine {
     return dmnEngineConfiguration;
   }
 
-  public List<DmnDecision> parseDecisions(String filename) {
-    ensureNotNull("filename", filename);
-    try {
-      InputStream inputStream = IoUtil.fileAsStream(filename);
-      return parseDecisions(inputStream);
-    }
-    catch (IoUtilException e) {
-      throw LOG.unableToReadFile(filename, e);
-    }
-  }
-
   public List<DmnDecision> parseDecisions(InputStream inputStream) {
     ensureNotNull("inputStream", inputStream);
     return transformer.createTransform()
@@ -69,47 +56,6 @@ public class DefaultDmnEngine implements DmnEngine {
     return transformer.createTransform()
       .modelInstance(dmnModelInstance)
       .transformDecisions();
-  }
-
-  public DmnDecision parseFirstDecision(String filename) {
-    List<DmnDecision> decisions = parseDecisions(filename);
-    if (!decisions.isEmpty()) {
-      return decisions.get(0);
-    }
-    else {
-      throw LOG.unableToFindAnyDecisionInFile(filename);
-    }
-  }
-
-  public DmnDecision parseFirstDecision(InputStream inputStream) {
-    List<DmnDecision> decisions = parseDecisions(inputStream);
-    if (!decisions.isEmpty()) {
-      return decisions.get(0);
-    }
-    else {
-      throw LOG.unableToFindAnyDecision();
-    }
-  }
-
-  public DmnDecision parseFirstDecision(DmnModelInstance dmnModelInstance) {
-    List<DmnDecision> decisions = parseDecisions(dmnModelInstance);
-    if (!decisions.isEmpty()) {
-      return decisions.get(0);
-    }
-    else {
-      throw LOG.unableToFindAnyDecision();
-    }
-  }
-
-  public DmnDecision parseDecision(String decisionKey, String filename) {
-    ensureNotNull("decisionKey", decisionKey);
-    List<DmnDecision> decisions = parseDecisions(filename);
-    for (DmnDecision decision : decisions) {
-      if (decisionKey.equals(decision.getKey())) {
-        return decision;
-      }
-    }
-    throw LOG.unableToFindDecisionWithKeyInFile(decisionKey, filename);
   }
 
   public DmnDecision parseDecision(String decisionKey, InputStream inputStream) {
@@ -151,67 +97,6 @@ public class DefaultDmnEngine implements DmnEngine {
     else {
       throw LOG.decisionTypeNotSupported(decision);
     }
-  }
-
-  public DmnDecisionTableResult evaluateFirstDecisionTable(String filename, Map<String, Object> variables) {
-    ensureNotNull("variables", variables);
-    return evaluateFirstDecisionTable(filename, Variables.fromMap(variables).asVariableContext());
-  }
-
-  public DmnDecisionTableResult evaluateFirstDecisionTable(String filename, VariableContext variableContext) {
-    List<DmnDecision> decisions = parseDecisions(filename);
-    for (DmnDecision decision : decisions) {
-      if (decision.isDecisionTable()) {
-        return evaluateDecisionTable(decision, variableContext);
-      }
-    }
-    throw LOG.unableToFindAnyDecisionTableInFile(filename);
-  }
-
-  public DmnDecisionTableResult evaluateFirstDecisionTable(InputStream inputStream, Map<String, Object> variables) {
-    ensureNotNull("variables", variables);
-    return evaluateFirstDecisionTable(inputStream, Variables.fromMap(variables).asVariableContext());
-  }
-
-  public DmnDecisionTableResult evaluateFirstDecisionTable(InputStream inputStream, VariableContext variableContext) {
-    List<DmnDecision> decisions = parseDecisions(inputStream);
-    for (DmnDecision decision : decisions) {
-      if (decision.isDecisionTable()) {
-        return evaluateDecisionTable(decision, variableContext);
-      }
-    }
-    throw LOG.unableToFindAnyDecisionTable();
-  }
-
-  public DmnDecisionTableResult evaluateFirstDecisionTable(DmnModelInstance dmnModelInstance, Map<String, Object> variables) {
-    ensureNotNull("variables", variables);
-    return evaluateFirstDecisionTable(dmnModelInstance, Variables.fromMap(variables).asVariableContext());
-  }
-
-  public DmnDecisionTableResult evaluateFirstDecisionTable(DmnModelInstance dmnModelInstance, VariableContext variableContext) {
-    List<DmnDecision> decisions = parseDecisions(dmnModelInstance);
-    for (DmnDecision decision : decisions) {
-      if (decision.isDecisionTable()) {
-        return evaluateDecisionTable(decision, variableContext);
-      }
-    }
-    throw LOG.unableToFindAnyDecisionTable();
-  }
-
-  public DmnDecisionTableResult evaluateDecisionTable(String decisionKey, String filename, Map<String, Object> variables) {
-    ensureNotNull("variables", variables);
-    return evaluateDecisionTable(decisionKey, filename, Variables.fromMap(variables).asVariableContext());
-  }
-
-  public DmnDecisionTableResult evaluateDecisionTable(String decisionKey, String filename, VariableContext variableContext) {
-    ensureNotNull("decisionKey", decisionKey);
-    List<DmnDecision> decisions = parseDecisions(filename);
-    for (DmnDecision decision : decisions) {
-      if (decisionKey.equals(decision.getKey())) {
-        return evaluateDecisionTable(decision, variableContext);
-      }
-    }
-    throw LOG.unableToFindDecisionWithKeyInFile(decisionKey, filename);
   }
 
   public DmnDecisionTableResult evaluateDecisionTable(String decisionKey, InputStream inputStream, Map<String, Object> variables) {

@@ -40,22 +40,8 @@ public class ParseDecisionTest extends DmnEngineTest {
   public static final String DUPLICATE_COMPOUND_OUTPUT_NAME_DMN = "org/camunda/bpm/dmn/engine/api/CompoundOutputs.duplicateName.dmn";
 
   @Test
-  public void shouldParseDecisionFromFile() {
-    DmnDecision decision = dmnEngine.parseFirstDecision(NO_INPUT_DMN);
-    assertDecision(decision);
-
-    decision = dmnEngine.parseDecision("decision", NO_INPUT_DMN);
-    assertDecision(decision);
-  }
-
-  @Test
   public void shouldParseDecisionFromInputStream() {
     InputStream inputStream = IoUtil.fileAsStream(NO_INPUT_DMN);
-
-    DmnDecision decision = dmnEngine.parseFirstDecision(inputStream);
-    assertDecision(decision);
-
-    inputStream = IoUtil.fileAsStream(NO_INPUT_DMN);
     decision = dmnEngine.parseDecision("decision", inputStream);
     assertDecision(decision);
   }
@@ -65,59 +51,28 @@ public class ParseDecisionTest extends DmnEngineTest {
     InputStream inputStream = IoUtil.fileAsStream(NO_INPUT_DMN);
     DmnModelInstance modelInstance = Dmn.readModelFromStream(inputStream);
 
-    DmnDecision decision = dmnEngine.parseFirstDecision(modelInstance);
-    assertDecision(decision);
-
     decision = dmnEngine.parseDecision("decision", modelInstance);
     assertDecision(decision);
   }
 
   @Test
-  public void shouldFailIfModelDoesNotContainDecision() {
-    try {
-      dmnEngine.parseFirstDecision(NO_DECISION_DMN);
-      failBecauseExceptionWasNotThrown(DmnTransformException.class);
-    }
-    catch (DmnTransformException e) {
-      Assertions.assertThat(e)
-        .hasMessageStartingWith("DMN-01004")
-        .hasMessageContaining("Unable to find any decision")
-        .hasMessageContaining("NoDecision.dmn");
-    }
-  }
-
-  @Test
   public void shouldFailIfDecisionKeyIsUnknown() {
     try {
-      dmnEngine.parseDecision("unknownDecision", NO_INPUT_DMN);
+      parseDecisionFromFile("unknownDecision", NO_INPUT_DMN);
       failBecauseExceptionWasNotThrown(DmnTransformException.class);
     }
     catch (DmnTransformException e) {
       Assertions.assertThat(e)
-        .hasMessageStartingWith("DMN-01002")
+        .hasMessageStartingWith("DMN-01001")
         .hasMessageContaining("Unable to find decision")
-        .hasMessageContaining("unknownDecision")
-        .hasMessageContaining("NoInput.dmn");
-    }
-  }
-
-  @Test
-  public void shouldFailIfNoSupportedDecisionIsFound() {
-    try {
-      dmnEngine.parseFirstDecision(INVOCATION_DECISION_DMN);
-    }
-    catch (DmnTransformException e) {
-      Assertions.assertThat(e)
-        .hasMessageStartingWith("DMN-01004")
-        .hasMessageContaining("Unable to find any decision")
-        .hasMessageContaining("InvocationDecision.dmn");
+        .hasMessageContaining("unknownDecision");
     }
   }
 
   @Test
   public void shouldFailIfDecisionIdIsMissing() {
     try {
-      dmnEngine.parseFirstDecision(MISSING_DECISION_ID_DMN);
+      parseDecisionsFromFile(MISSING_DECISION_ID_DMN);
       failBecauseExceptionWasNotThrown(DmnTransformException.class);
     }
     catch (DmnTransformException e) {
@@ -132,7 +87,7 @@ public class ParseDecisionTest extends DmnEngineTest {
   @Test
   public void shouldFailIfInputIdIsMissing() {
     try {
-      dmnEngine.parseFirstDecision(MISSING_INPUT_ID_DMN);
+      parseDecisionsFromFile(MISSING_INPUT_ID_DMN);
       failBecauseExceptionWasNotThrown(DmnTransformException.class);
     }
     catch (DmnTransformException e) {
@@ -147,7 +102,7 @@ public class ParseDecisionTest extends DmnEngineTest {
   @Test
   public void shouldFailIfOutputIdIsMissing() {
     try {
-      dmnEngine.parseFirstDecision(MISSING_OUTPUT_ID_DMN);
+      parseDecisionsFromFile(MISSING_OUTPUT_ID_DMN);
       failBecauseExceptionWasNotThrown(DmnTransformException.class);
     }
     catch (DmnTransformException e) {
@@ -162,7 +117,7 @@ public class ParseDecisionTest extends DmnEngineTest {
   @Test
   public void shouldFailIfRuleIdIsMissing() {
     try {
-      dmnEngine.parseFirstDecision(MISSING_RULE_ID_DMN);
+      parseDecisionsFromFile(MISSING_RULE_ID_DMN);
       failBecauseExceptionWasNotThrown(DmnTransformException.class);
     }
     catch (DmnTransformException e) {
@@ -177,7 +132,7 @@ public class ParseDecisionTest extends DmnEngineTest {
   @Test
   public void shouldFailIfCompoundOutputsNameIsMissing() {
     try {
-      dmnEngine.parseFirstDecision(MISSING_COMPOUND_OUTPUT_NAME_DMN);
+      parseDecisionsFromFile(MISSING_COMPOUND_OUTPUT_NAME_DMN);
       failBecauseExceptionWasNotThrown(DmnTransformException.class);
     }
     catch (DmnTransformException e) {
@@ -192,7 +147,7 @@ public class ParseDecisionTest extends DmnEngineTest {
   @Test
   public void shouldFailIfCompoundOutputsHaveDuplicateName() {
     try {
-      dmnEngine.parseFirstDecision(DUPLICATE_COMPOUND_OUTPUT_NAME_DMN);
+      parseDecisionsFromFile(DUPLICATE_COMPOUND_OUTPUT_NAME_DMN);
       failBecauseExceptionWasNotThrown(DmnTransformException.class);
     }
     catch (DmnTransformException e) {

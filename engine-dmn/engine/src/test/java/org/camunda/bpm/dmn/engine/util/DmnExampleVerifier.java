@@ -15,18 +15,22 @@ package org.camunda.bpm.dmn.engine.util;
 
 import static org.camunda.bpm.dmn.engine.test.asserts.DmnEngineTestAssertions.assertThat;
 
+import java.io.InputStream;
+
 import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnEngine;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.commons.utils.IoUtil;
 
 public final class DmnExampleVerifier {
 
   public static final String EXAMPLE_DMN = "org/camunda/bpm/dmn/engine/api/Example.dmn";
 
   public static void assertExample(DmnEngine engine) {
-    DmnDecision decision = engine.parseFirstDecision(EXAMPLE_DMN);
+    InputStream inputStream = IoUtil.fileAsStream(EXAMPLE_DMN);
+    DmnDecision decision = engine.parseDecision("decision", inputStream);
     assertExample(engine, decision);
   }
 

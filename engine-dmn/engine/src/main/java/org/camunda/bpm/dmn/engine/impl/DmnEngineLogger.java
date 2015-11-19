@@ -21,45 +21,16 @@ import org.camunda.bpm.dmn.engine.impl.transform.DmnTransformException;
 
 public class DmnEngineLogger extends DmnLogger {
 
-  public DmnTransformException unableToReadFile(String filename, Throwable cause) {
-    return new DmnTransformException(exceptionMessage(
-      "001",
-      "Unable to read model from file '{}'.", filename),
-      cause
-    );
-  }
-
-  public DmnTransformException unableToFindDecisionWithKeyInFile(String decisionKey, String filename) {
-    return new DmnTransformException(exceptionMessage(
-      "002",
-      "Unable to find decision with id '{}' in file '{}'.", decisionKey, filename)
-    );
-  }
-
   public DmnTransformException unableToFindDecisionWithKey(String decisionKey) {
     return new DmnTransformException(exceptionMessage(
-      "003",
+      "001",
       "Unable to find decision with id '{}' in model.", decisionKey)
-    );
-  }
-
-  public DmnTransformException unableToFindAnyDecisionInFile(String filename) {
-    return new DmnTransformException(exceptionMessage(
-      "004",
-      "Unable to find any decision in file '{}'.", filename)
-    );
-  }
-
-  public DmnTransformException unableToFindAnyDecision() {
-    return new DmnTransformException(exceptionMessage(
-      "005",
-      "Unable to find any decision in model.")
     );
   }
 
   public DmnEvaluationException unableToEvaluateExpression(String expression, String expressionLanguage, Throwable cause) {
     return new DmnEvaluationException(exceptionMessage(
-      "006",
+      "002",
       "Unable to evaluate expression for language '{}': '{}'", expressionLanguage, expression),
       cause
     );
@@ -67,56 +38,49 @@ public class DmnEngineLogger extends DmnLogger {
 
   public DmnEvaluationException noScriptEngineFoundForLanguage(String expressionLanguage) {
     return new DmnEvaluationException(exceptionMessage(
-      "007",
+      "003",
       "Unable to find script engine for expression language '{}'.", expressionLanguage)
     );
   }
 
   public DmnEngineException decisionTypeNotSupported(DmnDecision decision) {
     return new DmnEngineException(exceptionMessage(
-      "008",
+      "004",
       "Decision type '{}' not supported by DMN engine.", decision.getClass())
     );
   }
 
   public DmnEngineException invalidValueForTypeDefinition(String typeName, Object value) {
     return new DmnEngineException(exceptionMessage(
-      "009",
+      "005",
       "Invalid value '{}' for clause with type '{}'.", value, typeName)
     );
   }
 
   public void unsupportedTypeDefinitionForClause(String typeName) {
     logWarn(
-      "010",
+      "006",
       "Unsupported type '{}' for clause. Values of this clause will not transform into another type.", typeName
     );
   }
 
   public DmnDecisionResultException decisionOutputHasMoreThanOneValue(DmnDecisionRuleResult ruleResult) {
     return new DmnDecisionResultException(exceptionMessage(
-      "011",
+      "007",
       "Unable to get single decision rule result entry as it has more than one entry '{}'", ruleResult)
     );
   }
 
   public DmnDecisionResultException decisionResultHasMoreThanOneOutput(DmnDecisionTableResult decisionResult) {
     return new DmnDecisionResultException(exceptionMessage(
-      "012",
+      "008",
       "Unable to get single decision rule result as it has more than one rule result '{}'", decisionResult)
-    );
-  }
-
-  public DmnTransformException unableToFindAnyDecisionTableInFile(String filename) {
-    return new DmnTransformException(exceptionMessage(
-      "013",
-      "Unable to find any decision table in file '{}'.", filename)
     );
   }
 
   public DmnTransformException unableToFindAnyDecisionTable() {
     return new DmnTransformException(exceptionMessage(
-      "014",
+      "009",
       "Unable to find any decision table in model.")
     );
   }

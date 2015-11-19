@@ -16,6 +16,7 @@ package org.camunda.bpm.dmn.engine.api;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.camunda.bpm.dmn.engine.spi.DmnEngineMetricCollector;
+import org.camunda.bpm.dmn.engine.test.DecisionResource;
 import org.camunda.bpm.dmn.engine.test.DmnEngineTest;
 import org.junit.After;
 import org.junit.Before;
@@ -49,25 +50,27 @@ public class DmnEngineMetricCollectorTest extends DmnEngineTest {
   }
 
   @Test
+  @DecisionResource(resource = EXAMPLE_DMN)
   public void testExecutedDecisionElementsValue() {
     assertThat(metricCollector.getExecutedDecisionElements()).isEqualTo(0L);
 
-    dmnEngine.evaluateFirstDecisionTable(EXAMPLE_DMN, variables);
+    dmnEngine.evaluateDecisionTable(decision, variables);
     assertThat(metricCollector.getExecutedDecisionElements()).isEqualTo(16L);
 
-    dmnEngine.evaluateFirstDecisionTable(EXAMPLE_DMN, variables);
+    dmnEngine.evaluateDecisionTable(decision, variables);
     assertThat(metricCollector.getExecutedDecisionElements()).isEqualTo(32L);
 
-    dmnEngine.evaluateFirstDecisionTable(EXAMPLE_DMN, variables);
-    dmnEngine.evaluateFirstDecisionTable(EXAMPLE_DMN, variables);
+    dmnEngine.evaluateDecisionTable(decision, variables);
+    dmnEngine.evaluateDecisionTable(decision, variables);
     assertThat(metricCollector.getExecutedDecisionElements()).isEqualTo(64L);
   }
 
   @Test
+  @DecisionResource(resource = EXAMPLE_DMN)
   public void testClearExecutedDecisionElementsValue() {
     assertThat(metricCollector.getExecutedDecisionElements()).isEqualTo(0L);
 
-    dmnEngine.evaluateFirstDecisionTable(EXAMPLE_DMN, variables);
+    dmnEngine.evaluateDecisionTable(decision, variables);
     assertThat(metricCollector.getExecutedDecisionElements()).isEqualTo(16L);
     assertThat(metricCollector.clearExecutedDecisionElements()).isEqualTo(16L);
 

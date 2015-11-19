@@ -68,14 +68,15 @@ public class ExpressionLanguageTest extends DmnEngineTest {
   }
 
   @Test
+  @DecisionResource(resource = GROOVY_DMN)
   public void testGlobalExpressionLanguage() {
-    DmnDecisionTableImpl decision = (DmnDecisionTableImpl) dmnEngine.parseDecision("decision", GROOVY_DMN);
+    DmnDecisionTableImpl decisionTable  = (DmnDecisionTableImpl) decision;
 
-    for (DmnDecisionTableInputImpl dmnInput : decision.getInputs()) {
+    for (DmnDecisionTableInputImpl dmnInput : decisionTable.getInputs()) {
       assertThat(dmnInput.getExpression().getExpressionLanguage()).isEqualTo("groovy");
     }
 
-    for (DmnDecisionTableRuleImpl dmnRule : decision.getRules()) {
+    for (DmnDecisionTableRuleImpl dmnRule : decisionTable.getRules()) {
       for (DmnExpressionImpl condition : dmnRule.getConditions()) {
         assertThat(condition.getExpressionLanguage()).isEqualTo("groovy");
       }

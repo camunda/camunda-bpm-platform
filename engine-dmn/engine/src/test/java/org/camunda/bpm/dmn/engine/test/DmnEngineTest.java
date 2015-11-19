@@ -15,6 +15,9 @@ package org.camunda.bpm.dmn.engine.test;
 
 import static org.camunda.bpm.dmn.engine.test.asserts.DmnEngineTestAssertions.assertThat;
 
+import java.io.InputStream;
+import java.util.List;
+
 import org.camunda.bpm.dmn.engine.DmnDecision;
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
 import org.camunda.bpm.dmn.engine.DmnEngine;
@@ -23,6 +26,7 @@ import org.camunda.bpm.dmn.engine.impl.DefaultDmnEngineConfiguration;
 import org.camunda.bpm.dmn.engine.test.asserts.DmnDecisionTableResultAssert;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
+import org.camunda.commons.utils.IoUtil;
 import org.junit.Before;
 import org.junit.Rule;
 
@@ -52,6 +56,18 @@ public abstract class DmnEngineTest {
   @Before
   public void initVariables() {
     variables = Variables.createVariables();
+  }
+
+  // parsing //////////////////////////////////////////////////////////////////
+
+  public List<DmnDecision> parseDecisionsFromFile(String filename) {
+    InputStream inputStream = IoUtil.fileAsStream(filename);
+    return dmnEngine.parseDecisions(inputStream);
+  }
+
+  public DmnDecision parseDecisionFromFile(String decisionKey, String filename) {
+    InputStream inputStream = IoUtil.fileAsStream(filename);
+    return dmnEngine.parseDecision(decisionKey, inputStream);
   }
 
   // evaluations //////////////////////////////////////////////////////////////
