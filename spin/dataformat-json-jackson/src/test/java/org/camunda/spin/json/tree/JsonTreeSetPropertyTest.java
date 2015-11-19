@@ -12,20 +12,21 @@
  */
 package org.camunda.spin.json.tree;
 
-import org.camunda.spin.json.SpinJsonNode;
-import org.camunda.spin.json.SpinJsonPropertyException;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.camunda.spin.Spin.JSON;
 import static org.camunda.spin.json.JsonTestConstants.EXAMPLE_JSON;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.camunda.spin.json.SpinJsonNode;
+import org.camunda.spin.json.SpinJsonPropertyException;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Stefan Hentschel
@@ -39,6 +40,7 @@ public class JsonTreeSetPropertyTest {
   protected SpinJsonNode customers;
   protected SpinJsonNode orderDetails;
   protected SpinJsonNode active;
+  protected SpinJsonNode nullValue;
 
   @Before
   public void readJson() {
@@ -49,6 +51,7 @@ public class JsonTreeSetPropertyTest {
     customers = jsonNode.prop("customers");
     orderDetails = jsonNode.prop("orderDetails");
     active = jsonNode.prop("active");
+    nullValue = jsonNode.prop("nullValue");
   }
 
   @Test
@@ -373,5 +376,70 @@ public class JsonTreeSetPropertyTest {
     } catch(SpinJsonPropertyException e) {
       // expected
     }
+  }
+
+  @Test
+  public void replaceNullProperty() {
+    jsonNode.prop("order", (String) null);
+    jsonNode.prop("id", (String) null);
+    jsonNode.prop("nullValue", (String) null);
+
+    assertThat(jsonNode.prop("order").isNull()).isTrue();
+    assertThat(jsonNode.prop("order").value()).isNull();
+
+    assertThat(jsonNode.prop("id").isNull()).isTrue();
+    assertThat(jsonNode.prop("id").value()).isNull();
+
+    assertThat(jsonNode.prop("nullValue").isNull()).isTrue();
+    assertThat(jsonNode.prop("nullValue").value()).isNull();
+  }
+
+  @Test
+  public void setNullStringProperty() {
+
+    jsonNode.prop("newNullValue", (String) null);
+
+    assertThat(jsonNode.prop("newNullValue").isNull()).isTrue();
+    assertThat(jsonNode.prop("newNullValue").value()).isNull();
+  }
+
+  @Test
+  public void setNullMapProperty() {
+    jsonNode.prop("newNullValue", (Map) null);
+
+    assertThat(jsonNode.prop("newNullValue").isNull()).isTrue();
+    assertThat(jsonNode.prop("newNullValue").value()).isNull();
+  }
+
+  @Test
+  public void setNullListProperty() {
+    jsonNode.prop("newNullValue", (List) null);
+
+    assertThat(jsonNode.prop("newNullValue").isNull()).isTrue();
+    assertThat(jsonNode.prop("newNullValue").value()).isNull();
+  }
+
+  @Test
+  public void setNullBooleanProperty() {
+    jsonNode.prop("newNullValue", (Boolean) null);
+
+    assertThat(jsonNode.prop("newNullValue").isNull()).isTrue();
+    assertThat(jsonNode.prop("newNullValue").value()).isNull();
+  }
+
+  @Test
+  public void setNullNumberProperty() {
+    jsonNode.prop("newNullValue", (Number) null);
+
+    assertThat(jsonNode.prop("newNullValue").isNull()).isTrue();
+    assertThat(jsonNode.prop("newNullValue").value()).isNull();
+  }
+
+  @Test
+  public void setNullSpinJsonNodeProperty() {
+    jsonNode.prop("newNullValue", (SpinJsonNode) null);
+
+    assertThat(jsonNode.prop("newNullValue").isNull()).isTrue();
+    assertThat(jsonNode.prop("newNullValue").value()).isNull();
   }
 }

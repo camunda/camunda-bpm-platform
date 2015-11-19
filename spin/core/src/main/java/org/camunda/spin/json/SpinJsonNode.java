@@ -21,7 +21,7 @@ import java.util.Map;
 
 /**
  * A json node.
- * 
+ *
  * @author Thorben Lindhauer
  * @author Stefan Hentschel
  */
@@ -280,6 +280,13 @@ public abstract class SpinJsonNode extends Spin<SpinJsonNode> {
   public abstract String stringValue();
 
   /**
+   * Check if this node represents a null value.
+   *
+   * @return true if this node is a null value, false otherwise
+   */
+  public abstract Boolean isNull();
+
+  /**
    * Check if this node is a value.
    *
    * @return true if this node is a value, false otherwise
@@ -287,10 +294,11 @@ public abstract class SpinJsonNode extends Spin<SpinJsonNode> {
   public abstract Boolean isValue();
 
   /**
-   * Get this node as a number value.
+   * Gets the actual value of the node, in case it is a Boolean/String/Number/Null node.
+   * In that case a Java Boolean/String/Number or null is returned.
    *
-   * @return the string value of this node
-   * @throws SpinDataFormatException if this node is not a string value
+   * @return the value of this node
+   * @throws SpinDataFormatException if this node is not a Boolean/String/Number/Nul value
    */
   public abstract Object value();
 

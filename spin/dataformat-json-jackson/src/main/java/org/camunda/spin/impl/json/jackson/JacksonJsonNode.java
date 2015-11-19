@@ -180,7 +180,9 @@ public class JacksonJsonNode extends SpinJsonNode {
     ObjectNode node = (ObjectNode) jsonNode;
 
     // Numbers magic because Jackson has no native .put(Number value)
-    if(newProperty instanceof Long) {
+    if (newProperty == null) {
+      node.putNull(name);
+    } else if(newProperty instanceof Long) {
       node.put(name, newProperty.longValue());
     } else if(newProperty instanceof Integer) {
       node.put(name, newProperty.intValue());
@@ -237,7 +239,12 @@ public class JacksonJsonNode extends SpinJsonNode {
   public SpinJsonNode prop(String name, SpinJsonNode newProperty) {
     ObjectNode node = (ObjectNode) jsonNode;
 
-    node.set(name, (JsonNode) newProperty.unwrap());
+    if (newProperty != null) {
+      node.set(name, (JsonNode) newProperty.unwrap());
+    }
+    else {
+      node.putNull(name);
+    }
 
     return this;
   }
@@ -374,6 +381,10 @@ public class JacksonJsonNode extends SpinJsonNode {
     }
   }
 
+  public Boolean isNull() {
+    return jsonNode.isNull();
+  }
+
   public Boolean isValue() {
     return jsonNode.isValueNode();
   }
@@ -391,7 +402,11 @@ public class JacksonJsonNode extends SpinJsonNode {
       return jsonNode.textValue();
     }
 
-    throw LOG.unableToParseValue("String/Number/Boolean", jsonNode.getNodeType());
+    if (jsonNode.isNull()) {
+      return null;
+    }
+
+    throw LOG.unableToParseValue("String/Number/Boolean/Null", jsonNode.getNodeType());
   }
 
   public Boolean isArray() {

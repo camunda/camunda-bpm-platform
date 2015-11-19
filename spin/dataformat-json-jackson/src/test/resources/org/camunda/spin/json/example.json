@@ -26,5 +26,6 @@
     ],
     "paid": false
   },
-  "active": true
+  "active": true,
+  "nullValue": null
 }

@@ -209,6 +209,30 @@ public abstract class JsonTreeSetPropertyScriptTest extends ScriptTest {
     assertThat(newValue.isObject()).isTrue();
   }
 
+  @Test
+  @Script
+  @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
+  public void shouldSetNullProperty() {
+    SpinJsonNode propertyNode = script.getVariable("propertyNode");
+    Object value = script.getVariable("value");
+
+    assertThat(propertyNode).isNotNull();
+    assertThat(propertyNode.isNull()).isTrue();
+    assertThat(value).isNull();
+  }
+
+  @Test
+  @Script
+  @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)
+  public void shouldReplaceNullProperty() {
+    SpinJsonNode propertyNode = script.getVariable("propertyNode");
+    Object newValue = script.getVariable("newValue");
+
+    assertThat(propertyNode).isNotNull();
+    assertThat(propertyNode.isNull()).isTrue();
+    assertThat(newValue).isNull();
+  }
+
   @Test(expected = SpinJsonPropertyException.class)
   @Script(execute = false)
   @ScriptVariable(name = "input", file = EXAMPLE_JSON_FILE_NAME)

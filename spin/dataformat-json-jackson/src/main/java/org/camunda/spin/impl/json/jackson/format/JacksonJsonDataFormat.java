@@ -238,6 +238,8 @@ public class JacksonJsonDataFormat implements DataFormat<SpinJsonNode> {
     } else if(parameter instanceof Map) {
       return createJsonNode((Map<String, Object>) parameter);
 
+    } else if (parameter == null) {
+      return createNullJsonNode();
     } else {
       throw LOG.unableToCreateNode(parameter.getClass().getSimpleName());
     }
@@ -264,18 +266,33 @@ public class JacksonJsonDataFormat implements DataFormat<SpinJsonNode> {
   }
 
   public JsonNode createJsonNode(List<Object> parameter) {
-    ArrayNode node = objectMapper.getNodeFactory().arrayNode();
-    for(Object entry : parameter) {
-      node.add(createJsonNode(entry));
+    if (parameter != null) {
+      ArrayNode node = objectMapper.getNodeFactory().arrayNode();
+      for(Object entry : parameter) {
+        node.add(createJsonNode(entry));
+      }
+      return node;
     }
-    return node;
+    else {
+      return createNullJsonNode();
+    }
+
   }
 
   public JsonNode createJsonNode(Map<String, Object> parameter) {
-    ObjectNode node = objectMapper.getNodeFactory().objectNode();
-    for (Map.Entry<String, Object> entry : parameter.entrySet()) {
-      node.set(entry.getKey(), createJsonNode(entry.getValue()));
+    if (parameter != null) {
+      ObjectNode node = objectMapper.getNodeFactory().objectNode();
+      for (Map.Entry<String, Object> entry : parameter.entrySet()) {
+        node.set(entry.getKey(), createJsonNode(entry.getValue()));
+      }
+      return node;
     }
-    return node;
+    else {
+      return createNullJsonNode();
+    }
+  }
+
+  public JsonNode createNullJsonNode() {
+    return objectMapper.getNodeFactory().nullNode();
   }
 }

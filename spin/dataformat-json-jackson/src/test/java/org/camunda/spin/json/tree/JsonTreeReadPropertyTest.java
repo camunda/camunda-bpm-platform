@@ -38,6 +38,7 @@ public class JsonTreeReadPropertyTest {
   protected SpinJsonNode customers;
   protected SpinJsonNode orderDetails;
   protected SpinJsonNode active;
+  protected SpinJsonNode nullValue;
 
   @Before
   public void readJson() {
@@ -48,6 +49,7 @@ public class JsonTreeReadPropertyTest {
     customers = jsonNode.prop("customers");
     orderDetails = jsonNode.prop("orderDetails");
     active = jsonNode.prop("active");
+    nullValue = jsonNode.prop("nullValue");
   }
 
   @Test
@@ -59,6 +61,7 @@ public class JsonTreeReadPropertyTest {
     assertThat(customers.hasProp("order")).isFalse();
     assertThat(orderDetails.hasProp("price")).isTrue();
     assertThat(active.hasProp("order")).isFalse();
+    assertThat(jsonNode.hasProp("nullValue")).isTrue();
   }
 
   @Test
@@ -367,6 +370,24 @@ public class JsonTreeReadPropertyTest {
     } catch(SpinDataFormatException e) {
       // expected
     }
+  }
+
+  @Test
+  public void checkForNullValue() {
+    assertThat(nullValue.isNull()).isTrue();
+    assertThat(jsonNode.isNull()).isFalse();
+    assertThat(order.isNull()).isFalse();
+    assertThat(dueUntil.isNull()).isFalse();
+    assertThat(id.isNull()).isFalse();
+    assertThat(customers.isNull()).isFalse();
+    assertThat(orderDetails.isNull()).isFalse();
+    assertThat(active.isNull()).isFalse();
+  }
+
+  @Test
+  public void shouldReadNullValue() {
+    assertThat(nullValue.isValue()).isTrue();
+    assertThat(nullValue.value()).isNull();
   }
 
   @Test

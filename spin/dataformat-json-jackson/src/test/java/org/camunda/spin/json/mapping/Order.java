@@ -22,6 +22,7 @@ public class Order {
   private boolean active;
   private List<RegularCustomer> customers;
   private OrderDetails orderDetails;
+  private Object nullValue;
 
   public long getId() {
     return id;
@@ -58,5 +59,11 @@ public class Order {
   }
   public void setOrderDetails(OrderDetails orderDetails) {
     this.orderDetails = orderDetails;
+  }
+  public Object getNullValue() {
+    return nullValue;
+  }
+  public void setNullValue(Object nullValue) {
+    this.nullValue = nullValue;
   }
 }
