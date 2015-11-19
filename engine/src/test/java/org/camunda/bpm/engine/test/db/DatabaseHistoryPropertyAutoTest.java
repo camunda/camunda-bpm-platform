@@ -52,7 +52,7 @@ public class DatabaseHistoryPropertyAutoTest {
     buildEngine(config("true", ProcessEngineConfiguration.HISTORY_FULL));
 
     thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("historyLevel mismatch: configuration says HistoryLevelAudit(name=audit, id=2) and database says 3");
+    thrown.expectMessage("historyLevel mismatch: configuration says HistoryLevelAudit(name=audit, id=2) and database says HistoryLevelFull(name=full, id=3)");
 
     buildEngine(config(ProcessEngineConfiguration.HISTORY_AUDIT));
   }
