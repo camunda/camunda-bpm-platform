@@ -287,6 +287,46 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  public void testSaveAttachment() {
+    int historyLevel = processEngineConfiguration.getHistoryLevel().getId();
+    if (historyLevel> ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      // given
+      Task task = taskService.newTask();
+      taskService.saveTask(task);
+
+      String attachmentType = "someAttachment";
+      String processInstanceId = "someProcessInstanceId";
+      String attachmentName = "attachmentName";
+      String attachmentDescription = "attachmentDescription";
+      String url = "http://camunda.org";
+
+      Attachment attachment = taskService.createAttachment(
+          attachmentType,
+          task.getId(),
+          processInstanceId,
+          attachmentName,
+          attachmentDescription,
+          url);
+
+      // when
+      attachment.setDescription("updatedDescription");
+      attachment.setName("updatedName");
+      taskService.saveAttachment(attachment);
+
+      // then
+      Attachment fetchedAttachment = taskService.getAttachment(attachment.getId());
+      assertEquals(attachment.getId(), fetchedAttachment.getId());
+      assertEquals(attachmentType, fetchedAttachment.getType());
+      assertEquals(task.getId(), fetchedAttachment.getTaskId());
+      assertEquals(processInstanceId, fetchedAttachment.getProcessInstanceId());
+      assertEquals("updatedName", fetchedAttachment.getName());
+      assertEquals("updatedDescription", fetchedAttachment.getDescription());
+      assertEquals(url, fetchedAttachment.getUrl());
+
+      taskService.deleteTask(task.getId(), true);
+    }
+  }
+
   public void testTaskDelegation() {
     Task task = taskService.newTask();
     task.setOwner("johndoe");
@@ -370,6 +410,7 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     // Finally, delete task
     taskService.deleteTask(task.getId(), true);
   }
+
 
   public void testSaveTaskNullTask() {
     try {
