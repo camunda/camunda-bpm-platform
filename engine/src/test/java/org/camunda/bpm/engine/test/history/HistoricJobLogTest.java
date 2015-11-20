@@ -12,7 +12,9 @@
  */
 package org.camunda.bpm.engine.test.history;
 
+import java.math.BigInteger;
 import java.util.Date;
+import java.util.Random;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricJobLog;
@@ -28,6 +30,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.JobExceptionUtil;
@@ -1106,6 +1109,43 @@ public class HistoricJobLogTest extends PluggableProcessEngineTestCase {
     assertNotNull(stacktrace);
     assertTextPresent(ThrowExceptionWithoutMessageDelegate.class.getName(), stacktrace);
   }
+
+  @Deployment
+  public void testThrowExceptionMessageTruncation() {
+    // given
+    String exceptionMessage = randomString(10000);
+    ThrowExceptionWithOverlongMessageDelegate delegate =
+        new ThrowExceptionWithOverlongMessageDelegate(exceptionMessage);
+
+    runtimeService.startProcessInstanceByKey("process", Variables.createVariables().putValue("delegate", delegate));
+    Job job = managementService.createJobQuery().singleResult();
+
+    // when
+    try {
+      managementService.executeJob(job.getId());
+      fail();
+    } catch (Exception e) {
+      // expected
+    }
+
+    // then
+    HistoricJobLog failedHistoricJobLog = historyService
+        .createHistoricJobLogQuery()
+        .failureLog()
+        .singleResult();
+
+    assertNotNull(failedHistoricJobLog);
+    assertEquals(exceptionMessage.substring(0, JobEntity.MAX_EXCEPTION_MESSAGE_LENGTH),
+        failedHistoricJobLog.getJobExceptionMessage());
+  }
+
+  /**
+   * returns a random of the given size using characters [0-1]
+   */
+  protected static String randomString(int numCharacters) {
+    return new BigInteger(numCharacters, new Random()).toString(2);
+  }
+
 
   public void testDeleteByteArray() {
     final String processDefinitionId = "myProcessDefition";
