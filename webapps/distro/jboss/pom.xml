@@ -3,7 +3,7 @@
   <parent>
     <artifactId>camunda-webapp-root</artifactId>
     <groupId>org.camunda.bpm.webapp</groupId>
-    <version>7.4.0-alpha3</version>
+    <version>7.4.0-SNAPSHOT</version>
     <relativePath>../..</relativePath>
   </parent>
 
