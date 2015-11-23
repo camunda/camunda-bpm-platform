@@ -29,7 +29,7 @@ function() {
             realOutput.textContent = ' = ' + data.decisionInstance.outputs.filter(function(output) {
               return output.ruleId === row.id && output.clauseId === column.id;
             })[0].value;
-            event.gfx.appendChild(realOutput);
+            event.gfx.firstChild.appendChild(realOutput);
           }
         });
       }

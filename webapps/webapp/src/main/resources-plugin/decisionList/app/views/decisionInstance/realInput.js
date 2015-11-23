@@ -28,7 +28,7 @@ function() {
             var realInput = document.createElement('span');
             realInput.className = 'dmn-input';
             realInput.textContent = ' = ' + data.decisionInstance.inputs[inputIdx].value;
-            event.gfx.appendChild(realInput);
+            event.gfx.firstChild.appendChild(realInput);
           }
         });
 
