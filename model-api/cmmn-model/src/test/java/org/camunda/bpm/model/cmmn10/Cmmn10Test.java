@@ -13,11 +13,13 @@
 package org.camunda.bpm.model.cmmn10;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.util.Collection;
 
 import org.camunda.bpm.model.cmmn.Cmmn;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
+import org.camunda.bpm.model.cmmn.impl.CmmnModelConstants;
 import org.camunda.bpm.model.cmmn.instance.Case;
 import org.camunda.bpm.model.cmmn.instance.CasePlanModel;
 import org.camunda.bpm.model.cmmn.instance.CaseRole;
@@ -26,6 +28,7 @@ import org.camunda.bpm.model.cmmn.instance.ConditionExpression;
 import org.camunda.bpm.model.cmmn.instance.Documentation;
 import org.camunda.bpm.model.cmmn.instance.EntryCriterion;
 import org.camunda.bpm.model.cmmn.instance.Event;
+import org.camunda.bpm.model.cmmn.instance.EventListener;
 import org.camunda.bpm.model.cmmn.instance.ExitCriterion;
 import org.camunda.bpm.model.cmmn.instance.HumanTask;
 import org.camunda.bpm.model.cmmn.instance.IfPart;
@@ -168,6 +171,48 @@ public class Cmmn10Test {
 
     assertThat(expression.getBody()).isEqualTo("${value >= 100}");
     assertThat(expression.getText()).isEqualTo("${value >= 100}");
+  }
+
+  @Test
+  public void shouldNotAbleToAddNewElement() {
+    CmmnModelInstance modelInstance = getCmmnModelInstance();
+    CasePlanModel casePlanModel = modelInstance.getModelElementsByType(CasePlanModel.class).iterator().next();
+
+    HumanTask humanTask = modelInstance.newInstance(HumanTask.class);
+    casePlanModel.getPlanItemDefinitions().add(humanTask);
+
+    try {
+      Cmmn.writeModelToStream(System.out, modelInstance);
+      fail("cannot save cmmn 1.0 model");
+    }
+    catch (Exception e) {
+      // expected exception
+    }
+  }
+
+  @Test
+  public void shouldReturnCmmn11Namespace() {
+    CmmnModelInstance modelInstance = getCmmnModelInstance();
+    CasePlanModel casePlanModel = modelInstance.getModelElementsByType(CasePlanModel.class).iterator().next();
+
+    assertThat(casePlanModel.getElementType().getTypeNamespace()).isEqualTo(CmmnModelConstants.CMMN11_NS);
+  }
+
+  @Test
+  public void shouldNotAbleToAddCmmn10Element() {
+    CmmnModelInstance modelInstance = Cmmn.readModelFromStream(Cmmn10Test.class.getResourceAsStream("Cmmn11Test.cmmn"));
+    CasePlanModel casePlanModel = modelInstance.getModelElementsByType(CasePlanModel.class).iterator().next();
+
+    Event event = modelInstance.newInstance(Event.class);
+    casePlanModel.getPlanItemDefinitions().add(event);
+
+    try {
+      Cmmn.writeModelToStream(System.out, modelInstance);
+      fail("cannot save cmmn 1.1 model");
+    }
+    catch (Exception e) {
+      // expected exception
+    }
   }
 
   protected CmmnModelInstance getCmmnModelInstance() {
