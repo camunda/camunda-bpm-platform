@@ -24,11 +24,24 @@ function() {
           }).indexOf(column.id);
 
           if(ruleIndex !== -1 && columnIndex !== -1) {
-            var realOutput = document.createElement('span');
-            realOutput.className = 'dmn-output';
-            realOutput.textContent = ' = ' + data.decisionInstance.outputs.filter(function(output) {
+
+            var output = data.decisionInstance.outputs.filter(function(output) {
               return output.ruleId === row.id && output.clauseId === column.id;
-            })[0].value;
+            })[0];
+
+            var realOutput = document.createElement('span');
+            if(output.type !== 'Object' &&
+               output.type !== 'Bytes' &&
+               output.type !== 'File') {
+
+              realOutput.className = 'dmn-output';
+              realOutput.textContent = ' = ' + output.value;
+
+            } else {
+              realOutput.className = 'dmn-output-object';
+              realOutput.setAttribute('title', 'Variable value of type ' + output.type + ' is not shown');
+              realOutput.textContent = ' = [' + output.type + ']';
+            }
             event.gfx.firstChild.appendChild(realOutput);
           }
         });
