@@ -64,19 +64,24 @@ public class InvoiceProcessApplication extends ServletProcessApplication {
     invoiceInputStream = InvoiceProcessApplication.class.getClassLoader().getResourceAsStream("invoice.pdf");
 
     // process instance 2
-    ProcessInstance pi = processEngine.getRuntimeService().startProcessInstanceByKey("invoice", createVariables()
-        .putValue("creditor", "Bobby's Office Supplies")
-        .putValue("amount", 900.00d)
-        .putValue("invoiceCategory", "Misc")
-        .putValue("invoiceNumber", "BOS-43934")
-        .putValue("invoiceDocument", fileValue("invoice.pdf")
-            .file(invoiceInputStream)
-            .mimeType("application/pdf")
-            .create()));
     try {
       Calendar calendar = Calendar.getInstance();
       calendar.add(Calendar.DAY_OF_MONTH, -14);
       ClockUtil.setCurrentTime(calendar.getTime());
+
+      ProcessInstance pi = processEngine.getRuntimeService().startProcessInstanceByKey("invoice", createVariables()
+          .putValue("creditor", "Bobby's Office Supplies")
+          .putValue("amount", 900.00d)
+          .putValue("invoiceCategory", "Misc")
+          .putValue("invoiceNumber", "BOS-43934")
+          .putValue("invoiceDocument", fileValue("invoice.pdf")
+              .file(invoiceInputStream)
+              .mimeType("application/pdf")
+              .create()));
+
+      calendar.add(Calendar.DAY_OF_MONTH, 14);
+      ClockUtil.setCurrentTime(calendar.getTime());
+
       processEngine.getIdentityService().setAuthentication("demo", Arrays.asList(Groups.CAMUNDA_ADMIN));
       Task task = processEngine.getTaskService().createTaskQuery().processInstanceId(pi.getId()).singleResult();
       processEngine.getTaskService().claim(task.getId(), "demo");
@@ -91,17 +96,24 @@ public class InvoiceProcessApplication extends ServletProcessApplication {
     invoiceInputStream = InvoiceProcessApplication.class.getClassLoader().getResourceAsStream("invoice.pdf");
 
     // process instance 3
-    pi = processEngine.getRuntimeService().startProcessInstanceByKey("invoice", createVariables()
-        .putValue("creditor", "Papa Steve's all you can eat")
-        .putValue("amount", 10.99d)
-        .putValue("invoiceCategory", "Travel Expenses")
-        .putValue("invoiceNumber", "PSACE-5342")
-        .putValue("invoiceDocument", fileValue("invoice.pdf")
-            .file(invoiceInputStream)
-            .mimeType("application/pdf")
-            .create()));
-
     try {
+      Calendar calendar = Calendar.getInstance();
+      calendar.add(Calendar.DAY_OF_MONTH, -5);
+      ClockUtil.setCurrentTime(calendar.getTime());
+
+      ProcessInstance pi = processEngine.getRuntimeService().startProcessInstanceByKey("invoice", createVariables()
+          .putValue("creditor", "Papa Steve's all you can eat")
+          .putValue("amount", 10.99d)
+          .putValue("invoiceCategory", "Travel Expenses")
+          .putValue("invoiceNumber", "PSACE-5342")
+          .putValue("invoiceDocument", fileValue("invoice.pdf")
+              .file(invoiceInputStream)
+              .mimeType("application/pdf")
+              .create()));
+
+      calendar.add(Calendar.DAY_OF_MONTH, 5);
+      ClockUtil.setCurrentTime(calendar.getTime());
+
       processEngine.getIdentityService().setAuthenticatedUserId("mary");
       Task task = processEngine.getTaskService().createTaskQuery().processInstanceId(pi.getId()).singleResult();
       processEngine.getTaskService().createComment(null, pi.getId(), "I cannot approve this invoice: the amount is missing.\n\n Could you please provide the amount?");
