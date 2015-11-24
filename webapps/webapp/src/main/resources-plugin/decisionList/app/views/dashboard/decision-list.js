@@ -17,6 +17,9 @@ define([
 
         var decisionDefinitionService = camAPI.resource('decision-definition');
 
+        $scope.orderByPredicate = 'name';
+        $scope.orderByReverse = false;
+
         // get ALL the decisions
         decisionDefinitionService.list({
           latestVersion: true,
