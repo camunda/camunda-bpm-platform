@@ -132,7 +132,7 @@ describe('Cockpit Dashboard Spec', function() {
         dashboardPage.navigateTo();
 
         // then
-        expect(dashboardPage.deployedDecisionsList.decisionCountHeader()).to.eventually.eql('2 decision table deployed');
+        expect(dashboardPage.deployedDecisionsList.decisionCountHeader()).to.eventually.eql('2 decision tables deployed');
         expect(dashboardPage.deployedDecisionsList.decisionsList().count()).to.eventually.eql(2);
         expect(dashboardPage.deployedDecisionsList.decisionName(0)).to.eventually.eql('invoice-approver');
       });
