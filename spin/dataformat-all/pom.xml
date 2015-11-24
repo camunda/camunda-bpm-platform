@@ -12,13 +12,6 @@
 
   <dependencies>
 
-    <!-- exclude core from artifact -->
-    <dependency>
-      <groupId>org.camunda.spin</groupId>
-      <artifactId>camunda-spin-core</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
     <dependency>
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
@@ -50,6 +43,7 @@
               <artifactSet>
                 <excludes>
                   <exclude>org.camunda.commons:*</exclude>
+                  <exclude>org.camunda.spin:camunda-spin-core</exclude>
                   <exclude>org.slf4j:*</exclude>
                 </excludes>
               </artifactSet>
