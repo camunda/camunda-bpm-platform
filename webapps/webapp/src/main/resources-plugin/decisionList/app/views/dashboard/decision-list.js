@@ -18,7 +18,11 @@ define([
         var decisionDefinitionService = camAPI.resource('decision-definition');
 
         // get ALL the decisions
-        decisionDefinitionService.list({latestVersion: true}, function(err, data) {
+        decisionDefinitionService.list({
+          latestVersion: true,
+          sortBy: 'name',
+          sortOrder: 'asc'
+        }, function(err, data) {
           $scope.decisionCount = data.length;
           $scope.decisions = data;
         });
