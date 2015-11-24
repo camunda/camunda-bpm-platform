@@ -213,7 +213,8 @@ ul.deployments {
     cursor: pointer;
     color: @link-color;
     margin-bottom: 7px;
-    word-wrap: break-word;
+    word-wrap: break-all;
+    display: block;
   }
 
   dl {
@@ -428,6 +429,9 @@ section.deployments.ctn-column > .cell.content {
         .font-light;
         font-size: 18px;
         outline: none;
+        overflow: hidden;
+        word-break: break-all;
+        display: block;
       }
     }
 
@@ -471,6 +475,9 @@ section.deployments.ctn-column > .cell.content {
 
   h2.name {
     padding-right: @grid-gutter-width / 2;
+    overflow: hidden;
+    word-break: break-all;
+    display: block;
   }
 
   .cmmn-resource,
