@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+    xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+    xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+    typeLanguage="http://www.w3.org/2001/XMLSchema"
+    expressionLanguage="http://www.w3.org/1999/XPath"
+    targetNamespace="test">
+
+  <process id="FormDataTest.testTwoTasksWithSameFormFieldId">
+
+    <startEvent id="start">
+      <outgoing>sequenceFlow1</outgoing>
+    </startEvent>
+
+    <userTask id="userTask1" name="User Task 1">
+      <extensionElements>
+        <camunda:formData>
+          <camunda:formField id="actions" label="actions" type="enum">
+            <camunda:value id="accept" name="accept"/>
+            <camunda:value id="reject" name="reject"/>
+            <camunda:value id="postpone" name="postpone"/>
+          </camunda:formField>
+        </camunda:formData>
+      </extensionElements>
+
+      <incoming>sequenceFlow1</incoming>
+      <outgoing>sequenceFlow2</outgoing>
+    </userTask>
+
+    <userTask id="userTask2" name="User Task 2">
+      <extensionElements>
+        <camunda:formData>
+          <camunda:formField id="actions" label="actions" type="enum">
+            <camunda:value id="accept" name="accept"/>
+            <camunda:value id="reject" name="reject"/>
+          </camunda:formField>
+        </camunda:formData>
+      </extensionElements>
+
+      <incoming>sequenceFlow2</incoming>
+      <outgoing>sequenceFlow3</outgoing>
+    </userTask>
+
+    <endEvent id="end">
+      <incoming>sequenceFlow3</incoming>
+    </endEvent>
+
+    <sequenceFlow id="sequenceFlow1" sourceRef="start" targetRef="userTask1"/>
+    <sequenceFlow id="sequenceFlow2" sourceRef="userTask1" targetRef="userTask2"/>
+    <sequenceFlow id="sequenceFlow3" sourceRef="userTask2" targetRef="end"/>
+
+  </process>
+
+</definitions>
