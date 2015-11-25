@@ -10,7 +10,7 @@
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
-    <version>7.4.0-SNAPSHOT</version>
+    <version>7.4.0</version>
     <relativePath>../camunda-bpm-platform/database</relativePath>
   </parent>
 
