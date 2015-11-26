@@ -49,7 +49,7 @@ public abstract class JsonTreeMapObjectToJsonScriptTest extends ScriptTest {
     json = script.getVariable("integerVar");
 
     assertThat(json.isNumber()).isTrue();
-    assertThat(json.numberValue()).isEqualTo(42);
+    assertThat(json.numberValue().intValue()).isEqualTo(42);
 
     SpinJsonNode jsonList = script.getVariable("listVar");
 
