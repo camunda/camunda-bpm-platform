@@ -7,15 +7,13 @@
     <version>7.5.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>camunda-qa-upgrade-test-fixture-74</artifactId>
+  <artifactId>camunda-qa-upgrade-test-fixture-75</artifactId>
   <packaging>jar</packaging>
-  <name>camunda BPM - QA - upgrade - instance migration - test fixture - 7.4.0</name>
+  <name>camunda BPM - QA - upgrade - instance migration - test fixture - 7.5.0</name>
 
-  <!-- Due to https://issues.apache.org/jira/browse/MRELEASE-799 the release test fails when
-     the version is managed in a property. Thus we use explicit versions everywhere. -->
   <properties>
-    <!-- camunda.version.current>${project.version}</camunda.version.current-->
-    <camunda.version.previous>7.3.0</camunda.version.previous>
+    <camunda.version.current>${project.version}</camunda.version.current>
+    <camunda.version.previous>7.4.0</camunda.version.previous>
   </properties>
 
   <dependencies>
@@ -24,28 +22,6 @@
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
-      <version>7.4.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.camunda.bpm.model</groupId>
-      <artifactId>camunda-bpmn-model</artifactId>
-      <version>7.4.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.camunda.bpm.model</groupId>
-      <artifactId>camunda-cmmn-model</artifactId>
-      <version>7.4.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.camunda.bpm.model</groupId>
-      <artifactId>camunda-dmn-model</artifactId>
-      <version>7.4.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.camunda.bpm.model</groupId>
-      <artifactId>camunda-xml-model</artifactId>
-      <version>7.4.0</version>
     </dependency>
 
     <dependency>
@@ -86,7 +62,7 @@
                   <artifactItem>
                     <groupId>org.camunda.bpm.distro</groupId>
                     <artifactId>camunda-sql-scripts</artifactId>
-                    <version>7.4.0</version>
+                    <version>${camunda.version.current}</version>
                     <type>test-jar</type>
                     <outputDirectory>${project.build.directory}/scripts-current</outputDirectory>
                     <overWrite>true</overWrite>
@@ -114,23 +90,24 @@
                 <phase>generate-test-resources</phase>
                 <configuration>
                   <target>
-
+                    <property name="current.minor.version" value="${camunda.current.majorVersion}.${camunda.current.minorVersion}" />
+                    <property name="previous.minor.version" value="${camunda.previous.majorVersion}.${camunda.previous.minorVersion}" />
+                    <property name="current.sql.upgrade.dir" value="${project.build.directory}/scripts-current/sql/upgrade" />
+                    <property name="minor.version.upgrade.script.previous.to.current.engine" value="${database.type}_engine_${previous.minor.version}_to_${current.minor.version}.sql" />
+                    <property name="minor.version.upgrade.script.previous.to.current.identity" value="${database.type}_identity_${previous.minor.version}_to_${current.minor.version}.sql" />
+                    <property name="patch.version.upgrade.script.previous.engine.prefix" value="${database.type}_engine_${previous.minor.version}_patch_${previous.minor.version}" />
+                    
                     <!-- create the SQL scripts so that the files exist even if they do not exist in the distribution. (this can be the case if there are no db
                       upgrades (yet) for a particular release ) -->
 
-                    <mkdir dir="${project.build.directory}/scripts-current/sql/upgrade/" />
+                    <mkdir dir="${current.sql.upgrade.dir}/" />
 
                     <!-- patches for previous minor version if any -->
-                    <!-- 7.3.0 to 7.3.1 -->
-                    <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.0_to_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.1.sql" />
-                    <!-- 7.3.2 to 7.3.3_1 -->
-                    <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.2_to_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.3_1.sql" />
-                    <!-- 7.3.2 to 7.3.3_2 -->
-                    <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.2_to_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.3_2.sql" />
+                    <!--touch file="${current.sql.upgrade.dir}/${patch.version.upgrade.script.engine.prefix}.X_to_${previous.minor.version}.Y.sql" /-->
 
                     <!-- minor version upgrade from previous to current version -->
-                    <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql" />
-                    <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql" />
+                    <touch file="${current.sql.upgrade.dir}/${minor.version.upgrade.script.previous.to.current.engine}" />
+                    <touch file="${current.sql.upgrade.dir}/${minor.version.upgrade.script.previous.to.current.identity}" />
                   </target>
                 </configuration>
                 <goals>
@@ -158,7 +135,7 @@
                 </goals>
                 <configuration>
                   <propertyPrefix>camunda.current</propertyPrefix>
-                  <versionString>7.4.0</versionString>
+                  <versionString>${camunda.version.current}</versionString>
                 </configuration>
               </execution>
               <execution>
@@ -188,12 +165,8 @@
                   <srcFiles>
                     <!-- now patch old version of the schema -->
 
-                    <!-- 7.3.0 to 7.3.1 -->
-                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.0_to_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.1.sql</srcFile>
-                    <!-- 7.3.2 to 7.3.3_1 -->
-                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.2_to_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.3_1.sql</srcFile>
-                    <!-- 7.3.2 to 7.3.3_2 -->
-                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.2_to_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.3_2.sql</srcFile>
+                    <!-- 7.4.0 to 7.4.1 -->
+                    <!--srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.X_to_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.Y.sql</srcFile-->
                   </srcFiles>
                 </configuration>
               </execution>
