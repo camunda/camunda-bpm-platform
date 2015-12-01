@@ -12,7 +12,7 @@
   </parent>
 
   <properties>
-    <version.old>1.2.0-alpha4</version.old>
+    <version.old>1.2.0</version.old>
   </properties>
 
   <dependencies>
