@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.bpmn.parser;
 
+import org.camunda.bpm.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.helper.BpmnProperties;
 import org.camunda.bpm.engine.impl.core.model.PropertyKey;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
@@ -25,8 +27,9 @@ public class FoxFailedJobParseListener extends AbstractBpmnParseListener {
   protected static final String BOUNDARY_TIMER = "boundaryTimer";
   protected static final String INTERMEDIATE_SIGNAL_THROW = "intermediateSignalThrow";
   protected static final String INTERMEDIATE_TIMER = "intermediateTimer";
-
   protected static final String SIGNAL_EVENT_DEFINITION = "signalEventDefinition";
+  protected static final String MULTI_INSTANCE_LOOP_CHARACTERISTICS = "multiInstanceLoopCharacteristics";
+
   protected static final String EXTENSION_ELEMENTS = "extensionElements";
   protected static final String FAILED_JOB_RETRY_TIME_CYCLE = "failedJobRetryTimeCycle";
 
@@ -40,7 +43,7 @@ public class FoxFailedJobParseListener extends AbstractBpmnParseListener {
 
   @Override
   public void parseStartEvent(Element startEventElement, ScopeImpl scope, ActivityImpl startEventActivity) {
-    String type = (String) startEventActivity.getProperty(TYPE);
+    String type = startEventActivity.getProperties().get(BpmnProperties.TYPE);
     if (type != null && type.equals(START_TIMER_EVENT)){
       this.setFailedJobRetryTimeCycleValue(startEventElement, startEventActivity);
     }
@@ -48,7 +51,7 @@ public class FoxFailedJobParseListener extends AbstractBpmnParseListener {
 
   @Override
   public void parseBoundaryEvent(Element boundaryEventElement, ScopeImpl scopeElement, ActivityImpl nestedActivity) {
-    String type = (String) nestedActivity.getProperty(TYPE);
+    String type = nestedActivity.getProperties().get(BpmnProperties.TYPE);
     if (type != null && type.equals(BOUNDARY_TIMER)) {
       this.setFailedJobRetryTimeCycleValue(boundaryEventElement, nestedActivity);
     }
@@ -56,7 +59,7 @@ public class FoxFailedJobParseListener extends AbstractBpmnParseListener {
 
   @Override
   public void parseIntermediateThrowEvent(Element intermediateEventElement, ScopeImpl scope, ActivityImpl activity) {
-    String type = (String) activity.getProperty(TYPE);
+    String type = activity.getProperties().get(BpmnProperties.TYPE);
     if (type != null && type.equals(INTERMEDIATE_SIGNAL_THROW)) {
       Element signalDefElement = intermediateEventElement.element(SIGNAL_EVENT_DEFINITION);
       boolean asynch = "true".equals(signalDefElement.attributeNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, "async", "false"));
@@ -68,7 +71,7 @@ public class FoxFailedJobParseListener extends AbstractBpmnParseListener {
 
   @Override
   public void parseIntermediateCatchEvent(Element intermediateEventElement, ScopeImpl scope, ActivityImpl activity) {
-    String type = (String) activity.getProperty(TYPE);
+    String type = activity.getProperties().get(BpmnProperties.TYPE);
     if (type != null && type.equals(INTERMEDIATE_TIMER)) {
       this.setFailedJobRetryTimeCycleValue(intermediateEventElement, activity);
     }
@@ -76,83 +79,85 @@ public class FoxFailedJobParseListener extends AbstractBpmnParseListener {
 
   @Override
   public void parseScriptTask(Element scriptTaskElement, ScopeImpl scope, ActivityImpl activity) {
-    if (isAsync(activity)) {
-      this.setFailedJobRetryTimeCycleValue(scriptTaskElement, activity);
-    }
+    parseActivity(scriptTaskElement, activity);
   }
 
   @Override
   public void parseServiceTask(Element serviceTaskElement, ScopeImpl scope, ActivityImpl activity) {
-    if (isAsync(activity)) {
-      this.setFailedJobRetryTimeCycleValue(serviceTaskElement, activity);
-    }
+    parseActivity(serviceTaskElement, activity);
   }
 
   @Override
   public void parseBusinessRuleTask(Element businessRuleTaskElement, ScopeImpl scope, ActivityImpl activity) {
-    if (isAsync(activity)) {
-      this.setFailedJobRetryTimeCycleValue(businessRuleTaskElement, activity);
-    }
+    parseActivity(businessRuleTaskElement, activity);
   }
 
   @Override
   public void parseTask(Element taskElement, ScopeImpl scope, ActivityImpl activity) {
-    if (isAsync(activity)) {
-      this.setFailedJobRetryTimeCycleValue(taskElement, activity);
-    }
+    parseActivity(taskElement, activity);
   }
 
   @Override
   public void parseUserTask(Element userTaskElement, ScopeImpl scope, ActivityImpl activity) {
-    if (isAsync(activity)) {
-      this.setFailedJobRetryTimeCycleValue(userTaskElement, activity);
-    }
+    parseActivity(userTaskElement, activity);
   }
 
   @Override
   public void parseCallActivity(Element callActivityElement, ScopeImpl scope, ActivityImpl activity) {
-    if (isAsync(activity)) {
-      this.setFailedJobRetryTimeCycleValue(callActivityElement, activity);
-    }
+    parseActivity(callActivityElement, activity);
   }
 
   @Override
   public void parseReceiveTask(Element receiveTaskElement, ScopeImpl scope, ActivityImpl activity) {
-    if (isAsync(activity)) {
-      this.setFailedJobRetryTimeCycleValue(receiveTaskElement, activity);
-    }
+    parseActivity(receiveTaskElement, activity);
   }
 
   @Override
   public void parseSendTask(Element sendTaskElement, ScopeImpl scope, ActivityImpl activity) {
-    if (isAsync(activity)) {
-      this.setFailedJobRetryTimeCycleValue(sendTaskElement, activity);
-    }
+    parseActivity(sendTaskElement, activity);
   }
 
   @Override
   public void parseSubProcess(Element subProcessElement, ScopeImpl scope, ActivityImpl activity) {
-    if (isAsync(activity)) {
-      this.setFailedJobRetryTimeCycleValue(subProcessElement, activity);
-    }
+    parseActivity(subProcessElement, activity);
   }
 
   @Override
   public void parseTransaction(Element transactionElement, ScopeImpl scope, ActivityImpl activity) {
-    if (activity.isAsyncBefore()) {
-      this.setFailedJobRetryTimeCycleValue(transactionElement, activity);
-    }
+    parseActivity(transactionElement, activity);
   }
 
   protected boolean isAsync(ActivityImpl activity) {
     return activity.isAsyncBefore() || activity.isAsyncAfter();
   }
 
+  protected void parseActivity(Element element, ActivityImpl activity) {
+
+    if (isMultiInstance(activity)) {
+      // in case of multi-instance, the extension elements is set according to the async attributes
+      // the extension for multi-instance body is set on the element of the activity
+      ActivityImpl miBody = activity.getParentFlowScopeActivity();
+      if (isAsync(miBody)) {
+        setFailedJobRetryTimeCycleValue(element, miBody);
+      }
+      // the extension for inner activity is set on the multiInstanceLoopCharacteristics element
+      if (isAsync(activity)) {
+        Element multiInstanceLoopCharacteristics = element.element(MULTI_INSTANCE_LOOP_CHARACTERISTICS);
+        setFailedJobRetryTimeCycleValue(multiInstanceLoopCharacteristics, activity);
+      }
+
+    } else if (isAsync(activity)) {
+      setFailedJobRetryTimeCycleValue(element, activity);
+    }
+  }
+
   protected void setFailedJobRetryTimeCycleValue(Element element, ActivityImpl activity) {
+
     Element extensionElements = element.element(EXTENSION_ELEMENTS);
     if (extensionElements != null) {
       Element failedJobRetryTimeCycleElement = extensionElements.elementNS(FOX_ENGINE_NS, FAILED_JOB_RETRY_TIME_CYCLE);
-      if (failedJobRetryTimeCycleElement == null) { // try to get it from the activiti namespace
+      if (failedJobRetryTimeCycleElement == null) {
+        // try to get it from the activiti namespace
         failedJobRetryTimeCycleElement = extensionElements.elementNS(BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS, FAILED_JOB_RETRY_TIME_CYCLE);
       }
       if (failedJobRetryTimeCycleElement != null) {
@@ -161,4 +166,11 @@ public class FoxFailedJobParseListener extends AbstractBpmnParseListener {
       }
     }
   }
+
+  protected boolean isMultiInstance(ActivityImpl activity) {
+    // #isMultiInstance() don't work since the property is not set yet
+    ActivityImpl parent = activity.getParentFlowScopeActivity();
+    return parent != null && parent.getActivityBehavior() instanceof MultiInstanceActivityBehavior;
+  }
+
 }

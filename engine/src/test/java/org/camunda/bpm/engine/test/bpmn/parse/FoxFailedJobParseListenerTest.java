@@ -1,5 +1,6 @@
 package org.camunda.bpm.engine.test.bpmn.parse;
 
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.FoxFailedJobParseListener;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -8,181 +9,139 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 
-
 public class FoxFailedJobParseListenerTest extends PluggableProcessEngineTestCase {
 
-  @Deployment
-          (resources =
-                { "org/camunda/bpm/engine/test/bpmn/parse/FoxFailedJobParseListenerTest.testUserTask.bpmn20.xml" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/parse/FoxFailedJobParseListenerTest.testUserTask.bpmn20.xml" })
   public void testUserTaskParseFailedJobRetryTimeCycle() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("asyncUserTaskFailedJobRetryTimeCycle");
 
-    assertTrue(pi instanceof ExecutionEntity);
-    ExecutionEntity execution = (ExecutionEntity) pi;
-
-    ProcessDefinitionImpl processDefinition = execution.getProcessDefinition();
-    assertNotNull(processDefinition);
-
-    ActivityImpl userTask = processDefinition.findActivity("task");
-    assertNotNull(userTask);
-
-    this.checkFoxFailedJobConfig(userTask);
+    ActivityImpl userTask = findActivity(pi, "task");
+    checkFoxFailedJobConfig(userTask);
   }
 
-  @Deployment
-      (resources =
-          { "org/camunda/bpm/engine/test/bpmn/parse/CamundaFailedJobParseListenerTest.testUserTask.bpmn20.xml" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/parse/CamundaFailedJobParseListenerTest.testUserTask.bpmn20.xml" })
   public void testUserTaskParseFailedJobRetryTimeCycleInActivitiNamespace() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("asyncUserTaskFailedJobRetryTimeCycle");
 
-    assertTrue(pi instanceof ExecutionEntity);
-    ExecutionEntity execution = (ExecutionEntity) pi;
-
-    ProcessDefinitionImpl processDefinition = execution.getProcessDefinition();
-    assertNotNull(processDefinition);
-
-    ActivityImpl userTask = processDefinition.findActivity("task");
-    assertNotNull(userTask);
-
-    this.checkFoxFailedJobConfig(userTask);
+    ActivityImpl userTask = findActivity(pi, "task");
+    checkFoxFailedJobConfig(userTask);
   }
 
-  @Deployment
-          (resources =
-              { "org/camunda/bpm/engine/test/bpmn/parse/FoxFailedJobParseListenerTest.testUserTask.bpmn20.xml" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/parse/FoxFailedJobParseListenerTest.testUserTask.bpmn20.xml" })
   public void testNotAsyncUserTaskParseFailedJobRetryTimeCycle() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("notAsyncUserTaskFailedJobRetryTimeCycle");
 
-    assertTrue(pi instanceof ExecutionEntity);
-    ExecutionEntity execution = (ExecutionEntity) pi;
-
-    ProcessDefinitionImpl processDefinition = execution.getProcessDefinition();
-    assertNotNull(processDefinition);
-
-    ActivityImpl userTask = processDefinition.findActivity("notAsyncTask");
-    assertNotNull(userTask);
-
-    this.checkNotContainingFoxFailedJobConfig(userTask);
+    ActivityImpl userTask = findActivity(pi, "notAsyncTask");
+    checkNotContainingFoxFailedJobConfig(userTask);
   }
 
-  @Deployment
-          (resources =
-                { "org/camunda/bpm/engine/test/bpmn/parse/FoxFailedJobParseListenerTest.testUserTask.bpmn20.xml" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/parse/FoxFailedJobParseListenerTest.testUserTask.bpmn20.xml" })
   public void testAsyncUserTaskButWithoutParseFailedJobRetryTimeCycle() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("asyncUserTaskButWithoutFailedJobRetryTimeCycle");
 
-    assertTrue(pi instanceof ExecutionEntity);
-    ExecutionEntity execution = (ExecutionEntity) pi;
-
-    ProcessDefinitionImpl processDefinition = execution.getProcessDefinition();
-    assertNotNull(processDefinition);
-
-    ActivityImpl userTask = processDefinition.findActivity("asyncTaskWithoutFailedJobRetryTimeCycle");
-    assertNotNull(userTask);
-    assertTrue(userTask.isAsyncBefore());
-
-    this.checkNotContainingFoxFailedJobConfig(userTask);
+    ActivityImpl userTask = findActivity(pi, "asyncTaskWithoutFailedJobRetryTimeCycle");
+    checkNotContainingFoxFailedJobConfig(userTask);
   }
 
-  @Deployment
-          (resources =
-                { "org/camunda/bpm/engine/test/bpmn/parse/FoxFailedJobParseListenerTest.testTimer.bpmn20.xml" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/parse/FoxFailedJobParseListenerTest.testTimer.bpmn20.xml" })
   public void testTimerBoundaryEventWithFailedJobRetryTimeCycle() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("boundaryEventWithFailedJobRetryTimeCycle");
 
-    assertTrue(pi instanceof ExecutionEntity);
-    ExecutionEntity execution = (ExecutionEntity) pi;
-
-    ProcessDefinitionImpl processDefinition = execution.getProcessDefinition();
-    assertNotNull(processDefinition);
-
-    ActivityImpl boundaryActivity = processDefinition.findActivity("boundaryTimerWithFailedJobRetryTimeCycle");
-    assertNotNull(boundaryActivity);
-
-    this.checkFoxFailedJobConfig(boundaryActivity);
+    ActivityImpl boundaryActivity = findActivity(pi, "boundaryTimerWithFailedJobRetryTimeCycle");
+    checkFoxFailedJobConfig(boundaryActivity);
   }
 
-  @Deployment
-    (resources =
-          { "org/camunda/bpm/engine/test/bpmn/parse/FoxFailedJobParseListenerTest.testTimer.bpmn20.xml" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/parse/FoxFailedJobParseListenerTest.testTimer.bpmn20.xml" })
   public void testTimerBoundaryEventWithoutFailedJobRetryTimeCycle() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("boundaryEventWithoutFailedJobRetryTimeCycle");
 
-    assertTrue(pi instanceof ExecutionEntity);
-    ExecutionEntity execution = (ExecutionEntity) pi;
-
-    ProcessDefinitionImpl processDefinition = execution.getProcessDefinition();
-    assertNotNull(processDefinition);
-
-    ActivityImpl boundaryActivity = processDefinition.findActivity("boundaryTimerWithoutFailedJobRetryTimeCycle");
-    assertNotNull(boundaryActivity);
-
-    this.checkNotContainingFoxFailedJobConfig(boundaryActivity);
+    ActivityImpl boundaryActivity = findActivity(pi, "boundaryTimerWithoutFailedJobRetryTimeCycle");
+    checkNotContainingFoxFailedJobConfig(boundaryActivity);
   }
 
-  @Deployment
-          (resources =
-                { "org/camunda/bpm/engine/test/bpmn/parse/FoxFailedJobParseListenerTest.testTimer.bpmn20.xml" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/parse/FoxFailedJobParseListenerTest.testTimer.bpmn20.xml" })
   public void testTimerStartEventWithFailedJobRetryTimeCycle() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("startEventWithFailedJobRetryTimeCycle");
 
-    assertTrue(pi instanceof ExecutionEntity);
-    ExecutionEntity execution = (ExecutionEntity) pi;
-
-    ProcessDefinitionImpl processDefinition = execution.getProcessDefinition();
-    assertNotNull(processDefinition);
-
-    ActivityImpl startEvent = processDefinition.findActivity("startEventFailedJobRetryTimeCycle");
-    assertNotNull(startEvent);
-
-    this.checkFoxFailedJobConfig(startEvent);
+    ActivityImpl startEvent = findActivity(pi, "startEventFailedJobRetryTimeCycle");
+    checkFoxFailedJobConfig(startEvent);
   }
 
-  @Deployment
-          (resources =
-                { "org/camunda/bpm/engine/test/bpmn/parse/FoxFailedJobParseListenerTest.testTimer.bpmn20.xml" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/parse/FoxFailedJobParseListenerTest.testTimer.bpmn20.xml" })
   public void testIntermediateCatchTimerEventWithFailedJobRetryTimeCycle() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("intermediateTimerEventWithFailedJobRetryTimeCycle");
 
-    assertTrue(pi instanceof ExecutionEntity);
-    ExecutionEntity execution = (ExecutionEntity) pi;
-
-    ProcessDefinitionImpl processDefinition = execution.getProcessDefinition();
-    assertNotNull(processDefinition);
-
-    ActivityImpl timer = processDefinition.findActivity("timerEventWithFailedJobRetryTimeCycle");
-    assertNotNull(timer);
-
-    this.checkFoxFailedJobConfig(timer);
+    ActivityImpl timer = findActivity(pi, "timerEventWithFailedJobRetryTimeCycle");
+    checkFoxFailedJobConfig(timer);
   }
 
-  @Deployment
-          (resources =
-                { "org/camunda/bpm/engine/test/bpmn/parse/FoxFailedJobParseListenerTest.testSignal.bpmn20.xml" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/parse/FoxFailedJobParseListenerTest.testSignal.bpmn20.xml" })
   public void testSignalEventWithFailedJobRetryTimeCycle() {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("signalEventWithFailedJobRetryTimeCycle");
 
+    ActivityImpl signal = findActivity(pi, "signalWithFailedJobRetryTimeCycle");
+    checkFoxFailedJobConfig(signal);
+  }
+
+  @Deployment
+  public void testMultiInstanceBodyWithFailedJobRetryTimeCycle() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
+
+    ActivityImpl miBody = findMultiInstanceBody(pi, "task");
+    checkFoxFailedJobConfig(miBody);
+
+    ActivityImpl innerActivity = findActivity(pi, "task");
+    checkNotContainingFoxFailedJobConfig(innerActivity);
+  }
+
+  @Deployment
+  public void testInnerMultiInstanceActivityWithFailedJobRetryTimeCycle() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
+
+    ActivityImpl miBody = findMultiInstanceBody(pi, "task");
+    checkNotContainingFoxFailedJobConfig(miBody);
+
+    ActivityImpl innerActivity = findActivity(pi, "task");
+    checkFoxFailedJobConfig(innerActivity);
+  }
+
+  @Deployment
+  public void testMultiInstanceBodyAndInnerActivityWithFailedJobRetryTimeCycle() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
+
+    ActivityImpl miBody = findMultiInstanceBody(pi, "task");
+    checkFoxFailedJobConfig(miBody);
+
+    ActivityImpl innerActivity = findActivity(pi, "task");
+    checkFoxFailedJobConfig(innerActivity);
+  }
+
+  protected ActivityImpl findActivity(ProcessInstance pi, String activityId) {
     assertTrue(pi instanceof ExecutionEntity);
     ExecutionEntity execution = (ExecutionEntity) pi;
 
     ProcessDefinitionImpl processDefinition = execution.getProcessDefinition();
     assertNotNull(processDefinition);
 
-    ActivityImpl signal = processDefinition.findActivity("signalWithFailedJobRetryTimeCycle");
-    assertNotNull(signal);
-
-    this.checkFoxFailedJobConfig(signal);
+    ActivityImpl activity = processDefinition.findActivity(activityId);
+    assertNotNull(activity);
+    return activity;
   }
 
-  private void checkFoxFailedJobConfig(ActivityImpl activity) {
+  protected ActivityImpl findMultiInstanceBody(ProcessInstance pi, String activityId) {
+    return findActivity(pi, activityId + BpmnParse.MULTI_INSTANCE_BODY_ID_SUFFIX);
+  }
+
+  protected void checkFoxFailedJobConfig(ActivityImpl activity) {
+    assertNotNull(activity);
+
     assertTrue(activity.getProperties().contains(FoxFailedJobParseListener.FOX_FAILED_JOB_CONFIGURATION));
 
     Object value = activity.getProperties().get(FoxFailedJobParseListener.FOX_FAILED_JOB_CONFIGURATION);
-    assertNotNull(value);
     assertEquals("R5/PT5M", value);
   }
 
-  private void checkNotContainingFoxFailedJobConfig(ActivityImpl activity) {
+  protected void checkNotContainingFoxFailedJobConfig(ActivityImpl activity) {
     assertFalse(activity.getProperties().contains(FoxFailedJobParseListener.FOX_FAILED_JOB_CONFIGURATION));
   }
 
