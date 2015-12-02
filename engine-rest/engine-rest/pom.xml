@@ -194,35 +194,6 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>create-classes-jar</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-            <phase>package</phase>
-            <configuration>
-              <classifier>classes</classifier>
-              <excludes>
-                <exclude>org/camunda/bpm/engine/rest/impl/application/DefaultApplication.class</exclude>
-              </excludes>
-            </configuration>
-          </execution>
-          <execution>
-            <id>create-test-jar</id>
-            <phase>package</phase>
-            <goals>
-              <goal>test-jar</goal>
-            </goals>
-            <configuration>
-              <forceCreation>true</forceCreation>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
         <executions>
           <execution>

@@ -17,6 +17,19 @@
       <artifactId>camunda-engine-rest-core</artifactId>
       <version>${project.version}</version>
     </dependency>
+    
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- dependencies only used for assemblies should be scope provided -->
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine</artifactId>
+      <scope>provided</scope>
+    </dependency>
 
     <!-- dependencies only used for assemblies should be scope provided -->
     <dependency>
@@ -27,14 +40,6 @@
       <scope>provided</scope>
     </dependency>
     
-    <dependency>
-      <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine-rest-core</artifactId>
-      <version>${project.version}</version>
-      <classifier>classes</classifier>
-      <scope>provided</scope>
-    </dependency>
-
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jaxrs</artifactId>
@@ -131,8 +136,9 @@
               <outputDirectory>target/</outputDirectory>
               <workDirectory>target/assembly/work</workDirectory>
             </configuration>
-        </execution>
-        <execution>
+          </execution>
+          
+          <execution>
             <id>sources</id>
             <phase>package</phase>
             <goals>
@@ -148,7 +154,6 @@
               <workDirectory>target/assembly/work</workDirectory>
             </configuration>
           </execution>
-
         </executions>
       </plugin>
 

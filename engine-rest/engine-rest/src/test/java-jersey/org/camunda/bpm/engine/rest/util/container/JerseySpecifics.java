@@ -19,7 +19,6 @@ import javax.ws.rs.core.Application;
 
 import org.camunda.bpm.engine.rest.ExceptionHandlerTest;
 import org.camunda.bpm.engine.rest.application.TestCustomResourceApplication;
-import org.camunda.bpm.engine.rest.impl.application.DefaultApplication;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.TestRule;
 
@@ -30,7 +29,7 @@ import org.junit.rules.TestRule;
 public class JerseySpecifics implements ContainerSpecifics {
 
   protected static final TestRuleFactory DEFAULT_RULE_FACTORY =
-      new EmbeddedServerRuleFactory(new DefaultApplication());
+      new EmbeddedServerRuleFactory(new JaxrsApplication());
 
   protected static final Map<Class<?>, TestRuleFactory> TEST_RULE_FACTORIES =
       new HashMap<Class<?>, TestRuleFactory>();

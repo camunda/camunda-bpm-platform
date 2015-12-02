@@ -10,7 +10,7 @@
     <servlet-class>org.apache.wink.server.internal.servlet.RestServlet</servlet-class>
     <init-param>
       <param-name>javax.ws.rs.Application</param-name>
-      <param-value>org.camunda.bpm.engine.rest.impl.application.DefaultApplication</param-value>
+      <param-value>org.camunda.bpm.engine.rest.util.container.JaxrsApplication</param-value>
     </init-param>
   </servlet>
 

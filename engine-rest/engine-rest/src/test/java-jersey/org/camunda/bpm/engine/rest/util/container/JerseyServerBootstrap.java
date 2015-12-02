@@ -9,7 +9,6 @@ import java.util.Properties;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.UriBuilder;
 
-import org.camunda.bpm.engine.rest.impl.application.DefaultApplication;
 import org.glassfish.grizzly.http.server.HttpServer;
 
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
@@ -21,7 +20,7 @@ public class JerseyServerBootstrap extends EmbeddedServerBootstrap {
   private HttpServer server;
 
   public JerseyServerBootstrap() {
-    setupServer(new DefaultApplication());
+    setupServer(new JaxrsApplication());
   }
 
   public JerseyServerBootstrap(Application application) {

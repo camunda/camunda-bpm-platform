@@ -19,11 +19,8 @@ import javax.ws.rs.core.Application;
 
 import org.camunda.bpm.engine.rest.ExceptionHandlerTest;
 import org.camunda.bpm.engine.rest.application.TestCustomResourceApplication;
-import org.camunda.bpm.engine.rest.impl.application.DefaultApplication;
 import org.camunda.bpm.engine.rest.standalone.NoServletAuthenticationFilterTest;
 import org.camunda.bpm.engine.rest.standalone.ServletAuthenticationFilterTest;
-import org.camunda.bpm.engine.rest.util.container.ContainerSpecifics;
-import org.camunda.bpm.engine.rest.util.container.TestRuleFactory;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TemporaryFolder;
@@ -36,7 +33,7 @@ import org.junit.rules.TestRule;
 public class ResteasySpecifics implements ContainerSpecifics {
 
   protected static final TestRuleFactory DEFAULT_RULE_FACTORY =
-      new EmbeddedServerRuleFactory(new DefaultApplication());
+      new EmbeddedServerRuleFactory(new JaxrsApplication());
 
   protected static final Map<Class<?>, TestRuleFactory> TEST_RULE_FACTORIES =
       new HashMap<Class<?>, TestRuleFactory>();

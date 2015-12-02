@@ -14,9 +14,8 @@
     <dependencySet>
       <outputDirectory>/</outputDirectory>
       <unpack>true</unpack>
-      <scope>provided</scope>
       <includes>
-        <include>org.camunda.bpm:camunda-engine-rest-core:jar:classes:*</include>
+        <include>org.camunda.bpm:camunda-engine-rest-core:jar:*</include>
       </includes>
     </dependencySet>
   </dependencySets>
