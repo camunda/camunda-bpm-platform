@@ -129,7 +129,7 @@ public class ProcessApplicationManager {
 
   protected void logRegistration(Set<String> deploymentIds, ProcessApplicationReference reference) {
 
-    if (LOG.isInfoEnabled()) {
+    if (!LOG.isInfoEnabled()) {
       // building the log message is expensive (db queries) so we avoid it if we can
       return;
     }
