@@ -17,7 +17,9 @@ import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeAc
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
@@ -714,6 +716,40 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
 
       // but the containing sub process output mapping was executed
       assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableName("subProcessOutputMappingExecuted").count());
+    }
+  }
+
+  public void FAILING_testDeployAndRemoveAsyncActivity() {
+    Set<String> deployments = new HashSet<String>();
+
+    try {
+      // given a deployment that contains a process called "process" with an async task "task"
+      org.camunda.bpm.engine.repository.Deployment deployment1 = repositoryService
+          .createDeployment()
+          .addClasspathResource("org/camunda/bpm/engine/test/bpmn/async/AsyncTaskTest.testDeployAndRemoveAsyncActivity.v1.bpmn20.xml")
+          .deploy();
+      deployments.add(deployment1.getId());
+
+      // when redeploying the process where that task is not contained anymore
+      org.camunda.bpm.engine.repository.Deployment deployment2 = repositoryService
+          .createDeployment()
+          .addClasspathResource("org/camunda/bpm/engine/test/bpmn/async/AsyncTaskTest.testDeployAndRemoveAsyncActivity.v2.bpmn20.xml")
+          .deploy();
+      deployments.add(deployment2.getId());
+
+
+      // and clearing the deployment cache (note that the equivalent of this in a real-world
+      // scenario would be making the deployment with a different engine
+      processEngineConfiguration.getDeploymentCache().discardProcessDefinitionCache();
+
+      // then it should be possible to load the latest process definition
+      ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+      assertNotNull(processInstance);
+
+    } finally {
+      for (String deploymentId : deployments) {
+        repositoryService.deleteDeployment(deploymentId, true);
+      }
     }
   }
 
