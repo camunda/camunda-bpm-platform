@@ -4,8 +4,8 @@
 
   <process id="listenerProcess">
     <extensionElements>
-      <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener" />
-      <camunda:executionListener event="end" class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener" />
+      <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener" />
+      <camunda:executionListener event="end" class="org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener" />
     </extensionElements>
 
     <startEvent id="theStart" />
@@ -15,15 +15,15 @@
 
     <subProcess id="subProcess">
       <extensionElements>
-        <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener" />
-        <camunda:executionListener event="end" class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener" />
+        <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener" />
+        <camunda:executionListener event="end" class="org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener" />
       </extensionElements>
       <startEvent id="theSubProcessStart" />
       <sequenceFlow id="flow3" sourceRef="theSubProcessStart" targetRef="innerTask" />
       <userTask id="innerTask">
         <extensionElements>
-          <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener" />
-          <camunda:executionListener event="end" class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener" />
+          <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener" />
+          <camunda:executionListener event="end" class="org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener" />
         </extensionElements>
       </userTask>
       <sequenceFlow id="flow4" sourceRef="innerTask" targetRef="theSubProcessEnd" />

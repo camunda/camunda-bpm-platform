@@ -24,7 +24,7 @@ import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
 import static org.camunda.bpm.engine.authorization.Resources.GROUP;
 import static org.camunda.bpm.engine.authorization.Resources.GROUP_MEMBERSHIP;
 import static org.camunda.bpm.engine.authorization.Resources.USER;
-import static org.camunda.bpm.engine.test.authorization.util.AuthorizationTestUtil.assertExceptionInfo;
+import static org.camunda.bpm.engine.test.api.authorization.util.AuthorizationTestUtil.assertExceptionInfo;
 
 import java.util.ArrayList;
 import java.util.List;

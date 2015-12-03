@@ -22,7 +22,7 @@
       <extensionElements>
         <camunda:executionListener
             event="start"
-            class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener" />
+            class="org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener" />
       </extensionElements>
       <terminateEventDefinition id="terminateEndDefinition1"/>
     </endEvent>
@@ -36,7 +36,7 @@
       <extensionElements>
         <camunda:executionListener
             event="start"
-            class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener" />
+            class="org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener" />
       </extensionElements>
       <terminateEventDefinition id="terminateEndDefinition2"/>
     </endEvent>

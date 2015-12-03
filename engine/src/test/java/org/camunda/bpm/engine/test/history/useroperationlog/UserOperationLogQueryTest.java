@@ -508,7 +508,7 @@ public class UserOperationLogQueryTest extends AbstractUserOperationLogTest {
     assertNull(suspendedJobEntry.getOrgValue());
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/cmd/FoxJobRetryCmdTest.testFailedServiceTask.bpmn20.xml" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/async/FoxJobRetryCmdTest.testFailedServiceTask.bpmn20.xml" })
   public void testQueryJobRetryOperationsById() {
     // given
     process = runtimeService.startProcessInstanceByKey("failedServiceTask");

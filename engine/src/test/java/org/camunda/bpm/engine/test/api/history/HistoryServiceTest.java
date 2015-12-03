@@ -104,8 +104,8 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     assertEquals("theEnd", historicProcessInstance.getEndActivityId());
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/examples/bpmn/callactivity/orderProcess.bpmn20.xml",
-      "org/camunda/bpm/engine/test/examples/bpmn/callactivity/checkCreditProcess.bpmn20.xml" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/history/orderProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/history/checkCreditProcess.bpmn20.xml" })
   public void testOrderProcessWithCallActivity() {
     // After the process has started, the 'verify credit history' task should be
     // active
@@ -125,8 +125,9 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     assertTrue(historicProcessInstance.getProcessDefinitionId().contains("checkCreditProcess"));
   }
 
-  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml", "org/camunda/bpm/engine/test/examples/bpmn/callactivity/orderProcess.bpmn20.xml",
-      "org/camunda/bpm/engine/test/examples/bpmn/callactivity/checkCreditProcess.bpmn20.xml" })
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/history/orderProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/history/checkCreditProcess.bpmn20.xml" })
   public void testHistoricProcessInstanceQueryByProcessDefinitionKey() {
 
     String processDefinitionKey = "oneTaskProcess";

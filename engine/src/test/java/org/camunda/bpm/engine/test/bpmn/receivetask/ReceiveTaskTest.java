@@ -495,4 +495,17 @@ public class ReceiveTaskTest extends PluggableProcessEngineTestCase {
     // expect: this ends the process instance
     assertProcessEnded(processInstance.getId());
   }
+
+  @Deployment
+  public void testWaitStateBehavior() {
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("receiveTask");
+    Execution execution = runtimeService.createExecutionQuery()
+      .processInstanceId(pi.getId())
+      .activityId("waitState")
+      .singleResult();
+    assertNotNull(execution);
+
+    runtimeService.signal(execution.getId());
+    assertProcessEnded(pi.getId());
+  }
 }

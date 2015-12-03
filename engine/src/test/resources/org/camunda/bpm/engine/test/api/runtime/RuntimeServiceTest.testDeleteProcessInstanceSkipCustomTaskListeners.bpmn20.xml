@@ -11,10 +11,10 @@
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask" />
     <userTask id="theTask" name="my task" camunda:assignee="kermit">
       <extensionElements>
-        <camunda:taskListener event="create" class="org.camunda.bpm.engine.test.examples.bpmn.tasklistener.RecorderTaskListener" />
-        <camunda:taskListener event="assignment" class="org.camunda.bpm.engine.test.examples.bpmn.tasklistener.RecorderTaskListener" />
-        <camunda:taskListener event="complete" class="org.camunda.bpm.engine.test.examples.bpmn.tasklistener.RecorderTaskListener" />
-        <camunda:taskListener event="delete" class="org.camunda.bpm.engine.test.examples.bpmn.tasklistener.RecorderTaskListener" />
+        <camunda:taskListener event="create" class="org.camunda.bpm.engine.test.bpmn.tasklistener.util.RecorderTaskListener" />
+        <camunda:taskListener event="assignment" class="org.camunda.bpm.engine.test.bpmn.tasklistener.util.RecorderTaskListener" />
+        <camunda:taskListener event="complete" class="org.camunda.bpm.engine.test.bpmn.tasklistener.util.RecorderTaskListener" />
+        <camunda:taskListener event="delete" class="org.camunda.bpm.engine.test.bpmn.tasklistener.util.RecorderTaskListener" />
       </extensionElements>
     </userTask>
     <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theEnd" />

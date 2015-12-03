@@ -6,7 +6,7 @@
 
   <process id="asyncListenerSubProcess">
     <extensionElements>
-      <camunda:executionListener event="end" class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener" />
+      <camunda:executionListener event="end" class="org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener" />
     </extensionElements>
   
     <startEvent id="start" />
@@ -14,14 +14,14 @@
     
     <subProcess id="subProcess">
       <extensionElements>
-        <camunda:executionListener event="end" class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener" />
+        <camunda:executionListener event="end" class="org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener" />
       </extensionElements>
       
       <startEvent id="subProcessStart" />
       <sequenceFlow id="flow2" sourceRef="subProcessStart" targetRef="subProcessTask" />
       <userTask id="subProcessTask" camunda:asyncBefore="true">
         <extensionElements>
-          <camunda:executionListener event="end" class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener" />
+          <camunda:executionListener event="end" class="org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener" />
         </extensionElements>
       </userTask>
       <sequenceFlow id="flow3" sourceRef="subProcessTask" targetRef="subProcessEnd" />

@@ -10,7 +10,7 @@
     
     <userTask id="theTask" camunda:asyncBefore="true">
       <extensionElements>
-        <camunda:executionListener event="end" class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener" />
+        <camunda:executionListener event="end" class="org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener" />
       </extensionElements>
     </userTask>
     

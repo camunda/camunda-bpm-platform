@@ -23,8 +23,11 @@ import java.util.Map;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.repository.CaseDefinition;
+import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseExecutionCommandBuilder;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
+import org.camunda.bpm.engine.runtime.CaseInstance;
 import org.camunda.bpm.engine.runtime.CaseInstanceQuery;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.test.Deployment;
@@ -2318,4 +2321,167 @@ public class CaseServiceTest extends PluggableProcessEngineTestCase {
     assertEquals("aThirdVariable", variable.getName());
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/cmmn/loan-application.cmmn")
+  public void testCreateCaseInstanceById() {
+    // given
+    // there exists a deployment containing a case definition with key "loanApplication"
+
+    CaseDefinition caseDefinition = repositoryService
+      .createCaseDefinitionQuery()
+      .caseDefinitionKey("loanApplication")
+      .singleResult();
+
+    assertNotNull(caseDefinition);
+
+    // when
+    // create a new case instance by id
+
+    CaseInstance caseInstance = caseService
+      .withCaseDefinition(caseDefinition.getId())
+      .create();
+
+    // then
+    // the returned caseInstance is not null
+
+    assertNotNull(caseInstance);
+
+    // verify that the case instance is persisted using the API
+
+    CaseInstance instance = caseService
+      .createCaseInstanceQuery()
+      .caseInstanceId(caseInstance.getId())
+      .singleResult();
+
+    assertNotNull(instance);
+
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/cmmn/loan-application.cmmn")
+  public void testCreateCaseInstanceByKey() {
+    // given
+    // there exists a deployment containing a case definition with key "loanApplication"
+
+    CaseDefinition caseDefinition = repositoryService
+      .createCaseDefinitionQuery()
+      .caseDefinitionKey("loanApplication")
+      .singleResult();
+
+    assertNotNull(caseDefinition);
+
+    // when
+    // create a new case instance by key
+
+    CaseInstance caseInstance = caseService
+      .withCaseDefinitionByKey(caseDefinition.getKey())
+      .create();
+
+    // then
+    // the returned caseInstance is not null
+
+    assertNotNull(caseInstance);
+
+    // verify that the case instance is persisted using the API
+
+    CaseInstance instance = caseService
+      .createCaseInstanceQuery()
+      .caseInstanceId(caseInstance.getId())
+      .singleResult();
+
+    assertNotNull(instance);
+
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/cmmn/loan-application.cmmn")
+  public void testCaseExecutionQuery() {
+    // given
+    // there exists a deployment containing a case definition with key "loanApplication"
+
+    CaseDefinition caseDefinition = repositoryService
+      .createCaseDefinitionQuery()
+      .caseDefinitionKey("loanApplication")
+      .singleResult();
+
+    assertNotNull(caseDefinition);
+
+    // when
+    // create a new case instance by key
+
+    CaseInstance caseInstance = caseService
+      .withCaseDefinitionByKey(caseDefinition.getKey())
+      .create();
+
+    // then
+    // the returned caseInstance is not null
+
+    assertNotNull(caseInstance);
+
+    // verify that there are three case execution:
+    // - the case instance itself (ie. for the casePlanModel)
+    // - a case execution for the stage
+    // - a case execution for the humanTask
+
+    List<CaseExecution> caseExecutions = caseService
+        .createCaseExecutionQuery()
+        .caseInstanceId(caseInstance.getId())
+        .list();
+
+    assertEquals(3, caseExecutions.size());
+
+    CaseExecution casePlanModelExecution = caseService
+        .createCaseExecutionQuery()
+        .activityId("CasePlanModel_1")
+        .singleResult();
+
+    assertNotNull(casePlanModelExecution);
+
+    CaseExecution stageExecution = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_Stage_1")
+        .singleResult();
+
+    assertNotNull(stageExecution);
+
+    CaseExecution humanTaskExecution = caseService
+        .createCaseExecutionQuery()
+        .activityId("PI_HumanTask_6")
+        .singleResult();
+
+    assertNotNull(humanTaskExecution);
+
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/cmmn/loan-application.cmmn")
+  public void testCaseInstanceQuery() {
+    // given
+    // there exists a deployment containing a case definition with key "loanApplication"
+
+    CaseDefinition caseDefinition = repositoryService
+      .createCaseDefinitionQuery()
+      .caseDefinitionKey("loanApplication")
+      .singleResult();
+
+    assertNotNull(caseDefinition);
+
+    // when
+    // create a new case instance by key
+
+    CaseInstance caseInstance = caseService
+      .withCaseDefinitionByKey(caseDefinition.getKey())
+      .create();
+
+    // then
+    // the returned caseInstance is not null
+
+    assertNotNull(caseInstance);
+
+    // verify that there is one caseInstance
+
+    // only select ACTIVE case instances
+    List<CaseInstance> caseInstances = caseService
+        .createCaseInstanceQuery()
+        .active()
+        .list();
+
+    assertEquals(1, caseInstances.size());
+  }
 }

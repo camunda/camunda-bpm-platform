@@ -43,6 +43,24 @@ public class ConditionalSequenceFlowTest extends PluggableProcessEngineTestCase 
     assertEquals("task right", task.getName());
   }
 
+  @Deployment
+  public void testValueAndMethodExpression() {
+    // An order of price 150 is a standard order (goes through an UEL value expression)
+    ConditionalSequenceFlowTestOrder order = new ConditionalSequenceFlowTestOrder(150);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("uelExpressions",
+            CollectionUtil.singletonMap("order",  order));
+    Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals("Standard service", task.getName());
+
+    // While an order of 300, gives us a premium service (goes through an UEL method expression)
+    order = new ConditionalSequenceFlowTestOrder(300);
+    processInstance = runtimeService.startProcessInstanceByKey("uelExpressions",
+            CollectionUtil.singletonMap("order",  order));
+    task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertEquals("Premium service", task.getName());
+
+  }
+
   /**
    * Test that Conditional Sequence Flows throw an exception, if no condition
    * evaluates to true.

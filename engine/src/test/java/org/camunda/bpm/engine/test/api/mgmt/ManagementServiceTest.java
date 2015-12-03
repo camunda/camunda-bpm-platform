@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.test.api.mgmt;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -37,10 +39,12 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.TableMetaData;
+import org.camunda.bpm.engine.management.TablePage;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Assert;
 
@@ -638,6 +642,122 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     managementService.setJobPriority(job.getId(), Long.MIN_VALUE + 1); // +1 for informix
     job = managementService.createJobQuery().singleResult();
     assertEquals(Long.MIN_VALUE + 1, job.getPriority());
+  }
+
+  public void testTableCount() {
+    Map<String, Long> tableCount = managementService.getTableCount();
+
+    String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
+    assertEquals(new Long(5), tableCount.get(tablePrefix+"ACT_GE_PROPERTY"));
+    assertEquals(new Long(0), tableCount.get(tablePrefix+"ACT_GE_BYTEARRAY"));
+    assertEquals(new Long(0), tableCount.get(tablePrefix+"ACT_RE_DEPLOYMENT"));
+    assertEquals(new Long(0), tableCount.get(tablePrefix+"ACT_RU_EXECUTION"));
+    assertEquals(new Long(0), tableCount.get(tablePrefix+"ACT_ID_GROUP"));
+    assertEquals(new Long(0), tableCount.get(tablePrefix+"ACT_ID_MEMBERSHIP"));
+    assertEquals(new Long(0), tableCount.get(tablePrefix+"ACT_ID_USER"));
+    assertEquals(new Long(0), tableCount.get(tablePrefix+"ACT_RE_PROCDEF"));
+    assertEquals(new Long(0), tableCount.get(tablePrefix+"ACT_RU_TASK"));
+    assertEquals(new Long(0), tableCount.get(tablePrefix+"ACT_RU_IDENTITYLINK"));
+  }
+
+  public void testGetTableMetaData() {
+
+    String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
+
+    TableMetaData tableMetaData = managementService.getTableMetaData(tablePrefix+"ACT_RU_TASK");
+    assertEquals(tableMetaData.getColumnNames().size(), tableMetaData.getColumnTypes().size());
+    assertEquals(20, tableMetaData.getColumnNames().size());
+
+    int assigneeIndex = tableMetaData.getColumnNames().indexOf("ASSIGNEE_");
+    int createTimeIndex = tableMetaData.getColumnNames().indexOf("CREATE_TIME_");
+
+    assertTrue(assigneeIndex >= 0);
+    assertTrue(createTimeIndex >= 0);
+
+    assertOneOf(new String [] {"VARCHAR", "NVARCHAR2", "nvarchar", "NVARCHAR"}, tableMetaData.getColumnTypes().get(assigneeIndex));
+    assertOneOf(new String [] {"TIMESTAMP", "TIMESTAMP(6)", "datetime", "DATETIME", "DATETIME2"}, tableMetaData.getColumnTypes().get(createTimeIndex));
+  }
+
+  private void assertOneOf(String[] possibleValues, String currentValue) {
+    for(String value : possibleValues) {
+      if(currentValue.equals(value)) {
+        return;
+      }
+    }
+    fail("Value '" + currentValue + "' should be one of: " + Arrays.deepToString(possibleValues));
+  }
+
+  public void testGetTablePage() {
+    String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
+    List<String> taskIds = generateDummyTasks(20);
+
+    TablePage tablePage = managementService.createTablePageQuery()
+      .tableName(tablePrefix+"ACT_RU_TASK")
+      .listPage(0, 5);
+
+    assertEquals(0, tablePage.getFirstResult());
+    assertEquals(5, tablePage.getSize());
+    assertEquals(5, tablePage.getRows().size());
+    assertEquals(20, tablePage.getTotal());
+
+    tablePage = managementService.createTablePageQuery()
+      .tableName(tablePrefix+"ACT_RU_TASK")
+      .listPage(14, 10);
+
+    assertEquals(14, tablePage.getFirstResult());
+    assertEquals(6, tablePage.getSize());
+    assertEquals(6, tablePage.getRows().size());
+    assertEquals(20, tablePage.getTotal());
+
+    taskService.deleteTasks(taskIds, true);
+  }
+
+  public void testGetSortedTablePage() {
+    String tablePrefix = processEngineConfiguration.getDatabaseTablePrefix();
+    List<String> taskIds = generateDummyTasks(15);
+
+    // With an ascending sort
+    TablePage tablePage = managementService.createTablePageQuery()
+      .tableName(tablePrefix+"ACT_RU_TASK")
+      .orderAsc("NAME_")
+      .listPage(1, 7);
+    String[] expectedTaskNames = new String[] {"B", "C", "D", "E", "F", "G", "H"};
+    verifyTaskNames(expectedTaskNames, tablePage.getRows());
+
+    // With a descending sort
+    tablePage = managementService.createTablePageQuery()
+      .tableName(tablePrefix+"ACT_RU_TASK")
+      .orderDesc("NAME_")
+      .listPage(6, 8);
+    expectedTaskNames = new String[] {"I", "H", "G", "F", "E", "D", "C", "B"} ;
+    verifyTaskNames(expectedTaskNames, tablePage.getRows());
+
+    taskService.deleteTasks(taskIds, true);
+  }
+
+  private void verifyTaskNames(String[] expectedTaskNames, List<Map<String, Object>> rowData) {
+    assertEquals(expectedTaskNames.length, rowData.size());
+    String columnKey = "NAME_";
+
+    // mybatis will return the correct case for postgres table columns from version 3.0.6 on
+    if (processEngineConfiguration.getDatabaseType().equals("postgres")) {
+      columnKey = "name_";
+    }
+
+    for (int i=0; i < expectedTaskNames.length; i++) {
+      assertEquals(expectedTaskNames[i], rowData.get(i).get(columnKey));
+    }
+  }
+
+  private List<String> generateDummyTasks(int nrOfTasks) {
+    ArrayList<String> taskIds = new ArrayList<String>();
+    for (int i = 0; i < nrOfTasks; i++) {
+      Task task = taskService.newTask();
+      task.setName(((char)('A' + i)) + "");
+      taskService.saveTask(task);
+      taskIds.add(task.getId());
+    }
+    return taskIds;
   }
 
 }

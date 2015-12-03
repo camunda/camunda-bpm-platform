@@ -15,6 +15,8 @@ package org.camunda.bpm.engine.test.api.runtime;
 
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
+import static org.camunda.bpm.engine.variable.Variables.createVariables;
+import static org.camunda.bpm.engine.variable.Variables.objectValue;
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -24,9 +26,12 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertThat;
 
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -34,8 +39,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.ProcessEngines;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.exception.NullValueException;
@@ -43,6 +51,9 @@ import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -54,11 +65,14 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.TransitionInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
+import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener;
-import org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
-import org.camunda.bpm.engine.test.examples.bpmn.tasklistener.RecorderTaskListener;
+import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener;
+import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
+import org.camunda.bpm.engine.test.bpmn.tasklistener.util.RecorderTaskListener;
+import org.camunda.bpm.engine.test.api.runtime.util.SimpleSerializableBean;
+import org.camunda.bpm.engine.test.history.SerializableVariable;
 import org.camunda.bpm.engine.test.util.TestExecutionListener;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
@@ -1840,5 +1854,409 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     assertNotNull(task);
     assertNotNull(task.getActivityType());
     assertEquals("startEvent", task.getActivityType());
+  }
+
+  //Test for a bug: when the process engine is rebooted the
+  // cache is cleaned and the deployed process definition is
+  // removed from the process cache. This led to problems because
+  // the id wasnt fetched from the DB after a redeploy.
+  public void testStartProcessInstanceByIdAfterReboot() {
+
+    // In case this test is run in a test suite, previous engines might
+    // have been initialized and cached.  First we close the
+    // existing process engines to make sure that the db is clean
+    // and that there are no existing process engines involved.
+    ProcessEngines.destroy();
+
+    // Creating the DB schema (without building a process engine)
+    ProcessEngineConfigurationImpl processEngineConfiguration = new StandaloneInMemProcessEngineConfiguration();
+    processEngineConfiguration.setProcessEngineName("reboot-test-schema");
+    processEngineConfiguration.setJdbcUrl("jdbc:h2:mem:activiti-reboot-test;DB_CLOSE_DELAY=1000");
+    ProcessEngine schemaProcessEngine = processEngineConfiguration.buildProcessEngine();
+
+    // Create process engine and deploy test process
+    ProcessEngine processEngine = new StandaloneProcessEngineConfiguration()
+      .setProcessEngineName("reboot-test")
+      .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE)
+      .setJdbcUrl("jdbc:h2:mem:activiti-reboot-test;DB_CLOSE_DELAY=1000")
+      .setJobExecutorActivate(false)
+      .buildProcessEngine();
+
+    processEngine.getRepositoryService()
+      .createDeployment()
+      .addClasspathResource("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+      .deploy();
+      // verify existence of process definition
+    List<ProcessDefinition> processDefinitions = processEngine
+      .getRepositoryService()
+      .createProcessDefinitionQuery()
+      .list();
+
+    assertEquals(1, processDefinitions.size());
+
+    // Start a new Process instance
+    ProcessInstance processInstance = processEngine.getRuntimeService().startProcessInstanceById(processDefinitions.get(0).getId());
+    String processInstanceId = processInstance.getId();
+    assertNotNull(processInstance);
+
+    // Close the process engine
+    processEngine.close();
+    assertNotNull(processEngine.getRuntimeService());
+
+    // Reboot the process engine
+    processEngine = new StandaloneProcessEngineConfiguration()
+      .setProcessEngineName("reboot-test")
+      .setDatabaseSchemaUpdate(org.camunda.bpm.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE)
+      .setJdbcUrl("jdbc:h2:mem:activiti-reboot-test;DB_CLOSE_DELAY=1000")
+      .setJobExecutorActivate(false)
+      .buildProcessEngine();
+
+    // Check if the existing process instance is still alive
+    processInstance = processEngine
+      .getRuntimeService()
+      .createProcessInstanceQuery()
+      .processInstanceId(processInstanceId)
+      .singleResult();
+
+    assertNotNull(processInstance);
+
+    // Complete the task.  That will end the process instance
+    TaskService taskService = processEngine.getTaskService();
+    Task task = taskService
+      .createTaskQuery()
+      .list()
+      .get(0);
+    taskService.complete(task.getId());
+
+    // Check if the process instance has really ended.  This means that the process definition has
+    // re-loaded into the process definition cache
+    processInstance = processEngine
+      .getRuntimeService()
+      .createProcessInstanceQuery()
+      .processInstanceId(processInstanceId)
+      .singleResult();
+    assertNull(processInstance);
+
+    // Extra check to see if a new process instance can be started as well
+    processInstance = processEngine.getRuntimeService().startProcessInstanceById(processDefinitions.get(0).getId());
+    assertNotNull(processInstance);
+
+    // close the process engine
+    processEngine.close();
+
+    // Cleanup schema
+    schemaProcessEngine.close();
+  }
+
+  @Deployment
+  public void testVariableScope() {
+
+    // After starting the process, the task in the subprocess should be active
+    Map<String, Object> varMap = new HashMap<String, Object>();
+    varMap.put("test", "test");
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcess", varMap);
+    Task subProcessTask = taskService.createTaskQuery()
+        .processInstanceId(pi.getId())
+        .singleResult();
+    assertEquals("Task in subprocess", subProcessTask.getName());
+
+    // get variables for execution id user task, should return the new value of variable test --> test2
+    assertEquals("test2", runtimeService.getVariable(subProcessTask.getExecutionId(), "test"));
+    assertEquals("test2", runtimeService.getVariables(subProcessTask.getExecutionId()).get("test"));
+
+    // get variables for process instance id, should return the initial value of variable test --> test
+    assertEquals("test", runtimeService.getVariable(pi.getId(), "test"));
+    assertEquals("test", runtimeService.getVariables(pi.getId()).get("test"));
+
+    runtimeService.setVariableLocal(subProcessTask.getExecutionId(), "test", "test3");
+
+    // get variables for execution id user task, should return the new value of variable test --> test3
+    assertEquals("test3", runtimeService.getVariable(subProcessTask.getExecutionId(), "test"));
+    assertEquals("test3", runtimeService.getVariables(subProcessTask.getExecutionId()).get("test"));
+
+    // get variables for process instance id, should still return the initial value of variable test --> test
+    assertEquals("test", runtimeService.getVariable(pi.getId(), "test"));
+    assertEquals("test", runtimeService.getVariables(pi.getId()).get("test"));
+
+    runtimeService.setVariable(pi.getId(), "test", "test4");
+
+    // get variables for execution id user task, should return the old value of variable test --> test3
+    assertEquals("test3", runtimeService.getVariable(subProcessTask.getExecutionId(), "test"));
+    assertEquals("test3", runtimeService.getVariables(subProcessTask.getExecutionId()).get("test"));
+
+    // get variables for process instance id, should also return the initial value of variable test --> test4
+    assertEquals("test4", runtimeService.getVariable(pi.getId(), "test"));
+    assertEquals("test4", runtimeService.getVariables(pi.getId()).get("test"));
+
+    // After completing the task in the subprocess,
+    // the subprocess scope is destroyed and the complete process ends
+    taskService.complete(subProcessTask.getId());
+  }
+
+  @Deployment
+  public void testBasicVariableOperations() {
+
+    Date now = new Date();
+    List<String> serializable = new ArrayList<String>();
+    serializable.add("one");
+    serializable.add("two");
+    serializable.add("three");
+    byte[] bytes = "somebytes".getBytes();
+    byte[] streamBytes = "morebytes".getBytes();
+
+    // Start process instance with different types of variables
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("longVar", 928374L);
+    variables.put("shortVar", (short) 123);
+    variables.put("integerVar", 1234);
+    variables.put("stringVar", "coca-cola");
+    variables.put("dateVar", now);
+    variables.put("nullVar", null);
+    variables.put("serializableVar", serializable);
+    variables.put("bytesVar", bytes);
+    variables.put("byteStreamVar", new ByteArrayInputStream(streamBytes));
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskAssigneeProcess", variables);
+
+    variables = runtimeService.getVariables(processInstance.getId());
+    assertEquals("coca-cola", variables.get("stringVar"));
+    assertEquals(928374L, variables.get("longVar"));
+    assertEquals((short) 123, variables.get("shortVar"));
+    assertEquals(1234, variables.get("integerVar"));
+    assertEquals(now, variables.get("dateVar"));
+    assertEquals(null, variables.get("nullVar"));
+    assertEquals(serializable, variables.get("serializableVar"));
+    assertTrue(Arrays.equals(bytes, (byte[]) variables.get("bytesVar")));
+    assertTrue(Arrays.equals(streamBytes, (byte[]) variables.get("byteStreamVar")));
+    assertEquals(9, variables.size());
+
+    // Set all existing variables values to null
+    runtimeService.setVariable(processInstance.getId(), "longVar", null);
+    runtimeService.setVariable(processInstance.getId(), "shortVar", null);
+    runtimeService.setVariable(processInstance.getId(), "integerVar", null);
+    runtimeService.setVariable(processInstance.getId(), "stringVar", null);
+    runtimeService.setVariable(processInstance.getId(), "dateVar", null);
+    runtimeService.setVariable(processInstance.getId(), "nullVar", null);
+    runtimeService.setVariable(processInstance.getId(), "serializableVar", null);
+    runtimeService.setVariable(processInstance.getId(), "bytesVar", null);
+    runtimeService.setVariable(processInstance.getId(), "byteStreamVar", null);
+
+    variables = runtimeService.getVariables(processInstance.getId());
+    assertEquals(null, variables.get("longVar"));
+    assertEquals(null, variables.get("shortVar"));
+    assertEquals(null, variables.get("integerVar"));
+    assertEquals(null, variables.get("stringVar"));
+    assertEquals(null, variables.get("dateVar"));
+    assertEquals(null, variables.get("nullVar"));
+    assertEquals(null, variables.get("serializableVar"));
+    assertEquals(null, variables.get("bytesVar"));
+    assertEquals(null, variables.get("byteStreamVar"));
+    assertEquals(9, variables.size());
+
+    // Update existing variable values again, and add a new variable
+    runtimeService.setVariable(processInstance.getId(), "new var", "hi");
+    runtimeService.setVariable(processInstance.getId(), "longVar", 9987L);
+    runtimeService.setVariable(processInstance.getId(), "shortVar", (short) 456);
+    runtimeService.setVariable(processInstance.getId(), "integerVar", 4567);
+    runtimeService.setVariable(processInstance.getId(), "stringVar", "colgate");
+    runtimeService.setVariable(processInstance.getId(), "dateVar", now);
+    runtimeService.setVariable(processInstance.getId(), "serializableVar", serializable);
+    runtimeService.setVariable(processInstance.getId(), "bytesVar", bytes);
+    runtimeService.setVariable(processInstance.getId(), "byteStreamVar", new ByteArrayInputStream(streamBytes));
+
+    variables = runtimeService.getVariables(processInstance.getId());
+    assertEquals("hi", variables.get("new var"));
+    assertEquals(9987L, variables.get("longVar"));
+    assertEquals((short)456, variables.get("shortVar"));
+    assertEquals(4567, variables.get("integerVar"));
+    assertEquals("colgate", variables.get("stringVar"));
+    assertEquals(now, variables.get("dateVar"));
+    assertEquals(null, variables.get("nullVar"));
+    assertEquals(serializable, variables.get("serializableVar"));
+    assertTrue(Arrays.equals(bytes, (byte[]) variables.get("bytesVar")));
+    assertTrue(Arrays.equals(streamBytes, (byte[]) variables.get("byteStreamVar")));
+    assertEquals(10, variables.size());
+
+    Collection<String> varFilter = new ArrayList<String>(2);
+    varFilter.add("stringVar");
+    varFilter.add("integerVar");
+
+    Map<String, Object> filteredVariables = runtimeService.getVariables(processInstance.getId(), varFilter);
+    assertEquals(2, filteredVariables.size());
+    assertTrue(filteredVariables.containsKey("stringVar"));
+    assertTrue(filteredVariables.containsKey("integerVar"));
+
+    // Try setting the value of the variable that was initially created with value 'null'
+    runtimeService.setVariable(processInstance.getId(), "nullVar", "a value");
+    Object newValue = runtimeService.getVariable(processInstance.getId(), "nullVar");
+    assertNotNull(newValue);
+    assertEquals("a value", newValue);
+
+    // Try setting the value of the serializableVar to an integer value
+    runtimeService.setVariable(processInstance.getId(), "serializableVar", 100);
+    variables = runtimeService.getVariables(processInstance.getId());
+    assertEquals(100, variables.get("serializableVar"));
+
+    // Try setting the value of the serializableVar back to a serializable value
+    runtimeService.setVariable(processInstance.getId(), "serializableVar", serializable);
+    variables = runtimeService.getVariables(processInstance.getId());
+    assertEquals(serializable, variables.get("serializableVar"));
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testBasicVariableOperations.bpmn20.xml"})
+  public void testOnlyChangeType() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("aVariable", 1234);
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("taskAssigneeProcess", variables);
+
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableName("aVariable");
+
+    VariableInstance variable = query.singleResult();
+    assertEquals(ValueType.INTEGER.getName(), variable.getTypeName());
+
+    runtimeService.setVariable(pi.getId(), "aVariable", 1234L);
+    variable = query.singleResult();
+    assertEquals(ValueType.LONG.getName(), variable.getTypeName());
+
+    runtimeService.setVariable(pi.getId(), "aVariable", (short)1234);
+    variable = query.singleResult();
+    assertEquals(ValueType.SHORT.getName(), variable.getTypeName());
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testBasicVariableOperations.bpmn20.xml"})
+  public void testChangeTypeFromSerializableUsingApi() {
+
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("aVariable", new SerializableVariable("foo"));
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("taskAssigneeProcess", variables);
+
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableName("aVariable");
+
+    VariableInstance variable = query.singleResult();
+    assertEquals(ValueType.OBJECT.getName(), variable.getTypeName());
+
+    runtimeService.setVariable(pi.getId(), "aVariable", null);
+    variable = query.singleResult();
+    assertEquals(ValueType.NULL.getName(), variable.getTypeName());
+
+  }
+
+  @Deployment
+  public void testChangeSerializableInsideEngine() {
+
+    runtimeService.startProcessInstanceByKey("testProcess");
+
+    Task task = taskService.createTaskQuery().singleResult();
+
+    SerializableVariable var = (SerializableVariable) taskService.getVariable(task.getId(), "variableName");
+    assertNotNull(var);
+
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testBasicVariableOperations.bpmn20.xml"})
+  public void testChangeToSerializableUsingApi() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("aVariable", "test");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskAssigneeProcess", variables);
+
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableName("aVariable");
+
+    VariableInstance variable = query.singleResult();
+    assertEquals(ValueType.STRING.getName(), variable.getTypeName());
+
+    runtimeService.setVariable(processInstance.getId(), "aVariable", new SerializableVariable("foo"));
+    variable = query.singleResult();
+    assertEquals(ValueType.OBJECT.getName(), variable.getTypeName());
+
+  }
+
+  @Deployment
+  public void testGetVariableInstancesFromVariableScope() {
+
+    VariableMap variables = createVariables()
+      .putValue("anIntegerVariable", 1234)
+      .putValue("anObjectValue", objectValue(new SimpleSerializableBean(10)).serializationDataFormat(Variables.SerializationDataFormats.JAVA))
+      .putValue("anUntypedObjectValue", new SimpleSerializableBean(30));
+
+    runtimeService.startProcessInstanceByKey("testProcess", variables);
+
+    // assertions are part of the java delegate AssertVariableInstancesDelegate
+    // only there we can access the VariableScope methods
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testSetVariableInScope.bpmn20.xml")
+  public void testSetVariableInScopeExplicitUpdate() {
+    // when a process instance is started and the task after the subprocess reached
+    runtimeService.startProcessInstanceByKey("testProcess",
+        Collections.<String, Object>singletonMap("shouldExplicitlyUpdateVariable", true));
+
+    // then there should be only the "shouldExplicitlyUpdateVariable" variable
+    VariableInstance variableInstance = runtimeService.createVariableInstanceQuery().singleResult();
+    assertNotNull(variableInstance);
+    assertEquals("shouldExplicitlyUpdateVariable", variableInstance.getName());
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testSetVariableInScope.bpmn20.xml")
+  public void testSetVariableInScopeImplicitUpdate() {
+    // when a process instance is started and the task after the subprocess reached
+    runtimeService.startProcessInstanceByKey("testProcess",
+        Collections.<String, Object>singletonMap("shouldExplicitlyUpdateVariable", true));
+
+    // then there should be only the "shouldExplicitlyUpdateVariable" variable
+    VariableInstance variableInstance = runtimeService.createVariableInstanceQuery().singleResult();
+    assertNotNull(variableInstance);
+    assertEquals("shouldExplicitlyUpdateVariable", variableInstance.getName());
+  }
+
+  @Deployment
+  public void testUpdateVariableInProcessWithoutWaitstate() {
+    // when a process instance is started
+    runtimeService.startProcessInstanceByKey("oneScriptTaskProcess",
+        Collections.<String, Object>singletonMap("var", new SimpleSerializableBean(10)));
+
+    // then it should succeeds successfully
+    ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
+    assertNull(processInstance);
+  }
+
+  @Deployment
+  public void testSetUpdateAndDeleteComplexVariable() {
+    // when a process instance is started
+    runtimeService.startProcessInstanceByKey("oneUserTaskProcess",
+        Collections.<String, Object>singletonMap("var", new SimpleSerializableBean(10)));
+
+    // then it should wait at the user task
+    ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
+    assertNotNull(processInstance);
+  }
+
+  @Deployment
+  public void testRollback() {
+    try {
+      runtimeService.startProcessInstanceByKey("RollbackProcess");
+
+      fail("Starting the process instance should throw an exception");
+
+    } catch (Exception e) {
+      assertEquals("Buzzz", e.getMessage());
+    }
+
+    assertEquals(0, runtimeService.createExecutionQuery().count());
+  }
+
+  @Deployment(resources = {
+      "org/camunda/bpm/engine/test/api/runtime/trivial.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/runtime/rollbackAfterSubProcess.bpmn20.xml"})
+  public void testRollbackAfterSubProcess() {
+    try {
+      runtimeService.startProcessInstanceByKey("RollbackAfterSubProcess");
+
+      fail("Starting the process instance should throw an exception");
+
+    } catch (Exception e) {
+      assertEquals("Buzzz", e.getMessage());
+    }
+
+    assertEquals(0, runtimeService.createExecutionQuery().count());
+
   }
 }

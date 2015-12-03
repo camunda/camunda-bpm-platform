@@ -14,7 +14,7 @@
       <sequenceFlow sourceRef="innerStart" targetRef="theTask" />
       <userTask id="theTask" name="my task">
         <extensionElements>
-          <camunda:taskListener event="delete" class="org.camunda.bpm.engine.test.examples.bpmn.tasklistener.RecorderTaskListener"/>
+          <camunda:taskListener event="delete" class="org.camunda.bpm.engine.test.bpmn.tasklistener.util.RecorderTaskListener"/>
         </extensionElements>
       </userTask>
     </subProcess>

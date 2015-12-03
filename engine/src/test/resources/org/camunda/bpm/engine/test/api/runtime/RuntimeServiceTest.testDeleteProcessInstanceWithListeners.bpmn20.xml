@@ -6,8 +6,8 @@
 
   <process id="nestedParallelGatewayScopeTasks">
     <extensionElements>
-      <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener"/>
-      <camunda:executionListener event="end" class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener"/>
+      <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener"/>
+      <camunda:executionListener event="end" class="org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener"/>
     </extensionElements>
   
     <startEvent id="theStart" />
@@ -17,8 +17,8 @@
     <sequenceFlow id="flow2" sourceRef="fork" targetRef="outerTask" />
     <userTask id="outerTask">
       <extensionElements>
-        <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener"/>
-        <camunda:executionListener event="end" class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener"/>
+        <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener"/>
+        <camunda:executionListener event="end" class="org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener"/>
       </extensionElements>
     </userTask>    
     <sequenceFlow id="flow3" sourceRef="outerTask" targetRef="outerEnd" />
@@ -27,8 +27,8 @@
     
     <subProcess id="subProcess">
       <extensionElements>
-        <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener"/>
-        <camunda:executionListener event="end" class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener"/>
+        <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener"/>
+        <camunda:executionListener event="end" class="org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener"/>
       </extensionElements>
       <startEvent id="subProcessStart" />
       <sequenceFlow id="flow5" sourceRef="subProcessStart" targetRef="innerFork" />
@@ -36,8 +36,8 @@
       <sequenceFlow id="flow6" sourceRef="innerFork" targetRef="innerTask1" />
       <userTask id="innerTask1">
         <extensionElements>
-          <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener"/>
-          <camunda:executionListener event="end" class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener"/>
+          <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener"/>
+          <camunda:executionListener event="end" class="org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener"/>
         </extensionElements>
       </userTask>
       <sequenceFlow id="flow7" sourceRef="innerTask1" targetRef="subProcessEnd1" />
@@ -46,8 +46,8 @@
       <sequenceFlow id="flow8" sourceRef="innerFork" targetRef="innerTask2" />
       <userTask id="innerTask2">
         <extensionElements>
-          <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener"/>
-          <camunda:executionListener event="end" class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener"/>
+          <camunda:executionListener event="start" class="org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener"/>
+          <camunda:executionListener event="end" class="org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener"/>
         </extensionElements>
       </userTask>
       <sequenceFlow id="flow9" sourceRef="innerTask2" targetRef="subProcessEnd2" />

@@ -44,6 +44,20 @@ import org.camunda.bpm.engine.variable.Variables;
  */
 public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
 
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+
+    // Normally the UI will do this automatically for us
+    identityService.setAuthenticatedUserId("kermit");
+  }
+
+  @Override
+  protected void tearDown() throws Exception {
+    identityService.clearAuthentication();
+    super.tearDown();
+  }
+
   @Deployment
   public void testCatchErrorOnEmbeddedSubprocess() {
     runtimeService.startProcessInstanceByKey("boundaryErrorOnEmbeddedSubprocess");
@@ -352,7 +366,7 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
 
     assertProcessEnded(procId);
   }
-  
+
   @Deployment
   public void testCatchErrorThrownBySignallableActivityBehaviour() {
     String procId = runtimeService.startProcessInstanceByKey("catchErrorThrownBySignallableActivityBehaviour").getId();
@@ -885,5 +899,46 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
     //the code we gave the thrown error
     Object errorCode = "errorCode";
     checkErrorCodeVariable(variableName, errorCode);
+  }
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/error/reviewSalesLead.bpmn20.xml"})
+  public void testReviewSalesLeadProcess() {
+
+    // After starting the process, a task should be assigned to the 'initiator' (normally set by GUI)
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("details", "very interesting");
+    variables.put("customerName", "Alfresco");
+    String procId = runtimeService.startProcessInstanceByKey("reviewSaledLead", variables).getId();
+    Task task = taskService.createTaskQuery().taskAssignee("kermit").singleResult();
+    assertEquals("Provide new sales lead", task.getName());
+
+    // After completing the task, the review subprocess will be active
+    taskService.complete(task.getId());
+    Task ratingTask = taskService.createTaskQuery().taskCandidateGroup("accountancy").singleResult();
+    assertEquals("Review customer rating", ratingTask.getName());
+    Task profitabilityTask = taskService.createTaskQuery().taskCandidateGroup("management").singleResult();
+    assertEquals("Review profitability", profitabilityTask.getName());
+
+    // Complete the management task by stating that not enough info was provided
+    // This should throw the error event, which closes the subprocess
+    variables = new HashMap<String, Object>();
+    variables.put("notEnoughInformation", true);
+    taskService.complete(profitabilityTask.getId(), variables);
+
+    // The 'provide additional details' task should now be active
+    Task provideDetailsTask = taskService.createTaskQuery().taskAssignee("kermit").singleResult();
+    assertEquals("Provide additional details", provideDetailsTask.getName());
+
+    // Providing more details (ie. completing the task), will activate the subprocess again
+    taskService.complete(provideDetailsTask.getId());
+    List<Task> reviewTasks = taskService.createTaskQuery().orderByTaskName().asc().list();
+    assertEquals("Review customer rating", reviewTasks.get(0).getName());
+    assertEquals("Review profitability", reviewTasks.get(1).getName());
+
+    // Completing both tasks normally ends the process
+    taskService.complete(reviewTasks.get(0).getId());
+    variables.put("notEnoughInformation", false);
+    taskService.complete(reviewTasks.get(1).getId(), variables);
+    assertProcessEnded(procId);
   }
 }

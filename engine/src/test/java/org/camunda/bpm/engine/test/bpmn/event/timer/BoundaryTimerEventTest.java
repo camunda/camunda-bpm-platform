@@ -188,4 +188,23 @@ public class BoundaryTimerEventTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(pi.getId());
   }
 
+  @Deployment
+  public void testInterruptingTimerDuration() {
+
+    // Start process instance
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("escalationExample");
+
+    // There should be one task, with a timer : first line support
+    Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+    assertEquals("First line support", task.getName());
+
+    // Manually execute the job
+    Job timer = managementService.createJobQuery().singleResult();
+    managementService.executeJob(timer.getId());
+
+    // The timer has fired, and the second task (secondlinesupport) now exists
+    task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+    assertEquals("Handle escalated issue", task.getName());
+  }
+
 }

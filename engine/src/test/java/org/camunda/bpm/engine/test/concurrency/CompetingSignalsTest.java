@@ -15,10 +15,6 @@ package org.camunda.bpm.engine.test.concurrency;
 
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
-import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
-import org.camunda.bpm.engine.impl.interceptor.RetryInterceptor;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -91,37 +87,4 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     assertTextPresent("was updated by another transaction concurrently", threadTwo.exception.getMessage());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/concurrency/CompetingSignalsTest.testCompetingSignals.bpmn20.xml"})
-  public void testCompetingSignalsWithRetry() throws Exception {
-    RuntimeServiceImpl runtimeServiceImpl = (RuntimeServiceImpl)runtimeService;
-    CommandExecutor before = runtimeServiceImpl.getCommandExecutor();
-    try {
-      CommandInterceptor retryInterceptor = new RetryInterceptor();
-      retryInterceptor.setNext(before);
-      runtimeServiceImpl.setCommandExecutor(retryInterceptor);
-
-      ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("CompetingSignalsProcess");
-      String processInstanceId = processInstance.getId();
-
-      LOG.debug("test thread starts thread one");
-      SignalThread threadOne = new SignalThread(processInstanceId);
-      threadOne.startAndWaitUntilControlIsReturned();
-
-      LOG.debug("test thread continues to start thread two");
-      SignalThread threadTwo = new SignalThread(processInstanceId);
-      threadTwo.startAndWaitUntilControlIsReturned();
-
-      LOG.debug("test thread notifies thread 1");
-      threadOne.proceedAndWaitTillDone();
-      assertNull(threadOne.exception);
-
-      LOG.debug("test thread notifies thread 2");
-      threadTwo.proceedAndWaitTillDone();
-      assertNull(threadTwo.exception);
-    } finally {
-      // reset the command executor
-      runtimeServiceImpl.setCommandExecutor(before);
-    }
-
-  }
 }

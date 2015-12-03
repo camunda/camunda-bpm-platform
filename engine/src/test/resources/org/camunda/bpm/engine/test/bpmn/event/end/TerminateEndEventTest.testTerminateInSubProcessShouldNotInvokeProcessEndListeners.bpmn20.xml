@@ -3,7 +3,7 @@
   <process id="terminateEndEventExample">
     <extensionElements>
       <camunda:executionListener 
-        class="org.camunda.bpm.engine.test.examples.bpmn.executionlistener.RecorderExecutionListener" 
+        class="org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener" 
         event="end" />
     </extensionElements>
   

@@ -54,7 +54,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/db/processOne.bpmn20.xml"})
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/processOne.bpmn20.xml"})
   public void testProcessDefinitionActiveByDefault() {
 
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -63,7 +63,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/db/processOne.bpmn20.xml"})
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/processOne.bpmn20.xml"})
   public void testSuspendActivateProcessDefinitionById() {
 
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -80,7 +80,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     assertFalse(processDefinition.isSuspended());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/db/processOne.bpmn20.xml"})
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/processOne.bpmn20.xml"})
   public void testSuspendActivateProcessDefinitionByKey() {
 
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -97,7 +97,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     assertFalse(processDefinition.isSuspended());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/db/processOne.bpmn20.xml"})
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/processOne.bpmn20.xml"})
   public void testActivateAlreadyActiveProcessDefinition() {
 
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -113,7 +113,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
 
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/db/processOne.bpmn20.xml"})
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/processOne.bpmn20.xml"})
   public void testSuspendAlreadySuspendedProcessDefinition() {
 
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -132,8 +132,8 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources={
-          "org/camunda/bpm/engine/test/db/processOne.bpmn20.xml",
-          "org/camunda/bpm/engine/test/db/processTwo.bpmn20.xml"
+          "org/camunda/bpm/engine/test/api/repository/processOne.bpmn20.xml",
+          "org/camunda/bpm/engine/test/api/repository/processTwo.bpmn20.xml"
           })
   public void testQueryForActiveDefinitions() {
 
@@ -152,8 +152,8 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
   }
 
   @Deployment(resources={
-          "org/camunda/bpm/engine/test/db/processOne.bpmn20.xml",
-          "org/camunda/bpm/engine/test/db/processTwo.bpmn20.xml"
+          "org/camunda/bpm/engine/test/api/repository/processOne.bpmn20.xml",
+          "org/camunda/bpm/engine/test/api/repository/processTwo.bpmn20.xml"
           })
   public void testQueryForSuspendedDefinitions() {
 
@@ -171,7 +171,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     assertEquals(1, repositoryService.createProcessDefinitionQuery().suspended().count());
   }
 
-  @Deployment(resources={"org/camunda/bpm/engine/test/db/processOne.bpmn20.xml"})
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/repository/processOne.bpmn20.xml"})
   public void testStartProcessInstanceForSuspendedProcessDefinition() {
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
     repositoryService.suspendProcessDefinitionById(processDefinition.getId());

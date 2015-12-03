@@ -1467,8 +1467,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={
-      "org/camunda/bpm/engine/test/examples/bpmn/callactivity/orderProcess.bpmn20.xml",
-      "org/camunda/bpm/engine/test/examples/bpmn/callactivity/checkCreditProcess.bpmn20.xml"
+      "org/camunda/bpm/engine/test/bpmn/callactivity/orderProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/bpmn/callactivity/checkCreditProcess.bpmn20.xml"
     })
     public void testOrderProcessWithCallActivity() {
       // After the process has started, the 'verify credit history' task should be active
