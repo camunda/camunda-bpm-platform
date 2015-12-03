@@ -272,6 +272,11 @@ alter table ACT_RE_PROCDEF
     unique (KEY_,VERSION_);
     
 alter table ACT_RU_EXECUTION
+    add constraint ACT_FK_EXE_PROCINST
+    foreign key (PROC_INST_ID_)
+    references ACT_RU_EXECUTION (ID_);    
+    
+alter table ACT_RU_EXECUTION
     add constraint ACT_FK_EXE_PARENT 
     foreign key (PARENT_ID_) 
     references ACT_RU_EXECUTION (ID_);

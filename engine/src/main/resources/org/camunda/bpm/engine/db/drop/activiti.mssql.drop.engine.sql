@@ -47,6 +47,9 @@ alter table ACT_GE_BYTEARRAY
     drop constraint ACT_FK_BYTEARR_DEPL;
 
 alter table ACT_RU_EXECUTION 
+    drop constraint ACT_FK_EXE_PROCINST;    
+    
+alter table ACT_RU_EXECUTION 
     drop constraint ACT_FK_EXE_PROCDEF;
 	
 alter table ACT_RU_EXECUTION 
