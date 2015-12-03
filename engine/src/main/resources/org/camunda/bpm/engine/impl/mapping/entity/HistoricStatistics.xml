@@ -65,8 +65,6 @@
           </if>
           )
 
-          <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
-
         ) ACTIVITY
 
         left outer join

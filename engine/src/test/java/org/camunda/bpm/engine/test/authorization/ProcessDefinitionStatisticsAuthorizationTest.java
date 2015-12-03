@@ -112,9 +112,11 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     // then
     assertEquals(2, statistics.size());
 
-    for (ProcessDefinitionStatistics result : statistics) {
-      verifyStatisticsResult(result, 0, 0, 0);
-    }
+    ProcessDefinitionStatistics oneTaskProcessStatistics = getStatisticsByKey(statistics, ONE_TASK_PROCESS_KEY);
+    verifyStatisticsResult(oneTaskProcessStatistics, 2, 0, 0);
+
+    ProcessDefinitionStatistics oneIncidentProcessStatistics = getStatisticsByKey(statistics, ONE_INCIDENT_PROCESS_KEY);
+    verifyStatisticsResult(oneIncidentProcessStatistics, 3, 0, 0);
   }
 
   public void testQueryIncludingInstancesWithReadPermissionOnFirstProcessInstance() {
@@ -136,10 +138,10 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     assertEquals(2, statistics.size());
 
     ProcessDefinitionStatistics oneTaskProcessStatistics = getStatisticsByKey(statistics, ONE_TASK_PROCESS_KEY);
-    verifyStatisticsResult(oneTaskProcessStatistics, 1, 0, 0);
+    verifyStatisticsResult(oneTaskProcessStatistics, 2, 0, 0);
 
     ProcessDefinitionStatistics oneIncidentProcessStatistics = getStatisticsByKey(statistics, ONE_INCIDENT_PROCESS_KEY);
-    verifyStatisticsResult(oneIncidentProcessStatistics, 0, 0, 0);
+    verifyStatisticsResult(oneIncidentProcessStatistics, 3, 0, 0);
   }
 
   public void testQueryIncludingInstancesWithReadPermissionOnAnyProcessInstance() {
@@ -189,7 +191,7 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     verifyStatisticsResult(oneTaskProcessStatistics, 2, 0, 0);
 
     ProcessDefinitionStatistics oneIncidentProcessStatistics = getStatisticsByKey(statistics, ONE_INCIDENT_PROCESS_KEY);
-    verifyStatisticsResult(oneIncidentProcessStatistics, 0, 0, 0);
+    verifyStatisticsResult(oneIncidentProcessStatistics, 3, 0, 0);
   }
 
   public void testQueryIncludingInstancesWithReadInstancePermissionOnAnyProcessDefinition() {
@@ -238,9 +240,11 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     // then
     assertEquals(2, statistics.size());
 
-    for (ProcessDefinitionStatistics result : statistics) {
-      verifyStatisticsResult(result, 0, 0, 0);
-    }
+    ProcessDefinitionStatistics oneTaskProcessStatistics = getStatisticsByKey(statistics, ONE_TASK_PROCESS_KEY);
+    verifyStatisticsResult(oneTaskProcessStatistics, 2, 0, 0);
+
+    ProcessDefinitionStatistics oneIncidentProcessStatistics = getStatisticsByKey(statistics, ONE_INCIDENT_PROCESS_KEY);
+    verifyStatisticsResult(oneIncidentProcessStatistics, 3, 3, 0);
   }
 
   public void testQueryIncludingFailedJobsWithReadPermissionOnFirstProcessInstance() {
@@ -265,10 +269,10 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     assertEquals(2, statistics.size());
 
     ProcessDefinitionStatistics oneTaskProcessStatistics = getStatisticsByKey(statistics, ONE_TASK_PROCESS_KEY);
-    verifyStatisticsResult(oneTaskProcessStatistics, 0, 0, 0);
+    verifyStatisticsResult(oneTaskProcessStatistics, 2, 0, 0);
 
     ProcessDefinitionStatistics oneIncidentProcessStatistics = getStatisticsByKey(statistics, ONE_INCIDENT_PROCESS_KEY);
-    verifyStatisticsResult(oneIncidentProcessStatistics, 1, 1, 0);
+    verifyStatisticsResult(oneIncidentProcessStatistics, 3, 3, 0);
   }
 
   public void testQueryIncludingFailedJobsWithReadPermissionOnAnyProcessInstance() {
@@ -321,7 +325,7 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     assertEquals(2, statistics.size());
 
     ProcessDefinitionStatistics oneTaskProcessStatistics = getStatisticsByKey(statistics, ONE_TASK_PROCESS_KEY);
-    verifyStatisticsResult(oneTaskProcessStatistics, 0, 0, 0);
+    verifyStatisticsResult(oneTaskProcessStatistics, 2, 0, 0);
 
     ProcessDefinitionStatistics oneIncidentProcessStatistics = getStatisticsByKey(statistics, ONE_INCIDENT_PROCESS_KEY);
     verifyStatisticsResult(oneIncidentProcessStatistics, 3, 3, 0);
@@ -376,9 +380,11 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     // then
     assertEquals(2, statistics.size());
 
-    for (ProcessDefinitionStatistics result : statistics) {
-      verifyStatisticsResult(result, 0, 0, 0);
-    }
+    ProcessDefinitionStatistics oneTaskProcessStatistics = getStatisticsByKey(statistics, ONE_TASK_PROCESS_KEY);
+    verifyStatisticsResult(oneTaskProcessStatistics, 2, 0, 0);
+
+    ProcessDefinitionStatistics oneIncidentProcessStatistics = getStatisticsByKey(statistics, ONE_INCIDENT_PROCESS_KEY);
+    verifyStatisticsResult(oneIncidentProcessStatistics, 3, 0, 3);
   }
 
   public void testQueryIncludingIncidentsWithReadPermissionOnFirstProcessInstance() {
@@ -403,10 +409,10 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     assertEquals(2, statistics.size());
 
     ProcessDefinitionStatistics oneTaskProcessStatistics = getStatisticsByKey(statistics, ONE_TASK_PROCESS_KEY);
-    verifyStatisticsResult(oneTaskProcessStatistics, 0, 0, 0);
+    verifyStatisticsResult(oneTaskProcessStatistics, 2, 0, 0);
 
     ProcessDefinitionStatistics oneIncidentProcessStatistics = getStatisticsByKey(statistics, ONE_INCIDENT_PROCESS_KEY);
-    verifyStatisticsResult(oneIncidentProcessStatistics, 1, 0, 1);
+    verifyStatisticsResult(oneIncidentProcessStatistics, 3, 0, 3);
   }
 
   public void testQueryIncludingIncidentsWithReadPermissionOnAnyProcessInstance() {
@@ -459,7 +465,7 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     assertEquals(2, statistics.size());
 
     ProcessDefinitionStatistics oneTaskProcessStatistics = getStatisticsByKey(statistics, ONE_TASK_PROCESS_KEY);
-    verifyStatisticsResult(oneTaskProcessStatistics, 0, 0, 0);
+    verifyStatisticsResult(oneTaskProcessStatistics, 2, 0, 0);
 
     ProcessDefinitionStatistics oneIncidentProcessStatistics = getStatisticsByKey(statistics, ONE_INCIDENT_PROCESS_KEY);
     verifyStatisticsResult(oneIncidentProcessStatistics, 3, 0, 3);
@@ -515,9 +521,11 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     // then
     assertEquals(2, statistics.size());
 
-    for (ProcessDefinitionStatistics result : statistics) {
-      verifyStatisticsResult(result, 0, 0, 0);
-    }
+    ProcessDefinitionStatistics oneTaskProcessStatistics = getStatisticsByKey(statistics, ONE_TASK_PROCESS_KEY);
+    verifyStatisticsResult(oneTaskProcessStatistics, 2, 0, 0);
+
+    ProcessDefinitionStatistics oneIncidentProcessStatistics = getStatisticsByKey(statistics, ONE_INCIDENT_PROCESS_KEY);
+    verifyStatisticsResult(oneIncidentProcessStatistics, 3, 3, 3);
   }
 
   public void testQueryIncludingIncidentsAndFailedJobsWithReadPermissionOnFirstProcessInstance() {
@@ -543,10 +551,10 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     assertEquals(2, statistics.size());
 
     ProcessDefinitionStatistics oneTaskProcessStatistics = getStatisticsByKey(statistics, ONE_TASK_PROCESS_KEY);
-    verifyStatisticsResult(oneTaskProcessStatistics, 0, 0, 0);
+    verifyStatisticsResult(oneTaskProcessStatistics, 2, 0, 0);
 
     ProcessDefinitionStatistics oneIncidentProcessStatistics = getStatisticsByKey(statistics, ONE_INCIDENT_PROCESS_KEY);
-    verifyStatisticsResult(oneIncidentProcessStatistics, 1, 1, 1);
+    verifyStatisticsResult(oneIncidentProcessStatistics, 3, 3, 3);
   }
 
   public void testQueryIncludingIncidentsAndFailedJobsWithReadPermissionOnAnyProcessInstance() {
@@ -601,7 +609,7 @@ public class ProcessDefinitionStatisticsAuthorizationTest extends AuthorizationT
     assertEquals(2, statistics.size());
 
     ProcessDefinitionStatistics oneTaskProcessStatistics = getStatisticsByKey(statistics, ONE_TASK_PROCESS_KEY);
-    verifyStatisticsResult(oneTaskProcessStatistics, 0, 0, 0);
+    verifyStatisticsResult(oneTaskProcessStatistics, 2, 0, 0);
 
     ProcessDefinitionStatistics oneIncidentProcessStatistics = getStatisticsByKey(statistics, ONE_INCIDENT_PROCESS_KEY);
     verifyStatisticsResult(oneIncidentProcessStatistics, 3, 3, 3);

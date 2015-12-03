@@ -1,10 +1,8 @@
 package org.camunda.bpm.engine.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.db.PermissionCheck;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
@@ -30,11 +28,6 @@ public class ProcessDefinitionStatisticsQueryImpl extends AbstractQuery<ProcessD
   protected boolean includeFailedJobs = false;
   protected boolean includeIncidents = false;
   protected String includeIncidentsForType;
-
-  // for internal use
-  protected List<PermissionCheck> processInstancePermissionChecks = new ArrayList<PermissionCheck>();
-  protected List<PermissionCheck> jobPermissionChecks = new ArrayList<PermissionCheck>();
-  protected List<PermissionCheck> incidentPermissionChecks = new ArrayList<PermissionCheck>();
 
   public ProcessDefinitionStatisticsQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
@@ -87,44 +80,6 @@ public class ProcessDefinitionStatisticsQueryImpl extends AbstractQuery<ProcessD
     if (includeIncidents && includeIncidentsForType != null) {
       throw new ProcessEngineException("Invalid query: It is not possible to use includeIncident() and includeIncidentForType() to execute one query.");
     }
-  }
-
-  // getter/setter for authorization check
-
-  public List<PermissionCheck> getProcessInstancePermissionChecks() {
-    return processInstancePermissionChecks;
-  }
-
-  public void setProcessInstancePermissionChecks(List<PermissionCheck> processInstancePermissionChecks) {
-    this.processInstancePermissionChecks = processInstancePermissionChecks;
-  }
-
-  public void addProcessInstancePermissionCheck(PermissionCheck permissionCheck) {
-    processInstancePermissionChecks.add(permissionCheck);
-  }
-
-  public List<PermissionCheck> getJobPermissionChecks() {
-    return jobPermissionChecks;
-  }
-
-  public void setJobPermissionChecks(List<PermissionCheck> jobPermissionChecks) {
-    this.jobPermissionChecks = jobPermissionChecks;
-  }
-
-  public void addJobPermissionCheck(PermissionCheck permissionCheck) {
-    jobPermissionChecks.add(permissionCheck);
-  }
-
-  public List<PermissionCheck> getIncidentPermissionChecks() {
-    return incidentPermissionChecks;
-  }
-
-  public void setIncidentPermissionChecks(List<PermissionCheck> incidentPermissionChecks) {
-    this.incidentPermissionChecks = incidentPermissionChecks;
-  }
-
-  public void addIncidentPermissionCheck(PermissionCheck permissionCheck) {
-    incidentPermissionChecks.add(permissionCheck);
   }
 
 }

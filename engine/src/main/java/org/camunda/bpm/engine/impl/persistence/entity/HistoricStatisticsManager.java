@@ -12,11 +12,16 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import static org.camunda.bpm.engine.authorization.Permissions.READ_HISTORY;
+import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.history.HistoricActivityStatistics;
 import org.camunda.bpm.engine.impl.HistoricActivityStatisticsQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 
 /**
@@ -28,13 +33,38 @@ public class HistoricStatisticsManager extends AbstractManager {
 
   @SuppressWarnings("unchecked")
   public List<HistoricActivityStatistics> getHistoricStatisticsGroupedByActivity(HistoricActivityStatisticsQueryImpl query, Page page) {
-    getAuthorizationManager().configureHistoricActivityStatisticsQuery(query);
-    return getDbEntityManager().selectList("selectHistoricActivityStatistics", query, page);
+    if (ensureHistoryReadOnProcessDefinition(query)) {
+      return getDbEntityManager().selectList("selectHistoricActivityStatistics", query, page);
+    }
+    else {
+      return new ArrayList<HistoricActivityStatistics>();
+    }
   }
 
   public long getHistoricStatisticsCountGroupedByActivity(HistoricActivityStatisticsQueryImpl query) {
-    getAuthorizationManager().configureHistoricActivityStatisticsQuery(query);
-    return (Long) getDbEntityManager().selectOne("selectHistoricActivityStatisticsCount", query);
+    if (ensureHistoryReadOnProcessDefinition(query)) {
+      return (Long) getDbEntityManager().selectOne("selectHistoricActivityStatisticsCount", query);
+    }
+    else {
+      return 0;
+    }
+  }
+
+  protected boolean ensureHistoryReadOnProcessDefinition(HistoricActivityStatisticsQueryImpl query) {
+    CommandContext commandContext = getCommandContext();
+
+    if(isAuthorizationEnabled() && getCurrentAuthentication() != null && commandContext.isAuthorizationCheckEnabled()) {
+      String processDefinitionId = query.getProcessDefinitionId();
+      ProcessDefinitionEntity definition = getProcessDefinitionManager().findLatestProcessDefinitionById(processDefinitionId);
+
+      if (definition == null) {
+        return false;
+      }
+
+      return getAuthorizationManager().isAuthorized(READ_HISTORY, PROCESS_DEFINITION, definition.getKey());
+    }
+
+    return true;
   }
 
 }

@@ -93,29 +93,8 @@
                 from
                     ${prefix}ACT_RU_EXECUTION E
 
-                <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
-                inner join
-                    ${prefix}ACT_RE_PROCDEF P
-                on
-                    E.PROC_DEF_ID_ = P.ID_
-                </if>
-
                 where
                     E.PARENT_ID_ IS NULL
-
-                    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
-                    and
-                        (
-                        <foreach item="permCheck" collection="processInstancePermissionChecks" separator=",">
-                          ${dbSpecificIfNullFunction}((<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
-                        </foreach>
-                          , 0
-                        <foreach item="permCheck" collection="processInstancePermissionChecks">
-                          )
-                        </foreach>
-                        ) = 1
-                    </if>
-
                 group by
                     E.PROC_DEF_ID_
               ) INSTANCE
@@ -134,20 +113,6 @@
                     ${prefix}ACT_RU_JOB J
                 where
                     J.RETRIES_ = 0
-
-                    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
-                    and
-                        (
-                        <foreach item="permCheck" collection="jobPermissionChecks" separator=",">
-                          ${dbSpecificIfNullFunction}((<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
-                        </foreach>
-                          , 0
-                        <foreach item="permCheck" collection="jobPermissionChecks">
-                          )
-                        </foreach>
-                        ) = 1
-                    </if>
-
                 group by
                     J.PROCESS_DEF_ID_
               ) JOB
@@ -167,29 +132,10 @@
                 from
                     ${prefix}ACT_RU_INCIDENT I
 
-                <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
-                inner join
-                    ${prefix}ACT_RE_PROCDEF PROCDEF
-                on
-                    I.PROC_DEF_ID_ = PROCDEF.ID_
-                </if>
                 <where>
 
                   <if test="includeIncidentsForType != null">
                       I.INCIDENT_TYPE_ = #{includeIncidentsForType}
-                  </if>
-
-                  <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
-                  and
-                      (
-                      <foreach item="permCheck" collection="incidentPermissionChecks" separator=",">
-                        ${dbSpecificIfNullFunction}((<include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>)
-                      </foreach>
-                        , 0
-                      <foreach item="permCheck" collection="incidentPermissionChecks">
-                        )
-                      </foreach>
-                      ) = 1
                   </if>
 
                 </where>
