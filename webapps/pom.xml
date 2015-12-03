@@ -66,8 +66,7 @@
       </dependency>
       <dependency>
         <groupId>org.camunda.bpm</groupId>
-        <artifactId>camunda-engine-rest</artifactId>
-        <classifier>classes</classifier>
+        <artifactId>camunda-engine-rest-core</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

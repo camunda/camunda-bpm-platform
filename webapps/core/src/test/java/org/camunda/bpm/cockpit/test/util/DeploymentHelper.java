@@ -99,7 +99,7 @@ public class DeploymentHelper {
             .addPackages(true, cockpitPkg + ".plugin")
             .addPackages(true, cockpitPkg + ".test.sample.web")
 
-            .addAsLibraries(getMavenDependencies("org.camunda.bpm:camunda-engine-rest:jar:classes"))
+            .addAsLibraries(getMavenDependencies("org.camunda.bpm:camunda-engine-rest-core:jar"))
             .addAsServiceProvider(ProcessEngineProvider.class, TestProcessEngineProvider.class);;
 
     TestContainer.addContainerSpecificResources(archive);
@@ -126,7 +126,7 @@ public class DeploymentHelper {
 
             .addPackages(true, adminPkg)
 
-            .addAsLibraries(getMavenDependencies("org.camunda.bpm:camunda-engine-rest:jar:classes"))
+            .addAsLibraries(getMavenDependencies("org.camunda.bpm:camunda-engine-rest-core:jar"))
             .addAsServiceProvider(ProcessEngineProvider.class, TestProcessEngineProvider.class);
 
 
@@ -157,7 +157,7 @@ public class DeploymentHelper {
 
             .addPackages(true, tasklistPkg)
 
-            .addAsLibraries(getMavenDependencies("org.camunda.bpm:camunda-engine-rest:jar:classes"))
+            .addAsLibraries(getMavenDependencies("org.camunda.bpm:camunda-engine-rest-core:jar"))
             .addAsServiceProvider(ProcessEngineProvider.class, TestProcessEngineProvider.class);
 
 
