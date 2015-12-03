@@ -17,28 +17,31 @@
 
     <tbody>
       <tr ng-repeat="incident in incidents">
-        <td class="message">
-          <span ng-show="incident.incidentType === 'failedJob'">
-            <a href="{{ getJobStacktraceUrl(incident) }}"
-               target="_blank"
-               ng-show="incident.rootCauseIncidentMessage"
-               tooltip="Open stacktrace in new window"
-               tooltip-placement="top">
-              {{ incident.rootCauseIncidentMessage }}
-            </a>
-            <a href="{{ getJobStacktraceUrl(incident) }}"
-               target="_blank"
-               ng-hide="incident.rootCauseIncidentMessage"
-               tooltip="Open stacktrace in new window"
-               tooltip-placement="top">
-              <i>Message is null.</i>
-            </a>
-          </span>
-
-          <span ng-hide="incident.incidentType === 'failedJob'">
-            <span ng-show="incident.rootCauseIncidentMessage">{{ incident.rootCauseIncidentMessage }}</span>
-            <span ng-hide="incident.rootCauseIncidentMessage"><i>Message is null.</i></span>
-          </span>
+        <td class="message"
+            ng-show="incident.incidentType === 'failedJob'">
+          <a ng-if="incident.rootCauseIncidentMessage"
+             href="{{ getJobStacktraceUrl(incident) }}"
+             target="_blank"
+             tooltip="Open stacktrace in new window"
+             tooltip-placement="top"
+             class="auto-cutoff">
+            {{ incident.rootCauseIncidentMessage }}
+          </a>
+          <a ng-if="!incident.rootCauseIncidentMessage"
+             href="{{ getJobStacktraceUrl(incident) }}"
+             target="_blank"
+             tooltip="Open stacktrace in new window"
+             tooltip-placement="top">
+            <i>Message is null.</i>
+          </a>
+        </td>
+        <td class="message"
+            ng-if="incident.incidentType !== 'failedJob' && incident.rootCauseIncidentMessage">
+          <div class="auto-cutoff">{{ incident.rootCauseIncidentMessage }}</div>
+        </td>
+        <td class="message"
+            ng-if="incident.incidentType !== 'failedJob' && !incident.rootCauseIncidentMessage">
+          <i>Message is null.</i>
         </td>
 
         <td class="timestamp">
