@@ -22,6 +22,9 @@
     <!-- http-client uses an old version of slf4j -->
     <version.slf4j>1.5.6</version.slf4j>
     <version.logback>0.9.15</version.logback>
+    <!-- other JAX-RS implementations -->
+    <wink.version>1.1.1-incubating</wink.version>
+    <jersey.version>1.17.1</jersey.version>
   </properties>
 
 
@@ -251,7 +254,7 @@
         <dependency>
           <groupId>com.sun.jersey</groupId>
           <artifactId>jersey-grizzly2</artifactId>
-          <version>1.17.1</version>
+          <version>${jersey.version}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
@@ -381,7 +384,7 @@
         <dependency>
           <groupId>org.apache.wink</groupId>
           <artifactId>wink-server</artifactId>
-          <version>1.1.1-incubating</version>
+          <version>${wink.version}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
