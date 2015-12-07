@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.test.db;
+package org.camunda.bpm.engine.test.api.cfg;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -26,7 +26,7 @@ import org.junit.Test;
  * @author Roman Smirnov
  *
  */
-public class DatabaseDmnTest {
+public class DmnDisabledTest {
 
   protected static ProcessEngineImpl processEngineImpl;
 
