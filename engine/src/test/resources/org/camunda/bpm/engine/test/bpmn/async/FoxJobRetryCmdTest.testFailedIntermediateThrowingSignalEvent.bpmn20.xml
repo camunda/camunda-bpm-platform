@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions id="definitions"
-	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-	xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
-	xmlns:fox="http://www.camunda.com/fox"
-	targetNamespace="Examples">
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+  xmlns:fox="http://www.camunda.com/fox"
+  targetNamespace="Examples">
 
   <signal id="signal" name="abort" />
 
-	<process id="failedIntermediateThrowingSignalEvent">
+  <process id="failedIntermediateThrowingSignalEvent">
 
-		<startEvent id="theStart" />
+    <startEvent id="theStart" />
     
-		<sequenceFlow sourceRef="theStart" targetRef="failingSignalEvent" />
+    <sequenceFlow sourceRef="theStart" targetRef="failingSignalEvent" />
     
     <intermediateThrowEvent id="failingSignalEvent">
       <extensionElements>
@@ -19,11 +19,11 @@
       </extensionElements>
       <signalEventDefinition signalRef="signal" camunda:async="true" />
     </intermediateThrowEvent>
-    		
-		<sequenceFlow sourceRef="failingSignalEvent" targetRef="end" />
         
-		<endEvent id="end" />
+    <sequenceFlow sourceRef="failingSignalEvent" targetRef="end" />
+        
+    <endEvent id="end" />
 
-	</process>
+  </process>
 
 </definitions>
