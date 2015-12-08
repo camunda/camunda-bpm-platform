@@ -12,6 +12,10 @@ module.exports = Base.extend({
     return element(by.css('.djs-overlays-'+activityName+' .badge[tooltip="Running Activity Instances"]'));
   },
 
+  incidentsBadgeFor: function(activityName) {
+    return element(by.css('.djs-overlays-'+activityName+' .badge[tooltip="Open Incidents"]'));
+  },
+
   diagramActivity: function(activityName) {
     return element(by.css('*[data-element-id=' + '"' + activityName + '"' + ']'));
   },

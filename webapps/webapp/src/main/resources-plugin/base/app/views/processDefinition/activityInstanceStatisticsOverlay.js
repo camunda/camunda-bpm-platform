@@ -24,12 +24,28 @@ define(['angular', 'text!./activity-instance-statistics-overlay.html'], function
           return null;
         }]);
 
+        processData.provide('activityInstanceMI', ['activityInstanceStatistics', function (activityInstanceStatistics) {
+          for (var i = 0; i < activityInstanceStatistics.length; i++) {
+            var current = activityInstanceStatistics[i];
+            if (current.id === bpmnElement.id + '#multiInstanceBody') {
+              return current;
+            }
+          }
+          return null;
+        }]);
+
         $scope.activityInstance = processData.observe('activityInstance', function(activityInstance) {
           if (activityInstance) {
             bpmnElement.isSelectable = true;
           }
 
           $scope.activityInstance = activityInstance;
+        });
+        $scope.activityInstanceMI = processData.observe('activityInstanceMI', function(activityInstance) {
+          if (activityInstance) {
+            bpmnElement.isSelectable = true;
+          }
+          $scope.activityInstanceMI = activityInstance;
         });
 
         var currentFilter = processData.observe('filter', function(filter) {

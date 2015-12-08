@@ -18,6 +18,13 @@ module.exports = {
           content: fs.readFileSync(__dirname + '/../../resources/user-tasks.bpmn').toString()
         }]
       }]),
+      operation('deployment', 'create', [{
+        deploymentName:  'mi-incident',
+        files: [{
+          name: 'mi-incident.bpmn',
+          content: fs.readFileSync(__dirname + '/../../resources/mi-incident.bpmn').toString()
+        }]
+      }]),
 
       operation('process-definition', 'start', [{
         key: 'user-tasks',
@@ -68,6 +75,10 @@ module.exports = {
               type: 'Date'
           }
         }
+      },
+      {
+        key: 'mi-incident',
+        businessKey: 'MultiInstance'
       }])
 
 )};

@@ -1,19 +1,20 @@
 <!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processDefinition/activity-instance-statistics-overlay.html -->
 <span class="activity-bottom-left-position"
-      ng-show="activityInstance"
+      ng-show="activityInstance || activityInstanceMI"
       ng-click="selectRunningInstances($event)">
   <span class="badge"
         tooltip="Running Activity Instances"
         tooltip-placement="top"
         tooltip-animation="false"
-        ng-show="activityInstance.instances">
-    {{ activityInstance.instances | abbreviateNumber }}
+        ng-show="activityInstance.instances || activityInstanceMI.instances">
+    {{ (activityInstance.instances | abbreviateNumber) ||
+       (activityInstanceMI.instances | abbreviateNumber)}}
   </span>
 
   <span class="badge badge-important"
         tooltip="Open Incidents"
         tooltip-placement="top"
         tooltip-animation="false"
-        ng-show="activityInstance.incidents">!</span>
+        ng-show="activityInstance.incidents || activityInstanceMI.incidents">!</span>
 </span>
 <!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processDefinition/activity-instance-statistics-overlay.html -->
