@@ -295,13 +295,15 @@ define([
         if (ctrl) {
           if (selected) {
             activityIds.splice(idx, 1);
+            activityIds.splice(activityIds.indexOf(activityId + '#multiInstanceBody'), 1);
 
           } else {
             activityIds.push(activityId);
+            activityIds.push(activityId+'#multiInstanceBody');
           }
 
         } else {
-          activityIds = [ activityId ];
+          activityIds = [ activityId, activityId+'#multiInstanceBody' ];
         }
       }
 
@@ -422,7 +424,9 @@ define([
       var result = [];
 
       angular.forEach(ids, function(id) {
-        result.push({ id: id, name: bpmnElements[id].name || id });
+        if(bpmnElements[id]) {
+          result.push({ id: id, name: bpmnElements[id].name || id });
+        }
       });
 
       return result;

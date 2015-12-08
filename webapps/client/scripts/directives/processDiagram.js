@@ -16,7 +16,7 @@ define([
                     function( $scope,   $compile,   Views,   $timeout) {
 
     $scope.vars = { read: [ 'processData', 'bpmnElement', 'pageData', 'viewer' ] };
-    
+
     $scope.overlayProviders = Views.getProviders({ component:  $scope.overlayProviderComponent });
 
     var overlay = '<div class="bpmn-overlay"><div view ng-repeat="overlayProvider in overlayProviders" provider="overlayProvider" vars="vars"></div></div>';
@@ -78,7 +78,10 @@ define([
     };
 
     $scope.onMouseLeave = function(element, $event) {
-      if(bpmnElements[element.businessObject.id] && isElementSelectable(bpmnElements[element.businessObject.id]) && (!selection || selection.indexOf(element.businessObject.id) === -1)) {
+      if(bpmnElements[element.businessObject.id] &&
+         isElementSelectable(bpmnElements[element.businessObject.id]) &&
+         (!selection || selection.indexOf(element.businessObject.id) === -1) &&
+         (!selection || selection.indexOf(element.businessObject.id + '#multiInstanceBody') === -1)) {
         $scope.control.clearHighlight(element.businessObject.id);
       }
     };
@@ -145,6 +148,10 @@ define([
       if ($scope.control.isLoaded()) {
         if (selection) {
           angular.forEach(selection, function(elementId) {
+            if(elementId.indexOf('#multiInstanceBody') !== -1 &&
+               elementId.indexOf('#multiInstanceBody') === elementId.length - 18) {
+              elementId = elementId.substr(0, elementId.length - 18);
+            }
             if(bpmnElements[elementId]) {
               $scope.control.clearHighlight(elementId);
             }
@@ -153,6 +160,10 @@ define([
 
         if (newSelection) {
           angular.forEach(newSelection, function(elementId) {
+            if(elementId.indexOf('#multiInstanceBody') !== -1 &&
+               elementId.indexOf('#multiInstanceBody') === elementId.length - 18) {
+              elementId = elementId.substr(0, elementId.length - 18);
+            }
             if(bpmnElements[elementId]) {
               $scope.control.highlight(elementId);
             }

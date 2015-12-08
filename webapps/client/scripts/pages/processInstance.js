@@ -439,11 +439,20 @@ define([
           activityIds = angular.copy(filter.activityIds) || [],
           activityInstanceIds = angular.copy(filter.activityInstanceIds) || [],
           idx = activityIds.indexOf(id),
-          instanceList = $scope.activityIdToInstancesMap[id],
+          instanceList = angular.copy($scope.activityIdToInstancesMap[id]) || [],
+          multiInstance = $scope.activityIdToInstancesMap[id+'#multiInstanceBody'],
           newFilter;
+
+      if(multiInstance) {
+        Array.prototype.push.apply(instanceList, multiInstance);
+      }
 
       if (!ctrlKey) {
         activityIds = [ id ];
+        if(multiInstance) {
+          activityIds.push( id+'#multiInstanceBody' );
+        }
+
         activityInstanceIds = [];
         angular.forEach(instanceList, function (instance) {
           activityInstanceIds.push(instance.id);
@@ -454,6 +463,9 @@ define([
 
         if (idx === -1) {
           activityIds.push(id);
+          if(multiInstance) {
+            activityIds.push( id+'#multiInstanceBody' );
+          }
           angular.forEach(instanceList, function (instance) {
             activityInstanceIds.push(instance.id);
           });
@@ -461,6 +473,9 @@ define([
 
         if (idx !== -1) {
           activityIds.splice(idx, 1);
+          if(multiInstance) {
+            activityIds.splice( activityIds.indexOf(id+'#multiInstanceBody' ), 1);
+          }
 
           angular.forEach(instanceList, function (instance) {
             var instanceId = instance.id,
