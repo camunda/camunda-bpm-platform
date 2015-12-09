@@ -6,6 +6,9 @@ var promised = require('chai-as-promised');
 chai.use(promised);
 global.expect   = chai.expect;
 
+process.env.PROSHOT_DIR = './target/screenshots';
+process.env.multi = 'xunit-file=- mocha-proshot=-';
+
 exports.config = {
 
   // The timeout for each script run on the browser. This should be longer
@@ -70,7 +73,7 @@ exports.config = {
   mochaOpts: {
     timeout: 15000,
     colors: false,
-    reporter: 'xunit-file',
+    reporter: 'mocha-multi',
     slow: 3000
   }
 };
