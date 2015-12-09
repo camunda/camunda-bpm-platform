@@ -39,6 +39,25 @@ module.exports = Page.extend({
   deleteGroup: function() {
     this.deleteGroupButton().click();
     element(by.css('.modal-footer [ng-click="$close()"]')).click();
+  },
+
+  selectUserNavbarItem: function(navbarItem) {
+    var index = [
+      'Group',
+      'Users'
+    ];
+    var item;
+    var itemIndex = index.indexOf(navbarItem) + 1;
+
+    if (itemIndex) {
+      item = element(by.css('.sidebar-nav ul li:nth-child(' + itemIndex + ')'));
+    }
+    else {
+      item = element(by.css('.sidebar-nav ul li:nth-child(1)'));
+    }
+
+    item.click();
+    return item;
   }
 
 });

@@ -411,4 +411,22 @@ describe('Admin Users Spec', function() {
 
   });
 
+  describe('Pagination', function () {
+
+    before(function() {
+      return testHelper(setupFile.setup3, function() {
+        usersPage.navigateToWebapp('Admin');
+        usersPage.authentication.userLogin('admin', 'admin');
+      });
+    });
+
+    it('displays a pager', function () {
+
+      // then
+      expect(element(by.css('.pagination')).isPresent()).to.eventually.eql(true);
+      expect(element.all(by.css('[ng-repeat="page in pages track by $index"]')).count()).to.eventually.eql(2);
+    });
+
+  });
+
 });

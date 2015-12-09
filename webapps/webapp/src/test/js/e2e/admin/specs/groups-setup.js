@@ -5,6 +5,49 @@ var fs = require('fs'),
     combine = factory.combine,
     operation = factory.operation;
 
+function createEntities(factory) {
+  var batch = [];
+  for (var i = 0; i < 45; i++) {
+    batch.push(factory(i));
+  }
+  return batch;
+}
+
+var fragment2 = combine(
+  operation('group', 'create', createEntities(function(idx) {
+    return {
+      id: 'group' + idx,
+      name: 'group' + idx,
+      type: 'GROUP' + idx
+    };
+  }))
+);
+
+var fragment3 = combine(
+
+  operation('group', 'create', [{
+    id:   "accounting",
+    name: "Accounting",
+    type: "WORKFLOW"
+  }]),
+
+  operation('user', 'create', createEntities(function(idx) {
+    return {
+      id: 'user' + idx,
+      password: 'cam123',
+      firstName: 'abc',
+      lastName: 'def'
+    };
+  })),
+
+  operation('group', 'createMember', createEntities(function(idx) {
+    return {
+      id:     'accounting',
+      userId: 'user' + idx
+    };
+  }))
+);
+
 module.exports = {
 
   setup1:
@@ -54,4 +97,10 @@ module.exports = {
         userId: "john"
       }])
 
-)};
+    ),
+
+  setup2: fragment2,
+
+  setup3: fragment3
+
+};

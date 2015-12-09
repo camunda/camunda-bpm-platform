@@ -152,4 +152,50 @@ describe('Admin Groups Spec', function() {
 
   });
 
+  describe('Pagination', function () {
+
+    describe('list of groups', function() {
+
+      before(function() {
+        return testHelper(setupFile.setup2, function() {
+          usersPage.navigateToWebapp('Admin');
+          usersPage.authentication.userLogin('admin', 'admin');
+          groupsPage.navigateTo();
+        });
+      });
+
+      it('displays a pager', function () {
+
+        // then
+        expect(element(by.css('.pagination')).isPresent()).to.eventually.eql(true);
+        expect(element.all(by.css('[ng-repeat="page in pages track by $index"]')).count()).to.eventually.eql(2);
+      });
+
+    });
+
+    describe('list of users in group', function() {
+
+      before(function() {
+        return testHelper(setupFile.setup3, function() {
+          usersPage.navigateToWebapp('Admin');
+          usersPage.authentication.userLogin('admin', 'admin');
+          groupsPage.navigateTo();
+        });
+      });
+
+      it('displays a pager', function () {
+
+        // when
+        groupsPage.selectGroupByNameLink(0);
+        groupsPage.editGroup.selectUserNavbarItem('Users');
+
+        // then
+        expect(element(by.css('.pagination')).isPresent()).to.eventually.eql(true);
+        expect(element.all(by.css('[ng-repeat="page in pages track by $index"]')).count()).to.eventually.eql(2);
+      });
+
+    });
+
+  });
+
 });

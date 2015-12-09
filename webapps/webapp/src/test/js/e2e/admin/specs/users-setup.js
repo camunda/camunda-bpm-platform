@@ -58,9 +58,22 @@ var fragment2 = combine(
     }])
 )
 
+var userBatch = [];
+for (var i = 0; i < 45; i++) {
+  userBatch.push({
+    id:         'user' + i,
+    password:   'cam123',
+    firstName:  'abc',
+    lastName:   'def'
+  });
+}
+
+var fragment3 = combine(
+  operation('user', 'create', userBatch)
+)
 
 module.exports = {
-
   setup1: fragment1,
-  setup2: combine(fragment1, fragment2)
+  setup2: combine(fragment1, fragment2),
+  setup3: fragment3
 };
