@@ -109,7 +109,7 @@ describe('Cockpit Suspsension Spec', function() {
       definitionPage.jobDefinitionsTab.suspendJobDefinition(0);
 
       // then
-      expect(definitionPage.diagram.isActivitySuspended('IntermediateCatchEvent_1')).to.eventually.be.true
+      expect(definitionPage.diagram.isActivitySuspended('HelloCallActivity')).to.eventually.be.true;
     });
 
 
@@ -119,7 +119,16 @@ describe('Cockpit Suspsension Spec', function() {
       definitionPage.jobDefinitionsTab.activateJobDefinition(0);
 
       // then
-      expect(definitionPage.diagram.isActivitySuspended('IntermediateCatchEvent_1')).to.eventually.be.false
+      expect(definitionPage.diagram.isActivitySuspended('HelloCallActivity')).to.eventually.be.false;
+    });
+
+    it('should display suspension badge on suspension for second job for activity', function() {
+
+      // when
+      definitionPage.jobDefinitionsTab.suspendJobDefinition(1);
+
+      // then
+      expect(definitionPage.diagram.isActivitySuspended('HelloCallActivity')).to.eventually.be.true;
     });
 
   });

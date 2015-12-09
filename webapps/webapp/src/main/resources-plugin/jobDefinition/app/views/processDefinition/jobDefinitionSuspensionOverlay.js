@@ -1,26 +1,35 @@
 define(['text!./job-definition-suspension-overlay.html'], function(template) {
 
+  'use strict';
+
   var Controller = [ '$scope', function ($scope) {
 
     var bpmnElement = $scope.bpmnElement,
         processData = $scope.processData.newChild($scope);
 
-    processData.provide('jobDefinition', ['jobDefinitions', function (jobDefinitions) {
+    processData.provide('jobDefinitionsForElement', ['jobDefinitions', function (jobDefinitions) {
+      var matchedDefinitions = [];
       for(var i = 0; i < jobDefinitions.length; i++) {
         var jobDefinition = jobDefinitions[i];
         if (jobDefinition.activityId === bpmnElement.id) {
-          return jobDefinition;
+          matchedDefinitions.push(jobDefinition);
         }
       }
-      return null;
+      return matchedDefinitions;
     }]);
 
-    $scope.jobDefinition = processData.observe('jobDefinition', function(jobDefinition) {
-      if (jobDefinition) {
+    $scope.jobDefinitionsForElement = processData.observe('jobDefinitionsForElement', function(jobDefinitionsForElement) {
+      if (jobDefinitionsForElement.length > 0) {
         bpmnElement.isSelectable = true;
       }
-      $scope.jobDefinition = jobDefinition;
+      $scope.jobDefinitionsForElement = jobDefinitionsForElement;
     });
+
+    $scope.isSuspended = function() {
+      return $scope.jobDefinitionsForElement.filter(function(jobDefinition) {
+        return jobDefinition.suspended;
+      }).length > 0;
+    };
 
   }];
 
