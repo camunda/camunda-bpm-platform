@@ -7,7 +7,8 @@ define([], function() {
       updateProfile : {method:'PUT', params: { 'action' : 'profile'}},
       updateCredentials : {method:'PUT', params: { 'action' : 'credentials'}},
       createUser : {method:'POST', params: { 'userId' : 'create'}},
-      OPTIONS : {method:'OPTIONS', params: {}}
+      OPTIONS : {method:'OPTIONS', params: {}},
+      count : {method: 'GET', params: { 'userId' : 'count'}}
     });
   }];
 });

@@ -42,5 +42,29 @@
       </tbody>
     </table>
   </div>
+
+  <div ng-show="loadingState === 'EMPTY' && pages.total && (!userList || !userList.length)"
+       class="well">
+    <span class="glyphicon glyphicon-info-sign"></span>
+    The current search parameters could not retrieve any users. Try to <a ng-click="pageChange(1)">reset page number.</a>
+  </div>
+
+  <pagination ng-if="pages.total > pages.size"
+              class="pagination-sm"
+
+              ng-model="pages.current"
+              ng-change="pageChange(pages.current)"
+
+              total-items="pages.total"
+              items-per-page="pages.size"
+              max-size="7"
+
+              boundary-links="true"
+
+              next-text="&rsaquo;"
+              last-text="&raquo;"
+              previous-text="&lsaquo;"
+              first-text="&laquo;"></pagination>
+
 </div>
 <!-- / CE - camunda-admin-ui/client/scripts/pages/users.html -->

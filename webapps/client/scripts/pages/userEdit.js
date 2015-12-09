@@ -145,9 +145,17 @@ define([
 
         // group form /////////////////////////////
 
+        $scope.$watch(function() {
+          return $location.search().tab === 'groups';
+        }, function(newValue) {
+          return newValue && loadGroups();
+        });
+
         var loadGroups = $scope.loadGroups = function() {
+          $scope.groupLoadingState = 'LOADING';
           GroupResource.query({'member' : $scope.decodedUserId}).$promise.then(function(response) {
-            // $scope.groupList = response.data;
+            $scope.groupLoadingState = response.length ? 'LOADED' : 'EMPTY';
+
             $scope.groupList = response;
             $scope.groupIdList = [];
             angular.forEach($scope.groupList, function(group) {
@@ -214,7 +222,6 @@ define([
         // initialization ///////////////////////////////////
 
         loadProfile();
-        loadGroups();
         checkRemoveGroupMembershipAuthorized();
 
         if(!$location.search().tab) {

@@ -243,45 +243,46 @@
               </a>
             </div>
 
-            <table class="cam-table"
-                   ng-hide="groupList.length == 0">
-              <thead>
-                <tr>
-                  <th class="group-id">Group Id</th>
-                  <th class="group-name">Group Name</th>
-                  <th class="group-type">Group Type</th>
-                  <th class="action"
-                      ng-show="availableOperations.removeGroup">
-                    Action
-                  </th>
-                </tr>
-              </thead>
+            <div cam-widget-loader
+                 loading-state="{{ groupLoadingState }}"
+                 text-empty="User {{user.firstName}} {{user.lastName}} is currently not member of any groups.">
+              <table class="cam-table"
+                     ng-hide="groupList.length == 0">
+                <thead>
+                  <tr>
+                    <th class="group-id">Group Id</th>
+                    <th class="group-name">Group Name</th>
+                    <th class="group-type">Group Type</th>
+                    <th class="action"
+                        ng-show="availableOperations.removeGroup">
+                      Action
+                    </th>
+                  </tr>
+                </thead>
 
-              <tbody>
-                <tr ng-repeat="group in groupList">
-                  <td class="group-id">
-                    <a href="#/groups/{{group.id | escape}}?tab=group">{{group.id}}</a>
-                  </td>
+                <tbody>
+                  <tr ng-repeat="group in groupList">
+                    <td class="group-id">
+                      <a href="#/groups/{{group.id | escape}}?tab=group">{{group.id}}</a>
+                    </td>
 
-                  <td class="group-name">
-                    {{group.name}}
-                  </td>
+                    <td class="group-name">
+                      {{group.name}}
+                    </td>
 
-                  <td class="group-type">
-                    {{group.type}}
-                  </td>
+                    <td class="group-type">
+                      {{group.type}}
+                    </td>
 
-                  <td class="action"
-                      ng-show="availableOperations.removeGroup">
-                    <a ng-click="removeGroup(group.id)">Remove</a>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                    <td class="action"
+                        ng-show="availableOperations.removeGroup">
+                      <a ng-click="removeGroup(group.id)">Remove</a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
 
-            <p ng-show="groupList.length == 0">
-              User {{user.firstName}} {{user.lastName}} is currently not member of any groups
-            </p>
+            </div>
 
           </form>
         </div>

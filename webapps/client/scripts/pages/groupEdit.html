@@ -88,7 +88,7 @@
       </form>
 
       <div ng-show="show('users')">
-        <legend>Users {{ groupUserList.length ? ('('+ groupUserList.length +')') : '' }}</legend>
+        <legend>Users</legend>
 
         <div cam-widget-loader
              loading-state="{{ userLoadingState }}"
@@ -102,12 +102,29 @@
             </thead>
             <tbody>
               <tr ng-repeat="user in groupUserList">
-                <td>{{user.firstName}} {{user.lastName}}</td>
+                <td><a ng-href="#/users/{{user.id | escape}}">{{user.firstName}} {{user.lastName}}</a></td>
                 <td>{{user.id}}</td>
               </tr>
             </tbody>
           </table>
         </div><!-- /cam-widget-loader -->
+
+        <pagination ng-if="groupUserPages.total > groupUserPages.size"
+                    class="pagination-sm"
+
+                    ng-model="groupUserPages.current"
+                    ng-change="pageChange(groupUserPages.current)"
+
+                    total-items="groupUserPages.total"
+                    items-per-page="groupUserPages.size"
+                    max-size="7"
+
+                    boundary-links="true"
+
+                    next-text="&rsaquo;"
+                    last-text="&raquo;"
+                    previous-text="&lsaquo;"
+                    first-text="&laquo;"></pagination>
 
       </div>
     </div>

@@ -1,14 +1,44 @@
 define(['angular', 'text!./groups.html'], function(angular, template) {
   'use strict';
-  var Controller = ['$scope', 'GroupResource', function ($scope, GroupResource) {
+  var Controller = ['$scope', '$location', 'search', 'GroupResource', function ($scope, $location, search, GroupResource) {
 
     $scope.availableOperations={};
     $scope.loadingState = 'LOADING';
 
-    GroupResource.query().$promise.then(function(response) {
-      $scope.groupList = response;
-      $scope.loadingState = response.length ? 'LOADED' : 'EMPTY';
+    var pages = $scope.pages = { size: 25, total: 0 };
+
+    $scope.$watch(function() {
+      return parseInt(($location.search() || {}).page || '1');
+    }, function(newValue) {
+      pages.current = newValue
+      updateView();
     });
+
+    $scope.pageChange = function(page) {
+      search.updateSilently({ page: !page || page == 1 ? null : page });
+    };
+
+    function updateView() {
+      var page = pages.current,
+          count = pages.size,
+          firstResult = (page - 1) * count;
+
+      var pagingParams = {
+        firstResult: firstResult,
+        maxResults: count
+      };
+
+      $scope.loadingState = 'LOADING';
+      GroupResource.query(pagingParams).$promise.then(function(response) {
+        $scope.groupList = response;
+        $scope.loadingState = response.length ? 'LOADED' : 'EMPTY';
+      });
+
+      GroupResource.count().$promise.then(function(response) {
+        pages.total = response.count;
+      });
+
+    }
 
     GroupResource.OPTIONS().$promise.then(function(response) {
       angular.forEach(response.links, function(link){
@@ -22,7 +52,8 @@ define(['angular', 'text!./groups.html'], function(angular, template) {
     $routeProvider.when('/groups', {
       template: template,
       controller: Controller,
-      authentication: 'required'
+      authentication: 'required',
+      reloadOnSearch: false
     });
   }];
 });
