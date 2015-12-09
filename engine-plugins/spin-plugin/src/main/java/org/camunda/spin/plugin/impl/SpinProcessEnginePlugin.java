@@ -15,9 +15,7 @@ package org.camunda.spin.plugin.impl;
 import static org.camunda.spin.plugin.variable.type.SpinValueType.JSON;
 import static org.camunda.spin.plugin.variable.type.SpinValueType.XML;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.camunda.bpm.engine.impl.cfg.AbstractProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -27,7 +25,6 @@ import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
 import org.camunda.bpm.engine.variable.type.ValueTypeResolver;
 import org.camunda.spin.DataFormats;
-import org.camunda.spin.spi.DataFormat;
 
 /**
  * @author Thorben Lindhauer
@@ -48,6 +45,11 @@ public class SpinProcessEnginePlugin extends AbstractProcessEnginePlugin {
     registerScriptResolver(processEngineConfiguration);
     registerSerializers(processEngineConfiguration);
     registerValueTypes(processEngineConfiguration);
+    registerFallbackSerializer(processEngineConfiguration);
+  }
+
+  protected void registerFallbackSerializer(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    processEngineConfiguration.setFallbackSerializerFactory(new SpinFallbackSerializerFactory());
   }
 
   protected void registerSerializers(ProcessEngineConfigurationImpl processEngineConfiguration) {
@@ -65,20 +67,8 @@ public class SpinProcessEnginePlugin extends AbstractProcessEnginePlugin {
   }
 
   protected List<TypedValueSerializer<?>> lookupSpinSerializers() {
-    List<TypedValueSerializer<?>> serializers = new ArrayList<TypedValueSerializer<?>>();
-
-    Set<DataFormat<?>> availableDataFormats = DataFormats.getAvailableDataFormats();
-    for (DataFormat<?> dataFormat : availableDataFormats) {
-      serializers.add(new SpinObjectValueSerializer("spin://"+dataFormat.getName(), dataFormat));
-    }
-    if(DataFormats.json() != null) {
-      serializers.add(new JsonValueSerializer());
-    }
-    if(DataFormats.xml() != null){
-      serializers.add(new XmlValueSerializer());
-    }
-
-    return serializers;
+    DataFormats globalFormats = DataFormats.getInstance();
+    return SpinVariableSerializers.createSerializers(globalFormats);
   }
 
   protected void registerScriptResolver(ProcessEngineConfigurationImpl processEngineConfiguration) {

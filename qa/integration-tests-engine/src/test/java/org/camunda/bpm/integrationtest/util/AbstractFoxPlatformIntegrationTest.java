@@ -68,7 +68,8 @@ public abstract class AbstractFoxPlatformIntegrationTest {
               .addAsLibraries(DeploymentHelper.getEngineCdi())
               .addAsResource(processesXmlPath, "META-INF/processes.xml")
               .addClass(AbstractFoxPlatformIntegrationTest.class)
-              .addClass(TestContainer.class);
+              .addClass(TestContainer.class)
+              .addClass(TestConstants.class);
 
     TestContainer.addContainerSpecificResources(archive);
 

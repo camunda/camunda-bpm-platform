@@ -31,6 +31,8 @@ import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.impl.ProcessApplicationDeploymentInfoImpl;
 import org.camunda.bpm.application.impl.ProcessApplicationInfoImpl;
 import org.camunda.bpm.container.impl.deployment.util.InjectionUtil;
+import org.camunda.bpm.container.impl.plugin.BpmPlatformPlugin;
+import org.camunda.bpm.container.impl.plugin.BpmPlatformPlugins;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.repository.ProcessApplicationDeployment;
@@ -81,6 +83,8 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
 
   /** injector for the default process engine */
   protected InjectedValue<ProcessEngine> defaultProcessEngineInjector = new InjectedValue<ProcessEngine>();
+
+  protected InjectedValue<BpmPlatformPlugins> platformPluginsInjector = new InjectedValue<BpmPlatformPlugins>();
 
   protected AnnotationInstance preUndeployDescription;
   protected AnnotationInstance postDeployDescription;
@@ -145,8 +149,10 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
       // install the ManagedProcessApplication Service as a child to this service
       // if this service stops (at undeployment) the ManagedProcessApplication service is removed as well.
       ServiceName serviceName = ServiceNames.forManagedProcessApplication(processApplicationInfo.getName());
-      MscManagedProcessApplication managedProcessApplication = new MscManagedProcessApplication(processApplicationInfo);
+      MscManagedProcessApplication managedProcessApplication = new MscManagedProcessApplication(processApplicationInfo, processApplication.getReference());
       context.getChildTarget().addService(serviceName, managedProcessApplication).install();
+
+      notifyBpmPlatformPlugins(platformPluginsInjector.getValue(), processApplication);
 
     } catch (StartException e) {
       throw e;
@@ -161,7 +167,11 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
     }
   }
 
-
+  protected void notifyBpmPlatformPlugins(BpmPlatformPlugins value, ProcessApplicationInterface processApplication) {
+    for (BpmPlatformPlugin plugin : value.getPlugins()) {
+      plugin.postProcessApplicationDeploy(processApplication);
+    }
+  }
 
   public void stop(StopContext context) {
 
@@ -303,6 +313,10 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
 
   public InjectedValue<ProcessEngine> getDefaultProcessEngineInjector() {
     return defaultProcessEngineInjector;
+  }
+
+  public InjectedValue<BpmPlatformPlugins> getPlatformPluginsInjector() {
+    return platformPluginsInjector;
   }
 
 }

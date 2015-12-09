@@ -34,7 +34,7 @@
 
     <module name="org.camunda.bpm.camunda-engine" />
     <module name="org.camunda.bpm.identity.camunda-identity-ldap" />
-    <module name="org.camunda.bpm.camunda-engine-plugin-spin" />
+    <module name="org.camunda.bpm.camunda-engine-plugin-spin" services="import" />
     <module name="org.camunda.bpm.camunda-engine-plugin-connect" />
 
     <!-- for LDAP plugin only -->

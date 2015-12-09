@@ -23,8 +23,10 @@ import org.camunda.bpm.container.impl.jboss.deployment.processor.ProcessApplicat
 import org.camunda.bpm.container.impl.jboss.deployment.processor.ProcessEngineStartProcessor;
 import org.camunda.bpm.container.impl.jboss.deployment.processor.ProcessesXmlProcessor;
 import org.camunda.bpm.container.impl.jboss.extension.ModelConstants;
+import org.camunda.bpm.container.impl.jboss.service.MscBpmPlatformPlugins;
 import org.camunda.bpm.container.impl.jboss.service.MscRuntimeContainerDelegate;
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
+import org.camunda.bpm.container.impl.plugin.BpmPlatformPlugins;
 import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
@@ -81,6 +83,18 @@ public class BpmPlatformSubsystemAdd extends AbstractBoottimeAddStepHandler {
             .install();
 
     newControllers.add(controller);
+
+    // discover and register bpm platform plugins
+    BpmPlatformPlugins plugins = BpmPlatformPlugins.load(getClass().getClassLoader());
+    MscBpmPlatformPlugins managedPlugins = new MscBpmPlatformPlugins(plugins);
+
+    ServiceController<BpmPlatformPlugins> serviceController = context.getServiceTarget()
+      .addService(ServiceNames.forBpmPlatformPlugins(), managedPlugins)
+      .addListener(verificationHandler)
+      .setInitialMode(Mode.ACTIVE)
+      .install();
+
+    newControllers.add(serviceController);
   }
 
 }

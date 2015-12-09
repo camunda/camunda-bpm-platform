@@ -27,11 +27,14 @@ import org.camunda.bpm.application.ProcessApplicationDeploymentInfo;
 import org.camunda.bpm.application.impl.ProcessApplicationDeploymentInfoImpl;
 import org.camunda.bpm.application.impl.ProcessApplicationInfoImpl;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
+import org.camunda.bpm.container.impl.RuntimeContainerDelegateImpl;
 import org.camunda.bpm.container.impl.deployment.util.DeployedProcessArchive;
+import org.camunda.bpm.container.impl.jmx.services.JmxManagedBpmPlatformPlugins;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessApplication;
-import org.camunda.bpm.container.impl.spi.PlatformServiceContainer;
+import org.camunda.bpm.container.impl.plugin.BpmPlatformPlugin;
 import org.camunda.bpm.container.impl.spi.DeploymentOperation;
 import org.camunda.bpm.container.impl.spi.DeploymentOperationStep;
+import org.camunda.bpm.container.impl.spi.PlatformServiceContainer;
 import org.camunda.bpm.container.impl.spi.ServiceTypes;
 
 /**
@@ -62,6 +65,8 @@ public class StartProcessApplicationServiceStep extends DeploymentOperationStep 
 
     // start service
     serviceContainer.startService(ServiceTypes.PROCESS_APPLICATION, processApplication.getName(), mbean);
+
+    notifyBpmPlatformPlugins(serviceContainer, processApplication);
   }
 
   protected ProcessApplicationInfoImpl createProcessApplicationInfo(final AbstractProcessApplication processApplication,
@@ -91,6 +96,17 @@ public class StartProcessApplicationServiceStep extends DeploymentOperationStep 
     processApplicationInfo.setDeploymentInfo(deploymentInfoList);
 
     return processApplicationInfo;
+  }
+
+  protected void notifyBpmPlatformPlugins(PlatformServiceContainer serviceContainer, AbstractProcessApplication processApplication) {
+    JmxManagedBpmPlatformPlugins plugins =
+        serviceContainer.getService(ServiceTypes.BPM_PLATFORM, RuntimeContainerDelegateImpl.SERVICE_NAME_PLATFORM_PLUGINS);
+
+    if (plugins != null) {
+      for (BpmPlatformPlugin  plugin : plugins.getValue().getPlugins()) {
+        plugin.postProcessApplicationDeploy(processApplication);
+      }
+    }
   }
 
 }

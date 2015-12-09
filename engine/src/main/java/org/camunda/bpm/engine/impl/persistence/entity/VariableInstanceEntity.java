@@ -15,11 +15,14 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
+import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.DbEntityLifecycleAware;
@@ -455,11 +458,46 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   }
 
   @Override
-  public void onImplicitValueUpdate(TypedValue updatedValue) {
+  public void onImplicitValueUpdate(final TypedValue updatedValue) {
     // note: this implementation relies on the
     //   behavior that the variable scope
     //   of variable value can never become null
-    getVariableScope().setVariableLocal(name, updatedValue);
+
+    ProcessApplicationReference targetProcessApplication = getContextProcessApplication();
+    if (targetProcessApplication != null) {
+      Context.executeWithinProcessApplication(new Callable<Void>() {
+
+        @Override
+        public Void call() throws Exception {
+          getVariableScope().setVariableLocal(name, updatedValue);
+          return null;
+        }
+
+      }, targetProcessApplication);
+
+    }
+    else {
+      getVariableScope().setVariableLocal(name, updatedValue);
+    }
+  }
+
+  protected ProcessApplicationReference getContextProcessApplication() {
+    // TODO: consolidate with getVariableScope
+    if (taskId != null) {
+      TaskEntity task = Context.getCommandContext().getTaskManager().findTaskById(taskId);
+      return ProcessApplicationContextUtil.getTargetProcessApplication(task);
+    }
+    else if (executionId != null) {
+      ExecutionEntity execution = Context.getCommandContext().getExecutionManager().findExecutionById(executionId);
+      return ProcessApplicationContextUtil.getTargetProcessApplication(execution);
+    }
+    else if (caseExecutionId != null) {
+      CaseExecutionEntity caseExecution = Context.getCommandContext().getCaseExecutionManager().findCaseExecutionById(caseExecutionId);
+      return ProcessApplicationContextUtil.getTargetProcessApplication(caseExecution);
+    }
+    else {
+      return null;
+    }
   }
 
   @Override

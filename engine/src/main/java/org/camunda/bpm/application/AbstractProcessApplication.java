@@ -12,11 +12,14 @@
  */
 package org.camunda.bpm.application;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.concurrent.Callable;
+
 import javax.script.ScriptEngine;
 
 import org.camunda.bpm.application.impl.DefaultElResolverLookup;
@@ -30,6 +33,9 @@ import org.camunda.bpm.engine.impl.javax.el.BeanELResolver;
 import org.camunda.bpm.engine.impl.javax.el.ELResolver;
 import org.camunda.bpm.engine.impl.scripting.ExecutableScript;
 import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
+import org.camunda.bpm.engine.impl.variable.serializer.DefaultVariableSerializers;
+import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
+import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 
 
@@ -44,6 +50,8 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
   protected ELResolver processApplicationElResolver;
   protected BeanELResolver processApplicationBeanElResolver;
   protected ProcessApplicationScriptEnvironment processApplicationScriptEnvironment;
+
+  protected VariableSerializers variableSerializers;
 
   protected boolean isDeployed = false;
 
@@ -203,6 +211,14 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
       }
     }
     return processApplicationScriptEnvironment;
+  }
+
+  public VariableSerializers getVariableSerializers() {
+    return variableSerializers;
+  }
+
+  public void setVariableSerializers(VariableSerializers variableSerializers) {
+    this.variableSerializers = variableSerializers;
   }
 
 }

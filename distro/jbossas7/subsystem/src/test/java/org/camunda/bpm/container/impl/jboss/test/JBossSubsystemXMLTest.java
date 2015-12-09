@@ -32,6 +32,7 @@ import org.camunda.bpm.container.impl.jboss.extension.ModelConstants;
 import org.camunda.bpm.container.impl.jboss.service.MscManagedProcessEngineController;
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEnginePluginXml;
+import org.camunda.bpm.container.impl.plugin.BpmPlatformPlugins;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.jboss.as.controller.PathAddress;
@@ -193,6 +194,23 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
     assertNotNull("platform service should be installed", container.getService(PLATFORM_SERVICE_NAME));
     assertNotNull("process engine service should be bound in JNDI", container.getService(processEngineServiceBindingServiceName));
 
+  }
+
+  @Test
+  public void testInstallSubsystemXmlPlatformPlugins() throws Exception {
+    String subsystemXml = FileUtils.readFile(SUBSYSTEM_WITH_PROCESS_ENGINES_ELEMENT_ONLY);
+
+    KernelServices services = createKernelServicesBuilder(null)
+        .setSubsystemXml(subsystemXml)
+        .build();
+
+    ServiceContainer container = services.getContainer();
+    ServiceController<BpmPlatformPlugins> serviceController = (ServiceController<BpmPlatformPlugins>) container.getService(ServiceNames.forBpmPlatformPlugins());
+    assertNotNull(serviceController);
+    BpmPlatformPlugins platformPlugins = serviceController.getValue();
+    assertNotNull(platformPlugins);
+    assertEquals(1, platformPlugins.getPlugins().size());
+    assertTrue(platformPlugins.getPlugins().get(0) instanceof ExampleBpmPlatformPlugin);
   }
 
   @Test

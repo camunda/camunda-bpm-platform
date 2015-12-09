@@ -9,6 +9,7 @@
     <module name="org.joda.time" slot="2.1" />
 
     <module name="org.camunda.commons.camunda-commons-typed-values" />
+    <module name="org.camunda.commons.camunda-commons-logging" />
     <module name="org.camunda.bpm.camunda-engine" />
 
     <module name="org.camunda.spin.camunda-spin-core" />

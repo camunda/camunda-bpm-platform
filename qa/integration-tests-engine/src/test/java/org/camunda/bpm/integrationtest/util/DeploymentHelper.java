@@ -15,18 +15,34 @@
  */
 package org.camunda.bpm.integrationtest.util;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.jboss.shrinkwrap.resolver.api.CoordinateParseException;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
+import org.jboss.shrinkwrap.resolver.api.maven.MavenStrategyStage;
 import org.jboss.shrinkwrap.resolver.api.maven.ScopeType;
+import org.jboss.shrinkwrap.resolver.api.maven.coordinate.MavenCoordinate;
+import org.jboss.shrinkwrap.resolver.api.maven.coordinate.MavenCoordinates;
 import org.jboss.shrinkwrap.resolver.api.maven.coordinate.MavenDependencies;
+import org.jboss.shrinkwrap.resolver.api.maven.coordinate.MavenDependency;
+import org.jboss.shrinkwrap.resolver.api.maven.filter.MavenResolutionFilter;
+import org.jboss.shrinkwrap.resolver.api.maven.filter.RejectDependenciesFilter;
+import org.jboss.shrinkwrap.resolver.api.maven.strategy.DefaultTransitiveExclusionPolicy;
+import org.jboss.shrinkwrap.resolver.api.maven.strategy.MavenResolutionStrategy;
+import org.jboss.shrinkwrap.resolver.api.maven.strategy.RejectDependenciesStrategy;
+import org.jboss.shrinkwrap.resolver.api.maven.strategy.TransitiveExclusionPolicy;
 
 
 public class DeploymentHelper {
-  
+
   public static final String CAMUNDA_EJB_CLIENT = "org.camunda.bpm.javaee:camunda-ejb-client";
   public static final String CAMUNDA_ENGINE_CDI = "org.camunda.bpm:camunda-engine-cdi";
   public static final String CAMUNDA_ENGINE_SPRING = "org.camunda.bpm:camunda-engine-spring";
-  
+
   private static JavaArchive CACHED_CLIENT_ASSET;
   private static JavaArchive CACHED_ENGINE_CDI_ASSET;
   private static JavaArchive[] CACHED_WELD_ASSETS;
@@ -36,24 +52,24 @@ public class DeploymentHelper {
     if(CACHED_CLIENT_ASSET != null) {
       return CACHED_CLIENT_ASSET;
     } else {
-      
+
       JavaArchive[] resolvedArchives = Maven.resolver()
           .offline()
           .loadPomFromFile("pom.xml")
           .resolve(CAMUNDA_EJB_CLIENT)
           .withTransitivity()
           .as(JavaArchive.class);
-      
+
       if(resolvedArchives.length != 1) {
         throw new RuntimeException("could not resolve "+CAMUNDA_EJB_CLIENT);
-      } else {    
+      } else {
         CACHED_CLIENT_ASSET = resolvedArchives[0];
         return CACHED_CLIENT_ASSET;
       }
     }
-    
+
   }
-  
+
   public static JavaArchive getEngineCdi() {
     if(CACHED_ENGINE_CDI_ASSET != null) {
       return CACHED_ENGINE_CDI_ASSET;
@@ -65,16 +81,16 @@ public class DeploymentHelper {
           .resolve(CAMUNDA_ENGINE_CDI)
           .withTransitivity()
           .as(JavaArchive.class);
-      
+
       if(resolvedArchives.length != 1) {
         throw new RuntimeException("could not resolve "+CAMUNDA_ENGINE_CDI);
-      } else {    
+      } else {
         CACHED_ENGINE_CDI_ASSET = resolvedArchives[0];
         return CACHED_ENGINE_CDI_ASSET;
       }
-    }    
+    }
   }
-  
+
   public static JavaArchive[] getWeld() {
     if(CACHED_WELD_ASSETS != null) {
       return CACHED_WELD_ASSETS;
@@ -86,17 +102,17 @@ public class DeploymentHelper {
           .resolve(CAMUNDA_ENGINE_CDI, "org.jboss.weld.servlet:weld-servlet")
           .withTransitivity()
           .as(JavaArchive.class);
-      
+
       if(resolvedArchives.length == 0) {
         throw new RuntimeException("could not resolve org.jboss.weld.servlet:weld-servlet");
-      } else {    
+      } else {
         CACHED_WELD_ASSETS = resolvedArchives;
         return CACHED_WELD_ASSETS;
       }
     }
-    
+
   }
-  
+
   public static JavaArchive[] getEngineSpring() {
     if(CACHED_SPRING_ASSETS != null) {
       return CACHED_SPRING_ASSETS;
@@ -112,15 +128,15 @@ public class DeploymentHelper {
           .resolve()
           .withTransitivity()
           .as(JavaArchive.class);
-      
+
       if(resolvedArchives.length == 0) {
         throw new RuntimeException("could not resolve org.camunda.bpm:camunda-engine-spring");
-      } else {    
+      } else {
         CACHED_SPRING_ASSETS = resolvedArchives;
         return CACHED_SPRING_ASSETS;
       }
     }
-    
+
   }
-   
+
 }

@@ -244,6 +244,7 @@ import org.camunda.bpm.engine.impl.variable.serializer.NullValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.ShortValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.StringValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
+import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializerFactory;
 import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSession;
 import org.camunda.bpm.engine.impl.variable.serializer.jpa.EntityManagerSessionFactory;
@@ -363,6 +364,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected List<TypedValueSerializer> customPreVariableSerializers;
   protected List<TypedValueSerializer> customPostVariableSerializers;
   protected VariableSerializers variableSerializers;
+  protected VariableSerializerFactory fallbackSerializerFactory;
+
   protected String defaultSerializationFormat = Variables.SerializationDataFormats.JAVA.getName();
   protected String defaultCharsetName = null;
   protected Charset defaultCharset = null;
@@ -1891,6 +1894,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public VariableSerializers getVariableSerializers() {
     return variableSerializers;
+  }
+
+  public VariableSerializerFactory getFallbackSerializerFactory() {
+    return fallbackSerializerFactory;
+  }
+
+  public void setFallbackSerializerFactory(VariableSerializerFactory fallbackSerializerFactory) {
+    this.fallbackSerializerFactory = fallbackSerializerFactory;
   }
 
   public ProcessEngineConfigurationImpl setVariableTypes(VariableSerializers variableSerializers) {

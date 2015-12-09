@@ -34,11 +34,19 @@ public class DefaultVariableSerializers implements Serializable, VariableSeriali
   protected List<TypedValueSerializer<?>> serializerList = new ArrayList<TypedValueSerializer<?>>();
   protected Map<String, TypedValueSerializer<?>> serializerMap = new HashMap<String, TypedValueSerializer<?>>();
 
-  public TypedValueSerializer<?> getSerializerByName(String serializerName) {
-    return serializerMap.get(serializerName);
+  public DefaultVariableSerializers() {
   }
 
-  public TypedValueSerializer<?> findSerializerForValue(TypedValue value) {
+  public DefaultVariableSerializers(DefaultVariableSerializers serializers) {
+    this.serializerList.addAll(serializers.serializerList);
+    this.serializerMap.putAll(serializers.serializerMap);
+  }
+
+  public TypedValueSerializer<?> getSerializerByName(String serializerName) {
+     return serializerMap.get(serializerName);
+  }
+
+  public TypedValueSerializer<?> findSerializerForValue(TypedValue value, VariableSerializerFactory fallBackSerializerFactory) {
 
     String defaultSerializationFormat = Context.getProcessEngineConfiguration().getDefaultSerializationFormat();
 
@@ -66,6 +74,13 @@ public class DefaultVariableSerializers implements Serializable, VariableSeriali
     }
 
     if(matchedSerializers.size() == 0) {
+      if (fallBackSerializerFactory != null) {
+        TypedValueSerializer<?> serializer = fallBackSerializerFactory.getSerializer(value);
+        if (serializer != null) {
+          return serializer;
+        }
+      }
+
       throw new ProcessEngineException("Cannot find serializer for value '"+value+"'.");
     }
     else if(matchedSerializers.size() == 1) {
@@ -84,6 +99,10 @@ public class DefaultVariableSerializers implements Serializable, VariableSeriali
       return matchedSerializers.get(0);
     }
 
+  }
+
+  public TypedValueSerializer<?> findSerializerForValue(TypedValue value) {
+    return findSerializerForValue(value, null);
   }
 
   public DefaultVariableSerializers addSerializer(TypedValueSerializer<?> serializer) {
@@ -124,5 +143,33 @@ public class DefaultVariableSerializers implements Serializable, VariableSeriali
     return this;
   }
 
+  public VariableSerializers join(VariableSerializers other) {
+    DefaultVariableSerializers copy = new DefaultVariableSerializers();
+
+    // "new" serializers override existing ones if their names match
+    for (TypedValueSerializer<?> thisSerializer : serializerList) {
+      TypedValueSerializer<?> serializer = other.getSerializerByName(thisSerializer.getName());
+
+      if (serializer == null) {
+        serializer = thisSerializer;
+      }
+
+      copy.addSerializer(serializer);
+    }
+
+    // add all "new" serializers that did not exist before to the end of the list
+    for (TypedValueSerializer<?> otherSerializer : other.getSerializers()) {
+      if (!copy.serializerMap.containsKey(otherSerializer.getName())) {
+        copy.addSerializer(otherSerializer);
+      }
+    }
+
+
+    return copy;
+  }
+
+  public List<TypedValueSerializer<?>> getSerializers() {
+    return new ArrayList<TypedValueSerializer<?>>(serializerList);
+  }
 
 }

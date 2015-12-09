@@ -22,7 +22,7 @@
       <scope>test</scope>
       <type>pom</type>
     </dependency>
-
+    
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -109,6 +109,12 @@
       <groupId>org.camunda.spin</groupId>
       <artifactId>camunda-spin-core</artifactId>
     </dependency>
+    
+    <dependency>
+      <groupId>org.camunda.spin</groupId>
+      <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
+    </dependency>
+    
 
     <dependency>
       <groupId>org.camunda.connect</groupId>

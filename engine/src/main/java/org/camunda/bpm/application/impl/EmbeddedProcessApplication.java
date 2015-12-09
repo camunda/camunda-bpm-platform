@@ -31,10 +31,11 @@ import org.camunda.bpm.engine.impl.ProcessEngineLogger;
  */
 public class EmbeddedProcessApplication extends AbstractProcessApplication {
 
+  public static final String DEFAULT_NAME = "Process Application";
   private static ProcessApplicationLogger LOG = ProcessEngineLogger.PROCESS_APPLICATION_LOGGER;
 
   protected String autodetectProcessApplicationName() {
-    return "Process Application";
+    return DEFAULT_NAME;
   }
 
   public ProcessApplicationReference getReference() {

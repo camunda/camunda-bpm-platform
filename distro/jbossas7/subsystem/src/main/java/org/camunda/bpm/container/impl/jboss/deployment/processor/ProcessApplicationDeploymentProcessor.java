@@ -24,6 +24,7 @@ import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
 import org.camunda.bpm.container.impl.jboss.util.JBossCompatibilityExtension;
 import org.camunda.bpm.container.impl.jboss.util.ProcessesXmlWrapper;
 import org.camunda.bpm.container.impl.metadata.PropertyHelper;
+import org.camunda.bpm.container.impl.plugin.BpmPlatformPlugins;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.impl.util.StringUtil;
@@ -139,6 +140,7 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
     ServiceBuilder<ProcessApplicationStartService> serviceBuilder = phaseContext.getServiceTarget().addService(paStartServiceName, paStartService)
       .addDependency(phaseContext.getPhaseServiceName())
       .addDependency(ServiceNames.forDefaultProcessEngine(), ProcessEngine.class, paStartService.getDefaultProcessEngineInjector())
+      .addDependency(ServiceNames.forBpmPlatformPlugins(), BpmPlatformPlugins.class, paStartService.getPlatformPluginsInjector())
       .addDependencies(deploymentServiceNames)
       .setInitialMode(Mode.ACTIVE);
 

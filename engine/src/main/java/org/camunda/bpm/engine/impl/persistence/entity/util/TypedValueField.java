@@ -17,6 +17,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.camunda.bpm.application.AbstractProcessApplication;
+import org.camunda.bpm.application.ProcessApplicationInterface;
+import org.camunda.bpm.application.ProcessApplicationReference;
+import org.camunda.bpm.application.ProcessApplicationUnavailableException;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntityLifecycleAware;
@@ -26,6 +31,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContextListener;
 import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
 import org.camunda.bpm.engine.impl.variable.serializer.ValueFields;
 import org.camunda.bpm.engine.impl.variable.serializer.ValueFieldsImpl;
+import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializerFactory;
 import org.camunda.bpm.engine.impl.variable.serializer.VariableSerializers;
 import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
 import org.camunda.bpm.engine.variable.type.ValueType;
@@ -101,7 +107,8 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
 
   public TypedValue setValue(TypedValue value) {
     // determine serializer to use
-    serializer = getSerializers().findSerializerForValue(value);
+    serializer = getSerializers().findSerializerForValue(value,
+        Context.getProcessEngineConfiguration().getFallbackSerializerFactory());
     serializerName = serializer.getName();
 
     if(value instanceof UntypedValueImpl) {
@@ -173,6 +180,11 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
   protected void ensureSerializerInitialized() {
     if (serializerName != null && serializer == null) {
       serializer = getSerializers().getSerializerByName(serializerName);
+
+      if (serializer == null) {
+        serializer = getFallbackSerializer(serializerName);
+      }
+
       if (serializer == null) {
         throw LOG.serializerNotDefinedException(this);
       }
@@ -181,9 +193,54 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
 
   public static VariableSerializers getSerializers() {
     if (Context.getCommandContext() != null) {
-      return Context.getProcessEngineConfiguration().getVariableSerializers();
+      VariableSerializers variableSerializers = Context.getProcessEngineConfiguration().getVariableSerializers();
+      VariableSerializers paSerializers = getCurrentPaSerializers();
+
+      if (paSerializers != null) {
+        return variableSerializers.join(paSerializers);
+      }
+      else {
+        return variableSerializers;
+      }
     } else {
       throw LOG.serializerOutOfContextException();
+    }
+  }
+
+  public static TypedValueSerializer<?> getFallbackSerializer(String serializerName) {
+    if (Context.getProcessEngineConfiguration() != null) {
+      VariableSerializerFactory fallbackSerializerFactory = Context.getProcessEngineConfiguration().getFallbackSerializerFactory();
+      if (fallbackSerializerFactory != null) {
+        return fallbackSerializerFactory.getSerializer(serializerName);
+      }
+      else {
+        return null;
+      }
+    }
+    else {
+      throw LOG.serializerOutOfContextException();
+    }
+  }
+
+  protected static VariableSerializers getCurrentPaSerializers() {
+    if (Context.getCurrentProcessApplication() != null) {
+      ProcessApplicationReference processApplicationReference = Context.getCurrentProcessApplication();
+      try {
+        ProcessApplicationInterface processApplicationInterface = processApplicationReference.getProcessApplication();
+
+        ProcessApplicationInterface rawPa = processApplicationInterface.getRawObject();
+        if (rawPa instanceof AbstractProcessApplication) {
+          return ((AbstractProcessApplication) rawPa).getVariableSerializers();
+        }
+        else {
+          return null;
+        }
+      } catch (ProcessApplicationUnavailableException e) {
+        throw new ProcessEngineException("Context Process Application is unavailable.", e);
+      }
+    }
+    else {
+      return null;
     }
   }
 

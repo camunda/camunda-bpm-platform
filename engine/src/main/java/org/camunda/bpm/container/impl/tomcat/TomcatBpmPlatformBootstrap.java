@@ -19,9 +19,11 @@ import org.apache.catalina.core.StandardServer;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.container.impl.ContainerIntegrationLogger;
 import org.camunda.bpm.container.impl.RuntimeContainerDelegateImpl;
+import org.camunda.bpm.container.impl.deployment.DiscoverBpmPlatformPluginsStep;
 import org.camunda.bpm.container.impl.deployment.PlatformXmlStartProcessEnginesStep;
 import org.camunda.bpm.container.impl.deployment.StopProcessApplicationsStep;
 import org.camunda.bpm.container.impl.deployment.StopProcessEnginesStep;
+import org.camunda.bpm.container.impl.deployment.UnregisterBpmPlatformPluginsStep;
 import org.camunda.bpm.container.impl.deployment.jobexecutor.StartJobExecutorStep;
 import org.camunda.bpm.container.impl.deployment.jobexecutor.StartManagedThreadPoolStep;
 import org.camunda.bpm.container.impl.deployment.jobexecutor.StopJobExecutorStep;
@@ -69,6 +71,7 @@ public class TomcatBpmPlatformBootstrap implements LifecycleListener {
     containerDelegate.getServiceContainer().createDeploymentOperation("deploy BPM platform")
       .addAttachment(TomcatAttachments.SERVER, server)
       .addStep(new TomcatParseBpmPlatformXmlStep())
+      .addStep(new DiscoverBpmPlatformPluginsStep())
       .addStep(new StartManagedThreadPoolStep())
       .addStep(new StartJobExecutorStep())
       .addStep(new PlatformXmlStartProcessEnginesStep())
@@ -88,6 +91,7 @@ public class TomcatBpmPlatformBootstrap implements LifecycleListener {
       .addStep(new StopProcessApplicationsStep())
       .addStep(new StopProcessEnginesStep())
       .addStep(new StopJobExecutorStep())
+      .addStep(new UnregisterBpmPlatformPluginsStep())
       .execute();
 
     LOG.camundaBpmPlatformStopped(server.getServerInfo());

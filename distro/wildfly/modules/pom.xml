@@ -13,8 +13,8 @@
 
   <properties>
     <org.jboss.shrinkwrap.resolver.version>1.0.0-beta-5</org.jboss.shrinkwrap.resolver.version>
-    <version.jackson>2.5.3</version.jackson>
-    <version.jackson.annotations>2.5.0</version.jackson.annotations>
+    <version.jackson>2.6.3</version.jackson>
+    <version.jackson.annotations>2.6.0</version.jackson.annotations>
   </properties>
 
   <dependencies>

@@ -1,23 +1,18 @@
 package org.camunda.bpm.integrationtest.util;
 
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.resolver.api.maven.Maven;
+import org.jboss.shrinkwrap.resolver.api.maven.strategy.RejectDependenciesStrategy;
 
 
 
 /**
  * Tomcat test container.
- * 
+ *
  * @author Daniel Meyer
  */
 public class TestContainer {
-  
-  public final static String APP_NAME = "";
-  public final static String PROCESS_ENGINE_SERVICE_JNDI_NAME = "java:comp/env/ProcessEngineService";
-  public final static String PROCESS_APPLICATION_SERVICE_JNDI_NAME = "java:comp/env/ProcessApplicationService";
-
-  public static String getAppName() {
-    return APP_NAME;
-  }
 
   public static void addContainerSpecificResources(WebArchive webArchive) {
     webArchive
@@ -50,5 +45,22 @@ public class TestContainer {
   public static void addContainerSpecificProcessEngineConfigurationClass(WebArchive deployment) {
     // nothing to do
   }
-  
+
+  public static void addSpinJacksonJsonDataFormat(WebArchive webArchive) {
+    webArchive.addAsLibraries(getSpinJacksonJsonDataFormat());
+  }
+
+  protected static JavaArchive[] getSpinJacksonJsonDataFormat() {
+    return Maven.resolver()
+      .offline()
+      .loadPomFromFile("pom.xml")
+      .resolve("org.camunda.spin:camunda-spin-dataformat-json-jackson")
+      .using(new RejectDependenciesStrategy(false,
+          "org.camunda.spin:camunda-spin-core",
+          "org.camunda.commons:camunda-commons-logging",
+          "org.camunda.commons:camunda-commons-utils"))
+      .as(JavaArchive.class);
+  }
+
+
 }

@@ -45,10 +45,10 @@
   <dependencies>
       
     <dependency>
-    	<groupId>org.jboss.as</groupId>
-    	<artifactId>jboss-as-threads</artifactId>
-    	<version>${version.jboss.as}</version>
-    	<scope>provided</scope>
+      <groupId>org.jboss.as</groupId>
+      <artifactId>jboss-as-threads</artifactId>
+      <version>${version.jboss.as}</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
