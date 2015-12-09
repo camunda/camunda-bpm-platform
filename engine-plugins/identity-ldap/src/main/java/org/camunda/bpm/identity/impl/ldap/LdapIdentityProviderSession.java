@@ -12,6 +12,18 @@
  */
 package org.camunda.bpm.identity.impl.ldap;
 
+import static org.camunda.bpm.engine.authorization.Permissions.READ;
+import static org.camunda.bpm.engine.authorization.Resources.GROUP;
+import static org.camunda.bpm.engine.authorization.Resources.USER;
+
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.identity.Group;
@@ -38,17 +50,6 @@ import javax.naming.ldap.Control;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 import javax.naming.ldap.SortControl;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static org.camunda.bpm.engine.authorization.Permissions.READ;
-import static org.camunda.bpm.engine.authorization.Resources.GROUP;
-import static org.camunda.bpm.engine.authorization.Resources.USER;
 
 /**
  * <p>LDAP {@link ReadOnlyIdentityProvider}.</p>
@@ -229,14 +230,16 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
       while (enumeration.hasMoreElements() && userList.size() < query.getMaxResults()) {
         SearchResult result = enumeration.nextElement();
 
-        if(resultCount >= query.getFirstResult()) {
-          UserEntity user = transformUser(result);
-          if(isAuthenticatedUser(user) || isAuthorized(READ, USER, user.getId())) {
+        UserEntity user = transformUser(result);
+
+        if(isAuthenticatedUser(user) || isAuthorized(READ, USER, user.getId())) {
+
+          if(resultCount >= query.getFirstResult()) {
             userList.add(user);
           }
-        }
 
-        resultCount ++;
+          resultCount ++;
+        }
       }
 
       return userList;
@@ -384,14 +387,17 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
       while (enumeration.hasMoreElements() && groupList.size() < query.getMaxResults()) {
         SearchResult result = enumeration.nextElement();
 
-        if(resultCount >= query.getFirstResult()) {
-          GroupEntity group = transformGroup(result);
-          if(isAuthorized(READ, GROUP, group.getId())) {
+        GroupEntity group = transformGroup(result);
+
+        if(isAuthorized(READ, GROUP, group.getId())) {
+
+          if(resultCount >= query.getFirstResult()) {
             groupList.add(group);
           }
+
+          resultCount ++;
         }
 
-        resultCount ++;
       }
 
       return groupList;
@@ -568,7 +574,7 @@ public class LdapIdentityProviderSession implements ReadOnlyIdentityProvider {
   }
 
   protected boolean isAuthorized(Permission permission, Resource resource, String resourceId) {
-    return org.camunda.bpm.engine.impl.context.Context.getCommandContext()
+    return !ldapConfiguration.isAuthorizationCheckEnabled() || org.camunda.bpm.engine.impl.context.Context.getCommandContext()
       .getAuthorizationManager()
       .isAuthorized(permission, resource, resourceId);
   }

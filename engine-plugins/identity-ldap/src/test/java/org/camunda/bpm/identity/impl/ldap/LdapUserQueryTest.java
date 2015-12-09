@@ -12,9 +12,16 @@
  */
 package org.camunda.bpm.identity.impl.ldap;
 
-import org.camunda.bpm.engine.identity.User;
+import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
+import static org.camunda.bpm.engine.authorization.Permissions.READ;
+import static org.camunda.bpm.engine.authorization.Resources.USER;
 
 import java.util.List;
+
+import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.authorization.Resource;
+import org.camunda.bpm.engine.identity.User;
 
 /**
  * @author Daniel Meyer
@@ -173,6 +180,104 @@ public class LdapUserQueryTest extends LdapIdentityProviderTest {
       processEngineConfiguration.setAuthorizationEnabled(false);
       identityService.clearAuthentication();
     }
+  }
+
+  public void testPagination() {
+    List<User> users = identityService.createUserQuery().listPage(0, 2);
+    assertEquals(2, users.size());
+
+    assertEquals("roman", users.get(0).getId());
+    assertEquals("robert", users.get(1).getId());
+
+    users = identityService.createUserQuery().listPage(2, 2);
+    assertEquals(2, users.size());
+
+    assertEquals("daniel", users.get(0).getId());
+    assertEquals("oscar", users.get(1).getId());
+
+    users = identityService.createUserQuery().listPage(4, 2);
+    assertEquals(2, users.size());
+
+    assertEquals("monster", users.get(0).getId());
+    assertEquals("david(IT)", users.get(1).getId());
+
+    users = identityService.createUserQuery().listPage(6, 2);
+    assertEquals(2, users.size());
+
+    assertEquals("ruecker", users.get(0).getId());
+    assertEquals("fozzie", users.get(1).getId());
+
+    users = identityService.createUserQuery().listPage(8, 2);
+    assertEquals(0, users.size());
+  }
+
+  public void testPaginationWithAuthenticatedUser() {
+    createGrantAuthorization(USER, "roman", "oscar", READ);
+    createGrantAuthorization(USER, "daniel", "oscar", READ);
+    createGrantAuthorization(USER, "monster", "oscar", READ);
+    createGrantAuthorization(USER, "ruecker", "oscar", READ);
+
+    try {
+      processEngineConfiguration.setAuthorizationEnabled(true);
+
+      identityService.setAuthenticatedUserId("oscar");
+
+      List<User> users = identityService.createUserQuery().listPage(0, 2);
+      assertEquals(2, users.size());
+
+      assertEquals("roman", users.get(0).getId());
+      assertEquals("daniel", users.get(1).getId());
+
+      users = identityService.createUserQuery().listPage(2, 2);
+      assertEquals(2, users.size());
+
+      assertEquals("oscar", users.get(0).getId());
+      assertEquals("monster", users.get(1).getId());
+
+      users = identityService.createUserQuery().listPage(4, 2);
+      assertEquals(1, users.size());
+
+      assertEquals("ruecker", users.get(0).getId());
+
+      identityService.setAuthenticatedUserId("daniel");
+
+      users = identityService.createUserQuery().listPage(0, 2);
+      assertEquals(1, users.size());
+
+      assertEquals("daniel", users.get(0).getId());
+
+      users = identityService.createUserQuery().listPage(2, 2);
+      assertEquals(0, users.size());
+
+    } finally {
+      processEngineConfiguration.setAuthorizationEnabled(false);
+      identityService.clearAuthentication();
+
+      for (Authorization authorization : authorizationService.createAuthorizationQuery().list()) {
+        authorizationService.deleteAuthorization(authorization.getId());
+      }
+
+    }
+  }
+
+  protected void createGrantAuthorization(Resource resource, String resourceId, String userId, Permission... permissions) {
+    Authorization authorization = createAuthorization(AUTH_TYPE_GRANT, resource, resourceId);
+    authorization.setUserId(userId);
+    for (Permission permission : permissions) {
+      authorization.addPermission(permission);
+    }
+    authorizationService.saveAuthorization(authorization);
+  }
+
+  protected Authorization createAuthorization(int type, Resource resource, String resourceId) {
+    Authorization authorization = authorizationService.createNewAuthorization(type);
+
+    authorization.setResource(resource);
+    if (resourceId != null) {
+      authorization.setResourceId(resourceId);
+    }
+
+    return authorization;
   }
 
 }

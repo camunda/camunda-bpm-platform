@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" 
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
+  
+    <property name="processEngineName" value="LdapDisableAuthorizationCheckTest-engine" />
+  
+    <property name="jdbcUrl" value="jdbc:h2:mem:LdapDisableAuthorizationCheckTest;DB_CLOSE_DELAY=1000" />
+    <property name="jdbcDriver" value="org.h2.Driver" />
+    <property name="jdbcUsername" value="sa" />
+    <property name="jdbcPassword" value="" />
+  
+    <!-- Database configurations -->
+    <property name="history" value="audit" />
+    <property name="databaseSchemaUpdate" value="create-drop" />
+    
+    <!-- job executor configurations -->
+    <property name="jobExecutorActivate" value="false" />
+    
+    <property name="createDiagramOnDeploy" value="true" />
+    
+    <property name="processEnginePlugins">
+      <list>
+        <ref bean="ldapIdentityProviderPlugin" />
+      </list>
+    </property>
+    
+  </bean>
+  
+  <bean id="ldapIdentityProviderPlugin" class="org.camunda.bpm.identity.impl.ldap.plugin.LdapIdentityProviderPlugin">
+  
+    <property name="serverUrl" value="ldap://localhost:${ldap.server.port}/" />
+    <property name="managerDn" value="uid=daniel,ou=office-berlin,o=camunda,c=org" />
+    <property name="managerPassword" value="daniel" />    
+    <property name="baseDn" value="o=camunda,c=org" />
+    
+    <property name="userSearchBase" value="" />
+    <property name="userSearchFilter" value="(objectclass=person)" />
+    <property name="userIdAttribute" value="uid" />
+    <property name="userFirstnameAttribute" value="cn" />
+    <property name="userLastnameAttribute" value="sn" />
+    <property name="userEmailAttribute" value="mail" />
+    <property name="userPasswordAttribute" value="userpassword" />
+    
+    <property name="groupSearchBase" value="" />
+    <property name="groupSearchFilter" value="(objectclass=groupOfNames)" />
+    <property name="groupIdAttribute" value="ou" />
+    <property name="groupNameAttribute" value="cn" />
+    <property name="groupMemberAttribute" value="member" />
+    <property name="allowAnonymousLogin" value="true" />
+    
+    <property name="authorizationCheckEnabled" value="false" />
+    
+  </bean>
+
+</beans>

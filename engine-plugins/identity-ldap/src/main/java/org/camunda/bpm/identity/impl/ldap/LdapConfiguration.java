@@ -61,6 +61,8 @@ public class LdapConfiguration {
   protected boolean usePosixGroups = false;
   protected boolean allowAnonymousLogin = false;
 
+  protected boolean authorizationCheckEnabled = true;
+
   // getters / setters //////////////////////////////////////
 
   public String getInitialContextFactory() {
@@ -269,4 +271,13 @@ public class LdapConfiguration {
   public void setAllowAnonymousLogin(boolean allowAnonymousLogin) {
     this.allowAnonymousLogin = allowAnonymousLogin;
   }
+
+  public boolean isAuthorizationCheckEnabled() {
+    return authorizationCheckEnabled;
+  }
+
+  public void setAuthorizationCheckEnabled(boolean authorizationCheckEnabled) {
+    this.authorizationCheckEnabled = authorizationCheckEnabled;
+  }
+
 }
