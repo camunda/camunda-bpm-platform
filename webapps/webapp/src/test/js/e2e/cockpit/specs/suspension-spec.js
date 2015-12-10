@@ -8,7 +8,7 @@ var definitionPage = require('../pages/process-definition');
 var instancePage = require('../pages/process-instance');
 
 
-describe.only('Cockpit Suspsension Spec', function() {
+describe('Cockpit Suspsension Spec', function() {
 
   describe('process definition suspension', function() {
 
