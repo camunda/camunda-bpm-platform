@@ -166,6 +166,7 @@ public class BpmnDiTest {
     assertThat(edge.getBpmnElement()).isEqualTo(sequenceFlow);
   }
 
+  @Test
   public void shouldCreateValidBpmnDi() {
     modelInstance = Bpmn
       .createProcess("process")
