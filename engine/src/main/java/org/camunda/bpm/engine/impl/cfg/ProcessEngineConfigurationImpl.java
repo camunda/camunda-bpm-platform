@@ -1140,7 +1140,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   }
 
   public void setDmnEngineConfiguration(DmnEngineConfiguration dmnEngineConfiguration) {
-    dmnEngineConfiguration = dmnEngineConfiguration;
+    this.dmnEngineConfiguration = dmnEngineConfiguration;
   }
 
   // job executor /////////////////////////////////////////////////////////////
