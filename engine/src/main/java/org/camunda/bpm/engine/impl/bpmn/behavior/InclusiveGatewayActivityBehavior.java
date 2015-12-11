@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
+import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 
 /**
  * Implementation of the Inclusive Gateway/OR gateway/inclusive data-based
@@ -126,35 +127,39 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
   }
 
   protected boolean isReachable(PvmActivity srcActivity, PvmActivity targetActivity, Set<PvmActivity> visitedActivities) {
-    // if source has no outputs, it is the end of the process, and its parent process should be checked.
-    if (srcActivity.getOutgoingTransitions().size() == 0) {
-      visitedActivities.add(srcActivity);
-      if (srcActivity.getFlowScope() == null || !(srcActivity.getFlowScope() instanceof PvmActivity)) {
-        return false;
-      }
-      srcActivity = (PvmActivity) srcActivity.getFlowScope();
-    }
     if (srcActivity.equals(targetActivity)) {
       return true;
     }
 
     // To avoid infinite looping, we must capture every node we visit and
-    // check before going further in the graph if we have already visitied the node.
+    // check before going further in the graph if we have already visited the node.
     visitedActivities.add(srcActivity);
 
-    List<PvmTransition> transitionList = srcActivity.getOutgoingTransitions();
-    if (transitionList != null && transitionList.size() > 0) {
-      for (PvmTransition pvmTransition : transitionList) {
+    List<PvmTransition> outgoingTransitions = srcActivity.getOutgoingTransitions();
+    if (outgoingTransitions.isEmpty()) {
+      ScopeImpl flowScope = srcActivity.getFlowScope();
+      if (flowScope == null || !(flowScope instanceof PvmActivity)) {
+        return false;
+      }
+
+      return isReachable((PvmActivity) flowScope, targetActivity, visitedActivities);
+    }
+    else {
+      for (PvmTransition pvmTransition : outgoingTransitions) {
         PvmActivity destinationActivity = pvmTransition.getDestination();
         if (destinationActivity != null && !visitedActivities.contains(destinationActivity)) {
+
           boolean reachable = isReachable(destinationActivity, targetActivity, visitedActivities);
+
           // If false, we should investigate other paths, and not yet return the result
           if (reachable) {
             return true;
           }
+
         }
       }
     }
+
     return false;
   }
 

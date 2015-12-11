@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
 
 /**
@@ -542,4 +543,56 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
     }
 
   }
+
+  @Deployment
+  public void testJoinAfterSequentialMultiInstanceSubProcess() {
+    // given
+    runtimeService.startProcessInstanceByKey("process");
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    // when
+    Task task = query
+        .taskDefinitionKey("task")
+        .singleResult();
+    taskService.complete(task.getId());
+
+    // then
+    assertNull(query.taskDefinitionKey("taskAfterJoin").singleResult());
+  }
+
+  @Deployment
+  public void testJoinAfterParallelMultiInstanceSubProcess() {
+    // given
+    runtimeService.startProcessInstanceByKey("process");
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    // when
+    Task task = query
+        .taskDefinitionKey("task")
+        .singleResult();
+    taskService.complete(task.getId());
+
+    // then
+    assertNull(query.taskDefinitionKey("taskAfterJoin").singleResult());
+  }
+
+  @Deployment
+  public void testJoinAfterNestedScopes() {
+    // given
+    runtimeService.startProcessInstanceByKey("process");
+
+    TaskQuery query = taskService.createTaskQuery();
+
+    // when
+    Task task = query
+        .taskDefinitionKey("task")
+        .singleResult();
+    taskService.complete(task.getId());
+
+    // then
+    assertNull(query.taskDefinitionKey("taskAfterJoin").singleResult());
+  }
+
 }
