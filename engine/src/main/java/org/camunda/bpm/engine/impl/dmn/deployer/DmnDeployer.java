@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.dmn.deployer;
 import org.camunda.bpm.dmn.engine.impl.spi.transform.DmnTransformer;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.AbstractDefinitionDeployer;
+import org.camunda.bpm.engine.impl.core.model.Properties;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
@@ -39,7 +40,7 @@ public class DmnDeployer extends AbstractDefinitionDeployer<DecisionDefinitionEn
     return DMN_RESOURCE_SUFFIXES;
   }
 
-  protected List<DecisionDefinitionEntity> transformDefinitions(DeploymentEntity deployment, ResourceEntity resource) {
+  protected List<DecisionDefinitionEntity> transformDefinitions(DeploymentEntity deployment, ResourceEntity resource, Properties properties) {
     byte[] bytes = resource.getBytes();
     ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
 

@@ -719,7 +719,7 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  public void FAILING_testDeployAndRemoveAsyncActivity() {
+  public void testDeployAndRemoveAsyncActivity() {
     Set<String> deployments = new HashSet<String>();
 
     try {
@@ -736,7 +736,6 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
           .addClasspathResource("org/camunda/bpm/engine/test/bpmn/async/AsyncTaskTest.testDeployAndRemoveAsyncActivity.v2.bpmn20.xml")
           .deploy();
       deployments.add(deployment2.getId());
-
 
       // and clearing the deployment cache (note that the equivalent of this in a real-world
       // scenario would be making the deployment with a different engine

@@ -29,6 +29,8 @@ import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParser;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.cmd.DeleteJobsCmd;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.core.model.Properties;
+import org.camunda.bpm.engine.impl.core.model.PropertyMapKey;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.event.MessageEventHandler;
@@ -72,10 +74,13 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
 
   public static final String[] BPMN_RESOURCE_SUFFIXES = new String[] { "bpmn20.xml", "bpmn" };
 
+  protected static final PropertyMapKey<String, List<JobDeclaration<?, ?>>> JOB_DECLARATIONS_PROPERTY =
+      new PropertyMapKey<String, List<JobDeclaration<?, ?>>>("JOB_DECLARATIONS_PROPERTY");
+
   protected ExpressionManager expressionManager;
   protected BpmnParser bpmnParser;
 
-  protected Map<String, List<JobDeclaration<?, ?>>> jobDeclarations = new HashMap<String, List<JobDeclaration<?, ?>>>();
+  /** <!> FURTHER MEMBERS ARE NOT ALLOWED <!> **/
 
   @Override
   protected String[] getResourcesSuffixes() {
@@ -83,7 +88,7 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
   }
 
   @Override
-  protected List<ProcessDefinitionEntity> transformDefinitions(DeploymentEntity deployment, ResourceEntity resource) {
+  protected List<ProcessDefinitionEntity> transformDefinitions(DeploymentEntity deployment, ResourceEntity resource, Properties properties) {
     byte[] bytes = resource.getBytes();
     ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
 
@@ -99,7 +104,10 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
 
     bpmnParse.execute();
 
-    jobDeclarations.putAll(bpmnParse.getJobDeclarations());
+    if (!properties.contains(JOB_DECLARATIONS_PROPERTY)) {
+      properties.set(JOB_DECLARATIONS_PROPERTY, new HashMap<String, List<JobDeclaration<?, ?>>>());
+    }
+    properties.get(JOB_DECLARATIONS_PROPERTY).putAll(bpmnParse.getJobDeclarations());
 
     return bpmnParse.getProcessDefinitions();
   }
@@ -147,8 +155,9 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
   }
 
   @Override
-  protected void definitionAddedToDeploymentCache(DeploymentEntity deployment, ProcessDefinitionEntity definition) {
-    List<JobDeclaration<?, ?>> declarations = jobDeclarations.get(definition.getKey());
+  protected void definitionAddedToDeploymentCache(DeploymentEntity deployment, ProcessDefinitionEntity definition, Properties properties) {
+    List<JobDeclaration<?, ?>> declarations = properties.get(JOB_DECLARATIONS_PROPERTY).get(definition.getKey());
+
     updateJobDeclarations(declarations, definition, deployment.isNew());
 
     ProcessDefinitionEntity latestDefinition = findLatestDefinitionByKey(definition.getKey());
