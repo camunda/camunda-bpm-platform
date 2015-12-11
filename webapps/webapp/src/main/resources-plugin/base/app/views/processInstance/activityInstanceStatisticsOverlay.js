@@ -38,6 +38,21 @@ define(['angular', 'text!./activity-instance-statistics-overlay.html'], function
           currentFilter = filter;
         });
 
+        $scope.getInstanceCount = function() {
+          var count = 0;
+
+          if($scope.activityInstanceStatistics.instances) {
+            count += $scope.activityInstanceStatistics.instances.length || 0;
+          }
+          if($scope.activityInstanceStatistics.instancesMI) {
+            count += $scope.activityInstanceStatistics.instancesMI.filter(function(instance) {
+              return instance.isTransitionInstance;
+            }).length || 0;
+          }
+
+          return count;
+        };
+
         $scope.selectRunningInstances = function(e) {
           var newFilter = angular.copy(currentFilter),
               ctrl = e.ctrlKey,

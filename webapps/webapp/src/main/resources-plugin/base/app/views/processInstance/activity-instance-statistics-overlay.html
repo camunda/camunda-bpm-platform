@@ -8,8 +8,7 @@
         tooltip-animation="false"
         ng-show="activityInstanceStatistics.instances   && activityInstanceStatistics.instances.length ||
                  activityInstanceStatistics.instancesMI && activityInstanceStatistics.instancesMI.length">
-    {{ (activityInstanceStatistics.instances.length | abbreviateNumber) ||
-       (activityInstanceStatistics.instancesMI.length | abbreviateNumber) }}
+    {{ getInstanceCount() }}
   </span>
 
   <span class="badge badge-important"
