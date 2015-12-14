@@ -475,7 +475,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
   @Override
   public boolean tryPruneLastConcurrentChild() {
-
     if (getNonEventScopeExecutions().size() == 1) {
       PvmExecutionImpl lastConcurrent = getNonEventScopeExecutions().get(0);
       if (lastConcurrent.isConcurrent()) {
@@ -491,8 +490,10 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
             }
           }
 
-          // Copy execution-local variables of lastConcurrent
-          setVariablesLocal(lastConcurrent.getVariablesLocal());
+          if (!lastConcurrent.isEnded()) {
+            // Copy execution-local variables of lastConcurrent
+            setVariablesLocal(lastConcurrent.getVariablesLocal());
+          }
 
           // Make sure parent execution is re-activated when the last concurrent
           // child execution is active
@@ -846,6 +847,25 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       recyclableExecutions = new ArrayList<ActivityExecution>(_recyclableExecutions);
     }
 
+    // mark all recyclable executions as ended
+    // if the list of recyclable executions also
+    // contains 'this' execution, then 'this' execution
+    // is also marked as ended. (if 'this' execution is
+    // pruned, then the local variables are not copied
+    // to the parent execution)
+    // this is a workaround to not delete all recyclable
+    // executions and create a new execution which leaves
+    // the activity.
+    for (ActivityExecution execution : recyclableExecutions) {
+      execution.setEnded(true);
+    }
+
+    // remove 'this' from recyclable executions to
+    // leave the activity with 'this' execution
+    // (when 'this' execution is the last concurrent
+    // execution, then 'this' execution will be pruned,
+    // and the activity is left with a propagating
+    // execution)
     recyclableExecutions.remove(this);
     for (ActivityExecution execution : recyclableExecutions) {
       execution.end(_transitions.isEmpty());

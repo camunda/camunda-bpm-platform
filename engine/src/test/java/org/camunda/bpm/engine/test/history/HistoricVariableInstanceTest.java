@@ -42,7 +42,6 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
-import org.junit.Test;
 
 
 /**
@@ -1451,6 +1450,58 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     assertEquals(taskId, instance.getTaskId());
 
     taskService.deleteTask(taskId, true);
+  }
+
+  @Deployment
+  public void testJoinParallelGatewayLocalVariableOnLastJoiningExecution() {
+    // when
+    runtimeService.startProcessInstanceByKey("process");
+
+    // then
+    assertEquals(0, runtimeService.createVariableInstanceQuery().count());
+
+    HistoricVariableInstance historicVariable = historyService.createHistoricVariableInstanceQuery().singleResult();
+    assertNotNull(historicVariable);
+    assertEquals("testVar", historicVariable.getName());
+  }
+
+  @Deployment
+  public void testNestedJoinParallelGatewayLocalVariableOnLastJoiningExecution() {
+    // when
+    runtimeService.startProcessInstanceByKey("process");
+
+    // then
+    assertEquals(0, runtimeService.createVariableInstanceQuery().count());
+
+    HistoricVariableInstance historicVariable = historyService.createHistoricVariableInstanceQuery().singleResult();
+    assertNotNull(historicVariable);
+    assertEquals("testVar", historicVariable.getName());
+  }
+
+  @Deployment
+  public void testJoinInclusiveGatewayLocalVariableOnLastJoiningExecution() {
+    // when
+    runtimeService.startProcessInstanceByKey("process");
+
+    // then
+    assertEquals(0, runtimeService.createVariableInstanceQuery().count());
+
+    HistoricVariableInstance historicVariable = historyService.createHistoricVariableInstanceQuery().singleResult();
+    assertNotNull(historicVariable);
+    assertEquals("testVar", historicVariable.getName());
+  }
+
+  @Deployment
+  public void testNestedJoinInclusiveGatewayLocalVariableOnLastJoiningExecution() {
+    // when
+    runtimeService.startProcessInstanceByKey("process");
+
+    // then
+    assertEquals(0, runtimeService.createVariableInstanceQuery().count());
+
+    HistoricVariableInstance historicVariable = historyService.createHistoricVariableInstanceQuery().singleResult();
+    assertNotNull(historicVariable);
+    assertEquals("testVar", historicVariable.getName());
   }
 
 }
