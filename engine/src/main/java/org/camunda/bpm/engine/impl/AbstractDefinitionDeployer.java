@@ -37,7 +37,7 @@ import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
  * {@link Deployer} responsible to parse resource files and create the proper entities.
  * This class is extended by specific resource deployers.
  *
- * Note: Implementations must not have any members.
+ * Note: Implementations must be thread-safe. In particular they should not keep deployment-specific state.
  */
 public abstract class AbstractDefinitionDeployer<DefinitionEntity extends ResourceDefinitionEntity> implements Deployer {
 

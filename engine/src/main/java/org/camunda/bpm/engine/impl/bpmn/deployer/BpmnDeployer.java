@@ -80,7 +80,7 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
   protected ExpressionManager expressionManager;
   protected BpmnParser bpmnParser;
 
-  /** <!> FURTHER MEMBERS ARE NOT ALLOWED <!> **/
+  /** <!> DON'T KEEP DEPLOYMENT-SPECIFIC STATE <!> **/
 
   @Override
   protected String[] getResourcesSuffixes() {
