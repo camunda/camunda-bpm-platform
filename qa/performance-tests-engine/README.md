@@ -263,6 +263,22 @@ mvn clean install -Pbenchmark,mysql,history-level-none
 mvn clean install -Pbenchmark,mysql,history-level-full
 ```
 
+<a name="configuration-tests" />
+### Selecting tests
+
+A test or a group of tests can be selected using the properties `test.includes` and `test.excludes`:
+
+```Shell
+mvn clean install -Pbenchmark,mysql -Dtest.includes=dmn
+```
+
+Or use one of the predefined maven profiles:
+
+```Shell
+mvn clean install -Pbenchmark,mysql,testBpmn
+mvn clean install -Pbenchmark,mysql,testDmn
+```
+
 [1]: docs/benchmark-report.png
 [2]: docs/sql-statement-log-report.png
 [3]: docs/longTermBenchmarkResults.png
