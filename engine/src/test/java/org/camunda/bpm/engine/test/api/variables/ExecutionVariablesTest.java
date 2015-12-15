@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.api.variables;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -27,14 +28,14 @@ public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
 
   @Deployment
   public void testTreeCompactionWithLocalVariableOnConcurrentExecution() {
-    runtimeService.startProcessInstanceByKey("process");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
     Execution innerTaskExecution = runtimeService
         .createExecutionQuery()
         .activityId("innerTask")
         .singleResult();
 
-    Execution firstConcurrentExecution = runtimeService
+    Execution subProcessConcurrentExecution = runtimeService
         .createExecutionQuery()
         .executionId(((ExecutionEntity) innerTaskExecution).getParentId())
         .singleResult();
@@ -45,19 +46,21 @@ public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
         .singleResult();
 
     // when
-    runtimeService.setVariableLocal(firstConcurrentExecution.getId(), "foo", "bar");
+    runtimeService.setVariableLocal(subProcessConcurrentExecution.getId(), "foo", "bar");
+    // and completing the concurrent task, thereby pruning the sub process concurrent execution
     taskService.complete(task.getId());
 
-    // then
+    // then the variable still exists
     VariableInstance variable = runtimeService.createVariableInstanceQuery().singleResult();
     assertNotNull(variable);
     assertEquals("foo", variable.getName());
+    assertEquals(processInstance.getId(), variable.getExecutionId());
   }
 
   @Deployment
   public void testTreeCompactionForkParallelGateway() {
     // given
-    runtimeService.startProcessInstanceByKey("process");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 
     Task task1 = taskService
         .createTaskQuery()
@@ -71,12 +74,14 @@ public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
 
     // when
     runtimeService.setVariableLocal(task2Execution.getId(), "foo", "bar");
+    // and completing the other task, thereby pruning the concurrent execution
     taskService.complete(task1.getId());
 
-    // then
+    // then the variable still exists
     VariableInstance variable = runtimeService.createVariableInstanceQuery().singleResult();
     assertNotNull(variable);
     assertEquals("foo", variable.getName());
+    assertEquals(processInstance.getId(), variable.getExecutionId());
   }
 
   @Deployment
@@ -93,15 +98,18 @@ public class ExecutionVariablesTest extends PluggableProcessEngineTestCase {
         .createExecutionQuery()
         .activityId("task2")
         .singleResult();
+    String subProcessScopeExecutionId = ((ExecutionEntity) task2Execution).getParentId();
 
     // when
     runtimeService.setVariableLocal(task2Execution.getId(), "foo", "bar");
+    // and completing the other task, thereby pruning the concurrent execution
     taskService.complete(task1.getId());
 
-    // then
+    // then the variable still exists on the subprocess scope execution
     VariableInstance variable = runtimeService.createVariableInstanceQuery().singleResult();
     assertNotNull(variable);
     assertEquals("foo", variable.getName());
+    assertEquals(subProcessScopeExecutionId, variable.getExecutionId());
   }
 
   @Deployment

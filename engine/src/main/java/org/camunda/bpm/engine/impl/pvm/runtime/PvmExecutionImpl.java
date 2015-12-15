@@ -864,7 +864,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     // leave the activity with 'this' execution
     // (when 'this' execution is the last concurrent
     // execution, then 'this' execution will be pruned,
-    // and the activity is left with a propagating
+    // and the activity is left with the scope
     // execution)
     recyclableExecutions.remove(this);
     for (ActivityExecution execution : recyclableExecutions) {
