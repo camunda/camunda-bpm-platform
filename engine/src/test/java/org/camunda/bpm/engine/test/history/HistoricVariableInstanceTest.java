@@ -32,6 +32,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEn
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.runtime.CaseInstance;
+import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
@@ -1502,6 +1503,60 @@ public class HistoricVariableInstanceTest extends PluggableProcessEngineTestCase
     HistoricVariableInstance historicVariable = historyService.createHistoricVariableInstanceQuery().singleResult();
     assertNotNull(historicVariable);
     assertEquals("testVar", historicVariable.getName());
+  }
+
+  @Deployment
+  public void FAILING_testForkParallelGatewayTreeCompaction() {
+    // given
+    runtimeService.startProcessInstanceByKey("process");
+
+    Task task1 = taskService
+        .createTaskQuery()
+        .taskDefinitionKey("task1")
+        .singleResult();
+
+    Execution task2Execution = runtimeService
+        .createExecutionQuery()
+        .activityId("task2")
+        .singleResult();
+
+    // when
+    runtimeService.setVariableLocal(task2Execution.getId(), "foo", "bar");
+    taskService.complete(task1.getId());
+
+    // then
+    assertEquals(1, runtimeService.createVariableInstanceQuery().count());
+
+    HistoricVariableInstance historicVariable = historyService.createHistoricVariableInstanceQuery().singleResult();
+    assertNotNull(historicVariable);
+    assertEquals("foo", historicVariable.getName());
+  }
+
+  @Deployment
+  public void FAILING_testNestedForkParallelGatewayTreeCompaction() {
+    // given
+    runtimeService.startProcessInstanceByKey("process");
+
+    Task task1 = taskService
+        .createTaskQuery()
+        .taskDefinitionKey("task1")
+        .singleResult();
+
+    Execution task2Execution = runtimeService
+        .createExecutionQuery()
+        .activityId("task2")
+        .singleResult();
+
+    // when
+    runtimeService.setVariableLocal(task2Execution.getId(), "foo", "bar");
+    taskService.complete(task1.getId());
+
+    // then
+    assertEquals(1, runtimeService.createVariableInstanceQuery().count());
+
+    HistoricVariableInstance historicVariable = historyService.createHistoricVariableInstanceQuery().singleResult();
+    assertNotNull(historicVariable);
+    assertEquals("foo", historicVariable.getName());
   }
 
 }
