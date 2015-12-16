@@ -113,7 +113,7 @@ public class DataFormats {
     }
   }
 
-  protected void registerDataFormats(ClassLoader classloader) {
+  public void registerDataFormats(ClassLoader classloader) {
     Map<String, DataFormat<?>> dataFormats = new HashMap<String, DataFormat<?>>();
 
     if(classloader == null) {
