@@ -21,7 +21,7 @@ import org.camunda.bpm.qa.performance.engine.steps.EvaluateDecisionTableStep;
 import org.junit.Test;
 
 /**
- * Evaluate DMN decision tables.
+ * Evaluate DMN decision tables via decision service.
  *
  * @author Philipp Ossler
  */
@@ -32,25 +32,15 @@ public class DmnEnginePerformanceTest extends ProcessEnginePerformanceTestCase {
   private static final double NUMBER_OF_MATCHING_RULES = 1.0;
 
   // decision ids
-  private static final String ONE_RULE = "oneRule";
   private static final String TWO_RULES = "twoRules";
   private static final String FIVE_RULES = "fiveRules";
   private static final String TEN_RULES = "tenRules";
   private static final String ONE_HUNDRED_RULES = "oneHundredRules";
 
-  private static final String ONE_RULE_TWO_INPUTS = "oneRuleTwoInputs";
   private static final String TWO_RULES_TWO_INPUTS = "twoRulesTwoInputs";
   private static final String FIVE_RULES_TWO_INPUTS = "fiveRulesTwoInputs";
   private static final String TEN_RULES_TWO_INPUTS = "tenRulesTwoInputs";
   private static final String ONE_HUNDRED_RULES_TWO_INPUTS = "oneHundredRulesTwoInputs";
-
-  @Test
-  @Deployment
-  public void oneRule() {
-    performanceTest()
-      .step(evaluateDecisionTableStep(ONE_RULE))
-    .run();
-  }
 
   @Test
   @Deployment
@@ -86,14 +76,6 @@ public class DmnEnginePerformanceTest extends ProcessEnginePerformanceTestCase {
 
   @Test
   @Deployment
-  public void oneRuleTwoInputs() {
-    performanceTest()
-      .step(evaluateDecisionTableStep(ONE_RULE_TWO_INPUTS))
-    .run();
-  }
-
-  @Test
-  @Deployment
   public void twoRulesTwoInputs() {
     performanceTest()
       .step(evaluateDecisionTableStep(TWO_RULES_TWO_INPUTS))
@@ -103,7 +85,7 @@ public class DmnEnginePerformanceTest extends ProcessEnginePerformanceTestCase {
   @Test
   @Deployment
   public void fiveRulesTwoInputs() {
-    performanceTest()
+   performanceTest()
       .step(evaluateDecisionTableStep(FIVE_RULES_TWO_INPUTS))
     .run();
   }
