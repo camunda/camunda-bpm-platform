@@ -80,6 +80,12 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
       <groupId>org.apache.ant</groupId>
       <artifactId>ant</artifactId>
       <scope>provided</scope>
@@ -655,6 +661,12 @@
      </properties>
     </profile>
     <profile>
+     <id>testDmn</id>
+     <properties>
+      <test.includes>dmn</test.includes>
+     </properties>
+    </profile>
+    <profile>
      <id>testBpmnCmmn</id>
      <properties>
       <test.includes>bpmn|cmmn</test.includes>
@@ -670,6 +682,12 @@
      <id>testExceptCmmn</id>
      <properties>
       <test.excludes>cmmn</test.excludes>
+     </properties>
+    </profile>
+    <profile>
+     <id>testExceptDmn</id>
+     <properties>
+      <test.excludes>dmn</test.excludes>
      </properties>
     </profile>
     <profile>
