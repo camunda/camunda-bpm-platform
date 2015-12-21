@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_KvS8sPBXEeOtYvXzz5ksgw" targetNamespace="http://camunda.org/schema/1.0/bpmn">
+  <process id="testProcess" isExecutable="true">
+    <startEvent id="start" />
+    <sequenceFlow sourceRef="start" targetRef="task" />
+    <serviceTask id="task" camunda:asyncAfter="true">
+      <extensionElements>
+        <camunda:connector>
+          <camunda:connectorId>testConnector</camunda:connectorId>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="in">
+              <camunda:script scriptFormat="groovy">
+                if (throwInMapping == 'in') {
+                  throw exception
+                }
+              </camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="out">
+              <camunda:script scriptFormat="groovy">
+                if (throwInMapping == 'out') {
+                  throw exception
+                }
+              </camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+        </camunda:connector>
+      </extensionElements>
+    </serviceTask>
+    <boundaryEvent id="BoundaryEvent_1" name="" attachedToRef="task">
+      <outgoing>SequenceFlow_3</outgoing>
+      <errorEventDefinition id="_ErrorEventDefinition_4"/>
+    </boundaryEvent>
+    <sequenceFlow id="SequenceFlow_3" name="" sourceRef="BoundaryEvent_1" targetRef="UserTask_1"/>
+    <userTask id="UserTask_1" name="User Task">
+      <incoming>SequenceFlow_3</incoming>
+      <outgoing>SequenceFlow_4</outgoing>
+    </userTask>
+    <endEvent id="EndEvent_2">
+      <incoming>SequenceFlow_4</incoming>
+    </endEvent>
+    <sequenceFlow id="SequenceFlow_4" name="" sourceRef="UserTask_1" targetRef="EndEvent_2"/>
+    <sequenceFlow id="SequenceFlow_AsyncAfter" sourceRef="task" targetRef="wait" />
+    <receiveTask id="wait" />
+    <sequenceFlow sourceRef="wait" targetRef="end" />
+    <endEvent id="end" />
+  </process>
+</definitions>

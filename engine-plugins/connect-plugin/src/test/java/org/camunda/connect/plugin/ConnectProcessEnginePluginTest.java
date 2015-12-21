@@ -209,6 +209,25 @@ public class ConnectProcessEnginePluginTest extends PluggableProcessEngineTestCa
     }
   }
 
+  @Deployment(resources="org/camunda/connect/plugin/ConnectProcessEnginePluginTest.testConnectorBpmnErrorThrownInScriptResourceNoAsyncAfterJobIsCreated.bpmn")
+  public void testConnectorBpmnErrorThrownInScriptResourceNoAsyncAfterJobIsCreated() {
+    // given
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("throwInMapping", "in");
+    variables.put("exception", new BpmnError("error"));
+
+    // when
+    runtimeService.startProcessInstanceByKey("testProcess", variables);
+
+    // then
+    // we will only reach the user task if the BPMNError from the script was handled by the boundary event
+    Task task = taskService.createTaskQuery().singleResult();
+    assertThat(task.getName(), is("User Task"));
+
+    // no job is created
+    assertThat(Long.valueOf(managementService.createJobQuery().count()), is(0l));
+  }
+
   @Deployment
   public void testFollowingExceptionIsNotHandledByConnector(){
     try {
