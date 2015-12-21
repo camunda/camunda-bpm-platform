@@ -43,7 +43,7 @@ public class SpinVariableSerializers {
     }
     if(dataFormats.getDataFormatByName(DataFormats.XML_DATAFORMAT_NAME) != null){
       DataFormat<SpinXmlElement> xmlDataFormat =
-          (DataFormat<SpinXmlElement>) dataFormats.getDataFormatByName(DataFormats.JSON_DATAFORMAT_NAME);
+          (DataFormat<SpinXmlElement>) dataFormats.getDataFormatByName(DataFormats.XML_DATAFORMAT_NAME);
       serializers.add(new XmlValueSerializer(xmlDataFormat));
     }
 
