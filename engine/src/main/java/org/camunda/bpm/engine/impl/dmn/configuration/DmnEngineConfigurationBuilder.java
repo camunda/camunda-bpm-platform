@@ -111,7 +111,7 @@ public class DmnEngineConfigurationBuilder {
 
   protected List<DmnDecisionTableEvaluationListener> createCustomPostDecisionTableEvaluationListeners() {
     ensureNotNull("dmnHistoryEventProducer", dmnHistoryEventProducer);
-    ensureNotNull("historyLevel", historyLevel);
+    // note that the history level may be null - see CAM-5165
 
     HistoryDecisionTableListener historyDecisionTableListener = new HistoryDecisionTableListener(dmnHistoryEventProducer, historyLevel);
 
