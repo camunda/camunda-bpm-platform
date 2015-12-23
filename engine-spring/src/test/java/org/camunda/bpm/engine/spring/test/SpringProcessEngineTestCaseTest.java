@@ -27,4 +27,5 @@ public class SpringProcessEngineTestCaseTest extends SpringProcessEngineTestCase
     assertNotNull(processEngine);
     assertTrue(((ProcessEngineImpl) processEngine).getProcessEngineConfiguration().isJobExecutorDeploymentAware());
   }
+
 }
