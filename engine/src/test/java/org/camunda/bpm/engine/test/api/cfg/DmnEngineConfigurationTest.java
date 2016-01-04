@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.test.api.cfg;
 
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
@@ -73,8 +74,9 @@ public class DmnEngineConfigurationTest {
   public void setCustomPostTableExecutionListener() {
     // given a DMN engine configuration with custom listener
     DefaultDmnEngineConfiguration dmnEngineConfiguration = (DefaultDmnEngineConfiguration) DmnEngineConfiguration.createDefaultDmnEngineConfiguration();
+    DmnDecisionTableEvaluationListener customEvaluationListener = mock(DmnDecisionTableEvaluationListener.class);
     List<DmnDecisionTableEvaluationListener> customListeners = new ArrayList<DmnDecisionTableEvaluationListener>();
-    customListeners.add(mock(DmnDecisionTableEvaluationListener.class));
+    customListeners.add(customEvaluationListener);
     dmnEngineConfiguration.setCustomPostDecisionTableEvaluationListeners(customListeners);
 
     ProcessEngineConfigurationImpl processEngineConfiguration = createProcessEngineConfiguration();
@@ -84,7 +86,7 @@ public class DmnEngineConfigurationTest {
     engine = processEngineConfiguration.buildProcessEngine();
 
     // then the custom listener should be set on the DMN engine
-    assertThat(getConfigurationOfDmnEngine().getCustomPostDecisionTableEvaluationListeners(), is(customListeners));
+    assertThat(getConfigurationOfDmnEngine().getCustomPostDecisionTableEvaluationListeners(), hasItem(customEvaluationListener));
   }
 
   @Test
