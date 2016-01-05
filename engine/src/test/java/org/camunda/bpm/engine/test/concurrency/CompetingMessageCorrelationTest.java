@@ -316,10 +316,45 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     assertTrue(thread1.getException() instanceof OptimisticLockingException);
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingMessageCorrelationTest.eventSubprocess.bpmn")
+  public void testEventSubprocess() {
+    InvocationLogListener.reset();
+
+    // given a process instance
+    runtimeService.startProcessInstanceByKey("testProcess");
+
+    // and two threads correlating in parallel
+    ThreadControl thread1 = executeControllableCommand(new ControllableMessageCorrelationCommand("incoming", false));
+    thread1.reportInterrupts();
+    ThreadControl thread2 = executeControllableCommand(new ControllableMessageCorrelationCommand("incoming", false));
+    thread2.reportInterrupts();
+
+    // both threads open a transaction and wait before correlating the message
+    thread1.waitForSync();
+    thread2.waitForSync();
+
+    // both threads correlate
+    thread1.makeContinue();
+    thread2.makeContinue();
+
+    thread1.waitForSync();
+    thread2.waitForSync();
+
+    // the first thread ends its transaction
+    thread1.waitUntilDone();
+    assertNull(thread1.getException());
+
+    // the second thread ends its transaction and fails with optimistic locking exception
+    thread2.waitUntilDone();
+    assertTrue(thread2.getException() != null);
+    assertTrue(thread2.getException() instanceof OptimisticLockingException);
+  }
+
   public static class InvocationLogListener implements JavaDelegate {
 
     protected static AtomicInteger invocations = new AtomicInteger(0);
 
+    @Override
     public void execute(DelegateExecution execution) throws Exception {
       invocations.incrementAndGet();
     }
@@ -349,6 +384,7 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
       this.processInstanceId = processInstanceId;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
 
       monitor.sync();  // thread will block here until makeContinue() is called form main thread
