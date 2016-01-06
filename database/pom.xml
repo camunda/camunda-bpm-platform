@@ -241,7 +241,7 @@
     <profile>
       <id>mariadb</id>
       <properties>
-        <database.type>mysql</database.type>
+        <database.type>mariadb</database.type>
         <database.driver>org.mariadb.jdbc.Driver</database.driver>
         <database.datasource.class>org.mariadb.jdbc.MySQLDataSource</database.datasource.class>
         <jboss.datasource.filename>mariadb-ds.xml</jboss.datasource.filename>

@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.impl.db.sql;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,6 +37,7 @@ public class DbSqlSessionFactory implements SessionFactory {
   public static final String H2 = "h2";
   public static final String MYSQL = "mysql";
   public static final String POSTGRES = "postgres";
+  public static final String MARIADB = "mariadb";
 
   protected static final Map<String, Map<String, String>> databaseSpecificStatements = new HashMap<String, Map<String,String>>();
 
@@ -89,34 +91,38 @@ public class DbSqlSessionFactory implements SessionFactory {
     constants.put("constant.for.update", "for update");
     dbSpecificConstants.put(H2, constants);
 
-    //mysql specific
-    databaseSpecificLimitBeforeStatements.put(MYSQL, "");
-    databaseSpecificLimitAfterStatements.put(MYSQL, "LIMIT #{maxResults} OFFSET #{firstResult}");
-    databaseSpecificInnerLimitAfterStatements.put(MYSQL, databaseSpecificLimitAfterStatements.get(MYSQL));
-    databaseSpecificLimitBetweenStatements.put(MYSQL, "");
-    databaseSpecificLimitBetweenClobStatements.put(MYSQL, databaseSpecificLimitBetweenStatements.get(MYSQL));
-    databaseSpecificOrderByStatements.put(MYSQL, defaultOrderBy);
-    databaseSpecificLimitBeforeNativeQueryStatements.put(MYSQL, "");
+    // mysql specific
+    // use the same specific for mariadb since it based on mysql and work with the exactly same statements
+    for(String mysqlLikeDatabase : Arrays.asList(MYSQL, MARIADB)) {
 
-    databaseSpecificBitAnd1.put(MYSQL, "");
-    databaseSpecificBitAnd2.put(MYSQL, " & ");
-    databaseSpecificBitAnd3.put(MYSQL, "");
-    databaseSpecificDummyTable.put(MYSQL, "");
-    databaseSpecificTrueConstant.put(MYSQL, "1");
-    databaseSpecificFalseConstant.put(MYSQL, "0");
-    databaseSpecificIfNull.put(MYSQL, "IFNULL");
-    addDatabaseSpecificStatement(MYSQL, "selectProcessDefinitionsByQueryCriteria", "selectProcessDefinitionsByQueryCriteria_mysql");
-    addDatabaseSpecificStatement(MYSQL, "selectProcessDefinitionCountByQueryCriteria", "selectProcessDefinitionCountByQueryCriteria_mysql");
-    addDatabaseSpecificStatement(MYSQL, "selectDeploymentsByQueryCriteria", "selectDeploymentsByQueryCriteria_mysql");
-    addDatabaseSpecificStatement(MYSQL, "selectDeploymentCountByQueryCriteria", "selectDeploymentCountByQueryCriteria_mysql");
+      databaseSpecificLimitBeforeStatements.put(mysqlLikeDatabase, "");
+      databaseSpecificLimitAfterStatements.put(mysqlLikeDatabase, "LIMIT #{maxResults} OFFSET #{firstResult}");
+      databaseSpecificInnerLimitAfterStatements.put(mysqlLikeDatabase, databaseSpecificLimitAfterStatements.get(mysqlLikeDatabase));
+      databaseSpecificLimitBetweenStatements.put(mysqlLikeDatabase, "");
+      databaseSpecificLimitBetweenClobStatements.put(mysqlLikeDatabase, databaseSpecificLimitBetweenStatements.get(mysqlLikeDatabase));
+      databaseSpecificOrderByStatements.put(mysqlLikeDatabase, defaultOrderBy);
+      databaseSpecificLimitBeforeNativeQueryStatements.put(mysqlLikeDatabase, "");
 
-    constants = new HashMap<String, String>();
-    constants.put("constant.event", "'event'");
-    constants.put("constant.op_message", "CONCAT(NEW_VALUE_, '_|_', PROPERTY_)");
-    constants.put("constant.for.update", "for update");
-    dbSpecificConstants.put(MYSQL, constants);
+      databaseSpecificBitAnd1.put(mysqlLikeDatabase, "");
+      databaseSpecificBitAnd2.put(mysqlLikeDatabase, " & ");
+      databaseSpecificBitAnd3.put(mysqlLikeDatabase, "");
+      databaseSpecificDummyTable.put(mysqlLikeDatabase, "");
+      databaseSpecificTrueConstant.put(mysqlLikeDatabase, "1");
+      databaseSpecificFalseConstant.put(mysqlLikeDatabase, "0");
+      databaseSpecificIfNull.put(mysqlLikeDatabase, "IFNULL");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "selectProcessDefinitionsByQueryCriteria", "selectProcessDefinitionsByQueryCriteria_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "selectProcessDefinitionCountByQueryCriteria", "selectProcessDefinitionCountByQueryCriteria_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "selectDeploymentsByQueryCriteria", "selectDeploymentsByQueryCriteria_mysql");
+      addDatabaseSpecificStatement(mysqlLikeDatabase, "selectDeploymentCountByQueryCriteria", "selectDeploymentCountByQueryCriteria_mysql");
 
-    //postgres specific
+      constants = new HashMap<String, String>();
+      constants.put("constant.event", "'event'");
+      constants.put("constant.op_message", "CONCAT(NEW_VALUE_, '_|_', PROPERTY_)");
+      constants.put("constant.for.update", "for update");
+      dbSpecificConstants.put(mysqlLikeDatabase, constants);
+    }
+
+    // postgres specific
     databaseSpecificLimitBeforeStatements.put(POSTGRES, "");
     databaseSpecificLimitAfterStatements.put(POSTGRES, "LIMIT #{maxResults} OFFSET #{firstResult}");
     databaseSpecificInnerLimitAfterStatements.put(POSTGRES, databaseSpecificLimitAfterStatements.get(POSTGRES));

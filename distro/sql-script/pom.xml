@@ -136,6 +136,10 @@
                 <concat destfile="target/sql/create/mysql_engine_${project.version}.sql" fixlastline="yes">
                   <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.mysql.create.engine.sql activiti.mysql.create.case.engine.sql activiti.mysql.create.decision.engine.sql activiti.mysql.create.history.sql activiti.mysql.create.case.history.sql activiti.mysql.create.decision.history.sql" />
                 </concat>
+                
+                <concat destfile="target/sql/create/mariadb_engine_${project.version}.sql" fixlastline="yes">
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.mariadb.create.engine.sql activiti.mariadb.create.case.engine.sql activiti.mariadb.create.decision.engine.sql activiti.mariadb.create.history.sql activiti.mariadb.create.case.history.sql activiti.mariadb.create.decision.history.sql" />
+                </concat>
 
                 <concat destfile="target/sql/create/oracle_engine_${project.version}.sql" fixlastline="yes">
                   <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.oracle.create.engine.sql activiti.oracle.create.case.engine.sql activiti.oracle.create.decision.engine.sql activiti.oracle.create.history.sql activiti.oracle.create.case.history.sql activiti.oracle.create.decision.history.sql" />
@@ -173,6 +177,10 @@
 
                 <concat destfile="target/sql/drop/mysql_engine_${project.version}.sql" fixlastline="yes">
                   <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.mysql.drop.decision.engine.sql activiti.mysql.drop.case.engine.sql activiti.mysql.drop.engine.sql activiti.mysql.drop.decision.history.sql activiti.mysql.drop.case.history.sql activiti.mysql.drop.history.sql" />
+                </concat>
+                
+                <concat destfile="target/sql/drop/mariadb_engine_${project.version}.sql" fixlastline="yes">
+                  <filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.mariadb.drop.decision.engine.sql activiti.mariadb.drop.case.engine.sql activiti.mariadb.drop.engine.sql activiti.mariadb.drop.decision.history.sql activiti.mariadb.drop.case.history.sql activiti.mariadb.drop.history.sql" />
                 </concat>
 
                 <concat destfile="target/sql/drop/oracle_engine_${project.version}.sql" fixlastline="yes">
