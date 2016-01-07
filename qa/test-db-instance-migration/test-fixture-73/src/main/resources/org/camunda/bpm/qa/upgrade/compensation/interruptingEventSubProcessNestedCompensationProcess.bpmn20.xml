@@ -6,7 +6,7 @@
   <message id="messageId1" name="EventSubProcessMessage" />
   <message id="messageId2" name="BoundaryEventMessage" />
   
-  <process id="InterruptingEventSubProcessNestedCompensationScenario">
+  <process id="InterruptingEventSubProcessNestedCompensationScenario" isExecutable="true">
     <startEvent id="start" />
     
     <sequenceFlow sourceRef="start" targetRef="outerTask" />

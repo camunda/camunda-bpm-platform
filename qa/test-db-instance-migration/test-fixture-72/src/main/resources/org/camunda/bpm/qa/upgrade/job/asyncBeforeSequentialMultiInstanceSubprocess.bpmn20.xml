@@ -4,7 +4,7 @@
   <message id="boundaryMessageId" name="BoundaryEventMessage" />
   <error id="errorId" errorCode="ThrowBpmnErrorDelegate"/>
   
-  <process id="AsyncBeforeSequentialMultiInstanceSubprocess">
+  <process id="AsyncBeforeSequentialMultiInstanceSubprocess" isExecutable="true">
     <startEvent id="theStart" />
     <sequenceFlow sourceRef="theStart" targetRef="miSubProcess" />
 

@@ -4,7 +4,7 @@
   xmlns:activiti="http://activiti.org/bpmn"
   targetNamespace="Examples">
   
-  <process id="SubprocessCompensationScenario">
+  <process id="SubprocessCompensationScenario" isExecutable="true">
     <startEvent id="start" />
     
     <sequenceFlow sourceRef="start" targetRef="subProcess" />

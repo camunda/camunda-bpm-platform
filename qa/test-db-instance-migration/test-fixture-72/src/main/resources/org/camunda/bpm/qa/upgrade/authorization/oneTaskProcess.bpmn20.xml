@@ -3,7 +3,7 @@
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
   targetNamespace="Examples">
 
-  <process id="oneTaskProcess" name="The One Task Process">
+  <process id="oneTaskProcess" name="The One Task Process" isExecutable="true">
     <startEvent id="theStart" />
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask" />
     <userTask id="theTask" name="my task" />

@@ -4,7 +4,7 @@
   xmlns:activiti="http://activiti.org/bpmn"
   targetNamespace="Examples">
 
-  <process id="ParallelScopeTasksScenario.plain" >
+  <process id="ParallelScopeTasksScenario.plain" isExecutable="true">
     <startEvent id="start" />
     <sequenceFlow id="flow1" sourceRef="start" targetRef="fork" />
     <parallelGateway id="fork" />

@@ -4,7 +4,7 @@
   xmlns:activiti="http://activiti.org/bpmn"
   targetNamespace="Examples">
 
-  <process id="OneScopeTaskScenario.nested" >
+  <process id="OneScopeTaskScenario.nested" isExecutable="true">
     <startEvent id="start" />
     <sequenceFlow id="flow1" sourceRef="start" targetRef="subProcess" />
     

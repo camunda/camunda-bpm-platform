@@ -5,7 +5,7 @@
   targetNamespace="Examples">
   <message id="messageId" name="EventSubProcessMessage" />
   
-  <process id="NonInterruptingEventSubProcessCompensationScenario">
+  <process id="NonInterruptingEventSubProcessCompensationScenario" isExecutable="true">
     <startEvent id="start" />
     
     <sequenceFlow sourceRef="start" targetRef="outerTask" />

@@ -6,7 +6,7 @@
   
   <message id="messageId" name="Message" />
   
-  <process id="InterruptingEventSubprocessCompensationScenario">
+  <process id="InterruptingEventSubprocessCompensationScenario" isExecutable="true">
     <startEvent id="start" />
     
     <sequenceFlow sourceRef="start" targetRef="subProcess" />

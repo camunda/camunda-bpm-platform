@@ -4,7 +4,7 @@
   xmlns:activiti="http://activiti.org/bpmn"
   targetNamespace="Examples">
 
-  <process id="OneTaskScenario.plain" >
+  <process id="OneTaskScenario.plain" isExecutable="true">
     <startEvent id="start" />
     <sequenceFlow id="flow1" sourceRef="start" targetRef="task" />
     <userTask id="task" />
