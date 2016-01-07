@@ -53,7 +53,7 @@
           <executions>
             <execution>
               <id>unpack-current-sql-scripts</id>
-              <phase>generate-test-resources</phase>
+              <phase>generate-test-sources</phase>
               <goals>
                 <goal>unpack</goal>
               </goals>
@@ -86,8 +86,8 @@
             <artifactId>maven-antrun-plugin</artifactId>
             <executions>
               <execution>
-                <id>compile</id>
-                <phase>generate-test-resources</phase>
+                <id>create-sql-script-stubs</id>
+                <phase>generate-test-sources</phase>
                 <configuration>
                   <target>
                     <property name="current.minor.version" value="${camunda.current.majorVersion}.${camunda.current.minorVersion}" />
@@ -108,6 +108,26 @@
                     <!-- minor version upgrade from previous to current version -->
                     <touch file="${current.sql.upgrade.dir}/${minor.version.upgrade.script.previous.to.current.engine}" />
                     <touch file="${current.sql.upgrade.dir}/${minor.version.upgrade.script.previous.to.current.identity}" />
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>copy-old-mysql-scripts-for-mariadb</id>
+                <phase>generate-test-resources</phase>
+                <configuration>
+                  <target>
+
+                    <!-- TODO: if 7.4 patch scripts for mysql are created they have to be copied for mariadb -->
+                    <!-- example: 7.4.0 to 7.4.1 -->
+                    <!--<copy-->
+                      <!--file="${project.build.directory}/scripts-current/sql/upgrade/mysql_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.0_to_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.1.sql"-->
+                      <!--tofile="${project.build.directory}/scripts-current/sql/upgrade/mariadb_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.0_to_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.1.sql"-->
+                      <!--overwrite="true"-->
+                    <!--/>-->
+
                   </target>
                 </configuration>
                 <goals>

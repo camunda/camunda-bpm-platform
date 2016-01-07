@@ -103,7 +103,7 @@
             <artifactId>maven-antrun-plugin</artifactId>
             <executions>
               <execution>
-                <id>compile</id>
+                <id>create-sql-script-stubs</id>
                 <phase>generate-test-sources</phase>
                 <configuration>
                   <target>
@@ -124,6 +124,33 @@
                     <!-- example:
                     <touch file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.current.majorVersion}.${camunda.current.minorVersion}_patch_{camunda.current.majorVersion}.${camunda.current.minorVersion}.0_to_{camunda.current.majorVersion}.${camunda.current.minorVersion}.1.sql" />
                     -->
+
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>copy-old-mysql-scripts-for-mariadb</id>
+                <phase>generate-test-resources</phase>
+                <configuration>
+                  <target>
+
+                    <!-- copy mysql create scripts from 7.4 for mariadb as with 7.5 mariadb has own scripts -->
+                    <!-- TODO: if 7.4 patch scripts for mysql are created they probably also have to be copied for mariadb -->
+                    <!-- NOTE: this should be removed during the 7.6 development cycle -->
+
+                    <copy
+                      file="${project.build.directory}/scripts-old/sql/create/mysql_engine_${camunda.version.old}.sql"
+                      tofile="${project.build.directory}/scripts-old/sql/create/mariadb_engine_${camunda.version.old}.sql"
+                      overwrite="true"
+                    />
+                    <copy
+                      file="${project.build.directory}/scripts-old/sql/create/mysql_identity_${camunda.version.old}.sql"
+                      tofile="${project.build.directory}/scripts-old/sql/create/mariadb_identity_${camunda.version.old}.sql"
+                      overwrite="true"
+                    />
 
                   </target>
                 </configuration>
@@ -159,7 +186,7 @@
               </execution>
               <execution>
                 <id>unpack-old-scripts</id>
-                <phase>generate-test-resources</phase>
+                <phase>generate-test-sources</phase>
                 <goals>
                   <goal>unpack</goal>
                 </goals>
@@ -185,6 +212,8 @@
               </execution>
             </executions>
           </plugin>
+
+
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>sql-maven-plugin</artifactId>
