@@ -1,4 +1,4 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
+	/* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -12,20 +12,25 @@
  */
 package org.camunda.bpm.engine.rest.impl.history;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+import org.camunda.bpm.engine.history.ReportResult;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
+import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceReportDto;
+import org.camunda.bpm.engine.rest.dto.history.ReportResultDto;
 import org.camunda.bpm.engine.rest.history.HistoricProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.sub.history.HistoricProcessInstanceResource;
 import org.camunda.bpm.engine.rest.sub.history.impl.HistoricProcessInstanceResourceImpl;
 
 import javax.ws.rs.core.UriInfo;
-import java.util.ArrayList;
-import java.util.List;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class HistoricProcessInstanceRestServiceImpl implements HistoricProcessInstanceRestService {
 
@@ -92,6 +97,19 @@ public class HistoricProcessInstanceRestServiceImpl implements HistoricProcessIn
     long count = query.count();
     CountResultDto result = new CountResultDto();
     result.setCount(count);
+
+    return result;
+  }
+
+  @Override
+  public List<ReportResultDto> getHistoricProcessInstancesReport(UriInfo uriInfo) {
+    HistoricProcessInstanceReportDto reportDto = new HistoricProcessInstanceReportDto(objectMapper, uriInfo.getQueryParameters());
+    List<? extends ReportResult> reports = reportDto.executeReport(processEngine);
+
+    List<ReportResultDto> result = new ArrayList<ReportResultDto>();
+    for (ReportResult report : reports) {
+      result.add(ReportResultDto.fromReportResult(report));
+    }
 
     return result;
   }

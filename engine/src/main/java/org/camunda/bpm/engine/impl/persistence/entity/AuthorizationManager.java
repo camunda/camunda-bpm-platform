@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
 import static org.camunda.bpm.engine.authorization.Permissions.CREATE_INSTANCE;
 import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
@@ -465,6 +466,10 @@ public class AuthorizationManager extends AbstractManager {
     if (historicJobLog.getProcessDefinitionKey() != null) {
       checkAuthorization(READ_HISTORY, PROCESS_DEFINITION, historicJobLog.getProcessDefinitionKey());
     }
+  }
+
+  public void checkReadHistoryAnyProcessDefinition() {
+    checkAuthorization(READ_HISTORY, PROCESS_DEFINITION, ANY);
   }
 
   // update permission //////////////////////////////////////////////////

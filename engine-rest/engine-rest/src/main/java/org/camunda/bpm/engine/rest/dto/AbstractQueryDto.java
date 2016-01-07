@@ -12,29 +12,20 @@
  */
 package org.camunda.bpm.engine.rest.dto;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.Direction;
-import org.camunda.bpm.engine.impl.QueryOrderingProperty;
-import org.camunda.bpm.engine.impl.VariableOrderProperty;
 import org.camunda.bpm.engine.query.Query;
-import org.camunda.bpm.engine.query.QueryProperty;
-import org.camunda.bpm.engine.rest.dto.converter.JacksonAwareStringToTypeConverter;
-import org.camunda.bpm.engine.rest.dto.converter.StringToTypeConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response.Status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -45,7 +36,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Thorben Lindhauer
  *
  */
-public abstract class AbstractQueryDto<T extends Query<?, ?>> {
+public abstract class AbstractQueryDto<T extends Query<?, ?>>  extends AbstractSearchQueryDto {
 
   public static final String SORT_ORDER_ASC_VALUE = "asc";
   public static final String SORT_ORDER_DESC_VALUE = "desc";
@@ -56,8 +47,6 @@ public abstract class AbstractQueryDto<T extends Query<?, ?>> {
     VALID_SORT_ORDER_VALUES.add(SORT_ORDER_ASC_VALUE);
     VALID_SORT_ORDER_VALUES.add(SORT_ORDER_DESC_VALUE);
   }
-
-  protected ObjectMapper objectMapper;
 
   protected String sortBy;
   protected String sortOrder;
@@ -72,20 +61,7 @@ public abstract class AbstractQueryDto<T extends Query<?, ?>> {
   }
 
   public AbstractQueryDto(ObjectMapper objectMapper, MultivaluedMap<String, String> queryParameters) {
-    this.objectMapper = objectMapper;
-    for (Entry<String, List<String>> param : queryParameters.entrySet()) {
-      String key = param.getKey();
-      String value = param.getValue().iterator().next();
-      this.setValueBasedOnAnnotation(key, value);
-    }
-  }
-
-  // note: with Jackson version >= 1.9, it would be better to use @JacksonInject and
-  // configure the object mapper in the JacksonConfigurator class to be an injectable value.
-  // then, explicitly calling this method with every query is not necessary any longer
-  @JsonIgnore
-  public void setObjectMapper(ObjectMapper objectMapper) {
-    this.objectMapper = objectMapper;
+    super(objectMapper, queryParameters);
   }
 
   @CamundaQueryParam("sortBy")
@@ -116,72 +92,6 @@ public abstract class AbstractQueryDto<T extends Query<?, ?>> {
 
   protected boolean sortOptionsValid() {
     return (sortBy != null && sortOrder != null) || (sortBy == null && sortOrder == null);
-  }
-
-  /**
-   * Finds the methods that are annotated with a {@link CamundaQueryParam} with a value that matches the key parameter.
-   * Before invoking these methods, the annotated {@link StringToTypeConverter} is used to convert the String value to the desired Java type.
-   * @param key
-   * @param value
-   */
-  protected void setValueBasedOnAnnotation(String key, String value) {
-    List<Method> matchingMethods = findMatchingAnnotatedMethods(key);
-    for (Method method : matchingMethods) {
-      Class<? extends JacksonAwareStringToTypeConverter<?>> converterClass = findAnnotatedTypeConverter(method);
-      if (converterClass == null) {
-        continue;
-      }
-
-      JacksonAwareStringToTypeConverter<?> converter = null;
-      try {
-        converter = converterClass.newInstance();
-        converter.setObjectMapper(objectMapper);
-        Object convertedValue = converter.convertQueryParameterToType(value);
-        method.invoke(this, convertedValue);
-      } catch (InstantiationException e) {
-        throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Server error.");
-      } catch (IllegalAccessException e) {
-        throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Server error.");
-      } catch (InvocationTargetException e) {
-        throw new InvalidRequestException(Status.BAD_REQUEST, e, "Cannot set query parameter '" + key + "' to value '" + value + "'");
-      } catch (RestException e) {
-        throw new InvalidRequestException(e.getStatus(), e,
-            "Cannot set query parameter '" + key + "' to value '" + value + "': " + e.getMessage());
-      }
-    }
-  }
-
-  private List<Method> findMatchingAnnotatedMethods(String parameterName) {
-    List<Method> result = new ArrayList<Method>();
-    Method[] methods = this.getClass().getMethods();
-    for (int i = 0; i < methods.length; i++) {
-      Method method = methods[i];
-      Annotation[] methodAnnotations = method.getAnnotations();
-
-      for (int j = 0; j < methodAnnotations.length; j++) {
-        Annotation annotation = methodAnnotations[j];
-        if (annotation instanceof CamundaQueryParam) {
-          CamundaQueryParam parameterAnnotation = (CamundaQueryParam) annotation;
-          if (parameterAnnotation.value().equals(parameterName)) {
-            result.add(method);
-          }
-        }
-      }
-    }
-    return result;
-  }
-
-  private Class<? extends JacksonAwareStringToTypeConverter<?>> findAnnotatedTypeConverter(Method method) {
-    Annotation[] methodAnnotations = method.getAnnotations();
-
-    for (int j = 0; j < methodAnnotations.length; j++) {
-      Annotation annotation = methodAnnotations[j];
-      if (annotation instanceof CamundaQueryParam) {
-        CamundaQueryParam parameterAnnotation = (CamundaQueryParam) annotation;
-        return parameterAnnotation.converter();
-      }
-    }
-    return null;
   }
 
   public T toQuery(ProcessEngine engine) {

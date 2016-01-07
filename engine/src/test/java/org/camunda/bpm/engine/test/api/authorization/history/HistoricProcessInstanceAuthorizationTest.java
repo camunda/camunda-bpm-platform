@@ -20,9 +20,12 @@ import static org.camunda.bpm.engine.authorization.Resources.PROCESS_DEFINITION;
 import java.util.List;
 
 import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.authorization.MissingAuthorization;
+import org.camunda.bpm.engine.history.DurationReportResult;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.impl.AbstractQuery;
+import org.camunda.bpm.engine.query.PeriodUnit;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.api.authorization.AuthorizationTest;
 
@@ -283,6 +286,53 @@ public class HistoricProcessInstanceAuthorizationTest extends AuthorizationTest 
         .count();
     assertEquals(0, count);
     enableAuthorization();
+  }
+
+  // create historic process instance report
+
+  public void testHistoricProcessInstanceReportWithoutAuthorization() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    disableAuthorization();
+    taskService.complete(taskId);
+    enableAuthorization();
+
+    try {
+      // when
+      historyService
+          .createHistoricProcessInstanceReport()
+          .duration(PeriodUnit.MONTH);
+      fail("Exception expected: It should not be possible to create a historic process instance report");
+    } catch (AuthorizationException e) {
+      // then
+      List<MissingAuthorization> missingAuthorizations = e.getMissingAuthorizations();
+      assertEquals(1, missingAuthorizations.size());
+
+      MissingAuthorization missingAuthorization = missingAuthorizations.get(0);
+      assertEquals(READ_HISTORY.toString(), missingAuthorization.getViolatedPermissionName());
+      assertEquals(PROCESS_DEFINITION.resourceName(), missingAuthorization.getResourceType());
+      assertEquals(ANY, missingAuthorization.getResourceId());
+    }
+  }
+
+  public void testHistoricProcessInstanceReportWithHistoryReadPermissionOnAny() {
+    // given
+    startProcessInstanceByKey(PROCESS_KEY);
+    String taskId = selectSingleTask().getId();
+    disableAuthorization();
+    taskService.complete(taskId);
+    enableAuthorization();
+
+    createGrantAuthorization(PROCESS_DEFINITION, ANY, userId, READ_HISTORY);
+
+    // when
+    List<DurationReportResult> result = historyService
+        .createHistoricProcessInstanceReport()
+        .duration(PeriodUnit.MONTH);
+
+    // then
+    assertEquals(1, result.size());
   }
 
   // helper ////////////////////////////////////////////////////////

@@ -46,6 +46,7 @@ import org.camunda.bpm.engine.form.FormProperty;
 import org.camunda.bpm.engine.form.FormType;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.form.TaskFormData;
+import org.camunda.bpm.engine.history.DurationReportResult;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityStatistics;
 import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
@@ -74,6 +75,7 @@ import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.MetricsQuery;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.query.Query;
+import org.camunda.bpm.engine.query.PeriodUnit;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
@@ -428,6 +430,12 @@ public abstract class MockProvider {
   public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_STARTED_BEFORE = "2013-01-23T13:42:43";
   public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_FINISHED_AFTER = "2013-01-23T13:42:43";
   public static final String EXAMPLE_HISTORIC_PROCESS_INSTANCE_FINISHED_BEFORE = "2013-04-23T13:42:43";
+
+  // historic process instance duration report
+  public static final long EXAMPLE_HISTORIC_PROC_INST_DURATION_REPORT_AVG = 10;
+  public static final long EXAMPLE_HISTORIC_PROC_INST_DURATION_REPORT_MIN = 5;
+  public static final long EXAMPLE_HISTORIC_PROC_INST_DURATION_REPORT_MAX = 15;
+  public static final int EXAMPLE_HISTORIC_PROC_INST_DURATION_REPORT_PERIOD = 1;
 
   // Historic Case Instance
   public static final long EXAMPLE_HISTORIC_CASE_INSTANCE_DURATION_MILLIS = 2000l;
@@ -1638,6 +1646,32 @@ public abstract class MockProvider {
     when(mock.getStartTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_PROCESS_INSTANCE_START_TIME));
     when(mock.getDurationInMillis()).thenReturn(EXAMPLE_HISTORIC_PROCESS_INSTANCE_DURATION_MILLIS);
     return mock;
+  }
+
+  public static List<DurationReportResult> createMockHistoricProcessInstanceDurationReportByMonth() {
+    DurationReportResult mock = mock(DurationReportResult.class);
+    when(mock.getAverage()).thenReturn(EXAMPLE_HISTORIC_PROC_INST_DURATION_REPORT_AVG);
+    when(mock.getMinimum()).thenReturn(EXAMPLE_HISTORIC_PROC_INST_DURATION_REPORT_MIN);
+    when(mock.getMaximum()).thenReturn(EXAMPLE_HISTORIC_PROC_INST_DURATION_REPORT_MAX);
+    when(mock.getPeriod()).thenReturn(EXAMPLE_HISTORIC_PROC_INST_DURATION_REPORT_PERIOD);
+    when(mock.getPeriodUnit()).thenReturn(PeriodUnit.MONTH);
+
+    List<DurationReportResult> mockList = new ArrayList<DurationReportResult>();
+    mockList.add(mock);
+    return mockList;
+  }
+
+  public static List<DurationReportResult> createMockHistoricProcessInstanceDurationReportByQuarter() {
+    DurationReportResult mock = mock(DurationReportResult.class);
+    when(mock.getAverage()).thenReturn(EXAMPLE_HISTORIC_PROC_INST_DURATION_REPORT_AVG);
+    when(mock.getMinimum()).thenReturn(EXAMPLE_HISTORIC_PROC_INST_DURATION_REPORT_MIN);
+    when(mock.getMaximum()).thenReturn(EXAMPLE_HISTORIC_PROC_INST_DURATION_REPORT_MAX);
+    when(mock.getPeriod()).thenReturn(EXAMPLE_HISTORIC_PROC_INST_DURATION_REPORT_PERIOD);
+    when(mock.getPeriodUnit()).thenReturn(PeriodUnit.QUARTER);
+
+    List<DurationReportResult> mockList = new ArrayList<DurationReportResult>();
+    mockList.add(mock);
+    return mockList;
   }
 
   public static List<HistoricCaseInstance> createMockHistoricCaseInstances() {

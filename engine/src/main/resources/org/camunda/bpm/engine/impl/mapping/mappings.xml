@@ -44,6 +44,7 @@
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Filter.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Metrics.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/ExternalTask.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Report.xml" />
 
     <!-- CMMN -->
 

@@ -32,6 +32,8 @@ import java.util.List;
 
 
 
+
+import org.camunda.bpm.engine.impl.AbstractReport;
 import org.camunda.bpm.engine.impl.DeploymentQueryImpl;
 import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
 import org.camunda.bpm.engine.impl.GroupQueryImpl;
@@ -148,6 +150,10 @@ public class DbEntityManager implements Session, EntityLoadListener {
     }else {
       return selectList(statement, parameter, 0, Integer.MAX_VALUE);
     }
+  }
+
+  public List selectList(String statement, AbstractReport reportQuery) {
+    return selectListWithRawParameter(statement, reportQuery, 0, Integer.MAX_VALUE);
   }
 
   public List selectList(String statement, ListQueryParameterObject parameter, Page page) {

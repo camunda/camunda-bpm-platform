@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.history.HistoricJobLog;
 import org.camunda.bpm.engine.history.HistoricJobLogQuery;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+import org.camunda.bpm.engine.history.HistoricProcessInstanceReport;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstanceQuery;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
@@ -196,5 +197,12 @@ public interface HistoryService {
    * @since 7.3
    */
   String getHistoricJobLogExceptionStacktrace(String historicJobLogId);
+
+  /**
+   * Creates a new programmatic query to create a historic process instance report.
+   *
+   * @since 7.5
+   */
+  HistoricProcessInstanceReport createHistoricProcessInstanceReport();
 
 }
