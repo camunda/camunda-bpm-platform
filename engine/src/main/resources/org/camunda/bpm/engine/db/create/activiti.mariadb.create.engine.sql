@@ -30,7 +30,7 @@ create table ACT_GE_BYTEARRAY (
 create table ACT_RE_DEPLOYMENT (
     ID_ varchar(64),
     NAME_ varchar(255),
-    DEPLOY_TIME_ timestamp,
+    DEPLOY_TIME_ timestamp(3),
     SOURCE_ varchar(255),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
@@ -61,7 +61,7 @@ create table ACT_RU_JOB (
     ID_ varchar(64) NOT NULL,
     REV_ integer,
     TYPE_ varchar(255) NOT NULL,
-    LOCK_EXP_TIME_ timestamp NULL,
+    LOCK_EXP_TIME_ timestamp(3) NULL,
     LOCK_OWNER_ varchar(255),
     EXCLUSIVE_ boolean,
     EXECUTION_ID_ varchar(64),
@@ -71,7 +71,7 @@ create table ACT_RU_JOB (
     RETRIES_ integer,
     EXCEPTION_STACK_ID_ varchar(64),
     EXCEPTION_MSG_ varchar(4000),
-    DUEDATE_ timestamp NULL,
+    DUEDATE_ timestamp(3) NULL,
     REPEAT_ varchar(255),
     HANDLER_TYPE_ varchar(255),
     HANDLER_CFG_ varchar(4000),
@@ -128,7 +128,7 @@ create table ACT_RU_TASK (
     ASSIGNEE_ varchar(255),
     DELEGATION_ varchar(64),
     PRIORITY_ integer,
-    CREATE_TIME_ timestamp,
+    CREATE_TIME_ timestamp(3),
     DUE_DATE_ datetime(3),
     FOLLOW_UP_DATE_ datetime(3),
     SUSPENSION_STATE_ integer,
@@ -176,14 +176,14 @@ create table ACT_RU_EVENT_SUBSCR (
     PROC_INST_ID_ varchar(64),
     ACTIVITY_ID_ varchar(64),
     CONFIGURATION_ varchar(255),
-    CREATED_ timestamp not null,
+    CREATED_ timestamp(3) not null,
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
 create table ACT_RU_INCIDENT (
   ID_ varchar(64) not null,
   REV_ integer not null,
-  INCIDENT_TIMESTAMP_ timestamp not null,
+  INCIDENT_TIMESTAMP_ timestamp(3) not null,
   INCIDENT_MSG_ varchar(4000),
   INCIDENT_TYPE_ varchar(255) not null,
   EXECUTION_ID_ varchar(64),
@@ -224,7 +224,7 @@ create table ACT_RU_METER_LOG (
   NAME_ varchar(64) not null,
   REPORTER_ varchar(255),
   VALUE_ bigint,
-  TIMESTAMP_ timestamp not null,
+  TIMESTAMP_ timestamp(3) not null,
   primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
@@ -235,7 +235,7 @@ create table ACT_RU_EXT_TASK (
   TOPIC_NAME_ varchar(255),
   RETRIES_ integer,
   ERROR_MSG_ varchar(4000),
-  LOCK_EXP_TIME_ timestamp NULL,
+  LOCK_EXP_TIME_ timestamp(3) NULL,
   SUSPENSION_STATE_ integer,
   EXECUTION_ID_ varchar(64),
   PROC_INST_ID_ varchar(64),
