@@ -501,6 +501,7 @@
                 <exclude>**/HistoricIncident*Test.java</exclude>
                 <exclude>**/HistoricVariableDataFormatTest.java</exclude>
                 <exclude>**/Historic*QueryTest.java</exclude>
+                <exclude>**/Historic*ReportTest.java</exclude>
                 <exclude>**/HistoricJobLog*Test.java</exclude>
                 <exclude>**/ProcessInstanceModificationHistoryTest.java</exclude>
                 <exclude>**/ProcessInstantiationAtActivitiesHistoryTest.java</exclude>
