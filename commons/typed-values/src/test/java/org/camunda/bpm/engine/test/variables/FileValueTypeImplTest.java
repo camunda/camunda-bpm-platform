@@ -107,6 +107,12 @@ public class FileValueTypeImplTest {
     assertThat(value.getType(), is(instanceOf(FileValueTypeImpl.class)));
     checkStreamFromValue(value, "text");
   }
+  
+  @Test(expected = IllegalArgumentException.class)
+  public void createValueFromObject() throws IOException, URISyntaxException {
+    type.createValue(new Object(), Collections.<String, Object> singletonMap(FileValueTypeImpl.VALUE_INFO_FILE_NAME, "simpleFile.txt"));
+    fail();
+  }
 
   @Test
   public void createValueWithProperties() {

@@ -13,8 +13,6 @@
 package org.camunda.bpm.engine.variable.impl.value.builder;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
@@ -23,6 +21,7 @@ import org.camunda.bpm.engine.variable.type.PrimitiveValueType;
 import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.engine.variable.value.builder.FileValueBuilder;
 import org.camunda.commons.utils.EnsureUtil;
+import org.camunda.commons.utils.IoUtilException;
 
 /**
  * @author Ronny Bräunlich
@@ -52,17 +51,19 @@ public class FileValueBuilderImpl implements FileValueBuilder {
   @Override
   public FileValueBuilder file(File file) {
     try {
-      this.file(new FileInputStream(file));
-    } catch (FileNotFoundException e) {
+      return file(org.camunda.commons.utils.IoUtil.fileAsByteArray(file));
+    } catch(IoUtilException e) {
       throw new IllegalArgumentException(e);
     }
-    return this;
   }
 
   @Override
   public FileValueBuilder file(InputStream stream) {
-      this.file(org.camunda.commons.utils.IoUtil.inputStreamAsString(stream).getBytes());
-    return this;
+      try {
+        return file(org.camunda.commons.utils.IoUtil.inputStreamAsByteArray(stream));
+	  } catch(IoUtilException e) {
+	  	throw new IllegalArgumentException(e);
+	  }
   }
 
   @Override

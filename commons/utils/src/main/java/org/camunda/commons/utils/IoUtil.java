@@ -49,6 +49,28 @@ public class IoUtil {
   }
 
   /**
+   * Returns the input stream as {@link byte[]}.
+   *
+   * @param inputStream the input stream
+   */
+  public static byte[] inputStreamAsByteArray(InputStream inputStream) {
+    ByteArrayOutputStream os = new ByteArrayOutputStream();
+    try {
+      byte[] buffer = new byte[16 * 1024];
+      int read;
+      while((read = inputStream.read(buffer)) > 0) {
+        os.write(buffer, 0, read);
+      }
+      return os.toByteArray();
+    } catch (IOException e) {
+      throw LOG.unableToReadInputStream(e);
+    }
+    finally {
+      closeSilently(inputStream);
+    }
+  }
+  
+  /**
    * Returns the {@link Reader} content as {@link String}.
    *
    * @param reader the {@link Reader}
@@ -120,6 +142,21 @@ public class IoUtil {
     }
   }
 
+  /**
+   * Returns the content of a {@link File}.
+   *
+   * @param file the file to load
+   * @return Content of the file as {@link String}
+   */
+  public static byte[] fileAsByteArray(File file) {
+    try {
+      return inputStreamAsByteArray(new FileInputStream(file));
+    } catch(FileNotFoundException e) {
+      throw LOG.fileNotFoundException(file.getAbsolutePath(), e);
+    }
+  }
+
+  
   /**
    * Returns the input stream of a file with specified filename
    *
@@ -201,4 +238,5 @@ public class IoUtil {
       throw LOG.fileNotFoundException(filename, e);
     }
   }
+
 }
