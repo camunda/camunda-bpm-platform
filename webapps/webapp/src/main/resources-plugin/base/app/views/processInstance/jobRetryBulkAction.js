@@ -12,6 +12,7 @@ define(['text!./job-retry-bulk-dialog.html', 'text!./job-retry-bulk-action.html'
               processData: function() { return $scope.processData; },
               processInstance: function() { return $scope.processInstance; }
             },
+            size: 'lg',
             controller: 'JobRetriesController',
             template: dialogTemplate
           });

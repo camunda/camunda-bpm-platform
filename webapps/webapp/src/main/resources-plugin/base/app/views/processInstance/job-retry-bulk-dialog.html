@@ -120,7 +120,7 @@
           ng-click="retryFailedJobs(selectedFailedJobIds)"
           ng-disabled="!failedJobs || !failedJobs.length || !selectedFailedJobIds.length"
           ng-hide="status === 'finished' || status === 'performing'">
-    Retry
+    Retry <span ng-if="selectedFailedJobIds.length > 1">{{ selectedFailedJobIds.length }} jobs</span>
   </button>
 
   <button class="btn btn-primary"
