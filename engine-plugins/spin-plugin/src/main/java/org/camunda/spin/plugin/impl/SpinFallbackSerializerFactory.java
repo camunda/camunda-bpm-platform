@@ -35,7 +35,6 @@ public class SpinFallbackSerializerFactory implements VariableSerializerFactory 
       return new FallbackSpinObjectValueSerializer(serializationFormat);
     }
     else {
-      // TODO: or throw exception
       return null;
     }
   }

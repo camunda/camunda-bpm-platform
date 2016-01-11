@@ -420,18 +420,26 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   protected VariableScope getVariableScope() {
 
     if (taskId != null) {
-      return Context.getCommandContext().getTaskManager().findTaskById(taskId);
+      return getTask();
     }
     else if (executionId != null) {
-      return Context.getCommandContext().getExecutionManager().findExecutionById(executionId);
+      return getExecution();
     }
     else if (caseExecutionId != null) {
-      return Context.getCommandContext().getCaseExecutionManager().findCaseExecutionById(caseExecutionId);
+      return getCaseExecution();
     }
     else {
       return null;
     }
+  }
 
+  protected TaskEntity getTask() {
+    if (taskId != null) {
+      return Context.getCommandContext().getTaskManager().findTaskById(taskId);
+    }
+    else {
+      return null;
+    }
   }
 
   //sequence counter ///////////////////////////////////////////////////////////
@@ -482,18 +490,14 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   }
 
   protected ProcessApplicationReference getContextProcessApplication() {
-    // TODO: consolidate with getVariableScope
     if (taskId != null) {
-      TaskEntity task = Context.getCommandContext().getTaskManager().findTaskById(taskId);
-      return ProcessApplicationContextUtil.getTargetProcessApplication(task);
+      return ProcessApplicationContextUtil.getTargetProcessApplication(getTask());
     }
     else if (executionId != null) {
-      ExecutionEntity execution = Context.getCommandContext().getExecutionManager().findExecutionById(executionId);
-      return ProcessApplicationContextUtil.getTargetProcessApplication(execution);
+      return ProcessApplicationContextUtil.getTargetProcessApplication(getExecution());
     }
     else if (caseExecutionId != null) {
-      CaseExecutionEntity caseExecution = Context.getCommandContext().getCaseExecutionManager().findCaseExecutionById(caseExecutionId);
-      return ProcessApplicationContextUtil.getTargetProcessApplication(caseExecution);
+      return ProcessApplicationContextUtil.getTargetProcessApplication(getCaseExecution());
     }
     else {
       return null;

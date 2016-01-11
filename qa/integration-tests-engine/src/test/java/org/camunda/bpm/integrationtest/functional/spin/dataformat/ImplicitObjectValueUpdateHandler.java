@@ -15,13 +15,15 @@ package org.camunda.bpm.integrationtest.functional.spin.dataformat;
 import java.util.Date;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.delegate.TaskListener;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class ImplicitObjectValueUpdateDelegate implements JavaDelegate {
+public class ImplicitObjectValueUpdateHandler implements JavaDelegate, TaskListener {
 
   public static final String VARIABLE_NAME = "var";
   public static final long ONE_DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
@@ -33,9 +35,17 @@ public class ImplicitObjectValueUpdateDelegate implements JavaDelegate {
 
   }
 
+  public void notify(DelegateTask delegateTask) {
+    JsonSerializable variable = (JsonSerializable) delegateTask.getVariable(VARIABLE_NAME);
+
+    addADay(variable);  // implicit update, i.e. no setVariable call
+
+  }
+
   public static void addADay(JsonSerializable jsonSerializable) {
     Date newDate = new Date(jsonSerializable.getDateProperty().getTime() + ONE_DAY_IN_MILLIS);
     jsonSerializable.setDateProperty(newDate);
   }
+
 
 }

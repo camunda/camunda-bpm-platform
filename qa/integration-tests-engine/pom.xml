@@ -115,6 +115,12 @@
       <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
     </dependency>
     
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-joda</artifactId>
+      <version>2.6.3</version>
+    </dependency> 
+    
 
     <dependency>
       <groupId>org.camunda.connect</groupId>

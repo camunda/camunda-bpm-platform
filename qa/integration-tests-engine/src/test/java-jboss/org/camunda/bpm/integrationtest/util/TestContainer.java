@@ -38,4 +38,20 @@ public class TestContainer {
     webArchive.addAsManifestResource("jboss-deployment-structure-spin-json.xml", "jboss-deployment-structure.xml");
   }
 
+  public static void addJodaTimeJacksonModule(WebArchive webArchive) {
+    webArchive.addAsLibraries(getJodaTimeModule());
+  }
+
+  protected static JavaArchive[] getJodaTimeModule() {
+    return Maven.resolver()
+        .offline()
+        .loadPomFromFile("pom.xml")
+        .resolve("com.fasterxml.jackson.datatype:jackson-datatype-joda")
+        .using(new RejectDependenciesStrategy(false,
+            "com.fasterxml.jackson.core:jackson-annotations",
+            "com.fasterxml.jackson.core:jackson-core",
+            "com.fasterxml.jackson.core:jackson-databind"))
+        .as(JavaArchive.class);
+  }
+
 }

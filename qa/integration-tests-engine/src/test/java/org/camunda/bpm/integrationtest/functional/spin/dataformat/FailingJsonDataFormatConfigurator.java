@@ -12,38 +12,28 @@
  */
 package org.camunda.bpm.integrationtest.functional.spin.dataformat;
 
-import java.io.Writer;
+import java.text.SimpleDateFormat;
 
-import org.camunda.spin.Spin;
+import org.camunda.spin.impl.json.jackson.format.JacksonJsonDataFormat;
+import org.camunda.spin.spi.DataFormatConfigurator;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class FooSpin extends Spin<FooSpin> {
+public class FailingJsonDataFormatConfigurator implements DataFormatConfigurator<JacksonJsonDataFormat> {
 
-  public String getDataFormatName() {
-    return null;
+  public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
+  @Override
+  public Class<JacksonJsonDataFormat> getDataFormatClass() {
+    return JacksonJsonDataFormat.class;
   }
 
-  public Object unwrap() {
-    return null;
-  }
+  @Override
+  public void configure(JacksonJsonDataFormat dataFormat) {
+    throw new RuntimeException("Can't do this");
 
-  public String toString() {
-    return null;
-  }
-
-  public void writeToWriter(Writer writer) {
-
-  }
-
-  public <C> C mapTo(Class<C> type) {
-    return null;
-  }
-
-  public <C> C mapTo(String type) {
-    return null;
   }
 
 }

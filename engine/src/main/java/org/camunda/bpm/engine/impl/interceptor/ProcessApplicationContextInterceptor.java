@@ -72,7 +72,14 @@ public class ProcessApplicationContextInterceptor extends CommandInterceptor {
     }
     else if (processApplicationIdentifier.getName() != null) {
        RuntimeContainerDelegate runtimeContainerDelegate = RuntimeContainerDelegate.INSTANCE.get();
-       return runtimeContainerDelegate.getDeployedProcessApplication(processApplicationIdentifier.getName());
+       ProcessApplicationReference reference = runtimeContainerDelegate.getDeployedProcessApplication(processApplicationIdentifier.getName());
+
+       if (reference == null) {
+         throw new ProcessEngineException("A process application with name " + processApplicationIdentifier.getName() + " is not registered");
+       }
+       else {
+         return reference;
+       }
     }
     else {
       throw new ProcessEngineException("Cannot resolve process application based on " + processApplicationIdentifier);
