@@ -14,6 +14,7 @@ create table ACT_HI_DECINST (
     ACT_ID_ varchar(255),
     EVAL_TIME_ datetime not null,
     COLLECT_VALUE_ double,
+    USER_ID_ varchar(255),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 

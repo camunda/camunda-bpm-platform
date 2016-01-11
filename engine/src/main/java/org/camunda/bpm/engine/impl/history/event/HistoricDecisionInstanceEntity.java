@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
  * History entry for an evaluated decision.
  *
  * @author Philipp Ossler
+ * @author Ingo Richtsmeier
  *
  */
 public class HistoricDecisionInstanceEntity extends HistoryEvent implements HistoricDecisionInstance {
@@ -46,6 +47,8 @@ public class HistoricDecisionInstanceEntity extends HistoryEvent implements Hist
   protected Date evaluationTime;
 
   protected Double collectResultValue;
+  
+  protected String userId;
 
   protected List<HistoricDecisionInputInstance> inputs;
   protected List<HistoricDecisionOutputInstance> outputs;
@@ -151,5 +154,13 @@ public class HistoricDecisionInstanceEntity extends HistoryEvent implements Hist
 
   public void setCollectResultValue(Double collectResultValue) {
     this.collectResultValue = collectResultValue;
+  }
+
+  public String getUserId() {
+    return userId;
+  }
+
+  public void setUserId(String userId) {
+    this.userId = userId;
   }
 }

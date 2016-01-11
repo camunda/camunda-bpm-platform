@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.history.HistoricDecisionOutputInstance;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInputInstanceEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceEntity;
@@ -46,6 +47,7 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * @author Philipp Ossler
+ * @author Ingo Richtsmeier
  */
 public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
 
@@ -111,6 +113,8 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     event.setDecisionDefinitionId(((DecisionDefinition) decisionTable).getId());
     event.setDecisionDefinitionKey(decisionTable.getKey());
     event.setDecisionDefinitionName(decisionTable.getName());
+    
+    event.setUserId(Context.getCommandContext().getAuthenticatedUserId());
 
     if(evaluationEvent.getCollectResultValue() != null) {
       Double collectResultValue = getCollectResultValue(evaluationEvent.getCollectResultValue());

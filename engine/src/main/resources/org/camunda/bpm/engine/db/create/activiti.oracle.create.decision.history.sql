@@ -14,6 +14,7 @@ create table ACT_HI_DECINST (
     ACT_ID_ NVARCHAR2(255),
     EVAL_TIME_ TIMESTAMP(6) not null,
     COLLECT_VALUE_ NUMBER(*,10),
+    USER_ID_ NVARCHAR(255),
     primary key (ID_)
 );
 
