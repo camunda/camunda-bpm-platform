@@ -47,7 +47,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Thorben Lindhauer
  *
  */
-@Ignore
 @RunWith(Arquillian.class)
 public class PaDataFormatConfiguratorTest extends AbstractFoxPlatformIntegrationTest {
 
