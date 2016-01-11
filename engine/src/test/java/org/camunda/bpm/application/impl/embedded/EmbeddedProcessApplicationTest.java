@@ -13,6 +13,7 @@
 package org.camunda.bpm.application.impl.embedded;
 
 import java.util.List;
+import java.util.Set;
 
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
@@ -155,6 +156,18 @@ public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCa
     assertEquals(ProcessApplicationDeployment.PROCESS_APPLICATION_DEPLOYMENT_SOURCE, deployment.getSource());
 
     processApplication.undeploy();
+  }
+
+  public void testDeployProcessApplicationWithNameAttribute() {
+    TestApplicationWithCustomName pa = new TestApplicationWithCustomName();
+
+    pa.deploy();
+
+    Set<String> deployedPAs = runtimeContainerDelegate.getProcessApplicationService().getProcessApplicationNames();
+    assertEquals(1, deployedPAs.size());
+    assertTrue(deployedPAs.contains(TestApplicationWithCustomName.NAME));
+
+    pa.undeploy();
   }
 
 }
