@@ -18,7 +18,6 @@ import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
-import org.camunda.bpm.engine.rest.dto.history.ReportResultDto;
 import org.camunda.bpm.engine.rest.sub.history.HistoricProcessInstanceResource;
 
 import javax.ws.rs.Consumes;
@@ -30,6 +29,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 @Path(HistoricProcessInstanceRestService.PATH)
@@ -80,7 +81,6 @@ public interface HistoricProcessInstanceRestService {
 
   @GET
   @Path("/report")
-  @Produces(MediaType.APPLICATION_JSON)
-  List<ReportResultDto> getHistoricProcessInstancesReport(@Context UriInfo uriInfo);
-
+  @Produces({ MediaType.APPLICATION_JSON, "text/csv", "application/csv" })
+  Response getHistoricProcessInstancesReport(@Context UriInfo uriInfo, @Context Request request);
 }

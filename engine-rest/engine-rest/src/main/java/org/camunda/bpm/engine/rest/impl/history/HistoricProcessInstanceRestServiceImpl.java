@@ -20,19 +20,31 @@ import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.history.ReportResult;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.converter.ReportResultToCsvConverter;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceReportDto;
 import org.camunda.bpm.engine.rest.dto.history.ReportResultDto;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.history.HistoricProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.sub.history.HistoricProcessInstanceResource;
 import org.camunda.bpm.engine.rest.sub.history.impl.HistoricProcessInstanceResourceImpl;
 
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Variant;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class HistoricProcessInstanceRestServiceImpl implements HistoricProcessInstanceRestService {
+
+  public static final MediaType APPLICATION_CSV_TYPE = new MediaType("application", "csv");
+  public static final MediaType TEXT_CSV_TYPE = new MediaType("text", "csv");
+  public static final List<Variant> VARIANTS = Variant.mediaTypes(MediaType.APPLICATION_JSON_TYPE, APPLICATION_CSV_TYPE, TEXT_CSV_TYPE).add().build();
 
   protected ObjectMapper objectMapper;
   protected ProcessEngine processEngine;
@@ -101,16 +113,46 @@ public class HistoricProcessInstanceRestServiceImpl implements HistoricProcessIn
     return result;
   }
 
-  @Override
-  public List<ReportResultDto> getHistoricProcessInstancesReport(UriInfo uriInfo) {
+  @SuppressWarnings("unchecked")
+  protected List<ReportResult> queryHistoricProcessInstanceReport(UriInfo uriInfo) {
     HistoricProcessInstanceReportDto reportDto = new HistoricProcessInstanceReportDto(objectMapper, uriInfo.getQueryParameters());
-    List<? extends ReportResult> reports = reportDto.executeReport(processEngine);
+    return (List<ReportResult>) reportDto.executeReport(processEngine);
+  }
 
+  @Override
+  public Response getHistoricProcessInstancesReport(UriInfo uriInfo, Request request) {
+    Variant variant = request.selectVariant(VARIANTS);
+    if (variant != null) {
+      MediaType mediaType = variant.getMediaType();
+
+      if (MediaType.APPLICATION_JSON_TYPE.equals(mediaType)) {
+        List<ReportResultDto> result = getReportResultAsJson(uriInfo);
+        return Response.ok(result, mediaType).build();
+      }
+      else if (APPLICATION_CSV_TYPE.equals(mediaType) || TEXT_CSV_TYPE.equals(mediaType)) {
+        String csv = getReportResultAsCsv(uriInfo);
+        return Response
+            .ok(csv, mediaType)
+            .header("Content-Disposition", "attachment; filename=process-instance-report.csv")
+            .build();
+      }
+    }
+    throw new InvalidRequestException(Status.NOT_ACCEPTABLE, "No acceptable content-type found");
+  }
+
+  protected List<ReportResultDto> getReportResultAsJson(UriInfo uriInfo) {
+    List<ReportResult> reports = queryHistoricProcessInstanceReport(uriInfo);
     List<ReportResultDto> result = new ArrayList<ReportResultDto>();
     for (ReportResult report : reports) {
       result.add(ReportResultDto.fromReportResult(report));
     }
-
     return result;
+  }
+
+  protected String getReportResultAsCsv(UriInfo uriInfo) {
+    List<ReportResult> reports = queryHistoricProcessInstanceReport(uriInfo);
+    MultivaluedMap<String,String> queryParameters = uriInfo.getQueryParameters();
+    String reportType = queryParameters.getFirst("reportType");
+    return ReportResultToCsvConverter.convertReportResult(reports, reportType);
   }
 }
