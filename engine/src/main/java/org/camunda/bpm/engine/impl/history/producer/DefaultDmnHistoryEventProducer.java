@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.history.HistoricDecisionOutputInstance;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseExecutionEntity;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInputInstanceEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceEntity;
@@ -46,6 +47,7 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
 
 /**
  * @author Philipp Ossler
+ * @author Ingo Richtsmeier
  */
 public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
 
@@ -88,6 +90,8 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     initDecisionInstanceEvent(event, evaluationEvent, HistoryEventTypes.DMN_DECISION_EVALUATE);
     // set current time as evaluation time
     event.setEvaluationTime(ClockUtil.getCurrentTime());
+    // set the user id if there is an authenticated user and no process instance
+    setUserId(event);
 
     return event;
   }
@@ -226,6 +230,10 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     } else {
       return null;
     }
+  }
+
+  protected void setUserId(HistoricDecisionInstanceEntity event) {
+    event.setUserId(Context.getCommandContext().getAuthenticatedUserId());
   }
 
 }

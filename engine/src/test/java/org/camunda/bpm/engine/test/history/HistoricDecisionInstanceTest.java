@@ -46,6 +46,7 @@ import org.joda.time.DateTime;
 
 /**
  * @author Philipp Ossler
+ * @author Ingo Richtsmeier
  */
 public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase {
 
@@ -869,6 +870,8 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     assertThat(historicDecisionInstance.getProcessInstanceId(), is(nullValue()));
     assertThat(historicDecisionInstance.getActivityId(), is(nullValue()));
     assertThat(historicDecisionInstance.getActivityInstanceId(), is(nullValue()));
+    // the user should be null since no user was authenticated during evaluation
+    assertThat(historicDecisionInstance.getUserId(), is(nullValue()));
   }
 
   @Deployment(resources = { DECISION_PROCESS_WITH_DECISION_SERVICE, DECISION_SINGLE_OUTPUT_DMN })
@@ -1047,6 +1050,45 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     assertThat(historicDecisionInstance.getActivityId(), is("start"));
     assertThat(historicDecisionInstance.getActivityInstanceId(), is(nullValue()));
     assertThat(historicDecisionInstance.getEvaluationTime(), is(notNullValue()));
+  }
+
+  @Deployment(resources = { DECISION_SINGLE_OUTPUT_DMN })
+  public void testDecisionEvaluatedWithAuthenticatedUser() {
+    identityService.setAuthenticatedUserId("demo");
+    VariableMap variables = Variables.putValue("input1", "test");
+    decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY, variables);
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery().singleResult();
+
+    assertThat(historicDecisionInstance, is(notNullValue()));
+    // the user should be set since the decision was evaluated with the decision service
+    assertThat(historicDecisionInstance.getUserId(), is("demo"));
+  }
+
+  @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
+  public void testDecisionEvaluatedWithAuthenticatedUserFromProcess() {
+    identityService.setAuthenticatedUserId("demo");
+    startProcessInstanceAndEvaluateDecision();
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery().singleResult();
+
+    assertThat(historicDecisionInstance, is(notNullValue()));
+    // the user should be null since the decision was evaluated by the process
+    assertThat(historicDecisionInstance.getUserId(), is(nullValue()));
+  }
+
+  @Deployment(resources = { DECISION_CASE_WITH_DECISION_SERVICE, DECISION_SINGLE_OUTPUT_DMN })
+  public void testDecisionEvaluatedWithAuthenticatedUserFromCase() {
+    identityService.setAuthenticatedUserId("demo");
+    CaseInstance caseInstance = createCaseInstanceAndEvaluateDecision();
+
+    HistoricDecisionInstance historicDecisionInstance = historyService
+        .createHistoricDecisionInstanceQuery()
+        .singleResult();
+
+    assertThat(historicDecisionInstance, is(notNullValue()));
+    // the user should be null since decision was evaluated by the case
+    assertThat(historicDecisionInstance.getUserId(), is(nullValue()));
   }
 
   @Deployment(resources = { DECISION_CASE_WITH_DECISION_SERVICE, DECISION_SINGLE_OUTPUT_DMN })

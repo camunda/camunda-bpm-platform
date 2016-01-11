@@ -14,6 +14,7 @@ create table ACT_HI_DECINST (
     ACT_ID_ nvarchar(255),
     EVAL_TIME_ datetime2 not null,
     COLLECT_VALUE_ double precision,
+    USER_ID_ nvarchar(255),
     primary key (ID_)
 );
 

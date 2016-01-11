@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
  * Represents one evaluation of a decision.
  *
  * @author Philipp Ossler
+ * @author Ingo Richtsmeier
  *
  */
 public interface HistoricDecisionInstance {
@@ -64,6 +65,12 @@ public interface HistoricDecisionInstance {
 
   /** The corresponding activity instance in case the decision was evaluated inside a process or a case. */
   String getActivityInstanceId();
+
+  /**
+   * The user ID in case the decision was evaluated by an authenticated user using the decision service
+   * outside of an execution context.
+   */
+  String getUserId();
 
   /**
    * The input values of the evaluated decision. The fetching of the input values must be enabled on the query.
