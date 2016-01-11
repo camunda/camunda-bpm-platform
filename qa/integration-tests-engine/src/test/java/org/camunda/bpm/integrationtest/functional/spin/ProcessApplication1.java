@@ -19,7 +19,7 @@ import org.camunda.bpm.application.impl.ServletProcessApplication;
  * @author Thorben Lindhauer
  *
  */
-@ProcessApplication(name = "pa1")
+@ProcessApplication("pa1")
 public class ProcessApplication1 extends ServletProcessApplication {
 
 }
