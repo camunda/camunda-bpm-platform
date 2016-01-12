@@ -48,6 +48,10 @@ public class ProcessApplicationDeploymentImpl implements ProcessApplicationDeplo
     return deployment.getSource();
   }
 
+  public String getTenantId() {
+    return deployment.getTenantId();
+  }
+
   public ProcessApplicationRegistration getProcessApplicationRegistration() {
     return registration;
   }

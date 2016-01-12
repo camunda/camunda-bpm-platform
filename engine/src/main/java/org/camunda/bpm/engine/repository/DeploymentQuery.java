@@ -45,7 +45,7 @@ public interface DeploymentQuery extends Query<DeploymentQuery, Deployment>{
   DeploymentQuery deploymentNameLike(String nameLike);
 
   /**
-   * Iff the given <code>source</code> is <code>null</code>,
+   * If the given <code>source</code> is <code>null</code>,
    * then deployments are returned where source is equal to null.
    * Otherwise only deployments with the given source are
    * selected.
@@ -58,6 +58,12 @@ public interface DeploymentQuery extends Query<DeploymentQuery, Deployment>{
   /** Only select deployments deployed after the given date */
   DeploymentQuery deploymentAfter(Date after);
 
+  /** Only select deployments with the given tenant id. */
+  DeploymentQuery tenantId(String tenantId);
+
+  /** Only select deployments with one of the given tenant ids. */
+  DeploymentQuery tenantIdIn(String... tenantIds);
+
   //sorting ////////////////////////////////////////////////////////
 
   /** Order by deployment id (needs to be followed by {@link #asc()} or {@link #desc()}). */
@@ -68,4 +74,8 @@ public interface DeploymentQuery extends Query<DeploymentQuery, Deployment>{
 
   /** Order by deployment time (needs to be followed by {@link #asc()} or {@link #desc()}). */
   DeploymentQuery orderByDeploymenTime();
+
+  /** Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  DeploymentQuery orderByTenantId();
+
 }

@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,6 +36,7 @@ public class DeploymentQueryDto extends AbstractQueryDto<DeploymentQuery> {
   private static final String SORT_BY_ID_VALUE = "id";
   private static final String SORT_BY_NAME_VALUE = "name";
   private static final String SORT_BY_DEPLOYMENT_TIME_VALUE = "deploymentTime";
+  private static final String SORT_BY_TENANT_ID = "tenantId";
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -42,6 +44,7 @@ public class DeploymentQueryDto extends AbstractQueryDto<DeploymentQuery> {
     VALID_SORT_BY_VALUES.add(SORT_BY_ID_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_NAME_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_DEPLOYMENT_TIME_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID);
   }
 
   private String id;
@@ -51,6 +54,8 @@ public class DeploymentQueryDto extends AbstractQueryDto<DeploymentQuery> {
   private Boolean withoutSource;
   private Date before;
   private Date after;
+  private String tenantId;
+  private List<String> tenantIds;
 
   public DeploymentQueryDto() {
   }
@@ -94,6 +99,16 @@ public class DeploymentQueryDto extends AbstractQueryDto<DeploymentQuery> {
     this.after = deploymentAfter;
   }
 
+  @CamundaQueryParam("tenantId")
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
+  @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
+  public void setTenantIdIn(List<String> tenantIds) {
+    this.tenantIds = tenantIds;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -131,6 +146,12 @@ public class DeploymentQueryDto extends AbstractQueryDto<DeploymentQuery> {
     if (after != null) {
       query.deploymentAfter(after);
     }
+    if (tenantId != null) {
+      query.tenantId(tenantId);
+    }
+    if (tenantIds != null && !tenantIds.isEmpty()) {
+      query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
   }
 
   @Override
@@ -141,6 +162,8 @@ public class DeploymentQueryDto extends AbstractQueryDto<DeploymentQuery> {
       query.orderByDeploymentName();
     } else if (sortBy.equals(SORT_BY_DEPLOYMENT_TIME_VALUE)) {
       query.orderByDeploymenTime();
+    } else if (sortBy.equals(SORT_BY_TENANT_ID)) {
+      query.orderByTenantId();
     }
   }
 

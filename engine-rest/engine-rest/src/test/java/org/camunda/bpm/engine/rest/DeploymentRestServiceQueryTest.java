@@ -3,6 +3,7 @@ package org.camunda.bpm.engine.rest;
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -151,6 +152,7 @@ public class DeploymentRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockedQuery).deploymentNameLike(queryParameters.get("nameLike"));
     verify(mockedQuery).deploymentId(queryParameters.get("id"));
     verify(mockedQuery).deploymentSource(queryParameters.get("source"));
+    verify(mockedQuery).tenantId(queryParameters.get("tenantId"));
     verify(mockedQuery).list();
   }
 
@@ -209,6 +211,31 @@ public class DeploymentRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockedQuery).list();
   }
 
+  @Test
+  public void testDeploymentTenantIdList() {
+    mockedQuery = setUpMockDeploymentQuery(MockProvider.createMockDeploymentsTwoTenants());
+
+    Response response = given()
+      .queryParam("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(DEPLOYMENT_QUERY_URL);
+
+    verify(mockedQuery).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> definitions = from(content).getList("");
+    assertThat(definitions).hasSize(2);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    String returnedTenantId2 = from(content).getString("[1].tenantId");
+
+    assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
+    assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+  }
+
   private Map<String, String> getCompleteQueryParameters() {
     Map<String, String> parameters = new HashMap<String, String>();
 
@@ -216,6 +243,7 @@ public class DeploymentRestServiceQueryTest extends AbstractRestServiceTest {
     parameters.put("name", "name");
     parameters.put("nameLike", "nameLike");
     parameters.put("source", "source");
+    parameters.put("tenantId", "tenantId");
 
     return parameters;
   }
@@ -250,6 +278,16 @@ public class DeploymentRestServiceQueryTest extends AbstractRestServiceTest {
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySuccessfulSorting("name", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByDeploymentName();
+    inOrder.verify(mockedQuery).desc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySuccessfulSorting("tenantId", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderByTenantId();
+    inOrder.verify(mockedQuery).asc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySuccessfulSorting("tenantId", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderByTenantId();
     inOrder.verify(mockedQuery).desc();
   }
 

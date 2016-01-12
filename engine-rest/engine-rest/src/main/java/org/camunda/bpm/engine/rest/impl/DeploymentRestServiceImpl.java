@@ -19,6 +19,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
@@ -33,10 +37,6 @@ import org.camunda.bpm.engine.rest.mapper.MultipartFormData.FormPart;
 import org.camunda.bpm.engine.rest.sub.repository.DeploymentResource;
 import org.camunda.bpm.engine.rest.sub.repository.impl.DeploymentResourceImpl;
 
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware implements DeploymentRestService {
@@ -45,6 +45,7 @@ public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware im
   public final static String ENABLE_DUPLICATE_FILTERING = "enable-duplicate-filtering";
   public final static String DEPLOY_CHANGED_ONLY = "deploy-changed-only";
   public final static String DEPLOYMENT_SOURCE = "deployment-source";
+  public final static String TENANT_ID = "tenant-id";
 
   protected static final Set<String> RESERVED_KEYWORDS = new HashSet<String>();
 
@@ -53,6 +54,7 @@ public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware im
     RESERVED_KEYWORDS.add(ENABLE_DUPLICATE_FILTERING);
     RESERVED_KEYWORDS.add(DEPLOY_CHANGED_ONLY);
     RESERVED_KEYWORDS.add(DEPLOYMENT_SOURCE);
+    RESERVED_KEYWORDS.add(TENANT_ID);
   }
 
 	public DeploymentRestServiceImpl(String engineName, ObjectMapper objectMapper) {
@@ -105,6 +107,11 @@ public class DeploymentRestServiceImpl extends AbstractRestProcessEngineAware im
     if (payload.getNamedPart(DEPLOYMENT_SOURCE) != null) {
       FormPart part = payload.getNamedPart(DEPLOYMENT_SOURCE);
       deploymentBuilder.source(part.getTextContent());
+    }
+
+    if (payload.getNamedPart(TENANT_ID) != null) {
+      FormPart part = payload.getNamedPart(TENANT_ID);
+      deploymentBuilder.tenantId(part.getTextContent());
     }
 
     boolean enableDuplicateFiltering = false;

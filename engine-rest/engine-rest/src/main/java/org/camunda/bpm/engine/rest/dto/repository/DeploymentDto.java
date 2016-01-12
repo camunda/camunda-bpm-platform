@@ -23,6 +23,7 @@ public class DeploymentDto extends LinkableDto {
   protected String name;
   protected String source;
   protected Date deploymentTime;
+  protected String tenantId;
 
   public DeploymentDto() {
   }
@@ -43,12 +44,17 @@ public class DeploymentDto extends LinkableDto {
     return deploymentTime;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
   public static DeploymentDto fromDeployment(Deployment deployment) {
     DeploymentDto dto = new DeploymentDto();
     dto.id = deployment.getId();
     dto.name = deployment.getName();
     dto.source = deployment.getSource();
     dto.deploymentTime = deployment.getDeploymentTime();
+    dto.tenantId = deployment.getTenantId();
 
     return dto;
   }

@@ -74,8 +74,8 @@ import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.MetricsQuery;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
-import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.query.PeriodUnit;
+import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.Deployment;
@@ -115,6 +115,11 @@ public abstract class MockProvider {
 
   // general non existing Id
   public static final String NON_EXISTING_ID = "nonExistingId";
+
+  // tenant ids
+  public static final String EXAMPLE_TENANT_ID = "aTenantId";
+  public static final String ANOTHER_EXAMPLE_TENANT_ID = "anotherTenantId";
+  public static final String EXAMPLE_TENANT_ID_LIST = EXAMPLE_TENANT_ID + "," + ANOTHER_EXAMPLE_TENANT_ID;
 
   // engine
   public static final String EXAMPLE_PROCESS_ENGINE_NAME = "default";
@@ -1055,12 +1060,24 @@ public abstract class MockProvider {
     return mocks;
   }
 
+  public static List<Deployment> createMockDeploymentsTwoTenants() {
+    List<Deployment> mocks = new ArrayList<Deployment>();
+    mocks.add(createMockDeployment(EXAMPLE_TENANT_ID));
+    mocks.add(createMockDeployment(ANOTHER_EXAMPLE_TENANT_ID));
+    return mocks;
+  }
+
   public static Deployment createMockDeployment() {
+    return createMockDeployment(null);
+  }
+
+  public static Deployment createMockDeployment(String tenantId) {
     Deployment mockDeployment = mock(Deployment.class);
     when(mockDeployment.getId()).thenReturn(EXAMPLE_DEPLOYMENT_ID);
     when(mockDeployment.getName()).thenReturn(EXAMPLE_DEPLOYMENT_NAME);
     when(mockDeployment.getDeploymentTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_DEPLOYMENT_TIME));
     when(mockDeployment.getSource()).thenReturn(EXAMPLE_DEPLOYMENT_SOURCE);
+    when(mockDeployment.getTenantId()).thenReturn(tenantId);
 
     return mockDeployment;
   }

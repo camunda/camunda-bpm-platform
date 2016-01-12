@@ -41,6 +41,8 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
   protected String source;
   protected Date deploymentBefore;
   protected Date deploymentAfter;
+  protected String tenantId;
+  protected String[] tenantIds;
 
   public DeploymentQueryImpl() {
   }
@@ -85,6 +87,18 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
     return this;
   }
 
+  public DeploymentQuery tenantId(String tenantId) {
+    ensureNotNull("tenantId", tenantId);
+    this.tenantId = tenantId;
+    return this;
+  }
+
+  public DeploymentQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    return this;
+  }
+
   @Override
   protected boolean hasExcludingConditions() {
     return super.hasExcludingConditions() || CompareUtil.areNotInAscendingOrder(deploymentAfter, deploymentBefore);
@@ -102,6 +116,10 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
 
   public DeploymentQuery orderByDeploymentName() {
     return orderBy(DeploymentQueryProperty.DEPLOYMENT_NAME);
+  }
+
+  public DeploymentQuery orderByTenantId() {
+    return orderBy(DeploymentQueryProperty.TENANT_ID);
   }
 
   //results ////////////////////////////////////////////////////////

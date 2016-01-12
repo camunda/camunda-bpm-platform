@@ -172,4 +172,9 @@ public interface DeploymentBuilder {
    */
   Collection<String> getResourceNames();
 
+  /**
+   * Sets the tenant id of a deployment.
+   */
+  DeploymentBuilder tenantId(String tenantId);
+
 }

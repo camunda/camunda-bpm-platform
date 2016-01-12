@@ -67,6 +67,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
   private static final String NAMESPACE = "xmlns='http://www.omg.org/spec/BPMN/20100524/MODEL'";
   private static final String TARGET_NAMESPACE = "targetNamespace='" + BpmnParse.CAMUNDA_BPMN_EXTENSIONS_NS + "'";
 
+  @Override
   public void tearDown() throws Exception {
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     commandExecutor.execute(new Command<Object>() {
@@ -763,6 +764,34 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(1, processDefinition.getVersion());
 
     deleteDeployments(deploymentIds);
+  }
+
+  public void testDeploymentWithTenantId() {
+    String deploymentTenantOne = repositoryService
+      .createDeployment()
+      .tenantId("tenant 1")
+      .addClasspathResource("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+      .deploy()
+      .getId();
+
+    String deploymentTenantTwo = repositoryService
+        .createDeployment()
+        .tenantId("tenant 2")
+        .addClasspathResource("org/camunda/bpm/engine/test/api/twoTasksProcess.bpmn20.xml")
+        .deploy()
+        .getId();
+
+    List<org.camunda.bpm.engine.repository.Deployment> deployments = repositoryService
+        .createDeploymentQuery()
+        .orderByTenantId()
+        .asc()
+        .list();
+
+    assertEquals(2, deployments.size());
+    assertEquals("tenant 1", deployments.get(0).getTenantId());
+    assertEquals("tenant 2", deployments.get(1).getTenantId());
+
+    deleteDeployments(Arrays.asList(deploymentTenantOne, deploymentTenantTwo));
   }
 
   private String deployProcessString(String processString) {

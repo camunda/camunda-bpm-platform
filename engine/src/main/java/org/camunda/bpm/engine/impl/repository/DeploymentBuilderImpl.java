@@ -12,9 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.repository;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotEmpty;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotContainsNull;
 
 import java.io.InputStream;
 import java.io.Serializable;
@@ -200,6 +200,11 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
 
   public DeploymentBuilder source(String source) {
     deployment.setSource(source);
+    return this;
+  }
+
+  public DeploymentBuilder tenantId(String tenantId) {
+    deployment.setTenantId(tenantId);
     return this;
   }
 

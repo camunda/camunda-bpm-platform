@@ -39,6 +39,7 @@ public class DeploymentEntity implements Serializable, Deployment, DbEntity {
   protected boolean validatingSchema = true;
   protected boolean isNew;
   protected String source;
+  protected String tenantId;
 
   /**
    * Will only be used during actual deployment to pass deployed artifacts (eg process definitions).
@@ -160,6 +161,14 @@ public class DeploymentEntity implements Serializable, Deployment, DbEntity {
     this.source = source;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
   @Override
   public String toString() {
     return this.getClass().getSimpleName()
@@ -170,6 +179,8 @@ public class DeploymentEntity implements Serializable, Deployment, DbEntity {
            + ", validatingSchema=" + validatingSchema
            + ", isNew=" + isNew
            + ", source=" + source
+           + ", tenantId=" + tenantId
            + "]";
   }
+
 }

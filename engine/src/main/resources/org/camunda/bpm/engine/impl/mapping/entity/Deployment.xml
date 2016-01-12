@@ -7,8 +7,8 @@
   <!-- DEPLOYMENT INSERT -->
 
   <insert id="insertDeployment" parameterType="org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity">
-    insert into ${prefix}ACT_RE_DEPLOYMENT(ID_, NAME_, DEPLOY_TIME_, SOURCE_)
-    values(#{id, jdbcType=VARCHAR}, #{name, jdbcType=VARCHAR}, #{deploymentTime, jdbcType=TIMESTAMP}, #{source, jdbcType=VARCHAR})
+    insert into ${prefix}ACT_RE_DEPLOYMENT(ID_, NAME_, DEPLOY_TIME_, SOURCE_, TENANT_ID_)
+    values(#{id, jdbcType=VARCHAR}, #{name, jdbcType=VARCHAR}, #{deploymentTime, jdbcType=TIMESTAMP}, #{source, jdbcType=VARCHAR}, #{tenantId, jdbcType=VARCHAR})
   </insert>
 
   <!-- DEPLOYMENT UPDATE -->
@@ -26,6 +26,7 @@
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="source" column="SOURCE_" jdbcType="VARCHAR" />
     <result property="deploymentTime" column="DEPLOY_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
   </resultMap>
 
   <!-- DEPLOYMENT SELECT -->
@@ -93,6 +94,16 @@
         <if test="source == null">
           and RES.SOURCE_ is null
         </if>
+      </if>
+      <if test="tenantId != null">
+        RES.TENANT_ID_ = #{tenantId}
+      </if>
+      <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+        and RES.TENANT_ID_ in
+        <foreach item="tenantId" index="index" collection="tenantIds"
+                 open="(" separator="," close=")">
+          #{tenantId}
+        </foreach>
       </if>
 
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />

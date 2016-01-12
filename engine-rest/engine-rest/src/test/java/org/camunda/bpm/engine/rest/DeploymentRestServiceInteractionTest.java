@@ -41,6 +41,7 @@ import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT_TIF_RESOURCE_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT_TXT_RESOURCE_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_DEPLOYMENT_XML_RESOURCE_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.EXAMPLE_TENANT_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.NON_EXISTING_DEPLOYMENT_ID;
 import static org.camunda.bpm.engine.rest.helper.MockProvider.NON_EXISTING_DEPLOYMENT_RESOURCE_ID;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -69,6 +70,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
@@ -86,9 +90,6 @@ import org.camunda.bpm.engine.rest.util.container.TestContainerRule;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.Response.Status;
 
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.path.json.JsonPath;
@@ -139,6 +140,7 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
     when(mockDeploymentBuilder.addDeploymentResourcesById(anyString(), anyListOf(String.class))).thenReturn(mockDeploymentBuilder);
     when(mockDeploymentBuilder.addDeploymentResourcesByName(anyString(), anyListOf(String.class))).thenReturn(mockDeploymentBuilder);
     when(mockDeploymentBuilder.source(anyString())).thenReturn(mockDeploymentBuilder);
+    when(mockDeploymentBuilder.tenantId(anyString())).thenReturn(mockDeploymentBuilder);
     when(mockDeploymentBuilder.getResourceNames()).thenReturn(resourceNames);
     when(mockDeploymentBuilder.deploy()).thenReturn(mockDeployment);
   }
@@ -1101,6 +1103,22 @@ public class DeploymentRestServiceInteractionTest extends AbstractRestServiceTes
 
     verify(mockDeploymentBuilder).source("my-deployment-source");
 
+  }
+
+  @Test
+  public void testCreateDeploymentWithTenantId() throws Exception {
+
+    resourceNames.addAll( Arrays.asList("data", "more-data") );
+
+    given()
+      .multiPart("data", "unspecified", createMockDeploymentResourceByteData())
+      .multiPart("tenant-id", EXAMPLE_TENANT_ID)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(CREATE_DEPLOYMENT_URL);
+
+    verify(mockDeploymentBuilder).tenantId(EXAMPLE_TENANT_ID);
   }
 
   @Test

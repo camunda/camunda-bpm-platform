@@ -19,7 +19,7 @@ import java.util.Date;
  *
  * A deployment is a container for resources such as process definitions, images, forms, etc.
  *
- * When a deployment is 'deployed' through the {@link org.camunda.bpm.engine.RuntimeService},
+ * When a deployment is 'deployed' through the {@link org.camunda.bpm.engine.RepositoryService},
  * the engine will recognize certain of such resource types and act upon
  * them (e.g. process definitions will be parsed to an executable Java artifact).
  *
@@ -39,5 +39,11 @@ public interface Deployment {
   Date getDeploymentTime();
 
   String getSource();
+
+  /**
+   * Returns the tenant id of the deployment. The id is <code>null</code> if no
+   * tenant id was set on the {@link DeploymentBuilder}.
+   */
+  String getTenantId();
 
 }
