@@ -31,28 +31,28 @@ module.exports = function(config, watchConf) {
       ]
   };
 
-  watchConf.admin_scripts = {
-      options: options,
-      files: [
-        '<%= pkg.gruntConfig.adminSourceDir %>/scripts/**/*.{js,html,json}'
-      ],
-      tasks: [
-        'requirejs:admin_scripts'
-      ]
-  };
+  // watchConf.admin_scripts = {
+  //     options: options,
+  //     files: [
+  //       '<%= pkg.gruntConfig.adminSourceDir %>/scripts/**/*.{js,html,json}'
+  //     ],
+  //     tasks: [
+  //       'requirejs:admin_scripts'
+  //     ]
+  // };
 
-  watchConf.admin_dependencies = {
-      options: options,
-      files: [
-        '<%= pkg.gruntConfig.adminSourceDir %>/../../camunda-commons-ui/lib/**/*.{js,html}',
-        '<%= pkg.gruntConfig.adminSourceDir %>/../../camunda-commons-ui/{resources,lib/*}/locales/**/*.json',
-        '<%= pkg.gruntConfig.adminSourceDir %>/../../camunda-commons-ui/node_modules/camunda-bpm-sdk-js/dist/**/*.js',
-        '../../camunda-bpm-platform-ee/webapps/camunda-webapp/plugins/target/classes/plugin-webapp/**/*.{js,html}'
-      ],
-      tasks: [
-        'requirejs:admin_scripts'
-      ]
-  };
+  // watchConf.admin_dependencies = {
+  //     options: options,
+  //     files: [
+  //       '<%= pkg.gruntConfig.adminSourceDir %>/../../camunda-commons-ui/lib/**/*.{js,html}',
+  //       '<%= pkg.gruntConfig.adminSourceDir %>/../../camunda-commons-ui/{resources,lib/*}/locales/**/*.json',
+  //       '<%= pkg.gruntConfig.adminSourceDir %>/../../camunda-commons-ui/node_modules/camunda-bpm-sdk-js/dist/**/*.js',
+  //       '../../camunda-bpm-platform-ee/webapps/camunda-webapp/plugins/target/classes/plugin-webapp/**/*.{js,html}'
+  //     ],
+  //     tasks: [
+  //       'requirejs:admin_scripts'
+  //     ]
+  // };
 
   watchConf.admin_dist = {
     options: {

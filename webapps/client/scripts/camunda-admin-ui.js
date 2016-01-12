@@ -1,47 +1,33 @@
-define('camunda-admin-ui', [
-  './pages/main',
-  './directives/main',
-  './filters/main',
-  './services/main',
-  './resources/main',
-  'camunda-commons-ui',
-  'ngDefine'
-], function () {
-  'use strict';
+'use strict';
+
+var pagesModule = require('./pages/main'),
+    directivesModule = require('./directives/main'),
+    filtersModule = require('./filters/main'),
+    servicesModule = require('./services/main'),
+    resourcesModule = require('./resources/main'),
+    camCommonsUi = require('camunda-commons-ui/lib'),
+    sdk = require('camunda-bpm-sdk-js/lib/angularjs/index'),
+    angular = require('angular'),
+    $ = require('jquery');
+
+
   var APP_NAME = 'cam.admin';
 
-  var pluginPackages = window.PLUGIN_PACKAGES || [];
-  var pluginDependencies = window.PLUGIN_DEPENDENCIES || [];
-
-
-  require.config({
-    packages: pluginPackages
-  });
-
-
-  var dependencies = [].concat(pluginDependencies.map(function(plugin) {
-    return plugin.requirePackageName;
-  }));
-
-
-
-  require(dependencies, function() {
+  module.exports = function(pluginDependencies) {
 
     var ngDependencies = [
       'ng',
       'ngResource',
-      require('camunda-commons-ui').name,
-      require('./directives/main').name,
-      require('./filters/main').name,
-      require('./pages/main').name,
-      require('./resources/main').name,
-      require('./services/main').name
+      camCommonsUi.name,
+      directivesModule.name,
+      filtersModule.name,
+      pagesModule.name,
+      resourcesModule.name,
+      servicesModule.name
     ].concat(pluginDependencies.map(function(el){
       return el.ngModuleName;
     }));
 
-    var angular = require('angular');
-    var $ = require('jquery');
     var appNgModule = angular.module(APP_NAME, ngDependencies);
 
     var ModuleConfig = [
@@ -112,9 +98,7 @@ define('camunda-admin-ui', [
     }]);
 
 
-    require([
-      'domReady!'
-    ], function () {
+    $(document).ready(function () {
       angular.bootstrap(document, [ appNgModule.name ]);
       var html = document.getElementsByTagName('html')[0];
 
@@ -128,14 +112,14 @@ define('camunda-admin-ui', [
       }
     });
 
-
-
-    /* live-reload
-    // loads livereload client library (without breaking other scripts execution)
-    require(['jquery'], function($) {
+      /* live-reload
+      // loads livereload client library (without breaking other scripts execution)
       $('body').append('<script src="//' + location.hostname + ':LIVERELOAD_PORT/livereload.js?snipver=1"></script>');
-    });
-    /* */
-  });
-});
+      /* */
+  };
 
+  module.exports.exposePackages = function(requirePackages) {
+    requirePackages.angular = angular;
+    requirePackages['camunda-commons-ui'] = camCommonsUi;
+    requirePackages['camunda-bpm-sdk-js'] = sdk;
+  };

@@ -1,9 +1,8 @@
-/* global define: false, angular: false */
-/* jshint browser: true */
-define(['angular'], function(angular) {
-  'use strict';
+'use strict';
 
-  return [
+var angular = require('angular');
+
+  module.exports = [
             '$scope', '$q', '$location', 'Uri', 'Notifications', 'GroupMembershipResource', 'GroupResource', '$modalInstance', 'user', 'userId', 'groupIdList',
     function($scope,   $q,   $location,   Uri,   Notifications,   GroupMembershipResource,   GroupResource,   $modalInstance,   user,   userId,   groupIdList) {
 
@@ -93,5 +92,3 @@ define(['angular'], function(angular) {
       $modalInstance.close(status);
     };
   }];
-
-});

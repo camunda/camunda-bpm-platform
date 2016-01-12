@@ -1,5 +1,11 @@
-define(['angular', 'text!./users.html'], function(angular, template) {
-  'use strict';
+'use strict';
+
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/users.html', 'utf8');
+
+var angular = require('angular');
+
   var Controller = ['$scope', '$location', 'search', 'UserResource', function ($scope, $location, search, UserResource) {
 
     $scope.availableOperations={};
@@ -48,7 +54,7 @@ define(['angular', 'text!./users.html'], function(angular, template) {
 
   }];
 
-  return [ '$routeProvider', function($routeProvider) {
+  module.exports = [ '$routeProvider', function($routeProvider) {
     $routeProvider.when('/users', {
       template: template,
       controller: Controller,
@@ -56,4 +62,3 @@ define(['angular', 'text!./users.html'], function(angular, template) {
       reloadOnSearch: false
     });
   }];
-});

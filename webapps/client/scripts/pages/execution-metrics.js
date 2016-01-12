@@ -1,11 +1,9 @@
-define([
-  'text!./execution-metrics.html',
-  'camunda-bpm-sdk-js'
-], function(
-  template,
-  CamSDK
-) {
-  'use strict';
+'use strict';
+
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/execution-metrics.html', 'utf8');
+var CamSDK = require('camunda-bpm-sdk-js');
 
   var Controller = [
    '$scope',
@@ -63,7 +61,7 @@ define([
 
   }];
 
-  return ['ViewsProvider', function PluginConfiguration(ViewsProvider) {
+  module.exports = ['ViewsProvider', function PluginConfiguration(ViewsProvider) {
 
     ViewsProvider.registerDefaultView('admin.system', {
       id: 'system-settings-metrics',
@@ -73,5 +71,3 @@ define([
       priority: 900
     });
   }];
-});
-

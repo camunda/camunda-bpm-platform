@@ -1,6 +1,6 @@
-define([], function() {
+'use strict';
 
-  return [ '$resource', 'Uri', function ($resource, Uri) {
+  module.exports = [ '$resource', 'Uri', function ($resource, Uri) {
 
     return $resource(Uri.appUri('engine://engine/:engine/user/:userId/:action'), { userId: '@id' }, {
       profile : {method:'GET', params: { 'action' : 'profile'}},
@@ -11,4 +11,3 @@ define([], function() {
       count : {method: 'GET', params: { 'userId' : 'count'}}
     });
   }];
-});

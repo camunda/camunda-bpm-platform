@@ -1,16 +1,11 @@
-define(['angular',
-	'./userResource',
-	'./groupResource',
-	'./groupMembershipResource',
-	'./initialUserResource',
-  './metricsResource'
-], function(angular,
-	userResource,
-	groupResource,
-	groupMembershipResource,
-	initialUserResource,
-  metricsResource) {
-  'use strict';
+'use strict';
+
+var angular = require('angular'),
+  userResource = require('./userResource'),
+  groupResource = require('./groupResource'),
+  groupMembershipResource = require('./groupMembershipResource'),
+  initialUserResource = require('./initialUserResource'),
+  metricsResource = require('./metricsResource');
 
   var ngModule = angular.module('admin.resources', []);
 
@@ -20,5 +15,4 @@ define(['angular',
   ngModule.factory('InitialUserResource', initialUserResource);
   ngModule.factory('MetricsResource', metricsResource);
 
-  return ngModule;
-});
+  module.exports = ngModule;

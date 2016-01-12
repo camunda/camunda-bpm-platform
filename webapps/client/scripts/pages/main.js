@@ -1,38 +1,22 @@
-define(['angular',
-  'angular-route',
-  'camunda-commons-ui',
-  './authorizations',
-  './authorizationCreate',
-  './authorizationDeleteConfirm',
-  './users',
-  './userCreate',
-  './userEdit',
-  './groups',
-  './groupCreate',
-  './groupEdit',
-  './groupMembershipsCreate',
-  './setup',
-  './system',
-  './systemSettingsGeneral',
-  './execution-metrics'
-], function(angular,
-  angularRoute,
-  camundaCommonsUi,
-  authorizations,
-  authorizationCreate,
-  authorizationDeleteConfirm,
-  users,
-  userCreate,
-  userEdit,
-  groups,
-  groupCreate,
-  groupEdit,
-  groupMembershipsCreate,
-  setup,
-  system,
-  systemSettingsGeneral,
-  executionMetrics) {
-  'use strict';
+'use strict';
+
+var angular = require('angular'),
+    angularRoute = require('angular-route'),
+    camundaCommonsUi = require('camunda-commons-ui'),
+    authorizations = require('./authorizations'),
+    authorizationCreate = require('./authorizationCreate'),
+    authorizationDeleteConfirm = require('./authorizationDeleteConfirm'),
+    users = require('./users'),
+    userCreate = require('./userCreate'),
+    userEdit = require('./userEdit'),
+    groups = require('./groups'),
+    groupCreate = require('./groupCreate'),
+    groupEdit = require('./groupEdit'),
+    groupMembershipsCreate = require('./groupMembershipsCreate'),
+    setup = require('./setup'),
+    system = require('./system'),
+    systemSettingsGeneral = require('./systemSettingsGeneral'),
+    executionMetrics = require('./execution-metrics');
 
   var ngModule = angular.module('admin.pages', ['ngRoute', 'cam.commons']);
 
@@ -51,5 +35,4 @@ define(['angular',
   ngModule.config(systemSettingsGeneral);
   ngModule.config(executionMetrics);
 
-  return ngModule;
-});
+  module.exports = ngModule;

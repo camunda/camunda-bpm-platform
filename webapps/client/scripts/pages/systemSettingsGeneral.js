@@ -1,5 +1,8 @@
-define(['text!./systemSettingsGeneral.html'], function(template) {
-  'use strict';
+'use strict';
+
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/systemSettingsGeneral.html', 'utf8');
 
   var Controller = [
    '$scope',
@@ -11,7 +14,7 @@ define(['text!./systemSettingsGeneral.html'], function(template) {
 
   }];
 
-  return ['ViewsProvider', function PluginConfiguration(ViewsProvider) {
+  module.exports = ['ViewsProvider', function PluginConfiguration(ViewsProvider) {
 
     ViewsProvider.registerDefaultView('admin.system', {
       id: 'system-settings-general',
@@ -21,5 +24,3 @@ define(['text!./systemSettingsGeneral.html'], function(template) {
       priority: 1000
     });
   }];
-});
-

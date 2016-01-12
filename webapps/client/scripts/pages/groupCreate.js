@@ -1,5 +1,9 @@
-define(['text!./groupCreate.html'], function(template) {
-  'use strict';
+'use strict';
+
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/groupCreate.html', 'utf8');
+
   var Controller = ['$scope', 'GroupResource', 'Notifications', '$location', function ($scope, GroupResource, Notifications, $location) {
 
     // data model for new group
@@ -24,11 +28,10 @@ define(['text!./groupCreate.html'], function(template) {
 
   }];
 
-  return [ '$routeProvider', function($routeProvider) {
+  module.exports = [ '$routeProvider', function($routeProvider) {
     $routeProvider.when('/group-create', {
       template: template,
       controller: Controller,
       authentication: 'required'
     });
   }];
-});

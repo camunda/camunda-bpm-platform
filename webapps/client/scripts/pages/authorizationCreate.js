@@ -1,6 +1,9 @@
-define(['camunda-bpm-sdk-js', 'angular'], function(CamSDK, angular) {
-  'use strict';
-  return [ '$scope', '$q', '$location', 'Uri', 'Notifications', 'AuthorizationResource', function AuthorizationCreateController ($scope, $q, $location, Uri, Notifications, AuthorizationResource) {
+'use strict';
+
+var CamSDK = require('camunda-bpm-sdk-js');
+var angular = require('angular');
+
+  module.exports = [ '$scope', '$q', '$location', 'Uri', 'Notifications', 'AuthorizationResource', function AuthorizationCreateController ($scope, $q, $location, Uri, Notifications, AuthorizationResource) {
 
     var authorizationService = new CamSDK.Client({
       apiUri: Uri.appUri('engine://'),
@@ -129,4 +132,3 @@ define(['camunda-bpm-sdk-js', 'angular'], function(CamSDK, angular) {
       }
     };
   }];
-});

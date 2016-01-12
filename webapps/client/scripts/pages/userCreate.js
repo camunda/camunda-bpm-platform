@@ -1,5 +1,9 @@
-define(['text!./userCreate.html'], function(template) {
-  'use strict';
+'use strict';
+
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/userCreate.html', 'utf8');
+
   var Controller = ['$scope', 'UserResource', 'Notifications', '$location', function ($scope, UserResource, Notifications, $location) {
 
     // data model for user profile
@@ -33,11 +37,10 @@ define(['text!./userCreate.html'], function(template) {
 
   }];
 
-  return [ '$routeProvider', function($routeProvider) {
+  module.exports = [ '$routeProvider', function($routeProvider) {
     $routeProvider.when('/user-create', {
       template: template,
       controller: Controller,
       authentication: 'required'
     });
   }];
-});

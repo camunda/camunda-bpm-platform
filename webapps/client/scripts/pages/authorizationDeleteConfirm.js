@@ -1,8 +1,7 @@
 /* global define: false */
-define([], function() {
   'use strict';
 
-  return [
+  module.exports = [
           '$scope', '$q', '$location', 'Uri', 'Notifications', 'AuthorizationResource', '$modalInstance', 'authorizationToDelete', 'formatPermissions', 'getResource', 'getType',
   function($scope,   $q,   $location,   Uri,   Notifications,   AuthorizationResource,   $modalInstance,   authorizationToDelete,   formatPermissions,   getResource,   getType) {
 
@@ -31,5 +30,3 @@ define([], function() {
       });
     };
   }];
-
-});

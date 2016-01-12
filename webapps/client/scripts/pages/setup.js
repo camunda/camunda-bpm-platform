@@ -1,5 +1,9 @@
-define(['text!./setup.html'], function(template) {
-  'use strict';
+'use strict';
+
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/setup.html', 'utf8');
+
   var Controller = ['$scope', 'InitialUserResource', 'Notifications', '$location', 'Uri', function ($scope, InitialUserResource, Notifications, $location, Uri) {
 
     if (!/.*\/app\/admin\/(\w+)\/setup\/.*/.test($location.absUrl())) {
@@ -43,10 +47,9 @@ define(['text!./setup.html'], function(template) {
 
   }];
 
-  return [ '$routeProvider', function($routeProvider) {
+  module.exports = [ '$routeProvider', function($routeProvider) {
     $routeProvider.when('/setup', {
       template: template,
       controller: Controller
     });
   }];
-});

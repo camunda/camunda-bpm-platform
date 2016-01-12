@@ -1,6 +1,6 @@
-define([], function() {
+'use strict';
 
-  return [ '$resource', 'Uri', function ($resource, Uri) {
+  module.exports = [ '$resource', 'Uri', function ($resource, Uri) {
 
     return $resource(Uri.appUri('engine://engine/:engine/group/:groupId/:action'), { groupId: '@id' }, {
       createGroup : {method:'POST', params: { 'groupId' : 'create'}},
@@ -9,4 +9,3 @@ define([], function() {
       count : {method: 'GET', params: { 'groupId' : 'count'}}
     });
   }];
-});

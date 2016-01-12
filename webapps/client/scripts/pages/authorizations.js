@@ -1,7 +1,13 @@
 /* global define: false */
-define(['text!./authorizations.html', 'text!./confirm-delete-authorization.html' ], function(template, confirmTemplate) {
-  'use strict';
-  return [ '$routeProvider', function($routeProvider) {
+
+'use strict';
+
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/authorizations.html', 'utf8');
+var confirmTemplate = fs.readFileSync(__dirname + '/confirm-delete-authorization.html', 'utf8');
+
+  module.exports = [ '$routeProvider', function($routeProvider) {
     $routeProvider.when('/authorization', {
       template: template,
       controller: [
@@ -185,4 +191,3 @@ define(['text!./authorizations.html', 'text!./confirm-delete-authorization.html'
       reloadOnSearch: false
     });
   }];
-});

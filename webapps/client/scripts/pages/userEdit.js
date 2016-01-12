@@ -1,17 +1,14 @@
-/* global define: false */
-define([
-  'angular',
-  'text!./userEdit.html',
-  'text!./create-group-membership.html',
-  'text!./generic-confirmation.html'
-], function(
-  angular,
-  template,
-  groupTemplate,
-  confirmationTemplate
-) {
-  'use strict';
-  return [ '$routeProvider', function($routeProvider) {
+'use strict';
+
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/userEdit.html', 'utf8');
+var groupTemplate = fs.readFileSync(__dirname + '/create-group-membership.html', 'utf8');
+var confirmationTemplate = fs.readFileSync(__dirname + '/generic-confirmation.html', 'utf8');
+
+var angular = require('angular');
+
+  module.exports = [ '$routeProvider', function($routeProvider) {
     $routeProvider.when('/users/:userId', {
       template: template,
       controller: [
@@ -234,4 +231,3 @@ define([
       reloadOnSearch: false
     });
   }];
-});

@@ -1,5 +1,9 @@
-define(['text!./system.html'], function(template) {
-  'use strict';
+'use strict';
+
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/system.html', 'utf8');
+
   var Controller = [
     '$scope',
     '$location',
@@ -28,11 +32,10 @@ define(['text!./system.html'], function(template) {
 
   }];
 
-  return [ '$routeProvider', function($routeProvider) {
+  module.exports = [ '$routeProvider', function($routeProvider) {
     $routeProvider.when('/system', {
       template: template,
       controller: Controller,
       authentication: 'required'
     });
   }];
-});

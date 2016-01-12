@@ -1,3 +1,5 @@
-define(['angular'], function(angular) {
-  return angular.module('admin.filters', []);
-});
+'use strict';
+
+var angular = require('angular');
+
+module.exports = angular.module('admin.filters', []);

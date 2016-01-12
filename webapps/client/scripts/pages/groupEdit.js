@@ -1,13 +1,11 @@
-define([
-  'angular',
-  'text!./groupEdit.html',
-  'text!./generic-confirmation.html'
-], function(
-  angular,
-  template,
-  confirmationTemplate
-) {
-  'use strict';
+'use strict';
+
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/groupEdit.html', 'utf8');
+var confirmationTemplate = fs.readFileSync(__dirname + '/generic-confirmation.html', 'utf8');
+
+var angular = require('angular');
 
   var Controller = [
     '$scope',
@@ -177,7 +175,7 @@ define([
 
   }];
 
-  return [ '$routeProvider', function($routeProvider) {
+  module.exports = [ '$routeProvider', function($routeProvider) {
     $routeProvider.when('/groups/:groupId', {
       template: template,
       controller: Controller,
@@ -185,4 +183,3 @@ define([
       reloadOnSearch: false
     });
   }];
-});
