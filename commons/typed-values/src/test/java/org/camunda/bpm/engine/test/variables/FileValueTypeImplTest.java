@@ -111,7 +111,6 @@ public class FileValueTypeImplTest {
   @Test(expected = IllegalArgumentException.class)
   public void createValueFromObject() throws IOException, URISyntaxException {
     type.createValue(new Object(), Collections.<String, Object> singletonMap(FileValueTypeImpl.VALUE_INFO_FILE_NAME, "simpleFile.txt"));
-    fail();
   }
 
   @Test
