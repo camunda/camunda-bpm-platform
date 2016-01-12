@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.variable.type.PrimitiveValueType;
 import org.camunda.bpm.engine.variable.value.FileValue;
 import org.camunda.bpm.engine.variable.value.builder.FileValueBuilder;
 import org.camunda.commons.utils.EnsureUtil;
+import org.camunda.commons.utils.IoUtil;
 import org.camunda.commons.utils.IoUtilException;
 
 /**
@@ -51,7 +52,7 @@ public class FileValueBuilderImpl implements FileValueBuilder {
   @Override
   public FileValueBuilder file(File file) {
     try {
-      return file(org.camunda.commons.utils.IoUtil.fileAsByteArray(file));
+      return file(IoUtil.fileAsByteArray(file));
     } catch(IoUtilException e) {
       throw new IllegalArgumentException(e);
     }
@@ -60,7 +61,7 @@ public class FileValueBuilderImpl implements FileValueBuilder {
   @Override
   public FileValueBuilder file(InputStream stream) {
       try {
-        return file(org.camunda.commons.utils.IoUtil.inputStreamAsByteArray(stream));
+        return file(IoUtil.inputStreamAsByteArray(stream));
 	  } catch(IoUtilException e) {
 	  	throw new IllegalArgumentException(e);
 	  }

@@ -32,20 +32,7 @@ public class IoUtil {
    * @param inputStream the input stream
    */
   public static String inputStreamAsString(InputStream inputStream) {
-    ByteArrayOutputStream os = new ByteArrayOutputStream();
-    try {
-      byte[] buffer = new byte[16 * 1024];
-      int read;
-      while((read = inputStream.read(buffer)) > 0) {
-        os.write(buffer, 0, read);
-      }
-      return os.toString("utf-8");
-    } catch (IOException e) {
-      throw LOG.unableToReadInputStream(e);
-    }
-    finally {
-      closeSilently(inputStream);
-    }
+    return new String(inputStreamAsByteArray(inputStream), ENCODING_CHARSET);
   }
 
   /**
