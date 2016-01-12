@@ -739,13 +739,12 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(expectedTaskNames.length, rowData.size());
     String columnKey = "NAME_";
 
-    // mybatis will return the correct case for postgres table columns from version 3.0.6 on
-    if (processEngineConfiguration.getDatabaseType().equals("postgres")) {
-      columnKey = "name_";
-    }
-
     for (int i=0; i < expectedTaskNames.length; i++) {
-      assertEquals(expectedTaskNames[i], rowData.get(i).get(columnKey));
+      Object o = rowData.get(i).get(columnKey);
+      if ( o == null ) {
+        o = rowData.get(i).get(columnKey.toLowerCase());
+      }
+      assertEquals(expectedTaskNames[i], o);
     }
   }
 
