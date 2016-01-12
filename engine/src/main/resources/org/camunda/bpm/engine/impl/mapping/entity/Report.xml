@@ -28,7 +28,7 @@
 
   <select id="selectHistoricProcessInstanceDurationReport" parameterType="org.camunda.bpm.engine.impl.HistoricProcessInstanceReportImpl" resultMap="durationReportResultMap">
     SELECT
-      MIN(RES.DURATION_) AS MIN_, MAX(RES.DURATION_) AS MAX_, AVG(RES.DURATION_) AS AVG_, RES.PERIOD_, #{reportPeriodUnitName} as PERIOD_UNIT_
+      MIN(RES.DURATION_) AS MIN_, MAX(RES.DURATION_) AS MAX_, AVG(RES.DURATION_) AS AVG_, RES.PERIOD_, '${reportPeriodUnitName}' AS PERIOD_UNIT_
     FROM
       (
         SELECT
@@ -41,7 +41,7 @@
 
   <select id="selectHistoricProcessInstanceDurationReport_oracle" parameterType="org.camunda.bpm.engine.impl.HistoricProcessInstanceReportImpl" resultMap="durationReportResultMap">
     SELECT
-      MIN(RES.DURATION_) AS MIN_, MAX(RES.DURATION_) AS MAX_, AVG(RES.DURATION_) AS AVG_, RES.PERIOD_, #{reportPeriodUnitName} as PERIOD_UNIT_
+      MIN(RES.DURATION_) AS MIN_, MAX(RES.DURATION_) AS MAX_, AVG(RES.DURATION_) AS AVG_, RES.PERIOD_, '${reportPeriodUnitName}' AS PERIOD_UNIT_
     FROM
       (
         SELECT
