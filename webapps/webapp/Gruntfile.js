@@ -18,12 +18,15 @@ module.exports = function(grunt) {
     }
   };
 
-  require('./grunt/config/requirejs')(config, requireJsConf);
-  require('camunda-admin-ui/grunt/config/requirejs')(config, requireJsConf);
-  require('camunda-cockpit-ui/grunt/config/requirejs')(config, requireJsConf);
-  require('camunda-tasklist-ui/grunt/config/requirejs')(config, requireJsConf);
+  var browserifyConf = { };
 
-  var copyConf = { };
+  require('camunda-admin-ui/grunt/config/browserify')(config, browserifyConf);
+  require('camunda-tasklist-ui/grunt/config/browserify')(config, browserifyConf);
+  require('camunda-cockpit-ui/grunt/config/browserify')(config, browserifyConf);
+
+  require('./grunt/config/requirejs')(config, requireJsConf);
+
+  var copyConf = require('./grunt/config/copy');
   require('camunda-admin-ui/grunt/config/copy')(config, copyConf);
   require('camunda-cockpit-ui/grunt/config/copy')(config, copyConf);
   require('camunda-tasklist-ui/grunt/config/copy')(config, copyConf);
@@ -58,21 +61,11 @@ module.exports = function(grunt) {
   require('camunda-cockpit-ui/grunt/config/watch')(config, watchConf);
   require('camunda-admin-ui/grunt/config/watch')(config, watchConf);
 
-  // watch the SDK
-  watchConf.watchSdk = {
-    options: {
-      livereload: false
-    },
-    files: ['node_modules/camunda-commons-ui/node_modules/camunda-bpm-sdk-js/lib/**/*.js'],
-    tasks: ['grunt:buildSdk']
-  };
-
-  var gruntConf = {
-    buildSdk: {
-      gruntfile: 'node_modules/camunda-commons-ui/node_modules/camunda-bpm-sdk-js/Gruntfile.js',
-      tasks: ['browserify:distAngular', 'browserify:distTypeUtils']
-    }
-  };
+  var uglifyConf = {};
+  require('./grunt/config/uglify')(config, uglifyConf);
+  require('camunda-admin-ui/grunt/config/uglify')(config, uglifyConf);
+  require('camunda-tasklist-ui/grunt/config/uglify')(config, uglifyConf);
+  require('camunda-cockpit-ui/grunt/config/uglify')(config, uglifyConf);
 
 
   grunt.initConfig({
@@ -82,19 +75,21 @@ module.exports = function(grunt) {
 
     requirejs:        requireJsConf,
 
+    browserify:       browserifyConf,
+
     copy:             copyConf,
 
     less:             lessConf,
 
     localescompile:   localesConf,
 
+    uglify:           uglifyConf,
+
     clean:            require('./grunt/config/clean')(config),
 
     watch:            watchConf,
 
-    protractor:       require('./grunt/config/protractor')(config),
-
-    grunt:            gruntConf
+    protractor:       require('./grunt/config/protractor')(config)
   });
 
   require('camunda-commons-ui/grunt/tasks/localescompile')(grunt);
@@ -104,7 +99,7 @@ module.exports = function(grunt) {
 
     if(typeof app !== 'undefined') {
       console.log(' ------------  will build ' + app + ' -------------');
-      var objs = [requireJsConf, copyConf, lessConf, localesConf, watchConf, gruntConf];
+      var objs = [requireJsConf, browserifyConf, copyConf, lessConf, localesConf, watchConf, uglifyConf];
       for(var i = 0; i < objs.length; i++) {
         var obj = objs[i];
         for (var key in obj) {
@@ -119,24 +114,23 @@ module.exports = function(grunt) {
 
     grunt.config.data.buildMode = mode || 'prod';
 
-    if(typeof app !== 'undefined' && app !== 'tasklist') {
-      grunt.task.run([
-        'clean',
-        'grunt',
-        'requirejs',
-        'copy',
-        'less'
-      ]);
-    } else {
-      grunt.task.run([
-        'clean',
-        'grunt',
-        'requirejs',
-        'copy',
-        'localescompile',
-        'less'
-      ]);
+    var tasksToRun = [
+      'clean',
+      'requirejs',
+      'browserify',
+      'copy',
+      'less'
+    ];
+
+    if(typeof app === 'undefined' || app === 'tasklist') {
+      tasksToRun.push('localescompile');
     }
+
+    if(grunt.config.data.buildMode === 'prod') {
+      tasksToRun.push('uglify');
+    }
+
+    grunt.task.run(tasksToRun);
 
   });
 

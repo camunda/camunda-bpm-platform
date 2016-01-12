@@ -15,7 +15,11 @@ module.exports = function(config, requireJsConf) {
       'angular': 'empty:',
       'angular-data-depend': 'empty:',
       'camunda-bpm-sdk-js': 'empty:',
+      'camunda-commons-ui': 'empty:',
       'text': '<%= pkg.gruntConfig.pluginSourceDir.split("/").map(function () { return ".." }).join("/") %>/node_modules/requirejs-text/text'
+    },
+    shim: {
+      angular: {exports: 'angular'}
     }
   };
 
@@ -23,7 +27,7 @@ module.exports = function(config, requireJsConf) {
     options: _.extend({}, options, {
       out: '<%= pkg.gruntConfig.pluginBuildTarget %>/base/app/plugin.js',
       include: ['base/app/plugin'],
-      exclude: ['text'],
+      exclude: ['angular'],
       insertRequire: ['base/app/plugin']
     })
   };
@@ -33,7 +37,7 @@ module.exports = function(config, requireJsConf) {
     options: _.extend({}, options, {
       out: '<%= pkg.gruntConfig.pluginBuildTarget %>/jobDefinition/app/plugin.js',
       include: ['jobDefinition/app/plugin'],
-      exclude: ['text'],
+      exclude: ['angular'],
       insertRequire: ['jobDefinition/app/plugin']
     })
   };
@@ -42,7 +46,7 @@ module.exports = function(config, requireJsConf) {
     options: _.extend({}, options, {
       out: '<%= pkg.gruntConfig.pluginBuildTarget %>/standaloneTask/app/plugin.js',
       include: ['standaloneTask/app/plugin'],
-      exclude: ['text'],
+      exclude: ['angular'],
       insertRequire: ['standaloneTask/app/plugin']
     })
   };
@@ -51,7 +55,7 @@ module.exports = function(config, requireJsConf) {
     options: _.extend({}, options, {
       out: '<%= pkg.gruntConfig.pluginBuildTarget %>/decisionList/app/plugin.js',
       include: ['decisionList/app/plugin'],
-      exclude: ['text'],
+      exclude: ['angular'],
       insertRequire: ['decisionList/app/plugin']
     })
   };

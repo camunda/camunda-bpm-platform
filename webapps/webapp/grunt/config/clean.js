@@ -9,7 +9,8 @@ module.exports = function() {
     },
     apps: {
       src: [
-        'target/webapp/app'
+        'target/webapp/app',
+        'target/webapp/lib'
       ]
     }
   };
