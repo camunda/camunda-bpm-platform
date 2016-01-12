@@ -48,7 +48,8 @@ module.exports = function(config, copyConf) {
         expand: true,
         cwd: '<%= pkg.gruntConfig.adminSourceDir %>/scripts/',
         src: [
-          'index.html'
+          'index.html',
+          'camunda-admin-bootstrap.js'
         ],
         dest: '<%= pkg.gruntConfig.adminBuildTarget %>/'
       }
@@ -72,7 +73,8 @@ module.exports = function(config, copyConf) {
           expand: true,
           cwd: '<%= pkg.gruntConfig.adminSourceDir %>/scripts/',
           src: [
-            'index.html'
+            'index.html',
+            'camunda-admin-bootstrap.js'
           ],
           dest: '<%= pkg.gruntConfig.adminBuildTarget %>/'
         }

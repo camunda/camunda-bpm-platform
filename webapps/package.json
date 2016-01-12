@@ -8,5 +8,13 @@
     "clientDir": "client",
     "prodTarget": "dist",
     "devTarget": "dist/app/admin"
+  },
+  "browserify": {
+    "transform": [
+      "brfs"
+    ]
+  },
+  "devDependencies": {
+    "brfs": "^1.4.2"
   }
 }
