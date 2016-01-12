@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.rest.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.impl.identity.Authentication;
@@ -35,6 +36,10 @@ public abstract class AbstractAuthorizedRestResource extends AbstractRestProcess
   }
 
   protected boolean isAuthorized(Permission permission, Resource resource, String resourceId) {
+    if (!processEngine.getProcessEngineConfiguration().isAuthorizationEnabled()) {
+      // if authorization is disabled everyone is authorized
+      return true;
+    }
 
     final IdentityService identityService = processEngine.getIdentityService();
     final AuthorizationService authorizationService = processEngine.getAuthorizationService();
