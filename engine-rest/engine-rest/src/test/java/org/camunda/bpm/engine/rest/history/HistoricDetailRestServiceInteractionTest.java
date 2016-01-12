@@ -300,8 +300,8 @@ public class HistoricDetailRestServiceInteractionTest extends AbstractRestServic
     when(historicDetailQueryMock.disableCustomObjectDeserialization()).thenReturn(historicDetailQueryMock);
     when(historicDetailQueryMock.singleResult()).thenReturn(detailMock);
 
-    Response response = given().pathParam("id", MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_ID).log().all()
-    .then().expect().log().all()
+    Response response = given().pathParam("id", MockProvider.EXAMPLE_HISTORIC_VAR_UPDATE_ID)
+    .then().expect()
       .statusCode(Status.OK.getStatusCode())
       . body(is(equalTo(new String(byteContent))))
       .and()

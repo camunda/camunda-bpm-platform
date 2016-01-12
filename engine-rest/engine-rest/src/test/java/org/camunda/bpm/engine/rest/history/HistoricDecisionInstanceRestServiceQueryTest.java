@@ -204,7 +204,7 @@ public class HistoricDecisionInstanceRestServiceQueryTest extends AbstractRestSe
 
     Response response = given()
         .queryParam("decisionDefinitionId", decisionDefinitionId)
-      .then().expect().log().body()
+      .then().expect()
         .statusCode(Status.OK.getStatusCode())
       .when()
         .get(HISTORIC_DECISION_INSTANCE_RESOURCE_URL);

@@ -647,7 +647,7 @@ public class AuthorizationRestServiceInteractionTest extends AbstractRestService
         .body("links[1]", nullValue())
         .body("links[2]", nullValue())
 
-    .when().log().all()
+    .when()
         .options(AUTH_RESOURCE_PATH);
 
     verify(identityServiceMock, times(2)).getCurrentAuthentication();
