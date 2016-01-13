@@ -1,7 +1,7 @@
 'use strict';
 
-var fs = require('fs'),
-    factory = require('../../setup-factory.js'),
+var factory = require('../../setup-factory.js'),
+    readResource = factory.readResource,
     combine = factory.combine,
     operation = factory.operation;
 
@@ -40,13 +40,13 @@ module.exports = {
         deploymentName: 'assign-approver',
         files: [{
           name: 'assign-approver-groups.dmn',
-          content: fs.readFileSync(__dirname + '/../../resources/assign-approver-groups.dmn').toString()
+          content: readResource('assign-approver-groups.dmn')
         }]
       },{
         deploymentName: 'invoice',
         files: [{
           name: 'invoice.bpmn',
-          content: fs.readFileSync(__dirname + '/../../resources/invoice.bpmn').toString()
+          content: readResource('invoice.bpmn')
         }]
       }]),
 

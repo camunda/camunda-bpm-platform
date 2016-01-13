@@ -1,7 +1,7 @@
 'use strict';
 
-var fs = require('fs'),
-    factory = require('../../setup-factory.js'),
+var factory = require('../../setup-factory.js'),
+    readResource = factory.readResource,
     combine = factory.combine,
     operation = factory.operation;
 
@@ -14,14 +14,14 @@ module.exports = {
         deploymentName:  'user-tasks',
         files:           [{
           name: 'user-tasks.bpmn',
-          content: fs.readFileSync(__dirname + '/../../resources/user-tasks.bpmn').toString()
+          content: readResource('user-tasks.bpmn')
         }]
       },
       {
         deploymentName:  'suspension-process',
         files:           [{
           name: 'suspension-process.bpmn',
-          content: fs.readFileSync(__dirname + '/../../resources/suspension-process.bpmn').toString()
+          content: readResource('suspension-process.bpmn')
         }]
       }]),
 

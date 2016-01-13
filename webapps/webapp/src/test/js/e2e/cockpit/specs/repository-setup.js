@@ -1,7 +1,7 @@
 'use strict';
 
-var fs = require('fs'),
-    factory = require('../../setup-factory.js'),
+var factory = require('../../setup-factory.js'),
+    readResource = factory.readResource,
     combine = factory.combine,
     operation = factory.operation;
 
@@ -16,14 +16,14 @@ module.exports = {
         deploymentSource: 'process application',
         files: [{
           name: 'user-tasks.bpmn',
-          content: fs.readFileSync(__dirname + '/../../resources/user-tasks.bpmn').toString()
+          content: readResource('user-tasks.bpmn')
         }]
       },
       {
         deploymentName:  'second-deployment',
         files: [{
           name: 'suspension-process.bpmn',
-          content: fs.readFileSync(__dirname + '/../../resources/suspension-process.bpmn').toString()
+          content: readResource('suspension-process.bpmn')
         }]
       },
       {
@@ -31,7 +31,7 @@ module.exports = {
         deploymentSource: 'cockpit',
         files: [{
           name: 'failing-process.bpmn',
-          content: fs.readFileSync(__dirname + '/../../resources/failing-process.bpmn').toString()
+          content: readResource('failing-process.bpmn')
         }]
       }]),
 
@@ -53,35 +53,35 @@ module.exports = {
         deploymentName: 'bpmn',
         files: [{
           name: 'user-tasks.bpmn',
-          content: fs.readFileSync(__dirname + '/../../resources/user-tasks.bpmn').toString()
+          content: readResource('user-tasks.bpmn')
         }]
       },
       {
         deploymentName: 'cmmn',
         files: [{
           name: 'loan-application.cmmn',
-          content: fs.readFileSync(__dirname + '/../../resources/loan-application.cmmn').toString()
+          content: readResource('loan-application.cmmn')
         }]
       },
       {
         deploymentName: 'dmn',
         files: [{
           name: 'assign-approver-groups.dmn',
-          content: fs.readFileSync(__dirname + '/../../resources/assign-approver-groups.dmn').toString()
+          content: readResource('assign-approver-groups.dmn')
         }]
       },
       {
         deploymentName: 'image',
         files: [{
           name: 'diagram.svg',
-          content: fs.readFileSync(__dirname + '/../../resources/diagram.svg').toString()
+          content: readResource('diagram.svg')
         }]
       },
       {
         deploymentName: 'script',
         files: [{
           name: 'my-script.groovy',
-          content: fs.readFileSync(__dirname + '/../../resources/my-script.groovy').toString()
+          content: readResource('my-script.groovy')
         }]
       }]),
 

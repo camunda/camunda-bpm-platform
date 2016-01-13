@@ -1,4 +1,6 @@
 'use strict';
+var fs = require('fs');
+
 module.exports = {
   combine: function() {
     return Array.prototype.concat.apply([], arguments);
@@ -14,5 +16,9 @@ module.exports = {
       });
     }
     return out;
+  },
+
+  readResource: function (filename) {
+    return fs.readFileSync(__dirname + '/resources/' + filename).toString();
   }
 };

@@ -1,7 +1,7 @@
 'use strict';
 
-var fs = require('fs'),
-    factory = require('../../setup-factory.js'),
+var factory = require('../../setup-factory.js'),
+    readResource = factory.readResource,
     combine = factory.combine,
     operation = factory.operation;
 
@@ -43,7 +43,7 @@ var fragment4 = combine(
     deploymentName:  'user-tasks',
     files: [{
       name: 'user-tasks.bpmn',
-      content: fs.readFileSync(__dirname + '/../../resources/user-tasks.bpmn').toString()
+      content: readResource('user-tasks.bpmn')
     }]
   }]),
 

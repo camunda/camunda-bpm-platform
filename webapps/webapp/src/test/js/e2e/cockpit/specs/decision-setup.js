@@ -1,7 +1,7 @@
 'use strict';
 
-var fs = require('fs'),
-    factory = require('../../setup-factory.js'),
+var factory = require('../../setup-factory.js'),
+    readResource = factory.readResource,
     combine = factory.combine,
     operation = factory.operation;
 
@@ -11,13 +11,13 @@ operation('deployment', 'create', [{
   deploymentName: 'assign-approver',
   files: [{
     name: 'assign-approver-groups.dmn',
-    content: fs.readFileSync(__dirname + '/../../resources/assign-approver-groups.dmn').toString()
+    content: readResource('assign-approver-groups.dmn')
   }]
 },{
   deploymentName: 'invoice',
   files: [{
     name: 'invoice.bpmn',
-    content: fs.readFileSync(__dirname + '/../../resources/invoice.bpmn').toString()
+    content: readResource('invoice.bpmn')
   }]
 }
 ]),
@@ -37,7 +37,7 @@ var deploySecond = operation('deployment', 'create', [{
   deploymentName: 'assign-approver',
   files: [{
     name: 'assign-approver-groups-changed.dmn',
-    content: fs.readFileSync(__dirname + '/../../resources/assign-approver-groups-changed.dmn').toString()
+    content: readResource('assign-approver-groups-changed.dmn')
   }]
 }]);
 
@@ -47,13 +47,13 @@ operation('deployment', 'create', [{
   deploymentName: 'assign-approver-without-clause-name',
   files: [{
     name: 'assign-approver-groups-clauses-without-name.dmn',
-    content: fs.readFileSync(__dirname + '/../../resources/assign-approver-groups-clauses-without-name.dmn').toString()
+    content: readResource('assign-approver-groups-clauses-without-name.dmn')
   }]
 },{
   deploymentName: 'invoice',
   files: [{
     name: 'invoice.bpmn',
-    content: fs.readFileSync(__dirname + '/../../resources/invoice.bpmn').toString()
+    content: readResource('invoice.bpmn')
   }]
 }
 ]),
@@ -75,7 +75,7 @@ operation('deployment', 'create', [{
   deploymentName: 'assign-approver',
   files: [{
     name: 'assign-approver-groups.dmn',
-    content: fs.readFileSync(__dirname + '/../../resources/assign-approver-groups.dmn').toString()
+    content: readResource('assign-approver-groups.dmn')
   }]
 }]),
 
