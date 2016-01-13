@@ -1,12 +1,6 @@
-define([
-  'angular',
-  'camunda-bpm-sdk-js'
-],
-function(
-  angular,
-  CamSDK
-) {
-  'use strict';
+'use strict';
+var angular = require('angular'),
+  CamSDK = require('camunda-bpm-sdk-js/lib/angularjs/index');
 
   var apiModule = angular.module('cam.tasklist.client', []);
 
@@ -49,5 +43,4 @@ function(
     return new CamSDK.Client(conf);
   }]);
 
-  return apiModule;
-});
+  module.exports = apiModule;

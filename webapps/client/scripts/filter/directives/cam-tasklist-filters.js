@@ -1,18 +1,11 @@
-define([
-  'text!./cam-tasklist-filters.html',
-  'angular'
-], function(
-  template,
-  angular
-) {
-  'use strict';
+'use strict';
+var fs = require('fs');
 
-  var $ = angular.element;
-  var each = angular.forEach;
+var template = fs.readFileSync(__dirname + '/cam-tasklist-filters.html', 'utf8');
 
   var noop = function () {};
 
-  return [function() {
+  module.exports = [function() {
 
     return {
 
@@ -94,4 +87,3 @@ define([
       }]
     };
   }];
-});

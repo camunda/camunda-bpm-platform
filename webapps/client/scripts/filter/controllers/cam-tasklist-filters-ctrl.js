@@ -1,11 +1,9 @@
-define([
-  'text!./../modals/cam-tasklist-filter-modal.html'
-], function(
-  template
-) {
-  'use strict';
+'use strict';
+var fs = require('fs');
 
-  return [
+var template = fs.readFileSync(__dirname + '/../modals/cam-tasklist-filter-modal.html', 'utf8');
+
+  module.exports = [
     '$scope',
     '$modal',
     '$q',
@@ -86,5 +84,3 @@ define([
     };
 
   }];
-
-});

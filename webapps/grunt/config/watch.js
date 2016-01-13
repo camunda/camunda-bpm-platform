@@ -31,17 +31,6 @@ module.exports = function(config, watchConf) {
       ]
   };
 
-  watchConf.tasklist_scripts = {
-      options: options,
-      files: [
-        '<%= pkg.gruntConfig.tasklistSourceDir %>/scripts/**/*.{js,html,json}'
-      ],
-      tasks: [
-        'localescompile:tasklist_locales',
-        'requirejs:tasklist_scripts'
-      ]
-  };
-
   watchConf.tasklist_config = {
       options: options,
       files: [
@@ -55,14 +44,10 @@ module.exports = function(config, watchConf) {
   watchConf.tasklist_dependencies = {
       options: options,
       files: [
-        '<%= pkg.gruntConfig.tasklistSourceDir %>/../../camunda-commons-ui/lib/**/*.{js,html}',
         '<%= pkg.gruntConfig.tasklistSourceDir %>/../../camunda-commons-ui/{resources,lib/*}/locales/**/*.json',
-        '<%= pkg.gruntConfig.tasklistSourceDir %>/../../camunda-commons-ui/node_modules/camunda-bpm-sdk-js/dist/**/*.js',
-        '../../camunda-bpm-platform-ee/webapps/camunda-webapp/plugins/target/classes/plugin-webapp/**/*.{js,html}'
       ],
       tasks: [
-        'localescompile:tasklist_locales',
-        'requirejs:tasklist_scripts'
+        'localescompile:tasklist_locales'
       ]
   };
 

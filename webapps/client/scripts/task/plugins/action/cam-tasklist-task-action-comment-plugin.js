@@ -1,11 +1,8 @@
-define([
-  'text!./cam-tasklist-task-action-comment-plugin.html',
-  'text!./modals/cam-tasklist-comment-form.html'
-], function(
-  addCommentTemplate,
-  addCommentFormTemplate
-) {
-  'use strict';
+'use strict';
+var fs = require('fs');
+
+var addCommentTemplate = fs.readFileSync(__dirname + '/cam-tasklist-task-action-comment-plugin.html', 'utf8');
+var addCommentFormTemplate = fs.readFileSync(__dirname + '/modals/cam-tasklist-comment-form.html', 'utf8');
 
   var Controller = [
    '$scope',
@@ -53,6 +50,4 @@ define([
 
   Configuration.$inject = ['ViewsProvider'];
 
-  return Configuration;
-
-});
+  module.exports = Configuration;

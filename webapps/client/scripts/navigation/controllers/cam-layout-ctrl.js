@@ -1,13 +1,11 @@
-define([
-  'angular'
-], function(
-  angular
-) {
-  'use strict';
-  var $ = angular.element;
+'use strict';
+
+var angular = require('angular');
+
+  var $ = require('jquery');
   var $bdy = $('body');
 
-  return [
+  module.exports = [
     '$scope',
     '$timeout',
   function(
@@ -87,4 +85,3 @@ define([
       open('task');
     };
   }];
-});

@@ -1,25 +1,8 @@
-define([
-  'angular',
+'use strict';
 
-    /* action plugins */
-  './plugins/action/cam-tasklist-navbar-action-start-process-plugin',
-
-    /* action plugin controller */
-  './plugins/action/modals/cam-tasklist-process-start-modal'
-
-], function(
-  angular,
-
-  /* action plugins */
-  camNavbarActionStartProcessPlugin,
-
-  /* action plugin controller */
-  camProcessStartModalCtrl
-
-
-) {
-
-  'use strict';
+var angular = require('angular'),
+    camNavbarActionStartProcessPlugin = require('./plugins/action/cam-tasklist-navbar-action-start-process-plugin'),
+    camProcessStartModalCtrl = require('./plugins/action/modals/cam-tasklist-process-start-modal');
 
   var processModule = angular.module('cam.tasklist.process', [
     'cam.tasklist.client',
@@ -34,6 +17,4 @@ define([
   /* action plugin controller */
   processModule.controller('camProcessStartModalCtrl', camProcessStartModalCtrl);
 
-  return processModule;
-
-});
+  module.exports = processModule;

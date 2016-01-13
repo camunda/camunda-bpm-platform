@@ -1,13 +1,10 @@
-define([
-  'angular',
-  'text!./cam-tasklist-task.html',
-  'jquery'
-], function(
-  angular,
-  template,
-  jquery
-) {
-  'use strict';
+'use strict';
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/cam-tasklist-task.html', 'utf8');
+
+var angular = require('angular');
+var jquery = require('jquery');
 
   var TaskErrorManager = (function() {
 
@@ -21,7 +18,7 @@ define([
 
   })();
 
-  return [ function() {
+  module.exports = [ function() {
 
     return {
       restrict: 'A',
@@ -253,5 +250,3 @@ define([
       }]
     };
   }];
-});
-

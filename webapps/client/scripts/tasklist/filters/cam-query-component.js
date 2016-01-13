@@ -1,13 +1,9 @@
-define([
-  'angular',
-  'moment'
-], function(
-  angular,
-  moment
-) {
-  'use strict';
+'use strict';
 
-  return [
+var angular = require('angular');
+var moment = require('moment');
+
+  module.exports = [
     '$filter',
   function($filter) {
 
@@ -27,4 +23,3 @@ define([
     };
 
   }];
-});

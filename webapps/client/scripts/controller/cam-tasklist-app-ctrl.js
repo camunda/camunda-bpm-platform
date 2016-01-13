@@ -1,4 +1,3 @@
-define(function() {
   'use strict';
 
   var TasklistApp = (function() {
@@ -13,7 +12,7 @@ define(function() {
 
   })();
 
-  return [
+  module.exports = [
     'camAPI',
     '$window',
     '$scope',
@@ -52,5 +51,3 @@ define(function() {
       $window.location.reload();
     });
   }];
-
-});

@@ -1,9 +1,6 @@
-define([
-], function(
-) {
   'use strict';
 
-  return [
+  module.exports = [
     '$translate',
     'AuthenticationService',
     'Notifications',
@@ -25,5 +22,3 @@ define([
       });
 
   }];
-
-});

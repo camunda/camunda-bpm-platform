@@ -1,9 +1,6 @@
-define([
-  'angular'
-], function(
-  angular
-) {
-  'use strict';
+'use strict';
+
+var angular = require('angular');
 
   var copy = angular.copy;
   var each = angular.forEach;
@@ -66,7 +63,7 @@ define([
     return obj;
   }
 
-  return [
+  module.exports = [
     '$scope',
     '$translate',
     '$q',
@@ -338,5 +335,3 @@ define([
     };
 
   }];
-
-});

@@ -1,11 +1,8 @@
-define([
-  'text!./cam-tasklist-navbar-action-start-process-plugin.html',
-  'text!./modals/cam-tasklist-process-start-modal.html'
-], function(
-  startProcessActionTemplate,
-  template
-) {
-  'use strict';
+'use strict';
+var fs = require('fs');
+
+var startProcessActionTemplate = fs.readFileSync(__dirname + '/cam-tasklist-navbar-action-start-process-plugin.html', 'utf8');
+var template = fs.readFileSync(__dirname + '/modals/cam-tasklist-process-start-modal.html', 'utf8');
 
   var Controller = [
     '$scope',
@@ -102,6 +99,4 @@ define([
 
   Configuration.$inject = ['ViewsProvider'];
 
-  return Configuration;
-
-});
+  module.exports = Configuration;

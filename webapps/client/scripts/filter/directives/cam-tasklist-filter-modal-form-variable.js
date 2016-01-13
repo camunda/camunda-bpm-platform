@@ -1,13 +1,13 @@
-define([
-  'text!./cam-tasklist-filter-modal-form-variable.html'
-], function(
-  template
-) {
-  'use strict';
+'use strict';
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/cam-tasklist-filter-modal-form-variable.html', 'utf8');
+
+var angular = require('angular');
 
   var copy = angular.copy;
 
-  return [function() {
+  module.exports = [function() {
 
     return {
 
@@ -75,5 +75,3 @@ define([
     };
 
   }];
-
-});

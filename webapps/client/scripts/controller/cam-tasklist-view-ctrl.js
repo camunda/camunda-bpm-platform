@@ -1,9 +1,6 @@
-define([
-  'angular'
-], function(
-  angular
-) {
-  'use strict';
+'use strict';
+
+var angular = require('angular');
 
   function getRefreshProvider(tasklistData) {
     return {
@@ -13,7 +10,7 @@ define([
     };
   }
 
-  return [
+  module.exports = [
     '$scope',
     '$q',
     '$location',
@@ -271,4 +268,3 @@ define([
       tasklistData.changed('currentFilter');
     });
   }];
-});

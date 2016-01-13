@@ -1,7 +1,6 @@
-define([], function() {
   'use strict';
 
-  return [
+  module.exports = [
     '$tooltipProvider',
   function(
     $tooltipProvider
@@ -11,4 +10,3 @@ define([], function() {
       popupDelay: 500
     });
   }];
-});

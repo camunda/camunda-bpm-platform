@@ -1,19 +1,11 @@
-define([
-  'angular',
-  'camunda-commons-ui/auth/index',
-  '../api/index',
+'use strict';
 
-  './controller/cam-user-logout-ctrl',
-  './controller/cam-user-login-ctrl'
-], function(
-  angular,
-  auth,
-  api,
+var angular = require('angular'),
+  auth = require('camunda-commons-ui/lib/auth/index'),
+  api = require('../api/index'),
 
-  camUserLogoutCtrl,
-  camUserLoginCtrl
-) {
-  'use strict';
+  camUserLogoutCtrl = require('./controller/cam-user-logout-ctrl'),
+  camUserLoginCtrl = require('./controller/cam-user-login-ctrl');
 
   /**
    * @module cam.tasklist.user
@@ -39,6 +31,5 @@ define([
   userModule.controller('camUserLoginCtrl', camUserLoginCtrl);
 
 
-  return userModule;
-});
+  module.exports = userModule;
 

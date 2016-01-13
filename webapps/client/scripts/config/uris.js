@@ -1,12 +1,8 @@
-define([
-  'angular'
-], function(
-  angular
-) {
-  'use strict';
+'use strict';
 
+var angular = require('angular');
 
-  return function(ngModule, config) {
+  module.exports = function(ngModule, config) {
 
     ngModule.config([
       'UriProvider',
@@ -35,4 +31,3 @@ define([
         }]);
       }]);
   };
-});

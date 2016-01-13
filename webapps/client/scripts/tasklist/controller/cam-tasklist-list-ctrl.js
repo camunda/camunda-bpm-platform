@@ -1,7 +1,6 @@
-define([], function() {
   'use strict';
 
-  return [
+  module.exports = [
     '$scope',
     'Views',
   function(
@@ -13,5 +12,3 @@ define([], function() {
     $scope.tasklistPlugins = Views.getProviders({ component: 'tasklist.list' });
 
   }];
-
-});

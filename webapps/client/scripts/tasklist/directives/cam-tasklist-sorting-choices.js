@@ -1,11 +1,10 @@
-define([
-  'angular',
-  'text!./cam-tasklist-sorting-choices.html'
-], function(
-  angular,
-  template
-) {
-  'use strict';
+'use strict';
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/cam-tasklist-sorting-choices.html', 'utf8');
+
+var angular = require('angular');
+var $ = require('jquery');
 
   function stringifySortings(sortingQuery) {
     return JSON.stringify(sortingQuery.map(function (sorting) {
@@ -25,7 +24,7 @@ define([
     }));
   }
 
-  return [
+  module.exports = [
     'search',
     '$translate',
     '$location',
@@ -49,7 +48,7 @@ define([
       controller: [function () {}],
 
       link: function(scope, element) {
-        var $bdy = angular.element('body');
+        var $bdy = $('body');
         var $newSort = element.find('.new-sort .dropdown-menu');
 
         scope.sortings = [{
@@ -69,7 +68,7 @@ define([
           }
 
           plannedRefresh = $timeout(function () {
-            var columns = element.parents('.columns');
+            var columns = $(element).parents('.columns');
             var headers = columns.find('.cell.top');
             var bodies = columns.find('.cell.content');
             var shown = $bdy.hasClass('list-column-close');
@@ -83,9 +82,9 @@ define([
               return;
             }
 
-            var height = element.height();
+            var height = $(element).height();
             var columnTop = element.parent();
-            columnTop.height(height);
+            $(columnTop).height(height);
             var columnTopHeight = height;
 
             headers.height(columnTopHeight);
@@ -280,4 +279,3 @@ define([
       }
     };
   }];
-});

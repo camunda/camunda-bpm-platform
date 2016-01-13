@@ -1,11 +1,9 @@
-define([
-  'angular',
-  'text!./cam-tasklist-task-detail-form-plugin.html',
-], function(
-  angular,
-  template
-) {
-  'use strict';
+'use strict';
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/cam-tasklist-task-detail-form-plugin.html', 'utf8');
+
+var angular = require('angular');
 
   var Controller = [
    '$scope',
@@ -132,6 +130,4 @@ define([
 
   Configuration.$inject = ['ViewsProvider'];
 
-  return Configuration;
-
-});
+  module.exports = Configuration;

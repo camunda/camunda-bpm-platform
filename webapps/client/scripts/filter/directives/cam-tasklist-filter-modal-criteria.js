@@ -1,4 +1,3 @@
-define(function() {
   'use strict';
 
   var dateExpLangHelp = 'E.g.: `${ now() }`, `${ dateTime() }` or `${ dateTime().plusWeeks(2) }`';
@@ -291,8 +290,7 @@ define(function() {
       ]
     }
   ];
-  return criteria.map(function (item) {
+  module.exports = criteria.map(function (item) {
     item.name = item.group.toLowerCase().replace(/[^a-z0-9-]+/g, '-');
     return item;
   });
-});

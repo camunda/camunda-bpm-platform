@@ -1,60 +1,32 @@
-define([
-  'angular',
-  'moment',
+'use strict';
 
-  './directives/cam-tasklist-task',
-  './directives/cam-tasklist-task-meta',
+var angular = require('angular'),
 
-  './controller/cam-tasklist-task-action-ctrl',
-  './controller/cam-tasklist-task-groups-ctrl',
+  taskDirective = require('./directives/cam-tasklist-task'),
+  taskMetaDirective = require('./directives/cam-tasklist-task-meta'),
 
-  /* detail plugins */
-  './plugins/detail/cam-tasklist-task-detail-form-plugin',
-  './plugins/detail/cam-tasklist-task-detail-history-plugin',
-  './plugins/detail/cam-tasklist-task-detail-diagram-plugin',
-  './plugins/detail/cam-tasklist-task-detail-description-plugin',
-
-  /* action plugins */
-  './plugins/action/cam-tasklist-task-action-comment-plugin',
-
-  /* action plugin controller */
-  './plugins/action/modals/cam-tasklist-comment-form',
-
-  /* modals */
-  './modals/cam-tasklist-groups-modal',
-
-  '../api/index',
-  'angular-bootstrap'
-
-], function(
-  angular,
-  moment,
-
-  taskDirective,
-  taskMetaDirective,
-
-  camTaskActionCtrl,
-  camTaskGroupsCtrl,
+  camTaskActionCtrl = require('./controller/cam-tasklist-task-action-ctrl'),
+  camTaskGroupsCtrl = require('./controller/cam-tasklist-task-groups-ctrl'),
 
   /* detail plugins */
-  camTaskDetailFormPlugin,
-  camTaskDetailHistoryPlugin,
-  camTaskDetailDiagramPlugin,
-  camTaskDetailDescriptionPlugin,
+  camTaskDetailFormPlugin = require('./plugins/detail/cam-tasklist-task-detail-form-plugin'),
+  camTaskDetailHistoryPlugin = require('./plugins/detail/cam-tasklist-task-detail-history-plugin'),
+  camTaskDetailDiagramPlugin = require('./plugins/detail/cam-tasklist-task-detail-diagram-plugin'),
+  camTaskDetailDescriptionPlugin = require('./plugins/detail/cam-tasklist-task-detail-description-plugin'),
 
   /* action plugins */
-  camTaskActionCommentPlugin,
+  camTaskActionCommentPlugin = require('./plugins/action/cam-tasklist-task-action-comment-plugin'),
 
   /* action plugin controller */
-  camCommentCreateModalCtrl,
+  camCommentCreateModalCtrl = require('./plugins/action/modals/cam-tasklist-comment-form'),
 
   /* modals */
-  camGroupEditModalCtrl,
+  camGroupEditModalCtrl = require('./modals/cam-tasklist-groups-modal'),
 
   /* API */
-  apiClient
-) {
-  'use strict';
+  apiClient = require('../api/index');
+
+  require('camunda-commons-ui/vendor/ui-bootstrap-tpls-0.11.2-camunda');
 
   var taskModule = angular.module('cam.tasklist.task', [
     apiClient.name,
@@ -92,5 +64,4 @@ define([
 
   taskModule.controller('camGroupEditModalCtrl', camGroupEditModalCtrl);
 
-  return taskModule;
-});
+  module.exports = taskModule;

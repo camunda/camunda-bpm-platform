@@ -1,13 +1,10 @@
-define([
-  'angular'
-], function(
-  angular
-) {
-  'use strict';
+'use strict';
+
+var angular = require('angular');
 
   var GROUP_TYPE = 'candidate';
 
-  return [
+  module.exports = [
     '$scope',
     '$translate',
     '$q',
@@ -146,5 +143,3 @@ define([
     };
 
   }];
-
-});

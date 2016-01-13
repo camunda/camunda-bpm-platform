@@ -1,16 +1,15 @@
-define([
-  'angular',
-  'moment',
-  'text!./cam-tasklist-tasks.html'
-], function(
-  angular,
-  moment,
-  template
-) {
-  'use strict';
+'use strict';
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/cam-tasklist-tasks.html', 'utf8');
+
+var angular = require('angular');
+
+var moment = require('moment');
+
   var $ = angular.element;
 
-  return [function(){
+  module.exports = [function(){
 
     return {
 
@@ -197,4 +196,3 @@ define([
       }]
     };
   }];
-});

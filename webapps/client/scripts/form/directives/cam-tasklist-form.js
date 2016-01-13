@@ -1,11 +1,9 @@
-define([
-  'angular',
-  'text!./cam-tasklist-form.html'
-], function(
-  angular,
-  template
-) {
-  'use strict';
+'use strict';
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/cam-tasklist-form.html', 'utf8');
+
+var angular = require('angular');
 
   var EMBEDDED_KEY = 'embedded:',
       APP_KEY = 'app:',
@@ -23,7 +21,7 @@ define([
 
   var noop = function () {};
 
-  return [function(){
+  module.exports = [function(){
 
     return {
 
@@ -210,4 +208,3 @@ define([
       }]
     };
   }];
-});

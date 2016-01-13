@@ -1,13 +1,10 @@
-define([
-  'jquery',
-  'moment',
-  'text!./cam-tasklist-task-detail-history-plugin.html',
-], function(
-  jquery,
-  moment,
-  template
-) {
-  'use strict';
+'use strict';
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/cam-tasklist-task-detail-history-plugin.html', 'utf8');
+
+var jquery = require('jquery');
+var moment = require('moment');
 
   var findOrCreateDay = function(days, timestamp) {
     var day = jquery.grep(days, function(elem) {
@@ -147,7 +144,7 @@ define([
   }];
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
-    
+
     ViewsProvider.registerDefaultView('tasklist.task.detail', {
       id: 'task-detail-history',
       label: 'HISTORY',
@@ -159,6 +156,4 @@ define([
 
   Configuration.$inject = ['ViewsProvider'];
 
-  return Configuration;
-
-});
+  module.exports = Configuration;

@@ -5,19 +5,13 @@
  * Set of features to deal with variables (from tasks, processes, ...)
  */
 
+'use strict';
 
+var angular = require('angular'),
+    camTasklistVariables = require('./directives/cam-tasklist-variables'),
+    camTasklistVariablesDetailsModalCtrl = require('./modals/cam-tasklist-variables-detail-modal');
 
-define([
-  'angular',
-  './directives/cam-tasklist-variables',
-  './modals/cam-tasklist-variables-detail-modal',
-  'angular-moment'
-], function(
-  angular,
-  camTasklistVariables,
-  camTasklistVariablesDetailsModalCtrl
-) {
-  'use strict';
+require('angular-moment');
 
   var variableModule = angular.module('cam.tasklist.variables', [
     'ui.bootstrap',
@@ -27,5 +21,4 @@ define([
   variableModule.directive('camTasklistVariables', camTasklistVariables);
   variableModule.controller('camTasklistVariablesDetailsModalCtrl', camTasklistVariablesDetailsModalCtrl);
 
-  return variableModule;
-});
+  module.exports = variableModule;

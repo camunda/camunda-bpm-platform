@@ -1,61 +1,39 @@
-define([
-  'angular',
+'use strict';
+
+var angular = require('angular'),
 
   /* controller */
-  './controller/cam-tasklist-list-ctrl',
+  camTasklistListCtrl = require('./controller/cam-tasklist-list-ctrl'),
 
   /* directives */
-  './directives/cam-tasklist-sorting-choices',
-  './directives/cam-tasklist-sorting-dropdown',
-  './directives/cam-tasklist-sorting-inputs',
-  './directives/cam-tasklist-tasks',
+  camTasklistSortingChoices = require('./directives/cam-tasklist-sorting-choices'),
+  camTasklistSortingDropdown = require('./directives/cam-tasklist-sorting-dropdown'),
+  camTasklistSortingInputs = require('./directives/cam-tasklist-sorting-inputs'),
+  camTasklistTasks = require('./directives/cam-tasklist-tasks'),
 
   /* filters */
-  './filters/cam-query-component',
+  camQueryComponent = require('./filters/cam-query-component'),
 
   /* plugins */
-  './plugins/cam-tasklist-search-plugin'
+  camTasklistSearchPlugin = require('./plugins/cam-tasklist-search-plugin');
 
-], function(
-  angular,
-
-  /* controller */
-  camTasklistListCtrl,
-
-  /* directives */
-  camTasklistSortingChoices,
-  camTasklistSortingDropdown,
-  camTasklistSortingInputs,
-  camTasklistTasks,
-
-  /* filters */
-  camQueryComponent,
-
-  /* plugins */
-  camTasklistSearchPlugin
-
-) {
-  'use strict';
-
-  var module = angular.module('cam.tasklist.tasklist', [
+  var ngModule = angular.module('cam.tasklist.tasklist', [
     'ui.bootstrap'
   ]);
 
   /* controller */
-  module.controller('camListCtrl', camTasklistListCtrl);
+  ngModule.controller('camListCtrl', camTasklistListCtrl);
 
   /* directives */
-  module.directive('camSortingChoices', camTasklistSortingChoices);
-  module.directive('camSortingDropdown', camTasklistSortingDropdown);
-  module.directive('camSortingInputs', camTasklistSortingInputs);
-  module.directive('camTasks', camTasklistTasks);
+  ngModule.directive('camSortingChoices', camTasklistSortingChoices);
+  ngModule.directive('camSortingDropdown', camTasklistSortingDropdown);
+  ngModule.directive('camSortingInputs', camTasklistSortingInputs);
+  ngModule.directive('camTasks', camTasklistTasks);
 
   /* filters */
-  module.filter('camQueryComponent', camQueryComponent);
+  ngModule.filter('camQueryComponent', camQueryComponent);
 
   /* plugins */
-  module.config(camTasklistSearchPlugin);
+  ngModule.config(camTasklistSearchPlugin);
 
-  return module;
-
-});
+  module.exports = ngModule;

@@ -1,9 +1,6 @@
-define([
-], function(
-) {
   'use strict';
 
-  return [
+  module.exports = [
     '$scope',
     'Views',
     'CamForm',
@@ -33,5 +30,3 @@ define([
     $scope.taskActions = Views.getProviders({ component: 'tasklist.task.action' });
 
   }];
-
-});

@@ -1,17 +1,15 @@
-define([
-  'angular',
-  'text!./cam-tasklist-filter-modal-form-permission.html'
-], function(
-  angular,
-  template
-) {
-  'use strict';
+'use strict';
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/cam-tasklist-filter-modal-form-permission.html', 'utf8');
+
+var angular = require('angular');
 
   var copy = angular.copy;
 
   var RESOURCE_TYPE = 5;
 
-  return [
+  module.exports = [
     'camAPI',
     '$q',
   function(
@@ -576,5 +574,3 @@ define([
     };
 
   }];
-
-});

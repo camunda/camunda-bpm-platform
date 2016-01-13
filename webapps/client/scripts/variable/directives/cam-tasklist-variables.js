@@ -1,17 +1,13 @@
-// RequireJS dependencies
-define([
-  'angular',
-  'text!./cam-tasklist-variables.html',
-  'text!../modals/cam-tasklist-variables-detail-modal.html'
-], function(
-  angular,
-  template,
-  modalTemplate
-) {
-  'use strict';
+'use strict';
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/cam-tasklist-variables.html', 'utf8');
+var modalTemplate = fs.readFileSync(__dirname + '/../modals/cam-tasklist-variables-detail-modal.html', 'utf8');
+
+var angular = require('angular');
 
   // AngularJS DI
-  return [
+  module.exports = [
     '$modal',
     '$window',
     'Uri',
@@ -81,4 +77,3 @@ define([
       }
     };
   }];
-});

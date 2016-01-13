@@ -1,11 +1,9 @@
-define([
-  'angular',
-  'text!./cam-tasklist-filter-modal-form.html'
-], function(
-  angular,
-  template
-) {
-  'use strict';
+'use strict';
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/cam-tasklist-filter-modal-form.html', 'utf8');
+
+var angular = require('angular');
 
   var isArray = angular.isArray;
 
@@ -16,7 +14,7 @@ define([
       CRITERIA_ACCORDION =      'criteria',
       VARIABLE_ACCORDION =      'variable';
 
-  return [function() {
+  module.exports = [function() {
 
     return {
 
@@ -147,5 +145,3 @@ define([
     };
 
   }];
-
-});

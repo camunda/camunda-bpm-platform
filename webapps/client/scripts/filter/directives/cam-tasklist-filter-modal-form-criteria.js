@@ -1,13 +1,10 @@
-define([
-  'angular',
-  'text!./cam-tasklist-filter-modal-form-criteria.html',
-  './cam-tasklist-filter-modal-criteria'
-], function(
-  angular,
-  template,
-  criteria
-) {
-  'use strict';
+'use strict';
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/cam-tasklist-filter-modal-form-criteria.html', 'utf8');
+
+var angular = require('angular');
+var criteria = require('./cam-tasklist-filter-modal-criteria');
 
   var each = angular.forEach;
   var copy = angular.copy;
@@ -39,7 +36,7 @@ define([
     });
   });
 
-  return [function() {
+  module.exports = [function() {
 
     return {
 
@@ -189,5 +186,3 @@ define([
     };
 
   }];
-
-});

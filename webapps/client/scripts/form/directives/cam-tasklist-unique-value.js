@@ -1,7 +1,6 @@
-define([], function() {
   'use strict';
 
-  return [function() {
+  module.exports = [function() {
 
     return {
 
@@ -47,4 +46,3 @@ define([], function() {
       }
     };
   }];
-});

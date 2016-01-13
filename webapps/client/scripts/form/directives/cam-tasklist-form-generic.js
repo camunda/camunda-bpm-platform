@@ -1,15 +1,14 @@
-define([
-  'angular',
-  'text!./cam-tasklist-form-generic.html'
-], function(
-  angular,
-  template
-) {
-  'use strict';
+'use strict';
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/cam-tasklist-form-generic.html', 'utf8');
+
+var angular = require('angular');
+var $ = require('jquery');
 
   function noop () {}
 
-  return [
+  module.exports = [
     'CamForm',
     'camAPI',
   function(
@@ -30,7 +29,7 @@ define([
       link: function($scope, $element, attrs, formController) {
         $scope.showBusinessKeyField = !!formController.getParams().processDefinitionId;
 
-        var formElement = $element.find('form');
+        var formElement = $($element[0]).find('form');
         var camForm = null;
         var form = {
           '$valid': false,
@@ -131,4 +130,3 @@ define([
       }
     };
   }];
-});

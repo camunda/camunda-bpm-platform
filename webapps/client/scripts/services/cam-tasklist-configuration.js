@@ -1,5 +1,6 @@
-define(['angular'], function(angular) {
-  'use strict';
+'use strict';
+
+var angular = require('angular');
 
   var config = window.camTasklistConf;
   var defaultConfig = {
@@ -16,7 +17,7 @@ define(['angular'], function(angular) {
       "fallbackLocale": "en"
     }
   };
-  return [function() {
+  module.exports = [function() {
     this.getDateFormat = function(formatName) {
       var dateFormatObj = config.dateFormat || defaultConfig.dateFormat;
       return dateFormatObj[formatName] || defaultConfig.dateFormat[formatName];
@@ -47,4 +48,3 @@ define(['angular'], function(angular) {
       return this;
     };
   }];
-});

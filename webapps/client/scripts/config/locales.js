@@ -1,7 +1,8 @@
-define(['moment', 'angular'], function(moment, angular) {
-  'use strict';
+'use strict';
+var moment = require('camunda-commons-ui/lib/util/require_helper')('moment'),
+    angular = require('angular');
 
-  return function(ngModule, appRoot) {
+  module.exports = function(ngModule, appRoot) {
 
     ngModule.factory('localeLoader', ['$q', '$http', 'Notifications',
       function($q, $http, Notifications) {
@@ -83,4 +84,3 @@ define(['moment', 'angular'], function(moment, angular) {
         });
       }]);
   };
-});

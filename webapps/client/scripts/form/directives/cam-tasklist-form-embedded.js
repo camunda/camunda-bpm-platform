@@ -1,14 +1,12 @@
-define([
-  'angular',
-  'text!./cam-tasklist-form-embedded.html'
-], function(
-  angular,
-  template
-) {
-  'use strict';
+'use strict';
+var fs = require('fs');
 
+var template = fs.readFileSync(__dirname + '/cam-tasklist-form-embedded.html', 'utf8');
 
-  return [
+var angular = require('angular');
+var $ = require('jquery');
+
+  module.exports = [
     'CamForm',
     'camAPI',
     '$timeout',
@@ -30,7 +28,7 @@ define([
 
       link : function($scope, $element, attrs, formController) {
 
-        var container = $element.find('.form-container');
+        var container = $($element[0]).find('.form-container');
         var camForm = null;
         var form = $scope.form = {
           '$valid': false,
@@ -118,5 +116,3 @@ define([
     };
 
   }];
-
-});

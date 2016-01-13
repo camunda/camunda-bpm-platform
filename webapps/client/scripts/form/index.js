@@ -1,22 +1,12 @@
-define([
-  'angular',
-  './directives/cam-tasklist-form',
-  './directives/cam-tasklist-form-generic',
-  './directives/cam-tasklist-form-generic-variables',
-  './directives/cam-tasklist-form-embedded',
-  './directives/cam-tasklist-form-external',
+'use strict';
 
-  './directives/cam-tasklist-unique-value'
-], function(
-  angular,
-  camTasklistForm,
-  camTasklistFormGeneric,
-  camTasklistFormGenericVariables,
-  camTasklistFormEmbedded,
-  camTasklistFormExternal,
-  camTasklistUniqueValue
-) {
-  'use strict';
+var angular = require('angular'),
+  camTasklistForm = require('./directives/cam-tasklist-form'),
+  camTasklistFormGeneric = require('./directives/cam-tasklist-form-generic'),
+  camTasklistFormGenericVariables = require('./directives/cam-tasklist-form-generic-variables'),
+  camTasklistFormEmbedded = require('./directives/cam-tasklist-form-embedded'),
+  camTasklistFormExternal = require('./directives/cam-tasklist-form-external'),
+  camTasklistUniqueValue = require('./directives/cam-tasklist-unique-value');
 
   var formModule = angular.module('cam.tasklist.form', [
     'ui.bootstrap'
@@ -29,5 +19,4 @@ define([
   formModule.directive('camTasklistFormExternal', camTasklistFormExternal);
   formModule.directive('camUniqueValue', camTasklistUniqueValue);
 
-  return formModule;
-});
+  module.exports = formModule;

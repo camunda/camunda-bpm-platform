@@ -1,17 +1,13 @@
-define([
-  'angular',
-  './controllers/cam-layout-ctrl',
-  './controllers/cam-header-views-ctrl',
-  'camunda-commons-ui/util/index'
-], function(
-  angular,
-  camLayoutCtrl,
-  camHeaderViewsCtrl
-) {
-  'use strict';
+'use strict';
+
+var angular = require('angular'),
+    camLayoutCtrl = require('./controllers/cam-layout-ctrl'),
+    camHeaderViewsCtrl = require('./controllers/cam-header-views-ctrl');
+
+require('camunda-commons-ui/lib/util/index');
 
   var navigationModule = angular.module('cam.tasklist.navigation', [
-    require('camunda-commons-ui/util/index').name,
+    require('camunda-commons-ui/lib/util/index').name,
     'ui.bootstrap',
     'cam.tasklist.user'
   ]);
@@ -19,5 +15,4 @@ define([
   navigationModule.controller('camHeaderViewsCtrl', camHeaderViewsCtrl);
   navigationModule.controller('camLayoutCtrl', camLayoutCtrl);
 
-  return navigationModule;
-});
+  module.exports = navigationModule;

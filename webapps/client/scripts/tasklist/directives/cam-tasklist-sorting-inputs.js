@@ -1,12 +1,11 @@
-define([
-  'angular',
-  'text!./cam-tasklist-sorting-inputs.html'
-], function (
-  angular,
-  template
-) {
-  'use strict';
-  return [
+'use strict';
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/cam-tasklist-sorting-inputs.html', 'utf8');
+
+var angular = require('angular');
+
+  module.exports = [
     '$translate',
   function (
     $translate
@@ -46,4 +45,3 @@ define([
       }]
     };
   }];
-});

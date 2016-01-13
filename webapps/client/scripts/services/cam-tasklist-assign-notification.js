@@ -1,6 +1,5 @@
-define([], function() {
   'use strict';
-  return ['camAPI', 'Notifications', '$translate',
+  module.exports = ['camAPI', 'Notifications', '$translate',
   function(camAPI,   Notifications,   $translate) {
     var Task = camAPI.resource('task');
     /**
@@ -32,4 +31,3 @@ define([], function() {
       });
     };
   }];
-});

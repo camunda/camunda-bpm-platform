@@ -1,17 +1,12 @@
-define([
-  'angular',
-  'text!./cam-tasklist-task-meta.html',
-  'text!../modals/cam-tasklist-groups-modal.html',
-], function(
-  angular,
-  template,
-  editGroupsFormTemplate
-) {
-  'use strict';
+'use strict';
+var fs = require('fs');
 
-  var $ = angular.element;
+var template = fs.readFileSync(__dirname + '/cam-tasklist-task-meta.html', 'utf8');
+var editGroupsFormTemplate = fs.readFileSync(__dirname + '/../modals/cam-tasklist-groups-modal.html', 'utf8');
 
-  return [
+var angular = require('angular');
+
+  module.exports = [
     '$modal',
     'camAPI',
   function(
@@ -256,4 +251,3 @@ define([
       }
     ]};
   }];
-});

@@ -1,9 +1,6 @@
-define([
-], function(
-) {
-  'use strict';
+'use strict';
 
-  return [
+  module.exports = [
     '$scope',
     '$translate',
     'AuthenticationService',
@@ -41,5 +38,3 @@ define([
     };
 
   }];
-
-});

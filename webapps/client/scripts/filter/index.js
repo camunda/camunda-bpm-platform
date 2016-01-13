@@ -5,43 +5,24 @@
  * Filters are predefined filters for tasks.
  */
 
+'use strict';
 
-
-define([
-  'angular',
-
-  /* directives */
-  './directives/cam-tasklist-filters',
-  './directives/cam-tasklist-filter-modal-form',
-  './directives/cam-tasklist-filter-modal-form-general',
-  './directives/cam-tasklist-filter-modal-form-criteria',
-  './directives/cam-tasklist-filter-modal-form-variable',
-  './directives/cam-tasklist-filter-modal-form-permission',
-
-  /* controllers */
-  './controllers/cam-tasklist-filters-ctrl',
-
-  /* modals */
-  './modals/cam-tasklist-filter-modal',
-
-], function(
-  angular,
+var angular = require('angular'),
 
   /* directives */
-  camTasklistFilters,
-  camTasklistFilterModalForm,
-  camTasklistFilterModalFormGeneral,
-  camTasklistFilterModalFormCriteria,
-  camTasklistFilterModalFormVariable,
-  camTasklistFilterModalFormPermission,
+  camTasklistFilters = require('./directives/cam-tasklist-filters'),
+  camTasklistFilterModalForm = require('./directives/cam-tasklist-filter-modal-form'),
+  camTasklistFilterModalFormGeneral = require('./directives/cam-tasklist-filter-modal-form-general'),
+  camTasklistFilterModalFormCriteria = require('./directives/cam-tasklist-filter-modal-form-criteria'),
+  camTasklistFilterModalFormVariable = require('./directives/cam-tasklist-filter-modal-form-variable'),
+  camTasklistFilterModalFormPermission = require('./directives/cam-tasklist-filter-modal-form-permission'),
 
   /* controllers */
-  camTasklistFiltersCtrl,
+  camTasklistFiltersCtrl = require('./controllers/cam-tasklist-filters-ctrl'),
 
   /* modals */
-  camTasklistFilterModal
-) {
-  'use strict';
+  camTasklistFilterModal = require('./modals/cam-tasklist-filter-modal');
+
 
   var filterModule = angular.module('cam.tasklist.filter', [
     'ui.bootstrap',
@@ -62,5 +43,4 @@ define([
   /* modals */
   filterModule.controller('camFilterModalCtrl', camTasklistFilterModal);
 
-  return filterModule;
-});
+  module.exports = filterModule;

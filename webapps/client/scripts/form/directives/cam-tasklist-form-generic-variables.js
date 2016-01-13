@@ -1,13 +1,11 @@
-define([
-  'angular',
-  'text!./cam-tasklist-form-generic-variables.html'
-], function(
-  angular,
-  template
-) {
-  'use strict';
+'use strict';
+var fs = require('fs');
 
-  return ['camAPI', 'Notifications', '$translate', function(camAPI, Notifications, $translate){
+var template = fs.readFileSync(__dirname + '/cam-tasklist-form-generic-variables.html', 'utf8');
+
+var angular = require('angular');
+
+  module.exports = ['camAPI', 'Notifications', '$translate', function(camAPI, Notifications, $translate){
 
     return {
 
@@ -107,4 +105,3 @@ define([
       }
     };
   }];
-});

@@ -1,11 +1,8 @@
-define([
-  'angular'
-], function(
-  angular
-) {
-  'use strict';
+'use strict';
 
-  return [
+var angular = require('angular');
+
+  module.exports = [
     '$scope',
     '$http',
     'Uri',
@@ -37,7 +34,7 @@ define([
 
         // attempt fetching the deserialized value
         $http({
-          method: 'GET', 
+          method: 'GET',
           url: Uri.appUri('engine://engine/:engine'+$scope.variable._links.self.href)
         }).success(function(data, status) {
           $scope.valueDeserialized = JSON.stringify(data.value);
@@ -56,5 +53,3 @@ define([
     };
 
   }];
-
-});

@@ -1,12 +1,11 @@
-define([
-  'angular',
-  'text!./cam-tasklist-sorting-dropdown.html'
-], function (
-  angular,
-  template
-) {
-  'use strict';
-  return ['$translate',
+'use strict';
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/cam-tasklist-sorting-dropdown.html', 'utf8');
+
+var angular = require('angular');
+
+  module.exports = ['$translate',
   function ($translate){
     return {
       restrict: 'A',
@@ -75,4 +74,3 @@ define([
       }
     };
   }];
-});

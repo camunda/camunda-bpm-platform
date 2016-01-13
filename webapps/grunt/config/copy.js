@@ -65,6 +65,19 @@ module.exports = function(config, copyConf) {
       ]
   };
 
+  copyConf.tasklist_bootstrap = {
+      files: [
+        {
+          expand: true,
+          cwd: '<%= pkg.gruntConfig.tasklistSourceDir %>/scripts/',
+          src: [
+            'camunda-tasklist-bootstrap.js'
+          ],
+          dest: '<%= pkg.gruntConfig.tasklistBuildTarget %>/',
+        }
+      ]
+  };
+
   copyConf.tasklist_assets = {
       files: [
         {

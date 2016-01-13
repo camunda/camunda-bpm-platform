@@ -1,6 +1,5 @@
-define([], function() {
   'use strict';
-  return [
+  module.exports = [
     'camDateFormatProvider',
     'configurationProvider',
   function(
@@ -13,4 +12,3 @@ define([], function() {
     }
 
   }];
-});

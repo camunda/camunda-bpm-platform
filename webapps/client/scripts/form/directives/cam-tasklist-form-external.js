@@ -1,14 +1,11 @@
-define([
-  'angular',
-  'text!./cam-tasklist-form-external.html'
-], function(
-  angular,
-  template
-) {
-  'use strict';
+'use strict';
+var fs = require('fs');
 
+var template = fs.readFileSync(__dirname + '/cam-tasklist-form-external.html', 'utf8');
 
-  return [
+var angular = require('angular');
+
+  module.exports = [
     '$location',
   function($location) {
 
@@ -88,5 +85,3 @@ define([
     };
 
   }];
-
-});
