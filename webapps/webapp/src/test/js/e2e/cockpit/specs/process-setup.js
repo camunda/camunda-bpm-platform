@@ -86,7 +86,42 @@ module.exports = {
         key: 'mi-incident',
         businessKey: 'MultiInstance'
       }])
+    ),
 
-)
+  setup3:
+    combine(
+      operation('deployment', 'create', [{
+        deploymentName:  'bulk-retry',
+        files: [{
+          name: 'mi-incident.bpmn',
+          content: readResource('mi-incident.bpmn')
+        }]
+      }]),
 
+      operation('deployment', 'create', [{
+        deploymentName:  'four-fails',
+        files: [{
+          name: '4-failed-service-tasks.bpmn',
+          content: readResource('4-failed-service-tasks.bpmn')
+        }]
+      }]),
+
+      operation('deployment', 'create', [{
+        deploymentName:  'seven-fails',
+        files: [{
+          name: '7-failed-service-tasks.bpmn',
+          content: readResource('7-failed-service-tasks.bpmn')
+        }]
+      }]),
+
+      operation('process-definition', 'start', [{
+        key: 'mi-incident'
+      },
+      {
+        key: 'fourFailingServiceTasks'
+      },
+      {
+        key: 'sevenFailingServiceTasks'
+      }])
+    )
 };

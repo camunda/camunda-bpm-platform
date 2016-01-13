@@ -371,4 +371,62 @@ describe('Cockpit Process Instance Spec', function() {
 
   });
 
+
+  describe('Bulk job retry', function () {
+    before(function () {
+      return testHelper(setupFile.setup3, function() {
+        dashboardPage.navigateToWebapp('Cockpit');
+        dashboardPage.authentication.userLogin('admin', 'admin');
+      });
+    });
+
+    function goToInstanceJobRetryModal(name) {
+      dashboardPage.navigateToWebapp('Cockpit');
+      dashboardPage.deployedProcessesList.selectProcessByName(name);
+      element(by.css('.ctn-content-bottom .instance-id a')).click();
+      element(by.css('.ctn-toolbar [tooltip~="Retries"]')).click();
+    }
+
+    function getCheckedCheckboxes() {
+      return element.all(by.css('.modal-body [type=checkbox]:checked'));
+    }
+
+
+    describe('when only 1 job failed', function () {
+      before(function () {
+        goToInstanceJobRetryModal('mi-incident');
+      });
+
+      it('pre-selects the job', function () {
+        expect(element(by.css('.modal-body')).isDisplayed()).to.eventually.eql(true);
+        expect(getCheckedCheckboxes().count()).to.eventually.eql(2);
+      });
+    });
+
+
+
+    describe('when 4 jobs failed', function () {
+      before(function () {
+        goToInstanceJobRetryModal('4 Failing Service Tasks');
+      });
+
+      it('pre-selects the jobs', function () {
+        expect(element(by.css('.modal-body')).isDisplayed()).to.eventually.eql(true);
+        expect(getCheckedCheckboxes().count()).to.eventually.eql(5);
+      });
+    });
+
+
+
+    describe('when 7 job failed', function () {
+      before(function () {
+        goToInstanceJobRetryModal('7 Failing Service Tasks');
+      });
+
+      it('does not pre-select the jobs', function () {
+        expect(element(by.css('.modal-body')).isDisplayed()).to.eventually.eql(true);
+        expect(getCheckedCheckboxes().count()).to.eventually.eql(0);
+      });
+    });
+  });
 });

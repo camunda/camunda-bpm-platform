@@ -18,6 +18,10 @@ module.exports = Base.extend({
     return this.processesList().get(item).element(by.css('.name a')).click();
   },
 
+  selectProcessByName: function(name) {
+    return this.listObject().element(by.cssContainingText('tbody tr .name a', name)).click();
+  },
+
   processName: function(item) {
     return this.processesList().get(item).element(by.css('.name a')).getText();
   },
