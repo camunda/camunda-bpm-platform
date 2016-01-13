@@ -7,5 +7,13 @@
     "clientDir": "client",
     "prodTarget": "dist",
     "devTarget": "dist/app/tasklist"
+  },
+  "browserify": {
+    "transform": [
+      "brfs"
+    ]
+  },
+  "devDependencies": {
+    "brfs": "^1.4.2"
   }
 }
