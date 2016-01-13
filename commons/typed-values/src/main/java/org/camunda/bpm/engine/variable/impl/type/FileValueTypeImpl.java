@@ -52,6 +52,8 @@ public class FileValueTypeImpl extends AbstractValueTypeImpl implements FileValu
       builder.file((InputStream) value);
     } else if (value instanceof byte[]) {
       builder.file((byte[]) value);
+    } else {
+      throw new IllegalArgumentException("Provided value is not of File, InputStream or byte[] type.");
     }
 
     if (valueInfo.containsKey(VALUE_INFO_FILE_MIME_TYPE)) {
