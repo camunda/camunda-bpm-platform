@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
 import org.camunda.bpm.engine.impl.core.variable.scope.CoreVariableStore;
 import org.camunda.bpm.engine.impl.core.variable.scope.SimpleVariableStore;
+import org.camunda.bpm.engine.impl.form.FormException;
 import org.camunda.bpm.engine.impl.form.handler.FormFieldHandler;
 import org.camunda.bpm.engine.impl.form.validator.FormFieldValidator;
 import org.camunda.bpm.engine.impl.form.validator.FormFieldValidatorContext;
@@ -93,8 +94,7 @@ public class BuiltInValidatorsTest extends PluggableProcessEngineTestCase {
     try {
       validator.validate(4, new TestValidatorContext("4.4"));
       fail("exception expected");
-    } catch (ProcessEngineException e) {
-      e.printStackTrace();
+    } catch (FormException e) {
       assertTrue(e.getMessage().contains("Cannot validate Integer value 4: configuration 4.4 cannot be parsed as Integer."));
     }
 
@@ -117,8 +117,7 @@ public class BuiltInValidatorsTest extends PluggableProcessEngineTestCase {
     try {
       validator.validate(4, new TestValidatorContext("4.4"));
       fail("exception expected");
-    } catch (ProcessEngineException e) {
-      e.printStackTrace();
+    } catch (FormException e) {
       assertTrue(e.getMessage().contains("Cannot validate Integer value 4: configuration 4.4 cannot be parsed as Integer."));
     }
 
@@ -141,7 +140,7 @@ public class BuiltInValidatorsTest extends PluggableProcessEngineTestCase {
     try {
       validator.validate("test", new TestValidatorContext("4.4"));
       fail("exception expected");
-    } catch (ProcessEngineException e) {
+    } catch (FormException e) {
       assertTrue(e.getMessage().contains("Cannot validate \"maxlength\": configuration 4.4 cannot be interpreted as Integer"));
     }
   }
@@ -157,7 +156,7 @@ public class BuiltInValidatorsTest extends PluggableProcessEngineTestCase {
     try {
       validator.validate("test", new TestValidatorContext("4.4"));
       fail("exception expected");
-    } catch (ProcessEngineException e) {
+    } catch (FormException e) {
       assertTrue(e.getMessage().contains("Cannot validate \"minlength\": configuration 4.4 cannot be interpreted as Integer"));
     }
   }

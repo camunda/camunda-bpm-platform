@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.form.validator;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.form.FormException;
 
 
 /**
@@ -26,7 +27,8 @@ public class MaxLengthValidator extends AbstractTextValueValidator {
     try {
       maxLength = Integer.parseInt(configuration);
     } catch (NumberFormatException e) {
-      throw new ProcessEngineException("Cannot validate \"maxlength\": configuration "+configuration+" cannot be interpreted as Integer");    
+      // do not throw validation exception, as the issue is not with the submitted value
+      throw new FormFieldConfigurationException(configuration, "Cannot validate \"maxlength\": configuration "+configuration+" cannot be interpreted as Integer");    
     }
 
     return submittedValue.length() < maxLength;
