@@ -10,40 +10,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.integrationtest.functional.spin.dataformat;
+package org.camunda.bpm.application.impl.embedded;
 
-import java.io.Writer;
-
-import org.camunda.spin.Spin;
+import org.camunda.bpm.application.ProcessApplication;
+import org.camunda.bpm.application.impl.EmbeddedProcessApplication;
 
 /**
- * @author Thorben Lindhauer
+ * @author Daniel Meyer
  *
  */
-public class FooSpin extends Spin<FooSpin> {
+@ProcessApplication(
+    name = TestApplicationWithCustomName.NAME
+)
+public class TestApplicationWithCustomName extends EmbeddedProcessApplication {
 
-  public String getDataFormatName() {
-    return null;
-  }
-
-  public Object unwrap() {
-    return null;
-  }
-
-  public String toString() {
-    return null;
-  }
-
-  public void writeToWriter(Writer writer) {
-
-  }
-
-  public <C> C mapTo(Class<C> type) {
-    return null;
-  }
-
-  public <C> C mapTo(String type) {
-    return null;
-  }
-
+  public static final String NAME = "foooooooo";
 }

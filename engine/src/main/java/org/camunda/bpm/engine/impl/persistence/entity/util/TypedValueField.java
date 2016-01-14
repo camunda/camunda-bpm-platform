@@ -236,7 +236,8 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
           return null;
         }
       } catch (ProcessApplicationUnavailableException e) {
-        throw new ProcessEngineException("Context Process Application is unavailable.", e);
+        throw new ProcessEngineException("Cannot determine process application variable serializers. "
+            + "Context Process Application is unavailable.", e);
       }
     }
     else {

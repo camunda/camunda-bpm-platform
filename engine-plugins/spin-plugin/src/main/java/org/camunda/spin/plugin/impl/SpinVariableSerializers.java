@@ -28,13 +28,19 @@ import org.camunda.spin.xml.SpinXmlElement;
  */
 public class SpinVariableSerializers {
 
-  public static List<TypedValueSerializer<?>> createSerializers(DataFormats dataFormats) {
+  public static List<TypedValueSerializer<?>> createObjectValueSerializers(DataFormats dataFormats) {
     List<TypedValueSerializer<?>> serializers = new ArrayList<TypedValueSerializer<?>>();
 
     Set<DataFormat<?>> availableDataFormats = dataFormats.getAllAvailableDataFormats();
     for (DataFormat<?> dataFormat : availableDataFormats) {
       serializers.add(new SpinObjectValueSerializer("spin://"+dataFormat.getName(), dataFormat));
     }
+
+    return serializers;
+  }
+
+  public static List<TypedValueSerializer<?>> createSpinValueSerializers(DataFormats dataFormats) {
+    List<TypedValueSerializer<?>> serializers = new ArrayList<TypedValueSerializer<?>>();
 
     if(dataFormats.getDataFormatByName(DataFormats.JSON_DATAFORMAT_NAME) != null) {
       DataFormat<SpinJsonNode> jsonDataFormat =

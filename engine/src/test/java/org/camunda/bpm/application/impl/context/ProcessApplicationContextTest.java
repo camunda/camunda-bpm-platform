@@ -18,6 +18,7 @@ import org.camunda.bpm.application.ProcessApplicationContext;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
 import org.camunda.bpm.application.impl.embedded.TestApplicationWithoutEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -111,7 +112,7 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTestCas
     try {
       ProcessApplicationContext.setCurrentProcessApplication(pa);
 
-      Assert.assertEquals(getCurrentContextApplication().getProcessApplication(), pa);
+      Assert.assertEquals(pa, getCurrentContextApplication().getProcessApplication());
     } finally {
       ProcessApplicationContext.clear();
     }
@@ -134,6 +135,46 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTestCas
     Assert.assertEquals(contextPA.getProcessApplication(), pa);
 
     Assert.assertNull(Context.getCurrentProcessApplication());
+  }
+
+  public void testCannotSetUnregisteredProcessApplicationName() {
+
+    String nonExistingName = pa.getName() + pa.getName();
+
+    try {
+      ProcessApplicationContext.setCurrentProcessApplication(nonExistingName);
+
+      try {
+        getCurrentContextApplication();
+        fail("should not succeed");
+
+      } catch (ProcessEngineException e) {
+        assertTextPresent("A process application with name " + nonExistingName + " is not registered", e.getMessage());
+      }
+
+    } finally {
+      ProcessApplicationContext.clear();
+    }
+  }
+
+  public void testCannotExecuteInUnregisteredPaContext() throws Exception {
+    String nonExistingName = pa.getName() + pa.getName();
+
+    try {
+      ProcessApplicationContext.executeInProcessApplication(new Callable<Void>() {
+
+        public Void call() throws Exception {
+          getCurrentContextApplication();
+          return null;
+        }
+
+      }, nonExistingName);
+      fail("should not succeed");
+
+    } catch (ProcessEngineException e) {
+      assertTextPresent("A process application with name " + nonExistingName + " is not registered", e.getMessage());
+    }
+
   }
 
   protected ProcessApplicationReference getCurrentContextApplication() {

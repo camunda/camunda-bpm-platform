@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.camunda.bpm.engine.OptimisticLockingException;
@@ -348,6 +349,67 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     thread2.waitUntilDone();
     assertTrue(thread2.getException() != null);
     assertTrue(thread2.getException() instanceof OptimisticLockingException);
+  }
+
+  @Deployment
+  public void testConcurrentMessageCorrelationAndTreeCompaction() {
+    runtimeService.startProcessInstanceByKey("process");
+
+    // trigger non-interrupting boundary event and wait before flush
+    ThreadControl correlateThread = executeControllableCommand(
+        new ControllableMessageCorrelationCommand("Message", false));
+    correlateThread.reportInterrupts();
+
+    // stop correlation right before the flush
+    correlateThread.waitForSync();
+    correlateThread.makeContinueAndWaitForSync();
+
+    // trigger tree compaction
+    List<Task> tasks = taskService.createTaskQuery().list();
+
+    for (Task task : tasks) {
+      taskService.complete(task.getId());
+    }
+
+    // flush correlation
+    correlateThread.waitUntilDone();
+
+    // the correlation should not have succeeded
+    Throwable exception = correlateThread.getException();
+    assertNotNull(exception);
+    assertTrue(exception instanceof OptimisticLockingException);
+  }
+
+  @Deployment
+  public void FAILING_testConcurrentMessageCorrelationTwiceAndTreeCompaction() {
+    runtimeService.startProcessInstanceByKey("process");
+
+    // trigger non-interrupting boundary event 1 that ends in a none end event immediately
+    runtimeService.correlateMessage("Message2");
+
+    // trigger non-interrupting boundary event 2 and wait before flush
+    ThreadControl correlateThread = executeControllableCommand(
+        new ControllableMessageCorrelationCommand("Message1", false));
+    correlateThread.reportInterrupts();
+
+    // stop correlation right before the flush
+    correlateThread.waitForSync();
+    correlateThread.makeContinueAndWaitForSync();
+
+    // trigger tree compaction
+    List<Task> tasks = taskService.createTaskQuery().list();
+
+    for (Task task : tasks) {
+      taskService.complete(task.getId());
+    }
+
+    // flush correlation
+    correlateThread.waitUntilDone();
+
+    // the correlation should not have succeeded
+    Throwable exception = correlateThread.getException();
+    assertNotNull(exception);
+    assertTrue(exception instanceof OptimisticLockingException);
   }
 
   public static class InvocationLogListener implements JavaDelegate {

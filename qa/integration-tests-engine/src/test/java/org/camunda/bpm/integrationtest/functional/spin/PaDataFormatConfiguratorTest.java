@@ -17,25 +17,22 @@ import java.util.Date;
 
 import org.camunda.bpm.application.ProcessApplicationContext;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
-import org.camunda.bpm.engine.impl.variable.serializer.TypedValueSerializer;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.Variables.SerializationDataFormats;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
-import org.camunda.bpm.integrationtest.functional.spin.dataformat.ImplicitObjectValueUpdateDelegate;
+import org.camunda.bpm.integrationtest.functional.spin.dataformat.ImplicitObjectValueUpdateHandler;
 import org.camunda.bpm.integrationtest.functional.spin.dataformat.JsonDataFormatConfigurator;
 import org.camunda.bpm.integrationtest.functional.spin.dataformat.JsonSerializable;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.camunda.bpm.integrationtest.util.TestContainer;
-import org.camunda.spin.json.SpinJsonNode;
 import org.camunda.spin.spi.DataFormatConfigurator;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -58,9 +55,10 @@ public class PaDataFormatConfiguratorTest extends AbstractFoxPlatformIntegration
         .addClass(TestContainer.class)
         .addClass(ReferenceStoringProcessApplication.class)
         .addAsResource("org/camunda/bpm/integrationtest/oneTaskProcess.bpmn")
-        .addAsResource("org/camunda/bpm/integrationtest/functional/spin/implicitUpdate.bpmn")
+        .addAsResource("org/camunda/bpm/integrationtest/functional/spin/implicitProcessVariableUpdate.bpmn")
+        .addAsResource("org/camunda/bpm/integrationtest/functional/spin/implicitTaskVariableUpdate.bpmn")
         .addClass(JsonSerializable.class)
-        .addClass(ImplicitObjectValueUpdateDelegate.class)
+        .addClass(ImplicitObjectValueUpdateHandler.class)
         .addClass(JsonDataFormatConfigurator.class)
         .addAsServiceProvider(DataFormatConfigurator.class, JsonDataFormatConfigurator.class);
 
@@ -70,8 +68,12 @@ public class PaDataFormatConfiguratorTest extends AbstractFoxPlatformIntegration
 
   }
 
+  /**
+   * Tests that the PA-local data format applies when a variable is set in
+   * the context of it
+   */
   @Test
-  public void testBuiltinFormatDoesNotApply() throws JsonProcessingException, IOException {
+  public void testPaLocalFormatApplies() throws JsonProcessingException, IOException {
 
     // given a process instance
     final ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
@@ -102,8 +104,12 @@ public class PaDataFormatConfiguratorTest extends AbstractFoxPlatformIntegration
     Assert.assertEquals(expectedJsonTree, actualJsonTree);
   }
 
+  /**
+   * Tests that the PA-local format does not apply if the value is set outside of the context
+   * of the process application
+   */
   @Test
-  public void testBuiltinFormatApplies() throws JsonProcessingException, IOException {
+  public void testPaLocalFormatDoesNotApply() throws JsonProcessingException, IOException {
 
     // given a process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
@@ -129,70 +135,39 @@ public class PaDataFormatConfiguratorTest extends AbstractFoxPlatformIntegration
     Assert.assertEquals(expectedJsonTree, actualJsonTree);
   }
 
+  /**
+   * Tests that an implicit object value update happens in the context of the
+   * process application.
+   */
   @Test
-  @Ignore
-  public void testConfiguredNativeJsonFormat() {
-    // given a process instance
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess");
+  public void testExecutionVariableImplicitObjectValueUpdate() throws JsonProcessingException, IOException {
 
-    // when
-    JsonSerializable jsonSerializable = new JsonSerializable(new Date(JsonSerializable.ONE_DAY_IN_MILLIS * 10));
-    String serializedJsonValue = jsonSerializable.toExpectedJsonString(JsonDataFormatConfigurator.DATE_FORMAT);
-
-    // then I can set a serialized Spin value that adheres to the configured format
-    try {
-      // TODO: the creation of the variable is not correct; right now it is not possible to create
-      //   a native json/xml value with a pa-specific data format
-      ProcessApplicationContext.setCurrentProcessApplication(ReferenceStoringProcessApplication.INSTANCE);
-      runtimeService.setVariable(pi.getId(),
-        "jsonSerializable",
-        Variables.serializedObjectValue(serializedJsonValue).serializationDataFormat("json").create());
-    } finally {
-      ProcessApplicationContext.clear();
-    }
-
-    // and I can access it as well
-    SpinJsonNode spinNode = null;
-
-    try {
-      ProcessApplicationContext.setCurrentProcessApplication(ReferenceStoringProcessApplication.INSTANCE);
-      spinNode = (SpinJsonNode) runtimeService.getVariable(pi.getId(), "jsonSerializable");
-    } finally {
-      ProcessApplicationContext.clear();
-    }
-
-    JsonSerializable mappedSerializable = spinNode.mapTo(JsonSerializable.class);
-    Assert.assertEquals(jsonSerializable, mappedSerializable);
-  }
-
-  @Test
-  public void testImplicitObjectValueUpdate() throws JsonProcessingException, IOException {
-
-    // given a process instance
-    ProcessInstance pi = runtimeService.startProcessInstanceByKey("implicitUpdate");
+    // given a process instance and a task
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("implicitProcessVariableUpdate");
 
     // when setting a variable such that the process-application-local dataformat applies
     Date date = new Date(JsonSerializable.ONE_DAY_IN_MILLIS * 10); // 10th of January 1970
     JsonSerializable jsonSerializable = new JsonSerializable(date);
     try {
+
       ProcessApplicationContext.setCurrentProcessApplication(ReferenceStoringProcessApplication.INSTANCE);
       runtimeService.setVariable(pi.getId(),
-        ImplicitObjectValueUpdateDelegate.VARIABLE_NAME,
+        ImplicitObjectValueUpdateHandler.VARIABLE_NAME,
         Variables.objectValue(jsonSerializable).serializationDataFormat(SerializationDataFormats.JSON).create());
     } finally {
       ProcessApplicationContext.clear();
     }
 
-    Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
     // and triggering an implicit update of the object value variable
+    Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
     taskService.complete(task.getId());
 
     // then the process-application-local format was used for making the update
     ObjectValue objectValue = runtimeService.getVariableTyped(pi.getId(),
-        ImplicitObjectValueUpdateDelegate.VARIABLE_NAME,
+        ImplicitObjectValueUpdateHandler.VARIABLE_NAME,
         false);
 
-    ImplicitObjectValueUpdateDelegate.addADay(jsonSerializable);
+    ImplicitObjectValueUpdateHandler.addADay(jsonSerializable);
     String serializedValue = objectValue.getValueSerialized();
     String expectedSerializedValue = jsonSerializable.toExpectedJsonString(JsonDataFormatConfigurator.DATE_FORMAT);
 
@@ -206,7 +181,7 @@ public class PaDataFormatConfiguratorTest extends AbstractFoxPlatformIntegration
     HistoricVariableInstance historicObjectValue = historyService
         .createHistoricVariableInstanceQuery()
         .processInstanceId(pi.getId())
-        .variableName(ImplicitObjectValueUpdateDelegate.VARIABLE_NAME)
+        .variableName(ImplicitObjectValueUpdateHandler.VARIABLE_NAME)
         .disableCustomObjectDeserialization()
         .singleResult();
 
@@ -215,5 +190,53 @@ public class PaDataFormatConfiguratorTest extends AbstractFoxPlatformIntegration
     Assert.assertEquals(expectedJsonTree, actualJsonTree);
   }
 
-  // TODO: another test for implicit update of a task variable required?
+  @Test
+  public void testTaskVariableImplicitObjectValueUpdate() throws JsonProcessingException, IOException {
+
+    // given a process instance
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("implicitTaskVariableUpdate");
+    Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+
+    // when setting a variable such that the process-application-local dataformat applies
+    Date date = new Date(JsonSerializable.ONE_DAY_IN_MILLIS * 10); // 10th of January 1970
+    JsonSerializable jsonSerializable = new JsonSerializable(date);
+    try {
+      ProcessApplicationContext.setCurrentProcessApplication(ReferenceStoringProcessApplication.INSTANCE);
+      taskService.setVariableLocal(task.getId(),
+        ImplicitObjectValueUpdateHandler.VARIABLE_NAME,
+        Variables.objectValue(jsonSerializable).serializationDataFormat(SerializationDataFormats.JSON).create());
+    } finally {
+      ProcessApplicationContext.clear();
+    }
+
+    // and triggering an implicit update of the object value variable
+    taskService.setAssignee(task.getId(), "foo");
+
+    // then the process-application-local format was used for making the update
+    ObjectValue objectValue = taskService.getVariableTyped(task.getId(),
+        ImplicitObjectValueUpdateHandler.VARIABLE_NAME,
+        false);
+
+    ImplicitObjectValueUpdateHandler.addADay(jsonSerializable);
+    String serializedValue = objectValue.getValueSerialized();
+    String expectedSerializedValue = jsonSerializable.toExpectedJsonString(JsonDataFormatConfigurator.DATE_FORMAT);
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    JsonNode actualJsonTree = objectMapper.readTree(serializedValue);
+    JsonNode expectedJsonTree = objectMapper.readTree(expectedSerializedValue);
+    // JsonNode#equals makes a deep comparison
+    Assert.assertEquals(expectedJsonTree, actualJsonTree);
+
+    // and it is also correct in the history
+    HistoricVariableInstance historicObjectValue = historyService
+        .createHistoricVariableInstanceQuery()
+        .processInstanceId(pi.getId())
+        .variableName(ImplicitObjectValueUpdateHandler.VARIABLE_NAME)
+        .disableCustomObjectDeserialization()
+        .singleResult();
+
+    serializedValue = ((ObjectValue) historicObjectValue.getTypedValue()).getValueSerialized();
+    actualJsonTree = objectMapper.readTree(serializedValue);
+    Assert.assertEquals(expectedJsonTree, actualJsonTree);
+  }
 }

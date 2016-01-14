@@ -10,40 +10,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.integrationtest.functional.spin.dataformat;
 
-import java.io.Writer;
+package org.camunda.bpm.engine.impl.form;
 
-import org.camunda.spin.Spin;
+import org.camunda.bpm.engine.ProcessEngineException;
 
 /**
- * @author Thorben Lindhauer
- *
+ * @author Thomas Skjolberg
  */
-public class FooSpin extends Spin<FooSpin> {
+public class FormException extends ProcessEngineException {
 
-  public String getDataFormatName() {
-    return null;
+  private static final long serialVersionUID = 1L;
+
+  public FormException() {
+    super();
   }
 
-  public Object unwrap() {
-    return null;
+  public FormException(String message, Throwable cause) {
+    super(message, cause);
   }
 
-  public String toString() {
-    return null;
+  public FormException(String message) {
+    super(message);
   }
 
-  public void writeToWriter(Writer writer) {
-
-  }
-
-  public <C> C mapTo(Class<C> type) {
-    return null;
-  }
-
-  public <C> C mapTo(String type) {
-    return null;
+  public FormException(Throwable cause) {
+    super(cause);
   }
 
 }

@@ -57,6 +57,13 @@ public class PaDataFormatProviderTest extends AbstractFoxPlatformIntegrationTest
     return webArchive;
   }
 
+  /**
+   * Tests that
+   * 1) a serialized value can be set OUT OF process application context
+   *   even if the data format is not available (using the fallback serializer)
+   * 2) and that this value can be deserialized IN process application context
+   *   by using the PA-local serializer
+   */
   @Test
   public void customFormatCanBeUsedForVariableSerialization() {
     final ProcessInstance pi = runtimeService.startProcessInstanceByKey("testProcess",

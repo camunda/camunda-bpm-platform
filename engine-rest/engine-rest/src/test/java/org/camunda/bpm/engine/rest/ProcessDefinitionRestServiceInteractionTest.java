@@ -2012,15 +2012,15 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     String message = "expected exception";
     doThrow(new AuthorizationException(message)).when(repositoryServiceMock).suspendProcessDefinitionByKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, false, null);
 
-    given().log().all(true)
+    given()
       .contentType(ContentType.JSON)
       .body(params)
     .then()
-      .expect().log().all(true)
+      .expect()
         .statusCode(Status.FORBIDDEN.getStatusCode())
         .body("type", is(AuthorizationException.class.getSimpleName()))
         .body("message", is(message))
-      .when().log().all(true)
+      .when()
         .put(PROCESS_DEFINITION_SUSPENDED_URL);
   }
 

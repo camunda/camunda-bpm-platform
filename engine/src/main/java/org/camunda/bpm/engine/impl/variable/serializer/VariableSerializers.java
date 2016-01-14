@@ -65,8 +65,15 @@ public interface VariableSerializers {
 
   public int getSerializerIndexByName(String serializerName);
 
+  /**
+   * Merges two {@link VariableSerializers} instances into one. Implementations may apply
+   * different merging strategies.
+   */
   public VariableSerializers join(VariableSerializers other);
 
+  /**
+   * Returns the serializers as a list in the order of their indices.
+   */
   public List<TypedValueSerializer<?>> getSerializers();
 
 }

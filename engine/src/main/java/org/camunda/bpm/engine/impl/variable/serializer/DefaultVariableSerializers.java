@@ -146,7 +146,7 @@ public class DefaultVariableSerializers implements Serializable, VariableSeriali
   public VariableSerializers join(VariableSerializers other) {
     DefaultVariableSerializers copy = new DefaultVariableSerializers();
 
-    // "new" serializers override existing ones if their names match
+    // "other" serializers override existing ones if their names match
     for (TypedValueSerializer<?> thisSerializer : serializerList) {
       TypedValueSerializer<?> serializer = other.getSerializerByName(thisSerializer.getName());
 
@@ -157,7 +157,7 @@ public class DefaultVariableSerializers implements Serializable, VariableSeriali
       copy.addSerializer(serializer);
     }
 
-    // add all "new" serializers that did not exist before to the end of the list
+    // add all "other" serializers that did not exist before to the end of the list
     for (TypedValueSerializer<?> otherSerializer : other.getSerializers()) {
       if (!copy.serializerMap.containsKey(otherSerializer.getName())) {
         copy.addSerializer(otherSerializer);

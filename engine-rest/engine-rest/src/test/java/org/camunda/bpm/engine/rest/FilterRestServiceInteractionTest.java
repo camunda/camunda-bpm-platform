@@ -53,6 +53,7 @@ import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.anyVararg;
 import static org.mockito.Matchers.argThat;
@@ -78,8 +79,11 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.FilterService;
 import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.filter.FilterQuery;
@@ -140,7 +144,8 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
 
   protected AuthorizationService authorizationServiceMock;
   protected IdentityService identityServiceMock;
-  private VariableInstanceQuery variableInstanceQueryMock;
+  protected VariableInstanceQuery variableInstanceQueryMock;
+  protected ProcessEngineConfiguration processEngineConfigurationMock;
 
   @Before
   @SuppressWarnings("unchecked")
@@ -200,9 +205,11 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
 
     authorizationServiceMock = mock(AuthorizationServiceImpl.class);
     identityServiceMock = mock(IdentityServiceImpl.class);
+    processEngineConfigurationMock = mock(ProcessEngineConfiguration.class);
 
     when(processEngine.getAuthorizationService()).thenReturn(authorizationServiceMock);
     when(processEngine.getIdentityService()).thenReturn(identityServiceMock);
+    when(processEngine.getProcessEngineConfiguration()).thenReturn(processEngineConfigurationMock);
 
     TaskService taskService = processEngine.getTaskService();
     when(taskService.createTaskQuery()).thenReturn(new TaskQueryImpl());
@@ -1161,6 +1168,8 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
 
     // anonymity means the identityService returns a null authentication, so no need to mock here
 
+    when(processEngineConfigurationMock.isAuthorizationEnabled()).thenReturn(true);
+
     given()
       .then()
         .statusCode(Status.OK.getStatusCode())
@@ -1195,6 +1204,8 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
 
     when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, UPDATE, FILTER, ANY)).thenReturn(false);
 
+    when(processEngineConfigurationMock.isAuthorizationEnabled()).thenReturn(true);
+
     given()
       .then()
         .statusCode(Status.OK.getStatusCode())
@@ -1217,10 +1228,42 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
   }
 
   @Test
+  public void testFilterOptionsWithDisabledAuthorization() {
+    String fullFilterUrl = "http://localhost:" + PORT + FILTER_URL;
+
+    when(processEngineConfigurationMock.isAuthorizationEnabled()).thenReturn(false);
+
+    given()
+    .then()
+      .statusCode(Status.OK.getStatusCode())
+
+      .body("links.size()", is(3))
+
+      .body("links[0].href", equalTo(fullFilterUrl))
+      .body("links[0].method", equalTo(HttpMethod.GET))
+      .body("links[0].rel", equalTo("list"))
+
+      .body("links[1].href", equalTo(fullFilterUrl + "/count"))
+      .body("links[1].method", equalTo(HttpMethod.GET))
+      .body("links[1].rel", equalTo("count"))
+
+      .body("links[2].href", equalTo(fullFilterUrl + "/create"))
+      .body("links[2].method", equalTo(HttpMethod.POST))
+      .body("links[2].rel", equalTo("create"))
+
+    .when()
+      .options(FILTER_URL);
+
+    verifyNoAuthorizationCheckPerformed();
+  }
+
+  @Test
   public void testAnonymousFilterResourceOptions() {
     String fullFilterUrl = "http://localhost:" + PORT + FILTER_URL + "/" + EXAMPLE_FILTER_ID;
 
     // anonymity means the identityService returns a null authentication, so no need to mock here
+
+    when(processEngineConfigurationMock.isAuthorizationEnabled()).thenReturn(true);
 
     given()
         .pathParam("id", EXAMPLE_FILTER_ID)
@@ -1281,6 +1324,8 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, DELETE, FILTER, EXAMPLE_FILTER_ID)).thenReturn(false);
     when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, UPDATE, FILTER, EXAMPLE_FILTER_ID)).thenReturn(false);
 
+    when(processEngineConfigurationMock.isAuthorizationEnabled()).thenReturn(true);
+
     given()
         .pathParam("id", EXAMPLE_FILTER_ID)
     .then()
@@ -1307,6 +1352,8 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, READ, FILTER, EXAMPLE_FILTER_ID)).thenReturn(true);
     when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, DELETE, FILTER, EXAMPLE_FILTER_ID)).thenReturn(true);
     when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, UPDATE, FILTER, EXAMPLE_FILTER_ID)).thenReturn(false);
+
+    when(processEngineConfigurationMock.isAuthorizationEnabled()).thenReturn(true);
 
     given()
         .pathParam("id", EXAMPLE_FILTER_ID)
@@ -1355,6 +1402,61 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, DELETE, FILTER, EXAMPLE_FILTER_ID);
     verify(authorizationServiceMock, times(1)).isUserAuthorized(MockProvider.EXAMPLE_USER_ID, null, UPDATE, FILTER, EXAMPLE_FILTER_ID);
 
+  }
+
+  @Test
+  public void testFilterResourceOptionsWithAuthorizationDisabled() {
+    String fullFilterUrl = "http://localhost:" + PORT + FILTER_URL + "/" + EXAMPLE_FILTER_ID;
+
+    when(processEngineConfigurationMock.isAuthorizationEnabled()).thenReturn(false);
+
+    given()
+      .pathParam("id", EXAMPLE_FILTER_ID)
+    .then()
+      .statusCode(Status.OK.getStatusCode())
+
+      .body("links.size()", is(9))
+
+      .body("links[0].href", equalTo(fullFilterUrl))
+      .body("links[0].method", equalTo(HttpMethod.GET))
+      .body("links[0].rel", equalTo("self"))
+
+      .body("links[1].href", equalTo(fullFilterUrl + "/singleResult"))
+      .body("links[1].method", equalTo(HttpMethod.GET))
+      .body("links[1].rel", equalTo("singleResult"))
+
+      .body("links[2].href", equalTo(fullFilterUrl + "/singleResult"))
+      .body("links[2].method", equalTo(HttpMethod.POST))
+      .body("links[2].rel", equalTo("singleResult"))
+
+      .body("links[3].href", equalTo(fullFilterUrl + "/list"))
+      .body("links[3].method", equalTo(HttpMethod.GET))
+      .body("links[3].rel", equalTo("list"))
+
+      .body("links[4].href", equalTo(fullFilterUrl + "/list"))
+      .body("links[4].method", equalTo(HttpMethod.POST))
+      .body("links[4].rel", equalTo("list"))
+
+      .body("links[5].href", equalTo(fullFilterUrl + "/count"))
+      .body("links[5].method", equalTo(HttpMethod.GET))
+      .body("links[5].rel", equalTo("count"))
+
+      .body("links[6].href", equalTo(fullFilterUrl + "/count"))
+      .body("links[6].method", equalTo(HttpMethod.POST))
+      .body("links[6].rel", equalTo("count"))
+
+      .body("links[7].href", equalTo(fullFilterUrl))
+      .body("links[7].method", equalTo(HttpMethod.DELETE))
+      .body("links[7].rel", equalTo("delete"))
+
+      .body("links[8].href", equalTo(fullFilterUrl))
+      .body("links[8].method", equalTo(HttpMethod.PUT))
+      .body("links[8].rel", equalTo("update"))
+
+    .when()
+      .options(SINGLE_FILTER_URL);
+
+    verifyNoAuthorizationCheckPerformed();
   }
 
   @Test
@@ -1733,6 +1835,11 @@ public class FilterRestServiceInteractionTest extends AbstractRestServiceTest {
     assertThat(links).hasSize(1);
     assertThat(links.get("self")).hasSize(1);
     assertThat(links.get("self").get("href")).isEqualTo(scopeResourcePath + "/" + scopeId + "/" + variablesName + "/" + name);
+  }
+
+  protected void verifyNoAuthorizationCheckPerformed() {
+    verify(identityServiceMock, times(0)).getCurrentAuthentication();
+    verify(authorizationServiceMock, times(0)).isUserAuthorized(anyString(), anyListOf(String.class), any(Permission.class), any(Resource.class));
   }
 
 }

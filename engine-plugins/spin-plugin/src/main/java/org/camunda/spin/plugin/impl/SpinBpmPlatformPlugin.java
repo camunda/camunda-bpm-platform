@@ -43,12 +43,14 @@ public class SpinBpmPlatformPlugin implements BpmPlatformPlugin {
   protected void initializeVariableSerializers(AbstractProcessApplication abstractProcessApplication) {
     VariableSerializers paVariableSerializers = abstractProcessApplication.getVariableSerializers();
 
-    paVariableSerializers = new DefaultVariableSerializers();
+    if (paVariableSerializers == null) {
+      paVariableSerializers = new DefaultVariableSerializers();
+      abstractProcessApplication.setVariableSerializers(paVariableSerializers);
+    }
+
     for (TypedValueSerializer<?> serializer : lookupSpinSerializers(abstractProcessApplication.getProcessApplicationClassloader())) {
       paVariableSerializers.addSerializer(serializer);
     }
-
-    abstractProcessApplication.setVariableSerializers(paVariableSerializers);
   }
 
   protected List<TypedValueSerializer<?>> lookupSpinSerializers(ClassLoader classLoader) {
@@ -56,7 +58,9 @@ public class SpinBpmPlatformPlugin implements BpmPlatformPlugin {
     DataFormats paDataFormats = new DataFormats();
     paDataFormats.registerDataFormats(classLoader);
 
-    return SpinVariableSerializers.createSerializers(paDataFormats);
+    // does not create PA-local serializers for native Spin values;
+    // this is still an open feature CAM-5246
+    return SpinVariableSerializers.createObjectValueSerializers(paDataFormats);
   }
 
 }

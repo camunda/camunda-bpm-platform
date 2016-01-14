@@ -68,7 +68,11 @@ public class SpinProcessEnginePlugin extends AbstractProcessEnginePlugin {
 
   protected List<TypedValueSerializer<?>> lookupSpinSerializers() {
     DataFormats globalFormats = DataFormats.getInstance();
-    return SpinVariableSerializers.createSerializers(globalFormats);
+    List<TypedValueSerializer<?>> serializers =
+        SpinVariableSerializers.createObjectValueSerializers(globalFormats);
+    serializers.addAll(SpinVariableSerializers.createSpinValueSerializers(globalFormats));
+
+    return serializers;
   }
 
   protected void registerScriptResolver(ProcessEngineConfigurationImpl processEngineConfiguration) {

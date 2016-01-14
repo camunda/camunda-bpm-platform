@@ -50,6 +50,10 @@ public class TestContainer {
   public static void addSpinJacksonJsonDataFormat(WebArchive webArchive) {
     webArchive.addAsLibraries(getSpinJacksonJsonDataFormat());
   }
+  
+  public static void addJodaTimeJacksonModule(WebArchive webArchive) {
+    webArchive.addAsLibraries(getJodaTimeModule());
+  }
 
   protected static JavaArchive[] getSpinJacksonJsonDataFormat() {
     return Maven.resolver()
@@ -61,6 +65,16 @@ public class TestContainer {
           "org.camunda.commons:camunda-commons-logging",
           "org.camunda.commons:camunda-commons-utils"))
       .as(JavaArchive.class);
+  }
+  
+  protected static JavaArchive[] getJodaTimeModule() {
+    return Maven.resolver()
+        .offline()
+        .loadPomFromFile("pom.xml")
+        .resolve("com.fasterxml.jackson.datatype:jackson-datatype-joda")
+        .using(new RejectDependenciesStrategy(false,
+            "joda-time:joda-time"))
+        .as(JavaArchive.class);
   }
 
 }
