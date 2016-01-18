@@ -85,13 +85,13 @@ module.exports = function(config, copyConf) {
           expand: true,
           cwd: '<%= pkg.gruntConfig.tasklistSourceDir %>/../../camunda-commons-ui/node_modules/bootstrap/fonts',
           src: ['**'],
-          dest: '<%= pkg.gruntConfig.tasklistBuildTarget %>/fonts/bootstrap/'
+          dest: '<%= pkg.gruntConfig.tasklistBuildTarget %>/fonts/'
         },
         {
           expand: true,
           cwd: '<%= pkg.gruntConfig.tasklistSourceDir %>/images',
           src: ['**'],
-          dest: '<%= pkg.gruntConfig.tasklistBuildTarget %>/images/'
+          dest: '<%= pkg.gruntConfig.tasklistBuildTarget %>/assets/images/'
         },
         {
           expand: true,

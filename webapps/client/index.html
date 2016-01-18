@@ -32,16 +32,16 @@
 
   <!-- favicon -->
   <link rel="shortcut icon"
-        href="$APP_ROOT/app/tasklist/images/favicon.ico"
+        href="$APP_ROOT/app/tasklist/assets/images/favicon.ico"
         type="image/x-icon" />
   <link rel="apple-touch-icon"
-        href="$APP_ROOT/app/tasklist/images/camunda.60.png" />
+        href="$APP_ROOT/app/tasklist/assets/images/camunda.60.png" />
   <link rel="apple-touch-icon"
         sizes="72x72"
-        href="$APP_ROOT/app/tasklist/images/camunda.72.png" />
+        href="$APP_ROOT/app/tasklist/assets/images/camunda.72.png" />
   <link rel="apple-touch-icon"
         sizes="114x114"
-        href="$APP_ROOT/app/tasklist/images/camunda.114.png" />
+        href="$APP_ROOT/app/tasklist/assets/images/camunda.114.png" />
 
 </head>
 
@@ -54,12 +54,13 @@
        sign-out="{{ 'SIGN_OUT_ACTION' | translate }}"
        my-profile="{{ 'MY_PROFILE' | translate }}"
        brand-name="{{ 'APP_VENDOR' | translate }} {{ 'TASKLIST_APP' | translate }}">
-   <ul class="header-actions"
+   <ul class="navbar-nav nav"
+       cam-if-logged-in
+       ng-cloak
        ng-controller="camHeaderViewsCtrl">
       <li ng-repeat="actionProvider in navbarActions"
           ng-class="actionProvider.id">
-        <view cam-if-logged-in
-              ng-cloak
+        <view ng-cloak
               provider="actionProvider"
               vars="navbarVars">
         </view>
