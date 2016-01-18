@@ -1,24 +1,13 @@
-define([
-  'angular',
+'use strict';
 
-  './transform',
-  './variables',
-  './page',
-  './breadcrumbTrails',
-  './routeUtil',
-  './cam-api'
-], function(
-  angular,
+var angular = require('angular'),
 
-   transform,
-   variables,
-   page,
-   breadcrumbTrails,
-   routeUtil,
-   camAPI
-) {
-
-  'use strict';
+   transform = require('./transform'),
+   variables = require('./variables'),
+   page = require('./page'),
+   breadcrumbTrails = require('./breadcrumbTrails'),
+   routeUtil = require('./routeUtil'),
+   camAPI = require('./cam-api');
 
   var servicesModule = angular.module('cam.cockpit.services', []);
 
@@ -29,6 +18,4 @@ define([
   servicesModule.factory('routeUtil', routeUtil);
   servicesModule.factory('camAPI', camAPI);
 
-  return servicesModule;
-
-});
+  module.exports = servicesModule;

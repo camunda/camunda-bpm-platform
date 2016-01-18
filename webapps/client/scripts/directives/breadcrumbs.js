@@ -1,13 +1,10 @@
-/* global require: false */
-/* jshint unused: false */
-define([
-  'angular',
-  'text!./breadcrumbs.html'
-],
-function(angular, template) {
-  'use strict';
+'use strict';
 
-  return ['$location', 'routeUtil', function ($location, routeUtil) {
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/breadcrumbs.html', 'utf8');
+
+  module.exports = ['$location', 'routeUtil', function ($location, routeUtil) {
     return {
       scope: {
         divider: '@'
@@ -41,5 +38,3 @@ function(angular, template) {
       }]
     };
   }];
-
-});

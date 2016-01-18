@@ -1,12 +1,6 @@
-/* global define: false, require: false */
-define([
-  'angular'
-], function(
-  angular
-) {
-  'use strict';
+'use strict';
 
-  return [
+  module.exports = [
     '$scope',
     '$q',
     'camAPI',
@@ -156,5 +150,3 @@ define([
     };
 
   }];
-
-});

@@ -1,13 +1,15 @@
-define([
-  'require',
-  'angular',
-  'cockpit/util/routeUtil',
-  'camunda-commons-ui',
-  'angular-data-depend',
-  'text!./process-instance.html'
-], function(require, angular, routeUtil, camCommoms, dataDepend, template) {
-  'use strict';
-    var module = angular.module('cam.cockpit.pages.processInstance', [camCommoms.name, dataDepend.name]);
+'use strict';
+
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/process-instance.html', 'utf8');
+
+var angular = require('angular'),
+    routeUtil = require('../util/routeUtil'),
+    dataDepend = require('angular-data-depend'),
+    camCommons = require('camunda-commons-ui/lib');
+
+  var ngModule = angular.module('cam.cockpit.pages.processInstance', [camCommons.name, 'dataDepend']);
 
   var Controller = [
           '$scope', '$filter', '$rootScope', '$location', 'search', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'IncidentResource', 'Views', 'Data', 'Transform', 'processInstance', 'dataDepend', 'page', 'breadcrumbTrails',
@@ -655,7 +657,7 @@ define([
 
 
 
-  module
+  ngModule
     .controller('ProcessInstanceFilterController', [
       '$scope',
     function ($scope) {
@@ -792,10 +794,9 @@ define([
     });
   }];
 
-  module
+  ngModule
     .config(RouteConfig)
     .config(ViewConfig)
   ;
 
-  return module;
-});
+  module.exports = ngModule;

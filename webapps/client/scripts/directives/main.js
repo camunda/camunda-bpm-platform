@@ -1,46 +1,24 @@
-define([
-  'angular',
+'use strict';
 
-  './breadcrumbs',
-  './numeric',
-  './date',
-  './processDiagram',
-  './decisionTable',
-  './processDiagramPreview',
-  './activityInstanceTree',
-  './sidebarContainer',
-  './stateCircle',
-  './variable',
-  './focus',
-  './viewPills',
-  './selectActivity',
-  './selectActivityInstance',
-  './processVariable',
-  './dynamicName',
-  './quickFilter'
-], function(
-  angular,
+var angular = require('angular'),
 
-  breadcrumbs,
-  numeric,
-  date,
-  processDiagram,
-  decisionTable,
-  processDiagramPreview,
-  activityInstanceTree,
-  sidebarContainer,
-  stateCircle,
-  variable,
-  focus,
-  viewPills,
-  selectActivity,
-  selectActivityInstance,
-  processVariable,
-  dynamicName,
-  quickFilter
-) {
-
-  'use strict';
+  breadcrumbs = require('./breadcrumbs'),
+  numeric = require('./numeric'),
+  date = require('./date'),
+  processDiagram = require('./processDiagram'),
+  decisionTable = require('./decisionTable'),
+  processDiagramPreview = require('./processDiagramPreview'),
+  activityInstanceTree = require('./activityInstanceTree'),
+  sidebarContainer = require('./sidebarContainer'),
+  stateCircle = require('./stateCircle'),
+  variable = require('./variable'),
+  focus = require('./focus'),
+  viewPills = require('./viewPills'),
+  selectActivity = require('./selectActivity'),
+  selectActivityInstance = require('./selectActivityInstance'),
+  processVariable = require('./processVariable'),
+  dynamicName = require('./dynamicName'),
+  quickFilter = require('./quickFilter');
 
   var directivesModule = angular.module('cam.cockpit.directives', []);
 
@@ -62,6 +40,4 @@ define([
   directivesModule.directive('camDynamicName', dynamicName);
   directivesModule.directive('camQuickFilter', quickFilter);
 
-  return directivesModule;
-
-});
+  module.exports = directivesModule;

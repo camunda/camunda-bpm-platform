@@ -1,33 +1,19 @@
-define([
-  'angular',
-  'angular-data-depend',
-  'camunda-commons-ui',
+'use strict';
 
-  /* config */
-  './config/routes',
+var angular = require('angular'),
+    dataDepend = require('angular-data-depend'),
+    camCommons = require('camunda-commons-ui/lib/index'),
 
-  /* controllers */
-  './controllers/cam-cockpit-repository-view-ctrl',
 
-  /* modules */
-  './deployments/main',
-  './resources/main',
-  './resource/main'
-], function(
-  angular,
-  dataDepend,
-  camCommons,
+    routes = require('./config/routes'),
 
-  routes,
 
-  camCockpitRepositoryViewCtrl,
+    camCockpitRepositoryViewCtrl = require('./controllers/cam-cockpit-repository-view-ctrl'),
 
-  deploymentsModule,
-  resourcesModule,
-  resourceDetailsModule
-) {
 
-  'use strict';
+    deploymentsModule = require('./deployments/main'),
+    resourcesModule = require('./resources/main'),
+    resourceDetailsModule = require('./resource/main');
 
   var ngDeps = [
     'cam.commons',
@@ -44,6 +30,4 @@ define([
 
   deploymentModule.controller('camCockpitRepositoryViewCtrl', camCockpitRepositoryViewCtrl);
 
-  return deploymentModule;
-
-});
+  module.exports = deploymentModule;

@@ -1,13 +1,10 @@
-define([
-  'text!./cam-cockpit-deployments.html',
-  'angular'
-], function(
-  template,
-  angular
-) {
-  'use strict';
+'use strict';
 
-  return [function() {
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/cam-cockpit-deployments.html', 'utf8');
+
+  module.exports = [function() {
 
     return {
 
@@ -37,12 +34,7 @@ define([
 
         var updateSilently = function(params) {
           search.updateSilently(params);
-        }
-
-        var getPropertyFromLocation = function(property) {
-          var search = $location.search() || {};
-          return search[property] || null;
-        }
+        };
 
 
         // control ///////////////////////////////////////////////////////////////////
@@ -119,4 +111,3 @@ define([
       }]
     };
   }];
-});

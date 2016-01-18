@@ -1,8 +1,8 @@
-/* global define: false */
-define([
-  'text!./decisionTable.html'
-], function(template) {
-  'use strict';
+'use strict';
+
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/decisionTable.html', 'utf8');
 
   var DirectiveController = ['$scope',
                     function( $scope) {
@@ -30,5 +30,4 @@ define([
 
   Directive.$inject = [ '$compile'];
 
-  return Directive;
-});
+  module.exports = Directive;

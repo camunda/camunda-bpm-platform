@@ -1,13 +1,11 @@
-define([
-  'angular',
-  'text!./cam-cockpit-deployments-search-plugin.html',
-  'text!./cam-cockpit-deployments-search-plugin-config.json'
-], function(
-  angular,
-  template,
-  searchConfigJSON
-) {
-  'use strict';
+'use strict';
+
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/cam-cockpit-deployments-search-plugin.html', 'utf8');
+var searchConfigJSON = fs.readFileSync(__dirname + '/cam-cockpit-deployments-search-plugin-config.json', 'utf8');
+
+var angular = require('angular');
 
   var searchConfig = JSON.parse(searchConfigJSON);
 
@@ -59,7 +57,7 @@ define([
       if (search.basic) {
         return true;
       }
-      return sanitizeValue(parseValue(search.value.value), search.operator.value.key)
+      return sanitizeValue(parseValue(search.value.value), search.operator.value.key);
     };
 
     var addSearchToQuery = function(query, search) {
@@ -97,6 +95,4 @@ define([
 
   Configuration.$inject = ['ViewsProvider'];
 
-  return Configuration;
-
-});
+  module.exports = Configuration;

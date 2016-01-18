@@ -8,7 +8,6 @@
 
   @author Roman Smirnov <roman.smirnov@camunda.com>
  */
-define([], function() {
   'use strict';
 
   var Filter = function() {
@@ -48,5 +47,4 @@ define([], function() {
     }
 
   };
-  return Filter;
-});
+  module.exports = Filter;

@@ -1,7 +1,6 @@
-define([], function() {
   'use strict';
 
-  return [
+  module.exports = [
     '$scope',
     '$q',
     'Uri',
@@ -183,5 +182,3 @@ define([], function() {
     $scope.resourceActions = Views.getProviders({ component: PLUGIN_ACTION_COMPONENT });
 
   }];
-
-});

@@ -1,5 +1,3 @@
-/* global define: false */
-define([], function() {
   'use strict';
 
   var Directive = function () {
@@ -55,6 +53,4 @@ define([], function() {
     };
   };
 
-  return Directive;
-
-});
+  module.exports = Directive;

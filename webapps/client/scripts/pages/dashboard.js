@@ -1,6 +1,11 @@
-/* global define: false */
-define(['angular', 'text!./dashboard.html'], function(angular, template) {
-  'use strict';
+'use strict';
+
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/dashboard.html', 'utf8');
+
+var angular = require('angular');
+
   var $ = angular.element;
 
   var Controller = [
@@ -67,5 +72,4 @@ define(['angular', 'text!./dashboard.html'], function(angular, template) {
     });
   }];
 
-  return RouteConfig;
-});
+  module.exports = RouteConfig;

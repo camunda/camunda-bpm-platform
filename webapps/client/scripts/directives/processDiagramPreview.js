@@ -1,7 +1,12 @@
-define(['text!./processDiagramPreview.html', 'angular'], function(template, angular) {
-  'use strict';
+'use strict';
 
-  return ['ProcessDefinitionResource', 'debounce', function (ProcessDefinitionResource, debounce) {
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/processDiagramPreview.html', 'utf8');
+
+var angular = require('angular');
+
+  module.exports = ['ProcessDefinitionResource', 'debounce', function (ProcessDefinitionResource, debounce) {
     return {
       restrict: 'EAC',
       template: template,
@@ -44,4 +49,3 @@ define(['text!./processDiagramPreview.html', 'angular'], function(template, angu
       }
     };
   }];
-});

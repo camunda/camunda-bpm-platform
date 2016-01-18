@@ -1,8 +1,6 @@
-/* global define: false */
-define(function() {
   'use strict';
 
-  return function () {
+  module.exports = function () {
     return {
       restrict: 'EAC',
       link: function(scope, element, attrs) {
@@ -55,4 +53,3 @@ define(function() {
       }
     };
   };
-});

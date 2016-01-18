@@ -1,36 +1,19 @@
-define([
-  'angular',
+'use strict';
+
+var angular = require('angular'),
 
   /* controllers */
-  './controllers/cam-cockpit-resource-details-ctrl',
+  camResourceDetailsCtrl = require('./controllers/cam-cockpit-resource-details-ctrl'),
 
   /* directives */
-  './directives/cam-cockpit-resource-wrapper',
-  './directives/cam-cockpit-resource-meta',
-  './directives/cam-cockpit-resource-content',
-  './directives/cam-cockpit-source',
+  camCockpitResourceWrapper = require('./directives/cam-cockpit-resource-wrapper'),
+  camCockpitResourceMeta = require('./directives/cam-cockpit-resource-meta'),
+  camCockpitResourceContent = require('./directives/cam-cockpit-resource-content'),
+  camCockpitSource = require('./directives/cam-cockpit-source'),
 
   /* plugins */
-  './plugins/details/definitions/cam-cockpit-definitions-plugin',
-  './plugins/actions/download/cam-cockpit-resource-action-download-plugin',
-
-], function(
-  angular,
-
-  /* controllers */
-  camResourceDetailsCtrl,
-
-  /* directives */
-  camCockpitResourceWrapper,
-  camCockpitResourceMeta,
-  camCockpitResourceContent,
-  camCockpitSource,
-
-  /* plugins */
-  camCockpitDefinitionsPlugin,
-  camCockpitResourceDownloadPlugin
-) {
-  'use strict';
+  camCockpitDefinitionsPlugin = require('./plugins/details/definitions/cam-cockpit-definitions-plugin'),
+  camCockpitResourceDownloadPlugin = require('./plugins/actions/download/cam-cockpit-resource-action-download-plugin');
 
   var resourceModule = angular.module('cam.cockpit.repository.resource', []);
 
@@ -47,5 +30,4 @@ define([
   resourceModule.config(camCockpitDefinitionsPlugin);
   resourceModule.config(camCockpitResourceDownloadPlugin);
 
-  return resourceModule;
-});
+  module.exports = resourceModule;

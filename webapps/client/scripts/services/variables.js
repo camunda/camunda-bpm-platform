@@ -1,5 +1,3 @@
-/* global define: false */
-define([], function() {
   'use strict';
 
   var VariablesFactory = [ function() {
@@ -131,5 +129,4 @@ define([], function() {
       operators: keys(SYM_TO_OPS)
     };
   }];
-  return VariablesFactory;
-});
+  module.exports = VariablesFactory;

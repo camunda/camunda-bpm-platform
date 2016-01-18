@@ -1,40 +1,21 @@
-define([
-  'angular',
+'use strict';
 
-  /* controllers */
-  './controllers/cam-cockpit-deployments-ctrl',
+var angular = require('angular'),
 
-  /* directives */
-  './directives/cam-cockpit-deployments',
-  './directives/cam-cockpit-deployment',
-  './directives/cam-cockpit-deployments-sorting-choices',
+    /* controller */
+    camCockpitDeploymentsCtrl = require('./controllers/cam-cockpit-deployments-ctrl'),
 
-  /* plugins */
-  './plugins/search/cam-cockpit-deployments-search-plugin',
-  './plugins/actions/delete/cam-cockpit-delete-deployment-plugin',
+    /* directives */
+    camCockpitDeployments = require('./directives/cam-cockpit-deployments'),
+    camCockpitDeployment = require('./directives/cam-cockpit-deployment'),
+    camCockpitDeploymentsSortingChoices = require('./directives/cam-cockpit-deployments-sorting-choices'),
 
-  /* modals */
-  './plugins/actions/delete/modals/cam-cockpit-delete-deployment-modal-ctrl'
+    /* plugins */
+    camCockpitDeploymentsSearchPlugin = require('./plugins/search/cam-cockpit-deployments-search-plugin'),
+    camCockpitDeleteDeploymentPlugin = require('./plugins/actions/delete/cam-cockpit-delete-deployment-plugin'),
 
-], function(
-  angular,
-
-  /* controller */
-  camCockpitDeploymentsCtrl,
-
-  /* directives */
-  camCockpitDeployments,
-  camCockpitDeployment,
-  camCockpitDeploymentsSortingChoices,
-
-  /* plugins */
-  camCockpitDeploymentsSearchPlugin,
-  camCockpitDeleteDeploymentPlugin,
-
-  /* modals */
-  camCockpitDeleteDeploymentModalCtrl
-) {
-  'use strict';
+    /* modals */
+    camCockpitDeleteDeploymentModalCtrl = require('./plugins/actions/delete/modals/cam-cockpit-delete-deployment-modal-ctrl');
 
   var deploymentsModule = angular.module('cam.cockpit.repository.deployments', [
     'ui.bootstrap'
@@ -55,5 +36,4 @@ define([
   /* modals */
   deploymentsModule.controller('camDeleteDeploymentModalCtrl', camCockpitDeleteDeploymentModalCtrl);
 
-  return deploymentsModule;
-});
+  module.exports = deploymentsModule;

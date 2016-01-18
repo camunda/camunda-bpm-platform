@@ -1,10 +1,12 @@
-/* global define: false */
-define([
-  'angular',
-  'jquery',
-  'text!./processDiagram.html'
-], function(angular, $, template) {
-  'use strict';
+'use strict';
+
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/processDiagram.html', 'utf8');
+
+var angular = require('angular');
+var $ = require('jquery');
+
   /* jshint unused: false */
   var _unique = 0;
   function unique(prefix) {
@@ -224,5 +226,4 @@ define([
 
   Directive.$inject = [ '$compile', 'Views'];
 
-  return Directive;
-});
+  module.exports = Directive;

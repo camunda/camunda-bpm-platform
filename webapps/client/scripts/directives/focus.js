@@ -1,5 +1,4 @@
-define([ 'angular' ], function(angular) {
-  'use strict';
+'use strict';
 
   var FocusDirective = ['$compile', function ($compile) {
     return {
@@ -16,5 +15,4 @@ define([ 'angular' ], function(angular) {
     };
   }];
 
-  return FocusDirective;
-});
+  module.exports = FocusDirective;

@@ -1,7 +1,6 @@
-/* global define: false */
-define([
-  'cockpit/util/routeUtil'
-],
+'use strict';
+
+var routeUtil = require('../util/routeUtil');
 
 /**
  * A wrapper to use the cockpit/util/routeUtil as a angular service
@@ -12,10 +11,7 @@ define([
  *
  * @module cam.cockpit.services.routeUtil
  */
-function(routeUtil) {
-  'use strict';
-
-  return [function() {
+  module.exports = [function() {
 
     return {
 
@@ -33,5 +29,3 @@ function(routeUtil) {
     }
 
   }];
-
-});

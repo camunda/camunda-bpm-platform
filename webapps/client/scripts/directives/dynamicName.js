@@ -1,6 +1,4 @@
-/* global define: false */
-define([ 'angular' ], function(angular) {
-  'use strict';
+'use strict';
 
   /**
    * Interpolate a given dynamic name which contains markup. The result will be set
@@ -20,7 +18,7 @@ define([ 'angular' ], function(angular) {
       ....
     </div>
    */
-  return [ '$interpolate', '$compile', function($interpolate, $compile) {
+  module.exports = [ '$interpolate', '$compile', function($interpolate, $compile) {
 
     return {
       restrict: 'A',
@@ -34,4 +32,3 @@ define([ 'angular' ], function(angular) {
       }
     };
   }];
-});

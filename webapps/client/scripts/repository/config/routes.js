@@ -1,10 +1,10 @@
-define([
-  'text!./../controllers/cam-cockpit-repository-view.html'
-], function(
-  template) {
-  'use strict';
+'use strict';
 
-  return [
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/../controllers/cam-cockpit-repository-view.html', 'utf8');
+
+  module.exports = [
     '$routeProvider',
   function(
     $routeProvider
@@ -18,4 +18,3 @@ define([
         reloadOnSearch: false
       });
   }];
-});

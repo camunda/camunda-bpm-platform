@@ -1,19 +1,11 @@
-define([
-  'angular',
+'use strict';
 
-  './shorten',
-  './abbreviateNumber',
-  './duration'
+var angular = require('angular'),
 
-], function(
-  angular,
+   shorten = require('./shorten'),
+   abbreviateNumber = require('./abbreviateNumber'),
+   duration = require('./duration');
 
-   shorten,
-   abbreviateNumber,
-   duration
-) {
-
-  'use strict';
 
   var filtersModule = angular.module('cam.cockpit.filters', []);
 
@@ -21,5 +13,4 @@ define([
   filtersModule.filter('abbreviateNumber', abbreviateNumber);
   filtersModule.filter('duration', duration);
 
-  return filtersModule;
-});
+  module.exports = filtersModule;

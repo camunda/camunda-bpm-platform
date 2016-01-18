@@ -1,9 +1,8 @@
-define([
-  'text!./cam-cockpit-resource-action-download-plugin.html'
-], function(
-  template
-) {
-  'use strict';
+'use strict';
+
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/cam-cockpit-resource-action-download-plugin.html', 'utf8');
 
   var Controller = [
    '$scope',
@@ -45,6 +44,4 @@ define([
 
   Configuration.$inject = ['ViewsProvider'];
 
-  return Configuration;
-
-});
+  module.exports = Configuration;

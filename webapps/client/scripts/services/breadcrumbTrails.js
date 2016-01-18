@@ -1,8 +1,6 @@
-/* global define: false */
-define([], function() {
   'use strict';
 
-  return [
+  module.exports = [
     'ProcessDefinitionResource',
     'page',
   function(ProcessDefinitionResource, page) {
@@ -48,4 +46,3 @@ define([], function() {
 
     return breadcrumbTrails;
   }];
-});

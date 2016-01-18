@@ -1,5 +1,3 @@
-/* global define: false */
-define([], function() {
   'use strict';
 
   var Resource = [ '$resource', 'Uri', function ($resource, Uri) {
@@ -8,5 +6,4 @@ define([], function() {
       count: { method: 'GET', isArray: false, params: { count: 'count' }}
     });
   }];
-  return Resource;
-});
+  module.exports = Resource;

@@ -1,14 +1,13 @@
-define([
-  'angular',
-  'text!./cam-cockpit-source.html',
-  'prismjs'
-], function(
-  angular,
-  template
-) {
-  'use strict';
+'use strict';
 
-  return [
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/cam-cockpit-source.html', 'utf8');
+
+var angular = require('angular');
+require('camunda-commons-ui/vendor/prism');
+
+  module.exports = [
     '$window',
   function(
     $window
@@ -61,5 +60,3 @@ define([
     };
 
   }];
-
-});

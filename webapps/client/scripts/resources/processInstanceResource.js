@@ -1,8 +1,6 @@
-/* global define: false */
-define([], function() {
   'use strict';
 
-  return [
+  module.exports = [
     '$resource',
     'Uri',
   function ($resource, Uri) {
@@ -28,4 +26,3 @@ define([], function() {
       }
     });
   }];
-});

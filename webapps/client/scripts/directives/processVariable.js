@@ -1,8 +1,6 @@
-/* global define: false */
-define([], function() {
   'use strict';
 
-  return ['Variables', function(Variables) {
+  module.exports = ['Variables', function(Variables) {
 
     return {
 
@@ -28,4 +26,3 @@ define([], function() {
     };
 
   }];
-});

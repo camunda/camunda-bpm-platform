@@ -1,22 +1,11 @@
-define([
-  'angular',
+'use strict';
 
-  /* directives */
-  './directives/cam-cockpit-resources'
-
-], function(
-  angular,
-
-  /* directives */
-  camCockpitResources
-
-) {
-  'use strict';
+var angular = require('angular'),
+    camCockpitResources = require('./directives/cam-cockpit-resources');
 
   var resourcesModule = angular.module('cam.cockpit.repository.resources', []);
 
   /* directives */
   resourcesModule.directive('camResources', camCockpitResources);
 
-  return resourcesModule;
-});
+  module.exports = resourcesModule;

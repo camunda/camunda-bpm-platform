@@ -1,7 +1,6 @@
-define([], function() {
   'use strict';
 
-  return [
+  module.exports = [
     '$scope',
     'Views',
   function(
@@ -14,5 +13,3 @@ define([], function() {
     $scope.deploymentsPlugins = Views.getProviders({ component: 'cockpit.repository.deployments.list' });
 
   }];
-
-});

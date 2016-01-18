@@ -1,20 +1,15 @@
-/* global define: false, require: false */
-define([
-  'angular',
-  'cockpit/util/routeUtil',
-  'angular-data-depend',
-  'camunda-commons-ui',
-  'text!./process-definition.html'],
-  function(
-  angular,
-  routeUtil,
-  dataDepend,
-  camCommons,
-  template) {
+'use strict';
 
-  'use strict';
+var fs = require('fs');
 
-  var module = angular.module('cam.cockpit.pages.processDefinition', [dataDepend.name, camCommons.name]);
+var template = fs.readFileSync(__dirname + '/process-definition.html', 'utf8');
+
+var angular = require('angular'),
+    routeUtil = require('../util/routeUtil'),
+    dataDepend = require('angular-data-depend'),
+    camCommons = require('camunda-commons-ui/lib');
+
+  var ngModule = angular.module('cam.cockpit.pages.processDefinition', ['dataDepend', camCommons.name]);
 
   var Controller = [
           '$scope', '$rootScope', '$q', 'search', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'Views', 'Data', 'Transform', 'Variables', 'dataDepend', 'processDefinition', 'page',
@@ -661,11 +656,10 @@ define([
     });
   }];
 
-  module
+  ngModule
     .controller('ProcessDefinitionFilterController', ProcessDefinitionFilterController)
     .config(RouteConfig)
     .config(ViewConfig)
   ;
 
-  return module;
-  });
+  module.exports = ngModule;

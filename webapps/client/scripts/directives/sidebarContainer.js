@@ -1,11 +1,10 @@
-/* global define: false */
-define([
-  'jquery',
-  'jquery-ui-draggable'
-], function($) {
-  'use strict';
+'use strict';
 
-  return function() {
+var $ = require('jquery');
+
+require('jquery-ui/draggable');
+
+  module.exports = function() {
 
     return {
       restrict: 'CA',
@@ -181,4 +180,3 @@ define([
       }
     };
   };
-});

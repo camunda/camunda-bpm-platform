@@ -1,13 +1,12 @@
-define([
-  'text!./cam-cockpit-deployments-sorting-choices.html',
-  'angular'
-], function(
-  template,
-  angular
-) {
-  'use strict';
+'use strict';
 
-  return [function() {
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/cam-cockpit-deployments-sorting-choices.html', 'utf8');
+
+var angular = require('angular');
+
+  module.exports = [function() {
 
     return {
 
@@ -33,20 +32,20 @@ define([
           name:             'Name',
           deploymentTime:   'Deployment Time'
         };
-       
+
 
         // utilities /////////////////////////////////////////////////////////////////
 
         var updateSilently = function(params) {
           search.updateSilently(params);
-        }
+        };
 
         var updateSorting = function(searchParam, value) {
           var search = {};
           search[searchParam] = value;
           updateSilently(search);
           deploymentsSortingData.changed('deploymentsSorting');
-        }
+        };
 
         // observe data /////////////////////////////////////////////////////////////
 
@@ -65,7 +64,7 @@ define([
         // sort order //////////////////////////////////////////////////////////////
 
         $scope.changeOrder = function() {
-          var value = $scope.sorting.sortOrder === 'asc' ? 'desc' : 'asc'
+          var value = $scope.sorting.sortOrder === 'asc' ? 'desc' : 'asc';
           updateSorting('deploymentsSortOrder', value);
         };
 
@@ -79,4 +78,3 @@ define([
       }]
     };
   }];
-});

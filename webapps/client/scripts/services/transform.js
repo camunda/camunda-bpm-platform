@@ -1,6 +1,6 @@
-/* global define: false */
-define([ 'bpmn-io' ], function(BpmnIO) {
-  'use strict';
+'use strict';
+
+var BpmnIO = require('bpmn-js/lib/NavigatedViewer');
 
   var Service = ['$q', function ($q) {
     return {
@@ -20,5 +20,4 @@ define([ 'bpmn-io' ], function(BpmnIO) {
       }
     };
   }];
-  return Service;
-});
+  module.exports = Service;

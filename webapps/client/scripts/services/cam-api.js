@@ -1,11 +1,8 @@
-/* global define: false */
-define([
-  'camunda-bpm-sdk-js'
-],
-function(CamSDK) {
-  'use strict';
+'use strict';
 
-  return ['Uri', 'camAPIHttpClient', function(Uri, camAPIHttpClient) {
+var CamSDK = require('camunda-bpm-sdk-js/lib/angularjs/index');
+
+  module.exports = ['Uri', 'camAPIHttpClient', function(Uri, camAPIHttpClient) {
 
     return new CamSDK.Client({
       HttpClient: camAPIHttpClient,
@@ -14,5 +11,3 @@ function(CamSDK) {
     });
 
   }];
-
-});

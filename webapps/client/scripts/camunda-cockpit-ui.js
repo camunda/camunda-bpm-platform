@@ -1,38 +1,22 @@
-define('camunda-cockpit-ui', [
-  './repository/main',
-  './directives/main',
-  './filters/main',
-  './pages/main',
-  './resources/main',
-  './services/main',
-  'camunda-commons-ui',
-  'camunda-bpm-sdk-js',
-  'ngDefine'
-], function () {
-  'use strict';
-  var APP_NAME = 'cam.cockpit';
+'use strict';
 
-  var pluginPackages = window.PLUGIN_PACKAGES || [];
-  var pluginDependencies = window.PLUGIN_DEPENDENCIES || [];
+var $ = require('jquery');
+window.jQuery = $;
 
+var commons = require('camunda-commons-ui/lib');
+var sdk = require('camunda-bpm-sdk-js/lib/angularjs/index');
+var dataDepend = require('angular-data-depend');
 
-  require.config({
-    packages: pluginPackages
-  });
+var APP_NAME = 'cam.cockpit';
 
+var angular = require('angular');
 
-  var dependencies = [].concat(pluginDependencies.map(function(plugin) {
-    return plugin.requirePackageName;
-  }));
-
-
-
-  require(dependencies, function() {
+  module.exports = function(pluginDependencies) {
 
     var ngDependencies = [
       'ng',
       'ngResource',
-      require('camunda-commons-ui').name,
+      commons.name,
       require('./repository/main').name,
       require('./directives/main').name,
       require('./filters/main').name,
@@ -43,8 +27,6 @@ define('camunda-cockpit-ui', [
       return el.ngModuleName;
     }));
 
-    var angular = require('angular');
-    var $ = require('jquery');
     var appNgModule = angular.module(APP_NAME, ngDependencies);
 
     var ModuleConfig = [
@@ -106,9 +88,6 @@ define('camunda-cockpit-ui', [
       }
     }]);
 
-    require([
-      'domReady!'
-    ], function () {
       angular.bootstrap(document, [ appNgModule.name ]);
       var html = document.getElementsByTagName('html')[0];
 
@@ -120,16 +99,21 @@ define('camunda-cockpit-ui', [
       if (top !== window) {
         window.parent.postMessage({ type: 'loadamd' }, '*');
       }
-    });
 
 
 
-    /* live-reload
-    // loads livereload client library (without breaking other scripts execution)
-    require(['jquery'], function($) {
-      $('body').append('<script src="//' + location.hostname + ':LIVERELOAD_PORT/livereload.js?snipver=1"></script>');
-    });
-    /* */
-  });
-});
+  };
 
+  module.exports.exposePackages = function(container) {
+    container.angular = angular;
+    container.jquery = $;
+    container['camunda-commons-ui'] = commons;
+    container['camunda-bpm-sdk-js'] = sdk;
+    container['angular-data-depend'] = dataDepend;
+  };
+
+
+/* live-reload
+// loads livereload client library (without breaking other scripts execution)
+$('body').append('<script src="//' + location.hostname + ':LIVERELOAD_PORT/livereload.js?snipver=1"></script>');
+/* */

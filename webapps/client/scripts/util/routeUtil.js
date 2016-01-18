@@ -1,5 +1,3 @@
-/* global define: false */
-define([], function() {
   'use strict';
 
   /**
@@ -70,5 +68,4 @@ define([], function() {
     return redirectUrl + (search.length ? '?' + search.join('&') : '');
   }
 
-  return utils;
-});
+  module.exports = utils;

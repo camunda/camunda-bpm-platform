@@ -1,20 +1,15 @@
-/* global define: false, require: false */
-define([
-  'angular',
-  'cockpit/util/routeUtil',
-  'angular-data-depend',
-  'camunda-commons-ui',
-  'text!./decision-definition.html'],
-  function(
-  angular,
-  routeUtil,
-  dataDepend,
-  camCommons,
-  template) {
+'use strict';
 
-  'use strict';
+var fs = require('fs');
 
-  var module = angular.module('cam.cockpit.pages.decisionDefinition', [dataDepend.name, camCommons.name]);
+var template = fs.readFileSync(__dirname + '/decision-definition.html', 'utf8');
+
+var angular = require('angular'),
+    routeUtil = require('../util/routeUtil'),
+    dataDepend = require('angular-data-depend'),
+    camCommons = require('camunda-commons-ui/lib');
+
+  var ngModule = angular.module('cam.cockpit.pages.decisionDefinition', ['dataDepend', camCommons.name]);
 
   var Controller = [
           '$scope', '$rootScope', '$q', 'dataDepend', 'page', 'camAPI', 'decisionDefinition', 'Views', 'search',
@@ -229,10 +224,9 @@ define([
     });
   }];
 
-  module
+  ngModule
     .config(RouteConfig)
     .config(ViewConfig)
   ;
 
-  return module;
-  });
+  module.exports = ngModule;

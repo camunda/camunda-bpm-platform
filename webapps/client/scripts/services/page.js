@@ -1,7 +1,6 @@
-/* global define: false */
+'use strict';
 
-define(['angular'], function(angular) {
-  'use strict';
+var angular = require('angular');
 
   /**
    * A service to manage a page page.
@@ -13,7 +12,7 @@ define(['angular'], function(angular) {
    * @module cam.cockpit.services.page
    */
 
-  return [
+  module.exports = [
     '$rootScope',
     '$location',
     'camAPI',
@@ -166,4 +165,3 @@ define(['angular'], function(angular) {
       }
     };
   }];
-});

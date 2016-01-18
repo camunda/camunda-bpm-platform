@@ -1,28 +1,15 @@
-define([
-  'angular',
+'use strict';
 
-  'camunda-commons-ui/util/index',
-  './processDefinitionResource',
-  './incidentResource',
-  './processInstanceResource',
-  './localExecutionVariableResource',
-  './jobResource',
-  './taskResource',
-  './jobDefinitionResource'
-], function(
-  angular,
+var angular = require('angular'),
 
-  commonsUi,
-  processDefinitionResource,
-  incidentResource,
-  processInstanceResource,
-  localExecutionVariableResource,
-  jobResource,
-  taskResource,
-  jobDefinitionResource
-) {
-
-  'use strict';
+  commonsUi = require('camunda-commons-ui/lib/util/index'),
+  processDefinitionResource = require('./processDefinitionResource'),
+  incidentResource = require('./incidentResource'),
+  processInstanceResource = require('./processInstanceResource'),
+  localExecutionVariableResource = require('./localExecutionVariableResource'),
+  jobResource = require('./jobResource'),
+  taskResource = require('./taskResource'),
+  jobDefinitionResource = require('./jobDefinitionResource');
 
   var resourcesModule = angular.module('cam.cockpit.resources', []);
 
@@ -34,6 +21,4 @@ define([
   resourcesModule.factory('TaskResource', taskResource);
   resourcesModule.factory('JobDefinitionResource', jobDefinitionResource);
 
-  return resourcesModule;
-
-});
+  module.exports = resourcesModule;

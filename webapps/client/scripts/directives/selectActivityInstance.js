@@ -1,8 +1,6 @@
-/* global define: true */
-define([], function() {
   'use strict';
 
-  return function() {
+  module.exports = function() {
     return {
       link: function(scope, element) {
 
@@ -31,5 +29,3 @@ define([], function() {
       }
     };
   };
-
-});

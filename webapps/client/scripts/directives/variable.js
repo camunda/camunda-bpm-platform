@@ -2,8 +2,15 @@
   DEPRECATION WARNING:
   this directive should not be used anymore, see cam-widget-variable instead
 */
-define([ 'angular', 'text!./variable.html' ], function(angular, template) {
-  'use strict';
+
+'use strict';
+
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/variable.html', 'utf8');
+
+var angular = require('angular');
+
   var Directive = ['$compile', function ($compile) {
     return {
       restrict: 'EAC',
@@ -96,5 +103,4 @@ define([ 'angular', 'text!./variable.html' ], function(angular, template) {
     };
   }];
 
-  return Directive;
-});
+  module.exports = Directive;

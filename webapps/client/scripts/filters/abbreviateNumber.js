@@ -1,4 +1,5 @@
-define([], function() {
+'use strict';
+
   var AbbreviateNumberFilter = function() {
     return function(number, decimal) {
 
@@ -51,5 +52,4 @@ define([], function() {
       return number;
     }
   };
-  return AbbreviateNumberFilter;
-});
+  module.exports = AbbreviateNumberFilter;

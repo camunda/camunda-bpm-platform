@@ -1,5 +1,3 @@
-/* global define: false */
-define([], function() {
   'use strict';
   var TaskResource = [ '$resource', 'Uri', function ($resource, Uri) {
     var endpoint = Uri.appUri('engine://engine/:engine/task/:id/:action/:subAction');
@@ -40,5 +38,4 @@ define([], function() {
     });
   }];
 
-  return TaskResource;
-});
+  module.exports = TaskResource;

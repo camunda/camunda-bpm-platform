@@ -1,6 +1,10 @@
-/* global define: false */
-define([ 'angular', 'require', 'text!./activity-instance-tree.html' ], function(angular, require, template) {
-  'use strict';
+'use strict';
+
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/activity-instance-tree.html', 'utf8');
+
+var angular = require('angular');
 
   // QUESTION: Shouldn't we use the templateUrl property instead?
 
@@ -177,5 +181,4 @@ define([ 'angular', 'require', 'text!./activity-instance-tree.html' ], function(
     };
   }];
 
-  return Directive;
-});
+  module.exports = Directive;

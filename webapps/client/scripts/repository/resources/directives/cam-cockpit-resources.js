@@ -1,15 +1,14 @@
-define([
-  'angular',
-  'text!./cam-cockpit-resources.html'
-], function(
-  angular,
-  template
-) {
-  'use strict';
+'use strict';
+
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/cam-cockpit-resources.html', 'utf8');
+
+var angular = require('angular');
 
   var $ = angular.element;
 
-  return [function(){
+  module.exports = [function(){
 
     return {
 
@@ -144,4 +143,3 @@ define([
       }]
     };
   }];
-});

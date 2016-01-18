@@ -1,4 +1,3 @@
-/* global define: false, require: false */
 /**
   Defines a widget to filter activity instances in the activity tree
 
@@ -17,10 +16,16 @@
          item-selector=".tree-node-group">
     </div>
  */
-define(['jquery', 'text!./quick-filter.html'], function($, template) {
-  'use strict';
 
-  return function() {
+'use strict';
+
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/quick-filter.html', 'utf8');
+
+var $ = require('jquery');
+
+  module.exports = function() {
 
     /**
       determine if an element has to be schown
@@ -123,4 +128,3 @@ define(['jquery', 'text!./quick-filter.html'], function($, template) {
       }
     };
   };
-});

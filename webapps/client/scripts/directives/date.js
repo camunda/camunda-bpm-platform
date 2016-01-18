@@ -1,8 +1,6 @@
-/* global define: false */
-define([ 'angular' ], function(angular) {
-  'use strict';
+'use strict';
 
-  return function () {
+  module.exports = function () {
     return {
       restrict: 'A',
       require: 'ngModel',
@@ -50,4 +48,3 @@ define([ 'angular' ], function(angular) {
       }
     };
   };
-});

@@ -1,13 +1,12 @@
-define([
-  'angular',
-  'text!./cam-cockpit-resource-wrapper.html'
-], function(
-  angular,
-  template
-) {
-  'use strict';
+'use strict';
 
-  return [ function() {
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/cam-cockpit-resource-wrapper.html', 'utf8');
+
+var angular = require('angular');
+
+  module.exports = [ function() {
 
     return {
       restrict: 'A',
@@ -145,5 +144,3 @@ define([
       }]
     };
   }];
-});
-

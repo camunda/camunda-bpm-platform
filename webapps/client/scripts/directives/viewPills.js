@@ -1,8 +1,6 @@
-/* global define: false */
-define([], function() {
   'use strict';
 
-  return [
+  module.exports = [
   function() {
     var ViewPillsController = [
       '$scope',
@@ -44,4 +42,3 @@ define([], function() {
       controller: ViewPillsController
     };
   }];
-});

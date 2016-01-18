@@ -1,12 +1,8 @@
-/* global define: false, require: false */
-define([
-  'angular'
-], function(
-  angular
-) {
-  'use strict';
+'use strict';
 
-  return [
+var angular = require('angular');
+
+  module.exports = [
     '$scope',
     '$q',
     '$location',
@@ -280,5 +276,3 @@ define([
     });
 
   }];
-
-});
