@@ -1,20 +1,28 @@
-@import "_vars.less";
-@import "../../../camunda-commons-ui/resources/less/common";
-@import "../../../camunda-commons-ui/resources/less/_fonts";
+@import "cam-variables.less";
+@import (optional) "app-variables.less";
+@import "cam-bootstrap.less";
+@import "cam-common.less";
+
+/* ---------------------------------------------------------------- */
 
 
-@import "../../../camunda-commons-ui/lib/auth/page/login";
-@import "../../../camunda-commons-ui/resources/less/directives/notifications-panel";
-@import "../../../camunda-commons-ui/resources/less/directives/cam-breadcrumbs-panel";
-@import "../../../camunda-commons-ui/resources/less/directives/pagination";
-@import "../../../camunda-commons-ui/resources/less/directives/cam-in-place-text-field";
+@import "variable/cam-widget-variable";
+@import "variables-table/cam-widget-variables-table";
 
-@import "../../../camunda-commons-ui/lib/widgets/inline-field/cam-widget-inline-field";
-@import "../../../camunda-commons-ui/lib/widgets/search-pill/cam-widget-search-pill";
-@import "../../../camunda-commons-ui/lib/widgets/search/cam-widget-search";
-@import "../../../camunda-commons-ui/lib/widgets/loader/cam-widget-loader";
+@import "bpmn-viewer/cam-widget-bpmn-viewer.less";
 
-@import (less) "../../../camunda-commons-ui/resources/css/prism.css";
+
+@import "directives/notifications-panel";
+@import "directives/cam-breadcrumbs-panel";
+@import "directives/pagination";
+@import "directives/cam-in-place-text-field";
+
+@import "inline-field/cam-widget-inline-field";
+@import "search-pill/cam-widget-search-pill";
+@import "search/cam-widget-search";
+@import "loader/cam-widget-loader";
+
+@import (less) "prism.css";
 
 @import "_ctn";
 @import "_filters";
@@ -32,20 +40,7 @@
 @import "directives/view-pills";
 @import "directives/dmn-table";
 
-
-h1,
-h2,
-h3,
-h4 {
-  .font-light;
-}
-
-h1 {
-  text-transform: uppercase;
-}
+/* ---------------------------------------------------------------- */
 
 
-label,
-strong {
-  .font-bold();
-}
+@import (optional) "custom-styles.less";
