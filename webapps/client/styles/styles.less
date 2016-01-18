@@ -1,36 +1,17 @@
-@import "_vars.less";
-@import "../../../camunda-commons-ui/resources/less/common";
-@import "../../../camunda-commons-ui/resources/less/_fonts";
+@import "cam-variables.less";
+@import (optional) "app-variables.less";
+@import "cam-bootstrap.less";
+@import "cam-common.less";
 
-@import "../../../camunda-commons-ui/resources/less/directives/notifications-panel";
-@import "../../../camunda-commons-ui/resources/less/directives/pagination";
-@import "../../../camunda-commons-ui/lib/widgets/loader/cam-widget-loader";
-
-@import "pages/authorizations";
-
-
-h1,
-h2,
-h3,
-h4 {
-  .font-light;
-}
-
-h1 {
-  text-transform: uppercase;
-}
-
-
-label,
-strong {
-  .font-bold();
-}
-
-h1 .glyphicon {
-  font-size: 0.7em;
-}
+/* ---------------------------------------------------------------- */
 
 .page-header{
   margin-left: @grid-gutter-width / 2;
   margin-right: @grid-gutter-width / 2;
 }
+@import "pages/authorizations.less";
+
+/* ---------------------------------------------------------------- */
+
+
+@import (optional) "custom-styles.less";
