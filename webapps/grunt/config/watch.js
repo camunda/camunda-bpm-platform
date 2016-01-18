@@ -32,29 +32,6 @@ module.exports = function(config, watchConf) {
       ]
   };
 
-  watchConf.cockpit_scripts = {
-      options: options,
-      files: [
-        '<%= pkg.gruntConfig.cockpitSourceDir %>/scripts/**/*.{js,html,json}'
-      ],
-      tasks: [
-        'requirejs:cockpit_scripts'
-      ]
-  };
-
-  watchConf.cockpit_dependencies = {
-      options: options,
-      files: [
-        '<%= pkg.gruntConfig.cockpitSourceDir %>/../../camunda-commons-ui/lib/**/*.{js,html}',
-        '<%= pkg.gruntConfig.cockpitSourceDir %>/../../camunda-commons-ui/{resources,lib/*}/locales/**/*.json',
-        '<%= pkg.gruntConfig.cockpitSourceDir %>/../../camunda-commons-ui/node_modules/camunda-bpm-sdk-js/dist/**/*.js',
-        '../../camunda-bpm-platform-ee/webapps/camunda-webapp/plugins/target/classes/plugin-webapp/**/*.{js,html}'
-      ],
-      tasks: [
-        'requirejs:cockpit_scripts'
-      ]
-  };
-
   watchConf.cockpit_dist = {
     options: {
       cwd: '<%= pkg.gruntConfig.cockpitBuildTarget %>/',
