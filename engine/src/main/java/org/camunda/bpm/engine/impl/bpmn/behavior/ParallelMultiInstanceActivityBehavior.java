@@ -94,7 +94,12 @@ public class ParallelMultiInstanceActivityBehavior extends MultiInstanceActivity
   }
 
   protected boolean allExecutionsEnded(ActivityExecution scopeExecution, ActivityExecution endedExecution) {
-    return getLocalLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES) <= 0;
+    int numberOfInactiveConcurrentExecutions = endedExecution.findInactiveConcurrentExecutions(endedExecution.getActivity()).size();
+    int concurrentExecutions = scopeExecution.getExecutions().size();
+
+    // no active instances exist and all concurrent executions are inactive
+    return getLocalLoopVariable(scopeExecution, NUMBER_OF_ACTIVE_INSTANCES) <= 0 &&
+           numberOfInactiveConcurrentExecutions == concurrentExecutions;
   }
 
   @Override

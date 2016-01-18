@@ -804,25 +804,18 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
   @SuppressWarnings({ "rawtypes", "unchecked" })
   public List<ActivityExecution> findInactiveConcurrentExecutions(PvmActivity activity) {
     List<PvmExecutionImpl> inactiveConcurrentExecutionsInActivity = new ArrayList<PvmExecutionImpl>();
-    List<PvmExecutionImpl> otherConcurrentExecutions = new ArrayList<PvmExecutionImpl>();
     if (isConcurrent()) {
       List< ? extends PvmExecutionImpl> concurrentExecutions = getParent().getAllChildExecutions();
       for (PvmExecutionImpl concurrentExecution: concurrentExecutions) {
-        if (concurrentExecution.getActivity()==activity) {
-          if (!concurrentExecution.isActive()) {
-            inactiveConcurrentExecutionsInActivity.add(concurrentExecution);
-          }
-        } else {
-          otherConcurrentExecutions.add(concurrentExecution);
+        if (concurrentExecution.getActivity() == activity && !concurrentExecution.isActive()) {
+          inactiveConcurrentExecutionsInActivity.add(concurrentExecution);
         }
       }
-    } else {
-      if (!isActive()) {
-        inactiveConcurrentExecutionsInActivity.add(this);
-      } else {
-        otherConcurrentExecutions.add(this);
-      }
     }
+    else if (!isActive()) {
+      inactiveConcurrentExecutionsInActivity.add(this);
+    }
+
     return (List) inactiveConcurrentExecutionsInActivity;
   }
 

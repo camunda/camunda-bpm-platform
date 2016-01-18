@@ -18,9 +18,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.MessageCorrelationBuilderImpl;
+import org.camunda.bpm.engine.impl.cmd.MessageEventReceivedCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -412,6 +415,50 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     assertTrue(exception instanceof OptimisticLockingException);
   }
 
+  @Deployment
+  public void testConcurrentEndExecutionListener() {
+    InvocationLogListener.reset();
+
+    // given a process instance
+    runtimeService.startProcessInstanceByKey("testProcess");
+
+    List<Execution> tasks = runtimeService.createExecutionQuery().messageEventSubscriptionName("Message").list();
+    // two tasks waiting for the message
+    assertEquals(2, tasks.size());
+
+    // start first thread and wait in the second Execution End Listener
+    ThreadControl thread1 = executeControllableCommand(new ControllableMessageEventReceivedCommand(tasks.get(0).getId(), "Message", true));
+    thread1.reportInterrupts();
+    thread1.waitForSync();
+
+    // start second thread and complete the task
+    ThreadControl thread2 = executeControllableCommand(new ControllableMessageEventReceivedCommand(tasks.get(1).getId(), "Message", false));
+    thread2.waitForSync();
+    thread2.makeContinue();
+    thread2.waitUntilDone();
+
+    // the execution listener was executed on task 1 and 2
+    assertEquals(2, InvocationLogListener.getInvocations());
+
+    // continue with thread 1
+    thread1.makeContinueAndWaitForSync();
+
+    // the execution listener was not executed again
+    assertEquals(2, InvocationLogListener.getInvocations());
+
+    // complete thread 1
+    thread1.makeContinue();
+    thread1.waitUntilDone();
+
+    // thread 1 was rolled back with an optimistic locking exception
+    Throwable exception = thread1.getException();
+    assertNotNull(exception);
+    assertTrue(exception instanceof OptimisticLockingException);
+
+    // the execution listener was not executed again
+    assertEquals(2, InvocationLogListener.getInvocations());
+  }
+
   public static class InvocationLogListener implements JavaDelegate {
 
     protected static AtomicInteger invocations = new AtomicInteger(0);
@@ -427,6 +474,23 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
 
     public static int getInvocations() {
       return invocations.get();
+    }
+  }
+
+  public static class WaitingListener implements ExecutionListener {
+
+    protected static ThreadControl monitor;
+
+    public void notify(DelegateExecution execution) throws Exception {
+      if (WaitingListener.monitor != null) {
+        ThreadControl localMonitor = WaitingListener.monitor;
+        WaitingListener.monitor = null;
+        localMonitor.sync();
+      }
+    }
+
+    public static void setMonitor(ThreadControl monitor) {
+      WaitingListener.monitor = monitor;
     }
   }
 
@@ -469,4 +533,33 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     }
 
   }
+
+  protected static class ControllableMessageEventReceivedCommand extends ControllableCommand<Void> {
+
+    protected final String executionId;
+    protected final String messageName;
+    protected final boolean shouldWaitInListener;
+
+    public ControllableMessageEventReceivedCommand(String executionId, String messageName, boolean shouldWaitInListener) {
+      this.executionId = executionId;
+      this.messageName = messageName;
+      this.shouldWaitInListener = shouldWaitInListener;
+    }
+
+    public Void execute(CommandContext commandContext) {
+
+      if (shouldWaitInListener) {
+        WaitingListener.setMonitor(monitor);
+      }
+
+      MessageEventReceivedCmd receivedCmd = new MessageEventReceivedCmd(messageName, executionId, null);
+
+      receivedCmd.execute(commandContext);
+
+      monitor.sync();
+
+      return null;
+    }
+  }
+
 }
