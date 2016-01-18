@@ -36,6 +36,8 @@ public interface ResourceDefinitionEntity extends ResourceDefinition {
 
   void setDiagramResourceName(String diagramResourceName);
 
+  void setTenantId(String tenantId);
+
   ResourceDefinitionEntity getPreviousDefinition();
 
 }

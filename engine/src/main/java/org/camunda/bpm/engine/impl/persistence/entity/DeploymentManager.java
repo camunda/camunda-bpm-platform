@@ -81,7 +81,8 @@ public class DeploymentManager extends AbstractManager {
       // remove timer start events:
       List<JobEntity> timerStartJobs = getJobManager().findJobsByConfiguration(TimerStartEventJobHandler.TYPE, processDefinition.getKey());
 
-      ProcessDefinitionEntity latestVersion = getProcessDefinitionManager().findLatestProcessDefinitionByKey(processDefinition.getKey());
+      ProcessDefinitionEntity latestVersion = getProcessDefinitionManager()
+          .findLatestProcessDefinitionByKeyAndTenantId(processDefinition.getKey(), processDefinition.getTenantId());
 
       // delete timer start event jobs only if this is the latest version of the process definition.
       if(latestVersion != null && latestVersion.getId().equals(processDefinition.getId())) {

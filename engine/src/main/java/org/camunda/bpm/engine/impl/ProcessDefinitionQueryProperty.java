@@ -30,5 +30,6 @@ public interface ProcessDefinitionQueryProperty {
   public static final QueryProperty PROCESS_DEFINITION_VERSION = new QueryPropertyImpl("VERSION_");
   public static final QueryProperty PROCESS_DEFINITION_NAME = new QueryPropertyImpl("NAME_");
   public static final QueryProperty DEPLOYMENT_ID = new QueryPropertyImpl("DEPLOYMENT_ID_");
+  public static final QueryProperty TENANT_ID = new QueryPropertyImpl("TENANT_ID_");
 
 }

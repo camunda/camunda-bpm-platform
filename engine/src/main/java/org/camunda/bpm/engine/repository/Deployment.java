@@ -41,8 +41,8 @@ public interface Deployment {
   String getSource();
 
   /**
-   * Returns the tenant id of the deployment. The id is <code>null</code> if no
-   * tenant id was set on the {@link DeploymentBuilder}.
+   * Returns the id of the tenant this deployment belongs to. Can be <code>null</code>
+   * if the deployment belongs to no single tenant.
    */
   String getTenantId();
 

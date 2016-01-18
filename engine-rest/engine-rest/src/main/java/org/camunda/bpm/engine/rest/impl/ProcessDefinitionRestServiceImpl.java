@@ -12,7 +12,12 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
+
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
@@ -31,10 +36,7 @@ import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.repository.ProcessDefinitionResource;
 import org.camunda.bpm.engine.rest.sub.repository.impl.ProcessDefinitionResourceImpl;
 
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
-import java.util.ArrayList;
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineAware implements ProcessDefinitionRestService {
 
@@ -48,19 +50,29 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
       throw new InvalidRequestException(Status.BAD_REQUEST, "Query parameter 'processDefinitionKey' cannot be null");
     }
 
-    ProcessDefinitionQuery processDefinitionQuery = getProcessEngine().getRepositoryService().createProcessDefinitionQuery();
-    processDefinitionQuery = processDefinitionQuery.processDefinitionKey(processDefinitionKey);
+    ProcessDefinitionQuery processDefinitionQuery = getProcessEngine()
+        .getRepositoryService()
+        .createProcessDefinitionQuery()
+        .processDefinitionKey(processDefinitionKey)
+        .latestVersion();
 
-    ProcessDefinition processDefinition = processDefinitionQuery.latestVersion().singleResult();
-
-    if (processDefinition == null) {
+    long count = processDefinitionQuery.count();
+    if(count == 0){
       String errorMessage = String.format("No matching process definition with key: %s ", processDefinitionKey);
       throw new RestException(Status.NOT_FOUND, errorMessage);
+
+    } else if(count > 1) {
+      String errorMessage = String.format(
+          "Found multiple process definition with key '%s' for different tenants. You have to request the process definition by id instead of key.",
+          processDefinitionKey);
+      throw new RestException(Status.BAD_REQUEST, errorMessage);
+
+    } else {
+      ProcessDefinition processDefinition = processDefinitionQuery.singleResult();
+      ProcessDefinitionResource processDefinitionResource = getProcessDefinitionById(processDefinition.getId());
+
+      return processDefinitionResource;
     }
-
-    ProcessDefinitionResource processDefinitionResource = getProcessDefinitionById(processDefinition.getId());
-
-    return processDefinitionResource;
   }
 
   @Override

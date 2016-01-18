@@ -52,7 +52,7 @@ public class CmmnDeployer extends AbstractDefinitionDeployer<CaseDefinitionEntit
     return getCaseDefinitionManager().findCaseDefinitionByDeploymentAndKey(deploymentId, definitionKey);
   }
 
-  protected CaseDefinitionEntity findLatestDefinitionByKey(String definitionKey) {
+  protected CaseDefinitionEntity findLatestDefinitionByKeyAndTenantId(String definitionKey, String tenantId) {
     return getCaseDefinitionManager().findLatestCaseDefinitionByKey(definitionKey);
   }
 

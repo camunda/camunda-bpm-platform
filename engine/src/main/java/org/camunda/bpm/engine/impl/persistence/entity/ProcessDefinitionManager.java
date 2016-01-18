@@ -17,8 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.identity.Group;
-import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -46,8 +45,43 @@ public class ProcessDefinitionManager extends AbstractManager {
 
   // select ///////////////////////////////////////////////////////////
 
+  /**
+   * @return the latest version of the process definition with the given key (from any tenant)
+   *
+   * @throws ProcessEngineException if more than one tenant has a process definition with the given key
+   *
+   * @see #findLatestProcessDefinitionByKeyAndTenantId(String, String)
+   */
   public ProcessDefinitionEntity findLatestProcessDefinitionByKey(String processDefinitionKey) {
-    return (ProcessDefinitionEntity) getDbEntityManager().selectOne("selectLatestProcessDefinitionByKey", processDefinitionKey);
+    @SuppressWarnings("unchecked")
+    List<ProcessDefinitionEntity> processDefinitions = getDbEntityManager().selectList("selectLatestProcessDefinitionByKey", processDefinitionKey);
+
+    if (processDefinitions.isEmpty()) {
+      return null;
+
+    } else if (processDefinitions.size() == 1) {
+      return processDefinitions.iterator().next();
+
+    } else {
+      throw LOG.multipleTenantsForProcessDefinitionKeyException(processDefinitionKey);
+    }
+  }
+
+  /**
+   * @return the latest version of the process definition with the given key and tenant id
+   *
+   * @see #findLatestProcessDefinitionByKeyAndTenantId(String, String)
+   */
+  public ProcessDefinitionEntity findLatestProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String tenantId) {
+    Map<String, String> parameters = new HashMap<String, String>();
+    parameters.put("processDefinitionKey", processDefinitionKey);
+    parameters.put("tenantId", tenantId);
+
+    if (tenantId == null) {
+      return (ProcessDefinitionEntity) getDbEntityManager().selectOne("selectLatestProcessDefinitionByKeyWithoutTenantId", parameters);
+    } else {
+      return (ProcessDefinitionEntity) getDbEntityManager().selectOne("selectLatestProcessDefinitionByKeyAndTenantId", parameters);
+    }
   }
 
   public ProcessDefinitionEntity findLatestProcessDefinitionById(String processDefinitionId) {

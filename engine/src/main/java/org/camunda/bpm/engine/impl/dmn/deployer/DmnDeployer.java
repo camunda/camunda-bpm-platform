@@ -56,7 +56,7 @@ public class DmnDeployer extends AbstractDefinitionDeployer<DecisionDefinitionEn
     return getDecisionDefinitionManager().findDecisionDefinitionByDeploymentAndKey(deploymentId, definitionKey);
   }
 
-  protected DecisionDefinitionEntity findLatestDefinitionByKey(String definitionKey) {
+  protected DecisionDefinitionEntity findLatestDefinitionByKeyAndTenantId(String definitionKey, String tenantId) {
     return getDecisionDefinitionManager().findLatestDecisionDefinitionByKey(definitionKey);
   }
 

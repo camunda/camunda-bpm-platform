@@ -118,8 +118,8 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
   }
 
   @Override
-  protected ProcessDefinitionEntity findLatestDefinitionByKey(String definitionKey) {
-    return getProcessDefinitionManager().findLatestProcessDefinitionByKey(definitionKey);
+  protected ProcessDefinitionEntity findLatestDefinitionByKeyAndTenantId(String definitionKey, String tenantId) {
+    return getProcessDefinitionManager().findLatestProcessDefinitionByKeyAndTenantId(definitionKey, tenantId);
   }
 
   @Override
@@ -160,7 +160,7 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
 
     updateJobDeclarations(declarations, definition, deployment.isNew());
 
-    ProcessDefinitionEntity latestDefinition = findLatestDefinitionByKey(definition.getKey());
+    ProcessDefinitionEntity latestDefinition = findLatestDefinitionByKeyAndTenantId(definition.getKey(), definition.getTenantId());
 
     if (deployment.isNew()) {
       adjustStartEventSubscriptions(definition, latestDefinition);

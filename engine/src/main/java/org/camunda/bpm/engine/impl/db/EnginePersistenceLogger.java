@@ -550,6 +550,15 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
 
   public void debugJobExecuted(JobEntity jobEntity) {
     logDebug(
-        "067", "Job executed, deleting it", jobEntity);
+        "069", "Job executed, deleting it", jobEntity);
   }
+
+  public ProcessEngineException multipleTenantsForProcessDefinitionKeyException(String processDefinitionKey) {
+    return new ProcessEngineException(exceptionMessage(
+        "070",
+        "Cannot resolve a unique process definition for key '{}' because it exists for multiple tenants.",
+        processDefinitionKey
+        ));
+  }
+
 }

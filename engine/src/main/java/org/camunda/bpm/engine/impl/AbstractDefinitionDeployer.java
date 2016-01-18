@@ -221,8 +221,9 @@ public abstract class AbstractDefinitionDeployer<DefinitionEntity extends Resour
   protected void persistDefinitions(DeploymentEntity deployment, List<DefinitionEntity> definitions, Properties properties) {
     for (DefinitionEntity definition : definitions) {
       String definitionKey = definition.getKey();
+      String tenantId = deployment.getTenantId();
 
-      DefinitionEntity latestDefinition = findLatestDefinitionByKey(definitionKey);
+      DefinitionEntity latestDefinition = findLatestDefinitionByKeyAndTenantId(definitionKey, tenantId);
 
       updateDefinitionByLatestDefinition(deployment, definition, latestDefinition);
 
@@ -235,6 +236,7 @@ public abstract class AbstractDefinitionDeployer<DefinitionEntity extends Resour
     definition.setVersion(getNextVersion(deployment, definition, latestDefinition));
     definition.setId(generateDefinitionId(deployment, definition, latestDefinition));
     definition.setDeploymentId(deployment.getId());
+    definition.setTenantId(deployment.getTenantId());
   }
 
   protected void loadDefinitions(DeploymentEntity deployment, List<DefinitionEntity> definitions, Properties properties) {
@@ -256,6 +258,7 @@ public abstract class AbstractDefinitionDeployer<DefinitionEntity extends Resour
     definition.setVersion(persistedDefinition.getVersion());
     definition.setId(persistedDefinition.getId());
     definition.setDeploymentId(deployment.getId());
+    definition.setTenantId(persistedDefinition.getTenantId());
   }
 
   /**
@@ -278,11 +281,11 @@ public abstract class AbstractDefinitionDeployer<DefinitionEntity extends Resour
   protected abstract DefinitionEntity findDefinitionByDeploymentAndKey(String deploymentId, String definitionKey);
 
   /**
-   * Find the last deployed definition entity by definition key.
-   * @param definitionKey the definition key
+   * Find the last deployed definition entity by definition key and tenant id.
+   *
    * @return the corresponding definition entity or null if non is found
    */
-  protected abstract DefinitionEntity findLatestDefinitionByKey(String definitionKey);
+  protected abstract DefinitionEntity findLatestDefinitionByKeyAndTenantId(String definitionKey, String tenantId);
 
   /**
    * Persist definition entity into the database.

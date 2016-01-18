@@ -682,8 +682,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(4, repositoryService.createProcessDefinitionQuery().orderByProcessDefinitionName().asc().count());
     assertEquals(2, repositoryService.createProcessDefinitionQuery().latestVersion().orderByProcessDefinitionName().asc().count());
 
-    repositoryService.deleteDeployment(deployment1Id);
-    repositoryService.deleteDeployment(deployment2Id);
+    deleteDeployments(Arrays.asList(deployment1Id, deployment2Id));
   }
 
   public void testGetProcessDefinitions() {
@@ -764,34 +763,6 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(1, processDefinition.getVersion());
 
     deleteDeployments(deploymentIds);
-  }
-
-  public void testDeploymentWithTenantId() {
-    String deploymentTenantOne = repositoryService
-      .createDeployment()
-      .tenantId("tenant 1")
-      .addClasspathResource("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
-      .deploy()
-      .getId();
-
-    String deploymentTenantTwo = repositoryService
-        .createDeployment()
-        .tenantId("tenant 2")
-        .addClasspathResource("org/camunda/bpm/engine/test/api/twoTasksProcess.bpmn20.xml")
-        .deploy()
-        .getId();
-
-    List<org.camunda.bpm.engine.repository.Deployment> deployments = repositoryService
-        .createDeploymentQuery()
-        .orderByTenantId()
-        .asc()
-        .list();
-
-    assertEquals(2, deployments.size());
-    assertEquals("tenant 1", deployments.get(0).getTenantId());
-    assertEquals("tenant 2", deployments.get(1).getTenantId());
-
-    deleteDeployments(Arrays.asList(deploymentTenantOne, deploymentTenantTwo));
   }
 
   private String deployProcessString(String processString) {

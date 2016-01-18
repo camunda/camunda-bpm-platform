@@ -36,6 +36,7 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
   private static final String SORT_BY_NAME_VALUE = "name";
   private static final String SORT_BY_VERSION_VALUE = "version";
   private static final String SORT_BY_DEPLOYMENT_ID_VALUE = "deploymentId";
+  private static final String SORT_BY_TENANT_ID = "tenantId";
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -46,6 +47,7 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
     VALID_SORT_BY_VALUES.add(SORT_BY_NAME_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_VERSION_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_DEPLOYMENT_ID_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID);
   }
 
   private String processDefinitionId;
@@ -68,6 +70,8 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
   private String incidentType;
   private String incidentMessage;
   private String incidentMessageLike;
+  private String tenantId;
+  private List<String> tenantIds;
 
   public ProcessDefinitionQueryDto() {
 
@@ -195,6 +199,16 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
     this.incidentMessageLike = incidentMessageLike;
   }
 
+  @CamundaQueryParam("tenantId")
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
+  @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
+  public void setTenantIdIn(List<String> tenantIds) {
+    this.tenantIds = tenantIds;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -267,6 +281,12 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
     if (incidentMessageLike != null) {
       query.incidentMessageLike(incidentMessageLike);
     }
+    if (tenantId != null) {
+      query.tenantId(tenantId);
+    }
+    if (tenantIds != null && !tenantIds.isEmpty()) {
+      query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
   }
 
   @Override
@@ -283,6 +303,8 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
       query.orderByProcessDefinitionName();
     } else if (sortBy.equals(SORT_BY_DEPLOYMENT_ID_VALUE)) {
       query.orderByDeploymentId();
+    } else if (sortBy.equals(SORT_BY_TENANT_ID)) {
+      query.orderByTenantId();
     }
   }
 }

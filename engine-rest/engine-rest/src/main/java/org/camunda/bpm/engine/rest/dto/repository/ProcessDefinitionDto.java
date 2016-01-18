@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,7 +26,8 @@ public class ProcessDefinitionDto {
   protected String deploymentId;
   protected String diagram;
   protected boolean suspended;
-  
+  protected String tenantId;
+
   public String getId() {
     return id;
   }
@@ -67,6 +68,10 @@ public class ProcessDefinitionDto {
     return suspended;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
   public static ProcessDefinitionDto fromProcessDefinition(ProcessDefinition definition) {
     ProcessDefinitionDto dto = new ProcessDefinitionDto();
     dto.id = definition.getId();
@@ -79,7 +84,9 @@ public class ProcessDefinitionDto {
     dto.deploymentId = definition.getDeploymentId();
     dto.diagram = definition.getDiagramResourceName();
     dto.suspended = definition.isSuspended();
-    
+    dto.tenantId = definition.getTenantId();
+
     return dto;
   }
+
 }

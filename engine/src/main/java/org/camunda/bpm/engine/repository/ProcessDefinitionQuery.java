@@ -74,15 +74,26 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
   ProcessDefinitionQuery processDefinitionVersion(Integer processDefinitionVersion);
 
   /**
-   * Only select the process definitions which are the latest deployed
-   * (ie. which have the highest version number for the given key).
+   * <p>
+   * Only select the process definitions which are the latest deployed (ie.
+   * which have the highest version number for the given key).
+   * </p>
    *
-   * Can only be used in combinatioin with {@link #processDefinitionKey(String)} of {@link #processDefinitionKeyLike(String)}.
-   * Can also be used without any other criteria (ie. query.latest().list()), which
-   * will then give all the latest versions of all the deployed process definitions.
+   * <p>
+   * Can only be used in combination with {@link #processDefinitionKey(String)}
+   * of {@link #processDefinitionKeyLike(String)}. Can also be used without any
+   * other criteria (ie. query.latest().list()), which will then give all the
+   * latest versions of all the deployed process definitions.
+   * </p>
    *
-   * @throws ProcessEngineException if used in combination with  {@link #groupId(string)}, {@link #processDefinitionVersion(int)}
-   *                           or {@link #deploymentId(String)}
+   * <p>For multi-tenancy: select the latest deployed process definitions for each
+   * tenant. If a process definition is deployed for multiple tenants then all
+   * process definitions are selected.</p>
+   *
+   * @throws ProcessEngineException
+   *           if used in combination with {@link #groupId(string)},
+   *           {@link #processDefinitionVersion(int)} or
+   *           {@link #deploymentId(String)}
    */
   ProcessDefinitionQuery latestVersion();
 
@@ -141,6 +152,12 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
    */
   ProcessDefinitionQuery messageEventSubscriptionName(String messageName);
 
+  /** Only select process definitions with the given tenant id. */
+  ProcessDefinitionQuery tenantId(String tenantId);
+
+  /** Only select process definitions with one of the given tenant ids. */
+  ProcessDefinitionQuery tenantIdIn(String... tenantIds);
+
   // ordering ////////////////////////////////////////////////////////////
 
   /** Order by the category of the process definitions (needs to be followed by {@link #asc()} or {@link #desc()}). */
@@ -160,5 +177,8 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
 
   /** Order by deployment id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   ProcessDefinitionQuery orderByDeploymentId();
+
+  /** Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  ProcessDefinitionQuery orderByTenantId();
 
 }

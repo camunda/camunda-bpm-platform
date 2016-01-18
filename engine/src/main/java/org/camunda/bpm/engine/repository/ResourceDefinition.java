@@ -41,7 +41,13 @@ public interface ResourceDefinition {
   /** The deployment in which this definition is contained. */
   String getDeploymentId();
 
-  /** The diagram resource name for this decision if exist */
+  /** The diagram resource name for this definition if exist */
   String getDiagramResourceName();
+
+  /**
+   * The id of the tenant this definition belongs to. Can be <code>null</code>
+   * if the definition belongs to no single tenant.
+   */
+  String getTenantId();
 
 }

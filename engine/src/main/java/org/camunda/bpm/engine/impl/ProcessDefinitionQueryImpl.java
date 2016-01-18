@@ -68,6 +68,8 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
 
   protected String eventSubscriptionName;
   protected String eventSubscriptionType;
+  protected String tenantId;
+  protected String[] tenantIds;
 
   public ProcessDefinitionQueryImpl() {
   }
@@ -212,6 +214,18 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     return super.hasExcludingConditions() || CompareUtil.elementIsNotContainedInArray(id, ids);
   }
 
+  public ProcessDefinitionQuery tenantId(String tenantId) {
+    ensureNotNull("tenantId", tenantId);
+    this.tenantId = tenantId;
+    return this;
+  }
+
+  public ProcessDefinitionQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    return this;
+  }
+
   //sorting ////////////////////////////////////////////
 
   public ProcessDefinitionQuery orderByDeploymentId() {
@@ -238,8 +252,13 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     return orderBy(ProcessDefinitionQueryProperty.PROCESS_DEFINITION_NAME);
   }
 
+  public ProcessDefinitionQuery orderByTenantId() {
+    return orderBy(ProcessDefinitionQueryProperty.TENANT_ID);
+  }
+
   //results ////////////////////////////////////////////
 
+  @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     return commandContext
@@ -247,6 +266,7 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
       .findProcessDefinitionCountByQueryCriteria(this);
   }
 
+  @Override
   public List<ProcessDefinition> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     List<ProcessDefinition> list = commandContext
@@ -276,6 +296,7 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     return list;
   }
 
+  @Override
   public void checkQueryOk() {
     super.checkQueryOk();
 

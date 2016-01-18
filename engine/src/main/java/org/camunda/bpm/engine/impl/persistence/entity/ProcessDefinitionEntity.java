@@ -61,6 +61,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
   protected Map<String, TaskDefinition> taskDefinitions;
   protected boolean hasStartFormKey;
   protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
+  protected String tenantId;
   protected boolean isIdentityLinksInitialized = false;
   protected List<IdentityLinkEntity> definitionIdentityLinkEntities = new ArrayList<IdentityLinkEntity>();
   protected Set<Expression> candidateStarterUserIdExpressions = new HashSet<Expression>();
@@ -81,26 +82,32 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     }
   }
 
+  @Override
   public ExecutionEntity createProcessInstance() {
     return (ExecutionEntity) super.createProcessInstance();
   }
 
+  @Override
   public ExecutionEntity createProcessInstance(String businessKey) {
     return (ExecutionEntity) super.createProcessInstance(businessKey);
   }
 
+  @Override
   public ExecutionEntity createProcessInstance(String businessKey, String caseInstanceId) {
     return (ExecutionEntity) super.createProcessInstance(businessKey, caseInstanceId);
   }
 
+  @Override
   public ExecutionEntity createProcessInstance(String businessKey, ActivityImpl initial) {
     return (ExecutionEntity) super.createProcessInstance(businessKey, initial);
   }
 
+  @Override
   protected PvmExecutionImpl newProcessInstance() {
     return ExecutionEntity.createNewExecution();
   }
 
+  @Override
   public ExecutionEntity createProcessInstance(String businessKey, String caseInstanceId, ActivityImpl initial) {
     ensureNotSuspended();
 
@@ -165,6 +172,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     return definitionIdentityLinkEntities;
   }
 
+  @Override
   public String toString() {
     return "ProcessDefinitionEntity["+id+"]";
   }
@@ -273,10 +281,12 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     this.key = key;
   }
 
+  @Override
   public String getDescription() {
     return (String) getProperty(BpmnParse.PROPERTYNAME_DOCUMENTATION);
   }
 
+  @Override
   public String getDeploymentId() {
     return deploymentId;
   }
@@ -294,6 +304,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     firstVersion = (this.version == 1);
   }
 
+  @Override
   public void setId(String id) {
     this.id = id;
   }
@@ -338,6 +349,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     this.category = category;
   }
 
+  @Override
   public String getDiagramResourceName() {
     return diagramResourceName;
   }
@@ -407,6 +419,14 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
 
   public void addCandidateStarterGroupIdExpression(Expression groupId) {
     candidateStarterGroupIdExpressions.add(groupId);
+  }
+
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
   }
 
 }

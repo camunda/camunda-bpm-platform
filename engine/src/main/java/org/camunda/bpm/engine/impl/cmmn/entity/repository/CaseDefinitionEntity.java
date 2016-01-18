@@ -209,8 +209,20 @@ public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefi
     return CaseDefinitionEntity.class;
   }
 
+  @Override
   public String toString() {
     return "CaseDefinitionEntity["+id+"]";
+  }
+
+  @Override
+  public String getTenantId() {
+    // TODO add tenant id - see CAM-5189
+    return null;
+  }
+
+  @Override
+  public void setTenantId(String tenantId) {
+    // TODO set tenant id - see CAM-5189
   }
 
 }

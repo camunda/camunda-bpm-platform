@@ -1033,12 +1033,23 @@ public abstract class MockProvider {
     return mocks;
   }
 
+  public static List<ProcessDefinition> createMockProcessDefinitionsTwoTenants() {
+    List<ProcessDefinition> mocks = new ArrayList<ProcessDefinition>();
+    mocks.add(createMockDefinition(EXAMPLE_TENANT_ID));
+    mocks.add(createMockDefinition(ANOTHER_EXAMPLE_TENANT_ID));
+    return mocks;
+  }
+
   public static ProcessDefinition createMockDefinition() {
+    return createMockDefinition(EXAMPLE_TENANT_ID);
+  }
+
+  public static ProcessDefinition createMockDefinition(String tenantId) {
     MockDefinitionBuilder builder = new MockDefinitionBuilder();
     ProcessDefinition mockDefinition = builder.id(EXAMPLE_PROCESS_DEFINITION_ID).category(EXAMPLE_PROCESS_DEFINITION_CATEGORY)
         .name(EXAMPLE_PROCESS_DEFINITION_NAME).key(EXAMPLE_PROCESS_DEFINITION_KEY).description(EXAMPLE_PROCESS_DEFINITION_DESCRIPTION)
         .version(EXAMPLE_PROCESS_DEFINITION_VERSION).resource(EXAMPLE_PROCESS_DEFINITION_RESOURCE_NAME).deploymentId(EXAMPLE_DEPLOYMENT_ID)
-        .diagram(EXAMPLE_PROCESS_DEFINITION_DIAGRAM_RESOURCE_NAME).suspended(EXAMPLE_PROCESS_DEFINITION_IS_SUSPENDED).build();
+        .diagram(EXAMPLE_PROCESS_DEFINITION_DIAGRAM_RESOURCE_NAME).suspended(EXAMPLE_PROCESS_DEFINITION_IS_SUSPENDED).tenantId(tenantId).build();
 
     return mockDefinition;
   }
@@ -1068,7 +1079,7 @@ public abstract class MockProvider {
   }
 
   public static Deployment createMockDeployment() {
-    return createMockDeployment(null);
+    return createMockDeployment(EXAMPLE_TENANT_ID);
   }
 
   public static Deployment createMockDeployment(String tenantId) {

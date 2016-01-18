@@ -67,10 +67,12 @@ public class DecisionDefinitionEntity extends DmnDecisionTableImpl implements De
     return revision + 1;
   }
 
+  @Override
   public String getName() {
     return name;
   }
 
+  @Override
   public void setName(String name) {
     this.name = name;
   }
@@ -83,10 +85,12 @@ public class DecisionDefinitionEntity extends DmnDecisionTableImpl implements De
     this.category = category;
   }
 
+  @Override
   public String getKey() {
     return key;
   }
 
+  @Override
   public void setKey(String key) {
     this.key = key;
   }
@@ -211,6 +215,17 @@ public class DecisionDefinitionEntity extends DmnDecisionTableImpl implements De
       ", version=" + version +
       ", deploymentId='" + deploymentId + '\'' +
       '}';
+  }
+
+  @Override
+  public String getTenantId() {
+    // TODO add tenant id - see CAM-5190
+    return null;
+  }
+
+  @Override
+  public void setTenantId(String tenantId) {
+    // TODO set tenant id - see CAM-5190
   }
 
 }
