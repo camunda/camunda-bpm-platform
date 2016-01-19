@@ -18,8 +18,9 @@ import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.impl.ProcessApplicationContextImpl;
 import org.camunda.bpm.application.impl.ProcessApplicationIdentifier;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.context.Context;
 
 /**
@@ -27,6 +28,8 @@ import org.camunda.bpm.engine.impl.context.Context;
  *
  */
 public class ProcessApplicationContextInterceptor extends CommandInterceptor {
+
+  private final static CommandLogger LOG = ProcessEngineLogger.CMD_LOGGER;
 
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
@@ -46,6 +49,7 @@ public class ProcessApplicationContextInterceptor extends CommandInterceptor {
         ProcessApplicationReference reference = getPaReference(processApplicationIdentifier);
         return Context.executeWithinProcessApplication(new Callable<T>() {
 
+          @Override
           public T call() throws Exception {
             return next.execute(command);
           }
@@ -75,14 +79,14 @@ public class ProcessApplicationContextInterceptor extends CommandInterceptor {
        ProcessApplicationReference reference = runtimeContainerDelegate.getDeployedProcessApplication(processApplicationIdentifier.getName());
 
        if (reference == null) {
-         throw new ProcessEngineException("A process application with name " + processApplicationIdentifier.getName() + " is not registered");
+         throw LOG.paWithNameNotRegistered(processApplicationIdentifier.getName());
        }
        else {
          return reference;
        }
     }
     else {
-      throw new ProcessEngineException("Cannot resolve process application based on " + processApplicationIdentifier);
+      throw LOG.cannotReolvePa(processApplicationIdentifier);
     }
   }
 

@@ -160,6 +160,7 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
     ((TypedValueSerializer<TypedValue>) serializer).writeValue(value, valueFields);
   }
 
+  @Override
   public void onCommandContextClose(CommandContext commandContext) {
     if (isValuedImplicitlyUpdated()) {
       for (TypedValueUpdateListener typedValueImplicitUpdateListener : updateListeners) {
@@ -168,6 +169,7 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
     }
   }
 
+  @Override
   public void onCommandFailed(CommandContext commandContext, Throwable t) {
     // ignore
   }
@@ -236,8 +238,7 @@ public class TypedValueField implements DbEntityLifecycleAware, CommandContextLi
           return null;
         }
       } catch (ProcessApplicationUnavailableException e) {
-        throw new ProcessEngineException("Cannot determine process application variable serializers. "
-            + "Context Process Application is unavailable.", e);
+        throw LOG.cannotDeterminePaDataformats(e);
       }
     }
     else {

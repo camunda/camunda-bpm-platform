@@ -34,11 +34,13 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTestCas
 
   protected TestApplicationWithoutEngine pa;
 
+  @Override
   public void setUp() {
     pa = new TestApplicationWithoutEngine();
     pa.deploy();
   }
 
+  @Override
   public void tearDown() {
     pa.undeploy();
   }
@@ -64,6 +66,7 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTestCas
     ProcessApplicationReference contextPA = ProcessApplicationContext.executeInProcessApplication(
         new Callable<ProcessApplicationReference>() {
 
+          @Override
           public ProcessApplicationReference call() throws Exception {
             return getCurrentContextApplication();
           }
@@ -95,6 +98,7 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTestCas
     ProcessApplicationReference contextPA = ProcessApplicationContext.executeInProcessApplication(
         new Callable<ProcessApplicationReference>() {
 
+          @Override
           public ProcessApplicationReference call() throws Exception {
             return getCurrentContextApplication();
           }
@@ -126,6 +130,7 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTestCas
     ProcessApplicationReference contextPA = ProcessApplicationContext.executeInProcessApplication(
         new Callable<ProcessApplicationReference>() {
 
+          @Override
           public ProcessApplicationReference call() throws Exception {
             return getCurrentContextApplication();
           }
@@ -149,7 +154,7 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTestCas
         fail("should not succeed");
 
       } catch (ProcessEngineException e) {
-        assertTextPresent("A process application with name " + nonExistingName + " is not registered", e.getMessage());
+        assertTextPresent("A process application with name '" + nonExistingName + "' is not registered", e.getMessage());
       }
 
     } finally {
@@ -163,6 +168,7 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTestCas
     try {
       ProcessApplicationContext.executeInProcessApplication(new Callable<Void>() {
 
+        @Override
         public Void call() throws Exception {
           getCurrentContextApplication();
           return null;
@@ -172,7 +178,7 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTestCas
       fail("should not succeed");
 
     } catch (ProcessEngineException e) {
-      assertTextPresent("A process application with name " + nonExistingName + " is not registered", e.getMessage());
+      assertTextPresent("A process application with name '" + nonExistingName + "' is not registered", e.getMessage());
     }
 
   }
@@ -181,6 +187,7 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTestCas
     ProcessEngineConfigurationImpl engineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
     return engineConfiguration.getCommandExecutorTxRequired().execute(new Command<ProcessApplicationReference>() {
 
+      @Override
       public ProcessApplicationReference execute(CommandContext commandContext) {
         return Context.getCurrentProcessApplication();
       }

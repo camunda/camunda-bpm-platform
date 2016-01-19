@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.application.ProcessApplicationUnavailableException;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.OptimisticLockingException;
@@ -559,6 +560,11 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         "Cannot resolve a unique process definition for key '{}' because it exists for multiple tenants.",
         processDefinitionKey
         ));
+  }
+
+  public ProcessEngineException cannotDeterminePaDataformats(ProcessApplicationUnavailableException e) {
+    return new ProcessEngineException(exceptionMessage(
+        "071","Cannot determine process application variable serializers. Context Process Application is unavailable."), e);
   }
 
 }

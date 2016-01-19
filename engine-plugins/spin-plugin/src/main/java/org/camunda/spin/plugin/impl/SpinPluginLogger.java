@@ -12,6 +12,7 @@
  */
 package org.camunda.spin.plugin.impl;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.commons.logging.BaseLogger;
 
 /**
@@ -25,6 +26,12 @@ public class SpinPluginLogger extends BaseLogger {
   public static final SpinPluginLogger LOGGER = BaseLogger.createLogger(SpinPluginLogger.class, PROJECT_CODE, "org.camunda.spin.plugin", "01");
 
   public void logNoDataFormatsInitiailized(String dataFormatDescription, String reason) {
-    logInfo("001", "Cannot initialize %s: %s", dataFormatDescription, reason);
+    logInfo(
+        "001", "Cannot initialize %s: %s", dataFormatDescription, reason);
+  }
+
+  public ProcessEngineException fallbackSerializerCannotDeserializeObjects() {
+    return new ProcessEngineException(exceptionMessage(
+        "002", "Fallback serializer cannot handle deserialized objects"));
   }
 }

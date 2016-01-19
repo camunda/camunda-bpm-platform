@@ -12,7 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import org.camunda.bpm.application.impl.ProcessApplicationIdentifier;
 import org.camunda.bpm.engine.OptimisticLockingException;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
@@ -124,6 +126,16 @@ public class CommandLogger extends ProcessEngineLogger {
   public void debugProcessingResource(String name) {
     logDebug(
         "019", "Processing resource {}", name);
+  }
+
+  public ProcessEngineException paWithNameNotRegistered(String name) {
+    return new ProcessEngineException(exceptionMessage(
+        "020", "A process application with name '{}' is not registered", name));
+  }
+
+  public ProcessEngineException cannotReolvePa(ProcessApplicationIdentifier processApplicationIdentifier) {
+    return new ProcessEngineException(exceptionMessage(
+        "021", "Cannot resolve process application based on {}", processApplicationIdentifier));
   }
 
 }

@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.container.impl.jmx.services;
 
+import java.util.List;
+
+import org.camunda.bpm.container.impl.plugin.BpmPlatformPlugin;
 import org.camunda.bpm.container.impl.plugin.BpmPlatformPlugins;
 import org.camunda.bpm.container.impl.spi.PlatformService;
 import org.camunda.bpm.container.impl.spi.PlatformServiceContainer;
@@ -28,16 +31,33 @@ public class JmxManagedBpmPlatformPlugins implements PlatformService<BpmPlatform
     this.plugins = plugins;
   }
 
+  @Override
   public void start(PlatformServiceContainer mBeanServiceContainer) {
     // no callbacks or initialization in the plugins
   }
 
+  @Override
   public void stop(PlatformServiceContainer mBeanServiceContainer) {
     // no callbacks or initialization in the plugins
   }
 
+  @Override
   public BpmPlatformPlugins getValue() {
     return plugins;
+  }
+
+  @Override
+  public String[] getPluginNames() {
+    // expose names of discovered plugins in JMX
+    List<BpmPlatformPlugin> pluginList = plugins.getPlugins();
+    String[] names = new String[pluginList.size()];
+    for (int i = 0; i < names.length; i++) {
+      BpmPlatformPlugin bpmPlatformPlugin = pluginList.get(i);
+      if(bpmPlatformPlugin != null) {
+        names[i] = bpmPlatformPlugin.getClass().getName();
+      }
+    }
+    return names;
   }
 
 }

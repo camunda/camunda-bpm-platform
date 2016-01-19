@@ -12,13 +12,14 @@
  */
 package org.camunda.spin.plugin.impl;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.variable.serializer.AbstractObjectValueSerializer;
 
 /**
  * @author Thorben Lindhauer
  */
 public class FallbackSpinObjectValueSerializer extends AbstractObjectValueSerializer {
+
+  private final static SpinPluginLogger LOG = SpinPluginLogger.LOGGER;
 
   public static final String DESERIALIZED_OBJECTS_EXCEPTION_MESSAGE = "Fallback serializer cannot handle deserialized objects";
 
@@ -29,28 +30,34 @@ public class FallbackSpinObjectValueSerializer extends AbstractObjectValueSerial
     this.serializationFormat = serializationFormat;
   }
 
+  @Override
   public String getName() {
     return "spin://" + serializationFormat;
   }
 
+  @Override
   protected String getTypeNameForDeserialized(Object deserializedObject) {
-    throw new ProcessEngineException(DESERIALIZED_OBJECTS_EXCEPTION_MESSAGE);
+    throw LOG.fallbackSerializerCannotDeserializeObjects();
   }
 
+  @Override
   protected byte[] serializeToByteArray(Object deserializedObject) throws Exception {
-    throw new ProcessEngineException(DESERIALIZED_OBJECTS_EXCEPTION_MESSAGE);
+    throw LOG.fallbackSerializerCannotDeserializeObjects();
   }
 
+  @Override
   protected Object deserializeFromByteArray(byte[] object, String objectTypeName) throws Exception {
-    throw new ProcessEngineException(DESERIALIZED_OBJECTS_EXCEPTION_MESSAGE);
+    throw LOG.fallbackSerializerCannotDeserializeObjects();
   }
 
+  @Override
   protected boolean isSerializationTextBased() {
     return true;
   }
 
+  @Override
   protected boolean canSerializeValue(Object value) {
-    throw new ProcessEngineException(DESERIALIZED_OBJECTS_EXCEPTION_MESSAGE);
+    throw LOG.fallbackSerializerCannotDeserializeObjects();
   }
 
 }
