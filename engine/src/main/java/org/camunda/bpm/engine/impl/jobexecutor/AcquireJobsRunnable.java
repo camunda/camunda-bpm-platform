@@ -48,7 +48,6 @@ public abstract class AcquireJobsRunnable implements Runnable {
         }
       }
       LOG.jobExecutorThreadWokeUp();
-      isJobAdded = false;
     }
     catch (InterruptedException e) {
       LOG.jobExecutionWaitInterrupted();
@@ -76,6 +75,10 @@ public abstract class AcquireJobsRunnable implements Runnable {
         MONITOR.notifyAll();
       }
     }
+  }
+
+  protected void clearJobAddedNotification() {
+    isJobAdded = false;
   }
 
   public boolean isJobAdded() {

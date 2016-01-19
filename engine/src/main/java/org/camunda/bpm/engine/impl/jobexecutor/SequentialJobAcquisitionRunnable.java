@@ -44,6 +44,8 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
     while (!isInterrupted) {
       acquisitionContext.reset();
       acquisitionContext.setAcquisitionTime(System.currentTimeMillis());
+      // we are in a new acquisition cycle; discard any previous notification
+      clearJobAddedNotification();
 
       Iterator<ProcessEngineImpl> engineIterator = jobExecutor.engineIterator();
 

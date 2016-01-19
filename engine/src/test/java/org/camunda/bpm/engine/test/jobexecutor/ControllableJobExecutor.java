@@ -36,11 +36,22 @@ public class ControllableJobExecutor extends JobExecutor {
 
   protected ThreadControl acquisitionThreadControl;
 
-  public ControllableJobExecutor(ProcessEngineImpl processEngine) {
+  public ControllableJobExecutor() {
     acquireJobsRunnable = new RecordingAcquireJobsRunnable(this);
     jobAcquisitionThread = new Thread(acquireJobsRunnable);
     acquisitionThreadControl = new ThreadControl(jobAcquisitionThread);
     acquireJobsCmdFactory = new ControllableJobAcquisitionCommandFactory();
+  }
+
+  /**
+   * Creates the job executor and registers the given process engine
+   * with it.
+   *
+   * Use this constructor if the process engine is not registered
+   * with the job executor when the process engine is bootstrapped.
+   */
+  public ControllableJobExecutor(ProcessEngineImpl processEngine) {
+    this();
     processEngines.add(processEngine);
   }
 
