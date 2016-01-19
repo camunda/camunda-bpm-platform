@@ -181,6 +181,11 @@
             </goals>
             <configuration>
               <forceCreation>true</forceCreation>
+              <excludes>
+                <exclude>org/camunda/bpm/integrationtest/util/TestConstants*</exclude>
+                <exclude>org/camunda/bpm/integrationtest/util/TestContainer*</exclude>
+                <exclude>org/camunda/bpm/integrationtest/util/TestProcessApplication*</exclude>
+              </excludes>
             </configuration>
           </execution>
         </executions>
