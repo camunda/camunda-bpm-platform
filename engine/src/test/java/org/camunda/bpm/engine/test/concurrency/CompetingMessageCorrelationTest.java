@@ -426,28 +426,29 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     // two tasks waiting for the message
     assertEquals(2, tasks.size());
 
-    // start first thread and wait in the second Execution End Listener
+    // start first thread and wait in the second execution end listener
     ThreadControl thread1 = executeControllableCommand(new ControllableMessageEventReceivedCommand(tasks.get(0).getId(), "Message", true));
     thread1.reportInterrupts();
     thread1.waitForSync();
 
+    // the counting execution listener was executed on task 1
+    assertEquals(1, InvocationLogListener.getInvocations());
+
     // start second thread and complete the task
     ThreadControl thread2 = executeControllableCommand(new ControllableMessageEventReceivedCommand(tasks.get(1).getId(), "Message", false));
     thread2.waitForSync();
-    thread2.makeContinue();
     thread2.waitUntilDone();
 
-    // the execution listener was executed on task 1 and 2
+    // the counting execution listener was executed on task 1 and 2
     assertEquals(2, InvocationLogListener.getInvocations());
 
     // continue with thread 1
     thread1.makeContinueAndWaitForSync();
 
-    // the execution listener was not executed again
+    // the counting execution listener was not executed again
     assertEquals(2, InvocationLogListener.getInvocations());
 
-    // complete thread 1
-    thread1.makeContinue();
+    // try to complete thread 1
     thread1.waitUntilDone();
 
     // thread 1 was rolled back with an optimistic locking exception
