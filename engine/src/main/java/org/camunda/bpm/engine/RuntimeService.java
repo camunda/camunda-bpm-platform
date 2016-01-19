@@ -19,6 +19,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -1655,4 +1656,23 @@ public interface RuntimeService {
    * @return the created process instance
    */
   ProcessInstantiationBuilder createProcessInstanceByKey(String processDefinitionKey);
+
+  /**
+   * Creates a migration plan to migrate process instance between different process definitions.
+   * Returns a fluent builder that can be used to specify migration instructions and build the plan.
+   *
+   * @param sourceProcessDefinitionId the process definition that instances are migrated from
+   * @param targetProcessDefinitionId the process definition that instances are migrated to
+   * @return a fluent builder
+   */
+  MigrationPlanBuilder createMigrationPlan(String sourceProcessDefinitionId, String targetProcessDefinitionId);
+
+  /**
+   * Applies a migration plan to the given process instances. Migration can only be successful if
+   * all active activity instances can be migrated, i.e. there is a migration instruction that applies.
+   *
+   * @param migrationPlan the migration plan to apply
+   * @param processInstanceIds the instances to apply the plan to
+   */
+  void executeMigrationPlan(MigrationPlan migrationPlan, List<String> processInstanceIds);
 }

@@ -1245,6 +1245,7 @@ public class BpmnParse extends Parse {
     }
 
     if (activity != null) {
+      activity.setName(activityElement.attribute("name"));
       parseActivityInputOutput(activityElement, activity);
     }
 

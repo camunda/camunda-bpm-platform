@@ -27,6 +27,7 @@ public class ExecutionTreeAssertion {
   protected Boolean expectedIsScope = true;
   protected Boolean expectedIsConcurrent = false;
   protected Boolean expectedIsEventScope = false;
+  protected String expectedId;
 
   protected List<ExecutionTreeAssertion> childAssertions = new ArrayList<ExecutionTreeAssertion>();
 
@@ -47,6 +48,10 @@ public class ExecutionTreeAssertion {
     if (expectedActivityId == null && actualActivityId != null) {
       return false;
     } else if (expectedActivityId != null && !expectedActivityId.equals(tree.getActivityId())) {
+      return false;
+    }
+
+    if (expectedId != null && !expectedId.equals(tree.getId())) {
       return false;
     }
 
@@ -142,6 +147,11 @@ public class ExecutionTreeAssertion {
     sb.append("[activityId=");
     sb.append(expectedActivityId);
 
+    if (expectedId != null) {
+      sb.append(", id=");
+      sb.append(expectedId);
+    }
+
     if (expectedIsScope != null) {
       sb.append(", isScope=");
       sb.append(expectedIsScope);
@@ -173,6 +183,10 @@ public class ExecutionTreeAssertion {
 
   public void setExpectedIsEventScope(Boolean expectedIsEventScope) {
     this.expectedIsEventScope = expectedIsEventScope;
+  }
+
+  public void setExpectedId(String expectedId) {
+    this.expectedId = expectedId;
   }
 
 }

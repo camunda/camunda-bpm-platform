@@ -39,11 +39,15 @@ public class ActivityExecutionTreeMapping {
   protected String processInstanceId;
 
   public ActivityExecutionTreeMapping(CommandContext commandContext, String processInstanceId) {
+    this();
     this.commandContext = commandContext;
     this.processInstanceId = processInstanceId;
-    this.activityExecutionMapping = new HashMap<ScopeImpl, Set<ExecutionEntity>>();
 
     initialize();
+  }
+
+  public ActivityExecutionTreeMapping() {
+    this.activityExecutionMapping = new HashMap<ScopeImpl, Set<ExecutionEntity>>();
   }
 
   protected void submitExecution(ExecutionEntity execution, ScopeImpl scope) {

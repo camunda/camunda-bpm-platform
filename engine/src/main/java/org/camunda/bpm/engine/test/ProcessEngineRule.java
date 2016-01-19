@@ -13,7 +13,9 @@
 package org.camunda.bpm.engine.test;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.CaseService;
@@ -84,6 +86,7 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
   protected String configurationResource = "camunda.cfg.xml";
   protected String configurationResourceCompat = "activiti.cfg.xml";
   protected String deploymentId = null;
+  protected List<String> additionalDeployments = new ArrayList<String>();
 
   protected boolean ensureCleanAfterTest = false;
 
@@ -184,6 +187,10 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
   @Override
   public void finished(Description description) {
     TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, description.getTestClass(), description.getMethodName());
+    for (String additionalDeployment : additionalDeployments) {
+      TestHelper.deleteDeployment(processEngine, additionalDeployment);
+    }
+
     if (ensureCleanAfterTest) {
       TestHelper.assertAndEnsureCleanDbAndCache(processEngine);
     }
@@ -328,6 +335,10 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
 
   public void setDecisionService(DecisionService decisionService) {
     this.decisionService = decisionService;
+  }
+
+  public void manageDeployment(org.camunda.bpm.engine.repository.Deployment deployment) {
+    this.additionalDeployments.add(deployment.getId());
   }
 
 }

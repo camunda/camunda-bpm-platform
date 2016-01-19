@@ -1090,6 +1090,12 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   }
   public void setExecution(ExecutionEntity execution) {
     this.execution = execution;
+    if (execution != null) {
+      this.executionId = execution.getId();
+    }
+    else {
+      this.executionId = null;
+    }
   }
   public void setProcessInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;

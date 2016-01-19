@@ -83,6 +83,12 @@ public class ExecutionAssert {
       return this;
     }
 
+    public ExecutionTreeBuilder id(String id) {
+      ExecutionTreeAssertion currentAssertion = activityInstanceStack.peek();
+      currentAssertion.setExpectedId(id);
+      return this;
+    }
+
     public ExecutionTreeBuilder up() {
       activityInstanceStack.pop();
       return this;

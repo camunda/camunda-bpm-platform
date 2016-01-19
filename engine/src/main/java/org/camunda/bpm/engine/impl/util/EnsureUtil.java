@@ -290,6 +290,11 @@ public final class EnsureUtil {
   }
 
   @SuppressWarnings("rawtypes")
+  public static void ensureNumberOfElements(Class<? extends ProcessEngineException> exceptionClass, String variableName, Collection collection, int elements) {
+    ensureNumberOfElements(exceptionClass, "", variableName, collection, elements);
+  }
+
+  @SuppressWarnings("rawtypes")
   public static void ensureNumberOfElements(Class<? extends ProcessEngineException> exceptionClass, String message, String variableName, Collection collection, int elements) {
     ensureNotNull(exceptionClass, message, variableName, collection);
     if (collection.size() != elements) {

@@ -1006,7 +1006,6 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
     // update the related tasks
     for (TaskEntity task : getTasksInternal()) {
-      task.setExecutionId(other.getId());
       task.setExecution(other);
 
       // update the related local task variables
