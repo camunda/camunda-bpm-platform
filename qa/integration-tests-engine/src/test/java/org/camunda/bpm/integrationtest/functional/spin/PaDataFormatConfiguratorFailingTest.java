@@ -24,11 +24,11 @@ import org.jboss.arquillian.container.test.api.Deployer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.arquillian.junit.InSequence;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -67,19 +67,19 @@ public class PaDataFormatConfiguratorFailingTest {
     return webArchive;
   }
 
-  @Test
-  @InSequence(1)
-  public void testFailingConfiguratorPreventsProcessApplicationDeployment() {
+  @Before
+  public void setUp() {
     try {
       deployer.deploy("deployment");
-      Assert.fail("exception expected");
+      // The failing configurator provokes a RuntimeException in a servlet context listener.
+      // Apparently such an exception needs not cancel the deployment of a Java EE application.
+      // That means deployment fails for some servers and for others not.
+      // => we don't care if there is an exception here or not
     }catch (Exception e) {
-      // expected
     }
   }
 
   @Test
-  @InSequence(2)
   @OperateOnDeployment("checkDeployment")
   public void testNoProcessApplicationIsDeployed() {
     Set<String> registeredPAs = BpmPlatform.getProcessApplicationService().getProcessApplicationNames();
