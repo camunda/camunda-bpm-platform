@@ -60,7 +60,7 @@ public class ExecutionQueryDto extends AbstractQueryDto<ExecutionQuery> {
   private String incidentType;
   private String incidentMessage;
   private String incidentMessageLike;
-  private List<String> tenantIds;
+  private List<String> tenantIdIn;
 
   private List<VariableQueryParameterDto> variables;
   private List<VariableQueryParameterDto> processVariables;
@@ -149,8 +149,8 @@ public class ExecutionQueryDto extends AbstractQueryDto<ExecutionQuery> {
   }
 
   @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
-  public void setTenantIdIn(List<String> tenantIds) {
-    this.tenantIds = tenantIds;
+  public void setTenantIdIn(List<String> tenantIdIn) {
+    this.tenantIdIn = tenantIdIn;
   }
 
   @Override
@@ -204,8 +204,8 @@ public class ExecutionQueryDto extends AbstractQueryDto<ExecutionQuery> {
     if (incidentMessageLike != null) {
       query.incidentMessageLike(incidentMessageLike);
     }
-    if (tenantIds != null && !tenantIds.isEmpty()) {
-      query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    if (tenantIdIn != null && !tenantIdIn.isEmpty()) {
+      query.tenantIdIn(tenantIdIn.toArray(new String[tenantIdIn.size()]));
     }
 
     if (variables != null) {
