@@ -120,6 +120,7 @@ var pagesModule = require('./pages/main'),
 
   module.exports.exposePackages = function(requirePackages) {
     requirePackages.angular = angular;
+    requirePackages.jquery = $;
     requirePackages['camunda-commons-ui'] = camCommonsUi;
     requirePackages['camunda-bpm-sdk-js'] = sdk;
   };
