@@ -1,7 +1,7 @@
 {
   "name": "camunda-bpm-webapp",
   "private": true,
-  "version": "7.4.0-SNAPSHOT",
+  "version": "7.5.0-SNAPSHOT",
   "gruntConfig": {
     "connectPort": 8020,
     "livereloadPort": 8021,
