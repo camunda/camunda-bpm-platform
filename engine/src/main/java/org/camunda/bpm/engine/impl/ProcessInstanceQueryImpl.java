@@ -53,6 +53,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
   protected String caseInstanceId;
   protected String superCaseInstanceId;
   protected String subCaseInstanceId;
+  protected String[] tenantIds;
 
   // Unused, see dynamic query
   protected String activityId;
@@ -153,6 +154,11 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     return this;
   }
 
+  public ProcessInstanceQuery orderByTenantId() {
+    orderBy(ProcessInstanceQueryProperty.TENANT_ID);
+    return this;
+  }
+
   public ProcessInstanceQuery active() {
     this.suspensionState = SuspensionState.ACTIVE;
     return this;
@@ -187,8 +193,15 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     return this;
   }
 
+  public ProcessInstanceQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    return this;
+  }
+
   //results /////////////////////////////////////////////////////////////////
 
+  @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     ensureVariablesInitialized();
@@ -197,6 +210,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
       .findProcessInstanceCountByQueryCriteria(this);
   }
 
+  @Override
   public List<ProcessInstance> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     ensureVariablesInitialized();

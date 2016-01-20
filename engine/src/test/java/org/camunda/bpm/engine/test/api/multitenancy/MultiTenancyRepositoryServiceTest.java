@@ -17,79 +17,74 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 
 public class MultiTenancyRepositoryServiceTest extends PluggableProcessEngineTestCase {
 
-  protected static final String TENANT_ONE = "tenant 1";
-  protected static final String TENANT_TWO = "tenant 2";
-
-  protected String deploymentOneId;
-  protected String deploymentTwoId;
-
-  @Override
-  protected void setUp() throws Exception {
-    deploymentOneId = repositoryService
-        .createDeployment()
-        .tenantId(TENANT_ONE)
-        .addClasspathResource("org/camunda/bpm/engine/test/repository/one.bpmn20.xml")
-        .addClasspathResource("org/camunda/bpm/engine/test/repository/two.bpmn20.xml")
-        .deploy()
-        .getId();
-
-    deploymentTwoId = repositoryService
-        .createDeployment()
-        .tenantId(TENANT_TWO)
-        .addClasspathResource("org/camunda/bpm/engine/test/repository/one.bpmn20.xml")
-        .deploy()
-        .getId();
-
-    super.setUp();
-  }
-
   @Override
   protected void tearDown() throws Exception {
-    repositoryService.deleteDeployment(deploymentOneId);
-    repositoryService.deleteDeployment(deploymentTwoId);
+    List<Deployment> deployments = repositoryService.createDeploymentQuery().list();
+
+    for(Deployment deployment : deployments) {
+      repositoryService.deleteDeployment(deployment.getId(), true);
+    }
+  }
+
+  public void testDeploymentWithoutTenantId() {
+    createDeployment()
+      .deploy();
+
+    Deployment deployment = repositoryService
+        .createDeploymentQuery()
+        .singleResult();
+
+    assertNotNull(deployment);
+    assertNull(deployment.getTenantId());
   }
 
   public void testDeploymentWithTenantId() {
-    List<Deployment> deployments = repositoryService
-        .createDeploymentQuery()
-        .orderByTenantId()
-        .asc()
-        .list();
+    createDeployment()
+      .tenantId("tenant 1")
+      .deploy();
 
-    assertEquals(2, deployments.size());
-    assertEquals(TENANT_ONE, deployments.get(0).getTenantId());
-    assertEquals(TENANT_TWO, deployments.get(1).getTenantId());
+    Deployment deployment = repositoryService
+        .createDeploymentQuery()
+        .singleResult();
+
+    assertNotNull(deployment);
+    assertEquals("tenant 1", deployment.getTenantId());
   }
 
-  public void testDeployProcessDefinitionWithTenantId() {
-    List<ProcessDefinition> processDefinitions = repositoryService
-        .createProcessDefinitionQuery()
-        .orderByTenantId()
-        .asc()
-        .list();
+  public void testPropagateTenantIdToProcessDefinition() {
+    createDeployment()
+      .tenantId("tenant 1")
+      .deploy();
 
-    assertEquals(3, processDefinitions.size());
+    ProcessDefinition processDefinition = repositoryService
+        .createProcessDefinitionQuery()
+        .singleResult();
+
+    assertNotNull(processDefinition);
     // inherit the tenant id from deployment
-    assertEquals(TENANT_ONE, processDefinitions.get(0).getTenantId());
-    assertEquals(TENANT_ONE, processDefinitions.get(1).getTenantId());
-    assertEquals(TENANT_TWO, processDefinitions.get(2).getTenantId());
+    assertEquals("tenant 1", processDefinition.getTenantId());
   }
 
   public void testProcessDefinitionVersionWithTenantId() {
-    String deploymentId = repositoryService
-        .createDeployment()
-        .tenantId(TENANT_ONE)
-        .addClasspathResource("org/camunda/bpm/engine/test/repository/one.bpmn20.xml")
-        .deploy()
-        .getId();
+    createDeployment()
+      .tenantId("tenant 1")
+      .deploy();
+
+    createDeployment()
+      .tenantId("tenant 1")
+      .deploy();
+
+    createDeployment()
+      .tenantId("tenant 2")
+      .deploy();
 
     List<ProcessDefinition> processDefinitions = repositoryService
         .createProcessDefinitionQuery()
-        .processDefinitionKey("one")
         .orderByTenantId()
         .asc()
         .orderByProcessDefinitionVersion()
@@ -102,8 +97,12 @@ public class MultiTenancyRepositoryServiceTest extends PluggableProcessEngineTes
     assertEquals(2, processDefinitions.get(1).getVersion());
     // process definition version of tenant two have to be independent from tenant one
     assertEquals(1, processDefinitions.get(2).getVersion());
+  }
 
-    repositoryService.deleteDeployment(deploymentId);
+  protected DeploymentBuilder createDeployment() {
+    return repositoryService
+        .createDeployment()
+        .addClasspathResource("org/camunda/bpm/engine/test/repository/one.bpmn20.xml");
   }
 
 }

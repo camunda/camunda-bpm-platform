@@ -12,6 +12,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -286,7 +287,6 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
     verify(mockedQuery).incidentType(queryParameters.get("incidentType"));
     verify(mockedQuery).incidentMessage(queryParameters.get("incidentMessage"));
     verify(mockedQuery).incidentMessageLike(queryParameters.get("incidentMessageLike"));
-    verify(mockedQuery).tenantId(queryParameters.get("tenantId"));
     verify(mockedQuery).list();
   }
 
@@ -312,14 +312,13 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
     parameters.put("incidentType", "incType");
     parameters.put("incidentMessage", "incMessage");
     parameters.put("incidentMessageLike", "incMessageLike");
-    parameters.put("tenantId", "tenantId");
 
     return parameters;
   }
 
   @Test
-  public void testDeploymentTenantIdList() {
-    mockedQuery = setUpMockDefinitionQuery(MockProvider.createMockProcessDefinitionsTwoTenants());
+  public void testProcessDefinitionTenantIdList() {
+    mockedQuery = setUpMockDefinitionQuery(createMockProcessDefinitionsTwoTenants());
 
     Response response = given()
       .queryParam("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST)
@@ -340,6 +339,12 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
 
     assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
     assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+  }
+
+  private List<ProcessDefinition> createMockProcessDefinitionsTwoTenants() {
+    return Arrays.asList(
+        MockProvider.createMockDefinition(MockProvider.EXAMPLE_TENANT_ID),
+        MockProvider.createMockDefinition(MockProvider.ANOTHER_EXAMPLE_TENANT_ID));
   }
 
   @Test

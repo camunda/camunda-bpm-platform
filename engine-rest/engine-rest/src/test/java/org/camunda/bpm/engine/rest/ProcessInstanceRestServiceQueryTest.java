@@ -3,6 +3,7 @@ package org.camunda.bpm.engine.rest;
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Matchers.anySetOf;
@@ -15,6 +16,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -153,6 +155,7 @@ public class ProcessInstanceRestServiceQueryTest extends
     String returnedBusinessKey = from(content).getString("[0].businessKey");
     Boolean returnedIsSuspended = from(content).getBoolean("[0].suspended");
     String returnedCaseInstanceId = from(content).getString("[0].caseInstanceId");
+    String returnedTenantId = from(content).getString("[0].tenantId");
 
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, returnedInstanceId);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_ENDED, returnedIsEnded);
@@ -160,6 +163,7 @@ public class ProcessInstanceRestServiceQueryTest extends
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY, returnedBusinessKey);
     Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED, returnedIsSuspended);
     Assert.assertEquals(MockProvider.EXAMPLE_CASE_INSTANCE_ID, returnedCaseInstanceId);
+    Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, returnedTenantId);
   }
 
   @Test
@@ -415,6 +419,37 @@ public class ProcessInstanceRestServiceQueryTest extends
   }
 
   @Test
+  public void testProcessInstanceTenantIdList() {
+    mockedQuery = setUpMockInstanceQuery(createMockProcessInstancesTwoTenants());
+
+    Response response = given()
+      .queryParam("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(PROCESS_INSTANCE_QUERY_URL);
+
+    verify(mockedQuery).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> instances = from(content).getList("");
+    assertThat(instances).hasSize(2);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    String returnedTenantId2 = from(content).getString("[1].tenantId");
+
+    assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
+    assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+  }
+
+  private List<ProcessInstance> createMockProcessInstancesTwoTenants() {
+    return Arrays.asList(
+        MockProvider.createMockInstance(MockProvider.EXAMPLE_TENANT_ID),
+        MockProvider.createMockInstance(MockProvider.ANOTHER_EXAMPLE_TENANT_ID));
+  }
+
+  @Test
   public void testSortingParameters() {
     InOrder inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("instanceId", "asc", Status.OK);
@@ -429,6 +464,11 @@ public class ProcessInstanceRestServiceQueryTest extends
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("definitionId", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessDefinitionId();
+    inOrder.verify(mockedQuery).asc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("tenantId", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderByTenantId();
     inOrder.verify(mockedQuery).asc();
   }
 

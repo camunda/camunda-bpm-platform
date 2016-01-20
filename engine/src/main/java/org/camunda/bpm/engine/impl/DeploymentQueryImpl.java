@@ -41,7 +41,6 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
   protected String source;
   protected Date deploymentBefore;
   protected Date deploymentAfter;
-  protected String tenantId;
   protected String[] tenantIds;
 
   public DeploymentQueryImpl() {
@@ -84,12 +83,6 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
   public DeploymentQuery deploymentAfter(Date after) {
     ensureNotNull("deploymentAfter", after);
     this.deploymentAfter = after;
-    return this;
-  }
-
-  public DeploymentQuery tenantId(String tenantId) {
-    ensureNotNull("tenantId", tenantId);
-    this.tenantId = tenantId;
     return this;
   }
 

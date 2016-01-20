@@ -58,9 +58,6 @@ public interface DeploymentQuery extends Query<DeploymentQuery, Deployment>{
   /** Only select deployments deployed after the given date */
   DeploymentQuery deploymentAfter(Date after);
 
-  /** Only select deployments with the given tenant id. */
-  DeploymentQuery tenantId(String tenantId);
-
   /** Only select deployments with one of the given tenant ids. */
   DeploymentQuery tenantIdIn(String... tenantIds);
 
@@ -75,7 +72,8 @@ public interface DeploymentQuery extends Query<DeploymentQuery, Deployment>{
   /** Order by deployment time (needs to be followed by {@link #asc()} or {@link #desc()}). */
   DeploymentQuery orderByDeploymenTime();
 
-  /** Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  /** Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of process instances without tenant id is database-specific. */
   DeploymentQuery orderByTenantId();
 
 }

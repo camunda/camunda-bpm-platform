@@ -13,96 +13,106 @@
 
 package org.camunda.bpm.engine.test.api.multitenancy;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
-import org.camunda.bpm.engine.test.api.repository.AbstractDefinitionQueryTest;
 
-public class MultiTenancyProcessDefinitionQueryTest extends AbstractDefinitionQueryTest {
+public class MultiTenancyProcessDefinitionQueryTest extends AbstractMultiTenancyQueryTest {
 
-  protected static final String TENANT_ONE = "tenantOne";
-  protected static final String TENANT_TWO = "tenantTwo";
+  protected static final String PROCESS_DEFINITION_KEY = "oneTaskProcess";
 
   @Override
-  protected String getResourceOnePath() {
-    return "org/camunda/bpm/engine/test/repository/one.bpmn20.xml";
-  }
-
-  @Override
-  protected String getResourceTwoPath() {
-    return "org/camunda/bpm/engine/test/repository/two.bpmn20.xml";
-  }
-
-  @Override
-  protected String getTenantOne() {
-    return TENANT_ONE;
-  }
-
-  @Override
-  protected String getTenantTwo() {
-    return TENANT_TWO;
+  protected void initScenario() {
+    // process definitions are already deployed with different tenant ids
   }
 
   public void testQueryWithoutTenantId() {
-    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
-    verifyQueryResults(query, 3);
+    ProcessDefinitionQuery query = repositoryService
+        .createProcessDefinitionQuery();
+
+    verifyQueryResults(query, 2);
   }
 
   public void testQueryByTenantId() {
-    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().tenantId(TENANT_ONE);
-    verifyQueryResults(query, 2);
+    ProcessDefinitionQuery query = repositoryService
+        .createProcessDefinitionQuery()
+        .tenantIdIn(TENANT_ONE);
 
-    query = repositoryService.createProcessDefinitionQuery().tenantId(TENANT_TWO);
+    verifyQueryResults(query, 1);
+
+    query = repositoryService.
+        createProcessDefinitionQuery()
+        .tenantIdIn(TENANT_TWO);
+
     verifyQueryResults(query, 1);
   }
 
   public void testQueryByTenantIds() {
-    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().tenantIdIn(TENANT_ONE, TENANT_TWO);
-    verifyQueryResults(query, 3);
+    ProcessDefinitionQuery query = repositoryService
+        .createProcessDefinitionQuery()
+        .tenantIdIn(TENANT_ONE, TENANT_TWO);
 
-    query = repositoryService.createProcessDefinitionQuery().tenantIdIn(TENANT_ONE);
     verifyQueryResults(query, 2);
   }
 
   public void testQueryByKey() {
-    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionKey("one");
+    ProcessDefinitionQuery query = repositoryService
+        .createProcessDefinitionQuery()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY);
     // one definition for each tenant
     verifyQueryResults(query, 2);
 
-    query = repositoryService.createProcessDefinitionQuery().processDefinitionKey("one").tenantId(TENANT_ONE);
+    query = repositoryService
+        .createProcessDefinitionQuery()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
+        .tenantIdIn(TENANT_ONE);
+
     verifyQueryResults(query, 1);
   }
 
   public void testQueryByLatest() {
-    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().processDefinitionKey("one").latestVersion();
+    ProcessDefinitionQuery query = repositoryService
+        .createProcessDefinitionQuery()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
+        .latestVersion();
     // one definition for each tenant
     verifyQueryResults(query, 2);
 
-    query = repositoryService.createProcessDefinitionQuery().processDefinitionKey("one").tenantId(TENANT_ONE).latestVersion();
+    query = repositoryService
+        .createProcessDefinitionQuery()
+        .processDefinitionKey(PROCESS_DEFINITION_KEY)
+        .tenantIdIn(TENANT_ONE)
+        .latestVersion();
+
     verifyQueryResults(query, 1);
   }
 
-  public void testQuerySorting() {
-    // asc
-    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().orderByTenantId().asc();
-    verifyQueryResults(query, 3);
+  public void testQuerySortingAsc() {
+    List<ProcessDefinition> processDefinitions = repositoryService
+        .createProcessDefinitionQuery()
+        .orderByTenantId()
+        .asc()
+        .list();
 
-    // desc
-    query = repositoryService.createProcessDefinitionQuery().orderByTenantId().desc();
-    verifyQueryResults(query, 3);
+    assertThat(processDefinitions.size(), is(2));
+    assertThat(processDefinitions.get(0).getTenantId(), is(TENANT_ONE));
+    assertThat(processDefinitions.get(1).getTenantId(), is(TENANT_TWO));
+  }
 
-    // Typical use case
-    query = repositoryService.createProcessDefinitionQuery().orderByTenantId().asc().orderByProcessDefinitionKey().asc();
-    List<ProcessDefinition> processDefinitions = query.list();
-    assertEquals(3, processDefinitions.size());
+  public void testQuerySortingDesc() {
+    List<ProcessDefinition> processDefinitions = repositoryService
+        .createProcessDefinitionQuery()
+        .orderByTenantId()
+        .desc()
+        .list();
 
-    assertEquals("one", processDefinitions.get(0).getKey());
-    assertEquals(TENANT_ONE, processDefinitions.get(0).getTenantId());
-    assertEquals("two", processDefinitions.get(1).getKey());
-    assertEquals(TENANT_ONE, processDefinitions.get(1).getTenantId());
-    assertEquals("one", processDefinitions.get(2).getKey());
-    assertEquals(TENANT_TWO, processDefinitions.get(2).getTenantId());
+    assertThat(processDefinitions.size(), is(2));
+    assertThat(processDefinitions.get(0).getTenantId(), is(TENANT_TWO));
+    assertThat(processDefinitions.get(1).getTenantId(), is(TENANT_ONE));
   }
 
 }

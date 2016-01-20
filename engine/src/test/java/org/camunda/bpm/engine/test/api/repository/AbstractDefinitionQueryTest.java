@@ -27,7 +27,6 @@ public abstract class AbstractDefinitionQueryTest extends PluggableProcessEngine
     deploymentOneId = repositoryService
       .createDeployment()
       .name("firstDeployment")
-      .tenantId(getTenantOne())
       .addClasspathResource(getResourceOnePath())
       .addClasspathResource(getResourceTwoPath())
       .deploy()
@@ -36,7 +35,6 @@ public abstract class AbstractDefinitionQueryTest extends PluggableProcessEngine
     deploymentTwoId = repositoryService
       .createDeployment()
       .name("secondDeployment")
-      .tenantId(getTenantTwo())
       .addClasspathResource(getResourceOnePath())
       .deploy()
       .getId();
@@ -47,14 +45,6 @@ public abstract class AbstractDefinitionQueryTest extends PluggableProcessEngine
   protected abstract String getResourceOnePath();
 
   protected abstract String getResourceTwoPath();
-
-  protected String getTenantOne() {
-    return null;
-  }
-
-  protected String getTenantTwo() {
-    return null;
-  }
 
   @Override
   protected void tearDown() throws Exception {

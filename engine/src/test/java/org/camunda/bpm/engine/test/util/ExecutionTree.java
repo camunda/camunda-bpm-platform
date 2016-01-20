@@ -89,6 +89,7 @@ public class ExecutionTree implements Execution {
     return ((PvmExecutionImpl) wrappedExecution).getActivityId();
   }
 
+  @Override
   public String toString() {
     return wrappedExecution.toString();
   }
@@ -103,6 +104,10 @@ public class ExecutionTree implements Execution {
 
   public Boolean isEventScope() {
     return ((PvmExecutionImpl) wrappedExecution).isEventScope();
+  }
+
+  public String getTenantId() {
+    return wrappedExecution.getTenantId();
   }
 
   public Execution getExecution() {

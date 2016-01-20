@@ -23,6 +23,7 @@ public class ProcessInstanceDto extends LinkableDto {
   private String caseInstanceId;
   private boolean ended;
   private boolean suspended;
+  private String tenantId;
 
   public String getId() {
     return id;
@@ -48,6 +49,10 @@ public class ProcessInstanceDto extends LinkableDto {
     return suspended;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
   public static ProcessInstanceDto fromProcessInstance(ProcessInstance instance) {
     ProcessInstanceDto result = new ProcessInstanceDto();
     result.id = instance.getId();
@@ -56,6 +61,7 @@ public class ProcessInstanceDto extends LinkableDto {
     result.caseInstanceId = instance.getCaseInstanceId();
     result.ended = instance.isEnded();
     result.suspended = instance.isSuspended();
+    result.tenantId = instance.getTenantId();
     return result;
   }
 

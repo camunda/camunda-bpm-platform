@@ -192,6 +192,9 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
    */
   ProcessInstanceQuery incidentMessageLike(String incidentMessageLike);
 
+  /** Only select process instances with one of the given tenant ids. */
+  ProcessInstanceQuery tenantIdIn(String... tenantIds);
+
   //ordering /////////////////////////////////////////////////////////////////
 
   /** Order by id (needs to be followed by {@link #asc()} or {@link #desc()}). */
@@ -202,5 +205,11 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
 
   /** Order by process definition id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   ProcessInstanceQuery orderByProcessDefinitionId();
+
+  /**
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of process instances without tenant id is database-specific.
+   */
+  ProcessInstanceQuery orderByTenantId();
 
 }

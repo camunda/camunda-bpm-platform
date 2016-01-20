@@ -95,9 +95,6 @@
           and RES.SOURCE_ is null
         </if>
       </if>
-      <if test="tenantId != null">
-        RES.TENANT_ID_ = #{tenantId}
-      </if>
       <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
         and RES.TENANT_ID_ in
         <foreach item="tenantId" index="index" collection="tenantIds"

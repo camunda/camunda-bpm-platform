@@ -13,70 +13,48 @@
 
 package org.camunda.bpm.engine.test.api.multitenancy;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
 
-public class MultiTenancyDeploymentQueryTest extends PluggableProcessEngineTestCase {
-
-  protected static final String TENANT_ONE = "tenant 1";
-  protected static final String TENANT_TWO = "tenant 2";
-
-  protected String deploymentOneId;
-  protected String deploymentTwoId;
+public class MultiTenancyDeploymentQueryTest extends AbstractMultiTenancyQueryTest {
 
   @Override
-  protected void setUp() throws Exception {
-    deploymentOneId = repositoryService
-        .createDeployment()
-        .tenantId(TENANT_ONE)
-        .addClasspathResource("org/camunda/bpm/engine/test/repository/one.bpmn20.xml")
-        .deploy()
-        .getId();
-
-    deploymentTwoId = repositoryService
-        .createDeployment()
-        .tenantId(TENANT_TWO)
-        .addClasspathResource("org/camunda/bpm/engine/test/repository/two.bpmn20.xml")
-        .deploy()
-        .getId();
-
-    super.setUp();
-  }
-
-  @Override
-  protected void tearDown() throws Exception {
-    repositoryService.deleteDeployment(deploymentOneId, true);
-    repositoryService.deleteDeployment(deploymentTwoId, true);
+  protected void initScenario() {
+    // two deployments for different tenant ids
   }
 
   public void testQueryWithoutTenantId() {
     DeploymentQuery query = repositoryService
         .createDeploymentQuery();
 
-    assertEquals(2, query.count());
+   verifyQueryResults(query, 2);
   }
 
   public void testQueryByTenantId() {
     DeploymentQuery query = repositoryService
         .createDeploymentQuery()
-        .tenantId(TENANT_ONE);
+        .tenantIdIn(TENANT_ONE);
 
-    assertEquals(1, query.count());
+    verifyQueryResults(query, 1);
+
+    query = repositoryService
+        .createDeploymentQuery()
+        .tenantIdIn(TENANT_TWO);
+
+    verifyQueryResults(query, 1);
   }
 
   public void testQueryByTenantIds() {
     DeploymentQuery query = repositoryService
         .createDeploymentQuery()
         .tenantIdIn(TENANT_ONE, TENANT_TWO);
-    assertEquals(2, query.count());
 
-    query = repositoryService
-        .createDeploymentQuery()
-        .tenantIdIn(TENANT_ONE);
-    assertEquals(1, query.count());
+    verifyQueryResults(query, 2);
   }
 
   public void testQuerySortingAsc() {
@@ -85,9 +63,9 @@ public class MultiTenancyDeploymentQueryTest extends PluggableProcessEngineTestC
         .asc()
         .list();
 
-    assertEquals(2, deployments.size());
-    assertEquals(TENANT_ONE, deployments.get(0).getTenantId());
-    assertEquals(TENANT_TWO, deployments.get(1).getTenantId());
+    assertThat(deployments.size(), is(2));
+    assertThat(deployments.get(0).getTenantId(), is(TENANT_ONE));
+    assertThat(deployments.get(1).getTenantId(), is(TENANT_TWO));
   }
 
   public void testQuerySortingDesc() {
@@ -96,9 +74,9 @@ public class MultiTenancyDeploymentQueryTest extends PluggableProcessEngineTestC
         .desc()
         .list();
 
-    assertEquals(2, deployments.size());
-    assertEquals(TENANT_TWO, deployments.get(0).getTenantId());
-    assertEquals(TENANT_ONE, deployments.get(1).getTenantId());
+    assertThat(deployments.size(), is(2));
+    assertThat(deployments.get(0).getTenantId(), is(TENANT_TWO));
+    assertThat(deployments.get(1).getTenantId(), is(TENANT_ONE));
   }
 
 }

@@ -68,7 +68,6 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
 
   protected String eventSubscriptionName;
   protected String eventSubscriptionType;
-  protected String tenantId;
   protected String[] tenantIds;
 
   public ProcessDefinitionQueryImpl() {
@@ -212,12 +211,6 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
   @Override
   protected boolean hasExcludingConditions() {
     return super.hasExcludingConditions() || CompareUtil.elementIsNotContainedInArray(id, ids);
-  }
-
-  public ProcessDefinitionQuery tenantId(String tenantId) {
-    ensureNotNull("tenantId", tenantId);
-    this.tenantId = tenantId;
-    return this;
   }
 
   public ProcessDefinitionQuery tenantIdIn(String... tenantIds) {

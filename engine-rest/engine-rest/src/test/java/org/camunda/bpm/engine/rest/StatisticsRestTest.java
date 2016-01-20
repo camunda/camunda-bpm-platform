@@ -8,6 +8,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.core.Response.Status;
@@ -70,6 +71,7 @@ public class StatisticsRestTest extends AbstractRestServiceTest {
     when(processDefinitionQueryMock.processDefinitionKey(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)).thenReturn(processDefinitionQueryMock);
     when(processDefinitionQueryMock.latestVersion()).thenReturn(processDefinitionQueryMock);
     when(processDefinitionQueryMock.singleResult()).thenReturn(mockDefinition);
+    when(processDefinitionQueryMock.list()).thenReturn(Collections.singletonList(mockDefinition));
     when(processDefinitionQueryMock.count()).thenReturn(1L);
     when(processEngine.getRepositoryService().createProcessDefinitionQuery()).thenReturn(processDefinitionQueryMock);
   }

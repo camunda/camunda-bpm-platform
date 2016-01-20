@@ -152,9 +152,6 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
    */
   ProcessDefinitionQuery messageEventSubscriptionName(String messageName);
 
-  /** Only select process definitions with the given tenant id. */
-  ProcessDefinitionQuery tenantId(String tenantId);
-
   /** Only select process definitions with one of the given tenant ids. */
   ProcessDefinitionQuery tenantIdIn(String... tenantIds);
 
@@ -178,7 +175,8 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
   /** Order by deployment id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   ProcessDefinitionQuery orderByDeploymentId();
 
-  /** Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  /** Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of process instances without tenant id is database-specific. */
   ProcessDefinitionQuery orderByTenantId();
 
 }

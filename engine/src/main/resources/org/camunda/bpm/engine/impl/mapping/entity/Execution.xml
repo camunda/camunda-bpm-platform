@@ -26,6 +26,7 @@
       SUSPENSION_STATE_,
       CACHED_ENT_STATE_,
       SEQUENCE_COUNTER_,
+      TENANT_ID_,
       REV_
     )
     values
@@ -47,6 +48,7 @@
       #{suspensionState, jdbcType=INTEGER},
       #{cachedEntityState, jdbcType=INTEGER},
       #{sequenceCounter, jdbcType=BIGINT},
+      #{tenantId, jdbcType=VARCHAR},
       1
     )
   </insert>
@@ -67,7 +69,8 @@
       SUPER_EXEC_ = #{superExecutionId, jdbcType=VARCHAR},
       SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
       CACHED_ENT_STATE_ = #{cachedEntityState, jdbcType=INTEGER},
-      SEQUENCE_COUNTER_ = #{sequenceCounter, jdbcType=BIGINT}
+      SEQUENCE_COUNTER_ = #{sequenceCounter, jdbcType=BIGINT},
+      TENANT_ID_ = #{tenantId, jdbcType=BIGINT}
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
@@ -116,6 +119,7 @@
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER"/>
     <result property="cachedEntityState" column="CACHED_ENT_STATE_" jdbcType="INTEGER"/>
     <result property="sequenceCounter" column="SEQUENCE_COUNTER_" jdbcType="BIGINT"/>
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
   </resultMap>
   
   <!-- EXECUTION SELECT -->
@@ -291,6 +295,13 @@
       </if>
       <if test="incidentMessageLike != null">
         and INC.INCIDENT_MSG_ like #{incidentMessageLike}
+      </if>
+      <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+        and RES.TENANT_ID_ in
+        <foreach item="tenantId" index="index" collection="tenantIds"
+                 open="(" separator="," close=")">
+          #{tenantId}
+        </foreach>
       </if>
 
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />

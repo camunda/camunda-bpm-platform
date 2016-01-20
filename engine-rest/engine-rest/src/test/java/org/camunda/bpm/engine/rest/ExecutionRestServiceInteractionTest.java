@@ -116,6 +116,7 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
       .body("id", equalTo(MockProvider.EXAMPLE_EXECUTION_ID))
       .body("ended", equalTo(MockProvider.EXAMPLE_EXECUTION_IS_ENDED))
       .body("processInstanceId", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
+      .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
       .when().get(EXECUTION_URL);
   }
 

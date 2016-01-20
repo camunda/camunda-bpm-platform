@@ -11,6 +11,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -152,7 +153,6 @@ public class DeploymentRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockedQuery).deploymentNameLike(queryParameters.get("nameLike"));
     verify(mockedQuery).deploymentId(queryParameters.get("id"));
     verify(mockedQuery).deploymentSource(queryParameters.get("source"));
-    verify(mockedQuery).tenantId(queryParameters.get("tenantId"));
     verify(mockedQuery).list();
   }
 
@@ -213,7 +213,7 @@ public class DeploymentRestServiceQueryTest extends AbstractRestServiceTest {
 
   @Test
   public void testDeploymentTenantIdList() {
-    mockedQuery = setUpMockDeploymentQuery(MockProvider.createMockDeploymentsTwoTenants());
+    mockedQuery = setUpMockDeploymentQuery(createMockDeploymentsTwoTenants());
 
     Response response = given()
       .queryParam("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST)
@@ -236,6 +236,12 @@ public class DeploymentRestServiceQueryTest extends AbstractRestServiceTest {
     assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
   }
 
+  private List<Deployment> createMockDeploymentsTwoTenants() {
+    return Arrays.asList(
+        MockProvider.createMockDeployment(MockProvider.EXAMPLE_TENANT_ID),
+        MockProvider.createMockDeployment(MockProvider.ANOTHER_EXAMPLE_TENANT_ID));
+  }
+
   private Map<String, String> getCompleteQueryParameters() {
     Map<String, String> parameters = new HashMap<String, String>();
 
@@ -243,7 +249,6 @@ public class DeploymentRestServiceQueryTest extends AbstractRestServiceTest {
     parameters.put("name", "name");
     parameters.put("nameLike", "nameLike");
     parameters.put("source", "source");
-    parameters.put("tenantId", "tenantId");
 
     return parameters;
   }

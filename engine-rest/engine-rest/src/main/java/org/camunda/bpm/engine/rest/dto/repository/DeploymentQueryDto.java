@@ -54,7 +54,6 @@ public class DeploymentQueryDto extends AbstractQueryDto<DeploymentQuery> {
   private Boolean withoutSource;
   private Date before;
   private Date after;
-  private String tenantId;
   private List<String> tenantIds;
 
   public DeploymentQueryDto() {
@@ -99,11 +98,6 @@ public class DeploymentQueryDto extends AbstractQueryDto<DeploymentQuery> {
     this.after = deploymentAfter;
   }
 
-  @CamundaQueryParam("tenantId")
-  public void setTenantId(String tenantId) {
-    this.tenantId = tenantId;
-  }
-
   @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
   public void setTenantIdIn(List<String> tenantIds) {
     this.tenantIds = tenantIds;
@@ -145,9 +139,6 @@ public class DeploymentQueryDto extends AbstractQueryDto<DeploymentQuery> {
     }
     if (after != null) {
       query.deploymentAfter(after);
-    }
-    if (tenantId != null) {
-      query.tenantId(tenantId);
     }
     if (tenantIds != null && !tenantIds.isEmpty()) {
       query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));

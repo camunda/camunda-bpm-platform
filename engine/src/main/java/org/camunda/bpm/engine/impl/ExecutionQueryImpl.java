@@ -45,6 +45,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
   protected String incidentId;
   protected String incidentMessage;
   protected String incidentMessageLike;
+  protected String[] tenantIds;
 
   // Not used by end-users, but needed for dynamic ibatis query
   protected String superProcessInstanceId;
@@ -174,6 +175,12 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     return this;
   }
 
+  public ExecutionQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    return this;
+  }
+
   //ordering ////////////////////////////////////////////////////
 
   public ExecutionQueryImpl orderByProcessInstanceId() {
@@ -196,8 +203,14 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     return this;
   }
 
+  public ExecutionQuery orderByTenantId() {
+    orderBy(ExecutionQueryProperty.TENANT_ID);
+    return this;
+  }
+
   //results ////////////////////////////////////////////////////
 
+  @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     ensureVariablesInitialized();
@@ -206,6 +219,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
       .findExecutionCountByQueryCriteria(this);
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public List<Execution> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();

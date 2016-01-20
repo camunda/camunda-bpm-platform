@@ -887,6 +887,10 @@ public abstract class MockProvider {
   }
 
   public static ProcessInstance createMockInstance() {
+    return createMockInstance(EXAMPLE_TENANT_ID);
+  }
+
+  public static ProcessInstance createMockInstance(String tenantId) {
     ProcessInstance mock = mock(ProcessInstance.class);
 
     when(mock.getId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
@@ -896,6 +900,7 @@ public abstract class MockProvider {
     when(mock.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
     when(mock.isSuspended()).thenReturn(EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED);
     when(mock.isEnded()).thenReturn(EXAMPLE_PROCESS_INSTANCE_IS_ENDED);
+    when(mock.getTenantId()).thenReturn(tenantId);
 
     return mock;
   }
@@ -923,11 +928,16 @@ public abstract class MockProvider {
   }
 
   public static Execution createMockExecution() {
+    return createMockExecution(EXAMPLE_TENANT_ID);
+  }
+
+  public static Execution createMockExecution(String tenantId) {
     Execution mock = mock(Execution.class);
 
     when(mock.getId()).thenReturn(EXAMPLE_EXECUTION_ID);
     when(mock.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
     when(mock.isEnded()).thenReturn(EXAMPLE_EXECUTION_IS_ENDED);
+    when(mock.getTenantId()).thenReturn(tenantId);
 
     return mock;
   }
@@ -1033,13 +1043,6 @@ public abstract class MockProvider {
     return mocks;
   }
 
-  public static List<ProcessDefinition> createMockProcessDefinitionsTwoTenants() {
-    List<ProcessDefinition> mocks = new ArrayList<ProcessDefinition>();
-    mocks.add(createMockDefinition(EXAMPLE_TENANT_ID));
-    mocks.add(createMockDefinition(ANOTHER_EXAMPLE_TENANT_ID));
-    return mocks;
-  }
-
   public static ProcessDefinition createMockDefinition() {
     return createMockDefinition(EXAMPLE_TENANT_ID);
   }
@@ -1068,13 +1071,6 @@ public abstract class MockProvider {
   public static List<Deployment> createMockDeployments() {
     List<Deployment> mocks = new ArrayList<Deployment>();
     mocks.add(createMockDeployment());
-    return mocks;
-  }
-
-  public static List<Deployment> createMockDeploymentsTwoTenants() {
-    List<Deployment> mocks = new ArrayList<Deployment>();
-    mocks.add(createMockDeployment(EXAMPLE_TENANT_ID));
-    mocks.add(createMockDeployment(ANOTHER_EXAMPLE_TENANT_ID));
     return mocks;
   }
 

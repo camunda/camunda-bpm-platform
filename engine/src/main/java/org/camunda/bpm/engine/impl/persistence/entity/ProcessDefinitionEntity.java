@@ -104,7 +104,13 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
 
   @Override
   protected PvmExecutionImpl newProcessInstance() {
-    return ExecutionEntity.createNewExecution();
+    ExecutionEntity newExecution = ExecutionEntity.createNewExecution();
+
+    if(tenantId != null) {
+      newExecution.setTenantId(tenantId);
+    }
+
+    return newExecution;
   }
 
   @Override
@@ -131,6 +137,10 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     // initialize case instance id
     if (caseInstanceId != null) {
       processInstance.setCaseInstanceId(caseInstanceId);
+    }
+
+    if(tenantId != null) {
+      processInstance.setTenantId(tenantId);
     }
 
     return processInstance;

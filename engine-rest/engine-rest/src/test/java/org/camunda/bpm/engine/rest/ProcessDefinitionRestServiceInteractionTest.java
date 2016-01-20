@@ -26,6 +26,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -169,6 +170,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     when(processDefinitionQueryMock.latestVersion()).thenReturn(processDefinitionQueryMock);
     when(processDefinitionQueryMock.singleResult()).thenReturn(mockDefinition);
     when(processDefinitionQueryMock.count()).thenReturn(1L);
+    when(processDefinitionQueryMock.list()).thenReturn(Collections.singletonList(mockDefinition));
     when(repositoryServiceMock.createProcessDefinitionQuery()).thenReturn(processDefinitionQueryMock);
   }
 
@@ -2665,6 +2667,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
     when(repositoryServiceMock.createProcessDefinitionQuery().processDefinitionKey(nonExistingKey)).thenReturn(processDefinitionQueryMock);
     when(processDefinitionQueryMock.latestVersion()).thenReturn(processDefinitionQueryMock);
     when(processDefinitionQueryMock.singleResult()).thenReturn(null);
+    when(processDefinitionQueryMock.list()).thenReturn(Collections.<ProcessDefinition>emptyList());
     when(processDefinitionQueryMock.count()).thenReturn(0L);
 
     given().pathParam("key", nonExistingKey)
@@ -2678,6 +2681,11 @@ public class ProcessDefinitionRestServiceInteractionTest extends AbstractRestSer
   @Test
   public void testProcessDefinitionRetrievalForMultipleTenants_ByKey() {
     // process definition is deployed for two tenants
+    List<ProcessDefinition> processDefinitions = Arrays.asList(
+        MockProvider.createMockDefinition(MockProvider.EXAMPLE_TENANT_ID),
+        MockProvider.createMockDefinition(MockProvider.ANOTHER_EXAMPLE_TENANT_ID));
+
+    when(processDefinitionQueryMock.list()).thenReturn(processDefinitions);
     when(processDefinitionQueryMock.count()).thenReturn(2L);
     when(processDefinitionQueryMock.singleResult()).thenThrow(new ProcessEngineException("not a unique result"));
 

@@ -55,6 +55,7 @@ create table ACT_RU_EXECUTION (
     SUSPENSION_STATE_ integer,
     CACHED_ENT_STATE_ integer,
     SEQUENCE_COUNTER_ bigint,
+    TENANT_ID_ varchar(255),
     primary key (ID_)
 );
 
@@ -249,6 +250,7 @@ create table ACT_RU_EXT_TASK (
 );
 
 create index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION(BUSINESS_KEY_);
+create index ACT_IDX_EXEC_TENANT_ID on ACT_RU_EXECUTION(TENANT_ID_);
 create index ACT_IDX_TASK_CREATE on ACT_RU_TASK(CREATE_TIME_);
 create index ACT_IDX_TASK_ASSIGNEE on ACT_RU_TASK(ASSIGNEE_);
 create index ACT_IDX_IDENT_LNK_USER on ACT_RU_IDENTITYLINK(USER_ID_);

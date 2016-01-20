@@ -192,9 +192,6 @@
       <if test="incidentMessageLike != null">
         and INC.INCIDENT_MSG_ like #{incidentMessageLike}
       </if>
-      <if test="tenantId != null">
-        and RES.TENANT_ID_ = #{tenantId}
-      </if>
       <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
         and RES.TENANT_ID_ in
         <foreach item="tenantId" index="index" collection="tenantIds"
@@ -214,17 +211,18 @@
     where DEPLOYMENT_ID_ = #{deploymentId}
       and KEY_ = #{processDefinitionKey}
   </select>
-    
+  
   <select id="selectLatestProcessDefinitionByKey" parameterType="string" resultMap="processDefinitionResultMap">
-    select *
+    select * 
     from ${prefix}ACT_RE_PROCDEF p1
-    where KEY_ = #{parameter} and
-          VERSION_ = (
-              select max(VERSION_) 
-              from ${prefix}ACT_RE_PROCDEF p2
-              where KEY_ = #{parameter} 
-                  and (p1.TENANT_ID_ = p2.TENANT_ID_
-                      or (p1.TENANT_ID_ is null and p2.TENANT_ID_ is null)))
+        inner join
+          (select KEY_, TENANT_ID_, max(VERSION_) as MAX_VERSION
+          from ${prefix}ACT_RE_PROCDEF
+          where KEY_ = #{parameter}
+          group by TENANT_ID_, KEY_) p2
+        on p1.KEY_ = p2.KEY_
+        where p1.VERSION_ = p2.MAX_VERSION and 
+          (p1.TENANT_ID_ = p2.TENANT_ID_ or (p1.TENANT_ID_ is null and p2.TENANT_ID_ is null))         
   </select>
   
   <select id="selectLatestProcessDefinitionByKeyWithoutTenantId" parameterType="map" resultMap="processDefinitionResultMap">

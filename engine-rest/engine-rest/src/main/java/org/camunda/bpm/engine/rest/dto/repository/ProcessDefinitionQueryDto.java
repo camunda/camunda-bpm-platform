@@ -70,7 +70,6 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
   private String incidentType;
   private String incidentMessage;
   private String incidentMessageLike;
-  private String tenantId;
   private List<String> tenantIds;
 
   public ProcessDefinitionQueryDto() {
@@ -199,11 +198,6 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
     this.incidentMessageLike = incidentMessageLike;
   }
 
-  @CamundaQueryParam("tenantId")
-  public void setTenantId(String tenantId) {
-    this.tenantId = tenantId;
-  }
-
   @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
   public void setTenantIdIn(List<String> tenantIds) {
     this.tenantIds = tenantIds;
@@ -280,9 +274,6 @@ public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitio
     }
     if (incidentMessageLike != null) {
       query.incidentMessageLike(incidentMessageLike);
-    }
-    if (tenantId != null) {
-      query.tenantId(tenantId);
     }
     if (tenantIds != null && !tenantIds.isEmpty()) {
       query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));

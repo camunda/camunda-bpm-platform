@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
@@ -35,6 +36,7 @@ public class ExecutionQueryDto extends AbstractQueryDto<ExecutionQuery> {
   private static final String SORT_BY_INSTANCE_ID_VALUE = "instanceId";
   private static final String SORT_BY_DEFINITION_KEY_VALUE = "definitionKey";
   private static final String SORT_BY_DEFINITION_ID_VALUE = "definitionId";
+  private static final String SORT_BY_TENANT_ID = "tenantId";
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -42,6 +44,7 @@ public class ExecutionQueryDto extends AbstractQueryDto<ExecutionQuery> {
     VALID_SORT_BY_VALUES.add(SORT_BY_INSTANCE_ID_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_DEFINITION_KEY_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_DEFINITION_ID_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID);
   }
 
   private String processDefinitionKey;
@@ -57,6 +60,7 @@ public class ExecutionQueryDto extends AbstractQueryDto<ExecutionQuery> {
   private String incidentType;
   private String incidentMessage;
   private String incidentMessageLike;
+  private List<String> tenantIds;
 
   private List<VariableQueryParameterDto> variables;
   private List<VariableQueryParameterDto> processVariables;
@@ -144,6 +148,11 @@ public class ExecutionQueryDto extends AbstractQueryDto<ExecutionQuery> {
     this.incidentMessageLike = incidentMessageLike;
   }
 
+  @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
+  public void setTenantIdIn(List<String> tenantIds) {
+    this.tenantIds = tenantIds;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -194,6 +203,9 @@ public class ExecutionQueryDto extends AbstractQueryDto<ExecutionQuery> {
     }
     if (incidentMessageLike != null) {
       query.incidentMessageLike(incidentMessageLike);
+    }
+    if (tenantIds != null && !tenantIds.isEmpty()) {
+      query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
     }
 
     if (variables != null) {
@@ -247,6 +259,8 @@ public class ExecutionQueryDto extends AbstractQueryDto<ExecutionQuery> {
       query.orderByProcessDefinitionKey();
     } else if (sortBy.equals(SORT_BY_DEFINITION_ID_VALUE)) {
       query.orderByProcessDefinitionId();
+    } else if (sortBy.equals(SORT_BY_TENANT_ID)) {
+      query.orderByTenantId();
     }
   }
 }

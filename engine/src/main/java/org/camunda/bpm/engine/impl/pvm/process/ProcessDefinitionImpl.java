@@ -148,6 +148,7 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
     return null;
   }
 
+  @Override
   public CoreActivityBehavior<? extends BaseDelegateExecution> getActivityBehavior() {
     // unsupported in PVM
     return null;
@@ -163,6 +164,7 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
     this.initial = initial;
   }
 
+  @Override
   public String toString() {
     return "ProcessDefinition("+id+")";
   }
@@ -206,6 +208,7 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
     return null;
   }
 
+  @Override
   public boolean isSubProcessScope() {
     return true;
   }

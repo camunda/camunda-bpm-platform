@@ -474,6 +474,7 @@ public class ProcessInstanceRestServiceInteractionTest extends
       .body("definitionId", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
       .body("businessKey", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY))
       .body("suspended", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED))
+      .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
       .when().get(SINGLE_PROCESS_INSTANCE_URL);
   }
 

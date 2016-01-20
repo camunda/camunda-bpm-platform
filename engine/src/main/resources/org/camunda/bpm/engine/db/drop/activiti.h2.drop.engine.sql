@@ -103,6 +103,10 @@ drop index ACT_IDX_JOB_HANDLER_TYPE;
 drop index ACT_IDX_EVENT_SUBSCR_EVT_NAME;
 drop index ACT_IDX_PROCDEF_DEPLOYMENT_ID;
 
+drop index ACT_IDX_EXEC_TENANT_ID;
+drop index ACT_IDX_PROCDEF_TENANT_ID;
+drop index ACT_IDX_DEPLOYMENT_TENANT_ID;
+
 drop table ACT_GE_PROPERTY if exists;
 drop table ACT_GE_BYTEARRAY if exists;
 drop table ACT_RE_DEPLOYMENT if exists;

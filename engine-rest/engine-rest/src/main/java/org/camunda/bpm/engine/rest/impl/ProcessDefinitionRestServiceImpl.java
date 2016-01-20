@@ -50,25 +50,25 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
       throw new InvalidRequestException(Status.BAD_REQUEST, "Query parameter 'processDefinitionKey' cannot be null");
     }
 
-    ProcessDefinitionQuery processDefinitionQuery = getProcessEngine()
+    List<ProcessDefinition> processDefinitions = getProcessEngine()
         .getRepositoryService()
         .createProcessDefinitionQuery()
         .processDefinitionKey(processDefinitionKey)
-        .latestVersion();
+        .latestVersion()
+        .list();
 
-    long count = processDefinitionQuery.count();
-    if(count == 0){
+    if(processDefinitions.isEmpty()){
       String errorMessage = String.format("No matching process definition with key: %s ", processDefinitionKey);
       throw new RestException(Status.NOT_FOUND, errorMessage);
 
-    } else if(count > 1) {
+    } else if(processDefinitions.size() > 1) {
       String errorMessage = String.format(
           "Found multiple process definition with key '%s' for different tenants. You have to request the process definition by id instead of key.",
           processDefinitionKey);
       throw new RestException(Status.BAD_REQUEST, errorMessage);
 
     } else {
-      ProcessDefinition processDefinition = processDefinitionQuery.singleResult();
+      ProcessDefinition processDefinition = processDefinitions.get(0);
       ProcessDefinitionResource processDefinitionResource = getProcessDefinitionById(processDefinition.getId());
 
       return processDefinitionResource;
