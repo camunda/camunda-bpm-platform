@@ -667,15 +667,6 @@
                 <inherited>false</inherited>
                 <configuration>
                   <target>
-                    <!-- update webdriver -->
-                    <exec executable="./node_modules/grunt-protractor-runner/node_modules/protractor/bin/webdriver-manager" failonerror="true" osfamily="unix">
-                      <arg value="update" />
-                    </exec>
-                    <exec executable="cmd" failonerror="true" osfamily="windows">
-                      <arg value="/c" />
-                      <arg value="node_modules\grunt-protractor-runner\node_modules\.bin\webdriver-manager" />
-                      <arg value="update" />
-                    </exec>
                     <!-- grunt test-e2e -->
                     <exec executable="./node_modules/grunt-cli/bin/grunt" failonerror="true" osfamily="unix">
                       <env key="XUNIT_FILE" value="target/xunit.xml" />
