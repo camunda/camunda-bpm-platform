@@ -57,7 +57,15 @@ module.exports = function(grunt) {
     buildTarget: pkg.gruntConfig.tasklistBuildTarget,
   });
 
-  var watchConf = { };
+  var watchConf = {
+    commons_styles: {
+      options: {
+        liverreload: false,
+      },
+      files: ['node_modules/camunda-commons-ui/{lib,resources}/**/*.less'],
+      tasks: ['less']
+    }
+  };
   require('./grunt/config/watch')(config, watchConf);
   require('camunda-tasklist-ui/grunt/config/watch')(config, watchConf);
   require('camunda-cockpit-ui/grunt/config/watch')(config, watchConf);
