@@ -113,7 +113,7 @@ public class ProcessApplicationContext {
    * @param callable the callable to execute
    * @param name the name of the process application to switch into
    */
-  public static <T> T executeInProcessApplication(Callable<T> callable, String processApplicationName) throws Exception {
+  public static <T> T withProcessApplicationContext(Callable<T> callable, String processApplicationName) throws Exception {
     try {
       setCurrentProcessApplication(processApplicationName);
       return callable.call();
@@ -140,7 +140,7 @@ public class ProcessApplicationContext {
    * @param callable the callable to execute
    * @param reference a reference of the process application to switch into
    */
-  public static <T> T executeInProcessApplication(Callable<T> callable, ProcessApplicationReference reference) throws Exception {
+  public static <T> T withProcessApplicationContext(Callable<T> callable, ProcessApplicationReference reference) throws Exception {
     try {
       setCurrentProcessApplication(reference);
       return callable.call();
@@ -167,7 +167,7 @@ public class ProcessApplicationContext {
    * @param callable the callable to execute
    * @param processApplication the process application to switch into
    */
-  public static <T> T executeInProcessApplication(Callable<T> callable, ProcessApplicationInterface processApplication) throws Exception {
+  public static <T> T withProcessApplicationContext(Callable<T> callable, ProcessApplicationInterface processApplication) throws Exception {
     try {
       setCurrentProcessApplication(processApplication);
       return callable.call();

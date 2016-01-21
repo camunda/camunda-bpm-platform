@@ -63,7 +63,7 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTestCas
   public void testExecutionInPAContextByName() throws Exception {
     Assert.assertNull(Context.getCurrentProcessApplication());
 
-    ProcessApplicationReference contextPA = ProcessApplicationContext.executeInProcessApplication(
+    ProcessApplicationReference contextPA = ProcessApplicationContext.withProcessApplicationContext(
         new Callable<ProcessApplicationReference>() {
 
           @Override
@@ -95,7 +95,7 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTestCas
   public void testExecutionInPAContextByReference() throws Exception {
     Assert.assertNull(Context.getCurrentProcessApplication());
 
-    ProcessApplicationReference contextPA = ProcessApplicationContext.executeInProcessApplication(
+    ProcessApplicationReference contextPA = ProcessApplicationContext.withProcessApplicationContext(
         new Callable<ProcessApplicationReference>() {
 
           @Override
@@ -127,7 +127,7 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTestCas
   public void testExecutionInPAContextbyRawPA() throws Exception {
     Assert.assertNull(Context.getCurrentProcessApplication());
 
-    ProcessApplicationReference contextPA = ProcessApplicationContext.executeInProcessApplication(
+    ProcessApplicationReference contextPA = ProcessApplicationContext.withProcessApplicationContext(
         new Callable<ProcessApplicationReference>() {
 
           @Override
@@ -166,7 +166,7 @@ public class ProcessApplicationContextTest extends PluggableProcessEngineTestCas
     String nonExistingName = pa.getName() + pa.getName();
 
     try {
-      ProcessApplicationContext.executeInProcessApplication(new Callable<Void>() {
+      ProcessApplicationContext.withProcessApplicationContext(new Callable<Void>() {
 
         @Override
         public Void call() throws Exception {

@@ -36,6 +36,8 @@ import org.junit.runner.RunWith;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import static org.camunda.bpm.application.ProcessApplicationContext.*;
+
 /**
  * @author Thorben Lindhauer
  *
@@ -83,8 +85,9 @@ public class PaContextSwitchTest extends AbstractFoxPlatformIntegrationTest {
   @OperateOnDeployment("pa1")
   public void testNoContextSwitchOnInnerCommand() throws Exception {
 
-    ProcessInstance pi = ProcessApplicationContext.executeInProcessApplication(new Callable<ProcessInstance>() {
+    ProcessInstance pi = withProcessApplicationContext(new Callable<ProcessInstance>() {
 
+      @Override
       public ProcessInstance call() throws Exception {
         return runtimeService.startProcessInstanceByKey("process");
       }
