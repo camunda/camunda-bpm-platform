@@ -138,4 +138,10 @@ public class CommandLogger extends ProcessEngineLogger {
         "021", "Cannot resolve process application based on {}", processApplicationIdentifier));
   }
 
+  public void warnDisabledDeploymentLock() {
+    logWarn(
+        "022", "No exclusive lock is aquired while deploying because it is disabled. "
+        + "This can lead to problems when multiple process engines use the same data source (i.e. in cluster mode).");
+  }
+
 }

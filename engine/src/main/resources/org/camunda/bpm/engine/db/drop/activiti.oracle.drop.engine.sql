@@ -68,9 +68,6 @@ alter table ACT_RU_JOB
 alter table ACT_RU_EVENT_SUBSCR
     drop CONSTRAINT ACT_FK_EVENT_EXEC;
 
-alter table ACT_RE_PROCDEF
-    drop CONSTRAINT ACT_UNIQ_PROCDEF;
-
 alter table ACT_RU_INCIDENT
     drop CONSTRAINT ACT_FK_INC_EXE; 
 

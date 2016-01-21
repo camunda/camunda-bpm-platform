@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
+
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -408,7 +409,12 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
       // This is important to ensure that duplicate filtering works correctly
       // in a multi-node cluster. See also https://app.camunda.com/jira/browse/CAM-2128
 
+      // It is also important to ensure the uniqueness of a process definition key,
+      // version and tenant-id since there is no database constraint to check it.
+
       commandContext.getPropertyManager().acquireExclusiveLock();
+    } else {
+      LOG.warnDisabledDeploymentLock();
     }
   }
 
