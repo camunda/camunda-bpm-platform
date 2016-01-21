@@ -101,6 +101,7 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
     this.paModule = paModule;
   }
 
+  @Override
   public void start(StartContext context) throws StartException {
 
     ManagedReference reference = null;
@@ -142,6 +143,8 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
       }
       processApplicationInfo.setDeploymentInfo(deploymentInfos);
 
+      notifyBpmPlatformPlugins(platformPluginsInjector.getValue(), processApplication);
+
       if(postDeployDescription != null) {
         invokePostDeploy(processApplication);
       }
@@ -151,8 +154,6 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
       ServiceName serviceName = ServiceNames.forManagedProcessApplication(processApplicationInfo.getName());
       MscManagedProcessApplication managedProcessApplication = new MscManagedProcessApplication(processApplicationInfo, processApplication.getReference());
       context.getChildTarget().addService(serviceName, managedProcessApplication).install();
-
-      notifyBpmPlatformPlugins(platformPluginsInjector.getValue(), processApplication);
 
     } catch (StartException e) {
       throw e;
@@ -173,6 +174,7 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
     }
   }
 
+  @Override
   public void stop(StopContext context) {
 
     ManagedReference reference = null;
@@ -208,6 +210,7 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
     if(postDeployMethod != null) {
       try {
         processApplication.execute(new Callable<Void>() {
+          @Override
           public Void call() throws Exception {
             postDeployMethod.invoke(processApplication.getRawObject(), getInjections(postDeployMethod));
             return null;
@@ -228,6 +231,7 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
       if(preUndeployMethod != null) {
         try {
           processApplication.execute(new Callable<Void>() {
+            @Override
             public Void call() throws Exception {
               preUndeployMethod.invoke(processApplication.getRawObject(), getInjections(preUndeployMethod));
               return null;
@@ -307,6 +311,7 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
     return paComponentViewInjector;
   }
 
+  @Override
   public ProcessApplicationStartService getValue() throws IllegalStateException, IllegalArgumentException {
     return this;
   }
