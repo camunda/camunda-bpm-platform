@@ -1,3 +1,5 @@
+var child_process = require('child_process');
+
 module.exports = function(grunt) {
   'use strict';
 
@@ -148,7 +150,16 @@ module.exports = function(grunt) {
     }
   });
 
+  grunt.registerTask('ensureSelenium', function() {
+    // async task
+    var done = this.async();
+
+    child_process.execFile('node', [__dirname + '/node_modules/grunt-protractor-runner/node_modules/protractor/bin/webdriver-manager', '--chrome', 'update'], function(err) {
+      done();
+    });
+  });
+
   grunt.registerTask('default', ['build']);
 
-  grunt.registerTask('test-e2e', ['protractor:e2e']);
+  grunt.registerTask('test-e2e', ['ensureSelenium', 'protractor:e2e']);
 };
