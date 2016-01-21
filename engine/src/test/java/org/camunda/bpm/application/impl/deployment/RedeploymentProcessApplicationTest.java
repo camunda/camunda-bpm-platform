@@ -624,6 +624,7 @@ public class RedeploymentProcessApplicationTest extends PluggableProcessEngineTe
   protected void deleteDeployments(Deployment... deployments){
     for (Deployment deployment : deployments) {
       repositoryService.deleteDeployment(deployment.getId(), true);
+      managementService.unregisterProcessApplication(deployment.getId(), false);
     }
   }
 

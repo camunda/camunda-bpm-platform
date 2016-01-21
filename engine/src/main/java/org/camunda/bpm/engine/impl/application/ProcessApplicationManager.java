@@ -68,6 +68,10 @@ public class ProcessApplicationManager {
     removeProcessApplicationRegistration(deploymentIds, removeProcessesFromCache);
   }
 
+  public boolean hasRegistrations() {
+    return !registrationsByDeploymentId.isEmpty();
+  }
+
   protected DefaultProcessApplicationRegistration createProcessApplicationRegistration(Set<String> deploymentsToRegister, ProcessApplicationReference reference) {
     final String processEngineName = Context.getProcessEngineConfiguration().getProcessEngineName();
 

@@ -1167,6 +1167,41 @@ public class RedeploymentRegistrationTest extends PluggableProcessEngineTestCase
     deleteDeployments(deployment1, deployment2, deployment3);
   }
 
+  public void testNoRegistrationCheckIfNoProcessApplicationIsDeployed() {
+
+    // create two deployments; both contain a process with the same key
+    Deployment deployment1 = repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addModelInstance(BPMN_RESOURCE_1, createProcessWithServiceTask(PROCESS_KEY_1))
+        .deploy();
+
+    Deployment deployment2 = repositoryService
+        .createDeployment()
+        .name(DEPLOYMENT_NAME)
+        .addDeploymentResources(deployment1.getId())
+        .deploy();
+
+    // assume an empty deployment cache (e.g. on a different engine)
+    processEngineConfiguration.getDeploymentCache().discardProcessDefinitionCache();
+
+    // then starting a process instance for the latest version
+    //
+    // The context switch mechanism for process definitions in redeployments
+    // is to look up the process application registration from a previous version
+    // of the same process. This can trigger fetching these process definitions
+    // from the database.
+    //
+    // In case where there are no process application registrations anyway (e.g. embedded engine),
+    // this logic should not be executed.
+    runtimeService.startProcessInstanceByKey(PROCESS_KEY_1);
+
+    // accordingly the process definition cache should only contain the latest version now
+    assertEquals(1, processEngineConfiguration.getDeploymentCache().getProcessDefinitionCache().size());
+
+    deleteDeployments(deployment1, deployment2);
+  }
+
   // helper ///////////////////////////////////////////
 
   protected ProcessDefinition queryLatestProcessDefinitionByKey(String key) {
@@ -1232,6 +1267,7 @@ public class RedeploymentRegistrationTest extends PluggableProcessEngineTestCase
   protected void deleteDeployments(Deployment... deployments){
     for (Deployment deployment : deployments) {
       repositoryService.deleteDeployment(deployment.getId(), true);
+      managementService.unregisterProcessApplication(deployment.getId(), false);
     }
   }
 

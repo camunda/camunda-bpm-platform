@@ -70,7 +70,7 @@ public class ProcessApplicationContextUtil {
   public static ProcessApplicationReference getTargetProcessApplication(ResourceDefinitionEntity definition) {
     ProcessApplicationReference reference = getTargetProcessApplication(definition.getDeploymentId());
 
-    if (reference == null) {
+    if (reference == null && areProcessApplicationsRegistered()) {
       ResourceDefinitionEntity previous = definition.getPreviousDefinition();
 
       // do it in a iterative way instead of recursive to avoid
@@ -99,6 +99,13 @@ public class ProcessApplicationContextUtil {
     ProcessApplicationReference processApplicationForDeployment = processApplicationManager.getProcessApplicationForDeployment(deploymentId);
 
     return processApplicationForDeployment;
+  }
+
+  public static boolean areProcessApplicationsRegistered() {
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    ProcessApplicationManager processApplicationManager = processEngineConfiguration.getProcessApplicationManager();
+
+    return processApplicationManager.hasRegistrations();
   }
 
   private static void loggContextSwitchDetails(ExecutionEntity execution) {
