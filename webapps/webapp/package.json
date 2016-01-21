@@ -32,6 +32,7 @@
   },
   "devDependencies": {
     "brfs": "1.4.2",
+    "camunda-webapp-test": "git://github.com/camunda/camunda-webapp-test#master",
     "chai": "2.0.0",
     "chai-as-promised": "4.2.0",
     "exposify": "^0.5.0",
@@ -50,7 +51,6 @@
     "mocha": "2.1.0",
     "mocha-multi": "0.7.2",
     "mocha-proshot": "1.0.1",
-    "request": "2.53.0",
     "requirejs-text": "2.0.12",
     "source-map": "0.4.4",
     "xunit-file": "0.0.6"

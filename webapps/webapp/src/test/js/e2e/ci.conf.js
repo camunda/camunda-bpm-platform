@@ -9,6 +9,8 @@ global.expect   = chai.expect;
 process.env.PROSHOT_DIR = './target/screenshots';
 process.env.multi = 'xunit-file=- mocha-proshot=-';
 
+var tested = process.env.TESTED || '*';
+
 exports.config = {
 
   // The timeout for each script run on the browser. This should be longer
@@ -28,30 +30,7 @@ exports.config = {
   // Spec patterns are relative to the location of the spec file. They may
   // include glob patterns.
   specs: [
-    'admin/specs/admin-user-spec.js',
-    'admin/specs/users-spec.js',
-    'admin/specs/groups-spec.js',
-    'admin/specs/system-spec.js',
-    'admin/specs/authorizations-spec.js',
-    'cockpit/specs/dashboard-spec.js',
-    'cockpit/specs/process-definition-spec.js',
-    'cockpit/specs/decision-definition-spec.js',
-    'cockpit/specs/decision-instance-spec.js',
-    'cockpit/specs/process-instance-spec.js',
-    'cockpit/specs/process-definition-filter-spec.js',
-    'cockpit/specs/variable-spec.js',
-    'cockpit/specs/suspension-spec.js',
-    'cockpit/specs/repository-spec.js',
-    'tasklist/specs/filter-basic-spec.js',
-    'tasklist/specs/filter-permissions-spec.js',
-    'tasklist/specs/filter-criteria-spec.js',
-    'tasklist/specs/filter-variables-spec.js',
-    'tasklist/specs/task-claiming-spec.js',
-    'tasklist/specs/process-start-spec.js',
-    'tasklist/specs/tasklist-sorting-spec.js',
-    'tasklist/specs/tasklist-search-spec.js',
-    'tasklist/specs/task-detail-view-spec.js',
-    'tasklist/specs/task-dates-spec.js'
+    '../../../../node_modules/camunda-webapp-test/{admin,tasklist,cockpit}/specs/' + tested + '-spec.js'
   ],
 
   // A base URL for your application under test. Calls to protractor.get()
