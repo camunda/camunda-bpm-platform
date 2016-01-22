@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.test.concurrency;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 
 import java.io.ByteArrayOutputStream;
@@ -67,12 +68,9 @@ public class ConcurrentDeploymentTest extends ConcurrencyTestCase {
    */
   public void testDuplicateFiltering() throws InterruptedException {
 
-    DeploymentBuilder deployment = new DeploymentBuilderImpl(null)
-        .name("some-deployment-name")
-        .addString("foo.bpmn", processResource)
-        .enableDuplicateFiltering(false);
-
-    deployOnTwoConcurrentThreads(deployment);
+    deployOnTwoConcurrentThreads(
+        createDeploymentBuilder().enableDuplicateFiltering(false),
+        createDeploymentBuilder().enableDuplicateFiltering(false));
 
     // ensure that although both transactions were run concurrently, only one deployment was constructed.
     DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
@@ -81,11 +79,10 @@ public class ConcurrentDeploymentTest extends ConcurrencyTestCase {
 
   public void testVersioning() throws InterruptedException {
 
-    DeploymentBuilder deployment = new DeploymentBuilderImpl(null)
-        .name("some-deployment-name")
-        .addString("foo.bpmn", processResource);
-
-    deployOnTwoConcurrentThreads(deployment);
+    deployOnTwoConcurrentThreads(
+        createDeploymentBuilder(),
+        createDeploymentBuilder()
+        );
 
     // ensure that although both transactions were run concurrently, the process definitions have different versions
     List<ProcessDefinition> processDefinitions = repositoryService
@@ -99,14 +96,22 @@ public class ConcurrentDeploymentTest extends ConcurrencyTestCase {
     assertThat(processDefinitions.get(1).getVersion(), is(2));
   }
 
-  protected void deployOnTwoConcurrentThreads(DeploymentBuilder deploymentBuilder) throws InterruptedException {
+  protected DeploymentBuilder createDeploymentBuilder() {
+    return new DeploymentBuilderImpl(null)
+        .name("some-deployment-name")
+        .addString("foo.bpmn", processResource);
+  }
+
+  protected void deployOnTwoConcurrentThreads(DeploymentBuilder deploymentOne, DeploymentBuilder deploymentTwo) throws InterruptedException {
+    assertThat("you can not use the same deployment builder for both deployments", deploymentOne, is(not(deploymentTwo)));
+
     // STEP 1: bring two threads to a point where they have
     // 1) started a new transaction
     // 2) are ready to deploy
-    ThreadControl thread1 = executeControllableCommand(new ControllableDeployCommand(deploymentBuilder));
+    ThreadControl thread1 = executeControllableCommand(new ControllableDeployCommand(deploymentOne));
     thread1.waitForSync();
 
-    ThreadControl thread2 = executeControllableCommand(new ControllableDeployCommand(deploymentBuilder));
+    ThreadControl thread2 = executeControllableCommand(new ControllableDeployCommand(deploymentTwo));
     thread2.waitForSync();
 
     // STEP 2: make Thread 1 proceed and wait until it has deployed but not yet committed
