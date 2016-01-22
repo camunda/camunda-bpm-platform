@@ -65,6 +65,10 @@ module.exports = function(config, requireJsConfig) {
         {
           name: 'repository',
           location: './scripts/repository',
+        },
+        {
+          name: 'reports',
+          location: './scripts/reports',
         }
       ])
   };

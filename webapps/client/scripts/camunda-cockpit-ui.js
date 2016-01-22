@@ -18,6 +18,7 @@ var angular = require('angular');
       'ngResource',
       commons.name,
       require('./repository/main').name,
+      require('./reports/main').name,
       require('./directives/main').name,
       require('./filters/main').name,
       require('./pages/main').name,
@@ -110,6 +111,7 @@ var angular = require('angular');
     container['camunda-commons-ui'] = commons;
     container['camunda-bpm-sdk-js'] = sdk;
     container['angular-data-depend'] = dataDepend;
+    container['require-helper'] = require('camunda-commons-ui/lib/util/require_helper');
   };
 
 

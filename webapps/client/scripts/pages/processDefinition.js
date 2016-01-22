@@ -318,6 +318,8 @@ var angular = require('angular'),
     // with process definition data providers
     Data.instantiateProviders('cockpit.processDefinition.data', { $scope: $scope, processData : processData });
 
+    $scope.hasReportPlugin = Views.getProviders({ component: 'cockpit.report' }).length > 0;
+
     // INITIALIZE PLUGINS
     var processPlugins = (
         Views.getProviders({ component: 'cockpit.processDefinition.runtime.tab' })).concat(
