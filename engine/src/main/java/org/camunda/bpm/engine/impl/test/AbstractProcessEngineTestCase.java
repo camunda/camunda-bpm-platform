@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
+
 import org.apache.ibatis.logging.LogFactory;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.CaseService;
@@ -114,13 +115,28 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     finally {
       TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, getClass(), getName());
       identityService.clearAuthentication();
-      TestHelper.assertAndEnsureCleanDbAndCache(processEngine);
+
+      ensureCleanDbAndCache();
       ClockUtil.reset();
 
       // Can't do this in the teardown, as the teardown will be called as part
       // of the super.runBare
       closeDownProcessEngine();
       clearServiceReferences();
+    }
+  }
+
+  protected void ensureCleanDbAndCache() throws AssertionError {
+    try {
+      TestHelper.assertAndEnsureCleanDbAndCache(processEngine);
+
+    } catch (AssertionError e) {
+      if (exception != null) {
+        // if the test fails then ignore clean db failures to not obscure the true test failure
+        // - the db failure is already logged by the test helper
+      } else {
+        throw e;
+      }
     }
   }
 
