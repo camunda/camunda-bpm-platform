@@ -29,8 +29,11 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 @Produces({MediaType.APPLICATION_JSON, Hal.APPLICATION_HAL_JSON})
 public class JacksonConfigurator implements ContextResolver<ObjectMapper> {
 
+  public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+  public static String dateFormatString = DEFAULT_DATE_FORMAT;
+
   public static ObjectMapper configureObjectMapper(ObjectMapper mapper) {
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    SimpleDateFormat dateFormat = new SimpleDateFormat(dateFormatString);
     mapper.setDateFormat(dateFormat);
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
@@ -41,6 +44,10 @@ public class JacksonConfigurator implements ContextResolver<ObjectMapper> {
   @Override
   public ObjectMapper getContext(Class<?> clazz) {
     return configureObjectMapper(new ObjectMapper());
+  }
+
+  public static void setDateFormatString(String dateFormatString) {
+    JacksonConfigurator.dateFormatString = dateFormatString;
   }
 
 }

@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.rest.util.container;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.camunda.bpm.engine.rest.CustomJacksonDateFormatTest;
 import org.camunda.bpm.engine.rest.ExceptionHandlerTest;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.RuleChain;
@@ -35,6 +36,7 @@ public class WinkSpecifics implements ContainerSpecifics {
 
   static {
     TEST_RULE_FACTORIES.put(ExceptionHandlerTest.class, new ServletContainerRuleFactory("custom-application-web.xml"));
+    TEST_RULE_FACTORIES.put(CustomJacksonDateFormatTest.class, new ServletContainerRuleFactory("custom-date-format-web.xml"));
   }
 
   public TestRule getTestRule(Class<?> testClass) {

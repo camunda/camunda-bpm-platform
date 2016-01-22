@@ -17,9 +17,12 @@ import java.util.Map;
 
 import javax.ws.rs.core.Application;
 
+import org.camunda.bpm.engine.rest.CustomJacksonDateFormatTest;
 import org.camunda.bpm.engine.rest.ExceptionHandlerTest;
 import org.camunda.bpm.engine.rest.application.TestCustomResourceApplication;
 import org.junit.rules.ExternalResource;
+import org.junit.rules.RuleChain;
+import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestRule;
 
 /**
@@ -36,6 +39,7 @@ public class JerseySpecifics implements ContainerSpecifics {
 
   static {
     TEST_RULE_FACTORIES.put(ExceptionHandlerTest.class, new EmbeddedServerRuleFactory(new TestCustomResourceApplication()));
+    TEST_RULE_FACTORIES.put(CustomJacksonDateFormatTest.class, new ServletContainerRuleFactory("custom-date-format-web.xml"));
   }
 
   public TestRule getTestRule(Class<?> testClass) {
@@ -74,6 +78,36 @@ public class JerseySpecifics implements ContainerSpecifics {
 
   public TestRule getTestRule(String webXmlResource) {
     throw new UnsupportedOperationException();
+  }
+
+  public static class ServletContainerRuleFactory implements TestRuleFactory {
+
+    protected String webXmlResource;
+
+    public ServletContainerRuleFactory(String webXmlResource) {
+      this.webXmlResource = webXmlResource;
+    }
+
+    public TestRule createTestRule() {
+      final TemporaryFolder tempFolder = new TemporaryFolder();
+
+      return RuleChain
+        .outerRule(tempFolder)
+        .around(new ExternalResource() {
+
+          TomcatServerBootstrap bootstrap = new JerseyTomcatServerBootstrap(webXmlResource);
+
+          protected void before() throws Throwable {
+            bootstrap.setWorkingDir(tempFolder.getRoot().getAbsolutePath());
+            bootstrap.start();
+          }
+
+          protected void after() {
+            bootstrap.stop();
+          }
+        });
+    }
+
   }
 
 }
