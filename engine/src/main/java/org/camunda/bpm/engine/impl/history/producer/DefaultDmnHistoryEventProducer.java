@@ -90,6 +90,8 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     initDecisionInstanceEvent(event, evaluationEvent, HistoryEventTypes.DMN_DECISION_EVALUATE);
     // set current time as evaluation time
     event.setEvaluationTime(ClockUtil.getCurrentTime());
+    // set the user id if there is an authenticated user and no process instance  
+    setUserId(event);
 
     return event;
   }
@@ -114,8 +116,6 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     event.setDecisionDefinitionKey(decisionTable.getKey());
     event.setDecisionDefinitionName(decisionTable.getName());
     
-    event.setUserId(Context.getCommandContext().getAuthenticatedUserId());
-
     if(evaluationEvent.getCollectResultValue() != null) {
       Double collectResultValue = getCollectResultValue(evaluationEvent.getCollectResultValue());
       event.setCollectResultValue(collectResultValue);
@@ -230,6 +230,10 @@ public class DefaultDmnHistoryEventProducer implements DmnHistoryEventProducer {
     } else {
       return null;
     }
+  }
+
+  protected void setUserId(HistoricDecisionInstanceEntity event) {
+    event.setUserId(Context.getCommandContext().getAuthenticatedUserId());
   }
 
 }
