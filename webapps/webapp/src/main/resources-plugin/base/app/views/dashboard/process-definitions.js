@@ -25,6 +25,8 @@ define([
         $scope.orderByPredicate = 'definition.name';
         $scope.orderByReverse = false;
 
+        $scope.hasReportPlugin = Views.getProviders({ component: 'cockpit.report' }).length > 0;
+
         processData.observe('processDefinitionStatistics', function (processDefinitionStatistics) {
           $scope.statistics = processDefinitionStatistics;
         });

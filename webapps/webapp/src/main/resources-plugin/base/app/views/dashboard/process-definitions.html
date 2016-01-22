@@ -15,6 +15,8 @@
             <th class="name">Name</th>
             <th ng-if="hasHistoryPlugin"
                 class="history-link">History view</th>
+            <th ng-if="hasReportPlugin"
+                class="report-link">Report</th>
           </tr>
         </thead>
 
@@ -39,6 +41,12 @@
                 class="history-link">
               <a href="#/process-definition/{{ statistic.definition.id }}/history">
                 History view
+              </a>
+            </td>
+            <td ng-if="hasReportPlugin"
+                class="report-link">
+              <a href="#/reports/?processDefinitionKey={{ statistic.definition.key }}">
+                <span class="glyphicon glyphicon-signal"></span>
               </a>
             </td>
           </tr>

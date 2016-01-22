@@ -9,6 +9,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.camunda.bpm.admin.impl.web.SetupResource;
 import org.camunda.bpm.application.PostDeploy;
@@ -28,6 +29,8 @@ import org.camunda.bpm.engine.rest.dto.identity.UserProfileDto;
 import org.camunda.bpm.engine.runtime.CaseExecutionQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.pa.demo.InvoiceDemoDataGenerator;
 import org.joda.time.DateTime;
 
@@ -38,10 +41,13 @@ import org.joda.time.DateTime;
 @ProcessApplication("camunda-test-processes")
 public class DevProcessApplication extends ServletProcessApplication {
 
+  private final static Logger LOGGER = Logger.getLogger(DevProcessApplication.class.getName());
+
   @PostDeploy
   public void startProcesses(ProcessEngine engine) throws Exception {
     createAdminDemoData(engine);
     createTasklistDemoData(engine);
+    createReportDemoData(engine);
     createCockpitDemoData(engine);
   }
 
@@ -357,4 +363,94 @@ public class DevProcessApplication extends ServletProcessApplication {
             .create()));
 
   }
+
+  protected void createReportDemoData(ProcessEngine engine) {
+
+    LOGGER.info("Generating random report data for cockpit");
+
+    Calendar instance = Calendar.getInstance();
+    Date currentTime = instance.getTime();
+
+    BpmnModelInstance model = createProcessWithUserTask("my-reporting-process", "Report Process");
+
+    startAndCompleteReportingInstances(engine, model, currentTime, 24);
+    startAndCompleteReportingInstances(engine, model, currentTime, 16);
+    startAndCompleteReportingInstances(engine, model, currentTime, 8);
+  }
+
+  protected void startAndCompleteReportingInstances(ProcessEngine engine, BpmnModelInstance model, Date currentTime, int offset) {
+    Calendar calendar = Calendar.getInstance();
+
+    int currentMonth = calendar.get(Calendar.MONTH);
+    int currentYear = calendar.get(Calendar.YEAR);
+
+    calendar.add(Calendar.MONTH, offset * (-1));
+    ClockUtil.setCurrentTime(calendar.getTime());
+
+    createDeployment(engine, "reports", model);
+
+    RuntimeService runtimeService = engine.getRuntimeService();
+    TaskService taskService = engine.getTaskService();
+
+    while (calendar.get(Calendar.YEAR) < currentYear || calendar.get(Calendar.MONTH) <= currentMonth) {
+
+      int numOfInstances = getRandomBetween(10, 50);
+
+      for(int i = 0; i <= numOfInstances; i++) {
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("my-reporting-process");
+
+        try {
+
+          int min = getRandomBetween(1, 10);
+          int max = offset > 0 ? offset * 30 : min;
+          int randomDuration = getRandomBetween(min, max);
+
+          Calendar calendarInstance = Calendar.getInstance();
+          calendarInstance.setTime(ClockUtil.getCurrentTime());
+          calendarInstance.add(Calendar.DAY_OF_YEAR, randomDuration);
+          ClockUtil.setCurrentTime(calendarInstance.getTime());
+
+          String processInstanceId = pi.getId();
+          String taskId = taskService
+              .createTaskQuery()
+              .processInstanceId(processInstanceId)
+              .singleResult()
+              .getId();
+          taskService.complete(taskId);
+
+        }
+        finally {
+          ClockUtil.setCurrentTime(calendar.getTime());
+        }
+      }
+
+      offset--;
+      calendar.add(Calendar.MONTH, 1);
+      ClockUtil.setCurrentTime(calendar.getTime());
+    }
+
+    ClockUtil.reset();
+  }
+
+  protected int getRandomBetween(int min, int max) {
+    return (int)(Math.random() * (max - min) + min);
+  }
+
+  protected void createDeployment(ProcessEngine engine, String deploymentName, BpmnModelInstance model) {
+    engine.getRepositoryService()
+      .createDeployment()
+      .name(deploymentName)
+      .addModelInstance("path/to/my/process.bpmn", model)
+      .deploy();
+  }
+
+  protected BpmnModelInstance createProcessWithUserTask(String key, String name) {
+    return Bpmn.createExecutableProcess(key)
+      .name(name)
+      .startEvent()
+      .userTask()
+      .endEvent()
+    .done();
+  }
+
 }
