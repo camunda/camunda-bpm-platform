@@ -56,7 +56,7 @@ public class CustomJacksonDateFormatTest extends AbstractRestServiceTest {
     given()
         .pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
         .pathParam("varId", EXAMPLE_VARIABLE_KEY)
-      .then().expect().log().all()
+      .then().expect()
         .statusCode(Status.OK.getStatusCode())
         .body("value", is(testDateFormatted))
         .body("type", is("Date"))
