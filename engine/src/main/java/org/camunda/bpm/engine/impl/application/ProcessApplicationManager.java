@@ -63,6 +63,10 @@ public class ProcessApplicationManager {
     return registration;
   }
 
+  public synchronized void clearRegistrations() {
+    registrationsByDeploymentId.clear();
+  }
+
   public synchronized void unregisterProcessApplicationForDeployments(Set<String> deploymentIds, boolean removeProcessesFromCache) {
     removeJobExecutorRegistrations(deploymentIds);
     removeProcessApplicationRegistration(deploymentIds, removeProcessesFromCache);

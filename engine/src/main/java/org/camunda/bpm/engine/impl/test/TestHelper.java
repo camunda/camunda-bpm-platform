@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.SchemaOperationsProcessEngineBuild;
+import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmmn.deployer.CmmnDeployer;
@@ -174,6 +175,7 @@ public abstract class TestHelper {
   public static void assertAndEnsureCleanDbAndCache(ProcessEngine processEngine) {
     String cacheMessage = assertAndEnsureCleanDeploymentCache(processEngine, false);
     String dbMessage = assertAndEnsureCleanDb(processEngine, false);
+    String paRegistrationMessage = assertAndEnsureNoProcessApplicationsRegistered(processEngine);
 
     StringBuilder message = new StringBuilder();
     if (cacheMessage != null) {
@@ -181,6 +183,9 @@ public abstract class TestHelper {
     }
     if (dbMessage != null) {
       message.append(dbMessage);
+    }
+    if (paRegistrationMessage != null) {
+      message.append(paRegistrationMessage);
     }
 
     if (message.length() > 0) {
@@ -332,6 +337,20 @@ public abstract class TestHelper {
       LOG.debug("Database was clean");
     }
     return null;
+  }
+
+  public static String assertAndEnsureNoProcessApplicationsRegistered(ProcessEngine processEngine) {
+    ProcessEngineConfigurationImpl engineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
+    ProcessApplicationManager processApplicationManager = engineConfiguration.getProcessApplicationManager();
+
+    if (processApplicationManager.hasRegistrations()) {
+      processApplicationManager.clearRegistrations();
+      return "There are still process applications registered";
+    }
+    else {
+      return null;
+    }
+
   }
 
   public static void waitForJobExecutorToProcessAllJobs(ProcessEngineConfigurationImpl processEngineConfiguration, long maxMillisToWait, long intervalMillis) {
