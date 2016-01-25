@@ -114,7 +114,8 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     finally {
       TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, getClass(), getName());
       identityService.clearAuthentication();
-      TestHelper.assertAndEnsureCleanDbAndCache(processEngine);
+      // only fail if no test failure was recorded
+      TestHelper.assertAndEnsureCleanDbAndCache(processEngine, exception == null);
       ClockUtil.reset();
 
       // Can't do this in the teardown, as the teardown will be called as part

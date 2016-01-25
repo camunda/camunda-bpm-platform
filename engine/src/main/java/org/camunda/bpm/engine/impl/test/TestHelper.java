@@ -172,7 +172,27 @@ public abstract class TestHelper {
     return r.append("." + suffix).toString();
   }
 
+
+  /**
+   * Ensures that the deployment cache and database is clean after a test. If not the cache
+   * and database will be cleared.
+   *
+   * @param processEngine the {@link ProcessEngine} to test
+   * @throws AssertionError if the deployment cache or database was not clean
+   */
   public static void assertAndEnsureCleanDbAndCache(ProcessEngine processEngine) {
+    assertAndEnsureCleanDbAndCache(processEngine, true);
+  }
+
+  /**
+   * Ensures that the deployment cache and database is clean after a test. If not the cache
+   * and database will be cleared.
+   *
+   * @param processEngine the {@link ProcessEngine} to test
+   * @param fail if true the method will throw an {@link AssertionError} if the deployment cache or database is not clean
+   * @throws AssertionError if the deployment cache or database was not clean
+   */
+  public static void assertAndEnsureCleanDbAndCache(ProcessEngine processEngine, boolean fail) {
     String cacheMessage = assertAndEnsureCleanDeploymentCache(processEngine, false);
     String dbMessage = assertAndEnsureCleanDb(processEngine, false);
     String paRegistrationMessage = assertAndEnsureNoProcessApplicationsRegistered(processEngine);
@@ -188,7 +208,7 @@ public abstract class TestHelper {
       message.append(paRegistrationMessage);
     }
 
-    if (message.length() > 0) {
+    if (fail && message.length() > 0) {
       Assert.fail(message.toString());
     }
   }
