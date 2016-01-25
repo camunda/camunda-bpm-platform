@@ -29,7 +29,7 @@ public class TestDeploymentTenantId extends AbstractFoxPlatformIntegrationTest {
   @Deployment
   public static WebArchive processArchive() {
     return initWebArchiveDeployment()
-        .addAsResource("org/camunda/bpm/integrationtest/deployment/cfg/processes-with-tenand-id.xml", "META-INF/processes.xml")
+        .addAsResource("org/camunda/bpm/integrationtest/deployment/cfg/processes-with-tenant-id.xml", "META-INF/processes.xml")
         .addAsResource("org/camunda/bpm/integrationtest/deployment/cfg/invoice-it.bpmn20.xml");
   }
 
