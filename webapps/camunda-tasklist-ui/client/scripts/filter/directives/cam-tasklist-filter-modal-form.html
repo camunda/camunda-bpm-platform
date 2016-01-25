@@ -1,0 +1,87 @@
+<form name="filterForm" role="form">
+
+  <accordion close-others="true">
+
+    <accordion-group is-open="accordion.general">
+
+      <accordion-heading>
+        {{ 'FILTER_FORM_BASICS' | translate }}
+        <span class="glyphicon glyphicon-exclamation-sign"
+              ng-show="showHint('filterGeneralForm')"></span>
+      </accordion-heading>
+
+      <div class="task-filter-hint text-help">
+        <span class="glyphicon glyphicon-info-sign"></span>
+        {{ 'FILTER_FORM_BASICS_HINT' | translate }}
+      </div>
+
+      <div cam-tasklist-filter-modal-form-general
+           filter="filter"
+           accesses="accesses">
+      </div>
+
+    </accordion-group>
+
+    <accordion-group is-open="accordion.criteria">
+      <accordion-heading>
+        {{ 'FILTER_FORM_CRITERIA' | translate }}
+        <span class="glyphicon glyphicon-exclamation-sign"
+              ng-show="showHint('filterCriteriaForm')"></span>
+      </accordion-heading>
+
+      <div class="task-filter-hint text-help">
+        <span class="glyphicon glyphicon-info-sign"></span>
+        {{ 'FILTER_FORM_CRITERIA_HINT' | translate }}
+      </div>
+
+      <div cam-tasklist-filter-modal-form-criteria
+           filter="filter"
+           accesses="accesses">
+      </div>
+
+    </accordion-group>
+
+    <accordion-group is-open="accordion.permission">
+      <accordion-heading>
+        {{ 'FILTER_FORM_PERMISSIONS' | translate }}
+        <span class="glyphicon glyphicon-exclamation-sign"
+              ng-show="showHint('filterPermissionForm')"></span>
+      </accordion-heading>
+
+      <div class="task-filter-hint text-help">
+        <span class="glyphicon glyphicon-info-sign"></span>
+        {{ 'FILTER_FORM_PERMISSIONS_HINT' | translate }}
+      </div>
+
+      <div cam-tasklist-filter-modal-form-permission
+           filter="filter"
+           accesses="accesses"
+           filter-modal-form-data="filterModalFormData"
+           is-open="accordion.permission">
+      </div>
+
+    </accordion-group>
+
+    <accordion-group is-open="accordion.variable">
+      <accordion-heading>
+        {{ 'FILTER_FORM_VARIABLES' | translate }}
+        <span class="glyphicon glyphicon-exclamation-sign"
+              ng-show="showHint('filterVariableForm')"></span>
+      </accordion-heading>
+
+      <div class="task-filter-hint text-help">
+        <span class="glyphicon glyphicon-info-sign"></span>
+        {{ 'FILTER_FORM_VARIABLES_HINT' | translate }}
+      </div>
+
+      <div cam-tasklist-filter-modal-form-variable
+           filter="filter"
+           accesses="accesses">
+      </div>
+
+    </accordion-group>
+
+  </accordion>
+
+</form>
+

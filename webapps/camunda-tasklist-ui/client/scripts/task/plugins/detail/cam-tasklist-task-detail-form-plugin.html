@@ -1,0 +1,17 @@
+<div class="form-pane">
+
+  <div ng-if="taskFormState.$error" class="alert alert-danger" role="alert">
+    <span class="glyphicon glyphicon-exclamation-sign"></span>
+    <strong class="status">{{ 'FORM_FAILURE' | translate }}</strong>
+    <span class="message">{{ taskFormState.$error.message }}</span>
+  </div>
+
+  <div ng-if="taskFormState.$loaded && !taskFormState.$error"
+       cam-tasklist-form
+       tasklist-form="taskForm"
+       on-form-completion-callback="completionCallback"
+       options="options"
+       params="params" >
+  </div>
+
+</div>

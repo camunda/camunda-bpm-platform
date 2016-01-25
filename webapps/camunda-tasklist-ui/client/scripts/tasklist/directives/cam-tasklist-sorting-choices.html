@@ -1,0 +1,53 @@
+<span class="sorting-label hidden-xs hidden-sm hidden-md"
+      translate="SORT_BY"></span>
+
+<ol class="sorting-choice list-inline">
+  <li ng-repeat="(index, sorting) in sortings"
+      class="sorting-choice dropdown"
+      is-open="openDropdowns[index]"
+      on-toggle="openDropdown(index, open)">
+    <a class="glyphicon glyphicon-minus-sign"
+       ng-if="sortings.length > 1"
+       ng-click="removeSorting(index)"
+       tooltip-placement="bottom"
+       tooltip="{{ 'REMOVE_SORTING' | translate }}"></a>
+
+    <a href
+       tabindex="-1"
+       class="dropdown-toggle">
+      <span class="sort-by">{{ byLabel(index) }}</span>
+    </a>
+
+    <a href
+       tabindex="-1"
+       tooltip="{{ (sorting.order === 'desc' ? 'DESC' : 'ASC') | translate }}"
+       class="sort-direction glyphicon"
+       ng-class="sorting.order === 'asc' ? 'glyphicon-chevron-up' : 'glyphicon-chevron-down'"
+       ng-click="changeOrder(index)"></a>
+
+    <ul cam-sorting-dropdown
+        options="availableOptions"
+        click-handler="changeSorting(index, id, type, value)"
+        reset-function="resetFunctions[index]"
+        change="true">
+    </ul>
+  </li>
+
+  <li class="dropdown new-sort"
+      is-open="openDropdownNew"
+      on-toggle="openDropdown(-1, open)">
+    <a href
+       class="dropdown-toggle">
+      <span class="glyphicon glyphicon-plus-sign"
+            tooltip="{{ 'ADD_SORT_BY' | translate }}"></span>
+      <span class="hidden-xs hidden-sm hidden-md"
+            translate="ADD_SORT_BY"></span>
+    </a>
+
+    <ul cam-sorting-dropdown
+        options="availableOptions"
+        click-handler="addSorting(id, type, value)"
+        reset-function="resetFunctions[-1]">
+    </ul>
+  </li>
+</ol>

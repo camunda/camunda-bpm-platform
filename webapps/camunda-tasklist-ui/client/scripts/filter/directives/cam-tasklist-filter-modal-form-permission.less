@@ -1,0 +1,51 @@
+[cam-tasklist-filter-modal-form-permission] {
+  .btn-link {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .input-group-btn:first-child > .btn {
+    border-right: 0;
+  }
+
+  .form-control-static {
+    padding-top: 8px;
+  }
+
+  .fake-button {
+    display: inline-block;
+    text-align: center;
+    width: 39px;
+    padding: @padding-base-vertical @padding-base-horizontal;
+    border: 1px solid transparent;
+    > .glyphicon {
+      vertical-align: middle;
+    }
+  }
+
+  .global-access {
+    margin-bottom: 0;
+  }
+
+  .row-action {
+    padding-top: 0;
+  }
+
+  .btn-remove {
+    > .hidden-sm {
+      padding-right: 0;
+      margin-right: 0;
+    }
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  input.ng-invalid-authorization.ng-valid-duplicate {
+    color: @input-color;
+    background-color: @input-bg;
+    border-color: @input-border;
+    .box-shadow(inset 0 1px 1px rgba(0,0,0,.075));
+    .form-control-focus();
+  }
+}

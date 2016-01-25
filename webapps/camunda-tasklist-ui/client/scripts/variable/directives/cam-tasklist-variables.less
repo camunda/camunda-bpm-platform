@@ -1,0 +1,66 @@
+[cam-tasklist-variables] {
+  margin-bottom: 0;
+  margin-top: (@grid-gutter-width / 3);
+
+  .variables-list {
+    color: @gray;
+    font-size: 12px;
+    transition: max-height 0.218s ease-in-out;
+    max-height: 58px;
+    overflow: hidden;
+    position: relative;
+
+    .shutter {
+      display: block;
+      position: absolute;
+      z-index: 10;
+      bottom: 0;
+      text-align: center;
+      left: (@grid-gutter-width / 2);
+      right: (@grid-gutter-width / 2);
+      height: (@grid-gutter-width / 2);
+
+      transition: background-color 0.218s ease-in-out;
+
+      .gradient(top, fade(@column-center-bg, 0), @column-center-bg);
+      background-position-y: 100%;
+      background-repeat: repeat-x;
+    }
+
+    &.expanded {
+      max-height: 2000px;
+      padding-bottom: (@grid-gutter-width / 2);
+      .shutter {
+        background: none;
+      }
+    }
+  }
+
+  .undefined {
+    color: fade(@text-color, 50%);
+  }
+
+
+  div.row {
+    margin-bottom: (@grid-gutter-width / 5);
+
+    > div {
+      padding-top: (@grid-gutter-width / 5);
+      padding-bottom: (@grid-gutter-width / 5);
+      background-color: @gray-lighter;
+      overflow: hidden;
+    }
+
+    span {
+      overflow: hidden;
+
+      > span,
+      > a,
+      > strong {
+        .truncate(100%);
+        display: inline-block;
+        max-height: 1.5em;
+      }
+    }
+  }
+}

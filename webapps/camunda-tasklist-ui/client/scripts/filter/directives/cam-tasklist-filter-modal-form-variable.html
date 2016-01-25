@@ -1,0 +1,100 @@
+<div ng-form class="form-horizontal" name="filterVariableForm" role="form">
+
+  <div ng-show="variables.length > 5"
+       class="alert alert-warning"
+       role="alert">
+    <span class="glyphicon glyphicon-exclamation-sign"></span>
+    {{ 'FILTER_VARIABLES_AMOUNT_WARNING' | translate }}
+  </div>
+
+
+  <div class="row labels-left">
+    <div class="col-xs-12">
+      <div class="undefined-variable checkbox">
+        <label>
+          <input type="checkbox"
+                 class="form-control"
+                 ng-model="filter.properties.showUndefinedVariable" />
+          {{ 'FILTER_FORM_VARIABLES_SHOW_UNDEFINED' | translate }}
+        </label>
+      </div>
+    </div>
+
+    <div class="col-xs-2 row-action" ng-show="!filter.id || (filter.id && accesses.update)">
+      <a ng-click="addVariable()"
+         href>
+        <span class="hidden-sm hidden-xs">{{ 'FILTER_ADD_VARIABLE' | translate }}</span>
+        <span class="glyphicon glyphicon-plus-sign"></span>
+      </a>
+    </div>
+
+    <div ng-class="{ 'col-xs-10': !filter.id || (filter.id && accesses.update) , 'col-xs-12': !(!filter.id || (filter.id && accesses.update)) }">
+      <div class="form-group" ng-show="variables.length">
+        <label class="col-xs-6 control-label"
+               translate="FILTER_VARIABLE_NAME">Name</label>
+        <label class="col-xs-6 control-label"
+               translate="FILTER_VARIABLE_LABEL">Label</label>
+      </div>
+    </div>
+  </div>
+
+  <div ng-repeat="(delta, variable) in variables" class="row">
+
+    <div ng-form name="variableFieldForm">
+      <div ng-init="addForm(this.variableFieldForm)"></div>
+
+      <div class="col-xs-2 row-action" ng-show="!filter.id || (filter.id && accesses.update)">
+        <a ng-click="removeVariable(delta)"
+           href>
+          <span class="hidden-sm hidden-xs">{{ 'FILTER_REMOVE_VARIABLE' | translate }}</span>
+          <span class="glyphicon glyphicon-minus-sign"></span>
+        </a>
+      </div>
+
+
+      <div ng-class="{ 'col-xs-10': !filter.id || (filter.id && accesses.update) , 'col-xs-12': !(!filter.id || (filter.id && accesses.update)) }">
+        <div class="form-group">
+
+          <div class="col-xs-6">
+
+            <input class="form-control"
+                   type="text"
+                   name="variableName"
+                   ng-model="variable.name"
+                   placeholder="{{ 'FILTER_VARIABLE_NAME_PLACEHOLDER' | translate }}"
+                   required
+                   ng-readonly="filter.id && !accesses.update"
+                   ng-disabled="filter.id && !accesses.update" />
+
+              <div ng-if="this.variableFieldForm.variableName.$invalid && this.variableFieldForm.variableName.$dirty"
+                    class="has-error">
+                <span ng-show="this.variableFieldForm.variableName.$error.required" class="help-block">
+                  {{ 'REQUIRED_FIELD' | translate }}
+                </span>
+              </div>
+
+          </div>
+
+          <div class="col-xs-6">
+            <input class="form-control"
+                   type="text"
+                   name="variableLabel"
+                   ng-model="variable.label"
+                   placeholder="{{ 'FILTER_VARIABLE_LABEL_PLACEHOLDER' | translate }}"
+                   required
+                   ng-readonly="filter.id && !accesses.update"
+                   ng-disabled="filter.id && !accesses.update" />
+              <div ng-if="this.variableFieldForm.variableLabel.$invalid && this.variableFieldForm.variableLabel.$dirty"
+                    class="has-error">
+                <span ng-show="this.variableFieldForm.variableLabel.$error.required" class="help-block">
+                  {{ 'REQUIRED_FIELD' | translate }}
+                </span>
+              </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

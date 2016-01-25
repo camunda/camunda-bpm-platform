@@ -1,0 +1,38 @@
+{
+  "FORM_FAILURE":
+      "Form failure:",
+  "INIT_EXTERNAL_FORM_FAILED":
+      "Cannot initialize external form url: either task id or process definition key must be provided. Try to refresh the page to try again.",
+  "TASK_EXTERNAL_FORM_NOTE":
+      "This task contains an external form to complete it. In order to open the external form click on the \"Open external form\" link below.",
+  "PROCESS_EXTERNAL_FORM_NOTE":
+      "This process contains an external form to start a new process instance. In order to open the external form click on the \"Open external form\" link below.",
+  "USE_GENERIC_FORM":
+      "You can set variables, using a generic form, by clicking the \"Add a variable\" link below.",
+  "EXTERNAL_FORM_LINK":
+      "Open external form",
+  "SAVE_HINT":
+      "Save the current state of the form to complete it later",
+  "ADD_VARIABLE":
+                        "Add a variable",
+  "NAME":
+                        "Name",
+  "TYPE":
+                        "Type",
+  "VALUE":
+                        "Value",
+  "VARIABLE_NAME":
+                        "Variable name",
+  "VARIABLE_TYPE":
+                        "Variable type",
+  "LOAD_VARIABLES":
+                        "Load Variables",
+  "LOAD_VARIABLES_FAILURE":
+                        "Could not load variables",
+  "BUSINESS_KEY":
+                        "Business Key",
+  "NO_TASK_VARIABLES":
+                        "The task does not contain any variables",
+  "REQUIRE_UNIQUE_NAME":
+                        "Name must be unique"
+}
