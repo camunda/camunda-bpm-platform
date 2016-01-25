@@ -145,7 +145,7 @@ You can submit issues in the [camunda Jira](https://app.camunda.com/jira/issues/
 
 Clone the repository, add, fix or improve and send us a pull request.
 But please take care about the commit messages, [our conventions can be found
-here](https://github.com/ajoslin/conventional-changelog/blob/master/CONVENTIONS.md).
+here](https://github.com/camunda/camunda-bpm-platform/blob/master/CONTRIBUTING.md).
 
 ### Coding style guide
 
