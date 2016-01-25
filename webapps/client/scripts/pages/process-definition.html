@@ -335,7 +335,9 @@
       </div>
 
       <a class="navigate-deployment" ng-href="{{ getDeploymentUrl() }}">Navigate to deployment</a>
-      <a ng-if="hasReportPlugin" class="report-link" ng-href="#/reports/?processDefinitionKey={{ processDefinition.key }}">
+      <a ng-if="hasReportPlugin"
+         class="report-link"
+         ng-href="#/reports/?processDefinitionKey={{ processDefinition.key }}&processDefinitionVersion={{ processDefinition.version }}">
         <span class="glyphicon glyphicon-signal"></span>
       </a>
 
