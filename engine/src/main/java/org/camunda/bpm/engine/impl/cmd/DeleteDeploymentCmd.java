@@ -19,10 +19,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
+
+import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.TransactionLogger;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeleteDeploymentFailListener;
@@ -65,11 +68,17 @@ public class DeleteDeploymentCmd implements Command<Void>, Serializable {
       .getDeploymentManager()
       .deleteDeployment(deploymentId, cascade, skipCustomListeners);
 
-    DeleteDeploymentFailListener listener = new DeleteDeploymentFailListener(deploymentId);
+    ProcessApplicationReference processApplicationReference = Context
+      .getProcessEngineConfiguration()
+      .getProcessApplicationManager()
+      .getProcessApplicationForDeployment(deploymentId);
+
+    DeleteDeploymentFailListener listener = new DeleteDeploymentFailListener(deploymentId, processApplicationReference);
 
     try {
       commandContext.runWithoutAuthorization(new Callable<Void>() {
         public Void call() throws Exception {
+          new UnregisterProcessApplicationCmd(deploymentId, false).execute(commandContext);
           new UnregisterDeploymentCmd(Collections.singleton(deploymentId)).execute(commandContext);
           return null;
         }

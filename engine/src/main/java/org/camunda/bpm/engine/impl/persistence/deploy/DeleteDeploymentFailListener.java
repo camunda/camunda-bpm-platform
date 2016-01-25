@@ -12,20 +12,27 @@
  */
 package org.camunda.bpm.engine.impl.persistence.deploy;
 
+import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.impl.cfg.TransactionListener;
 import org.camunda.bpm.engine.impl.cmd.RegisterDeploymentCmd;
+import org.camunda.bpm.engine.impl.cmd.RegisterProcessApplicationCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
 public class DeleteDeploymentFailListener implements TransactionListener {
 
   protected String deploymentId;
-  
-  public DeleteDeploymentFailListener(String deploymentId) {
+  protected ProcessApplicationReference processApplicationReference;
+
+  public DeleteDeploymentFailListener(String deploymentId, ProcessApplicationReference processApplicationReference) {
     this.deploymentId = deploymentId;
+    this.processApplicationReference = processApplicationReference;
   }
-  
+
   public void execute(CommandContext commandContext) {
     new RegisterDeploymentCmd(deploymentId).execute(commandContext);
+    if (processApplicationReference != null) {
+      new RegisterProcessApplicationCmd(deploymentId, processApplicationReference).execute(commandContext);
+    }
   }
 
 }

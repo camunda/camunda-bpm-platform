@@ -925,6 +925,26 @@ public class ProcessApplicationDeploymentTest extends PluggableProcessEngineTest
     deleteDeployments(deployment1, deployment2);
   }
 
+  public void testUnregisterProcessApplicationOnDeploymentDeletion() {
+    // given a deployment with a process application registration
+    Deployment deployment = repositoryService
+      .createDeployment()
+      .addModelInstance("process.bpmn", Bpmn.createExecutableProcess("foo").done())
+      .deploy();
+
+    // and a process application registration
+    managementService.registerProcessApplication(deployment.getId(), processApplication.getReference());
+
+    // when deleting the deploymen
+    repositoryService.deleteDeployment(deployment.getId(), true);
+
+    // then the registration is removed
+    assertNull(managementService.getProcessApplicationForDeployment(deployment.getId()));
+
+
+
+  }
+
   /**
    * Deletes the deployments cascading.
    */

@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.authorization.Resources;
@@ -144,6 +145,7 @@ public class DeploymentManager extends AbstractManager {
 
     deleteAuthorizations(Resources.DEPLOYMENT, deploymentId);
     getDbEntityManager().delete(DeploymentEntity.class, "deleteDeployment", deploymentId);
+
   }
 
   protected void deleteCaseDeployment(String deploymentId, boolean cascade) {
