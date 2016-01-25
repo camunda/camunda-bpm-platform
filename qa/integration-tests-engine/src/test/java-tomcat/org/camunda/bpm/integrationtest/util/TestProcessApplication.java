@@ -20,6 +20,6 @@ import org.camunda.bpm.application.impl.ServletProcessApplication;
  *
  */
 @ProcessApplication
-public class IntegrationTestProcessApplication extends ServletProcessApplication {
+public class TestProcessApplication extends ServletProcessApplication {
 
 }

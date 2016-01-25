@@ -18,14 +18,14 @@ public class TestContainer {
     webArchive
       .addAsManifestResource("context.xml")
       .addAsLibraries(DeploymentHelper.getWeld())
-      .addClass(IntegrationTestProcessApplication.class)
+      .addClass(TestProcessApplication.class)
       .addAsWebInfResource("web.xml");
   }
 
   public static void addContainerSpecificResourcesWithoutWeld(WebArchive webArchive) {
     webArchive
       .addAsManifestResource("context.xml")
-      .addClass(IntegrationTestProcessApplication.class)
+      .addClass(TestProcessApplication.class)
       .addAsWebInfResource("web-without-weld.xml", "web.xml");
   }
 
