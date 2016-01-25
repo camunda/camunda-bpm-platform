@@ -95,6 +95,11 @@ public class ProcessApplicationDeploymentBuilderImpl extends DeploymentBuilderIm
   }
 
   @Override
+  public ProcessApplicationDeploymentBuilderImpl tenantId(String tenantId) {
+    return (ProcessApplicationDeploymentBuilderImpl) super.tenantId(tenantId);
+  }
+
+  @Override
   public ProcessApplicationDeploymentBuilderImpl nameFromDeployment(String deploymentId) {
     return (ProcessApplicationDeploymentBuilderImpl) super.nameFromDeployment(deploymentId);
   }
@@ -114,6 +119,7 @@ public class ProcessApplicationDeploymentBuilderImpl extends DeploymentBuilderIm
     return (ProcessApplicationDeploymentBuilderImpl) super.enableDuplicateFiltering(deployChangedOnly);
   }
 
+  @Override
   public ProcessApplicationDeploymentBuilderImpl addDeploymentResources(String deploymentId) {
     return (ProcessApplicationDeploymentBuilderImpl) super.addDeploymentResources(deploymentId);
   }

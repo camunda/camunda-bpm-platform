@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
 import org.camunda.bpm.container.impl.ContainerIntegrationLogger;
@@ -62,10 +63,12 @@ public class DeployProcessArchiveStep extends DeploymentOperationStep {
     this.metaFileUrl = url;
   }
 
+  @Override
   public String getName() {
     return "Deployment of process archive '" + processArchive.getName();
   }
 
+  @Override
   public void performOperationStep(DeploymentOperation operationContext) {
 
     final PlatformServiceContainer serviceContainer = operationContext.getServiceContainer();
@@ -107,6 +110,12 @@ public class DeployProcessArchiveStep extends DeploymentOperationStep {
       deploymentName = processApplication.getName();
     }
     deploymentBuilder.name(deploymentName);
+
+    // set the tenant id for the deployment
+    String tenantId = processArchive.getTenantId();
+    if(tenantId != null && !tenantId.isEmpty()) {
+      deploymentBuilder.tenantId(tenantId);
+    }
 
     // enable duplicate filtering
     deploymentBuilder.enableDuplicateFiltering(PropertyHelper.getBooleanProperty(processArchive.getProperties(), ProcessArchiveXml.PROP_IS_DEPLOY_CHANGED_ONLY, false));
@@ -170,6 +179,7 @@ public class DeployProcessArchiveStep extends DeploymentOperationStep {
     return ProcessApplicationScanningUtil.findResources(processApplicationClassloader, paResourceRoot, metaFileUrl, additionalResourceSuffixes);
   }
 
+  @Override
   public void cancelOperationStep(DeploymentOperation operationContext) {
 
     final PlatformServiceContainer serviceContainer = operationContext.getServiceContainer();

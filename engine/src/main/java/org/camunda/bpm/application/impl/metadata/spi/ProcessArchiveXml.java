@@ -104,6 +104,11 @@ public interface ProcessArchiveXml {
   public String getName();
 
   /**
+   * @return the id of the tenant the resources of the process archive should deploy for. Can be <code>null</code>.
+   */
+  public String getTenantId();
+
+  /**
    * @return the name of the process engine which the deployment should be made to. If null, the "default engine" is used.
    */
   public String getProcessEngineName();

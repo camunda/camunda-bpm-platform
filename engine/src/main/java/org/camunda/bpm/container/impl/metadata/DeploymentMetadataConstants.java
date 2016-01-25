@@ -21,6 +21,7 @@ package org.camunda.bpm.container.impl.metadata;
 public class DeploymentMetadataConstants {
 
   public static final String NAME = "name";
+  public static final String TENANT_ID = "tenantId";
   public static final String DEFAULT = "default";
   public static final String PROPERTIES = "properties";
   public static final String PROPERTY = "property";

@@ -20,6 +20,7 @@ import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
 public class ProcessArchiveXmlImpl implements ProcessArchiveXml {
 
   private String name;
+  private String tenantId;
   private String processEngineName;
   private List<String> processResourceNames;
   private Map<String, String> properties;
@@ -30,6 +31,14 @@ public class ProcessArchiveXmlImpl implements ProcessArchiveXml {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
   }
 
   public String getProcessEngineName() {
@@ -55,6 +64,5 @@ public class ProcessArchiveXmlImpl implements ProcessArchiveXml {
   public void setProperties(Map<String, String> properties) {
     this.properties = properties;
   }
-
 
 }

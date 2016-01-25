@@ -37,6 +37,7 @@
               <xsd:element name="properties" type="tns:Properties" minOccurs="0" maxOccurs="1" />
             </xsd:sequence>
             <xsd:attribute name="name" type="xsd:string" use="optional" />
+            <xsd:attribute name="tenantId" type="xsd:string" use="optional" />
           </xsd:complexType>
 
         </xsd:element>

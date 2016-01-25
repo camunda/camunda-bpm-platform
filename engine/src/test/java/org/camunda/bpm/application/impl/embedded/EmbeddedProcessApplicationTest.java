@@ -39,10 +39,12 @@ public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCa
     defaultEngineRegistered = true;
   }
 
+  @Override
   protected void setUp() throws Exception {
     defaultEngineRegistered = false;
   }
 
+  @Override
   public void tearDown() {
     if (defaultEngineRegistered) {
       runtimeContainerDelegate.unregisterProcessEngine(processEngine);
@@ -168,6 +170,39 @@ public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCa
     assertTrue(deployedPAs.contains(TestApplicationWithCustomName.NAME));
 
     pa.undeploy();
+  }
+
+  public void testDeployWithTenantIds() {
+    registerProcessEngine();
+
+    TestApplicationWithTenantId processApplication = new TestApplicationWithTenantId();
+    processApplication.deploy();
+
+    List<Deployment> deployments = repositoryService
+        .createDeploymentQuery()
+        .orderByTenantId()
+        .asc()
+        .list();
+
+    assertEquals(2, deployments.size());
+    assertEquals("tenant1", deployments.get(0).getTenantId());
+    assertEquals("tenant2", deployments.get(1).getTenantId());
+
+    processApplication.undeploy();
+  }
+
+  public void testDeployWithoutTenantId() {
+    registerProcessEngine();
+
+    TestApplicationWithResources processApplication = new TestApplicationWithResources();
+    processApplication.deploy();
+
+    Deployment deployment = repositoryService.createDeploymentQuery().singleResult();
+
+    assertNotNull(deployment);
+    assertNull(deployment.getTenantId());
+
+    processApplication.undeploy();
   }
 
 }
