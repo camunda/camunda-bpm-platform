@@ -26,7 +26,8 @@ public class CmmnOperationLogger extends ProcessEngineLogger {
       "001",
       "Error while completing sub case of case execution '{}'. Reason: '{}'",
       execution,
-      cause.getMessage());
+      cause.getMessage(),
+      cause);
   }
 
   public ProcessEngineException completingSubCaseErrorException(CmmnExecution execution, Throwable cause) {

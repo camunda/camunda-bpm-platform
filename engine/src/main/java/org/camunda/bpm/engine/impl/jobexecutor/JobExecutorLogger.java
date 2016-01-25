@@ -31,7 +31,7 @@ public class JobExecutorLogger extends ProcessEngineLogger {
 
   public void exceptionWhileExecutingJob(JobEntity job, RuntimeException exception) {
     logWarn(
-        "002", "Exception while executing job {}: {}", job, exception.getMessage());
+        "002", "Exception while executing job {}: ", job, exception);
   }
 
   public void debugFallbackToDefaultRetryStrategy() {
@@ -51,7 +51,7 @@ public class JobExecutorLogger extends ProcessEngineLogger {
 
   public void exceptionWhileExecutingJob(String nextJobId, Throwable t) {
     logWarn(
-        "006", "Exception while executing job {}: {}", nextJobId, t);
+        "006", "Exception while executing job {}: ", nextJobId, t);
   }
 
   public void couldNotDeterminePriority(ExecutionEntity execution, Object value, ProcessEngineException e) {

@@ -271,7 +271,8 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
       "Could not remove {} definition with id '{}' from the cache. Reason: '{}'",
       modelName,
       id,
-      cause.getMessage()
+      cause.getMessage(),
+      cause
     );
   }
 

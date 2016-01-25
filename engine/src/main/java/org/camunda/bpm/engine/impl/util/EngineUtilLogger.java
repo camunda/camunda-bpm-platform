@@ -65,7 +65,7 @@ public class EngineUtilLogger extends ProcessEngineLogger {
   public void unableToSetSchemaResource(Throwable cause) {
     logWarn(
         "006",
-        "Setting schema resource failed because of: '{}'", cause.getMessage());
+        "Setting schema resource failed because of: '{}'", cause.getMessage(), cause);
   }
 
   public ProcessEngineException invalidBitNumber(int bitNumber) {
