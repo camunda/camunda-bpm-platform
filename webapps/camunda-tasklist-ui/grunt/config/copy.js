@@ -90,13 +90,13 @@ module.exports = function(config, copyConf) {
         },
         {
           expand: true,
-          cwd: 'node_modules/camunda-commons-ui/vendor/fonts',
+          cwd: '<%= pkg.gruntConfig.commonsUiDir %>/vendor/fonts',
           src: ['*.{eot,svg,ttf,woff,woff2}'],
           dest: '<%= pkg.gruntConfig.tasklistBuildTarget %>/fonts/'
         },
         {
           expand: true,
-          cwd: 'node_modules/camunda-commons-ui/node_modules/bootstrap/fonts',
+          cwd: '<%= pkg.gruntConfig.commonsUiDir %>/node_modules/bootstrap/fonts',
           src: ['**'],
           dest: '<%= pkg.gruntConfig.tasklistBuildTarget %>/fonts/'
         },
@@ -116,7 +116,7 @@ module.exports = function(config, copyConf) {
         // placeholder shims
         {
           expand: true,
-          cwd: 'node_modules/camunda-commons-ui/vendor',
+          cwd: '<%= pkg.gruntConfig.commonsUiDir %>/vendor',
           src: ['placeholders.*'],
           dest: '<%= pkg.gruntConfig.tasklistBuildTarget %>/scripts/'
         }
