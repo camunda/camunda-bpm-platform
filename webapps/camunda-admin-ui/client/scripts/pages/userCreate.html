@@ -1,0 +1,155 @@
+<!-- # CE - camunda-admin-ui/client/scripts/pages/userCreate.html -->
+<div class="container-fluid">
+  <section class="row">
+    <div class="page-header">
+      <h1>
+        <!-- <span class="glyphicon glyphicon-user"></span> -->
+        Create New User
+      </h1>
+    </div>
+
+    <form class="form-horizontal"
+          name="createUserForm">
+      <div class="col-xs-12">
+        <legend>User Account</legend>
+
+        <div class="form-group">
+          <label class="control-label col-sm-4"
+                 for="inputUserId">User id*</label>
+
+          <div class="col-sm-8">
+            <input id="inputUserId"
+                   name="userId"
+                   class="form-control"
+                   type="text"
+                   ng-model="profile.id"
+                   novalidate
+                   required />
+
+            <span class="help-inline"
+                  ng-show="createUserForm.userId.$error.required">
+              User id is required.
+            </span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="control-label col-sm-4"
+                 for="inputPassword">Password*:</label>
+
+          <div class="col-sm-8">
+            <input id="inputPassword"
+                name="inputPassword"
+                class="form-control"
+                type="password"
+                ng-model="credentials.password"
+                data-password required />
+
+            <span class="help-inline"
+                  ng-show="createUserForm.inputPassword.$error.password">
+              Password must have at least 8 characters.
+            </span>
+
+            <span class="help-inline"
+                  ng-show="createUserForm.inputPassword.$error.required">
+              Password is required.
+            </span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="control-label col-sm-4"
+                 for="inputPasswordRepeat">Password (repeat)*:</label>
+
+          <div class="col-sm-8">
+            <input id="inputPasswordRepeat"
+                   name="inputPasswordRepeat"
+                   class="form-control"
+                   type="password"
+                   ng-model="credentials.password2"
+                   data-password-repeat="credentials.password" />
+
+            <span class="help-inline"
+                  ng-show="createUserForm.inputPasswordRepeat.$error.passwordRepeat">
+              Passwords must match.
+            </span>
+          </div>
+        </div>
+
+        <legend>User Profile</legend>
+
+        <div class="form-group">
+          <label class="control-label col-sm-4"
+                 for="inputFirstname">Firstname*</label>
+
+          <div class="col-sm-8">
+            <input id="inputFirstname"
+                   name="firstname"
+                   class="form-control"
+                   type="text"
+                   ng-model="profile.firstName"
+                   novalidate
+                   required />
+
+            <span class="help-inline"
+                  ng-show="createUserForm.firstname.$error.required">
+              Firstname is required.
+            </span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="control-label col-sm-4"
+                 for="inputLastname">Lastname*</label>
+
+          <div class="col-sm-8">
+            <input id="inputLastname"
+                   class="form-control"
+                   type="text"
+                   ng-model="profile.lastName"
+                   novalidate
+                   required />
+
+            <span class="help-inline"
+                  ng-show="createUserForm.firstname.$error.required">
+              Lastname is required.
+            </span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="control-label col-sm-4"
+              for="inputEmail">Email</label>
+
+          <div class="col-sm-8">
+            <input id="inputEmail"
+                   name="email"
+                   class="form-control"
+                   type="text"
+                   ng-model="profile.email"
+                   data-email />
+
+            <span class="help-inline"
+                  ng-show="createUserForm.email.$error.email">
+              Not a valid email address.
+            </span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="col-sm-8 col-sm-offset-4">
+            <a class="btn btn-default"
+               href="#/users">Cancel</a>
+
+            <button type="submit"
+                    class="btn btn-primary"
+                    ng-disabled="!createUserForm.$valid"
+                    ng-click="createUser()">Create new User</button>
+          </div>
+        </div>
+
+      </div>
+    </form>
+  </section>
+</div>
+<!-- / CE - camunda-admin-ui/client/scripts/pages/userCreate.html -->

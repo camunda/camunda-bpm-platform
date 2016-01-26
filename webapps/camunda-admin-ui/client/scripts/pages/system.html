@@ -1,0 +1,29 @@
+<!-- # CE - camunda-admin-ui/client/scripts/pages/system.html -->
+<div class="container-fluid"
+     ng-cloak>
+  <section class="row">
+    <div class="page-header">
+      <h1>System Settings</h1>
+    </div>
+
+    <div class="col-md-3">
+      <div class="well sidebar-nav">
+        <ul class="nav nav-list">
+          <li class="nav-header">Categories</li>
+
+          <li ng-class="activeClass('section='+systemSettingsProvider.id)"
+              ng-repeat="systemSettingsProvider in systemSettingsProviders">
+            <a href="#/system/?section={{systemSettingsProvider.id}}">
+              {{systemSettingsProvider.label}}
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-md-9">
+      <view provider="activeSettingsProvier" />
+    </div>
+  </section>
+</div>
+<!-- / CE - camunda-admin-ui/client/scripts/pages/system.html -->

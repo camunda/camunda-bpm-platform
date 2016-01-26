@@ -1,0 +1,133 @@
+<!-- # CE - camunda-admin-ui/client/scripts/pages/groupEdit.html -->
+<div class="container-fluid">
+  <section class="row">
+    <div class="page-header">
+      <h1>{{groupName}}</h1>
+    </div>
+
+    <div class="col-md-3">
+      <div class="well sidebar-nav">
+        <ul class="nav nav-list">
+          <li ng-class="activeClass('tab=group')">
+            <a href="#/groups/{{group.id | escape}}?tab=group">Group</a>
+          </li>
+          <li ng-class="activeClass('tab=users')">
+            <a href="#/groups/{{group.id | escape}}?tab=users">Users</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-md-9">
+      <form ng-show="show('group')"
+            class="form-horizontal"
+            name="editGroupForm"
+            cam-widget-loader
+            loading-state="{{ groupLoadingState }}">
+        <legend>Group</legend>
+
+        <div class="form-group">
+          <label class="control-label col-sm-4"
+                 for="inputName">Group Name*</label>
+
+          <div class="col-sm-8">
+            <input id="inputName"
+                   name="groupName"
+                   class="form-control"
+                   type="text"
+                   ng-model="group.name"
+                   novalidate
+                   required
+                   ng-disabled="!availableOperations.update" />
+
+            <p class="text-danger"
+               ng-show="createGroupForm.groupName.$error.required">
+              Name is required.
+            </p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="control-label col-sm-4"
+                 for="inputType">Group Type</label>
+
+          <div class="col-sm-8">
+            <input id="inputType"
+                   name="groupType"
+                   class="form-control"
+                   type="text"
+                   ng-model="group.type"
+                   ng-disabled="!availableOperations.update" />
+          </div>
+        </div>
+
+        <div class="form-group"
+             ng-show="availableOperations.update">
+          <div class="col-sm-8 col-sm-offset-4">
+            <button type="submit"
+                    class="btn btn-default"
+                    ng-disabled="!canSubmit(editGroupForm, 'group')"
+                    ng-click="updateGroup()">Update Group</button>
+          </div>
+        </div>
+      </form>
+
+      <form class="form-horizontal"
+            ng-show="show('group') && availableOperations.delete">
+        <legend>Delete Group</legend>
+
+        <div class="alert alert-danger">
+          <strong>Warning:</strong> deleting a group cannot be undone.
+        </div>
+
+        <button type="submit"
+                class="btn btn-danger"
+                ng-click="deleteGroup()">
+          Delete Group
+        </button>
+      </form>
+
+      <div ng-show="show('users')">
+        <legend>Users</legend>
+
+        <div cam-widget-loader
+             loading-state="{{ userLoadingState }}"
+             text-empty="Group {{group.name}} does not currently have any users.">
+          <table class="cam-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Username</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="user in groupUserList">
+                <td><a ng-href="#/users/{{user.id | escape}}">{{user.firstName}} {{user.lastName}}</a></td>
+                <td>{{user.id}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div><!-- /cam-widget-loader -->
+
+        <pagination ng-if="groupUserPages.total > groupUserPages.size"
+                    class="pagination-sm"
+
+                    ng-model="groupUserPages.current"
+                    ng-change="pageChange(groupUserPages.current)"
+
+                    total-items="groupUserPages.total"
+                    items-per-page="groupUserPages.size"
+                    max-size="7"
+
+                    boundary-links="true"
+
+                    next-text="&rsaquo;"
+                    last-text="&raquo;"
+                    previous-text="&lsaquo;"
+                    first-text="&laquo;"></pagination>
+
+      </div>
+    </div>
+  </section>
+</div>
+<!-- / CE - camunda-admin-ui/client/scripts/pages/groupEdit.html -->

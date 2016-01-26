@@ -1,0 +1,187 @@
+<!-- # CE - camunda-admin-ui/client/scripts/pages/setup.html -->
+<div class="container-fluid">
+  <section id="users"
+           ng-switch on="created">
+    <div class="row">
+      <div class="page-header">
+        <h1>
+          <!-- <span class="glyphicon glyphicon-user"></span> -->
+          Setup
+        </h1>
+      </div>
+    </div>
+
+    <div class="row"
+         ng-switch-when="true">
+      <div class="col-md-12">
+
+        <div class="alert alert-success">
+          <strong>User created</strong>
+          You have created an initial user.
+        </div>
+
+        Head over to the <a href="./#/login">signin page</a> to login using the newly created credentials.
+      </div>
+    </div>
+
+    <div class="row"
+         ng-switch-when="false">
+      <div class="col-md-8 box">
+
+        <div notifications-panel
+             class="notifications-panel"></div>
+
+        <form class="form-horizontal"
+              name="createUserForm">
+          <legend>User Account</legend>
+
+          <div class="form-group">
+            <label class="control-label col-sm-4"
+                   for="inputUserId">User id*</label>
+
+            <div class="col-sm-8">
+              <input id="inputUserId"
+                     name="userId"
+                     class="form-control"
+                     type="text"
+                     ng-model="profile.id"
+                     novalidate required></input>
+
+              <span class="help-inline"
+                    ng-show="createUserForm.userId.$error.required">
+                User id is required.
+              </span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="control-label col-sm-4"
+                   for="inputPassword">Password*:</label>
+
+            <div class="col-sm-8">
+              <input id="inputPassword"
+                     name="inputPassword"
+                     class="form-control"
+                     type="password"
+                     ng-model="credentials.password"
+                     data-password
+                     required></input>
+
+              <span class="help-inline"
+                    ng-show="createUserForm.inputPassword.$error.password">
+                Password must have at least 8 characters.
+              </span>
+              <span class="help-inline"
+                    ng-show="createUserForm.inputPassword.$error.required">
+                Password is required.
+              </span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="control-label col-sm-4"
+                   for="inputPasswordRepeat">Password (repeat)*:</label>
+
+            <div class="col-sm-8">
+              <input id="inputPasswordRepeat"
+                  name="inputPasswordRepeat"
+                  class="form-control"
+                  type="password"
+                  ng-model="credentials.password2"
+                  data-password-repeat="credentials.password"></input>
+
+              <span class="help-inline"
+                    ng-show="createUserForm.inputPasswordRepeat.$error.passwordRepeat">
+                Passwords must match.
+              </span>
+            </div>
+          </div>
+
+          <legend>User Profile</legend>
+
+          <div class="form-group">
+            <label class="control-label col-sm-4"
+                for="inputFirstname">Firstname*</label>
+
+            <div class="col-sm-8">
+              <input id="inputFirstname"
+                     name="firstname"
+                     type="text"
+                     class="form-control"
+                     ng-model="profile.firstName"
+                     novalidate
+                     required></input>
+
+              <span class="help-inline"="text-danger"
+                    ng-show="createUserForm.firstname.$error.required">
+                Firstname is required.
+              </span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="control-label col-sm-4"
+                for="inputLastname">Lastname*</label>
+
+            <div class="col-sm-8">
+              <input id="inputLastname"
+                  type="text"
+                  class="form-control"
+                  ng-model="profile.lastName"
+                  novalidate
+                  required></input>
+
+              <span class="help-inline"
+                    ng-show="createUserForm.firstname.$error.required">
+                Lastname is required.
+              </span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="control-label col-sm-4"
+                for="inputEmail">Email</label>
+
+            <div class="col-sm-8">
+              <input id="inputEmail"
+                  name="email"
+                  type="text"
+                  class="form-control"
+                  ng-model="profile.email"
+                  data-email></input>
+
+              <span class="help-inline"
+                    ng-show="createUserForm.email.$error.email">
+                Not a valid email address.
+              </span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="col-sm-8 col-sm-offset-4">
+              <button type="submit"
+                      class="btn btn-primary"
+                      ng-disabled="!createUserForm.$valid"
+                      ng-click="createUser()">Create new User</button>
+            </div>
+          </div>
+
+        </form>
+      </div>
+
+      <div class="col-md-4 well">
+        <legend>Why is this page shown?</legend>
+        <p>You are trying to access the process engine &quot;<strong>{{ engineName }}</strong>&quot;.
+        This process engine is configured to use the built-in identity service (database) but has no administrative users configured.
+        This page allows you to create a user for accessing the process engine.</p>
+        <p>
+          <a href="http://docs.camunda.org/guides/installation-guide/"
+             class="btn btn-success">
+            » Setup LDAP instead
+          </a>
+        </p>
+      </div>
+    </div>
+  </section>
+</div>
+<!-- / CE - camunda-admin-ui/client/scripts/pages/setup.html -->
