@@ -16,7 +16,7 @@
     "libTargetDir": "target/webapp/lib"
   },
   "dependencies": {
-    "camunda-commons-ui": "git://github.com/camunda/camunda-commons-ui#master",
+    "camunda-commons-ui": "git://github.com/camunda/camunda-commons-ui#frontend-union",
     "camunda-bpm-sdk-js": "git://github.com/camunda/camunda-bpm-sdk-js#master",
     "requirejs-angular-define": "git://github.com/camunda/requirejs-angular-define#master",
     "angular": "1.2.29",
@@ -25,7 +25,9 @@
     "angular-route": "1.2.29",
     "jquery": "2.1.1",
     "moment": "2.9.0",
-    "requirejs": "2.1.22"
+    "requirejs": "2.1.22",
+    "bpmn-js": "0.12.1",
+    "jquery-ui": "1.10.5"
   },
   "devDependencies": {
     "brfs": "1.4.2",
