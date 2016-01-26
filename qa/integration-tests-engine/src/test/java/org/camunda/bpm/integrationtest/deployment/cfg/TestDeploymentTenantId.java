@@ -17,8 +17,11 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
+import org.camunda.bpm.integrationtest.util.DeploymentHelper;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,9 +31,13 @@ public class TestDeploymentTenantId extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
   public static WebArchive processArchive() {
-    return initWebArchiveDeployment()
+    return ShrinkWrap.create(WebArchive.class, "test.war")
+        .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
+        .addAsLibraries(DeploymentHelper.getEngineCdi())
         .addAsResource("org/camunda/bpm/integrationtest/deployment/cfg/processes-with-tenant-id.xml", "META-INF/processes.xml")
-        .addAsResource("org/camunda/bpm/integrationtest/deployment/cfg/invoice-it.bpmn20.xml");
+        .addAsResource("org/camunda/bpm/integrationtest/deployment/cfg/invoice-it.bpmn20.xml")
+        .addClass(AbstractFoxPlatformIntegrationTest.class)
+        .addClass(DummyProcessApplication.class);
   }
 
   @Test
