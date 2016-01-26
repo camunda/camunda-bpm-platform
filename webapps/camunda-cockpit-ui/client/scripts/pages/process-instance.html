@@ -1,0 +1,136 @@
+<!-- # CE - camunda-cockpit-ui/client/scripts/pages/process-instance.html -->
+<div class="ctn-fixed-view">
+  <div class="ctn-header">
+    <h1>
+      <span class="process-name-prefix">
+        <span>Process</span>
+        <span>instance</span>
+      </span>
+
+      {{ processDefinition.name || processDefinition.key }}
+
+      <span title="Process instance id, as it appears in the database">
+        &lt;{{ processInstance.id }}&gt;
+      </span>
+
+      <span ng-show="processInstance.businessKey.length > 0"
+            title="Business key of the process instance">
+        &lt;{{ processInstance.businessKey}}&gt;
+      </span>
+
+      <span class="badge badge-warning badge-suspended"
+            ng-show="processInstance.suspended"
+            tooltip="Currently suspended"
+            tooltip-placement="top">
+        <span class="glyphicon glyphicon-pause white"></span>
+      </span>
+    </h1>
+
+    <div class="view-pills"
+         id="cockpit.processInstance.view"></div>
+  </div>
+
+  <div class="ctn-content-container"
+       ctn-collapsable-parent="sidebar">
+
+    <!-- toolbar -->
+    <div class="ctn-toolbar">
+
+      <!-- Toolbar actions are provided by plugins -->
+      <span ng-repeat="tabProvider in processInstanceActions">
+        <view provider="tabProvider"
+              vars="processInstanceVars" />
+      </span>
+
+    </div>
+
+    <!-- sidebar -->
+    <div class="ctn-column ctn-sidebar ctn-scroll"
+         ctn-collapsable="left">
+
+      <div class="filters"
+           ng-controller="ProcessInstanceFilterController">
+        <h5>
+          Filter
+
+          <button class="btn btn-sm btn-link btn-control btn-control-link"
+                  tooltip="The activity instance tree with all currently selected activity instances. You may change the selection via (CTRL +) click.">
+            <span class="glyphicon glyphicon-question-sign"></span>
+          </button>
+        </h5>
+
+        <div cam-quick-filter
+             name-filter
+             holder-selector=".instance-tree"
+             label-selector=".tree-node-label"
+             item-selector=".tree-node-group">
+        </div>
+
+        <div class="filter">
+          <button class="btn btn-link btn-xs btn-control"
+                  ng-show="filterData.activityInstanceCount"
+                  ng-click="clearSelection()">
+            <span class="glyphicon glyphicon-remove"></span>
+          </button>
+
+          <ng-pluralize count="filterData.activityInstanceCount"
+                        when="{ 'null' : 'Nothing',
+                                '0': 'Nothing',
+                                'one': '1 activity instance',
+                                'other': '{{ filterData.activityInstanceCount }} activity instances'}">
+          </ng-pluralize>
+
+          selected
+        </div>
+
+
+        <div class="filter instance-tree">
+          <div activity-instance-tree="activityInstanceTree"
+               selection="filter"
+               on-element-click="handleActivityInstanceSelection(id, activityId, $event)"
+               order-children-by="orderChildrenBy()">
+          </div>
+        </div>
+      </div>
+
+      <a class="hide-collapsable pull-right"></a>
+    </div>
+
+    <div class="ctn-column ctn-content"
+         ctn-collapsable-parent="tabs">
+
+      <!-- content top pane -->
+      <div class="ctn-row ctn-content-top">
+        <div process-diagram="processDiagram"
+             on-element-click="handleBpmnElementSelection(id, $event)"
+             selection="filter"
+             process-data="processData"
+             page-data="pageData"
+             overlay-provider-component="cockpit.processInstance.diagram.overlay"></div>
+      </div>
+
+      <!-- content bottom pane -->
+      <div class="ctn-row ctn-content-bottom ctn-tabbed"
+           ctn-collapsable="bottom">
+        <div ng-show="processInstanceTabs.length">
+          <ul class="nav nav-tabs">
+            <li ng-class="{ active: selectedTab == tabProvider }"
+                ng-repeat="tabProvider in processInstanceTabs">
+              <a href
+                 ng-click="selectTab(tabProvider)">{{ tabProvider.label }}</a>
+            </li>
+          </ul>
+
+          <div class="ctn-tabbed-content ctn-scroll">
+            <view provider="selectedTab"
+                  vars="processInstanceVars" />
+          </div>
+        </div>
+      </div>
+
+      <a class="show-collapsable"></a>
+    </div>
+  </div>
+
+</div><!-- end .ctn-fixed-view -->
+<!-- / CE - camunda-cockpit-ui/client/scripts/pages/process-instance.html -->

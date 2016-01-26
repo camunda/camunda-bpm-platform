@@ -1,0 +1,23 @@
+<div ng-if="!plugins || !(plugins.length > 0)"
+     class="well no-reports-available">
+  <span class="glyphicon glyphicon-info-sign"></span>
+  No reports available.
+</div>
+
+<form ng-if="plugins && plugins.length > 0"
+      class="form-horizontal"
+      name="typeForm"
+      role="form">
+  <div class="col-xs-12 form-group">
+    <label for="reportType"
+           class="col-xs-3 control-label">Report:</label>
+    <div class="col-xs-9">
+      <select class="form-control reports-type-selection"
+              name="reportType"
+              ng-model="selection.type"
+              ng-change="selectReport(selection.type)"
+              ng-options="provider.id as provider.label for provider in plugins">
+      </select>
+    </div>
+  </div>
+</form>

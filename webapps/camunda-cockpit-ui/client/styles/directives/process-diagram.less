@@ -1,0 +1,125 @@
+[process-diagram] {
+  overflow: hidden;
+  height: 100%;
+
+  /* disable text selection */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  .activity-highlight  {
+    .box-shadow(~"0 0 @{border-radius-base} @{border-radius-base} @{highlihgt-shadow-color}");
+    border-radius: @border-radius-base;
+    cursor: pointer;
+  }
+
+  .selectable {
+    cursor: pointer;
+  }
+
+  .process-diagram {
+  }
+
+  .activity-top-right-position,
+  .activity-bottom-right-position {
+    position: absolute;
+    right: -1.3em;
+  }
+
+  .activity-top-right-position {
+    top: -0.85em;
+  }
+
+  .activity-top-left-position {
+    position: absolute;
+    right: 100%;
+    bottom: 100%;
+    margin-right: -0.8em;
+    margin-bottom: -0.8em;
+    .badge-warning {
+      font-weight: normal;
+      .transition(padding 0.218s ease);
+      &.hovered {
+        padding: 7px 11px;
+      }
+    }
+  }
+
+  .activity-bottom-right-position {
+    bottom: -0.65em;
+  }
+
+  .activity-bottom-left-position {
+    position: absolute;
+    left: -0.9em;
+    bottom: -0.65em;
+  }
+
+  /* IE Highlight Fix */
+  .bpmnElement {
+    background-color: rgba(255,255,255,0);
+  }
+
+
+  .diagram-rendering-error {
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+    text-align: center;
+    max-width: 300px;
+  }
+
+  .bpmn-overlay {
+    position: absolute;
+    pointer-events:none;
+    filter:Alpha(opacity=0);
+
+    > [view] {
+      pointer-events:all;
+    }
+  }
+
+  .badge {
+    font-size: 12px;
+    border-width: 1px;
+    border-style: solid;
+
+    background-color: @running-color;
+    border-color: @running-darker;
+    color: @running-darker;
+
+    &.badge-warning {
+      background-color: @warning-color;
+      border-color: @warning-darker;
+      color: @warning-darker;
+    }
+
+    &.badge-important {
+      background-color: @important-color;
+      border-color: @important-darker;
+      font-weight: bolder;
+      color: contrast(@important-color);
+    }
+
+    &.activity-instance-completed {
+      background-color: @completed-color;
+      border-color: @completed-darker;
+      color: @completed-darker;
+    }
+
+    &.activity-instance-canceled {
+      background-color: @canceled-color;
+      border-color: @canceled-darker;
+      color: @canceled-darker;
+    }
+
+    &.drag {
+      opacity: 0.5;
+      position: absolute;
+      .box-shadow(0 0 3px @gray);
+    }
+  }
+}

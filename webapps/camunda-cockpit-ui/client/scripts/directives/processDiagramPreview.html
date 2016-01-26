@@ -1,0 +1,10 @@
+<span ng-hide="diagramXML">
+  <i class="glyphicon glyphicon-loading"></i> loading process diagram...
+</span>
+<div ng-show="diagramXML">
+  <div cam-widget-bpmn-viewer
+    diagram-data='diagramXML'
+    control='control'
+    disable-navigation='true'>
+  </div>
+</div>

@@ -1,0 +1,167 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.camunda.bpm.webapp</groupId>
+  <artifactId>camunda-cockpit-ui</artifactId>
+  <version>7.4.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>camunda-cockpit-ui</name>
+
+  <parent>
+    <groupId>org.camunda</groupId>
+    <artifactId>camunda-release-parent</artifactId>
+    <version>2.5</version>
+    <!-- do not remove empty tag - http://jira.codehaus.org/browse/MNG-4687 -->
+    <relativePath />
+  </parent>
+
+  <profiles>
+    <profile>
+      <id>node-build-windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>generate-zip</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <inherited>false</inherited>
+                <configuration>
+                  <tasks>
+                    <!-- run node build -->
+                    <exec executable="cmd" failonerror="true">
+                      <arg value="/c" />
+                      <arg value="npm" />
+                      <arg value="install" />
+                    </exec>
+                    <exec executable="cmd" failonerror="true">
+                      <arg value="/c" />
+                      <arg value="npm" />
+                      <arg value="run-script" />
+                      <arg value="win-build-sdk" />
+                    </exec>
+                   <exec executable="cmd" failonerror="true">
+                      <arg value="/c" />
+                      <arg value="node_modules\.bin\grunt.cmd" />
+                      <arg value="build" />
+                      <arg value="--color=false" />
+                    </exec>
+                  </tasks>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>node-build-unix</id>
+      <activation>
+        <os>
+          <family>!windows</family>
+        </os>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>generate-zip</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <inherited>false</inherited>
+                <configuration>
+                  <tasks>
+                    <!-- run node build -->
+                    <exec executable="npm" failonerror="true">
+                      <arg value="install" />
+                    </exec>
+                    <exec executable="npm" failonerror="true">
+                      <arg value="run-script" />
+                      <arg value="build-sdk" />
+                    </exec>
+                    <exec executable="./node_modules/grunt-cli/bin/grunt" failonerror="true">
+                      <arg value="build" />
+                      <arg value="--color=false" />
+                    </exec>
+                  </tasks>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+  <build>
+    <plugins>
+      <!-- create distribution zip -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>generate-zip</id>
+            <phase>package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <inherited>false</inherited>
+            <configuration>
+              <tasks>
+                <mkdir dir="${basedir}/target/" />
+                <zip destfile="${basedir}/target/dist.zip" basedir="dist/" />
+              </tasks>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- attach zip to the build -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <execution>
+            <id>attach-artifacts</id>
+            <phase>package</phase>
+            <goals>
+              <goal>attach-artifact</goal>
+            </goals>
+            <configuration>
+              <artifacts>
+                <artifact>
+                  <file>${basedir}/target/dist.zip</file>
+                  <type>zip</type>
+                </artifact>
+              </artifacts>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <scm>
+    <url>https://github.com/camunda/camunda-cockpit-ui</url>
+    <connection>scm:git:git@github.com:camunda/camunda-cockpit-ui.git</connection>
+    <developerConnection>scm:git:git@github.com:camunda/camunda-cockpit-ui.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+
+</project>
