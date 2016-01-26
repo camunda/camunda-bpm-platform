@@ -13,7 +13,8 @@
     "tasklistSourceDir": "camunda-tasklist-ui/client",
     "pluginBuildTarget": "target/webapp/plugin",
     "pluginSourceDir": "camunda-webapp-plugin",
-    "libTargetDir": "target/webapp/lib"
+    "libTargetDir": "target/webapp/lib",
+    "commonsUiDir": "node_modules/camunda-commons-ui"
   },
   "dependencies": {
     "camunda-commons-ui": "git://github.com/camunda/camunda-commons-ui#frontend-union",
