@@ -21,7 +21,8 @@
       ACT_INST_ID_,
       ACT_ID_,
       EVAL_TIME_,
-      COLLECT_VALUE_)
+      COLLECT_VALUE_,
+      USER_ID_)
     values (#{id, jdbcType=VARCHAR},
             #{decisionDefinitionId, jdbcType=VARCHAR},
             #{decisionDefinitionKey, jdbcType=VARCHAR},
@@ -35,7 +36,8 @@
             #{activityInstanceId, jdbcType=VARCHAR},
             #{activityId, jdbcType=VARCHAR},
             #{evaluationTime, jdbcType=TIMESTAMP},
-            #{collectResultValue, jdbcType=DOUBLE}
+            #{collectResultValue, jdbcType=DOUBLE},
+            #{userId, jdbcType=VARCHAR}
            )
   </insert>
   
@@ -62,6 +64,7 @@
     <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR"/>
     <result property="evaluationTime" column="EVAL_TIME_" jdbcType="TIMESTAMP"/>
     <result property="collectResultValue" column="COLLECT_VALUE_" jdbcType="DOUBLE"/>
+    <result property="userId" column="USER_ID_" jdbcType="VARCHAR"/>
   </resultMap>
 
   <!-- select -->

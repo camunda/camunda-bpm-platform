@@ -46,6 +46,7 @@ import org.joda.time.DateTime;
 
 /**
  * @author Philipp Ossler
+ * @author Ingo Richtsmeier
  */
 public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase {
 
@@ -1047,6 +1048,106 @@ public class HistoricDecisionInstanceTest extends PluggableProcessEngineTestCase
     assertThat(historicDecisionInstance.getActivityId(), is("start"));
     assertThat(historicDecisionInstance.getActivityInstanceId(), is(nullValue()));
     assertThat(historicDecisionInstance.getEvaluationTime(), is(notNullValue()));
+  }
+  
+  @Deployment(resources = { DECISION_SINGLE_OUTPUT_DMN })
+  public void testDecisionEvaluatedWithAuthenticatedUser() {
+
+    identityService.setAuthenticatedUserId("demo");
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("input1", "test");
+    decisionService.evaluateDecisionTableByKey(DECISION_DEFINITION_KEY, variables);
+
+    String decisionDefinitionId = repositoryService.createDecisionDefinitionQuery().decisionDefinitionKey(DECISION_DEFINITION_KEY).singleResult().getId();
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery().singleResult();
+
+    assertThat(historicDecisionInstance, is(notNullValue()));
+    assertThat(historicDecisionInstance.getDecisionDefinitionId(), is(decisionDefinitionId));
+    assertThat(historicDecisionInstance.getDecisionDefinitionKey(), is(DECISION_DEFINITION_KEY));
+    assertThat(historicDecisionInstance.getDecisionDefinitionName(), is("sample decision"));
+
+    assertThat(historicDecisionInstance.getEvaluationTime(), is(notNullValue()));
+    // references to process instance should be null since the decision is not evaluated while executing a process instance
+    assertThat(historicDecisionInstance.getProcessDefinitionKey(), is(nullValue()));
+    assertThat(historicDecisionInstance.getProcessDefinitionId(), is(nullValue()));
+    assertThat(historicDecisionInstance.getProcessInstanceId(), is(nullValue()));
+    assertThat(historicDecisionInstance.getActivityId(), is(nullValue()));
+    assertThat(historicDecisionInstance.getActivityInstanceId(), is(nullValue()));
+    assertThat(historicDecisionInstance.getUserId(), is("demo"));
+  }
+
+  @Deployment(resources = { DECISION_PROCESS, DECISION_SINGLE_OUTPUT_DMN })
+  public void testDecisionEvaluatedWithAuthenticatedUserFromProcess() {
+
+    identityService.setAuthenticatedUserId("demo");
+    startProcessInstanceAndEvaluateDecision();
+    ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processInstance.getProcessDefinitionId()).singleResult();
+    String activityInstanceId = historyService.createHistoricActivityInstanceQuery().activityId("task").singleResult().getId();
+
+    String decisionDefinitionId = repositoryService.createDecisionDefinitionQuery().decisionDefinitionKey(DECISION_DEFINITION_KEY).singleResult().getId();
+
+    HistoricDecisionInstance historicDecisionInstance = historyService.createHistoricDecisionInstanceQuery().singleResult();
+
+    assertThat(historicDecisionInstance, is(notNullValue()));
+    assertThat(historicDecisionInstance.getDecisionDefinitionId(), is(decisionDefinitionId));
+    assertThat(historicDecisionInstance.getDecisionDefinitionKey(), is(DECISION_DEFINITION_KEY));
+    assertThat(historicDecisionInstance.getDecisionDefinitionName(), is("sample decision"));
+
+    assertThat(historicDecisionInstance.getEvaluationTime(), is(notNullValue()));
+    // references to process instance should be null since the decision is not evaluated while executing a process instance
+    assertThat(historicDecisionInstance.getProcessDefinitionKey(), is(processDefinition.getKey()));
+    assertThat(historicDecisionInstance.getProcessDefinitionId(), is(processDefinition.getId()));
+    assertThat(historicDecisionInstance.getProcessInstanceId(), is(processInstance.getId()));
+    assertThat(historicDecisionInstance.getActivityId(), is("task"));
+    assertThat(historicDecisionInstance.getActivityInstanceId(), is(activityInstanceId));
+    assertThat(historicDecisionInstance.getUserId(), is(nullValue()));
+  }
+
+  @Deployment(resources = { DECISION_CASE_WITH_DECISION_SERVICE, DECISION_SINGLE_OUTPUT_DMN })
+  public void testDecisionEvaluatedWithAuthenticatedUserFromCase() {
+
+    identityService.setAuthenticatedUserId("demo");
+    CaseInstance caseInstance = createCaseInstanceAndEvaluateDecision();
+
+    CaseDefinition caseDefinition = repositoryService
+        .createCaseDefinitionQuery()
+        .caseDefinitionId(caseInstance.getCaseDefinitionId())
+        .singleResult();
+
+    String decisionDefinitionId = repositoryService
+        .createDecisionDefinitionQuery()
+        .decisionDefinitionKey(DECISION_DEFINITION_KEY)
+        .singleResult()
+        .getId();
+
+    String activityInstanceId = historyService
+        .createHistoricCaseActivityInstanceQuery()
+        .caseActivityId("PI_HumanTask_1")
+        .singleResult()
+        .getId();
+
+    HistoricDecisionInstance historicDecisionInstance = historyService
+        .createHistoricDecisionInstanceQuery()
+        .singleResult();
+
+    assertThat(historicDecisionInstance, is(notNullValue()));
+    assertThat(historicDecisionInstance.getDecisionDefinitionId(), is(decisionDefinitionId));
+    assertThat(historicDecisionInstance.getDecisionDefinitionKey(), is(DECISION_DEFINITION_KEY));
+    assertThat(historicDecisionInstance.getDecisionDefinitionName(), is("sample decision"));
+
+    // references to case instance should be set since the decision is evaluated while executing a case instance
+    assertThat(historicDecisionInstance.getProcessDefinitionKey(), is(nullValue()));
+    assertThat(historicDecisionInstance.getProcessDefinitionId(), is(nullValue()));
+    assertThat(historicDecisionInstance.getProcessInstanceId(), is(nullValue()));
+    assertThat(historicDecisionInstance.getCaseDefinitionKey(), is(caseDefinition.getKey()));
+    assertThat(historicDecisionInstance.getCaseDefinitionId(), is(caseDefinition.getId()));
+    assertThat(historicDecisionInstance.getCaseInstanceId(), is(caseInstance.getId()));
+    assertThat(historicDecisionInstance.getActivityId(), is("PI_HumanTask_1"));
+    assertThat(historicDecisionInstance.getActivityInstanceId(), is(activityInstanceId));
+    assertThat(historicDecisionInstance.getEvaluationTime(), is(notNullValue()));
+    assertThat(historicDecisionInstance.getUserId(), is(nullValue()));
   }
 
   @Deployment(resources = { DECISION_CASE_WITH_DECISION_SERVICE, DECISION_SINGLE_OUTPUT_DMN })

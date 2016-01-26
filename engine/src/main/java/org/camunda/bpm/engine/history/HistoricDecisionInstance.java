@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
  * Represents one evaluation of a decision.
  *
  * @author Philipp Ossler
+ * @author Ingo Richtsmeier
  *
  */
 public interface HistoricDecisionInstance {
@@ -85,4 +86,7 @@ public interface HistoricDecisionInstance {
 
   /** The result of the collect operation if the hit policy 'collect' was used for the decision. */
   Double getCollectResultValue();
+
+  /** The user ID in case the decision was executed by an authenticated user directly (without a process or case instance) */
+  String getUserId();
 }
