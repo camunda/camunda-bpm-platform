@@ -1,12 +1,16 @@
-<div class="ctn-fixed-view">
+<!-- # CE - camunda-cockpit-ui/client/scripts/reports/controllers/reports-view.html -->
+<div class="reports-wrapper container-fluid">
+  <div class="row">
+    <div class="col-xs-12 reports-type-wrapper"
+         cam-reports-type
+         report-data="reportData"
+         get-plugin-providers="getPluginProviders">
+    </div>
 
-  <div cam-reports-type
-       report-data="reportData"
-       get-plugin-providers="getPluginProviders">
+    <div class="col-xs-12 reports-plugin-wrapper"
+         cam-reports-plugin
+         report-data="reportData">
+    </div>
   </div>
-
-  <div cam-reports-plugin
-       report-data="reportData">
-  </div>
-
 </div>
+<!-- / CE - camunda-cockpit-ui/client/scripts/reports/controllers/reports-view.html -->
