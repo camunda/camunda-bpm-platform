@@ -1,0 +1,47 @@
+<form
+	role="form"
+	name="variablesForm">
+	<div class="row">
+		<div class="form-group">
+			<div class="col-xs-12">
+			<h2>Long Var</h2>
+				<label for="inputLongVar">Long Var</label>
+				<div class="controls">
+					<input
+						required
+						type="text"
+						name="inputLongVar"
+						class="form-control"
+						placeholder="e.g. 123"
+						cam-variable-type="Long"
+						cam-variable-name="longVar" />
+				</div>
+
+				<label for="customerNumber">Customer Number</label>
+				<div class="controls">
+					<input
+						required
+						type="number"
+						name="customerNumber"
+						class="form-control"
+						placeholder="e.g. 11513"
+						cam-variable-type="Integer"
+						cam-variable-name="customerNumber" />
+				</div>
+			</div>
+			<script cam-script type="text/form-script">
+    			var variableManager = camForm.variableManager;
+
+    			camForm.on('submit', function(evt) {
+						// create history
+      		  variableManager.createVariable({
+        			name: 'history',
+       				type: 'String',
+        			value: moment().format('YYYY-MM-DD HH:mm') + ' - initial sample request.',
+        			isDirty: true
+      		  });
+          });
+  			</script>
+		</div>
+	</div>
+</form>
