@@ -19,8 +19,11 @@ import java.util.List;
 
 public class ListTransformer implements FeelToJuelTransformer {
 
+  // regex to split by comma which does a positive look ahead to ignore commas enclosed in quotes
+  protected static final String COMMA_SEPARATOR_REGEX = ",(?=([^\"]*\"[^\"]*\")*[^\"]*$)";
+
   public boolean canTransform(String feelExpression) {
-    return feelExpression.split(",").length > 1;
+    return splitExpression(feelExpression, false).size() > 1;
   }
 
   public String transform(FeelToJuelTransform transform, String feelExpression, String inputName) {
@@ -30,7 +33,11 @@ public class ListTransformer implements FeelToJuelTransformer {
   }
 
   protected List<String> collectExpressions(String feelExpression) {
-    return Arrays.asList(feelExpression.split(","));
+    return splitExpression(feelExpression, true);
+  }
+
+  private List<String> splitExpression(String feelExpression, boolean discardTrailingEmptySpace) {
+    return Arrays.asList(feelExpression.split(COMMA_SEPARATOR_REGEX, discardTrailingEmptySpace ? 0 : -1));
   }
 
   protected List<String> transformExpressions(FeelToJuelTransform transform, List<String> expressions, String inputName) {

@@ -36,6 +36,7 @@ public class FeelToJuelTransformTest {
     assertTransform("x", "\"123\"", "${x == \"123\"}");
     assertTransform("x", "\"Why.not?\"", "${x == \"Why.not?\"}");
     assertTransform("x", "'Hello'", "${x == 'Hello'}");
+    assertTransform("x", "\"1,2,3\"", "${x == \"1,2,3\"}");
   }
 
   @Test
@@ -215,6 +216,8 @@ public class FeelToJuelTransformTest {
     assertTransform("x", "<y,<=12,>13.37,>=.37", "${(x < y) || (x <= 12) || (x > 13.37) || (x >= .37)}");
     assertTransform("x", "a,date(\"2015-12-12\"),date(\"2016-06-06\"),date(\"2017-07-07\")", "${(x == a) || (x == date(\"2015-12-12\")) || (x == date(\"2016-06-06\")) || (x == date(\"2017-07-07\"))}");
     assertTransform("x", "<a,<=date(\"2015-12-12\"),>date(\"2016-06-06\"),>=date(\"2017-07-07\")", "${(x < a) || (x <= date(\"2015-12-12\")) || (x > date(\"2016-06-06\")) || (x >= date(\"2017-07-07\"))}");
+    assertTransform("x", "1,\"2,3,4\",5,\"6,7,8\",9", "${(x == 1) || (x == \"2,3,4\") || (x == 5) || (x == \"6,7,8\") || (x == 9)}");
+    assertTransform("x", "1,", "${(x == 1)}");
   }
 
   @Test
