@@ -10,7 +10,7 @@
       ng-if="plugins && plugins.length > 1">
     <li ng-repeat="provider in plugins">
       <a ng-class="{active: selection.type === provider.id}"
-         ng-click="selection.type = provider.id">{{ provider.label }}</a>
+         ng-click="selectReport(provider.id)">{{ provider.label }}</a>
     </li>
   </ul>
 </div>
