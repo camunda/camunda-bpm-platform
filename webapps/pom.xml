@@ -29,7 +29,7 @@
     <exec.arg>-c</exec.arg>
 
     <grunt.target>development</grunt.target>
-    <skip.frontend.build>true</skip.frontend.build>
+    <skip.frontend.build>false</skip.frontend.build>
   </properties>
 
   <dependencyManagement>
@@ -253,7 +253,6 @@
       <id>distro</id>
       <properties>
         <grunt.target>production</grunt.target>
-        <skip.frontend.build>false</skip.frontend.build>
       </properties>
     </profile>
     <profile>
@@ -432,13 +431,7 @@
       </build>
       <properties>
         <java.resources.override>src/main/runtime/develop/resources</java.resources.override>
-      </properties>
-    </profile>
-
-    <profile>
-      <id>doFrontendBuild</id>
-      <properties>
-        <skip.frontend.build>false</skip.frontend.build>
+        <skip.frontend.build>true</skip.frontend.build>
       </properties>
     </profile>
 
@@ -588,6 +581,7 @@
       </build>
       <properties>
         <java.resources.override>src/main/runtime/test/resources</java.resources.override>
+        <skip.frontend.build>true</skip.frontend.build>
       </properties>
     </profile>
 
@@ -945,6 +939,21 @@
         </plugins>
       </build>
     </profile>
+
+    <profile>
+      <id>doFrontendBuild</id>
+      <properties>
+        <skip.frontend.build>false</skip.frontend.build>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>skipFrontendBuild</id>
+      <properties>
+        <skip.frontend.build>true</skip.frontend.build>
+      </properties>
+    </profile>
+
   </profiles>
 
 </project>
