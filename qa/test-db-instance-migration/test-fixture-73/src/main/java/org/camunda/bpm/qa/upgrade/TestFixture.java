@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.qa.upgrade.scenarios.boundary.NonInterruptingBoundaryEventScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.compensation.InterruptingEventSubProcessCompensationScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.compensation.InterruptingEventSubProcessNestedCompensationScenario;
 import org.camunda.bpm.qa.upgrade.scenarios.compensation.NestedCompensationScenario;
@@ -79,6 +80,9 @@ public class TestFixture {
 
     // job
     runner.setupScenarios(JobMigrationScenario.class);
+
+    // boundary events
+    runner.setupScenarios(NonInterruptingBoundaryEventScenario.class);
 
     processEngine.close();
   }

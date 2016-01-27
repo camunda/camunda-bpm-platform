@@ -460,6 +460,7 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
       PvmExecutionImpl concurrentReplacingExecution = this.createExecution();
       concurrentReplacingExecution.setConcurrent(true);
       concurrentReplacingExecution.setScope(false);
+      concurrentReplacingExecution.setActive(false);
       child.setParent(concurrentReplacingExecution);
       this.leaveActivityInstance();
       this.setActivity(null);
@@ -697,7 +698,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     }
 
     PvmActivity activityImpl = activity;
-    setActive(true);
     switch (activityStartBehavior) {
     case CONCURRENT_IN_FLOW_SCOPE:
       this.nextActivity = activityImpl;

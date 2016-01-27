@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Incident;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Assert;
@@ -406,6 +407,60 @@ public class ActivityStatisticsQueryTest extends PluggableProcessEngineTestCase 
     for (ActivityStatistics result : statistics) {
       Assert.assertEquals(1, result.getInstances());
     }
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testNonInterruptingBoundaryEventStatisticsQuery.bpmn20.xml")
+  public void testNonInterruptingBoundaryEventActivityStatisticsQuery() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    Job boundaryJob = managementService.createJobQuery().singleResult();
+    managementService.executeJob(boundaryJob.getId());
+
+    // when
+    List<ActivityStatistics> activityStatistics = managementService
+      .createActivityStatisticsQuery(processInstance.getProcessDefinitionId())
+      .list();
+
+    // then
+    assertEquals(2, activityStatistics.size());
+
+    ActivityStatistics userTaskStatistics = getStatistics(activityStatistics, "task");
+    assertNotNull(userTaskStatistics);
+    assertEquals("task", userTaskStatistics.getId());
+    assertEquals(1, userTaskStatistics.getInstances());
+
+    ActivityStatistics afterBoundaryStatistics = getStatistics(activityStatistics, "afterBoundaryTask");
+    assertNotNull(afterBoundaryStatistics);
+    assertEquals("afterBoundaryTask", afterBoundaryStatistics.getId());
+    assertEquals(1, afterBoundaryStatistics.getInstances());
+
+  }
+
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testAsyncInterruptingEventSubProcessStatisticsQuery.bpmn20.xml")
+  public void testAsyncInterruptingEventSubProcessActivityStatisticsQuery() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+    runtimeService.correlateMessage("Message");
+
+    // when
+    ActivityStatistics activityStatistics = managementService
+        .createActivityStatisticsQuery(processInstance.getProcessDefinitionId())
+        .singleResult();
+
+      // then
+      assertNotNull(activityStatistics);
+      assertEquals("eventSubprocess", activityStatistics.getId());
+      assertEquals(1, activityStatistics.getInstances());
+  }
+
+  protected ActivityStatistics getStatistics(List<ActivityStatistics> activityStatistics, String activityId) {
+    for (ActivityStatistics statistics : activityStatistics) {
+      if (activityId.equals(statistics.getId())) {
+        return statistics;
+      }
+    }
+
+    return null;
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testFailedTimerStartEvent.bpmn20.xml")

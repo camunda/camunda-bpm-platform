@@ -352,6 +352,9 @@
                   where
                       E.PROC_DEF_ID_ = #{processDefinitionId}
                       and E.IS_ACTIVE_ = ${trueConstant}
+                      <!-- CAM-5252: tolerate inconsistent execution trees where IS_ACTIVE_ is 
+                        true but no current activity is set -->
+                      and E.ACT_ID_ is not null 
 
                       <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
                       and
@@ -432,7 +435,7 @@
           left outer join
 
                 <!-- Count and group all activity instances by activity ids.
-                The executions that are actual activity instances can be found with the IS_ACTIVE_.
+                The executions that are actual activity instances can be found with the IS_ACTIVE_ field.
                 This will not count parent executions such as the process instance itself. -->
                 (
                  select
@@ -449,6 +452,7 @@
                    where
                     E.PROC_DEF_ID_ = #{processDefinitionId}
                     and E.IS_ACTIVE_ = ${trueConstant}
+                    
                     <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
                     and
                         (
