@@ -28,6 +28,10 @@ module.exports = Base.extend({
 
   runningInstances: function(item) {
     return this.processesList().get(item).element(by.binding('{{ statistic.instances }}')).getText();
+  },
+
+  getReportColumn: function() {
+    return this.pluginObject().element(by.css('th.report-link'))
   }
 
 });

@@ -38,7 +38,6 @@ describe('Cockpit Dashboard Spec', function() {
       expect(dashboardPage.deployedProcessesPreviews.processesPreviews().count()).to.eventually.eql(1);
     });
 
-
     it('should validate prosess list tab', function() {
 
       // when
@@ -48,6 +47,11 @@ describe('Cockpit Dashboard Spec', function() {
       expect(dashboardPage.deployedProcessesList.processesList().count()).to.eventually.eql(1);
       expect(dashboardPage.deployedProcessesList.processName(0)).to.eventually.eql('Failing Process');
       expect(dashboardPage.deployedProcessesList.runningInstances(0)).to.eventually.eql('0');
+    });
+
+    it('should not display report column in process list tab', function() {
+      // then
+      expect(dashboardPage.deployedProcessesList.getReportColumn().isPresent()).to.eventually.be.false;
     });
 
 

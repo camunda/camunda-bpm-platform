@@ -79,6 +79,11 @@ describe('Cockpit Process Definition Spec', function() {
       expect(definitionPage.processInstancesTab.tabName()).to.eventually.eql(definitionPage.processInstancesTab.tabLabel);
     });
 
+    it('should not display report link', function() {
+      // then
+      expect(definitionPage.getReportLink().isPresent()).to.eventually.be.false;
+    });
+
   });
 
 

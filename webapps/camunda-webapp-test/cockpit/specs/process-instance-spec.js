@@ -363,7 +363,7 @@ describe('Cockpit Process Instance Spec', function() {
       // given
       definitionPage.processInstancesTab.table().count().then(function(numberOfInstances) {
         definitionPage.processInstancesTab.selectInstanceId(0);
-
+        browser.sleep(1000);
         // then
         expect(instancePage.diagram.incidentsBadgeFor('ServiceTask_1').getText()).to.eventually.eql('!');
       });

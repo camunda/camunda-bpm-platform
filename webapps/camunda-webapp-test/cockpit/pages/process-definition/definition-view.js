@@ -26,6 +26,10 @@ module.exports = Base.extend({
       .then(function(classes) {
         return classes.indexOf('ng-hide') === -1;
       });
+  },
+
+  getReportLink: function() {
+    return element(by.css('a.report-link'));
   }
 
 });
