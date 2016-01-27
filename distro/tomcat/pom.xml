@@ -31,6 +31,8 @@
       </activation>
       <modules>
         <module>distro</module>
+        <module>webapp</module>
+        <module>webapp-standalone</module>
       </modules>
     </profile>
   </profiles>
