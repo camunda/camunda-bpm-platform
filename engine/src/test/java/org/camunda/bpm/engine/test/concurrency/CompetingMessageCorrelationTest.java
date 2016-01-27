@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.MessageCorrelationBuilderImpl;
+import org.camunda.bpm.engine.impl.cmd.CompleteTaskCmd;
 import org.camunda.bpm.engine.impl.cmd.MessageEventReceivedCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -355,7 +356,7 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
   }
 
   @Deployment
-  public void FAILING_testConcurrentMessageCorrelationAndTreeCompaction() {
+  public void testConcurrentMessageCorrelationAndTreeCompaction() {
     runtimeService.startProcessInstanceByKey("process");
 
     // trigger non-interrupting boundary event and wait before flush
@@ -383,8 +384,33 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     assertTrue(exception instanceof OptimisticLockingException);
   }
 
+  @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingMessageCorrelationTest.testConcurrentMessageCorrelationAndTreeCompaction.bpmn20.xml")
+  public void testConcurrentTreeCompactionAndMessageCorrelation() {
+    runtimeService.startProcessInstanceByKey("process");
+    List<Task> tasks = taskService.createTaskQuery().list();
+
+    // trigger tree compaction and wait before flush
+    ThreadControl taskCompletionThread = executeControllableCommand(new ControllableCompleteTaskCommand(tasks));
+    taskCompletionThread.reportInterrupts();
+
+    // stop task completion right before flush
+    taskCompletionThread.waitForSync();
+
+    // perform message correlation to non-interrupting boundary event
+    // (i.e. adds another concurrent execution to the scope execution)
+    runtimeService.correlateMessage("Message");
+
+    // flush task completion and tree compaction
+    taskCompletionThread.waitUntilDone();
+
+    // then it should not have succeeded
+    Throwable exception = taskCompletionThread.getException();
+    assertNotNull(exception);
+    assertTrue(exception instanceof OptimisticLockingException);
+  }
+
   @Deployment
-  public void FAILING_testConcurrentMessageCorrelationTwiceAndTreeCompaction() {
+  public void testConcurrentMessageCorrelationTwiceAndTreeCompaction() {
     runtimeService.startProcessInstanceByKey("process");
 
     // trigger non-interrupting boundary event 1 that ends in a none end event immediately
@@ -561,6 +587,28 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
 
       return null;
     }
+  }
+
+  public static class ControllableCompleteTaskCommand extends ControllableCommand<Void> {
+
+    protected List<Task> tasks;
+
+    public ControllableCompleteTaskCommand(List<Task> tasks) {
+      this.tasks = tasks;
+    }
+
+    public Void execute(CommandContext commandContext) {
+
+      for (Task task : tasks) {
+        CompleteTaskCmd completeTaskCmd = new CompleteTaskCmd(task.getId(), null);
+        completeTaskCmd.execute(commandContext);
+      }
+
+      monitor.sync();
+
+      return null;
+    }
+
   }
 
 }

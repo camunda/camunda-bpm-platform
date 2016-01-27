@@ -443,6 +443,11 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     // eX+1 is concurrent and the new root for the activity stack to instantiate
     List<? extends PvmExecutionImpl> children = this.getNonEventScopeExecutions();
 
+    // whenever we change the set of child executions we have to force an update
+    // on the scope executions to avoid concurrent modifications (e.g. tree compaction)
+    // that go unnoticed
+    forceUpdate();
+
     if (children.isEmpty()) {
       // (1)
       PvmExecutionImpl replacingExecution = this.createExecution();
