@@ -17,34 +17,43 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.camunda.bpm.dmn.feel.impl.juel.FeelEngineLogger;
+import org.camunda.bpm.dmn.feel.impl.juel.FeelLogger;
+
 public class ListTransformer implements FeelToJuelTransformer {
 
+  public static final FeelEngineLogger LOG = FeelLogger.ENGINE_LOGGER;
   // regex to split by comma which does a positive look ahead to ignore commas enclosed in quotes
-  protected static final String COMMA_SEPARATOR_REGEX = ",(?=([^\"]*\"[^\"]*\")*[^\"]*$)";
+  public static final String COMMA_SEPARATOR_REGEX = ",(?=([^\"]*\"[^\"]*\")*[^\"]*$)";
 
   public boolean canTransform(String feelExpression) {
-    return splitExpression(feelExpression, false).size() > 1;
+    return splitExpression(feelExpression).size() > 1;
   }
 
   public String transform(FeelToJuelTransform transform, String feelExpression, String inputName) {
-    List<String> expressions = collectExpressions(feelExpression);
-    List<String> juelExpressions = transformExpressions(transform, expressions, inputName);
+    List<String> juelExpressions = transformExpressions(transform, feelExpression, inputName);
     return joinExpressions(juelExpressions);
   }
 
   protected List<String> collectExpressions(String feelExpression) {
-    return splitExpression(feelExpression, true);
+    return splitExpression(feelExpression);
   }
 
-  private List<String> splitExpression(String feelExpression, boolean discardTrailingEmptySpace) {
-    return Arrays.asList(feelExpression.split(COMMA_SEPARATOR_REGEX, discardTrailingEmptySpace ? 0 : -1));
+  private List<String> splitExpression(String feelExpression) {
+    return Arrays.asList(feelExpression.split(COMMA_SEPARATOR_REGEX, -1));
   }
 
-  protected List<String> transformExpressions(FeelToJuelTransform transform, List<String> expressions, String inputName) {
+  protected List<String> transformExpressions(FeelToJuelTransform transform, String feelExpression, String inputName) {
+    List<String> expressions = collectExpressions(feelExpression);
     List<String> juelExpressions = new ArrayList<String>();
     for (String expression : expressions) {
-      String juelExpression = transform.transformSimplePositiveUnaryTest(expression, inputName);
-      juelExpressions.add(juelExpression);
+      if (!expression.trim().isEmpty()) {
+        String juelExpression = transform.transformSimplePositiveUnaryTest(expression, inputName);
+        juelExpressions.add(juelExpression);
+      }
+      else {
+        throw LOG.invalidListExpression(feelExpression);
+      }
     }
     return juelExpressions;
   }

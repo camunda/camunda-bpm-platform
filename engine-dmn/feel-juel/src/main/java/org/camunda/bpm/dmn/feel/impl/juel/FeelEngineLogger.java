@@ -186,4 +186,9 @@ public class FeelEngineLogger extends FeelLogger {
     );
   }
 
+  public FeelSyntaxException invalidListExpression(String feelExpression) {
+    String description = "List expression can not have empty elements";
+    return syntaxException("020", feelExpression, description);
+  }
+
 }

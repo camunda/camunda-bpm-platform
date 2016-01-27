@@ -272,6 +272,18 @@ public class FeelExceptionTest {
     );
   }
 
+  @Test
+  public void testInvalidListFormat() {
+    assertException("FEEL-01020",
+      ",",
+      "1,",
+      "1,2,,3",
+      ",1,2",
+      "1,2,   ,3,4",
+      "1,\t,2"
+      );
+  }
+
   public void assertException(String exceptionCode, String... feelExpressions) {
     for (String feelExpression : feelExpressions) {
       try {
