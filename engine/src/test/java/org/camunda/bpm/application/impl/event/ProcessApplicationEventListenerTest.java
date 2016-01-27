@@ -290,4 +290,81 @@ public class ProcessApplicationEventListenerTest extends ResourceProcessEngineTe
 
   }
 
+  @Deployment
+  public void testIntermediateTimerEvent() {
+
+    // given
+    final List<String> timerEvents = new ArrayList<String>();
+
+    EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication() {
+      public ExecutionListener getExecutionListener() {
+        return new ExecutionListener() {
+          public void notify(DelegateExecution delegateExecution) {
+            String currentActivityId = delegateExecution.getCurrentActivityId();
+            String eventName = delegateExecution.getEventName();
+            if ("timer".equals(currentActivityId) &&
+                (ExecutionListener.EVENTNAME_START.equals(eventName) || ExecutionListener.EVENTNAME_END.equals(eventName))) {
+              timerEvents.add(delegateExecution.getEventName());
+            }
+          }
+        };
+      }
+    };
+
+    // register app so that it is notified about events
+    managementService.registerProcessApplication(deploymentId, processApplication.getReference());
+
+    // when
+    runtimeService.startProcessInstanceByKey("process");
+    String jobId = managementService.createJobQuery().singleResult().getId();
+    managementService.executeJob(jobId);
+
+    // then
+    assertEquals(2, timerEvents.size());
+
+    // "start" event listener
+    assertEquals(ExecutionListener.EVENTNAME_START, timerEvents.get(0));
+
+    // "end" event listener
+    assertEquals(ExecutionListener.EVENTNAME_END, timerEvents.get(1));
+  }
+
+  @Deployment
+  public void testIntermediateSignalEvent() {
+
+    // given
+    final List<String> timerEvents = new ArrayList<String>();
+
+    EmbeddedProcessApplication processApplication = new EmbeddedProcessApplication() {
+      public ExecutionListener getExecutionListener() {
+        return new ExecutionListener() {
+          public void notify(DelegateExecution delegateExecution) {
+            String currentActivityId = delegateExecution.getCurrentActivityId();
+            String eventName = delegateExecution.getEventName();
+            if ("signal".equals(currentActivityId) &&
+                (ExecutionListener.EVENTNAME_START.equals(eventName) || ExecutionListener.EVENTNAME_END.equals(eventName))) {
+              timerEvents.add(delegateExecution.getEventName());
+            }
+          }
+        };
+      }
+    };
+
+    // register app so that it is notified about events
+    managementService.registerProcessApplication(deploymentId, processApplication.getReference());
+
+    // when
+    runtimeService.startProcessInstanceByKey("process");
+    runtimeService.signalEventReceived("abort");
+
+    // then
+    assertEquals(2, timerEvents.size());
+
+    // "start" event listener
+    assertEquals(ExecutionListener.EVENTNAME_START, timerEvents.get(0));
+
+    // "end" event listener
+    assertEquals(ExecutionListener.EVENTNAME_END, timerEvents.get(1));
+  }
+
 }

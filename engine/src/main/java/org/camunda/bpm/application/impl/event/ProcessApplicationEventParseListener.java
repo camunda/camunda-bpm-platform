@@ -191,8 +191,7 @@ public class ProcessApplicationEventParseListener implements BpmnParseListener {
 
   @Override
   public void parseIntermediateTimerEventDefinition(Element timerEventDefinition, ActivityImpl timerActivity) {
-    addStartEventListener(timerActivity);
-    addEndEventListener(timerActivity);
+    // start and end event listener are set by parseIntermediateCatchEvent()
   }
 
   @Override
@@ -203,8 +202,7 @@ public class ProcessApplicationEventParseListener implements BpmnParseListener {
 
   @Override
   public void parseIntermediateSignalCatchEventDefinition(Element signalEventDefinition, ActivityImpl signalActivity) {
-    addStartEventListener(signalActivity);
-    addEndEventListener(signalActivity);
+    // start and end event listener are set by parseIntermediateCatchEvent()
   }
 
   @Override
