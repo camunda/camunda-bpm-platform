@@ -2,8 +2,12 @@
 
 var chai     = require('chai');
 var promised = require('chai-as-promised');
+
 chai.use(promised);
 global.expect   = chai.expect;
+
+process.env.PROSHOT_DIR = './target/screenshots';
+process.env.multi = 'xunit-file=- mocha-proshot=-';
 
 var tested = process.env.TESTED || '*';
 
@@ -11,32 +15,22 @@ exports.config = {
 
   // The timeout for each script run on the browser. This should be longer
   // than the maximum time your application needs to stabilize between tasks.
-  allScriptsTimeout: 11000,
+  allScriptsTimeout: 15000,
 
   // Capabilities to be passed to the webdriver instance.
   capabilities: {
     'browserName': 'chrome',
-    'chromeOptions': {
-      'args': ['incognito', 'disable-extensions', 'start-maximized', 'enable-crash-reporter-for-testing']
-    },
     'loggingPrefs': {
       'browser': 'ALL'
     }
   },
-
-  /*    multiCapabilities: [{
-   'browserName': 'chrome'
-   }, {
-   'browserName': 'firefox'
-   }],
-   */
 
   // ----- What tests to run -----
   //
   // Spec patterns are relative to the location of the spec file. They may
   // include glob patterns.
   specs: [
-    '../../../../node_modules/camunda-webapp-test/{admin,tasklist,cockpit}/specs/' + tested + '-spec.js'
+    '{admin,tasklist,cockpit}/specs/' + tested + '-spec.js'
   ],
 
   // A base URL for your application under test. Calls to protractor.get()
@@ -50,22 +44,15 @@ exports.config = {
   // assertion framework if working with mocha.
   framework: 'mocha',
 
-/*
   // ----- Options to be passed to minijasminenode -----
   //
-  // Options to be passed to Jasmine-node.
+  // Options to be passed to Mocha-node.
   // See the full list at https://github.com/juliemr/minijasminenode
-  jasmineNodeOpts: {
-    defaultTimeoutInterval: 15000, // Default time to wait in ms before a test fails.
-    showColors: true, // Use colors in the command line report.
-    includeStackTrace: true // If true, include stack traces in failures.
-  }
-  */
 
   mochaOpts: {
     timeout: 15000,
-    colors: true,
-    reporter: 'spec',
+    colors: false,
+    reporter: 'mocha-multi',
     slow: 3000
   }
 };
