@@ -17,7 +17,7 @@
     "commonsUiDir": "node_modules/camunda-commons-ui"
   },
   "dependencies": {
-    "camunda-commons-ui": "git://github.com/camunda/camunda-commons-ui#frontend-union",
+    "camunda-commons-ui": "git://github.com/camunda/camunda-commons-ui#master",
     "camunda-bpm-sdk-js": "git://github.com/camunda/camunda-bpm-sdk-js#master",
     "requirejs-angular-define": "git://github.com/camunda/requirejs-angular-define#master",
     "angular": "1.2.29",
