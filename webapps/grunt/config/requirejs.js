@@ -1,0 +1,63 @@
+var _ = require('lodash');
+
+module.exports = function(config, requireJsConf) {
+  'use strict';
+
+  var options = {
+    stubModules: ['text'],
+
+    preserveLicenseComments: false,
+    generateSourceMaps: true,
+
+    baseUrl: '<%= pkg.gruntConfig.pluginSourceDir %>/',
+
+    paths: {
+      'angular': 'empty:',
+      'angular-data-depend': 'empty:',
+      'camunda-bpm-sdk-js': 'empty:',
+      'camunda-commons-ui': 'empty:',
+      'text': '<%= pkg.gruntConfig.pluginSourceDir.split("/").map(function () { return ".." }).join("/") %>/node_modules/requirejs-text/text'
+    },
+    shim: {
+      angular: {exports: 'angular'}
+    }
+  };
+
+  requireJsConf.webapp_core = {
+    options: _.extend({}, options, {
+      out: '<%= pkg.gruntConfig.pluginBuildTarget %>/base/app/plugin.js',
+      include: ['base/app/plugin'],
+      exclude: ['angular'],
+      insertRequire: ['base/app/plugin']
+    })
+  };
+
+
+  requireJsConf.webapp_jobDefinition = {
+    options: _.extend({}, options, {
+      out: '<%= pkg.gruntConfig.pluginBuildTarget %>/jobDefinition/app/plugin.js',
+      include: ['jobDefinition/app/plugin'],
+      exclude: ['angular'],
+      insertRequire: ['jobDefinition/app/plugin']
+    })
+  };
+
+  requireJsConf.webapp_standaloneTask = {
+    options: _.extend({}, options, {
+      out: '<%= pkg.gruntConfig.pluginBuildTarget %>/standaloneTask/app/plugin.js',
+      include: ['standaloneTask/app/plugin'],
+      exclude: ['angular'],
+      insertRequire: ['standaloneTask/app/plugin']
+    })
+  };
+
+  requireJsConf.webapp_decisionList = {
+    options: _.extend({}, options, {
+      out: '<%= pkg.gruntConfig.pluginBuildTarget %>/decisionList/app/plugin.js',
+      include: ['decisionList/app/plugin'],
+      exclude: ['angular'],
+      insertRequire: ['decisionList/app/plugin']
+    })
+  };
+
+};

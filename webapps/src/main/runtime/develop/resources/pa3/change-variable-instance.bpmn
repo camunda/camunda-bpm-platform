@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://activiti.org/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_4lGncKBlEeO4IoJaDKNTsQ" targetNamespace="http://activiti.org/bpmn">
+  <bpmn2:process id="changeVariablesProcess" name="Change Variables Process" isExecutable="true">
+    <bpmn2:startEvent id="StartEvent_1">
+      <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:serviceTask id="addVariables" camunda:class="org.camunda.bpm.pa.service.AddVariablesService" name="Add Variables">
+      <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:sequenceFlow id="SequenceFlow_1" name="" sourceRef="StartEvent_1" targetRef="addVariables"/>
+    <bpmn2:serviceTask id="changeVariables_1" camunda:class="org.camunda.bpm.pa.service.ChangeVariablesService" name="Change Variables 1">
+      <bpmn2:incoming>SequenceFlow_2</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_3</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:sequenceFlow id="SequenceFlow_2" name="" sourceRef="addVariables" targetRef="changeVariables_1"/>
+    <bpmn2:serviceTask id="changeVariables_2" camunda:class="org.camunda.bpm.pa.service.AnotherChangeVariablesService" name="Change Variables 2">
+      <bpmn2:incoming>SequenceFlow_3</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_4</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:sequenceFlow id="SequenceFlow_3" name="" sourceRef="changeVariables_1" targetRef="changeVariables_2"/>
+    <bpmn2:userTask id="userTask" name="Approve Variables" camunda:assignee="jonny1">
+      <bpmn2:incoming>SequenceFlow_4</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_5</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:sequenceFlow id="SequenceFlow_4" name="" sourceRef="changeVariables_2" targetRef="userTask"/>
+    <bpmn2:endEvent id="EndEvent_1">
+      <bpmn2:incoming>SequenceFlow_5</bpmn2:incoming>
+    </bpmn2:endEvent>
+    <bpmn2:sequenceFlow id="SequenceFlow_5" name="" sourceRef="userTask" targetRef="EndEvent_1"/>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="changeVariablesProcess">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_20" bpmnElement="StartEvent_1">
+        <dc:Bounds height="36.0" width="36.0" x="218.0" y="263.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_ServiceTask_3" bpmnElement="addVariables">
+        <dc:Bounds height="80.0" width="100.0" x="304.0" y="241.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1" sourceElement="_BPMNShape_StartEvent_20" targetElement="_BPMNShape_ServiceTask_3">
+        <di:waypoint xsi:type="dc:Point" x="254.0" y="281.0"/>
+        <di:waypoint xsi:type="dc:Point" x="304.0" y="281.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_ServiceTask_4" bpmnElement="changeVariables_1">
+        <dc:Bounds height="80.0" width="100.0" x="454.0" y="241.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_2" bpmnElement="SequenceFlow_2" sourceElement="_BPMNShape_ServiceTask_3" targetElement="_BPMNShape_ServiceTask_4">
+        <di:waypoint xsi:type="dc:Point" x="404.0" y="281.0"/>
+        <di:waypoint xsi:type="dc:Point" x="454.0" y="281.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_ServiceTask_5" bpmnElement="changeVariables_2">
+        <dc:Bounds height="80.0" width="100.0" x="604.0" y="241.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_3" bpmnElement="SequenceFlow_3" sourceElement="_BPMNShape_ServiceTask_4" targetElement="_BPMNShape_ServiceTask_5">
+        <di:waypoint xsi:type="dc:Point" x="554.0" y="281.0"/>
+        <di:waypoint xsi:type="dc:Point" x="604.0" y="281.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_UserTask_2" bpmnElement="userTask">
+        <dc:Bounds height="80.0" width="100.0" x="754.0" y="241.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_4" bpmnElement="SequenceFlow_4" sourceElement="_BPMNShape_ServiceTask_5" targetElement="_BPMNShape_UserTask_2">
+        <di:waypoint xsi:type="dc:Point" x="704.0" y="281.0"/>
+        <di:waypoint xsi:type="dc:Point" x="754.0" y="281.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_EndEvent_22" bpmnElement="EndEvent_1">
+        <dc:Bounds height="36.0" width="36.0" x="904.0" y="263.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_5" bpmnElement="SequenceFlow_5" sourceElement="_BPMNShape_UserTask_2" targetElement="_BPMNShape_EndEvent_22">
+        <di:waypoint xsi:type="dc:Point" x="854.0" y="281.0"/>
+        <di:waypoint xsi:type="dc:Point" x="904.0" y="281.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>
