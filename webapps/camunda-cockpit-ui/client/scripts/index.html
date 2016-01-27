@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible"
+          content="IE=edge" />
+
+    <title>Camunda Cockpit</title>
+
+    <meta charset="utf-8" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <meta name="description"
+          content="Camunda Cockpit" />
+    <meta name="author"
+          content="camunda services GmbH" />
+
+    <!-- settings the base path for relative links -->
+    <base href="$BASE"
+          cockpit-api="$APP_ROOT/api/cockpit/"
+          engine-api="$APP_ROOT/api/engine/"
+          app-root="$APP_ROOT" />
+
+    <!-- an example of plugin/feature exclusion -->
+    <!--
+    <base href="$BASE"
+          cockpit-api="$APP_ROOT/api/cockpit/"
+          engine-api="$APP_ROOT/api/engine/"
+          app-root="$APP_ROOT"
+          cam-exclude-plugins="cockpit.dashboard:process-definition-tiles" />
+    -->
+
+
+    <!-- styles -->
+    <link href="$APP_ROOT/app/cockpit/styles/styles.css"
+          rel="stylesheet" />
+    <link rel="stylesheet"
+          type="text/css"
+          href="$APP_ROOT/app/cockpit/styles/user-styles.css">
+
+    <!-- favicon -->
+    <link rel="shortcut icon"
+          href="$APP_ROOT/app/cockpit/assets/images/favicon.ico"
+          type="image/x-icon" />
+    <link rel="apple-touch-icon"
+          href="$APP_ROOT/app/cockpit/assets/images/camunda.60.png" />
+    <link rel="apple-touch-icon"
+          sizes="72x72"
+          href="$APP_ROOT/app/cockpit/assets/images/camunda.72.png" />
+    <link rel="apple-touch-icon"
+          sizes="114x114"
+          href="$APP_ROOT/app/cockpit/assets/images/camunda.114.png" />
+  </head>
+  <body>
+    <!-- navigation -->
+    <div cam-widget-header
+         authentication="authentication"
+         user-name="userFullName"
+         current-app="cockpit"
+         brand-name="Camunda Cockpit">
+      <ul ng-cloak
+          cam-if-logged-in
+          class="navbar-nav">
+        <li ng-class="isActivePage('dashboard')"><a href="#/dashboard">Dashboard</a></li>
+        <li ng-class="isActivePage('repository')"><a href="#/repository">Deployments</a></li>
+        <li ng-class="isActivePage('reports')"><a href="#/reports">Reports</a></li>
+      </ul>
+    </div>
+
+    <!-- content -->
+    <div class="ctn-main">
+      <div class="ctn-wrapper">
+        <div ng-if="showBreadcrumbs"
+             cam-breadcrumbs-panel
+             divider="&raquo;"
+             class="breadcrumbs-panel"></div>
+
+        <div notifications-panel
+             class="page-notifications"></div>
+
+        <!-- view body provided by ngView -->
+        <div ng-view></div>
+      </div>
+    </div>
+
+    <!-- footer -->
+    <footer cam-widget-footer
+            version="v${project.version}"></footer>
+
+    <script type="application/javascript">
+      window.PLUGIN_DEPENDENCIES = $PLUGIN_DEPENDENCIES || [];
+      window.PLUGIN_PACKAGES = $PLUGIN_PACKAGES || [];
+
+      window.require = {
+          waitSeconds: 0
+      };
+    </script>
+
+    <script type="application/javascript" data-main="$APP_ROOT/app/cockpit/camunda-cockpit-bootstrap" src="$APP_ROOT/lib/require.js"></script>
+
+
+    <!--[if lte IE 9]>
+    <script type="text/javascript"
+            src="$APP_ROOT/app/cockpit/scripts/placeholders.utils.js"></script>
+    <script type="text/javascript"
+            src="$APP_ROOT/app/cockpit/scripts/placeholders.main.js"></script>
+    <script type="text/javascript"
+            src="$APP_ROOT/app/cockpit/scripts/placeholders.jquery.js"></script>
+    <![endif]-->
+  </body>
+</html>

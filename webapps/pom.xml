@@ -1,11 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.camunda.bpm.webapp</groupId>
-  <artifactId>camunda-webapp-root</artifactId>
-  <packaging>pom</packaging>
-  <name>camunda BPM - webapp - root</name>
 
   <parent>
     <groupId>org.camunda.bpm</groupId>
@@ -14,56 +10,30 @@
     <relativePath>../camunda-bpm-platform/database</relativePath>
   </parent>
 
-  <profiles>
-    <profile>
-      <id>distro</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <modules>
-
-        <module>core</module>
-        <module>webapp</module>
-        <module>test-utility</module>
-        <module>webjar</module>
-
-      </modules>
-    </profile>
-
-    <profile>
-      <id>distro-ce</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <modules>
-
-        <module>distro/jboss</module>
-        <module>distro/jboss-standalone</module>
-        <module>distro/tomcat</module>
-        <module>distro/tomcat-standalone</module>
-        <module>distro/glassfish</module>
-        <module>distro/glassfish-standalone</module>
-
-      </modules>
-    </profile>
-  </profiles>
+  <artifactId>camunda-webapp</artifactId>
+  <groupId>org.camunda.bpm.webapp</groupId>
+  <packaging>war</packaging>
+  <name>camunda BPM - webapp - app</name>
 
   <properties>
-    <version.tomcat>7.0.50</version.tomcat>
-    <tomcat6.connector.http.port>48080</tomcat6.connector.http.port>
-    <tomcat6.connector.http.redirectPort>48443</tomcat6.connector.http.redirectPort>
-    <tomcat6.connector.ajp.port>48009</tomcat6.connector.ajp.port>
-    <tomcat6.connector.ajp.redirectPort>48443</tomcat6.connector.ajp.redirectPort>
-    <tomcat6.server.port>48005</tomcat6.server.port>
+    <web.resources.override>src/main/runtime/default/webapp</web.resources.override>
+    <java.resources.override>src/main/runtime/default/resources</java.resources.override>
+    <properties.override>src/main/runtime/default/config.properties</properties.override>
+
+    <frontend.app.path>${project.build.directory}/webapp/</frontend.app.path>
+
+    <frontend.development.cockpit.path>${frontend.app.path}</frontend.development.cockpit.path>
+    <frontend.development.tasklist.path>${frontend.app.path}</frontend.development.tasklist.path>
+
+    <exec.shell>bash</exec.shell>
+    <exec.arg>-c</exec.arg>
+
+    <grunt.target>development</grunt.target>
+    <skip.frontend.build>true</skip.frontend.build>
   </properties>
 
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>org.camunda.bpm.webapp</groupId>
-        <artifactId>camunda-webapp-core</artifactId>
-        <version>${project.version}</version>
-      </dependency>
       <dependency>
         <groupId>org.camunda.bpm</groupId>
         <artifactId>camunda-engine-rest-core</artifactId>
@@ -75,13 +45,6 @@
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.jboss.arquillian</groupId>
-        <artifactId>arquillian-bom</artifactId>
-        <version>1.0.3.Final</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
-      <dependency>
         <groupId>javax.activation</groupId>
         <artifactId>activation</artifactId>
         <version>1.1</version>
@@ -89,7 +52,103 @@
     </dependencies>
   </dependencyManagement>
 
+  <repositories>
+    <repository>
+      <id>camunda-nexus</id>
+      <name>camunda BPM Maven Repository</name>
+      <url>https://app.camunda.com/nexus/content/groups/public</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
+  <dependencies>
+
+    <!-- jee spec -->
+    <dependency>
+      <groupId>org.jboss.spec</groupId>
+      <artifactId>jboss-javaee-6.0</artifactId>
+      <type>pom</type>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- rest api -->
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine-rest-core</artifactId>
+    </dependency>
+
+    <!-- tests -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.uuid</groupId>
+      <artifactId>java-uuid-generator</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.easytesting</groupId>
+      <artifactId>fest-assert</artifactId>
+      <version>1.4</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm.webapp</groupId>
+      <artifactId>camunda-webapp-test-utility</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-client</artifactId>
+      <version>1.17</version>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
   <build>
+    <finalName>camunda-webapp</finalName>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+      <resource>
+        <directory>${java.resources.override}</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
+
     <pluginManagement>
       <plugins>
         <!-- test plugins -->
@@ -129,20 +188,763 @@
         </plugin>
       </plugins>
     </pluginManagement>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <webResources>
+            <resource>
+              <filtering>true</filtering>
+              <directory>${web.resources.override}</directory>
+            </resource>
+            <resource>
+              <filtering>false</filtering>
+              <directory>target/webapp</directory>
+              <excludes>
+                <exclude>**/*.html</exclude>
+              </excludes>
+            </resource>
+            <resource>
+              <filtering>true</filtering>
+              <directory>target/webapp</directory>
+              <!-- no filtering for favicon because linux destroys images through carriage return -->
+              <includes>
+                <include>**/*.html</include>
+              </includes>
+            </resource>
+          </webResources>
+          <!-- exclude development resources (task forms etc.) -->
+          <packagingExcludes>
+            develop/**
+          </packagingExcludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <failIfNoTests>false</failIfNoTests>
+          <trimStackTrace>false</trimStackTrace>
+          <redirectTestOutputToFile>true</redirectTestOutputToFile>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>create-jar</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+            <phase>package</phase>
+            <configuration>
+              <classifier>classes</classifier>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
 
-  <repositories>
-    <repository>
-      <id>camunda-nexus</id>
-      <name>camunda BPM Maven Repository</name>
-      <url>https://app.camunda.com/nexus/content/groups/public</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
+  <profiles>
+    <profile>
+      <id>distro</id>
+      <properties>
+        <grunt.target>production</grunt.target>
+        <skip.frontend.build>false</skip.frontend.build>
+      </properties>
+    </profile>
+    <profile>
+      <id>os</id>
+      <activation>
+        <os>
+          <family>Windows</family>
+        </os>
+      </activation>
+      <properties>
+        <exec.shell>cmd</exec.shell>
+        <exec.arg>/c</exec.arg>
+      </properties>
+    </profile>
+    <profile>
+      <id>tomcat</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-jaxrs</artifactId>
+          <scope>runtime</scope>
+        </dependency>
+      </dependencies>
+      <properties>
+        <web.resources.override>src/main/runtime/tomcat/webapp</web.resources.override>
+        <java.resources.override>src/main/runtime/tomcat/resources</java.resources.override>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>jboss</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-jaxrs</artifactId>
+          <scope>provided</scope>
+        </dependency>
+      </dependencies>
+      <properties>
+        <web.resources.override>src/main/runtime/jboss/webapp</web.resources.override>
+        <java.resources.override>src/main/runtime/jboss/resources</java.resources.override>
+      </properties>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <configuration>
+              <archive>
+                <manifestEntries>
+                  <!-- module dependencies for deployment on AS 7 -->
+                  <Dependencies>org.camunda.bpm.camunda-engine,org.camunda.bpm.dmn.camunda-engine-dmn</Dependencies>
+                </manifestEntries>
+              </archive>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>develop</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-jaxrs</artifactId>
+          <scope>runtime</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.camunda.bpm</groupId>
+          <artifactId>camunda-engine</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.camunda.bpm</groupId>
+          <artifactId>camunda-engine-plugin-spin</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.camunda.spin</groupId>
+          <artifactId>camunda-spin-dataformat-json-jackson</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.camunda.spin</groupId>
+          <artifactId>camunda-spin-dataformat-xml-dom</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.camunda.bpm</groupId>
+          <artifactId>camunda-engine-plugin-connect</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.camunda.connect</groupId>
+          <artifactId>camunda-connect-http-client</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.camunda.connect</groupId>
+          <artifactId>camunda-connect-soap-http-client</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.camunda.bpm.identity</groupId>
+          <artifactId>camunda-identity-ldap</artifactId>
+          <version>${project.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-jdk14</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>com.h2database</groupId>
+          <artifactId>h2</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>com.fasterxml.uuid</groupId>
+          <artifactId>java-uuid-generator</artifactId>
+        </dependency>
+
+        <dependency>
+          <groupId>org.apache.tomcat</groupId>
+          <artifactId>tomcat-jdbc</artifactId>
+          <version>7.0.33</version>
+        </dependency>
+
+        <dependency>
+          <groupId>org.apache.tomcat</groupId>
+          <artifactId>tomcat-juli</artifactId>
+          <version>7.0.33</version>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>jetty-maven-plugin</artifactId>
+            <version>8.1.14.v20131031</version>
+            <configuration>
+              <webAppConfig>
+                <contextPath>/camunda</contextPath>
+                <defaultsDescriptor>${project.basedir}/src/main/runtime/develop/jetty/webdefault.xml</defaultsDescriptor>
+                <resourceBases>
+                  <resourceBase>${project.basedir}/target/webapp</resourceBase>
+                  <resourceBase>${project.basedir}/src/main/webapp</resourceBase>
+                </resourceBases>
+              </webAppConfig>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>add-sources</id>
+                <goals>
+                  <goal>add-source</goal>
+                </goals>
+                <configuration>
+                  <sources>
+                    <source>src/main/runtime/develop/java</source>
+                  </sources>
+                </configuration>
+              </execution>
+              <execution>
+                <id>add-resources</id>
+                <goals>
+                  <goal>add-resource</goal>
+                </goals>
+                <configuration>
+                  <resources>
+                    <resource>
+                      <directory>src/main/runtime/develop/resources</directory>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+      <properties>
+        <java.resources.override>src/main/runtime/develop/resources</java.resources.override>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>doFrontendBuild</id>
+      <properties>
+        <skip.frontend.build>false</skip.frontend.build>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>mariadb</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <excludedGroups>org.camunda.bpm.cockpit.plugin.base.SlowMariaDbTest</excludedGroups>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+
+    <profile>
+      <id>dev-e2e</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-jaxrs</artifactId>
+          <scope>runtime</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.tomcat</groupId>
+          <artifactId>tomcat-jdbc</artifactId>
+          <version>7.0.33</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.tomcat</groupId>
+          <artifactId>tomcat-juli</artifactId>
+          <version>7.0.33</version>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>jetty-maven-plugin</artifactId>
+            <version>8.1.14.v20131031</version>
+            <configuration>
+              <webAppConfig>
+                <contextPath>/camunda</contextPath>
+                <defaultsDescriptor>${project.basedir}/src/main/runtime/test/jetty/webdefault.xml</defaultsDescriptor>
+                <resourceBases>
+                  <resourceBase>${project.basedir}/target/webapp</resourceBase>
+                  <resourceBase>${project.basedir}/src/main/webapp</resourceBase>
+                </resourceBases>
+              </webAppConfig>
+              <contextHandlers>
+                <contextHandler implementation="org.eclipse.jetty.webapp.WebAppContext">
+                  <war>${basedir}/target/engine-rest.war</war>
+                  <contextPath>/engine-rest</contextPath>
+                </contextHandler>
+              </contextHandlers>
+            </configuration>
+            <dependencies>
+              <dependency>
+                <groupId>org.camunda.bpm</groupId>
+                <artifactId>camunda-engine</artifactId>
+                <version>${project.version}</version>
+              </dependency>
+              <dependency>
+                <groupId>org.camunda.bpm.identity</groupId>
+                <artifactId>camunda-identity-ldap</artifactId>
+                <version>${project.version}</version>
+              </dependency>
+              <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-jdk14</artifactId>
+                <version>1.7.7</version>
+              </dependency>
+              <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>1.4.181</version>
+              </dependency>
+              <dependency>
+                <groupId>com.fasterxml.uuid</groupId>
+                <artifactId>java-uuid-generator</artifactId>
+                <version>3.1.2</version>
+              </dependency>
+            </dependencies>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>add-sources</id>
+                <goals>
+                  <goal>add-source</goal>
+                </goals>
+                <configuration>
+                  <sources>
+                    <source>src/main/runtime/test/java</source>
+                  </sources>
+                </configuration>
+              </execution>
+              <execution>
+                <id>add-resources</id>
+                <goals>
+                  <goal>add-resource</goal>
+                </goals>
+                <configuration>
+                  <resources>
+                    <resource>
+                      <directory>src/main/runtime/test/resources</directory>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <version>2.10</version>
+            <executions>
+              <execution>
+                <id>copy</id>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>copy</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.camunda.bpm</groupId>
+                      <artifactId>camunda-engine-rest</artifactId>
+                      <version>${project.version}</version>
+                      <type>war</type>
+                      <classifier>tomcat</classifier>
+                      <overWrite>true</overWrite>
+                      <outputDirectory>${project.build.directory}/</outputDirectory>
+                      <destFileName>engine-rest.war</destFileName>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+      <properties>
+        <java.resources.override>src/main/runtime/test/resources</java.resources.override>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>test-e2e</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-jaxrs</artifactId>
+          <scope>runtime</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.tomcat</groupId>
+          <artifactId>tomcat-jdbc</artifactId>
+          <version>7.0.33</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.tomcat</groupId>
+          <artifactId>tomcat-juli</artifactId>
+          <version>7.0.33</version>
+        </dependency>
+        <dependency>
+          <groupId>org.camunda.bpm.identity</groupId>
+          <artifactId>camunda-identity-ldap</artifactId>
+          <version>${project.version}</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skipTests>true</skipTests>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>jetty-maven-plugin</artifactId>
+            <version>8.1.14.v20131031</version>
+            <configuration>
+              <webAppConfig>
+                <contextPath>/camunda</contextPath>
+                <defaultsDescriptor>${project.basedir}/src/main/runtime/test/jetty/webdefault.xml</defaultsDescriptor>
+              </webAppConfig>
+              <contextHandlers>
+                <contextHandler implementation="org.eclipse.jetty.webapp.WebAppContext">
+                  <war>${basedir}/target/engine-rest.war</war>
+                  <contextPath>/engine-rest</contextPath>
+                </contextHandler>
+              </contextHandlers>
+              <stopKey>STOP</stopKey>
+              <stopPort>9999</stopPort>
+              <stopWait>10</stopWait>
+            </configuration>
+            <executions>
+              <execution>
+                <id>start-jetty</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>run-war</goal>
+                </goals>
+                <configuration>
+                  <scanIntervalSeconds>0</scanIntervalSeconds>
+                  <daemon>true</daemon>
+                </configuration>
+              </execution>
+              <execution>
+                <id>stop-jetty</id>
+                <phase>post-integration-test</phase>
+                <goals>
+                  <goal>stop</goal>
+                </goals>
+              </execution>
+            </executions>
+            <dependencies>
+              <dependency>
+                <groupId>org.camunda.bpm</groupId>
+                <artifactId>camunda-engine</artifactId>
+                <version>${project.version}</version>
+              </dependency>
+              <dependency>
+                <groupId>org.camunda.bpm.identity</groupId>
+                <artifactId>camunda-identity-ldap</artifactId>
+                <version>${project.version}</version>
+              </dependency>
+              <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-jdk14</artifactId>
+                <version>1.7.7</version>
+              </dependency>
+              <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>1.4.181</version>
+              </dependency>
+              <dependency>
+                <groupId>com.fasterxml.uuid</groupId>
+                <artifactId>java-uuid-generator</artifactId>
+                <version>3.1.2</version>
+              </dependency>
+            </dependencies>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>grunt-test</id>
+                <phase>integration-test</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <inherited>false</inherited>
+                <configuration>
+                  <target>
+                    <!-- grunt test-e2e -->
+                    <exec executable="./node_modules/grunt-cli/bin/grunt" failonerror="true" osfamily="unix">
+                      <env key="XUNIT_FILE" value="target/xunit.xml" />
+                      <env key="LOG_XUNIT" value="true" />
+                      <arg value="test-e2e" />
+                      <arg value="--color=false" />
+                    </exec>
+                    <exec executable="cmd" failonerror="true" osfamily="windows">
+                      <env key="XUNIT_FILE" value="target/xunit.xml" />
+                      <env key="LOG_XUNIT" value="true" />
+                      <arg value="/c" />
+                      <arg value="node_modules\.bin\grunt.cmd" />
+                      <arg value="test-e2e" />
+                      <arg value="--color=false" />
+                    </exec>
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>add-sources</id>
+                <goals>
+                  <goal>add-source</goal>
+                </goals>
+                <configuration>
+                  <sources>
+                    <source>src/main/runtime/test/java</source>
+                  </sources>
+                </configuration>
+              </execution>
+              <execution>
+                <id>add-resources</id>
+                <goals>
+                  <goal>add-resource</goal>
+                </goals>
+                <configuration>
+                  <resources>
+                    <resource>
+                      <directory>src/main/runtime/test/resources</directory>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <version>2.10</version>
+            <executions>
+              <execution>
+                <id>copy</id>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>copy</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.camunda.bpm</groupId>
+                      <artifactId>camunda-engine-rest</artifactId>
+                      <version>${project.version}</version>
+                      <type>war</type>
+                      <classifier>tomcat</classifier>
+                      <overWrite>true</overWrite>
+                      <outputDirectory>${project.build.directory}/</outputDirectory>
+                      <destFileName>engine-rest.war</destFileName>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+      <properties>
+        <java.resources.override>src/main/runtime/test/resources</java.resources.override>
+      </properties>
+    </profile>
+
+    <!-- database QA profiles -->
+    <profile>
+      <id>database</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>database-test-drop-schema-before-test</id>
+                <phase>process-test-classes</phase>
+                <goals>
+                  <goal>java</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>database-test-drop-schema-after-test</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>java</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <mainClass>org.camunda.bpm.engine.impl.db.DbSchemaDrop</mainClass>
+              <classpathScope>test</classpathScope>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- profile for running cockpit testsuite with database table prefix -->
+    <profile>
+      <id>db-table-prefix</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>database-test-create-schema</id>
+                <phase>process-test-classes</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target>
+                    <copy file="target/test-classes/camunda.cfg.prefix.xml" tofile="target/test-classes/camunda.cfg.xml" overwrite="true" />
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>node-build-windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>generate-zip</id>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <inherited>false</inherited>
+                <configuration>
+                  <skip>${skip.frontend.build}</skip>
+                  <target>
+                    <!-- run node build -->
+                    <exec executable="cmd" failonerror="true">
+                      <arg value="/c" />
+                      <arg value="npm" />
+                      <arg value="install" />
+                      <arg value="--optional=false" />
+                    </exec>
+                    <!--
+                    <exec executable="cmd" failonerror="true">
+                      <arg value="/c" />
+                      <arg value="node_modules\.bin\bower.cmd" />
+                      <arg value="install" />
+                    </exec>
+                    -->
+                    <exec executable="cmd" failonerror="true">
+                      <arg value="/c" />
+                      <arg value="node_modules\.bin\grunt.cmd" />
+                      <arg value="build" />
+                      <arg value="--color=false" />
+                    </exec>
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>node-build-unix</id>
+      <activation>
+        <os>
+          <family>!windows</family>
+        </os>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>generate-zip</id>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <inherited>false</inherited>
+                <configuration>
+                  <skip>${skip.frontend.build}</skip>
+                  <target>
+                    <!-- run node build -->
+                    <exec executable="npm" failonerror="true">
+                      <arg value="install" />
+                      <arg value="--optional=false" />
+                    </exec>
+                    <!--
+                    <exec executable="./node_modules/bower/bin/bower" failonerror="true">
+                      <arg value="install" />
+                    </exec>
+                    -->
+                    <exec executable="./node_modules/grunt-cli/bin/grunt" failonerror="true">
+                      <arg value="build" />
+                      <arg value="--color=false" />
+                    </exec>
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>

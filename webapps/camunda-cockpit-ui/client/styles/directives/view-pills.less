@@ -1,0 +1,19 @@
+ul.view-pills,
+[view-pills] {
+  > li {
+    > a {
+      padding: 5px 10px;
+    }
+
+    &.active {
+      > a {
+        background-color: @link-color;
+
+        &:hover,
+        &:focus {
+          background-color: @link-color;
+        }
+      }
+    }
+  }
+}

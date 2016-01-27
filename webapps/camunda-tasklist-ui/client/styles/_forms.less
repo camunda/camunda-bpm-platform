@@ -1,0 +1,95 @@
+.disabled-form {
+  position: relative;
+  &:before {
+    display: block;
+    content: ' ';
+    background-color: fade(@body-bg, 33%);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    cursor: not-allowed;
+    z-index: 1000;
+  }
+}
+
+.form-control{
+  &.ng-dirty {
+    &.ng-invalid {
+      color: @state-danger-text;
+      border-color: @state-danger-text;
+      background-color: @state-danger-bg;
+      .box-shadow(~"inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px @{state-danger-bg}");
+    }
+  }
+
+  &[type="checkbox"] {
+    width: auto;
+    height: auto;
+  }
+}
+
+.checkbox {
+  label,
+  [type="checkbox"] {
+    vertical-align: middle;
+  }
+
+  label [type="checkbox"] {
+    margin-right: 5px;
+  }
+}
+
+
+.labels-left {
+  .control-label {
+    text-align: left;
+  }
+}
+
+.row-action {
+  text-align: right;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 7px;
+
+  > a[ng-click],
+  .btn-link {
+    white-space: nowrap;
+
+    > span {
+      max-width: 100%;
+      display: inline-block;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      position: relative;
+      padding-right: 24px;
+      margin-right: -24px;
+      vertical-align: middle;
+      z-index: 1;
+    }
+
+    .glyphicon {
+      padding: 0;
+      margin: 0;
+      z-index: 2;
+    }
+  }
+}
+
+.control-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.modal-footer {
+  .row-action {
+    padding-top: 0;
+  }
+
+  button {
+    min-height: 31px;
+  }
+}

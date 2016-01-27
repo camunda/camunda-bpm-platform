@@ -1,0 +1,34 @@
+<!-- # cockpit client/scripts/repository/deployments/directives/cam-cockpit-deployments-sorting-choices.html -->
+<div class="dropdown">
+
+  <a href
+     tabindex="-1"
+     role="button"
+     class="dropdown-toggle"
+     data-toggle="dropdown">
+    <span class="hidden-xs hidden-sm hidden-md"></span>
+    <span class="sort-by">{{ byLabel(sorting.sortBy) }}</span>
+  </a>
+
+  <a href
+     tabindex="-1"
+     tooltip="{{ (sorting.sortOrder === 'desc' ? 'DESC' : 'ASC') }}"
+     class="glyphicon sort-direction"
+     ng-class="sorting.sortOrder === 'asc' ? 'glyphicon-chevron-up' : 'glyphicon-chevron-down'"
+     ng-click="changeOrder()"></a>
+
+  <ul class="dropdown-menu"
+      role="menu">
+
+    <li ng-show="sorting.sortBy !== id"
+        ng-repeat="(id, name) in uniqueProps">
+      <a href
+         tabindex="-1"
+         class="sort-by-choice"
+         ng-click="changeBy(id)">{{ name }}</a>
+    </li>
+
+  </ul>
+
+</div>
+<!-- / cockpit client/scripts/repository/deployments/directives/cam-cockpit-deployments-sorting-choices.html -->

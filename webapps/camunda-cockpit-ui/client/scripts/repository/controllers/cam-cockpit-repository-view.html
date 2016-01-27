@@ -1,0 +1,71 @@
+<!-- # cockpit client/scripts/repository/controllers/cam-cockpit-repository-view.html -->
+<div cam-repository
+     class="ctn-fixed-view">
+  <div class="ctn-content-container">
+
+      <!-- # deployment-list column -->
+    <section class="ctn-column deployments"
+             ng-controller="camDeploymentsCtrl">
+
+      <header class="cell top">
+        <div cam-deployments-sorting-choices
+             deployments-data="deploymentsData"></div>
+      </header>
+
+      <div class="cell content">
+
+        <view ng-repeat="deploymentsPlugin in deploymentsPlugins"
+              provider="deploymentsPlugin"
+              class="deployment-plugins"
+              vars="deploymentsVars" />
+
+        <div cam-deployments
+             ng-style="{top: deploymentsListTop}"
+             deployments-data="deploymentsData"></div>
+      </div>
+
+    </section>
+    <!-- / deployment-list column -->
+
+
+
+    <!-- # resource-list column -->
+    <section class="ctn-column resources">
+
+      <header class="cell top">
+      </header>
+
+      <div class="cell content">
+        <div cam-resources
+             repository-data="repositoryData"></div>
+      </div>
+
+    </section>
+    <!-- / resource-list column -->
+
+
+
+    <!-- # resource-details column -->
+    <section class="ctn-column resource-details"
+             ng-controller="camResourceDetailsCtrl">
+
+      <header class="cell top">
+        <div class="resource-actions"
+             ng-if="resource"
+             ng-repeat="resourceAction in resourceActions">
+          <view provider="resourceAction" vars="resourceVars">
+        </div>
+      </header>
+
+      <div class="cell content">
+        <div cam-resource-wrapper
+             resource-details-data="resourceDetailsData"
+             control="control"></div>
+      </div>
+
+    </section>
+    <!-- # resource-details column -->
+
+  </div>
+</div>
+<!-- / cockpit client/scripts/repository/controllers/cam-cockpit-repository-view.html -->

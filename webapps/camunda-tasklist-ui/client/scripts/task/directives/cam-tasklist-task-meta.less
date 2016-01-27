@@ -1,0 +1,120 @@
+[cam-tasklist-task-meta] {
+  .meta {
+    float: left;
+    width: 50%;
+    margin: 0 0 (@grid-gutter-width / 3) 0;
+    padding: 0;
+
+    > li {
+      float: none;
+      display: block;
+      margin: 0;
+      padding: 0;
+      width: auto;
+      max-width: 100%;
+      height: 26px;
+
+      &.set-value {
+        padding-top: 3px;
+      }
+    }
+  }
+
+  [cam-widget-inline-field] {
+    padding-right: 20px;
+    margin-right: -20px;
+    margin-left: -3px;
+
+    &.inline-editing {
+      padding-right: 0;
+      margin-right: 0;
+    }
+
+    .view-value {
+      max-width: 100%;
+    }
+  }
+
+  .groups,
+  .assignee {
+    text-align: right;
+  }
+
+  .groups {
+    > span {
+      position: relative;
+      top: 2px;
+
+      > .glyphicon,
+      > a {
+        vertical-align: top;
+      }
+
+      .glyphicon {
+        top: 2px;
+      }
+
+      a {
+        display: inline-block;
+        max-width: 100%;
+        padding-left: 20px;
+        margin-left: -20px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+    }
+  }
+
+
+  .glyphicon-remove {
+    top: 3px;
+  }
+}
+
+// S+
+@media (min-width: @screen-sm-min) {
+  [cam-tasklist-task-meta] .meta {
+    > li {
+      float: left;
+    }
+  }
+}
+
+// S
+@media (min-width: @screen-sm-min) and (max-width: @screen-sm-max) {
+  body {
+    &.list-column-close {
+      [cam-tasklist-task-meta] .meta {
+        > li {
+          width: 50%;
+        }
+      }
+    }
+  }
+}
+
+
+// M
+@media (min-width: @screen-md-min) and (max-width: @screen-md-max) {
+  body {
+    &.list-column-close {
+      [cam-tasklist-task-meta] .meta {
+        width: 100%;
+
+        > li {
+          width: 50%;
+        }
+      }
+    }
+  }
+}
+
+
+@media (min-width: @screen-lg-min) {
+  [cam-tasklist-task-meta] .meta {
+    > li {
+      width: 50%;
+    }
+  }
+}

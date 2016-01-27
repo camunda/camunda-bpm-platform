@@ -1,0 +1,23 @@
+/*
+[cam-widget-header] .navbar-brand {
+  background-image: url(../images/your-app-logo.png);
+}
+
+[cam-widget-header] {
+  background-color: #009edf;
+  border-color: #006E99;
+}
+
+[cam-widget-header] > [ng-transclude] {
+  border-right-color: rgba(0, 0, 0, 0.2);
+}
+[cam-widget-header] > .cam-nav {
+  border-left-color: rgba(255, 255, 255, 0.5);
+}
+
+[cam-widget-header] .navbar-nav > .open > a,
+[cam-widget-header] .navbar-nav > .open > a:hover,
+[cam-widget-header] .navbar-nav > .open > a:focus {
+  background-color: #006E99;
+}
+*/

@@ -1,0 +1,28 @@
+<!-- # CE - camunda-cockpit-ui/client/scripts/directives/breadcrumbs.html -->
+<ul class="breadcrumb">
+  <li>
+    <a href="#">Home</a>
+  </li>
+
+  <li ng-repeat="(index, crumb) in breadcrumbs"
+      ng-class="{ active: !!$last }"
+      data-index="{{ index }}">
+    <span class="divider">{{ crumb.divider || divider }}</span>
+
+    <span ng-if="!!crumb.href">
+      <a ng-if="!$last"
+         href="{{ getHref(crumb) }}">{{ crumb.label }}</a>
+
+      <span ng-if="!!$last">{{ crumb.label }}</span>
+    </span>
+
+    <span ng-if="!crumb.href">
+      <a ng-if="!!crumb.callback"
+         ng-click="crumb.callback(index, breadcrumbs)"
+         href>{{ crumb.label }}</a>
+
+      <span ng-if="!crumb.callback">{{ crumb.label }}</span>
+    </span>
+  </li>
+</ul>
+<!-- / CE - camunda-cockpit-ui/client/scripts/directives/breadcrumbs.html -->

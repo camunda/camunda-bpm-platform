@@ -1,0 +1,135 @@
+{
+  "FILTER_CREATE":
+                        "Create a filter",
+  "FILTER_EDIT":
+                        "Edit filter",
+  "FILTER_DETAILS":
+                        "Filter details",
+  "FILTER_DELETE":
+                        "Delete filter",
+
+  "FILTER_DELETION_WARNING":
+                        "Deleting the filter can not be undone, are your sure to want to proceed?",
+  "FILTER_DELETION_SUCCESS":
+                        "The filter has been deleted",
+  "FILTER_DELETION_ERROR":
+                        "Something went wrong while deleting the filter",
+
+  "FILTER_SAVE_SUCCESS":
+                        "The filter was saved",
+  "FILTER_SAVE_ERROR":
+                        "Something went wrong while saving the filter",
+
+  "FILTER_NOT_FOUND":
+                        "Filter not found",
+
+  "FILTER_FORM_BASICS":
+                        "General",
+  "FILTER_FORM_BASICS_HINT":
+                        "Customize the appearance of the filter.",
+  "FILTER_NAME_LABEL":
+                        "Name",
+  "FILTER_NAME_PLACEHOLDER":
+                        "My tasks",
+  "FILTER_PRIORITY_LABEL":
+                        "Priority",
+  "FILTER_COLOR_LABEL":
+                        "Color",
+  "FILTER_DESCRIPTION_LABEL":
+                        "Description",
+  "FILTER_DESCRIPTION_PLACEHOLDER":
+                        "Shows the tasks I am assigned",
+  "FILTER_REFRESH_LABEL":
+                        "Auto-Refresh",
+  "FILTER_REFRESH_TOOLTIP":
+                        "Automatically fetches latest changes and keeps the task list up to date",
+
+  "FILTER_FORM_CRITERIA":
+                        "Criteria",
+  "FILTER_FORM_CRITERIA_HINT":
+                        "This section is aimed to set the parameters used to filter the tasks. Keys marked with a * accept expressions as value.",
+  "FILTER_CRITERIA_KEY":
+                        "Key",
+  "FILTER_CRITERION_SUPPORT_EXPRESSION":
+                        "You can utilize expression with this criterion.",
+  "FILTER_CRITERIA_OPERATOR":
+                        "Operator",
+  "FILTER_CRITERIA_INCLUDE_ASSIGNED_TASKS":
+                        "Include assigned tasks",
+  "FILTER_CRITERIA_INCLUDE_ASSIGNED_TASKS_HINT":
+                        "Also include tasks that are assigned to users in candidate queries.<br/>Default is to only include tasks that are not assigned to any user if you query by candidate user or group(s).",
+  "FILTER_CRITERIA_VALUE":
+                        "Value",
+  "FILTER_ADD_CRITERION":
+                        "Add criterion",
+  "FILTER_REMOVE_CRITERION":
+                        "Remove",
+
+  "ADD_PERMISSION":
+                        "Add permis.",
+  "FILTER_FORM_PERMISSIONS":
+                        "Permissions",
+  "FILTER_FORM_PERMISSIONS_GLOBAL":
+                        "Accessible by all users",
+  "FILTER_FORM_PERMISSIONS_LOADING_FAILURE":
+                        "Loading the permissions finished with failures. Try to refresh the page to try again.",
+  "FILTER_FORM_PERMISSIONS_HINT":
+                        "This section is aimed to set read permissions for the filter.",
+  "FILTER_FORM_PERMISSIONS_EDIT_HINT":
+                        "In order to edit the read permissions you need an authorization to create or edit a filter and a further authorization to create or edit authorizations.",
+  "FILTER_FORM_PERMISSIONS_IDENTITY_TYPE_TOOLTIP":
+                        "Permission is applied to",
+  "FILTER_FORM_PERMISSIONS_IDENTITY_TYPE_USER":
+                        "user",
+  "FILTER_FORM_PERMISSIONS_IDENTITY_TYPE_GROUP":
+                        "group",
+  "FILTER_FORM_PERMISSIONS_REMOVE":
+                        "Remove",
+  "FILTER_FORM_PERMISSIONS_SAVE_ERROR":
+                        "Something went wrong while saving the permissions",
+  "FILTER_FORM_PERMISSIONS_USER_ID":
+                        "User Id",
+  "FILTER_FORM_PERMISSIONS_GROUP_ID":
+                        "Group Id",
+  "FILTER_FORM_PERMISSIONS_DUPLICATE_USER":
+                        "Given user has already read permissions",
+  "FILTER_FORM_PERMISSIONS_DUPLICATE_GROUP":
+                        "Given group has already read permissions",
+  "FILTER_FORM_PERMISSION_GROUP_USER":
+                        "Group / User",
+  "FILTER_FORM_PERMISSION_IDENTIFIER":
+                        "Identifier",
+
+  "FILTER_FORM_VARIABLES":
+                        "Variables",
+  "FILTER_FORM_VARIABLES_SHOW_UNDEFINED":
+                        "Show undefined variables",
+  "FILTER_FORM_VARIABLES_HINT":
+                        "You can define variables shown in the tasks list.",
+  "FILTER_VARIABLE_NAME":
+                        "Name",
+  "FILTER_VARIABLE_LABEL":
+                        "Label",
+  "FILTER_VARIABLE_NAME_PLACEHOLDER":
+                        "Machine name of variable",
+  "FILTER_VARIABLE_LABEL_PLACEHOLDER":
+                        "Human readable label",
+  "FILTER_ADD_VARIABLE":
+                        "Add variable",
+  "FILTER_REMOVE_VARIABLE":
+                        "Remove",
+  "FILTER_VARIABLES_AMOUNT_WARNING":
+                        "Showing too much variables in the tasks list could impact on the user experience.",
+
+  "NO_AVAILABLE_FILTER":
+                        "No filter available.",
+
+  "FILTERS_LOADING_FAILURE":
+                        "Loading the filters finished with failures. Try to refresh the page to try again.",
+
+  "INVALID_DATE":
+                        "Invalid date: the date should have the pattern 'yyyy-MM-ddTHH:mm:ss'",
+
+  "REQUIRE_UNIQUE_KEY":
+                        "Key must be unique"
+}

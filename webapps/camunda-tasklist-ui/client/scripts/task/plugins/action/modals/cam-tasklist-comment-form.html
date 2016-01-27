@@ -1,0 +1,36 @@
+<form class="form form-horizontal"
+      name="newComment"
+      role="form">
+
+  <div class="modal-header">
+    <h3 class="modal-title">
+      {{ 'COMMENT_CREATE' | translate }}
+    </h3>
+  </div>
+
+  <div class="modal-body">
+      <textarea class="form-control"
+             id="comment-form-message"
+             ng-model="comment.message"
+             placeholder="{{ 'COMMENT_MESSAGE_PLACEHOLDER' | translate }}">
+      </textarea>
+  </div>
+
+  <div class="modal-footer">
+    <div class="row row-action">
+      <div class="col-xs-12">
+        <button class="btn btn-xs btn-link"
+                type="button"
+                ng-click="$dismiss()"
+                translate="CLOSE">Close</button>
+
+        <button class="btn btn-primary"
+                type="submit"
+                ng-disabled="!comment.message"
+                ng-click="submit()"
+                translate="SAVE">Save</button>
+
+      </div>
+    </div>
+  </div>
+</form>

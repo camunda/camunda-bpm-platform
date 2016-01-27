@@ -1,0 +1,58 @@
+<!-- # CE - camunda-admin-ui/client/scripts/pages/confirm-delete-authorization.html -->
+<div class="modal-header">
+  <h3>Confirm Delete</h3>
+</div>
+
+<div class="confirm-delete-authorization modal-body">
+  <div notifications-panel></div>
+
+  <div ng-hide="status === 'SUCCESS' || status === 'FAILED'">
+    <p>Are you sure you want to delete the following authorization?</p>
+
+    <dl class="dl-horizontal">
+      <dt>Type</dt>
+      <dd>{{getType(authorizationToDelete)}}</dd>
+      <dt>User</dt>
+      <dd>
+        {{authorizationToDelete.userId}} &nbsp;
+      </dd>
+      <dt>Group</dt>
+      <dd>
+        {{authorizationToDelete.groupId}} &nbsp;
+      </dd>
+      <dt>Permissions</dt>
+      <dd>{{formatPermissions(authorizationToDelete.permissions)}}</dd>
+      <dt>Resource</dt>
+      <dd>{{getResource(authorizationToDelete.resourceType)}}</dd>
+      <dt>Resource Id</dt>
+      <dd>{{authorizationToDelete.resourceId}}</dd>
+    </dl>
+  </div>
+
+  <div ng-show="status === 'SUCCESS'">
+    <p>The authorization has been deleted successfully.</p>
+  </div>
+
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-default"
+          ng-click="close()"
+          ng-disabled="status === 'performCreate'"
+          ng-hide="status === 'SUCCESS' || status === 'FAILED'">
+    Close
+  </button>
+
+  <button class="btn btn-primary"
+          ng-click="close(status)"
+          ng-show="status === 'SUCCESS' || status === 'FAILED'">
+    OK
+  </button>
+
+  <button class="btn btn-primary"
+          ng-click="performDelete()"
+          ng-hide="status === 'SUCCESS' || status === 'FAILED'">
+    Delete
+  </button>
+</div>
+<!-- / CE - camunda-admin-ui/client/scripts/pages/confirm-delete-authorization.html -->

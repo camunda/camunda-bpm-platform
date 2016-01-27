@@ -1,0 +1,28 @@
+[state-circle] {
+  display: block;
+  width: @state-circle-size;
+  height: @state-circle-size;
+  border-radius: @state-circle-size;
+  position: relative;
+
+  &.circle-red {
+    background-color: @state-error-color;
+    &:before {
+      content: '!';
+      font-weight: bolder;
+      color: contrast(@important-color);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: @state-circle-size;
+      height: @state-circle-size;
+      text-align: center;
+      line-height: @state-circle-size;
+      font-size: @state-circle-size * 0.75;
+    }
+  }
+
+  &.circle-green {
+    background-color: @state-ok-color;
+  }
+}

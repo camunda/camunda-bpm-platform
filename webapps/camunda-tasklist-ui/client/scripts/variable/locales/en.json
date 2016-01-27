@@ -1,0 +1,28 @@
+{
+  "EMPTY_VALUE":
+                    "&lt;Empty&gt;",
+  "TASK_VARIABLES":
+                    "Variables",
+  "VARIABLE_OBJECT_TYPE_NAME":
+                    "Object Type Name",
+  "VARIABLE_VALUE_INFO":
+                    "Value Info",
+  "VARIABLE_SERIALIZATION_DATA_FORMAT":
+                    "Serialization Data Format",
+  "DOWNLOAD":
+                    "Download",
+  "LESS_VARIABLES":
+                    "Show less variables",
+  "MORE_VARIABLES":
+                    "Show more variables",
+  "UNDEFINED_VARIABLE":
+                    "&lt;Undefined&gt;",
+  "TOGGLE":
+                    "Toggle",
+  "SERIALIZED":
+                    "Serialized",
+  "DESERIALIZED":
+                    "Deserialized",
+  "DESERIALIZATION_ERROR":
+                    "Deserialization error"
+}

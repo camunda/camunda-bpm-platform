@@ -1,0 +1,87 @@
+<div>
+  <!-- # CE - camunda-cockpit-ui/client/scripts/directives/variable.html -->
+
+  <div ng-if="isBoolean(variable)">
+    <label class="radio">
+      <input ng-model="variable.value"
+             ng-value="true"
+             type="radio"
+             name="booleanValue">
+       true
+    </label>
+
+    <label class="radio">
+      <input ng-model="variable.value"
+             ng-value="false"
+             type="radio"
+             name="booleanValue">
+       false
+    </label>
+  </div>
+
+  <input ng-if="isInteger(variable) || isShort(variable) || isLong(variable)"
+         class="form-control"
+         name="editIntegerValue"
+         type="text"
+         numeric
+         integer="true"
+         ng-model="variable.value"
+         ng-class="{'in-place-edit': isInPlaceEdit() }"
+         autofocus="autofocus"
+         required />
+
+  <input ng-if="isDouble(variable) || isFloat(variable)"
+         class="form-control"
+         name="editFloatValue"
+         type="text"
+         numeric
+         ng-model="variable.value"
+         ng-class="{'in-place-edit': isInPlaceEdit() }"
+         autofocus="autofocus"
+         required />
+
+  <input ng-if="isDate(variable)"
+         class="form-control"
+         date
+         name="editDateValue"
+         ng-model="variable.value"
+         type="text"
+         ng-class="{'in-place-edit': isInPlaceEdit() }"
+         autofocus="autofocus"
+         required />
+
+  <textarea ng-if="isString(variable)"
+            rows="5"
+            ng-model="variable.value"
+            class="form-control variable-type-string"
+            ng-class="{'in-place-edit': isInPlaceEdit() }"
+            autofocus="autofocus"
+            required></textarea>
+
+  <div ng-if="isObject(variable)">
+      <label class="control-label"
+             for="objectTypeName">Object type name*</label>
+        <input id="objectTypeName"
+               name="objectTypeName"
+               class="form-control"
+               type="text"
+               ng-model="variable.valueInfo.objectTypeName"
+               autofocus
+               required />
+      <label class="control-label"
+             for="serializationDataFormat">Serialization data format*</label>
+        <input id="serializationDataFormat"
+               name="serializationDataFormat"
+               class="form-control"
+               type="text"
+               ng-model="variable.valueInfo.serializationDataFormat"
+               required />
+      <label class="control-label"
+             for="serializedValue">Serialized value</label>
+        <textarea rows="5"
+                  ng-model="variable.value"
+                  class="form-control"
+                  ></textarea>
+  </div>
+  <!-- / CE - camunda-cockpit-ui/client/scripts/directives/variable.html -->
+</div>

@@ -1,0 +1,43 @@
+<!-- # cockpit client/scripts/repository/resource/directives/cam-cockpit-resource-content.html -->
+<div ng-if="binary || (resource && isImageResource(resource))"
+     class="resource-wrapper">
+
+  <div ng-if="isBpmnResource(resource)"
+       cam-widget-bpmn-viewer
+       diagram-data="binary">
+  </div>
+
+
+  <div ng-if="isDmnResource(resource)"
+       cam-widget-dmn-viewer
+       table-xml="binary">
+  </div>
+
+
+  <div ng-if="isCmmnResource(resource)"
+       class="cmmn-resource">
+    <div cam-source
+         name="resource.name"
+         source="binary">
+    </div>
+  </div>
+
+
+  <div ng-if="isImageResource(resource)"
+       class="image-resource">
+    <img ng-src="{{ imageLink(deployment, resource) }}">
+  </div>
+
+
+  <div ng-if="isUnkownResource(resource)"
+       class="unkown-resource">
+    <div cam-source
+         name="resource.name"
+         source="binary">
+    </div>
+  </div>
+
+  <div>
+
+</div>
+<!-- / cockpit client/scripts/repository/resource/directives/cam-cockpit-resource-content.html -->

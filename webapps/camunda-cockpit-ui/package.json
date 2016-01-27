@@ -1,0 +1,31 @@
+{
+  "name": "camunda-cockpit-ui",
+  "version": "7.5.0-SNAPSHOT",
+  "private": true,
+  "gruntConfig": {
+    "connectPort": 8030,
+    "livereloadPort": 8031,
+    "clientDir": "client",
+    "prodTarget": "dist",
+    "devTarget": "dist/app/cockpit"
+  },
+  "browserify": {
+    "transform": [
+      "brfs"
+    ]
+  },
+  "dependencies": {
+    "bpmn-js": "0.12.1",
+    "jquery-ui": "1.10.5",
+    "angular": "1.2.29",
+    "angular-data-depend": "git://github.com/camunda-third-party/angular-data-depend#8e3b66914c611069e3698fd5d4275e6cf8055d01",
+    "angular-route": "1.2.29",
+    "camunda-bpm-sdk-js": "git://github.com/camunda/camunda-bpm-sdk-js#master",
+    "camunda-commons-ui": "git://github.com/camunda/camunda-commons-ui#master",
+    "jquery": "2.1.1",
+    "requirejs": "2.1.22"
+  },
+  "devDependencies": {
+    "brfs": "^1.4.2"
+  }
+}

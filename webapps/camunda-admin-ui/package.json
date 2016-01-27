@@ -1,0 +1,28 @@
+{
+  "name": "camunda-admin-ui",
+  "version": "7.5.0-SNAPSHOT",
+  "private": true,
+  "gruntConfig": {
+    "connectPort": 8020,
+    "livereloadPort": 8021,
+    "clientDir": "client",
+    "prodTarget": "dist",
+    "devTarget": "dist/app/admin"
+  },
+  "browserify": {
+    "transform": [
+      "brfs"
+    ]
+  },
+  "dependencies": {
+    "angular": "1.2.29",
+    "angular-route": "1.2.29",
+    "jquery": "2.1.1",
+    "requirejs": "2.1.22",
+    "camunda-commons-ui": "git://github.com/camunda/camunda-commons-ui#master",
+    "camunda-bpm-sdk-js": "git://github.com/camunda/camunda-bpm-sdk-js#master"
+  },
+  "devDependencies": {
+    "brfs": "^1.4.2"
+  }
+}

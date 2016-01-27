@@ -1,0 +1,57 @@
+<!-- # cockpit client/scripts/repository/resource/directives/cam-cockpit-resource-wrapper.html -->
+<div ng-show="!resourceState.$loaded"
+     class="loader">
+  <span class="animate-spin glyphicon glyphicon-refresh"></span>
+  Loading
+</div>
+
+<div ng-show="resourceState.$loaded">
+
+  <div ng-if="!resource">
+    <div class="no-resource well">
+      <span class="glyphicon glyphicon-info-sign"></span>
+      Select a resource in the list.
+    </div>
+  </div>
+
+  <section ng-if="resource" class="resource">
+
+    <header class="row">
+      <div class="col-xs-12"
+           cam-resource-meta
+           resource-data="resourceData"
+           control="control">
+      </div>
+    </header>
+
+    <div class="section-content row">
+      <div class="col-xs-12"
+           cam-resource-content
+           resource-data="resourceData"
+           control="control">
+      </div>
+
+      <div ng-show="resourceDetailTabs.length"
+           class="col-xs-12 ctn-tabbed-content">
+
+        <ul class="nav nav-tabs">
+          <li ng-class="{ active: selectedResourceDetailTab == resourceDetailTab }"
+              ng-repeat="resourceDetailTab in resourceDetailTabs">
+            <a href
+               ng-click="selectResourceDetailTab(resourceDetailTab)">{{ resourceDetailTab.label }}</a>
+          </li>
+        </ul>
+
+        <div class="tab-content">
+          <view provider="selectedResourceDetailTab"
+                vars="resourceVars" />
+        </div>
+
+      </div><!-- / !!resourceDetailTabs -->
+
+    </div><!-- / .section-content -->
+
+  </section>
+
+</div>
+<!-- / cockpit client/scripts/repository/resource/directives/cam-cockpit-resource-wrapper.html -->

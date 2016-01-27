@@ -1,0 +1,488 @@
+{
+  "types": [
+    {
+      "id": {
+        "key": "processVariables",
+        "value": "PROCESS_VARIABLE"
+      },
+      "extended": true,
+      "allowDates": true
+    },
+    {
+      "id": {
+        "key": "taskVariables",
+        "value": "TASK_VARIABLE"
+      },
+      "extended": true,
+      "allowDates": true
+    },
+    {
+      "id": {
+        "key": "caseInstanceVariables",
+        "value": "CASE_VARIABLE"
+      },
+      "extended": true,
+      "allowDates": true
+    },
+    {
+      "id": {
+        "key": "processInstanceId",
+        "value": "PROCESS_INSTANCE_ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },    {
+      "id": {
+        "key": "processInstanceBusinessKey",
+        "value": "PROCESS_INSTANCE_BUSINESS_KEY"
+      },
+      "operators": [
+        {
+          "key": "Like",
+          "value": "LIKE"
+        },{
+          "key": "eq",
+          "value": "="
+        }
+
+      ]
+    },    {
+      "id": {
+        "key": "processDefinitionId",
+        "value": "PROCESS_DEFINITION_ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },    {
+      "id": {
+        "key": "processDefinitionKey",
+        "value": "PROCESS_DEFINITION_KEY"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },    {
+      "id": {
+        "key": "processDefinitionName",
+        "value": "PROCESS_DEFINITION_NAME"
+      },
+      "operators": [
+        {
+          "key": "Like",
+          "value": "LIKE"
+        },{
+          "key": "eq",
+          "value": "="
+        }
+
+      ]
+    },    {
+      "id": {
+        "key": "executionId",
+        "value": "EXECUTION_ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },    {
+      "id": {
+        "key": "caseInstanceId",
+        "value": "CASE_INSTANCE_ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },    {
+      "id": {
+        "key": "caseInstanceBusinessKey",
+        "value": "CASE_INSTANCE_BUSINESS_KEY"
+      },
+      "operators": [
+        {
+          "key": "Like",
+          "value": "LIKE"
+        },{
+          "key": "eq",
+          "value": "="
+        }
+
+      ]
+    },    {
+      "id": {
+        "key": "caseDefinitionId",
+        "value": "CASE_DEFINITION_ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },    {
+      "id": {
+        "key": "caseDefinitionKey",
+        "value": "CASE_DEFINITION_KEY"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },    {
+      "id": {
+        "key": "caseDefinitionName",
+        "value": "CASE_DEFINITION_NAME"
+      },
+      "operators": [
+        {
+          "key": "Like",
+          "value": "LIKE"
+        },{
+          "key": "eq",
+          "value": "="
+        }
+
+      ]
+    },    {
+      "id": {
+        "key": "caseExecutionId",
+        "value": "CASE_EXECUTION_ID"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },    {
+      "id": {
+        "key": "assignee",
+        "value": "ASSIGNEE"
+      },
+      "operators": [
+        {
+          "key": "Like",
+          "value": "LIKE"
+        },{
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },    {
+      "id": {
+        "key": "owner",
+        "value": "OWNER"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },    {
+      "id": {
+        "key": "candidateGroup",
+        "value": "CANDIDATE_GROUP"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },    {
+      "id": {
+        "key": "candidateUser",
+        "value": "CANDIDATE_USER"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },    {
+      "id": {
+        "key": "involvedUser",
+        "value": "INVOLVED_USER"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },    {
+      "id": {
+        "key": "taskDefinitionKey",
+        "value": "TASK_DEFINITION_KEY"
+      },
+      "operators": [
+        {
+          "key": "Like",
+          "value": "LIKE"
+        },{
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    },    {
+      "id": {
+        "key": "name",
+        "value": "NAME"
+      },
+      "operators": [
+        {
+          "key": "Like",
+          "value": "LIKE"
+        },{
+          "key": "eq",
+          "value": "="
+        }
+
+      ],
+      "default": true
+    },    {
+      "id": {
+        "key": "description",
+        "value": "DESCRIPTION"
+      },
+      "operators": [
+        {
+          "key": "Like",
+          "value": "LIKE"
+        },{
+          "key": "eq",
+          "value": "="
+        }
+
+      ]
+    },    {
+      "id": {
+        "key": "priority",
+        "value": "PRIORITY"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        },
+        {
+          "key": "max",
+          "value": "<="
+        },
+        {
+          "key": "min",
+          "value": ">="
+        }
+      ]
+    },    {
+      "id": {
+        "key": "due",
+        "value": "DUE_DATE"
+      },
+      "operators": [
+        {
+          "key": "Before",
+          "value": "BEFORE"
+        },
+        {
+          "key": "After",
+          "value": "AFTER"
+        }
+      ],
+      "allowDates": true,
+      "enforceDates": true
+    },    {
+      "id": {
+        "key": "followUp",
+        "value": "FOLLOW_UP_DATE"
+      },
+      "operators": [
+        {
+          "key": "Before",
+          "value": "BEFORE"
+        },
+        {
+          "key": "After",
+          "value": "AFTER"
+        }
+      ],
+      "allowDates": true,
+      "enforceDates": true
+    },    {
+      "id": {
+        "key": "created",
+        "value": "CREATION_DATE"
+      },
+      "operators": [
+        {
+          "key": "Before",
+          "value": "BEFORE"
+        },
+        {
+          "key": "After",
+          "value": "AFTER"
+        }
+      ],
+      "allowDates": true,
+      "enforceDates": true
+    },    {
+      "id": {
+        "key": "delegationState",
+        "value": "DELEGATION_STATE"
+      },
+      "operators": [
+        {
+          "key": "eq",
+          "value": "="
+        }
+      ]
+    }
+  ],
+  "operators": {
+    "date": [
+      {
+        "key": "lteq",
+        "value": "BEFORE"
+      },
+      {
+        "key": "gteq",
+        "value": "AFTER"
+      }
+    ],
+    "boolean": [
+      {
+        "key": "eq",
+        "value": "="
+      },
+      {
+        "key": "neq",
+        "value": "!="
+      }
+    ],
+    "object": [
+      {
+        "key": "eq",
+        "value": "="
+      },
+      {
+        "key": "neq",
+        "value": "!="
+      }
+    ],
+    "number": [
+      {
+        "key": "eq",
+        "value": "="
+      },
+      {
+        "key": "neq",
+        "value": "!="
+      },
+      {
+        "key": "gt",
+        "value": ">"
+      },
+      {
+        "key": "gteq",
+        "value": ">="
+      },
+      {
+        "key": "lt",
+        "value": "<"
+      },
+      {
+        "key": "lteq",
+        "value": "<="
+      }
+    ],
+    "string": [
+      {
+        "key": "eq",
+        "value": "="
+      },
+      {
+        "key": "neq",
+        "value": "!="
+      },
+      {
+        "key": "gt",
+        "value": ">"
+      },
+      {
+        "key": "gteq",
+        "value": ">="
+      },
+      {
+        "key": "lt",
+        "value": "<"
+      },
+      {
+        "key": "lteq",
+        "value": "<="
+      },
+      {
+        "key": "like",
+        "value": "like"
+      }
+    ],
+    "undefined": [
+      {
+        "key": "eq",
+        "value": "="
+      },
+      {
+        "key": "neq",
+        "value": "!="
+      },
+      {
+        "key": "gt",
+        "value": ">"
+      },
+      {
+        "key": "gteq",
+        "value": ">="
+      },
+      {
+        "key": "lt",
+        "value": "<"
+      },
+      {
+        "key": "lteq",
+        "value": "<="
+      },
+      {
+        "key": "like",
+        "value": "like"
+      }
+    ]
+  },
+  "tooltips": {
+    "inputPlaceholder": "SEARCH_PLACEHOLDER",
+    "invalid": "INVALID_SEARCH",
+    "deleteSearch": "DELETE_SEARCH",
+    "type": "TYPE",
+    "name": "PROPERTY",
+    "operator": "OPERATOR",
+    "value": "VALUE"
+  }
+}
