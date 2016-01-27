@@ -32,7 +32,7 @@ create table ACT_RE_DEPLOYMENT (
     NAME_ nvarchar(255),
     DEPLOY_TIME_ datetime2,
     SOURCE_ nvarchar(255),
-    TENANT_ID_ nvarchar(255),
+    TENANT_ID_ nvarchar(64),
     primary key (ID_)
 );
 
@@ -55,7 +55,7 @@ create table ACT_RU_EXECUTION (
     SUSPENSION_STATE_ tinyint,
     CACHED_ENT_STATE_ int,
     SEQUENCE_COUNTER_ numeric(19,0),
-    TENANT_ID_ nvarchar(255),
+    TENANT_ID_ nvarchar(64),
     primary key (ID_)
 );
 
@@ -110,7 +110,7 @@ create table ACT_RE_PROCDEF (
     DGRM_RESOURCE_NAME_ nvarchar(4000),
     HAS_START_FORM_KEY_ tinyint,
     SUSPENSION_STATE_ tinyint,
-    TENANT_ID_ nvarchar(255),
+    TENANT_ID_ nvarchar(64),
     primary key (ID_)
 );
 

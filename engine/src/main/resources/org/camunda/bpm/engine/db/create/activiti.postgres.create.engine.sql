@@ -32,7 +32,7 @@ create table ACT_RE_DEPLOYMENT (
     NAME_ varchar(255),
     DEPLOY_TIME_ timestamp,
     SOURCE_ varchar(255),
-    TENANT_ID_ varchar(255),
+    TENANT_ID_ varchar(64),
     primary key (ID_)
 );
 
@@ -55,7 +55,7 @@ create table ACT_RU_EXECUTION (
     SUSPENSION_STATE_ integer,
     CACHED_ENT_STATE_ integer,
     SEQUENCE_COUNTER_ bigint,
-    TENANT_ID_ varchar(255),
+    TENANT_ID_ varchar(64),
     primary key (ID_)
 );
 
@@ -110,7 +110,7 @@ create table ACT_RE_PROCDEF (
     DGRM_RESOURCE_NAME_ varchar(4000),
     HAS_START_FORM_KEY_ boolean,
     SUSPENSION_STATE_ integer,
-    TENANT_ID_ varchar(255),
+    TENANT_ID_ varchar(64),
     primary key (ID_)
 );
 
