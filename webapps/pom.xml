@@ -29,7 +29,7 @@
     <exec.arg>-c</exec.arg>
 
     <grunt.target>development</grunt.target>
-    <skip.frontend.build>false</skip.frontend.build>
+    <skip.frontend.build>true</skip.frontend.build>
   </properties>
 
   <dependencyManagement>
@@ -253,6 +253,7 @@
       <id>distro</id>
       <properties>
         <grunt.target>production</grunt.target>
+        <skip.frontend.build>false</skip.frontend.build>
       </properties>
     </profile>
     <profile>
@@ -435,9 +436,9 @@
     </profile>
 
     <profile>
-      <id>skipFrontendBuild</id>
+      <id>doFrontendBuild</id>
       <properties>
-        <skip.frontend.build>true</skip.frontend.build>
+        <skip.frontend.build>false</skip.frontend.build>
       </properties>
     </profile>
 
