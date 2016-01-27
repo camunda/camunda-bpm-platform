@@ -51,7 +51,7 @@ module.exports = function(grunt) {
   });
 
   var localesConf = { };
-  require('camunda-commons-ui/grunt/config/localescompile')(config, localesConf, {
+  require('./grunt/config/localescompile')(config, localesConf, {
     appName: 'tasklist',
     sourceDir: pkg.gruntConfig.tasklistSourceDir,
     buildTarget: pkg.gruntConfig.tasklistBuildTarget,
