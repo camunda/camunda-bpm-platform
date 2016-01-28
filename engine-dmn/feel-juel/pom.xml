@@ -104,6 +104,24 @@
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <unpackBundle>false</unpackBundle>
+          <instructions>
+            <Export-Package>
+              ${project.groupId}*
+            </Export-Package>
+            <Import-Package>
+              !de.odysseus.el*,
+              !javax.el,
+              *
+            </Import-Package>
+            <Bundle-ClassPath>.</Bundle-ClassPath>
+            <Embed-Dependency>
+              de.odysseus.el*;inline=true,
+              javax.el*;inline=true
+            </Embed-Dependency>
+          </instructions>
+        </configuration>
         <executions>
           <execution>
             <id>bundle-manifest</id>
