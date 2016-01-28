@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>
     <artifactId>camunda-qa</artifactId>
-    <version>7.5.0-SNAPSHOT</version>
+    <version>7.5.0-alpha1</version>
   </parent>
 
   <artifactId>camunda-qa-db-upgrade</artifactId>
@@ -141,16 +141,8 @@
                     <!-- TODO: if 7.4 patch scripts for mysql are created they probably also have to be copied for mariadb -->
                     <!-- NOTE: this should be removed during the 7.6 development cycle -->
 
-                    <copy
-                      file="${project.build.directory}/scripts-old/sql/create/mysql_engine_${camunda.version.old}.sql"
-                      tofile="${project.build.directory}/scripts-old/sql/create/mariadb_engine_${camunda.version.old}.sql"
-                      overwrite="true"
-                    />
-                    <copy
-                      file="${project.build.directory}/scripts-old/sql/create/mysql_identity_${camunda.version.old}.sql"
-                      tofile="${project.build.directory}/scripts-old/sql/create/mariadb_identity_${camunda.version.old}.sql"
-                      overwrite="true"
-                    />
+                    <copy file="${project.build.directory}/scripts-old/sql/create/mysql_engine_${camunda.version.old}.sql" tofile="${project.build.directory}/scripts-old/sql/create/mariadb_engine_${camunda.version.old}.sql" overwrite="true" />
+                    <copy file="${project.build.directory}/scripts-old/sql/create/mysql_identity_${camunda.version.old}.sql" tofile="${project.build.directory}/scripts-old/sql/create/mariadb_identity_${camunda.version.old}.sql" overwrite="true" />
 
                   </target>
                 </configuration>

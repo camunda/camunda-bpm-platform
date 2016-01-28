@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda.bpm.qa.upgrade</groupId>
     <artifactId>camunda-qa-db-instance-migration</artifactId>
-    <version>7.5.0-SNAPSHOT</version>
+    <version>7.5.0-alpha1</version>
   </parent>
 
   <artifactId>camunda-qa-upgrade-test-fixture-73</artifactId>
@@ -131,11 +131,7 @@
                     <!-- copy mysql upgrade scripts from 7.3 for mariadb as with 7.5 mariadb has own scripts -->
                     <!-- TODO: if 7.2 patch scripts for mysql are created they probably also have to be copied for mariadb -->
 
-                    <copy
-                      file="${project.build.directory}/scripts-current/sql/upgrade/mysql_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql"
-                      tofile="${project.build.directory}/scripts-current/sql/upgrade/mariadb_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql"
-                      overwrite="true"
-                    />
+                    <copy file="${project.build.directory}/scripts-current/sql/upgrade/mysql_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql" tofile="${project.build.directory}/scripts-current/sql/upgrade/mariadb_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_to_${camunda.current.majorVersion}.${camunda.current.minorVersion}.sql" overwrite="true" />
 
                   </target>
                 </configuration>

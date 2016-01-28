@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda.bpm.qa.upgrade</groupId>
     <artifactId>camunda-qa-db-instance-migration</artifactId>
-    <version>7.5.0-SNAPSHOT</version>
+    <version>7.5.0-alpha1</version>
   </parent>
 
   <artifactId>camunda-qa-upgrade-test-fixture-75</artifactId>
@@ -126,7 +126,7 @@
                       <!--file="${project.build.directory}/scripts-current/sql/upgrade/mysql_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.0_to_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.1.sql"-->
                       <!--tofile="${project.build.directory}/scripts-current/sql/upgrade/mariadb_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.0_to_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.1.sql"-->
                       <!--overwrite="true"-->
-                    <!--/>-->
+                    <!-- />-->
 
                   </target>
                 </configuration>
