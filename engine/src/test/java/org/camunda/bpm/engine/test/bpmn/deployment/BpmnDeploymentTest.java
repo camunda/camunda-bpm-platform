@@ -256,9 +256,7 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
     List<org.camunda.bpm.engine.repository.Deployment> deploymentList = repositoryService.createDeploymentQuery().list();
     assertEquals(2, deploymentList.size());
 
-    for (org.camunda.bpm.engine.repository.Deployment deployment : deploymentList) {
-      repositoryService.deleteDeployment(deployment.getId());
-    }
+    deleteDeployments(deploymentList);
   }
 
   public void testDiagramCreationDisabled() {
@@ -267,6 +265,7 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
     // Graphical information is not yet exposed publicly, so we need to do some plumbing
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
     ProcessDefinitionEntity processDefinitionEntity = commandExecutor.execute(new Command<ProcessDefinitionEntity>() {
+      @Override
       public ProcessDefinitionEntity execute(CommandContext commandContext) {
         return Context.getProcessEngineConfiguration()
                       .getDeploymentCache()
@@ -353,4 +352,100 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
     assertEquals(deploymentId, resource.getDeploymentId());
   }
 
+
+  public void testTenantIdOverridesDeploymentWithNoTenant() {
+
+    // given
+
+    // deployment without tenant ID
+    String bpmnResourceName = "org/camunda/bpm/engine/test/bpmn/deployment/BpmnDeploymentTest.testGetBpmnXmlFileThroughService.bpmn20.xml";
+    repositoryService.createDeployment()
+      .enableDuplicateFiltering(false)
+      .addClasspathResource(bpmnResourceName)
+      .name("twice")
+      .deploy();
+
+    // if
+    // the same process is deployed with tenant ID
+    repositoryService.createDeployment()
+      .enableDuplicateFiltering(false)
+      .addClasspathResource(bpmnResourceName)
+      .name("twice")
+      .tenantId("tenant1")
+      .deploy();
+
+    // then a new deployment is created
+    List<org.camunda.bpm.engine.repository.Deployment> deploymentList = repositoryService.createDeploymentQuery().list();
+    assertEquals(2, deploymentList.size());
+
+    // cleanup
+    deleteDeployments(deploymentList);
+  }
+
+  public void testDoesNotOverrideDeploymentForSameTenant() {
+
+    // given
+    // deployment without tenant ID
+    String bpmnResourceName = "org/camunda/bpm/engine/test/bpmn/deployment/BpmnDeploymentTest.testGetBpmnXmlFileThroughService.bpmn20.xml";
+    repositoryService.createDeployment()
+      .enableDuplicateFiltering(false)
+      .addClasspathResource(bpmnResourceName)
+      .name("twice")
+      .tenantId("tenant1")
+      .deploy();
+
+    // if
+    // the same process is deployed with tenant ID
+    repositoryService.createDeployment()
+      .enableDuplicateFiltering(false)
+      .addClasspathResource(bpmnResourceName)
+      .name("twice")
+      .tenantId("tenant1")
+      .deploy();
+
+    // then
+    // it does not create a new deployment
+    List<org.camunda.bpm.engine.repository.Deployment> deploymentList = repositoryService.createDeploymentQuery().list();
+    assertEquals(1, deploymentList.size());
+
+    // cleanup
+    deleteDeployments(deploymentList);
+  }
+
+  public void testDoesOverrideDeploymentForDifferentTenant() {
+
+    // given
+    // deployment without tenant ID
+    String bpmnResourceName = "org/camunda/bpm/engine/test/bpmn/deployment/BpmnDeploymentTest.testGetBpmnXmlFileThroughService.bpmn20.xml";
+    repositoryService.createDeployment()
+      .enableDuplicateFiltering(false)
+      .addClasspathResource(bpmnResourceName)
+      .name("twice")
+      .tenantId("tenant1")
+      .deploy();
+
+    // if
+    // the same process is deployed with tenant ID
+    repositoryService.createDeployment()
+      .enableDuplicateFiltering(false)
+      .addClasspathResource(bpmnResourceName)
+      .name("twice")
+      .tenantId("tenant2")
+      .deploy();
+
+    // then
+    // it does create a new deployment
+    List<org.camunda.bpm.engine.repository.Deployment> deploymentList = repositoryService.createDeploymentQuery().list();
+    assertEquals(2, deploymentList.size());
+
+    // cleanup
+    deleteDeployments(deploymentList);
+  }
+
+
+  private void deleteDeployments(List<org.camunda.bpm.engine.repository.Deployment> deploymentList) {
+    for (org.camunda.bpm.engine.repository.Deployment deployment : deploymentList) {
+      repositoryService.deleteDeployment(deployment.getId());
+    }
+  }
 }

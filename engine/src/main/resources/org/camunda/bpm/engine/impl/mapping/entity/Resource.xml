@@ -146,6 +146,9 @@
     <if test="processApplicationSource.equals(parameter.source)">
       )
     </if>
+    <if test="parameter.tenantId != null">
+      and D.TENANT_ID_ = #{ parameter.tenantId }
+    </if>
   </sql>
 
   <!-- postgresql specific -->

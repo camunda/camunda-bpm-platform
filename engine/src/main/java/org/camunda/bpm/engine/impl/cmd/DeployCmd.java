@@ -86,6 +86,7 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
     this.deploymentBuilder = deploymentBuilder;
   }
 
+  @Override
   public Deployment execute(final CommandContext commandContext) {
     // ensure serial processing of multiple deployments on the same node.
     // We experienced deadlock situations with highly concurrent deployment of multiple
@@ -125,6 +126,7 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
 
     // perform deployment
     Deployment deployment = commandContext.runWithoutAuthorization(new Callable<Deployment>() {
+      @Override
       public Deployment call() throws Exception {
         acquireExclusiveLock(commandContext);
         DeploymentEntity deployment = initDeployment();
@@ -437,7 +439,7 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
 
       Map<String, ResourceEntity> existingResources = commandContext
           .getResourceManager()
-          .findLatestResourcesByDeploymentName(deployment.getName(), containedResources.keySet(), source);
+          .findLatestResourcesByDeploymentName(deployment.getName(), containedResources.keySet(), source, deployment.getTenantId());
 
       for (ResourceEntity deployedResource : containedResources.values()) {
         String resourceName = deployedResource.getName();
