@@ -1,0 +1,35 @@
+
+[cam-tasklist-task] {
+  header {
+    position: relative;
+    z-index: 15;
+  }
+
+  .names {
+    h2 {
+      margin-top: 0;
+    }
+    h4:empty {
+      display: none;
+    }
+  }
+
+  .nav-tabs .glyphicon {
+    margin-left: 5px;
+  }
+
+  .form-container {
+    // aimed to correct the with of forms for which the nesting of elements
+    // was not done correctly (form > .row > .form-group)
+    form.form > .form-group {
+      margin-left: 0;
+      margin-right: 0;
+    }
+  }
+}
+
+[cam-tasklist-form] {
+  .form-actions {
+    margin-top: (@grid-gutter-width / 2);
+  }
+}

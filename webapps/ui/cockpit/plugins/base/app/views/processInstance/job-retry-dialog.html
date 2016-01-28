@@ -1,0 +1,46 @@
+<!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/job-retry-dialog.html -->
+<div class="modal-header">
+  <h3>Increment Number of Retries</h3>
+</div>
+
+<div class="job-retry modal-body">
+  <div notifications-panel></div>
+
+  <div ng-hide="status === 'finished' || status === 'failed'">
+    <p>The number of retries of the corresponding failed job of the selected incident will be incremented.</p>
+    <p>Are you sure to increment the number of retries?</p>
+  </div>
+
+  <div ng-show="status === 'finished'">
+    The number of retries of the corresponding failed job of the selected incident has been incremented successfully.
+  </div>
+
+  <div ng-show="status === 'failed'">
+    The number of retries of the corresponding failed job of the selected incident could not be incremented successfully.
+  </div>
+
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-default"
+          ng-click="close(status)"
+          ng-disabled="status === 'performing'"
+          ng-hide="status === 'finished' || status === 'failed'">
+    Close
+  </button>
+
+  <button type="submit"
+          class="btn btn-primary"
+          ng-click="incrementRetry()"
+          ng-hide="status === 'finished' || status === 'failed'"
+          ng-disabled="status === 'performing'">
+    Retry
+  </button>
+
+  <button class="btn btn-primary"
+          ng-click="close(status)"
+          ng-show="status === 'finished' || status === 'failed'">
+    OK
+  </button>
+</div>
+<!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/job-retry-dialog.html -->

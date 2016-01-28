@@ -1,0 +1,61 @@
+<!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/jobDefinition/app/views/processDefinition/job-definition-table.html -->
+<table class="job-definition cam-table">
+  <thead>
+    <tr>
+      <th class="state">State</th>
+      <th class="activity">Activity</th>
+      <th class="type">Type</th>
+      <th class="configuration">Configuration</th>
+      <th class="overriding-job-priority">Overriding Job Priority</th>
+      <th class="action">Action</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr ng-repeat="jobDefinition in jobDefinitions">
+      <td class="state">
+        <span ng-show="jobDefinition.suspended">
+          Suspended
+        </span>
+        <span ng-hide="jobDefinition.suspended">
+          Active
+        </span>
+      </td>
+      <td class="activity">
+        <a cam-select-activity="jobDefinition.activityId"
+           ng-href="#/process-definition/{{ processDefinition.id }}?activityIds={{ jobDefinition.activityId }}&amp;detailsTab=job-definition-table">
+          {{ jobDefinition.activityName }}
+        </a>
+      </td>
+      <td class="type">
+        {{ jobDefinition.jobType }}
+      </td>
+      <td class="configuration">
+        {{ jobDefinition.jobConfiguration }}
+      </td>
+      <td class="overriding-job-priority">
+        {{ jobDefinition.overridingJobPriority }}
+      </td>
+      <td class="action">
+        <span ng-repeat="actionProvider in jobDefinitionActions">
+          <view provider="actionProvider" vars="jobDefinitionVars"/>
+        </span>
+      </td>
+    </tr>
+
+    <tr ng-if="!jobDefinitions">
+      <td colspan="6">
+        <span class="glyphicon glyphicon-loading"></span>
+        loading job definitions...
+      </td>
+    </tr>
+
+    <tr ng-if="jobDefinitions && !jobDefinitions.length">
+      <td colspan="6">
+        No job definitions matched by current filter.
+      </td>
+    </tr>
+
+  </tbody>
+</table>
+<!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/jobDefinition/app/views/processDefinition/job-definition-table.html -->

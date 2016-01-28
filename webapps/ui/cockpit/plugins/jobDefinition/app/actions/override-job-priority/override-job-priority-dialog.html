@@ -1,0 +1,154 @@
+<!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/jobDefinition/app/actions/override-job-priority/override-job-priority-dialog.html -->
+<div class="modal-header">
+  <h3>Change Overriding Job Priority</h3>
+</div>
+
+<div class="job-definition-override-job-priority modal-body">
+  <div notifications-panel></div>
+
+  <div ng-hide="status === 'SUCCESS' || status === 'FAIL'">
+
+    <p>Change the overriding priority for jobs of the given job definition.</p>
+
+    <form class="form-horizontal"
+          name="overrideJobPriorityForm"
+          novalidate
+          request-aware
+          ng-submit="isValid() && submit()">
+
+      <fieldset>
+
+        <div class="form-group" ng-show="hasOverridingJobPriority()">
+          <label class="col-xs-4 control-label"
+                 for="execute">
+            Execute
+            <span class="glyphicon glyphicon-question-sign"
+                  tooltip="Decide whether to clear the job definition's overriding job priority or to set a new priority as job definition's overriding job priority."
+                  tooltip-placement="right">
+            </span>
+          </label>
+
+          <div class="col-xs-8">
+            <div class="radio">
+              <label>
+                <input ng-model="setJobPriority"
+                       ng-value="false"
+                       type="radio"
+                       name="execute" />
+                Clear Overriding Job Priority
+              </label>
+            </div>
+
+            <div class="radio">
+              <label>
+                <input ng-model="setJobPriority"
+                       ng-value="true"
+                       type="radio"
+                       name="execute" />
+                Set Overriding Job Priority
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group" ng-show="setJobPriority">
+          <label class="col-xs-4 control-label"
+                 for="priority">
+            Priority
+            <span class="glyphicon glyphicon-question-sign"
+                  tooltip="The new priority number for new jobs of the given definition. The new priority overrides any setting specified in the BPMN 2.0 XML."
+                  tooltip-placement="right">
+            </span>
+          </label>
+
+          <div class="col-xs-8">
+            <input name="priority"
+                   ng-model="data.priority"
+                   class="form-control"
+                   numeric integer="true"
+                   required />
+            <p class="invalid"
+               ng-show="this.overrideJobPriorityForm.priority.$error.numeric">
+              Invalid value: Only an Integer value is allowed.
+            </p>
+          </div>
+        </div>
+
+        <div class="form-group" ng-show="setJobPriority">
+          <label class="col-xs-4 control-label"
+                 for="includeJobsPriority">
+            Include Existing Jobs
+            <span class="glyphicon glyphicon-question-sign"
+                  tooltip="Including jobs means that all existing jobs of the given definition will receive the priority as well."
+                  tooltip-placement="right">
+            </span>
+          </label>
+
+          <div class="col-xs-8 checkbox">
+            <label>
+              <input name="includeJobsPriority"
+                     type="checkbox"
+                     ng-model="data.includeJobs" />
+            </label>
+          </div>
+        </div>
+
+      </fieldset>
+    </form>
+
+    <p>
+      Do you really want to change the overriding job priority?
+    </p>
+
+  </div>
+
+  <div ng-show="status === 'SUCCESS'">
+    <p ng-show="setJobPriority">
+      The overriding job priority has been updated to {{ data.priority }} successfully.
+    </p>
+    <p ng-hide="setJobPriority">
+      The overriding job priority has been cleared successfully.
+    </p>
+  </div>
+
+  <div ng-show="status === 'FAIL'">
+    <p ng-show="setJobPriority">
+      The overriding job priority could not be updated to {{ data.priority }} successfully.
+    </p>
+    <p ng-hide="setJobPriority">
+      The overriding job priority could not be cleared successfully.
+    </p>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-link"
+          ng-click="close(status)"
+          ng-disabled="status === 'PERFORM_UDPATE'"
+          ng-hide="status === 'SUCCESS' || status === 'FAIL'">
+    Close
+  </button>
+
+  <button type="submit"
+          class="btn btn-primary"
+          ng-click="submit()"
+          ng-hide="setJobPriority || status === 'SUCCESS' || status === 'FAIL'"
+          ng-disabled="!isValid() || status === 'PERFORM_UDPATE'">
+    Clear
+  </button>
+
+  <button type="submit"
+          class="btn btn-primary"
+          ng-click="submit()"
+          ng-hide="!setJobPriority || status === 'SUCCESS' || status === 'FAIL'"
+          ng-disabled="!isValid() || status === 'PERFORM_UDPATE'">
+    Override
+  </button>
+
+  <button class="btn btn-primary"
+          ng-click="close(status)"
+          ng-show="status === 'SUCCESS' || status === 'FAIL'">
+    OK
+  </button>
+</div>
+<!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/jobDefinition/app/actions/override-job-priority/override-job-priority-dialog.html -->

@@ -1,0 +1,135 @@
+.authorizations td {
+  &.authorization-type {
+    min-width: 120px;
+    max-width: 160px;
+    width: 120px;
+    select {
+      padding-left: 3px;
+    }
+  }
+
+  &.identity-id {
+    width: 180px;
+  }
+
+  &.user {
+    width: 180px;
+  }
+
+  &.resource-id {
+    min-width: 320px;
+    max-width: 350px;
+    width: 320px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &.permissions {
+    .form-control-static {
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .input-group-btn {
+      vertical-align: top;
+    }
+  }
+
+  &.action {
+    width: 120px;
+  }
+}
+
+
+.sidebar-nav {
+  &.well {
+    border: none;
+    padding: (@grid-gutter-width / 4) 0;
+    .box-shadow(none);
+  }
+  li {
+    margin: 0;
+    padding: 0;
+    position: relative;
+    font-size: 1.25em;
+
+    &.nav-header {
+      padding: (@grid-gutter-width / 4) (@grid-gutter-width / 2);
+      &:before,
+      &:after {
+        display: none;
+      }
+    }
+    a {
+      margin: 0;
+      padding: (@grid-gutter-width / 4) (@grid-gutter-width / 2);
+      position: relative;
+      z-index: 1;
+      .font-light;
+
+      &:hover {
+        background: none;
+      }
+      &:focus {
+        outline: none;
+      }
+    }
+
+    &:before,
+    &:after {
+      content: ' ';
+      display: block;
+      position: absolute;
+      border-bottom: 0 solid transparent;
+      border-right: 0 solid @body-bg;
+      border-top: 0 solid transparent;
+      margin-top: 0;
+    }
+
+    &:before {
+      top: 0;
+      bottom: 0;
+      right: 0;
+      z-index: 1;
+      background-color: @gray-lighter;
+      width: 100%;
+      max-width: 0;
+      .transition(max-width 0.218s ease);
+    }
+
+    &:after {
+      height: 0;
+      right: 0 - (@grid-gutter-width / 3);
+      top: 50%;
+      width: 0;
+      z-index: 3;
+
+      border-bottom: (@grid-gutter-width / 3) solid transparent;
+      border-right: (@grid-gutter-width / 3) solid @body-bg;
+      border-top: (@grid-gutter-width / 3) solid transparent;
+      margin-top: -(@grid-gutter-width / 3);
+
+      .transition(right 0.218s ease);
+    }
+
+    &:hover {
+      &:before {
+        max-width: 100%;
+      }
+      &:after {
+        right: 0 - (@grid-gutter-width / 5);
+      }
+    }
+
+    &.active {
+      background-color: @gray-lighter;
+    }
+
+    &.active,
+    &.active:hover {
+      &:after {
+        right: 0;
+      }
+    }
+  }
+}

@@ -1,0 +1,135 @@
+<div ng-form class="form-horizontal" name="filterCriteriaForm" role="form">
+
+  <div class="row labels-left">
+    <div class="col-xs-2 row-action" ng-show="!filter.id || (filter.id && accesses.update)">
+      <a ng-click="addCriterion()"
+         href>
+        <span class="hidden-sm hidden-xs">{{ 'FILTER_ADD_CRITERION' | translate }}</span>
+        <span class="glyphicon glyphicon-plus-sign"></span>
+      </a>
+    </div>
+
+    <div ng-class="{ 'col-xs-10': !filter.id || (filter.id && accesses.update) , 'col-xs-12': !(!filter.id || (filter.id && accesses.update)) }">
+      <div class="form-group" ng-show="query.length">
+        <label class="col-xs-6 control-label"
+               translate="FILTER_CRITERIA_KEY">Key</label>
+        <label class="col-xs-6 control-label"
+               translate="FILTER_CRITERIA_VALUE">Value</label>
+      </div>
+    </div>
+  </div>
+
+  <div ng-repeat="(delta, queryParam) in query" class="row">
+
+    <div ng-form name="criteriaFieldForm">
+      <div ng-init="addForm(this.criteriaFieldForm)"></div>
+
+      <div class="col-xs-2 row-action" ng-show="!filter.id || (filter.id && accesses.update)">
+        <a ng-click="removeCriterion(delta)"
+           href>
+          <span class="hidden-sm hidden-xs">{{ 'FILTER_REMOVE_CRITERION' | translate }}</span>
+          <span class="glyphicon glyphicon-minus-sign"></span>
+        </a>
+      </div>
+
+      <div ng-class="{ 'col-xs-10': !filter.id || (filter.id && accesses.update) , 'col-xs-12': !(!filter.id || (filter.id && accesses.update)) }">
+        <div class="form-group">
+
+          <div class="col-xs-6">
+
+            <select class="form-control"
+                    ng-model="queryParam.key"
+                    name="queryParamKey"
+                    ng-change="valueChanged(queryParam, this.criteriaFieldForm.queryParamValue)"
+                    cam-unique-value="{{ getQueryParamKeys() }}"
+                    required
+                    ng-disabled="filter.id && !accesses.update">
+              <optgroup ng-repeat="criteriaGroup in criteria"
+                        label="{{ criteriaGroup.group | translate }}">
+
+                <option ng-repeat="criterion in criteriaGroup.options"
+                        ng-selected="criterion.name === getCriterionName(queryParam.key)"
+                        ng-value="criterion.name">
+
+                  {{ criterion.label | translate }}
+                  {{ (criterion.expressionSupport ? '*' : '') }}
+
+                </option>
+              </optgroup>
+
+            </select>
+            <div ng-if="this.criteriaFieldForm.queryParamKey.$invalid && this.criteriaFieldForm.queryParamKey.$dirty"
+                    class="has-error">
+                <span ng-show="this.criteriaFieldForm.queryParamKey.$error.required" class="help-block">
+                  {{ 'REQUIRED_FIELD' | translate }}
+                </span>
+                <span ng-show="this.criteriaFieldForm.queryParamKey.$error.camUniqueValue" class="help-block">
+                  {{ 'REQUIRE_UNIQUE_KEY' | translate }}
+                </span>
+            </div>
+          </div>
+
+          <div class="col-xs-6">
+
+            <div ng-if="!booleanCriterion[getCriterionName(queryParam.key)]">
+              <input class="form-control"
+                     name="queryParamValue"
+                     type="text"
+                     ng-model="queryParam.value"
+                     ng-change="valueChanged(queryParam, this.criteriaFieldForm.queryParamValue)"
+                     required
+                     ng-readonly="filter.id && !accesses.update"
+                     ng-disabled="filter.id && !accesses.update" />
+              <span class="help-block text-help"
+                    ng-show="isCriteriaHelpAvailable(queryParam.key)">
+                {{ getCriteriaHelp(queryParam.key) | translate }}
+              </span>
+
+              <div ng-if="this.criteriaFieldForm.queryParamValue.$invalid && this.criteriaFieldForm.queryParamValue.$dirty"
+                   class="has-error">
+                <span ng-show="this.criteriaFieldForm.queryParamValue.$error.required"
+                      class="help-block">
+                  {{ 'REQUIRED_FIELD' | translate }}
+                </span>
+                <span ng-show="this.criteriaFieldForm.queryParamValue.$error.number"
+                      class="help-block">
+                  {{ 'REQUIRED_INTEGER_FIELD' | translate }}
+                </span>
+                <span ng-show="this.criteriaFieldForm.queryParamValue.$error.date"
+                      class="help-block">
+                  {{ 'INVALID_DATE' | translate }}
+                </span>
+              </div>
+            </div>
+
+            <div ng-if="booleanCriterion[getCriterionName(queryParam.key)]"
+                 class="form-control-static">
+              <span class="glyphicon glyphicon-ok"></span>
+              <input type="hidden"
+                     name="queryParamValue"
+                     ng-model="queryParam.value" />
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <div ng-if="canIncludeAssignedTasks()"
+       class="row">
+    <div class="col-xs-10 col-xs-offset-2 checkbox">
+      <label>
+        <input type="checkbox"
+               class="form-control"
+               ng-model="filter.includeAssignedTasks" />
+        {{ 'FILTER_CRITERIA_INCLUDE_ASSIGNED_TASKS' | translate }}
+      </label>
+      <div class="help-block"
+           translate="FILTER_CRITERIA_INCLUDE_ASSIGNED_TASKS_HINT"></div>
+    </div>
+  </div>
+</div>

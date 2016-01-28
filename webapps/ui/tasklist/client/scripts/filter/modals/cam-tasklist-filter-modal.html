@@ -1,0 +1,81 @@
+<div class="modal-header">
+  <h3 class="modal-title">
+    {{ (
+      filter.id && !deletion ?
+      (accesses.update ? 'FILTER_EDIT' : 'FILTER_DETAILS') :
+      (deletion ? 'FILTER_DELETE' : 'FILTER_CREATE')
+    ) | translate }}
+  </h3>
+</div>
+
+
+
+<div class="modal-body">
+
+  <div notifications-panel></div>
+
+  <div ng-show="!deletion"
+       cam-tasklist-filter-modal-form
+       filter="filter"
+       filter-modal-data="filterModalData"
+       register-is-valid-provider="registerValidationProvider"
+       register-post-filter-saved-provider="registerPostFilterSavedProvider">
+  </div>
+
+  <div ng-show="deletion"
+       class="alert alert-warning"
+       role="alert">
+    <span class="glyphicon glyphicon-exclamation-sign"></span>
+    {{ 'FILTER_DELETION_WARNING' | translate }}
+  </div>
+
+</div>
+
+
+<div class="modal-footer">
+
+  <div class="row row-action">
+
+    <div class="col-xs-4 align-left">
+
+      <button ng-show="!deletion && filter.id && accesses.delete"
+              class="btn btn-xs btn-link"
+              type="button"
+              ng-click="confirmDeletion()"
+              translate="FILTER_DELETE">Delete filter</button>
+
+
+      <button ng-show="deletion"
+              class="btn btn-xs btn-link"
+              type="button"
+              ng-click="abortDeletion()"
+              translate="FILTER_EDIT">Edit filter</button>
+    </div>
+
+    <div class="col-xs-8">
+      <div class="row">
+        <div class="col-xs-12">
+
+          <button class="btn btn-xs btn-link"
+                  type="button"
+                  ng-click="$dismiss()"
+                  translate="CLOSE">Close</button>
+
+          <button ng-if="!deletion && (!filter.id || (filter.id && accesses.update))"
+                  class="btn btn-primary"
+                  type="submit"
+                  ng-disabled="!isValid()"
+                  ng-click="submit()"
+                  translate="SAVE">Save</button>
+
+
+          <button ng-if="deletion"
+                  class="btn btn-primary"
+                  type="submit"
+                  ng-click="delete()"
+                  translate="DELETE">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

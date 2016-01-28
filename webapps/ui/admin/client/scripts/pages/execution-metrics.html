@@ -1,0 +1,68 @@
+<form name="form">
+  <legend>Execution Metrics</legend>
+
+  <div class="alert alert-info">
+    <p>
+      Displays an approximate number of <strong>Flow Nodes Instances (FNI)</strong> and
+      <strong>Executed Decision Elements (EDE)</strong> processed by the engine in
+      the selected time range.
+    </p>
+  </div>
+
+  <div class="row">
+    <div class="form-group col-xs-12 col-sm-6">
+      <label for="startDate">
+        Start Date
+      </label>
+      <input type="text"
+             ng-model="startDate"
+             ng-required="true"
+             ng-change="load()"
+             class="form-control"
+             id="startDate" />
+    </div>
+
+    <div class="form-group col-xs-12 col-sm-6">
+      <label for="endDate">
+        End Date
+      </label>
+      <input type="text"
+             ui-datepicker-popup
+             ng-model="endDate"
+             ng-change="load()"
+             ng-required="true"
+             class="form-control"
+             id="endDate" />
+    </div>
+  </div>
+
+
+  <div cam-widget-loader
+       loading-state="{{ loadingState }}"
+       text-error="An error occured">
+    <div class="panel panel-default">
+      <div class="panel-heading">Results</div>
+      <div class="panel-body">
+        <ul>
+          <li>
+            <strong>{{ metrics.flowNodes }}</strong> Flow Node Instances (FNI).
+          </li>
+          <li>
+            <strong>{{ metrics.decisionElements }}</strong> Executed Decision Elements (EDE).
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-right"
+       ng-show="loadingState !== 'INITIAL'">
+    <button type="submit"
+            ng-disabled="loadingState === 'LOADING'"
+            class="btn btn-default"
+            ng-click="load()">
+      Refresh
+    </button>
+  </div>
+
+</form>

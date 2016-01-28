@@ -1,0 +1,38 @@
+@brand-info:                        #533053;
+
+@state-info-text:                   lighten(@brand-info, @color-shift * 5);
+
+@body-bg:                           #292929;
+@text-color:                        negation(@body-bg, #fff);
+@link-color:                        lighten(@text-color, @color-shift * 2);
+
+@btn-default-color:                 @text-color;
+@btn-default-border:                lighten(@body-bg, @color-shift * 2);
+@btn-default-bg:                    lighten(@body-bg, @color-shift);
+
+@gray-darker:                       darken(@text-color, 13.5%);
+@gray-dark:                         darken(@text-color, 20%);
+@gray:                              darken(@text-color, 33.5%);
+@gray-light:                        darken(@text-color, 60%);
+@gray-lighter:                      darken(@text-color, 93.5%);
+
+@column-left-bg:                    lighten(@body-bg, @color-shift * 6.18);
+@column-center-bg:                  lighten(@body-bg, @color-shift * (6.18 * 0.618));
+@column-right-bg:                   lighten(@body-bg, @color-shift * 0);
+
+@modal-content-bg:                  @body-bg;
+
+@well-bg:                           darken(@body-bg, @color-shift);
+@well-border:                       darken(@well-bg, @color-shift);
+
+@panel-bg:                          lighten(@body-bg, @color-shift);
+@panel-default-border:              lighten(@panel-bg, @color-shift);
+@panel-default-heading-bg:          lighten(@panel-bg, @color-shift * 2);
+
+@pagination-bg:                     darken(@body-bg, @color-shift);
+@pagination-disabled-bg:            @body-bg;
+
+@input-color:                       @text-color;
+@input-bg:                          lighten(@body-bg, @color-shift);
+@input-border:                      lighten(@body-bg, @color-shift * 2);
+@input-border-focus:                lighten(@brand-info, @color-shift);

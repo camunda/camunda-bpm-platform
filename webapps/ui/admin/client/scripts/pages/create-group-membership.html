@@ -1,0 +1,74 @@
+<!-- # CE - camunda-admin-ui/client/scripts/pages/create-group-membership.html -->
+<div class="modal-header">
+  <h3>Select Groups</h3>
+</div>
+
+<div class="create-group-membership modal-body">
+  <div notifications-panel></div>
+
+  <table class="cam-table"
+         ng-hide="status !== 'beforeCreate' || availableGroups.length == 0">
+    <thead>
+      <tr>
+        <th class="select"></th>
+        <th class="group-id">Group Id</th>
+        <th class="group-name">Group Name</th>
+        <th class="group-type">Group Type</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr ng-repeat="group in availableGroups">
+        <td class="row-select">
+          <input type="checkbox"
+                 ng-model="group.checked" />
+        </td>
+
+        <td class="group-id">
+          <a href="#/groups/{{group.id | escape}}">{{group.id}}</a>
+        </td>
+
+        <td class="group-name">
+          {{group.name}}
+        </td>
+
+        <td class="group-type">
+          {{group.type}}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p ng-show="availableGroups.length == 0">
+    There are no additional groups available to which the user can be added.
+    You can create a new group <a href="#/group-create" ng-click="close">here</a>.
+  </p>
+
+  <p ng-show="status === 'SUCCESS'">
+    User was successfully added to selected groups.
+  </p>
+
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-default"
+          ng-click="close()"
+          ng-disabled="status === 'performCreate'"
+          ng-hide="status === 'SUCCESS' || status === 'FAILED' || status === 'loadingFailed'">
+    Close
+  </button>
+
+  <button class="btn btn-primary"
+          ng-click="close(status)"
+          ng-show="status === 'SUCCESS' || status === 'FAILED' || status === 'loadingFailed'">
+    OK
+  </button>
+
+  <button class="btn btn-primary"
+          ng-click="createGroupMemberships()"
+          ng-disabled="status !== 'beforeCreate'"
+          ng-hide="status === 'SUCCESS' || status === 'FAILED' || status === 'loadingFailed' || availableGroups.length == 0">
+    Add Groups
+  </button>
+</div>
+<!-- / CE - camunda-admin-ui/client/scripts/pages/create-group-membership.html -->

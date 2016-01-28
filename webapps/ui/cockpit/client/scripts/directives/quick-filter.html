@@ -1,0 +1,68 @@
+<!-- # CE - src/main/webapp/app/cockpit/directives/quick-filter.html -->
+<form name="quickFilters"
+      class="quick-filters">
+  <div class="quick-filter name-filter"
+       ng-if="showNameFilter">
+    <label class="input-group">
+      <input ng-keyup="search()"
+             ng-model="name"
+             name="name"
+             type="text"
+             class="form-control" />
+      <span class="input-group-addon"
+            tooltip="Click here to clear the field value.">
+        <span class="glyphicon glyphicon-search"
+              ng-click="clearName()"></span>
+      </span>
+    </label>
+    <button class="btn btn-sm btn-link btn-control-link"
+            type="button"
+            tooltip="Filters activity instances that have the entered name.">
+      <span class="glyphicon glyphicon-question-sign"></span>
+    </button>
+  </div>
+
+  <div class="quick-filter state-filter"
+       ng-if="showStateFilter">
+    <span class="name">State</span>
+
+    <ul class="list-inline">
+      <li>
+        <label class="btn btn-default btn-xs running"
+               tooltip="Running Activity Instance"
+               tooltip-placement="bottom">
+          <span class="glyphicon glyphicon-adjust"></span>
+          <input ng-change="search()"
+                 ng-model="running"
+                 name="running"
+                 type="checkbox" />
+        </label>
+      </li>
+
+      <li>
+        <label class="btn btn-default btn-xs completed"
+               tooltip="Completed Activity Instance"
+               tooltip-placement="bottom">
+          <span class="glyphicon glyphicon-ok-circle"></span>
+          <input ng-change="search()"
+                 ng-model="completed"
+                 name="completed"
+                 type="checkbox" />
+        </label>
+      </li>
+
+      <li>
+        <label class="btn btn-default btn-xs canceled"
+               tooltip="Canceled Activity Instance"
+               tooltip-placement="bottom">
+          <span class="glyphicon glyphicon-ban-circle"></span>
+          <input ng-change="search()"
+                 ng-model="canceled"
+                 name="canceled"
+                 type="checkbox" />
+        </label>
+      </li>
+    </ul>
+  </div>
+</form>
+<!-- / CE - src/main/webapp/app/cockpit/directives/quick-filter.html -->

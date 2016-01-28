@@ -1,0 +1,75 @@
+<div class="history-pane">
+
+  <div ng-show="!state.$loaded"
+       class="loader">
+    <span class="animate-spin glyphicon glyphicon-refresh"></span>
+    {{ 'LOADING' | translate }}
+  </div>
+
+  <div ng-hide="!state.$loaded">
+    <div ng-if="!days.length">
+      <div class="well">
+        <span class="glyphicon glyphicon-info-sign"></span>
+        {{ 'NO_HISTORY' | translate }}
+      </div>
+    </div>
+
+    <div ng-if="days.length"
+         class="day row"
+         ng-repeat="day in days | orderBy:'-date'">
+      <div class="col-xs-2">
+        <div class="date-badge">
+          <div>
+            <span class="day">{{ day.date | camDate:'day' }}</span>
+            <span class="month">{{ day.date | camDate:'monthName' }}</span>
+            <span class="year">{{ day.date | date:'yyyy' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xs-10">
+        <div class="instant row"
+             ng-repeat="event in day.events | orderBy:'-time'">
+          <div class="col-xs-2 operation-meta">
+            <div class="operation-time"
+                 tooltip-placement="left"
+                 tooltip="{{ event.time | camDate:'long' }}">{{ event.time | date:'HH:mm' }}</div>
+            <div class="operation-user"
+                 tooltip-placement="top"
+                 tooltip="{{ event.userId }}">{{ event.userId }}</div>
+          </div>
+
+          <div class="col-xs-10 operation-detail">
+            <div class="row">
+              <h4 class="col-xs-12">{{ event.type | translate }}</h4>
+            </div>
+
+            <div class="row event-body">
+              <div class="line"
+                   ng-repeat="subEvent in event.subEvents"
+                   ng-if="event.type !== 'Comment'">
+                <h5 class="col-sm-12 col-md-3 event-property">{{ subEvent.property | translate }}</h5>
+
+                <div class="col-sm-12 col-md-9">
+                  <div class="new-value" ng-if="subEvent.newValue">
+                    <span ng-if="subEvent.propertyIsDate">{{ subEvent.newValue | camDate }}</span>
+                    <span ng-if="!subEvent.propertyIsDate">{{ subEvent.newValue }}</span>
+                  </div>
+
+                  <div class="original-value"
+                       ng-if="subEvent.orgValue">
+                    <span ng-if="subEvent.propertyIsDate">{{ subEvent.orgValue | camDate }}</span>
+                    <span ng-if="!subEvent.propertyIsDate">{{ subEvent.orgValue }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xs-12"
+                   ng-if="event.type === 'Comment'"
+                   nl2br="event.message"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

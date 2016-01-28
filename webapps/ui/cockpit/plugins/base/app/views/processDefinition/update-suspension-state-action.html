@@ -1,0 +1,19 @@
+<!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processDefinition/update-suspension-state-action.html -->
+<a class="btn btn-default btn-toolbar btn-suspend-action"
+   href
+   ng-click="openDialog()"
+   tooltip="Suspend Process Definition"
+   tooltip-placement="left"
+   ng-show="!processDefinition.suspended">
+  <span class="glyphicon glyphicon-pause"></span>
+</a>
+
+<a class="btn btn-default btn-toolbar"
+   href
+   ng-click="openDialog()"
+   tooltip="Activate Process Definition"
+   tooltip-placement="left"
+   ng-hide="!processDefinition.suspended">
+  <span class="glyphicon glyphicon-play"></span>
+</a>
+<!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processDefinition/update-suspension-state-action.html -->

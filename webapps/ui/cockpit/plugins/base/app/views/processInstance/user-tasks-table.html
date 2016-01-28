@@ -1,0 +1,91 @@
+<!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/user-tasks-table.html -->
+<div cam-widget-loader
+     loading-state="{{ loadingState }}"
+     text-empty="No user tasks">
+  <table class="process-instance user-tasks cam-table">
+    <thead>
+      <tr>
+        <th class="activity uuid">Activity</th>
+        <th class="assignee">Assignee</th>
+        <th class="owner">Owner</th>
+        <th class="created">Creation Date</th>
+        <th class="due">Due Date</th>
+        <th class="follow-up">Follow Up Date</th>
+        <th class="priority">Priority</th>
+        <th class="delegation-state">Delegation State</th>
+        <th class="task-id uuid">Task ID</th>
+        <th class="action">Action</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr ng-repeat="userTask in userTasks">
+        <td class="activity">
+          <a cam-select-activity-instance="userTask.instance.id"
+             ng-href="{{ getHref(userTask) }}">{{ userTask.instance.name || userTask.instance.id }}</a>
+        </td>
+
+        <td class="assignee">
+          <cam-in-place-text-field
+            submit="submitAssigneeChange"
+            context="userTask"
+            property="assignee" />
+        </td>
+
+        <td class="owner">
+          {{ userTask.owner }}
+        </td>
+
+        <td class="created">
+          {{ userTask.created }}
+        </td>
+        <td class="due">
+          {{ userTask.due }}
+        </td>
+        <td class="follow-up">
+          {{ userTask.followUp }}
+        </td>
+        <td class="priority">
+          {{ userTask.priority }}
+        </td>
+        <td class="delegation-state">
+          {{ userTask.delegationState }}
+        </td>
+        <td class="task-id uuid">
+          {{ userTask.id }}
+        </td>
+
+        <td class="action">
+          <a ng-click="changeGroupIdentityLinks()"
+             ng-model="userTask"
+             class="btn btn-default action-button change-group-identity-links"
+             tooltip-placement="left"
+             tooltip="Manage group(s) for '{{ userTask.name || userTask.id }}'">
+            <span class="glyphicon glyphicon-th"></span>
+          </a>
+          <a ng-click="changeUserIdentityLinks()"
+             ng-model="userTask"
+             class="btn btn-default action-button change-user-identity-links"
+             tooltip-placement="left"
+             tooltip="Manage user(s) for '{{ userTask.name || userTask.id }}'">
+            <span class="glyphicon glyphicon-user"></span>
+          </a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <pagination ng-if="pages.total > pages.size"
+              class="pagination-sm"
+
+              page="pages.current"
+              ng-model="pages.current"
+
+              total-items="pages.total"
+              items-per-page="pages.size"
+
+              max-size="7"
+              boundary-links="true"></pagination>
+</div>
+<!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/user-tasks-table.html -->

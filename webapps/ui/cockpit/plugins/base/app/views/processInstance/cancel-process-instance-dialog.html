@@ -1,0 +1,85 @@
+<!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/cancel-process-instance-dialog.html -->
+<div class="modal-header">
+  <h3>Cancel Process Instance</h3>
+</div>
+
+<div class="cancel-process-instance modal-body">
+  <div notifications-panel></div>
+
+  <div ng-hide="status === 'cancellationSuccess' || status === 'cancellationFailed' || status === 'beforeCancellation' || status === 'loadingFailed'">
+    <span class="glyphicon glyphicon-loading"></span>
+    loading process instance information...
+  </div>
+
+  <p ng-show="status === 'loadingFailed'">
+    It was not possible to get further process instance informations to be able to cancel this process instance. Refresh the current page by pressing F5 and try once again to cancel this process instance.
+  </p>
+
+  <div ng-show="status === 'beforeCancellation'">
+    <div ng-show="subProcessInstances.length > 0">
+      <p>
+        If you cancel this process instance the following sub process instances will also be canceled:
+      </p>
+
+      <table class="table cam-table">
+        <thead>
+          <tr>
+            <th class="instance-id uuid">ID</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr ng-repeat="subProcessInstance in subProcessInstances">
+            <td class="instance-id uuid">
+              <a target="_blank"
+                 ng-href="#/process-instance/{{ subProcessInstance.id }}">
+                {{ subProcessInstance.id }}
+              </a>
+            </td>
+          </tr>
+
+          <tr>
+            <td ng-hide="subProcessInstances.length === subProcessInstancesCount">
+              and {{ subProcessInstancesCount - subProcessInstances.length }} other process instances.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Do you really want to cancel this process instance?</p>
+  </div>
+
+  <div ng-show="status === 'cancellationSuccess'">
+    <p>The process instance was canceled successfully.</p>
+    <p>After closing this dialog you will be redirected to the corresponding process definition overview.</p>
+  </div>
+
+  <div ng-show="status === 'cancellationFailed'">
+    <p>The process instance could not be canceled successfully.</p>
+    <p>Maybe the process instance has already been cancelled or finished. Try to press F5 to refresh the page.</p>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-default"
+          ng-click="close(status)"
+          ng-disabled="status === 'performCancellation'"
+          ng-hide="status === 'cancellationSuccess' || status === 'cancellationFailed' || status === 'loadingFailed'">
+    Close
+  </button>
+
+  <button class="btn btn-primary"
+          ng-click="close(status)"
+          ng-show="status === 'cancellationSuccess' || status === 'cancellationFailed' || status === 'loadingFailed'">
+    OK
+  </button>
+
+  <button class="btn btn-primary"
+          ng-click="cancelProcessInstance()"
+          ng-disabled="status !== 'beforeCancellation'"
+          ng-hide="status === 'cancellationSuccess' || status === 'cancellationFailed' || status === 'loadingFailed'">
+    Cancel Process Instance
+  </button>
+</div>
+<!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/cancel-process-instance-dialog.html -->

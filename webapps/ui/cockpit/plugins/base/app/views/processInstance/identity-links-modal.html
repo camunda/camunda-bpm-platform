@@ -1,0 +1,61 @@
+<!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/identity-links-modal.html -->
+<div class="modal-header">
+  <h3 class="modal-title">{{ title }}</h3>
+</div>
+
+<div class="identity-links modal-body">
+  <div notifications-panel></div>
+
+  <form name="editForm"
+        ng-submit="!invalid() && addItem()">
+    <fieldset ng-show="identityLinks.length">
+      <legend>{{ decorator.table.label }}</legend>
+
+      <table class="table cam-table">
+        <thead>
+          <tr>
+            <th class="id">{{ decorator.table.id }}</th>
+            <th class="action text-right">Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr ng-repeat="(delta, identityLink) in identityLinks">
+            <td class="id">{{ identityLink[key] }}</td>
+            <td class="action text-right">
+              <span class="btn btn-default action-button"
+                    ng-click="removeItem()">
+                <span class="glyphicon glyphicon-ban-circle"></span>
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </fieldset>
+
+    <fieldset>
+      <legend>{{ decorator.add.label }}</legend>
+
+      <div class="input-group">
+        <input class="form-control"
+               type="text"
+               ng-model="newItem"
+               name="newItem"
+               required />
+        <span class="btn btn-primary input-group-addon"
+              ng-click="addItem()"
+              ng-disabled="invalid()">
+          <span class="glyphicon glyphicon-plus"></span>
+        </span>
+      </div>
+    </fieldset>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button ng-click="$dismiss()"
+          class="btn btn-default">
+    Close
+  </button>
+</div>
+<!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/identity-links-modal.html -->

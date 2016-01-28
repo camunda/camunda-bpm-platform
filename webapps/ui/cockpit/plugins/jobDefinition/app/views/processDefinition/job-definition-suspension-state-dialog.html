@@ -1,0 +1,182 @@
+<!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/jobDefinition/app/views/processDefinition/job-definition-suspension-state-dialog.html -->
+<div class="modal-header">
+  <h3>{{ (jobDefinition.suspended ? 'Activate' : 'Suspend') }} Job Definition</h3>
+</div>
+
+<div class="job-definition-suspension-state modal-body">
+  <div notifications-panel></div>
+
+  <div ng-hide="status === 'SUCCESS' || status === 'FAIL'">
+
+    <p ng-show="jobDefinition.suspended">
+      <!-- activation -->
+      This job definition will be activated, so that new jobs based on this job definition are initially active.
+    </p>
+
+    <p ng-hide="jobDefinition.suspended">
+      <!-- suspension -->
+      This job definition will be suspended, so that new jobs based on this job definition are initially suspended.
+    </p>
+
+    <form class="form-horizontal"
+          name="updateSuspensionStateForm"
+          novalidate
+          request-aware
+          ng-submit="updateSuspensionState()">
+
+      <fieldset>
+        <div class="form-group">
+          <label class="col-xs-4 control-label"
+                 for="includeJobsValue">
+            Include Existing Jobs
+            <!-- activation -->
+            <span class="glyphicon glyphicon-question-sign"
+                  tooltip="Including jobs means that all existing jobs of this job definition will be activated too, if the value is set to true."
+                  tooltip-placement="right"
+                  ng-show="jobDefinition.suspended">
+            </span>
+
+            <!-- suspension -->
+            <span class="glyphicon glyphicon-question-sign"
+                  tooltip="Including jobs means that all existing jobs of this job definition will be suspended too, if the value is set to true."
+                  tooltip-placement="right"
+                  ng-hide="jobDefinition.suspended">
+            </span>
+          </label>
+
+
+          <div class="col-xs-8 checkbox">
+            <label>
+              <input id="includeJobsValueId"
+                     name="includeJobsValue"
+                     type="checkbox"
+                     ng-model="data.includeJobs" />
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="col-xs-4 control-label"
+                 for="executeImmediately">
+            Execute
+            <span class="glyphicon glyphicon-question-sign"
+                  tooltip="Decide whether the activation of this job definition should be executed immediately or delayed. If the activation should happen delayed then an execution date must be provided on which the activation will be scheduled."
+                  tooltip-placement="right"
+                  ng-show="jobDefinition.suspended">
+            </span>
+
+            <span class="glyphicon glyphicon-question-sign"
+                  tooltip="Decide whether the suspension of this job definition should be executed immediately or delayed. If the suspension should happen delayed then an execution date must be provided on which the suspension will be scheduled."
+                  tooltip-placement="right"
+                  ng-hide="jobDefinition.suspended">
+            </span>
+          </label>
+
+          <div class="col-xs-8">
+            <div class="radio">
+              <label>
+                <input ng-model="data.executeImmediately"
+                       ng-value="true"
+                       type="radio"
+                       name="execute" />
+                Immediately
+              </label>
+            </div>
+
+            <div class="radio">
+              <label>
+                <input ng-model="data.executeImmediately"
+                       ng-value="false"
+                       type="radio"
+                       name="execute" />
+                Delayed
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group"
+             ng-show="!data.executeImmediately">
+          <label class="col-xs-4 control-label"
+                 for="executionDateValue">
+            Schedule at
+          </label>
+
+          <div class="col-xs-8">
+            <input name="executionDateValue"
+                   ng-model="data.executionDate"
+                   class="form-control"
+                   type="text"
+                   date
+                   required />
+
+            <p class="invalid"
+               ng-show="this.updateSuspensionStateForm.executionDateValue.$error.date">
+              Supported pattern 'yyyy-MM-ddTHH:mm:ss'.
+            </p>
+          </div>
+        </div>
+
+      </fieldset>
+    </form>
+
+    <p>
+      Do you really want to {{ (jobDefinition.suspended ? 'activate' : 'suspend') }} this job definition?
+    </p>
+
+  </div>
+
+  <div ng-show="status === 'SUCCESS'">
+    <p ng-show="jobDefinition.suspended && data.executeImmediately">
+      The suspension state of the Job Definition has been updated to "active" successfully.
+    </p>
+    <p ng-show="jobDefinition.suspended && !data.executeImmediately">
+      The activation of the Job Definition has been scheduled to {{ data.executionDate }} successfully.
+    </p>
+    <p ng-show="!jobDefinition.suspended && data.executeImmediately">
+      The suspension state of the Job Definition has been updated to "suspended" successfully.
+    </p>
+    <p ng-show="!jobDefinition.suspended && !data.executeImmediately">
+      The suspension of the Job Definition has been scheduled to {{ data.executionDate }} successfully.
+    </p>
+  </div>
+
+  <div ng-show="status === 'FAIL'">
+    <p ng-show="jobDefinition.suspended && data.executeImmediately">
+      The suspension state of the Job Definition could not be updated to "active" successfully.
+    </p>
+    <p ng-show="jobDefinition.suspended && !data.executeImmediately">
+      The activation of the Job Definition could not be scheduled to {{ data.executionDate }} successfully.
+    </p>
+    <p ng-show="!jobDefinition.suspended && data.executeImmediately">
+      The suspension state of the Job Definition could not be updated to "suspended" successfully.
+    </p>
+    <p ng-show="!jobDefinition.suspended && !data.executeImmediately">
+      The suspension of the Job Definition could not be scheduled to {{ data.executionDate }} successfully.
+    </p>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-link"
+          ng-click="close(status)"
+          ng-disabled="status === 'PERFORM_UDPATE'"
+          ng-hide="status === 'SUCCESS' || status === 'FAIL'">
+    Close
+  </button>
+
+  <button type="submit"
+          class="btn btn-primary"
+          ng-click="updateSuspensionState()"
+          ng-hide="status === 'SUCCESS' || status === 'FAIL'"
+          ng-disabled="!isValid() || status === 'PERFORM_UDPATE'">
+    {{ (jobDefinition.suspended ? 'Activate' : 'Suspend') }}
+  </button>
+
+  <button class="btn btn-primary"
+          ng-click="close(status)"
+          ng-show="status === 'SUCCESS' || status === 'FAIL'">
+    OK
+  </button>
+</div>
+<!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/jobDefinition/app/views/processDefinition/job-definition-suspension-state-dialog.html -->

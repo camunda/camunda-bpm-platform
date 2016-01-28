@@ -1,0 +1,63 @@
+<!-- # cockpit client/scripts/repository/deployments/directives/cam-cockpit-deployments.html -->
+<div ng-show="!state.$loaded && !state.$error"
+     class="loader">
+  <span class="animate-spin glyphicon glyphicon-refresh"></span>
+  Loading
+</div>
+
+<div ng-show="state.$error" class="alert alert-danger" role="alert">
+  <span class="glyphicon glyphicon-exclamation-sign"></span>
+  <strong class="status">Failure:</strong>
+  <span class="message">Loading the deployments finished with failures. Try to refresh the page to try again.</span>
+</div>
+
+<div ng-show="state.$loaded && !state.$error"
+     class="wrapper">
+
+  <div ng-hide="totalItems"
+       class="well">
+    <span class="glyphicon glyphicon-info-sign"></span>
+    No deployments available.
+  </div>
+
+  <div ng-show="totalItems && (!deployments || !deployments.length)"
+       class="well">
+    <span class="glyphicon glyphicon-info-sign"></span>
+    The current search parameters could not retrieve any tasks. Try to reset the search parameters or to&nbsp;
+    <a ng-click="resetPage()">reset page number.</a>
+  </div>
+
+  <ul class="deployments">
+    <li ng-show="totalItems"
+        ng-repeat="(delta, deployment) in deployments"
+        ng-class="{active: isFocused(deployment), deployment: true}"
+        ng-style="{'z-index': ((deployments.length + 10) - delta) }"
+        ng-click="focus(deployment)">
+
+      <div cam-deployment
+           deployment="deployment"
+           deployments-list-data="deploymentsListData"
+           control="control">
+      </div>
+
+    </li>
+  </ul>
+</div>
+
+<pagination ng-show="state.$loaded && totalItems > pageSize"
+            class="pagination-sm"
+
+            ng-model="pageNum"
+            ng-change="pageChange(pageNum)"
+
+            total-items="totalItems"
+            items-per-page="pageSize"
+            max-size="3"
+
+            boundary-links="false"
+
+            next-text="&rsaquo;"
+            last-text="&raquo;"
+            previous-text="&lsaquo;"
+            first-text="&laquo;"></pagination>
+<!-- / cockpit client/scripts/repository/deployments/directives/cam-cockpit-deployments.html -->

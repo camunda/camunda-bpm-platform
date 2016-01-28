@@ -1,0 +1,56 @@
+<div ng-show="!taskState.$loaded"
+     class="loader">
+  <span class="animate-spin glyphicon glyphicon-refresh"></span>
+  {{ 'LOADING' | translate }}
+</div>
+
+<div ng-show="taskState.$loaded">
+  <div ng-hide="task">
+    <div class="no-task well">
+      <span class="glyphicon glyphicon-info-sign"></span>
+      {{ 'SELECT_TASK_IN_LIST' | translate }}
+    </div>
+  </div>
+
+  <section ng-if="task" class="task-card">
+    <header class="row">
+      <div class="col-xs-12">
+        <div class="names">
+          <h2 class="task">{{ task.name || task.taskDefinitionKey || task.id }}</h2>
+          <h4 class="process-definition"
+              ng-if="task.processDefinitionId">
+            {{ task._embedded.processDefinition[0].name || task._embedded.processDefinition[0].key }}
+          </h4>
+          <h4 class="case-definition"
+              ng-if="task.caseDefinitionId">
+            {{ task._embedded.caseDefinition[0].name || task._embedded.caseDefinition[0].key }}
+          </h4>
+        </div>
+
+        <div cam-tasklist-task-meta
+             task-data="taskData"
+             error-handler="errorHandler"></div>
+      </div>
+    </header>
+
+    <div class="row tabbed-content">
+
+      <div ng-show="taskDetailTabs.length" class="col-xs-12">
+        <ul class="nav nav-tabs">
+          <li ng-class="{ active: selectedTaskDetailTab == taskDetailTab }" ng-repeat="taskDetailTab in taskDetailTabs">
+            <a href ng-click="selectTaskDetailTab(taskDetailTab)">{{ taskDetailTab.label | translate }}</a>
+          </li>
+        </ul>
+
+        <div class="tab-content">
+          <view provider="selectedTaskDetailTab" vars="taskVars"></view>
+        </div>
+
+      </div>
+    </div>
+
+  </section>
+
+</div>
+
+

@@ -1,0 +1,89 @@
+<!-- # cockpit client/scripts/repository/deployments/modals/cam-cockpit-delete-deployment-modal.html -->
+<div class="modal-header">
+  <h3 class="modal-title">Delete Deployment: {{ deployment.name || deployment.id }}</h3>
+</div>
+
+<div class="modal-body delete-deployment-dialog">
+  <div notifications-panel></div>
+
+  <div ng-hide="countsLoaded()"
+       class="loader">
+    <span class="animate-spin glyphicon glyphicon-refresh"></span>
+    Loading deployment informations...
+  </div>
+
+  <div ng-show="countsLoaded()">
+
+    This deployment will be deleted.
+
+    <div class="alert alert-info" ng-show="hasInstances()">
+      {{ getInfoSnippet() }} In order to delete this deployment it is necessary to enable the <code>Cascade</code> flag.
+    </div>
+
+    <form class="form-horizontal"
+          name="deleteDeploymentForm"
+          novalidate
+          request-aware>
+
+      <div class="form-group cascade">
+
+        <label class="control-label col-xs-5"
+               for="cascade">
+          Cascade
+          <span class="glyphicon glyphicon-question-sign"
+                tooltip="If the value is enabled, all instances, including historic instances, related to this deployment will also be deleted."
+                tooltip-placement="right">
+          </span>
+        </label>
+
+        <div class="col-xs-7">
+          <label class="checkbox">
+            <input name="cascade"
+                   type="checkbox"
+                   ng-model="options.cascade">
+          </label>
+        </div>
+
+      </div>
+
+      <div class="form-group skip-custom-listener">
+
+        <label class="control-label col-xs-5"
+               for="skipCustomListeners">
+          Skip Custom Listeners
+          <span class="glyphicon glyphicon-question-sign"
+                tooltip="If the value is enabled, only built-in listeners will be notified with the end event."
+                tooltip-placement="right">
+          </span>
+        </label>
+
+        <div class="col-xs-7">
+          <label class="checkbox">
+            <input name="skipCustomListeners"
+                   type="checkbox"
+                   ng-model="options.skipCustomListeners">
+          </label>
+        </div>
+
+      </div>
+
+    </form>
+
+    Are you sure to delete the given deployment?
+
+  </div>
+
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-link"
+          ng-click="$dismiss()"
+          ng-disabled="status === 'PERFORM_DELETE'">Close</button>
+
+  <button type="submit"
+          class="btn btn-primary"
+          ng-click="deleteDeployment()"
+          ng-show="countsLoaded()"
+          ng-disabled="!canDeleteDeployment() || status === 'PERFORM_DELETE'">Delete</button>
+</div>
+<!-- / cockpit client/scripts/repository/deployments/modals/cam-cockpit-delete-deployment-modal.html -->

@@ -1,0 +1,382 @@
+<!-- # CE - camunda-cockpit-ui/client/scripts/pages/process-definition.html -->
+<div class="ctn-fixed-view">
+
+  <div class="ctn-header">
+    <h1>
+      <span class="process-name-prefix">
+        <span>Process</span>
+        <span>definition</span>
+      </span>
+
+      {{ processDefinition.name || processDefinition.key }}
+
+      <span class="badge badge-warning badge-suspended"
+            ng-show="processDefinition.suspended"
+            tooltip="Currently suspended"
+            tooltip-placement="top">
+        <span class="glyphicon glyphicon-pause white"></span>
+      </span>
+    </h1>
+
+    <div class="view-pills" id="cockpit.processDefinition.view"></div>
+  </div>
+
+  <div class="ctn-content-container"
+       ctn-collapsable-parent="sidebar">
+
+    <!-- tool bar -->
+    <div class="ctn-toolbar">
+
+      <!-- Toolbar actions are provided by plugins -->
+      <span ng-repeat="actionProvider in processDefinitionActions">
+        <view provider="actionProvider"
+              vars="processDefinitionVars" />
+      </span>
+    </div>
+
+    <!-- sidebar -->
+    <div class="ctn-column ctn-sidebar ctn-scroll"
+         ctn-collapsable="left">
+
+      <div class="definition-details">
+        <div class="key">
+          <span class="name">
+            Key
+          </span>
+          {{ processDefinition.key }}
+        </div>
+      </div>
+
+      <div class="filters"
+           ng-controller="ProcessDefinitionFilterController">
+        <div class="version-filter filter">
+          <span class="name">
+            Version
+          </span>
+          <span ng-if="!instanceStatistics.$loaded"
+                class="glyphicon glyphicon-refresh animate-spin"></span>
+
+          <div class="btn-group dropdown"
+               ng-if="instanceStatistics.$loaded && filterData.allDefinitions.length > 1">
+            <button class="btn btn-default dropdown-toggle"
+                    data-toggle="dropdown">
+              {{ processDefinition.version }} <span class="caret"></span>
+            </button>
+
+            <ul class="dropdown-menu">
+              <li ng-repeat="definition in filterData.allDefinitions">
+                <a ng-href="#/process-definition/{{ definition.id }}">
+                  {{ definition.version }}
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <span ng-if="instanceStatistics.$loaded && filterData.allDefinitions.length < 2">
+            {{ filterData.allDefinitions.length }}
+          </span>
+        </div>
+
+
+        <div class="process-instances">
+          <label>Running Instances</label>
+          <ul ng-if="instanceStatistics.$loaded">
+            <li>
+              of the selected version:
+              <label>{{ instanceStatistics.current.count }}</label>
+            </li>
+
+            <li>
+              of all versions:
+              <label>{{ instanceStatistics.all.count }}</label>
+            </li>
+          </ul>
+          <span ng-if="!instanceStatistics.$loaded"
+                class="glyphicon glyphicon-refresh animate-spin"></span>
+        </div>
+
+
+        <h5>
+          Filter
+          <div class="btn-group btn-control dropdown">
+            <button class="btn btn-link dropdown-toggle"
+                    data-toggle="dropdown">
+              <span class="glyphicon glyphicon-plus-sign"></span>
+            </button>
+
+            <ul class="dropdown-menu">
+              <li>
+                <a href
+                   ng-click="addVariableFilter()">
+                  by variable
+                </a>
+              </li>
+              <li ng-hide="filterData.businessKey">
+                <a href
+                   ng-click="addBusinessKeyFilter()">
+                  by business key
+                </a>
+              </li>
+              <li ng-hide="filterData.start.length">
+                <a href
+                   ng-click="addStartDateFilter()">
+                  by start date
+                </a>
+              </li>
+            </ul>
+          </div>
+        </h5>
+
+
+        <form name="filterForm"
+              novalidate
+              ng-submit="filterChanged()">
+          <ul class="list-unstyled">
+            <li class="parent-filter filter" ng-if="filterData.parent">
+              <div class="name">
+                Parent
+              </div>
+
+              <div class="search search-text">
+
+                <button class="btn btn-link btn-xs btn-control remove"
+                        ng-click="removeParentFilter()">
+                  <span class="glyphicon glyphicon-remove"></span>
+                </button>
+
+                <a ng-href="#/process-definition/{{ filterData.parent.id }}">
+                  {{ filterData.parent.name || filterData.parent.key }}
+                </a>
+              </div>
+            </li>
+
+            <li class="business-key-filter filter" ng-if="filterData.businessKey">
+              <div class="name">
+                Business Key
+              </div>
+
+              <div class="search">
+                <button class="btn btn-link btn-xs btn-control remove"
+                        ng-click="removeBusinessKeyFilter()">
+                  <span class="glyphicon glyphicon-remove"></span>
+                </button>
+                <input type="text"
+                       required
+                       placeholder="Filter Business Key"
+                       name="businessKey"
+                       class="form-control"
+                       ng-model="filterData.businessKey.value"
+                       ng-change="filterChanged()" />
+              </div>
+
+              <div class="note note-error note-small"
+                   ng-if="filterForm.businessKey.$invalid">
+                Field is required
+              </div>
+            </li>
+
+            <li class="date-filter filter" ng-if="filterData.start.length">
+              <div class="name">
+                Start Date
+              </div>
+
+              <div class="search search-date"
+                   ng-repeat="date in filterData.start">
+                <div class="wrapper">
+                  <select ng-model="date.type"
+                          ng-options="item as item for item in dateTypeItems"
+                          required
+                          class="form-control"
+                          cam-dynamic-name="startDateFilterType{{$index}}"
+                          ng-change="dateFilterTypeChanged(filterForm['startDateFilterType0'], filterForm['startDateFilterType1'])">
+                  </select>
+
+                  <div class="removable-input">
+                    <input type="text"
+                           class="form-control"
+                           date
+                           required
+                           ng-change="filterChanged()"
+                           ng-model="date.value"
+                           cam-dynamic-name="startDateFilterValue{{$index}}" />
+
+                    <button class="btn btn-link btn-xs btn-control remove-date-filter"
+                            ng-click="removeStartDateFilter(date)">
+                      <span class="glyphicon glyphicon-remove"></span>
+                    </button>
+                  </div>
+                </div><!-- / .wrapper -->
+
+                <div class="note note-error note-small"
+                     ng-if="filterForm['startDateFilterValue' + $index].$invalid">
+                  <div ng-show="filterForm['startDateFilterValue' + $index].$error.required">
+                    Field is required.
+                  </div>
+
+                  <div ng-show="filterForm['startDateFilterValue' + $index].$error.date && !filterForm['startDateFilterValue' + $index].$error.required">
+                    Syntax for a date is <code>yyyy-MM-ddTHH:mm:ss</code>.
+                  </div>
+                </div><!-- / .error -->
+
+                <div class="note note-error note-small"
+                     ng-if="filterForm['startDateFilterType0'].$invalid && filterForm['startDateFilterType1'].$invalid">
+                  <div ng-show="filterForm['startDateFilterType0'].$error.dateTypeEqual && filterForm['startDateFilterType1'].$error.dateTypeEqual">
+                    Only the combination <code>after/before</code> is allowed.
+                  </div>
+                </div><!-- / .error -->
+
+                <a class="glyphicon glyphicon-plus-sign pull-right"
+                   tooltip="Add a start date filter"
+                   tooltip-placement="right"
+                   ng-click="addStartDateFilter()"
+                   ng-if="filterData.start.length < 2"></a>
+              </div><!-- ./ ng-repeat -->
+
+            </li>
+
+            <li class="variable-filter filter"
+                ng-if="filterData.variables.length">
+              <div class="name">
+                Variables
+                <a href
+                   ng-click="toggleVariableFilterHelp()"
+                   tooltip-placement="right"
+                   tooltip="Get help on variable filters">
+                  <span class="glyphicon glyphicon-question-sign"></span>
+                </a>
+              </div>
+
+              <div class="search"
+                   ng-repeat="variable in filterData.variables">
+
+                <button class="btn btn-link btn-xs btn-control remove"
+                        ng-click="removeVariableFilter(variable)">
+                  <span class="glyphicon glyphicon-remove"></span>
+                </button>
+
+                <input type="text"
+                       required
+                       class="form-control"
+                       cam-dynamic-name="variableFilter{{$index}}"
+                       placeholder="Filter Variable"
+                       ng-model="variable.value"
+                       ng-change="filterChanged()"
+                       process-variable />
+
+                <div class="note note-error note-small"
+                     ng-show="filterForm['variableFilter' + $index].$invalid">
+                  <div ng-show="filterForm['variableFilter' + $index].$error.required">
+                    Field is required.
+                  </div>
+                  <div ng-show="filterForm['variableFilter' + $index].$error.processVariableFilter && !filterForm['variableFilter' + $index].$error.required">
+                    Syntax for variable filters is <code>variableName OPERATOR value</code>.
+                    <a href
+                       ng-show="!showVariableFilterHelp" ng-click="toggleVariableFilterHelp()">
+                      Learn more.
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <a tooltip="Add a variable filter"
+                 tooltip-placement="right"
+                 class="pull-right glyphicon glyphicon-plus-sign"
+                 ng-click="addVariableFilter()">
+              </a>
+
+              <div class="note"
+                   ng-show="showVariableFilterHelp">
+                <h5>
+                  Variable filter syntax
+                  <a ng-click="toggleVariableFilterHelp()">hide</a>
+                </h5>
+
+                <div>
+                  Filters on variables must be specified as
+                  <code>variableName OPERATOR value</code> where <code>OPERATOR</code> may be any of
+                  <span ng-repeat="op in operators">
+                    <span ng-show="$index > 0">, </span>
+                    <code>{{ op }}</code>
+                  </span>.
+                  <br/>
+                  All variable filters are applied using the logical <code>AND</code>.
+                  Strings must be properly enclosed in <code>""</code>.
+                  <br/>
+                  <br/>
+                  Samples:  <code>customerId = 1212</code>,
+                            <code>name like "%Walter"</code>,
+                            <code>checked = true</code>
+                </div>
+              </div>
+            </li>
+
+            <li class="activity-filter filter"
+                ng-if="filterData.activities.length">
+              <div class="name">
+                Activity
+              </div>
+
+              <div class="search search-text"
+                   ng-repeat="activity in filterData.activities">
+                <button class="btn btn-link btn-xs btn-control remove"
+                        ng-click="removeActivityFilter(activity)">
+                  <span class="glyphicon glyphicon-remove"></span>
+                </button>
+                {{ activity.name }}
+              </div>
+            </li>
+          </ul>
+        </form>
+
+        <div class="footer"
+             ng-show="filterChanged.$loading">
+          <span class="glyphicon glyphicon-refresh animate-spin"></span> refreshing…
+        </div>
+      </div>
+
+      <a class="navigate-deployment" ng-href="{{ getDeploymentUrl() }}">Navigate to deployment</a>
+      <a ng-if="hasReportPlugin"
+         class="report-link"
+         ng-href="#/reports/?processDefinitionKey={{ processDefinition.key }}&processDefinitionVersion={{ processDefinition.version }}">
+        <span class="glyphicon glyphicon-signal"></span>
+      </a>
+
+      <a class="hide-collapsable pull-right"></a>
+    </div>
+
+    <div class="ctn-column ctn-content"
+         ctn-collapsable-parent="tabs">
+
+      <!-- content top pane -->
+      <div class="ctn-row ctn-content-top">
+        <div process-diagram="processDiagram"
+             on-element-click="handleBpmnElementSelection(id, $event)"
+             selection="filter"
+             process-data="processData"
+             overlay-provider-component="cockpit.processDefinition.diagram.overlay"></div>
+      </div>
+
+      <!-- content bottom pane -->
+      <div class="ctn-row ctn-content-bottom ctn-tabbed"
+           ctn-collapsable="bottom">
+        <div ng-show="processDefinitionTabs.length">
+          <ul class="nav nav-tabs">
+            <li ng-class="{ active: selectedTab == tabProvider }"
+                ng-repeat="tabProvider in processDefinitionTabs">
+              <a href ng-click="selectTab(tabProvider)">{{ tabProvider.label }}</a>
+            </li>
+          </ul>
+
+          <div class="ctn-tabbed-content ctn-scroll">
+            <view provider="selectedTab"
+                  vars="processDefinitionVars" />
+          </div>
+        </div>
+      </div>
+
+      <a class="show-collapsable"></a>
+    </div>
+  </div>
+
+</div><!-- end .ctn-fixed-view -->
+<!-- / CE - camunda-cockpit-ui/client/scripts/pages/process-definition.html -->

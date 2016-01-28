@@ -1,0 +1,18 @@
+<!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/update-suspension-state-action.html -->
+<a class="btn btn-default btn-toolbar btn-suspend-action"
+   href
+   ng-click="openDialog()"
+   tooltip="Suspend Process Instance"
+   tooltip-placement="left"
+   ng-show="!processInstance.suspended">
+  <span class="glyphicon glyphicon-pause"></span>
+</a>
+<a class="btn btn-default btn-toolbar"
+   href
+   ng-click="openDialog()"
+   tooltip="Activate Process Instance"
+   tooltip-placement="left"
+   ng-hide="!processInstance.suspended">
+  <span class="glyphicon glyphicon-play"></span>
+</a>
+<!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/update-suspension-state-action.html -->

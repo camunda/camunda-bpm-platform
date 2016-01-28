@@ -1,0 +1,41 @@
+<!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processDefinition/called-process-definition-table.html -->
+<div cam-widget-loader
+     loading-state="{{ loadingState }}"
+     text-empty="No called process definitions">
+  <table class="called-process-definition cam-table">
+    <thead>
+      <tr>
+        <th class="process-definition">Called Process Definition</th>
+        <th class="activity">Activity</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr ng-repeat="calledProcessDefinition in calledProcessDefinitions">
+        <td class="process-definition">
+          <a ng-href="#/process-definition/{{ calledProcessDefinition.id }}?parentProcessDefinitionId={{ processDefinition.id }}">
+            {{ calledProcessDefinition.name }}
+          </a>
+        </td>
+
+        <td class="activity">
+          <a ng-show="calledProcessDefinition.calledFromActivities.length === 1"
+             cam-select-activity="calledProcessDefinition.calledFromActivities[0].id"
+             ng-href="#/process-definition/{{ processDefinition.id }}?activityIds={{ calledProcessDefinition.calledFromActivities[0].id }}&amp;detailsTab=call-process-definitions-table">
+            {{ calledProcessDefinition.calledFromActivities[0].name }}
+          </a>
+
+          <ul ng-show="calledProcessDefinition.calledFromActivities.length > 1">
+            <li ng-repeat="activity in calledProcessDefinition.calledFromActivities">
+              <a cam-select-activity="activity.id"
+                 ng-href="#/process-definition/{{ processDefinition.id }}?activityIds={{ activity.id }}&amp;detailsTab=call-process-definitions-table">
+                {{ activity.name }}
+              </a>
+            </li>
+          <ul>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processDefinition/called-process-definition-table.html -->

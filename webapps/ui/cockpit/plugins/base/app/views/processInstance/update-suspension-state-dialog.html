@@ -1,0 +1,99 @@
+<!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/update-suspension-state-dialog.html -->
+<div class="modal-header">
+  <h3>{{ (processInstance.suspended ? 'Activate' : 'Suspend') }} Process Instance</h3>
+</div>
+
+<div class="process-instance update-suspension-state modal-body">
+  <div notifications-panel></div>
+
+  <div ng-hide="status === 'SUCCESS' || status === 'FAIL'">
+
+    <div ng-show="processInstance.suspended">
+      <!-- activation -->
+      <p>
+        Activating a process instance means that the execution is running, so the <i>token state</i> will change.
+      </p>
+
+      <p>
+        Tasks belonging to this process instance will also be activated.
+      </p>
+
+      <p>
+        If a process instance is in the state active, the engine will also execute jobs associated with this process instance.
+      </p>
+
+      <p>
+        If this process instance have a process instance hierarchy, activating this process instance from the hierarchy will not activate other process instances from that hierarchy.
+      </p>
+
+      <p>Do you really want to activate this process instance?</p>
+    </div>
+
+    <div ng-hide="processInstance.suspended">
+      <!-- suspension -->
+      <p>
+        Suspending a process instance means that the execution is stopped, so the <i>token state</i> will not change. However, actions that do not change token state, like setting or removing variables, etc. will still succeed.
+      </p>
+
+      <p>
+        Tasks belonging to this process instance will also be suspended. This means that any actions influencing the tasks' lifecycles will fail, such as
+        <ul>
+          <li>claiming</li>
+          <li>completing</li>
+          <li>delegation</li>
+          <li>changes in task assignees, owners, etc.</li>
+        </ul>
+        Actions that only change task properties will still succeed, such as changing variables.
+      </p>
+
+      <p>
+        If a process instance is in the state suspended, the engine will also not execute jobs associated with this process instance.
+      </p>
+
+      <p>
+        If this process instance have a process instance hierarchy, suspending this process instance from the hierarchy will not suspend other process instances from that hierarchy.
+      </p>
+
+      <p>Do you really want to suspend this process instance?</p>
+    </div>
+
+  </div>
+
+  <div ng-show="status === 'SUCCESS'">
+    <p ng-show="processInstance.suspended">
+      The suspension state of the process instance has been updated to "active" successfully.
+    </p>
+    <p ng-hide="processInstance.suspended">
+      The suspension state of the process instance has been updated to "suspended" successfully.
+    </p>
+  </div>
+
+  <div ng-show="status === 'FAIL'">
+    <p ng-show="processInstance.suspended">
+      The suspension state of the process instance could not be updated to "active" successfully.
+    </p>
+    <p ng-hide="processInstance.suspended">
+      The suspension state of the process instance could not be updated to "suspended" successfully.
+    </p>
+  </div>
+
+</div>
+<div class="modal-footer">
+  <button class="btn btn-default"
+          ng-click="close(status)"
+          ng-disabled="status === 'PERFORM_UDPATE'"
+          ng-hide="status === 'SUCCESS' || status === 'FAIL'">Close</button>
+
+  <button type="submit"
+          class="btn btn-primary"
+          ng-click="updateSuspensionState()"
+          ng-hide="status === 'SUCCESS' || status === 'FAIL'"
+          ng-disabled="status === 'PERFORM_UDPATE'">
+    {{ (processInstance.suspended ? 'Activate' : 'Suspend') }}
+  </button>
+
+  <button class="btn btn-primary"
+          ng-click="close(status)"
+          ng-show="status === 'SUCCESS' || status === 'FAIL'">OK</button>
+</div>
+<!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/update-suspension-state-dialog.html -->

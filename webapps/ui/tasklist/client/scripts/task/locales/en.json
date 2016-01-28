@@ -1,0 +1,224 @@
+{
+  "ADD":
+        "Add",
+  "REMOVE":
+        "Remove",
+  "SUCCESSFUL":
+        "Successful",
+  "FAILED":
+        "Failed",
+  "FAILURE":
+        "Failure",
+  "FINISHED":
+        "Finished",
+  "INIT_GROUPS_FAILURE":
+        "Loading the groups of the selected task failed. Try to refresh the page to try again.",
+  "ADD_GROUP_FAILED":
+        "Adding the group to the selected task finished with failures. Try to refresh the page to try again.",
+  "REMOVE_GROUP_FAILED":
+        "Removing the group of the selected task finished with failures. Try to refresh the page to try again.",
+  "TASK_NAME":
+        "Task name",
+  "SEARCH_BY_TASK_NAME":
+        "Search by task name, case sensitive.",
+  "FOLLOW_UP_DATE":
+        "Follow-up date",
+  "DUE_DATE":
+        "Due date",
+  "ASSIGNEE":
+        "Assignee",
+  "ACTION":
+        "Action",
+  "GROUP":
+        "Group",
+  "GROUPS":
+        "Groups",
+  "MANAGE_GROUPS":
+        "Manage Groups",
+  "GROUPS_ADD":
+        "Add Groups",
+  "CURRENT_GROUPS":
+        "Current group(s)",
+  "GROUP_ID":
+        "Group ID",
+  "GROUP_ADD":
+        "Add a group",
+  "GROUP_REMOVE":
+        "Remove group",
+  "GROUP_ADD_ERROR":
+        "Group could not be added",
+  "GROUP_DELETE_ERROR":
+        "Group could not be removed",
+  "ADD_GROUPS":
+        "Add groups",
+  "USE_ADD_GROUP":
+        "You can add a group by typing a group id into the input field and afterwards clicking the button with the plus sign.",
+  "DUPLICATE_GROUP":
+        "Task is already in this group.",
+  "OWNER":
+        "Owner",
+  "DIAGRAM":
+        "Diagram",
+  "RENDERING":
+        "Rendering…",
+  "DIAGRAM_RENDER_FAILURE":
+        "Failure",
+  "FORM":
+        "Form",
+  "NO_TASK_FORM":
+        "",
+  "HISTORY":
+        "History",
+  "NO_HISTORY":
+        "There is no history for the task.",
+  "COMMENT":
+        "Comment",
+  "COMMENT_CREATE":
+        "Add Comment",
+  "COMMENT_MESSAGE_PLACEHOLDER":
+        "Enter Comment",
+  "COMMENT_SAVE_ERROR":
+        "Comment could not be saved",
+  "DESCRIPTION":
+        "Description",
+  "NO_DESCRIPTION":
+        "Note there is no description of the task.",
+  "NO_DIAGRAM":
+        "Note there is no diagram available.",
+  "SELECT_TASK_IN_LIST":
+        "Select a task in the list.",
+  "CLAIM_TASK":
+        "Claim",
+  "UNCLAIM_TASK":
+        "Unclaim",
+  "RESET_TASK_ASSIGNEE":
+        "Reset assignee",
+  "DELEGATE_TASK":
+        "Delegate",
+  "SET_FOLLOW_UP_DATE":
+        "Set follow-up date",
+  "RESET_FOLLOW_UP_DATE":
+        "Reset follow-up date",
+  "SET_DUE_DATE":
+        "Set due date",
+  "RESET_DUE_DATE":
+        "Reset due date",
+  "ASSIGNED_TO_YOU":
+        "Assigned to you",
+  "OWNER_IS_YOU":
+        "You are owner",
+  "ASSIGNEE_RESET_OK":
+        "The assignee has been reset.",
+  "ASSIGNEE_RESET_ERROR":
+        "Could not reset the assignee.",
+
+  "TASK_NO_PROCESS_DEFINITION":
+        "Could not find the process definition of the task.",
+
+  "CLAIM_OK":
+        "The task has been claimed.",
+  "CLAIM_ERROR":
+        "An error happend while claiming the task.",
+
+  "UNCLAIM_OK":
+        "The task has been unclaimed.",
+  "UNCLAIM_ERROR":
+        "An error happend while unclaiming the task.",
+
+  "RESOLVE_OK":
+        "The task has been resolved.",
+  "RESOLVE_ERROR":
+        "An error happend while resolving the task.",
+
+  "DELEGATE_ERROR":
+        "An error happend while delegating the task.",
+  "DELEGATE_OK":
+        "The task has been delegated.",
+
+  "ASSIGNED_ERROR":
+        "An error happend while assigning the task.",
+  "ASSIGNED_OK":
+        "The task has been assigned.",
+
+  "COMPLETE_ERROR":
+        "An error happend while submitting the task form",
+  "COMPLETE_OK":
+        "The task is completed.",
+
+  "TASK_UPDATE_SUCESS":
+        "The task was saved.",
+
+  "TASK_UPDATE_ERROR":
+        "The task could not be saved.",
+
+  "TASK_NOT_EXIST":
+        "The task does not exist anymore",
+  "INSTANCE_SUSPENDED":
+        "The task is currently suspended",
+
+  "COMPLETE":
+        "Complete",
+
+  "NONE":
+        "None",
+
+  "Assign":
+        "Assign",
+  "Claim":
+        "Claim",
+  "Complete":
+        "Complete",
+  "Create":
+        "Create",
+  "Delegate":
+        "Delegate",
+  "Delete":
+        "Delete",
+  "Resolve":
+        "Resolve",
+  "SetOwner":
+        "Set Owner",
+  "SetPriority":
+        "Set Priority",
+  "Update":
+        "Update",
+  "Activate":
+        "Activate",
+  "Suspend":
+        "Suspend",
+  "AddUserLink":
+        "Add User Link",
+  "DeleteUserLink":
+        "Delete User Link",
+  "AddGroupLink":
+        "Add Group Link",
+  "DeleteGroupLink":
+        "Delete Group Link",
+  "AddAttachment":
+        "Add Attachment",
+  "DeleteAttachment":
+        "Delete Attachment",
+
+  "assignee":
+        "Assignee",
+  "delegation":
+        "Delegation",
+  "delete":
+        "Delete",
+  "description":
+        "Description",
+  "dueDate":
+        "Due date",
+  "followUpDate":
+        "Follow-up date",
+  "name":
+        "Name",
+  "owner":
+        "Owner",
+  "parentTask":
+        "Parent task",
+  "priority":
+        "Priority",
+  "caseInstanceId":
+        "Case instance id"
+}

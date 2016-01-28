@@ -1,0 +1,92 @@
+<!-- # CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/add-variable-dialog.html -->
+<div class="modal-header">
+  <h3>Add Variable to Process Instance</h3>
+</div>
+
+<div class="modal-body add-variable-dialog">
+  <div notifications-panel></div>
+
+  <form class="form-horizontal"
+        name="addVariableForm"
+        novalidate
+        ng-submit="save()"
+        ng-hide="status === 'SUCCESS' || status === 'FAIL'"
+        request-aware>
+    <fieldset>
+
+      <div class="form-group variable-name">
+        <label class="control-label col-xs-4"
+               for="variableName">Variable Name*</label>
+        <div class="col-xs-8">
+          <input id="variableNameId"
+                 name="variableName"
+                 class="form-control"
+                 type="text"
+                 ng-model="newVariable.name"
+                 autofocus
+                 required />
+        </div>
+      </div>
+
+      <div class="form-group variable-type">
+        <label class="control-label col-xs-4"
+               for="variableType">Variable Type*</label>
+        <div class="col-xs-8">
+          <select id="variableTypeId"
+                  name="variableType"
+                  class="form-control"
+                  ng-options="variableType for variableType in variableTypes"
+                  ng-model="newVariable.type"
+                  ng-change="changeVariableType(variableType)">
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group variable-value">
+        <label class="control-label col-xs-4"
+               for="variableValue">Variable Value*</label>
+        <div class="col-xs-8">
+          <div variable="newVariable"></div>
+
+          <p class="invalid"
+             ng-show="this.addVariableForm.editDateValue.$error.date">
+            Supported pattern 'yyyy-MM-ddTHH:mm:ss'.
+          </p>
+
+          <p class="invalid"
+             ng-show="this.addVariableForm.editIntegerValue.$error.numeric || this.addVariableForm.editFloatValue.$error.numeric">
+            Only a {{ newVariable.type }} value is allowed.
+          </p>
+        </div>
+      </div>
+
+    </fieldset>
+  </form>
+
+  <div ng-show="status === 'SUCCESS'">
+    The variable "{{ newVariable.name }}" has been added to the process instance successfully.
+  </div>
+
+  <div ng-show="status === 'FAIL'">
+    The variable "{{ newVariable.name }}" could not be added to the process instance.
+  </div>
+
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-link"
+          ng-click="close()"
+          ng-disabled="status === 'PERFORM_SAVE'"
+          ng-hide="status === 'SUCCESS' || status === 'FAIL'">Close</button>
+
+  <button type="submit"
+          class="btn btn-primary"
+          ng-click="save()"
+          ng-hide="status === 'SUCCESS' || status === 'FAIL'"
+          ng-disabled="!isValid()">Add</button>
+
+  <button class="btn btn-primary"
+          ng-click="close()"
+          ng-show="status === 'SUCCESS' || status === 'FAIL'">OK</button>
+</div>
+<!-- / CE - camunda-bpm-webapp/webapp/src/main/resources-plugin/base/app/views/processInstance/add-variable-dialog.html -->

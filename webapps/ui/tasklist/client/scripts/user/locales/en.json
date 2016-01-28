@@ -1,0 +1,28 @@
+{
+  "LOGGED_IN":
+                        "You are now logged in.",
+  "CREDENTIALS_ERROR":
+                        "Can not log in with those credentials.",
+  "USERNAME":
+                        "Username",
+  "PASSWORD":
+                        "Password",
+  "PLEASE_SIGN_IN":
+                        "Please sign in",
+  "LOGIN":
+                        "Login",
+  "SIGN_IN_ACTION":
+                        "Sign in",
+  "SIGN_OUT_ACTION":
+                        "Sign out",
+  "MY_PROFILE":
+                        "My profile",
+  "LOGGED_OUT":
+                        "You are logged out.",
+  "USER_NAME":
+                        "User name",
+  "SESSION_EXPIRED":
+                        "Your session has expired",
+  "SESSION_EXPIRED_MESSAGE":
+                        "You need to sign in again."
+}

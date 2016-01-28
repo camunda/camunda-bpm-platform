@@ -1,0 +1,68 @@
+<div class="modal-header">
+  <h3 class="modal-title">
+    <span translate="VARIABLE_VALUE">Value of</span>
+    {{ variable.name }}
+  </h3>
+</div>
+
+<div class="modal-body">
+  <div class="form-group">
+    <label translate="VARIABLE_VALUE_INFO">Value Info</label>
+  </div>
+  <div class="form-group">
+    {{ 'VARIABLE_OBJECT_TYPE_NAME' | translate }}:
+    <code class="variable-type">{{ type }}</code>
+  </div>
+  <div class="form-group">
+    {{ 'VARIABLE_SERIALIZATION_DATA_FORMAT' | translate }}:
+    <code class="variable-type">{{ dataFormat }}</code>
+  </div>
+
+  <div class="form-group">
+    <label translate="VARIABLE_VALUE">Value</label>
+  </div>
+
+   <ul class="nav nav-tabs">
+    <li ng-class="{ active: selectedTab === 'serialized' }">
+      <a href ng-click="selectTab('serialized')">{{ 'SERIALIZED' | translate }}</a>
+    </li>
+    <li ng-class="{ active: selectedTab === 'deserialized' }">
+      <a href ng-click="selectTab('deserialized')">{{ 'DESERIALIZED' | translate }}</a>
+    </li>
+  </ul>
+
+  <div ng-show="selectedTab === 'serialized'" class="tab-content">
+    <textarea disabled
+              ng-model="value"
+              rows="10"
+              class="form-control input-xxlarge">
+    </textarea>
+  </div>
+  <div ng-show="selectedTab === 'deserialized'" class="tab-content">
+    <div class="alert alert-warning"
+         role="alert" 
+         ng-show="deserializationError">
+      <strong>{{ 'DESERIALIZATION_ERROR' | translate }}</strong>:
+      {{ deserializationError }}
+    </div>
+    <div ng-show="!deserializationError">
+      <textarea disabled
+                ng-model="valueDeserialized"
+                rows="10"
+                class="form-control input-xxlarge">
+      </textarea>
+    </div>
+  </div>
+
+</div>
+
+<div class="modal-footer">
+  <div class="row row-action">
+    <div class="col-xs-12">
+      <button class="btn btn-xs btn-link"
+              type="submit"
+              ng-click="$dismiss()"
+              translate="CLOSE">Close</button>
+    </div>
+  </div>
+</div>
