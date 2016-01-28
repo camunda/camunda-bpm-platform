@@ -165,6 +165,11 @@ public class NamedProcessEngineRestServiceImpl extends AbstractProcessEngineRest
     return super.getExternalTaskRestService(engineName);
   }
 
+  @Path("/{name}" + MigrationRestService.PATH)
+  public MigrationRestService getMigrationRestService(@PathParam("name") String engineName) {
+    return super.getMigrationRestService(engineName);
+  }
+
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   public List<ProcessEngineDto> getProcessEngineNames() {

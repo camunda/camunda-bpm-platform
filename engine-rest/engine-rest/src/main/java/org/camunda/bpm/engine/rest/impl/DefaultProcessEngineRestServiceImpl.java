@@ -133,6 +133,11 @@ public class DefaultProcessEngineRestServiceImpl extends AbstractProcessEngineRe
     return super.getExternalTaskRestService(null);
   }
 
+  @Path(MigrationRestService.PATH)
+  public MigrationRestService getMigrationRestService() {
+    return super.getMigrationRestService(null);
+  }
+
   @Override
   protected URI getRelativeEngineUri(String engineName) {
     // the default engine
