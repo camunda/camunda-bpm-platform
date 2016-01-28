@@ -26,9 +26,9 @@ module.exports = function(config, requireJsConf) {
   requireJsConf.webapp_core = {
     options: _.extend({}, options, {
       out: '<%= pkg.gruntConfig.pluginBuildTarget %>/base/app/plugin.js',
-      include: ['base/app/plugin'],
+      include: ['cockpit/plugins/base/app/plugin'],
       exclude: ['angular'],
-      insertRequire: ['base/app/plugin']
+      insertRequire: ['cockpit/plugins/base/app/plugin']
     })
   };
 
@@ -36,27 +36,27 @@ module.exports = function(config, requireJsConf) {
   requireJsConf.webapp_jobDefinition = {
     options: _.extend({}, options, {
       out: '<%= pkg.gruntConfig.pluginBuildTarget %>/jobDefinition/app/plugin.js',
-      include: ['jobDefinition/app/plugin'],
+      include: ['cockpit/plugins/jobDefinition/app/plugin'],
       exclude: ['angular'],
-      insertRequire: ['jobDefinition/app/plugin']
+      insertRequire: ['cockpit/plugins/jobDefinition/app/plugin']
     })
   };
 
   requireJsConf.webapp_standaloneTask = {
     options: _.extend({}, options, {
       out: '<%= pkg.gruntConfig.pluginBuildTarget %>/standaloneTask/app/plugin.js',
-      include: ['standaloneTask/app/plugin'],
+      include: ['tasklist/plugins/standaloneTask/app/plugin'],
       exclude: ['angular'],
-      insertRequire: ['standaloneTask/app/plugin']
+      insertRequire: ['tasklist/plugins/standaloneTask/app/plugin']
     })
   };
 
   requireJsConf.webapp_decisionList = {
     options: _.extend({}, options, {
       out: '<%= pkg.gruntConfig.pluginBuildTarget %>/decisionList/app/plugin.js',
-      include: ['decisionList/app/plugin'],
+      include: ['cockpit/plugins/decisionList/app/plugin'],
       exclude: ['angular'],
-      insertRequire: ['decisionList/app/plugin']
+      insertRequire: ['cockpit/plugins/decisionList/app/plugin']
     })
   };
 

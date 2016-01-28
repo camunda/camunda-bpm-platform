@@ -22,29 +22,29 @@ module.exports = function(grunt) {
 
   var browserifyConf = { };
 
-  require('./camunda-admin-ui/grunt/config/browserify')(config, browserifyConf);
-  require('./camunda-tasklist-ui/grunt/config/browserify')(config, browserifyConf);
-  require('./camunda-cockpit-ui/grunt/config/browserify')(config, browserifyConf);
+  require('./ui/admin/grunt/config/browserify')(config, browserifyConf);
+  require('./ui/tasklist/grunt/config/browserify')(config, browserifyConf);
+  require('./ui/cockpit/grunt/config/browserify')(config, browserifyConf);
 
   require('./grunt/config/requirejs')(config, requireJsConf);
 
   var copyConf = require('./grunt/config/copy');
-  require('./camunda-admin-ui/grunt/config/copy')(config, copyConf);
-  require('./camunda-cockpit-ui/grunt/config/copy')(config, copyConf);
-  require('./camunda-tasklist-ui/grunt/config/copy')(config, copyConf);
+  require('./ui/admin/grunt/config/copy')(config, copyConf);
+  require('./ui/cockpit/grunt/config/copy')(config, copyConf);
+  require('./ui/tasklist/grunt/config/copy')(config, copyConf);
 
   var lessConf = { };
-  require('camunda-commons-ui/grunt/config/less')(config, lessConf, {
+  require('./grunt/config/less')(config, lessConf, {
     appName: 'admin',
     sourceDir: pkg.gruntConfig.adminSourceDir,
     buildTarget: pkg.gruntConfig.adminBuildTarget,
   });
-  require('camunda-commons-ui/grunt/config/less')(config, lessConf, {
+  require('./grunt/config/less')(config, lessConf, {
     appName: 'cockpit',
     sourceDir: pkg.gruntConfig.cockpitSourceDir,
     buildTarget: pkg.gruntConfig.cockpitBuildTarget,
   });
-  require('camunda-commons-ui/grunt/config/less')(config, lessConf, {
+  require('./grunt/config/less')(config, lessConf, {
     appName: 'tasklist',
     sourceDir: pkg.gruntConfig.tasklistSourceDir,
     buildTarget: pkg.gruntConfig.tasklistBuildTarget,
@@ -67,15 +67,15 @@ module.exports = function(grunt) {
     }
   };
   require('./grunt/config/watch')(config, watchConf);
-  require('./camunda-tasklist-ui/grunt/config/watch')(config, watchConf);
-  require('./camunda-cockpit-ui/grunt/config/watch')(config, watchConf);
-  require('./camunda-admin-ui/grunt/config/watch')(config, watchConf);
+  require('./ui/tasklist/grunt/config/watch')(config, watchConf);
+  require('./ui/cockpit/grunt/config/watch')(config, watchConf);
+  require('./ui/admin/grunt/config/watch')(config, watchConf);
 
   var uglifyConf = {};
   require('./grunt/config/uglify')(config, uglifyConf);
-  require('./camunda-admin-ui/grunt/config/uglify')(config, uglifyConf);
-  require('./camunda-tasklist-ui/grunt/config/uglify')(config, uglifyConf);
-  require('./camunda-cockpit-ui/grunt/config/uglify')(config, uglifyConf);
+  require('./ui/admin/grunt/config/uglify')(config, uglifyConf);
+  require('./ui/tasklist/grunt/config/uglify')(config, uglifyConf);
+  require('./ui/cockpit/grunt/config/uglify')(config, uglifyConf);
 
 
   grunt.initConfig({

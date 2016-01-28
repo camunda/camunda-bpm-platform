@@ -1,8 +1,0 @@
-{
-  "globals": {
-  },
-  "browser": false,
-  "node": true,
-  "indent": 2,
-  "strict": true
-}
