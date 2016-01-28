@@ -1,7 +1,7 @@
 {
   "name": "camunda-bpm-webapp",
   "private": true,
-  "version": "7.5.0-alpha1",
+  "version": "7.5.0-SNAPSHOT",
   "gruntConfig": {
     "connectPort": 8020,
     "livereloadPort": 8021,
@@ -16,11 +16,11 @@
     "libTargetDir": "target/webapp/lib"
   },
   "dependencies": {
-    "camunda-admin-ui": "git://github.com/camunda/camunda-admin-ui#7.5.0-alpha1",
-    "camunda-commons-ui": "git://github.com/camunda/camunda-commons-ui#7.5.0-alpha1",
-    "camunda-tasklist-ui": "git://github.com/camunda/camunda-tasklist-ui#7.5.0-alpha1",
-    "camunda-cockpit-ui": "git://github.com/camunda/camunda-cockpit-ui#7.5.0-alpha1",
-    "camunda-bpm-sdk-js": "git://github.com/camunda/camunda-bpm-sdk-js#7.5.0-alpha1",
+    "camunda-admin-ui": "git://github.com/camunda/camunda-admin-ui#master",
+    "camunda-commons-ui": "git://github.com/camunda/camunda-commons-ui#master",
+    "camunda-tasklist-ui": "git://github.com/camunda/camunda-tasklist-ui#master",
+    "camunda-cockpit-ui": "git://github.com/camunda/camunda-cockpit-ui#master",
+    "camunda-bpm-sdk-js": "git://github.com/camunda/camunda-bpm-sdk-js#master",
     "requirejs-angular-define": "git://github.com/camunda/requirejs-angular-define#master",
     "angular": "1.2.29",
     "angular-data-depend": "git://github.com/camunda-third-party/angular-data-depend#8e3b66914c611069e3698fd5d4275e6cf8055d01",
