@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
+import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.history.HistoricIncident;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
@@ -367,6 +368,30 @@ public class ExternalTaskServiceTest extends PluggableProcessEngineTestCase {
         .execute();
 
     assertEquals(1, externalTasks.size());
+  }
+
+  /**
+   * Note: this does not test a hard API guarantee, i.e. the test is stricter than the API (Javadoc).
+   * Its purpose is to ensure that the API implementation is less error-prone to use.
+   *
+   * Bottom line: if there is good reason to change behavior such that this test breaks, it may
+   * be ok to change the test.
+   */
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  public void testFetchAndLockWithInitialBuilder() {
+    // given
+    runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
+
+    // when
+    ExternalTaskQueryBuilder initialBuilder = externalTaskService.fetchAndLock(1, WORKER_ID);
+    initialBuilder.topic(TOPIC_NAME, LOCK_TIME);
+
+    // should execute regardless whether the initial builder is used or the builder returned by the
+    // #topic invocation
+    List<LockedExternalTask> tasks = initialBuilder.execute();
+
+    // then
+    assertEquals(1, tasks.size());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml")

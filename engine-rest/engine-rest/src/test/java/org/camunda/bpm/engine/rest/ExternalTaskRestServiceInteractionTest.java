@@ -78,7 +78,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   protected ExternalTaskService externalTaskService;
 
   protected LockedExternalTask lockedExternalTaskMock;
-  protected ExternalTaskQueryTopicBuilder fetchBuilder;
+  protected ExternalTaskQueryTopicBuilder fetchTopicBuilder;
 
   protected ExternalTask externalTaskMock;
   protected ExternalTaskQuery externalTaskQueryMock;
@@ -92,11 +92,12 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     lockedExternalTaskMock = MockProvider.createMockLockedExternalTask();
 
     // fetching
-    fetchBuilder = mock(ExternalTaskQueryTopicBuilder.class);
-    when(externalTaskService.fetchAndLock(anyInt(), any(String.class))).thenReturn(fetchBuilder);
-    when(fetchBuilder.topic(any(String.class), anyLong())).thenReturn(fetchBuilder);
-    when(fetchBuilder.variables(anyListOf(String.class))).thenReturn(fetchBuilder);
-    when(fetchBuilder.variables(any(String[].class))).thenReturn(fetchBuilder);
+    fetchTopicBuilder = mock(ExternalTaskQueryTopicBuilder.class);
+    when(externalTaskService.fetchAndLock(anyInt(), any(String.class))).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.topic(any(String.class), anyLong())).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.variables(anyListOf(String.class))).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.variables(any(String[].class))).thenReturn(fetchTopicBuilder);
+    when(fetchTopicBuilder.topic(any(String.class), anyLong())).thenReturn(fetchTopicBuilder);
 
     // querying
     externalTaskQueryMock = mock(ExternalTaskQuery.class);
@@ -110,7 +111,7 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
   @Test
   public void testFetchAndLock() {
     // given
-    when(fetchBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
+    when(fetchTopicBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
 
     // when
     Map<String, Object> parameters = new HashMap<String, Object>();
@@ -148,18 +149,18 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
           equalTo("String"))
       .when().post(FETCH_EXTERNAL_TASK_URL);
 
-    InOrder inOrder = inOrder(fetchBuilder, externalTaskService);
+    InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
     inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId");
-    inOrder.verify(fetchBuilder).topic("aTopicName", 12354L);
-    inOrder.verify(fetchBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
-    inOrder.verify(fetchBuilder).execute();
-    verifyNoMoreInteractions(fetchBuilder, externalTaskService);
+    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(fetchTopicBuilder).variables(Arrays.asList(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME));
+    inOrder.verify(fetchTopicBuilder).execute();
+    verifyNoMoreInteractions(fetchTopicBuilder, externalTaskService);
   }
 
   @Test
   public void testFetchWithoutVariables() {
     // given
-    when(fetchBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
+    when(fetchTopicBuilder.execute()).thenReturn(Arrays.asList(lockedExternalTaskMock));
 
     // when
     Map<String, Object> parameters = new HashMap<String, Object>();
@@ -182,11 +183,11 @@ public class ExternalTaskRestServiceInteractionTest extends AbstractRestServiceT
     .when()
       .post(FETCH_EXTERNAL_TASK_URL);
 
-    InOrder inOrder = inOrder(fetchBuilder, externalTaskService);
+    InOrder inOrder = inOrder(fetchTopicBuilder, externalTaskService);
     inOrder.verify(externalTaskService).fetchAndLock(5, "aWorkerId");
-    inOrder.verify(fetchBuilder).topic("aTopicName", 12354L);
-    inOrder.verify(fetchBuilder).execute();
-    verifyNoMoreInteractions(fetchBuilder, externalTaskService);
+    inOrder.verify(fetchTopicBuilder).topic("aTopicName", 12354L);
+    inOrder.verify(fetchTopicBuilder).execute();
+    verifyNoMoreInteractions(fetchTopicBuilder, externalTaskService);
   }
 
   @Test

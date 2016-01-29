@@ -21,7 +21,7 @@ import org.camunda.bpm.engine.impl.cmd.CompleteExternalTaskCmd;
 import org.camunda.bpm.engine.impl.cmd.HandleExternalTaskFailureCmd;
 import org.camunda.bpm.engine.impl.cmd.SetExternalTaskRetriesCmd;
 import org.camunda.bpm.engine.impl.cmd.UnlockExternalTaskCmd;
-import org.camunda.bpm.engine.impl.externaltask.ExternalTaskQueryBuilderImpl;
+import org.camunda.bpm.engine.impl.externaltask.ExternalTaskQueryTopicBuilderImpl;
 
 /**
  * @author Thorben Lindhauer
@@ -30,7 +30,7 @@ import org.camunda.bpm.engine.impl.externaltask.ExternalTaskQueryBuilderImpl;
 public class ExternalTaskServiceImpl extends ServiceImpl implements ExternalTaskService {
 
   public ExternalTaskQueryBuilder fetchAndLock(int maxTasks, String workerId) {
-    return new ExternalTaskQueryBuilderImpl(commandExecutor, workerId, maxTasks);
+    return new ExternalTaskQueryTopicBuilderImpl(commandExecutor, workerId, maxTasks);
   }
 
   public void complete(String externalTaskId, String workerId) {
