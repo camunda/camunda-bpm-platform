@@ -1,12 +1,8 @@
-define([
-  'angular'
-], function(
-  angular
-) {
+'use strict';
 
-  'use strict';
+var angular = require('angular');
 
-  return [
+  module.exports = [
     '$scope',
     '$translate',
     'Notifications',
@@ -66,5 +62,3 @@ define([
     };
 
   }];
-
-});

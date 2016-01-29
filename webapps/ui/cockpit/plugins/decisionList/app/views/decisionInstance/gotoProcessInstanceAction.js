@@ -1,8 +1,10 @@
-/* global ngDefine: false */
-define(['text!./goto-process-instance-action.html'], function(template) {
-  'use strict';
+'use strict';
 
-  return function(ngModule) {
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/goto-process-instance-action.html', 'utf8');
+
+  module.exports = function(ngModule) {
     ngModule.controller('GotoProcessInstanceActionController', [
             '$scope', 'Views',
     function($scope,   Views) {
@@ -40,4 +42,3 @@ define(['text!./goto-process-instance-action.html'], function(template) {
 
     ngModule.config(Configuration);
   };
-});

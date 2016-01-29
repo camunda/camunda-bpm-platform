@@ -1,4 +1,9 @@
-define(['angular', 'text!./job-definition-table.html'], function(angular, template) {
+'use strict';
+
+var fs = require('fs');
+
+var angular = require('angular');
+var template = fs.readFileSync(__dirname + '/job-definition-table.html', 'utf8');
 
   var Controller = [
     '$scope',
@@ -57,5 +62,4 @@ define(['angular', 'text!./job-definition-table.html'], function(angular, templa
 
   Configuration.$inject = ['ViewsProvider'];
 
-  return Configuration;
-});
+  module.exports = Configuration;

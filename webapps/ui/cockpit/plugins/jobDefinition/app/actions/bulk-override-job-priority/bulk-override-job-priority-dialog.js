@@ -1,8 +1,8 @@
-/* global define: false, angular: false */
-define(['angular'], function(angular) {
-  'use strict';
+'use strict';
 
-  return [
+var angular = require('angular');
+
+  module.exports = [
            '$scope', '$q', 'Notifications', 'JobDefinitionResource', '$modalInstance', 'jobDefinitions',
   function ($scope,   $q,   Notifications,   JobDefinitionResource,   $modalInstance,   jobDefinitions) {
 
@@ -13,7 +13,7 @@ define(['angular'], function(angular) {
         FAILED = 'FAILED';
 
     var finishedWithFailures = false;
-    
+
     var summarizePages = $scope.summarizePages = { size: 5, total: jobDefinitions.length, current: 1 };
 
     var data = $scope.data = {
@@ -155,4 +155,3 @@ define(['angular'], function(angular) {
     };
 
   }];
-});

@@ -1,8 +1,11 @@
-/* global define: false */
-define(['angular', 'text!./activity-instance-statistics-overlay.html'], function(angular, template) {
-  'use strict';
+'use strict';
 
-  return [ 'ViewsProvider', function(ViewsProvider) {
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/activity-instance-statistics-overlay.html', 'utf8');
+var angular = require('angular');
+
+  module.exports = [ 'ViewsProvider', function(ViewsProvider) {
 
     ViewsProvider.registerDefaultView('cockpit.processDefinition.diagram.overlay', {
       id: 'activity-instance-statistics-overlay',
@@ -87,4 +90,3 @@ define(['angular', 'text!./activity-instance-statistics-overlay.html'], function
       priority: 20
     });
   }];
-});

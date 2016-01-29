@@ -1,6 +1,8 @@
-define(['text!./job-definition-suspension-overlay.html'], function(template) {
+'use strict';
 
-  'use strict';
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/job-definition-suspension-overlay.html', 'utf8');
 
   var Controller = [ '$scope', function ($scope) {
 
@@ -45,5 +47,4 @@ define(['text!./job-definition-suspension-overlay.html'], function(template) {
 
   Configuration.$inject = ['ViewsProvider'];
 
-  return Configuration;
-});
+  module.exports = Configuration;

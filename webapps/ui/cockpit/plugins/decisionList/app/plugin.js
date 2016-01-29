@@ -1,5 +1,3 @@
-/* global define: false */
-
 /**
  * @namespace cam.cockpit.plugin
  */
@@ -7,10 +5,9 @@
 /**
  * @namespace cam.cockpit.plugin.decisionList
  */
-define(['angular',
-        './views/main'
-], function(angular, viewsModule) {
-  'use strict';
+'use strict';
 
-  return angular.module('cockpit.plugin.decisionList', [viewsModule.name]);
-});
+var angular = require('angular'),
+    viewsModule = require('./views/main');
+
+  module.exports = angular.module('cockpit.plugin.decisionList', [viewsModule.name]);

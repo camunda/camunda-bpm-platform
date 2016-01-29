@@ -8,7 +8,7 @@ define('camunda-cockpit-bootstrap', [
   });
 
   require(['globalize'], function(globalize) {
-    var requirePackages = {};
+    var requirePackages = window;
 
     camundaCockpitUi.exposePackages(requirePackages);
     globalize(require, ['angular', 'camunda-commons-ui', 'camunda-bpm-sdk-js', 'jquery', 'angular-data-depend', 'require-helper'], requirePackages);

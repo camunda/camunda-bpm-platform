@@ -42,15 +42,6 @@ module.exports = function(config, requireJsConf) {
     })
   };
 
-  requireJsConf.webapp_standaloneTask = {
-    options: _.extend({}, options, {
-      out: '<%= pkg.gruntConfig.pluginBuildTarget %>/standaloneTask/app/plugin.js',
-      include: ['tasklist/plugins/standaloneTask/app/plugin'],
-      exclude: ['angular'],
-      insertRequire: ['tasklist/plugins/standaloneTask/app/plugin']
-    })
-  };
-
   requireJsConf.webapp_decisionList = {
     options: _.extend({}, options, {
       out: '<%= pkg.gruntConfig.pluginBuildTarget %>/decisionList/app/plugin.js',

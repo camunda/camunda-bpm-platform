@@ -1,9 +1,12 @@
-/* global define: false, angular: false */
-define(['text!./variable-instance-upload-dialog.html', 'text!./variable-instance-inspect-dialog.html', 'text!./variable-instances-tab.html'],
-function(uploadTemplate, inspectTemplate, instancesTemplate) {
-  'use strict';
+'use strict';
 
-  return function(ngModule) {
+var fs = require('fs');
+
+var uploadTemplate = fs.readFileSync(__dirname + '/variable-instance-upload-dialog.html', 'utf8');
+var inspectTemplate = fs.readFileSync(__dirname + '/variable-instance-inspect-dialog.html', 'utf8');
+var instancesTemplate = fs.readFileSync(__dirname + '/variable-instances-tab.html', 'utf8');
+
+  module.exports = function(ngModule) {
     ngModule.controller('VariableInstancesController', [
               '$scope', '$sce', '$http', 'search', 'Uri', 'LocalExecutionVariableResource', 'Notifications', '$modal', '$q', 'camAPI',
       function($scope,   $sce,   $http,   search,   Uri,   LocalExecutionVariableResource,   Notifications,   $modal,   $q,   camAPI) {
@@ -309,4 +312,3 @@ function(uploadTemplate, inspectTemplate, instancesTemplate) {
       Configuration.$inject = ['ViewsProvider'];
       ngModule.config(Configuration);
   };
-});

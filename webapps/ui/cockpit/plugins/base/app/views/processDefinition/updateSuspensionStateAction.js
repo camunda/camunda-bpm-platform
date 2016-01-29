@@ -1,7 +1,12 @@
-/* global define: false, angular: false */
-define(['angular', 'text!./update-suspension-state-action.html', 'text!./update-suspension-state-dialog.html'], function(angular, actionTemplate, dialogTemplate) {
-  'use strict';
-  return ['ViewsProvider', function(ViewsProvider) {
+'use strict';
+
+var fs = require('fs');
+
+var actionTemplate = fs.readFileSync(__dirname + '/update-suspension-state-action.html', 'utf8');
+var dialogTemplate = fs.readFileSync(__dirname + '/update-suspension-state-dialog.html', 'utf8');
+var angular = require('angular');
+
+  module.exports = ['ViewsProvider', function(ViewsProvider) {
     ViewsProvider.registerDefaultView('cockpit.processDefinition.runtime.action', {
       id: 'update-suspension-state-action',
       label: 'Update Suspension State',
@@ -38,4 +43,3 @@ define(['angular', 'text!./update-suspension-state-action.html', 'text!./update-
       priority: 50
     });
   }];
-});

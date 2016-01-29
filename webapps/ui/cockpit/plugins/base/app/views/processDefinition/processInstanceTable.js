@@ -1,12 +1,11 @@
-/* global define: false, angular: false */
-define([
-  'angular',
-  'text!./process-instance-table.html'
-],
-function(angular, template) {
-  'use strict';
+'use strict';
 
-  return [ 'ViewsProvider', function(ViewsProvider) {
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/process-instance-table.html', 'utf8');
+var angular = require('angular');
+
+  module.exports = [ 'ViewsProvider', function(ViewsProvider) {
 
     ViewsProvider.registerDefaultView('cockpit.processDefinition.runtime.tab', {
       id: 'process-instances-table',
@@ -111,4 +110,3 @@ function(angular, template) {
       priority: 10
     });
   }];
-});

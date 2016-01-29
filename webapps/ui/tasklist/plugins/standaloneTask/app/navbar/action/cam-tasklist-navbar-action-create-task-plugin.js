@@ -1,11 +1,9 @@
-define([
-  'text!./cam-tasklist-navbar-action-create-task-plugin.html',
-  'text!./modals/cam-tasklist-create-task-modal.html'
-], function(
-  createTaskActionTemplate,
-  createTaskModalTemplate
-) {
-  'use strict';
+'use strict';
+
+var fs = require('fs');
+
+var createTaskActionTemplate = fs.readFileSync(__dirname + '/cam-tasklist-navbar-action-create-task-plugin.html', 'utf8');
+var createTaskModalTemplate = fs.readFileSync(__dirname + '/modals/cam-tasklist-create-task-modal.html', 'utf8');
 
   var Controller = [
    '$scope',
@@ -41,6 +39,4 @@ define([
 
   Configuration.$inject = ['ViewsProvider'];
 
-  return Configuration;
-
-});
+  module.exports = Configuration;

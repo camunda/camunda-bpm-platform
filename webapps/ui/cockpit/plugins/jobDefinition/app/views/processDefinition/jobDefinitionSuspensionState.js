@@ -1,8 +1,8 @@
-/* global define: false */
-define(['angular'], function(angular) {
-  'use strict';
+'use strict';
 
-  return [
+var angular = require('angular');
+
+  module.exports = [
           '$scope', '$http', '$filter', 'Uri', 'Notifications', '$modalInstance', 'jobDefinition',
   function($scope,   $http,   $filter,   Uri,   Notifications,   $modalInstance,   jobDefinition) {
 
@@ -76,5 +76,3 @@ define(['angular'], function(angular) {
     };
 
   }];
-});
-

@@ -1,9 +1,6 @@
-/* global define: false */
-define([],
-function() {
   'use strict';
 
-  return [ 'ViewsProvider', function(ViewsProvider) {
+  module.exports = [ 'ViewsProvider', function(ViewsProvider) {
 
     ViewsProvider.registerDefaultView('cockpit.decisionInstance.table', {
       id: 'realInput',
@@ -49,4 +46,3 @@ function() {
       }
     });
   }];
-});

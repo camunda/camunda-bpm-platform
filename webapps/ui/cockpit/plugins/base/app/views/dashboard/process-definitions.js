@@ -1,11 +1,10 @@
-define([
-  'text!./process-definitions.html'
-], function(
-  template
-) {
-  'use strict';
+'use strict';
 
-  return [ 'ViewsProvider', function (ViewsProvider) {
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/process-definitions.html', 'utf8');
+
+  module.exports = [ 'ViewsProvider', function (ViewsProvider) {
     ViewsProvider.registerDefaultView('cockpit.dashboard', {
       id: 'process-definition',
       label: 'Deployed Process Definitions',
@@ -40,4 +39,3 @@ define([
       priority: 0
     });
   }];
-});

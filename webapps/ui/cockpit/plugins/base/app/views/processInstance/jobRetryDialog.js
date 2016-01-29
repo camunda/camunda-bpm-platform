@@ -1,8 +1,6 @@
-/* global define: false */
-define([], function() {
   'use strict';
 
-  return [
+  module.exports = [
            '$scope', '$location', 'Notifications', 'JobResource', '$modalInstance', 'incident',
   function ($scope,   $location,   Notifications,   JobResource,   $modalInstance,   incident) {
 
@@ -43,4 +41,3 @@ define([], function() {
       $modalInstance.close(status);
     };
   }];
-});

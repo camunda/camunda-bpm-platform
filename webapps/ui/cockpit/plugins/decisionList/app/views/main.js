@@ -1,39 +1,23 @@
-/* global define: false */
+'use strict';
 
-/**
- * @namespace cam.cockpit.plugin.base.views
- */
-define([
-  'angular',
+var angular = require('angular'),
 
-  // dashboard
-  './dashboard/decision-list',
+    // dashboard
+    decisionList = require('./dashboard/decision-list'),
 
-  // decision definition
-  './decisionDefinition/decisionInstanceTable',
+    // decision definition
+    decisionInstanceTable = require('./decisionDefinition/decisionInstanceTable'),
 
-  // decision instance
-  './decisionInstance/inputTable',
-  './decisionInstance/outputTable',
-  './decisionInstance/gotoProcessInstanceAction',
+    // decision instance
+    inputTable = require('./decisionInstance/inputTable'),
+    outputTable = require('./decisionInstance/outputTable'),
+    gotoProcessInstanceAction = require('./decisionInstance/gotoProcessInstanceAction'),
 
-  // decision instance table
-  './decisionInstance/highlightRules',
-  './decisionInstance/realInput',
-  './decisionInstance/realOutput'
+    // decision instance table
+    highlightRules = require('./decisionInstance/highlightRules'),
+    realInput = require('./decisionInstance/realInput'),
+    realOutput = require('./decisionInstance/realOutput');
 
-], function(
-  angular,
-  decisionList,
-  decisionInstanceTable,
-  inputTable,
-  outputTable,
-  gotoProcessInstanceAction,
-  highlightRules,
-  realInput,
-  realOutput) {
-
-  'use strict';
   var ngModule = angular.module('cockpit.plugin.decisionList.views', []);
 
   ngModule.config(decisionList);
@@ -46,5 +30,4 @@ define([
 
   gotoProcessInstanceAction(ngModule);
 
-  return ngModule;
-});
+  module.exports = ngModule;

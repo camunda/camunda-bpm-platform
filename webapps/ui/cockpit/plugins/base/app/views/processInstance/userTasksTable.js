@@ -1,8 +1,12 @@
-/* global define: false, angular: false, require: false */
-define(['angular', 'text!./identity-links-modal.html', 'text!./user-tasks-table.html'], function(angular, identityLinksTemplate, userTasksTemplate) {
-  'use strict';
+'use strict';
 
-  return function(ngModule) {
+var fs = require('fs');
+
+var identityLinksTemplate = fs.readFileSync(__dirname + '/identity-links-modal.html', 'utf8');
+var userTasksTemplate = fs.readFileSync(__dirname + '/user-tasks-table.html', 'utf8');
+var angular = require('angular');
+
+  module.exports = function(ngModule) {
 
     /**
      * @name userTaskTable
@@ -376,4 +380,3 @@ define(['angular', 'text!./identity-links-modal.html', 'text!./user-tasks-table.
     ngModule.config(Configuration);
 
   };
-});

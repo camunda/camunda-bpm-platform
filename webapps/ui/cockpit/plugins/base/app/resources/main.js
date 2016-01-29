@@ -1,13 +1,12 @@
-define(['angular',
-       './processDefinition',
-       './processInstance'],
-function(angular,
-         processDefinition,
-         processInstance) {
+'use strict';
+
+var angular = require('angular'),
+    processDefinition = require('./processDefinition'),
+    processInstance = require('./processInstance');
+
   var ngModule = angular.module('cockpit.plugin.base.resources', []);
 
   ngModule.factory('PluginProcessDefinitionResource', processDefinition);
   ngModule.factory('PluginProcessInstanceResource', processInstance);
 
-  return ngModule;
-});
+  module.exports = ngModule;
