@@ -1,57 +1,47 @@
 # camunda Webapp
 
-This is the camunda BPM webapplication backend and assembly.
+This is the camunda BPM webapplication source.
 Clean, package and install it via [Maven](https://maven.apache.org/).
 
 ## Structure of this project
 
 The structure is as follows:
 
-* `core` - camunda core application and plugin infrastructure
-* `webapp` - camunda web application
-* `webjar` - stripped down webjar for use in embedded containers (like spring boot)
-* `distro/{container}` - projects that produce camunda web application for the different bpm platform containers
+* `ui` - HTML, CSS and Javascript sources as well as plugins and test for the Camunda webapplications Cockpit, Tasklist and Admin.
+* `src` - Java sources and tests for the Camunda webapplication.
 
-## Webapps
 
-They are 3 webapps available for the camunda BPM platform, they are:
+## UI
 
-* [__cockpit__](#cockpit): is an administration interface for the processes
-* [__tasklist__](#tasklist): provides an interface to process user tasks
-* [__admin__](#admin): is used to administer users, groups and their authorizations
+There are 3 webapplications available for the camunda BPM platform:
+
+* __cockpit__: an administration interface for processes and decisions
+* __tasklist__: provides an interface to process user tasks
+* __admin__: is used to administer users, groups and their authorizations
 
 The webapps above are relying on 2 libraries:
 
-* [__JS SDK__](#js-sdk): provides tools for developers who want interact with the platform using Javascript
-* [__commons__](#commons-ui): is a set of shared scripts, templates and assets, used in the different webapps
-
-### Cockpit
-
+* __camunda-bpm-sdk-js__: provides tools for developers who want interact with the platform using Javascript
+* __camunda-commons-ui__: is a set of shared scripts, templates and assets, used in the different webapps
 
 
 #### Plugins
 
-Parts of the cockpit application may be extended using plugins.
-The aim of these plugins is to provide the application with additional views on process engines provided by a camunda BPM platform installation.
+Parts of the webapplications can be extended using plugins.
 
 See [plugin development guide](http://docs.camunda.org/latest/real-life/how-to/#cockpit-how-to-develop-a-cockpit-plugin) for details.
-
-### Tasklist
-
-
-
-### Admin
 
 
 ## Libraries
 
-### [JS SDK](https://github.com/camunda/camunda-bpm-sdk-js)
+### [camunda-bpm-sdk-js](https://github.com/camunda/camunda-bpm-sdk-js)
 
 Has tools to work with the REST API and forms.
 
-### [Commons](https://github.com/camunda/camunda-commons-ui)
+### [camunda-commons-ui](https://github.com/camunda/camunda-commons-ui)
 
 Contains resources like images, [`.less`](http://lesscss.org) stylesheets as well as some [angular.js](http://angularjs.org) modules and locales for the translation of the Tasklist interface texts.
+
 
 ## Development
 
@@ -73,54 +63,31 @@ Installing the webapps is done by grunt:
 ```sh
 # cd <path to your workspace>
 git clone git@github.com:camunda/camunda-bpm-webapp.git
-cd camunda-bpm-webapp/webapp
+cd camunda-bpm-webapp
 npm install
 grunt
 ```
 
-#### Development Setup
-
-In order to make changes to the webapps, you have to clone the repositories you need:
-
-```sh
-# cd <path to your workspace>
-
-git clone git@github.com:camunda/camunda-bpm-webapp.git
-git clone git@github.com:camunda/camunda-commons-ui.git
-git clone git@github.com:camunda/camunda-bpm-sdk-js.git
-git clone git@github.com:camunda/camunda-tasklist-ui.git
-git clone git@github.com:camunda/camunda-admin-ui.git
-git clone git@github.com:camunda/camunda-cockpit-ui.git
-```
-
-You can then link the projects so that changes are automatically picked up by the server. This example shows how to link the cockpit webapp:
-
-```sh
-# cd <path to your workspace>
-
-cd camunda-cockpit-ui
-npm link
-
-cd ../camunda-bpm-webapp/webapp
-npm link camunda-cockpit-ui
-```
-
-If you want to make changes in the camunda-commons-ui project or the camunda-bpm-sdk-js, you have to link the projects to the webapps itself (i.e. camunda-cockpit-ui --> camunda-commons-ui --> camunda-bpm-sdk-js).
-
 To start the server in development mode, call
 
 ```sh
-cd camunda-bpm-webapp/webapp
-mvn clean jetty:run -Pdevelop
+mvn jetty:run -Pdevelop
 ```
 The webapps are then available pointing a browser at [http://localhost:8080](http://localhost:8080)
 
 You can now start developing using the `grunt auto-build` command in the webapp directory. To shorten compile times, you can specify the project you are going to make changes to by calling `grunt auto-build:cockpit`
 
-If you do not want the server to perform a frontend build on startup, because you are running your own grunt build during development, you can start the server with
+
+If you want to make changes in the camunda-commons-ui project or the camunda-bpm-sdk-js, you have to link the projects to the camunda-bpm-webapp:
 
 ```sh
-mvn jetty:run -Pdevelop,skipFrontendBuild
+# cd <path to your workspace>
+git clone git@github.com:camunda/camunda-commons-ui.git
+cd camunda-commons-ui
+npm install
+npm link
+cd ../camunda-bpm-webapp
+npm link camunda-commons-ui
 ```
 
 
