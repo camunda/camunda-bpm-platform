@@ -1932,7 +1932,7 @@ public class BpmnParse extends Parse {
         parseEmailServiceTask(activity, serviceTaskElement, parseFieldDeclarations(serviceTaskElement));
       } else if (type.equalsIgnoreCase("shell")) {
         parseShellServiceTask(activity, serviceTaskElement, parseFieldDeclarations(serviceTaskElement));
-      } else if (type.equalsIgnoreCase("external")) {
+      } else if (isExternalTaskType(type)) {
         parseExternalServiceTask(activity, serviceTaskElement);
       } else {
         addError("Invalid usage of type attribute on " + elementName + ": '" + type + "'", serviceTaskElement);
@@ -4065,7 +4065,12 @@ public class BpmnParse extends Parse {
 
     return element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "class") != null
         || element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "expression") != null
-        || element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "delegateExpression") != null;
+        || element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "delegateExpression") != null
+        || isExternalTaskType(element.attributeNS(CAMUNDA_BPMN_EXTENSIONS_NS, "type"));
+  }
+
+  protected boolean isExternalTaskType(String type) {
+    return "external".equalsIgnoreCase(type);
   }
 
   public Map<String, List<JobDeclaration<?, ?>>> getJobDeclarations() {
