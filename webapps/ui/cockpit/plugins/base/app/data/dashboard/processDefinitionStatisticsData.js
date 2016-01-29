@@ -1,4 +1,6 @@
-define(['angular'], function(angular) {
+'use strict';
+
+var angular = require('angular');
 
   var Controller = [ '$scope', 'processData', 'ProcessDefinitionResource',
       function ($scope, processData, ProcessDefinitionResource) {
@@ -114,5 +116,4 @@ define(['angular'], function(angular) {
 
   Configuration.$inject = ['DataProvider'];
 
-  return Configuration;
-});
+  module.exports = Configuration;

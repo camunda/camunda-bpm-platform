@@ -1,4 +1,4 @@
-define([], function() {
+'use strict';
 
   var Controller = [ '$scope', 'processData', 'ProcessDefinitionResource',
       function ($scope, processData, ProcessDefinitionResource) {
@@ -19,5 +19,4 @@ define([], function() {
 
   Configuration.$inject = ['DataProvider'];
 
-  return Configuration;
-});
+  module.exports = Configuration;

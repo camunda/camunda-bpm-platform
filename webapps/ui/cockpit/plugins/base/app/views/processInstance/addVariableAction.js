@@ -1,6 +1,11 @@
-/* global define: false, angular: false */
-define(['angular', 'text!./add-variable-action.html', 'text!./add-variable-dialog.html'], function(angular, actionTemplate, dialogTemplate) {
-  'use strict';
+'use strict';
+
+var fs = require('fs');
+
+var actionTemplate = fs.readFileSync(__dirname + '/add-variable-action.html', 'utf8');
+var dialogTemplate = fs.readFileSync(__dirname + '/add-variable-dialog.html', 'utf8');
+var angular = require('angular');
+
   var Configuration = function PluginConfiguration(ViewsProvider) {
     ViewsProvider.registerDefaultView('cockpit.processInstance.runtime.action', {
       id: 'add-variable-action',
@@ -36,5 +41,4 @@ define(['angular', 'text!./add-variable-action.html', 'text!./add-variable-dialo
 
   Configuration.$inject = ['ViewsProvider'];
 
-  return Configuration;
-});
+  module.exports = Configuration;

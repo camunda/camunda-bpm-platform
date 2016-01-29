@@ -1,6 +1,10 @@
-/* global define: false, angular: false */
-define(['angular', 'text!./suspension-state-action.html', 'text!./job-definition-suspension-state-dialog.html'], function(angular, actionTemplate, dialogTemplate) {
-  'use strict';
+'use strict';
+
+var fs = require('fs');
+
+var angular = require('angular');
+var actionTemplate = fs.readFileSync(__dirname + '/suspension-state-action.html', 'utf8');
+var dialogTemplate = fs.readFileSync(__dirname + '/job-definition-suspension-state-dialog.html', 'utf8');
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
     ViewsProvider.registerDefaultView('cockpit.jobDefinition.action', {
@@ -40,5 +44,4 @@ define(['angular', 'text!./suspension-state-action.html', 'text!./job-definition
 
   Configuration.$inject = ['ViewsProvider'];
 
-  return Configuration;
-});
+  module.exports = Configuration;

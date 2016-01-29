@@ -1,69 +1,38 @@
-/* global define: false */
-
 /**
  * @namespace cam.cockpit.plugin.base.views
  */
-define([
-  'angular',
+'use strict';
 
-  // dashboard
-  './dashboard/process-definitions',
+var angular = require('angular'),
 
-  // process definition
-  './processDefinition/processInstanceTable',
-  './processDefinition/calledProcessDefinitionTable',
-  './processDefinition/updateSuspensionStateAction',
-  './processDefinition/updateSuspensionStateDialog',
-  './processDefinition/activityInstanceStatisticsOverlay',
+    // dashboard
+    processDefinitions = require('./dashboard/process-definitions'),
 
-  // process instance
-  './processInstance/variableInstancesTab',
-  './processInstance/variableInstanceUploadDialog',
-  './processInstance/variableInstanceInspectDialog',
-  './processInstance/incidentsTab',
-  './processInstance/calledProcessInstanceTable',
-  './processInstance/userTasksTable',
-  './processInstance/jobRetryBulkAction',
-  './processInstance/jobRetryBulkDialog',
-  './processInstance/jobRetryDialog',
-  './processInstance/cancelProcessInstanceAction',
-  './processInstance/cancelProcessInstanceDialog',
-  './processInstance/addVariableAction',
-  './processInstance/addVariableDialog',
-  './processInstance/updateSuspensionStateAction',
-  './processInstance/updateSuspensionStateDialog',
-  './processInstance/activityInstanceStatisticsOverlay'
-], function(
-  angular,
+    // process definition
+    processInstanceTable = require('./processDefinition/processInstanceTable'),
+    calledProcessDefinitionTable = require('./processDefinition/calledProcessDefinitionTable'),
+    updateSuspensionStateAction = require('./processDefinition/updateSuspensionStateAction'),
+    updateSuspensionStateDialog = require('./processDefinition/updateSuspensionStateDialog'),
+    activityInstanceStatisticsOverlay = require('./processDefinition/activityInstanceStatisticsOverlay'),
 
-  // dashboard
-  processDefinitions,
+    // process instance
+    variableInstancesTab = require('./processInstance/variableInstancesTab'),
+    variableInstanceUploadDialog = require('./processInstance/variableInstanceUploadDialog'),
+    variableInstanceInspectDialog = require('./processInstance/variableInstanceInspectDialog'),
+    incidentsTab = require('./processInstance/incidentsTab'),
+    calledProcessInstanceTable = require('./processInstance/calledProcessInstanceTable'),
+    userTasksTable = require('./processInstance/userTasksTable'),
+    jobRetryBulkAction = require('./processInstance/jobRetryBulkAction'),
+    jobRetryBulkDialog = require('./processInstance/jobRetryBulkDialog'),
+    jobRetryDialog = require('./processInstance/jobRetryDialog'),
+    cancelProcessInstanceAction = require('./processInstance/cancelProcessInstanceAction'),
+    cancelProcessInstanceDialog = require('./processInstance/cancelProcessInstanceDialog'),
+    addVariableAction = require('./processInstance/addVariableAction'),
+    addVariableDialog = require('./processInstance/addVariableDialog'),
+    updateSuspensionStateActionPI = require('./processInstance/updateSuspensionStateAction'),
+    updateSuspensionStateDialogPI = require('./processInstance/updateSuspensionStateDialog'),
+    activityInstanceStatisticsOverlayPI = require('./processInstance/activityInstanceStatisticsOverlay');
 
-  // process definition
-  processInstanceTable,
-  calledProcessDefinitionTable,
-  updateSuspensionStateAction,
-  updateSuspensionStateDialog,
-  activityInstanceStatisticsOverlay,
-
-  // process instance
-  variableInstancesTab,
-  variableInstanceUploadDialog,
-  variableInstanceInspectDialog,
-  incidentsTab,
-  calledProcessInstanceTable,
-  userTasksTable,
-  jobRetryBulkAction,
-  jobRetryBulkDialog,
-  jobRetryDialog,
-  cancelProcessInstanceAction,
-  cancelProcessInstanceDialog,
-  addVariableAction,
-  addVariableDialog,
-  updateSuspensionStateActionPI,
-  updateSuspensionStateDialogPI,
-  activityInstanceStatisticsOverlayPI) {
-  'use strict';
   var ngModule = angular.module('cockpit.plugin.base.views', []);
 
   ngModule.config(processDefinitions);
@@ -91,5 +60,4 @@ define([
   ngModule.controller('UpdateProcessInstanceSuspensionStateController', updateSuspensionStateDialogPI);
   ngModule.config(activityInstanceStatisticsOverlayPI);
 
-  return ngModule;
-});
+  module.exports = ngModule;

@@ -1,8 +1,11 @@
-/* global ngDefine: false */
-define(['text!./cancel-process-instance-dialog.html', 'text!./cancel-process-instance-action.html'], function(dialogTemplate, actionTemplate) {
-  'use strict';
+'use strict';
 
-  return function(ngModule) {
+var fs = require('fs');
+
+var dialogTemplate = fs.readFileSync(__dirname + '/cancel-process-instance-dialog.html', 'utf8');
+var actionTemplate = fs.readFileSync(__dirname + '/cancel-process-instance-action.html', 'utf8');
+
+  module.exports = function(ngModule) {
     ngModule.controller('CancelProcessInstanceActionController', [
             '$scope', '$http', 'search', 'Uri', '$modal',
     function($scope,   $http,   search,   Uri,   $modal) {
@@ -33,4 +36,3 @@ define(['text!./cancel-process-instance-dialog.html', 'text!./cancel-process-ins
 
     ngModule.config(Configuration);
   };
-});

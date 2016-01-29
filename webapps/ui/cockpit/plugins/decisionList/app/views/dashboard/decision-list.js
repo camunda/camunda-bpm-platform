@@ -1,11 +1,10 @@
-define([
-  'text!./decision-list.html'
-], function(
-  template
-) {
-  'use strict';
+'use strict';
 
-  return [ 'ViewsProvider', function (ViewsProvider) {
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/decision-list.html', 'utf8');
+
+  module.exports = [ 'ViewsProvider', function (ViewsProvider) {
     ViewsProvider.registerDefaultView('cockpit.dashboard', {
       id: 'decision-list',
       label: 'Deployed Decision Tables',
@@ -35,4 +34,3 @@ define([
       priority: -5 // display below the process definition list
     });
   }];
-});

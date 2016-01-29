@@ -1,6 +1,10 @@
-/* global define: false, angular: false */
-define(['angular', 'text!./bulk-override-job-priority-action.html', 'text!./bulk-override-job-priority-dialog.html'], function(angular, actionTemplate, dialogTemplate) {
-  'use strict';
+'use strict';
+
+var fs = require('fs');
+
+var angular = require('angular');
+var actionTemplate = fs.readFileSync(__dirname + '/bulk-override-job-priority-action.html', 'utf8');
+var dialogTemplate = fs.readFileSync(__dirname + '/bulk-override-job-priority-dialog.html', 'utf8');
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
     ViewsProvider.registerDefaultView('cockpit.processDefinition.runtime.action', {
@@ -41,5 +45,4 @@ define(['angular', 'text!./bulk-override-job-priority-action.html', 'text!./bulk
 
   Configuration.$inject = ['ViewsProvider'];
 
-  return Configuration;
-});
+  module.exports = Configuration;

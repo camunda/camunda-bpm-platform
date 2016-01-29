@@ -1,7 +1,5 @@
-/* global define: false */
-define([], function() {
   'use strict';
-  return [
+  module.exports = [
           '$scope', '$location', 'Notifications', 'ProcessInstanceResource', '$modalInstance', 'processInstance', 'processData', 'Views',
   function($scope,   $location,   Notifications,   ProcessInstanceResource,   $modalInstance,   processInstance,   processData,   Views) {
 
@@ -88,4 +86,3 @@ define([], function() {
       }
     };
   }];
-});

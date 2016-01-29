@@ -1,6 +1,10 @@
-/* global define: false, angular: false */
-define(['angular', 'text!./update-suspension-state-action.html', 'text!./update-suspension-state-dialog.html'], function(angular, actionTemplate, dialogTemplate) {
-  'use strict';
+'use strict';
+
+var fs = require('fs');
+
+var actionTemplate = fs.readFileSync(__dirname + '/update-suspension-state-action.html', 'utf8');
+var dialogTemplate = fs.readFileSync(__dirname + '/update-suspension-state-dialog.html', 'utf8');
+var angular = require('angular');
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
     ViewsProvider.registerDefaultView('cockpit.processInstance.runtime.action', {
@@ -41,6 +45,4 @@ define(['angular', 'text!./update-suspension-state-action.html', 'text!./update-
 
   Configuration.$inject = ['ViewsProvider'];
 
-  return Configuration;
-
-});
+  module.exports = Configuration;

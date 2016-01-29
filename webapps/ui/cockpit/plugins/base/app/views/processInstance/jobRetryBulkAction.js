@@ -1,8 +1,11 @@
-/* global define: false */
-define(['text!./job-retry-bulk-dialog.html', 'text!./job-retry-bulk-action.html'], function(dialogTemplate, actionTemplate) {
-  'use strict';
+'use strict';
 
-  return function(ngModule) {
+var fs = require('fs');
+
+var dialogTemplate = fs.readFileSync(__dirname + '/job-retry-bulk-dialog.html', 'utf8');
+var actionTemplate = fs.readFileSync(__dirname + '/job-retry-bulk-action.html', 'utf8');
+
+  module.exports = function(ngModule) {
     ngModule.controller('JobRetryActionController', [
               '$scope', '$modal',
       function($scope,   $modal) {
@@ -33,5 +36,3 @@ define(['text!./job-retry-bulk-dialog.html', 'text!./job-retry-bulk-action.html'
 
       ngModule.config(Configuration);
   };
-
-});

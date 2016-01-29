@@ -1,6 +1,10 @@
-/* global define: false, angular: false */
-define(['angular', 'text!./incidents-tab.html', 'text!./job-retry-dialog.html'], function(angular, incidentsTemplate, retryTemplate) {
-  'use strict';
+'use strict';
+
+var fs = require('fs');
+
+var angular = require('angular');
+var incidentsTemplate = fs.readFileSync(__dirname + '/incidents-tab.html', 'utf8');
+var retryTemplate = fs.readFileSync(__dirname + '/job-retry-dialog.html', 'utf8');
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
     ViewsProvider.registerDefaultView('cockpit.processInstance.runtime.tab', {
@@ -120,5 +124,4 @@ define(['angular', 'text!./incidents-tab.html', 'text!./job-retry-dialog.html'],
 
   Configuration.$inject = ['ViewsProvider'];
 
-  return Configuration;
-});
+  module.exports = Configuration;

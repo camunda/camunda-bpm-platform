@@ -14,19 +14,12 @@ module.exports = function(grunt) {
   config.pkg = pkg;
   config.protractorConfig = protractorConfig;
 
-  var requireJsConf = {
-    options: {
-      optimize: '<%= (buildMode === "prod" ? "uglify2" : "none") %>',
-    }
-  };
-
   var browserifyConf = { };
 
+  require('./grunt/config/browserify')(config, browserifyConf);
   require('./ui/admin/grunt/config/browserify')(config, browserifyConf);
   require('./ui/tasklist/grunt/config/browserify')(config, browserifyConf);
   require('./ui/cockpit/grunt/config/browserify')(config, browserifyConf);
-
-  require('./grunt/config/requirejs')(config, requireJsConf);
 
   var copyConf = require('./grunt/config/copy');
   require('./ui/admin/grunt/config/copy')(config, copyConf);
@@ -83,8 +76,6 @@ module.exports = function(grunt) {
 
     pkg:              pkg,
 
-    requirejs:        requireJsConf,
-
     browserify:       browserifyConf,
 
     copy:             copyConf,
@@ -126,7 +117,6 @@ module.exports = function(grunt) {
 
     var tasksToRun = [
       'clean',
-      'requirejs',
       'browserify',
       'copy',
       'less'

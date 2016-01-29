@@ -1,6 +1,9 @@
-/* global define: false */
-define(['angular', 'text!./activity-instance-statistics-overlay.html'], function(angular, template) {
-  'use strict';
+'use strict';
+
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/activity-instance-statistics-overlay.html', 'utf8');
+var angular = require('angular');
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
 
@@ -100,5 +103,4 @@ define(['angular', 'text!./activity-instance-statistics-overlay.html'], function
 
   Configuration.$inject = ['ViewsProvider'];
 
-  return Configuration;
-});
+  module.exports = Configuration;

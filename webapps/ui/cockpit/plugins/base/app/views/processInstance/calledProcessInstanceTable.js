@@ -1,8 +1,11 @@
-/* global define: false, angular: false */
-define(['angular', 'text!./called-process-instance-table.html'], function(angular, template) {
-  'use strict';
+'use strict';
 
-  return function(ngModule) {
+var fs = require('fs');
+
+var template = fs.readFileSync(__dirname + '/called-process-instance-table.html', 'utf8');
+var angular = require('angular');
+
+  module.exports = function(ngModule) {
     ngModule.controller('CalledProcessInstanceController', [
               '$scope', 'PluginProcessInstanceResource',
       function($scope,   PluginProcessInstanceResource) {
@@ -64,4 +67,3 @@ define(['angular', 'text!./called-process-instance-table.html'], function(angula
 
       ngModule.config(Configuration);
   };
-});

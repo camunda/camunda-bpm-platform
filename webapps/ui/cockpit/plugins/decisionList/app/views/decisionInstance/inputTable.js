@@ -1,12 +1,11 @@
-/* global define: false, angular: false */
-define([
-  'angular',
-  'text!./variable-table.html'
-],
-function(angular, template) {
-  'use strict';
+'use strict';
 
-  return [ 'ViewsProvider', function(ViewsProvider) {
+var fs = require('fs');
+
+var angular = require('angular');
+var template = fs.readFileSync(__dirname + '/variable-table.html', 'utf8');
+
+  module.exports = [ 'ViewsProvider', function(ViewsProvider) {
 
     ViewsProvider.registerDefaultView('cockpit.decisionInstance.tab', {
       id: 'decision-input-table',
@@ -30,4 +29,4 @@ function(angular, template) {
       priority: 20
     });
   }];
-});
+

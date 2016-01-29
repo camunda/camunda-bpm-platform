@@ -8,6 +8,7 @@ var sdk = require('camunda-bpm-sdk-js/lib/angularjs/index');
 require('angular-data-depend');
 
 var angular = require('angular');
+var dataDepend = require('angular-data-depend');
 
   /**
    * @namespace cam
@@ -88,8 +89,10 @@ var angular = require('angular');
 
   module.exports.exposePackages = function(container) {
     container.angular = angular;
+    container.jquery = $;
     container['camunda-commons-ui'] = commons;
     container['camunda-bpm-sdk-js'] = sdk;
+    container['angular-data-depend'] = dataDepend;
   };
 
   /* live-reload

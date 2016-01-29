@@ -24,15 +24,6 @@ module.exports = function(config, watchConf) {
       'requirejs:webapp_jobDefinition'
     ]
   };
-  watchConf.webapp_standaloneTask = {
-    options: options,
-    files: [
-      '<%= pkg.gruntConfig.pluginSourceDir %>/standaloneTask/**/*.*'
-    ],
-    tasks: [
-      'requirejs:webapp_standaloneTask'
-    ]
-  };
 
   watchConf.webapp_decisionList = {
     options: options,

@@ -11,10 +11,10 @@ define('camunda-tasklist-bootstrap', [
   });
 
   require(['globalize'], function(globalize) {
-    var requirePackages = {};
+    var requirePackages = window;
 
     camundaTasklistUi.exposePackages(requirePackages);
-    globalize(require, ['angular', 'camunda-commons-ui', 'camunda-bpm-sdk-js'], requirePackages);
+    globalize(require, ['angular', 'camunda-commons-ui', 'camunda-bpm-sdk-js', 'jquery', 'angular-data-depend'], requirePackages);
 
     var pluginPackages = window.PLUGIN_PACKAGES || [];
     var pluginDependencies = window.PLUGIN_DEPENDENCIES || [];
