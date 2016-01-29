@@ -79,10 +79,16 @@ public interface DelegateExecution extends BaseDelegateExecution, BpmnModelExecu
    * @return the super execution or null.
    */
   DelegateExecution getSuperExecution();
-  
+
   /**
    * Returns whether this execution has been canceled.
    */
   boolean isCanceled();
+
+  /**
+   * Return the id of the tenant this execution belongs to. Can be <code>null</code>
+   * if the execution belongs to no single tenant.
+   */
+  String getTenantId();
 
 }

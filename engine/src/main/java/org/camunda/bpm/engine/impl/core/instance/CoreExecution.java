@@ -40,6 +40,8 @@ public abstract class CoreExecution extends AbstractVariableScope implements Bas
    */
   protected String businessKey;
 
+  protected String tenantId;
+
   // events ///////////////////////////////////////////////////////////////////
 
   protected String eventName;
@@ -109,6 +111,14 @@ public abstract class CoreExecution extends AbstractVariableScope implements Bas
 
   public void setBusinessKey(String businessKey) {
     this.businessKey = businessKey;
+  }
+
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
   }
 
   public boolean isSkipCustomListeners() {

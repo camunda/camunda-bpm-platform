@@ -131,8 +131,6 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   protected boolean shouldQueryForSubCaseInstance = false;
 
-  protected String tenantId;
-
   // associated entities /////////////////////////////////////////////////////
 
   // (we cache associated entities here to minimize db queries)
@@ -1562,14 +1560,6 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
   public boolean isSuspended() {
     return suspensionState == SuspensionState.SUSPENDED.getStateCode();
-  }
-
-  public String getTenantId() {
-    return tenantId;
-  }
-
-  public void setTenantId(String tenantId) {
-    this.tenantId = tenantId;
   }
 
   @Override
