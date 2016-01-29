@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.rest.helper;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
@@ -40,6 +39,7 @@ public class MockVariableInstanceBuilder {
   protected String caseExecutionId;
   protected String taskId;
   protected String activityInstanceId;
+  protected String tenantId;
   protected String errorMessage;
 
   public MockVariableInstanceBuilder id(String id) {
@@ -87,6 +87,11 @@ public class MockVariableInstanceBuilder {
     return this;
   }
 
+  public MockVariableInstanceBuilder tenantId(String tenantId) {
+    this.tenantId = tenantId;
+    return this;
+  }
+
   public MockVariableInstanceBuilder errorMessage(String errorMessage) {
     this.errorMessage = errorMessage;
     return this;
@@ -130,6 +135,10 @@ public class MockVariableInstanceBuilder {
 
   public String getActivityInstanceId() {
     return activityInstanceId;
+  }
+
+  public String getTenantId() {
+    return tenantId;
   }
 
   public String getErrorMessage() {
@@ -182,6 +191,7 @@ public class MockVariableInstanceBuilder {
     when(mockVariable.getCaseExecutionId()).thenReturn(caseExecutionId);
     when(mockVariable.getTaskId()).thenReturn(taskId);
     when(mockVariable.getActivityInstanceId()).thenReturn(activityInstanceId);
+    when(mockVariable.getTenantId()).thenReturn(tenantId);
     when(mockVariable.getErrorMessage()).thenReturn(errorMessage);
 
     return mockVariable;

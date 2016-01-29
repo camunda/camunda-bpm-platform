@@ -920,6 +920,7 @@ public abstract class MockProvider {
       .caseExecutionId(EXAMPLE_VARIABLE_INSTANCE_CASE_EXECUTION_ID)
       .taskId(EXAMPLE_VARIABLE_INSTANCE_TASK_ID)
       .activityInstanceId(EXAMPLE_VARIABLE_INSTANCE_ACTIVITY_INSTANCE_ID)
+      .tenantId(EXAMPLE_TENANT_ID)
       .errorMessage(null);
   }
 

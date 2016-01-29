@@ -99,6 +99,7 @@ public class VariableInstanceRestServiceInteractionTest extends AbstractRestServ
       .body("caseExecutionId", equalTo(builder.getCaseExecutionId()))
       .body("taskId", equalTo(builder.getTaskId()))
       .body("activityInstanceId", equalTo(builder.getActivityInstanceId()))
+      .body("tenantId", equalTo(builder.getTenantId()))
       .body("errorMessage", equalTo(builder.getErrorMessage()))
     .when().get(VARIABLE_INSTANCE_URL);
 
@@ -134,6 +135,7 @@ public class VariableInstanceRestServiceInteractionTest extends AbstractRestServ
       .body("caseExecutionId", equalTo(builder.getCaseExecutionId()))
       .body("taskId", equalTo(builder.getTaskId()))
       .body("activityInstanceId", equalTo(builder.getActivityInstanceId()))
+      .body("tenantId", equalTo(builder.getTenantId()))
       .body("errorMessage", equalTo(builder.getErrorMessage()))
     .when().get(VARIABLE_INSTANCE_URL);
 
@@ -171,6 +173,7 @@ public class VariableInstanceRestServiceInteractionTest extends AbstractRestServ
       .body("caseExecutionId", equalTo(builder.getCaseExecutionId()))
       .body("taskId", equalTo(builder.getTaskId()))
       .body("activityInstanceId", equalTo(builder.getActivityInstanceId()))
+      .body("tenantId", equalTo(builder.getTenantId()))
       .body("errorMessage", equalTo(builder.getErrorMessage()))
     .when().get(VARIABLE_INSTANCE_URL);
 

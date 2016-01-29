@@ -394,10 +394,12 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     return new TaskEntityVariableStore(this);
   }
 
+  @Override
   protected CoreVariableStore getVariableStore() {
     return variableStore;
   }
 
+  @Override
   public AbstractVariableScope getParentVariableScope() {
     if (getExecution()!=null) {
       return execution;
@@ -414,7 +416,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     variableInstance.setProcessInstanceId(processInstanceId);
     variableInstance.setCaseExecutionId(caseExecutionId);
     variableInstance.setCaseInstanceId(caseInstanceId);
-
+    // TODO set the tenant-id from the task when CAM-5195 is done
   }
 
   protected List<VariableInstanceEntity> loadVariableInstances() {
@@ -658,6 +660,7 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
     }
   }
 
+  @Override
   public String toString() {
     return "Task["+id+"]";
   }

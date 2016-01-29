@@ -198,6 +198,11 @@ public class VariableInstanceRestServiceQueryTest extends AbstractRestServiceTes
     executeAndVerifySorting("activityInstanceId", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByActivityInstanceId();
     inOrder.verify(mockedQuery).asc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("tenantId", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderByTenantId();
+    inOrder.verify(mockedQuery).desc();
   }
 
   @Test
@@ -289,6 +294,7 @@ public class VariableInstanceRestServiceQueryTest extends AbstractRestServiceTes
           .body("[0].caseExecutionId", equalTo(mockInstanceBuilder.getCaseExecutionId()))
           .body("[0].taskId", equalTo(mockInstanceBuilder.getTaskId()))
           .body("[0].activityInstanceId", equalTo(mockInstanceBuilder.getActivityInstanceId()))
+          .body("[0].tenantId", equalTo(mockInstanceBuilder.getTenantId()))
           .body("[0].errorMessage", equalTo(mockInstanceBuilder.getErrorMessage()))
           .body("[0].serializedValue", nullValue())
         .when().get(VARIABLE_INSTANCE_QUERY_URL);
@@ -330,6 +336,7 @@ public class VariableInstanceRestServiceQueryTest extends AbstractRestServiceTes
           .body("[0].caseExecutionId", equalTo(mockInstanceBuilder.getCaseExecutionId()))
           .body("[0].taskId", equalTo(mockInstanceBuilder.getTaskId()))
           .body("[0].activityInstanceId", equalTo(mockInstanceBuilder.getActivityInstanceId()))
+          .body("[0].tenantId", equalTo(mockInstanceBuilder.getTenantId()))
           .body("[0].errorMessage", equalTo(mockInstanceBuilder.getErrorMessage()))
           .body("[0].serializedValue", nullValue())
         .when().post(VARIABLE_INSTANCE_QUERY_URL);
@@ -364,6 +371,7 @@ public class VariableInstanceRestServiceQueryTest extends AbstractRestServiceTes
     queryParameters.put("taskIdIn", "aTaskId");
     queryParameters.put("variableScopeIdIn", "aVariableScopeId");
     queryParameters.put("activityInstanceIdIn", "anActivityInstanceId");
+    queryParameters.put("tenantIdIn", "anTenantId");
 
     given().queryParams(queryParameters)
       .expect().statusCode(Status.OK.getStatusCode())
@@ -378,6 +386,7 @@ public class VariableInstanceRestServiceQueryTest extends AbstractRestServiceTes
     verify(mockedQuery).taskIdIn(queryParameters.get("taskIdIn"));
     verify(mockedQuery).variableScopeIdIn(queryParameters.get("variableScopeIdIn"));
     verify(mockedQuery).activityInstanceIdIn(queryParameters.get("activityInstanceIdIn"));
+    verify(mockedQuery).tenantIdIn(queryParameters.get("tenantIdIn"));
     verify(mockedQuery).list();
 
     verify(mockedQuery).disableBinaryFetching();
@@ -398,6 +407,7 @@ public class VariableInstanceRestServiceQueryTest extends AbstractRestServiceTes
     String anActivityInstanceId = "anActivityInstanceId";
     String aCaseInstanceId = "aCaseInstanceId";
     String aCaseExecutionId = "aCaseExecutionId";
+    String aTenantId = "aTenantId";
 
     Map<String, Object> queryParameters = new HashMap<String, Object>();
 
@@ -432,6 +442,10 @@ public class VariableInstanceRestServiceQueryTest extends AbstractRestServiceTes
     activityInstanceIdIn.add(anActivityInstanceId);
     queryParameters.put("activityInstanceIdIn", activityInstanceIdIn);
 
+    List<String> tenantIdIn = new ArrayList<String>();
+    tenantIdIn.add(aTenantId);
+    queryParameters.put("tenantIdIn", tenantIdIn);
+
     given().contentType(POST_JSON_CONTENT_TYPE).body(queryParameters)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().post(VARIABLE_INSTANCE_QUERY_URL);
@@ -443,6 +457,7 @@ public class VariableInstanceRestServiceQueryTest extends AbstractRestServiceTes
     verify(mockedQuery).taskIdIn(aTaskId);
     verify(mockedQuery).variableScopeIdIn(aVariableScopeId);
     verify(mockedQuery).activityInstanceIdIn(anActivityInstanceId);
+    verify(mockedQuery).tenantIdIn(aTenantId);
     verify(mockedQuery).list();
     verify(mockedQuery).disableBinaryFetching();
 

@@ -14,10 +14,13 @@
 package org.camunda.bpm.engine.impl.test;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
+
 import org.apache.ibatis.logging.LogFactory;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.CaseService;
@@ -63,6 +66,8 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
   protected ProcessEngine processEngine;
 
   protected String deploymentId;
+  protected Set<String> deploymentIds = new HashSet<String>();
+
   protected Throwable exception;
 
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
@@ -112,7 +117,9 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
 
     }
     finally {
-      TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, getClass(), getName());
+
+      deleteDeployments();
+
       identityService.clearAuthentication();
       // only fail if no test failure was recorded
       TestHelper.assertAndEnsureCleanDbAndCache(processEngine, exception == null);
@@ -123,6 +130,19 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
       closeDownProcessEngine();
       clearServiceReferences();
     }
+  }
+
+  protected void deleteDeployments() {
+    if(deploymentId != null) {
+      deploymentIds.add(deploymentId);
+    }
+
+    for(String deploymentId : deploymentIds) {
+      TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, getClass(), getName());
+    }
+
+    deploymentId = null;
+    deploymentIds.clear();
   }
 
   protected void initializeServices() {
@@ -380,15 +400,26 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     }
   }
 
-  public void deployment(BpmnModelInstance... bpmnModelInstances) {
+  protected void deployment(BpmnModelInstance... bpmnModelInstances) {
     DeploymentBuilder deploymentBuilder = repositoryService.createDeployment();
 
+    deployment(deploymentBuilder, bpmnModelInstances);
+  }
+
+  protected void deploymentForTenant(String tenantId, BpmnModelInstance... bpmnModelInstances) {
+    DeploymentBuilder deploymentBuilder = repositoryService.createDeployment().tenantId(tenantId);
+
+    deployment(deploymentBuilder, bpmnModelInstances);
+  }
+
+  protected void deployment(DeploymentBuilder deploymentBuilder, BpmnModelInstance... bpmnModelInstances) {
     for (int i = 0; i < bpmnModelInstances.length; i++) {
       BpmnModelInstance bpmnModelInstance = bpmnModelInstances[i];
       deploymentBuilder.addModelInstance("testProcess-"+i+".bpmn", bpmnModelInstance);
     }
 
     deploymentId = deploymentBuilder.deploy().getId();
+    deploymentIds.add(deploymentId);
   }
 
 }

@@ -56,6 +56,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   protected String caseInstanceId;
   protected String caseExecutionId;
   protected String activityInstanceId;
+  protected String tenantId;
 
   protected Long longValue;
   protected Double doubleValue;
@@ -280,6 +281,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
   public void setExecution(ExecutionEntity execution) {
     this.executionId = execution.getId();
     this.processInstanceId = execution.getProcessInstanceId();
+    this.tenantId = execution.getTenantId();
     forcedUpdate = true;
   }
 
@@ -516,6 +518,7 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
       + ", caseExecutionId=" + caseExecutionId
       + ", taskId=" + taskId
       + ", activityInstanceId=" + activityInstanceId
+      + ", tenantId=" + tenantId
       + ", longValue=" + longValue
       + ", doubleValue=" + doubleValue
       + ", textValue=" + textValue
@@ -567,6 +570,14 @@ public class VariableInstanceEntity implements VariableInstance, CoreVariableIns
    */
   public boolean isTransient() {
     return isTransient;
+  }
+
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
   }
 
 }

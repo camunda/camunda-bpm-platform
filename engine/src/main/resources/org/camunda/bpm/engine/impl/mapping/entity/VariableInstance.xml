@@ -25,6 +25,7 @@
       VAR_SCOPE_,
       SEQUENCE_COUNTER_,
       IS_CONCURRENT_LOCAL_,
+      TENANT_ID_,
       REV_
     )
     values (
@@ -44,6 +45,7 @@
       #{variableScopeId, jdbcType=VARCHAR},
       #{sequenceCounter, jdbcType=BIGINT},
       #{isConcurrentLocal, jdbcType=BOOLEAN},
+      #{tenantId, jdbcType=VARCHAR},
       1
     )
   </insert>
@@ -95,6 +97,7 @@
       <result property="longValue" column="LONG_" jdbcType="BIGINT"/>
       <result property="sequenceCounter" column="SEQUENCE_COUNTER_" jdbcType="BIGINT"/>
       <result property="isConcurrentLocal" column="IS_CONCURRENT_LOCAL_" jdbcType="BOOLEAN"/>
+      <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
 	</resultMap>
 
   <!-- VARIABLE INSTANCE SELECT -->
@@ -334,6 +337,14 @@
               <foreach item="item" index="index" collection="activityInstanceIds"
                        open="(" separator="," close=")">
                 #{item}
+              </foreach>
+            </if>
+            
+            <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+              and RES.TENANT_ID_ in
+              <foreach item="tenantId" index="index" collection="tenantIds"
+                       open="(" separator="," close=")">
+                #{tenantId}
               </foreach>
             </if>
 

@@ -13,8 +13,8 @@
 package org.camunda.bpm.engine.impl.variable.listener;
 
 import org.camunda.bpm.engine.ProcessEngineServices;
-import org.camunda.bpm.engine.delegate.DelegateCaseVariableInstance;
 import org.camunda.bpm.engine.delegate.DelegateCaseExecution;
+import org.camunda.bpm.engine.delegate.DelegateCaseVariableInstance;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.variable.value.TypedValue;
@@ -36,6 +36,7 @@ public class DelegateCaseVariableInstanceImpl implements DelegateCaseVariableIns
   protected String caseExecutionId;
   protected String taskId;
   protected String activityInstanceId;
+  protected String tenantId;
   protected String errorMessage;
   protected String name;
   protected TypedValue value;
@@ -101,6 +102,14 @@ public class DelegateCaseVariableInstanceImpl implements DelegateCaseVariableIns
     return errorMessage;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
   public String getTypeName() {
     if(value != null) {
       return value.getType().getName();
@@ -140,6 +149,7 @@ public class DelegateCaseVariableInstanceImpl implements DelegateCaseVariableIns
     delegateInstance.caseInstanceId = variableInstance.getCaseInstanceId();
     delegateInstance.taskId = variableInstance.getTaskId();
     delegateInstance.activityInstanceId = variableInstance.getActivityInstanceId();
+    delegateInstance.tenantId = variableInstance.getTenantId();
     delegateInstance.errorMessage = variableInstance.getErrorMessage();
     delegateInstance.name = variableInstance.getName();
     delegateInstance.value = variableInstance.getTypedValue();

@@ -86,4 +86,10 @@ public interface VariableInstance {
    */
   String getErrorMessage();
 
+  /**
+   * The id of the tenant this variable belongs to. Can be <code>null</code>
+   * if the variable belongs to no single tenant.
+   */
+  String getTenantId();
+
 }

@@ -18,21 +18,31 @@ import static org.junit.Assert.assertThat;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
-public class MultiTenancyDeploymentQueryTest extends AbstractMultiTenancyQueryTest {
+public class MultiTenancyDeploymentQueryTest extends PluggableProcessEngineTestCase {
+
+  protected final static String TENANT_ONE = "tenant1";
+  protected final static String TENANT_TWO = "tenant2";
 
   @Override
-  protected void initScenario() {
-    // two deployments for different tenant ids
+  public void setUp() throws Exception {
+    BpmnModelInstance emptyProcess = Bpmn.createExecutableProcess().done();
+
+    deploymentForTenant(TENANT_ONE, emptyProcess);
+    deploymentForTenant(TENANT_TWO, emptyProcess);
   }
 
   public void testQueryWithoutTenantId() {
     DeploymentQuery query = repositoryService
         .createDeploymentQuery();
 
-   verifyQueryResults(query, 2);
+   assertThat(query.count(), is(2L));
   }
 
   public void testQueryByTenantId() {
@@ -40,13 +50,13 @@ public class MultiTenancyDeploymentQueryTest extends AbstractMultiTenancyQueryTe
         .createDeploymentQuery()
         .tenantIdIn(TENANT_ONE);
 
-    verifyQueryResults(query, 1);
+    assertThat(query.count(), is(1L));
 
     query = repositoryService
         .createDeploymentQuery()
         .tenantIdIn(TENANT_TWO);
 
-    verifyQueryResults(query, 1);
+    assertThat(query.count(), is(1L));
   }
 
   public void testQueryByTenantIds() {
@@ -54,7 +64,25 @@ public class MultiTenancyDeploymentQueryTest extends AbstractMultiTenancyQueryTe
         .createDeploymentQuery()
         .tenantIdIn(TENANT_ONE, TENANT_TWO);
 
-    verifyQueryResults(query, 2);
+    assertThat(query.count(), is(2L));
+  }
+
+  public void testQueryByNonExistingTenantId() {
+    DeploymentQuery query = repositoryService
+        .createDeploymentQuery()
+        .tenantIdIn("nonExisting");
+
+    assertThat(query.count(), is(0L));
+  }
+
+  public void testFailQueryByTenantIdNull() {
+    try {
+      repositoryService.createDeploymentQuery()
+        .tenantIdIn((String) null);
+
+      fail("expected exception");
+    } catch (NullValueException e) {
+    }
   }
 
   public void testQuerySortingAsc() {

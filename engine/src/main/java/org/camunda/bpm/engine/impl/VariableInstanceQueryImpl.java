@@ -16,6 +16,7 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
 import java.util.List;
+
 import org.camunda.bpm.engine.impl.cmd.CommandLogger;
 import org.camunda.bpm.engine.impl.db.CompositePermissionCheck;
 import org.camunda.bpm.engine.impl.db.PermissionCheck;
@@ -47,6 +48,7 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
   protected String[] taskIds;
   protected String[] variableScopeIds;
   protected String[] activityInstanceIds;
+  protected String[] tenantIds;
 
   protected boolean isByteArrayFetchingEnabled = true;
   protected boolean isCustomObjectDeserializationEnabled = true;
@@ -126,6 +128,12 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
     return this;
   }
 
+  public VariableInstanceQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    return this;
+  }
+
   // ordering ////////////////////////////////////////////////////
 
   public VariableInstanceQuery orderByVariableName() {
@@ -143,6 +151,11 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
     return this;
   }
 
+  public VariableInstanceQuery orderByTenantId() {
+    orderBy(VariableInstanceQueryProperty.TENANT_ID);
+    return this;
+  }
+
   @Override
   protected boolean hasExcludingConditions() {
     return super.hasExcludingConditions() || CompareUtil.elementIsNotContainedInArray(variableName, variableNames);
@@ -150,6 +163,7 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
 
   // results ////////////////////////////////////////////////////
 
+  @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     ensureVariablesInitialized();
@@ -158,6 +172,7 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
       .findVariableInstanceCountByQueryCriteria(this);
   }
 
+  @Override
   public List<VariableInstance> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     ensureVariablesInitialized();

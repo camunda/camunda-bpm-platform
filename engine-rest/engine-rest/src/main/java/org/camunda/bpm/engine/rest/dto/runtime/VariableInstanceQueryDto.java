@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
 import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
@@ -38,6 +39,7 @@ public class VariableInstanceQueryDto extends AbstractQueryDto<VariableInstanceQ
   private static final String SORT_BY_VARIABLE_NAME_VALUE = "variableName";
   private static final String SORT_BY_VARIABLE_TYPE_VALUE = "variableType";
   private static final String SORT_BY_ACTIVITY_INSTANCE_ID_VALUE = "activityInstanceId";
+  private static final String SORT_BY_TENANT_ID = "tenantId";
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -45,6 +47,7 @@ public class VariableInstanceQueryDto extends AbstractQueryDto<VariableInstanceQ
     VALID_SORT_BY_VALUES.add(SORT_BY_VARIABLE_NAME_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_VARIABLE_TYPE_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_ACTIVITY_INSTANCE_ID_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID);
   }
 
   protected String variableName;
@@ -57,6 +60,7 @@ public class VariableInstanceQueryDto extends AbstractQueryDto<VariableInstanceQ
   protected String[] taskIdIn;
   protected String[] variableScopeIdIn;
   protected String[] activityInstanceIdIn;
+  private List<String> tenantIds;
 
   public VariableInstanceQueryDto() {}
 
@@ -112,6 +116,11 @@ public class VariableInstanceQueryDto extends AbstractQueryDto<VariableInstanceQ
   @CamundaQueryParam(value="activityInstanceIdIn", converter = StringArrayConverter.class)
   public void setActivityInstanceIdIn(String[] activityInstanceIdIn) {
     this.activityInstanceIdIn = activityInstanceIdIn;
+  }
+
+  @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
+  public void setTenantIdIn(List<String> tenantIds) {
+    this.tenantIds = tenantIds;
   }
 
   @Override
@@ -187,6 +196,9 @@ public class VariableInstanceQueryDto extends AbstractQueryDto<VariableInstanceQ
     if (activityInstanceIdIn != null && activityInstanceIdIn.length > 0) {
       query.activityInstanceIdIn(activityInstanceIdIn);
     }
+    if (tenantIds != null && !tenantIds.isEmpty()) {
+      query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
   }
 
   @Override
@@ -197,6 +209,8 @@ public class VariableInstanceQueryDto extends AbstractQueryDto<VariableInstanceQ
       query.orderByVariableType();
     } else if (sortBy.equals(SORT_BY_ACTIVITY_INSTANCE_ID_VALUE)) {
       query.orderByActivityInstanceId();
+    } else if (sortBy.equals(SORT_BY_TENANT_ID)) {
+      query.orderByTenantId();
     }
   }
 

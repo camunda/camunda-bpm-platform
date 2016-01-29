@@ -1056,6 +1056,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
     variableInstance.setProcessInstanceId(processInstanceId);
     variableInstance.setExecutionId(id);
+    variableInstance.setTenantId(tenantId);
 
     variableInstance.setConcurrentLocal(!isScope || isExecutingScopeLeafActivity());
   }

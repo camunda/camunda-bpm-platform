@@ -18,13 +18,29 @@ import static org.junit.Assert.assertThat;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
-public class MultiTenancyProcessInstanceQueryTest extends AbstractMultiTenancyQueryTest {
+public class MultiTenancyProcessInstanceQueryTest extends PluggableProcessEngineTestCase {
+
+  protected final static String TENANT_ONE = "tenant1";
+  protected final static String TENANT_TWO = "tenant2";
 
   @Override
-  protected void initScenario() {
+  protected void setUp() {
+    BpmnModelInstance oneTaskProcess = Bpmn.createExecutableProcess("testProcess")
+      .startEvent()
+      .userTask()
+      .endEvent()
+    .done();
+
+    deploymentForTenant(TENANT_ONE, oneTaskProcess);
+    deploymentForTenant(TENANT_TWO, oneTaskProcess);
+
     startProcessInstanceForTenant(TENANT_ONE);
     startProcessInstanceForTenant(TENANT_TWO);
   }
@@ -33,7 +49,7 @@ public class MultiTenancyProcessInstanceQueryTest extends AbstractMultiTenancyQu
     ProcessInstanceQuery query = runtimeService.
         createProcessInstanceQuery();
 
-    verifyQueryResults(query, 2);
+    assertThat(query.count(), is(2L));
   }
 
   public void testQueryByTenantId() {
@@ -41,13 +57,13 @@ public class MultiTenancyProcessInstanceQueryTest extends AbstractMultiTenancyQu
         .createProcessInstanceQuery()
         .tenantIdIn(TENANT_ONE);
 
-    verifyQueryResults(query, 1);
+    assertThat(query.count(), is(1L));
 
     query = runtimeService
         .createProcessInstanceQuery()
         .tenantIdIn(TENANT_TWO);
 
-    verifyQueryResults(query, 1);
+    assertThat(query.count(), is(1L));
   }
 
   public void testQueryByTenantIds() {
@@ -55,7 +71,25 @@ public class MultiTenancyProcessInstanceQueryTest extends AbstractMultiTenancyQu
         .createProcessInstanceQuery()
         .tenantIdIn(TENANT_ONE, TENANT_TWO);
 
-    verifyQueryResults(query, 2);
+    assertThat(query.count(), is(2L));
+  }
+
+  public void testQueryByNonExistingTenantId() {
+    ProcessInstanceQuery query = runtimeService
+        .createProcessInstanceQuery()
+        .tenantIdIn("nonExisting");
+
+    assertThat(query.count(), is(0L));
+  }
+
+  public void testFailQueryByTenantIdNull() {
+    try {
+      runtimeService.createProcessInstanceQuery()
+        .tenantIdIn((String) null);
+
+      fail("expected exception");
+    } catch (NullValueException e) {
+    }
   }
 
   public void testQuerySortingAsc() {

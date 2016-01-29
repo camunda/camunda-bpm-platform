@@ -24,6 +24,10 @@ ALTER TABLE ACT_RU_EXECUTION
 
 create index ACT_IDX_EXEC_TENANT_ID on ACT_RU_EXECUTION(TENANT_ID_);
 
+ALTER TABLE ACT_RU_VARIABLE
+  ADD TENANT_ID_ nvarchar(64);
+
+create index ACT_IDX_VARIABLE_TENANT_ID on ACT_RU_VARIABLE(TENANT_ID_);
 
 -- user on historic decision instance --
 

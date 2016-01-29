@@ -144,6 +144,9 @@ public interface VariableInstanceQuery extends Query<VariableInstanceQuery, Vari
    */
   VariableInstanceQuery variableValueLike(String name, String value);
 
+  /** Only select variable instances with one of the given tenant ids. */
+  VariableInstanceQuery tenantIdIn(String... tenantIds);
+
   /** Order by variable name (needs to be followed by {@link #asc()} or {@link #desc()}). */
   VariableInstanceQuery orderByVariableName();
 
@@ -152,5 +155,11 @@ public interface VariableInstanceQuery extends Query<VariableInstanceQuery, Vari
 
   /** Order by activity instance id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   VariableInstanceQuery orderByActivityInstanceId();
+
+  /**
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of variable instances without tenant id is database-specific.
+   */
+  VariableInstanceQuery orderByTenantId();
 
 }

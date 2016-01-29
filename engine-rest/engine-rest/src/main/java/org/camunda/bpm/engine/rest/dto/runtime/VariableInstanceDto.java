@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
-import java.util.Map;
-
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 
@@ -31,6 +29,7 @@ public class VariableInstanceDto extends VariableValueDto {
   protected String taskId;
   protected String activityInstanceId;
   protected String errorMessage;
+  private String tenantId;
 
   public VariableInstanceDto() { }
 
@@ -98,6 +97,10 @@ public class VariableInstanceDto extends VariableValueDto {
     return caseInstanceId;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
   public static VariableInstanceDto fromVariableInstance(VariableInstance variableInstance) {
     VariableInstanceDto dto = new VariableInstanceDto();
 
@@ -111,6 +114,8 @@ public class VariableInstanceDto extends VariableValueDto {
 
     dto.taskId = variableInstance.getTaskId();
     dto.activityInstanceId = variableInstance.getActivityInstanceId();
+
+    dto.tenantId = variableInstance.getTenantId();
 
     if(variableInstance.getErrorMessage() == null) {
       VariableValueDto.fromTypedValue(dto, variableInstance.getTypedValue());
