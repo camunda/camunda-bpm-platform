@@ -953,6 +953,7 @@ public abstract class MockProvider {
     when(mock.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
     when(mock.getActivityId()).thenReturn(EXAMPLE_ACTIVITY_ID);
     when(mock.getCreated()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_EVENT_SUBSCRIPTION_CREATION_DATE));
+    when(mock.getTenantId()).thenReturn(EXAMPLE_TENANT_ID);
 
     return mock;
   }

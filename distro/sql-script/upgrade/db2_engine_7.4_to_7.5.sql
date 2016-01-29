@@ -22,6 +22,11 @@ ALTER TABLE ACT_RU_VARIABLE
   ADD TENANT_ID_ varchar(64);
 
 create index ACT_IDX_VARIABLE_TENANT_ID on ACT_RU_VARIABLE(TENANT_ID_);  
+
+ALTER TABLE ACT_RU_EVENT_SUBSCR
+  ADD TENANT_ID_ varchar(64);
+
+create index ACT_IDX_EVENT_SUBSCR_TENANT_ID on ACT_RU_EVENT_SUBSCR(TENANT_ID_);  
   
 -- user on historic decision instance --
 
