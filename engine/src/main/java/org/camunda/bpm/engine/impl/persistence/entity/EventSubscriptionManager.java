@@ -156,11 +156,12 @@ public class EventSubscriptionManager extends AbstractManager {
     return getDbEntityManager().selectList(query, params);
   }
 
-  public List<EventSubscriptionEntity> findEventSubscriptionsByName(String type, String eventName) {
-    final String query = "selectEventSubscriptionsByName";
+  public List<EventSubscriptionEntity> findEventSubscriptionsByNameAndTenantId(String type, String eventName, String tenantId) {
+    final String query = "selectEventSubscriptionsByNameAndTenantId";
     Map<String,String> params = new HashMap<String, String>();
     params.put("eventType", type);
     params.put("eventName", eventName);
+    params.put("tenantId", tenantId);
     return getDbEntityManager().selectList(query, params);
   }
 

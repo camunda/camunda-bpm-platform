@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
@@ -142,6 +143,75 @@ public class MultiTenancyPropagationTest extends PluggableProcessEngineTestCase 
     assertThat(variableInstance, is(notNullValue()));
     // inherit the tenant id from execution
     assertThat(variableInstance.getTenantId(), is(TENANT_ID));
+  }
+
+  public void testPropagateTenantIdToStartMessageEventSubscription() {
+
+    deployment(repositoryService.createDeployment()
+        .tenantId(TENANT_ID)
+        .addClasspathResource("org/camunda/bpm/engine/test/api/multitenancy/messageStartEvent.bpmn"));
+
+    // the event subscription of the message start is created on deployment
+    EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
+    assertThat(eventSubscription, is(notNullValue()));
+    // inherit the tenant id from process definition
+    assertThat(eventSubscription.getTenantId(), is(TENANT_ID));
+  }
+
+  public void testPropagateTenantIdToStartSignalEventSubscription() {
+
+    deployment(repositoryService.createDeployment()
+        .tenantId(TENANT_ID)
+        .addClasspathResource("org/camunda/bpm/engine/test/api/multitenancy/signalStartEvent.bpmn"));
+
+    // the event subscription of the signal start event is created on deployment
+    EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
+    assertThat(eventSubscription, is(notNullValue()));
+    // inherit the tenant id from process definition
+    assertThat(eventSubscription.getTenantId(), is(TENANT_ID));
+  }
+
+  public void testPropagateTenantIdToIntermediateMessageEventSubscription() {
+
+    deployment(repositoryService.createDeployment()
+        .tenantId(TENANT_ID)
+        .addClasspathResource("org/camunda/bpm/engine/test/api/multitenancy/intermediateMessageCatchEvent.bpmn"));
+
+    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+
+    EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
+    assertThat(eventSubscription, is(notNullValue()));
+    // inherit the tenant id from process instance
+    assertThat(eventSubscription.getTenantId(), is(TENANT_ID));
+  }
+
+  public void testPropagateTenantIdToIntermediateSignalEventSubscription() {
+
+    deployment(repositoryService.createDeployment()
+        .tenantId(TENANT_ID)
+        .addClasspathResource("org/camunda/bpm/engine/test/api/multitenancy/intermediateSignalCatchEvent.bpmn"));
+
+    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+
+    EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
+    assertThat(eventSubscription, is(notNullValue()));
+    // inherit the tenant id from process instance
+    assertThat(eventSubscription.getTenantId(), is(TENANT_ID));
+  }
+
+  public void testPropagateTenantIdToCompensationEventSubscription() {
+
+    deployment(repositoryService.createDeployment()
+        .tenantId(TENANT_ID)
+        .addClasspathResource("org/camunda/bpm/engine/test/api/multitenancy/compensationBoundaryEvent.bpmn"));
+
+    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+
+    // the event subscription is created after execute the activity with the attached compensation boundary event
+    EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
+    assertThat(eventSubscription, is(notNullValue()));
+    // inherit the tenant id from process instance
+    assertThat(eventSubscription.getTenantId(), is(TENANT_ID));
   }
 
   public static class SetVariableTask implements JavaDelegate {

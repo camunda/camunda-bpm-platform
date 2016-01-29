@@ -21,7 +21,6 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.test.api.delegate.AssertingJavaDelegate;
 import org.camunda.bpm.engine.test.api.delegate.AssertingJavaDelegate.DelegateExecutionAsserter;
 import org.camunda.bpm.model.bpmn.Bpmn;
-import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 /**
  * Tests if a {@link DelegateExecution} has the correct tenant-id. The
@@ -80,15 +79,6 @@ public class MultiTenancyDelegateExecutionTest extends PluggableProcessEngineTes
     AssertingJavaDelegate.addAsserts(hasTenantId("tenant1"));
 
     runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
-  }
-
-  protected void deploymentForTenant(String tenantId, BpmnModelInstance bpmnModelInstance) {
-    deploymentId = repositoryService
-        .createDeployment()
-        .tenantId(tenantId)
-        .addModelInstance("test.bpmn", bpmnModelInstance)
-        .deploy()
-        .getId();
   }
 
   @Override

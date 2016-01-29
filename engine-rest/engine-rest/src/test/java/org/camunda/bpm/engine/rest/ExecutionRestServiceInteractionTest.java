@@ -1442,6 +1442,7 @@ public class ExecutionRestServiceInteractionTest extends AbstractRestServiceTest
     .body("processInstanceId", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
     .body("activityId", equalTo(MockProvider.EXAMPLE_ACTIVITY_ID))
     .body("createdDate", equalTo(MockProvider.EXAMPLE_EVENT_SUBSCRIPTION_CREATION_DATE))
+    .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
     .when().get(MESSAGE_SUBSCRIPTION_URL);
   }
 

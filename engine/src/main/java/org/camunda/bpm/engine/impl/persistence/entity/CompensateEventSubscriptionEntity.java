@@ -36,6 +36,7 @@ public class CompensateEventSubscriptionEntity extends EventSubscriptionEntity {
   public static CompensateEventSubscriptionEntity createAndInsert(ExecutionEntity executionEntity, ActivityImpl activity) {
     CompensateEventSubscriptionEntity eventSubscription = new CompensateEventSubscriptionEntity(executionEntity);
     eventSubscription.setActivity(activity);
+    eventSubscription.setTenantId(executionEntity.getTenantId());
     eventSubscription.insert();
     return eventSubscription;
   }

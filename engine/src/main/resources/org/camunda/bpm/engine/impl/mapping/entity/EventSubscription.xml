@@ -30,6 +30,7 @@
     <result property="activityId" column="ACTIVITY_ID_" jdbcType="VARCHAR" />
     <result property="configuration" column="CONFIGURATION_" jdbcType="VARCHAR" />
     <result property="created" column="CREATED_" jdbcType="TIMESTAMP" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
     <discriminator javaType="string" column="EVENT_TYPE_">
       <case value="message" resultMap="messageResultMap"/>
       <case value="signal" resultMap="signalResultMap"/>
@@ -91,6 +92,14 @@
       </if>
       <if test="eventName != null">
         and RES.EVENT_NAME_ = #{eventName}
+      </if>
+      
+      <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+        and RES.TENANT_ID_ in
+        <foreach item="tenantId" index="index" collection="tenantIds"
+                 open="(" separator="," close=")">
+          #{tenantId}
+        </foreach>
       </if>
 
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
@@ -164,11 +173,17 @@
     	and (CONFIGURATION_ = #{parameter.configuration})
   </select>
 
-  <select id="selectEventSubscriptionsByName" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
+  <select id="selectEventSubscriptionsByNameAndTenantId" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
     select *
     from ${prefix}ACT_RU_EVENT_SUBSCR
     where (EVENT_TYPE_ = #{parameter.eventType})
     	and (EVENT_NAME_ = #{parameter.eventName})
+      <if test="parameter.tenantId != null">
+        and TENANT_ID_ = #{parameter.tenantId}  
+      </if>
+      <if test="parameter.tenantId == null">
+        and TENANT_ID_ is null 
+      </if>
   </select>
 
   <select id="selectEventSubscriptionsByNameAndExecution" resultMap="eventSubscriptionResultMap" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject">
@@ -213,6 +228,7 @@
            	ACTIVITY_ID_,
            	CONFIGURATION_,
            	CREATED_,
+            TENANT_ID_,
             REV_
     )
     values (#{id, jdbcType=VARCHAR},
@@ -223,6 +239,7 @@
             #{activityId, jdbcType=VARCHAR},
             #{configuration, jdbcType=VARCHAR},
             #{created, jdbcType=TIMESTAMP},
+            #{tenantId, jdbcType=VARCHAR},
             1
     )
   </insert>
@@ -256,6 +273,7 @@
            	ACTIVITY_ID_,
            	CONFIGURATION_,
            	CREATED_,
+            TENANT_ID_,
             REV_
     )
     values (#{id, jdbcType=VARCHAR},
@@ -266,6 +284,7 @@
             #{activityId, jdbcType=VARCHAR},
             #{configuration, jdbcType=VARCHAR},
             #{created, jdbcType=TIMESTAMP},
+            #{tenantId, jdbcType=VARCHAR},
             1
     )
   </insert>
@@ -299,7 +318,8 @@
            	PROC_INST_ID_,
            	ACTIVITY_ID_,
            	CONFIGURATION_,
-           	CREATED_
+           	CREATED_,
+            TENANT_ID_
     )
     values (#{id, jdbcType=VARCHAR},
             1,
@@ -309,7 +329,8 @@
             #{processInstanceId, jdbcType=VARCHAR},
             #{activityId, jdbcType=VARCHAR},
             #{configuration, jdbcType=VARCHAR},
-            #{created, jdbcType=TIMESTAMP}
+            #{created, jdbcType=TIMESTAMP},
+            #{tenantId, jdbcType=VARCHAR}
     )
   </insert>
 

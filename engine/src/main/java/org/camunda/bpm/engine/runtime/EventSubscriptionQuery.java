@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +16,7 @@ import org.camunda.bpm.engine.query.Query;
 
 /**
  * Allows querying of event subscriptions.
- * 
+ *
  * @author Thorben Lindhauer
  */
 public interface EventSubscriptionQuery extends Query<EventSubscriptionQuery, EventSubscription>{
@@ -26,8 +26,8 @@ public interface EventSubscriptionQuery extends Query<EventSubscriptionQuery, Ev
 
   /** Only select subscriptions for events with the given name. **/
   EventSubscriptionQuery eventName(String eventName);
-  
-  /** Only select subscriptions for events with the given type. "message" selects message event subscriptions, 
+
+  /** Only select subscriptions for events with the given type. "message" selects message event subscriptions,
    * "signal" selects signal event subscriptions, "compensation" selects compensation event subscriptions.**/
   EventSubscriptionQuery eventType(String eventType);
 
@@ -40,7 +40,16 @@ public interface EventSubscriptionQuery extends Query<EventSubscriptionQuery, Ev
   /** Only select subscriptions that belong to an activity with the given id. **/
   EventSubscriptionQuery activityId(String activityId);
 
+  /** Only select subscriptions that belong to one of the given tenant ids. */
+  EventSubscriptionQuery tenantIdIn(String... tenantIds);
+
   /** Order by event subscription creation date (needs to be followed by {@link #asc()} or {@link #desc()}). */
   EventSubscriptionQuery orderByCreated();
+
+  /**
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of subscriptions without tenant id is database-specific.
+   */
+  EventSubscriptionQuery orderByTenantId();
 
 }

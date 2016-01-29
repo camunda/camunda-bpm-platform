@@ -307,7 +307,9 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
 
   protected void addMessageEventSubscription(EventSubscriptionDeclaration messageEventDefinition, ProcessDefinitionEntity processDefinition) {
 
-    if(isSameMessageEventSubscriptionAlreadyPresent(messageEventDefinition)) {
+    String tenantId = processDefinition.getTenantId();
+
+    if(isSameMessageEventSubscriptionAlreadyPresent(messageEventDefinition, tenantId)) {
       throw LOG.messageEventSubscriptionWithSameNameExists(processDefinition.getResourceName(), messageEventDefinition.getEventName());
     }
 
@@ -315,14 +317,15 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
     newSubscription.setEventName(messageEventDefinition.getEventName());
     newSubscription.setActivityId(messageEventDefinition.getActivityId());
     newSubscription.setConfiguration(processDefinition.getId());
+    newSubscription.setTenantId(tenantId);
 
     newSubscription.insert();
   }
 
-  protected boolean isSameMessageEventSubscriptionAlreadyPresent(EventSubscriptionDeclaration eventSubscription) {
+  protected boolean isSameMessageEventSubscriptionAlreadyPresent(EventSubscriptionDeclaration eventSubscription, String tenantId) {
     // look for subscriptions for the same name in db:
     List<EventSubscriptionEntity> subscriptionsForSameMessageName = getEventSubscriptionManager()
-      .findEventSubscriptionsByName(MessageEventHandler.EVENT_HANDLER_TYPE, eventSubscription.getEventName());
+      .findEventSubscriptionsByNameAndTenantId(MessageEventHandler.EVENT_HANDLER_TYPE, eventSubscription.getEventName(), tenantId);
 
     // also look for subscriptions created in the session:
     List<MessageEventSubscriptionEntity> cachedSubscriptions = getDbEntityManager()
@@ -331,7 +334,9 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
     for (MessageEventSubscriptionEntity cachedSubscription : cachedSubscriptions) {
 
       if(eventSubscription.getEventName().equals(cachedSubscription.getEventName())
+        && hasTenantId(cachedSubscription, tenantId)
         && !subscriptionsForSameMessageName.contains(cachedSubscription)) {
+
         subscriptionsForSameMessageName.add(cachedSubscription);
       }
     }
@@ -343,6 +348,14 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
     subscriptionsForSameMessageName = filterSubscriptionsOfDifferentType(eventSubscription, subscriptionsForSameMessageName);
 
     return !subscriptionsForSameMessageName.isEmpty();
+  }
+
+  protected boolean hasTenantId(MessageEventSubscriptionEntity cachedSubscription, String tenantId) {
+    if(tenantId == null) {
+      return cachedSubscription.getTenantId() == null;
+    } else {
+      return tenantId.equals(cachedSubscription.getTenantId());
+    }
   }
 
   /**
@@ -389,6 +402,7 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
     newSubscription.setEventName(signalEventDefinition.getEventName());
     newSubscription.setActivityId(signalEventDefinition.getActivityId());
     newSubscription.setConfiguration(processDefinition.getId());
+    newSubscription.setTenantId(processDefinition.getTenantId());
 
     newSubscription.insert();
   }

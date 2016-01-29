@@ -128,6 +128,8 @@ public class EventSubscriptionDeclaration implements Serializable {
       eventSubscriptionEntity.setActivity(activity);
     }
 
+    eventSubscriptionEntity.setTenantId(execution.getTenantId());
+
     eventSubscriptionEntity.insert();
     LegacyBehavior.removeLegacySubscriptionOnParent(execution, eventSubscriptionEntity);
 

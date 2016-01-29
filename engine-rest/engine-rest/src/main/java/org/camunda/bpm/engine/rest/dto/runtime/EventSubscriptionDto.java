@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,9 +12,9 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
-import org.camunda.bpm.engine.runtime.EventSubscription;
-
 import java.util.Date;
+
+import org.camunda.bpm.engine.runtime.EventSubscription;
 
 public class EventSubscriptionDto {
 
@@ -25,7 +25,8 @@ public class EventSubscriptionDto {
   private String processInstanceId;
   private String activityId;
   private Date createdDate;
-  
+  private String tenantId;
+
   public String getId() {
     return id;
   }
@@ -47,7 +48,11 @@ public class EventSubscriptionDto {
   public Date getCreatedDate() {
     return createdDate;
   }
-  
+
+  public String getTenantId() {
+    return tenantId;
+  }
+
   public static EventSubscriptionDto fromEventSubscription(EventSubscription eventSubscription) {
     EventSubscriptionDto dto = new EventSubscriptionDto();
     dto.id = eventSubscription.getId();
@@ -57,9 +62,10 @@ public class EventSubscriptionDto {
     dto.processInstanceId = eventSubscription.getProcessInstanceId();
     dto.activityId = eventSubscription.getActivityId();
     dto.createdDate = eventSubscription.getCreated();
-    
+    dto.tenantId = eventSubscription.getTenantId();
+
     return dto;
   }
-  
-  
+
+
 }
