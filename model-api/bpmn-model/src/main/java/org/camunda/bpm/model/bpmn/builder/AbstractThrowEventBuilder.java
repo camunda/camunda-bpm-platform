@@ -15,6 +15,7 @@ package org.camunda.bpm.model.bpmn.builder;
 
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
+import org.camunda.bpm.model.bpmn.instance.SignalEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.ThrowEvent;
 
 /**
@@ -36,6 +37,20 @@ public abstract class AbstractThrowEventBuilder<B extends AbstractThrowEventBuil
   public B message(String messageName) {
     MessageEventDefinition messageEventDefinition = createMessageEventDefinition(messageName);
     element.getEventDefinitions().add(messageEventDefinition);
+
+    return myself;
+  }
+
+  /**
+   * Sets an event definition for the given signal name. If already a signal
+   * with this name exists it will be used, otherwise a new signal is created.
+   *
+   * @param signalName the name of the signal
+   * @return the builder object
+   */
+  public B signal(String signalName) {
+    SignalEventDefinition signalEventDefinition = createSignalEventDefinition(signalName);
+    element.getEventDefinitions().add(signalEventDefinition);
 
     return myself;
   }

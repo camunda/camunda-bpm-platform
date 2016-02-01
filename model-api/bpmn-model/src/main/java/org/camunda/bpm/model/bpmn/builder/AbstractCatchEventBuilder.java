@@ -16,6 +16,7 @@ package org.camunda.bpm.model.bpmn.builder;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.CatchEvent;
 import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
+import org.camunda.bpm.model.bpmn.instance.SignalEventDefinition;
 
 /**
  * @author Sebastian Menski
@@ -46,6 +47,20 @@ public abstract class AbstractCatchEventBuilder<B extends  AbstractCatchEventBui
   public B message(String messageName) {
     MessageEventDefinition messageEventDefinition = createMessageEventDefinition(messageName);
     element.getEventDefinitions().add(messageEventDefinition);
+
+    return myself;
+  }
+
+  /**
+   * Sets an event definition for the given signal name. If already a signal
+   * with this name exists it will be used, otherwise a new signal is created.
+   *
+   * @param signalName the name of the signal
+   * @return the builder object
+   */
+  public B signal(String signalName) {
+    SignalEventDefinition signalEventDefinition = createSignalEventDefinition(signalName);
+    element.getEventDefinitions().add(signalEventDefinition);
 
     return myself;
   }

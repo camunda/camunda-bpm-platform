@@ -21,6 +21,8 @@ import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
 import org.camunda.bpm.model.bpmn.instance.ExtensionElements;
 import org.camunda.bpm.model.bpmn.instance.Message;
 import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
+import org.camunda.bpm.model.bpmn.instance.Signal;
+import org.camunda.bpm.model.bpmn.instance.SignalEventDefinition;
 
 /**
  * @author Sebastian Menski
@@ -89,6 +91,30 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
     MessageEventDefinition messageEventDefinition = modelInstance.newInstance(MessageEventDefinition.class);
     messageEventDefinition.setMessage(message);
     return messageEventDefinition;
+  }
+
+  protected Signal findSignalForName(String signalName) {
+    Collection<Signal> signals = modelInstance.getModelElementsByType(Signal.class);
+    for (Signal signal : signals) {
+      if (signalName.equals(signal.getName())) {
+        // return already existing signal for signal name
+        return signal;
+      }
+    }
+
+    // create new signal for non existing signal name
+    Signal signal = modelInstance.newInstance(Signal.class);
+    signal.setName(signalName);
+    modelInstance.getDefinitions().addChildElement(signal);
+
+    return signal;
+  }
+
+  protected SignalEventDefinition createSignalEventDefinition(String signalName) {
+    Signal signal = findSignalForName(signalName);
+    SignalEventDefinition signalEventDefinition = modelInstance.newInstance(SignalEventDefinition.class);
+    signalEventDefinition.setSignal(signal);
+    return signalEventDefinition;
   }
 
   /**

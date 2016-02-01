@@ -57,6 +57,8 @@ import org.camunda.bpm.model.bpmn.instance.ScriptTask;
 import org.camunda.bpm.model.bpmn.instance.SendTask;
 import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
 import org.camunda.bpm.model.bpmn.instance.ServiceTask;
+import org.camunda.bpm.model.bpmn.instance.Signal;
+import org.camunda.bpm.model.bpmn.instance.SignalEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.StartEvent;
 import org.camunda.bpm.model.bpmn.instance.SubProcess;
 import org.camunda.bpm.model.bpmn.instance.Task;
@@ -913,6 +915,113 @@ public class ProcessBuilderTest {
     assertOnlyOneMessageExists("message");
   }
 
+  @Test
+  public void testSignalStartEvent() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent("start").signal("signal")
+      .done();
+
+    assertSignalCatchEventDefinition("start", "signal");
+  }
+
+  @Test
+  public void testSignalStartEventWithExistingSignal() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent("start").signal("signal")
+      .subProcess().triggerByEvent()
+      .embeddedSubProcess()
+      .startEvent("subStart").signal("signal")
+      .subProcessDone()
+      .done();
+
+    Signal signal = assertSignalCatchEventDefinition("start", "signal");
+    Signal subSignal = assertSignalCatchEventDefinition("subStart", "signal");
+
+    assertThat(signal).isEqualTo(subSignal);
+
+    assertOnlyOneSignalExists("signal");
+  }
+
+  @Test
+  public void testIntermediateSignalCatchEvent() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .intermediateCatchEvent("catch").signal("signal")
+      .done();
+
+    assertSignalCatchEventDefinition("catch", "signal");
+  }
+
+  @Test
+  public void testIntermediateSignalCatchEventWithExistingSignal() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .intermediateCatchEvent("catch1").signal("signal")
+      .intermediateCatchEvent("catch2").signal("signal")
+      .done();
+
+    Signal signal1 = assertSignalCatchEventDefinition("catch1", "signal");
+    Signal signal2 = assertSignalCatchEventDefinition("catch2", "signal");
+
+    assertThat(signal1).isEqualTo(signal2);
+
+    assertOnlyOneSignalExists("signal");
+  }
+
+  @Test
+  public void testSignalEndEvent() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .endEvent("end").signal("signal")
+      .done();
+
+    assertSignalThrowEventDefinition("end", "signal");
+  }
+
+  @Test
+  public void testSignalEndEventWithExistingSignal() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .parallelGateway()
+      .endEvent("end1").signal("signal")
+      .moveToLastGateway()
+      .endEvent("end2").signal("signal")
+      .done();
+
+    Signal signal1 = assertSignalThrowEventDefinition("end1", "signal");
+    Signal signal2 = assertSignalThrowEventDefinition("end2", "signal");
+
+    assertThat(signal1).isEqualTo(signal2);
+
+    assertOnlyOneSignalExists("signal");
+  }
+
+  @Test
+  public void testIntermediateSignalThrowEvent() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .intermediateThrowEvent("throw").signal("signal")
+      .done();
+
+    assertSignalThrowEventDefinition("throw", "signal");
+  }
+
+  @Test
+  public void testIntermediateSignalThrowEventWithExistingSignal() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .intermediateThrowEvent("throw1").signal("signal")
+      .intermediateThrowEvent("throw2").signal("signal")
+      .done();
+
+    Signal signal1 = assertSignalThrowEventDefinition("throw1", "signal");
+    Signal signal2 = assertSignalThrowEventDefinition("throw2", "signal");
+
+    assertThat(signal1).isEqualTo(signal2);
+
+    assertOnlyOneSignalExists("signal");
+  }
+
   protected Message assertMessageCatchEventDefinition(String elementId, String messageName) {
     CatchEvent catchEvent = modelInstance.getModelElementById(elementId);
     Collection<EventDefinition> eventDefinitions = catchEvent.getEventDefinitions();
@@ -941,6 +1050,36 @@ public class ProcessBuilderTest {
   protected void assertOnlyOneMessageExists(String messageName) {
     Collection<Message> messages = modelInstance.getModelElementsByType(Message.class);
     assertThat(messages).hasSize(1);
+  }
+
+  protected Signal assertSignalCatchEventDefinition(String elementId, String signalName) {
+    CatchEvent catchEvent = modelInstance.getModelElementById(elementId);
+    Collection<EventDefinition> eventDefinitions = catchEvent.getEventDefinitions();
+    return assertSignalEventDefinition(signalName, eventDefinitions);
+  }
+
+  protected Signal assertSignalThrowEventDefinition(String elementId, String signalName) {
+    ThrowEvent throwEvent = modelInstance.getModelElementById(elementId);
+    Collection<EventDefinition> eventDefinitions = throwEvent.getEventDefinitions();
+    return assertSignalEventDefinition(signalName, eventDefinitions);
+  }
+
+  protected Signal assertSignalEventDefinition(String signalName, Collection<EventDefinition> eventDefinitions) {
+    assertThat(eventDefinitions).hasSize(1);
+
+    EventDefinition eventDefinition = eventDefinitions.iterator().next();
+    assertThat(eventDefinition).isInstanceOf(SignalEventDefinition.class);
+
+    Signal signal = ((SignalEventDefinition) eventDefinition).getSignal();
+    assertThat(signal).isNotNull();
+    assertThat(signal.getName()).isEqualTo(signalName);
+
+    return signal;
+  }
+
+  protected void assertOnlyOneSignalExists(String signalName) {
+    Collection<Signal> signals = modelInstance.getModelElementsByType(Signal.class);
+    assertThat(signals).hasSize(1);
   }
 
 }
