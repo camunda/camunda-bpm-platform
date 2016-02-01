@@ -13,10 +13,13 @@
 
 package org.camunda.bpm.engine.impl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -25,8 +28,6 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.CompareUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 
 /**
@@ -58,6 +59,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
   protected String exceptionMessage;
   protected boolean noRetriesLeft;
   protected SuspensionState suspensionState;
+  protected String[] tenantIds;
 
   public JobQueryImpl() {
   }
@@ -233,6 +235,12 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
     return CompareUtil.areNotInAscendingOrder(dueDates);
   }
 
+  public JobQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    return this;
+  }
+
   //sorting //////////////////////////////////////////
 
   public JobQuery orderByJobDuedate() {
@@ -267,8 +275,13 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
     return orderBy(JobQueryProperty.PRIORITY);
   }
 
+  public JobQuery orderByTenantId() {
+    return orderBy(JobQueryProperty.TENANT_ID);
+  }
+
   //results //////////////////////////////////////////
 
+  @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     return commandContext
@@ -276,6 +289,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
       .findJobCountByQueryCriteria(this);
   }
 
+  @Override
   public List<Job> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     return commandContext

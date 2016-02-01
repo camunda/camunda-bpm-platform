@@ -22,9 +22,11 @@ import java.util.List;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -212,6 +214,52 @@ public class MultiTenancyPropagationTest extends PluggableProcessEngineTestCase 
     assertThat(eventSubscription, is(notNullValue()));
     // inherit the tenant id from process instance
     assertThat(eventSubscription.getTenantId(), is(TENANT_ID));
+  }
+
+  public void testPropagateTenantIdToStartTimerJobDefinition() {
+
+    deployment(repositoryService.createDeployment()
+        .tenantId(TENANT_ID)
+        .addClasspathResource("org/camunda/bpm/engine/test/api/multitenancy/timerStartEvent.bpmn"));
+
+    // the job definition is created on deployment
+    JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
+    assertThat(jobDefinition, is(notNullValue()));
+    // inherit the tenant id from process definition
+    assertThat(jobDefinition.getTenantId(), is(TENANT_ID));
+  }
+
+  public void testPropagateTenantIdToIntermediateTimerJob() {
+
+    deployment(repositoryService.createDeployment()
+        .tenantId(TENANT_ID)
+        .addClasspathResource("org/camunda/bpm/engine/test/api/multitenancy/intermediateTimerEvent.bpmn"));
+
+    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+
+    // the job is created when the timer event is reached
+    Job job = managementService.createJobQuery().singleResult();
+    assertThat(job, is(notNullValue()));
+    // inherit the tenant id from job definition
+    assertThat(job.getTenantId(), is(TENANT_ID));
+  }
+
+  public void testPropagateTenantIdToAsyncJob() {
+
+    deploymentForTenant(TENANT_ID, Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
+        .startEvent()
+        .userTask()
+          .camundaAsyncBefore()
+        .endEvent()
+      .done());
+
+    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+
+    // the job is created when the asynchronous activity is reached
+    Job job = managementService.createJobQuery().singleResult();
+    assertThat(job, is(notNullValue()));
+    // inherit the tenant id from job definition
+    assertThat(job.getTenantId(), is(TENANT_ID));
   }
 
   public static class SetVariableTask implements JavaDelegate {

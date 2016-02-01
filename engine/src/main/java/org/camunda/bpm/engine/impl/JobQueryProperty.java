@@ -32,5 +32,6 @@ public interface JobQueryProperty {
   public static final QueryProperty RETRIES = new QueryPropertyImpl("RETRIES_");
   public static final QueryProperty TYPE = new QueryPropertyImpl("TYPE_");
   public static final QueryProperty PRIORITY = new QueryPropertyImpl("PRIORITY_");
+  public static final QueryProperty TENANT_ID = new QueryPropertyImpl("TENANT_ID_");
 
 }

@@ -15,8 +15,8 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 import java.io.Serializable;
 import java.util.HashMap;
 
-import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.db.DbEntity;
+import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.management.JobDefinition;
 
@@ -56,6 +56,8 @@ public class JobDefinitionEntity implements JobDefinition, HasDbRevision, DbEnti
 
   protected Long jobPriority;
 
+  protected String tenantId;
+
   public JobDefinitionEntity() {
   }
 
@@ -74,6 +76,7 @@ public class JobDefinitionEntity implements JobDefinition, HasDbRevision, DbEnti
     state.put("jobConfiguration", jobConfiguration);
     state.put("suspensionState", suspensionState);
     state.put("jobPriority", jobPriority);
+    state.put("tenantId", tenantId);
     return state;
   }
 
@@ -163,6 +166,14 @@ public class JobDefinitionEntity implements JobDefinition, HasDbRevision, DbEnti
 
   public void setJobPriority(Long jobPriority) {
     this.jobPriority = jobPriority;
+  }
+
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
   }
 
 }

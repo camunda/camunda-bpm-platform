@@ -71,21 +71,25 @@ public interface JobQuery extends Query<JobQuery, Job> {
   /** Only select jobs where the duedate is lower then the given date.
    * @deprecated
    */
+  @Deprecated
   JobQuery duedateLowerThen(Date date);
 
   /** Only select jobs where the duedate is lower then or equals the given date.
    * @deprecated
    */
+  @Deprecated
   JobQuery duedateLowerThenOrEquals(Date date);
 
   /** Only select jobs where the duedate is higher then the given date.
    * @deprecated
    */
+  @Deprecated
   JobQuery duedateHigherThen(Date date);
 
   /** Only select jobs where the duedate is higher then or equals the given date.
    * @deprecated
    */
+  @Deprecated
   JobQuery duedateHigherThenOrEquals(Date date);
 
   /**
@@ -117,6 +121,9 @@ public interface JobQuery extends Query<JobQuery, Job> {
   /** Only select jobs that are suspended. */
   JobQuery suspended();
 
+  /** Only select jobs that belong to one of the given tenant ids. */
+  JobQuery tenantIdIn(String... tenantIds);
+
   //sorting //////////////////////////////////////////
 
   /** Order by job id (needs to be followed by {@link #asc()} or {@link #desc()}). */
@@ -147,5 +154,10 @@ public interface JobQuery extends Query<JobQuery, Job> {
   /** Order by execution id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   JobQuery orderByExecutionId();
 
+  /**
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of job without tenant id is database-specific.
+   */
+  JobQuery orderByTenantId();
 
 }

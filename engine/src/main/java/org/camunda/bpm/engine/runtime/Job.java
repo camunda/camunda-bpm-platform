@@ -98,4 +98,11 @@ public interface Job {
    * @since 7.4
    */
   long getPriority();
+
+  /**
+   * The id of the tenant this job belongs to. Can be <code>null</code>
+   * if the job belongs to no single tenant.
+   */
+  String getTenantId();
+
 }

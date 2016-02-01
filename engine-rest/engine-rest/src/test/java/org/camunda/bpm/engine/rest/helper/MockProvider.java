@@ -1376,6 +1376,10 @@ public abstract class MockProvider {
 
   // jobs
   public static Job createMockJob() {
+    return createMockJob(EXAMPLE_TENANT_ID);
+  }
+
+  public static Job createMockJob(String tenantId) {
     Job mock = new MockJobBuilder()
       .id(EXAMPLE_JOB_ID)
       .processInstanceId(EXAMPLE_PROCESS_INSTANCE_ID)
@@ -1388,6 +1392,7 @@ public abstract class MockProvider {
       .suspended(EXAMPLE_JOB_IS_SUSPENDED)
       .priority(EXAMPLE_JOB_PRIORITY)
       .jobDefinitionId(EXAMPLE_JOB_DEFINITION_ID)
+      .tenantId(tenantId)
       .build();
     return mock;
   }
@@ -1836,7 +1841,10 @@ public abstract class MockProvider {
   }
 
   public static JobDefinition createMockJobDefinition() {
+    return createMockJobDefinition(EXAMPLE_TENANT_ID);
+  }
 
+  public static JobDefinition createMockJobDefinition(String tenantId) {
     return new MockJobDefinitionBuilder()
       .id(EXAMPLE_JOB_DEFINITION_ID)
       .activityId(EXAMPLE_ACTIVITY_ID)
@@ -1846,8 +1854,8 @@ public abstract class MockProvider {
       .suspended(EXAMPLE_JOB_DEFINITION_IS_SUSPENDED)
       .processDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID)
       .processDefinitionKey(EXAMPLE_PROCESS_DEFINITION_KEY)
+      .tenantId(tenantId)
       .build();
-
   }
 
   public static List<UserOperationLogEntry> createUserOperationLogEntries() {

@@ -87,4 +87,10 @@ public interface JobDefinition {
    */
   Long getOverridingJobPriority();
 
+  /**
+   * The id of the tenant this job definition belongs to. Can be <code>null</code>
+   * if the definition belongs to no single tenant.
+   */
+  String getTenantId();
+
 }

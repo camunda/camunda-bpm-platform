@@ -58,7 +58,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
-  
+
   protected static final String JOB_RESOURCE_URL = TEST_RESOURCE_ROOT_PATH + "/job";
   protected static final String SINGLE_JOB_RESOURCE_URL = JOB_RESOURCE_URL + "/{id}";
   protected static final String JOB_RESOURCE_SET_RETRIES_URL = SINGLE_JOB_RESOURCE_URL + "/retries";
@@ -87,6 +87,7 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
       .dueDate(new Date())
       .priority(MockProvider.EXAMPLE_JOB_PRIORITY)
       .jobDefinitionId(MockProvider.EXAMPLE_JOB_DEFINITION_ID)
+      .tenantId(MockProvider.EXAMPLE_TENANT_ID)
       .build();
 
     when(mockQuery.singleResult()).thenReturn(mockedJob);
@@ -174,12 +175,13 @@ public class JobRestServiceInteractionTest extends AbstractRestServiceTest {
   @Test
   public void testSimpleJobGet() {
     given().pathParam("id", MockProvider.EXAMPLE_JOB_ID).then().expect().statusCode(Status.OK.getStatusCode())
-    .body("id", equalTo(MockProvider.EXAMPLE_JOB_ID))
-    .body("processInstanceId", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
-    .body("executionId", equalTo(MockProvider.EXAMPLE_EXECUTION_ID))
-    .body("exceptionMessage", equalTo(MockProvider.EXAMPLE_JOB_NO_EXCEPTION_MESSAGE))
-    .body("priority", equalTo(MockProvider.EXAMPLE_JOB_PRIORITY))
-    .body("jobDefinitionId", equalTo(MockProvider.EXAMPLE_JOB_DEFINITION_ID))
+      .body("id", equalTo(MockProvider.EXAMPLE_JOB_ID))
+      .body("processInstanceId", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
+      .body("executionId", equalTo(MockProvider.EXAMPLE_EXECUTION_ID))
+      .body("exceptionMessage", equalTo(MockProvider.EXAMPLE_JOB_NO_EXCEPTION_MESSAGE))
+      .body("priority", equalTo(MockProvider.EXAMPLE_JOB_PRIORITY))
+      .body("jobDefinitionId", equalTo(MockProvider.EXAMPLE_JOB_DEFINITION_ID))
+      .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
     .when().get(SINGLE_JOB_RESOURCE_URL);
 
     InOrder inOrder = inOrder(mockQuery);

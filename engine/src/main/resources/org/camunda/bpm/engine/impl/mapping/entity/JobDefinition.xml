@@ -15,6 +15,7 @@
       JOB_CONFIGURATION_,
       JOB_PRIORITY_,
       SUSPENSION_STATE_,
+      TENANT_ID_,
       REV_
       )
     values (
@@ -26,6 +27,7 @@
       #{jobConfiguration, jdbcType=VARCHAR},
       #{jobPriority, jdbcType=BIGINT},
       #{suspensionState, jdbcType=INTEGER},
+      #{tenantId, jdbcType=VARCHAR},
       1
     )
   </insert>
@@ -92,6 +94,7 @@
     <result property="jobConfiguration" column="JOB_CONFIGURATION_" jdbcType="VARCHAR" />
     <result property="jobPriority" column="JOB_PRIORITY_" jdbcType="BIGINT" />
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
   </resultMap>
 
   <!-- SELECTS -->
@@ -149,6 +152,14 @@
       </if>
       <if test="withOverridingJobPriority != null &amp;&amp; withOverridingJobPriority">
         and RES.JOB_PRIORITY_ is not null
+      </if>
+      
+      <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+        and RES.TENANT_ID_ in
+        <foreach item="tenantId" index="index" collection="tenantIds"
+                 open="(" separator="," close=")">
+          #{tenantId}
+        </foreach>
       </if>
 
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />

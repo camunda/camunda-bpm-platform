@@ -224,6 +224,7 @@ public class BpmnDeployer extends AbstractDefinitionDeployer<ProcessDefinitionEn
     JobDefinitionEntity jobDefinitionEntity = new JobDefinitionEntity(jobDeclaration);
     jobDefinitionEntity.setProcessDefinitionId(processDefinition.getId());
     jobDefinitionEntity.setProcessDefinitionKey(processDefinition.getKey());
+    jobDefinitionEntity.setTenantId(processDefinition.getTenantId());
     jobDefinitionManager.insert(jobDefinitionEntity);
     jobDeclaration.setJobDefinitionId(jobDefinitionEntity.getId());
   }

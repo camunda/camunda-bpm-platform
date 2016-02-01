@@ -12,9 +12,9 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
-import org.camunda.bpm.engine.runtime.Job;
-
 import java.util.Date;
+
+import org.camunda.bpm.engine.runtime.Job;
 
 public class JobDto {
 
@@ -29,6 +29,7 @@ public class JobDto {
   protected Date dueDate;
   protected boolean suspended;
   protected long priority;
+  protected String tenantId;
 
   public static JobDto fromJob(Job job) {
     JobDto dto = new JobDto();
@@ -43,6 +44,8 @@ public class JobDto {
     dto.dueDate = job.getDuedate();
     dto.suspended = job.isSuspended();
     dto.priority = job.getPriority();
+    dto.tenantId = job.getTenantId();
+
     return dto;
   }
 
@@ -88,6 +91,10 @@ public class JobDto {
 
   public long getPriority() {
     return priority;
+  }
+
+  public String getTenantId() {
+    return tenantId;
   }
 
 }

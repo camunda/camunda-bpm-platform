@@ -90,6 +90,7 @@
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER"/>
     <result property="jobDefinitionId" column="JOB_DEF_ID_" jdbcType="VARCHAR" />
     <result property="priority" column="PRIORITY_" jdbcType="BIGINT" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="sequenceCounter" column="SEQUENCE_COUNTER_" jdbcType="BIGINT" />
     <discriminator javaType="string" column="TYPE_">
       <case value="message" resultMap="messageResultMap"/>
@@ -267,6 +268,14 @@
       <if test="suspensionState != null">
         and RES.SUSPENSION_STATE_ = #{suspensionState.stateCode}
       </if>
+      
+      <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+        and RES.TENANT_ID_ in
+        <foreach item="tenantId" index="index" collection="tenantIds"
+                 open="(" separator="," close=")">
+          #{tenantId}
+        </foreach>
+      </if>
 
       <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
         AND
@@ -311,6 +320,7 @@
             JOB_DEF_ID_,
             PRIORITY_,
             SEQUENCE_COUNTER_,
+            TENANT_ID_,
             REV_
           )
     values (#{id, jdbcType=VARCHAR},
@@ -334,6 +344,7 @@
             #{jobDefinitionId, jdbcType=VARCHAR},
             #{priority, jdbcType=BIGINT},
             #{sequenceCounter, jdbcType=BIGINT},
+            #{tenantId, jdbcType=VARCHAR},
             1
     )
   </insert>
@@ -408,6 +419,7 @@
             JOB_DEF_ID_,
             PRIORITY_,
             SEQUENCE_COUNTER_,
+            TENANT_ID_,
             REV_
             )
     values (#{id, jdbcType=VARCHAR},
@@ -430,6 +442,7 @@
             #{jobDefinitionId, jdbcType=VARCHAR},
             #{priority, jdbcType=BIGINT},
             #{sequenceCounter, jdbcType=BIGINT},
+            #{tenantId, jdbcType=VARCHAR},
             1
     )
   </insert>

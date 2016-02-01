@@ -82,6 +82,7 @@ create table ACT_RU_JOB (
     JOB_DEF_ID_ varchar(64),
     PRIORITY_ bigint not null default 0,
     SEQUENCE_COUNTER_ bigint,
+    TENANT_ID_ varchar(64),
     primary key (ID_)
 );
 
@@ -95,6 +96,7 @@ create table ACT_RU_JOBDEF (
     JOB_CONFIGURATION_ varchar(255),
     SUSPENSION_STATE_ integer,
     JOB_PRIORITY_ bigint,
+    TENANT_ID_ varchar(64),
     primary key (ID_)
 );
 
@@ -267,6 +269,8 @@ create index ACT_IDX_VARIABLE_TENANT_ID on ACT_RU_VARIABLE(TENANT_ID_);
 create index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK(PROC_DEF_ID_);
 create index ACT_IDX_INC_CONFIGURATION on ACT_RU_INCIDENT(CONFIGURATION_);
 create index ACT_IDX_JOB_PROCINST on ACT_RU_JOB(PROCESS_INSTANCE_ID_);
+create index ACT_IDX_JOB_TENANT_ID on ACT_RU_JOB(TENANT_ID_);
+create index ACT_IDX_JOBDEF_TENANT_ID on ACT_RU_JOBDEF(TENANT_ID_);
 create index ACT_IDX_METER_LOG on ACT_RU_METER_LOG(NAME_,TIMESTAMP_);
 create index ACT_IDX_EXT_TASK_TOPIC ON ACT_RU_EXT_TASK(TOPIC_NAME_);
 

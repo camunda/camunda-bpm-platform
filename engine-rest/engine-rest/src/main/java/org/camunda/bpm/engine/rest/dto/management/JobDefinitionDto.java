@@ -27,6 +27,7 @@ public class JobDefinitionDto {
   protected String activityId;
   protected boolean suspended;
   protected Long overridingJobPriority;
+  protected String tenantId;
 
   public JobDefinitionDto() { }
 
@@ -55,6 +56,10 @@ public class JobDefinitionDto {
     return overridingJobPriority;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
   public static JobDefinitionDto fromJobDefinition(JobDefinition definition) {
     JobDefinitionDto dto = new JobDefinitionDto();
 
@@ -66,6 +71,7 @@ public class JobDefinitionDto {
     dto.activityId = definition.getActivityId();
     dto.suspended = definition.isSuspended();
     dto.overridingJobPriority = definition.getOverridingJobPriority();
+    dto.tenantId = definition.getTenantId();
 
     return dto;
   }

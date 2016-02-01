@@ -32,6 +32,7 @@ public class MockJobBuilder {
 	protected boolean suspended;
 	protected long priority;
 	protected String jobDefinitionId;
+	protected String tenantId;
 
 	public MockJobBuilder id(String id) {
 		this.id = id;
@@ -88,6 +89,11 @@ public class MockJobBuilder {
 	  return this;
 	}
 
+	public MockJobBuilder tenantId(String tenantId) {
+	  this.tenantId = tenantId;
+	  return this;
+	}
+
 	public Job build() {
 		Job mockJob = mock(Job.class);
 		when(mockJob.getId()).thenReturn(id);
@@ -101,6 +107,7 @@ public class MockJobBuilder {
 		when(mockJob.isSuspended()).thenReturn(suspended);
 		when(mockJob.getPriority()).thenReturn(priority);
 		when(mockJob.getJobDefinitionId()).thenReturn(jobDefinitionId);
+		when(mockJob.getTenantId()).thenReturn(tenantId);
 		return mockJob;
 	}
 

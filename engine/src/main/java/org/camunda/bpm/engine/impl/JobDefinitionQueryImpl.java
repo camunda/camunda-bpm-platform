@@ -38,6 +38,7 @@ public class JobDefinitionQueryImpl extends AbstractQuery<JobDefinitionQuery, Jo
   protected String jobConfiguration;
   protected SuspensionState suspensionState;
   protected Boolean withOverridingJobPriority;
+  protected String[] tenantIds;
 
   public JobDefinitionQueryImpl() {
   }
@@ -53,7 +54,7 @@ public class JobDefinitionQueryImpl extends AbstractQuery<JobDefinitionQuery, Jo
   }
 
   public JobDefinitionQuery activityIdIn(String... activityIds) {
-    ensureNotNull("Activity ids", activityIds);
+    ensureNotNull("Activity ids", (Object[]) activityIds);
     this.activityIds = activityIds;
     return this;
   }
@@ -97,6 +98,12 @@ public class JobDefinitionQueryImpl extends AbstractQuery<JobDefinitionQuery, Jo
     return this;
   }
 
+  public JobDefinitionQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    return this;
+  }
+
   // order by ///////////////////////////////////////////
 
   public JobDefinitionQuery orderByJobDefinitionId() {
@@ -123,8 +130,13 @@ public class JobDefinitionQueryImpl extends AbstractQuery<JobDefinitionQuery, Jo
     return orderBy(JobDefinitionQueryProperty.JOB_CONFIGURATION);
   }
 
+  public JobDefinitionQuery orderByTenantId() {
+    return orderBy(JobDefinitionQueryProperty.TENANT_ID);
+  }
+
   // results ////////////////////////////////////////////
 
+  @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     return commandContext
@@ -132,6 +144,7 @@ public class JobDefinitionQueryImpl extends AbstractQuery<JobDefinitionQuery, Jo
       .findJobDefinitionCountByQueryCriteria(this);
   }
 
+  @Override
   public List<JobDefinition> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     return commandContext

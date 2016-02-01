@@ -52,6 +52,9 @@ public interface JobDefinitionQuery extends Query<JobDefinitionQuery, JobDefinit
    */
   JobDefinitionQuery withOverridingJobPriority();
 
+  /** Only select job definitions that belong to one of the given tenant ids. */
+  JobDefinitionQuery tenantIdIn(String... tenantIds);
+
   /** Order by id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   JobDefinitionQuery orderByJobDefinitionId();
 
@@ -69,5 +72,11 @@ public interface JobDefinitionQuery extends Query<JobDefinitionQuery, JobDefinit
 
   /** Order by job configuration (needs to be followed by {@link #asc()} or {@link #desc()}). */
   JobDefinitionQuery orderByJobConfiguration();
+
+  /**
+   * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of job definitions without tenant id is database-specific.
+   */
+  JobDefinitionQuery orderByTenantId();
 
 }

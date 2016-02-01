@@ -82,6 +82,7 @@ create table ACT_RU_JOB (
     PRIORITY_ numeric(19,0) NOT NULL DEFAULT 0,
     JOB_DEF_ID_ nvarchar(64),
     SEQUENCE_COUNTER_ numeric(19,0),
+    TENANT_ID_ nvarchar(64),
     primary key (ID_)
 );
 
@@ -95,6 +96,7 @@ create table ACT_RU_JOBDEF (
     JOB_CONFIGURATION_ nvarchar(255),
     SUSPENSION_STATE_ tinyint,
     JOB_PRIORITY_ numeric(19,0),
+    TENANT_ID_ nvarchar(64),
     primary key (ID_)
 );
 
@@ -264,6 +266,8 @@ create index ACT_IDX_VARIABLE_TENANT_ID on ACT_RU_VARIABLE(TENANT_ID_);
 create index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK(PROC_DEF_ID_);
 create index ACT_IDX_INC_CONFIGURATION on ACT_RU_INCIDENT(CONFIGURATION_);
 create index ACT_IDX_JOB_PROCINST on ACT_RU_JOB(PROCESS_INSTANCE_ID_);
+create index ACT_IDX_JOB_TENANT_ID on ACT_RU_JOB(TENANT_ID_);
+create index ACT_IDX_JOBDEF_TENANT_ID on ACT_RU_JOBDEF(TENANT_ID_);
 create unique index ACT_UNIQ_AUTH_USER on ACT_RU_AUTHORIZATION (TYPE_,USER_ID_,RESOURCE_TYPE_,RESOURCE_ID_) where USER_ID_ is not null;
 create unique index ACT_UNIQ_AUTH_GROUP on ACT_RU_AUTHORIZATION (TYPE_,GROUP_ID_,RESOURCE_TYPE_,RESOURCE_ID_) where GROUP_ID_ is not null;
 create unique index ACT_UNIQ_VARIABLE on ACT_RU_VARIABLE(VAR_SCOPE_, NAME_);

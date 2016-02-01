@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -97,6 +98,8 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
 
   protected long priority = DefaultJobPriorityProvider.DEFAULT_PRIORITY;
 
+  protected String tenantId;
+
   // runtime state /////////////////////////////
   protected boolean executing = false;
   protected String activityId;
@@ -143,7 +146,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     if (execution != null) {
       execution.addJob(this);
 
-      ProcessDefinitionImpl processDefinition = (ProcessDefinitionImpl) execution.getProcessDefinition();
+      ProcessDefinitionImpl processDefinition = execution.getProcessDefinition();
       this.deploymentId = processDefinition.getDeploymentId();
     }
 
@@ -190,6 +193,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     persistentState.put("deploymentId", deploymentId);
     persistentState.put("jobHandlerConfiguration", jobHandlerConfiguration);
     persistentState.put("priority", priority);
+    persistentState.put("tenantId", tenantId);
     if(exceptionByteArrayId != null) {
       persistentState.put("exceptionByteArrayId", exceptionByteArrayId);
     }
@@ -540,6 +544,14 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     this.priority = priority;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
   protected void ensureActivityIdInitialized() {
     if (activityId == null) {
       JobDefinition jobDefinition = getJobDefinition();
@@ -602,6 +614,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
            + ", exceptionMessage=" + exceptionMessage
            + ", deploymentId=" + deploymentId
            + ", priority=" + priority
+           + ", tenantId=" + tenantId
            + "]";
   }
 

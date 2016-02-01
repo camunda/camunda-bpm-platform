@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -38,7 +39,7 @@ public class JobDefinitionQueryDto extends AbstractQueryDto<JobDefinitionQuery> 
   private static final String SORT_BY_PROCESS_DEFINITION_KEY = "processDefinitionKey";
   private static final String SORT_BY_JOB_TYPE = "jobType";
   private static final String SORT_BY_JOB_CONFIGURATION = "jobConfiguration";
-
+  private static final String SORT_BY_TENANT_ID = "tenantId";
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -50,6 +51,7 @@ public class JobDefinitionQueryDto extends AbstractQueryDto<JobDefinitionQuery> 
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_DEFINITION_KEY);
     VALID_SORT_BY_VALUES.add(SORT_BY_JOB_TYPE);
     VALID_SORT_BY_VALUES.add(SORT_BY_JOB_CONFIGURATION);
+    VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID);
   }
 
   protected String jobDefinitionId;
@@ -61,6 +63,7 @@ public class JobDefinitionQueryDto extends AbstractQueryDto<JobDefinitionQuery> 
   protected Boolean active;
   protected Boolean suspended;
   protected Boolean withOverridingJobPriority;
+  private List<String> tenantIds;
 
   public JobDefinitionQueryDto() {}
 
@@ -113,14 +116,22 @@ public class JobDefinitionQueryDto extends AbstractQueryDto<JobDefinitionQuery> 
     this.withOverridingJobPriority = withOverridingJobPriority;
   }
 
+  @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
+  public void setTenantIdIn(List<String> tenantIds) {
+    this.tenantIds = tenantIds;
+  }
+
+  @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
   }
 
+  @Override
   protected JobDefinitionQuery createNewQuery(ProcessEngine engine) {
     return engine.getManagementService().createJobDefinitionQuery();
   }
 
+  @Override
   protected void applyFilters(JobDefinitionQuery query) {
     if (jobDefinitionId != null) {
       query.jobDefinitionId(jobDefinitionId);
@@ -157,8 +168,13 @@ public class JobDefinitionQueryDto extends AbstractQueryDto<JobDefinitionQuery> 
     if (withOverridingJobPriority != null && withOverridingJobPriority) {
       query.withOverridingJobPriority();
     }
+
+    if (tenantIds != null && !tenantIds.isEmpty()) {
+      query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
   }
 
+  @Override
   protected void applySortBy(JobDefinitionQuery query, String sortBy, Map<String, Object> parameters, ProcessEngine engine) {
     if (sortBy.equals(SORT_BY_JOB_DEFINITION_ID)) {
       query.orderByJobDefinitionId();
@@ -172,6 +188,8 @@ public class JobDefinitionQueryDto extends AbstractQueryDto<JobDefinitionQuery> 
       query.orderByJobType();
     } else if (sortBy.equals(SORT_BY_JOB_CONFIGURATION)) {
       query.orderByJobConfiguration();
+    } else if (sortBy.equals(SORT_BY_TENANT_ID)) {
+      query.orderByTenantId();
     }
   }
 

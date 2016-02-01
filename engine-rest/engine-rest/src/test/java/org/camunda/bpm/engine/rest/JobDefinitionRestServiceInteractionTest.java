@@ -1,11 +1,13 @@
 package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
@@ -13,8 +15,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
@@ -38,12 +43,13 @@ import org.junit.Test;
 import org.mockito.InOrder;
 
 import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.response.Response;
 
 public class JobDefinitionRestServiceInteractionTest extends AbstractRestServiceTest {
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
-  
+
   protected static final String JOB_DEFINITION_RESOURCE_URL = TEST_RESOURCE_ROOT_PATH + "/job-definition";
   protected static final String SINGLE_JOB_DEFINITION_RESOURCE_URL = JOB_DEFINITION_RESOURCE_URL + "/{id}";
   protected static final String SINGLE_JOB_DEFINITION_SUSPENDED_URL = SINGLE_JOB_DEFINITION_RESOURCE_URL + "/suspended";
@@ -51,26 +57,36 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
   protected static final String JOB_DEFINITION_RETRIES_URL = SINGLE_JOB_DEFINITION_RESOURCE_URL + "/retries";
   protected static final String JOB_DEFINITION_PRIORITY_URL = SINGLE_JOB_DEFINITION_RESOURCE_URL + "/jobPriority";
 
-
   private ProcessEngine namedProcessEngine;
   private ManagementService mockManagementService;
   private JobDefinitionQuery mockQuery;
 
   @Before
   public void setUpRuntimeData() {
-
-    mockQuery = mock(JobDefinitionQuery.class);
-
-    JobDefinition mockedJobDefinition = MockProvider.createMockJobDefinition();
-
-    when(mockQuery.singleResult()).thenReturn(mockedJobDefinition);
-    when(mockQuery.jobDefinitionId(MockProvider.EXAMPLE_JOB_DEFINITION_ID)).thenReturn(mockQuery);
-
     mockManagementService = mock(ManagementService.class);
-    when(mockManagementService.createJobDefinitionQuery()).thenReturn(mockQuery);
 
     namedProcessEngine = getProcessEngine(MockProvider.EXAMPLE_PROCESS_ENGINE_NAME);
     when(namedProcessEngine.getManagementService()).thenReturn(mockManagementService);
+
+    List<JobDefinition> mockJobDefinitions = Collections.singletonList(MockProvider.createMockJobDefinition());
+    mockQuery = setUpMockJobDefinitionQuery(mockJobDefinitions);
+  }
+
+  private JobDefinitionQuery setUpMockJobDefinitionQuery(List<JobDefinition> mockedJobDefinitions) {
+    JobDefinitionQuery sampleJobDefinitionQuery = mock(JobDefinitionQuery.class);
+
+    when(sampleJobDefinitionQuery.list()).thenReturn(mockedJobDefinitions);
+    when(sampleJobDefinitionQuery.count()).thenReturn((long) mockedJobDefinitions.size());
+    if(mockedJobDefinitions.size() == 1) {
+      when(sampleJobDefinitionQuery.singleResult()).thenReturn(mockedJobDefinitions.get(0));
+    }
+
+    when(sampleJobDefinitionQuery.jobDefinitionId(MockProvider.EXAMPLE_JOB_DEFINITION_ID)).thenReturn(sampleJobDefinitionQuery);
+
+    when(processEngine.getManagementService().createJobDefinitionQuery()).thenReturn(sampleJobDefinitionQuery);
+    when(mockManagementService.createJobDefinitionQuery()).thenReturn(sampleJobDefinitionQuery);
+
+    return sampleJobDefinitionQuery;
   }
 
   @Test
@@ -88,6 +104,7 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
         .body("activityId", equalTo(MockProvider.EXAMPLE_ACTIVITY_ID))
         .body("suspended", equalTo(MockProvider.EXAMPLE_JOB_DEFINITION_IS_SUSPENDED))
         .body("overridingJobPriority", equalTo(MockProvider.EXAMPLE_JOB_DEFINITION_PRIORITY))
+        .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
     .when()
       .get(SINGLE_JOB_DEFINITION_RESOURCE_URL);
 
@@ -1429,5 +1446,64 @@ public class JobDefinitionRestServiceInteractionTest extends AbstractRestService
       .put(JOB_DEFINITION_PRIORITY_URL);
   }
 
+  @Test
+  public void testTenantIdListParameter() {
+    mockQuery = setUpMockJobDefinitionQuery(createMockJobDefinitionsTwoTenants());
+
+    Response response = given()
+      .queryParam("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(JOB_DEFINITION_RESOURCE_URL);
+
+    verify(mockQuery).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+    verify(mockQuery).list();
+
+    String content = response.asString();
+    List<String> jobDefinitions = from(content).getList("");
+    assertThat(jobDefinitions).hasSize(2);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    String returnedTenantId2 = from(content).getString("[1].tenantId");
+
+    assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
+    assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+  }
+
+  @Test
+  public void testTenantIdListPostParameter() {
+    mockQuery = setUpMockJobDefinitionQuery(createMockJobDefinitionsTwoTenants());
+
+    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    queryParameters.put("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST.split(","));
+
+    Response response = given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(queryParameters)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(JOB_DEFINITION_RESOURCE_URL);
+
+    verify(mockQuery).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+    verify(mockQuery).list();
+
+    String content = response.asString();
+    List<String> jobDefinitions = from(content).getList("");
+    assertThat(jobDefinitions).hasSize(2);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    String returnedTenantId2 = from(content).getString("[1].tenantId");
+
+    assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
+    assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+  }
+
+  private List<JobDefinition> createMockJobDefinitionsTwoTenants() {
+    return Arrays.asList(
+        MockProvider.createMockJobDefinition(MockProvider.EXAMPLE_TENANT_ID),
+        MockProvider.createMockJobDefinition(MockProvider.ANOTHER_EXAMPLE_TENANT_ID));
+  }
 
 }

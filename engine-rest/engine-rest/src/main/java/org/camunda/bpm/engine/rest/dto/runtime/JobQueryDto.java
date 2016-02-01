@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.ConditionListConverter;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.LongConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.runtime.JobQuery;
@@ -44,6 +45,7 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
   private static final String SORT_BY_JOB_RETRIES_VALUE = "jobRetries";
   private static final String SORT_BY_JOB_DUEDATE_VALUE = "jobDueDate";
   private static final String SORT_BY_JOB_PRIORITY_VALUE = "jobPriority";
+  private static final String SORT_BY_TENANT_ID = "tenantId";
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -56,6 +58,7 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
     VALID_SORT_BY_VALUES.add(SORT_BY_JOB_RETRIES_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_JOB_DUEDATE_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_JOB_PRIORITY_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID);
   }
 
   protected String activityId;
@@ -76,6 +79,7 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
   protected Long priorityHigherThanOrEquals;
   protected Long priorityLowerThanOrEquals;
   protected String jobDefinitionId;
+  private List<String> tenantIds;
 
   protected List<ConditionQueryParameterDto> dueDates;
 
@@ -178,6 +182,11 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
   @CamundaQueryParam("jobDefinitionId")
   public void setJobDefinitionId(String jobDefinitionId) {
     this.jobDefinitionId = jobDefinitionId;
+  }
+
+  @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
+  public void setTenantIdIn(List<String> tenantIds) {
+    this.tenantIds = tenantIds;
   }
 
   @Override
@@ -293,6 +302,10 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
         }
       }
     }
+
+    if (tenantIds != null && !tenantIds.isEmpty()) {
+      query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
   }
 
   @Override
@@ -313,8 +326,9 @@ public class JobQueryDto extends AbstractQueryDto<JobQuery> {
       query.orderByJobDuedate();
     } else if (sortBy.equals(SORT_BY_JOB_PRIORITY_VALUE)) {
       query.orderByJobPriority();
+    } else if (sortBy.equals(SORT_BY_TENANT_ID)) {
+      query.orderByTenantId();
     }
-
   }
 
 }
