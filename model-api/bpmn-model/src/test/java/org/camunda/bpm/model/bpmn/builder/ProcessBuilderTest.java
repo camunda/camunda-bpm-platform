@@ -43,11 +43,16 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.GatewayDirection;
 import org.camunda.bpm.model.bpmn.instance.BusinessRuleTask;
 import org.camunda.bpm.model.bpmn.instance.CallActivity;
+import org.camunda.bpm.model.bpmn.instance.CatchEvent;
 import org.camunda.bpm.model.bpmn.instance.Definitions;
 import org.camunda.bpm.model.bpmn.instance.Event;
+import org.camunda.bpm.model.bpmn.instance.EventDefinition;
 import org.camunda.bpm.model.bpmn.instance.FlowNode;
 import org.camunda.bpm.model.bpmn.instance.Gateway;
+import org.camunda.bpm.model.bpmn.instance.Message;
+import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.Process;
+import org.camunda.bpm.model.bpmn.instance.ReceiveTask;
 import org.camunda.bpm.model.bpmn.instance.ScriptTask;
 import org.camunda.bpm.model.bpmn.instance.SendTask;
 import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
@@ -55,6 +60,7 @@ import org.camunda.bpm.model.bpmn.instance.ServiceTask;
 import org.camunda.bpm.model.bpmn.instance.StartEvent;
 import org.camunda.bpm.model.bpmn.instance.SubProcess;
 import org.camunda.bpm.model.bpmn.instance.Task;
+import org.camunda.bpm.model.bpmn.instance.ThrowEvent;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
@@ -81,6 +87,13 @@ public class ProcessBuilderTest {
     gatewayType = model.getType(Gateway.class);
     eventType = model.getType(Event.class);
     processType = model.getType(Process.class);
+  }
+
+  @After
+  public void validateModel() throws IOException {
+    if (modelInstance != null) {
+      Bpmn.validateModel(modelInstance);
+    }
   }
 
   @Test
@@ -727,12 +740,207 @@ public class ProcessBuilderTest {
     }
   }
 
+  @Test
+  public void testMessageStartEvent() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent("start").message("message")
+      .done();
 
-  @After
-  public void validateModel() throws IOException {
-    if (modelInstance != null) {
-      Bpmn.validateModel(modelInstance);
-    }
+    assertMessageCatchEventDefinition("start", "message");
+  }
+
+  @Test
+  public void testMessageStartEventWithExistingMessage() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent("start").message("message")
+        .subProcess().triggerByEvent()
+         .embeddedSubProcess()
+         .startEvent("subStart").message("message")
+         .subProcessDone()
+      .done();
+
+    Message message = assertMessageCatchEventDefinition("start", "message");
+    Message subMessage = assertMessageCatchEventDefinition("subStart", "message");
+
+    assertThat(message).isEqualTo(subMessage);
+
+    assertOnlyOneMessageExists("message");
+  }
+
+  @Test
+  public void testIntermediateMessageCatchEvent() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .intermediateCatchEvent("catch").message("message")
+      .done();
+
+    assertMessageCatchEventDefinition("catch", "message");
+  }
+
+  @Test
+  public void testIntermediateMessageCatchEventWithExistingMessage() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .intermediateCatchEvent("catch1").message("message")
+      .intermediateCatchEvent("catch2").message("message")
+      .done();
+
+    Message message1 = assertMessageCatchEventDefinition("catch1", "message");
+    Message message2 = assertMessageCatchEventDefinition("catch2", "message");
+
+    assertThat(message1).isEqualTo(message2);
+
+    assertOnlyOneMessageExists("message");
+  }
+
+  @Test
+  public void testMessageEndEvent() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .endEvent("end").message("message")
+      .done();
+
+    assertMessageThrowEventDefinition("end", "message");
+  }
+
+  @Test
+  public void testMessageEndEventWithExistingMessage() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .parallelGateway()
+      .endEvent("end1").message("message")
+      .moveToLastGateway()
+      .endEvent("end2").message("message")
+      .done();
+
+    Message message1 = assertMessageThrowEventDefinition("end1", "message");
+    Message message2 = assertMessageThrowEventDefinition("end2", "message");
+
+    assertThat(message1).isEqualTo(message2);
+
+    assertOnlyOneMessageExists("message");
+  }
+
+  @Test
+  public void testIntermediateMessageThrowEvent() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .intermediateThrowEvent("throw").message("message")
+      .done();
+
+    assertMessageThrowEventDefinition("throw", "message");
+  }
+
+  @Test
+  public void testIntermediateMessageThrowEventWithExistingMessage() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .intermediateThrowEvent("throw1").message("message")
+      .intermediateThrowEvent("throw2").message("message")
+      .done();
+
+    Message message1 = assertMessageThrowEventDefinition("throw1", "message");
+    Message message2 = assertMessageThrowEventDefinition("throw2", "message");
+
+    assertThat(message1).isEqualTo(message2);
+
+    assertOnlyOneMessageExists("message");
+  }
+
+  @Test
+  public void testReceiveTaskMessage() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .receiveTask("receive").message("message")
+      .done();
+
+    ReceiveTask receiveTask = modelInstance.getModelElementById("receive");
+
+    Message message = receiveTask.getMessage();
+    assertThat(message).isNotNull();
+    assertThat(message.getName()).isEqualTo("message");
+  }
+
+  @Test
+  public void testReceiveTaskWithExistingMessage() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .receiveTask("receive1").message("message")
+      .receiveTask("receive2").message("message")
+      .done();
+
+    ReceiveTask receiveTask1 = modelInstance.getModelElementById("receive1");
+    Message message1 = receiveTask1.getMessage();
+
+    ReceiveTask receiveTask2 = modelInstance.getModelElementById("receive2");
+    Message message2 = receiveTask2.getMessage();
+
+    assertThat(message1).isEqualTo(message2);
+
+    assertOnlyOneMessageExists("message");
+  }
+
+  @Test
+  public void testSendTaskMessage() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .sendTask("send").message("message")
+      .done();
+
+    SendTask sendTask = modelInstance.getModelElementById("send");
+
+    Message message = sendTask.getMessage();
+    assertThat(message).isNotNull();
+    assertThat(message.getName()).isEqualTo("message");
+  }
+
+  @Test
+  public void testSendTaskWithExistingMessage() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .sendTask("send1").message("message")
+      .sendTask("send2").message("message")
+      .done();
+
+    SendTask sendTask1 = modelInstance.getModelElementById("send1");
+    Message message1 = sendTask1.getMessage();
+
+    SendTask sendTask2 = modelInstance.getModelElementById("send2");
+    Message message2 = sendTask2.getMessage();
+
+    assertThat(message1).isEqualTo(message2);
+
+    assertOnlyOneMessageExists("message");
+  }
+
+  protected Message assertMessageCatchEventDefinition(String elementId, String messageName) {
+    CatchEvent catchEvent = modelInstance.getModelElementById(elementId);
+    Collection<EventDefinition> eventDefinitions = catchEvent.getEventDefinitions();
+    return assertMessageEventDefinition(messageName, eventDefinitions);
+  }
+
+  protected Message assertMessageThrowEventDefinition(String elementId, String messageName) {
+    ThrowEvent throwEvent = modelInstance.getModelElementById(elementId);
+    Collection<EventDefinition> eventDefinitions = throwEvent.getEventDefinitions();
+    return assertMessageEventDefinition(messageName, eventDefinitions);
+  }
+
+  protected Message assertMessageEventDefinition(String messageName, Collection<EventDefinition> eventDefinitions) {
+    assertThat(eventDefinitions).hasSize(1);
+
+    EventDefinition eventDefinition = eventDefinitions.iterator().next();
+    assertThat(eventDefinition).isInstanceOf(MessageEventDefinition.class);
+
+    Message message = ((MessageEventDefinition) eventDefinition).getMessage();
+    assertThat(message).isNotNull();
+    assertThat(message.getName()).isEqualTo(messageName);
+
+    return message;
+  }
+
+  protected void assertOnlyOneMessageExists(String messageName) {
+    Collection<Message> messages = modelInstance.getModelElementsByType(Message.class);
+    assertThat(messages).hasSize(1);
   }
 
 }

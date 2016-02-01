@@ -14,6 +14,7 @@
 package org.camunda.bpm.model.bpmn.builder;
 
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.ThrowEvent;
 
 /**
@@ -23,6 +24,20 @@ public abstract class AbstractThrowEventBuilder<B extends AbstractThrowEventBuil
 
   protected AbstractThrowEventBuilder(BpmnModelInstance modelInstance, E element, Class<?> selfType) {
     super(modelInstance, element, selfType);
+  }
+
+  /**
+   * Sets an event definition for the given message name. If already a message
+   * with this name exists it will be used, otherwise a new message is created.
+   *
+   * @param messageName the name of the message
+   * @return the builder object
+   */
+  public B message(String messageName) {
+    MessageEventDefinition messageEventDefinition = createMessageEventDefinition(messageName);
+    element.getEventDefinitions().add(messageEventDefinition);
+
+    return myself;
   }
 
 }

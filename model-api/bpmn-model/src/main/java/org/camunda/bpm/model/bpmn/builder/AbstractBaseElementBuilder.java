@@ -13,10 +13,14 @@
 
 package org.camunda.bpm.model.bpmn.builder;
 
+import java.util.Collection;
+
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.BaseElement;
 import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
 import org.camunda.bpm.model.bpmn.instance.ExtensionElements;
+import org.camunda.bpm.model.bpmn.instance.Message;
+import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
 
 /**
  * @author Sebastian Menski
@@ -61,6 +65,30 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
     T instance = createInstance(typeClass, identifier);
     element.getParentElement().addChildElement(instance);
     return instance;
+  }
+
+  protected Message findMessageForName(String messageName) {
+    Collection<Message> messages = modelInstance.getModelElementsByType(Message.class);
+    for (Message message : messages) {
+      if (messageName.equals(message.getName())) {
+        // return already existing message for message name
+        return message;
+      }
+    }
+
+    // create new message for non existing message name
+    Message message = modelInstance.newInstance(Message.class);
+    message.setName(messageName);
+    modelInstance.getDefinitions().addChildElement(message);
+
+    return message;
+  }
+
+  protected MessageEventDefinition createMessageEventDefinition(String messageName) {
+    Message message = findMessageForName(messageName);
+    MessageEventDefinition messageEventDefinition = modelInstance.newInstance(MessageEventDefinition.class);
+    messageEventDefinition.setMessage(message);
+    return messageEventDefinition;
   }
 
   /**

@@ -59,6 +59,18 @@ public abstract class AbstractReceiveTaskBuilder<B extends AbstractReceiveTaskBu
   }
 
   /**
+   * Sets the message with the given message name. If already a message
+   * with this name exists it will be used, otherwise a new message is created.
+   *
+   * @param messageName the name of the message
+   * @return the builder object
+   */
+  public B message(String messageName) {
+    Message message = findMessageForName(messageName);
+    return message(message);
+  }
+
+  /**
    * Sets the operation of the send task.
    *
    * @param operation  the operation to set
