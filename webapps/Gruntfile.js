@@ -59,7 +59,6 @@ module.exports = function(grunt) {
       tasks: ['less']
     }
   };
-  require('./grunt/config/watch')(config, watchConf);
   require('./ui/tasklist/grunt/config/watch')(config, watchConf);
   require('./ui/cockpit/grunt/config/watch')(config, watchConf);
   require('./ui/admin/grunt/config/watch')(config, watchConf);
