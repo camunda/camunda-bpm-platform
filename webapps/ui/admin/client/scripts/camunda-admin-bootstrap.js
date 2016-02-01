@@ -8,7 +8,7 @@ define('camunda-admin-bootstrap', [
   });
 
   require(['globalize'], function(globalize) {
-    var requirePackages = {};
+    var requirePackages = window;
 
     camundaAdminUi.exposePackages(requirePackages);
     globalize(require, ['angular', 'camunda-commons-ui', 'camunda-bpm-sdk-js', 'jquery'], requirePackages);
