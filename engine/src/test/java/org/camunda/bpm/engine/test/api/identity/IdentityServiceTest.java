@@ -190,6 +190,83 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     identityService.deleteUser(user.getId());
   }
 
+  public void testUserDelegation() {
+    // First, create two  new users
+    User user = identityService.newUser("johndoe");
+    identityService.saveUser(user);
+    User delegatedUser = identityService.newUser("salajlan");
+    identityService.saveUser(delegatedUser);
+
+    // update user with delegation
+    user.setDelegatedUserId(delegatedUser.getId());
+
+    identityService.saveUser(user);
+
+    // Fetch and update the user
+    user = identityService.createUserQuery().userId("johndoe").singleResult();
+    assertEquals(delegatedUser.getId(),user.getDelegatedUserId());
+
+    identityService.deleteUser(user.getId());
+    identityService.deleteUser(delegatedUser.getId());
+  }
+
+  public void testUserDelegationNoExistedDelegatedUser() {
+    // First, create  new user
+    User user = identityService.newUser("johndoe");
+    identityService.saveUser(user);
+
+    user.setDelegatedUserId("salajlan");
+    identityService.saveUser(user);
+
+    user = identityService.createUserQuery().userId("johndoe").singleResult();
+    assertEquals("salajlan",user.getDelegatedUserId());
+
+    identityService.deleteUser(user.getId());
+  }
+
+  public void testUserDelegationHasExistingDelegation() {
+    // First, create three new users
+    User user = identityService.newUser("johndoe");
+    identityService.saveUser(user);
+    User delegatedUser = identityService.newUser("salajlan");
+    identityService.saveUser(delegatedUser);
+    User userToBeDelegated = identityService.newUser("sulaiman");
+    identityService.saveUser(userToBeDelegated);
+
+    // update user with delegation
+    delegatedUser.setDelegatedUserId(userToBeDelegated.getId());
+    identityService.saveUser(delegatedUser);
+
+    user.setDelegatedUserId(delegatedUser.getId());
+    identityService.saveUser(user);
+
+    // Fetch and update the user
+    user = identityService.createUserQuery().userId("johndoe").singleResult();
+    assertNotSame("user can't delegate user who already delegate to another user","salajlan", user.getDelegatedUserId());
+    assertEquals(null, user.getDelegatedUserId());
+
+    identityService.deleteUser(user.getId());
+    identityService.deleteUser(delegatedUser.getId());
+    identityService.deleteUser(userToBeDelegated.getId());
+  }
+
+  public void testUserDelegationHimself() {
+    // First, create a new user
+    User user = identityService.newUser("johndoe");
+    identityService.saveUser(user);
+    // update user with delegation
+    user.setDelegatedUserId("johndoe");
+
+    identityService.saveUser(user);
+
+    // Fetch and update the user
+    user = identityService.createUserQuery().userId("johndoe").singleResult();
+    assertNotSame("user can't delegate him self expected null","johndoe", user.getDelegatedUserId());
+    assertEquals(null,user.getDelegatedUserId());
+
+    identityService.deleteUser(user.getId());
+  }
+
   public void testUpdateGroup() {
     Group group = identityService.newGroup("sales");
     group.setName("Sales");
@@ -257,7 +334,7 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     try {
       identityService.createMembership(johndoe.getId(), sales.getId());
     } catch(RuntimeException re) {
-     // Expected exception, membership already exists
+      // Expected exception, membership already exists
     }
 
     identityService.deleteGroup(sales.getId());
@@ -411,7 +488,7 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
   public void testDeleteUserUnexistingUserId() {
     // No exception should be thrown. Deleting an unexisting user should
     // be ignored silently
-     identityService.deleteUser("unexistinguser");
+    identityService.deleteUser("unexistinguser");
   }
 
   public void testCheckPassword() {

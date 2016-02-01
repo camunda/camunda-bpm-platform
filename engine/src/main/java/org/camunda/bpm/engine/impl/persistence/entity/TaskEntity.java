@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
@@ -1205,6 +1206,15 @@ public class TaskEntity extends AbstractVariableScope implements Task, DelegateT
   public ProcessEngineServices getProcessEngineServices() {
     return Context.getProcessEngineConfiguration()
           .getProcessEngine();
+  }
+
+  public String getProperAssignee(String assignee){
+    CommandContext commandContext = Context.getCommandContext();
+    ensureNotNull("commandContext",commandContext);
+
+    User user = commandContext.getReadOnlyIdentityProvider().findUserById(assignee);
+
+    return (user == null ? assignee : (user.getDelegatedUserId() == null ? assignee : user.getDelegatedUserId()));
   }
 
   @Override

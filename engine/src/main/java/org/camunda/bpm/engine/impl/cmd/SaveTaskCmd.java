@@ -19,6 +19,7 @@ import java.io.Serializable;
 import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.UserOperationLogEntry;
+import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
@@ -44,6 +45,8 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
 
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     String operation;
+
+    task.setAssignee(task.getProperAssignee(task.getAssignee()));
 
     if (task.getRevision() == 0) {
 

@@ -791,6 +791,83 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     taskService.deleteTask(task.getId(), true);
   }
 
+  public void testSetAssigneeWithDelegateUser() {
+    User user = identityService.newUser("user");
+    user.setDelegatedUserId("salajlan");
+    identityService.saveUser(user);
+
+    Task task = taskService.newTask();
+    assertNull(task.getAssignee());
+    taskService.saveTask(task);
+
+    // Set assignee
+    taskService.setAssignee(task.getId(), user.getId());
+
+    // Fetch task again
+    task = taskService.createTaskQuery().taskId(task.getId()).singleResult();
+    assertEquals(user.getDelegatedUserId(), task.getAssignee());
+
+    identityService.deleteUser(user.getId());
+    taskService.deleteTask(task.getId(), true);
+  }
+
+  public void testTaskSetAssigneeWithDelegateUser() {
+    User user = identityService.newUser("user");
+    user.setDelegatedUserId("salajlan");
+    identityService.saveUser(user);
+
+    Task task = taskService.newTask();
+    assertNull(task.getAssignee());
+    taskService.saveTask(task);
+
+    // Set assignee
+    task.setAssignee(user.getId());
+    taskService.saveTask(task);
+
+    // Fetch task again
+    task = taskService.createTaskQuery().taskId(task.getId()).singleResult();
+    assertEquals(user.getDelegatedUserId(), task.getAssignee());
+
+    identityService.deleteUser(user.getId());
+    taskService.deleteTask(task.getId(), true);
+  }
+
+  public void testSetAssigneeWithUserIdAsString() {
+
+    Task task = taskService.newTask();
+    assertNull(task.getAssignee());
+    taskService.saveTask(task);
+
+    // Set assignee
+    taskService.setAssignee(task.getId(), "salajlan");
+
+    // Fetch task again
+    task = taskService.createTaskQuery().taskId(task.getId()).singleResult();
+    assertEquals("salajlan", task.getAssignee());
+
+    taskService.deleteTask(task.getId(), true);
+  }
+
+  public void testCreateTaskWithDelegateUser() {
+    User user = identityService.newUser("user");
+    user.setDelegatedUserId("salajlan");
+    identityService.saveUser(user);
+
+    Task task = taskService.newTask();
+    task.setAssignee(user.getId());
+    taskService.saveTask(task);
+
+    // Set assignee
+    taskService.setAssignee(task.getId(), user.getId());
+
+    // Fetch task again
+    task = taskService.createTaskQuery().taskId(task.getId()).singleResult();
+    assertEquals(user.getDelegatedUserId(), task.getAssignee());
+
+    identityService.deleteUser(user.getId());
+    taskService.deleteTask(task.getId(), true);
+  }
+
   public void testSetAssigneeNullTaskId() {
     try {
       taskService.setAssignee(null, "userId");

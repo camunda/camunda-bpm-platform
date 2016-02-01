@@ -37,4 +37,7 @@ public interface User extends Serializable {
   
   String getPassword(); 
   void setPassword(String string);
+
+  void setDelegatedUserId(String userId);
+  String getDelegatedUserId();
 }
