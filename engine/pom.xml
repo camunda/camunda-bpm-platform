@@ -209,54 +209,54 @@
 
 
   <properties>
-      <test.includes />
-      <!-- without a special test profile we don't want to exclude anything, this expressions should never match -->
-      <test.excludes>$.</test.excludes>
-      <history.level>full</history.level>
-      <mail.server.port>5025</mail.server.port>
+    <test.includes />
+    <!-- without a special test profile we don't want to exclude anything, this expressions should never match -->
+    <test.excludes>$.</test.excludes>
+    <history.level>full</history.level>
+    <mail.server.port>5025</mail.server.port>
 
-      <camunda.artifact>
-        org.camunda.bpm
-      </camunda.artifact>
-      <camunda.osgi.export.pkg>
-        ${camunda.artifact};${camunda.osgi.version};-noimport:=true,
-        ${camunda.artifact}.application.*;${camunda.osgi.version};-noimport:=true,
-        ${camunda.artifact}.container.*;${camunda.osgi.version};-noimport:=true,
-		!${camunda.artifact}.engine.variable*,
-        ${camunda.artifact}.engine.*;${camunda.osgi.version};-noimport:=true
-      </camunda.osgi.export.pkg>
-	  <camunda.osgi.import.defaults>
-		org.camunda.bpm.engine.variable;${camunda.osgi.import.camunda.commons.version},
-		org.camunda.bpm.engine.variable.context;${camunda.osgi.import.camunda.commons.version},
-		org.camunda.bpm.engine.variable.impl;${camunda.osgi.import.camunda.commons.version},
-		org.camunda.bpm.engine.variable.impl.context;${camunda.osgi.import.camunda.commons.version},
-		org.camunda.bpm.engine.variable.impl.type;${camunda.osgi.import.camunda.commons.version},
-		org.camunda.bpm.engine.variable.impl.value;${camunda.osgi.import.camunda.commons.version},
-		org.camunda.bpm.engine.variable.impl.value.builder;${camunda.osgi.import.camunda.commons.version},
-		org.camunda.bpm.engine.variable.type;${camunda.osgi.import.camunda.commons.version},
-		org.camunda.bpm.engine.variable.value;${camunda.osgi.import.camunda.commons.version},
-		org.camunda.bpm.engine.variable.value.builder;${camunda.osgi.import.camunda.commons.version},
-		org.camunda.commons.logging;${camunda.osgi.import.camunda.commons.version},
-		org.camunda.commons.utils;${camunda.osgi.import.camunda.commons.version}
-	  </camunda.osgi.import.defaults>
-      <camunda.osgi.import.additional>
-          junit*;resolution:=optional,
-          org.junit*;resolution:=optional,
-          com.sun*;resolution:=optional,
-          javax.persistence*;resolution:=optional,
-          javax.servlet*;resolution:=optional,
-          javax.transaction*;resolution:=optional,
-          javax.ejb*;resolution:=optional,
-          javax.xml*;resolution:=optional,
-          javax.mail*;resolution:=optional,
-          org.apache.catalina*;resolution:=optional,
-          org.apache.commons.mail;resolution:=optional,
-          org.apache.tools.ant*;resolution:=optional,
-          org.apache.xerces*;resolution:=optional,
-          org.springframework*;resolution:=optional,
-          com.fasterxml*;resolution:=optional,
-          org.jboss.vfs*;resolution:=optional
-      </camunda.osgi.import.additional>
+    <camunda.artifact>
+      org.camunda.bpm
+    </camunda.artifact>
+    <camunda.osgi.export.pkg>
+      ${camunda.artifact};${camunda.osgi.version};-noimport:=true,
+      ${camunda.artifact}.application.*;${camunda.osgi.version};-noimport:=true,
+      ${camunda.artifact}.container.*;${camunda.osgi.version};-noimport:=true,
+      !${camunda.artifact}.engine.variable.*,
+      ${camunda.artifact}.engine.*;${camunda.osgi.version};-noimport:=true
+    </camunda.osgi.export.pkg>
+    <camunda.osgi.import.defaults>
+      org.camunda.bpm.engine.variable;${camunda.osgi.import.camunda.commons.version},
+      org.camunda.bpm.engine.variable.context;${camunda.osgi.import.camunda.commons.version},
+      org.camunda.bpm.engine.variable.impl;${camunda.osgi.import.camunda.commons.version},
+      org.camunda.bpm.engine.variable.impl.context;${camunda.osgi.import.camunda.commons.version},
+      org.camunda.bpm.engine.variable.impl.type;${camunda.osgi.import.camunda.commons.version},
+      org.camunda.bpm.engine.variable.impl.value;${camunda.osgi.import.camunda.commons.version},
+      org.camunda.bpm.engine.variable.impl.value.builder;${camunda.osgi.import.camunda.commons.version},
+      org.camunda.bpm.engine.variable.type;${camunda.osgi.import.camunda.commons.version},
+      org.camunda.bpm.engine.variable.value;${camunda.osgi.import.camunda.commons.version},
+      org.camunda.bpm.engine.variable.value.builder;${camunda.osgi.import.camunda.commons.version},
+      org.camunda.commons.logging;${camunda.osgi.import.camunda.commons.version},
+      org.camunda.commons.utils;${camunda.osgi.import.camunda.commons.version}
+    </camunda.osgi.import.defaults>
+    <camunda.osgi.import.additional>
+      junit*;resolution:=optional,
+      org.junit*;resolution:=optional,
+      com.sun*;resolution:=optional,
+      javax.persistence*;resolution:=optional,
+      javax.servlet*;resolution:=optional,
+      javax.transaction*;resolution:=optional,
+      javax.ejb*;resolution:=optional,
+      javax.xml*;resolution:=optional,
+      javax.mail*;resolution:=optional,
+      org.apache.catalina*;resolution:=optional,
+      org.apache.commons.mail;resolution:=optional,
+      org.apache.tools.ant*;resolution:=optional,
+      org.apache.xerces*;resolution:=optional,
+      org.springframework*;resolution:=optional,
+      com.fasterxml*;resolution:=optional,
+      org.jboss.vfs*;resolution:=optional
+    </camunda.osgi.import.additional>
   </properties>
 
   <build>
