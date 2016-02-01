@@ -219,25 +219,15 @@
       org.camunda.bpm
     </camunda.artifact>
     <camunda.osgi.export.pkg>
+      !${camunda.artifact}.engine.variable.*,
       ${camunda.artifact};${camunda.osgi.version};-noimport:=true,
       ${camunda.artifact}.application.*;${camunda.osgi.version};-noimport:=true,
       ${camunda.artifact}.container.*;${camunda.osgi.version};-noimport:=true,
-      !${camunda.artifact}.engine.variable.*,
       ${camunda.artifact}.engine.*;${camunda.osgi.version};-noimport:=true
     </camunda.osgi.export.pkg>
     <camunda.osgi.import.defaults>
-      org.camunda.bpm.engine.variable;${camunda.osgi.import.camunda.commons.version},
-      org.camunda.bpm.engine.variable.context;${camunda.osgi.import.camunda.commons.version},
-      org.camunda.bpm.engine.variable.impl;${camunda.osgi.import.camunda.commons.version},
-      org.camunda.bpm.engine.variable.impl.context;${camunda.osgi.import.camunda.commons.version},
-      org.camunda.bpm.engine.variable.impl.type;${camunda.osgi.import.camunda.commons.version},
-      org.camunda.bpm.engine.variable.impl.value;${camunda.osgi.import.camunda.commons.version},
-      org.camunda.bpm.engine.variable.impl.value.builder;${camunda.osgi.import.camunda.commons.version},
-      org.camunda.bpm.engine.variable.type;${camunda.osgi.import.camunda.commons.version},
-      org.camunda.bpm.engine.variable.value;${camunda.osgi.import.camunda.commons.version},
-      org.camunda.bpm.engine.variable.value.builder;${camunda.osgi.import.camunda.commons.version},
-      org.camunda.commons.logging;${camunda.osgi.import.camunda.commons.version},
-      org.camunda.commons.utils;${camunda.osgi.import.camunda.commons.version}
+      ${camunda.artifact}.engine.variable.*;version=${camunda.osgi.import.camunda.commons.version},
+      org.camunda.commons.*;version=${camunda.osgi.import.camunda.commons.version}
     </camunda.osgi.import.defaults>
     <camunda.osgi.import.additional>
       junit*;resolution:=optional,
