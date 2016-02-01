@@ -47,7 +47,7 @@ public abstract class AbstractHttpConnector<Q extends HttpBaseRequest<Q, R>, R e
   }
 
   protected CloseableHttpClient createClient() {
-    return HttpClients.createDefault();
+    return HttpClients.createSystem();
   }
 
   public CloseableHttpClient getHttpClient() {
@@ -83,7 +83,6 @@ public abstract class AbstractHttpConnector<Q extends HttpBaseRequest<Q, R>, R e
    * @param request the given request
    * @return {@link HttpRequestBase} an apache representation of the request
    */
-  @SuppressWarnings("unchecked")
   protected <T extends HttpRequestBase> T createHttpRequest(Q request) {
     T httpRequest = createHttpRequestBase(request);
 
