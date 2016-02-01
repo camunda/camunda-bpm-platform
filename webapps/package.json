@@ -41,7 +41,6 @@
     "grunt-contrib-clean": "0.5.0",
     "grunt-contrib-copy": "0.5.0",
     "grunt-contrib-less": "0.9.0",
-    "grunt-contrib-requirejs": "0.4.4",
     "grunt-contrib-uglify": "0.11.0",
     "grunt-contrib-watch": "0.5.0",
     "grunt-protractor-runner": "2.0.0",
@@ -51,7 +50,6 @@
     "mocha-multi": "0.7.2",
     "mocha-proshot": "1.0.1",
     "request": "2.53.0",
-    "requirejs-text": "2.0.12",
     "source-map": "0.4.4",
     "xunit-file": "0.0.6"
   }

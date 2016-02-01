@@ -100,7 +100,7 @@ module.exports = function(grunt) {
 
     if(typeof app !== 'undefined') {
       console.log(' ------------  will build ' + app + ' -------------');
-      var objs = [requireJsConf, browserifyConf, copyConf, lessConf, localesConf, watchConf, uglifyConf];
+      var objs = [browserifyConf, copyConf, lessConf, localesConf, watchConf, uglifyConf];
       for(var i = 0; i < objs.length; i++) {
         var obj = objs[i];
         for (var key in obj) {
