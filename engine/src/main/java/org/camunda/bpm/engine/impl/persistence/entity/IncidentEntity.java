@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.impl.history.event.HistoryEventType;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
+import org.camunda.bpm.engine.impl.incident.IncidentContext;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Incident;
 
@@ -50,6 +51,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
   protected String rootCauseIncidentId;
   protected String configuration;
   protected String incidentMessage;
+  protected String tenantId;
 
   public List<IncidentEntity> createRecursiveIncidents() {
     List<IncidentEntity> createdIncidents = new ArrayList<IncidentEntity>();
@@ -69,12 +71,13 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
 
     if(execution != null) {
 
-      String superExecutionId = execution.getProcessInstance().getSuperExecutionId();
+      ExecutionEntity superExecution = execution.getProcessInstance().getSuperExecution();
 
-      if (superExecutionId != null && !superExecutionId.isEmpty()) {
+      if (superExecution != null) {
 
         // create a new incident
-        IncidentEntity newIncident = create(incidentType, superExecutionId, null, null);
+        IncidentEntity newIncident = create(incidentType);
+        newIncident.setExecution(superExecution);
 
         // set cause and root cause
         newIncident.setCauseIncidentId(id);
@@ -91,36 +94,37 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     }
   }
 
-  public static IncidentEntity createAndInsertIncident(String incidentType, String configuration, String message) {
-    return createAndInsertIncident(incidentType, null, configuration, message);
-  }
-
-  public static IncidentEntity createAndInsertIncident(String incidentType, String executionId, String configuration, String message) {
-
+  public static IncidentEntity createAndInsertIncident(String incidentType, IncidentContext context, String message) {
     // create new incident
-    IncidentEntity newIncident = create(incidentType, executionId, configuration, message);
+    IncidentEntity newIncident = create(incidentType);
+
+    newIncident.setConfiguration(context.getConfiguration());
+    newIncident.setIncidentMessage(message);
+
+    if(context.getExecutionId() != null) {
+      // fetch execution
+      ExecutionEntity execution = Context
+        .getCommandContext()
+        .getExecutionManager()
+        .findExecutionById(context.getExecutionId());
+
+      // inherit further properties from execution
+      newIncident.setExecution(execution);
+
+    } else {
+      // set further properties from context
+      newIncident.setActivityId(context.getActivityId());
+      newIncident.setProcessDefinitionId(context.getProcessDefinitionId());
+      newIncident.setTenantId(context.getTenantId());
+    }
+
     // insert new incident (and create a new historic incident)
     insert(newIncident);
 
     return newIncident;
   }
 
-  public static IncidentEntity createAndInsertIncident(String incidentType, String processDefinitionId, String activityId, String configuration, String message) {
-
-    // create new incident
-    IncidentEntity newIncident = create(incidentType, null, configuration, message);
-
-    // set further properties
-    newIncident.setActivityId(activityId);
-    newIncident.setProcessDefinitionId(processDefinitionId);
-
-    // insert new incident (and create a new historic incident)
-    insert(newIncident);
-
-    return newIncident;
-  }
-
-  protected static IncidentEntity create(String incidentType, String executionId, String configuration, String message) {
+  protected static IncidentEntity create(String incidentType) {
 
     String incidentId = Context.getProcessEngineConfiguration()
         .getDbSqlSessionFactory()
@@ -131,21 +135,9 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     IncidentEntity newIncident = new IncidentEntity();
     newIncident.setId(incidentId);
     newIncident.setIncidentTimestamp(ClockUtil.getCurrentTime());
-    newIncident.setIncidentMessage(message);
-    newIncident.setConfiguration(configuration);
     newIncident.setIncidentType(incidentType);
     newIncident.setCauseIncidentId(incidentId);
     newIncident.setRootCauseIncidentId(incidentId);
-
-    if (executionId != null) {
-      // fetch execution
-      ExecutionEntity execution = Context
-        .getCommandContext()
-        .getExecutionManager()
-        .findExecutionById(executionId);
-
-      newIncident.setExecution(execution);
-    }
 
     return newIncident;
   }
@@ -344,11 +336,21 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     this.configuration = configuration;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
   public void setExecution(ExecutionEntity execution) {
     executionId = execution.getId();
     activityId = execution.getActivityId();
     processInstanceId = execution.getProcessInstanceId();
     processDefinitionId = execution.getProcessDefinitionId();
+    tenantId = execution.getTenantId();
+
     execution.addIncident(this);
   }
 
@@ -394,6 +396,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
            + ", causeIncidentId=" + causeIncidentId
            + ", rootCauseIncidentId=" + rootCauseIncidentId
            + ", configuration=" + configuration
+           + ", tenantId=" + tenantId
            + ", incidentMessage=" + incidentMessage
            + "]";
   }

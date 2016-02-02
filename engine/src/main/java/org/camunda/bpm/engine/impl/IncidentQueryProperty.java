@@ -29,5 +29,6 @@ public interface IncidentQueryProperty {
   public static final QueryProperty CAUSE_INCIDENT_ID = new QueryPropertyImpl("CAUSE_INCIDENT_ID_");
   public static final QueryProperty ROOT_CAUSE_INCIDENT_ID = new QueryPropertyImpl("ROOT_CAUSE_INCIDENT_ID_");
   public static final QueryProperty CONFIGURATION = new QueryPropertyImpl("CONFIGURATION_");
+  public static final QueryProperty TENANT_ID = new QueryPropertyImpl("TENANT_ID_");
 
 }

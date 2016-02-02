@@ -3,12 +3,12 @@ package org.camunda.bpm.engine.rest;
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.fest.assertions.Assertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.fest.assertions.Assertions.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,7 +35,7 @@ public class JobDefinitionRestServiceQueryTest extends AbstractRestServiceTest {
 
   @ClassRule
   public static TestContainerRule rule = new TestContainerRule();
-  
+
   protected static final String JOB_DEFINITION_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/job-definition";
   protected static final String JOB_DEFINITION_COUNT_QUERY_URL = JOB_DEFINITION_QUERY_URL + "/count";
   private JobDefinitionQuery mockedQuery;
@@ -159,6 +159,11 @@ public class JobDefinitionRestServiceQueryTest extends AbstractRestServiceTest {
     inOrder.verify(mockedQuery).orderByJobConfiguration();
     inOrder.verify(mockedQuery).asc();
 
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("tenantId", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderByTenantId();
+    inOrder.verify(mockedQuery).asc();
+
     // desc
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("jobDefinitionId", "desc", Status.OK);
@@ -188,6 +193,11 @@ public class JobDefinitionRestServiceQueryTest extends AbstractRestServiceTest {
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("jobConfiguration", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByJobConfiguration();
+    inOrder.verify(mockedQuery).desc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("tenantId", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderByTenantId();
     inOrder.verify(mockedQuery).desc();
   }
 

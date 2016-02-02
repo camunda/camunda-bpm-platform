@@ -19,13 +19,16 @@ import static org.junit.Assert.assertThat;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
@@ -260,6 +263,69 @@ public class MultiTenancyPropagationTest extends PluggableProcessEngineTestCase 
     assertThat(job, is(notNullValue()));
     // inherit the tenant id from job definition
     assertThat(job.getTenantId(), is(TENANT_ID));
+  }
+
+  public void testPropagateTenantIdToFailedJobIncident() {
+
+    deployment(repositoryService.createDeployment()
+        .tenantId(TENANT_ID)
+        .addClasspathResource("org/camunda/bpm/engine/test/api/multitenancy/failingTask.bpmn"));
+
+    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+    // execute the job of the async activity
+    Job job = managementService.createJobQuery().singleResult();
+    try {
+      managementService.executeJob(job.getId());
+    } catch(ProcessEngineException e) {
+      // the job failed and created an incident
+    }
+
+    Incident incident = runtimeService.createIncidentQuery().singleResult();
+    assertThat(incident, is(notNullValue()));
+    // inherit the tenant id from execution
+    assertThat(incident.getTenantId(), is(TENANT_ID));
+  }
+
+  public void testPropagateTenantIdToFailedStartTimerIncident() {
+
+    deployment(repositoryService.createDeployment()
+        .tenantId(TENANT_ID)
+        .addClasspathResource("org/camunda/bpm/engine/test/api/multitenancy/timerStartEventWithfailingTask.bpmn"));
+
+    // execute the job of the timer start event
+    Job job = managementService.createJobQuery().singleResult();
+    try {
+      managementService.executeJob(job.getId());
+    } catch(ProcessEngineException e) {
+      // the job failed and created an incident
+    }
+
+    Incident incident = runtimeService.createIncidentQuery().singleResult();
+    assertThat(incident, is(notNullValue()));
+    // inherit the tenant id from job
+    assertThat(incident.getTenantId(), is(TENANT_ID));
+  }
+
+  public void testPropagateTenantIdToFailedExternalTaskIncident() {
+
+    deploymentForTenant(TENANT_ID, Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
+        .startEvent()
+        .serviceTask()
+          .camundaType("external")
+          .camundaTopic("test")
+        .endEvent()
+      .done());
+
+    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+
+    // fetch the external task and mark it as failed which create an incident
+    List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(1, "test-worker").topic("test", 1000).execute();
+    externalTaskService.handleFailure(tasks.get(0).getId(), "test-worker", "expected", 0, 0);
+
+    Incident incident = runtimeService.createIncidentQuery().singleResult();
+    assertThat(incident, is(notNullValue()));
+    // inherit the tenant id from job
+    assertThat(incident.getTenantId(), is(TENANT_ID));
   }
 
   public static class SetVariableTask implements JavaDelegate {

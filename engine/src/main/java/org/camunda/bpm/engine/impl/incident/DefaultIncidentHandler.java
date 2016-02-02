@@ -50,35 +50,33 @@ public class DefaultIncidentHandler implements IncidentHandler {
     return type;
   }
 
-  public void handleIncident(String processDefinitionId, String activityId, String executionId, String jobId, String message) {
-    createIncident(processDefinitionId, activityId, executionId, jobId, message);
+  public void handleIncident(IncidentContext context, String message) {
+    createIncident(context, message);
   }
 
-  public Incident createIncident(String processDefinitionId, String activityId, String executionId, String jobId, String message) {
-    IncidentEntity newIncident;
-    if(executionId != null) {
-      newIncident = IncidentEntity.createAndInsertIncident(type, executionId, jobId, message);
-      newIncident.createRecursiveIncidents();
+  public Incident createIncident(IncidentContext context, String message) {
+    IncidentEntity newIncident = IncidentEntity.createAndInsertIncident(type, context, message);
 
-    } else {
-      newIncident = IncidentEntity.createAndInsertIncident(type, processDefinitionId, activityId, jobId, message);
+    if(context.getExecutionId() != null) {
+      newIncident.createRecursiveIncidents();
     }
+
     return newIncident;
   }
 
-  public void resolveIncident(String processDefinitionId, String activityId, String executionId, String configuration) {
-    removeIncident(processDefinitionId, activityId, executionId, configuration, true);
+  public void resolveIncident(IncidentContext context) {
+    removeIncident(context, true);
   }
 
-  public void deleteIncident(String processDefinitionId, String activityId, String executionId, String configuration) {
-    removeIncident(processDefinitionId, activityId, executionId, configuration, false);
+  public void deleteIncident(IncidentContext context) {
+    removeIncident(context, false);
   }
 
-  protected void removeIncident(String processDefinitionId, String activityId, String executionId, String configuration, boolean incidentResolved) {
+  protected void removeIncident(IncidentContext context, boolean incidentResolved) {
     List<Incident> incidents = Context
         .getCommandContext()
         .getIncidentManager()
-        .findIncidentByConfiguration(configuration);
+        .findIncidentByConfiguration(context.getConfiguration());
 
     for (Incident currentIncident : incidents) {
       IncidentEntity incident = (IncidentEntity) currentIncident;

@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.test.standalone.entity;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.incident.IncidentContext;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -175,7 +176,10 @@ public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTestCa
       .execute(new Command<Void>() {
         public Void execute(CommandContext commandContext) {
 
-          IncidentEntity.createAndInsertIncident("foo", execution.getId(), null, null);
+          IncidentContext incidentContext = new IncidentContext();
+          incidentContext.setExecutionId(execution.getId());
+
+          IncidentEntity.createAndInsertIncident("foo", incidentContext, null);
 
           return null;
         }
@@ -201,7 +205,10 @@ public class ExecutionCachedEntityStateTest extends PluggableProcessEngineTestCa
       .execute(new Command<Void>() {
         public Void execute(CommandContext commandContext) {
 
-          IncidentEntity.createAndInsertIncident("foo", execution.getId(), null, null);
+          IncidentContext incidentContext = new IncidentContext();
+          incidentContext.setExecutionId(execution.getId());
+
+          IncidentEntity.createAndInsertIncident("foo", incidentContext, null);
 
           return null;
         }

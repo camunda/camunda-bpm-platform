@@ -21,6 +21,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
+import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 import org.camunda.bpm.engine.runtime.IncidentQuery;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,6 +42,7 @@ public class IncidentQueryDto extends AbstractQueryDto<IncidentQuery>{
   private static final String SORT_BY_CAUSE_INCIDENT_ID = "causeIncidentId";
   private static final String SORT_BY_ROOT_CAUSE_INCIDENT_ID = "rootCauseIncidentId";
   private static final String SORT_BY_CONFIGURATION = "configuration";
+  private static final String SORT_BY_TENANT_ID = "tenantId";
 
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -55,6 +57,7 @@ public class IncidentQueryDto extends AbstractQueryDto<IncidentQuery>{
     VALID_SORT_BY_VALUES.add(SORT_BY_CAUSE_INCIDENT_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_ROOT_CAUSE_INCIDENT_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_CONFIGURATION);
+    VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID);
   }
 
   protected String incidentId;
@@ -67,6 +70,7 @@ public class IncidentQueryDto extends AbstractQueryDto<IncidentQuery>{
   protected String causeIncidentId;
   protected String rootCauseIncidentId;
   protected String configuration;
+  protected List<String> tenantIds;
 
   public IncidentQueryDto() {}
 
@@ -124,6 +128,11 @@ public class IncidentQueryDto extends AbstractQueryDto<IncidentQuery>{
     this.configuration = configuration;
   }
 
+  @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
+  public void setTenantIdIn(List<String> tenantIds) {
+    this.tenantIds = tenantIds;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -167,6 +176,9 @@ public class IncidentQueryDto extends AbstractQueryDto<IncidentQuery>{
     if (configuration != null) {
       query.configuration(configuration);
     }
+    if (tenantIds != null && !tenantIds.isEmpty()) {
+      query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
   }
 
   @Override
@@ -191,6 +203,8 @@ public class IncidentQueryDto extends AbstractQueryDto<IncidentQuery>{
       query.orderByRootCauseIncidentId();
     } else if (sortBy.equals(SORT_BY_CONFIGURATION)) {
       query.orderByConfiguration();
+    } else if (sortBy.equals(SORT_BY_TENANT_ID)) {
+      query.orderByTenantId();
     }
   }
 

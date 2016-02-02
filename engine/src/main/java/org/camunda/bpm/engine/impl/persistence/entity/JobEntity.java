@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.incident.IncidentContext;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.DefaultJobPriorityProvider;
@@ -306,9 +307,12 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
 
       }
 
+      IncidentContext incidentContext = createIncidentContext();
+      incidentContext.setActivityId(getActivityId());
+
       processEngineConfiguration
         .getIncidentHandler(incidentHandlerType)
-        .handleIncident(getProcessDefinitionId(), getActivityId(), executionId, id, exceptionMessage);
+        .handleIncident(incidentContext, exceptionMessage);
 
     }
   }
@@ -318,11 +322,26 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
         .getProcessEngineConfiguration()
         .getIncidentHandler(Incident.FAILED_JOB_HANDLER_TYPE);
 
+    IncidentContext incidentContext = createIncidentContext();
+
     if (incidentResolved) {
-      handler.resolveIncident(getProcessDefinitionId(), null, executionId, id);
+      handler.resolveIncident(incidentContext);
     } else {
-      handler.deleteIncident(getProcessDefinitionId(), null, executionId, id);
+      handler.deleteIncident(incidentContext);
     }
+  }
+
+  protected IncidentContext createIncidentContext() {
+    IncidentContext incidentContext = new IncidentContext();
+    incidentContext.setProcessDefinitionId(processDefinitionId);
+    incidentContext.setTenantId(tenantId);
+    incidentContext.setConfiguration(id);
+
+    if(executionId != null) {
+      incidentContext.setExecutionId(executionId);
+    }
+
+    return incidentContext;
   }
 
   public String getExceptionStacktrace() {

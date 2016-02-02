@@ -473,6 +473,10 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
     inOrder.verify(mockQuery).orderByJobPriority();
     inOrder.verify(mockQuery).asc();
 
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("tenantId", "desc", Status.OK);
+    inOrder.verify(mockQuery).orderByTenantId();
+    inOrder.verify(mockQuery).desc();
   }
 
   private void executeAndVerifySorting(String sortBy, String sortOrder,

@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
+import org.camunda.bpm.engine.impl.incident.IncidentContext;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
@@ -223,7 +224,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
         .getProcessEngineConfiguration()
         .getIncidentHandler(Incident.EXTERNAL_TASK_HANDLER_TYPE);
 
-    incidentHandler.handleIncident(processDefinitionId, activityId, executionId, id, errorMessage);
+    incidentHandler.handleIncident(createIncidentContext(), errorMessage);
   }
 
   protected void removeIncident() {
@@ -231,7 +232,17 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
         .getProcessEngineConfiguration()
         .getIncidentHandler(Incident.EXTERNAL_TASK_HANDLER_TYPE);
 
-    handler.resolveIncident(getProcessDefinitionId(), null, executionId, id);
+    handler.resolveIncident(createIncidentContext());
+  }
+
+  protected IncidentContext createIncidentContext() {
+    IncidentContext context = new IncidentContext();
+    context.setProcessDefinitionId(processDefinitionId);
+    context.setExecutionId(executionId);
+    context.setActivityId(activityId);
+    // TODO set tenant-id -> CAM-5196
+    context.setConfiguration(id);
+    return context;
   }
 
   public void lock(String workerId, long lockDuration) {
@@ -264,6 +275,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     }
   }
 
+  @Override
   public String toString() {
     return "ExternalTaskEntity ["
         + "id=" + id

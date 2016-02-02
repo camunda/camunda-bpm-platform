@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -37,6 +39,7 @@ public class IncidentQueryImpl extends AbstractQuery<IncidentQuery, Incident> im
   protected String causeIncidentId;
   protected String rootCauseIncidentId;
   protected String configuration;
+  protected String[] tenantIds;
 
   public IncidentQueryImpl() {
   }
@@ -95,6 +98,12 @@ public class IncidentQueryImpl extends AbstractQuery<IncidentQuery, Incident> im
     return this;
   }
 
+  public IncidentQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    return this;
+  }
+
   //ordering ////////////////////////////////////////////////////
 
   public IncidentQuery orderByIncidentId() {
@@ -147,8 +156,13 @@ public class IncidentQueryImpl extends AbstractQuery<IncidentQuery, Incident> im
     return this;
   }
 
+  public IncidentQuery orderByTenantId() {
+    return orderBy(IncidentQueryProperty.TENANT_ID);
+  }
+
   //results ////////////////////////////////////////////////////
 
+  @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     return commandContext
@@ -156,6 +170,7 @@ public class IncidentQueryImpl extends AbstractQuery<IncidentQuery, Incident> im
       .findIncidentCountByQueryCriteria(this);
   }
 
+  @Override
   public List<Incident> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     return commandContext

@@ -1990,6 +1990,10 @@ public abstract class MockProvider {
   // Incident ///////////////////////////////////////
 
   public static Incident createMockIncident() {
+    return createMockIncident(EXAMPLE_TENANT_ID);
+  }
+
+  public static Incident createMockIncident(String tenantId) {
     Incident incident = mock(Incident.class);
 
     when(incident.getId()).thenReturn(EXAMPLE_INCIDENT_ID);
@@ -2003,6 +2007,7 @@ public abstract class MockProvider {
     when(incident.getRootCauseIncidentId()).thenReturn(EXAMPLE_INCIDENT_ROOT_CAUSE_INCIDENT_ID);
     when(incident.getConfiguration()).thenReturn(EXAMPLE_INCIDENT_CONFIGURATION);
     when(incident.getIncidentMessage()).thenReturn(EXAMPLE_INCIDENT_MESSAGE);
+    when(incident.getTenantId()).thenReturn(tenantId);
 
     return incident;
   }

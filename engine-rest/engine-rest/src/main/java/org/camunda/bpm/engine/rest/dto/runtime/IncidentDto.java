@@ -12,9 +12,9 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
-import org.camunda.bpm.engine.runtime.Incident;
-
 import java.util.Date;
+
+import org.camunda.bpm.engine.runtime.Incident;
 
 /**
  *
@@ -34,6 +34,7 @@ public class IncidentDto {
   protected String rootCauseIncidentId;
   protected String configuration;
   protected String incidentMessage;
+  protected String tenantId;
 
   public String getId() {
     return id;
@@ -79,6 +80,10 @@ public class IncidentDto {
     return incidentMessage;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
   public static IncidentDto fromIncident(Incident incident) {
     IncidentDto dto = new IncidentDto();
 
@@ -93,6 +98,7 @@ public class IncidentDto {
     dto.rootCauseIncidentId = incident.getRootCauseIncidentId();
     dto.configuration = incident.getConfiguration();
     dto.incidentMessage = incident.getIncidentMessage();
+    dto.tenantId = incident.getTenantId();
 
     return dto;
   }
