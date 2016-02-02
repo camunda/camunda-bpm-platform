@@ -65,6 +65,7 @@ public abstract class EventSubscriptionEntity implements EventSubscription, DbEn
     setExecution(executionEntity);
     setActivity(execution.getActivity());
     this.processInstanceId = executionEntity.getProcessInstanceId();
+    this.tenantId = executionEntity.getTenantId();
   }
 
   // processing /////////////////////////////
