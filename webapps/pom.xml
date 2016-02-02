@@ -115,13 +115,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.camunda.bpm.webapp</groupId>
-      <artifactId>camunda-webapp-test-utility</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-client</artifactId>
       <version>1.17</version>
