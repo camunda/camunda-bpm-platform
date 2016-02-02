@@ -6,7 +6,7 @@ module.exports = function(grunt) {
   require('load-grunt-tasks')(grunt);
 
   var pkg = require('./package.json');
-  var protractorConfig = grunt.option('protractorConfig') || 'camunda-webapp-test/ci.conf.js';
+  var protractorConfig = grunt.option('protractorConfig') || 'ui/common/tests/ci.conf.js';
 
   var config = pkg.gruntConfig || {};
 
