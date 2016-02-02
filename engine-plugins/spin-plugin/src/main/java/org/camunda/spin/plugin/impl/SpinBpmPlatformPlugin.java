@@ -30,6 +30,7 @@ public class SpinBpmPlatformPlugin implements BpmPlatformPlugin {
 
   private static final SpinPluginLogger LOG = SpinPluginLogger.LOGGER;
 
+  @Override
   public void postProcessApplicationDeploy(ProcessApplicationInterface processApplication) {
     ProcessApplicationInterface rawPa = processApplication.getRawObject();
     if (rawPa instanceof AbstractProcessApplication) {
@@ -61,6 +62,11 @@ public class SpinBpmPlatformPlugin implements BpmPlatformPlugin {
     // does not create PA-local serializers for native Spin values;
     // this is still an open feature CAM-5246
     return SpinVariableSerializers.createObjectValueSerializers(paDataFormats);
+  }
+
+  @Override
+  public void postProcessApplicationUndeploy(ProcessApplicationInterface processApplication) {
+
   }
 
 }

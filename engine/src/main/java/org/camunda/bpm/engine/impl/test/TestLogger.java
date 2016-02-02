@@ -24,4 +24,5 @@ public class TestLogger extends ProcessEngineLogger {
   public Logger getLogger() {
     return delegateLogger;
   }
+
 }

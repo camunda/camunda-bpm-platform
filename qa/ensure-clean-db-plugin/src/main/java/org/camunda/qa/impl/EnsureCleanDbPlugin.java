@@ -10,24 +10,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.container.impl.jboss.test;
+package org.camunda.qa.impl;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.container.impl.plugin.BpmPlatformPlugin;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.impl.test.TestHelper;
 
 /**
- * @author Thorben Lindhauer
+ * @author Daniel Meyer
  *
  */
-public class ExampleBpmPlatformPlugin implements BpmPlatformPlugin {
+public class EnsureCleanDbPlugin implements BpmPlatformPlugin {
+
+  private AtomicInteger counter = new AtomicInteger();
 
   @Override
   public void postProcessApplicationDeploy(ProcessApplicationInterface processApplication) {
+    counter.incrementAndGet();
   }
 
   @Override
   public void postProcessApplicationUndeploy(ProcessApplicationInterface processApplication) {
 
+    // some tests deploy multiple PAs. => only check for clean DB after last PA is undeployed
+    if(counter.decrementAndGet() == 0) {
+
+      ProcessEngine defaultProcessEngine = BpmPlatform.getDefaultProcessEngine();
+      try {
+        System.out.println("Ensure cleanup after integration test ");
+        TestHelper.assertAndEnsureCleanDbAndCache(defaultProcessEngine, false);
+      }
+      catch(Throwable e) {
+        System.err.println("Could not clean DB:");
+        e.printStackTrace();
+      }
+    }
   }
 
 }
