@@ -32,11 +32,12 @@ import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 
-public class MultiTenancyPropagationTest extends PluggableProcessEngineTestCase {
+public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngineTestCase {
 
   protected static final String PROCESS_DEFINITION_KEY = "testProcess";
   protected static final String TENANT_ID = "tenant1";
@@ -115,6 +116,22 @@ public class MultiTenancyPropagationTest extends PluggableProcessEngineTestCase 
     assertThat(executions.get(1).getTenantId(), is(TENANT_ID));
   }
 
+  public void testPropagateTenantIdToTask() {
+
+    deploymentForTenant(TENANT_ID, Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
+        .startEvent()
+        .userTask()
+        .endEvent()
+      .done());
+
+    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+
+    Task task = taskService.createTaskQuery().singleResult();
+    assertThat(task, is(notNullValue()));
+    // inherit the tenant id from execution
+    assertThat(task.getTenantId(), is(TENANT_ID));
+  }
+
   public void testPropagateTenantIdToVariableInstanceOnStartProcessInstance() {
 
     deploymentForTenant(TENANT_ID, Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
@@ -147,6 +164,27 @@ public class MultiTenancyPropagationTest extends PluggableProcessEngineTestCase 
     VariableInstance variableInstance = runtimeService.createVariableInstanceQuery().singleResult();
     assertThat(variableInstance, is(notNullValue()));
     // inherit the tenant id from execution
+    assertThat(variableInstance.getTenantId(), is(TENANT_ID));
+  }
+
+  public void testPropagateTenantIdToVariableInstanceFromTask() {
+
+    deploymentForTenant(TENANT_ID, Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
+        .startEvent()
+        .userTask()
+          .camundaAsyncAfter()
+        .endEvent()
+      .done());
+
+    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+
+    VariableMap variables = Variables.createVariables().putValue("var", "test");
+    Task task = taskService.createTaskQuery().singleResult();
+    taskService.complete(task.getId(), variables);
+
+    VariableInstance variableInstance = runtimeService.createVariableInstanceQuery().singleResult();
+    assertThat(variableInstance, is(notNullValue()));
+    // inherit the tenant id from task
     assertThat(variableInstance.getTenantId(), is(TENANT_ID));
   }
 

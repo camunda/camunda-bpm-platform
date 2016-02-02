@@ -41,6 +41,7 @@ public class MockTaskBuilder {
   private String caseInstanceId;
   private String caseExecutionId;
   private String formKey;
+  private String tenantId;
 
   public MockTaskBuilder id(String id) {
     this.id = id;
@@ -137,6 +138,11 @@ public class MockTaskBuilder {
     return this;
   }
 
+  public MockTaskBuilder tenantId(String tenantId) {
+    this.tenantId = tenantId;
+    return this;
+  }
+
   public Task build() {
     Task mockTask = mock(Task.class);
     when(mockTask.getId()).thenReturn(id);
@@ -158,6 +164,7 @@ public class MockTaskBuilder {
     when(mockTask.getCaseInstanceId()).thenReturn(caseInstanceId);
     when(mockTask.getCaseExecutionId()).thenReturn(caseExecutionId);
     when(mockTask.getFormKey()).thenReturn(formKey);
+    when(mockTask.getTenantId()).thenReturn(tenantId);
     return mockTask;
   }
 

@@ -68,6 +68,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   protected String processInstanceId;
   protected String executionId;
   protected String[] activityInstanceIdIn;
+  protected String[] tenantIds;
   protected Date createTime;
   protected Date createTimeBefore;
   protected Date createTimeAfter;
@@ -116,53 +117,62 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     super(commandExecutor);
   }
 
+  @Override
   public TaskQueryImpl taskId(String taskId) {
     ensureNotNull("Task id", taskId);
     this.taskId = taskId;
     return this;
   }
 
+  @Override
   public TaskQueryImpl taskName(String name) {
     this.name = name;
     return this;
   }
 
+  @Override
   public TaskQueryImpl taskNameLike(String nameLike) {
     ensureNotNull("Task nameLike", nameLike);
     this.nameLike = nameLike;
     return this;
   }
 
+  @Override
   public TaskQueryImpl taskDescription(String description) {
     ensureNotNull("Description", description);
     this.description = description;
     return this;
   }
 
+  @Override
   public TaskQuery taskDescriptionLike(String descriptionLike) {
     ensureNotNull("Task descriptionLike", descriptionLike);
     this.descriptionLike = descriptionLike;
     return this;
   }
 
+  @Override
   public TaskQuery taskPriority(Integer priority) {
     ensureNotNull("Priority", priority);
     this.priority = priority;
     return this;
   }
 
+  @Override
   public TaskQuery taskMinPriority(Integer minPriority) {
     ensureNotNull("Min Priority", minPriority);
     this.minPriority = minPriority;
     return this;
   }
 
+  @Override
   public TaskQuery taskMaxPriority(Integer maxPriority) {
     ensureNotNull("Max Priority", maxPriority);
     this.maxPriority = maxPriority;
     return this;
   }
 
+  @Override
   public TaskQueryImpl taskAssignee(String assignee) {
     ensureNotNull("Assignee", assignee);
     this.assignee = assignee;
@@ -170,12 +180,14 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return this;
   }
 
+  @Override
   public TaskQuery taskAssigneeExpression(String assigneeExpression) {
     ensureNotNull("Assignee expression", assigneeExpression);
     expressions.put("taskAssignee", assigneeExpression);
     return this;
   }
 
+  @Override
   public TaskQuery taskAssigneeLike(String assignee) {
     ensureNotNull("Assignee", assignee);
     this.assigneeLike = assignee;
@@ -183,12 +195,14 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return this;
   }
 
+  @Override
   public TaskQuery taskAssigneeLikeExpression(String assigneeLikeExpression) {
     ensureNotNull("Assignee like expression", assigneeLikeExpression);
     expressions.put("taskAssigneeLike", assigneeLikeExpression);
     return this;
   }
 
+  @Override
   public TaskQueryImpl taskOwner(String owner) {
     ensureNotNull("Owner", owner);
     this.owner = owner;
@@ -196,6 +210,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return this;
   }
 
+  @Override
   public TaskQuery taskOwnerExpression(String ownerExpression) {
     ensureNotNull("Owner expression", ownerExpression);
     expressions.put("taskOwner", ownerExpression);
@@ -203,16 +218,19 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
   }
 
   /** @see {@link #taskUnassigned} */
+  @Override
   @Deprecated
   public TaskQuery taskUnnassigned() {
     return taskUnassigned();
   }
 
+  @Override
   public TaskQuery taskUnassigned() {
     this.unassigned = true;
     return this;
   }
 
+  @Override
   public TaskQuery taskDelegationState(DelegationState delegationState) {
     if (delegationState == null) {
       this.noDelegationState = true;
@@ -222,6 +240,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return this;
   }
 
+  @Override
   public TaskQueryImpl taskCandidateUser(String candidateUser) {
     ensureNotNull("Candidate user", candidateUser);
 
@@ -236,6 +255,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return this;
   }
 
+  @Override
   public TaskQuery taskCandidateUserExpression(String candidateUserExpression) {
     ensureNotNull("Candidate user expression", candidateUserExpression);
 
@@ -250,6 +270,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return this;
   }
 
+  @Override
   public TaskQueryImpl taskInvolvedUser(String involvedUser) {
     ensureNotNull("Involved user", involvedUser);
     this.involvedUser = involvedUser;
@@ -257,12 +278,14 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return this;
   }
 
+  @Override
   public TaskQuery taskInvolvedUserExpression(String involvedUserExpression) {
     ensureNotNull("Involved user expression", involvedUserExpression);
     expressions.put("taskInvolvedUser", involvedUserExpression);
     return this;
   }
 
+  @Override
   public TaskQueryImpl taskCandidateGroup(String candidateGroup) {
     ensureNotNull("Candidate group", candidateGroup);
 
@@ -277,6 +300,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return this;
   }
 
+  @Override
   public TaskQuery taskCandidateGroupExpression(String candidateGroupExpression) {
     ensureNotNull("Candidate group expression", candidateGroupExpression);
 
@@ -291,6 +315,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return this;
   }
 
+  @Override
   public TaskQuery taskCandidateGroupIn(List<String> candidateGroups) {
     ensureNotEmpty("Candidate group list", candidateGroups);
 
@@ -306,6 +331,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return this;
   }
 
+  @Override
   public TaskQuery taskCandidateGroupInExpression(String candidateGroupsExpression) {
     ensureNotEmpty("Candidate group list expression", candidateGroupsExpression);
 
@@ -320,6 +346,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return this;
   }
 
+  @Override
   public TaskQuery includeAssignedTasks() {
     if (candidateUser == null && candidateGroup == null && candidateGroups == null
         && !expressions.containsKey("taskCandidateUser") && !expressions.containsKey("taskCandidateGroup")
@@ -336,311 +363,377 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return this;
   }
 
+  @Override
   public TaskQueryImpl processInstanceId(String processInstanceId) {
     this.processInstanceId = processInstanceId;
     return this;
   }
 
+  @Override
   public TaskQueryImpl processInstanceBusinessKey(String processInstanceBusinessKey) {
     this.processInstanceBusinessKey = processInstanceBusinessKey;
     return this;
   }
 
+  @Override
   public TaskQuery processInstanceBusinessKeyIn(String... processInstanceBusinessKeys) {
     this.processInstanceBusinessKeys = processInstanceBusinessKeys;
     return this;
   }
 
+  @Override
   public TaskQuery processInstanceBusinessKeyLike(String processInstanceBusinessKey) {
   	this.processInstanceBusinessKeyLike = processInstanceBusinessKey;
   	return this;
   }
 
+  @Override
   public TaskQueryImpl executionId(String executionId) {
     this.executionId = executionId;
     return this;
   }
 
+  @Override
   public TaskQuery activityInstanceIdIn(String... activityInstanceIds) {
     this.activityInstanceIdIn = activityInstanceIds;
     return this;
   }
 
+  @Override
+  public TaskQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    return this;
+  }
+
+  @Override
   public TaskQueryImpl taskCreatedOn(Date createTime) {
     this.createTime = createTime;
     expressions.remove("taskCreatedOn");
     return this;
   }
 
+  @Override
   public TaskQuery taskCreatedOnExpression(String createTimeExpression) {
     expressions.put("taskCreatedOn", createTimeExpression);
     return this;
   }
 
+  @Override
   public TaskQuery taskCreatedBefore(Date before) {
     this.createTimeBefore = before;
     expressions.remove("taskCreatedBefore");
     return this;
   }
 
+  @Override
   public TaskQuery taskCreatedBeforeExpression(String beforeExpression) {
     expressions.put("taskCreatedBefore", beforeExpression);
     return this;
   }
 
+  @Override
   public TaskQuery taskCreatedAfter(Date after) {
     this.createTimeAfter = after;
     expressions.remove("taskCreatedAfter");
     return this;
   }
 
+  @Override
   public TaskQuery taskCreatedAfterExpression(String afterExpression) {
     expressions.put("taskCreatedAfter", afterExpression);
     return this;
   }
 
+  @Override
   public TaskQuery taskDefinitionKey(String key) {
     this.key = key;
     return this;
   }
 
+  @Override
   public TaskQuery taskDefinitionKeyLike(String keyLike) {
     this.keyLike = keyLike;
     return this;
   }
 
+  @Override
   public TaskQuery taskDefinitionKeyIn(String... taskDefinitionKeys) {
   	this.taskDefinitionKeys = taskDefinitionKeys;
   	return this;
   }
 
+  @Override
   public TaskQuery taskParentTaskId(String taskParentTaskId) {
     this.parentTaskId = taskParentTaskId;
     return this;
   }
 
+  @Override
   public TaskQuery caseInstanceId(String caseInstanceId) {
     ensureNotNull("caseInstanceId", caseInstanceId);
     this.caseInstanceId = caseInstanceId;
     return this;
   }
 
+  @Override
   public TaskQuery caseInstanceBusinessKey(String caseInstanceBusinessKey) {
     ensureNotNull("caseInstanceBusinessKey", caseInstanceBusinessKey);
     this.caseInstanceBusinessKey = caseInstanceBusinessKey;
     return this;
   }
 
+  @Override
   public TaskQuery caseInstanceBusinessKeyLike(String caseInstanceBusinessKeyLike) {
     ensureNotNull("caseInstanceBusinessKeyLike", caseInstanceBusinessKeyLike);
     this.caseInstanceBusinessKeyLike = caseInstanceBusinessKeyLike;
     return this;
   }
 
+  @Override
   public TaskQuery caseExecutionId(String caseExecutionId) {
     ensureNotNull("caseExecutionId", caseExecutionId);
     this.caseExecutionId = caseExecutionId;
     return this;
   }
 
+  @Override
   public TaskQuery caseDefinitionId(String caseDefinitionId) {
     ensureNotNull("caseDefinitionId", caseDefinitionId);
     this.caseDefinitionId = caseDefinitionId;
     return this;
   }
 
+  @Override
   public TaskQuery caseDefinitionKey(String caseDefinitionKey) {
     ensureNotNull("caseDefinitionKey", caseDefinitionKey);
     this.caseDefinitionKey = caseDefinitionKey;
     return this;
   }
 
+  @Override
   public TaskQuery caseDefinitionName(String caseDefinitionName) {
     ensureNotNull("caseDefinitionName", caseDefinitionName);
     this.caseDefinitionName = caseDefinitionName;
     return this;
   }
 
+  @Override
   public TaskQuery caseDefinitionNameLike(String caseDefinitionNameLike) {
     ensureNotNull("caseDefinitionNameLike", caseDefinitionNameLike);
     this.caseDefinitionNameLike = caseDefinitionNameLike;
     return this;
   }
 
+  @Override
   public TaskQuery taskVariableValueEquals(String variableName, Object variableValue) {
     addVariable(variableName, variableValue, QueryOperator.EQUALS, true, false);
     return this;
   }
 
+  @Override
   public TaskQuery taskVariableValueNotEquals(String variableName, Object variableValue) {
     addVariable(variableName, variableValue, QueryOperator.NOT_EQUALS, true, false);
     return this;
   }
 
+  @Override
   public TaskQuery taskVariableValueLike(String variableName, String variableValue) {
     addVariable(variableName, variableValue, QueryOperator.LIKE, true, false);
   	return this;
   }
 
+  @Override
   public TaskQuery taskVariableValueGreaterThan(String variableName, Object variableValue) {
     addVariable(variableName, variableValue, QueryOperator.GREATER_THAN, true, false);
   	return this;
   }
 
+  @Override
   public TaskQuery taskVariableValueGreaterThanOrEquals(String variableName, Object variableValue) {
     addVariable(variableName, variableValue, QueryOperator.GREATER_THAN_OR_EQUAL, true, false);
   	return this;
   }
 
+  @Override
   public TaskQuery taskVariableValueLessThan(String variableName, Object variableValue) {
     addVariable(variableName, variableValue, QueryOperator.LESS_THAN, true, false);
   	return this;
   }
 
+  @Override
   public TaskQuery taskVariableValueLessThanOrEquals(String variableName, Object variableValue) {
     addVariable(variableName, variableValue, QueryOperator.LESS_THAN_OR_EQUAL, true, false);
   	return this;
   }
 
+  @Override
   public TaskQuery processVariableValueEquals(String variableName, Object variableValue) {
     addVariable(variableName, variableValue, QueryOperator.EQUALS, false, true);
     return this;
   }
 
+  @Override
   public TaskQuery processVariableValueNotEquals(String variableName, Object variableValue) {
     addVariable(variableName, variableValue, QueryOperator.NOT_EQUALS, false, true);
     return this;
   }
 
+  @Override
   public TaskQuery processVariableValueLike(String variableName, String variableValue) {
     addVariable(variableName, variableValue, QueryOperator.LIKE, false, true);
   	return this;
   }
 
+  @Override
   public TaskQuery processVariableValueGreaterThan(String variableName, Object variableValue) {
     addVariable(variableName, variableValue, QueryOperator.GREATER_THAN, false, true);
   	return this;
   }
 
+  @Override
   public TaskQuery processVariableValueGreaterThanOrEquals(String variableName, Object variableValue) {
     addVariable(variableName, variableValue, QueryOperator.GREATER_THAN_OR_EQUAL, false, true);
   	return this;
   }
 
+  @Override
   public TaskQuery processVariableValueLessThan(String variableName, Object variableValue) {
     addVariable(variableName, variableValue, QueryOperator.LESS_THAN, false, true);
   	return this;
   }
 
+  @Override
   public TaskQuery processVariableValueLessThanOrEquals(String variableName, Object variableValue) {
     addVariable(variableName, variableValue, QueryOperator.LESS_THAN_OR_EQUAL, false, true);
   	return this;
   }
 
+  @Override
   public TaskQuery caseInstanceVariableValueEquals(String variableName, Object variableValue) {
     addVariable(variableName, variableValue, QueryOperator.EQUALS, false, false);
     return this;
   }
 
+  @Override
   public TaskQuery caseInstanceVariableValueNotEquals(String variableName, Object variableValue) {
     addVariable(variableName, variableValue, QueryOperator.NOT_EQUALS, false, false);
     return this;
   }
 
+  @Override
   public TaskQuery caseInstanceVariableValueLike(String variableName, String variableValue) {
     addVariable(variableName, variableValue, QueryOperator.LIKE, false, false);
     return this;
   }
 
+  @Override
   public TaskQuery caseInstanceVariableValueGreaterThan(String variableName, Object variableValue) {
     addVariable(variableName, variableValue, QueryOperator.GREATER_THAN, false, false);
     return this;
   }
 
+  @Override
   public TaskQuery caseInstanceVariableValueGreaterThanOrEquals(String variableName, Object variableValue) {
     addVariable(variableName, variableValue, QueryOperator.GREATER_THAN_OR_EQUAL, false, false);
     return this;
   }
 
+  @Override
   public TaskQuery caseInstanceVariableValueLessThan(String variableName, Object variableValue) {
     addVariable(variableName, variableValue, QueryOperator.LESS_THAN, false, false);
     return this;
   }
 
+  @Override
   public TaskQuery caseInstanceVariableValueLessThanOrEquals(String variableName, Object variableValue) {
     addVariable(variableName, variableValue, QueryOperator.LESS_THAN_OR_EQUAL, false, false);
     return this;
   }
 
+  @Override
   public TaskQuery processDefinitionKey(String processDefinitionKey) {
     this.processDefinitionKey = processDefinitionKey;
     return this;
   }
 
+  @Override
   public TaskQuery processDefinitionKeyIn(String... processDefinitionKeys) {
     this.processDefinitionKeys = processDefinitionKeys;
     return this;
   }
 
+  @Override
   public TaskQuery processDefinitionId(String processDefinitionId) {
     this.processDefinitionId = processDefinitionId;
     return this;
   }
 
+  @Override
   public TaskQuery processDefinitionName(String processDefinitionName) {
     this.processDefinitionName = processDefinitionName;
     return this;
   }
 
+  @Override
   public TaskQuery processDefinitionNameLike(String processDefinitionName) {
   	this.processDefinitionNameLike = processDefinitionName;
   	return this;
   }
 
+  @Override
   public TaskQuery dueDate(Date dueDate) {
     this.dueDate = dueDate;
     expressions.remove("dueDate");
     return this;
   }
 
+  @Override
   public TaskQuery dueDateExpression(String dueDateExpression) {
     expressions.put("dueDate", dueDateExpression);
     return this;
   }
 
+  @Override
   public TaskQuery dueBefore(Date dueBefore) {
     this.dueBefore = dueBefore;
     expressions.remove("dueBefore");
     return this;
   }
 
+  @Override
   public TaskQuery dueBeforeExpression(String dueDate) {
     expressions.put("dueBefore", dueDate);
     return this;
   }
 
+  @Override
   public TaskQuery dueAfter(Date dueAfter) {
     this.dueAfter = dueAfter;
     expressions.remove("dueAfter");
     return this;
   }
 
+  @Override
   public TaskQuery dueAfterExpression(String dueDateExpression) {
     expressions.put("dueAfter", dueDateExpression);
     return this;
   }
 
+  @Override
   public TaskQuery followUpDate(Date followUpDate) {
     this.followUpDate = followUpDate;
     expressions.remove("followUpDate");
     return this;
   }
 
+  @Override
   public TaskQuery followUpDateExpression(String followUpDateExpression) {
     expressions.put("followUpDate", followUpDateExpression);
     return this;
   }
 
+  @Override
   public TaskQuery followUpBefore(Date followUpBefore) {
     this.followUpBefore = followUpBefore;
     this.followUpNullAccepted = false;
@@ -648,6 +741,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return this;
   }
 
+  @Override
   public TaskQuery followUpBeforeExpression(String followUpBeforeExpression) {
     this.followUpNullAccepted = false;
     expressions.put("followUpBefore", followUpBeforeExpression);
@@ -673,32 +767,38 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     this.followUpNullAccepted = followUpNullAccepted;
   }
 
+  @Override
   public TaskQuery followUpAfter(Date followUpAfter) {
     this.followUpAfter = followUpAfter;
     expressions.remove("followUpAfter");
     return this;
   }
 
+  @Override
   public TaskQuery followUpAfterExpression(String followUpAfterExpression) {
     expressions.put("followUpAfter", followUpAfterExpression);
     return this;
   }
 
+  @Override
   public TaskQuery excludeSubtasks() {
     this.excludeSubtasks = true;
     return this;
   }
 
+  @Override
   public TaskQuery active() {
     this.suspensionState = SuspensionState.ACTIVE;
     return this;
   }
 
+  @Override
   public TaskQuery suspended() {
     this.suspensionState = SuspensionState.SUSPENDED;
     return this;
   }
 
+  @Override
   public TaskQuery initializeFormKeys() {
     this.initializeFormKeys = true;
     return this;
@@ -795,59 +895,78 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   //ordering ////////////////////////////////////////////////////////////////
 
+  @Override
   public TaskQuery orderByTaskId() {
     return orderBy(TaskQueryProperty.TASK_ID);
   }
 
+  @Override
   public TaskQuery orderByTaskName() {
     return orderBy(TaskQueryProperty.NAME);
   }
 
+  @Override
   public TaskQuery orderByTaskNameCaseInsensitive() {
     taskNameCaseInsensitive();
     return orderBy(TaskQueryProperty.NAME_CASE_INSENSITIVE);
   }
 
+  @Override
   public TaskQuery orderByTaskDescription() {
     return orderBy(TaskQueryProperty.DESCRIPTION);
   }
 
+  @Override
   public TaskQuery orderByTaskPriority() {
     return orderBy(TaskQueryProperty.PRIORITY);
   }
 
+  @Override
   public TaskQuery orderByProcessInstanceId() {
     return orderBy(TaskQueryProperty.PROCESS_INSTANCE_ID);
   }
 
+  @Override
   public TaskQuery orderByCaseInstanceId() {
     return orderBy(TaskQueryProperty.CASE_INSTANCE_ID);
   }
 
+  @Override
   public TaskQuery orderByExecutionId() {
     return orderBy(TaskQueryProperty.EXECUTION_ID);
   }
 
+  @Override
+  public TaskQuery orderByTenantId() {
+    return orderBy(TaskQueryProperty.TENANT_ID);
+  }
+
+  @Override
   public TaskQuery orderByCaseExecutionId() {
     return orderBy(TaskQueryProperty.CASE_EXECUTION_ID);
   }
 
+  @Override
   public TaskQuery orderByTaskAssignee() {
     return orderBy(TaskQueryProperty.ASSIGNEE);
   }
 
+  @Override
   public TaskQuery orderByTaskCreateTime() {
     return orderBy(TaskQueryProperty.CREATE_TIME);
   }
 
+  @Override
   public TaskQuery orderByDueDate() {
     return orderBy(TaskQueryProperty.DUE_DATE);
   }
 
+  @Override
   public TaskQuery orderByFollowUpDate() {
     return orderBy(TaskQueryProperty.FOLLOW_UP_DATE);
   }
 
+  @Override
   public TaskQuery orderByProcessVariable(String variableName, ValueType valueType) {
     ensureNotNull("variableName", variableName);
     ensureNotNull("valueType", valueType);
@@ -856,6 +975,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return this;
   }
 
+  @Override
   public TaskQuery orderByExecutionVariable(String variableName, ValueType valueType) {
     ensureNotNull("variableName", variableName);
     ensureNotNull("valueType", valueType);
@@ -864,6 +984,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return this;
   }
 
+  @Override
   public TaskQuery orderByTaskVariable(String variableName, ValueType valueType) {
     ensureNotNull("variableName", variableName);
     ensureNotNull("valueType", valueType);
@@ -872,6 +993,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return this;
   }
 
+  @Override
   public TaskQuery orderByCaseExecutionVariable(String variableName, ValueType valueType) {
     ensureNotNull("variableName", variableName);
     ensureNotNull("valueType", valueType);
@@ -880,6 +1002,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return this;
   }
 
+  @Override
   public TaskQuery orderByCaseInstanceVariable(String variableName, ValueType valueType) {
     ensureNotNull("variableName", variableName);
     ensureNotNull("valueType", valueType);
@@ -890,6 +1013,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   //results ////////////////////////////////////////////////////////////////
 
+  @Override
   public List<Task> executeList(CommandContext commandContext, Page page) {
     ensureVariablesInitialized();
     checkQueryOk();
@@ -907,6 +1031,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return taskList;
   }
 
+  @Override
   public long executeCount(CommandContext commandContext) {
     ensureVariablesInitialized();
     checkQueryOk();
@@ -992,6 +1117,10 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
 
   public String[] getActivityInstanceIdIn() {
     return activityInstanceIdIn;
+  }
+
+  public String[] getTenantIds() {
+    return tenantIds;
   }
 
   public String getTaskId() {
@@ -1154,6 +1283,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
     return taskNameCaseInsensitive;
   }
 
+  @Override
   public TaskQuery extend(TaskQuery extending) {
     TaskQueryImpl extendingQuery = (TaskQueryImpl) extending;
     TaskQueryImpl extendedQuery = new TaskQueryImpl();
@@ -1581,6 +1711,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
       return variableValue;
     }
 
+    @Override
     public boolean equals(Object o) {
       if (this == o) return true;
       if (o == null || getClass() != o.getClass()) return false;
@@ -1592,6 +1723,7 @@ public class TaskQueryImpl extends AbstractQuery<TaskQuery, Task> implements Tas
              && variableValue.isLocal() == other.isLocal();
     }
 
+    @Override
     public int hashCode() {
       int result = variableValue.getName() != null ? variableValue.getName().hashCode() : 0;
       result = 31 * result + (variableValue.isProcessInstanceVariable() ? 1 : 0);

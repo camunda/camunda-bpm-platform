@@ -51,5 +51,6 @@ public interface TaskQueryProperty {
   public static final QueryProperty CASE_EXECUTION_ID = new QueryPropertyImpl("CASE_EXECUTION_ID_");
   public static final QueryProperty DUE_DATE = new QueryPropertyImpl("DUE_DATE_");
   public static final QueryProperty FOLLOW_UP_DATE = new QueryPropertyImpl("FOLLOW_UP_DATE_");
+  public static final QueryProperty TENANT_ID = new QueryPropertyImpl("TENANT_ID_");
 
 }

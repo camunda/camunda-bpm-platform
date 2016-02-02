@@ -568,4 +568,15 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         "071","Cannot determine process application variable serializers. Context Process Application is unavailable."), e);
   }
 
+  public ProcessEngineException cannotChangeTenantIdOfTask(String taskId, String currentTenantId, String tenantIdToSet) {
+    return new ProcessEngineException(exceptionMessage(
+        "072", "Cannot change tenantId of Task '{}'. Current tenant id '{}', Tenant id to set '{}'", taskId, currentTenantId, tenantIdToSet));
+  }
+
+  public ProcessEngineException cannotSetDifferentTenantIdOnSubtask(String parentTaskId, String tenantId, String tenantIdToSet) {
+    return new ProcessEngineException(exceptionMessage(
+        "073", "Cannot set different tenantId on subtask than on parent Task. Parent taskId: '{}', tenantId: '{}', tenant id to set '{}'", parentTaskId, tenantId, tenantIdToSet));
+  }
+
+
 }

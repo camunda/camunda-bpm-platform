@@ -20,6 +20,8 @@ import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.query.Query;
+import org.camunda.bpm.engine.repository.DeploymentQuery;
+import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.variable.type.ValueType;
 
 /**
@@ -727,6 +729,9 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    */
   TaskQuery initializeFormKeys();
 
+  /** Only select tasks definitions with one of the given tenant ids. */
+  TaskQuery tenantIdIn(String... tenantIds);
+
   // ordering ////////////////////////////////////////////////////////////
 
   /** Order by task id (needs to be followed by {@link #asc()} or {@link #desc()}). */
@@ -803,4 +808,7 @@ public interface TaskQuery extends Query<TaskQuery, Task>{
    */
   TaskQuery orderByCaseInstanceVariable(String variableName, ValueType valueType);
 
+  /** Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of process instances without tenant id is database-specific. */
+  TaskQuery orderByTenantId();
 }

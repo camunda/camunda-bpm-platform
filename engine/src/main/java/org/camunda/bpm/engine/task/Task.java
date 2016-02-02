@@ -145,4 +145,23 @@ public interface Task {
    * @throws BadUserRequestException in case the form key is not initialized.
    */
   String getFormKey();
+
+  /**
+   * Returns the task's tenant id or null in case this task does not belong to a tenant.
+   *
+   * @return the task's tenant id or null
+   *
+   * @since 7.5
+   */
+  String getTenantId();
+
+  /**
+   * Sets the tenant id for this task.
+   *
+   * @param tenantId the tenant id to set
+   *
+   * @since 7.5
+   */
+  void setTenantId(String tenantId);
+
 }
