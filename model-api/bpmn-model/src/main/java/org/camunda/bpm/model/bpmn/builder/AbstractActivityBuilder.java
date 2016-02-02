@@ -15,6 +15,7 @@ package org.camunda.bpm.model.bpmn.builder;
 
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.Activity;
+import org.camunda.bpm.model.bpmn.instance.BoundaryEvent;
 
 /**
  * @author Sebastian Menski
@@ -23,6 +24,16 @@ public abstract class AbstractActivityBuilder<B extends AbstractActivityBuilder<
 
   protected AbstractActivityBuilder(BpmnModelInstance modelInstance, E element, Class<?> selfType) {
     super(modelInstance, element, selfType);
+  }
+
+  public BoundaryEventBuilder boundaryEvent() {
+    return boundaryEvent(null);
+  }
+
+  public BoundaryEventBuilder boundaryEvent(String id) {
+    BoundaryEvent boundaryEvent = createSibling(BoundaryEvent.class, id);
+    boundaryEvent.setAttachedTo(element);
+    return boundaryEvent.builder();
   }
 
 }

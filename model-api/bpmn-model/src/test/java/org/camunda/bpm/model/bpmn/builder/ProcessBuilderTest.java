@@ -36,15 +36,18 @@ import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN20_NS;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelException;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.GatewayDirection;
+import org.camunda.bpm.model.bpmn.instance.BoundaryEvent;
 import org.camunda.bpm.model.bpmn.instance.BusinessRuleTask;
 import org.camunda.bpm.model.bpmn.instance.CallActivity;
 import org.camunda.bpm.model.bpmn.instance.CatchEvent;
 import org.camunda.bpm.model.bpmn.instance.Definitions;
+import org.camunda.bpm.model.bpmn.instance.EndEvent;
 import org.camunda.bpm.model.bpmn.instance.Event;
 import org.camunda.bpm.model.bpmn.instance.EventDefinition;
 import org.camunda.bpm.model.bpmn.instance.FlowNode;
@@ -1020,6 +1023,72 @@ public class ProcessBuilderTest {
     assertThat(signal1).isEqualTo(signal2);
 
     assertOnlyOneSignalExists("signal");
+  }
+
+  @Test
+  public void testMessageBoundaryEvent() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask("task")
+      .endEvent()
+      .moveToActivity("task") // jump back to user task and attach a boundary event
+      .boundaryEvent("boundary").message("message")
+      .endEvent("boundaryEnd")
+      .done();
+
+    assertMessageCatchEventDefinition("boundary", "message");
+
+    UserTask userTask = modelInstance.getModelElementById("task");
+    BoundaryEvent boundaryEvent = modelInstance.getModelElementById("boundary");
+    EndEvent boundaryEnd = modelInstance.getModelElementById("boundaryEnd");
+
+    // boundary event is attached to the user task
+    assertThat(boundaryEvent.getAttachedTo()).isEqualTo(userTask);
+
+    // boundary event has no incoming sequence flows
+    assertThat(boundaryEvent.getIncoming()).isEmpty();
+
+    // the next flow node is the boundary end event
+    List<FlowNode> succeedingNodes = boundaryEvent.getSucceedingNodes().list();
+    assertThat(succeedingNodes).containsOnly(boundaryEnd);
+  }
+
+  @Test
+  public void testMultipleBoundaryEvents() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask("task")
+      .endEvent()
+      .moveToActivity("task") // jump back to user task and attach a boundary event
+      .boundaryEvent("boundary1").message("message")
+      .endEvent("boundaryEnd1")
+      .moveToActivity("task") // jump back to user task and attach another boundary event
+      .boundaryEvent("boundary2").signal("signal")
+      .endEvent("boundaryEnd2")
+      .done();
+
+    assertMessageCatchEventDefinition("boundary1", "message");
+    assertSignalCatchEventDefinition("boundary2", "signal");
+
+    UserTask userTask = modelInstance.getModelElementById("task");
+    BoundaryEvent boundaryEvent1 = modelInstance.getModelElementById("boundary1");
+    EndEvent boundaryEnd1 = modelInstance.getModelElementById("boundaryEnd1");
+    BoundaryEvent boundaryEvent2 = modelInstance.getModelElementById("boundary2");
+    EndEvent boundaryEnd2 = modelInstance.getModelElementById("boundaryEnd2");
+
+    // boundary events are attached to the user task
+    assertThat(boundaryEvent1.getAttachedTo()).isEqualTo(userTask);
+    assertThat(boundaryEvent2.getAttachedTo()).isEqualTo(userTask);
+
+    // boundary events have no incoming sequence flows
+    assertThat(boundaryEvent1.getIncoming()).isEmpty();
+    assertThat(boundaryEvent2.getIncoming()).isEmpty();
+
+    // the next flow node is the boundary end event
+    List<FlowNode> succeedingNodes = boundaryEvent1.getSucceedingNodes().list();
+    assertThat(succeedingNodes).containsOnly(boundaryEnd1);
+    succeedingNodes = boundaryEvent2.getSucceedingNodes().list();
+    assertThat(succeedingNodes).containsOnly(boundaryEnd2);
   }
 
   protected Message assertMessageCatchEventDefinition(String elementId, String messageName) {

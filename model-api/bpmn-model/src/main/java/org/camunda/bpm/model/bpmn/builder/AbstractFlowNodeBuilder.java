@@ -15,6 +15,7 @@ package org.camunda.bpm.model.bpmn.builder;
 
 import org.camunda.bpm.model.bpmn.BpmnModelException;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.instance.Activity;
 import org.camunda.bpm.model.bpmn.instance.BusinessRuleTask;
 import org.camunda.bpm.model.bpmn.instance.CallActivity;
 import org.camunda.bpm.model.bpmn.instance.ConditionExpression;
@@ -229,6 +230,17 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
     ModelElementInstance instance = modelInstance.getModelElementById(identifier);
     if (instance != null && instance instanceof FlowNode) {
       return ((FlowNode) instance).builder();
+    }
+    else {
+      throw new BpmnModelException("Flow node not found for id " + identifier);
+    }
+  }
+
+  @SuppressWarnings({"rawtypes", "unchecked"})
+  public <T extends AbstractActivityBuilder> T moveToActivity(String identifier) {
+    ModelElementInstance instance = modelInstance.getModelElementById(identifier);
+    if (instance != null && instance instanceof Activity) {
+      return (T) ((Activity) instance).builder();
     }
     else {
       throw new BpmnModelException("Flow node not found for id " + identifier);

@@ -11,25 +11,18 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.model.bpmn.instance;
+package org.camunda.bpm.model.bpmn.builder;
 
-import org.camunda.bpm.model.bpmn.builder.BoundaryEventBuilder;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.instance.BoundaryEvent;
 
 /**
- * The BPMN boundaryEvent element
- *
  * @author Sebastian Menski
  */
-public interface BoundaryEvent extends CatchEvent {
+public class BoundaryEventBuilder extends AbstractBoundaryEventBuilder<BoundaryEventBuilder> {
 
-  boolean cancelActivity();
-
-  void setCancelActivity(boolean cancelActivity);
-
-  Activity getAttachedTo();
-
-  void setAttachedTo(Activity attachedTo);
-
-  BoundaryEventBuilder builder();
+  public BoundaryEventBuilder(BpmnModelInstance modelInstance, BoundaryEvent element) {
+    super(modelInstance, element, BoundaryEventBuilder.class);
+  }
 
 }
