@@ -8,8 +8,8 @@ module.exports = function(config, localesConfig, pathConfig) {
         anOption: 'for production'
       },
       src: [
-        'node_modules/camunda-commons-ui/resources/locales/*.json',
-        'node_modules/camunda-commons-ui/lib/*/locales/*.json',
+        '<%= pkg.gruntConfig.commonsUiDir %>/resources/locales/*.json',
+        '<%= pkg.gruntConfig.commonsUiDir %>/lib/*/locales/*.json',
         pathConfig.sourceDir + '/scripts/**/locales/*.json'
       ]
   };
