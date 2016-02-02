@@ -12,7 +12,9 @@
  */
 package org.camunda.bpm.webapp.plugin.resource;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,9 +22,11 @@ import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
@@ -106,10 +110,23 @@ public class AbstractAppPluginRootResource<T extends AppPlugin> {
 
     if (plugin != null) {
       InputStream assetStream = getPluginAssetAsStream(plugin, file);
-      assetStream = applyResourceOverrides(file, assetStream);
+      final InputStream filteredStream = applyResourceOverrides(file, assetStream);
+
       if (assetStream != null) {
         String contentType = getContentType(file);
-        return Response.ok(assetStream, contentType).build();
+        return Response.ok(new StreamingOutput() {
+
+          @Override
+          public void write(OutputStream out) throws IOException, WebApplicationException {
+
+            byte[] buff = new byte[512 * 1000];
+            int read = 0;
+            while((read = filteredStream.read(buff)) > 0) {
+              out.write(buff, 0, read);
+            }
+
+          }
+        }, contentType).build();
       }
     }
 
