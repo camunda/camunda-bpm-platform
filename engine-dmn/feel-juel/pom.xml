@@ -108,6 +108,7 @@
           <unpackBundle>false</unpackBundle>
           <instructions>
             <Export-Package>
+              !${project.groupId}.feel.impl,
               ${project.groupId}*
             </Export-Package>
             <Import-Package>
