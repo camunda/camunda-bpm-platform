@@ -33,6 +33,7 @@ import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.webapp.AppRuntimeDelegate;
 import org.camunda.bpm.webapp.plugin.spi.AppPlugin;
+import org.camunda.commons.utils.IoUtil;
 
 /**
  * A resource class that provides a plugins restful API.
@@ -119,10 +120,16 @@ public class AbstractAppPluginRootResource<T extends AppPlugin> {
           @Override
           public void write(OutputStream out) throws IOException, WebApplicationException {
 
-            byte[] buff = new byte[512 * 1000];
-            int read = 0;
-            while((read = filteredStream.read(buff)) > 0) {
-              out.write(buff, 0, read);
+            try {
+              byte[] buff = new byte[16 * 1000];
+              int read = 0;
+              while((read = filteredStream.read(buff)) > 0) {
+                out.write(buff, 0, read);
+              }
+            }
+            finally {
+              IoUtil.closeSilently(filteredStream);
+              IoUtil.closeSilently(out);
             }
 
           }
