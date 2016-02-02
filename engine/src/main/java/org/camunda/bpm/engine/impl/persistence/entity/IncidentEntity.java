@@ -94,6 +94,18 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     }
   }
 
+  /**
+   * use {@link #createAndInsertIncident(String, IncidentContext, String)}
+   */
+  @Deprecated
+  public static IncidentEntity createAndInsertIncident(String incidentType, String executionId, String configuration, String message) {
+    IncidentContext ctx = new IncidentContext();
+    ctx.setExecutionId(executionId);
+    ctx.setConfiguration(configuration);
+
+    return createAndInsertIncident(incidentType, ctx, message);
+  }
+
   public static IncidentEntity createAndInsertIncident(String incidentType, IncidentContext context, String message) {
     // create new incident
     IncidentEntity newIncident = create(incidentType);
@@ -225,6 +237,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     }
   }
 
+  @Override
   public boolean hasReferenceTo(DbEntity entity) {
     if (entity instanceof IncidentEntity) {
       IncidentEntity incident = (IncidentEntity) entity;
@@ -238,14 +251,17 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     return false;
   }
 
+  @Override
   public String getId() {
     return id;
   }
 
+  @Override
   public void setId(String id) {
     this.id = id;
   }
 
+  @Override
   public Date getIncidentTimestamp() {
     return incidentTimestamp;
   }
@@ -254,6 +270,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     this.incidentTimestamp = incidentTimestamp;
   }
 
+  @Override
   public String getIncidentType() {
     return incidentType;
   }
@@ -262,6 +279,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     this.incidentType = incidentType;
   }
 
+  @Override
   public String getIncidentMessage() {
     return incidentMessage;
   }
@@ -270,6 +288,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     this.incidentMessage = incidentMessage;
   }
 
+  @Override
   public String getExecutionId() {
     return executionId;
   }
@@ -278,6 +297,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     this.executionId = executionId;
   }
 
+  @Override
   public String getActivityId() {
     return activityId;
   }
@@ -286,6 +306,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     this.activityId = activityId;
   }
 
+  @Override
   public String getProcessInstanceId() {
     return processInstanceId;
   }
@@ -304,6 +325,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     return null;
   }
 
+  @Override
   public String getProcessDefinitionId() {
     return processDefinitionId;
   }
@@ -312,6 +334,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     this.processDefinitionId = processDefinitionId;
   }
 
+  @Override
   public String getCauseIncidentId() {
     return causeIncidentId;
   }
@@ -320,6 +343,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     this.causeIncidentId = causeIncidentId;
   }
 
+  @Override
   public String getRootCauseIncidentId() {
     return rootCauseIncidentId;
   }
@@ -328,6 +352,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     this.rootCauseIncidentId = rootCauseIncidentId;
   }
 
+  @Override
   public String getConfiguration() {
     return configuration;
   }
@@ -336,6 +361,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     this.configuration = configuration;
   }
 
+  @Override
   public String getTenantId() {
     return tenantId;
   }
@@ -364,6 +390,7 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     }
   }
 
+  @Override
   public Object getPersistentState() {
     Map<String, Object> persistentState = new HashMap<String, Object>();
     persistentState.put("executionId", this.executionId);
@@ -371,14 +398,17 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
     return persistentState;
   }
 
+  @Override
   public void setRevision(int revision) {
     this.revision = revision;
   }
 
+  @Override
   public int getRevision() {
     return revision;
   }
 
+  @Override
   public int getRevisionNext() {
     return revision + 1;
   }
@@ -425,5 +455,6 @@ public class IncidentEntity implements Incident, DbEntity, HasDbRevision, HasDbR
       return false;
     return true;
   }
+
 
 }
