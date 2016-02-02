@@ -13,27 +13,24 @@
 package org.camunda.bpm.engine.impl.migration;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
-import org.camunda.bpm.engine.impl.ActivityExecutionTreeMapping;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.cmd.GetActivityInstanceCmd;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingExecutionBranch;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessInstance;
+import org.camunda.bpm.engine.impl.migration.validation.AdditionalFlowScopeValidator;
+import org.camunda.bpm.engine.impl.migration.validation.MigrationInstructionInstanceValidationReport;
+import org.camunda.bpm.engine.impl.migration.validation.MigrationInstructionInstanceValidator;
+import org.camunda.bpm.engine.impl.migration.validation.RemoveFlowScopeValidator;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
-import org.camunda.bpm.engine.impl.tree.ActivityStackCollector;
-import org.camunda.bpm.engine.impl.tree.FlowScopeWalker;
-import org.camunda.bpm.engine.impl.tree.TreeWalker.WalkCondition;
-import org.camunda.bpm.engine.migration.MigrationInstruction;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 
@@ -62,83 +59,121 @@ public class MigrateProcessInstanceCmd implements Command<Void> {
   }
 
   public Void migrateProcessInstance(CommandContext commandContext, String processInstanceId) {
-    ProcessDefinitionEntity targetProcessDefinition = Context.getProcessEngineConfiguration()
-        .getDeploymentCache().findDeployedProcessDefinitionById(migrationPlan.getTargetProcessDefinitionId());
 
     ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
 
-    ActivityInstance activityInstanceTree = new GetActivityInstanceCmd(processInstanceId).execute(commandContext);
-    List<MigratingActivityInstance> migratingInstances = new ArrayList<MigratingActivityInstance>();
+    ProcessDefinitionEntity targetProcessDefinition = Context.getProcessEngineConfiguration()
+        .getDeploymentCache().findDeployedProcessDefinitionById(migrationPlan.getTargetProcessDefinitionId());
 
-    Set<ActivityInstance> unmappedLeafInstances = collectLeafInstances(activityInstanceTree);
+    // Initialize migration: match migration instructions to activity instances and collect required entities
+    MigratingProcessInstance migratingProcessInstance = MigratingProcessInstance.initializeFrom(
+        commandContext, migrationPlan, processInstance, targetProcessDefinition);
 
-    // 1. collect activity instances that are migrated
-    for (MigrationInstruction instruction : migrationPlan.getInstructions()) {
-      ActivityInstance[] instancesForSourceActivity =
-          activityInstanceTree.getActivityInstances(instruction.getSourceActivityIds().get(0));
+    validateInstructions(migratingProcessInstance);
 
-      for (ActivityInstance instance : instancesForSourceActivity) {
-        MigratingActivityInstance migratingInstance = new MigratingActivityInstance();
-        migratingInstance.activityInstanceId = instance.getId();
-        migratingInstance.instruction = instruction;
-
-        String taskExecutionId = instance.getExecutionIds()[0];
-        List<TaskEntity> tasksByExecutionId = Context.getCommandContext().getTaskManager().findTasksByExecutionId(taskExecutionId);
-        migratingInstance.userTask = tasksByExecutionId.get(0);
-        migratingInstances.add(migratingInstance);
-
-        unmappedLeafInstances.remove(instance);
-      }
-    }
-
-    if (!unmappedLeafInstances.isEmpty()) {
-      throw LOGGER.unmappedActivityInstances(processInstanceId, unmappedLeafInstances);
-    }
-
-    // 2. update process definition IDs
-    processInstance.setProcessDefinition(targetProcessDefinition);
-
-    for (MigratingActivityInstance migratingInstance : migratingInstances) {
-      migratingInstance.userTask.setProcessDefinitionId(targetProcessDefinition.getId());
-    }
+    migrateProcessInstance(migratingProcessInstance);
 
     return null;
   }
 
-  protected Set<ActivityInstance> collectLeafInstances(ActivityInstance activityInstanceTree) {
-    if (activityInstanceTree.getChildActivityInstances().length == 0) {
-      return Collections.singleton(activityInstanceTree);
-    }
-    else {
-      Set<ActivityInstance> leafInstances = new HashSet<ActivityInstance>();
-      for (ActivityInstance childInstance : activityInstanceTree.getChildActivityInstances()) {
-        leafInstances.addAll(collectLeafInstances(childInstance));
+  protected void validateInstructions(MigratingProcessInstance migratingProcessInstance) {
+
+    List<MigrationInstructionInstanceValidator> validators = Arrays.asList(new AdditionalFlowScopeValidator(),
+        new RemoveFlowScopeValidator());
+    MigrationInstructionInstanceValidationReport validationReport = new MigrationInstructionInstanceValidationReport(migratingProcessInstance);
+
+    for (MigratingActivityInstance migratingActivityInstance : migratingProcessInstance.getMigratingActivityInstances()) {
+      for (MigrationInstructionInstanceValidator validator : validators) {
+        validator.validate(migratingProcessInstance, migratingActivityInstance, validationReport);
       }
-
-      return leafInstances;
     }
+
+    if (validationReport.hasFailures()) {
+      throw LOGGER.failingInstructionInstanceValidation(validationReport);
+    }
+
   }
 
-  protected List<PvmActivity> collectFlowScopes(final ActivityImpl sourceActivity, final ActivityExecutionTreeMapping mapping) {
-    ActivityStackCollector stackCollector = new ActivityStackCollector();
-    FlowScopeWalker walker = new FlowScopeWalker(sourceActivity.isScope() ? sourceActivity : sourceActivity.getFlowScope());
-    walker.addPreVisitor(stackCollector);
+  protected void migrateProcessInstance(MigratingProcessInstance migratingProcessInstance) {
+    MigratingActivityInstance rootActivityInstance =
+        migratingProcessInstance.getMigratingInstance(migratingProcessInstance.getProcessInstanceId());
 
-    // walk until a scope is reached for which executions exist
-    walker.walkWhile(new WalkCondition<ScopeImpl>() {
-      public boolean isFulfilled(ScopeImpl element) {
-        return !mapping.getExecutions(element).isEmpty() || element == sourceActivity.getProcessDefinition();
+    migrateActivityInstance(migratingProcessInstance, new MigratingExecutionBranch(), rootActivityInstance);
+  }
+
+  protected void migrateActivityInstance(
+      MigratingProcessInstance migratingProcessInstance,
+      MigratingExecutionBranch migratingExecutionBranch,
+      MigratingActivityInstance migratingActivityInstance) {
+
+    ActivityInstance activityInstance = migratingActivityInstance.getActivityInstance();
+
+    if (!activityInstance.getId().equals(activityInstance.getProcessInstanceId())) {
+      final MigratingActivityInstance parentMigratingInstance = migratingProcessInstance.getMigratingInstance(
+          activityInstance.getParentActivityInstanceId());
+
+      ScopeImpl targetFlowScope = migratingActivityInstance.getTargetScope().getFlowScope();
+      ScopeImpl parentActivityInstanceTargetScope = parentMigratingInstance.getTargetScope();
+
+      if (targetFlowScope != parentActivityInstanceTargetScope) {
+        // create intermediate scopes
+
+        ExecutionEntity flowScopeExecution = migratingActivityInstance.getFlowScopeExecution();
+
+        // 1. detach activity instance
+        migratingActivityInstance.detachState();
+
+        // 2. manipulate execution tree
+        ExecutionEntity targetExecution = migratingExecutionBranch.getExecution(targetFlowScope);
+
+        if (targetExecution == null) {
+          targetExecution = createMissingTargetFlowScopeExecution(flowScopeExecution, (PvmActivity) targetFlowScope);
+          migratingExecutionBranch.registerExecution(targetFlowScope, targetExecution);
+        }
+        else {
+          targetExecution = (ExecutionEntity) targetExecution.createConcurrentExecution();
+        }
+
+        // 3. attach to newly created execution
+        migratingActivityInstance.attachState(targetExecution);
       }
-    });
+    }
 
-    return stackCollector.getActivityStack();
+    // 4. update state (e.g. activity id)
+    migratingActivityInstance.migrateState();
+
+    // 5. migrate instance state other than execution-tree structure
+    migratingActivityInstance.migrateDependentEntities();
+
+    // Let activity instances on the same level of subprocess share the same execution context
+    // of newly created scope executions.
+    // This ensures that newly created scope executions
+    // * are reused to attach activity instances to when the activity instances share a
+    //   common ancestor path to the process instance
+    // * are not reused when activity instances are in unrelated branches of the execution tree
+    migratingExecutionBranch = migratingExecutionBranch.copy();
+
+    for (ActivityInstance childInstance : activityInstance.getChildActivityInstances()) {
+      MigratingActivityInstance migratingChildInstance = migratingProcessInstance.getMigratingInstance(childInstance.getId());
+      migrateActivityInstance(migratingProcessInstance, migratingExecutionBranch, migratingChildInstance);
+    }
+
   }
 
-  public static class MigratingActivityInstance {
-    protected String activityInstanceId;
-    protected TaskEntity userTask;
-    protected MigrationInstruction instruction;
-  }
+  protected ExecutionEntity createMissingTargetFlowScopeExecution(ExecutionEntity parentScopeExecution, PvmActivity targetFlowScope) {
+    ExecutionEntity newParentExecution = parentScopeExecution;
+    if (!parentScopeExecution.getNonEventScopeExecutions().isEmpty() || parentScopeExecution.getActivity() != null) {
+      newParentExecution = (ExecutionEntity) parentScopeExecution.createConcurrentExecution();
+    }
 
+    List<PvmActivity> scopesToInstantiate = new ArrayList<PvmActivity>();
+    scopesToInstantiate.add(targetFlowScope);
+    newParentExecution.createScopes(scopesToInstantiate);
+    ExecutionEntity targetFlowScopeExecution = newParentExecution.getExecutions().get(0); // TODO: this does not work for more than one scope
+
+    targetFlowScopeExecution.setActivity(null);
+
+    return targetFlowScopeExecution;
+  }
 
 }

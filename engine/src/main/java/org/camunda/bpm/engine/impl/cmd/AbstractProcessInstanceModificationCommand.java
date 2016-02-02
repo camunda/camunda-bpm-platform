@@ -117,14 +117,9 @@ public abstract class AbstractProcessInstanceModificationCommand implements Comm
       //     => the scope execution may have been replaced itself again with another concurrent execution (second hop)
       //   note that the scope execution may have a long "history" of replacements, but only the last replacement is relevant here
       if (cachedExecution != null) {
-        ExecutionEntity replacingExecution = cachedExecution.getReplacedBy();
+        ExecutionEntity replacingExecution = cachedExecution.resolveReplacedBy();
 
         if (replacingExecution != null) {
-          ExecutionEntity secondHopReplacingExecution = replacingExecution.getReplacedBy();
-          if (secondHopReplacingExecution != null) {
-            replacingExecution = secondHopReplacingExecution;
-          }
-
           match = replacingExecution.getId().equals(instance.getId());
         }
       }

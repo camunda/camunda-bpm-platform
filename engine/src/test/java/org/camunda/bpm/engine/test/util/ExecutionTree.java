@@ -89,11 +89,6 @@ public class ExecutionTree implements Execution {
     return ((PvmExecutionImpl) wrappedExecution).getActivityId();
   }
 
-  @Override
-  public String toString() {
-    return wrappedExecution.toString();
-  }
-
   public Boolean isScope() {
     return ((PvmExecutionImpl) wrappedExecution).isScope();
   }
@@ -112,6 +107,42 @@ public class ExecutionTree implements Execution {
 
   public Execution getExecution() {
     return wrappedExecution;
+  }
+
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    appendString("", sb);
+    return sb.toString();
+  }
+
+  public void appendString(String prefix, StringBuilder sb) {
+    sb.append(prefix);
+    sb.append(executionTreeToString(this));
+    sb.append("\n");
+    for (ExecutionTree child : getExecutions()) {
+      child.appendString(prefix + "   ", sb);
+    }
+  }
+
+  protected static String executionTreeToString(ExecutionTree executionTree) {
+    StringBuilder sb = new StringBuilder();
+    sb.append(executionTree.getExecution());
+
+    sb.append("[activityId=");
+    sb.append(executionTree.getActivityId());
+
+    sb.append(", isScope=");
+    sb.append(executionTree.isScope());
+
+    sb.append(", isConcurrent=");
+    sb.append(executionTree.isConcurrent());
+
+    sb.append(", isEventScope=");
+    sb.append(executionTree.isEventScope());
+
+    sb.append("]");
+
+    return sb.toString();
   }
 
 }

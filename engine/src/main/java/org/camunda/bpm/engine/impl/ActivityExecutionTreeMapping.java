@@ -19,12 +19,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.CompensationBehavior;
 import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 
 /**
  * Maps an activity (plain activities + their containing flow scopes) to the scope executions
@@ -37,17 +40,14 @@ public class ActivityExecutionTreeMapping {
   protected Map<ScopeImpl, Set<ExecutionEntity>> activityExecutionMapping;
   protected CommandContext commandContext;
   protected String processInstanceId;
+  protected ProcessDefinitionImpl processDefinition;
 
   public ActivityExecutionTreeMapping(CommandContext commandContext, String processInstanceId) {
-    this();
+    this.activityExecutionMapping = new HashMap<ScopeImpl, Set<ExecutionEntity>>();
     this.commandContext = commandContext;
     this.processInstanceId = processInstanceId;
 
     initialize();
-  }
-
-  public ActivityExecutionTreeMapping() {
-    this.activityExecutionMapping = new HashMap<ScopeImpl, Set<ExecutionEntity>>();
   }
 
   protected void submitExecution(ExecutionEntity execution, ScopeImpl scope) {
@@ -64,8 +64,29 @@ public class ActivityExecutionTreeMapping {
     return executionsForActivity;
   }
 
+  public ExecutionEntity getExecution(ActivityInstance activityInstance) {
+    return intersect(
+        getExecutions(processDefinition.findActivity(activityInstance.getActivityId())),
+        activityInstance.getExecutionIds());
+  }
+
+  protected ExecutionEntity intersect(Set<ExecutionEntity> executions, String[] executionIds) {
+    Set<String> executionIdSet = new HashSet<String>();
+    for (String executionId : executionIds) {
+      executionIdSet.add(executionId);
+    }
+
+    for (ExecutionEntity execution : executions) {
+      if (executionIdSet.contains(execution.getId())) {
+        return execution;
+      }
+    }
+    throw new ProcessEngineException("Could not determine execution");
+  }
+
   protected void initialize() {
     ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
+    this.processDefinition = processInstance.getProcessDefinition();
 
     List<ExecutionEntity> executions = fetchExecutionsForProcessInstance(processInstance);
     executions.add(processInstance);

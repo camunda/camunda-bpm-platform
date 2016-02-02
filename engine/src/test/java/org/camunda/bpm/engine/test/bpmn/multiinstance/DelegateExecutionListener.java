@@ -10,13 +10,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.test.util;
+package org.camunda.bpm.engine.test.bpmn.multiinstance;
+
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.ExecutionListener;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public interface ExecutionTreeAssertion {
+public class DelegateExecutionListener implements ExecutionListener {
 
-  void assertExecution(ExecutionTree tree);
+  @Override
+  public void notify(DelegateExecution execution) throws Exception {
+    DelegateEvent.recordEventFor(execution);
+  }
+
 }

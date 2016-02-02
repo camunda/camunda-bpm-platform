@@ -10,13 +10,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.test.util;
+package org.camunda.bpm.engine.impl.migration.validation;
+
+import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
+import org.camunda.bpm.engine.migration.MigrationPlan;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public interface ExecutionTreeAssertion {
+public interface MigrationPlanValidator {
 
-  void assertExecution(ExecutionTree tree);
+  void validateMigrationPlan(ProcessDefinitionImpl sourceProcessDefinition,
+                             ProcessDefinitionImpl targetProcessDefinition,
+                             MigrationPlan migrationPlan,
+                             MigrationPlanValidationReport validationReport);
+
 }

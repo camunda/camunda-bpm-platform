@@ -19,11 +19,14 @@ import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.migration.DefaultMigrationPlanGenerator;
-import org.camunda.bpm.engine.impl.migration.DefaultMigrationPlanValidator;
+import org.camunda.bpm.engine.impl.migration.MigrationLogger;
+import org.camunda.bpm.engine.impl.migration.validation.DefaultMigrationPlanValidator;
 import org.camunda.bpm.engine.impl.migration.MigrationPlanBuilderImpl;
 import org.camunda.bpm.engine.impl.migration.MigrationPlanImpl;
-import org.camunda.bpm.engine.impl.migration.MigrationPlanValidator;
+import org.camunda.bpm.engine.impl.migration.validation.MigrationPlanValidationReport;
+import org.camunda.bpm.engine.impl.migration.validation.MigrationPlanValidator;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
+import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
 import org.camunda.bpm.engine.impl.util.EnsureUtil;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 import org.camunda.bpm.engine.migration.MigrationPlan;
@@ -34,6 +37,8 @@ import org.camunda.bpm.engine.migration.MigrationPlan;
  */
 public class CreateMigrationPlanCmd implements Command<MigrationPlan> {
 
+  public static final MigrationLogger LOG = EngineUtilLogger.MIGRATION_LOGGER;
+
   protected MigrationPlanBuilderImpl migrationBuilder;
 
   public CreateMigrationPlanCmd(MigrationPlanBuilderImpl migrationPlanBuilderImpl) {
@@ -42,27 +47,27 @@ public class CreateMigrationPlanCmd implements Command<MigrationPlan> {
 
   @Override
   public MigrationPlan execute(CommandContext commandContext) {
-    EnsureUtil.ensureNotNull(BadUserRequestException.class, "sourceProcessDefinitionId", migrationBuilder.getSourceProcessDefinitionId());
-    EnsureUtil.ensureNotNull(BadUserRequestException.class, "targetProcessDefinitionId", migrationBuilder.getTargetProcessDefinitionId());
+    String sourceProcessDefinitionId = migrationBuilder.getSourceProcessDefinitionId();
+    String targetProcessDefinitionId = migrationBuilder.getTargetProcessDefinitionId();
+    MigrationPlanImpl migrationPlan = new MigrationPlanImpl(sourceProcessDefinitionId, targetProcessDefinitionId);
+
+    EnsureUtil.ensureNotNull(BadUserRequestException.class, "sourceProcessDefinitionId", sourceProcessDefinitionId);
+    EnsureUtil.ensureNotNull(BadUserRequestException.class, "targetProcessDefinitionId", targetProcessDefinitionId);
 
     ProcessDefinitionImpl sourceProcessDefinition = commandContext.getProcessEngineConfiguration()
-        .getDeploymentCache().findProcessDefinitionFromCache(migrationBuilder.getSourceProcessDefinitionId());
+        .getDeploymentCache().findProcessDefinitionFromCache(sourceProcessDefinitionId);
     ProcessDefinitionImpl targetProcessDefinition = commandContext.getProcessEngineConfiguration()
-        .getDeploymentCache().findProcessDefinitionFromCache(migrationBuilder.getTargetProcessDefinitionId());
+        .getDeploymentCache().findProcessDefinitionFromCache(targetProcessDefinitionId);
 
     EnsureUtil.ensureNotNull(BadUserRequestException.class,
-      "source process definition with id " + migrationBuilder.getSourceProcessDefinitionId() + " does not exist",
+      "source process definition with id " + sourceProcessDefinitionId + " does not exist",
       "sourceProcessDefinition",
       sourceProcessDefinition);
 
     EnsureUtil.ensureNotNull(BadUserRequestException.class,
-      "target process definition with id " + migrationBuilder.getTargetProcessDefinitionId() + " does not exist",
+      "target process definition with id " + targetProcessDefinitionId + " does not exist",
       "targetProcessDefinition",
       targetProcessDefinition);
-
-    MigrationPlanImpl migrationPlan = new MigrationPlanImpl(
-        migrationBuilder.getSourceProcessDefinitionId(),
-        migrationBuilder.getTargetProcessDefinitionId());
 
     List<MigrationInstruction> instructions = new ArrayList<MigrationInstruction>();
 
@@ -73,17 +78,18 @@ public class CreateMigrationPlanCmd implements Command<MigrationPlan> {
     }
 
     instructions.addAll(migrationBuilder.getExplicitMigrationInstructions());
+    migrationPlan.setInstructions(instructions);
+
+    MigrationPlanValidationReport validationReport = new MigrationPlanValidationReport(migrationPlan);
 
     MigrationPlanValidator validator = new DefaultMigrationPlanValidator();
-    for (MigrationInstruction instruction : instructions) {
-      validator.validateMigrationInstruction(sourceProcessDefinition, targetProcessDefinition, instruction);
-    }
+    validator.validateMigrationPlan(sourceProcessDefinition, targetProcessDefinition, migrationPlan, validationReport);
 
-    migrationPlan.setInstructions(instructions);
+    if (validationReport.hasFailures()) {
+      throw LOG.failingMigrationPlanValidation(validationReport);
+    }
 
     return migrationPlan;
   }
-
-
 
 }

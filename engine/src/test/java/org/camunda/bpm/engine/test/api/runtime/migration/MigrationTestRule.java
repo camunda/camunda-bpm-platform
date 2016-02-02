@@ -28,6 +28,8 @@ import org.junit.runner.Description;
  */
 public class MigrationTestRule extends TestWatcher {
 
+  public static final String DEFAULT_BPMN_RESOURCE_NAME = "process.bpmn20.xml";
+
   protected ProcessEngineRule processEngineRule;
   protected ProcessEngine processEngine;
 
@@ -63,7 +65,7 @@ public class MigrationTestRule extends TestWatcher {
         .singleResult();
   }
 
-  public String deploy(String name, BpmnModelInstance bpmnModel) {
+  public ProcessDefinition deploy(String name, BpmnModelInstance bpmnModel) {
     Deployment deployment = processEngine.getRepositoryService()
       .createDeployment()
       .addModelInstance(name, bpmnModel)
@@ -71,7 +73,16 @@ public class MigrationTestRule extends TestWatcher {
 
     processEngineRule.manageDeployment(deployment);
 
-    return deployment.getId();
+    return processEngineRule.getRepositoryService()
+      .createProcessDefinitionQuery()
+      .deploymentId(deployment.getId())
+      .singleResult();
   }
 
+  /**
+   * Deploys a bpmn model instance and returns its corresponding process definition object
+   */
+  public ProcessDefinition deploy(BpmnModelInstance bpmnModel) {
+    return deploy(DEFAULT_BPMN_RESOURCE_NAME, bpmnModel);
+  }
 }

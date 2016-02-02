@@ -14,10 +14,17 @@ package org.camunda.bpm.engine.impl.migration;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
+import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.migration.validation.MigrationInstructionInstanceValidationException;
+import org.camunda.bpm.engine.impl.migration.validation.MigrationInstructionInstanceValidationReport;
+import org.camunda.bpm.engine.impl.migration.validation.MigrationPlanValidationException;
+import org.camunda.bpm.engine.impl.migration.validation.MigrationPlanValidationReport;
+import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 
 /**
@@ -29,8 +36,33 @@ public class MigrationLogger extends ProcessEngineLogger {
   public ProcessEngineException unmappedActivityInstances(String processInstanceId, Set<ActivityInstance> unmappedInstances) {
     return new ProcessEngineException(exceptionMessage(
         "001",
-        "Process instance " + processInstanceId + " cannot be migrated. There are no migration instructions that apply"
-            + " to the following activity instances " + formatActivityInstances(unmappedInstances)));
+        "Process instance '{}' cannot be migrated. There are no migration instructions that apply to the following activity instances: {}",
+        processInstanceId, formatActivityInstances(unmappedInstances)));
+  }
+
+  public BadUserRequestException invalidMigrationPlan(MigrationPlan migrationPlan, List<String> errorMessages) {
+    return new BadUserRequestException(exceptionMessage(
+        "002",
+        "The provided migration plan is invalid: {}\n{}",
+        migrationPlan, formatMigrationPlanErrors(errorMessages)
+    ));
+  }
+
+  public MigrationInstructionInstanceValidationException failingInstructionInstanceValidation(MigrationInstructionInstanceValidationReport validationReport) {
+    StringBuilder sb = new StringBuilder();
+    validationReport.writeTo(sb);
+    return new MigrationInstructionInstanceValidationException(exceptionMessage("003", "Cannot migrate process instance {}: {}",
+      validationReport.getMigratingProcessInstance().getProcessInstanceId(),
+      sb.toString()), validationReport);
+  }
+
+  public MigrationPlanValidationException failingMigrationPlanValidation(MigrationPlanValidationReport validationReport) {
+    StringBuilder sb = new StringBuilder();
+    validationReport.writeTo(sb);
+    return new MigrationPlanValidationException(exceptionMessage("004", "Cannot migrate process definition {} to {}: {}",
+      validationReport.getMigratingPlan().getSourceProcessDefinitionId(),
+      validationReport.getMigratingPlan().getTargetProcessDefinitionId(),
+      sb.toString()), validationReport);
   }
 
   protected String formatActivityInstances(Collection<ActivityInstance> activityInstances) {
@@ -47,4 +79,17 @@ public class MigrationLogger extends ProcessEngineLogger {
     return sb.toString();
   }
 
+  protected String formatMigrationPlanErrors(List<String> errorMessages) {
+    StringBuilder sb = new StringBuilder();
+
+    Iterator<String> iterator = errorMessages.iterator();
+    while(iterator.hasNext()) {
+      sb.append(iterator.next());
+      if (iterator.hasNext()) {
+        sb.append("\n");
+      }
+    }
+
+    return sb.toString();
+  }
 }

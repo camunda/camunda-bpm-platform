@@ -10,19 +10,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.migration;
+package org.camunda.bpm.engine.impl.migration.validation;
 
-import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
-import org.camunda.bpm.engine.migration.MigrationInstruction;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
+import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessInstance;
 
 /**
+ * Validates that a migration instruction is valid for an activity instance
+ *
  * @author Thorben Lindhauer
  *
  */
-public interface MigrationPlanValidator {
+public interface MigrationInstructionInstanceValidator {
 
-  void validateMigrationInstruction(ProcessDefinitionImpl sourceProcessDefinition,
-      ProcessDefinitionImpl targetProcessDefinition,
-      MigrationInstruction migrationInstruction);
-
+  void validate(MigratingProcessInstance migratingProcessInstance, MigratingActivityInstance migratingActivityInstance,
+      MigrationInstructionInstanceValidationReport validationReport);
 }

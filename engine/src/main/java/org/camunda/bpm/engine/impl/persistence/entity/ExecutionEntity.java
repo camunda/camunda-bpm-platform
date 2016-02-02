@@ -973,6 +973,11 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   }
 
   @Override
+  public ExecutionEntity resolveReplacedBy() {
+    return (ExecutionEntity) super.resolveReplacedBy();
+  }
+
+  @Override
   public void replace(PvmExecutionImpl execution) {
     ExecutionEntity replacedExecution = (ExecutionEntity) execution;
 

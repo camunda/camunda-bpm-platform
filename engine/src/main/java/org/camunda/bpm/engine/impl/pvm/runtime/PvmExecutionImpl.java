@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
 import org.camunda.bpm.engine.impl.pvm.PvmExecution;
@@ -571,6 +572,41 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
    */
   public abstract PvmExecutionImpl getReplacedBy();
 
+  /**
+   * Instead of {@link #getReplacedBy()}, which returns the execution that this execution was directly replaced with,
+   * this resolves the chain of replacements (i.e. in the case the replacedBy execution itself was replaced again)
+   */
+  public PvmExecutionImpl resolveReplacedBy() {
+    // follow the links of execution replacement;
+    // note: this can be at most two hops:
+    // case 1:
+    //   this execution is a scope execution
+    //     => tree may have expanded meanwhile
+    //     => scope execution references replacing execution directly (one hop)
+    //
+    // case 2:
+    //   this execution is a concurrent execution
+    //     => tree may have compacted meanwhile
+    //     => concurrent execution references scope execution directly (one hop)
+    //
+    // case 3:
+    //   this execution is a concurrent execution
+    //     => tree may have compacted/expanded/compacted/../expanded any number of times
+    //     => the concurrent execution has been removed and therefore references the scope execution (first hop)
+    //     => the scope execution may have been replaced itself again with another concurrent execution (second hop)
+    //   note that the scope execution may have a long "history" of replacements, but only the last replacement is relevant here
+    PvmExecutionImpl replacingExecution = getReplacedBy();
+
+    if (replacingExecution != null) {
+      PvmExecutionImpl secondHopReplacingExecution = replacingExecution.getReplacedBy();
+      if (secondHopReplacingExecution != null) {
+        replacingExecution = secondHopReplacingExecution;
+      }
+    }
+
+    return replacingExecution;
+  }
+
   public boolean hasReplacedParent() {
     return getParent() != null && getParent().getReplacedBy() == this;
   }
@@ -757,6 +793,17 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
 
     propagatingExecution.executeActivities(activityStack, targetActivity, targetTransition, variables, localVariables,
         skipCustomListeners, skipIoMappings);
+  }
+
+  public void createScopes(List<PvmActivity> activityStack) {
+
+    ExecutionStartContext executionStartContext = new ExecutionStartContext(false);
+
+    InstantiationStack instantiationStack = new InstantiationStack(activityStack);
+    executionStartContext.setInstantiationStack(instantiationStack);
+    setStartContext(executionStartContext);
+
+    performOperation(PvmAtomicOperation.ACTIVITY_INIT_STACK_AND_RETURN);
   }
 
   /**

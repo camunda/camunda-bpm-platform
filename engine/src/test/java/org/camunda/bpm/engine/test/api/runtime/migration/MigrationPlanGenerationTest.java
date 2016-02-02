@@ -12,12 +12,17 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
-import java.util.List;
+import static org.camunda.bpm.engine.test.util.MigrationPlanAssert.assertThat;
+import static org.camunda.bpm.engine.test.util.MigrationPlanAssert.migrate;
+import static org.camunda.bpm.engine.test.util.MigrationPlanValidationReportAssert.assertThat;
 
-import org.camunda.bpm.engine.migration.MigrationInstruction;
+import org.camunda.bpm.engine.impl.migration.validation.MigrationPlanValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.instance.SubProcess;
+import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,11 +43,8 @@ public class MigrationPlanGenerationTest {
   @Test
   public void testMapEqualActivitiesInProcessDefinitionScope() {
     // given
-    testHelper.deploy("oneTaskProcess.bpmn20.xml", ProcessModels.ONE_TASK_PROCESS);
-    testHelper.deploy("oneTaskProcess.bpmn20.xml", ProcessModels.ONE_TASK_PROCESS);
-
-    ProcessDefinition sourceProcessDefinition = testHelper.findProcessDefinition("UserTaskProcess", 1);
-    ProcessDefinition targetProcessDefinition = testHelper.findProcessDefinition("UserTaskProcess", 2);
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
 
     // when
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -51,27 +53,19 @@ public class MigrationPlanGenerationTest {
       .build();
 
     // then
-    Assert.assertNotNull(migrationPlan);
-    Assert.assertEquals(sourceProcessDefinition.getId(), migrationPlan.getSourceProcessDefinitionId());
-    Assert.assertEquals(targetProcessDefinition.getId(), migrationPlan.getTargetProcessDefinitionId());
-
-    List<MigrationInstruction> instructions = migrationPlan.getInstructions();
-    Assert.assertNotNull(instructions);
-    Assert.assertEquals(1, instructions.size());
-    Assert.assertEquals(1, instructions.get(0).getSourceActivityIds().size());
-    Assert.assertEquals("userTask", instructions.get(0).getSourceActivityIds().get(0));
-    Assert.assertEquals(1, instructions.get(0).getTargetActivityIds().size());
-    Assert.assertEquals("userTask", instructions.get(0).getTargetActivityIds().get(0));
+    assertThat(migrationPlan)
+      .hasSourceProcessDefinition(sourceProcessDefinition)
+      .hasTargetProcessDefinition(targetProcessDefinition)
+      .hasInstructions(
+        migrate("userTask").to("userTask")
+      );
   }
 
   @Test
   public void testMapEqualActivitiesInSameSubProcessScope() {
     // given
-    testHelper.deploy("subProcessProcess.bpmn20.xml", ProcessModels.SUBPROCESS_PROCESS);
-    testHelper.deploy("subProcessProcess.bpmn20.xml", ProcessModels.SUBPROCESS_PROCESS);
-
-    ProcessDefinition sourceProcessDefinition = testHelper.findProcessDefinition("SubProcess", 1);
-    ProcessDefinition targetProcessDefinition = testHelper.findProcessDefinition("SubProcess", 2);
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
 
     // when
     MigrationPlan migrationPlan = rule.getRuntimeService()
@@ -80,17 +74,178 @@ public class MigrationPlanGenerationTest {
       .build();
 
     // then
-    Assert.assertNotNull(migrationPlan);
-    Assert.assertEquals(sourceProcessDefinition.getId(), migrationPlan.getSourceProcessDefinitionId());
-    Assert.assertEquals(targetProcessDefinition.getId(), migrationPlan.getTargetProcessDefinitionId());
+    assertThat(migrationPlan)
+      .hasSourceProcessDefinition(sourceProcessDefinition)
+      .hasTargetProcessDefinition(targetProcessDefinition)
+      .hasInstructions(
+        migrate("subProcess").to("subProcess"),
+        migrate("userTask").to("userTask")
+      );
 
-    List<MigrationInstruction> instructions = migrationPlan.getInstructions();
-    Assert.assertNotNull(instructions);
-    Assert.assertEquals(1, instructions.size());
-    Assert.assertEquals(1, instructions.get(0).getSourceActivityIds().size());
-    Assert.assertEquals("userTask", instructions.get(0).getSourceActivityIds().get(0));
-    Assert.assertEquals(1, instructions.get(0).getTargetActivityIds().size());
-    Assert.assertEquals("userTask", instructions.get(0).getTargetActivityIds().get(0));
+  }
+
+  @Test
+  public void testMapEqualActivitiesToSubProcessScope() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
+
+    // when
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    // then
+    assertThat(migrationPlan)
+      .hasSourceProcessDefinition(sourceProcessDefinition)
+      .hasTargetProcessDefinition(targetProcessDefinition)
+      .hasInstructions(
+        migrate("userTask").to("userTask")
+      );
+  }
+
+  @Test
+  public void testMapEqualActivitiesToNestedSubProcessScope() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.DOUBLE_SUBPROCESS_PROCESS.clone()
+      .<SubProcess>getModelElementById("outerSubProcess")
+      .builder()
+        .id("subProcess")  // make ID match with subprocess ID of source definition
+        .done());
+
+    // when
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    // then
+    assertThat(migrationPlan)
+      .hasSourceProcessDefinition(sourceProcessDefinition)
+      .hasTargetProcessDefinition(targetProcessDefinition)
+      .hasInstructions(
+        migrate("subProcess").to("subProcess"),
+        migrate("userTask").to("userTask")
+      );
+  }
+
+  @Test
+  public void testMapEqualActivitiesToSurroundingSubProcessScope() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.DOUBLE_SUBPROCESS_PROCESS.clone()
+        .<SubProcess>getModelElementById("innerSubProcess")
+        .builder()
+          .id("subProcess")  // make ID match with subprocess ID of source definition
+          .done());
+
+    // when
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    // then
+    assertThat(migrationPlan)
+      .hasSourceProcessDefinition(sourceProcessDefinition)
+      .hasTargetProcessDefinition(targetProcessDefinition)
+      .hasInstructions(
+        migrate("subProcess").to("subProcess"),
+        migrate("userTask").to("userTask")
+      );
+  }
+
+  @Test
+  public void testMapEqualActivitiesToDeeplyNestedSubProcessScope() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.DOUBLE_SUBPROCESS_PROCESS);
+
+    // when
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    // then
+    assertThat(migrationPlan)
+      .hasSourceProcessDefinition(sourceProcessDefinition)
+      .hasTargetProcessDefinition(targetProcessDefinition)
+      .hasEmptyInstructions();
+  }
+
+  @Test
+  public void testMapEqualActivitiesToSiblingScope() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_SUBPROCESS_PROCESS.clone()
+      .<UserTask>getModelElementById("userTask1").builder()
+      .id("userTask3")
+      .moveToActivity("userTask2")
+      .id("userTask1")
+      .done()
+    );
+
+    // when
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    // then
+    assertThat(migrationPlan)
+      .hasSourceProcessDefinition(sourceProcessDefinition)
+      .hasTargetProcessDefinition(targetProcessDefinition)
+      .hasInstructions(
+        migrate("subProcess1").to("subProcess1"),
+        migrate("subProcess2").to("subProcess2")
+      );
+  }
+
+  @Test
+  public void testMapEqualActivitiesWhichBecomeScope() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SCOPE_TASK_PROCESS);
+
+    // when
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    // then
+    assertThat(migrationPlan)
+      .hasSourceProcessDefinition(sourceProcessDefinition)
+      .hasTargetProcessDefinition(targetProcessDefinition)
+      .hasEmptyInstructions();
+  }
+
+  @Test
+  public void testMapEqualActivitiesWhichParallelMultiInstance() {
+    // given
+    BpmnModelInstance testProcess = ProcessModels.ONE_TASK_PROCESS.clone()
+      .<UserTask>getModelElementById("userTask").builder()
+        .multiInstance().parallel().cardinality("3").multiInstanceDone().done();
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(testProcess);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(testProcess);
+
+    // when
+    try {
+      MigrationPlan migrationPlan = rule.getRuntimeService()
+        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+        .mapEqualActivities()
+        .build();
+      Assert.fail("Should not succeed");
+    }
+    catch (MigrationPlanValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasFailures(2)
+        .hasFailure("userTask", "multi instance child activities are currently not supported")
+        .hasFailure("userTask#multiInstanceBody", "the source and target activity must be of type 'org.camunda.bpm.engine.impl.bpmn.behavior.SubProcessActivityBehavior'");
+    }
   }
 
 }

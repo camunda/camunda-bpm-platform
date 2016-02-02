@@ -13,7 +13,7 @@
 package org.camunda.bpm.engine.impl.migration;
 
 import java.util.ArrayList;
-import static java.util.Collections.*;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -29,26 +29,27 @@ import org.camunda.bpm.engine.migration.MigrationInstruction;
  */
 public class DefaultMigrationPlanGenerator implements MigrationInstructionGenerator {
 
+  @Override
   public List<MigrationInstruction> generate(ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition) {
-    return generateInstructionsInScope(sourceProcessDefinition, targetProcessDefinition);
+    return generateInstructionsInScope(sourceProcessDefinition, targetProcessDefinition, 1);
   }
 
-  protected List<MigrationInstruction> generateInstructionsInScope(ScopeImpl sourceScope, ScopeImpl targetScope) {
+  protected List<MigrationInstruction> generateInstructionsInScope(ScopeImpl sourceScope, ScopeImpl targetScope, int allowedScopeDepth) {
     List<MigrationInstruction> instructions = new ArrayList<MigrationInstruction>();
 
     for (ActivityImpl sourceActivity : sourceScope.getActivities()) {
-
-      // matching IDs
-      ActivityImpl targetActivity = targetScope.getChildActivity(sourceActivity.getId());
-
-      if(targetActivity != null) {
+      for (ActivityImpl targetActivity : targetScope.getActivities()) {
         if (areEqualScopes(sourceActivity, targetActivity)) {
-          instructions.addAll(generateInstructionsInScope(sourceActivity, targetActivity));
+          instructions.add(new MigrationInstructionImpl(
+            Collections.singletonList(sourceActivity.getId()), Collections.singletonList(targetActivity.getId())));
+          instructions.addAll(generateInstructionsInScope(sourceActivity, targetActivity, allowedScopeDepth));
         }
         else if (areEqualActivities(sourceActivity, targetActivity)) {
           instructions.add(new MigrationInstructionImpl(
-              singletonList(sourceActivity.getId()),
-              singletonList(targetActivity.getId())));
+            Collections.singletonList(sourceActivity.getId()), Collections.singletonList(targetActivity.getId())));
+        }
+        else if (allowedScopeDepth > 0 && isScope(targetActivity)) {
+          instructions.addAll(generateInstructionsInScope(sourceScope, targetActivity, allowedScopeDepth - 1));
         }
       }
     }
@@ -58,19 +59,27 @@ public class DefaultMigrationPlanGenerator implements MigrationInstructionGenera
 
   protected boolean areEqualScopes(ScopeImpl sourceScope, ScopeImpl targetScope) {
 
-    boolean areScopes = !sourceScope.getActivities().isEmpty() && !targetScope.getActivities().isEmpty();
+    boolean areScopes = isScope(sourceScope) && isScope(targetScope);
+    boolean matchingIds = sourceScope.getId().equals(targetScope.getId());
     boolean matchingTypes = (sourceScope == sourceScope.getProcessDefinition() && targetScope == targetScope.getProcessDefinition())
         || (sourceScope.getActivityBehavior().getClass() == targetScope.getActivityBehavior().getClass());
 
-    return matchingTypes && areScopes;
+    return matchingIds && matchingTypes && areScopes;
   }
 
   protected boolean areEqualActivities(ActivityImpl sourceActivity, ActivityImpl targetActivity) {
+    boolean matchingIds = sourceActivity.getId().equals(targetActivity.getId());
 
     boolean matchingTypes = sourceActivity.getActivityBehavior() instanceof UserTaskActivityBehavior
         && targetActivity.getActivityBehavior() instanceof UserTaskActivityBehavior;
 
-    return matchingTypes;
+    boolean areBothEitherScopesOrNot = isScope(sourceActivity) == isScope(targetActivity);
+
+    return matchingIds && matchingTypes && areBothEitherScopesOrNot;
+  }
+
+  protected boolean isScope(ScopeImpl scope) {
+    return scope.isScope();
   }
 
 }
