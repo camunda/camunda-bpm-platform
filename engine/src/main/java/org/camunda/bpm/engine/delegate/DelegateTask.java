@@ -179,4 +179,10 @@ public interface DelegateTask extends VariableScope, BpmnModelExecutionContext, 
    */
   public UserTask getBpmnModelElementInstance();
 
+  /**
+   * Return the id of the tenant this task belongs to. Can be <code>null</code>
+   * if the task belongs to no single tenant.
+   */
+  String getTenantId();
+
 }
