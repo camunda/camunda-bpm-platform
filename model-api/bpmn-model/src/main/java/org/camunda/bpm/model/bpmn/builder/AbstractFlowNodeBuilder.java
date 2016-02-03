@@ -244,7 +244,7 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
       return (T) ((Activity) instance).builder();
     }
     else {
-      throw new BpmnModelException("Flow node not found for id " + identifier);
+      throw new BpmnModelException("Activity not found for id " + identifier);
     }
   }
 
