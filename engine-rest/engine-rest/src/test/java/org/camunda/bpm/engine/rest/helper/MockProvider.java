@@ -2432,12 +2432,13 @@ public abstract class MockProvider {
   }
 
   public static ExternalTask createMockExternalTask() {
-    return mockExternalTask().buildExternalTask();
+    return mockExternalTask().tenantId(EXAMPLE_TENANT_ID).buildExternalTask();
   }
 
   public static LockedExternalTask createMockLockedExternalTask() {
     return mockExternalTask()
       .variable(EXAMPLE_VARIABLE_INSTANCE_NAME, EXAMPLE_PRIMITIVE_VARIABLE_VALUE)
+      .tenantId(EXAMPLE_TENANT_ID)
       .buildLockedExternalTask();
   }
 

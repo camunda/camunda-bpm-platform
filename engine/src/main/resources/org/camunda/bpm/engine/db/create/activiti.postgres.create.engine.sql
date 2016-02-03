@@ -252,6 +252,7 @@ create table ACT_RU_EXT_TASK (
   PROC_DEF_KEY_ varchar(255),
   ACT_ID_ varchar(255),
   ACT_INST_ID_ varchar(64),
+  TENANT_ID_ varchar(64),
   primary key (ID_)
 );
 
@@ -273,6 +274,7 @@ create index ACT_IDX_JOB_TENANT_ID on ACT_RU_JOB(TENANT_ID_);
 create index ACT_IDX_JOBDEF_TENANT_ID on ACT_RU_JOBDEF(TENANT_ID_);
 create index ACT_IDX_METER_LOG on ACT_RU_METER_LOG(NAME_,TIMESTAMP_);
 create index ACT_IDX_EXT_TASK_TOPIC on ACT_RU_EXT_TASK(TOPIC_NAME_);
+create index ACT_IDX_EXT_TASK_TENANT_ID on ACT_RU_EXT_TASK(TENANT_ID_);
 
 create index ACT_IDX_BYTEAR_DEPL on ACT_GE_BYTEARRAY(DEPLOYMENT_ID_);
 alter table ACT_GE_BYTEARRAY

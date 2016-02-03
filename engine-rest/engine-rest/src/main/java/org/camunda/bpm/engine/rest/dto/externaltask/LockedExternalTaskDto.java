@@ -39,6 +39,7 @@ public class LockedExternalTaskDto {
   protected boolean suspended;
   protected String workerId;
   protected String topicName;
+  protected String tenantId;
   protected Map<String, VariableValueDto> variables;
 
   public String getActivityId() {
@@ -80,6 +81,9 @@ public class LockedExternalTaskDto {
   public String getTopicName() {
     return topicName;
   }
+  public String getTenantId() {
+    return tenantId;
+  }
   public Map<String, VariableValueDto> getVariables() {
     return variables;
   }
@@ -98,6 +102,7 @@ public class LockedExternalTaskDto {
     dto.retries = task.getRetries();
     dto.topicName = task.getTopicName();
     dto.workerId = task.getWorkerId();
+    dto.tenantId = task.getTenantId();
     dto.variables = VariableValueDto.fromVariableMap(task.getVariables());
 
     return dto;

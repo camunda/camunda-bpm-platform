@@ -53,6 +53,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   protected String processDefinitionKey;
   protected String activityId;
   protected String activityInstanceId;
+  protected String tenantId;
 
   protected ExecutionEntity execution;
 
@@ -135,6 +136,12 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
   public void setProcessDefinitionId(String processDefinitionId) {
     this.processDefinitionId = processDefinitionId;
   }
+  public String getTenantId() {
+    return tenantId;
+  }
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
   public Integer getRetries() {
     return retries;
   }
@@ -165,6 +172,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     persistentState.put("activityId", activityId);
     persistentState.put("activityInstanceId", activityInstanceId);
     persistentState.put("suspensionState", suspensionState);
+    persistentState.put("tenantId", tenantId);
 
     return persistentState;
   }
@@ -240,7 +248,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     context.setProcessDefinitionId(processDefinitionId);
     context.setExecutionId(executionId);
     context.setActivityId(activityId);
-    // TODO set tenant-id -> CAM-5196
+    context.setTenantId(tenantId);
     context.setConfiguration(id);
     return context;
   }
@@ -300,6 +308,7 @@ public class ExternalTaskEntity implements ExternalTask, DbEntity, HasDbRevision
     externalTask.setProcessDefinitionId(execution.getProcessDefinitionId());
     externalTask.setActivityId(execution.getActivityId());
     externalTask.setActivityInstanceId(execution.getActivityInstanceId());
+    externalTask.setTenantId(execution.getTenantId());
 
     ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) execution.getProcessDefinition();
     externalTask.setProcessDefinitionKey(processDefinition.getKey());

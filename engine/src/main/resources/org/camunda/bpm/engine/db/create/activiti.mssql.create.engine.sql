@@ -252,6 +252,7 @@ create table ACT_RU_EXT_TASK (
   PROC_DEF_KEY_ nvarchar(255),
   ACT_ID_ nvarchar(255),
   ACT_INST_ID_ nvarchar(64),
+  TENANT_ID_ nvarchar(64),
   primary key (ID_)
 );
 
@@ -277,6 +278,7 @@ create unique index ACT_UNIQ_AUTH_GROUP on ACT_RU_AUTHORIZATION (TYPE_,GROUP_ID_
 create unique index ACT_UNIQ_VARIABLE on ACT_RU_VARIABLE(VAR_SCOPE_, NAME_);
 create index ACT_IDX_METER_LOG on ACT_RU_METER_LOG(NAME_,TIMESTAMP_);
 create index ACT_IDX_EXT_TASK_TOPIC on ACT_RU_EXT_TASK(TOPIC_NAME_);
+create index ACT_IDX_EXT_TASK_TENANT_ID on ACT_RU_EXT_TASK(TENANT_ID_);
 
 alter table ACT_GE_BYTEARRAY
     add constraint ACT_FK_BYTEARR_DEPL 

@@ -14,11 +14,13 @@ package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.fest.assertions.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -129,6 +131,7 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
     Boolean suspended = from(content).getBoolean("[0].suspended");
     String topicName = from(content).getString("[0].topicName");
     String workerId = from(content).getString("[0].workerId");
+    String tenantId = from(content).getString("[0].tenantId");
 
     Assert.assertEquals(MockProvider.EXAMPLE_ACTIVITY_ID, activityId);
     Assert.assertEquals(MockProvider.EXAMPLE_ACTIVITY_INSTANCE_ID, activityInstanceId);
@@ -143,7 +146,7 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
     Assert.assertEquals(MockProvider.EXTERNAL_TASK_SUSPENDED, suspended);
     Assert.assertEquals(MockProvider.EXTERNAL_TASK_TOPIC_NAME, topicName);
     Assert.assertEquals(MockProvider.EXTERNAL_TASK_WORKER_ID, workerId);
-
+    Assert.assertEquals(MockProvider.EXAMPLE_TENANT_ID, tenantId);
   }
 
   @Test
@@ -261,6 +264,11 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
     inOrder.verify(mockQuery).orderByProcessDefinitionKey();
     inOrder.verify(mockQuery).desc();
 
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifyGETSorting("tenantId", "desc", Status.OK);
+    inOrder.verify(mockQuery).orderByTenantId();
+    inOrder.verify(mockQuery).desc();
+
     // asc
     inOrder = Mockito.inOrder(mockQuery);
     executeAndVerifyGETSorting("id", "asc", Status.OK);
@@ -285,6 +293,11 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
     inOrder = Mockito.inOrder(mockQuery);
     executeAndVerifyGETSorting("processDefinitionKey", "asc", Status.OK);
     inOrder.verify(mockQuery).orderByProcessDefinitionKey();
+    inOrder.verify(mockQuery).asc();
+
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifyGETSorting("tenantId", "asc", Status.OK);
+    inOrder.verify(mockQuery).orderByTenantId();
     inOrder.verify(mockQuery).asc();
   }
 
@@ -370,4 +383,65 @@ public class ExternalTaskRestServiceQueryTest extends AbstractRestServiceTest {
 
     verify(mockQuery).count();
   }
+
+  @Test
+  public void testQueryByTenantIdListGet() {
+    mockQuery = setUpMockExternalTaskQuery(createMockExternalTasksTwoTenants());
+
+    Response response = given()
+      .queryParam("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(EXTERNAL_TASK_QUERY_URL);
+
+    verify(mockQuery).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+    verify(mockQuery).list();
+
+    String content = response.asString();
+    List<String> executions = from(content).getList("");
+    assertThat(executions).hasSize(2);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    String returnedTenantId2 = from(content).getString("[1].tenantId");
+
+    assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
+    assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+  }
+
+  @Test
+  public void testQueryByTenantIdListPost() {
+    mockQuery = setUpMockExternalTaskQuery(createMockExternalTasksTwoTenants());
+
+    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    queryParameters.put("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST.split(","));
+
+    Response response = given()
+        .contentType(POST_JSON_CONTENT_TYPE)
+        .body(queryParameters)
+    .expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .post(EXTERNAL_TASK_QUERY_URL);
+
+    verify(mockQuery).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+    verify(mockQuery).list();
+
+    String content = response.asString();
+    List<String> executions = from(content).getList("");
+    assertThat(executions).hasSize(2);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    String returnedTenantId2 = from(content).getString("[1].tenantId");
+
+    assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
+    assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+  }
+
+  private List<ExternalTask> createMockExternalTasksTwoTenants() {
+    return Arrays.asList(
+        MockProvider.mockExternalTask().tenantId(MockProvider.EXAMPLE_TENANT_ID).buildExternalTask(),
+        MockProvider.mockExternalTask().tenantId(MockProvider.ANOTHER_EXAMPLE_TENANT_ID).buildExternalTask());
+  }
+
 }

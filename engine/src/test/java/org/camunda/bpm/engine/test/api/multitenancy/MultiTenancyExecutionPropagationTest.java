@@ -22,6 +22,7 @@ import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.JobDefinition;
@@ -362,8 +363,26 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
 
     Incident incident = runtimeService.createIncidentQuery().singleResult();
     assertThat(incident, is(notNullValue()));
-    // inherit the tenant id from job
+    // inherit the tenant id from execution
     assertThat(incident.getTenantId(), is(TENANT_ID));
+  }
+
+  public void testPropagateTenantIdToExternalTask() {
+
+    deploymentForTenant(TENANT_ID, Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
+        .startEvent()
+        .serviceTask()
+          .camundaType("external")
+          .camundaTopic("test")
+        .endEvent()
+      .done());
+
+    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+
+    ExternalTask externalTask = externalTaskService.createExternalTaskQuery().singleResult();
+    assertThat(externalTask, is(notNullValue()));
+    // inherit the tenant id from execution
+    assertThat(externalTask.getTenantId(), is(TENANT_ID));
   }
 
   public static class SetVariableTask implements JavaDelegate {

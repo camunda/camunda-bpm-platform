@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -39,6 +40,7 @@ public class ExternalTaskQueryDto extends AbstractQueryDto<ExternalTaskQuery> {
   public static final String SORT_BY_PROCESS_INSTANCE_ID = "processInstanceId";
   public static final String SORT_BY_PROCESS_DEFINITION_ID = "processDefinitionId";
   public static final String SORT_BY_PROCESS_DEFINITION_KEY = "processDefinitionKey";
+  public static final String SORT_BY_TENANT_ID = "tenantId";
 
   public static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -48,6 +50,7 @@ public class ExternalTaskQueryDto extends AbstractQueryDto<ExternalTaskQuery> {
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_INSTANCE_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_DEFINITION_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_DEFINITION_KEY);
+    VALID_SORT_BY_VALUES.add(SORT_BY_TENANT_ID);
   }
 
   protected String externalTaskId;
@@ -65,6 +68,7 @@ public class ExternalTaskQueryDto extends AbstractQueryDto<ExternalTaskQuery> {
   protected Boolean withRetriesLeft;
   protected Boolean noRetriesLeft;
   protected String workerId;
+  protected List<String> tenantIds;
 
   public ExternalTaskQueryDto() {
   }
@@ -148,6 +152,11 @@ public class ExternalTaskQueryDto extends AbstractQueryDto<ExternalTaskQuery> {
     this.workerId = workerId;
   }
 
+  @CamundaQueryParam(value = "tenantIdIn", converter = StringListConverter.class)
+  public void setTenantIdIn(List<String> tenantIds) {
+    this.tenantIds = tenantIds;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -205,6 +214,9 @@ public class ExternalTaskQueryDto extends AbstractQueryDto<ExternalTaskQuery> {
     if (workerId != null) {
       query.workerId(workerId);
     }
+    if (tenantIds != null && !tenantIds.isEmpty()) {
+      query.tenantIdIn(tenantIds.toArray(new String[tenantIds.size()]));
+    }
   }
 
   @Override
@@ -223,6 +235,8 @@ public class ExternalTaskQueryDto extends AbstractQueryDto<ExternalTaskQuery> {
     }
     else if (SORT_BY_PROCESS_INSTANCE_ID.equals(sortBy)) {
       query.orderByProcessInstanceId();
+    } else if (sortBy.equals(SORT_BY_TENANT_ID)) {
+      query.orderByTenantId();
     }
   }
 

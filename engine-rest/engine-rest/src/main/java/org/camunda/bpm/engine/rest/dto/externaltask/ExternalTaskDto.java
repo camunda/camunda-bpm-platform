@@ -35,6 +35,7 @@ public class ExternalTaskDto {
   protected boolean suspended;
   protected String workerId;
   protected String topicName;
+  protected String tenantId;
 
   public String getActivityId() {
     return activityId;
@@ -75,6 +76,9 @@ public class ExternalTaskDto {
   public String getTopicName() {
     return topicName;
   }
+  public String getTenantId() {
+    return tenantId;
+  }
 
   public static ExternalTaskDto fromExternalTask(ExternalTask task) {
     ExternalTaskDto dto = new ExternalTaskDto();
@@ -91,6 +95,7 @@ public class ExternalTaskDto {
     dto.suspended = task.isSuspended();
     dto.topicName = task.getTopicName();
     dto.workerId = task.getWorkerId();
+    dto.tenantId = task.getTenantId();
 
     return dto;
   }

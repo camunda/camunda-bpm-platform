@@ -47,7 +47,12 @@ ALTER TABLE ACT_RU_INCIDENT
   ADD TENANT_ID_ varchar(64);
 
 create index ACT_IDX_INC_TENANT_ID on ACT_RU_INCIDENT(TENANT_ID_); 
-  
+
+ALTER TABLE ACT_RU_EXT_TASK
+  ADD TENANT_ID_ varchar(64);
+
+create index ACT_IDX_EXT_TASK_TENANT_ID on ACT_RU_EXT_TASK(TENANT_ID_); 
+
 -- user on historic decision instance --
 
 ALTER TABLE ACT_HI_DECINST

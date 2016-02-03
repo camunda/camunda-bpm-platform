@@ -42,6 +42,7 @@ public class MockExternalTaskBuilder {
   protected boolean suspended;
   protected String topicName;
   protected String workerId;
+  protected String tenantId;
   protected VariableMap variables = Variables.createVariables();
 
   public MockExternalTaskBuilder activityId(String activityId) {
@@ -109,6 +110,11 @@ public class MockExternalTaskBuilder {
     return this;
   }
 
+  public MockExternalTaskBuilder tenantId(String tenantId) {
+    this.tenantId = tenantId;
+    return this;
+  }
+
   public MockExternalTaskBuilder variable(String variableName, TypedValue value) {
     this.variables.putValueTyped(variableName, value);
     return this;
@@ -129,6 +135,7 @@ public class MockExternalTaskBuilder {
     when(task.isSuspended()).thenReturn(suspended);
     when(task.getTopicName()).thenReturn(topicName);
     when(task.getWorkerId()).thenReturn(workerId);
+    when(task.getTenantId()).thenReturn(tenantId);
 
     return task;
   }
@@ -147,6 +154,7 @@ public class MockExternalTaskBuilder {
     when(task.getRetries()).thenReturn(retries);
     when(task.getTopicName()).thenReturn(topicName);
     when(task.getWorkerId()).thenReturn(workerId);
+    when(task.getTenantId()).thenReturn(tenantId);
     when(task.getVariables()).thenReturn(variables);
 
     return task;
