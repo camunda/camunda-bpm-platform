@@ -34,6 +34,7 @@ import org.camunda.bpm.model.bpmn.instance.SequenceFlow;
 import org.camunda.bpm.model.bpmn.instance.ServiceTask;
 import org.camunda.bpm.model.bpmn.instance.SubProcess;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
 import org.camunda.bpm.model.bpmn.instance.EventBasedGateway;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 
@@ -328,6 +329,36 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
 
   public B camundaJobPriority(String jobPriority) {
     element.setCamundaJobPriority(jobPriority);
+    return myself;
+  }
+
+  public B camundaExecutionListenerClass(String eventName, String fullQualifiedClassName) {
+    CamundaExecutionListener executionListener = createInstance(CamundaExecutionListener.class);
+    executionListener.setCamundaEvent(eventName);
+    executionListener.setCamundaClass(fullQualifiedClassName);
+
+    addExtensionElement(executionListener);
+
+    return myself;
+  }
+
+  public B camundaExecutionListenerExpression(String eventName, String expression) {
+    CamundaExecutionListener executionListener = createInstance(CamundaExecutionListener.class);
+    executionListener.setCamundaEvent(eventName);
+    executionListener.setCamundaExpression(expression);
+
+    addExtensionElement(executionListener);
+
+    return myself;
+  }
+
+  public B camundaExecutionListenerDelegateExpression(String eventName, String delegateExpression) {
+    CamundaExecutionListener executionListener = createInstance(CamundaExecutionListener.class);
+    executionListener.setCamundaEvent(eventName);
+    executionListener.setCamundaDelegateExpression(delegateExpression);
+
+    addExtensionElement(executionListener);
+
     return myself;
   }
 

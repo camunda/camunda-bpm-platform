@@ -50,6 +50,7 @@ import org.camunda.bpm.model.bpmn.instance.Definitions;
 import org.camunda.bpm.model.bpmn.instance.EndEvent;
 import org.camunda.bpm.model.bpmn.instance.Event;
 import org.camunda.bpm.model.bpmn.instance.EventDefinition;
+import org.camunda.bpm.model.bpmn.instance.ExtensionElements;
 import org.camunda.bpm.model.bpmn.instance.FlowNode;
 import org.camunda.bpm.model.bpmn.instance.Gateway;
 import org.camunda.bpm.model.bpmn.instance.Message;
@@ -67,6 +68,7 @@ import org.camunda.bpm.model.bpmn.instance.SubProcess;
 import org.camunda.bpm.model.bpmn.instance.Task;
 import org.camunda.bpm.model.bpmn.instance.ThrowEvent;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
@@ -1089,6 +1091,63 @@ public class ProcessBuilderTest {
     assertThat(succeedingNodes).containsOnly(boundaryEnd1);
     succeedingNodes = boundaryEvent2.getSucceedingNodes().list();
     assertThat(succeedingNodes).containsOnly(boundaryEnd2);
+  }
+
+  @Test
+  public void testCamundaExecutionListenerByClass() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask("task")
+      .camundaExecutionListenerClass("start", "aClass")
+      .endEvent()
+      .done();
+
+    UserTask userTask = modelInstance.getModelElementById("task");
+    ExtensionElements extensionElements = userTask.getExtensionElements();
+    Collection<CamundaExecutionListener> executionListeners = extensionElements.getChildElementsByType(CamundaExecutionListener.class);
+    assertThat(executionListeners).hasSize(1);
+
+    CamundaExecutionListener executionListener = executionListeners.iterator().next();
+    assertThat(executionListener.getCamundaClass()).isEqualTo("aClass");
+    assertThat(executionListener.getCamundaEvent()).isEqualTo("start");
+  }
+
+  @Test
+  public void testCamundaExecutionListenerByExpression() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask("task")
+      .camundaExecutionListenerExpression("start", "anExpression")
+      .endEvent()
+      .done();
+
+    UserTask userTask = modelInstance.getModelElementById("task");
+    ExtensionElements extensionElements = userTask.getExtensionElements();
+    Collection<CamundaExecutionListener> executionListeners = extensionElements.getChildElementsByType(CamundaExecutionListener.class);
+    assertThat(executionListeners).hasSize(1);
+
+    CamundaExecutionListener executionListener = executionListeners.iterator().next();
+    assertThat(executionListener.getCamundaExpression()).isEqualTo("anExpression");
+    assertThat(executionListener.getCamundaEvent()).isEqualTo("start");
+  }
+
+  @Test
+  public void testCamundaExecutionListenerByDelegateExpression() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask("task")
+      .camundaExecutionListenerDelegateExpression("start", "aDelegateExpression")
+      .endEvent()
+      .done();
+
+    UserTask userTask = modelInstance.getModelElementById("task");
+    ExtensionElements extensionElements = userTask.getExtensionElements();
+    Collection<CamundaExecutionListener> executionListeners = extensionElements.getChildElementsByType(CamundaExecutionListener.class);
+    assertThat(executionListeners).hasSize(1);
+
+    CamundaExecutionListener executionListener = executionListeners.iterator().next();
+    assertThat(executionListener.getCamundaDelegateExpression()).isEqualTo("aDelegateExpression");
+    assertThat(executionListener.getCamundaEvent()).isEqualTo("start");
   }
 
   protected Message assertMessageCatchEventDefinition(String elementId, String messageName) {
