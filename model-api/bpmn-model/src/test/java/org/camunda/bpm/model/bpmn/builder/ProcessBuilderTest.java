@@ -1118,7 +1118,7 @@ public class ProcessBuilderTest {
 
   protected void assertOnlyOneMessageExists(String messageName) {
     Collection<Message> messages = modelInstance.getModelElementsByType(Message.class);
-    assertThat(messages).hasSize(1);
+    assertThat(messages).extracting("name").containsOnlyOnce(messageName);
   }
 
   protected Signal assertSignalCatchEventDefinition(String elementId, String signalName) {
@@ -1148,7 +1148,7 @@ public class ProcessBuilderTest {
 
   protected void assertOnlyOneSignalExists(String signalName) {
     Collection<Signal> signals = modelInstance.getModelElementsByType(Signal.class);
-    assertThat(signals).hasSize(1);
+    assertThat(signals).extracting("name").containsOnlyOnce(signalName);
   }
 
 }
