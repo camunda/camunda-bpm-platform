@@ -1,0 +1,21 @@
+[cam-breadcrumbs-panel] {
+  position: absolute;
+  height: @breadcrumb-height;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: @custom-gray-lighter;
+
+  > .breadcrumb {
+    font-size: 0.85em;
+
+    line-height: @grid-gutter-width;
+    background-color: inherit;
+    margin: 0 0 20px;
+    padding: 0 10px;
+
+    > li + li:before {
+      display: none;
+    }
+  }
+}

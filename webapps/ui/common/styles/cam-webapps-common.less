@@ -1,0 +1,117 @@
+.align-left {
+  text-align: left;
+}
+
+.align-right {
+  text-align: right;
+}
+
+
+
+.text-help {
+  font-style: italic;
+  font-size: 90%;
+  color: @gray;
+  margin-bottom: (@grid-gutter-width / 2);
+}
+
+
+
+.dropdown-menu {
+  .shadow;
+  > li > a {
+    padding-left: 9px;
+    padding-right: 9px;
+  }
+
+  > .active,
+  > li:hover {
+    background-color: transparent;
+
+    > a {
+      background-color: transparent;
+      padding-left: 6px;
+      padding-right: 6px;
+      border-width: 0 3px;
+      border-style: solid;
+      color: @link-color;
+      border-color: @link-color;
+
+      &:hover {
+        background-color: transparent;
+        color: @link-hover-color;
+        border-color: @link-hover-color;
+      }
+    }
+  }
+
+  > li:hover {
+    > a {
+      color: @link-hover-color;
+      border-color: @link-hover-color;
+    }
+  }
+}
+
+.list-inline > li {
+  padding: 1px 5px;
+}
+
+
+.tab-content {
+  position: relative;
+  padding-top: @grid-gutter-width;
+}
+
+
+.tooltip .tooltip-inner {
+  word-wrap: break-word;
+}
+
+
+.btn-link:hover {
+  color: @link-hover-color;
+}
+
+
+
+
+/* ---------------------------------------------------------------- */
+
+/*
+.form-control {
+  background-color: transparent;
+  border-width: 0 0 1px 0;
+  border-bottom-style: dotted;
+  padding: @padding-base-vertical 0;
+  .box-shadow(none);
+
+  &:focus {
+    .box-shadow(none);
+    border-bottom-width: 2px;
+  }
+
+  &[required],
+  &.required {
+    border-bottom-style: solid;
+  }
+}
+*/
+
+/* ---------------------------------------------------------------- */
+
+
+
+
+@import "_animate-spin";
+@import "_modal";
+@import "_cam-table";
+
+@import "_ng-validation";
+@import "directives/notifications-panel";
+@import "directives/pagination";
+
+@import "../../lib/auth/page/login";
+
+@import "header/cam-widget-header.less";
+@import "footer/cam-widget-footer.less";
