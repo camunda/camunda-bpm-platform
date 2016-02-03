@@ -16,7 +16,6 @@ module.exports = function(grunt) {
 
   var browserifyConf = { };
 
-  require('./grunt/config/browserify')(config, browserifyConf);
   require('./ui/admin/grunt/config/browserify')(config, browserifyConf);
   require('./ui/tasklist/grunt/config/browserify')(config, browserifyConf);
   require('./ui/cockpit/grunt/config/browserify')(config, browserifyConf);
