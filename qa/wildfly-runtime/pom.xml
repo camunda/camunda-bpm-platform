@@ -212,7 +212,6 @@
                     <copy todir="${wildfly.runtime.location}/modules" overwrite="true">
                       <fileset dir="src/main/modules" />
                     </copy>
-
                   </target>
                 </configuration>
               </execution>
@@ -232,7 +231,9 @@
                     </copy>
 
                     <!-- delete plugin jar -->
-                    <delete file="${wildfly.runtime.location}/modules/org/camunda/bpm/qa/camunda-qa-ensure-clean-db/main/*.jar" />
+                    <delete>
+                      <fileset dir="${wildfly.runtime.location}/modules/org/camunda/bpm/qa" includes="**/*.jar"/>
+                    </delete>
 
                     <!-- re-copy plugin jar with correct version number -->
                     <copy todir="${wildfly.runtime.location}/modules" flatten="false" overwrite="true">
@@ -240,7 +241,7 @@
                       <mapper>
                         <chainedmapper>
                           <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
-                          <regexpmapper from="^(org.camunda.bpm.qa)/((camunda-qa-ensure-clean-db-)[0-9\.]*).*.jar$$" to="\1/\3${project.version}.jar" handledirsep="yes" />
+                          <regexpmapper from="^(org.camunda.bpm.qa.*)/((camunda-[A-Za-z-]*)[0-9\.]*).*.jar$$" to="\1/\3${project.version}.jar" handledirsep="yes" />
                         </chainedmapper>
                       </mapper>
                     </copy>
