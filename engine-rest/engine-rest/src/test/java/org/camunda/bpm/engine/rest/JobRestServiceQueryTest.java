@@ -474,6 +474,11 @@ public class JobRestServiceQueryTest extends AbstractRestServiceTest {
     inOrder.verify(mockQuery).asc();
 
     inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("tenantId", "asc", Status.OK);
+    inOrder.verify(mockQuery).orderByTenantId();
+    inOrder.verify(mockQuery).asc();
+
+    inOrder = Mockito.inOrder(mockQuery);
     executeAndVerifySorting("tenantId", "desc", Status.OK);
     inOrder.verify(mockQuery).orderByTenantId();
     inOrder.verify(mockQuery).desc();
