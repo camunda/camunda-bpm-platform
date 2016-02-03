@@ -31,7 +31,7 @@ import java.util.Map;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.IncidentStatisticsDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessInstanceDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDto;
-import org.camunda.bpm.cockpit.impl.plugin.base.resources.ProcessInstanceRestService;
+import org.camunda.bpm.cockpit.impl.plugin.resources.ProcessInstanceRestService;
 import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;

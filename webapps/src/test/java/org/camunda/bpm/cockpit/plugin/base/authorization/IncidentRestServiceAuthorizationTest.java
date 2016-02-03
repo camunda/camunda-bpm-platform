@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.IncidentDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.query.IncidentQueryDto;
-import org.camunda.bpm.cockpit.impl.plugin.base.resources.IncidentRestService;
+import org.camunda.bpm.cockpit.impl.plugin.resources.IncidentRestService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

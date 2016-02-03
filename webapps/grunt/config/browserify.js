@@ -21,48 +21,27 @@ module.exports = function(config, browserifyConfig) {
     ]
   }
 
-  browserifyConfig.tasklist_standaloneTask = {
+  browserifyConfig.tasklist_plugins = {
     options: _.extend({}, options, {
       browserifyOptions: {
-        standalone: 'StandaloneTaskPlugin',
+        standalone: 'TasklistPlugins',
         debug: true
       }
     }),
-    src: ['./<%= pkg.gruntConfig.pluginSourceDir %>/tasklist/plugins/standaloneTask/app/plugin.js'],
-    dest: '<%= pkg.gruntConfig.pluginBuildTarget %>/standaloneTask/app/plugin.js'
+    src: ['./<%= pkg.gruntConfig.pluginSourceDir %>/tasklist/plugins/tasklistPlugins.js'],
+    dest: '<%= pkg.gruntConfig.pluginBuildTarget %>/tasklist/app/plugin.js'
   };
 
-  browserifyConfig.cockpit_base = {
+  browserifyConfig.cockpit_plugins = {
     options: _.extend({}, options, {
       browserifyOptions: {
-        standalone: 'BasePlugin',
+        standalone: 'CockpitPlugins',
         debug: true
       }
     }),
-    src: ['./<%= pkg.gruntConfig.pluginSourceDir %>/cockpit/plugins/base/app/plugin.js'],
-    dest: '<%= pkg.gruntConfig.pluginBuildTarget %>/base/app/plugin.js'
+    src: ['./<%= pkg.gruntConfig.pluginSourceDir %>/cockpit/plugins/cockpitPlugins.js'],
+    dest: '<%= pkg.gruntConfig.pluginBuildTarget %>/cockpit/app/plugin.js'
   };
 
-  browserifyConfig.cockpit_jobDefinition = {
-    options: _.extend({}, options, {
-      browserifyOptions: {
-        standalone: 'JobDefinitionPlugin',
-        debug: true
-      }
-    }),
-    src: ['./<%= pkg.gruntConfig.pluginSourceDir %>/cockpit/plugins/jobDefinition/app/plugin.js'],
-    dest: '<%= pkg.gruntConfig.pluginBuildTarget %>/jobDefinition/app/plugin.js'
-  };
-
-  browserifyConfig.cockpit_decisionList = {
-    options: _.extend({}, options, {
-      browserifyOptions: {
-        standalone: 'DecisionListPlugin',
-        debug: true
-      }
-    }),
-    src: ['./<%= pkg.gruntConfig.pluginSourceDir %>/cockpit/plugins/decisionList/app/plugin.js'],
-    dest: '<%= pkg.gruntConfig.pluginBuildTarget %>/decisionList/app/plugin.js'
-  };
 
 };

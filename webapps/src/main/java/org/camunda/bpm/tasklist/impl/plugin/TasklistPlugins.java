@@ -10,42 +10,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.cockpit.impl.plugin.base;
+package org.camunda.bpm.tasklist.impl.plugin;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.camunda.bpm.cockpit.impl.plugin.base.resources.BaseRootResource;
-import org.camunda.bpm.cockpit.plugin.spi.impl.AbstractCockpitPlugin;
+import org.camunda.bpm.tasklist.impl.plugin.resources.TasklistPluginsRootResource;
+import org.camunda.bpm.tasklist.plugin.spi.impl.AbstractTasklistPlugin;
 
 /**
  *
- * @author nico.rehwaldt
+ * @author Roman Smirnov
  */
-public class BasePlugin extends AbstractCockpitPlugin {
+public class TasklistPlugins extends AbstractTasklistPlugin {
 
-  public static final String ID = "base";
-
-  private static final String[] MAPPING_FILES = {
-    "org/camunda/bpm/cockpit/plugin/base/queries/processDefinition.xml",
-    "org/camunda/bpm/cockpit/plugin/base/queries/processInstance.xml",
-    "org/camunda/bpm/cockpit/plugin/base/queries/incident.xml"
-  };
-
-  @Override
-  public Set<Class<?>> getResourceClasses() {
-    HashSet<Class<?>> classes = new HashSet<Class<?>>();
-
-    classes.add(BaseRootResource.class);
-
-    return classes;
-  }
-
-  public String getAssetDirectory() {
-    return "plugin/base";
-  }
+  public static final String ID = "tasklistPlugins";
 
   @Override
   public String getId() {
@@ -53,7 +34,17 @@ public class BasePlugin extends AbstractCockpitPlugin {
   }
 
   @Override
-  public List<String> getMappingFiles() {
-    return Arrays.asList(MAPPING_FILES);
+  public Set<Class<?>> getResourceClasses() {
+    HashSet<Class<?>> classes = new HashSet<Class<?>>();
+
+    classes.add(TasklistPluginsRootResource.class);
+
+    return classes;
   }
+
+  @Override
+  public String getAssetDirectory() {
+    return "plugin/tasklist";
+  }
+
 }
