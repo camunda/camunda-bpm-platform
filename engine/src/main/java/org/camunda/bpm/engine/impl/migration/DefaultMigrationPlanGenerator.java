@@ -13,7 +13,8 @@
 package org.camunda.bpm.engine.impl.migration;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import static java.util.Collections.*;
+import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
@@ -28,7 +29,6 @@ import org.camunda.bpm.engine.migration.MigrationInstruction;
  */
 public class DefaultMigrationPlanGenerator implements MigrationInstructionGenerator {
 
-  @Override
   public List<MigrationInstruction> generate(ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition) {
     return generateInstructionsInScope(sourceProcessDefinition, targetProcessDefinition);
   }
@@ -37,13 +37,18 @@ public class DefaultMigrationPlanGenerator implements MigrationInstructionGenera
     List<MigrationInstruction> instructions = new ArrayList<MigrationInstruction>();
 
     for (ActivityImpl sourceActivity : sourceScope.getActivities()) {
-      for (ActivityImpl targetActivity : targetScope.getActivities()) {
+
+      // matching IDs
+      ActivityImpl targetActivity = targetScope.getChildActivity(sourceActivity.getId());
+
+      if(targetActivity != null) {
         if (areEqualScopes(sourceActivity, targetActivity)) {
           instructions.addAll(generateInstructionsInScope(sourceActivity, targetActivity));
         }
         else if (areEqualActivities(sourceActivity, targetActivity)) {
           instructions.add(new MigrationInstructionImpl(
-              Arrays.asList(sourceActivity.getId()), Arrays.asList(targetActivity.getId())));
+              singletonList(sourceActivity.getId()),
+              singletonList(targetActivity.getId())));
         }
       }
     }
@@ -54,20 +59,18 @@ public class DefaultMigrationPlanGenerator implements MigrationInstructionGenera
   protected boolean areEqualScopes(ScopeImpl sourceScope, ScopeImpl targetScope) {
 
     boolean areScopes = !sourceScope.getActivities().isEmpty() && !targetScope.getActivities().isEmpty();
-    boolean matchingIds = sourceScope.getId().equals(targetScope.getId());
     boolean matchingTypes = (sourceScope == sourceScope.getProcessDefinition() && targetScope == targetScope.getProcessDefinition())
         || (sourceScope.getActivityBehavior().getClass() == targetScope.getActivityBehavior().getClass());
 
-    return matchingIds && matchingTypes && areScopes;
+    return matchingTypes && areScopes;
   }
 
   protected boolean areEqualActivities(ActivityImpl sourceActivity, ActivityImpl targetActivity) {
-    boolean matchingIds = sourceActivity.getId().equals(targetActivity.getId());
 
     boolean matchingTypes = sourceActivity.getActivityBehavior() instanceof UserTaskActivityBehavior
         && targetActivity.getActivityBehavior() instanceof UserTaskActivityBehavior;
 
-    return matchingIds && matchingTypes;
+    return matchingTypes;
   }
 
 }
