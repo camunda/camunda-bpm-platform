@@ -33,7 +33,7 @@ import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.webapp.AppRuntimeDelegate;
 import org.camunda.bpm.webapp.plugin.spi.AppPlugin;
-import org.camunda.commons.utils.IoUtil;
+import org.camunda.bpm.engine.impl.util.IoUtil;
 
 /**
  * A resource class that provides a plugins restful API.
