@@ -180,7 +180,7 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
 
     VariableMap variables = Variables.createVariables().putValue("var", "test");
     Task task = taskService.createTaskQuery().singleResult();
-    taskService.complete(task.getId(), variables);
+    taskService.setVariablesLocal(task.getId(), variables);
 
     VariableInstance variableInstance = runtimeService.createVariableInstanceQuery().singleResult();
     assertThat(variableInstance, is(notNullValue()));
