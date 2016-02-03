@@ -10,21 +10,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.cockpit.impl.plugin.decisionList.resources;
+package org.camunda.bpm.tasklist.impl.plugin.resources;
 
 import javax.ws.rs.Path;
 
-import org.camunda.bpm.cockpit.impl.plugin.decisionList.DecisionListPlugin;
-import org.camunda.bpm.cockpit.plugin.resource.AbstractCockpitPluginRootResource;
+import org.camunda.bpm.tasklist.impl.plugin.TasklistPlugins;
+import org.camunda.bpm.tasklist.resource.AbstractTasklistPluginRootResource;
 
 /**
- * @author sebastian.stamm
+ * @author Roman Smirnov
+ *
  */
-@Path("plugin/" + DecisionListPlugin.ID)
-public class DecisionListRootResource extends AbstractCockpitPluginRootResource {
+@Path("plugin/" + TasklistPlugins.ID)
+public class TasklistPluginsRootResource extends AbstractTasklistPluginRootResource {
 
-  public DecisionListRootResource() {
-    super(DecisionListPlugin.ID);
+  public TasklistPluginsRootResource() {
+    super(TasklistPlugins.ID);
   }
 
 }

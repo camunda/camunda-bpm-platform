@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessInstanceDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDto;
-import org.camunda.bpm.cockpit.impl.plugin.base.resources.ProcessInstanceRestService;
+import org.camunda.bpm.cockpit.impl.plugin.resources.ProcessInstanceRestService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

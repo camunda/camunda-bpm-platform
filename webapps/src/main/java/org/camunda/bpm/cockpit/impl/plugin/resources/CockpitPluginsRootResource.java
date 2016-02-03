@@ -10,22 +10,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.tasklist.impl.plugin.standalonetask.resources;
+package org.camunda.bpm.cockpit.impl.plugin.resources;
 
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 
-import org.camunda.bpm.tasklist.impl.plugin.standalonetask.StandaloneTaskPlugin;
-import org.camunda.bpm.tasklist.resource.AbstractTasklistPluginRootResource;
+import org.camunda.bpm.cockpit.impl.plugin.CockpitPlugins;
+import org.camunda.bpm.cockpit.plugin.resource.AbstractCockpitPluginRootResource;
 
 /**
- * @author Roman Smirnov
- *
+ * @author Sebastian Stamm
  */
-@Path("plugin/" + StandaloneTaskPlugin.ID)
-public class StandaloneTaskRootResource extends AbstractTasklistPluginRootResource {
+@Path("plugin/" + CockpitPlugins.ID)
+public class CockpitPluginsRootResource extends AbstractCockpitPluginRootResource {
 
-  public StandaloneTaskRootResource() {
-    super(StandaloneTaskPlugin.ID);
+  public CockpitPluginsRootResource() {
+    super(CockpitPlugins.ID);
   }
 
 }

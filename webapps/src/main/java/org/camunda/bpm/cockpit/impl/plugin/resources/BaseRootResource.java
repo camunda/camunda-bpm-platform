@@ -10,26 +10,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.cockpit.impl.plugin.base.resources;
+package org.camunda.bpm.cockpit.impl.plugin.resources;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
-import org.camunda.bpm.cockpit.impl.plugin.base.BasePlugin;
-import org.camunda.bpm.cockpit.plugin.resource.AbstractPluginRootResource;
+import org.camunda.bpm.cockpit.impl.plugin.CockpitPlugins;
+import org.camunda.bpm.cockpit.plugin.resource.AbstractCockpitPluginRootResource;
 
 /**
- * Root resource of the base plugin
- * 
+ *
  * @author nico.rehwaldt
  */
-@Path("plugin/" + BasePlugin.ID)
-public class BaseRootResource extends AbstractPluginRootResource {
+@Path("plugin/base")
+public class BaseRootResource extends AbstractCockpitPluginRootResource {
 
   public BaseRootResource() {
-    super(BasePlugin.ID);
+    super("base");
   }
-  
+
   @Path("{engine}" + ProcessDefinitionRestService.PATH)
   public ProcessDefinitionRestService getProcessDefinitionResource(@PathParam("engine") String engineName) {
     return subResource(new ProcessDefinitionRestService(engineName), engineName);
@@ -39,7 +38,7 @@ public class BaseRootResource extends AbstractPluginRootResource {
   public ProcessInstanceRestService getProcessInstanceRestService(@PathParam("engine") String engineName) {
     return subResource(new ProcessInstanceRestService(engineName), engineName);
   }
-  
+
   @Path("{engine}" + IncidentRestService.PATH)
   public IncidentRestService getIncidentRestService(@PathParam("engine") String engineName) {
     return subResource(new IncidentRestService(engineName), engineName);
