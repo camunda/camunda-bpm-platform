@@ -231,6 +231,20 @@
                       <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
                     </copy>
 
+                    <!-- delete plugin jar -->
+                    <delete file="${wildfly.runtime.location}/modules/org/camunda/bpm/qa/camunda-qa-ensure-clean-db/main/*.jar" />
+
+                    <!-- re-copy plugin jar with correct version number -->
+                    <copy todir="${wildfly.runtime.location}/modules" flatten="false" overwrite="true">
+                      <fileset refid="maven.project.dependencies" />
+                      <mapper>
+                        <chainedmapper>
+                          <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
+                          <regexpmapper from="^(org.camunda.bpm.qa)/((camunda-qa-ensure-clean-db-)[0-9\.]*).*.jar$$" to="\1/\3${project.version}.jar" handledirsep="yes" />
+                        </chainedmapper>
+                      </mapper>
+                    </copy>
+
                     <replace dir="${wildfly.runtime.location}/modules">
                       <include name="**/module.xml" />
                       <replacefilter token="@project.version@" value="${project.version}" />
