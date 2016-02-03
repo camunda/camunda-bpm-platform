@@ -15,12 +15,13 @@ package org.camunda.bpm.model.bpmn.instance;
 import java.util.Collection;
 
 import org.camunda.bpm.model.bpmn.MultiInstanceFlowCondition;
+import org.camunda.bpm.model.bpmn.builder.MultiInstanceLoopCharacteristicsBuilder;
 
 /**
  * The BPMN 2.0 multiInstanceLoopCharacteristics element type
- * 
+ *
  * @author Filip Hrisafov
- * 
+ *
  */
 public interface MultiInstanceLoopCharacteristics extends LoopCharacteristics {
 
@@ -66,6 +67,14 @@ public interface MultiInstanceLoopCharacteristics extends LoopCharacteristics {
 
   void setNoneBehaviorEventRef(EventDefinition noneBehaviorEventRef);
 
+  String getCamundaCollection();
+
+  void setCamundaCollection(String expression);
+
+  String getCamundaElementVariable();
+
+  void setCamundaElementVariable(String variableName);
+
   boolean isCamundaAsyncBefore();
 
   void setCamundaAsyncBefore(boolean isCamundaAsyncBefore);
@@ -77,5 +86,7 @@ public interface MultiInstanceLoopCharacteristics extends LoopCharacteristics {
   boolean isCamundaExclusive();
 
   void setCamundaExclusive(boolean isCamundaExclusive);
+
+  MultiInstanceLoopCharacteristicsBuilder builder();
 
 }

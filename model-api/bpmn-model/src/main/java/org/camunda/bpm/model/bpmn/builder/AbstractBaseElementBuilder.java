@@ -15,6 +15,7 @@ package org.camunda.bpm.model.bpmn.builder;
 
 import java.util.Collection;
 
+import org.camunda.bpm.model.bpmn.BpmnModelException;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.BaseElement;
 import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
@@ -67,6 +68,25 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
     T instance = createInstance(typeClass, identifier);
     element.getParentElement().addChildElement(instance);
     return instance;
+  }
+
+  protected <T extends BaseElement> T getCreateSingleChild(Class<T> typeClass) {
+    Collection<T> childrenOfType = element.getChildElementsByType(typeClass);
+    if (childrenOfType.isEmpty()) {
+      T child = modelInstance.newInstance(typeClass);
+      element.addChildElement(child);
+      return child;
+    }
+    else {
+      if (childrenOfType.size() > 1) {
+        throw new BpmnModelException("Element " + element.getId() + " of type " +
+            element.getElementType().getTypeName() + " has more than one child element of type " +
+            typeClass.getName());
+      }
+      else {
+        return childrenOfType.iterator().next();
+      }
+    }
   }
 
   protected Message findMessageForName(String messageName) {

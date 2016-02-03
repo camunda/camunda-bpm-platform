@@ -55,6 +55,7 @@ import org.camunda.bpm.model.bpmn.instance.FlowNode;
 import org.camunda.bpm.model.bpmn.instance.Gateway;
 import org.camunda.bpm.model.bpmn.instance.Message;
 import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
+import org.camunda.bpm.model.bpmn.instance.MultiInstanceLoopCharacteristics;
 import org.camunda.bpm.model.bpmn.instance.Process;
 import org.camunda.bpm.model.bpmn.instance.ReceiveTask;
 import org.camunda.bpm.model.bpmn.instance.ScriptTask;
@@ -1148,6 +1149,57 @@ public class ProcessBuilderTest {
     CamundaExecutionListener executionListener = executionListeners.iterator().next();
     assertThat(executionListener.getCamundaDelegateExpression()).isEqualTo("aDelegateExpression");
     assertThat(executionListener.getCamundaEvent()).isEqualTo("start");
+  }
+
+  @Test
+  public void testMultiInstanceLoopCharacteristicsSequential() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask("task")
+        .multiInstance()
+          .sequential()
+          .cardinality("card")
+          .completionCondition("compl")
+          .camundaCollection("coll")
+          .camundaElementVariable("element")
+        .multiInstanceDone()
+      .endEvent()
+      .done();
+
+    UserTask userTask = modelInstance.getModelElementById("task");
+    Collection<MultiInstanceLoopCharacteristics> miCharacteristics =
+        userTask.getChildElementsByType(MultiInstanceLoopCharacteristics.class);
+
+    assertThat(miCharacteristics).hasSize(1);
+
+    MultiInstanceLoopCharacteristics miCharacteristic = miCharacteristics.iterator().next();
+    assertThat(miCharacteristic.isSequential()).isTrue();
+    assertThat(miCharacteristic.getLoopCardinality().getTextContent()).isEqualTo("card");
+    assertThat(miCharacteristic.getCompletionCondition().getTextContent()).isEqualTo("compl");
+    assertThat(miCharacteristic.getCamundaCollection()).isEqualTo("coll");
+    assertThat(miCharacteristic.getCamundaElementVariable()).isEqualTo("element");
+
+  }
+
+  @Test
+  public void testMultiInstanceLoopCharacteristicsParallel() {
+      modelInstance = Bpmn.createProcess()
+        .startEvent()
+        .userTask("task")
+          .multiInstance()
+            .parallel()
+          .multiInstanceDone()
+        .endEvent()
+        .done();
+
+      UserTask userTask = modelInstance.getModelElementById("task");
+      Collection<MultiInstanceLoopCharacteristics> miCharacteristics =
+          userTask.getChildElementsByType(MultiInstanceLoopCharacteristics.class);
+
+      assertThat(miCharacteristics).hasSize(1);
+
+      MultiInstanceLoopCharacteristics miCharacteristic = miCharacteristics.iterator().next();
+      assertThat(miCharacteristic.isSequential()).isFalse();
   }
 
   protected Message assertMessageCatchEventDefinition(String elementId, String messageName) {

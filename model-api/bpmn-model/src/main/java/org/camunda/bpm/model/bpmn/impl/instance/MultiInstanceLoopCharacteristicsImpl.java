@@ -21,11 +21,15 @@ import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN_ELEMENT_ON
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_ASYNC_AFTER;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_ASYNC_BEFORE;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_EXCLUSIVE;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_COLLECTION;
+import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_ATTRIBUTE_ELEMENT_VARIABLE;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.CAMUNDA_NS;
 
 import java.util.Collection;
 
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.MultiInstanceFlowCondition;
+import org.camunda.bpm.model.bpmn.builder.MultiInstanceLoopCharacteristicsBuilder;
 import org.camunda.bpm.model.bpmn.instance.CompletionCondition;
 import org.camunda.bpm.model.bpmn.instance.ComplexBehaviorDefinition;
 import org.camunda.bpm.model.bpmn.instance.DataInput;
@@ -68,6 +72,8 @@ public class MultiInstanceLoopCharacteristicsImpl extends LoopCharacteristicsImp
   protected static Attribute<Boolean> camundaAsyncAfter;
   protected static Attribute<Boolean> camundaAsyncBefore;
   protected static Attribute<Boolean> camundaExclusive;
+  protected static Attribute<String> camundaCollection;
+  protected static Attribute<String> camundaElementVariable;
 
   public static void registerType(ModelBuilder modelBuilder) {
     ModelElementTypeBuilder typeBuilder = modelBuilder
@@ -137,11 +143,23 @@ public class MultiInstanceLoopCharacteristicsImpl extends LoopCharacteristicsImp
         .defaultValue(true)
         .build();
 
+    camundaCollection = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_COLLECTION)
+        .namespace(CAMUNDA_NS)
+        .build();
+
+    camundaElementVariable = typeBuilder.stringAttribute(CAMUNDA_ATTRIBUTE_ELEMENT_VARIABLE)
+        .namespace(CAMUNDA_NS)
+        .build();
+
     typeBuilder.build();
   }
 
   public MultiInstanceLoopCharacteristicsImpl(ModelTypeInstanceContext instanceContext) {
     super(instanceContext);
+  }
+
+  public MultiInstanceLoopCharacteristicsBuilder builder() {
+    return new MultiInstanceLoopCharacteristicsBuilder((BpmnModelInstance) modelInstance, this);
   }
 
   public LoopCardinality getLoopCardinality() {
@@ -250,5 +268,21 @@ public class MultiInstanceLoopCharacteristicsImpl extends LoopCharacteristicsImp
 
   public void setCamundaExclusive(boolean isCamundaExclusive) {
     camundaExclusive.setValue(this, isCamundaExclusive);
+  }
+
+  public String getCamundaCollection() {
+    return camundaCollection.getValue(this);
+  }
+
+  public void setCamundaCollection(String expression) {
+    camundaCollection.setValue(this, expression);
+  }
+
+  public String getCamundaElementVariable() {
+    return camundaElementVariable.getValue(this);
+  }
+
+  public void setCamundaElementVariable(String variableName) {
+    camundaElementVariable.setValue(this, variableName);
   }
 }

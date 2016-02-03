@@ -1,0 +1,73 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.camunda.bpm.model.bpmn.builder;
+
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.camunda.bpm.model.bpmn.instance.Activity;
+import org.camunda.bpm.model.bpmn.instance.CompletionCondition;
+import org.camunda.bpm.model.bpmn.instance.LoopCardinality;
+import org.camunda.bpm.model.bpmn.instance.MultiInstanceLoopCharacteristics;
+
+/**
+ * @author Thorben Lindhauer
+ *
+ */
+public class AbstractMultiInstanceLoopCharacteristicsBuilder<B extends AbstractMultiInstanceLoopCharacteristicsBuilder<B>>
+  extends AbstractBaseElementBuilder<B, MultiInstanceLoopCharacteristics>{
+
+  protected AbstractMultiInstanceLoopCharacteristicsBuilder(BpmnModelInstance modelInstance, MultiInstanceLoopCharacteristics element, Class<?> selfType) {
+    super(modelInstance, element, selfType);
+  }
+
+  public B sequential() {
+    element.setSequential(true);
+    return myself;
+  }
+
+  public B parallel() {
+    element.setSequential(false);
+    return myself;
+  }
+
+  public B cardinality(String expression) {
+    LoopCardinality cardinality = getCreateSingleChild(LoopCardinality.class);
+    cardinality.setTextContent(expression);
+
+    return myself;
+  }
+
+  public B completionCondition(String expression) {
+    CompletionCondition condition = getCreateSingleChild(CompletionCondition.class);
+    condition.setTextContent(expression);
+
+    return myself;
+  }
+
+  public B camundaCollection(String expression) {
+    element.setCamundaCollection(expression);
+
+    return myself;
+  }
+
+  public B camundaElementVariable(String variableName) {
+    element.setCamundaElementVariable(variableName);
+
+    return myself;
+  }
+
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  public <T extends AbstractActivityBuilder> T multiInstanceDone() {
+    return (T) ((Activity) element.getParentElement()).builder();
+  }
+
+}

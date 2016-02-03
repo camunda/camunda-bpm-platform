@@ -53,7 +53,9 @@ public class MultiInstanceLoopCharacteristicsTest extends BpmnModelElementInstan
       new AttributeAssumption("noneBehaviorEventRef"),
       new AttributeAssumption(CAMUNDA_NS, "asyncBefore", false, false, false),
       new AttributeAssumption(CAMUNDA_NS, "asyncAfter", false, false, false),
-      new AttributeAssumption(CAMUNDA_NS, "exclusive", false, false, true)
+      new AttributeAssumption(CAMUNDA_NS, "exclusive", false, false, true),
+      new AttributeAssumption(CAMUNDA_NS, "collection"),
+      new AttributeAssumption(CAMUNDA_NS, "elementVariable")
     );
   }
 }

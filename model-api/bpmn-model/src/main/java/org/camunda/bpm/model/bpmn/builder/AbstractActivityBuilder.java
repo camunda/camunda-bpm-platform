@@ -16,6 +16,7 @@ package org.camunda.bpm.model.bpmn.builder;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.Activity;
 import org.camunda.bpm.model.bpmn.instance.BoundaryEvent;
+import org.camunda.bpm.model.bpmn.instance.MultiInstanceLoopCharacteristics;
 
 /**
  * @author Sebastian Menski
@@ -34,6 +35,13 @@ public abstract class AbstractActivityBuilder<B extends AbstractActivityBuilder<
     BoundaryEvent boundaryEvent = createSibling(BoundaryEvent.class, id);
     boundaryEvent.setAttachedTo(element);
     return boundaryEvent.builder();
+  }
+
+  public MultiInstanceLoopCharacteristicsBuilder multiInstance() {
+    MultiInstanceLoopCharacteristics miCharacteristics
+      = createChild(MultiInstanceLoopCharacteristics.class);
+
+    return miCharacteristics.builder();
   }
 
 }
