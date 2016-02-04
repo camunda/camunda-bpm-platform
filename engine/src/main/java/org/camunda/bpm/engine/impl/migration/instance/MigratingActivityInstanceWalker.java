@@ -10,20 +10,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.migration.validation;
+package org.camunda.bpm.engine.impl.migration.instance;
 
-import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
-import org.camunda.bpm.engine.migration.MigrationPlan;
+import org.camunda.bpm.engine.impl.tree.TreeWalker;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public interface MigrationPlanValidator {
+public class MigratingActivityInstanceWalker extends TreeWalker<MigratingActivityInstance> {
 
-  void validateMigrationPlan(ProcessDefinitionImpl sourceProcessDefinition,
-                             ProcessDefinitionImpl targetProcessDefinition,
-                             MigrationPlan migrationPlan,
-                             MigrationPlanValidationReportImpl validationReport);
+  public MigratingActivityInstanceWalker(MigratingActivityInstance initialElement) {
+    super(initialElement);
+  }
 
+  @Override
+  protected MigratingActivityInstance nextElement() {
+    return currentElement.getParent();
+  }
 }

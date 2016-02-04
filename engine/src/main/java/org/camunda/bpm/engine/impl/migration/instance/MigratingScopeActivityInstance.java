@@ -23,6 +23,12 @@ import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
 public class MigratingScopeActivityInstance extends MigratingActivityInstance {
 
   @Override
+  public ExecutionEntity resolveRepresentativeExecution() {
+    // scope executions are stable, so we don't follow the replacedBy links here
+    return representativeExecution;
+  }
+
+  @Override
   public void detachState() {
     ExecutionEntity currentScopeExecution = resolveRepresentativeExecution();
 
@@ -34,22 +40,29 @@ public class MigratingScopeActivityInstance extends MigratingActivityInstance {
     if (parentExecution.isConcurrent()) {
       parentExecution.remove();
       parentScopeExecution.tryPruneLastConcurrentChild();
+      parentScopeExecution.forceUpdate();
     }
     else {
       if (sourceScope.getActivityBehavior() instanceof CompositeActivityBehavior) {
         parentExecution.leaveActivityInstance();
       }
     }
-
   }
 
   @Override
   public void attachState(ExecutionEntity newScopeExecution) {
+
+    ExecutionEntity newParentExecution = newScopeExecution;
+    if (!newScopeExecution.getNonEventScopeExecutions().isEmpty()) {
+      newParentExecution = (ExecutionEntity) newScopeExecution.createConcurrentExecution();
+      newScopeExecution.forceUpdate();
+    }
+
     ExecutionEntity currentScopeExecution = resolveRepresentativeExecution();
-    currentScopeExecution.setParent(newScopeExecution);
+    currentScopeExecution.setParent(newParentExecution);
 
     if (sourceScope.getActivityBehavior() instanceof CompositeActivityBehavior) {
-      newScopeExecution.setActivityInstanceId(activityInstance.getId());
+      newParentExecution.setActivityInstanceId(activityInstance.getId());
     }
   }
 
@@ -68,6 +81,30 @@ public class MigratingScopeActivityInstance extends MigratingActivityInstance {
       currentScopeExecution.setActivity((PvmActivity) targetScope);
     }
 
+  }
+
+
+  @Override
+  public void remove() {
+    parentInstance.getChildren().remove(this);
+    for (MigratingActivityInstance child : childInstances) {
+      child.parentInstance = null;
+    }
+
+    ExecutionEntity currentExecution = resolveRepresentativeExecution();
+    ExecutionEntity parentExecution = currentExecution.getParent();
+
+    currentExecution.setActivity((PvmActivity) sourceScope);
+    currentExecution.setActivityInstanceId(activityInstance.getId());
+
+    currentExecution.deleteCascade("migration");
+
+    if (parentExecution.isConcurrent()) {
+      ExecutionEntity grandParent = parentExecution.getParent();
+      parentExecution.remove();
+      grandParent.tryPruneLastConcurrentChild();
+      grandParent.forceUpdate();
+    }
   }
 
   @Override

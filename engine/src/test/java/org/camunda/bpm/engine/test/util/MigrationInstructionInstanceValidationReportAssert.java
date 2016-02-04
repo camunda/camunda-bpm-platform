@@ -18,11 +18,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.util.List;
-
-import org.camunda.bpm.engine.impl.migration.validation.MigrationInstructionInstanceValidationFailure;
-import org.camunda.bpm.engine.impl.migration.validation.MigrationInstructionInstanceValidationReport;
-import org.camunda.bpm.engine.migration.MigrationInstruction;
+import org.camunda.bpm.engine.migration.MigrationInstructionInstanceValidationFailure;
+import org.camunda.bpm.engine.migration.MigrationInstructionInstanceValidationReport;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
@@ -48,14 +45,14 @@ public class MigrationInstructionInstanceValidationReportAssert {
   public MigrationInstructionInstanceValidationReportAssert hasProcessInstanceId(String processInstanceId) {
     isNotNull();
 
-    assertEquals("Expected report to be for process instance", processInstanceId, actual.getMigratingProcessInstance().getProcessInstanceId());
+    assertEquals("Expected report to be for process instance", processInstanceId, actual.getProcessInstanceId());
 
     return this;
   }
 
   public MigrationInstructionInstanceValidationReportAssert hasFailures() {
     isNotNull();
-    assertTrue("Expected report to contain failures", actual.hasFailures());
+    assertTrue("Expected report to contain failures", actual.getValidationFailures().isEmpty());
 
     return this;
   }
@@ -73,8 +70,10 @@ public class MigrationInstructionInstanceValidationReportAssert {
     boolean failureFound = false;
 
     for (MigrationInstructionInstanceValidationFailure failure : actual.getValidationFailures()) {
-      if (failure.getMigratingInstance().getActivityInstance().getActivityId().equals(activityId)) {
+      if (failure.getMigrationInstruction().getSourceActivityIds().get(0).equals(activityId)) {
         Assert.assertThat(failure.getErrorMessage(), CoreMatchers.containsString(errorMessage));
+        Assert.assertNotNull(failure.getActivityInstanceIds());
+        Assert.assertEquals(1, failure.getActivityInstanceIds().size());
         failureFound = true;
         break;
       }

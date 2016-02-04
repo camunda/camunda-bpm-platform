@@ -24,29 +24,36 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
  * @author Thorben Lindhauer
  */
 public class MigratingExecutionBranch {
-  protected Map<ScopeImpl, ExecutionEntity> createdScopeExecutions;
+  protected Map<ScopeImpl, ExecutionEntity> scopeExecutions;
 
   public MigratingExecutionBranch() {
     this(new HashMap<ScopeImpl, ExecutionEntity>());
   }
 
   protected MigratingExecutionBranch(Map<ScopeImpl, ExecutionEntity> createdScopeExecutions) {
-    this.createdScopeExecutions = createdScopeExecutions;
+    this.scopeExecutions = createdScopeExecutions;
   }
 
   public MigratingExecutionBranch copy() {
-    return new MigratingExecutionBranch(new HashMap<ScopeImpl, ExecutionEntity>(createdScopeExecutions));
+    return new MigratingExecutionBranch(new HashMap<ScopeImpl, ExecutionEntity>(scopeExecutions));
   }
 
   public ExecutionEntity getExecution(ScopeImpl scope) {
-    return createdScopeExecutions.get(scope);
+    return scopeExecutions.get(scope);
   }
 
   public boolean hasExecution(ScopeImpl scope) {
-    return createdScopeExecutions.containsKey(scope);
+    return scopeExecutions.containsKey(scope);
   }
 
   public void registerExecution(ScopeImpl scope, ExecutionEntity execution) {
-    this.createdScopeExecutions.put(scope, execution);
+    this.scopeExecutions.put(scope, execution);
+  }
+
+  public void visited(MigratingActivityInstance activityInstance) {
+    ScopeImpl targetScope = activityInstance.getTargetScope();
+    if (targetScope.isScope()) {
+      scopeExecutions.put(targetScope, activityInstance.resolveRepresentativeExecution());
+    }
   }
 }

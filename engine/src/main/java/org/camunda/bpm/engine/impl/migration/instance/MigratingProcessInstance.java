@@ -30,6 +30,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
+import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -63,6 +64,7 @@ public class MigratingProcessInstance {
   }
 
   protected MigratingActivityInstance addActivityInstance(
+      MigrationInstruction migrationInstruction,
       ActivityInstance activityInstance,
       ScopeImpl sourceScope,
       ScopeImpl targetScope,
@@ -75,6 +77,7 @@ public class MigratingProcessInstance {
       migratingInstance = new MigratingNonScopeActivityInstance();
     }
 
+    migratingInstance.migrationInstruction = migrationInstruction;
     migratingInstance.activityInstance = activityInstance;
     migratingInstance.sourceScope = sourceScope;
     migratingInstance.targetScope = targetScope;
@@ -83,6 +86,7 @@ public class MigratingProcessInstance {
 
     return migratingInstance;
   }
+
 
   /**
    * Returns a {@link MigratingProcessInstance}, a data structure that contains meta-data for the activity
@@ -100,56 +104,94 @@ public class MigratingProcessInstance {
 
     ActivityInstance activityInstanceTree = new GetActivityInstanceCmd(processInstance.getId())
       .execute(commandContext);
-    Set<ActivityInstance> unmappedInstances = collectLeafInstances(activityInstanceTree);
+    Set<ActivityInstance> activityInstances = flatten(activityInstanceTree);
+    Set<ActivityInstance> unmappedLeafInstances = new HashSet<ActivityInstance>();
 
     // always create an entry for the root activity instance because it is implicitly always migrated
     migratingProcessInstance.addActivityInstance(
+        null,
         activityInstanceTree,
         sourceProcessDefinition,
         targetProcessDefinition,
         processInstance);
-    unmappedInstances.remove(activityInstanceTree);
+    activityInstances.remove(activityInstanceTree);
 
-    for (MigrationInstruction instruction : migrationPlan.getInstructions()) {
-      ActivityInstance[] instancesForSourceActivity =
-          activityInstanceTree.getActivityInstances(instruction.getSourceActivityIds().get(0));
+    Map<String, List<MigrationInstruction>> organizedInstructions = organizeInstructionsBySourceScope(migrationPlan);
 
-      for (ActivityInstance instance : instancesForSourceActivity) {
-        ActivityImpl sourceActivity = sourceProcessDefinition.findActivity(instance.getActivityId());
-        ActivityImpl targetActivity = targetProcessDefinition.findActivity(instruction.getTargetActivityIds().get(0));
-        MigratingActivityInstance migratingInstance = migratingProcessInstance.addActivityInstance(
-            instance,
-            sourceActivity,
-            targetActivity,
-            mapping.getExecution(instance));
-        unmappedInstances.remove(instance);
+    for (ActivityInstance instance : activityInstances) {
+      ActivityImpl sourceActivity = sourceProcessDefinition.findActivity(instance.getActivityId());
 
-        if (sourceActivity.getActivityBehavior() instanceof UserTaskActivityBehavior) {
-          List<TaskEntity> tasks = migratingInstance.representativeExecution.getTasks();
-          migratingInstance.addDependentInstance(new MigratingTaskInstance(tasks.get(0), migratingInstance));
+      List<MigrationInstruction> instructionCandidates = organizedInstructions.get(sourceActivity.getId());
+      MigrationInstruction applyingInstruction = null;
+      ActivityImpl targetActivity = null;
+
+      if (instructionCandidates != null && instructionCandidates.size() > 0) {
+        // TODO: this could be more than one when we support conditional instructions
+        applyingInstruction = instructionCandidates.get(0);
+        targetActivity = targetProcessDefinition.findActivity(applyingInstruction.getTargetActivityIds().get(0));
+
+      }
+      else {
+        if (instance.getChildActivityInstances().length == 0) {
+          unmappedLeafInstances.add(instance);
         }
+      }
+
+      MigratingActivityInstance migratingInstance = migratingProcessInstance.addActivityInstance(
+        applyingInstruction,
+        instance,
+        sourceActivity,
+        targetActivity,
+        mapping.getExecution(instance));
+
+      if (sourceActivity.getActivityBehavior() instanceof UserTaskActivityBehavior) {
+        List<TaskEntity> tasks = migratingInstance.representativeExecution.getTasks();
+        migratingInstance.addDependentInstance(new MigratingTaskInstance(tasks.get(0), migratingInstance));
       }
     }
 
-    if (!unmappedInstances.isEmpty()) {
-      throw LOGGER.unmappedActivityInstances(processInstance.getId(), unmappedInstances);
+    if (!unmappedLeafInstances.isEmpty()) {
+      throw LOGGER.unmappedActivityInstances(processInstance.getId(), unmappedLeafInstances);
     }
+
+    initializeParentChildRelationships(migratingProcessInstance);
 
     return migratingProcessInstance;
   }
 
-  protected static Set<ActivityInstance> collectLeafInstances(ActivityInstance activityInstanceTree) {
+  protected static Set<ActivityInstance> flatten(ActivityInstance activityInstance) {
     Set<ActivityInstance> instances = new HashSet<ActivityInstance>();
 
-    if (activityInstanceTree.getChildActivityInstances().length == 0) {
-      instances.add(activityInstanceTree);
-    }
-    else {
-      for (ActivityInstance childInstance : activityInstanceTree.getChildActivityInstances()) {
-        instances.addAll(collectLeafInstances(childInstance));
-      }
+    instances.add(activityInstance);
+
+    for (ActivityInstance childInstance : activityInstance.getChildActivityInstances()) {
+      instances.addAll(flatten(childInstance));
     }
 
     return instances;
+  }
+
+  protected static Map<String, List<MigrationInstruction>> organizeInstructionsBySourceScope(MigrationPlan migrationPlan) {
+    Map<String, List<MigrationInstruction>> organizedInstructions = new HashMap<String, List<MigrationInstruction>>();
+
+    for (MigrationInstruction instruction : migrationPlan.getInstructions()) {
+      CollectionUtil.addToMapOfLists(organizedInstructions, instruction.getSourceActivityIds().get(0), instruction);
+    }
+
+    return organizedInstructions;
+  }
+
+  protected static void initializeParentChildRelationships(MigratingProcessInstance migratingProcessInstance) {
+    for (MigratingActivityInstance migratingActivityInstance : migratingProcessInstance.migratingActivityInstances.values()) {
+      ActivityInstance activityInstance = migratingActivityInstance.getActivityInstance();
+
+      migratingActivityInstance.parentInstance = migratingProcessInstance.getMigratingInstance(activityInstance.getParentActivityInstanceId());
+      migratingActivityInstance.childInstances = new HashSet<MigratingActivityInstance>();
+
+      for (ActivityInstance childActivityInstance : activityInstance.getChildActivityInstances()) {
+        migratingActivityInstance.childInstances.add(
+            migratingProcessInstance.getMigratingInstance(childActivityInstance.getId()));
+      }
+    }
   }
 }

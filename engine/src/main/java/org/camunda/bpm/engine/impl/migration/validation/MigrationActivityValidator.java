@@ -13,19 +13,13 @@
 
 package org.camunda.bpm.engine.impl.migration.validation;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
+import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 
-public class MigrationInstructionInstanceValidationException extends ProcessEngineException {
+public interface MigrationActivityValidator {
 
-  protected MigrationInstructionInstanceValidationReport validationReport;
+  boolean canBeMigrated(String activityId, ProcessDefinitionImpl processDefinition);
 
-  public MigrationInstructionInstanceValidationException(String message, MigrationInstructionInstanceValidationReport validationReport) {
-    super(message);
-    this.validationReport = validationReport;
-  }
-
-  public MigrationInstructionInstanceValidationReport getValidationReport() {
-    return validationReport;
-  }
+  boolean canBeMigrated(ActivityImpl activity, ProcessDefinitionImpl processDefinition);
 
 }

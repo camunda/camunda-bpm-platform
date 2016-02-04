@@ -12,18 +12,11 @@
  */
 package org.camunda.bpm.engine.impl.migration.validation;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.SubProcessActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
-import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
-import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
-import org.camunda.bpm.engine.impl.tree.FlowScopeWalker;
-import org.camunda.bpm.engine.impl.tree.TreeWalker;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 
@@ -34,11 +27,14 @@ import org.camunda.bpm.engine.migration.MigrationPlan;
 public class DefaultMigrationPlanValidator implements MigrationPlanValidator {
 
   public void validateMigrationPlan(ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition,
-                                    MigrationPlan migrationPlan, MigrationPlanValidationReport validationReport) {
+                                    MigrationPlan migrationPlan, MigrationPlanValidationReportImpl validationReport) {
+
+    Set<String> alreadyMappedSourceActivityIds = new HashSet<String>();
 
     for (MigrationInstruction instruction : migrationPlan.getInstructions()) {
       try {
         validateMigrationInstruction(sourceProcessDefinition, targetProcessDefinition, instruction);
+        validateEveryActivityIsOnlyOnceMapped(instruction, alreadyMappedSourceActivityIds);
       }
       catch (BadUserRequestException e) {
         validationReport.addValidationFailure(instruction, e.getMessage());
@@ -49,102 +45,30 @@ public class DefaultMigrationPlanValidator implements MigrationPlanValidator {
 
   public void validateMigrationInstruction(ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition,
                                            MigrationInstruction instruction) {
-
-    ensureOneToOneMapping(instruction);
-
-    String sourceActivityId = instruction.getSourceActivityIds().get(0);
-    String targetActivityId = instruction.getTargetActivityIds().get(0);
-    ActivityImpl sourceActivity = sourceProcessDefinition.findActivity(sourceActivityId);
-    ActivityImpl targetActivity = targetProcessDefinition.findActivity(targetActivityId);
-
-    ensureMappedActivitiesExist(instruction, sourceActivity, targetActivity);
-    ensureSupportedActivity(instruction, sourceActivity, targetActivity);
-    ensureNotChildOfMultiInstance(instruction, sourceActivity, targetActivity);
+    ensureOneToOneMapping(instruction, sourceProcessDefinition, targetProcessDefinition);
+    ensureActivitiesCanBeMigrated(instruction, sourceProcessDefinition, targetProcessDefinition);
   }
 
-  protected void ensureOneToOneMapping(MigrationInstruction instruction) {
-    List<String> sourceActivityIds = instruction.getSourceActivityIds();
-    List<String> targetActivityIds = instruction.getTargetActivityIds();
-
-    if (sourceActivityIds.size() != 1 || targetActivityIds.size() != 1) {
-      throw new BadUserRequestException("only one to one mappings are supported");
-    }
-
-    if (sourceActivityIds.get(0) == null || targetActivityIds.get(0) == null) {
-      throw new BadUserRequestException("the source activity id and target activity id must not be null");
-    }
-  }
-
-  protected void ensureMappedActivitiesExist(MigrationInstruction instruction, ActivityImpl sourceActivity, ActivityImpl targetActivity) {
-    String errorMessage = null;
-    if (sourceActivity == null && targetActivity == null) {
-      errorMessage = "the source activity and target activity does not exist";
-    }
-    else if (sourceActivity == null) {
-      errorMessage = "the source activity does not exist";
-    }
-    else if (targetActivity == null) {
-      errorMessage = "the target activity does not exist";
-    }
-
-    if (errorMessage != null) {
-      throw new BadUserRequestException(errorMessage);
-    }
-  }
-
-  protected void ensureSupportedActivity(MigrationInstruction instruction, ActivityImpl sourceActivity, ActivityImpl targetActivity) {
-    if (isScope(sourceActivity)) {
-      ensureSameActivityType(instruction, sourceActivity, targetActivity, SubProcessActivityBehavior.class);
-    }
-    else {
-      ensureSameActivityType(instruction, sourceActivity, targetActivity, UserTaskActivityBehavior.class);
-    }
-  }
-
-  protected void ensureSameActivityType(MigrationInstruction instruction, ActivityImpl sourceActivity, ActivityImpl targetActivity, Class<? extends ActivityBehavior> type) {
-    boolean sourceHasExpectedType = type.isAssignableFrom(sourceActivity.getActivityBehavior().getClass());
-    boolean targetHasExpectedType = type.isAssignableFrom(targetActivity.getActivityBehavior().getClass());
-
-    if (sourceHasExpectedType && !targetHasExpectedType) {
-      throw new BadUserRequestException("the source activity is of type '" + type.getName() + "' but the target activity not");
-    }
-    else if (!sourceHasExpectedType && targetHasExpectedType) {
-      throw new BadUserRequestException("the target activity is of type '" + type.getName() + "' but the source activity not");
-    }
-    else if (!sourceHasExpectedType) {
-      throw new BadUserRequestException("the source and target activity must be of type '" + type.getName() + "'");
-    }
-  }
-
-  protected void ensureNotChildOfMultiInstance(MigrationInstruction instruction, ActivityImpl sourceActivity, ActivityImpl targetActivity) {
-    boolean sourceActivityHasMultiInstanceParent = hasMultiInstanceParent(sourceActivity);
-    boolean targetActivityHasMultiInstanceParent = hasMultiInstanceParent(targetActivity);
-    if (sourceActivityHasMultiInstanceParent || targetActivityHasMultiInstanceParent) {
-      throw new BadUserRequestException("multi instance child activities are currently not supported");
-    }
-  }
-
-  protected boolean hasMultiInstanceParent(ActivityImpl activity) {
-    FlowScopeWalker flowScopeWalker = new FlowScopeWalker(activity);
-    flowScopeWalker.walkUntil(new TreeWalker.WalkCondition<ScopeImpl>() {
-      public boolean isFulfilled(ScopeImpl element) {
-        return isProcessDefinition(element) || isMultiInstance(element);
+  protected void validateEveryActivityIsOnlyOnceMapped(MigrationInstruction instruction, Set<String> alreadyMappedSourceActivityIds) {
+    for (String sourceActivityId : instruction.getSourceActivityIds()) {
+      if (alreadyMappedSourceActivityIds.contains(sourceActivityId)) {
+        throw new BadUserRequestException("the source activity with id '" + sourceActivityId + "' was already mapped");
       }
-    });
-
-    return isMultiInstance(flowScopeWalker.getCurrentElement());
+      alreadyMappedSourceActivityIds.add(sourceActivityId);
+    }
   }
 
-  protected boolean isMultiInstance(ScopeImpl scope) {
-    return !isProcessDefinition(scope) && scope.getActivityBehavior() instanceof MultiInstanceActivityBehavior;
+
+  protected void ensureOneToOneMapping(MigrationInstruction instruction, ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition) {
+    if (!MigrationInstructionValidators.ONE_TO_ONE_VALIDATOR.isInstructionValid(instruction, sourceProcessDefinition, targetProcessDefinition)) {
+      throw new BadUserRequestException("only one to one mappings of existing activities are supported");
+    }
   }
 
-  protected boolean isProcessDefinition(ScopeImpl scope) {
-    return scope == scope.getProcessDefinition();
-  }
-
-  protected boolean isScope(ActivityImpl sourceActivity) {
-    return !sourceActivity.getActivities().isEmpty();
+  protected void ensureActivitiesCanBeMigrated(MigrationInstruction instruction, ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition) {
+    if (!MigrationInstructionValidators.ACTIVITIES_CAN_BE_MIGRATED.isInstructionValid(instruction, sourceProcessDefinition, targetProcessDefinition)) {
+      throw new BadUserRequestException("the mapped activities are either null or not supported");
+    }
   }
 
 }

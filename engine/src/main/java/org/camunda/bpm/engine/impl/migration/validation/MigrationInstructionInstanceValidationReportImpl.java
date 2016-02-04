@@ -15,6 +15,8 @@ package org.camunda.bpm.engine.impl.migration.validation;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.engine.migration.MigrationInstructionInstanceValidationFailure;
+import org.camunda.bpm.engine.migration.MigrationInstructionInstanceValidationReport;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessInstance;
 
@@ -22,17 +24,17 @@ import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessInstance;
  * @author Thorben Lindhauer
  *
  */
-public class MigrationInstructionInstanceValidationReport {
+public class MigrationInstructionInstanceValidationReportImpl implements MigrationInstructionInstanceValidationReport {
 
   protected MigratingProcessInstance migratingProcessInstance;
-  protected List<MigrationInstructionInstanceValidationFailure> validationFailures = new ArrayList<MigrationInstructionInstanceValidationFailure>();
+  protected List<MigrationInstructionInstanceValidationFailureImpl> validationFailures = new ArrayList<MigrationInstructionInstanceValidationFailureImpl>();
 
-  public MigrationInstructionInstanceValidationReport(MigratingProcessInstance migratingProcessInstance) {
+  public MigrationInstructionInstanceValidationReportImpl(MigratingProcessInstance migratingProcessInstance) {
     this.migratingProcessInstance = migratingProcessInstance;
   }
 
   public void addValidationFailure(MigratingActivityInstance activityInstance, String errorMessage) {
-    validationFailures.add(new MigrationInstructionInstanceValidationFailure(activityInstance, errorMessage));
+    validationFailures.add(new MigrationInstructionInstanceValidationFailureImpl(activityInstance, errorMessage));
   }
 
   public boolean hasFailures() {
@@ -43,18 +45,24 @@ public class MigrationInstructionInstanceValidationReport {
     return migratingProcessInstance;
   }
 
+  @Override
   public List<MigrationInstructionInstanceValidationFailure> getValidationFailures() {
-    return validationFailures;
+    return (List) validationFailures;
   }
 
   public void writeTo(StringBuilder sb) {
     sb.append("Migration plan is not valid for process:\n");
 
-    for (MigrationInstructionInstanceValidationFailure failure : validationFailures) {
+    for (MigrationInstructionInstanceValidationFailureImpl failure : validationFailures) {
       failure.writeTo(sb);
       sb.append("\n");
     }
 
+  }
+
+  @Override
+  public String getProcessInstanceId() {
+    return migratingProcessInstance.getProcessInstanceId();
   }
 
 }

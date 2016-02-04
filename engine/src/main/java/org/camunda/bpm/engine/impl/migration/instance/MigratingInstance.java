@@ -44,4 +44,5 @@ public interface MigratingInstance {
    * (e.g. an activity instance aggregates task instances).
    */
   void migrateDependentEntities();
+
 }

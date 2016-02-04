@@ -10,20 +10,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.migration.validation;
-
-import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
-import org.camunda.bpm.engine.migration.MigrationPlan;
+package org.camunda.bpm.engine.migration;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public interface MigrationPlanValidator {
+public interface MigrationPlanValidationFailure {
 
-  void validateMigrationPlan(ProcessDefinitionImpl sourceProcessDefinition,
-                             ProcessDefinitionImpl targetProcessDefinition,
-                             MigrationPlan migrationPlan,
-                             MigrationPlanValidationReportImpl validationReport);
+  /**
+   * @return the reason why the migration instruction is not valid
+   */
+  String getErrorMessage();
+
+  /**
+   * @return the instruction that is not valid
+   */
+  MigrationInstruction getMigrationInstruction();
 
 }

@@ -14,11 +14,12 @@ package org.camunda.bpm.engine.impl.migration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.bpmn.behavior.SubProcessActivityBehavior;
-import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
+import org.camunda.bpm.engine.impl.migration.validation.MigrationActivityValidator;
+import org.camunda.bpm.engine.impl.migration.validation.MigrationActivityValidators;
+import org.camunda.bpm.engine.impl.migration.validation.MigrationInstructionValidator;
+import org.camunda.bpm.engine.impl.migration.validation.MigrationInstructionValidators;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
@@ -30,60 +31,56 @@ import org.camunda.bpm.engine.migration.MigrationInstruction;
  */
 public class DefaultMigrationPlanGenerator implements MigrationInstructionGenerator {
 
-  @Override
+  public static final List<MigrationActivityValidator> activityValidators = Arrays.asList(
+    MigrationActivityValidators.SUPPORTED_ACTIVITY,
+    MigrationActivityValidators.HAS_NO_BOUNDARY_EVENT,
+    MigrationActivityValidators.NOT_MULTI_INSTANCE_CHILD
+  );
+
+  public static final List<MigrationInstructionValidator> instructionValidators = Arrays.asList(
+    MigrationInstructionValidators.SAME_ID_VALIDATOR,
+    MigrationInstructionValidators.SAME_SCOPE
+  );
+
   public List<MigrationInstruction> generate(ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition) {
-    return generateInstructionsInScope(sourceProcessDefinition, targetProcessDefinition, 1);
+    List<MigrationInstruction> migrationInstructions = new ArrayList<MigrationInstruction>();
+    generate(sourceProcessDefinition, targetProcessDefinition, sourceProcessDefinition, targetProcessDefinition, migrationInstructions);
+    return migrationInstructions;
   }
 
-  protected List<MigrationInstruction> generateInstructionsInScope(ScopeImpl sourceScope, ScopeImpl targetScope, int allowedScopeDepth) {
-    List<MigrationInstruction> instructions = new ArrayList<MigrationInstruction>();
-
+  public void generate(ScopeImpl sourceScope, ScopeImpl targetScope, ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition, List<MigrationInstruction> migrationInstructions) {
     for (ActivityImpl sourceActivity : sourceScope.getActivities()) {
       for (ActivityImpl targetActivity : targetScope.getActivities()) {
-        if (areEqualScopes(sourceActivity, targetActivity)) {
-          instructions.add(new MigrationInstructionImpl(
-            Collections.singletonList(sourceActivity.getId()), Collections.singletonList(targetActivity.getId())));
-          instructions.addAll(generateInstructionsInScope(sourceActivity, targetActivity, allowedScopeDepth));
-        }
-        else if (areEqualActivities(sourceActivity, targetActivity)) {
-          instructions.add(new MigrationInstructionImpl(
-            Collections.singletonList(sourceActivity.getId()), Collections.singletonList(targetActivity.getId())));
-        }
-        else if (allowedScopeDepth > 0 && isScope(targetActivity)) {
-          instructions.addAll(generateInstructionsInScope(sourceScope, targetActivity, allowedScopeDepth - 1));
+        MigrationInstructionImpl migrationInstruction = new MigrationInstructionImpl(sourceActivity.getId(), targetActivity.getId());
+        if (canBeMigrated(sourceActivity, sourceProcessDefinition) && canBeMigrated(targetActivity, targetProcessDefinition) &&
+            isValidInstruction(migrationInstruction, sourceProcessDefinition, targetProcessDefinition)) {
+
+          migrationInstructions.add(migrationInstruction);
+
+          if (sourceActivity.isScope() && targetActivity.isScope()) {
+            generate(sourceActivity, targetActivity, sourceProcessDefinition, targetProcessDefinition, migrationInstructions);
+          }
         }
       }
     }
-
-    return instructions;
   }
 
-  protected boolean areEqualScopes(ScopeImpl sourceScope, ScopeImpl targetScope) {
-
-    boolean areScopes = isScope(sourceScope) && isScope(targetScope);
-    boolean matchingIds = sourceScope.getId().equals(targetScope.getId());
-    boolean matchingTypes = (sourceScope == sourceScope.getProcessDefinition() && targetScope == targetScope.getProcessDefinition())
-        || (sourceScope.getActivityBehavior().getClass() == targetScope.getActivityBehavior().getClass());
-
-    boolean supportedTypes = sourceScope.getActivityBehavior() instanceof SubProcessActivityBehavior ||
-      sourceScope.getActivityBehavior() instanceof UserTaskActivityBehavior;
-
-    return matchingIds && areScopes && matchingTypes && supportedTypes;
+  protected boolean canBeMigrated(ActivityImpl activity, ProcessDefinitionImpl processDefinition) {
+    for (MigrationActivityValidator activityValidator : activityValidators) {
+      if (!activityValidator.canBeMigrated(activity, processDefinition)) {
+        return false;
+      }
+    }
+    return true;
   }
 
-  protected boolean areEqualActivities(ActivityImpl sourceActivity, ActivityImpl targetActivity) {
-    boolean matchingIds = sourceActivity.getId().equals(targetActivity.getId());
-
-    boolean matchingTypes = sourceActivity.getActivityBehavior() instanceof UserTaskActivityBehavior
-        && targetActivity.getActivityBehavior() instanceof UserTaskActivityBehavior;
-
-    boolean areBothEitherScopesOrNot = isScope(sourceActivity) == isScope(targetActivity);
-
-    return matchingIds && matchingTypes && areBothEitherScopesOrNot;
-  }
-
-  protected boolean isScope(ScopeImpl scope) {
-    return scope.isScope();
+  protected boolean isValidInstruction(MigrationInstructionImpl instruction, ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition) {
+    for (MigrationInstructionValidator instructionValidator : instructionValidators) {
+      if (!instructionValidator.isInstructionValid(instruction, sourceProcessDefinition, targetProcessDefinition)) {
+        return false;
+      }
+    }
+    return true;
   }
 
 }

@@ -19,7 +19,6 @@ import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -50,7 +49,7 @@ public class MigrationHorizontalScopeChangeTest {
       .mapActivities("subProcess1", "subProcess1")
       .mapActivities("subProcess2", "subProcess2")
       .mapActivities("userTask1", "userTask2")
-      .mapActivities("userTask2", "userTask2")
+      .mapActivities("userTask2", "userTask1")
       .build();
 
     ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());

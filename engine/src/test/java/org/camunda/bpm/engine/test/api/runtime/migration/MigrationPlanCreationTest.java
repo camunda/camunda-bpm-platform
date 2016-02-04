@@ -16,11 +16,10 @@ import static org.camunda.bpm.engine.test.util.MigrationPlanAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.MigrationPlanAssert.migrate;
 import static org.camunda.bpm.engine.test.util.MigrationPlanValidationReportAssert.assertThat;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 import org.camunda.bpm.engine.BadUserRequestException;
-import org.camunda.bpm.engine.impl.migration.validation.MigrationPlanValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlan;
+import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -135,7 +134,7 @@ public class MigrationPlanCreationTest {
     } catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
         .hasFailures(1)
-        .hasFailure("thisActivityDoesNotExist", "source activity does not exist");
+        .hasFailure("thisActivityDoesNotExist", "the mapped activities are either null or not supported");
     }
   }
 
@@ -153,7 +152,7 @@ public class MigrationPlanCreationTest {
     } catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
         .hasFailures(1)
-        .hasFailure(null, "source activity id and target activity id must not be null");
+        .hasFailure(null, "the mapped activities are either null or not supported");
     }
   }
 
@@ -171,7 +170,7 @@ public class MigrationPlanCreationTest {
     } catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
         .hasFailures(1)
-        .hasFailure("userTask", "target activity does not exist");
+        .hasFailure("userTask", "the mapped activities are either null or not supported");
     }
   }
 
@@ -189,7 +188,7 @@ public class MigrationPlanCreationTest {
     } catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
         .hasFailures(1)
-        .hasFailure("userTask", "source activity id and target activity id must not be null");
+        .hasFailure("userTask", "the mapped activities are either null or not supported");
     }
   }
 
@@ -226,7 +225,7 @@ public class MigrationPlanCreationTest {
     } catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
         .hasFailures(1)
-        .hasFailure("userTask", "the source activity is of type 'org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior' but the target activity not");
+        .hasFailure("userTask", "the mapped activities are either null or not supported");
     }
   }
 
@@ -244,12 +243,12 @@ public class MigrationPlanCreationTest {
     } catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
         .hasFailures(1)
-        .hasFailure("subProcess", "the target activity does not exist");
+        .hasFailure("subProcess", "the mapped activities are either null or not supported");
     }
   }
 
   @Test
-  public void testMapEqualActivitiesWhichParallelMultiInstance() {
+  public void testMapEqualActivitiesWithParallelMultiInstance() {
     // given
     BpmnModelInstance testProcess = ProcessModels.ONE_TASK_PROCESS.clone()
       .<UserTask>getModelElementById("userTask").builder()
@@ -259,7 +258,7 @@ public class MigrationPlanCreationTest {
 
     // when
     try {
-      MigrationPlan migrationPlan = rule.getRuntimeService()
+      rule.getRuntimeService()
         .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
         .mapActivities("userTask", "userTask")
         .build();
@@ -268,7 +267,7 @@ public class MigrationPlanCreationTest {
     catch (MigrationPlanValidationException e) {
       assertThat(e.getValidationReport())
         .hasFailures(1)
-        .hasFailure("userTask", "multi instance child activities are currently not supported");
+        .hasFailure("userTask", "the mapped activities are either null or not supported");
     }
   }
 

@@ -13,29 +13,31 @@
 
 package org.camunda.bpm.engine.impl.migration.validation;
 
-import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
+import org.camunda.bpm.engine.migration.MigrationInstruction;
+import org.camunda.bpm.engine.migration.MigrationPlanValidationFailure;
 
-public class MigrationInstructionInstanceValidationFailure {
+public class MigrationPlanValidationFailureImpl implements MigrationPlanValidationFailure {
 
-  protected MigratingActivityInstance migratingInstance;
+  protected MigrationInstruction migrationInstruction;
   protected String errorMessage;
 
-  public MigrationInstructionInstanceValidationFailure(MigratingActivityInstance migratingInstance, String errorMessage) {
-    this.migratingInstance = migratingInstance;
+  public MigrationPlanValidationFailureImpl(MigrationInstruction migrationInstruction, String errorMessage) {
+    this.migrationInstruction = migrationInstruction;
     this.errorMessage = errorMessage;
   }
 
-  public MigratingActivityInstance getMigratingInstance() {
-    return migratingInstance;
+  @Override
+  public MigrationInstruction getMigrationInstruction() {
+    return migrationInstruction;
   }
 
+  @Override
   public String getErrorMessage() {
     return errorMessage;
   }
 
   public void writeTo(StringBuilder sb) {
-    sb.append("ActivityInstance ");
-    sb.append(migratingInstance.getActivityInstance().getId());
+    sb.append(migrationInstruction);
     sb.append(": ");
     sb.append(errorMessage);
   }

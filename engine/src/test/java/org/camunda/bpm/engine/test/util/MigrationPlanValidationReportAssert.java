@@ -18,11 +18,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.camunda.bpm.engine.impl.migration.validation.MigrationInstructionInstanceValidationFailure;
-import org.camunda.bpm.engine.impl.migration.validation.MigrationInstructionInstanceValidationReport;
-import org.camunda.bpm.engine.impl.migration.validation.MigrationPlanValidationFailure;
-import org.camunda.bpm.engine.impl.migration.validation.MigrationPlanValidationReport;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.impl.migration.validation.MigrationPlanValidationReportImpl;
+import org.camunda.bpm.engine.migration.MigrationPlanValidationFailure;
+import org.camunda.bpm.engine.migration.MigrationPlanValidationReport;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 
@@ -42,7 +40,7 @@ public class MigrationPlanValidationReportAssert {
 
   public MigrationPlanValidationReportAssert hasFailures() {
     isNotNull();
-    assertTrue("Expected report to contain failures", actual.hasFailures());
+    assertTrue("Expected report to contain failures", ((MigrationPlanValidationReportImpl) actual).hasFailures());
 
     return this;
   }

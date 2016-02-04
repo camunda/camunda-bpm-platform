@@ -13,31 +13,47 @@
 
 package org.camunda.bpm.engine.impl.migration.validation;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
+import org.camunda.bpm.engine.migration.MigrationInstructionInstanceValidationFailure;
 
-public class MigrationPlanValidationFailure {
+public class MigrationInstructionInstanceValidationFailureImpl implements MigrationInstructionInstanceValidationFailure {
 
-  protected MigrationInstruction migrationInstruction;
+  protected MigratingActivityInstance migratingInstance;
   protected String errorMessage;
 
-  public MigrationPlanValidationFailure(MigrationInstruction migrationInstruction, String errorMessage) {
-    this.migrationInstruction = migrationInstruction;
+  public MigrationInstructionInstanceValidationFailureImpl(MigratingActivityInstance migratingInstance, String errorMessage) {
+    this.migratingInstance = migratingInstance;
     this.errorMessage = errorMessage;
   }
 
-  public MigrationInstruction getMigrationInstruction() {
-    return migrationInstruction;
+  public MigratingActivityInstance getMigratingInstance() {
+    return migratingInstance;
   }
 
+  @Override
   public String getErrorMessage() {
     return errorMessage;
   }
 
   public void writeTo(StringBuilder sb) {
-    sb.append(migrationInstruction);
+    sb.append("ActivityInstance ");
+    sb.append(migratingInstance.getActivityInstance().getId());
     sb.append(": ");
     sb.append(errorMessage);
+  }
+
+  @Override
+  public List<String> getActivityInstanceIds() {
+    return Arrays.asList(migratingInstance.getActivityInstance().getId());
+  }
+
+  @Override
+  public MigrationInstruction getMigrationInstruction() {
+    return migratingInstance.getMigrationInstruction();
   }
 
 }

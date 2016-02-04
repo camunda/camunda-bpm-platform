@@ -13,11 +13,47 @@
 
 package org.camunda.bpm.engine.rest;
 
-import com.jayway.restassured.response.Response;
+import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.ANOTHER_EXAMPLE_ACTIVITY_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.NON_EXISTING_ACTIVITY_ID;
+import static org.camunda.bpm.engine.rest.helper.MockProvider.NON_EXISTING_PROCESS_DEFINITION_ID;
+import static org.fest.assertions.Assertions.assertThat;
+import static org.fest.assertions.MapAssert.entry;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.MigrationPlanBuilder;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.migration.MigrationInstruction;
+import org.camunda.bpm.engine.migration.MigrationInstructionInstanceValidationException;
+import org.camunda.bpm.engine.migration.MigrationInstructionInstanceValidationFailure;
+import org.camunda.bpm.engine.migration.MigrationInstructionInstanceValidationReport;
 import org.camunda.bpm.engine.migration.MigrationPlan;
+import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
+import org.camunda.bpm.engine.migration.MigrationPlanValidationFailure;
+import org.camunda.bpm.engine.migration.MigrationPlanValidationReport;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationExecutionDto;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationInstructionDto;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationPlanDto;
@@ -29,23 +65,7 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-import javax.ws.rs.core.Response.Status;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import static com.jayway.restassured.RestAssured.given;
-import static com.jayway.restassured.path.json.JsonPath.from;
-import static org.camunda.bpm.engine.rest.helper.MockProvider.*;
-import static org.fest.assertions.Assertions.assertThat;
-import static org.fest.assertions.MapAssert.entry;
-import static org.hamcrest.CoreMatchers.is;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNull;
-import static org.mockito.Mockito.*;
+import com.jayway.restassured.response.Response;
 
 public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest {
 
@@ -398,10 +418,10 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
       .processInstances(EXAMPLE_PROCESS_INSTANCE_ID, ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID)
       .build();
 
-    given().log().all()
+    given()
       .contentType(POST_JSON_CONTENT_TYPE)
       .body(migrationExecution)
-    .then().expect().log().all()
+    .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .body("message", is(message))
     .when()
@@ -428,6 +448,92 @@ public class MigrationRestServiceInteractionTest extends AbstractRestServiceTest
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
       .body("message", is(message))
+    .when()
+      .post(EXECUTE_MIGRATION_URL);
+  }
+
+  @Test
+  public void executeMigrationPlanValidationException() {
+
+    MigrationInstruction migrationInstruction = mock(MigrationInstruction.class);
+    when(migrationInstruction.getSourceActivityIds()).thenReturn(Arrays.asList(EXAMPLE_ACTIVITY_ID));
+    when(migrationInstruction.getTargetActivityIds()).thenReturn(Arrays.asList(ANOTHER_EXAMPLE_ACTIVITY_ID));
+
+    MigrationPlanValidationFailure validationFailure = mock(MigrationPlanValidationFailure.class);
+    when(validationFailure.getMigrationInstruction()).thenReturn(migrationInstruction);
+    when(validationFailure.getErrorMessage()).thenReturn("anErrorMessage");
+
+    MigrationPlanValidationReport validationReport = mock(MigrationPlanValidationReport.class);
+    when(validationReport.getValidationFailures()).thenReturn(Arrays.asList(validationFailure));
+
+    when(migrationPlanBuilderMock.build()).thenThrow(new MigrationPlanValidationException("fooo", validationReport));
+
+    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+      .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
+        .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
+        .done()
+      .processInstances(EXAMPLE_PROCESS_INSTANCE_ID, ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID)
+      .build();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(migrationExecution)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(MigrationPlanValidationException.class.getSimpleName()))
+      .body("message", is("fooo"))
+      .body("errorReport.validationErrors", hasSize(1))
+      .body("errorReport.validationErrors[0].message", is("anErrorMessage"))
+      .body("errorReport.validationErrors[0].instruction.sourceActivityIds", hasSize(1))
+      .body("errorReport.validationErrors[0].instruction.sourceActivityIds[0]", is(EXAMPLE_ACTIVITY_ID))
+      .body("errorReport.validationErrors[0].instruction.targetActivityIds", hasSize(1))
+      .body("errorReport.validationErrors[0].instruction.targetActivityIds[0]", is(ANOTHER_EXAMPLE_ACTIVITY_ID))
+    .when()
+      .post(EXECUTE_MIGRATION_URL);
+  }
+
+  @Test
+  public void executeMigrationPlanInstanceValidationException() {
+
+    MigrationInstruction migrationInstruction = mock(MigrationInstruction.class);
+    when(migrationInstruction.getSourceActivityIds()).thenReturn(Arrays.asList(EXAMPLE_ACTIVITY_ID));
+    when(migrationInstruction.getTargetActivityIds()).thenReturn(Arrays.asList(ANOTHER_EXAMPLE_ACTIVITY_ID));
+
+    MigrationInstructionInstanceValidationFailure validationFailure = mock(MigrationInstructionInstanceValidationFailure.class);
+    when(validationFailure.getActivityInstanceIds()).thenReturn(Arrays.asList(EXAMPLE_ACTIVITY_INSTANCE_ID));
+    when(validationFailure.getMigrationInstruction()).thenReturn(migrationInstruction);
+    when(validationFailure.getErrorMessage()).thenReturn("anErrorMessage");
+
+    MigrationInstructionInstanceValidationReport validationReport = mock(MigrationInstructionInstanceValidationReport.class);
+    when(validationReport.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
+    when(validationReport.getValidationFailures()).thenReturn(Arrays.asList(validationFailure));
+
+    doThrow(new MigrationInstructionInstanceValidationException("fooo", validationReport))
+      .when(runtimeServiceMock).executeMigrationPlan(any(MigrationPlan.class), any(List.class));
+
+    MigrationExecutionDto migrationExecution = new MigrationExecutionDtoBuilder()
+      .migrationPlan(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
+        .instruction(EXAMPLE_ACTIVITY_ID, ANOTHER_EXAMPLE_ACTIVITY_ID)
+        .done()
+      .processInstances(EXAMPLE_PROCESS_INSTANCE_ID, ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID)
+      .build();
+
+    given()
+      .contentType(POST_JSON_CONTENT_TYPE)
+      .body(migrationExecution)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(MigrationInstructionInstanceValidationException.class.getSimpleName()))
+      .body("message", is("fooo"))
+      .body("errorReport.processInstanceId", is(EXAMPLE_PROCESS_INSTANCE_ID))
+      .body("errorReport.validationErrors", hasSize(1))
+      .body("errorReport.validationErrors[0].message", is("anErrorMessage"))
+      .body("errorReport.validationErrors[0].activityInstanceIds", hasSize(1))
+      .body("errorReport.validationErrors[0].activityInstanceIds[0]", is(EXAMPLE_ACTIVITY_INSTANCE_ID))
+      .body("errorReport.validationErrors[0].instruction.sourceActivityIds", hasSize(1))
+      .body("errorReport.validationErrors[0].instruction.sourceActivityIds[0]", is(EXAMPLE_ACTIVITY_ID))
+      .body("errorReport.validationErrors[0].instruction.targetActivityIds", hasSize(1))
+      .body("errorReport.validationErrors[0].instruction.targetActivityIds[0]", is(ANOTHER_EXAMPLE_ACTIVITY_ID))
     .when()
       .post(EXECUTE_MIGRATION_URL);
   }

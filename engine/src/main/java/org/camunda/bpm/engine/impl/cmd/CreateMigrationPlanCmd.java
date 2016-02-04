@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.impl.migration.MigrationLogger;
 import org.camunda.bpm.engine.impl.migration.validation.DefaultMigrationPlanValidator;
 import org.camunda.bpm.engine.impl.migration.MigrationPlanBuilderImpl;
 import org.camunda.bpm.engine.impl.migration.MigrationPlanImpl;
-import org.camunda.bpm.engine.impl.migration.validation.MigrationPlanValidationReport;
+import org.camunda.bpm.engine.impl.migration.validation.MigrationPlanValidationReportImpl;
 import org.camunda.bpm.engine.impl.migration.validation.MigrationPlanValidator;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.util.EngineUtilLogger;
@@ -80,7 +80,7 @@ public class CreateMigrationPlanCmd implements Command<MigrationPlan> {
     instructions.addAll(migrationBuilder.getExplicitMigrationInstructions());
     migrationPlan.setInstructions(instructions);
 
-    MigrationPlanValidationReport validationReport = new MigrationPlanValidationReport(migrationPlan);
+    MigrationPlanValidationReportImpl validationReport = new MigrationPlanValidationReportImpl(migrationPlan);
 
     MigrationPlanValidator validator = new DefaultMigrationPlanValidator();
     validator.validateMigrationPlan(sourceProcessDefinition, targetProcessDefinition, migrationPlan, validationReport);

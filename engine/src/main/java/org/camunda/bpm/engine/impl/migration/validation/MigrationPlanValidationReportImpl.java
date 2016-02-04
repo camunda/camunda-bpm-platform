@@ -16,39 +16,41 @@ package org.camunda.bpm.engine.impl.migration.validation;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessInstance;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 import org.camunda.bpm.engine.migration.MigrationPlan;
+import org.camunda.bpm.engine.migration.MigrationPlanValidationFailure;
+import org.camunda.bpm.engine.migration.MigrationPlanValidationReport;
 
-public class MigrationPlanValidationReport {
+public class MigrationPlanValidationReportImpl implements MigrationPlanValidationReport {
 
   protected MigrationPlan migrationPlan;
-  protected List<MigrationPlanValidationFailure> validationFailures = new ArrayList<MigrationPlanValidationFailure>();
+  protected List<MigrationPlanValidationFailureImpl> validationFailures = new ArrayList<MigrationPlanValidationFailureImpl>();
 
-  public MigrationPlanValidationReport(MigrationPlan migrationPlan) {
+  public MigrationPlanValidationReportImpl(MigrationPlan migrationPlan) {
     this.migrationPlan = migrationPlan;
   }
 
   public void addValidationFailure(MigrationInstruction migrationInstruction, String errorMessage) {
-    validationFailures.add(new MigrationPlanValidationFailure(migrationInstruction, errorMessage));
+    validationFailures.add(new MigrationPlanValidationFailureImpl(migrationInstruction, errorMessage));
   }
 
   public boolean hasFailures() {
     return !validationFailures.isEmpty();
   }
 
-  public MigrationPlan getMigratingPlan() {
+  public MigrationPlan getMigrationPlan() {
     return migrationPlan;
   }
 
+  @Override
   public List<MigrationPlanValidationFailure> getValidationFailures() {
-    return validationFailures;
+    return (List) validationFailures;
   }
 
   public void writeTo(StringBuilder sb) {
     sb.append("Migration plan is not valid for process:\n");
 
-    for (MigrationPlanValidationFailure failure : validationFailures) {
+    for (MigrationPlanValidationFailureImpl failure : validationFailures) {
       failure.writeTo(sb);
       sb.append("\n");
     }

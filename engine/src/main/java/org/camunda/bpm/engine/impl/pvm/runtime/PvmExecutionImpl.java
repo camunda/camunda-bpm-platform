@@ -27,7 +27,6 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
 import org.camunda.bpm.engine.impl.pvm.PvmExecution;
@@ -1141,10 +1140,6 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
     } else {
       return getParent().getActivityInstanceId();
     }
-  }
-
-  public void forceUpdateActivityInstance() {
-    activityInstanceId = generateActivityInstanceId(getActivity().getId());
   }
 
   @Override

@@ -38,7 +38,7 @@ import org.junit.rules.RuleChain;
  * @author Thorben Lindhauer
  *
  */
-public class MigrationPlanExecutionTest {
+public class MigrationSameScopesTest {
 
   protected ProcessEngineRule rule = new ProcessEngineRule();
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);
@@ -195,6 +195,7 @@ public class MigrationPlanExecutionTest {
         .createProcessInstanceById(sourceProcessDefinition.getId())
         .startBeforeActivity("userTask1")
         .execute();
+    ActivityInstance activityInstance = rule.getRuntimeService().getActivityInstance(processInstance.getId());
 
     // when
     rule.getRuntimeService().executeMigrationPlan(migrationPlan, Arrays.asList(processInstance.getId()));
@@ -210,7 +211,7 @@ public class MigrationPlanExecutionTest {
     ActivityInstance updatedTree = rule.getRuntimeService().getActivityInstance(processInstance.getId());
     assertThat(updatedTree).hasStructure(
         describeActivityInstanceTree(targetProcessDefinition.getId())
-          .activity("userTask2")
+          .activity("userTask2", testHelper.getSingleActivityInstance(activityInstance, "userTask1").getId())
         .done());
 
     Task migratedTask = rule.getTaskService().createTaskQuery().singleResult();

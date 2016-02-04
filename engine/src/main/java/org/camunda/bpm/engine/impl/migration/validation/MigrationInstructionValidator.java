@@ -13,19 +13,12 @@
 
 package org.camunda.bpm.engine.impl.migration.validation;
 
-import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
+import org.camunda.bpm.engine.migration.MigrationInstruction;
 
-public class MigrationPlanValidationException extends BadUserRequestException {
+public interface MigrationInstructionValidator {
 
-  protected MigrationPlanValidationReport validationReport;
-
-  public MigrationPlanValidationException(String message, MigrationPlanValidationReport validationReport) {
-    super(message);
-    this.validationReport = validationReport;
-  }
-
-  public MigrationPlanValidationReport getValidationReport() {
-    return validationReport;
-  }
+  boolean isInstructionValid(MigrationInstruction instruction, ProcessDefinitionImpl sourceProcessDefinition,
+                             ProcessDefinitionImpl targetProcessDefinition);
 
 }

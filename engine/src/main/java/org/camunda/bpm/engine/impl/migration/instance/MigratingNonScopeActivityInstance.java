@@ -38,19 +38,26 @@ public class MigratingNonScopeActivityInstance extends MigratingActivityInstance
       ExecutionEntity parent = currentExecution.getParent();
       currentExecution.remove();
       parent.tryPruneLastConcurrentChild();
+      parent.forceUpdate();
     }
 
   }
 
   @Override
   public void attachState(ExecutionEntity newScopeExecution) {
+
     this.representativeExecution = newScopeExecution;
-    newScopeExecution.setActivity((PvmActivity) sourceScope);
-    newScopeExecution.setActivityInstanceId(activityInstance.getId());
+    if (!newScopeExecution.getNonEventScopeExecutions().isEmpty() || newScopeExecution.getActivity() != null) {
+      this.representativeExecution = (ExecutionEntity) newScopeExecution.createConcurrentExecution();
+      newScopeExecution.forceUpdate();
+    }
+
+    representativeExecution.setActivity((PvmActivity) sourceScope);
+    representativeExecution.setActivityInstanceId(activityInstance.getId());
 
     if (dependentInstances != null) {
       for (MigratingInstance dependentInstance : dependentInstances) {
-        dependentInstance.attachState(newScopeExecution);
+        dependentInstance.attachState(representativeExecution);
       }
     }
   }
@@ -64,6 +71,11 @@ public class MigratingNonScopeActivityInstance extends MigratingActivityInstance
   }
 
   @Override
+  public void remove() {
+    // not yet implemented since it is not needed
+  }
+
+  @Override
   public ExecutionEntity getFlowScopeExecution() {
 
     ExecutionEntity currentScopeExecution = resolveRepresentativeExecution();
@@ -73,6 +85,16 @@ public class MigratingNonScopeActivityInstance extends MigratingActivityInstance
     }
     else {
       return currentScopeExecution;
+    }
+  }
+
+  @Override
+  public ExecutionEntity resolveRepresentativeExecution() {
+    if (representativeExecution.getReplacedBy() != null) {
+      return representativeExecution.resolveReplacedBy();
+    }
+    else {
+      return representativeExecution;
     }
   }
 

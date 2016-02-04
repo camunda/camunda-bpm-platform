@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.migration.MigrationPlan;
+import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
 import org.camunda.bpm.engine.rest.MigrationRestService;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationExecutionDto;
 import org.camunda.bpm.engine.rest.dto.migration.MigrationPlanDto;
@@ -57,6 +58,10 @@ public class MigrationRestServiceImpl extends AbstractRestProcessEngineAware imp
       MigrationPlan migrationPlan = MigrationPlanDto.toMigrationPlan(processEngine, migrationPlanDto);
       processEngine.getRuntimeService()
         .executeMigrationPlan(migrationPlan, processInstanceIds);
+    }
+    catch (MigrationPlanValidationException e) {
+      // handled by exception handler
+      throw e;
     }
     catch (BadUserRequestException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e, e.getMessage());

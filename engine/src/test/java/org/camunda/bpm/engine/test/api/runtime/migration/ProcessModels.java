@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.api.runtime.migration;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.builder.ProcessBuilder;
+import org.camunda.bpm.model.bpmn.builder.UserTaskBuilder;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
 
 /**
@@ -99,7 +100,7 @@ public class ProcessModels {
   public static final BpmnModelInstance PARALLEL_GATEWAY_PROCESS =
     newModel()
       .startEvent()
-      .parallelGateway()
+      .parallelGateway("fork")
       .userTask("userTask1").name("User Task 1")
       .endEvent()
       .moveToLastGateway()
@@ -110,7 +111,7 @@ public class ProcessModels {
   public static final BpmnModelInstance PARALLEL_SUBPROCESS_PROCESS =
       newModel()
         .startEvent()
-        .parallelGateway()
+        .parallelGateway("fork")
         .subProcess("subProcess1")
           .embeddedSubProcess()
             .startEvent()
@@ -128,13 +129,60 @@ public class ProcessModels {
         .endEvent()
         .done();
 
+  public static final BpmnModelInstance PARALLEL_DOUBLE_SUBPROCESS_PROCESS =
+    newModel()
+      .startEvent()
+      .parallelGateway()
+      .subProcess("subProcess1")
+        .embeddedSubProcess()
+          .startEvent()
+          .subProcess("nestedSubProcess1")
+            .embeddedSubProcess()
+              .startEvent()
+              .userTask("userTask1")
+              .endEvent()
+            .subProcessDone()
+        .endEvent()
+      .subProcessDone()
+    .endEvent()
+    .moveToLastGateway()
+    .subProcess("subProcess2")
+      .embeddedSubProcess()
+        .startEvent()
+          .subProcess("nestedSubProcess2")
+            .embeddedSubProcess()
+              .startEvent()
+              .userTask("userTask2")
+              .endEvent()
+            .subProcessDone()
+        .endEvent()
+      .subProcessDone()
+    .endEvent()
+    .done();
+
+  public static final BpmnModelInstance PARALLEL_TASK_AND_SUBPROCESS_PROCESS =
+      newModel()
+        .startEvent()
+        .parallelGateway("fork")
+        .subProcess("subProcess")
+          .embeddedSubProcess()
+            .startEvent()
+            .userTask("userTask1")
+            .endEvent()
+          .subProcessDone()
+        .endEvent()
+        .moveToLastGateway()
+        .userTask("userTask2")
+        .endEvent()
+        .done();
+
   public static final BpmnModelInstance PARALLEL_GATEWAY_SUBPROCESS_PROCESS =
     newModel()
       .startEvent()
       .subProcess("subProcess")
         .embeddedSubProcess()
           .startEvent()
-          .parallelGateway()
+          .parallelGateway("fork")
           .userTask("userTask1").name("User Task 1")
           .endEvent()
           .moveToLastGateway()
@@ -144,28 +192,29 @@ public class ProcessModels {
       .done();
 
   public static final BpmnModelInstance SCOPE_TASK_PROCESS = ONE_TASK_PROCESS.clone()
-      .<UserTask>getModelElementById("userTask").builder()
-      .boundaryEvent().message("Message")
-      .done();
+    .<UserTask>getModelElementById("userTask").builder()
+      .camundaInputParameter("foo", "bar")
+    .done();
 
   public static final BpmnModelInstance SCOPE_TASK_SUBPROCESS_PROCESS = SUBPROCESS_PROCESS.clone()
-      .<UserTask>getModelElementById("userTask").builder()
-      .boundaryEvent().message("Message")
-      .done();
+    .<UserTask>getModelElementById("userTask").builder()
+      .camundaInputParameter("foo", "bar")
+    .done();
 
   public static final BpmnModelInstance PARALLEL_SCOPE_TASKS = PARALLEL_GATEWAY_PROCESS.clone()
-      .<UserTask>getModelElementById("userTask1").builder()
-      .boundaryEvent().message("Message")
-      .moveToActivity("userTask2")
-      .boundaryEvent().message("Message")
-      .done();
+    .<UserTask>getModelElementById("userTask1").builder()
+      .camundaInputParameter("foo", "bar")
+    .<UserTaskBuilder>moveToActivity("userTask2")
+      .camundaInputParameter("foo", "bar")
+    .done();
 
   public static final BpmnModelInstance PARALLEL_SCOPE_TASKS_SUB_PROCESS = PARALLEL_GATEWAY_SUBPROCESS_PROCESS.clone()
-      .<UserTask>getModelElementById("userTask1").builder()
-      .boundaryEvent().message("Message")
-      .moveToActivity("userTask2")
-      .boundaryEvent().message("Message")
-      .done();
+    .<UserTask>getModelElementById("userTask1").builder()
+      .camundaInputParameter("foo", "bar")
+    .<UserTaskBuilder>moveToActivity("userTask2")
+      .camundaInputParameter("foo", "bar")
+    .done();
+
 
   public static final BpmnModelInstance UNSUPPORTED_ACTIVITIES = Bpmn.createExecutableProcess(PROCESS_KEY)
     .startEvent()

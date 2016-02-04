@@ -20,11 +20,11 @@ import java.util.Set;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.migration.validation.MigrationInstructionInstanceValidationException;
-import org.camunda.bpm.engine.impl.migration.validation.MigrationInstructionInstanceValidationReport;
-import org.camunda.bpm.engine.impl.migration.validation.MigrationPlanValidationException;
-import org.camunda.bpm.engine.impl.migration.validation.MigrationPlanValidationReport;
+import org.camunda.bpm.engine.impl.migration.validation.MigrationInstructionInstanceValidationReportImpl;
+import org.camunda.bpm.engine.impl.migration.validation.MigrationPlanValidationReportImpl;
+import org.camunda.bpm.engine.migration.MigrationInstructionInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlan;
+import org.camunda.bpm.engine.migration.MigrationPlanValidationException;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 
 /**
@@ -48,7 +48,7 @@ public class MigrationLogger extends ProcessEngineLogger {
     ));
   }
 
-  public MigrationInstructionInstanceValidationException failingInstructionInstanceValidation(MigrationInstructionInstanceValidationReport validationReport) {
+  public MigrationInstructionInstanceValidationException failingInstructionInstanceValidation(MigrationInstructionInstanceValidationReportImpl validationReport) {
     StringBuilder sb = new StringBuilder();
     validationReport.writeTo(sb);
     return new MigrationInstructionInstanceValidationException(exceptionMessage("003", "Cannot migrate process instance {}: {}",
@@ -56,12 +56,12 @@ public class MigrationLogger extends ProcessEngineLogger {
       sb.toString()), validationReport);
   }
 
-  public MigrationPlanValidationException failingMigrationPlanValidation(MigrationPlanValidationReport validationReport) {
+  public MigrationPlanValidationException failingMigrationPlanValidation(MigrationPlanValidationReportImpl validationReport) {
     StringBuilder sb = new StringBuilder();
     validationReport.writeTo(sb);
     return new MigrationPlanValidationException(exceptionMessage("004", "Cannot migrate process definition {} to {}: {}",
-      validationReport.getMigratingPlan().getSourceProcessDefinitionId(),
-      validationReport.getMigratingPlan().getTargetProcessDefinitionId(),
+      validationReport.getMigrationPlan().getSourceProcessDefinitionId(),
+      validationReport.getMigrationPlan().getTargetProcessDefinitionId(),
       sb.toString()), validationReport);
   }
 

@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.migration;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.migration.MigrationInstruction;
@@ -24,6 +25,10 @@ public class MigrationInstructionImpl implements MigrationInstruction {
 
   protected List<String> sourceActivityIds;
   protected List<String> targetActivityIds;
+
+  public MigrationInstructionImpl(String sourceActivityId, String targetActivityId) {
+    this(Collections.singletonList(sourceActivityId), Collections.singletonList(targetActivityId));
+  }
 
   public MigrationInstructionImpl(List<String> sourceActivityIds, List<String> targetActivityIds) {
     this.sourceActivityIds = sourceActivityIds;
