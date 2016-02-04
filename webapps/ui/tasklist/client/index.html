@@ -54,8 +54,7 @@
        sign-out="{{ 'SIGN_OUT_ACTION' | translate }}"
        my-profile="{{ 'MY_PROFILE' | translate }}"
        brand-name="{{ 'APP_VENDOR' | translate }} {{ 'TASKLIST_APP' | translate }}">
-   <ul class="navbar-nav nav"
-       cam-if-logged-in
+   <ul cam-if-logged-in
        ng-cloak
        ng-controller="camHeaderViewsCtrl">
       <li ng-repeat="actionProvider in navbarActions"

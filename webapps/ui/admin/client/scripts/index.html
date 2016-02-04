@@ -60,28 +60,23 @@
          brand-name="Camunda Admin">
       <ul ng-cloak
           cam-if-logged-in
-          class="nav navbar-nav"
           ng-controller="NavigationController">
 
-        <li class="dropdown"
-            ng-class="activeClass('#/user')">
+        <li ng-class="activeClass('#/user')">
           <a href="#/users">Users</a>
         </li>
 
-        <li class="dropdown"
-            ng-class="activeClass('#/group')">
+        <li ng-class="activeClass('#/group')">
           <a href="#/groups">Groups</a>
         </li>
 
-        <li class="dropdown"
-            ng-class="activeClass('#/authorization')"
+        <li ng-class="activeClass('#/authorization')"
             show-if-authorized
             auth-permission="ALL"
             auth-resource-name="authorization">
           <a href="#/authorization?resource=0">Authorizations</a>
         </li>
-        <li class="dropdown"
-            ng-class="activeClass('#/system')">
+        <li ng-class="activeClass('#/system')">
           <a href="#/system?section=system-settings-general">System</a>
         </li>
       </ul>
