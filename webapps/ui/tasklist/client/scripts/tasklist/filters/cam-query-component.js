@@ -1,7 +1,7 @@
 'use strict';
 
 var angular = require('angular');
-var moment = require('moment');
+var moment = require('camunda-commons-ui/vendor/moment');
 
   module.exports = [
     '$filter',
