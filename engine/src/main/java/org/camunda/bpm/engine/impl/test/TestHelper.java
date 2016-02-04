@@ -335,7 +335,7 @@ public abstract class TestHelper {
         LOG.error("Dropping and recreating database");
 
         processEngineConfiguration
-          .getCommandExecutorTxRequired()
+          .getCommandExecutorSchemaOperations()
           .execute(new Command<Object>() {
             public Object execute(CommandContext commandContext) {
               PersistenceSession persistenceSession = commandContext.getSession(PersistenceSession.class);
@@ -422,6 +422,7 @@ public abstract class TestHelper {
     public boolean isTimeLimitExceeded() {
       return timeLimitExceeded;
     }
+    @Override
     public void run() {
       timeLimitExceeded = true;
       thread.interrupt();

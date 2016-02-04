@@ -18,6 +18,13 @@ import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.container.impl.plugin.BpmPlatformPlugin;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cfg.TransactionContext;
+import org.camunda.bpm.engine.impl.cfg.TransactionListener;
+import org.camunda.bpm.engine.impl.cfg.TransactionState;
+import org.camunda.bpm.engine.impl.interceptor.Command;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 
 /**
@@ -39,16 +46,39 @@ public class EnsureCleanDbPlugin implements BpmPlatformPlugin {
     // some tests deploy multiple PAs. => only check for clean DB after last PA is undeployed
     if(counter.decrementAndGet() == 0) {
 
-      ProcessEngine defaultProcessEngine = BpmPlatform.getDefaultProcessEngine();
-      try {
-        System.out.println("Ensure cleanup after integration test ");
-        TestHelper.assertAndEnsureCleanDbAndCache(defaultProcessEngine, false);
-      }
-      catch(Throwable e) {
-        System.err.println("Could not clean DB:");
-        e.printStackTrace();
-      }
+      final ProcessEngine defaultProcessEngine = BpmPlatform.getDefaultProcessEngine();
+      ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) defaultProcessEngine.getProcessEngineConfiguration();
+      processEngineConfiguration.getCommandExecutorTxRequired()
+        .execute(new Command<Void>() {
+
+          public Void execute(CommandContext commandContext) {
+            TransactionContext transactionContext = commandContext.getTransactionContext();
+            transactionContext.addTransactionListener(TransactionState.COMMITTED, createTxListener(defaultProcessEngine));
+            transactionContext.addTransactionListener(TransactionState.ROLLED_BACK, createTxListener(defaultProcessEngine));
+            return null;
+          }
+
+        });
+
     }
   }
 
+  private TransactionListener createTxListener(final ProcessEngine defaultProcessEngine) {
+    return new TransactionListener() {
+
+      @Override
+      public void execute(CommandContext commandContext) {
+
+        try {
+          System.out.println("Ensure cleanup after integration test ");
+          TestHelper.assertAndEnsureCleanDbAndCache(defaultProcessEngine, false);
+        }
+        catch(Throwable e) {
+          System.err.println("Could not clean DB:");
+          e.printStackTrace();
+        }
+
+      }
+    };
+  }
 }
