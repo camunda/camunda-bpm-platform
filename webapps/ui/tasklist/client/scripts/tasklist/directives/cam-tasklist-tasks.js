@@ -5,7 +5,7 @@ var template = fs.readFileSync(__dirname + '/cam-tasklist-tasks.html', 'utf8');
 
 var angular = require('angular');
 
-var moment = require('moment');
+var moment = require('camunda-commons-ui/vendor/moment');
 
   var $ = angular.element;
 
