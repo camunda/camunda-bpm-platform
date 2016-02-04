@@ -47,38 +47,16 @@ public class EnsureCleanDbPlugin implements BpmPlatformPlugin {
     if(counter.decrementAndGet() == 0) {
 
       final ProcessEngine defaultProcessEngine = BpmPlatform.getDefaultProcessEngine();
-      ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) defaultProcessEngine.getProcessEngineConfiguration();
-      processEngineConfiguration.getCommandExecutorTxRequired()
-        .execute(new Command<Void>() {
-
-          public Void execute(CommandContext commandContext) {
-            TransactionContext transactionContext = commandContext.getTransactionContext();
-            transactionContext.addTransactionListener(TransactionState.COMMITTED, createTxListener(defaultProcessEngine));
-            transactionContext.addTransactionListener(TransactionState.ROLLED_BACK, createTxListener(defaultProcessEngine));
-            return null;
-          }
-
-        });
-
-    }
-  }
-
-  private TransactionListener createTxListener(final ProcessEngine defaultProcessEngine) {
-    return new TransactionListener() {
-
-      @Override
-      public void execute(CommandContext commandContext) {
-
-        try {
-          System.out.println("Ensure cleanup after integration test ");
-          TestHelper.assertAndEnsureCleanDbAndCache(defaultProcessEngine, false);
-        }
-        catch(Throwable e) {
-          System.err.println("Could not clean DB:");
-          e.printStackTrace();
-        }
-
+      try {
+        System.out.println("Ensure cleanup after integration test ");
+        TestHelper.assertAndEnsureCleanDbAndCache(defaultProcessEngine, false);
       }
-    };
+      catch(Throwable e) {
+        System.err.println("Could not clean DB:");
+        e.printStackTrace();
+      }
+    }
+
   }
+
 }
