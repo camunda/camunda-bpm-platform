@@ -70,17 +70,21 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
     return instance;
   }
 
-  protected <T extends BaseElement> T getCreateSingleChild(Class<T> typeClass) {
-    Collection<T> childrenOfType = element.getChildElementsByType(typeClass);
+  protected <T extends BpmnModelElementInstance> T getCreateSingleChild(Class<T> typeClass) {
+    return getCreateSingleChild(element, typeClass);
+  }
+
+  protected <T extends BpmnModelElementInstance> T getCreateSingleChild(BpmnModelElementInstance parent, Class<T> typeClass) {
+    Collection<T> childrenOfType = parent.getChildElementsByType(typeClass);
     if (childrenOfType.isEmpty()) {
       T child = modelInstance.newInstance(typeClass);
-      element.addChildElement(child);
+      parent.addChildElement(child);
       return child;
     }
     else {
       if (childrenOfType.size() > 1) {
-        throw new BpmnModelException("Element " + element.getId() + " of type " +
-            element.getElementType().getTypeName() + " has more than one child element of type " +
+        throw new BpmnModelException("Element " + parent + " of type " +
+            parent.getElementType().getTypeName() + " has more than one child element of type " +
             typeClass.getName());
       }
       else {

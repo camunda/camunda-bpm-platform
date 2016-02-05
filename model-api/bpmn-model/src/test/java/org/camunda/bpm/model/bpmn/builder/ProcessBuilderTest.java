@@ -35,6 +35,7 @@ import static org.camunda.bpm.model.bpmn.BpmnTestConstants.TEST_USERS_LIST_API;
 import static org.camunda.bpm.model.bpmn.impl.BpmnModelConstants.BPMN20_NS;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -42,6 +43,7 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelException;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.GatewayDirection;
+import org.camunda.bpm.model.bpmn.instance.BaseElement;
 import org.camunda.bpm.model.bpmn.instance.BoundaryEvent;
 import org.camunda.bpm.model.bpmn.instance.BusinessRuleTask;
 import org.camunda.bpm.model.bpmn.instance.CallActivity;
@@ -70,6 +72,9 @@ import org.camunda.bpm.model.bpmn.instance.Task;
 import org.camunda.bpm.model.bpmn.instance.ThrowEvent;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaInputOutput;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaInputParameter;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaOutputParameter;
 import org.camunda.bpm.model.xml.Model;
 import org.camunda.bpm.model.xml.instance.ModelElementInstance;
 import org.camunda.bpm.model.xml.type.ModelElementType;
@@ -1183,23 +1188,74 @@ public class ProcessBuilderTest {
 
   @Test
   public void testMultiInstanceLoopCharacteristicsParallel() {
-      modelInstance = Bpmn.createProcess()
-        .startEvent()
-        .userTask("task")
-          .multiInstance()
-            .parallel()
-          .multiInstanceDone()
-        .endEvent()
-        .done();
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask("task")
+        .multiInstance()
+          .parallel()
+        .multiInstanceDone()
+      .endEvent()
+      .done();
 
-      UserTask userTask = modelInstance.getModelElementById("task");
-      Collection<MultiInstanceLoopCharacteristics> miCharacteristics =
-          userTask.getChildElementsByType(MultiInstanceLoopCharacteristics.class);
+    UserTask userTask = modelInstance.getModelElementById("task");
+    Collection<MultiInstanceLoopCharacteristics> miCharacteristics =
+      userTask.getChildElementsByType(MultiInstanceLoopCharacteristics.class);
 
-      assertThat(miCharacteristics).hasSize(1);
+    assertThat(miCharacteristics).hasSize(1);
 
-      MultiInstanceLoopCharacteristics miCharacteristic = miCharacteristics.iterator().next();
-      assertThat(miCharacteristic.isSequential()).isFalse();
+    MultiInstanceLoopCharacteristics miCharacteristic = miCharacteristics.iterator().next();
+    assertThat(miCharacteristic.isSequential()).isFalse();
+  }
+
+  public void testTaskWithCamundaInputOutput() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask("task")
+        .camundaInputParameter("foo", "bar")
+        .camundaInputParameter("yoo", "hoo")
+        .camundaOutputParameter("one", "two")
+        .camundaOutputParameter("three", "four")
+      .endEvent()
+      .done();
+
+    UserTask task = modelInstance.getModelElementById("task");
+    assertCamundaInputOutputParameter(task);
+  }
+
+  @Test
+  public void testTaskWithCamundaInputOutputWithExistingExtensionElements() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask("task")
+        .camundaExecutionListenerExpression("end", "${true}")
+        .camundaInputParameter("foo", "bar")
+        .camundaInputParameter("yoo", "hoo")
+        .camundaOutputParameter("one", "two")
+        .camundaOutputParameter("three", "four")
+      .endEvent()
+      .done();
+
+    UserTask task = modelInstance.getModelElementById("task");
+    assertCamundaInputOutputParameter(task);
+  }
+
+  @Test
+  public void testTaskWithCamundaInputOutputWithExistingCamundaInputOutput() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask("task")
+        .camundaInputParameter("foo", "bar")
+        .camundaOutputParameter("one", "two")
+      .endEvent()
+      .done();
+
+    UserTask task = modelInstance.getModelElementById("task");
+
+    task.builder()
+      .camundaInputParameter("yoo", "hoo")
+      .camundaOutputParameter("three", "four");
+
+    assertCamundaInputOutputParameter(task);
   }
 
   protected Message assertMessageCatchEventDefinition(String elementId, String messageName) {
@@ -1260,6 +1316,33 @@ public class ProcessBuilderTest {
   protected void assertOnlyOneSignalExists(String signalName) {
     Collection<Signal> signals = modelInstance.getModelElementsByType(Signal.class);
     assertThat(signals).extracting("name").containsOnlyOnce(signalName);
+  }
+
+  protected void assertCamundaInputOutputParameter(BaseElement element) {
+    CamundaInputOutput camundaInputOutput = element.getExtensionElements().getElementsQuery().filterByType(CamundaInputOutput.class).singleResult();
+    assertThat(camundaInputOutput).isNotNull();
+
+    List<CamundaInputParameter> camundaInputParameters = new ArrayList<CamundaInputParameter>(camundaInputOutput.getCamundaInputParameters());
+    assertThat(camundaInputParameters).hasSize(2);
+
+    CamundaInputParameter camundaInputParameter = camundaInputParameters.get(0);
+    assertThat(camundaInputParameter.getCamundaName()).isEqualTo("foo");
+    assertThat(camundaInputParameter.getTextContent()).isEqualTo("bar");
+
+    camundaInputParameter = camundaInputParameters.get(1);
+    assertThat(camundaInputParameter.getCamundaName()).isEqualTo("yoo");
+    assertThat(camundaInputParameter.getTextContent()).isEqualTo("hoo");
+
+    List<CamundaOutputParameter> camundaOutputParameters = new ArrayList<CamundaOutputParameter>(camundaInputOutput.getCamundaOutputParameters());
+    assertThat(camundaOutputParameters).hasSize(2);
+
+    CamundaOutputParameter camundaOutputParameter = camundaOutputParameters.get(0);
+    assertThat(camundaOutputParameter.getCamundaName()).isEqualTo("one");
+    assertThat(camundaOutputParameter.getTextContent()).isEqualTo("two");
+
+    camundaOutputParameter = camundaOutputParameters.get(1);
+    assertThat(camundaOutputParameter.getCamundaName()).isEqualTo("three");
+    assertThat(camundaOutputParameter.getTextContent()).isEqualTo("four");
   }
 
 }
