@@ -48,7 +48,8 @@ module.exports = function(config, browserifyConfig) {
                'camunda-commons-ui': 'camunda-commons-ui',
                'camunda-bpm-sdk-js': 'camunda-bpm-sdk-js',
                'angular-data-depend': 'angular-data-depend',
-               'moment': 'moment'
+               'moment': 'moment',
+               'events': 'events'
               }
             }
         ]

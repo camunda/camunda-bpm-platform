@@ -23,7 +23,8 @@ var angular = require('angular');
       require('./filters/main').name,
       require('./pages/main').name,
       require('./resources/main').name,
-      require('./services/main').name
+      require('./services/main').name,
+      require('./navigation/main').name
     ].concat(pluginDependencies.map(function(el){
       return el.ngModuleName;
     }));
@@ -106,6 +107,7 @@ var angular = require('angular');
     container['camunda-bpm-sdk-js'] = sdk;
     container['angular-data-depend'] = dataDepend;
     container['moment'] = require('camunda-commons-ui/vendor/moment');
+    container['events'] = require('events');
   };
 
 

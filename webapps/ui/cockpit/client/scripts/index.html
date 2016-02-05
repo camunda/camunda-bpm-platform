@@ -59,15 +59,14 @@
          current-app="cockpit"
          brand-name="Camunda Cockpit">
       <ul ng-cloak
-          cam-if-logged-in>
-        <li ng-class="isActivePage('dashboard')">
-          <a href="#/dashboard">Dashboard</a>
-        </li>
-        <li ng-class="isActivePage('repository')">
-          <a href="#/repository">Deployments</a>
-        </li>
-        <li ng-class="isActivePage('reports')">
-          <a href="#/reports">Reports</a>
+          cam-if-logged-in
+          ng-controller="camHeaderViewsCtrl">
+        <li ng-repeat="actionProvider in navbarActions"
+            ng-class="activeClass(actionProvider.id)">
+            <view ng-cloak
+                  provider="actionProvider"
+                  vars="navbarVars">
+            </view>
         </li>
       </ul>
     </div>
