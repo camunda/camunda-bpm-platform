@@ -32,16 +32,16 @@ public class TimerStartEventJobHandler extends TimerEventJobHandler {
     return TYPE;
   }
 
-  public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext) {
+  public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
     DeploymentCache deploymentCache = Context
             .getProcessEngineConfiguration()
             .getDeploymentCache();
 
     String definitionKey = getKey(configuration);
-    ProcessDefinition processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKey(definitionKey);
+    ProcessDefinition processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKeyAndTenantId(definitionKey, tenantId);
     try {
       if(!processDefinition.isSuspended()) {
-        new StartProcessInstanceCmd(definitionKey, null, null, null, null).execute(commandContext);
+        new StartProcessInstanceCmd(definitionKey, null, null, null, tenantId, null).execute(commandContext);
       }
       else {
         LOG.ignoringSuspendedJob(processDefinition);

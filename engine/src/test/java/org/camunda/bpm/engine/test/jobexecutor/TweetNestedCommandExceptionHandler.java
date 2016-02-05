@@ -32,7 +32,7 @@ public class TweetNestedCommandExceptionHandler implements JobHandler {
     return TYPE;
   }
 
-  public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext) {
+  public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
     Context.getProcessEngineConfiguration().getCommandExecutorTxRequired().execute(new Command<Void>() {
 
       public Void execute(CommandContext commandContext) {

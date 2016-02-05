@@ -157,6 +157,12 @@
   <select id="selectJobsByConfiguration" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
       select * from ${prefix}ACT_RU_JOB
       where HANDLER_TYPE_ = #{parameter.handlerType}
+      <if test="parameter.tenantId != null">
+        and TENANT_ID_ = #{parameter.tenantId}
+      </if>
+      <if test="parameter.tenantId == null">
+        and TENANT_ID_ is null
+      </if>
       and (HANDLER_CFG_ = #{parameter.handlerConfiguration}
       <if test="parameter.handlerConfigurationWithFollowUpJobCreatedProperty != null">
       or HANDLER_CFG_ = #{parameter.handlerConfigurationWithFollowUpJobCreatedProperty}

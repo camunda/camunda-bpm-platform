@@ -125,7 +125,7 @@ public abstract class JobEntity implements Serializable, Job, DbEntity, HasDbRev
     preExecute(commandContext);
     JobHandler jobHandler = getJobHandler();
     ensureNotNull("Cannot find job handler '" + jobHandlerType + "' from job '" + this + "'", "jobHandler", jobHandler);
-    jobHandler.execute(jobHandlerConfiguration, execution, commandContext);
+    jobHandler.execute(jobHandlerConfiguration, execution, commandContext, tenantId);
     postExecute(commandContext);
   }
 

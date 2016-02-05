@@ -40,13 +40,16 @@ public class StartProcessInstanceCmd implements Command<ProcessInstance>, Serial
   protected Map<String, Object> variables;
   protected String businessKey;
   protected String caseInstanceId;
+  protected String tenantId;
 
-  public StartProcessInstanceCmd(String processDefinitionKey, String processDefinitionId, String businessKey, String caseInstanceId, Map<String, Object> variables) {
+  // TODO too many arguments - CAM-5240
+  public StartProcessInstanceCmd(String processDefinitionKey, String processDefinitionId, String businessKey, String caseInstanceId, String tenantId, Map<String, Object> variables) {
     this.processDefinitionKey = processDefinitionKey;
     this.processDefinitionId = processDefinitionId;
     this.businessKey = businessKey;
     this.caseInstanceId = caseInstanceId;
     this.variables = variables;
+    this.tenantId = tenantId;
   }
 
   public ProcessInstance execute(CommandContext commandContext) {
@@ -60,8 +63,9 @@ public class StartProcessInstanceCmd implements Command<ProcessInstance>, Serial
       processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
       ensureNotNull("No process definition found for id = '" + processDefinitionId + "'", "processDefinition", processDefinition);
     } else if(processDefinitionKey != null) {
-      processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKey(processDefinitionKey);
-      ensureNotNull("No process definition found for key '" + processDefinitionKey + "'", "processDefinition", processDefinition);
+      // TODO allow to start a process instance by key from any tenant if only one tenant has a definition with this key - CAM-5211
+      processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
+      ensureNotNull("No process definition found for key '" + processDefinitionKey + "' and tenant-id '" + tenantId + "'", "processDefinition", processDefinition);
     } else {
       throw new ProcessEngineException("processDefinitionKey and processDefinitionId are null");
     }

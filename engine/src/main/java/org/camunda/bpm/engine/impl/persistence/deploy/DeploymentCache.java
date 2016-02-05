@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.cmmn.CaseDefinitionNotFoundException;
 import org.camunda.bpm.engine.exception.dmn.DecisionDefinitionNotFoundException;
 import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
@@ -93,12 +94,32 @@ public class DeploymentCache {
     return processDefinition;
   }
 
+  /**
+   * @return the latest version of the process definition with the given key (from any tenant)
+   *
+   * @throws ProcessEngineException if more than one tenant has a process definition with the given key
+   *
+   * @see #findDeployedLatestProcessDefinitionByKeyAndTenantId(String, String)
+   */
   public ProcessDefinitionEntity findDeployedLatestProcessDefinitionByKey(String processDefinitionKey) {
     ProcessDefinitionEntity processDefinition = Context
       .getCommandContext()
       .getProcessDefinitionManager()
       .findLatestProcessDefinitionByKey(processDefinitionKey);
     ensureNotNull("no processes deployed with key '" + processDefinitionKey + "'", "processDefinition", processDefinition);
+    processDefinition = resolveProcessDefinition(processDefinition);
+    return processDefinition;
+  }
+
+  /**
+   * @return the latest version of the process definition with the given key and tenant id
+   */
+  public ProcessDefinitionEntity findDeployedLatestProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String tenantId) {
+    ProcessDefinitionEntity processDefinition = Context
+        .getCommandContext()
+        .getProcessDefinitionManager()
+        .findLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
+    ensureNotNull("no processes deployed with key '" + processDefinitionKey + "' and tenant-id '" + tenantId + "'", "processDefinition", processDefinition);
     processDefinition = resolveProcessDefinition(processDefinition);
     return processDefinition;
   }

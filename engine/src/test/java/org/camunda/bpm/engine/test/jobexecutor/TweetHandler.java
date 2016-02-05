@@ -28,7 +28,7 @@ public class TweetHandler implements JobHandler {
     return "tweet";
   }
 
-  public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext) {
+  public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
     messages.add(configuration);
     Assert.assertNotNull(commandContext);
   }

@@ -64,7 +64,7 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
         .endEvent()
        .done());
 
-    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+    startProcessInstance(PROCESS_DEFINITION_KEY);
 
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
     assertThat(processInstance, is(notNullValue()));
@@ -85,7 +85,7 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
             .connectTo("join")
             .done());
 
-    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+    startProcessInstance(PROCESS_DEFINITION_KEY);
 
     List<Execution> executions = runtimeService.createExecutionQuery().list();
     assertThat(executions.size(), is(3));
@@ -108,7 +108,7 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
       .endEvent()
     .done());
 
-    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+    startProcessInstance(PROCESS_DEFINITION_KEY);
 
     List<Execution> executions = runtimeService.createExecutionQuery().list();
     assertThat(executions.size(), is(2));
@@ -125,7 +125,7 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
         .endEvent()
       .done());
 
-    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+    startProcessInstance(PROCESS_DEFINITION_KEY);
 
     Task task = taskService.createTaskQuery().singleResult();
     assertThat(task, is(notNullValue()));
@@ -142,7 +142,9 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
       .done());
 
     VariableMap variables = Variables.putValue("var", "test");
-    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, variables);
+
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    runtimeService.startProcessInstanceById(processDefinition.getId(), variables);
 
     VariableInstance variableInstance = runtimeService.createVariableInstanceQuery().singleResult();
     assertThat(variableInstance, is(notNullValue()));
@@ -160,7 +162,7 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
         .endEvent()
       .done());
 
-    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+    startProcessInstance(PROCESS_DEFINITION_KEY);
 
     VariableInstance variableInstance = runtimeService.createVariableInstanceQuery().singleResult();
     assertThat(variableInstance, is(notNullValue()));
@@ -177,7 +179,7 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
         .endEvent()
       .done());
 
-    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+    startProcessInstance(PROCESS_DEFINITION_KEY);
 
     VariableMap variables = Variables.createVariables().putValue("var", "test");
     Task task = taskService.createTaskQuery().singleResult();
@@ -221,7 +223,7 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
         .tenantId(TENANT_ID)
         .addClasspathResource("org/camunda/bpm/engine/test/api/multitenancy/intermediateMessageCatchEvent.bpmn"));
 
-    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+    startProcessInstance(PROCESS_DEFINITION_KEY);
 
     EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
     assertThat(eventSubscription, is(notNullValue()));
@@ -235,7 +237,7 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
         .tenantId(TENANT_ID)
         .addClasspathResource("org/camunda/bpm/engine/test/api/multitenancy/intermediateSignalCatchEvent.bpmn"));
 
-    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+    startProcessInstance(PROCESS_DEFINITION_KEY);
 
     EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
     assertThat(eventSubscription, is(notNullValue()));
@@ -249,7 +251,7 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
         .tenantId(TENANT_ID)
         .addClasspathResource("org/camunda/bpm/engine/test/api/multitenancy/compensationBoundaryEvent.bpmn"));
 
-    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+    startProcessInstance(PROCESS_DEFINITION_KEY);
 
     // the event subscription is created after execute the activity with the attached compensation boundary event
     EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
@@ -277,7 +279,7 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
         .tenantId(TENANT_ID)
         .addClasspathResource("org/camunda/bpm/engine/test/api/multitenancy/intermediateTimerEvent.bpmn"));
 
-    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+    startProcessInstance(PROCESS_DEFINITION_KEY);
 
     // the job is created when the timer event is reached
     Job job = managementService.createJobQuery().singleResult();
@@ -295,7 +297,7 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
         .endEvent()
       .done());
 
-    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+    startProcessInstance(PROCESS_DEFINITION_KEY);
 
     // the job is created when the asynchronous activity is reached
     Job job = managementService.createJobQuery().singleResult();
@@ -310,7 +312,7 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
         .tenantId(TENANT_ID)
         .addClasspathResource("org/camunda/bpm/engine/test/api/multitenancy/failingTask.bpmn"));
 
-    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+    startProcessInstance(PROCESS_DEFINITION_KEY);
     // execute the job of the async activity
     Job job = managementService.createJobQuery().singleResult();
     try {
@@ -355,7 +357,7 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
         .endEvent()
       .done());
 
-    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+    startProcessInstance(PROCESS_DEFINITION_KEY);
 
     // fetch the external task and mark it as failed which create an incident
     List<LockedExternalTask> tasks = externalTaskService.fetchAndLock(1, "test-worker").topic("test", 1000).execute();
@@ -377,7 +379,7 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
         .endEvent()
       .done());
 
-    runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+    startProcessInstance(PROCESS_DEFINITION_KEY);
 
     ExternalTask externalTask = externalTaskService.createExternalTaskQuery().singleResult();
     assertThat(externalTask, is(notNullValue()));
@@ -390,6 +392,16 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
     public void execute(DelegateExecution execution) throws Exception {
       execution.setVariable("var", "test");
     }
+  }
+
+  protected void startProcessInstance(String processDefinitionKey) {
+    ProcessDefinition processDefinition = repositoryService
+        .createProcessDefinitionQuery()
+        .processDefinitionKey(processDefinitionKey)
+        .latestVersion()
+        .singleResult();
+
+    runtimeService.startProcessInstanceById(processDefinition.getId());
   }
 
 }

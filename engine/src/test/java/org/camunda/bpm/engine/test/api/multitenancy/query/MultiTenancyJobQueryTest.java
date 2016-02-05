@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.engine.test.api.multitenancy;
+package org.camunda.bpm.engine.test.api.multitenancy.query;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -20,62 +20,64 @@ import java.util.List;
 
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.management.JobDefinition;
-import org.camunda.bpm.engine.management.JobDefinitionQuery;
+import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.JobQuery;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
-public class MultiTenancyJobDefinitionQueryTest extends PluggableProcessEngineTestCase {
+public class MultiTenancyJobQueryTest extends PluggableProcessEngineTestCase {
 
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
 
-  protected static final String BPMN = "org/camunda/bpm/engine/test/api/multitenancy/timerStartEvent.bpmn";
-
   @Override
   protected void setUp() {
-    deployment(repositoryService.createDeployment()
-        .tenantId(TENANT_ONE)
-        .addClasspathResource(BPMN));
+    BpmnModelInstance asyncTaskProcess = Bpmn.createExecutableProcess("testProcess")
+      .startEvent()
+      .userTask()
+        .camundaAsyncBefore()
+      .endEvent()
+    .done();
 
-    deployment(repositoryService.createDeployment()
-        .tenantId(TENANT_TWO)
-        .addClasspathResource(BPMN));
+    deploymentForTenant(TENANT_ONE, asyncTaskProcess);
+    deploymentForTenant(TENANT_TWO, asyncTaskProcess);
 
-    // the deployed process definition contains a timer start event
-    // - so a job definition is created on deployment.
+    startProcessInstanceForTenant(TENANT_ONE);
+    startProcessInstanceForTenant(TENANT_TWO);
   }
 
   public void testQueryWithoutTenantId() {
-    JobDefinitionQuery query = managementService
-        .createJobDefinitionQuery();
+    JobQuery query = managementService
+        .createJobQuery();
 
     assertThat(query.count(), is(2L));
   }
 
   public void testQueryByTenantId() {
-    JobDefinitionQuery query = managementService
-        .createJobDefinitionQuery()
+    JobQuery query = managementService
+        .createJobQuery()
         .tenantIdIn(TENANT_ONE);
 
     assertThat(query.count(), is(1L));
 
     query = managementService
-        .createJobDefinitionQuery()
+        .createJobQuery()
         .tenantIdIn(TENANT_TWO);
 
     assertThat(query.count(), is(1L));
   }
 
   public void testQueryByTenantIds() {
-    JobDefinitionQuery query = managementService
-        .createJobDefinitionQuery()
+    JobQuery query = managementService
+        .createJobQuery()
         .tenantIdIn(TENANT_ONE, TENANT_TWO);
 
     assertThat(query.count(), is(2L));
   }
 
   public void testQueryByNonExistingTenantId() {
-    JobDefinitionQuery query = managementService
-        .createJobDefinitionQuery()
+    JobQuery query = managementService
+        .createJobQuery()
         .tenantIdIn("nonExisting");
 
     assertThat(query.count(), is(0L));
@@ -83,7 +85,7 @@ public class MultiTenancyJobDefinitionQueryTest extends PluggableProcessEngineTe
 
   public void testFailQueryByTenantIdNull() {
     try {
-      managementService.createJobDefinitionQuery()
+      managementService.createJobQuery()
         .tenantIdIn((String) null);
 
       fail("expected exception");
@@ -92,25 +94,35 @@ public class MultiTenancyJobDefinitionQueryTest extends PluggableProcessEngineTe
   }
 
   public void testQuerySortingAsc() {
-    List<JobDefinition> jobDefinitions = managementService.createJobDefinitionQuery()
+    List<Job> jobs = managementService.createJobQuery()
         .orderByTenantId()
         .asc()
         .list();
 
-    assertThat(jobDefinitions.size(), is(2));
-    assertThat(jobDefinitions.get(0).getTenantId(), is(TENANT_ONE));
-    assertThat(jobDefinitions.get(1).getTenantId(), is(TENANT_TWO));
+    assertThat(jobs.size(), is(2));
+    assertThat(jobs.get(0).getTenantId(), is(TENANT_ONE));
+    assertThat(jobs.get(1).getTenantId(), is(TENANT_TWO));
   }
 
   public void testQuerySortingDesc() {
-    List<JobDefinition> jobDefinitions = managementService.createJobDefinitionQuery()
+    List<Job> jobs = managementService.createJobQuery()
         .orderByTenantId()
         .desc()
         .list();
 
-    assertThat(jobDefinitions.size(), is(2));
-    assertThat(jobDefinitions.get(0).getTenantId(), is(TENANT_TWO));
-    assertThat(jobDefinitions.get(1).getTenantId(), is(TENANT_ONE));
+    assertThat(jobs.size(), is(2));
+    assertThat(jobs.get(0).getTenantId(), is(TENANT_TWO));
+    assertThat(jobs.get(1).getTenantId(), is(TENANT_ONE));
+  }
+
+  protected void startProcessInstanceForTenant(String tenant) {
+    String processDefinitionId = repositoryService
+      .createProcessDefinitionQuery()
+      .tenantIdIn(tenant)
+      .singleResult()
+      .getId();
+
+    runtimeService.startProcessInstanceById(processDefinitionId);
   }
 
 }

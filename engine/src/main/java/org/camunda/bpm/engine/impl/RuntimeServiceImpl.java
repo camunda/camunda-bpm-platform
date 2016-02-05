@@ -67,51 +67,51 @@ import org.camunda.bpm.engine.variable.value.TypedValue;
 public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
 
   public ProcessInstance startProcessInstanceByKey(String processDefinitionKey) {
-    return commandExecutor.execute(new StartProcessInstanceCmd(processDefinitionKey, null, null, null, null));
+    return commandExecutor.execute(new StartProcessInstanceCmd(processDefinitionKey, null, null, null, null, null));
   }
 
   public ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey) {
-    return commandExecutor.execute(new StartProcessInstanceCmd(processDefinitionKey, null, businessKey, null, null));
+    return commandExecutor.execute(new StartProcessInstanceCmd(processDefinitionKey, null, businessKey, null, null, null));
   }
 
   public ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey, String caseInstanceId) {
-    return commandExecutor.execute(new StartProcessInstanceCmd(processDefinitionKey, null, businessKey, caseInstanceId, null));
+    return commandExecutor.execute(new StartProcessInstanceCmd(processDefinitionKey, null, businessKey, caseInstanceId, null, null));
   }
 
   public ProcessInstance startProcessInstanceByKey(String processDefinitionKey, Map<String, Object> variables) {
-    return commandExecutor.execute(new StartProcessInstanceCmd(processDefinitionKey, null, null, null, variables));
+    return commandExecutor.execute(new StartProcessInstanceCmd(processDefinitionKey, null, null, null, null, variables));
   }
 
   public ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey, Map<String, Object> variables) {
-    return commandExecutor.execute(new StartProcessInstanceCmd(processDefinitionKey, null, businessKey, null, variables));
+    return commandExecutor.execute(new StartProcessInstanceCmd(processDefinitionKey, null, businessKey, null, null, variables));
   }
 
   public ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey, String caseInstanceId, Map<String, Object> variables) {
-    return commandExecutor.execute(new StartProcessInstanceCmd(processDefinitionKey, null, businessKey, caseInstanceId, variables));
+    return commandExecutor.execute(new StartProcessInstanceCmd(processDefinitionKey, null, businessKey, caseInstanceId, null, variables));
   }
 
   public ProcessInstance startProcessInstanceById(String processDefinitionId) {
-    return commandExecutor.execute(new StartProcessInstanceCmd(null, processDefinitionId, null, null, null));
+    return commandExecutor.execute(new StartProcessInstanceCmd(null, processDefinitionId, null, null, null, null));
   }
 
   public ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey) {
-    return commandExecutor.execute(new StartProcessInstanceCmd(null, processDefinitionId, businessKey, null, null));
+    return commandExecutor.execute(new StartProcessInstanceCmd(null, processDefinitionId, businessKey, null, null, null));
   }
 
   public ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey, String caseInstanceId) {
-    return commandExecutor.execute(new StartProcessInstanceCmd(null, processDefinitionId, businessKey, caseInstanceId, null));
+    return commandExecutor.execute(new StartProcessInstanceCmd(null, processDefinitionId, businessKey, caseInstanceId, null, null));
   }
 
   public ProcessInstance startProcessInstanceById(String processDefinitionId, Map<String, Object> variables) {
-    return commandExecutor.execute(new StartProcessInstanceCmd(null, processDefinitionId, null, null, variables));
+    return commandExecutor.execute(new StartProcessInstanceCmd(null, processDefinitionId, null, null, null, variables));
   }
 
   public ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey, Map<String, Object> variables) {
-    return commandExecutor.execute(new StartProcessInstanceCmd(null, processDefinitionId, businessKey, null, variables));
+    return commandExecutor.execute(new StartProcessInstanceCmd(null, processDefinitionId, businessKey, null, null, variables));
   }
 
   public ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey, String caseInstanceId, Map<String, Object> variables) {
-    return commandExecutor.execute(new StartProcessInstanceCmd(null, processDefinitionId, businessKey, caseInstanceId, variables));
+    return commandExecutor.execute(new StartProcessInstanceCmd(null, processDefinitionId, businessKey, caseInstanceId, null, variables));
   }
 
   public void deleteProcessInstance(String processInstanceId, String deleteReason) {

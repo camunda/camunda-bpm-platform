@@ -36,7 +36,7 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     return TYPE;
   }
 
-  public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext) {
+  public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
     if (exceptionsRemaining.decrementAndGet() >= 0) {
       throw new RuntimeException("exception remaining: "+exceptionsRemaining);
     }

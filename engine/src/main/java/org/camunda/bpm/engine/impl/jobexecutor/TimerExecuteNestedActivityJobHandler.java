@@ -32,7 +32,7 @@ public class TimerExecuteNestedActivityJobHandler extends TimerEventJobHandler {
     return TYPE;
   }
 
-  public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext) {
+  public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
     String activityId = getKey(configuration);
     ActivityImpl activity = execution.getProcessDefinition().findActivity(activityId);
 

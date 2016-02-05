@@ -50,7 +50,7 @@ public class EventSubscriptionManager extends AbstractManager {
     }
 
     // if the event subscription has been triggered asynchronously but not yet executed
-    List<JobEntity> asyncJobs = getJobManager().findJobsByConfiguration(ProcessEventJobHandler.TYPE, persistentObject.getId());
+    List<JobEntity> asyncJobs = getJobManager().findJobsByConfiguration(ProcessEventJobHandler.TYPE, persistentObject.getId(), persistentObject.getTenantId());
     for (JobEntity asyncJob : asyncJobs) {
       asyncJob.delete();
     }

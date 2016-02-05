@@ -18,6 +18,7 @@ import static org.junit.Assert.assertThat;
 
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.api.delegate.AssertingTaskListener;
 import org.camunda.bpm.engine.test.api.delegate.AssertingTaskListener.DelegateTaskAsserter;
 
@@ -37,7 +38,8 @@ public class MultiTenancyDelegateTaskTest extends PluggableProcessEngineTestCase
 
     AssertingTaskListener.addAsserts(hasTenantId("tenant1"));
 
-    runtimeService.startProcessInstanceByKey("testProcess");
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    runtimeService.startProcessInstanceById(processDefinition.getId());
   }
 
   protected static DelegateTaskAsserter hasTenantId(final String expectedTenantId) {
