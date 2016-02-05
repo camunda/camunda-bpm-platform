@@ -11,7 +11,7 @@
 
   <groupId>org.camunda.bpm.extension</groupId>
   <artifactId>camunda-bpm-spring-boot-starter-root</artifactId>
-  <version>1.1.0-SNAPSHOT</version>
+  <version>1.1.0</version>
 
   <packaging>pom</packaging>
 
@@ -38,7 +38,7 @@
           <configuration>
             <archive>
               <manifest>
-                <addDefaultImplementationEntries/>
+                <addDefaultImplementationEntries />
               </manifest>
             </archive>
           </configuration>
@@ -74,7 +74,7 @@
     <connection>scm:git:git@github.com:camunda/camunda-bpm-spring-boot-starter.git</connection>
     <url>scm:git:git@github.com:camunda/camunda-bpm-spring-boot-starter.git</url>
     <developerConnection>scm:git:git@github.com:camunda/camunda-bpm-spring-boot-starter.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>1.1.0</tag>
   </scm>
 
   <!-- repositories used for distribution of releases and snapshots, DO NOT CHANGE -->
