@@ -5,6 +5,8 @@ var setupFile = require('./users-setup');
 
 var users = setupFile.setup1;
 
+testHelper.expectStringEqual = require('../../../common/tests/string-equal');
+
 var usersPage = require('../pages/users');
 var groupsPage = require('../pages/groups');
 
@@ -33,7 +35,7 @@ describe('Admin Users Spec', function() {
 
       // then
       usersPage.isActive();
-      expect(usersPage.pageHeader()).to.eventually.eql('Users'.toUpperCase());
+      testHelper.expectStringEqual(usersPage.pageHeader(), 'Users');
       expect(usersPage.newUserButton().isEnabled()).to.eventually.eql(true);
     });
 
@@ -45,7 +47,7 @@ describe('Admin Users Spec', function() {
 
       // then
       usersPage.editUserProfile.isActive({ user: users[1].params.id });
-      expect(usersPage.editUserProfile.pageHeader()).to.eventually.eql((users[1].params.firstName + ' ' + users[1].params.lastName).toUpperCase());
+      testHelper.expectStringEqual(usersPage.editUserProfile.pageHeader(), users[1].params.firstName + ' ' + users[1].params.lastName);
       expect(usersPage.editUserProfile.emailInput().getAttribute('value')).to.eventually.eql(users[1].params.email);
     });
 
@@ -57,7 +59,7 @@ describe('Admin Users Spec', function() {
 
       // then
       usersPage.editUserProfile.isActive({ user: users[0].params.id });
-      expect(usersPage.editUserProfile.pageHeader()).to.eventually.eql((users[0].params.firstName + ' ' + users[0].params.lastName).toUpperCase());
+      testHelper.expectStringEqual(usersPage.editUserProfile.pageHeader(), users[0].params.firstName + ' ' + users[0].params.lastName);
       expect(usersPage.editUserProfile.emailInput().getAttribute('value')).to.eventually.eql(users[0].params.email);
     });
 
@@ -84,7 +86,7 @@ describe('Admin Users Spec', function() {
 
       // then
       usersPage.newUser.isActive();
-      expect(usersPage.newUser.pageHeader()).to.eventually.eql('Create New User'.toUpperCase());
+      testHelper.expectStringEqual(usersPage.newUser.pageHeader(), 'Create New User');
       expect(usersPage.newUser.createNewUserButton().isEnabled()).to.eventually.eql(false);
     });
 
@@ -96,7 +98,7 @@ describe('Admin Users Spec', function() {
       usersPage.editUserProfile.navigateTo({ user: 'Xäbi' });
 
       // then
-      expect(usersPage.editUserProfile.pageHeader()).to.eventually.eql('Xäbi Älönsö'.toUpperCase());
+      testHelper.expectStringEqual(usersPage.editUserProfile.pageHeader(), 'Xäbi Älönsö');
     });
 
 
@@ -194,8 +196,8 @@ describe('Admin Users Spec', function() {
         usersPage.editUserProfile.updateProfileButton().click();
 
         // then
-        expect(usersPage.editUserProfile.pageHeader())
-          .to.eventually.eql((users[0].params.firstName + 'i' + ' ' + users[0].params.lastName).toUpperCase());
+        testHelper.expectStringEqual(usersPage.editUserProfile.pageHeader(),
+          users[0].params.firstName + 'i' + ' ' + users[0].params.lastName);
       });
 
     });
@@ -341,7 +343,7 @@ describe('Admin Users Spec', function() {
           usersPage.editUserGroups.selectGroupModal.groupId(0).click().then(function() {
 
             // then
-            expect(groupsPage.editGroup.pageHeader()).to.eventually.eql(groupName.toUpperCase());
+            testHelper.expectStringEqual(groupsPage.editGroup.pageHeader(), groupName);
           });
         });
       });

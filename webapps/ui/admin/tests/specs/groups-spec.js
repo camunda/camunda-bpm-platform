@@ -3,6 +3,8 @@
 var testHelper = require('../../../common/tests/test-helper');
 var setupFile = require('./groups-setup');
 
+testHelper.expectStringEqual = require('../../../common/tests/string-equal');
+
 var groupsPage = require('../pages/groups');
 var usersPage = require('../pages/users');
 
@@ -29,7 +31,7 @@ describe('Admin Groups Spec', function() {
       groupsPage.newGroup.isActive();
 
       // then
-      expect(groupsPage.newGroup.pageHeader()).to.eventually.eql('Create New Group'.toUpperCase());
+      testHelper.expectStringEqual(groupsPage.newGroup.pageHeader(), 'Create New Group');
     });
 
 
@@ -69,7 +71,7 @@ describe('Admin Groups Spec', function() {
         groupsPage.selectGroupByNameLink(0);
 
         // then
-        expect(groupsPage.editGroup.pageHeader()).to.eventually.eql(groupName.toUpperCase());
+        testHelper.expectStringEqual(groupsPage.editGroup.pageHeader(), groupName);
       });
     });
 
@@ -124,7 +126,7 @@ describe('Admin Groups Spec', function() {
       groupsPage.selectGroupByNameLink(1);
 
       // then
-      expect(groupsPage.editGroup.pageHeader()).to.eventually.eql('camunda BPM Administrators'.toUpperCase());
+      testHelper.expectStringEqual(groupsPage.editGroup.pageHeader(), 'camunda BPM Administrators');
       groupsPage.editGroup.isActive({ group: 'camunda-admin' });
       expect(groupsPage.editGroup.updateGroupButton().isEnabled()).to.eventually.eql(false);
     });
@@ -137,7 +139,7 @@ describe('Admin Groups Spec', function() {
       groupsPage.editGroup.updateGroupButton().click();
 
       // then
-      expect(groupsPage.editGroup.pageHeader()).to.eventually.eql('camunda BPM Administratorsi'.toUpperCase());
+      testHelper.expectStringEqual(groupsPage.editGroup.pageHeader(), 'camunda BPM Administratorsi');
     });
 
 

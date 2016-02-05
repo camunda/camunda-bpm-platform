@@ -3,6 +3,8 @@
 var testHelper = require('../../../common/tests/test-helper');
 var setupFile = require('./admin-user-setup');
 
+testHelper.expectStringEqual = require('../../../common/tests/string-equal');
+
 var usersPage = require('../pages/users');
 
 describe('Admin admin-user Spec', function() {
@@ -18,7 +20,7 @@ describe('Admin admin-user Spec', function() {
     usersPage.navigateToWebapp('Admin');
 
     // then
-    expect(usersPage.adminUserSetup.pageHeader()).to.eventually.eql('SETUP');
+    testHelper.expectStringEqual(usersPage.adminUserSetup.pageHeader(), 'SETUP');
     expect(usersPage.adminUserSetup.createNewAdminButton().isEnabled()).to.eventually.eql(false);
   });
 
