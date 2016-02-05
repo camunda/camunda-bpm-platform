@@ -6,6 +6,7 @@ var systemPage = require('../pages/system');
 
 var setupFile = require('./system-setup');
 
+testHelper.expectStringEqual = require('../../../common/tests/string-equal');
 
 describe('Admin system Spec', function() {
 
@@ -28,7 +29,7 @@ describe('Admin system Spec', function() {
       // then
       systemPage.general.isActive();
       systemPage.general.loggedInUser('admin');
-      expect(systemPage.pageHeader()).to.eventually.eql('System Settings'.toUpperCase());
+      testHelper.expectStringEqual(systemPage.pageHeader(), 'System Settings');
     });
 
 
