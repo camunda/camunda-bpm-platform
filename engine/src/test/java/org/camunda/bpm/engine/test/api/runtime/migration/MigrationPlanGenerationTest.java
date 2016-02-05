@@ -232,20 +232,34 @@ public class MigrationPlanGenerationTest {
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(testProcess);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(testProcess);
 
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    assertThat(migrationPlan)
+      .hasSourceProcessDefinition(sourceProcessDefinition)
+      .hasTargetProcessDefinition(targetProcessDefinition)
+      .hasEmptyInstructions();
+  }
+
+  @Test
+  public void testMapEqualActivitiesIgnoreUnsupportedActivities() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.UNSUPPORTED_ACTIVITIES);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.UNSUPPORTED_ACTIVITIES);
+
     // when
-    try {
-      MigrationPlan migrationPlan = rule.getRuntimeService()
-        .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-        .mapEqualActivities()
-        .build();
-      Assert.fail("Should not succeed");
-    }
-    catch (MigrationPlanValidationException e) {
-      assertThat(e.getValidationReport())
-        .hasFailures(2)
-        .hasFailure("userTask", "multi instance child activities are currently not supported")
-        .hasFailure("userTask#multiInstanceBody", "the source and target activity must be of type 'org.camunda.bpm.engine.impl.bpmn.behavior.SubProcessActivityBehavior'");
-    }
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapEqualActivities()
+      .build();
+
+    // then
+    assertThat(migrationPlan)
+      .hasSourceProcessDefinition(sourceProcessDefinition)
+      .hasTargetProcessDefinition(targetProcessDefinition)
+      .hasEmptyInstructions();
   }
 
 }

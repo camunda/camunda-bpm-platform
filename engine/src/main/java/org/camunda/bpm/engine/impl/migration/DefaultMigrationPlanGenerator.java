@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.bpmn.behavior.SubProcessActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
@@ -64,7 +65,10 @@ public class DefaultMigrationPlanGenerator implements MigrationInstructionGenera
     boolean matchingTypes = (sourceScope == sourceScope.getProcessDefinition() && targetScope == targetScope.getProcessDefinition())
         || (sourceScope.getActivityBehavior().getClass() == targetScope.getActivityBehavior().getClass());
 
-    return matchingIds && matchingTypes && areScopes;
+    boolean supportedTypes = sourceScope.getActivityBehavior() instanceof SubProcessActivityBehavior ||
+      sourceScope.getActivityBehavior() instanceof UserTaskActivityBehavior;
+
+    return matchingIds && areScopes && matchingTypes && supportedTypes;
   }
 
   protected boolean areEqualActivities(ActivityImpl sourceActivity, ActivityImpl targetActivity) {

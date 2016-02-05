@@ -167,4 +167,15 @@ public class ProcessModels {
       .boundaryEvent().message("Message")
       .done();
 
+  public static final BpmnModelInstance UNSUPPORTED_ACTIVITIES = Bpmn.createExecutableProcess(PROCESS_KEY)
+    .startEvent()
+    .businessRuleTask("decisionTask")
+      .camundaDecisionRef("testDecision")
+    .intermediateCatchEvent("catch")
+      .message("Message")
+    .intermediateThrowEvent("throw")
+      .message("Message")
+    .endEvent()
+    .done();
+
 }
