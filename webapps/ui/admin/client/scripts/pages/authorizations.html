@@ -13,23 +13,21 @@
       </h1>
     </div>
 
-    <div class="col-md-3">
-      <div class="well sidebar-nav">
-        <ul class="nav nav-list">
-          <li class="nav-header">Resources</li>
-          <li ng-class="activeClass('resource='+res.id)"
-              ng-repeat="res in resourceList | orderBy:'name':false">
-            <a href="#/authorization/?resource={{res.id}}">{{res.name}}</a>
-          </li>
-        </ul>
-      </div>
+    <div class="col-md-3 sidebar-nav">
+      <h2>Resources</h2>
+      <ul>
+        <li ng-class="activeClass('resource='+res.id)"
+            ng-repeat="res in resourceList | orderBy:'name':false">
+          <a href="#/authorization/?resource={{res.id}}">{{res.name}}</a>
+        </li>
+      </ul>
     </div>
 
     <form class="col-md-9 form-horizontal"
           name="createAuthForm"
           ng-controller="AuthorizationCreateController">
 
-      <legend>{{title}} Authorizations</legend>
+      <h2>{{title}} Authorizations</h2>
 
       <table class="cam-table">
         <thead>
