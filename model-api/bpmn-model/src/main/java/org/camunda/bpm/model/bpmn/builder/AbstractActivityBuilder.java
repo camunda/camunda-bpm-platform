@@ -16,7 +16,11 @@ package org.camunda.bpm.model.bpmn.builder;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.Activity;
 import org.camunda.bpm.model.bpmn.instance.BoundaryEvent;
+import org.camunda.bpm.model.bpmn.instance.ExtensionElements;
 import org.camunda.bpm.model.bpmn.instance.MultiInstanceLoopCharacteristics;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaInputOutput;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaInputParameter;
+import org.camunda.bpm.model.bpmn.instance.camunda.CamundaOutputParameter;
 
 /**
  * @author Sebastian Menski
@@ -44,4 +48,47 @@ public abstract class AbstractActivityBuilder<B extends AbstractActivityBuilder<
     return miCharacteristics.builder();
   }
 
+  /**
+   * Creates a new camunda input parameter extension element with the
+   * given name and value.
+   *
+   * @param name the name of the input parameter
+   * @param value the value of the input parameter
+   * @return the builder object
+   */
+  public B camundaInputParameter(String name, String value) {
+    ExtensionElements extensionElements = getCreateSingleChild(ExtensionElements.class);
+    CamundaInputOutput camundaInputOutput = getCreateSingleChild(extensionElements, CamundaInputOutput.class);
+
+    CamundaInputParameter camundaInputParameter = modelInstance.newInstance(CamundaInputParameter.class);
+    camundaInputParameter.setCamundaName(name);
+    camundaInputParameter.setTextContent(value);
+    camundaInputOutput.addChildElement(camundaInputParameter);
+
+    return myself;
+  }
+
+  /**
+   * Creates a new camunda output parameter extension element with the
+   * given name and value.
+   *
+   * @param name the name of the output parameter
+   * @param value the value of the output parameter
+   * @return the builder object
+   */
+  public B camundaOutputParameter(String name, String value) {
+    CamundaOutputParameter camundaOutputParameter = modelInstance.newInstance(CamundaOutputParameter.class);
+    camundaOutputParameter.setCamundaName(name);
+    camundaOutputParameter.setTextContent(value);
+
+    CamundaInputOutput camundaInputOutput = element.getExtensionElements().getElementsQuery().filterByType(CamundaInputOutput.class).singleResult();
+    if (camundaInputOutput == null) {
+      camundaInputOutput = modelInstance.newInstance(CamundaInputOutput.class);
+      addExtensionElement(camundaInputOutput);
+    }
+
+    camundaInputOutput.addChildElement(camundaOutputParameter);
+
+    return myself;
+  }
 }

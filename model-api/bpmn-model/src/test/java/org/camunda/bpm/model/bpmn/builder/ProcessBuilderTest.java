@@ -1207,6 +1207,7 @@ public class ProcessBuilderTest {
     assertThat(miCharacteristic.isSequential()).isFalse();
   }
 
+  @Test
   public void testTaskWithCamundaInputOutput() {
     modelInstance = Bpmn.createProcess()
       .startEvent()
@@ -1256,6 +1257,70 @@ public class ProcessBuilderTest {
       .camundaOutputParameter("three", "four");
 
     assertCamundaInputOutputParameter(task);
+  }
+
+  @Test
+  public void testSubProcessWithCamundaInputOutput() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .subProcess("subProcess")
+        .camundaInputParameter("foo", "bar")
+        .camundaInputParameter("yoo", "hoo")
+        .camundaOutputParameter("one", "two")
+        .camundaOutputParameter("three", "four")
+        .embeddedSubProcess()
+          .startEvent()
+          .endEvent()
+        .subProcessDone()
+      .endEvent()
+      .done();
+
+    SubProcess subProcess = modelInstance.getModelElementById("subProcess");
+    assertCamundaInputOutputParameter(subProcess);
+  }
+
+  @Test
+  public void testSubProcessWithCamundaInputOutputWithExistingExtensionElements() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .subProcess("subProcess")
+        .camundaExecutionListenerExpression("end", "${true}")
+        .camundaInputParameter("foo", "bar")
+        .camundaInputParameter("yoo", "hoo")
+        .camundaOutputParameter("one", "two")
+        .camundaOutputParameter("three", "four")
+        .embeddedSubProcess()
+          .startEvent()
+          .endEvent()
+        .subProcessDone()
+      .endEvent()
+      .done();
+
+    SubProcess subProcess = modelInstance.getModelElementById("subProcess");
+    assertCamundaInputOutputParameter(subProcess);
+  }
+
+  @Test
+  public void testSubProcessWithCamundaInputOutputWithExistingCamundaInputOutput() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .subProcess("subProcess")
+        .camundaInputParameter("foo", "bar")
+        .camundaOutputParameter("one", "two")
+        .embeddedSubProcess()
+          .startEvent()
+          .endEvent()
+        .subProcessDone()
+      .endEvent()
+      .done();
+
+    SubProcess subProcess = modelInstance.getModelElementById("subProcess");
+
+    subProcess.builder()
+      .camundaInputParameter("yoo", "hoo")
+      .camundaOutputParameter("three", "four");
+
+    assertCamundaInputOutputParameter(subProcess);
   }
 
   protected Message assertMessageCatchEventDefinition(String elementId, String messageName) {
