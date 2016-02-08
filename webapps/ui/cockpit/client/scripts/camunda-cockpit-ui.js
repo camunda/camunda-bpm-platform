@@ -90,12 +90,6 @@ var angular = require('angular');
     }]);
 
       angular.bootstrap(document, [ appNgModule.name ]);
-      var html = document.getElementsByTagName('html')[0];
-
-      html.setAttribute('ng-app', appNgModule.name);
-      if (html.dataset) {
-        html.dataset.ngApp = appNgModule.name;
-      }
 
       if (top !== window) {
         window.parent.postMessage({ type: 'loadamd' }, '*');
