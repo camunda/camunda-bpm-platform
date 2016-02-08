@@ -6,6 +6,8 @@ chai.use(promised);
 global.expect   = chai.expect;
 
 var tested = process.env.TESTED || '*';
+var testedApp = process.env.TESTED_APP || 'admin,tasklist,cockpit';
+testedApp = testedApp.indexOf(',') > -1 ? ('{' + testedApp + '}') : testedApp;
 
 exports.config = {
 
@@ -36,7 +38,7 @@ exports.config = {
   // Spec patterns are relative to the location of the spec file. They may
   // include glob patterns.
   specs: [
-    '../../{admin,tasklist,cockpit}/tests/specs/' + tested + '-spec.js'
+    '../../'+ testedApp +'/tests/specs/' + tested + '-spec.js'
   ],
 
   // A base URL for your application under test. Calls to protractor.get()
