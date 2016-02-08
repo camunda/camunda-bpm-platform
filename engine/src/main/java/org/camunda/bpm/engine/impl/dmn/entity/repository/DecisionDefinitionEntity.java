@@ -37,6 +37,7 @@ public class DecisionDefinitionEntity extends DmnDecisionTableImpl implements De
   protected String deploymentId;
   protected String resourceName;
   protected String diagramResourceName;
+  protected String tenantId;
 
   // firstVersion is true, when version == 1 or when
   // this definition does not have any previous definitions
@@ -128,6 +129,14 @@ public class DecisionDefinitionEntity extends DmnDecisionTableImpl implements De
     this.diagramResourceName = diagramResourceName;
   }
 
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
   public Object getPersistentState() {
     return DecisionDefinitionEntity.class;
   }
@@ -214,18 +223,8 @@ public class DecisionDefinitionEntity extends DmnDecisionTableImpl implements De
       ", key='" + key + '\'' +
       ", version=" + version +
       ", deploymentId='" + deploymentId + '\'' +
+      ", tenantId='" + tenantId + '\'' +
       '}';
-  }
-
-  @Override
-  public String getTenantId() {
-    // TODO add tenant id - see CAM-5190
-    return null;
-  }
-
-  @Override
-  public void setTenantId(String tenantId) {
-    // TODO set tenant id - see CAM-5190
   }
 
 }

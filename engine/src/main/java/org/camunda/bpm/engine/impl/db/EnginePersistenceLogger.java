@@ -578,5 +578,12 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         "073", "Cannot set different tenantId on subtask than on parent Task. Parent taskId: '{}', tenantId: '{}', tenant id to set '{}'", parentTaskId, tenantId, tenantIdToSet));
   }
 
+  public ProcessEngineException multipleTenantsForDecisionDefinitionKeyException(String decisionDefinitionKey) {
+    return new ProcessEngineException(exceptionMessage(
+        "074",
+        "Cannot resolve a unique decision definition for key '{}' because it exists for multiple tenants.",
+        decisionDefinitionKey
+        ));
+  }
 
 }

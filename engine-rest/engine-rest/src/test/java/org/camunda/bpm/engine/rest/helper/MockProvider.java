@@ -2239,7 +2239,7 @@ public abstract class MockProvider {
     return mocks;
   }
 
-  public static DecisionDefinition createMockDecisionDefinition() {
+  public static MockDecisionDefinitionBuilder mockDecisionDefinition() {
     MockDecisionDefinitionBuilder builder = new MockDecisionDefinitionBuilder();
 
     return builder
@@ -2251,21 +2251,17 @@ public abstract class MockProvider {
       .resource(EXAMPLE_DECISION_DEFINITION_RESOURCE_NAME)
       .diagram(EXAMPLE_DECISION_DEFINITION_DIAGRAM_RESOURCE_NAME)
       .deploymentId(EXAMPLE_DEPLOYMENT_ID)
-      .build();
+      .tenantId(EXAMPLE_TENANT_ID);
+  }
+
+  public static DecisionDefinition createMockDecisionDefinition() {
+    return mockDecisionDefinition().build();
   }
 
   public static DecisionDefinition createAnotherMockDecisionDefinition() {
-    MockDecisionDefinitionBuilder builder = new MockDecisionDefinitionBuilder();
-
-    return builder
+    return mockDecisionDefinition()
       .id(ANOTHER_EXAMPLE_DECISION_DEFINITION_ID)
-      .category(EXAMPLE_DECISION_DEFINITION_CATEGORY)
-      .name(EXAMPLE_DECISION_DEFINITION_NAME)
-      .key(EXAMPLE_DECISION_DEFINITION_KEY)
-      .version(EXAMPLE_DECISION_DEFINITION_VERSION)
-      .resource(EXAMPLE_DECISION_DEFINITION_RESOURCE_NAME)
-      .diagram(EXAMPLE_DECISION_DEFINITION_DIAGRAM_RESOURCE_NAME)
-      .deploymentId(EXAMPLE_DEPLOYMENT_ID)
+      .tenantId(ANOTHER_EXAMPLE_TENANT_ID)
       .build();
   }
 

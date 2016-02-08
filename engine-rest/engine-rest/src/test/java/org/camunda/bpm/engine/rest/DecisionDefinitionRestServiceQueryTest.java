@@ -185,6 +185,11 @@ public class DecisionDefinitionRestServiceQueryTest extends AbstractRestServiceT
     inOrder.verify(mockedQuery).orderByDeploymentId();
     inOrder.verify(mockedQuery).asc();
 
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("tenantId", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderByTenantId();
+    inOrder.verify(mockedQuery).asc();
+
     // desc
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("id", "desc", Status.OK);
@@ -214,6 +219,11 @@ public class DecisionDefinitionRestServiceQueryTest extends AbstractRestServiceT
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("deploymentId", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByDeploymentId();
+    inOrder.verify(mockedQuery).desc();
+
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("tenantId", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderByTenantId();
     inOrder.verify(mockedQuery).desc();
   }
 
@@ -296,6 +306,7 @@ public class DecisionDefinitionRestServiceQueryTest extends AbstractRestServiceT
     int returnedVersion = from(content).getInt("[0].version");
     String returnedResource = from(content).getString("[0].resource");
     String returnedDeploymentId = from(content).getString("[0].deploymentId");
+    String returnedTenantId = from(content).getString("[0].tenantId");
 
     assertThat(returnedId).isEqualTo(MockProvider.EXAMPLE_DECISION_DEFINITION_ID);
     assertThat(returnedKey).isEqualTo(MockProvider.EXAMPLE_DECISION_DEFINITION_KEY);
@@ -304,6 +315,7 @@ public class DecisionDefinitionRestServiceQueryTest extends AbstractRestServiceT
     assertThat(returnedVersion).isEqualTo(MockProvider.EXAMPLE_DECISION_DEFINITION_VERSION);
     assertThat(returnedResource).isEqualTo(MockProvider.EXAMPLE_DECISION_DEFINITION_RESOURCE_NAME);
     assertThat(returnedDeploymentId).isEqualTo(MockProvider.EXAMPLE_DEPLOYMENT_ID);
+    assertThat(returnedTenantId).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
   }
 
   @Test
@@ -374,6 +386,32 @@ public class DecisionDefinitionRestServiceQueryTest extends AbstractRestServiceT
     verify(mockedQuery).decisionDefinitionResourceNameLike(queryParameters.get("resourceNameLike"));
     verify(mockedQuery).list();
   }
+
+  @Test
+  public void testDecisionDefinitionTenantIdList() {
+    mockedQuery = createMockDecisionDefinitionQuery(MockProvider.createMockTwoDecisionDefinitions());
+
+    Response response = given()
+      .queryParam("tenantIdIn", MockProvider.EXAMPLE_TENANT_ID_LIST)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when()
+      .get(DECISION_DEFINITION_QUERY_URL);
+
+    verify(mockedQuery).tenantIdIn(MockProvider.EXAMPLE_TENANT_ID, MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+    verify(mockedQuery).list();
+
+    String content = response.asString();
+    List<String> definitions = from(content).getList("");
+    assertThat(definitions).hasSize(2);
+
+    String returnedTenantId1 = from(content).getString("[0].tenantId");
+    String returnedTenantId2 = from(content).getString("[1].tenantId");
+
+    assertThat(returnedTenantId1).isEqualTo(MockProvider.EXAMPLE_TENANT_ID);
+    assertThat(returnedTenantId2).isEqualTo(MockProvider.ANOTHER_EXAMPLE_TENANT_ID);
+  }
+
 
   @Test
   public void testQueryCount() {

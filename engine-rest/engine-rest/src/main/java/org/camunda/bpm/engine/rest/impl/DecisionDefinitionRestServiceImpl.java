@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
@@ -46,20 +47,27 @@ public class DecisionDefinitionRestServiceImpl extends AbstractRestProcessEngine
 
     ProcessEngine engine = getProcessEngine();
     RepositoryService repositoryService = engine.getRepositoryService();
-    DecisionDefinitionQuery query = repositoryService.createDecisionDefinitionQuery();
 
-    query
+    List<DecisionDefinition> decisionDefinitions = repositoryService
+      .createDecisionDefinitionQuery()
       .decisionDefinitionKey(decisionDefinitionKey)
-      .latestVersion();
+      .latestVersion()
+      .list();
 
-    DecisionDefinition decisionDefinition = query.singleResult();
-
-    if (decisionDefinition == null) {
+    if (decisionDefinitions.isEmpty()) {
       String errorMessage = String.format("No matching decision definition with key: %s ", decisionDefinitionKey);
       throw new RestException(Status.NOT_FOUND, errorMessage);
-    }
 
-    return getDecisionDefinitionById(decisionDefinition.getId());
+    } else if(decisionDefinitions.size() > 1) {
+      String errorMessage = String.format(
+          "Found multiple decision definition with key '%s' for different tenants. You have to request the decision definition by id instead of key.",
+          decisionDefinitionKey);
+      throw new RestException(Status.BAD_REQUEST, errorMessage);
+
+    } else {
+      DecisionDefinition decisionDefinition = decisionDefinitions.get(0);
+      return getDecisionDefinitionById(decisionDefinition.getId());
+    }
   }
 
   @Override

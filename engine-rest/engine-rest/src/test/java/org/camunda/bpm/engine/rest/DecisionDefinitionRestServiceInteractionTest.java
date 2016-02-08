@@ -32,8 +32,10 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.dmn.engine.DmnDecisionTableResult;
@@ -60,8 +62,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-
-import javax.ws.rs.core.Response.Status;
 
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
@@ -101,6 +101,7 @@ public class DecisionDefinitionRestServiceInteractionTest extends AbstractRestSe
     when(decisionDefinitionQueryMock.decisionDefinitionKey(MockProvider.EXAMPLE_DECISION_DEFINITION_KEY)).thenReturn(decisionDefinitionQueryMock);
     when(decisionDefinitionQueryMock.latestVersion()).thenReturn(decisionDefinitionQueryMock);
     when(decisionDefinitionQueryMock.singleResult()).thenReturn(mockDecisionDefinition);
+    when(decisionDefinitionQueryMock.list()).thenReturn(Collections.singletonList(mockDecisionDefinition));
     when(repositoryServiceMock.createDecisionDefinitionQuery()).thenReturn(decisionDefinitionQueryMock);
 
     decisionServiceMock = mock(DecisionService.class);
@@ -143,6 +144,7 @@ public class DecisionDefinitionRestServiceInteractionTest extends AbstractRestSe
         .body("deploymentId", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_ID))
         .body("version", equalTo(MockProvider.EXAMPLE_DECISION_DEFINITION_VERSION))
         .body("resource", equalTo(MockProvider.EXAMPLE_DECISION_DEFINITION_RESOURCE_NAME))
+        .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
     .when()
       .get(SINGLE_DECISION_DEFINITION_URL);
 
@@ -178,6 +180,7 @@ public class DecisionDefinitionRestServiceInteractionTest extends AbstractRestSe
         .body("deploymentId", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_ID))
         .body("version", equalTo(MockProvider.EXAMPLE_DECISION_DEFINITION_VERSION))
         .body("resource", equalTo(MockProvider.EXAMPLE_DECISION_DEFINITION_RESOURCE_NAME))
+        .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
     .when()
       .get(SINGLE_DECISION_DEFINITION_BY_KEY_URL);
 
@@ -191,6 +194,7 @@ public class DecisionDefinitionRestServiceInteractionTest extends AbstractRestSe
     when(repositoryServiceMock.createDecisionDefinitionQuery().decisionDefinitionKey(nonExistingKey)).thenReturn(decisionDefinitionQueryMock);
     when(decisionDefinitionQueryMock.latestVersion()).thenReturn(decisionDefinitionQueryMock);
     when(decisionDefinitionQueryMock.singleResult()).thenReturn(null);
+    when(decisionDefinitionQueryMock.list()).thenReturn(Collections.<DecisionDefinition> emptyList());
 
     given()
       .pathParam("key", nonExistingKey)
@@ -201,6 +205,23 @@ public class DecisionDefinitionRestServiceInteractionTest extends AbstractRestSe
         .body("message", containsString("No matching decision definition with key: " + nonExistingKey))
     .when()
       .get(SINGLE_DECISION_DEFINITION_BY_KEY_URL);
+  }
+
+  @Test
+  public void testDecisionDefinitionRetrievalForMultipleTenants_ByKey() {
+    // decision definition is deployed for two tenants
+    List<DecisionDefinition> decisionDefinitions = MockProvider.createMockTwoDecisionDefinitions();
+
+    when(decisionDefinitionQueryMock.list()).thenReturn(decisionDefinitions);
+    when(decisionDefinitionQueryMock.count()).thenReturn(2L);
+    when(decisionDefinitionQueryMock.singleResult()).thenThrow(new ProcessEngineException("not a unique result"));
+
+    given().pathParam("key", MockProvider.EXAMPLE_DECISION_DEFINITION_KEY)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", is(RestException.class.getSimpleName()))
+      .body("message", containsString("Found multiple decision definition with key '"+MockProvider.EXAMPLE_DECISION_DEFINITION_KEY+"' for different tenants"))
+    .when().get(SINGLE_DECISION_DEFINITION_BY_KEY_URL);
   }
 
   @Test

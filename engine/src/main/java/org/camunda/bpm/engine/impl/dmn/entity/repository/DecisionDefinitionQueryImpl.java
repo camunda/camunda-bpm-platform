@@ -42,6 +42,7 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
   protected String resourceNameLike;
   protected Integer version;
   protected boolean latest = false;
+  protected String[] tenantIds;
 
   public DecisionDefinitionQueryImpl() {
   }
@@ -129,6 +130,12 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
     return this;
   }
 
+  public DecisionDefinitionQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    return this;
+  }
+
   public DecisionDefinitionQuery orderByDecisionDefinitionCategory() {
     orderBy(DecisionDefinitionQueryProperty.DECISION_DEFINITION_CATEGORY);
     return this;
@@ -159,8 +166,13 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
     return this;
   }
 
+  public DecisionDefinitionQuery orderByTenantId() {
+    return orderBy(DecisionDefinitionQueryProperty.TENANT_ID);
+  }
+
   //results ////////////////////////////////////////////
 
+  @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     return commandContext
@@ -168,6 +180,7 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
       .findDecisionDefinitionCountByQueryCriteria(this);
   }
 
+  @Override
   public List<DecisionDefinition> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     return commandContext
@@ -175,6 +188,7 @@ public class DecisionDefinitionQueryImpl extends AbstractQuery<DecisionDefinitio
       .findDecisionDefinitionsByQueryCriteria(this, page);
   }
 
+  @Override
   public void checkQueryOk() {
     super.checkQueryOk();
 
