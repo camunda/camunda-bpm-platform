@@ -89,7 +89,7 @@ module.exports = function(config, copyConf) {
           expand: true,
           cwd: '<%= pkg.gruntConfig.commonsUiDir %>/node_modules/bootstrap/fonts',
           src: [
-            '*.{eot,ttf,svg,woff}'
+            '*.{eot,ttf,svg,woff,woff2}'
           ],
           dest: '<%= pkg.gruntConfig.cockpitBuildTarget %>/fonts/'
         },
