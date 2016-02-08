@@ -54,7 +54,10 @@ module.exports = function(grunt) {
       options: {
         liverreload: false,
       },
-      files: ['node_modules/camunda-commons-ui/{lib,resources}/**/*.less'],
+      files: [
+        'ui/common/styles/**/*.less',
+        'node_modules/camunda-commons-ui/{lib,resources}/**/*.less'
+      ],
       tasks: ['less']
     }
   };
