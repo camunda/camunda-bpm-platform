@@ -103,6 +103,88 @@
 
 
 
+
+// Give the tabs something to sit on
+.nav-tabs {
+  > li {
+    border: none;
+    margin: 0;
+    vertical-align: bottom;
+
+    > a {
+      line-height: @line-height-base;
+      border: none;
+      background: none;
+      display: block;
+      overflow: hidden;
+      margin: 0;
+      padding-bottom: 5px;
+
+      &:hover,
+      &:focus {
+        background: none;
+      }
+    }
+
+    &:after {
+      content: '';
+      display: block;
+      height: 5px;
+      bottom: 0;
+      width: 100%;
+      border: none;
+    }
+
+    &:hover/*,
+    &:focus*/ {
+      border: none;
+      background: none;
+      &:after {
+        background-color: @link-hover-color;
+      }
+    }
+
+    &.active {
+      border: none;
+      > a {
+        &,
+        &:hover,
+        &:focus {
+          color: @nav-tabs-active-link-hover-color;
+          background: none;
+          border: none;
+          cursor: default;
+        }
+      }
+
+      &:after {
+        background-color: @nav-tabs-active-link-hover-border-color;
+      }
+    }
+  }
+
+  .nav-justified();
+  .nav-tabs-justified();
+
+  > .active > a,
+  > .active > a:hover,
+  > .active > a:focus {
+    border: none;
+  }
+
+  @media (min-width: @screen-sm-min) {
+    > li > a {
+      border: none;
+    }
+  }
+
+  padding-left: 0;
+  padding-right: 0;
+  margin-top: 5px;
+  border: 5px solid @gray-lighter;
+  border-width: 1px 0 5px 0;
+}
+
 @import "_animate-spin";
 @import "_modal";
 @import "_cam-table";
