@@ -25,25 +25,29 @@ public class MigrationInstructionValidators {
   // Validators
 
   public static final MigrationInstructionValidator ACTIVITIES_CAN_BE_MIGRATED = new MigrationInstructionValidator() {
-    public final List<MigrationActivityValidator> activityValidators = Arrays.asList(
+    public final List<MigrationActivityValidator> sourceActivityValidators = Arrays.asList(
       MigrationActivityValidators.SUPPORTED_ACTIVITY, MigrationActivityValidators.NOT_MULTI_INSTANCE_CHILD, MigrationActivityValidators.HAS_NO_BOUNDARY_EVENT
     );
 
+    public final List<MigrationActivityValidator> targetActivityValidators = Arrays.asList(
+      MigrationActivityValidators.SUPPORTED_ACTIVITY, MigrationActivityValidators.NOT_MULTI_INSTANCE_CHILD
+    );
+
     public boolean isInstructionValid(MigrationInstruction instruction, ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition) {
-      return canActivitiesBeMigrated(instruction.getSourceActivityIds(), sourceProcessDefinition) &&
-        canActivitiesBeMigrated(instruction.getTargetActivityIds(), targetProcessDefinition);
+      return canActivitiesBeMigrated(instruction.getSourceActivityIds(), sourceProcessDefinition, sourceActivityValidators) &&
+        canActivitiesBeMigrated(instruction.getTargetActivityIds(), targetProcessDefinition, targetActivityValidators);
     }
 
-    protected boolean canActivitiesBeMigrated(List<String> activityIds, ProcessDefinitionImpl processDefinition) {
+    protected boolean canActivitiesBeMigrated(List<String> activityIds, ProcessDefinitionImpl processDefinition, List<MigrationActivityValidator> activityValidators) {
       for (String activityId : activityIds) {
-        if (!canActivityBeMigrated(activityId, processDefinition)) {
+        if (!canActivityBeMigrated(activityId, processDefinition, activityValidators)) {
           return false;
         }
       }
       return true;
     }
 
-    protected boolean canActivityBeMigrated(String activityId, ProcessDefinitionImpl processDefinition) {
+    protected boolean canActivityBeMigrated(String activityId, ProcessDefinitionImpl processDefinition, List<MigrationActivityValidator> activityValidators) {
       for (MigrationActivityValidator activityValidator : activityValidators) {
         if (!activityValidator.canBeMigrated(activityId, processDefinition)) {
           return false;

@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.engine.impl.migration.instance;
 
+import java.util.List;
+
+import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
@@ -77,12 +80,17 @@ public class MigratingScopeActivityInstance extends MigratingActivityInstance {
       parentExecution.setProcessDefinition(targetScope.getProcessDefinition());
     }
 
-    if (sourceScope.getId().equals(currentScopeExecution.getActivityId())) {
+    if (!currentScopeExecution.isProcessInstanceExecution()) {
       currentScopeExecution.setActivity((PvmActivity) targetScope);
     }
 
-  }
+    createMissingEventSubscriptions(currentScopeExecution);
+    createMissingTimerJobs(currentScopeExecution);
 
+    if (!isLeafActivity()) {
+      currentScopeExecution.setActivity(null);
+    }
+  }
 
   @Override
   public void remove() {
@@ -111,6 +119,10 @@ public class MigratingScopeActivityInstance extends MigratingActivityInstance {
   public ExecutionEntity getFlowScopeExecution() {
     ExecutionEntity parent = representativeExecution.getParent();
     return parent.isScope() ? parent : parent.getParent();
+  }
+
+  protected boolean isLeafActivity() {
+    return targetScope.getActivities().isEmpty();
   }
 
 }

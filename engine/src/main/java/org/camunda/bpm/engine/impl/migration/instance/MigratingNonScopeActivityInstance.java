@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.migration.instance;
 
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
+import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
 
 /**
  * @author Thorben Lindhauer
@@ -68,6 +69,34 @@ public class MigratingNonScopeActivityInstance extends MigratingActivityInstance
     ExecutionEntity currentExecution = resolveRepresentativeExecution();
     currentExecution.setProcessDefinition(targetScope.getProcessDefinition());
     currentExecution.setActivity((PvmActivity) targetScope);
+
+    currentExecution = createNewScopeIfNeeded(currentExecution);
+
+    createMissingEventSubscriptions(currentExecution);
+    createMissingTimerJobs(currentExecution);
+  }
+
+  protected ExecutionEntity createNewScopeIfNeeded(ExecutionEntity currentExecution) {
+    if (targetScope.isScope()) {
+      for (MigratingInstance dependentInstance : dependentInstances) {
+        dependentInstance.detachState();
+      }
+
+      currentExecution = currentExecution.createExecution();
+      ExecutionEntity parent = currentExecution.getParent();
+      parent.setActivity(null);
+
+      if (!parent.isConcurrent()) {
+        parent.leaveActivityInstance();
+      }
+
+      representativeExecution = currentExecution;
+      for (MigratingInstance dependentInstance : dependentInstances) {
+        dependentInstance.attachState(currentExecution);
+      }
+    }
+
+    return currentExecution;
   }
 
   @Override

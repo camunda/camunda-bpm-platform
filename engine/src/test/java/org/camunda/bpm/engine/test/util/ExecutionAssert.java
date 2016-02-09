@@ -32,13 +32,15 @@ public class ExecutionAssert {
     return assertion;
   }
 
-  public void matches(ExecutionTreeAssertion assertion) {
+  public ExecutionAssert matches(ExecutionTreeAssertion assertion) {
     assertion.assertExecution(tree);
+    return this;
   }
 
-  public void hasProcessDefinitionId(String expectedProcessDefinitionId) {
+  public ExecutionAssert hasProcessDefinitionId(String expectedProcessDefinitionId) {
     ExecutionTreeAssertion assertion = ExecutionTreeProcessDefinitionIdAssertion.processDefinitionId(expectedProcessDefinitionId);
     matches(assertion);
+    return this;
   }
 
   public static class ExecutionTreeBuilder {

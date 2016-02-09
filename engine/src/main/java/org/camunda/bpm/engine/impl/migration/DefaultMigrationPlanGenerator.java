@@ -31,9 +31,14 @@ import org.camunda.bpm.engine.migration.MigrationInstruction;
  */
 public class DefaultMigrationPlanGenerator implements MigrationInstructionGenerator {
 
-  public static final List<MigrationActivityValidator> activityValidators = Arrays.asList(
+  public static final List<MigrationActivityValidator> sourceActivityValidators = Arrays.asList(
     MigrationActivityValidators.SUPPORTED_ACTIVITY,
     MigrationActivityValidators.HAS_NO_BOUNDARY_EVENT,
+    MigrationActivityValidators.NOT_MULTI_INSTANCE_CHILD
+  );
+
+  public static final List<MigrationActivityValidator> targetActivityValidators = Arrays.asList(
+    MigrationActivityValidators.SUPPORTED_ACTIVITY,
     MigrationActivityValidators.NOT_MULTI_INSTANCE_CHILD
   );
 
@@ -52,7 +57,7 @@ public class DefaultMigrationPlanGenerator implements MigrationInstructionGenera
     for (ActivityImpl sourceActivity : sourceScope.getActivities()) {
       for (ActivityImpl targetActivity : targetScope.getActivities()) {
         MigrationInstructionImpl migrationInstruction = new MigrationInstructionImpl(sourceActivity.getId(), targetActivity.getId());
-        if (canBeMigrated(sourceActivity, sourceProcessDefinition) && canBeMigrated(targetActivity, targetProcessDefinition) &&
+        if (canBeMigrated(sourceActivity, sourceProcessDefinition, sourceActivityValidators) && canBeMigrated(targetActivity, targetProcessDefinition, targetActivityValidators) &&
             isValidInstruction(migrationInstruction, sourceProcessDefinition, targetProcessDefinition)) {
 
           migrationInstructions.add(migrationInstruction);
@@ -65,7 +70,7 @@ public class DefaultMigrationPlanGenerator implements MigrationInstructionGenera
     }
   }
 
-  protected boolean canBeMigrated(ActivityImpl activity, ProcessDefinitionImpl processDefinition) {
+  protected boolean canBeMigrated(ActivityImpl activity, ProcessDefinitionImpl processDefinition, List<MigrationActivityValidator> activityValidators) {
     for (MigrationActivityValidator activityValidator : activityValidators) {
       if (!activityValidator.canBeMigrated(activity, processDefinition)) {
         return false;

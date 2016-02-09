@@ -19,16 +19,18 @@ package org.camunda.bpm.engine.impl.persistence.entity;
  * @author Daniel Meyer
  */
 public class SignalEventSubscriptionEntity extends EventSubscriptionEntity {
-  
+
   private static final long serialVersionUID = 1L;
-  
+
+  public static final String EVENT_TYPE = "signal";
+
   public SignalEventSubscriptionEntity(ExecutionEntity executionEntity) {
     super(executionEntity);
-    eventType = "signal";
+    eventType = EVENT_TYPE;
   }
   
   public SignalEventSubscriptionEntity() {    
-    eventType = "signal";
+    eventType = EVENT_TYPE;
   }
 
   @Override

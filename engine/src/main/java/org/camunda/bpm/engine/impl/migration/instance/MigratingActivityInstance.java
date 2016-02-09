@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
@@ -64,6 +65,17 @@ public abstract class MigratingActivityInstance implements MigratingInstance {
     }
 
     dependentInstances.add(migratingInstance);
+  }
+
+  protected void createMissingEventSubscriptions(ExecutionEntity currentScopeExecution) {
+    List<EventSubscriptionDeclaration> eventSubscriptionDeclarations = EventSubscriptionDeclaration.getDeclarationsForScope(targetScope);
+    for (EventSubscriptionDeclaration eventSubscriptionDeclaration : eventSubscriptionDeclarations) {
+      eventSubscriptionDeclaration.createSubscription(currentScopeExecution);
+    }
+  }
+
+  protected void createMissingTimerJobs(ExecutionEntity currentScopeExecution) {
+    currentScopeExecution.initializeTimerDeclarations();
   }
 
   public ActivityInstance getActivityInstance() {

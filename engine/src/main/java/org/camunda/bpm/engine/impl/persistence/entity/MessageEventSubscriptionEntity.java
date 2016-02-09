@@ -20,14 +20,16 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 public class MessageEventSubscriptionEntity extends EventSubscriptionEntity {
 
   private static final long serialVersionUID = 1L;
-  
+
+  public static final String EVENT_TYPE = "message";
+
   public MessageEventSubscriptionEntity(ExecutionEntity executionEntity) {
     super(executionEntity);
-    eventType = "message";
+    eventType = EVENT_TYPE;
   }
     
   public MessageEventSubscriptionEntity() {
-    eventType = "message";
+    eventType = EVENT_TYPE;
   }
 
   @Override
