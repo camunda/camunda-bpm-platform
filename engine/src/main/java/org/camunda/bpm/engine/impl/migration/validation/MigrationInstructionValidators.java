@@ -13,16 +13,11 @@
 
 package org.camunda.bpm.engine.impl.migration.validation;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
-import org.camunda.bpm.engine.impl.tree.FlowScopeWalker;
-import org.camunda.bpm.engine.impl.tree.TreeVisitor;
-import org.camunda.bpm.engine.impl.tree.TreeWalker.WalkCondition;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 
 public class MigrationInstructionValidators {
@@ -72,13 +67,6 @@ public class MigrationInstructionValidators {
     }
   };
 
-  public static final MigrationInstructionValidator AT_MOST_ONE_ADDITIONAL_SCOPE = new MigrationInstructionValidator() {
-    public boolean isInstructionValid(MigrationInstruction instruction, ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition) {
-      return ONE_TO_ONE_VALIDATOR.isInstructionValid(instruction, sourceProcessDefinition, targetProcessDefinition) &&
-        atMostOneNewScopeWasAdded(instruction.getSourceActivityIds().get(0), instruction.getTargetActivityIds().get(0), sourceProcessDefinition, targetProcessDefinition);
-    }
-  };
-
   public static final MigrationInstructionValidator SAME_SCOPE = new MigrationInstructionValidator() {
     public boolean isInstructionValid(MigrationInstruction instruction, ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition) {
       return ONE_TO_ONE_VALIDATOR.isInstructionValid(instruction, sourceProcessDefinition, targetProcessDefinition) &&
@@ -98,56 +86,6 @@ public class MigrationInstructionValidators {
 
   protected static boolean isProcessDefinition(ScopeImpl scope) {
     return scope.getProcessDefinition() == scope;
-  }
-
-  protected static boolean atMostOneNewScopeWasAdded(String sourceActivityId, String targetActivityId, ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition) {
-    ActivityImpl sourceActivity = sourceProcessDefinition.findActivity(sourceActivityId);
-    ActivityImpl targetActivity = targetProcessDefinition.findActivity(targetActivityId);
-
-    List<String> originalScopeIds = collectScopeIds(sourceActivity);
-    List<String> addedScopeIds = collectAddedScopeIds(targetActivity, originalScopeIds);
-
-    return addedScopeIds.size() <= 1;
-  }
-
-  protected static List<String> collectScopeIds(final ActivityImpl activity) {
-    FlowScopeWalker flowScopeWalker = new FlowScopeWalker(activity.getFlowScope());
-
-    ScopeIdCollector scopeIdCollector = new ScopeIdCollector();
-    flowScopeWalker.addPreVisitor(scopeIdCollector).walkWhile(new WalkCondition<ScopeImpl>() {
-      public boolean isFulfilled(ScopeImpl element) {
-        return element == null || element == activity.getProcessDefinition();
-      }
-    });
-
-    return scopeIdCollector.getScopeIds();
-  }
-
-  protected static List<String> collectAddedScopeIds(final ActivityImpl activity, final List<String> originalScopeIds) {
-    FlowScopeWalker flowScopeWalker = new FlowScopeWalker(activity.getFlowScope());
-
-    ScopeIdCollector scopeIdCollector = new ScopeIdCollector();
-    flowScopeWalker.addPreVisitor(scopeIdCollector).walkWhile(new WalkCondition<ScopeImpl>() {
-      public boolean isFulfilled(ScopeImpl element) {
-        return element == null || element == activity.getProcessDefinition() || originalScopeIds.contains(element.getId());
-      }
-    });
-
-    return scopeIdCollector.getScopeIds();
-  }
-
-  protected static class ScopeIdCollector implements TreeVisitor<ScopeImpl> {
-
-    public List<String> scopeIds = new ArrayList<String>();
-
-    public void visit(ScopeImpl scope) {
-      scopeIds.add(scope.getId());
-    }
-
-    public List<String> getScopeIds() {
-      return scopeIds;
-    }
-
   }
 
 }

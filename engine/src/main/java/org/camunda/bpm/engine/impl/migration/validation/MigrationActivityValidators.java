@@ -50,7 +50,7 @@ public class MigrationActivityValidators {
 
   public static final MigrationActivityValidator HAS_NO_BOUNDARY_EVENT = new AbstractMigrationActivityValidator() {
     public boolean canBeMigrated(ActivityImpl activity, ProcessDefinitionImpl processDefinition) {
-      return !isScope(activity) || !hasBoundaryEvent(activity, processDefinition);
+      return !isScope(activity) || !hasBoundaryEvent(activity);
     }
   };
 
@@ -68,7 +68,7 @@ public class MigrationActivityValidators {
     return isMultiInstance(flowScopeWalker.getCurrentElement());
   }
 
-  protected static boolean hasBoundaryEvent(ScopeImpl scope, ProcessDefinitionImpl processDefinition) {
+  protected static boolean hasBoundaryEvent(ScopeImpl scope) {
     ScopeImpl flowScope = scope.getFlowScope();
     for (ActivityImpl siblingActivity : flowScope.getActivities()) {
       if (scope.equals(siblingActivity.getEventScope())) {
