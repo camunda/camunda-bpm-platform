@@ -45,7 +45,7 @@ public class AbstractComplexGatewayBuilder<B extends AbstractComplexGatewayBuild
    * @return the builder object
    */
   public B activationCondition(String conditionExpression) {
-    ActivationCondition activationCondition = modelInstance.newInstance(ActivationCondition.class);
+    ActivationCondition activationCondition = createInstance(ActivationCondition.class);
     activationCondition.setTextContent(conditionExpression);
     element.setActivationCondition(activationCondition);
     return myself;

@@ -61,7 +61,7 @@ public abstract class AbstractFlowNodeBuilder<B extends AbstractFlowNodeBuilder<
     if (name != null) {
       getCurrentSequenceFlowBuilder().name(name);
     }
-    ConditionExpression conditionExpression = modelInstance.newInstance(ConditionExpression.class);
+    ConditionExpression conditionExpression = createInstance(ConditionExpression.class);
     conditionExpression.setTextContent(condition);
     getCurrentSequenceFlowBuilder().condition(conditionExpression);
     return myself;

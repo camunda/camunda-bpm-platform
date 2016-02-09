@@ -57,14 +57,11 @@ public abstract class AbstractActivityBuilder<B extends AbstractActivityBuilder<
    * @return the builder object
    */
   public B camundaInputParameter(String name, String value) {
+    CamundaInputOutput camundaInputOutput = getCreateSingleExtensionElement(CamundaInputOutput.class);
 
-    CamundaInputParameter camundaInputParameter = modelInstance.newInstance(CamundaInputParameter.class);
+    CamundaInputParameter camundaInputParameter = createChild(camundaInputOutput, CamundaInputParameter.class);
     camundaInputParameter.setCamundaName(name);
     camundaInputParameter.setTextContent(value);
-
-    ExtensionElements extensionElements = getCreateSingleChild(ExtensionElements.class);
-    CamundaInputOutput camundaInputOutput = getCreateSingleChild(extensionElements, CamundaInputOutput.class);
-    camundaInputOutput.addChildElement(camundaInputParameter);
 
     return myself;
   }
@@ -78,13 +75,11 @@ public abstract class AbstractActivityBuilder<B extends AbstractActivityBuilder<
    * @return the builder object
    */
   public B camundaOutputParameter(String name, String value) {
-    CamundaOutputParameter camundaOutputParameter = modelInstance.newInstance(CamundaOutputParameter.class);
+    CamundaInputOutput camundaInputOutput = getCreateSingleExtensionElement(CamundaInputOutput.class);
+
+    CamundaOutputParameter camundaOutputParameter = createChild(camundaInputOutput, CamundaOutputParameter.class);
     camundaOutputParameter.setCamundaName(name);
     camundaOutputParameter.setTextContent(value);
-
-    ExtensionElements extensionElements = getCreateSingleChild(ExtensionElements.class);
-    CamundaInputOutput camundaInputOutput = getCreateSingleChild(extensionElements, CamundaInputOutput.class);
-    camundaInputOutput.addChildElement(camundaOutputParameter);
 
     return myself;
   }

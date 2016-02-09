@@ -19,6 +19,7 @@ import org.camunda.bpm.model.bpmn.BpmnModelException;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.BaseElement;
 import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
+import org.camunda.bpm.model.bpmn.instance.Definitions;
 import org.camunda.bpm.model.bpmn.instance.ExtensionElements;
 import org.camunda.bpm.model.bpmn.instance.Message;
 import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
@@ -47,14 +48,22 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
   }
 
   protected <T extends BpmnModelElementInstance> T createChild(Class<T> typeClass) {
-    T instance = createInstance(typeClass);
-    element.addChildElement(instance);
-    return instance;
+    return createChild(element, typeClass);
   }
 
   protected <T extends BaseElement> T createChild(Class<T> typeClass, String identifier) {
+    return createChild(element, typeClass, identifier);
+  }
+
+  protected <T extends BpmnModelElementInstance> T createChild(BpmnModelElementInstance parent, Class<T> typeClass) {
+    T instance = createInstance(typeClass);
+    parent.addChildElement(instance);
+    return instance;
+  }
+
+  protected <T extends BaseElement> T createChild(BpmnModelElementInstance parent, Class<T> typeClass, String identifier) {
     T instance = createInstance(typeClass, identifier);
-    element.addChildElement(instance);
+    parent.addChildElement(instance);
     return instance;
   }
 
@@ -77,9 +86,7 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
   protected <T extends BpmnModelElementInstance> T getCreateSingleChild(BpmnModelElementInstance parent, Class<T> typeClass) {
     Collection<T> childrenOfType = parent.getChildElementsByType(typeClass);
     if (childrenOfType.isEmpty()) {
-      T child = modelInstance.newInstance(typeClass);
-      parent.addChildElement(child);
-      return child;
+      return createChild(parent, typeClass);
     }
     else {
       if (childrenOfType.size() > 1) {
@@ -93,6 +100,11 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
     }
   }
 
+  protected <T extends BpmnModelElementInstance> T getCreateSingleExtensionElement(Class<T> typeClass) {
+    ExtensionElements extensionElements = getCreateSingleChild(ExtensionElements.class);
+    return getCreateSingleChild(extensionElements, typeClass);
+  }
+
   protected Message findMessageForName(String messageName) {
     Collection<Message> messages = modelInstance.getModelElementsByType(Message.class);
     for (Message message : messages) {
@@ -103,16 +115,16 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
     }
 
     // create new message for non existing message name
-    Message message = modelInstance.newInstance(Message.class);
+    Definitions definitions = modelInstance.getDefinitions();
+    Message message = createChild(definitions, Message.class);
     message.setName(messageName);
-    modelInstance.getDefinitions().addChildElement(message);
 
     return message;
   }
 
   protected MessageEventDefinition createMessageEventDefinition(String messageName) {
     Message message = findMessageForName(messageName);
-    MessageEventDefinition messageEventDefinition = modelInstance.newInstance(MessageEventDefinition.class);
+    MessageEventDefinition messageEventDefinition = createInstance(MessageEventDefinition.class);
     messageEventDefinition.setMessage(message);
     return messageEventDefinition;
   }
@@ -127,16 +139,16 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
     }
 
     // create new signal for non existing signal name
-    Signal signal = modelInstance.newInstance(Signal.class);
+    Definitions definitions = modelInstance.getDefinitions();
+    Signal signal = createChild(definitions, Signal.class);
     signal.setName(signalName);
-    modelInstance.getDefinitions().addChildElement(signal);
 
     return signal;
   }
 
   protected SignalEventDefinition createSignalEventDefinition(String signalName) {
     Signal signal = findSignalForName(signalName);
-    SignalEventDefinition signalEventDefinition = modelInstance.newInstance(SignalEventDefinition.class);
+    SignalEventDefinition signalEventDefinition = createInstance(SignalEventDefinition.class);
     signalEventDefinition.setSignal(signal);
     return signalEventDefinition;
   }
@@ -159,12 +171,9 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
    * @return the builder object
    */
   public B addExtensionElement(BpmnModelElementInstance extensionElement) {
-    ExtensionElements extensionElements = element.getExtensionElements();
-    if (extensionElements == null) {
-      extensionElements = modelInstance.newInstance(ExtensionElements.class);
-      element.setExtensionElements(extensionElements);
-    }
+    ExtensionElements extensionElements = getCreateSingleChild(ExtensionElements.class);
     extensionElements.addChildElement(extensionElement);
     return myself;
   }
+
 }
