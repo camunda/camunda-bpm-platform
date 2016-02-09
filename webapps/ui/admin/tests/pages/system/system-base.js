@@ -2,30 +2,15 @@
 
 var Page = require('./../base');
 
-var groupsSection = element(by.css('section'));
+var groupsSection = element(by.css('[provider=activeSettingsProvier]'));
 
 module.exports = Page.extend({
 
   selectSystemNavbarItem: function(navbarItem) {
-    var index = [
-      'General',
-      'Execution Metrics',
-      'License Key'
-    ];
-    var item;
-    var itemIndex = index.indexOf(navbarItem) + 2;
-
-    if (itemIndex)
-      item = groupsSection.element(by.css('.sidebar-nav ul li:nth-child(' + itemIndex + ')'));
-    else
-      item = groupsSection.element(by.css('.sidebar-nav ul li:nth-child(1)'));
-
-    item.click();
-    return item;
+    return element(by.cssContainingText('.sidebar-nav li', navbarItem)).click();
   },
 
   boxHeader: function() {
-    return groupsSection.element(by.css('legend')).getText();
+    return groupsSection.element(by.css('h2, legend')).getText();
   }
-
 });
