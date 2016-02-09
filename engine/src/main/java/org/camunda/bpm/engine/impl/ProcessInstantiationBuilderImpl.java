@@ -16,8 +16,10 @@ import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureOnlyOneNotNull;
 
 import java.util.Map;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cmd.StartProcessInstanceAtActivitiesCmd;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.cmd.StartProcessInstanceCmd;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
@@ -30,7 +32,6 @@ import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
 public class ProcessInstantiationBuilderImpl implements ProcessInstantiationBuilder {
 
   protected CommandExecutor commandExecutor;
-  protected CommandContext commandContext;
 
   protected String processDefinitionId;
   protected String processDefinitionKey;
@@ -40,23 +41,11 @@ public class ProcessInstantiationBuilderImpl implements ProcessInstantiationBuil
 
   protected ProcessInstanceModificationBuilderImpl modificationBuilder;
 
-  public ProcessInstantiationBuilderImpl(String processDefinitionId, String processDefinitionKey) {
-    ensureOnlyOneNotNull("either process definition id or key must be set", processDefinitionId, processDefinitionKey);
-    this.processDefinitionId = processDefinitionId;
-    this.processDefinitionKey = processDefinitionKey;
+  private ProcessInstantiationBuilderImpl(CommandExecutor commandExecutor) {
     modificationBuilder = new ProcessInstanceModificationBuilderImpl();
-  }
 
-  public ProcessInstantiationBuilderImpl(CommandExecutor commandExecutor, String processDefinitionId, String processDefinitionKey) {
-    this(processDefinitionId, processDefinitionKey);
     this.commandExecutor = commandExecutor;
   }
-
-  public ProcessInstantiationBuilderImpl(CommandContext commandContext, String processDefinitionId, String processDefinitionKey) {
-    this(processDefinitionId, processDefinitionKey);
-    this.commandContext = commandContext;
-  }
-
 
   public ProcessInstantiationBuilder startBeforeActivity(String activityId) {
     modificationBuilder.startBeforeActivity(activityId);
@@ -84,12 +73,16 @@ public class ProcessInstantiationBuilderImpl implements ProcessInstantiationBuil
   }
 
   public ProcessInstantiationBuilder setVariables(Map<String, Object> variables) {
-    modificationBuilder.setVariables(variables);
+    if (variables != null) {
+      modificationBuilder.setVariables(variables);
+    }
     return this;
   }
 
   public ProcessInstantiationBuilder setVariablesLocal(Map<String, Object> variables) {
-    modificationBuilder.setVariablesLocal(variables);
+    if (variables != null) {
+      modificationBuilder.setVariablesLocal(variables);
+    }
     return this;
   }
 
@@ -108,15 +101,27 @@ public class ProcessInstantiationBuilderImpl implements ProcessInstantiationBuil
   }
 
   public ProcessInstance execute(boolean skipCustomListeners, boolean skipIoMappings) {
-    modificationBuilder.setSkipCustomListeners(skipCustomListeners);
-    modificationBuilder.setSkipIoMappings(skipIoMappings);
+    ensureOnlyOneNotNull("either process definition id or key must be set", processDefinitionId, processDefinitionKey);
 
-    StartProcessInstanceAtActivitiesCmd cmd = new StartProcessInstanceAtActivitiesCmd(this);
-    if (commandExecutor != null) {
-      return commandExecutor.execute(cmd);
+    Command<ProcessInstance> command;
+
+    if (modificationBuilder.getModificationOperations().isEmpty()) {
+
+      if(skipCustomListeners || skipIoMappings) {
+        throw new ProcessEngineException("It is not supported no start a process instance at the default start activity and skip custom listeners or input/output mappings.");
+      }
+      // start at the default start activity
+      command = new StartProcessInstanceCmd(this, null);
+
     } else {
-      return cmd.execute(commandContext);
+      // start at any activity using the instructions
+      modificationBuilder.setSkipCustomListeners(skipCustomListeners);
+      modificationBuilder.setSkipIoMappings(skipIoMappings);
+
+      command = new StartProcessInstanceAtActivitiesCmd(this);
     }
+
+    return commandExecutor.execute(command);
   }
 
   public String getProcessDefinitionId() {
@@ -137,6 +142,22 @@ public class ProcessInstantiationBuilderImpl implements ProcessInstantiationBuil
 
   public String getCaseInstanceId() {
     return caseInstanceId;
+  }
+
+  public Map<String, Object> getVariables() {
+    return modificationBuilder.getProcessVariables();
+  }
+
+  public static ProcessInstantiationBuilder createProcessInstanceById(CommandExecutor commandExecutor, String processDefinitionId) {
+    ProcessInstantiationBuilderImpl builder = new ProcessInstantiationBuilderImpl(commandExecutor);
+    builder.processDefinitionId = processDefinitionId;
+    return builder;
+  }
+
+  public static ProcessInstantiationBuilder createProcessInstanceByKey(CommandExecutor commandExecutor, String processDefinitionKey) {
+    ProcessInstantiationBuilderImpl builder = new ProcessInstantiationBuilderImpl(commandExecutor);
+    builder.processDefinitionKey = processDefinitionKey;
+    return builder;
   }
 
 }

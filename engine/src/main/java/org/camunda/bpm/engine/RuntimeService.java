@@ -1642,19 +1642,32 @@ public interface RuntimeService {
   ProcessInstanceModificationBuilder createProcessInstanceModification(String processInstanceId);
 
   /**
-   * Starts a process instance at any set of activities in the process with the given id.
-   * Returns a fluent builder that can be used to specify instantiation instructions.
+   * Returns a fluent builder to start a new process instance in the exactly
+   * specified version of the process definition with the given id. The builder
+   * can be used to set further properties and specify instantiation
+   * instructions to start the instance at any set of activities in the process.
+   * If no instantiation instructions are set then the instance start at the
+   * default start activity.
    *
-   * @return the created process instance
+   * @param processDefinitionId
+   *          the id of the process definition, cannot be <code>null</code>.
+   *
+   * @return a builder to create a process instance of the definition
    */
   ProcessInstantiationBuilder createProcessInstanceById(String processDefinitionId);
 
   /**
-   * Starts a process instance at any set of activities in the process with the latest version
-   * of the given key. Returns a fluent builder that can be used to specify instantiation
-   * instructions.
+   * Returns a fluent builder to start a new process instance in the latest
+   * version of the process definition with the given key. The builder can be
+   * used to set further properties and specify instantiation instructions to
+   * start the instance at any set of activities in the process. If no
+   * instantiation instructions are set then the instance start at the default
+   * start activity.
    *
-   * @return the created process instance
+   * @param processDefinitionKey
+   *          the key of the process definition, cannot be <code>null</code>.
+   *
+   * @return a builder to create a process instance of the definition
    */
   ProcessInstantiationBuilder createProcessInstanceByKey(String processDefinitionKey);
 
@@ -1679,4 +1692,5 @@ public interface RuntimeService {
    *   that are not applicable to any of the process instances
    */
   void executeMigrationPlan(MigrationPlan migrationPlan, List<String> processInstanceIds);
+
 }

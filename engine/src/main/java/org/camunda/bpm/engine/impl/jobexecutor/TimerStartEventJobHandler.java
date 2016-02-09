@@ -13,13 +13,16 @@
 package org.camunda.bpm.engine.impl.jobexecutor;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.ProcessInstantiationBuilderImpl;
 import org.camunda.bpm.engine.impl.cmd.StartProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
 
 
 public class TimerStartEventJobHandler extends TimerEventJobHandler {
@@ -41,7 +44,10 @@ public class TimerStartEventJobHandler extends TimerEventJobHandler {
     ProcessDefinition processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKeyAndTenantId(definitionKey, tenantId);
     try {
       if(!processDefinition.isSuspended()) {
-        new StartProcessInstanceCmd(definitionKey, null, null, null, tenantId, null).execute(commandContext);
+        RuntimeService runtimeService = commandContext.getProcessEngineConfiguration().getRuntimeService();
+        // TODO use the method from runtime service - CAM-5211
+        ProcessInstantiationBuilder processInstantiationBuilder = runtimeService.createProcessInstanceByKey(definitionKey);
+        new StartProcessInstanceCmd((ProcessInstantiationBuilderImpl) processInstantiationBuilder, tenantId).execute(commandContext);
       }
       else {
         LOG.ignoringSuspendedJob(processDefinition);

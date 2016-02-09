@@ -13,11 +13,11 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureOnlyOneNotNull;
 
 import java.io.Serializable;
-import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.ProcessInstantiationBuilderImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -27,7 +27,6 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -35,48 +34,53 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 public class StartProcessInstanceCmd implements Command<ProcessInstance>, Serializable {
 
   private static final long serialVersionUID = 1L;
-  protected String processDefinitionKey;
-  protected String processDefinitionId;
-  protected Map<String, Object> variables;
-  protected String businessKey;
-  protected String caseInstanceId;
+
+  protected final ProcessInstantiationBuilderImpl processInstantiationBuilder;
+
+  // TODO move tenant-id to builder - CAM-5211
   protected String tenantId;
 
-  // TODO too many arguments - CAM-5240
-  public StartProcessInstanceCmd(String processDefinitionKey, String processDefinitionId, String businessKey, String caseInstanceId, String tenantId, Map<String, Object> variables) {
-    this.processDefinitionKey = processDefinitionKey;
-    this.processDefinitionId = processDefinitionId;
-    this.businessKey = businessKey;
-    this.caseInstanceId = caseInstanceId;
-    this.variables = variables;
+  public StartProcessInstanceCmd(ProcessInstantiationBuilderImpl processInstantiationBuilder, String tenantId) {
+    this.processInstantiationBuilder = processInstantiationBuilder;
     this.tenantId = tenantId;
   }
 
   public ProcessInstance execute(CommandContext commandContext) {
 
-    DeploymentCache deploymentCache = Context
-        .getProcessEngineConfiguration()
-        .getDeploymentCache();
-    // Find the process definition
-    ProcessDefinitionEntity processDefinition = null;
-    if (processDefinitionId!=null) {
-      processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
-      ensureNotNull("No process definition found for id = '" + processDefinitionId + "'", "processDefinition", processDefinition);
-    } else if(processDefinitionKey != null) {
-      // TODO allow to start a process instance by key from any tenant if only one tenant has a definition with this key - CAM-5211
-      processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
-      ensureNotNull("No process definition found for key '" + processDefinitionKey + "' and tenant-id '" + tenantId + "'", "processDefinition", processDefinition);
-    } else {
-      throw new ProcessEngineException("processDefinitionKey and processDefinitionId are null");
-    }
+    ProcessDefinitionEntity processDefinition = findProcessDefinition();
 
     // check authorization
     AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     authorizationManager.checkCreateProcessInstance(processDefinition);
 
     // Start the process instance
-    ExecutionEntity processInstance = processDefinition.createProcessInstance(businessKey, caseInstanceId);
-    processInstance.start(variables);
+    ExecutionEntity processInstance = processDefinition.createProcessInstance(processInstantiationBuilder.getBusinessKey(),
+        processInstantiationBuilder.getCaseInstanceId());
+    processInstance.start(processInstantiationBuilder.getVariables());
     return processInstance;
+  }
+
+  protected ProcessDefinitionEntity findProcessDefinition() {
+    DeploymentCache deploymentCache = Context.getProcessEngineConfiguration().getDeploymentCache();
+
+    ProcessDefinitionEntity processDefinition = null;
+
+    String processDefinitionId = processInstantiationBuilder.getProcessDefinitionId();
+    String processDefinitionKey = processInstantiationBuilder.getProcessDefinitionKey();
+    ensureOnlyOneNotNull("either process definition id or key must be set", processDefinitionId, processDefinitionKey);
+
+    if (processDefinitionId != null) {
+      processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
+      ensureNotNull("No process definition found for id = '" + processDefinitionId + "'", "processDefinition", processDefinition);
+
+    } else {
+      // TODO allow to start a process instance by key from any tenant if only
+      // one tenant has a definition with this key - CAM-5211
+      processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
+      ensureNotNull("No process definition found for key '" + processDefinitionKey + "' and tenant-id '" + tenantId + "'", "processDefinition",
+          processDefinition);
+    }
+
+    return processDefinition;
   }
 }
