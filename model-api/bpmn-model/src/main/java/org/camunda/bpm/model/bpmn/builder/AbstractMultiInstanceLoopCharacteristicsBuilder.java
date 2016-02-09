@@ -29,16 +29,32 @@ public class AbstractMultiInstanceLoopCharacteristicsBuilder<B extends AbstractM
     super(modelInstance, element, selfType);
   }
 
+  /**
+   * Sets the multi instance loop characteristics to be sequential.
+   *
+   * @return  the builder object
+   */
   public B sequential() {
     element.setSequential(true);
     return myself;
   }
 
+  /**
+   * Sets the multi instance loop characteristics to be parallel.
+   *
+   * @return  the builder object
+   */
   public B parallel() {
     element.setSequential(false);
     return myself;
   }
 
+  /**
+   * Sets the cardinality expression.
+   *
+   * @param expression the cardinality expression
+   * @return the builder object
+   */
   public B cardinality(String expression) {
     LoopCardinality cardinality = getCreateSingleChild(LoopCardinality.class);
     cardinality.setTextContent(expression);
@@ -46,6 +62,12 @@ public class AbstractMultiInstanceLoopCharacteristicsBuilder<B extends AbstractM
     return myself;
   }
 
+  /**
+   * Sets the completion condition expression.
+   *
+   * @param expression the completion condition expression
+   * @return the builder object
+   */
   public B completionCondition(String expression) {
     CompletionCondition condition = getCreateSingleChild(CompletionCondition.class);
     condition.setTextContent(expression);
@@ -53,18 +75,35 @@ public class AbstractMultiInstanceLoopCharacteristicsBuilder<B extends AbstractM
     return myself;
   }
 
+  /**
+   * Sets the camunda collection expression.
+   *
+   * @param expression the collection expression
+   * @return the builder object
+   */
   public B camundaCollection(String expression) {
     element.setCamundaCollection(expression);
 
     return myself;
   }
 
+  /**
+   * Sets the camunda element variable name.
+   *
+   * @param variableName the name of the element variable
+   * @return the builder object
+   */
   public B camundaElementVariable(String variableName) {
     element.setCamundaElementVariable(variableName);
 
     return myself;
   }
 
+  /**
+   * Finishes the building of a multi instance loop characteristics.
+   *
+   * @return the parent activity builder
+   */
   @SuppressWarnings({ "rawtypes", "unchecked" })
   public <T extends AbstractActivityBuilder> T multiInstanceDone() {
     return (T) ((Activity) element.getParentElement()).builder();
