@@ -75,18 +75,6 @@ describe('Admin system Spec', function() {
       expect(systemPage.executionMetrics.flowNodesResult()).to.eventually.eql('0');
       expect(systemPage.executionMetrics.decisionElementsResult()).to.eventually.eql('0');
     });
-
-
-    xit('should validate license key page', function() {
-
-      // when
-      systemPage.selectSystemNavbarItem('License Key');
-
-      // then
-      systemPage.licenseKey.isActive();
-      expect(systemPage.licenseKey.boxHeader()).to.eventually.eql('License Key');
-    });
-
   });
 
 });

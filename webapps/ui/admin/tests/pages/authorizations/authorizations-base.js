@@ -6,34 +6,12 @@ var groupsSection = element(by.css('section.authorizations'));
 
 module.exports = Page.extend({
 
-   selectAuthorizationNavbarItem: function(navbarItem) {
-    var index = [
-      'Application',
-      'Authorization',
-      'Decision Definition',
-      'Deployment',
-      'Filter',
-      'Group',
-      'Group Membership',
-      'Process Definition',
-      'Process Instance',
-      'Task',
-      'User'
-    ];
-    var item;
-    var itemIndex = index.indexOf(navbarItem) + 2;
-
-    if (itemIndex)
-      item = groupsSection.element(by.css('.sidebar-nav ul li:nth-child(' + itemIndex + ')'));
-    else
-      item = groupsSection.element(by.css('.sidebar-nav ul li:nth-child(1)'));
-
-    item.click();
-    return item;
+  selectAuthorizationNavbarItem: function(navbarItem) {
+    return element(by.cssContainingText('.sidebar-nav li', navbarItem)).click();
   },
 
   boxHeader: function() {
-    return groupsSection.element(by.css('[ng-controller="AuthorizationCreateController"] legend')).getText();
+    return groupsSection.element(by.css('[ng-controller="AuthorizationCreateController"] h2')).getText();
   },
 
   newAuthorizationButton: function() {
