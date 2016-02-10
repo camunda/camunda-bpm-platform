@@ -385,6 +385,10 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
     assertThat(externalTask, is(notNullValue()));
     // inherit the tenant id from execution
     assertThat(externalTask.getTenantId(), is(TENANT_ID));
+
+    List<LockedExternalTask> externalTasks = externalTaskService.fetchAndLock(1, "test").topic("test", 1000).execute();
+    assertThat(externalTasks.size(), is(1));
+    assertThat(externalTasks.get(0).getTenantId(), is(TENANT_ID));
   }
 
   public static class SetVariableTask implements JavaDelegate {
