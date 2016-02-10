@@ -380,7 +380,7 @@
         <artifactId>jboss-servlet-api_3.0_spec</artifactId>
         <version>1.0.2.Final</version>
       </dependency>
-      
+
       <dependency>
         <groupId>org.jboss.spec.javax.ws.rs</groupId>
         <artifactId>jboss-jaxrs-api_1.1_spec</artifactId>
@@ -481,7 +481,7 @@
             <systemPropertyVariables>
               <myWorkingDir>${project.build.directory}</myWorkingDir>
             </systemPropertyVariables>
-            <argLine>-XX:MaxPermSize=128m</argLine>
+            <argLine>-XX:MaxPermSize=192m</argLine>
           </configuration>
         </plugin>
         <plugin>
