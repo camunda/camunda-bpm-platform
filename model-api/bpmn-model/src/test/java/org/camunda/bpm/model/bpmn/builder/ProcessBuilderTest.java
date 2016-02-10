@@ -45,9 +45,9 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.GatewayDirection;
 import org.camunda.bpm.model.bpmn.instance.BaseElement;
 import org.camunda.bpm.model.bpmn.instance.BoundaryEvent;
+import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
 import org.camunda.bpm.model.bpmn.instance.BusinessRuleTask;
 import org.camunda.bpm.model.bpmn.instance.CallActivity;
-import org.camunda.bpm.model.bpmn.instance.CatchEvent;
 import org.camunda.bpm.model.bpmn.instance.Definitions;
 import org.camunda.bpm.model.bpmn.instance.EndEvent;
 import org.camunda.bpm.model.bpmn.instance.Event;
@@ -69,7 +69,6 @@ import org.camunda.bpm.model.bpmn.instance.SignalEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.StartEvent;
 import org.camunda.bpm.model.bpmn.instance.SubProcess;
 import org.camunda.bpm.model.bpmn.instance.Task;
-import org.camunda.bpm.model.bpmn.instance.ThrowEvent;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaInputOutput;
@@ -759,7 +758,7 @@ public class ProcessBuilderTest {
       .startEvent("start").message("message")
       .done();
 
-    assertMessageCatchEventDefinition("start", "message");
+    assertMessageEventDefinition("start", "message");
   }
 
   @Test
@@ -772,8 +771,8 @@ public class ProcessBuilderTest {
          .subProcessDone()
       .done();
 
-    Message message = assertMessageCatchEventDefinition("start", "message");
-    Message subMessage = assertMessageCatchEventDefinition("subStart", "message");
+    Message message = assertMessageEventDefinition("start", "message");
+    Message subMessage = assertMessageEventDefinition("subStart", "message");
 
     assertThat(message).isEqualTo(subMessage);
 
@@ -787,7 +786,7 @@ public class ProcessBuilderTest {
       .intermediateCatchEvent("catch").message("message")
       .done();
 
-    assertMessageCatchEventDefinition("catch", "message");
+    assertMessageEventDefinition("catch", "message");
   }
 
   @Test
@@ -798,8 +797,8 @@ public class ProcessBuilderTest {
       .intermediateCatchEvent("catch2").message("message")
       .done();
 
-    Message message1 = assertMessageCatchEventDefinition("catch1", "message");
-    Message message2 = assertMessageCatchEventDefinition("catch2", "message");
+    Message message1 = assertMessageEventDefinition("catch1", "message");
+    Message message2 = assertMessageEventDefinition("catch2", "message");
 
     assertThat(message1).isEqualTo(message2);
 
@@ -813,7 +812,7 @@ public class ProcessBuilderTest {
       .endEvent("end").message("message")
       .done();
 
-    assertMessageThrowEventDefinition("end", "message");
+    assertMessageEventDefinition("end", "message");
   }
 
   @Test
@@ -826,8 +825,8 @@ public class ProcessBuilderTest {
       .endEvent("end2").message("message")
       .done();
 
-    Message message1 = assertMessageThrowEventDefinition("end1", "message");
-    Message message2 = assertMessageThrowEventDefinition("end2", "message");
+    Message message1 = assertMessageEventDefinition("end1", "message");
+    Message message2 = assertMessageEventDefinition("end2", "message");
 
     assertThat(message1).isEqualTo(message2);
 
@@ -841,7 +840,7 @@ public class ProcessBuilderTest {
       .intermediateThrowEvent("throw").message("message")
       .done();
 
-    assertMessageThrowEventDefinition("throw", "message");
+    assertMessageEventDefinition("throw", "message");
   }
 
   @Test
@@ -852,8 +851,8 @@ public class ProcessBuilderTest {
       .intermediateThrowEvent("throw2").message("message")
       .done();
 
-    Message message1 = assertMessageThrowEventDefinition("throw1", "message");
-    Message message2 = assertMessageThrowEventDefinition("throw2", "message");
+    Message message1 = assertMessageEventDefinition("throw1", "message");
+    Message message2 = assertMessageEventDefinition("throw2", "message");
 
     assertThat(message1).isEqualTo(message2);
 
@@ -932,7 +931,7 @@ public class ProcessBuilderTest {
       .startEvent("start").signal("signal")
       .done();
 
-    assertSignalCatchEventDefinition("start", "signal");
+    assertSignalEventDefinition("start", "signal");
   }
 
   @Test
@@ -945,8 +944,8 @@ public class ProcessBuilderTest {
       .subProcessDone()
       .done();
 
-    Signal signal = assertSignalCatchEventDefinition("start", "signal");
-    Signal subSignal = assertSignalCatchEventDefinition("subStart", "signal");
+    Signal signal = assertSignalEventDefinition("start", "signal");
+    Signal subSignal = assertSignalEventDefinition("subStart", "signal");
 
     assertThat(signal).isEqualTo(subSignal);
 
@@ -960,7 +959,7 @@ public class ProcessBuilderTest {
       .intermediateCatchEvent("catch").signal("signal")
       .done();
 
-    assertSignalCatchEventDefinition("catch", "signal");
+    assertSignalEventDefinition("catch", "signal");
   }
 
   @Test
@@ -971,8 +970,8 @@ public class ProcessBuilderTest {
       .intermediateCatchEvent("catch2").signal("signal")
       .done();
 
-    Signal signal1 = assertSignalCatchEventDefinition("catch1", "signal");
-    Signal signal2 = assertSignalCatchEventDefinition("catch2", "signal");
+    Signal signal1 = assertSignalEventDefinition("catch1", "signal");
+    Signal signal2 = assertSignalEventDefinition("catch2", "signal");
 
     assertThat(signal1).isEqualTo(signal2);
 
@@ -986,7 +985,7 @@ public class ProcessBuilderTest {
       .endEvent("end").signal("signal")
       .done();
 
-    assertSignalThrowEventDefinition("end", "signal");
+    assertSignalEventDefinition("end", "signal");
   }
 
   @Test
@@ -999,8 +998,8 @@ public class ProcessBuilderTest {
       .endEvent("end2").signal("signal")
       .done();
 
-    Signal signal1 = assertSignalThrowEventDefinition("end1", "signal");
-    Signal signal2 = assertSignalThrowEventDefinition("end2", "signal");
+    Signal signal1 = assertSignalEventDefinition("end1", "signal");
+    Signal signal2 = assertSignalEventDefinition("end2", "signal");
 
     assertThat(signal1).isEqualTo(signal2);
 
@@ -1014,7 +1013,7 @@ public class ProcessBuilderTest {
       .intermediateThrowEvent("throw").signal("signal")
       .done();
 
-    assertSignalThrowEventDefinition("throw", "signal");
+    assertSignalEventDefinition("throw", "signal");
   }
 
   @Test
@@ -1025,8 +1024,8 @@ public class ProcessBuilderTest {
       .intermediateThrowEvent("throw2").signal("signal")
       .done();
 
-    Signal signal1 = assertSignalThrowEventDefinition("throw1", "signal");
-    Signal signal2 = assertSignalThrowEventDefinition("throw2", "signal");
+    Signal signal1 = assertSignalEventDefinition("throw1", "signal");
+    Signal signal2 = assertSignalEventDefinition("throw2", "signal");
 
     assertThat(signal1).isEqualTo(signal2);
 
@@ -1044,7 +1043,7 @@ public class ProcessBuilderTest {
       .endEvent("boundaryEnd")
       .done();
 
-    assertMessageCatchEventDefinition("boundary", "message");
+    assertMessageEventDefinition("boundary", "message");
 
     UserTask userTask = modelInstance.getModelElementById("task");
     BoundaryEvent boundaryEvent = modelInstance.getModelElementById("boundary");
@@ -1075,8 +1074,8 @@ public class ProcessBuilderTest {
       .endEvent("boundaryEnd2")
       .done();
 
-    assertMessageCatchEventDefinition("boundary1", "message");
-    assertSignalCatchEventDefinition("boundary2", "signal");
+    assertMessageEventDefinition("boundary1", "message");
+    assertSignalEventDefinition("boundary2", "signal");
 
     UserTask userTask = modelInstance.getModelElementById("task");
     BoundaryEvent boundaryEvent1 = modelInstance.getModelElementById("boundary1");
@@ -1323,25 +1322,9 @@ public class ProcessBuilderTest {
     assertCamundaInputOutputParameter(subProcess);
   }
 
-  protected Message assertMessageCatchEventDefinition(String elementId, String messageName) {
-    CatchEvent catchEvent = modelInstance.getModelElementById(elementId);
-    Collection<EventDefinition> eventDefinitions = catchEvent.getEventDefinitions();
-    return assertMessageEventDefinition(messageName, eventDefinitions);
-  }
-
-  protected Message assertMessageThrowEventDefinition(String elementId, String messageName) {
-    ThrowEvent throwEvent = modelInstance.getModelElementById(elementId);
-    Collection<EventDefinition> eventDefinitions = throwEvent.getEventDefinitions();
-    return assertMessageEventDefinition(messageName, eventDefinitions);
-  }
-
-  protected Message assertMessageEventDefinition(String messageName, Collection<EventDefinition> eventDefinitions) {
-    assertThat(eventDefinitions).hasSize(1);
-
-    EventDefinition eventDefinition = eventDefinitions.iterator().next();
-    assertThat(eventDefinition).isInstanceOf(MessageEventDefinition.class);
-
-    Message message = ((MessageEventDefinition) eventDefinition).getMessage();
+  protected Message assertMessageEventDefinition(String elementId, String messageName) {
+    MessageEventDefinition messageEventDefinition = assertAndGetSingleEventDefinition(elementId, MessageEventDefinition.class);
+    Message message = messageEventDefinition.getMessage();
     assertThat(message).isNotNull();
     assertThat(message.getName()).isEqualTo(messageName);
 
@@ -1353,25 +1336,9 @@ public class ProcessBuilderTest {
     assertThat(messages).extracting("name").containsOnlyOnce(messageName);
   }
 
-  protected Signal assertSignalCatchEventDefinition(String elementId, String signalName) {
-    CatchEvent catchEvent = modelInstance.getModelElementById(elementId);
-    Collection<EventDefinition> eventDefinitions = catchEvent.getEventDefinitions();
-    return assertSignalEventDefinition(signalName, eventDefinitions);
-  }
-
-  protected Signal assertSignalThrowEventDefinition(String elementId, String signalName) {
-    ThrowEvent throwEvent = modelInstance.getModelElementById(elementId);
-    Collection<EventDefinition> eventDefinitions = throwEvent.getEventDefinitions();
-    return assertSignalEventDefinition(signalName, eventDefinitions);
-  }
-
-  protected Signal assertSignalEventDefinition(String signalName, Collection<EventDefinition> eventDefinitions) {
-    assertThat(eventDefinitions).hasSize(1);
-
-    EventDefinition eventDefinition = eventDefinitions.iterator().next();
-    assertThat(eventDefinition).isInstanceOf(SignalEventDefinition.class);
-
-    Signal signal = ((SignalEventDefinition) eventDefinition).getSignal();
+  protected Signal assertSignalEventDefinition(String elementId, String signalName) {
+    SignalEventDefinition signalEventDefinition = assertAndGetSingleEventDefinition(elementId, SignalEventDefinition.class);
+    Signal signal = signalEventDefinition.getSignal();
     assertThat(signal).isNotNull();
     assertThat(signal.getName()).isEqualTo(signalName);
 
@@ -1408,6 +1375,17 @@ public class ProcessBuilderTest {
     camundaOutputParameter = camundaOutputParameters.get(1);
     assertThat(camundaOutputParameter.getCamundaName()).isEqualTo("three");
     assertThat(camundaOutputParameter.getTextContent()).isEqualTo("four");
+  }
+
+  @SuppressWarnings("unchecked")
+  protected <T extends EventDefinition> T assertAndGetSingleEventDefinition(String elementId, Class<T> eventDefinitionType) {
+    BpmnModelElementInstance element = modelInstance.getModelElementById(elementId);
+    Collection<EventDefinition> eventDefinitions = element.getChildElementsByType(EventDefinition.class);
+    assertThat(eventDefinitions).hasSize(1);
+
+    EventDefinition eventDefinition = eventDefinitions.iterator().next();
+    assertThat(eventDefinition).isInstanceOf(eventDefinitionType);
+    return (T) eventDefinition;
   }
 
 }
