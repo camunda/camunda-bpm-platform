@@ -46,9 +46,6 @@ public class TimerStartEventJobHandler extends TimerEventJobHandler {
     catch (RuntimeException e) {
       throw e;
     }
-    catch (Exception e) {
-      throw new ProcessEngineException("exception during timer execution: " + e.getMessage(), e);
-    }
   }
 
   protected void startProcessInstance(CommandContext commandContext, String tenantId, ProcessDefinition processDefinition) {
