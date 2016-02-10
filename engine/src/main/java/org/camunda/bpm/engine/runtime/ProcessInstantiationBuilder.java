@@ -25,6 +25,12 @@ public interface ProcessInstantiationBuilder
     extends ActivityInstantiationBuilder<ProcessInstantiationBuilder>, InstantiationBuilder<ProcessInstantiationBuilder> {
 
   /**
+   * Specify the id of the tenant the process definition belongs to. Can only be
+   * used when the definition is referenced by <code>key</code> and not by <code>id</code>.
+   */
+  ProcessInstantiationBuilder tenantId(String tenantId);
+
+  /**
    * Set the business key for the process instance
    */
   ProcessInstantiationBuilder businessKey(String businessKey);

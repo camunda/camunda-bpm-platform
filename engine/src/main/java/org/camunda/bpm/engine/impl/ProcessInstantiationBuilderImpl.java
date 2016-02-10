@@ -39,6 +39,9 @@ public class ProcessInstantiationBuilderImpl implements ProcessInstantiationBuil
   protected String businessKey;
   protected String caseInstanceId;
 
+  protected String tenantId;
+  protected boolean isTenantIdSet = false;
+
   protected ProcessInstanceModificationBuilderImpl modificationBuilder;
 
   private ProcessInstantiationBuilderImpl(CommandExecutor commandExecutor) {
@@ -96,12 +99,22 @@ public class ProcessInstantiationBuilderImpl implements ProcessInstantiationBuil
     return this;
   }
 
+  public ProcessInstantiationBuilder tenantId(String tenantId) {
+    this.tenantId = tenantId;
+    isTenantIdSet = true;
+    return this;
+  }
+
   public ProcessInstance execute() {
     return execute(false, false);
   }
 
   public ProcessInstance execute(boolean skipCustomListeners, boolean skipIoMappings) {
     ensureOnlyOneNotNull("either process definition id or key must be set", processDefinitionId, processDefinitionKey);
+
+    if (isTenantIdSet && processDefinitionId != null) {
+      throw new ProcessEngineException("It is not supported to specify a tenant-id when the process definition is referenced by id.");
+    }
 
     Command<ProcessInstance> command;
 
@@ -111,7 +124,7 @@ public class ProcessInstantiationBuilderImpl implements ProcessInstantiationBuil
         throw new ProcessEngineException("It is not supported no start a process instance at the default start activity and skip custom listeners or input/output mappings.");
       }
       // start at the default start activity
-      command = new StartProcessInstanceCmd(this, null);
+      command = new StartProcessInstanceCmd(this);
 
     } else {
       // start at any activity using the instructions
@@ -146,6 +159,14 @@ public class ProcessInstantiationBuilderImpl implements ProcessInstantiationBuil
 
   public Map<String, Object> getVariables() {
     return modificationBuilder.getProcessVariables();
+  }
+
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public boolean isTenantIdSet() {
+    return isTenantIdSet;
   }
 
   public static ProcessInstantiationBuilder createProcessInstanceById(CommandExecutor commandExecutor, String processDefinitionId) {
