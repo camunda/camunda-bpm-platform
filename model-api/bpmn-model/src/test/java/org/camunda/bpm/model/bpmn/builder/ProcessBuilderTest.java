@@ -69,6 +69,10 @@ import org.camunda.bpm.model.bpmn.instance.SignalEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.StartEvent;
 import org.camunda.bpm.model.bpmn.instance.SubProcess;
 import org.camunda.bpm.model.bpmn.instance.Task;
+import org.camunda.bpm.model.bpmn.instance.TimeCycle;
+import org.camunda.bpm.model.bpmn.instance.TimeDate;
+import org.camunda.bpm.model.bpmn.instance.TimeDuration;
+import org.camunda.bpm.model.bpmn.instance.TimerEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaExecutionListener;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaInputOutput;
@@ -85,6 +89,10 @@ import org.junit.Test;
  * @author Sebastian Menski
  */
 public class ProcessBuilderTest {
+
+  public static final String TIMER_DATE = "2011-03-11T12:13:14Z";
+  public static final String TIMER_DURATION = "P10D";
+  public static final String TIMER_CYCLE = "R3/PT10H";
 
   private BpmnModelInstance modelInstance;
   private static ModelElementType taskType;
@@ -1322,8 +1330,108 @@ public class ProcessBuilderTest {
     assertCamundaInputOutputParameter(subProcess);
   }
 
+  @Test
+  public void testTimerStartEventWithDate() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent("start").timerWithDate(TIMER_DATE)
+      .done();
+
+    assertTimerWithDate("start", TIMER_DATE);
+  }
+
+  @Test
+  public void testTimerStartEventWithDuration() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent("start").timerWithDuration(TIMER_DURATION)
+      .done();
+
+    assertTimerWithDuration("start", TIMER_DURATION);
+  }
+
+  @Test
+  public void testTimerStartEventWithCycle() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent("start").timerWithCycle(TIMER_CYCLE)
+      .done();
+
+    assertTimerWithCycle("start", TIMER_CYCLE);
+  }
+
+  @Test
+  public void testIntermediateTimerCatchEventWithDate() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .intermediateCatchEvent("catch").timerWithDate(TIMER_DATE)
+      .done();
+
+    assertTimerWithDate("catch", TIMER_DATE);
+  }
+
+  @Test
+  public void testIntermediateTimerCatchEventWithDuration() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .intermediateCatchEvent("catch").timerWithDuration(TIMER_DURATION)
+      .done();
+
+    assertTimerWithDuration("catch", TIMER_DURATION);
+  }
+
+  @Test
+  public void testIntermediateTimerCatchEventWithCycle() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .intermediateCatchEvent("catch").timerWithCycle(TIMER_CYCLE)
+      .done();
+
+    assertTimerWithCycle("catch", TIMER_CYCLE);
+  }
+
+  @Test
+  public void testTimerBoundaryEventWithDate() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask("task")
+      .endEvent()
+      .moveToActivity("task")
+      .boundaryEvent("boundary").timerWithDate(TIMER_DATE)
+      .done();
+
+    assertTimerWithDate("boundary", TIMER_DATE);
+  }
+
+  @Test
+  public void testTimerBoundaryEventWithDuration() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask("task")
+      .endEvent()
+      .moveToActivity("task")
+      .boundaryEvent("boundary").timerWithDuration(TIMER_DURATION)
+      .done();
+
+    assertTimerWithDuration("boundary", TIMER_DURATION);
+  }
+
+  @Test
+  public void testTimerBoundaryEventWithCycle() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask("task")
+      .endEvent()
+      .moveToActivity("task")
+      .boundaryEvent("boundary").timerWithCycle(TIMER_CYCLE)
+      .done();
+
+    assertTimerWithCycle("boundary", TIMER_CYCLE);
+  }
+
   protected Message assertMessageEventDefinition(String elementId, String messageName) {
     MessageEventDefinition messageEventDefinition = assertAndGetSingleEventDefinition(elementId, MessageEventDefinition.class);
+    return assertMessageEventDefinition(messageName, messageEventDefinition);
+  }
+
+  protected Message assertMessageEventDefinition(String messageName, MessageEventDefinition messageEventDefinition) {
     Message message = messageEventDefinition.getMessage();
     assertThat(message).isNotNull();
     assertThat(message.getName()).isEqualTo(messageName);
@@ -1375,6 +1483,27 @@ public class ProcessBuilderTest {
     camundaOutputParameter = camundaOutputParameters.get(1);
     assertThat(camundaOutputParameter.getCamundaName()).isEqualTo("three");
     assertThat(camundaOutputParameter.getTextContent()).isEqualTo("four");
+  }
+
+  protected void assertTimerWithDate(String elementId, String timerDate) {
+    TimerEventDefinition timerEventDefinition = assertAndGetSingleEventDefinition(elementId, TimerEventDefinition.class);
+    TimeDate timeDate = timerEventDefinition.getTimeDate();
+    assertThat(timeDate).isNotNull();
+    assertThat(timeDate.getTextContent()).isEqualTo(timerDate);
+  }
+
+  protected void assertTimerWithDuration(String elementId, String timerDuration) {
+    TimerEventDefinition timerEventDefinition = assertAndGetSingleEventDefinition(elementId, TimerEventDefinition.class);
+    TimeDuration timeDuration = timerEventDefinition.getTimeDuration();
+    assertThat(timeDuration).isNotNull();
+    assertThat(timeDuration.getTextContent()).isEqualTo(timerDuration);
+  }
+
+  protected void assertTimerWithCycle(String elementId, String timerCycle) {
+    TimerEventDefinition timerEventDefinition = assertAndGetSingleEventDefinition(elementId, TimerEventDefinition.class);
+    TimeCycle timeCycle = timerEventDefinition.getTimeCycle();
+    assertThat(timeCycle).isNotNull();
+    assertThat(timeCycle.getTextContent()).isEqualTo(timerCycle);
   }
 
   @SuppressWarnings("unchecked")
