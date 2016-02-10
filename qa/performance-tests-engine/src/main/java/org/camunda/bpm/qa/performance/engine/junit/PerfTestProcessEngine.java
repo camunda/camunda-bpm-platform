@@ -81,7 +81,7 @@ public class PerfTestProcessEngine {
     return processEngineConfiguration.buildProcessEngine();
   }
 
-  protected static Properties loadProperties() {
+  public static Properties loadProperties() {
     InputStream propertyInputStream = null;
     try {
       propertyInputStream = PerfTestProcessEngine.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE_NAME);
