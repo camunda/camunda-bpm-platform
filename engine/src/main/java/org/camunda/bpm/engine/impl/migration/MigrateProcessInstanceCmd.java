@@ -12,10 +12,11 @@
  */
 package org.camunda.bpm.engine.impl.migration;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
@@ -33,6 +34,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.PvmExecutionImpl;
+import org.camunda.bpm.engine.impl.tree.FlowScopeWalker;
 import org.camunda.bpm.engine.impl.tree.TreeVisitor;
 import org.camunda.bpm.engine.impl.tree.TreeWalker.WalkCondition;
 import org.camunda.bpm.engine.migration.MigrationPlan;
@@ -195,27 +198,37 @@ public class MigrateProcessInstanceCmd implements Command<Void> {
     if (!activityInstance.getId().equals(activityInstance.getProcessInstanceId())) {
       final MigratingActivityInstance parentMigratingInstance = migratingActivityInstance.getParent();
 
-      ScopeImpl targetFlowScope = migratingActivityInstance.getTargetScope().getFlowScope();
+      ScopeImpl targetScope = migratingActivityInstance.getTargetScope();
+      ScopeImpl targetFlowScope = targetScope.getFlowScope();
       ScopeImpl parentActivityInstanceTargetScope = parentMigratingInstance.getTargetScope();
 
       if (targetFlowScope != parentActivityInstanceTargetScope) {
         // create intermediate scopes
 
-        ExecutionEntity flowScopeExecution = migratingActivityInstance.getFlowScopeExecution();
-
         // 1. detach activity instance
         migratingActivityInstance.detachState();
 
         // 2. manipulate execution tree
-        ExecutionEntity targetExecution = migratingExecutionBranch.getExecution(targetFlowScope);
 
-        if (targetExecution == null) {
-          targetExecution = createMissingTargetFlowScopeExecution(flowScopeExecution, (PvmActivity) targetFlowScope);
-          migratingExecutionBranch.registerExecution(targetFlowScope, targetExecution);
-        }
+        // determine the list of ancestor scopes (parent, grandparent, etc.) for which
+        //     no executions exist yet
+        List<ScopeImpl> nonExistingScopes = collectNonExistingFlowScopes(targetFlowScope, migratingExecutionBranch);
+
+        // get the closest ancestor scope that is instantiated already
+        ScopeImpl existingScope = nonExistingScopes.isEmpty() ?
+            targetFlowScope :
+            nonExistingScopes.get(0).getFlowScope();
+
+        // and its scope execution
+        ExecutionEntity ancestorScopeExecution = migratingExecutionBranch.getExecution(existingScope);
+
+        // Instantiate the scopes as children of the scope execution
+        instantiateScopes(ancestorScopeExecution, migratingExecutionBranch, nonExistingScopes);
+
+        ExecutionEntity targetFlowScopeExecution = migratingExecutionBranch.getExecution(targetFlowScope);
 
         // 3. attach to newly created execution
-        migratingActivityInstance.attachState(targetExecution);
+        migratingActivityInstance.attachState(targetFlowScopeExecution);
       }
     }
 
@@ -240,20 +253,63 @@ public class MigrateProcessInstanceCmd implements Command<Void> {
 
   }
 
-  protected ExecutionEntity createMissingTargetFlowScopeExecution(ExecutionEntity parentScopeExecution, PvmActivity targetFlowScope) {
-    ExecutionEntity newParentExecution = parentScopeExecution;
-    if (!parentScopeExecution.getNonEventScopeExecutions().isEmpty() || parentScopeExecution.getActivity() != null) {
-      newParentExecution = (ExecutionEntity) parentScopeExecution.createConcurrentExecution();
+  /**
+   * Returns a list of flow scopes from the given scope until a scope is reached that is already present in the given
+   * {@link MigratingExecutionBranch} (exclusive). The order of the returned list is top-down, i.e. the highest scope
+   * is the first element of the list.
+   */
+  protected List<ScopeImpl> collectNonExistingFlowScopes(ScopeImpl scope, final MigratingExecutionBranch migratingExecutionBranch) {
+    FlowScopeWalker walker = new FlowScopeWalker(scope);
+    final List<ScopeImpl> result = new LinkedList<ScopeImpl>();
+    walker.addPreVisitor(new TreeVisitor<ScopeImpl>() {
+
+      @Override
+      public void visit(ScopeImpl obj) {
+        result.add(0, obj);
+      }
+    });
+
+    walker.walkWhile(new WalkCondition<ScopeImpl>() {
+
+      @Override
+      public boolean isFulfilled(ScopeImpl element) {
+        return migratingExecutionBranch.hasExecution(element);
+      }
+    });
+
+    return result;
+  }
+
+  /**
+   * Creates scope executions for the given list of scopes;
+   * Registers these executions with the migrating execution branch;
+   *
+   * @param ancestorScopeExecution the execution for the scope that the scopes to instantiate
+   *   are subordinates to
+   * @param executionBranch the migrating execution branch that manages scopes and their executions
+   * @param scopesToInstantiate a list of hierarchical scopes to instantiate, ordered top-down
+   */
+  protected void instantiateScopes(ExecutionEntity ancestorScopeExecution,
+      MigratingExecutionBranch executionBranch, List<ScopeImpl> scopesToInstantiate) {
+
+    if (scopesToInstantiate.isEmpty()) {
+      return;
     }
 
-    List<PvmActivity> scopesToInstantiate = new ArrayList<PvmActivity>();
-    scopesToInstantiate.add(targetFlowScope);
-    newParentExecution.createScopes(scopesToInstantiate);
-    ExecutionEntity targetFlowScopeExecution = newParentExecution.getExecutions().get(0); // TODO: this does not work for more than one scope
+    ExecutionEntity newParentExecution = ancestorScopeExecution;
+    if (!ancestorScopeExecution.getNonEventScopeExecutions().isEmpty() || ancestorScopeExecution.getActivity() != null) {
+      newParentExecution = (ExecutionEntity) ancestorScopeExecution.createConcurrentExecution();
+    }
 
-    targetFlowScopeExecution.setActivity(null);
+    Map<PvmActivity, PvmExecutionImpl> createdExecutions =
+        newParentExecution.instantiateScopes((List) scopesToInstantiate);
 
-    return targetFlowScopeExecution;
+    for (ScopeImpl scope : scopesToInstantiate) {
+      ExecutionEntity createdExecution = (ExecutionEntity) createdExecutions.get(scope);
+      createdExecution.setActivity(null);
+      executionBranch.registerExecution(scope, createdExecution);
+
+    }
   }
 
 }

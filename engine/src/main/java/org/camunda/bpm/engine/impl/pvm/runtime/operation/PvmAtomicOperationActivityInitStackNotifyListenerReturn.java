@@ -64,7 +64,7 @@ public class PvmAtomicOperationActivityInitStackNotifyListenerReturn extends Pvm
     else {
       // else instantiate the activity stack further
       execution.setActivity(null);
-      execution.performOperation(ACTIVITY_INIT_STACK);
+      execution.performOperation(ACTIVITY_INIT_STACK_AND_RETURN);
 
     }
 

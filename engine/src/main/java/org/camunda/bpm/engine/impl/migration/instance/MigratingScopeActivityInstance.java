@@ -115,14 +115,7 @@ public class MigratingScopeActivityInstance extends MigratingActivityInstance {
     }
   }
 
-  @Override
-  public ExecutionEntity getFlowScopeExecution() {
-    ExecutionEntity parent = representativeExecution.getParent();
-    return parent.isScope() ? parent : parent.getParent();
-  }
-
   protected boolean isLeafActivity() {
     return targetScope.getActivities().isEmpty();
   }
-
 }

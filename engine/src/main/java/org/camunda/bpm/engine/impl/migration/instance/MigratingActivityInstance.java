@@ -57,8 +57,6 @@ public abstract class MigratingActivityInstance implements MigratingInstance {
 
   public abstract ExecutionEntity resolveRepresentativeExecution();
 
-  public abstract ExecutionEntity getFlowScopeExecution();
-
   public void addDependentInstance(MigratingInstance migratingInstance) {
     if (dependentInstances == null) {
       dependentInstances = new ArrayList<MigratingInstance>();

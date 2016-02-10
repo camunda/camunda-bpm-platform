@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +28,7 @@ import org.camunda.bpm.engine.impl.cmmn.execution.CmmnExecution;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
 import org.camunda.bpm.engine.impl.pvm.PvmExecution;
@@ -794,15 +796,38 @@ public abstract class PvmExecutionImpl extends CoreExecution implements Activity
         skipCustomListeners, skipIoMappings);
   }
 
-  public void createScopes(List<PvmActivity> activityStack) {
+  /**
+   * Instantiates the given set of activities and returns the execution for the bottom-most activity
+   */
+  public Map<PvmActivity, PvmExecutionImpl> instantiateScopes(List<PvmActivity> activityStack) {
+
+    if (activityStack.isEmpty()) {
+      return Collections.emptyMap();
+    }
 
     ExecutionStartContext executionStartContext = new ExecutionStartContext(false);
 
-    InstantiationStack instantiationStack = new InstantiationStack(activityStack);
+    InstantiationStack instantiationStack = new InstantiationStack(new LinkedList<PvmActivity>(activityStack));
     executionStartContext.setInstantiationStack(instantiationStack);
     setStartContext(executionStartContext);
 
     performOperation(PvmAtomicOperation.ACTIVITY_INIT_STACK_AND_RETURN);
+
+    Map<PvmActivity, PvmExecutionImpl> createdExecutions = new HashMap<PvmActivity, PvmExecutionImpl>();
+
+    PvmExecutionImpl currentExecution = this;
+    for (PvmActivity instantiatedActivity : activityStack) {
+      // there must exactly one child execution
+      currentExecution = (ExecutionEntity) currentExecution.getNonEventScopeExecutions().get(0);
+      if (currentExecution.isConcurrent()) {
+        // there may be a non-scope execution that we have to skip (e.g. multi-instance)
+        currentExecution = (ExecutionEntity) currentExecution.getNonEventScopeExecutions().get(0);
+      }
+
+      createdExecutions.put(instantiatedActivity, currentExecution);
+    }
+
+    return createdExecutions;
   }
 
   /**

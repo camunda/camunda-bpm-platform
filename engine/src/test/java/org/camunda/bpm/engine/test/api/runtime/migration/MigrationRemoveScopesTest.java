@@ -16,6 +16,7 @@ import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
+import static org.camunda.bpm.engine.test.util.MigrationInstructionInstanceValidationReportAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
@@ -23,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.migration.MigrationInstructionInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -344,6 +346,7 @@ public class MigrationRemoveScopesTest {
   }
 
   @Test
+  @Ignore("Missing feature CAM-5407")
   public void testRemoveScopeAndMoveToConcurrentActivity() {
 
     // given
@@ -394,6 +397,37 @@ public class MigrationRemoveScopesTest {
       rule.getTaskService().complete(migratedTask.getId());
     }
     testHelper.assertProcessEnded(processInstance.getId());
+  }
+
+  /**
+   * Remove when implementing CAM-5407
+   */
+  @Test
+  public void testCannotRemoveScopeAndMoveToConcurrentActivity() {
+
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_GATEWAY_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_TASK_AND_SUBPROCESS_PROCESS);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("subProcess", "subProcess")
+      .mapActivities("userTask1", "userTask1")
+      .mapActivities("userTask2", "userTask2")
+      .build();
+
+    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+
+    // when
+    try {
+      rule.getRuntimeService().executeMigrationPlan(migrationPlan, Arrays.asList(processInstance.getId()));
+      Assert.fail("should not validate");
+    } catch (MigrationInstructionInstanceValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasProcessInstance(processInstance)
+        .hasFailure("userTask2", "Closest migrating ancestor activity instance is migrated "
+            + "to activity 'subProcess' which is not an ancestor of target activity 'userTask2'");
+    }
   }
 
   @Test
@@ -473,6 +507,35 @@ public class MigrationRemoveScopesTest {
     assertEquals(testHelper.getSingleActivityInstance(activityInstance, "subProcess").getId(), event.getActivityInstanceId());
 
     DelegateEvent.clearEvents();
+  }
+
+  @Test
+  public void testCannotRemoveParentScopeAndMoveOutOfGrandParentScope() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.TRIPLE_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.TRIPLE_SUBPROCESS_PROCESS);
+
+    // subProcess2 is not migrated
+    // subProcess 3 is moved out of the subProcess1 scope (by becoming a subProcess1 itself)
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("subProcess1", "subProcess1")
+      .mapActivities("subProcess3", "subProcess1")
+      .mapActivities("userTask", "userTask")
+      .build();
+
+    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+
+    // when
+    try {
+      rule.getRuntimeService().executeMigrationPlan(migrationPlan, Arrays.asList(processInstance.getId()));
+      Assert.fail("should not validate");
+    } catch (MigrationInstructionInstanceValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasProcessInstance(processInstance)
+        .hasFailure("subProcess3", "Closest migrating ancestor activity instance is migrated to activity 'subProcess1' which is "
+            + "not an ancestor of target activity 'subProcess1'");
+    }
   }
 
 }

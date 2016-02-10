@@ -17,7 +17,6 @@ import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeAc
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
 import static org.junit.Assert.assertEquals;
-import static org.camunda.bpm.engine.test.util.MigrationInstructionInstanceValidationReportAssert.assertThat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,7 +24,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.migration.MigrationInstructionInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
@@ -680,7 +678,7 @@ public class MigrationAddScopesTest {
   }
 
   @Test
-  public void testCannotAddTwoScopes() {
+  public void testAddTwoScopes() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.ONE_TASK_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.DOUBLE_SUBPROCESS_PROCESS);
@@ -691,22 +689,94 @@ public class MigrationAddScopesTest {
       .build();
 
     ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ActivityInstance activityInstance = rule.getRuntimeService().getActivityInstance(processInstance.getId());
 
     // when
-    try {
-      rule.getRuntimeService().executeMigrationPlan(migrationPlan, Collections.singletonList(processInstance.getId()));
-      Assert.fail("should fail");
-    }
-    catch (MigrationInstructionInstanceValidationException e) {
-      assertThat(e.getValidationReport())
-        .hasProcessInstance(processInstance)
-        .hasFailures(1)
-        .hasFailure("userTask", "Parent activity instance must be migrated to the parent or grandparent scope");
-    }
+    rule.getRuntimeService().executeMigrationPlan(migrationPlan, Collections.singletonList(processInstance.getId()));
+
+    // then
+    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
+    assertThat(executionTree)
+    .matches(
+      describeExecutionTree(null).scope().id(processInstance.getId())
+        .child(null).scope()
+          .child("userTask").scope()
+      .done());
+
+    assertThat(executionTree).hasProcessDefinitionId(targetProcessDefinition.getId());
+
+    ActivityInstance updatedTree = rule.getRuntimeService().getActivityInstance(processInstance.getId());
+    assertThat(updatedTree).hasStructure(
+        describeActivityInstanceTree(targetProcessDefinition.getId())
+          .beginScope("outerSubProcess")
+            .beginScope("innerSubProcess")
+              .activity("userTask", testHelper.getSingleActivityInstance(activityInstance, "userTask").getId())
+        .done());
+
+    Task migratedTask = rule.getTaskService().createTaskQuery().singleResult();
+    Assert.assertNotNull(migratedTask);
+    assertEquals(targetProcessDefinition.getId(), migratedTask.getProcessDefinitionId());
+
+    // and it is possible to successfully complete the migrated instance
+    rule.getTaskService().complete(migratedTask.getId());
+    testHelper.assertProcessEnded(processInstance.getId());
   }
 
   @Test
-  public void testCannotMigrateParentScopeWayTooHigh() {
+  public void testAddTwoConcurrentScopes() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_GATEWAY_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.DOUBLE_PARALLEL_SUBPROCESS_PROCESS);
+
+    MigrationPlan migrationPlan = rule.getRuntimeService()
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("userTask1", "userTask1")
+      .mapActivities("userTask2", "userTask2")
+      .build();
+
+    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ActivityInstance activityInstance = rule.getRuntimeService().getActivityInstance(processInstance.getId());
+
+    // when
+    rule.getRuntimeService().executeMigrationPlan(migrationPlan, Collections.singletonList(processInstance.getId()));
+
+    // then there is only one instance of outerSubProcess
+    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
+    assertThat(executionTree)
+    .matches(
+      describeExecutionTree(null).scope().id(processInstance.getId())
+        .child(null).scope()
+          .child(null).concurrent().noScope()
+            .child("userTask1").scope().up().up()
+          .child(null).concurrent().noScope()
+            .child("userTask2").scope()
+      .done());
+
+    assertThat(executionTree).hasProcessDefinitionId(targetProcessDefinition.getId());
+
+    ActivityInstance updatedTree = rule.getRuntimeService().getActivityInstance(processInstance.getId());
+    assertThat(updatedTree).hasStructure(
+        describeActivityInstanceTree(targetProcessDefinition.getId())
+          .beginScope("outerSubProcess")
+            .beginScope("innerSubProcess1")
+              .activity("userTask1", testHelper.getSingleActivityInstance(activityInstance, "userTask1").getId())
+            .endScope()
+            .beginScope("innerSubProcess2")
+              .activity("userTask2", testHelper.getSingleActivityInstance(activityInstance, "userTask2").getId())
+        .done());
+
+    List<Task> migratedTasks = rule.getTaskService().createTaskQuery().list();
+    Assert.assertEquals(2, migratedTasks.size());
+
+    // and it is possible to successfully complete the migrated instance
+    for (Task migratedTask : migratedTasks) {
+      rule.getTaskService().complete(migratedTask.getId());
+    }
+    testHelper.assertProcessEnded(processInstance.getId());
+  }
+
+  @Test
+  public void testCanMigrateParentScopeWayTooHigh() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.TRIPLE_SUBPROCESS_PROCESS);
@@ -718,18 +788,38 @@ public class MigrationAddScopesTest {
       .build();
 
     ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
+    ActivityInstance activityInstance = rule.getRuntimeService().getActivityInstance(processInstance.getId());
 
     // when
-    try {
-      rule.getRuntimeService().executeMigrationPlan(migrationPlan, Collections.singletonList(processInstance.getId()));
-      Assert.fail("should fail");
-    }
-    catch (MigrationInstructionInstanceValidationException e) {
-      assertThat(e.getValidationReport())
-        .hasProcessInstance(processInstance)
-        .hasFailures(1)
-        .hasFailure("userTask", "Parent activity instance must be migrated to the parent or grandparent scope");
-    }
+    rule.getRuntimeService().executeMigrationPlan(migrationPlan, Collections.singletonList(processInstance.getId()));
+
+    // then there is only one instance of outerSubProcess
+    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
+    assertThat(executionTree)
+    .matches(
+      describeExecutionTree(null).scope().id(processInstance.getId())
+        .child(null).scope().id(testHelper.getSingleExecutionIdForActivity(activityInstance, "subProcess"))
+          .child(null).scope()
+            .child("userTask").scope()
+      .done());
+
+    assertThat(executionTree).hasProcessDefinitionId(targetProcessDefinition.getId());
+
+    ActivityInstance updatedTree = rule.getRuntimeService().getActivityInstance(processInstance.getId());
+    assertThat(updatedTree).hasStructure(
+        describeActivityInstanceTree(targetProcessDefinition.getId())
+          .beginScope("subProcess1", testHelper.getSingleActivityInstance(activityInstance, "subProcess").getId())
+            .beginScope("subProcess2")
+              .beginScope("subProcess3")
+                .activity("userTask", testHelper.getSingleActivityInstance(activityInstance, "userTask").getId())
+        .done());
+
+    Task migratedTask = rule.getTaskService().createTaskQuery().singleResult();
+    Assert.assertNotNull(migratedTask);
+
+    // and it is possible to successfully complete the migrated instance
+    rule.getTaskService().complete(migratedTask.getId());
+    testHelper.assertProcessEnded(processInstance.getId());
   }
 
   @Test

@@ -67,6 +67,32 @@ public class ProcessModels {
       .endEvent()
       .done();
 
+  public static final BpmnModelInstance DOUBLE_PARALLEL_SUBPROCESS_PROCESS =
+      newModel()
+        .startEvent()
+        .subProcess("outerSubProcess")
+         .embeddedSubProcess()
+           .startEvent()
+           .parallelGateway("fork")
+           .subProcess("innerSubProcess1")
+             .embeddedSubProcess()
+               .startEvent()
+               .userTask("userTask1").name("User Task 1")
+               .endEvent()
+           .subProcessDone()
+           .endEvent()
+           .moveToLastGateway()
+           .subProcess("innerSubProcess2")
+             .embeddedSubProcess()
+               .startEvent()
+               .userTask("userTask2").name("User Task 2")
+               .endEvent()
+           .subProcessDone()
+           .endEvent()
+       .subProcessDone()
+       .endEvent()
+       .done();
+
   public static final BpmnModelInstance TRIPLE_SUBPROCESS_PROCESS =
       newModel()
         .startEvent()

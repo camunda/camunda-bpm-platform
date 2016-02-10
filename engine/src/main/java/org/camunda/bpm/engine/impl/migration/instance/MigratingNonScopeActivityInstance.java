@@ -105,19 +105,6 @@ public class MigratingNonScopeActivityInstance extends MigratingActivityInstance
   }
 
   @Override
-  public ExecutionEntity getFlowScopeExecution() {
-
-    ExecutionEntity currentScopeExecution = resolveRepresentativeExecution();
-
-    if (!currentScopeExecution.isScope()) {
-      return currentScopeExecution.getParent();
-    }
-    else {
-      return currentScopeExecution;
-    }
-  }
-
-  @Override
   public ExecutionEntity resolveRepresentativeExecution() {
     if (representativeExecution.getReplacedBy() != null) {
       return representativeExecution.resolveReplacedBy();

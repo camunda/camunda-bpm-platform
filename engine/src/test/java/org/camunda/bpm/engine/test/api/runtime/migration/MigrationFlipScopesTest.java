@@ -12,14 +12,15 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
+import static org.camunda.bpm.engine.test.util.MigrationInstructionInstanceValidationReportAssert.assertThat;
+
 import java.util.Arrays;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.migration.MigrationInstructionInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,7 +30,7 @@ import org.junit.rules.RuleChain;
  * @author Thorben Lindhauer
  *
  */
-public class MigrationHorizontalScopeChangeTest {
+public class MigrationFlipScopesTest {
 
   protected ProcessEngineRule rule = new ProcessEngineRule();
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);
@@ -38,18 +39,16 @@ public class MigrationHorizontalScopeChangeTest {
   public RuleChain ruleChain = RuleChain.outerRule(rule).around(testHelper);
 
   @Test
-  public void testCannotMigrateHorizontallyBetweenScopes() {
-
+  public void testCannotFlipAncestorScopes() {
     // given
-    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_SUBPROCESS_PROCESS);
-    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.PARALLEL_SUBPROCESS_PROCESS);
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.DOUBLE_SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.DOUBLE_SUBPROCESS_PROCESS);
 
     MigrationPlan migrationPlan = rule.getRuntimeService()
       .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
-      .mapActivities("subProcess1", "subProcess1")
-      .mapActivities("subProcess2", "subProcess2")
-      .mapActivities("userTask1", "userTask2")
-      .mapActivities("userTask2", "userTask1")
+      .mapActivities("outerSubProcess", "innerSubProcess")
+      .mapActivities("innerSubProcess", "outerSubProcess")
+      .mapActivities("userTask", "userTask")
       .build();
 
     ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
@@ -57,13 +56,12 @@ public class MigrationHorizontalScopeChangeTest {
     // when
     try {
       rule.getRuntimeService().executeMigrationPlan(migrationPlan, Arrays.asList(processInstance.getId()));
-      Assert.fail("should fail");
-    }
-    catch (ProcessEngineException e) {
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Closest migrating ancestor activity instance is migrated "
-          + "to activity 'subProcess1' which is not an ancestor of target activity 'userTask2'"));
-      Assert.assertThat(e.getMessage(), CoreMatchers.containsString("Closest migrating ancestor activity instance is migrated "
-          + "to activity 'subProcess2' which is not an ancestor of target activity 'userTask1'"));
+      Assert.fail("should not validate");
+    } catch (MigrationInstructionInstanceValidationException e) {
+      assertThat(e.getValidationReport())
+        .hasProcessInstance(processInstance)
+        .hasFailure("innerSubProcess", "Closest migrating ancestor activity instance is migrated "
+          + "to activity 'innerSubProcess' which is not an ancestor of target activity 'outerSubProcess'");
     }
   }
 }

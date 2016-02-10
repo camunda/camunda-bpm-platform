@@ -18,8 +18,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 
 /**
- * Validates that an activity instance is migrated below its migrated parent activity instance
- * with at most one new flow scope in between
+ * Validates that an activity instance is migrated below its migrated parent activity instance.
  *
  * @author Thorben Lindhauer
  */
@@ -28,23 +27,28 @@ public class AdditionalFlowScopeValidator implements MigrationInstructionInstanc
   @Override
   public void validate(MigratingProcessInstance migratingProcessInstance, MigratingActivityInstance migratingActivityInstance,
       MigrationInstructionInstanceValidationReportImpl validationReport) {
-    ActivityInstance activityInstance = migratingActivityInstance.getActivityInstance();
-    MigratingActivityInstance parentInstance = migratingProcessInstance.getMigratingInstance(activityInstance.getParentActivityInstanceId());
+    MigratingActivityInstance ancestorInstance = getClosestPreservedAncestorInstance(migratingActivityInstance);
     ScopeImpl targetScope = migratingActivityInstance.getTargetScope();
 
     // note: this also detects and rejects horizontal migration. In that case, the parent activity instance
     // is migrated to a scope that is not present in this activity instance's target scope parent hierarchy
-    if (parentInstance != null && targetScope != null && targetScope != targetScope.getProcessDefinition()) {
-      ScopeImpl parentInstanceTargetScope = parentInstance.getTargetScope();
-      ScopeImpl flowScope = targetScope.getFlowScope();
-      if (flowScope != parentInstanceTargetScope) {
-        if (flowScope != flowScope.getProcessDefinition() && flowScope.getFlowScope() != parentInstanceTargetScope) {
-          validationReport.addValidationFailure(migratingActivityInstance, "Parent activity instance must be migrated to"
-              + " the parent or grandparent scope");
-        }
+    if (ancestorInstance != null && targetScope != null && targetScope != targetScope.getProcessDefinition()) {
+      ScopeImpl parentInstanceTargetScope = ancestorInstance.getTargetScope();
+      if (parentInstanceTargetScope != null && !parentInstanceTargetScope.isAncestorFlowScopeOf(targetScope)) {
+        validationReport.addValidationFailure(migratingActivityInstance, "Closest migrating ancestor activity instance is migrated "
+            + "to activity '" + parentInstanceTargetScope.getId() + "' which is not an ancestor of target activity '"
+            + targetScope.getId() + "'");
       }
     }
-
   }
 
+  protected MigratingActivityInstance getClosestPreservedAncestorInstance(MigratingActivityInstance activityInstance) {
+    MigratingActivityInstance parent = activityInstance.getParent();
+
+    while (parent != null && parent.getTargetScope() == null) {
+      parent = parent.getParent();
+    }
+
+    return parent;
+  }
 }
