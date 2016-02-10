@@ -1426,6 +1426,18 @@ public class ProcessBuilderTest {
     assertTimerWithCycle("boundary", TIMER_CYCLE);
   }
 
+  @Test
+  public void testNotCancelingBoundaryEvent() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask()
+      .boundaryEvent("boundary").cancelActivity(false)
+      .done();
+
+    BoundaryEvent boundaryEvent = modelInstance.getModelElementById("boundary");
+    assertThat(boundaryEvent.cancelActivity()).isFalse();
+  }
+
   protected Message assertMessageEventDefinition(String elementId, String messageName) {
     MessageEventDefinition messageEventDefinition = assertAndGetSingleEventDefinition(elementId, MessageEventDefinition.class);
     return assertMessageEventDefinition(messageName, messageEventDefinition);
