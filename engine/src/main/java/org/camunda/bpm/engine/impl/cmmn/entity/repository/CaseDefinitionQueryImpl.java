@@ -47,6 +47,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
   protected String resourceNameLike;
   protected Integer version;
   protected boolean latest = false;
+  protected String[] tenantIds;
 
   public CaseDefinitionQueryImpl() {
   }
@@ -134,6 +135,12 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
     return this;
   }
 
+  public CaseDefinitionQuery tenantIdIn(String... tenantIds) {
+    ensureNotNull("tenantIds", (Object[]) tenantIds);
+    this.tenantIds = tenantIds;
+    return this;
+  }
+
   public CaseDefinitionQuery orderByCaseDefinitionCategory() {
     orderBy(CaseDefinitionQueryProperty.CASE_DEFINITION_CATEGORY);
     return this;
@@ -164,6 +171,10 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
     return this;
   }
 
+  public CaseDefinitionQuery orderByTenantId() {
+    return orderBy(CaseDefinitionQueryProperty.TENANT_ID);
+  }
+
   @Override
   protected boolean hasExcludingConditions() {
     return super.hasExcludingConditions() || CompareUtil.elementIsNotContainedInArray(id, ids);
@@ -171,6 +182,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
 
   //results ////////////////////////////////////////////
 
+  @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     return commandContext
@@ -178,6 +190,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
       .findCaseDefinitionCountByQueryCriteria(this);
   }
 
+  @Override
   public List<CaseDefinition> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     return commandContext
@@ -185,6 +198,7 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
       .findCaseDefinitionsByQueryCriteria(this, page);
   }
 
+  @Override
   public void checkQueryOk() {
     super.checkQueryOk();
 

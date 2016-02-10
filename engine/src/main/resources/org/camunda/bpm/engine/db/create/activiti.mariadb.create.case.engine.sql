@@ -9,6 +9,7 @@ create table ACT_RE_CASE_DEF (
     DEPLOYMENT_ID_ varchar(64),
     RESOURCE_NAME_ varchar(4000),
     DGRM_RESOURCE_NAME_ varchar(4000),
+    TENANT_ID_ varchar(64),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
@@ -44,11 +45,6 @@ create table ACT_RU_CASE_SENTRY_PART (
     SATISFIED_ boolean,
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
-
--- create unique constraint on ACT_RE_CASE_DEF --
-alter table ACT_RE_CASE_DEF
-    add constraint ACT_UNIQ_CASE_DEF
-    unique (KEY_,VERSION_);
 
 -- create index on business key --
 create index ACT_IDX_CASE_EXEC_BUSKEY on ACT_RU_CASE_EXECUTION(BUSINESS_KEY_);
@@ -101,3 +97,5 @@ alter table ACT_RU_CASE_SENTRY_PART
     add constraint ACT_FK_CASE_SENTRY_CASE_EXEC
     foreign key (CASE_EXEC_ID_)
     references ACT_RU_CASE_EXECUTION(ID_);
+    
+create index ACT_IDX_CASE_DEF_TENANT_ID on ACT_RE_CASE_DEF(TENANT_ID_);    

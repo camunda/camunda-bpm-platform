@@ -586,4 +586,12 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         ));
   }
 
+  public ProcessEngineException multipleTenantsForCaseDefinitionKeyException(String caseDefinitionKey) {
+    return new ProcessEngineException(exceptionMessage(
+        "075",
+        "Cannot resolve a unique case definition for key '{}' because it exists for multiple tenants.",
+        caseDefinitionKey
+        ));
+  }
+
 }

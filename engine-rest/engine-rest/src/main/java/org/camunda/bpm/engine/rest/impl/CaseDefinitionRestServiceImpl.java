@@ -12,7 +12,12 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.repository.CaseDefinition;
@@ -26,10 +31,7 @@ import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.repository.CaseDefinitionResource;
 import org.camunda.bpm.engine.rest.sub.repository.impl.CaseDefinitionResourceImpl;
 
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
-import java.util.ArrayList;
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  *
@@ -50,20 +52,27 @@ public class CaseDefinitionRestServiceImpl extends AbstractRestProcessEngineAwar
 
     ProcessEngine engine = getProcessEngine();
     RepositoryService repositoryService = engine.getRepositoryService();
-    CaseDefinitionQuery query = repositoryService.createCaseDefinitionQuery();
 
-    query
+    List<CaseDefinition> caseDefinitions = repositoryService
+      .createCaseDefinitionQuery()
       .caseDefinitionKey(caseDefinitionKey)
-      .latestVersion();
+      .latestVersion()
+      .list();
 
-    CaseDefinition caseDefinition = query.singleResult();
-
-    if (caseDefinition == null) {
+    if (caseDefinitions.isEmpty()) {
       String errorMessage = String.format("No matching case definition with key: %s ", caseDefinitionKey);
       throw new RestException(Status.NOT_FOUND, errorMessage);
-    }
 
-    return getCaseDefinitionById(caseDefinition.getId());
+    } else if(caseDefinitions.size() > 1) {
+      String errorMessage = String.format(
+          "Found multiple case definition with key '%s' for different tenants. You have to request the case definition by id instead of key.",
+          caseDefinitionKey);
+      throw new RestException(Status.BAD_REQUEST, errorMessage);
+
+    } else {
+      CaseDefinition caseDefinition = caseDefinitions.get(0);
+      return getCaseDefinitionById(caseDefinition.getId());
+    }
   }
 
   @Override

@@ -7,7 +7,17 @@
   <!-- CASEDEFINITION INSERT -->
 
   <insert id="insertCaseDefinition" parameterType="org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity">
-    insert into ${prefix}ACT_RE_CASE_DEF(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, DGRM_RESOURCE_NAME_, REV_)
+    insert into ${prefix}ACT_RE_CASE_DEF(
+      ID_, 
+      CATEGORY_, 
+      NAME_, 
+      KEY_, 
+      VERSION_, 
+      DEPLOYMENT_ID_, 
+      RESOURCE_NAME_, 
+      DGRM_RESOURCE_NAME_, 
+      TENANT_ID_,
+      REV_)
     values (#{id, jdbcType=VARCHAR},
             #{category, jdbcType=VARCHAR},
             #{name, jdbcType=VARCHAR},
@@ -16,6 +26,7 @@
             #{deploymentId, jdbcType=VARCHAR},
             #{resourceName, jdbcType=VARCHAR},
             #{diagramResourceName, jdbcType=VARCHAR},
+            #{tenantId, jdbcType=VARCHAR},
             1
            )
   </insert>
@@ -46,7 +57,8 @@
     <result property="version" column="VERSION_" jdbcType="INTEGER"/>
     <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR"/>
     <result property="resourceName" column="RESOURCE_NAME_" jdbcType="VARCHAR"/>
-    <result property="diagramResourceName" column="DGRM_RESOURCE_NAME_" jdbcType="VARCHAR"/>    
+    <result property="diagramResourceName" column="DGRM_RESOURCE_NAME_" jdbcType="VARCHAR"/>
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>    
   </resultMap>
 
   <!-- CASEDEFINITION SELECT -->
@@ -68,9 +80,37 @@
 
   <select id="selectLatestCaseDefinitionByKey" parameterType="string" resultMap="caseDefinitionResultMap">
     select *
+    from ${prefix}ACT_RE_CASE_DEF c1
+      inner join
+          (select KEY_, TENANT_ID_, max(VERSION_) as MAX_VERSION
+          from ${prefix}ACT_RE_CASE_DEF
+          where KEY_ = #{parameter}
+          group by TENANT_ID_, KEY_) c2
+        on c1.KEY_ = c2.KEY_
+    where c1.VERSION_ = c2.MAX_VERSION and 
+          (c1.TENANT_ID_ = c2.TENANT_ID_ or (c1.TENANT_ID_ is null and c2.TENANT_ID_ is null))
+  </select>
+  
+  <select id="selectLatestCaseDefinitionByKeyWithoutTenantId" parameterType="map" resultMap="caseDefinitionResultMap">
+    select *
     from ${prefix}ACT_RE_CASE_DEF 
-    where KEY_ = #{caseDefinitionKey} and
-          VERSION_ = (select max(VERSION_) from ${prefix}ACT_RE_CASE_DEF where KEY_ = #{caseDefinitionKey})
+    where KEY_ = #{caseDefinitionKey}
+          and TENANT_ID_ is null
+          and VERSION_ = (
+              select max(VERSION_) 
+              from ${prefix}ACT_RE_CASE_DEF 
+              where KEY_ = #{caseDefinitionKey} and TENANT_ID_ is null)
+  </select>
+  
+  <select id="selectLatestCaseDefinitionByKeyAndTenantId" parameterType="map" resultMap="caseDefinitionResultMap">
+    select *
+    from ${prefix}ACT_RE_CASE_DEF 
+    where KEY_ = #{caseDefinitionKey}
+          and TENANT_ID_ = #{tenantId}
+          and VERSION_ = (
+              select max(VERSION_) 
+              from ${prefix}ACT_RE_CASE_DEF 
+              where KEY_ = #{caseDefinitionKey} and TENANT_ID_ = #{tenantId})
   </select>
 
   <select id="selectCaseDefinitionByKeyAndVersion" parameterType="map" resultMap="caseDefinitionResultMap">
@@ -121,6 +161,18 @@
 
   <sql id="selectCaseDefinitionsByQueryCriteriaSql">
     from ${prefix}ACT_RE_CASE_DEF RES
+    <if test="latest">
+      inner join
+          (select KEY_, TENANT_ID_, max(VERSION_) as MAX_VERSION
+          from ${prefix}ACT_RE_CASE_DEF
+          <where>
+            <if test="key != null">
+              KEY_ = #{key}
+            </if>
+          </where>
+          group by TENANT_ID_, KEY_) VER
+        on RES.KEY_ = VER.KEY_
+    </if>
     <where>
       <if test="id != null">
         RES.ID_ = #{id}
@@ -163,8 +215,17 @@
         and RES.DEPLOYMENT_ID_ = #{deploymentId}
       </if>
       <if test="latest">
-        and RES.VERSION_ = (select max(VERSION_) from ${prefix}ACT_RE_CASE_DEF where KEY_ = RES.KEY_)
+       and RES.VERSION_ = VER.MAX_VERSION and 
+          (RES.TENANT_ID_ = VER.TENANT_ID_ or (RES.TENANT_ID_ is null and VER.TENANT_ID_ is null)) 
       </if>
+      <if test="tenantIds != null &amp;&amp; tenantIds.length > 0">
+        and RES.TENANT_ID_ in
+        <foreach item="tenantId" index="index" collection="tenantIds"
+                 open="(" separator="," close=")">
+          #{tenantId}
+        </foreach>
+      </if>
+      
     </where>
   </sql>
 

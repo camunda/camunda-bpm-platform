@@ -42,6 +42,8 @@ public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefi
   protected String deploymentId;
   protected String resourceName;
   protected String diagramResourceName;
+  protected String tenantId;
+
   protected Map<String, TaskDefinition> taskDefinitions;
 
   // firstVersion is true, when version == 1 or when
@@ -120,6 +122,14 @@ public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefi
 
   public void setTaskDefinitions(Map<String, TaskDefinition> taskDefinitions) {
     this.taskDefinitions = taskDefinitions;
+  }
+
+  public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
   }
 
   // previous case definition //////////////////////////////////////////////
@@ -212,17 +222,6 @@ public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefi
   @Override
   public String toString() {
     return "CaseDefinitionEntity["+id+"]";
-  }
-
-  @Override
-  public String getTenantId() {
-    // TODO add tenant id - see CAM-5189
-    return null;
-  }
-
-  @Override
-  public void setTenantId(String tenantId) {
-    // TODO set tenant id - see CAM-5189
   }
 
 }

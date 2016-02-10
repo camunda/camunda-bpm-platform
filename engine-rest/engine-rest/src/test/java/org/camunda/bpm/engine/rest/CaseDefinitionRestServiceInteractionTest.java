@@ -29,7 +29,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
@@ -101,6 +103,7 @@ public class CaseDefinitionRestServiceInteractionTest extends AbstractRestServic
     when(caseDefinitionQueryMock.caseDefinitionKey(MockProvider.EXAMPLE_CASE_DEFINITION_KEY)).thenReturn(caseDefinitionQueryMock);
     when(caseDefinitionQueryMock.latestVersion()).thenReturn(caseDefinitionQueryMock);
     when(caseDefinitionQueryMock.singleResult()).thenReturn(mockCaseDefinition);
+    when(caseDefinitionQueryMock.list()).thenReturn(Collections.singletonList(mockCaseDefinition));
     when(repositoryServiceMock.createCaseDefinitionQuery()).thenReturn(caseDefinitionQueryMock);
 
     caseServiceMock = mock(CaseService.class);
@@ -152,6 +155,7 @@ public class CaseDefinitionRestServiceInteractionTest extends AbstractRestServic
         .body("deploymentId", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_ID))
         .body("version", equalTo(MockProvider.EXAMPLE_CASE_DEFINITION_VERSION))
         .body("resource", equalTo(MockProvider.EXAMPLE_CASE_DEFINITION_RESOURCE_NAME))
+        .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
     .when()
       .get(SINGLE_CASE_DEFINITION_URL);
 
@@ -188,6 +192,7 @@ public class CaseDefinitionRestServiceInteractionTest extends AbstractRestServic
         .body("deploymentId", equalTo(MockProvider.EXAMPLE_DEPLOYMENT_ID))
         .body("version", equalTo(MockProvider.EXAMPLE_CASE_DEFINITION_VERSION))
         .body("resource", equalTo(MockProvider.EXAMPLE_CASE_DEFINITION_RESOURCE_NAME))
+        .body("tenantId", equalTo(MockProvider.EXAMPLE_TENANT_ID))
     .when()
       .get(SINGLE_CASE_DEFINITION_BY_KEY_URL);
 
@@ -201,6 +206,7 @@ public class CaseDefinitionRestServiceInteractionTest extends AbstractRestServic
     when(repositoryServiceMock.createCaseDefinitionQuery().caseDefinitionKey(nonExistingKey)).thenReturn(caseDefinitionQueryMock);
     when(caseDefinitionQueryMock.latestVersion()).thenReturn(caseDefinitionQueryMock);
     when(caseDefinitionQueryMock.singleResult()).thenReturn(null);
+    when(caseDefinitionQueryMock.list()).thenReturn(Collections.<CaseDefinition> emptyList());
 
     given()
       .pathParam("key", nonExistingKey)
@@ -211,6 +217,23 @@ public class CaseDefinitionRestServiceInteractionTest extends AbstractRestServic
         .body("message", containsString("No matching case definition with key: " + nonExistingKey))
     .when()
       .get(SINGLE_CASE_DEFINITION_BY_KEY_URL);
+  }
+
+  @Test
+  public void testCaseDefinitionRetrievalForMultipleTenants_ByKey() {
+    // case definition is deployed for two tenants
+    List<CaseDefinition> caseDefinitions = MockProvider.createMockTwoCaseDefinitions();
+
+    when(caseDefinitionQueryMock.list()).thenReturn(caseDefinitions);
+    when(caseDefinitionQueryMock.count()).thenReturn(2L);
+    when(caseDefinitionQueryMock.singleResult()).thenThrow(new ProcessEngineException("not a unique result"));
+
+    given().pathParam("key", MockProvider.EXAMPLE_CASE_DEFINITION_KEY)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", is(RestException.class.getSimpleName()))
+      .body("message", containsString("Found multiple case definition with key '"+MockProvider.EXAMPLE_CASE_DEFINITION_KEY+"' for different tenants"))
+    .when().get(SINGLE_CASE_DEFINITION_BY_KEY_URL);
   }
 
   @Test

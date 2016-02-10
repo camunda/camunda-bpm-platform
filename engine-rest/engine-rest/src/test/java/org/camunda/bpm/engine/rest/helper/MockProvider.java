@@ -2064,10 +2064,8 @@ public abstract class MockProvider {
     return mocks;
   }
 
-  public static CaseDefinition createMockCaseDefinition() {
-    MockCaseDefinitionBuilder builder = new MockCaseDefinitionBuilder();
-
-    CaseDefinition mockDefinition = builder
+  public static MockCaseDefinitionBuilder mockCaseDefinition() {
+    return new MockCaseDefinitionBuilder()
         .id(EXAMPLE_CASE_DEFINITION_ID)
         .category(EXAMPLE_CASE_DEFINITION_CATEGORY)
         .name(EXAMPLE_CASE_DEFINITION_NAME)
@@ -2076,26 +2074,18 @@ public abstract class MockProvider {
         .resource(EXAMPLE_CASE_DEFINITION_RESOURCE_NAME)
         .diagram(EXAMPLE_CASE_DEFINITION_DIAGRAM_RESOURCE_NAME)
         .deploymentId(EXAMPLE_DEPLOYMENT_ID)
-        .build();
+        .tenantId(EXAMPLE_TENANT_ID);
+  }
 
-    return mockDefinition;
+  public static CaseDefinition createMockCaseDefinition() {
+    return mockCaseDefinition().build();
   }
 
   public static CaseDefinition createAnotherMockCaseDefinition() {
-    MockCaseDefinitionBuilder builder = new MockCaseDefinitionBuilder();
-
-    CaseDefinition mockDefinition = builder
-      .id(ANOTHER_EXAMPLE_CASE_DEFINITION_ID)
-      .category(EXAMPLE_CASE_DEFINITION_CATEGORY)
-      .name(EXAMPLE_CASE_DEFINITION_NAME)
-      .key(EXAMPLE_CASE_DEFINITION_KEY)
-      .version(EXAMPLE_CASE_DEFINITION_VERSION)
-      .resource(EXAMPLE_CASE_DEFINITION_RESOURCE_NAME)
-      .diagram(EXAMPLE_CASE_DEFINITION_DIAGRAM_RESOURCE_NAME)
-      .deploymentId(EXAMPLE_DEPLOYMENT_ID)
-      .build();
-
-    return mockDefinition;
+    return mockCaseDefinition()
+       .id(ANOTHER_EXAMPLE_CASE_DEFINITION_ID)
+       .tenantId(ANOTHER_EXAMPLE_TENANT_ID)
+       .build();
   }
 
   // case instance

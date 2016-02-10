@@ -32,6 +32,7 @@ public class MockCaseDefinitionBuilder {
   private String resource = null;
   protected String diagramResource = null;
   private String deploymentId = null;
+  private String tenantId = null;
 
   public MockCaseDefinitionBuilder id(String id) {
     this.id = id;
@@ -73,6 +74,11 @@ public class MockCaseDefinitionBuilder {
     return this;
   }
 
+  public MockCaseDefinitionBuilder tenantId(String tenantId) {
+    this.tenantId = tenantId;
+    return this;
+  }
+
   public CaseDefinition build() {
     CaseDefinition mockDefinition = mock(CaseDefinition.class);
 
@@ -84,6 +90,7 @@ public class MockCaseDefinitionBuilder {
     when(mockDefinition.getResourceName()).thenReturn(resource);
     when(mockDefinition.getDiagramResourceName()).thenReturn(diagramResource);
     when(mockDefinition.getDeploymentId()).thenReturn(deploymentId);
+    when(mockDefinition.getTenantId()).thenReturn(tenantId);
 
     return mockDefinition;
   }

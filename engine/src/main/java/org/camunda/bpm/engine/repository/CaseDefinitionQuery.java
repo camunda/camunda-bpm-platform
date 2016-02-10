@@ -122,6 +122,9 @@ public interface CaseDefinitionQuery extends Query<CaseDefinitionQuery, CaseDefi
    */
   CaseDefinitionQuery caseDefinitionResourceNameLike(String resourceNameLike);
 
+  /** Only select case definitions with one of the given tenant ids. */
+  CaseDefinitionQuery tenantIdIn(String... tenantIds);
+
   // ordering ////////////////////////////////////////////////////////////
 
   /** Order by the category of the case definitions (needs to be followed by
@@ -147,5 +150,9 @@ public interface CaseDefinitionQuery extends Query<CaseDefinitionQuery, CaseDefi
   /** Order by deployment id (needs to be followed by {@link #asc()}
    * or {@link #desc()}). */
   CaseDefinitionQuery orderByDeploymentId();
+
+  /** Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
+   * Note that the ordering of case instances without tenant id is database-specific. */
+  CaseDefinitionQuery orderByTenantId();
 
 }

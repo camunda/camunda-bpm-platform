@@ -1,7 +1,5 @@
 drop index ACT_IDX_CASE_EXEC_BUSKEY;
-
-alter table ACT_RE_CASE_DEF
-    drop constraint ACT_UNIQ_CASE_DEF;
+drop index ACT_IDX_CASE_DEF_TENANT_ID;
 
 alter table ACT_RU_CASE_EXECUTION
     drop constraint ACT_FK_CASE_EXE_CASE_INST;
