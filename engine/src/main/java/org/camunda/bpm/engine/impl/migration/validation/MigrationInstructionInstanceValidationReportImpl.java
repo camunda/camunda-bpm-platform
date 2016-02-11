@@ -15,10 +15,10 @@ package org.camunda.bpm.engine.impl.migration.validation;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.migration.MigrationInstructionInstanceValidationFailure;
-import org.camunda.bpm.engine.migration.MigrationInstructionInstanceValidationReport;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessInstance;
+import org.camunda.bpm.engine.migration.MigrationInstructionInstanceValidationFailure;
+import org.camunda.bpm.engine.migration.MigrationInstructionInstanceValidationReport;
 
 /**
  * @author Thorben Lindhauer

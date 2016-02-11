@@ -137,6 +137,7 @@ public abstract class EventSubscriptionEntity implements EventSubscription, DbEn
     HashMap<String, Object> persistentState = new HashMap<String, Object>();
     persistentState.put("executionId", executionId);
     persistentState.put("configuration", configuration);
+    persistentState.put("activityId", activityId);
     return persistentState;
   }
 
@@ -152,9 +153,15 @@ public abstract class EventSubscriptionEntity implements EventSubscription, DbEn
   }
 
   public void setExecution(ExecutionEntity execution) {
-    this.execution = execution;
     if(execution != null) {
+      this.execution = execution;
       this.executionId = execution.getId();
+      addToExecution();
+    }
+    else {
+      removeFromExecution();
+      this.executionId = null;
+      this.execution = null;
     }
   }
 

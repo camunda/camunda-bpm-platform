@@ -12,11 +12,11 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
+import static org.camunda.bpm.engine.test.api.runtime.migration.ModifiableBpmnModelInstance.modify;
+
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.builder.ProcessBuilder;
-import org.camunda.bpm.model.bpmn.builder.UserTaskBuilder;
-import org.camunda.bpm.model.bpmn.instance.UserTask;
 
 /**
  * @author Thorben Lindhauer
@@ -217,29 +217,19 @@ public class ProcessModels {
       .endEvent()
       .done();
 
-  public static final BpmnModelInstance SCOPE_TASK_PROCESS = ONE_TASK_PROCESS.clone()
-    .<UserTask>getModelElementById("userTask").builder()
-      .camundaInputParameter("foo", "bar")
-    .done();
+  public static final BpmnModelInstance SCOPE_TASK_PROCESS = modify(ONE_TASK_PROCESS)
+    .addCamundaInputParameter("userTask", "foo", "bar");
 
-  public static final BpmnModelInstance SCOPE_TASK_SUBPROCESS_PROCESS = SUBPROCESS_PROCESS.clone()
-    .<UserTask>getModelElementById("userTask").builder()
-      .camundaInputParameter("foo", "bar")
-    .done();
+  public static final BpmnModelInstance SCOPE_TASK_SUBPROCESS_PROCESS = modify(SUBPROCESS_PROCESS)
+    .addCamundaInputParameter("userTask", "foo", "bar");
 
-  public static final BpmnModelInstance PARALLEL_SCOPE_TASKS = PARALLEL_GATEWAY_PROCESS.clone()
-    .<UserTask>getModelElementById("userTask1").builder()
-      .camundaInputParameter("foo", "bar")
-    .<UserTaskBuilder>moveToActivity("userTask2")
-      .camundaInputParameter("foo", "bar")
-    .done();
+  public static final BpmnModelInstance PARALLEL_SCOPE_TASKS = modify(PARALLEL_GATEWAY_PROCESS)
+    .addCamundaInputParameter("userTask1", "foo", "bar")
+    .addCamundaInputParameter("userTask2", "foo", "bar");
 
-  public static final BpmnModelInstance PARALLEL_SCOPE_TASKS_SUB_PROCESS = PARALLEL_GATEWAY_SUBPROCESS_PROCESS.clone()
-    .<UserTask>getModelElementById("userTask1").builder()
-      .camundaInputParameter("foo", "bar")
-    .<UserTaskBuilder>moveToActivity("userTask2")
-      .camundaInputParameter("foo", "bar")
-    .done();
+  public static final BpmnModelInstance PARALLEL_SCOPE_TASKS_SUB_PROCESS = modify(PARALLEL_GATEWAY_SUBPROCESS_PROCESS)
+    .addCamundaInputParameter("userTask1", "foo", "bar")
+    .addCamundaInputParameter("userTask2", "foo", "bar");
 
 
   public static final BpmnModelInstance UNSUPPORTED_ACTIVITIES = Bpmn.createExecutableProcess(PROCESS_KEY)

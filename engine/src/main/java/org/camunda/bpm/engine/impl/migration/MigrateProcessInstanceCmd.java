@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.migration;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -111,7 +112,7 @@ public class MigrateProcessInstanceCmd implements Command<Void> {
         public void visit(MigratingActivityInstance currentInstance) {
 
           visitedActivityInstances.add(currentInstance);
-          if (currentInstance.getTargetScope() == null) {
+          if (!currentInstance.migrates()) {
             Set<MigratingActivityInstance> children = currentInstance.getChildren();
             MigratingActivityInstance parent = currentInstance.getParent();
 
@@ -129,6 +130,9 @@ public class MigrateProcessInstanceCmd implements Command<Void> {
               parent.getChildren().add(child);
               child.setParent(parent);
             }
+          }
+          else {
+            currentInstance.removeUnmappedDependentInstances();
           }
         }
       });
@@ -159,7 +163,7 @@ public class MigrateProcessInstanceCmd implements Command<Void> {
 
   protected void validateInstructions(MigratingProcessInstance migratingProcessInstance) {
 
-    List<MigrationInstructionInstanceValidator> validators = Arrays.<MigrationInstructionInstanceValidator>asList(new AdditionalFlowScopeValidator());
+    List<MigrationInstructionInstanceValidator> validators = Collections.<MigrationInstructionInstanceValidator>singletonList(new AdditionalFlowScopeValidator());
     MigrationInstructionInstanceValidationReportImpl validationReport = new MigrationInstructionInstanceValidationReportImpl(migratingProcessInstance);
 
     for (MigratingActivityInstance migratingActivityInstance : migratingProcessInstance.getMigratingActivityInstances()) {
@@ -251,7 +255,7 @@ public class MigrateProcessInstanceCmd implements Command<Void> {
       migrateActivityInstance(migratingProcessInstance, migratingExecutionBranch, childInstance);
     }
 
-  }
+}
 
   /**
    * Returns a list of flow scopes from the given scope until a scope is reached that is already present in the given

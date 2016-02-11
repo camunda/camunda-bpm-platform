@@ -13,16 +13,20 @@
 package org.camunda.bpm.engine.impl.jobexecutor;
 
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.calendar.BusinessCalendar;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.el.StartProcessVariableScope;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TimerEntity;
+import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 /**
@@ -163,6 +167,17 @@ public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerE
 
   protected ExecutionEntity resolveExecution(ExecutionEntity context) {
     return context;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static List<TimerDeclarationImpl> getDeclarationsForScope(PvmScope scope) {
+    Object result = scope.getProperty(BpmnParse.PROPERTYNAME_TIMER_DECLARATION);
+    if (result != null) {
+      return (List<TimerDeclarationImpl>) result;
+    }
+    else {
+      return Collections.emptyList();
+    }
   }
 
 }

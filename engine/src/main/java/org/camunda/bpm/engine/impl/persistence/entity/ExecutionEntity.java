@@ -362,7 +362,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   public void initializeTimerDeclarations() {
     LOG.initializeTimerDeclaration(this);
     ScopeImpl scope = getScopeActivity();
-    List<TimerDeclarationImpl> timerDeclarations = (List<TimerDeclarationImpl>) scope.getProperty(BpmnParse.PROPERTYNAME_TIMER_DECLARATION);
+    List<TimerDeclarationImpl> timerDeclarations = TimerDeclarationImpl.getDeclarationsForScope(scope);
     if (timerDeclarations != null) {
       for (TimerDeclarationImpl timerDeclaration : timerDeclarations) {
         timerDeclaration.createTimerInstance(this);

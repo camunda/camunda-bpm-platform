@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.impl.migration.validation;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
-import org.camunda.bpm.engine.runtime.ActivityInstance;
 
 /**
  * Validates that an activity instance is migrated below its migrated parent activity instance.

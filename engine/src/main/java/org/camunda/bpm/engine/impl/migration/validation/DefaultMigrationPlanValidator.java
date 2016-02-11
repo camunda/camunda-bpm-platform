@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.migration.validation;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.camunda.bpm.engine.BadUserRequestException;
@@ -31,9 +32,10 @@ public class DefaultMigrationPlanValidator implements MigrationPlanValidator {
 
     Set<String> alreadyMappedSourceActivityIds = new HashSet<String>();
 
-    for (MigrationInstruction instruction : migrationPlan.getInstructions()) {
+    List<MigrationInstruction> instructions = migrationPlan.getInstructions();
+    for (MigrationInstruction instruction : instructions) {
       try {
-        validateMigrationInstruction(sourceProcessDefinition, targetProcessDefinition, instruction);
+        validateMigrationInstruction(sourceProcessDefinition, targetProcessDefinition, instruction, instructions);
         validateEveryActivityIsOnlyOnceMapped(instruction, alreadyMappedSourceActivityIds);
       }
       catch (BadUserRequestException e) {
@@ -44,9 +46,10 @@ public class DefaultMigrationPlanValidator implements MigrationPlanValidator {
   }
 
   public void validateMigrationInstruction(ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition,
-                                           MigrationInstruction instruction) {
-    ensureOneToOneMapping(instruction, sourceProcessDefinition, targetProcessDefinition);
-    ensureActivitiesCanBeMigrated(instruction, sourceProcessDefinition, targetProcessDefinition);
+                                           MigrationInstruction instruction, List<MigrationInstruction> instructions) {
+    ensureOneToOneMapping(instruction, instructions, sourceProcessDefinition, targetProcessDefinition);
+    ensureActivitiesCanBeMigrated(instruction, instructions, sourceProcessDefinition, targetProcessDefinition);
+    ensureBoundaryEventsAreMigratedWithEventScope(instruction, instructions, sourceProcessDefinition, targetProcessDefinition);
   }
 
   protected void validateEveryActivityIsOnlyOnceMapped(MigrationInstruction instruction, Set<String> alreadyMappedSourceActivityIds) {
@@ -59,15 +62,21 @@ public class DefaultMigrationPlanValidator implements MigrationPlanValidator {
   }
 
 
-  protected void ensureOneToOneMapping(MigrationInstruction instruction, ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition) {
-    if (!MigrationInstructionValidators.ONE_TO_ONE_VALIDATOR.isInstructionValid(instruction, sourceProcessDefinition, targetProcessDefinition)) {
+  protected void ensureOneToOneMapping(MigrationInstruction instruction, List<MigrationInstruction> instructions, ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition) {
+    if (!MigrationInstructionValidators.ONE_TO_ONE_VALIDATOR.isInstructionValid(instruction, instructions, sourceProcessDefinition, targetProcessDefinition)) {
       throw new BadUserRequestException("only one to one mappings of existing activities are supported");
     }
   }
 
-  protected void ensureActivitiesCanBeMigrated(MigrationInstruction instruction, ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition) {
-    if (!MigrationInstructionValidators.ACTIVITIES_CAN_BE_MIGRATED.isInstructionValid(instruction, sourceProcessDefinition, targetProcessDefinition)) {
+  protected void ensureActivitiesCanBeMigrated(MigrationInstruction instruction, List<MigrationInstruction> instructions, ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition) {
+    if (!MigrationInstructionValidators.ACTIVITIES_CAN_BE_MIGRATED.isInstructionValid(instruction, instructions, sourceProcessDefinition, targetProcessDefinition)) {
       throw new BadUserRequestException("the mapped activities are either null or not supported");
+    }
+  }
+
+  protected void ensureBoundaryEventsAreMigratedWithEventScope(MigrationInstruction instruction, List<MigrationInstruction> instructions, ProcessDefinitionImpl sourceProcessDefinition, ProcessDefinitionImpl targetProcessDefinition) {
+    if (!MigrationInstructionValidators.SAME_EVENT_SCOPE.isInstructionValid(instruction, instructions, sourceProcessDefinition, targetProcessDefinition)) {
+      throw new BadUserRequestException("the mapped boundary event has be migrated together with the activity it is attached to");
     }
   }
 

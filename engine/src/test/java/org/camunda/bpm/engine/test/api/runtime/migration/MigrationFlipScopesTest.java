@@ -14,12 +14,9 @@ package org.camunda.bpm.engine.test.api.runtime.migration;
 
 import static org.camunda.bpm.engine.test.util.MigrationInstructionInstanceValidationReportAssert.assertThat;
 
-import java.util.Arrays;
-
 import org.camunda.bpm.engine.migration.MigrationInstructionInstanceValidationException;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -51,15 +48,13 @@ public class MigrationFlipScopesTest {
       .mapActivities("userTask", "userTask")
       .build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
-
     // when
     try {
-      rule.getRuntimeService().executeMigrationPlan(migrationPlan, Arrays.asList(processInstance.getId()));
+      testHelper.createProcessInstanceAndMigrate(migrationPlan);
       Assert.fail("should not validate");
     } catch (MigrationInstructionInstanceValidationException e) {
       assertThat(e.getValidationReport())
-        .hasProcessInstance(processInstance)
+        .hasProcessInstanceId(testHelper.snapshotBeforeMigration.getProcessInstanceId())
         .hasFailure("innerSubProcess", "Closest migrating ancestor activity instance is migrated "
           + "to activity 'innerSubProcess' which is not an ancestor of target activity 'outerSubProcess'");
     }

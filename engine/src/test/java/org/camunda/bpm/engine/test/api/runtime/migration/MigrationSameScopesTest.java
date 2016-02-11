@@ -12,22 +12,17 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
-import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
-import static org.camunda.bpm.engine.test.util.ExecutionAssert.assertThat;
 import static org.camunda.bpm.engine.test.util.ExecutionAssert.describeExecutionTree;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
-import org.camunda.bpm.engine.test.util.ExecutionTree;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -56,28 +51,25 @@ public class MigrationSameScopesTest {
       .mapEqualActivities()
       .build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
-    Task task = rule.getTaskService().createTaskQuery().singleResult();
-
     // when
-    rule.getRuntimeService().executeMigrationPlan(migrationPlan, Arrays.asList(processInstance.getId()));
+    testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
 
     // the entities were migrated
-    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
-    assertThat(executionTree)
-    .matches(
-      describeExecutionTree("userTask").scope().id(processInstance.getId())
-        .done());
-    assertThat(executionTree).hasProcessDefinitionId(targetProcessDefinition.getId());
+    testHelper.assertExecutionTreeAfterMigration()
+      .hasProcessDefinitionId(targetProcessDefinition.getId())
+      .matches(
+        describeExecutionTree("userTask").scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
+          .done());
 
-    Task migratedTask = rule.getTaskService().createTaskQuery().singleResult();
+    Task task = testHelper.snapshotBeforeMigration.getTaskForKey("userTask");
+    Task migratedTask = testHelper.snapshotAfterMigration.getTaskForKey("userTask");
     Assert.assertEquals(task.getId(), migratedTask.getId());
 
     // and it is possible to successfully complete the migrated instance
     rule.getTaskService().complete(migratedTask.getId());
-    testHelper.assertProcessEnded(processInstance.getId());
+    testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
 
   }
 
@@ -92,31 +84,27 @@ public class MigrationSameScopesTest {
       .mapEqualActivities()
       .build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
-    ExecutionTree sourceExecutionTree = ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
-    Task task = rule.getTaskService().createTaskQuery().singleResult();
-
     // when
-    rule.getRuntimeService().executeMigrationPlan(migrationPlan, Arrays.asList(processInstance.getId()));
+    testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
 
     // the entities were migrated
-    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
-    assertThat(executionTree)
-    .matches(
-      describeExecutionTree(null).scope().id(processInstance.getId())
-        .child("userTask").scope().id(sourceExecutionTree.getExecutions().get(0).getId())
-        .done());
-    assertThat(executionTree).hasProcessDefinitionId(targetProcessDefinition.getId());
+    testHelper.assertExecutionTreeAfterMigration()
+      .hasProcessDefinitionId(targetProcessDefinition.getId())
+      .matches(
+        describeExecutionTree(null).scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
+          .child("userTask").scope().id(testHelper.getSingleExecutionIdForActivityBeforeMigration("userTask"))
+          .done());
 
-    Task migratedTask = rule.getTaskService().createTaskQuery().singleResult();
+    Task task = testHelper.snapshotBeforeMigration.getTaskForKey("userTask");
+    Task migratedTask = testHelper.snapshotAfterMigration.getTaskForKey("userTask");
     Assert.assertEquals(task.getId(), migratedTask.getId());
     Assert.assertEquals(targetProcessDefinition.getId(), migratedTask.getProcessDefinitionId());
 
     // and it is possible to successfully complete the migrated instance
     rule.getTaskService().complete(migratedTask.getId());
-    testHelper.assertProcessEnded(processInstance.getId());
+    testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
   @Test
@@ -129,24 +117,21 @@ public class MigrationSameScopesTest {
       .mapEqualActivities()
       .build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
-
     // when
-    rule.getRuntimeService().executeMigrationPlan(migrationPlan, Arrays.asList(processInstance.getId()));
+    testHelper.createProcessInstanceAndMigrate(migrationPlan);
 
     // then
 
     // the entities were migrated
-    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
-    assertThat(executionTree)
-    .matches(
-      describeExecutionTree(null).scope().id(processInstance.getId())
-        .child("userTask1").concurrent().noScope().up()
-        .child("userTask2").concurrent().noScope()
-      .done());
-    assertThat(executionTree).hasProcessDefinitionId(targetProcessDefinition.getId());
+    testHelper.assertExecutionTreeAfterMigration()
+      .hasProcessDefinitionId(targetProcessDefinition.getId())
+      .matches(
+        describeExecutionTree(null).scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
+          .child("userTask1").concurrent().noScope().up()
+          .child("userTask2").concurrent().noScope()
+          .done());
 
-    List<Task> migratedTasks = rule.getTaskService().createTaskQuery().list();
+    List<Task> migratedTasks = testHelper.snapshotAfterMigration.getTasks();
     Assert.assertEquals(2, migratedTasks.size());
 
     for (Task migratedTask : migratedTasks) {
@@ -157,7 +142,7 @@ public class MigrationSameScopesTest {
     for (Task migratedTask : migratedTasks) {
       rule.getTaskService().complete(migratedTask.getId());
     }
-    testHelper.assertProcessEnded(processInstance.getId());
+    testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
   @Test
@@ -170,11 +155,10 @@ public class MigrationSameScopesTest {
       .mapActivities("userTask1", "userTask1")
       .build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
 
     // when
     try {
-      rule.getRuntimeService().executeMigrationPlan(migrationPlan, Arrays.asList(processInstance.getId()));
+      testHelper.createProcessInstanceAndMigrate(migrationPlan);
       Assert.fail("should not succeed because the userTask2 instance is not mapped");
     } catch (ProcessEngineException e) {
       Assert.assertThat(e.getMessage(), CoreMatchers.containsString("There are no migration instructions that apply to the following activity instances"));
@@ -195,32 +179,29 @@ public class MigrationSameScopesTest {
         .createProcessInstanceById(sourceProcessDefinition.getId())
         .startBeforeActivity("userTask1")
         .execute();
-    ActivityInstance activityInstance = rule.getRuntimeService().getActivityInstance(processInstance.getId());
 
     // when
-    rule.getRuntimeService().executeMigrationPlan(migrationPlan, Arrays.asList(processInstance.getId()));
+    testHelper.migrateProcessInstance(migrationPlan, processInstance);
 
     // then
-    ExecutionTree executionTree = ExecutionTree.forExecution(processInstance.getId(), rule.getProcessEngine());
-    assertThat(executionTree)
-    .matches(
-      describeExecutionTree("userTask2").scope().id(processInstance.getId())
-      .done());
-    assertThat(executionTree).hasProcessDefinitionId(targetProcessDefinition.getId());
+    testHelper.assertExecutionTreeAfterMigration()
+      .hasProcessDefinitionId(targetProcessDefinition.getId())
+      .matches(
+        describeExecutionTree("userTask2").scope().id(testHelper.snapshotBeforeMigration.getProcessInstanceId())
+          .done());
 
-    ActivityInstance updatedTree = rule.getRuntimeService().getActivityInstance(processInstance.getId());
-    assertThat(updatedTree).hasStructure(
+    testHelper.assertActivityTreeAfterMigration().hasStructure(
         describeActivityInstanceTree(targetProcessDefinition.getId())
-          .activity("userTask2", testHelper.getSingleActivityInstance(activityInstance, "userTask1").getId())
+          .activity("userTask2", testHelper.getSingleActivityInstanceBeforeMigration("userTask1").getId())
         .done());
 
-    Task migratedTask = rule.getTaskService().createTaskQuery().singleResult();
+    Task migratedTask = testHelper.snapshotAfterMigration.getTaskForKey("userTask1");
     Assert.assertNotNull(migratedTask);
     Assert.assertEquals(targetProcessDefinition.getId(), migratedTask.getProcessDefinitionId());
 
     // and it is possible to successfully complete the migrated instance
     rule.getTaskService().complete(migratedTask.getId());
-    testHelper.assertProcessEnded(processInstance.getId());
+    testHelper.assertProcessEnded(testHelper.snapshotBeforeMigration.getProcessInstanceId());
   }
 
 }

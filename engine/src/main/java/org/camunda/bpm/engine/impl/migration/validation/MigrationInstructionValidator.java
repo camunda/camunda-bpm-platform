@@ -13,12 +13,17 @@
 
 package org.camunda.bpm.engine.impl.migration.validation;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.migration.MigrationInstruction;
 
 public interface MigrationInstructionValidator {
 
   boolean isInstructionValid(MigrationInstruction instruction, ProcessDefinitionImpl sourceProcessDefinition,
+                             ProcessDefinitionImpl targetProcessDefinition);
+
+  boolean isInstructionValid(MigrationInstruction instruction, List<MigrationInstruction> instructions, ProcessDefinitionImpl sourceProcessDefinition,
                              ProcessDefinitionImpl targetProcessDefinition);
 
 }

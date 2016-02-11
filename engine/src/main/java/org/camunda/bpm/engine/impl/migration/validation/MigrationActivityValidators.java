@@ -15,8 +15,11 @@ package org.camunda.bpm.engine.impl.migration.validation;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import org.camunda.bpm.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.SubProcessActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
@@ -32,10 +35,13 @@ public class MigrationActivityValidators {
   // Validators
 
   public static final MigrationActivityValidator SUPPORTED_ACTIVITY = new AbstractMigrationActivityValidator() {
+
     @SuppressWarnings("unchecked")
-    public final Set<Class<? extends ActivityBehavior>> SUPPORTED_ACTIVITY_BEHAVIORS = new HashSet<Class<? extends ActivityBehavior>>(
-      Arrays.asList(SubProcessActivityBehavior.class, UserTaskActivityBehavior.class)
-    );
+    public final Set<Class<? extends ActivityBehavior>> SUPPORTED_ACTIVITY_BEHAVIORS = new HashSet<Class<? extends ActivityBehavior>>(Arrays.asList(
+      SubProcessActivityBehavior.class,
+      UserTaskActivityBehavior.class,
+      BoundaryEventActivityBehavior.class
+    ));
 
     public boolean canBeMigrated(ActivityImpl activity, ProcessDefinitionImpl processDefinition) {
       return SUPPORTED_ACTIVITY_BEHAVIORS.contains(activity.getActivityBehavior().getClass());
@@ -48,12 +54,35 @@ public class MigrationActivityValidators {
     }
   };
 
-  public static final MigrationActivityValidator HAS_NO_BOUNDARY_EVENT = new AbstractMigrationActivityValidator() {
+  public static final MigrationActivityValidator SUPPORTED_BOUNDARY_EVENT = new AbstractMigrationActivityValidator() {
+    public final List<String> supportedTypes = Arrays.asList(
+      "boundaryMessage",
+      "boundarySignal",
+      "boundaryTimer"
+    );
+
     public boolean canBeMigrated(ActivityImpl activity, ProcessDefinitionImpl processDefinition) {
-      return !isScope(activity) || !hasBoundaryEvent(activity);
+      if (activity.getActivityBehavior().getClass().isAssignableFrom(BoundaryEventActivityBehavior.class)) {
+        String boundaryType = (String) activity.getProperty("type");
+        return supportedTypes.contains(boundaryType);
+      }
+      else {
+        return true;
+      }
     }
   };
 
+  public static final MigrationActivityValidator NOT_EVENT_SUB_PROCESS_CHILD = new AbstractMigrationActivityValidator() {
+    public boolean canBeMigrated(ActivityImpl activity, ProcessDefinitionImpl processDefinition) {
+      return !hasEventSubProcessParent(activity);
+    }
+  };
+
+  public static final MigrationActivityValidator HAS_NO_EVENT_SUB_PROCESS_CHILD = new AbstractMigrationActivityValidator() {
+    public boolean canBeMigrated(ActivityImpl activity, ProcessDefinitionImpl processDefinition) {
+      return !hasEventSubProcessChildOrAncestor(activity);
+    }
+  };
 
   // Helper
 
@@ -68,18 +97,48 @@ public class MigrationActivityValidators {
     return isMultiInstance(flowScopeWalker.getCurrentElement());
   }
 
-  protected static boolean hasBoundaryEvent(ScopeImpl scope) {
-    ScopeImpl flowScope = scope.getFlowScope();
-    for (ActivityImpl siblingActivity : flowScope.getActivities()) {
-      if (scope.equals(siblingActivity.getEventScope())) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   protected static boolean isMultiInstance(ScopeImpl scope) {
     return !isProcessDefinition(scope) && scope.getActivityBehavior() instanceof MultiInstanceActivityBehavior;
+  }
+
+  protected static boolean hasEventSubProcessParent(ActivityImpl activity) {
+    FlowScopeWalker flowScopeWalker = new FlowScopeWalker(activity);
+    flowScopeWalker.walkUntil(new TreeWalker.WalkCondition<ScopeImpl>() {
+      public boolean isFulfilled(ScopeImpl element) {
+        return isProcessDefinition(element) || isEventSubProcess(element);
+      }
+    });
+
+    return isEventSubProcess(flowScopeWalker.getCurrentElement());
+  }
+
+  protected static boolean isEventSubProcess(ScopeImpl scope) {
+    return !isProcessDefinition(scope) && scope.getActivityBehavior() instanceof EventSubProcessActivityBehavior;
+  }
+
+  protected static boolean hasEventSubProcessChildOrAncestor(ActivityImpl activity) {
+    if (isScope(activity) || isProcessDefinition(activity.getFlowScope())) {
+      List<ActivityImpl> activitiesToCheck;
+      if (!isScope(activity) && isProcessDefinition(activity.getFlowScope())) {
+        // if the activity is not a scope its parent is the process definition
+        // so we have to check for ancestors not childs as the process definition
+        // has no explicit instruction
+        activitiesToCheck = activity.getFlowScope().getActivities();
+      }
+      else {
+        activitiesToCheck = activity.getActivities();
+      }
+
+      for (ActivityImpl activityToCheck : activitiesToCheck) {
+        ActivityBehavior activityBehavior = activityToCheck.getActivityBehavior();
+        if (activityBehavior instanceof EventSubProcessActivityBehavior) {
+          return true;
+        }
+      }
+
+    }
+
+    return false;
   }
 
   protected static boolean isProcessDefinition(ScopeImpl scope) {

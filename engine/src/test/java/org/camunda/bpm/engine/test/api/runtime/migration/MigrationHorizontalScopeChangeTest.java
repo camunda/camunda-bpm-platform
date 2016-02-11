@@ -12,12 +12,9 @@
  */
 package org.camunda.bpm.engine.test.api.runtime.migration;
 
-import java.util.Arrays;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
@@ -52,11 +49,10 @@ public class MigrationHorizontalScopeChangeTest {
       .mapActivities("userTask2", "userTask1")
       .build();
 
-    ProcessInstance processInstance = rule.getRuntimeService().startProcessInstanceById(sourceProcessDefinition.getId());
 
     // when
     try {
-      rule.getRuntimeService().executeMigrationPlan(migrationPlan, Arrays.asList(processInstance.getId()));
+      testHelper.createProcessInstanceAndMigrate(migrationPlan);
       Assert.fail("should fail");
     }
     catch (ProcessEngineException e) {

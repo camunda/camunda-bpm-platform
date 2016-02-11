@@ -14,6 +14,7 @@
 package org.camunda.bpm.engine.impl.migration.validation;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
@@ -48,7 +49,7 @@ public class MigrationInstructionInstanceValidationFailureImpl implements Migrat
 
   @Override
   public List<String> getActivityInstanceIds() {
-    return Arrays.asList(migratingInstance.getActivityInstance().getId());
+    return Collections.singletonList(migratingInstance.getActivityInstance().getId());
   }
 
   @Override
