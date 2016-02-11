@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
+<?xml version="1.0" encoding="UTF-8" ?>
 
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity">
 
@@ -10,6 +10,8 @@
       ID_,
       PROC_DEF_ID_,
       PROC_DEF_KEY_,
+      CASE_DEF_ID_,
+      CASE_DEF_KEY_,
       ACT_ID_,
       JOB_TYPE_,
       JOB_CONFIGURATION_,
@@ -22,6 +24,8 @@
       #{id ,jdbcType=VARCHAR},
       #{processDefinitionId, jdbcType=VARCHAR},
       #{processDefinitionKey, jdbcType=VARCHAR},
+      #{caseDefinitionId, jdbcType=VARCHAR},
+      #{caseDefinitionKey, jdbcType=VARCHAR},
       #{activityId, jdbcType=VARCHAR},
       #{jobType, jdbcType=VARCHAR},
       #{jobConfiguration, jdbcType=VARCHAR},
@@ -39,6 +43,8 @@
       REV_ = #{revisionNext, jdbcType=INTEGER},
       PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
       PROC_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR},
+      CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR},
+      CASE_DEF_KEY_ = #{caseDefinitionKey, jdbcType=VARCHAR},
       ACT_ID_ = #{activityId, jdbcType=VARCHAR},
       JOB_TYPE_ = #{jobType, jdbcType=VARCHAR},
       JOB_CONFIGURATION_ = #{jobConfiguration, jdbcType=VARCHAR},
@@ -99,6 +105,13 @@
         PROC_DEF_ID_ = #{id}
   </delete>
 
+  <delete id="deleteJobDefinitionsByCaseDefinitionId" parameterType="string">
+    DELETE FROM
+        ${prefix}ACT_RU_JOBDEF
+    where
+        CASE_DEF_ID_ = #{id}
+  </delete>
+
   <!-- JOB DEFINITION RESULTMAP -->
 
   <resultMap id="jobDefinitionResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity">
@@ -106,6 +119,8 @@
     <result property="revision" column="REV_" jdbcType="INTEGER" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionKey" column="PROC_DEF_KEY_" jdbcType="VARCHAR" />
+    <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="caseDefinitionKey" column="CASE_DEF_KEY_" jdbcType="VARCHAR" />
     <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR" />
     <result property="jobType" column="JOB_TYPE_" jdbcType="VARCHAR" />
     <result property="jobConfiguration" column="JOB_CONFIGURATION_" jdbcType="VARCHAR" />
@@ -122,6 +137,10 @@
 
   <select id="selectJobDefinitionsByProcessDefinitionId" resultMap="jobDefinitionResultMap">
     select * from ${prefix}ACT_RU_JOBDEF where PROC_DEF_ID_ = #{parameter}
+  </select>
+
+  <select id="selectJobDefinitionsByCaseDefinitionId" resultMap="jobDefinitionResultMap">
+    select * from ${prefix}ACT_RU_JOBDEF where CASE_DEF_ID_ = #{parameter}
   </select>
 
   <select id="selectJobDefinitionByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.JobDefinitionQueryImpl" resultMap="jobDefinitionResultMap">
@@ -178,7 +197,7 @@
             #{tenantId}
           </foreach>
           <if test="includeJobDefinitionsWithoutTenantId">
-            or RES.TENANT_ID_ is null 
+            or RES.TENANT_ID_ is null
           </if>
           )
         </if>

@@ -97,6 +97,10 @@
     <result property="processInstanceId" column="PROCESS_INSTANCE_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROCESS_DEF_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionKey" column="PROCESS_DEF_KEY_" jdbcType="VARCHAR" />
+    <result property="caseExecutionId" column="CASE_EXECUTION_ID_" jdbcType="VARCHAR" />
+    <result property="caseInstanceId" column="CASE_INSTANCE_ID_" jdbcType="VARCHAR" />
+    <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="caseDefinitionKey" column="CASE_DEF_KEY_" jdbcType="VARCHAR" />
     <result property="retriesFromPersistence" column="RETRIES_" jdbcType="INTEGER" />
     <result property="exceptionByteArrayId" column="EXCEPTION_STACK_ID_" jdbcType="VARCHAR" />
     <result property="exceptionMessage" column="EXCEPTION_MSG_" jdbcType="VARCHAR" />
@@ -202,6 +206,18 @@
     select *
     from ${prefix}ACT_RU_JOB J
     where J.JOB_DEF_ID_ = #{parameter}
+  </select>
+
+  <select id="selectJobsByCaseExecutionId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+    select *
+    from ${prefix}ACT_RU_JOB J
+    where J.CASE_EXECUTION_ID_ = #{parameter}
+  </select>
+
+  <select id="selectJobsByCaseInstanceId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+    select *
+    from ${prefix}ACT_RU_JOB J
+    where J.CASE_INSTANCE_ID_ = #{parameter}
   </select>
 
   <select id="selectJobByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.JobQueryImpl" resultMap="jobResultMap">
@@ -351,6 +367,10 @@
             PROCESS_INSTANCE_ID_,
             PROCESS_DEF_ID_,
             PROCESS_DEF_KEY_,
+            CASE_EXECUTION_ID_,
+            CASE_INSTANCE_ID_,
+            CASE_DEF_ID_,
+            CASE_DEF_KEY_,
             RETRIES_,
             EXCEPTION_STACK_ID_,
             EXCEPTION_MSG_,
@@ -375,6 +395,10 @@
             #{processInstanceId, jdbcType=VARCHAR},
             #{processDefinitionId, jdbcType=VARCHAR},
             #{processDefinitionKey, jdbcType=VARCHAR},
+            #{caseExecutionId, jdbcType=VARCHAR},
+            #{caseInstanceId, jdbcType=VARCHAR},
+            #{caseDefinitionId, jdbcType=VARCHAR},
+            #{caseDefinitionKey, jdbcType=VARCHAR},
             #{retries, jdbcType=INTEGER},
             #{exceptionByteArrayId, jdbcType=VARCHAR},
             #{exceptionMessage, jdbcType=VARCHAR},
@@ -408,6 +432,8 @@
        SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
        PROCESS_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
        PROCESS_DEF_KEY_ = #{processDefinitionKey, jdbcType=VARCHAR},
+       CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR},
+       CASE_DEF_KEY_ = #{caseDefinitionKey, jdbcType=VARCHAR},
        JOB_DEF_ID_ = #{jobDefinitionId, jdbcType=VARCHAR},
        DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR},
        HANDLER_CFG_ = #{jobHandlerConfigurationRaw, jdbcType=VARCHAR},

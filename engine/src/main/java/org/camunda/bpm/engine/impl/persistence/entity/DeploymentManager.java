@@ -173,13 +173,16 @@ public class DeploymentManager extends AbstractManager {
         .deleteCaseDefinitionsByDeploymentId(deploymentId);
 
       for (CaseDefinition caseDefinition : caseDefinitions) {
-        String processDefinitionId = caseDefinition.getId();
+        String caseDefinitionId = caseDefinition.getId();
 
         // remove case definitions from cache:
         Context
           .getProcessEngineConfiguration()
           .getDeploymentCache()
-          .removeCaseDefinition(processDefinitionId);
+          .removeCaseDefinition(caseDefinitionId);
+
+        // delete job definitions
+        getJobDefinitionManager().deleteJobDefinitionsByCaseDefinitionId(caseDefinitionId);
       }
     }
   }

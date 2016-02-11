@@ -33,24 +33,16 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
  * @author Tom Baeyens
  * @author Daniel Meyer
  */
-public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerEntity> {
+public class TimerDeclarationImpl extends TimerJobDeclaration<ExecutionEntity> {
 
   private static final long serialVersionUID = 1L;
 
-  protected Expression description;
-  protected TimerDeclarationType type;
-
-  protected String repeat;
   protected boolean isInterruptingTimer; // For boundary timers
   protected String eventScopeActivityId = null;
   protected Boolean isParallelMultiInstance;
 
-  protected String rawJobHandlerConfiguration;
-
   public TimerDeclarationImpl(Expression expression, TimerDeclarationType type, String jobHandlerType) {
-    super(jobHandlerType);
-    this.description = expression;
-    this.type= type;
+    super(expression, type, jobHandlerType);
   }
 
   public boolean isInterruptingTimer() {
@@ -61,30 +53,12 @@ public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerE
     this.isInterruptingTimer = isInterruptingTimer;
   }
 
-  public String getRepeat() {
-    return repeat;
-  }
-
   public void setEventScopeActivityId(String eventScopeActivityId) {
     this.eventScopeActivityId = eventScopeActivityId;
   }
 
   public String getEventScopeActivityId() {
     return eventScopeActivityId;
-  }
-
-  protected TimerEntity newJobInstance(ExecutionEntity execution) {
-
-    TimerEntity timer = new TimerEntity(this);
-    if (execution != null) {
-      timer.setExecution(execution);
-    }
-
-    return timer;
-  }
-
-  public void setRawJobHandlerConfiguration(String rawJobHandlerConfiguration) {
-    this.rawJobHandlerConfiguration = rawJobHandlerConfiguration;
   }
 
   public void updateJob(TimerEntity timer) {
@@ -150,41 +124,8 @@ public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerE
     return dueDate;
   }
 
-  public TimerEntity createTimerInstance(ExecutionEntity execution) {
-    return createTimer(execution);
-  }
-
-  public TimerEntity createStartTimerInstance(String deploymentId) {
-    return createTimer(deploymentId);
-  }
-
-  public TimerEntity createTimer(String deploymentId) {
-    TimerEntity timer = super.createJobInstance((ExecutionEntity) null);
-    timer.setDeploymentId(deploymentId);
-    scheduleTimer(timer);
-    return timer;
-  }
-
-  public TimerEntity createTimer(ExecutionEntity execution) {
-    TimerEntity timer = super.createJobInstance(execution);
-    scheduleTimer(timer);
-    return timer;
-  }
-
-  protected void scheduleTimer(TimerEntity timer) {
-    Context
-      .getCommandContext()
-      .getJobManager()
-      .schedule(timer);
-  }
-
   protected ExecutionEntity resolveExecution(ExecutionEntity context) {
     return context;
-  }
-
-  @Override
-  protected JobHandlerConfiguration resolveJobHandlerConfiguration(ExecutionEntity context) {
-    return resolveJobHandler().newConfiguration(rawJobHandlerConfiguration);
   }
 
   public static Map<String, TimerDeclarationImpl> getDeclarationsForScope(PvmScope scope) {
@@ -199,6 +140,10 @@ public class TimerDeclarationImpl extends JobDeclaration<ExecutionEntity, TimerE
     else {
       return Collections.emptyMap();
     }
+  }
+
+  public TimerEntity createStartTimerInstance(String deploymentId) {
+    return createTimer(deploymentId);
   }
 
 }

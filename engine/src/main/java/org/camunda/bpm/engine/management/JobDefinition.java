@@ -92,5 +92,13 @@ public interface JobDefinition {
    * if the definition belongs to no single tenant.
    */
   String getTenantId();
+  /**
+   * @return the id of the {@link org.camunda.bpm.engine.repository.CaseDefinition} this job definition is associated with.
+   */
+  String getCaseDefinitionId();
 
+  /**
+   * @return the key of the {@link org.camunda.bpm.engine.repository.CaseDefinition} this job definition is associated with.
+   */
+  String getCaseDefinitionKey();
 }

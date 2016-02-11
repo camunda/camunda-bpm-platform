@@ -32,9 +32,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import javax.naming.InitialContext;
-import javax.sql.DataSource;
-
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.apache.ibatis.mapping.Environment;
@@ -182,6 +179,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.RejectedJobsHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateJobDefinitionHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerCatchIntermediateEventJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerEventListenerJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventSubprocessJobHandler;
@@ -298,6 +296,9 @@ import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
+
+import javax.naming.InitialContext;
+import javax.sql.DataSource;
 
 
 /**
@@ -1367,6 +1368,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     TimerActivateJobDefinitionHandler activateJobDefinitionHandler = new TimerActivateJobDefinitionHandler();
     jobHandlers.put(activateJobDefinitionHandler.getType(), activateJobDefinitionHandler);
+
+    TimerEventListenerJobHandler timerEventListenerHandler = new TimerEventListenerJobHandler();
+    jobHandlers.put(timerEventListenerHandler.getType(), timerEventListenerHandler);
 
     BatchSeedJobHandler batchSeedJobHandler = new BatchSeedJobHandler();
     jobHandlers.put(batchSeedJobHandler.getType(), batchSeedJobHandler);

@@ -57,6 +57,7 @@ import org.camunda.bpm.engine.impl.history.producer.CmmnHistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.CaseExecutionEntityReferencer;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
@@ -70,6 +71,7 @@ import org.camunda.bpm.engine.impl.task.TaskDecorator;
 import org.camunda.bpm.engine.repository.CaseDefinition;
 import org.camunda.bpm.engine.runtime.CaseExecution;
 import org.camunda.bpm.engine.runtime.CaseInstance;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
@@ -109,6 +111,8 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
   protected transient CaseExecutionEntity subCaseInstance;
 
   protected transient CaseExecutionEntity superCaseExecution;
+
+  protected transient List<JobEntity> jobs;
 
   // associated entities /////////////////////////////////////////////////////
 
@@ -730,6 +734,42 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
       .findVariableInstancesByCaseExecutionId(id);
   }
 
+  // referenced job entities //////////////////////////////////////////////////
+
+  protected void ensureJobsInitialized() {
+    if (jobs == null) {
+      jobs = Context.getCommandContext()
+          .getJobManager()
+          .findJobsByCaseExecutionId(id);
+    }
+  }
+
+  protected List<JobEntity> getJobsInternal() {
+    ensureJobsInitialized();
+    return jobs;
+  }
+
+  public List<JobEntity> getJobs() {
+    return new ArrayList<JobEntity>(getJobsInternal());
+  }
+
+  public void addJob(JobEntity jobEntity) {
+    List<JobEntity> jobsInternal = getJobsInternal();
+    if (!jobsInternal.contains(jobEntity)) {
+      jobsInternal.add(jobEntity);
+    }
+  }
+
+  public void removeJob(JobEntity job) {
+    getJobsInternal().remove(job);
+  }
+
+  protected void removeJobs() {
+    for (Job job : getJobs()) {
+      ((JobEntity) job).delete();
+    }
+  }
+
   // toString /////////////////////////////////////////////////////////////
 
   public String toString() {
@@ -757,6 +797,8 @@ public class CaseExecutionEntity extends CmmnExecution implements CaseExecution,
     }
 
     CommandContext commandContext = Context.getCommandContext();
+
+    removeJobs();
 
     for (CaseSentryPartEntity sentryPart : getCaseSentryParts()) {
       commandContext

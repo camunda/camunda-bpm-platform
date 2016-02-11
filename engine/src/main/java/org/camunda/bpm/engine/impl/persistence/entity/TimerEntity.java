@@ -22,9 +22,9 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.RepeatingFailedJobListener;
-import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerEventJobHandler.TimerJobConfiguration;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerJobDeclaration;
 
 
 /**
@@ -41,7 +41,7 @@ public class TimerEntity extends JobEntity {
   public TimerEntity() {
   }
 
-  public TimerEntity(TimerDeclarationImpl timerDeclaration) {
+  public TimerEntity(TimerJobDeclaration<?> timerDeclaration) {
     repeat = timerDeclaration.getRepeat();
   }
 
@@ -58,6 +58,10 @@ public class TimerEntity extends JobEntity {
     deploymentId = te.deploymentId;
     processDefinitionId = te.processDefinitionId;
     processDefinitionKey = te.processDefinitionKey;
+    caseDefinitionId = te.caseDefinitionId;
+    caseDefinitionKey = te.caseDefinitionKey;
+    caseInstanceId = te.caseInstanceId;
+    caseExecutionId = te.caseExecutionId;
   }
 
   protected void preExecute(CommandContext commandContext) {
@@ -133,6 +137,10 @@ public class TimerEntity extends JobEntity {
            + ", lockExpirationTime=" + lockExpirationTime
            + ", executionId=" + executionId
            + ", processInstanceId=" + processInstanceId
+           + ", caseDefinitionId=" + caseDefinitionId
+           + ", caseDefinitionKey=" + caseDefinitionKey
+           + ", caseExecutionId=" + caseExecutionId
+           + ", caseInstanceId=" + caseInstanceId
            + ", isExclusive=" + isExclusive
            + ", retries=" + retries
            + ", jobHandlerType=" + jobHandlerType

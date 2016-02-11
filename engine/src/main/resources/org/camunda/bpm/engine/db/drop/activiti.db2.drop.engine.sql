@@ -23,7 +23,7 @@ alter table ACT_RU_EXECUTION
 alter table ACT_RU_EXECUTION
     drop foreign key ACT_FK_EXE_SUPER;
 
-alter table ACT_RU_EXECUTION 
+alter table ACT_RU_EXECUTION
     drop foreign key ACT_FK_EXE_PROCDEF;
 
 alter table ACT_RU_IDENTITYLINK
@@ -118,6 +118,7 @@ drop index ACT_IDX_EXT_TASK_EXEC;
 drop index ACT_IDX_BYTEARRAY_NAME;
 drop index ACT_IDX_DEPLOYMENT_NAME;
 drop index ACT_IDX_JOBDEF_PROC_DEF_ID;
+drop index ACT_IDX_JOBDEF_CASE_DEF_ID;
 drop index ACT_IDX_JOB_HANDLER_TYPE;
 drop index ACT_IDX_EVENT_SUBSCR_EVT_NAME;
 drop index ACT_IDX_PROCDEF_DEPLOYMENT_ID;

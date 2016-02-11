@@ -39,6 +39,10 @@ public class JobDefinitionManager extends AbstractManager {
     return getDbEntityManager().selectList("selectJobDefinitionsByProcessDefinitionId", processDefinitionId);
   }
 
+  public List<JobDefinitionEntity> findByCaseDefinitionId(String caseDefinitionId){
+    return getDbEntityManager().selectList("selectJobDefinitionsByCaseDefinitionId",caseDefinitionId);
+  }
+
   public void deleteJobDefinitionsByProcessDefinitionId(String id) {
     getDbEntityManager().delete(JobDefinitionEntity.class, "deleteJobDefinitionsByProcessDefinitionId", id);
   }
@@ -87,6 +91,10 @@ public class JobDefinitionManager extends AbstractManager {
 
   protected ListQueryParameterObject configureParameterizedQuery(Object parameter) {
     return getTenantManager().configureQuery(parameter);
+  }
+
+  public void deleteJobDefinitionsByCaseDefinitionId(String definitionId) {
+    getDbEntityManager().delete(JobDefinitionEntity.class, "deleteJobDefinitionsByCaseDefinitionId", definitionId);
   }
 
 }

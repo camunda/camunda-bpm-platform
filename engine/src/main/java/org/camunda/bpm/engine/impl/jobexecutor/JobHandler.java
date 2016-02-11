@@ -12,8 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor;
 
+import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
 
@@ -24,7 +24,7 @@ public interface JobHandler<T extends JobHandlerConfiguration> {
 
   String getType();
 
-  void execute(T configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId);
+  void execute(T configuration, CoreExecution execution, CommandContext commandContext, String tenantId);
 
   T newConfiguration(String canonicalString);
 

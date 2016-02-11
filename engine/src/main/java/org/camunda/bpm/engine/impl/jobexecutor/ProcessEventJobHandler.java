@@ -13,10 +13,10 @@
 
 package org.camunda.bpm.engine.impl.jobexecutor;
 
+import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.ProcessEventJobHandler.EventSubscriptionJobConfiguration;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
 
@@ -31,7 +31,7 @@ public class ProcessEventJobHandler implements JobHandler<EventSubscriptionJobCo
     return TYPE;
   }
 
-  public void execute(EventSubscriptionJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+  public void execute(EventSubscriptionJobConfiguration configuration, CoreExecution context, CommandContext commandContext, String tenantId) {
     // lookup subscription:
     String eventSubscriptionId = configuration.getEventSubscriptionId();
     EventSubscriptionEntity eventSubscription = commandContext.getEventSubscriptionManager()

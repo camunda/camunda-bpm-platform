@@ -83,8 +83,11 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
         // if job definition is suspended while creating a job instance,
         // suspend the job instance right away:
         job.setSuspensionState(jobDefinition.getSuspensionState());
+
         job.setProcessDefinitionKey(jobDefinition.getProcessDefinitionKey());
         job.setProcessDefinitionId(jobDefinition.getProcessDefinitionId());
+        job.setCaseDefinitionKey(jobDefinition.getCaseDefinitionKey());
+        job.setCaseDefinitionId(jobDefinition.getCaseDefinitionId());
         job.setTenantId(jobDefinition.getTenantId());
       }
 
@@ -136,6 +139,10 @@ public abstract class JobDeclaration<S, T extends JobEntity> implements Serializ
   protected abstract ExecutionEntity resolveExecution(S context);
 
   protected abstract T newJobInstance(S context);
+
+  protected boolean isJobPrioritySupported() {
+    return true;
+  }
 
   // Getter / Setters //////////////////////////////////////////
 

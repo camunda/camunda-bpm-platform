@@ -201,6 +201,11 @@ public class JobManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
+  public List<JobEntity> findJobsByCaseExecutionId(String caseExecutionId) {
+    return getDbEntityManager().selectList("selectJobsByCaseExecutionId", caseExecutionId);
+  }
+
+  @SuppressWarnings("unchecked")
   public List<JobEntity> findJobsByProcessInstanceId(String processInstanceId) {
     return getDbEntityManager().selectList("selectJobsByProcessInstanceId", processInstanceId);
   }

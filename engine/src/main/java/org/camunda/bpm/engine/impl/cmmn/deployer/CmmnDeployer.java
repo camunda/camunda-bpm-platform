@@ -12,18 +12,25 @@
  */
 package org.camunda.bpm.engine.impl.cmmn.deployer;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.AbstractDefinitionDeployer;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionManager;
+import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransform;
 import org.camunda.bpm.engine.impl.cmmn.transformer.CmmnTransformer;
 import org.camunda.bpm.engine.impl.core.model.Properties;
+import org.camunda.bpm.engine.impl.core.model.PropertyMapKey;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
+import org.camunda.bpm.engine.management.JobDefinition;
 
 /**
  * {@link Deployer} responsible to parse CMMN 1.0 XML files and create the
@@ -37,6 +44,9 @@ public class CmmnDeployer extends AbstractDefinitionDeployer<CaseDefinitionEntit
 
   public static final String[] CMMN_RESOURCE_SUFFIXES = new String[] { "cmmn11.xml", "cmmn10.xml", "cmmn" };
 
+  protected static final PropertyMapKey<String, List<JobDeclaration<?, ?>>> JOB_DECLARATIONS_PROPERTY =
+          new PropertyMapKey<String, List<JobDeclaration<?, ?>>>("JOB_DECLARATIONS_PROPERTY");
+
   protected ExpressionManager expressionManager;
   protected CmmnTransformer transformer;
 
@@ -47,7 +57,16 @@ public class CmmnDeployer extends AbstractDefinitionDeployer<CaseDefinitionEntit
 
   @Override
   protected List<CaseDefinitionEntity> transformDefinitions(DeploymentEntity deployment, ResourceEntity resource, Properties properties) {
-    return transformer.createTransform().deployment(deployment).resource(resource).transform();
+    CmmnTransform cmmnTransform = transformer.createTransform();
+
+    List<CaseDefinitionEntity> definitions = cmmnTransform.deployment(deployment).resource(resource).transform();
+
+    if(!properties.contains(JOB_DECLARATIONS_PROPERTY)){
+      properties.set(JOB_DECLARATIONS_PROPERTY, new HashMap<String, List<JobDeclaration<?, ?>>>());
+    }
+    properties.get(JOB_DECLARATIONS_PROPERTY).putAll(cmmnTransform.getJobDeclarations());
+
+    return definitions;
   }
 
   @Override
@@ -68,6 +87,66 @@ public class CmmnDeployer extends AbstractDefinitionDeployer<CaseDefinitionEntit
   @Override
   protected void addDefinitionToDeploymentCache(DeploymentCache deploymentCache, CaseDefinitionEntity definition) {
     deploymentCache.addCaseDefinition(definition);
+  }
+
+  protected JobDefinitionManager getJobDefinitionManager() {
+    return getCommandContext().getJobDefinitionManager();
+  }
+
+  @Override
+  protected void definitionAddedToDeploymentCache(DeploymentEntity deployment, CaseDefinitionEntity definition, Properties properties) {
+    List<JobDeclaration<?, ?>> declarations = properties.get(JOB_DECLARATIONS_PROPERTY).get(definition.getKey());
+    if(declarations != null && !declarations.isEmpty()) {
+      updateJobDeclarations(declarations, definition, deployment.isNew());
+    }
+  }
+
+  protected void updateJobDeclarations(List<JobDeclaration<?, ?>> jobDeclarations, CaseDefinitionEntity definition, boolean isNewDeployment) {
+    if(jobDeclarations == null || jobDeclarations.isEmpty()) {
+      return;
+    }
+
+   final JobDefinitionManager jobDefinitionManager = getJobDefinitionManager();
+
+    if(isNewDeployment) {
+      for(JobDeclaration<?,?> jobDeclaration:jobDeclarations){
+        createJobDefinition(definition, jobDeclaration);
+      }
+    } else {
+      List<JobDefinitionEntity> existingDefinitions = jobDefinitionManager.findByCaseDefinitionId(definition.getId());
+      for (JobDeclaration<?, ?> jobDeclaration : jobDeclarations) {
+        boolean jobDefinitionExists = false;
+        for (JobDefinition jobDefinitionEntity : existingDefinitions) {
+          // <!> Assumption: there can be only one job definition per activity and type
+          if(jobDeclaration.getActivityId().equals(jobDefinitionEntity.getActivityId()) &&
+                  jobDeclaration.getJobHandlerType().equals(jobDefinitionEntity.getJobType())) {
+            jobDeclaration.setJobDefinitionId(jobDefinitionEntity.getId());
+            jobDefinitionExists = true;
+            break;
+          }
+        }
+        if(!jobDefinitionExists) {
+          // not found: create new definition
+          createJobDefinition(definition, jobDeclaration);
+        }
+
+      }
+
+    }
+  }
+
+  protected void createJobDefinition(CaseDefinitionEntity definition, JobDeclaration<?,?> jobDeclaration) {
+    JobDefinitionEntity jobDefinitionEntity = new JobDefinitionEntity(jobDeclaration);
+
+    jobDefinitionEntity.setCaseDefinitionId(definition.getId());
+    jobDefinitionEntity.setCaseDefinitionKey(definition.getKey());
+    jobDefinitionEntity.setTenantId(definition.getTenantId());
+    jobDefinitionEntity.setActivityId(jobDeclaration.getActivityId());
+
+    JobDefinitionManager jobDefinitionManager = getJobDefinitionManager();
+    jobDefinitionManager.insert(jobDefinitionEntity);
+
+    jobDeclaration.setJobDefinitionId(jobDefinitionEntity.getId());
   }
 
   // context ///////////////////////////////////////////////////////////////////////////////////////////

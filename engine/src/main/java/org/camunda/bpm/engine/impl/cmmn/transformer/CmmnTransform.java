@@ -13,9 +13,7 @@
 package org.camunda.bpm.engine.impl.cmmn.transformer;
 
 import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmmn.entity.repository.CaseDefinitionEntity;
@@ -30,8 +28,10 @@ import org.camunda.bpm.engine.impl.cmmn.model.CmmnCaseDefinition;
 import org.camunda.bpm.engine.impl.cmmn.model.CmmnSentryDeclaration;
 import org.camunda.bpm.engine.impl.core.transformer.Transform;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.engine.impl.jobexecutor.JobDeclaration;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
+import org.camunda.bpm.engine.impl.repository.ResourceDefinitionEntity;
 import org.camunda.bpm.model.cmmn.Cmmn;
 import org.camunda.bpm.model.cmmn.CmmnModelException;
 import org.camunda.bpm.model.cmmn.CmmnModelInstance;
@@ -52,6 +52,7 @@ import org.camunda.bpm.model.cmmn.instance.ProcessTask;
 import org.camunda.bpm.model.cmmn.instance.Sentry;
 import org.camunda.bpm.model.cmmn.instance.Stage;
 import org.camunda.bpm.model.cmmn.instance.Task;
+import org.camunda.bpm.model.cmmn.instance.TimerEventListener;
 
 /**
  * @author Roman Smirnov
@@ -73,6 +74,12 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
   protected CmmnModelInstance model;
   protected CmmnHandlerContext context = new CmmnHandlerContext();
   protected List<CaseDefinitionEntity> caseDefinitions = new ArrayList<CaseDefinitionEntity>();
+
+  /**
+   * Mapping from a case definition key to this containing list of job
+   * declarations
+   **/
+  protected Map<String, List<JobDeclaration<?, ?>>> jobDeclarations = new HashMap<String, List<JobDeclaration<?, ?>>>();
 
   public CmmnTransform(CmmnTransformer transformer) {
     this.transformer = transformer;
@@ -159,16 +166,23 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
   protected CaseDefinitionEntity transformCase(Case element) {
     // get CaseTransformer
     CmmnElementHandler<Case, CmmnActivity> caseTransformer = getDefinitionHandler(Case.class);
-    CmmnActivity definition = caseTransformer.handleElement(element, context);
+    CmmnCaseDefinition definition = (CmmnCaseDefinition) caseTransformer.handleElement(element, context);
 
-    context.setCaseDefinition((CmmnCaseDefinition) definition);
+    context.setCaseDefinition(definition);
     context.setParent(definition);
 
     CasePlanModel casePlanModel = element.getCasePlanModel();
     transformCasePlanModel(casePlanModel);
 
     for (CmmnTransformListener transformListener : transformListeners) {
-      transformListener.transformCase(element, (CmmnCaseDefinition) definition);
+      transformListener.transformCase(element, definition);
+    }
+
+    List<JobDeclaration<?,?>> declarations = context.getJobDeclarations();
+    if (!declarations.isEmpty()) {
+      ResourceDefinitionEntity resource = (ResourceDefinitionEntity) definition;
+      jobDeclarations.put(resource.getKey(), new ArrayList<JobDeclaration<?,?>>(declarations));
+      declarations.clear();
     }
 
     return (CaseDefinitionEntity) definition;
@@ -271,6 +285,8 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
       planItemTransformer = getPlanItemHandler(Stage.class);
     } else if (definition instanceof Milestone) {
       planItemTransformer = getPlanItemHandler(Milestone.class);
+    } else if (definition instanceof TimerEventListener) {
+      planItemTransformer = getPlanItemHandler(TimerEventListener.class);
     } else if (definition instanceof EventListener) {
       planItemTransformer = getPlanItemHandler(EventListener.class);
     }
@@ -366,6 +382,10 @@ public class CmmnTransform implements Transform<CaseDefinitionEntity> {
 
   public void setExpressionManager(ExpressionManager expressionManager) {
     this.expressionManager = expressionManager;
+  }
+
+  public Map<String, List<JobDeclaration<?, ?>>> getJobDeclarations() {
+    return jobDeclarations;
   }
 
 }

@@ -15,10 +15,10 @@ package org.camunda.bpm.engine.impl.batch;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import org.camunda.bpm.engine.impl.batch.BatchSeedJobHandler.BatchSeedJobConfiguration;
+import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 
 /**
@@ -37,7 +37,7 @@ public class BatchSeedJobHandler implements JobHandler<BatchSeedJobConfiguration
     return TYPE;
   }
 
-  public void execute(BatchSeedJobConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+  public void execute(BatchSeedJobConfiguration configuration, CoreExecution execution, CommandContext commandContext, String tenantId) {
 
     String batchId = configuration.getBatchId();
     BatchEntity batch = commandContext.getBatchManager().findBatchById(batchId);

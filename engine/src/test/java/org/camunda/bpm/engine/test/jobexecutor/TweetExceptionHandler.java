@@ -15,10 +15,10 @@ package org.camunda.bpm.engine.test.jobexecutor;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandlerConfiguration;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.slf4j.Logger;
 
@@ -38,7 +38,7 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     return TYPE;
   }
 
-  public void execute(JobHandlerConfiguration configuration, ExecutionEntity execution, CommandContext commandContext, String tenantId) {
+  public void execute(JobHandlerConfiguration configuration, CoreExecution execution, CommandContext commandContext, String tenantId) {
     if (exceptionsRemaining.decrementAndGet() >= 0) {
       throw new RuntimeException("exception remaining: "+exceptionsRemaining);
     }
