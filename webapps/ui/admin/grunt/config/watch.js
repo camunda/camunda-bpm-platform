@@ -21,8 +21,6 @@ module.exports = function(config, watchConf) {
   watchConf.admin_styles = {
       options: options,
       files: [
-        '<%= pkg.gruntConfig.adminSourceDir %>/../../camunda-commons-ui/lib/**/*.less',
-        '<%= pkg.gruntConfig.adminSourceDir %>/../../camunda-commons-ui/resources/less/**/*.less',
         '<%= pkg.gruntConfig.adminSourceDir %>/styles/**/*.{css,less}',
         '<%= pkg.gruntConfig.adminSourceDir %>/scripts/**/*.{css,less}'
       ],

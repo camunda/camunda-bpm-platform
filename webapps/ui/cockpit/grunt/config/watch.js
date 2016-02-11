@@ -22,8 +22,6 @@ module.exports = function(config, watchConf) {
   watchConf.cockpit_styles = {
       options: options,
       files: [
-        '<%= pkg.gruntConfig.cockpitSourceDir %>/../../camunda-commons-ui/lib/**/*.less',
-        '<%= pkg.gruntConfig.cockpitSourceDir %>/../../camunda-commons-ui/resources/less/**/*.less',
         '<%= pkg.gruntConfig.cockpitSourceDir %>/styles/**/*.{css,less}',
         '<%= pkg.gruntConfig.cockpitSourceDir %>/scripts/**/*.{css,less}'
       ],
