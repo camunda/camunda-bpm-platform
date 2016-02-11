@@ -27,6 +27,7 @@ import org.camunda.bpm.model.cmmn.instance.PlanItemDefinition;
 import org.camunda.bpm.model.cmmn.instance.ProcessTask;
 import org.camunda.bpm.model.cmmn.instance.Stage;
 import org.camunda.bpm.model.cmmn.instance.Task;
+import org.camunda.bpm.model.cmmn.instance.TimerEventListener;
 
 /**
  * @author Roman Smirnov
@@ -49,6 +50,7 @@ public class DefaultCmmnElementHandlerRegistry {
   protected DecisionTaskItemHandler decisionTaskPlanItemHandler = new DecisionTaskItemHandler();
   protected MilestoneItemHandler milestonePlanItemHandler = new MilestoneItemHandler();
   protected EventListenerItemHandler eventListenerPlanItemHandler = new EventListenerItemHandler();
+  protected TimerEventListenerItemHandler timerEventListenerItemHandler=new TimerEventListenerItemHandler();
 
   protected StageItemHandler stageDiscretionaryItemHandler = new StageItemHandler();
   protected HumanTaskItemHandler humanTaskDiscretionaryItemHandler = new HumanTaskItemHandler();
@@ -75,7 +77,8 @@ public class DefaultCmmnElementHandlerRegistry {
     planItemElementHandlers.put(Milestone.class, milestonePlanItemHandler);
 
     // Note: EventListener is currently not supported!
-    // planItemElementHandlers.put(EventListener.class, eventListenerPlanItemHandler);
+   // planItemElementHandlers.put(EventListener.class, eventListenerPlanItemHandler);
+    planItemElementHandlers.put(TimerEventListener.class, timerEventListenerItemHandler);
 
     // init discretionary element handler
     discretionaryElementHandlers = new HashMap<Class<? extends PlanItemDefinition>, ItemHandler>();
