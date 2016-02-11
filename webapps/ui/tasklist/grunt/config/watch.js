@@ -21,8 +21,6 @@ module.exports = function(config, watchConf) {
   watchConf.tasklist_styles = {
       options: options,
       files: [
-        '<%= pkg.gruntConfig.tasklistSourceDir %>/../../camunda-commons-ui/lib/**/*.less',
-        '<%= pkg.gruntConfig.tasklistSourceDir %>/../../camunda-commons-ui/resources/less/**/*.less',
         '<%= pkg.gruntConfig.tasklistSourceDir %>/styles/**/*.{css,less}',
         '<%= pkg.gruntConfig.tasklistSourceDir %>/scripts/**/*.{css,less}'
       ],
