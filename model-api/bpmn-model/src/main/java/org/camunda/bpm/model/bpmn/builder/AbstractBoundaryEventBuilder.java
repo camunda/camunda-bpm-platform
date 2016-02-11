@@ -16,8 +16,6 @@ package org.camunda.bpm.model.bpmn.builder;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.BoundaryEvent;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-
 /**
  * @author Sebastian Menski
  */
