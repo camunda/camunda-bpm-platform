@@ -1639,7 +1639,7 @@ public class MigrationAddBoundaryEventsTest {
   }
 
   @Test
-  public void testAddEscalationBoundaryEventToSubProcessAndThrowError() {
+  public void testAddEscalationBoundaryEventToSubProcessAndThrowEscalation() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
     ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS.clone()
