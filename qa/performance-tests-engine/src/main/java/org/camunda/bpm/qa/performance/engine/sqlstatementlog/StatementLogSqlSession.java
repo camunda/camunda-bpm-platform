@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.qa.performance.engine.sqlstatementlog;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,12 @@ import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.session.SqlSession;
 import org.camunda.bpm.qa.performance.engine.util.DelegatingSqlSession;
+import org.camunda.bpm.qa.performance.engine.util.JsonUtil;
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.SerializationConfig;
+import org.codehaus.jackson.map.SerializationConfig.Feature;
+import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
  * <p>This SqlSession wraps an actual SqlSession and logs executed sql statements. (Calls to the
@@ -268,13 +275,17 @@ public class StatementLogSqlSession extends DelegatingSqlSession {
     /** the duration the statement took to execute in Milliseconds */
     protected long durationMs;
 
-    protected Object statementParameters;
+    protected String statementParameters;
 
     public SqlStatementLog(SqlStatementType type, Object parameters, String statement, long duration) {
       statementType = type;
       this.statement = statement;
       this.durationMs = duration;
-      this.statementParameters = parameters;
+      try {
+        statementParameters = JsonUtil.getMapper().writeValueAsString(parameters).replaceAll("\"", "'");
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }
 
     public String getStatement() {
@@ -289,7 +300,7 @@ public class StatementLogSqlSession extends DelegatingSqlSession {
       return durationMs;
     }
 
-    public Object getStatementParameters() {
+    public String getStatementParameters() {
       return statementParameters;
     }
 

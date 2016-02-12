@@ -29,8 +29,15 @@ public class CompletionSignalingRunnable implements Runnable {
   }
 
   public void run() {
-    delegate.run();
-    latch.countDown();
+    try {
+        delegate.run();
+    }
+    catch(Exception e) {
+      e.printStackTrace();
+    }
+    finally {
+      latch.countDown();
+    }
   }
 
   public static CompletionSignalingRunnable wrap(Runnable runnable, CountDownLatch latch) {

@@ -101,6 +101,7 @@
         <testWatchers></testWatchers>
         <processEnginePlugins></processEnginePlugins>
         <watchActivities></watchActivities>
+        <test.excludes>query</test.excludes>
       </properties>
 
       <build>
@@ -169,6 +170,7 @@
         <testWatchers>org.camunda.bpm.qa.performance.engine.sqlstatementlog.StatementLogPerfTestWatcher</testWatchers>
         <processEnginePlugins>org.camunda.bpm.qa.performance.engine.sqlstatementlog.StatementLogProcessEnginePlugin</processEnginePlugins>
         <watchActivities></watchActivities>
+        <test.excludes>query</test.excludes>
       </properties>
 
       <build>

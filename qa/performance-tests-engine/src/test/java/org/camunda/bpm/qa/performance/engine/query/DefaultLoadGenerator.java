@@ -17,9 +17,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.log4j.jmx.LayoutDynamicMBean;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.impl.javax.el.DynamicBeanPropertyELResolver;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.Process;
