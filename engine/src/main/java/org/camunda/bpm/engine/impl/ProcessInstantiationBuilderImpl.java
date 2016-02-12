@@ -39,7 +39,7 @@ public class ProcessInstantiationBuilderImpl implements ProcessInstantiationBuil
   protected String businessKey;
   protected String caseInstanceId;
 
-  protected String tenantId;
+  protected String processDefinitionTenantId;
   protected boolean isTenantIdSet = false;
 
   protected ProcessInstanceModificationBuilderImpl modificationBuilder;
@@ -99,8 +99,8 @@ public class ProcessInstantiationBuilderImpl implements ProcessInstantiationBuil
     return this;
   }
 
-  public ProcessInstantiationBuilder tenantId(String tenantId) {
-    this.tenantId = tenantId;
+  public ProcessInstantiationBuilder processDefinitionTenantId(String tenantId) {
+    this.processDefinitionTenantId = tenantId;
     isTenantIdSet = true;
     return this;
   }
@@ -161,8 +161,8 @@ public class ProcessInstantiationBuilderImpl implements ProcessInstantiationBuil
     return modificationBuilder.getProcessVariables();
   }
 
-  public String getTenantId() {
-    return tenantId;
+  public String getProcessDefinitionTenantId() {
+    return processDefinitionTenantId;
   }
 
   public boolean isTenantIdSet() {

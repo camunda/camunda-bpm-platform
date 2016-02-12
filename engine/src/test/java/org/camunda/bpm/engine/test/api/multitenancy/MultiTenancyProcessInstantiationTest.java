@@ -39,7 +39,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     deploymentForTenant(TENANT_TWO, PROCESS);
 
     runtimeService.createProcessInstanceByKey("testProcess")
-      .tenantId(TENANT_ONE)
+      .processDefinitionTenantId(TENANT_ONE)
       .execute();
 
     assertThat(runtimeService.createProcessInstanceQuery().tenantIdIn(TENANT_ONE).count(), is(1L));
@@ -59,7 +59,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
 
     try {
       runtimeService.createProcessInstanceByKey("testProcess")
-        .tenantId(TENANT_TWO)
+        .processDefinitionTenantId(TENANT_TWO)
         .execute();
 
       fail("expected exception");
@@ -89,7 +89,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
 
     try {
       runtimeService.createProcessInstanceById(processDefinition.getId())
-        .tenantId(TENANT_ONE)
+        .processDefinitionTenantId(TENANT_ONE)
         .execute();
 
       fail("expected exception");
@@ -103,7 +103,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
     deploymentForTenant(TENANT_TWO, PROCESS);
 
     runtimeService.createProcessInstanceByKey("testProcess")
-      .tenantId(TENANT_ONE)
+      .processDefinitionTenantId(TENANT_ONE)
       .startBeforeActivity("userTask")
       .execute();
 
@@ -125,7 +125,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
 
     try {
       runtimeService.createProcessInstanceByKey("testProcess")
-        .tenantId(TENANT_TWO)
+        .processDefinitionTenantId(TENANT_TWO)
         .startBeforeActivity("userTask")
         .execute();
 
@@ -157,7 +157,7 @@ public class MultiTenancyProcessInstantiationTest extends PluggableProcessEngine
 
     try {
       runtimeService.createProcessInstanceById(processDefinition.getId())
-        .tenantId(TENANT_ONE)
+        .processDefinitionTenantId(TENANT_ONE)
         .startBeforeActivity("userTask")
         .execute();
 

@@ -52,7 +52,7 @@ public class TimerStartEventJobHandler extends TimerEventJobHandler {
     if(!processDefinition.isSuspended()) {
 
       RuntimeService runtimeService = commandContext.getProcessEngineConfiguration().getRuntimeService();
-      runtimeService.createProcessInstanceByKey(processDefinition.getKey()).tenantId(tenantId).execute();
+      runtimeService.createProcessInstanceByKey(processDefinition.getKey()).processDefinitionTenantId(tenantId).execute();
 
     } else {
       LOG.ignoringSuspendedJob(processDefinition);

@@ -27,7 +27,7 @@ public class GetDeployedProcessDefinitionCmd implements Command<ProcessDefinitio
   protected String processDefinitionId;
   protected String processDefinitionKey;
 
-  protected String tenantId;
+  protected String processDefinitionTenantId;
   protected boolean isTenantIdSet = false;
 
   protected final boolean checkReadPermission;
@@ -40,7 +40,7 @@ public class GetDeployedProcessDefinitionCmd implements Command<ProcessDefinitio
   public GetDeployedProcessDefinitionCmd(ProcessInstantiationBuilderImpl instantiationBuilder, boolean checkReadPermission) {
     this.processDefinitionId = instantiationBuilder.getProcessDefinitionId();
     this.processDefinitionKey = instantiationBuilder.getProcessDefinitionKey();
-    this.tenantId = instantiationBuilder.getTenantId();
+    this.processDefinitionTenantId = instantiationBuilder.getProcessDefinitionTenantId();
     this.isTenantIdSet = instantiationBuilder.isTenantIdSet();
     this.checkReadPermission = checkReadPermission;
   }
@@ -77,7 +77,7 @@ public class GetDeployedProcessDefinitionCmd implements Command<ProcessDefinitio
 
   protected ProcessDefinitionEntity findByKey(DeploymentCache deploymentCache, String processDefinitionKey) {
     if (isTenantIdSet) {
-      return deploymentCache.findDeployedLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
+      return deploymentCache.findDeployedLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, processDefinitionTenantId);
 
     } else {
       return deploymentCache.findDeployedLatestProcessDefinitionByKey(processDefinitionKey);
