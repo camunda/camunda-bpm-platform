@@ -20,6 +20,8 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.BaseElement;
 import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
 import org.camunda.bpm.model.bpmn.instance.Definitions;
+import org.camunda.bpm.model.bpmn.instance.Error;
+import org.camunda.bpm.model.bpmn.instance.ErrorEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.ExtensionElements;
 import org.camunda.bpm.model.bpmn.instance.Message;
 import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
@@ -151,6 +153,30 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
     SignalEventDefinition signalEventDefinition = createInstance(SignalEventDefinition.class);
     signalEventDefinition.setSignal(signal);
     return signalEventDefinition;
+  }
+
+  protected Error findErrorForNameAndCode(String errorCode) {
+    Collection<Error> errors = modelInstance.getModelElementsByType(Error.class);
+    for (Error error : errors) {
+      if (errorCode.equals(error.getErrorCode())) {
+        // return already existing error
+        return error;
+      }
+    }
+
+    // create new error
+    Definitions definitions = modelInstance.getDefinitions();
+    Error error = createChild(definitions, Error.class);
+    error.setErrorCode(errorCode);
+
+    return error;
+  }
+
+  protected ErrorEventDefinition createErrorEventDefinition(String errorCode) {
+    Error error = findErrorForNameAndCode(errorCode);
+    ErrorEventDefinition errorEventDefinition = createInstance(ErrorEventDefinition.class);
+    errorEventDefinition.setError(error);
+    return errorEventDefinition;
   }
 
   /**

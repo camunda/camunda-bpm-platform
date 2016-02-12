@@ -15,6 +15,8 @@ package org.camunda.bpm.model.bpmn.builder;
 
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.BoundaryEvent;
+import org.camunda.bpm.model.bpmn.instance.ErrorEventDefinition;
+import org.camunda.bpm.model.bpmn.instance.SignalEventDefinition;
 
 /**
  * @author Sebastian Menski
@@ -33,6 +35,32 @@ public abstract class AbstractBoundaryEventBuilder<B extends AbstractBoundaryEve
    */
   public B cancelActivity(Boolean cancelActivity) {
     element.setCancelActivity(cancelActivity);
+
+    return myself;
+  }
+
+  /**
+   * Sets a catch all error definition.
+   *
+   * @return the builder object
+   */
+  public B error() {
+    ErrorEventDefinition errorEventDefinition = createInstance(ErrorEventDefinition.class);
+    element.getEventDefinitions().add(errorEventDefinition);
+
+    return myself;
+  }
+
+  /**
+   * Sets an error definition for the given error code. If already an error
+   * with this code exists it will be used, otherwise a new error is created.
+   *
+   * @param errorCode the code of the error
+   * @return the builder object
+   */
+  public B error(String errorCode) {
+    ErrorEventDefinition errorEventDefinition = createErrorEventDefinition(errorCode);
+    element.getEventDefinitions().add(errorEventDefinition);
 
     return myself;
   }

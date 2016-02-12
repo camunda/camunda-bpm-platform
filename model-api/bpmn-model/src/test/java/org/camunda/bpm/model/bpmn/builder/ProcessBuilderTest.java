@@ -50,6 +50,8 @@ import org.camunda.bpm.model.bpmn.instance.BusinessRuleTask;
 import org.camunda.bpm.model.bpmn.instance.CallActivity;
 import org.camunda.bpm.model.bpmn.instance.Definitions;
 import org.camunda.bpm.model.bpmn.instance.EndEvent;
+import org.camunda.bpm.model.bpmn.instance.Error;
+import org.camunda.bpm.model.bpmn.instance.ErrorEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.Event;
 import org.camunda.bpm.model.bpmn.instance.EventDefinition;
 import org.camunda.bpm.model.bpmn.instance.ExtensionElements;
@@ -1438,12 +1440,82 @@ public class ProcessBuilderTest {
     assertThat(boundaryEvent.cancelActivity()).isFalse();
   }
 
-  protected Message assertMessageEventDefinition(String elementId, String messageName) {
-    MessageEventDefinition messageEventDefinition = assertAndGetSingleEventDefinition(elementId, MessageEventDefinition.class);
-    return assertMessageEventDefinition(messageName, messageEventDefinition);
+  @Test
+  public void testCatchAllErrorBoundaryEvent() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask("task")
+      .endEvent()
+      .moveToActivity("task")
+      .boundaryEvent("boundary").error()
+      .endEvent("boundaryEnd")
+      .done();
+
+    ErrorEventDefinition errorEventDefinition = assertAndGetSingleEventDefinition("boundary", ErrorEventDefinition.class);
+    assertThat(errorEventDefinition).isNotNull();
+    assertThat(errorEventDefinition.getError()).isNull();
   }
 
-  protected Message assertMessageEventDefinition(String messageName, MessageEventDefinition messageEventDefinition) {
+  @Test
+  public void testErrorBoundaryEvent() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask("task")
+      .endEvent()
+      .moveToActivity("task")
+      .boundaryEvent("boundary").error("myErrorCode")
+      .endEvent("boundaryEnd")
+      .done();
+
+    assertErrorEventDefinition("boundary", "myErrorCode");
+
+    UserTask userTask = modelInstance.getModelElementById("task");
+    BoundaryEvent boundaryEvent = modelInstance.getModelElementById("boundary");
+    EndEvent boundaryEnd = modelInstance.getModelElementById("boundaryEnd");
+
+    // boundary event is attached to the user task
+    assertThat(boundaryEvent.getAttachedTo()).isEqualTo(userTask);
+
+    // boundary event has no incoming sequence flows
+    assertThat(boundaryEvent.getIncoming()).isEmpty();
+
+    // the next flow node is the boundary end event
+    List<FlowNode> succeedingNodes = boundaryEvent.getSucceedingNodes().list();
+    assertThat(succeedingNodes).containsOnly(boundaryEnd);
+  }
+
+  @Test
+  public void testErrorEndEvent() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .endEvent("end").error("myErrorCode")
+      .done();
+
+    assertErrorEventDefinition("end", "myErrorCode");
+  }
+
+  @Test
+  public void testErrorEndEventWithExistingError() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask("task")
+      .endEvent("end").error("myErrorCode")
+      .moveToActivity("task")
+      .boundaryEvent("boundary").error("myErrorCode")
+      .endEvent("boundaryEnd")
+      .done();
+
+    Error boundaryError = assertErrorEventDefinition("boundary", "myErrorCode");
+    Error endError = assertErrorEventDefinition("end", "myErrorCode");
+
+    assertThat(boundaryError).isEqualTo(endError);
+
+    assertOnlyOneErrorExists("myErrorCode");
+
+  }
+
+  protected Message assertMessageEventDefinition(String elementId, String messageName) {
+    MessageEventDefinition messageEventDefinition = assertAndGetSingleEventDefinition(elementId, MessageEventDefinition.class);
     Message message = messageEventDefinition.getMessage();
     assertThat(message).isNotNull();
     assertThat(message.getName()).isEqualTo(messageName);
@@ -1468,6 +1540,20 @@ public class ProcessBuilderTest {
   protected void assertOnlyOneSignalExists(String signalName) {
     Collection<Signal> signals = modelInstance.getModelElementsByType(Signal.class);
     assertThat(signals).extracting("name").containsOnlyOnce(signalName);
+  }
+
+  protected Error assertErrorEventDefinition(String elementId, String errorCode) {
+    ErrorEventDefinition errorEventDefinition = assertAndGetSingleEventDefinition(elementId, ErrorEventDefinition.class);
+    Error error = errorEventDefinition.getError();
+    assertThat(error).isNotNull();
+    assertThat(error.getErrorCode()).isEqualTo(errorCode);
+
+    return error;
+  }
+
+  protected void assertOnlyOneErrorExists(String errorCode) {
+    Collection<Error> errors = modelInstance.getModelElementsByType(Error.class);
+    assertThat(errors).extracting("errorCode").containsOnlyOnce(errorCode);
   }
 
   protected void assertCamundaInputOutputParameter(BaseElement element) {

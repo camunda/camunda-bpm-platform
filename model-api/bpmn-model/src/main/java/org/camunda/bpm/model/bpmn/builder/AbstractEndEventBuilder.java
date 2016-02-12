@@ -15,6 +15,7 @@ package org.camunda.bpm.model.bpmn.builder;
 
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.EndEvent;
+import org.camunda.bpm.model.bpmn.instance.ErrorEventDefinition;
 
 /**
  * @author Sebastian Menski
@@ -23,6 +24,20 @@ public abstract class AbstractEndEventBuilder<B extends AbstractEndEventBuilder<
 
   protected AbstractEndEventBuilder(BpmnModelInstance modelInstance, EndEvent element, Class<?> selfType) {
     super(modelInstance, element, selfType);
+  }
+
+  /**
+   * Sets an error definition for the given error code. If already an error
+   * with this code exists it will be used, otherwise a new error is created.
+   *
+   * @param errorCode the code of the error
+   * @return the builder object
+   */
+  public B error(String errorCode) {
+    ErrorEventDefinition errorEventDefinition = createErrorEventDefinition(errorCode);
+    element.getEventDefinitions().add(errorEventDefinition);
+
+    return myself;
   }
 
 }
