@@ -2,6 +2,7 @@ drop index ACT_IDX_BYTEAR_DEPL ;
 drop index ACT_IDX_EXE_PROCINST ;
 drop index ACT_IDX_EXE_PARENT ;
 drop index ACT_IDX_EXE_SUPER;
+drop index ACT_IDX_EXE_PROCDEF;
 drop index ACT_IDX_TSKASS_TASK;
 drop index ACT_IDX_TASK_EXEC;
 drop index ACT_IDX_TASK_PROCINST;
@@ -66,25 +67,25 @@ alter table ACT_RU_JOB
     drop constraint ACT_FK_JOB_EXCEPTION;
 
 alter table ACT_RU_EVENT_SUBSCR
-    drop constraint ACT_FK_EVENT_EXEC; 
+    drop constraint ACT_FK_EVENT_EXEC;
 
 alter table ACT_RU_INCIDENT
-    drop constraint ACT_FK_INC_EXE; 
+    drop constraint ACT_FK_INC_EXE;
 
 alter table ACT_RU_INCIDENT
-    drop constraint ACT_FK_INC_PROCINST; 
+    drop constraint ACT_FK_INC_PROCINST;
 
 alter table ACT_RU_INCIDENT
     drop constraint ACT_FK_INC_PROCDEF;
 
 alter table ACT_RU_INCIDENT
-    drop constraint ACT_FK_INC_CAUSE; 
+    drop constraint ACT_FK_INC_CAUSE;
 
 alter table ACT_RU_INCIDENT
-    drop constraint ACT_FK_INC_RCAUSE; 
+    drop constraint ACT_FK_INC_RCAUSE;
 
 alter table ACT_RU_AUTHORIZATION
-    drop constraint ACT_UNIQ_AUTH_GROUP; 
+    drop constraint ACT_UNIQ_AUTH_GROUP;
 
 alter table ACT_RU_AUTHORIZATION
     drop constraint ACT_UNIQ_AUTH_USER;
