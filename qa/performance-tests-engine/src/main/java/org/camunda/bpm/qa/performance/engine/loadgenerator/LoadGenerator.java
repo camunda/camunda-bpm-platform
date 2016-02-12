@@ -37,6 +37,9 @@ public class LoadGenerator {
   public static final String ANSI_CYAN = "\u001B[36m";
   public static final String ANSI_WHITE = "\u001B[37m";
 
+  public static final String ANSI_CLEAR_LINE = "\u001B[2K";
+  public static final String CLEAR_LINE = ANSI_CLEAR_LINE + "\r";
+
   protected LoadGeneratorConfiguration configuration;
 
   public LoadGenerator(LoadGeneratorConfiguration configuration) {
@@ -75,8 +78,7 @@ public class LoadGenerator {
 
     timer.cancel();
 
-    if(configuration.isColor()) System.out.print("\033[2K\r");
-    if(configuration.isColor()) System.out.print(ANSI_GREEN);
+    if(configuration.isColor()) System.out.print(CLEAR_LINE + ANSI_GREEN);
     System.out.println("Finished generating load.");
     if(configuration.isColor()) System.out.print(ANSI_RESET);
 
@@ -107,7 +109,6 @@ public class LoadGenerator {
     private int totalWork;
     protected CountDownLatch sync;
 
-    DecimalFormat df = new DecimalFormat("#.00");
     protected boolean color;
 
     public ProgressReporter(int totalWork, CountDownLatch latch, boolean color) {
@@ -124,11 +125,9 @@ public class LoadGenerator {
 
       StringBuilder statusMessage = new StringBuilder();
 
-      if(color) statusMessage.append("\033[2K\r");
+      if(color) statusMessage.append(CLEAR_LINE + ANSI_YELLOW);
 
-      if(color) statusMessage.append(ANSI_YELLOW);
-
-      statusMessage.append(df.format(progress));
+      statusMessage.append(String.format("%6.2f", progress));
       statusMessage.append("% done");
 
       if(color) statusMessage.append(ANSI_RESET);
