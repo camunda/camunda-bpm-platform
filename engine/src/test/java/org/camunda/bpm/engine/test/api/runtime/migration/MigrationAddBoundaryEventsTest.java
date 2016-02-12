@@ -49,7 +49,7 @@ public class MigrationAddBoundaryEventsTest {
   public static final String AFTER_BOUNDARY_TASK = "afterBoundary";
   public static final String MESSAGE_NAME = "Message";
   public static final String SIGNAL_NAME = "Signal";
-  public static final String TIMER_DATE = "3016-02-11T12:13:14Z";
+  public static final String TIMER_DATE = "2016-02-11T12:13:14Z";
 
   protected ProcessEngineRule rule = new ProcessEngineRule();
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);
@@ -1052,7 +1052,7 @@ public class MigrationAddBoundaryEventsTest {
     sendSignalAndCompleteTasks(SIGNAL_NAME, AFTER_BOUNDARY_TASK, "userTask2");
     testHelper.assertProcessEnded(processInstance.getId());
   }
-  
+
   @Test
   public void testAddTimerBoundaryEventToUserTask() {
     // given
