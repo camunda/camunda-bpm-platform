@@ -52,6 +52,8 @@ import org.camunda.bpm.model.bpmn.instance.Definitions;
 import org.camunda.bpm.model.bpmn.instance.EndEvent;
 import org.camunda.bpm.model.bpmn.instance.Error;
 import org.camunda.bpm.model.bpmn.instance.ErrorEventDefinition;
+import org.camunda.bpm.model.bpmn.instance.Escalation;
+import org.camunda.bpm.model.bpmn.instance.EscalationEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.Event;
 import org.camunda.bpm.model.bpmn.instance.EventDefinition;
 import org.camunda.bpm.model.bpmn.instance.ExtensionElements;
@@ -1514,6 +1516,91 @@ public class ProcessBuilderTest {
 
   }
 
+  @Test
+  public void testCatchAllEscalationBoundaryEvent() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask("task")
+      .endEvent()
+      .moveToActivity("task")
+      .boundaryEvent("boundary").escalation()
+      .endEvent("boundaryEnd")
+      .done();
+
+    EscalationEventDefinition escalationEventDefinition = assertAndGetSingleEventDefinition("boundary", EscalationEventDefinition.class);
+    assertThat(escalationEventDefinition).isNotNull();
+    assertThat(escalationEventDefinition.getEscalation()).isNull();
+  }
+
+  @Test
+  public void testEscalationBoundaryEvent() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .subProcess("subProcess")
+      .endEvent()
+      .moveToActivity("subProcess")
+      .boundaryEvent("boundary").escalation("myEscalationCode")
+      .endEvent("boundaryEnd")
+      .done();
+
+    assertEscalationEventDefinition("boundary", "myEscalationCode");
+
+    SubProcess subProcess = modelInstance.getModelElementById("subProcess");
+    BoundaryEvent boundaryEvent = modelInstance.getModelElementById("boundary");
+    EndEvent boundaryEnd = modelInstance.getModelElementById("boundaryEnd");
+
+    // boundary event is attached to the sub process
+    assertThat(boundaryEvent.getAttachedTo()).isEqualTo(subProcess);
+
+    // boundary event has no incoming sequence flows
+    assertThat(boundaryEvent.getIncoming()).isEmpty();
+
+    // the next flow node is the boundary end event
+    List<FlowNode> succeedingNodes = boundaryEvent.getSucceedingNodes().list();
+    assertThat(succeedingNodes).containsOnly(boundaryEnd);
+  }
+
+  @Test
+  public void testEscalationEndEvent() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .endEvent("end").escalation("myEscalationCode")
+      .done();
+
+    assertEscalationEventDefinition("end", "myEscalationCode");
+  }
+
+  @Test
+  public void testIntermediateEscalationThrowEvent() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .intermediateThrowEvent("throw").escalation("myEscalationCode")
+      .endEvent()
+      .done();
+
+    assertEscalationEventDefinition("throw", "myEscalationCode");
+  }
+
+  @Test
+  public void testEscalationEndEventWithExistingEscalation() {
+    modelInstance = Bpmn.createProcess()
+      .startEvent()
+      .userTask("task")
+      .endEvent("end").escalation("myEscalationCode")
+      .moveToActivity("task")
+      .boundaryEvent("boundary").escalation("myEscalationCode")
+      .endEvent("boundaryEnd")
+      .done();
+
+    Escalation boundaryEscalation = assertEscalationEventDefinition("boundary", "myEscalationCode");
+    Escalation endEscalation = assertEscalationEventDefinition("end", "myEscalationCode");
+
+    assertThat(boundaryEscalation).isEqualTo(endEscalation);
+
+    assertOnlyOneEscalationExists("myEscalationCode");
+
+  }
+
   protected Message assertMessageEventDefinition(String elementId, String messageName) {
     MessageEventDefinition messageEventDefinition = assertAndGetSingleEventDefinition(elementId, MessageEventDefinition.class);
     Message message = messageEventDefinition.getMessage();
@@ -1554,6 +1641,20 @@ public class ProcessBuilderTest {
   protected void assertOnlyOneErrorExists(String errorCode) {
     Collection<Error> errors = modelInstance.getModelElementsByType(Error.class);
     assertThat(errors).extracting("errorCode").containsOnlyOnce(errorCode);
+  }
+
+  protected Escalation assertEscalationEventDefinition(String elementId, String escalationCode) {
+    EscalationEventDefinition escalationEventDefinition = assertAndGetSingleEventDefinition(elementId, EscalationEventDefinition.class);
+    Escalation escalation = escalationEventDefinition.getEscalation();
+    assertThat(escalation).isNotNull();
+    assertThat(escalation.getEscalationCode()).isEqualTo(escalationCode);
+
+    return escalation;
+  }
+
+  protected void assertOnlyOneEscalationExists(String escalationCode) {
+    Collection<Escalation> escalations = modelInstance.getModelElementsByType(Escalation.class);
+    assertThat(escalations).extracting("escalationCode").containsOnlyOnce(escalationCode);
   }
 
   protected void assertCamundaInputOutputParameter(BaseElement element) {

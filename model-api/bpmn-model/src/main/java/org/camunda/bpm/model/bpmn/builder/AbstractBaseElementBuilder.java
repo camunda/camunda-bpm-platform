@@ -22,6 +22,8 @@ import org.camunda.bpm.model.bpmn.instance.BpmnModelElementInstance;
 import org.camunda.bpm.model.bpmn.instance.Definitions;
 import org.camunda.bpm.model.bpmn.instance.Error;
 import org.camunda.bpm.model.bpmn.instance.ErrorEventDefinition;
+import org.camunda.bpm.model.bpmn.instance.Escalation;
+import org.camunda.bpm.model.bpmn.instance.EscalationEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.ExtensionElements;
 import org.camunda.bpm.model.bpmn.instance.Message;
 import org.camunda.bpm.model.bpmn.instance.MessageEventDefinition;
@@ -177,6 +179,28 @@ public abstract class AbstractBaseElementBuilder<B extends AbstractBaseElementBu
     ErrorEventDefinition errorEventDefinition = createInstance(ErrorEventDefinition.class);
     errorEventDefinition.setError(error);
     return errorEventDefinition;
+  }
+
+  protected Escalation findEscalationForCode(String escalationCode) {
+    Collection<Escalation> escalations = modelInstance.getModelElementsByType(Escalation.class);
+    for (Escalation escalation : escalations) {
+      if (escalationCode.equals(escalation.getEscalationCode())) {
+          // return already existing escalation
+          return escalation;
+      }
+    }
+
+    Definitions definitions = modelInstance.getDefinitions();
+    Escalation escalation = createChild(definitions, Escalation.class);
+    escalation.setEscalationCode(escalationCode);
+    return escalation;
+  }
+
+  protected EscalationEventDefinition createEscalationEventDefinition(String escalationCode) {
+    Escalation escalation = findEscalationForCode(escalationCode);
+    EscalationEventDefinition escalationEventDefinition = createInstance(EscalationEventDefinition.class);
+    escalationEventDefinition.setEscalation(escalation);
+    return escalationEventDefinition;
   }
 
   /**

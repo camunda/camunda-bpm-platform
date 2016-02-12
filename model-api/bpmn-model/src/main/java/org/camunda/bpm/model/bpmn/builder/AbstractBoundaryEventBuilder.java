@@ -16,6 +16,7 @@ package org.camunda.bpm.model.bpmn.builder;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.BoundaryEvent;
 import org.camunda.bpm.model.bpmn.instance.ErrorEventDefinition;
+import org.camunda.bpm.model.bpmn.instance.EscalationEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.SignalEventDefinition;
 
 /**
@@ -61,6 +62,32 @@ public abstract class AbstractBoundaryEventBuilder<B extends AbstractBoundaryEve
   public B error(String errorCode) {
     ErrorEventDefinition errorEventDefinition = createErrorEventDefinition(errorCode);
     element.getEventDefinitions().add(errorEventDefinition);
+
+    return myself;
+  }
+
+  /**
+   * Sets a catch all escalation definition.
+   *
+   * @return the builder object
+   */
+  public B escalation() {
+    EscalationEventDefinition escalationEventDefinition = createInstance(EscalationEventDefinition.class);
+    element.getEventDefinitions().add(escalationEventDefinition);
+
+    return myself;
+  }
+
+  /**
+   * Sets an escalation definition for the given escalation code. If already an escalation
+   * with this code exists it will be used, otherwise a new escalation is created.
+   *
+   * @param escalationCode the code of the error
+   * @return the builder object
+   */
+  public B escalation(String escalationCode) {
+    EscalationEventDefinition escalationEventDefinition = createEscalationEventDefinition(escalationCode);
+    element.getEventDefinitions().add(escalationEventDefinition);
 
     return myself;
   }
