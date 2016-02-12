@@ -45,7 +45,7 @@ public class ProcessModels {
         .embeddedSubProcess()
           .startEvent()
           .userTask("userTask").name("User Task")
-          .endEvent()
+          .endEvent("subProcessEnd")
         .subProcessDone()
       .endEvent()
       .done();

@@ -37,6 +37,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ExecutionTree;
+import org.camunda.bpm.model.bpmn.instance.EndEvent;
 import org.camunda.bpm.model.bpmn.instance.SubProcess;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
 import org.junit.Before;
@@ -50,6 +51,8 @@ public class MigrationAddBoundaryEventsTest {
   public static final String MESSAGE_NAME = "Message";
   public static final String SIGNAL_NAME = "Signal";
   public static final String TIMER_DATE = "2016-02-11T12:13:14Z";
+  public static final String ERROR_CODE = "Error";
+  public static final String ESCALATION_CODE = "Escalation";
 
   protected ProcessEngineRule rule = new ProcessEngineRule();
   protected MigrationTestRule testHelper = new MigrationTestRule(rule);
@@ -60,12 +63,12 @@ public class MigrationAddBoundaryEventsTest {
   public ProcessEngine processEngine;
   public RuntimeService runtimeService;
   public TaskService taskService;
+  public ManagementService managementService;
 
   public ProcessInstance processInstance;
   public ActivityInstance originalActivityTree;
   public ActivityInstance updatedActivityTree;
   public ExecutionTree migratedExecutionTree;
-  public ManagementService managementService;
 
   @Before
   public void initServices() {
@@ -1589,6 +1592,92 @@ public class MigrationAddBoundaryEventsTest {
 
     // and it is possible to successfully complete the migrated instance
     completeTasks("userTask");
+    testHelper.assertProcessEnded(processInstance.getId());
+  }
+
+  @Test
+  public void testAddErrorBoundaryEventToSubProcessAndThrowError() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS.clone()
+      .<EndEvent>getModelElementById("subProcessEnd").builder()
+      .error(ERROR_CODE)  // let the end event of the subprocess throw an error
+      .moveToActivity("subProcess")
+      .boundaryEvent().error(ERROR_CODE)  // catch error with boundary event
+      .userTask(AFTER_BOUNDARY_TASK)
+      .endEvent()
+      .done()
+    );
+
+    MigrationPlan migrationPlan = runtimeService
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("subProcess", "subProcess")
+      .mapActivities("userTask", "userTask")
+      .build();
+
+    // when
+    createProcessInstanceAndMigrate(migrationPlan);
+
+    // then
+    assertThat(migratedExecutionTree)
+      .hasProcessDefinitionId(targetProcessDefinition.getId())
+      .matches(
+        describeExecutionTree(null).scope().id(processInstance.getId())
+          .child("userTask").scope().id(testHelper.getSingleExecutionIdForActivity(originalActivityTree, "subProcess"))
+          .done());
+
+    assertThat(updatedActivityTree).hasStructure(
+      describeActivityInstanceTree(targetProcessDefinition.getId())
+        .beginScope("subProcess", testHelper.getSingleActivityInstance(originalActivityTree, "subProcess").getId())
+        .activity("userTask", testHelper.getSingleActivityInstance(originalActivityTree, "userTask").getId())
+        .done());
+
+    // and it is possible to successfully complete the migrated instance
+    completeTasks("userTask");
+    completeTasks(AFTER_BOUNDARY_TASK);
+    testHelper.assertProcessEnded(processInstance.getId());
+  }
+
+  @Test
+  public void testAddEscalationBoundaryEventToSubProcessAndThrowError() {
+    // given
+    ProcessDefinition sourceProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS);
+    ProcessDefinition targetProcessDefinition = testHelper.deploy(ProcessModels.SUBPROCESS_PROCESS.clone()
+      .<EndEvent>getModelElementById("subProcessEnd").builder()
+      .escalation(ESCALATION_CODE)  // let the end event of the subprocess escalate
+      .moveToActivity("subProcess")
+      .boundaryEvent().escalation(ESCALATION_CODE)  // catch escalation with boundary event
+      .userTask(AFTER_BOUNDARY_TASK)
+      .endEvent()
+      .done()
+    );
+
+    MigrationPlan migrationPlan = runtimeService
+      .createMigrationPlan(sourceProcessDefinition.getId(), targetProcessDefinition.getId())
+      .mapActivities("subProcess", "subProcess")
+      .mapActivities("userTask", "userTask")
+      .build();
+
+    // when
+    createProcessInstanceAndMigrate(migrationPlan);
+
+    // then
+    assertThat(migratedExecutionTree)
+      .hasProcessDefinitionId(targetProcessDefinition.getId())
+      .matches(
+        describeExecutionTree(null).scope().id(processInstance.getId())
+          .child("userTask").scope().id(testHelper.getSingleExecutionIdForActivity(originalActivityTree, "subProcess"))
+          .done());
+
+    assertThat(updatedActivityTree).hasStructure(
+      describeActivityInstanceTree(targetProcessDefinition.getId())
+        .beginScope("subProcess", testHelper.getSingleActivityInstance(originalActivityTree, "subProcess").getId())
+        .activity("userTask", testHelper.getSingleActivityInstance(originalActivityTree, "userTask").getId())
+        .done());
+
+    // and it is possible to successfully complete the migrated instance
+    completeTasks("userTask");
+    completeTasks(AFTER_BOUNDARY_TASK);
     testHelper.assertProcessEnded(processInstance.getId());
   }
 
