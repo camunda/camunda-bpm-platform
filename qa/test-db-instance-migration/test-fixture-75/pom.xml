@@ -185,7 +185,7 @@
                     <!-- now patch old version of the schema -->
 
                     <!-- 7.4.2 to 7.4.3 -->
-                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.2_to_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.3.sql"</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}_patch_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.2_to_${camunda.previous.majorVersion}.${camunda.previous.minorVersion}.3.sql</srcFile>
                   </srcFiles>
                 </configuration>
               </execution>
