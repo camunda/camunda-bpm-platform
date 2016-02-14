@@ -143,6 +143,7 @@
 
                     <copy file="${project.build.directory}/scripts-old/sql/create/mysql_engine_${camunda.version.old}.sql" tofile="${project.build.directory}/scripts-old/sql/create/mariadb_engine_${camunda.version.old}.sql" overwrite="true" />
                     <copy file="${project.build.directory}/scripts-old/sql/create/mysql_identity_${camunda.version.old}.sql" tofile="${project.build.directory}/scripts-old/sql/create/mariadb_identity_${camunda.version.old}.sql" overwrite="true" />
+                    <copy file="${project.build.directory}/scripts-current/sql/upgrade/mysql_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" tofile="${project.build.directory}/scripts-current/sql/upgrade/mariadb_engine_${camunda.old.majorVersion}.${camunda.old.minorVersion}_patch.sql" overwrite="true" />
 
                   </target>
                 </configuration>
