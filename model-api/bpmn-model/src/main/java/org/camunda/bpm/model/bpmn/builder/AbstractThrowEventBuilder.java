@@ -60,7 +60,7 @@ public abstract class AbstractThrowEventBuilder<B extends AbstractThrowEventBuil
    * Sets an escalation definition for the given escalation code. If already an escalation
    * with this code exists it will be used, otherwise a new escalation is created.
    *
-   * @param escalationCode the code of the error
+   * @param escalationCode the code of the escalation
    * @return the builder object
    */
   public B escalation(String escalationCode) {

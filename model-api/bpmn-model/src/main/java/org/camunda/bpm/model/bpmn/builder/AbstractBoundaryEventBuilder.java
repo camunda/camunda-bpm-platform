@@ -17,7 +17,6 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.BoundaryEvent;
 import org.camunda.bpm.model.bpmn.instance.ErrorEventDefinition;
 import org.camunda.bpm.model.bpmn.instance.EscalationEventDefinition;
-import org.camunda.bpm.model.bpmn.instance.SignalEventDefinition;
 
 /**
  * @author Sebastian Menski
@@ -82,7 +81,7 @@ public abstract class AbstractBoundaryEventBuilder<B extends AbstractBoundaryEve
    * Sets an escalation definition for the given escalation code. If already an escalation
    * with this code exists it will be used, otherwise a new escalation is created.
    *
-   * @param escalationCode the code of the error
+   * @param escalationCode the code of the escalation
    * @return the builder object
    */
   public B escalation(String escalationCode) {
