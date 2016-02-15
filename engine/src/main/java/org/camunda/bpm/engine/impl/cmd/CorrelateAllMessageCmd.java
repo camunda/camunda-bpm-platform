@@ -21,6 +21,7 @@ import java.util.concurrent.Callable;
 
 import org.camunda.bpm.engine.impl.MessageCorrelationBuilderImpl;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.CorrelationSet;
@@ -31,7 +32,7 @@ import org.camunda.bpm.engine.impl.runtime.MessageCorrelationResult;
  * @author Daniel Meyer
  * @author Michael Scholz
  */
-public class CorrelateAllMessageCmd extends AbstractCorrelateMessageCmd {
+public class CorrelateAllMessageCmd extends AbstractCorrelateMessageCmd implements Command<Void> {
 
   public CorrelateAllMessageCmd(String messageName, String businessKey,
       Map<String, Object> correlationKeys, Map<String, Object> processVariables) {
@@ -52,7 +53,7 @@ public class CorrelateAllMessageCmd extends AbstractCorrelateMessageCmd {
         + "messageName, businessKey, correlationKeys, processInstanceId", messageName, businessKey, correlationKeys, processInstanceId);
 
     final CorrelationHandler correlationHandler = Context.getProcessEngineConfiguration().getCorrelationHandler();
-    final CorrelationSet correlationSet = new CorrelationSet(businessKey, processInstanceId, correlationKeys);
+    final CorrelationSet correlationSet = new CorrelationSet(businessKey, processInstanceId, correlationKeys, null);
     List<MessageCorrelationResult> correlationResults = commandContext.runWithoutAuthorization(new Callable<List<MessageCorrelationResult>>() {
       public List<MessageCorrelationResult> call() throws Exception {
         return correlationHandler.correlateMessages(commandContext, messageName, correlationSet);

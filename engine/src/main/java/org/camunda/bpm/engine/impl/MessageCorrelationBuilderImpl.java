@@ -12,17 +12,21 @@
  */
 package org.camunda.bpm.engine.impl;
 
+import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
+
 import java.util.HashMap;
 import java.util.Map;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cmd.CorrelateAllMessageCmd;
 import org.camunda.bpm.engine.impl.cmd.CorrelateMessageCmd;
+import org.camunda.bpm.engine.impl.cmd.CorrelateStartMessageCmd;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
-
-import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 /**
  * @author Daniel Meyer
@@ -34,9 +38,12 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
   protected CommandContext commandContext;
 
   protected boolean isExclusiveCorrelation = false;
+
   protected String messageName;
   protected String businessKey;
   protected String processInstanceId;
+  protected String processDefinitionId;
+
   protected Map<String, Object> correlationProcessInstanceVariables;
   protected Map<String, Object> payloadProcessInstanceVariables;
 
@@ -57,6 +64,7 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
   }
 
   public MessageCorrelationBuilder processInstanceBusinessKey(String businessKey) {
+    ensureNotNull("businessKey", businessKey);
     this.businessKey = businessKey;
     return this;
   }
@@ -70,8 +78,24 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
     return this;
   }
 
+  public MessageCorrelationBuilder processInstanceVariablesEqual(Map<String, Object> variables) {
+    ensureNotNull("variables", variables);
+    if(correlationProcessInstanceVariables == null) {
+      correlationProcessInstanceVariables = new HashMap<String, Object>();
+    }
+    correlationProcessInstanceVariables.putAll(variables);
+    return this;
+  }
+
   public MessageCorrelationBuilder processInstanceId(String id) {
+    ensureNotNull("processInstanceId", id);
     this.processInstanceId = id;
+    return this;
+  }
+
+  public MessageCorrelationBuilder processDefinitionId(String processDefinitionId) {
+    ensureNotNull("processDefinitionId", processDefinitionId);
+    this.processDefinitionId = processDefinitionId;
     return this;
   }
 
@@ -97,26 +121,38 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
   }
 
   public void correlate() {
-    CorrelateMessageCmd command = new CorrelateMessageCmd(this);
-    if(commandExecutor != null) {
-      commandExecutor.execute(command);
-    } else {
-      command.execute(commandContext);
-    }
-  }
+    ensureProcessDefinitionIdNotSet();
 
+    execute(new CorrelateMessageCmd(this));
+  }
 
   public void correlateExclusively() {
     isExclusiveCorrelation = true;
+
     correlate();
   }
 
   public void correlateAll() {
-    CorrelateAllMessageCmd command = new CorrelateAllMessageCmd(this);
+    ensureProcessDefinitionIdNotSet();
+
+    execute(new CorrelateAllMessageCmd(this));
+  }
+
+  public ProcessInstance correlateStartMessage() {
+    return execute(new CorrelateStartMessageCmd(this));
+  }
+
+  protected void ensureProcessDefinitionIdNotSet() {
+    if(processDefinitionId != null) {
+      throw new ProcessEngineException("It is not supported to specify a process definition id except for correlate a message start event.");
+    }
+  }
+
+  protected <T> T execute(Command<T> command) {
     if(commandExecutor != null) {
-      commandExecutor.execute(command);
+      return commandExecutor.execute(command);
     } else {
-      command.execute(commandContext);
+      return command.execute(commandContext);
     }
   }
 
@@ -140,6 +176,10 @@ public class MessageCorrelationBuilderImpl implements MessageCorrelationBuilder 
 
   public String getProcessInstanceId() {
     return processInstanceId;
+  }
+
+  public String getProcessDefinitionId() {
+    return processDefinitionId;
   }
 
   public Map<String, Object> getCorrelationProcessInstanceVariables() {

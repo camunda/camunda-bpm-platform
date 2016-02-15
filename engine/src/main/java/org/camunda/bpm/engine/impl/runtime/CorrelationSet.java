@@ -19,12 +19,14 @@ public class CorrelationSet {
 
   protected final String businessKey;
   protected final Map<String, Object> correlationKeys;
-  protected String processInstanceId;
+  protected final String processInstanceId;
+  protected final String processDefinitionId;
 
-  public CorrelationSet(String businessKey, String processInstanceId, Map<String, Object> correlationKeys) {
+  public CorrelationSet(String businessKey, String processInstanceId, Map<String, Object> correlationKeys, String processDefinitionId) {
     this.businessKey = businessKey;
     this.processInstanceId = processInstanceId;
     this.correlationKeys = correlationKeys;
+    this.processDefinitionId = processDefinitionId;
   }
 
   public String getBusinessKey() {
@@ -37,5 +39,9 @@ public class CorrelationSet {
 
   public String getProcessInstanceId() {
     return processInstanceId;
+  }
+
+  public String getProcessDefinitionId() {
+    return processDefinitionId;
   }
 }
