@@ -34,13 +34,8 @@ public class MultiTenancyIncidentQueryTest extends PluggableProcessEngineTestCas
 
   @Override
   protected void setUp() {
-    deployment(repositoryService.createDeployment()
-        .tenantId(TENANT_ONE)
-        .addClasspathResource(BPMN));
-
-    deployment(repositoryService.createDeployment()
-        .tenantId(TENANT_TWO)
-        .addClasspathResource(BPMN));
+    deploymentForTenant(TENANT_ONE, BPMN);
+    deploymentForTenant(TENANT_TWO, BPMN);
 
     startProcessInstanceAndExecuteFailingJobForTenant(TENANT_ONE);
     startProcessInstanceAndExecuteFailingJobForTenant(TENANT_TWO);

@@ -197,7 +197,7 @@ public class CaseDefinitionEntity extends CmmnCaseDefinition implements CaseDefi
       previousCaseDefinitionId = Context
           .getCommandContext()
           .getCaseDefinitionManager()
-          .findPreviousCaseDefinitionIdByKeyAndVersion(key, version);
+          .findPreviousCaseDefinitionId(key, version, tenantId);
 
       if (previousCaseDefinitionId == null) {
         firstVersion = true;

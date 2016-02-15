@@ -33,14 +33,8 @@ public class MultiTenancyCaseDefinitionQueryTest extends PluggableProcessEngineT
 
   @Override
   protected void setUp() {
-    deployCaseDefinitionForTenant(TENANT_ONE);
-    deployCaseDefinitionForTenant(TENANT_TWO);
-  }
-
-  protected void deployCaseDefinitionForTenant(String tenantId) {
-    deployment(repositoryService.createDeployment()
-        .tenantId(tenantId)
-        .addClasspathResource(CMMN));
+    deploymentForTenant(TENANT_ONE, CMMN);
+    deploymentForTenant(TENANT_TWO, CMMN);
   }
 
   public void testQueryWithoutTenantId() {
@@ -89,7 +83,7 @@ public class MultiTenancyCaseDefinitionQueryTest extends PluggableProcessEngineT
 
   public void testQueryByLatestWithoutTenantId() {
     // deploy a second version for tenant one
-    deployCaseDefinitionForTenant(TENANT_ONE);
+    deploymentForTenant(TENANT_ONE, CMMN);
 
     CaseDefinitionQuery query = repositoryService
         .createCaseDefinitionQuery()
@@ -109,7 +103,7 @@ public class MultiTenancyCaseDefinitionQueryTest extends PluggableProcessEngineT
 
   public void testQueryByLatestWithTenantId() {
     // deploy a second version for tenant one
-    deployCaseDefinitionForTenant(TENANT_ONE);
+    deploymentForTenant(TENANT_ONE, CMMN);
 
     CaseDefinitionQuery query = repositoryService
         .createCaseDefinitionQuery()
@@ -138,7 +132,7 @@ public class MultiTenancyCaseDefinitionQueryTest extends PluggableProcessEngineT
 
   public void testQueryByLatestWithTenantIds() {
     // deploy a second version for tenant one
-    deployCaseDefinitionForTenant(TENANT_ONE);
+    deploymentForTenant(TENANT_ONE, CMMN);
 
     CaseDefinitionQuery query = repositoryService
         .createCaseDefinitionQuery()

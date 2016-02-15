@@ -96,11 +96,12 @@ public class CaseDefinitionManager extends AbstractManager {
     return (CaseDefinitionEntity) getDbEntityManager().selectOne("selectCaseDefinitionByDeploymentAndKey", parameters);
   }
 
-  public String findPreviousCaseDefinitionIdByKeyAndVersion(String caseDefinitionKey, Integer version) {
+  public String findPreviousCaseDefinitionId(String caseDefinitionKey, Integer version, String tenantId) {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("key", caseDefinitionKey);
     params.put("version", version);
-    return (String) getDbEntityManager().selectOne("selectPreviousCaseDefinitionIdByKeyAndVersion", params);
+    params.put("tenantId", tenantId);
+    return (String) getDbEntityManager().selectOne("selectPreviousCaseDefinitionId", params);
   }
 
   @SuppressWarnings("unchecked")

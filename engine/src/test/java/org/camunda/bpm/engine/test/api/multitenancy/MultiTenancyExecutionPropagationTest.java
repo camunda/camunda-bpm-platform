@@ -193,9 +193,11 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
 
   public void testPropagateTenantIdToStartMessageEventSubscription() {
 
-    deployment(repositoryService.createDeployment()
-        .tenantId(TENANT_ID)
-        .addClasspathResource("org/camunda/bpm/engine/test/api/multitenancy/messageStartEvent.bpmn"));
+    deploymentForTenant(TENANT_ID, Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
+        .startEvent()
+          .message("start")
+        .endEvent()
+        .done());
 
     // the event subscription of the message start is created on deployment
     EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
@@ -206,9 +208,11 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
 
   public void testPropagateTenantIdToStartSignalEventSubscription() {
 
-    deployment(repositoryService.createDeployment()
-        .tenantId(TENANT_ID)
-        .addClasspathResource("org/camunda/bpm/engine/test/api/multitenancy/signalStartEvent.bpmn"));
+    deploymentForTenant(TENANT_ID, Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
+      .startEvent()
+        .signal("start")
+      .endEvent()
+      .done());
 
     // the event subscription of the signal start event is created on deployment
     EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
@@ -219,9 +223,12 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
 
   public void testPropagateTenantIdToIntermediateMessageEventSubscription() {
 
-    deployment(repositoryService.createDeployment()
-        .tenantId(TENANT_ID)
-        .addClasspathResource("org/camunda/bpm/engine/test/api/multitenancy/intermediateMessageCatchEvent.bpmn"));
+    deploymentForTenant(TENANT_ID, Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
+      .startEvent()
+      .intermediateCatchEvent()
+        .message("start")
+      .endEvent()
+      .done());
 
     startProcessInstance(PROCESS_DEFINITION_KEY);
 
@@ -233,9 +240,12 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
 
   public void testPropagateTenantIdToIntermediateSignalEventSubscription() {
 
-    deployment(repositoryService.createDeployment()
-        .tenantId(TENANT_ID)
-        .addClasspathResource("org/camunda/bpm/engine/test/api/multitenancy/intermediateSignalCatchEvent.bpmn"));
+    deploymentForTenant(TENANT_ID, Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
+        .startEvent()
+        .intermediateCatchEvent()
+          .signal("start")
+        .endEvent()
+        .done());
 
     startProcessInstance(PROCESS_DEFINITION_KEY);
 
@@ -247,9 +257,7 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
 
   public void testPropagateTenantIdToCompensationEventSubscription() {
 
-    deployment(repositoryService.createDeployment()
-        .tenantId(TENANT_ID)
-        .addClasspathResource("org/camunda/bpm/engine/test/api/multitenancy/compensationBoundaryEvent.bpmn"));
+    deploymentForTenant(TENANT_ID, "org/camunda/bpm/engine/test/api/multitenancy/compensationBoundaryEvent.bpmn");
 
     startProcessInstance(PROCESS_DEFINITION_KEY);
 
@@ -262,9 +270,11 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
 
   public void testPropagateTenantIdToStartTimerJobDefinition() {
 
-    deployment(repositoryService.createDeployment()
-        .tenantId(TENANT_ID)
-        .addClasspathResource("org/camunda/bpm/engine/test/api/multitenancy/timerStartEvent.bpmn"));
+    deploymentForTenant(TENANT_ID, Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
+        .startEvent()
+          .timerWithDuration("PT1M")
+        .endEvent()
+        .done());
 
     // the job definition is created on deployment
     JobDefinition jobDefinition = managementService.createJobDefinitionQuery().singleResult();
@@ -275,9 +285,12 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
 
   public void testPropagateTenantIdToIntermediateTimerJob() {
 
-    deployment(repositoryService.createDeployment()
-        .tenantId(TENANT_ID)
-        .addClasspathResource("org/camunda/bpm/engine/test/api/multitenancy/intermediateTimerEvent.bpmn"));
+    deploymentForTenant(TENANT_ID, Bpmn.createExecutableProcess(PROCESS_DEFINITION_KEY)
+        .startEvent()
+        .intermediateCatchEvent()
+          .timerWithDuration("PT1M")
+        .endEvent()
+        .done());
 
     startProcessInstance(PROCESS_DEFINITION_KEY);
 
@@ -308,9 +321,7 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
 
   public void testPropagateTenantIdToFailedJobIncident() {
 
-    deployment(repositoryService.createDeployment()
-        .tenantId(TENANT_ID)
-        .addClasspathResource("org/camunda/bpm/engine/test/api/multitenancy/failingTask.bpmn"));
+    deploymentForTenant(TENANT_ID, "org/camunda/bpm/engine/test/api/multitenancy/failingTask.bpmn");
 
     startProcessInstance(PROCESS_DEFINITION_KEY);
     // execute the job of the async activity
@@ -329,9 +340,7 @@ public class MultiTenancyExecutionPropagationTest extends PluggableProcessEngine
 
   public void testPropagateTenantIdToFailedStartTimerIncident() {
 
-    deployment(repositoryService.createDeployment()
-        .tenantId(TENANT_ID)
-        .addClasspathResource("org/camunda/bpm/engine/test/api/multitenancy/timerStartEventWithfailingTask.bpmn"));
+    deploymentForTenant(TENANT_ID, "org/camunda/bpm/engine/test/api/multitenancy/timerStartEventWithfailingTask.bpmn");
 
     // execute the job of the timer start event
     Job job = managementService.createJobQuery().singleResult();

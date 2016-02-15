@@ -22,23 +22,25 @@ import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 public class MultiTenancyEventSubscriptionQueryTest extends PluggableProcessEngineTestCase {
 
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
 
-  protected static final String BPMN = "org/camunda/bpm/engine/test/api/multitenancy/messageStartEvent.bpmn";
-
   @Override
   protected void setUp() {
-    deployment(repositoryService.createDeployment()
-        .tenantId(TENANT_ONE)
-        .addClasspathResource(BPMN));
+    BpmnModelInstance process = Bpmn.createExecutableProcess("testProcess")
+      .startEvent()
+        .message("start")
+        .userTask()
+        .endEvent()
+        .done();
 
-    deployment(repositoryService.createDeployment()
-        .tenantId(TENANT_TWO)
-        .addClasspathResource(BPMN));
+    deploymentForTenant(TENANT_ONE, process);
+    deploymentForTenant(TENANT_TWO, process);
 
     // the deployed process definition contains a message start event
     // - so a message event subscription is created on deployment.

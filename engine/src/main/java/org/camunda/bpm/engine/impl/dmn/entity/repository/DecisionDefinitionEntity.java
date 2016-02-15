@@ -206,7 +206,7 @@ public class DecisionDefinitionEntity extends DmnDecisionTableImpl implements De
       previousDecisionDefinitionId = Context
           .getCommandContext()
           .getDecisionDefinitionManager()
-          .findPreviousDecisionDefinitionIdByKeyAndVersion(key, version);
+          .findPreviousDecisionDefinitionId(key, version, tenantId);
 
       if (previousDecisionDefinitionId == null) {
         firstVersion = true;

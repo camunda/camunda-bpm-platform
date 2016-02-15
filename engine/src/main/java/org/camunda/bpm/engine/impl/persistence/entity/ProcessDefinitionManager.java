@@ -129,11 +129,12 @@ public class ProcessDefinitionManager extends AbstractManager {
     return new ProcessDefinitionQueryImpl().startableByUser(user).list();
   }
 
-  public String findPreviousProcessDefinitionIdByKeyAndVersion(String processDefinitionKey, Integer version) {
+  public String findPreviousProcessDefinitionId(String processDefinitionKey, Integer version, String tenantId) {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("key", processDefinitionKey);
     params.put("version", version);
-    return (String) getDbEntityManager().selectOne("selectPreviousProcessDefinitionIdByKeyAndVersion", params);
+    params.put("tenantId", tenantId);
+    return (String) getDbEntityManager().selectOne("selectPreviousProcessDefinitionId", params);
   }
 
   @SuppressWarnings("unchecked")

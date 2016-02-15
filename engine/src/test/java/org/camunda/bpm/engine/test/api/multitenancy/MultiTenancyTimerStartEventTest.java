@@ -21,19 +21,24 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 public class MultiTenancyTimerStartEventTest extends PluggableProcessEngineTestCase {
 
-  protected static final String BPMN = "org/camunda/bpm/engine/test/api/multitenancy/timerStartEvent.bpmn";
+  protected static final BpmnModelInstance PROCESS = Bpmn.createExecutableProcess()
+      .startEvent()
+        .timerWithDuration("PT1M")
+      .userTask()
+      .endEvent()
+      .done();
 
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
 
   public void testStartProcessInstanceWithTenantId() {
 
-    deployment(repositoryService.createDeployment()
-         .tenantId(TENANT_ONE)
-         .addClasspathResource(BPMN));
+    deploymentForTenant(TENANT_ONE, PROCESS);
 
     Job job = managementService.createJobQuery().singleResult();
     assertThat(job.getTenantId(), is(TENANT_ONE));
@@ -47,13 +52,8 @@ public class MultiTenancyTimerStartEventTest extends PluggableProcessEngineTestC
 
   public void testStartProcessInstanceTwoTenants() {
 
-    deployment(repositoryService.createDeployment()
-       .tenantId(TENANT_ONE)
-       .addClasspathResource(BPMN));
-
-    deployment(repositoryService.createDeployment()
-        .tenantId(TENANT_TWO)
-        .addClasspathResource(BPMN));
+    deploymentForTenant(TENANT_ONE, PROCESS);
+    deploymentForTenant(TENANT_TWO, PROCESS);
 
     Job jobForTenantOne = managementService.createJobQuery().tenantIdIn(TENANT_ONE).singleResult();
     assertThat(jobForTenantOne, is(notNullValue()));
@@ -69,17 +69,8 @@ public class MultiTenancyTimerStartEventTest extends PluggableProcessEngineTestC
 
   public void testDeleteJobsWhileUndeployment() {
 
-     String deploymentForTenantOne = repositoryService.createDeployment()
-        .tenantId(TENANT_ONE)
-        .addClasspathResource(BPMN)
-        .deploy()
-        .getId();
-
-     String deploymentForTenantTwo = repositoryService.createDeployment()
-         .tenantId(TENANT_TWO)
-         .addClasspathResource(BPMN)
-         .deploy()
-         .getId();
+     String deploymentForTenantOne = deploymentForTenant(TENANT_ONE, PROCESS);
+     String deploymentForTenantTwo = deploymentForTenant(TENANT_TWO, PROCESS);
 
      JobQuery query = managementService.createJobQuery();
      assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
@@ -98,17 +89,9 @@ public class MultiTenancyTimerStartEventTest extends PluggableProcessEngineTestC
 
   public void testDontCreateNewJobsWhileReDeployment() {
 
-    deployment(repositoryService.createDeployment()
-        .tenantId(TENANT_ONE)
-        .addClasspathResource(BPMN));
-
-    deployment(repositoryService.createDeployment()
-        .tenantId(TENANT_TWO)
-        .addClasspathResource(BPMN));
-
-    deployment(repositoryService.createDeployment()
-        .tenantId(TENANT_ONE)
-        .addClasspathResource(BPMN));
+    deploymentForTenant(TENANT_ONE, PROCESS);
+    deploymentForTenant(TENANT_TWO, PROCESS);
+    deploymentForTenant(TENANT_ONE, PROCESS);
 
     JobQuery query = managementService.createJobQuery();
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));

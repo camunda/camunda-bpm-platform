@@ -33,14 +33,8 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
 
   @Override
   protected void setUp() {
-    deployDecisionDefinitionForTenant(TENANT_ONE);
-    deployDecisionDefinitionForTenant(TENANT_TWO);
-  }
-
-  protected void deployDecisionDefinitionForTenant(String tenantId) {
-    deployment(repositoryService.createDeployment()
-        .tenantId(tenantId)
-        .addClasspathResource(DMN));
+    deploymentForTenant(TENANT_ONE, DMN);
+    deploymentForTenant(TENANT_TWO, DMN);
   }
 
   public void testQueryWithoutTenantId() {
@@ -89,7 +83,7 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
 
   public void testQueryByLatestWithoutTenantId() {
     // deploy a second version for tenant one
-    deployDecisionDefinitionForTenant(TENANT_ONE);
+    deploymentForTenant(TENANT_ONE, DMN);
 
     DecisionDefinitionQuery query = repositoryService
         .createDecisionDefinitionQuery()
@@ -109,7 +103,7 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
 
   public void testQueryByLatestWithTenantId() {
     // deploy a second version for tenant one
-    deployDecisionDefinitionForTenant(TENANT_ONE);
+    deploymentForTenant(TENANT_ONE, DMN);
 
     DecisionDefinitionQuery query = repositoryService
         .createDecisionDefinitionQuery()
@@ -138,7 +132,7 @@ public class MultiTenancyDecisionDefinitionQueryTest extends PluggableProcessEng
 
   public void testQueryByLatestWithTenantIds() {
     // deploy a second version for tenant one
-    deployDecisionDefinitionForTenant(TENANT_ONE);
+    deploymentForTenant(TENANT_ONE, DMN);
 
     DecisionDefinitionQuery query = repositoryService
         .createDecisionDefinitionQuery()

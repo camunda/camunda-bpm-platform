@@ -120,11 +120,27 @@
       and VERSION_ = #{decisionDefinitionVersion}
   </select>
 
-  <select id="selectPreviousDecisionDefinitionIdByKeyAndVersion" parameterType="map" resultType="string">
+  <select id="selectPreviousDecisionDefinitionId" parameterType="map" resultType="string">
     select RES.ID_
       from ${prefix}ACT_RE_DECISION_DEF RES
      where RES.KEY_ = #{key}
-       and RES.VERSION_ = (select MAX(VERSION_) from ${prefix}ACT_RE_DECISION_DEF where KEY_ = #{key} AND VERSION_ &lt; #{version})
+       <if test="tenantId != null">
+          AND TENANT_ID_ = #{tenantId}
+        </if>
+        <if test="tenantId == null">
+          AND TENANT_ID_ is null
+        </if>
+       and RES.VERSION_ = (
+        select MAX(VERSION_) 
+        from ${prefix}ACT_RE_DECISION_DEF 
+        where KEY_ = #{key} 
+          <if test="tenantId != null">
+            AND TENANT_ID_ = #{tenantId}
+          </if>
+          <if test="tenantId == null">
+            AND TENANT_ID_ is null
+          </if>
+          AND VERSION_ &lt; #{version})
   </select>
 
   <select id="selectDecisionDefinitionsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionQueryImpl" resultMap="decisionDefinitionResultMap">

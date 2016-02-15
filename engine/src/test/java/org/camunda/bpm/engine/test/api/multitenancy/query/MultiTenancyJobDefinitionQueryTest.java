@@ -22,23 +22,25 @@ import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.JobDefinition;
 import org.camunda.bpm.engine.management.JobDefinitionQuery;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 
 public class MultiTenancyJobDefinitionQueryTest extends PluggableProcessEngineTestCase {
 
   protected static final String TENANT_ONE = "tenant1";
   protected static final String TENANT_TWO = "tenant2";
 
-  protected static final String BPMN = "org/camunda/bpm/engine/test/api/multitenancy/timerStartEvent.bpmn";
-
   @Override
   protected void setUp() {
-    deployment(repositoryService.createDeployment()
-        .tenantId(TENANT_ONE)
-        .addClasspathResource(BPMN));
+    BpmnModelInstance process = Bpmn.createExecutableProcess("testProcess")
+      .startEvent()
+        .timerWithDuration("PT1M")
+      .userTask()
+      .endEvent()
+      .done();
 
-    deployment(repositoryService.createDeployment()
-        .tenantId(TENANT_TWO)
-        .addClasspathResource(BPMN));
+    deploymentForTenant(TENANT_ONE, process);
+    deploymentForTenant(TENANT_TWO, process);
 
     // the deployed process definition contains a timer start event
     // - so a job definition is created on deployment.

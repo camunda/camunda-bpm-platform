@@ -31,10 +31,7 @@ public class MultiTenancyDelegateTaskTest extends PluggableProcessEngineTestCase
   protected static final String BPMN = "org/camunda/bpm/engine/test/api/multitenancy/taskListener.bpmn";
 
   public void testSingleExecutionWithUserTask() {
-
-    deployment(repositoryService.createDeployment()
-        .tenantId("tenant1")
-        .addClasspathResource(BPMN));
+    deploymentForTenant("tenant1", BPMN);
 
     AssertingTaskListener.addAsserts(hasTenantId("tenant1"));
 
