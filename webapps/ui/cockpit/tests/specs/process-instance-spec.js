@@ -276,6 +276,7 @@ describe('Cockpit Process Instance Spec', function() {
     it('should process clicks in diagram', function() {
 
       // given
+      instancePage.sidebarTabClick('Filter');
       instancePage.instanceTree.selectInstance('User Task 1');
       expect(instancePage.diagram.isActivitySelected('UserTask_1')).to.eventually.be.true;
 
@@ -309,6 +310,7 @@ describe('Cockpit Process Instance Spec', function() {
     it('should reflect the tree view selection in diagram', function() {
 
       // given
+      instancePage.sidebarTabClick('Filter');
       instancePage.instanceTree.selectInstance('User Task 1');
       expect(instancePage.diagram.isActivitySelected('UserTask_1')).to.eventually.be.true;
 

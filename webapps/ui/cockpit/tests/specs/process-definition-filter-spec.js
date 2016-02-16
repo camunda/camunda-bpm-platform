@@ -23,6 +23,7 @@ describe('Cockpit Process Definition Filter Spec', function() {
     it('should add new filter', function() {
 
       // when
+      definitionPage.sidebarTabClick('Filter');
       definitionPage.filter.addFilterByVariable('test = 1.5');
 
       // then
@@ -33,6 +34,7 @@ describe('Cockpit Process Definition Filter Spec', function() {
     it('should add second filter', function() {
 
       // when
+      definitionPage.sidebarTabClick('Filter');
       definitionPage.filter.addFilterByVariable('myString = \"abc dfg\"');
 
       // then
@@ -44,6 +46,7 @@ describe('Cockpit Process Definition Filter Spec', function() {
     it('should remove the first filter', function() {
 
       // when
+      definitionPage.sidebarTabClick('Filter');
       definitionPage.filter.removeVariableFilter(0);
 
       // then
@@ -57,6 +60,7 @@ describe('Cockpit Process Definition Filter Spec', function() {
       definitionPage.filter.removeVariableFilter(0);
 
       // when
+      definitionPage.sidebarTabClick('Filter');
       definitionPage.filter.addFilterByVariable('myString like \"123%\"');
 
       // then
@@ -80,6 +84,7 @@ describe('Cockpit Process Definition Filter Spec', function() {
     it('should add new filter', function() {
 
       // when
+      definitionPage.sidebarTabClick('Filter');
       definitionPage.filter.addFilterByBusinessKey('myBusinessKey')
 
       // then
@@ -91,6 +96,7 @@ describe('Cockpit Process Definition Filter Spec', function() {
     it('should remove the filter', function() {
 
       // when
+      definitionPage.sidebarTabClick('Filter');
       definitionPage.filter.removeBusinessKeyFilter();
 
       // then
@@ -101,12 +107,14 @@ describe('Cockpit Process Definition Filter Spec', function() {
     it('should combine variable filter and business key filter', function() {
 
       // when
+      definitionPage.sidebarTabClick('Filter');
       definitionPage.filter.addFilterByVariable('test>1.49');
 
       // then
       expect(definitionPage.processInstancesTab.table().count()).to.eventually.eql(2);
 
       // when
+      definitionPage.sidebarTabClick('Filter');
       definitionPage.filter.addFilterByBusinessKey('Instance1');
 
       // then
@@ -134,6 +142,7 @@ describe('Cockpit Process Definition Filter Spec', function() {
     it('should filter date', function() {
 
       // when
+      definitionPage.sidebarTabClick('Filter');
       definitionPage.filter.addFilterByVariable('myDate  =  2011-11-11T11:11:11');
 
       // then
@@ -145,6 +154,7 @@ describe('Cockpit Process Definition Filter Spec', function() {
     it('should filter long variable', function() {
 
       // when
+      definitionPage.sidebarTabClick('Filter');
       definitionPage.filter.addFilterByVariable('extraLong=1234567890987654321');
 
       // then
@@ -168,6 +178,7 @@ describe('Cockpit Process Definition Filter Spec', function() {
     it('should add date filter', function() {
 
       // when
+      definitionPage.sidebarTabClick('Filter');
       definitionPage.processInstancesTab.startTime(0).getText().then(function(startTime) {
         definitionPage.filter.addFilterByStartDate('after', startTime);
       });

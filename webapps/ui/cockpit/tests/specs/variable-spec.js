@@ -24,6 +24,7 @@ describe('Cockpit Variable Spec', function() {
     it('should select variable scope', function() {
 
       // given
+      instancePage.sidebarTabClick('Filter');
       expect(instancePage.instanceTree.instanceSelectionLabel().getText()).to.eventually.eql('Nothing');
 
       // when

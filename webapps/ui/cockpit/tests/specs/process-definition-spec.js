@@ -41,9 +41,11 @@ describe('Cockpit Process Definition Spec', function() {
 
 
     it('should display definition key', function() {
+      // when
+      definitionPage.sidebarTabClick('Information');
 
       // then
-      expect(definitionPage.filter.definitionKey()).to.eventually.contain('user-tasks');
+      expect(definitionPage.information.definitionKey()).to.eventually.contain('user-tasks');
     });
 
 
@@ -138,6 +140,7 @@ describe('Cockpit Process Definition Spec', function() {
     it('should process clicks in Filter table', function() {
 
       // when
+      definitionPage.sidebarTabClick('Filter');
       definitionPage.filter.removeSelectionButton('User Task 1').click();
 
       // then
