@@ -387,6 +387,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   public void testMessageStartEventCorrelation() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("aKey", "aValue");
+
     runtimeService.correlateMessage("newInvoiceMessage", new HashMap<String, Object>(), variables);
 
     long instances = runtimeService.createProcessInstanceQuery().processDefinitionKey("messageStartEvent")
@@ -396,6 +397,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMessageStartEventCorrelation.bpmn20.xml")
   public void testMessageStartEventCorrelationUsingFluentCorrelateStartMessage() {
+
     runtimeService.createMessageCorrelation("newInvoiceMessage")
       .setVariable("aKey", "aValue")
       .correlateStartMessage();
@@ -407,6 +409,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMessageStartEventCorrelation.bpmn20.xml")
   public void testMessageStartEventCorrelationUsingFluentCorrelateSingle() {
+
     runtimeService.createMessageCorrelation("newInvoiceMessage")
       .setVariable("aKey", "aValue")
       .correlate();
@@ -418,8 +421,6 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMessageStartEventCorrelation.bpmn20.xml")
   public void testMessageStartEventCorrelationUsingFluentCorrelateAll() {
-    Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("aKey", "aValue");
 
     runtimeService.createMessageCorrelation("newInvoiceMessage")
       .setVariable("aKey", "aValue")
@@ -434,40 +435,52 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMessageStartEventCorrelation.bpmn20.xml"})
-  public void testMessageStartEventCorrelationBusKey() {
+  public void testMessageStartEventCorrelationWithBusinessKey() {
     final String businessKey = "aBusinessKey";
 
     runtimeService.correlateMessage("newInvoiceMessage", businessKey);
 
-    // assert that the business key is set correctly
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
+    assertNotNull(processInstance);
     assertEquals(businessKey, processInstance.getBusinessKey());
+  }
 
-    runtimeService.deleteProcessInstance(processInstance.getId(), null);
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMessageStartEventCorrelation.bpmn20.xml"})
+  public void testMessageStartEventCorrelationWithBusinessKeyUsingFluentCorrelateStartMessage() {
+    final String businessKey = "aBusinessKey";
 
-    // fluent builder ////////////////
+    runtimeService.createMessageCorrelation("newInvoiceMessage")
+      .processInstanceBusinessKey(businessKey)
+      .correlateStartMessage();
+
+    ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
+    assertNotNull(processInstance);
+    assertEquals(businessKey, processInstance.getBusinessKey());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMessageStartEventCorrelation.bpmn20.xml"})
+  public void testMessageStartEventCorrelationWithBusinessKeyUsingFluentCorrelateSingle() {
+    final String businessKey = "aBusinessKey";
 
     runtimeService.createMessageCorrelation("newInvoiceMessage")
       .processInstanceBusinessKey(businessKey)
       .correlate();
 
-    // assert that the business key is set correctly
-    processInstance = runtimeService.createProcessInstanceQuery().singleResult();
+    ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
+    assertNotNull(processInstance);
     assertEquals(businessKey, processInstance.getBusinessKey());
-
-    runtimeService.deleteProcessInstance(processInstance.getId(), null);
   }
 
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMessageStartEventCorrelation.bpmn20.xml"})
-  public void testMessageStartEventCorrelationBusKeyUsingFluentCorrelateAll() {
+  public void testMessageStartEventCorrelationWithBusinessKeyUsingFluentCorrelateAll() {
     final String businessKey = "aBusinessKey";
 
     runtimeService.createMessageCorrelation("newInvoiceMessage")
       .processInstanceBusinessKey(businessKey)
       .correlateAll();
 
-    // assert that the business key is set correctly
     ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
+    assertNotNull(processInstance);
     assertEquals(businessKey, processInstance.getBusinessKey());
   }
 
@@ -571,12 +584,32 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
     assertNotNull(task);
     assertNull(taskService.createTaskQuery().taskDefinitionKey("task1").singleResult());
     taskService.complete(task.getId());
+  }
 
-    // fluent builder //////////////////////////
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMultipleMessageStartEventsCorrelation.bpmn20.xml"})
+  public void testMultipleMessageStartEventsCorrelationUsingFluentCorrelateStartMessage() {
+
+    runtimeService.createMessageCorrelation("someMessage").correlateStartMessage();
+    // verify the right start event was selected:
+    Task task = taskService.createTaskQuery().taskDefinitionKey("task1").singleResult();
+    assertNotNull(task);
+    assertNull(taskService.createTaskQuery().taskDefinitionKey("task2").singleResult());
+    taskService.complete(task.getId());
+
+    runtimeService.createMessageCorrelation("someOtherMessage").correlateStartMessage();
+    // verify the right start event was selected:
+    task = taskService.createTaskQuery().taskDefinitionKey("task2").singleResult();
+    assertNotNull(task);
+    assertNull(taskService.createTaskQuery().taskDefinitionKey("task1").singleResult());
+    taskService.complete(task.getId());
+  }
+
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMultipleMessageStartEventsCorrelation.bpmn20.xml"})
+  public void testMultipleMessageStartEventsCorrelationUsingFluentCorrelateSingle() {
 
     runtimeService.createMessageCorrelation("someMessage").correlate();
     // verify the right start event was selected:
-    task = taskService.createTaskQuery().taskDefinitionKey("task1").singleResult();
+    Task task = taskService.createTaskQuery().taskDefinitionKey("task1").singleResult();
     assertNotNull(task);
     assertNull(taskService.createTaskQuery().taskDefinitionKey("task2").singleResult());
     taskService.complete(task.getId());
@@ -594,6 +627,7 @@ public class MessageCorrelationTest extends PluggableProcessEngineTestCase {
    */
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.testMultipleMessageStartEventsCorrelation.bpmn20.xml"})
   public void testMultipleMessageStartEventsCorrelationUsingFluentCorrelateAll() {
+
     runtimeService.createMessageCorrelation("someMessage").correlateAll();
     // verify the right start event was selected:
     Task task = taskService.createTaskQuery().taskDefinitionKey("task1").singleResult();
