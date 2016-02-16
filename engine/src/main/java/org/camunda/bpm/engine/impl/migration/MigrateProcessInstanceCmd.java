@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.migration.instance.MigratingActivityInstance;
@@ -69,18 +68,19 @@ public class MigrateProcessInstanceCmd implements Command<Void> {
   }
 
   public Void execute(CommandContext commandContext) {
+    ProcessDefinitionEntity targetProcessDefinition = commandContext.getProcessEngineConfiguration()
+      .getDeploymentCache().findDeployedProcessDefinitionById(migrationPlan.getTargetProcessDefinitionId());
+
     for (String processInstanceId : processInstanceIds) {
-      migrateProcessInstance(commandContext, processInstanceId);
+      migrateProcessInstance(commandContext, processInstanceId, targetProcessDefinition);
     }
+
     return null;
   }
 
-  public Void migrateProcessInstance(CommandContext commandContext, String processInstanceId) {
+  public Void migrateProcessInstance(CommandContext commandContext, String processInstanceId, ProcessDefinitionEntity targetProcessDefinition) {
 
     ExecutionEntity processInstance = commandContext.getExecutionManager().findExecutionById(processInstanceId);
-
-    ProcessDefinitionEntity targetProcessDefinition = Context.getProcessEngineConfiguration()
-        .getDeploymentCache().findDeployedProcessDefinitionById(migrationPlan.getTargetProcessDefinitionId());
 
     // Initialize migration: match migration instructions to activity instances and collect required entities
     MigratingProcessInstance migratingProcessInstance = MigratingProcessInstance.initializeFrom(
